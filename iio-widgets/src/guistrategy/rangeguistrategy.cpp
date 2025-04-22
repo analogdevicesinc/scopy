@@ -64,6 +64,8 @@ bool RangeAttrUi::isValid()
 
 void RangeAttrUi::setCustomTitle(QString title) { m_spinBox->setName(title); }
 
+void RangeAttrUi::setToolTip(QString toolTip) { m_spinBox->setToolTip(toolTip); }
+
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
 	QSignalBlocker blocker(m_spinBox);

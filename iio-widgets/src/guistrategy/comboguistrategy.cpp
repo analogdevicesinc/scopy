@@ -36,13 +36,14 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_ui->setLayout(new QHBoxLayout(m_ui));
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-		m_title = new QLabel(recipe.data, m_ui);
+		m_toolTipTitle = new ToolTipTitle(recipe.data, "", m_ui);
+
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
 		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-		m_ui->layout()->addWidget(m_title);
+		m_ui->layout()->addWidget(m_toolTipTitle);
 		m_ui->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 		m_ui->layout()->addWidget(m_comboWidget);
 	} else {
@@ -80,9 +81,18 @@ bool ComboAttrUi::isValid()
 void ComboAttrUi::setCustomTitle(QString title)
 {
 	if(m_isCompact) {
-		m_title->setText(title);
+		m_toolTipTitle->setTitle(title);
 	} else {
 		m_comboMenuWidget->setTitle(title);
+	}
+}
+
+void ComboAttrUi::setToolTip(QString toolTip)
+{
+	if(m_isCompact) {
+		m_toolTipTitle->setToolTip(toolTip);
+	} else {
+		m_comboMenuWidget->setToolTip(toolTip);
 	}
 }
 

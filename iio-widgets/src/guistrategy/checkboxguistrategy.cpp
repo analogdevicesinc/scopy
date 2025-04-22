@@ -37,12 +37,10 @@ CheckBoxAttrUi::CheckBoxAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QW
 	m_menuOnOffSwitch = new MenuOnOffSwitch("", m_ui);
 
 	if(!m_isCompact) {
-		m_title = new QLabel(recipe.data, m_ui);
-		m_title->setWordWrap(true);
-		m_title->setFixedWidth(m_menuOnOffSwitch->width());
-		Style::setStyle(m_title, style::properties::label::subtle);
+		m_toolTipTitle = new ToolTipTitle(recipe.data, "", m_ui);
+		m_toolTipTitle->setFixedWidth(m_menuOnOffSwitch->width());
 		m_ui->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-		m_ui->layout()->addWidget(m_title);
+		m_ui->layout()->addWidget(m_toolTipTitle);
 	}
 	m_ui->layout()->addWidget(m_menuOnOffSwitch);
 
@@ -68,7 +66,14 @@ bool CheckBoxAttrUi::isValid()
 void CheckBoxAttrUi::setCustomTitle(QString title)
 {
 	if(!m_isCompact) {
-		m_title->setText(title);
+		m_toolTipTitle->setTitle(title);
+	}
+}
+
+void CheckBoxAttrUi::setToolTip(QString toolTip)
+{
+	if(!m_isCompact) {
+		m_toolTipTitle->setToolTip(toolTip);
 	}
 }
 

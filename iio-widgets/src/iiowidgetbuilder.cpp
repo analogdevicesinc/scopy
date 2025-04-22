@@ -239,6 +239,7 @@ void IIOWidgetBuilder::clear()
 	m_uiStrategy = UIS::NoUIStrategy;
 	m_widgetParent = nullptr;
 	m_title = "";
+	m_toolTip = "";
 }
 
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
@@ -322,6 +323,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::parent(QWidget *parent)
 IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
 {
 	m_title = title;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::toolTip(QString toolTip)
+{
+	m_toolTip = toolTip;
 	return *this;
 }
 
@@ -441,6 +448,10 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	if(!m_title.isEmpty() && ui != nullptr) {
 		ui->setCustomTitle(m_title);
+	}
+
+	if(!m_toolTip.isEmpty() && ui != nullptr) {
+		ui->setToolTip(m_toolTip);
 	}
 
 	return ui;

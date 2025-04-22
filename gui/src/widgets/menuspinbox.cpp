@@ -31,8 +31,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	: QWidget(parent)
 {
 	m_large_widget = large_widget;
-	m_label = new QLabel(name, parent);
-	Style::setStyle(m_label, style::properties::label::subtle);
+	m_toolTipTitle = new ToolTipTitle(name, "", parent);
 
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
@@ -110,7 +109,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	btnLay->addWidget(m_plus);
 	btnLay->addWidget(m_minus);
 
-	editLay->addWidget(m_label);
+	editLay->addWidget(m_toolTipTitle);
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
@@ -169,7 +168,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	btnLay->addWidget(m_minus);
 	btnLay->addWidget(m_plus);
 
-	editLay->addWidget(m_label);
+	editLay->addWidget(m_toolTipTitle);
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
@@ -182,8 +181,6 @@ void MenuSpinbox::layoutHorizontally(bool left)
 		lay->addLayout(editLay);
 		lay->addLayout(btnLay);
 	}
-
-	Style::setStyle(m_label, style::properties::label::subtle);
 
 	int size = Style::getDimension(json::global::unit_2_5);
 	m_plus->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
@@ -367,14 +364,18 @@ double MenuSpinbox::clamp(double val, double min, double max)
 
 QString MenuSpinbox::name() const { return m_name; }
 
+QString MenuSpinbox::toolTip() const { return m_toolTipTitle->getToolTip(); }
+
 void MenuSpinbox::setName(const QString &newName)
 {
 	if(m_name == newName)
 		return;
 	m_name = newName;
-	m_label->setText(m_name);
+	m_toolTipTitle->setTitle(m_name);
 	Q_EMIT nameChanged(newName);
 }
+
+void MenuSpinbox::setToolTip(const QString &newToolTip) { m_toolTipTitle->setToolTip(newToolTip); }
 
 double MenuSpinbox::getScaleForPrefix(QString prefix, Qt::CaseSensitivity s)
 {

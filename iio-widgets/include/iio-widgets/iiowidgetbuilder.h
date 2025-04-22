@@ -178,6 +178,12 @@ public:
 	 */
 	IIOWidgetBuilder &title(QString title);
 
+	/**
+	 * @brief Sets a custom toolTip for the IIOWidget
+	 * @param toolTip
+	 */
+	IIOWidgetBuilder &toolTip(QString toolTip);
+
 private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
@@ -193,6 +199,7 @@ private:
 	QString m_optionsAttribute;
 	QString m_optionsValues;
 	QString m_title;
+	QString m_toolTip;
 	IIOWidgetBuilder::DS m_dataStrategy;
 	IIOWidgetBuilder::UIS m_uiStrategy;
 	QWidget *m_widgetParent;

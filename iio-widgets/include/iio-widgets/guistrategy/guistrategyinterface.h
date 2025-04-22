@@ -50,7 +50,16 @@ public:
 	 * */
 	virtual bool isValid() = 0;
 
+	/**
+	 * @brief Allows user to set custom title
+	 * */
 	virtual void setCustomTitle(QString title) = 0;
+
+	/**
+	 * @brief Allows user to set the toolTip that will show when the "i" icon is hovered
+	 * @param toolTip A QString representing the text of the toolTip
+	 * */
+	virtual void setToolTip(QString toolTip) = 0;
 
 public Q_SLOTS:
 	/**

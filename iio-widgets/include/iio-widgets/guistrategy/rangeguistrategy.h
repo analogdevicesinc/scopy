@@ -52,6 +52,8 @@ public:
 
 	void setCustomTitle(QString title) override;
 
+	void setToolTip(QString toolTip) override;
+
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 

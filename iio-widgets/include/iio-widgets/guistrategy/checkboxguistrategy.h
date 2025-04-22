@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <iio.h>
+#include <tooltiptitle.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
@@ -49,6 +50,8 @@ public:
 
 	void setCustomTitle(QString title) override;
 
+	void setToolTip(QString toolTip);
+
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
@@ -61,7 +64,7 @@ private:
 	QWidget *m_ui;
 	MenuOnOffSwitch *m_menuOnOffSwitch;
 	bool m_isCompact;
-	QLabel *m_title;
+	ToolTipTitle *m_toolTipTitle;
 };
 } // namespace scopy
 

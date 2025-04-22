@@ -60,12 +60,11 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 	lay->setSpacing(0);
 	lay->setMargin(0);
 
-	m_label = new QLabel(title, this);
-	Style::setStyle(m_label, style::properties::label::subtle);
+	m_toolTipTitle = new ToolTipTitle(title, "", this);
 
 	m_combo = new QComboBox(this);
 
-	lay->addWidget(m_label);
+	lay->addWidget(m_toolTipTitle);
 	lay->addWidget(m_combo);
 	m_mouseWheelGuard->installEventRecursively(this);
 }
@@ -73,8 +72,10 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 MenuCombo::~MenuCombo() {}
 QComboBox *MenuCombo::combo() { return m_combo; }
 
-QString MenuCombo::title() const { return m_label->text(); }
+QString MenuCombo::title() const { return m_toolTipTitle->getTitle(); }
 
-void MenuCombo::setTitle(const QString &newTitle) { m_label->setText(newTitle); }
+void MenuCombo::setTitle(const QString &newTitle) { m_toolTipTitle->setTitle(newTitle); }
+
+void MenuCombo::setToolTip(QString toolTip) { m_toolTipTitle->setToolTip(toolTip); }
 
 #include "moc_menucombo.cpp"

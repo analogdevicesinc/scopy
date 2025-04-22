@@ -22,6 +22,8 @@
 #ifndef MENUCOMBO_H
 #define MENUCOMBO_H
 
+#include "tooltiptitle.h"
+
 #include <QComboBox>
 #include <QLabel>
 #include <QPen>
@@ -45,9 +47,10 @@ public:
 
 	QString title() const;
 	void setTitle(const QString &newTitle);
+	void setToolTip(QString toolTip);
 
 private:
-	QLabel *m_label;
+	ToolTipTitle *m_toolTipTitle;
 	QComboBox *m_combo;
 	MouseWheelWidgetGuard *m_mouseWheelGuard;
 };

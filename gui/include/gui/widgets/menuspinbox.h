@@ -25,6 +25,7 @@
 #include "plot_utils.hpp"
 #include "utils.h"
 #include "mousewheelwidgetguard.h"
+#include "tooltiptitle.h"
 #include <cmath>
 #include <scopy-gui_export.h>
 #include <QWidget>
@@ -156,11 +157,13 @@ public:
 	QString unit() const;
 	IncrementStrategy *incrementStrategy() const;
 	QString name() const;
+	QString toolTip() const;
 
 	void setScaleRange(double min, double max);
 
 public Q_SLOTS:
 	void setName(const QString &newName);
+	void setToolTip(const QString &newToolTip);
 	void setUnit(const QString &newUnit);
 	void setMinValue(double);
 	void setMaxValue(double);
@@ -185,7 +188,7 @@ private:
 	void layoutHorizontally(bool left);
 	double clamp(double val, double min, double max);
 
-	QLabel *m_label;
+	ToolTipTitle *m_toolTipTitle;
 	QLineEdit *m_edit;
 	QComboBox *m_scaleCb;
 	QPushButton *m_plus;

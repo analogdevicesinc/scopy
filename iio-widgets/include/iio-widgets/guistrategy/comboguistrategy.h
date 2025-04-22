@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <iio.h>
+#include <tooltiptitle.h>
 #include <gui/widgets/menucombo.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
@@ -49,6 +50,8 @@ public:
 
 	void setCustomTitle(QString title) override;
 
+	void setToolTip(QString toolTip) override;
+
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
@@ -61,7 +64,7 @@ private:
 	QWidget *m_ui;
 	QComboBox *m_comboWidget;
 	bool m_isCompact;
-	QLabel *m_title;
+	ToolTipTitle *m_toolTipTitle;
 	MenuCombo *m_comboMenuWidget;
 };
 } // namespace scopy
