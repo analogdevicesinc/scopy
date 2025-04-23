@@ -30,7 +30,8 @@ if(NOT EXISTS ${"${PDK_DEPS_LIB}"})
 	message(FATAL_ERROR "The path=" \"${"${PDK_DEPS_LIB}"}\" " to the libraries doesn't exist!")
 endif()
 
-set(PLUGIN_INSTALL_PATH ${"${CMAKE_CURRENT_BINARY_DIR}"}/plugin/${plugin_dir}/libscopy-${plugin_name}.so)
+set(PLUGIN_INSTALL_PATH ${"${CMAKE_CURRENT_BINARY_DIR}"}/plugin/${plugin_dir}/plugins/libscopy-${plugin_name}.so)
+set(PLUGIN_BUILD_PATH ${"${CMAKE_CURRENT_BINARY_DIR}"}/plugin/${plugin_dir})
 set(PATH_TO_INI ${preferences_path})
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
@@ -44,6 +45,14 @@ configure_file(include/pdk-util_config.h.cmakein ${"${CMAKE_CURRENT_SOURCE_DIR}"
 set(PROJECT_SOURCES ${"${SRC_LIST}"} ${"${HEADER_LIST}"} ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/pdk-util_config.h)
 find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
 find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
+
+if(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Windows")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${"${PLUGIN_BUILD_PATH}"}/plugins)
+elseif(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Darwin")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${"${CMAKE_BINARY_DIR}"}/Scopy.app/Contents/MacOS/${plugin_dir}/plugins)
+else()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${"${PLUGIN_BUILD_PATH}"}/plugins)
+endif()
 
 add_subdirectory(plugin/${plugin_dir})
 

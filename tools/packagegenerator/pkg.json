@@ -1,0 +1,8 @@
+{
+    "id": "newpackage",
+    "title": "New package",
+    "description": "A new package",
+    "author": "Analog Devices Inc.",
+    "license": "LGPL",
+    "category": ["iio", "plugin"]
+}

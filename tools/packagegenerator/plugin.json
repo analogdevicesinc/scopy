@@ -1,0 +1,47 @@
+{
+    "baseplugin": false,
+    "plugin_name": "newplugin",
+    "plugin_display_name": "New Plugin",
+    "plugin_description": "A new plugin",
+    "class_name": "NEWPlugin",
+    "namespace": "scopy::newplugin",
+    "device_category": "iio",
+    "tools": [
+        {
+            "id": "newtool1",
+            "tool_name": "Tool1",
+            "file_name": "tool1",
+            "class_name": "Tool1",
+            "namespace": "scopy::newplugin"
+        },
+        {
+            "id": "newtool2",
+            "tool_name": "Tool2",
+            "file_name": "tool2",
+            "class_name": "Tool2",
+            "namespace": "scopy::newplugin"
+        }
+    ],
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "style": {
+        "qss": true,
+        "json": false
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true,
+    "pdk": {
+        "deps_path": "",
+        "project_path": ""
+    }
+}

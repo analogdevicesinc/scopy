@@ -57,6 +57,17 @@ generate_export_header(
     ${"${PROJECT_NAME}"} EXPORT_FILE_NAME ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"}/${"${PROJECT_NAME}"}_export.h 
 )
 
+%if not pdk_en and (style_qss or style_json):  
+message("Generate plugin style:")
+include(ScopyStyle)
+%if style_qss:
+file(MAKE_DIRECTORY ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${PACKAGE_NAME}"}/style/qss)
+%else:
+file(MAKE_DIRECTORY ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${PACKAGE_NAME}"}/style/json)
+%endif
+generate_style("--plugin" ${"${CMAKE_CURRENT_SOURCE_DIR}"}/style  ${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"} ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${PACKAGE_NAME}"})
+%endif
+
 configure_file(
 	include/${"${SCOPY_MODULE}"}/scopy-${"${SCOPY_MODULE}"}_config.h.cmakein
 	${"${CMAKE_CURRENT_SOURCE_DIR}"}/include/${"${SCOPY_MODULE}"}/scopy-${"${SCOPY_MODULE}"}_config.h @ONLY
@@ -76,6 +87,7 @@ target_link_libraries(${"${PROJECT_NAME}"} PUBLIC Qt::Widgets Qt::Core)
 link_libs(${"${PDK_DEPS_LIB}"})
 
 % else:
+target_include_directories(${"${PROJECT_NAME}"} PUBLIC ${"${CURRENT_PKG_PATH}"}/include)
 target_include_directories(${"${PROJECT_NAME}"} PUBLIC scopy-pluginbase scopy-gui) 
 
 target_link_libraries( 
@@ -94,4 +106,4 @@ if(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Windows")
 	configureinstallersettings(${"${SCOPY_MODULE}"} ${"${PLUGIN_DESCRIPTION}"} FALSE)
 endif()
 
-set(${scopy_module}_TARGET_NAME ${"${PROJECT_NAME}"} PARENT_SCOPE)
+set(${scopy_module.upper()}_TARGET_NAME ${"${PROJECT_NAME}"} PARENT_SCOPE)
