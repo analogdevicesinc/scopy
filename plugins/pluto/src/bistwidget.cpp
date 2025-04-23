@@ -24,29 +24,36 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	QHBoxLayout *hLayout1 = new QHBoxLayout();
 
 	// bist_tone
-	m_bistTone = IIOWidgetBuilder(this).device(m_device).attribute("bist_tone").buildSingle();
+	m_bistTone = IIOWidgetBuilder(this).device(m_device).attribute("bist_tone").title("Bist TONE").buildSingle();
 	hLayout1->addWidget(m_bistTone);
 
 	// bist_prbs
-	IIOWidget *bistPrbs = IIOWidgetBuilder(this).device(m_device).attribute("bist_prbs").buildSingle();
+	IIOWidget *bistPrbs =
+		IIOWidgetBuilder(this).device(m_device).attribute("bist_prbs").title("Bist PRBS").buildSingle();
 	hLayout1->addWidget(bistPrbs);
 
 	// loopback
-	IIOWidget *loopback = IIOWidgetBuilder(this).device(m_device).attribute("loopback").buildSingle();
+	IIOWidget *loopback =
+		IIOWidgetBuilder(this).device(m_device).attribute("loopback").title("LoopBack").buildSingle();
 	hLayout1->addWidget(loopback);
 
 	m_layout->addLayout(hLayout1);
 
 	// tone_level
-	m_toneLevel = IIOWidgetBuilder(this).device(m_device).attribute("tone_level").buildSingle();
+	m_toneLevel = IIOWidgetBuilder(this).device(m_device).attribute("tone_level").title("Level").buildSingle();
 	m_layout->addWidget(m_toneLevel);
 
 	// bist_tone_frequency
-	m_toneFrequency = IIOWidgetBuilder(this).device(m_device).attribute("bist_tone_frequency").buildSingle();
+	m_toneFrequency = IIOWidgetBuilder(this)
+				  .device(m_device)
+				  .attribute("bist_tone_frequency")
+				  .title("Frequency")
+				  .buildSingle();
 	m_layout->addWidget(m_toneFrequency);
 
-	QHBoxLayout *hLayout2 = new QHBoxLayout();
+	m_layout->addWidget(new QLabel("Channel Mask", this));
 
+	QHBoxLayout *hLayout2 = new QHBoxLayout();
 	// C2-Q
 	m_c2q = new MenuOnOffSwitch("C2-Q", this, false);
 	hLayout2->addWidget(m_c2q);

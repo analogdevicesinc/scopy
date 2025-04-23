@@ -23,6 +23,7 @@
 #define AD963XADVANCED_H
 
 #include <QBoxLayout>
+#include <QPushButton>
 #include <QWidget>
 #include <tooltemplate.h>
 
@@ -41,6 +42,7 @@ private:
 	QString m_uri;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
+	QPushButton *m_refreshButton;
 };
 } // namespace pluto
 } // namespace scopy
