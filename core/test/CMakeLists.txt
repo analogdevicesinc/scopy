@@ -27,7 +27,7 @@ setup_scopy_tests(pluginmanager pluginrepository)
 # test_translationsrepository
 if(ENABLE_TRANSLATION)
 	set(TEST_GENERATETRANSLATIONS ${PROJECT_NAME}_test_generatetranslations)
-	generate_translations()
+	generate_translations(${CMAKE_BINARY_DIR}/translations)
 	qt_add_resources(TEST_TRANSLATIONS_REPOSITORY "${CMAKE_CURRENT_BINARY_DIR}/translations.qrc")
 
 	if(ANDROID)
