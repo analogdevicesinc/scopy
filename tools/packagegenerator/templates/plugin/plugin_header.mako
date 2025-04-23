@@ -4,9 +4,8 @@
 
 #define SCOPY_PLUGIN_NAME ${config['class_name']}
 
-% if "plugin_name" in config:
-#include "scopy-${config["plugin_name"]}_export.h"
-% endif
+
+#include "scopy-${plugin_name}_export.h"
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
