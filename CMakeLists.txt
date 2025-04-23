@@ -95,7 +95,7 @@ option(ENABLE_TRANSLATION "Enable translation" ON)
 include(ScopyTranslation)
 
 if(ENABLE_TRANSLATION)
-	generate_translations()
+	generate_translations(${CMAKE_BINARY_DIR}/translations)
 	qt_add_resources(SCOPY_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
 endif()
 
