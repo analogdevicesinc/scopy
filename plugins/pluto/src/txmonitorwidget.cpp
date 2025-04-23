@@ -31,13 +31,19 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 	gLayout1->addWidget(new QLabel("LO Common Mode", this), 2, 0);
 
 	// adi,txmon-1-front-end-gain
-	IIOWidget *tx1FrontendGain =
-		IIOWidgetBuilder(this).device(m_device).attribute("adi,txmon-1-front-end-gain").buildSingle();
+	IIOWidget *tx1FrontendGain = IIOWidgetBuilder(this)
+					     .device(m_device)
+					     .attribute("adi,txmon-1-front-end-gain")
+					     .title(" ")
+					     .buildSingle();
 	gLayout1->addWidget(tx1FrontendGain, 1, 1);
 
 	// adi,txmon-2-front-end-gain
-	IIOWidget *tx2FrontendGain =
-		IIOWidgetBuilder(this).device(m_device).attribute("adi,txmon-2-front-end-gain").buildSingle();
+	IIOWidget *tx2FrontendGain = IIOWidgetBuilder(this)
+					     .device(m_device)
+					     .attribute("adi,txmon-2-front-end-gain")
+					     .title(" ")
+					     .buildSingle();
 	gLayout1->addWidget(tx2FrontendGain, 1, 2);
 
 	// adi,txmon-1-lo-cm
@@ -46,6 +52,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					     .device(m_device)
 					     .attribute("adi,txmon-1-lo-cm")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
+					     .title(" ")
 					     .buildSingle();
 	gLayout1->addWidget(tx1LoCommonMode, 2, 1);
 
@@ -55,6 +62,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					     .device(m_device)
 					     .attribute("adi,txmon-2-lo-cm")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
+					     .title(" ")
 					     .buildSingle();
 	gLayout1->addWidget(tx2LoCommonMode, 2, 2);
 
@@ -66,6 +74,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					  .device(m_device)
 					  .attribute("adi,txmon-low-high-thresh")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
+					  .title("Low/ High Gain Threshold (mdB)")
 					  .buildSingle();
 	m_layout->addWidget(lowHighTresh);
 
@@ -75,6 +84,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				     .device(m_device)
 				     .attribute("adi,txmon-low-gain")
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
+				     .title("Low Gain (dB)")
 				     .buildSingle();
 	m_layout->addWidget(lowGain);
 
@@ -84,6 +94,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				      .device(m_device)
 				      .attribute("adi,txmon-high-gain")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
+				      .title("High Gain (dB)")
 				      .buildSingle();
 	m_layout->addWidget(highGain);
 
@@ -93,6 +104,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				   .device(m_device)
 				   .attribute("adi,txmon-delay")
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
+				   .title("Delay (RX samples) ")
 				   .buildSingle();
 	m_layout->addWidget(delay);
 
@@ -102,18 +114,27 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				      .device(m_device)
 				      .attribute("adi,txmon-duration")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
+				      .title("Duration (RX samples)")
 				      .buildSingle();
 	m_layout->addWidget(duration);
 
 	// adi,txmon-dc-tracking-enable
 
-	IIOWidget *dcTrackingEnabled =
-		IIOWidgetBuilder(this).device(m_device).attribute("adi,txmon-dc-tracking-enable").buildSingle();
+	IIOWidget *dcTrackingEnabled = IIOWidgetBuilder(this)
+					       .device(m_device)
+					       .attribute("adi,txmon-dc-tracking-enable")
+					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					       .title("DC Tracking")
+					       .buildSingle();
 	m_layout->addWidget(dcTrackingEnabled);
 
 	// adi,txmon-one-shot-mode-enable
-	IIOWidget *oneShotModeEnabled =
-		IIOWidgetBuilder(this).device(m_device).attribute("adi,txmon-one-shot-mode-enable").buildSingle();
+	IIOWidget *oneShotModeEnabled = IIOWidgetBuilder(this)
+						.device(m_device)
+						.attribute("adi,txmon-one-shot-mode-enable")
+						.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+						.title("One Shot Mode")
+						.buildSingle();
 	m_layout->addWidget(oneShotModeEnabled);
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));

@@ -25,6 +25,8 @@
 #include <QWidget>
 #include <QBoxLayout>
 #include <iio.h>
+#include <menuonoffswitch.h>
+#include <iiowidgetbuilder.h>
 
 namespace scopy {
 namespace pluto {
@@ -49,6 +51,12 @@ private:
 	QWidget *controlsOutWidget(QWidget *parent);
 	QWidget *gposWidget(QWidget *parent);
 	QWidget *gpoWidget(QString gpox, QWidget *parent);
+
+	MenuOnOffSwitch *m_gpo0Mask;
+	MenuOnOffSwitch *m_gpo1Mask;
+	MenuOnOffSwitch *m_gpo2Mask;
+	MenuOnOffSwitch *m_gpo3Mask;
+	void applyGpoMask();
 };
 } // namespace pluto
 } // namespace scopy
