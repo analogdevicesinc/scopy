@@ -30,6 +30,7 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 					  .device(m_device)
 					  .attribute("rssi-duration")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
+					  .title("Duration (us)")
 					  .buildSingle();
 	m_layout->addWidget(rssiDuration);
 
@@ -38,6 +39,7 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 				       .device(m_device)
 				       .attribute("rssi-delay")
 				       .uiStrategy(IIOWidgetBuilder::RangeUi)
+				       .title("Delay (us)")
 				       .buildSingle();
 	m_layout->addWidget(rssiDelay);
 
@@ -46,6 +48,7 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 				      .device(m_device)
 				      .attribute("rssi-wait")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
+				      .title("Wait (us)")
 				      .buildSingle();
 	m_layout->addWidget(rssiWait);
 
@@ -53,6 +56,7 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 	IIOWidget *rssiRestartMode = IIOWidgetBuilder(this)
 					     .device(m_device)
 					     .attribute("adi,rssi-restart-mode")
+					     .title("Restart Mode")
 					     // TODO FIND WHERE THE DROPDOWN SHOULD GET VALUES
 					     // .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .buildSingle();

@@ -44,12 +44,15 @@ private:
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_controlsWidget;
 	QWidget *m_blockDiagramWidget;
+	QPushButton *m_refreshButton;
 
 	QWidget *generateGlobalSettingsWidget(QWidget *parent);
 
-	QWidget *generateRxWidget(QWidget *parent);
+	QWidget *generateRxChainWidget(QWidget *parent);
+	QWidget *generateRxWidget(iio_channel *chn, QWidget *parent);
 
-	QWidget *generateTxWidget(QWidget *parent);
+	QWidget *generateTxChainWidget(QWidget *parent);
+	QWidget *generateTxWidget(iio_device *chn, QWidget *parent);
 };
 } // namespace pluto
 } // namespace scopy
