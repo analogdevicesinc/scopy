@@ -49,6 +49,12 @@ private:
 	QWidget *lmtOverloadWidget(QWidget *parent);
 	QWidget *digitalGainWidget(QWidget *parent);
 	QWidget *fastAttackAGCWidget(QWidget *parent);
+	QWidget *stateResponseToPeakOverload(QWidget *parent);
+	QWidget *lowPowerCheck(QWidget *parent);
+	QWidget *agcLockLevelAdjustment(QWidget *parent);
+	QWidget *peakDetectors(QWidget *parent);
+	QWidget *gainUnlock(QWidget *parent);
+	QWidget *miscWidget(QWidget *parent);
 };
 } // namespace pluto
 } // namespace scopy

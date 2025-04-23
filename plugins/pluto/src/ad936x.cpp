@@ -54,13 +54,15 @@ AD936X::AD936X(QString uri, QWidget *parent)
 		// });
 	});
 
+	m_refreshButton = new QPushButton("Refresh", this);
+	Style::setStyle(m_refreshButton, style::properties::button::basicButton);
+	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
+
 	QStackedWidget *centralWidget = new QStackedWidget(this);
 
 	m_controlsWidget = new QWidget(this);
 	QVBoxLayout *controlsLayout = new QVBoxLayout(m_controlsWidget);
 	m_controlsWidget->setLayout(controlsLayout);
-
-	/// this tab will have 4 main wigets each of them in a separate class ??
 
 	QWidget *controlsWidget = new QWidget(this);
 	QVBoxLayout *controlWidgetLayout = new QVBoxLayout(controlsWidget);
@@ -76,10 +78,10 @@ AD936X::AD936X(QString uri, QWidget *parent)
 	controlWidgetLayout->addWidget(generateGlobalSettingsWidget(controlsWidget));
 
 	/// second is Rx ( receive chain)
-	controlWidgetLayout->addWidget(generateRxWidget(controlsWidget));
+	controlWidgetLayout->addWidget(generateRxChainWidget(controlsWidget));
 
 	/// third is Tx (transimt chain)
-	controlWidgetLayout->addWidget(generateTxWidget(controlsWidget));
+	controlWidgetLayout->addWidget(generateTxChainWidget(controlsWidget));
 
 	controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
@@ -113,12 +115,15 @@ AD936X::AD936X(QString uri, QWidget *parent)
 	centralWidgetButtons->setExclusive(true);
 
 	QPushButton *ad963xBtn = new QPushButton("Controls", this);
-	Style::setStyle(ad963xBtn, style::properties::button::basicButton);
+	ad963xBtn->setCheckable(true);
+	ad963xBtn->setChecked(true);
+	Style::setStyle(ad963xBtn, style::properties::button::blueGrayButton);
 	connect(ad963xBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(m_controlsWidget); });
 
 	QPushButton *blockDiagramBtn = new QPushButton("Block Diagram", this);
-	Style::setStyle(blockDiagramBtn, style::properties::button::basicButton);
+	blockDiagramBtn->setCheckable(true);
+	Style::setStyle(blockDiagramBtn, style::properties::button::blueGrayButton);
 	connect(blockDiagramBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(m_blockDiagramWidget); });
 
@@ -127,8 +132,6 @@ AD936X::AD936X(QString uri, QWidget *parent)
 
 	m_tool->addWidgetToTopContainerHelper(ad963xBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(blockDiagramBtn, TTA_LEFT);
-
-	// Style::setStyle(scrollWidget, style::properties::widget::border_interactive, true, true);
 }
 
 AD936X::~AD936X()
@@ -141,6 +144,8 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 {
 	QWidget *globalSettingsWidget = new QWidget(parent);
 	Style::setBackgroundColor(globalSettingsWidget, json::theme::background_primary);
+	Style::setStyle(globalSettingsWidget, style::properties::widget::border_interactive);
+
 	QVBoxLayout *layout = new QVBoxLayout(globalSettingsWidget);
 	globalSettingsWidget->setLayout(layout);
 
@@ -158,10 +163,13 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 				      .device(plutoDevice)
 				      .attribute("ensm_mode")
 				      .optionsAttribute("ensm_mode_available")
+				      .title("ENSM Mode")
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .buildSingle();
 
 	hlayout->addWidget(ensmMode);
+
+	connect(m_refreshButton, &QPushButton::clicked, ensmMode, &IIOWidget::read);
 
 	////calib_mode
 
@@ -169,10 +177,13 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 				       .device(plutoDevice)
 				       .attribute("calib_mode")
 				       .optionsAttribute("calib_mode_available")
+				       .title("Calibration Mode")
 				       .uiStrategy(IIOWidgetBuilder::ComboUi)
 
 				       .buildSingle();
 	hlayout->addWidget(calibMode);
+	connect(m_refreshButton, &QPushButton::clicked, calibMode, &IIOWidget::read);
+
 	Style::setStyle(calibMode, style::properties::widget::basicBackground, true, true);
 
 	// trx_rate_governor
@@ -181,9 +192,11 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 					     .device(plutoDevice)
 					     .attribute("trx_rate_governor")
 					     .optionsAttribute("trx_rate_governor_available")
+					     .title("TRX Rate Governor")
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .buildSingle();
 	hlayout->addWidget(trxRateGovernor);
+	connect(m_refreshButton, &QPushButton::clicked, trxRateGovernor, &IIOWidget::read);
 
 	FirFilterQidget *firFilter = new FirFilterQidget(plutoDevice, nullptr, globalSettingsWidget);
 	hlayout->addWidget(firFilter);
@@ -192,16 +205,25 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 
 	// rx_path_rates
 
-	IIOWidget *rxPathRates =
-		IIOWidgetBuilder(globalSettingsWidget).device(plutoDevice).attribute("rx_path_rates").buildSingle();
+	IIOWidget *rxPathRates = IIOWidgetBuilder(globalSettingsWidget)
+					 .device(plutoDevice)
+					 .attribute("rx_path_rates")
+					 .title("RX Path Rates")
+					 .buildSingle();
 	layout->addWidget(rxPathRates);
+	rxPathRates->setEnabled(false);
+	connect(m_refreshButton, &QPushButton::clicked, rxPathRates, &IIOWidget::read);
 
 	// tx_path_rates
 
-	IIOWidget *txPathRates =
-		IIOWidgetBuilder(globalSettingsWidget).device(plutoDevice).attribute("tx_path_rates").buildSingle();
-
+	IIOWidget *txPathRates = IIOWidgetBuilder(globalSettingsWidget)
+					 .device(plutoDevice)
+					 .attribute("tx_path_rates")
+					 .title("Tx Path Rates")
+					 .buildSingle();
 	layout->addWidget(txPathRates);
+	txPathRates->setEnabled(false);
+	connect(m_refreshButton, &QPushButton::clicked, txPathRates, &IIOWidget::read);
 
 	connect(firFilter, &FirFilterQidget::filterChangeWasMade, this, [=, this]() {
 		rxPathRates->read();
@@ -213,20 +235,23 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 					  .device(plutoDevice)
 					  .attribute("xo_correction")
 					  .optionsAttribute("xo_correction_available")
+					  .title("XO Correction")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .buildSingle();
 	layout->addWidget(xoCorrection);
+	connect(m_refreshButton, &QPushButton::clicked, xoCorrection, &IIOWidget::read);
 
-	/// close device connection
-	// ConnectionProvider::close(m_uri);
+	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return globalSettingsWidget;
 }
 
-QWidget *AD936X::generateRxWidget(QWidget *parent)
+QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 {
 	QWidget *rxChainWidget = new QWidget(parent);
 	Style::setBackgroundColor(rxChainWidget, json::theme::background_primary);
+	Style::setStyle(rxChainWidget, style::properties::widget::border_interactive);
+
 	QVBoxLayout *layout = new QVBoxLayout(rxChainWidget);
 	rxChainWidget->setLayout(layout);
 
@@ -248,26 +273,27 @@ QWidget *AD936X::generateRxWidget(QWidget *parent)
 					 .channel(voltage0)
 					 .attribute("rf_bandwidth")
 					 .optionsAttribute("rf_bandwidth_available")
+					 .title("RF Bandwidth(MHz)")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
-	hLayout->addWidget(rfBandwidth);
+	hLayout->addWidget(rfBandwidth, Qt::AlignTop);
 
 	// voltage0:  sampling_frequency
-
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(rxChainWidget)
 					       .channel(voltage0)
 					       .attribute("sampling_frequency")
 					       .optionsAttribute("sampling_frequency_available")
+					       .title("Sampling Rate(MSPS")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
 	hLayout->addWidget(samplingFrequency);
 
 	// voltage 0 : rf_port_select
-
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(rxChainWidget)
 					  .channel(voltage0)
 					  .attribute("rf_port_select")
 					  .optionsAttribute("rf_port_select_available")
+					  .title("RF Port Select")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .buildSingle();
 	hLayout->addWidget(rfPortSelect);
@@ -283,6 +309,7 @@ QWidget *AD936X::generateRxWidget(QWidget *parent)
 						  .channel(altVoltage0)
 						  .attribute("frequency")
 						  .optionsAttribute("frequency_available")
+						  .title("RX LO Frequency(MHz)")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .buildSingle();
 
@@ -310,57 +337,94 @@ QWidget *AD936X::generateRxWidget(QWidget *parent)
 
 	// quadrature_tracking_en
 
-	IIOWidget *quadratureTrackingEn =
-		IIOWidgetBuilder(rxChainWidget).channel(voltage0).attribute("quadrature_tracking_en").buildSingle();
+	IIOWidget *quadratureTrackingEn = IIOWidgetBuilder(rxChainWidget)
+						  .channel(voltage0)
+						  .attribute("quadrature_tracking_en")
+						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+						  .title("Quadrature")
+						  .buildSingle();
 	trackingLayout->addWidget(quadratureTrackingEn);
 
 	// rf_dc_offset_tracking_en
-	IIOWidget *rcDcOffsetTrackingEn =
-		IIOWidgetBuilder(rxChainWidget).channel(voltage0).attribute("rf_dc_offset_tracking_en").buildSingle();
+	IIOWidget *rcDcOffsetTrackingEn = IIOWidgetBuilder(rxChainWidget)
+						  .channel(voltage0)
+						  .attribute("rf_dc_offset_tracking_en")
+						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+						  .title("RF DC")
+						  .buildSingle();
 	trackingLayout->addWidget(rcDcOffsetTrackingEn);
 
 	// bb_dc_offset_tracking_en
-	IIOWidget *bbDcOffsetTrackingEn =
-		IIOWidgetBuilder(rxChainWidget).channel(voltage0).attribute("bb_dc_offset_tracking_en").buildSingle();
+	IIOWidget *bbDcOffsetTrackingEn = IIOWidgetBuilder(rxChainWidget)
+						  .channel(voltage0)
+						  .attribute("bb_dc_offset_tracking_en")
+						  .title("BB DC")
+						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+						  .buildSingle();
 	trackingLayout->addWidget(bbDcOffsetTrackingEn);
 
 	hLayout->addLayout(trackingLayout);
 
 	layout->addLayout(hLayout);
 
-	// voltage0: hardwaregain
-	IIOWidget *hardwaregain = IIOWidgetBuilder(rxChainWidget)
-					  .channel(voltage0)
-					  .attribute("hardwaregain")
-					  .optionsAttribute("hardwaregain_available")
-					  .uiStrategy(IIOWidgetBuilder::RangeUi)
-					  .buildSingle();
-	layout->addWidget(hardwaregain);
+	QHBoxLayout *rxWidgetsLayout = new QHBoxLayout();
+	rxWidgetsLayout->addWidget(generateRxWidget(voltage0, rxChainWidget));
 
-	// voltage0: rssi
-	IIOWidget *rssi = IIOWidgetBuilder(rxChainWidget).channel(voltage0).attribute("rssi").buildSingle();
-	layout->addWidget(rssi);
+	// TODO add condition for multiple devices
 
-	// voltage0: gain_control_mode
-	IIOWidget *gainControlMode = IIOWidgetBuilder(rxChainWidget)
-					     .channel(voltage0)
-					     .attribute("gain_control_mode")
-					     .optionsAttribute("gain_control_mode_available")
-					     .uiStrategy(IIOWidgetBuilder::ComboUi)
-					     .buildSingle();
-	layout->addWidget(gainControlMode);
+	rxWidgetsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
+	layout->addLayout(rxWidgetsLayout);
 
-	/// close device connection
-	// ConnectionProvider::close(m_uri);
+	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return rxChainWidget;
 }
 
-QWidget *AD936X::generateTxWidget(QWidget *parent)
+QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 {
+	QWidget *rxWidget = new QWidget(parent);
+	Style::setStyle(rxWidget, style::properties::widget::border_interactive);
 
+	QVBoxLayout *layout = new QVBoxLayout(rxWidget);
+	rxWidget->setLayout(layout);
+
+	layout->addWidget(new QLabel("RX", rxWidget));
+
+	// TODO move to function
+
+	// voltage0: hardwaregain
+	IIOWidget *hardwaregain = IIOWidgetBuilder(rxWidget)
+					  .channel(chn)
+					  .attribute("hardwaregain")
+					  .optionsAttribute("hardwaregain_available")
+					  .title("Hadware Gain(dB)")
+					  .uiStrategy(IIOWidgetBuilder::RangeUi)
+					  .buildSingle();
+	layout->addWidget(hardwaregain);
+
+	// voltage: rssi
+	IIOWidget *rssi = IIOWidgetBuilder(rxWidget).channel(chn).attribute("rssi").title("RSSI(dB)").buildSingle();
+	layout->addWidget(rssi);
+
+	// voltage: gain_control_mode
+	IIOWidget *gainControlMode = IIOWidgetBuilder(rxWidget)
+					     .channel(chn)
+					     .attribute("gain_control_mode")
+					     .optionsAttribute("gain_control_mode_available")
+					     .title("Gain Control Mode")
+					     .uiStrategy(IIOWidgetBuilder::ComboUi)
+					     .buildSingle();
+	layout->addWidget(gainControlMode);
+
+	return rxWidget;
+}
+
+QWidget *AD936X::generateTxChainWidget(QWidget *parent)
+{
 	QWidget *txChainWidget = new QWidget(parent);
 	Style::setBackgroundColor(txChainWidget, json::theme::background_primary);
+	Style::setStyle(txChainWidget, style::properties::widget::border_interactive);
+
 	QVBoxLayout *layout = new QVBoxLayout(txChainWidget);
 	txChainWidget->setLayout(layout);
 
@@ -440,16 +504,44 @@ QWidget *AD936X::generateTxWidget(QWidget *parent)
 
 	layout->addLayout(hLayout);
 
-	// adi,tx-attenuation-mdB
-	IIOWidget *txAttenuation =
-		IIOWidgetBuilder(txChainWidget).device(plutoDevice).attribute("adi,tx-attenuation-mdB").buildSingle();
-	layout->addWidget(txAttenuation);
+	QHBoxLayout *txWidgetsLayout = new QHBoxLayout();
+	txWidgetsLayout->addWidget(generateTxWidget(plutoDevice, txChainWidget));
 
-	// voltage0: rssi
-	IIOWidget *rssi = IIOWidgetBuilder(txChainWidget).channel(voltage0).attribute("rssi").buildSingle();
-	layout->addWidget(rssi);
+	// TODO add condition for multiple devices
 
-	// ConnectionProvider::close(m_uri);
+	txWidgetsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
+	layout->addLayout(txWidgetsLayout);
+
+	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return txChainWidget;
+}
+
+QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
+{
+	QWidget *txWidget = new QWidget(parent);
+	Style::setStyle(txWidget, style::properties::widget::border_interactive);
+
+	QVBoxLayout *layout = new QVBoxLayout(txWidget);
+	txWidget->setLayout(layout);
+
+	layout->addWidget(new QLabel("TX", txWidget));
+
+	// adi,tx-attenuation-mdB
+	IIOWidget *txAttenuation = IIOWidgetBuilder(txWidget)
+					   .device(dev)
+					   .attribute("adi,tx-attenuation-mdB")
+					   .uiStrategy(IIOWidgetBuilder::RangeUi)
+					   .title("Attenuation(dB")
+					   .buildSingle();
+	layout->addWidget(txAttenuation);
+
+	bool isOutput = true;
+	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
+	// voltage0: rssi
+	IIOWidget *rssi =
+		IIOWidgetBuilder(txWidget).channel(voltage0).attribute("rssi").title("RSSI(dB)").buildSingle();
+	layout->addWidget(rssi);
+
+	return txWidget;
 }

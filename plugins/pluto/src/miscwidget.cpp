@@ -39,6 +39,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 						 .device(m_device)
 						 .attribute("adi,dc-offset-attenuation-low-range")
 						 .uiStrategy(IIOWidgetBuilder::RangeUi)
+						 .title(" ")
 						 .buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationLowRange, 1, 1);
 
@@ -47,6 +48,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 						  .device(m_device)
 						  .attribute("adi,dc-offset-attenuation-high-range")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
+						  .title(" ")
 						  .buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationHighRange, 1, 2);
 
@@ -58,6 +60,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 					   .device(m_device)
 					   .attribute("adi,dc-offset-count-low-range")
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
+					   .title(" ")
 					   .buildSingle();
 	dcOffsetTrackingLayout->addWidget(countLowRange, 2, 1);
 
@@ -66,6 +69,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 					    .device(m_device)
 					    .attribute("adi,dc-offset-count-high-range")
 					    .uiStrategy(IIOWidgetBuilder::RangeUi)
+					    .title(" ")
 					    .buildSingle();
 	dcOffsetTrackingLayout->addWidget(countHighRange, 2, 2);
 
@@ -75,6 +79,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 					     .device(m_device)
 					     .attribute("adi,dc-offset-tracking-update-event-mask")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
+					     .title(" ")
 					     .buildSingle();
 	dcOffsetTrackingLayout->addWidget(updateEventMask, 3, 1);
 
@@ -90,7 +95,8 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 	IIOWidget *qecTrackingIio = IIOWidgetBuilder(qecTracking)
 					    .device(m_device)
 					    .attribute("adi,qec-tracking-slow-mode-enable")
-					    // TODO MAKE IT SWITCH
+					    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					    .title("Slow QEC")
 					    .buildSingle();
 	qecTrackingLayout->addWidget(qecTrackingIio);
 
