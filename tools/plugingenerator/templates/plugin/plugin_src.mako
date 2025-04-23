@@ -1,5 +1,4 @@
-% if 'plugin_name' in config:
-#include "${config['plugin_name']}.h"
+#include "${plugin_name}.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -13,7 +12,7 @@
 % endif 
 
 % if 'class_name' in config:
-Q_LOGGING_CATEGORY(CAT_${config['plugin_name'].upper()}, "${config['class_name']}")
+Q_LOGGING_CATEGORY(CAT_${plugin_name.upper()}, "${config['class_name']}")
 % if 'namespace' in config:
 using namespace ${config['namespace']};
 
@@ -45,7 +44,7 @@ bool ${config['class_name']}::loadPage()
 		const char *value;
 		int ret = iio_context_get_attr(context, i, &name, &value);
 		if(ret < 0) {
-			qWarning(CAT_${config['plugin_name'].upper()}) << "Could not read attribute with index:" << i;
+			qWarning(CAT_${plugin_name.upper()}) << "Could not read attribute with index:" << i;
 			continue;
 		}
 
@@ -129,6 +128,5 @@ void ${config['class_name']}::initMetadata()
 	}
 )plugin");
 }
-% endif
 % endif
 % endif
