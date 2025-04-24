@@ -25,7 +25,13 @@ class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget {
 	Q_OBJECT
 public:
     IMUAnalyzerInterface(QWidget *parent = nullptr);
-    //~IMUAnalyzerInterface();
+    ~IMUAnalyzerInterface();
+
+Q_SIGNALS:
+	void generateRot(rotation rot);
+
+public:
+	void generateRotation();
 
 private:
     ToolTemplate *m_tool;
@@ -36,6 +42,11 @@ private:
     QPushButton *m_rstView;
 
     SceneRenderer *m_sceneRender;
+    rotation m_rot;
+
+    std::thread t;
+    bool m_runThread = true;
+
 };
 }
 

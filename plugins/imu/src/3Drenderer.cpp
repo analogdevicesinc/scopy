@@ -2,6 +2,45 @@
 
 using namespace scopy;
 
+Qt3DRender::QMaterial* createWireframeMaterial(Qt3DCore::QNode* parent = nullptr) {
+	// Create a new material
+	auto* material = new Qt3DRender::QMaterial(parent);
+
+	       // Shader
+	auto* shader = new Qt3DRender::QShaderProgram();
+	shader->setVertexShaderCode(Qt3DRender::QShaderProgram::loadSource(QUrl("qrc:/shaders/basic.vert")));
+	shader->setFragmentShaderCode(Qt3DRender::QShaderProgram::loadSource(QUrl("qrc:/shaders/basic.frag")));
+
+	       // Render pass
+	auto* renderPass = new Qt3DRender::QRenderPass();
+	renderPass->setShaderProgram(shader);
+
+	       // Polygon mode set to line (wireframe)
+	// auto* polygonMode = new QPolygonMode();
+	// polygonMode->setMode(QPolygon::Line);
+
+	auto* renderStateSet = new Qt3DRender::QRenderStateSet();
+	//renderStateSet->addRenderState(polygonMode);
+	//renderPass->setRenderStateSet(renderStateSet);
+
+	       // Technique
+	auto* technique = new Qt3DRender::QTechnique();
+	technique->graphicsApiFilter()->setApi(Qt3DRender::QGraphicsApiFilter::OpenGL);
+	technique->graphicsApiFilter()->setProfile(Qt3DRender::QGraphicsApiFilter::CoreProfile);
+	technique->graphicsApiFilter()->setMajorVersion(3);
+	technique->graphicsApiFilter()->setMinorVersion(1);
+	technique->addRenderPass(renderPass);
+
+	       // Effect
+	auto* effect = new Qt3DRender::QEffect();
+	effect->addTechnique(technique);
+
+	       // Set the effect on the material
+	material->setEffect(effect);
+
+	return material;
+}
+
 SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	view = new Qt3DExtras::Qt3DWindow();
 	//view->defaultFrameGraph()->setClearColor(QColor(QRgb(0x4d4d4f)));
@@ -13,46 +52,79 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	layout->addWidget(container);
 	layout->setMargin(0);
 
-	       // Root entity
+	// Root entity
 	rootEntity = new Qt3DCore::QEntity();
 
-	       // Camera
+	// Camera
 	Qt3DRender::QCamera *camera = view->camera();
 	camera->lens()->setPerspectiveProjection(45.0f, 16.f/9.f, 0.1f, 1000.0f);
-	camera->setPosition(QVector3D(0, 0, 10.0f));
+	camera->setPosition(QVector3D(0, 2.0f, 5.0f));
 	camera->setViewCenter(QVector3D(0, 0, 0));
 
-	       // Camera controls
+	// Camera controls
 	auto *camController = new Qt3DExtras::QOrbitCameraController(rootEntity);
 	camController->setCamera(camera);
 
-	       // Cube mesh
-	auto *mesh = new Qt3DExtras::QCuboidMesh();
+	//Initialize cube
 
-	       // Transform
-	transform = new Qt3DCore::QTransform();
+	// Cube mesh
+	auto *cubeMesh = new Qt3DExtras::QCuboidMesh();
 
-	       // Material
-	auto *material = new Qt3DExtras::QPhongMaterial();
-	material->setDiffuse(QColor(QRgb(0xbeb32b)));
+	 // Transform
+	cubeTransform = new Qt3DCore::QTransform();
 
-	       // Entity
-	auto *cubeEntity = new Qt3DCore::QEntity(rootEntity);
-	cubeEntity->addComponent(mesh);
-	cubeEntity->addComponent(transform);
-	cubeEntity->addComponent(material);
+	// Material
+	auto *cubeMaterial = new Qt3DExtras::QPhongMaterial();
+	cubeMaterial->setDiffuse(QColor(QRgb(0x008ECC)));
 
-	       // Set root entity
+	// Entity
+	cubeEntity = new Qt3DCore::QEntity(rootEntity);
+	cubeEntity->addComponent(cubeMesh);
+	cubeEntity->addComponent(cubeTransform);
+	cubeEntity->addComponent(cubeMaterial);
+
+	//Add line axes
+	auto *planeMesh = new Qt3DExtras::QPlaneMesh(rootEntity);
+	planeMesh->setWidth(400);
+	planeMesh->setHeight(300);
+
+	auto *planeMaterial = new Qt3DExtras::QPhongMaterial();
+	planeMaterial->setDiffuse(QColor(QRgb(0xa0a0a0)));
+
+	 // Transform
+	planeTransform = new Qt3DCore::QTransform();
+	planeTransform->setTranslation((QVector3D(0.0f,-1.0f,0.0f)));
+
+	auto meshEntity = new Qt3DCore::QEntity(rootEntity);
+	meshEntity->addComponent(planeMesh);
+	meshEntity->addComponent(planeTransform);
+	meshEntity->addComponent(planeMaterial);
+	//rootEntity->addComponent(planeMesh);
+
+	// Set root entity
 	view->setRootEntity(rootEntity);
-
-	       // Rotation animation
-	// connect(&timer, &QTimer::timeout, this, &Scene3D::updateRotation);
-	// timer.start(16); // ~60 FPS
 }
 
+// Qt3DExtras::QPlaneMesh* SceneRenderer::generateAxes(/*Qt3DCore::QEntity* parent*/) {
+// 	auto *planeMesh = new Qt3DExtras::QPlaneMesh();
+// }
+
+
 void SceneRenderer::resetView(){
-	view->camera()->setPosition(QVector3D(0, 0, 10.0f));
+	view->camera()->lens()->setPerspectiveProjection(45.0f, 16.f/9.f, 0.1f, 1000.0f);
+	view->camera()->setPosition(QVector3D(0, 2.0f, 5.0f));
 	view->camera()->setViewCenter(QVector3D(0, 0, 0));
+	view->camera()->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+}
+
+void SceneRenderer::resetPos(){
+	setRot(rotation{0.0f, 0.0f, 0.0f});
+}
+
+void SceneRenderer::setRot(rotation rot){
+	cubeTransform->setRotationX(rot.rotX);
+	cubeTransform->setRotationY(rot.rotY);
+	cubeTransform->setRotationZ(rot.rotZ);
 }
 
 #include "moc_3Drenderer.cpp"

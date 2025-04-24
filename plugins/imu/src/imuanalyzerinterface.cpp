@@ -2,8 +2,27 @@
 
 using namespace scopy;
 
+Q_DECLARE_METATYPE(rotation)
+
+void IMUAnalyzerInterface::generateRotation(){
+	m_rot = {0.0f, 0.0f, 0.0f};
+	bool direction = false;
+
+	while(1){
+		if(m_rot.rotX == 0 || m_rot.rotX == 90) direction = !direction;
+		if(direction) m_rot.rotX = m_rot.rotX + 1.0f;
+		else m_rot.rotX = m_rot.rotX - 1.0f;
+
+		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
+					  Q_ARG(rotation, m_rot));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+}
+
 IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
-    QHBoxLayout *lay = new QHBoxLayout(this);
+	qRegisterMetaType<rotation>("rotation");
+
+	QHBoxLayout *lay = new QHBoxLayout(this);
 	lay->setMargin(0);
 	setLayout(lay);
 
@@ -29,11 +48,22 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	m_rstPos->setText("Reset Position");
 	m_tool->addWidgetToBottomContainerHelper(m_rstPos, TTA_LEFT);
 
+	connect(m_rstPos, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetPos);
+
 	m_rstView = new QPushButton(this);
 	m_rstView->setText("Reset View");
 	m_tool->addWidgetToBottomContainerHelper(m_rstView, TTA_LEFT);
 
 	connect(m_rstView, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetView);
+
+	connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
+
+	t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
+
+}
+
+IMUAnalyzerInterface::~IMUAnalyzerInterface(){
+	t.join();
 }
 
 #include "moc_imuanalyzerinterface.cpp"
