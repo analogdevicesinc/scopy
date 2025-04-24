@@ -61,7 +61,8 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES}
-    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2Drenderer.hpp # ${PROJECT_RESOURCES}
+    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2Drenderer.hpp
+    include/imuanalyzer/imuanalyzerutils.hpp # ${PROJECT_RESOURCES}
 )
 
 generate_export_header(
