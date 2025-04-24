@@ -91,6 +91,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer();
 	tabWidget->addTab(bubbleLevelRenderer, "2D View");
 
+	connect(this, &IMUAnalyzerInterface::generateRot, bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
 }
 
 IMUAnalyzerInterface::~IMUAnalyzerInterface(){
