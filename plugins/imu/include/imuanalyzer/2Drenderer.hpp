@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QPainter>
+#include <QVBoxLayout>
 
 namespace scopy {
 
@@ -19,6 +20,12 @@ public Q_SLOTS:
 	void resetView();
 	void resetPos();
 	void setRot(rotation rot);
+
+protected:
+	void paintEvent(QPaintEvent *event) override;
+
+private:
+	rotation m_rot;
 
 };
 }
