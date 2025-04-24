@@ -25,6 +25,8 @@ QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
 KDDOCK_BRANCH=2.1
+ECM_BRANCH=kf5
+KARCHIVE_BRANCH=kf5
 
 QT=/opt/Qt/5.15.2/gcc_64
 QMAKE_BIN=$QT/bin/qmake
@@ -82,6 +84,8 @@ clone() {
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
+	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	popd
 }
 
@@ -298,6 +302,23 @@ build_kddock () {
 	popd
 }
 
+build_ecm() {
+	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
+	pushd $STAGING_AREA/extra-cmake-modules
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	build_with_cmake $1 || { echo "Error: Failed to build ECM"; exit 1; }
+	popd
+}
+
+build_karchive () {
+	echo "### Building karchive - version $KARCHIVE_BRANCH"
+    export CMAKE_PREFIX_PATH=$STAGING_AREA_DEPS/share/ECM/cmake:$CMAKE_PREFIX_PATH
+    pushd $STAGING_AREA/karchive
+    CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+    build_with_cmake $1 || { echo "Error: Failed to build karchive"; exit 1; }
+    popd
+}
+
 build_iio-emu() {
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	pushd $STAGING_AREA/iio-emu
@@ -336,6 +357,8 @@ build_deps(){
 	build_libsigrokdecode ON
 	build_libtinyiiod ON
 	build_kddock ON
+	build_ecm ON
+	build_karchive ON
 	build_iio-emu ON
 }
 
