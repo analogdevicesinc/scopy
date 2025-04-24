@@ -4,18 +4,38 @@ using namespace scopy;
 
 Q_DECLARE_METATYPE(rotation)
 
+std::atomic<bool> m_runThread(false);
+
 void IMUAnalyzerInterface::generateRotation(){
 	m_rot = {0.0f, 0.0f, 0.0f};
 	bool direction = false;
-
 	while(1){
+	if (!m_runThread) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Light pause loop
+		continue;
+	}
+
+	for(int i = 0; i < 180; i++){
+		if(!m_runThread) break;
 		if(m_rot.rotX == 0 || m_rot.rotX == 90) direction = !direction;
 		if(direction) m_rot.rotX = m_rot.rotX + 1.0f;
 		else m_rot.rotX = m_rot.rotX - 1.0f;
 
 		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
 					  Q_ARG(rotation, m_rot));
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	for(int i = 0; i < 180; i++){
+		if(!m_runThread) break;
+		if(m_rot.rotY == 0 || m_rot.rotY == 90) direction = !direction;
+		if(direction) m_rot.rotY = m_rot.rotY + 1.0f;
+		else m_rot.rotY = m_rot.rotY - 1.0f;
+
+		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
+					  Q_ARG(rotation, m_rot));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
 	}
 }
 
@@ -42,7 +62,11 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 
 	m_sceneRender = new SceneRenderer(this);
-	m_tool->addWidgetToCentralContainerHelper(m_sceneRender);
+	QTabWidget *tabWidget = new QTabWidget;
+	tabWidget->addTab(m_sceneRender,"3D View");
+	// tabWidget->setTabPosition(QTabWidget::West);
+
+	m_tool->addWidgetToCentralContainerHelper(tabWidget);
 
 	m_rstPos = new QPushButton(this);
 	m_rstPos->setText("Reset Position");
@@ -58,7 +82,14 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 
 	connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
 
+	connect(m_runBtn, &QPushButton::pressed,[](){
+		m_runThread = !m_runThread;
+	});
+
 	t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
+
+	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer();
+	tabWidget->addTab(bubbleLevelRenderer, "2D View");
 
 }
 
