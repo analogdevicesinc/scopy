@@ -3,6 +3,7 @@
 
 #include "scopy-imuanalyzer_export.h"
 #include "3Drenderer.hpp"
+#include "2Drenderer.hpp"
 
 #include <QLineEdit>
 #include <QObject>
@@ -45,8 +46,6 @@ private:
     rotation m_rot;
 
     std::thread t;
-    bool m_runThread = true;
-
 };
 }
 
