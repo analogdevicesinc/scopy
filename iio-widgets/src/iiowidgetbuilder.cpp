@@ -101,6 +101,8 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 		.data = m_attribute,
 		.iioDataOptions = m_optionsAttribute,
 		.constDataOptions = m_optionsValues,
+		.infoMessage = m_infoMessage,
+
 	};
 
 	ds = createDS();
@@ -322,6 +324,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::parent(QWidget *parent)
 IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
 {
 	m_title = title;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::infoMessage(QString infoMessage)
+{
+	m_infoMessage = infoMessage;
 	return *this;
 }
 

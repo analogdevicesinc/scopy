@@ -37,12 +37,14 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 		m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 		m_title = new QLabel(recipe.data, m_ui);
+		m_infoIcon = new InfoIconWidget(recipe.infoMessage, m_ui);
 		m_comboWidget = new QComboBox(m_ui);
 		m_comboWidget->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
 
 		m_comboWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 		m_ui->layout()->addWidget(m_title);
+		m_ui->layout()->addWidget(m_infoIcon);
 		m_ui->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
 		m_ui->layout()->addWidget(m_comboWidget);
 	} else {
@@ -83,6 +85,13 @@ void ComboAttrUi::setCustomTitle(QString title)
 		m_title->setText(title);
 	} else {
 		m_comboMenuWidget->setTitle(title);
+	}
+}
+
+void ComboAttrUi::setInfoMessage(QString infoMessage)
+{
+	if(!m_isCompact) {
+		m_infoIcon->setInfoMessage(infoMessage);
 	}
 }
 

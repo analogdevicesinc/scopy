@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <iio.h>
+#include <infoiconwidget.h>
 #include "guistrategy/guistrategyinterface.h"
 #include <gui/widgets/menulineedit.h>
 #include "iiowidgetdata.h"
@@ -49,6 +50,7 @@ public:
 	bool isValid() override;
 
 	void setCustomTitle(QString title) override;
+	void setInfoMessage(QString infoMessage);
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
@@ -63,6 +65,7 @@ private:
 	MenuLineEdit *m_lineEdit;
 	QString m_lastEmittedText;
 	QLabel *m_title;
+	InfoIconWidget *m_infoIcon;
 };
 } // namespace scopy
 
