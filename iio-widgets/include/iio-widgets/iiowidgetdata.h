@@ -35,6 +35,7 @@ struct SCOPY_IIO_WIDGETS_EXPORT IIOWidgetFactoryRecipe
 	QString data = "";	       // the name of the 'main' attribute that will be changed in the iio channel
 	QString iioDataOptions = "";   // the IIO attribute that describes what values can the attribute take
 	QString constDataOptions = ""; // the set of constant data that will populate an entry (e.g. combo box, range)
+	QString infoMessage = "";      // the message that will show when the "i" icon is hovered
 };
 
 #endif // SCOPY_IIOWIDGETDATA_H

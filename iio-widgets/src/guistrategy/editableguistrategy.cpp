@@ -30,6 +30,7 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 {
 	m_recipe = recipe;
 	m_title = new QLabel(recipe.data, m_ui);
+	m_infoIcon = new InfoIconWidget(recipe.infoMessage, m_ui);
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
@@ -42,7 +43,18 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 	Style::setStyle(m_lineEdit->edit(), style::properties::iiowidgets::lineEdit, true, true);
 	m_lineEdit->edit()->setCursorPosition(0);
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
-	m_ui->layout()->addWidget(m_title);
+
+	QHBoxLayout *titleLayout = new QHBoxLayout();
+	titleLayout->setContentsMargins(0, 0, 0, 0);
+	titleLayout->setMargin(0);
+	titleLayout->setSpacing(5);
+
+	titleLayout->addWidget(m_title);
+	titleLayout->addWidget(m_infoIcon);
+	titleLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
+	m_ui->layout()->addItem(titleLayout);
+
 	m_ui->layout()->addWidget(m_lineEdit);
 	m_ui->layout()->setSpacing(0);
 
@@ -70,6 +82,8 @@ bool EditableGuiStrategy::isValid()
 }
 
 void EditableGuiStrategy::setCustomTitle(QString title) { m_title->setText(title); }
+
+void EditableGuiStrategy::setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
 
 void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 {

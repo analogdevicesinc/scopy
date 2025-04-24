@@ -178,6 +178,12 @@ public:
 	 */
 	IIOWidgetBuilder &title(QString title);
 
+	/**
+	 * @brief Sets a info message for the IIOWidget
+	 * @param infoMessage
+	 */
+	IIOWidgetBuilder &infoMessage(QString infoMessage);
+
 private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
@@ -193,6 +199,7 @@ private:
 	QString m_optionsAttribute;
 	QString m_optionsValues;
 	QString m_title;
+	QString m_infoMessage;
 	IIOWidgetBuilder::DS m_dataStrategy;
 	IIOWidgetBuilder::UIS m_uiStrategy;
 	QWidget *m_widgetParent;

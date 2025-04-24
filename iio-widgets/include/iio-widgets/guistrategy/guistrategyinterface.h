@@ -50,6 +50,10 @@ public:
 	 * */
 	virtual bool isValid() = 0;
 
+	/**
+	 * @brief Allows user to set custom title
+	 * @param title
+	 * */
 	virtual void setCustomTitle(QString title) = 0;
 
 public Q_SLOTS:
