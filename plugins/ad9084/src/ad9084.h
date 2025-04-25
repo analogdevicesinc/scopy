@@ -28,6 +28,7 @@
 #include <gui/widgets/toolbuttons.h>
 #include <gui/animationpushbutton.h>
 #include <gui/widgets/menucontrolbutton.h>
+#include <gui/widgets/filebrowserwidget.h>
 #include <iiowidget.h>
 #include <QWidget>
 #include <iio.h>
@@ -44,16 +45,11 @@ public:
 Q_SIGNALS:
 	void triggerRead();
 
-private Q_SLOTS:
-	QString chooseFile();
-	void chooseCfir();
-	void choosePfir();
-
 private:
 	void setupChannels();
 	QWidget *createMenu();
-	void loadCfir();
-	void loadPfir();
+	void loadCfir(QString path);
+	void loadPfir(QString path);
 	QString readFile(QString file);
 
 	struct iio_device *m_device;
@@ -63,9 +59,8 @@ private:
 	QPushButton *m_rxChain;
 	QPushButton *m_txChain;
 	AnimationPushButton *m_refreshBtn;
-	QLineEdit *m_cfirLineEdit;
-	QLineEdit *m_pfirLineEdit;
-	//	QVector<Ad9084Channel*> m_channelsExtraRx;
+	FileBrowserWidget *m_cfirFileBrowser;
+	FileBrowserWidget *m_pfirFileBrowser;
 	QVector<Ad9084Channel *> m_channelsRx;
 	QVector<Ad9084Channel *> m_channelsTx;
 	QSplitter *m_hSplitter;
