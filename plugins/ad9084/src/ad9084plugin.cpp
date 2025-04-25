@@ -44,6 +44,10 @@ bool AD9084Plugin::compatible(QString m_param, QString category)
 	}
 
 	iio_device *apolloDevice = iio_context_find_device(conn->context(), "axi-ad9084-rx-hpc");
+	if(!apolloDevice) {
+		apolloDevice = iio_context_find_device(conn->context(), "axi-ad9088-rx-hpc");
+	}
+
 	if(apolloDevice) {
 		ret = true;
 	}
@@ -61,15 +65,16 @@ bool AD9084Plugin::loadIcon()
 
 void AD9084Plugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("ad9084", "AD9084", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad9084", "AD9084",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_network_analyzer.svg"));
 }
 
 void AD9084Plugin::unload()
 { /*delete m_infoPage;*/
 }
 
-QString AD9084Plugin::description() { return "Tool for Apollo MxFE Quad AD9084 interaction."; }
+QString AD9084Plugin::description() { return "Tool for Apollo MxFE interaction."; }
 
 bool AD9084Plugin::onConnect()
 {
@@ -87,6 +92,8 @@ bool AD9084Plugin::onConnect()
 
 	unsigned int devCount = iio_context_get_devices_count(conn->context());
 	for(unsigned int i = 0; i < devCount; i++) {
+		bool newTool = false;
+		QString toolName = "";
 		struct iio_device *rxDev = iio_context_get_device(conn->context(), i);
 		if(!rxDev) {
 			continue;
@@ -97,13 +104,24 @@ bool AD9084Plugin::onConnect()
 
 		QString name = iio_device_get_name(rxDev);
 		if(name.contains("axi-ad9084-rx")) {
-			m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad9084", QString("AD9084 %1").arg(deviceIdx),
-								  Style::getAttribute(json::theme::icon_theme_folder) +
-									  "/icons/tool_network_analyzer.svg"));
-			Q_EMIT toolListChanged();
-			m_toolList.last()->setTool(new Ad9084(rxDev));
+			newTool = true;
+			toolName = "AD9084";
+		}
+		if(name.contains("axi-ad9088-rx")) {
+			newTool = true;
+			toolName = "AD9088";
+		}
+
+		if(newTool) {
+			m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
+				"ad9084", toolName,
+				":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+					"/icons/tool_network_analyzer.svg"));
 			m_toolList.last()->setEnabled(true);
 			m_toolList.last()->setRunBtnVisible(true);
+			Q_EMIT toolListChanged();
+			Ad9084 *ad9084 = new Ad9084(rxDev);
+			m_toolList.last()->setTool(ad9084);
 			deviceIdx++;
 		}
 	}
