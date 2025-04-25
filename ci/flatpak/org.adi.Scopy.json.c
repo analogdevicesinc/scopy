@@ -501,6 +501,36 @@
 			]
 		},
 		{
+			"name": "extra-cmake-modules",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/KDE/extra-cmake-modules.git",
+					"branch": "kf5"
+				}
+			]
+		},
+		{
+			"name": "karchive",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/KDE/karchive.git",
+					"branch": "kf5"
+				}
+			]
+		},
+		{
 			"name": "iio-emu",
 			"builddir": true,
 			"buildsystem": "cmake",
