@@ -33,14 +33,13 @@
 #include <preferenceshelper.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 
-#define NUM_MAX_CHANNEL 8
-
 using namespace scopy;
 using namespace scopy::ad9084;
 
 Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	: QWidget(parent)
 	, m_device(dev)
+	, m_channelPaths({})
 {
 	QHBoxLayout *lay = new QHBoxLayout();
 	this->setLayout(lay);
@@ -101,7 +100,7 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	QLabel *globalRxLbl = new QLabel("RX Chain");
 	QScrollArea *rxScroll = new QScrollArea(m_hSplitter);
 	MenuSectionWidget *globalRxSection = new MenuSectionWidget(this);
-	QVBoxLayout *layRxScroll = new QVBoxLayout(globalRxSection);
+	QVBoxLayout *layRxScroll = new QVBoxLayout();
 	globalRxSection->contentLayout()->setSpacing(10);
 
 	globalRxSection->setLayout(layRxScroll);
@@ -114,7 +113,7 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	QLabel *globalTxLbl = new QLabel("TX Chain");
 	QScrollArea *txScroll = new QScrollArea(m_hSplitter);
 	MenuSectionWidget *globalTxSection = new MenuSectionWidget(this);
-	QVBoxLayout *layTxScroll = new QVBoxLayout(globalTxSection);
+	QVBoxLayout *layTxScroll = new QVBoxLayout();
 	globalTxSection->contentLayout()->setSpacing(10);
 
 	globalTxSection->setLayout(layTxScroll);
@@ -168,7 +167,7 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	tool->addWidgetToCentralContainerHelper(m_hSplitter);
 	tool->rightStack()->add(settingsMenuId, rightSideMenu);
 
-	setupChannels();
+	scanChannels();
 	for(auto w : qAsConst(m_channelsRx)) {
 		globalRxSection->contentLayout()->addWidget(w);
 	}
@@ -180,45 +179,109 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 
 Ad9084::~Ad9084() {}
 
-void Ad9084::setupChannels()
+void Ad9084::scanChannels()
 {
-	for(unsigned int i = 0; i < NUM_MAX_CHANNEL; i++) {
-		// RX channels
-		QString chnName = QString("voltage%1_i").arg(i);
-		struct iio_channel *rxchn = iio_device_find_channel(m_device, chnName.toUtf8(), false);
-		if(!rxchn) {
-			chnName = QString("voltage%1").arg(i);
-			rxchn = iio_device_find_channel(m_device, chnName.toUtf8(), false);
-		}
-
-		if(!rxchn) {
+	unsigned int nbChannels = iio_device_get_channels_count(m_device);
+	for(unsigned int i = 0; i < nbChannels; i++) {
+		bool notBuffer = false;
+		struct iio_channel *chn = iio_device_get_channel(m_device, i);
+		if(!chn) {
 			continue;
 		}
 
-		bool usefulChn = !!iio_channel_find_attr(rxchn, "channel_nco_frequency");
-		if(!usefulChn) {
+		auto attr = iio_channel_find_attr(chn, "label");
+		if(!attr) {
 			continue;
 		}
+		notBuffer = extractChannelPaths(chn);
+	}
+	mapPathsUnique();
 
+	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
+		QString chn = m_rx_coarse_ddc_channel_names.at(i);
+		struct iio_channel *rxchn = iio_device_find_channel(m_device, chn.toUtf8(), false);
 		Ad9084Channel *rxchnWidget = new Ad9084Channel(rxchn, i, this);
 		connect(this, &Ad9084::triggerRead, rxchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsRx.push_back(rxchnWidget);
+		rxchnWidget->init();
+	}
 
-		// TX channels
-		chnName = QString("voltage%1_i").arg(i);
-		struct iio_channel *txchn = iio_device_find_channel(m_device, chnName.toUtf8(), true);
-		if(!txchn) {
-			chnName = QString("voltage%1").arg(i);
-			txchn = iio_device_find_channel(m_device, chnName.toUtf8(), true);
-		}
-
+	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
+		QString chn = m_tx_coarse_duc_channel_names.at(i);
+		struct iio_channel *txchn = iio_device_find_channel(m_device, chn.toUtf8(), true);
 		Ad9084Channel *txchnWidget = new Ad9084Channel(txchn, i, this);
 		connect(this, &Ad9084::triggerRead, txchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsTx.push_back(txchnWidget);
-
-		rxchnWidget->init();
 		txchnWidget->init();
 	}
+}
+
+void Ad9084::mapPathsUnique()
+{
+	auto sides = m_channelPaths.keys();
+	for(QString &side : sides) {
+		auto converters = m_channelPaths[side].keys();
+		for(QString &converter : converters) {
+			auto cdcs = m_channelPaths[side][converter].keys();
+			for(QString &cdc : cdcs) {
+				QList<QString> channels = {};
+				auto fdcs = m_channelPaths[side][converter][cdc].keys();
+				for(QString &fdc : fdcs) {
+					auto chnLst = m_channelPaths[side][converter][cdc][fdc];
+					for(QString &chn : chnLst) {
+						if(chn.contains("_i")) {
+							channels.push_back(chn);
+						}
+					}
+				}
+				if(converter.contains("ADC")) {
+					m_rx_coarse_ddc_channel_names.push_back(channels.at(0));
+					m_rx_fine_ddc_channel_names.append(channels);
+				} else {
+					m_tx_coarse_duc_channel_names.push_back(channels.at(0));
+					m_tx_fine_duc_channel_names.append(channels);
+				}
+			}
+		}
+	}
+}
+
+bool Ad9084::extractChannelPaths(struct iio_channel *chn)
+{
+	bool notBuffer = false;
+	size_t labelSize = 1024;
+	char buf[labelSize];
+	int ret = iio_channel_attr_read(chn, "label", buf, labelSize);
+	QString label(buf);
+	QString chnId = iio_channel_get_id(chn);
+
+	if(!label.contains("->")) {
+		return false;
+	}
+
+	QStringList tokens = label.replace(":", "->").split("->");
+	if(tokens.count() != 4) {
+		return false;
+	}
+	QString side = tokens.at(0);
+	QString fddc = tokens.at(1);
+	QString cddc = tokens.at(2);
+	QString adc = tokens.at(3);
+
+	if(!m_channelPaths.contains(side)) {
+		m_channelPaths.insert(side, {});
+	}
+	if(!m_channelPaths[side].contains(adc)) {
+		m_channelPaths[side].insert(adc, {});
+	}
+	if(!m_channelPaths[side][adc].contains(cddc)) {
+		m_channelPaths[side][adc].insert(cddc, {});
+	}
+	if(!m_channelPaths[side][adc][cddc].contains(fddc)) {
+		m_channelPaths[side][adc][cddc].insert(fddc, {});
+	}
+	m_channelPaths[side][adc][cddc][fddc].push_back(chnId);
+	return true;
 }
 
 QWidget *Ad9084::createMenu()

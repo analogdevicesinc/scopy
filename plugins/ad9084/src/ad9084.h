@@ -46,7 +46,9 @@ Q_SIGNALS:
 	void triggerRead();
 
 private:
-	void setupChannels();
+	void scanChannels();
+	bool extractChannelPaths(iio_channel *chn);
+	void mapPathsUnique();
 	QWidget *createMenu();
 	void loadCfir(QString path);
 	void loadPfir(QString path);
@@ -66,6 +68,18 @@ private:
 	QSplitter *m_hSplitter;
 
 	const QString settingsMenuId = "settings";
+
+	using ChannelList = QList<QString>;	    // channels list
+	using FddcMap = QMap<QString, ChannelList>; // FDDC map
+	using CddcMap = QMap<QString, FddcMap>;
+	using AdcMap = QMap<QString, CddcMap>;
+	using SideMap = QMap<QString, AdcMap>;
+	SideMap m_channelPaths;
+
+	QList<QString> m_rx_fine_ddc_channel_names;
+	QList<QString> m_rx_coarse_ddc_channel_names;
+	QList<QString> m_tx_fine_duc_channel_names;
+	QList<QString> m_tx_coarse_duc_channel_names;
 };
 } // namespace ad9084
 } // namespace scopy

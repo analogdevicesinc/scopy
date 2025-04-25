@@ -138,6 +138,7 @@ bool AD9084Plugin::onDisconnect()
 		tool->setRunBtnVisible(false);
 		QWidget *w = tool->tool();
 		if(w) {
+			m_toolList.removeAll(tool);
 			tool->setTool(nullptr);
 			delete(w);
 		}
