@@ -96,7 +96,14 @@ void IIOModel::setupCurrentDevice()
 	m_currentDevice = iio_context_get_device(m_ctx, static_cast<uint>(m_currentDeviceIndex));
 	m_devList = IIOWidgetBuilder(m_parent).device(m_currentDevice).includeAvailableAttributes(true).buildAll();
 	m_currentDeviceName = iio_device_get_name(m_currentDevice);
+	QString lbl = iio_device_get_label(m_currentDevice);
+	if(!lbl.isEmpty()) {
+		m_currentDeviceName = lbl;
+	}
 	QString currentDeviceId = iio_device_get_id(m_currentDevice);
+	if(m_currentDeviceName.isEmpty()) {
+		m_currentDeviceName = currentDeviceId;
+	}
 	bool is_trigger = iio_device_is_trigger(m_currentDevice);
 	if(is_trigger) {
 		m_currentDeviceItem =
