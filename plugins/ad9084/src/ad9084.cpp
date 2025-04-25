@@ -223,49 +223,41 @@ void Ad9084::setupChannels()
 
 QWidget *Ad9084::createMenu()
 {
-	// tbd will be replaced with a FileBrowserWidget (PR open)
 	QWidget *menu = new QWidget(this);
 	QVBoxLayout *vLay = new QVBoxLayout();
 	vLay->setMargin(0);
 	menu->setLayout(vLay);
 
+	// PFIR load container
 	auto pfirContainer = new MenuSectionCollapseWidget("PFIR CONFIG", MenuCollapseSection::MHCW_NONE,
 							   MenuCollapseSection::MHW_BASEWIDGET, menu);
 	QHBoxLayout *pfirlay = new QHBoxLayout(this);
 	pfirlay->setMargin(0);
 	pfirlay->setSpacing(10);
 
-	m_pfirLineEdit = new QLineEdit(this);
+	m_pfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
+	m_pfirFileBrowser->setFilter(tr("All Files(*)"));
+	auto pfirFileBrowserEdit = m_pfirFileBrowser->lineEdit();
+	QObject::connect(pfirFileBrowserEdit, &QLineEdit::textChanged, this, &Ad9084::loadPfir);
 
-	QPushButton *pfirBtn = new QPushButton(this);
-	StyleHelper::BrowseButton(pfirBtn);
-
-	pfirlay->addWidget(m_pfirLineEdit);
-	pfirlay->addWidget(pfirBtn);
-
-	connect(pfirBtn, &QPushButton::pressed, this, &Ad9084::choosePfir);
-	connect(m_pfirLineEdit, &QLineEdit::editingFinished, this, &Ad9084::loadPfir);
+	pfirlay->addWidget(m_pfirFileBrowser);
 	Style::setStyle(this, style::properties::widget::border_interactive);
 	pfirContainer->contentLayout()->addLayout(pfirlay);
 
+	// CFIR load container
 	auto cfirContainer = new MenuSectionCollapseWidget("CFIR CONFIG", MenuCollapseSection::MHCW_NONE,
 							   MenuCollapseSection::MHW_BASEWIDGET, menu);
 	QHBoxLayout *cfirlay = new QHBoxLayout(this);
 	cfirlay->setMargin(0);
 	cfirlay->setSpacing(10);
 
-	m_cfirLineEdit = new QLineEdit(this);
+	m_cfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
+	m_cfirFileBrowser->setFilter(tr("All Files(*)"));
+	auto cfirFileBrowserEdit = m_cfirFileBrowser->lineEdit();
+	QObject::connect(cfirFileBrowserEdit, &QLineEdit::textChanged, this, &Ad9084::loadCfir);
 
-	QPushButton *cfirBtn = new QPushButton(this);
-	StyleHelper::BrowseButton(cfirBtn);
-
-	cfirlay->addWidget(m_cfirLineEdit);
-	cfirlay->addWidget(cfirBtn);
-
-	connect(cfirBtn, &QPushButton::pressed, this, &Ad9084::chooseCfir);
-	connect(m_cfirLineEdit, &QLineEdit::editingFinished, this, &Ad9084::loadCfir);
+	cfirlay->addWidget(m_cfirFileBrowser);
 	Style::setStyle(this, style::properties::widget::border_interactive);
-
 	cfirContainer->contentLayout()->addLayout(cfirlay);
 
 	vLay->addWidget(pfirContainer);
@@ -291,9 +283,8 @@ QString Ad9084::readFile(QString file)
 	return content;
 }
 
-void Ad9084::loadCfir()
+void Ad9084::loadCfir(QString path)
 {
-	QString path = m_cfirLineEdit->text();
 	if(path.isEmpty()) {
 		return;
 	}
@@ -303,9 +294,9 @@ void Ad9084::loadCfir()
 		qWarning() << "Failed to load CFIR CONFIG file to CFIR_CONFIG attr";
 }
 
-void Ad9084::loadPfir()
+void Ad9084::loadPfir(QString path)
 {
-	QString path = m_pfirLineEdit->text();
+
 	if(path.isEmpty()) {
 		return;
 	}
@@ -313,29 +304,4 @@ void Ad9084::loadPfir()
 	size_t ret = iio_device_attr_write_raw(m_device, "pfilt_config", content.toStdString().c_str(), content.size());
 	if(ret < 0)
 		qWarning() << "Failed to load PFIR CONFIG file to PFILT_CONFIG attr";
-}
-
-QString Ad9084::chooseFile()
-{
-	QString selectedFilter;
-
-	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-	QString tmpFilename = QFileDialog::getOpenFileName(
-		this, tr("Import"), "", tr("All Files(*)"), &selectedFilter,
-		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
-	return tmpFilename;
-}
-
-void Ad9084::chooseCfir()
-{
-	QString path = chooseFile();
-	m_cfirLineEdit->setText(path);
-	Q_EMIT m_cfirLineEdit->editingFinished();
-}
-
-void Ad9084::choosePfir()
-{
-	QString path = chooseFile();
-	m_pfirLineEdit->setText(path);
-	Q_EMIT m_pfirLineEdit->editingFinished();
 }
