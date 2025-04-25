@@ -125,6 +125,8 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
+	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	popd
 }
 
@@ -304,6 +306,22 @@ build_kddock () {
 	popd
 }
 
+build_ecm() {
+	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
+	pushd $STAGING_AREA/extra-cmake-modules
+	CURRENT_BUILD_CMAKE_OPTS=""
+	build_with_cmake || { echo "Error: Failed to build ECM"; exit 1; }
+	popd
+}
+
+build_karchive () {
+	echo "### Building karchive - version $KARCHIVE_BRANCH"
+    pushd $STAGING_AREA/karchive
+    CURRENT_BUILD_CMAKE_OPTS=""
+    build_with_cmake || { echo "Error: Failed to build karchive"; exit 1; }
+    popd
+}
+
 build_iio-emu(){
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	pushd $STAGING_AREA
@@ -467,6 +485,8 @@ build_deps(){
 	build_libsigrokdecode
 	build_libtinyiiod
 	build_kddock
+	build_ecm
+	build_karchive
 }
 
 run_workflow(){
