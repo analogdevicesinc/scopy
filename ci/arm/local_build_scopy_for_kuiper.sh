@@ -26,6 +26,8 @@ QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
 KDDOCK_BRANCH=2.1
+ECM_BRANCH=kf5
+KARCHIVE_BRANCH=kf5
 
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
@@ -84,6 +86,8 @@ clone() {
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
+	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	popd
 }
 
@@ -238,6 +242,20 @@ build_kddock () {
 	popd
 }
 
+build_ecm() {
+	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
+	pushd $STAGING_AREA/extra-cmake-modules
+	build_with_cmake ../
+	popd
+}
+
+build_karchive () {
+	echo "### Building karchive - version $KARCHIVE_BRANCH"
+    pushd $STAGING_AREA/karchive
+    build_with_cmake ../
+    popd
+}
+
 build_iio-emu() {
 	echo "####### BUILD IIO-EMU #######"
 	pushd $STAGING_AREA/iio-emu
@@ -276,6 +294,8 @@ buid_deps() {
 	build_libsigrokdecode
 	build_libtinyiiod
 	build_kddock
+	build_ecm
+	build_karchive
 }
 
 
