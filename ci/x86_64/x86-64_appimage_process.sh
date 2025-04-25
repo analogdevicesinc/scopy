@@ -31,6 +31,8 @@ QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=master
 KDDOCK_BRANCH=2.1
+ECM_BRANCH=kf5
+KARCHIVE_BRANCH=kf5
 
 # default python version used in CI scripts, can be changed to match locally installed python
 PYTHON_VERSION=python3.8
@@ -97,6 +99,8 @@ clone() {
 	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
+	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	popd
 }
 
@@ -366,6 +370,22 @@ build_kddock () {
 	popd
 }
 
+build_ecm() {
+	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
+	pushd $STAGING_AREA/extra-cmake-modules
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	build_with_cmake $1 || { echo "Error: Failed to build ECM"; exit 1; }
+	popd
+}
+
+build_karchive () {
+	echo "### Building karchive - version $KARCHIVE_BRANCH"
+	pushd $STAGING_AREA/karchive
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	build_with_cmake $1 || { echo "Error: Failed to build karchive"; exit 1; }
+	popd
+}
+
 build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
@@ -516,6 +536,8 @@ build_deps(){
 	build_libsigrokdecode ON
 	build_libtinyiiod ON
 	build_kddock ON
+	build_ecm ON
+	build_karchive ON
 }
 
 run_workflow(){
