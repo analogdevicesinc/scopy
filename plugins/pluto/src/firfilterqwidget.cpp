@@ -1,4 +1,4 @@
-#include "firfilterqidget.h"
+#include "firfilterqwidget.h"
 
 #include <QFileDialog>
 #include <QLabel>
@@ -12,7 +12,7 @@ using namespace scopy;
 using namespace pluto;
 Q_LOGGING_CATEGORY(CAT_FIR_FILTER, "FirFilter")
 
-FirFilterQidget::FirFilterQidget(iio_device *dev1, iio_device *dev2, QWidget *parent)
+FirFilterQWidget::FirFilterQWidget(iio_device *dev1, iio_device *dev2, QWidget *parent)
 	: m_dev1(dev1)
 	, m_dev2(dev2)
 	, QWidget{parent}
@@ -24,25 +24,25 @@ FirFilterQidget::FirFilterQidget(iio_device *dev1, iio_device *dev2, QWidget *pa
 	m_isRxFilter = false;
 	m_isTxFilter = false;
 
-	QLabel *label = new QLabel("Filter FIR configuraion:", this);
+	QLabel *label = new QLabel("Filter FIR configuration:", this);
 
 	// TODO REPLACE WITH FILE CHOSE WIDGET
-	m_choseFileBtn = new QPushButton("(None)", this);
+	m_chooseFileBtn = new QPushButton("(None)", this);
 
-	Style::setStyle(m_choseFileBtn, style::properties::button::basicButton);
+	Style::setStyle(m_chooseFileBtn, style::properties::button::basicButton);
 
-	connect(m_choseFileBtn, &QPushButton::clicked, this, &FirFilterQidget::chooseFile);
+	connect(m_chooseFileBtn, &QPushButton::clicked, this, &FirFilterQWidget::chooseFile);
 
 	MenuOnOffSwitch *autoFilter = new MenuOnOffSwitch("Auto Filter", this, false);
 
-	connect(autoFilter->onOffswitch(), &QAbstractButton::toggled, this, &FirFilterQidget::autofilterToggled);
+	connect(autoFilter->onOffswitch(), &QAbstractButton::toggled, this, &FirFilterQWidget::autofilterToggled);
 
 	m_applyRxTxFilter = new MenuOnOffSwitch("Enable RX and TX FIR Filters", this, false);
 
 	connect(m_applyRxTxFilter->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
 		if(m_isRxFilter) {
 			if(m_isTxFilter) {
-				// we have a rx & tx filter we try to apply filter fo device
+				// we have a rx & tx filter we try to apply filter for device
 				toggleDeviceFilter(m_dev1, toggled);
 				if(m_dev2 != nullptr) {
 					toggleDeviceFilter(m_dev2, toggled);
@@ -60,13 +60,13 @@ FirFilterQidget::FirFilterQidget(iio_device *dev1, iio_device *dev2, QWidget *pa
 
 	m_layout->addWidget(label);
 	m_layout->addWidget(autoFilter);
-	m_layout->addWidget(m_choseFileBtn);
+	m_layout->addWidget(m_chooseFileBtn);
 	m_layout->addWidget(m_applyRxTxFilter);
 
 	m_applyRxTxFilter->setVisible(false);
 }
 
-void FirFilterQidget::chooseFile()
+void FirFilterQWidget::chooseFile()
 {
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
@@ -76,14 +76,12 @@ void FirFilterQidget::chooseFile()
 		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(!filename.isEmpty()) {
-		m_choseFileBtn->setText(filename);
-
-		// TODO implement fir filter functionality
+		m_chooseFileBtn->setText(filename);
 		applyFirFilter(filename);
 	}
 }
 
-void FirFilterQidget::applyFirFilter(QString path)
+void FirFilterQWidget::applyFirFilter(QString path)
 {
 	if(path.isEmpty()) {
 		qWarning(CAT_FIR_FILTER) << "No file path provided";
@@ -136,7 +134,7 @@ void FirFilterQidget::applyFirFilter(QString path)
 				<< "FIR Filter Configuration Failed" << QString::fromLocal8Bit(strerror(ret * (-1)));
 		}
 	} else {
-		qWarning(CAT_FIR_FILTER) << "Can't open file: " << path;
+		qWarning(CAT_FIR_FILTER) << "Unable to open file: " << path;
 		return;
 	}
 
@@ -147,7 +145,7 @@ void FirFilterQidget::applyFirFilter(QString path)
 	}
 }
 
-void FirFilterQidget::applyChannelFilterToggled(bool isTx, bool toggled)
+void FirFilterQWidget::applyChannelFilterToggled(bool isTx, bool toggled)
 {
 	iio_channel *chn = iio_device_find_channel(m_dev1, "voltage0", isTx);
 	toggleChannelFilter(chn, "filter_fir_en", toggled);
@@ -157,7 +155,7 @@ void FirFilterQidget::applyChannelFilterToggled(bool isTx, bool toggled)
 	}
 }
 
-void FirFilterQidget::toggleDeviceFilter(iio_device *dev, bool toggled)
+void FirFilterQWidget::toggleDeviceFilter(iio_device *dev, bool toggled)
 {
 	int ret = -ENOMEM;
 	// for FMCOMMS2 devices the attribute might be a device attr or a channel attr
@@ -168,20 +166,20 @@ void FirFilterQidget::toggleDeviceFilter(iio_device *dev, bool toggled)
 		iio_channel *chn = iio_device_find_channel(dev, "out", false);
 		toggleChannelFilter(chn, "voltage_filter_fir_en", toggled);
 	} else {
-		Q_EMIT filterChangeWasMade();
+		Q_EMIT filterChanged();
 	}
 }
 
-void FirFilterQidget::toggleChannelFilter(iio_channel *chn, QString attr, bool toggled)
+void FirFilterQWidget::toggleChannelFilter(iio_channel *chn, QString attr, bool toggled)
 {
 	if(chn) {
 		int ret = -ENOMEM;
 		ret = iio_channel_attr_write_bool(chn, attr.toStdString().c_str(), toggled);
 		if(ret < 0) {
-			qWarning(CAT_FIR_FILTER) << "FIR Filter channel enablement failed: "
+			qWarning(CAT_FIR_FILTER) << "Failed to enable FIR filter channel: "
 						 << QString::fromLocal8Bit(strerror(ret * (-1)));
 		} else {
-			Q_EMIT filterChangeWasMade();
+			Q_EMIT filterChanged();
 		}
 	}
 }
