@@ -41,7 +41,7 @@ public:
 	QComboBox *fastlockProfiles() const;
 
 	QString title() const;
-	void setTitle(QString *newTitle);
+	void setTitle(QString &newTitle);
 
 Q_SIGNALS:
 	void recallCalled();

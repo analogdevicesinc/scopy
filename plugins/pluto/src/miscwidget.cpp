@@ -29,12 +29,11 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 	QGridLayout *dcOffsetTrackingLayout = new QGridLayout(dcOffsetTracking);
 	dcOffsetTracking->setLayout(dcOffsetTrackingLayout);
 
-	dcOffsetTrackingLayout->addWidget(new QLabel("RX Freq", dcOffsetTracking), 0, 0);
+	dcOffsetTrackingLayout->addWidget(new QLabel("RX Frequency", dcOffsetTracking), 0, 0);
 	dcOffsetTrackingLayout->addWidget(new QLabel("> 4 GHz", dcOffsetTracking), 0, 1);
 	dcOffsetTrackingLayout->addWidget(new QLabel("< 4 GHz", dcOffsetTracking), 0, 2);
 
 	// attenuation
-
 	dcOffsetTrackingLayout->addWidget(new QLabel("Attenuation", dcOffsetTracking), 1, 0);
 
 	// adi,dc-offset-attenuation-low-range
@@ -45,7 +44,9 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 						 .title(" ")
 						 .buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationLowRange, 1, 1);
-	attenuationLowRange->setToolTip("RX LO < 4 GHz: These bits control the attenuator for the initialization and tracking RF DC offset calibrations. The integrated data shifts by this twos complement value and ranges from -16 to +15.");
+	attenuationLowRange->setToolTip(
+		"RX LO < 4 GHz: These bits control the attenuator for the initialization and tracking RF DC offset "
+		"calibrations. The integrated data shifts by this twos complement value and ranges from -16 to +15.");
 
 	// adi,dc-offset-attenuation-high-range
 	IIOWidget *attenuationHighRange = IIOWidgetBuilder(dcOffsetTracking)
@@ -55,7 +56,9 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 						  .title(" ")
 						  .buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationHighRange, 1, 2);
-	attenuationHighRange->setToolTip("RX LO > 4 GHz: These bits control the attenuator for the initialization and tracking RF DC offset calibrations. The integrated data shifts by this twos complement value and ranges from -16 to +15.");
+	attenuationHighRange->setToolTip(
+		"RX LO > 4 GHz: These bits control the attenuator for the initialization and tracking RF DC offset "
+		"calibrations. The integrated data shifts by this twos complement value and ranges from -16 to +15.");
 
 	// count
 	dcOffsetTrackingLayout->addWidget(new QLabel("Count", dcOffsetTracking), 2, 0);
@@ -68,7 +71,10 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 					   .title(" ")
 					   .buildSingle();
 	dcOffsetTrackingLayout->addWidget(countLowRange, 2, 1);
-	countLowRange->setToolTip("RX LO < 4 GHz: This value affects both RF DC offset initialization and tracking and it sets the number of integrated samples and the loop gain. The number of samples equals 256 × RF DC Offset Count[7:0] in ClkRF cycles. Increasing this value increases loop gain.");
+	countLowRange->setToolTip(
+		"RX LO < 4 GHz: This value affects both RF DC offset initialization and tracking and it sets the "
+		"number of integrated samples and the loop gain. The number of samples equals 256 × RF DC Offset "
+		"Count[7:0] in ClkRF cycles. Increasing this value increases loop gain.");
 
 	// adi,dc-offset-count-high-range
 	IIOWidget *countHighRange = IIOWidgetBuilder(dcOffsetTracking)
@@ -78,7 +84,10 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 					    .title(" ")
 					    .buildSingle();
 	dcOffsetTrackingLayout->addWidget(countHighRange, 2, 2);
-	countHighRange->setToolTip("RX LO > 4 GHz: This value affects both RF DC offset initialization and tracking and it sets the number of integrated samples and the loop gain. The number of samples equals 256 × RF DC Offset Count[7:0] in ClkRF cycles. Increasing this value increases loop gain.");
+	countHighRange->setToolTip(
+		"RX LO > 4 GHz: This value affects both RF DC offset initialization and tracking and it sets the "
+		"number of integrated samples and the loop gain. The number of samples equals 256 × RF DC Offset "
+		"Count[7:0] in ClkRF cycles. Increasing this value increases loop gain.");
 
 	// adi,dc-offset-tracking-update-event-mask
 	dcOffsetTrackingLayout->addWidget(new QLabel("Update Event Mask", dcOffsetTracking), 3, 0);
@@ -89,7 +98,9 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 					     .title(" ")
 					     .buildSingle();
 	dcOffsetTrackingLayout->addWidget(updateEventMask, 3, 1);
-	updateEventMask->setToolTip("BIT(0) Apply a new tracking word when a gain change occurs. BIT(1) Apply a new tracking word when the received signal is less than the SOI Threshold. BIT(2) Apply a new tracking word after the device exits the receive state");
+	updateEventMask->setToolTip("BIT(0) Apply a new tracking word when a gain change occurs. BIT(1) Apply a new "
+				    "tracking word when the received signal is less than the SOI Threshold. BIT(2) "
+				    "Apply a new tracking word after the device exits the receive state");
 
 	m_layout->addWidget(dcOffsetTracking);
 
@@ -104,7 +115,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	qecTrackingLayout->addWidget(title);
 
-	//adi,qec-tracking-slow-mode-enable
+	// adi,qec-tracking-slow-mode-enable
 	IIOWidget *qecTrackingIio = IIOWidgetBuilder(qecTracking)
 					    .device(m_device)
 					    .attribute("adi,qec-tracking-slow-mode-enable")
@@ -117,8 +128,7 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 	m_layout->addWidget(qecTracking);
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-
-	connect(this, &MiscWidget::readRequested, this, [=, this](){
+	connect(this, &MiscWidget::readRequested, this, [=, this]() {
 		attenuationLowRange->readAsync();
 		attenuationHighRange->readAsync();
 		countLowRange->readAsync();

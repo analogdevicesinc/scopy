@@ -1,7 +1,7 @@
 #include "ad936x.h"
 
 #include "fastlockprofileswidget.h"
-#include "firfilterqidget.h"
+#include "firfilterqwidget.h"
 
 #include <QLabel>
 #include <QTabWidget>
@@ -58,7 +58,7 @@ AD936X::AD936X(QString uri, QWidget *parent)
 
 	m_refreshButton = new AnimationPushButton(this);
 	m_refreshButton->setIcon(
-	                Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
 	m_refreshButton->setIconSize(QSize(25, 25));
 	m_refreshButton->setText("Refresh");
 	m_refreshButton->setAutoDefault(true);
@@ -68,21 +68,21 @@ AD936X::AD936X(QString uri, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
 
 	connect(m_refreshButton, &QPushButton::clicked, this, [this]() {
-		        m_refreshButton->startAnimation();
+		m_refreshButton->startAnimation();
 
-			QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-			connect(
-			        watcher, &QFutureWatcher<void>::finished, this,
-			        [this, watcher]() {
-				        m_refreshButton->stopAnimation();
-					watcher->deleteLater();
-			        },
-			        Qt::QueuedConnection);
+		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+		connect(
+			watcher, &QFutureWatcher<void>::finished, this,
+			[this, watcher]() {
+				m_refreshButton->stopAnimation();
+				watcher->deleteLater();
+			},
+			Qt::QueuedConnection);
 
-			QFuture<void> future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
+		QFuture<void> future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
 
-			watcher->setFuture(future);
-	        });
+		watcher->setFuture(future);
+	});
 
 	QStackedWidget *centralWidget = new QStackedWidget(this);
 
@@ -228,7 +228,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	hlayout->addWidget(trxRateGovernor);
 	connect(this, &AD936X::readRequested, trxRateGovernor, &IIOWidget::readAsync);
 
-	FirFilterQidget *firFilter = new FirFilterQidget(plutoDevice, nullptr, globalSettingsWidget);
+	FirFilterQWidget *firFilter = new FirFilterQWidget(plutoDevice, nullptr, globalSettingsWidget);
 	hlayout->addWidget(firFilter);
 
 	layout->addLayout(hlayout);
@@ -255,7 +255,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	txPathRates->setEnabled(false);
 	connect(this, &AD936X::readRequested, txPathRates, &IIOWidget::readAsync);
 
-	connect(firFilter, &FirFilterQidget::filterChangeWasMade, this, [=, this]() {
+	connect(firFilter, &FirFilterQWidget::filterChanged, this, [=, this]() {
 		rxPathRates->read();
 		txPathRates->read();
 	});
@@ -314,7 +314,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					       .channel(voltage0)
 					       .attribute("sampling_frequency")
 					       .optionsAttribute("sampling_frequency_available")
-					       .title("Sampling Rate(MSPS")
+					       .title("Sampling Rate(MSPS)")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
 	hLayout->addWidget(samplingFrequency);
@@ -434,7 +434,7 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 					  .channel(chn)
 					  .attribute("hardwaregain")
 					  .optionsAttribute("hardwaregain_available")
-					  .title("Hadware Gain(dB)")
+					  .title("Hardware Gain(dB)")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .buildSingle();
 	layout->addWidget(hardwaregain);

@@ -62,14 +62,14 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	fddMode->setToolTip("Use FDD mode - default TDD");
 
 	// adi,ensm-enable-pin-pulse-mode-enable
-	IIOWidget *ensmEnablePinPluseMode = IIOWidgetBuilder(ensmModeWidget)
+	IIOWidget *ensmEnablePinPulseMode = IIOWidgetBuilder(ensmModeWidget)
 						    .device(m_device)
 						    .attribute("adi,ensm-enable-pin-pulse-mode-enable")
 						    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						    .title("Pin Pluse Mode")
+						    .title("Pin Pulse Mode")
 						    .buildSingle();
-	ensmModeWidgetLayout->addWidget(ensmEnablePinPluseMode);
-	ensmEnablePinPluseMode->setToolTip("ENSM control Pins (ENABLE/TXNRX) use Pulse mode - default Level Mode");
+	ensmModeWidgetLayout->addWidget(ensmEnablePinPulseMode);
+	ensmEnablePinPulseMode->setToolTip("ENSM control Pins (ENABLE/TXNRX) use Pulse mode - default Level Mode");
 
 	// adi,ensm-enable-txnrx-control-enable
 	IIOWidget *ensmEnableTxnrx = IIOWidgetBuilder(ensmModeWidget)
@@ -124,20 +124,20 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 						 .title("Update Tx Gain in ALERT")
 						 .buildSingle();
 	ensmHBoxLayout->addWidget(updateTxGainInAlert);
-	updateTxGainInAlert->setToolTip("in TDD mode disable immediate TX Gain update and wait until ENSM moves to Alert");
+	updateTxGainInAlert->setToolTip(
+		"in TDD mode disable immediate TX Gain update and wait until ENSM moves to Alert");
 
 	ensmModeWidgetLayout->addLayout(ensmHBoxLayout);
 
-	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this](){
+	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this]() {
 		fddMode->readAsync();
-		ensmEnablePinPluseMode->readAsync();
+		ensmEnablePinPulseMode->readAsync();
 		ensmEnableTxnrx->readAsync();
 		useDualSynth->readAsync();
 		useFddVcoTable->readAsync();
 		skipVcoCal->readAsync();
 		updateTxGainInAlert->readAsync();
 	});
-
 
 	return ensmModeWidget;
 }
@@ -180,7 +180,7 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 	modeWidgetLayout->addWidget(rx1Rx2Phase);
 	rx1Rx2Phase->setToolTip("If enabled RX1 and RX2 are phase aligned");
 
-	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this](){
+	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this]() {
 		rxPortInput->readAsync();
 		txPortInput->readAsync();
 		rx1Rx2Phase->readAsync();
@@ -206,18 +206,18 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 						   .device(m_device)
 						   .attribute("adi,xo-disable-use-ext-refclk-enable")
 						   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						   .title("XO Disable use EXT RefCLK")
+						   .title("XO Disable Use EXT RefCLK")
 						   .buildSingle();
 	clocksWidgetLayout->addWidget(xoDisableUseExtRefclk, 1, 0);
 	xoDisableUseExtRefclk->setToolTip("Disable XO use Ext CLK into XTAL_N - default XO into XTAL");
 
 	// adi,external-rx-lo-enable
 	IIOWidget *externalRxLo = IIOWidgetBuilder(clocksWidget)
-					 .device(m_device)
-					 .attribute("adi,external-rx-lo-enable")
-					 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					 .title("Ext RX LO")
-					 .buildSingle();
+					  .device(m_device)
+					  .attribute("adi,external-rx-lo-enable")
+					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					  .title("Ext RX LO")
+					  .buildSingle();
 	clocksWidgetLayout->addWidget(externalRxLo, 2, 0);
 	externalRxLo->setToolTip("Enables external LO for RX");
 
@@ -232,11 +232,11 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 
 	// adi,external-tx-lo-enable
 	IIOWidget *externalTxLo = IIOWidgetBuilder(clocksWidget)
-					 .device(m_device)
-					 .attribute("adi,external-tx-lo-enable")
-					 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					 .title("Ext TX LO")
-					 .buildSingle();
+					  .device(m_device)
+					  .attribute("adi,external-tx-lo-enable")
+					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					  .title("Ext TX LO")
+					  .buildSingle();
 	clocksWidgetLayout->addWidget(externalTxLo, 3, 0);
 	externalTxLo->setToolTip("Enables external LO for TX");
 
@@ -254,8 +254,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	IIOWidget *rxFastLockDelay = IIOWidgetBuilder(clocksWidget)
 					     .device(m_device)
 					     .attribute("adi,rx-fastlock-delay-ns")
-					     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					     .title("RX Fastlock Delay")
+					     .title("RX Fastlock Delay (ns)")
 					     .buildSingle();
 	clocksWidgetLayout->addWidget(rxFastLockDelay, 4, 1);
 	rxFastLockDelay->setToolTip("RX fastlock delay in ns");
@@ -264,7 +263,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	IIOWidget *txFastlockPincontrol = IIOWidgetBuilder(clocksWidget)
 						  .device(m_device)
 						  .attribute("adi,tx-fastlock-pincontrol-enable")
-	                                          .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("TX Fastlock Pin Control")
 						  .buildSingle();
 	clocksWidgetLayout->addWidget(txFastlockPincontrol, 5, 0);
@@ -274,13 +273,12 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	IIOWidget *txFastLockDelay = IIOWidgetBuilder(clocksWidget)
 					     .device(m_device)
 					     .attribute("adi,tx-fastlock-delay-ns")
-					     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					     .title("TX Fastlock Delay")
+					     .title("TX Fastlock Delay (ns)")
 					     .buildSingle();
 	clocksWidgetLayout->addWidget(txFastLockDelay, 5, 1);
 	txFastLockDelay->setToolTip("TX fastlock delay in ns");
 
-	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this](){
+	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this]() {
 		xoDisableUseExtRefclk->readAsync();
 		externalRxLo->readAsync();
 		clkOutputMode->readAsync();
