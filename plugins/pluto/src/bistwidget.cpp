@@ -38,12 +38,12 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 
 	// bist_prbs
 	IIOWidget *bistPrbs =
-	        IIOWidgetBuilder(widget).device(m_device).attribute("bist_prbs").title("Bist PRBS").buildSingle();
+		IIOWidgetBuilder(widget).device(m_device).attribute("bist_prbs").title("Bist PRBS").buildSingle();
 	hLayout1->addWidget(bistPrbs);
 
 	// loopback
 	IIOWidget *loopback =
-	        IIOWidgetBuilder(widget).device(m_device).attribute("loopback").title("LoopBack").buildSingle();
+		IIOWidgetBuilder(widget).device(m_device).attribute("loopback").title("Loopback").buildSingle();
 	hLayout1->addWidget(loopback);
 
 	layout->addLayout(hLayout1);
@@ -88,7 +88,7 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	connect(this, &BistWidget::readRequested, this, [=, this](){
+	connect(this, &BistWidget::readRequested, this, [=, this]() {
 		m_bistTone->read();
 		bistPrbs->read();
 		loopback->read();
@@ -123,7 +123,7 @@ void BistWidget::updateBistTone()
 
 	int ret = iio_device_debug_attr_write(m_device, "bist_tone", config.toStdString().c_str());
 	if(ret < 0) {
-		qWarning() << "FIR Filter channel enablement failed: " << QString::fromLocal8Bit(strerror(ret * (-1)));
+		qWarning() << "BIST Tone configuration failed" << QString::fromLocal8Bit(strerror(ret * (-1)));
 	}
 	// if (m_dev2)
 	// 	iio_device_debug_attr_write(m_dev2, "bist_tone", temp);

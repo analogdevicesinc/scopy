@@ -13,7 +13,6 @@ FastlockProfilesWidget::FastlockProfilesWidget(iio_channel *chn, QWidget *parent
 {
 
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	this->setLayout(layout);
 
 	m_title = new QLabel("Fastlock Profiles", this);
 	layout->addWidget(m_title);
@@ -21,7 +20,7 @@ FastlockProfilesWidget::FastlockProfilesWidget(iio_channel *chn, QWidget *parent
 	m_fastlockProfiles = new QComboBox(this);
 	layout->addWidget(m_fastlockProfiles);
 
-	// there are 7 fastlock posibile slots
+	// there are 7 fastlock possible slots
 	for(int i = 0; i <= 7; i++) {
 		m_fastlockProfiles->addItem(QString::number(i), i);
 	}
@@ -55,4 +54,4 @@ QComboBox *FastlockProfilesWidget::fastlockProfiles() const { return m_fastlockP
 
 QString FastlockProfilesWidget::title() const { return m_title->text(); }
 
-void FastlockProfilesWidget::setTitle(QString *newTitle) { m_title->setText(*newTitle); }
+void FastlockProfilesWidget::setTitle(QString &newTitle) { m_title->setText(newTitle); }

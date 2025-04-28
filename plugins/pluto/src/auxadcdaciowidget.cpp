@@ -52,7 +52,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
 
-	QLabel *title = new QLabel("Temp Snesor", widget);
+	QLabel *title = new QLabel("Temp Sensor", widget);
 	Style::setStyle(title, style::properties::label::menuBig);
 	tempSensorLayout->addWidget(title);
 
@@ -81,7 +81,8 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 						 .title("Decimation")
 						 .buildSingle();
 	tempSensorLayout->addWidget(tempSenseDecimation);
-	tempSenseDecimation->setToolTip("Decimation of the AuxADC used to derive the temperature. This data is processed by the driver.");
+	tempSenseDecimation->setToolTip(
+		"Decimation of the AuxADC used to derive the temperature. This data is processed by the driver.");
 
 	// adi,temp-sense-periodic-measurement-enable
 	IIOWidget *tempSensePeriodicMeasurement = IIOWidgetBuilder(widget)
@@ -93,7 +94,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 	tempSensorLayout->addWidget(tempSensePeriodicMeasurement);
 	tempSensePeriodicMeasurement->setToolTip("Enables periodic measurement");
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() {
 		tempSenseMeasurementInterval->readAsync();
 		tempSenseOffset->readAsync();
 		tempSenseDecimation->readAsync();
@@ -117,13 +118,11 @@ QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 	widgetLayout->addWidget(title);
 
 	// adi,aux-adc-rate
-	IIOWidget *auxAdcRate = IIOWidgetBuilder(widget)
-					.device(m_device)
-					.attribute("adi,aux-adc-rate")
-					.title("Rate")
-					.buildSingle();
+	IIOWidget *auxAdcRate =
+		IIOWidgetBuilder(widget).device(m_device).attribute("adi,aux-adc-rate").title("Rate").buildSingle();
 	widgetLayout->addWidget(auxAdcRate);
-	auxAdcRate->setToolTip("This sets the AuxADC clock frequency in Hz. See register 0x01C, bits [D5:D0]. This data is processed by the driver.");
+	auxAdcRate->setToolTip("This sets the AuxADC clock frequency in Hz. See register 0x01C, bits [D5:D0]. This "
+			       "data is processed by the driver.");
 
 	// adi,aux-adc-decimation
 	IIOWidget *auxAdcDecimation = IIOWidgetBuilder(widget)
@@ -132,9 +131,10 @@ QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 					      .title("Decimation")
 					      .buildSingle();
 	widgetLayout->addWidget(auxAdcDecimation);
-	auxAdcDecimation->setToolTip("This sets the AuxADC decimation, See register 0x01D, bits [D3:D1]. This data is processed by the driver.");
+	auxAdcDecimation->setToolTip("This sets the AuxADC decimation, See register 0x01D, bits [D3:D1]. This data is "
+				     "processed by the driver.");
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() {
 		auxAdcRate->readAsync();
 		auxAdcDecimation->readAsync();
 	});
@@ -162,9 +162,7 @@ QWidget *AuxAdcDacIoWidget::auxDacWidget(QWidget *parent)
 	auxDacWidgetLayout->addWidget(auxDacManualMode);
 	auxDacManualMode->setToolTip("If enabled the Aux DAC doesn't slave the ENSM");
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
-		auxDacManualMode->readAsync();
-	});
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() { auxDacManualMode->readAsync(); });
 
 	// getAuxAdcDac
 	QHBoxLayout *auxDacLayout = new QHBoxLayout();
@@ -196,12 +194,12 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 	iio_device *m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	// adi,aux-dacx-default-value-m
-	IIOWidget *dacDefaultVlue = IIOWidgetBuilder(auxDacWidget)
-					    .device(m_device)
-					    .attribute("adi,aux-dac" + dacx + "-default-value-mV")
-					    .title("Default Value (mV)")
-					    .buildSingle();
-	layout->addWidget(dacDefaultVlue, 1, 1);
+	IIOWidget *dacDefaultValue = IIOWidgetBuilder(auxDacWidget)
+					     .device(m_device)
+					     .attribute("adi,aux-dac" + dacx + "-default-value-mV")
+					     .title("Default Value (mV)")
+					     .buildSingle();
+	layout->addWidget(dacDefaultValue, 1, 1);
 
 	// adi,aux-dacx-active-in-alert-enable
 	IIOWidget *dacActiveInAlert = IIOWidgetBuilder(auxDacWidget)
@@ -228,7 +226,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 					   .device(m_device)
 					   .attribute("adi,aux-dac" + dacx + "-active-in-tx-enable")
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					   .title("Enabe in Tx")
+					   .title("Enable in Tx")
 					   .buildSingle();
 	layout->addWidget(dacActiveInTx, 4, 0);
 
@@ -248,8 +246,8 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 				     .buildSingle();
 	layout->addWidget(txDelay, 4, 1);
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
-		dacDefaultVlue->readAsync();
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() {
+		dacDefaultValue->readAsync();
 		dacActiveInAlert->readAsync();
 		dacActiveInRx->readAsync();
 		dacActiveInTx->readAsync();
@@ -287,7 +285,7 @@ QWidget *AuxAdcDacIoWidget::controlsOutWidget(QWidget *parent)
 					  .buildSingle();
 	controlsOutWidgetLayout->addWidget(ctrlOutsMask);
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() {
 		ctrlOutsIndex->readAsync();
 		ctrlOutsMask->readAsync();
 	});
@@ -317,11 +315,13 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 					   .title("Enable")
 					   .buildSingle();
 	widgetLayout->addWidget(gpoManualMode, 1, 0);
-	gpoManualMode->setToolTip("Enables GPO manual mode, this will conflict with automatic ENSM slave and eLNA mode");
+	gpoManualMode->setToolTip(
+		"Enables GPO manual mode, this will conflict with automatic ENSM slave and eLNA mode");
 
 	// bitmask
 	QLabel *bitmaskLabel = new QLabel("GPO Bit Mask", widget);
-	bitmaskLabel->setToolTip("Enable bit mask, setting or clearing bits will change the level of the corresponding output. Bit0 → GPO, Bit1 → GPO1, Bit2 → GPO2, Bit3 → GP03");
+	bitmaskLabel->setToolTip("Enable bit mask, setting or clearing bits will change the level of the corresponding "
+				 "output. Bit0 → GPO, Bit1 → GPO1, Bit2 → GPO2, Bit3 → GP03");
 	widgetLayout->addWidget(bitmaskLabel, 2, 0);
 	// GPO0
 	m_gpo0Mask = new MenuOnOffSwitch("GPO0", this, false);
@@ -353,9 +353,7 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 	widgetLayout->addWidget(gpoWidget("2", parent), 5, 0, 1, 2);
 	widgetLayout->addWidget(gpoWidget("3", parent), 5, 2, 1, 2);
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
-		gpoManualMode->readAsync();
-	});
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() { gpoManualMode->readAsync(); });
 
 	return widget;
 }
@@ -376,13 +374,13 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 	gpoContent->setLayout(layout);
 
 	// adi,gpoX-inactive-state-high-enable
-	IIOWidget *interactiveState = IIOWidgetBuilder(gpoContent)
-					      .device(m_device)
-					      .attribute("adi,gpo" + gpox + "-inactive-state-high-enable")
-					      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					      .title("Enable Inactive High State")
-					      .buildSingle();
-	layout->addWidget(interactiveState, 0, 0);
+	IIOWidget *inactiveState = IIOWidgetBuilder(gpoContent)
+					   .device(m_device)
+					   .attribute("adi,gpo" + gpox + "-inactive-state-high-enable")
+					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					   .title("Enable Inactive High State")
+					   .buildSingle();
+	layout->addWidget(inactiveState, 0, 0);
 
 	// adi,gpoX-slave-rx-enable
 	IIOWidget *stateRx = IIOWidgetBuilder(gpoContent)
@@ -423,8 +421,8 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 
 	gpoSection->contentLayout()->addWidget(gpoContent);
 
-	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
-		interactiveState->readAsync();
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() {
+		inactiveState->readAsync();
 		stateRx->readAsync();
 		stateTx->readAsync();
 		rxDelay->readAsync();

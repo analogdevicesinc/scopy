@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef FIRFILTERQIDGET_H
-#define FIRFILTERQIDGET_H
+#ifndef FIRFILTERQWIDGET_H
+#define FIRFILTERQWIDGET_H
 
 #include <QPushButton>
 #include <QWidget>
@@ -31,20 +31,20 @@
 
 namespace scopy {
 namespace pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT FirFilterQidget : public QWidget
+class SCOPY_PLUTOPLUGIN_EXPORT FirFilterQWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	// at least one device is required
-	explicit FirFilterQidget(iio_device *dev1, iio_device *dev2 = nullptr, QWidget *parent = nullptr);
+	explicit FirFilterQWidget(iio_device *dev1, iio_device *dev2 = nullptr, QWidget *parent = nullptr);
 
 Q_SIGNALS:
 	void autofilterToggled(bool toogled);
-	void filterChangeWasMade();
+	void filterChanged();
 
 private:
 	QVBoxLayout *m_layout;
-	QPushButton *m_choseFileBtn;
+	QPushButton *m_chooseFileBtn;
 	void chooseFile();
 	iio_device *m_dev1;
 	iio_device *m_dev2;
@@ -60,4 +60,4 @@ private:
 };
 } // namespace pluto
 } // namespace scopy
-#endif // FIRFILTERQIDGET_H
+#endif // FIRFILTERQWIDGET_H
