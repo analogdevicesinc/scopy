@@ -79,13 +79,13 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 
 	// adi,txmon-low-high-thresh
 
-	IIOWidget *lowHighTresh = IIOWidgetBuilder(widget)
-					  .device(m_device)
-					  .attribute("adi,txmon-low-high-thresh")
-					  .uiStrategy(IIOWidgetBuilder::RangeUi)
-					  .title("Low/ High Gain Threshold (mdB)")
-					  .buildSingle();
-	layout->addWidget(lowHighTresh);
+	IIOWidget *lowHighThresh = IIOWidgetBuilder(widget)
+					   .device(m_device)
+					   .attribute("adi,txmon-low-high-thresh")
+					   .uiStrategy(IIOWidgetBuilder::RangeUi)
+					   .title("Low/High Gain Threshold (mdB)")
+					   .buildSingle();
+	layout->addWidget(lowHighThresh);
 
 	// adi,txmon-low-gain
 
@@ -113,7 +113,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				   .device(m_device)
 				   .attribute("adi,txmon-delay")
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
-				   .title("Delay (RX samples) ")
+				   .title("Delay (RX samples)")
 				   .buildSingle();
 	layout->addWidget(delay);
 
@@ -123,7 +123,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				      .device(m_device)
 				      .attribute("adi,txmon-duration")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
-				      .title("Duration (RX samples)")
+				      .title("Duration (RX Samples)")
 				      .buildSingle();
 	layout->addWidget(duration);
 
@@ -132,7 +132,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					       .device(m_device)
 					       .attribute("adi,txmon-dc-tracking-enable")
 					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					       .title("DC Tracking")
+					       .title("Enable DC Tracking")
 					       .buildSingle();
 	layout->addWidget(dcTrackingEnabled);
 
@@ -141,18 +141,18 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 						.device(m_device)
 						.attribute("adi,txmon-one-shot-mode-enable")
 						.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						.title("One Shot Mode")
+						.title("Enable One Shot Mode")
 						.buildSingle();
 	layout->addWidget(oneShotModeEnabled);
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	connect(this, &TxMonitorWidget::readRequested, this, [=, this](){
+	connect(this, &TxMonitorWidget::readRequested, this, [=, this]() {
 		tx1FrontendGain->readAsync();
 		tx2FrontendGain->readAsync();
 		tx1LoCommonMode->readAsync();
 		tx2LoCommonMode->readAsync();
-		lowHighTresh->readAsync();
+		lowHighThresh->readAsync();
 		lowGain->readAsync();
 		highGain->readAsync();
 		delay->readAsync();

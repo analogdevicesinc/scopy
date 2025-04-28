@@ -53,7 +53,8 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 				       .title("Delay (us)")
 				       .buildSingle();
 	layout->addWidget(rssiDelay);
-	rssiDelay->setToolTip("When the RSSI algorithm (re)starts, the AD9361 first waits for the Rx signal path to settle. This delay is the “RSSI Delay”");
+	rssiDelay->setToolTip("When the RSSI algorithm (re)starts, the AD9361 first waits for the Rx signal path to "
+			      "settle. This delay is the “RSSI Delay”");
 
 	// wait  adi,rssi-wait
 	IIOWidget *rssiWait = IIOWidgetBuilder(widget)
@@ -63,9 +64,10 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 				      .title("Wait (us)")
 				      .buildSingle();
 	layout->addWidget(rssiWait);
-	rssiWait->setToolTip("After the “RSSI Delay” the RSSI algorithm alternates between measuring RSSI and waiting “RSSI Wait” to measure RSSI");
+	rssiWait->setToolTip("After the “RSSI Delay” the RSSI algorithm alternates between measuring RSSI and waiting "
+			     "“RSSI Wait” to measure RSSI");
 
-	//adi,rssi-restart-mode
+	// adi,rssi-restart-mode
 	IIOWidget *rssiRestartMode = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,rssi-restart-mode")
@@ -77,7 +79,7 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	connect(this, &RssiWidget::readRequested, this, [=, this](){
+	connect(this, &RssiWidget::readRequested, this, [=, this]() {
 		rssiDuration->readAsync();
 		rssiDelay->readAsync();
 		rssiWait->readAsync();

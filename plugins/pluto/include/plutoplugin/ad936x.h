@@ -40,7 +40,6 @@ public:
 	AD936X(QString uri, QWidget *parent = nullptr);
 	~AD936X();
 
-
 Q_SIGNALS:
 	void readRequested();
 
