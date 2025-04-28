@@ -29,6 +29,8 @@
 
 #include <iio-widgets/iiowidgetbuilder.h>
 
+#include <animationpushbutton.h>
+
 namespace scopy {
 namespace pluto {
 class SCOPY_PLUTOPLUGIN_EXPORT AD936X : public QWidget
@@ -38,13 +40,17 @@ public:
 	AD936X(QString uri, QWidget *parent = nullptr);
 	~AD936X();
 
+
+Q_SIGNALS:
+	void readRequested();
+
 private:
 	QString m_uri;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_controlsWidget;
 	QWidget *m_blockDiagramWidget;
-	QPushButton *m_refreshButton;
+	AnimationPushButton *m_refreshButton;
 
 	QWidget *generateGlobalSettingsWidget(QWidget *parent);
 

@@ -36,7 +36,8 @@ public:
 	explicit GainWidget(QString uri, QWidget *parent = nullptr);
 	~GainWidget();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;

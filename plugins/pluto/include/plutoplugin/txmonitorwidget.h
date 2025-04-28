@@ -35,7 +35,8 @@ public:
 	explicit TxMonitorWidget(QString uri, QWidget *parent = nullptr);
 	~TxMonitorWidget();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;

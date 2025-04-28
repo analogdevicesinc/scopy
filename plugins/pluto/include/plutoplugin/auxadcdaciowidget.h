@@ -38,7 +38,8 @@ public:
 	explicit AuxAdcDacIoWidget(QString uri, QWidget *parent = nullptr);
 	~AuxAdcDacIoWidget();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;
