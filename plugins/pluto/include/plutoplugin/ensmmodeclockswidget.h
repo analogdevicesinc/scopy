@@ -36,7 +36,8 @@ public:
 	explicit EnsmModeClocksWidget(QString uri, QWidget *parent = nullptr);
 	~EnsmModeClocksWidget();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;

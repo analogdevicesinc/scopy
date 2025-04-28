@@ -12,10 +12,19 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
-	Style::setStyle(this, style::properties::widget::border_interactive);
 
 	m_layout = new QVBoxLayout(this);
+	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
+
+	QWidget *widget = new QWidget(this);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	widget->setLayout(layout);
+
+	m_layout->addWidget(widget);
+
+	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// Get connection to device
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
@@ -24,14 +33,14 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 
 	QGridLayout *gLayout1 = new QGridLayout();
 
-	gLayout1->addWidget(new QLabel("TX1", this), 0, 1);
-	gLayout1->addWidget(new QLabel("TX2", this), 0, 2);
+	gLayout1->addWidget(new QLabel("TX1", widget), 0, 1);
+	gLayout1->addWidget(new QLabel("TX2", widget), 0, 2);
 
-	gLayout1->addWidget(new QLabel("Frontend Gain", this), 1, 0);
-	gLayout1->addWidget(new QLabel("LO Common Mode", this), 2, 0);
+	gLayout1->addWidget(new QLabel("Frontend Gain", widget), 1, 0);
+	gLayout1->addWidget(new QLabel("LO Common Mode", widget), 2, 0);
 
 	// adi,txmon-1-front-end-gain
-	IIOWidget *tx1FrontendGain = IIOWidgetBuilder(this)
+	IIOWidget *tx1FrontendGain = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,txmon-1-front-end-gain")
 					     .title(" ")
@@ -39,7 +48,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 	gLayout1->addWidget(tx1FrontendGain, 1, 1);
 
 	// adi,txmon-2-front-end-gain
-	IIOWidget *tx2FrontendGain = IIOWidgetBuilder(this)
+	IIOWidget *tx2FrontendGain = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,txmon-2-front-end-gain")
 					     .title(" ")
@@ -48,7 +57,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 
 	// adi,txmon-1-lo-cm
 
-	IIOWidget *tx1LoCommonMode = IIOWidgetBuilder(this)
+	IIOWidget *tx1LoCommonMode = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,txmon-1-lo-cm")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
@@ -58,7 +67,7 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 
 	// adi,txmon-2-lo-cm
 
-	IIOWidget *tx2LoCommonMode = IIOWidgetBuilder(this)
+	IIOWidget *tx2LoCommonMode = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,txmon-2-lo-cm")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
@@ -66,78 +75,91 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					     .buildSingle();
 	gLayout1->addWidget(tx2LoCommonMode, 2, 2);
 
-	m_layout->addLayout(gLayout1);
+	layout->addLayout(gLayout1);
 
 	// adi,txmon-low-high-thresh
 
-	IIOWidget *lowHighTresh = IIOWidgetBuilder(this)
+	IIOWidget *lowHighTresh = IIOWidgetBuilder(widget)
 					  .device(m_device)
 					  .attribute("adi,txmon-low-high-thresh")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .title("Low/ High Gain Threshold (mdB)")
 					  .buildSingle();
-	m_layout->addWidget(lowHighTresh);
+	layout->addWidget(lowHighTresh);
 
 	// adi,txmon-low-gain
 
-	IIOWidget *lowGain = IIOWidgetBuilder(this)
+	IIOWidget *lowGain = IIOWidgetBuilder(widget)
 				     .device(m_device)
 				     .attribute("adi,txmon-low-gain")
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .title("Low Gain (dB)")
 				     .buildSingle();
-	m_layout->addWidget(lowGain);
+	layout->addWidget(lowGain);
 
 	// adi,txmon-high-gain
 
-	IIOWidget *highGain = IIOWidgetBuilder(this)
+	IIOWidget *highGain = IIOWidgetBuilder(widget)
 				      .device(m_device)
 				      .attribute("adi,txmon-high-gain")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
 				      .title("High Gain (dB)")
 				      .buildSingle();
-	m_layout->addWidget(highGain);
+	layout->addWidget(highGain);
 
 	// adi,txmon-delay
 
-	IIOWidget *delay = IIOWidgetBuilder(this)
+	IIOWidget *delay = IIOWidgetBuilder(widget)
 				   .device(m_device)
 				   .attribute("adi,txmon-delay")
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
 				   .title("Delay (RX samples) ")
 				   .buildSingle();
-	m_layout->addWidget(delay);
+	layout->addWidget(delay);
 
 	// adi,txmon-duration
 
-	IIOWidget *duration = IIOWidgetBuilder(this)
+	IIOWidget *duration = IIOWidgetBuilder(widget)
 				      .device(m_device)
 				      .attribute("adi,txmon-duration")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
 				      .title("Duration (RX samples)")
 				      .buildSingle();
-	m_layout->addWidget(duration);
+	layout->addWidget(duration);
 
 	// adi,txmon-dc-tracking-enable
-
-	IIOWidget *dcTrackingEnabled = IIOWidgetBuilder(this)
+	IIOWidget *dcTrackingEnabled = IIOWidgetBuilder(widget)
 					       .device(m_device)
 					       .attribute("adi,txmon-dc-tracking-enable")
 					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					       .title("DC Tracking")
 					       .buildSingle();
-	m_layout->addWidget(dcTrackingEnabled);
+	layout->addWidget(dcTrackingEnabled);
 
 	// adi,txmon-one-shot-mode-enable
-	IIOWidget *oneShotModeEnabled = IIOWidgetBuilder(this)
+	IIOWidget *oneShotModeEnabled = IIOWidgetBuilder(widget)
 						.device(m_device)
 						.attribute("adi,txmon-one-shot-mode-enable")
 						.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						.title("One Shot Mode")
 						.buildSingle();
-	m_layout->addWidget(oneShotModeEnabled);
+	layout->addWidget(oneShotModeEnabled);
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+
+	connect(this, &TxMonitorWidget::readRequested, this, [=, this](){
+		tx1FrontendGain->readAsync();
+		tx2FrontendGain->readAsync();
+		tx1LoCommonMode->readAsync();
+		tx2LoCommonMode->readAsync();
+		lowHighTresh->readAsync();
+		lowGain->readAsync();
+		highGain->readAsync();
+		delay->readAsync();
+		duration->readAsync();
+		dcTrackingEnabled->readAsync();
+		oneShotModeEnabled->readAsync();
+	});
 }
 
 TxMonitorWidget::~TxMonitorWidget() { ConnectionProvider::close(m_uri); }

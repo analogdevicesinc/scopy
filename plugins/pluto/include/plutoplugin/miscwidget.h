@@ -35,6 +35,9 @@ public:
 	explicit MiscWidget(QString uri, QWidget *parent = nullptr);
 	~MiscWidget();
 
+Q_SIGNALS:
+	void readRequested();
+
 private:
 	QString m_uri;
 	QVBoxLayout *m_layout;

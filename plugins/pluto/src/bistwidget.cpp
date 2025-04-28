@@ -11,10 +11,19 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
-	Style::setStyle(this, style::properties::widget::border_interactive);
 
 	m_layout = new QVBoxLayout(this);
+	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
+
+	QWidget *widget = new QWidget(this);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	widget->setLayout(layout);
+
+	m_layout->addWidget(widget);
+
+	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// Get connection to device
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
@@ -24,50 +33,50 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	QHBoxLayout *hLayout1 = new QHBoxLayout();
 
 	// bist_tone
-	m_bistTone = IIOWidgetBuilder(this).device(m_device).attribute("bist_tone").title("Bist TONE").buildSingle();
+	m_bistTone = IIOWidgetBuilder(widget).device(m_device).attribute("bist_tone").title("Bist TONE").buildSingle();
 	hLayout1->addWidget(m_bistTone);
 
 	// bist_prbs
 	IIOWidget *bistPrbs =
-		IIOWidgetBuilder(this).device(m_device).attribute("bist_prbs").title("Bist PRBS").buildSingle();
+	        IIOWidgetBuilder(widget).device(m_device).attribute("bist_prbs").title("Bist PRBS").buildSingle();
 	hLayout1->addWidget(bistPrbs);
 
 	// loopback
 	IIOWidget *loopback =
-		IIOWidgetBuilder(this).device(m_device).attribute("loopback").title("LoopBack").buildSingle();
+	        IIOWidgetBuilder(widget).device(m_device).attribute("loopback").title("LoopBack").buildSingle();
 	hLayout1->addWidget(loopback);
 
-	m_layout->addLayout(hLayout1);
+	layout->addLayout(hLayout1);
 
 	// tone_level
-	m_toneLevel = IIOWidgetBuilder(this).device(m_device).attribute("tone_level").title("Level").buildSingle();
-	m_layout->addWidget(m_toneLevel);
+	m_toneLevel = IIOWidgetBuilder(widget).device(m_device).attribute("tone_level").title("Level").buildSingle();
+	layout->addWidget(m_toneLevel);
 
 	// bist_tone_frequency
-	m_toneFrequency = IIOWidgetBuilder(this)
+	m_toneFrequency = IIOWidgetBuilder(widget)
 				  .device(m_device)
 				  .attribute("bist_tone_frequency")
 				  .title("Frequency")
 				  .buildSingle();
-	m_layout->addWidget(m_toneFrequency);
+	layout->addWidget(m_toneFrequency);
 
-	m_layout->addWidget(new QLabel("Channel Mask", this));
+	layout->addWidget(new QLabel("Channel Mask", widget));
 
 	QHBoxLayout *hLayout2 = new QHBoxLayout();
 	// C2-Q
-	m_c2q = new MenuOnOffSwitch("C2-Q", this, false);
+	m_c2q = new MenuOnOffSwitch("C2-Q", widget, false);
 	hLayout2->addWidget(m_c2q);
 
 	//  C2-I
-	m_c2i = new MenuOnOffSwitch("C2-I", this, false);
+	m_c2i = new MenuOnOffSwitch("C2-I", widget, false);
 	hLayout2->addWidget(m_c2i);
 
 	//  C1-Q
-	m_c1q = new MenuOnOffSwitch("C1-Q", this, false);
+	m_c1q = new MenuOnOffSwitch("C1-Q", widget, false);
 	hLayout2->addWidget(m_c1q);
 
 	//  C1-I
-	m_c1i = new MenuOnOffSwitch("C1-I", this, false);
+	m_c1i = new MenuOnOffSwitch("C1-I", widget, false);
 	hLayout2->addWidget(m_c1i);
 
 	connect(m_c2q->onOffswitch(), &QAbstractButton::toggled, this, &BistWidget::updateBistTone);
@@ -75,9 +84,16 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	connect(m_c1q->onOffswitch(), &QAbstractButton::toggled, this, &BistWidget::updateBistTone);
 	connect(m_c1i->onOffswitch(), &QAbstractButton::toggled, this, &BistWidget::updateBistTone);
 
-	m_layout->addLayout(hLayout2);
+	layout->addLayout(hLayout2);
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+
+	connect(this, &BistWidget::readRequested, this, [=, this](){
+		m_bistTone->read();
+		bistPrbs->read();
+		loopback->read();
+		m_toneFrequency->read();
+	});
 }
 
 scopy::pluto::BistWidget::~BistWidget() { ConnectionProvider::close(m_uri); }

@@ -36,7 +36,8 @@ public:
 	explicit RssiWidget(QString uri, QWidget *parent = nullptr);
 	~RssiWidget();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;

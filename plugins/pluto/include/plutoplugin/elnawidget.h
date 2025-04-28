@@ -36,7 +36,8 @@ public:
 	explicit ElnaWidget(QString uri, QWidget *parent = nullptr);
 	~ElnaWidget();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;

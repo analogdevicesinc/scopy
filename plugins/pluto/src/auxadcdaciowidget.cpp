@@ -12,10 +12,13 @@ AuxAdcDacIoWidget::AuxAdcDacIoWidget(QString uri, QWidget *parent)
 {
 
 	m_layout = new QVBoxLayout(this);
+	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
 	QWidget *auxAdcDacIoWidget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(auxAdcDacIoWidget);
+	layout->setSpacing(10);
 	auxAdcDacIoWidget->setLayout(layout);
 	layout->setMargin(0);
 
@@ -42,79 +45,101 @@ AuxAdcDacIoWidget::~AuxAdcDacIoWidget() { ConnectionProvider::close(m_uri); }
 
 QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 {
-	QWidget *tempSensorWidget = new QWidget(parent);
-	QVBoxLayout *tempSensorLayout = new QVBoxLayout(tempSensorWidget);
-	tempSensorWidget->setLayout(tempSensorLayout);
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *tempSensorLayout = new QVBoxLayout(widget);
+	widget->setLayout(tempSensorLayout);
 
-	Style::setStyle(tempSensorWidget, style::properties::widget::border_interactive);
-	Style::setBackgroundColor(tempSensorWidget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
 
-	tempSensorLayout->addWidget(new QLabel("Temp Snesor", tempSensorWidget));
+	QLabel *title = new QLabel("Temp Snesor", widget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	tempSensorLayout->addWidget(title);
 
 	// adi,temp-sense-measurement-interval-ms
-	IIOWidget *tempSenseMeasurementInterval = IIOWidgetBuilder(tempSensorWidget)
+	IIOWidget *tempSenseMeasurementInterval = IIOWidgetBuilder(widget)
 							  .device(m_device)
 							  .attribute("adi,temp-sense-measurement-interval-ms")
 							  .title("Measurement Interval (ms) ")
 							  .buildSingle();
 	tempSensorLayout->addWidget(tempSenseMeasurementInterval);
+	tempSenseMeasurementInterval->setToolTip("Measurement interval in ms. This data is processed by the driver.");
 
 	// adi,temp-sense-offset-signed
-	IIOWidget *tempSenseOffset = IIOWidgetBuilder(tempSensorWidget)
+	IIOWidget *tempSenseOffset = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,temp-sense-offset-signed")
 					     .title("Offset")
 					     .buildSingle();
 	tempSensorLayout->addWidget(tempSenseOffset);
+	tempSenseOffset->setToolTip("Offset in signed deg. C, range -128…127");
 
 	// adi,temp-sense-decimation
-	IIOWidget *tempSenseDecimation = IIOWidgetBuilder(tempSensorWidget)
+	IIOWidget *tempSenseDecimation = IIOWidgetBuilder(widget)
 						 .device(m_device)
 						 .attribute("adi,temp-sense-decimation")
 						 .title("Decimation")
 						 .buildSingle();
 	tempSensorLayout->addWidget(tempSenseDecimation);
+	tempSenseDecimation->setToolTip("Decimation of the AuxADC used to derive the temperature. This data is processed by the driver.");
 
 	// adi,temp-sense-periodic-measurement-enable
-	IIOWidget *tempSensePeriodicMeasurement = IIOWidgetBuilder(tempSensorWidget)
+	IIOWidget *tempSensePeriodicMeasurement = IIOWidgetBuilder(widget)
 							  .device(m_device)
 							  .attribute("adi,temp-sense-periodic-measurement-enable")
 							  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 							  .title("Periodic Measurement")
 							  .buildSingle();
 	tempSensorLayout->addWidget(tempSensePeriodicMeasurement);
+	tempSensePeriodicMeasurement->setToolTip("Enables periodic measurement");
 
-	return tempSensorWidget;
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		tempSenseMeasurementInterval->readAsync();
+		tempSenseOffset->readAsync();
+		tempSenseDecimation->readAsync();
+		tempSensePeriodicMeasurement->readAsync();
+	});
+
+	return widget;
 }
 
 QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 {
-	QWidget *auxAdcWidget = new QWidget(parent);
-	QVBoxLayout *auxAdcWidgetLayout = new QVBoxLayout(auxAdcWidget);
-	auxAdcWidget->setLayout(auxAdcWidgetLayout);
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *widgetLayout = new QVBoxLayout(widget);
+	widget->setLayout(widgetLayout);
 
-	Style::setStyle(auxAdcWidget, style::properties::widget::border_interactive);
-	Style::setBackgroundColor(auxAdcWidget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
 
-	auxAdcWidgetLayout->addWidget(new QLabel("Aux ADC", auxAdcWidget));
+	QLabel *title = new QLabel("Aux ADC", widget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	widgetLayout->addWidget(title);
 
 	// adi,aux-adc-rate
-	IIOWidget *auxAdcRate = IIOWidgetBuilder(auxAdcWidget)
+	IIOWidget *auxAdcRate = IIOWidgetBuilder(widget)
 					.device(m_device)
 					.attribute("adi,aux-adc-rate")
 					.title("Rate")
 					.buildSingle();
-	auxAdcWidgetLayout->addWidget(auxAdcRate);
+	widgetLayout->addWidget(auxAdcRate);
+	auxAdcRate->setToolTip("This sets the AuxADC clock frequency in Hz. See register 0x01C, bits [D5:D0]. This data is processed by the driver.");
 
 	// adi,aux-adc-decimation
-	IIOWidget *auxAdcDecimation = IIOWidgetBuilder(auxAdcWidget)
+	IIOWidget *auxAdcDecimation = IIOWidgetBuilder(widget)
 					      .device(m_device)
 					      .attribute("adi,aux-adc-decimation")
 					      .title("Decimation")
 					      .buildSingle();
-	auxAdcWidgetLayout->addWidget(auxAdcDecimation);
+	widgetLayout->addWidget(auxAdcDecimation);
+	auxAdcDecimation->setToolTip("This sets the AuxADC decimation, See register 0x01D, bits [D3:D1]. This data is processed by the driver.");
 
-	return auxAdcWidget;
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		auxAdcRate->readAsync();
+		auxAdcDecimation->readAsync();
+	});
+
+	return widget;
 }
 
 QWidget *AuxAdcDacIoWidget::auxDacWidget(QWidget *parent)
@@ -128,7 +153,6 @@ QWidget *AuxAdcDacIoWidget::auxDacWidget(QWidget *parent)
 	Style::setBackgroundColor(auxDacWidget, json::theme::background_primary);
 
 	// adi,aux-dac-manual-mode-enable
-
 	IIOWidget *auxDacManualMode = IIOWidgetBuilder(auxDacWidget)
 					      .device(m_device)
 					      .attribute("adi,aux-dac-manual-mode-enable")
@@ -136,6 +160,11 @@ QWidget *AuxAdcDacIoWidget::auxDacWidget(QWidget *parent)
 					      .title("Manual Mode Enabled")
 					      .buildSingle();
 	auxDacWidgetLayout->addWidget(auxDacManualMode);
+	auxDacManualMode->setToolTip("If enabled the Aux DAC doesn't slave the ENSM");
+
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		auxDacManualMode->readAsync();
+	});
 
 	// getAuxAdcDac
 	QHBoxLayout *auxDacLayout = new QHBoxLayout();
@@ -158,6 +187,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 	Style::setStyle(auxDacWidget, style::properties::widget::border_interactive);
 
 	QLabel *dacLabel = new QLabel("DAC" + dacx, auxDacWidget);
+	Style::setStyle(dacLabel, style::properties::label::menuBig);
 	layout->addWidget(dacLabel, 0, 0);
 
 	// Get connection to device
@@ -165,7 +195,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 	// iio:device0: ad9361-phy
 	iio_device *m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
-	// adi,aux-dacx-default-value-mV
+	// adi,aux-dacx-default-value-m
 	IIOWidget *dacDefaultVlue = IIOWidgetBuilder(auxDacWidget)
 					    .device(m_device)
 					    .attribute("adi,aux-dac" + dacx + "-default-value-mV")
@@ -218,6 +248,15 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 				     .buildSingle();
 	layout->addWidget(txDelay, 4, 1);
 
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		dacDefaultVlue->readAsync();
+		dacActiveInAlert->readAsync();
+		dacActiveInRx->readAsync();
+		dacActiveInTx->readAsync();
+		rxDelay->readAsync();
+		txDelay->readAsync();
+	});
+
 	return auxDacWidget;
 }
 
@@ -248,20 +287,27 @@ QWidget *AuxAdcDacIoWidget::controlsOutWidget(QWidget *parent)
 					  .buildSingle();
 	controlsOutWidgetLayout->addWidget(ctrlOutsMask);
 
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		ctrlOutsIndex->readAsync();
+		ctrlOutsMask->readAsync();
+	});
+
 	return controlsOutWidget;
 }
 
 QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 {
 
-	QWidget *gposWidget = new QWidget(parent);
-	QGridLayout *gposWidgetLayout = new QGridLayout(gposWidget);
-	gposWidget->setLayout(gposWidgetLayout);
+	QWidget *widget = new QWidget(parent);
+	QGridLayout *widgetLayout = new QGridLayout(widget);
+	widget->setLayout(widgetLayout);
 
-	Style::setStyle(gposWidget, style::properties::widget::border_interactive);
-	Style::setBackgroundColor(gposWidget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
 
-	gposWidgetLayout->addWidget(new QLabel("GPO Manual Mode", gposWidget), 0, 0);
+	QLabel *title = new QLabel("GPO Manual Mode", widget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	widgetLayout->addWidget(title, 0, 0);
 
 	// adi,gpo-manual-mode-enable
 	IIOWidget *gpoManualMode = IIOWidgetBuilder(parent)
@@ -270,37 +316,48 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					   .title("Enable")
 					   .buildSingle();
-	gposWidgetLayout->addWidget(gpoManualMode, 1, 0);
+	widgetLayout->addWidget(gpoManualMode, 1, 0);
+	gpoManualMode->setToolTip("Enables GPO manual mode, this will conflict with automatic ENSM slave and eLNA mode");
 
 	// bitmask
-	gposWidgetLayout->addWidget(new QLabel("GPO Bit Mask", gposWidget), 2, 0);
+	QLabel *bitmaskLabel = new QLabel("GPO Bit Mask", widget);
+	bitmaskLabel->setToolTip("Enable bit mask, setting or clearing bits will change the level of the corresponding output. Bit0 → GPO, Bit1 → GPO1, Bit2 → GPO2, Bit3 → GP03");
+	widgetLayout->addWidget(bitmaskLabel, 2, 0);
 	// GPO0
 	m_gpo0Mask = new MenuOnOffSwitch("GPO0", this, false);
-	gposWidgetLayout->addWidget(m_gpo0Mask, 3, 0);
+	Style::setStyle(m_gpo0Mask, style::properties::widget::border_interactive);
+	widgetLayout->addWidget(m_gpo0Mask, 3, 0);
 
 	//  GPO1
 	m_gpo1Mask = new MenuOnOffSwitch("GPO1", this, false);
-	gposWidgetLayout->addWidget(m_gpo1Mask, 3, 1);
+	Style::setStyle(m_gpo1Mask, style::properties::widget::border_interactive);
+	widgetLayout->addWidget(m_gpo1Mask, 3, 1);
 
 	//  GPO2
 	m_gpo2Mask = new MenuOnOffSwitch("GPO2", this, false);
-	gposWidgetLayout->addWidget(m_gpo2Mask, 3, 2);
+	Style::setStyle(m_gpo2Mask, style::properties::widget::border_interactive);
+	widgetLayout->addWidget(m_gpo2Mask, 3, 2);
 
 	//  GPO3
 	m_gpo3Mask = new MenuOnOffSwitch("GPO03", this, false);
-	gposWidgetLayout->addWidget(m_gpo3Mask, 3, 3);
+	Style::setStyle(m_gpo3Mask, style::properties::widget::border_interactive);
+	widgetLayout->addWidget(m_gpo3Mask, 3, 3);
 
 	connect(m_gpo0Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 	connect(m_gpo1Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 	connect(m_gpo2Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 	connect(m_gpo3Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 
-	gposWidgetLayout->addWidget(gpoWidget("0", parent), 4, 0);
-	gposWidgetLayout->addWidget(gpoWidget("1", parent), 4, 1);
-	gposWidgetLayout->addWidget(gpoWidget("2", parent), 5, 0);
-	gposWidgetLayout->addWidget(gpoWidget("3", parent), 5, 1);
+	widgetLayout->addWidget(gpoWidget("0", parent), 4, 0, 1, 2);
+	widgetLayout->addWidget(gpoWidget("1", parent), 4, 2, 1, 2);
+	widgetLayout->addWidget(gpoWidget("2", parent), 5, 0, 1, 2);
+	widgetLayout->addWidget(gpoWidget("3", parent), 5, 2, 1, 2);
 
-	return gposWidget;
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		gpoManualMode->readAsync();
+	});
+
+	return widget;
 }
 
 QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
@@ -365,6 +422,14 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 	layout->addWidget(txDelay, 2, 1);
 
 	gpoSection->contentLayout()->addWidget(gpoContent);
+
+	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this](){
+		interactiveState->readAsync();
+		stateRx->readAsync();
+		stateTx->readAsync();
+		rxDelay->readAsync();
+		txDelay->readAsync();
+	});
 
 	return gpoContainer;
 }
