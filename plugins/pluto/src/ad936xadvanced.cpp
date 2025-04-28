@@ -7,6 +7,8 @@
 #include "txmonitorwidget.h"
 #include "miscwidget.h"
 
+#include <QFutureWatcher>
+#include <QtConcurrent>
 #include <bistwidget.h>
 #include <iiowidgetbuilder.h>
 #include <menuonoffswitch.h>
@@ -53,9 +55,34 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 		// });
 	});
 
-	m_refreshButton = new QPushButton("Refresh", this);
+	m_refreshButton = new AnimationPushButton(this);
+	m_refreshButton->setIcon(
+	                Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	m_refreshButton->setIconSize(QSize(25, 25));
+	m_refreshButton->setText("Refresh");
+	m_refreshButton->setAutoDefault(true);
 	Style::setStyle(m_refreshButton, style::properties::button::basicButton);
+	QMovie *movie = new QMovie(":/gui/loading.gif");
+	m_refreshButton->setAnimation(movie, 20000);
 	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
+
+	connect(m_refreshButton, &QPushButton::clicked, this, [this]() {
+		        m_refreshButton->startAnimation();
+
+			QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+			connect(
+			        watcher, &QFutureWatcher<void>::finished, this,
+			        [this, watcher]() {
+				        m_refreshButton->stopAnimation();
+					watcher->deleteLater();
+			        },
+			        Qt::QueuedConnection);
+
+			QFuture<void> future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
+
+			watcher->setFuture(future);
+	});
+
 
 	// main widget body
 
@@ -73,6 +100,8 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	EnsmModeClocksWidget *ensmModeClocks = new EnsmModeClocksWidget(m_uri, centralWidget);
 	centralWidget->addWidget(ensmModeClocks);
 
+	connect(this, &AD936XAdvanced::readRequested, ensmModeClocks, &EnsmModeClocksWidget::readRequested);
+
 	connect(ensmModeClocksBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(ensmModeClocks); });
 
@@ -83,6 +112,8 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	ElnaWidget *elna = new ElnaWidget(m_uri, centralWidget);
 	centralWidget->addWidget(elna);
 
+	connect(this, &AD936XAdvanced::readRequested, elna, &ElnaWidget::readRequested);
+
 	connect(eLnaBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(elna); });
 
 	QPushButton *rssiBtn = new QPushButton("RSSI", this);
@@ -91,6 +122,8 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 
 	RssiWidget *rssi = new RssiWidget(m_uri, centralWidget);
 	centralWidget->addWidget(rssi);
+
+	connect(this, &AD936XAdvanced::readRequested, rssi, &RssiWidget::readRequested);
 
 	connect(rssiBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(rssi); });
 
@@ -101,6 +134,8 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	GainWidget *gainWidget = new GainWidget(m_uri, centralWidget);
 	centralWidget->addWidget(gainWidget);
 
+	connect(this, &AD936XAdvanced::readRequested, gainWidget, &GainWidget::readRequested);
+
 	connect(gainBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(gainWidget); });
 
 	QPushButton *txMonitorBtn = new QPushButton("TX MONITOR", this);
@@ -109,6 +144,9 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 
 	TxMonitorWidget *txMonitor = new TxMonitorWidget(m_uri, centralWidget);
 	centralWidget->addWidget(txMonitor);
+
+	connect(this, &AD936XAdvanced::readRequested, txMonitor, &TxMonitorWidget::readRequested);
+
 	connect(txMonitorBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(txMonitor); });
 
 	QPushButton *auxAdcDacIioBtn = new QPushButton("Aux ADC/DAC/IIO", this);
@@ -117,6 +155,9 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 
 	AuxAdcDacIoWidget *auxAdcDacIo = new AuxAdcDacIoWidget(m_uri, centralWidget);
 	centralWidget->addWidget(auxAdcDacIo);
+
+	connect(this, &AD936XAdvanced::readRequested, auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
+
 	connect(auxAdcDacIioBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(auxAdcDacIo); });
 
@@ -127,6 +168,8 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	MiscWidget *misc = new MiscWidget(m_uri, centralWidget);
 	centralWidget->addWidget(misc);
 
+	connect(this, &AD936XAdvanced::readRequested, misc, &MiscWidget::readRequested);
+
 	connect(miscBtb, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(misc); });
 
 	QPushButton *bistBtn = new QPushButton("BIST", this);
@@ -135,6 +178,9 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 
 	BistWidget *bist = new BistWidget(m_uri, centralWidget);
 	centralWidget->addWidget(bist);
+
+	connect(this, &AD936XAdvanced::readRequested, bist, &BistWidget::readRequested);
+
 	connect(bistBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(bist); });
 
 	navigationButtons->addButton(ensmModeClocksBtn);

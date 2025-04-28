@@ -11,6 +11,8 @@
 #include <QList>
 #include <style.h>
 #include <menuonoffswitch.h>
+#include <QFutureWatcher>
+#include <QtConcurrent>
 
 #include <iioutil/connectionprovider.h>
 
@@ -54,18 +56,46 @@ AD936X::AD936X(QString uri, QWidget *parent)
 		// });
 	});
 
-	m_refreshButton = new QPushButton("Refresh", this);
+	m_refreshButton = new AnimationPushButton(this);
+	m_refreshButton->setIcon(
+	                Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	m_refreshButton->setIconSize(QSize(25, 25));
+	m_refreshButton->setText("Refresh");
+	m_refreshButton->setAutoDefault(true);
 	Style::setStyle(m_refreshButton, style::properties::button::basicButton);
+	QMovie *movie = new QMovie(":/gui/loading.gif");
+	m_refreshButton->setAnimation(movie, 20000);
 	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
+
+	connect(m_refreshButton, &QPushButton::clicked, this, [this]() {
+		        m_refreshButton->startAnimation();
+
+			QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+			connect(
+			        watcher, &QFutureWatcher<void>::finished, this,
+			        [this, watcher]() {
+				        m_refreshButton->stopAnimation();
+					watcher->deleteLater();
+			        },
+			        Qt::QueuedConnection);
+
+			QFuture<void> future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
+
+			watcher->setFuture(future);
+	        });
 
 	QStackedWidget *centralWidget = new QStackedWidget(this);
 
 	m_controlsWidget = new QWidget(this);
 	QVBoxLayout *controlsLayout = new QVBoxLayout(m_controlsWidget);
+	controlsLayout->setMargin(0);
+	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	m_controlsWidget->setLayout(controlsLayout);
 
 	QWidget *controlsWidget = new QWidget(this);
 	QVBoxLayout *controlWidgetLayout = new QVBoxLayout(controlsWidget);
+	controlWidgetLayout->setMargin(0);
+	controlWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	controlsWidget->setLayout(controlWidgetLayout);
 
 	QScrollArea *scrollArea = new QScrollArea(this);
@@ -169,7 +199,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 
 	hlayout->addWidget(ensmMode);
 
-	connect(m_refreshButton, &QPushButton::clicked, ensmMode, &IIOWidget::read);
+	connect(this, &AD936X::readRequested, ensmMode, &IIOWidget::readAsync);
 
 	////calib_mode
 
@@ -182,7 +212,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 
 				       .buildSingle();
 	hlayout->addWidget(calibMode);
-	connect(m_refreshButton, &QPushButton::clicked, calibMode, &IIOWidget::read);
+	connect(this, &AD936X::readRequested, calibMode, &IIOWidget::readAsync);
 
 	Style::setStyle(calibMode, style::properties::widget::basicBackground, true, true);
 
@@ -196,7 +226,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .buildSingle();
 	hlayout->addWidget(trxRateGovernor);
-	connect(m_refreshButton, &QPushButton::clicked, trxRateGovernor, &IIOWidget::read);
+	connect(this, &AD936X::readRequested, trxRateGovernor, &IIOWidget::readAsync);
 
 	FirFilterQidget *firFilter = new FirFilterQidget(plutoDevice, nullptr, globalSettingsWidget);
 	hlayout->addWidget(firFilter);
@@ -212,7 +242,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 					 .buildSingle();
 	layout->addWidget(rxPathRates);
 	rxPathRates->setEnabled(false);
-	connect(m_refreshButton, &QPushButton::clicked, rxPathRates, &IIOWidget::read);
+	connect(this, &AD936X::readRequested, rxPathRates, &IIOWidget::readAsync);
 
 	// tx_path_rates
 
@@ -223,7 +253,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 					 .buildSingle();
 	layout->addWidget(txPathRates);
 	txPathRates->setEnabled(false);
-	connect(m_refreshButton, &QPushButton::clicked, txPathRates, &IIOWidget::read);
+	connect(this, &AD936X::readRequested, txPathRates, &IIOWidget::readAsync);
 
 	connect(firFilter, &FirFilterQidget::filterChangeWasMade, this, [=, this]() {
 		rxPathRates->read();
@@ -239,7 +269,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .buildSingle();
 	layout->addWidget(xoCorrection);
-	connect(m_refreshButton, &QPushButton::clicked, xoCorrection, &IIOWidget::read);
+	connect(this, &AD936X::readRequested, xoCorrection, &IIOWidget::readAsync);
 
 	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
@@ -277,6 +307,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
 	hLayout->addWidget(rfBandwidth, Qt::AlignTop);
+	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
 
 	// voltage0:  sampling_frequency
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(rxChainWidget)
@@ -287,6 +318,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
 	hLayout->addWidget(samplingFrequency);
+	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);
 
 	// voltage 0 : rf_port_select
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(rxChainWidget)
@@ -297,6 +329,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .buildSingle();
 	hLayout->addWidget(rfPortSelect);
+	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
 
 	// altvoltage0: RX_LO // frequency
 
@@ -312,6 +345,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 						  .title("RX LO Frequency(MHz)")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .buildSingle();
+	connect(this, &AD936X::readRequested, altVoltage0Frequency, &IIOWidget::readAsync);
 
 	MenuOnOffSwitch *useExternalRxLo = new MenuOnOffSwitch("External Rx LO", rxChainWidget, false);
 	useExternalRxLo->onOffswitch()->setChecked(true);
@@ -344,6 +378,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 						  .title("Quadrature")
 						  .buildSingle();
 	trackingLayout->addWidget(quadratureTrackingEn);
+	connect(this, &AD936X::readRequested, quadratureTrackingEn, &IIOWidget::readAsync);
 
 	// rf_dc_offset_tracking_en
 	IIOWidget *rcDcOffsetTrackingEn = IIOWidgetBuilder(rxChainWidget)
@@ -353,6 +388,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 						  .title("RF DC")
 						  .buildSingle();
 	trackingLayout->addWidget(rcDcOffsetTrackingEn);
+	connect(this, &AD936X::readRequested, rcDcOffsetTrackingEn, &IIOWidget::readAsync);
 
 	// bb_dc_offset_tracking_en
 	IIOWidget *bbDcOffsetTrackingEn = IIOWidgetBuilder(rxChainWidget)
@@ -362,6 +398,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .buildSingle();
 	trackingLayout->addWidget(bbDcOffsetTrackingEn);
+	connect(this, &AD936X::readRequested, bbDcOffsetTrackingEn, &IIOWidget::readAsync);
 
 	hLayout->addLayout(trackingLayout);
 
@@ -401,6 +438,7 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .buildSingle();
 	layout->addWidget(hardwaregain);
+	connect(this, &AD936X::readRequested, hardwaregain, &IIOWidget::readAsync);
 
 	// voltage: rssi
 	IIOWidget *rssi = IIOWidgetBuilder(rxWidget).channel(chn).attribute("rssi").title("RSSI(dB)").buildSingle();
@@ -415,6 +453,7 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .buildSingle();
 	layout->addWidget(gainControlMode);
+	connect(this, &AD936X::readRequested, gainControlMode, &IIOWidget::readAsync);
 
 	return rxWidget;
 }
@@ -448,7 +487,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
 	hLayout->addWidget(rfBandwidth);
-	rfBandwidth->read();
+	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
 
 	// voltage0:  sampling_frequency
 
@@ -459,7 +498,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
 	hLayout->addWidget(samplingFrequency);
-	samplingFrequency->read();
+	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);
 
 	// voltage0:  rf_port_select
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(txChainWidget)
@@ -469,6 +508,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .buildSingle();
 	hLayout->addWidget(rfPortSelect);
+	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
 
 	// altvoltage1: TX_LO // frequency
 
@@ -482,6 +522,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 						  .optionsAttribute("frequency_available")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .buildSingle();
+	connect(this, &AD936X::readRequested, altVoltage1Frequency, &IIOWidget::readAsync);
 
 	MenuOnOffSwitch *useExternalTxLo = new MenuOnOffSwitch("External Tx LO", txChainWidget, false);
 	useExternalTxLo->onOffswitch()->setChecked(true);
@@ -535,6 +576,7 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 					   .title("Attenuation(dB")
 					   .buildSingle();
 	layout->addWidget(txAttenuation);
+	connect(this, &AD936X::readRequested, txAttenuation, &IIOWidget::readAsync);
 
 	bool isOutput = true;
 	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
@@ -542,6 +584,7 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	IIOWidget *rssi =
 		IIOWidgetBuilder(txWidget).channel(voltage0).attribute("rssi").title("RSSI(dB)").buildSingle();
 	layout->addWidget(rssi);
+	connect(this, &AD936X::readRequested, rssi, &IIOWidget::readAsync);
 
 	return txWidget;
 }
