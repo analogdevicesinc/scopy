@@ -29,7 +29,6 @@
 #include <cstring>
 #include <iioutil/connectionprovider.h>
 #include <iterator>
-#include <list>
 #include <math.h>
 #include <numeric>
 #include <string>
@@ -46,7 +45,6 @@ ADMTController::ADMTController(QString uri, QObject *parent)
 	: QObject(parent)
 	, uri(uri)
 {
-	connect(this, &ADMTController::streamData, this, &ADMTController::handleStreamData);
 	connect(this, &ADMTController::streamBufferedData, this, &ADMTController::handleStreamBufferedData);
 }
 
@@ -205,7 +203,8 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	double value;
 	const char *scaleAttrName = "scale";
 	const char *offsetAttrName = "offset";
-	size_t samples = 1;
+	size_t samples = bufferSize;
+	vector<double> values;
 	bool isOutput = false, isCyclic = false;
 
 	unsigned int i, j, major, minor;
@@ -255,15 +254,21 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	for(pointerData = static_cast<char *>(iio_buffer_first(buffer, channel)); pointerData < pointerEnd;
 	    pointerData += pointerIncrement) {
 		for(int j = 0; j < repeat; j++) {
-			if(format->length / 8 == sizeof(int16_t)) {
+			if(format->bits <= 8) {
+				int8_t rawValue = (reinterpret_cast<int8_t *>(pointerData))[j];
+				values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
+			} else if(format->length / 8 == sizeof(int16_t)) {
 				int16_t rawValue = (reinterpret_cast<int16_t *>(pointerData))[j];
-				value = (rawValue - offsetAttrValue) * *scaleAttrValue;
+				values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
 			}
 		}
 	}
 
+	value = values[bufferSize - 1];
+
 	delete scaleAttrValue;
 	iio_buffer_destroy(buffer);
+	iio_channel_disable(channel);
 	return value;
 }
 
@@ -1703,7 +1708,7 @@ int ADMTController::streamIO()
 	delete[] offsetDst;
 	struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
 
-	while(!stopStream) {
+	while(!stopStream.loadAcquire()) {
 		ssize_t numBytesRead;
 		char *pointerData, *pointerEnd;
 		ptrdiff_t pointerIncrement;
@@ -1735,20 +1740,131 @@ int ADMTController::streamIO()
 	return 0;
 }
 
+int ADMTController::streamChannel(const char *deviceName, const QVector<QString> channelNames, int bufferSize)
+{
+	int result = -1;
+	const char *scaleAttrName = "scale";
+	const char *offsetAttrName = "offset";
+	size_t samples = bufferSize;
+	vector<double> values;
+	bool isOutput = false, isCyclic = true;
+
+	unsigned int i, j, major, minor;
+	char git_tag[8];
+	iio_library_get_version(&major, &minor, git_tag);
+	bool has_repeat = ((major * 10000) + minor) >= 8 ? true : false;
+
+	if(!m_iioCtx)
+		return result; // Check if the context is valid
+	if(iio_context_get_devices_count(m_iioCtx) < 1)
+		return result; // Check if there are devices in the context
+	struct iio_device *device = iio_context_find_device(m_iioCtx, deviceName); // Find the ADMT device
+
+	if(device == NULL)
+		return result;
+
+	QVector<struct iio_channel *> channels;
+	QVector<double> scales;
+	QVector<int> offsets;
+
+	for(int i = 0; i < channelNames.size(); i++) {
+		struct iio_channel *channel =
+			iio_device_find_channel(device, channelNames.at(i).toLocal8Bit().data(), isOutput);
+		if(channel == NULL)
+			break;
+		iio_channel_enable(channel);
+		channels.append(channel);
+	}
+
+	if(channels.size() == 0 && channels.size() != channelNames.size())
+		return result;
+
+	double *scaleAttrValue = new double();
+	for(int i = 0; i < channels.size(); i++) {
+		int scaleRet = iio_channel_attr_read_double(const_cast<iio_channel *>(channels[i]), scaleAttrName,
+							    scaleAttrValue); // Read the scale attribute
+		if(scaleRet != 0)
+			break;
+		scales.insert(i, *scaleAttrValue);
+	}
+
+	delete scaleAttrValue;
+
+	for(int i = 0; i < channels.size(); i++) {
+		char *offsetDst = new char[maxAttrSize];
+		iio_channel_attr_read(const_cast<iio_channel *>(channels[i]), offsetAttrName, offsetDst,
+				      maxAttrSize); // Read the offset attribute
+		int offsetAttrValue = atoi(offsetDst);
+		delete[] offsetDst;
+		offsets.insert(i, offsetAttrValue);
+	}
+
+	struct iio_buffer *buffer = iio_device_create_buffer(device, samples, isCyclic); // Create a buffer
+
+	QMap<QString, double> streamDataMap;
+	while(!stopStream.loadAcquire()) {
+		for(int i = 0; i < channels.size(); i++) {
+			values.clear();
+
+			ssize_t numBytesRead;
+			char *pointerData, *pointerEnd;
+			ptrdiff_t pointerIncrement;
+
+			numBytesRead = iio_buffer_refill(buffer);
+			if(numBytesRead < 0)
+				break;
+
+			pointerIncrement = iio_buffer_step(buffer);
+			pointerEnd = static_cast<char *>(iio_buffer_end(buffer));
+
+			const struct iio_data_format *format =
+				iio_channel_get_data_format(const_cast<iio_channel *>(channels[i]));
+			unsigned int repeat = has_repeat ? format->repeat : 1;
+
+			for(pointerData = static_cast<char *>(
+				    iio_buffer_first(buffer, const_cast<iio_channel *>(channels[i])));
+			    pointerData < pointerEnd; pointerData += pointerIncrement) {
+				for(int j = 0; j < repeat; j++) {
+					if(format->bits <= 8) {
+						int8_t rawValue = (reinterpret_cast<int8_t *>(pointerData))[j];
+						values.push_back((rawValue - offsets.at(i)) * scales.at(i));
+					} else if(format->length / 8 == sizeof(int16_t)) {
+						int16_t rawValue = (reinterpret_cast<int16_t *>(pointerData))[j];
+						values.push_back((rawValue - offsets.at(i)) * scales.at(i));
+					}
+				}
+			}
+
+			streamDataMap[channelNames.at(i)] = values[bufferSize - 1];
+		}
+
+		Q_EMIT streamChannelData(streamDataMap);
+	}
+
+	iio_buffer_destroy(buffer);
+
+	for(int i = 0; i < channels.size(); i++) {
+		iio_channel_disable(const_cast<iio_channel *>(channels[i]));
+	}
+
+	return 0;
+}
+
 void ADMTController::handleStreamData(double value) { streamedValue = value; }
 
-void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
+void ADMTController::handleStreamChannelData(QMap<QString, double> dataMap) { streamedChannelDataMap = dataMap; }
+
+void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate, int bufferSize)
 {
-	QVector<double> bufferedValues;
-	vector<uint16_t> rawBufferedValues;
+	vector<double> values;
 	sampleCount = 0;
 
 	int result = -1;
 	const char *deviceName = "admt4000";
-	const char *channelName = "rot";
+	const char *channelName = "angl";
 	const char *scaleAttrName = "scale";
 	const char *offsetAttrName = "offset";
-	size_t samples = 1;
+	size_t samples = bufferSize;
 	bool isOutput = false;
 	bool isCyclic = true;
 
@@ -1784,8 +1900,9 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 	offsetAttrValue = atoi(offsetDst);
 	struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
 
-	while(!stopStream && sampleCount < totalSamples) {
+	while(!stopStream.loadAcquire() && sampleCount < totalSamples) {
 		elapsedStreamTimer.start();
+		values.clear();
 
 		ssize_t numBytesRead;
 		char *pointerData, *pointerEnd;
@@ -1806,12 +1923,15 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 		    pointerData += pointerIncrement) {
 			for(j = 0; j < repeat; j++) {
 				if(format->length / 8 == sizeof(int16_t)) {
-					rawBufferedValues.push_back((reinterpret_cast<int16_t *>(pointerData))[j]);
-					sampleCount++;
-					continue;
+					int16_t rawValue = (reinterpret_cast<int16_t *>(pointerData))[j];
+					values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
 				}
 			}
 		}
+
+		double value = values[bufferSize - 1];
+		Q_EMIT streamData(value);
+		sampleCount++;
 
 		qint64 elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
 		while(elapsedNanoseconds < targetSampleRate) {
@@ -1819,13 +1939,7 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 		}
 	}
 	iio_buffer_destroy(buffer);
-
-	for(int i = 0; i < rawBufferedValues.size(); i++) {
-		double scaledValue = (rawBufferedValues[i] - offsetAttrValue) * *scaleAttrValue;
-		bufferedValues.append(scaledValue);
-	}
-
-	Q_EMIT streamBufferedData(bufferedValues);
+	iio_channel_disable(channel);
 
 	delete scaleAttrValue;
 	delete[] offsetDst;
@@ -1833,13 +1947,12 @@ void ADMTController::bufferedStreamIO(int totalSamples, int targetSampleRate)
 
 void ADMTController::registryStream(int totalSamples, int targetSampleRate)
 {
-	QVector<double> values;
 	sampleCount = 0;
 	double angle = 0;
 	bool readSuccess = false;
 	uint32_t *registerValue = new uint32_t;
 
-	while(!stopStream && sampleCount < totalSamples) {
+	while(!stopStream.loadAcquire() && sampleCount < totalSamples) {
 		elapsedStreamTimer.start();
 
 		qint64 elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
@@ -1852,8 +1965,9 @@ void ADMTController::registryStream(int totalSamples, int targetSampleRate)
 
 		angle = getAngle(static_cast<uint16_t>(*registerValue));
 
-		values.append(angle);
 		sampleCount++;
+
+		Q_EMIT streamData(angle);
 
 		elapsedNanoseconds = elapsedStreamTimer.nsecsElapsed();
 		while(elapsedNanoseconds < targetSampleRate) {
@@ -1862,8 +1976,6 @@ void ADMTController::registryStream(int totalSamples, int targetSampleRate)
 	}
 
 	delete registerValue;
-
-	Q_EMIT streamBufferedData(values);
 }
 
 void ADMTController::handleStreamBufferedData(const QVector<double> &value) { streamBufferedValues = value; }

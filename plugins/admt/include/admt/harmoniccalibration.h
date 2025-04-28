@@ -121,6 +121,8 @@ public Q_SLOTS:
 	void updateFaultRegisterUI(quint16 registerValue);
 	void updateMTDiagnosticRegisterUI(quint16 registerValue);
 	void updateMTDiagnosticsUI(quint16 registerValue);
+	void handleStreamChannelData(QMap<QString, double> dataMap);
+	void handleStreamCalibrationData(double value);
 Q_SIGNALS:
 	void runningChanged(bool);
 	void acquisitionDataChanged(QMap<SensorData, double> sensorDataMap);
@@ -148,8 +150,8 @@ private:
 
 	const char *rotationChannelName, *angleChannelName, *countChannelName, *temperatureChannelName;
 
-	double rotation, angle, count, temp = 0.0, motor_rpm, amax, rotate_vmax, dmax, disable, target_pos, current_pos,
-				       ramp_mode, afeDiag0, afeDiag1, afeDiag2;
+	double rotation = 0, angle = 0, count = 0, temp = 0, motor_rpm, amax, rotate_vmax, dmax, disable, target_pos,
+	       current_pos, ramp_mode, afeDiag0, afeDiag1, afeDiag2;
 
 	QPen channel0Pen, channel1Pen, channel2Pen, channel3Pen, channel4Pen, channel5Pen, channel6Pen, channel7Pen;
 
@@ -290,9 +292,10 @@ private:
 	void updateAcquisitionMotorRPM();
 	void updateAcquisitionMotorRotationDirection();
 	void getAcquisitionSamples(QMap<SensorData, bool> dataMap);
+	double calculateABSAngle(double &absAngle, double &turnCount);
 	double getSensorDataAcquisitionValue(const ADMTController::SensorRegister &key);
 	void plotAcquisition(QVector<double> list, PlotChannel *channel);
-	void appendAcquisitionData(const double &data, QVector<double> &list);
+	void appendAcquisitionData(double data, QVector<double> &list);
 	void resetAcquisitionYAxisScale();
 	void updateSequenceWidget();
 	void updateCapturedDataCheckBoxes();

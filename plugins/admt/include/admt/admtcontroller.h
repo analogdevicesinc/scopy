@@ -52,10 +52,11 @@ public:
 	int HAR_MAG_1, HAR_MAG_2, HAR_MAG_3, HAR_MAG_8, HAR_PHASE_1, HAR_PHASE_2, HAR_PHASE_3, HAR_PHASE_8,
 		sampleCount = 0;
 
-	bool stopStream = false;
+	QAtomicInt stopStream = false;
 
 	double streamedValue = 0.0;
 	QVector<double> streamBufferedValues;
+	QMap<QString, double> streamedChannelDataMap;
 
 	QElapsedTimer elapsedStreamTimer;
 
@@ -256,16 +257,19 @@ public:
 	map<string, double> getTmp1RegisterBitMapping(uint16_t registerValue, bool is5V);
 	bool checkRegisterFault(uint16_t registerValue, bool isMode1);
 	int streamIO();
-	void bufferedStreamIO(int totalSamples, int targetSampleRate);
+	void bufferedStreamIO(int totalSamples, int targetSampleRate, int bufferSize);
 	void registryStream(int totalSamples, int targetSampleRate);
 	bool checkVelocityReachedFlag(uint16_t registerValue);
 	uint16_t changeCNVPage(uint16_t registerValue, uint8_t page);
 	uint16_t convertStart(bool start, uint16_t registerValue);
+	int streamChannel(const char *deviceName, const QVector<QString> channelNames, int bufferSize);
 public Q_SLOTS:
 	void handleStreamData(double value);
+	void handleStreamChannelData(QMap<QString, double> dataMap);
 	void handleStreamBufferedData(const QVector<double> &value);
 Q_SIGNALS:
 	void streamData(double value);
+	void streamChannelData(QMap<QString, double> dataMap);
 	void streamBufferedData(const QVector<double> &value);
 	void requestDisconnect();
 
