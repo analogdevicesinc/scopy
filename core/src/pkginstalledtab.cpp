@@ -120,6 +120,7 @@ void PkgInstalledTab::fillPkgSection()
 	const QList<QVariantMap> pkgsMeta = PkgManager::getPkgsMeta();
 	for(const QVariantMap &meta : pkgsMeta) {
 		PkgItemWidget *pkgItem = createPkgItemWidget(meta);
+		pkgItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		m_pkgGrid->addPkg(pkgItem);
 	}
 }
