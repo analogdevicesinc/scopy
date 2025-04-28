@@ -25,6 +25,7 @@
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QWidget>
+#include <animationpushbutton.h>
 #include <tooltemplate.h>
 
 namespace scopy {
@@ -36,13 +37,14 @@ public:
 	explicit AD936XAdvanced(QString uri, QWidget *parent = nullptr);
 	~AD936XAdvanced();
 
-signals:
+Q_SIGNALS:
+	void readRequested();
 
 private:
 	QString m_uri;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
-	QPushButton *m_refreshButton;
+	AnimationPushButton *m_refreshButton;
 };
 } // namespace pluto
 } // namespace scopy

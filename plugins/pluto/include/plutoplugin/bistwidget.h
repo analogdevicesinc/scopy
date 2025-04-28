@@ -40,6 +40,7 @@ public:
 
 Q_SIGNALS:
 	void bistToneUpdated();
+	void readRequested();
 
 private:
 	QString m_uri;
