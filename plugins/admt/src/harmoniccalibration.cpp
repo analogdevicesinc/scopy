@@ -37,14 +37,15 @@ static int utilityUITimerRate = 1000;
 static int deviceStatusMonitorRate = 500;
 static int motorPositionMonitorRate = 500;
 static int readMotorDebounce = 50;
+static int readDeviceDebounce = 20;
 
 // In nanoseconds
 static int continuousCalibrationSampleRate = 10000000;
 
-static int bufferSize = 1;
+static int bufferSize = 5;
 static int cycleCount = 11;
-static int samplesPerCycle = 24;
-static int totalSamplesCount = 256;
+static int samplesPerCycle = 47;
+static int totalSamplesCount = 512;
 static bool isStartMotor = false;
 static bool isPostCalibration = false;
 static bool isCalculatedCoeff = false;
@@ -53,7 +54,7 @@ static bool resetToZero = true;
 static bool hasMTDiagnostics = false;
 static bool isMotorRotationClockwise = true;
 
-static double default_motor_rpm = 30;
+static double default_motor_rpm = 60;
 static double fast_motor_rpm = 300;
 static double motorFullStepAngle = 0.9;	 // TODO input as configuration
 static double microStepResolution = 256; // TODO input as configuration
@@ -221,6 +222,10 @@ HarmonicCalibration::HarmonicCalibration(ADMTController *m_admtController, bool 
 	connect(this, &HarmonicCalibration::DIAG1RegisterChanged, this,
 		&HarmonicCalibration::updateMTDiagnosticRegisterUI);
 	connect(this, &HarmonicCalibration::DIAG2RegisterChanged, this, &HarmonicCalibration::updateMTDiagnosticsUI);
+	qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
+	connect(m_admtController, &ADMTController::streamChannelData, this,
+		&HarmonicCalibration::handleStreamChannelData);
+	connect(m_admtController, &ADMTController::streamData, this, &HarmonicCalibration::handleStreamCalibrationData);
 
 	isAcquisitionTab = true;
 	startDeviceStatusMonitor();
@@ -1463,9 +1468,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 		toggleTabSwitching(true);
 
 		if(isPostCalibration) {
-			graphPostDataList = m_admtController->streamBufferedValues;
-			postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
-			postCalibrationRawDataPlotWidget->replot();
 			if(static_cast<int>(graphPostDataList.size()) == totalSamplesCount) {
 				computeSineCosineOfAngles(graphPostDataList);
 				m_admtController->postcalibrate(
@@ -1478,9 +1480,6 @@ ToolTemplate *HarmonicCalibration::createCalibrationWidget()
 				toggleCalibrationButtonState(4);
 			}
 		} else {
-			graphDataList = m_admtController->streamBufferedValues;
-			calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
-			calibrationRawDataPlotWidget->replot();
 			if(static_cast<int>(graphDataList.size()) >= totalSamplesCount) {
 				computeSineCosineOfAngles(graphDataList);
 				calibrationLogWrite(m_admtController->calibrate(
@@ -2688,7 +2687,7 @@ bool HarmonicCalibration::updateChannelValues()
 	if(readMode == 0) {
 		updateChannelValue(0);
 		updateChannelValue(1);
-		updateChannelValue(2);
+		// updateChannelValue(2);
 		updateChannelValue(3);
 	} else if(readMode == 1) {
 		if(conversionMode == 1)
@@ -2844,6 +2843,10 @@ void HarmonicCalibration::startAcquisition()
 
 	convertRestart();
 
+	stopDeviceStatusMonitor();
+
+	m_admtController->stopStream.storeRelease(false);
+
 	m_acquisitionDataThread =
 		QtConcurrent::run(this, &HarmonicCalibration::getAcquisitionSamples, acquisitionDataMap);
 	m_acquisitionDataWatcher.setFuture(m_acquisitionDataThread);
@@ -2852,6 +2855,7 @@ void HarmonicCalibration::startAcquisition()
 void HarmonicCalibration::stopAcquisition()
 {
 	isStartAcquisition = false;
+	m_admtController->stopStream.storeRelease(true);
 	if(m_acquisitionDataThread.isRunning()) {
 		m_acquisitionDataThread.cancel();
 		m_acquisitionDataWatcher.waitForFinished();
@@ -2892,64 +2896,119 @@ void HarmonicCalibration::updateAcquisitionMotorRotationDirection()
 
 void HarmonicCalibration::getAcquisitionSamples(QMap<SensorData, bool> dataMap)
 {
-	QMap<SensorData, double> sensorDataMap;
-	bool dataChanged = false;
-	while(isStartAcquisition) {
-		if(updateChannelValues()) {
-			dataChanged = false;
+	if(readMode == 0) {
+		QVector<QString> channelNames = {"rot", "angl", "count", "temp"};
 
-			if(dataMap.value(ANGLE)) {
-				sensorDataMap[ANGLE] = angle;
-				dataChanged = true;
-			}
-			if(dataMap.value(ABSANGLE)) {
-				sensorDataMap[ABSANGLE] = rotation;
-				dataChanged = true;
-			}
-			if(dataMap.value(TMP0)) {
-				sensorDataMap[TMP0] = temp;
-				dataChanged = true;
-			}
-			if(dataMap.value(SINE)) {
-				sensorDataMap[SINE] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SINE);
-				dataChanged = true;
-			}
-			if(dataMap.value(COSINE)) {
-				sensorDataMap[COSINE] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::COSINE);
-				dataChanged = true;
-			}
-			if(dataMap.value(RADIUS)) {
-				sensorDataMap[RADIUS] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::RADIUS);
-				dataChanged = true;
-			}
-			if(dataMap.value(ANGLESEC)) {
-				sensorDataMap[ANGLESEC] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::ANGLESEC);
-				dataChanged = true;
-			}
-			if(dataMap.value(SECANGLI)) {
-				sensorDataMap[SECANGLI] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLI);
-				dataChanged = true;
-			}
-			if(dataMap.value(SECANGLQ)) {
-				sensorDataMap[SECANGLQ] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLQ);
-				dataChanged = true;
-			}
-			if(dataMap.value(TMP1)) {
-				sensorDataMap[TMP1] =
-					getSensorDataAcquisitionValue(ADMTController::SensorRegister::TMP1);
-				dataChanged = true;
+		m_admtController->streamChannel(m_admtController->getDeviceId(ADMTController::Device::ADMT4000),
+						channelNames, bufferSize);
+	} else if(readMode == 1) {
+		QMap<SensorData, double> sensorDataMap;
+		while(isStartAcquisition) {
+			if(updateChannelValues()) {
+
+				if(acquisitionDataMap.value(ANGLE)) {
+					sensorDataMap[ANGLE] = angle;
+				}
+				if(acquisitionDataMap.value(ABSANGLE)) {
+					sensorDataMap[ABSANGLE] = rotation;
+				}
+				if(acquisitionDataMap.value(TMP0)) {
+					sensorDataMap[TMP0] = temp;
+				}
+				if(acquisitionDataMap.value(SINE)) {
+					sensorDataMap[SINE] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::SINE);
+				}
+				if(acquisitionDataMap.value(COSINE)) {
+					sensorDataMap[COSINE] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::COSINE);
+				}
+				if(acquisitionDataMap.value(RADIUS)) {
+					sensorDataMap[RADIUS] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::RADIUS);
+				}
+				if(acquisitionDataMap.value(ANGLESEC)) {
+					sensorDataMap[ANGLESEC] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::ANGLESEC);
+				}
+				if(acquisitionDataMap.value(SECANGLI)) {
+					sensorDataMap[SECANGLI] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLI);
+				}
+				if(acquisitionDataMap.value(SECANGLQ)) {
+					sensorDataMap[SECANGLQ] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLQ);
+				}
+				if(acquisitionDataMap.value(TMP1)) {
+					sensorDataMap[TMP1] =
+						getSensorDataAcquisitionValue(ADMTController::SensorRegister::TMP1);
+				}
+
+				if(sensorDataMap.count() > 0)
+					Q_EMIT acquisitionDataChanged(sensorDataMap);
 			}
 
-			if(dataChanged)
-				Q_EMIT acquisitionDataChanged(sensorDataMap);
+			QThread::msleep(readDeviceDebounce);
 		}
 	}
+}
+
+void HarmonicCalibration::handleStreamChannelData(QMap<QString, double> dataMap)
+{
+	if(dataMap.contains("angl"))
+		angle = dataMap.value("angl");
+	if(dataMap.contains("rot") && dataMap.contains("count")) {
+		double tempCount = dataMap.value("count");
+		count = tempCount;
+		double tempRotation = dataMap.value("rot");
+		rotation = calculateABSAngle(tempRotation, tempCount);
+	}
+	if(dataMap.contains("temp"))
+		temp = dataMap.value("temp");
+
+	QMap<SensorData, double> sensorDataMap;
+
+	if(acquisitionDataMap.value(ANGLE)) {
+		sensorDataMap[ANGLE] = angle;
+	}
+	if(acquisitionDataMap.value(ABSANGLE)) {
+		sensorDataMap[ABSANGLE] = rotation;
+	}
+	if(acquisitionDataMap.value(TMP0)) {
+		sensorDataMap[TMP0] = temp;
+	}
+	if(acquisitionDataMap.value(SINE)) {
+		sensorDataMap[SINE] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::SINE);
+	}
+	if(acquisitionDataMap.value(COSINE)) {
+		sensorDataMap[COSINE] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::COSINE);
+	}
+	if(acquisitionDataMap.value(RADIUS)) {
+		sensorDataMap[RADIUS] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::RADIUS);
+	}
+	if(acquisitionDataMap.value(ANGLESEC)) {
+		sensorDataMap[ANGLESEC] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::ANGLESEC);
+	}
+	if(acquisitionDataMap.value(SECANGLI)) {
+		sensorDataMap[SECANGLI] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLI);
+	}
+	if(acquisitionDataMap.value(SECANGLQ)) {
+		sensorDataMap[SECANGLQ] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::SECANGLQ);
+	}
+	if(acquisitionDataMap.value(TMP1)) {
+		sensorDataMap[TMP1] = getSensorDataAcquisitionValue(ADMTController::SensorRegister::TMP1);
+	}
+
+	if(sensorDataMap.count() > 0)
+		Q_EMIT acquisitionDataChanged(sensorDataMap);
+}
+
+double HarmonicCalibration::calculateABSAngle(double &absAngle, double &turnCount)
+{
+	if(turnCount != 0)
+		return absAngle + (turnCount * 360);
+	else
+		return absAngle;
 }
 
 double HarmonicCalibration::getSensorDataAcquisitionValue(const ADMTController::SensorRegister &key)
@@ -3019,7 +3078,7 @@ void HarmonicCalibration::plotAcquisition(QVector<double> list, PlotChannel *cha
 		acquisitionGraphYMax = *result.second;
 }
 
-void HarmonicCalibration::appendAcquisitionData(const double &data, QVector<double> &list)
+void HarmonicCalibration::appendAcquisitionData(double data, QVector<double> &list)
 {
 	if(data == qQNaN())
 		return;
@@ -3162,20 +3221,43 @@ void HarmonicCalibration::toggleAcquisitionControls(bool value)
 	eighthHarmonicMenuCombo->setEnabled(value);
 	applySequenceButton->setEnabled(value);
 	displayLengthLineEdit->setEnabled(value);
+
+	if(sequenceMode == 0) // Sequence Mode 1
+	{
+		angleCheckBox->setEnabled(value);
+		sineCheckBox->setEnabled(value);
+		cosineCheckBox->setEnabled(value);
+		radiusCheckBox->setEnabled(value);
+		absAngleCheckBox->setEnabled(value);
+		temp0CheckBox->setEnabled(value);
+	} else if(sequenceMode == 1) // Sequence Mode 2
+	{
+		angleCheckBox->setEnabled(value);
+		sineCheckBox->setEnabled(value);
+		cosineCheckBox->setEnabled(value);
+		angleSecCheckBox->setEnabled(value);
+		secAnglQCheckBox->setEnabled(value);
+		secAnglICheckBox->setEnabled(value);
+		radiusCheckBox->setEnabled(value);
+		absAngleCheckBox->setEnabled(value);
+		temp0CheckBox->setEnabled(value);
+		temp1CheckBox->setEnabled(value);
+	}
 }
 
 void HarmonicCalibration::connectCheckBoxToAcquisitionGraph(QCheckBox *widget, PlotChannel *channel, SensorData key)
 {
 	connect(widget, &QCheckBox::stateChanged, this, [this, channel, key](int state) {
+		bool value = true;
 		if(state == Qt::Checked) {
-			channel->setEnabled(true);
-			acquisitionDataMap[key] = true;
+			value = true;
 		} else {
-			channel->setEnabled(false);
-			acquisitionDataMap[key] = false;
+			value = false;
 		}
-
-		restartAcquisition();
+		channel->setEnabled(value);
+		acquisitionDataMap[key] = value;
+		if(!value)
+			acquisitionGraphPlotWidget->replot();
 	});
 }
 
@@ -3242,6 +3324,7 @@ void HarmonicCalibration::run(bool b)
 	if(!b) {
 		isStartAcquisition = false;
 		runButton->setChecked(false);
+		stopAcquisition();
 	} else {
 		startAcquisition();
 	}
@@ -3437,23 +3520,43 @@ void HarmonicCalibration::resetMotorToZero()
 	}
 }
 
+void HarmonicCalibration::handleStreamCalibrationData(double value)
+{
+	if(isPostCalibration) {
+		graphPostDataList.append(value);
+		postCalibrationRawDataPlotChannel->curve()->setSamples(graphPostDataList);
+		postCalibrationRawDataPlotWidget->replot();
+	} else {
+		graphDataList.append(value);
+		calibrationRawDataPlotChannel->curve()->setSamples(graphDataList);
+		calibrationRawDataPlotWidget->replot();
+	}
+}
+
 void HarmonicCalibration::startCalibrationStreamThread()
 {
 	if(!m_calibrationStreamThread.isRunning()) {
-		m_admtController->stopStream = false;
+		m_admtController->stopStream.storeRelease(false);
 
 		continuousCalibrationSampleRate =
 			calculateContinuousCalibrationSampleRate(convertVMAXtoRPS(rotate_vmax), samplesPerCycle);
-		m_calibrationStreamThread = QtConcurrent::run([this]() {
-			m_admtController->registryStream(totalSamplesCount, continuousCalibrationSampleRate);
-		});
+		if(readMode == 0) {
+			m_calibrationStreamThread = QtConcurrent::run([this]() {
+				m_admtController->bufferedStreamIO(totalSamplesCount, continuousCalibrationSampleRate,
+								   bufferSize);
+			});
+		} else if(readMode == 1) {
+			m_calibrationStreamThread = QtConcurrent::run([this]() {
+				m_admtController->registryStream(totalSamplesCount, continuousCalibrationSampleRate);
+			});
+		}
 		m_calibrationStreamWatcher.setFuture(m_calibrationStreamThread);
 	}
 }
 
 void HarmonicCalibration::stopCalibrationStreamThread()
 {
-	m_admtController->stopStream = true;
+	m_admtController->stopStream.storeRelease(true);
 	if(m_calibrationStreamThread.isRunning()) {
 		m_calibrationStreamThread.cancel();
 		m_calibrationStreamWatcher.waitForFinished();
@@ -4974,29 +5077,44 @@ bool HarmonicCalibration::updateChannelValue(int channelIndex)
 	bool success = false;
 	switch(channelIndex) {
 	case ADMTController::Channel::ROTATION:
-		rotation = m_admtController->getChannelValue(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName, 1);
+		double tempRotation;
+		count = m_admtController->getChannelValue(
+			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, bufferSize);
+		if(count == UINT32_MAX) {
+			success = false;
+			break;
+		}
+		tempRotation = m_admtController->getChannelValue(
+			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), rotationChannelName,
+			bufferSize);
 		if(rotation == UINT32_MAX) {
 			success = false;
+			break;
 		}
+
+		if(count != 0)
+			rotation = tempRotation + (count * 360);
+		else
+			rotation = tempRotation;
 		break;
 	case ADMTController::Channel::ANGL:
 		angle = m_admtController->getChannelValue(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, 1);
+			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), angleChannelName, bufferSize);
 		if(angle == UINT32_MAX) {
 			success = false;
 		}
 		break;
 	case ADMTController::Channel::COUNT:
 		count = m_admtController->getChannelValue(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, 1);
+			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), countChannelName, bufferSize);
 		if(count == UINT32_MAX) {
 			success = false;
 		}
 		break;
 	case ADMTController::Channel::TEMPERATURE:
 		temp = m_admtController->getChannelValue(
-			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName, 1);
+			m_admtController->getDeviceId(ADMTController::Device::ADMT4000), temperatureChannelName,
+			bufferSize);
 		if(temp == UINT32_MAX) {
 			success = false;
 		}
