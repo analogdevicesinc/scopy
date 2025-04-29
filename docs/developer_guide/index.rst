@@ -20,5 +20,6 @@ Contents
    :maxdepth: 3
 
    style
+   create_plugin_introduction
 
 
