@@ -293,6 +293,8 @@ private:
 	void updateAcquisitionMotorRotationDirection();
 	void getAcquisitionSamples(QMap<SensorData, bool> dataMap);
 	double calculateABSAngle(double &absAngle, double &turnCount);
+	double getTurnCount(double rawAbsAngleValue);
+	double getABSAngle(double rawAbsAngleValue);
 	double getSensorDataAcquisitionValue(const ADMTController::SensorRegister &key);
 	void plotAcquisition(QVector<double> list, PlotChannel *channel);
 	void appendAcquisitionData(double data, QVector<double> &list);

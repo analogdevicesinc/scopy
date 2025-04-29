@@ -200,7 +200,7 @@ int ADMTController::getChannelIndex(const char *deviceName, const char *channelN
 
 double ADMTController::getChannelValue(const char *deviceName, const char *channelName, int bufferSize)
 {
-	double value;
+	double value = UINT32_MAX;
 	const char *scaleAttrName = "scale";
 	const char *offsetAttrName = "offset";
 	size_t samples = bufferSize;
@@ -218,10 +218,10 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 		return UINT32_MAX;
 	if(iio_context_get_devices_count(m_iioCtx) < 1)
 		return UINT32_MAX;
-	struct iio_device *admtDevice = iio_context_find_device(m_iioCtx, deviceName);
-	if(admtDevice == NULL)
+	struct iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+	if(iioDevice == NULL)
 		return UINT32_MAX;
-	struct iio_channel *channel = iio_device_find_channel(admtDevice, channelName, isOutput);
+	struct iio_channel *channel = iio_device_find_channel(iioDevice, channelName, isOutput);
 	if(channel == NULL)
 		return UINT32_MAX;
 	iio_channel_enable(channel);
@@ -238,33 +238,37 @@ double ADMTController::getChannelValue(const char *deviceName, const char *chann
 	offsetAttrValue = atoi(offsetDst);
 	delete[] offsetDst;
 
-	struct iio_buffer *buffer = iio_device_create_buffer(admtDevice, samples, isCyclic); // Create a buffer
+	struct iio_buffer *buffer = iio_device_create_buffer(iioDevice, samples, isCyclic); // Create a buffer
 	ssize_t numBytesRead;
 	char *pointerData, *pointerEnd;
 	ptrdiff_t pointerIncrement;
 
 	numBytesRead = iio_buffer_refill(buffer);
 
-	pointerIncrement = iio_buffer_step(buffer);
-	pointerEnd = static_cast<char *>(iio_buffer_end(buffer));
+	if(numBytesRead >= 0) {
+		pointerIncrement = iio_buffer_step(buffer);
+		pointerEnd = static_cast<char *>(iio_buffer_end(buffer));
 
-	const struct iio_data_format *format = iio_channel_get_data_format(channel);
-	unsigned int repeat = has_repeat ? format->repeat : 1;
+		const struct iio_data_format *format = iio_channel_get_data_format(channel);
+		unsigned int repeat = has_repeat ? format->repeat : 1;
 
-	for(pointerData = static_cast<char *>(iio_buffer_first(buffer, channel)); pointerData < pointerEnd;
-	    pointerData += pointerIncrement) {
-		for(int j = 0; j < repeat; j++) {
-			if(format->bits <= 8) {
-				int8_t rawValue = (reinterpret_cast<int8_t *>(pointerData))[j];
-				values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
-			} else if(format->length / 8 == sizeof(int16_t)) {
-				int16_t rawValue = (reinterpret_cast<int16_t *>(pointerData))[j];
-				values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
+		for(pointerData = static_cast<char *>(iio_buffer_first(buffer, channel)); pointerData < pointerEnd;
+		    pointerData += pointerIncrement) {
+			for(int j = 0; j < repeat; j++) {
+				if(format->bits <= 8) {
+					int8_t rawValue = (reinterpret_cast<int8_t *>(pointerData))[j];
+					values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
+				} else if(format->is_fully_defined) {
+					values.push_back((reinterpret_cast<int16_t *>(pointerData))[j]);
+				} else if(format->length / 8 == sizeof(int16_t)) {
+					int16_t rawValue = (reinterpret_cast<int16_t *>(pointerData))[j];
+					values.push_back((rawValue - offsetAttrValue) * *scaleAttrValue);
+				}
 			}
 		}
-	}
 
-	value = values[bufferSize - 1];
+		value = values[bufferSize - 1];
+	}
 
 	delete scaleAttrValue;
 	iio_buffer_destroy(buffer);
@@ -393,6 +397,43 @@ int ADMTController::readDeviceRegistry(const char *deviceName, uint32_t address,
 	if(iioDevice == NULL) {
 		return result;
 	}
+	result = iio_device_reg_read(iioDevice, address, returnValue);
+
+	return result;
+}
+
+int ADMTController::readDeviceRegistry(const char *deviceName, uint32_t address, uint8_t page, uint32_t *returnValue)
+{
+	if(!m_iioCtx)
+		return -1;
+	if(address == UINT32_MAX)
+		return -1;
+
+	int result = -1;
+	int deviceCount = iio_context_get_devices_count(m_iioCtx);
+	if(deviceCount == 0) {
+		return result;
+	}
+	iio_device *iioDevice = iio_context_find_device(m_iioCtx, deviceName);
+	if(iioDevice == NULL) {
+		return result;
+	}
+
+	if(page != UINT8_MAX) {
+		uint32_t *readCNVValue = new uint32_t;
+
+		if(iio_device_reg_read(iioDevice, getConfigurationRegister(ConfigurationRegister::CNVPAGE),
+				       readCNVValue) == 0) {
+			iio_device_reg_write(iioDevice, getConfigurationRegister(ConfigurationRegister::CNVPAGE),
+					     changeCNVPage(static_cast<uint16_t>(*readCNVValue), page));
+		} else {
+			delete readCNVValue;
+			return -1;
+		}
+
+		delete readCNVValue;
+	}
+
 	result = iio_device_reg_read(iioDevice, address, returnValue);
 
 	return result;
@@ -1175,19 +1216,21 @@ uint16_t ADMTController::setGeneralRegisterBitMapping(uint16_t currentRegisterVa
 
 int ADMTController::getAbsAngleTurnCount(uint16_t registerValue)
 {
-	// Bits 15:8: Turn count in quarter turns
-	uint8_t turnCount = (registerValue >> 8) & 0xFC;
+	// Bits 15:10: Number of whole turns
+	int8_t turnCount = registerValue >> 10;
 
-	if(turnCount <= 0xD4) {
+	if(turnCount <= 0x35) {
 		// Straight binary turn count
-		return turnCount / 4; // Convert from quarter turns to whole turns
-	} else if(turnCount == 0xD8) {
+		return turnCount; // Convert from quarter turns to whole turns
+	} else if(turnCount == 0x36) {
 		// Invalid turn count
-		return turnCount / 4;
+		return turnCount;
 	} else {
 		// 2's complement turn count
-		int8_t signedTurnCount = static_cast<int8_t>(turnCount); // Handle as signed value
-		return signedTurnCount / 4;				 // Convert from quarter turns to whole turns
+		if(turnCount & (1 << 5)) {
+			turnCount -= 64;
+		}
+		return turnCount;
 	}
 }
 
@@ -1740,14 +1783,15 @@ int ADMTController::streamIO()
 	return 0;
 }
 
-int ADMTController::streamChannel(const char *deviceName, const QVector<QString> channelNames, int bufferSize)
+int ADMTController::streamChannel(const char *deviceName, const QVector<QString> channelNames, int bufferSize,
+				  int sampleRate)
 {
 	int result = -1;
 	const char *scaleAttrName = "scale";
 	const char *offsetAttrName = "offset";
 	size_t samples = bufferSize;
 	vector<double> values;
-	bool isOutput = false, isCyclic = true;
+	bool isOutput = false, isCyclic = false;
 
 	unsigned int i, j, major, minor;
 	char git_tag[8];
@@ -1803,6 +1847,7 @@ int ADMTController::streamChannel(const char *deviceName, const QVector<QString>
 
 	QMap<QString, double> streamDataMap;
 	while(!stopStream.loadAcquire()) {
+		elapsedStreamTimer.start();
 		for(int i = 0; i < channels.size(); i++) {
 			values.clear();
 
@@ -1839,6 +1884,11 @@ int ADMTController::streamChannel(const char *deviceName, const QVector<QString>
 		}
 
 		Q_EMIT streamChannelData(streamDataMap);
+
+		qint64 elapsed = elapsedStreamTimer.elapsed();
+		while(elapsed < sampleRate) {
+			elapsed = elapsedStreamTimer.elapsed();
+		}
 	}
 
 	iio_buffer_destroy(buffer);
