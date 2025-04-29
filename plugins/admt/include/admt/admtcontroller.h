@@ -226,6 +226,7 @@ public:
 	QString calibrate(vector<double> PANG, int cycles, int samplesPerCycle, bool CCW);
 	int writeDeviceRegistry(const char *deviceName, uint32_t address, uint32_t value);
 	int readDeviceRegistry(const char *deviceName, uint32_t address, uint32_t *returnValue);
+	int readDeviceRegistry(const char *deviceName, uint32_t address, uint8_t page, uint32_t *returnValue);
 	void computeSineCosineOfAngles(const vector<double> &angles);
 	uint16_t calculateHarmonicCoefficientMagnitude(uint16_t harmonicCoefficient, uint16_t originalValue,
 						       const string &key);
@@ -262,7 +263,7 @@ public:
 	bool checkVelocityReachedFlag(uint16_t registerValue);
 	uint16_t changeCNVPage(uint16_t registerValue, uint8_t page);
 	uint16_t convertStart(bool start, uint16_t registerValue);
-	int streamChannel(const char *deviceName, const QVector<QString> channelNames, int bufferSize);
+	int streamChannel(const char *deviceName, const QVector<QString> channelNames, int bufferSize, int sampleRate);
 public Q_SLOTS:
 	void handleStreamData(double value);
 	void handleStreamChannelData(QMap<QString, double> dataMap);
