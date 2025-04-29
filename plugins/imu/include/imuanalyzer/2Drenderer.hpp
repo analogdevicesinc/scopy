@@ -3,6 +3,8 @@
 
 #include "imuanalyzerutils.hpp"
 #include "scopy-imuanalyzer_export.h"
+#include "plotwidget.h"
+#include <plotaxis.h>
 
 #include <QWidget>
 #include <QPainter>
@@ -21,11 +23,13 @@ public Q_SLOTS:
 	void resetPos();
 	void setRot(rotation rot);
 
-protected:
-	void paintEvent(QPaintEvent *event) override;
-
 private:
 	rotation m_rot;
+	QVector<double> xLinePoint{90,90};
+	QVector<double> yLinePoint{3,3};
+	PlotWidget *plotWidget;
+	QwtPlotCurve *point;
+
 
 };
 }
