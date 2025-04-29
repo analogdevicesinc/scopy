@@ -7,20 +7,28 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
 	lay->setMargin(0);
 	setLayout(lay);
 
-
 	m_rot = {0.0f, 0.0f, 0.0f};
-	//lay->addWidget(this);
+
+	plotWidget = new PlotWidget(this);
+	lay->addWidget(plotWidget);
+
+	plotWidget->xAxis()->setInterval(-120.0,120.0);
+	plotWidget->yAxis()->setInterval(-120.0,120.0);
+
+	plotWidget->xAxis()->setVisible(true);
+	plotWidget->yAxis()->setVisible(true);
+
+	point = new QwtPlotCurve("Point");
+	point->setSamples(xLinePoint, yLinePoint);
+	point->setStyle(QwtPlotCurve::Dots);
+	point->setSymbol(new QwtSymbol(QwtSymbol::Ellipse, QBrush(Qt::red), QPen(Qt::red), QSize(20, 20)));
+	point->attach(plotWidget->plot());
 }
 
 void BubbleLevelRenderer::setRot(rotation rot){
 	m_rot = rot;
-	this->update();
-}
-
-void BubbleLevelRenderer::paintEvent(QPaintEvent *event){
-
-	QPainter painter(this);
-	painter.setBrush(Qt::red);
-	painter.drawEllipse(QPointF(200.0f + m_rot.rotX, 100.0f), 100, 100);
-	painter.drawEllipse(QPointF(200.0f, 400 + m_rot.rotY), 100, 100);
+	xLinePoint = {double(m_rot.rotX),double(m_rot.rotX)};
+	yLinePoint = {double(m_rot.rotY),double(m_rot.rotY)};
+	point->setSamples(xLinePoint, yLinePoint);
+	plotWidget->replot();
 }

@@ -8,7 +8,7 @@ std::atomic<bool> m_runThread(false);
 
 void IMUAnalyzerInterface::generateRotation(){
 	m_rot = {0.0f, 0.0f, 0.0f};
-	bool direction = false;
+	bool directionX = false, directionY = false;
 	while(1){
 	if (!m_runThread) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Light pause loop
@@ -17,8 +17,8 @@ void IMUAnalyzerInterface::generateRotation(){
 
 	for(int i = 0; i < 180; i++){
 		if(!m_runThread) break;
-		if(m_rot.rotX == 0 || m_rot.rotX == 90) direction = !direction;
-		if(direction) m_rot.rotX = m_rot.rotX + 1.0f;
+		if(m_rot.rotX == 0 || m_rot.rotX == 90) directionX = !directionX;
+		if(directionX) m_rot.rotX = m_rot.rotX + 1.0f;
 		else m_rot.rotX = m_rot.rotX - 1.0f;
 
 		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
@@ -28,8 +28,8 @@ void IMUAnalyzerInterface::generateRotation(){
 
 	for(int i = 0; i < 180; i++){
 		if(!m_runThread) break;
-		if(m_rot.rotY == 0 || m_rot.rotY == 90) direction = !direction;
-		if(direction) m_rot.rotY = m_rot.rotY + 1.0f;
+		if(m_rot.rotY == 0 || m_rot.rotY == 90) directionY = !directionY;
+		if(directionY) m_rot.rotY = m_rot.rotY + 1.0f;
 		else m_rot.rotY = m_rot.rotY - 1.0f;
 
 		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
@@ -90,6 +90,8 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 
 	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer();
 	tabWidget->addTab(bubbleLevelRenderer, "2D View");
+
+	tabWidget->
 
 	connect(this, &IMUAnalyzerInterface::generateRot, bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
 }
