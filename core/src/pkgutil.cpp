@@ -180,6 +180,7 @@ void PkgUtil::addFileMetadata(QJsonObject &metadata, const QString &path)
 	QString lastModifiedDate = pkgInfo.lastModified().toString();
 	addExtraField(metadata, "size", size);
 	addExtraField(metadata, "last_modified", lastModifiedDate);
+	addExtraField(metadata, "path", path);
 }
 
 QString PkgUtil::getFileSize(const QString &path)

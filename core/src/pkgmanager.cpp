@@ -109,7 +109,7 @@ bool PkgManager::uninstall(const QString &pkgId, bool performRestart)
 
 bool PkgManager::_uninstall(const QString &pkgId, bool performRestart)
 {
-	QString pkgPath = PkgUtil::checkPkgPath(packagesPath_, pkgId);
+	QString pkgPath = validPackages_[pkgId].value("path").toString();
 	if(pkgPath.isEmpty()) {
 		qWarning(CAT_PKGMANAGER) << "There is no package:" << pkgId;
 		return false;
@@ -141,7 +141,7 @@ void PkgManager::loadPkg(const QFileInfo &fileInfo)
 		qWarning(CAT_PKGMANAGER) << "MANIFEST file validation failed:" << metadataPath;
 		return;
 	}
-	validPackages_.insert(fileInfo.absolutePath(), metadata.toVariantMap());
+	validPackages_.insert(metadata["id"].toString(), metadata.toVariantMap());
 }
 
 void PkgManager::createPkgDirectory()
@@ -155,8 +155,8 @@ void PkgManager::createPkgDirectory()
 QFileInfoList PkgManager::listFilesInfo(const QStringList &filter)
 {
 	QFileInfoList files;
-	const QStringList packagesPath = validPackages_.keys();
-	for(const QString &pkgPath : packagesPath) {
+	for(auto &it : validPackages_) {
+		QString pkgPath = it["path"].toString();
 		files.append(getFilesInfo(pkgPath, filter));
 	}
 	return files;
@@ -165,8 +165,8 @@ QFileInfoList PkgManager::listFilesInfo(const QStringList &filter)
 QStringList PkgManager::listFilesPath(const QStringList &filter)
 {
 	QStringList files;
-	const QStringList packagesPath = validPackages_.keys();
-	for(const QString &pkgPath : packagesPath) {
+	for(auto &it : validPackages_) {
+		QString pkgPath = it["path"].toString();
 		files.append(getFilesPath(pkgPath, filter));
 	}
 	return files;
