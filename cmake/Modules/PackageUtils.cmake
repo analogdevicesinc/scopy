@@ -1,26 +1,34 @@
 # cmake/PackageUtils.cmake
 
-function(add_all_packages PACKAGES_DIR)
-    file(GLOB CHILD_DIRS RELATIVE ${PACKAGES_DIR} ${PACKAGES_DIR}/*)
+function(add_subdirectories_with_options base_dir output_dir prefix)
+    file(GLOB CHILDREN RELATIVE ${base_dir} ${base_dir}/*)
 
-    foreach(PACKAGE_NAME ${CHILD_DIRS})
-	set(PACKAGE_PATH "${PACKAGES_DIR}/${PACKAGE_NAME}")
+    foreach(child ${CHILDREN})
+        if(IS_DIRECTORY ${base_dir}/${child})
+            string(TOUPPER ${child} CHILD_UPPER)
+            set(ENABLE_CHILD_VAR "${prefix}_${CHILD_UPPER}")
 
-	if(IS_DIRECTORY "${PACKAGE_PATH}" AND EXISTS "${PACKAGE_PATH}/CMakeLists.txt")
-	    string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER)
-	    set(ENABLE_VAR "ENABLE_PACKAGE_${PACKAGE_UPPER}")
+            # Set default ON
+            if(NOT DEFINED ${ENABLE_CHILD_VAR})
+                set(${ENABLE_CHILD_VAR} ON CACHE BOOL "Enable ${prefix} ${child}")
+            endif()
 
-	    # Set default ON
-	    if(NOT DEFINED ${ENABLE_VAR})
-		set(${ENABLE_VAR} ON CACHE BOOL "Enable package ${PACKAGE_NAME}")
-	    endif()
+            if(${ENABLE_CHILD_VAR})
+                message(STATUS "Including ${prefix}: ${child}")
 
-	    if(${ENABLE_VAR})
-		message(STATUS "Including package: ${PACKAGE_NAME}")
-		add_subdirectory(${PACKAGE_PATH})
-	    else()
-		message(STATUS "Skipping package: ${PACKAGE_NAME}")
-	    endif()
-	endif()
+                # Set output directories based on platform
+                if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+		    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_dir})
+                elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+		    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/${output_dir}")
+                else()
+		    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${output_dir})
+                endif()
+
+                add_subdirectory(${base_dir}/${child})
+            else()
+                message(STATUS "Skipping ${prefix}: ${child}")
+            endif()
+        endif()
     endforeach()
 endfunction()

@@ -10,6 +10,9 @@ endif()
 # Include utils
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(PackageUtils)
-# Set packages location
-set(PACKAGES_DIR "${CMAKE_SOURCE_DIR}/packages")
-add_all_packages(${PACKAGES_DIR})
+
+add_subdirectories_with_options(
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${SCOPY_PACKAGE_BUILD_PATH}
+	"ENABLE_PACKAGE"
+)
