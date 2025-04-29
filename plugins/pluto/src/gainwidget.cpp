@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2025 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "gainwidget.h"
 #include <style.h>
 #include <iioutil/connectionprovider.h>
@@ -511,14 +532,15 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	adcOverloadWidgetLayout->addWidget(largeOverloadThresh, 1, 0);
 
 	// adi,gc-adc-small-overload-thresh
-	IIOWidget *smallOverloadThresh = IIOWidgetBuilder(adcOverloadWidget)
-						 .device(m_device)
-						 .attribute("adi,gc-adc-small-overload-thresh")
-						 .uiStrategy(IIOWidgetBuilder::RangeUi)
-						 .optionsValues("[0 1 255]")
-						 .title("Small Thresh")
-	                .infoMessage("This attribute sets the small ADC overload. See register 0x104.")
-						 .buildSingle();
+	IIOWidget *smallOverloadThresh =
+		IIOWidgetBuilder(adcOverloadWidget)
+			.device(m_device)
+			.attribute("adi,gc-adc-small-overload-thresh")
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 255]")
+			.title("Small Thresh")
+			.infoMessage("This attribute sets the small ADC overload. See register 0x104.")
+			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(smallOverloadThresh, 1, 1);
 
 	// adi,agc-adc-large-overload-exceed-counter

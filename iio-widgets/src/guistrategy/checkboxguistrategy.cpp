@@ -43,7 +43,6 @@ CheckBoxAttrUi::CheckBoxAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QW
 	m_infoIcon = new InfoIconWidget("", m_ui);
 	m_ui->layout()->addWidget(m_infoIcon);
 
-
 	if(m_isCompact) {
 		m_title->setWordWrap(true);
 	}
