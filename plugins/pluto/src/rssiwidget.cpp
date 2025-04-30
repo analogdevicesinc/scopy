@@ -3,6 +3,7 @@
 #include <style.h>
 #include <iioutil/connectionprovider.h>
 #include <iiowidgetbuilder.h>
+#include <iiowidgetutils.h>
 
 using namespace scopy;
 using namespace pluto;
@@ -38,44 +39,71 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 	// adi,rssi-duration
 	IIOWidget *rssiDuration = IIOWidgetBuilder(widget)
 					  .device(m_device)
-					  .attribute("rssi-duration")
+					  .attribute("adi,rssi-duration")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
+					  .optionsValues("[0 1 100000]")
 					  .title("Duration (us)")
+					  .infoMessage("Total RSSI measurement duration")
 					  .buildSingle();
 	layout->addWidget(rssiDuration);
-	rssiDuration->setToolTip("Total RSSI measurement duration");
 
 	// adi,rssi-delay
-	IIOWidget *rssiDelay = IIOWidgetBuilder(widget)
-				       .device(m_device)
-				       .attribute("rssi-delay")
-				       .uiStrategy(IIOWidgetBuilder::RangeUi)
-				       .title("Delay (us)")
-				       .buildSingle();
+	IIOWidget *rssiDelay =
+		IIOWidgetBuilder(widget)
+			.device(m_device)
+			.attribute("adi,rssi-delay")
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 100000]")
+			.title("Delay (us)")
+			.infoMessage(
+				"When the RSSI algorithm (re)starts, the AD9361 first waits for the Rx signal path to "
+				"settle. This delay is the “RSSI Delay”")
+			.buildSingle();
 	layout->addWidget(rssiDelay);
-	rssiDelay->setToolTip("When the RSSI algorithm (re)starts, the AD9361 first waits for the Rx signal path to "
-			      "settle. This delay is the “RSSI Delay”");
 
 	// wait  adi,rssi-wait
 	IIOWidget *rssiWait = IIOWidgetBuilder(widget)
 				      .device(m_device)
-				      .attribute("rssi-wait")
+				      .attribute("adi,rssi-wait")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
+				      .optionsValues("[0 1 100000]")
 				      .title("Wait (us)")
+				      .infoMessage("After the “RSSI Delay” the RSSI algorithm alternates between "
+						   "measuring RSSI and waiting "
+						   "“RSSI Wait” to measure RSSI")
 				      .buildSingle();
 	layout->addWidget(rssiWait);
-	rssiWait->setToolTip("After the “RSSI Delay” the RSSI algorithm alternates between measuring RSSI and waiting "
-			     "“RSSI Wait” to measure RSSI");
 
 	// adi,rssi-restart-mode
+	QMap<QString, QString> *rssiRestartModeOptions = new QMap<QString, QString>();
+	rssiRestartModeOptions->insert("0", "AGC_in_Fast_Attack_Mode_Locks_the_Gain");
+	rssiRestartModeOptions->insert("1", "EN_AGC_pin_is_pulled_High");
+	rssiRestartModeOptions->insert("2", "AD9361_Enters_Rx_Mode");
+	rssiRestartModeOptions->insert("3", "Gain_Change_Occurs");
+	rssiRestartModeOptions->insert("4", "SPI_Write_to_Register");
+	rssiRestartModeOptions->insert("5", "Gain_Change_Occurs_OR_EN_AGC_pin_pulled_High");
+
+	auto values = rssiRestartModeOptions->values();
+	QString optionasData = "";
+	for(int i = 0; i < values.size(); i++) {
+		optionasData += " " + values.at(i);
+	}
+
 	IIOWidget *rssiRestartMode = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,rssi-restart-mode")
+					     .uiStrategy(IIOWidgetBuilder::ComboUi)
+					     .optionsValues(optionasData)
 					     .title("Restart Mode")
-					     // TODO FIND WHERE THE DROPDOWN SHOULD GET VALUES
-					     // .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .buildSingle();
 	layout->addWidget(rssiRestartMode);
+
+	rssiRestartMode->setUItoDataConversion([this, rssiRestartModeOptions](QString data) {
+		return IIOWidgetUtils::comboUiToDataConversionFunction(data, rssiRestartModeOptions);
+	});
+	rssiRestartMode->setDataToUIConversion([this, rssiRestartModeOptions](QString data) {
+		return IIOWidgetUtils::comboDataToUiConversionFunction(data, rssiRestartModeOptions);
+	});
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 

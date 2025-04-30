@@ -3,6 +3,7 @@
 #include <style.h>
 #include <iioutil/connectionprovider.h>
 #include <iiowidgetbuilder.h>
+#include <iiowidgetutils.h>
 
 using namespace scopy;
 using namespace pluto;
@@ -33,27 +34,61 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 
 	QGridLayout *gLayout1 = new QGridLayout();
 
+	QLabel *txMonitorTitle = new QLabel("Tx Monitor", widget);
+	Style::setStyle(txMonitorTitle, style::properties::label::menuBig);
+	layout->addWidget(txMonitorTitle);
+
 	gLayout1->addWidget(new QLabel("TX1", widget), 0, 1);
 	gLayout1->addWidget(new QLabel("TX2", widget), 0, 2);
 
 	gLayout1->addWidget(new QLabel("Frontend Gain", widget), 1, 0);
 	gLayout1->addWidget(new QLabel("LO Common Mode", widget), 2, 0);
 
+	QMap<QString, QString> *txFrontendGainOptions = new QMap<QString, QString>();
+	txFrontendGainOptions->insert("0", "Open");
+	txFrontendGainOptions->insert("1", "0dB");
+	txFrontendGainOptions->insert("2", "6dB");
+	txFrontendGainOptions->insert("3", "9.5dB");
+
+	auto values = txFrontendGainOptions->values();
+	QString optionasData = "";
+	for(int i = 0; i < values.size(); i++) {
+		optionasData += " " + values.at(i);
+	}
+
 	// adi,txmon-1-front-end-gain
 	IIOWidget *tx1FrontendGain = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,txmon-1-front-end-gain")
-					     .title(" ")
+					     .uiStrategy(IIOWidgetBuilder::ComboUi)
+					     .optionsValues(optionasData)
+					     .title("")
 					     .buildSingle();
 	gLayout1->addWidget(tx1FrontendGain, 1, 1);
+
+	tx1FrontendGain->setUItoDataConversion([this, txFrontendGainOptions](QString data) {
+		return IIOWidgetUtils::comboUiToDataConversionFunction(data, txFrontendGainOptions);
+	});
+	tx1FrontendGain->setDataToUIConversion([this, txFrontendGainOptions](QString data) {
+		return IIOWidgetUtils::comboDataToUiConversionFunction(data, txFrontendGainOptions);
+	});
 
 	// adi,txmon-2-front-end-gain
 	IIOWidget *tx2FrontendGain = IIOWidgetBuilder(widget)
 					     .device(m_device)
 					     .attribute("adi,txmon-2-front-end-gain")
-					     .title(" ")
+					     .uiStrategy(IIOWidgetBuilder::ComboUi)
+					     .optionsValues(optionasData)
+					     .title("")
 					     .buildSingle();
 	gLayout1->addWidget(tx2FrontendGain, 1, 2);
+
+	tx2FrontendGain->setUItoDataConversion([this, txFrontendGainOptions](QString data) {
+		return IIOWidgetUtils::comboUiToDataConversionFunction(data, txFrontendGainOptions);
+	});
+	tx2FrontendGain->setDataToUIConversion([this, txFrontendGainOptions](QString data) {
+		return IIOWidgetUtils::comboDataToUiConversionFunction(data, txFrontendGainOptions);
+	});
 
 	// adi,txmon-1-lo-cm
 
@@ -61,7 +96,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					     .device(m_device)
 					     .attribute("adi,txmon-1-lo-cm")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
-					     .title(" ")
+					     .optionsValues("[0 1 63]")
+					     .title("")
+					     .infoMessage("Please see the manual")
 					     .buildSingle();
 	gLayout1->addWidget(tx1LoCommonMode, 2, 1);
 
@@ -71,7 +108,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					     .device(m_device)
 					     .attribute("adi,txmon-2-lo-cm")
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
-					     .title(" ")
+					     .optionsValues("[0 1 63]")
+					     .title("")
+					     .infoMessage("Please see the manual")
 					     .buildSingle();
 	gLayout1->addWidget(tx2LoCommonMode, 2, 2);
 
@@ -83,7 +122,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					   .device(m_device)
 					   .attribute("adi,txmon-low-high-thresh")
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
+					   .optionsValues("[0 250 63750]")
 					   .title("Low/High Gain Threshold (mdB)")
+					   .infoMessage("Please see the manual")
 					   .buildSingle();
 	layout->addWidget(lowHighThresh);
 
@@ -93,7 +134,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				     .device(m_device)
 				     .attribute("adi,txmon-low-gain")
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
+				     .optionsValues("[0 1 31]")
 				     .title("Low Gain (dB)")
+				     .infoMessage("Please see the manual")
 				     .buildSingle();
 	layout->addWidget(lowGain);
 
@@ -103,7 +146,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				      .device(m_device)
 				      .attribute("adi,txmon-high-gain")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
+				      .optionsValues("[0 1 31]")
 				      .title("High Gain (dB)")
+				      .infoMessage("Please see the manual")
 				      .buildSingle();
 	layout->addWidget(highGain);
 
@@ -113,7 +158,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				   .device(m_device)
 				   .attribute("adi,txmon-delay")
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
+				   .optionsValues("[0 1 255]")
 				   .title("Delay (RX samples)")
+				   .infoMessage("Please see the manual")
 				   .buildSingle();
 	layout->addWidget(delay);
 
@@ -123,7 +170,9 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 				      .device(m_device)
 				      .attribute("adi,txmon-duration")
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
+				      .optionsValues("[16 16 8192]")
 				      .title("Duration (RX Samples)")
+				      .infoMessage("Please see the manual")
 				      .buildSingle();
 	layout->addWidget(duration);
 
@@ -133,8 +182,11 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 					       .attribute("adi,txmon-dc-tracking-enable")
 					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					       .title("Enable DC Tracking")
+					       .infoMessage("Please see the manual")
 					       .buildSingle();
 	layout->addWidget(dcTrackingEnabled);
+	dcTrackingEnabled->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	dcTrackingEnabled->showProgressBar(false);
 
 	// adi,txmon-one-shot-mode-enable
 	IIOWidget *oneShotModeEnabled = IIOWidgetBuilder(widget)
@@ -142,8 +194,11 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 						.attribute("adi,txmon-one-shot-mode-enable")
 						.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						.title("Enable One Shot Mode")
+						.infoMessage("Please see the manual")
 						.buildSingle();
 	layout->addWidget(oneShotModeEnabled);
+	oneShotModeEnabled->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	oneShotModeEnabled->showProgressBar(false);
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 

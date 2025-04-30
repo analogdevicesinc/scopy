@@ -202,7 +202,6 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	connect(this, &AD936X::readRequested, ensmMode, &IIOWidget::readAsync);
 
 	////calib_mode
-
 	IIOWidget *calibMode = IIOWidgetBuilder(globalSettingsWidget)
 				       .device(plutoDevice)
 				       .attribute("calib_mode")
@@ -217,7 +216,6 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	Style::setStyle(calibMode, style::properties::widget::basicBackground, true, true);
 
 	// trx_rate_governor
-
 	IIOWidget *trxRateGovernor = IIOWidgetBuilder(globalSettingsWidget)
 					     .device(plutoDevice)
 					     .attribute("trx_rate_governor")
@@ -234,7 +232,6 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	layout->addLayout(hlayout);
 
 	// rx_path_rates
-
 	IIOWidget *rxPathRates = IIOWidgetBuilder(globalSettingsWidget)
 					 .device(plutoDevice)
 					 .attribute("rx_path_rates")
@@ -245,7 +242,6 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	connect(this, &AD936X::readRequested, rxPathRates, &IIOWidget::readAsync);
 
 	// tx_path_rates
-
 	IIOWidget *txPathRates = IIOWidgetBuilder(globalSettingsWidget)
 					 .device(plutoDevice)
 					 .attribute("tx_path_rates")
@@ -282,23 +278,22 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	Style::setBackgroundColor(rxChainWidget, json::theme::background_primary);
 	Style::setStyle(rxChainWidget, style::properties::widget::border_interactive);
 
-	QVBoxLayout *layout = new QVBoxLayout(rxChainWidget);
-	rxChainWidget->setLayout(layout);
+	QVBoxLayout *mainLayout = new QVBoxLayout(rxChainWidget);
+	rxChainWidget->setLayout(mainLayout);
 
-	layout->addWidget(new QLabel("AD9361 / AD9364 Receive Chain", rxChainWidget));
+	mainLayout->addWidget(new QLabel("AD9361 / AD9364 Receive Chain", rxChainWidget));
 
 	// Get connection to device
 	Connection *conn = ConnectionProvider::open(m_uri);
 	iio_device *plutoDevice = iio_context_find_device(conn->context(), "ad9361-phy");
 
-	QHBoxLayout *hLayout = new QHBoxLayout();
-
-	// voltage0: rf_bandwidth
+	QGridLayout *layout = new QGridLayout();
 
 	bool isOutput = false;
 
 	iio_channel *voltage0 = iio_device_find_channel(plutoDevice, "voltage0", isOutput);
 
+	// voltage0: rf_bandwidth
 	IIOWidget *rfBandwidth = IIOWidgetBuilder(rxChainWidget)
 					 .channel(voltage0)
 					 .attribute("rf_bandwidth")
@@ -306,7 +301,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					 .title("RF Bandwidth(MHz)")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
-	hLayout->addWidget(rfBandwidth, Qt::AlignTop);
+	layout->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
 
 	// voltage0:  sampling_frequency
@@ -317,7 +312,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					       .title("Sampling Rate(MSPS)")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
-	hLayout->addWidget(samplingFrequency);
+	layout->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);
 
 	// voltage 0 : rf_port_select
@@ -328,16 +323,13 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 					  .title("RF Port Select")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .buildSingle();
-	hLayout->addWidget(rfPortSelect);
+	layout->addWidget(rfPortSelect, 0, 2, 2, 1);
 	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
-
-	// altvoltage0: RX_LO // frequency
-
-	QVBoxLayout *rxLoLayout = new QVBoxLayout();
 
 	// because this channel is marked as output by libiio we need to mark altvoltage0 as output
 	iio_channel *altVoltage0 = iio_device_find_channel(plutoDevice, "altvoltage0", true);
 
+	// altvoltage0: RX_LO // frequency
 	IIOWidget *altVoltage0Frequency = IIOWidgetBuilder(rxChainWidget)
 						  .channel(altVoltage0)
 						  .attribute("frequency")
@@ -350,34 +342,29 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	MenuOnOffSwitch *useExternalRxLo = new MenuOnOffSwitch("External Rx LO", rxChainWidget, false);
 	useExternalRxLo->onOffswitch()->setChecked(true);
 
-	rxLoLayout->addWidget(altVoltage0Frequency);
-	rxLoLayout->addWidget(useExternalRxLo);
-
-	hLayout->addLayout(rxLoLayout);
+	layout->addWidget(altVoltage0Frequency, 0, 3, 2, 1);
+	layout->addWidget(useExternalRxLo, 2, 3, 1, 1);
 
 	// fastlock profile
-
 	FastlockProfilesWidget *fastlockProfile = new FastlockProfilesWidget(altVoltage0, rxChainWidget);
 
 	connect(useExternalRxLo->onOffswitch(), &QAbstractButton::toggled, this,
 		[=, this](bool toggled) { fastlockProfile->setEnabled(toggled); });
 
-	hLayout->addWidget(fastlockProfile);
+	layout->addWidget(fastlockProfile, 0, 4, 3, 1);
 
 	connect(fastlockProfile, &FastlockProfilesWidget::recallCalled, this,
 		[=, this] { altVoltage0Frequency->read(); });
 
-	QVBoxLayout *trackingLayout = new QVBoxLayout();
-
 	// quadrature_tracking_en
-
 	IIOWidget *quadratureTrackingEn = IIOWidgetBuilder(rxChainWidget)
 						  .channel(voltage0)
 						  .attribute("quadrature_tracking_en")
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("Quadrature")
 						  .buildSingle();
-	trackingLayout->addWidget(quadratureTrackingEn);
+	layout->addWidget(quadratureTrackingEn, 0, 5);
+	quadratureTrackingEn->showProgressBar(false);
 	connect(this, &AD936X::readRequested, quadratureTrackingEn, &IIOWidget::readAsync);
 
 	// rf_dc_offset_tracking_en
@@ -387,7 +374,8 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("RF DC")
 						  .buildSingle();
-	trackingLayout->addWidget(rcDcOffsetTrackingEn);
+	layout->addWidget(rcDcOffsetTrackingEn, 1, 5);
+	rcDcOffsetTrackingEn->showProgressBar(false);
 	connect(this, &AD936X::readRequested, rcDcOffsetTrackingEn, &IIOWidget::readAsync);
 
 	// bb_dc_offset_tracking_en
@@ -397,12 +385,11 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 						  .title("BB DC")
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .buildSingle();
-	trackingLayout->addWidget(bbDcOffsetTrackingEn);
+	layout->addWidget(bbDcOffsetTrackingEn, 2, 5);
+	bbDcOffsetTrackingEn->showProgressBar(false);
 	connect(this, &AD936X::readRequested, bbDcOffsetTrackingEn, &IIOWidget::readAsync);
 
-	hLayout->addLayout(trackingLayout);
-
-	layout->addLayout(hLayout);
+	mainLayout->addLayout(layout);
 
 	QHBoxLayout *rxWidgetsLayout = new QHBoxLayout();
 	rxWidgetsLayout->addWidget(generateRxWidget(voltage0, rxChainWidget));
@@ -410,9 +397,9 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	// TODO add condition for multiple devices
 
 	rxWidgetsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
-	layout->addLayout(rxWidgetsLayout);
+	mainLayout->addLayout(rxWidgetsLayout);
 
-	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return rxChainWidget;
 }
@@ -473,31 +460,29 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	Connection *conn = ConnectionProvider::open(m_uri);
 	iio_device *plutoDevice = iio_context_find_device(conn->context(), "ad9361-phy");
 
-	QHBoxLayout *hLayout = new QHBoxLayout();
+	QGridLayout *lay = new QGridLayout();
 
 	bool isOutput = true;
 	iio_channel *voltage0 = iio_device_find_channel(plutoDevice, "voltage0", isOutput);
 
 	// voltage0: rf_bandwidth
-
 	IIOWidget *rfBandwidth = IIOWidgetBuilder(txChainWidget)
 					 .channel(voltage0)
 					 .attribute("rf_bandwidth")
 					 .optionsAttribute("rf_bandwidth_available")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
-	hLayout->addWidget(rfBandwidth);
+	lay->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
 
 	// voltage0:  sampling_frequency
-
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(txChainWidget)
 					       .channel(voltage0)
 					       .attribute("sampling_frequency")
 					       .optionsAttribute("sampling_frequency_available")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
-	hLayout->addWidget(samplingFrequency);
+	lay->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);
 
 	// voltage0:  rf_port_select
@@ -507,15 +492,12 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					  .optionsAttribute("rf_port_select_available")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .buildSingle();
-	hLayout->addWidget(rfPortSelect);
+	lay->addWidget(rfPortSelect, 0, 2, 2, 1);
 	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
-
-	// altvoltage1: TX_LO // frequency
 
 	iio_channel *altVoltage1 = iio_device_find_channel(plutoDevice, "altvoltage1", isOutput);
 
-	QVBoxLayout *txLoLayout = new QVBoxLayout();
-
+	// altvoltage1: TX_LO // frequency
 	IIOWidget *altVoltage1Frequency = IIOWidgetBuilder(txChainWidget)
 						  .channel(altVoltage1)
 						  .attribute("frequency")
@@ -527,10 +509,8 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	MenuOnOffSwitch *useExternalTxLo = new MenuOnOffSwitch("External Tx LO", txChainWidget, false);
 	useExternalTxLo->onOffswitch()->setChecked(true);
 
-	txLoLayout->addWidget(altVoltage1Frequency);
-	txLoLayout->addWidget(useExternalTxLo);
-
-	hLayout->addLayout(txLoLayout);
+	lay->addWidget(altVoltage1Frequency, 0, 3, 2, 1);
+	lay->addWidget(useExternalTxLo, 2, 3, 1, 1);
 
 	// fastlock profile
 	FastlockProfilesWidget *fastlockProfile = new FastlockProfilesWidget(altVoltage1, txChainWidget);
@@ -538,12 +518,12 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	connect(useExternalTxLo->onOffswitch(), &QAbstractButton::toggled, this,
 		[=, this](bool toggled) { fastlockProfile->setEnabled(toggled); });
 
-	hLayout->addWidget(fastlockProfile);
+	lay->addWidget(fastlockProfile, 0, 4, 3, 1);
 
 	connect(fastlockProfile, &FastlockProfilesWidget::recallCalled, this,
 		[=, this] { altVoltage1Frequency->read(); });
 
-	layout->addLayout(hLayout);
+	layout->addLayout(lay);
 
 	QHBoxLayout *txWidgetsLayout = new QHBoxLayout();
 	txWidgetsLayout->addWidget(generateTxWidget(plutoDevice, txChainWidget));

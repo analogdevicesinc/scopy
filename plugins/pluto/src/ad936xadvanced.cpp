@@ -100,7 +100,6 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	centralWidget->addWidget(ensmModeClocks);
 
 	connect(this, &AD936XAdvanced::readRequested, ensmModeClocks, &EnsmModeClocksWidget::readRequested);
-
 	connect(ensmModeClocksBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(ensmModeClocks); });
 
@@ -112,7 +111,6 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	centralWidget->addWidget(elna);
 
 	connect(this, &AD936XAdvanced::readRequested, elna, &ElnaWidget::readRequested);
-
 	connect(eLnaBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(elna); });
 
 	QPushButton *rssiBtn = new QPushButton("RSSI", this);
@@ -123,7 +121,6 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	centralWidget->addWidget(rssi);
 
 	connect(this, &AD936XAdvanced::readRequested, rssi, &RssiWidget::readRequested);
-
 	connect(rssiBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(rssi); });
 
 	QPushButton *gainBtn = new QPushButton("GAIN", this);
@@ -134,7 +131,6 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	centralWidget->addWidget(gainWidget);
 
 	connect(this, &AD936XAdvanced::readRequested, gainWidget, &GainWidget::readRequested);
-
 	connect(gainBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(gainWidget); });
 
 	QPushButton *txMonitorBtn = new QPushButton("TX MONITOR", this);
