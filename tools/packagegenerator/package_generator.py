@@ -247,6 +247,17 @@ def generate_plugin(plugin_path, plugin, pdk_enable=False):
             f.write(f"include/{plugin_name}/scopy-{plugin_name}_config.h\n")
         print("Plugin .gitignore file created!")
 
+def generate_translation(resources_path):
+    print("Adding translation templates...")
+    translation_path = os.path.join(resources_path, "translations")
+    create_directory(translation_path)
+    translations_qrc = os.path.join(resources_path, "translations.qrc")
+    if not os.path.exists(translations_qrc):
+        with open(translations_qrc, "w") as f:
+            f.write("<RCC>\n<qresource prefix=\"/translations\">\n"
+                    "@TRANSLATIONS@\n</qresource>\n</RCC>")
+        log_created_file(translations_qrc)
+
 def generate_style(pkg_path):
     print("Adding style templates...")
     # Create directories for style
@@ -398,16 +409,10 @@ def generate_pkg(packages_path, config, args):
         if maybe_clear_plugin_dir(plugin_path, plugin):
             save_config(plugin_path, plugin)
             generate_plugin(plugin_path, plugin)   
+            
     if args.translation or args.all:
-        print("Adding translation templates...")
-        translation_path = os.path.join(resources_path, "translations")
-        create_directory(translation_path)
-        translations_qrc = os.path.join(resources_path, "translations.qrc")
-        if not os.path.exists(translations_qrc):
-            with open(translations_qrc, "w") as f:
-                f.write("<RCC>\n<qresource prefix=\"/translations\">\n"
-                        "@TRANSLATIONS@\n</qresource>\n</RCC>")
-            log_created_file(translations_qrc)
+        generate_translation(resources_path)
+        
     if args.style or args.all:
         generate_style(pkg_path)  
         
