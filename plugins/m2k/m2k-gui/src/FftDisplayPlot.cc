@@ -904,6 +904,7 @@ void FftDisplayPlot::setAverage(uint chIdx, enum AverageType avg_type, uint hist
 	if(d_ch_avg_obj[chIdx] && (history != d_ch_avg_obj[chIdx]->history()) &&
 	   (history_en == d_ch_avg_obj[chIdx]->historyEnabled())) {
 		d_ch_avg_obj[chIdx]->setHistory(history);
+		resetAverageHistory();
 	} else {
 		d_ch_average_type[chIdx] = avg_type;
 		d_ch_avg_obj[chIdx] = getNewAvgObject(avg_type, d_numPoints, history, history_en);
