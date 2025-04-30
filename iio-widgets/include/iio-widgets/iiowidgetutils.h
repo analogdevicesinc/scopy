@@ -32,7 +32,6 @@ class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetUtils : public QObject
 public:
 	static QString comboUiToDataConversionFunction(QString value, QMap<QString, QString> *map);
 	static QString comboDataToUiConversionFunction(QString value, QMap<QString, QString> *map);
-
 signals:
 };
 

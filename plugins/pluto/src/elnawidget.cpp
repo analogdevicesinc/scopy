@@ -20,6 +20,8 @@ ElnaWidget::ElnaWidget(QString uri, QWidget *parent)
 
 	QWidget *widget = new QWidget(this);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(5, 5, 5, 5);
+	layout->setSpacing(10);
 	widget->setLayout(layout);
 
 	m_layout->addWidget(widget);
@@ -38,82 +40,102 @@ ElnaWidget::ElnaWidget(QString uri, QWidget *parent)
 	// adi,elna-gain-mdB
 	IIOWidget *gain = IIOWidgetBuilder(widget)
 				  .device(m_device)
-				  .attribute("elna-gain-mdB")
+				  .attribute("adi,elna-gain-mdB")
 				  .uiStrategy(IIOWidgetBuilder::RangeUi)
+				  .optionsValues("[0 500 31500]")
 				  .title("LNA Gain (mdB)")
+				  .infoMessage("These options must have non-zero values only if (1) an external LNA is "
+					       "used and (2) the “Ext LNA "
+					       "ctrl” bits in the Gain Table have been programmed. For a fixed-gain "
+					       "LNA, set elna-gain-mdB to the "
+					       "gain of the LNA and leave register elna-bypass-loss-mdB at its default "
+					       "of 0. For an external LNA with "
+					       "a bypass mode, program elna-gain-mdB with the “high gain” (non-bypass) "
+					       "value and program "
+					       "elna-bypass-loss-mdB with the “low gain” (bypass) value. The part "
+					       "considers both values to represent "
+					       "positive gain in the front end prior to the AD9361. Both registers "
+					       "range from 0 to 31500mdB in 500mdB "
+					       "steps. See elna-rx[1|2]-gpo[0|1]-control-enable to route the external "
+					       "LNA gain table bits to the GPO "
+					       "pins.")
 				  .buildSingle();
 	layout->addWidget(gain);
-	gain->setToolTip(
-		"These options must have non-zero values only if (1) an external LNA is used and (2) the “Ext LNA "
-		"ctrl” bits in the Gain Table have been programmed. For a fixed-gain LNA, set elna-gain-mdB to the "
-		"gain of the LNA and leave register elna-bypass-loss-mdB at its default of 0. For an external LNA with "
-		"a bypass mode, program elna-gain-mdB with the “high gain” (non-bypass) value and program "
-		"elna-bypass-loss-mdB with the “low gain” (bypass) value. The part considers both values to represent "
-		"positive gain in the front end prior to the AD9361. Both registers range from 0 to 31500mdB in 500mdB "
-		"steps. See elna-rx[1|2]-gpo[0|1]-control-enable to route the external LNA gain table bits to the GPO "
-		"pins.");
 
 	// adi,elna-bypass-loss-mdB
 	IIOWidget *bypassLoss = IIOWidgetBuilder(widget)
 					.device(m_device)
-					.attribute("bypass-loss-mdB")
+					.attribute("adi,elna-bypass-loss-mdB")
 					.uiStrategy(IIOWidgetBuilder::RangeUi)
+					.optionsValues("[0 500 31500]")
 					.title("LNA Bypass Loss (mdB)")
+					.infoMessage("These options must have non-zero values only if (1) an external "
+						     "LNA is used and (2) the “Ext LNA "
+						     "ctrl” bits in the Gain Table have been programmed. For a "
+						     "fixed-gain LNA, set elna-gain-mdB to the "
+						     "gain of the LNA and leave register elna-bypass-loss-mdB at its "
+						     "default of 0. For an external LNA with "
+						     "a bypass mode, program elna-gain-mdB with the “high gain” "
+						     "(non-bypass) value and program "
+						     "elna-bypass-loss-mdB with the “low gain” (bypass) value. The "
+						     "part considers both values to represent "
+						     "positive gain in the front end prior to the AD9361. Both "
+						     "registers range from 0 to 31500mdB in 500mdB "
+						     "steps. See elna-rx[1|2]-gpo[0|1]-control-enable to route the "
+						     "external LNA gain table bits to the GPO "
+						     "pins.")
 					.buildSingle();
 	layout->addWidget(bypassLoss);
-	bypassLoss->setToolTip(
-		"These options must have non-zero values only if (1) an external LNA is used and (2) the “Ext LNA "
-		"ctrl” bits in the Gain Table have been programmed. For a fixed-gain LNA, set elna-gain-mdB to the "
-		"gain of the LNA and leave register elna-bypass-loss-mdB at its default of 0. For an external LNA with "
-		"a bypass mode, program elna-gain-mdB with the “high gain” (non-bypass) value and program "
-		"elna-bypass-loss-mdB with the “low gain” (bypass) value. The part considers both values to represent "
-		"positive gain in the front end prior to the AD9361. Both registers range from 0 to 31500mdB in 500mdB "
-		"steps. See elna-rx[1|2]-gpo[0|1]-control-enable to route the external LNA gain table bits to the GPO "
-		"pins.");
 
 	// adi,elna-settling-delay-ns
 	IIOWidget *settlingDelay = IIOWidgetBuilder(widget)
 					   .device(m_device)
-					   .attribute("settling-delay-ns")
+					   .attribute("adi,elna-settling-delay-ns")
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
+					   .optionsValues("[0 1 20000]")
 					   .title("Settling Delay (ns)")
+					   .infoMessage("Settling delay of external LNA in ns")
 					   .buildSingle();
 	layout->addWidget(settlingDelay);
-	settlingDelay->setToolTip("Settling delay of external LNA in ns");
-
-	QHBoxLayout *hlayout = new QHBoxLayout();
 
 	// adi,elna-rx1-gpo0-control-enable
-	IIOWidget *rx1GPO0Control = IIOWidgetBuilder(widget)
-					    .device(m_device)
-					    .attribute("adi,elna-rx1-gpo0-control-enable")
-					    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					    .title("RX1 GPO0")
-					    .buildSingle();
-	hlayout->addWidget(rx1GPO0Control);
-	rx1GPO0Control->setToolTip("When set, the “Ext LNA Ctrl” bit in the Rx1 gain table sets the GPO0 state");
+	IIOWidget *rx1GPO0Control =
+		IIOWidgetBuilder(widget)
+			.device(m_device)
+			.attribute("adi,elna-rx1-gpo0-control-enable")
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("RX1 GPO0")
+			.infoMessage("When set, the “Ext LNA Ctrl” bit in the Rx1 gain table sets the GPO0 state")
+			.buildSingle();
+	layout->addWidget(rx1GPO0Control);
+	rx1GPO0Control->showProgressBar(false);
+	rx1GPO0Control->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	// adi,elna-rx2-gpo1-control-enable
-	IIOWidget *rx2GPO0Control = IIOWidgetBuilder(widget)
-					    .device(m_device)
-					    .attribute("adi,elna-rx2-gpo1-control-enable")
-					    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					    .title("RX2 GPO0")
-					    .buildSingle();
-	hlayout->addWidget(rx2GPO0Control);
-	rx2GPO0Control->setToolTip("When set, the “Ext LNA Ctrl” bit in the Rx2 gain table sets the GPO1 state");
-
-	layout->addLayout(hlayout);
+	IIOWidget *rx2GPO0Control =
+		IIOWidgetBuilder(widget)
+			.device(m_device)
+			.attribute("adi,elna-rx2-gpo1-control-enable")
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("RX2 GPO0")
+			.infoMessage("When set, the “Ext LNA Ctrl” bit in the Rx2 gain table sets the GPO1 state")
+			.buildSingle();
+	layout->addWidget(rx2GPO0Control);
+	rx2GPO0Control->showProgressBar(false);
+	rx2GPO0Control->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	// adi,elna-gaintable-all-index-enable
-	IIOWidget *gaintableAllIndex = IIOWidgetBuilder(widget)
-					       .device(m_device)
-					       .attribute("adi,elna-gaintable-all-index-enable")
-					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					       .title("External LNA enabled for all gain indexes")
-					       .buildSingle();
+	IIOWidget *gaintableAllIndex =
+		IIOWidgetBuilder(widget)
+			.device(m_device)
+			.attribute("adi,elna-gaintable-all-index-enable")
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("External LNA enabled for all gain indexes")
+			.infoMessage("The external LNA control bit in the gain tables is set for all indexes")
+			.buildSingle();
 	layout->addWidget(gaintableAllIndex);
-	gaintableAllIndex->setToolTip("The external LNA control bit in the gain tables is set for all indexes");
+	gaintableAllIndex->showProgressBar(false);
+	gaintableAllIndex->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 

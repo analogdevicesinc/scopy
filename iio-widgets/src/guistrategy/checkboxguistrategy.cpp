@@ -40,7 +40,7 @@ CheckBoxAttrUi::CheckBoxAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QW
 	Style::setStyle(m_title, style::properties::label::subtle);
 	m_ui->layout()->addWidget(m_title);
 
-	m_infoIcon = new InfoIconWidget(recipe.infoMessage, m_ui);
+	m_infoIcon = new InfoIconWidget("", m_ui);
 	m_ui->layout()->addWidget(m_infoIcon);
 
 
