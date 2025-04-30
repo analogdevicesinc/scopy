@@ -48,6 +48,7 @@ public:
 	bool isValid() final;
 
 	void setCustomTitle(QString title) override;
+	void setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
@@ -62,6 +63,7 @@ private:
 	MenuOnOffSwitch *m_menuOnOffSwitch;
 	bool m_isCompact;
 	QLabel *m_title;
+	InfoIconWidget *m_infoIcon;
 };
 } // namespace scopy
 

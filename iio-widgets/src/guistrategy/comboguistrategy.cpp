@@ -54,6 +54,7 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 
 		m_comboMenuWidget = new MenuCombo(recipe.data, m_ui);
 		m_comboWidget = m_comboMenuWidget->combo();
+		m_comboMenuWidget->setInfoMessage(recipe.infoMessage);
 
 		m_ui->layout()->addWidget(m_comboMenuWidget);
 	}
@@ -93,6 +94,8 @@ void ComboAttrUi::setInfoMessage(QString infoMessage)
 {
 	if(!m_isCompact) {
 		m_infoIcon->setInfoMessage(infoMessage);
+	} else {
+		m_comboMenuWidget->setInfoMessage(infoMessage);
 	}
 }
 

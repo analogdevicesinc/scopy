@@ -39,10 +39,12 @@ CheckBoxAttrUi::CheckBoxAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QW
 	if(!m_isCompact) {
 		m_title = new QLabel(recipe.data, m_ui);
 		m_title->setWordWrap(true);
-		m_title->setFixedWidth(m_menuOnOffSwitch->width());
 		Style::setStyle(m_title, style::properties::label::subtle);
 		m_ui->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		m_ui->layout()->addWidget(m_title);
+
+		m_infoIcon = new InfoIconWidget(recipe.infoMessage, m_ui);
+		m_ui->layout()->addWidget(m_infoIcon);
 	}
 	m_ui->layout()->addWidget(m_menuOnOffSwitch);
 

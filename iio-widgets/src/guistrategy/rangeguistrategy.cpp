@@ -44,6 +44,8 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	m_spinBox->setScalingEnabled(false);
 	m_ui->layout()->addWidget(m_spinBox);
 
+	setInfoMessage(recipe.infoMessage);
+
 	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this,
 		[&](double value) { Q_EMIT emitData(Util::doubleToQString(value)); });
 	Q_EMIT requestData();
@@ -63,6 +65,8 @@ bool RangeAttrUi::isValid()
 }
 
 void RangeAttrUi::setCustomTitle(QString title) { m_spinBox->setName(title); }
+
+void RangeAttrUi::setInfoMessage(QString infoMessage) { m_spinBox->setInfoMessage(infoMessage); }
 
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
