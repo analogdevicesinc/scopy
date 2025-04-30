@@ -83,8 +83,6 @@ bool EditableGuiStrategy::isValid()
 
 void EditableGuiStrategy::setCustomTitle(QString title) { m_title->setText(title); }
 
-void EditableGuiStrategy::setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
-
 void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 {
 	QSignalBlocker blocker(m_lineEdit);
