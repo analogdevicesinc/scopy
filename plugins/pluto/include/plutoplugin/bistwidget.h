@@ -48,9 +48,9 @@ private:
 	iio_device *m_device;
 	void updateBistTone();
 
-	IIOWidget *m_bistTone;
-	IIOWidget *m_toneFrequency;
-	IIOWidget *m_toneLevel;
+	MenuComboWidget *m_bistTone;
+	MenuComboWidget *m_toneFrequency;
+	MenuComboWidget *m_toneLevel;
 
 	MenuOnOffSwitch *m_c2q;
 	MenuOnOffSwitch *m_c2i;

@@ -1,5 +1,6 @@
 #include "bistwidget.h"
 
+#include <iiowidgetutils.h>
 #include <style.h>
 #include <iioutil/connectionprovider.h>
 
@@ -25,6 +26,10 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
+	QLabel *title = new QLabel("BIST", widget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	layout->addWidget(title);
+
 	// Get connection to device
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
 	// iio:device0: ad9361-phy
@@ -33,31 +38,83 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	QHBoxLayout *hLayout1 = new QHBoxLayout();
 
 	// bist_tone
-	m_bistTone = IIOWidgetBuilder(widget).device(m_device).attribute("bist_tone").title("Bist TONE").buildSingle();
+	m_bistTone = new MenuComboWidget("Bist TONE", widget);
+	m_bistTone->combo()->addItem("Disable", 0);
+	m_bistTone->combo()->addItem("Injection Point TX", 1);
+	m_bistTone->combo()->addItem("Injection Point RX", 2);
 	hLayout1->addWidget(m_bistTone);
 
 	// bist_prbs
-	IIOWidget *bistPrbs =
-		IIOWidgetBuilder(widget).device(m_device).attribute("bist_prbs").title("Bist PRBS").buildSingle();
+	QMap<QString, QString> *bistOptions = new QMap<QString, QString>();
+	bistOptions->insert("0", "Disable");
+	bistOptions->insert("1", "Injection_Point_TX");
+	bistOptions->insert("2", "Injection_Point_RX");
+
+	auto bistValues = bistOptions->values();
+	QString bistOptionasData = "";
+	for(int i = 0; i < bistValues.size(); i++) {
+		bistOptionasData += " " + bistValues.at(i);
+	}
+
+	IIOWidget *bistPrbs = IIOWidgetBuilder(widget)
+				      .device(m_device)
+				      .attribute("bist_prbs")
+				      .uiStrategy(IIOWidgetBuilder::ComboUi)
+				      .optionsValues(bistOptionasData)
+				      .title("Bist PRBS")
+				      .buildSingle();
 	hLayout1->addWidget(bistPrbs);
 
+	bistPrbs->setUItoDataConversion([this, bistOptions](QString data) {
+		return IIOWidgetUtils::comboUiToDataConversionFunction(data, bistOptions);
+	});
+	bistPrbs->setDataToUIConversion([this, bistOptions](QString data) {
+		return IIOWidgetUtils::comboDataToUiConversionFunction(data, bistOptions);
+	});
+
 	// loopback
-	IIOWidget *loopback =
-		IIOWidgetBuilder(widget).device(m_device).attribute("loopback").title("Loopback").buildSingle();
+	QMap<QString, QString> *loopbackOptions = new QMap<QString, QString>();
+	loopbackOptions->insert("0", "Disable");
+	loopbackOptions->insert("1", "Digital_TX→Digital_RX");
+	loopbackOptions->insert("2", "RF_RX→RF_TX");
+
+	auto loopbackValues = loopbackOptions->values();
+	QString loopbackOptionasData = "";
+	for(int i = 0; i < loopbackValues.size(); i++) {
+		loopbackOptionasData += " " + loopbackValues.at(i);
+	}
+	IIOWidget *loopback = IIOWidgetBuilder(widget)
+				      .device(m_device)
+				      .attribute("loopback")
+				      .uiStrategy(IIOWidgetBuilder::ComboUi)
+				      .optionsValues(loopbackOptionasData)
+				      .title("Loopback")
+				      .buildSingle();
 	hLayout1->addWidget(loopback);
+
+	loopback->setUItoDataConversion([this, loopbackOptions](QString data) {
+		return IIOWidgetUtils::comboUiToDataConversionFunction(data, loopbackOptions);
+	});
+	loopback->setDataToUIConversion([this, loopbackOptions](QString data) {
+		return IIOWidgetUtils::comboDataToUiConversionFunction(data, loopbackOptions);
+	});
 
 	layout->addLayout(hLayout1);
 
 	// tone_level
-	m_toneLevel = IIOWidgetBuilder(widget).device(m_device).attribute("tone_level").title("Level").buildSingle();
+	m_toneLevel = new MenuComboWidget("Level", widget);
+	m_toneLevel->combo()->addItem("0dB", 0);
+	m_toneLevel->combo()->addItem("-6dB", 6);
+	m_toneLevel->combo()->addItem("-12dB", 12);
+	m_toneLevel->combo()->addItem("-18dB", 18);
 	layout->addWidget(m_toneLevel);
 
 	// bist_tone_frequency
-	m_toneFrequency = IIOWidgetBuilder(widget)
-				  .device(m_device)
-				  .attribute("bist_tone_frequency")
-				  .title("Frequency")
-				  .buildSingle();
+	m_toneFrequency = new MenuComboWidget("Frequency", widget);
+	m_toneFrequency->combo()->addItem("Fsamp / 32");
+	m_toneFrequency->combo()->addItem("Fsamp / 16");
+	m_toneFrequency->combo()->addItem("Fsamp * 3 / 32");
+	m_toneFrequency->combo()->addItem("Fsamp / 8");
 	layout->addWidget(m_toneFrequency);
 
 	layout->addWidget(new QLabel("Channel Mask", widget));
@@ -65,20 +122,32 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	QHBoxLayout *hLayout2 = new QHBoxLayout();
 	// C2-Q
 	m_c2q = new MenuOnOffSwitch("C2-Q", widget, false);
+	m_c2q->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	hLayout2->addWidget(m_c2q);
 
 	//  C2-I
 	m_c2i = new MenuOnOffSwitch("C2-I", widget, false);
+	m_c2i->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	hLayout2->addWidget(m_c2i);
 
 	//  C1-Q
 	m_c1q = new MenuOnOffSwitch("C1-Q", widget, false);
+	m_c1q->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	hLayout2->addWidget(m_c1q);
 
 	//  C1-I
 	m_c1i = new MenuOnOffSwitch("C1-I", widget, false);
+	m_c1i->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	hLayout2->addWidget(m_c1i);
 
+	hLayout2->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
+	connect(m_bistTone->combo(), static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+		[this](int index) { updateBistTone(); });
+	connect(m_toneFrequency->combo(), static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+		[this](int index) { updateBistTone(); });
+	connect(m_toneLevel->combo(), static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+		[this](int index) { updateBistTone(); });
 	connect(m_c2q->onOffswitch(), &QAbstractButton::toggled, this, &BistWidget::updateBistTone);
 	connect(m_c2i->onOffswitch(), &QAbstractButton::toggled, this, &BistWidget::updateBistTone);
 	connect(m_c1q->onOffswitch(), &QAbstractButton::toggled, this, &BistWidget::updateBistTone);
@@ -89,10 +158,8 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	connect(this, &BistWidget::readRequested, this, [=, this]() {
-		m_bistTone->read();
-		bistPrbs->read();
-		loopback->read();
-		m_toneFrequency->read();
+		bistPrbs->readAsync();
+		loopback->readAsync();
 	});
 }
 
@@ -100,8 +167,6 @@ scopy::pluto::BistWidget::~BistWidget() { ConnectionProvider::close(m_uri); }
 
 void BistWidget::updateBistTone()
 {
-	// sprintf(temp, "%u %u %u %u", mode, freq, level * 6,
-	// 	(c2q << 3) | (c2i << 2) | (c1q << 1) | c1i);
 
 	int c2qVal = m_c2q->onOffswitch()->isChecked() ? 1 : 0;
 	int c2iVal = m_c2i->onOffswitch()->isChecked() ? 1 : 0;
@@ -110,9 +175,9 @@ void BistWidget::updateBistTone()
 
 	unsigned int bitmask = (c2qVal << 3) | (c2iVal << 2) | (c1qVal << 1) | c1iVal;
 
-	auto tone = m_bistTone->read().first;
-	auto freq = m_toneFrequency->read().first;
-	auto level = m_toneLevel->read().first.toInt() * 6;
+	auto tone = QString::number(m_bistTone->combo()->currentData().toInt());
+	auto freq = m_toneFrequency->combo()->currentText();
+	auto level = QString::number(m_toneLevel->combo()->currentData().toInt() * 6 * (-1));
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
 	// iio:device0: ad9361-phy
