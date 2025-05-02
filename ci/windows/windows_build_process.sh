@@ -371,14 +371,14 @@ build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	CURRENT_BUILD=extra-cmake-modules
 	CURRENT_BUILD_CMAKE_OPTS=""
-	build_with_cmake $1 || { echo "Error: Failed to build ECM"; exit 1; }
+	build_with_cmake $1
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
 	CURRENT_BUILD=karchive
-	CURRENT_BUILD_CMAKE_OPTS=""
-	build_with_cmake $1 || { echo "Error: Failed to build karchive"; exit 1; }
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
+	build_with_cmake $1
 }
 
 #
