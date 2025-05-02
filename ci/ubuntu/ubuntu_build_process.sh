@@ -57,6 +57,7 @@ if [ "$USE_STAGING" == "ON" ]
 			-DCMAKE_PREFIX_PATH=$QT \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 			-DCMAKE_VERBOSE_MAKEFILE=ON \
+			-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
 		)
 fi
 
@@ -297,7 +298,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	CURRENT_BUILD_CMAKE_OPTS=""
 	build_with_cmake $1
 	popd
 }
@@ -305,18 +306,18 @@ build_kddock () {
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	pushd $STAGING_AREA/extra-cmake-modules
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
-	build_with_cmake $1 || { echo "Error: Failed to build ECM"; exit 1; }
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+	build_with_cmake $1
 	popd
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
-    export CMAKE_PREFIX_PATH=$STAGING_AREA_DEPS/share/ECM/cmake:$CMAKE_PREFIX_PATH
-    pushd $STAGING_AREA/karchive
-    CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
-    build_with_cmake $1 || { echo "Error: Failed to build karchive"; exit 1; }
-    popd
+	export CMAKE_PREFIX_PATH=$STAGING_AREA_DEPS/share/ECM/cmake:$CMAKE_PREFIX_PATH
+	pushd $STAGING_AREA/karchive
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
+	build_with_cmake $1
+	popd
 }
 
 build_iio-emu() {
