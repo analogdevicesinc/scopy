@@ -30,6 +30,8 @@ apt -y install '^libxcb.*-dev' autoconf automake bison build-essential cmake fig
 	mesa-common-dev mesa-utils* perl pkg-config dh-python unzip wget
 apt -y install libusb-1.0-0-dev libaio-dev libpkgconf-dev libpython3-all-dev libfftw3-dev swig swig4.0 libgsl-dev libfuse2  libzmq3-dev libwayland-egl-backend-dev  libwayland-dev libwayland-egl1-mesa libssl-dev  
 
+apt -y remove *qt*
+
 wget https://raw.githubusercontent.com/abhiTronix/raspberry-pi-cross-compilers/master/utils/SSymlinker
 sed -i 's/sudo//g' SSymlinker
 chmod +x SSymlinker

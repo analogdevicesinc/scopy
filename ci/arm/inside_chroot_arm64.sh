@@ -24,6 +24,8 @@ apt -y install '^libxcb.*-dev' autoconf automake bison build-essential cmake dh-
 	libx11-xcb-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev libxml2-dev libxml2-utils mesa-common-dev mesa-utils* \
 	perl pkg-config unzip wget
 
+apt -y remove *qt*
+
 wget https://raw.githubusercontent.com/abhiTronix/raspberry-pi-cross-compilers/master/utils/SSymlinker
 sed -i 's/sudo//g' SSymlinker
 chmod +x SSymlinker
