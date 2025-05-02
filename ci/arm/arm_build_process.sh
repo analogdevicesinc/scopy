@@ -37,10 +37,6 @@ set_config_opts() {
 	AR="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ar"
 	RANLIB="${TOOLCHAIN_BIN}/${TOOLCHAIN_HOST}-ranlib"
 
-	CFLAGS=" -march=armv7-a -I${SYSROOT}/include -I${SYSROOT}/include/${TOOLCHAIN_HOST} -I${SYSROOT}/usr/include -I${SYSROOT}/usr/include/${TOOLCHAIN_HOST} -I${TOOLCHAIN}/include- -fPIC"
-	CPPFLAGS="-fexceptions ${CFLAGS}"
-	LDFLAGS="--sysroot=${SYSROOT} -Wl,-rpath=XORIGIN -L${SYSROOT}/lib -L${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST} -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}"
-
 	CONFIG_OPTS=()
 	CONFIG_OPTS+=("--prefix=${SYSROOT}")
 	CONFIG_OPTS+=("--host=${TOOLCHAIN_HOST}")
@@ -53,13 +49,16 @@ set_config_opts() {
 	if [ "$TOOLCHAIN_HOST" == "aarch64-linux-gnu" ]; then
 		CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
 		CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+		CFLAGS="-march=armv8-a"
 	elif [ "$TOOLCHAIN_HOST" == "arm-linux-gnueabihf" ]; then
 		CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/bin/arm-linux-gnueabihf-pkg-config")
 		CONFIG_OPTS+=("PKG_CONFIG=${SYSROOT}/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+		CFLAGS="-march=armv7-a"
 	fi
 
-	# CONFIG_OPTS+=("PKG_CONFIG_PATH=${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}/pkgconfig")
-	# CONFIG_OPTS+=("PKG_CONFIG=/usr/bin/${TOOLCHAIN_HOST}-pkg-config" )
+	CFLAGS="${CFLAGS} -I${SYSROOT}/include -I${SYSROOT}/include/${TOOLCHAIN_HOST} -I${SYSROOT}/usr/include -I${SYSROOT}/usr/include/${TOOLCHAIN_HOST} -I${TOOLCHAIN}/include- -fPIC"
+	CPPFLAGS="-fexceptions ${CFLAGS}"
+	LDFLAGS="--sysroot=${SYSROOT} -Wl,-rpath=XORIGIN -L${SYSROOT}/lib -L${SYSROOT}/usr/lib -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST} -L${SYSROOT}/usr/lib/${TOOLCHAIN_HOST}"
 
 	CONFIG_OPTS+=("PKG_CONFIG_ALLOW_CROSS=1")
 	CONFIG_OPTS+=("LDFLAGS=${LDFLAGS}")
@@ -209,17 +208,6 @@ build_gnuradio() {
 	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
 	pushd $STAGING_AREA/gnuradio
 
-	PYTHON_WRAPPER="$STAGING_AREA/python-wrapper.sh"
-
-	echo '#!/bin/bash' > $PYTHON_WRAPPER
-	echo "
-	LOADER="$SYSROOT/lib/ld-linux-armhf.so.3"
-	LIB_PATH="$SYSROOT/usr/lib/arm-linux-gnueabihf"
-	PYTHON_BIN="$SYSROOT/usr/bin/python3"
-	" >> $PYTHON_WRAPPER
-	echo 'exec $LOADER --library-path $LIB_PATH $PYTHON_BIN "$@"'>> $PYTHON_WRAPPER
-	chmod +x $PYTHON_WRAPPER
-
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_DEFAULT=OFF \
 		-DENABLE_GNURADIO_RUNTIME=ON \
@@ -229,8 +217,20 @@ build_gnuradio() {
 		-DENABLE_GR_FILTER=ON \
 		-DENABLE_GR_IIO=ON \
 		-DENABLE_POSTINSTALL=OFF \
-		-DPYTHON_EXECUTABLE=${PYTHON_WRAPPER} \
 		"
+
+	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+		PYTHON_WRAPPER="$STAGING_AREA/python-wrapper.sh"
+		echo '#!/bin/bash' > $PYTHON_WRAPPER
+		echo "
+		LOADER="$SYSROOT/lib/ld-linux-armhf.so.3"
+		LIB_PATH="$SYSROOT/usr/lib/arm-linux-gnueabihf"
+		PYTHON_BIN="$SYSROOT/usr/bin/python3"
+		" >> $PYTHON_WRAPPER
+		echo 'exec $LOADER --library-path $LIB_PATH $PYTHON_BIN "$@"'>> $PYTHON_WRAPPER
+		chmod +x $PYTHON_WRAPPER
+		CURRENT_BUILD_CMAKE_OPTS="${CURRENT_BUILD_CMAKE_OPTS} -DPYTHON_EXECUTABLE=${PYTHON_WRAPPER} \ "
+	fi
 
 	build_with_cmake
 	sudo make install
@@ -309,17 +309,20 @@ build_kddock () {
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	pushd $STAGING_AREA/extra-cmake-modules
-	CURRENT_BUILD_CMAKE_OPTS=""
-	build_with_cmake || { echo "Error: Failed to build ECM"; exit 1; }
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+	build_with_cmake
+	sudo make install
 	popd
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
-    pushd $STAGING_AREA/karchive
-    CURRENT_BUILD_CMAKE_OPTS=""
-    build_with_cmake || { echo "Error: Failed to build karchive"; exit 1; }
-    popd
+	pushd $STAGING_AREA/karchive
+	# karchive must be installed in usr/local
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$SYSROOT/usr/local"
+	build_with_cmake
+	sudo make install
+	popd
 }
 
 build_iio-emu(){
