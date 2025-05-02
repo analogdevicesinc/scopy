@@ -245,21 +245,28 @@ build_kddock () {
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	pushd $STAGING_AREA/extra-cmake-modules
-	build_with_cmake ../
+	build_with_cmake \
+		-DBUILD_TESTING=OFF \
+		-DBUILD_HTML_DOCS=OFF \
+		-DBUILD_MAN_DOCS=OFF \
+		-DBUILD_QTHELP_DOCS=OFF ../
+	sudo make install
 	popd
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
-    pushd $STAGING_AREA/karchive
-    build_with_cmake ../
-    popd
+	pushd $STAGING_AREA/karchive
+	build_with_cmake -DBUILD_TESTING=OFF ../
+	sudo make install
+	popd
 }
 
 build_iio-emu() {
 	echo "####### BUILD IIO-EMU #######"
 	pushd $STAGING_AREA/iio-emu
 	build_with_cmake ../
+	sudo make install
 	popd
 }
 

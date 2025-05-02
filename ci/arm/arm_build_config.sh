@@ -46,6 +46,12 @@ TOOLCHAIN_BIN=$TOOLCHAIN/bin
 TOOLCHAIN_FILE=$SRC_SCRIPT/cmake_toolchain.cmake
 QT_LOCATION=$SYSROOT/usr/lib/$TOOLCHAIN_HOST/qt5
 
+if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+	QT_BUILD_DEVICE=linux-rasp-pi4-v3d-g++
+elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+	QT_BUILD_DEVICE=linux-rasp-pi3-vc4-g++
+fi
+
 CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
 QMAKE_BIN=$QT_LOCATION/bin/qmake
 JOBS=-j14

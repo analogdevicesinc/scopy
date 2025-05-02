@@ -186,7 +186,9 @@ build_libserialport(){
 	./autogen.sh
 	[ "$USE_STAGING" == "ON" ] && ./configure --prefix $STAGING_AREA_DEPS || ./configure
 	make $JOBS
-	[ "$INSTALL" == "ON" ] && sudo make install
+	if [ "$INSTALL" == "ON" ];then
+		if [ "$USE_STAGING" == "ON" ]; then make install; else sudo make install; fi
+	fi
 
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
@@ -373,16 +375,16 @@ build_kddock () {
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	pushd $STAGING_AREA/extra-cmake-modules
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
-	build_with_cmake $1 || { echo "Error: Failed to build ECM"; exit 1; }
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+	build_with_cmake $1
 	popd
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
 	pushd $STAGING_AREA/karchive
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
-	build_with_cmake $1 || { echo "Error: Failed to build karchive"; exit 1; }
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF"
+	build_with_cmake $1
 	popd
 }
 

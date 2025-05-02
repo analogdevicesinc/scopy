@@ -21,10 +21,11 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 	usermod -aG sudo $USER && \
 	usermod -aG plugdev $USER
 
-USER $USER
 WORKDIR /home/${USER}/scripts
 COPY x86-64_appimage_process.sh .
+RUN chown -R $USER:$USER /home/${USER}/scripts
 
+USER $USER
 RUN ./x86-64_appimage_process.sh configure_system
 RUN rm -rf /home/${USER}/scripts/staging
 RUN ./x86-64_appimage_process.sh download_tools
