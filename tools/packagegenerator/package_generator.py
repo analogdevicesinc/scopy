@@ -138,6 +138,19 @@ def generate_tool_sources(tools, include_path, src_path, plugin_name, plugin_exp
         )
 
 def generate_plugin(plugin_path, plugin, pdk_enable=False):
+    """
+    Generates a plugin structure with headers, source files, and optional resources.
+
+    Args:
+        plugin_path (str): Path to the directory where the plugin will be created.
+        plugin (dict): Plugin configuration dictionary containing details like name, class, and resources.
+        pdk_enable (bool): Whether the plugin is part of a PDK project (default: False).
+
+    Functionality:
+        - Creates directories for headers, source files, UI, and resources.
+        - Generates plugin-specific files, including `CMakeLists.txt`, headers, and source files.
+        - Handles optional features like styles, tests, and resources.
+    """
     if not has_all_required_fields(plugin, REQUIRED_PLUGIN_FIELDS):
         print("Missing required fields in plugin configuration.")
         return
@@ -248,6 +261,16 @@ def generate_plugin(plugin_path, plugin, pdk_enable=False):
         print("Plugin .gitignore file created!")
 
 def generate_translation(resources_path):
+    """
+    Adds translation templates to the package.
+
+    Args:
+        resources_path (str): Path to the package resources directory.
+
+    Functionality:
+        - Creates a `translations` directory and a `translations.qrc` file.
+        - Ensures the directory structure is ready for adding translation files.
+    """
     print("Adding translation templates...")
     translation_path = os.path.join(resources_path, "translations")
     create_directory(translation_path)
@@ -259,6 +282,16 @@ def generate_translation(resources_path):
         log_created_file(translations_qrc)
 
 def generate_style(pkg_path):
+    """
+    Adds style templates to the package.
+
+    Args:
+        pkg_path (str): Path to the package directory.
+
+    Functionality:
+        - Creates directories for styles, including `qss` and `json`.
+        - Adds `.gitkeep` files to ensure empty directories are tracked in version control.
+    """
     print("Adding style templates...")
     # Create directories for style
     create_directory(os.path.join(pkg_path, "include", os.path.basename(pkg_path)))
@@ -389,6 +422,19 @@ def handle_cmakelists(pkg_path, config, args):
 
 
 def generate_pkg(packages_path, config, args):
+    """
+    Generates a complete package structure, including plugins, translations, and styles.
+
+    Args:
+        packages_path (str): Path to the directory where packages will be created.
+        config (dict): Configuration dictionary loaded from `pkg.json`.
+        args (argparse.Namespace): Parsed command-line arguments.
+
+    Functionality:
+        - Creates the package directory and handles the `CMakeLists.txt` file.
+        - Generates plugins, translations, and styles based on the provided arguments.
+        - Saves the package configuration and generates a `manifest.json.cmakein` file.
+    """
     print("Generating package...")
     pkg_path = os.path.join(packages_path, config["id"])
     resources_path = os.path.join(pkg_path, "resources")
@@ -430,6 +476,19 @@ def console_log(config):
         print(*sorted(FILES_CREATED), sep="\n")
  
 def pdk(config, args):
+    """
+    Generates a Plugin Development Kit (PDK) project and optionally creates a plugin within it.
+
+    Args:
+        config (dict): Configuration dictionary containing the plugin details.
+        args (argparse.Namespace): Parsed command-line arguments.
+
+    Functionality:
+        - Reads the PDK project path from the plugin configuration.
+        - Creates the Scopy Plugin Runner project if it doesn't exist.
+        - Generates the PDK structure and optionally a plugin within it.
+        - For plugin generation the plugin.json file is used.
+    """
     print("Generating PDK...")
     plugin_config_path = os.path.join(scopy_path, "tools/packagegenerator/plugin.json")
     plugin = load_config(plugin_config_path)
