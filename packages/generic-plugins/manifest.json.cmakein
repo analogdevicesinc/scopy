@@ -1,0 +1,13 @@
+{
+    "id": "generic-plugins",
+    "title": "Generic Plugins",
+    "version": "@PROJECT_VERSION@",
+    "description": "A set of generic plugins for various IIO devices. Can be used alongside the specific plugins to provide additional features or to support devices that do not have a specific plugin. The plugins from this package are: ADC, DAC, DATALOGGER, DEBUGGER and REGMAP.",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin", "base-pkg"]
+  }
+  

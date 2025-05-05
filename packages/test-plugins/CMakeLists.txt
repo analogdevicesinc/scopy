@@ -20,18 +20,16 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-project(scopy-packages VERSION 0.1 LANGUAGES CXX)
+set(SCOPY_MODULE test-plugins)
+set(CURRENT_PKG_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+set(PACKAGE_NAME ${SCOPY_MODULE})
 
-option(ENABLE_PACKAGE_GENERIC-PLUGINS "Enable generic-plugins package" ON)
-option(ENABLE_PACKAGE_TEST-PLUGINS "Enable test-plugins package" OFF)
+message(STATUS "building package: " ${SCOPY_MODULE})
 
-# If DEV_MODE, remove all previously built packages
-if(SCOPY_DEV_MODE)
-	file(REMOVE_RECURSE ${SCOPY_PACKAGE_BUILD_PATH})
+project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+
+configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
+message("Including plugins")
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
+	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 endif()
-
-# Include utils
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(PackageUtils)
-
-add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})
