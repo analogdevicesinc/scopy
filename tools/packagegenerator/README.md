@@ -1,109 +1,368 @@
-# Plugin generator
+# Package Generator
 
-## Pre-request
+## Overview
 
-`pip install -r requirements.txt`
+The `package_generator.py` script is a utility for generating and managing packages, plugins, and related resources for the Scopy project. It provides functionality to create package structures, generate plugins, handle translations, manage styles, and more.
 
-## Run plugin generator script
+## Platform
 
-1. If it is run from "scopy/tools/plugingenerator"
+The `package_generator.py` script is designed to work on Linux, Windows, and macOS. Below are platform-specific details and instructions:
 
-    `./plugin_generator.py`
+### Linux
 
-2. Otherwise
+- **Prerequisites**:
+  - Ensure Python 3 is installed.
+  - Install Git and other required tools using your package manager:
 
-    `python plugin_generator.py --scopy_path=path/to/scopy --config_file_path=path/to/config/file.json`
+    ```bash
+    sudo apt update && sudo apt install git python3-pip
+    ```
 
-For help: `python plugin_generator.py -h`  
+  - Install the required Python dependencies:
 
-### After running the script, you must insert the new plugin in plugins/CMakeLists.txt
+    ```bash
+    pip install -r requirements.txt
+    ```
 
+- **Running the Script**:
+  - Use the terminal to navigate to the `scopy/tools/packagegenerator` directory and run:
+
+    ```bash
+    ./package_generator.py
+    ```
+
+### Windows
+
+- **Prerequisites**:
+
+  - Install Python 3 from [python.org](https://www.python.org/).
+  - Ensure Git is installed and added to the system `PATH`.
+  - Install the required Python dependencies:
+
+    ```cmd
+    pip install -r requirements.txt
+    ```
+
+- **Running the Script**:
+  - Open a Command Prompt or PowerShell, navigate to the `scopy/tools/packagegenerator` directory, and run:
+
+    ```cmd
+    python package_generator.py
+    ```
+
+- **Note**:
+  - On Windows, the script does not use POSIX file permissions (`MODE = 0o775`), so permissions-related functionality is skipped.
+
+### macOS
+
+- **Prerequisites**:
+  - Ensure Python 3 is installed (can be installed via [Homebrew](https://brew.sh/)):
+
+    ```bash
+    brew install python3
+    ```
+
+  - Install Git:
+
+    ```bash
+    brew install git
+    ```
+
+  - Install the required Python dependencies:
+
+    ```bash
+    pip3 install -r requirements.txt
+    ```
+
+- **Running the Script**:
+  - Use the terminal to navigate to the `scopy/tools/packagegenerator` directory and run:
+
+    ```bash
+    ./package_generator.py
+    ```
+
+- **Note**:
+  - macOS handles file permissions similarly to Linux, so no additional adjustments are needed.
+
+## Running the Script
+
+### Basic Usage
+
+1. If the script is run from the `scopy/tools/packagegenerator` directory:
+
+    ```bash
+    ./package_generator.py
+    ```
+
+2. Otherwise, specify the paths to the Scopy repository and configuration files:
+
+    ```bash
+    ./package_generator.py --scopy_path=path/to/scopy --config_file_path=path/to/pkg.json
+    ```
+
+For help, run:
+
+```bash
+./package_generator.py -h
 ```
-option(ENABLE_PLUGIN_NEWPLUGIN "Enable NEWPLUGIN plugin" ON)
-if(ENABLE_PLUGIN_NEWPLUGIN)
- add_subdirectory(new)
- list(APPEND PLUGINS ${PLUGIN_NAME})
-endif()
+
+### Example Commands
+
+1. **Generate a complete package structure**:
+
+    ```bash
+    ./package_generator.py --all
+    ```
+
+2. **Generate a plugin using a specific configuration file**:
+
+    ```bash
+    ./package_generator.py -p /path/to/plugin.json
+    ```
+
+3. **Add translations to a package**:
+
+    ```bash
+    ./package_generator.py --translation
+    ```
+
+4. **Add style templates to a package**:
+
+    ```bash
+    ./package_generator.py --style
+    ```
+
+5. **Generate a Plugin Development Kit (PDK)**:
+
+    ```bash
+    ./package_generator.py --pdk
+    ```
+
+6. **Initialize a new Git submodule and generate a package**:
+
+    ```bash
+    ./package_generator.py --init
+    ```
+
+7. **Add an existing Git repository as a submodule**:
+
+    ```bash
+    ./package_generator.py --add_submodule <repository_url>
+    ```
+
+8. **Archive all packages in a directory**:
+
+    ```bash
+    ./package_generator.py -a --src /path/to/packages --dest /path/to/archives
+    ```
+
+---
+
+## Configuration Files
+
+### `pkg.json`
+
+The `pkg.json` file contains the configuration details for generating packages. Below is an example:
+
+```json
+{
+    "id": "newpackage",
+    "title": "New package",
+    "description": "A new package",
+    "author": "Analog Devices Inc.",
+    "license": "LGPL",
+    "category": ["iio", "plugin"]
+}
 ```
 
-## Config.json attributes explanation
+### `plugin.json`
 
-1. **pdk**: Contains the configuration options of the plugin development tool.
-    1. `enable` (bool): If true a ScopyPluginRunner project will be created at `project_path`.
-        - If pdk is enabled, the plugin will be generated in the ScopyPluginRunner project.
-    2. `deps_path` (string): The path to the scopy pdk package (the package must be unzipped).
-    3. `project_path` (string): The path to the directory where the PluginRunner project is created.
-2. **plugin**: Contains details specific to the plugin.
-    1. `dir_name` (string): The name of the plugin directory.
-    2. `plugin_name` (string): The plugin name. The header and source files will have this name.
-    3. `class_name` (string): The name of the class that will be created for the plugin.
-    4. `cmakelists` (bool): If true a CMakeLists file will be created for the plugin.
-    5. `namespace` (string): The namespace the plugin belongs to.
-        - The name of namespace should be short, meaningful, concise, and all lower-case.
-        - Try to avoid use of underscores inside namespace names.
-        - The keyword "namespace" is filled in automatically. All you have to do is to write the identifier (name of the namespace).
-        - For nested namespaces use the scope resolution operator (::).
-    6. `device_category` (string): The category the plugin belongs to. (iio for example)
-    7. `tools`: List which contains the tools to be implemented and used by the plugin.
-        1. `id` (string): Tool id.
-        2. `tool_name` (string): The name that appears in Scopy.
-        3. `file_name` (string): The tool header and source file will have this name.
-            - No special character is allowed in the file name except for underscore (‘_’) and dash (‘-‘).
-            - Do not use filenames that already exist in /user/include. or any predefined header file name.
-        4. `class_name` (string): The name of the class that will be created for the tool.
-            - The class name should be a noun.
-            - Use upper case letters as word separators, and lower case for the rest of the word.
-            - The first character in the class name must be in upper case.
-            - No underscores (‘_’) are permitted in the class name.
-        5. `namespace` (string): The namespace the tool belongs to.
-3. **cmakelists**: Contains the details of the CMakeLists.
-    1. `cmake_min_required` (float): Require a minimum version of cmake.
-    2. `cxx_standard` (int): The C++ standard whose features are requested to build this target.
-    3. `enable_testing` (string): Enables the tests for the plugin. The only accepted variants are "ON" and "OFF".
-4. **test**: Contains the details of the plugin tests.
-    1. `mkdir` (bool): If true the test directory is created.
-    2. `cmakelists` (bool): If true a CMakeLists file will be created for the tests.
-    3. `cmake_min_required` (float): Require a minimum version of cmake.
-    4. `tst_pluginloader` (bool): If true the pluginloader test is created.
-5. **doc**: Contains the details of the plugin documentation.
-    1. `mkdir` (bool): If true the doc directory is created.
-6. **resources**: Contains the details of the plugin resources.
-    1. `mkdir` (bool): If true the res directory is created.
-    2. `resources_qrc` (bool): If true the resources_qrc file is created.
+The `plugin.json` file contains the configuration details for generating plugins. Below is an example:
 
-*All fields must be filled in.
+```json
+{
+    "baseplugin": false,
+    "plugin_name": "newplugin",
+    "plugin_display_name": "New Plugin",
+    "plugin_description": "A new plugin",
+    "class_name": "NEWPlugin",
+    "namespace": "scopy::newplugin",
+    "device_category": "iio",
+    "tools": [
+        {
+            "id": "newtool1",
+            "tool_name": "Tool1",
+            "file_name": "tool1",
+            "class_name": "Tool1",
+            "namespace": "scopy::newplugin"
+        }
+    ],
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "style": {
+        "qss": true,
+        "json": false
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true,
+    "pdk": {
+        "deps_path": "",
+        "project_path": ""
+    }
+}
+```
+
+---
+
+## Manifest File
+
+The `manifest.json.cmakein` file is generated as part of the package structure. It contains metadata about the package and is used during the build process. Below is an example of its structure:
+
+```json
+{
+    "id": "newpackage",
+    "title": "New Package",
+    "description": "A new package for Scopy",
+    "author": "Analog Devices Inc.",
+    "license": "LGPL",
+    "category": ["iio", "plugin"]
+}
+```
+
+The manifest file is automatically created during the package generation process and ensures that all necessary metadata is included for proper integration with Scopy.
+
+---
+
+## Packages development flow
+
+### New package
+
+1. Clone Scopy using:  
+
+    ```bash
+    git clone --branch <branch_or_tag> https://github.com/analogdevicesinc/scopy.git
+    ```
+
+2. Fill the `pkg.json` and `plugin.json` configuration files (see the [pkg.json example](#pkgjson) and [plugin.json example](#pluginjson) for guidance).
+
+3. Create a package repository using:  
+
+    ```bash
+    ./package_generator.py --init
+    ```
+
+    - If you want to create a repository and a complete package structure call:
+
+        ```bash
+        ./package_generator.py --init --all
+        ```
+
+    - If you don't want to save the package sources inside a Git repository, you can directly generate the package structure using:
+
+        ```bash
+        ./package_generator.py --all
+        ```
+
+    - If the package contains only plugins, you can call:
+
+        ```bash
+        ./package_generator.py --plugin
+        ```
+
+4. Implement the package functionalities, build the package inside Scopy, and test it. After all the work is done, push the sources into the repository.
+
+5. If you want to export the package, use the following command:
+
+    ```bash
+    ./package_generator.py -a --src /path/to/package/build/folder --dest /path/to/destination
+    ```
+
+    - Here, the "build folder" refers to the directory where the package was built, and the "destination" refers to the directory where the generated archive (zip file) will be saved.
+    - The archived package can be installed in Scopy using the package manager.
+
+### Existent package
+
+1. Clone Scopy using:  
+
+    ```bash
+    git clone --branch <branch_or_tag> https://github.com/analogdevicesinc/scopy.git
+    ```
+
+2. Add the package as submodule using:  
+
+    ```bash
+    ./package_generator.py --add_submodule <repository_url>
+    ```
+
+3. Implement the package functionalities, build the package inside Scopy, and test it. After all the work is done, push the sources into the repository.
+
+    - To generate a plugin structure for an existent package you must 
+
+4. If you want to export the package, use the following command:  
+
+    ```bash
+    ./package_generator.py -a --src /path/to/package/build/folder --dest /path/to/destination
+    ```
+
+    - Here, the "build folder" refers to the directory where the package was built, and the "destination" refers to the directory where the generated archive (zip file) will be saved.
+    - The archived package can be installed in Scopy using the package manager.
 
 ## Scopy PDK
 
-### Add new modules to the PDK package
+### Adding New Modules to the PDK Package
 
-If we want a new module from Scopy to be part of the package, then when installing libraries or directories in CMakeLists, the option `COMPONENT ${SCOPY_PDK}` must be added.
+To include a new module in the PDK package, ensure that the `COMPONENT ${SCOPY_PDK}` option is added when installing libraries or directories in `CMakeLists.txt`.
 
-- libraries: `install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK} RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH})`.
-- headers: `install(DIRECTORY include/ DESTINATION include/ COMPONENT ${SCOPY_PDK})`.
-- resources: `install(DIRECTORY res/ DESTINATION resources/ COMPONENT ${SCOPY_PDK})`.
+- **Libraries**:
 
-### Develop a new plugin using ScopyPluginRunner
+    ```cmake
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK} RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH})
+    ```
+
+- **Headers**:
+
+    ```cmake
+    install(DIRECTORY include/ DESTINATION include/ COMPONENT ${SCOPY_PDK})
+    ```
+
+- **Resources**:
+
+    ```cmake
+    install(DIRECTORY res/ DESTINATION resources/ COMPONENT ${SCOPY_PDK})
+    ```
+
+### Developing a New Plugin Using ScopyPluginRunner
 
 1. Download the PDK package from the Scopy repository.
-    - If the package is not available or if changes have been made to the Scopy libraries, then Scopy must be built locally with the `--target package` option.
-        - In this case a `package` folder will be generated inside the Scopy build folder.
-2. Generate the ScopyPluginRunner project using the `plugin_generator.py`.
-    - Fill in the `config.json` file.
-    - This project contains a `plugin` submodule where the desired plugin can be developed.
+    - If the package is unavailable or changes have been made to the Scopy libraries, build Scopy locally with the `--target package` option.
+    - This will generate a `package` folder inside the Scopy build directory.
+
+2. Generate the ScopyPluginRunner project using `package_generator.py`.
+    - Fill in the `plugin.json` file.
+    - The project will contain a `plugin` submodule where the desired plugin can be developed.
+
 3. Choose an IDE and start working.
-    - Our recommendation is to use QtCreator.
+    - **Recommendation**: Use QtCreator.
 
-## Adding new config specifications
+---
 
-For fields like `plugin`, `tool` and `cmakelists` new specifications can be added.
-A few steps must be completed:
+## Adding New Config Specifications
 
-1. Add the new specification in the desired field (add new fields in `config.json`).
-2. Use the specification in the templates. Each template contains a `config` variable through which
-the information from each field can be accessed. A specific syntax must be used because the script uses the
-the mako library to render the templates. [Watch mako documentation page for more details.](https://docs.makotemplates.org/en/latest/)
-    - the changes made in the `plugin` field will be reflected in the **plugin_src_template** and **plugin_header_template** template files
-    - the changes made in the `tool` field will be reflected in the **tool_src_template** and **tool_header_template** template files
-    - the changes made in the `cmakelists` field will be reflected in the **cmakelists_template**  template file
-3. Run the `plugin_generator.py` script.
+To add new specifications for fields like `plugin`, `tool`, or `cmakelists`, follow these steps:
+
+1. Add the new specification to the desired field in `pkg.json` or `plugin.json`.
+2. Use the specification in the templates. Each template contains a `config` variable to access the field's information. Use the [Mako template syntax](https://docs.makotemplates.org/en/latest/) for rendering.
+    - Changes to the `plugin` field will affect the `plugin_src` and `plugin_header` files.
+    - Changes to the `tool` field will affect the `tool_src` and `tool_header` files.
+    - Changes to the `cmakelists` field will affect the `cmakelists` file.
+3. Run the `package_generator.py` script to apply the changes.
