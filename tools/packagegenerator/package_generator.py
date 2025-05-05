@@ -6,28 +6,32 @@ import argparse
 import shutil
 from mako.template import Template
 import subprocess
+import platform
 
-MODE = 0o775
+if platform.system() != "Windows":
+    MODE = 0o775
+else:
+    MODE = None
 FILES_CREATED = []
 DIRS_CREATED = []
 REQUIRED_PLUGIN_FIELDS = ["plugin_name", "plugin_display_name", "plugin_description", 
                         "class_name", "namespace", "device_category", "tools", 
                         "cmakelists", "style", "test", "resources", "doc"]
 TEMPLATES = {
-    "plugin_cmakein": "templates/plugin/plugin_cmakein.mako", 
-    "plugin_loader": "templates/plugin/pluginloader.mako",
-    "plugin_header": "templates/plugin/plugin_header.mako",
-    "plugin_src": "templates/plugin/plugin_src.mako",
-    "plugin_cmake": "templates/plugin/cmakelists.mako",
-    "tool_header": "templates/plugin/tool_header.mako",
-    "tool_src": "templates/plugin/tool_src.mako",
-    "pkg_cmake": "templates/package/pkg_cmakelists.mako",
-    "manifest": "templates/package/manifest_cmakein.mako",
-    "pdk_header": "templates/pdk/pdk_header.mako",
-    "pdk_src": "templates/pdk/pdk_src.mako",
-    "pdk_cmake": "templates/pdk/pdk_cmakelists.mako",
-    "pdk_cmakein": "templates/pdk/pdk_cmakein.mako",
-    "pdk_cmake_module": "templates/pdk/pdk_cmake_module.mako"
+    "plugin_cmakein": os.path("templates","plugin","plugin_cmakein.mako"),
+    "plugin_loader": os.path.join("templates", "plugin", "pluginloader.mako"),
+    "plugin_header": os.path.join("templates", "plugin", "plugin_header.mako"),
+    "plugin_src": os.path.join("templates", "plugin", "plugin_src.mako"),
+    "plugin_cmake": os.path.join("templates", "plugin", "cmakelists.mako"),
+    "tool_header": os.path.join("templates", "plugin", "tool_header.mako"),
+    "tool_src": os.path.join("templates", "plugin", "tool_src.mako"),
+    "pkg_cmake": os.path.join("templates", "package", "pkg_cmakelists.mako"),
+    "manifest": os.path.join("templates", "package", "manifest_cmakein.mako"),
+    "pdk_header": os.path.join("templates", "pdk", "pdk_header.mako"),
+    "pdk_src": os.path.join("templates", "pdk", "pdk_src.mako"),
+    "pdk_cmake": os.path.join("templates", "pdk", "pdk_cmakelists.mako"),
+    "pdk_cmakein": os.path.join("templates", "pdk", "pdk_cmakein.mako"),
+    "pdk_cmake_module": os.path.join("templates", "pdk", "pdk_cmake_module.mako")
 }
 
 def log_created_file(path):
@@ -39,9 +43,16 @@ def log_created_dir(path):
 def has_all_required_fields(config, required_fields):
     return all(field in config for field in required_fields)
 
+def is_git_available():
+    result = subprocess.run(["git", "--version"], capture_output=True, text=True)
+    return result.returncode == 0
+
 def create_directory(path):
     if not os.path.exists(path):
-        os.makedirs(path, MODE)
+        if MODE:
+            os.makedirs(path, MODE)
+        else:
+            os.makedirs(path)
         log_created_dir(path)
     else:
         print(f"{path} already exists!")
@@ -626,9 +637,15 @@ if __name__ == "__main__":
         pdk(config, args)
         console_log(config)
     elif args.init:
+        if not is_git_available():
+            print("Git is not installed or not available in PATH.")
+            exit(1)
         init_submodule_and_generate_pkg(packages_path, config, args)
         console_log(config)
     elif args.add_submodule:
+        if not is_git_available():
+            print("Git is not installed or not available in PATH.")
+            exit(1)
         add_existing_git_submodule(packages_path, args.add_submodule)
     elif args.plugin or args.style or args.translation:
         generate_pkg(packages_path, config, args)
