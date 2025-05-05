@@ -11,8 +11,4 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(PackageUtils)
 
-add_subdirectories_with_options(
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${SCOPY_PACKAGE_BUILD_PATH}
-	"ENABLE_PACKAGE"
-)
+add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})

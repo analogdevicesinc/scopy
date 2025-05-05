@@ -32,3 +32,11 @@ function(add_subdirectories_with_options base_dir output_dir prefix)
         endif()
     endforeach()
 endfunction()
+
+function(add_packages base_dir output_dir)
+	add_subdirectories_with_options(${base_dir} ${output_dir} "ENABLE_PACKAGE")
+endfunction()
+
+function(add_plugins base_dir output_dir)
+	add_subdirectories_with_options(${base_dir} ${output_dir} "ENABLE_PLUGIN")
+endfunction()
