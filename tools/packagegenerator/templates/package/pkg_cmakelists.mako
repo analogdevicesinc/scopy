@@ -27,9 +27,5 @@ endif()
 %endif
 message("Including plugins")
 if(EXISTS ${"${CMAKE_CURRENT_SOURCE_DIR}"}/plugins)
-	add_subdirectories_with_options(
-		${"${CMAKE_CURRENT_SOURCE_DIR}"}/plugins
-		${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/plugins
-		"ENABLE_PLUGIN"
-	)
+	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 endif()

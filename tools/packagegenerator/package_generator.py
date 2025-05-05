@@ -18,7 +18,7 @@ REQUIRED_PLUGIN_FIELDS = ["plugin_name", "plugin_display_name", "plugin_descript
                         "class_name", "namespace", "device_category", "tools", 
                         "cmakelists", "style", "test", "resources", "doc"]
 TEMPLATES = {
-    "plugin_cmakein": os.path("templates","plugin","plugin_cmakein.mako"),
+    "plugin_cmakein": os.path.join("templates","plugin","plugin_cmakein.mako"),
     "plugin_loader": os.path.join("templates", "plugin", "pluginloader.mako"),
     "plugin_header": os.path.join("templates", "plugin", "plugin_header.mako"),
     "plugin_src": os.path.join("templates", "plugin", "plugin_src.mako"),
