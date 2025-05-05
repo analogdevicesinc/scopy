@@ -88,15 +88,17 @@ void PkgItemWidget::setVersions(QStringList versions)
 void PkgItemWidget::fillMetadata(QVariantMap metadata, bool installed)
 {
 	m_metadata = metadata;
+	QStringList categories = metadata[PkgManifest::PKG_CATEGORY].toStringList();
 	QString pkgTitle = metadata.contains(PkgManifest::PKG_TITLE) ? metadata[PkgManifest::PKG_TITLE].toString()
 								     : metadata[PkgManifest::PKG_ID].toString();
+	bool basePkg = categories.contains(PkgManifest::PKG_BASE);
 	m_title->setText(pkgTitle);
 	m_subtitle->setText("by " + metadata[PkgManifest::PKG_AUTHOR].toString());
 	m_versCb->insertItem(0, "version " + metadata[PkgManifest::PKG_VERSION].toString());
 	m_description->setText(metadata[PkgManifest::PKG_DESCRIPTION].toString());
 	m_installBtn->setVisible(!installed);
-	m_uninstallBtn->setVisible(installed);
-	fillCategories(metadata[PkgManifest::PKG_CATEGORY].toStringList());
+	m_uninstallBtn->setVisible(installed && !basePkg);
+	fillCategories(categories);
 }
 
 void PkgItemWidget::mousePressEvent(QMouseEvent *event)
