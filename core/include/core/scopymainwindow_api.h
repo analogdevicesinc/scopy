@@ -71,6 +71,7 @@ public:
 	Q_INVOKABLE bool uninstall(const QString &pkgName);
 
 	Q_INVOKABLE QStringList listFiles(const QString &category);
+	Q_INVOKABLE QString findPkgName(const QString &filePath);
 
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);
