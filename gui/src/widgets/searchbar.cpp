@@ -30,7 +30,7 @@ SearchBar::SearchBar(QSet<QString> options, QWidget *parent)
 	, m_lineEdit(new QLineEdit(this))
 	, m_completer(new QCompleter(options.values(), this))
 {
-	Style::setStyle(m_lineEdit, style::properties::widget::searchBar);
+	Style::setStyle(m_lineEdit, style::properties::widget::genericSearchBar);
 	setFixedHeight(34); // Hardcoded to match similar container
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
 	m_completer->setFilterMode(Qt::MatchContains);
