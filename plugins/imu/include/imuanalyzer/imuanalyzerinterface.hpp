@@ -4,6 +4,7 @@
 #include "scopy-imuanalyzer_export.h"
 #include "3Drenderer.hpp"
 #include "2Drenderer.hpp"
+#include "imuanalyzersettings.hpp"
 
 #include <QLineEdit>
 #include <QObject>
@@ -41,8 +42,11 @@ private:
     RunBtn *m_runBtn;
     QPushButton *m_rstPos;
     QPushButton *m_rstView;
+    GearBtn *m_gearBtn;
 
     SceneRenderer *m_sceneRender;
+
+    ImuAnalyzerSettings *m_settingsPanel;
     rotation m_rot;
 
     std::thread t;

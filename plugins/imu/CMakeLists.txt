@@ -62,10 +62,8 @@ find_package(GLUT REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES}
     include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2Drenderer.hpp
-    include/imuanalyzer/imuanalyzerutils.hpp
-
-    src/imuanalizersettings.cpp
-    src/imuanalizersettings.cpp  # ${PROJECT_RESOURCES}
+    include/imuanalyzer/imuanalyzerutils.hpp include/imuanalyzer/imuanalyzersettings.hpp
+ # ${PROJECT_RESOURCES}
 )
 
 generate_export_header(

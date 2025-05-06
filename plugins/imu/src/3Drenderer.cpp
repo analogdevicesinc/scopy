@@ -74,22 +74,22 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	cubeTransform = new Qt3DCore::QTransform();
 
 	// Material
-	auto *cubeMaterial = new Qt3DExtras::QPhongMaterial();
-	cubeMaterial->setDiffuse(QColor(QRgb(0x008ECC)));
+	m_cubeMaterial = new Qt3DExtras::QPhongMaterial();
+	m_cubeMaterial->setDiffuse(m_cubeColor);
 
 	// Entity
 	cubeEntity = new Qt3DCore::QEntity(rootEntity);
 	cubeEntity->addComponent(cubeMesh);
 	cubeEntity->addComponent(cubeTransform);
-	cubeEntity->addComponent(cubeMaterial);
+	cubeEntity->addComponent(m_cubeMaterial);
 
 	//Add line axes
 	auto *planeMesh = new Qt3DExtras::QPlaneMesh(rootEntity);
 	planeMesh->setWidth(400);
 	planeMesh->setHeight(300);
 
-	auto *planeMaterial = new Qt3DExtras::QPhongMaterial();
-	planeMaterial->setDiffuse(QColor(QRgb(0xa0a0a0)));
+	m_planeMaterial = new Qt3DExtras::QPhongMaterial();
+	m_planeMaterial->setDiffuse(m_planeColor);
 
 	 // Transform
 	planeTransform = new Qt3DCore::QTransform();
@@ -98,8 +98,7 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	auto meshEntity = new Qt3DCore::QEntity(rootEntity);
 	meshEntity->addComponent(planeMesh);
 	meshEntity->addComponent(planeTransform);
-	meshEntity->addComponent(planeMaterial);
-	//rootEntity->addComponent(planeMesh);
+	meshEntity->addComponent(m_planeMaterial);
 
 	// Set root entity
 	view->setRootEntity(rootEntity);
@@ -126,6 +125,15 @@ void SceneRenderer::setRot(rotation rot){
 	cubeTransform->setRotationY(rot.rotY);
 	cubeTransform->setRotationZ(rot.rotZ);
 }
+
+void SceneRenderer::updateCubeColor(QColor color){
+	m_cubeMaterial->setDiffuse(color);
+}
+
+void SceneRenderer::updatePlaneColor(QColor color){
+	m_planeMaterial->setDiffuse(color);
+}
+
 
 #include "moc_3Drenderer.cpp"
 

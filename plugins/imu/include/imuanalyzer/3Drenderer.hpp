@@ -52,19 +52,22 @@ private:
 
 	Qt3DCore::QTransform *cubeTransform;
 	Qt3DCore::QTransform *planeTransform;
-	QTimer timer;
-	float angle = 0.0f;
+	Qt3DExtras::QPhongMaterial *m_cubeMaterial;
+	Qt3DExtras::QPhongMaterial *m_planeMaterial;
 
 	Qt3DCore::QEntity *cubeEntity;
+
+	QColor m_cubeColor = QRgb(0x008ECC);
+	QColor m_planeColor = QRgb(0xa0a0a0);
 
 public Q_SLOTS:
 	void resetView();
 	void resetPos();
 	void setRot(rotation rot);
+	void updateCubeColor(QColor color);
+	void updatePlaneColor(QColor color);
 
-
-private:
-	Qt3DCore::QEntity* generateAxes(Qt3DCore::QEntity* parent);
+	friend class ImuAnalyzerSettings;
 };
 }
 
