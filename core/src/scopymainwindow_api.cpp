@@ -554,4 +554,10 @@ QStringList ScopyMainWindow_API::listFiles(const QString &category)
 {
 	return PkgManager::listFilesPath(QStringList() << category);
 }
+
+QString ScopyMainWindow_API::findPkgName(const QString &filePath)
+{
+	return PkgManager::reverseSearch(filePath).baseName();
+}
+
 #include "moc_scopymainwindow_api.cpp"
