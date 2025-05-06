@@ -30,6 +30,9 @@ private:
 	PlotWidget *plotWidget;
 	QwtPlotCurve *point;
 
+public:
+	friend class ImuAnalyzerSettings;
+
 
 };
 }

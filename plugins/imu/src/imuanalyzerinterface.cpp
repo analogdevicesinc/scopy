@@ -50,7 +50,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_tool->topContainer()->setVisible(true);
 	m_tool->leftContainer()->setVisible(false);
-	m_tool->rightContainer()->setVisible(false);
+	m_tool->rightContainer()->setVisible(true);
 	m_tool->bottomContainer()->setVisible(true);
 
 	lay->addWidget(m_tool);
@@ -91,9 +91,23 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer();
 	tabWidget->addTab(bubbleLevelRenderer, "2D View");
 
-	tabWidget->
-
 	connect(this, &IMUAnalyzerInterface::generateRot, bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
+
+	m_gearBtn = new GearBtn(this);
+	m_tool->addWidgetToTopContainerMenuControlHelper(m_gearBtn, TTA_LEFT);
+
+	m_gearBtn->setChecked(true);
+
+	QString key = "Settings";
+	m_settingsPanel = new ImuAnalyzerSettings(m_sceneRender, bubbleLevelRenderer, this);
+	m_tool->rightStack()->add(key,m_settingsPanel);
+
+	connect(m_gearBtn, &GearBtn::toggled, this, [=, this](bool toggled) {
+		if(toggled)
+			m_tool->requestMenu(key);
+
+		m_tool->openRightContainerHelper(toggled);
+	});
 }
 
 IMUAnalyzerInterface::~IMUAnalyzerInterface(){
