@@ -13,6 +13,7 @@ Chapters
 --------------------------------------------------------------------------------
 
 1. **Create a New Plugin**
+--------------------------------------------------------------------------------
 
    This guide provides instructions on how to use the Scopy package generator, including the plugin generator.
 
@@ -99,6 +100,8 @@ Chapters
    By following these steps, you can create the basic structure of a new plugin and implement the required methods.
 
 2. **Using Connection Provider**
+--------------------------------------------------------------------------------
+
    Understand how to use the connection provider to interact with external systems or data sources.
 
    To access the device, we use the `ConnectionProvider` class. This class is available by adding:
@@ -122,6 +125,8 @@ Chapters
        conn->context();
 
 3. **How Do We Determine When the Plugin Will Show (Compatibility Condition)**
+--------------------------------------------------------------------------------
+
    To determine if the plugin you created will show as an option for a device, you need to create 
    a compatibility condition. This is done inside the `compatible` function, depending on the 
    restrictions of your plugin. Here, you should define a condition for when the plugin should show.
@@ -150,6 +155,8 @@ Chapters
    be marked as compatible and will show as an option for the device.
 
 4. **How to Filter Between Compatible Plugins**
+--------------------------------------------------------------------------------
+
    Inside the `initMetadata()` function, you can define specific metadata to filter and prioritize plugins. 
    This metadata includes the following fields:
 
@@ -184,6 +191,8 @@ Chapters
    By setting these fields appropriately, you can control the visibility and priority of your plugin relative to others.
 
 5. **Setting Tool Icon and Title**
+--------------------------------------------------------------------------------
+
    To have your plugin's tools appear in the left menu among others, you need to set a title and an icon for it. 
    Since a plugin can have multiple tools, each tool needs to be considered during this process.
 
@@ -215,6 +224,8 @@ Chapters
    By following these steps, you can ensure that your plugin's tools are properly displayed and functional in the Scopy interface.
 
 6. **How to Add Resources**
+--------------------------------------------------------------------------------
+
    To add resource files to your plugin, you first need to place the file in the `resources` folder of your project. 
    Then, in the same folder, locate the `resources.qrc` file and add the resorce name to it.
 
@@ -237,6 +248,8 @@ Chapters
    By following these steps, you can include and use additional resource files, such as images, or other assets, in your plugin.
 
 7. **How to Create / Edit Preferences for the Plugin**
+--------------------------------------------------------------------------------
+
    Plugin preferences are settings that retain their values between runs. These preferences are available before connecting to a device and are displayed in the bottom left corner of the application.
 
    To add preferences to your plugin, you need to include the following headers:
@@ -320,6 +333,7 @@ Chapters
    If you want to update your code when the value of a preference changes, you can use the `preferenceChanged` signal from the `Preferences` class.
 
 8. **How to Add Compatible Plugins**
+--------------------------------------------------------------------------------
 
    If you want to use parts of other plugins in your plugin, you first need to modify your plugin's `CMakeLists.txt` file.
 
@@ -345,6 +359,7 @@ Chapters
    Ensure that the library you are linking is available and properly configured in your Scopy environment.
 
 9. **Useful Tools**
+--------------------------------------------------------------------------------
 
    We have a couple of tools designed to make some of your work easier. Among these tools are a script for code formatting and a script for license headers. It is recommended that, before making a pull request, you run these two scripts.
 
@@ -363,6 +378,225 @@ Chapters
    .. code-block:: bash
 
        ./tools/format.sh
+
+10. **IIOWidgets**
+--------------------------------------------------------------------------------
+
+   `IIOWidgets` are modular UI components in Scopy designed to facilitate interaction with IIO (Industrial I/O) devices. They provide a graphical interface for displaying and managing data from these devices, making it easier for users to interact with hardware.
+
+   **Key Features of IIOWidgets**
+
+   - **Data Interaction**:
+     `IIOWidgets` use data strategies (`DataStrategyInterface`) to handle reading and writing data from IIO devices. They support asynchronous operations such as `readAsync()` and `writeAsync()` to ensure smooth data handling without blocking the UI.
+
+   - **UI Customization**:
+     `IIOWidgets` use UI strategies (`GuiStrategyInterface`) to define their appearance and behavior. This allows developers to create widgets that are tailored to specific use cases or device requirements.
+
+   - **Integration with Scopy**:
+     `IIOWidgets` are seamlessly integrated into the Scopy application, allowing them to be used alongside other tools and plugins. They can be added to the interface using the `IIOWidgetBuilder`.
+
+   - **Progress and Status Indicators**:
+     Many `IIOWidgets` include built-in progress bars and status indicators to provide real-time feedback to users during operations.
+
+   - **Resource Management**:
+     Developers can customize `IIOWidgets` with titles, attributes, and other parameters using the `IIOWidgetBuilder`. This ensures that widgets are properly configured for their intended purpose.
+
+   **Creating an IIOWidget**
+
+   Below are two examples of creating `IIOWidgets` using the `IIOWidgetBuilder`:
+
+   **1. Creating a Single IIOWidget for a Specific Device Attribute**
+
+   To create a single `IIOWidget` for a specific device attribute, you can use the following code:
+
+   .. code-block:: cpp
+
+       IIOWidget *attributeWidget = IIOWidgetBuilder(parent)
+                                    .device(myDevice)
+                                    .attribute("specific_attribute_name")
+                                    .uiStrategy(IIOWidgetBuilder::RangeUi)
+                                    .infoMessage("This is an informational message")
+                                    .title("Attribute Title")
+                                    .buildSingle();
+
+   In this example:
+   - `device()` specifies the device to which the widget is linked.
+   - `attribute()` specifies the attribute of the device to be controlled or displayed.
+   - `uiStrategy()` defines the UI strategy for the widget (e.g., `RangeUi`).
+   - `infoMessage()` adds an informational message for the widget.
+   - `title()` sets the title of the widget.
+   - `buildSingle()` creates the widget.
+
+   **2. Creating All IIOWidgets for a Channel of a Device**
+
+   To create all `IIOWidgets` for a specific channel of a device, you can use the following code:
+
+   .. code-block:: cpp
+
+       QList<IIOWidget *> channelWidgets = 
+           IIOWidgetBuilder(parent)
+               .channel(myChannel)
+               .buildAll();
+
+   In this example:
+   - `channel()` specifies the channel of the device for which widgets are created.
+   - `buildAll()` automatically creates widgets for all attributes of the specified channel.
+
+   **UI Strategy Assignment**
+
+   - When using `buildAll()`, the UI strategy for each widget is assigned automatically based on the attribute type and metadata.
+   - When using `buildSingle()`, you can manually specify the UI strategy using the `uiStrategy()` method.
+
+   By leveraging these methods, developers can create both individual and grouped `IIOWidgets` to suit their specific use cases.
+
+   **Benefits of Using IIOWidgets**
+
+   - Simplifies the development of user interfaces for IIO devices.
+   - Provides a consistent look and feel across different plugins.
+   - Reduces the amount of boilerplate code needed to create UI components.
+   - Supports advanced features like asynchronous data handling and progress indicators.
+
+   By leveraging `IIOWidgets`, developers can create powerful and user-friendly interfaces for interacting with IIO devices in Scopy.
+
+11. **Menu UI Items**
+--------------------------------------------------------------------------------
+
+   Scopy provides a variety of `Menu` UI components to create intuitive and organized user interfaces. These components are designed to help developers build menus, settings panels, and other hierarchical UI structures with ease. Below is a detailed description of the available `Menu` components and how they can be used.
+
+   **1. MenuSectionWidget**
+
+   - **Purpose**: 
+     `MenuSectionWidget` is a container widget used to group related menu items. It provides a layout for organizing multiple widgets, such as buttons, sliders, or dropdowns, within a single section.
+
+   - **Key Features**:
+     - Acts as a container for other widgets.
+     - Provides a clean and organized structure for menus.
+     - Can be used as a standalone section or within collapsible sections.
+
+   - **Example Usage**:
+     ```cpp
+     MenuSectionWidget *section = new MenuSectionWidget(parent);
+     QVBoxLayout *layout = section->contentLayout();
+     layout->addWidget(new QLabel("Section Title"));
+     layout->addWidget(menuCombo); // Add a MenuCombo widget
+     ```
+
+   **2. MenuCollapseSection**
+
+   - **Purpose**: 
+     `MenuCollapseSection` is a collapsible container widget that can expand or collapse to show or hide its content. It is ideal for organizing menus with multiple sections, allowing users to focus on specific parts.
+
+   - **Key Features**:
+     - Provides expand/collapse functionality.
+     - Includes a header with a title and an arrow indicator.
+     - Can contain any type of widgets, including `MenuSectionWidget`.
+
+   - **Example Usage**:
+     ```cpp
+     MenuCollapseSection *collapseSection = new MenuCollapseSection(
+         "Collapsible Section", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+     collapseSection->contentLayout()->addWidget(section); // Add a MenuSectionWidget
+     ```
+
+   **3. MenuCombo**
+
+   - **Purpose**: 
+     `MenuCombo` is a dropdown menu that allows users to select an option from a list. It combines a label and a `QComboBox` for user interaction.
+
+   - **Key Features**:
+     - Provides a labeled dropdown menu.
+     - Allows dynamic addition of options.
+     - Emits signals when the selected option changes.
+
+   - **Example Usage**:
+     ```cpp
+     MenuCombo *menuCombo = new MenuCombo("Select Option", parent);
+     menuCombo->combo()->addItem("Option 1");
+     menuCombo->combo()->addItem("Option 2");
+     connect(menuCombo->combo(), &QComboBox::currentTextChanged, this, [](const QString &text) {
+         qDebug() << "Selected option:" << text;
+     });
+     ```
+
+   **4. MenuSpinBox**
+
+   - **Purpose**: 
+     `MenuSpinBox` is a numeric input widget that allows users to adjust values within a defined range. It combines a label and a `QSpinBox` for user interaction.
+
+   - **Key Features**:
+     - Provides a labeled numeric input field.
+     - Supports range and step size configuration.
+     - Emits signals when the value changes.
+
+   - **Example Usage**:
+     ```cpp
+     MenuSpinBox *menuSpinBox = new MenuSpinBox("Set Frequency (Hz)", parent);
+     menuSpinBox->spinBox()->setRange(100, 10000); // Set range from 100 Hz to 10,000 Hz
+     menuSpinBox->spinBox()->setSingleStep(100);  // Set step size to 100 Hz
+     menuSpinBox->spinBox()->setValue(1000);      // Set default value to 1,000 Hz
+
+     connect(menuSpinBox->spinBox(), QOverload<int>::of(&QSpinBox::valueChanged), this, [](int value) {
+         qDebug() << "Frequency set to:" << value << "Hz";
+     });
+     ```
+
+   **5. MenuHeaderWidget**
+
+   - **Purpose**: 
+     `MenuHeaderWidget` is a header widget used to display a title or provide controls like toggle buttons for a menu or section.
+
+   - **Key Features**:
+     - Adds a visual header to menus or sections.
+     - Can include additional controls, such as buttons or checkboxes.
+
+   - **Example Usage**:
+     ```cpp
+     MenuHeaderWidget *header = new MenuHeaderWidget("Menu Header", QPen(Qt::black), parent);
+     ```
+
+   **6. Creating a Simple Menu with Menu Components**
+
+   Below is an example of how to use these components to create a simple menu:
+
+   ```cpp
+   QWidget *createSimpleMenu(QWidget *parent) {
+       // Create the main menu container
+       QWidget *menu = new QWidget(parent);
+       QVBoxLayout *menuLayout = new QVBoxLayout(menu);
+       menuLayout->setMargin(0);
+       menuLayout->setSpacing(10);
+
+       // Add a header
+       MenuHeaderWidget *header = new MenuHeaderWidget("Settings Menu", QPen(Qt::blue), menu);
+       menuLayout->addWidget(header);
+
+       // Create a collapsible section
+       MenuCollapseSection *collapseSection = new MenuCollapseSection(
+           "Frequency Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, menu);
+
+       // Add a MenuSpinBox to the collapsible section
+       MenuSpinBox *menuSpinBox = new MenuSpinBox("Set Frequency (Hz)", collapseSection);
+       menuSpinBox->spinBox()->setRange(100, 10000);
+       menuSpinBox->spinBox()->setSingleStep(100);
+       menuSpinBox->spinBox()->setValue(1000);
+
+       connect(menuSpinBox->spinBox(), QOverload<int>::of(&QSpinBox::valueChanged), this, [](int value) {
+           qDebug() << "Frequency set to:" << value << "Hz";
+       });
+
+       collapseSection->contentLayout()->addWidget(menuSpinBox);
+
+       // Add the collapsible section to the menu
+       menuLayout->addWidget(collapseSection);
+
+       // Add a spacer to push content to the top
+       menuLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+       return menu;
+   }
+   ````
+
+   By following these steps, you can create powerful and user-friendly interfaces for interacting with IIO devices in Scopy.
 
 Conclusion
 --------------------------------------------------------------------------------
