@@ -51,6 +51,8 @@ public:
 	static bool preview(const QString &zipPath = "");
 	bool _preview(const QString &zipPath = "");
 
+	static QFileInfo reverseSearch(const QString &filePath);
+
 	static QFileInfoList listFilesInfo(const QStringList &filter);
 	static QStringList listFilesPath(const QStringList &filter);
 
