@@ -66,8 +66,6 @@ public Q_SLOTS:
 	void setRot(rotation rot);
 	void updateCubeColor(QColor color);
 	void updatePlaneColor(QColor color);
-
-	friend class ImuAnalyzerSettings;
 };
 }
 

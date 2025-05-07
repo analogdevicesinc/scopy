@@ -22,6 +22,7 @@ public Q_SLOTS:
 	void resetView();
 	void resetPos();
 	void setRot(rotation rot);
+	void setDisplayPoints(QString displayP);
 
 private:
 	rotation m_rot;
@@ -29,9 +30,9 @@ private:
 	QVector<double> yLinePoint{3,3};
 	PlotWidget *plotWidget;
 	QwtPlotCurve *point;
+	QString m_displayPoints;
 
 public:
-	friend class ImuAnalyzerSettings;
 
 
 };

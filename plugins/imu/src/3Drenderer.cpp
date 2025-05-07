@@ -72,6 +72,7 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 
 	 // Transform
 	cubeTransform = new Qt3DCore::QTransform();
+	cubeTransform->setScale(2.0f);
 
 	// Material
 	m_cubeMaterial = new Qt3DExtras::QPhongMaterial();
@@ -103,11 +104,6 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	// Set root entity
 	view->setRootEntity(rootEntity);
 }
-
-// Qt3DExtras::QPlaneMesh* SceneRenderer::generateAxes(/*Qt3DCore::QEntity* parent*/) {
-// 	auto *planeMesh = new Qt3DExtras::QPlaneMesh();
-// }
-
 
 void SceneRenderer::resetView(){
 	view->camera()->lens()->setPerspectiveProjection(45.0f, 16.f/9.f, 0.1f, 1000.0f);

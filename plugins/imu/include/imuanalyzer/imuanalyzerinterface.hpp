@@ -40,8 +40,8 @@ private:
 
     InfoBtn *m_infoBtn;
     RunBtn *m_runBtn;
-    QPushButton *m_rstPos;
-    QPushButton *m_rstView;
+    MenuControlButton *m_rstPos;
+    MenuControlButton *m_rstView;
     GearBtn *m_gearBtn;
 
     SceneRenderer *m_sceneRender;

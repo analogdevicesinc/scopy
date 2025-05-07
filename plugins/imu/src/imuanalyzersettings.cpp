@@ -7,21 +7,38 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	lay->setMargin(0);
+	lay->setSpacing(10);
 	setLayout(lay);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(Qt::blue), this);
 
-	MenuCollapseSection *generalSettings = new MenuCollapseSection(
-		"General Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, this);
+	MenuSectionWidget *generalSettings = new MenuSectionWidget(this);
+	MenuCollapseSection *generalSettingsWidget = new MenuCollapseSection(
+		"General Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, generalSettings);
 
-	MenuCollapseSection *bubbleLevelSettings = new MenuCollapseSection(
-		"2D Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, this);
+	MenuSectionWidget *bubbleLevelSettings = new MenuSectionWidget(this);
+	MenuCollapseSection *bubbleLevelSettingsWidget = new MenuCollapseSection(
+		"2D Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, bubbleLevelSettings);
 
-	MenuCollapseSection *sceneRendererSettings = new MenuCollapseSection(
-		"3D Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, this);
+	MenuCombo *displayPoints = new MenuCombo("Display Points");
+	displayPoints->combo()->addItem("XY");
+	displayPoints->combo()->addItem("XZ");
+	displayPoints->combo()->addItem("YZ");
+	displayPoints->combo()->setCurrentIndex(0);
+
+	connect(this, &ImuAnalyzerSettings::updateDisplayPoints, blRend, &BubbleLevelRenderer::setDisplayPoints);
+	connect(displayPoints->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		emit updateDisplayPoints(displayPoints->combo()->itemText(idx));
+	});
+
+	bubbleLevelSettingsWidget->contentLayout()->addWidget(displayPoints);
+
+	MenuSectionWidget *sceneRendererSettings = new MenuSectionWidget(this);
+	MenuCollapseSection *sceneRendererSettingsWidget = new MenuCollapseSection(
+		"3D Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, sceneRendererSettings);
 
 	QPushButton *cubeColorButton = new QPushButton("Select New Cube Color");
-	sceneRendererSettings->contentLayout()->addWidget(cubeColorButton);
+	sceneRendererSettingsWidget->contentLayout()->addWidget(cubeColorButton);
 
 	connect(this, &ImuAnalyzerSettings::updateCubeColor, scRend, &SceneRenderer::updateCubeColor);
 	connect(cubeColorButton, &QPushButton::clicked, [&]() {
@@ -31,7 +48,7 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 	});
 
 	QPushButton *planeColorButton = new QPushButton("Select New Plane Color");
-	sceneRendererSettings->contentLayout()->addWidget(planeColorButton);
+	sceneRendererSettingsWidget->contentLayout()->addWidget(planeColorButton);
 
 	connect(this, &ImuAnalyzerSettings::updatePlaneColor, scRend, &SceneRenderer::updatePlaneColor);
 	connect(planeColorButton, &QPushButton::clicked, [&]() {
@@ -39,6 +56,10 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 		if(color.isValid())
 			emit updatePlaneColor(color);
 	});
+
+	generalSettings->layout()->addWidget(generalSettingsWidget);
+	bubbleLevelSettings->layout()->addWidget(bubbleLevelSettingsWidget);
+	sceneRendererSettings->layout()->addWidget(sceneRendererSettingsWidget);
 
 	lay->addWidget(header);
 	lay->addWidget(generalSettings);

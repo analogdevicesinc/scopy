@@ -15,8 +15,10 @@
 #include <menucontrolbutton.h>
 #include <menuheader.h>
 #include <menucollapsesection.h>
+#include <menusectionwidget.h>
 #include "2Drenderer.hpp"
 #include "3Drenderer.hpp"
+#include "menuspinbox.h"
 
 #include <QColorDialog>
 #include <QPalette>
@@ -34,6 +36,7 @@ public:
 signals:
 	void updateCubeColor(QColor color);
 	void updatePlaneColor(QColor color);
+	void updateDisplayPoints(QString displayP);
 };
 }
 #endif // IMUANALYZERSETTINGS_H

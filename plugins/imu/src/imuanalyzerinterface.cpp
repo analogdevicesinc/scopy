@@ -52,6 +52,8 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	m_tool->leftContainer()->setVisible(false);
 	m_tool->rightContainer()->setVisible(true);
 	m_tool->bottomContainer()->setVisible(true);
+	m_tool->topContainerMenuControl()->setVisible(false);
+	m_tool->setRightContainerWidth(300);
 
 	lay->addWidget(m_tool);
 
@@ -68,14 +70,20 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 
 	m_tool->addWidgetToCentralContainerHelper(tabWidget);
 
-	m_rstPos = new QPushButton(this);
-	m_rstPos->setText("Reset Position");
+	m_rstPos = new MenuControlButton(this);
+	m_rstPos->setName("Reset Position");
+	m_rstPos->checkBox()->setVisible(false);
+	m_rstPos->button()->setVisible(false);
+	m_rstPos->setCheckable(false);
 	m_tool->addWidgetToBottomContainerHelper(m_rstPos, TTA_LEFT);
 
 	connect(m_rstPos, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetPos);
 
-	m_rstView = new QPushButton(this);
-	m_rstView->setText("Reset View");
+	m_rstView = new MenuControlButton(this);
+	m_rstView->setName("Reset View");
+	m_rstView->checkBox()->setVisible(false);
+	m_rstView->button()->setVisible(false);
+	m_rstView->setCheckable(false);
 	m_tool->addWidgetToBottomContainerHelper(m_rstView, TTA_LEFT);
 
 	connect(m_rstView, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetView);
@@ -94,7 +102,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	connect(this, &IMUAnalyzerInterface::generateRot, bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
 
 	m_gearBtn = new GearBtn(this);
-	m_tool->addWidgetToTopContainerMenuControlHelper(m_gearBtn, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(m_gearBtn, TTA_RIGHT);
 
 	m_gearBtn->setChecked(true);
 
