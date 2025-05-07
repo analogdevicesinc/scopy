@@ -53,14 +53,14 @@ public:
 
 	static QFileInfo reverseSearch(const QString &filePath);
 
-	static QFileInfoList listFilesInfo(const QStringList &filter);
-	static QStringList listFilesPath(const QStringList &filter);
+	static QFileInfoList listFilesInfo(QStringList dirFilter = {}, QStringList fileFilter = {});
 
 	static QStringList getPkgsName();
 	static QStringList getPkgsAuthor();
 	static QStringList getPkgsVersion();
 	static QStringList getPkgsCategory();
 	static QList<QVariantMap> getPkgsMeta();
+
 Q_SIGNALS:
 	void pkgExists(const QString &zipPath, const QString &pkgName);
 
@@ -70,8 +70,8 @@ Q_SIGNALS:
 	void zipMetadata(QVariantMap metadata);
 
 private:
-	static QFileInfoList getFilesInfo(const QString &path, const QStringList &filterList);
-	static QStringList getFilesPath(const QString &path, const QStringList &filterList);
+	static QFileInfoList getFilesInfo(const QString &path, const QStringList &dirFilter,
+					  const QStringList &fileFilter);
 	void loadPkg(const QFileInfo &fileInfo);
 	void createPkgDirectory();
 
