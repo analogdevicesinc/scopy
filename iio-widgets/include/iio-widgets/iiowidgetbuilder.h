@@ -199,6 +199,7 @@ private:
 	QString m_optionsAttribute;
 	QString m_optionsValues;
 	QString m_title;
+	bool m_hasTitle;
 	QString m_infoMessage;
 	IIOWidgetBuilder::DS m_dataStrategy;
 	IIOWidgetBuilder::UIS m_uiStrategy;
