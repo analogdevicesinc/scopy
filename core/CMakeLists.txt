@@ -42,8 +42,20 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc)
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(
+	GLOB
+	SRC_LIST
+	src/*.cpp
+	src/*.cc
+	src/pkgmanager/*.cpp
+)
+file(
+	GLOB
+	HEADER_LIST
+	include/${SCOPY_MODULE}/*.h
+	include/${SCOPY_MODULE}/*.hpp
+	include/${SCOPY_MODULE}/pkgmanager/*.h
+)
 file(GLOB UI_LIST ui/*.ui)
 
 if(ENABLE_TESTING)
@@ -110,10 +122,14 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(
+	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkgmanager
+)
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkgmanager
 		${GLIB_INCLUDE_DIRS}
 		${GLIBCONFIG_INCLUDE_DIRS}
 		${LIBSIGROK_DECODE_INCLUDE_DIRS}
