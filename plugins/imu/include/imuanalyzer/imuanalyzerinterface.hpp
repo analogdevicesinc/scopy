@@ -21,12 +21,15 @@
 #include <toolbuttons.h>
 #include <tooltemplate.h>
 
+#include <iio.h>
+#include <iioutil/connectionprovider.h>
+
 namespace scopy {
 
 class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget {
 	Q_OBJECT
 public:
-    IMUAnalyzerInterface(QWidget *parent = nullptr);
+    IMUAnalyzerInterface(QString uri, QWidget *parent = nullptr);
     ~IMUAnalyzerInterface();
 
 Q_SIGNALS:
@@ -34,6 +37,7 @@ Q_SIGNALS:
 
 public:
 	void generateRotation();
+	void initIIODevice();
 
 private:
     ToolTemplate *m_tool;
@@ -50,6 +54,11 @@ private:
     rotation m_rot;
 
     std::thread t;
+    QString m_uri;
+
+    iio_device *m_device;
+
+    // Connection conn;
 };
 }
 

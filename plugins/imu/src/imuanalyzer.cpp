@@ -30,14 +30,31 @@
 
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
+#include <qdebug.h>
 
-Q_LOGGING_CATEGORY(CAT_TESTPLUGIN, "IMUAnalyzer");
+Q_LOGGING_CATEGORY(CAT_IMUANALYZER, "IMUAnalyzer");
 using namespace scopy;
 
 bool IMUAnalyzer::compatible(QString m_param, QString category)
 {
-	qDebug(CAT_TESTPLUGIN) << "compatible";
-	return true;
+	qDebug(CAT_IMUANALYZER) << "compatible";
+	bool ret = false;
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
+	if(conn == nullptr)
+		return ret;
+
+	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
+		iio_device *dev = iio_context_get_device(conn->context(), i);
+		std::string name = iio_device_get_name(dev);
+		if(name.find("adis") != std::string::npos){
+			ret = true;
+			goto finish;
+		}
+	}
+finish:
+
+	ConnectionProvider::GetInstance()->close(m_param);
+	return ret;
 }
 
 void IMUAnalyzer::loadToolList()
@@ -45,11 +62,17 @@ void IMUAnalyzer::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IMUAnalyzer_tool", "imuanalyzer", ":/gui/icons/home.svg"));
 }
 
-bool IMUAnalyzer::onConnect()
-{
+bool IMUAnalyzer::onConnect(){
+
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
+
+	if(conn == nullptr) {
+		return false;
+	}
+
 	m_toolList[0]->setEnabled(true);
 
-	m_imuInterface = new IMUAnalyzerInterface();
+	m_imuInterface = new IMUAnalyzerInterface(m_param);
 
 	QString tool_name = QString("IMUAnalyzer");
 
@@ -63,6 +86,9 @@ bool IMUAnalyzer::onDisconnect()
 {
 	m_toolList[0]->setEnabled(false);
 	m_toolList[0]->setTool(nullptr);
+
+	ConnectionProvider::GetInstance()->close(m_param);
+
 	return true;
 }
 

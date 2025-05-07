@@ -6,45 +6,15 @@ Q_DECLARE_METATYPE(rotation)
 
 std::atomic<bool> m_runThread(false);
 
-void IMUAnalyzerInterface::generateRotation(){
-	m_rot = {0.0f, 0.0f, 0.0f};
-	bool directionX = false, directionY = false;
-	while(1){
-	if (!m_runThread) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Light pause loop
-		continue;
-	}
-
-	for(int i = 0; i < 180; i++){
-		if(!m_runThread) break;
-		if(m_rot.rotX == 0 || m_rot.rotX == 90) directionX = !directionX;
-		if(directionX) m_rot.rotX = m_rot.rotX + 1.0f;
-		else m_rot.rotX = m_rot.rotX - 1.0f;
-
-		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
-					  Q_ARG(rotation, m_rot));
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-
-	for(int i = 0; i < 180; i++){
-		if(!m_runThread) break;
-		if(m_rot.rotY == 0 || m_rot.rotY == 90) directionY = !directionY;
-		if(directionY) m_rot.rotY = m_rot.rotY + 1.0f;
-		else m_rot.rotY = m_rot.rotY - 1.0f;
-
-		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
-					  Q_ARG(rotation, m_rot));
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	}
-}
-
-IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
+IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidget{parent}{
 	qRegisterMetaType<rotation>("rotation");
 
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	lay->setMargin(0);
 	setLayout(lay);
+
+	m_uri = uri;
+	initIIODevice();
 
 	m_tool = new ToolTemplate(this);
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -66,7 +36,6 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 	m_sceneRender = new SceneRenderer(this);
 	QTabWidget *tabWidget = new QTabWidget;
 	tabWidget->addTab(m_sceneRender,"3D View");
-	// tabWidget->setTabPosition(QTabWidget::West);
 
 	m_tool->addWidgetToCentralContainerHelper(tabWidget);
 
@@ -120,6 +89,54 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QWidget *parent) : QWidget{parent}{
 
 IMUAnalyzerInterface::~IMUAnalyzerInterface(){
 	t.join();
+}
+
+void IMUAnalyzerInterface::generateRotation(){
+
+	iio_channel *anglVelChX = iio_device_find_channel(m_device, "anglvel_x", false);
+	iio_channel *anglVelChY = iio_device_find_channel(m_device, "anglvel_y", false);
+	iio_channel *anglVelChZ = iio_device_find_channel(m_device, "anglvel_z", false);
+
+	double anglVelGainX;
+	iio_channel_attr_read_double(anglVelChX, "scale", &anglVelGainX);
+	double anglVelGainY;
+	iio_channel_attr_read_double(anglVelChY, "scale", &anglVelGainY);
+	double anglVelGainZ;
+	iio_channel_attr_read_double(anglVelChZ, "scale", &anglVelGainZ);
+
+	double anglVelX, anglVelY, anglVelZ;
+
+	m_rot = {0.0f, 0.0f, 0.0f};
+	bool directionX = false, directionY = false;
+	while(1){
+		if (!m_runThread) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Light pause loop
+			continue;
+		}
+
+		iio_channel_attr_read_double(anglVelChX, "raw", &anglVelX);
+		iio_channel_attr_read_double(anglVelChY, "raw", &anglVelY);
+		iio_channel_attr_read_double(anglVelChZ, "raw", &anglVelZ);
+
+		m_rot.rotX += float(anglVelX * anglVelGainX / 2);
+		m_rot.rotY += float(anglVelY * anglVelGainY / 2);
+		m_rot.rotZ += float(anglVelZ * anglVelGainZ / 2);
+
+		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
+					  Q_ARG(rotation, m_rot));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+}
+
+void IMUAnalyzerInterface::initIIODevice(){
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
+	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
+		m_device = iio_context_get_device(conn->context(), i);
+		std::string name = iio_device_get_name(m_device);
+		if(name.find("adis") != std::string::npos){
+			return;
+		}
+	}
 }
 
 #include "moc_imuanalyzerinterface.cpp"
