@@ -550,9 +550,14 @@ QVariantMap ScopyMainWindow_API::extractMetadata(QString zipPath)
 
 bool ScopyMainWindow_API::uninstall(const QString &pkgName) { return PkgManager::uninstall(pkgName); }
 
-QStringList ScopyMainWindow_API::listFiles(const QString &category)
+QStringList ScopyMainWindow_API::listFiles(const QStringList &dirFilter, const QStringList &fileFilter)
 {
-	return PkgManager::listFilesPath(QStringList() << category);
+	const QFileInfoList infoList = PkgManager::listFilesInfo(dirFilter, fileFilter);
+	QStringList pathList;
+	for(auto &info : infoList) {
+		pathList.append(info.absoluteFilePath());
+	}
+	return pathList;
 }
 
 QString ScopyMainWindow_API::findPkgName(const QString &filePath)
