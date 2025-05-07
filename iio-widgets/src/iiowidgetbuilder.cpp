@@ -53,6 +53,7 @@ IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	, m_dataStrategy(DS::NoDataStrategy)
 	, m_uiStrategy(UIS::NoUIStrategy)
 	, m_widgetParent(parent)
+	, m_hasTitle(false)
 {
 	setObjectName("IIOWidgetBuilder");
 }
@@ -322,6 +323,7 @@ IIOWidgetBuilder &IIOWidgetBuilder::parent(QWidget *parent)
 
 IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
 {
+	m_hasTitle = true;
 	m_title = title;
 	return *this;
 }
@@ -446,7 +448,7 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 		break;
 	}
 
-	if(!m_title.isEmpty() && ui != nullptr) {
+	if(m_hasTitle && ui != nullptr) {
 		ui->setCustomTitle(m_title);
 	}
 	if(!m_infoMessage.isEmpty()) {

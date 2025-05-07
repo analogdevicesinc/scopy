@@ -36,15 +36,15 @@ CheckBoxAttrUi::CheckBoxAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QW
 	m_ui->layout()->setMargin(0);
 	m_menuOnOffSwitch = new MenuOnOffSwitch("", m_ui);
 
-	if(!m_isCompact) {
-		m_title = new QLabel(recipe.data, m_ui);
-		m_title->setWordWrap(true);
-		Style::setStyle(m_title, style::properties::label::subtle);
-		m_ui->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-		m_ui->layout()->addWidget(m_title);
+	m_title = new QLabel(recipe.data, m_ui);
+	Style::setStyle(m_title, style::properties::label::subtle);
+	m_ui->layout()->addWidget(m_title);
 
-		m_infoIcon = new InfoIconWidget("", m_ui);
-		m_ui->layout()->addWidget(m_infoIcon);
+	m_infoIcon = new InfoIconWidget("", m_ui);
+	m_ui->layout()->addWidget(m_infoIcon);
+
+	if(m_isCompact) {
+		m_title->setWordWrap(true);
 	}
 	m_ui->layout()->addWidget(m_menuOnOffSwitch);
 
@@ -67,12 +67,7 @@ bool CheckBoxAttrUi::isValid()
 	return false;
 }
 
-void CheckBoxAttrUi::setCustomTitle(QString title)
-{
-	if(!m_isCompact) {
-		m_title->setText(title);
-	}
-}
+void CheckBoxAttrUi::setCustomTitle(QString title) { m_title->setText(title); }
 
 void CheckBoxAttrUi::receiveData(QString currentData, QString optionalData)
 {
