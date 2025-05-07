@@ -8,15 +8,17 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
 	setLayout(lay);
 
 	m_rot = {0.0f, 0.0f, 0.0f};
+	m_displayPoints = "XY";
 
 	plotWidget = new PlotWidget(this);
 	lay->addWidget(plotWidget);
 
-	plotWidget->xAxis()->setInterval(-120.0,120.0);
-	plotWidget->yAxis()->setInterval(-120.0,120.0);
+	plotWidget->xAxis()->setInterval(-180.0,180.0);
+	plotWidget->yAxis()->setInterval(-180.0,180.0);
 
 	plotWidget->xAxis()->setVisible(true);
 	plotWidget->yAxis()->setVisible(true);
+
 
 	point = new QwtPlotCurve("Point");
 	point->setSamples(xLinePoint, yLinePoint);
@@ -27,8 +29,24 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
 
 void BubbleLevelRenderer::setRot(rotation rot){
 	m_rot = rot;
-	xLinePoint = {double(m_rot.rotX),double(m_rot.rotX)};
-	yLinePoint = {double(m_rot.rotY),double(m_rot.rotY)};
+
+	if(m_displayPoints == "XY"){
+		xLinePoint = {double(m_rot.rotX),double(m_rot.rotX)};
+		yLinePoint = {double(m_rot.rotY),double(m_rot.rotY)};
+
+	} else if(m_displayPoints == "XZ"){
+		xLinePoint = {double(m_rot.rotX),double(m_rot.rotX)};
+		yLinePoint = {double(m_rot.rotZ),double(m_rot.rotZ)};
+
+	} else if(m_displayPoints == "YZ"){
+		xLinePoint = {double(m_rot.rotY),double(m_rot.rotY)};
+		yLinePoint = {double(m_rot.rotZ),double(m_rot.rotZ)};
+	}
+
 	point->setSamples(xLinePoint, yLinePoint);
 	plotWidget->replot();
+}
+
+void BubbleLevelRenderer::setDisplayPoints(QString displayP){
+	m_displayPoints = displayP;
 }
