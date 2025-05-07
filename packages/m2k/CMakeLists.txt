@@ -42,3 +42,5 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 		add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 	endif()
 endif()
+
+include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
