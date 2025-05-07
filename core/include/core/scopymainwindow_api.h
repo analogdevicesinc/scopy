@@ -70,7 +70,7 @@ public:
 	Q_INVOKABLE QVariantMap extractMetadata(QString zipPath);
 	Q_INVOKABLE bool uninstall(const QString &pkgName);
 
-	Q_INVOKABLE QStringList listFiles(const QString &category);
+	Q_INVOKABLE QStringList listFiles(const QStringList &dirFilter, const QStringList &fileFilter);
 	Q_INVOKABLE QString findPkgName(const QString &filePath);
 
 private:
