@@ -164,22 +164,12 @@ void PkgManager::createPkgDirectory()
 	}
 }
 
-QFileInfoList PkgManager::listFilesInfo(const QStringList &filter)
+QFileInfoList PkgManager::listFilesInfo(QStringList dirFilter, QStringList fileFilter)
 {
 	QFileInfoList files;
 	for(auto &it : validPackages_) {
 		QString pkgPath = it[PkgManifest::PKG_PATH].toString();
-		files.append(getFilesInfo(pkgPath, filter));
-	}
-	return files;
-}
-
-QStringList PkgManager::listFilesPath(const QStringList &filter)
-{
-	QStringList files;
-	for(auto &it : validPackages_) {
-		QString pkgPath = it[PkgManifest::PKG_PATH].toString();
-		files.append(getFilesPath(pkgPath, filter));
+		files.append(getFilesInfo(pkgPath, dirFilter, fileFilter));
 	}
 	return files;
 }
@@ -224,26 +214,18 @@ QStringList PkgManager::getPkgsCategory()
 	return categoryList;
 }
 
-QFileInfoList PkgManager::getFilesInfo(const QString &path, const QStringList &filterList)
+QFileInfoList PkgManager::getFilesInfo(const QString &path, const QStringList &dirFilter = {},
+				       const QStringList &fileFilter = {})
 {
-	QDirIterator it(path, filterList, QDir::NoFilter, QDirIterator::Subdirectories);
 	QFileInfoList files;
+	QStringList nameFilters = (dirFilter.isEmpty()) ? fileFilter : dirFilter;
+	QDirIterator it(path, nameFilters, QDir::NoFilter, QDirIterator::Subdirectories);
 	while(it.hasNext()) {
-		QDir dir(it.next());
-		files.append(dir.entryInfoList(QDir::Files));
-	}
-	return files;
-}
-
-QStringList PkgManager::getFilesPath(const QString &path, const QStringList &filterList)
-{
-	QDirIterator it(path, filterList, QDir::NoFilter, QDirIterator::Subdirectories);
-	QStringList files;
-	while(it.hasNext()) {
-		QDir dir(it.next());
-		const QFileInfoList infoList = dir.entryInfoList(QDir::Files);
-		for(const QFileInfo &info : infoList) {
-			files.append(info.absoluteFilePath());
+		if(dirFilter.isEmpty()) {
+			files.append(it.next());
+		} else {
+			QDir dir(it.next());
+			files.append(dir.entryInfoList(fileFilter, QDir::Files));
 		}
 	}
 	return files;

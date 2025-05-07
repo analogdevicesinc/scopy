@@ -65,8 +65,8 @@ QString TranslationsRepository::getTranslationsPath()
 QStringList TranslationsRepository::getLanguages()
 {
 	QDir directory(TranslationsRepository::getTranslationsPath());
-	QFileInfoList languagesFileInfo = PkgManager::listFilesInfo(QStringList() << "translations"
-										  << "*.qm");
+	QFileInfoList languagesFileInfo = PkgManager::listFilesInfo(
+		QStringList() << scopy::config::pkgTranslationsDir(), QStringList() << "*.qm");
 	QStringList languages;
 	std::transform(languagesFileInfo.begin(), languagesFileInfo.end(), std::back_inserter(languages),
 		       [](const QFileInfo &fi) { return fi.fileName(); });
@@ -96,8 +96,8 @@ void TranslationsRepository::loadTranslations(QString language)
 	QList<QTranslator *> translatorList = QList<QTranslator *>();
 	QDir directory(TranslationsRepository::getTranslationsPath());
 	QFileInfoList languages = directory.entryInfoList(QStringList() << "*.qm", QDir::Files);
-	languages.append(PkgManager::listFilesInfo(QStringList() << "translations"
-								 << "*.qm"));
+	languages.append(PkgManager::listFilesInfo(QStringList() << scopy::config::pkgTranslationsDir(),
+						   QStringList() << "*.qm"));
 
 	for(const QFileInfo &lang : languages) {
 		if(lang.fileName().endsWith("_" + language + ".qm") || lang.fileName() == language + ".qm") {
