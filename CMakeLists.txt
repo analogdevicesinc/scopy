@@ -297,24 +297,6 @@ if(NOT ENABLE_APPLICATION_BUNDLE)
 	)
 endif()
 
-file(GLOB alldirs ${CMAKE_CURRENT_SOURCE_DIR}/plugins/*)
-set(childdirlist "")
-foreach(child ${alldirs})
-	set(CHILD_EMU_XML ${child}/res/emu_xml)
-	if(IS_DIRECTORY ${CHILD_EMU_XML})
-		message("-- Found IIO Emulator XMLs in: " ${CHILD_EMU_XML})
-		file(GLOB EMU_FILES ${CHILD_EMU_XML}/*)
-		foreach(_emu_file ${EMU_FILES})
-			file(COPY ${_emu_file} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/plugins/emu_xml/)
-		endforeach()
-
-	endif()
-endforeach()
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins/resources/scopy_emu_options_config.json
-	DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}/resources
-)
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/emu_xml DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${SCOPY_TRANSLATION_INSTALL_PATH})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/style DESTINATION ${SCOPY_STYLE_INSTALL_PATH})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/packages DESTINATION ${SCOPY_PACKAGE_INSTALL_PATH})
