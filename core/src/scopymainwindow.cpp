@@ -466,10 +466,10 @@ void ScopyMainWindow::initStyle()
 {
 	Style *style = Style::GetInstance();
 	QString theme = Preferences::get("general_theme").toString();
-	style->setPkgsThemes(PkgManager::listFilesInfo(QStringList() << "json"
-								     << "*.json"));
-	style->setPkgsQss(PkgManager::listFilesInfo(QStringList() << "qss"
-								  << "*.qss"));
+	style->setPkgsThemes(PkgManager::listFilesInfo(QStringList() << scopy::config::pkgStyleThemesDir(),
+						       QStringList() << "*.json"));
+	style->setPkgsQss(
+		PkgManager::listFilesInfo(QStringList() << scopy::config::pkgStylePropDir(), QStringList() << "*.qss"));
 	if(!style->getThemeList().contains(theme)) {
 		theme = style->getTheme();
 		Preferences::set("general_theme", theme);
