@@ -72,7 +72,6 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 
 	 // Transform
 	cubeTransform = new Qt3DCore::QTransform();
-	cubeTransform->setScale(2.0f);
 
 	// Material
 	m_cubeMaterial = new Qt3DExtras::QPhongMaterial();

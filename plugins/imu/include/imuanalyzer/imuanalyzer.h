@@ -42,6 +42,9 @@
 #include <pluginbase/pluginbase.h>
 #include "style.h"
 
+#include <iio.h>
+#include <iioutil/connectionprovider.h>
+
 namespace scopy {
 
 class SCOPY_IMUANALYZER_EXPORT IMUAnalyzer : public QObject, public PluginBase
