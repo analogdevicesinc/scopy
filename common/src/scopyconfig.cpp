@@ -148,3 +148,15 @@ QString scopy::config::getUuid()
 	return QString::number(uuid++);
 #endif
 }
+
+QString scopy::config::emuSetupFile() { return PKG_EMU_SETUP_FILE; }
+
+QString scopy::config::pkgEmuDir() { return PKG_EMU_DIR; }
+
+QString scopy::config::pkgPluginsDir() { return PKG_PLUGINS_DIR; }
+
+QString scopy::config::pkgStyleThemesDir() { return PKG_STYLE_THEMES_DIR; }
+
+QString scopy::config::pkgStylePropDir() { return PKG_STYLE_PROP_DIR; }
+
+QString scopy::config::pkgTranslationsDir() { return PKG_TRANSLATION_DIR; }
