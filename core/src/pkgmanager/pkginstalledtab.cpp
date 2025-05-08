@@ -102,44 +102,43 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 
 PkgInstalledTab::~PkgInstalledTab() {}
 
-PkgItemWidget *PkgInstalledTab::createPkgItemWidget(const QVariantMap &meta)
+PkgCard *PkgInstalledTab::createPkgCard(const QVariantMap &meta)
 {
-	PkgItemWidget *pkgItem = new PkgItemWidget(m_pkgGrid);
-	pkgItem->fillMetadata(meta, true);
-	connect(pkgItem, &PkgItemWidget::preview, this, &PkgInstalledTab::onPkgPreview);
-	connect(pkgItem, &PkgItemWidget::hidePreview, this,
-		[this]() { m_pkgGrid->updatePkgsStyle(m_preview->isEnabled()); });
-	connect(pkgItem, &PkgItemWidget::categorySelected, this, &PkgInstalledTab::onCategorySelected);
-	connect(pkgItem, &PkgItemWidget::hidePreview, m_preview, &PkgPreviewPage::hide);
-	connect(pkgItem, &PkgItemWidget::uninstallClicked, this, &PkgInstalledTab::onUninstall);
-	return pkgItem;
+	PkgCard *pkgCard = new PkgCard(m_pkgGrid);
+	pkgCard->fillMetadata(meta, true);
+	connect(pkgCard, &PkgCard::preview, this, &PkgInstalledTab::onPkgPreview);
+	connect(pkgCard, &PkgCard::hidePreview, this, [this]() { m_pkgGrid->updatePkgsStyle(m_preview->isEnabled()); });
+	connect(pkgCard, &PkgCard::categorySelected, this, &PkgInstalledTab::onCategorySelected);
+	connect(pkgCard, &PkgCard::hidePreview, m_preview, &PkgPreviewPage::hide);
+	connect(pkgCard, &PkgCard::uninstallClicked, this, &PkgInstalledTab::onUninstall);
+	return pkgCard;
 }
 
 void PkgInstalledTab::fillPkgSection()
 {
 	const QList<QVariantMap> pkgsMeta = PkgManager::getPkgsMeta();
 	for(const QVariantMap &meta : pkgsMeta) {
-		PkgItemWidget *pkgItem = createPkgItemWidget(meta);
-		pkgItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-		m_pkgGrid->addPkg(pkgItem);
+		PkgCard *pkgCard = createPkgCard(meta);
+		pkgCard->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		m_pkgGrid->addWidget(pkgCard, pkgCard->id());
 	}
 }
 
 void PkgInstalledTab::onUninstall()
 {
-	PkgItemWidget *pkgItem = dynamic_cast<PkgItemWidget *>(QObject::sender());
-	if(!pkgItem) {
+	PkgCard *pkgCard = dynamic_cast<PkgCard *>(QObject::sender());
+	if(!pkgCard) {
 		return;
 	}
 	InstallPkgDialog *uninstallDialog = new InstallPkgDialog(this);
-	uninstallDialog->setMessage("Are you sure you want to uninstall " + pkgItem->id() + "?");
-	connect(uninstallDialog, &InstallPkgDialog::yesClicked, this, [this, uninstallDialog, pkgItem]() {
-		bool uninstalled = PkgManager::uninstall(pkgItem->id());
-		pkgItem->uninstallFinished(uninstalled);
+	uninstallDialog->setMessage("Are you sure you want to uninstall " + pkgCard->id() + "?");
+	connect(uninstallDialog, &InstallPkgDialog::yesClicked, this, [this, uninstallDialog, pkgCard]() {
+		bool uninstalled = PkgManager::uninstall(pkgCard->id());
+		pkgCard->uninstallFinished(uninstalled);
 		uninstallDialog->deleteLater();
 	});
-	connect(uninstallDialog, &InstallPkgDialog::noClicked, this, [this, uninstallDialog, pkgItem]() {
-		pkgItem->uninstallFinished(false);
+	connect(uninstallDialog, &InstallPkgDialog::noClicked, this, [this, uninstallDialog, pkgCard]() {
+		pkgCard->uninstallFinished(false);
 		uninstallDialog->deleteLater();
 	});
 	QMetaObject::invokeMethod(uninstallDialog, &InstallPkgDialog::showDialog, Qt::QueuedConnection);
