@@ -28,9 +28,9 @@ using namespace jesdstatus;
 
 JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 	: QWidget(parent)
-	, m_parserThread(new QThread())
+	, m_parserThread(new QThread(this))
 {
-	m_parser = new JesdStatusParser(dev, this);
+	m_parser = new JesdStatusParser(dev, nullptr);
 	m_parser->moveToThread(m_parserThread);
 
 	connect(m_parserThread, &QThread::started, m_parser, &JesdStatusParser::update);
@@ -88,7 +88,7 @@ JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 		laneScroll->setWidget(laneHeader);
 		laneScrollLayH->setMargin(0);
 		//		laneScroll->setSizePolicy(laneScroll->sizePolicy().horizontalPolicy(),
-		//QSizePolicy::Maximum);
+		// QSizePolicy::Maximum);
 
 		// Setup lane status label
 		QLabel *laneContainerLbl = new QLabel("LANE STATUS", laneContainer);
@@ -112,6 +112,12 @@ JesdStatusView::~JesdStatusView()
 {
 	m_laneLabels.clear();
 	m_statusLabels.clear();
+	if(m_parserThread->isRunning()) {
+		m_parserThread->quit();
+		m_parserThread->wait(2000);
+	}
+	delete m_parser;
+	m_parserThread->deleteLater();
 }
 
 void JesdStatusView::initStatusValues(QWidget *statusContainer)

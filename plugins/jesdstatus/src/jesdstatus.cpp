@@ -66,10 +66,24 @@ JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
 	}
 
 	jesdDeviceStack->setCurrentIndex(0);
-	m_timer->start(1000);
 }
 
-JesdStatus::~JesdStatus() {}
+JesdStatus::~JesdStatus()
+{
+	if(m_timer->isActive()) {
+		Q_EMIT running(false);
+		m_timer->stop();
+	}
+}
+
+void JesdStatus::runToggled(bool toggled)
+{
+	if(toggled) {
+		m_timer->start(1000);
+	} else {
+		m_timer->stop();
+	}
+}
 
 void JesdStatus::setupDevice(struct iio_device *dev)
 {

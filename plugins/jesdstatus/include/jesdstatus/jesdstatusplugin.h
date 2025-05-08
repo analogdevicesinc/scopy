@@ -48,6 +48,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	struct iio_context *m_ctx;
 	QList<QString> scanCompatibleDevices(iio_context *ctx);
 };
 } // namespace scopy::jesdstatus
