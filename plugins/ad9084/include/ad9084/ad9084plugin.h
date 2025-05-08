@@ -46,6 +46,9 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	struct iio_context *m_ctx;
 };
 } // namespace scopy::ad9084
 #endif // AD9084PLUGIN_H

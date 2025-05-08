@@ -77,7 +77,7 @@ bool JesdStatusPlugin::loadIcon()
 
 void JesdStatusPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("jesdstatus", "Jesd Status",
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("jesdstatus", "JESD STATUS",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_voltmeter.svg"));
 }
@@ -95,9 +95,10 @@ bool JesdStatusPlugin::onConnect()
 	if(!conn) {
 		return false;
 	}
+	m_ctx = conn->context();
 	QList<struct iio_device *> devLst;
 	auto lst = scanCompatibleDevices(conn->context());
-	for(auto id : lst) {
+	for(auto id : qAsConst(lst)) {
 		auto dev = iio_context_find_device(conn->context(), id.toUtf8());
 		if(dev) {
 			devLst.push_back(dev);
@@ -108,6 +109,10 @@ bool JesdStatusPlugin::onConnect()
 	m_toolList[0]->setTool(jesdStatus);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
+	connect(m_toolList.last(), &ToolMenuEntry::runToggled, dynamic_cast<JesdStatus *>(jesdStatus),
+		&JesdStatus::runToggled);
+	connect(dynamic_cast<JesdStatus *>(jesdStatus), &JesdStatus::running, m_toolList[0],
+		&ToolMenuEntry::setRunning);
 	return true;
 }
 
@@ -125,6 +130,8 @@ bool JesdStatusPlugin::onDisconnect()
 			delete(w);
 		}
 	}
+	if(m_ctx)
+		ConnectionProvider::GetInstance()->close(m_param);
 	return true;
 }
 

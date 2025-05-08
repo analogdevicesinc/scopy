@@ -85,6 +85,7 @@ bool AD9084Plugin::onConnect()
 		return false;
 	}
 
+	m_ctx = conn->context();
 	struct iio_device *dev = iio_context_find_device(conn->context(), "axi-ad9084-rx-hpc");
 	m_toolList.last()->setTool(new Ad9084(dev));
 	m_toolList.last()->setEnabled(true);
@@ -138,11 +139,15 @@ bool AD9084Plugin::onDisconnect()
 		tool->setRunBtnVisible(false);
 		QWidget *w = tool->tool();
 		if(w) {
-			m_toolList.removeAll(tool);
+			m_toolList.removeOne(tool);
 			tool->setTool(nullptr);
 			delete(w);
 		}
 	}
+	loadToolList();
+	Q_EMIT toolListChanged();
+	if(m_ctx)
+		ConnectionProvider::GetInstance()->close(m_param);
 	return true;
 }
 
