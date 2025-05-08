@@ -23,41 +23,24 @@
 #define PKGGRIDWIDGET_H
 
 #include <QWidget>
-#include <QGridLayout>
-#include <QMap>
-#include <pkgitemwidget.h>
+#include <pkgcard.h>
+#include <gridwidget.h>
 
 namespace scopy {
 
-class PkgGridWidget : public QWidget
+class PkgGridWidget : public GridWidget
 {
 	Q_OBJECT
 public:
 	PkgGridWidget(QWidget *parent = nullptr);
 	~PkgGridWidget();
 
-	void addPkg(PkgItemWidget *pkgItem);
-	void removePkg(const QString &pkgName);
-
-	int gridSize() const;
+	void searchPkg(const QStringList &fields, const QStringList &options);
 	void updatePkgsStyle(bool property);
 
-public Q_SLOTS:
-	void searchPkg(const QStringList &fields, const QStringList &options);
-
-private Q_SLOTS:
-	void colNumberChanged(QString pref, QVariant val);
-
 private:
-	void hideAll();
-	void rebuildLayout();
-	void showPkg(QWidget *pkg, int index);
-	bool isSearchMatch(const QString &pkgVal, const QStringList &searchingValues);
 	bool isFieldMatch(const QVariantMap &pkgMetadata, const QString &field, const QStringList &options);
-
-	QMap<QString, PkgItemWidget *> m_pkgMap;
-	QGridLayout *m_layout;
-	int m_maxCol;
+	bool isSearchMatch(const QString &pkgVal, const QStringList &searchingValues);
 };
 } // namespace scopy
 

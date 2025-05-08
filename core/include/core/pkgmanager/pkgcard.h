@@ -28,17 +28,16 @@
 #include <QPushButton>
 #include <animationpushbutton.h>
 #include <toolbuttons.h>
+#include <cardwidget.h>
 #include <widgets/interactivelabel.h>
 
 namespace scopy {
-class PkgItemWidget : public QFrame
+class PkgCard : public CardWidget
 {
 	Q_OBJECT
 public:
-	PkgItemWidget(QWidget *parent = nullptr);
-	~PkgItemWidget();
-
-	QString id() const;
+	PkgCard(QWidget *parent = nullptr);
+	~PkgCard();
 
 	void setVersions(QStringList versions);
 	void installFinished(bool installed);
@@ -60,13 +59,8 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 
 private:
-	QWidget *createTitleW(QWidget *parent = nullptr);
 	void fillCategories(QStringList categories);
 
-	QLineEdit *m_title;
-	QLabel *m_subtitle;
-	QComboBox *m_versCb;
-	QLabel *m_description;
 	InstallBtn *m_installBtn;
 	UninstallBtn *m_uninstallBtn;
 	QVariantMap m_metadata;
