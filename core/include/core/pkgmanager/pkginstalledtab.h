@@ -44,7 +44,7 @@ private Q_SLOTS:
 
 private:
 	void fillPkgSection();
-	PkgItemWidget *createPkgItemWidget(const QVariantMap &meta);
+	PkgCard *createPkgCard(const QVariantMap &meta);
 
 	PkgGridWidget *m_pkgGrid;
 	SearchBar *m_searchBar;
