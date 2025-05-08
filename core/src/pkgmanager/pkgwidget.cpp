@@ -25,7 +25,7 @@
 #include <QJsonObject>
 #include <application_restarter.h>
 #include <installpkgdialog.h>
-#include <pkgitemwidget.h>
+#include <pkgcard.h>
 #include <qgridlayout.h>
 #include <restartdialog.h>
 #include <style.h>
