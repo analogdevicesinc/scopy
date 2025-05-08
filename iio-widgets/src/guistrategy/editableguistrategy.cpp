@@ -30,7 +30,7 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 {
 	m_recipe = recipe;
 	m_title = new QLabel(recipe.data, m_ui);
-	m_infoIcon = new InfoIconWidget(recipe.infoMessage, m_ui);
+	m_infoIcon = new InfoIconWidget("", m_ui);
 
 	if(isCompact) {
 		m_ui->setLayout(new QHBoxLayout(m_ui));
