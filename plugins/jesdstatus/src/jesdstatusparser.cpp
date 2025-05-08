@@ -24,7 +24,6 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QLoggingCategory>
-
 using namespace scopy::jesdstatus;
 
 Q_LOGGING_CATEGORY(CAT_JESDPARSER, "JesdParser");

@@ -39,6 +39,12 @@ public:
 	JesdStatus(QList<struct iio_device *> devLst, QWidget *parent = nullptr);
 	~JesdStatus();
 
+Q_SIGNALS:
+	void running(bool toggled);
+
+public Q_SLOTS:
+	void runToggled(bool toggled);
+
 private:
 	ToolTemplate *tool;
 	QTimer *m_timer;
