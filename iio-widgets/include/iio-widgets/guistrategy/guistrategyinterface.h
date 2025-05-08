@@ -56,6 +56,12 @@ public:
 	 * */
 	virtual void setCustomTitle(QString title) = 0;
 
+	/**
+	 * @brief Allows user to set info message
+	 * @param infoMessage
+	 * */
+	virtual void setInfoMessage(QString infoMessage) = 0;
+
 public Q_SLOTS:
 	/**
 	 * @brief Reads the data from the attributes that are set in the recipe if available.

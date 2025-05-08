@@ -101,8 +101,6 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 		.data = m_attribute,
 		.iioDataOptions = m_optionsAttribute,
 		.constDataOptions = m_optionsValues,
-		.infoMessage = m_infoMessage,
-
 	};
 
 	ds = createDS();
@@ -241,6 +239,7 @@ void IIOWidgetBuilder::clear()
 	m_uiStrategy = UIS::NoUIStrategy;
 	m_widgetParent = nullptr;
 	m_title = "";
+	m_infoMessage = "";
 }
 
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
@@ -449,6 +448,9 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	if(!m_title.isEmpty() && ui != nullptr) {
 		ui->setCustomTitle(m_title);
+	}
+	if(!m_infoMessage.isEmpty()) {
+		ui->setInfoMessage(m_infoMessage);
 	}
 
 	return ui;
