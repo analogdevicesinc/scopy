@@ -22,6 +22,8 @@
 #ifndef MENUCOMBO_H
 #define MENUCOMBO_H
 
+#include "infoiconwidget.h"
+
 #include <QComboBox>
 #include <QLabel>
 #include <QPen>
@@ -45,9 +47,11 @@ public:
 
 	QString title() const;
 	void setTitle(const QString &newTitle);
+	void setInfoMessage(QString infoMessage);
 
 private:
 	QLabel *m_label;
+	InfoIconWidget *m_infoIcon;
 	QComboBox *m_combo;
 	MouseWheelWidgetGuard *m_mouseWheelGuard;
 };
@@ -64,6 +68,7 @@ public:
 
 	QString title() const;
 	void setTitle(const QString &newTitle);
+	void setInfoMessage(QString infoMessage);
 
 private:
 	MenuCombo *m_combo;

@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <iio.h>
+#include <infoiconwidget.h>
 #include <gui/widgets/menucombo.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
@@ -48,6 +49,7 @@ public:
 	bool isValid() final;
 
 	void setCustomTitle(QString title) override;
+	void setInfoMessage(QString infoMessage);
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
@@ -62,6 +64,7 @@ private:
 	QComboBox *m_comboWidget;
 	bool m_isCompact;
 	QLabel *m_title;
+	InfoIconWidget *m_infoIcon;
 	MenuCombo *m_comboMenuWidget;
 };
 } // namespace scopy

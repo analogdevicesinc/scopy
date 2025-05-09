@@ -33,6 +33,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QBoxLayout>
+#include <infoiconwidget.h>
 
 namespace scopy {
 namespace gui {
@@ -161,6 +162,7 @@ public:
 
 public Q_SLOTS:
 	void setName(const QString &newName);
+	void setInfoMessage(QString infoMessage);
 	void setUnit(const QString &newUnit);
 	void setMinValue(double);
 	void setMaxValue(double);
@@ -186,6 +188,7 @@ private:
 	double clamp(double val, double min, double max);
 
 	QLabel *m_label;
+	InfoIconWidget *m_infoIcon;
 	QLineEdit *m_edit;
 	QComboBox *m_scaleCb;
 	QPushButton *m_plus;

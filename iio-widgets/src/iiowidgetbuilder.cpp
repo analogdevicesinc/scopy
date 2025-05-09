@@ -239,6 +239,7 @@ void IIOWidgetBuilder::clear()
 	m_uiStrategy = UIS::NoUIStrategy;
 	m_widgetParent = nullptr;
 	m_title = "";
+	m_infoMessage = "";
 }
 
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
@@ -322,6 +323,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::parent(QWidget *parent)
 IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
 {
 	m_title = title;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::infoMessage(QString infoMessage)
+{
+	m_infoMessage = infoMessage;
 	return *this;
 }
 
@@ -441,6 +448,9 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	if(!m_title.isEmpty() && ui != nullptr) {
 		ui->setCustomTitle(m_title);
+	}
+	if(!m_infoMessage.isEmpty()) {
+		ui->setInfoMessage(m_infoMessage);
 	}
 
 	return ui;

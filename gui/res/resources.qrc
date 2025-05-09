@@ -176,6 +176,7 @@
         <file>icons/circle_led.svg</file>
         <file>icons/device-shapes/square.svg</file>
         <file>icons/device-shapes/rounded_square.svg</file>
+        <file>icons/info.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

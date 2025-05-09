@@ -64,6 +64,8 @@ bool RangeAttrUi::isValid()
 
 void RangeAttrUi::setCustomTitle(QString title) { m_spinBox->setName(title); }
 
+void RangeAttrUi::setInfoMessage(QString infoMessage) { m_spinBox->setInfoMessage(infoMessage); }
+
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
 	QSignalBlocker blocker(m_spinBox);
