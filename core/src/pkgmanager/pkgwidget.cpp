@@ -34,6 +34,7 @@
 #include <pkgzipwidget.h>
 #include <pkggridwidget.h>
 #include <pkginstalledtab.h>
+#include <pluginstab.h>
 
 using namespace scopy;
 
@@ -50,8 +51,11 @@ PkgWidget::PkgWidget(QWidget *parent)
 
 	PkgInstalledTab *installedTab = new PkgInstalledTab(m_tabWidget);
 
+	PluginsTab *pluginsTab = new PluginsTab(m_tabWidget);
+
 	m_tabWidget->addTab(installedTab, "Installed");
 	m_tabWidget->addTab(zipWidget, "Install from file");
+	m_tabWidget->addTab(pluginsTab, "Plugins info");
 
 	QWidget *restartW = createRestartWidget(this);
 	restartW->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
