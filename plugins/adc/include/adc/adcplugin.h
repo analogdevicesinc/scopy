@@ -68,6 +68,7 @@ public:
 	bool loadIcon() override;
 	void loadToolList() override;
 	QString description() override;
+	QString pkgName() override;
 	QString about() override;
 	QString version() override;
 	bool onConnect() override;

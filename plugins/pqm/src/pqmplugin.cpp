@@ -20,6 +20,7 @@
  */
 
 #include "pqmplugin.h"
+#include "scopy-pqm_config.h"
 
 #include <QLoggingCategory>
 #include <QPushButton>
@@ -128,7 +129,9 @@ void PQMPlugin::loadToolList()
 
 void PQMPlugin::unload() { delete m_infoPage; }
 
-QString PQMPlugin::description() { return "Adds functionality specific to PQM board"; }
+QString PQMPlugin::description() { return PQM_PLUGIN_DESCRIPTION; }
+
+QString PQMPlugin::pkgName() { return PQM_PKG_NAME; }
 
 bool PQMPlugin::onConnect()
 {

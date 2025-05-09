@@ -55,6 +55,7 @@ public:
 	bool compatible(QString param, QString category) override;
 	void initMetadata() override;
 	QString description() override;
+	QString pkgName() override;
 
 public Q_SLOTS:
 	bool onConnect() override;

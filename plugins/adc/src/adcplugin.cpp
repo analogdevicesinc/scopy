@@ -40,6 +40,7 @@
 
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
+#include "scopy-adc_config.h"
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -479,6 +480,8 @@ void ADCPlugin::saveSettings(QSettings &s) {}
 void ADCPlugin::loadSettings(QSettings &s) {}
 
 QString ADCPlugin::description() { return "Tool for generic IIO ADC visualization and control"; }
+
+QString ADCPlugin::pkgName() { return ADC_PKG_NAME; }
 
 QString ADCPlugin::about()
 {

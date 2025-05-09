@@ -338,6 +338,13 @@ public:
 	 */
 	virtual PingTask *pingTask() = 0;
 
+	/**
+	 * @brief package name
+	 * @return plugin package name
+	 * Default implementation in PluginBase
+	 */
+	virtual QString pkgName() = 0;
+
 public Q_SLOTS:
 	/**
 	 * @brief onConnect

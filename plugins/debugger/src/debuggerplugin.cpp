@@ -23,6 +23,7 @@
 
 #include "debugger/debuggerinstrument.h"
 #include "iioexplorerinstrument.h"
+#include <scopy-debugger_config.h>
 
 #include <iio.h>
 
@@ -107,6 +108,8 @@ void DebuggerPlugin::loadToolList()
 void DebuggerPlugin::unload() {}
 
 QString DebuggerPlugin::description() { return "IIO context explorer tool"; }
+
+QString DebuggerPlugin::pkgName() { return DEBUGGER_PKG_NAME; }
 
 QString DebuggerPlugin::version() { return "0.1"; }
 
