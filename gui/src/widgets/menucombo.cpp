@@ -49,6 +49,8 @@ QString MenuComboWidget::title() const { return m_combo->title(); }
 
 void MenuComboWidget::setTitle(const QString &newTitle) { m_combo->setTitle(newTitle); }
 
+void MenuComboWidget::setInfoMessage(QString infoMessage) { m_combo->setInfoMessage(infoMessage); }
+
 MenuCombo::MenuCombo(QString title, QWidget *parent)
 	: QWidget(parent)
 {
@@ -63,9 +65,19 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 	m_label = new QLabel(title, this);
 	Style::setStyle(m_label, style::properties::label::subtle);
 
+	m_infoIcon = new InfoIconWidget("", parent);
+
 	m_combo = new QComboBox(this);
 
-	lay->addWidget(m_label);
+	QHBoxLayout *labelLayout = new QHBoxLayout();
+	labelLayout->setContentsMargins(0, 0, 0, 0);
+	labelLayout->setSpacing(5);
+
+	labelLayout->addWidget(m_label);
+	labelLayout->addWidget(m_infoIcon);
+	labelLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
+	lay->addLayout(labelLayout);
 	lay->addWidget(m_combo);
 	m_mouseWheelGuard->installEventRecursively(this);
 }
@@ -76,5 +88,7 @@ QComboBox *MenuCombo::combo() { return m_combo; }
 QString MenuCombo::title() const { return m_label->text(); }
 
 void MenuCombo::setTitle(const QString &newTitle) { m_label->setText(newTitle); }
+
+void MenuCombo::setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
 
 #include "moc_menucombo.cpp"

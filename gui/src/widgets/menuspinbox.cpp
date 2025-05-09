@@ -34,6 +34,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	m_label = new QLabel(name, parent);
 	Style::setStyle(m_label, style::properties::label::subtle);
 
+	m_infoIcon = new InfoIconWidget("", parent);
+
 	m_edit = new QLineEdit("0", parent);
 	m_scaleCb = new QComboBox(parent);
 	m_plus = new QPushButton("", parent);
@@ -110,7 +112,14 @@ void MenuSpinbox::layoutVertically(bool left)
 	btnLay->addWidget(m_plus);
 	btnLay->addWidget(m_minus);
 
-	editLay->addWidget(m_label);
+	QHBoxLayout *labelLayout = new QHBoxLayout();
+	labelLayout->setContentsMargins(0, 0, 0, 0);
+	labelLayout->setSpacing(2);
+	labelLayout->addWidget(m_label);
+	labelLayout->addWidget(m_infoIcon);
+	labelLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
+
+	editLay->addItem(labelLayout);
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
@@ -170,6 +179,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	btnLay->addWidget(m_plus);
 
 	editLay->addWidget(m_label);
+	editLay->addWidget(m_infoIcon);
 	editLay->addWidget(m_edit);
 
 	editLay->addWidget(m_scaleCb);
@@ -375,6 +385,8 @@ void MenuSpinbox::setName(const QString &newName)
 	m_label->setText(m_name);
 	Q_EMIT nameChanged(newName);
 }
+
+void MenuSpinbox::setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
 
 double MenuSpinbox::getScaleForPrefix(QString prefix, Qt::CaseSensitivity s)
 {
