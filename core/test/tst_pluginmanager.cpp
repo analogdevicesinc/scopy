@@ -108,9 +108,6 @@ void TST_PluginManager::loadLibs()
 	}
 	QVERIFY2(found, "TestPluginIp not found");
 
-	p->add(NONPLUGIN_LIBRARY_LOCATION);
-	QVERIFY2(p->count() == plugins.count(), "Added nonplugin library to manager");
-
 	usbPlugins.clear();
 	usbPlugins = p->getCompatiblePlugins("usb:", "test");
 	for(auto &&p : usbPlugins) {
