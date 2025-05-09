@@ -133,4 +133,10 @@ QList<Plugin *> PluginRepository::getCompatiblePlugins(const QString &param, con
 	return pm->getCompatiblePlugins(param, category);
 }
 
+QList<PluginInfo> PluginRepository::getPluginsInfo()
+{
+	PluginManager *pm = getPluginManager();
+	return pm->getPluginsInfo();
+}
+
 #include "moc_pluginrepository.cpp"
