@@ -26,7 +26,7 @@
 
 #include <QList>
 #include <QObject>
-
+#include "plugininfo.h"
 #include <pluginbase/plugin.h>
 
 namespace scopy {
@@ -39,11 +39,14 @@ public:
 	void add(QStringList pluginFileList);
 	void add(QString pluginFileName);
 	int count();
-	void sort();
+	void sort(bool ascending = false);
 	void clear();
 	QList<Plugin *> getOriginalPlugins() const;
 	QList<Plugin *> getPlugins(QString category = "");
 	QList<Plugin *> getCompatiblePlugins(QString param, QString category = "");
+	QList<PluginInfo> getPluginsInfo() const;
+	QList<PluginInfo> getLoadedPlugins() const;
+	QList<PluginInfo> getUnloadedPlugins() const;
 	void setMetadata(QJsonObject metadata);
 	QJsonObject metadata() const;
 
@@ -52,7 +55,7 @@ Q_SIGNALS:
 
 private:
 	Plugin *loadPlugin(QString file);
-	QList<Plugin *> list;
+	QList<PluginInfo> m_plugins;
 	QJsonObject m_metadata;
 
 	void applyMetadata(Plugin *plugin, QJsonObject *metadata);
