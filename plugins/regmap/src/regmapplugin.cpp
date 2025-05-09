@@ -291,6 +291,8 @@ void RegmapPlugin::initMetadata()
 QString RegmapPlugin::description() { return REGMAP_PLUGIN_DESCRIPTION; }
 QString RegmapPlugin::displayName() { return REGMAP_PLUGIN_DISPLAY_NAME; }
 
+QString RegmapPlugin::pkgName() { return REGMAP_PKG_NAME; }
+
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 
 void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
