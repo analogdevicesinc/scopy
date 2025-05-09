@@ -33,6 +33,7 @@
 #include <whatsnewoverlay.h>
 #include <pkgmanager.h>
 #include <pkgwidget.h>
+#include <pluginstab.h>
 
 #include <common/debugtimer.h>
 #include "logging_categories.h"
@@ -358,12 +359,14 @@ void ScopyMainWindow::initAboutPage()
 		return;
 	}
 	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
-	for(Plugin *p : plugin) {
+	for(Plugin *p : qAsConst(plugin)) {
 		QString content = p->about();
 		if(!content.isEmpty()) {
 			about->addHorizontalTab(about->buildPage(content), p->name());
 		}
 	}
+	PluginsTab *pluginsTab = new PluginsTab();
+	about->addHorizontalTab(pluginsTab, "Plugins info");
 	DEBUGTIMER_LOG(benchmark, "Init about page took:");
 }
 
@@ -375,7 +378,7 @@ void ScopyMainWindow::initPreferencesPage()
 	}
 
 	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
-	for(Plugin *p : plugin) {
+	for(Plugin *p : qAsConst(plugin)) {
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
 			prefPage->addHorizontalTab(p->preferencesPage(), p->name());
