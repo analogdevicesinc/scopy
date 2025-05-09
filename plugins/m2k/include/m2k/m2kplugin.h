@@ -66,6 +66,7 @@ public:
 	void loadSettings(QSettings &s) override;
 
 	QString description() override;
+	QString pkgName() override;
 
 public Q_SLOTS:
 	void showPageCallback() override;

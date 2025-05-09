@@ -33,6 +33,7 @@
 #include "patterngenerator/pattern_generator.h"
 #include "power_controller.hpp"
 #include "qtextbrowser.h"
+#include "scopy-m2k_config.h"
 #include "signal_generator.hpp"
 #include "spectrum_analyzer.hpp"
 
@@ -583,6 +584,8 @@ QString M2kPlugin::description()
 	return "Implements ADALM2000 instruments - Oscilloscope, Spectrum Analyzer, Voltmeter, Network Analyzer, "
 	       "Signal Generator, Logic Analyzer, Pattern Generator, Digital I/O";
 }
+
+QString M2kPlugin::pkgName() { return M2K_PKG_NAME; }
 
 void M2kPlugin::initMetadata()
 {

@@ -29,6 +29,7 @@
 #include <deviceiconbuilder.h>
 #include <style.h>
 
+#include "scopy-swiot_config.h"
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
 #include "faults/faults.h"
@@ -381,6 +382,8 @@ void SWIOTPlugin::clearPingTask()
 }
 
 QString SWIOTPlugin::description() { return "Adds functionality specific to SWIOT1L board"; }
+
+QString SWIOTPlugin::pkgName() { return SWIOT_PKG_NAME; }
 
 void SWIOTPlugin::initMetadata()
 {
