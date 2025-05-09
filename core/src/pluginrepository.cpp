@@ -127,6 +127,18 @@ QList<Plugin *> PluginRepository::getPlugins(QString category)
 	return pm->getPlugins(category);
 }
 
+QList<PluginManager::PluginInfo> PluginRepository::getUnloadedPlugins()
+{
+	PluginManager *pm = getPluginManager();
+	return pm->getUnloadedPlugins();
+}
+
+QList<PluginManager::PluginInfo> PluginRepository::getLoadedPlugins()
+{
+	PluginManager *pm = getPluginManager();
+	return pm->getLoadedPlugins();
+}
+
 QList<Plugin *> PluginRepository::getCompatiblePlugins(const QString &param, const QString &category)
 {
 	PluginManager *pm = getPluginManager();
