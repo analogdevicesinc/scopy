@@ -51,6 +51,7 @@ public:
 	void unload() override;
 	void initMetadata() override;
 	QString description() override;
+	QString pkgName() override;
 	QString version() override;
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;

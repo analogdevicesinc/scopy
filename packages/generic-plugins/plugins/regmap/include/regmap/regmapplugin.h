@@ -65,6 +65,7 @@ public:
 	void initMetadata() override;
 	QString description() override;
 	QString displayName() override;
+	QString pkgName() override;
 
 	QWidget *getTool();
 

@@ -40,6 +40,7 @@
 #include <gui/preferenceshelper.h>
 
 #include <pluginbase/scopyjs.h>
+#include <scopy-datalogger_config.h>
 
 Q_LOGGING_CATEGORY(CAT_DATALOGGERLUGIN, "DataLoggerPlugin")
 using namespace scopy::datamonitor;
@@ -316,5 +317,7 @@ bool DataLoggerPlugin::loadPreferencesPage()
 }
 
 QString DataLoggerPlugin::description() { return "Use IIO raw and scale attributes to plot and save data"; }
+
+QString DataLoggerPlugin::pkgName() { return DATALOGGER_PKG_NAME; }
 
 #include "moc_dataloggerplugin.cpp"
