@@ -34,6 +34,16 @@ class SCOPY_CORE_EXPORT PluginManager : public QObject
 {
 	Q_OBJECT
 public:
+	typedef struct
+	{
+		QString filePath;
+		QString name;
+		bool isLoaded;
+		QString details;
+		// Plugin *plugin; ??? this approach help us the handle both loaded and unloaded plugins using a single
+		// QList
+	} PluginInfo;
+
 	PluginManager(QObject *parent = nullptr);
 	~PluginManager();
 	void add(QStringList pluginFileList);
@@ -44,6 +54,8 @@ public:
 	QList<Plugin *> getOriginalPlugins() const;
 	QList<Plugin *> getPlugins(QString category = "");
 	QList<Plugin *> getCompatiblePlugins(QString param, QString category = "");
+	QList<PluginInfo> getUnloadedPlugins() const;
+	QList<PluginInfo> getLoadedPlugins() const;
 	void setMetadata(QJsonObject metadata);
 	QJsonObject metadata() const;
 
@@ -53,6 +65,8 @@ Q_SIGNALS:
 private:
 	Plugin *loadPlugin(QString file);
 	QList<Plugin *> list;
+	// could potentially replace the "list" member
+	QList<PluginInfo> plugins;
 	QJsonObject m_metadata;
 
 	void applyMetadata(Plugin *plugin, QJsonObject *metadata);
