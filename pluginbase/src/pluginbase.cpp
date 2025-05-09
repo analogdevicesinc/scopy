@@ -95,6 +95,8 @@ QString PluginBase::param() { return m_param; }
 
 QString PluginBase::name() { return m_name; }
 
+QString PluginBase::pkgName() { return ""; }
+
 QString PluginBase::displayName() { return m_displayName; }
 
 QString PluginBase::displayParam() { return m_displayParam; }

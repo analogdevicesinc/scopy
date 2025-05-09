@@ -23,6 +23,7 @@
 #include "dac_logging_categories.h"
 #include "dacinstrument.h"
 #include "dacutils.h"
+#include "scopy-dac_config.h"
 
 #include <QLabel>
 #include <deviceiconbuilder.h>
@@ -108,6 +109,8 @@ void DACPlugin::unload()
 }
 
 QString DACPlugin::description() { return "Tool for generic IIO DAC control."; }
+
+QString DACPlugin::pkgName() { return DAC_PKG_NAME; }
 
 QString DACPlugin::about()
 {
