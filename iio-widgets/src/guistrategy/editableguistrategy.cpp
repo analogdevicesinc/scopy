@@ -92,3 +92,5 @@ void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 }
 
 #include "moc_editableguistrategy.cpp"
+
+void EditableGuiStrategy::setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }

@@ -50,7 +50,7 @@ public:
 	bool isValid() override;
 
 	void setCustomTitle(QString title) override;
-	void setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
+	void setInfoMessage(QString infoMessage) override;
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;

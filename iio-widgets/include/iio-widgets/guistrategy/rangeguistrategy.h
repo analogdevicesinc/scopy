@@ -52,7 +52,7 @@ public:
 
 	void setCustomTitle(QString title) override;
 
-	void setInfoMessage(QString infoMessage);
+	void setInfoMessage(QString infoMessage) override;
 
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
