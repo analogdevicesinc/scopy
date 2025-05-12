@@ -24,6 +24,7 @@
 #include <QLabel>
 
 #include <style.h>
+#include <gui/deviceiconbuilder.h>
 #include <iioutil/connectionprovider.h>
 
 #include "ad9084.h"
@@ -59,7 +60,16 @@ bool AD9084Plugin::loadPage() { return false; }
 
 bool AD9084Plugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("APOLLO");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
