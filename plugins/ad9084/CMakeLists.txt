@@ -27,15 +27,7 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 set(PLUGIN_DISPLAY_NAME "AD9084")
-set(PLUGIN_DESCRIPTION
-    ""TOOL
-    FOR
-    APOLLO
-    MXFE
-    QUAD
-    AD9084
-    INTERACTION.""
-)
+set(PLUGIN_DESCRIPTION "Apollo MXFE QUAD AD9084 interaction.")
 
 include(GenerateExportHeader)
 
