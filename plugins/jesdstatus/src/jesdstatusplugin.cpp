@@ -86,7 +86,7 @@ void JesdStatusPlugin::unload()
 { /*delete m_infoPage;*/
 }
 
-QString JesdStatusPlugin::description() { return "Tool for exposing JESD status in compatible devices"; }
+QString JesdStatusPlugin::description() { return "JESD status GUI tool for compatible devices"; }
 
 bool JesdStatusPlugin::onConnect()
 {

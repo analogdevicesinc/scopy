@@ -27,7 +27,7 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 set(PLUGIN_DISPLAY_NAME "JESDSTATUS")
-set(PLUGIN_DESCRIPTION" TOOL FOR EXPOSING JESD STATUS IN COMPATIBLE DEVICES")
+set(PLUGIN_DESCRIPTION "JESD status GUI tool for compatible devices")
 
 include(GenerateExportHeader)
 
