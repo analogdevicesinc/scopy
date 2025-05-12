@@ -177,7 +177,13 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	Q_EMIT triggerRead();
 }
 
-Ad9084::~Ad9084() {}
+Ad9084::~Ad9084()
+{
+	while(!m_iioWidgetGroups.isEmpty()) {
+		auto grp = m_iioWidgetGroups.takeFirst();
+		delete grp;
+	}
+}
 
 void Ad9084::scanChannels()
 {
@@ -197,21 +203,27 @@ void Ad9084::scanChannels()
 	}
 	mapPathsUnique();
 
+	IIOWidgetGroup *adcFrequencyGrp = new IIOWidgetGroup(false, this);
+	m_iioWidgetGroups.push_back(adcFrequencyGrp);
 	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
 		QString chn = m_rx_coarse_ddc_channel_names.at(i);
 		struct iio_channel *rxchn = iio_device_find_channel(m_device, chn.toUtf8(), false);
 		Ad9084Channel *rxchnWidget = new Ad9084Channel(rxchn, i, this);
 		connect(this, &Ad9084::triggerRead, rxchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsRx.push_back(rxchnWidget);
+		rxchnWidget->addGroup(ad9084::ADC_FREQUENCY, adcFrequencyGrp);
 		rxchnWidget->init();
 	}
 
+	IIOWidgetGroup *dacFrequencyGrp = new IIOWidgetGroup(false, this);
+	m_iioWidgetGroups.push_back(dacFrequencyGrp);
 	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
 		QString chn = m_tx_coarse_duc_channel_names.at(i);
 		struct iio_channel *txchn = iio_device_find_channel(m_device, chn.toUtf8(), true);
 		Ad9084Channel *txchnWidget = new Ad9084Channel(txchn, i, this);
 		connect(this, &Ad9084::triggerRead, txchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsTx.push_back(txchnWidget);
+		txchnWidget->addGroup(ad9084::DAC_FREQUENCY, dacFrequencyGrp);
 		txchnWidget->init();
 	}
 }
