@@ -1,0 +1,1648 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE context [
+<!ELEMENT context (device | context-attribute)*>
+<!ELEMENT context-attribute EMPTY>
+<!ELEMENT device (channel | attribute | debug-attribute | buffer-attribute)*>
+<!ELEMENT channel (scan-element?, attribute*)>
+<!ELEMENT attribute EMPTY>
+<!ELEMENT scan-element EMPTY>
+<!ELEMENT debug-attribute EMPTY>
+<!ELEMENT buffer-attribute EMPTY>
+<!ATTLIST context name CDATA #REQUIRED description CDATA #IMPLIED>
+<!ATTLIST context-attribute name CDATA #REQUIRED value CDATA #REQUIRED>
+<!ATTLIST device id CDATA #REQUIRED name CDATA #IMPLIED>
+<!ATTLIST channel id CDATA #REQUIRED type (input|output) #REQUIRED name CDATA #IMPLIED>
+<!ATTLIST scan-element index CDATA #REQUIRED format CDATA #REQUIRED scale CDATA #IMPLIED>
+<!ATTLIST attribute name CDATA #REQUIRED filename CDATA #IMPLIED value CDATA #IMPLIED>
+<!ATTLIST debug-attribute name CDATA #REQUIRED value CDATA #IMPLIED>
+<!ATTLIST buffer-attribute name CDATA #REQUIRED value CDATA #IMPLIED>]>
+<context name="network" description="10.44.3.65 Linux analog-vck190 6.6.0+ #275 SMP Thu Mar  6 16:28:13 CET 2025 aarch64" >
+	<context-attribute name="hw_carrier" value="Analog Devices AD9084-FMCA-EBZ (Rev. B0) @Xilinx/vck190" />
+	<context-attribute name="hw_model" value="AD9084-FMCA-EBZ on Analog Devices AD9084-FMCA-EBZ (Rev. B0) @Xilinx/vck190" />
+	<context-attribute name="hdl_system_id" value="[ad9084_fmcb_ebz] on [vck190] git branch [dev_apollo_fsrc_2] git [15e2002623da75379a7ead32af02c9ca988430f0] dirty [2025-02-18 14:37:11] UTC" />
+	<context-attribute name="local,kernel" value="6.6.0+" />
+	<context-attribute name="uri" value="ip:10.44.3.65" />
+	<context-attribute name="ip,ip-addr" value="10.44.3.65" />
+	<device id="iio:device0" name="xlnx,versal-sysmon" >
+		<channel id="temp160" name="temp" type="input" >
+			<attribute name="input" filename="in_temp160_temp_input" value="47.539062500" />
+			<attribute name="label" filename="in_temp160_temp_label" value="temp" />
+			<attribute name="raw" filename="in_temp160_temp_raw" value="6079" />
+		</channel>
+		<channel id="temp162" name="max_max" type="input" >
+			<attribute name="input" filename="in_temp162_max_max_input" value="48.320312500" />
+			<attribute name="label" filename="in_temp162_max_max_label" value="max_max" />
+			<attribute name="raw" filename="in_temp162_max_max_raw" value="6185" />
+		</channel>
+		<channel id="temp163" name="min_min" type="input" >
+			<attribute name="input" filename="in_temp163_min_min_input" value="39.226562500" />
+			<attribute name="label" filename="in_temp163_min_min_label" value="min_min" />
+			<attribute name="raw" filename="in_temp163_min_min_raw" value="5021" />
+		</channel>
+		<channel id="temp161" name="min" type="input" >
+			<attribute name="input" filename="in_temp161_min_input" value="44.093750000" />
+			<attribute name="label" filename="in_temp161_min_label" value="min" />
+			<attribute name="raw" filename="in_temp161_min_raw" value="5667" />
+		</channel>
+		<channel id="temp165" type="input" >
+			<attribute name="ot_label" filename="in_temp165_ot_label" value="ot" />
+		</channel>
+		<channel id="temp164" type="input" >
+			<attribute name="temp_label" filename="in_temp164_temp_label" value="temp" />
+		</channel>
+		<attribute name="waiting_for_supplier" value="0" />
+	</device>
+	<device id="iio:device1" name="adf4382" >
+		<channel id="altvoltage1" type="output" >
+			<attribute name="en" filename="out_altvoltage1_en" value="1" />
+			<attribute name="en_auto_align" filename="out_altvoltage_en_auto_align" value="1" />
+			<attribute name="frequency" filename="out_altvoltage_frequency" value="20000000000" />
+			<attribute name="hardwaregain" filename="out_altvoltage1_hardwaregain" value="0" />
+			<attribute name="phase" filename="out_altvoltage_phase" value="250" />
+		</channel>
+		<channel id="altvoltage0" type="output" >
+			<attribute name="en" filename="out_altvoltage0_en" value="1" />
+			<attribute name="en_auto_align" filename="out_altvoltage_en_auto_align" value="1" />
+			<attribute name="frequency" filename="out_altvoltage_frequency" value="20000000000" />
+			<attribute name="hardwaregain" filename="out_altvoltage0_hardwaregain" value="11" />
+			<attribute name="phase" filename="out_altvoltage_phase" value="250" />
+		</channel>
+		<attribute name="waiting_for_supplier" value="0" />
+		<debug-attribute name="coarse_current" value="0" />
+		<debug-attribute name="fine_current" value="0" />
+		<debug-attribute name="bleed_pol" value="0" />
+		<debug-attribute name="del_cnt_raw" value="0" />
+		<debug-attribute name="direct_reg_access" value="0x18" />
+	</device>
+	<device id="iio:device2" name="hmc7044" >
+		<channel id="altvoltage10" name="FPGA_REFCLK" type="output" >
+			<attribute name="frequency" filename="out_altvoltage10_FPGA_REFCLK_frequency" value="312500000" />
+			<attribute name="label" filename="out_altvoltage10_FPGA_REFCLK_label" value="FPGA_REFCLK" />
+			<attribute name="phase" filename="out_altvoltage10_FPGA_REFCLK_phase" value="0.000000" />
+		</channel>
+		<channel id="altvoltage8" name="CORE_CLK_TX" type="output" >
+			<attribute name="frequency" filename="out_altvoltage8_CORE_CLK_TX_frequency" value="312500000" />
+			<attribute name="label" filename="out_altvoltage8_CORE_CLK_TX_label" value="CORE_CLK_TX" />
+			<attribute name="phase" filename="out_altvoltage8_CORE_CLK_TX_phase" value="0.000000" />
+		</channel>
+		<channel id="altvoltage9" name="CORE_CLK_RX" type="output" >
+			<attribute name="frequency" filename="out_altvoltage9_CORE_CLK_RX_frequency" value="312500000" />
+			<attribute name="label" filename="out_altvoltage9_CORE_CLK_RX_label" value="CORE_CLK_RX" />
+			<attribute name="phase" filename="out_altvoltage9_CORE_CLK_RX_phase" value="0.000000" />
+		</channel>
+		<channel id="altvoltage1" name="ADF4030_REFIN" type="output" >
+			<attribute name="frequency" filename="out_altvoltage1_ADF4030_REFIN_frequency" value="125000000" />
+			<attribute name="label" filename="out_altvoltage1_ADF4030_REFIN_label" value="ADF4030_REFIN" />
+			<attribute name="phase" filename="out_altvoltage1_ADF4030_REFIN_phase" value="0.000000" />
+		</channel>
+		<channel id="altvoltage11" name="CORE_CLK_RX_B" type="output" >
+			<attribute name="frequency" filename="out_altvoltage11_CORE_CLK_RX_B_frequency" value="312500000" />
+			<attribute name="label" filename="out_altvoltage11_CORE_CLK_RX_B_label" value="CORE_CLK_RX_B" />
+			<attribute name="phase" filename="out_altvoltage11_CORE_CLK_RX_B_phase" value="0.000000" />
+		</channel>
+		<channel id="altvoltage3" name="ADF4030_BSYNC0" type="output" >
+			<attribute name="frequency" filename="out_altvoltage3_ADF4030_BSYNC0_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage3_ADF4030_BSYNC0_label" value="ADF4030_BSYNC0" />
+			<attribute name="phase" filename="out_altvoltage3_ADF4030_BSYNC0_phase" value="0.000000" />
+		</channel>
+		<channel id="altvoltage12" name="CORE_CLK_TX_B" type="output" >
+			<attribute name="frequency" filename="out_altvoltage12_CORE_CLK_TX_B_frequency" value="312500000" />
+			<attribute name="label" filename="out_altvoltage12_CORE_CLK_TX_B_label" value="CORE_CLK_TX_B" />
+			<attribute name="phase" filename="out_altvoltage12_CORE_CLK_TX_B_phase" value="0.000000" />
+		</channel>
+		<attribute name="mute_request" value="0" />
+		<attribute name="reseed_request" value="0" />
+		<attribute name="reset_dividers_request" value="0" />
+		<attribute name="sleep_request" value="0" />
+		<attribute name="sync_pin_mode" value="sync" />
+		<attribute name="sync_pin_mode_available" value="disable sync sysref sync_else_sysref" />
+		<attribute name="sysref_request" value="0" />
+		<attribute name="waiting_for_supplier" value="0" />
+		<debug-attribute name="status" value="ERROR" />
+		<debug-attribute name="direct_reg_access" value="0x0" />
+	</device>
+	<device id="iio:device3" name="adf4030" >
+		<channel id="altvoltage5" name="APOLLO_SYSREF" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage5_APOLLO_SYSREF_duty_cycle" value="50.002712" />
+			<attribute name="frequency" filename="out_altvoltage5_APOLLO_SYSREF_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage5_APOLLO_SYSREF_label" value="APOLLO_SYSREF" />
+			<attribute name="output_enable" filename="out_altvoltage5_APOLLO_SYSREF_output_enable" value="1" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage5_APOLLO_SYSREF_phase" value="2179095" />
+			<attribute name="reference_channel" filename="out_altvoltage5_APOLLO_SYSREF_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage8" name="SYSREF_IN_F" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage8_SYSREF_IN_F_duty_cycle" value="50.009167" />
+			<attribute name="frequency" filename="out_altvoltage8_SYSREF_IN_F_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage8_SYSREF_IN_F_label" value="SYSREF_IN_F" />
+			<attribute name="output_enable" filename="out_altvoltage8_SYSREF_IN_F_output_enable" value="1" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage8_SYSREF_IN_F_phase" value="-13203497" />
+			<attribute name="reference_channel" filename="out_altvoltage8_SYSREF_IN_F_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage1" name="BSYNC1_DEBUG" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage1_BSYNC1_DEBUG_duty_cycle" value="50.010520" />
+			<attribute name="frequency" filename="out_altvoltage1_BSYNC1_DEBUG_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage1_BSYNC1_DEBUG_label" value="BSYNC1_DEBUG" />
+			<attribute name="output_enable" filename="out_altvoltage1_BSYNC1_DEBUG_output_enable" value="1" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage1_BSYNC1_DEBUG_phase" value="-6744" />
+			<attribute name="reference_channel" filename="out_altvoltage1_BSYNC1_DEBUG_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage4" name="BOGUS4" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage4_BOGUS4_duty_cycle" value="ERROR" />
+			<attribute name="frequency" filename="out_altvoltage4_BOGUS4_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage4_BOGUS4_label" value="BOGUS4" />
+			<attribute name="output_enable" filename="out_altvoltage4_BOGUS4_output_enable" value="0" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage4_BOGUS4_phase" value="ERROR" />
+			<attribute name="reference_channel" filename="out_altvoltage4_BOGUS4_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage6" name="BOGUS6" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage6_BOGUS6_duty_cycle" value="ERROR" />
+			<attribute name="frequency" filename="out_altvoltage6_BOGUS6_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage6_BOGUS6_label" value="BOGUS6" />
+			<attribute name="output_enable" filename="out_altvoltage6_BOGUS6_output_enable" value="0" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage6_BOGUS6_phase" value="ERROR" />
+			<attribute name="reference_channel" filename="out_altvoltage6_BOGUS6_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage0" name="ADF4030_SCLKOUT3" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage0_ADF4030_SCLKOUT3_duty_cycle" value="49.998944" />
+			<attribute name="frequency" filename="out_altvoltage0_ADF4030_SCLKOUT3_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage0_ADF4030_SCLKOUT3_label" value="ADF4030_SCLKOUT3" />
+			<attribute name="output_enable" filename="out_altvoltage0_ADF4030_SCLKOUT3_output_enable" value="0" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage0_ADF4030_SCLKOUT3_phase" value="54" />
+			<attribute name="reference_channel" filename="out_altvoltage0_ADF4030_SCLKOUT3_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage3" name="BOGUS3" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage3_BOGUS3_duty_cycle" value="ERROR" />
+			<attribute name="frequency" filename="out_altvoltage3_BOGUS3_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage3_BOGUS3_label" value="BOGUS3" />
+			<attribute name="output_enable" filename="out_altvoltage3_BOGUS3_output_enable" value="0" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage3_BOGUS3_phase" value="ERROR" />
+			<attribute name="reference_channel" filename="out_altvoltage3_BOGUS3_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage2" name="BSYNC2_DEBUG" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage2_BSYNC2_DEBUG_duty_cycle" value="50.008338" />
+			<attribute name="frequency" filename="out_altvoltage2_BSYNC2_DEBUG_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage2_BSYNC2_DEBUG_label" value="BSYNC2_DEBUG" />
+			<attribute name="output_enable" filename="out_altvoltage2_BSYNC2_DEBUG_output_enable" value="0" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage2_BSYNC2_DEBUG_phase" value="-1876470" />
+			<attribute name="reference_channel" filename="out_altvoltage2_BSYNC2_DEBUG_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage7" name="BOGUS7" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage7_BOGUS7_duty_cycle" value="ERROR" />
+			<attribute name="frequency" filename="out_altvoltage7_BOGUS7_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage7_BOGUS7_label" value="BOGUS7" />
+			<attribute name="output_enable" filename="out_altvoltage7_BOGUS7_output_enable" value="0" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage7_BOGUS7_phase" value="ERROR" />
+			<attribute name="reference_channel" filename="out_altvoltage7_BOGUS7_reference_channel" value="0" />
+		</channel>
+		<channel id="altvoltage9" name="SYSREF_OUT_FMC" type="output" >
+			<attribute name="autoalign_iteration" filename="out_altvoltage_autoalign_iteration" value="8" />
+			<attribute name="autoalign_threshold" filename="out_altvoltage_autoalign_threshold" value="1400" />
+			<attribute name="autoalign_threshold_en" filename="out_altvoltage_autoalign_threshold_en" value="0" />
+			<attribute name="duty_cycle" filename="out_altvoltage9_SYSREF_OUT_FMC_duty_cycle" value="69.575411" />
+			<attribute name="frequency" filename="out_altvoltage9_SYSREF_OUT_FMC_frequency" value="9765625" />
+			<attribute name="label" filename="out_altvoltage9_SYSREF_OUT_FMC_label" value="SYSREF_OUT_FMC" />
+			<attribute name="output_enable" filename="out_altvoltage9_SYSREF_OUT_FMC_output_enable" value="1" />
+			<attribute name="oversampling_ratio" filename="out_altvoltage_oversampling_ratio" value="2097152" />
+			<attribute name="oversampling_ratio_available" filename="out_altvoltage_oversampling_ratio_available" value="64 128 256 512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576 2097152" />
+			<attribute name="phase" filename="out_altvoltage9_SYSREF_OUT_FMC_phase" value="-17148834" />
+			<attribute name="reference_channel" filename="out_altvoltage9_SYSREF_OUT_FMC_reference_channel" value="0" />
+		</channel>
+		<channel id="temp0" type="input" >
+			<attribute name="input" filename="in_temp0_input" value="56000" />
+		</channel>
+		<attribute name="waiting_for_supplier" value="0" />
+		<debug-attribute name="status" value="ERROR" />
+		<debug-attribute name="direct_reg_access" value="0x3C" />
+	</device>
+	<device id="iio:device4" name="axi_fsrc" >
+		<channel id="altvoltage0" type="output" >
+			<attribute name="frequency" filename="out_altvoltage0_frequency" value="ERROR" />
+			<attribute name="trig_enable" filename="out_altvoltage0_trig_enable" value="ERROR" />
+			<attribute name="tx_enable" filename="out_altvoltage0_tx_enable" value="ERROR" />
+			<attribute name="tx_pause" filename="out_altvoltage0_tx_pause" value="ERROR" />
+		</channel>
+		<attribute name="waiting_for_supplier" value="0" />
+	</device>
+	<device id="iio:device5" name="axi_aion_trig" >
+		<channel id="voltage3" type="input" >
+			<attribute name="en" filename="in_voltage3_en" value="1" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage3_phase" value="0" />
+			<attribute name="status" filename="in_voltage3_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage6" type="input" >
+			<attribute name="en" filename="in_voltage6_en" value="0" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage6_phase" value="0" />
+			<attribute name="status" filename="in_voltage6_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage0" type="input" >
+			<attribute name="en" filename="in_voltage0_en" value="1" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage0_phase" value="0" />
+			<attribute name="status" filename="in_voltage0_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage1" type="input" >
+			<attribute name="en" filename="in_voltage1_en" value="1" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage1_phase" value="0" />
+			<attribute name="status" filename="in_voltage1_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage7" type="input" >
+			<attribute name="en" filename="in_voltage7_en" value="0" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage7_phase" value="0" />
+			<attribute name="status" filename="in_voltage7_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage2" type="input" >
+			<attribute name="en" filename="in_voltage2_en" value="1" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage2_phase" value="0" />
+			<attribute name="status" filename="in_voltage2_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage4" type="input" >
+			<attribute name="en" filename="in_voltage4_en" value="0" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage4_phase" value="0" />
+			<attribute name="status" filename="in_voltage4_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<channel id="voltage5" type="input" >
+			<attribute name="en" filename="in_voltage5_en" value="0" />
+			<attribute name="frequency" filename="in_voltage_frequency" value="9765625" />
+			<attribute name="internal_bsync_enable" filename="in_voltage_internal_bsync_enable" value="1" />
+			<attribute name="output_enable" filename="in_voltage_output_enable" value="0" />
+			<attribute name="phase" filename="in_voltage5_phase" value="0" />
+			<attribute name="status" filename="in_voltage5_status" value="ERROR" />
+			<attribute name="trigger_now" filename="in_voltage_trigger_now" value="0" />
+			<attribute name="trigger_select_gpio_enable" filename="in_voltage_trigger_select_gpio_enable" value="1" />
+		</channel>
+		<attribute name="waiting_for_supplier" value="0" />
+		<debug-attribute name="debug_trig" value="0" />
+		<debug-attribute name="enable_debug_trig" value="0" />
+		<debug-attribute name="direct_reg_access" value="0x10061" />
+	</device>
+	<device id="iio:device8" name="axi-ad9084-tx-hpc" >
+		<channel id="voltage0_i" type="output" >
+			<scan-element index="0" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage0_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage0_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage0_q" type="output" >
+			<scan-element index="1" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage0_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage0_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_i" type="output" >
+			<scan-element index="2" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage1_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage1_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_q" type="output" >
+			<scan-element index="3" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage1_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage1_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_i" type="output" >
+			<scan-element index="4" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage2_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage2_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_q" type="output" >
+			<scan-element index="5" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage2_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage2_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage3_i" type="output" >
+			<scan-element index="6" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage3_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage3_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage3_q" type="output" >
+			<scan-element index="7" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage3_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage3_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="altvoltage11" name="TX3_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage11_TX3_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage11_TX3_Q_F2_label" value="TX3_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage11_TX3_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage11_TX3_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage11_TX3_Q_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage3" name="TX1_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage3_TX1_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage3_TX1_Q_F2_label" value="TX1_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage3_TX1_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage3_TX1_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage3_TX1_Q_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage9" name="TX3_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage9_TX3_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage9_TX3_I_F2_label" value="TX3_I_F2" />
+			<attribute name="phase" filename="out_altvoltage9_TX3_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage9_TX3_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage9_TX3_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage5" name="TX2_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage5_TX2_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage5_TX2_I_F2_label" value="TX2_I_F2" />
+			<attribute name="phase" filename="out_altvoltage5_TX2_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage5_TX2_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage5_TX2_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage2" name="TX1_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage2_TX1_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage2_TX1_Q_F1_label" value="TX1_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage2_TX1_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage2_TX1_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage2_TX1_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage8" name="TX3_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage8_TX3_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage8_TX3_I_F1_label" value="TX3_I_F1" />
+			<attribute name="phase" filename="out_altvoltage8_TX3_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage8_TX3_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage8_TX3_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage12" name="TX4_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage12_TX4_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage12_TX4_I_F1_label" value="TX4_I_F1" />
+			<attribute name="phase" filename="out_altvoltage12_TX4_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage12_TX4_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage12_TX4_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage1" name="TX1_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage1_TX1_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage1_TX1_I_F2_label" value="TX1_I_F2" />
+			<attribute name="phase" filename="out_altvoltage1_TX1_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage1_TX1_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage1_TX1_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage7" name="TX2_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage7_TX2_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage7_TX2_Q_F2_label" value="TX2_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage7_TX2_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage7_TX2_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage7_TX2_Q_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage4" name="TX2_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage4_TX2_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage4_TX2_I_F1_label" value="TX2_I_F1" />
+			<attribute name="phase" filename="out_altvoltage4_TX2_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage4_TX2_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage4_TX2_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage14" name="TX4_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage14_TX4_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage14_TX4_Q_F1_label" value="TX4_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage14_TX4_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage14_TX4_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage14_TX4_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage13" name="TX4_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage13_TX4_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage13_TX4_I_F2_label" value="TX4_I_F2" />
+			<attribute name="phase" filename="out_altvoltage13_TX4_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage13_TX4_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage13_TX4_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage0" name="TX1_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage0_TX1_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage0_TX1_I_F1_label" value="TX1_I_F1" />
+			<attribute name="phase" filename="out_altvoltage0_TX1_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage0_TX1_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage0_TX1_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage10" name="TX3_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage10_TX3_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage10_TX3_Q_F1_label" value="TX3_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage10_TX3_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage10_TX3_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage10_TX3_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage6" name="TX2_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage6_TX2_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage6_TX2_Q_F1_label" value="TX2_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage6_TX2_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage6_TX2_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage6_TX2_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage15" name="TX4_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage15_TX4_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage15_TX4_Q_F2_label" value="TX4_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage15_TX4_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage15_TX4_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage15_TX4_Q_F2_scale" value="0.250000" />
+		</channel>
+		<attribute name="sync_start_enable" value="disarm" />
+		<attribute name="sync_start_enable_available" value="arm disarm trigger_manual" />
+		<attribute name="waiting_for_supplier" value="0" />
+		<buffer-attribute name="data_available" value="0" />
+		<buffer-attribute name="direction" value="out" />
+		<buffer-attribute name="length_align_bytes" value="32" />
+		<debug-attribute name="pl_ddr_fifo_enable" value="1" />
+		<debug-attribute name="direct_reg_access" value="0x90262" />
+	</device>
+	<device id="iio:device9" name="axi-ad9084-rx-hpc" >
+		<channel id="voltage0_i" type="input" >
+			<scan-element index="0" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage0_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage0_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage0_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage0_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage0_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage0_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage0_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage0_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage0_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage0_i_label" value="Side-A:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage0_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage0_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage0_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage0_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage0_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage0_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage0_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage0_q" type="input" >
+			<scan-element index="1" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage0_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage0_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage0_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage0_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage0_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage0_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage0_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage0_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage0_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage0_q_label" value="Side-A:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage0_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage0_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage0_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage0_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage0_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage0_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage0_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage1_i" type="input" >
+			<scan-element index="2" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage1_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage1_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage1_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage1_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage1_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage1_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage1_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage1_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage1_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage1_i_label" value="Side-A:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage1_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage1_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage1_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage1_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage1_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage1_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage1_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage1_q" type="input" >
+			<scan-element index="3" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage1_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage1_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage1_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage1_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage1_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage1_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage1_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage1_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage1_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage1_q_label" value="Side-A:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage1_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage1_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage1_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage1_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage1_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage1_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage1_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage2_i" type="input" >
+			<scan-element index="4" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage2_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage2_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage2_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage2_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage2_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage2_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage2_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage2_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage2_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage2_i_label" value="Side-B:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage2_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage2_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage2_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage2_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage2_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage2_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage2_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage2_q" type="input" >
+			<scan-element index="5" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage2_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage2_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage2_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage2_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage2_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage2_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage2_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage2_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage2_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage2_q_label" value="Side-B:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage2_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage2_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage2_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage2_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage2_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage2_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage2_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage3_i" type="input" >
+			<scan-element index="6" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage3_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage3_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage3_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage3_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage3_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage3_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage3_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage3_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage3_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage3_i_label" value="Side-B:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage3_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage3_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage3_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage3_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage3_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage3_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage3_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage3_q" type="input" >
+			<scan-element index="7" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage3_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage3_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage3_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage3_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage3_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage3_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage3_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage3_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage3_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage3_q_label" value="Side-B:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage3_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage3_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage3_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage3_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage3_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage3_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage3_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage3_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage3_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage3_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage3_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage3_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage3_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage3_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage3_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage3_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage3_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage3_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage3_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage3_i_label" value="Side-B:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage3_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage3_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage3_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage3_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage2_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage2_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage2_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage2_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage2_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage2_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage2_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage2_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage2_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage2_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage2_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage2_q_label" value="Side-B:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage2_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage2_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage2_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage2_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage0_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage0_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage0_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage0_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage0_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage0_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage0_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage0_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage0_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage0_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage0_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage0_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage0_i_label" value="Side-A:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage0_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage0_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage0_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage0_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage1_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage1_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage1_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage1_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage1_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage1_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage1_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage1_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage1_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage1_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage1_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage1_i_label" value="Side-A:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage1_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage1_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage1_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage1_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage2_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage2_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage2_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage2_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage2_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage2_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage2_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage2_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage2_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage2_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage2_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage2_i_label" value="Side-B:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage2_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage2_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage2_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage2_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage0_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage0_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage0_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage0_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage0_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage0_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage0_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage0_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage0_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage0_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage0_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage0_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage0_q_label" value="Side-A:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage0_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage0_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage0_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage0_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage3_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage3_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage3_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage3_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage3_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage3_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage3_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage3_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage3_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage3_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage3_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage3_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage3_q_label" value="Side-B:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage3_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage3_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage3_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage3_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage1_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage1_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage1_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage1_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage1_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage1_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage1_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage1_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage1_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage1_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage1_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage1_q_label" value="Side-A:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage1_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage1_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage1_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage1_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="temp0" type="input" >
+			<attribute name="input" filename="in_temp0_input" value="49000" />
+			<attribute name="label" filename="in_temp0_label" value="Side-A:FDDC0->CDDC0->ADC0" />
+		</channel>
+		<attribute name="cfir_config" value="ERROR" />
+		<attribute name="jesd204_fsm_ctrl" value="1" />
+		<attribute name="jesd204_fsm_error" value="0" />
+		<attribute name="jesd204_fsm_paused" value="0" />
+		<attribute name="jesd204_fsm_resume" value="ERROR" />
+		<attribute name="jesd204_fsm_state" value="opt_post_running_stage" />
+		<attribute name="loopback1_blend_available" value="0 1 3" />
+		<attribute name="loopback1_blend_side_a" value="0" />
+		<attribute name="loopback1_blend_side_b" value="0" />
+		<attribute name="mcs_bg_tacking_cal_freeze" value="0" />
+		<attribute name="mcs_bg_tacking_cal_run" value="1" />
+		<attribute name="mcs_cal_run" value="Passed" />
+		<attribute name="mcs_dt0_measurement" value="5509" />
+		<attribute name="mcs_dt1_measurement" value="785456" />
+		<attribute name="mcs_dt1_restore" value="ERROR" />
+		<attribute name="mcs_fg_tacking_cal_run" value="ERROR" />
+		<attribute name="mcs_init" value="ERROR" />
+		<attribute name="mcs_init_cal_status" value="ERROR" />
+		<attribute name="mcs_tracking_init" value="ERROR" />
+		<attribute name="mcs_tracking_status" value="ERROR" />
+		<attribute name="pfilt_config" value="ERROR" />
+		<attribute name="sync_start_enable" value="disarm" />
+		<attribute name="sync_start_enable_available" value="arm disarm trigger_manual" />
+		<attribute name="waiting_for_supplier" value="0" />
+		<buffer-attribute name="data_available" value="0" />
+		<buffer-attribute name="direction" value="in" />
+		<buffer-attribute name="length_align_bytes" value="32" />
+		<debug-attribute name="jrx_phase_adjust_calc" value="0" />
+		<debug-attribute name="generic" value="0" />
+		<debug-attribute name="trig_sync" value="0" />
+		<debug-attribute name="hsci_enable" value="1" />
+		<debug-attribute name="temperature_status" value="ERROR" />
+		<debug-attribute name="clk_pwr_stat" value="Clock input power detection A: GOOD
+Clock input power detection B: UNUSED" />
+		<debug-attribute name="chip_version" value="AD0 Rev. 0 Grade 0" />
+		<debug-attribute name="uuid" value="334d0b28248a328c8e4abc27eb592153" />
+		<debug-attribute name="api_version" value="0.4.58" />
+		<debug-attribute name="bist_2d_eyescan_jrx" value="ERROR" />
+		<debug-attribute name="bist_prbs_error_counters_jrx" value="ERROR" />
+		<debug-attribute name="bist_prbs_select_jtx" value="0" />
+		<debug-attribute name="bist_prbs_select_jrx" value="0" />
+		<debug-attribute name="status" value="ERROR" />
+		<debug-attribute name="pseudorandom_err_check" value="ERROR" />
+		<debug-attribute name="direct_reg_access" value="0xF0" />
+	</device>
+	<device id="iio:device8" name="axi-ad9088-tx-hpc" >
+		<channel id="voltage0_i" type="output" >
+			<scan-element index="0" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage0_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage0_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage0_q" type="output" >
+			<scan-element index="1" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage0_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage0_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_i" type="output" >
+			<scan-element index="2" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage1_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage1_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_q" type="output" >
+			<scan-element index="3" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage1_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage1_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_i" type="output" >
+			<scan-element index="4" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage2_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage2_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_q" type="output" >
+			<scan-element index="5" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage2_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage2_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage3_i" type="output" >
+			<scan-element index="6" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage3_i_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage3_i_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage3_q" type="output" >
+			<scan-element index="7" format="le:S16/16&gt;&gt;0" />
+			<attribute name="calibphase" filename="out_voltage3_q_calibphase" value="0.000000" />
+			<attribute name="calibscale" filename="out_voltage3_q_calibscale" value="1.000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="altvoltage11" name="TX3_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage11_TX3_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage11_TX3_Q_F2_label" value="TX3_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage11_TX3_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage11_TX3_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage11_TX3_Q_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage3" name="TX1_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage3_TX1_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage3_TX1_Q_F2_label" value="TX1_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage3_TX1_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage3_TX1_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage3_TX1_Q_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage9" name="TX3_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage9_TX3_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage9_TX3_I_F2_label" value="TX3_I_F2" />
+			<attribute name="phase" filename="out_altvoltage9_TX3_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage9_TX3_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage9_TX3_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage5" name="TX2_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage5_TX2_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage5_TX2_I_F2_label" value="TX2_I_F2" />
+			<attribute name="phase" filename="out_altvoltage5_TX2_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage5_TX2_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage5_TX2_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage2" name="TX1_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage2_TX1_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage2_TX1_Q_F1_label" value="TX1_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage2_TX1_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage2_TX1_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage2_TX1_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage8" name="TX3_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage8_TX3_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage8_TX3_I_F1_label" value="TX3_I_F1" />
+			<attribute name="phase" filename="out_altvoltage8_TX3_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage8_TX3_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage8_TX3_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage12" name="TX4_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage12_TX4_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage12_TX4_I_F1_label" value="TX4_I_F1" />
+			<attribute name="phase" filename="out_altvoltage12_TX4_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage12_TX4_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage12_TX4_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage1" name="TX1_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage1_TX1_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage1_TX1_I_F2_label" value="TX1_I_F2" />
+			<attribute name="phase" filename="out_altvoltage1_TX1_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage1_TX1_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage1_TX1_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage7" name="TX2_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage7_TX2_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage7_TX2_Q_F2_label" value="TX2_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage7_TX2_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage7_TX2_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage7_TX2_Q_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage4" name="TX2_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage4_TX2_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage4_TX2_I_F1_label" value="TX2_I_F1" />
+			<attribute name="phase" filename="out_altvoltage4_TX2_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage4_TX2_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage4_TX2_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage14" name="TX4_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage14_TX4_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage14_TX4_Q_F1_label" value="TX4_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage14_TX4_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage14_TX4_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage14_TX4_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage13" name="TX4_I_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage13_TX4_I_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage13_TX4_I_F2_label" value="TX4_I_F2" />
+			<attribute name="phase" filename="out_altvoltage13_TX4_I_F2_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage13_TX4_I_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage13_TX4_I_F2_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage0" name="TX1_I_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage0_TX1_I_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage0_TX1_I_F1_label" value="TX1_I_F1" />
+			<attribute name="phase" filename="out_altvoltage0_TX1_I_F1_phase" value="90000" />
+			<attribute name="raw" filename="out_altvoltage0_TX1_I_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage0_TX1_I_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage10" name="TX3_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage10_TX3_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage10_TX3_Q_F1_label" value="TX3_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage10_TX3_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage10_TX3_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage10_TX3_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage6" name="TX2_Q_F1" type="output" >
+			<attribute name="frequency" filename="out_altvoltage6_TX2_Q_F1_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage6_TX2_Q_F1_label" value="TX2_Q_F1" />
+			<attribute name="phase" filename="out_altvoltage6_TX2_Q_F1_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage6_TX2_Q_F1_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage6_TX2_Q_F1_scale" value="0.250000" />
+		</channel>
+		<channel id="altvoltage15" name="TX4_Q_F2" type="output" >
+			<attribute name="frequency" filename="out_altvoltage15_TX4_Q_F2_frequency" value="39997711" />
+			<attribute name="label" filename="out_altvoltage15_TX4_Q_F2_label" value="TX4_Q_F2" />
+			<attribute name="phase" filename="out_altvoltage15_TX4_Q_F2_phase" value="0" />
+			<attribute name="raw" filename="out_altvoltage15_TX4_Q_F2_raw" value="1" />
+			<attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="1250000000" />
+			<attribute name="scale" filename="out_altvoltage15_TX4_Q_F2_scale" value="0.250000" />
+		</channel>
+		<attribute name="sync_start_enable" value="disarm" />
+		<attribute name="sync_start_enable_available" value="arm disarm trigger_manual" />
+		<attribute name="waiting_for_supplier" value="0" />
+		<buffer-attribute name="data_available" value="0" />
+		<buffer-attribute name="direction" value="out" />
+		<buffer-attribute name="length_align_bytes" value="32" />
+		<debug-attribute name="pl_ddr_fifo_enable" value="1" />
+		<debug-attribute name="direct_reg_access" value="0x90262" />
+	</device>
+	<device id="iio:device9" name="axi-ad9088-rx-hpc" >
+		<channel id="voltage0_i" type="input" >
+			<scan-element index="0" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage0_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage0_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage0_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage0_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage0_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage0_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage0_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage0_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage0_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage0_i_label" value="Side-A:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage0_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage0_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage0_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage0_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage0_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage0_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage0_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage0_q" type="input" >
+			<scan-element index="1" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage0_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage0_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage0_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage0_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage0_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage0_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage0_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage0_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage0_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage0_q_label" value="Side-A:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage0_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage0_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage0_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage0_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage0_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage0_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage0_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage1_i" type="input" >
+			<scan-element index="2" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage1_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage1_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage1_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage1_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage1_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage1_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage1_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage1_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage1_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage1_i_label" value="Side-A:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage1_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage1_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage1_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage1_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage1_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage1_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage1_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage1_q" type="input" >
+			<scan-element index="3" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage1_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage1_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage1_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage1_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage1_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage1_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage1_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage1_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage1_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage1_q_label" value="Side-A:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage1_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage1_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage1_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage1_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage1_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage1_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage1_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage2_i" type="input" >
+			<scan-element index="4" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage2_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage2_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage2_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage2_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage2_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage2_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage2_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage2_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage2_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage2_i_label" value="Side-B:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage2_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage2_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage2_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage2_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage2_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage2_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage2_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage2_q" type="input" >
+			<scan-element index="5" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage2_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage2_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage2_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage2_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage2_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage2_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage2_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage2_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage2_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage2_q_label" value="Side-B:FDDC0->CDDC0->ADC0" />
+			<attribute name="loopback" filename="in_voltage2_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage2_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage2_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage2_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage2_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage2_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage2_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage3_i" type="input" >
+			<scan-element index="6" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage3_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage3_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage3_i_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage3_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage3_i_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage3_i_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage3_i_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage3_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage3_i_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage3_i_label" value="Side-B:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage3_i_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage3_i_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage3_i_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage3_i_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage3_i_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage3_i_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage3_i_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage3_q" type="input" >
+			<scan-element index="7" format="le:S16/16&gt;&gt;0" />
+			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />
+			<attribute name="cfir_en" filename="in_voltage3_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="in_voltage3_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_6db_digital_gain_en" filename="in_voltage3_q_channel_6db_digital_gain_en" value="1" />
+			<attribute name="channel_nco_frequency" filename="in_voltage3_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="in_voltage3_q_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_phase" filename="in_voltage3_q_channel_nco_phase" value="0" />
+			<attribute name="en" filename="in_voltage3_q_en" value="1" />
+			<attribute name="fsrc_m" filename="in_voltage3_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="in_voltage3_q_fsrc_n" value="1" />
+			<attribute name="label" filename="in_voltage3_q_label" value="Side-B:FDDC2->CDDC1->ADC1" />
+			<attribute name="loopback" filename="in_voltage3_q_loopback" value="off" />
+			<attribute name="loopback_available" filename="in_voltage_loopback_available" value="off loopback0 loopback1 loopback2 loopback3_jesd loopback0_2_se" />
+			<attribute name="main_hb1_6db_digital_gain_en" filename="in_voltage3_q_main_hb1_6db_digital_gain_en" value="0" />
+			<attribute name="main_nco_frequency" filename="in_voltage3_q_main_nco_frequency" value="2400000002" />
+			<attribute name="main_nco_frequency_available" filename="in_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="in_voltage3_q_main_nco_phase" value="0" />
+			<attribute name="main_tb1_6db_digital_gain_en" filename="in_voltage3_q_main_tb1_6db_digital_gain_en" value="0" />
+			<attribute name="nyquist_zone" filename="in_voltage3_q_nyquist_zone" value="odd" />
+			<attribute name="nyquist_zone_available" filename="in_voltage_nyquist_zone_available" value="odd even" />
+			<attribute name="sampling_frequency" filename="in_voltage_sampling_frequency" value="1250000000" />
+			<attribute name="test_mode" filename="in_voltage3_q_test_mode" value="off" />
+			<attribute name="test_mode_available" filename="in_voltage_test_mode_available" value="ERROR" />
+		</channel>
+		<channel id="voltage3_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage3_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage3_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage3_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage3_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage3_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage3_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage3_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage3_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage3_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage3_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage3_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage3_i_label" value="Side-B:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage3_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage3_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage3_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage3_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage2_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage2_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage2_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage2_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage2_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage2_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage2_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage2_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage2_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage2_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage2_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage2_q_label" value="Side-B:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage2_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage2_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage2_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage2_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage0_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage0_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage0_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage0_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage0_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage0_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage0_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage0_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage0_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage0_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage0_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage0_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage0_i_label" value="Side-A:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage0_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage0_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage0_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage0_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage1_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage1_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage1_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage1_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage1_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage1_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage1_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage1_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage1_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage1_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage1_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage1_i_label" value="Side-A:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage1_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage1_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage1_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage1_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage2_i" type="output" >
+			<attribute name="cfir_en" filename="out_voltage2_i_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage2_i_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage2_i_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage2_i_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage2_i_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage2_i_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage2_i_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage2_i_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage2_i_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage2_i_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage2_i_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage2_i_label" value="Side-B:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage2_i_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage2_i_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage2_i_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage2_i_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage0_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage0_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage0_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage0_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage0_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage0_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage0_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage0_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage0_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage0_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage0_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage0_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage0_q_label" value="Side-A:FDUC0->CDUC0->DAC0" />
+			<attribute name="main_nco_frequency" filename="out_voltage0_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage0_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage0_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage0_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage3_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage3_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage3_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage3_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage3_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage3_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage3_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage3_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage3_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage3_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage3_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage3_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage3_q_label" value="Side-B:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage3_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage3_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage3_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage3_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="voltage1_q" type="output" >
+			<attribute name="cfir_en" filename="out_voltage1_q_cfir_en" value="0" />
+			<attribute name="cfir_profile_sel" filename="out_voltage1_q_cfir_profile_sel" value="0" />
+			<attribute name="channel_nco_frequency" filename="out_voltage1_q_channel_nco_frequency" value="100000000" />
+			<attribute name="channel_nco_frequency_available" filename="out_voltage_channel_nco_frequency_available" value="[-2500000000 1 2500000000]" />
+			<attribute name="channel_nco_gain_scale" filename="out_voltage1_q_channel_nco_gain_scale" value="0" />
+			<attribute name="channel_nco_phase" filename="out_voltage1_q_channel_nco_phase" value="0" />
+			<attribute name="channel_nco_test_tone_en" filename="out_voltage1_q_channel_nco_test_tone_en" value="0" />
+			<attribute name="channel_nco_test_tone_scale" filename="out_voltage1_q_channel_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="dac_frequency" filename="out_voltage_dac_frequency" value="20000000000" />
+			<attribute name="en" filename="out_voltage1_q_en" value="1" />
+			<attribute name="fsrc_m" filename="out_voltage1_q_fsrc_m" value="1" />
+			<attribute name="fsrc_n" filename="out_voltage1_q_fsrc_n" value="0" />
+			<attribute name="invsinc_en" filename="out_voltage1_q_invsinc_en" value="1" />
+			<attribute name="label" filename="out_voltage1_q_label" value="Side-A:FDUC1->CDUC1->DAC1" />
+			<attribute name="main_nco_frequency" filename="out_voltage1_q_main_nco_frequency" value="1000000001" />
+			<attribute name="main_nco_frequency_available" filename="out_voltage_main_nco_frequency_available" value="[-10000000000 1 10000000000]" />
+			<attribute name="main_nco_phase" filename="out_voltage1_q_main_nco_phase" value="0" />
+			<attribute name="main_nco_test_tone_en" filename="out_voltage1_q_main_nco_test_tone_en" value="0" />
+			<attribute name="main_nco_test_tone_scale" filename="out_voltage1_q_main_nco_test_tone_scale" value="0.000000000" />
+			<attribute name="sampling_frequency" filename="out_voltage_sampling_frequency" value="1250000000" />
+		</channel>
+		<channel id="temp0" type="input" >
+			<attribute name="input" filename="in_temp0_input" value="49000" />
+			<attribute name="label" filename="in_temp0_label" value="Side-A:FDDC0->CDDC0->ADC0" />
+		</channel>
+		<attribute name="cfir_config" value="ERROR" />
+		<attribute name="jesd204_fsm_ctrl" value="1" />
+		<attribute name="jesd204_fsm_error" value="0" />
+		<attribute name="jesd204_fsm_paused" value="0" />
+		<attribute name="jesd204_fsm_resume" value="ERROR" />
+		<attribute name="jesd204_fsm_state" value="opt_post_running_stage" />
+		<attribute name="loopback1_blend_available" value="0 1 3" />
+		<attribute name="loopback1_blend_side_a" value="0" />
+		<attribute name="loopback1_blend_side_b" value="0" />
+		<attribute name="mcs_bg_tacking_cal_freeze" value="0" />
+		<attribute name="mcs_bg_tacking_cal_run" value="1" />
+		<attribute name="mcs_cal_run" value="Passed" />
+		<attribute name="mcs_dt0_measurement" value="5509" />
+		<attribute name="mcs_dt1_measurement" value="785456" />
+		<attribute name="mcs_dt1_restore" value="ERROR" />
+		<attribute name="mcs_fg_tacking_cal_run" value="ERROR" />
+		<attribute name="mcs_init" value="ERROR" />
+		<attribute name="mcs_init_cal_status" value="ERROR" />
+		<attribute name="mcs_tracking_init" value="ERROR" />
+		<attribute name="mcs_tracking_status" value="ERROR" />
+		<attribute name="pfilt_config" value="ERROR" />
+		<attribute name="sync_start_enable" value="disarm" />
+		<attribute name="sync_start_enable_available" value="arm disarm trigger_manual" />
+		<attribute name="waiting_for_supplier" value="0" />
+		<buffer-attribute name="data_available" value="0" />
+		<buffer-attribute name="direction" value="in" />
+		<buffer-attribute name="length_align_bytes" value="32" />
+		<debug-attribute name="jrx_phase_adjust_calc" value="0" />
+		<debug-attribute name="generic" value="0" />
+		<debug-attribute name="trig_sync" value="0" />
+		<debug-attribute name="hsci_enable" value="1" />
+		<debug-attribute name="temperature_status" value="ERROR" />
+		<debug-attribute name="clk_pwr_stat" value="Clock input power detection A: GOOD
+Clock input power detection B: UNUSED" />
+		<debug-attribute name="chip_version" value="AD0 Rev. 0 Grade 0" />
+		<debug-attribute name="uuid" value="334d0b28248a328c8e4abc27eb592153" />
+		<debug-attribute name="api_version" value="0.4.58" />
+		<debug-attribute name="bist_2d_eyescan_jrx" value="ERROR" />
+		<debug-attribute name="bist_prbs_error_counters_jrx" value="ERROR" />
+		<debug-attribute name="bist_prbs_select_jtx" value="0" />
+		<debug-attribute name="bist_prbs_select_jrx" value="0" />
+		<debug-attribute name="status" value="ERROR" />
+		<debug-attribute name="pseudorandom_err_check" value="ERROR" />
+		<debug-attribute name="direct_reg_access" value="0xF0" />
+	</device>
+	<device id="iio:device6" name="adi-iio-fakedev" label="axi-jesd204-rx">
+		<attribute name="encoder" value="64b66" />
+		<attribute name="lane0_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane1_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane2_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane3_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane4_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane5_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane6_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="lane7_info" value="Errors: 0
+State of Extended multiblock alignment:EMB_INIT
+Lane Latency: 0 (min/max 64/4" />
+		<attribute name="status" value="Link is disabled
+Measured Link Clock: 312.502 MHz
+Reported Link Clock: 312.500 MHz
+Measured Device Clock: 312.502 MHz
+Reported Device Clock: 312.500 MHz
+Desired Device Clock: 312.500 MHz
+External reset is deasserted" />
+		<attribute name="waiting_for_supplier" value="0" />
+	</device>
+	<device id="iio:device7" name="adi-iio-fakedev" label="axi-jesd204-tx">
+		<attribute name="encoder" value="64b66" />
+		<attribute name="status" value="Link is disabled
+Measured Link Clock: 312.502 MHz
+Reported Link Clock: 312.500 MHz
+Measured Device Clock: 312.502 MHz
+Reported Device Clock: 312.500 MHz
+Desired Device Clock: 312.500 MHz
+External reset is deasserted" />
+		<attribute name="waiting_for_supplier" value="0" />
+	</device>
+
+	<device id="iio_sysfs_trigger" >
+		<attribute name="add_trigger" value="ERROR" />
+		<attribute name="remove_trigger" value="ERROR" />
+	</device>
+</context>
