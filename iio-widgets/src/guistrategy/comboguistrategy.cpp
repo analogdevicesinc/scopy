@@ -91,7 +91,7 @@ void ComboAttrUi::setCustomTitle(QString title)
 
 void ComboAttrUi::setInfoMessage(QString infoMessage)
 {
-	if(!m_isCompact) {
+	if(m_isCompact) {
 		m_infoIcon->setInfoMessage(infoMessage);
 	} else {
 		m_comboMenuWidget->setInfoMessage(infoMessage);

@@ -88,3 +88,5 @@ void CheckBoxAttrUi::receiveData(QString currentData, QString optionalData)
 }
 
 #include "moc_checkboxguistrategy.cpp"
+
+void CheckBoxAttrUi::setInfoMessage(QString infoMessage) { m_infoIcon->setInfoMessage(infoMessage); }
