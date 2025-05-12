@@ -30,6 +30,8 @@
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
 #include <style.h>
+#include <pkgmanager.h>
+#include <pkgwidget.h>
 
 #include <common/debugtimer.h>
 #include "logging_categories.h"
@@ -73,8 +75,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, m_glLoader(nullptr)
 {
 	DebugTimer benchmark;
+
 	initPreferences();
-	setAppTheme();
+
+	PkgManager::GetInstance();
+	PkgManager::init();
+
+	initStyle();
 	ScopySplashscreen::showMessage("Initializing ui");
 	ui->setupUi(this);
 
@@ -112,31 +119,32 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	scanTask->setScanParams("usb");
 	scanCycle = new CyclicalTask(scanTask, this);
 	scc = new ScannedIIOContextCollector(this);
-	pr = new PluginRepository(this);
-	loadPluginsFromRepository(pr);
 
-	PluginManager *pm = pr->getPluginManager();
+	loadPluginsFromRepository();
 
-	initAboutPage(pm);
-	initPreferencesPage(pm);
+	initAboutPage();
+	initPreferencesPage();
 	initTranslations();
 
 	ScopySplashscreen::showMessage("Loading homepage");
-	hp = new ScopyHomePage(this, pm);
+	hp = new ScopyHomePage(this);
 	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
 	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
 
 	DeviceAutoConnect::initPreferences();
-	dm = new DeviceManager(pm, this);
+	dm = new DeviceManager(this);
 	bool general_connect_to_multiple_devices = Preferences::get("general_connect_to_multiple_devices").toBool();
 	dm->setExclusive(!general_connect_to_multiple_devices);
 
 	dtm = new DetachedToolWindowManager(this);
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
+	PkgWidget *pkgWidget = new PkgWidget(this);
+
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
+	ts->add("package", pkgWidget);
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
@@ -334,13 +342,14 @@ ScopyMainWindow::~ScopyMainWindow()
 	delete ui;
 }
 
-void ScopyMainWindow::initAboutPage(PluginManager *pm)
+void ScopyMainWindow::initAboutPage()
 {
 	DebugTimer benchmark;
 	about = new ScopyAboutPage(this);
-	if(!pm)
+	if(!PluginRepository::GetInstance()) {
 		return;
-	QList<Plugin *> plugin = pm->getOriginalPlugins();
+	}
+	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
 	for(Plugin *p : plugin) {
 		QString content = p->about();
 		if(!content.isEmpty()) {
@@ -350,13 +359,14 @@ void ScopyMainWindow::initAboutPage(PluginManager *pm)
 	DEBUGTIMER_LOG(benchmark, "Init about page took:");
 }
 
-void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
+void ScopyMainWindow::initPreferencesPage()
 {
 	prefPage = new ScopyPreferencesPage(this);
-	if(!pm)
+	if(!PluginRepository::GetInstance()) {
 		return;
+	}
 
-	QList<Plugin *> plugin = pm->getOriginalPlugins();
+	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
 	for(Plugin *p : plugin) {
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
@@ -429,26 +439,29 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_connect_to_multiple_devices", true);
 	p->init("general_scan_for_devices", true);
 	p->init("device_menu_item", true);
+	p->init("pkg_menu_columns", 1);
+	p->init("packages_path", scopy::config::pkgFolderPath());
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
 }
 
-// must be called after initializing preferences
-void ScopyMainWindow::setAppTheme()
+void ScopyMainWindow::initStyle()
 {
-	Preferences *p = Preferences::GetInstance();
-
-	QString theme = p->get("general_theme").toString();
-	float font = p->get("font_scale").toFloat();
-	bool theme_set = Style::GetInstance()->init(theme, font);
-
-	// set default theme if current theme is invalid
-	if(!theme_set) {
-		QString default_theme = Style::GetInstance()->getTheme();
-		Style::GetInstance()->init(default_theme, font);
-		p->set("general_theme", default_theme);
+	Style *style = Style::GetInstance();
+	QString theme = Preferences::get("general_theme").toString();
+	style->setPkgsThemes(PkgManager::listFilesInfo(QStringList() << scopy::config::pkgStyleThemesDir(),
+						       QStringList() << "*.json"));
+	style->setPkgsQss(
+		PkgManager::listFilesInfo(QStringList() << scopy::config::pkgStylePropDir(), QStringList() << "*.qss"));
+	if(!style->getThemeList().contains(theme)) {
+		theme = style->getTheme();
+		Preferences::set("general_theme", theme);
 	}
+	style->init(theme, Preferences::get("font_scale").toFloat());
+
+	QString themeName = "scopy-" + theme;
+	QIcon::setThemeSearchPaths({":/gui/icons/" + themeName});
 }
 
 void ScopyMainWindow::loadOpenGL()
@@ -499,26 +512,26 @@ void ScopyMainWindow::loadOpenGL()
 	m_glLoader = nullptr;
 }
 
-void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr)
+void ScopyMainWindow::loadPluginsFromRepository()
 {
 
 	DebugTimer benchmark;
 	// Check the local build plugins folder first
 	// Check if directory exists and it's not empty
 	QDir pathDir(scopy::config::localPluginFolderPath());
+	PluginRepository *pr = PluginRepository::GetInstance();
+	PluginManager *pm = pr->getPluginManager();
 
 	ScopySplashscreen::setPrefix("Loading plugin: ");
 
-	connect(pr->getPluginManager(), SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(),
-		SLOT(setMessage(QString)));
+	connect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
 	if(pathDir.exists() && pathDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0) {
 		pr->init(scopy::config::localPluginFolderPath());
 	} else {
 		pr->init(scopy::config::defaultPluginFolderPath());
 	}
 	ScopySplashscreen::setPrefix("");
-	disconnect(pr->getPluginManager(), SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(),
-		   SLOT(setMessage(QString)));
+	disconnect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
 
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
@@ -566,6 +579,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "general_scan_for_devices") {
 		enableScanner();
 	} else if(str == "iio_emu_dir_path") {
+		Q_EMIT p->restartRequired();
+	} else if(str == "packages_path") {
 		Q_EMIT p->restartRequired();
 	}
 }

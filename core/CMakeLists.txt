@@ -42,8 +42,20 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc)
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(
+	GLOB
+	SRC_LIST
+	src/*.cpp
+	src/*.cc
+	src/pkgmanager/*.cpp
+)
+file(
+	GLOB
+	HEADER_LIST
+	include/${SCOPY_MODULE}/*.h
+	include/${SCOPY_MODULE}/*.hpp
+	include/${SCOPY_MODULE}/pkgmanager/*.h
+)
 file(GLOB UI_LIST ui/*.ui)
 
 if(ENABLE_TESTING)
@@ -102,6 +114,7 @@ set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${P
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
+find_package(KF5Archive QUIET)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 
@@ -109,10 +122,14 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(
+	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+				  ${CMAKE_CURRENT_SOURCE_DIR}/${SCOPY_MODULE}/pkgmanager
+)
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkgmanager
 		${GLIB_INCLUDE_DIRS}
 		${GLIBCONFIG_INCLUDE_DIRS}
 		${LIBSIGROK_DECODE_INCLUDE_DIRS}
@@ -120,6 +137,9 @@ target_include_directories(
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common)
+if(KF5Archive_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+endif()
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
@@ -139,11 +159,3 @@ target_link_libraries(
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 )
-
-file(COPY ${CMAKE_SOURCE_DIR}/resources/scopy_emu_options_config.json
-     DESTINATION ${CMAKE_BINARY_DIR}/plugins/resources/
-)
-file(GLOB EMU_FILES ${CMAKE_SOURCE_DIR}/resources/emu_xml/*.xml)
-foreach(_emu_file ${EMU_FILES})
-	file(COPY ${_emu_file} DESTINATION ${CMAKE_BINARY_DIR}/plugins/emu_xml/)
-endforeach()

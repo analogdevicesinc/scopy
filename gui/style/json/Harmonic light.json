@@ -1,6 +1,8 @@
 {
 "icon_theme_folder": "scopy-light",
 "pixmap_color": "#101820",
+"interactive_pixmap": "#0067B9",
+"interactive_pixmap_hover": "#00427A",
 "interactive_subtle_idle": "#848B95",
 "interactive_subtle_hover": "#5E6773",
 "interactive_subtle_pressed": "#4b525c",

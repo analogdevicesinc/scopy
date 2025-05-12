@@ -1,0 +1,20 @@
+*[&&property&&=true] {
+    border: &border_width_interactive& solid &interactive_primary_idle&;
+    border-radius: &radius_1&;
+    background-color: transparent;
+    color: &interactive_primary_idle&;
+}
+
+*[&&property&&="success"] {
+    border: &border_width_interactive& solid &led_success&;
+    border-radius: &radius_1&;
+    background-color: transparent;
+    color: &led_success&;
+}
+
+*[&&property&&="error"] {
+    border: &border_width_interactive& solid &led_error&;
+    border-radius: &radius_1&;
+    background-color: transparent;
+    color: &led_error&;
+}

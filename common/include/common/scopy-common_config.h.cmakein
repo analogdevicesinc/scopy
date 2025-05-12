@@ -16,5 +16,11 @@
 
 #define SCOPY_TEMP_LOG_FILE ".scopyTmpLog"
 
-#endif // SCOPY_COMMON_CONFIG_H_CMAKEIN
+#define PKG_EMU_SETUP_FILE "emu_setup.json"
+#define PKG_EMU_DIR "emu-xml"
+#define PKG_PLUGINS_DIR "plugins"
+#define PKG_STYLE_THEMES_DIR "json"
+#define PKG_STYLE_PROP_DIR "qss"
+#define PKG_TRANSLATION_DIR "translations"
 
+#endif // SCOPY_COMMON_CONFIG_H_CMAKEIN

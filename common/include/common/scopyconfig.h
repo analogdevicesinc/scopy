@@ -46,9 +46,17 @@ public:
 	static QString fullversion();
 	static QString os();
 	static QString pcSpecs();
+	static QString pkgFolderPath();
 
 	static QString dump();
 	static QString getUuid();
+
+	static QString emuSetupFile();
+	static QString pkgEmuDir();
+	static QString pkgPluginsDir();
+	static QString pkgStyleThemesDir();
+	static QString pkgStylePropDir();
+	static QString pkgTranslationsDir();
 
 private:
 	inline static int uuid = 0;
