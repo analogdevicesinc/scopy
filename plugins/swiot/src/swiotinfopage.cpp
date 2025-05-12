@@ -47,7 +47,7 @@ void SwiotInfoPage::initTempCheckBox()
 	connect(m_enTempReadCheckBox, &QCheckBox::toggled, this, &SwiotInfoPage::temperatureReadEnabled);
 	m_enTempReadCheckBox->setEnabled(false);
 	m_enTempReadCheckBox->setVisible(true);
-	m_enTempReadCheckBox->setChecked(true);
+	m_enTempReadCheckBox->setChecked(false);
 }
 
 #include "moc_swiotinfopage.cpp"
