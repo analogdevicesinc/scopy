@@ -82,6 +82,7 @@ void Ad9084Channel::setupFrequency()
 					    .title("ADC Frequency")
 					    .parent(this)
 					    .buildSingle();
+		m_iioWidgetGroupList.value(ADC_FREQUENCY)->add(m_frequencyWidget);
 	} else {
 		m_frequencyWidget = IIOWidgetBuilder(this)
 					    .channel(m_channel)
@@ -90,6 +91,7 @@ void Ad9084Channel::setupFrequency()
 					    .title("DAC Frequency")
 					    .parent(this)
 					    .buildSingle();
+		m_iioWidgetGroupList.value(DAC_FREQUENCY)->add(m_frequencyWidget);
 	}
 	m_frequencyWidget->setUItoDataConversion(
 		std::bind(&Ad9084Channel::frequencyUItoDS, this, std::placeholders::_1));
@@ -356,6 +358,13 @@ void Ad9084Channel::init()
 		m_chnSection->contentLayout()->addWidget(mainNcoWidget);
 	}
 	this->layout()->addWidget(m_chnSection);
+}
+
+void Ad9084Channel::addGroup(SharedAttrCategory attr, IIOWidgetGroup *grp)
+{
+	if(!m_iioWidgetGroupList.contains(attr)) {
+		m_iioWidgetGroupList.insert(attr, grp);
+	}
 }
 
 void Ad9084Channel::readChannel()

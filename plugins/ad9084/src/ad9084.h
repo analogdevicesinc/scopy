@@ -76,6 +76,7 @@ private:
 	using SideMap = QMap<QString, AdcMap>;
 	SideMap m_channelPaths;
 
+	QList<IIOWidgetGroup *> m_iioWidgetGroups;
 	QList<QString> m_rx_fine_ddc_channel_names;
 	QList<QString> m_rx_coarse_ddc_channel_names;
 	QList<QString> m_tx_fine_duc_channel_names;
