@@ -27,14 +27,7 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 set(PLUGIN_DISPLAY_NAME AD936X)
-set(PLUGIN_DESCRIPTION
-    THIS
-    IS
-    A
-    PLUGIN
-    FOR
-    AD936X
-)
+set(PLUGIN_DESCRIPTION "This is a plugin for AD936X")
 
 include(GenerateExportHeader)
 
@@ -93,6 +86,7 @@ target_link_libraries(
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(INSTALLER_DESCRIPTION "${PLUGIN_DISPLAY_NAME} ${PLUGIN_DESCRIPTION}")
 	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
 endif()
 
