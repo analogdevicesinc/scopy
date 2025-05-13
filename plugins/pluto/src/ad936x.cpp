@@ -56,36 +56,7 @@ AD936X::AD936X(QString uri, QWidget *parent)
 
 	m_mainLayout->addWidget(m_tool);
 
-	///////// info button /////////////////
-	InfoBtn *infoBtn = new InfoBtn(this, true);
-	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-
-	connect(infoBtn, &InfoBtn::clicked, this, [=, this]() {
-		// infoBtn->generateInfoPopup(this);
-		// TODO
-		// connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() {
-		// 	if(searchBarWidget->isVisible()) {
-		// 		startTutorial();
-		// 	} else {
-		// 		startSimpleTutorial();
-		// 	}
-		// });
-
-		// connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=]() {
-		// 	QDesktopServices::openUrl(
-		// 		QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
-		// });
-	});
-
-	m_refreshButton = new AnimationPushButton(this);
-	m_refreshButton->setIcon(
-		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
-	m_refreshButton->setIconSize(QSize(25, 25));
-	m_refreshButton->setText("Refresh");
-	m_refreshButton->setAutoDefault(true);
-	Style::setStyle(m_refreshButton, style::properties::button::basicButton);
-	QMovie *movie = new QMovie(":/gui/loading.gif");
-	m_refreshButton->setAnimation(movie, 20000);
+	m_refreshButton = new AnimatedRefreshBtn(false, this);
 	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
 
 	connect(m_refreshButton, &QPushButton::clicked, this, [this]() {
