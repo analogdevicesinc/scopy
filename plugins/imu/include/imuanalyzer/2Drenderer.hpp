@@ -21,11 +21,11 @@ public:
 public Q_SLOTS:
 	void resetView();
 	void resetPos();
-	void setRot(rotation rot);
+	void setRot(data3P rot);
 	void setDisplayPoints(QString displayP);
 
 private:
-	rotation m_rot;
+	data3P m_rot;
 	QVector<double> xLinePoint{90,90};
 	QVector<double> yLinePoint{3,3};
 	PlotWidget *plotWidget;

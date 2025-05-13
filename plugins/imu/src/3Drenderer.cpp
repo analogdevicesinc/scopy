@@ -44,13 +44,14 @@ Qt3DRender::QMaterial* createWireframeMaterial(Qt3DCore::QNode* parent = nullptr
 SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	view = new Qt3DExtras::Qt3DWindow();
 	//view->defaultFrameGraph()->setClearColor(QColor(QRgb(0x4d4d4f)));
-	container = QWidget::createWindowContainer(view);
+	container = QWidget::createWindowContainer(view, this);
 	container->setMinimumSize(400, 300);
-	container->setFocusPolicy(Qt::StrongFocus);
+	// container->setFocusPolicy(Qt::StrongFocus);
 
-	QVBoxLayout *layout = new QVBoxLayout(this);
+	QVBoxLayout *layout = new QVBoxLayout();
 	layout->addWidget(container);
 	layout->setMargin(0);
+	this->setLayout(layout);
 
 	// Root entity
 	rootEntity = new Qt3DCore::QEntity();
@@ -102,6 +103,7 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 
 	// Set root entity
 	view->setRootEntity(rootEntity);
+
 }
 
 void SceneRenderer::resetView(){
@@ -112,13 +114,13 @@ void SceneRenderer::resetView(){
 }
 
 void SceneRenderer::resetPos(){
-	setRot(rotation{0.0f, 0.0f, 0.0f});
+	setRot(data3P{0.0f, 0.0f, 0.0f});
 }
 
-void SceneRenderer::setRot(rotation rot){
-	cubeTransform->setRotationX(rot.rotX);
-	cubeTransform->setRotationY(rot.rotY);
-	cubeTransform->setRotationZ(rot.rotZ);
+void SceneRenderer::setRot(data3P rot){
+	cubeTransform->setRotationX(rot.dataX);
+	cubeTransform->setRotationY(rot.dataY);
+	cubeTransform->setRotationZ(rot.dataZ);
 }
 
 void SceneRenderer::updateCubeColor(QColor color){

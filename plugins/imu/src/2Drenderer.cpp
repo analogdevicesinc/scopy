@@ -27,20 +27,20 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
 	point->attach(plotWidget->plot());
 }
 
-void BubbleLevelRenderer::setRot(rotation rot){
+void BubbleLevelRenderer::setRot(data3P rot){
 	m_rot = rot;
 
 	if(m_displayPoints == "XY"){
-		xLinePoint = {double(m_rot.rotX),double(m_rot.rotX)};
-		yLinePoint = {double(m_rot.rotY),double(m_rot.rotY)};
+		xLinePoint = {double(m_rot.dataX),double(m_rot.dataX)};
+		yLinePoint = {double(m_rot.dataY),double(m_rot.dataY)};
 
 	} else if(m_displayPoints == "XZ"){
-		xLinePoint = {double(m_rot.rotX),double(m_rot.rotX)};
-		yLinePoint = {double(m_rot.rotZ),double(m_rot.rotZ)};
+		xLinePoint = {double(m_rot.dataX),double(m_rot.dataX)};
+		yLinePoint = {double(m_rot.dataZ),double(m_rot.dataZ)};
 
 	} else if(m_displayPoints == "YZ"){
-		xLinePoint = {double(m_rot.rotY),double(m_rot.rotY)};
-		yLinePoint = {double(m_rot.rotZ),double(m_rot.rotZ)};
+		xLinePoint = {double(m_rot.dataY),double(m_rot.dataY)};
+		yLinePoint = {double(m_rot.dataZ),double(m_rot.dataZ)};
 	}
 
 	point->setSamples(xLinePoint, yLinePoint);

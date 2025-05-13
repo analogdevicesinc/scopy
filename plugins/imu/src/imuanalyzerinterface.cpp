@@ -2,12 +2,12 @@
 
 using namespace scopy;
 
-Q_DECLARE_METATYPE(rotation)
+Q_DECLARE_METATYPE(data3P)
 
 std::atomic<bool> m_runThread(false);
 
 IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidget{parent}{
-	qRegisterMetaType<rotation>("rotation");
+	qRegisterMetaType<data3P>("data3P");
 
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	lay->setMargin(0);
@@ -27,17 +27,22 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 	lay->addWidget(m_tool);
 
+	m_dataV = new DataVisualizer();
+	m_tool->addWidgetToCentralContainerHelper(m_dataV);
+
+	connect(this, &IMUAnalyzerInterface::updateValues, m_dataV, &DataVisualizer::updateValues);
+
 	m_infoBtn = new InfoBtn(this, false);
 	m_tool->addWidgetToTopContainerHelper(m_infoBtn, TTA_LEFT);
 
 	m_runBtn = new RunBtn(this);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 
-	m_sceneRender = new SceneRenderer(this);
-	QTabWidget *tabWidget = new QTabWidget;
-	tabWidget->addTab(m_sceneRender,"3D View");
-
+	QTabWidget *tabWidget = new QTabWidget(this);
 	m_tool->addWidgetToCentralContainerHelper(tabWidget);
+
+	m_sceneRender = new SceneRenderer();
+	tabWidget->addTab(m_sceneRender,"3D View");
 
 	m_rstPos = new MenuControlButton(this);
 	m_rstPos->setName("Reset Position");
@@ -57,6 +62,21 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 	connect(m_rstView, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetView);
 
+	m_measureBtn = new MenuControlButton(this);
+	m_measureBtn->setName("Measure");
+	m_measureBtn->checkBox()->setVisible(false);
+	m_measureBtn->button()->setVisible(false);
+	m_measureBtn->setCheckable(true);
+	m_measureBtn->setChecked(true);
+	m_tool->addWidgetToBottomContainerHelper(m_measureBtn, TTA_RIGHT);
+
+	connect(m_measureBtn, &QPushButton::toggled, this, [=, this](bool toggled){
+		if(toggled)
+			m_dataV->show();
+		else
+			m_dataV->hide();
+	});
+
 	connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
 
 	connect(m_runBtn, &QPushButton::pressed,[](){
@@ -65,7 +85,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 	t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
 
-	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer();
+	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer(tabWidget);
 	tabWidget->addTab(bubbleLevelRenderer, "2D View");
 
 	connect(this, &IMUAnalyzerInterface::generateRot, bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
@@ -76,7 +96,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_gearBtn->setChecked(true);
 
 	QString key = "Settings";
-	m_settingsPanel = new ImuAnalyzerSettings(m_sceneRender, bubbleLevelRenderer, this);
+	m_settingsPanel = new ImuAnalyzerSettings(m_sceneRender, bubbleLevelRenderer, m_device, this);
 	m_tool->rightStack()->add(key,m_settingsPanel);
 
 	connect(m_gearBtn, &GearBtn::toggled, this, [=, this](bool toggled) {
@@ -85,7 +105,9 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 		m_tool->openRightContainerHelper(toggled);
 	});
-}
+
+	}
+
 
 IMUAnalyzerInterface::~IMUAnalyzerInterface(){
 	t.join();
@@ -118,12 +140,14 @@ void IMUAnalyzerInterface::generateRotation(){
 		iio_channel_attr_read_double(anglVelChY, "raw", &anglVelY);
 		iio_channel_attr_read_double(anglVelChZ, "raw", &anglVelZ);
 
-		m_rot.rotX += float(anglVelX * anglVelGainX / 2);
-		m_rot.rotY += float(anglVelY * anglVelGainY / 2);
-		m_rot.rotZ += float(anglVelZ * anglVelGainZ / 2);
+		m_rot.dataX += float(anglVelX * anglVelGainX / 2);
+		m_rot.dataY += float(anglVelY * anglVelGainY / 2);
+		m_rot.dataZ += float(anglVelZ * anglVelGainZ / 2);
 
 		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
-					  Q_ARG(rotation, m_rot));
+					  Q_ARG(data3P, m_rot));
+		QMetaObject::invokeMethod(this, "updateValues", Qt::QueuedConnection,
+					  Q_ARG(data3P, m_rot),Q_ARG(data3P, m_rot),Q_ARG(float, 0.0f));
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
@@ -138,5 +162,7 @@ void IMUAnalyzerInterface::initIIODevice(){
 		}
 	}
 }
+
+
 
 #include "moc_imuanalyzerinterface.cpp"

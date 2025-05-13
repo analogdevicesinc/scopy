@@ -5,6 +5,7 @@
 #include "3Drenderer.hpp"
 #include "2Drenderer.hpp"
 #include "imuanalyzersettings.hpp"
+#include "datavisualizer.hpp"
 
 #include <QLineEdit>
 #include <QObject>
@@ -24,6 +25,10 @@
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
 
+#include <hoverwidget.h>
+#include <QStackedLayout>
+#include <measurementpanel.h>
+
 namespace scopy {
 
 class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget {
@@ -33,7 +38,8 @@ public:
     ~IMUAnalyzerInterface();
 
 Q_SIGNALS:
-	void generateRot(rotation rot);
+	void generateRot(data3P rot);
+	void updateValues(data3P rot, data3P pos, float temp);
 
 public:
 	void generateRotation();
@@ -46,12 +52,14 @@ private:
     RunBtn *m_runBtn;
     MenuControlButton *m_rstPos;
     MenuControlButton *m_rstView;
+    MenuControlButton *m_measureBtn;
     GearBtn *m_gearBtn;
 
     SceneRenderer *m_sceneRender;
 
     ImuAnalyzerSettings *m_settingsPanel;
-    rotation m_rot;
+    DataVisualizer *m_dataV;
+    data3P m_rot;
 
     std::thread t;
     QString m_uri;

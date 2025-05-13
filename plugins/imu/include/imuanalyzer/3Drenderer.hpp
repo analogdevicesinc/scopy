@@ -38,6 +38,8 @@
 #include <QPolygon>
 #include <Qt3DRender/QGraphicsApiFilter>
 #include <Qt3DRender/QRenderStateSet>
+#include <Qt3DExtras/QText2DEntity>
+#include <Qt3DCore/QEntity>
 
 namespace scopy{
 class SCOPY_IMUANALYZER_EXPORT SceneRenderer : public QWidget{
@@ -63,7 +65,7 @@ private:
 public Q_SLOTS:
 	void resetView();
 	void resetPos();
-	void setRot(rotation rot);
+	void setRot(data3P rot);
 	void updateCubeColor(QColor color);
 	void updatePlaneColor(QColor color);
 };

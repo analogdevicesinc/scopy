@@ -24,6 +24,10 @@
 #include <QPalette>
 
 #include "scopy-imuanalyzer_export.h"
+#include "iio.h"
+#include "iio-widgets/iiowidget.h"
+#include "iio-widgets/iiowidgetbuilder.h"
+#include "iio-widgets/iiowidgetdata.h"
 
 namespace scopy{
 
@@ -31,12 +35,15 @@ class SCOPY_IMUANALYZER_EXPORT ImuAnalyzerSettings : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, QWidget *parent);
+	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent);
 
 signals:
 	void updateCubeColor(QColor color);
 	void updatePlaneColor(QColor color);
 	void updateDisplayPoints(QString displayP);
+
+private:
+	iio_device *m_device;
 };
 }
 #endif // IMUANALYZERSETTINGS_H

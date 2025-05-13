@@ -2,13 +2,15 @@
 
 using namespace scopy;
 
-ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, QWidget *parent)
+ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent)
 	: QWidget{parent}
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	lay->setMargin(0);
 	lay->setSpacing(10);
 	setLayout(lay);
+
+	m_device = device;
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(Qt::blue), this);
 
@@ -56,6 +58,12 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 		if(color.isValid())
 			emit updatePlaneColor(color);
 	});
+
+	QList <IIOWidget *>attributeWidget = IIOWidgetBuilder(nullptr)
+					     .device(m_device).buildAll();
+	for(auto widget : attributeWidget){
+		generalSettingsWidget->contentLayout()->addWidget(widget);
+	}
 
 	generalSettings->layout()->addWidget(generalSettingsWidget);
 	bubbleLevelSettings->layout()->addWidget(bubbleLevelSettingsWidget);
