@@ -25,7 +25,7 @@
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QWidget>
-#include <animationpushbutton.h>
+#include <animatedrefreshbtn.h>
 #include <tooltemplate.h>
 
 namespace scopy {
@@ -44,7 +44,7 @@ private:
 	QString m_uri;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
-	AnimationPushButton *m_refreshButton;
+	AnimatedRefreshBtn *m_refreshButton;
 };
 } // namespace pluto
 } // namespace scopy
