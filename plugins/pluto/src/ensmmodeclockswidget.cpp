@@ -226,15 +226,15 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 
 	// adi,rx-rf-port-input-select
 	QMap<QString, QString> *rxPortInputOptions = new QMap<QString, QString>();
-	rxPortInputOptions->insert("0", "(RX1A_N & RX1A_P) and (RX2A_N & RX2A_P) enabled");
-	rxPortInputOptions->insert("1", "(RX1B_N & RX1B_P) and (RX2B_N & RX2B_P) enabled");
-	rxPortInputOptions->insert("2", "(RX1C_N & RX1C_P) and (RX2C_N & RX2C_P) enabled	");
-	rxPortInputOptions->insert("3", "RX1A_N and RX2A_N enabled");
-	rxPortInputOptions->insert("4", "RX1A_P and RX2A_P enabled");
-	rxPortInputOptions->insert("5", "RX1B_N and RX2B_N enabled");
-	rxPortInputOptions->insert("6", "RX1B_P and RX2B_P enabled");
-	rxPortInputOptions->insert("7", "RX1C_N and RX2C_N enabled");
-	rxPortInputOptions->insert("8", "RX1C_P and RX2C_P enabled");
+	rxPortInputOptions->insert("0", "(RX1A_N_&_RX1A_P)_and_(RX2A_N_&_RX2A_P)_enabled");
+	rxPortInputOptions->insert("1", "(RX1B_N_&_RX1B_P)_and_(RX2B_N_&_RX2B_P)_enabled");
+	rxPortInputOptions->insert("2", "(RX1C_N_&_RX1C_P)_and_(RX2C_N_&_RX2C_P)_enabled");
+	rxPortInputOptions->insert("3", "RX1A_N_and_RX2A_N_enabled");
+	rxPortInputOptions->insert("4", "RX1A_P_and_RX2A_P_enabled");
+	rxPortInputOptions->insert("5", "RX1B_N_and_RX2B_N_enabled");
+	rxPortInputOptions->insert("6", "RX1B_P_and_RX2B_P_enabled");
+	rxPortInputOptions->insert("7", "RX1C_N_and_RX2C_N_enabled");
+	rxPortInputOptions->insert("8", "RX1C_P_and_RX2C_P_enabled");
 
 	auto rxValues = rxPortInputOptions->values();
 	QString rxOptionasData = "";

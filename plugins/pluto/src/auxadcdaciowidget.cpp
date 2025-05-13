@@ -222,6 +222,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 {
 	QWidget *auxDacWidget = new QWidget(parent);
 	QGridLayout *layout = new QGridLayout(auxDacWidget);
+	layout->setSpacing(10);
 	auxDacWidget->setLayout(layout);
 
 	Style::setStyle(auxDacWidget, style::properties::widget::border_interactive);
@@ -353,6 +354,7 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 
 	QWidget *widget = new QWidget(parent);
 	QGridLayout *widgetLayout = new QGridLayout(widget);
+	widgetLayout->setSpacing(10);
 	widget->setLayout(widgetLayout);
 
 	Style::setStyle(widget, style::properties::widget::border_interactive);
@@ -381,31 +383,42 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 	bitmaskLabel->setToolTip("Enable bit mask, setting or clearing bits will change the level of the corresponding "
 				 "output. Bit0 → GPO, Bit1 → GPO1, Bit2 → GPO2, Bit3 → GP03");
 	widgetLayout->addWidget(bitmaskLabel, 2, 0);
+
+	QHBoxLayout *hLayout2 = new QHBoxLayout();
+	hLayout2->setMargin(0);
+	hLayout2->setSpacing(10);
+
 	// GPO0
 	m_gpo0Mask = new MenuOnOffSwitch("GPO0", this, false);
-	widgetLayout->addWidget(m_gpo0Mask, 3, 0);
+	m_gpo0Mask->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	hLayout2->addWidget(m_gpo0Mask);
 
 	//  GPO1
 	m_gpo1Mask = new MenuOnOffSwitch("GPO1", this, false);
-	widgetLayout->addWidget(m_gpo1Mask, 3, 1);
+	m_gpo1Mask->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	hLayout2->addWidget(m_gpo1Mask);
 
 	//  GPO2
 	m_gpo2Mask = new MenuOnOffSwitch("GPO2", this, false);
-	widgetLayout->addWidget(m_gpo2Mask, 3, 2);
+	m_gpo2Mask->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	hLayout2->addWidget(m_gpo2Mask);
 
 	//  GPO3
 	m_gpo3Mask = new MenuOnOffSwitch("GPO03", this, false);
-	widgetLayout->addWidget(m_gpo3Mask, 3, 3);
+	m_gpo3Mask->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	hLayout2->addWidget(m_gpo3Mask);
+
+	widgetLayout->addLayout(hLayout2, 3, 0, Qt::AlignLeft);
 
 	connect(m_gpo0Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 	connect(m_gpo1Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 	connect(m_gpo2Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 	connect(m_gpo3Mask->onOffswitch(), &QAbstractButton::toggled, this, &AuxAdcDacIoWidget::applyGpoMask);
 
-	widgetLayout->addWidget(gpoWidget("0", parent), 4, 0, 1, 2);
-	widgetLayout->addWidget(gpoWidget("1", parent), 4, 2, 1, 2);
-	widgetLayout->addWidget(gpoWidget("2", parent), 5, 0, 1, 2);
-	widgetLayout->addWidget(gpoWidget("3", parent), 5, 2, 1, 2);
+	widgetLayout->addWidget(gpoWidget("0", parent), 4, 0);
+	widgetLayout->addWidget(gpoWidget("1", parent), 4, 1);
+	widgetLayout->addWidget(gpoWidget("2", parent), 5, 0);
+	widgetLayout->addWidget(gpoWidget("3", parent), 5, 1);
 
 	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() { gpoManualMode->readAsync(); });
 
@@ -422,9 +435,11 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 								  MenuCollapseSection::MHW_BASEWIDGET, gpoContainer);
 
 	gpoContainer->contentLayout()->addWidget(gpoSection);
+	gpoContainer->contentLayout()->setMargin(0);
 
 	QWidget *gpoContent = new QWidget(gpoSection);
 	QGridLayout *layout = new QGridLayout(gpoContent);
+	layout->setSpacing(10);
 	gpoContent->setLayout(layout);
 
 	// adi,gpoX-inactive-state-high-enable

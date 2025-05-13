@@ -32,7 +32,7 @@ ElnaWidget::ElnaWidget(QString uri, QWidget *parent)
 	: m_uri(uri)
 	, QWidget{parent}
 {
-	Style::setBackgroundColor(this, json::theme::background_primary, true);
+	Style::setBackgroundColor(this, json::theme::background_primary);
 
 	m_layout = new QVBoxLayout(this);
 	m_layout->setMargin(0);

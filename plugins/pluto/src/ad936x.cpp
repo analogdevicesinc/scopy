@@ -37,6 +37,8 @@
 
 #include <iioutil/connectionprovider.h>
 
+#include <guistrategy/comboguistrategy.h>
+
 using namespace scopy;
 using namespace pluto;
 
@@ -125,7 +127,7 @@ AD936X::AD936X(QString uri, QWidget *parent)
 	QLabel *blockDiagram = new QLabel(m_blockDiagramWidget);
 	blockDiagramWidgetLayout->addWidget(blockDiagram);
 	blockDiagram->setAlignment(Qt::AlignCenter);
-	QPixmap pixmap(":/pluto/ad936x.svg"); // Use the resource path
+	QPixmap pixmap(":/pluto/ad936x.svg");
 	blockDiagram->setPixmap(pixmap);
 
 	centralWidget->addWidget(m_controlsWidget);
@@ -406,33 +408,50 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 
 	layout->addWidget(new QLabel("RX", rxWidget));
 
-	// TODO move to function
-
 	// voltage0: hardwaregain
 	IIOWidget *hardwaregain = IIOWidgetBuilder(rxWidget)
 					  .channel(chn)
 					  .attribute("hardwaregain")
+					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .optionsAttribute("hardwaregain_available")
 					  .title("Hardware Gain(dB)")
-					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .buildSingle();
 	layout->addWidget(hardwaregain);
 	connect(this, &AD936X::readRequested, hardwaregain, &IIOWidget::readAsync);
 
+	hardwaregain->setDataToUIConversion([this](QString data) {
+		auto result = data.split(" ");
+		return result.first();
+	});
+
+	hardwaregain->lastReturnCode();
+
 	// voltage: rssi
 	IIOWidget *rssi = IIOWidgetBuilder(rxWidget).channel(chn).attribute("rssi").title("RSSI(dB)").buildSingle();
 	layout->addWidget(rssi);
+	rssi->setEnabled(false);
 
 	// voltage: gain_control_mode
 	IIOWidget *gainControlMode = IIOWidgetBuilder(rxWidget)
 					     .channel(chn)
 					     .attribute("gain_control_mode")
+					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .optionsAttribute("gain_control_mode_available")
 					     .title("Gain Control Mode")
-					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .buildSingle();
 	layout->addWidget(gainControlMode);
 	connect(this, &AD936X::readRequested, gainControlMode, &IIOWidget::readAsync);
+
+	connect(dynamic_cast<ComboAttrUi *>(gainControlMode->getUiStrategy()), &ComboAttrUi::displayedNewData, this,
+		[this, hardwaregain, rssi](QString data, QString optionalData) {
+			if(data == "manual") {
+				hardwaregain->setEnabled(true);
+			} else {
+				hardwaregain->setEnabled(false);
+			}
+			hardwaregain->readAsync();
+			rssi->readAsync();
+		});
 
 	return rxWidget;
 }
@@ -544,11 +563,19 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	IIOWidget *txAttenuation = IIOWidgetBuilder(txWidget)
 					   .device(dev)
 					   .attribute("adi,tx-attenuation-mdB")
-					   .uiStrategy(IIOWidgetBuilder::RangeUi)
-					   .title("Attenuation(dB")
+					   .title("Attenuation(dB)")
 					   .buildSingle();
 	layout->addWidget(txAttenuation);
 	connect(this, &AD936X::readRequested, txAttenuation, &IIOWidget::readAsync);
+
+	txAttenuation->setUItoDataConversion([this](QString data) {
+		double value = data.toDouble() * 1000;
+		return QString::number(value);
+	});
+	txAttenuation->setDataToUIConversion([this](QString data) {
+		double value = data.toDouble() / 1000;
+		return QString::number(value);
+	});
 
 	bool isOutput = true;
 	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
@@ -556,6 +583,7 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	IIOWidget *rssi =
 		IIOWidgetBuilder(txWidget).channel(voltage0).attribute("rssi").title("RSSI(dB)").buildSingle();
 	layout->addWidget(rssi);
+	rssi->setEnabled(false);
 	connect(this, &AD936X::readRequested, rssi, &IIOWidget::readAsync);
 
 	return txWidget;
