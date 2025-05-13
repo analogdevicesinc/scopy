@@ -43,6 +43,8 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 	QWidget *widget = new QWidget(this);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	widget->setLayout(layout);
+	layout->setContentsMargins(5, 5, 5, 5);
+	layout->setSpacing(10);
 
 	m_layout->addWidget(widget);
 
