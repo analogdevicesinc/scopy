@@ -29,7 +29,7 @@
 
 #include <iio-widgets/iiowidgetbuilder.h>
 
-#include <animationpushbutton.h>
+#include <animatedrefreshbtn.h>
 
 namespace scopy {
 namespace pluto {
@@ -49,7 +49,7 @@ private:
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_controlsWidget;
 	QWidget *m_blockDiagramWidget;
-	AnimationPushButton *m_refreshButton;
+	AnimatedRefreshBtn *m_refreshButton;
 
 	QWidget *generateGlobalSettingsWidget(QWidget *parent);
 
