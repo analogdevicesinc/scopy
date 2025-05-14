@@ -174,3 +174,5 @@ void AD9084Plugin::initMetadata()
 	}
 )plugin");
 }
+
+#include "moc_ad9084plugin.cpp"
