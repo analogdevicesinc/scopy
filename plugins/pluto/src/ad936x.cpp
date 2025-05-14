@@ -173,7 +173,9 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	QVBoxLayout *layout = new QVBoxLayout(globalSettingsWidget);
 	globalSettingsWidget->setLayout(layout);
 
-	layout->addWidget(new QLabel("AD9361 / AD9364 Global Settings", globalSettingsWidget));
+	QLabel *title = new QLabel("AD9361 / AD9364 Global Settings", globalSettingsWidget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	layout->addWidget(title);
 
 	// Get connection to device
 	Connection *conn = ConnectionProvider::open(m_uri);
@@ -275,7 +277,9 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout(rxChainWidget);
 	rxChainWidget->setLayout(mainLayout);
 
-	mainLayout->addWidget(new QLabel("AD9361 / AD9364 Receive Chain", rxChainWidget));
+	QLabel *title = new QLabel("AD9361 / AD9364 Receive Chain", rxChainWidget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	mainLayout->addWidget(title);
 
 	// Get connection to device
 	Connection *conn = ConnectionProvider::open(m_uri);
@@ -465,7 +469,9 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	QVBoxLayout *layout = new QVBoxLayout(txChainWidget);
 	txChainWidget->setLayout(layout);
 
-	layout->addWidget(new QLabel("AD9361 / AD9364 Transmit Chain", txChainWidget));
+	QLabel *title = new QLabel("AD9361 / AD9364 Transmit Chain", txChainWidget);
+	Style::setStyle(title, style::properties::label::menuBig);
+	layout->addWidget(title);
 
 	// Get connection to device
 	Connection *conn = ConnectionProvider::open(m_uri);
