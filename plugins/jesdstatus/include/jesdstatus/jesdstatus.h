@@ -31,7 +31,8 @@
 #include <QWidget>
 #include <QTimer>
 
-namespace scopy::jesdstatus {
+namespace scopy {
+namespace jesdstatus {
 class SCOPY_JESDSTATUS_EXPORT JesdStatus : public QWidget
 {
 	Q_OBJECT
@@ -46,14 +47,15 @@ public Q_SLOTS:
 	void runToggled(bool toggled);
 
 private:
-	ToolTemplate *tool;
+	ToolTemplate *m_tool;
 	QTimer *m_timer;
 	QList<struct iio_device *> m_deviceList;
 	MenuComboWidget *m_deviceSelector;
-	MapStackedWidget *jesdDeviceStack;
+	MapStackedWidget *m_jesdDeviceStack;
 
 	void setupDevice(iio_device *dev);
 	void poll();
 };
-} // namespace scopy::jesdstatus
+} // namespace jesdstatus
+} // namespace scopy
 #endif // JESDSTATUS_H
