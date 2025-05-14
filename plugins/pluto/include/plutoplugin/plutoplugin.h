@@ -19,20 +19,34 @@
  *
  */
 
-#ifndef IIOWIDGETUTILS_H
-#define IIOWIDGETUTILS_H
+#ifndef PLUTOPLUGIN_H
+#define PLUTOPLUGIN_H
 
-#include <QMap>
+#define SCOPY_PLUGIN_NAME PlutoPlugin
+
+#include "scopy-plutoplugin_export.h"
 #include <QObject>
-#include "scopy-iio-widgets_export.h"
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
 
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetUtils : public QObject
+namespace scopy::pluto {
+class SCOPY_PLUTOPLUGIN_EXPORT PlutoPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
-public:
-	static QString comboUiToDataConversionFunction(QString value, QMap<QString, QString> *map);
-	static QString comboDataToUiConversionFunction(QString value, QMap<QString, QString> *map);
-signals:
-};
+	SCOPY_PLUGIN;
 
-#endif // IIOWIDGETUTILS_H
+public:
+	bool compatible(QString m_param, QString category) override;
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
+	void unload() override;
+	void initMetadata() override;
+	QString description() override;
+
+public Q_SLOTS:
+	bool onConnect() override;
+	bool onDisconnect() override;
+};
+} // namespace scopy::pluto
+#endif // PLUTOPLUGIN_H

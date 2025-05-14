@@ -19,20 +19,30 @@
  *
  */
 
-#ifndef IIOWIDGETUTILS_H
-#define IIOWIDGETUTILS_H
+#ifndef MISCWIDGET_H
+#define MISCWIDGET_H
 
-#include <QMap>
-#include <QObject>
-#include "scopy-iio-widgets_export.h"
+#include <QWidget>
+#include <QBoxLayout>
+#include <iio.h>
 
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetUtils : public QObject
+namespace scopy {
+namespace pluto {
+class MiscWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static QString comboUiToDataConversionFunction(QString value, QMap<QString, QString> *map);
-	static QString comboDataToUiConversionFunction(QString value, QMap<QString, QString> *map);
-signals:
-};
+	explicit MiscWidget(QString uri, QWidget *parent = nullptr);
+	~MiscWidget();
 
-#endif // IIOWIDGETUTILS_H
+Q_SIGNALS:
+	void readRequested();
+
+private:
+	QString m_uri;
+	QVBoxLayout *m_layout;
+	iio_device *m_device;
+};
+} // namespace pluto
+} // namespace scopy
+#endif // MISCWIDGET_H

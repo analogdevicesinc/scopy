@@ -19,20 +19,35 @@
  *
  */
 
-#ifndef IIOWIDGETUTILS_H
-#define IIOWIDGETUTILS_H
+#ifndef ENSMMODECLOCKSWIDGET_H
+#define ENSMMODECLOCKSWIDGET_H
 
-#include <QMap>
-#include <QObject>
-#include "scopy-iio-widgets_export.h"
+#include <QBoxLayout>
+#include <QWidget>
+#include <iio.h>
 
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetUtils : public QObject
+namespace scopy {
+namespace pluto {
+
+class EnsmModeClocksWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static QString comboUiToDataConversionFunction(QString value, QMap<QString, QString> *map);
-	static QString comboDataToUiConversionFunction(QString value, QMap<QString, QString> *map);
-signals:
-};
+	explicit EnsmModeClocksWidget(QString uri, QWidget *parent = nullptr);
+	~EnsmModeClocksWidget();
 
-#endif // IIOWIDGETUTILS_H
+Q_SIGNALS:
+	void readRequested();
+
+private:
+	QString m_uri;
+	QVBoxLayout *m_layout;
+	iio_device *m_device;
+	QWidget *generateEnsmModeWidget(QWidget *parent);
+	QWidget *generateModeWidget(QWidget *parent);
+	QWidget *generateClocksWidget(QWidget *parent);
+};
+} // namespace pluto
+} // namespace scopy
+
+#endif // ENSMMODECLOCKSWIDGET_H

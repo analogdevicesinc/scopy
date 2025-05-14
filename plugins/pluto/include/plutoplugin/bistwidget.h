@@ -19,20 +19,45 @@
  *
  */
 
-#ifndef IIOWIDGETUTILS_H
-#define IIOWIDGETUTILS_H
+#ifndef BISTWIDGET_H
+#define BISTWIDGET_H
 
-#include <QMap>
-#include <QObject>
-#include "scopy-iio-widgets_export.h"
+#include <QWidget>
+#include <QBoxLayout>
+#include <iio.h>
+#include <menuonoffswitch.h>
+#include <iiowidgetbuilder.h>
 
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetUtils : public QObject
+namespace scopy {
+namespace pluto {
+
+class BistWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static QString comboUiToDataConversionFunction(QString value, QMap<QString, QString> *map);
-	static QString comboDataToUiConversionFunction(QString value, QMap<QString, QString> *map);
-signals:
-};
+	explicit BistWidget(QString uri, QWidget *parent = nullptr);
+	~BistWidget();
 
-#endif // IIOWIDGETUTILS_H
+Q_SIGNALS:
+	void bistToneUpdated();
+	void readRequested();
+
+private:
+	QString m_uri;
+	QVBoxLayout *m_layout;
+	iio_device *m_device;
+	void updateBistTone();
+
+	MenuComboWidget *m_bistTone;
+	MenuComboWidget *m_toneFrequency;
+	MenuComboWidget *m_toneLevel;
+
+	MenuOnOffSwitch *m_c2q;
+	MenuOnOffSwitch *m_c2i;
+	MenuOnOffSwitch *m_c1q;
+	MenuOnOffSwitch *m_c1i;
+};
+} // namespace pluto
+} // namespace scopy
+
+#endif // BISTWIDGET_H

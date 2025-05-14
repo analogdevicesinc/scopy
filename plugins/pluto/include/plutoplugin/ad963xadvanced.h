@@ -19,20 +19,33 @@
  *
  */
 
-#ifndef IIOWIDGETUTILS_H
-#define IIOWIDGETUTILS_H
+#ifndef AD963XADVANCED_H
+#define AD963XADVANCED_H
 
-#include <QMap>
-#include <QObject>
-#include "scopy-iio-widgets_export.h"
+#include <QBoxLayout>
+#include <QPushButton>
+#include <QWidget>
+#include <animatedrefreshbtn.h>
+#include <tooltemplate.h>
 
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetUtils : public QObject
+namespace scopy {
+namespace pluto {
+class AD936XAdvanced : public QWidget
 {
 	Q_OBJECT
 public:
-	static QString comboUiToDataConversionFunction(QString value, QMap<QString, QString> *map);
-	static QString comboDataToUiConversionFunction(QString value, QMap<QString, QString> *map);
-signals:
-};
+	explicit AD936XAdvanced(QString uri, QWidget *parent = nullptr);
+	~AD936XAdvanced();
 
-#endif // IIOWIDGETUTILS_H
+Q_SIGNALS:
+	void readRequested();
+
+private:
+	QString m_uri;
+	ToolTemplate *m_tool;
+	QVBoxLayout *m_mainLayout;
+	AnimatedRefreshBtn *m_refreshButton;
+};
+} // namespace pluto
+} // namespace scopy
+#endif // AD963XADVANCED_H
