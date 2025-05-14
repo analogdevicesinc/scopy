@@ -26,7 +26,7 @@
 
 #include <gui/tooltemplate.h>
 #include <gui/widgets/toolbuttons.h>
-#include <gui/animationpushbutton.h>
+#include <gui/widgets/animatedrefreshbtn.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/filebrowserwidget.h>
 #include <iiowidget.h>
@@ -55,12 +55,12 @@ private:
 	QString readFile(QString file);
 
 	struct iio_device *m_device;
-	ToolTemplate *tool;
-	GearBtn *settingsBtn;
+	ToolTemplate *m_tool;
+	GearBtn *m_settingsBtn;
 	QPushButton *m_deviceName;
 	QPushButton *m_rxChain;
 	QPushButton *m_txChain;
-	AnimationPushButton *m_refreshBtn;
+	AnimatedRefreshBtn *m_refreshBtn;
 	FileBrowserWidget *m_cfirFileBrowser;
 	FileBrowserWidget *m_pfirFileBrowser;
 	QVector<Ad9084Channel *> m_channelsRx;

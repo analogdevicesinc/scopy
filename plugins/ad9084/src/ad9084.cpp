@@ -45,24 +45,24 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	this->setLayout(lay);
 	lay->setMargin(0);
 
-	tool = new ToolTemplate(this);
-	tool->topContainer()->setVisible(true);
-	tool->topContainerMenuControl()->setVisible(false);
-	tool->bottomContainer()->setVisible(false);
-	tool->rightContainer()->setVisible(true);
-	tool->leftContainer()->setVisible(false);
-	tool->topCentral()->setVisible(false);
-	tool->centralContainer()->setVisible(true);
-	tool->setRightContainerWidth(300);
-	lay->addWidget(tool);
+	m_tool = new ToolTemplate(this);
+	m_tool->topContainer()->setVisible(true);
+	m_tool->topContainerMenuControl()->setVisible(false);
+	m_tool->bottomContainer()->setVisible(false);
+	m_tool->rightContainer()->setVisible(true);
+	m_tool->leftContainer()->setVisible(false);
+	m_tool->topCentral()->setVisible(false);
+	m_tool->centralContainer()->setVisible(true);
+	m_tool->setRightContainerWidth(300);
+	lay->addWidget(m_tool);
 
-	settingsBtn = new GearBtn(this);
-	settingsBtn->setCheckable(true);
-	settingsBtn->setChecked(true);
+	m_settingsBtn = new GearBtn(this);
+	m_settingsBtn->setCheckable(true);
+	m_settingsBtn->setChecked(true);
 
-	connect(settingsBtn, &QPushButton::toggled, this, [this](bool b) {
-		tool->openRightContainerHelper(b);
-		tool->requestMenu(settingsMenuId);
+	connect(m_settingsBtn, &QPushButton::toggled, this, [this](bool b) {
+		m_tool->openRightContainerHelper(b);
+		m_tool->requestMenu(settingsMenuId);
 	});
 
 	m_hSplitter = new QSplitter(Qt::Horizontal, this);
@@ -72,13 +72,13 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	m_rxChain->setText("RX");
 	m_rxChain->setCheckable(true);
 	m_rxChain->setChecked(true);
-	Style::setStyle(m_rxChain, style::properties::button::squareIconButton);
+	Style::setStyle(m_rxChain, style::properties::button::blueGrayButton);
 
 	m_txChain = new QPushButton(this);
 	m_txChain->setText("TX");
 	m_txChain->setCheckable(true);
 	m_txChain->setChecked(true);
-	Style::setStyle(m_txChain, style::properties::button::squareIconButton);
+	Style::setStyle(m_txChain, style::properties::button::blueGrayButton);
 
 	m_deviceName = new QPushButton(this);
 	m_deviceName->setText(iio_device_get_name(m_device));
@@ -86,15 +86,9 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	m_deviceName->setCheckable(false);
 	m_deviceName->setChecked(true);
 
-	m_refreshBtn = new AnimationPushButton(this);
-	m_refreshBtn->setIcon(
-		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
-	m_refreshBtn->setIconSize(QSize(25, 25));
+	m_refreshBtn = new AnimatedRefreshBtn(false, this);
 	m_refreshBtn->setText("Refresh");
 	m_refreshBtn->setAutoDefault(true);
-	Style::setStyle(m_refreshBtn, style::properties::button::basicButton);
-	QMovie *movie = new QMovie(":/gui/loading.gif");
-	m_refreshBtn->setAnimation(movie, 20000);
 
 	// RX chain scrollable container
 	QLabel *globalRxLbl = new QLabel("RX Chain");
@@ -159,13 +153,13 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	// Create right side menu
 	QWidget *rightSideMenu = createMenu();
 
-	tool->addWidgetToTopContainerHelper(m_deviceName, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(m_rxChain, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(m_txChain, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(m_refreshBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
-	tool->addWidgetToCentralContainerHelper(m_hSplitter);
-	tool->rightStack()->add(settingsMenuId, rightSideMenu);
+	m_tool->addWidgetToTopContainerHelper(m_deviceName, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(m_rxChain, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(m_txChain, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(m_refreshBtn, TTA_RIGHT);
+	m_tool->addWidgetToTopContainerHelper(m_settingsBtn, TTA_RIGHT);
+	m_tool->addWidgetToCentralContainerHelper(m_hSplitter);
+	m_tool->rightStack()->add(settingsMenuId, rightSideMenu);
 
 	scanChannels();
 	for(auto w : qAsConst(m_channelsRx)) {
@@ -313,6 +307,7 @@ QWidget *Ad9084::createMenu()
 	m_pfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
 	m_pfirFileBrowser->setFilter(tr("All Files(*)"));
 	auto pfirFileBrowserEdit = m_pfirFileBrowser->lineEdit();
+	pfirFileBrowserEdit->setReadOnly(true);
 	QObject::connect(pfirFileBrowserEdit, &QLineEdit::textChanged, this, &Ad9084::loadPfir);
 
 	pfirlay->addWidget(m_pfirFileBrowser);
@@ -329,6 +324,7 @@ QWidget *Ad9084::createMenu()
 	m_cfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
 	m_cfirFileBrowser->setFilter(tr("All Files(*)"));
 	auto cfirFileBrowserEdit = m_cfirFileBrowser->lineEdit();
+	cfirFileBrowserEdit->setReadOnly(true);
 	QObject::connect(cfirFileBrowserEdit, &QLineEdit::textChanged, this, &Ad9084::loadCfir);
 
 	cfirlay->addWidget(m_cfirFileBrowser);
