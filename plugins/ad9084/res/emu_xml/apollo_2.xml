@@ -1160,7 +1160,7 @@ Clock input power detection B: UNUSED" />
 		<debug-attribute name="pl_ddr_fifo_enable" value="1" />
 		<debug-attribute name="direct_reg_access" value="0x90262" />
 	</device>
-	<device id="iio:device9" name="axi-ad9088-rx-hpc" >
+	<device id="iio:device10" name="axi-ad9088-rx-hpc" >
 		<channel id="voltage0_i" type="input" >
 			<scan-element index="0" format="le:S16/16&gt;&gt;0" />
 			<attribute name="adc_frequency" filename="in_voltage_adc_frequency" value="20000000000" />

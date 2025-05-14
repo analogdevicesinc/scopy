@@ -79,7 +79,7 @@ void Ad9084Channel::setupFrequency()
 					    .channel(m_channel)
 					    .attribute("adc_frequency")
 					    .uiStrategy(IIOWidgetBuilder::EditableUi)
-					    .title("ADC Frequency")
+					    .title("ADC Frequency (MHz)")
 					    .parent(this)
 					    .buildSingle();
 		m_iioWidgetGroupList.value(ADC_FREQUENCY)->add(m_frequencyWidget);
@@ -88,7 +88,7 @@ void Ad9084Channel::setupFrequency()
 					    .channel(m_channel)
 					    .attribute("dac_frequency")
 					    .uiStrategy(IIOWidgetBuilder::EditableUi)
-					    .title("DAC Frequency")
+					    .title("DAC Frequency (MHz)")
 					    .parent(this)
 					    .buildSingle();
 		m_iioWidgetGroupList.value(DAC_FREQUENCY)->add(m_frequencyWidget);
@@ -108,7 +108,7 @@ void Ad9084Channel::setupChannelNco(QLayout *lay)
 				  .attribute("channel_nco_frequency")
 				  .uiStrategy(IIOWidgetBuilder::RangeUi)
 				  .optionsAttribute("channel_nco_frequency_available")
-				  .title("NCO Frequency")
+				  .title("NCO Frequency (MHz)")
 				  .parent(this)
 				  .buildSingle();
 	chnNcoFreq->setUItoDataConversion(std::bind(&Ad9084Channel::frequencyUItoDS, this, std::placeholders::_1));
@@ -296,6 +296,7 @@ void Ad9084Channel::init()
 				       .title("CFIR Enable")
 				       .parent(this)
 				       .buildSingle());
+	m_iioWidgets.last()->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_iioWidgets.last()->showProgressBar(false);
 	cfirLay->addWidget(m_iioWidgets.last());
 
@@ -314,8 +315,10 @@ void Ad9084Channel::init()
 				       .attribute("en")
 				       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				       .compactMode(true)
+				       .title("")
 				       .parent(this)
 				       .buildSingle());
+	m_iioWidgets.last()->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_iioWidgets.last()->showProgressBar(false);
 	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_iioWidgets.last()->getDataStrategy()),
 		&ChannelAttrDataStrategy::emitStatus, this,
