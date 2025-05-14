@@ -33,7 +33,7 @@ include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -58,7 +58,15 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
+set(APOLLO_FILTERS_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/ad9084)
+set(APOLLO_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/res/ad9084)
+
 install(DIRECTORY res/filters DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
+
+file(GLOB FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/res/filters/*)
+foreach(_filter ${FILTERS})
+	file(COPY ${_filter} DESTINATION ${APOLLO_FILTERS_BUILD_PATH})
+endforeach()
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})

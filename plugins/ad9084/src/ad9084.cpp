@@ -131,8 +131,10 @@ Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
 	m_hSplitter->setStretchFactor(1, 1);
 	m_hSplitter->setSizes({1, 1});
 
-	connect(m_rxChain, &QPushButton::toggled, this, [=, this](bool toggled) { rxScroll->setVisible(toggled); });
-	connect(m_txChain, &QPushButton::toggled, this, [=, this](bool toggled) { txScroll->setVisible(toggled); });
+	connect(m_rxChain, &QPushButton::toggled, this,
+		[this, rxScroll](bool toggled) { rxScroll->setVisible(toggled); });
+	connect(m_txChain, &QPushButton::toggled, this,
+		[this, txScroll](bool toggled) { txScroll->setVisible(toggled); });
 	connect(m_refreshBtn, &QPushButton::clicked, this, [this]() {
 		m_refreshBtn->startAnimation();
 
@@ -183,7 +185,6 @@ void Ad9084::scanChannels()
 {
 	unsigned int nbChannels = iio_device_get_channels_count(m_device);
 	for(unsigned int i = 0; i < nbChannels; i++) {
-		bool notBuffer = false;
 		struct iio_channel *chn = iio_device_get_channel(m_device, i);
 		if(!chn) {
 			continue;
@@ -193,7 +194,7 @@ void Ad9084::scanChannels()
 		if(!attr) {
 			continue;
 		}
-		notBuffer = extractChannelPaths(chn);
+		extractChannelPaths(chn);
 	}
 	mapPathsUnique();
 
@@ -254,10 +255,9 @@ void Ad9084::mapPathsUnique()
 
 bool Ad9084::extractChannelPaths(struct iio_channel *chn)
 {
-	bool notBuffer = false;
 	size_t labelSize = 1024;
 	char buf[labelSize];
-	int ret = iio_channel_attr_read(chn, "label", buf, labelSize);
+	iio_channel_attr_read(chn, "label", buf, labelSize);
 	QString label(buf);
 	QString chnId = iio_channel_get_id(chn);
 
