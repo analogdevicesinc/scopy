@@ -87,8 +87,7 @@ JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 		laneScroll->setWidgetResizable(true);
 		laneScroll->setWidget(laneHeader);
 		laneScrollLayH->setMargin(0);
-		//		laneScroll->setSizePolicy(laneScroll->sizePolicy().horizontalPolicy(),
-		// QSizePolicy::Maximum);
+		laneScroll->setSizePolicy(statusScroll->sizePolicy().horizontalPolicy(), QSizePolicy::Maximum);
 
 		// Setup lane status label
 		QLabel *laneContainerLbl = new QLabel("LANE STATUS", laneContainer);
@@ -205,6 +204,7 @@ void JesdStatusView::initLaneStatusValues(QWidget *laneContainer)
 
 	for(int i = 0; i < m_parser->getLaneCount(); i++) {
 		MenuSectionWidget *lane = new MenuSectionWidget(laneValues);
+		lane->contentLayout()->setMargin(0);
 		laneValuesLay->addWidget(lane);
 		m_laneLabels.insert(i, {});
 
@@ -279,7 +279,7 @@ void JesdStatusView::updateStatus()
 void JesdStatusView::updateLaneStatus()
 {
 	auto lanes = m_laneLabels.keys();
-	for(unsigned int i : lanes) {
+	for(unsigned int i : qAsConst(lanes)) {
 		for(auto &pair : m_laneLabels.value(i)) {
 			QLabel *vLbl = pair.first;
 			auto callback = pair.second;

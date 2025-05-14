@@ -212,7 +212,6 @@ QPair<QString, VISUAL_STATUS> JesdStatusParser::getMeasuredDeviceClock()
 	bool ok;
 	float measured = 0.0;
 	float reported = 0.0;
-	//	float div40 = 0.0;
 	QString measuredDeviceClock = m_jesd204_status.measured_device_clock;
 	QString reportedDeviceClock = m_jesd204_status.reported_device_clock;
 

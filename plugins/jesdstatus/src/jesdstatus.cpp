@@ -34,38 +34,38 @@ JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
 	this->setLayout(lay);
 	lay->setMargin(0);
 
-	tool = new ToolTemplate(this);
-	tool->topContainer()->setVisible(false);
-	tool->topContainerMenuControl()->setVisible(false);
-	tool->bottomContainer()->setVisible(false);
-	tool->rightContainer()->setVisible(false);
-	tool->leftContainer()->setVisible(false);
-	tool->topCentral()->setVisible(false);
-	tool->centralContainer()->setVisible(true);
-	tool->setRightContainerWidth(0);
-	tool->centralContainer()->layout()->setSpacing(10);
-	lay->addWidget(tool);
+	m_tool = new ToolTemplate(this);
+	m_tool->topContainer()->setVisible(false);
+	m_tool->topContainerMenuControl()->setVisible(false);
+	m_tool->bottomContainer()->setVisible(false);
+	m_tool->rightContainer()->setVisible(false);
+	m_tool->leftContainer()->setVisible(false);
+	m_tool->topCentral()->setVisible(false);
+	m_tool->centralContainer()->setVisible(true);
+	m_tool->setRightContainerWidth(0);
+	m_tool->centralContainer()->layout()->setSpacing(10);
+	lay->addWidget(m_tool);
 
-	jesdDeviceStack = new MapStackedWidget(this);
+	m_jesdDeviceStack = new MapStackedWidget(this);
 
 	MenuSectionWidget *deviceSelectorWidget = new MenuSectionWidget(this);
 	m_deviceSelector = new MenuComboWidget("JESD204 Link Layer Device", deviceSelectorWidget);
 	Style::setStyle(m_deviceSelector, style::properties::label::menuBig);
 	deviceSelectorWidget->contentLayout()->addWidget(m_deviceSelector);
 	Style::setStyle(deviceSelectorWidget, style::properties::widget::border_interactive);
-	connect(m_deviceSelector->combo(), qOverload<int>(&QComboBox::currentIndexChanged),
+	connect(m_deviceSelector->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
 		[=, this](int idx) { poll(); });
 
 	connect(m_timer, &QTimer::timeout, this, &JesdStatus::poll);
 
-	tool->addWidgetToCentralContainerHelper(deviceSelectorWidget);
-	tool->addWidgetToCentralContainerHelper(jesdDeviceStack);
+	m_tool->addWidgetToCentralContainerHelper(deviceSelectorWidget);
+	m_tool->addWidgetToCentralContainerHelper(m_jesdDeviceStack);
 
 	for(auto dev : qAsConst(m_deviceList)) {
 		setupDevice(dev);
 	}
 
-	jesdDeviceStack->setCurrentIndex(0);
+	m_jesdDeviceStack->setCurrentIndex(0);
 }
 
 JesdStatus::~JesdStatus()
@@ -90,7 +90,7 @@ void JesdStatus::setupDevice(struct iio_device *dev)
 	JesdStatusView *jesdLinkDevView = new JesdStatusView(dev, this);
 	QString devLbl = iio_device_get_label(dev);
 	m_deviceSelector->combo()->addItem(devLbl);
-	jesdDeviceStack->add(devLbl, jesdLinkDevView);
+	m_jesdDeviceStack->add(devLbl, jesdLinkDevView);
 	jesdLinkDevView->update();
 }
 
@@ -98,8 +98,8 @@ void JesdStatus::poll()
 {
 	unsigned int idx = m_deviceSelector->combo()->currentIndex();
 	QString device = m_deviceSelector->combo()->itemText(idx);
-	jesdDeviceStack->show(device);
-	JesdStatusView *current = dynamic_cast<JesdStatusView *>(jesdDeviceStack->get(device));
+	m_jesdDeviceStack->show(device);
+	JesdStatusView *current = dynamic_cast<JesdStatusView *>(m_jesdDeviceStack->get(device));
 	if(current) {
 		current->update();
 	}
