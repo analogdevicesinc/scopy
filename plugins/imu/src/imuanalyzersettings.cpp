@@ -5,18 +5,19 @@ using namespace scopy;
 ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent)
 	: QWidget{parent}
 {
-	QVBoxLayout *lay = new QVBoxLayout(this);
+	QVBoxLayout *lay = new QVBoxLayout();
 	lay->setMargin(0);
 	lay->setSpacing(10);
 	setLayout(lay);
 
 	m_device = device;
 
-	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(Qt::blue), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(Qt::blue));
 
 	MenuSectionWidget *generalSettings = new MenuSectionWidget(this);
 	MenuCollapseSection *generalSettingsWidget = new MenuCollapseSection(
 		"General Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, generalSettings);
+	generalSettingsWidget->contentLayout()->setSpacing(10);
 
 	MenuSectionWidget *bubbleLevelSettings = new MenuSectionWidget(this);
 	MenuCollapseSection *bubbleLevelSettingsWidget = new MenuCollapseSection(
@@ -75,4 +76,5 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 	lay->addWidget(sceneRendererSettings);
 
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
 }

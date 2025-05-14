@@ -24,11 +24,13 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_tool->bottomContainer()->setVisible(true);
 	m_tool->topContainerMenuControl()->setVisible(false);
 	m_tool->setRightContainerWidth(300);
+	m_tool->centralContainer()->layout()->setSpacing(10);
 
 	lay->addWidget(m_tool);
 
 	m_dataV = new DataVisualizer();
 	m_tool->addWidgetToCentralContainerHelper(m_dataV);
+	m_dataV->hide();
 
 	connect(this, &IMUAnalyzerInterface::updateValues, m_dataV, &DataVisualizer::updateValues);
 
@@ -51,7 +53,10 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_rstPos->setCheckable(false);
 	m_tool->addWidgetToBottomContainerHelper(m_rstPos, TTA_LEFT);
 
-	connect(m_rstPos, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetPos);
+	connect(m_rstPos, &QPushButton::clicked, this, [=, this](bool toggled){
+		m_rot = {0.0f, 0.0f, 0.0f};
+	});
+
 
 	m_rstView = new MenuControlButton(this);
 	m_rstView->setName("Reset View");
@@ -67,7 +72,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_measureBtn->checkBox()->setVisible(false);
 	m_measureBtn->button()->setVisible(false);
 	m_measureBtn->setCheckable(true);
-	m_measureBtn->setChecked(true);
+	m_measureBtn->setChecked(false);
 	m_tool->addWidgetToBottomContainerHelper(m_measureBtn, TTA_RIGHT);
 
 	connect(m_measureBtn, &QPushButton::toggled, this, [=, this](bool toggled){
@@ -79,16 +84,19 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 	connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
 
-	connect(m_runBtn, &QPushButton::pressed,[](){
+	connect(m_runBtn, &QPushButton::toggled,[=, this](bool toggled){
 		m_runThread = !m_runThread;
+		if(toggled){
+			t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
+		} else {
+			t.join();
+		}
 	});
 
-	t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
+	m_bubbleLevelRenderer = new BubbleLevelRenderer(tabWidget);
+	tabWidget->addTab(m_bubbleLevelRenderer, "2D View");
 
-	BubbleLevelRenderer *bubbleLevelRenderer = new BubbleLevelRenderer(tabWidget);
-	tabWidget->addTab(bubbleLevelRenderer, "2D View");
-
-	connect(this, &IMUAnalyzerInterface::generateRot, bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
+	connect(this, &IMUAnalyzerInterface::generateRot, m_bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
 
 	m_gearBtn = new GearBtn(this);
 	m_tool->addWidgetToTopContainerHelper(m_gearBtn, TTA_RIGHT);
@@ -96,8 +104,13 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_gearBtn->setChecked(true);
 
 	QString key = "Settings";
-	m_settingsPanel = new ImuAnalyzerSettings(m_sceneRender, bubbleLevelRenderer, m_device, this);
-	m_tool->rightStack()->add(key,m_settingsPanel);
+	m_settingsPanel = new ImuAnalyzerSettings(m_sceneRender, m_bubbleLevelRenderer, m_device);
+
+	QScrollArea *scrollArea = new QScrollArea;
+	scrollArea->setWidget(m_settingsPanel);
+	scrollArea->setWidgetResizable(true);
+
+	m_tool->rightStack()->add(key,scrollArea);
 
 	connect(m_gearBtn, &GearBtn::toggled, this, [=, this](bool toggled) {
 		if(toggled)
@@ -105,6 +118,10 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 		m_tool->openRightContainerHelper(toggled);
 	});
+
+	connect(m_rstPos, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetPos);
+	connect(m_rstPos, &QPushButton::clicked, m_bubbleLevelRenderer, &BubbleLevelRenderer::resetPos);
+	connect(m_rstPos, &QPushButton::clicked, m_dataV, &DataVisualizer::resetPos);
 
 	}
 
@@ -119,36 +136,69 @@ void IMUAnalyzerInterface::generateRotation(){
 	iio_channel *anglVelChY = iio_device_find_channel(m_device, "anglvel_y", false);
 	iio_channel *anglVelChZ = iio_device_find_channel(m_device, "anglvel_z", false);
 
-	double anglVelGainX;
+	iio_channel *linearAccChX = iio_device_find_channel(m_device, "accel_x", false);
+	iio_channel *linearAccChY = iio_device_find_channel(m_device, "accel_y", false);
+	iio_channel *linearAccChZ = iio_device_find_channel(m_device, "accel_z", false);
+
+	iio_channel *tempCh = iio_device_find_channel(m_device, "temp0", false);
+
+	double operatingFreq;
+	iio_device_attr_read_double(m_device, "sampling_frequency", &operatingFreq);
+
+	double anglVelGainX, anglVelGainY, anglVelGainZ;
+
 	iio_channel_attr_read_double(anglVelChX, "scale", &anglVelGainX);
-	double anglVelGainY;
 	iio_channel_attr_read_double(anglVelChY, "scale", &anglVelGainY);
-	double anglVelGainZ;
 	iio_channel_attr_read_double(anglVelChZ, "scale", &anglVelGainZ);
 
-	double anglVelX, anglVelY, anglVelZ;
+	double linearAccGainX, linearAccGainY, linearAccGainZ;
+	if(linearAccChX != nullptr){
+		iio_channel_attr_read_double(linearAccChX, "scale", &linearAccGainX);
+		iio_channel_attr_read_double(linearAccChY, "scale", &linearAccGainY);
+		iio_channel_attr_read_double(linearAccChZ, "scale", &linearAccGainZ);
+	}
 
-	m_rot = {0.0f, 0.0f, 0.0f};
-	bool directionX = false, directionY = false;
-	while(1){
-		if (!m_runThread) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Light pause loop
-			continue;
-		}
+	double tempGain, tempOffset;
+	if(tempCh != nullptr){
+		iio_channel_attr_read_double(tempCh, "scale", &tempGain);
+		iio_channel_attr_read_double(tempCh, "offset", &tempOffset);
+	}
+
+	double anglVelX, anglVelY, anglVelZ;
+	double linearAccX, linearAccY, linearAccZ;
+	double temp;
+
+	while(m_runThread){
 
 		iio_channel_attr_read_double(anglVelChX, "raw", &anglVelX);
 		iio_channel_attr_read_double(anglVelChY, "raw", &anglVelY);
 		iio_channel_attr_read_double(anglVelChZ, "raw", &anglVelZ);
 
-		m_rot.dataX += float(anglVelX * anglVelGainX / 2);
-		m_rot.dataY += float(anglVelY * anglVelGainY / 2);
-		m_rot.dataZ += float(anglVelZ * anglVelGainZ / 2);
+		m_rot.dataX += float(anglVelX * anglVelGainX);
+		m_rot.dataY += float(anglVelY * anglVelGainY);
+		m_rot.dataZ += float(anglVelZ * anglVelGainZ);
+
+		if(linearAccChX != nullptr){
+			iio_channel_attr_read_double(linearAccChX, "raw", &linearAccX);
+			iio_channel_attr_read_double(linearAccChY, "raw", &linearAccY);
+			iio_channel_attr_read_double(linearAccChZ, "raw", &linearAccZ);
+
+			m_dist.dataX = float(linearAccX * linearAccGainX);
+			m_dist.dataY = float(linearAccY * linearAccGainY);
+			m_dist.dataZ = float(linearAccZ * linearAccGainZ);
+		}
+
+		if(tempCh != nullptr){
+			iio_channel_attr_read_double(tempCh, "raw", &temp);
+
+			temp = temp * tempGain - tempOffset;
+		}
 
 		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
 					  Q_ARG(data3P, m_rot));
 		QMetaObject::invokeMethod(this, "updateValues", Qt::QueuedConnection,
-					  Q_ARG(data3P, m_rot),Q_ARG(data3P, m_rot),Q_ARG(float, 0.0f));
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					  Q_ARG(data3P, m_rot),Q_ARG(data3P, m_dist),Q_ARG(float, float(temp)));
+		std::this_thread::sleep_for(std::chrono::nanoseconds(int(1000000 / operatingFreq)));
 	}
 }
 

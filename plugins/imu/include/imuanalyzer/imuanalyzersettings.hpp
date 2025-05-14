@@ -35,7 +35,7 @@ class SCOPY_IMUANALYZER_EXPORT ImuAnalyzerSettings : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent);
+	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent = nullptr);
 
 signals:
 	void updateCubeColor(QColor color);

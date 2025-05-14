@@ -50,3 +50,7 @@ void BubbleLevelRenderer::setRot(data3P rot){
 void BubbleLevelRenderer::setDisplayPoints(QString displayP){
 	m_displayPoints = displayP;
 }
+
+void BubbleLevelRenderer::resetPos(){
+	setRot(data3P{0.0f, 0.0f, 0.0f});
+}

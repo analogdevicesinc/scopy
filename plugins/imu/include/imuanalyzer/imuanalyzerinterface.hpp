@@ -56,10 +56,12 @@ private:
     GearBtn *m_gearBtn;
 
     SceneRenderer *m_sceneRender;
+    BubbleLevelRenderer *m_bubbleLevelRenderer;
 
     ImuAnalyzerSettings *m_settingsPanel;
     DataVisualizer *m_dataV;
-    data3P m_rot;
+    data3P m_rot = {0.0f, 0.0f, 0.0f};
+    data3P m_dist = {0.0f, 0.0f, 0.0f};
 
     std::thread t;
     QString m_uri;
