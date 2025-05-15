@@ -211,9 +211,20 @@ void MenuSpinbox::setValue(double newValue) { setValueForce(newValue, 0); }
 
 void MenuSpinbox::setValueForce(double newValue, bool force)
 {
-	if(qFuzzyCompare(m_value, newValue) || force)
+	// when force is true value does not consider min/max limits
+	if(force) {
+		m_value = newValue;
+		populateWidgets();
+		Q_EMIT valueChanged(m_value);
 		return;
+	}
 
+	if(qFuzzyCompare(m_value, newValue)) {
+		// check if text in edit changed even if value does not
+		if(QString::number(m_value).compare(m_edit->text()) != 0)
+			populateWidgets(); // reset to last valid value
+		return;
+	}
 	m_value = clamp(newValue, m_min, m_max);
 	populateWidgets();
 	Q_EMIT valueChanged(m_value);
@@ -280,7 +291,7 @@ void MenuSpinbox::userInput(QString s)
 	bool ok;
 	double val = nr.toDouble(&ok);
 	if(!ok)
-		setValue(m_value); // reset
+		setValueForce(m_value);// reset
 
 	if(m_scalingEnabled) {
 		QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
