@@ -211,8 +211,12 @@ void MenuSpinbox::setValue(double newValue) { setValueForce(newValue, 0); }
 
 void MenuSpinbox::setValueForce(double newValue, bool force)
 {
-	if(qFuzzyCompare(m_value, newValue) || force)
+	if(qFuzzyCompare(m_value, newValue) && !force) {
+		// check if text in edit changed even if value does not
+		if(QString::number(m_value).compare(m_edit->text()) != 0)
+			populateWidgets(); // reset to last valid value
 		return;
+	}
 
 	m_value = clamp(newValue, m_min, m_max);
 	populateWidgets();
@@ -279,8 +283,10 @@ void MenuSpinbox::userInput(QString s)
 		i + 1); // interpret number up to that digit - this makes sure you can also set stuff like 2e6 or 2M
 	bool ok;
 	double val = nr.toDouble(&ok);
-	if(!ok)
-		setValue(m_value); // reset
+	if(!ok) {
+		setValueForce(m_value, true); // reset
+		return;
+	}
 
 	if(m_scalingEnabled) {
 		QString unit = s.mid(i + 1, 1); // isolate prefix and unit from the whole string (mV)
