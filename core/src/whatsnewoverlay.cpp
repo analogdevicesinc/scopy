@@ -30,6 +30,7 @@
 #include <QScrollArea>
 #include <preferenceshelper.h>
 #include <stylehelper.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
@@ -44,19 +45,19 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 
 	m_carouselWidget = new QStackedWidget(this);
 
-	// bottom of main layout has controll widget
+	// bottom of main layout has control widget
 
-	QWidget *overlayControllWidget = new QWidget(this);
-	QVBoxLayout *overlayControllWidgetLayout = new QVBoxLayout(overlayControllWidget);
+	QWidget *overlayControlWidget = new QWidget(this);
+	QVBoxLayout *overlayControlWidgetLayout = new QVBoxLayout(overlayControlWidget);
 
-	QWidget *optionsoverlayControllWidget = new QWidget(overlayControllWidget);
-	overlayControllWidgetLayout->addWidget(optionsoverlayControllWidget);
-	QHBoxLayout *optionsControllLayout = new QHBoxLayout(optionsoverlayControllWidget);
-	optionsoverlayControllWidget->setLayout(optionsControllLayout);
+	QWidget *optionsoverlayControlWidget = new QWidget(overlayControlWidget);
+	overlayControlWidgetLayout->addWidget(optionsoverlayControlWidget);
+	QHBoxLayout *optionsControlLayout = new QHBoxLayout(optionsoverlayControlWidget);
+	optionsoverlayControlWidget->setLayout(optionsControlLayout);
 
-	QCheckBox *showAgain = new QCheckBox("Show this again", optionsoverlayControllWidget);
+	QCheckBox *showAgain = new QCheckBox("Show this again", optionsoverlayControlWidget);
 	showAgain->setChecked(true);
-	optionsControllLayout->addWidget(showAgain);
+	optionsControlLayout->addWidget(showAgain);
 
 	connect(showAgain, &QCheckBox::toggled, this, [=](bool en) {
 		Preferences *p = Preferences::GetInstance();
@@ -64,19 +65,19 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	});
 
 	// version picker
-	m_versionCb = new QComboBox(optionsoverlayControllWidget);
+	m_versionCb = new QComboBox(optionsoverlayControlWidget);
 
 	connect(m_versionCb, qOverload<int>(&QComboBox::currentIndexChanged), this,
 		[=](int idx) { m_carouselWidget->setCurrentIndex(idx); });
 
-	QPushButton *okButton = new QPushButton("Ok", optionsoverlayControllWidget);
+	QPushButton *okButton = new QPushButton("Ok", optionsoverlayControlWidget);
 	connect(okButton, &QPushButton::clicked, this, [=]() { this->deleteLater(); });
 	Style::setStyle(okButton, style::properties::button::basicButton, true, true);
-	optionsControllLayout->addWidget(okButton);
+	optionsControlLayout->addWidget(okButton);
 
 	mainLayout->addWidget(m_carouselWidget);
 	mainLayout->addWidget(m_versionCb);
-	mainLayout->addWidget(overlayControllWidget);
+	mainLayout->addWidget(overlayControlWidget);
 	Style::setBackgroundColor(this, json::theme::background_primary);
 
 	initCarousel();
@@ -139,11 +140,11 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 	carouselContentLayout->setMargin(2);
 	carouselContentLayout->setSpacing(0);
 
-	QStackedWidget *versionCarouselWithControlls = new QStackedWidget(m_carouselWidget);
-	carouselContentLayout->addWidget(versionCarouselWithControlls, 9);
+	QStackedWidget *versionCarouselWithControls = new QStackedWidget(m_carouselWidget);
+	carouselContentLayout->addWidget(versionCarouselWithControls, 9);
 
 	QDir versionDir(filePath);
-	QFileInfoList fileList = versionDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+	const QFileInfoList fileList = versionDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 	for(const QFileInfo &page : fileList) {
 
@@ -159,7 +160,7 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 		htmlPage->setProperty("openExternalLinks", true);
 
 		scrollWidget->layout()->addWidget(htmlPage);
-		versionCarouselWithControlls->addWidget(scrollArea);
+		versionCarouselWithControls->addWidget(scrollArea);
 		Style::setStyle(scrollWidget, style::properties::widget::border_interactive);
 	}
 
@@ -167,29 +168,29 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 
 	if(numberOfPages > 1) {
 		// carousel control contains buttons for changeing info page
-		QWidget *carouselControllWidget = new QWidget(carouselContent);
+		QWidget *carouselControlWidget = new QWidget(carouselContent);
 
-		QButtonGroup *m_carouselButtons = new QButtonGroup(carouselControllWidget);
+		QButtonGroup *m_carouselButtons = new QButtonGroup(carouselControlWidget);
 		m_carouselButtons->setExclusive(true);
 
-		QHBoxLayout *carouselControllLayout = new QHBoxLayout(carouselControllWidget);
-		carouselControllWidget->setLayout(carouselControllLayout);
-		carouselControllLayout->setContentsMargins(0, 0, 0, 4);
+		QHBoxLayout *carouselControlayout = new QHBoxLayout(carouselControlWidget);
+		carouselControlWidget->setLayout(carouselControlayout);
+		carouselControlayout->setContentsMargins(0, 0, 0, 4);
 
-		QPushButton *previous = new QPushButton(carouselControllWidget);
+		QPushButton *previous = new QPushButton(carouselControlWidget);
 
 		StyleHelper::BlueIconButton(previous,
 					    Style::getPixmap(":/gui/icons/handle_left_arrow.svg",
 							     Style::getColor(json::theme::content_inverse)),
 					    "previousButton");
 
-		carouselControllLayout->addWidget(previous);
-		carouselControllLayout->addSpacerItem(
+		carouselControlayout->addWidget(previous);
+		carouselControlayout->addSpacerItem(
 			new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 		for(int i = 0; i < numberOfPages; i++) {
 
-			QPushButton *htmlPageButton = new QPushButton("", carouselControllWidget);
+			QPushButton *htmlPageButton = new QPushButton("", carouselControlWidget);
 			htmlPageButton->setCheckable(true);
 
 			if(i == 0) {
@@ -198,26 +199,25 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 
 			connect(htmlPageButton, &QPushButton::toggled, this, [=](bool toggled) {
 				if(toggled) {
-					versionCarouselWithControlls->setCurrentIndex(i);
+					versionCarouselWithControls->setCurrentIndex(i);
 				}
 			});
 
-			carouselControllLayout->addWidget(htmlPageButton, 0, Qt::AlignBottom);
-			// carouselControllLayout->setAlignment(htmlPageButton, Qt::AlignBottom);
+			carouselControlayout->addWidget(htmlPageButton, 0, Qt::AlignBottom);
 			m_carouselButtons->addButton(htmlPageButton, i);
 			Style::setStyle(htmlPageButton, style::properties::button::whatsNewButton, true, true);
 			htmlPageButton->setFixedHeight(Style::getAttribute(json::global::radius_2).toInt());
 		}
 
-		QPushButton *next = new QPushButton(carouselControllWidget);
+		QPushButton *next = new QPushButton(carouselControlWidget);
 		StyleHelper::BlueIconButton(next,
 					    Style::getPixmap(":/gui/icons/handle_right_arrow.svg",
 							     Style::getColor(json::theme::content_inverse)),
 					    "nextButton");
 
-		carouselControllLayout->addSpacerItem(
+		carouselControlayout->addSpacerItem(
 			new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-		carouselControllLayout->addWidget(next);
+		carouselControlayout->addWidget(next);
 
 		connect(previous, &QPushButton::clicked, this, [=]() {
 			int currentIndex = m_carouselButtons->checkedId();
@@ -231,7 +231,7 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 			m_carouselButtons->button(nextIndex)->setChecked(true);
 		});
 
-		carouselContentLayout->addWidget(carouselControllWidget, 1);
+		carouselContentLayout->addWidget(carouselControlWidget, 1);
 	}
 
 	m_carouselWidget->addWidget(carouselContent);
@@ -240,7 +240,7 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 QString WhatsNewOverlay::getHtmlPageContent(QString fileName)
 {
 	QFile file(fileName);
-	if(!file.open(QIODevice::ReadOnly)) {
+	if(file.open(QIODevice::ReadOnly)) {
 		QString text = QString(file.readAll());
 		file.close();
 		return text;
@@ -249,5 +249,3 @@ QString WhatsNewOverlay::getHtmlPageContent(QString fileName)
 }
 
 #include "moc_whatsnewoverlay.cpp"
-
-#include <pluginbase/preferences.h>

@@ -18,6 +18,7 @@ resources/stylesheets/light.qss
 resources/credits.html
 resources/scopy_home.html
 resources/about.html
+resources/whatsnew/whatsnew.qrc
 *qt.conf
 !android/src/org/adi/scopy
 *.swp
