@@ -1,0 +1,25 @@
+# coeffs_16_lp0.txt
+dest: tx cfir_all profile_all datapath_all
+gain: 0
+complex_scalar: 32767 0
+enable: 1 profile_2
+selection_mode: direct_regmap
+coeff_transfer: 0
+bypass: 0
+242 242
+541 541
+151 151
+64329 64329
+63642 63642
+650 650
+6461 6461
+11575 11575
+11575 11575
+6461 6461
+650 650
+63642 63642
+64329 64329
+151 151
+541 541
+242 242
+
