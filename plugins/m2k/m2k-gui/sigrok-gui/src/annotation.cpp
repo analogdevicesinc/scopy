@@ -40,11 +40,16 @@
 #include "annotation.h"
 
 #include <cassert>
+#ifdef WIN32
 
+#include <libsigrokdecode/libsigrokdecode.h>
+
+#else
 extern "C"
 {
 #include <libsigrokdecode/libsigrokdecode.h>
 }
+#endif
 
 #include <vector>
 
