@@ -1,0 +1,52 @@
+#ifndef BASICBLOCK_H
+#define BASICBLOCK_H
+
+#include "scopy-iio-sink_export.h"
+#include <QMap>
+#include <QObject>
+
+namespace scopy::iiosink {
+class SCOPY_IIO_SINK_EXPORT ChannelData
+{
+public:
+    ChannelData(std::vector<float> data)
+        : data(std::move(data))
+    {}
+    ChannelData(int size = 0) { data.reserve(size); }
+
+    void setCopiedData(const std::vector<float> &new_data) { data = new_data; }
+
+    std::vector<float> data;
+};
+
+class SCOPY_IIO_SINK_EXPORT BlockData : public QMap<uint, ChannelData *>
+{
+public:
+    BlockData()
+        : QMap()
+    {}
+};
+
+class SCOPY_IIO_SINK_EXPORT BasicBlock : public QObject
+{
+    Q_OBJECT
+public:
+    BasicBlock(QString name = QString())
+        : QObject()
+        , m_name(std::move(name))
+    {}
+    ~BasicBlock() {}
+
+    QString getName() { return m_name; }
+
+    void setName(QString name) { m_name = name; }
+
+Q_SIGNALS:
+    void newData(ChannelData *data, uint ch);
+
+protected:
+    QString m_name;
+};
+}
+
+#endif
