@@ -35,16 +35,15 @@ class AuxAdcDacIoWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit AuxAdcDacIoWidget(QString uri, QWidget *parent = nullptr);
+	explicit AuxAdcDacIoWidget(iio_device *device, QWidget *parent = nullptr);
 	~AuxAdcDacIoWidget();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
 	QVBoxLayout *m_layout;
-	iio_device *m_device;
+	iio_device *m_device = nullptr;
 	QWidget *tempSensorWidget(QWidget *parent);
 	QWidget *auxAdcWidget(QWidget *parent);
 	QWidget *auxDacWidget(QWidget *parent);

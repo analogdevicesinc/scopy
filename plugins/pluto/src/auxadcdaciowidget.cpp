@@ -22,13 +22,12 @@
 #include "auxadcdaciowidget.h"
 
 #include <style.h>
-#include <iioutil/connectionprovider.h>
 
 using namespace scopy;
 using namespace pluto;
 
-AuxAdcDacIoWidget::AuxAdcDacIoWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+AuxAdcDacIoWidget::AuxAdcDacIoWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 
@@ -47,11 +46,6 @@ AuxAdcDacIoWidget::AuxAdcDacIoWidget(QString uri, QWidget *parent)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(auxAdcDacIoWidget);
 
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
-
 	layout->addWidget(tempSensorWidget(auxAdcDacIoWidget));
 	layout->addWidget(auxAdcWidget(auxAdcDacIoWidget));
 	layout->addWidget(auxDacWidget(auxAdcDacIoWidget));
@@ -62,7 +56,7 @@ AuxAdcDacIoWidget::AuxAdcDacIoWidget(QString uri, QWidget *parent)
 	m_layout->addWidget(scrollArea);
 }
 
-AuxAdcDacIoWidget::~AuxAdcDacIoWidget() { ConnectionProvider::close(m_uri); }
+AuxAdcDacIoWidget::~AuxAdcDacIoWidget() {}
 
 QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 {
@@ -230,11 +224,6 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 	QLabel *dacLabel = new QLabel("DAC" + dacx, auxDacWidget);
 	Style::setStyle(dacLabel, style::properties::label::menuBig);
 	layout->addWidget(dacLabel, 0, 0);
-
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	iio_device *m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	// adi,aux-dacx-default-value-m
 	IIOWidget *dacDefaultValue = IIOWidgetBuilder(auxDacWidget)

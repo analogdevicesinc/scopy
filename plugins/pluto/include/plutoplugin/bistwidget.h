@@ -35,7 +35,7 @@ class BistWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit BistWidget(QString uri, QWidget *parent = nullptr);
+	explicit BistWidget(iio_device *device, QWidget *parent = nullptr);
 	~BistWidget();
 
 Q_SIGNALS:
@@ -43,9 +43,8 @@ Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
 	QVBoxLayout *m_layout;
-	iio_device *m_device;
+	iio_device *m_device = nullptr;
 	void updateBistTone();
 
 	MenuComboWidget *m_bistTone;

@@ -33,16 +33,15 @@ class ElnaWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ElnaWidget(QString uri, QWidget *parent = nullptr);
+	explicit ElnaWidget(iio_device *device, QWidget *parent = nullptr);
 	~ElnaWidget();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
 	QVBoxLayout *m_layout;
-	iio_device *m_device;
+	iio_device *m_device = nullptr;
 };
 } // namespace pluto
 } // namespace scopy

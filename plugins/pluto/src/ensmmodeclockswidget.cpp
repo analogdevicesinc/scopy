@@ -25,14 +25,13 @@
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
 #include <style.h>
-#include <iioutil/connectionprovider.h>
 #include <guistrategy/comboguistrategy.h>
 
 using namespace scopy;
 using namespace pluto;
 
-EnsmModeClocksWidget::EnsmModeClocksWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+EnsmModeClocksWidget::EnsmModeClocksWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 	m_layout = new QVBoxLayout(this);
@@ -51,11 +50,6 @@ EnsmModeClocksWidget::EnsmModeClocksWidget(QString uri, QWidget *parent)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(mainWidget);
 
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
-
 	layout->addWidget(generateEnsmModeWidget(this));
 	layout->addWidget(generateModeWidget(this));
 	layout->addWidget(generateClocksWidget(this));
@@ -65,11 +59,7 @@ EnsmModeClocksWidget::EnsmModeClocksWidget(QString uri, QWidget *parent)
 	m_layout->addWidget(scrollArea);
 }
 
-EnsmModeClocksWidget::~EnsmModeClocksWidget()
-{
-	// close Connection
-	ConnectionProvider::close(m_uri);
-}
+EnsmModeClocksWidget::~EnsmModeClocksWidget() {}
 
 QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 {

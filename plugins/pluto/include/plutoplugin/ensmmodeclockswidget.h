@@ -33,16 +33,15 @@ class EnsmModeClocksWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit EnsmModeClocksWidget(QString uri, QWidget *parent = nullptr);
+	explicit EnsmModeClocksWidget(iio_device *device, QWidget *parent = nullptr);
 	~EnsmModeClocksWidget();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
 	QVBoxLayout *m_layout;
-	iio_device *m_device;
+	iio_device *m_device = nullptr;
 	QWidget *generateEnsmModeWidget(QWidget *parent);
 	QWidget *generateModeWidget(QWidget *parent);
 	QWidget *generateClocksWidget(QWidget *parent);

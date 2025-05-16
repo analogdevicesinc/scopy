@@ -28,8 +28,8 @@
 using namespace scopy;
 using namespace pluto;
 
-BistWidget::BistWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+BistWidget::BistWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -50,11 +50,6 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	QLabel *title = new QLabel("BIST", widget);
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title);
-
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	QHBoxLayout *hLayout1 = new QHBoxLayout();
 
@@ -184,7 +179,7 @@ BistWidget::BistWidget(QString uri, QWidget *parent)
 	});
 }
 
-scopy::pluto::BistWidget::~BistWidget() { ConnectionProvider::close(m_uri); }
+scopy::pluto::BistWidget::~BistWidget() {}
 
 void BistWidget::updateBistTone()
 {
@@ -200,10 +195,6 @@ void BistWidget::updateBistTone()
 	auto freq = m_toneFrequency->combo()->currentText();
 	auto level = QString::number(m_toneLevel->combo()->currentData().toInt() * 6 * (-1));
 
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	iio_device *m_device = iio_context_find_device(conn->context(), "ad9361-phy");
-
 	// Format the configuration string
 	QString config = QString("%1 %2 %3 %4").arg(tone).arg(freq).arg(level).arg(bitmask);
 
@@ -211,8 +202,6 @@ void BistWidget::updateBistTone()
 	if(ret < 0) {
 		qWarning() << "BIST Tone configuration failed" << QString::fromLocal8Bit(strerror(ret * (-1)));
 	}
-	// if (m_dev2)
-	// 	iio_device_debug_attr_write(m_dev2, "bist_tone", temp);
 
 	Q_EMIT bistToneUpdated();
 }

@@ -114,12 +114,19 @@ bool PlutoPlugin::onConnect()
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
-	AD936X *ad936X = new AD936X(m_param);
+	Connection *conn = ConnectionProvider::open(m_param);
+
+	if(!conn) {
+		qWarning(CAT_PLUTOPLUGIN) << "No context available for Pluto";
+		return false;
+	}
+
+	AD936X *ad936X = new AD936X(conn->context());
 	m_toolList[0]->setTool(ad936X);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(m_param);
+	AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context());
 	m_toolList[1]->setTool(ad936XAdvanced);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);
@@ -141,6 +148,7 @@ bool PlutoPlugin::onDisconnect()
 		}
 	}
 
+	ConnectionProvider::close(m_param);
 	// make sure connection is closed
 	// ConnectionProvider::close(m_param);
 	return true;
