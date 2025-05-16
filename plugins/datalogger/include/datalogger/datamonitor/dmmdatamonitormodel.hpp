@@ -33,8 +33,9 @@ class SCOPY_DATALOGGER_EXPORT DmmDataMonitorModel : public ReadableDataMonitorMo
 {
 	Q_OBJECT
 public:
-	DmmDataMonitorModel(QObject *parent = nullptr);
+	DmmDataMonitorModel(QObject *parent = nullptr, double defaultScale = 1, double defaultOffset = 0);
 	explicit DmmDataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure = nullptr,
+				     double defaultScale = 1, double defaultOffset = 0,
 				     DMMReadStrategy *readStrategy = nullptr, QObject *parent = nullptr);
 
 	iio_channel *iioChannel() const;
@@ -44,9 +45,12 @@ public:
 	iio_device *iioDevice() const;
 	void setIioDevice(iio_device *newIioDevice);
 
+	DMMReadStrategy *readStrategy();
+
 private:
 	iio_channel *m_iioChannel;
 	iio_device *m_iioDevice;
+	DMMReadStrategy *m_readStrategy;
 };
 } // namespace datamonitor
 } // namespace scopy

@@ -33,9 +33,10 @@ class SCOPY_DATALOGGER_EXPORT ReadableDataMonitorModel : public DataMonitorModel
 {
 	Q_OBJECT
 public:
-	ReadableDataMonitorModel(QObject *parent = nullptr);
+	ReadableDataMonitorModel(QObject *parent = nullptr, double defaultScale = 1, double defaultOffset = 0);
 	explicit ReadableDataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure = nullptr,
-					  IReadStrategy *readStrategy = nullptr, QObject *parent = nullptr);
+					  IReadStrategy *readStrategy = nullptr, double defaultScale = 1,
+					  double defaultOffset = 0, QObject *parent = nullptr);
 
 	void read();
 	IReadStrategy *readStrategy() const;
