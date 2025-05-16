@@ -22,15 +22,14 @@
 #include "rssiwidget.h"
 
 #include <style.h>
-#include <iioutil/connectionprovider.h>
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
 
 using namespace scopy;
 using namespace pluto;
 
-RssiWidget::RssiWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+RssiWidget::RssiWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -49,11 +48,6 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 	m_layout->addWidget(widget);
 
 	Style::setStyle(widget, style::properties::widget::border_interactive);
-
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	QLabel *title = new QLabel("RSSI", widget);
 	Style::setStyle(title, style::properties::label::menuBig);
@@ -138,4 +132,4 @@ RssiWidget::RssiWidget(QString uri, QWidget *parent)
 	});
 }
 
-RssiWidget::~RssiWidget() { ConnectionProvider::close(m_uri); }
+RssiWidget::~RssiWidget() {}

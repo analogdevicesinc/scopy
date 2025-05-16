@@ -28,8 +28,8 @@
 using namespace scopy;
 using namespace pluto;
 
-MiscWidget::MiscWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+MiscWidget::MiscWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -38,11 +38,6 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 	m_layout->setMargin(0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
-
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	QWidget *dcOffsetTracking = new QWidget(this);
 	Style::setStyle(dcOffsetTracking, style::properties::widget::border_interactive);
@@ -175,4 +170,4 @@ MiscWidget::MiscWidget(QString uri, QWidget *parent)
 	});
 }
 
-MiscWidget::~MiscWidget() { ConnectionProvider::close(m_uri); }
+MiscWidget::~MiscWidget() {}

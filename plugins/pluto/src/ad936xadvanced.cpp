@@ -35,13 +35,12 @@
 #include <menuonoffswitch.h>
 #include <style.h>
 #include <toolbuttons.h>
-#include <iioutil/connectionprovider.h>
 
 using namespace scopy;
 using namespace pluto;
 
-AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
-	: m_uri(uri)
+AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
+	: m_ctx(ctx)
 	, QWidget{parent}
 {
 	m_mainLayout = new QVBoxLayout(this);
@@ -88,111 +87,109 @@ AD936XAdvanced::AD936XAdvanced(QString uri, QWidget *parent)
 	ensmModeClocksBtn->setCheckable(true);
 	ensmModeClocksBtn->setChecked(true);
 
-	EnsmModeClocksWidget *ensmModeClocks = new EnsmModeClocksWidget(m_uri, centralWidget);
-	centralWidget->addWidget(ensmModeClocks);
+	if(m_ctx != nullptr) {
 
-	connect(this, &AD936XAdvanced::readRequested, ensmModeClocks, &EnsmModeClocksWidget::readRequested);
-	connect(ensmModeClocksBtn, &QPushButton::clicked, this,
-		[=, this]() { centralWidget->setCurrentWidget(ensmModeClocks); });
+		// iio:device0: ad9361-phy
+		iio_device *device = iio_context_find_device(ctx, "ad9361-phy");
 
-	QPushButton *eLnaBtn = new QPushButton("eLNA", this);
-	Style::setStyle(eLnaBtn, style::properties::button::blueGrayButton);
-	eLnaBtn->setCheckable(true);
+		EnsmModeClocksWidget *ensmModeClocks = new EnsmModeClocksWidget(device, centralWidget);
+		centralWidget->addWidget(ensmModeClocks);
 
-	ElnaWidget *elna = new ElnaWidget(m_uri, centralWidget);
-	centralWidget->addWidget(elna);
+		connect(this, &AD936XAdvanced::readRequested, ensmModeClocks, &EnsmModeClocksWidget::readRequested);
+		connect(ensmModeClocksBtn, &QPushButton::clicked, this,
+			[=, this]() { centralWidget->setCurrentWidget(ensmModeClocks); });
 
-	connect(this, &AD936XAdvanced::readRequested, elna, &ElnaWidget::readRequested);
-	connect(eLnaBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(elna); });
+		QPushButton *eLnaBtn = new QPushButton("eLNA", this);
+		Style::setStyle(eLnaBtn, style::properties::button::blueGrayButton);
+		eLnaBtn->setCheckable(true);
 
-	QPushButton *rssiBtn = new QPushButton("RSSI", this);
-	Style::setStyle(rssiBtn, style::properties::button::blueGrayButton);
-	rssiBtn->setCheckable(true);
+		ElnaWidget *elna = new ElnaWidget(device, centralWidget);
+		centralWidget->addWidget(elna);
 
-	RssiWidget *rssi = new RssiWidget(m_uri, centralWidget);
-	centralWidget->addWidget(rssi);
+		connect(this, &AD936XAdvanced::readRequested, elna, &ElnaWidget::readRequested);
+		connect(eLnaBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(elna); });
 
-	connect(this, &AD936XAdvanced::readRequested, rssi, &RssiWidget::readRequested);
-	connect(rssiBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(rssi); });
+		QPushButton *rssiBtn = new QPushButton("RSSI", this);
+		Style::setStyle(rssiBtn, style::properties::button::blueGrayButton);
+		rssiBtn->setCheckable(true);
 
-	QPushButton *gainBtn = new QPushButton("GAIN", this);
-	Style::setStyle(gainBtn, style::properties::button::blueGrayButton);
-	gainBtn->setCheckable(true);
+		RssiWidget *rssi = new RssiWidget(device, centralWidget);
+		centralWidget->addWidget(rssi);
 
-	GainWidget *gainWidget = new GainWidget(m_uri, centralWidget);
-	centralWidget->addWidget(gainWidget);
+		connect(this, &AD936XAdvanced::readRequested, rssi, &RssiWidget::readRequested);
+		connect(rssiBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(rssi); });
 
-	connect(this, &AD936XAdvanced::readRequested, gainWidget, &GainWidget::readRequested);
-	connect(gainBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(gainWidget); });
+		QPushButton *gainBtn = new QPushButton("GAIN", this);
+		Style::setStyle(gainBtn, style::properties::button::blueGrayButton);
+		gainBtn->setCheckable(true);
 
-	QPushButton *txMonitorBtn = new QPushButton("TX MONITOR", this);
-	Style::setStyle(txMonitorBtn, style::properties::button::blueGrayButton);
-	txMonitorBtn->setCheckable(true);
+		GainWidget *gainWidget = new GainWidget(device, centralWidget);
+		centralWidget->addWidget(gainWidget);
 
-	TxMonitorWidget *txMonitor = new TxMonitorWidget(m_uri, centralWidget);
-	centralWidget->addWidget(txMonitor);
+		connect(this, &AD936XAdvanced::readRequested, gainWidget, &GainWidget::readRequested);
+		connect(gainBtn, &QPushButton::clicked, this,
+			[=, this]() { centralWidget->setCurrentWidget(gainWidget); });
 
-	connect(this, &AD936XAdvanced::readRequested, txMonitor, &TxMonitorWidget::readRequested);
+		QPushButton *txMonitorBtn = new QPushButton("TX MONITOR", this);
+		Style::setStyle(txMonitorBtn, style::properties::button::blueGrayButton);
+		txMonitorBtn->setCheckable(true);
 
-	connect(txMonitorBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(txMonitor); });
+		TxMonitorWidget *txMonitor = new TxMonitorWidget(device, centralWidget);
+		centralWidget->addWidget(txMonitor);
 
-	QPushButton *auxAdcDacIioBtn = new QPushButton("Aux ADC/DAC/IIO", this);
-	Style::setStyle(auxAdcDacIioBtn, style::properties::button::blueGrayButton);
-	auxAdcDacIioBtn->setCheckable(true);
+		connect(this, &AD936XAdvanced::readRequested, txMonitor, &TxMonitorWidget::readRequested);
+		connect(txMonitorBtn, &QPushButton::clicked, this,
+			[=, this]() { centralWidget->setCurrentWidget(txMonitor); });
 
-	AuxAdcDacIoWidget *auxAdcDacIo = new AuxAdcDacIoWidget(m_uri, centralWidget);
-	centralWidget->addWidget(auxAdcDacIo);
+		QPushButton *auxAdcDacIioBtn = new QPushButton("Aux ADC/DAC/IIO", this);
+		Style::setStyle(auxAdcDacIioBtn, style::properties::button::blueGrayButton);
+		auxAdcDacIioBtn->setCheckable(true);
 
-	connect(this, &AD936XAdvanced::readRequested, auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
+		AuxAdcDacIoWidget *auxAdcDacIo = new AuxAdcDacIoWidget(device, centralWidget);
+		centralWidget->addWidget(auxAdcDacIo);
 
-	connect(auxAdcDacIioBtn, &QPushButton::clicked, this,
-		[=, this]() { centralWidget->setCurrentWidget(auxAdcDacIo); });
+		connect(this, &AD936XAdvanced::readRequested, auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
+		connect(auxAdcDacIioBtn, &QPushButton::clicked, this,
+			[=, this]() { centralWidget->setCurrentWidget(auxAdcDacIo); });
 
-	QPushButton *miscBtn = new QPushButton("MISC", this);
-	Style::setStyle(miscBtn, style::properties::button::blueGrayButton);
-	miscBtn->setCheckable(true);
+		QPushButton *miscBtn = new QPushButton("MISC", this);
+		Style::setStyle(miscBtn, style::properties::button::blueGrayButton);
+		miscBtn->setCheckable(true);
 
-	MiscWidget *misc = new MiscWidget(m_uri, centralWidget);
-	centralWidget->addWidget(misc);
+		MiscWidget *misc = new MiscWidget(device, centralWidget);
+		centralWidget->addWidget(misc);
 
-	connect(this, &AD936XAdvanced::readRequested, misc, &MiscWidget::readRequested);
+		connect(this, &AD936XAdvanced::readRequested, misc, &MiscWidget::readRequested);
+		connect(miscBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(misc); });
 
-	connect(miscBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(misc); });
+		QPushButton *bistBtn = new QPushButton("BIST", this);
+		Style::setStyle(bistBtn, style::properties::button::blueGrayButton);
+		bistBtn->setCheckable(true);
 
-	QPushButton *bistBtn = new QPushButton("BIST", this);
-	Style::setStyle(bistBtn, style::properties::button::blueGrayButton);
-	bistBtn->setCheckable(true);
+		BistWidget *bist = new BistWidget(device, centralWidget);
+		centralWidget->addWidget(bist);
 
-	BistWidget *bist = new BistWidget(m_uri, centralWidget);
-	centralWidget->addWidget(bist);
+		connect(this, &AD936XAdvanced::readRequested, bist, &BistWidget::readRequested);
+		connect(bistBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(bist); });
 
-	connect(this, &AD936XAdvanced::readRequested, bist, &BistWidget::readRequested);
+		navigationButtons->addButton(ensmModeClocksBtn);
+		navigationButtons->addButton(eLnaBtn);
+		navigationButtons->addButton(rssiBtn);
+		navigationButtons->addButton(gainBtn);
+		navigationButtons->addButton(txMonitorBtn);
+		navigationButtons->addButton(auxAdcDacIioBtn);
+		navigationButtons->addButton(miscBtn);
+		navigationButtons->addButton(bistBtn);
 
-	connect(bistBtn, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(bist); });
-
-	navigationButtons->addButton(ensmModeClocksBtn);
-	navigationButtons->addButton(eLnaBtn);
-	navigationButtons->addButton(rssiBtn);
-	navigationButtons->addButton(gainBtn);
-	navigationButtons->addButton(txMonitorBtn);
-	navigationButtons->addButton(auxAdcDacIioBtn);
-	navigationButtons->addButton(miscBtn);
-	navigationButtons->addButton(bistBtn);
-
-	m_tool->addWidgetToTopContainerHelper(ensmModeClocksBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(eLnaBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(rssiBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(gainBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(txMonitorBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(auxAdcDacIioBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(miscBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(bistBtn, TTA_LEFT);
-
-	// Style::setStyle(scrollWidget, style::properties::widget::border_interactive, true, true);
+		m_tool->addWidgetToTopContainerHelper(ensmModeClocksBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(eLnaBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(rssiBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(gainBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(txMonitorBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(auxAdcDacIioBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(miscBtn, TTA_LEFT);
+		m_tool->addWidgetToTopContainerHelper(bistBtn, TTA_LEFT);
+	}
 }
 
-AD936XAdvanced::~AD936XAdvanced()
-{
-	// close Connection
-	ConnectionProvider::close(m_uri);
-}
+AD936XAdvanced::~AD936XAdvanced() {}

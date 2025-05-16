@@ -35,16 +35,14 @@
 #include <QFutureWatcher>
 #include <QtConcurrent>
 
-#include <iioutil/connectionprovider.h>
-
 #include <guistrategy/comboguistrategy.h>
 
 using namespace scopy;
 using namespace pluto;
 
-AD936X::AD936X(QString uri, QWidget *parent)
+AD936X::AD936X(iio_context *ctx, QWidget *parent)
 	: QWidget(parent)
-	, m_uri(uri)
+	, m_ctx(ctx)
 {
 
 	m_mainLayout = new QVBoxLayout(this);
@@ -98,16 +96,18 @@ AD936X::AD936X(QString uri, QWidget *parent)
 
 	controlsLayout->addWidget(scrollArea);
 
-	///  fist widget the global settings can be created with iiowigets only
-	controlWidgetLayout->addWidget(generateGlobalSettingsWidget(controlsWidget));
+	if(m_ctx != nullptr) {
+		///  first widget the global settings can be created with iiowigets only
+		controlWidgetLayout->addWidget(generateGlobalSettingsWidget(controlsWidget));
 
-	/// second is Rx ( receive chain)
-	controlWidgetLayout->addWidget(generateRxChainWidget(controlsWidget));
+		/// second is Rx ( receive chain)
+		controlWidgetLayout->addWidget(generateRxChainWidget(controlsWidget));
 
-	/// third is Tx (transimt chain)
-	controlWidgetLayout->addWidget(generateTxChainWidget(controlsWidget));
+		/// third is Tx (transimt chain)
+		controlWidgetLayout->addWidget(generateTxChainWidget(controlsWidget));
 
-	controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+		controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+	}
 
 	m_blockDiagramWidget = new QWidget(this);
 	Style::setBackgroundColor(m_blockDiagramWidget, json::theme::background_primary);
@@ -158,11 +158,7 @@ AD936X::AD936X(QString uri, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(blockDiagramBtn, TTA_LEFT);
 }
 
-AD936X::~AD936X()
-{
-	// close Connection
-	ConnectionProvider::close(m_uri);
-}
+AD936X::~AD936X() {}
 
 QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 {
@@ -177,10 +173,7 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title);
 
-	// Get connection to device
-	Connection *conn = ConnectionProvider::open(m_uri);
-
-	iio_device *plutoDevice = iio_context_find_device(conn->context(), "ad9361-phy");
+	iio_device *plutoDevice = iio_context_find_device(m_ctx, "ad9361-phy");
 
 	QHBoxLayout *hlayout = new QHBoxLayout();
 
@@ -204,7 +197,6 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 				       .optionsAttribute("calib_mode_available")
 				       .title("Calibration Mode")
 				       .uiStrategy(IIOWidgetBuilder::ComboUi)
-
 				       .buildSingle();
 	hlayout->addWidget(calibMode);
 	connect(this, &AD936X::readRequested, calibMode, &IIOWidget::readAsync);
@@ -281,9 +273,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	mainLayout->addWidget(title);
 
-	// Get connection to device
-	Connection *conn = ConnectionProvider::open(m_uri);
-	iio_device *plutoDevice = iio_context_find_device(conn->context(), "ad9361-phy");
+	iio_device *plutoDevice = iio_context_find_device(m_ctx, "ad9361-phy");
 
 	QGridLayout *layout = new QGridLayout();
 
@@ -473,9 +463,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title);
 
-	// Get connection to device
-	Connection *conn = ConnectionProvider::open(m_uri);
-	iio_device *plutoDevice = iio_context_find_device(conn->context(), "ad9361-phy");
+	iio_device *plutoDevice = iio_context_find_device(m_ctx, "ad9361-phy");
 
 	QGridLayout *lay = new QGridLayout();
 

@@ -21,15 +21,14 @@
 
 #include "gainwidget.h"
 #include <style.h>
-#include <iioutil/connectionprovider.h>
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
 
 using namespace scopy;
 using namespace pluto;
 
-GainWidget::GainWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+GainWidget::GainWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 	m_layout = new QVBoxLayout(this);
@@ -47,11 +46,6 @@ GainWidget::GainWidget(QString uri, QWidget *parent)
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setWidget(gainWidget);
 
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
-
 	layout->addWidget(modeWidget(gainWidget));
 	layout->addWidget(mgcWidget(gainWidget));
 	layout->addWidget(agcThresholdGainChangesWidget(gainWidget));
@@ -66,7 +60,7 @@ GainWidget::GainWidget(QString uri, QWidget *parent)
 	m_layout->addWidget(scrollArea);
 }
 
-GainWidget::~GainWidget() { ConnectionProvider::close(m_uri); }
+GainWidget::~GainWidget() {}
 
 QWidget *GainWidget::modeWidget(QWidget *parent)
 {
@@ -77,11 +71,6 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 
 	Style::setStyle(modeWidget, style::properties::widget::border_interactive);
 	Style::setBackgroundColor(modeWidget, json::theme::background_primary);
-
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	QLabel *title = new QLabel("Mode", modeWidget);
 	Style::setStyle(title, style::properties::label::menuBig);

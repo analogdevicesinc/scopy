@@ -27,6 +27,7 @@
 #include <QWidget>
 #include <animatedrefreshbtn.h>
 #include <tooltemplate.h>
+#include <iio.h>
 
 namespace scopy {
 namespace pluto {
@@ -34,14 +35,14 @@ class AD936XAdvanced : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit AD936XAdvanced(QString uri, QWidget *parent = nullptr);
+	explicit AD936XAdvanced(iio_context *ctx, QWidget *parent = nullptr);
 	~AD936XAdvanced();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
+	iio_context *m_ctx = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;

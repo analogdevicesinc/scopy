@@ -37,14 +37,14 @@ class SCOPY_PLUTOPLUGIN_EXPORT AD936X : public QWidget
 {
 	Q_OBJECT
 public:
-	AD936X(QString uri, QWidget *parent = nullptr);
+	AD936X(iio_context *ctx, QWidget *parent = nullptr);
 	~AD936X();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
+	iio_context *m_ctx = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_controlsWidget;

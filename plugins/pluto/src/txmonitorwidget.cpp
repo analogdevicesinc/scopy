@@ -22,15 +22,14 @@
 #include "txmonitorwidget.h"
 
 #include <style.h>
-#include <iioutil/connectionprovider.h>
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
 
 using namespace scopy;
 using namespace pluto;
 
-TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
-	: m_uri(uri)
+TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
+	: m_device(device)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -47,11 +46,6 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 	m_layout->addWidget(widget);
 
 	Style::setStyle(widget, style::properties::widget::border_interactive);
-
-	// Get connection to device
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	// iio:device0: ad9361-phy
-	m_device = iio_context_find_device(conn->context(), "ad9361-phy");
 
 	QGridLayout *gLayout1 = new QGridLayout();
 
@@ -238,4 +232,4 @@ TxMonitorWidget::TxMonitorWidget(QString uri, QWidget *parent)
 	});
 }
 
-TxMonitorWidget::~TxMonitorWidget() { ConnectionProvider::close(m_uri); }
+TxMonitorWidget::~TxMonitorWidget() {}

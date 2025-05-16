@@ -33,16 +33,15 @@ class GainWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit GainWidget(QString uri, QWidget *parent = nullptr);
+	explicit GainWidget(iio_device *device, QWidget *parent = nullptr);
 	~GainWidget();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	QString m_uri;
 	QVBoxLayout *m_layout;
-	iio_device *m_device;
+	iio_device *m_device = nullptr;
 	QWidget *modeWidget(QWidget *parent);
 	QWidget *mgcWidget(QWidget *parent);
 	QWidget *agcThresholdGainChangesWidget(QWidget *parent);
