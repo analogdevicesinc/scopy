@@ -113,6 +113,7 @@ private:
 	void deviceAutoconnect();
 	void highlightMenuItem(ToolStack *ts, int idx);
 	void collapseToolMenu(bool collapse);
+	void showWhatsNew();
 
 protected:
 	void closeEvent(QCloseEvent *event) override;
