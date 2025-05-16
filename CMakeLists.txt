@@ -189,6 +189,7 @@ add_subdirectory(core)
 add_subdirectory(plugins)
 add_subdirectory(iio-widgets)
 add_subdirectory(packages)
+add_subdirectory(iio-sink)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS")
