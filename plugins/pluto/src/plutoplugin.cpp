@@ -23,6 +23,8 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
+#include <deviceiconbuilder.h>
+#include <style.h>
 
 #include "ad936x.h"
 #include "ad963xadvanced.h"
@@ -67,16 +69,26 @@ bool PlutoPlugin::loadPage()
 
 bool PlutoPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("AD936X");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
+
 	return true;
 }
 
 void PlutoPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	        SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xAdvancedTool", "AD936X Advanced",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	                                          ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
 }
 
 void PlutoPlugin::unload()
