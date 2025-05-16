@@ -515,19 +515,28 @@ SignalGenerator::SignalGenerator(libm2k::context::M2k *m2k, QString uri, Filter 
 	m_plot->setOffsetHandleVisible(0, false);
 	m_plot->setOffsetHandleVisible(1, false);
 	m_plot->setAxisVisible(QwtAxis::YLeft, false);
+	m_plot->setAxisVisible(QwtAxis::XBottom, false);
 	m_plot->setActiveVertAxis(0);
 
+	m_plot->enableXaxisLabels();
 	m_plot->enableTimeTrigger(false);
+
+	QWidget *bottomAxis = new QWidget();
+	bottomAxis->setLayout(new QHBoxLayout());
+	bottomAxis->layout()->addItem(new QSpacerItem(50, 0));
+	bottomAxis->layout()->addWidget(m_plot->bottomHandlesArea());
 
 	// plot widget
 	QWidget *centralWidget = new QWidget();
 	QGridLayout *gridLayout = new QGridLayout();
+
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
-	gridLayout->setContentsMargins(0, 0, 0, 5);
+	gridLayout->setContentsMargins(0, 0, 50, 5);
 
 	gridLayout->addWidget(m_plot->topArea(), 0, 0);
 	gridLayout->addWidget(m_plot->topHandlesArea(), 1, 0);
+	gridLayout->addWidget(bottomAxis, 3, 0);
 	gridLayout->addWidget(m_plot, 2, 0);
 
 	centralWidget->setLayout(gridLayout);
