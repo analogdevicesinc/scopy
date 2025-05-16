@@ -56,14 +56,16 @@ void ScopyAboutPage::initUI()
 QWidget *ScopyAboutPage::buildPage(QString src)
 {
 	QWidget *page = new QWidget(this);
+	Style::setBackgroundColor(page, json::theme::background_subtle);
 	QVBoxLayout *lay = new QVBoxLayout(page);
 	QTextBrowser *browser = new QTextBrowser(page);
 	browser->setOpenExternalLinks(true);
 
 	lay->addWidget(browser);
-	lay->setMargin(0);
+	lay->setMargin(10);
 	initNavigationWidget(browser);
-	Style::setStyle(browser, style::properties::widget::textBrowser);
+	Style::setStyle(browser, style::properties::widget::basicComponent);
+	Style::setStyle(browser, style::properties::widget::noBorder);
 
 	if(QFile::exists(QString(src).replace("qrc:/", ":/"))) {
 		browser->setSource(src);
