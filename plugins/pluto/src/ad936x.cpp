@@ -34,8 +34,11 @@
 #include <menuonoffswitch.h>
 #include <QFutureWatcher>
 #include <QtConcurrent>
+#include <QLoggingCategory>
 
 #include <guistrategy/comboguistrategy.h>
+
+Q_LOGGING_CATEGORY(CAT_AD936X, "AD936X");
 
 using namespace scopy;
 using namespace pluto;
@@ -173,8 +176,22 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title);
 
-	iio_device *plutoDevice = iio_context_find_device(m_ctx, "ad9361-phy");
+	iio_device *plutoDevice = nullptr;
+	int device_count = iio_context_get_devices_count(m_ctx);
+	for (int i = 0; i < device_count; ++i) {
+	    iio_device *dev = iio_context_get_device(m_ctx, i);
+	    const char *dev_name = iio_device_get_name(dev);
+	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+	        plutoDevice = dev;
+	        break;
+	    }
+	}
 
+	if (plutoDevice == nullptr) {
+		qWarning(CAT_AD936X) << "No AD936X device found";
+		return globalSettingsWidget;
+	}
+	
 	QHBoxLayout *hlayout = new QHBoxLayout();
 
 	//// ensm_mode
@@ -273,7 +290,21 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	mainLayout->addWidget(title);
 
-	iio_device *plutoDevice = iio_context_find_device(m_ctx, "ad9361-phy");
+	iio_device *plutoDevice = nullptr;
+	int device_count = iio_context_get_devices_count(m_ctx);
+	for (int i = 0; i < device_count; ++i) {
+	    iio_device *dev = iio_context_get_device(m_ctx, i);
+	    const char *dev_name = iio_device_get_name(dev);
+	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+	        plutoDevice = dev;
+	        break;
+	    }
+	}
+
+	if (plutoDevice == nullptr) {
+		qWarning(CAT_AD936X) << "No AD936X device found";
+		return rxChainWidget;
+	}
 
 	QGridLayout *layout = new QGridLayout();
 
@@ -463,7 +494,21 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title);
 
-	iio_device *plutoDevice = iio_context_find_device(m_ctx, "ad9361-phy");
+	iio_device *plutoDevice = nullptr;
+	int device_count = iio_context_get_devices_count(m_ctx);
+	for (int i = 0; i < device_count; ++i) {
+	    iio_device *dev = iio_context_get_device(m_ctx, i);
+	    const char *dev_name = iio_device_get_name(dev);
+	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+	        plutoDevice = dev;
+	        break;
+	    }
+	}
+
+	if (plutoDevice == nullptr) {
+		qWarning(CAT_AD936X) << "No AD936X device found";
+		return txChainWidget;
+	}
 
 	QGridLayout *lay = new QGridLayout();
 
@@ -563,12 +608,20 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	connect(this, &AD936X::readRequested, txAttenuation, &IIOWidget::readAsync);
 
 	txAttenuation->setUItoDataConversion([this](QString data) {
-		double value = data.toDouble() * 1000;
-		return QString::number(value);
+		bool ok;
+		double value = data.toDouble(&ok) * 1000;
+		if (ok)
+			return QString::number(value);
+
+		return QString("");
 	});
 	txAttenuation->setDataToUIConversion([this](QString data) {
-		double value = data.toDouble() / 1000;
-		return QString::number(value);
+		bool ok;
+		double value = data.toDouble(&ok) / 1000;
+		if (ok)
+			return QString::number(value);
+
+		return QString("0");
 	});
 
 	bool isOutput = true;

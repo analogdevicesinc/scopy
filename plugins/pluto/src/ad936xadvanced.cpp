@@ -35,6 +35,9 @@
 #include <menuonoffswitch.h>
 #include <style.h>
 #include <toolbuttons.h>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_AD936x_ADVANCED, "AD936x_ADVANCED")
 
 using namespace scopy;
 using namespace pluto;
@@ -88,11 +91,22 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 	ensmModeClocksBtn->setChecked(true);
 
 	if(m_ctx != nullptr) {
+		iio_device *plutoDevice = nullptr;
+		int device_count = iio_context_get_devices_count(ctx);
+		for (int i = 0; i < device_count; ++i) {
+			iio_device *dev = iio_context_get_device(ctx, i);
+			const char *dev_name = iio_device_get_name(dev);
+			if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+				plutoDevice = dev;
+				break;
+			}
+		}
+		if (plutoDevice == nullptr) {
+			qWarning(CAT_AD936x_ADVANCED) << "No AD936x device found in context!";
+			return;
+		}
 
-		// iio:device0: ad9361-phy
-		iio_device *device = iio_context_find_device(ctx, "ad9361-phy");
-
-		EnsmModeClocksWidget *ensmModeClocks = new EnsmModeClocksWidget(device, centralWidget);
+		EnsmModeClocksWidget *ensmModeClocks = new EnsmModeClocksWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(ensmModeClocks);
 
 		connect(this, &AD936XAdvanced::readRequested, ensmModeClocks, &EnsmModeClocksWidget::readRequested);
@@ -103,7 +117,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(eLnaBtn, style::properties::button::blueGrayButton);
 		eLnaBtn->setCheckable(true);
 
-		ElnaWidget *elna = new ElnaWidget(device, centralWidget);
+		ElnaWidget *elna = new ElnaWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(elna);
 
 		connect(this, &AD936XAdvanced::readRequested, elna, &ElnaWidget::readRequested);
@@ -113,7 +127,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(rssiBtn, style::properties::button::blueGrayButton);
 		rssiBtn->setCheckable(true);
 
-		RssiWidget *rssi = new RssiWidget(device, centralWidget);
+		RssiWidget *rssi = new RssiWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(rssi);
 
 		connect(this, &AD936XAdvanced::readRequested, rssi, &RssiWidget::readRequested);
@@ -123,7 +137,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(gainBtn, style::properties::button::blueGrayButton);
 		gainBtn->setCheckable(true);
 
-		GainWidget *gainWidget = new GainWidget(device, centralWidget);
+		GainWidget *gainWidget = new GainWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(gainWidget);
 
 		connect(this, &AD936XAdvanced::readRequested, gainWidget, &GainWidget::readRequested);
@@ -134,7 +148,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(txMonitorBtn, style::properties::button::blueGrayButton);
 		txMonitorBtn->setCheckable(true);
 
-		TxMonitorWidget *txMonitor = new TxMonitorWidget(device, centralWidget);
+		TxMonitorWidget *txMonitor = new TxMonitorWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(txMonitor);
 
 		connect(this, &AD936XAdvanced::readRequested, txMonitor, &TxMonitorWidget::readRequested);
@@ -145,7 +159,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(auxAdcDacIioBtn, style::properties::button::blueGrayButton);
 		auxAdcDacIioBtn->setCheckable(true);
 
-		AuxAdcDacIoWidget *auxAdcDacIo = new AuxAdcDacIoWidget(device, centralWidget);
+		AuxAdcDacIoWidget *auxAdcDacIo = new AuxAdcDacIoWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(auxAdcDacIo);
 
 		connect(this, &AD936XAdvanced::readRequested, auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
@@ -156,7 +170,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(miscBtn, style::properties::button::blueGrayButton);
 		miscBtn->setCheckable(true);
 
-		MiscWidget *misc = new MiscWidget(device, centralWidget);
+		MiscWidget *misc = new MiscWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(misc);
 
 		connect(this, &AD936XAdvanced::readRequested, misc, &MiscWidget::readRequested);
@@ -166,7 +180,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 		Style::setStyle(bistBtn, style::properties::button::blueGrayButton);
 		bistBtn->setCheckable(true);
 
-		BistWidget *bist = new BistWidget(device, centralWidget);
+		BistWidget *bist = new BistWidget(plutoDevice, centralWidget);
 		centralWidget->addWidget(bist);
 
 		connect(this, &AD936XAdvanced::readRequested, bist, &BistWidget::readRequested);
