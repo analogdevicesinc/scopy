@@ -356,6 +356,7 @@ create_appdir(){
 	PLUGINS=$BUILD_FOLDER/plugins/plugins
 	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
+	PLUTO_FILTERS=$SRC_DIR/plugins/pluto/res/firFilter
 	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
 	APOLLO_FILTERS=$SRC_DIR/plugins/ad9084/res/ad9084
 	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
@@ -393,6 +394,10 @@ create_appdir(){
 		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
 	fi
 
+	if [ -d $PLUTO_FILTERS ]; then
+		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
+	fi
+	
 	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
 	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
 	cp -r $APOLLO_FILTERS $APP_DIR/usr/lib/scopy/plugins
