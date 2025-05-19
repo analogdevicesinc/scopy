@@ -44,7 +44,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-jesdstatusplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-jesdstatus.so"
 
 void TST_JesdStatusPlugin::fileExists()
 {

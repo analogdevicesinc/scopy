@@ -44,7 +44,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-ad9084plugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-ad9084.so"
 
 void TST_AD9084Plugin::fileExists()
 {
