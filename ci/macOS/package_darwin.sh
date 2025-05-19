@@ -18,6 +18,7 @@ mkdir -p Scopy.app/Contents/MacOS/plugins/resources
 cp $REPO_SRC/resources/scopy_emu_options_config.json Scopy.app/Contents/MacOS/plugins/resources/
 cp -R $BUILDDIR/translations Scopy.app/Contents/MacOS
 cp -R $BUILDDIR/plugins/regmap/xmls Scopy.app/Contents/MacOS/plugins
+cp -R $SRC_DIR/plugins/pluto/res/firFilter Scopy.app/Contents/MacOS/plugins
 
 cp -R $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS/translations
 cp -R $BUILDDIR/style $BUILDDIR/Scopy.app/Contents/MacOS/style
