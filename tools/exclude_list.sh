@@ -76,7 +76,7 @@ OMIT_FILES_LIST=(
     \*.gitrepo
     \*.mat
     \*.user
-    filters\*.txt
+    ad9084\*.txt
 )
 OMIT_FILES_LIST=("${OMIT_FILES_LIST[@]/#/*\/}")
 GITINORE_FILES_LIST=(

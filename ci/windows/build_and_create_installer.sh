@@ -28,6 +28,7 @@ PYTHON_FILES=$STAGING_DIR/lib/python3.*
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 DAC_WAVEFORM_CSV=$SRC_FOLDER/plugins/dac/res/csv
+APOLLO_FILTERS=$SRC_FOLDER/plugins/ad9084/res/ad9084
 EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 EMU_CONFIG=$SRC_FOLDER/resources/scopy_emu_options_config.json
 
@@ -129,6 +130,7 @@ deploy_app(){
 		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins
 	fi
 	cp -r $DAC_WAVEFORM_CSV $DEST_FOLDER/plugins
+	cp -r $APOLLO_FILTERS $DEST_FOLDER/plugins
 	cp -r $EMU_XMLS $DEST_FOLDER/plugins
 	mkdir -p $DEST_FOLDER/plugins/resources
 	cp $EMU_CONFIG $DEST_FOLDER/plugins/resources

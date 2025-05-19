@@ -386,7 +386,7 @@ create_appdir(){
 	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
 	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
-	APOLLO_FILTERS=$SRC_DIR/plugins/ad9084/res/filters
+	APOLLO_FILTERS=$SRC_DIR/plugins/ad9084/res/ad9084
 	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
 	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
@@ -449,6 +449,7 @@ create_appdir(){
 	fi
 
 	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
+	cp -r $APOLLO_FILTERS $APP_DIR/usr/lib/scopy/plugins
 
 	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
 	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
