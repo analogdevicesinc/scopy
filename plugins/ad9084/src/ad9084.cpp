@@ -19,6 +19,7 @@
  */
 
 #include "ad9084.h"
+#include "scopy-ad9084_config.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -304,8 +305,21 @@ QWidget *Ad9084::createMenu()
 	pfirlay->setMargin(0);
 	pfirlay->setSpacing(10);
 
+	// Determine default search dir
+	QString defaultDir = AD9084_FILTERS_BUILD_PATH;
+#ifdef Q_OS_WINDOWS
+	defaultDir = AD9084_FILTERS_PATH_LOCAL;
+#elif defined __APPLE__
+	defaultDir = QCoreApplication::applicationDirPath() + "/plugins/ad9084";
+#elif defined(__appimage__)
+	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/ad9084";
+#else
+	defaultDir = AD9084_FILTERS_SYSTEM_PATH;
+#endif
+
 	m_pfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
 	m_pfirFileBrowser->setFilter(tr("All Files(*)"));
+	m_pfirFileBrowser->setBaseDirectory(defaultDir);
 	auto pfirFileBrowserEdit = m_pfirFileBrowser->lineEdit();
 	pfirFileBrowserEdit->setReadOnly(true);
 	QObject::connect(pfirFileBrowserEdit, &QLineEdit::textChanged, this, &Ad9084::loadPfir);
@@ -323,6 +337,7 @@ QWidget *Ad9084::createMenu()
 
 	m_cfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
 	m_cfirFileBrowser->setFilter(tr("All Files(*)"));
+	m_cfirFileBrowser->setBaseDirectory(defaultDir);
 	auto cfirFileBrowserEdit = m_cfirFileBrowser->lineEdit();
 	cfirFileBrowserEdit->setReadOnly(true);
 	QObject::connect(cfirFileBrowserEdit, &QLineEdit::textChanged, this, &Ad9084::loadCfir);
