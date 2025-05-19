@@ -178,20 +178,20 @@ QWidget *AD936X::generateGlobalSettingsWidget(QWidget *parent)
 
 	iio_device *plutoDevice = nullptr;
 	int device_count = iio_context_get_devices_count(m_ctx);
-	for (int i = 0; i < device_count; ++i) {
-	    iio_device *dev = iio_context_get_device(m_ctx, i);
-	    const char *dev_name = iio_device_get_name(dev);
-	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
-	        plutoDevice = dev;
-	        break;
-	    }
+	for(int i = 0; i < device_count; ++i) {
+		iio_device *dev = iio_context_get_device(m_ctx, i);
+		const char *dev_name = iio_device_get_name(dev);
+		if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+			plutoDevice = dev;
+			break;
+		}
 	}
 
-	if (plutoDevice == nullptr) {
+	if(plutoDevice == nullptr) {
 		qWarning(CAT_AD936X) << "No AD936X device found";
 		return globalSettingsWidget;
 	}
-	
+
 	QHBoxLayout *hlayout = new QHBoxLayout();
 
 	//// ensm_mode
@@ -292,16 +292,16 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 
 	iio_device *plutoDevice = nullptr;
 	int device_count = iio_context_get_devices_count(m_ctx);
-	for (int i = 0; i < device_count; ++i) {
-	    iio_device *dev = iio_context_get_device(m_ctx, i);
-	    const char *dev_name = iio_device_get_name(dev);
-	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
-	        plutoDevice = dev;
-	        break;
-	    }
+	for(int i = 0; i < device_count; ++i) {
+		iio_device *dev = iio_context_get_device(m_ctx, i);
+		const char *dev_name = iio_device_get_name(dev);
+		if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+			plutoDevice = dev;
+			break;
+		}
 	}
 
-	if (plutoDevice == nullptr) {
+	if(plutoDevice == nullptr) {
 		qWarning(CAT_AD936X) << "No AD936X device found";
 		return rxChainWidget;
 	}
@@ -496,16 +496,16 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 
 	iio_device *plutoDevice = nullptr;
 	int device_count = iio_context_get_devices_count(m_ctx);
-	for (int i = 0; i < device_count; ++i) {
-	    iio_device *dev = iio_context_get_device(m_ctx, i);
-	    const char *dev_name = iio_device_get_name(dev);
-	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
-	        plutoDevice = dev;
-	        break;
-	    }
+	for(int i = 0; i < device_count; ++i) {
+		iio_device *dev = iio_context_get_device(m_ctx, i);
+		const char *dev_name = iio_device_get_name(dev);
+		if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+			plutoDevice = dev;
+			break;
+		}
 	}
 
-	if (plutoDevice == nullptr) {
+	if(plutoDevice == nullptr) {
 		qWarning(CAT_AD936X) << "No AD936X device found";
 		return txChainWidget;
 	}
@@ -610,7 +610,7 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	txAttenuation->setUItoDataConversion([this](QString data) {
 		bool ok;
 		double value = data.toDouble(&ok) * 1000;
-		if (ok)
+		if(ok)
 			return QString::number(value);
 
 		return QString("");
@@ -618,7 +618,7 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	txAttenuation->setDataToUIConversion([this](QString data) {
 		bool ok;
 		double value = data.toDouble(&ok) / 1000;
-		if (ok)
+		if(ok)
 			return QString::number(value);
 
 		return QString("0");

@@ -48,13 +48,13 @@ bool PlutoPlugin::compatible(QString m_param, QString category)
 
 	ret = false;
 	int device_count = iio_context_get_devices_count(conn->context());
-	for (int i = 0; i < device_count; ++i) {
-	    iio_device *dev = iio_context_get_device(conn->context(), i);
-	    const char *dev_name = iio_device_get_name(dev);
-	    if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
-	        ret = true;
-	        break;
-	    }
+	for(int i = 0; i < device_count; ++i) {
+		iio_device *dev = iio_context_get_device(conn->context(), i);
+		const char *dev_name = iio_device_get_name(dev);
+		if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+			ret = true;
+			break;
+		}
 	}
 
 	ConnectionProvider::close(m_param);
@@ -62,10 +62,7 @@ bool PlutoPlugin::compatible(QString m_param, QString category)
 	return ret;
 }
 
-bool PlutoPlugin::loadPage()
-{
-	return false;
-}
+bool PlutoPlugin::loadPage() { return false; }
 
 bool PlutoPlugin::loadIcon()
 {
@@ -85,14 +82,15 @@ bool PlutoPlugin::loadIcon()
 
 void PlutoPlugin::loadToolList()
 {
-	m_toolList.append(
-	        SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xAdvancedTool", "AD936X Advanced",
-	                                          ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
-void PlutoPlugin::unload()
-{ }
+void PlutoPlugin::unload() {}
 
 QString PlutoPlugin::description() { return "This is a plugin for AD936X"; }
 

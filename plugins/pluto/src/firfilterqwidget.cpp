@@ -47,7 +47,6 @@ FirFilterQWidget::FirFilterQWidget(iio_device *dev1, iio_device *dev2, QWidget *
 
 	QLabel *label = new QLabel("Filter FIR configuration:", this);
 
-	// TODO REPLACE WITH FILE CHOSE WIDGET
 	m_chooseFileBtn = new QPushButton("(None)", this);
 
 	Style::setStyle(m_chooseFileBtn, style::properties::button::basicButton);

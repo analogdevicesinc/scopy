@@ -19,45 +19,46 @@
  *
  */
 
-#ifndef FIRFILTERQWIDGET_H
-#define FIRFILTERQWIDGET_H
+#ifndef AD936X_H
+#define AD936X_H
 
-#include <QPushButton>
-#include <QWidget>
-#include "scopy-plutoplugin_export.h"
-#include <iio.h>
+#include "scopy-pluto_export.h"
 #include <QBoxLayout>
-#include <menuonoffswitch.h>
+#include <QWidget>
+#include <tooltemplate.h>
+
+#include <iio-widgets/iiowidgetbuilder.h>
+
+#include <animatedrefreshbtn.h>
 
 namespace scopy {
 namespace pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT FirFilterQWidget : public QWidget
+class SCOPY_PLUTO_EXPORT AD936X : public QWidget
 {
 	Q_OBJECT
 public:
-	// at least one device is required
-	explicit FirFilterQWidget(iio_device *dev1, iio_device *dev2 = nullptr, QWidget *parent = nullptr);
+	AD936X(iio_context *ctx, QWidget *parent = nullptr);
+	~AD936X();
 
 Q_SIGNALS:
-	void autofilterToggled(bool toogled);
-	void filterChanged();
+	void readRequested();
 
 private:
-	QVBoxLayout *m_layout;
-	QPushButton *m_chooseFileBtn;
-	void chooseFile();
-	iio_device *m_dev1;
-	iio_device *m_dev2;
-	bool m_isRxFilter;
-	bool m_isTxFilter;
-	void applyFirFilter(QString path);
+	iio_context *m_ctx = nullptr;
+	ToolTemplate *m_tool;
+	QVBoxLayout *m_mainLayout;
+	QWidget *m_controlsWidget;
+	QWidget *m_blockDiagramWidget;
+	AnimatedRefreshBtn *m_refreshButton;
 
-	void applyChannelFilterToggled(bool isTx, bool toggled);
-	void toggleDeviceFilter(iio_device *dev, bool toggled);
-	void toggleChannelFilter(iio_channel *chn, QString attr, bool toggled);
+	QWidget *generateGlobalSettingsWidget(QWidget *parent);
 
-	MenuOnOffSwitch *m_applyRxTxFilter;
+	QWidget *generateRxChainWidget(QWidget *parent);
+	QWidget *generateRxWidget(iio_channel *chn, QWidget *parent);
+
+	QWidget *generateTxChainWidget(QWidget *parent);
+	QWidget *generateTxWidget(iio_device *chn, QWidget *parent);
 };
 } // namespace pluto
 } // namespace scopy
-#endif // FIRFILTERQWIDGET_H
+#endif // AD936X_H

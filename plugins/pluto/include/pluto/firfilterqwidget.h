@@ -19,39 +19,48 @@
  *
  */
 
-#ifndef FASTLOCKPROFILESWIDGET_H
-#define FASTLOCKPROFILESWIDGET_H
+#ifndef FIRFILTERQWIDGET_H
+#define FIRFILTERQWIDGET_H
 
-#include <QWidget>
-#include "scopy-plutoplugin_export.h"
-
-#include <QComboBox>
-#include <QLabel>
 #include <QPushButton>
+#include <QWidget>
+#include <filebrowserwidget.h>
+#include "scopy-pluto_export.h"
 #include <iio.h>
+#include <QBoxLayout>
+#include <menuonoffswitch.h>
 
 namespace scopy {
 namespace pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT FastlockProfilesWidget : public QWidget
+class SCOPY_PLUTO_EXPORT FirFilterQWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit FastlockProfilesWidget(iio_channel *chn, QWidget *parent = nullptr);
-
-	QComboBox *fastlockProfiles() const;
-
-	QString title() const;
-	void setTitle(QString &newTitle);
+	// at least one device is required
+	explicit FirFilterQWidget(iio_device *dev1, iio_device *dev2 = nullptr, QWidget *parent = nullptr);
 
 Q_SIGNALS:
-	void recallCalled();
+	void autofilterToggled(bool toogled);
+	void filterChanged();
 
 private:
-	QLabel *m_title;
-	QComboBox *m_fastlockProfiles;
-	QPushButton *m_storeBtn;
-	QPushButton *m_recallBtn;
+	QVBoxLayout *m_layout;
+	FileBrowserWidget *fileBrowser;
+
+	QPushButton *m_chooseFileBtn;
+	void chooseFile();
+	iio_device *m_dev1;
+	iio_device *m_dev2;
+	bool m_isRxFilter;
+	bool m_isTxFilter;
+	void applyFirFilter(QString path);
+
+	void applyChannelFilterToggled(bool isTx, bool toggled);
+	void toggleDeviceFilter(iio_device *dev, bool toggled);
+	void toggleChannelFilter(iio_channel *chn, QString attr, bool toggled);
+
+	MenuOnOffSwitch *m_applyRxTxFilter;
 };
 } // namespace pluto
 } // namespace scopy
-#endif // FASTLOCKPROFILESWIDGET_H
+#endif // FIRFILTERQWIDGET_H

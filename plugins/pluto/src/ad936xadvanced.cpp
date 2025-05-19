@@ -93,15 +93,15 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 	if(m_ctx != nullptr) {
 		iio_device *plutoDevice = nullptr;
 		int device_count = iio_context_get_devices_count(ctx);
-		for (int i = 0; i < device_count; ++i) {
+		for(int i = 0; i < device_count; ++i) {
 			iio_device *dev = iio_context_get_device(ctx, i);
 			const char *dev_name = iio_device_get_name(dev);
-			if (dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+			if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
 				plutoDevice = dev;
 				break;
 			}
 		}
-		if (plutoDevice == nullptr) {
+		if(plutoDevice == nullptr) {
 			qWarning(CAT_AD936x_ADVANCED) << "No AD936x device found in context!";
 			return;
 		}
