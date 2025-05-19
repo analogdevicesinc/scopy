@@ -1,2 +1,2 @@
-include/plutoplugin/scopy-pluto_export.h
-include/plutoplugin/scopy-pluto_config.h
+include/pluto/scopy-pluto_export.h
+include/pluto/scopy-pluto_config.h
