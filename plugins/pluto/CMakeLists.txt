@@ -20,7 +20,7 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE plutoplugin)
+set(SCOPY_MODULE pluto)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
@@ -100,4 +100,4 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
 endif()
 
-set(plutoplugin_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+set(PLUTO_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

@@ -24,13 +24,13 @@
 
 #define SCOPY_PLUGIN_NAME PlutoPlugin
 
-#include "scopy-plutoplugin_export.h"
+#include "scopy-pluto_export.h"
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
 namespace scopy::pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT PlutoPlugin : public QObject, public PluginBase
+class SCOPY_PLUTO_EXPORT PlutoPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

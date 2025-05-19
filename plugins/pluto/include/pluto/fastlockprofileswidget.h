@@ -19,46 +19,39 @@
  *
  */
 
-#ifndef AD936X_H
-#define AD936X_H
+#ifndef FASTLOCKPROFILESWIDGET_H
+#define FASTLOCKPROFILESWIDGET_H
 
-#include "scopy-plutoplugin_export.h"
-#include <QBoxLayout>
 #include <QWidget>
-#include <tooltemplate.h>
+#include "scopy-pluto_export.h"
 
-#include <iio-widgets/iiowidgetbuilder.h>
-
-#include <animatedrefreshbtn.h>
+#include <QComboBox>
+#include <QLabel>
+#include <QPushButton>
+#include <iio.h>
 
 namespace scopy {
 namespace pluto {
-class SCOPY_PLUTOPLUGIN_EXPORT AD936X : public QWidget
+class SCOPY_PLUTO_EXPORT FastlockProfilesWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	AD936X(iio_context *ctx, QWidget *parent = nullptr);
-	~AD936X();
+	explicit FastlockProfilesWidget(iio_channel *chn, QWidget *parent = nullptr);
+
+	QComboBox *fastlockProfiles() const;
+
+	QString title() const;
+	void setTitle(QString &newTitle);
 
 Q_SIGNALS:
-	void readRequested();
+	void recallCalled();
 
 private:
-	iio_context *m_ctx = nullptr;
-	ToolTemplate *m_tool;
-	QVBoxLayout *m_mainLayout;
-	QWidget *m_controlsWidget;
-	QWidget *m_blockDiagramWidget;
-	AnimatedRefreshBtn *m_refreshButton;
-
-	QWidget *generateGlobalSettingsWidget(QWidget *parent);
-
-	QWidget *generateRxChainWidget(QWidget *parent);
-	QWidget *generateRxWidget(iio_channel *chn, QWidget *parent);
-
-	QWidget *generateTxChainWidget(QWidget *parent);
-	QWidget *generateTxWidget(iio_device *chn, QWidget *parent);
+	QLabel *m_title;
+	QComboBox *m_fastlockProfiles;
+	QPushButton *m_storeBtn;
+	QPushButton *m_recallBtn;
 };
 } // namespace pluto
 } // namespace scopy
-#endif // AD936X_H
+#endif // FASTLOCKPROFILESWIDGET_H
