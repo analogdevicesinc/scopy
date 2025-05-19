@@ -44,7 +44,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-plutoplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-pluto.so"
 
 void TST_PlutoPlugin::fileExists()
 {
