@@ -28,7 +28,9 @@ namespace gui {
 
 MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, double max, bool vertical, bool left,
 			 bool large_widget, QWidget *parent)
-	: QWidget(parent)
+	: m_min(min)
+	, m_max(max)
+	, QWidget(parent)
 {
 	m_large_widget = large_widget;
 	m_label = new QLabel(name, parent);
@@ -82,7 +84,19 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 				setValue(-1 * scale);
 			}
 		} else {
-			setValue(m_incrementStrategy->decrement(m_value));
+			double newValue = m_incrementStrategy->decrement(m_value);
+			// If decrement would result in 0 and there is a lower scale, scale down instead
+			if(qFuzzyCompare(newValue, 0.0)) {
+				int idx = m_scaleCb->currentIndex();
+				if(idx > 0) {
+					double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
+					double currentScale = m_scaleCb->itemData(idx).toDouble();
+					double maxLower = (currentScale / lowerScale) - 1;
+					setValue(maxLower * lowerScale);
+					return;
+				}
+			}
+			setValue(newValue);
 		}
 	});
 
@@ -368,11 +382,10 @@ void MenuSpinbox::populateWidgets()
 		}
 	}
 
-
-	// only chnage the scale for non 0 values
-	if(m_value != 0) {
+	// only change  the scale for non 0 values
+	if(!qFuzzyCompare(m_value, 0.0)) {
 		m_edit->setText(QString::number(m_value / scale)); // reduce number to a meaningful value
-		m_scaleCb->setCurrentIndex(i);			   // set apropriate scale in combobox
+		m_scaleCb->setCurrentIndex(i);			   // set appropriate  scale in combobox
 		m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 	} else {
 		m_edit->setText(QString::number(m_value));
@@ -407,6 +420,21 @@ double MenuSpinbox::clamp(double val, double min, double max)
 {
 	val = std::max(val, min);
 	val = std::min(val, max);
+
+	// disable decrement button if min is reached
+	if((val == m_min) && (m_scaleCb->currentIndex() == 0)) {
+		m_minus->setEnabled(false);
+	} else {
+		m_minus->setEnabled(true);
+	}
+
+	// disable increment button if max is reached
+	if(val == m_max) {
+		m_plus->setEnabled(false);
+	} else {
+		m_plus->setEnabled(true);
+	}
+
 	return val;
 }
 
