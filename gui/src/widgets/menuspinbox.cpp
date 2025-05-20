@@ -58,8 +58,33 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 
 	m_incrementStrategy = new IncrementStrategyPower2();
 
-	connect(m_plus, &QAbstractButton::clicked, this, [=]() { setValue(m_incrementStrategy->increment(m_value)); });
-	connect(m_minus, &QAbstractButton::clicked, this, [=]() { setValue(m_incrementStrategy->decrement(m_value)); });
+	connect(m_plus, &QAbstractButton::clicked, this, [=]() {
+		if(qFuzzyCompare(m_value, 0.0)) {
+			// On increment from zero, set to 1 * current scale
+			double scale = m_scaleCb->itemData(m_scaleCb->currentIndex()).toDouble();
+			setValue(1 * scale);
+		} else {
+			setValue(m_incrementStrategy->increment(m_value));
+		}
+	});
+	connect(m_minus, &QAbstractButton::clicked, this, [=]() {
+		if(qFuzzyCompare(m_value, 0.0)) {
+			int idx = m_scaleCb->currentIndex();
+			if(idx > 0) {
+				// Go to max of lower scale - 1
+				double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
+				double currentScale = m_scaleCb->itemData(idx).toDouble();
+				double maxLower = (currentScale / lowerScale) - 1;
+				setValue(maxLower * lowerScale);
+			} else {
+				// Already at lowest scale, go to -1 * current scale
+				double scale = m_scaleCb->itemData(idx).toDouble();
+				setValue(-1 * scale);
+			}
+		} else {
+			setValue(m_incrementStrategy->decrement(m_value));
+		}
+	});
 
 	connect(m_edit, &QLineEdit::editingFinished, this, [=]() { userInput(m_edit->text()); });
 
@@ -314,10 +339,11 @@ void MenuSpinbox::userInput(QString s)
 
 void MenuSpinbox::populateWidgets()
 {
+	QSignalBlocker sb1(m_edit);
+	QSignalBlocker sb2(m_scaleCb);
+
 	// TODO: Review this function
 	if(!m_scalingEnabled) {
-		QSignalBlocker sb1(m_edit);
-		QSignalBlocker sb2(m_scaleCb);
 		m_edit->setText(Util::doubleToQString(m_value));
 		setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
 		return;
@@ -327,15 +353,13 @@ void MenuSpinbox::populateWidgets()
 	double scale = 1;
 	double absvalue = abs(m_value);
 	if(qFuzzyCompare(absvalue, 0)) {
-		scale = 1;
-		for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
-			if(m_scaleCb->itemData(i).toDouble() == 1)
-				break;
-		}
+		i = m_scaleCb->currentIndex();
+		scale = m_scaleCb->itemData(i).toDouble();
+
 	} else {
 		for(i = m_scaleCb->count() - 1; i >= 0; i--) { // find most suitable scale
 			scale = m_scaleCb->itemData(i).toDouble();
-			if(absvalue / scale >= 10)
+			if(absvalue / scale >= 1)
 				break;
 		}
 		if(i < 0) {
@@ -344,11 +368,16 @@ void MenuSpinbox::populateWidgets()
 		}
 	}
 
-	QSignalBlocker sb1(m_edit);
-	QSignalBlocker sb2(m_scaleCb);
-	m_edit->setText(QString::number(m_value / scale)); // reduce number to a meaningful value
-	m_scaleCb->setCurrentIndex(i);			   // set apropriate scale in combobox
-	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+
+	// only chnage the scale for non 0 values
+	if(m_value != 0) {
+		m_edit->setText(QString::number(m_value / scale)); // reduce number to a meaningful value
+		m_scaleCb->setCurrentIndex(i);			   // set apropriate scale in combobox
+		m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
+	} else {
+		m_edit->setText(QString::number(m_value));
+	}
+
 	setToolTip(QString::number(m_value, 'f', 6)); // set tooltip
 }
 
