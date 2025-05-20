@@ -270,6 +270,9 @@ void IioTabWidget::serialScanFinished()
 	m_serialPortsNames = m_fwSerialScan->result();
 	m_btnSerialScan->stopAnimation();
 	m_serialPortCb->combo()->clear();
+	m_serialPortCb->combo()->setPlaceholderText(QStringLiteral("--- Select Serial ---"));
+	m_serialPortCb->combo()->setCurrentIndex(-1);
+
 	if(!m_serialPortsNames.empty()) {
 		QList<QString> keys = m_serialPortsNames.keys();
 		for(const QString &port : keys) {
