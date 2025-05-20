@@ -149,7 +149,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	useFddVcoTable->showProgressBar(false);
 
 	bool isuseFddVcoTableEnabled = true;
-	if(iio_device_find_attr(m_device, useFddVcoTableAttr.toStdString().c_str()) == nullptr) {
+	if(iio_device_find_debug_attr(m_device, useFddVcoTableAttr.toStdString().c_str()) == nullptr) {
 		useFddVcoTable->setEnabled(false);
 		isuseFddVcoTableEnabled = false;
 		useFddVcoTable->getUiStrategy()->setInfoMessage(
@@ -325,7 +325,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	xoDisableUseExtRefclk->showProgressBar(false);
 
 	bool isxoDisableUseExtRefclkEnabled = true;
-	if(iio_device_find_attr(m_device, xoDisableUseExtRefclkAttr.toStdString().c_str()) == nullptr) {
+	if(iio_device_find_debug_attr(m_device, xoDisableUseExtRefclkAttr.toStdString().c_str()) == nullptr) {
 		xoDisableUseExtRefclk->setEnabled(false);
 		isxoDisableUseExtRefclkEnabled = false;
 		xoDisableUseExtRefclk->getUiStrategy()->setInfoMessage(
