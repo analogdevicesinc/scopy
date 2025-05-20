@@ -1114,18 +1114,6 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	Style::setStyle(row80, style::properties::label::subtle);
 	layout->addWidget(row80, 8, 0);
 
-	QLabel *row22 = new QLabel("Optimized Gain Offset", widget);
-	Style::setStyle(row22, style::properties::label::subtle);
-	layout->addWidget(row22, 2, 2);
-
-	QLabel *row42 = new QLabel("for (RX Samples) restart GLA ...", widget);
-	Style::setStyle(row42, style::properties::label::subtle);
-	layout->addWidget(row42, 4, 2);
-
-	QLabel *row52 = new QLabel("... and GTO", widget);
-	Style::setStyle(row52, style::properties::label::subtle);
-	layout->addWidget(row52, 5, 2);
-
 	// adi,fagc-gain-index-type-after-exit-rx-mode
 	QMap<QString, QString> *gainIndexTypeOptions = new QMap<QString, QString>();
 	gainIndexTypeOptions->insert("0", "MAX_Gain");
@@ -1195,12 +1183,12 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.attribute("adi,fagc-optimized-gain-offset")
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
-			.title("")
+			.title("Optimized Gain Offset")
 			.infoMessage("The offset added to the last gain lock level of the previous frame."
 				     "The result is the optimize gain index."
 				     "See register 0x116, bits [D3:D0].")
 			.buildSingle();
-	layout->addWidget(optimiezedGainOffset, 2, 3);
+	layout->addWidget(optimiezedGainOffset, 2, 2);
 
 	// adi,fagc-rst-gla-stronger-sig-thresh-exceeded-enable
 	IIOWidget *sigThreshExceedEn = IIOWidgetBuilder(widget)
@@ -1270,10 +1258,10 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 						.attribute("adi,fagc-energy-lost-stronger-sig-gain-lock-exit-cnt")
 						.uiStrategy(IIOWidgetBuilder::RangeUi)
 						.optionsValues("[0 1 63]")
-						.title("")
+						.title("for (RX Samples) restart GLA ...")
 						.infoMessage("Gain Lock Exit Count. See register 0x119, bits [D5:D0].")
 						.buildSingle();
-	layout->addWidget(energyLostStronger, 4, 3);
+	layout->addWidget(energyLostStronger, 3, 2);
 
 	// adi,fagc-rst-gla-large-lmt-overload-enable
 	IIOWidget *rstGlaLargeLmtOverloadEn =
@@ -1305,14 +1293,14 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.attribute("adi,fagc-rst-gla-engergy-lost-goto-optim-gain-enable")
 			.uiStrategy(IIOWidgetBuilder::ComboUi)
 			.optionsValues(rstGlaEnergyLostGotoOptimGainEnOptionsData)
-			.title("")
+			.title(".. and GTO")
 			.infoMessage("If this attribute is set and the fast AGC is in State 5, the gain index will go "
 				     "to the "
 				     "optimize gain value if an energy lost state occurs or when the EN_AGC signal "
 				     "goes high. See register "
 				     "0x110, bit D6.")
 			.buildSingle();
-	layout->addWidget(rstGlaEnergyLostGotoOptimGainEn, 5, 3);
+	layout->addWidget(rstGlaEnergyLostGotoOptimGainEn, 4, 2);
 
 	rstGlaEnergyLostGotoOptimGainEn->setUItoDataConversion([this,
 								rstGlaEnergyLostGotoOptimGainEnOptions](QString data) {

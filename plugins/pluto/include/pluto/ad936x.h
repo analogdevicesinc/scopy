@@ -54,10 +54,10 @@ private:
 	QWidget *generateGlobalSettingsWidget(QWidget *parent);
 
 	QWidget *generateRxChainWidget(QWidget *parent);
-	QWidget *generateRxWidget(iio_channel *chn, QWidget *parent);
+	QWidget *generateRxWidget(iio_channel *chn, QString title, QWidget *parent);
 
 	QWidget *generateTxChainWidget(QWidget *parent);
-	QWidget *generateTxWidget(iio_device *chn, QWidget *parent);
+	QWidget *generateTxWidget(iio_channel *chn, QString title, QWidget *parent);
 };
 } // namespace pluto
 } // namespace scopy

@@ -411,9 +411,12 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	mainLayout->addLayout(layout);
 
 	QHBoxLayout *rxWidgetsLayout = new QHBoxLayout();
-	rxWidgetsLayout->addWidget(generateRxWidget(voltage0, rxChainWidget));
+	rxWidgetsLayout->addWidget(generateRxWidget(voltage0, "RX1", rxChainWidget));
 
-	// TODO add condition for multiple devices
+	iio_channel *voltage1 = iio_device_find_channel(plutoDevice, "voltage1", isOutput);
+	if(voltage1 && iio_channel_find_attr(voltage1, "hardwaregain")) {
+		rxWidgetsLayout->addWidget(generateRxWidget(voltage1, "RX2", rxChainWidget));
+	}
 
 	rxWidgetsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
 	mainLayout->addLayout(rxWidgetsLayout);
@@ -423,7 +426,7 @@ QWidget *AD936X::generateRxChainWidget(QWidget *parent)
 	return rxChainWidget;
 }
 
-QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
+QWidget *AD936X::generateRxWidget(iio_channel *chn, QString title, QWidget *parent)
 {
 	QWidget *rxWidget = new QWidget(parent);
 	Style::setStyle(rxWidget, style::properties::widget::border_interactive);
@@ -431,7 +434,9 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 	QVBoxLayout *layout = new QVBoxLayout(rxWidget);
 	rxWidget->setLayout(layout);
 
-	layout->addWidget(new QLabel("RX", rxWidget));
+	QLabel *titleLabel = new QLabel(title, rxWidget);
+	Style::setStyle(titleLabel, style::properties::label::menuBig);
+	layout->addWidget(titleLabel);
 
 	// voltage0: hardwaregain
 	IIOWidget *hardwaregain = IIOWidgetBuilder(rxWidget)
@@ -445,6 +450,7 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QWidget *parent)
 	connect(this, &AD936X::readRequested, hardwaregain, &IIOWidget::readAsync);
 
 	hardwaregain->setDataToUIConversion([this](QString data) {
+		// data has dB as string in the value
 		auto result = data.split(" ");
 		return result.first();
 	});
@@ -576,9 +582,13 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	layout->addLayout(lay);
 
 	QHBoxLayout *txWidgetsLayout = new QHBoxLayout();
-	txWidgetsLayout->addWidget(generateTxWidget(plutoDevice, txChainWidget));
 
-	// TODO add condition for multiple devices
+	txWidgetsLayout->addWidget(generateTxWidget(voltage0, "TX 1", txChainWidget));
+
+	iio_channel *voltage1 = iio_device_find_channel(plutoDevice, "voltage1", isOutput);
+	if(voltage1 && iio_channel_find_attr(voltage1, "hardwaregain")) {
+		txWidgetsLayout->addWidget(generateTxWidget(voltage1, "TX 2", txChainWidget));
+	}
 
 	txWidgetsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
 	layout->addLayout(txWidgetsLayout);
@@ -588,7 +598,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 	return txChainWidget;
 }
 
-QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
+QWidget *AD936X::generateTxWidget(iio_channel *chn, QString title, QWidget *parent)
 {
 	QWidget *txWidget = new QWidget(parent);
 	Style::setStyle(txWidget, style::properties::widget::border_interactive);
@@ -596,39 +606,28 @@ QWidget *AD936X::generateTxWidget(iio_device *dev, QWidget *parent)
 	QVBoxLayout *layout = new QVBoxLayout(txWidget);
 	txWidget->setLayout(layout);
 
-	layout->addWidget(new QLabel("TX", txWidget));
+	QLabel *titleLabel = new QLabel(title, txWidget);
+	Style::setStyle(titleLabel, style::properties::label::menuBig);
+	layout->addWidget(titleLabel);
 
 	// adi,tx-attenuation-mdB
 	IIOWidget *txAttenuation = IIOWidgetBuilder(txWidget)
-					   .device(dev)
-					   .attribute("adi,tx-attenuation-mdB")
+					   .channel(chn)
+					   .attribute("hardwaregain")
+					   .uiStrategy(IIOWidgetBuilder::RangeUi)
+					   .optionsAttribute("hardwaregain_available")
 					   .title("Attenuation(dB)")
 					   .buildSingle();
 	layout->addWidget(txAttenuation);
 	connect(this, &AD936X::readRequested, txAttenuation, &IIOWidget::readAsync);
 
-	txAttenuation->setUItoDataConversion([this](QString data) {
-		bool ok;
-		double value = data.toDouble(&ok) * 1000;
-		if(ok)
-			return QString::number(value);
-
-		return QString("");
-	});
 	txAttenuation->setDataToUIConversion([this](QString data) {
-		bool ok;
-		double value = data.toDouble(&ok) / 1000;
-		if(ok)
-			return QString::number(value);
-
-		return QString("0");
+		// data has dB as string in the value
+		auto result = data.split(" ");
+		return result.first();
 	});
 
-	bool isOutput = true;
-	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
-	// voltage0: rssi
-	IIOWidget *rssi =
-		IIOWidgetBuilder(txWidget).channel(voltage0).attribute("rssi").title("RSSI(dB)").buildSingle();
+	IIOWidget *rssi = IIOWidgetBuilder(txWidget).channel(chn).attribute("rssi").title("RSSI(dB)").buildSingle();
 	layout->addWidget(rssi);
 	rssi->setEnabled(false);
 	connect(this, &AD936X::readRequested, rssi, &IIOWidget::readAsync);
