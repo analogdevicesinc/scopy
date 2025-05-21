@@ -29,6 +29,10 @@ endif()
 
 # Include utils
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	include(ScopyWindowsInstaller)
+endif()
 include(PackageUtils)
 
 if(DISABLE_ALL_PACKAGES)
