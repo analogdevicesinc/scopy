@@ -23,11 +23,12 @@
 
 #include <QFileDialog>
 #include <QLabel>
-#include <style.h>
-
-#include <pluginbase/preferences.h>
 #include <QDebug>
+#include <QCoreApplication>
+#include <style.h>
 #include <qloggingcategory.h>
+#include <pluginbase/preferences.h>
+#include <scopy-pluto_config.h>
 
 using namespace scopy;
 using namespace pluto;
@@ -88,11 +89,23 @@ FirFilterQWidget::FirFilterQWidget(iio_device *dev1, iio_device *dev2, QWidget *
 
 void FirFilterQWidget::chooseFile()
 {
+	// Determine default search dir
+	QString defaultDir = AD936X_FILTERS_BUILD_PATH;
+#ifdef Q_OS_WINDOWS
+	defaultDir = AD936X_FILTERS_PATH_LOCAL;
+#elif defined __APPLE__
+	defaultDir = QCoreApplication::applicationDirPath() + "/plugins/ad936x";
+#elif defined(__appimage__)
+	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/ad936x";
+#else
+	defaultDir = AD936X_FILTERS_SYSTEM_PATH;
+#endif
+
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
 	// Is there a way to open file dialog at our asset file ?
 	QString filename = QFileDialog::getOpenFileName(
-		this, tr("Export"), "", tr("Filter Files (*.ftr);;All Files(*)"), &selectedFilter,
+		this, tr("Export"), defaultDir, tr("Filter Files (*.ftr);;All Files(*)"), &selectedFilter,
 		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if(!filename.isEmpty()) {
