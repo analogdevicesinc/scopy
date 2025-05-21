@@ -292,6 +292,7 @@ Source: "{#DestFolder}\plugins\csv\*"; DestDir: "{app}\plugins\csv"; Components:
 Source: "{#DestFolder}\plugins\emu_xml\*"; DestDir: "{app}\plugins\emu_xml"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\plugins\resources\scopy_emu_options_config.json"; DestDir: "{app}\plugins\resources\"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\plugins\ad9084\*"; DestDir: "{app}\plugins\ad9084"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\plugins\ad936x\*"; DestDir: "{app}\plugins\ad936x"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
 @PLUGIN_COMPONENTS_FILES@
 
 [Tasks]

@@ -11,6 +11,7 @@ SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f
 echo "### Copy DLLs to Frameworks folder"
 cp -R $REPO_SRC/plugins/dac/res/csv Scopy.app/Contents/MacOS/plugins/
 cp -R $REPO_SRC/plugins/ad9084/res/ad9084 Scopy.app/Contents/MacOS/plugins/
+cp -R $REPO_SRC/plugins/pluto/res/ad936x Scopy.app/Contents/MacOS/plugins/
 cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
 cp -R $BUILDDIR/plugins/emu_xml Scopy.app/Contents/MacOS/plugins
@@ -18,7 +19,6 @@ mkdir -p Scopy.app/Contents/MacOS/plugins/resources
 cp $REPO_SRC/resources/scopy_emu_options_config.json Scopy.app/Contents/MacOS/plugins/resources/
 cp -R $BUILDDIR/translations Scopy.app/Contents/MacOS
 cp -R $BUILDDIR/plugins/regmap/xmls Scopy.app/Contents/MacOS/plugins
-cp -R $SRC_DIR/plugins/pluto/res/firFilter Scopy.app/Contents/MacOS/plugins
 
 cp -R $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS/translations
 cp -R $BUILDDIR/style $BUILDDIR/Scopy.app/Contents/MacOS/style

@@ -27,9 +27,9 @@ DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
-PLUTO_FILTERS=$SRC_DIR/plugins/pluto/res/firFilter
 DAC_WAVEFORM_CSV=$SRC_FOLDER/plugins/dac/res/csv
 APOLLO_FILTERS=$SRC_FOLDER/plugins/ad9084/res/ad9084
+PLUTO_FILTERS=$SRC_FOLDER/plugins/pluto/res/ad936x
 EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
 EMU_CONFIG=$SRC_FOLDER/resources/scopy_emu_options_config.json
 

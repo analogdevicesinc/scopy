@@ -45,8 +45,6 @@ Q_SIGNALS:
 
 private:
 	QVBoxLayout *m_layout;
-	FileBrowserWidget *fileBrowser;
-
 	QPushButton *m_chooseFileBtn;
 	void chooseFile();
 	iio_device *m_dev1;
