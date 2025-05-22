@@ -200,3 +200,40 @@ void GRFFTComplexProc::destroy_blks(GRTopBlock *top)
 	start_blk.clear();
 	end_blk = nullptr;
 }
+
+GRFFTAvgProc::GRFFTAvgProc(bool complex, QObject *parent)
+	: GRProxyBlock(parent)
+	, m_size(2)
+	, m_complex(complex)
+{}
+
+void GRFFTAvgProc::setSize(int size)
+{
+	m_size = size;
+	setEnabled(m_size > 1);
+	Q_EMIT requestRebuild();
+}
+
+void GRFFTAvgProc::build_blks(GRTopBlock *top)
+{
+	m_top = top;
+	auto fft_size = top->vlen();
+
+	if(m_complex) {
+		m_avg = gr::blocks::moving_average_cc::make(m_size, gr_complex(1.0f / m_size), 1, fft_size / 2);
+	} else {
+		m_avg = gr::blocks::moving_average_ff::make(m_size, 1.0f / m_size, 1, fft_size);
+	}
+
+	start_blk.append(m_avg);
+	end_blk = m_avg;
+}
+
+void GRFFTAvgProc::destroy_blks(GRTopBlock *top)
+{
+	m_avg = nullptr;
+	start_blk.clear();
+	end_blk = nullptr;
+}
+
+int GRFFTAvgProc::size() { return m_size; }
