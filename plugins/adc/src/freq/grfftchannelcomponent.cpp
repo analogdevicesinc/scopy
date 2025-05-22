@@ -32,6 +32,8 @@
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <freq/fftplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+#include <QSpinBox>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_GRFFTChannelComponent, "GRFFTChannelComponent");
 
@@ -188,8 +190,10 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	QWidget *yaxismenu = createYAxisMenu(m_menu);
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	QWidget *markerMenu = createMarkerMenu(m_menu);
+	QWidget *avgMenu = createAveragingMenu(m_menu);
 	m_menu->add(yaxismenu, "yaxis");
 	m_menu->add(markerMenu, "marker");
+	m_menu->add(avgMenu, "average");
 	m_menu->add(curvemenu, "curve");
 
 	if(dynamic_cast<GRIIOComplexChannelSrc *>(m_src) != nullptr) {
@@ -211,6 +215,43 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	m_menu->add(m_snapBtn, "snap", MenuWidget::MA_BOTTOMLAST);
 
 	return m_menu;
+}
+
+QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("AVERAGING", MenuCollapseSection::MHCW_ONOFF,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
+	auto layout = new QVBoxLayout();
+	layout->setSpacing(0);
+	layout->setMargin(0);
+
+	QLabel *avgLabel = new QLabel("Size", this);
+	Style::setStyle(avgLabel, style::properties::label::subtle);
+	QSpinBox *avgSpinBox = new QSpinBox(this);
+	avgSpinBox->setRange(2, 1000);
+	avgSpinBox->setValue(2);
+
+	layout->addWidget(avgLabel);
+	layout->addWidget(avgSpinBox);
+
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+		auto ch = dynamic_cast<FFTChannel *>(m_grtch);
+		if(ch) {
+			int size = b ? avgSpinBox->value() : 1;
+			ch->setAveragingSize(size);
+		}
+	});
+
+	connect(avgSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value) {
+		auto ch = dynamic_cast<FFTChannel *>(m_grtch);
+		if(ch) {
+			ch->setAveragingSize(value);
+		}
+	});
+
+	section->contentLayout()->addLayout(layout);
+	section->setCollapsed(true);
+	return section;
 }
 
 QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
@@ -419,6 +460,9 @@ void GRFFTChannelComponent::setWindow(int newWindow)
 	m_window = newWindow;
 	Q_EMIT windowChanged(newWindow);
 }
+
+// this cannot be implemented since averaging size can only be changed from within the channel signalpath
+void GRFFTChannelComponent::setAveragingSize(int size) {}
 
 bool GRFFTChannelComponent::windowCorrection() const { return m_windowCorrection; }
 
