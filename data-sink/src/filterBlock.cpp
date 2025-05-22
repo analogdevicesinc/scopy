@@ -1,6 +1,6 @@
-#include <include/iio-sink/basicBlock.h>
-#include <include/iio-sink/filterBlock.h>
-using namespace scopy::iiosink;
+#include <include/data-sink/basicBlock.h>
+#include <include/data-sink/filterBlock.h>
+using namespace scopy::datasink;
 
 FilterBlock::FilterBlock(bool copy, QString name)
     : BasicBlock(name)

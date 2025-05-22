@@ -1,5 +1,5 @@
-#include <include/iio-sink/sourceBlock.h>
-using namespace scopy::iiosink;
+#include <include/data-sink/sourceBlock.h>
+using namespace scopy::datasink;
 
 SourceBlock::SourceBlock(QString name)
     : BasicBlock(name)

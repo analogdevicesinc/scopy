@@ -2,14 +2,14 @@
 #define SOURCEBLOCK_H
 
 #include "basicBlock.h"
-#include "scopy-iio-sink_export.h"
+#include "scopy-data-sink_export.h"
 #include <QMap>
 #include <QObject>
 #include <QLoggingCategory>
 #include <QMutex>
 
-namespace scopy::iiosink {
-class SCOPY_IIO_SINK_EXPORT SourceBlock : public BasicBlock
+namespace scopy::datasink {
+class SCOPY_DATA_SINK_EXPORT SourceBlock : public BasicBlock
 {
     Q_OBJECT
 public:

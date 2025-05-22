@@ -1,5 +1,5 @@
-#include <include/iio-sink/customFilterBlocks.h>
-using namespace scopy::iiosink;
+#include <include/data-sink/customFilterBlocks.h>
+using namespace scopy::datasink;
 
 AddFilterBlock::AddFilterBlock(bool copy, QString name)
     : FilterBlock(copy, name)

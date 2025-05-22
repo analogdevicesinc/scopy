@@ -95,7 +95,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-gr-util
 	       scopy-iio-widgets
-	       scopy-iio-sink
+	       scopy-data-sink
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

@@ -1,12 +1,12 @@
 #ifndef BASICBLOCK_H
 #define BASICBLOCK_H
 
-#include "scopy-iio-sink_export.h"
+#include "scopy-data-sink_export.h"
 #include <QMap>
 #include <QObject>
 
-namespace scopy::iiosink {
-class SCOPY_IIO_SINK_EXPORT ChannelData
+namespace scopy::datasink {
+class SCOPY_DATA_SINK_EXPORT ChannelData
 {
 public:
     ChannelData(std::vector<float> data)
@@ -19,7 +19,7 @@ public:
     std::vector<float> data;
 };
 
-class SCOPY_IIO_SINK_EXPORT BlockData : public QMap<uint, ChannelData *>
+class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelData *>
 {
 public:
     BlockData()
@@ -27,7 +27,7 @@ public:
     {}
 };
 
-class SCOPY_IIO_SINK_EXPORT BasicBlock : public QObject
+class SCOPY_DATA_SINK_EXPORT BasicBlock : public QObject
 {
     Q_OBJECT
 public:

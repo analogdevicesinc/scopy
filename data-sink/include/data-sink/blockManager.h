@@ -2,11 +2,11 @@
 #define BLOCKMANAGER_H
 
 #include "filterBlock.h"
-#include "scopy-iio-sink_export.h"
+#include "scopy-data-sink_export.h"
 #include "sourceBlock.h"
 #include <QThread>
 
-namespace scopy::iiosink {
+namespace scopy::datasink {
 class OutputConnection
 {
 public:
@@ -24,7 +24,7 @@ public:
 	QMetaObject::Connection connection;
 };
 
-class SCOPY_IIO_SINK_EXPORT SourceBlockLink : public QObject
+class SCOPY_DATA_SINK_EXPORT SourceBlockLink : public QObject
 {
 	Q_OBJECT
 public:
@@ -43,7 +43,7 @@ public:
 	void removeSource(uint out_ch, uint source_ch);
 };
 
-class SCOPY_IIO_SINK_EXPORT BlockManager : public QObject
+class SCOPY_DATA_SINK_EXPORT BlockManager : public QObject
 {
 	Q_OBJECT
 public:
@@ -92,6 +92,6 @@ private:
 	// sourceBlocks multiple times
 	QMap<uint, OutputConnection *> m_requestDataConnections;
 };
-} // namespace scopy::iiosink
+} // namespace scopy::datasink
 
 #endif

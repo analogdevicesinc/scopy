@@ -1,7 +1,8 @@
 #include <QThread>
-#include <include/iio-sink/customSourceBlocks.h>
+#include <cmath>
+#include <include/data-sink/customSourceBlocks.h>
 #include <qfile.h>
-using namespace scopy::iiosink;
+using namespace scopy::datasink;
 
 FileSourceBlock::FileSourceBlock(QString filename, QString name)
 	: SourceBlock(name)
@@ -48,6 +49,30 @@ BlockData *FileSourceBlock::createData()
 			}
 		}
 		numRows++;
+	}
+
+	return map;
+}
+
+TestSourceBlock::TestSourceBlock(QString name)
+	: SourceBlock(name)
+{}
+
+TestSourceBlock::~TestSourceBlock() {}
+
+BlockData *TestSourceBlock::createData()
+{
+	BlockData *map = new BlockData();
+
+	for(int ch = 0; ch < m_channels.size(); ++ch) {
+		if(m_channels.value(ch)) {
+			ChannelData *data = new ChannelData(m_size);
+
+			for(int i=0; i<m_size; i++) {
+				data->data.push_back(i * pow(10, ch));
+			}
+			map->insert(ch, data);
+		}
 	}
 
 	return map;

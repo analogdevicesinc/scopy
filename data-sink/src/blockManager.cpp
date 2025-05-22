@@ -1,7 +1,7 @@
-#include <include/iio-sink/blockManager.h>
+#include <include/data-sink/blockManager.h>
 
 Q_LOGGING_CATEGORY(CAT_BLOCKMANAGER, "BLOCKMANAGER");
-using namespace scopy::iiosink;
+using namespace scopy::datasink;
 
 SourceBlockLink::SourceBlockLink(SourceBlock *sourceBlock, bool threaded)
     : QObject()

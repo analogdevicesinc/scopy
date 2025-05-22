@@ -25,8 +25,9 @@
 #include <customSourceBlocks.h>
 #include <customFilterBlocks.h>
 #include <blockManager.h>
+#include <iostream>
 
-using namespace scopy::iiosink;
+using namespace scopy::datasink;
 
 class TST_BlockManager : public QObject
 {
@@ -50,7 +51,7 @@ private Q_SLOTS:
 void TST_BlockManager::testAddFilter1()
 {
 	// add 2 channels
-	FileSourceBlock *fileSource = new FileSourceBlock("test.csv");
+	TestSourceBlock *fileSource = new TestSourceBlock("test.csv");
 	fileSource->enChannel(true, 0);
 	fileSource->enChannel(true, 1);
 	AddFilterBlock *filter = new AddFilterBlock();
@@ -66,7 +67,7 @@ void TST_BlockManager::testAddFilter1()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, this, &loop](ChannelData *data, uint ch) {
+		[=, &loop](ChannelData *data, uint ch) {
 			m_test_success = 1;
 			for(int i = 0; i < data->data.size(); i++) {
 				if(data->data[i] != i + i * 10) {
@@ -93,7 +94,7 @@ void TST_BlockManager::testAddFilter2()
 	// expect no out signal
 
 	// add 2 channels
-	FileSourceBlock *fileSource = new FileSourceBlock("test.csv");
+	TestSourceBlock *fileSource = new TestSourceBlock();
 	fileSource->enChannel(true, 1);
 	AddFilterBlock *filter = new AddFilterBlock();
 	int buffer_size = 100;
@@ -108,7 +109,7 @@ void TST_BlockManager::testAddFilter2()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, this, &loop](ChannelData *data, uint ch) {
+		[=, &loop](ChannelData *data, uint ch) {
 			m_test_success = 0;
 			loop.quit();
 		},
@@ -127,7 +128,7 @@ void TST_BlockManager::testAddFilter3()
 {
 	// only 1 channel is connected
 	// add 2 channels
-	FileSourceBlock *fileSource = new FileSourceBlock("test.csv");
+	TestSourceBlock *fileSource = new TestSourceBlock();
 	fileSource->enChannel(true, 0);
 	fileSource->enChannel(true, 1);
 	AddFilterBlock *filter = new AddFilterBlock();
@@ -142,7 +143,7 @@ void TST_BlockManager::testAddFilter3()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, this, &loop](ChannelData *data, uint ch) {
+		[=, &loop](ChannelData *data, uint ch) {
 			m_test_success = 1;
 			for(int i = 0; i < data->data.size(); i++) {
 				if(data->data[i] != i) {
@@ -181,7 +182,7 @@ void TST_BlockManager::testAddFilter4()
 
 	// cyclic run
 	// add 2 channels
-	FileSourceBlock *fileSource = new FileSourceBlock("test.csv");
+	TestSourceBlock *fileSource = new TestSourceBlock();
 	fileSource->enChannel(true, 0);
 	fileSource->enChannel(true, 1);
 	AddFilterBlock *filter = new AddFilterBlock();
@@ -251,8 +252,8 @@ void TST_BlockManager::testAddFilter5()
 	// cyclic run
 	// 2 sources
 
-	FileSourceBlock *fileSource1 = new FileSourceBlock("test.csv");
-	FileSourceBlock *fileSource2 = new FileSourceBlock("test.csv");
+	TestSourceBlock *fileSource1 = new TestSourceBlock();
+	TestSourceBlock *fileSource2 = new TestSourceBlock();
 	fileSource1->enChannel(true, 0);
 	fileSource2->enChannel(true, 0);
 	AddFilterBlock *filter1 = new AddFilterBlock();

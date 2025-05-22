@@ -3,12 +3,12 @@
 
 #include <qdebug.h>
 #include "basicBlock.h"
-#include "scopy-iio-sink_export.h"
+#include "scopy-data-sink_export.h"
 #include <QMap>
 #include <QObject>
 
-namespace scopy::iiosink {
-class SCOPY_IIO_SINK_EXPORT FilterBlock : public BasicBlock
+namespace scopy::datasink {
+class SCOPY_DATA_SINK_EXPORT FilterBlock : public BasicBlock
 {
     Q_OBJECT
 public:

@@ -2,11 +2,11 @@
 #define CUSTOMSOURCERBLOCKS_H
 
 #include "sourceBlock.h"
-#include "scopy-iio-sink_export.h"
+#include "scopy-data-sink_export.h"
 #include <iio.h>
 
-namespace scopy::iiosink {
-class SCOPY_IIO_SINK_EXPORT FileSourceBlock : public SourceBlock
+namespace scopy::datasink {
+class SCOPY_DATA_SINK_EXPORT FileSourceBlock : public SourceBlock
 {
 public:
     FileSourceBlock(QString filename, QString name = QString());
@@ -18,7 +18,17 @@ private:
     BlockData *createData() override;
 };
 
-class SCOPY_IIO_SINK_EXPORT IIOSourceBlock : public SourceBlock
+class SCOPY_DATA_SINK_EXPORT TestSourceBlock : public SourceBlock
+{
+public:
+	TestSourceBlock(QString name = QString());
+	~TestSourceBlock();
+
+private:
+	BlockData *createData() override;
+};
+
+class SCOPY_DATA_SINK_EXPORT IIOSourceBlock : public SourceBlock
 {
 public:
     IIOSourceBlock(iio_device* dev, QString name = QString());
