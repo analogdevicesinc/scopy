@@ -193,6 +193,17 @@ void GRDeviceComponent::createMenuControlButton(QWidget *parent)
 {
 	m_ctrl = new CollapsableMenuControlButton(parent);
 	setupDeviceMenuControlButtonHelper(m_ctrl->getControlBtn(), name);
+	setupDeviceOnOffSwitch();
+}
+
+void GRDeviceComponent::setupDeviceOnOffSwitch()
+{
+	m_ctrl->enableOnOffSwitch(true);
+	connect(m_ctrl->onOffSwitch(), &SmallOnOffSwitch::toggled, this, [=](bool en) {
+		for(auto ch : m_channels) {
+			ch->ctrl()->checkBox()->setChecked(en);
+		}
+	});
 }
 
 void GRDeviceComponent::setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, QString name)

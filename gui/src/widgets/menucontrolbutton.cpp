@@ -132,6 +132,8 @@ QCheckBox *MenuControlButton::checkBox() { return m_chk; }
 
 QPushButton *MenuControlButton::button() { return m_btn; }
 
+QHBoxLayout *MenuControlButton::layout() { return lay; }
+
 void MenuControlButton::applyStylesheet()
 {
 
@@ -167,6 +169,11 @@ CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent)
 	m_ctrl->setCheckBoxStyle(MenuControlButton::CS_COLLAPSE);
 	m_ctrl->setCheckable(false);
 	m_ctrl->checkBox()->setChecked(true);
+	m_onOffSwitch = new SmallOnOffSwitch(this);
+	m_onOffSwitch->hide();
+	m_onOffSwitch->setChecked(true);
+	m_ctrl->layout()->addWidget(m_onOffSwitch);
+
 	m_lay->addWidget(m_ctrl);
 	QWidget *container = new QWidget(this);
 	m_lay->addWidget(container);
@@ -191,5 +198,9 @@ void CollapsableMenuControlButton::remove(QWidget *ch) { m_contLayout->removeWid
 int CollapsableMenuControlButton::count() { return m_contLayout->count(); }
 
 MenuControlButton *CollapsableMenuControlButton::getControlBtn() { return m_ctrl; }
+
+SmallOnOffSwitch *CollapsableMenuControlButton::onOffSwitch() { return m_onOffSwitch; }
+
+SmallOnOffSwitch *CollapsableMenuControlButton::enableOnOffSwitch(bool en) { m_onOffSwitch->setVisible(en); }
 
 #include "moc_menucontrolbutton.cpp"
