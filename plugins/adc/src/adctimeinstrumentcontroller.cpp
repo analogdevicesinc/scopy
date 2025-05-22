@@ -107,6 +107,7 @@ void ADCTimeInstrumentController::init()
 	}
 
 	m_otherCMCB = new CollapsableMenuControlButton(m_ui->vcm());
+	m_otherCMCB->enableOnOffSwitch(true);
 	m_otherCMCB->getControlBtn()->button()->setVisible(false);
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_otherCMCB->hide();
@@ -239,6 +240,9 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
+
+	connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
+		[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
 }
 
 void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
