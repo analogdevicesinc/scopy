@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include <smallOnOffSwitch.h>
 
 #include <utils.h>
 #include <compositewidget.h>
@@ -68,6 +69,7 @@ public:
 
 	QCheckBox *checkBox();
 	QPushButton *button();
+	QHBoxLayout *layout();
 
 	MenuControlButton *header() override { return this; }
 
@@ -107,12 +109,15 @@ public:
 	int count();
 	MenuControlButton *getControlBtn();
 	MenuControlButton *header() override { return m_ctrl; }
+	SmallOnOffSwitch *onOffSwitch();
+	SmallOnOffSwitch *enableOnOffSwitch(bool en);
 
 private:
 	MenuControlButton *m_ctrl;
 	QWidget *m_container;
 	QVBoxLayout *m_contLayout;
 	QVBoxLayout *m_lay;
+	SmallOnOffSwitch *m_onOffSwitch;
 };
 
 } // namespace scopy

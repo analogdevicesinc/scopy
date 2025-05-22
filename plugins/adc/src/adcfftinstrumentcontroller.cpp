@@ -108,6 +108,7 @@ void ADCFFTInstrumentController::init()
 	}
 
 	m_otherCMCB = new CollapsableMenuControlButton(m_ui->vcm());
+	m_otherCMCB->enableOnOffSwitch(true);
 	m_otherCMCB->getControlBtn()->button()->setVisible(false);
 	m_otherCMCB->getControlBtn()->setName("Other");
 	m_otherCMCB->hide();
@@ -337,6 +338,9 @@ void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
+
+	connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
+		[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
 }
 
 bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q)
