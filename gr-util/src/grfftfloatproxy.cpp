@@ -200,3 +200,64 @@ void GRFFTComplexProc::destroy_blks(GRTopBlock *top)
 	start_blk.clear();
 	end_blk = nullptr;
 }
+
+GRFFTAvgProc::GRFFTAvgProc(bool complex, QObject *parent)
+	: GRProxyBlock(parent)
+	, m_size(1)
+	, m_complex(complex)
+{}
+
+void GRFFTAvgProc::setSize(int size)
+{
+	m_size = size;
+
+	if(m_avg) {
+		if(m_complex) {
+			auto avg = dynamic_cast<gr::blocks::moving_average_cc *>(m_avg.get());
+			if(avg) {
+				avg->set_length(m_size);
+				avg->set_scale(1.0f / m_size);
+			}
+		} else {
+			auto avg = dynamic_cast<gr::blocks::moving_average_ff *>(m_avg.get());
+			if(avg) {
+				avg->set_length(m_size);
+				avg->set_scale(1.0f / m_size);
+			}
+		}
+	}
+}
+
+void GRFFTAvgProc::build_blks(GRTopBlock *top)
+{
+	m_top = top;
+	auto fft_size = top->vlen();
+
+	if(m_complex) {
+		m_v2s = gr::blocks::vector_to_stream::make(sizeof(gr_complex), fft_size / 2);
+		m_avg = gr::blocks::moving_average_cc::make(m_size, gr_complex(1.0f / m_size), 1);
+		m_s2v = gr::blocks::stream_to_vector::make(sizeof(gr_complex), fft_size / 2);
+	} else {
+		m_v2s = gr::blocks::vector_to_stream::make(sizeof(float), fft_size);
+		m_avg = gr::blocks::moving_average_ff::make(m_size, 1.0f / m_size, 1);
+		m_s2v = gr::blocks::stream_to_vector::make(sizeof(float), fft_size);
+	}
+
+	top->connect(m_v2s, 0, m_avg, 0);
+	top->connect(m_avg, 0, m_s2v, 0);
+
+	start_blk.append(m_v2s);
+	end_blk = m_s2v;
+}
+
+void GRFFTAvgProc::destroy_blks(GRTopBlock *top)
+{
+	m_v2s = nullptr;
+	m_avg = nullptr;
+	m_s2v = nullptr;
+
+	start_blk.clear();
+	end_blk = nullptr;
+}
+
+int GRFFTAvgProc::size() { return m_size; }
