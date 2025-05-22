@@ -64,6 +64,8 @@ public:
 		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
 		m_fft->setNrBits(nrBits);
 		m_signalPath->append(m_fft);
+		m_avg = new GRFFTAvgProc(true, m_signalPath);
+		m_signalPath->append(m_avg);
 		m_signalPath->setEnabled(false);
 		m_top = top;
 		m_top->registerSignalPath(m_signalPath);
@@ -83,6 +85,8 @@ public:
 		m_fft->setPowerOffset(val);
 	}
 
+	void setAveragingSize(int size) override { m_avg->setSize(size); }
+
 	double powerOffset() { return m_powerOffset; }
 
 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
@@ -93,6 +97,7 @@ public:
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTComplexProc *m_fft;
+	GRFFTAvgProc *m_avg;
 	GRIIOComplexChannelSrc *m_grch;
 	double m_powerOffset;
 };
@@ -114,6 +119,8 @@ public:
 		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
 		m_fft->setNrBits(nrBits);
 		m_signalPath->append(m_fft);
+		m_avg = new GRFFTAvgProc(false, m_signalPath);
+		m_signalPath->append(m_avg);
 		m_signalPath->setEnabled(false);
 		m_top = top;
 		m_top->registerSignalPath(m_signalPath);
@@ -133,6 +140,8 @@ public:
 		m_fft->setPowerOffset(val);
 	}
 
+	void setAveragingSize(int size) override { m_avg->setSize(size); }
+
 	double powerOffset() { return m_powerOffset; }
 
 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
@@ -143,6 +152,7 @@ public:
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTFloatProc *m_fft;
+	GRFFTAvgProc *m_avg;
 	GRIIOFloatChannelSrc *m_grch;
 	double m_powerOffset;
 };
@@ -170,6 +180,7 @@ public:
 	double powerOffset();
 	void setPowerOffset(double) override;
 	void setWindow(int) override;
+	void setAveragingSize(int) override;
 	void setSamplingInfo(SamplingInfo p) override;
 	int window() const;
 	bool windowCorrection() const;
@@ -233,6 +244,7 @@ private:
 	QWidget *createMarkerMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
+	QWidget *createAveragingMenu(QWidget *parent);
 	QPushButton *createSnapshotButton(QWidget *parent);
 
 	YMode m_ymode;

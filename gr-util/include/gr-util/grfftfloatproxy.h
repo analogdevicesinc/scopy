@@ -25,7 +25,9 @@
 #include "grproxyblock.h"
 #include "scopy-gr-util_export.h"
 
+#include <gnuradio/blocks/moving_average.h>
 #include <gnuradio/blocks/stream_to_vector.h>
+#include <gnuradio/blocks/vector_to_stream.h>
 #include <gnuradio/fft/fft_v.h>
 #include <gnuradio/fft/window.h>
 #include <gnuradio/blocks/float_to_complex.h>
@@ -90,6 +92,25 @@ protected:
 	gr::fft::window::win_type m_fftwindow;
 	GRTopBlock *m_top;
 };
+
+class SCOPY_GR_UTIL_EXPORT GRFFTAvgProc : public GRProxyBlock
+{
+public:
+	// if complex is false, it uses float blocks
+	GRFFTAvgProc(bool complex, QObject *parent = nullptr);
+	void setSize(int size);
+	int size();
+	void build_blks(GRTopBlock *top);
+	void destroy_blks(GRTopBlock *top);
+
+protected:
+	bool m_complex;
+	int m_size;
+
+	gr::block_sptr m_avg;
+	GRTopBlock *m_top;
+};
+
 } // namespace scopy::grutil
 
 #endif // GRFFTFLOATPROXY_H
