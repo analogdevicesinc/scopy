@@ -110,7 +110,7 @@ public:
 	MenuControlButton *getControlBtn();
 	MenuControlButton *header() override { return m_ctrl; }
 	SmallOnOffSwitch *onOffSwitch();
-	SmallOnOffSwitch *enableOnOffSwitch(bool en);
+	void enableOnOffSwitch(bool en);
 
 private:
 	MenuControlButton *m_ctrl;

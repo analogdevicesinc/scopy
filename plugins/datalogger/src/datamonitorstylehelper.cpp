@@ -33,7 +33,7 @@ DataMonitorStyleHelper::DataMonitorStyleHelper(QObject *parent)
 void DataMonitorStyleHelper::DataMonitorToolStyle(DatamonitorTool *tool)
 {
 	tool->tool->setRightContainerWidth(300);
-	tool->tool->setLeftContainerWidth(185);
+	tool->tool->setLeftContainerWidth(210);
 	tool->tool->centralContainer()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	Style::setStyle(tool->textMonitors, style::properties::widget::textEditBigLabel, true, true);
