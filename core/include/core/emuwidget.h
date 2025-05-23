@@ -66,9 +66,7 @@ private:
 	bool startIioEmuProcess(QString processPath, QStringList arg = {});
 	void killEmuProcess();
 
-	void getEmuOptions();
 	void configureOption(QString option);
-	void getJsonConfiguration();
 	void setEnableDemo(bool en);
 
 	QComboBox *m_demoOptCb;
