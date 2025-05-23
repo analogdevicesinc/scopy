@@ -462,6 +462,12 @@ QWidget *AD936X::generateRxWidget(iio_channel *chn, QString title, QWidget *pare
 	layout->addWidget(rssi);
 	rssi->setEnabled(false);
 
+	QTimer timer;
+
+	QObject::connect(&timer, &QTimer::timeout, [&]() { rssi->readAsync(); });
+
+	timer.start(1000);
+
 	// voltage: gain_control_mode
 	IIOWidget *gainControlMode = IIOWidgetBuilder(rxWidget)
 					     .channel(chn)
@@ -527,6 +533,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					 .attribute("rf_bandwidth")
 					 .optionsAttribute("rf_bandwidth_available")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
+					 .title("RF Bandwidth(MHz)")
 					 .buildSingle();
 	lay->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
@@ -537,6 +544,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					       .attribute("sampling_frequency")
 					       .optionsAttribute("sampling_frequency_available")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
+					       .title("Sampling Rate(MSPS)")
 					       .buildSingle();
 	lay->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);
@@ -547,6 +555,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 					  .attribute("rf_port_select")
 					  .optionsAttribute("rf_port_select_available")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
+					  .title("RF Port Select")
 					  .buildSingle();
 	lay->addWidget(rfPortSelect, 0, 2, 2, 1);
 	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
@@ -559,6 +568,7 @@ QWidget *AD936X::generateTxChainWidget(QWidget *parent)
 						  .attribute("frequency")
 						  .optionsAttribute("frequency_available")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
+						  .title("TX LO Frequency(MHz)")
 						  .buildSingle();
 	connect(this, &AD936X::readRequested, altVoltage1Frequency, &IIOWidget::readAsync);
 
