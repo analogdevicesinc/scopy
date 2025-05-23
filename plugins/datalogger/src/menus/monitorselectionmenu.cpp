@@ -83,6 +83,8 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 void MonitorSelectionMenu::generateDeviceSection(QString device, bool import)
 {
 	CollapsableMenuControlButton *devMonitorsSection = new CollapsableMenuControlButton(this);
+	devMonitorsSection->enableOnOffSwitch(true);
+	devMonitorsSection->onOffSwitch()->setChecked(false);
 	devMonitorsSection->getControlBtn()->button()->setVisible(false);
 	devMonitorsSection->getControlBtn()->setName(device);
 
@@ -132,6 +134,9 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 	monitorChannel->setToolTip(monitor->getName());
 
 	m_monitorsGroup->addButton(monitorChannel);
+
+	connect(deviceMap.value(monitor->getDeviceName())->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
+		[=](bool en) { monitorChannel->checkBox()->setChecked(en); });
 
 	connect(monitorChannel, &MenuControlButton::clicked, this, [=, this](bool toggled) {
 		if(!monitorChannel->checkBox()->isChecked()) {

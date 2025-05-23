@@ -58,6 +58,7 @@ public:
 	virtual void setPowerOffset(double) = 0;
 	virtual void setWindow(int) = 0;
 	virtual void setWindowCorrection(bool) = 0;
+	virtual void setAveragingSize(int) = 0;
 };
 
 class SCOPY_GUI_EXPORT SampleRateProvider
