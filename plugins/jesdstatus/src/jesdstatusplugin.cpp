@@ -36,7 +36,7 @@ bool JesdStatusPlugin::compatible(QString m_param, QString category)
 	auto &&cp = ConnectionProvider::GetInstance();
 	Connection *conn = cp->open(m_param);
 	if(!conn) {
-		qWarning() << "The context is not compatible with the JesdStatus Plugin!";
+		qDebug(CAT_JESDSTATUSPLUGIN) << "The context is not compatible with the JesdStatus Plugin!";
 		return ret;
 	}
 
