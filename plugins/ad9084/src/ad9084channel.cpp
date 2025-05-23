@@ -26,6 +26,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
+Q_LOGGING_CATEGORY(CAT_AD9084CHANNEL, "AD9084Channel");
+
 using namespace scopy;
 using namespace scopy::ad9084;
 
@@ -386,7 +388,7 @@ QString Ad9084Channel::phaseUItoDS(QString data)
 	tmp_data.replace(" ", "");
 	double d_data = tmp_data.toDouble(&ok);
 	if(!ok) {
-		qWarning() << QString("Invalid phase value in UI %1").arg(data);
+		qDebug(CAT_AD9084CHANNEL) << QString("Invalid phase value in UI %1").arg(data);
 		return "";
 	}
 	d_data = d_data * 1000;
@@ -398,7 +400,7 @@ QString Ad9084Channel::phaseDStoUI(QString data)
 	bool ok = true;
 	double d_data = data.toInt(&ok);
 	if(!ok) {
-		qWarning() << QString("Invalid phase value on device %1").arg(data);
+		qDebug(CAT_AD9084CHANNEL) << QString("Invalid phase value on device %1").arg(data);
 		return data;
 	}
 	d_data = d_data / 1000;
@@ -414,7 +416,7 @@ QString Ad9084Channel::frequencyUItoDS(QString data)
 	tmp_data = tmp_data.simplified();
 	double d_data = tmp_data.toDouble(&ok);
 	if(!ok) {
-		qWarning() << QString("Invalid frequency value in UI %1").arg(data);
+		qDebug(CAT_AD9084CHANNEL) << QString("Invalid frequency value in UI %1").arg(data);
 		return "";
 	}
 	d_data = d_data * 1e6;
@@ -426,7 +428,7 @@ QString Ad9084Channel::frequencyDStoUI(QString data)
 	bool ok;
 	double d_data = data.toDouble(&ok);
 	if(!ok) {
-		qWarning() << QString("Invalid frequency value on device %1").arg(data);
+		qDebug(CAT_AD9084CHANNEL) << QString("Invalid frequency value on device %1").arg(data);
 		return data;
 	}
 	d_data = d_data / 1e6;

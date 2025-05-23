@@ -34,6 +34,8 @@
 #include <preferenceshelper.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 
+Q_LOGGING_CATEGORY(CAT_AD9084, "AD9084");
+
 using namespace scopy;
 using namespace scopy::ad9084;
 
@@ -377,7 +379,7 @@ void Ad9084::loadCfir(QString path)
 	QString content = readFile(path);
 	size_t ret = iio_device_attr_write_raw(m_device, "cfir_config", content.toStdString().c_str(), content.size());
 	if(ret < 0)
-		qWarning() << "Failed to load CFIR CONFIG file to CFIR_CONFIG attr";
+		qDebug(CAT_AD9084) << "Failed to load CFIR CONFIG file to CFIR_CONFIG attr";
 }
 
 void Ad9084::loadPfir(QString path)
@@ -389,5 +391,5 @@ void Ad9084::loadPfir(QString path)
 	QString content = readFile(path);
 	size_t ret = iio_device_attr_write_raw(m_device, "pfilt_config", content.toStdString().c_str(), content.size());
 	if(ret < 0)
-		qWarning() << "Failed to load PFIR CONFIG file to PFILT_CONFIG attr";
+		qDebug(CAT_AD9084) << "Failed to load PFIR CONFIG file to PFILT_CONFIG attr";
 }

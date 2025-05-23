@@ -40,7 +40,7 @@ bool AD9084Plugin::compatible(QString m_param, QString category)
 	auto &&cp = ConnectionProvider::GetInstance();
 	Connection *conn = cp->open(m_param);
 	if(!conn) {
-		qWarning() << "The context is not compatible with the AD9084 Plugin!";
+		qDebug(CAT_AD9084PLUGIN) << "The context is not compatible with the AD9084 Plugin!";
 		return ret;
 	}
 
