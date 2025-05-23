@@ -123,6 +123,9 @@ Transmit Chain
         (`TX Received Strength Signal Indicator (TX RSSI) <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#tx_received_strength_signal_indicator_tx_rssi>`_)
 
 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/ad936x.png
+    :align: center
+
 Block Diagram
 ---------------------------------
 
