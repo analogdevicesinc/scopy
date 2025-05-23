@@ -32,7 +32,7 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 {
 	lay = new QHBoxLayout(this);
 	lay->setMargin(16);
-	lay->setSpacing(16);
+	lay->setSpacing(10);
 
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setCheckable(true);
@@ -201,6 +201,6 @@ MenuControlButton *CollapsableMenuControlButton::getControlBtn() { return m_ctrl
 
 SmallOnOffSwitch *CollapsableMenuControlButton::onOffSwitch() { return m_onOffSwitch; }
 
-SmallOnOffSwitch *CollapsableMenuControlButton::enableOnOffSwitch(bool en) { m_onOffSwitch->setVisible(en); }
+void CollapsableMenuControlButton::enableOnOffSwitch(bool en) { m_onOffSwitch->setVisible(en); }
 
 #include "moc_menucontrolbutton.cpp"
