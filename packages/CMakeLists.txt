@@ -35,4 +35,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 include(PackageUtils)
 
+if(DISABLE_ALL_PACKAGES)
+	enable_all_packages(${CMAKE_CURRENT_SOURCE_DIR} OFF)
+	message(STATUS "DISABLE_ALL_PACKAGES is set.")
+endif()
 add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})
