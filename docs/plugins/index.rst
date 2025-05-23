@@ -22,6 +22,7 @@ General IIO plugins
 
 * :ref:`Register Map <registermap>`
 
+
 Application Specific plugins
 
 * ADALM2000 plugins :
@@ -50,6 +51,9 @@ Application Specific plugins
     * :ref:`Waveform <pqm-waveform>`
     * :ref:`Settings <pqm-settings>`
 
+* AD936X
+    * :ref:`AD936X <ad936x>`
+    * :ref:`AD936X Advanced <ad936x_advanced>`
 
 Contents
 ---------------------------------------------------------------------
@@ -66,4 +70,5 @@ Contents
    m2k/index
    pqm/index
    swiot1l/index
+   ad936x/index
 
