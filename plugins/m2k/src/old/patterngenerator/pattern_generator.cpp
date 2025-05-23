@@ -141,7 +141,7 @@ PatternGenerator::PatternGenerator(libm2k::context::M2k *m2k, Filter *filt, Tool
 	m_plot.addZoomer(0);
 	m_plot.addMagnifier(0);
 	m_plot.getMagnifier()->setYAxisEn(false);
-	m_plot.getMagnifier()->setXAxis(true);
+	m_plot.getMagnifier()->setXAxisEn(true);
 	m_plot.setZoomerParams(true, 20);
 	m_plot.zoomBaseUpdate();
 	m_plot.getMagnifier()->setBaseRect(m_plot.getZoomer()->zoomBase());

@@ -1816,10 +1816,14 @@ void Oscilloscope::enableLabels(bool enable)
 		if(!allDisabled) {
 			plot.setActiveVertAxis(current_channel);
 			plot.enableAxisLabels(enable);
+			plot.enableXaxisLabels();
+			plot.setAxisVisible(QwtAxis::XBottom, !enable);
 		}
 	}
 	if(!enable)
 		plot.enableAxisLabels(enable);
+
+	plot.bottomHandlesArea()->setVisible(enable);
 }
 
 void Oscilloscope::setTrigger_input(bool value) { trigger_input = value; }
