@@ -30,11 +30,12 @@
 #include <QLoggingCategory>
 #include <stylehelper.h>
 
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <style.h>
 #include <menusectionwidget.h>
+#include <pkgmanager.h>
+#include <emuutils.h>
 
 #define PORT_DEFAULT 30431
 #define PORT_MIN 30431
@@ -54,8 +55,7 @@ EmuWidget::EmuWidget(QWidget *parent)
 	layout->setSpacing(10);
 	setLayout(layout);
 
-	getJsonConfiguration();
-	getEmuOptions();
+	m_availableOptions = EmuUtils::availableDevices();
 
 	QWidget *container = new QWidget(this);
 	container->setLayout(new QGridLayout(container));
@@ -140,6 +140,7 @@ EmuWidget::~EmuWidget()
 	if(m_emuProcess) {
 		killEmuProcess();
 	}
+	EmuUtils::cleanup();
 }
 
 void EmuWidget::init()
@@ -301,90 +302,50 @@ void EmuWidget::killEmuProcess()
 	setEnableDemo(!m_enableDemo);
 }
 
-void EmuWidget::getEmuOptions()
-{
-	// Populate emu devices from json
-	QJsonDocument d = QJsonDocument::fromJson(m_jsonConfigVal.toUtf8());
-	QJsonArray valuesList = d.array();
-
-	for(auto object : valuesList) {
-		QString device = object.toObject().value(QString("device")).toString();
-		m_availableOptions.append(device);
-	}
-}
-
 void EmuWidget::configureOption(QString option)
 {
-	QJsonDocument d = QJsonDocument::fromJson(m_jsonConfigVal.toUtf8());
-	QJsonArray valuesList = d.array();
-
+	QJsonArray valuesList = EmuUtils::emuOptions();
 	for(auto jsonArrayItem : valuesList) {
 		QJsonObject jsonObject = jsonArrayItem.toObject();
 		QString device = jsonObject.value(QString("device")).toString();
-		if(device == option) {
-
-			// Check the local folder first
-			QString currentPath = QCoreApplication::applicationDirPath() + "/plugins/emu_xml/";
-			if(!QDir(currentPath).exists()) {
-				currentPath = config::defaultPluginFolderPath() + "/emu_xml/";
-			}
-
-			qDebug(CAT_EMU_ADD_PAGE) << "Emu xmls path: " << currentPath;
-
-			if(jsonObject.contains("xml_path")) {
-				QString xmlPath = jsonObject.value(QString("xml_path")).toString();
-				QLineEdit *xmlEdit = m_xmlFileBrowser->lineEdit();
-				xmlEdit->setText(currentPath + xmlPath);
-			}
-
-			if(jsonObject.contains("rx_tx_device")) {
-				QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
-				QString rxTxDevice = jsonObject.value(QString("rx_tx_device")).toString();
-				rxTxDevice += "@";
-				rxTxDevice += currentPath;
-				rxTxDevice += jsonObject.value(QString("rx_tx_bin_path")).toString();
-				rxTxEdit->setText(rxTxDevice);
-			}
-
-			if(jsonObject.contains("port")) {
-				QString port = jsonObject.value(QString("port")).toString();
-				m_portEdit->setText(port);
-			}
-
-			if(jsonObject.contains("uri")) {
-				QString uri = jsonObject.value(QString("uri")).toString();
-				m_uriEdit->setText(uri);
-			}
-
-			if(jsonObject.contains("emu-type")) {
-				m_emuType = jsonObject.value(QString("emu-type")).toString();
-			} else {
-				m_emuType = "generic";
-			}
-
-			break;
+		if(device != option) {
+			continue;
 		}
-	}
-}
+		QString currentPath = jsonObject["path"].toString();
+		qDebug(CAT_EMU_ADD_PAGE) << "Emu xmls path: " << currentPath;
 
-void EmuWidget::getJsonConfiguration()
-{
-	// Check the local file first
-	QString filePath = QCoreApplication::applicationDirPath() + "/plugins/resources/scopy_emu_options_config.json";
-	QFile file(filePath);
-	if(!file.exists()) {
-		filePath = config::defaultPluginFolderPath() + "/resources/scopy_emu_options_config.json";
-		file.setFileName(filePath);
-	}
-	qDebug(CAT_EMU_ADD_PAGE) << "Emu configuration file: " << filePath;
+		if(jsonObject.contains("xml_path")) {
+			QString xmlPath = jsonObject.value(QString("xml_path")).toString();
+			QLineEdit *xmlEdit = m_xmlFileBrowser->lineEdit();
+			xmlEdit->setText(currentPath + QDir::separator() + xmlPath);
+		}
 
-	if(file.exists()) {
-		file.open(QIODevice::ReadOnly | QIODevice::Text);
-		m_jsonConfigVal = file.readAll();
-		file.close();
-	} else {
-		qWarning(CAT_EMU_ADD_PAGE) << "Emu configuration file is missing ";
-		m_availableOptions.append("generic");
+		if(jsonObject.contains("rx_tx_device")) {
+			QLineEdit *rxTxEdit = m_rxTxFileBrowser->lineEdit();
+			QString rxTxDevice = jsonObject.value(QString("rx_tx_device")).toString();
+			rxTxDevice += "@";
+			rxTxDevice += currentPath;
+			rxTxDevice += QDir::separator();
+			rxTxDevice += jsonObject.value(QString("rx_tx_bin_path")).toString();
+			rxTxEdit->setText(rxTxDevice);
+		}
+
+		if(jsonObject.contains("port")) {
+			QString port = jsonObject.value(QString("port")).toString();
+			m_portEdit->setText(port);
+		}
+
+		if(jsonObject.contains("uri")) {
+			QString uri = jsonObject.value(QString("uri")).toString();
+			m_uriEdit->setText(uri);
+		}
+
+		if(jsonObject.contains("emu-type")) {
+			m_emuType = jsonObject.value(QString("emu-type")).toString();
+		} else {
+			m_emuType = "generic";
+		}
+		break;
 	}
 }
 
