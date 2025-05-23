@@ -1,15 +1,15 @@
 {
   "fw_version": {
-    "value": "Firmware version"
+	"value": "Firmware version"
   },
   "hw_model": {
-    "value": "Model"
+	"value": "Model"
   },
   "hw_model_variant": {
   	"value": "Model variant"
   },
   "hw_serial": {
-    "value": "Serial"
+	"value": "Serial"
   },
   "local,kernel": {
 	"value": "Kernel version"
@@ -33,7 +33,38 @@
   	"value": "Release"
   },
    "ip,ip-addr": {
-    "value": "IP Address"
+	"value": "IP Address"
+  },
+  "name": {
+	"value": "Name"
+  },
+  "version": {
+	"value": "Version"
+  },
+  "title": {
+	"value": "Title"
+  },
+  "description": {
+	"value": "Description"
+  },
+  "license": {
+	"value": "License"
+  },
+  "author": {
+	"value": "Author"
+  },
+  "scopy_compatibility": {
+	"value": "Scopy compatibility"
+  },
+  "category": {
+	"value": "Category"
+  },
+  "size": {
+	"value": "File size"
+  },
+  "last_modified": {
+	"value": "Last modified"
   }
+
   
 }

@@ -21,8 +21,9 @@
 
 #include "scopymainwindow_api.h"
 
+#include "pkgutil.h"
 #include "qapplication.h"
-
+#include <pkgmanager.h>
 #include <pluginbase/scopyjs.h>
 using namespace scopy;
 
@@ -440,15 +441,14 @@ QStringList ScopyMainWindow_API::getPlugins(QString uri, QString cat)
 
 QStringList ScopyMainWindow_API::availablePlugins(QString uri, QString cat, Device *dev)
 {
-	PluginRepository *pr = new PluginRepository(this);
-	m_w->loadPluginsFromRepository(pr);
-	PluginManager *pm = pr->getPluginManager();
+	PluginRepository *pr = PluginRepository::GetInstance();
+	m_w->loadPluginsFromRepository();
 	QList<Plugin *> compatiblePlugins;
 	QStringList resultList;
 	if(!uri.isEmpty()) {
-		compatiblePlugins = pm->getCompatiblePlugins(uri, cat);
-	} else {
-		compatiblePlugins = pm->getCompatiblePlugins(dev->param(), dev->category());
+		compatiblePlugins = pr->getCompatiblePlugins(uri, cat);
+	} else if(dev) {
+		compatiblePlugins = pr->getCompatiblePlugins(dev->param(), dev->category());
 	}
 
 	for(int i = 0; i < compatiblePlugins.size(); i++) {
@@ -534,4 +534,35 @@ bool ScopyMainWindow_API::saveSetup(QString filename, QString path)
 	}
 	return setupSaved;
 }
+
+bool ScopyMainWindow_API::install(QString zipPath) { return PkgManager::install(zipPath); }
+
+bool ScopyMainWindow_API::extractZip(QString zipPath, QString dest) { return PkgUtil::extractZip(zipPath, dest); }
+
+QVariantMap ScopyMainWindow_API::extractMetadata(QString zipPath)
+{
+	QJsonObject obj = PkgUtil::extractJsonMetadata(zipPath);
+	for(auto it = obj.begin(); it != obj.end(); ++it) {
+		qInfo(CAT_SCOPY_API) << it.key() << it.value();
+	}
+	return obj.toVariantMap();
+}
+
+bool ScopyMainWindow_API::uninstall(const QString &pkgName) { return PkgManager::uninstall(pkgName); }
+
+QStringList ScopyMainWindow_API::listFiles(const QStringList &dirFilter, const QStringList &fileFilter)
+{
+	const QFileInfoList infoList = PkgManager::listFilesInfo(dirFilter, fileFilter);
+	QStringList pathList;
+	for(auto &info : infoList) {
+		pathList.append(info.absoluteFilePath());
+	}
+	return pathList;
+}
+
+QString ScopyMainWindow_API::findPkgName(const QString &filePath)
+{
+	return PkgManager::reverseSearch(filePath).baseName();
+}
+
 #include "moc_scopymainwindow_api.cpp"

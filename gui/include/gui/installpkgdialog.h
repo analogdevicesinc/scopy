@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2025 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -19,31 +19,32 @@
  *
  */
 
-#ifndef SCOPY_SEARCHBAR_H
-#define SCOPY_SEARCHBAR_H
+#ifndef INSTALLPKGDIALOG_H
+#define INSTALLPKGDIALOG_H
 
-#include <QWidget>
-#include <QLineEdit>
-#include <QCompleter>
-#include <QStandardItemModel>
 #include <QPushButton>
-#include <QLabel>
-#include <QSet>
+#include <QWidget>
+#include <popupwidget.h>
+#include <scopy-gui_export.h>
 
-namespace scopy::debugger {
-class SearchBar : public QWidget
+namespace scopy {
+class SCOPY_GUI_EXPORT InstallPkgDialog : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SearchBar(QSet<QString> options, QWidget *parent = nullptr);
+	InstallPkgDialog(QWidget *parent = nullptr);
+	~InstallPkgDialog();
+	void showDialog();
+	void setMessage(const QString &msg);
 
-	QLineEdit *getLineEdit();
+Q_SIGNALS:
+	void yesClicked();
+	void noClicked();
 
 private:
-	QLabel *m_label;
-	QLineEdit *m_lineEdit;
-	QCompleter *m_completer;
+	QWidget *parent;
+	PopupWidget *m_popupWidget;
 };
-} // namespace scopy::debugger
+} // namespace scopy
 
-#endif // SCOPY_SEARCHBAR_H
+#endif // INSTALLPKGDIALOG_H

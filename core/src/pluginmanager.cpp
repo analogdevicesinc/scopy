@@ -20,34 +20,18 @@
  */
 
 #include "pluginmanager.h"
-
-#include "pluginfilter.h"
 #include "qpluginloader.h"
 
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QLoggingCategory>
+#include <pluginfilter.h>
 
 #include <algorithm>
 
 Q_LOGGING_CATEGORY(CAT_PLUGINMANAGER, "PluginManager")
 using namespace scopy;
-
-struct less_than_key
-{
-	inline bool operator()(Plugin *p1, Plugin *p2)
-	{
-		return (p1->metadata()["priority"].toInt() < p2->metadata()["priority"].toInt());
-	}
-};
-
-struct greater_than_key
-{
-	inline bool operator()(Plugin *p1, Plugin *p2)
-	{
-		return (p1->metadata()["priority"].toInt() > p2->metadata()["priority"].toInt());
-	}
-};
 
 PluginManager::PluginManager(QObject *parent)
 	: QObject(parent)
@@ -55,8 +39,10 @@ PluginManager::PluginManager(QObject *parent)
 
 PluginManager::~PluginManager()
 {
-	for(Plugin *p : qAsConst(list)) {
-		p->deinit();
+	for(const PluginInfo &p : qAsConst(m_plugins)) {
+		if(p.pluginInstance()) {
+			p.pluginInstance()->deinit();
+		}
 	}
 }
 
@@ -74,17 +60,17 @@ void PluginManager::add(QString pluginFileName)
 	if(p) {
 		Q_EMIT startLoadPlugin(p->name());
 		qInfo(CAT_PLUGINMANAGER) << "Found plugin:" << p->name() << "in " << pluginFileName;
-		list.append(p);
 		p->initMetadata();
 		applyMetadata(p, &m_metadata);
 		p->init();
 		QObject *obj = dynamic_cast<QObject *>(p);
-		if(obj)
+		if(obj) {
 			obj->setParent(this);
+		}
 	}
 }
 
-int PluginManager::count() { return list.count(); }
+int PluginManager::count() { return m_plugins.count(); }
 
 void PluginManager::applyMetadata(Plugin *plugin, QJsonObject *metadata)
 {
@@ -93,24 +79,40 @@ void PluginManager::applyMetadata(Plugin *plugin, QJsonObject *metadata)
 	}
 }
 
-void PluginManager::sort()
+void PluginManager::sort(bool ascending)
 {
-	std::sort(list.begin(), list.end(), greater_than_key());
+	std::sort(m_plugins.begin(), m_plugins.end(), [ascending](const PluginInfo &p1, const PluginInfo &p2) {
+		if(!p1.isLoaded() && !p2.isLoaded()) {
+			return ascending ? p1.name() < p2.name() : p1.name() > p2.name();
+		}
+		if(!p1.isLoaded()) {
+			return !ascending;
+		}
+		if(!p2.isLoaded()) {
+			return ascending;
+		}
+		int priority1 = p1.pluginInstance()->metadata()["priority"].toInt();
+		int priority2 = p2.pluginInstance()->metadata()["priority"].toInt();
+		return ascending ? priority1 < priority2 : priority1 > priority2;
+	});
 
 	qDebug(CAT_PLUGINMANAGER) << "New plugin order:";
-	for(Plugin *plugin : qAsConst(list)) {
-		qDebug(CAT_PLUGINMANAGER) << plugin->name();
+	for(const PluginInfo &plugin : qAsConst(m_plugins)) {
+		qDebug(CAT_PLUGINMANAGER) << plugin.name();
 	}
 }
 
-void PluginManager::clear() { list.clear(); }
+void PluginManager::clear() { m_plugins.clear(); }
 
 QList<Plugin *> PluginManager::getPlugins(QString category)
 {
 	QList<Plugin *> newlist;
-	for(Plugin *plugin : qAsConst(list)) {
-		if(!PluginFilter::pluginInCategory(plugin, category))
+	const QList<PluginInfo> loaded = getLoadedPlugins();
+	for(const PluginInfo &pluginInfo : loaded) {
+		Plugin *plugin = pluginInfo.pluginInstance();
+		if(!PluginFilter::pluginInCategory(plugin, category)) {
 			continue;
+		}
 		Plugin *p = plugin->clone();
 		newlist.append(p);
 	}
@@ -120,9 +122,12 @@ QList<Plugin *> PluginManager::getPlugins(QString category)
 QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString category)
 {
 	QList<Plugin *> comp;
-	for(Plugin *plugin : qAsConst(list)) {
-		if(!PluginFilter::pluginInCategory(plugin, category))
+	const QList<PluginInfo> loaded = getLoadedPlugins();
+	for(const PluginInfo &pluginInfo : loaded) {
+		Plugin *plugin = pluginInfo.pluginInstance();
+		if(!PluginFilter::pluginInCategory(plugin, category)) {
 			continue;
+		}
 		bool enable = (!PluginFilter::pluginInExclusionList(comp, plugin));
 		bool forcedInclusion = (PluginFilter::pluginForcedInclusionList(comp, plugin));
 
@@ -136,6 +141,30 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString categ
 	return comp;
 }
 
+QList<PluginInfo> PluginManager::getPluginsInfo() const { return m_plugins; }
+
+QList<PluginInfo> PluginManager::getLoadedPlugins() const
+{
+	QList<PluginInfo> loaded;
+	for(const PluginInfo &pInfo : qAsConst(m_plugins)) {
+		if(pInfo.isLoaded()) {
+			loaded.append(pInfo);
+		}
+	}
+	return loaded;
+}
+
+QList<PluginInfo> PluginManager::getUnloadedPlugins() const
+{
+	QList<PluginInfo> unloaded;
+	for(const PluginInfo &pInfo : qAsConst(m_plugins)) {
+		if(!pInfo.isLoaded()) {
+			unloaded.append(pInfo);
+		}
+	}
+	return unloaded;
+}
+
 void PluginManager::setMetadata(QJsonObject metadata) { m_metadata = metadata; }
 
 Plugin *PluginManager::loadPlugin(QString file)
@@ -143,48 +172,72 @@ Plugin *PluginManager::loadPlugin(QString file)
 	bool ret;
 	Plugin *original = nullptr;
 	Plugin *clone = nullptr;
-
-	if(!QFile::exists(file))
-		return nullptr;
-
-	if(!QLibrary::isLibrary(file))
-		return nullptr;
-
-	QPluginLoader qp(file);
-	ret = qp.load();
-	if(!ret) {
-		qWarning(CAT_PLUGINMANAGER) << "Cannot load library " + qp.fileName() + "- err: " + qp.errorString();
-		return nullptr;
+	QObject *inst = nullptr;
+	QPluginLoader qp;
+	QString cloneName;
+	QString errorMsg;
+	PluginInfo::PluginState state = PluginInfo::PLUGIN_UNLOADED;
+	if(!QFile::exists(file)) {
+		state = PluginInfo::PLUGIN_FILE_NOT_FOUND;
+		goto finish;
 	}
 
-	QObject *inst = qp.instance();
+	if(!QLibrary::isLibrary(file)) {
+		state = PluginInfo::PLUGIN_INVALID_LIBRARY;
+		goto finish;
+	}
+
+	qp.setFileName(file);
+	ret = qp.load();
+	if(!ret) {
+		errorMsg = "Cannot load library " + qp.fileName() + "- err: " + qp.errorString();
+		state = PluginInfo::PLUGIN_LOAD_FAILED;
+		goto finish;
+	}
+
+	inst = qp.instance();
 	if(!inst) {
-		qWarning(CAT_PLUGINMANAGER) << "Cannot create QObject instance from loaded library";
-		return nullptr;
+		state = PluginInfo::PLUGIN_INSTANCE_FAILED;
+		goto finish;
 	}
 
 	original = qobject_cast<Plugin *>(qp.instance());
 	if(!original) {
-		qWarning(CAT_PLUGINMANAGER) << "Loaded library instance is not a Plugin*";
-		return nullptr;
+		state = PluginInfo::PLUGIN_INVALID_PLUGIN;
+		goto finish;
 	}
 
 	clone = original->clone(this);
 	if(!clone) {
-		qWarning(CAT_PLUGINMANAGER) << "clone method does not clone the object";
-		return nullptr;
+		state = PluginInfo::PLUGIN_CLONE_FAILED;
+		goto finish;
 	}
 
-	QString cloneName;
 	cloneName = clone->name();
 
-	if(cloneName == "")
-		return nullptr;
-
+	if(cloneName == "") {
+		state = PluginInfo::PLUGIN_CLONE_FAILED;
+		goto finish;
+	}
+	state = PluginInfo::PLUGIN_LOADED;
+finish:
+	PluginInfo pluginInfo(file, state, errorMsg, clone);
+	m_plugins.append(pluginInfo);
+	if(!pluginInfo.isLoaded()) {
+		qWarning(CAT_PLUGINMANAGER) << pluginInfo.getErrorMessage();
+	}
 	return clone;
 }
 
-QList<Plugin *> PluginManager::getOriginalPlugins() const { return list; }
+QList<Plugin *> PluginManager::getOriginalPlugins() const
+{
+	QList<Plugin *> originalList;
+	const QList<PluginInfo> loaded = getLoadedPlugins();
+	for(const PluginInfo &pluginInfo : loaded) {
+		originalList.append(pluginInfo.pluginInstance());
+	}
+	return originalList;
+}
 
 QJsonObject PluginManager::metadata() const { return m_metadata; }
 
