@@ -45,6 +45,13 @@ public:
 	virtual double increment(double val) = 0;
 	virtual double decrement(double val) = 0;
 	virtual void setScale(double scale) = 0;
+
+protected:
+	static double roundToNDecimals(double value, int n)
+	{
+		double factor = std::pow(10.0, n);
+		return std::round(value * factor) / factor;
+	}
 };
 
 class SCOPY_GUI_EXPORT IncrementStrategy125 : public IncrementStrategy
@@ -55,8 +62,8 @@ public:
 	IncrementStrategy125()
 		: m_steps(1e-9, 1e9, 10){};
 	~IncrementStrategy125(){};
-	virtual double increment(double val) override { return m_steps.getNumberAfter(val); }
-	virtual double decrement(double val) override { return m_steps.getNumberBefore(val); }
+	virtual double increment(double val) override { return roundToNDecimals(m_steps.getNumberAfter(val), 9); }
+	virtual double decrement(double val) override { return roundToNDecimals(m_steps.getNumberBefore(val), 9); }
 
 	double m_scale;
 	void setScale(double scale) override { m_scale = scale; }
@@ -83,7 +90,7 @@ public:
 		while(val > m_steps[i]) {
 			i++;
 		}
-		return m_steps[i];
+		return roundToNDecimals(m_steps[i], 9);
 	}
 	virtual double decrement(double val) override
 	{
@@ -92,7 +99,7 @@ public:
 		while(val < m_steps[i]) {
 			i--;
 		}
-		return m_steps[i];
+		return roundToNDecimals(m_steps[i], 9);
 	}
 	double m_scale;
 
@@ -110,12 +117,12 @@ public:
 	virtual double increment(double val) override
 	{
 		val = val + m_k * m_scale;
-		return val;
+		return roundToNDecimals(val, 9);
 	}
 	virtual double decrement(double val) override
 	{
 		val = val - m_k * m_scale;
-		return val;
+		return roundToNDecimals(val, 9);
 	}
 	void setK(double val) { m_k = val; }
 	double k() { return m_k; }
