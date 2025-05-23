@@ -172,58 +172,60 @@ Plugin *PluginManager::loadPlugin(QString file)
 	bool ret;
 	Plugin *original = nullptr;
 	Plugin *clone = nullptr;
+	QObject *inst = nullptr;
+	QPluginLoader qp;
+	QString cloneName;
 	QString errorMsg;
+	PluginInfo::PluginState state = PluginInfo::PLUGIN_UNLOADED;
 	if(!QFile::exists(file)) {
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_FILE_NOT_FOUND));
-		qWarning(CAT_PLUGINMANAGER) << m_plugins.last().getErrorMessage();
-		return nullptr;
+		state = PluginInfo::PLUGIN_FILE_NOT_FOUND;
+		goto finish;
 	}
 
 	if(!QLibrary::isLibrary(file)) {
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_INVALID_LIBRARY));
-		qWarning(CAT_PLUGINMANAGER) << m_plugins.last().getErrorMessage();
-		return nullptr;
+		state = PluginInfo::PLUGIN_INVALID_LIBRARY;
+		goto finish;
 	}
 
-	QPluginLoader qp(file);
+	qp.setFileName(file);
 	ret = qp.load();
 	if(!ret) {
 		errorMsg = "Cannot load library " + qp.fileName() + "- err: " + qp.errorString();
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_LOAD_FAILED, errorMsg));
-		qWarning(CAT_PLUGINMANAGER) << errorMsg;
-		return nullptr;
+		state = PluginInfo::PLUGIN_LOAD_FAILED;
+		goto finish;
 	}
 
-	QObject *inst = qp.instance();
+	inst = qp.instance();
 	if(!inst) {
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_INSTANCE_FAILED));
-		qWarning(CAT_PLUGINMANAGER) << m_plugins.last().getErrorMessage();
-		return nullptr;
+		state = PluginInfo::PLUGIN_INSTANCE_FAILED;
+		goto finish;
 	}
 
 	original = qobject_cast<Plugin *>(qp.instance());
 	if(!original) {
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_INVALID_PLUGIN));
-		qWarning(CAT_PLUGINMANAGER) << m_plugins.last().getErrorMessage();
-		return nullptr;
+		state = PluginInfo::PLUGIN_INVALID_PLUGIN;
+		goto finish;
 	}
 
 	clone = original->clone(this);
 	if(!clone) {
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_CLONE_FAILED));
-		qWarning(CAT_PLUGINMANAGER) << m_plugins.last().getErrorMessage();
-		return nullptr;
+		state = PluginInfo::PLUGIN_CLONE_FAILED;
+		goto finish;
 	}
 
-	QString cloneName;
 	cloneName = clone->name();
 
 	if(cloneName == "") {
-		m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_CLONE_FAILED));
-		qWarning(CAT_PLUGINMANAGER) << m_plugins.last().getErrorMessage();
-		return nullptr;
+		state = PluginInfo::PLUGIN_CLONE_FAILED;
+		goto finish;
 	}
-	m_plugins.append(PluginInfo(file, PluginInfo::PLUGIN_LOADED, "", clone));
+	state = PluginInfo::PLUGIN_LOADED;
+finish:
+	PluginInfo pluginInfo(file, state, errorMsg, clone);
+	m_plugins.append(pluginInfo);
+	if(!pluginInfo.isLoaded()) {
+		qWarning(CAT_PLUGINMANAGER) << pluginInfo.getErrorMessage();
+	}
 	return clone;
 }
 
