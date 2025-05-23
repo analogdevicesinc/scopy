@@ -52,7 +52,8 @@ tools-software/linux-drivers/iio-transceiver/ad9361-customization>`_.
 ENSM/Mode/Clocks
 ------------------
 
-**AN IMAGE WILL BE HERE**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/ensm.png
+    :align: center
 
 The ENSM/Mode/Clocks section provides configuration for the Enable State
 Machine (ENSM) mode (FDD/TDD), pin pulse and TXNRX pin controls, and
@@ -85,9 +86,8 @@ AD936X for a wide range of applications and system requirements.
 Gain Control
 ------------------
 
-**AN IMAGE WILL BE HERE**
-
-**AN IMAGE WILL BE HERE**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain1.png
+    :align: center
 
 The Gain Control section provides comprehensive configuration for both Manual
 Gain Control (MGC) and Automatic Gain Control (AGC) modes for RX1 and RX2. Key
@@ -103,6 +103,10 @@ features include:
   increasing/decreasing gain, and gain update intervals.
 - **ADC Overload:** Set thresholds and counters for large/small ADC overloads,
   and control gain response to overload events.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain2.png
+    :align: center
+
 - **LMT Overload:** Configure high/low thresholds and counters for LMT overload
   detection and response.
 - **Digital Gain:** Enable digital gain, set maximum digital gain, and
@@ -119,10 +123,14 @@ These controls allow for precise and flexible management of the receiver gain,
 ensuring optimal signal quality and dynamic range in a variety of operating
 conditions.
 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain3.png
+    :align: center
+
 RSSI
 -------
 
-**AN IMAGE WILL BE HERE**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/rssi.png
+    :align: center
 
 The RSSI (Received Signal Strength Indicator) section allows you to configure:
 - **Duration (µs):** The measurement duration in microseconds.
@@ -139,7 +147,8 @@ your application.
 External LNA
 --------------
 
-**AN IMAGE WILL BE HERE**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/elna.png
+    :align: center
 
 The eLNA (external Low Noise Amplifier) section allows you to configure:
 - **LNA Gain (mdB):** Set the gain of the external LNA in milli-decibels.
@@ -157,7 +166,8 @@ performance.
 TX Monitor
 ------------
 
-**AN IMAGE WILL BE HERE**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/txMon.png
+    :align: center
 
 The TX Monitor section provides configuration for monitoring and controlling the
 transmit (TX) channels (TX1 and TX2). Key features include:
@@ -183,6 +193,7 @@ Axillary IO (ADC, DAC, Control IO, Temp Sensor)
 The Axillary IO section provides configuration and monitoring for auxiliary
 analog and digital I/O features of the AD936X, including:
 
+
 - **Temp Sensor:**
   - **Measurement Interval (ms):** Set how often the temperature sensor is 
   sampled.
@@ -194,6 +205,9 @@ analog and digital I/O features of the AD936X, including:
 - **Aux ADC:**
   - **Rate:** Set the sampling rate for the auxiliary ADC.
   - **Decimation:** Set the decimation factor for the ADC data.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/aux1.png
+    :align: center
 
 - **DAC1/DAC2:**
   - **Default Value (mV):** Set the default output voltage for each DAC
@@ -212,6 +226,9 @@ analog and digital I/O features of the AD936X, including:
   - **GPO 0-3:** For each GPO, configure inactive high state, RX/TX state, and
   associated delays.
 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/aux2.png
+    :align: center
+
 These controls allow for flexible configuration of auxiliary analog and digital
 I/O, enabling integration with external sensors, actuators, and system
 monitoring features. The graphical interface provides toggles, sliders, and
@@ -220,6 +237,9 @@ their effects in real time.
 
 MISC
 -------
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/misc.png
+    :align: center
 
 The MISC section provides additional configuration options for the AD936X,
 including frequency-dependent and tracking features:
@@ -247,7 +267,8 @@ making it easy to adjust and experiment with these advanced settings.
 BIST
 -----
 
-**AN IMAGE WILL BE HERE**
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/bist.png
+    :align: center
 
 BIST stands for Built-In Self-Test. Selections on this tab take immediate
 effect and therefore don’t require the Save Settings button. Functionality
