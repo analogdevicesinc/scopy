@@ -31,8 +31,8 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	: QAbstractButton(parent)
 {
 	lay = new QHBoxLayout(this);
-	lay->setMargin(16);
-	lay->setSpacing(16);
+	lay->setMargin(10);
+	lay->setSpacing(10);
 
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setCheckable(true);
