@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ADC plugin &#8212; Scopy  documentation</title>
+    <title>AD936X &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="DAC plugin" href="../dac/dac.html" />
-    <link rel="prev" title="Plugins" href="../index.html" />
+    <link rel="next" title="AD936X Advanced" href="ad936x_advanced.html" />
+    <link rel="prev" title="AD936x" href="index.html" />
    
   
   <meta name="repository" content="scopy">
@@ -85,7 +85,14 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">ADC plugin</a></li>
+<li><a class="reference internal" href="#">AD936X</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#device-global-settings">Device Global Settings</a></li>
+<li><a class="reference internal" href="#receive-chain">Receive Chain</a></li>
+<li><a class="reference internal" href="#transmit-chain">Transmit Chain</a></li>
+<li><a class="reference internal" href="#block-diagram">Block Diagram</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -121,7 +128,7 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
@@ -157,9 +164,9 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x.html">AD936X</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ad936x_advanced.html">AD936X Advanced</a></li>
 </ul>
 </li>
 </ul>
@@ -247,137 +254,167 @@ Content on this topic
     <nav class="breadcrumb">
         <ol>
           <li><a href="../index.html">Plugins</a></li>
+          <li><a href="index.html">AD936x</a></li>
           </ol>
     </nav>
   </div>
 
           <div class="body" role="main">
             
-  <section id="adc-plugin">
-<span id="adc"></span><h1>ADC plugin<a class="headerlink" href="#adc-plugin" title="Link to this heading"></a></h1>
-<p>Description:</p>
-<p>The ADC plugin is used to interface with IIO ADCs that implement an IIO buffer mechanism. The plugin implements two instruments for data acquisition and visualization in time and frequency domain.</p>
-<p>Compatible:</p>
-<p>The plugin is compatible with contexts that have at least an IIO device that implements an IIO buffer interface.</p>
-<p>Usage:</p>
-<p>ADC - Time instrument:</p>
-<p>Plot Controls</p>
-<p>X-Axis Menu</p>
-<ul class="simple">
-<li><p>Buffer Size - size of the acquisition buffer in samples</p></li>
-<li><p>Plot Size - size of the plot in samples. Can only be greater than the buffer size.</p></li>
-<li><p>Sync buffer-plot size - makes buffer and plot sizes equal</p></li>
-<li><p>Rolling Mode - controls how the plot is refreshed upon receiving a new buffer. When rolling mode is enabled, the buffers are placed in a queue, so the oldest buffer at the end of the queue is discarded in favor of the newest buffer at the beginning.</p></li>
-<li><p>X Min-Max control - sets the x axis limits</p></li>
-<li><p>X Mode - controls X axis units</p>
-<ul>
-<li><p>Samples - On the X axis the index of each buffer is represented</p></li>
-<li><p>Time -  sample rate is automatically read from the device if a sampling rate attribute is present</p></li>
-<li><p>Time - override sample rate: allows the user to set the sampling rate</p></li>
+  <section id="ad936x">
+<span id="id1"></span><h1>AD936X<a class="headerlink" href="#ad936x" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>The AD936X plugin works with Scopy. You should always use the latest version
+if possible. Changing any field will immediately write changes to the AD936X
+settings to the hardware, and then read it back to make sure the setting is
+valid. If you want to set something that the GUI changes to a different
+number, that means the hardware (either the AD9361 or the FPGA fabric) does
+not support that mode/precision.</p>
+<p>If you want to manipulate the devices behind the back of the GUI (e.g., via
+<code class="docutils literal notranslate"><span class="pre">/sys/bus/iio/devices/...</span></code>), you can still see the settings by clicking the
+“refresh” button at the bottom.</p>
+<p>If you think the device has a setting that isn’t managed by this tab, check
+out the AD936X Advanced Plugin for Scopy.</p>
+<dl class="simple">
+<dt>The AD936X view is divided in three sections:</dt><dd><ul class="simple">
+<li><p><strong>Device Global Settings</strong></p></li>
+<li><p><strong>Receive Chain</strong></p></li>
+<li><p><strong>Transmit Chain</strong></p></li>
 </ul>
-</li>
-<li><p>Sample rate - The value of the sampling rate used in X axis computation, depending on the X Mode it can be readonly or can be overriden</p></li>
-</ul>
-<p>Y-Axis Menu</p>
-<ul class="simple">
-<li><p>Y Min-Max control - sets the y axis limits</p></li>
-<li><p>Autoscale - disables Y axis controls and activates Y axis autoscaling</p></li>
-<li><p>Y Mode - controls Y axis units</p></li>
-</ul>
+</dd>
+</dl>
+<p><strong>AN IMAGE WILL BE HERE</strong></p>
+</section>
+<section id="device-global-settings">
+<h2>Device Global Settings<a class="headerlink" href="#device-global-settings" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
-<li><p>ADC counts - raw values as read from the ADC</p></li>
-<li><p>% Full scale - scales the input range to +/- 1.0</p></li>
-<li><p>Scale - only available if scale parameter is present in the ADC channel and uses the value for scaling via SI unit scaling</p></li>
+<li><p><strong>Active ENSM:</strong> Displays the active mode of the Enable State Machine.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#enable_state_machine_controls">Enable State Machine Controls</a>)</p></li>
+<li><p><strong>ENSM Modes:</strong> Selects one of the available modes: FDD and TDD.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#enable_state_machine_controls">Enable State Machine Controls</a>)</p></li>
+<li><p><strong>Calibration Mode:</strong> Displays the active calibration mode.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#calibration_mode_controls">Calibration Mode Controls</a>)</p></li>
+<li><p><strong>TRX Rate Governor:</strong> Displays the active option of the Rate Governors.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#rate_governors">Rate Governors</a>)</p></li>
+<li><p><strong>Filter FIR configuration:</strong> Allows a FIR filter configuration to be
+loaded from a file.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#digital_fir_filter_controls">Digital FIR Filter Controls</a>)</p></li>
+<li><p><strong>RX Path Rates:</strong> Lists the rates of: BBPLL, ADC, R2, R1, RF, RXSAMP.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#list_chosen_rx_path_rates">List Chosen RX Path Rates</a>)</p></li>
+<li><p><strong>TX Path Rates:</strong> Lists the rates of: TXSAMP, TF, T1, T2, DAC, BBPLL.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#list_chosen_tx_path_rates">List Chosen TX Path Rates</a>)</p></li>
+<li><p><strong>XO Coarse Tune:</strong> Selects the attribute for a coarse tune.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#dcxo_tuning_digital_controlled_crystal_oscillator">DCXO Tuning</a>)</p></li>
 </ul>
 </div></blockquote>
-<p>XY plot - activates XY plotting</p>
-<ul class="simple">
-<li><p>X axis sources</p></li>
-<li><p>Plot X source</p></li>
-</ul>
-<p>Settings</p>
-<ul class="simple">
-<li><p>Plot name - Customize the name of the plot. It is shown on the plot itself</p></li>
-<li><p>Show plot labels - shows axis labels on the plot</p></li>
-<li><p>Thickness / Style - customize plot curve styling</p></li>
-</ul>
-<p>Channel controls</p>
-<ul class="simple">
-<li><p>Y-Axis controls - separates the channel from the plot Y axis to it’s own Axis with it’s own set of controls</p></li>
-<li><p>Measurements - activates time domain measurements</p></li>
-<li><p>Curve - customize plot curve styling</p></li>
-<li><p>Attributes - IIO attributes that control the device</p></li>
-<li><p>Plot - which plot is the curve displayed on</p></li>
-</ul>
-<p>Device controls:</p>
-<ul class="simple">
-<li><p>Attributes - IIO attributes that control the device</p></li>
-</ul>
-<p>Cursors</p>
-<ul class="simple">
-<li><p>Enable - enable cursors on the plot</p></li>
-<li><p>Lock - lock cursors moving them together</p></li>
-<li><p>Track - track Y values on the X c cursor</p></li>
-<li><p>Move readouts - enables drag and drop of the cursor readouts on the plot</p></li>
-</ul>
-<p>Measurements</p>
-<ul class="simple">
-<li><p>enables measurement/stats panel</p></li>
-<li><p>show all - enables all available Measurements</p></li>
-<li><p>Sort by type/channel</p></li>
-</ul>
-<p>Frequency
-Plot Controls</p>
-<p>X-Axis Menu
-- Buffer Size - size of the acquisition buffer in samples</p>
-<ul class="simple">
-<li><p>X Min-Max control - sets the x axis limits</p></li>
-<li><p>X Mode - controls X axis units</p>
+</section>
+<section id="receive-chain">
+<h2>Receive Chain<a class="headerlink" href="#receive-chain" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>RF Bandwidth(MHz):</strong> Configures RX analog filters: RX TIA LPF and RX BB
+LPF. (<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#rx_rf_bandwidth_control">RX RF Bandwidth Control</a>)</p></li>
+<li><p><strong>Sampling Rate(MSPS):</strong> Selects the sample rate of the ADC.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#setting_/_querying_the_rx_sample_rate">Setting/Querying the RX Sample Rate</a>)</p></li>
+<li><p><strong>RF Port Select:</strong> Selects the RF port to be used. Can be either any of
+the inputs on the Rx input mux (in single ended or differential) or the
+Tx monitor input.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#rf_port_selection">RF Port Selection</a>)</p></li>
+<li><p><strong>RX LO Frequency(MHz):</strong> Selects the RX local oscillator frequency.
+Range 70MHz to 6GHz with 1Hz tuning granularity.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#local_oscillator_control(lo)">Local Oscillator Control</a>)</p></li>
+<li><p><strong>External RX LO:</strong> Allows switching between external and internal LO on
+the fly.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#external_lo_support">External LO Support</a>)</p></li>
+<li><p><strong>Fastlock Profile:</strong> Selects one of the 8 available profiles of
+frequency configuration information.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#fastlock_mode">Fastlock Mode</a>)</p>
 <ul>
-<li><p>Samples - On the X axis the index of each buffer is represented</p></li>
-<li><p>Time -  sample rate is automatically read from the device if a sampling rate attribute is present</p></li>
-<li><p>Time - override sample rate: allows the user to set the sampling rate</p></li>
+<li><p><strong>Store:</strong> Stores the current frequency configuration into the profile
+pointed by <strong>Fastlock Profile</strong>.</p></li>
+<li><p><strong>Recall:</strong> Recalls the profile pointed by <strong>Fastlock Profile</strong>.</p></li>
 </ul>
 </li>
-<li><p>Sample rate - The value of the sampling rate used in X axis computation, depending on the X Mode it can be readonly or can be overriden</p></li>
-<li><p>Frequency offset - offsets X axis by some value</p></li>
+<li><p><strong>Tracking</strong> (<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#calibration_tracking_controls">Calibration Tracking Controls</a>)</p>
+<ul>
+<li><p><strong>Quadrature</strong></p></li>
+<li><p><strong>RF DC</strong></p></li>
+<li><p><strong>BB DC</strong></p></li>
 </ul>
-<p>Y-Axis Menu</p>
+</li>
+<li><p><strong>RX</strong></p>
+<ul>
+<li><p><strong>Hardware Gain(dB):</strong> Controls the RX gain only in Manual Gain
+Control Mode (MGC).
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#MGC_setting_the_current_gain">MGC Setting the Current Gain</a>)</p></li>
+<li><p><strong>RSSI(dB):</strong> Displays the received strength signal level.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#received_strength_signal_indicator_(rssi)">Received Strength Signal Indicator (RSSI)</a>)</p></li>
+<li><p><strong>Gain Control:</strong> Displays the active gain mode.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#rx_gain_control">RX Gain Control</a>)</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="transmit-chain">
+<h2>Transmit Chain<a class="headerlink" href="#transmit-chain" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul>
+<li><p><strong>RF Bandwidth(MHz):</strong> Configures TX analog filters: TX BB LPF and  TX
+Secondary LPF.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#tx_rf_bandwidth_control">TX RF Bandwidth Control</a>)</p></li>
+<li><p><strong>Sampling Rate(MSPS):</strong> Selects the sample rate of the DAC.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#setting_/_querying_the_tx_sample_rate">Setting/Querying the TX Sample Rate</a>)</p></li>
+<li><p><strong>RF Port Select:</strong> Selects the RF port to be used.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#rf_port_selection">RF Port Selection</a>)</p></li>
+<li><p><strong>TX LO Frequency(MHz):</strong> Selects the TX local oscillator frequency.
+Range 70MHz to 6GHz with 1Hz tuning granularity.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#local_oscillator_control(lo)">Local Oscillator Control</a>)</p></li>
+<li><p><strong>External TX LO:</strong> Allows switching between external and internal LO on
+the fly.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#external_lo_support">External LO Support</a>)</p></li>
+<li><p><strong>Fastlock Profile:</strong> Selects one of the 8 available profiles of
+frequency configuration information.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#fastlock_mode">Fastlock Mode</a>)</p>
 <ul class="simple">
-<li><p>Y Min-Max control - sets the y axis limits</p></li>
-<li><p>Autoscale - disables Y axis controls and activates Y axis autoscaling</p></li>
-<li><p>Power offset - offsets y axis by some amount</p></li>
-<li><p>Window - selects window used in the FFT</p></li>
-<li><p>Window correction - applies a correction in the FFT chain based on the Window</p></li>
+<li><p><strong>Store:</strong> Stores the current frequency configuration into the profile
+pointed by <strong>Fastlock Profile</strong>.</p></li>
+<li><p><strong>Recall:</strong> Recalls the profile pointed by <strong>Fastlock Profile</strong>.</p></li>
 </ul>
-<p>Settings</p>
-<ul class="simple">
-<li><p>Plot name - Customize the name of the plot. It is shown on the plot itself</p></li>
-<li><p>Show plot labels - shows axis labels on the plot</p></li>
-<li><p>Thickness / Style - customize plot curve styling</p></li>
+</li>
+<li><p><strong>TX</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Attenuation(dB):</strong> Individually controls attenuation for TX1 and
+TX2. The range is from 0 to -89.75 dB in 0.25dB steps.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#tx_attenuation_control">TX Attenuation Control</a>)</p></li>
+<li><p><strong>RSSI(dB):</strong> TX Received Strength Signal Indicator. Active when
+TX_MONITOR port is selected in the RX <strong>RF Port Select</strong>.
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#tx_received_strength_signal_indicator_tx_rssi">TX Received Strength Signal Indicator (TX RSSI)</a>)</p></li>
 </ul>
-<p>Channel Controls
-- Y-Axis controls - separates the channel from the plot Y axis to it’s own Axis with it’s own set of controls</p>
-<ul class="simple">
-<li><p>Marker controls - enables, sets number of markers and selects between marker types
-- Fixed - fixed frequency marker
-- Peak - detects the first N peaks in the spectrum
-- Single Tone - detects DC, fundamental and the next N harmonics
-- Image - only available in complex mode - shows the DC, the fundamental and the fundamental image</p></li>
-<li><p>Curve - customize plot curve styling</p></li>
-<li><p>Attributes - IIO attributes that control the device</p></li>
-<li><p>Plot - which plot is the curve displayed on</p></li>
+</div></blockquote>
+</li>
 </ul>
-<p>Complex mode - activates complex mode. Complex channels are treated as whole different channels</p>
+</div></blockquote>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/ad936x.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/ad936x.png" />
+</section>
+<section id="block-diagram">
+<h2>Block Diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
+<blockquote>
+<div><p>The block diagram of the device is available in the “Block Diagram” tab for
+your reference.</p>
+</div></blockquote>
+</section>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Plugins</a>
-    <a href="../dac/dac.html" title="Next document (Alt+Shift+RightArrow)" class="next">DAC plugin</a>
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD936x</a>
+    <a href="ad936x_advanced.html" title="Next document (Alt+Shift+RightArrow)" class="next">AD936X Advanced</a>
               </div>
           
         </div>

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>ADC plugin &#8212; Scopy  documentation</title>
+    <title>AD936x &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="DAC plugin" href="../dac/dac.html" />
-    <link rel="prev" title="Plugins" href="../index.html" />
+    <link rel="next" title="AD936X" href="ad936x.html" />
+    <link rel="prev" title="Faults" href="../swiot1l/faults.html" />
    
   
   <meta name="repository" content="scopy">
@@ -85,7 +85,16 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">ADC plugin</a></li>
+<li><a class="reference internal" href="#">AD936x</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#supported-devices">Supported Devices</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -121,7 +130,7 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
@@ -157,9 +166,9 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x.html">AD936X</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5" checked=""/><div class="collapse"><a class="current reference internal" href="#">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ad936x_advanced.html">AD936X Advanced</a></li>
 </ul>
 </li>
 </ul>
@@ -253,131 +262,121 @@ Content on this topic
 
           <div class="body" role="main">
             
-  <section id="adc-plugin">
-<span id="adc"></span><h1>ADC plugin<a class="headerlink" href="#adc-plugin" title="Link to this heading"></a></h1>
-<p>Description:</p>
-<p>The ADC plugin is used to interface with IIO ADCs that implement an IIO buffer mechanism. The plugin implements two instruments for data acquisition and visualization in time and frequency domain.</p>
-<p>Compatible:</p>
-<p>The plugin is compatible with contexts that have at least an IIO device that implements an IIO buffer interface.</p>
-<p>Usage:</p>
-<p>ADC - Time instrument:</p>
-<p>Plot Controls</p>
-<p>X-Axis Menu</p>
+  <section id="ad936x">
+<span id="ad936x-index"></span><h1>AD936x<a class="headerlink" href="#ad936x" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The <strong>AD936x</strong> plugins for Scopy enable integration and control of AD936x-based devices within the Scopy software environment.
+These plugins allow users to visualize, analyze, and interact with RF signals and data streams via Scopy’s intuitive interface.</p>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Buffer Size - size of the acquisition buffer in samples</p></li>
-<li><p>Plot Size - size of the plot in samples. Can only be greater than the buffer size.</p></li>
-<li><p>Sync buffer-plot size - makes buffer and plot sizes equal</p></li>
-<li><p>Rolling Mode - controls how the plot is refreshed upon receiving a new buffer. When rolling mode is enabled, the buffers are placed in a queue, so the oldest buffer at the end of the queue is discarded in favor of the newest buffer at the beginning.</p></li>
-<li><p>X Min-Max control - sets the x axis limits</p></li>
-<li><p>X Mode - controls X axis units</p>
+<li><p><strong>Device Discovery:</strong> Automatic detection of connected PlutoSDR or AD936x devices.</p></li>
+<li><p><strong>Signal Acquisition:</strong> Real-time streaming of I/Q data from the device.</p></li>
+<li><p><strong>Device Configuration:</strong> Set parameters such as center frequency, bandwidth, sample rate, and gain.</p></li>
+</ul>
+</section>
+<section id="supported-devices">
+<h2>Supported Devices<a class="headerlink" href="#supported-devices" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>AD936x Family</strong> (including AD9361, AD9364, and compatible SDR platforms)</p></li>
+<li><p><strong>ADALM-Pluto (PlutoSDR)</strong> (based on Analog Devices AD9363)</p></li>
+<li><p><strong>AD-FMCOMMS2/3/4</strong> (with AD9361/AD9364)</p></li>
+<li><p><strong>AD-FMCOMMS5</strong> (with AD9361/AD9364)</p></li>
+</ul>
+</section>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<p><strong>Prerequisites</strong></p>
+<ul class="simple">
+<li><p>A supported SDR device (PlutoSDR or AD936x-based platform)</p></li>
+<li><p>Properly installed device drivers (see <a class="reference external" href="https://wiki.analog.com/university/tools/pluto/drivers">ADI Drivers</a>)</p></li>
+<li><p>Scopy version 2.1.0 or later</p></li>
+</ul>
+<p><strong>Using the Plugin</strong></p>
+</section>
+<section id="configuration-options">
+<h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Link to this heading"></a></h2>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 40.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Typical Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Center Frequency</p></td>
+<td><p>Tuning frequency of the SDR</p></td>
+<td><p>325 MHz – 3.8 GHz</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sample Rate</p></td>
+<td><p>ADC/DAC sample rate</p></td>
+<td><p>520 kHz – 61.44 MHz</p></td>
+</tr>
+<tr class="row-even"><td><p>Bandwidth</p></td>
+<td><p>RF bandwidth</p></td>
+<td><p>Up to 20 MHz</p></td>
+</tr>
+<tr class="row-odd"><td><p>RX/TX Gain</p></td>
+<td><p>Receiver/transmitter gain</p></td>
+<td><p>-89.75 dB to 0 dB (step: 0.25 dB)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Device Not Detected:</strong> Ensure drivers are installed and the device is connected via USB.</p></li>
+<li><p><strong>Signal Quality Issues:</strong> Check antenna connections, adjust gain and frequency.</p></li>
+</ul>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://wiki.analog.com/university/tools/pluto">ADALM-Pluto Wiki</a></p></li>
+<li><p><a class="reference external" href="https://www.analog.com/en/products/ad9361.html">AD936x Family Overview</a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
 <ul>
-<li><p>Samples - On the X axis the index of each buffer is represented</p></li>
-<li><p>Time -  sample rate is automatically read from the device if a sampling rate attribute is present</p></li>
-<li><p>Time - override sample rate: allows the user to set the sampling rate</p></li>
+<li class="toctree-l1"><a class="reference internal" href="ad936x.html">AD936X</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ad936x.html#description">Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x.html#device-global-settings">Device Global Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x.html#receive-chain">Receive Chain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x.html#transmit-chain">Transmit Chain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x.html#block-diagram">Block Diagram</a></li>
 </ul>
 </li>
-<li><p>Sample rate - The value of the sampling rate used in X axis computation, depending on the X Mode it can be readonly or can be overriden</p></li>
-</ul>
-<p>Y-Axis Menu</p>
-<ul class="simple">
-<li><p>Y Min-Max control - sets the y axis limits</p></li>
-<li><p>Autoscale - disables Y axis controls and activates Y axis autoscaling</p></li>
-<li><p>Y Mode - controls Y axis units</p></li>
-</ul>
-<blockquote>
-<div><ul class="simple">
-<li><p>ADC counts - raw values as read from the ADC</p></li>
-<li><p>% Full scale - scales the input range to +/- 1.0</p></li>
-<li><p>Scale - only available if scale parameter is present in the ADC channel and uses the value for scaling via SI unit scaling</p></li>
-</ul>
-</div></blockquote>
-<p>XY plot - activates XY plotting</p>
-<ul class="simple">
-<li><p>X axis sources</p></li>
-<li><p>Plot X source</p></li>
-</ul>
-<p>Settings</p>
-<ul class="simple">
-<li><p>Plot name - Customize the name of the plot. It is shown on the plot itself</p></li>
-<li><p>Show plot labels - shows axis labels on the plot</p></li>
-<li><p>Thickness / Style - customize plot curve styling</p></li>
-</ul>
-<p>Channel controls</p>
-<ul class="simple">
-<li><p>Y-Axis controls - separates the channel from the plot Y axis to it’s own Axis with it’s own set of controls</p></li>
-<li><p>Measurements - activates time domain measurements</p></li>
-<li><p>Curve - customize plot curve styling</p></li>
-<li><p>Attributes - IIO attributes that control the device</p></li>
-<li><p>Plot - which plot is the curve displayed on</p></li>
-</ul>
-<p>Device controls:</p>
-<ul class="simple">
-<li><p>Attributes - IIO attributes that control the device</p></li>
-</ul>
-<p>Cursors</p>
-<ul class="simple">
-<li><p>Enable - enable cursors on the plot</p></li>
-<li><p>Lock - lock cursors moving them together</p></li>
-<li><p>Track - track Y values on the X c cursor</p></li>
-<li><p>Move readouts - enables drag and drop of the cursor readouts on the plot</p></li>
-</ul>
-<p>Measurements</p>
-<ul class="simple">
-<li><p>enables measurement/stats panel</p></li>
-<li><p>show all - enables all available Measurements</p></li>
-<li><p>Sort by type/channel</p></li>
-</ul>
-<p>Frequency
-Plot Controls</p>
-<p>X-Axis Menu
-- Buffer Size - size of the acquisition buffer in samples</p>
-<ul class="simple">
-<li><p>X Min-Max control - sets the x axis limits</p></li>
-<li><p>X Mode - controls X axis units</p>
-<ul>
-<li><p>Samples - On the X axis the index of each buffer is represented</p></li>
-<li><p>Time -  sample rate is automatically read from the device if a sampling rate attribute is present</p></li>
-<li><p>Time - override sample rate: allows the user to set the sampling rate</p></li>
+<li class="toctree-l1"><a class="reference internal" href="ad936x_advanced.html">AD936X Advanced</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#ensm-mode-clocks">ENSM/Mode/Clocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#gain-control">Gain Control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#rssi">RSSI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#external-lna">External LNA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#tx-monitor">TX Monitor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#axillary-io-adc-dac-control-io-temp-sensor">Axillary IO (ADC, DAC, Control IO, Temp Sensor)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#misc">MISC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ad936x_advanced.html#bist">BIST</a></li>
 </ul>
 </li>
-<li><p>Sample rate - The value of the sampling rate used in X axis computation, depending on the X Mode it can be readonly or can be overriden</p></li>
-<li><p>Frequency offset - offsets X axis by some value</p></li>
 </ul>
-<p>Y-Axis Menu</p>
-<ul class="simple">
-<li><p>Y Min-Max control - sets the y axis limits</p></li>
-<li><p>Autoscale - disables Y axis controls and activates Y axis autoscaling</p></li>
-<li><p>Power offset - offsets y axis by some amount</p></li>
-<li><p>Window - selects window used in the FFT</p></li>
-<li><p>Window correction - applies a correction in the FFT chain based on the Window</p></li>
-</ul>
-<p>Settings</p>
-<ul class="simple">
-<li><p>Plot name - Customize the name of the plot. It is shown on the plot itself</p></li>
-<li><p>Show plot labels - shows axis labels on the plot</p></li>
-<li><p>Thickness / Style - customize plot curve styling</p></li>
-</ul>
-<p>Channel Controls
-- Y-Axis controls - separates the channel from the plot Y axis to it’s own Axis with it’s own set of controls</p>
-<ul class="simple">
-<li><p>Marker controls - enables, sets number of markers and selects between marker types
-- Fixed - fixed frequency marker
-- Peak - detects the first N peaks in the spectrum
-- Single Tone - detects DC, fundamental and the next N harmonics
-- Image - only available in complex mode - shows the DC, the fundamental and the fundamental image</p></li>
-<li><p>Curve - customize plot curve styling</p></li>
-<li><p>Attributes - IIO attributes that control the device</p></li>
-<li><p>Plot - which plot is the curve displayed on</p></li>
-</ul>
-<p>Complex mode - activates complex mode. Complex channels are treated as whole different channels</p>
+</div>
+</section>
 </section>
 
 
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Plugins</a>
-    <a href="../dac/dac.html" title="Next document (Alt+Shift+RightArrow)" class="next">DAC plugin</a>
+    <a href="../swiot1l/faults.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Faults</a>
+    <a href="ad936x.html" title="Next document (Alt+Shift+RightArrow)" class="next">AD936X</a>
               </div>
           
         </div>

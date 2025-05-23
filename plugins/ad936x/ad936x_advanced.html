@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>AD936X Advanced &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=c218d0f6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script defer="" src="../../_static/app.umd.js?v=8984ea49"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Scopy developer guide" href="../../developer_guide/index.html" />
+    <link rel="prev" title="AD936X" href="ad936x.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">AD936X Advanced</a><ul>
+<li><a class="reference internal" href="#ensm-mode-clocks">ENSM/Mode/Clocks</a></li>
+<li><a class="reference internal" href="#gain-control">Gain Control</a></li>
+<li><a class="reference internal" href="#rssi">RSSI</a></li>
+<li><a class="reference internal" href="#external-lna">External LNA</a></li>
+<li><a class="reference internal" href="#tx-monitor">TX Monitor</a></li>
+<li><a class="reference internal" href="#axillary-io-adc-dac-control-io-temp-sensor">Axillary IO (ADC, DAC, Control IO, Temp Sensor)</a></li>
+<li><a class="reference internal" href="#misc">MISC</a></li>
+<li><a class="reference internal" href="#bist">BIST</a><ul>
+<li><a class="reference internal" href="#bist-tone">BIST Tone</a></li>
+<li><a class="reference internal" href="#bist-prbs">BIST PRBS</a></li>
+<li><a class="reference internal" href="#bist-loopback">BIST Loopback</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img class="only-light" src="../../_static/scopy.png"/>
+      <img class="only-dark" src="../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5" checked=""/><div class="collapse"><a class="reference internal" href="index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ad936x.html">AD936X</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AD936X Advanced</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+    <nav class="breadcrumb">
+        <ol>
+          <li><a href="../index.html">Plugins</a></li>
+          <li><a href="index.html">AD936x</a></li>
+          </ol>
+    </nav>
+  </div>
+
+          <div class="body" role="main">
+            
+  <section id="ad936x-advanced">
+<span id="id1"></span><h1>AD936X Advanced<a class="headerlink" href="#ad936x-advanced" title="Link to this heading"></a></h1>
+<p>The AD936X Advanced plugin works with Scopy. Changing any field will
+immediately write changes to the AD936X settings to the hardware, and then
+read it back to make sure the setting is valid. If you want to set something
+that the GUI changes to a different number, that means the hardware (either
+the AD9361 or the FPGA fabric) does not support that mode/precision.</p>
+<p>If you want to manipulate the devices behind the back of the GUI (e.g., via
+<code class="docutils literal notranslate"><span class="pre">/sys/bus/iio/devices/...</span></code>), you can still see the settings by clicking the
+“refresh” button.</p>
+<p>The AD936X Advanced Plugin allows testing of different device driver
+initialization options and values. In contrast to the controls on the AD936X
+Main Plugin, the controls here are not part of the main driver API.</p>
+<ul class="simple">
+<li><p>In the No-OS driver, the values correspond to members of the setup/init
+structure.</p></li>
+<li><p>For the AD9361 Linux Device Driver, each control corresponds to a specific
+devicetree property.</p></li>
+</ul>
+<p>See more details about <a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361-customization">AD9361 Customization</a>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>TIP:</strong>
+After you customize the driver for your application needs, you can read
+back all values from the Linux debugfs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>root@linaro-ubuntu-desktop:~#<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/sys/kernel/debug/iio/iio<span class="se">\:</span>device1/
+root@linaro-ubuntu-desktop:/sys/kernel/debug/iio/iio:device1#<span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>*<span class="w"> </span><span class="p">|</span>
+sed<span class="w"> </span><span class="s2">&quot;s/:/ = &lt;/g&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $0&quot;&gt;;&quot;}&#39;</span>
+adi,2rx-2tx-mode-enable<span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;<span class="m">1</span>&gt;<span class="p">;</span>
+adi,agc-adc-large-overload-exceed-counter<span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;<span class="m">10</span>&gt;<span class="p">;</span>
+<span class="o">[</span><span class="w"> </span>--<span class="w"> </span>snip<span class="w"> </span>--<span class="w"> </span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Simply update the values here:
+<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361#example_linux_device-tree_initialization">AD9361 Devicetree Initialization</a></p>
+<p>For the No-OS driver, the mapping can be found here:
+<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/ad9361-customization">AD9361 Customization</a></p>
+</div>
+<section id="ensm-mode-clocks">
+<h2>ENSM/Mode/Clocks<a class="headerlink" href="#ensm-mode-clocks" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/ensm.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/ensm.png" />
+<p>The ENSM/Mode/Clocks section provides configuration for the Enable State
+Machine (ENSM) mode (FDD/TDD), pin pulse and TXNRX pin controls, and
+TDD-specific options such as dual synth, VCO tables, and VCO calibration. You
+can also update Tx gain in ALERT mode.</p>
+<ul class="simple">
+<li><p><strong>ENSM Mode:</strong> Select between FDD (Frequency Division Duplex) and TDD (Time
+Division Duplex) operation.</p></li>
+<li><p><strong>Pin Pulse and TXNRX Pin Controls:</strong> Configure the behavior of the ENSM
+using external pins for mode switching and control.</p></li>
+<li><p><strong>TDD Options:</strong> Enable dual synthesizer operation, configure VCO tables,
+and perform VCO calibration for TDD applications.</p></li>
+<li><p><strong>ALERT Mode Gain:</strong> Update the transmit gain while in ALERT mode.</p></li>
+<li><p><strong>RX/TX Port Selection:</strong> Choose the RX and TX port inputs and enable RX2
+phase inversion.</p></li>
+<li><p><strong>Clocks:</strong>
+- Disable the crystal oscillator (XO) and use an external reference clock.
+- Enable external RX/TX local oscillator (LO).
+- Control RX/TX fastlock pins and set fastlock delays.
+- Select the output clock mode (e.g., Disabled) for the CLOCKOUT setting.
+- Configure the Output Clock (<code class="docutils literal notranslate"><span class="pre">CLK_OUT</span></code> pin) to output either a buffered
+version of the external input clock (DCXO) or a divided version of the
+internal ADC sample clock (ADC_CLK) with selectable division ratios
+(÷2, ÷3, ÷4, ÷8, ÷16, ÷32, ÷64).</p></li>
+</ul>
+<p>These controls provide flexible and detailed management of the device’s
+operating modes, clocking, and signal routing, allowing you to optimize the
+AD936X for a wide range of applications and system requirements.</p>
+</section>
+<section id="gain-control">
+<h2>Gain Control<a class="headerlink" href="#gain-control" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain1.png" />
+<p>The Gain Control section provides comprehensive configuration for both Manual
+Gain Control (MGC) and Automatic Gain Control (AGC) modes for RX1 and RX2. Key
+features include:</p>
+<ul class="simple">
+<li><p><strong>Mode:</strong> Select gain control mode (e.g., Slow Attack, Fast Attack) for each
+channel and choose the gain table mode.</p></li>
+<li><p><strong>Power Measurement and Thresholds:</strong> Set power measurement duration, attack
+delay margin, and thresholds for power detection.</p></li>
+<li><p><strong>MGC:</strong> Configure manual gain steps, control input, and split table input
+mode.</p></li>
+<li><p><strong>AGC Thresholds and Gain Changes:</strong> Adjust outer/inner thresholds, steps for
+increasing/decreasing gain, and gain update intervals.</p></li>
+<li><p><strong>ADC Overload:</strong> Set thresholds and counters for large/small ADC overloads,
+and control gain response to overload events.</p></li>
+</ul>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain2.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain2.png" />
+<ul class="simple">
+<li><p><strong>LMT Overload:</strong> Configure high/low thresholds and counters for LMT overload
+detection and response.</p></li>
+<li><p><strong>Digital Gain:</strong> Enable digital gain, set maximum digital gain, and
+configure saturation and decrement step size.</p></li>
+<li><p><strong>Fast Attack AGC:</strong> Fine-tune AGC response to peak overloads and low power
+conditions.</p></li>
+<li><p><strong>AGC Lock Level Adjustment:</strong> Set lock level and gain increase limits.</p></li>
+<li><p><strong>Peak Detectors and Final Settling:</strong> Configure final settling steps and
+overrange counts.</p></li>
+<li><p><strong>Gain Unlock:</strong> Define behavior when exiting gain lock, including gain
+source, optimized offsets, and response to signal power changes or overloads.</p></li>
+</ul>
+<p>These controls allow for precise and flexible management of the receiver gain,
+ensuring optimal signal quality and dynamic range in a variety of operating
+conditions.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain3.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/gain3.png" />
+</section>
+<section id="rssi">
+<h2>RSSI<a class="headerlink" href="#rssi" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/rssi.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/rssi.png" />
+<p>The RSSI (Received Signal Strength Indicator) section allows you to configure:
+- <strong>Duration (µs):</strong> The measurement duration in microseconds.
+- <strong>Delay (µs):</strong> The delay before the RSSI measurement starts, in
+microseconds.
+- <strong>Wait (µs):</strong> The wait time after the measurement, in microseconds.
+- <strong>Restart Mode:</strong> Select the condition for restarting the RSSI measurement
+(e.g., when a gain change occurs).</p>
+<p>These settings provide fine control over how and when RSSI measurements are
+performed, enabling accurate monitoring and optimization of signal strength in
+your application.</p>
+</section>
+<section id="external-lna">
+<h2>External LNA<a class="headerlink" href="#external-lna" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/elna.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/elna.png" />
+<p>The eLNA (external Low Noise Amplifier) section allows you to configure:
+- <strong>LNA Gain (mdB):</strong> Set the gain of the external LNA in milli-decibels.
+- <strong>LNA Bypass Loss (mdB):</strong> Specify the loss when the LNA is bypassed.
+- <strong>Settling Delay (ns):</strong> Set the settling delay in nanoseconds for the LNA
+switching.
+- <strong>RX1 GPO0 / RX2 GPO0:</strong> Enable or disable GPIO control for RX1 and RX2.
+- <strong>External LNA enabled for all gain indexes:</strong> Toggle to enable the external
+LNA for all gain settings.</p>
+<p>These controls allow precise management of the external LNA’s behavior and
+integration with the receiver chain, optimizing signal quality and noise
+performance.</p>
+</section>
+<section id="tx-monitor">
+<h2>TX Monitor<a class="headerlink" href="#tx-monitor" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/txMon.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/txMon.png" />
+<p>The TX Monitor section provides configuration for monitoring and controlling the
+transmit (TX) channels (TX1 and TX2). Key features include:
+- <strong>Frontend Gain:</strong> Set the gain for each TX channel.
+- <strong>LO Common Mode:</strong> Adjust the local oscillator common mode voltage for each
+channel.
+- <strong>Low/High Gain Threshold (mdB):</strong> Set the threshold for switching between
+low and high gain.
+- <strong>Low Gain / High Gain (dB):</strong> Configure the gain values for low and high
+gain states.
+- <strong>Delay (RX samples):</strong> Set the delay in RX samples for monitoring.
+- <strong>Duration (RX samples):</strong> Set the duration in RX samples for monitoring.
+- <strong>Enable DC Tracking:</strong> Toggle DC tracking for the TX path.
+- <strong>Enable One Shot Mode:</strong> Enable or disable one-shot monitoring mode.</p>
+<p>These controls allow for detailed monitoring and adjustment of the TX signal
+path, helping to optimize performance and ensure signal integrity during
+transmission.</p>
+</section>
+<section id="axillary-io-adc-dac-control-io-temp-sensor">
+<h2>Axillary IO (ADC, DAC, Control IO, Temp Sensor)<a class="headerlink" href="#axillary-io-adc-dac-control-io-temp-sensor" title="Link to this heading"></a></h2>
+<p>The Axillary IO section provides configuration and monitoring for auxiliary
+analog and digital I/O features of the AD936X, including:</p>
+<ul class="simple">
+<li><p><strong>Temp Sensor:</strong>
+- <strong>Measurement Interval (ms):</strong> Set how often the temperature sensor is
+sampled.
+- <strong>Offset:</strong> Adjust the offset applied to the temperature reading.
+- <strong>Decimation:</strong> Set the decimation factor for the temperature sensor data.
+- <strong>Periodic Measurement:</strong> Enable or disable periodic temperature
+measurements.</p></li>
+<li><p><strong>Aux ADC:</strong>
+- <strong>Rate:</strong> Set the sampling rate for the auxiliary ADC.
+- <strong>Decimation:</strong> Set the decimation factor for the ADC data.</p></li>
+</ul>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/aux1.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/aux1.png" />
+<ul class="simple">
+<li><p><strong>DAC1/DAC2:</strong>
+- <strong>Default Value (mV):</strong> Set the default output voltage for each DAC
+channel.
+- <strong>Enable ALERT:</strong> Enable alert functionality for the DAC.
+- <strong>Enable in RX/Tx:</strong> Enable the DAC output during RX or TX operation, with
+optional delay settings.</p></li>
+<li><p><strong>Control OUTS:</strong>
+- <strong>Index/Mask:</strong> Configure the index and mask for control outputs.</p></li>
+<li><p><strong>GPO Manual Mode:</strong>
+- <strong>Enable:</strong> Enable or disable manual mode for General Purpose Outputs
+(GPOs).
+- <strong>GPO Bit Mask:</strong> Select which GPOs are active.
+- <strong>GPO 0-3:</strong> For each GPO, configure inactive high state, RX/TX state, and
+associated delays.</p></li>
+</ul>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/aux2.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/aux2.png" />
+<p>These controls allow for flexible configuration of auxiliary analog and digital
+I/O, enabling integration with external sensors, actuators, and system
+monitoring features. The graphical interface provides toggles, sliders, and
+input fields for each parameter, making it easy to adjust settings and observe
+their effects in real time.</p>
+</section>
+<section id="misc">
+<h2>MISC<a class="headerlink" href="#misc" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/misc.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/misc.png" />
+<p>The MISC section provides additional configuration options for the AD936X,
+including frequency-dependent and tracking features:</p>
+<ul class="simple">
+<li><p><strong>RX Frequency:</strong>
+- Separate settings are available for RX frequencies above and below 4 GHz.</p></li>
+<li><p><strong>Attenuation:</strong>
+- Set the attenuation value for each frequency range.</p></li>
+<li><p><strong>Count:</strong>
+- Configure the count parameter for each frequency range.</p></li>
+<li><p><strong>Update Event Mask:</strong>
+- Set the event mask for update events in each frequency range.</p></li>
+</ul>
+<p>These controls allow you to fine-tune the device’s behavior based on the RX
+frequency, providing flexibility for different operating bands.</p>
+<ul class="simple">
+<li><p><strong>QEC Tracking:</strong>
+- <strong>Slow QEC:</strong> Enable or disable slow Quadrature Error Correction (QEC)
+tracking. This toggle allows you to optimize QEC performance for your
+application.</p></li>
+</ul>
+<p>The graphical interface provides input fields and toggles for each parameter,
+making it easy to adjust and experiment with these advanced settings.</p>
+</section>
+<section id="bist">
+<h2>BIST<a class="headerlink" href="#bist" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/bist.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad936x/bist.png" />
+<p>BIST stands for Built-In Self-Test. Selections on this tab take immediate
+effect and therefore don’t require the Save Settings button. Functionality
+exposed here is only meant to inject test patterns/data that can be used to
+validate the Digital Interface or functionality of the device.</p>
+<p>There are three major facilities. The topmost drop-down selection box allows
+you to specify the injection point.</p>
+<section id="bist-tone">
+<h3>BIST Tone<a class="headerlink" href="#bist-tone" title="Link to this heading"></a></h3>
+<p>User selectable tone (with frequency and level selection), that can be injected
+into the RX or TX path. There are some checkboxes below that allow you to MASK
+off certain channels. A masked channel (box checked) is not driving any data.
+(This feature can be useful to determine the I,Q Rx1, Rx2 channel to data
+mapping.)</p>
+</section>
+<section id="bist-prbs">
+<h3>BIST PRBS<a class="headerlink" href="#bist-prbs" title="Link to this heading"></a></h3>
+<p>Pseudorandom Binary Sequence (PRBS) that can be injected into the RX or TX
+path.</p>
+</section>
+<section id="bist-loopback">
+<h3>BIST Loopback<a class="headerlink" href="#bist-loopback" title="Link to this heading"></a></h3>
+<p>Allows either to digitally loopback TX data into the RX path or vice versa.</p>
+<ul class="simple">
+<li><p><strong>Digital TX -&gt; Digital RX loopback:</strong> The loopback happens inside the
+AD9361/4 close to the internal digital interface block. The entire RF
+section is bypassed. This can be used to validate (monitor on RX) the
+digital samples/symbols sent to the device.</p></li>
+<li><p><strong>RF RX -&gt; RF TX loopback:</strong> The loopback happens in the ADI provided HDL
+core. The Transmitter will transmit anything that the receiver receives. The
+entire RF chain is active (Sample rates, RF bandwidth and FIR settings will
+all affect the transmission.)</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="ad936x.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD936X</a>
+    <a href="../../developer_guide/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Scopy developer guide</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
