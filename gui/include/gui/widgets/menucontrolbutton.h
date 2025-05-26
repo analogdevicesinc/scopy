@@ -66,6 +66,7 @@ public:
 
 	void setDoubleClickToOpenMenu(bool b);
 	void setOpenMenuChecksThis(bool b);
+	void enableToolTip(bool en);
 
 	QCheckBox *checkBox();
 	QPushButton *button();
@@ -83,6 +84,7 @@ private:
 	void applyStylesheet();
 
 	int width;
+	bool m_toolTip;
 	QColor m_color;
 	QHBoxLayout *lay;
 	QCheckBox *m_chk;
