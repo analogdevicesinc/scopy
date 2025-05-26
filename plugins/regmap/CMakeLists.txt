@@ -104,7 +104,9 @@ generate_export_header(
 )
 
 include(ScopyStyle)
-generate_style("--plugin" ${CMAKE_CURRENT_SOURCE_DIR}/style ${CMAKE_CURRENT_SOURCE_DIR}/include/regmap ${CMAKE_BINARY_DIR})
+generate_style(
+	"--plugin" ${CMAKE_CURRENT_SOURCE_DIR}/style ${CMAKE_CURRENT_SOURCE_DIR}/include/regmap ${CMAKE_BINARY_DIR}
+)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
