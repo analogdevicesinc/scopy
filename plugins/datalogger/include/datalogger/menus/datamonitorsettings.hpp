@@ -27,8 +27,8 @@
 #include <edittextmenuheader.h>
 #include <menucombo.h>
 #include <menuonoffswitch.h>
-#include <monitorplot.hpp>
 #include <monitorplotcurve.hpp>
+#include <monitorplotmanager.h>
 #include <progresslineedit.h>
 #include <spinbox_a.hpp>
 #include "scopy-datalogger_export.h"
@@ -53,7 +53,7 @@ class SCOPY_DATALOGGER_EXPORT DataMonitorSettings : public QWidget
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	explicit DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent = nullptr);
+	explicit DataMonitorSettings(MonitorPlotManager *m_plotManager, QWidget *parent = nullptr);
 	~DataMonitorSettings();
 
 	void init(QString title, QColor color);
@@ -63,29 +63,14 @@ public:
 	DataLoggingMenu *getDataLoggingMenu() const;
 
 public Q_SLOTS:
-	void plotYAxisMinValueUpdate(double value);
-	void plotYAxisMaxValueUpdate(double value);
+	void setEnableAddRemovePlot(bool);
 
 Q_SIGNALS:
 	void titleUpdated(QString title);
-	void curveStyleIndexChanged(int index);
-	void changeCurveThickness(double thickness);
-
-	void plotYAxisAutoscale(bool toggled);
-	void plotYAxisMinValueChange(double value);
-	void plotYAxisMaxValueChange(double value);
-	void plotXAxisMinValueChange(double value);
-	void plotXAxisMaxValueChange(double value);
-	void requestYMinMaxValues();
 
 private:
 	bool m_isDeletable;
-	PositionSpinButton *m_ymin;
-	PositionSpinButton *m_ymax;
 	QPushButton *deleteMonitor = nullptr;
-	QWidget *generateYAxisSettings(QWidget *parent);
-	QWidget *generateCurveStyleSettings(QWidget *parent);
-	QWidget *generatePlotUiSettings(QWidget *parent);
 
 	EditTextMenuHeader *header;
 	QVBoxLayout *layout;
@@ -93,10 +78,12 @@ private:
 	QWidget *settingsBody;
 	QVBoxLayout *mainLayout;
 
-	MonitorPlot *m_plot;
+	MonitorPlotManager *m_plotManager;
 
 	SevenSegmentMonitorSettings *sevenSegmentMonitorSettings;
 	DataLoggingMenu *dataLoggingMenu;
+
+	QPushButton *m_addPlotBtn;
 
 	bool eventFilter(QObject *watched, QEvent *event) override;
 };

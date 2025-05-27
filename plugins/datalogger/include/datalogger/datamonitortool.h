@@ -23,6 +23,7 @@
 #define DATAMONITORTOOL_H
 
 #include "dataacquisitionmanager.hpp"
+#include "monitorplotmanager.h"
 #include "scopy-datalogger_export.h"
 #include <QLabel>
 #include <QPushButton>
@@ -55,6 +56,8 @@ public:
 	~DatamonitorTool();
 
 	RunBtn *getRunButton() const;
+	void setEnableAddRemovePlot(bool);
+	void setEnableAddRemoveInstrument(bool);
 
 Q_SIGNALS:
 	void requestNewTool();
@@ -77,13 +80,14 @@ private:
 	PrintPlotManager *printplotManager;
 	RunBtn *runBtn;
 	QPushButton *clearBtn;
-	AddBtn *addMonitorButton;
+	AddBtn *addMonitorToolButton;
 	RemoveBtn *removeBtn;
 
 	bool first = true;
 	void resetStartTime();
 
-	MonitorPlot *m_monitorPlot;
+	MonitorPlotManager *m_plotManager;
+
 	QTextEdit *textMonitors;
 	SevenSegmentDisplay *sevenSegmetMonitors;
 
