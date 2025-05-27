@@ -28,13 +28,13 @@
 #include <menusectionwidget.h>
 #include <timemanager.hpp>
 #include <cfloat>
+#include <QwtDate>
 
 using namespace scopy;
 using namespace datamonitor;
 
-PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *parent)
-	: m_plot(m_plot)
-	, QWidget{parent}
+PlotTimeAxisController::PlotTimeAxisController(QWidget *parent)
+	: QWidget{parent}
 {
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setMargin(0);
@@ -69,17 +69,17 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 
 	connect(timeTracker, &TimeManager::timeout, this, [=, this]() {
 		if(livePlottingToggle->onOffswitch()->isChecked()) {
-			// plot using current date time as starting point
 			timeEdit->setTime(QTime::currentTime());
 			dateEdit->setDate(QDate::currentDate());
 			updatePlotStartPoint();
 		} else {
 			double time = QwtDate::toDouble(QDateTime::currentDateTime());
-			m_plot->updateBufferPreviewer(time);
+			Q_EMIT requestUpdateBufferPreviewer(time);
 		}
 	});
 
-	connect(realTimeToggle->onOffswitch(), &QAbstractButton::toggled, m_plot, &MonitorPlot::setIsRealTime);
+	connect(realTimeToggle->onOffswitch(), &QAbstractButton::toggled, this,
+		[=, this](bool toggled) { Q_EMIT requestSetIsRealTime(toggled); });
 	connect(livePlottingToggle->onOffswitch(), &QAbstractButton::toggled, this,
 		&PlotTimeAxisController::togglePlotNow);
 
@@ -87,7 +87,7 @@ PlotTimeAxisController::PlotTimeAxisController(MonitorPlot *m_plot, QWidget *par
 	connect(timeEdit, &QTimeEdit::timeChanged, this, &PlotTimeAxisController::updatePlotStartPoint);
 
 	connect(m_xdelta, &gui::MenuSpinbox::valueChanged, this,
-		[=, this](double value) { m_plot->updateXAxisIntervalMax(value); });
+		[=, this](double value) { Q_EMIT requestUpdateXAxisIntervalMax(value); });
 
 	xAxisSection->contentLayout()->addWidget(realTimeToggle);
 	xAxisSection->contentLayout()->addWidget(livePlottingToggle);
@@ -109,8 +109,7 @@ void PlotTimeAxisController::updatePlotStartPoint()
 {
 	double time = QwtDate::toDouble(QDateTime(dateEdit->date(), timeEdit->time()));
 	double delta = m_xdelta->value();
-
-	m_plot->updatePlotStartingPoint(time, delta);
+	Q_EMIT requestUpdatePlotStartPoint(time, delta);
 }
 
 #include "moc_plottimeaxiscontroller.cpp"

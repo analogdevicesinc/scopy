@@ -93,6 +93,9 @@ public:
 	bool hasOffset() const;
 	void setHasOffset(bool newHasOffset);
 
+	uint32_t plotUuid() const;
+	void setPlotUuid(uint32_t newPlotUuid);
+
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
 	void minValueUpdated(double value);
@@ -121,6 +124,8 @@ private:
 	void checkMinMaxUpdate(double value);
 	UnitOfMeasurement *unitOfMeasure;
 	Q_PROPERTY(bool hasOffset READ hasOffset CONSTANT FINAL)
+
+	uint32_t m_plotUuid = 0;
 };
 } // namespace datamonitor
 } // namespace scopy

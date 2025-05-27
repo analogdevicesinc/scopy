@@ -33,18 +33,21 @@
 #include <menuplotaxisrangecontrol.h>
 #include <menuplotchannelcurvestylecontrol.h>
 #include <menusectionwidget.h>
+#include <monitorplotsettings.h>
 #include <mousewheelwidgetguard.h>
 #include <plotautoscaler.h>
 #include <plotchannel.h>
+#include <style.h>
 #include <timemanager.hpp>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 using namespace datamonitor;
 
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS, "DataMonitorSettings")
 
-DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent)
-	: m_plot(m_plot)
+DataMonitorSettings::DataMonitorSettings(MonitorPlotManager *m_plotManager, QWidget *parent)
+	: m_plotManager(m_plotManager)
 	, QWidget{parent}
 {
 	mainLayout = new QVBoxLayout(this);
@@ -76,26 +79,180 @@ void DataMonitorSettings::init(QString title, QColor color)
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
 
-	// XAxis settings
-	PlotTimeAxisController *plotTimeAxisController = new PlotTimeAxisController(m_plot, this);
-	layout->addWidget(plotTimeAxisController);
-
-	// YAxis settings
-	layout->addWidget(generateYAxisSettings(this));
-
-	/// Curve style
-	layout->addWidget(generateCurveStyleSettings(this));
-
-	////Plot style
-	layout->addWidget(generatePlotUiSettings(this));
-
-	////// 7 segment settings ///////////////////
-	sevenSegmentMonitorSettings = new SevenSegmentMonitorSettings(this);
-	layout->addWidget(sevenSegmentMonitorSettings);
-
 	/////// data logging /////////////////
 	dataLoggingMenu = new DataLoggingMenu(this);
 	layout->addWidget(dataLoggingMenu);
+
+	m_activeSettings = new QStackedWidget(this);
+	layout->addWidget(m_activeSettings);
+
+	///// plot settings ////////////////////////
+	QWidget *plotSettingsWidget = new QWidget(this);
+	QVBoxLayout *plotSettingsLayout = new QVBoxLayout(plotSettingsWidget);
+	plotSettingsLayout->setMargin(0);
+	plotSettingsLayout->setSpacing(10);
+
+	m_activeSettings->addWidget(plotSettingsWidget);
+
+	///////////////// PlotTimeAxisController (global X axis settings) /////////////////
+	m_plotTimeAxisController = new PlotTimeAxisController(this);
+	plotSettingsLayout->addWidget(m_plotTimeAxisController);
+
+	///////////////// PLOT section ////////////////////////
+	// Create the PLOT section as a MenuSectionWidget
+	MenuSectionWidget *plotSection = new MenuSectionWidget(this);
+
+	// Create a MenuCollapseSection titled "PLOT"
+	MenuCollapseSection *plotCollapseSection = new MenuCollapseSection(
+		"PLOT", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, plotSection);
+
+	// Plot selector combo box
+	QComboBox *plotSelectorCombo = new QComboBox(this);
+
+	// Stacked widget for plot settings
+	QStackedWidget *monitorPlotsSettings = new QStackedWidget(this);
+
+	// Add combo and stacked widget to the PLOT section
+	plotCollapseSection->contentLayout()->addWidget(plotSelectorCombo);
+	plotCollapseSection->contentLayout()->addWidget(monitorPlotsSettings);
+
+	// Add the collapse section to the section widget
+	plotSection->contentLayout()->addWidget(plotCollapseSection);
+
+	// Add the section widget to the plot settings layout
+	plotSettingsLayout->addWidget(plotSection);
+
+	// Add initial plot(s)
+	QList<QPair<uint32_t, QString>> plotList = m_plotManager->plotList();
+	for(const auto &pair : plotList) {
+		plotSelectorCombo->addItem(pair.second, pair.first);
+		MonitorPlot *plt = m_plotManager->plot(pair.first);
+		if(plt) {
+			MonitorPlotSettings *monitorPlotSettings = new MonitorPlotSettings(plt, this);
+			if(plt != m_plotManager->plot()) {
+				monitorPlotSettings->toggleDeleteButtonVisible(true);
+			}
+			monitorPlotsSettings->addWidget(monitorPlotSettings);
+			connect(monitorPlotSettings, &MonitorPlotSettings::requestDeletePlot, this,
+				[=](uint32_t uuid) { m_plotManager->removePlot(uuid); });
+		}
+	}
+	if(plotSelectorCombo->count() > 0)
+		monitorPlotsSettings->setCurrentIndex(0);
+
+	connect(plotSelectorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+		[=](int idx) { monitorPlotsSettings->setCurrentIndex(idx); });
+
+	// Helper to connect controller signals to a plot
+	auto connectXAxisController = [this](MonitorPlot *plt) {
+		if(!plt)
+			return;
+		// Connect controller's signals to all plots' X axis relevant slots
+		QObject::connect(m_plotTimeAxisController, &PlotTimeAxisController::requestSetIsRealTime, plt,
+				 &MonitorPlot::setIsRealTime);
+		QObject::connect(m_plotTimeAxisController, &PlotTimeAxisController::requestUpdatePlotStartPoint, plt,
+				 &MonitorPlot::updatePlotStartingPoint);
+		QObject::connect(m_plotTimeAxisController, &PlotTimeAxisController::requestUpdateBufferPreviewer, plt,
+				 &MonitorPlot::updateBufferPreviewer);
+		QObject::connect(m_plotTimeAxisController, &PlotTimeAxisController::requestUpdateXAxisIntervalMax, plt,
+				 &MonitorPlot::updateXAxisIntervalMax);
+	};
+	for(const auto &pair : plotList) {
+		MonitorPlot *plt = m_plotManager->plot(pair.first);
+		connectXAxisController(plt);
+	}
+	connect(m_plotManager, &MonitorPlotManager::plotAdded, this, [=](uint32_t uuid) {
+		MonitorPlot *plt = m_plotManager->plot(uuid);
+		connectXAxisController(plt);
+	});
+
+	// Add new menu when a new plot is added
+	connect(m_plotManager, &MonitorPlotManager::plotAdded, this, [=](uint32_t uuid) {
+		MonitorPlot *plt = m_plotManager->plot(uuid);
+		if(plt) {
+			plotSelectorCombo->addItem(plt->name(), uuid);
+			MonitorPlotSettings *monitorPlotSettings = new MonitorPlotSettings(plt, this);
+			if(plt != m_plotManager->plot()) {
+				monitorPlotSettings->toggleDeleteButtonVisible(true);
+			}
+			monitorPlotsSettings->addWidget(monitorPlotSettings);
+			// Connect delete signal for new plots
+			connect(monitorPlotSettings, &MonitorPlotSettings::requestDeletePlot, this,
+				[=](uint32_t uuid) { m_plotManager->removePlot(uuid); });
+			connectXAxisController(plt);
+
+			connect(plt, &MonitorPlot::nameChanged, plotSelectorCombo,
+				[plotSelectorCombo, uuid](const QString &newName) {
+					for(int j = 0; j < plotSelectorCombo->count(); ++j) {
+						if(plotSelectorCombo->itemData(j).toUInt() == uuid) {
+							plotSelectorCombo->setItemText(j, newName);
+							break;
+						}
+					}
+				});
+		}
+	});
+
+	// Remove menu when a plot is removed
+	connect(m_plotManager, &MonitorPlotManager::plotRemoved, this, [=](uint32_t uuid) {
+		for(int i = 0; i < plotSelectorCombo->count(); ++i) {
+			if(plotSelectorCombo->itemData(i).toUInt() == uuid) {
+				plotSelectorCombo->removeItem(i);
+				QWidget *w = monitorPlotsSettings->widget(i);
+				monitorPlotsSettings->removeWidget(w);
+				w->deleteLater();
+				break;
+			}
+		}
+		if(plotSelectorCombo->count() > 0 && plotSelectorCombo->currentIndex() >= plotSelectorCombo->count())
+			plotSelectorCombo->setCurrentIndex(0);
+	});
+
+	// Keep plotSelectorCombo text in sync with plot name changes
+	for(const auto &pair : plotList) {
+		uint32_t uuid = pair.first;
+		MonitorPlot *plt = m_plotManager->plot(uuid);
+		if(plt) {
+			QObject::connect(plt, &MonitorPlot::nameChanged, plotSelectorCombo,
+					 [plotSelectorCombo, uuid](const QString &newName) {
+						 for(int j = 0; j < plotSelectorCombo->count(); ++j) {
+							 if(plotSelectorCombo->itemData(j).toUInt() == uuid) {
+								 plotSelectorCombo->setItemText(j, newName);
+								 break;
+							 }
+						 }
+					 });
+		}
+	}
+
+	/////// add plot ////////////////////////
+
+	m_addPlotBtn = new QPushButton("ADD PLOT", this);
+	Style::setStyle(m_addPlotBtn, style::properties::button::basicButton);
+
+	connect(m_addPlotBtn, &QPushButton::clicked, m_plotManager, [=]() { m_plotManager->addPlot("Monitor Plot"); });
+	plotSettingsLayout->addWidget(m_addPlotBtn);
+
+	Preferences *p = Preferences::GetInstance();
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=, this](QString id, QVariant var) {
+		if(id.contains("dataloggerplugin_add_remove_plot")) {
+			bool en = p->get("dataloggerplugin_add_remove_plot").toDouble();
+			setEnableAddRemovePlot(en);
+		}
+	});
+
+	////// 7 segment settings ///////////////////
+	QWidget *sevenSegmentSettingsWidget = new QWidget(this);
+	QVBoxLayout *sevenSegmentSettingsLayout = new QVBoxLayout(sevenSegmentSettingsWidget);
+	sevenSegmentSettingsLayout->setMargin(0);
+	sevenSegmentSettingsLayout->setSpacing(10);
+	sevenSegmentMonitorSettings = new SevenSegmentMonitorSettings(this);
+
+	sevenSegmentSettingsLayout->addWidget(sevenSegmentMonitorSettings);
+	QSpacerItem *ssSpacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
+	sevenSegmentSettingsLayout->addItem(ssSpacer);
+
+	m_activeSettings->addWidget(sevenSegmentSettingsWidget);
 
 	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
 	mouseWheelWidgetGuard->installEventRecursively(this);
@@ -104,117 +261,16 @@ void DataMonitorSettings::init(QString title, QColor color)
 	layout->addItem(spacer);
 }
 
-void DataMonitorSettings::plotYAxisMinValueUpdate(double value) { m_ymin->setValue(value); }
+void DataMonitorSettings::setEnableAddRemovePlot(bool en) { m_addPlotBtn->setVisible(en); }
 
-void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setValue(value); }
-
-QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
+void DataMonitorSettings::setActiveSettings(int idx)
 {
-	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *yAxisSection = new MenuCollapseSection(
-		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, yaxisContainer);
-
-	yaxisContainer->contentLayout()->addWidget(yAxisSection);
-
-	gui::MenuPlotAxisRangeControl *plotYAxisController =
-		new gui::MenuPlotAxisRangeControl(m_plot->plot()->yAxis(), this);
-
-	plotYAxisController->setMin(DataMonitorUtils::getAxisDefaultMinValue());
-	plotYAxisController->setMax(DataMonitorUtils::getAxisDefaultMaxValue());
-
-	gui::PlotAutoscaler *plotAutoscaler = new gui::PlotAutoscaler(yAxisSection);
-	connect(m_plot, &MonitorPlot::monitorCurveAdded, plotAutoscaler, &gui::PlotAutoscaler::addChannels);
-	connect(m_plot, &MonitorPlot::monitorCurveRemoved, plotAutoscaler, &gui::PlotAutoscaler::removeChannels);
-
-	plotAutoscaler->setTolerance(10);
-
-	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yAxisSection, false);
-
-	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
-		plotYAxisController->setEnabled(!toggled);
-		if(toggled) {
-			plotAutoscaler->start();
-		} else {
-			plotAutoscaler->stop();
-		}
-	});
-
-	autoscale->onOffswitch()->setChecked(true);
-
-	auto &&timeTracker = TimeManager::GetInstance();
-
-	connect(timeTracker, &TimeManager::toggleRunning, this, [=, this](bool toggled) {
-		if(toggled) {
-			if(autoscale->onOffswitch()->isChecked()) {
-				plotAutoscaler->start();
-			}
-		} else {
-			plotAutoscaler->stop();
-		}
-	});
-
-	connect(plotAutoscaler, &gui::PlotAutoscaler::newMin, m_plot, &MonitorPlot::updateYAxisIntervalMin);
-	connect(plotAutoscaler, &gui::PlotAutoscaler::newMax, m_plot, &MonitorPlot::updateYAxisIntervalMax);
-
-	yAxisSection->contentLayout()->addWidget(autoscale);
-	yAxisSection->contentLayout()->addWidget(plotYAxisController);
-
-	return yaxisContainer;
-}
-
-QWidget *DataMonitorSettings::generateCurveStyleSettings(QWidget *parent)
-{
-	MenuSectionWidget *curveStylecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *curveStyleSection = new MenuCollapseSection(
-		"CURVE", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, curveStylecontainer);
-
-	gui::MenuPlotChannelCurveStyleControl *curveMneu = new gui::MenuPlotChannelCurveStyleControl(curveStyleSection);
-
-	connect(m_plot, &MonitorPlot::monitorCurveAdded, curveMneu,
-		&gui::MenuPlotChannelCurveStyleControl::addChannels);
-	connect(m_plot, &MonitorPlot::monitorCurveRemoved, curveMneu,
-		&gui::MenuPlotChannelCurveStyleControl::removeChannels);
-
-	curveStyleSection->contentLayout()->addWidget(curveMneu);
-	curveStylecontainer->contentLayout()->addWidget(curveStyleSection);
-
-	return curveStylecontainer;
-}
-
-QWidget *DataMonitorSettings::generatePlotUiSettings(QWidget *parent)
-{
-	MenuSectionWidget *plotStylecontainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *plotStyleSection =
-		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE,
-					MenuCollapseSection::MHW_BASEWIDGET, plotStylecontainer);
-
-	plotStyleSection->contentLayout()->setSpacing(10);
-
-	MenuOnOffSwitch *showYAxisLabel = new MenuOnOffSwitch(tr("Y-AXIS label"), plotStyleSection, false);
-	showYAxisLabel->onOffswitch()->setChecked(true);
-
-	connect(showYAxisLabel->onOffswitch(), &QAbstractButton::toggled, this,
-		[=, this](bool toggled) { m_plot->plot()->yAxis()->setVisible(toggled); });
-
-	MenuOnOffSwitch *showXAxisLabel = new MenuOnOffSwitch(tr("X-AXIS label"), plotStyleSection, false);
-	showXAxisLabel->onOffswitch()->setChecked(true);
-
-	connect(showXAxisLabel->onOffswitch(), &QAbstractButton::toggled, this,
-		[=, this](bool toggled) { m_plot->plot()->xAxis()->setVisible(toggled); });
-
-	MenuOnOffSwitch *showBufferPreview = new MenuOnOffSwitch(tr("Buffer Preview"), plotStyleSection, false);
-	showBufferPreview->onOffswitch()->setChecked(true);
-
-	connect(showBufferPreview->onOffswitch(), &QAbstractButton::toggled, this,
-		[=, this](bool toggled) { m_plot->toggleBufferPreview(toggled); });
-
-	plotStyleSection->contentLayout()->addWidget(showBufferPreview);
-	plotStyleSection->contentLayout()->addWidget(showXAxisLabel);
-	plotStyleSection->contentLayout()->addWidget(showYAxisLabel);
-
-	plotStylecontainer->contentLayout()->addWidget(plotStyleSection);
-
-	return plotStylecontainer;
+	if(idx == 2) {
+		m_activeSettings->hide();
+	} else {
+		m_activeSettings->show();
+		m_activeSettings->setCurrentIndex(idx);
+	}
 }
 
 DataLoggingMenu *DataMonitorSettings::getDataLoggingMenu() const { return dataLoggingMenu; }

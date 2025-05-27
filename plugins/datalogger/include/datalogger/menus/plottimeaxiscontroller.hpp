@@ -26,7 +26,6 @@
 #include <QWidget>
 #include <menuonoffswitch.h>
 #include <menuspinbox.h>
-#include <monitorplot.hpp>
 #include "scopy-datalogger_export.h"
 
 namespace scopy {
@@ -36,15 +35,18 @@ class SCOPY_DATALOGGER_EXPORT PlotTimeAxisController : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit PlotTimeAxisController(MonitorPlot *m_plot, QWidget *parent = nullptr);
+	explicit PlotTimeAxisController(QWidget *parent = nullptr);
 
 	void togglePlotNow(bool toggled);
 	void updatePlotStartPoint();
 
 signals:
+	void requestSetIsRealTime(bool enabled);
+	void requestUpdatePlotStartPoint(double time, double delta);
+	void requestUpdateBufferPreviewer(double time);
+	void requestUpdateXAxisIntervalMax(double value);
 
 private:
-	MonitorPlot *m_plot;
 	gui::MenuSpinbox *m_xdelta;
 	QDateEdit *dateEdit;
 	QTimeEdit *timeEdit;
