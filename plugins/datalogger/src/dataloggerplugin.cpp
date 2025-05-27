@@ -214,6 +214,10 @@ void DataLoggerPlugin::addNewTool()
 	}
 
 	toolIndex++;
+
+	datamonitorTool->setEnableAddRemovePlot(Preferences::get("dataloggerplugin_add_remove_plot").toBool());
+	datamonitorTool->setEnableAddRemoveInstrument(
+		Preferences::get("dataloggerplugin_add_remove_instrument").toBool());
 }
 
 void DataLoggerPlugin::removeTool(QString toolId)
@@ -235,6 +239,12 @@ void DataLoggerPlugin::toggleRunState(bool toggled)
 {
 	for(int i = 0; i < m_toolList.length(); i++) {
 		m_toolList[i]->setRunning(toggled);
+
+		// Tool run/stop btn state sync
+		auto *toolWidget = qobject_cast<DatamonitorTool *>(m_toolList[i]->tool());
+		if(toolWidget && toolWidget->getRunButton()->isChecked() != toggled) {
+			toolWidget->getRunButton()->setChecked(toggled);
+		}
 	}
 	isRunning = toggled;
 }
@@ -266,6 +276,8 @@ void DataLoggerPlugin::initPreferences()
 	p->init("dataloggerplugin_data_storage_size", "10 Kb");
 	p->init("dataloggerplugin_read_interval", "1");
 	p->init("dataloggerplugin_date_time_format", "hh:mm:ss");
+	p->init("dataloggerplugin_add_remove_plot", false);
+	p->init("dataloggerplugin_add_remove_instrument", false);
 }
 
 bool DataLoggerPlugin::loadPreferencesPage()
@@ -312,6 +324,19 @@ bool DataLoggerPlugin::loadPreferencesPage()
 			return pattern.match(text).hasMatch();
 		},
 		generalSection));
+
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "dataloggerplugin_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)",
+				     "Experimental feature allowing the user to create multiple time or frequency plots"
+				     "within the ADC instrument. Any channel can be moved between plots to provide "
+				     "visual clarity and separation.",
+				     m_preferencesPage));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "dataloggerplugin_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)",
+		"Experimental feature allowing the user to create multiple time or frequency "
+		"instruments, providing an easy way to switch between different run scenarios "
+		"without affecting previous settings.",
+		m_preferencesPage));
 
 	return true;
 }

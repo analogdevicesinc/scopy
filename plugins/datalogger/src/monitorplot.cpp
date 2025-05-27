@@ -36,11 +36,12 @@
 using namespace scopy;
 using namespace datamonitor;
 
-MonitorPlot::MonitorPlot(QWidget *parent)
-	: QWidget{parent}
+MonitorPlot::MonitorPlot(QString name, uint32_t uuid, QWidget *parent)
+	: PlotComponent(name, uuid, parent)
 {
-	layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout();
 	setLayout(layout);
+	layout->setContentsMargins(0, 0, 0, 10);
 
 	Preferences *p = Preferences::GetInstance();
 	dateTimeFormat = p->get("dataloggerplugin_date_time_format").toString();
@@ -54,11 +55,17 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 
 	m_plot = new PlotWidget(this);
 
+	auto nameLbl = m_plot->getPlotInfo()->addLabelInfo(IP_LEFT, IP_TOP);
+	nameLbl->setText(m_name);
+	connect(this, &PlotComponent::nameChanged, nameLbl, &QLabel::setText);
+
 	m_plot->yAxis()->setInterval(DataMonitorUtils::getAxisDefaultMinValue(),
 				     DataMonitorUtils::getAxisDefaultMaxValue());
 	m_plot->yAxis()->setVisible(true);
 	m_plot->setShowXAxisLabels(true);
 	m_plot->setShowYAxisLabels(true);
+
+	m_plots.append(m_plot);
 
 	m_xAxisIntervalMin = DataMonitorUtils::getAxisDefaultMaxValue();
 	m_xAxisIntervalMax = DataMonitorUtils::getAxisDefaultMinValue();
@@ -78,11 +85,9 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	generateBufferPreviewer();
 
 	layout->addWidget(m_plot);
+	m_plotLayout->addLayout(layout);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
-
-	QString plotStyle("color: " + Style::getAttribute(json::theme::interactive_subtle_idle));
-	m_plot->setStyleSheet(plotStyle);
 }
 
 PlotWidget *MonitorPlot::plot() const { return m_plot; }
@@ -119,7 +124,9 @@ void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
 {
 	if(m_monitorCurves->contains(monitorName)) {
 		m_monitorCurves->value(monitorName)->toggleActive(toggled);
-		m_bufferPreviewer->updateBufferPreviewer();
+		if(m_bufferPreviewer->isVisible()) {
+			m_bufferPreviewer->updateBufferPreviewer();
+		}
 		m_plot->replot();
 	}
 }
@@ -130,7 +137,9 @@ void MonitorPlot::updateXAxisIntervalMin(double min)
 {
 	m_xAxisIntervalMax = min;
 	refreshXAxisInterval();
-	m_bufferPreviewer->updateBufferPreviewer();
+	if(m_bufferPreviewer->isVisible()) {
+		m_bufferPreviewer->updateBufferPreviewer();
+	}
 	m_plot->replot();
 }
 
@@ -138,7 +147,9 @@ void MonitorPlot::updateXAxisIntervalMax(double max)
 {
 	m_xAxisIntervalMin = max;
 	refreshXAxisInterval();
-	m_bufferPreviewer->updateBufferPreviewer();
+	if(m_bufferPreviewer->isVisible()) {
+		m_bufferPreviewer->updateBufferPreviewer();
+	}
 	m_plot->replot();
 }
 
@@ -259,24 +270,33 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 	m_plot->replot();
 }
 
-void MonitorPlot::toggleBufferPreview(bool toggled) { m_bufferPreviewer->setVisible(toggled); }
+void MonitorPlot::toggleBufferPreview(bool toggled)
+{
+	m_bufferPreviewer->setVisible(toggled);
+	Q_EMIT bufferPreviewerToggled(toggled);
+}
 
-void MonitorPlot::updateBufferPreviewer(double time) { m_bufferPreviewer->updateDataLimits(m_startTime, time); }
+void MonitorPlot::updateBufferPreviewer(double time)
+{
+	if(m_bufferPreviewer->isVisible()) {
+		m_bufferPreviewer->updateDataLimits(m_startTime, time);
+	}
+}
+
+PlotBufferPreviewer *MonitorPlot::bufferPreviewer() const { return m_bufferPreviewer; }
 
 void MonitorPlot::generateBufferPreviewer()
 {
-
-	AnalogBufferPreviewer *bufferPreviewer = new AnalogBufferPreviewer(this);
-	m_bufferPreviewer = new PlotBufferPreviewer(m_plot, bufferPreviewer, this);
+	AnalogBufferPreviewer *analogBufferPreviewer = new AnalogBufferPreviewer(this);
+	m_bufferPreviewer = new PlotBufferPreviewer(m_plot, analogBufferPreviewer, this);
 	m_bufferPreviewer->setManualDataLimits(true);
 
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, [=, this]() {
 		double time = QwtDate::toDouble(QDateTime::currentDateTime());
 		updateBufferPreviewer(time);
 	});
-
-	layout->addWidget(m_bufferPreviewer);
 	m_plot->navigator()->setResetOnNewBase(false);
+	layout->addWidget(m_bufferPreviewer);
 }
 
 #include "moc_monitorplot.cpp"

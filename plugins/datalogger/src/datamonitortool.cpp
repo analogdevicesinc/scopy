@@ -21,6 +21,7 @@
 
 #include "menus/channelattributesmenu.hpp"
 #include "datamonitortool.h"
+#include "monitorplotmanager.h"
 
 #include <QBoxLayout>
 #include <QDateTime>
@@ -36,6 +37,7 @@
 #include <pluginbase/preferences.h>
 #include "datamonitorstylehelper.hpp"
 #include <iioutil/connection.h>
+#include <QComboBox>
 
 using namespace scopy::datamonitor;
 
@@ -82,9 +84,17 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	});
 
 	//// add monitors
-	addMonitorButton = new AddBtn(this);
+	addMonitorToolButton = new AddBtn(this);
 
-	connect(addMonitorButton, &AddBtn::clicked, this, &DatamonitorTool::requestNewTool);
+	connect(addMonitorToolButton, &AddBtn::clicked, this, &DatamonitorTool::requestNewTool);
+
+	Preferences *p = Preferences::GetInstance();
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=, this](QString id, QVariant var) {
+		if(id.contains("dataloggerplugin_add_remove_instrument")) {
+			bool en = p->get("dataloggerplugin_add_remove_instrument").toDouble();
+			setEnableAddRemoveInstrument(en);
+		}
+	});
 
 	removeBtn = new RemoveBtn(this);
 	if(!isDeletable) {
@@ -118,7 +128,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
 
-	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(addMonitorToolButton, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 
 	///// time manager
@@ -147,12 +157,20 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	tool->addWidgetToCentralContainerHelper(centralWidget);
 
 	/////////////////////////plot///////////////////
-	m_monitorPlot = new MonitorPlot(this);
-	centralWidget->addWidget(m_monitorPlot);
+	m_plotManager = new MonitorPlotManager("MonitorPlotManager", this);
+	centralWidget->addWidget(m_plotManager);
+
+	// create the first plot
+	uint32_t plotId = m_plotManager->addPlot("Monitor Plot");
 
 	connect(printBtn, &QPushButton::clicked, this, [=, this]() {
 		QList<PlotWidget *> plotList;
-		plotList.push_back(m_monitorPlot->plot());
+
+		for(PlotComponent *pp : m_plotManager->plots()) {
+			for(PlotWidget *plt : pp->plots()) {
+				plotList.push_back(plt);
+			}
+		}
 		printplotManager->printPlots(plotList, "Data Logger");
 	});
 
@@ -178,10 +196,9 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	centralWidget->addWidget(sevenSegmetMonitors);
 
 	////////////////////////settings //////////////
-	m_dataMonitorSettings = new DataMonitorSettings(m_monitorPlot);
-	// TODO GET SETTINGS NAME FROM UTILS
-	m_dataMonitorSettings->init("Data Logger", Style::getAttribute(json::theme::interactive_primary_idle));
+	m_dataMonitorSettings = new DataMonitorSettings(m_plotManager);
 
+	m_dataMonitorSettings->init("Data Logger", Style::getAttribute(json::theme::interactive_primary_idle));
 	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), m_dataMonitorSettings);
 
 	connect(m_dataMonitorSettings, &DataMonitorSettings::titleUpdated, this,
@@ -212,7 +229,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	showPlot->button()->setVisible(false);
 	showPlot->setChecked(true);
 
-	connect(showPlot, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(m_monitorPlot); });
+	connect(showPlot, &QPushButton::clicked, this, [=, this]() {
+		centralWidget->setCurrentWidget(m_plotManager);
+		m_dataMonitorSettings->setActiveSettings(0);
+	});
 
 	showText = new MenuControlButton(this);
 	showText->setName("Text");
@@ -220,7 +240,11 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	showText->setDoubleClickToOpenMenu(true);
 	showText->checkBox()->setVisible(false);
 	showText->button()->setVisible(false);
-	connect(showText, &QPushButton::clicked, this, [=, this]() { centralWidget->setCurrentWidget(textMonitors); });
+	connect(showText, &QPushButton::clicked, this, [=, this]() {
+		centralWidget->setCurrentWidget(textMonitors);
+		// display only the data logging settings for this view
+		m_dataMonitorSettings->setActiveSettings(2);
+	});
 
 	showSegments = new MenuControlButton(this);
 	showSegments->setName("7 Segment");
@@ -228,8 +252,10 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	showSegments->setDoubleClickToOpenMenu(true);
 	showSegments->checkBox()->setVisible(false);
 	showSegments->button()->setVisible(false);
-	connect(showSegments, &QPushButton::clicked, this,
-		[=, this]() { centralWidget->setCurrentWidget(sevenSegmetMonitors); });
+	connect(showSegments, &QPushButton::clicked, this, [=, this]() {
+		centralWidget->setCurrentWidget(sevenSegmetMonitors);
+		m_dataMonitorSettings->setActiveSettings(1);
+	});
 
 	centralWidgetButtons->addButton(showPlot);
 	centralWidgetButtons->addButton(showText);
@@ -268,7 +294,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	////generate channel settings for compatible monitors
 	foreach(QString monitor, m_dataAcquisitionManager->getDataMonitorMap()->keys()) {
 		auto monitorModel = m_dataAcquisitionManager->getDataMonitorMap()->value(monitor);
-		tool->rightStack()->add(monitor, new ChannelAttributesMenu(monitorModel, this));
+		tool->rightStack()->add(monitor, new ChannelAttributesMenu(monitorModel, m_plotManager, this));
 	}
 
 	/////////////////monitor selection menu ///////////////
@@ -281,12 +307,15 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorAdded, this,
 		[=, this](DataMonitorModel *monitor) {
 			m_monitorSelectionMenu->addMonitor(monitor);
-			tool->rightStack()->add(monitor->getName(), new ChannelAttributesMenu(monitor, this));
+
+			tool->rightStack()->add(monitor->getName(),
+						new ChannelAttributesMenu(monitor, m_plotManager, this));
 		});
 
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::monitorRemoved, this,
 		[=, this](QString monitorName) {
-			m_monitorPlot->removeMonitor(monitorName);
+			m_plotManager->removePlotCurve(
+				m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName));
 			sevenSegmetMonitors->removeSegment(monitorName);
 			tool->rightStack()->remove(monitorName);
 		});
@@ -294,21 +323,20 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	connect(m_dataAcquisitionManager, &DataAcquisitionManager::deviceRemoved, m_monitorSelectionMenu,
 		&MonitorSelectionMenu::removeDevice);
 
-	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::monitorToggled, m_monitorPlot,
+	connect(m_monitorSelectionMenu, &MonitorSelectionMenu::monitorToggled, this,
 		[=, this](bool toggled, QString monitorName) {
-			// toggle monitor active inside data acquisiton manager
+			// Only update active monitor list, not plot assignment
 			m_dataAcquisitionManager->updateActiveMonitors(toggled, monitorName);
-
 			// handle monitor on plot
 			if(toggled) {
-				m_monitorPlot->addMonitor(
+				m_plotManager->addPlotCurve(
 					m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName));
-
 				sevenSegmetMonitors->generateSegment(
 					m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName));
 
 			} else {
-				m_monitorPlot->removeMonitor(monitorName);
+				m_plotManager->removePlotCurve(
+					m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName));
 				sevenSegmetMonitors->removeSegment(monitorName);
 			}
 		});
@@ -335,14 +363,18 @@ void DatamonitorTool::resetStartTime()
 {
 	auto &&timeTracker = TimeManager::GetInstance();
 	timeTracker->setStartTime();
-	m_monitorPlot->setStartTime();
+	Q_EMIT m_plotManager->requestSetStartTime();
 }
 
 void DatamonitorTool::initTutorialProperties()
 {
 	runBtn->setProperty("tutorial_name", "RUN_BUTTON");
 	clearBtn->setProperty("tutorial_name", "CLEAR_BUTTON");
-	addMonitorButton->setProperty("tutorial_name", "ADD_BUTTON");
+
+	if(addMonitorToolButton->isVisible()) {
+		addMonitorToolButton->setProperty("tutorial_name", "ADD_BUTTON");
+	}
+
 	showPlot->setProperty("tutorial_name", "SHOW_PLOT_BUTTON");
 	showText->setProperty("tutorial_name", "SHOW_TEXT_BUTTON");
 	showSegments->setProperty("tutorial_name", "SHOW_7SEG_BUTTON");
@@ -358,5 +390,9 @@ void DatamonitorTool::startTutorial()
 	datamonitorTutorial->setTitle("Tutorial");
 	datamonitorTutorial->start();
 }
+
+void DatamonitorTool::setEnableAddRemovePlot(bool en) { m_dataMonitorSettings->setEnableAddRemovePlot(en); }
+
+void DatamonitorTool::setEnableAddRemoveInstrument(bool en) { addMonitorToolButton->setVisible(en); }
 
 #include "moc_datamonitortool.cpp"
