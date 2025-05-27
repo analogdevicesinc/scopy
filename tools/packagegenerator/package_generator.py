@@ -7,6 +7,7 @@ import shutil
 from mako.template import Template
 import subprocess
 import platform
+import stat
 
 if platform.system() != "Windows":
     MODE = 0o775
@@ -27,6 +28,12 @@ TEMPLATES = {
     "tool_src": os.path.join("templates", "plugin", "tool_src.mako"),
     "pkg_cmake": os.path.join("templates", "package", "pkg_cmakelists.mako"),
     "manifest": os.path.join("templates", "package", "manifest_cmakein.mako"),
+    "ubuntu_build": os.path.join("templates", "ci", "ubuntu22_build.mako"),
+    "windows_build": os.path.join("templates", "ci", "windows_build.mako"),
+    "arm64_build": os.path.join("templates", "ci", "arm64_build.mako"),
+    "armhf_build": os.path.join("templates", "ci", "armhf_build.mako"),
+    "windows_script": os.path.join("templates", "ci", "build_mingw_pkg.mako"),
+    "macOS_build": os.path.join("templates", "ci", "macOS_build.mako"),
     "pdk_header": os.path.join("templates", "pdk", "pdk_header.mako"),
     "pdk_src": os.path.join("templates", "pdk", "pdk_src.mako"),
     "pdk_cmake": os.path.join("templates", "pdk", "pdk_cmakelists.mako"),
@@ -588,6 +595,8 @@ def init_submodule_and_generate_pkg(packages_path, config, args):
     
     # Generate the package in the submodule
     generate_pkg(packages_path, config, args)
+    # Generate workflows
+    generate_workflows(submodule_path)
     
 def add_existing_git_submodule(packages_path, repo_url):
     """
@@ -618,6 +627,39 @@ def add_existing_git_submodule(packages_path, repo_url):
         return
 
     print(f"Added existing repository as submodule at {submodule_path}.")
+
+def generate_workflows(package_path):
+    """
+    Generates GitHub Actions workflow files from Mako templates.    
+    Args:
+        package_path (str): Path to the package directory.
+    """
+    # Define the workflows directory
+    workflows_path = os.path.join(package_path, ".github", "workflows")
+    create_directory(workflows_path)    
+    # Create scripts directory
+    scripts_path = os.path.join(package_path, "scripts")
+    create_directory(scripts_path)
+
+    # Generate the Windows script
+    windows_script_path = os.path.join(scripts_path, "build_mingw_pkg.sh")
+    create_file_from_template(TEMPLATES["windows_script"], windows_script_path)
+
+    # Set executable permissions for non-Windows platforms
+    if platform.system() != "Windows":
+        os.chmod(windows_script_path, stat.S_IRWXU)
+        
+    # Define the templates and their output filenames
+    workflows = {
+        TEMPLATES["ubuntu_build"]: os.path.join(workflows_path, "ubuntu22_build.yml"),
+        TEMPLATES["windows_build"]: os.path.join(workflows_path, "windows_build.yml"),
+        TEMPLATES["arm64_build"]: os.path.join(workflows_path, "arm64_build.yml"),
+        TEMPLATES["armhf_build"]: os.path.join(workflows_path, "armhf_build.yml"),
+        TEMPLATES["macOS_build"]: os.path.join(package_path, "azure-pipelines.yml")
+    }   
+    for template_path, output_path in workflows.items():
+        # Generate the workflow file from the template
+        create_file_from_template(template_path, output_path)
 
 if __name__ == "__main__":
     args = get_args()
