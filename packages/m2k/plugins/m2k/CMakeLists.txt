@@ -156,3 +156,5 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 set(M2K_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+include(ConfigureInstallPlugin)

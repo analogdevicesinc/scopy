@@ -21,7 +21,6 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE datalogger)
-
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -77,8 +76,7 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
-
+qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
@@ -118,3 +116,5 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 set(DATALOGGER_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+include(ConfigureInstallPlugin)

@@ -39,8 +39,12 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 		message(STATUS "Libsigrokdecode is disabled or not found, M2K plugin disabled")
 	endif()
 	if(WITH_SIGROK AND WITH_PYTHON)
+		set(SCOPY_PARENT_MODULE ${SCOPY_MODULE})
 		add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 	endif()
 endif()
 
 include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
+
+install(FILES ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json
+	DESTINATION ${SCOPY_PACKAGE_INSTALL_PATH}/${SCOPY_MODULE})

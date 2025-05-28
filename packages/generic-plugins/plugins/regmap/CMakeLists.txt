@@ -21,7 +21,6 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE regmap)
-
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -66,7 +65,8 @@ file(
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
-qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 if(ENABLE_TESTING)
 	add_subdirectory(test)
@@ -75,16 +75,12 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
-
 find_package(libm2k REQUIRED)
 
 set(REGMAP_XML_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/xmls)
 set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/xmls)
 
-install(DIRECTORY xmls DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
-
 file(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/xmls/*.xml)
-
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/xmls/regmap-config.json DESTINATION ${REGMAP_XML_BUILD_PATH})
 foreach(_xml ${XMLS})
 	file(COPY ${_xml} DESTINATION ${REGMAP_XML_BUILD_PATH})
@@ -96,8 +92,6 @@ configure_file(
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
 )
 set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h)
-
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
@@ -133,3 +127,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 set(REGNMAP_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+include(ConfigureInstallPlugin)
+add_plugin_resources(${REGMAP_XML_BUILD_PATH})

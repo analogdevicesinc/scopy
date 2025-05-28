@@ -135,3 +135,5 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 set(SWIOT_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+include(ConfigureInstallPlugin)

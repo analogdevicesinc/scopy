@@ -21,7 +21,6 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE dac)
-
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -61,8 +60,6 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 set(DAC_CSV_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/csv)
 set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/res/csv)
 
-install(DIRECTORY res/csv DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
-
 file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/res/csv/*)
 foreach(_csv ${CSVS})
 	file(COPY ${_csv} DESTINATION ${DAC_CSV_BUILD_PATH})
@@ -101,3 +98,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 set(DAC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+include(ConfigureInstallPlugin)
+
+add_plugin_resources (res/csv)
