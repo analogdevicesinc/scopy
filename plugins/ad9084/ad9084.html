@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Digital IO &#8212; Scopy  documentation</title>
+    <title>AD9084 &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Voltmeter" href="voltmeter.html" />
-    <link rel="prev" title="Pattern Generator" href="pattern_generator.html" />
+    <link rel="next" title="JESD Status" href="../jesdstatus/index.html" />
+    <link rel="prev" title="APOLLO" href="index.html" />
    
   
   <meta name="repository" content="scopy">
@@ -85,9 +85,17 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Digital IO</a><ul>
-<li><a class="reference internal" href="#general-description">General description</a></li>
-<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#">AD9084</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#instrument-layout">Instrument Layout</a><ul>
+<li><a class="reference internal" href="#device-name-indicator">Device name indicator</a></li>
+<li><a class="reference internal" href="#rx-tx-enable-buttons">RX/TX enable buttons</a></li>
+<li><a class="reference internal" href="#refresh-button">Refresh button</a></li>
+<li><a class="reference internal" href="#settings-menu-button">Settings menu button</a></li>
+<li><a class="reference internal" href="#rx-chain-settings">RX Chain settings</a></li>
+<li><a class="reference internal" href="#tx-chain-settings">TX Chain settings</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -134,16 +142,16 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="oscilloscope.html">Oscilloscope</a></li>
-<li class="toctree-l3"><a class="reference internal" href="spectrum_analyzer.html">Spectrum Analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="network_analyzer.html">Network Analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="signal_generator.html">Signal Generator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_analyzer.html">Logic Analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pattern_generator.html">Pattern Generator</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Digital IO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="voltmeter.html">Voltmeter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="power_supply.html">Power Supply</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
@@ -166,8 +174,8 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../ad9084/ad9084.html">AD9084</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6" checked=""/><div class="collapse"><a class="reference internal" href="index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AD9084</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
@@ -256,119 +264,121 @@ Content on this topic
     <nav class="breadcrumb">
         <ol>
           <li><a href="../index.html">Plugins</a></li>
-          <li><a href="index.html">ADALM2000</a></li>
+          <li><a href="index.html">APOLLO</a></li>
           </ol>
     </nav>
   </div>
 
           <div class="body" role="main">
             
-  <section id="digital-io">
-<span id="digitalio"></span><h1>Digital IO<a class="headerlink" href="#digital-io" title="Link to this heading"></a></h1>
-<blockquote>
-<div><p><strong>Video guide:</strong></p>
-</div></blockquote>
-<div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/9cYstnAoUpk"></iframe><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
-<p><a href="https://www.youtube.com/watch?v=9cYstnAoUpk"><span>https://www.youtube.com/watch?v=9cYstnAoUpk</span></a></p>
-</div></div><div class="line-block">
-<div class="line"><br /></div>
-</div>
-<section id="general-description">
-<h2>General description<a class="headerlink" href="#general-description" title="Link to this heading"></a></h2>
-<img alt="alternate text" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_16-46-33.png" />
-<ol class="arabic simple">
-<li><p>Digital channel number - the physical pin of the M2K</p></li>
-<li><p>Channel input state - indicates the input read by the M2K</p></li>
-<li><p>Channel direction - indicates whether the channel is set to input/output</p></li>
-<li><p>Channel output state - indicates the output value configured of the M2K</p></li>
-</ol>
+  <section id="ad9084">
+<span id="id1"></span><h1>AD9084<a class="headerlink" href="#ad9084" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The <strong>AD9084</strong> instrument for Scopy enables integration and control of the
+Apollo MxFE platform within the Scopy software environment. This plugin
+allows users to configure and interact with the AD9084 ADC/DAC.</p>
 </section>
-<section id="use-cases">
-<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading"></a></h2>
-<blockquote>
-<div><p><strong>IO operation</strong></p>
-</div></blockquote>
-<img alt="alternate text" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_16-51-11.png" />
-<ol class="arabic simple">
-<li><p>Run instrument</p></li>
-<li><p>Connect digital channel 0 to channel 7</p></li>
-<li><p>Start digital IO instrument</p></li>
-<li><p>Monitor channel 0 using voltmeter/scope/logic analyzer</p></li>
-<li><p>Set channel 0 as output by clicking the direction button Channel 7 input
-state is the same as channel 0 output state Voltmeter shows the same state
-(5V/0V) as channel 0 output state</p></li>
-<li><p>Change channel 0 output state by clicking it (multiple times) Channel 7
-input state is the same as channel 0 output state Voltmeter shows the same
-state (5V/0V) as channel 0 output state</p></li>
-</ol>
-<hr class="docutils" />
-<blockquote>
-<div><p><strong>Grouped operation</strong></p>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>Make the following connections</p></li>
-</ol>
-<ul class="simple">
-<li><p>Channel 0 → Channel 8</p></li>
-<li><p>Channel 1 → Channel 9</p></li>
-<li><p>Channel 2 → Channel 10</p></li>
-<li><p>Channel 3 → Channel 11</p></li>
-<li><p>Channel 4 → Channel 12</p></li>
-<li><p>Channel 5 → Channel 13</p></li>
-<li><p>Channel 6 → Channel 14</p></li>
-<li><p>Channel 7 → Channel 15</p></li>
+<section id="instrument-layout">
+<h2>Instrument Layout<a class="headerlink" href="#instrument-layout" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad9084/ad9084_overview.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/ad9084/ad9084_overview.png" />
+<section id="device-name-indicator">
+<h3>Device name indicator<a class="headerlink" href="#device-name-indicator" title="Link to this heading"></a></h3>
+<p>This is the device that will be used to control the AD9084/AD9088 device.
+The device name is also used to identify the device in the IIO device tree.
+Default value is <strong>axi-ad9084-rx-hpc</strong>.</p>
+</section>
+<section id="rx-tx-enable-buttons">
+<h3>RX/TX enable buttons<a class="headerlink" href="#rx-tx-enable-buttons" title="Link to this heading"></a></h3>
+<p>These buttons allow enabling or disabling the RX and TX chain view in the Scopy instrument.
+The actual RX/TX chain operation is not disabled/enabled, as the buttons only control the
+visibility of the RX and TX chain settings within the instrument interface.</p>
+</section>
+<section id="refresh-button">
+<h3>Refresh button<a class="headerlink" href="#refresh-button" title="Link to this heading"></a></h3>
+<p>This button will refresh the current configuration values of the AD9084/AD9088 device.
+It will update all the displayed values in the instrument, ensuring that the user sees
+the latest configuration.</p>
+</section>
+<section id="settings-menu-button">
+<h3>Settings menu button<a class="headerlink" href="#settings-menu-button" title="Link to this heading"></a></h3>
+<p>This button will open the settings menu, allowing users to configure various parameters
+of the AD9084/AD9088 device. The settings menu includes options for:</p>
+<ul>
+<li><p><strong>PFIR config</strong></p>
+<p>Allows users to load a PFIR filter configuration file. Make sure the
+file has the correct format and compatible with the device.
+The plugin provides a default PFIR configuration file that can be used as a starting point.
+A file dialog will open in the default FIR filter files location.</p>
+</li>
+<li><p><strong>CFIR config</strong></p>
+<p>Allows users to load a CFIR filter configuration file. Make sure the
+file has the correct format and compatible with the device.
+The plugin provides a default CFIR configuration file that can be used as a starting point.
+A file dialog will open in the default FIR filter files location.</p>
+</li>
 </ul>
-<ol class="arabic simple" start="2">
-<li><p>Start digital IO instrument</p></li>
-<li><p>Also monitor these connections with a logic analyzer (use breadboard to
-split the connection)</p></li>
-<li><p>Set DIO 0-7 to Grouped interface</p></li>
-<li><p>Set all channels DIO8-15 to output</p></li>
-<li><p>Set each DIO8-15 output states at random</p></li>
-</ol>
-<p>DIO 0 – 7 grouped value should be the binary value of channels 8-15. Logic
-analyzer should show the same results</p>
-<ol class="arabic simple" start="7">
-<li><p>Set all channels 8-15 to input</p></li>
-<li><p>Set Group direction to output</p></li>
-<li><p>Set Group value to a random value</p></li>
-</ol>
-<p>Channels 8-15 input state should represent that value in binary</p>
-<p>Logic analyzer should show the same results</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-11-24.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-11-24.png" />
-<hr class="docutils" />
-<blockquote>
-<div><p><strong>Interaction with pattern generator</strong></p>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>Start digital IO instrument</p></li>
-<li><p>Generate clock signals on channels 0 and 8</p></li>
-</ol>
-<p>In the digitalIO the group as well as channel 8 should have a red highlight
-indicating that the pattern generator has ownership of the channels.</p>
-<p>The user cannot interact with those channels. Logic analyzer shows clock signal
-correctly generated at channels 0 and 8</p>
-<ol class="arabic simple" start="3">
-<li><p>Connect channel 10 to channel 11</p></li>
-<li><p>Set channel 10 as output and channel 11 as input</p></li>
-<li><p>Modify channel 10 output state</p></li>
-</ol>
-<p>Channel 11 input state follows channel 10 output state</p>
-<p>Rest of the channels work properly. The user can set direction and output state
-and can read input state</p>
-<ol class="arabic simple" start="6">
-<li><p>While running, set a clock signal on channel 10 in the pattern generator
-Channel 10 has a red highlight, the user cannot interact with it anymore.
-Channel 11 input state might flicker indicating that a signal can be read from
-channel 11.</p></li>
-</ol>
-<p>Logic analyzer shows a new clock signal generated at channel 10 which can also
-be read on channel 11</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-13-47.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-13-47.png" />
-<ol class="arabic simple" start="7">
-<li><p>Stop the pattern generator</p></li>
-</ol>
-<p>Red highlight is removed from the digitalIO, the channels now work properly.</p>
+</section>
+<section id="rx-chain-settings">
+<h3>RX Chain settings<a class="headerlink" href="#rx-chain-settings" title="Link to this heading"></a></h3>
+<p>The RX Chain section is a scrollable area containing configuration options for all the
+RX channels of the device.</p>
+<p>All the UI controls are interactive, displaying the state of the
+current operation, specifically a progress bar while the operation is in progress, becoming
+green or red based on the success or failure of the operation, respectively.
+At startup all UI elements are initialized with the current values from the device.</p>
+<p>Each RX channel section includes the following information:</p>
+<ul class="simple">
+<li><p><strong>Channel indicator</strong>: Displays the channel number (e.g., Channel 1, Channel 2, etc.).</p></li>
+<li><p><strong>Channel label</strong>: Indicates the FDDC/CDDC arrangement for the channel.</p></li>
+<li><p><strong>Channel enable</strong>: A checkbox to enable or disable the channel. When successfully disabled,
+the channel name size will be reduced to indicate that the channel is inactive.</p></li>
+<li><p><strong>CFIR enable</strong>: A checkbox to enable or disable the CFIR filter for the channel.</p></li>
+<li><p><strong>CFIR profile</strong>: A dropdown menu to select the CFIR profile for the channel.</p></li>
+<li><p><strong>ADC Frequency</strong>: Control the ADC frequency.
+The value is displayed in MHz and it is a shared value for all RX channels. Whenever
+the value is changed for one channel, a read operation is performed to update all the
+RX channels with the new value.</p></li>
+<li><p><strong>NCO Frequency</strong></p></li>
+<li><p><strong>NCO Phase</strong></p></li>
+<li><p><strong>Main NCO Frequency</strong></p></li>
+<li><p><strong>Main NCO Phase</strong></p></li>
+<li><p><strong>Test Mode</strong></p></li>
+<li><p><strong>Nyquist Zone</strong>: A dropdown menu to select the Nyquist zone for the channel.</p></li>
+<li><p><strong>Loopback Mode</strong></p></li>
+</ul>
+</section>
+<section id="tx-chain-settings">
+<h3>TX Chain settings<a class="headerlink" href="#tx-chain-settings" title="Link to this heading"></a></h3>
+<p>The TX Chain section is a scrollable area containing configuration options for all the
+TX channels of the device.</p>
+<p>All the UI controls are interactive, displaying the state of the
+current operation, specifically a progress bar while the operation is in progress, becoming
+green or red based on the success or failure of the operation, respectively.
+At startup all UI elements are initialized with the current values from the device.</p>
+<p>Each TX channel section includes the following information:</p>
+<ul class="simple">
+<li><p><strong>Channel indicator</strong>: Displays the channel number (e.g., Channel 1, Channel 2, etc.).</p></li>
+<li><p><strong>Channel label</strong>: Indicates the FDUC/CDUC arrangement for the channel.</p></li>
+<li><p><strong>Channel enable</strong>: A checkbox to enable or disable the channel. When successfully disabled,
+the channel name size will be reduced to indicate that the channel is inactive.</p></li>
+<li><p><strong>CFIR enable</strong>: A checkbox to enable or disable the CFIR filter for the channel.</p></li>
+<li><p><strong>CFIR profile</strong>: A dropdown menu to select the CFIR profile for the channel.</p></li>
+<li><p><strong>DAC Frequency</strong>: Control the DAC frequency.
+The value is displayed in MHz and it is a shared value for all TX channels. Whenever
+the value is changed for one channel, a read operation is performed to update all the
+TX channels with the new value.</p></li>
+<li><p><strong>NCO Frequency</strong></p></li>
+<li><p><strong>NCO Phase</strong></p></li>
+<li><p><strong>Gain Scale</strong></p></li>
+<li><p><strong>Test Tone Scale</strong></p></li>
+<li><p><strong>Test Tone Enable</strong></p></li>
+<li><p><strong>Main NCO Frequency</strong></p></li>
+<li><p><strong>Main NCO Phase</strong></p></li>
+<li><p><strong>Main Test Tone Scale</strong></p></li>
+<li><p><strong>Main Test Tone Enable</strong></p></li>
+</ul>
+</section>
 </section>
 </section>
 
@@ -376,8 +386,8 @@ be read on channel 11</p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="pattern_generator.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Pattern Generator</a>
-    <a href="voltmeter.html" title="Next document (Alt+Shift+RightArrow)" class="next">Voltmeter</a>
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">APOLLO</a>
+    <a href="../jesdstatus/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">JESD Status</a>
               </div>
           
         </div>

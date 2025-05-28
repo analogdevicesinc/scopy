@@ -22,6 +22,8 @@ General IIO plugins
 
 * :ref:`Register Map <registermap>`
 
+* :ref:`JESD204 Status <jesd_status>`
+
 
 Application Specific plugins
 
@@ -55,6 +57,9 @@ Application Specific plugins
     * :ref:`AD936X <ad936x>`
     * :ref:`AD936X Advanced <ad936x_advanced>`
 
+* AD9084
+    * :ref:`AD9084 <ad9084>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -71,4 +76,6 @@ Contents
    pqm/index
    swiot1l/index
    ad936x/index
+   ad9084/index
+   jesdstatus/index
 

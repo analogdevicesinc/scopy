@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Digital IO &#8212; Scopy  documentation</title>
+    <title>JESD Status &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Voltmeter" href="voltmeter.html" />
-    <link rel="prev" title="Pattern Generator" href="pattern_generator.html" />
+    <link rel="next" title="Scopy developer guide" href="../../developer_guide/index.html" />
+    <link rel="prev" title="AD9084" href="../ad9084/ad9084.html" />
    
   
   <meta name="repository" content="scopy">
@@ -85,9 +85,12 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">Digital IO</a><ul>
-<li><a class="reference internal" href="#general-description">General description</a></li>
-<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#">JESD Status</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#instrument-layout">Instrument Layout</a></li>
+<li><a class="reference internal" href="#comparison-with-jesd204b-status-utility">Comparison with JESD204B Status Utility</a></li>
+<li><a class="reference internal" href="#detailed-status-information">Detailed Status Information</a></li>
+<li><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
 </ul>
 </li>
 </ul>
@@ -134,16 +137,16 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
-<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="oscilloscope.html">Oscilloscope</a></li>
-<li class="toctree-l3"><a class="reference internal" href="spectrum_analyzer.html">Spectrum Analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="network_analyzer.html">Network Analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="signal_generator.html">Signal Generator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logic_analyzer.html">Logic Analyzer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pattern_generator.html">Pattern Generator</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Digital IO</a></li>
-<li class="toctree-l3"><a class="reference internal" href="voltmeter.html">Voltmeter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="power_supply.html">Power Supply</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
@@ -170,7 +173,7 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../ad9084/ad9084.html">AD9084</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">JESD Status</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
@@ -256,119 +259,131 @@ Content on this topic
     <nav class="breadcrumb">
         <ol>
           <li><a href="../index.html">Plugins</a></li>
-          <li><a href="index.html">ADALM2000</a></li>
           </ol>
     </nav>
   </div>
 
           <div class="body" role="main">
             
-  <section id="digital-io">
-<span id="digitalio"></span><h1>Digital IO<a class="headerlink" href="#digital-io" title="Link to this heading"></a></h1>
-<blockquote>
-<div><p><strong>Video guide:</strong></p>
-</div></blockquote>
-<div class="iframe-video"><iframe class="only-screen" src="https://www.youtube-nocookie.com/embed/9cYstnAoUpk"></iframe><span class="only-screen"></span><div class="admonition video only-print"><p class="admonition-title">Video</p>
-<p><a href="https://www.youtube.com/watch?v=9cYstnAoUpk"><span>https://www.youtube.com/watch?v=9cYstnAoUpk</span></a></p>
-</div></div><div class="line-block">
-<div class="line"><br /></div>
-</div>
-<section id="general-description">
-<h2>General description<a class="headerlink" href="#general-description" title="Link to this heading"></a></h2>
-<img alt="alternate text" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_16-46-33.png" />
-<ol class="arabic simple">
-<li><p>Digital channel number - the physical pin of the M2K</p></li>
-<li><p>Channel input state - indicates the input read by the M2K</p></li>
-<li><p>Channel direction - indicates whether the channel is set to input/output</p></li>
-<li><p>Channel output state - indicates the output value configured of the M2K</p></li>
-</ol>
+  <section id="jesd-status">
+<span id="id1"></span><h1>JESD Status<a class="headerlink" href="#jesd-status" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The JESD Status utility plugin provides a graphical interface to monitor the status of
+JESD204 in Scopy.
+It allows users to visualize the link and lane status of connected JESD204 devices and
+provides insights into the lane alignment and other relevant parameters.</p>
 </section>
-<section id="use-cases">
-<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading"></a></h2>
-<blockquote>
-<div><p><strong>IO operation</strong></p>
-</div></blockquote>
-<img alt="alternate text" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_16-51-11.png" />
-<ol class="arabic simple">
-<li><p>Run instrument</p></li>
-<li><p>Connect digital channel 0 to channel 7</p></li>
-<li><p>Start digital IO instrument</p></li>
-<li><p>Monitor channel 0 using voltmeter/scope/logic analyzer</p></li>
-<li><p>Set channel 0 as output by clicking the direction button Channel 7 input
-state is the same as channel 0 output state Voltmeter shows the same state
-(5V/0V) as channel 0 output state</p></li>
-<li><p>Change channel 0 output state by clicking it (multiple times) Channel 7
-input state is the same as channel 0 output state Voltmeter shows the same
-state (5V/0V) as channel 0 output state</p></li>
-</ol>
-<hr class="docutils" />
-<blockquote>
-<div><p><strong>Grouped operation</strong></p>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>Make the following connections</p></li>
-</ol>
+<section id="instrument-layout">
+<h2>Instrument Layout<a class="headerlink" href="#instrument-layout" title="Link to this heading"></a></h2>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/jesdstatus/jesdstatus_overview.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/jesdstatus/jesdstatus_overview.png" />
+</section>
+<section id="comparison-with-jesd204b-status-utility">
+<h2>Comparison with JESD204B Status Utility<a class="headerlink" href="#comparison-with-jesd204b-status-utility" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Scopy JESD Status plugin is not a replacement for the existing JESD204B Status utility.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Device compatibility is given by the presence of JESD204B IIO device in the IIO context.
+Make sure your build exposes the JESD204B IIO device in the device tree
+(<a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/jesd204/axi_jesd204_tx">TX</a>
+and <a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/jesd204/axi_jesd204_rx">RX</a>).</p>
+</div>
+<p>The Scopy JESD Status plugin does not replace the existing JESD204B Status utility.
+It is a new tool that provides integration and status monitoring from the same
+software environment used for device configuration and control.</p>
+<p>Check the additional resources section for more information on the JESD204B Status
+utility.</p>
+<p>The main difference between the two tools is in the way of data and status retrieval.
+The JESD Status plugin uses the IIO context to retrieve the status of the JESD204 link
+and lanes, while the JESD204B Status utility uses the SYSFS interface to read the
+status of the JESD204 link and lanes.</p>
+<p>The Scopy JESD Status plugin allows users to view the status of JESD204 devices
+alongside other IIO devices in Scopy.</p>
+</section>
+<section id="detailed-status-information">
+<h2>Detailed Status Information<a class="headerlink" href="#detailed-status-information" title="Link to this heading"></a></h2>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>What</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Link state (enabled/disabled)</p></td>
+<td><p>In case link state is disabled, that either means the link was never enabled
+or that an error occurred and the FSM rolled back and disabled the link.
+In the jesd204-fsm case this can be prevented by using the jesd204-ignore-errors;
+devicetree property when placed in the jesd204-fsm jesd204-top-device node.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Link status</p></td>
+<td><p>Depending on the encoding JESD204B/C 8B10B/64B66B there can be
+different values RESET, WAIT, CGS, ILAS, etc., DATA Please see link layer
+documentation for the state machine: JESD204B/C Link Receive Peripheral JESD204B/C
+Link Transmit Peripheral In general DATA is the desired state indicating proper operation.</p></td>
+</tr>
+<tr class="row-even"><td><p>SYNC is asserted/deasserted (8B10B only)</p></td>
+<td><p>State of the external SYNC signal</p></td>
+</tr>
+<tr class="row-odd"><td><p>SYSREF captured (Yes/No)</p></td>
+<td><p>Yes indicates that a SYSREF pulse was captured</p></td>
+</tr>
+<tr class="row-even"><td><p>SYSREF alignment error (Yes/No)</p></td>
+<td><p>Yes indicates that a SYSREF event has been observed which was unaligned,
+in regards to the LMFC/LEMC period, to a previously recorded SYSREF event.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lane rate</p></td>
+<td><p>The SERDES lane rate / bit clock</p></td>
+</tr>
+<tr class="row-even"><td><p>LMFC/LEMC rate</p></td>
+<td><p>Frequency of the internal local multiframe clocks (LMFC)/ local-multiblock-clock (LEMC)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lane rate / (40/66)</p></td>
+<td><p>Is equal to the desired Link Clock frequency</p></td>
+</tr>
+<tr class="row-even"><td><p>Reported Link Clock</p></td>
+<td><p>Is the Link Clock frequency which is reported by the common clock framework.
+If this rate is different from the desired Link Clock frequency,
+there is likely a problem. For example the clock provider wasn’t able to set
+the desired value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Measured Link Clock</p></td>
+<td><p>Is the measured Link Clock, using a frequency counter inside the Link Layer Peripheral.
+For proper operation desired, reported and measured frequency must match.</p></td>
+</tr>
+<tr class="row-even"><td><p>Desired Device Clock</p></td>
+<td><p>In case this value is different from the Desired Link Clock, this indicates
+Dual Clock Operation required by the Gearbox. Please see Gearbox/Dual Clock Operation
+in the Link Layer Peripheral documentation: JESD204B/C Link Receive Peripheral JESD204B/C
+Link Transmit Peripheral The Device Clock is typically generated by the clock provider
+which also provides SYSREF.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reported Device Clock</p></td>
+<td><p>Is the Device Clock frequency which is reported by the common clock framework.
+If this rate is different from the desired Device Clock frequency, there is likely
+a problem. For example the clock provider wasn’t able to set the desired value.</p></td>
+</tr>
+<tr class="row-even"><td><p>Measured Device Clock</p></td>
+<td><p>Is the measured Device Clock, using a frequency counter inside the Link Layer Peripheral.
+For proper operation desired, reported and measured frequency must match.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>Channel 0 → Channel 8</p></li>
-<li><p>Channel 1 → Channel 9</p></li>
-<li><p>Channel 2 → Channel 10</p></li>
-<li><p>Channel 3 → Channel 11</p></li>
-<li><p>Channel 4 → Channel 12</p></li>
-<li><p>Channel 5 → Channel 13</p></li>
-<li><p>Channel 6 → Channel 14</p></li>
-<li><p>Channel 7 → Channel 15</p></li>
+<li><p><a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-software/jesd_status">JESD204 Status Utility</a></p></li>
+<li><p><a class="reference external" href="https://wiki.analog.com/resources/tools-software/linux-software/jesd_eye_scan">JESD204 Eye Scan</a></p></li>
 </ul>
-<ol class="arabic simple" start="2">
-<li><p>Start digital IO instrument</p></li>
-<li><p>Also monitor these connections with a logic analyzer (use breadboard to
-split the connection)</p></li>
-<li><p>Set DIO 0-7 to Grouped interface</p></li>
-<li><p>Set all channels DIO8-15 to output</p></li>
-<li><p>Set each DIO8-15 output states at random</p></li>
-</ol>
-<p>DIO 0 – 7 grouped value should be the binary value of channels 8-15. Logic
-analyzer should show the same results</p>
-<ol class="arabic simple" start="7">
-<li><p>Set all channels 8-15 to input</p></li>
-<li><p>Set Group direction to output</p></li>
-<li><p>Set Group value to a random value</p></li>
-</ol>
-<p>Channels 8-15 input state should represent that value in binary</p>
-<p>Logic analyzer should show the same results</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-11-24.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-11-24.png" />
-<hr class="docutils" />
-<blockquote>
-<div><p><strong>Interaction with pattern generator</strong></p>
-</div></blockquote>
-<ol class="arabic simple">
-<li><p>Start digital IO instrument</p></li>
-<li><p>Generate clock signals on channels 0 and 8</p></li>
-</ol>
-<p>In the digitalIO the group as well as channel 8 should have a red highlight
-indicating that the pattern generator has ownership of the channels.</p>
-<p>The user cannot interact with those channels. Logic analyzer shows clock signal
-correctly generated at channels 0 and 8</p>
-<ol class="arabic simple" start="3">
-<li><p>Connect channel 10 to channel 11</p></li>
-<li><p>Set channel 10 as output and channel 11 as input</p></li>
-<li><p>Modify channel 10 output state</p></li>
-</ol>
-<p>Channel 11 input state follows channel 10 output state</p>
-<p>Rest of the channels work properly. The user can set direction and output state
-and can read input state</p>
-<ol class="arabic simple" start="6">
-<li><p>While running, set a clock signal on channel 10 in the pattern generator
-Channel 10 has a red highlight, the user cannot interact with it anymore.
-Channel 11 input state might flicker indicating that a signal can be read from
-channel 11.</p></li>
-</ol>
-<p>Logic analyzer shows a new clock signal generated at channel 10 which can also
-be read on channel 11</p>
-<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-13-47.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/m2k/digitalio/scopy_2018-05-15_17-13-47.png" />
-<ol class="arabic simple" start="7">
-<li><p>Stop the pattern generator</p></li>
-</ol>
-<p>Red highlight is removed from the digitalIO, the channels now work properly.</p>
 </section>
 </section>
 
@@ -376,8 +391,8 @@ be read on channel 11</p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="pattern_generator.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Pattern Generator</a>
-    <a href="voltmeter.html" title="Next document (Alt+Shift+RightArrow)" class="next">Voltmeter</a>
+    <a href="../ad9084/ad9084.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD9084</a>
+    <a href="../../developer_guide/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Scopy developer guide</a>
               </div>
           
         </div>
