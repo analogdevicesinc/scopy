@@ -28,8 +28,7 @@
 #include <QLoggingCategory>
 #include <plot_utils.hpp>
 #include <qjsonarray.h>
-#include <common/scopyconfig.h>
-
+#include <common/loggingutil.h>
 #include <common/scopyconfig.h>
 
 Q_LOGGING_CATEGORY(CAT_PKGUTIL, "PkgUtil")
@@ -86,12 +85,14 @@ QJsonObject PkgUtil::extractJsonMetadata(const QString &zipPath)
 	const KArchiveDirectory *zipDir = static_cast<const KArchiveDirectory *>(zip.directory()->entry(entryName));
 	const KArchiveFile *manifestFile = zipDir->file(METADATA_FILE);
 	if(!manifestFile) {
-		qWarning(CAT_PKGUTIL) << METADATA_FILE << "not found in package!";
+		LoggingUtil::logMessage(CAT_PKGUTIL, QString(METADATA_FILE) + " not found in package!",
+					LoggingUtil::Warning, true, true, STATUS_BAR_MS);
 		return {};
 	}
 	QJsonDocument doc = QJsonDocument::fromJson(manifestFile->data());
 	if(!doc.isObject()) {
-		qWarning(CAT_PKGUTIL) << "QJsonDocument parsing failed:" << METADATA_FILE;
+		LoggingUtil::logMessage(CAT_PKGUTIL, "QJsonDocument parsing failed: " + QString(METADATA_FILE),
+					LoggingUtil::Warning, true, true, STATUS_BAR_MS);
 		return {};
 	}
 	QJsonObject obj = doc.object();
@@ -116,7 +117,8 @@ QJsonObject PkgUtil::getMetadata(const QString &path)
 	return obj;
 }
 
-// In this method we also can make another checks
+// This method validates the package metadata by checking required fields.
+// Additional checks could include verifying field formats or ensuring compatibility with specific versions.
 bool PkgUtil::validatePkg(QJsonObject &metadata)
 {
 	if(metadata.isEmpty()) {
@@ -128,13 +130,15 @@ bool PkgUtil::validatePkg(QJsonObject &metadata)
 		QJsonValue value = metadata.value(field);
 		// Check if field is missing or null
 		if(value.isNull() || value.isUndefined()) {
-			qWarning(CAT_PKGUTIL) << "Missing required field:" << field;
+			LoggingUtil::logMessage(CAT_PKGUTIL, "Missing required field: " + field, LoggingUtil::Warning,
+						true, true, STATUS_BAR_MS);
 			return false;
 		}
 		// Check if field is empty (string or array)
 		if((value.isString() && value.toString().trimmed().isEmpty()) ||
 		   (value.isArray() && value.toArray().isEmpty())) {
-			qWarning(CAT_PKGUTIL) << "Empty required field:" << field;
+			LoggingUtil::logMessage(CAT_PKGUTIL, "Empty required field: " + field, LoggingUtil::Warning,
+						true, true, STATUS_BAR_MS);
 			return false;
 		}
 	}
@@ -161,12 +165,14 @@ QString PkgUtil::validateArchiveEntry(const KZip &zip)
 	}
 	QStringList zipEntries = zipDir->entries();
 	if(zipEntries.size() != 1) {
-		qWarning(CAT_PKGUTIL) << "There must be a single entry in the archive!";
+		LoggingUtil::logMessage(CAT_PKGUTIL, "There must be a single entry in the archive! (a directory)",
+					LoggingUtil::Warning, true, false, STATUS_BAR_MS);
 		return "";
 	}
 	QString entryName = zipEntries.first();
 	if(!zipDir->entry(entryName)->isDirectory()) {
-		qWarning(CAT_PKGUTIL) << "The archive entry must be a directory!!";
+		LoggingUtil::logMessage(CAT_PKGUTIL, "The archive entry must be a directory!", LoggingUtil::Warning,
+					true, false, STATUS_BAR_MS);
 		return "";
 	}
 	return entryName;
