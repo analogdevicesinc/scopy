@@ -53,6 +53,7 @@ public:
 	void initPreferences() override;
 	bool loadPreferencesPage() override;
 	QString description() override;
+	QString pkgName() override;
 
 public Q_SLOTS:
 	bool onConnect() override;

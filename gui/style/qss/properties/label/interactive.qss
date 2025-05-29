@@ -1,0 +1,12 @@
+*[&&property&&=true] {
+    border: &border_width_interactive& solid &interactive_primary_idle&;
+    border-radius: &radius_1&;
+    background-color: transparent;
+    color: &interactive_primary_idle&;
+}
+
+*[&&property&&=true]:hover {
+    border: &border_width_interactive& solid &interactive_primary_hover&; 
+    background-color: transparent;
+    color: &interactive_primary_hover&;
+}

@@ -351,4 +351,41 @@ void StyleHelper::BrowseButton(QPushButton *btn, QString objectName)
 	Style::setStyle(btn, style::properties::button::basicButton);
 }
 
+void StyleHelper::VerticalLine(QFrame *line, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		line->setObjectName(objectName);
+	}
+	line->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+	line->setFrameShape(QFrame::VLine);
+	line->setFrameShadow(QFrame::Plain);
+	line->setFixedWidth(1);
+
+	Style::setStyle(line, style::properties::frame::line);
+}
+
+void StyleHelper::ColoredInteractiveLabel(InteractiveLabel *w, int index, QString objectName)
+{
+	if(!objectName.isEmpty()) {
+		w->setObjectName(objectName);
+	}
+
+	QString style = QString(R"css(
+				*{
+					border-color: &&labelColor&&;
+					color: &&labelColor&&;
+				 }
+				*:hover{
+					border-color: &&hoverColor&&;
+					color: &&hoverColor&&;
+				 }
+				)css");
+
+	QColor color(getChannelColor(index));
+	style.replace("&&labelColor&&", color.name());
+	style.replace("&&hoverColor&&", color.lighter().name());
+
+	w->setStyleSheet(w->styleSheet() + "\n" + style);
+}
+
 #include "moc_stylehelper.cpp"

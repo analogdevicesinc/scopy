@@ -64,6 +64,7 @@ public:
 	virtual QString param() override;
 	virtual bool enabled() override;
 	virtual QString name() override;
+	virtual QString pkgName() override;
 	virtual QString displayName() override;
 	virtual QString displayParam() override;
 	virtual QWidget *icon() override;

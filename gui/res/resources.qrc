@@ -177,6 +177,8 @@
         <file>icons/device-shapes/square.svg</file>
         <file>icons/device-shapes/rounded_square.svg</file>
         <file>icons/info.svg</file>
+        <file>icons/uninstall-icon.svg</file>
+        <file>icons/install-icon.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>

@@ -89,13 +89,15 @@ find_file(SCOPY_ICON_ICO icon.ico PATHS ${CMAKE_SOURCE_DIR}/gui/res)
 message(STATUS "SCOPY_RESOURCE_FILES: " ${SCOPY_RESOURCE_FILES})
 
 include(ScopyStyle)
-generate_style("--core" ${CMAKE_CURRENT_SOURCE_DIR}/gui/style ${CMAKE_CURRENT_SOURCE_DIR}/gui/include/gui)
+generate_style(
+	"--core" ${CMAKE_CURRENT_SOURCE_DIR}/gui/style ${CMAKE_CURRENT_SOURCE_DIR}/gui/include/gui ${CMAKE_BINARY_DIR}
+)
 
 option(ENABLE_TRANSLATION "Enable translation" ON)
 include(ScopyTranslation)
 
 if(ENABLE_TRANSLATION)
-	generate_translations()
+	generate_translations(${CMAKE_BINARY_DIR}/translations)
 	qt_add_resources(SCOPY_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
 endif()
 
@@ -148,6 +150,8 @@ set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR}/scopy)
 set(SCOPY_STYLE_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/style)
 set(SCOPY_STYLE_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR}/scopy)
 set(SCOPY_PDK pdk)
+set(SCOPY_PACKAGE_BUILD_PATH ${CMAKE_BINARY_DIR}/packages)
+set(SCOPY_PACKAGE_INSTALL_PATH ${CMAKE_INSTALL_FULL_LIBDIR}/scopy)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
@@ -177,6 +181,7 @@ add_subdirectory(pluginbase)
 add_subdirectory(core)
 add_subdirectory(plugins)
 add_subdirectory(iio-widgets)
+add_subdirectory(packages)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS")
@@ -214,12 +219,27 @@ else()
 	endif()
 endif()
 
+find_package(ECM REQUIRED NO_MODULE)
+message(STATUS "ECM found at: ${ECM_DIR}")
+
+find_package(KF5Archive REQUIRED)
+if(KF5Archive_FOUND)
+	message(STATUS "Using KF5Archive")
+else()
+	message(STATUS "Not using KF5Archive")
+endif()
+
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
 add_definitions(-DQT_NO_KEYWORDS)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-core)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopy-core scopy-gui)
+
+if(KF5Archive_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+endif()
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
@@ -285,6 +305,7 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/plugins/resources/scopy_emu_options_co
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/emu_xml DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${SCOPY_TRANSLATION_INSTALL_PATH})
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/style DESTINATION ${SCOPY_STYLE_INSTALL_PATH})
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/packages DESTINATION ${SCOPY_PACKAGE_INSTALL_PATH})
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)

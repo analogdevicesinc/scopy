@@ -23,6 +23,7 @@
 #define STYLEREPOSITORY_H
 
 #include <QColor>
+#include <QFileInfoList>
 #include <QObject>
 #include "qvariant.h"
 #include "scopy-gui_export.h"
@@ -37,11 +38,13 @@ private:
 	Style(QObject *parent = nullptr);
 	~Style();
 
-	bool setTheme(QString themePath, float fontScale);
+	bool setTheme(QString theme, float fontScale);
+	QString getThemeFromPkgs(QString theme);
 	QString getStylePath(QString relativePath);
 	void initPaths();
-	void genrateStyle();
+	void generateStyle();
 	QString getAllProperties();
+	QFileInfoList getQssList(QString path);
 	static bool isProperty(QString style);
 	static const char *replaceProperty(const char *prop);
 	static QString scaleNumberInString(QString string, float factor);
@@ -101,6 +104,10 @@ public:
 	// you shouldn't have to use this
 	static QString replaceAttributes(QString style, int calls_limit = 10);
 
+	// Load the themes and QSS from the packages directory
+	static void setPkgsThemes(QFileInfoList infoList);
+	static void setPkgsQss(QFileInfoList infoList);
+
 	void setM2KStylesheet(QWidget *widget);
 	void setGlobalStyle(QWidget *widget = nullptr);
 
@@ -114,6 +121,10 @@ private:
 	QString m_qssGlobalFile;
 	QString m_qssFolderPath;
 	QString m_m2kqssFile;
+	QString m_jsonFolderPath;
+
+	static QFileInfoList m_pkgThemes;
+	static QFileInfoList m_pkgQss;
 };
 } // namespace scopy
 
