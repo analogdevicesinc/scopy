@@ -205,3 +205,39 @@ the Data Logger Plugin.
   - Allows the user to set the date time format for the X Axis.
   - **Default Value**: hh:mm:ss
 
+Experimental Features
+--------------------------------------------------------------------------------
+
+The Data Logger Plugin also includes several experimental features that may be 
+subject to change in future releases. These features are provided for early access 
+and feedback:
+
+1. **Multiple Plot Assignment**
+
+   - Channels can be assigned to different plots using the channel attributes menu.
+
+   This allows for more flexible data visualization and organization.
+
+   - The plot assignment combobox will update automatically if plots are added, 
+
+   removed, or renamed.
+
+2. **Dynamic Plot Management**
+
+   - Users can add or remove plots dynamically. Each plot can have its own settings 
+
+   and channels assigned.
+
+   - The plot selector and settings menus will update in real time to reflect changes 
+
+   in plot configuration.
+
+3. **Live Plot Name Synchronization**
+
+   - When a plot is renamed, all relevant menus and selectors update instantly to 
+   
+   reflect the new name, ensuring a consistent user experience.
+
+These experimental features are under active development. Feedback is welcome and 
+can help shape their future improvements.
+
