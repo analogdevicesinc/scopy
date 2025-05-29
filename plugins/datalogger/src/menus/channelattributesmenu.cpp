@@ -25,12 +25,13 @@
 #include <menuheader.h>
 #include <menuspinbox.h>
 #include <float.h>
+#include <plotmanagercombobox.h>
 
 using namespace scopy;
 using namespace datamonitor;
 using namespace gui;
 
-ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *parent)
+ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlotManager *plotManager, QWidget *parent)
 	: QWidget{parent}
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -221,6 +222,28 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, QWidget *p
 	scaling->contentLayout()->addLayout(scalingLayout);
 	scalingcontainer->contentLayout()->addWidget(scaling);
 	layout->addWidget(scalingcontainer);
+
+	////////////// Plot Assignment Section //////////////////////
+
+	MenuSectionWidget *plotSelectorContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *plotSelectorSection =
+		new MenuCollapseSection("Plot Assignment", MenuCollapseSection::MHCW_NONE,
+					MenuCollapseSection::MHW_BASEWIDGET, plotSelectorContainer);
+
+	QVBoxLayout *plotSelectorLayout = new QVBoxLayout();
+	plotSelectorLayout->setSpacing(10);
+	plotSelectorLayout->setMargin(0);
+	plotSelectorLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
+
+	// Use the new method from MonitorPlotManager to create the combobox
+	if(plotManager) {
+		m_plotSelector = plotManager->createPlotAssignmentComboBox(model, this);
+		plotSelectorLayout->addWidget(m_plotSelector);
+	}
+
+	plotSelectorSection->contentLayout()->addLayout(plotSelectorLayout);
+	plotSelectorContainer->contentLayout()->addWidget(plotSelectorSection);
+	layout->addWidget(plotSelectorContainer);
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);

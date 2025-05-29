@@ -123,6 +123,10 @@ void DataMonitorModel::checkMinMaxUpdate(double value)
 	}
 }
 
+uint32_t DataMonitorModel::plotUuid() const { return m_plotUuid; }
+
+void DataMonitorModel::setPlotUuid(uint32_t newPlotUuid) { m_plotUuid = newPlotUuid; }
+
 void DataMonitorModel::setDataStorageSize()
 {
 	Preferences *p = Preferences::GetInstance();

@@ -26,6 +26,8 @@
 #include <QWidget>
 #include <datamonitor/dmmdatamonitormodel.hpp>
 #include "scopy-datalogger_export.h"
+#include <QComboBox>
+#include <monitorplotmanager.h>
 
 namespace scopy {
 namespace datamonitor {
@@ -47,7 +49,11 @@ public:
 		OFFSET_OVERRIDE
 	} OffsetMode;
 
-	explicit ChannelAttributesMenu(DataMonitorModel *model, QWidget *parent = nullptr);
+	explicit ChannelAttributesMenu(DataMonitorModel *model, MonitorPlotManager *plotManager,
+				       QWidget *parent = nullptr);
+
+private:
+	QComboBox *m_plotSelector;
 };
 } // namespace datamonitor
 } // namespace scopy
