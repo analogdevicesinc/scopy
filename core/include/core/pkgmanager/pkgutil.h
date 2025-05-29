@@ -27,6 +27,7 @@
 #include <kzip.h>
 
 #define METADATA_FILE "MANIFEST.json"
+#define STATUS_BAR_MS 3000
 
 namespace scopy {
 class SCOPY_CORE_EXPORT PkgUtil

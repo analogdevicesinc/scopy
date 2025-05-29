@@ -27,6 +27,7 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonObject>
+#include <common/loggingutil.h>
 #include <common/scopyconfig.h>
 #include <QFileSystemModel>
 #include <QLoggingCategory>
@@ -96,7 +97,8 @@ bool PkgManager::_install(const QString &zipPath, bool performRestart)
 	if(installed) {
 		Q_EMIT pkgInstalled(performRestart);
 	} else {
-		qWarning(CAT_PKGMANAGER) << "Couldn't install:" << metadata[PkgManifest::PKG_ID];
+		LoggingUtil::logMessage(CAT_PKGMANAGER, "Couldn't install: " + metadata[PkgManifest::PKG_ID].toString(),
+					LoggingUtil::Warning, true, STATUS_BAR_MS);
 	}
 
 	return installed;
@@ -111,7 +113,8 @@ bool PkgManager::_uninstall(const QString &pkgId, bool performRestart)
 {
 	QString pkgPath = validPackages_[pkgId].value(PkgManifest::PKG_PATH).toString();
 	if(pkgPath.isEmpty()) {
-		qWarning(CAT_PKGMANAGER) << "There is no package:" << pkgId;
+		LoggingUtil::logMessage(CAT_PKGMANAGER, "Couldn't find the path for package " + pkgId,
+					LoggingUtil::Warning, true, STATUS_BAR_MS);
 		return false;
 	}
 	bool removed = PkgUtil::removePkg(pkgPath);
