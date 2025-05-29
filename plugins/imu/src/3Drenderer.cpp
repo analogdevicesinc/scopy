@@ -113,14 +113,11 @@ void SceneRenderer::resetView(){
 	view->camera()->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
 }
 
-void SceneRenderer::resetPos(){
-	setRot(data3P{0.0f, 0.0f, 0.0f});
-}
-
 void SceneRenderer::setRot(data3P rot){
+	//To match screen rotation with real time rotation
 	cubeTransform->setRotationX(rot.dataX);
-	cubeTransform->setRotationY(rot.dataY);
-	cubeTransform->setRotationZ(rot.dataZ);
+	cubeTransform->setRotationY(rot.dataZ);
+	cubeTransform->setRotationZ(rot.dataY);
 }
 
 void SceneRenderer::updateCubeColor(QColor color){

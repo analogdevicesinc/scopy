@@ -20,7 +20,6 @@ public:
 
 public Q_SLOTS:
 	void resetView();
-	void resetPos();
 	void setRot(data3P rot);
 	void setDisplayPoints(QString displayP);
 

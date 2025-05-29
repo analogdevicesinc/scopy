@@ -18,7 +18,6 @@ Q_OBJECT
 
 	public Q_SLOTS:
 		void updateValues(data3P rot, data3P pos, float temp);
-		void resetPos();
 
 	private:
 		data3P m_rot, m_deltaRot;

@@ -28,6 +28,8 @@
 #include <hoverwidget.h>
 #include <QStackedLayout>
 #include <measurementpanel.h>
+#include <math.h>
+#include <chrono>
 
 namespace scopy {
 
@@ -44,6 +46,9 @@ Q_SIGNALS:
 public:
 	void generateRotation();
 	void initIIODevice();
+
+// int callbackReadAll(struct iio_device *dev, const char *attr,
+// 				   const char *value, size_t len, void *d);
 
 private:
     ToolTemplate *m_tool;
@@ -67,8 +72,6 @@ private:
     QString m_uri;
 
     iio_device *m_device;
-
-    // Connection conn;
 };
 }
 

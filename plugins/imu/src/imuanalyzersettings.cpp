@@ -66,6 +66,12 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 		generalSettingsWidget->contentLayout()->addWidget(widget);
 	}
 
+	MenuSectionWidget *calibrationSettings = new MenuSectionWidget(this);
+	MenuCollapseSection *calibrationSettingsWidget = new MenuCollapseSection(
+		"Calibration Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, calibrationSettings);
+
+	// QListt<IIOWidget*> calibtarionWidget = IIOWidgetBuilder(nullptr).channel()
+
 	generalSettings->layout()->addWidget(generalSettingsWidget);
 	bubbleLevelSettings->layout()->addWidget(bubbleLevelSettingsWidget);
 	sceneRendererSettings->layout()->addWidget(sceneRendererSettingsWidget);

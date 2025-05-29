@@ -64,7 +64,6 @@ private:
 
 public Q_SLOTS:
 	void resetView();
-	void resetPos();
 	void setRot(data3P rot);
 	void updateCubeColor(QColor color);
 	void updatePlaneColor(QColor color);
