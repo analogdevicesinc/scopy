@@ -113,17 +113,6 @@ IMUAnalyzerInterface::~IMUAnalyzerInterface(){
 	t.join();
 }
 
-auto start = std::chrono::high_resolution_clock::now();
-auto stop = std::chrono::high_resolution_clock::now();
-auto end = (stop - start).count();
-void *someData;
-
-int callbackReadAll(struct iio_device *dev, const char *attr,
-		    const char *value, size_t len, void *d){
-	static int something = 1;
-	return something;
-}
-
 void IMUAnalyzerInterface::generateRotation(){
 
 	iio_channel *linearAccChX = iio_device_find_channel(m_device, "accel_x", false);
@@ -185,9 +174,5 @@ void IMUAnalyzerInterface::initIIODevice(){
 		}
 	}
 }
-
-
-
-
 
 #include "moc_imuanalyzerinterface.cpp"

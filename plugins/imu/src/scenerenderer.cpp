@@ -1,52 +1,11 @@
-#include "3Drenderer.hpp"
+#include "scenerenderer.hpp"
 
 using namespace scopy;
 
-Qt3DRender::QMaterial* createWireframeMaterial(Qt3DCore::QNode* parent = nullptr) {
-	// Create a new material
-	auto* material = new Qt3DRender::QMaterial(parent);
-
-	       // Shader
-	auto* shader = new Qt3DRender::QShaderProgram();
-	shader->setVertexShaderCode(Qt3DRender::QShaderProgram::loadSource(QUrl("qrc:/shaders/basic.vert")));
-	shader->setFragmentShaderCode(Qt3DRender::QShaderProgram::loadSource(QUrl("qrc:/shaders/basic.frag")));
-
-	       // Render pass
-	auto* renderPass = new Qt3DRender::QRenderPass();
-	renderPass->setShaderProgram(shader);
-
-	       // Polygon mode set to line (wireframe)
-	// auto* polygonMode = new QPolygonMode();
-	// polygonMode->setMode(QPolygon::Line);
-
-	auto* renderStateSet = new Qt3DRender::QRenderStateSet();
-	//renderStateSet->addRenderState(polygonMode);
-	//renderPass->setRenderStateSet(renderStateSet);
-
-	       // Technique
-	auto* technique = new Qt3DRender::QTechnique();
-	technique->graphicsApiFilter()->setApi(Qt3DRender::QGraphicsApiFilter::OpenGL);
-	technique->graphicsApiFilter()->setProfile(Qt3DRender::QGraphicsApiFilter::CoreProfile);
-	technique->graphicsApiFilter()->setMajorVersion(3);
-	technique->graphicsApiFilter()->setMinorVersion(1);
-	technique->addRenderPass(renderPass);
-
-	       // Effect
-	auto* effect = new Qt3DRender::QEffect();
-	effect->addTechnique(technique);
-
-	       // Set the effect on the material
-	material->setEffect(effect);
-
-	return material;
-}
-
 SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	view = new Qt3DExtras::Qt3DWindow();
-	//view->defaultFrameGraph()->setClearColor(QColor(QRgb(0x4d4d4f)));
 	container = QWidget::createWindowContainer(view, this);
 	container->setMinimumSize(400, 300);
-	// container->setFocusPolicy(Qt::StrongFocus);
 
 	QVBoxLayout *layout = new QVBoxLayout();
 	layout->addWidget(container);
@@ -128,6 +87,4 @@ void SceneRenderer::updatePlaneColor(QColor color){
 	m_planeMaterial->setDiffuse(color);
 }
 
-
-#include "moc_3Drenderer.cpp"
-
+#include "moc_scenerenderer.cpp"

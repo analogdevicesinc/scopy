@@ -16,8 +16,8 @@
 #include <menuheader.h>
 #include <menucollapsesection.h>
 #include <menusectionwidget.h>
-#include "2Drenderer.hpp"
-#include "3Drenderer.hpp"
+#include "bubblelevelrenderer.hpp"
+#include "scenerenderer.hpp"
 #include "menuspinbox.h"
 
 #include <QColorDialog>

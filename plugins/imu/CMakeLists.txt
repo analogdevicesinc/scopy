@@ -57,11 +57,9 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED Core Gui Widgets 3DCore 3DExtras 3DRender 3DInput)
-find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES}
-    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/3Drenderer.hpp include/imuanalyzer/2Drenderer.hpp
+    include/imuanalyzer/imuanalyzerinterface.hpp include/imuanalyzer/scenerenderer.hpp include/imuanalyzer/bubblelevelrenderer.hpp
     include/imuanalyzer/imuanalyzerutils.hpp include/imuanalyzer/imuanalyzersettings.hpp
     src/datavisualizer.cpp
     include/imuanalyzer/datavisualizer.hpp
@@ -97,8 +95,6 @@ target_link_libraries(
                Qt5::3DExtras
                Qt5::3DRender
                Qt5::3DInput
-               ${OPENGL_LIBRARIES}
-               ${GLUT_LIBRARY}
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

@@ -2,8 +2,8 @@
 #define IMUANALYZERINTERFACE_H
 
 #include "scopy-imuanalyzer_export.h"
-#include "3Drenderer.hpp"
-#include "2Drenderer.hpp"
+#include "scenerenderer.hpp"
+#include "bubblelevelrenderer.hpp"
 #include "imuanalyzersettings.hpp"
 #include "datavisualizer.hpp"
 
@@ -47,15 +47,11 @@ public:
 	void generateRotation();
 	void initIIODevice();
 
-// int callbackReadAll(struct iio_device *dev, const char *attr,
-// 				   const char *value, size_t len, void *d);
-
 private:
     ToolTemplate *m_tool;
 
     InfoBtn *m_infoBtn;
     RunBtn *m_runBtn;
-    MenuControlButton *m_rstPos;
     MenuControlButton *m_rstView;
     MenuControlButton *m_measureBtn;
     GearBtn *m_gearBtn;

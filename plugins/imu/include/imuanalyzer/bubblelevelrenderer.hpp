@@ -19,7 +19,6 @@ public:
 	//~BubbleLevelRenderer();
 
 public Q_SLOTS:
-	void resetView();
 	void setRot(data3P rot);
 	void setDisplayPoints(QString displayP);
 
