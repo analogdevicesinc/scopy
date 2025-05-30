@@ -72,7 +72,8 @@ typedef enum
 {
 	YMODE_COUNT,
 	YMODE_FS,
-	YMODE_SCALE
+	YMODE_SCALE,
+	YMODE_SCALE_OVERRIDE
 } YMode;
 
 class SCOPY_GUI_EXPORT ScaleProvider
