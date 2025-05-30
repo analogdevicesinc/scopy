@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2025 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
