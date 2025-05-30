@@ -32,6 +32,8 @@
 #include <pluginbase/preferences.h>
 #include <qdebug.h>
 
+#include <deviceiconbuilder.h>
+
 Q_LOGGING_CATEGORY(CAT_IMUANALYZER, "IMUAnalyzer");
 using namespace scopy;
 
@@ -59,7 +61,8 @@ finish:
 
 void IMUAnalyzer::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IMUAnalyzer_tool", "imuanalyzer", ":/gui/icons/home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IMUAnalyzer_tool", "imuanalyzer",":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_imuanalyzer.svg"));
 }
 
 bool IMUAnalyzer::onConnect(){
@@ -89,6 +92,23 @@ bool IMUAnalyzer::onDisconnect()
 
 	ConnectionProvider::GetInstance()->close(m_param);
 
+	return true;
+}
+
+bool IMUAnalyzer::loadIcon()
+{
+	SCOPY_PLUGIN_ICON(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+			  "/icons/tool_imuanalyzer.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("IMUAnalyzer");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 

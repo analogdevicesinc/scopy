@@ -59,12 +59,11 @@ public:
 
 	bool onConnect() override;
 	bool onDisconnect() override;
+	bool loadIcon() override;
 
 private:
 
 	IMUAnalyzerInterface *m_imuInterface;
-	QString m_toolIcon =
-		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/tool_datalogger.svg";
 };
 
 } // namespace scopy
