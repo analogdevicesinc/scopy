@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include <smallOnOffSwitch.h>
 
 #include <utils.h>
 #include <compositewidget.h>
@@ -65,9 +66,11 @@ public:
 
 	void setDoubleClickToOpenMenu(bool b);
 	void setOpenMenuChecksThis(bool b);
+	void enableToolTip(bool en);
 
 	QCheckBox *checkBox();
 	QPushButton *button();
+	QHBoxLayout *layout();
 
 	MenuControlButton *header() override { return this; }
 
@@ -81,6 +84,7 @@ private:
 	void applyStylesheet();
 
 	int width;
+	bool m_toolTip;
 	QColor m_color;
 	QHBoxLayout *lay;
 	QCheckBox *m_chk;
@@ -107,12 +111,15 @@ public:
 	int count();
 	MenuControlButton *getControlBtn();
 	MenuControlButton *header() override { return m_ctrl; }
+	SmallOnOffSwitch *onOffSwitch();
+	void enableOnOffSwitch(bool en);
 
 private:
 	MenuControlButton *m_ctrl;
 	QWidget *m_container;
 	QVBoxLayout *m_contLayout;
 	QVBoxLayout *m_lay;
+	SmallOnOffSwitch *m_onOffSwitch;
 };
 
 } // namespace scopy

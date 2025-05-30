@@ -29,10 +29,11 @@ using namespace scopy;
 
 MenuControlButton::MenuControlButton(QWidget *parent)
 	: QAbstractButton(parent)
+	, m_toolTip(false)
 {
 	lay = new QHBoxLayout(this);
 	lay->setMargin(16);
-	lay->setSpacing(16);
+	lay->setSpacing(10);
 
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setCheckable(true);
@@ -76,7 +77,13 @@ void MenuControlButton::setCheckBoxStyle(CheckboxStyle cs)
 	applyStylesheet();
 }
 
-void MenuControlButton::setName(QString s) { m_label->setText(s); }
+void MenuControlButton::setName(QString s)
+{
+	m_label->setText(s);
+	if(m_toolTip) {
+		m_label->setToolTip(s);
+	}
+}
 
 void MenuControlButton::setDoubleClickToOpenMenu(bool b)
 {
@@ -102,6 +109,12 @@ void MenuControlButton::setOpenMenuChecksThis(bool b)
 	} else {
 		disconnect(openMenuChecksThis);
 	}
+}
+
+void MenuControlButton::enableToolTip(bool en)
+{
+	m_toolTip = en;
+	m_label->setToolTip(en ? m_label->text() : "");
 }
 
 void MenuControlButton::mouseDoubleClickEvent(QMouseEvent *e)
@@ -131,6 +144,8 @@ void MenuControlButton::mousePressEvent(QMouseEvent *e)
 QCheckBox *MenuControlButton::checkBox() { return m_chk; }
 
 QPushButton *MenuControlButton::button() { return m_btn; }
+
+QHBoxLayout *MenuControlButton::layout() { return lay; }
 
 void MenuControlButton::applyStylesheet()
 {
@@ -163,10 +178,16 @@ CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent)
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
 	m_ctrl = new MenuControlButton(this);
+	m_ctrl->enableToolTip(true);
 	m_ctrl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	m_ctrl->setCheckBoxStyle(MenuControlButton::CS_COLLAPSE);
 	m_ctrl->setCheckable(false);
 	m_ctrl->checkBox()->setChecked(true);
+	m_onOffSwitch = new SmallOnOffSwitch(this);
+	m_onOffSwitch->hide();
+	m_onOffSwitch->setChecked(true);
+	m_ctrl->layout()->addWidget(m_onOffSwitch);
+
 	m_lay->addWidget(m_ctrl);
 	QWidget *container = new QWidget(this);
 	m_lay->addWidget(container);
@@ -191,5 +212,9 @@ void CollapsableMenuControlButton::remove(QWidget *ch) { m_contLayout->removeWid
 int CollapsableMenuControlButton::count() { return m_contLayout->count(); }
 
 MenuControlButton *CollapsableMenuControlButton::getControlBtn() { return m_ctrl; }
+
+SmallOnOffSwitch *CollapsableMenuControlButton::onOffSwitch() { return m_onOffSwitch; }
+
+void CollapsableMenuControlButton::enableOnOffSwitch(bool en) { m_onOffSwitch->setVisible(en); }
 
 #include "moc_menucontrolbutton.cpp"

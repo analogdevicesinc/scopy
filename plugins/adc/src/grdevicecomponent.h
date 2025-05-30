@@ -75,6 +75,7 @@ private:
 	void createMenuControlButton(QWidget * = nullptr);
 
 	void setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, QString name);
+	void setupDeviceOnOffSwitch();
 
 	QList<ChannelComponent *> m_channels;
 

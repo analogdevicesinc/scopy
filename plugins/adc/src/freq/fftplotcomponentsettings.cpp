@@ -26,6 +26,7 @@
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
 #include <style.h>
+#include <pluginbase/preferences.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -160,8 +161,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_autoscaleBtn->onOffswitch()->setChecked(false);
 	m_yCtrl->setMin(-140);
 	m_yCtrl->setMax(20);
-	labelsSwitch->onOffswitch()->setChecked(true);
-	labelsSwitch->onOffswitch()->setChecked(false);
+	labelsSwitch->onOffswitch()->setChecked(Preferences::get("adc_plot_labels").toBool());
 
 	m_deletePlotHover = new QPushButton("", nullptr);
 	m_deletePlotHover->setMaximumSize(16, 16);
