@@ -41,8 +41,9 @@
 #include <Qt3DExtras/QText2DEntity>
 #include <Qt3DCore/QEntity>
 
-namespace scopy{
-class SCOPY_IMUANALYZER_EXPORT SceneRenderer : public QWidget{
+namespace scopy {
+class SCOPY_IMUANALYZER_EXPORT SceneRenderer : public QWidget
+{
 	Q_OBJECT
 public:
 	SceneRenderer(QWidget *parent = nullptr);
@@ -68,6 +69,6 @@ public Q_SLOTS:
 	void updateCubeColor(QColor color);
 	void updatePlaneColor(QColor color);
 };
-}
+} // namespace scopy
 
-#endif //SCENERENDERER_H
+#endif // SCENERENDERER_H

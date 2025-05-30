@@ -2,7 +2,8 @@
 
 using namespace scopy;
 
-ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent)
+ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device,
+					 QWidget *parent)
 	: QWidget{parent}
 {
 	QVBoxLayout *lay = new QVBoxLayout();
@@ -15,13 +16,15 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 	MenuHeaderWidget *header = new MenuHeaderWidget("Settings", QPen(Qt::blue));
 
 	MenuSectionWidget *generalSettings = new MenuSectionWidget(this);
-	MenuCollapseSection *generalSettingsWidget = new MenuCollapseSection(
-		"General Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, generalSettings);
+	MenuCollapseSection *generalSettingsWidget =
+		new MenuCollapseSection("General Settings", MenuCollapseSection::MHCW_ARROW,
+					MenuCollapseSection::MHW_BASEWIDGET, generalSettings);
 	generalSettingsWidget->contentLayout()->setSpacing(10);
 
 	MenuSectionWidget *bubbleLevelSettings = new MenuSectionWidget(this);
-	MenuCollapseSection *bubbleLevelSettingsWidget = new MenuCollapseSection(
-		"2D Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, bubbleLevelSettings);
+	MenuCollapseSection *bubbleLevelSettingsWidget =
+		new MenuCollapseSection("2D Settings", MenuCollapseSection::MHCW_ARROW,
+					MenuCollapseSection::MHW_BASEWIDGET, bubbleLevelSettings);
 
 	MenuCombo *displayPoints = new MenuCombo("Display Points");
 	displayPoints->combo()->addItem("XY");
@@ -30,15 +33,15 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 	displayPoints->combo()->setCurrentIndex(0);
 
 	connect(this, &ImuAnalyzerSettings::updateDisplayPoints, blRend, &BubbleLevelRenderer::setDisplayPoints);
-	connect(displayPoints->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		emit updateDisplayPoints(displayPoints->combo()->itemText(idx));
-	});
+	connect(displayPoints->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[=](int idx) { emit updateDisplayPoints(displayPoints->combo()->itemText(idx)); });
 
 	bubbleLevelSettingsWidget->contentLayout()->addWidget(displayPoints);
 
 	MenuSectionWidget *sceneRendererSettings = new MenuSectionWidget(this);
-	MenuCollapseSection *sceneRendererSettingsWidget = new MenuCollapseSection(
-		"3D Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, sceneRendererSettings);
+	MenuCollapseSection *sceneRendererSettingsWidget =
+		new MenuCollapseSection("3D Settings", MenuCollapseSection::MHCW_ARROW,
+					MenuCollapseSection::MHW_BASEWIDGET, sceneRendererSettings);
 
 	QPushButton *cubeColorButton = new QPushButton("Select New Cube Color");
 	sceneRendererSettingsWidget->contentLayout()->addWidget(cubeColorButton);
@@ -60,9 +63,8 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 			emit updatePlaneColor(color);
 	});
 
-	QList <IIOWidget *>attributeWidget = IIOWidgetBuilder(nullptr)
-					     .device(m_device).buildAll();
-	for(auto widget : attributeWidget){
+	QList<IIOWidget *> attributeWidget = IIOWidgetBuilder(nullptr).device(m_device).buildAll();
+	for(auto widget : attributeWidget) {
 		generalSettingsWidget->contentLayout()->addWidget(widget);
 	}
 
@@ -76,5 +78,4 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 	lay->addWidget(sceneRendererSettings);
 
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
 }

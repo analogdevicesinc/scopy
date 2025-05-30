@@ -6,7 +6,9 @@ Q_DECLARE_METATYPE(data3P)
 
 std::atomic<bool> m_runThread(false);
 
-IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidget{parent}{
+IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
+	: QWidget{parent}
+{
 	qRegisterMetaType<data3P>("data3P");
 
 	QHBoxLayout *lay = new QHBoxLayout(this);
@@ -44,7 +46,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_tool->addWidgetToCentralContainerHelper(tabWidget);
 
 	m_sceneRender = new SceneRenderer();
-	tabWidget->addTab(m_sceneRender,"3D View");
+	tabWidget->addTab(m_sceneRender, "3D View");
 
 	m_rstView = new MenuControlButton(this);
 	m_rstView->setName("Reset View");
@@ -63,7 +65,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	m_measureBtn->setChecked(false);
 	m_tool->addWidgetToBottomContainerHelper(m_measureBtn, TTA_RIGHT);
 
-	connect(m_measureBtn, &QPushButton::toggled, this, [=, this](bool toggled){
+	connect(m_measureBtn, &QPushButton::toggled, this, [=, this](bool toggled) {
 		if(toggled)
 			m_dataV->show();
 		else
@@ -72,9 +74,9 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 	connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
 
-	connect(m_runBtn, &QPushButton::toggled,[=, this](bool toggled){
+	connect(m_runBtn, &QPushButton::toggled, [=, this](bool toggled) {
 		m_runThread = !m_runThread;
-		if(toggled){
+		if(toggled) {
 			t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
 		} else {
 			t.join();
@@ -98,7 +100,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 	scrollArea->setWidget(m_settingsPanel);
 	scrollArea->setWidgetResizable(true);
 
-	m_tool->rightStack()->add(key,scrollArea);
+	m_tool->rightStack()->add(key, scrollArea);
 
 	connect(m_gearBtn, &GearBtn::toggled, this, [=, this](bool toggled) {
 		if(toggled)
@@ -106,14 +108,12 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent) : QWidg
 
 		m_tool->openRightContainerHelper(toggled);
 	});
-	}
-
-
-IMUAnalyzerInterface::~IMUAnalyzerInterface(){
-	t.join();
 }
 
-void IMUAnalyzerInterface::generateRotation(){
+IMUAnalyzerInterface::~IMUAnalyzerInterface() { t.join(); }
+
+void IMUAnalyzerInterface::generateRotation()
+{
 
 	iio_channel *linearAccChX = iio_device_find_channel(m_device, "accel_x", false);
 	iio_channel *linearAccChY = iio_device_find_channel(m_device, "accel_y", false);
@@ -125,12 +125,12 @@ void IMUAnalyzerInterface::generateRotation(){
 	iio_device_attr_read_double(m_device, "sampling_frequency", &samplingFreq);
 
 	double linearAccGainX, linearAccGainY, linearAccGainZ;
-		iio_channel_attr_read_double(linearAccChX, "scale", &linearAccGainX);
-		iio_channel_attr_read_double(linearAccChY, "scale", &linearAccGainY);
-		iio_channel_attr_read_double(linearAccChZ, "scale", &linearAccGainZ);
+	iio_channel_attr_read_double(linearAccChX, "scale", &linearAccGainX);
+	iio_channel_attr_read_double(linearAccChY, "scale", &linearAccGainY);
+	iio_channel_attr_read_double(linearAccChZ, "scale", &linearAccGainZ);
 
 	double tempGain, tempOffset;
-	if(tempCh != nullptr){
+	if(tempCh != nullptr) {
 		iio_channel_attr_read_double(tempCh, "scale", &tempGain);
 		iio_channel_attr_read_double(tempCh, "offset", &tempOffset);
 	}
@@ -138,7 +138,7 @@ void IMUAnalyzerInterface::generateRotation(){
 	double linearAccX, linearAccY, linearAccZ;
 	double temp;
 
-	while(m_runThread){
+	while(m_runThread) {
 
 		iio_channel_attr_read_double(linearAccChX, "raw", &linearAccX);
 		iio_channel_attr_read_double(linearAccChY, "raw", &linearAccY);
@@ -148,28 +148,29 @@ void IMUAnalyzerInterface::generateRotation(){
 		m_dist.dataY = float(linearAccY * linearAccGainY);
 		m_dist.dataZ = float(linearAccZ * linearAccGainZ);
 
-		if(tempCh != nullptr){
+		if(tempCh != nullptr) {
 			iio_channel_attr_read_double(tempCh, "raw", &temp);
 			temp = temp * tempGain - tempOffset;
 		}
 
-		m_rot.dataX = atan2(-m_dist.dataX, sqrt(m_dist.dataY * m_dist.dataY + m_dist.dataZ * m_dist.dataZ)) * 180 / 3.14f;
-		m_rot.dataY = atan2(m_dist.dataY, m_dist.dataZ)  * 180 / 3.14f;
+		m_rot.dataX = atan2(-m_dist.dataX, sqrt(m_dist.dataY * m_dist.dataY + m_dist.dataZ * m_dist.dataZ)) *
+			180 / 3.14f;
+		m_rot.dataY = atan2(m_dist.dataY, m_dist.dataZ) * 180 / 3.14f;
 		m_rot.dataZ = 0;
 
-		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection,
-					  Q_ARG(data3P, m_rot));
-		QMetaObject::invokeMethod(this, "updateValues", Qt::QueuedConnection,
-					  Q_ARG(data3P, m_rot),Q_ARG(data3P, m_dist),Q_ARG(float, float(temp)));
+		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection, Q_ARG(data3P, m_rot));
+		QMetaObject::invokeMethod(this, "updateValues", Qt::QueuedConnection, Q_ARG(data3P, m_rot),
+					  Q_ARG(data3P, m_dist), Q_ARG(float, float(temp)));
 	}
 }
 
-void IMUAnalyzerInterface::initIIODevice(){
+void IMUAnalyzerInterface::initIIODevice()
+{
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
 	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
 		m_device = iio_context_get_device(conn->context(), i);
 		std::string name = iio_device_get_name(m_device);
-		if(name.find("adis") != std::string::npos){
+		if(name.find("adis") != std::string::npos) {
 			return;
 		}
 	}

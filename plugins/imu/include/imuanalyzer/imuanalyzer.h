@@ -62,7 +62,6 @@ public:
 	bool loadIcon() override;
 
 private:
-
 	IMUAnalyzerInterface *m_imuInterface;
 };
 

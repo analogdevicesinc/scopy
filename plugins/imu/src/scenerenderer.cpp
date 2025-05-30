@@ -2,7 +2,9 @@
 
 using namespace scopy;
 
-SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
+SceneRenderer::SceneRenderer(QWidget *parent)
+	: QWidget{parent}
+{
 	view = new Qt3DExtras::Qt3DWindow();
 	container = QWidget::createWindowContainer(view, this);
 	container->setMinimumSize(400, 300);
@@ -17,7 +19,7 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 
 	// Camera
 	Qt3DRender::QCamera *camera = view->camera();
-	camera->lens()->setPerspectiveProjection(45.0f, 16.f/9.f, 0.1f, 1000.0f);
+	camera->lens()->setPerspectiveProjection(45.0f, 16.f / 9.f, 0.1f, 1000.0f);
 	camera->setPosition(QVector3D(0, 2.5f, 5.0f));
 	camera->setViewCenter(QVector3D(0, 0, 0));
 
@@ -25,12 +27,12 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	auto *camController = new Qt3DExtras::QOrbitCameraController(rootEntity);
 	camController->setCamera(camera);
 
-	//Initialize cube
+	// Initialize cube
 
 	// Cube mesh
 	auto *cubeMesh = new Qt3DExtras::QCuboidMesh();
 
-	 // Transform
+	// Transform
 	cubeTransform = new Qt3DCore::QTransform();
 
 	// Material
@@ -43,7 +45,7 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	cubeEntity->addComponent(cubeTransform);
 	cubeEntity->addComponent(m_cubeMaterial);
 
-	//Add line axes
+	// Add line axes
 	auto *planeMesh = new Qt3DExtras::QPlaneMesh(rootEntity);
 	planeMesh->setWidth(400);
 	planeMesh->setHeight(300);
@@ -51,9 +53,9 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 	m_planeMaterial = new Qt3DExtras::QPhongMaterial();
 	m_planeMaterial->setDiffuse(m_planeColor);
 
-	 // Transform
+	// Transform
 	planeTransform = new Qt3DCore::QTransform();
-	planeTransform->setTranslation((QVector3D(0.0f,-1.0f,0.0f)));
+	planeTransform->setTranslation((QVector3D(0.0f, -1.0f, 0.0f)));
 
 	auto meshEntity = new Qt3DCore::QEntity(rootEntity);
 	meshEntity->addComponent(planeMesh);
@@ -62,29 +64,26 @@ SceneRenderer::SceneRenderer(QWidget *parent) : QWidget{parent} {
 
 	// Set root entity
 	view->setRootEntity(rootEntity);
-
 }
 
-void SceneRenderer::resetView(){
-	view->camera()->lens()->setPerspectiveProjection(45.0f, 16.f/9.f, 0.1f, 1000.0f);
+void SceneRenderer::resetView()
+{
+	view->camera()->lens()->setPerspectiveProjection(45.0f, 16.f / 9.f, 0.1f, 1000.0f);
 	view->camera()->setPosition(QVector3D(0, 2.5f, 5.0f));
 	view->camera()->setViewCenter(QVector3D(0, 0, 0));
 	view->camera()->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
 }
 
-void SceneRenderer::setRot(data3P rot){
-	//To match screen rotation with real time rotation
+void SceneRenderer::setRot(data3P rot)
+{
+	// To match screen rotation with real time rotation
 	cubeTransform->setRotationX(rot.dataX);
 	cubeTransform->setRotationY(rot.dataZ);
 	cubeTransform->setRotationZ(rot.dataY);
 }
 
-void SceneRenderer::updateCubeColor(QColor color){
-	m_cubeMaterial->setDiffuse(color);
-}
+void SceneRenderer::updateCubeColor(QColor color) { m_cubeMaterial->setDiffuse(color); }
 
-void SceneRenderer::updatePlaneColor(QColor color){
-	m_planeMaterial->setDiffuse(color);
-}
+void SceneRenderer::updatePlaneColor(QColor color) { m_planeMaterial->setDiffuse(color); }
 
 #include "moc_scenerenderer.cpp"

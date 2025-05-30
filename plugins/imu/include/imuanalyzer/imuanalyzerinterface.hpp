@@ -33,11 +33,12 @@
 
 namespace scopy {
 
-class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget {
+class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget
+{
 	Q_OBJECT
 public:
-    IMUAnalyzerInterface(QString uri, QWidget *parent = nullptr);
-    ~IMUAnalyzerInterface();
+	IMUAnalyzerInterface(QString uri, QWidget *parent = nullptr);
+	~IMUAnalyzerInterface();
 
 Q_SIGNALS:
 	void generateRot(data3P rot);
@@ -48,27 +49,27 @@ public:
 	void initIIODevice();
 
 private:
-    ToolTemplate *m_tool;
+	ToolTemplate *m_tool;
 
-    InfoBtn *m_infoBtn;
-    RunBtn *m_runBtn;
-    MenuControlButton *m_rstView;
-    MenuControlButton *m_measureBtn;
-    GearBtn *m_gearBtn;
+	InfoBtn *m_infoBtn;
+	RunBtn *m_runBtn;
+	MenuControlButton *m_rstView;
+	MenuControlButton *m_measureBtn;
+	GearBtn *m_gearBtn;
 
-    SceneRenderer *m_sceneRender;
-    BubbleLevelRenderer *m_bubbleLevelRenderer;
+	SceneRenderer *m_sceneRender;
+	BubbleLevelRenderer *m_bubbleLevelRenderer;
 
-    ImuAnalyzerSettings *m_settingsPanel;
-    DataVisualizer *m_dataV;
-    data3P m_rot = {0.0f, 0.0f, 0.0f};
-    data3P m_dist = {0.0f, 0.0f, 0.0f};
+	ImuAnalyzerSettings *m_settingsPanel;
+	DataVisualizer *m_dataV;
+	data3P m_rot = {0.0f, 0.0f, 0.0f};
+	data3P m_dist = {0.0f, 0.0f, 0.0f};
 
-    std::thread t;
-    QString m_uri;
+	std::thread t;
+	QString m_uri;
 
-    iio_device *m_device;
+	iio_device *m_device;
 };
-}
+} // namespace scopy
 
-#endif //IMUANALYZERINTERFACE_H
+#endif // IMUANALYZERINTERFACE_H

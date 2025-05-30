@@ -48,7 +48,7 @@ bool IMUAnalyzer::compatible(QString m_param, QString category)
 	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
 		iio_device *dev = iio_context_get_device(conn->context(), i);
 		std::string name = iio_device_get_name(dev);
-		if(name.find("adis") != std::string::npos){
+		if(name.find("adis") != std::string::npos) {
 			ret = true;
 			goto finish;
 		}
@@ -61,11 +61,13 @@ finish:
 
 void IMUAnalyzer::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IMUAnalyzer_tool", "imuanalyzer",":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IMUAnalyzer_tool", "imuanalyzer",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_imuanalyzer.svg"));
 }
 
-bool IMUAnalyzer::onConnect(){
+bool IMUAnalyzer::onConnect()
+{
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 

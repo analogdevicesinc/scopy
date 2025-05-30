@@ -2,7 +2,9 @@
 
 using namespace scopy;
 
-BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
+BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent)
+	: QWidget{parent}
+{
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	lay->setMargin(0);
 	setLayout(lay);
@@ -13,12 +15,11 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
 	plotWidget = new PlotWidget(this);
 	lay->addWidget(plotWidget);
 
-	plotWidget->xAxis()->setInterval(-180.0,180.0);
-	plotWidget->yAxis()->setInterval(-180.0,180.0);
+	plotWidget->xAxis()->setInterval(-180.0, 180.0);
+	plotWidget->yAxis()->setInterval(-180.0, 180.0);
 
 	plotWidget->xAxis()->setVisible(true);
 	plotWidget->yAxis()->setVisible(true);
-
 
 	point = new QwtPlotCurve("Point");
 	point->setSamples(xLinePoint, yLinePoint);
@@ -27,26 +28,25 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent) : QWidget{parent} {
 	point->attach(plotWidget->plot());
 }
 
-void BubbleLevelRenderer::setRot(data3P rot){
+void BubbleLevelRenderer::setRot(data3P rot)
+{
 	m_rot = rot;
 
-	if(m_displayPoints == "XY"){
-		xLinePoint = {double(m_rot.dataX),double(m_rot.dataX)};
-		yLinePoint = {double(m_rot.dataY),double(m_rot.dataY)};
+	if(m_displayPoints == "XY") {
+		xLinePoint = {double(m_rot.dataX), double(m_rot.dataX)};
+		yLinePoint = {double(m_rot.dataY), double(m_rot.dataY)};
 
-	} else if(m_displayPoints == "XZ"){
-		xLinePoint = {double(m_rot.dataX),double(m_rot.dataX)};
-		yLinePoint = {double(m_rot.dataZ),double(m_rot.dataZ)};
+	} else if(m_displayPoints == "XZ") {
+		xLinePoint = {double(m_rot.dataX), double(m_rot.dataX)};
+		yLinePoint = {double(m_rot.dataZ), double(m_rot.dataZ)};
 
-	} else if(m_displayPoints == "YZ"){
-		xLinePoint = {double(m_rot.dataY),double(m_rot.dataY)};
-		yLinePoint = {double(m_rot.dataZ),double(m_rot.dataZ)};
+	} else if(m_displayPoints == "YZ") {
+		xLinePoint = {double(m_rot.dataY), double(m_rot.dataY)};
+		yLinePoint = {double(m_rot.dataZ), double(m_rot.dataZ)};
 	}
 
 	point->setSamples(xLinePoint, yLinePoint);
 	plotWidget->replot();
 }
 
-void BubbleLevelRenderer::setDisplayPoints(QString displayP){
-	m_displayPoints = displayP;
-}
+void BubbleLevelRenderer::setDisplayPoints(QString displayP) { m_displayPoints = displayP; }

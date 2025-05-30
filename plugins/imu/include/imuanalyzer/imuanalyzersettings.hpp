@@ -29,13 +29,14 @@
 #include "iio-widgets/iiowidgetbuilder.h"
 #include "iio-widgets/iiowidgetdata.h"
 
-namespace scopy{
+namespace scopy {
 
 class SCOPY_IMUANALYZER_EXPORT ImuAnalyzerSettings : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device, QWidget *parent = nullptr);
+	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device,
+				     QWidget *parent = nullptr);
 
 signals:
 	void updateCubeColor(QColor color);
@@ -45,5 +46,5 @@ signals:
 private:
 	iio_device *m_device;
 };
-}
+} // namespace scopy
 #endif // IMUANALYZERSETTINGS_H

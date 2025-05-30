@@ -12,7 +12,8 @@
 
 namespace scopy {
 
-class SCOPY_IMUANALYZER_EXPORT BubbleLevelRenderer : public QWidget {
+class SCOPY_IMUANALYZER_EXPORT BubbleLevelRenderer : public QWidget
+{
 	Q_OBJECT
 public:
 	BubbleLevelRenderer(QWidget *parent = nullptr);
@@ -24,15 +25,13 @@ public Q_SLOTS:
 
 private:
 	data3P m_rot;
-	QVector<double> xLinePoint{90,90};
-	QVector<double> yLinePoint{3,3};
+	QVector<double> xLinePoint{90, 90};
+	QVector<double> yLinePoint{3, 3};
 	PlotWidget *plotWidget;
 	QwtPlotCurve *point;
 	QString m_displayPoints;
 
 public:
-
-
 };
-}
-#endif //BUBBLELEVELRENDERER_H
+} // namespace scopy
+#endif // BUBBLELEVELRENDERER_H
