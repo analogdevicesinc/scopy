@@ -30,6 +30,7 @@
 
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <style.h>
 #include <timeplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
@@ -81,12 +82,14 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 {
 	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF,
 						    MenuCollapseSection::MHW_BASEWIDGET, parent);
+	m_yaxisMenu->contentLayout()->setSpacing(6);
 
 	// Y-MODE
 	m_ymodeCb = new MenuCombo("YMODE", m_yaxisMenu);
 	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);
+	cb->addItem("Scale override", YMODE_SCALE_OVERRIDE);
 
 	m_scaleWidget = nullptr;
 	if(m_scaleAvailable) {
@@ -96,6 +99,19 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 					.attribute(m_src->scaleAttribute())
 					.buildSingle();
 	}
+
+	m_scaleOverrideWidget = new QWidget(m_yaxisMenu);
+	auto layout = new QVBoxLayout();
+	m_scaleOverrideWidget->setLayout(layout);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	QLabel *scaleLabel = new QLabel("Scale", this);
+	Style::setStyle(scaleLabel, style::properties::label::subtle);
+	m_scaleSpin = new QDoubleSpinBox(m_scaleOverrideWidget);
+	m_scaleSpin->setRange(0, 1000);
+	m_scaleSpin->setValue(1);
+	layout->addWidget(scaleLabel);
+	layout->addWidget(m_scaleSpin);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotComponentChannel->m_timePlotYAxis, m_yaxisMenu);
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), m_yaxisMenu, false);
@@ -123,8 +139,12 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_yaxisMenu->contentLayout()->addWidget(m_autoscaleBtn);
 	m_yaxisMenu->contentLayout()->addWidget(m_yCtrl);
 	m_yaxisMenu->contentLayout()->addWidget(m_ymodeCb);
+	m_yaxisMenu->contentLayout()->addWidget(m_scaleOverrideWidget);
 	if(m_scaleWidget)
 		m_yaxisMenu->contentLayout()->addWidget(m_scaleWidget);
+
+	connect(m_scaleSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+		[=](double value) { setYModeHelper(YMODE_SCALE_OVERRIDE); });
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
@@ -253,6 +273,7 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 
 	switch(mode) {
 	case YMODE_COUNT:
+		m_scaleOverrideWidget->setVisible(false);
 		if(m_scaleAvailable) {
 			m_scaleWidget->setVisible(false);
 		}
@@ -269,6 +290,7 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_FS:
+		m_scaleOverrideWidget->setVisible(false);
 		if(m_scaleAvailable) {
 			m_scaleWidget->setVisible(false);
 		}
@@ -285,9 +307,11 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_SCALE:
+		m_scaleOverrideWidget->setVisible(false);
 		if(m_scaleAvailable) {
 			scale = m_scaleWidget->read().first.toDouble();
 			m_scaleWidget->setVisible(true);
+			m_scaleOverrideWidget->setVisible(false);
 		}
 		if(fmt->is_signed) {
 			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
@@ -307,6 +331,32 @@ void GRTimeChannelComponent::setYModeHelper(YMode mode)
 		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 
 		break;
+	case YMODE_SCALE_OVERRIDE:
+		m_scaleOverrideWidget->setVisible(true);
+		if(m_scaleAvailable) {
+			m_scaleWidget->setVisible(false);
+		}
+		scale = m_scaleSpin->value();
+
+		if(fmt->is_signed) {
+			ymin = -(float)((int64_t)1 << (fmt->bits - 1));
+			ymax = (float)((int64_t)1 << (fmt->bits - 1));
+		} else {
+			ymin = 0;
+			ymax = (1 << (fmt->bits));
+		}
+
+		scale = scale / 1000.0;
+
+		ymin = ymin * scale;
+		ymax = ymax * scale;
+
+		m_timePlotComponentChannel->m_timePlotYAxis->setUnits("");
+		m_timePlotComponentChannel->m_timePlotYAxis->scaleDraw()->setFloatPrecision(3);
+		m_timePlotComponentChannel->m_timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
+
+		break;
+
 	default:
 		break;
 	}
