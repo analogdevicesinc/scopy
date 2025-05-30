@@ -35,6 +35,7 @@
 #include "adcinterfaces.h"
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
+#include <QSpinBox>
 #include "time/timeplotcomponent.h"
 
 namespace scopy {
@@ -141,6 +142,8 @@ private:
 	PlotAutoscaler *m_autoscaler;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	MenuCombo *m_ymodeCb;
+	QDoubleSpinBox *m_scaleSpin;
+	QWidget *m_scaleOverrideWidget;
 	IIOWidget *m_scaleWidget;
 
 	MenuPlotChannelCurveStyleControl *m_curvemenu;

@@ -55,6 +55,25 @@ QSpinBox::down-button
     image: url(&sba_cmb_box_arrow&) 1;
 }
 
+QDoubleSpinBox::up-button
+{
+    border: 0px;
+    padding-right: &padding_2&;
+    padding-top: 3;
+    width: 10px;
+    height: 6px;
+    image: url(&sba_cmb_box_arrow_up&) 1;
+}
+QDoubleSpinBox::down-button
+{
+    border: 0px;
+    padding-right: &padding_2&;
+    padding-bottom: 3;
+    width: 10px;
+    height: 6px;
+    image: url(&sba_cmb_box_arrow&) 1;
+}
+
 QToolTip {
     	color: &white&;
 	background-color: &black&;
