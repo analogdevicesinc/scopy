@@ -128,6 +128,13 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 
 		m_tool->openRightContainerHelper(toggled);
 	});
+
+	connect(tabWidget, &QTabWidget::currentChanged, [=, this](int index) {
+		if(index == 0)
+			m_rstView->show();
+		else
+			m_rstView->hide();
+	});
 }
 
 IMUAnalyzerInterface::~IMUAnalyzerInterface() { t.join(); }
