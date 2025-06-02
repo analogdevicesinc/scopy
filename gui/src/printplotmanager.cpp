@@ -33,7 +33,7 @@ PrintPlotManager::PrintPlotManager(QObject *parent)
 	: QObject{parent}
 {}
 
-void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName, QString folderPath)
+void PrintPlotManager::printPlots(QList<PlotWidget *> plotList, QString toolName)
 {
 	// select folder where to save
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
