@@ -116,18 +116,6 @@ void DataLogger_API::clearData()
 	m_dataLoggerPlugin->m_dataAcquisitionManager->clearMonitorsData();
 }
 
-void DataLogger_API::print(QString filepath)
-{
-	Q_ASSERT(m_dataLoggerPlugin->m_dataAcquisitionManager != nullptr);
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
-	if(tool) {
-		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
-		QList<PlotWidget *> plotList;
-		plotList.push_back(monitorTool->m_monitorPlot->plot());
-		monitorTool->printplotManager->printPlots(plotList, "DataLogger", filepath);
-	}
-}
-
 void DataLogger_API::changeTool(QString name)
 {
 	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
