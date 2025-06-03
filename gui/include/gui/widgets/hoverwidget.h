@@ -69,6 +69,7 @@ public:
 	void setDraggable(bool draggable);
 	void setRelative(bool relative);
 	void setRelativeOffset(QPointF offset);
+	void setUpdateVisibility(bool update);
 
 private:
 	QHBoxLayout *m_lay;
@@ -83,6 +84,7 @@ private:
 	QPoint *mouse_pos;
 	bool m_relative;
 	QPointF *m_relativeOffset;
+	bool m_updateVisibility;
 
 private:
 	void updateRelativeOffset();
