@@ -86,6 +86,8 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 
 	// Y-MODE
 	m_ymodeCb = new MenuCombo("YMODE", m_yaxisMenu);
+	InfoIconWidget::addHoveringInfoToWidget(m_ymodeCb->label(),
+						"Set Y axis scaling mode\nThis does not affect the data", m_ymodeCb);
 	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);

@@ -41,6 +41,7 @@ public:
 	virtual ~MenuOnOffSwitch();
 
 	QAbstractButton *onOffswitch();
+	QLabel *label() const;
 
 private:
 	QLabel *m_label;

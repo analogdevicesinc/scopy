@@ -54,4 +54,6 @@ MenuOnOffSwitch::~MenuOnOffSwitch() {}
 
 QAbstractButton *MenuOnOffSwitch::onOffswitch() { return m_switch; }
 
+QLabel *MenuOnOffSwitch::label() const { return m_label; }
+
 #include "moc_menuonoffswitch.cpp"

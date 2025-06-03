@@ -157,6 +157,7 @@ public:
 	QString unit() const;
 	IncrementStrategy *incrementStrategy() const;
 	QString name() const;
+	QLabel *label() const;
 
 	void setScaleRange(double min, double max);
 
