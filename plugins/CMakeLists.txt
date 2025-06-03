@@ -36,6 +36,7 @@ option(ENABLE_PLUGIN_DAC "Enable DAC plugin" ON)
 option(ENABLE_PLUGIN_AD9084 "Enable AD9084 plugin" ON)
 option(ENABLE_PLUGIN_JESDSTATUS "Enable JESDSTATUS plugin" ON)
 option(ENABLE_PLUGIN_PLUTO "Enable PLUTO plugin" ON)
+option(ENABLE_PLUGIN_QIQPLUGIN "Enable QIQPLUGIN plugin" ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
@@ -120,6 +121,11 @@ endif()
 
 if(ENABLE_PLUGIN_JESDSTATUS)
 	add_subdirectory(jesdstatus)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_QIQPLUGIN)
+	add_subdirectory(qiq)
 	list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 

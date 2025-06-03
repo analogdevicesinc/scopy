@@ -1,0 +1,40 @@
+{
+    "pdk": {
+        "enable": false,
+        "deps_path": "",
+        "project_path": ""
+    },
+    "plugin": {
+        "dir_name": "qiq",
+        "plugin_name": "qiqplugin",
+        "plugin_display_name": "QIQ",
+        "plugin_description": "Test plugin",
+        "class_name": "QIQPlugin",
+        "cmakelists": true,
+        "namespace": "scopy::qiqplugin",
+        "device_category": "iio",
+        "tools": [
+            {
+                "id": "plotting",
+                "tool_name": "Plotting",
+                "file_name": "plotting",
+                "class_name": "Plotting",
+                "namespace": "scopy::qiqplugin"
+            }
+        ]
+    },
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 17,
+        "enable_testing": "ON"
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true
+}
