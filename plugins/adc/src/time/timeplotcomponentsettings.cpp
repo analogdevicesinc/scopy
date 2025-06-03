@@ -99,6 +99,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	QAbstractButton *xySwitch = xySection->collapseSection()->header();
 
 	m_xAxisSrc = new MenuCombo("XY - X Axis source");
+	InfoIconWidget::addHoveringInfoToWidget(
+		m_xAxisSrc->label(), "Selects which channel provides the X-axis values for the XY plot", m_xAxisSrc);
 	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		QComboBox *cb = m_xAxisSrc->combo();
 		ChannelComponent *c = static_cast<ChannelComponent *>(cb->itemData(idx).value<void *>());
@@ -106,7 +108,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	});
 
 	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
-
+	InfoIconWidget::addHoveringInfoToWidget(
+		m_xAxisShow->label(), "Plots selected channel by itself over the current XY plot", m_xAxisShow);
 	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
 		m_plotComponent->xyPlot()->setVisible(b);
 		m_xAxisSrc->setVisible(b);
@@ -117,6 +120,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		[=](bool b) { m_plotComponent->showXSourceOnXy(b); });
 
 	m_yModeCb = new MenuCombo("YMODE", plotMenu);
+	InfoIconWidget::addHoveringInfoToWidget(m_yModeCb->label(),
+						"Set Y axis scaling mode\nThis does not affect the data", m_yModeCb);
 	auto ycb = m_yModeCb->combo();
 	ycb->addItem("ADC Counts", YMODE_COUNT);
 	ycb->addItem("% Full Scale", YMODE_FS);

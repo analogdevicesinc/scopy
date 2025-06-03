@@ -97,10 +97,13 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
 	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -300, 300, true, false, yaxis);
+	InfoIconWidget::addHoveringInfoToWidget(m_yPwrOffset->label(),
+						"Offsets all channels' Y axis by set a amout units", m_yPwrOffset);
 	m_yPwrOffset->setScaleRange(1, 1);
 	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
 	m_windowCb = new MenuCombo("Window", yaxis);
+	InfoIconWidget::addHoveringInfoToWidget(m_windowCb->label(), "Set applied FFT window function", m_windowCb);
 
 	m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
 	m_windowCb->combo()->addItem("Hanning", gr::fft::window::WIN_HANNING);

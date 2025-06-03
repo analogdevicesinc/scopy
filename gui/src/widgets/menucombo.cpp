@@ -85,6 +85,8 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 MenuCombo::~MenuCombo() {}
 QComboBox *MenuCombo::combo() { return m_combo; }
 
+QLabel *MenuCombo::label() const { return m_label; }
+
 QString MenuCombo::title() const { return m_label->text(); }
 
 void MenuCombo::setTitle(const QString &newTitle) { m_label->setText(newTitle); }
