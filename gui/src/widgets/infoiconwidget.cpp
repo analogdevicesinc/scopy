@@ -20,6 +20,7 @@
  */
 
 #include "infoiconwidget.h"
+#include "style.h"
 
 using namespace scopy;
 
@@ -52,5 +53,35 @@ void InfoIconWidget::setInfoMessage(QString infoMessage)
 }
 
 QString InfoIconWidget::getInfoMessage() { return m_infoIcon->toolTip(); }
+
+QWidget *InfoIconWidget::addInfoToWidget(QWidget *w, QString infoMessage)
+{
+	InfoIconWidget *info = new InfoIconWidget(infoMessage);
+
+	QWidget *newWidget = new QWidget();
+	QHBoxLayout *lay = new QHBoxLayout();
+	newWidget->setLayout(lay);
+	lay->setSpacing(Style::getDimension(json::global::unit_0_5));
+	lay->setMargin(0);
+	lay->addWidget(w);
+	lay->addWidget(info);
+
+	return newWidget;
+}
+
+QWidget *InfoIconWidget::addHoveringInfoToWidget(QWidget *w, QString infoMessage, QWidget *parent, HoverPosition pos)
+{
+	InfoIconWidget *info = new InfoIconWidget(infoMessage);
+	info->layout()->setMargin(5);
+	HoverWidget *hover = new HoverWidget(info, w, parent);
+	hover->setAnchorPos(pos);
+	hover->setContentPos(pos);
+	hover->setUpdateVisibility(true);
+	hover->setVisible(w->isVisible());
+
+	QObject::connect(w, &QObject::destroyed, hover, &QObject::deleteLater);
+
+	return hover;
+}
 
 #include "moc_infoiconwidget.cpp"

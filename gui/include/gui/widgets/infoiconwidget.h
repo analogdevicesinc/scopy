@@ -26,6 +26,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <scopy-gui_export.h>
+#include "hoverwidget.h"
 
 namespace scopy {
 class SCOPY_GUI_EXPORT InfoIconWidget : public QWidget
@@ -36,6 +37,13 @@ public:
 
 	void setInfoMessage(QString infoMessage);
 	QString getInfoMessage();
+
+	// helper function for creating a new widget containing an info
+	static QWidget *addInfoToWidget(QWidget *w, QString infoMessage);
+
+	// helper function for adding a hovering info widget
+	static QWidget *addHoveringInfoToWidget(QWidget *w, QString infoMessage, QWidget *parent,
+						HoverPosition pos = HP_RIGHT);
 
 private:
 	QVBoxLayout *m_layout;
