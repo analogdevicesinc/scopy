@@ -343,7 +343,7 @@ void TimePlotManagerSettings::onStart()
 	QComboBox *cb = m_xModeCb->combo();
 
 	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
-		double sr = readSampleRate();
+		double sr = m_sampleRateSpin->value();
 		setSampleRate(sr);
 	} else {
 		Q_EMIT sampleRateChanged(m_samplingInfo.sampleRate);

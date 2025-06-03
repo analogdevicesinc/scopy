@@ -179,6 +179,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_plotManager->setXUnit("Hz");
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
+			m_sampleRateSpin->setValue(readSampleRate());
 			m_freqOffsetSpin->setVisible(true);
 			m_freqOffsetSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
@@ -189,11 +190,13 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
 			}
 		}
+		updateXAxis();
 		m_plotManager->updateAxisScales();
 	});
 
-	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 0, DBL_MAX, true, false, section);
+	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 1, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
+	InfoIconWidget::addHoveringInfoToWidget(
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
@@ -245,6 +248,8 @@ void FFTPlotManagerSettings::updateXAxis()
 
 	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
 		max = m_samplingInfo.sampleRate;
+	} else if(cb->itemData(cb->currentIndex()) == XMODE_OVERRIDE) {
+		max = m_sampleRateSpin->value();
 	} else {
 		max = m_samplingInfo.bufferSize;
 	}
@@ -269,7 +274,7 @@ void FFTPlotManagerSettings::onStart()
 	QComboBox *cb = m_xModeCb->combo();
 
 	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
-		double sr = readSampleRate();
+		double sr = m_sampleRateSpin->value();
 		setSampleRate(sr);
 	}
 
