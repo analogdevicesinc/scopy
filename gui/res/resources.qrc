@@ -177,6 +177,8 @@
         <file>icons/device-shapes/square.svg</file>
         <file>icons/device-shapes/rounded_square.svg</file>
         <file>icons/info.svg</file>
+        <file>icons/scopy-light/icons/tool_imuanalyzer.svg</file>
+        <file>icons/scopy-default/icons/tool_imuanalyzer.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
