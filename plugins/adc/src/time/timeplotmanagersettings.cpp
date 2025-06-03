@@ -143,6 +143,11 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		}
 	});
 	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), section, false);
+	InfoIconWidget::addHoveringInfoToWidget(
+		m_rollingModeSw->label(),
+		"New data is updating from right to left, like a scrolling motionon the plot."
+		"\nSync buffer-plot sizes must be disabled",
+		section);
 	connect(m_rollingModeSw->onOffswitch(), &QAbstractButton::toggled, this,
 		&TimePlotManagerSettings::setRollingMode);
 
@@ -166,7 +171,9 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMaxLayout->addWidget(m_xmin);
 	xMinMaxLayout->addWidget(m_xmax);
 
-	m_xModeCb = new MenuCombo("XMode", section);
+	m_xModeCb = new MenuCombo("XMODE", section);
+	InfoIconWidget::addHoveringInfoToWidget(m_xModeCb->label(),
+						"Set X axis scaling mode\nThis does not affect the data", m_xModeCb);
 	auto xcb = m_xModeCb->combo();
 
 	xcb->addItem("Samples", XMODE_SAMPLES);
@@ -226,6 +233,10 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	m_sampleRateSpin = new MenuSpinbox("Sample rate", 1, "Hz", 1, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
+	InfoIconWidget::addHoveringInfoToWidget(
+		m_sampleRateSpin->label(),
+		"Controls how the X-axis is scaled when in Time XMode\nThis only affects the x scale, not the data",
+		section);
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);

@@ -44,6 +44,7 @@ public:
 	virtual ~MenuCombo();
 
 	QComboBox *combo();
+	QLabel *label() const;
 
 	QString title() const;
 	void setTitle(const QString &newTitle);
