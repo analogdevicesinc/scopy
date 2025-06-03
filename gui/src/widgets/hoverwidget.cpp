@@ -41,6 +41,7 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	, m_draggable(false)
 	, m_relative(false)
 	, m_relativeOffset(nullptr)
+	, m_updateVisibility(false)
 {
 	Style::setBackgroundColor(this, QString("transparent"), true);
 	m_lay = new QHBoxLayout(this);
@@ -134,6 +135,8 @@ void HoverWidget::setRelativeOffset(QPointF offset)
 	moveToRelativePos();
 }
 
+void HoverWidget::setUpdateVisibility(bool update) { m_updateVisibility = update; }
+
 void HoverWidget::setContent(QWidget *content)
 {
 	if(m_content) {
@@ -193,6 +196,12 @@ bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 		if((event->type() == QEvent::Move || event->type() == QEvent::Resize) && (!m_draggable || m_relative)) {
 			updatePos();
 		}
+	}
+	if(m_updateVisibility && (watched == m_anchor || watched == m_parent)) {
+		if(event->type() == QEvent::Hide)
+			hide();
+		if(event->type() == QEvent::Show)
+			show();
 	}
 
 	return QObject::eventFilter(watched, event);
