@@ -51,6 +51,7 @@
 #include <QLocale>
 #include <qwt_legend.h>
 #include <qwt_scale_draw.h>
+#include <style.h>
 
 #include <cmath>
 #include <iostream>
@@ -121,6 +122,11 @@ protected:
 		}
 
 		t.setBackgroundBrush(QBrush(QColor(0, 0, 0, 155)));
+
+		QFont font = QFont();
+		font.setPixelSize(Style::getDimension(json::global::font_size));
+		t.setFont(font);
+
 		return t;
 	}
 
