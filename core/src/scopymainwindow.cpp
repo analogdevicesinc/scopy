@@ -31,6 +31,7 @@
 #include <deviceautoconnect.h>
 #include <style.h>
 #include <whatsnewoverlay.h>
+#include <scriptingtool.h>
 
 #include <common/debugtimer.h>
 #include "logging_categories.h"
@@ -135,9 +136,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	dtm = new DetachedToolWindowManager(this);
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
+	ScriptingTool *scriptingTool = new ScriptingTool(this);
+
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
+	ts->add("scripting", scriptingTool);
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
