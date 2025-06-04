@@ -30,6 +30,7 @@
 #include <QDebug>
 #include <QStack>
 #include <qwt_symbol.h>
+#include <style.h>
 
 #define ERROR_VALUE -10000000
 
@@ -58,6 +59,11 @@ protected:
 	{
 		QPointF dp = QwtPlotZoomer::invTransform(p);
 		QwtText t(QString("(%1, %2)").arg(dp.x(), 0, 'f', 4).arg(dp.y(), 0, 'f', 4));
+
+		QFont font = QFont();
+		font.setPixelSize(Style::getDimension(json::global::font_size));
+		t.setFont(font);
+
 		return t;
 	}
 };

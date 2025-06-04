@@ -24,6 +24,7 @@
 #include <qwt_text.h>
 
 #include <dbgraph.hpp>
+#include <style.h>
 
 using namespace scopy;
 
@@ -52,6 +53,11 @@ QwtText XAxisScaleZoomer::trackerText(const QPoint &p) const
 	const dBgraph *plt = dynamic_cast<const dBgraph *>(plot());
 	t.setText(plt->getScaleValueFormat(dp.x(), QwtAxis::XTop, 4) + ", " +
 		  plt->getScaleValueFormat(dp.y(), QwtAxis::YLeft));
+
+	QFont font = QFont();
+	font.setPixelSize(Style::getDimension(json::global::font_size));
+	t.setFont(font);
+
 	return t;
 }
 

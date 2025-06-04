@@ -59,6 +59,7 @@ using QwtAxis::XBottom;
 
 using namespace scopy;
 #include <QDebug>
+#include <style.h>
 
 /***********************************************************************
  * Widget to provide mouse pointer coordinate text
@@ -91,6 +92,11 @@ protected:
 		QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
 		double secs = double(centerTime + dp.y() * getSecondsPerLine());
 		QwtText t(QString("(%1 %2, %3 s)").arg(dp.x(), 0, 'f', 4).arg(d_unitType.c_str()).arg(secs, 0, 'f', 4));
+
+		QFont font = QFont();
+		font.setPixelSize(Style::getDimension(json::global::font_size));
+		t.setFont(font);
+
 		return t;
 	}
 
