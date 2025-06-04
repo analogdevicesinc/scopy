@@ -30,13 +30,13 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent)
 	setLayout(lay);
 
 	m_rot = {0.0f, 0.0f, 0.0f};
-	m_displayPoints = "XY";
+	m_displayPoints = "Raw: XY";
 
 	plotWidget = new PlotWidget(this);
 	lay->addWidget(plotWidget);
 
-	plotWidget->xAxis()->setInterval(-180.0, 180.0);
-	plotWidget->yAxis()->setInterval(-180.0, 180.0);
+	plotWidget->xAxis()->setInterval(-10.0, 10.0);
+	plotWidget->yAxis()->setInterval(-10.0, 10.0);
 
 	plotWidget->xAxis()->setVisible(true);
 	plotWidget->yAxis()->setVisible(true);
@@ -48,25 +48,43 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent)
 	point->attach(plotWidget->plot());
 }
 
-void BubbleLevelRenderer::setRot(data3P rot)
+void BubbleLevelRenderer::setRot(data3P rot, data3P pos, float temp)
 {
-	m_rot = rot;
+	if(m_displayPoints == "Raw: XY") {
+		xLinePoint = {double(pos.dataX), double(pos.dataX)};
+		yLinePoint = {double(pos.dataY), double(pos.dataY)};
 
-	if(m_displayPoints == "XY") {
-		xLinePoint = {double(m_rot.dataX), double(m_rot.dataX)};
-		yLinePoint = {double(m_rot.dataY), double(m_rot.dataY)};
+	} else if(m_displayPoints == "Raw: XZ") {
+		xLinePoint = {double(pos.dataX), double(pos.dataX)};
+		yLinePoint = {double(pos.dataZ), double(pos.dataZ)};
 
-	} else if(m_displayPoints == "XZ") {
-		xLinePoint = {double(m_rot.dataX), double(m_rot.dataX)};
-		yLinePoint = {double(m_rot.dataZ), double(m_rot.dataZ)};
+	} else if(m_displayPoints == "Raw: YZ") {
+		xLinePoint = {double(pos.dataY), double(pos.dataY)};
+		yLinePoint = {double(pos.dataZ), double(pos.dataZ)};
 
-	} else if(m_displayPoints == "YZ") {
-		xLinePoint = {double(m_rot.dataY), double(m_rot.dataY)};
-		yLinePoint = {double(m_rot.dataZ), double(m_rot.dataZ)};
+	} else if(m_displayPoints == "Rotation: XZ") {
+		xLinePoint = {double(rot.dataX), double(rot.dataX)};
+		yLinePoint = {double(rot.dataZ), double(rot.dataZ)};
+
+	} else if(m_displayPoints == "Rotation: ZX") {
+		xLinePoint = {double(rot.dataZ), double(rot.dataZ)};
+		yLinePoint = {double(rot.dataX), double(rot.dataX)};
 	}
 
 	point->setSamples(xLinePoint, yLinePoint);
 	plotWidget->replot();
 }
 
-void BubbleLevelRenderer::setDisplayPoints(QString displayP) { m_displayPoints = displayP; }
+void BubbleLevelRenderer::setDisplayPoints(QString displayP)
+{
+	m_displayPoints = displayP;
+
+	if(m_displayPoints.contains("Rotation")) {
+		plotWidget->xAxis()->setInterval(-180.0, 180.0);
+		plotWidget->yAxis()->setInterval(-180.0, 180.0);
+
+	} else {
+		plotWidget->xAxis()->setInterval(-10.0, 10.0);
+		plotWidget->yAxis()->setInterval(-10.0, 10.0);
+	}
+}

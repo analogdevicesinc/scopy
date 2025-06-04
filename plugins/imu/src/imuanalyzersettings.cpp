@@ -47,9 +47,11 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 					MenuCollapseSection::MHW_BASEWIDGET, bubbleLevelSettings);
 
 	MenuCombo *displayPoints = new MenuCombo("Display Points");
-	displayPoints->combo()->addItem("XY");
-	displayPoints->combo()->addItem("XZ");
-	displayPoints->combo()->addItem("YZ");
+	displayPoints->combo()->addItem("Raw: XY");
+	displayPoints->combo()->addItem("Raw: XZ");
+	displayPoints->combo()->addItem("Raw: YZ");
+	displayPoints->combo()->addItem("Rotation: XZ");
+	displayPoints->combo()->addItem("Rotation: ZX");
 	displayPoints->combo()->setCurrentIndex(0);
 
 	connect(this, &ImuAnalyzerSettings::updateDisplayPoints, blRend, &BubbleLevelRenderer::setDisplayPoints);

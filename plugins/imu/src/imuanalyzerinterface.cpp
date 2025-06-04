@@ -106,7 +106,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	m_bubbleLevelRenderer = new BubbleLevelRenderer(tabWidget);
 	tabWidget->addTab(m_bubbleLevelRenderer, "2D View");
 
-	connect(this, &IMUAnalyzerInterface::generateRot, m_bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
+	connect(this, &IMUAnalyzerInterface::updateValues, m_bubbleLevelRenderer, &BubbleLevelRenderer::setRot);
 
 	m_gearBtn = new GearBtn(this);
 	m_tool->addWidgetToTopContainerHelper(m_gearBtn, TTA_RIGHT);
