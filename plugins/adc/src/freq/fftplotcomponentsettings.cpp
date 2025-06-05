@@ -71,8 +71,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
 	m_yCtrl->minSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
 	m_yCtrl->maxSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
-	m_yCtrl->minSpinbox()->setUnit("dB");
-	m_yCtrl->maxSpinbox()->setUnit("dB");
+	m_yCtrl->minSpinbox()->setUnit("dBFS");
+	m_yCtrl->maxSpinbox()->setUnit("dBFS");
 	m_yCtrl->minSpinbox()->setMinValue(-1000);
 	m_yCtrl->maxSpinbox()->setMinValue(-1000);
 	m_yCtrl->minSpinbox()->setMaxValue(1000);
@@ -92,11 +92,11 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		toggleAutoScale();
 	});
 
-	m_plotComponent->fftPlot()->yAxis()->setUnits("dB");
+	m_plotComponent->fftPlot()->yAxis()->setUnits("dBFS");
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
-	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -300, 300, true, false, yaxis);
+	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dBFS", -300, 300, true, false, yaxis);
 	InfoIconWidget::addHoveringInfoToWidget(m_yPwrOffset->label(),
 						"Offsets all channels' Y axis by set a amout units", m_yPwrOffset);
 	m_yPwrOffset->setScaleRange(1, 1);
