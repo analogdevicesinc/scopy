@@ -32,6 +32,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <plotbufferpreviewer.h>
+#include <plotcomponent.h>
 #include "scopy-datalogger_export.h"
 
 namespace scopy {
@@ -41,12 +42,12 @@ namespace datamonitor {
 
 class MonitorPlotCurve;
 
-class SCOPY_DATALOGGER_EXPORT MonitorPlot : public QWidget
+class SCOPY_DATALOGGER_EXPORT MonitorPlot : public PlotComponent
 {
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	explicit MonitorPlot(QWidget *parent = nullptr);
+	explicit MonitorPlot(QString name, uint32_t uuid, QWidget *parent = nullptr);
 
 	PlotWidget *plot() const;
 	void addMonitor(DataMonitorModel *dataMonitorModel);
@@ -70,6 +71,9 @@ public:
 	void toggleBufferPreview(bool toggled);
 	void updateBufferPreviewer(double time);
 
+	PlotBufferPreviewer *bufferPreviewer() const;
+	void generateBufferPreviewer(AnalogBufferPreviewer *analogBufferPreviewer);
+
 Q_SIGNALS:
 	void monitorCurveAdded(PlotChannel *c);
 	void monitorCurveRemoved(PlotChannel *c);
@@ -87,7 +91,6 @@ private:
 	double m_currentCurveThickness = 1;
 	bool m_isRealTime = false;
 
-	void generateBufferPreviewer();
 	void setupXAxis();
 	void genereateScaleDraw(QString format, double offset);
 	QwtDateScaleEngine *scaleEngine;
