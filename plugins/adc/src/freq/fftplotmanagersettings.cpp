@@ -196,7 +196,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 		m_plotManager->updateAxisScales();
 	});
 
-	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 1, DBL_MAX, true, false, section);
+	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 10, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
 	InfoIconWidget::addHoveringInfoToWidget(
 		m_sampleRateSpin->label(),
