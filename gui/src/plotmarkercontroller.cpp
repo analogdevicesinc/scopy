@@ -314,7 +314,7 @@ void MarkerLabel::updateInfo(QList<PlotMarkerController::MarkerInfo> markers)
 {
 	m_txt->setText(m_name);
 	for(const auto &m : markers) {
-		m_txt->append(m.name + ": " + m_mpf->format(m.peak.y, "dB", 2) + " @ " +
+		m_txt->append(m.name + ": " + m_mpf->format(m.peak.y, "dBFS", 2) + " @ " +
 			      m_mpf->format(m.peak.x, "Hz", 3));
 	}
 }
