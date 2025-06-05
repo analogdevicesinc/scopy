@@ -73,6 +73,8 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 		for(auto p : m_plotManager->plots()) {
 			auto tpc = dynamic_cast<TimePlotComponent *>(p);
 			if(tpc) {
+				tpc->timePlotInfo()->setShowSPS(m_xModeCb->combo()->currentData().toInt() !=
+								XMODE_SAMPLES);
 				tpc->timePlotInfo()->update(s);
 			}
 		}
