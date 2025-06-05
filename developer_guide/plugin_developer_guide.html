@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Plugin Developer Guide &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=c218d0f6" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+    <script defer="" src="../_static/app.umd.js?v=8984ea49"></script>
+    <link rel="icon" href="../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Test Cases" href="../tests/index.html" />
+    <link rel="prev" title="Package Generator" href="package_generator.html" />
+   
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com"></a>
+        <div class="vertical-divider"></div>
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        <a id="logo" href="../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Plugin Developer Guide</a><ul>
+<li><a class="reference internal" href="#id2">1. <strong>Using Connection Provider</strong></a></li>
+<li><a class="reference internal" href="#id3">2. <strong>How Do We Determine When the Plugin Will Show (Compatibility Condition)</strong></a></li>
+<li><a class="reference internal" href="#id4">3. <strong>How to Filter Between Compatible Plugins</strong></a></li>
+<li><a class="reference internal" href="#id5">4. <strong>Setting Tool Icon and Title</strong></a></li>
+<li><a class="reference internal" href="#id6">5. <strong>How to Add Resources</strong></a></li>
+<li><a class="reference internal" href="#id7">6. <strong>How to Create / Edit Preferences for the Plugin</strong></a></li>
+<li><a class="reference internal" href="#id8">7. <strong>How to Add Compatible Plugins</strong></a></li>
+<li><a class="reference internal" href="#id9">8. <strong>Useful Tools</strong></a></li>
+<li><a class="reference internal" href="#id10">9. <strong>IIOWidgets</strong></a></li>
+<li><a class="reference internal" href="#id11">10. <strong>Menu UI Items</strong></a></li>
+<li><a class="reference internal" href="#id12">11. <strong>How to Create a Device Icon</strong></a></li>
+<li><a class="reference internal" href="#id13">12. <strong>How to Create a Tutorial for Your Plugin</strong></a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../index.html">
+      <img class="only-light" src="../_static/scopy.png"/>
+      <img class="only-dark" src="../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../plugins/ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../plugins/ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../plugins/ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../plugins/jesdstatus/index.html">JESD Status</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3" checked=""/><div class="collapse"><a class="reference internal" href="index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package_generator.html">Package Generator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+    <nav class="breadcrumb">
+        <ol>
+          <li><a href="index.html">Scopy developer guide</a></li>
+          </ol>
+    </nav>
+  </div>
+
+          <div class="body" role="main">
+            
+  <section id="plugin-developer-guide">
+<span id="id1"></span><h1>Plugin Developer Guide<a class="headerlink" href="#plugin-developer-guide" title="Link to this heading"></a></h1>
+<p>This guide provides a comprehensive walkthrough for developing plugins in Scopy.
+It covers every major aspect of plugin creation, from establishing device connections
+and determining plugin compatibility, to customizing user interfaces, managing resources,
+handling preferences, and integrating advanced features like IIOWidgets and interactive tutorials.
+Each chapter is designed to help both new and experienced developers build, configure,
+and enhance Scopy plugins efficiently and according to best practices.</p>
+<p>Chapters</p>
+<ul class="simple">
+<li><p><a class="reference external" href="#using-connection-provider">1. Using Connection Provider</a></p></li>
+<li><p><a class="reference external" href="#how-do-we-determine-when-the-plugin-will-show-compatibility-condition">2. How Do We Determine When the Plugin Will Show (Compatibility Condition)</a></p></li>
+<li><p><a class="reference external" href="#how-to-filter-between-compatible-plugins">3. How to Filter Between Compatible Plugins</a></p></li>
+<li><p><a class="reference external" href="#setting-tool-icon-and-title">4. Setting Tool Icon and Title</a></p></li>
+<li><p><a class="reference external" href="#how-to-add-resources">5. How to Add Resources</a></p></li>
+<li><p><a class="reference external" href="#how-to-create--edit-preferences-for-the-plugin">6. How to Create / Edit Preferences for the Plugin</a></p></li>
+<li><p><a class="reference external" href="#how-to-add-compatible-plugins">7. How to Add Compatible Plugins</a></p></li>
+<li><p><a class="reference external" href="#useful-tools">8. Useful Tools</a></p></li>
+<li><p><a class="reference external" href="#iiowidgets">9. IIOWidgets</a></p></li>
+<li><p><a class="reference external" href="#menu-ui-items">10. Menu UI Items</a></p></li>
+<li><p><a class="reference external" href="#how-to-create-a-device-icon">11. How to Create a Device Icon</a></p></li>
+<li><p><a class="reference external" href="#how-to-create-a-tutorial-for-your-plugin">12. How to Create a Tutorial for Your Plugin</a></p></li>
+</ul>
+<section id="id2">
+<h2>1. <strong>Using Connection Provider</strong><a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>Understand how to use the connection provider to interact with external
+systems or data sources.</p>
+<p>To access the device, we use the <cite>ConnectionProvider</cite> class. This class is
+available by adding:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iioutil/connectionprovider.h&gt;</span>
+</pre></div>
+</div>
+<p>To get a connection to the hardware in your plugin, you can use the following
+code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Connection</span><span class="w"> </span><span class="o">*</span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionProvider</span><span class="o">::</span><span class="n">open</span><span class="p">(</span><span class="n">m_param</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Here, <cite>m_param</cite> is provided by the plugin.</p>
+<p>Make sure to also close the connection every time you finish using it:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">ConnectionProvider</span><span class="o">::</span><span class="n">close</span><span class="p">(</span><span class="n">m_param</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>To be able to access the context from the connection, use the following code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">conn</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>2. <strong>How Do We Determine When the Plugin Will Show (Compatibility Condition)</strong><a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>To determine if the plugin you created will show as an option for a device,
+you need to create a compatibility condition. This is done inside the
+<cite>compatible</cite> function, depending on the restrictions of your plugin. Here,
+you should define a condition for when the plugin should show.</p>
+<p>For example, if we are trying to determine if a device has <cite>“ad9361-phy”</cite> as
+a device, we would use:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="n">Connection</span><span class="w"> </span><span class="o">*</span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConnectionProvider</span><span class="o">::</span><span class="n">open</span><span class="p">(</span><span class="n">m_param</span><span class="p">);</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">conn</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">qWarning</span><span class="p">(</span><span class="n">CAT_PLUTOPLUGIN</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;No context available &quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">iio_device</span><span class="w"> </span><span class="o">*</span><span class="n">plutoDevice</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iio_context_find_device</span><span class="p">(</span><span class="n">conn</span><span class="o">-&gt;</span><span class="n">context</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;ad9361-phy&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">plutoDevice</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">ConnectionProvider</span><span class="o">::</span><span class="n">close</span><span class="p">(</span><span class="n">m_param</span><span class="p">);</span>
+
+<span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This function checks if the device context contains <cite>“ad9361-phy”</cite>. If it
+does, the plugin will be marked as compatible and will show as an option for
+the device.</p>
+</section>
+<section id="id4">
+<h2>3. <strong>How to Filter Between Compatible Plugins</strong><a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>Inside the <cite>initMetadata()</cite> function, you can define specific metadata to
+filter and prioritize plugins. This metadata includes the following fields:</p>
+<ul>
+<li><p><strong>Priority</strong>: Determines the loading order of plugins. Plugins with higher
+priority values are loaded earlier. This is used to ensure that critical
+plugins are initialized first or in a specific order relative to other
+plugins.</p></li>
+<li><p><strong>Category</strong>: Specifies the categories to which the plugin belongs. This is
+used to classify the plugin and determine for which contexts or purposes
+the plugin should be considered.</p></li>
+<li><p><strong>Exclude</strong>: Determines which plugins should not show if this one is
+displayed. For example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;exclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This means only this plugin will show. Alternatively:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;exclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;datalogger&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This means all compatible plugins will show except the <cite>datalogger</cite> plugin.</p>
+<p>You can also use <cite>!</cite> in front of a plugin name in the <cite>exclude</cite> list to
+ensure it will show. For example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;exclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;!datalogger&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This means only your plugin and the <cite>datalogger</cite> plugin will show.</p>
+</li>
+</ul>
+<p>By setting these fields appropriately, you can control the visibility and
+priority of your plugin relative to others.</p>
+</section>
+<section id="id5">
+<h2>4. <strong>Setting Tool Icon and Title</strong><a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<p>To have your plugin’s tools appear in the left menu among others, you need to
+set a title and an icon for it. Since a plugin can have multiple tools, each
+tool needs to be considered during this process.</p>
+<p>Inside the <cite>loadToolList()</cite> function, for each tool, you need to add the
+following:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">m_toolList</span><span class="p">.</span><span class="n">append</span><span class="p">(</span>
+<span class="w">    </span><span class="n">SCOPY_NEW_TOOLMENUENTRY</span><span class="p">(</span><span class="n">TOOL_ID</span><span class="p">,</span><span class="w"> </span><span class="n">TOOL_DISPLAY_NAME</span><span class="p">,</span><span class="w"> </span><span class="n">TOOL_ICON</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Note that this will not create the tool itself, only the menu entry for your
+tool.</p>
+<p>To associate the menu entry with a tool, you need to create the tool and set
+it for the corresponding menu entry inside the <cite>onConnect()</cite> function. For
+example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">MyTool</span><span class="w"> </span><span class="o">*</span><span class="n">myTool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MyTool</span><span class="p">();</span>
+<span class="n">m_toolList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">setTool</span><span class="p">(</span><span class="n">myTool</span><span class="p">);</span>
+<span class="n">m_toolList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">setEnabled</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="n">m_toolList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">setRunBtnVisible</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This will:
+- Create the tool (<cite>MyTool</cite> in this example).
+- Associate it with the menu entry you defined at index <cite>0</cite>.
+- Enable the tool’s run button.
+- Ensure the tool menu action is enabled.</p>
+<p>By following these steps, you can ensure that your plugin’s tools are
+properly displayed and functional in the Scopy interface.</p>
+</section>
+<section id="id6">
+<h2>5. <strong>How to Add Resources</strong><a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>To add resource files to your plugin, you first need to place the file in the
+<cite>resources</cite> folder of your project. Then, in the same folder, locate the
+<cite>resources.qrc</cite> file and add the resource name to it.</p>
+<p>For example, let’s add <cite>test.svg</cite> to our project resources. The
+<cite>resources.qrc</cite> file would look like this:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;RCC&gt;</span>
+<span class="w">    </span><span class="nt">&lt;qresource</span><span class="w"> </span><span class="na">prefix=</span><span class="s">&quot;/myPlugin&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span><span class="nt">&lt;file&gt;</span>test.svg<span class="nt">&lt;/file&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/qresource&gt;</span>
+<span class="nt">&lt;/RCC&gt;</span>
+</pre></div>
+</div>
+<p>Now that we have added the file to our resources, we can use it in the plugin
+by referencing it as follows:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;;/myPlugin/test.svg&quot;</span>
+</pre></div>
+</div>
+<p>By following these steps, you can include and use additional resource files,
+such as images, or other assets, in your plugin.</p>
+</section>
+<section id="id7">
+<h2>6. <strong>How to Create / Edit Preferences for the Plugin</strong><a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<p>Plugin preferences are settings that retain their values between runs. These
+preferences are available before connecting to a device and are displayed in
+the bottom left corner of the application.</p>
+<p>To add preferences to your plugin, you need to include the following headers:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;pluginbase/preferences.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gui/preferenceshelper.h&gt;</span>
+</pre></div>
+</div>
+<p>Additionally, you need to implement the functions <cite>initPreferences()</cite> and
+<cite>loadPreferencesPage()</cite>.</p>
+<p>### Adding a Preference
+Let’s add a preference to our plugin to store the read interval value.</p>
+<p><strong>1. Initialize Preferences</strong></p>
+<p>Inside the <cite>initPreferences()</cite> function, you set the default values for your
+preferences. Each preference has a unique ID that starts with the plugin
+name. In our case, it will be <cite>myplugin_read_interval</cite>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">MyPlugin::initPreferences</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Preferences</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Preferences</span><span class="o">::</span><span class="n">GetInstance</span><span class="p">();</span>
+<span class="w">    </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">(</span><span class="s">&quot;myplugin_read_interval&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>2. Display Preferences in Scopy</strong></p>
+<p>To display the preference under Scopy Preferences, you need to implement the
+<cite>loadPreferencesPage()</cite> function. Inside this function, you create a
+<cite>QWidget</cite> that contains the preferences. You can use predefined macros for
+creating different types of preferences.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="nf">MyPlugin::loadPreferencesPage</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">Preferences</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Preferences</span><span class="o">::</span><span class="n">GetInstance</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">QWidget</span><span class="w"> </span><span class="o">*</span><span class="n">preferencesPage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">QWidget</span><span class="p">();</span>
+<span class="w">    </span><span class="n">QVBoxLayout</span><span class="w"> </span><span class="o">*</span><span class="n">lay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">preferencesPage</span><span class="p">);</span>
+<span class="w">    </span><span class="n">lay</span><span class="o">-&gt;</span><span class="n">addWidget</span><span class="p">(</span><span class="n">PREFERENCE_EDIT_VALIDATION</span><span class="p">(</span>
+<span class="w">        </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;myplugin_read_interval&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Read interval (seconds)&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&quot;Select the time interval, in seconds, for data polling in the instrument.&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="p">[](</span><span class="k">const</span><span class="w"> </span><span class="n">QString</span><span class="w"> </span><span class="o">&amp;</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Check if input is a positive integer</span>
+<span class="w">            </span><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="p">;</span>
+<span class="w">            </span><span class="k">auto</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">text</span><span class="p">.</span><span class="n">toInt</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ok</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="n">preferencesPage</span><span class="p">));</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>### Available Preference Macros
+The following macros are available for creating preferences:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#define PREFERENCE_CHECK_BOX(p, id, title, description, parent) \</span>
+<span class="cp">    PreferencesHelper::addPreferenceCheckBox(p, id, title, description, parent)</span>
+
+<span class="cp">#define PREFERENCE_EDIT(p, id, title, description, parent) \</span>
+<span class="cp">    PreferencesHelper::addPreferenceEdit(p, id, title, description, parent)</span>
+
+<span class="cp">#define PREFERENCE_EDIT_VALIDATION(p, id, title, description, validator, parent) \</span>
+<span class="cp">    PreferencesHelper::addPreferenceEditValidation(p, id, title, description, validator, parent)</span>
+
+<span class="cp">#define PREFERENCE_COMBO(p, id, title, description, options, parent) \</span>
+<span class="cp">    PreferencesHelper::addPreferenceCombo(p, id, title, description, options, parent)</span>
+
+<span class="cp">#define PREFERENCE_COMBO_LIST(p, id, title, description, options, parent) \</span>
+<span class="cp">    PreferencesHelper::addPreferenceComboList(p, id, title, description, options, parent)</span>
+</pre></div>
+</div>
+<p>### Accessing Preferences
+You can access and use preferences in your code. For example, to access a
+preference called <cite>myplugin_test</cite>, you can do the following:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Preferences</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Preferences</span><span class="o">::</span><span class="n">GetInstance</span><span class="p">();</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">testPreference</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="o">-&gt;</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;myplugin_test&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>### Reacting to Preference Changes
+If you want to update your code when the value of a preference changes, you
+can use the <cite>preferenceChanged</cite> signal from the <cite>Preferences</cite> class.</p>
+</section>
+<section id="id8">
+<h2>7. <strong>How to Add Compatible Plugins</strong><a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<p>If you want to use parts of other plugins in your plugin, you first need to
+modify your plugin’s <cite>CMakeLists.txt</cite> file.</p>
+<p>### Adding a Library to Your Plugin</p>
+<p>Under the <cite>target_link_libraries</cite> section of your <cite>CMakeLists.txt</cite>, add the
+library you want to use. For example, if you want to add access to elements
+from <cite>scopy-test</cite> to your plugin, the code will look like this:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">target_link_libraries</span><span class="p">(</span>
+<span class="w">    </span><span class="o">${</span><span class="nv">PROJECT_NAME</span><span class="o">}</span>
+<span class="w">    </span><span class="s">PUBLIC</span><span class="w"> </span><span class="s">Qt::Widgets</span>
+<span class="w">           </span><span class="s">Qt::Core</span>
+<span class="w">           </span><span class="s">scopy-pluginbase</span>
+<span class="w">           </span><span class="s">scopy-gui</span>
+<span class="w">           </span><span class="s">scopy-iioutil</span>
+<span class="w">           </span><span class="s">scopy-iio-widgets</span>
+<span class="w">           </span><span class="s">scopy-test</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>By adding the desired library to the <cite>target_link_libraries</cite> section, you
+can access its functionality in your plugin.</p>
+<p>Ensure that the library you are linking is available and properly configured
+in your Scopy environment.</p>
+</section>
+<section id="id9">
+<h2>8. <strong>Useful Tools</strong><a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<p>We have a couple of tools designed to make some of your work easier. Among
+these tools are a script for code formatting and a script for license
+headers. It is recommended that, before making a pull request, you run these
+two scripts.</p>
+<p>### License Header Script</p>
+<p>This script should be run when creating new files to ensure they include the
+appropriate license headers. To run it, use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./tools/license.sh
+</pre></div>
+</div>
+<p>### Formatting Script</p>
+<p>The formatting script ensures that your code follows our coding guidelines.
+To run it, use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./tools/format.sh
+</pre></div>
+</div>
+</section>
+<section id="id10">
+<h2>9. <strong>IIOWidgets</strong><a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<p><cite>IIOWidgets</cite> are modular UI components in Scopy designed to facilitate
+interaction with IIO (Industrial I/O) devices. They provide a graphical
+interface for displaying and managing data from these devices, making it
+easier for users to interact with hardware.</p>
+<p><strong>Key Features of IIOWidgets</strong></p>
+<ul class="simple">
+<li><p><strong>Data Interaction</strong>:
+<cite>IIOWidgets</cite> use data strategies (<cite>DataStrategyInterface</cite>) to handle
+reading and writing data from IIO devices. They support asynchronous
+operations such as <cite>readAsync()</cite> and <cite>writeAsync()</cite> to ensure smooth data
+handling without blocking the UI.</p></li>
+<li><p><strong>UI Customization</strong>:
+<cite>IIOWidgets</cite> use UI strategies (<cite>GuiStrategyInterface</cite>) to define their
+appearance and behavior. This allows developers to create widgets that are
+tailored to specific use cases or device requirements.</p></li>
+<li><p><strong>Integration with Scopy</strong>:
+<cite>IIOWidgets</cite> are seamlessly integrated into the Scopy application,
+allowing them to be used alongside other tools and plugins. They can be
+added to the interface using the <cite>IIOWidgetBuilder</cite>.</p></li>
+<li><p><strong>Progress and Status Indicators</strong>:
+Many <cite>IIOWidgets</cite> include built-in progress bars and status indicators to
+provide real-time feedback to users during operations.</p></li>
+<li><p><strong>Resource Management</strong>:
+Developers can customize <cite>IIOWidgets</cite> with titles, attributes, and other
+parameters using the <cite>IIOWidgetBuilder</cite>. This ensures that widgets are
+properly configured for their intended purpose.</p></li>
+</ul>
+<p><strong>Creating an IIOWidget</strong></p>
+<p>Below are two examples of creating <cite>IIOWidgets</cite> using the <cite>IIOWidgetBuilder</cite>:</p>
+<p><strong>1. Creating a Single IIOWidget for a Specific Device Attribute</strong></p>
+<p>To create a single <cite>IIOWidget</cite> for a specific device attribute, you can use
+the following code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">IIOWidget</span><span class="w"> </span><span class="o">*</span><span class="n">attributeWidget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IIOWidgetBuilder</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+<span class="w">                             </span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="n">myDevice</span><span class="p">)</span>
+<span class="w">                             </span><span class="p">.</span><span class="n">attribute</span><span class="p">(</span><span class="s">&quot;specific_attribute_name&quot;</span><span class="p">)</span>
+<span class="w">                             </span><span class="p">.</span><span class="n">uiStrategy</span><span class="p">(</span><span class="n">IIOWidgetBuilder</span><span class="o">::</span><span class="n">RangeUi</span><span class="p">)</span>
+<span class="w">                             </span><span class="p">.</span><span class="n">infoMessage</span><span class="p">(</span><span class="s">&quot;This is an informational message&quot;</span><span class="p">)</span>
+<span class="w">                             </span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;Attribute Title&quot;</span><span class="p">)</span>
+<span class="w">                             </span><span class="p">.</span><span class="n">buildSingle</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>In this example:
+- <cite>device()</cite> specifies the device to which the widget is linked.
+- <cite>attribute()</cite> specifies the attribute of the device to be controlled or displayed.
+- <cite>uiStrategy()</cite> defines the UI strategy for the widget (e.g., <cite>RangeUi</cite>).
+- <cite>infoMessage()</cite> adds an informational message for the widget.
+- <cite>title()</cite> sets the title of the widget.
+- <cite>buildSingle()</cite> creates the widget.</p>
+<p><strong>2. Creating All IIOWidgets for a Channel of a Device</strong></p>
+<p>To create all <cite>IIOWidgets</cite> for a specific channel of a device, you can use
+the following code:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">QList</span><span class="o">&lt;</span><span class="n">IIOWidget</span><span class="w"> </span><span class="o">*&gt;</span><span class="w"> </span><span class="n">channelWidgets</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">IIOWidgetBuilder</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">channel</span><span class="p">(</span><span class="n">myChannel</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">buildAll</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>In this example:
+- <cite>channel()</cite> specifies the channel of the device for which widgets are created.
+- <cite>buildAll()</cite> automatically creates widgets for all attributes of the specified channel.</p>
+<p><strong>UI Strategy Assignment</strong></p>
+<ul class="simple">
+<li><p>When using <cite>buildAll()</cite>, the UI strategy for each widget is assigned
+automatically based on the attribute type and metadata.</p></li>
+<li><p>When using <cite>buildSingle()</cite>, you can manually specify the UI strategy using
+the <cite>uiStrategy()</cite> method.</p></li>
+</ul>
+<p>By leveraging these methods, developers can create both individual and
+grouped <cite>IIOWidgets</cite> to suit their specific use cases.</p>
+<p><strong>Benefits of Using IIOWidgets</strong></p>
+<ul class="simple">
+<li><p>Simplifies the development of user interfaces for IIO devices.</p></li>
+<li><p>Provides a consistent look and feel across different plugins.</p></li>
+<li><p>Reduces the amount of boilerplate code needed to create UI components.</p></li>
+<li><p>Supports advanced features like asynchronous data handling and progress
+indicators.</p></li>
+</ul>
+<p>By leveraging <cite>IIOWidgets</cite>, developers can create powerful and user-friendly
+interfaces for interacting with IIO devices in Scopy.</p>
+</section>
+<section id="id11">
+<h2>10. <strong>Menu UI Items</strong><a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p>Scopy provides a variety of <cite>Menu</cite> UI components to help developers build
+menus, settings panels, and other hierarchical UI structures. For details on
+available menu components and their usage, please refer to the relevant
+documentation or code examples.</p>
+</section>
+<section id="id12">
+<h2>11. <strong>How to Create a Device Icon</strong><a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<p>To create a custom device icon for your plugin, you can use the
+<cite>DeviceIconBuilder</cite> class. This allows you to combine images and labels to
+create a visually distinctive icon for your device in the Scopy interface.</p>
+<p>Below is a generic example of how to implement a device icon in your plugin:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="nf">PlutoPlugin::loadIcon</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">QLabel</span><span class="w"> </span><span class="o">*</span><span class="n">logo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">QLabel</span><span class="p">();</span>
+<span class="w">    </span><span class="n">QPixmap</span><span class="w"> </span><span class="n">pixmap</span><span class="p">(</span><span class="s">&quot;:/gui/icons/scopy-default/icons/logo_analog.svg&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">pixmapHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">;</span>
+<span class="w">    </span><span class="n">pixmap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pixmap</span><span class="p">.</span><span class="n">scaledToHeight</span><span class="p">(</span><span class="n">pixmapHeight</span><span class="p">,</span><span class="w"> </span><span class="n">Qt</span><span class="o">::</span><span class="n">SmoothTransformation</span><span class="p">);</span>
+<span class="w">    </span><span class="n">logo</span><span class="o">-&gt;</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">pixmap</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">QLabel</span><span class="w"> </span><span class="o">*</span><span class="n">footer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">QLabel</span><span class="p">(</span><span class="s">&quot;DEVICE_NAME&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">Style</span><span class="o">::</span><span class="n">setStyle</span><span class="p">(</span><span class="n">footer</span><span class="p">,</span><span class="w"> </span><span class="n">style</span><span class="o">::</span><span class="n">properties</span><span class="o">::</span><span class="n">label</span><span class="o">::</span><span class="n">deviceIcon</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">m_icon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceIconBuilder</span><span class="p">().</span><span class="n">shape</span><span class="p">(</span><span class="n">DeviceIconBuilder</span><span class="o">::</span><span class="n">SQUARE</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">headerWidget</span><span class="p">(</span><span class="n">logo</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">footerWidget</span><span class="p">(</span><span class="n">footer</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">build</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this example:
+- A <cite>QLabel</cite> is used to display the device logo, loaded from a resource file and scaled to the desired height.
+- Another <cite>QLabel</cite> is used as a footer to display a device name or model.
+- The <cite>DeviceIconBuilder</cite> is used to assemble the icon, specifying the shape, header, and footer widgets.
+- The resulting icon is assigned to <cite>m_icon</cite>.</p>
+<p>You can customize the icon by changing the image, label text, or shape as
+needed for your device.</p>
+</section>
+<section id="id13">
+<h2>12. <strong>How to Create a Tutorial for Your Plugin</strong><a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<p>Scopy supports interactive tutorials for plugins, allowing you to guide users
+through your tool’s features step by step. Tutorials are defined using JSON
+files and integrated into the GUI using the tutorial overlay system.</p>
+<p><strong>Step 1: Create a Tutorial Chapters JSON File</strong></p>
+<p>In your plugin’s <code class="docutils literal notranslate"><span class="pre">res</span></code> or <code class="docutils literal notranslate"><span class="pre">resources</span></code> folder, create a file named
+<code class="docutils literal notranslate"><span class="pre">tutorial_chapters.json</span></code>. Each tutorial consists of one or more chapters,
+each describing a UI element and its purpose.</p>
+<p>Example structure:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;mytool&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;names&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;RUN_BUTTON&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Click to start the tool.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;anchor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HP_BOTTOM&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HP_BOTTOM&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;y_offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;names&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;SETTINGS_BUTTON&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Open the settings for more options.&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;anchor&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HP_BOTTOM&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HP_BOTTOM&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;y_offset&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">names</span></code>: List of widget object names to highlight.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code>: Text shown to the user.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">anchor</span></code>/<code class="docutils literal notranslate"><span class="pre">content</span></code>: Positioning for the overlay (e.g., <code class="docutils literal notranslate"><span class="pre">HP_BOTTOM</span></code>,
+<code class="docutils literal notranslate"><span class="pre">HP_TOP</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">y_offset</span></code>, <code class="docutils literal notranslate"><span class="pre">x_offset</span></code>: Optional, for fine-tuning overlay position.</p></li>
+</ul>
+<p><strong>Step 2: Reference the Tutorial in Your Plugin</strong></p>
+<p>Ensure your plugin loads the tutorial chapters file and connects it to the
+tool’s UI. The Scopy GUI uses classes like <code class="docutils literal notranslate"><span class="pre">TutorialOverlay</span></code> and
+<code class="docutils literal notranslate"><span class="pre">TutorialChapter</span></code> to display these steps.</p>
+<p><strong>Step 3: Use the Tutorial Overlay in Code</strong></p>
+<p>In your tool’s code, you can trigger the tutorial overlay, for example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;gui/tutorialoverlay.h&gt;</span>
+<span class="c1">// ...existing code...</span>
+<span class="n">TutorialOverlay</span><span class="w"> </span><span class="o">*</span><span class="n">tutorial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TutorialOverlay</span><span class="p">(</span><span class="n">parentWidget</span><span class="p">);</span>
+<span class="n">tutorial</span><span class="o">-&gt;</span><span class="n">addChapter</span><span class="p">({</span><span class="n">runButton</span><span class="p">},</span>
+<span class="w">    </span><span class="s">&quot;Click to start the tool.&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">parentWidget</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+<span class="w">    </span><span class="n">HoverPosition</span><span class="o">::</span><span class="n">HP_BOTTOM</span><span class="p">,</span><span class="w"> </span><span class="n">HoverPosition</span><span class="o">::</span><span class="n">HP_BOTTOM</span><span class="p">);</span>
+<span class="c1">// Add more chapters as needed</span>
+<span class="n">tutorial</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Or, if your plugin is already set up for tutorials, simply ensure the JSON
+file is present and correctly formatted.</p>
+<p><strong>Step 4: Test Your Tutorial</strong></p>
+<p>Build and run Scopy, open your plugin, and start the tutorial. The overlay
+should highlight the specified widgets and display your descriptions.</p>
+<p><strong>Tips:</strong></p>
+<ul class="simple">
+<li><p>Use meaningful widget names in your UI code so they match the <code class="docutils literal notranslate"><span class="pre">names</span></code> in
+the JSON.</p></li>
+<li><p>You can localize or update descriptions easily by editing the JSON file.</p></li>
+<li><p>See other plugins’ <code class="docutils literal notranslate"><span class="pre">tutorial_chapters.json</span></code> for more examples.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
+<p>By following these chapters, you will gain a comprehensive understanding of how to create,
+customize, and deploy plugins in Scopy.</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="package_generator.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">Package Generator</a>
+    <a href="../tests/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Test Cases</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
