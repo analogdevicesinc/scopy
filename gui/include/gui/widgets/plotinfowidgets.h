@@ -52,12 +52,14 @@ class SCOPY_GUI_EXPORT TimeSamplingInfo : public QLabel
 public:
 	TimeSamplingInfo(QWidget *parent = nullptr);
 	virtual ~TimeSamplingInfo();
+	void setShowSPS(bool show);
 
 public Q_SLOTS:
 	void update(SamplingInfo info);
 
 private:
 	MetricPrefixFormatter *m_mpf;
+	bool m_showSPS; // samples per second
 };
 
 class SCOPY_GUI_EXPORT FFTSamplingInfo : public QLabel
@@ -66,12 +68,14 @@ class SCOPY_GUI_EXPORT FFTSamplingInfo : public QLabel
 public:
 	FFTSamplingInfo(QWidget *parent = nullptr);
 	virtual ~FFTSamplingInfo();
+	void setShowSPS(bool show);
 
 public Q_SLOTS:
 	void update(SamplingInfo info);
 
 private:
 	MetricPrefixFormatter *m_mpf;
+	bool m_showSPS; // samples per second
 };
 
 class SCOPY_GUI_EXPORT FPSInfo : public QLabel

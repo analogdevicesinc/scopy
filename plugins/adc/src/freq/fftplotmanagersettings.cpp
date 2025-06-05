@@ -78,6 +78,8 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 		for(auto p : m_plotManager->plots()) {
 			auto tpc = dynamic_cast<FFTPlotComponent *>(p);
 			if(tpc) {
+				tpc->fftPlotInfo()->setShowSPS(m_xModeCb->combo()->currentData().toInt() !=
+							       XMODE_SAMPLES);
 				tpc->fftPlotInfo()->update(s);
 			}
 		}
@@ -147,7 +149,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_xmin->setUnit("samples");
 			m_xmax->setUnit("samples");
 			m_plotManager->setXUnit("samples");
-			m_sampleRateSpin->setValue(1);
+			m_sampleRateSpin->setValue(m_samplingInfo.bufferSize);
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<FFTPlotComponent *>(plt);
 				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("");

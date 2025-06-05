@@ -76,11 +76,6 @@ void time_sink_f_impl::generate_time_axis()
 	}
 
 	double __sampleRate = m_sampleRate;
-	if(m_sampleRate == 1) {
-		// if sample rate is 1 (sample mode) use resolution bandwidth of 1
-		// this is a hack - a separate mode should be created
-		__sampleRate = m_size;
-	}
 	double freqoffset = m_freqOffset;
 	double rbw = __sampleRate / m_size;
 	;

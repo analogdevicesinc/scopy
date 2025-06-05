@@ -74,6 +74,7 @@ void HDivInfo::update(double val, bool zoomed)
 
 TimeSamplingInfo::TimeSamplingInfo(QWidget *parent)
 	: m_mpf(new MetricPrefixFormatter(this))
+	, m_showSPS(true)
 {
 	m_mpf->setTrimZeroes(true);
 	m_mpf->setTwoDecimalMode(false);
@@ -81,13 +82,14 @@ TimeSamplingInfo::TimeSamplingInfo(QWidget *parent)
 
 TimeSamplingInfo::~TimeSamplingInfo() {}
 
+void TimeSamplingInfo::setShowSPS(bool show) { m_showSPS = show; }
+
 void TimeSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
 	text = QString("%1 samples").arg(QString::number(info.plotSize));
-	//.arg(m_mpf->format(binfo.bufferSizes, "samples", 2));
-	//	if(info.sampleRate != 1.0)
-	if(info.sampleRate != 1) {
+
+	if(m_showSPS) {
 		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 2));
 	}
 
@@ -103,11 +105,13 @@ FFTSamplingInfo::FFTSamplingInfo(QWidget *parent)
 
 FFTSamplingInfo::~FFTSamplingInfo() {}
 
+void FFTSamplingInfo::setShowSPS(bool show) { m_showSPS = show; }
+
 void FFTSamplingInfo::update(SamplingInfo info)
 {
 	QString text;
 	text = QString("%1").arg(m_mpf->format(info.plotSize, "samples", 3));
-	if(info.sampleRate != 1) {
+	if(m_showSPS) {
 		text += QString(" at %2").arg(m_mpf->format(info.sampleRate, "sps", 3));
 	}
 	if(info.freqOffset != 0) {
