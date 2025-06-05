@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
 	CrashReport::initSignalHandler();
 
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
+	QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 	QApplication a(argc, argv);
