@@ -51,6 +51,7 @@
 #include <QFont>
 #include <qwt_legend.h>
 #include <qwt_scale_draw.h>
+#include <style.h>
 
 #include <cmath>
 #include <iostream>
@@ -83,6 +84,11 @@ protected:
 		QPointF dp = QwtPlotZoomer::invTransform(p);
 		const TimeDomainDisplayPlot *plt = (const TimeDomainDisplayPlot *)plot();
 		t.setText(plt->timeScaleValueFormat(dp.x(), 3) + "," + plt->yAxisScaleValueFormat(dp.y(), 3));
+
+		QFont font = QFont();
+		font.setPixelSize(Style::getDimension(json::global::font_size));
+		t.setFont(font);
+
 		return t;
 	}
 };

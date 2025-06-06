@@ -26,6 +26,7 @@
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
 #include <style.h>
+#include <pluginbase/preferences.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -70,8 +71,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->fftPlot()->yAxis(), this);
 	m_yCtrl->minSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
 	m_yCtrl->maxSpinbox()->setIncrementMode(MenuSpinbox::IS_FIXED);
-	m_yCtrl->minSpinbox()->setUnit("dB");
-	m_yCtrl->maxSpinbox()->setUnit("dB");
+	m_yCtrl->minSpinbox()->setUnit("dBFS");
+	m_yCtrl->maxSpinbox()->setUnit("dBFS");
 	m_yCtrl->minSpinbox()->setMinValue(-1000);
 	m_yCtrl->maxSpinbox()->setMinValue(-1000);
 	m_yCtrl->minSpinbox()->setMaxValue(1000);
@@ -91,15 +92,18 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		toggleAutoScale();
 	});
 
-	m_plotComponent->fftPlot()->yAxis()->setUnits("dB");
+	m_plotComponent->fftPlot()->yAxis()->setUnits("dBFS");
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
-	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dB", -300, 300, true, false, yaxis);
+	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dBFS", -300, 300, true, false, yaxis);
+	InfoIconWidget::addHoveringInfoToWidget(m_yPwrOffset->label(),
+						"Offsets all channels' Y axis by set a amout units", m_yPwrOffset);
 	m_yPwrOffset->setScaleRange(1, 1);
 	m_yPwrOffset->setIncrementMode(MenuSpinbox::IS_FIXED);
 
 	m_windowCb = new MenuCombo("Window", yaxis);
+	InfoIconWidget::addHoveringInfoToWidget(m_windowCb->label(), "Set applied FFT window function", m_windowCb);
 
 	m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
 	m_windowCb->combo()->addItem("Hanning", gr::fft::window::WIN_HANNING);
@@ -160,8 +164,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_autoscaleBtn->onOffswitch()->setChecked(false);
 	m_yCtrl->setMin(-140);
 	m_yCtrl->setMax(20);
-	labelsSwitch->onOffswitch()->setChecked(true);
-	labelsSwitch->onOffswitch()->setChecked(false);
+	labelsSwitch->onOffswitch()->setChecked(Preferences::get("adc_plot_labels").toBool());
 
 	m_deletePlotHover = new QPushButton("", nullptr);
 	m_deletePlotHover->setMaximumSize(16, 16);

@@ -40,7 +40,7 @@ FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotCo
 	m_markerController = new FFTMarkerController(this, this);
 	initPlotComponent(plotComponent);
 
-	m_fftPlotYAxis->setUnits("dB");
+	m_fftPlotYAxis->setUnits("dBFS");
 	m_fftPlotCh->xAxis()->setUnits("samples");
 	m_fftPlotYAxis->setInterval(-2048, 2048);
 
@@ -77,7 +77,7 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	int yPlotAxisPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
 	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
 	m_fftPlotYAxis = new PlotAxis(yPlotAxisPosition, fftplot, m_ch->pen(), this);
-	m_fftPlotYAxis->setUnits("dB");
+	m_fftPlotYAxis->setUnits("dBFS");
 
 	m_fftPlotCh = new PlotChannel(m_ch->name(), m_ch->pen(), fftplot->xAxis(), m_fftPlotYAxis, this);
 	m_fftPlotAxisHandle = new PlotAxisHandle(fftplot, m_fftPlotYAxis);

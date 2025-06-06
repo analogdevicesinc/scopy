@@ -377,6 +377,8 @@ double MenuSpinbox::clamp(double val, double min, double max)
 
 QString MenuSpinbox::name() const { return m_name; }
 
+QLabel *MenuSpinbox::label() const { return m_label; }
+
 void MenuSpinbox::setName(const QString &newName)
 {
 	if(m_name == newName)

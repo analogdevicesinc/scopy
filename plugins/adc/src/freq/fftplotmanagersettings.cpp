@@ -107,7 +107,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("X-AXIS", MenuCollapseSection::MHCW_NONE,
 									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 0, 4000000, true, false, section);
+	m_bufferSizeSpin = new MenuSpinbox("FFT Size", 16, "samples", 0, 4000000, true, false, section);
 	m_bufferSizeSpin->setScaleRange(1, 1e6);
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setBufferSize((uint32_t)val); });
 
@@ -131,7 +131,9 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xMinMaxLayout->addWidget(m_xmin);
 	xMinMaxLayout->addWidget(m_xmax);
 
-	m_xModeCb = new MenuCombo("XMode", section);
+	m_xModeCb = new MenuCombo("XMODE", section);
+	InfoIconWidget::addHoveringInfoToWidget(m_xModeCb->label(),
+						"Set X axis scaling mode\nThis does not affect the data", m_xModeCb);
 	auto xcb = m_xModeCb->combo();
 
 	xcb->addItem("Samples", XMODE_SAMPLES);
@@ -179,6 +181,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 			m_plotManager->setXUnit("Hz");
 			m_sampleRateSpin->setVisible(true);
 			m_sampleRateSpin->setEnabled(true);
+			m_sampleRateSpin->setValue(readSampleRate());
 			m_freqOffsetSpin->setVisible(true);
 			m_freqOffsetSpin->setEnabled(true);
 			for(PlotComponent *plt : m_plotManager->plots()) {
@@ -189,17 +192,24 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
 			}
 		}
+		updateXAxis();
 		m_plotManager->updateAxisScales();
 	});
 
-	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 0, DBL_MAX, true, false, section);
+	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 10, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
+	InfoIconWidget::addHoveringInfoToWidget(
+		m_sampleRateSpin->label(),
+		"Controls how the X-axis is scaled when in Time XMode\nThis only affects the x scale, not the data",
+		section);
 
 	m_sampleRateSpin->setValue(10);
 	m_sampleRateSpin->setEnabled(false);
 	connect(m_sampleRateSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setSampleRate(val); });
 
 	m_freqOffsetSpin = new MenuSpinbox("Frequency Offset", 1, "Hz", 0, DBL_MAX, true, false, section);
+	InfoIconWidget::addHoveringInfoToWidget(m_freqOffsetSpin->label(),
+						"Offsets all channels' X axis by set amout of Hz", m_freqOffsetSpin);
 	m_freqOffsetSpin->setIncrementMode(MenuSpinbox::IS_125);
 
 	m_freqOffsetSpin->setValue(0);
@@ -245,6 +255,8 @@ void FFTPlotManagerSettings::updateXAxis()
 
 	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
 		max = m_samplingInfo.sampleRate;
+	} else if(cb->itemData(cb->currentIndex()) == XMODE_OVERRIDE) {
+		max = m_sampleRateSpin->value();
 	} else {
 		max = m_samplingInfo.bufferSize;
 	}
@@ -269,7 +281,7 @@ void FFTPlotManagerSettings::onStart()
 	QComboBox *cb = m_xModeCb->combo();
 
 	if(cb->itemData(cb->currentIndex()) == XMODE_TIME) {
-		double sr = readSampleRate();
+		double sr = m_sampleRateSpin->value();
 		setSampleRate(sr);
 	}
 

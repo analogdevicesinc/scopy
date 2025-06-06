@@ -778,11 +778,12 @@ SpectralMeasure::SpectralMeasure(const float *buffer, size_t length)
 	: MeasureModel(buffer, length)
 {
 	// Spectral Measurements
-	m_measurements.push_back(std::make_shared<MeasurementData>("Noise_Floor", MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("SINAD", MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("SNR", MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("THD", MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("THDN", MeasurementData::HORIZONTAL_F, "dB"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>("Noise_Floor", MeasurementData::HORIZONTAL_F, "dBFS"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("SINAD", MeasurementData::HORIZONTAL_F, "dBFS"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("SNR", MeasurementData::HORIZONTAL_F, "dBFS"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("THD", MeasurementData::HORIZONTAL_F, "dBFS"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("THDN", MeasurementData::HORIZONTAL_F, "dBFS"));
 	m_measurements.push_back(std::make_shared<MeasurementData>("SFDR", MeasurementData::VERTICAL_F, "dBc"));
 }
 

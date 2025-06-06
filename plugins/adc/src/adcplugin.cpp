@@ -83,6 +83,7 @@ void ADCPlugin::initPreferences()
 	p->init("adc_plot_xcursor_position", HandlePos::SOUTH_OR_EAST);
 	p->init("adc_plot_ycursor_position", HandlePos::NORTH_OR_WEST);
 	p->init("adc_default_y_mode", 0);
+	p->init("adc_plot_labels", true);
 	p->init("adc_add_remove_plot", false);
 	p->init("adc_add_remove_instrument", false);
 	p->init("adc_acquisition_timeout", 10000);
@@ -160,6 +161,11 @@ bool ADCPlugin::loadPreferencesPage()
 			return ok && value >= 0;
 		},
 		m_preferencesPage);
+	auto adc_plot_labels =
+		PREFERENCE_CHECK_BOX(p, "adc_plot_labels", "Default state for plot labels",
+				     "Sets plot labels to be visible/hidden by default. Plot labels may be "
+				     "enabled/disabled within the ADC plot settings, overwriting this setting ",
+				     m_preferencesPage);
 	auto adc_add_remove_plot =
 		PREFERENCE_CHECK_BOX(p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)",
 				     "Experimental feature allowing the user to create multiple time or frequency plots"
@@ -180,6 +186,7 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->addWidget(adc_plot_ycursor_position);
 	generalSection->contentLayout()->addWidget(adc_default_y_mode);
 	generalSection->contentLayout()->addWidget(adc_acquisition_timeout);
+	generalSection->contentLayout()->addWidget(adc_plot_labels);
 	generalSection->contentLayout()->addWidget(adc_add_remove_plot);
 	generalSection->contentLayout()->addWidget(adc_add_remove_instrument);
 

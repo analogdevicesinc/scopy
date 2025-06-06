@@ -23,6 +23,7 @@
 #include "DisplayPlot.h"
 
 #include <QString>
+#include <style.h>
 
 using namespace scopy;
 
@@ -56,7 +57,12 @@ QwtText OscScaleZoomer::trackerText(const QPoint &pos) const
 	text += ", ";
 	text += draw_y->label(dp.y()).text();
 
-	return QwtText(text);
+	QwtText qwtText = QwtText(text);
+	QFont font = QFont();
+	font.setPixelSize(Style::getDimension(json::global::font_size));
+	qwtText.setFont(font);
+
+	return qwtText;
 }
 
 void OscScaleZoomer::cancel() { reset(); }
