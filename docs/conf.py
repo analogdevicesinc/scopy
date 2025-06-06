@@ -1,6 +1,14 @@
 # -- Import setup -------------------------------------------------------------
 
+import sys
 from os import path
+
+# -- Directive path setup ------------------------------------------------------
+sys.path.insert(0, path.abspath('_ext'))
+
+def setup(app):
+    from directives import setup as directives_setup
+    directives_setup(app)
 
 # -- Project information ------------------------------------------------------
 
