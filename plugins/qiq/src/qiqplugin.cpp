@@ -2,6 +2,7 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
+#include <provider.h>
 
 #include "plotting.h"
 
@@ -58,7 +59,9 @@ bool QIQPlugin::loadIcon()
 void QIQPlugin::loadToolList()
 {
 	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("plotting", "Plotting", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+		SCOPY_NEW_TOOLMENUENTRY("plotting", "Consumer test", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("provider", "Provider test", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 }
 
 void QIQPlugin::unload()
@@ -77,6 +80,11 @@ bool QIQPlugin::onConnect()
 	m_toolList[0]->setTool(plotting);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
+
+	Provider *provider = new Provider();
+	m_toolList[1]->setTool(provider);
+	m_toolList[1]->setEnabled(true);
+	m_toolList[1]->setRunBtnVisible(true);
 	return true;
 }
 

@@ -36,10 +36,11 @@ if(ENABLE_TESTING)
 endif() 
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST}) 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core) 
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
+find_package(libm2k REQUIRED)
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc) 
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}) 
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header( 
     ${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h 
@@ -59,6 +60,7 @@ target_link_libraries(
     ${PROJECT_NAME} 
     PUBLIC Qt::Widgets 
         Qt::Core 
+        libm2k::libm2k
         scopy-pluginbase 
         scopy-gui 
         scopy-iioutil 
