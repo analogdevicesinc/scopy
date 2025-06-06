@@ -30,6 +30,14 @@ jobs:
           echo "new_tag=0" >> "$GITHUB_ENV"
         fi
 
+    - name: Set TEST_RESULTS_GENERATION if PR branch starts with testsing_v
+      if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'testsing_v')
+      run: echo "TEST_RESULTS_GENERATION=true" >> $GITHUB_ENV
+
+    - name: Set TEST_RESULTS_GENERATION default
+      if: ${{ ! (github.event_name == 'pull_request' && startsWith(github.head_ref, 'testsing_v')) }}
+      run: echo "TEST_RESULTS_GENERATION=false" >> $GITHUB_ENV
+
     - name: Install pip packages
       working-directory: docs
       run: |
@@ -123,3 +131,47 @@ jobs:
         git add . >> /dev/null
         git commit -m "deploy: ${GITHUB_SHA}" --allow-empty
         git push origin gh-pages:gh-pages
+
+    - name: Check test_report.rst and get last release tag
+      id: get_last_release_tag
+      run: |
+        if [ "$(cat docs/test_report.rst)" != "no build done" ]; then
+          git fetch --tags
+          last_tag=$(git tag --list 'v*.*.*' --sort=-v:refname | head -n 1)
+          echo "last_release_tag=$last_tag" >> $GITHUB_OUTPUT
+        else
+          echo "last_release_tag=" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build doc (default, if no build done)
+      if: steps.get_last_release_tag.outputs.last_release_tag == ''
+      working-directory: docs
+      run: |
+        python3 extract_macros.py ../ user_guide/preferences_table.rst
+        export ADOC_DOC_VERSION=${{ github.ref_name }}
+        make html SPHINXOPTS='-W --keep-going'
+
+    - name: Store the generated doc (default)
+      if: steps.get_last_release_tag.outputs.last_release_tag == ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: html
+        path: docs/_build/html
+
+    - name: Build docs for last release tag (if build is needed for tag)
+      if: steps.get_last_release_tag.outputs.last_release_tag != ''
+      run: |
+        git fetch --tags
+        git checkout ${{ steps.get_last_release_tag.outputs.last_release_tag }}
+        pip install -r docs/requirements.txt
+        cd docs
+        python3 extract_macros.py ../ user_guide/preferences_table.rst
+        export ADOC_DOC_VERSION=${{ steps.get_last_release_tag.outputs.last_release_tag }}
+        make html SPHINXOPTS='-W --keep-going'
+        cd ..
+        git checkout gh-pages || git checkout --orphan gh-pages
+        mkdir -p docs_builds/${{ steps.get_last_release_tag.outputs.last_release_tag }}
+        cp -r docs/_build/html/* docs_builds/${{ steps.get_last_release_tag.outputs.last_release_tag }}/
+        git add docs_builds/${{ steps.get_last_release_tag.outputs.last_release_tag }}
+        git commit -m "Add docs for ${{ steps.get_last_release_tag.outputs.last_release_tag }}"
+        git push origin gh-pages
