@@ -1,6 +1,7 @@
 #ifndef DATAPROVIDER_H
 #define DATAPROVIDER_H
 
+#include "common/debugtimer.h"
 #include <QObject>
 #include <QFile>
 #include <qprocess.h>
@@ -36,6 +37,7 @@ private:
 	QString m_scriptPath;
 	QString m_outputFile;
 	static int m_uuid;
+	DebugTimer m_debugTimer = DebugTimer("/home/andrei/Desktop/benchmark.csv");
 
 	void readProcessedData();
 	void initOutputFile();

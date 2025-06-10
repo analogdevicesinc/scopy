@@ -27,6 +27,7 @@ DataProvider::~DataProvider()
 
 void DataProvider::processData(const QString &inputFile)
 {
+	m_debugTimer.startTimer();
 	runPython(QStringList() << "--input" << inputFile << "--output" << m_outputFile);
 }
 
@@ -34,6 +35,7 @@ void DataProvider::setScriptPath(const QString &newScriptPath) { m_scriptPath = 
 
 void DataProvider::readProcessedData()
 {
+	DebugTimer timer("/home/andrei/Desktop/benchmark.csv");
 	if(!m_data || m_size < 4) {
 		qWarning() << "Invalid file";
 		return;
@@ -50,6 +52,7 @@ void DataProvider::readProcessedData()
 		processedData[1].push_back(samples[i].ch2);
 	}
 
+	DEBUGTIMER_LOG(timer, "Read processed data:");
 	Q_EMIT dataReady(processedData);
 }
 
@@ -71,6 +74,7 @@ void DataProvider::setupConnections()
 		if(!m_data) {
 			mapFile();
 		}
+		DEBUGTIMER_LOG(m_debugTimer, "Running process data script:");
 		readProcessedData();
 	});
 }

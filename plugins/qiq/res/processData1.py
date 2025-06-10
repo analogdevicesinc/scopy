@@ -25,7 +25,7 @@ def read_interleaved_doubles(filename):
 
 def process_data(data):
     # Example processing: add 2 to each value
-    return [x + 10 for x in data] 
+    return [x + 40 for x in data] 
 
 def write_interleaved_doubles(filename, data):
     with open(filename, "wb") as f:

@@ -46,6 +46,7 @@ Provider::~Provider() {}
 
 void Provider::onDataAcqAvailable(const short *data, const int &dataSize, const QString &path)
 {
+	DebugTimer acqPlot("/home/andrei/Desktop/benchmark.csv");
 	size_t samplesPerChannel = (dataSize / sizeof(short)) / 2;
 	QVector<QVector<double>> vData(CHNL_NUMBER);
 	for(int i = 0; i < samplesPerChannel; i++) {
@@ -53,10 +54,13 @@ void Provider::onDataAcqAvailable(const short *data, const int &dataSize, const 
 			vData[j].push_back(*(data + i * CHNL_NUMBER + j));
 		}
 	}
+	DEBUGTIMER_LOG(acqPlot, "Structure data for plotting:");
+	acqPlot.restartTimer();
 	for(int i = 0; i < vData.size(); i++) {
 		m_acqPlot->getChannels()[i]->curve()->setSamples(m_xValues, vData[i]);
 	}
 	m_acqPlot->replot();
+	DEBUGTIMER_LOG(acqPlot, "Plot device samples:");
 
 	m_dataProvider->processData(path);
 }
@@ -91,14 +95,16 @@ void Provider::setupConnections()
 	connect(m_dataAcq, &DataAcquisition::dataAvailable, this, &Provider::onDataAcqAvailable);
 
 	connect(m_dataProvider, &DataProvider::dataReady, this, [this](const QVector<QVector<double>> &processedData) {
+		DebugTimer timer("/home/andrei/Desktop/benchmark.csv");
 		for(int i = 0; i < processedData.size(); i++) {
 			m_receiverPlot->getChannels()[i]->curve()->setSamples(m_xValues, processedData[i]);
 		}
 		m_receiverPlot->replot();
+		DEBUGTIMER_LOG(timer, "Plot processed samples:");
 		if(m_runBtn->isChecked()) {
 			m_dataAcq->readDeviceData();
 		}
-		DEBUGTIMER_LOG(m_testTimer, "Acquisition:");
+		DEBUGTIMER_LOG(m_testTimer, "Total:");
 		m_testTimer.restartTimer();
 	});
 

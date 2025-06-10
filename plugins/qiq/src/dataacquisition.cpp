@@ -38,11 +38,14 @@ DataAcquisition::~DataAcquisition()
 
 void DataAcquisition::readDeviceData()
 {
-	DebugTimer timer;
+	DebugTimer timer("/home/andrei/Desktop/benchmark.csv");
 	auto data = m_ain->getSamplesRawInterleaved(SAMPLES_PER_CHANNEL);
-	DEBUGTIMER_LOG(timer, "getSamplesRawInterleaved:");
+	DEBUGTIMER_LOG(timer, "Get device samples:");
+	timer.restartTimer();
 
 	writeToMappedFile(data, m_dataSize, FILE_PATH);
+	DEBUGTIMER_LOG(timer, "File writing:");
+
 	Q_EMIT dataAvailable(data, m_dataSize, FILE_PATH);
 }
 
@@ -78,7 +81,7 @@ void DataAcquisition::createOutputBuffers()
 {
 	std::vector<double> sinv;
 	std::vector<double> saw;
-	double bufferSize = 1024;
+	double bufferSize = 1024 * 10;
 
 	for(int i = 0; i < bufferSize; i++) {
 		double rad = 2 * M_PI * (i / bufferSize);
@@ -128,5 +131,4 @@ void DataAcquisition::writeToMappedFile(const short *data, int dataSize, const Q
 	for(size_t i = 0; i < samples; ++i) {
 		*writePtr++ = *data++;
 	}
-	m_file.close();
 }

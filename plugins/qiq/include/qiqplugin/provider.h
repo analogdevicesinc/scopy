@@ -27,7 +27,7 @@ private:
 	DataProvider *m_dataProvider;
 	DataAcquisition *m_dataAcq;
 	QVector<double> m_xValues;
-	DebugTimer m_testTimer;
+	DebugTimer m_testTimer = DebugTimer("/home/andrei/Desktop/benchmark.csv");
 
 	void setupPlotWidget();
 	void setupToolTemplate();
