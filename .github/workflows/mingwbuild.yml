@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
 
   make-exe-64:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:
     - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       run: |
             mkdir %GITHUB_WORKSPACE%\artifacts & echo %GITHUB_WORKSPACE%
 
-            set "BUILD_HOST=windows-2019"
+            set "BUILD_HOST=windows-2022"
             set "USERNAME=github-actions"
 
             for /F "tokens=1,2 delims=/" %%a in ("%GITHUB_REPOSITORY%") do (

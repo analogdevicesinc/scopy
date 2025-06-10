@@ -5,12 +5,12 @@ on:
   pull_request:
 
 env:
-  BUILD_HOST: windows-2019
+  BUILD_HOST: windows-2022
   USERNAME: github-actions
 
 jobs:
   build_package:
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     steps:
       - name: Checkout Package Repository (this repo)
@@ -33,7 +33,7 @@ jobs:
         shell: cmd
         run: |
               mkdir %GITHUB_WORKSPACE%\artifacts & echo %GITHUB_WORKSPACE%
-              set "BUILD_HOST=windows-2019"
+              set "BUILD_HOST=windows-2022"
               set "USERNAME=github-actions"
 
               for /F "tokens=1,2 delims=/" %%a in ("%GITHUB_REPOSITORY%") do (
