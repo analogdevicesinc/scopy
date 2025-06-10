@@ -60,11 +60,14 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 	QPushButton *saveBtn = new QPushButton("Save", m_tool);
 	m_debugBtn = new QPushButton("Debug", m_tool);
 	m_debugStepBtn = new QPushButton("Step", m_tool);
+	m_debugStepBtn->setEnabled(false);
 	m_runBtn = new RunBtn(this);
 
 	Style::setStyle(loadBtn, style::properties::button::basicButtonBig);
 	Style::setStyle(saveBtn, style::properties::button::basicButtonBig);
 
+
+	Style::setStyle(m_debugStepBtn, style::properties::button::basicButtonBig);
 	Style::setStyle(m_debugBtn, style::properties::button::singleButton);
 
 
@@ -77,7 +80,7 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 	connect(m_debugBtn, &QPushButton::clicked, this, [=]() {
 		debugClicked();
 	});
-	connect(m_debugBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_debugStepBtn, &QPushButton::clicked, this, [=]() {
 		debugStepClicked();
 	});
 
@@ -193,32 +196,44 @@ void ScriptingTool::compileCode(QString code)
 void ScriptingTool::debugClicked()
 {
 	QString code = m_codeEditor->toPlainText();
-	QStringList lines = code.split('\n');
-	QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-	for (int i = 0; i < lines.size(); ++i) {
-		QString line = lines[i].trimmed();
-	    if (line.isEmpty()) continue;
-	    if (m_codeEditor) m_codeEditor->highlightLine(i); // Highlight current line
-	    QCoreApplication::processEvents(); // Allow UI update
-	    QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(line, "");
-	    QString output;
-	    int ret = EXIT_SUCCESS;
-	    if (val.isError()) {
-		output += timestamp + QString(" [Line %1]: Exception: %2").arg(i+1).arg(val.toString());
-		ret = EXIT_FAILURE;
-	    } else if (!val.isUndefined()) {
-		output += timestamp + QString(" [Line %1]: %2").arg(i+1).arg(val.toString());
-	    }
-	    if (!output.isEmpty())
-		m_console->appendPlainText(output);
-	}
-	// if (m_codeEditor) m_codeEditor->highlightCurrentLine(); // Restore normal highlight
-	m_console->appendPlainText(timestamp + ": Debug finished");
+	m_debugLines = code.split('\n');
+	debugMode = true;
+	m_debugStepBtn->setEnabled(true);
+	m_runBtn->setEnabled(false);
+	debugLine = 0;
+	debugStepClicked();
+
 }
 
 void ScriptingTool::debugStepClicked()
 {
+	if (debugMode) {
+		QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+		QString line = m_debugLines[debugLine].trimmed();
+		if (!line.isEmpty()) {
+			if (m_codeEditor) m_codeEditor->highlightLine(debugLine); // Highlight current line
+			QCoreApplication::processEvents(); // Allow UI update
+			QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(line, "");
+			QString output;
+			int ret = EXIT_SUCCESS;
+			if (val.isError()) {
+				output += timestamp + QString(" [Line %1]: Exception: %2").arg(debugLine+1).arg(val.toString());
+				ret = EXIT_FAILURE;
+			} else if (!val.isUndefined()) {
+				output += timestamp + QString(" [Line %1]: %2").arg(debugLine+1).arg(val.toString());
+			}
+			if (!output.isEmpty())
+				m_console->appendPlainText(output);
 
+		}
+		debugLine++;
+		if (debugLine >= m_debugLines.length()) {
+			debugMode = false;
+			m_debugStepBtn->setEnabled(false);
+			m_runBtn->setEnabled(true);
+			m_console->appendPlainText(timestamp + ": Debug finished");
+		}
+	}
 }
 
 #include "moc_scriptingtool.cpp"

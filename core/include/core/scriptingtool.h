@@ -95,6 +95,10 @@ private:
 	//debug
 	QPushButton *m_debugBtn;
 	QPushButton *m_debugStepBtn;
+	QStringList m_debugLines;
+	bool debugMode = false;
+	int debugLine = 0;
+
 	void debugClicked();
 	void debugStepClicked();
 };
