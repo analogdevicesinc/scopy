@@ -145,7 +145,23 @@ echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
 echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 macdeployqt Scopy.app -verbose=3
 
+
+echo "=== Removing duplicated LC_RPATH"
+list=$(find Scopy.app -name "*.dylib")
+
+for file in $list; do
+	occ="$(otool -l $file | grep LC_RPATH | wc -l)"
+	if [[ "$occ" -gt 1 ]];then
+		echo ""
+		for (( i=1; i<=occ-1; i++ )); do
+			echo "removed LC_RPATH from $file"
+			install_name_tool -delete_rpath "@executable_path/../Frameworks/" $file
+		done
+	fi
+done
+
 if [ "$TF_BUILD" == "True" ];then
+	echo "=== Creating ScopyApp.zip"
 	zip -Xvr ScopyApp.zip Scopy.app
 	macdeployqt Scopy.app -dmg -verbose=3
 fi
