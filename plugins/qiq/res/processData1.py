@@ -3,9 +3,11 @@ import mmap
 import struct
 import os
 
+BYTES = 2
+
 def read_interleaved_doubles(filename):
     file_size = os.path.getsize(filename)
-    total_values = file_size // 8  # 8 bytes per double
+    total_values = file_size // BYTES  
 
     data = []
 
@@ -13,8 +15,8 @@ def read_interleaved_doubles(filename):
         mm = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
 
         for i in range(total_values):
-            offset = i * 8
-            value = struct.unpack_from('d', mm, offset)[0]
+            offset = i * BYTES
+            value = struct.unpack_from('h', mm, offset)[0]
             data.append(value)
 
         mm.close()
@@ -23,12 +25,12 @@ def read_interleaved_doubles(filename):
 
 def process_data(data):
     # Example processing: add 2 to each value
-    return [x + 2 for x in data] 
+    return [x + 10 for x in data] 
 
 def write_interleaved_doubles(filename, data):
     with open(filename, "wb") as f:
         for value in data:
-            f.write(struct.pack('d', value))
+            f.write(struct.pack('h', value))
 
 def main():
     parser = argparse.ArgumentParser(description="Read, process, and write interleaved binary data.")

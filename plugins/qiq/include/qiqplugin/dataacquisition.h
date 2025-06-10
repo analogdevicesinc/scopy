@@ -29,13 +29,15 @@ public:
 	void readDeviceData();
 
 Q_SIGNALS:
-	void dataAvailable(const double *data, const int &dataSize, const QString &path);
+	// void dataAvailable(const double *data, const int &dataSize, const QString &path);
+	void dataAvailable(const short *data, const int &dataSize, const QString &path);
 
 private:
 	M2k *m_ctx;
 	M2kAnalogIn *m_ain;
 	M2kAnalogOut *m_aout;
 
+	int m_dataSize;
 	QFile m_file;
 	uchar *m_mappedData;
 	const QString FILE_PATH = QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "device_data.bin";
@@ -43,7 +45,8 @@ private:
 	void setupAnalogIn();
 	void setupAnalogOut();
 	void createOutputBuffers();
-	void writeToMappedFile(const double *data, int dataSize, const QString &filePath);
+	void mapFile(const QString &filePath);
+	void writeToMappedFile(const short *data, int dataSize, const QString &filePath);
 };
 } // namespace scopy::qiqplugin
 

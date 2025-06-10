@@ -18,7 +18,7 @@ public:
 	~Provider();
 
 public Q_SLOTS:
-	void onDataAcqAvailable(const double *data, const int &dataSize, const QString &path);
+	void onDataAcqAvailable(const short *data, const int &dataSize, const QString &path);
 
 private:
 	PlotWidget *m_acqPlot;

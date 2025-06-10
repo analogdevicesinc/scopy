@@ -15,8 +15,8 @@ class DataProvider : public QObject
 public:
 	struct Sample
 	{
-		double ch1;
-		double ch2;
+		qint16 ch1;
+		qint16 ch2;
 	};
 
 	DataProvider(QObject *parent);

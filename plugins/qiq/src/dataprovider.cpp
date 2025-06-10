@@ -110,8 +110,8 @@ void DataProvider::runPython(const QStringList args)
 
 		process.waitForFinished(30000);
 
-		qInfo() << "Output:" << process.readAllStandardOutput();
-		qInfo() << "Errors:" << process.readAllStandardError();
+		// qInfo() << "Output:" << process.readAllStandardOutput();
+		// qInfo() << "Errors:" << process.readAllStandardError();
 	});
 	m_processFw->setFuture(f);
 }

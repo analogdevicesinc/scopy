@@ -27,9 +27,26 @@ Provider::Provider(QWidget *parent)
 
 Provider::~Provider() {}
 
-void Provider::onDataAcqAvailable(const double *data, const int &dataSize, const QString &path)
+// void Provider::onDataAcqAvailable(const double *data, const int &dataSize, const QString &path)
+// {
+// 	size_t samplesPerChannel = (dataSize / sizeof(double)) / 2;
+// 	QVector<QVector<double>> vData(CHNL_NUMBER);
+// 	for(int i = 0; i < samplesPerChannel; i++) {
+// 		for(int j = 0; j < CHNL_NUMBER; j++) {
+// 			vData[j].push_back(*(data + i * CHNL_NUMBER + j));
+// 		}
+// 	}
+// 	for(int i = 0; i < vData.size(); i++) {
+// 		m_acqPlot->getChannels()[i]->curve()->setSamples(m_xValues, vData[i]);
+// 	}
+// 	m_acqPlot->replot();
+
+// 	m_dataProvider->processData(path);
+// }
+
+void Provider::onDataAcqAvailable(const short *data, const int &dataSize, const QString &path)
 {
-	size_t samplesPerChannel = (dataSize / sizeof(double)) / 2;
+	size_t samplesPerChannel = (dataSize / sizeof(short)) / 2;
 	QVector<QVector<double>> vData(CHNL_NUMBER);
 	for(int i = 0; i < samplesPerChannel; i++) {
 		for(int j = 0; j < CHNL_NUMBER; j++) {
@@ -47,10 +64,10 @@ void Provider::onDataAcqAvailable(const double *data, const int &dataSize, const
 void Provider::setupPlotWidget()
 {
 	m_acqPlot = new PlotWidget(this);
-	configurePlot(m_acqPlot, -5, 5);
+	configurePlot(m_acqPlot, -200, 200);
 
 	m_receiverPlot = new PlotWidget(this);
-	configurePlot(m_receiverPlot, -5, 5);
+	configurePlot(m_receiverPlot, -200, 200);
 }
 
 void Provider::setupToolTemplate()
@@ -71,8 +88,6 @@ void Provider::setupToolTemplate()
 
 void Provider::setupConnections()
 {
-
-	// connect(m_timer, &QTimer::timeout, this, [this]() { m_dataAcq->readDeviceData(); });
 	connect(m_dataAcq, &DataAcquisition::dataAvailable, this, &Provider::onDataAcqAvailable);
 
 	connect(m_dataProvider, &DataProvider::dataReady, this, [this](const QVector<QVector<double>> &processedData) {
@@ -84,6 +99,7 @@ void Provider::setupConnections()
 			m_dataAcq->readDeviceData();
 		}
 		DEBUGTIMER_LOG(m_testTimer, "Acquisition:");
+		m_testTimer.restartTimer();
 	});
 
 	connect(m_runBtn, &RunBtn::toggled, this, [this](bool en) {
@@ -109,8 +125,11 @@ void Provider::configurePlot(PlotWidget *plot, int yMin, int yMax)
 	addPlotChannel(plot, "ch0", StyleHelper::getChannelColor(0));
 	addPlotChannel(plot, "ch1", StyleHelper::getChannelColor(1));
 
-	for(int i = 0; i < samplesPerChnl; i++) {
-		m_xValues.push_back(i);
+	if(samplesPerChnl != m_xValues.size()) {
+		m_xValues.clear();
+		for(int i = 0; i < samplesPerChnl; i++) {
+			m_xValues.push_back(i);
+		}
 	}
 
 	plot->replot();
