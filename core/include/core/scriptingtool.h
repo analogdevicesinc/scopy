@@ -31,6 +31,48 @@
 
 namespace scopy {
 
+// ConsoleEdit: QPlainTextEdit that allows direct input and processes Enter key
+class SCOPY_CORE_EXPORT ConsoleEdit : public QPlainTextEdit
+{
+	Q_OBJECT
+public:
+	explicit ConsoleEdit(QWidget *parent = nullptr)
+		: QPlainTextEdit(parent)
+	{
+		setUndoRedoEnabled(false);
+		setTabChangesFocus(true);
+		setLineWrapMode(QPlainTextEdit::NoWrap);
+		prompt = ">>> ";
+		appendPlainText(prompt);
+		moveCursor(QTextCursor::End);
+	}
+	QString prompt;
+
+signals:
+	void lineEntered(const QString &line);
+
+protected:
+	void keyPressEvent(QKeyEvent *e) override
+	{
+		if(e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+			QTextCursor cursor = textCursor();
+			cursor.movePosition(QTextCursor::End);
+			setTextCursor(cursor);
+			QString text = toPlainText();
+			int lastPrompt = text.lastIndexOf(prompt);
+			if(lastPrompt != -1) {
+				QString line = text.mid(lastPrompt + prompt.length()).split('\n').first();
+				emit lineEntered(line);
+				appendPlainText("");
+				appendPlainText(prompt);
+				moveCursor(QTextCursor::End);
+			}
+		} else {
+			QPlainTextEdit::keyPressEvent(e);
+		}
+	}
+};
+
 class SCOPY_CORE_EXPORT ScriptingTool : public QWidget
 {
 	Q_OBJECT
@@ -42,7 +84,8 @@ signals:
 private:
 	ToolTemplate *m_tool;
 	ScopyCodeEditor *m_codeEditor;
-	QPlainTextEdit *m_codeOutput;
+	// QPlainTextEdit *m_codeOutput;
+	ConsoleEdit *m_console;
 	RunBtn *m_runBtn;
 
 	void loadFile();

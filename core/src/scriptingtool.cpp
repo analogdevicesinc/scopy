@@ -32,6 +32,7 @@
 #include <QDateTime>
 #include <menuonoffswitch.h>
 #include <style.h>
+#include <QKeyEvent>
 
 using namespace scopy;
 
@@ -56,8 +57,8 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	QPushButton *loadBtn = new QPushButton("Load", m_tool);
 	QPushButton *saveBtn = new QPushButton("Save", m_tool);
-	MenuOnOffSwitch *toggleTerminalMode = new MenuOnOffSwitch("Terminal Mode", m_tool);
-	toggleTerminalMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	// MenuOnOffSwitch *toggleTerminalMode = new MenuOnOffSwitch("Terminal Mode", m_tool);
+	// toggleTerminalMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_runBtn = new RunBtn(this);
 
 	Style::setStyle(loadBtn, style::properties::button::basicButtonBig);
@@ -65,44 +66,29 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	m_tool->addWidgetToTopContainerHelper(loadBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(saveBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(toggleTerminalMode, TTA_RIGHT);
+	// m_tool->addWidgetToTopContainerHelper(toggleTerminalMode, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 
 	m_codeEditor = new ScopyCodeEditor(m_tool);
 	Style::setStyle(m_codeEditor, style::properties::widget::basicComponent);
 	Style::setStyle(m_codeEditor, style::properties::widget::border_interactive);
 
-	m_codeOutput = new QPlainTextEdit(m_tool);
-	m_codeOutput->setReadOnly(true);
-	Style::setStyle(m_codeOutput, style::properties::widget::basicComponent);
-	Style::setStyle(m_codeOutput, style::properties::widget::border_interactive);
-
 	connect(loadBtn, &QPushButton::clicked, this, [=]() { loadFile(); });
 	connect(saveBtn, &QPushButton::clicked, this, [=]() { saveToFile(); });
 	connect(m_runBtn, &QPushButton::clicked, this, [=]() { compileCode(m_codeEditor->toPlainText()); });
 
-	QLineEdit *lineEdit = new QLineEdit(m_tool);
-	lineEdit->setVisible(false);
-	Style::setStyle(lineEdit, style::properties::widget::border_interactive);
-	Style::setStyle(lineEdit, style::properties::widget::basicComponent);
+	m_console = new ConsoleEdit(m_tool);
+	Style::setStyle(m_console, style::properties::widget::basicComponent);
+	Style::setStyle(m_console, style::properties::widget::border_interactive);
 
-	connect(lineEdit, &QLineEdit::returnPressed, this, [=]() {
-		QString input = lineEdit->text();
-		compileCode(input);
-		m_codeEditor->appendPlainText(input);
-		lineEdit->clear();
-	});
-
-	connect(toggleTerminalMode->onOffswitch(), &QPushButton::toggled, this, [=](bool toggled) {
-		lineEdit->setVisible(toggled);
-		// when enabling console mode clear code
-		if(toggled)
-			m_codeEditor->clear();
+	connect(m_console, &ConsoleEdit::lineEntered, this, [=](const QString &input) {
+		if(!input.trimmed().isEmpty()) {
+			compileCode(input);
+		}
 	});
 
 	m_tool->addWidgetToCentralContainerHelper(m_codeEditor);
-	m_tool->addWidgetToCentralContainerHelper(m_codeOutput);
-	m_tool->addWidgetToCentralContainerHelper(lineEdit);
+	m_tool->addWidgetToCentralContainerHelper(m_console);
 }
 
 void ScriptingTool::loadFile()
@@ -129,7 +115,7 @@ void ScriptingTool::loadFile()
 		m_codeEditor->appendPlainText(fileContent);
 	} else {
 		qDebug() << "File already opened! ";
-		m_codeOutput->appendPlainText("File already opened! ");
+		m_console->appendPlainText("File already opened! ");
 	}
 
 	if(file.isOpen())
@@ -151,10 +137,10 @@ void ScriptingTool::saveToFile()
 		QTextStream out(&file);
 		out << m_codeEditor->toPlainText();
 
-		m_codeOutput->appendPlainText("Save completed");
+		m_console->appendPlainText("Save completed");
 	} else {
 		qDebug() << "File already opened! ";
-		m_codeOutput->appendPlainText("File already opened! ");
+		m_console->appendPlainText("File already opened! ");
 	}
 
 	if(file.isOpen())
@@ -179,10 +165,10 @@ void ScriptingTool::compileCode(QString code)
 		}
 
 		output += timestamp + ": Script finished with status " + QString::number(ret);
-		m_codeOutput->appendPlainText(output);
+		m_console->appendPlainText(output);
 	} else {
 		QString newValue = "\n" + timestamp + ": No input detected";
-		m_codeOutput->appendPlainText(newValue);
+		m_console->appendPlainText(newValue);
 	}
 
 	if(m_runBtn->isEnabled()) {
