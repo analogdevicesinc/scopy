@@ -33,13 +33,14 @@
 #include <menuonoffswitch.h>
 #include <style.h>
 #include <QKeyEvent>
+#include <QCoreApplication>
 
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCRIPTINGTOOL, "ScriptingTool")
 
 ScriptingTool::ScriptingTool(QWidget *parent)
-	: QWidget{parent}
+        : QWidget{parent}
 {
 
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -57,17 +58,28 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	QPushButton *loadBtn = new QPushButton("Load", m_tool);
 	QPushButton *saveBtn = new QPushButton("Save", m_tool);
-	// MenuOnOffSwitch *toggleTerminalMode = new MenuOnOffSwitch("Terminal Mode", m_tool);
-	// toggleTerminalMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+	m_debugBtn = new QPushButton("Debug", m_tool);
+	m_debugStepBtn = new QPushButton("Step", m_tool);
 	m_runBtn = new RunBtn(this);
 
 	Style::setStyle(loadBtn, style::properties::button::basicButtonBig);
 	Style::setStyle(saveBtn, style::properties::button::basicButtonBig);
 
+	Style::setStyle(m_debugBtn, style::properties::button::singleButton);
+
+
 	m_tool->addWidgetToTopContainerHelper(loadBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(saveBtn, TTA_LEFT);
-	// m_tool->addWidgetToTopContainerHelper(toggleTerminalMode, TTA_RIGHT);
+	m_tool->addWidgetToTopContainerHelper(m_debugStepBtn, TTA_RIGHT);
+	m_tool->addWidgetToTopContainerHelper(m_debugBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
+
+	connect(m_debugBtn, &QPushButton::clicked, this, [=]() {
+		debugClicked();
+	});
+	connect(m_debugBtn, &QPushButton::clicked, this, [=]() {
+		debugStepClicked();
+	});
 
 	m_codeEditor = new ScopyCodeEditor(m_tool);
 	Style::setStyle(m_codeEditor, style::properties::widget::basicComponent);
@@ -77,12 +89,14 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 	connect(saveBtn, &QPushButton::clicked, this, [=]() { saveToFile(); });
 	connect(m_runBtn, &QPushButton::clicked, this, [=]() { compileCode(m_codeEditor->toPlainText()); });
 
+
+
 	m_console = new ConsoleEdit(m_tool);
 	Style::setStyle(m_console, style::properties::widget::basicComponent);
 	Style::setStyle(m_console, style::properties::widget::border_interactive);
 
 	connect(m_console, &ConsoleEdit::lineEntered, this, [=](const QString &input) {
-		if(!input.trimmed().isEmpty()) {
+		if (!input.trimmed().isEmpty()) {
 			compileCode(input);
 		}
 	});
@@ -97,8 +111,8 @@ void ScriptingTool::loadFile()
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
 	QString fileName = QFileDialog::getOpenFileName(
-		this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
-		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	        this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
+	        (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	// display file content
 	QFile file(fileName);
@@ -127,8 +141,8 @@ void ScriptingTool::saveToFile()
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
 	QString fileName = QFileDialog::getSaveFileName(
-		this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
-		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	        this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
+	        (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	// display file content
 	QFile file(fileName);
 
@@ -174,6 +188,37 @@ void ScriptingTool::compileCode(QString code)
 	if(m_runBtn->isEnabled()) {
 		m_runBtn->setChecked(false);
 	}
+}
+
+void ScriptingTool::debugClicked()
+{
+	QString code = m_codeEditor->toPlainText();
+	QStringList lines = code.split('\n');
+	QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
+	for (int i = 0; i < lines.size(); ++i) {
+		QString line = lines[i].trimmed();
+	    if (line.isEmpty()) continue;
+	    if (m_codeEditor) m_codeEditor->highlightLine(i); // Highlight current line
+	    QCoreApplication::processEvents(); // Allow UI update
+	    QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(line, "");
+	    QString output;
+	    int ret = EXIT_SUCCESS;
+	    if (val.isError()) {
+		output += timestamp + QString(" [Line %1]: Exception: %2").arg(i+1).arg(val.toString());
+		ret = EXIT_FAILURE;
+	    } else if (!val.isUndefined()) {
+		output += timestamp + QString(" [Line %1]: %2").arg(i+1).arg(val.toString());
+	    }
+	    if (!output.isEmpty())
+		m_console->appendPlainText(output);
+	}
+	// if (m_codeEditor) m_codeEditor->highlightCurrentLine(); // Restore normal highlight
+	m_console->appendPlainText(timestamp + ": Debug finished");
+}
+
+void ScriptingTool::debugStepClicked()
+{
+
 }
 
 #include "moc_scriptingtool.cpp"

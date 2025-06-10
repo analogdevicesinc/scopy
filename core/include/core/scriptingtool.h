@@ -32,13 +32,10 @@
 namespace scopy {
 
 // ConsoleEdit: QPlainTextEdit that allows direct input and processes Enter key
-class SCOPY_CORE_EXPORT ConsoleEdit : public QPlainTextEdit
-{
+class SCOPY_CORE_EXPORT ConsoleEdit : public QPlainTextEdit {
 	Q_OBJECT
 public:
-	explicit ConsoleEdit(QWidget *parent = nullptr)
-		: QPlainTextEdit(parent)
-	{
+	explicit ConsoleEdit(QWidget *parent = nullptr) : QPlainTextEdit(parent) {
 		setUndoRedoEnabled(false);
 		setTabChangesFocus(true);
 		setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -52,19 +49,23 @@ signals:
 	void lineEntered(const QString &line);
 
 protected:
-	void keyPressEvent(QKeyEvent *e) override
-	{
-		if(e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
+	void keyPressEvent(QKeyEvent *e) override {
+		if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
 			QTextCursor cursor = textCursor();
 			cursor.movePosition(QTextCursor::End);
 			setTextCursor(cursor);
 			QString text = toPlainText();
 			int lastPrompt = text.lastIndexOf(prompt);
-			if(lastPrompt != -1) {
+			if (lastPrompt != -1) {
 				QString line = text.mid(lastPrompt + prompt.length()).split('\n').first();
 				emit lineEntered(line);
-				appendPlainText("");
-				appendPlainText(prompt);
+				if (line.trimmed() == "clear") {
+					clear();
+					appendPlainText(prompt);
+				} else {
+					appendPlainText("");
+					appendPlainText(prompt);
+				}
 				moveCursor(QTextCursor::End);
 			}
 		} else {
@@ -84,13 +85,18 @@ signals:
 private:
 	ToolTemplate *m_tool;
 	ScopyCodeEditor *m_codeEditor;
-	// QPlainTextEdit *m_codeOutput;
 	ConsoleEdit *m_console;
 	RunBtn *m_runBtn;
 
 	void loadFile();
 	void saveToFile();
 	void compileCode(QString code);
+
+	//debug
+	QPushButton *m_debugBtn;
+	QPushButton *m_debugStepBtn;
+	void debugClicked();
+	void debugStepClicked();
 };
 
 } // namespace scopy

@@ -119,4 +119,20 @@ void ScopyCodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 		updateLineNumberAreaWidth(0);
 }
 
+void ScopyCodeEditor::highlightLine(int lineNumber)
+{
+	QList<QTextEdit::ExtraSelection> extraSelections;
+	if (!isReadOnly() && lineNumber >= 0) {
+		QTextEdit::ExtraSelection selection;
+		QColor lineColor = QColor(255, 255, 0, 100); // yellow highlight
+		selection.format.setBackground(lineColor);
+		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+		QTextCursor cursor(document()->findBlockByLineNumber(lineNumber));
+		selection.cursor = cursor;
+		selection.cursor.clearSelection();
+		extraSelections.append(selection);
+	}
+	setExtraSelections(extraSelections);
+}
+
 #include "moc_scopycodeeditor.cpp"
