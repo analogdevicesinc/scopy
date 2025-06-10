@@ -181,7 +181,7 @@ void ScriptingTool::compileCode(QString code)
 			output += timestamp + ": " + val.toString();
 		}
 
-		output += timestamp + ": Script finished with status " + QString::number(ret);
+		output += "\n" + timestamp + ": Script finished with status " + QString::number(ret);
 		m_console->appendPlainText(output);
 	} else {
 		QString newValue = "\n" + timestamp + ": No input detected";
