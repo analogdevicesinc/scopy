@@ -463,6 +463,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("device_menu_item", true);
 	p->init("pkg_menu_columns", 1);
 	p->init("packages_path", scopy::config::pkgFolderPath());
+	p->init("general_scripting_enabled", false);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
