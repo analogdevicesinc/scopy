@@ -179,7 +179,6 @@ add_subdirectory(gui)
 add_subdirectory(gr-util)
 add_subdirectory(pluginbase)
 add_subdirectory(core)
-add_subdirectory(plugins)
 add_subdirectory(iio-widgets)
 add_subdirectory(packages)
 
