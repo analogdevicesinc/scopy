@@ -448,7 +448,11 @@ void ScopyMainWindow::initPreferences()
 	p->init("show_graticule", false);
 	p->init("iiowidgets_use_lazy_loading", true);
 	p->init("general_plot_target_fps", "60");
+#ifdef WIN32
+	p->init("general_show_plot_fps", true);
+#else
 	p->init("general_show_plot_fps", false);
+#endif
 	p->init("general_use_native_dialogs", false);
 	p->init("general_additional_plugin_path", "");
 	p->init("general_load_decoders", true);

@@ -395,6 +395,7 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	for(int baudRate : m_availableBaudRates) {
 		m_baudRateCb->combo()->addItem(QString::number(baudRate));
 	}
+	m_baudRateCb->combo()->setCurrentText("115200");
 
 	QWidget *lineEditWidget = new QWidget(w);
 	lineEditWidget->setLayout(new QVBoxLayout(lineEditWidget));
