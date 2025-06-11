@@ -25,6 +25,9 @@ if(ENABLE_TRANSLATION)
 	qt_add_resources(SCOPY_RESOURCES ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/translations.qrc)
 endif()
 %endif
+%if emu_xml:
+include_emu_xml(${"${CMAKE_CURRENT_SOURCE_DIR}"}/emu-xml ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/emu-xml)
+%endif
 message("Including plugins")
 if(EXISTS ${"${CMAKE_CURRENT_SOURCE_DIR}"}/plugins)
 	add_plugins(${"${CMAKE_CURRENT_SOURCE_DIR}"}/plugins ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/plugins)
