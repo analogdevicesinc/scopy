@@ -1,0 +1,9 @@
+[
+    {
+	"device": "pqm",
+	"xml_path": "pqm1.xml",
+	"uri": "ip:127.0.0.1",
+	"rx_tx_device":"iio:device0",
+	"rx_tx_bin_path": "pqm1.bin"
+    }
+]
