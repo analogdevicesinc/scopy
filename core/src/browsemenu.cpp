@@ -21,6 +21,7 @@
 
 #include "browsemenu.h"
 #include "style.h"
+#include <pluginbase/preferences.h>
 
 #include <QPushButton>
 #include <stylehelper.h>
@@ -68,6 +69,31 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 		[this, homeBtn](bool collapsed) { hideBtnText(homeBtn, tr("Home"), collapsed); });
 	m_btnsMap[HOME_ID] = homeBtn;
 
+	// Scripting button (availability controlled by preference)
+	m_scriptingBtn = createBtn("Scripting",
+				   ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+					   "/icons/preferences.svg",
+				   m_content);
+	Style::setStyle(m_scriptingBtn, style::properties::button::toolButton);
+	m_scriptingBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
+	m_scriptingBtn->setStyleSheet("text-align: left");
+	m_scriptingBtn->setCheckable(true);
+	m_scriptingBtn->setChecked(false);
+
+	m_btnsMap[SCRIPTING_ID] = m_scriptingBtn;
+	connect(m_scriptingBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(SCRIPTING_ID); });
+	bool scriptingEnabled = Preferences::get("general_scripting_enabled").toBool();
+	m_scriptingBtn->setVisible(scriptingEnabled);
+
+	// Connect to preference changes for scripting button
+	Preferences *prefs = Preferences::GetInstance();
+	connect(prefs, &Preferences::preferenceChanged, this, [=](QString key, QVariant val) {
+		if(key == "general_scripting_enabled") {
+			bool enabled = val.toBool();
+			m_scriptingBtn->setVisible(enabled);
+		}
+	});
+
 	QWidget *saveLoadWidget = new QWidget(m_content);
 	saveLoadWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	saveLoadWidget->setLayout(new QHBoxLayout(saveLoadWidget));
@@ -103,35 +129,6 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	preferencesBtn->setCheckable(true);
 	m_btnsMap[PREFERENCES_ID] = preferencesBtn;
 
-	QPushButton *toolsBtn = createBtn("Tools",
-					  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-						  "/icons/preferences.svg",
-					  m_content);
-	toolsBtn->setCheckable(true);
-
-	// popup widget for tools
-	QWidget *toolsPopup = new QWidget(nullptr, Qt::Popup);
-	QVBoxLayout *popupLayout = new QVBoxLayout(toolsPopup);
-	Style::setStyle(toolsPopup, style::properties::widget::basicComponent);
-	Style::setStyle(toolsPopup, style::properties::widget::border_interactive);
-	popupLayout->setContentsMargins(0, 0, 0, 0);
-
-	// Scripting btn
-	QPushButton *scriptingBtn = new QPushButton(tr("Scripting"), toolsPopup);
-	scriptingBtn->setCheckable(false);
-	popupLayout->addWidget(scriptingBtn);
-
-	connect(scriptingBtn, &QPushButton::clicked, this, [=]() {
-		Q_EMIT requestTool(SCRIPTING_ID);
-		toolsPopup->hide();
-	});
-
-	connect(toolsBtn, &QPushButton::clicked, this, [=]() {
-		QPoint pos = toolsBtn->mapToGlobal(QPoint(toolsBtn->width(), 0));
-		toolsPopup->move(pos);
-		toolsPopup->show();
-	});
-
 	// About button
 	QPushButton *aboutBtn = createBtn(
 		"About", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg",
@@ -146,12 +143,13 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	btnGroup->addButton(homeBtn);
 	btnGroup->addButton(pkgBtn);
+	btnGroup->addButton(m_scriptingBtn);
 	btnGroup->addButton(preferencesBtn);
-	btnGroup->addButton(toolsBtn);
 	btnGroup->addButton(aboutBtn);
 
 	add(createHLine(m_content), "headerLine", MA_TOPLAST);
 	add(homeBtn, "homeBtn", MA_TOPLAST);
+	add(m_scriptingBtn, "scriptingBtn", MA_TOPLAST);
 	add(createHLine(m_content), "toolMenuLine1", MA_TOPLAST);
 	add(m_toolMenu, "toolMenu", MA_TOPLAST);
 
@@ -159,7 +157,6 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
 	add(pkgBtn, "pkgBtn", MA_BOTTOMLAST);
 	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
-	add(toolsBtn, "toolsBtn", MA_BOTTOMLAST);
 	add(aboutBtn, "aboutBtn", MA_BOTTOMLAST);
 	add(logo, "logo", MA_BOTTOMLAST);
 
