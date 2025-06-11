@@ -1,0 +1,13 @@
+{
+    "id": "pqmon",
+    "title": "Power Quality Monitor",
+    "version": "@PROJECT_VERSION@",
+    "description": "A Power Quality Monitor (PQM) plugin designed to work with the IIO framework, enabling the monitoring of power quality parameters such as voltage, current, frequency, and harmonics.",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  
