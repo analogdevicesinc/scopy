@@ -69,6 +69,7 @@ private:
 	QSpacerItem *m_spacer;
 	ToolMenu *m_toolMenu;
 	QPushButton *m_btnCollapse;
+	QPushButton *m_scriptingBtn;
 	QMap<QString, QPushButton *> m_btnsMap;
 	bool m_collapsed;
 
