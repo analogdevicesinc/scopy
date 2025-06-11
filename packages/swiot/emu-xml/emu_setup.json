@@ -1,0 +1,12 @@
+[
+	{
+		"device": "swiot_config",
+		"xml_path": "swiot_config.xml",
+		"uri": "ip:127.0.0.1"
+	},
+	{
+		"device": "swiot_runtime",
+		"xml_path": "swiot_runtime1.xml",
+		"uri": "ip:127.0.0.1"
+	}
+]
