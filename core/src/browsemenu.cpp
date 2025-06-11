@@ -70,10 +70,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_btnsMap[HOME_ID] = homeBtn;
 
 	// Scripting button (availability controlled by preference)
-	m_scriptingBtn = createBtn("Scripting",
-				   ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-					   "/icons/preferences.svg",
-				   m_content);
+	m_scriptingBtn = createBtn("Scripting", ":/gui/icons/tool_scripting.svg", m_content);
 	Style::setStyle(m_scriptingBtn, style::properties::button::toolButton);
 	m_scriptingBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
 	m_scriptingBtn->setStyleSheet("text-align: left");
