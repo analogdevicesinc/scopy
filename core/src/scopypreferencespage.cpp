@@ -370,6 +370,10 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 					"Specifies the location from which the packages should be loaded.",
 					FileBrowserWidget::DIRECTORY, generalSection));
 
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "general_scripting_enabled", "Enable the use of Scripting Tool",
+				     "When disabled, the Scripting Tool will not be accessible.", generalSection));
+
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
 							    MenuCollapseSection::MHW_COMPOSITEWIDGET, page);
