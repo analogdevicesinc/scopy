@@ -98,6 +98,7 @@ def get_args():
     parser.add_argument("--pdk", help="Generate pdk. The pdk fields from config.json must be completed", action='store_true')
     parser.add_argument("--src", help="Path to the source directory for the archive. If not specified, the current directory will be used")
     parser.add_argument("--dest", help="Path to the destination directory. If not specified, the current directory will be used")
+    parser.add_argument("--emu", help="Generate emu-xml structure.", action='store_true')
     parser.add_argument("-s", "--scopy_path", help="Path to the Scopy repository")
     parser.add_argument("-c", "--config_file_path", help="Path to the configuration file")
     return parser.parse_args()
@@ -408,7 +409,8 @@ def handle_cmakelists(pkg_path, config, args):
     new_cmakelists_content = Template(filename=TEMPLATES["pkg_cmake"]).render(
         id=config["id"],
         en_translation=args.translation or args.all,
-        en_style=args.style or args.all).splitlines(keepends=True) 
+        en_style=args.style or args.all,
+        emu_xml=args.emu).splitlines(keepends=True) 
 
     if os.path.exists(cmakelists_path):
         with open(cmakelists_path, "r") as existing_file:
@@ -435,7 +437,8 @@ def handle_cmakelists(pkg_path, config, args):
             cmakelists_path,
             id=config["id"],
             en_translation=args.translation or args.all,
-            en_style=args.style or args.all
+            en_style=args.style or args.all,
+            emu_xml=args.emu
         )
 
 
@@ -480,10 +483,32 @@ def generate_pkg(packages_path, config, args):
     if args.style or args.all:
         generate_style(pkg_path)  
         
+    if args.emu:
+        generate_emu_xml(pkg_path)
+        
     if os.path.exists(pkg_path):
         generate_manifest(pkg_path, config)
         
+def generate_emu_xml(pkg_path):
+    """
+    Generates the emu-xml structure for the package.
+
+    Args:
+        pkg_path (str): Path to the package directory.
+
+    Functionality:
+        - Creates the `emu-xml` directory and generates the `emu_setup.json` file.
+    """
+    print("Generating emu-xml structure...")
+    emu_xml_path = os.path.join(pkg_path, "emu-xml")
+    create_directory(emu_xml_path)
     
+    emu_setup_file = os.path.join(emu_xml_path, "emu_setup.json")
+    if not os.path.exists(emu_setup_file):
+        with open(emu_setup_file, "w") as f:
+            f.write("[]")
+        log_created_file(emu_setup_file)
+
 def console_log(config):
     if DIRS_CREATED:
         print("\nGenerated directories:")
