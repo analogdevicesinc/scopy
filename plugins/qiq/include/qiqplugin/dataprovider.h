@@ -14,12 +14,6 @@ class DataProvider : public QObject
 {
 	Q_OBJECT
 public:
-	struct Sample
-	{
-		qint16 ch1;
-		qint16 ch2;
-	};
-
 	DataProvider(QObject *parent);
 	~DataProvider();
 
@@ -28,6 +22,7 @@ public:
 
 Q_SIGNALS:
 	void dataReady(QVector<QVector<double>> processedData);
+	void stopAcq();
 
 private:
 	QFutureWatcher<void> *m_processFw;
@@ -38,12 +33,16 @@ private:
 	QString m_outputFile;
 	static int m_uuid;
 	DebugTimer m_debugTimer = DebugTimer("/home/andrei/Desktop/benchmark.csv");
+	QString cliPath =
+		"/home/andrei/git_repositories/scopy/process_data/build/Desktop_Qt_5_15_2_GCC_64bit-Debug/process_data";
+	QProcess *m_cliProcess;
 
 	void readProcessedData();
 	void initOutputFile();
 	void setupConnections();
 	bool mapFile();
 	void runPython(const QStringList args);
+	void runProcess(const QStringList args);
 };
 } // namespace scopy::qiqplugin
 

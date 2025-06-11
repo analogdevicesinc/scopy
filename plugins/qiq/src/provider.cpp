@@ -114,6 +114,7 @@ void Provider::setupConnections()
 			m_dataAcq->readDeviceData();
 		}
 	});
+	connect(m_dataProvider, &DataProvider::stopAcq, this, [this]() { m_runBtn->setChecked(false); });
 }
 
 void Provider::configurePlot(PlotWidget *plot, int yMin, int yMax)

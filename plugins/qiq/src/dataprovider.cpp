@@ -11,10 +11,29 @@ int DataProvider::m_uuid{0};
 DataProvider::DataProvider(QObject *parent)
 	: QObject(parent)
 	, m_data(nullptr)
+	, m_cliProcess(new QProcess())
 {
 	m_processFw = new QFutureWatcher<void>(this);
 	initOutputFile();
 	setupConnections();
+	connect(m_cliProcess, &QProcess::readyReadStandardOutput, this, [this]() {
+		QString output = m_cliProcess->readAllStandardOutput();
+		if(output.contains("FAIL")) {
+			Q_EMIT stopAcq();
+		}
+		if(output.contains("OK")) {
+			if(!m_data) {
+				mapFile();
+			}
+			DEBUGTIMER_LOG(m_debugTimer, "C program command:");
+			readProcessedData();
+		}
+	});
+	connect(m_cliProcess, &QProcess::readyReadStandardError, this, [this]() {
+		QString output = m_cliProcess->readAllStandardError();
+		qInfo() << "Error:" << output;
+	});
+	runProcess({QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "device_data.bin", m_outputFile});
 }
 
 DataProvider::~DataProvider()
@@ -23,12 +42,16 @@ DataProvider::~DataProvider()
 		m_file.unmap(m_data);
 	}
 	m_file.remove();
+	if(m_cliProcess) {
+		m_cliProcess->kill();
+	}
 }
 
 void DataProvider::processData(const QString &inputFile)
 {
 	m_debugTimer.startTimer();
-	runPython(QStringList() << "--input" << inputFile << "--output" << m_outputFile);
+	m_cliProcess->write("p");
+	m_cliProcess->write("\n");
 }
 
 void DataProvider::setScriptPath(const QString &newScriptPath) { m_scriptPath = newScriptPath; }
@@ -41,15 +64,14 @@ void DataProvider::readProcessedData()
 		return;
 	}
 
-	int numSamples = m_size / sizeof(Sample);
+	int numSamples = m_size / sizeof(short);
 
-	const Sample *samples = reinterpret_cast<const Sample *>(m_data);
+	const short *samples = reinterpret_cast<const short *>(m_data);
 
 	QVector<QVector<double>> processedData(CHNL_NUMBER);
 
 	for(int i = 0; i < numSamples; ++i) {
-		processedData[0].push_back(samples[i].ch1);
-		processedData[1].push_back(samples[i].ch2);
+		processedData[0].push_back(samples[i]);
 	}
 
 	DEBUGTIMER_LOG(timer, "Read processed data:");
@@ -118,4 +140,24 @@ void DataProvider::runPython(const QStringList args)
 		// qInfo() << "Errors:" << process.readAllStandardError();
 	});
 	m_processFw->setFuture(f);
+}
+
+void DataProvider::runProcess(const QStringList args)
+{
+	if(m_processFw->isRunning()) {
+		return;
+	}
+
+	QString program = cliPath;
+
+	m_cliProcess->start(program, QStringList() << args);
+
+	if(!m_cliProcess->waitForStarted()) {
+		qWarning() << "Running C error!";
+		return;
+	}
+
+	qInfo() << "Process started";
+	qInfo() << m_cliProcess->readAllStandardOutput();
+	qInfo() << m_cliProcess->readAllStandardError();
 }
