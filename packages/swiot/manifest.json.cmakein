@@ -1,0 +1,13 @@
+{
+    "id": "swiot",
+    "title": "AD-SWIOT1L-SL",
+    "version": "@PROJECT_VERSION@",
+    "description": "Plugin for AD-SWIOT1L-SL.",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  
