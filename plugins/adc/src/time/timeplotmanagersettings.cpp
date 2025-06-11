@@ -261,18 +261,18 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 void TimePlotManagerSettings::onInit()
 {
-	m_samplingInfo.plotSize = 400;
-	m_samplingInfo.bufferSize = 400;
+	m_samplingInfo.plotSize = 1024;
+	m_samplingInfo.bufferSize = 1024;
 	m_samplingInfo.complexMode = 0;
 	m_samplingInfo.rollingMode = 0;
 	m_samplingInfo.freqOffset = 0;
 	m_samplingInfo.sampleRate = 1;
 
-	m_bufferSizeSpin->setValue(400);
-	m_plotSizeSpin->setValue(400);
+	m_bufferSizeSpin->setValue(1024);
+	m_plotSizeSpin->setValue(1024);
 	m_sampleRateSpin->setValue(1);
 	m_xmin->setValue(0);
-	m_xmax->setValue(400);
+	m_xmax->setValue(1024);
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
 	m_xModeCb->combo()->setCurrentIndex(1);
 	m_xModeCb->combo()->setCurrentIndex(0);
