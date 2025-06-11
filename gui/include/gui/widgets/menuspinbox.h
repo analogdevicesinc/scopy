@@ -186,6 +186,8 @@ private:
 	void layoutVertically(bool left);
 	void layoutHorizontally(bool left);
 	double clamp(double val, double min, double max);
+	void incrementValue();
+	void decrementValue();
 
 	QLabel *m_label;
 	InfoIconWidget *m_infoIcon;

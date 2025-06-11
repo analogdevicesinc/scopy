@@ -60,45 +60,8 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 
 	m_incrementStrategy = new IncrementStrategyPower2();
 
-	connect(m_plus, &QAbstractButton::clicked, this, [=]() {
-		if(qFuzzyCompare(m_value, 0.0)) {
-			// On increment from zero, set to 1 * current scale
-			double scale = m_scaleCb->itemData(m_scaleCb->currentIndex()).toDouble();
-			setValue(1 * scale);
-		} else {
-			setValue(m_incrementStrategy->increment(m_value));
-		}
-	});
-	connect(m_minus, &QAbstractButton::clicked, this, [=]() {
-		if(qFuzzyCompare(m_value, 0.0)) {
-			int idx = m_scaleCb->currentIndex();
-			if(idx > 0) {
-				// Go to max of lower scale - 1
-				double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
-				double currentScale = m_scaleCb->itemData(idx).toDouble();
-				double maxLower = (currentScale / lowerScale) - 1;
-				setValue(maxLower * lowerScale);
-			} else {
-				// Already at lowest scale, go to -1 * current scale
-				double scale = m_scaleCb->itemData(idx).toDouble();
-				setValue(-1 * scale);
-			}
-		} else {
-			double newValue = m_incrementStrategy->decrement(m_value);
-			// If decrement would result in 0 and there is a lower scale, scale down instead
-			if(qFuzzyCompare(newValue, 0.0)) {
-				int idx = m_scaleCb->currentIndex();
-				if(idx > 0) {
-					double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
-					double currentScale = m_scaleCb->itemData(idx).toDouble();
-					double maxLower = (currentScale / lowerScale) - 1;
-					setValue(maxLower * lowerScale);
-					return;
-				}
-			}
-			setValue(newValue);
-		}
-	});
+	connect(m_plus, &QAbstractButton::clicked, this, &MenuSpinbox::incrementValue);
+	connect(m_minus, &QAbstractButton::clicked, this, &MenuSpinbox::decrementValue);
 
 	connect(m_edit, &QLineEdit::editingFinished, this, [=]() { userInput(m_edit->text()); });
 
@@ -436,6 +399,49 @@ double MenuSpinbox::clamp(double val, double min, double max)
 	}
 
 	return val;
+}
+
+void MenuSpinbox::incrementValue()
+{
+	if(qFuzzyCompare(m_value, 0.0)) {
+		// On increment from zero, set to 1 * current scale
+		double scale = m_scaleCb->itemData(m_scaleCb->currentIndex()).toDouble();
+		setValue(1 * scale);
+	} else {
+		setValue(m_incrementStrategy->increment(m_value));
+	}
+}
+
+void MenuSpinbox::decrementValue()
+{
+	if(qFuzzyCompare(m_value, 0.0)) {
+		int idx = m_scaleCb->currentIndex();
+		if(idx > 0) {
+			// Go to max of lower scale - 1
+			double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
+			double currentScale = m_scaleCb->itemData(idx).toDouble();
+			double maxLower = (currentScale / lowerScale) - 1;
+			setValue(maxLower * lowerScale);
+		} else {
+			// Already at lowest scale, go to -1 * current scale
+			double scale = m_scaleCb->itemData(idx).toDouble();
+			setValue(-1 * scale);
+		}
+	} else {
+		double newValue = m_incrementStrategy->decrement(m_value);
+		// If decrement would result in 0 and there is a lower scale, scale down instead
+		if(qFuzzyCompare(newValue, 0.0)) {
+			int idx = m_scaleCb->currentIndex();
+			if(idx > 0) {
+				double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
+				double currentScale = m_scaleCb->itemData(idx).toDouble();
+				double maxLower = (currentScale / lowerScale) - 1;
+				setValue(maxLower * lowerScale);
+				return;
+			}
+		}
+		setValue(newValue);
+	}
 }
 
 QString MenuSpinbox::name() const { return m_name; }
