@@ -1,0 +1,13 @@
+{
+    "id": "apollo-ad9084",
+    "title": "Apollo AD9084",
+    "version": "@PROJECT_VERSION@",
+    "description": "This package provides support for Apollo MXFE QUAD AD9084.",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  
