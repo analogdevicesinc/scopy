@@ -175,7 +175,7 @@ QFileInfoList PkgManager::listFilesInfo(QStringList dirFilter, QStringList fileF
 	QFileInfoList files;
 	for(auto &it : validPackages_) {
 		QString pkgPath = it[PkgManifest::PKG_PATH].toString();
-		files.append(getFilesInfo(pkgPath, dirFilter, fileFilter));
+		files.append(PkgUtil::getFilesInfo(pkgPath, dirFilter, fileFilter));
 	}
 	return files;
 }
@@ -218,23 +218,6 @@ QStringList PkgManager::getPkgsCategory()
 		categoryList.append(pkgCat);
 	}
 	return categoryList;
-}
-
-QFileInfoList PkgManager::getFilesInfo(const QString &path, const QStringList &dirFilter = {},
-				       const QStringList &fileFilter = {})
-{
-	QFileInfoList files;
-	QStringList nameFilters = (dirFilter.isEmpty()) ? fileFilter : dirFilter;
-	QDirIterator it(path, nameFilters, QDir::NoFilter, QDirIterator::Subdirectories);
-	while(it.hasNext()) {
-		if(dirFilter.isEmpty()) {
-			files.append(it.next());
-		} else {
-			QDir dir(it.next());
-			files.append(dir.entryInfoList(fileFilter, QDir::Files));
-		}
-	}
-	return files;
 }
 
 #include "moc_pkgmanager.cpp"
