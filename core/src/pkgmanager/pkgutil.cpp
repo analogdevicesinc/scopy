@@ -23,6 +23,7 @@
 #include "pkgmanifestfields.h"
 
 #include <QDir>
+#include <QDirIterator>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLoggingCategory>
@@ -201,4 +202,21 @@ QString PkgUtil::getFileSize(const QString &path)
 	result = formatter.format(fileSizeBytes, "B", 2);
 
 	return result;
+}
+
+QFileInfoList PkgUtil::getFilesInfo(const QString &path, const QStringList &dirFilter = {},
+				    const QStringList &fileFilter = {})
+{
+	QFileInfoList files;
+	QStringList nameFilters = (dirFilter.isEmpty()) ? fileFilter : dirFilter;
+	QDirIterator it(path, nameFilters, QDir::NoFilter, QDirIterator::Subdirectories);
+	while(it.hasNext()) {
+		if(dirFilter.isEmpty()) {
+			files.append(it.next());
+		} else {
+			QDir dir(it.next());
+			files.append(dir.entryInfoList(fileFilter, QDir::Files));
+		}
+	}
+	return files;
 }
