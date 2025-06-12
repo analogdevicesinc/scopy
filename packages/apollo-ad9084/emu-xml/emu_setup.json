@@ -1,0 +1,12 @@
+[
+	{
+		"device": "apollo1",
+		"xml_path": "apollo.xml",
+		"uri": "ip:127.0.0.1"
+	},
+	{
+		"device": "apollo2",
+		"xml_path": "apollo_2.xml",
+		"uri": "ip:127.0.0.1"
+	}
+]
