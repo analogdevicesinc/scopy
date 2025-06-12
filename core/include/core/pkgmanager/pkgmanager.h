@@ -70,8 +70,6 @@ Q_SIGNALS:
 	void zipMetadata(QVariantMap metadata);
 
 private:
-	static QFileInfoList getFilesInfo(const QString &path, const QStringList &dirFilter,
-					  const QStringList &fileFilter);
 	void loadPkg(const QFileInfo &fileInfo);
 	void createPkgDirectory();
 
