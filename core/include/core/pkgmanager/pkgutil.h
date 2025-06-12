@@ -22,9 +22,10 @@
 #ifndef PKGUTIL_H
 #define PKGUTIL_H
 
-#include <scopy-core_export.h>
+#include "../scopy-core_export.h"
 #include <QObject>
 #include <kzip.h>
+#include <QFileInfoList>
 
 #define METADATA_FILE "MANIFEST.json"
 #define STATUS_BAR_MS 3000
@@ -41,6 +42,9 @@ public:
 	static bool validatePkg(QJsonObject &metadata);
 
 	static QString checkPkgPath(const QString &path, const QString &pkgId);
+
+	static QFileInfoList getFilesInfo(const QString &path, const QStringList &dirFilter,
+					  const QStringList &fileFilter);
 
 private:
 	static QString validateArchiveEntry(const KZip &zip);
