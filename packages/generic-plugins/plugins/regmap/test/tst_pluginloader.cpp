@@ -44,7 +44,7 @@ private Q_SLOTS:
 	void metadata();
 };
 
-#define PLUGIN_LOCATION "../../plugins"
+#define PLUGIN_LOCATION "../.."
 #define FILENAME PLUGIN_LOCATION "/libscopy-regmap.so"
 
 void TST_REGMAPPlugin::fileExists()
