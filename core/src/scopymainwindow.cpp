@@ -464,6 +464,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("device_menu_item", true);
 	p->init("pkg_menu_columns", 1);
 	p->init("packages_path", scopy::config::pkgFolderPath());
+	p->init("general_use_docking_if_available", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
@@ -594,6 +595,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "plugins_use_debugger_v2") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "debugger_v2_include_debugfs") {
+		Q_EMIT p->restartRequired();
+	} else if(str == "general_use_docking_if_available") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_connect_to_multiple_devices") {
 		bool general_connect_to_multiple_devices =
