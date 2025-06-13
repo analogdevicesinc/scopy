@@ -170,7 +170,14 @@ void DataLogger_API::setMinYAxis(double min)
 	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
-		monitorTool->m_monitorPlot->updateYAxisIntervalMin(min);
+		if(monitorTool && monitorTool->m_plotManager) {
+			for(PlotComponent *pc : monitorTool->m_plotManager->plots()) {
+				MonitorPlot *plot = dynamic_cast<MonitorPlot *>(pc);
+				if(plot) {
+					plot->updateYAxisIntervalMin(min);
+				}
+			}
+		}
 	}
 }
 
@@ -181,7 +188,14 @@ void DataLogger_API::setMaxYAxis(double max)
 	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
-		monitorTool->m_monitorPlot->updateYAxisIntervalMax(max);
+		if(monitorTool && monitorTool->m_plotManager) {
+			for(PlotComponent *pc : monitorTool->m_plotManager->plots()) {
+				MonitorPlot *plot = dynamic_cast<MonitorPlot *>(pc);
+				if(plot) {
+					plot->updateYAxisIntervalMax(max);
+				}
+			}
+		}
 	}
 }
 
