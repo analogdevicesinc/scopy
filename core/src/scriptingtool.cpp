@@ -73,7 +73,7 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	connect(loadBtn, &QPushButton::clicked, this, [=]() { loadFile(); });
 	connect(saveBtn, &QPushButton::clicked, this, [=]() { saveToFile(); });
-	connect(m_runBtn, &QPushButton::clicked, this, [=]() { compileCode(m_codeEditor->toPlainText()); });
+	connect(m_runBtn, &QPushButton::clicked, this, [=]() { evaluateCode(m_codeEditor->toPlainText()); });
 
 	m_console = new ScopyConsoleEdit(m_tool);
 	Style::setStyle(m_console, style::properties::widget::basicComponent);
@@ -81,7 +81,7 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	connect(m_console, &ScopyConsoleEdit::lineEntered, this, [=](const QString &input) {
 		if(!input.trimmed().isEmpty()) {
-			compileCode(input);
+			evaluateCode(input);
 		}
 	});
 
@@ -145,7 +145,7 @@ void ScriptingTool::saveToFile()
 		file.close();
 }
 
-void ScriptingTool::compileCode(QString code)
+void ScriptingTool::evaluateCode(QString code)
 {
 	QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
 	if(!code.isEmpty()) {
