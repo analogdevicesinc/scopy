@@ -59,13 +59,16 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	QPushButton *loadBtn = new QPushButton("Load", m_tool);
 	QPushButton *saveBtn = new QPushButton("Save", m_tool);
+	QPushButton *saveAsBtn = new QPushButton("Save As", m_tool);
 	m_runBtn = new RunBtn(this);
 
 	Style::setStyle(loadBtn, style::properties::button::basicButtonBig);
 	Style::setStyle(saveBtn, style::properties::button::basicButtonBig);
+	Style::setStyle(saveAsBtn, style::properties::button::basicButtonBig);
 
 	m_tool->addWidgetToTopContainerHelper(loadBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(saveBtn, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(saveAsBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 
 	m_codeEditor = new ScopyCodeEditor(m_tool);
@@ -74,6 +77,7 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 
 	connect(loadBtn, &QPushButton::clicked, this, [=]() { loadFile(); });
 	connect(saveBtn, &QPushButton::clicked, this, [=]() { saveToFile(); });
+	connect(saveAsBtn, &QPushButton::clicked, this, [=]() { saveFileAs(); });
 	connect(m_runBtn, &QPushButton::clicked, this, [=]() { evaluateCode(m_codeEditor->toPlainText()); });
 
 	m_console = new QPlainTextEdit(m_tool);
@@ -116,51 +120,58 @@ void ScriptingTool::loadFile()
 		this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
 		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	// display file content
+	if(fileName.isEmpty())
+		return;
+
 	QFile file(fileName);
-
-	if(!file.isOpen()) {
-		file.open(QIODevice::ReadOnly);
-
-		QTextStream in(&file);
-		QString fileContent = "";
-		while(!in.atEnd()) {
-			QString line = in.readLine();
-			fileContent += line + "\n";
-		}
-		m_codeEditor->appendPlainText(fileContent);
-	} else {
-		qDebug() << "File already opened! ";
-		m_console->appendPlainText("File already opened! ");
+	if(!file.open(QIODevice::ReadOnly)) {
+		m_console->appendPlainText("Failed to open file: " + fileName);
+		return;
 	}
+	QTextStream in(&file);
+	QString fileContent = in.readAll();
+	file.close();
 
-	if(file.isOpen())
-		file.close();
+	// Clear the editor before loading new content
+	m_codeEditor->clear();
+	m_codeEditor->setPlainText(fileContent);
+	m_currentFilePath = fileName;
+	m_console->appendPlainText("Loaded " + m_currentFilePath);
 }
 
 void ScriptingTool::saveToFile()
 {
-	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
-	QString selectedFilter;
-	QString fileName = QFileDialog::getSaveFileName(
-		this, tr("Export"), "", tr("All Files(*)"), &selectedFilter,
-		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
-	// display file content
-	QFile file(fileName);
-
-	if(!file.isOpen()) {
-		file.open(QIODevice::WriteOnly);
-		QTextStream out(&file);
-		out << m_codeEditor->toPlainText();
-
-		m_console->appendPlainText("Save completed");
-	} else {
-		qDebug() << "File already opened! ";
-		m_console->appendPlainText("File already opened! ");
+	if(m_currentFilePath.isEmpty()) {
+		saveFileAs();
+		return;
 	}
+	QFile file(m_currentFilePath);
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		m_console->appendPlainText("Failed to save file: " + m_currentFilePath);
+		return;
+	}
+	QTextStream out(&file);
+	out << m_codeEditor->toPlainText();
+	file.close();
+	m_console->appendPlainText("Saved to " + m_currentFilePath);
+}
 
-	if(file.isOpen())
-		file.close();
+void ScriptingTool::saveFileAs()
+{
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Save As"), m_currentFilePath.isEmpty() ? "" : m_currentFilePath, tr("All Files(*)"));
+	if(fileName.isEmpty())
+		return;
+	QFile file(fileName);
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		m_console->appendPlainText("Failed to save file: " + fileName);
+		return;
+	}
+	QTextStream out(&file);
+	out << m_codeEditor->toPlainText();
+	file.close();
+	m_currentFilePath = fileName;
+	m_console->appendPlainText("Saved to " + m_currentFilePath);
 }
 
 void ScriptingTool::evaluateCode(QString code)
