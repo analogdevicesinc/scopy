@@ -47,6 +47,9 @@
    * - regmap_color_by_value
      - Use color to reflect value
      - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
+   * - adc_plot_labels
+     - Default state for plot labels
+     - Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting 
    * - adc_plot_xaxis_label_position
      - Plot X-Axis scale position
      - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
