@@ -34,6 +34,7 @@
 #include <style.h>
 #include <QKeyEvent>
 #include <QCoreApplication>
+#include <QLineEdit>
 
 using namespace scopy;
 
@@ -75,18 +76,35 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 	connect(saveBtn, &QPushButton::clicked, this, [=]() { saveToFile(); });
 	connect(m_runBtn, &QPushButton::clicked, this, [=]() { evaluateCode(m_codeEditor->toPlainText()); });
 
-	m_console = new ScopyConsoleEdit(m_tool);
+	m_console = new QPlainTextEdit(m_tool);
+	m_console->setReadOnly(true);
+	m_console->setUndoRedoEnabled(false);
+	m_console->setTabChangesFocus(true);
+	m_console->setLineWrapMode(QPlainTextEdit::NoWrap);
+
 	Style::setStyle(m_console, style::properties::widget::basicComponent);
 	Style::setStyle(m_console, style::properties::widget::border_interactive);
 
-	connect(m_console, &ScopyConsoleEdit::lineEntered, this, [=](const QString &input) {
-		if(!input.trimmed().isEmpty()) {
-			evaluateCode(input);
-		}
-	});
+	// QLineEdit for user input with prompt
+	QLineEdit *m_inputLine = new QLineEdit(m_tool);
+	m_inputLine->setPlaceholderText(">>>");
+
+	Style::setStyle(m_inputLine, style::properties::widget::basicComponent);
+	Style::setStyle(m_inputLine, style::properties::widget::border_interactive);
 
 	m_tool->addWidgetToCentralContainerHelper(m_codeEditor);
 	m_tool->addWidgetToCentralContainerHelper(m_console);
+	m_tool->addWidgetToCentralContainerHelper(m_inputLine);
+
+	connect(m_inputLine, &QLineEdit::returnPressed, this, [this, m_inputLine]() {
+		QString input = m_inputLine->text();
+		if(!input.trimmed().isEmpty()) {
+			// Show prompt and input in console
+			m_console->appendPlainText(">>> " + input);
+			evaluateCode(input);
+		}
+		m_inputLine->clear();
+	});
 }
 
 void ScriptingTool::loadFile()
