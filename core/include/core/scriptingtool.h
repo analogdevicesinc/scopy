@@ -48,7 +48,7 @@ private:
 
 	void loadFile();
 	void saveToFile();
-	void compileCode(QString code);
+	void evaluateCode(QString code);
 };
 
 } // namespace scopy
