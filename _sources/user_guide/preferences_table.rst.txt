@@ -5,6 +5,72 @@
    * - ID
      - Title
      - Description
+   * - m2k_instrument_notes_active
+     - Instrument Notes
+     - Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.
+   * - m2k_debugger_plugin_included
+     - Include debugger plugin
+     - Include the Debugger in the current instrument list      when connected to an ADALM2000 device. Disabled by default.
+   * - m2k_show_adc_filters
+     - Show ADC digital filter config
+     - Enable/disable the configuration panel for ADC digital filters.      This allows manual control over the parameters of the filters.
+   * - m2k_show_graticule
+     - Enable graticule
+     - Select whether the plot backbone (graticule
+   * - m2k_mini_histogram
+     - Enable mini histogram
+     - Select whether the Oscilloscope plot displays a histogram on the right side.
+   * - m2k_osc_filtering
+     - Enable sample rate filters
+     - Enable or disable the ADALM2000 ADC filters for all samplerates less than      100 MHz.
+   * - m2k_osc_label
+     - Enable labels on the plot
+     - Enable or disable the plot labels in the Oscilloscope instrument.
+   * - m2k_spectrum_visible_peak_search
+     - Only search marker peaks in visible domain
+     - Enabled by default, this control allows the Spectrum Analyzer to search for marker peaks outside the visible frequency range.
+   * - m2k_na_show_zero
+     - Always display 0db value on the graph
+     - Select whether the 0dB value is displayed as a reference point on the      Network Analyzer plot. This control is disabled by default.
+   * - m2k_logic_separate_annotations
+     - Separate decoder annotations when exporting
+     - Select whether to export decoder annotations and data separately from the      Logic Analyzer instrument. Disabled by default.
+   * - m2k_logic_display_sampling_points
+     - Display sampling points when zoomed
+     - Select whether to display each sampling point when zoomed in on the Logic Analyzer. Disabled by default.
+   * - m2k_logic_display_sample_time
+     - Show sample and time info in decoder table
+     - Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.
+   * - dataloggerplugin_data_storage_size
+     - Maximum data stored for each monitor
+     - Select the maximum data storage size for each monitor in the datalogger.
+   * - regmap_color_by_value
+     - Use color to reflect value
+     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
+   * - adc_plot_xaxis_label_position
+     - Plot X-Axis scale position
+     - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
+   * - adc_plot_yaxis_label_position
+     - Plot Y-Axis scale position
+     - Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.
+   * - adc_plot_yaxis_handle_position
+     - Plot channel Y-handle position
+     - Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.
+   * - adc_plot_xcursor_position
+     - Plot X-Cursor position
+     - Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.
+   * - adc_plot_ycursor_position
+     - Plot Y-Cursor position
+     - Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.
+   * - adc_default_y_mode
+     - ADC Default Y-Mode
+     - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
+   * - plugins_use_debugger_v2
+     - Use Debugger V2 plugin
+     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
+   * - debugger_v2_include_debugfs
+     - Include debug attributes in IIO Explorer
+     - Enable/disable the use of advanced debug attributes in the instrument.
    * - general_save_session
      - Save/Load Scopy session
      - Allow Scopy to automatically save/load the session     using .ini files into a predefined location.
@@ -62,69 +128,3 @@
    * - general_plot_target_fps
      - Plot target FPS
      - Select the Frames per second value for rendering plots in the entire application.
-   * - adc_plot_xaxis_label_position
-     - Plot X-Axis scale position
-     - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
-   * - adc_plot_yaxis_label_position
-     - Plot Y-Axis scale position
-     - Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.
-   * - adc_plot_yaxis_handle_position
-     - Plot channel Y-handle position
-     - Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.
-   * - adc_plot_xcursor_position
-     - Plot X-Cursor position
-     - Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.
-   * - adc_plot_ycursor_position
-     - Plot Y-Cursor position
-     - Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.
-   * - adc_default_y_mode
-     - ADC Default Y-Mode
-     - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
-   * - m2k_instrument_notes_active
-     - Instrument Notes
-     - Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.
-   * - m2k_debugger_plugin_included
-     - Include debugger plugin
-     - Include the Debugger in the current instrument list      when connected to an ADALM2000 device. Disabled by default.
-   * - m2k_show_adc_filters
-     - Show ADC digital filter config
-     - Enable/disable the configuration panel for ADC digital filters.      This allows manual control over the parameters of the filters.
-   * - m2k_show_graticule
-     - Enable graticule
-     - Select whether the plot backbone (graticule
-   * - m2k_mini_histogram
-     - Enable mini histogram
-     - Select whether the Oscilloscope plot displays a histogram on the right side.
-   * - m2k_osc_filtering
-     - Enable sample rate filters
-     - Enable or disable the ADALM2000 ADC filters for all samplerates less than      100 MHz.
-   * - m2k_osc_label
-     - Enable labels on the plot
-     - Enable or disable the plot labels in the Oscilloscope instrument.
-   * - m2k_spectrum_visible_peak_search
-     - Only search marker peaks in visible domain
-     - Enabled by default, this control allows the Spectrum Analyzer to search for marker peaks outside the visible frequency range.
-   * - m2k_na_show_zero
-     - Always display 0db value on the graph
-     - Select whether the 0dB value is displayed as a reference point on the      Network Analyzer plot. This control is disabled by default.
-   * - m2k_logic_separate_annotations
-     - Separate decoder annotations when exporting
-     - Select whether to export decoder annotations and data separately from the      Logic Analyzer instrument. Disabled by default.
-   * - m2k_logic_display_sampling_points
-     - Display sampling points when zoomed
-     - Select whether to display each sampling point when zoomed in on the Logic Analyzer. Disabled by default.
-   * - m2k_logic_display_sample_time
-     - Show sample and time info in decoder table
-     - Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.
-   * - dataloggerplugin_data_storage_size
-     - Maximum data stored for each monitor
-     - Select the maximum data storage size for each monitor in the datalogger.
-   * - plugins_use_debugger_v2
-     - Use Debugger V2 plugin
-     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
-   * - debugger_v2_include_debugfs
-     - Include debug attributes in IIO Explorer
-     - Enable/disable the use of advanced debug attributes in the instrument.
-   * - regmap_color_by_value
-     - Use color to reflect value
-     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
