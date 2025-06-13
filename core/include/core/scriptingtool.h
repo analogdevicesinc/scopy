@@ -45,8 +45,11 @@ private:
 	QPlainTextEdit *m_console;
 	RunBtn *m_runBtn;
 
+	QString m_currentFilePath; // Track the current file path for Save/Save As
+
 	void loadFile();
 	void saveToFile();
+	void saveFileAs();
 	void evaluateCode(QString code);
 };
 
