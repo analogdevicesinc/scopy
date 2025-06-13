@@ -27,7 +27,6 @@
 #include <tooltemplate.h>
 #include "scopy-core_export.h"
 #include "scopycodeeditor.h"
-#include "scopyconsoleedit.h"
 #include <toolbuttons.h>
 
 namespace scopy {
@@ -43,7 +42,7 @@ signals:
 private:
 	ToolTemplate *m_tool;
 	ScopyCodeEditor *m_codeEditor;
-	ScopyConsoleEdit *m_console;
+	QPlainTextEdit *m_console;
 	RunBtn *m_runBtn;
 
 	void loadFile();
