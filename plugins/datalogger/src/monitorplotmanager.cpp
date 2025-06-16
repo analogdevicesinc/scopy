@@ -47,7 +47,7 @@ uint32_t MonitorPlotManager::addPlot(QString name)
 
 	connect(this, &PlotManager::newData, plt->plot(), &PlotWidget::newData);
 
-	connect(plt, &MonitorPlot::requestDeletePlot, this, [=]() {
+	connect(plt, &MonitorPlot::requestDeletePlot, this, [=, this]() {
 		Q_EMIT plotRemoved(plt->uuid());
 		removePlot(plt->uuid());
 		delete plt;
@@ -173,7 +173,7 @@ QComboBox *MonitorPlotManager::createPlotAssignmentComboBox(DataMonitorModel *mo
 	combo->setCurrentIndex(idx);
 
 	// Plot assignment logic: when user selects a plot, move this channel to that plot
-	QObject::connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), model, [=](int index) {
+	QObject::connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), model, [=, this](int index) {
 		uint32_t selectedUuid = combo->itemData(index).toUInt();
 		// Remove from all plots first
 		QList<QPair<uint32_t, QString>> allPlots = this->plotList();
@@ -191,7 +191,7 @@ QComboBox *MonitorPlotManager::createPlotAssignmentComboBox(DataMonitorModel *mo
 	});
 
 	// Keep plot selector in sync if plots are added/removed
-	QObject::connect(this, &MonitorPlotManager::plotAdded, combo, [=](uint32_t uuid) {
+	QObject::connect(this, &MonitorPlotManager::plotAdded, combo, [=, this](uint32_t uuid) {
 		MonitorPlot *plt = this->plot(uuid);
 		if(plt)
 			combo->addItem(plt->name(), QVariant::fromValue(uuid));

@@ -58,7 +58,7 @@ MonitorPlotSettings::MonitorPlotSettings(MonitorPlot *m_plot, QWidget *parent)
 	mainLayout->addWidget(m_deletePlot);
 	Style::setStyle(m_deletePlot, style::properties::button::basicButton);
 
-	connect(m_deletePlot, &QPushButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(m_plot->uuid()); });
+	connect(m_deletePlot, &QPushButton::clicked, this, [=, this]() { Q_EMIT requestDeletePlot(m_plot->uuid()); });
 
 	MouseWheelWidgetGuard *mouseWheelWidgetGuard = new MouseWheelWidgetGuard(this);
 	mouseWheelWidgetGuard->installEventRecursively(this);
@@ -80,7 +80,7 @@ QWidget *MonitorPlotSettings::generateEditTitleSettings(QWidget *parent)
 	widget->setLayout(layout);
 
 	QLineEdit *titleEdit = new QLineEdit(m_plot->name(), widget);
-	connect(titleEdit, &QLineEdit::textChanged, this, [=](const QString &text) { m_plot->setName(text); });
+	connect(titleEdit, &QLineEdit::textChanged, this, [=, this](const QString &text) { m_plot->setName(text); });
 
 	layout->addWidget(new QLabel("Title:"));
 	layout->addWidget(titleEdit);

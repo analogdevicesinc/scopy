@@ -134,7 +134,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 			}
 			monitorPlotsSettings->addWidget(monitorPlotSettings);
 			connect(monitorPlotSettings, &MonitorPlotSettings::requestDeletePlot, this,
-				[=](uint32_t uuid) { m_plotManager->removePlot(uuid); });
+				[=, this](uint32_t uuid) { m_plotManager->removePlot(uuid); });
 		}
 	}
 	if(plotSelectorCombo->count() > 0)
@@ -161,13 +161,13 @@ void DataMonitorSettings::init(QString title, QColor color)
 		MonitorPlot *plt = m_plotManager->plot(pair.first);
 		connectXAxisController(plt);
 	}
-	connect(m_plotManager, &MonitorPlotManager::plotAdded, this, [=](uint32_t uuid) {
+	connect(m_plotManager, &MonitorPlotManager::plotAdded, this, [=, this](uint32_t uuid) {
 		MonitorPlot *plt = m_plotManager->plot(uuid);
 		connectXAxisController(plt);
 	});
 
 	// Add new menu when a new plot is added
-	connect(m_plotManager, &MonitorPlotManager::plotAdded, this, [=](uint32_t uuid) {
+	connect(m_plotManager, &MonitorPlotManager::plotAdded, this, [=, this](uint32_t uuid) {
 		MonitorPlot *plt = m_plotManager->plot(uuid);
 		if(plt) {
 			plotSelectorCombo->addItem(plt->name(), uuid);
@@ -178,7 +178,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 			monitorPlotsSettings->addWidget(monitorPlotSettings);
 			// Connect delete signal for new plots
 			connect(monitorPlotSettings, &MonitorPlotSettings::requestDeletePlot, this,
-				[=](uint32_t uuid) { m_plotManager->removePlot(uuid); });
+				[=, this](uint32_t uuid) { m_plotManager->removePlot(uuid); });
 			connectXAxisController(plt);
 
 			connect(plt, &MonitorPlot::nameChanged, plotSelectorCombo,
@@ -230,7 +230,8 @@ void DataMonitorSettings::init(QString title, QColor color)
 	m_addPlotBtn = new QPushButton("ADD PLOT", this);
 	Style::setStyle(m_addPlotBtn, style::properties::button::basicButton);
 
-	connect(m_addPlotBtn, &QPushButton::clicked, m_plotManager, [=]() { m_plotManager->addPlot("Monitor Plot"); });
+	connect(m_addPlotBtn, &QPushButton::clicked, m_plotManager,
+		[=, this]() { m_plotManager->addPlot("Monitor Plot"); });
 	plotSettingsLayout->addWidget(m_addPlotBtn);
 
 	Preferences *p = Preferences::GetInstance();
