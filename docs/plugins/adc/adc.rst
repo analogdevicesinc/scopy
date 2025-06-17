@@ -153,3 +153,18 @@ Channel Controls
 - Plot - which plot is the curve displayed on
 
 Complex mode - activates complex mode. Complex channels are treated as whole different channels
+
+.. _fft_averaging:
+
+FFT Averaging (Frequency Instrument)
+-------------------------------------
+
+Starting with version 2.1.0, the ADC Frequency instrument supports FFT averaging using a 
+moving average filter. This feature allows you to smooth the frequency spectrum by averaging 
+multiple FFT frames, reducing noise fluctuations and making persistent signals easier to observe.
+
+**How to use:**
+- Open the channel menu in the Frequency instrument.
+- Adjust the "Averaging Size" spinbox to set the number of FFT frames to average.
+- The spectrum will update in real time as you change the averaging size.
+
