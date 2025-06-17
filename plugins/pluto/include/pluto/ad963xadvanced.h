@@ -29,6 +29,15 @@
 #include <tooltemplate.h>
 #include <iio.h>
 
+#include "auxadcdaciowidget.h"
+#include "elnawidget.h"
+#include "ensmmodeclockswidget.h"
+#include "gainwidget.h"
+#include "rssiwidget.h"
+#include "txmonitorwidget.h"
+#include "miscwidget.h"
+#include "bistwidget.h"
+
 namespace scopy {
 namespace pluto {
 class AD936XAdvanced : public QWidget
@@ -46,6 +55,14 @@ private:
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;
+	EnsmModeClocksWidget *m_ensmModeClocks;
+	ElnaWidget *m_elna;
+	RssiWidget *m_rssi;
+	GainWidget *m_gainWidget;
+	TxMonitorWidget *m_txMonitor;
+	AuxAdcDacIoWidget *m_auxAdcDacIo;
+	MiscWidget *m_misc;
+	BistWidget *m_bist;
 };
 } // namespace pluto
 } // namespace scopy
