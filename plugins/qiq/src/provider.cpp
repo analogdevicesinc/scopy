@@ -22,7 +22,7 @@ Provider::Provider(QString uri, QWidget *parent)
 	m_dataAcq = new DataAcq(conn->context(), this);
 
 	m_dataProvider = new DataProvider(this);
-	m_dataProvider->setScriptPath(QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "processData1.py");
+	// m_dataProvider->setScriptPath(QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "processData1.py");
 
 	m_runBtn = new RunBtn(this);
 	m_runBtn->setDisabled(true);

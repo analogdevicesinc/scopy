@@ -87,7 +87,7 @@ void DataProvider::readProcessedData()
 void DataProvider::initOutputFile()
 {
 	QString fileName = "processed_data_" + QString::number(m_uuid++) + ".bin";
-	m_outputFile = QString(QIQPLUGIN_RES_PATH) + QDir::separator() + fileName;
+	m_outputFile = scopy::config::settingsFolderPath() + QDir::separator() + fileName;
 	m_file.setFileName(m_outputFile);
 	if(!m_file.open(QIODevice::ReadWrite)) {
 		qInfo() << "Cannot create file: " << m_outputFile;
@@ -155,7 +155,7 @@ void DataProvider::runProcess(int chnls)
 
 	QString program = m_cliPath;
 	m_cliProcess->start(program,
-			    QStringList() << QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "device_data.bin"
+			    QStringList() << scopy::config::settingsFolderPath() + QDir::separator() + "device_data.bin"
 					  << m_outputFile);
 
 	if(!m_cliProcess->waitForStarted()) {

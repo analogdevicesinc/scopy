@@ -4,7 +4,7 @@
 #include <QDir>
 #include <QObject>
 #include "acqsetup.h"
-#include "scopy-qiqplugin_config.h"
+#include <common/scopyconfig.h>
 namespace scopy::qiqplugin {
 
 class DataAcq : public QObject
@@ -39,7 +39,7 @@ private:
 	QList<iio_channel *> m_chnls;
 	QVector<QVector<double>> m_data;
 
-	const QString FILE_PATH = QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "device_data.bin";
+	const QString FILE_PATH = scopy::config::settingsFolderPath() + QDir::separator() + "device_data.bin";
 };
 
 } // namespace scopy::qiqplugin
