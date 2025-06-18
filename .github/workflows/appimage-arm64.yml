@@ -7,10 +7,12 @@ env:
   USERNAME: github-actions
 
 jobs:
+  docker_tag_workflow:
+    uses: ./.github/workflows/get_docker_tag.yml
 
   build_scopy_arm64_appimage:
     runs-on: ubuntu-22.04
-
+    needs: docker_tag_workflow
     steps:
         - uses: actions/checkout@v4
           with:
@@ -18,7 +20,7 @@ jobs:
                 fetch-depth: '0'
 
         - name: Pull the Docker Image
-          run: docker pull cristianbindea/scopy2-arm64-appimage:latest
+          run: docker pull cristianbindea/scopy2-arm64-appimage:${{ needs.docker_tag_workflow.outputs.docker_tag }}
 
         - name: Create Scopy AppImage
           shell: bash
@@ -31,7 +33,7 @@ jobs:
                 docker run \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
                         --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
-                        cristianbindea/scopy2-arm64-appimage:latest \
+                        cristianbindea/scopy2-arm64-appimage:${{ needs.docker_tag_workflow.outputs.docker_tag }} \
                         /bin/bash -c    'cd $HOME && \
                                         sudo chown -R runner:runner scopy && \
                                         cd $HOME/scopy && \

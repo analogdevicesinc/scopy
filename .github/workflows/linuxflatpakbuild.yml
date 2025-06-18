@@ -7,17 +7,19 @@ env:
   USERNAME: github-actions
 
 jobs:
+  docker_tag_workflow:
+    uses: ./.github/workflows/get_docker_tag.yml
 
   make-flatpak:
     runs-on: ubuntu-latest
-
+    needs: docker_tag_workflow
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: '0'
 
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy2-flatpak:latest
+      run: docker pull cristianbindea/scopy2-flatpak:${{ needs.docker_tag_workflow.outputs.docker_tag }}
 
     - name: Run Docker Image
       run: |
@@ -26,7 +28,7 @@ jobs:
                 -e CI_SCRIPT='ON' \
                 --mount type=bind,source="$GITHUB_WORKSPACE",target=$GITHUB_WORKSPACE \
                 --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
-                cristianbindea/scopy2-flatpak:latest \
+                cristianbindea/scopy2-flatpak:${{ needs.docker_tag_workflow.outputs.docker_tag }} \
                 /bin/bash -c 'sudo chown -R runner:runner $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/flatpak/flatpak_build_process.sh'
 
     - name: Set short git commit SHA
