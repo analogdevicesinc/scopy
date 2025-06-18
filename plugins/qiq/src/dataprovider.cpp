@@ -48,10 +48,6 @@ DataProvider::~DataProvider()
 
 void DataProvider::processData(const QString &inputFile)
 {
-	if(m_data) {
-		m_file.unmap(m_data);
-		m_data = nullptr;
-	}
 	m_debugTimer.startTimer();
 	QString cmd("p " + QString::number(m_chnls));
 	m_cliProcess->write(cmd.toStdString().c_str());
@@ -148,6 +144,10 @@ void DataProvider::runPython(const QStringList args)
 void DataProvider::runProcess(int chnls)
 {
 	m_chnls = chnls;
+	if(m_data) {
+		m_file.unmap(m_data);
+		m_data = nullptr;
+	}
 	if(m_cliProcess->state() == QProcess::Running) {
 		m_cliProcess->kill();
 		m_cliProcess->waitForFinished();
