@@ -1,0 +1,41 @@
+name: Get Docker Tag reusable workflow
+
+on:
+  workflow_call:
+    outputs:
+      docker_tag:
+        value: ${{ jobs.get_docker_tag.outputs.docker_tag }}
+
+jobs:
+   get_docker_tag:
+    name: Get Docker Tag
+    runs-on: ubuntu-latest
+    outputs:
+        docker_tag: ${{ steps.set_docker_tag.outputs.docker_tag }}
+    steps:
+      - name: Get branch name
+        id: set_docker_tag
+        run: |
+          # if a branch contains "scopy-testing" in its name, use "testing" tag, otherwise use "latest"
+
+          echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+          echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
+          echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            BRANCH_NAME="$GITHUB_HEAD_REF"
+            else
+            BRANCH_NAME="$GITHUB_REF_NAME"
+          fi
+
+          case "$BRANCH_NAME" in
+            *scopy-testing*)
+                TAG="testing"
+                ;;
+            *)
+                TAG="latest"
+                ;;
+           esac
+
+           echo "Selected tag: $TAG"
+           echo "docker_tag=$TAG" >> $GITHUB_OUTPUT

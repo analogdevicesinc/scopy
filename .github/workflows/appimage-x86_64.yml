@@ -7,11 +7,14 @@ env:
   USERNAME: github-actions
 
 jobs:
+  docker_tag_workflow:
+    uses: ./.github/workflows/get_docker_tag.yml
 
   build_scopy_x86-64_appimage:
     runs-on: ubuntu-22.04
+    needs: docker_tag_workflow
     container:
-        image: cristianbindea/scopy2-x86_64-appimage:latest
+        image: cristianbindea/scopy2-x86_64-appimage:${{ needs.docker_tag_workflow.outputs.docker_tag }}
         options: --user root
 
     steps:
