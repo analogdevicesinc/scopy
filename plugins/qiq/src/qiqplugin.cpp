@@ -6,14 +6,33 @@
 
 #include "plotting.h"
 
+#include <iioutil/connectionprovider.h>
+
 Q_LOGGING_CATEGORY(CAT_QIQPLUGIN, "QIQPlugin")
 using namespace scopy::qiqplugin;
 
 bool QIQPlugin::compatible(QString m_param, QString category)
 {
-	// This function defines the characteristics according to which the
-	// plugin is compatible with a specific device
-	bool ret = true;
+	bool ret = false;
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
+
+	if(conn == nullptr)
+		return ret;
+
+	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
+		iio_device *dev = iio_context_get_device(conn->context(), i);
+		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+			struct iio_channel *chn = iio_device_get_channel(dev, j);
+			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
+				ret = true;
+				goto finish;
+			}
+		}
+	}
+
+finish:
+
+	ConnectionProvider::GetInstance()->close(m_param);
 	return ret;
 }
 
@@ -76,12 +95,18 @@ bool QIQPlugin::onConnect()
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
+	if(conn == nullptr) {
+		return false;
+	}
+	ConnectionProvider::GetInstance()->close(m_param);
+
 	Plotting *plotting = new Plotting();
 	m_toolList[0]->setTool(plotting);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	Provider *provider = new Provider();
+	Provider *provider = new Provider(m_param);
 	m_toolList[1]->setTool(provider);
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setRunBtnVisible(true);

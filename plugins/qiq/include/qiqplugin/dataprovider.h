@@ -6,8 +6,10 @@
 #include <QFile>
 #include <qprocess.h>
 #include <qfuturewatcher.h>
+#include <QDir>
+#include <common/scopyconfig.h>
 
-#define CHNL_NUMBER 2
+#define CHNLS 1
 
 namespace scopy::qiqplugin {
 class DataProvider : public QObject
@@ -19,6 +21,9 @@ public:
 
 	void processData(const QString &inputFile);
 	void setScriptPath(const QString &newScriptPath);
+	void runProcess(int chnls);
+
+	void setCliPath(const QString &newCliPath);
 
 Q_SIGNALS:
 	void dataReady(QVector<QVector<double>> processedData);
@@ -27,14 +32,14 @@ Q_SIGNALS:
 private:
 	QFutureWatcher<void> *m_processFw;
 	QFile m_file;
+	int m_chnls;
 	int m_size;
 	uchar *m_data;
 	QString m_scriptPath;
 	QString m_outputFile;
 	static int m_uuid;
-	DebugTimer m_debugTimer = DebugTimer("/home/andrei/Desktop/benchmark.csv");
-	QString cliPath =
-		"/home/andrei/git_repositories/scopy/process_data/build/Desktop_Qt_5_15_2_GCC_64bit-Debug/process_data";
+	DebugTimer m_debugTimer = DebugTimer(scopy::config::settingsFolderPath() + QDir::separator() + "benchmark.csv");
+	QString m_cliPath = scopy::config::executableFolderPath() + QDir::separator() + "process_data";
 	QProcess *m_cliProcess;
 
 	void readProcessedData();
@@ -42,7 +47,6 @@ private:
 	void setupConnections();
 	bool mapFile();
 	void runPython(const QStringList args);
-	void runProcess(const QStringList args);
 };
 } // namespace scopy::qiqplugin
 

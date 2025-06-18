@@ -5,64 +5,61 @@
 #include <stylehelper.h>
 #include <tooltemplate.h>
 
+#include <iioutil/connectionprovider.h>
+
 using namespace scopy::qiqplugin;
 
-Provider::Provider(QWidget *parent)
+Provider::Provider(QString uri, QWidget *parent)
 	: QWidget(parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	setLayout(layout);
 
-	m_dataAcq = new DataAcquisition(this);
+	Connection *conn = ConnectionProvider::GetInstance()->open(uri);
+
+	m_acqSetup = new AcqSetup(this);
+	m_dataAcq = new DataAcq(conn->context(), this);
+
 	m_dataProvider = new DataProvider(this);
 	m_dataProvider->setScriptPath(QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "processData1.py");
 
 	m_runBtn = new RunBtn(this);
+	m_runBtn->setDisabled(true);
 
 	setupPlotWidget();
 	setupToolTemplate();
 	setupConnections();
+
+	m_dataAcq->initDevicesAndChnls();
 }
 
-Provider::~Provider() {}
+Provider::~Provider() { ConnectionProvider::GetInstance()->close(m_uri); }
 
-// void Provider::onDataAcqAvailable(const double *data, const int &dataSize, const QString &path)
-// {
-// 	size_t samplesPerChannel = (dataSize / sizeof(double)) / 2;
-// 	QVector<QVector<double>> vData(CHNL_NUMBER);
-// 	for(int i = 0; i < samplesPerChannel; i++) {
-// 		for(int j = 0; j < CHNL_NUMBER; j++) {
-// 			vData[j].push_back(*(data + i * CHNL_NUMBER + j));
-// 		}
-// 	}
-// 	for(int i = 0; i < vData.size(); i++) {
-// 		m_acqPlot->getChannels()[i]->curve()->setSamples(m_xValues, vData[i]);
-// 	}
-// 	m_acqPlot->replot();
-
-// 	m_dataProvider->processData(path);
-// }
-
-void Provider::onDataAcqAvailable(const short *data, const int &dataSize, const QString &path)
+void Provider::onDataAcqAvailable(QVector<QVector<double>> data, const int &dataSize, const QString &path)
 {
-	DebugTimer acqPlot("/home/andrei/Desktop/benchmark.csv");
-	size_t samplesPerChannel = (dataSize / sizeof(short)) / 2;
-	QVector<QVector<double>> vData(CHNL_NUMBER);
-	for(int i = 0; i < samplesPerChannel; i++) {
-		for(int j = 0; j < CHNL_NUMBER; j++) {
-			vData[j].push_back(*(data + i * CHNL_NUMBER + j));
-		}
-	}
+	DebugTimer acqPlot(scopy::config::settingsFolderPath() + QDir::separator() + "benchmark.csv");
+
 	DEBUGTIMER_LOG(acqPlot, "Structure data for plotting:");
 	acqPlot.restartTimer();
-	for(int i = 0; i < vData.size(); i++) {
-		m_acqPlot->getChannels()[i]->curve()->setSamples(m_xValues, vData[i]);
+	for(int i = 0; i < data.size(); i++) {
+		m_acqPlot->getChannels()[i]->curve()->setSamples(m_xValues, data[i]);
 	}
 	m_acqPlot->replot();
 	DEBUGTIMER_LOG(acqPlot, "Plot device samples:");
-
 	m_dataProvider->processData(path);
+}
+
+void Provider::initXAxis(PlotWidget *plot, int samples)
+{
+	plot->xAxis()->setInterval(0, samples);
+	if(samples != m_xValues.size()) {
+		m_xValues.clear();
+		for(int i = 0; i < samples; i++) {
+			m_xValues.push_back(i);
+		}
+	}
+	plot->replot();
 }
 
 void Provider::setupPlotWidget()
@@ -72,6 +69,7 @@ void Provider::setupPlotWidget()
 
 	m_receiverPlot = new PlotWidget(this);
 	configurePlot(m_receiverPlot, -200, 200);
+	addPlotChannel(m_receiverPlot, "ch0", StyleHelper::getChannelColor(0));
 }
 
 void Provider::setupToolTemplate()
@@ -83,6 +81,7 @@ void Provider::setupToolTemplate()
 	tool->topContainerMenuControl()->setVisible(false);
 	tool->rightContainer()->setVisible(false);
 
+	tool->addWidgetToCentralContainerHelper(m_acqSetup);
 	tool->addWidgetToCentralContainerHelper(m_acqPlot);
 	tool->addWidgetToCentralContainerHelper(m_receiverPlot);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
@@ -92,10 +91,10 @@ void Provider::setupToolTemplate()
 
 void Provider::setupConnections()
 {
-	connect(m_dataAcq, &DataAcquisition::dataAvailable, this, &Provider::onDataAcqAvailable);
+	connect(m_dataAcq, &DataAcq::dataAvailable, this, &Provider::onDataAcqAvailable);
 
 	connect(m_dataProvider, &DataProvider::dataReady, this, [this](const QVector<QVector<double>> &processedData) {
-		DebugTimer timer("/home/andrei/Desktop/benchmark.csv");
+		DebugTimer timer(scopy::config::settingsFolderPath() + QDir::separator() + "benchmark.csv");
 		for(int i = 0; i < processedData.size(); i++) {
 			m_receiverPlot->getChannels()[i]->curve()->setSamples(m_xValues, processedData[i]);
 		}
@@ -115,12 +114,48 @@ void Provider::setupConnections()
 		}
 	});
 	connect(m_dataProvider, &DataProvider::stopAcq, this, [this]() { m_runBtn->setChecked(false); });
+	connect(m_runBtn, &RunBtn::toggled, m_acqSetup, &AcqSetup::setDisabled);
+	connect(m_acqSetup, &AcqSetup::configPressed, this, &Provider::configPressed);
+	connect(m_dataAcq, &DataAcq::contextInfo, m_acqSetup, &AcqSetup::init);
+}
+
+void Provider::removePlotChannels(PlotWidget *plot)
+{
+	const QList<PlotChannel *> chnls = plot->getChannels();
+	for(PlotChannel *ch : chnls) {
+		plot->removePlotChannel(ch);
+		delete ch;
+	}
+	plot->replot();
+}
+
+void Provider::initChannels(PlotWidget *plot, QStringList chnls)
+{
+	removePlotChannels(plot);
+	int i = 0;
+	for(const QString &ch : chnls) {
+		addPlotChannel(plot, ch, StyleHelper::getChannelColor(i));
+		i++;
+	}
+	plot->replot();
+}
+
+void Provider::configPressed(AcqSetup::AcqConfig config)
+{
+	initChannels(m_acqPlot, config.enChnls);
+	initXAxis(m_acqPlot, config.samples);
+	initXAxis(m_receiverPlot, config.samples);
+	m_dataAcq->onConfigPressed(config);
+	if(!config.cliPath.isEmpty()) {
+		m_dataProvider->setCliPath(config.cliPath);
+	}
+	m_dataProvider->runProcess(config.enChnls.size());
+	m_runBtn->setEnabled(true);
 }
 
 void Provider::configurePlot(PlotWidget *plot, int yMin, int yMax)
 {
-	int samplesPerChnl = SAMPLES_PER_CHANNEL;
-	plot->xAxis()->setInterval(0, samplesPerChnl);
+	initXAxis(plot, 1024);
 
 	plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
 	plot->yAxis()->scaleDraw()->setFloatPrecision(2);
@@ -128,16 +163,6 @@ void Provider::configurePlot(PlotWidget *plot, int yMin, int yMax)
 
 	plot->setShowXAxisLabels(true);
 	plot->setShowYAxisLabels(true);
-
-	addPlotChannel(plot, "ch0", StyleHelper::getChannelColor(0));
-	addPlotChannel(plot, "ch1", StyleHelper::getChannelColor(1));
-
-	if(samplesPerChnl != m_xValues.size()) {
-		m_xValues.clear();
-		for(int i = 0; i < samplesPerChnl; i++) {
-			m_xValues.push_back(i);
-		}
-	}
 
 	plot->replot();
 }

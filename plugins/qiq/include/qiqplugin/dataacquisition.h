@@ -16,7 +16,7 @@ using namespace libm2k;
 using namespace libm2k::analog;
 using namespace libm2k::context;
 
-#define SAMPLES_PER_CHANNEL 1024 * 100
+#define SAMPLES_PER_CHANNEL 1024
 
 namespace scopy::qiqplugin {
 class DataAcquisition : public QObject

@@ -33,7 +33,6 @@ DataProvider::DataProvider(QObject *parent)
 		QString output = m_cliProcess->readAllStandardError();
 		qInfo() << "Error:" << output;
 	});
-	runProcess({QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "device_data.bin", m_outputFile});
 }
 
 DataProvider::~DataProvider()
@@ -49,8 +48,13 @@ DataProvider::~DataProvider()
 
 void DataProvider::processData(const QString &inputFile)
 {
+	if(m_data) {
+		m_file.unmap(m_data);
+		m_data = nullptr;
+	}
 	m_debugTimer.startTimer();
-	m_cliProcess->write("p");
+	QString cmd("p " + QString::number(m_chnls));
+	m_cliProcess->write(cmd.toStdString().c_str());
 	m_cliProcess->write("\n");
 }
 
@@ -58,7 +62,7 @@ void DataProvider::setScriptPath(const QString &newScriptPath) { m_scriptPath = 
 
 void DataProvider::readProcessedData()
 {
-	DebugTimer timer("/home/andrei/Desktop/benchmark.csv");
+	DebugTimer timer(scopy::config::settingsFolderPath() + QDir::separator() + "benchmark.csv");
 	if(!m_data || m_size < 4) {
 		qWarning() << "Invalid file";
 		return;
@@ -68,10 +72,12 @@ void DataProvider::readProcessedData()
 
 	const short *samples = reinterpret_cast<const short *>(m_data);
 
-	QVector<QVector<double>> processedData(CHNL_NUMBER);
+	QVector<QVector<double>> processedData(CHNLS);
 
-	for(int i = 0; i < numSamples; ++i) {
-		processedData[0].push_back(samples[i]);
+	for(int i = 0; i < CHNLS; i++) {
+		for(int j = 0; j < numSamples; j++) {
+			processedData[i].push_back(samples[j]);
+		}
 	}
 
 	DEBUGTIMER_LOG(timer, "Read processed data:");
@@ -135,22 +141,22 @@ void DataProvider::runPython(const QStringList args)
 		}
 
 		process.waitForFinished(30000);
-
-		// qInfo() << "Output:" << process.readAllStandardOutput();
-		// qInfo() << "Errors:" << process.readAllStandardError();
 	});
 	m_processFw->setFuture(f);
 }
 
-void DataProvider::runProcess(const QStringList args)
+void DataProvider::runProcess(int chnls)
 {
-	if(m_processFw->isRunning()) {
-		return;
+	m_chnls = chnls;
+	if(m_cliProcess->state() == QProcess::Running) {
+		m_cliProcess->kill();
+		m_cliProcess->waitForFinished();
 	}
 
-	QString program = cliPath;
-
-	m_cliProcess->start(program, QStringList() << args);
+	QString program = m_cliPath;
+	m_cliProcess->start(program,
+			    QStringList() << QString(QIQPLUGIN_RES_PATH) + QDir::separator() + "device_data.bin"
+					  << m_outputFile);
 
 	if(!m_cliProcess->waitForStarted()) {
 		qWarning() << "Running C error!";
@@ -161,3 +167,5 @@ void DataProvider::runProcess(const QStringList args)
 	qInfo() << m_cliProcess->readAllStandardOutput();
 	qInfo() << m_cliProcess->readAllStandardError();
 }
+
+void DataProvider::setCliPath(const QString &newCliPath) { m_cliPath = newCliPath; }
