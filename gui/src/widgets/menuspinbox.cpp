@@ -273,6 +273,13 @@ void MenuSpinbox::setScalingEnabled(bool en)
 	m_scaleCb->setVisible(en);
 }
 
+void MenuSpinbox::setScaleList(QList<UnitPrefix> scales)
+{
+	m_scales.clear();
+	m_scales = scales;
+	setScaleRange(m_min, m_max);
+}
+
 void MenuSpinbox::userInput(QString s)
 {
 	// remove whitespace
