@@ -51,6 +51,17 @@ Q_SIGNALS:
 	void readRequested();
 
 private:
+	void init();
+
+	QPushButton *m_ensmModeClocksBtn = nullptr;
+	QPushButton *m_eLnaBtn = nullptr;
+	QPushButton *m_rssiBtn = nullptr;
+	QPushButton *m_gainBtn = nullptr;
+	QPushButton *m_txMonitorBtn = nullptr;
+	QPushButton *m_auxAdcDacIioBtn = nullptr;
+	QPushButton *m_miscBtn = nullptr;
+	QPushButton *m_bistBtn = nullptr;
+
 	iio_context *m_ctx = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
@@ -63,6 +74,12 @@ private:
 	AuxAdcDacIoWidget *m_auxAdcDacIo;
 	MiscWidget *m_misc;
 	BistWidget *m_bist;
+
+	iio_device *m_plutoDevice = nullptr;
+	QStackedWidget *m_centralWidget = nullptr;
+
+	bool m_isToolInitialized;
+	void showEvent(QShowEvent *event) override;
 };
 } // namespace pluto
 } // namespace scopy
