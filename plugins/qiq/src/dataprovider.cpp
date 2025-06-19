@@ -1,5 +1,4 @@
 #include "dataprovider.h"
-#include "scopy-qiqplugin_config.h"
 #include <QDir>
 #include <qdebug.h>
 #include <qtconcurrentrun.h>
@@ -27,6 +26,9 @@ DataProvider::DataProvider(QObject *parent)
 			}
 			DEBUGTIMER_LOG(m_debugTimer, "C program command:");
 			readProcessedData();
+		}
+		if(output.contains("CPU")) {
+			qInfo() << output;
 		}
 	});
 	connect(m_cliProcess, &QProcess::readyReadStandardError, this, [this]() {

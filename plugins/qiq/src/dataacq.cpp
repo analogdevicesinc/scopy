@@ -11,8 +11,7 @@ DataAcq::DataAcq(iio_context *ctx, QObject *parent)
 	, m_ctx(ctx)
 	, m_buffer(nullptr)
 	, m_mappedData(nullptr)
-{
-}
+{}
 
 DataAcq::~DataAcq()
 {
@@ -37,9 +36,6 @@ void DataAcq::readDeviceData()
 
 	int ch_index = 0;
 	for(iio_channel *ch : qAsConst(m_chnls)) {
-		if(!iio_channel_is_enabled(ch))
-			continue;
-
 		QVector<short> chData(m_samples);
 		chnlRead(ch, chData.data());
 		for(int i = 0; i < chData.size(); i++) {
