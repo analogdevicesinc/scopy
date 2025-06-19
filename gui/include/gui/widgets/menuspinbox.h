@@ -172,6 +172,7 @@ public Q_SLOTS:
 	void setValue(double newValue);
 	void setIncrementMode(IncrementMode is);
 	void setScalingEnabled(bool en);
+	void setScaleList(QList<UnitPrefix> scales);
 
 Q_SIGNALS:
 	void nameChanged(QString);
