@@ -46,10 +46,10 @@ libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep 
 libusbid="$(echo ${libusbpath} | rev | cut -d "/" -f 1 | rev)"
 cp ${libusbpath} ./Scopy.app/Contents/Frameworks/
 
-m2kpath=${STAGING_AREA_DEPS}/lib/libm2k.dylib
+m2kpath=${STAGING_AREA_DEPS}/lib/libm2k.?.?.?.dylib
 m2krpath="$(otool -D ${m2kpath} | grep @rpath)"
 m2kid=${m2krpath#"@rpath/"}
-cp ${STAGING_AREA_DEPS}/lib/libm2k.* ./Scopy.app/Contents/Frameworks
+cp ${STAGING_AREA_DEPS}/lib/libm2k.?.?.?.dylib ./Scopy.app/Contents/Frameworks
 install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 
 echo "### Get python version"
@@ -126,7 +126,6 @@ libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio 
 libserialportid="$(echo ${libserialportpath} | rev | cut -d "/" -f 1 | rev)"
 install_name_tool -change ${libserialportpath} @executable_path/../Frameworks/${libserialportid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 
-install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.dylib
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
