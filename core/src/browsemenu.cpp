@@ -74,6 +74,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	Style::setStyle(m_scriptingBtn, style::properties::button::toolButton);
 	m_scriptingBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
 	m_scriptingBtn->setStyleSheet("text-align: left");
+	m_scriptingBtn->setIconSize(QSize(32, 32));
 	m_scriptingBtn->setCheckable(true);
 	m_scriptingBtn->setChecked(false);
 

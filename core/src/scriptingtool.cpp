@@ -195,9 +195,6 @@ void ScriptingTool::evaluateCode(QString code)
 			output += "\n" + timestamp + ": Script finished with status " + QString::number(ret);
 
 		m_console->appendPlainText(output);
-	} else {
-		QString newValue = "\n" + timestamp + ": No input detected";
-		m_console->appendPlainText(newValue);
 	}
 
 	if(m_runBtn->isEnabled()) {
