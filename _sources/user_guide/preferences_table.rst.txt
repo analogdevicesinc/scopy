@@ -116,6 +116,9 @@
    * - device_menu_item
      - Show detailed device header in tool menu
      - Toggle the display of a detailed device header in the tool menu. This header includes the device name, URI, icon, and status indicators. Clicking the device icon navigates to the device configuration page, if available. Note: Enabling this option requires removing and re-adding all devices in the tool menu.
+   * - general_use_docking_if_available
+     - Use docking elements if available
+     - If the application was built with the docking feature, enable it. This will make some plots and elements detachable, thus enabling the user to configure the position of these elements in the application.
    * - autoconnect_previous
      - Auto-connect to previous session
      - Automatically use the saved URI to connect to previous devices,       if available, when the application starts. This speeds up the       connection process and reduces the number of necessary steps.
