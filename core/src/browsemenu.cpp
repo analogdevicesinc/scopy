@@ -24,6 +24,7 @@
 #include <pluginbase/preferences.h>
 
 #include <QPushButton>
+#include <QMouseEvent>
 #include <stylehelper.h>
 
 using namespace scopy;
@@ -82,6 +83,8 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	connect(m_scriptingBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(SCRIPTING_ID); });
 	bool scriptingEnabled = Preferences::get("general_scripting_enabled").toBool();
 	m_scriptingBtn->setVisible(scriptingEnabled);
+
+	m_scriptingBtn->installEventFilter(this);
 
 	// Connect to preference changes for scripting button
 	Preferences *prefs = Preferences::GetInstance();
@@ -192,6 +195,18 @@ void BrowseMenu::toggleCollapsed()
 	m_collapsed = !m_collapsed;
 	m_btnCollapse->setHidden(m_collapsed);
 	Q_EMIT collapsed(m_collapsed);
+}
+
+bool BrowseMenu::eventFilter(QObject *watched, QEvent *event)
+{
+	if(watched == m_scriptingBtn && event->type() == QEvent::MouseButtonDblClick) {
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+		if(mouseEvent->button() == Qt::LeftButton) {
+			Q_EMIT scriptingToolDetach();
+			return true;
+		}
+	}
+	return QWidget::eventFilter(watched, event);
 }
 
 void BrowseMenu::hideBtnText(QPushButton *btn, QString name, bool hide)

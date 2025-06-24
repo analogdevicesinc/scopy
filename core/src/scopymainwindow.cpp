@@ -27,6 +27,7 @@
 #include <QLoggingCategory>
 #include <QTranslator>
 #include <QOpenGLFunctions>
+#include <QVBoxLayout>
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
 #include <style.h>
@@ -76,6 +77,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ScopyMainWindow)
 	, m_glLoader(nullptr)
+	, m_scriptingTool(nullptr)
+	, m_detachedScriptingWindow(nullptr)
+	, m_scriptingToolDetached(false)
 {
 	DebugTimer benchmark;
 
@@ -116,10 +120,21 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	BrowseMenu *browseMenu = new BrowseMenu(ui->wToolBrowser);
 	ui->wToolBrowser->layout()->addWidget(browseMenu);
-	connect(browseMenu, &BrowseMenu::requestTool, ts, &ToolStack::show, Qt::QueuedConnection);
+	connect(
+		browseMenu, &BrowseMenu::requestTool, this,
+		[this, ts](QString toolId) {
+			// Scripting tool detach/attach logic
+			if(toolId == "scripting") {
+				handleScriptingToolRequest();
+			} else {
+				ts->show(toolId);
+			}
+		},
+		Qt::QueuedConnection);
 	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
 	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(browseMenu, &BrowseMenu::collapsed, this, &ScopyMainWindow::collapseToolMenu);
+	connect(browseMenu, &BrowseMenu::scriptingToolDetach, this, &ScopyMainWindow::handleScriptingToolDetach);
 
 	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
@@ -148,13 +163,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	m_toolMenuManager = new ToolMenuManager(ts, dtm, browseMenu->toolMenu(), this);
 
 	PkgWidget *pkgWidget = new PkgWidget(this);
-	ScriptingTool *scriptingTool = new ScriptingTool(this);
+	m_scriptingTool = new ScriptingTool(this);
 
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
 	ts->add("package", pkgWidget);
-	ts->add("scripting", scriptingTool);
+	ts->add("scripting", m_scriptingTool);
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
@@ -344,6 +359,14 @@ void ScopyMainWindow::loadSession(QSettings &s) {}
 
 void ScopyMainWindow::closeEvent(QCloseEvent *event)
 {
+	// Scripting tool detach/attach logic
+	if(m_detachedScriptingWindow) {
+		m_detachedScriptingWindow->removeEventFilter(this);
+		m_detachedScriptingWindow->close();
+		m_detachedScriptingWindow = nullptr;
+		m_scriptingToolDetached = false;
+	}
+
 	DeviceAutoConnect::clear();
 	if(Preferences::get("autoconnect_previous").toBool()) {
 		dm->saveSessionDevices();
@@ -746,6 +769,93 @@ void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)
 
 	qInfo(CAT_SCOPY) << "The upstream scopy version is" << upstreamScopyVersion << "and the current one is"
 			 << currentScopyVersion;
+}
+
+// Scripting tool detach/attach logic
+void ScopyMainWindow::handleScriptingToolDetach()
+{
+	if(m_scriptingToolDetached) {
+		attachScriptingTool();
+	} else {
+		detachScriptingTool();
+	}
+}
+
+// Scripting tool detach/attach logic
+void ScopyMainWindow::handleScriptingToolRequest()
+{
+	if(m_scriptingToolDetached && m_detachedScriptingWindow) {
+		m_detachedScriptingWindow->show();
+		m_detachedScriptingWindow->raise();
+		m_detachedScriptingWindow->activateWindow();
+	} else {
+		auto ts = ui->wsToolStack;
+		ts->show("scripting");
+	}
+}
+
+// Scripting tool detach/attach logic
+void ScopyMainWindow::detachScriptingTool()
+{
+	if(m_scriptingToolDetached)
+		return;
+
+	auto ts = ui->wsToolStack;
+	ts->remove("scripting");
+
+	m_detachedScriptingWindow = new QWidget(nullptr);
+	m_detachedScriptingWindow->setWindowTitle("Scopy - Scripting Tool");
+	m_detachedScriptingWindow->setWindowIcon(QIcon(":/gui/icons/tool_scripting.svg"));
+	m_detachedScriptingWindow->resize(800, 600);
+
+	m_scriptingTool->setParent(m_detachedScriptingWindow);
+	m_scriptingTool->show();
+
+	// Set up layout for detached window
+	QVBoxLayout *layout = new QVBoxLayout(m_detachedScriptingWindow);
+	layout->setMargin(0);
+	layout->addWidget(m_scriptingTool);
+
+	// Show detached window
+	m_detachedScriptingWindow->show();
+	m_detachedScriptingWindow->raise();
+	m_detachedScriptingWindow->activateWindow();
+
+	m_scriptingToolDetached = true;
+
+	// Install event filter to handle window close event
+	m_detachedScriptingWindow->installEventFilter(this);
+}
+
+// Scripting tool detach/attach logic
+void ScopyMainWindow::attachScriptingTool()
+{
+	if(!m_scriptingToolDetached)
+		return;
+
+	if(m_detachedScriptingWindow) {
+		m_scriptingTool->setParent(this);
+		m_detachedScriptingWindow->deleteLater();
+		m_detachedScriptingWindow = nullptr;
+	}
+
+	auto ts = ui->wsToolStack;
+	ts->add("scripting", m_scriptingTool);
+	ts->show("scripting");
+
+	m_scriptingToolDetached = false;
+}
+
+bool ScopyMainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+
+	if(watched == m_detachedScriptingWindow && event->type() == QEvent::Close) {
+		// Reattach the scripting tool when window is closed
+		attachScriptingTool();
+		return false;
+	}
+
+	return QMainWindow::eventFilter(watched, event);
 }
 
 #include "moc_scopymainwindow.cpp"
