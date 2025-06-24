@@ -69,6 +69,7 @@ private:
 	QSpacerItem *m_spacer;
 	ToolMenu *m_toolMenu;
 	QPushButton *m_btnCollapse;
+	QPushButton *m_scriptingBtn;
 	QMap<QString, QPushButton *> m_btnsMap;
 	bool m_collapsed;
 
@@ -76,6 +77,7 @@ private:
 	const QString PACKAGE_ID = "package";
 	const QString PREFERENCES_ID = "preferences";
 	const QString ABOUT_ID = "about";
+	const QString SCRIPTING_ID = "scripting";
 };
 } // namespace scopy
 
