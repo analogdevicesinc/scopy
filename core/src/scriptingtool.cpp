@@ -177,25 +177,23 @@ void ScriptingTool::saveFileAs()
 void ScriptingTool::evaluateCode(QString code)
 {
 	QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-	if(!code.isEmpty()) {
-		QString output;
+	QString output;
 
-		QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(code, "");
-		int ret = EXIT_SUCCESS;
-		if(val.isError()) {
-			qWarning(CAT_SCRIPTINGTOOL) << "Exception:" << val.toString();
-			ret = EXIT_FAILURE;
-			output += timestamp + ": Exception:" + val.toString();
-		} else if(!val.isUndefined()) {
-			qWarning(CAT_SCRIPTINGTOOL) << val.toString();
-			output += timestamp + ": " + val.toString();
-		}
-
-		if(m_runBtn->isChecked())
-			output += "\n" + timestamp + ": Script finished with status " + QString::number(ret);
-
-		m_console->appendPlainText(output);
+	QJSValue val = ScopyJS::GetInstance()->engine()->evaluate(code, "");
+	int ret = EXIT_SUCCESS;
+	if(val.isError()) {
+		qWarning(CAT_SCRIPTINGTOOL) << "Exception:" << val.toString();
+		ret = EXIT_FAILURE;
+		output += timestamp + ": Exception:" + val.toString();
+	} else if(!val.isUndefined()) {
+		qWarning(CAT_SCRIPTINGTOOL) << val.toString();
+		output += timestamp + ": " + val.toString();
 	}
+
+	if(m_runBtn->isChecked())
+		output += "\n" + timestamp + ": Script finished with status " + QString::number(ret);
+
+	m_console->appendPlainText(output);
 
 	if(m_runBtn->isEnabled()) {
 		m_runBtn->setChecked(false);

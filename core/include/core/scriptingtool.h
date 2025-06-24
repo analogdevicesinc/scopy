@@ -37,8 +37,6 @@ class SCOPY_CORE_EXPORT ScriptingTool : public QWidget
 public:
 	explicit ScriptingTool(QWidget *parent = nullptr);
 
-signals:
-
 private:
 	ToolTemplate *m_tool;
 	ScopyCodeEditor *m_codeEditor;

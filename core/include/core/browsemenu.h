@@ -54,6 +54,10 @@ Q_SIGNALS:
 	void requestSave();
 	void requestLoad();
 	void collapsed(bool collapsed);
+	void scriptingToolDetach();
+
+protected:
+	bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
 	void add(QWidget *w, QString name, MenuAlignment position);
