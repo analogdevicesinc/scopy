@@ -24,6 +24,8 @@ General IIO plugins
 
 * :ref:`JESD204 Status <jesd_status>`
 
+* :ref:`Scripting tool <scripting_tool>`
+
 
 Application Specific plugins
 
@@ -78,4 +80,5 @@ Contents
    ad936x/index
    ad9084/index
    jesdstatus/index
+   scripting/scripting
 
