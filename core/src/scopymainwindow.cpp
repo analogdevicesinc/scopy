@@ -30,6 +30,10 @@
 #include <browsemenu.h>
 #include <deviceautoconnect.h>
 #include <style.h>
+#if __ANDROID__
+#include <QtAndroidExtras/QtAndroid>
+#include <QAndroidJniEnvironment>
+#endif
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -73,6 +77,10 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {
 	QElapsedTimer timer;
 	timer.start();
+
+#ifdef __ANDROID__ // JNI hooks
+	// registerNativeMethods();
+#endif
 
 	initPreferences();
 	ScopySplashscreen::showMessage("Initializing ui");
@@ -378,7 +386,7 @@ void ScopyMainWindow::setupPreferences()
 		m_glLoader = new QOpenGLWidget(this);
 	}
 	if(p->get("general_load_decoders").toBool()) {
-		loadDecoders();
+		// loadDecoders();
 	}
 	if(p->get("general_show_status_bar").toBool()) {
 		StatusBarManager::GetInstance()->setEnabled(true);
@@ -687,5 +695,103 @@ void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)
 	qInfo(CAT_SCOPY) << "The upstream scopy version is" << upstreamScopyVersion << "and the current one is"
 			 << currentScopyVersion;
 }
+
+
+// #ifdef __ANDROID__
+
+// void ScopyMainWindow::saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/) {
+// 	qDebug()<<"-- Saving session JNI";
+// 	ScopyMainWindow::saveSession();
+// }
+
+// void ScopyMainWindow::saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thiz*/) {
+// 	qDebug()<<"-- Saving and stopping input tools JNI";
+// 	ToolLauncher* tl = getToolLauncherInstance();
+// 	if(tl)
+// 	{
+// 		getToolLauncherInstance()->saveRunningInputTools();
+// 		getToolLauncherInstance()->stopRunningTools();
+// 	}
+// }
+
+// void ScopyMainWindow::saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
+// 	qDebug()<<"-- Saving and stopping tools JNI";
+// 	ToolLauncher* tl = getToolLauncherInstance();
+// 	if(tl)
+// 	{
+// 		getToolLauncherInstance()->saveRunningTools();
+// 		getToolLauncherInstance()->stopRunningTools();
+// 	}
+// }
+
+// void ScopyMainWindow::restoreRunningToolsJNI(JNIEnv *env, QObject /*thiz*/) {
+// 	qDebug()<<"-- Saving and stopping tools JNI";
+// 	ToolLauncher* tl = getToolLauncherInstance();
+// 	if(tl)
+// 	{
+// 		getToolLauncherInstance()->restoreRunningTools();
+// 	}
+// }
+
+// int ScopyMainWindow::nrOfToolsSavedJNI(JNIEnv *env, jobject /*thiz*/) {
+// 	qDebug()<<"-- Getting number of stopped tools JNI";
+// 	ToolLauncher* tl = getToolLauncherInstance();
+// 	if(tl)
+// 	{
+// 		int val = getToolLauncherInstance()->running_tools.size();
+// 		qDebug()<<"saved: "<<val;
+// 		return val;
+// 	}
+// 	return 0;
+// }
+
+// int ScopyMainWindow::nrOfToolsRunningJNI(JNIEnv *env, jobject /*thiz*/) {
+// 	qDebug()<<"-- Getting number of stopped tools JNI";
+// 	ToolLauncher* tl = getToolLauncherInstance();
+// 	if(tl)
+// 	{
+// 		int val = getToolLauncherInstance()->getRunningToolsCount();
+// 		qDebug()<<"saved: "<<val;
+// 		return val;
+// 	}
+// 	return 0;
+// }
+
+// bool ScopyMainWindow::hasCtxJNI(JNIEnv *env, jobject /*thiz*/)
+// {
+// 	qDebug()<<"-- Getting number of stopped tools JNI";
+// 	ToolLauncher* tl = getToolLauncherInstance();
+// 	if(tl)
+// 	{
+// 		bool val = getToolLauncherInstance()->getCtx();
+// 		qDebug()<<"has Ctx : "<<val;
+// 		return val;
+// 	}
+// 	return false;
+// }
+
+
+// void ScopyMainWindow::registerNativeMethods()
+// {
+// 	JNINativeMethod methods[] = {{"saveSessionJavaHelper", "()V", reinterpret_cast<void*>(saveSessionJavaHelper) },
+// 				     {"saveAndStopRunningToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningToolsJNI) },
+// 				     {"saveAndStopRunningInputToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningInputToolsJNI) },
+// 				     {"restoreRunningToolsJNI", "()V", reinterpret_cast<void*>(restoreRunningToolsJNI) },
+// 				     {"nrOfToolsSavedJNI", "()I", reinterpret_cast<void*>(nrOfToolsSavedJNI) },
+// 				     {"nrOfToolsRunningJNI", "()I", reinterpret_cast<void*>(nrOfToolsRunningJNI) },
+// 				     {"hasCtxJNI", "()Z", reinterpret_cast<void*>(hasCtxJNI) },
+// 				     };
+
+// 	QAndroidJniObject activity = QtAndroid::androidActivity();
+// 	QAndroidJniEnvironment env;
+// 	jclass objectClass = env->GetObjectClass(activity.object<jobject>());
+
+// 	env->RegisterNatives(objectClass,
+// 			     methods,
+// 			     sizeof(methods) / sizeof(methods[0]));
+// 	env->DeleteLocalRef(objectClass);
+// }
+// #endif
+
 
 #include "moc_scopymainwindow.cpp"

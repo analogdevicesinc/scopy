@@ -62,6 +62,9 @@ public:
 	Q_INVOKABLE QStringList getPlugins(QString param, QString cat = "iio");
 	Q_INVOKABLE bool getToolBtnState(QString tool);
 	Q_INVOKABLE bool runTool(QString tool, bool flag);
+	Q_INVOKABLE bool runAllTools(bool flag);
+	Q_INVOKABLE bool isToolRunning(QString tool, bool flag);
+	Q_INVOKABLE QStringList runningTools();
 	Q_INVOKABLE bool loadSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 	Q_INVOKABLE bool saveSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 

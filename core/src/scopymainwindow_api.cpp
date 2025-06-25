@@ -508,6 +508,59 @@ bool ScopyMainWindow_API::runTool(QString tool, bool flag)
 	return toolStateChange;
 }
 
+bool ScopyMainWindow_API::runAllTools(bool flag)
+{
+	const QStringList toolList = getTools();
+	for(const QString &tool : toolList) {
+		if(!runTool(tool, flag))
+			return false;
+	}
+	return true;
+}
+
+bool ScopyMainWindow_API::isToolRunning(QString tool, bool flag)
+{
+
+	Q_ASSERT(m_w->dm != nullptr);
+	QString devID = "";
+	if(!m_w->dm->connectedDev.isEmpty()) {
+		devID = m_w->dm->connectedDev.back();
+	} else {
+		qWarning(CAT_SCOPY_API) << "No device connected";
+		return false;
+	}
+	Device *dev = m_w->dm->getDevice(devID);
+	if(dev) {
+		QList<ToolMenuEntry *> toolList = dev->toolList();
+		for(int i = 0; i < toolList.size(); i++) {
+			if(toolList[i]->name() == tool) {
+				flag = toolList[i]->running();
+				return true;
+			}
+		}
+	} else {
+		qWarning(CAT_SCOPY_API) << "Device with id " << devID << " is not available!";
+	}
+	return false;
+
+}
+
+QStringList ScopyMainWindow_API::runningTools()
+{
+	QStringList runningTools;
+	bool toolState;
+	const QStringList toolList = getTools();
+	for(const QString &tool : toolList) {
+		if(isToolRunning(tool, toolState)) {
+			if(toolState)
+				runningTools.append(tool);
+		}
+		else {
+			qWarning(CAT_SCOPY_API) << "Error checking " << tool << " running state!";
+		}
+	}
+}
+
 bool ScopyMainWindow_API::loadSetup(QString filename, QString path)
 {
 	QString fullPath = path + "/" + filename;
