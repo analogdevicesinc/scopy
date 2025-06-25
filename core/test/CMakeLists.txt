@@ -30,11 +30,7 @@ if(ENABLE_TRANSLATION)
 	generate_translations(${CMAKE_BINARY_DIR}/translations)
 	qt_add_resources(TEST_TRANSLATIONS_REPOSITORY "${CMAKE_CURRENT_BINARY_DIR}/translations.qrc")
 
-	if(ANDROID)
-		add_library(${TEST_GENERATETRANSLATIONS} SHARED ${TEST_TRANSLATIONS_REPOSITORY})
-	else()
-		add_library(${TEST_GENERATETRANSLATIONS} ${TEST_TRANSLATIONS_REPOSITORY})
-	endif()
+	add_library(${TEST_GENERATETRANSLATIONS} ${TEST_TRANSLATIONS_REPOSITORY})
 
 	# move test translation files to core/tests
 	add_custom_command(
