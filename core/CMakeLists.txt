@@ -50,6 +50,10 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
+if(ANDROID)
+	set(SCOPY_QT_COMPONENTS ${SCOPY_QT_COMPONENTS} AndroidExtras)
+endif()
+
 option(WITH_PYTHON "Enable Python" ON)
 if(${WITH_PYTHON})
 	set(Python_ADDITIONAL_VERSIONS 3)
@@ -117,6 +121,7 @@ target_include_directories(
 		${GLIBCONFIG_INCLUDE_DIRS}
 		${LIBSIGROK_DECODE_INCLUDE_DIRS}
 		${Python3_INCLUDE_DIRS}
+		${Qt5AndroidExtras_INCLUDE_DIRS}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common)
@@ -135,6 +140,10 @@ target_link_libraries(
 	       ${LIBSIGROK_DECODE_LINK_LIBRARIES}
 	       ${Python3_LIBRARIES}
 )
+
+if(ANDROID)
+	target_link_libraries(${PROJECT_NAME} PUBLIC EGL GLESv2)
+endif()
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}

@@ -145,6 +145,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/android-build/libs/arm64-v8a")
 else()
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
 endif()
@@ -190,9 +192,12 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 	# https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
 	if(ANDROID)
-		add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${SCOPY_RESOURCES} ${SCOPY_DEPENDENCIES})
-		# Define properties for Android with Qt 5 after find_package() calls as: set(ANDROID_PACKAGE_SOURCE_DIR
-		# "${CMAKE_CURRENT_SOURCE_DIR}/android")
+		add_library(${PROJECT_NAME} SHARED
+			${PROJECT_SOURCES}
+			${SCOPY_RESOURCES}
+			${SCOPY_DEPENDENCIES}
+			${EXTRA_BUNDLE_FILES}
+			)
 	else()
 		add_executable(
 			${PROJECT_NAME} WIN32
@@ -204,6 +209,22 @@ else()
 			${SCOPY_WIN32_RESOURCES}
 		)
 	endif()
+endif()
+
+
+if(ANDROID)
+	set(ANDROID_PACKAGE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/android" CACHE INTERNAL "")
+
+	message(STATUS "-=-=-= ANDROID_STAGING_LOCATION: " ${ANDROID_STAGING_LOCATION})
+	set(ANDROID_EXTRA_LIBS "")
+	file(GLOB libs ${ANDROID_STAGING_LOCATION}/*.so*)
+	foreach(lib ${libs})
+		message(STATUS "Adding ${lib} to ${CMAKE_BINARY_DIR}/android-build/libs/arm64-v8a")
+		file(COPY ${lib} DESTINATION "${CMAKE_BINARY_DIR}/android-build/libs/arm64-v8a")
+		list (APPEND ${ANDROID_EXTRA_LIBS} ${lib})
+	endforeach()
+
+	add_dependencies(apk ${PROJECT_NAME})
 endif()
 
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
@@ -235,6 +256,10 @@ set_target_properties(
 
 if(ENABLE_APPLICATION_BUNDLE OR ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
+endif()
+
+if(ANDROID)
+	set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_NAME ${PROJECT_NAME})
 endif()
 
 configure_file(resources/qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf COPYONLY)
