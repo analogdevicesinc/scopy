@@ -37,6 +37,8 @@ QString scopy::config::defaultTranslationFolderPath()
 	return QCoreApplication::applicationDirPath() + "/translations";
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
+#elif __ANDROID__
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
 #endif
 	return SCOPY_TRANSLATION_INSTALL_PATH;
 }
@@ -49,6 +51,8 @@ QString scopy::config::defaultStyleFolderPath()
 	return QCoreApplication::applicationDirPath() + "/style";
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/style";
+#elif __ANDROID__
+	return QCoreApplication::applicationDirPath() + "/style";
 #endif
 	return SCOPY_STYLE_INSTALL_PATH;
 }
