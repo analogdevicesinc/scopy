@@ -29,6 +29,7 @@
 #include <QTime>
 
 #include <deque>
+#include <mutex>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT CommandQueue : public QObject

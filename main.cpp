@@ -35,6 +35,10 @@
 #include <gui/utils.h>
 #include <gui/docking/docksettings.h>
 
+#ifdef __ANDROID__
+	#include <QtAndroidExtras/QtAndroid>
+#endif
+
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_RUNTIME_ENVIRONMENT_INFO, "RuntimeEnvironmentInfo")
@@ -113,6 +117,21 @@ int main(int argc, char *argv[])
 
 	initLogging();
 	CrashReport::initSignalHandler();
+
+	#ifdef  __ANDROID__
+
+	QAndroidJniObject jniObject = QtAndroid::androidActivity().callObjectMethod("getScaleFactor", "()Ljava/lang/String;");
+	QString scaleFactor = jniObject.toString();
+
+	qputenv("QT_SCALE_FACTOR", scaleFactor.toUtf8());
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+	qputenv("QT_USE_ANDROID_NATIVE_DIALOGS", "1");
+
+	QApplication::setAttribute(Qt::AA_CompressHighFrequencyEvents, true);
+	QApplication::setAttribute(Qt::AA_CompressTabletEvents, true);
+	qputenv("SCOPY_USE_OPEN_GL", "1");
+	#endif
 
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
 	QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
