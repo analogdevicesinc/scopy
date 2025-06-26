@@ -188,9 +188,9 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 #ifdef Q_OS_WINDOWS
 	defaultDir = DAC_CSV_PATH_LOCAL;
 #elif defined __APPLE__
-	defaultDir = QCoreApplication::applicationDirPath() + "/plugins/csv";
+	defaultDir = QCoreApplication::applicationDirPath() + "/packages/plugins/dac/resources/dac-csv";
 #elif defined(__appimage__)
-	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/csv";
+	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/packages/plugins/dac/resources/dac-csv";
 #else
 	defaultDir = DAC_CSV_SYSTEM_PATH;
 #endif
