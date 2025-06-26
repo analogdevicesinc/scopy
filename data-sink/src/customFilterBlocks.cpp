@@ -6,7 +6,7 @@ AddFilterBlock::AddFilterBlock(bool copy, QString name)
 {}
 AddFilterBlock::~AddFilterBlock() {}
 
-ChannelData *AddFilterBlock::createData()
+ChannelDataVector *AddFilterBlock::createData()
 {
     // find min size channel
     int size = 0;
@@ -18,11 +18,11 @@ ChannelData *AddFilterBlock::createData()
     }
 
     if(size <= 0)
-        return new ChannelData();
+	return new ChannelDataVector();
 
     // add data
-    ChannelData *new_data = new ChannelData(size);
-    ChannelData *firstCh = m_data->first();
+    ChannelDataVector *new_data = new ChannelDataVector(size);
+    ChannelDataVector *firstCh = m_data->first();
 
     for(int i = 0; i < size; ++i) {
         for(auto chData : *m_data)

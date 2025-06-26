@@ -62,6 +62,7 @@ public:
 	bool isMainInstrument() const;
 	void setIsMainInstrument(bool newIsMainInstrument);
 
+	void update();
 public Q_SLOTS:
 	virtual void init();
 	virtual void deinit();
@@ -71,17 +72,14 @@ public Q_SLOTS:
 	virtual void start();
 	virtual void stop() override;
 
-protected Q_SLOTS:
 	virtual void stopUpdates();
 	virtual void startUpdates();
 
+protected Q_SLOTS:
 	virtual void setSingleShot(bool b);
 	virtual void setFrameRate(double val);
 	virtual void updateFrameRate();
 	virtual void handlePreferences(QString key, QVariant v);
-
-	virtual void updateData();
-	virtual void update();
 
 Q_SIGNALS:
 	void requestStart();
@@ -102,14 +100,10 @@ protected:
 	ChannelIdProvider *chIdP;
 	CollapsableMenuControlButton *m_otherCMCB;
 
-	QFuture<void> m_refillFuture;
-	QFutureWatcher<void> *m_fw;
-	QTimer *m_plotTimer;
-
 	bool m_started;
 
 	AcqTreeNode *m_tree;
-	DataProvider *m_dataProvider;
+	datasink::BlockManager* m_blockManager;
 	QMap<AcqTreeNode *, ToolComponent *> m_acqNodeComponentMap;
 
 	bool m_refreshTimerRunning;

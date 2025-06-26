@@ -35,7 +35,7 @@ public:
     ~IIOSourceBlock();
 
 public Q_SLOTS:
-    void enChannel(bool en, uint id);
+    void enChannel(bool en, uint id) override;
 
 private:
     iio_device* m_dev;

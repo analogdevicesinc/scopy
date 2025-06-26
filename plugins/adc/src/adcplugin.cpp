@@ -36,6 +36,7 @@
 #include <gui/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+#include <customSourceBlocks.h>
 #include <deviceiconbuilder.h>
 
 #include "adctimeinstrumentcontroller.h"
@@ -251,6 +252,10 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 	ctxNode->setCtx(ctx);
 	for(int i = 0; i < devCount; i++) {
 		iio_device *dev = iio_context_get_device(ctx, i);
+		if(!iio_is_buffer_capable(dev)) { // at least one scan element
+			continue;
+		}
+
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
 
 		if(dev_name.isEmpty())
@@ -262,14 +267,13 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 		QStringList channelList;
 
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
-		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(ctxNode, gr_dev, gr_dev);
 
-		if(iio_is_buffer_capable(dev)) { // at least one scan element
-			ctxNode->addTreeChild(d);
-			ctxNode->src()->registerIIODeviceSource(gr_dev);
-		} else {
-			continue;
-		}
+		datasink::IIOSourceBlock *iioSource = new datasink::IIOSourceBlock(dev, dev_name);
+
+		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(iioSource, ctxNode, gr_dev, gr_dev);
+
+		ctxNode->addTreeChild(d);
+		ctxNode->src()->registerIIODeviceSource(gr_dev);
 
 		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
@@ -280,7 +284,7 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 
 				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
-				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(ctxNode, ch, d);
+				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(iioSource, ctxNode, ch, d);
 				d->addTreeChild(c);
 			}
 		}

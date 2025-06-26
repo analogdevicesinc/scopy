@@ -12,7 +12,7 @@ public:
     ~AddFilterBlock();
 
 private:
-    ChannelData *createData() override;
+    ChannelDataVector *createData() override;
 };
 }
 

@@ -29,9 +29,11 @@ Q_LOGGING_CATEGORY(CAT_ACQTREENODE, "AcqTreeNode")
 using namespace scopy;
 using namespace scopy::adc;
 
-GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent)
+GRIIOFloatChannelNode::GRIIOFloatChannelNode(datasink::SourceBlock *source, GRTopBlockNode *top,
+					     GRIIOFloatChannelSrc *c, QObject *parent)
 	: AcqTreeNode(c->getChannelName(), parent)
 	, m_top(top)
+	, m_source(source)
 {
 	m_src = c;
 }
@@ -40,11 +42,15 @@ GRIIOFloatChannelNode::~GRIIOFloatChannelNode() {}
 
 GRIIOFloatChannelSrc *GRIIOFloatChannelNode::src() const { return m_src; }
 
+datasink::SourceBlock *GRIIOFloatChannelNode::source() const { return m_source; }
+
 GRTopBlockNode *GRIIOFloatChannelNode::top() const { return m_top; }
 
-GRIIODeviceSourceNode::GRIIODeviceSourceNode(GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent)
+GRIIODeviceSourceNode::GRIIODeviceSourceNode(datasink::SourceBlock *source, GRTopBlockNode *top, GRIIODeviceSource *d,
+					     QObject *parent)
 	: AcqTreeNode(d->deviceName(), parent)
 	, m_top(top)
+	, m_source(source)
 {
 	m_src = d;
 }
@@ -55,9 +61,12 @@ GRIIODeviceSource *GRIIODeviceSourceNode::src() const { return m_src; }
 
 GRTopBlockNode *GRIIODeviceSourceNode::top() const { return m_top; }
 
+datasink::SourceBlock *GRIIODeviceSourceNode::source() const { return m_source; }
+
 GRTopBlockNode::GRTopBlockNode(GRTopBlock *g, QObject *parent)
 	: AcqTreeNode(g->name(), parent)
 	, m_src(g)
+	, m_manager(new datasink::BlockManager(g->name()))
 {
 	m_sync = new SyncController(this);
 	m_data = g;
@@ -70,6 +79,8 @@ GRTopBlock *GRTopBlockNode::src() const { return m_src; }
 SyncController *GRTopBlockNode::sync() const { return m_sync; }
 
 iio_context *GRTopBlockNode::ctx() const { return m_ctx; }
+
+datasink::BlockManager *GRTopBlockNode::manager() { return m_manager; }
 
 void GRTopBlockNode::setCtx(iio_context *ctx) { m_ctx = ctx; }
 

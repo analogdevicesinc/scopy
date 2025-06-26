@@ -33,7 +33,7 @@ void FilterBlock::resetChannels()
     }
 }
 
-void FilterBlock::onNewData(ChannelData *chData, uint ch)
+void FilterBlock::onNewData(ChannelDataVector *chData, uint ch)
 {
     if(m_copy) {
         chData->setCopiedData(chData->data);
@@ -46,7 +46,7 @@ void FilterBlock::onNewData(ChannelData *chData, uint ch)
 
     m_connectedChannels[ch] = true;
     if(areChannelsReady()) {
-        ChannelData *new_data = createData();
+	ChannelDataVector *new_data = createData();
 
         if(new_data->data.size() <= 0) {
             qWarning() << m_name << ": Empty buffer from filter!";

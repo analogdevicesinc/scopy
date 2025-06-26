@@ -24,10 +24,12 @@
 
 #include "scopy-adc_export.h"
 #include <QString>
+// #include <signalpath.h>
 #include "measurementcontroller.h"
 #include <gr-util/grsignalpath.h>
 #include <gui/plotmarkercontroller.h>
 #include <gui/interfaces.h>
+#include <timechannelsigpath.h>
 
 namespace scopy {
 
@@ -39,6 +41,12 @@ class SCOPY_ADC_EXPORT GRChannel : public DataProcessor
 {
 public:
 	virtual GRSignalPath *sigpath() = 0;
+};
+
+class SCOPY_ADC_EXPORT Channel : public DataProcessor
+{
+public:
+	virtual datasink::SignalPath *sigpath() = 0;
 };
 
 class TimePlotComponent;

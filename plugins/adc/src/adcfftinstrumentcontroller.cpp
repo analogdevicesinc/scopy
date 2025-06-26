@@ -136,184 +136,184 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 
 void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 {
-	int idx = chIdP->next();
-	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
-	GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
-	GRFFTChannelComponent *c =
-		new GRFFTChannelComponent(griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)),
-					  grtsc, chIdP->pen(idx), m_ui->rightStack);
-	Q_ASSERT(grtsc);
+	// int idx = chIdP->next();
+	// GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
+	// GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_blockManager);
+	// GRFFTChannelComponent *c =
+	// 	new GRFFTChannelComponent(griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)),
+	// 				  grtsc, chIdP->pen(idx), m_ui->rightStack);
+	// Q_ASSERT(grtsc);
 
-	m_plotComponentManager->addChannel(c);
-	QWidget *ww = m_plotComponentManager->plotCombo(c);
-	c->menu()->add(ww, "plot", gui::MenuWidget::MA_BOTTOMFIRST);
+	// m_plotComponentManager->addChannel(c);
+	// QWidget *ww = m_plotComponentManager->plotCombo(c);
+	// c->menu()->add(ww, "plot", gui::MenuWidget::MA_BOTTOMFIRST);
 
-	/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
+	// /*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
-	CompositeWidget *cw = nullptr;
-	GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn->treeParent());
-	GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
-	if(w) {
-		cw = dc->ctrl();
-	}
-	if(!cw) {
-		cw = m_ui->vcm();
-	}
-	m_acqNodeComponentMap[griiofcn] = c;
+	// CompositeWidget *cw = nullptr;
+	// GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn->treeParent());
+	// GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
+	// if(w) {
+	// 	cw = dc->ctrl();
+	// }
+	// if(!cw) {
+	// 	cw = m_ui->vcm();
+	// }
+	// m_acqNodeComponentMap[griiofcn] = c;
 
-	/*** End of mess ***/
+	// /*** End of mess ***/
 
-	m_ui->addChannel(c->ctrl(), c, cw);
+	// m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	// connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
-	grtsc->addChannel(c);			   // For matching Sink To Channels
-	dc->addChannel(c);			   // used for sample rate computation
-	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c,
-		&ChannelComponent::setSamplingInfo);
+	// grtsc->addChannel(c);			   // For matching Sink To Channels
+	// dc->addChannel(c);			   // used for sample rate computation
+	// m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
+	// connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c,
+	// 	&ChannelComponent::setSamplingInfo);
 
-	addComponent(c);
-	setupChannelMeasurement(m_plotComponentManager, c);
+	// addComponent(c);
+	// setupChannelMeasurement(m_plotComponentManager, c);
 
-	if(m_defaultRealCh == nullptr) {
-		m_defaultRealCh = c;
-		m_plotComponentManager->selectChannel(c);
-	}
-	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
-		auto info = c->markerController()->markerInfo();
-		QString name = c->name();
-		m_plotComponentManager->markerPanel()->updateChannel(name, info);
-	});
+	// if(m_defaultRealCh == nullptr) {
+	// 	m_defaultRealCh = c;
+	// 	m_plotComponentManager->selectChannel(c);
+	// }
+	// connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
+	// 	auto info = c->markerController()->markerInfo();
+	// 	QString name = c->name();
+	// 	m_plotComponentManager->markerPanel()->updateChannel(name, info);
+	// });
 
-	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
-		if(b) {
-			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
-		} else {
-			m_plotComponentManager->markerPanel()->deleteChannel(c->name());
-		}
+	// auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
+	// connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
+	// 	if(b) {
+	// 		m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
+	// 	} else {
+	// 		m_plotComponentManager->markerPanel()->deleteChannel(c->name());
+	// 	}
 
-		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
-		Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
-	});
+	// 	int markerCount = m_plotComponentManager->markerPanel()->markerCount();
+	// 	Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
+	// });
 }
 
 void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q)
 {
-	int idx = chIdP->next();
-	GRIIOFloatChannelNode *griiofcn_I = dynamic_cast<GRIIOFloatChannelNode *>(node_I);
-	GRIIOFloatChannelNode *griiofcn_Q = dynamic_cast<GRIIOFloatChannelNode *>(node_Q);
-	GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_dataProvider);
-	GRFFTChannelComponent *c = new GRFFTChannelComponent(
-		griiofcn_I, griiofcn_Q, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc,
-		chIdP->pen(idx), m_ui->rightStack);
-	Q_ASSERT(grtsc);
+	// int idx = chIdP->next();
+	// GRIIOFloatChannelNode *griiofcn_I = dynamic_cast<GRIIOFloatChannelNode *>(node_I);
+	// GRIIOFloatChannelNode *griiofcn_Q = dynamic_cast<GRIIOFloatChannelNode *>(node_Q);
+	// GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_blockManager);
+	// GRFFTChannelComponent *c = new GRFFTChannelComponent(
+	// 	griiofcn_I, griiofcn_Q, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc,
+	// 	chIdP->pen(idx), m_ui->rightStack);
+	// Q_ASSERT(grtsc);
 
-	m_plotComponentManager->addChannel(c);
-	QWidget *ww = m_plotComponentManager->plotCombo(c);
-	c->menu()->add(ww, "plot", gui::MenuWidget::MA_BOTTOMFIRST);
+	// m_plotComponentManager->addChannel(c);
+	// QWidget *ww = m_plotComponentManager->plotCombo(c);
+	// c->menu()->add(ww, "plot", gui::MenuWidget::MA_BOTTOMFIRST);
 
-	/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
+	// /*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
-	CompositeWidget *cw = nullptr;
-	GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn_I->treeParent());
-	GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
-	if(w) {
-		cw = dc->ctrl();
-	}
-	if(!cw) {
-		cw = m_ui->vcm();
-	}
-	/*** End of mess ***/
+	// CompositeWidget *cw = nullptr;
+	// GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn_I->treeParent());
+	// GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
+	// if(w) {
+	// 	cw = dc->ctrl();
+	// }
+	// if(!cw) {
+	// 	cw = m_ui->vcm();
+	// }
+	// /*** End of mess ***/
 
-	m_ui->addChannel(c->ctrl(), c, cw);
+	// m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	// connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
-	grtsc->addChannel(c);			   // For matching Sink To Channels
-	dc->addChannel(c);			   // used for sample rate computation
-	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c,
-		&ChannelComponent::setSamplingInfo);
+	// grtsc->addChannel(c);			   // For matching Sink To Channels
+	// dc->addChannel(c);			   // used for sample rate computation
+	// m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
+	// connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, c,
+	// 	&ChannelComponent::setSamplingInfo);
 
-	addComponent(c);
-	setupChannelMeasurement(m_plotComponentManager, c);
+	// addComponent(c);
+	// setupChannelMeasurement(m_plotComponentManager, c);
 
-	if(m_defaultComplexCh == nullptr) {
-		m_defaultComplexCh = c;
-	}
+	// if(m_defaultComplexCh == nullptr) {
+	// 	m_defaultComplexCh = c;
+	// }
 
-	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
-		auto info = c->markerController()->markerInfo();
-		m_plotComponentManager->markerPanel()->updateChannel(c->name(), info);
-	});
+	// connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
+	// 	auto info = c->markerController()->markerInfo();
+	// 	m_plotComponentManager->markerPanel()->updateChannel(c->name(), info);
+	// });
 
-	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
-		if(b) {
-			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
-		} else {
-			m_plotComponentManager->markerPanel()->deleteChannel(c->name());
-		}
+	// auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
+	// connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
+	// 	if(b) {
+	// 		m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
+	// 	} else {
+	// 		m_plotComponentManager->markerPanel()->deleteChannel(c->name());
+	// 	}
 
-		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
-		Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
-	});
+	// 	int markerCount = m_plotComponentManager->markerPanel()->markerCount();
+	// 	Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
+	// });
 }
 
 void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 {
-	GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
-	GRFFTSinkComponent *c = new GRFFTSinkComponent(m_name + "_fft", grtbn, this);
+	// GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
+	// GRFFTSinkComponent *c = new GRFFTSinkComponent(m_name + "_fft", grtbn, this);
 
-	m_dataProvider = c;
-	c->init();
+	// m_blockManager = c;
+	// c->init();
 
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p) {
-		if(m_started) {
-			stop();
-			c->setSamplingInfo(p);
-			start();
-		} else {
-			c->setSamplingInfo(p);
-		}
-	});
+	// connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p) {
+	// 	if(m_started) {
+	// 		stop();
+	// 		c->setSamplingInfo(p);
+	// 		start();
+	// 	} else {
+	// 		c->setSamplingInfo(p);
+	// 	}
+	// });
 
-	connect(c, &GRFFTSinkComponent::requestSingleShot, this, &ADCFFTInstrumentController::setSingleShot);
-	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent,
-		&FFTPlotManagerSettings::setBufferSize);
+	// connect(c, &GRFFTSinkComponent::requestSingleShot, this, &ADCFFTInstrumentController::setSingleShot);
+	// connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent,
+	// 	&FFTPlotManagerSettings::setBufferSize);
 
-	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
-		&FFTPlotManagerSettings::setComplexMode);
-	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
-		if(m_ui->m_complex->isChecked()) {
-			m_plotComponentManager->selectChannel(m_defaultComplexCh);
-			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
-		} else {
-			m_plotComponentManager->selectChannel(m_defaultRealCh);
-			Q_EMIT m_defaultRealCh->requestChannelMenu(false);
-		}
-	});
+	// connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
+	// 	&FFTPlotManagerSettings::setComplexMode);
+	// connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
+	// 	if(m_ui->m_complex->isChecked()) {
+	// 		m_plotComponentManager->selectChannel(m_defaultComplexCh);
+	// 		Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
+	// 	} else {
+	// 		m_plotComponentManager->selectChannel(m_defaultRealCh);
+	// 		Q_EMIT m_defaultRealCh->requestChannelMenu(false);
+	// 	}
+	// });
 
-	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
-		setSingleShot(b);
-		if(b && !m_started) {
-			Q_EMIT requestStart();
-		}
-	});
-	connect(m_ui, &ADCInstrument::requestStart, this, &ADCInstrumentController::requestStart);
-	connect(this, &ADCInstrumentController::requestStart, this, &ADCInstrumentController::start);
-	connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
-	connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
+	// connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
+	// 	setSingleShot(b);
+	// 	if(b && !m_started) {
+	// 		Q_EMIT requestStart();
+	// 	}
+	// });
+	// connect(m_ui, &ADCInstrument::requestStart, this, &ADCInstrumentController::requestStart);
+	// connect(this, &ADCInstrumentController::requestStart, this, &ADCInstrumentController::start);
+	// connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
+	// connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
 
-	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
+	// connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
-	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
-	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+	// connect(c, SIGNAL(arm()), this, SLOT(onStart()));
+	// connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
 
-	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
-	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
+	// connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
+	// connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
 }
 
 void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)

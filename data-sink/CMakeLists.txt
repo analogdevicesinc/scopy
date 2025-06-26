@@ -65,7 +65,16 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES}
+	include/data-sink/proxyblock.h
+	src/proxyblock.cpp
+	include/data-sink/signalpath.h
+	src/signalpath.cpp
+	include/data-sink/scaleoffsetfilter.h
+	src/scaleoffsetfilter.cpp
+	include/data-sink/channel.h
+	include/data-sink/timechannelsigpath.h
+	src/timechannelsigpath.cpp)
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h

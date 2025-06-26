@@ -15,11 +15,13 @@ class SCOPY_DATA_SINK_EXPORT SourceBlock : public BasicBlock
 public:
     SourceBlock(QString name = QString());
     ~SourceBlock();
+    QString name();
+    size_t bufferSize();
 
 public Q_SLOTS:
-    void enChannel(bool en, uint id);
+    virtual void enChannel(bool en, uint id);
     bool isChannelEn(uint id);
-    void setBufferSize(int size);
+    void setBufferSize(size_t size);
     void onRequestData();
 
 private:
@@ -32,7 +34,7 @@ Q_SIGNALS:
     void toggledCh(uint ch, bool en);
 
 protected:
-    int m_size;
+    size_t m_size;
     QMap<uint, bool> m_channels; // <channel, enabled>
 };
 }

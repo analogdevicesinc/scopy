@@ -67,7 +67,7 @@ void TST_BlockManager::testAddFilter1()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, &loop](ChannelData *data, uint ch) {
+		[=, &loop](ChannelDataVector *data, uint ch) {
 			m_test_success = 1;
 			for(int i = 0; i < data->data.size(); i++) {
 				if(data->data[i] != i + i * 10) {
@@ -109,7 +109,7 @@ void TST_BlockManager::testAddFilter2()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, &loop](ChannelData *data, uint ch) {
+		[=, &loop](ChannelDataVector *data, uint ch) {
 			m_test_success = 0;
 			loop.quit();
 		},
@@ -143,7 +143,7 @@ void TST_BlockManager::testAddFilter3()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, &loop](ChannelData *data, uint ch) {
+		[=, &loop](ChannelDataVector *data, uint ch) {
 			m_test_success = 1;
 			for(int i = 0; i < data->data.size(); i++) {
 				if(data->data[i] != i) {
@@ -182,6 +182,8 @@ void TST_BlockManager::testAddFilter4()
 
 	// cyclic run
 	// add 2 channels
+
+	// data source
 	TestSourceBlock *fileSource = new TestSourceBlock();
 	fileSource->enChannel(true, 0);
 	fileSource->enChannel(true, 1);
@@ -199,13 +201,13 @@ void TST_BlockManager::testAddFilter4()
 	QEventLoop loop;
 	counter = 0;
 
-	BlockManager *manager = new BlockManager();
+	BlockManager *manager = new BlockManager("test");
 	manager->addLink(fileSource, 0, filter, 0, 0, threaded);
 	manager->addLink(fileSource, 1, filter, 0, 0, threaded);
 
 	connect(
 		manager, &BlockManager::newData, this,
-		[this](ChannelData *data, uint ch) {
+		[this](ChannelDataVector *data, uint ch) {
 			counter++;
 			for(int i = 0; i < data->data.size(); i++) {
 				if(data->data[i] != i + i * 10) {
@@ -220,7 +222,7 @@ void TST_BlockManager::testAddFilter4()
 	int timeout = 10;
 	timer.start(timeout); // timeout in ms
 	fileSource->setBufferSize(buffer_size);
-	manager->start(true);
+	manager->start();
 	loop.exec();
 	manager->stop();
 
@@ -276,13 +278,13 @@ void TST_BlockManager::testAddFilter5()
 	counter = 0;
 	counter2 = 0;
 
-	BlockManager *manager = new BlockManager(waitForAllSources);
+	BlockManager *manager = new BlockManager("test", waitForAllSources);
 	manager->addLink(fileSource1, 0, filter1, 0, 0, threaded);
 	manager->addLink(fileSource2, 0, filter3, 0, 1, threaded);
 
 	connect(
 		manager, &BlockManager::newData, this,
-		[this](ChannelData *data, uint ch) {
+		[this](ChannelDataVector *data, uint ch) {
 			if(ch != 0)
 				return;
 
@@ -291,7 +293,7 @@ void TST_BlockManager::testAddFilter5()
 		Qt::QueuedConnection);
 	connect(
 		manager, &BlockManager::newData, this,
-		[this](ChannelData *data, uint ch) {
+		[this](ChannelDataVector *data, uint ch) {
 			if(ch != 1)
 				return;
 
@@ -304,7 +306,7 @@ void TST_BlockManager::testAddFilter5()
 	timer.start(timeout); // timeout in ms
 	fileSource1->setBufferSize(buffer_size);
 	fileSource2->setBufferSize(buffer_size);
-	manager->start(true);
+	manager->start();
 	loop.exec();
 	manager->stop();
 

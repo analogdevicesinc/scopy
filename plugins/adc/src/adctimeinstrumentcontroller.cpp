@@ -26,6 +26,9 @@
 #include "importchannelcomponent.h"
 #include "grtimesinkcomponent.h"
 
+#include <customSourceBlocks.h>
+#include <timechannelcomponent.h>
+
 using namespace scopy;
 using namespace adc;
 
@@ -123,19 +126,25 @@ void ADCTimeInstrumentController::init()
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 {
 	GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
-	GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name + "_time", grtbn, this);
+	// GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name + "_time", grtbn, this);
+
 	//		m_acqNodeComponentMap[grtbn] = (c);
 	// addComponent(c);
 
-	m_dataProvider = c;
-	c->init();
+	m_blockManager = new BlockManager(m_name + "_time");
+	m_blockManager->setBufferSize(m_timePlotSettingsComponent->bufferSize());
+	connect(m_blockManager, &datasink::BlockManager::sentAllData, this, &ADCInstrumentController::update);
 
-	connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCTimeInstrumentController::setSingleShot);
-	connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent,
-		&TimePlotManagerSettings::setBufferSize);
+	// c->init();
 
-	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, c,
-		&GRTimeSinkComponent::setSamplingInfo);
+	// connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCTimeInstrumentController::setSingleShot);
+	// connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent,
+	// 	&TimePlotManagerSettings::setBufferSize);
+
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, this,
+		[=](SamplingInfo info) {
+			m_blockManager->setBufferSize(info.bufferSize);
+		});
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
 		setSingleShot(b);
@@ -148,18 +157,19 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
 	connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
 
-	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
+	// connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
-	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
-	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+	// connect(c, SIGNAL(arm()), this, SLOT(onStart()));
+	// connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
 
-	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
-	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
+	connect(m_blockManager, &BlockManager::started, this, &ADCInstrumentController::startUpdates);
+	connect(m_blockManager, &BlockManager::stopped, this, &ADCInstrumentController::stopUpdates);
 }
 
 void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
 {
 	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
+	griiodsn->source()->setBufferSize(m_timePlotSettingsComponent->bufferSize());
 	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
 	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
@@ -176,12 +186,17 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 {
 	int idx = chIdP->next();
 	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
-	GRTimeSinkComponent *grtsc = dynamic_cast<GRTimeSinkComponent *>(m_dataProvider);
-	GRTimeChannelComponent *c =
-		new GRTimeChannelComponent(griiofcn, dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)),
-					   grtsc, chIdP->pen(idx), m_ui->rightStack);
-	Q_ASSERT(grtsc);
 
+
+	// Create TimeChannelComponent (replaces all your manual setup)
+	TimeChannelComponent *c = new TimeChannelComponent(
+		griiofcn->source(), idx, idx, static_cast<datasink::BlockManager *>(m_blockManager),
+		dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)), chIdP->pen(idx), m_ui->rightStack);
+
+	// Start the manager
+	// manager->start();
+
+	// Rest of your existing setup code...
 	m_plotComponentManager->addChannel(c);
 	QWidget *ww = m_plotComponentManager->plotCombo(c);
 	c->menu()->add(ww, "plot", gui::MenuWidget::MA_BOTTOMFIRST);
@@ -205,7 +220,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
-	grtsc->addChannel(c);			    // For matching Sink To Channels
+	// grtsc->addChannel(c);			    // For matching Sink To Channels
 	dc->addChannel(c);			    // used for sample rate computation
 	m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
 

@@ -6,20 +6,20 @@
 #include <QObject>
 
 namespace scopy::datasink {
-class SCOPY_DATA_SINK_EXPORT ChannelData
+class SCOPY_DATA_SINK_EXPORT ChannelDataVector
 {
 public:
-    ChannelData(std::vector<float> data)
+    ChannelDataVector(std::vector<float> data)
         : data(std::move(data))
     {}
-    ChannelData(int size = 0) { data.reserve(size); }
+    ChannelDataVector(int size = 0) { data.reserve(size); }
 
     void setCopiedData(const std::vector<float> &new_data) { data = new_data; }
 
     std::vector<float> data;
 };
 
-class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelData *>
+class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelDataVector *>
 {
 public:
     BlockData()
@@ -42,7 +42,7 @@ public:
     void setName(QString name) { m_name = name; }
 
 Q_SIGNALS:
-    void newData(ChannelData *data, uint ch);
+    void newData(ChannelDataVector *data, uint ch);
 
 protected:
     QString m_name;

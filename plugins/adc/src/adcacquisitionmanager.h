@@ -83,9 +83,11 @@ public:
 	GRTopBlock *src() const;
 	SyncController *sync() const;
 	iio_context *ctx() const;
+	datasink::BlockManager* manager();
 	void setCtx(iio_context *ctx);
 
 private:
+	datasink::BlockManager* m_manager;
 	GRTopBlock *m_src;
 	SyncController *m_sync;
 	iio_context *m_ctx;
@@ -94,12 +96,14 @@ private:
 class SCOPY_ADC_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
 {
 public:
-	GRIIODeviceSourceNode(GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent = nullptr);
+	GRIIODeviceSourceNode(datasink::SourceBlock* source, GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent = nullptr);
 	~GRIIODeviceSourceNode();
 	GRIIODeviceSource *src() const;
 	GRTopBlockNode *top() const;
+	datasink::SourceBlock* source() const;
 
 private:
+	datasink::SourceBlock* m_source;
 	GRTopBlockNode *m_top;
 	GRIIODeviceSource *m_src;
 };
@@ -107,13 +111,14 @@ private:
 class SCOPY_ADC_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
 {
 public:
-	GRIIOFloatChannelNode(GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
+	GRIIOFloatChannelNode(datasink::SourceBlock* source, GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
 	~GRIIOFloatChannelNode();
 	GRIIOFloatChannelSrc *src() const;
-
+	datasink::SourceBlock* source() const;
 	GRTopBlockNode *top() const;
 
 private:
+	datasink::SourceBlock* m_source;
 	GRTopBlockNode *m_top;
 	GRIIOFloatChannelSrc *m_src;
 };

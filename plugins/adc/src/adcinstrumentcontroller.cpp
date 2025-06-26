@@ -44,21 +44,7 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString uri
 	m_name = name;
 
 	Preferences *p = Preferences::GetInstance();
-
-	m_plotTimer = new QTimer(this);
-	m_plotTimer->setSingleShot(true);
-	connect(m_plotTimer, &QTimer::timeout, this, &ADCInstrumentController::updateData);
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
-
-	m_fw = new QFutureWatcher<void>(this);
-	connect(
-		m_fw, &QFutureWatcher<void>::finished, this,
-		[=]() {
-			update();
-			if(m_refreshTimerRunning)
-				m_plotTimer->start();
-		},
-		Qt::QueuedConnection);
 
 	m_ui = new ADCInstrument(tme, nullptr);
 }
@@ -96,6 +82,11 @@ void ADCInstrumentController::onStart()
 	m_started = true;
 }
 
+void ADCInstrumentController::update()
+{
+	m_plotComponentManager->replot();
+}
+
 void ADCInstrumentController::onStop()
 {
 	m_started = false;
@@ -108,7 +99,7 @@ void ADCInstrumentController::onStop()
 void ADCInstrumentController::start()
 {
 	ResourceManager::open("adc" + m_uri, this);
-	bool ret = m_dataProvider->start();
+	bool ret = m_blockManager->start();
 	if(!ret) {
 		Q_EMIT requestDisconnect();
 	}
@@ -116,15 +107,13 @@ void ADCInstrumentController::start()
 
 void ADCInstrumentController::stop()
 {
-	m_dataProvider->stop();
+	m_blockManager->stop();
 	ResourceManager::close("adc" + m_uri);
 }
 
 void ADCInstrumentController::stopUpdates()
 {
 	m_refreshTimerRunning = false;
-	m_refillFuture.cancel();
-	m_plotTimer->stop();
 	m_ui->stopped();
 }
 
@@ -132,27 +121,10 @@ void ADCInstrumentController::startUpdates()
 {
 	updateFrameRate();
 	m_refreshTimerRunning = true;
-	update();
-	m_plotTimer->start();
 	m_ui->started();
 }
 
-void ADCInstrumentController::setSingleShot(bool b) { m_dataProvider->setSingleShot(b); }
-
-void ADCInstrumentController::updateData()
-{
-	m_refillFuture = QtConcurrent::run([=]() { m_dataProvider->updateData(); });
-	m_fw->setFuture(m_refillFuture);
-}
-
-void ADCInstrumentController::update()
-{
-	m_dataProvider->setData(false);
-	if(m_dataProvider->finished()) {
-		Q_EMIT requestStop();
-	}
-	m_plotComponentManager->replot();
-}
+void ADCInstrumentController::setSingleShot(bool b) { m_blockManager->setSingleShot(b); }
 
 void ADCInstrumentController::handlePreferences(QString key, QVariant v)
 {
@@ -168,11 +140,7 @@ void ADCInstrumentController::updateFrameRate()
 	setFrameRate(framerate);
 }
 
-void ADCInstrumentController::setFrameRate(double val)
-{
-	int timeout = (1.0 / val) * 1000;
-	m_plotTimer->setInterval(timeout);
-}
+void ADCInstrumentController::setFrameRate(double val) { m_blockManager->setTargetFPS(val); }
 
 /*void ADCInstrumentController::addChannel(AcqTreeNode *node)
 {

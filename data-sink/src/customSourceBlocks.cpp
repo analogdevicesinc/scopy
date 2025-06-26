@@ -41,7 +41,7 @@ BlockData *FileSourceBlock::createData()
 			float num = values[col].toFloat();
 
 			if(numRows == 0) {
-				ChannelData *data = new ChannelData(m_size);
+				ChannelDataVector *data = new ChannelDataVector(m_size);
 				map->insert(col, data);
 				data->data.push_back(num);
 			} else {
@@ -66,7 +66,7 @@ BlockData *TestSourceBlock::createData()
 
 	for(int ch = 0; ch < m_channels.size(); ++ch) {
 		if(m_channels.value(ch)) {
-			ChannelData *data = new ChannelData(m_size);
+			ChannelDataVector *data = new ChannelDataVector(m_size);
 
 			for(int i=0; i<m_size; i++) {
 				data->data.push_back(i * pow(10, ch));
@@ -125,7 +125,7 @@ BlockData *IIOSourceBlock::createData()
 	int i;
 	for(auto it = m_channels.begin(); it != m_channels.end(); ++it) {
 		if(it.value()) {
-			ChannelData *data = new ChannelData(m_size);
+			ChannelDataVector *data = new ChannelDataVector(m_size);
 
 			i = 0;
 			for(p_dat = (char *)iio_buffer_first(buf, rx0_i); p_dat < p_end; p_dat += p_inc) {
