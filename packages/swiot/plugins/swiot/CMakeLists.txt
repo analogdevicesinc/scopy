@@ -91,7 +91,7 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
-qt_add_resources(PROJECT_RESOURCES res/resources.qrc ../../resources/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
