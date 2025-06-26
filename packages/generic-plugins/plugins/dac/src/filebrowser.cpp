@@ -47,15 +47,15 @@ FileBrowser::FileBrowser(QWidget *parent)
 	fileBufferContainer->contentLayout()->setSpacing(10);
 	fileBufferContainer->contentLayout()->setMargin(0);
 
-	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, fileBufferContainer);
-	fileBrowser->setFilter(tr("All Files(*)"));
-	QLineEdit *lineEdit = fileBrowser->lineEdit();
+	m_fileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, fileBufferContainer);
+	m_fileBrowser->setFilter(tr("All Files(*)"));
+	QLineEdit *lineEdit = m_fileBrowser->lineEdit();
 	lineEdit->setReadOnly(true);
 	connect(lineEdit, &QLineEdit::textChanged, this, &FileBrowser::setFilename);
 
 	m_fileBufferLoadBtn = new QPushButton("Load", fileBufferContainer);
 	connect(m_fileBufferLoadBtn, &QPushButton::clicked, this, &FileBrowser::loadFile);
-	fileBufferContainer->contentLayout()->addWidget(fileBrowser);
+	fileBufferContainer->contentLayout()->addWidget(m_fileBrowser);
 	fileBufferContainer->contentLayout()->addWidget(m_fileBufferLoadBtn);
 	Style::setStyle(m_fileBufferLoadBtn, style::properties::button::basicButton);
 
@@ -75,4 +75,8 @@ void FileBrowser::setFilename(const QString &text)
 	}
 }
 
-void FileBrowser::setDefaultDir(QString dir) { m_defaultDir = dir; }
+void FileBrowser::setDefaultDir(QString dir)
+{
+	m_defaultDir = dir;
+	m_fileBrowser->setBaseDirectory(m_defaultDir);
+}
