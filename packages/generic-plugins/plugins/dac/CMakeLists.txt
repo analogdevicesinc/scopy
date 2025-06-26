@@ -59,16 +59,16 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 set(DAC_CSV_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/csv)
-set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/res/csv)
+set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/csv)
 
-install(DIRECTORY res/csv DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
+install(DIRECTORY resources/csv DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
 
-file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/res/csv/*)
+file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/resources/csv/*)
 foreach(_csv ${CSVS})
 	file(COPY ${_csv} DESTINATION ${DAC_CSV_BUILD_PATH})
 endforeach()
 
-qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
