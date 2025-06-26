@@ -22,9 +22,7 @@
 #include "adctimeinstrumentcontroller.h"
 #include "adcinstrument.h"
 #include "grdevicecomponent.h"
-#include "grtimechannelcomponent.h"
 #include "importchannelcomponent.h"
-#include "grtimesinkcomponent.h"
 
 #include <customSourceBlocks.h>
 #include <timechannelcomponent.h>
@@ -131,8 +129,9 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	//		m_acqNodeComponentMap[grtbn] = (c);
 	// addComponent(c);
 
-	m_blockManager = new BlockManager(m_name + "_time");
+	m_blockManager = grtbn->manager();
 	m_blockManager->setBufferSize(m_timePlotSettingsComponent->bufferSize());
+	updateFrameRate();
 	connect(m_blockManager, &datasink::BlockManager::sentAllData, this, &ADCInstrumentController::update);
 
 	// c->init();
@@ -162,8 +161,14 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	// connect(c, SIGNAL(arm()), this, SLOT(onStart()));
 	// connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
 
-	connect(m_blockManager, &BlockManager::started, this, &ADCInstrumentController::startUpdates);
-	connect(m_blockManager, &BlockManager::stopped, this, &ADCInstrumentController::stopUpdates);
+	connect(m_blockManager, &BlockManager::sentAllData, this, [=](){
+		count++;
+		std::cout << "draw: " << count << std::endl;
+		if(m_blockManager->singleShot()) {
+			Q_EMIT m_ui->requestStop();
+		}
+	});
+	// connect(m_blockManager, &BlockManager::stopped, this, &ADCInstrumentController::stopUpdates);
 }
 
 void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)

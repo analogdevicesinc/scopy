@@ -46,6 +46,7 @@ public:
 private:
 	TimePlotManagerSettings *m_timePlotSettingsComponent;
 	ChannelComponent *m_defaultCh;
+	int count = 0;
 };
 
 } // namespace adc

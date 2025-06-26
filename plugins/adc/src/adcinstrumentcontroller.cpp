@@ -103,25 +103,27 @@ void ADCInstrumentController::start()
 	if(!ret) {
 		Q_EMIT requestDisconnect();
 	}
+	m_ui->started();
 }
 
 void ADCInstrumentController::stop()
 {
 	m_blockManager->stop();
 	ResourceManager::close("adc" + m_uri);
+	m_ui->stopped();
 }
 
 void ADCInstrumentController::stopUpdates()
 {
-	m_refreshTimerRunning = false;
-	m_ui->stopped();
+	// m_refreshTimerRunning = false;
+	// m_ui->stopped();
 }
 
 void ADCInstrumentController::startUpdates()
 {
-	updateFrameRate();
-	m_refreshTimerRunning = true;
-	m_ui->started();
+	// updateFrameRate();
+	// m_refreshTimerRunning = true;
+	// m_ui->started();
 }
 
 void ADCInstrumentController::setSingleShot(bool b) { m_blockManager->setSingleShot(b); }

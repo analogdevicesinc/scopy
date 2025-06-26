@@ -1,6 +1,7 @@
 #include <QThread>
 #include <cmath>
 #include <include/data-sink/customSourceBlocks.h>
+#include <iostream>
 #include <qfile.h>
 using namespace scopy::datasink;
 
@@ -98,14 +99,17 @@ void IIOSourceBlock::enChannel(bool en, uint id)
 
 BlockData *IIOSourceBlock::createData()
 {
-	// QThread::msleep(100);
-
 	iio_channel *rx0_i = iio_device_find_channel(m_dev, m_channels.value(0) ? "voltage0" : "voltage1", false);
+	QElapsedTimer timer;
+	timer.start();
 	iio_buffer *buf = iio_device_create_buffer(m_dev, m_size, false);
+	std::cout << "buff: " << timer.elapsed() << std::endl;
+
 	BlockData *map = new BlockData();
 	ssize_t nbytes_rx;
 	char *p_dat, *p_end;
 	ptrdiff_t p_inc;
+
 
 	if(!buf) {
 		return {};
@@ -144,7 +148,7 @@ BlockData *IIOSourceBlock::createData()
 
 	iio_buffer_destroy(buf);
 	count++;
-	// std::cout << "iio source:" << count <<  std::endl;
+	std::cout << "iio source:" << count <<  std::endl;
 
 	return map;
 }

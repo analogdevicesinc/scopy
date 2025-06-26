@@ -65,6 +65,7 @@ public:
 	void setSingleShot(bool single);
 	void setBufferSize(size_t size);
 	QString name();
+	bool singleShot();
 
 	static void connectBlockToFilter(BasicBlock *block, uint block_ch, uint filter_ch, FilterBlock *filter);
 	static void disconnectBlockToFilter(BasicBlock *block, uint block_ch, uint filter_ch, FilterBlock *filter);

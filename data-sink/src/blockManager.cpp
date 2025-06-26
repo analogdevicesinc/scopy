@@ -229,9 +229,7 @@ void BlockManager::addLink(SourceBlock *source, uint source_ch, BasicBlock *fina
 
 void BlockManager::setTargetFPS(uint fps) { m_fps = fps; }
 
-void BlockManager::setSingleShot(bool single) {
-	m_singleShot = single;
-}
+void BlockManager::setSingleShot(bool single) { m_singleShot = single; }
 
 void BlockManager::setBufferSize(size_t size)
 {
@@ -242,6 +240,8 @@ void BlockManager::setBufferSize(size_t size)
 }
 
 QString BlockManager::name() { return m_name; }
+
+bool BlockManager::singleShot() { return m_singleShot; }
 
 void BlockManager::connectBlockToFilter(BasicBlock *block, uint block_ch, uint filter_ch, FilterBlock *filter)
 {
@@ -277,9 +277,6 @@ bool BlockManager::start()
 	for(auto it = m_blockLinks.keyValueBegin(); it != m_blockLinks.keyValueEnd(); ++it) {
 		Q_EMIT it->first->requestData();
 	}
-
-	if(m_singleShot)
-		Q_EMIT stopped();
 
 	return true;
 }
