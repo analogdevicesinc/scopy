@@ -58,12 +58,10 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-set(DAC_CSV_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/csv)
-set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/csv)
+set(DAC_CSV_SYSTEM_PATH ${SCOPY_PACKAGE_INSTALL_PATH}/packages/${PACKAGE_NAME}/plugins/dac/resources/dac-csv)
+set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/dac-csv)
 
-install(DIRECTORY resources/csv DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
-
-file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/resources/csv/*)
+file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/resources/dac-csv/*)
 foreach(_csv ${CSVS})
 	file(COPY ${_csv} DESTINATION ${DAC_CSV_BUILD_PATH})
 endforeach()
