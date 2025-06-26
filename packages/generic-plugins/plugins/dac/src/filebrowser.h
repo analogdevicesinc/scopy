@@ -47,6 +47,7 @@ private Q_SLOTS:
 	void setFilename(const QString &text);
 
 private:
+	FileBrowserWidget *m_fileBrowser;
 	QPushButton *m_fileBufferLoadBtn;
 	QString m_filename;
 	QString m_defaultDir;
