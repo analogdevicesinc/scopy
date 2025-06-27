@@ -31,7 +31,7 @@
 #include <deviceautoconnect.h>
 #include <style.h>
 #include <whatsnewoverlay.h>
-#include <pkgmanager.h>
+#include <pkg-manager/pkgmanager.h>
 #include <pkgwidget.h>
 #include <pluginstab.h>
 

@@ -47,14 +47,14 @@ file(
 	SRC_LIST
 	src/*.cpp
 	src/*.cc
-	src/pkgmanager/*.cpp
+	src/pkggui/*.cpp
 )
 file(
 	GLOB
 	HEADER_LIST
 	include/${SCOPY_MODULE}/*.h
 	include/${SCOPY_MODULE}/*.hpp
-	include/${SCOPY_MODULE}/pkgmanager/*.h
+	include/${SCOPY_MODULE}/pkggui/*.h
 )
 file(GLOB UI_LIST ui/*.ui)
 
@@ -114,7 +114,6 @@ set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${P
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
-find_package(KF5Archive QUIET)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
 
@@ -124,22 +123,19 @@ generate_export_header(
 
 target_include_directories(
 	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkgmanager
+				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
 )
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkgmanager
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
 		${GLIB_INCLUDE_DIRS}
 		${GLIBCONFIG_INCLUDE_DIRS}
 		${LIBSIGROK_DECODE_INCLUDE_DIRS}
 		${Python3_INCLUDE_DIRS}
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common)
-if(KF5Archive_FOUND)
-	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
-endif()
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common scopy-pkg-manager)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
@@ -152,6 +148,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-pluginbase
 	       scopy-iioutil
+	       scopy-pkg-manager
 	       ${LIBSIGROK_DECODE_LINK_LIBRARIES}
 	       ${Python3_LIBRARIES}
 )

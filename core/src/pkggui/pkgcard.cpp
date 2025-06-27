@@ -27,7 +27,7 @@
 #include <qapplication.h>
 #include <stylehelper.h>
 #include <common/scopyconfig.h>
-#include "pkgmanifestfields.h"
+#include <pkg-manager/pkgmanifestfields.h>
 
 using namespace scopy;
 

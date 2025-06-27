@@ -27,10 +27,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLoggingCategory>
-#include <plot_utils.hpp>
 #include <qjsonarray.h>
 #include <common/loggingutil.h>
 #include <common/scopyconfig.h>
+#include <gui/plot_utils.hpp>
 
 Q_LOGGING_CATEGORY(CAT_PKGUTIL, "PkgUtil")
 

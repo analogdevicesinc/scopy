@@ -20,12 +20,11 @@
  */
 
 #include "pkginstalledtab.h"
-#include "pkgmanifestfields.h"
-
+#include <pkg-manager/pkgmanifestfields.h>
+#include <pkg-manager/pkgmanager.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <installpkgdialog.h>
 #include <menuonoffswitch.h>
-#include <pkgmanager.h>
 #include <pkgpreviewpage.h>
 #include <style.h>
 

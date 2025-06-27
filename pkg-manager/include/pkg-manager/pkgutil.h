@@ -22,7 +22,7 @@
 #ifndef PKGUTIL_H
 #define PKGUTIL_H
 
-#include "../scopy-core_export.h"
+#include "scopy-pkg-manager_export.h"
 #include <QObject>
 #include <kzip.h>
 #include <QFileInfoList>
@@ -31,7 +31,7 @@
 #define STATUS_BAR_MS 3000
 
 namespace scopy {
-class SCOPY_CORE_EXPORT PkgUtil
+class SCOPY_PKG_MANAGER_EXPORT PkgUtil
 {
 public:
 	static bool removePkg(const QString &path);
