@@ -58,17 +58,14 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-set(AD936X_FILTERS_SYSTEM_PATH ${SCOPY_PLUGIN_INSTALL_PATH}/ad936x)
-set(AD936X_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/res/pluto/ad936x)
+set(AD936X_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad936x-filters)
 
-install(DIRECTORY res/ad936x/ DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH})
-
-file(GLOB FIR_FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/res/ad936x/*)
+file(GLOB FIR_FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/resources/ad936x-filters/*)
 foreach(_fir ${FIR_FILTERS})
 	file(COPY ${_fir} DESTINATION ${AD936X_FILTERS_BUILD_PATH})
 endforeach()
 
-qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
@@ -83,7 +80,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -93,6 +90,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       scopy-pkg-manager
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
