@@ -172,6 +172,7 @@ if(APPLE)
 endif(APPLE)
 
 add_subdirectory(common)
+add_subdirectory(pkg-manager)
 add_subdirectory(iioutil)
 add_subdirectory(gui)
 add_subdirectory(gr-util)
