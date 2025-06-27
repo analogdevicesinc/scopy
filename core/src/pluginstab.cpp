@@ -25,7 +25,7 @@
 #include <QVBoxLayout>
 #include <cardwidget.h>
 #include <menusectionwidget.h>
-#include <pkgmanager.h>
+#include <pkg-manager/pkgmanager.h>
 #include <pluginrepository.h>
 #include <style.h>
 #include <stylehelper.h>

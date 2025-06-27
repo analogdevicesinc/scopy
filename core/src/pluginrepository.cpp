@@ -20,7 +20,7 @@
  */
 
 #include "pluginrepository.h"
-#include "pkgmanager.h"
+#include <pkg-manager/pkgmanager.h>
 
 #ifdef Q_OS_WINDOWS
 #include <windows.h>

@@ -25,9 +25,10 @@
 #include <QFileInfoList>
 #include <QMap>
 #include <QObject>
+#include "scopy-pkg-manager_export.h"
 
 namespace scopy {
-class PkgManager : public QObject
+class SCOPY_PKG_MANAGER_EXPORT PkgManager : public QObject
 {
 	Q_OBJECT
 protected:

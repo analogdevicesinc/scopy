@@ -21,9 +21,9 @@
 
 #include "scopymainwindow_api.h"
 
-#include "pkgutil.h"
+#include <pkg-manager/pkgutil.h>
 #include "qapplication.h"
-#include <pkgmanager.h>
+#include <pkg-manager/pkgmanager.h>
 #include <pluginbase/scopyjs.h>
 using namespace scopy;
 
