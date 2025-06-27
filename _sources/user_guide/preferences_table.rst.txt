@@ -5,6 +5,18 @@
    * - ID
      - Title
      - Description
+   * - regmap_color_by_value
+     - Use color to reflect value
+     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
+   * - plugins_use_debugger_v2
+     - Use Debugger V2 plugin
+     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
+   * - debugger_v2_include_debugfs
+     - Include debug attributes in IIO Explorer
+     - Enable/disable the use of advanced debug attributes in the instrument.
+   * - dataloggerplugin_data_storage_size
+     - Maximum data stored for each monitor
+     - Select the maximum data storage size for each monitor in the datalogger.
    * - m2k_instrument_notes_active
      - Instrument Notes
      - Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.
@@ -41,12 +53,6 @@
    * - m2k_logic_display_sample_time
      - Show sample and time info in decoder table
      - Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.
-   * - dataloggerplugin_data_storage_size
-     - Maximum data stored for each monitor
-     - Select the maximum data storage size for each monitor in the datalogger.
-   * - regmap_color_by_value
-     - Use color to reflect value
-     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
    * - adc_plot_labels
      - Default state for plot labels
      - Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting 
@@ -68,12 +74,6 @@
    * - adc_default_y_mode
      - ADC Default Y-Mode
      - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
-   * - plugins_use_debugger_v2
-     - Use Debugger V2 plugin
-     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
-   * - debugger_v2_include_debugfs
-     - Include debug attributes in IIO Explorer
-     - Enable/disable the use of advanced debug attributes in the instrument.
    * - general_save_session
      - Save/Load Scopy session
      - Allow Scopy to automatically save/load the session     using .ini files into a predefined location.

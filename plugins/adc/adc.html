@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
-    <script defer="" src="../../_static/app.umd.js?v=fe5054b0"></script>
+    <script defer="" src="../../_static/app.umd.js?v=5e042acc"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -88,7 +88,10 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">ADC plugin</a></li>
+<li><a class="reference internal" href="#">ADC plugin</a><ul>
+<li><a class="reference internal" href="#fft-averaging-frequency-instrument">FFT Averaging (Frequency Instrument)</a></li>
+</ul>
+</li>
 </ul>
 
         </nav>
@@ -380,6 +383,16 @@ Plot Controls</p>
 <li><p>Plot - which plot is the curve displayed on</p></li>
 </ul>
 <p>Complex mode - activates complex mode. Complex channels are treated as whole different channels</p>
+<section id="fft-averaging-frequency-instrument">
+<span id="fft-averaging"></span><h2>FFT Averaging (Frequency Instrument)<a class="headerlink" href="#fft-averaging-frequency-instrument" title="Link to this heading"></a></h2>
+<p>Starting with version 2.1.0, the ADC Frequency instrument supports FFT averaging using a
+moving average filter. This feature allows you to smooth the frequency spectrum by averaging
+multiple FFT frames, reducing noise fluctuations and making persistent signals easier to observe.</p>
+<p><strong>How to use:</strong>
+- Open the channel menu in the Frequency instrument.
+- Adjust the “Averaging Size” spinbox to set the number of FFT frames to average.
+- The spectrum will update in real time as you change the averaging size.</p>
+</section>
 </section>
 
 

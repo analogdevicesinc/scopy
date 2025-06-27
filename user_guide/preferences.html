@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=c218d0f6" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
-    <script defer="" src="../_static/app.umd.js?v=fe5054b0"></script>
+    <script defer="" src="../_static/app.umd.js?v=5e042acc"></script>
     <link rel="icon" href="../_static/scopy.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -286,6 +286,22 @@ identify them in the .ini files, can be found in the table below.</p>
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td><p>regmap_color_by_value</p></td>
+<td><p>Use color to reflect value</p></td>
+<td><p>Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>plugins_use_debugger_v2</p></td>
+<td><p>Use Debugger V2 plugin</p></td>
+<td><p>Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.</p></td>
+</tr>
+<tr class="row-even"><td><p>debugger_v2_include_debugfs</p></td>
+<td><p>Include debug attributes in IIO Explorer</p></td>
+<td><p>Enable/disable the use of advanced debug attributes in the instrument.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dataloggerplugin_data_storage_size</p></td>
+<td><p>Maximum data stored for each monitor</p></td>
+<td><p>Select the maximum data storage size for each monitor in the datalogger.</p></td>
+</tr>
 <tr class="row-even"><td><p>m2k_instrument_notes_active</p></td>
 <td><p>Instrument Notes</p></td>
 <td><p>Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.</p></td>
@@ -334,14 +350,6 @@ identify them in the .ini files, can be found in the table below.</p>
 <td><p>Show sample and time info in decoder table</p></td>
 <td><p>Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.</p></td>
 </tr>
-<tr class="row-even"><td><p>dataloggerplugin_data_storage_size</p></td>
-<td><p>Maximum data stored for each monitor</p></td>
-<td><p>Select the maximum data storage size for each monitor in the datalogger.</p></td>
-</tr>
-<tr class="row-odd"><td><p>regmap_color_by_value</p></td>
-<td><p>Use color to reflect value</p></td>
-<td><p>Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.</p></td>
-</tr>
 <tr class="row-even"><td><p>adc_plot_labels</p></td>
 <td><p>Default state for plot labels</p></td>
 <td><p>Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting</p></td>
@@ -369,14 +377,6 @@ identify them in the .ini files, can be found in the table below.</p>
 <tr class="row-even"><td><p>adc_default_y_mode</p></td>
 <td><p>ADC Default Y-Mode</p></td>
 <td><p>Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.</p></td>
-</tr>
-<tr class="row-odd"><td><p>plugins_use_debugger_v2</p></td>
-<td><p>Use Debugger V2 plugin</p></td>
-<td><p>Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.</p></td>
-</tr>
-<tr class="row-even"><td><p>debugger_v2_include_debugfs</p></td>
-<td><p>Include debug attributes in IIO Explorer</p></td>
-<td><p>Enable/disable the use of advanced debug attributes in the instrument.</p></td>
 </tr>
 <tr class="row-odd"><td><p>general_save_session</p></td>
 <td><p>Save/Load Scopy session</p></td>
