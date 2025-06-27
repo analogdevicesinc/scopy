@@ -170,6 +170,11 @@ void PkgManager::createPkgDirectory()
 	}
 }
 
+QString PkgManager::packagesPath()
+{
+	return packagesPath_;
+}
+
 QFileInfoList PkgManager::listFilesInfo(QStringList dirFilter, QStringList fileFilter)
 {
 	QFileInfoList files;
