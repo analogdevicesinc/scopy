@@ -35,6 +35,8 @@
 
 #include <pluginbase/preferences.h>
 
+#include <pkg-manager/pkgmanager.h>
+
 using namespace scopy::regmap;
 
 QMap<QString, JsonFormatedElement *> *Utils::spiJson{new QMap<QString, JsonFormatedElement *>()};
@@ -73,18 +75,9 @@ void Utils::removeLayoutMargins(QLayout *layout)
 
 QDir Utils::setXmlPath()
 {
-	QDir xmlsPath(REGMAP_XML_BUILD_PATH);
-	if(xmlsPath.entryList().empty()) {
-#ifdef Q_OS_WINDOWS
-		xmlsPath.setPath(REGMAP_XML_PATH_LOCAL);
-#elif defined __APPLE__
-		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/plugins/xmls");
-#elif defined(__appimage__)
-		xmlsPath.setPath(QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/xmls");
-#else
-		xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
-#endif
-	}
+	QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "regmap-xml", QStringList() << "*.xml");
+	QString defaultPath = (files.isEmpty()) ? PkgManager::packagesPath() : files.first().absolutePath();
+	QDir xmlsPath(defaultPath);
 
 	qDebug(CAT_REGMAP) << "XML folder found: " << xmlsPath;
 	if(!xmlsPath.entryList().empty()) {
