@@ -62,6 +62,8 @@ public:
 	static QStringList getPkgsCategory();
 	static QList<QVariantMap> getPkgsMeta();
 
+	static QString packagesPath();
+
 Q_SIGNALS:
 	void pkgExists(const QString &zipPath, const QString &pkgName);
 
