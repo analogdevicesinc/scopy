@@ -30,7 +30,7 @@
 #include <restartdialog.h>
 #include <style.h>
 #include <QSet>
-#include <pkgmanager.h>
+#include <pkg-manager/pkgmanager.h>
 #include <pkgzipwidget.h>
 #include <pkggridwidget.h>
 #include <pkginstalledtab.h>
