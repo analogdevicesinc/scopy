@@ -78,7 +78,6 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 find_package(libm2k REQUIRED)
 
-set(REGMAP_XML_SYSTEM_PATH ${SCOPY_PACKAGE_INSTALL_PATH}/packages/${PACKAGE_NAME}/plugins/regmap/resources/regmap-xml)
 set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/regmap-xml)
 
 file(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/resources/regmap-xml/*.xml)
@@ -122,6 +121,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-gui
 	       scopy-core
+	       scopy-pkg-manager
 	       Qt${QT_VERSION_MAJOR}::Xml
 	       libm2k::libm2k
 	       Qt5::Test
