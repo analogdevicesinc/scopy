@@ -22,7 +22,7 @@
 #include "translationsrepository.h"
 
 #include "common/scopyconfig.h"
-#include "pkgmanager.h"
+#include <pkg-manager/pkgmanager.h>
 
 #include <QApplication>
 #include <QDir>

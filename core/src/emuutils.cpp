@@ -20,11 +20,11 @@
  */
 
 #include "emuutils.h"
-#include "common/scopyconfig.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <pkgmanager.h>
+#include <pkg-manager/pkgmanager.h>
+#include <common/scopyconfig.h>
 
 using namespace scopy;
 

@@ -34,7 +34,7 @@
 #include <QJsonArray>
 #include <style.h>
 #include <menusectionwidget.h>
-#include <pkgmanager.h>
+#include <pkg-manager/pkgmanager.h>
 #include <emuutils.h>
 
 #define PORT_DEFAULT 30431
