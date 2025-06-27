@@ -20,6 +20,7 @@
  */
 
 #include "firfilterqwidget.h"
+#include "pkg-manager/pkgmanager.h"
 
 #include <QFileDialog>
 #include <QLabel>
@@ -90,16 +91,8 @@ FirFilterQWidget::FirFilterQWidget(iio_device *dev1, iio_device *dev2, QWidget *
 void FirFilterQWidget::chooseFile()
 {
 	// Determine default search dir
-	QString defaultDir = AD936X_FILTERS_BUILD_PATH;
-#ifdef Q_OS_WINDOWS
-	defaultDir = AD936X_FILTERS_PATH_LOCAL;
-#elif defined __APPLE__
-	defaultDir = QCoreApplication::applicationDirPath() + "/plugins/ad936x";
-#elif defined(__appimage__)
-	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/ad936x";
-#else
-	defaultDir = AD936X_FILTERS_SYSTEM_PATH;
-#endif
+	QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "ad936x-filters");
+	QString defaultDir = (files.isEmpty()) ? PkgManager::packagesPath() : files.first().absolutePath();
 
 	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
 	QString selectedFilter;
