@@ -58,7 +58,7 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-set(DAC_CSV_SYSTEM_PATH ${SCOPY_PACKAGE_INSTALL_PATH}/packages/${PACKAGE_NAME}/plugins/dac/resources/dac-csv)
+
 set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/dac-csv)
 
 file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/resources/dac-csv/*)
@@ -81,7 +81,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -91,6 +91,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       scopy-pkg-manager
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

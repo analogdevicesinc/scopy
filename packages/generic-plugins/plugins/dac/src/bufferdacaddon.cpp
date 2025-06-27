@@ -36,6 +36,7 @@
 
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/datastrategy/channelattrdatastrategy.h>
+#include <pkg-manager/pkgmanager.h>
 
 #include <QDateTime>
 #include <QCoreApplication>
@@ -184,16 +185,8 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	Style::setStyle(fileLbl, style::properties::label::subtle);
 
 	// Determine default search dir
-	QString defaultDir = DAC_CSV_BUILD_PATH;
-#ifdef Q_OS_WINDOWS
-	defaultDir = DAC_CSV_PATH_LOCAL;
-#elif defined __APPLE__
-	defaultDir = QCoreApplication::applicationDirPath() + "/packages/plugins/dac/resources/dac-csv";
-#elif defined(__appimage__)
-	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/packages/plugins/dac/resources/dac-csv";
-#else
-	defaultDir = DAC_CSV_SYSTEM_PATH;
-#endif
+	QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "dac-csv", QStringList() << "*.csv");
+	QString defaultDir = (files.isEmpty()) ? PkgManager::packagesPath() : files.first().absolutePath();
 
 	fm = new FileBrowser(fileBrowserSection);
 	fm->setDefaultDir(defaultDir);
