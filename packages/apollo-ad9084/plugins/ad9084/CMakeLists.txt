@@ -58,7 +58,6 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-set(APOLLO_FILTERS_SYSTEM_PATH ${SCOPY_PACKAGE_INSTALL_PATH}/${PACKAGE_NAME}/plugins/resources/ad9084-filters)
 set(APOLLO_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad9084-filters)
 
 file(GLOB FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/resources/ad9084-filters/*)
@@ -81,7 +80,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pkg-manager scopy-pluginbase scopy-gui)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -91,6 +90,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       scopy-pkg-manager
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

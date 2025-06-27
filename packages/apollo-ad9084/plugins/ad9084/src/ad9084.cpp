@@ -19,8 +19,6 @@
  */
 
 #include "ad9084.h"
-#include "scopy-ad9084_config.h"
-
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFutureWatcher>
@@ -33,6 +31,7 @@
 #include <style.h>
 #include <preferenceshelper.h>
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <pkg-manager/pkgmanager.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9084, "AD9084");
 
@@ -307,18 +306,8 @@ QWidget *Ad9084::createMenu()
 	pfirlay->setMargin(0);
 	pfirlay->setSpacing(10);
 
-	// Determine default search dir
-	QString defaultDir = AD9084_FILTERS_BUILD_PATH;
-#ifdef Q_OS_WINDOWS
-	defaultDir = AD9084_FILTERS_PATH_LOCAL;
-#elif defined __APPLE__
-	defaultDir = QCoreApplication::applicationDirPath() + "/plugins/ad9084";
-#elif defined(__appimage__)
-	defaultDir = QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins/ad9084";
-#else
-	defaultDir = AD9084_FILTERS_SYSTEM_PATH;
-#endif
-
+	QFileInfoList filters = PkgManager::listFilesInfo(QStringList() << "ad9084-filters");
+	QString defaultDir = (filters.size() > 0) ? filters.first().absolutePath() : PkgManager::packagesPath();
 	m_pfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);
 	m_pfirFileBrowser->setFilter(tr("All Files(*)"));
 	m_pfirFileBrowser->setBaseDirectory(defaultDir);
