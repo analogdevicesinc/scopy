@@ -96,7 +96,7 @@ find_package(
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
-qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
