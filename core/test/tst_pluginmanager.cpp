@@ -20,6 +20,8 @@
  */
 
 #include "core/pluginmanager.h"
+#include "pkg-manager/pkgmanager.h"
+#include "pkg-manager/pkgmanifestfields.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -46,20 +48,30 @@ private Q_SLOTS:
 
 private:
 	void initFileList();
+	bool basePkgsExist();
+	bool hasBasePkgs = false;
 	QStringList libs;
+	const QStringList basePkgs = {"test-plugins", "generic-plugins"};
 };
 
 #define NONPLUGIN_LIBRARY_LOCATION "../libscopycore.so"
-#define PLUGIN_LOCATION "../../plugins/plugins"
+#define PACKAGES_LOCATION "../../packages"
 
 void TST_PluginManager::libsFound()
 {
 	initFileList();
+	hasBasePkgs = basePkgsExist();
+	if(!hasBasePkgs) {
+		return;
+	}
 	QVERIFY2(libs.count() > 0, "No libs not found");
 }
 
 void TST_PluginManager::loadLibs()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -119,6 +131,9 @@ void TST_PluginManager::loadLibs()
 
 void TST_PluginManager::metadataOps()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -150,6 +165,9 @@ void TST_PluginManager::metadataOps()
 
 void TST_PluginManager::exclusion()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -186,6 +204,9 @@ void TST_PluginManager::exclusion()
 
 void TST_PluginManager::exclusionSpecificLowercase()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -221,6 +242,9 @@ void TST_PluginManager::exclusionSpecificLowercase()
 
 void TST_PluginManager::exclusionSpecificUppercase()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -256,6 +280,9 @@ void TST_PluginManager::exclusionSpecificUppercase()
 
 void TST_PluginManager::exclusionExcept()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -290,6 +317,9 @@ void TST_PluginManager::exclusionExcept()
 
 void TST_PluginManager::exclusionExceptUppercase()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -324,6 +354,9 @@ void TST_PluginManager::exclusionExceptUppercase()
 
 void TST_PluginManager::exclusionExceptLowercase()
 {
+	if(!hasBasePkgs) {
+		return;
+	}
 	PluginManager *p = new PluginManager(this);
 	p->add(libs);
 	QVERIFY2(p->count() > 0, "Load libs failed");
@@ -358,15 +391,31 @@ void TST_PluginManager::exclusionExceptLowercase()
 
 void TST_PluginManager::initFileList()
 {
-	QDir directory(PLUGIN_LOCATION);
-	QStringList files = directory.entryList();
+	PkgManager::GetInstance()->init(QSet<QString>() << PACKAGES_LOCATION);
+	const QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "plugins", QStringList() << "*.so");
 	libs.clear();
-	for(const QString &file : files) {
-		if(QLibrary::isLibrary(file)) {
-			qDebug() << "Library: " << file;
-			libs.append(directory.absoluteFilePath(file));
+	for(const QFileInfo &file : files) {
+		if(QLibrary::isLibrary(file.fileName())) {
+			qDebug() << "Library: " << file.fileName();
+			libs.append(file.absoluteFilePath());
 		}
 	}
+}
+
+bool TST_PluginManager::basePkgsExist()
+{
+	QStringList idList;
+	const QList<QVariantMap> pkgsMeta = PkgManager::getPkgsMeta();
+	std::transform(pkgsMeta.cbegin(), pkgsMeta.cend(), std::back_inserter(idList),
+		       [](const QVariantMap &v) { return v[PkgManifest::PKG_ID].toString(); });
+	qDebug() << "Available packages:" << idList;
+	for(const QString &pkgId : basePkgs) {
+		if(!idList.contains(pkgId)) {
+			qDebug() << "Base package cannot be found:" << pkgId;
+			return false;
+		}
+	}
+	return true;
 }
 
 QTEST_MAIN(TST_PluginManager)
