@@ -81,6 +81,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initPreferences();
 
 	QSet<QString> pkgsPath{};
+	pkgsPath.insert(scopy::config::defaultPkgFolderPath());
 #ifdef SCOPY_DEV_MODE
 	pkgsPath.insert(scopy::config::localPkgFolderPath());
 #endif
@@ -539,20 +540,12 @@ void ScopyMainWindow::loadPluginsFromRepository()
 {
 
 	DebugTimer benchmark;
-	// Check the local build plugins folder first
-	// Check if directory exists and it's not empty
-	QDir pathDir(scopy::config::localPluginFolderPath());
 	PluginRepository *pr = PluginRepository::GetInstance();
 	PluginManager *pm = pr->getPluginManager();
-
 	ScopySplashscreen::setPrefix("Loading plugin: ");
 
 	connect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
-	if(pathDir.exists() && pathDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).count() != 0) {
-		pr->init(scopy::config::localPluginFolderPath());
-	} else {
-		pr->init(scopy::config::defaultPluginFolderPath());
-	}
+	pr->init();
 	ScopySplashscreen::setPrefix("");
 	disconnect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
 

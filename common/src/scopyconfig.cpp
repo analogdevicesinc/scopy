@@ -31,25 +31,6 @@
 
 QString scopy::config::tempLogFilePath() { return QDir::cleanPath(settingsFolderPath() + "/" + SCOPY_TEMP_LOG_FILE); }
 
-QString scopy::config::defaultPluginFolderPath()
-{
-
-#ifdef WIN32
-	// Scopy_install_folder/plugins
-	return QCoreApplication::applicationDirPath() + "/plugins";
-#elif defined __APPLE__
-	// Scopy.app/Contents/MacOS/plugins
-	return QCoreApplication::applicationDirPath() + "/plugins";
-#elif defined(__appimage__)
-	// usr/lib/plugins
-	return QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins";
-#endif
-
-	return SCOPY_PLUGIN_INSTALL_PATH;
-}
-
-QString scopy::config::localPluginFolderPath() { return SCOPY_PLUGIN_BUILD_PATH; }
-
 QString scopy::config::defaultTranslationFolderPath()
 {
 #if defined __APPLE__
@@ -127,7 +108,7 @@ QString scopy::config::dump()
 	QString ret;
 
 	ret = QString("ScopyConfig");
-	ret += QString("\n") + "DefaultPluginFolderPath: " + defaultPluginFolderPath();
+	ret += QString("\n") + "DefaultPackageFolderPath: " + defaultPkgFolderPath();
 	ret += QString("\n") + "PreferencesPluginFolderPath: " + preferencesFolderPath();
 	ret += QString("\n") + "SettingsFolderPath: " + settingsFolderPath();
 	ret += QString("\n") + "ExecutableFolderPath: " + executableFolderPath();
@@ -162,3 +143,20 @@ QString scopy::config::pkgStylePropDir() { return PKG_STYLE_PROP_DIR; }
 QString scopy::config::pkgTranslationsDir() { return PKG_TRANSLATION_DIR; }
 
 QString scopy::config::localPkgFolderPath() { return SCOPY_PACKAGE_BUILD_PATH; }
+
+QString scopy::config::defaultPkgFolderPath()
+{
+
+#ifdef WIN32
+	// Scopy_install_folder/packages
+	return QCoreApplication::applicationDirPath() + "/packages";
+#elif defined __APPLE__
+	// Scopy.app/Contents/MacOS/packages
+	return QCoreApplication::applicationDirPath() + "/packages";
+#elif defined(__appimage__)
+	// usr/lib/packages
+	return QCoreApplication::applicationDirPath() + "/../lib/scopy/packages";
+#endif
+
+	return SCOPY_PACKAGE_INSTALL_PATH;
+}
