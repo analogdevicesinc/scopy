@@ -16,6 +16,8 @@
 
 #define SCOPY_TEMP_LOG_FILE ".scopyTmpLog"
 
+#define SCOPY_PACKAGE_BUILD_PATH "@SCOPY_PACKAGE_BUILD_PATH@"
+
 #define PKG_EMU_SETUP_FILE "emu_setup.json"
 #define PKG_EMU_DIR "emu-xml"
 #define PKG_PLUGINS_DIR "plugins"
