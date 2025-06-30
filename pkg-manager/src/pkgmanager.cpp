@@ -59,9 +59,13 @@ PkgManager *PkgManager::GetInstance()
 	return pinstance_;
 }
 
-void PkgManager::init() { pinstance_->_init(QStringList() << packagesPath_); }
+void PkgManager::init(QSet<QString> paths)
+{
+	paths.insert(packagesPath_);
+	pinstance_->_init(paths);
+}
 
-void PkgManager::_init(const QStringList &paths)
+void PkgManager::_init(const QSet<QString> &paths)
 {
 	for(const QString &p : paths) {
 		QDirIterator it(p, {"MANIFEST.json"}, QDir::Files, QDirIterator::Subdirectories);
@@ -170,10 +174,7 @@ void PkgManager::createPkgDirectory()
 	}
 }
 
-QString PkgManager::packagesPath()
-{
-	return packagesPath_;
-}
+QString PkgManager::packagesPath() { return packagesPath_; }
 
 QFileInfoList PkgManager::listFilesInfo(QStringList dirFilter, QStringList fileFilter)
 {
