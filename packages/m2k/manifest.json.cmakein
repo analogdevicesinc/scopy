@@ -1,0 +1,13 @@
+{
+    "id": "m2k",
+    "title": "ADALM2000",
+    "version": "@PROJECT_VERSION@",
+    "description": "Plugin for ADALM2000 (M2K).",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  
