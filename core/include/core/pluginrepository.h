@@ -42,7 +42,7 @@ public:
 	void operator=(const PluginRepository &) = delete;
 	static PluginRepository *GetInstance();
 
-	static void init(QString location);
+	static void init(QString location = "");
 	void _init(QString location);
 
 	static PluginManager *getPluginManager();
