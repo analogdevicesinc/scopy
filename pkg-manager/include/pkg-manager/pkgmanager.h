@@ -25,6 +25,7 @@
 #include <QFileInfoList>
 #include <QMap>
 #include <QObject>
+#include <QSet>
 #include "scopy-pkg-manager_export.h"
 
 namespace scopy {
@@ -40,8 +41,8 @@ public:
 	PkgManager(PkgManager &other) = delete;
 	void operator=(const PkgManager &) = delete;
 	static PkgManager *GetInstance();
-	static void init();
-	void _init(const QStringList &paths);
+	static void init(QSet<QString> paths = {});
+	void _init(const QSet<QString> &paths);
 
 	static bool install(const QString &zipPath = "", bool performRestart = true);
 	bool _install(const QString &zipPath = "", bool performRestart = true);
