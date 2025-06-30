@@ -80,8 +80,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	initPreferences();
 
+	QSet<QString> pkgsPath{};
+#ifdef SCOPY_DEV_MODE
+	pkgsPath.insert(scopy::config::localPkgFolderPath());
+#endif
 	PkgManager::GetInstance();
-	PkgManager::init();
+	PkgManager::init(pkgsPath);
 
 	initStyle();
 	ScopySplashscreen::showMessage("Initializing ui");

@@ -58,6 +58,8 @@ public:
 	static QString pkgStylePropDir();
 	static QString pkgTranslationsDir();
 
+	static QString localPkgFolderPath();
+
 private:
 	inline static int uuid = 0;
 };
