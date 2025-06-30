@@ -32,8 +32,6 @@ class SCOPY_COMMON_EXPORT config
 {
 public:
 	static QString tempLogFilePath();
-	static QString defaultPluginFolderPath();
-	static QString localPluginFolderPath();
 	static QString defaultTranslationFolderPath();
 	static QString localTranslationFolderPath();
 	static QString defaultStyleFolderPath();
@@ -59,6 +57,7 @@ public:
 	static QString pkgTranslationsDir();
 
 	static QString localPkgFolderPath();
+	static QString defaultPkgFolderPath();
 
 private:
 	inline static int uuid = 0;
