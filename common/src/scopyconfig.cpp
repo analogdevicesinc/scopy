@@ -160,3 +160,5 @@ QString scopy::config::pkgStyleThemesDir() { return PKG_STYLE_THEMES_DIR; }
 QString scopy::config::pkgStylePropDir() { return PKG_STYLE_PROP_DIR; }
 
 QString scopy::config::pkgTranslationsDir() { return PKG_TRANSLATION_DIR; }
+
+QString scopy::config::localPkgFolderPath() { return SCOPY_PACKAGE_BUILD_PATH; }
