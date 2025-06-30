@@ -96,7 +96,7 @@ find_package(
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
-qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 
 option(ENABLE_MATIO "Enable MATLAB support for ADALM2000 SignalGenerator" ON)
 if(ENABLE_MATIO)
