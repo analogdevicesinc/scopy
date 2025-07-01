@@ -49,7 +49,7 @@ void PluginInfo::setPluginInstance(Plugin *instance)
 {
 	m_pluginInstance = instance;
 	if(m_pluginInstance) {
-		m_name = m_pluginInstance->displayName();
+		m_name = m_pluginInstance->name();
 		m_description = m_pluginInstance->description();
 	}
 }
