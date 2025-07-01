@@ -26,7 +26,7 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
-set(PLUGIN_DISPLAY_NAME AD936X)
+set(PLUGIN_DISPLAY_NAME PLUTO)
 set(PLUGIN_DESCRIPTION "This is a plugin for AD936X")
 
 include(GenerateExportHeader)
