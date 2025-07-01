@@ -58,7 +58,6 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-
 set(DAC_CSV_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/dac-csv)
 
 file(GLOB CSVS ${CMAKE_CURRENT_SOURCE_DIR}/resources/dac-csv/*)
