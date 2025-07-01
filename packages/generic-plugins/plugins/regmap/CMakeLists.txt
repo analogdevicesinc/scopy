@@ -87,7 +87,6 @@ foreach(_xml ${XMLS})
 	file(COPY ${_xml} DESTINATION ${REGMAP_XML_BUILD_PATH})
 endforeach()
 
-
 message(include/${SCOPY_MODULE}/)
 configure_file(
 	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
