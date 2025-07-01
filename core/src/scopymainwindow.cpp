@@ -448,7 +448,7 @@ void ScopyMainWindow::setupPreferences()
 			Qt::QueuedConnection);
 	}
 
-	if(p->get("general_show_whats_new").toBool() && !p->get("general_first_run").toBool()) {
+	if(!p->get("general_dont_show_whats_new").toBool() && !p->get("general_first_run").toBool()) {
 		showWhatsNew();
 	}
 }
@@ -465,7 +465,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_save_session", true);
 	p->init("general_save_attached", true);
 	p->init("general_doubleclick_attach", true);
-	p->init("general_show_whats_new", true);
+	p->init("general_dont_show_whats_new", false);
 #if defined(__linux__) && (defined(__arm__) || defined(__aarch64__))
 	p->init("general_use_opengl", false);
 #else
