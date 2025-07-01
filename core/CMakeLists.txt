@@ -135,7 +135,14 @@ target_include_directories(
 		${Python3_INCLUDE_DIRS}
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common scopy-pkg-manager)
+target_include_directories(
+	${PROJECT_NAME}
+	PUBLIC scopy-gui
+	       scopy-pluginbase
+	       scopy-iioutil
+	       scopy-common
+	       scopy-pkg-manager
+)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})

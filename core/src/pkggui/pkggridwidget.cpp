@@ -99,3 +99,5 @@ bool PkgGridWidget::isSearchMatch(const QString &pkgVal, const QStringList &sear
 	}
 	return false;
 }
+
+#include "moc_pkggridwidget.cpp"

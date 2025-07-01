@@ -97,41 +97,39 @@ function(include_emu_xml base_dir output_dir)
 	endif()
 endfunction()
 
-
 function(install_plugins SRC_DIR INSTALL_DEST TARGET_PREFIX)
-    file(GLOB PLUGIN_DIRS RELATIVE ${SRC_DIR} ${SRC_DIR}/*)
-    foreach(plugin ${PLUGIN_DIRS})
-	set(target_name "${TARGET_PREFIX}-${plugin}")
-	if(TARGET ${target_name})
-	    install(TARGETS ${target_name}
-		RUNTIME DESTINATION ${INSTALL_DEST}
-		LIBRARY DESTINATION ${INSTALL_DEST}
-		ARCHIVE DESTINATION ${INSTALL_DEST}
-		)
-	else()
-	    message(STATUS "Skipping install for ${target_name} (target not defined)")
-	endif()
-	set(PLUGIN_DIR ${SRC_DIR}/${plugin})
-	if(IS_DIRECTORY ${PLUGIN_DIR})
-	    set(RESOURCES_DIR ${PLUGIN_DIR}/resources)
-	    if(EXISTS ${RESOURCES_DIR})
-		install(DIRECTORY ${RESOURCES_DIR}
-		    DESTINATION ${INSTALL_DEST}/${plugin})
-	    endif()
-	endif()
-    endforeach()
+	file(GLOB PLUGIN_DIRS RELATIVE ${SRC_DIR} ${SRC_DIR}/*)
+	foreach(plugin ${PLUGIN_DIRS})
+		set(target_name "${TARGET_PREFIX}-${plugin}")
+		if(TARGET ${target_name})
+			install(
+				TARGETS ${target_name}
+				RUNTIME DESTINATION ${INSTALL_DEST}
+				LIBRARY DESTINATION ${INSTALL_DEST}
+				ARCHIVE DESTINATION ${INSTALL_DEST}
+			)
+		else()
+			message(STATUS "Skipping install for ${target_name} (target not defined)")
+		endif()
+		set(PLUGIN_DIR ${SRC_DIR}/${plugin})
+		if(IS_DIRECTORY ${PLUGIN_DIR})
+			set(RESOURCES_DIR ${PLUGIN_DIR}/resources)
+			if(EXISTS ${RESOURCES_DIR})
+				install(DIRECTORY ${RESOURCES_DIR} DESTINATION ${INSTALL_DEST}/${plugin})
+			endif()
+		endif()
+	endforeach()
 endfunction()
 
 function(install_pkg pkg_src_dir install_dir)
-	install(FILES ${pkg_src_dir}/MANIFEST.json
-		DESTINATION ${install_dir})
+	install(FILES ${pkg_src_dir}/MANIFEST.json DESTINATION ${install_dir})
 	if(EXISTS ${pkg_src_dir}/emu-xml)
-	    install(DIRECTORY ${pkg_src_dir}/emu-xml DESTINATION ${install_dir})
+		install(DIRECTORY ${pkg_src_dir}/emu-xml DESTINATION ${install_dir})
 	endif()
 	if(EXISTS ${pkg_src_dir}/style)
-	    install(DIRECTORY ${pkg_src_dir}/style DESTINATION ${install_dir})
+		install(DIRECTORY ${pkg_src_dir}/style DESTINATION ${install_dir})
 	endif()
 	if(EXISTS ${pkg_src_dir}/resources)
-	    install(DIRECTORY ${pkg_src_dir}/resources DESTINATION ${install_dir})
+		install(DIRECTORY ${pkg_src_dir}/resources DESTINATION ${install_dir})
 	endif()
 endfunction()
