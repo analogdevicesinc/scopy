@@ -64,10 +64,11 @@ void PluginRepository::_init(QString location)
 	qInfo(CAT_PLUGINREPOSTIORY) << "initializing plugins from: " << location;
 	const QString pluginMetaFileName = "plugin.json";
 	QString pluginMetaFilePath = "";
-	QDir loc(location);
-
-	QFileInfoList plugins = loc.entryInfoList(QDir::Files);
-	plugins.append(PkgManager::listFilesInfo(QStringList() << "plugins"));
+	QFileInfoList plugins = PkgManager::listFilesInfo(QStringList() << "plugins");
+	if(!location.isEmpty() && QFile::exists(location)) {
+		QDir loc(location);
+		plugins.append(loc.entryInfoList(QDir::Files));
+	}
 	QStringList pluginFiles;
 
 	for(const QFileInfo &p : qAsConst(plugins)) {
