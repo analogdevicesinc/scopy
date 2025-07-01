@@ -43,6 +43,7 @@ public:
 	void unload() override;
 	void initMetadata() override;
 	QString description() override;
+	QString displayName() override;
 
 public Q_SLOTS:
 	bool onConnect() override;
