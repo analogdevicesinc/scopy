@@ -55,14 +55,14 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	QHBoxLayout *optionsControlLayout = new QHBoxLayout(optionsoverlayControlWidget);
 	optionsoverlayControlWidget->setLayout(optionsControlLayout);
 
-	QCheckBox *showAgain = new QCheckBox("Show this again", optionsoverlayControlWidget);
-	showAgain->setChecked(true);
+	QCheckBox *showAgain = new QCheckBox("Do not show this again", optionsoverlayControlWidget);
+
 	optionsControlLayout->addWidget(showAgain);
 
-	connect(showAgain, &QCheckBox::toggled, this, [=](bool en) {
-		Preferences *p = Preferences::GetInstance();
-		p->set("general_show_whats_new", en);
-	});
+	Preferences *p = Preferences::GetInstance();
+	connect(showAgain, &QCheckBox::toggled, this, [=](bool en) { p->set("general_dont_show_whats_new", en); });
+
+	showAgain->setChecked(true);
 
 	// version picker
 	m_versionCb = new QComboBox(optionsoverlayControlWidget);
