@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <deviceiconbuilder.h>
 #include <style.h>
+#include "scopy-pluto_config.h"
 
 #include "ad936x.h"
 #include "ad963xadvanced.h"
@@ -93,6 +94,8 @@ void PlutoPlugin::loadToolList()
 void PlutoPlugin::unload() {}
 
 QString PlutoPlugin::description() { return "This is a plugin for AD936X"; }
+
+QString PlutoPlugin::displayName() { return PLUTO_PLUGIN_DISPLAY_NAME; }
 
 bool PlutoPlugin::onConnect()
 {
