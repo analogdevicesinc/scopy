@@ -26,26 +26,25 @@
 #include <gui/channelcomponent.h>
 #include <gui/toolcomponent.h>
 #include <gui/interfaces.h>
-
-#include <gr-util/griiodevicesource.h>
 #include <gui/widgets/menucontrolbutton.h>
 
 #include <QLabel>
 #include <QPen>
+// #include <iiodevicesource.h>
 
 #include "adcacquisitionmanager.h"
 
 namespace scopy::adc {
 // class GRTimeChannelAddon;
 
-class SCOPY_ADC_EXPORT GRDeviceComponent : public QWidget, public ToolComponent, public SampleRateProvider
+class SCOPY_ADC_EXPORT DeviceComponent : public QWidget, public ToolComponent, public SampleRateProvider
 {
 	Q_OBJECT
 public:
-	GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *parent = nullptr);
-	~GRDeviceComponent();
+	DeviceComponent(IIODeviceSourceNode *node, QWidget *parent = nullptr);
+	~DeviceComponent();
 
-	GRIIODeviceSource *src() const;
+	// IIODeviceSource *src() const;
 	CollapsableMenuControlButton *ctrl();
 
 	virtual bool sampleRateAvailable() override;
@@ -64,8 +63,8 @@ public Q_SLOTS:
 private:
 	QString name;
 	QWidget *widget;
-	GRIIODeviceSourceNode *m_node;
-	GRIIODeviceSource *m_src;
+	IIODeviceSourceNode *m_node;
+	// IIODeviceSource *m_src;
 	CollapsableMenuControlButton *m_ctrl;
 	QPen m_pen;
 	// QList<GRTimeChannelAddon *> m_channels;

@@ -22,7 +22,7 @@
 #include "grscaleoffsetproc.h"
 
 #include "grlog.h"
-#include "grtopblock.h"
+#include "topblock.h"
 
 using namespace scopy::grutil;
 GRScaleOffsetProc::GRScaleOffsetProc(QObject *parent)
@@ -48,7 +48,7 @@ void GRScaleOffsetProc::setOffset(double off)
 	}
 }
 
-void GRScaleOffsetProc::build_blks(GRTopBlock *top)
+void GRScaleOffsetProc::build_blks(TopBlock *top)
 {
 	size_t m_vlen = top->vlen();
 	m_top = top;
@@ -67,7 +67,7 @@ void GRScaleOffsetProc::build_blks(GRTopBlock *top)
 	end_blk = add;
 }
 
-void GRScaleOffsetProc::destroy_blks(GRTopBlock *top)
+void GRScaleOffsetProc::destroy_blks(TopBlock *top)
 {
 	end_blk = nullptr;
 	mul = nullptr;

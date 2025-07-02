@@ -34,13 +34,23 @@ public:
     IIOSourceBlock(iio_device* dev, QString name = QString());
     ~IIOSourceBlock();
 
+    bool sampleRateAvailable();
+    double readSampleRate();
+    struct iio_device* iioDev();
+
 public Q_SLOTS:
     void enChannel(bool en, uint id) override;
+
+private:
+    QString findAttribute(QStringList possibleNames, iio_device *dev);
 
 private:
     iio_device* m_dev;
     BlockData *createData() override;
     int count = 0;
+    QString m_sampleRateAttribute;
+    iio_buffer *m_buf;
+    size_t m_current_buf_size;
 };
 }
 

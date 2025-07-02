@@ -38,8 +38,8 @@ public:
 	GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ,
 			       QObject *parent = nullptr);
 
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
+	void build_blks(TopBlock *top);
+	void destroy_blks(TopBlock *top);
 
 	const QString &getChannelNameI() const;
 	const QString &getChannelNameQ() const;

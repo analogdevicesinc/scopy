@@ -29,60 +29,48 @@ Q_LOGGING_CATEGORY(CAT_ACQTREENODE, "AcqTreeNode")
 using namespace scopy;
 using namespace scopy::adc;
 
-GRIIOFloatChannelNode::GRIIOFloatChannelNode(datasink::SourceBlock *source, GRTopBlockNode *top,
-					     GRIIOFloatChannelSrc *c, QObject *parent)
-	: AcqTreeNode(c->getChannelName(), parent)
-	, m_top(top)
-	, m_source(source)
-{
-	m_src = c;
-}
-
-GRIIOFloatChannelNode::~GRIIOFloatChannelNode() {}
-
-GRIIOFloatChannelSrc *GRIIOFloatChannelNode::src() const { return m_src; }
-
-datasink::SourceBlock *GRIIOFloatChannelNode::source() const { return m_source; }
-
-GRTopBlockNode *GRIIOFloatChannelNode::top() const { return m_top; }
-
-GRIIODeviceSourceNode::GRIIODeviceSourceNode(datasink::SourceBlock *source, GRTopBlockNode *top, GRIIODeviceSource *d,
+IIOFloatChannelNode::IIOFloatChannelNode(datasink::SourceBlock *source, TopBlockNode *top, QString name,
 					     QObject *parent)
-	: AcqTreeNode(d->deviceName(), parent)
+	: AcqTreeNode(name, parent)
 	, m_top(top)
 	, m_source(source)
-{
-	m_src = d;
-}
+{}
 
-GRIIODeviceSourceNode::~GRIIODeviceSourceNode() {}
+IIOFloatChannelNode::~IIOFloatChannelNode() {}
 
-GRIIODeviceSource *GRIIODeviceSourceNode::src() const { return m_src; }
+datasink::SourceBlock *IIOFloatChannelNode::source() const { return m_source; }
 
-GRTopBlockNode *GRIIODeviceSourceNode::top() const { return m_top; }
+TopBlockNode *IIOFloatChannelNode::top() const { return m_top; }
 
-datasink::SourceBlock *GRIIODeviceSourceNode::source() const { return m_source; }
+IIODeviceSourceNode::IIODeviceSourceNode(datasink::SourceBlock *source, TopBlockNode *top, QString name,
+					     QObject *parent)
+	: AcqTreeNode(name, parent)
+	, m_top(top)
+	, m_source(source)
+{}
 
-GRTopBlockNode::GRTopBlockNode(GRTopBlock *g, QObject *parent)
-	: AcqTreeNode(g->name(), parent)
-	, m_src(g)
-	, m_manager(new datasink::BlockManager(g->name()))
+IIODeviceSourceNode::~IIODeviceSourceNode() {}
+
+TopBlockNode *IIODeviceSourceNode::top() const { return m_top; }
+
+datasink::IIOSourceBlock *IIODeviceSourceNode::source() const { return static_cast<datasink::IIOSourceBlock *>(m_source); }
+
+TopBlockNode::TopBlockNode(QString name, QObject *parent)
+	: AcqTreeNode(name, parent)
+	, m_manager(new datasink::BlockManager(name))
 {
 	m_sync = new SyncController(this);
-	m_data = g;
 }
 
-GRTopBlockNode::~GRTopBlockNode() {}
+TopBlockNode::~TopBlockNode() {}
 
-GRTopBlock *GRTopBlockNode::src() const { return m_src; }
+SyncController *TopBlockNode::sync() const { return m_sync; }
 
-SyncController *GRTopBlockNode::sync() const { return m_sync; }
+iio_context *TopBlockNode::ctx() const { return m_ctx; }
 
-iio_context *GRTopBlockNode::ctx() const { return m_ctx; }
+datasink::BlockManager *TopBlockNode::manager() { return m_manager; }
 
-datasink::BlockManager *GRTopBlockNode::manager() { return m_manager; }
-
-void GRTopBlockNode::setCtx(iio_context *ctx) { m_ctx = ctx; }
+void TopBlockNode::setCtx(iio_context *ctx) { m_ctx = ctx; }
 
 AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
 	: QObject(parent)

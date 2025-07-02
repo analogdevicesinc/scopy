@@ -95,7 +95,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
-	       scopy-gr-util
+	       # scopy-gr-util
 	       scopy-iio-widgets
 	       scopy-data-sink
 )

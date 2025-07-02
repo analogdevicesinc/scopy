@@ -25,6 +25,7 @@
 #include "importchannelcomponent.h"
 
 #include <customSourceBlocks.h>
+#include <iostream>
 #include <timechannelcomponent.h>
 
 using namespace scopy;
@@ -123,7 +124,7 @@ void ADCTimeInstrumentController::init()
 
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 {
-	GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
+	TopBlockNode *grtbn = dynamic_cast<TopBlockNode *>(node);
 	// GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name + "_time", grtbn, this);
 
 	//		m_acqNodeComponentMap[grtbn] = (c);
@@ -163,7 +164,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 
 	connect(m_blockManager, &BlockManager::sentAllData, this, [=](){
 		count++;
-		std::cout << "draw: " << count << std::endl;
+		// std::cout << "draw: " << count << std::endl;
 		if(m_blockManager->singleShot()) {
 			Q_EMIT m_ui->requestStop();
 		}
@@ -173,9 +174,9 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 
 void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
 {
-	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
+	IIODeviceSourceNode *griiodsn = dynamic_cast<IIODeviceSourceNode *>(node);
 	griiodsn->source()->setBufferSize(m_timePlotSettingsComponent->bufferSize());
-	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
+	DeviceComponent *d = new DeviceComponent(griiodsn);
 	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
 
@@ -184,13 +185,13 @@ void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
 	addComponent(d);
 
 	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, d,
-		&GRDeviceComponent::setBufferSize);
+		&DeviceComponent::setBufferSize);
 }
 
 void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 {
 	int idx = chIdP->next();
-	GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
+	IIOFloatChannelNode *griiofcn = dynamic_cast<IIOFloatChannelNode *>(node);
 
 
 	// Create TimeChannelComponent (replaces all your manual setup)
@@ -209,8 +210,8 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	/*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
 	CompositeWidget *cw = nullptr;
-	GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn->treeParent());
-	GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
+	IIODeviceSourceNode *w = dynamic_cast<IIODeviceSourceNode *>(griiofcn->treeParent());
+	DeviceComponent *dc = dynamic_cast<DeviceComponent *>(m_acqNodeComponentMap[w]);
 	if(w) {
 		cw = dc->ctrl();
 	}
@@ -269,15 +270,15 @@ void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
 {
 	qInfo() << node->name();
 
-	if(dynamic_cast<GRTopBlockNode *>(node) != nullptr) {
+	if(dynamic_cast<TopBlockNode *>(node) != nullptr) {
 		createTimeSink(node);
 	}
 
-	if(dynamic_cast<GRIIODeviceSourceNode *>(node) != nullptr) {
+	if(dynamic_cast<IIODeviceSourceNode *>(node) != nullptr) {
 		createIIODevice(node);
 	}
 
-	if(dynamic_cast<GRIIOFloatChannelNode *>(node) != nullptr) {
+	if(dynamic_cast<IIOFloatChannelNode *>(node) != nullptr) {
 		createIIOFloatChannel(node);
 	}
 

@@ -25,7 +25,7 @@
 #include "gnuradio/blocks/int_to_float.h"
 #include "gnuradio/blocks/short_to_float.h"
 #include "grlog.h"
-#include "grtopblock.h"
+#include "topblock.h"
 
 using namespace scopy::grutil;
 GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent)
@@ -53,7 +53,7 @@ GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString chann
 	m_unit = IIOUnitsManager::iioChannelTypes().value(type, {"Adimensional", ".", 1});
 }
 
-void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
+void GRIIOFloatChannelSrc::build_blks(TopBlock *top)
 {
 	m_top = top;
 	qDebug(SCOPY_GR_UTIL) << "Building GRIIOFloatChannelSrc";
@@ -77,7 +77,7 @@ void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
 	start_blk.append(x2f);
 }
 
-void GRIIOFloatChannelSrc::destroy_blks(GRTopBlock *top)
+void GRIIOFloatChannelSrc::destroy_blks(TopBlock *top)
 {
 	m_dev->removeChannel(this);
 	s2v = nullptr;

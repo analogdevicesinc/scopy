@@ -47,8 +47,8 @@ public:
 	void setWindowCorrection(bool b);
 	void setPowerOffset(double);
 	void setNrBits(int);
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
+	void build_blks(TopBlock *top);
+	void destroy_blks(TopBlock *top);
 
 protected:
 	double m_powerOffset;
@@ -63,7 +63,7 @@ protected:
 	gr::blocks::add_const_vff::sptr powerOffset;
 
 	gr::fft::window::win_type m_fftwindow;
-	GRTopBlock *m_top;
+	TopBlock *m_top;
 };
 
 class SCOPY_GR_UTIL_EXPORT GRFFTComplexProc : public GRProxyBlock
@@ -74,8 +74,8 @@ public:
 	void setPowerOffset(double);
 	void setWindowCorrection(bool b);
 	void setNrBits(int);
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
+	void build_blks(TopBlock *top);
+	void destroy_blks(TopBlock *top);
 
 protected:
 	double m_powerOffset;
@@ -90,7 +90,7 @@ protected:
 	gr::blocks::add_const_vff::sptr powerOffset;
 
 	gr::fft::window::win_type m_fftwindow;
-	GRTopBlock *m_top;
+	TopBlock *m_top;
 };
 
 class SCOPY_GR_UTIL_EXPORT GRFFTAvgProc : public GRProxyBlock

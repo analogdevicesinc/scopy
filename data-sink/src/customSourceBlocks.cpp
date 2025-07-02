@@ -1,6 +1,7 @@
 #include <QThread>
 #include <cmath>
 #include <include/data-sink/customSourceBlocks.h>
+#include <QDateTime>
 #include <iostream>
 #include <qfile.h>
 using namespace scopy::datasink;
@@ -69,7 +70,7 @@ BlockData *TestSourceBlock::createData()
 		if(m_channels.value(ch)) {
 			ChannelDataVector *data = new ChannelDataVector(m_size);
 
-			for(int i=0; i<m_size; i++) {
+			for(int i = 0; i < m_size; i++) {
 				data->data.push_back(i * pow(10, ch));
 			}
 			map->insert(ch, data);
@@ -81,11 +82,34 @@ BlockData *TestSourceBlock::createData()
 
 IIOSourceBlock::IIOSourceBlock(iio_device *dev, QString name)
 	: SourceBlock(name)
+	, m_buf(nullptr)
+	, m_current_buf_size(-1)
 {
 	m_dev = dev;
+	m_sampleRateAttribute = findAttribute(
+		{
+			"sample_rate",
+			"sampling_rate",
+			"sample_frequency",
+			"sampling_frequency",
+		},
+		m_dev);
 }
 
 IIOSourceBlock::~IIOSourceBlock() {}
+
+QString IIOSourceBlock::findAttribute(QStringList possibleNames, iio_device *dev)
+{
+
+	const char *attr = nullptr;
+	for(const QString &name : possibleNames) {
+		attr = iio_device_find_attr(dev, name.toStdString().c_str());
+		if(attr)
+			break;
+	}
+	QString attributeName = QString(attr);
+	return attributeName;
+}
 
 void IIOSourceBlock::enChannel(bool en, uint id)
 {
@@ -97,34 +121,68 @@ void IIOSourceBlock::enChannel(bool en, uint id)
 		iio_channel_disable(iio_device_get_channel(m_dev, id));
 }
 
+bool IIOSourceBlock::sampleRateAvailable()
+{
+	if(m_sampleRateAttribute.isEmpty())
+		return false;
+	return true;
+}
+
+double IIOSourceBlock::readSampleRate()
+{
+	char buffer[20];
+	bool ok = false;
+	double sr;
+	if(!sampleRateAvailable())
+		return -1;
+
+	iio_device_attr_read(m_dev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	QString str(buffer);
+	sr = str.toDouble(&ok);
+	if(ok) {
+		return sr;
+	} else {
+		return -1;
+	}
+}
+
+iio_device *IIOSourceBlock::iioDev() { return m_dev; }
+
 BlockData *IIOSourceBlock::createData()
 {
 	iio_channel *rx0_i = iio_device_find_channel(m_dev, m_channels.value(0) ? "voltage0" : "voltage1", false);
-	QElapsedTimer timer;
-	timer.start();
-	iio_buffer *buf = iio_device_create_buffer(m_dev, m_size, false);
-	std::cout << "buff: " << timer.elapsed() << std::endl;
+	// QElapsedTimer timer;
+	// QThread::msleep(60);
+	// std::cout << "before: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() << '\n';
+	// timer.start();
+
+	if(m_current_buf_size != m_size) {
+		if(m_buf)
+			iio_buffer_destroy(m_buf);
+		m_buf = iio_device_create_buffer(m_dev, m_size, false);
+		m_current_buf_size = m_size;
+	}
+	// std::cout << "buff: " << timer.elapsed() << " of size: " << m_size << std::endl;
 
 	BlockData *map = new BlockData();
 	ssize_t nbytes_rx;
 	char *p_dat, *p_end;
 	ptrdiff_t p_inc;
 
-
-	if(!buf) {
+	if(!m_buf) {
 		return {};
 	}
 
 	// Refill RX buffer
-	nbytes_rx = iio_buffer_refill(buf);
+	nbytes_rx = iio_buffer_refill(m_buf);
 	if(nbytes_rx < 0) {
 		printf("Error refilling buf %d\n", (int)nbytes_rx);
 		return {};
 	}
 
 	// READ: Get pointers to RX buf and read IQ from RX buf port 0
-	p_inc = iio_buffer_step(buf);
-	p_end = (char *)iio_buffer_end(buf);
+	p_inc = iio_buffer_step(m_buf);
+	p_end = (char *)iio_buffer_end(m_buf);
 
 	int i;
 	for(auto it = m_channels.begin(); it != m_channels.end(); ++it) {
@@ -132,7 +190,7 @@ BlockData *IIOSourceBlock::createData()
 			ChannelDataVector *data = new ChannelDataVector(m_size);
 
 			i = 0;
-			for(p_dat = (char *)iio_buffer_first(buf, rx0_i); p_dat < p_end; p_dat += p_inc) {
+			for(p_dat = (char *)iio_buffer_first(m_buf, rx0_i); p_dat < p_end; p_dat += p_inc) {
 				// // Example: swap I and Q
 				// const int16_t i = ((int16_t*)p_dat)[0]; // Real (I)
 				// const int16_t q = ((int16_t*)p_dat)[1]; // Imag (Q)
@@ -146,9 +204,10 @@ BlockData *IIOSourceBlock::createData()
 		}
 	}
 
-	iio_buffer_destroy(buf);
+	// iio_buffer_destroy(m_buf);
 	count++;
-	std::cout << "iio source:" << count <<  std::endl;
+	// std::cout << "iio source:" << count << std::endl;
+	// std::cout << "after: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() << '\n';
 
 	return map;
 }

@@ -33,11 +33,6 @@
 #include <QLineEdit>
 #include <QObject>
 
-#include <gr-util/griiodevicesource.h>
-#include <gr-util/griiofloatchannelsrc.h>
-#include <gr-util/grproxyblock.h>
-#include <gr-util/grscaleoffsetproc.h>
-#include <gr-util/grtopblock.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 #include <gui/stylehelper.h>
@@ -45,7 +40,6 @@
 #include <adcinstrumentcontroller.h>
 namespace scopy {
 namespace adc {
-using namespace grutil;
 
 typedef enum
 {
@@ -76,7 +70,7 @@ public:
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
 
-	void newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock *grtp);
+	void newInstrument(ADCInstrumentType t, AcqTreeNode *root);
 	void deleteInstrument(ToolMenuEntry *w);
 
 public Q_SLOTS:
@@ -87,7 +81,7 @@ private:
 	QLineEdit *edit;
 	QList<ADCInstrumentController *> m_ctrls;
 
-	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
+	void createGRIIOTreeNode(TopBlockNode *node, iio_context *ctx);
 };
 } // namespace adc
 } // namespace scopy

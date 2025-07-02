@@ -45,7 +45,7 @@
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
-using namespace scopy::grutil;
+// using namespace scopy::grutil;
 using namespace scopy::adc;
 
 bool ADCPlugin::compatible(QString m_param, QString category)
@@ -245,7 +245,7 @@ bool iio_is_buffer_capable(struct iio_device *dev)
 	return false;
 }
 
-void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
+void ADCPlugin::createGRIIOTreeNode(TopBlockNode *ctxNode, iio_context *ctx)
 {
 	int devCount = iio_context_get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN) << " Found " << devCount << "devices";
@@ -266,14 +266,14 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 		qDebug(CAT_ADCPLUGIN) << "Looking for scanelements in " << dev_name;
 		QStringList channelList;
 
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
+		// IIODeviceSource *gr_dev = new IIODeviceSource(ctx, dev_name, dev_name, 0x400, ctxNode);
 
 		datasink::IIOSourceBlock *iioSource = new datasink::IIOSourceBlock(dev, dev_name);
 
-		GRIIODeviceSourceNode *d = new GRIIODeviceSourceNode(iioSource, ctxNode, gr_dev, gr_dev);
+		IIODeviceSourceNode *d = new IIODeviceSourceNode(iioSource, ctxNode, name());
 
 		ctxNode->addTreeChild(d);
-		ctxNode->src()->registerIIODeviceSource(gr_dev);
+		// ctxNode->src()->registerIIODeviceSource(gr_dev);
 
 		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
@@ -283,8 +283,8 @@ void ADCPlugin::createGRIIOTreeNode(GRTopBlockNode *ctxNode, iio_context *ctx)
 				continue;
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 
-				GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
-				GRIIOFloatChannelNode *c = new GRIIOFloatChannelNode(iioSource, ctxNode, ch, d);
+				// GRIIOFloatChannelSrc *ch = new GRIIOFloatChannelSrc(gr_dev, chn_name, d);
+				IIOFloatChannelNode *c = new IIOFloatChannelNode(iioSource, ctxNode, chn_name, d);
 				d->addTreeChild(c);
 			}
 		}
@@ -307,19 +307,19 @@ bool ADCPlugin::onConnect()
 	// create gnuradio flow out of channels
 	// pass channels to ADC instrument - figure out channel model (sample rate/ size/ etc)
 	AcqTreeNode *root = new AcqTreeNode("root", this);
-	GRTopBlock *top = new GRTopBlock("ctx", this);
-	GRTopBlockNode *ctxNode = new GRTopBlockNode(top, nullptr);
-	QMetaObject::invokeMethod(top, &GRTopBlock::suspendBuild, Qt::DirectConnection);
+	// TopBlock *top = new TopBlock("ctx", this);
+	TopBlockNode *ctxNode = new TopBlockNode(nullptr);
+	// QMetaObject::invokeMethod(top, &TopBlock::suspendBuild, Qt::DirectConnection);
 	root->addTreeChild(ctxNode);
 	createGRIIOTreeNode(ctxNode, m_ctx);
 
-	newInstrument(TIME, root, top);
-	newInstrument(FREQUENCY, root, top);
-	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
+	newInstrument(TIME, root);
+	newInstrument(FREQUENCY, root);
+	// QMetaObject::invokeMethod(top, &TopBlock::unsuspendBuild, Qt::QueuedConnection);
 	return true;
 }
 
-void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock *grtp)
+void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root)
 {
 
 	static int idx = 0;
@@ -346,11 +346,11 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
 			&ADCTimeInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
-			QMetaObject::invokeMethod(grtp, &GRTopBlock::suspendBuild, Qt::DirectConnection);
-			newInstrument(t, root, grtp);
-			QMetaObject::invokeMethod(grtp, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
-		});
+		// connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
+		// 	QMetaObject::invokeMethod(grtp, &TopBlock::suspendBuild, Qt::DirectConnection);
+		// 	newInstrument(t, root, grtp);
+		// 	QMetaObject::invokeMethod(grtp, &TopBlock::unsuspendBuild, Qt::QueuedConnection);
+		// });
 
 		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;
@@ -385,11 +385,11 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
 			&ADCFFTInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
-			QMetaObject::invokeMethod(grtp, &GRTopBlock::suspendBuild, Qt::DirectConnection);
-			newInstrument(t, root, grtp);
-			QMetaObject::invokeMethod(grtp, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
-		});
+		// connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
+		// 	QMetaObject::invokeMethod(grtp, &TopBlock::suspendBuild, Qt::DirectConnection);
+		// 	newInstrument(t, root, grtp);
+		// 	QMetaObject::invokeMethod(grtp, &TopBlock::unsuspendBuild, Qt::QueuedConnection);
+		// });
 
 		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;

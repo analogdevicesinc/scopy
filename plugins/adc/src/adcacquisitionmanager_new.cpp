@@ -30,48 +30,48 @@
 // using namespace scopy::adc;
 // using namespace scopy::datasink;
 
-// GRIIOFloatChannelNode::GRIIOFloatChannelNode(GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent)
+// IIOFloatChannelNode::IIOFloatChannelNode(TopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent)
 // 	: AcqTreeNode(c->getChannelName(), parent)
 // 	, m_top(top)
 // {
 // 	m_src = c;
 // }
 
-// GRIIOFloatChannelNode::~GRIIOFloatChannelNode() {}
+// IIOFloatChannelNode::~IIOFloatChannelNode() {}
 
-// GRIIOFloatChannelSrc *GRIIOFloatChannelNode::src() const { return m_src; }
+// GRIIOFloatChannelSrc *IIOFloatChannelNode::src() const { return m_src; }
 
-// GRTopBlockNode *GRIIOFloatChannelNode::top() const { return m_top; }
+// TopBlockNode *IIOFloatChannelNode::top() const { return m_top; }
 
-// GRIIODeviceSourceNode::GRIIODeviceSourceNode(GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent)
+// IIODeviceSourceNode::IIODeviceSourceNode(TopBlockNode *top, GRIIODeviceSource *d, QObject *parent)
 // 	: AcqTreeNode(d->deviceName(), parent)
 // 	, m_top(top)
 // {
 // 	m_src = d;
 // }
 
-// GRIIODeviceSourceNode::~GRIIODeviceSourceNode() {}
+// IIODeviceSourceNode::~IIODeviceSourceNode() {}
 
-// GRIIODeviceSource *GRIIODeviceSourceNode::src() const { return m_src; }
+// GRIIODeviceSource *IIODeviceSourceNode::src() const { return m_src; }
 
-// GRTopBlockNode *GRIIODeviceSourceNode::top() const { return m_top; }
+// TopBlockNode *IIODeviceSourceNode::top() const { return m_top; }
 
-// GRTopBlockNode::GRTopBlockNode(BlockManager *manager, QObject *parent)
+// TopBlockNode::TopBlockNode(BlockManager *manager, QObject *parent)
 // 	: AcqTreeNode(manager->name(), parent)
 // 	, m_manager(manager)
 // {
 // 	m_data = g;
 // }
 
-// GRTopBlockNode::~GRTopBlockNode() {}
+// TopBlockNode::~TopBlockNode() {}
 
-// BlockManager *GRTopBlockNode::manager() const { return m_manager; }
+// BlockManager *TopBlockNode::manager() const { return m_manager; }
 
-// SyncController *GRTopBlockNode::sync() const { return m_sync; }
+// SyncController *TopBlockNode::sync() const { return m_sync; }
 
-// iio_context *GRTopBlockNode::ctx() const { return m_ctx; }
+// iio_context *TopBlockNode::ctx() const { return m_ctx; }
 
-// void GRTopBlockNode::setCtx(iio_context *ctx) { m_ctx = ctx; }
+// void TopBlockNode::setCtx(iio_context *ctx) { m_ctx = ctx; }
 
 // AcqTreeNode::AcqTreeNode(QString name, QObject *parent)
 // 	: QObject(parent)

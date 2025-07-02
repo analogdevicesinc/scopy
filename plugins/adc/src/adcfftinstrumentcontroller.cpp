@@ -121,8 +121,8 @@ void ADCFFTInstrumentController::init()
 
 void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 {
-	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
-	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
+	IIODeviceSourceNode *griiodsn = dynamic_cast<IIODeviceSourceNode *>(node);
+	DeviceComponent *d = new DeviceComponent(griiodsn);
 	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
 
@@ -137,7 +137,7 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 {
 	// int idx = chIdP->next();
-	// GRIIOFloatChannelNode *griiofcn = dynamic_cast<GRIIOFloatChannelNode *>(node);
+	// IIOFloatChannelNode *griiofcn = dynamic_cast<IIOFloatChannelNode *>(node);
 	// GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_blockManager);
 	// GRFFTChannelComponent *c =
 	// 	new GRFFTChannelComponent(griiofcn, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)),
@@ -151,8 +151,8 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	// /*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
 	// CompositeWidget *cw = nullptr;
-	// GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn->treeParent());
-	// GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
+	// IIODeviceSourceNode *w = dynamic_cast<IIODeviceSourceNode *>(griiofcn->treeParent());
+	// DeviceComponent *dc = dynamic_cast<DeviceComponent *>(m_acqNodeComponentMap[w]);
 	// if(w) {
 	// 	cw = dc->ctrl();
 	// }
@@ -202,8 +202,8 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, AcqTreeNode *node_Q)
 {
 	// int idx = chIdP->next();
-	// GRIIOFloatChannelNode *griiofcn_I = dynamic_cast<GRIIOFloatChannelNode *>(node_I);
-	// GRIIOFloatChannelNode *griiofcn_Q = dynamic_cast<GRIIOFloatChannelNode *>(node_Q);
+	// IIOFloatChannelNode *griiofcn_I = dynamic_cast<IIOFloatChannelNode *>(node_I);
+	// IIOFloatChannelNode *griiofcn_Q = dynamic_cast<IIOFloatChannelNode *>(node_Q);
 	// GRFFTSinkComponent *grtsc = dynamic_cast<GRFFTSinkComponent *>(m_blockManager);
 	// GRFFTChannelComponent *c = new GRFFTChannelComponent(
 	// 	griiofcn_I, griiofcn_Q, dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(0)), grtsc,
@@ -217,8 +217,8 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 	// /*** This is a bit of a mess because CollapsableMenuControlButton is not a MenuControlButton ***/
 
 	// CompositeWidget *cw = nullptr;
-	// GRIIODeviceSourceNode *w = dynamic_cast<GRIIODeviceSourceNode *>(griiofcn_I->treeParent());
-	// GRDeviceComponent *dc = dynamic_cast<GRDeviceComponent *>(m_acqNodeComponentMap[w]);
+	// IIODeviceSourceNode *w = dynamic_cast<IIODeviceSourceNode *>(griiofcn_I->treeParent());
+	// DeviceComponent *dc = dynamic_cast<DeviceComponent *>(m_acqNodeComponentMap[w]);
 	// if(w) {
 	// 	cw = dc->ctrl();
 	// }
@@ -264,7 +264,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 {
-	// GRTopBlockNode *grtbn = dynamic_cast<GRTopBlockNode *>(node);
+	// TopBlockNode *grtbn = dynamic_cast<TopBlockNode *>(node);
 	// GRFFTSinkComponent *c = new GRFFTSinkComponent(m_name + "_fft", grtbn, this);
 
 	// m_blockManager = c;
@@ -374,15 +374,15 @@ void ADCFFTInstrumentController::addChannel(AcqTreeNode *node)
 {
 	qInfo() << node->name();
 
-	if(dynamic_cast<GRTopBlockNode *>(node) != nullptr) {
+	if(dynamic_cast<TopBlockNode *>(node) != nullptr) {
 		createFFTSink(node);
 	}
 
-	if(dynamic_cast<GRIIODeviceSourceNode *>(node) != nullptr) {
+	if(dynamic_cast<IIODeviceSourceNode *>(node) != nullptr) {
 		createIIODevice(node);
 	}
 
-	if(dynamic_cast<GRIIOFloatChannelNode *>(node) != nullptr) {
+	if(dynamic_cast<IIOFloatChannelNode *>(node) != nullptr) {
 		createIIOFloatChannel(node);
 		AcqTreeNode *node_I, *node_Q;
 		if(getComplexChannelPair(node, &node_I, &node_Q)) {

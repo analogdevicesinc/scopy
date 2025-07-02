@@ -23,7 +23,7 @@
 
 #include "griiodevicesource.h"
 #include "grlog.h"
-#include "grtopblock.h"
+#include "topblock.h"
 
 #include <QDebug>
 
@@ -38,7 +38,7 @@ GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceS
 	fmt = iio_channel_get_data_format(m_iioCh);
 }
 
-void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
+void GRIIOComplexChannelSrc::build_blks(TopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL) << "Building GRIIOComplexChannelSrc";
 	m_dev->addChannel(this);
@@ -56,7 +56,7 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 	end_blk = s2v;
 }
 
-void GRIIOComplexChannelSrc::destroy_blks(GRTopBlock *top)
+void GRIIOComplexChannelSrc::destroy_blks(TopBlock *top)
 {
 	m_dev->removeChannel(this);
 	end_blk = nullptr;

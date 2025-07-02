@@ -23,20 +23,15 @@
 #define ADCACQUISITIONMANAGER_H
 
 #include <QObject>
-#include <gr-util/griiodevicesource.h>
-#include <gr-util/grtopblock.h>
-#include <gr-util/griiofloatchannelsrc.h>
-#include <gr-util/grsignalpath.h>
-#include <gr-util/grscaleoffsetproc.h>
 #include <scopy-adc_export.h>
 #include <QMap>
 #include <interfaces.h>
 #include <adcinterfaces.h>
 #include <synccontroller.h>
+#include <customSourceBlocks.h>
 
 namespace scopy {
 namespace adc {
-using namespace grutil;
 class AcqTreeNode;
 
 class SCOPY_ADC_EXPORT AcqTreeNode : public QObject
@@ -75,12 +70,11 @@ protected:
 class SCOPY_ADC_EXPORT IIOContextNode : public AcqTreeNode
 {};
 
-class SCOPY_ADC_EXPORT GRTopBlockNode : public AcqTreeNode
+class SCOPY_ADC_EXPORT TopBlockNode : public AcqTreeNode
 {
 public:
-	GRTopBlockNode(GRTopBlock *g, QObject *parent = nullptr);
-	~GRTopBlockNode();
-	GRTopBlock *src() const;
+	TopBlockNode(QString name, QObject *parent = nullptr);
+	~TopBlockNode();
 	SyncController *sync() const;
 	iio_context *ctx() const;
 	datasink::BlockManager* manager();
@@ -88,39 +82,34 @@ public:
 
 private:
 	datasink::BlockManager* m_manager;
-	GRTopBlock *m_src;
 	SyncController *m_sync;
 	iio_context *m_ctx;
 };
 
-class SCOPY_ADC_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
+class SCOPY_ADC_EXPORT IIODeviceSourceNode : public AcqTreeNode
 {
 public:
-	GRIIODeviceSourceNode(datasink::SourceBlock* source, GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent = nullptr);
-	~GRIIODeviceSourceNode();
-	GRIIODeviceSource *src() const;
-	GRTopBlockNode *top() const;
-	datasink::SourceBlock* source() const;
+	IIODeviceSourceNode(datasink::SourceBlock* source, TopBlockNode *top, QString name, QObject *parent = nullptr);
+	~IIODeviceSourceNode();
+	TopBlockNode *top() const;
+	datasink::IIOSourceBlock *source() const;
 
 private:
 	datasink::SourceBlock* m_source;
-	GRTopBlockNode *m_top;
-	GRIIODeviceSource *m_src;
+	TopBlockNode *m_top;
 };
 
-class SCOPY_ADC_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
+class SCOPY_ADC_EXPORT IIOFloatChannelNode : public AcqTreeNode
 {
 public:
-	GRIIOFloatChannelNode(datasink::SourceBlock* source, GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
-	~GRIIOFloatChannelNode();
-	GRIIOFloatChannelSrc *src() const;
+	IIOFloatChannelNode(datasink::SourceBlock* source, TopBlockNode *top, QString name, QObject *parent = nullptr);
+	~IIOFloatChannelNode();
 	datasink::SourceBlock* source() const;
-	GRTopBlockNode *top() const;
+	TopBlockNode *top() const;
 
 private:
 	datasink::SourceBlock* m_source;
-	GRTopBlockNode *m_top;
-	GRIIOFloatChannelSrc *m_src;
+	TopBlockNode *m_top;
 };
 
 class SCOPY_ADC_EXPORT ImportFloatChannelNode : public AcqTreeNode

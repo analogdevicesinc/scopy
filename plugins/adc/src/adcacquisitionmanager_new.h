@@ -24,7 +24,7 @@
 
 // #include <QObject>
 // #include <gr-util/griiodevicesource.h>
-// #include <gr-util/grtopblock.h>
+// #include <gr-util/topblock.h>
 // #include <gr-util/griiofloatchannelsrc.h>
 // #include <gr-util/grsignalpath.h>
 // #include <gr-util/grscaleoffsetproc.h>
@@ -76,11 +76,11 @@
 // class SCOPY_ADC_EXPORT IIOContextNode : public AcqTreeNode
 // {};
 
-// class SCOPY_ADC_EXPORT GRTopBlockNode : public AcqTreeNode
+// class SCOPY_ADC_EXPORT TopBlockNode : public AcqTreeNode
 // {
 // public:
-// 	GRTopBlockNode(datasink::BlockManager *manager, QObject *parent = nullptr);
-// 	~GRTopBlockNode();
+// 	TopBlockNode(datasink::BlockManager *manager, QObject *parent = nullptr);
+// 	~TopBlockNode();
 // 	datasink::BlockManager *manager() const;
 // 	SyncController *sync() const;
 // 	iio_context *ctx() const;
@@ -92,30 +92,30 @@
 // 	iio_context *m_ctx;
 // };
 
-// class SCOPY_ADC_EXPORT GRIIODeviceSourceNode : public AcqTreeNode
+// class SCOPY_ADC_EXPORT IIODeviceSourceNode : public AcqTreeNode
 // {
 // public:
-// 	GRIIODeviceSourceNode(GRTopBlockNode *top, GRIIODeviceSource *d, QObject *parent = nullptr);
-// 	~GRIIODeviceSourceNode();
+// 	IIODeviceSourceNode(TopBlockNode *top, GRIIODeviceSource *d, QObject *parent = nullptr);
+// 	~IIODeviceSourceNode();
 // 	GRIIODeviceSource *src() const;
-// 	GRTopBlockNode *top() const;
+// 	TopBlockNode *top() const;
 
 // private:
-// 	GRTopBlockNode *m_top;
+// 	TopBlockNode *m_top;
 // 	GRIIODeviceSource *m_src;
 // };
 
-// class SCOPY_ADC_EXPORT GRIIOFloatChannelNode : public AcqTreeNode
+// class SCOPY_ADC_EXPORT IIOFloatChannelNode : public AcqTreeNode
 // {
 // public:
-// 	GRIIOFloatChannelNode(GRTopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
-// 	~GRIIOFloatChannelNode();
+// 	IIOFloatChannelNode(TopBlockNode *top, GRIIOFloatChannelSrc *c, QObject *parent = nullptr);
+// 	~IIOFloatChannelNode();
 // 	GRIIOFloatChannelSrc *src() const;
 
-// 	GRTopBlockNode *top() const;
+// 	TopBlockNode *top() const;
 
 // private:
-// 	GRTopBlockNode *m_top;
+// 	TopBlockNode *m_top;
 // 	GRIIOFloatChannelSrc *m_src;
 // };
 

@@ -20,7 +20,7 @@
  */
 
 #include "grsignalsrc.h"
-#include "grtopblock.h"
+#include "topblock.h"
 #include "grlog.h"
 
 using namespace scopy::grutil;
@@ -77,7 +77,7 @@ void GRSignalSrc::setOffset(double off)
 		sig->set_offset(m_offset);
 }
 
-void GRSignalSrc::build_blks(GRTopBlock *top)
+void GRSignalSrc::build_blks(TopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL) << "Building GRSignalSrc";
 	sig = gr::analog::sig_source_f::make(m_sampling_frequency, m_waveform, m_freq, m_amplitude, m_offset, m_phase);
@@ -88,7 +88,7 @@ void GRSignalSrc::build_blks(GRTopBlock *top)
 	end_blk = s2v;
 }
 
-void GRSignalSrc::destroy_blks(GRTopBlock *top)
+void GRSignalSrc::destroy_blks(TopBlock *top)
 {
 	end_blk = nullptr;
 	sig = nullptr;

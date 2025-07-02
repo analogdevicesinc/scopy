@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef GRTOPBLOCK_H
-#define GRTOPBLOCK_H
+#ifndef TOPBLOCK_H
+#define TOPBLOCK_H
 
 #include "griiodevicesource.h"
 #include "grsignalpath.h"
@@ -31,12 +31,12 @@
 #include <QObject>
 
 namespace scopy::grutil {
-class SCOPY_GR_UTIL_EXPORT GRTopBlock : public QObject
+class SCOPY_GR_UTIL_EXPORT TopBlock : public QObject
 {
 	Q_OBJECT
 public:
-	GRTopBlock(QString name, QObject *parent = nullptr);
-	~GRTopBlock();
+	TopBlock(QString name, QObject *parent = nullptr);
+	~TopBlock();
 	void registerSignalPath(GRSignalPath *path);
 	void unregisterSignalPath(GRSignalPath *path);
 	QList<GRSignalPath *> signalPaths() { return m_signalPaths; }
@@ -87,4 +87,4 @@ private:
 };
 
 } // namespace scopy::grutil
-#endif // GRTOPBLOCK_H
+#endif // TOPBLOCK_H

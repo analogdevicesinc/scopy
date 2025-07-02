@@ -300,5 +300,6 @@ void TimeChannelSigpath::forwardDataToChannel(ChannelDataVector *data)
 			xData[i] = static_cast<float>(i);
 		}
 		m_ch->chData()->onNewData(xData, data->data.data(), data->data.size(), false);
+		delete data;
 	}
 }

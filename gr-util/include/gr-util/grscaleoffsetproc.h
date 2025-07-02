@@ -35,15 +35,15 @@ public:
 	GRScaleOffsetProc(QObject *parent = nullptr);
 	void setScale(double sc);
 	void setOffset(double off);
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
+	void build_blks(TopBlock *top);
+	void destroy_blks(TopBlock *top);
 
 protected:
 	gr::blocks::add_const_v<float>::sptr add;
 	gr::blocks::multiply_const_ff::sptr mul;
 	double m_scale;
 	double m_offset;
-	GRTopBlock *m_top;
+	TopBlock *m_top;
 };
 } // namespace scopy::grutil
 #endif // GRSCALEOFFSETPROC_H

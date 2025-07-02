@@ -30,16 +30,15 @@
 
 using namespace scopy;
 using namespace scopy::adc;
-using namespace scopy::grutil;
 
-GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *parent)
+DeviceComponent::DeviceComponent(IIODeviceSourceNode *node, QWidget *parent)
 	: QWidget(parent)
 	, ToolComponent()
 {
 	m_node = node;
 	name = node->name();
 	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
-	m_src = node->src();
+	// m_node->source() = node->src();
 	// connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
@@ -51,9 +50,9 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 	createMenuControlButton();
 }
 
-QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
+QWidget *DeviceComponent::createChCommonAttrMenu(QWidget *parent)
 {
-	const struct iio_device *dev = m_src->iioDev();
+	const struct iio_device *dev = m_node->source()->iioDev();
 
 	QList<IIOWidget *> attrWidgets;
 	MenuSectionCollapseWidget *attr =
@@ -123,16 +122,16 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	return attr;
 }
 
-QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
+QWidget *DeviceComponent::createAttrMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *attr = new MenuSectionCollapseWidget("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
 									MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_src->iioDev()).buildAll();
-	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_node->source()->iioDev()).buildAll();
+	const struct iio_context *ctx = iio_device_get_context(m_node->source()->iioDev());
 	attrWidgets.append(IIOWidgetBuilder(attr)
 				   .context(const_cast<iio_context *>(ctx))
-				   .device(m_src->iioDev())
+				   .device(m_node->source()->iioDev())
 				   .attribute("Triggers")
 				   .uiStrategy(IIOWidgetBuilder::UIS::ComboUi)
 				   .dataStrategy(IIOWidgetBuilder::DS::TriggerData)
@@ -152,7 +151,7 @@ QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 	return attr;
 }
 
-QWidget *GRDeviceComponent::createMenu(QWidget *parent)
+QWidget *DeviceComponent::createMenu(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QVBoxLayout *lay = new QVBoxLayout();
@@ -189,7 +188,7 @@ QWidget *GRDeviceComponent::createMenu(QWidget *parent)
 	return w;
 }
 
-void GRDeviceComponent::createMenuControlButton(QWidget *parent)
+void DeviceComponent::createMenuControlButton(QWidget *parent)
 {
 	m_ctrl = new CollapsableMenuControlButton(parent);
 	setupDeviceMenuControlButtonHelper(m_ctrl->getControlBtn(), name);
@@ -206,7 +205,7 @@ void GRDeviceComponent::setupDeviceOnOffSwitch()
 	});
 }
 
-void GRDeviceComponent::setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, QString name)
+void DeviceComponent::setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, QString name)
 {
 	devBtn->setName(name);
 	devBtn->setCheckable(true);
@@ -215,31 +214,31 @@ void GRDeviceComponent::setupDeviceMenuControlButtonHelper(MenuControlButton *de
 	devBtn->setDoubleClickToOpenMenu(true);
 }
 
-CollapsableMenuControlButton *GRDeviceComponent::ctrl() { return m_ctrl; }
+CollapsableMenuControlButton *DeviceComponent::ctrl() { return m_ctrl; }
 
-bool GRDeviceComponent::sampleRateAvailable()
+bool DeviceComponent::sampleRateAvailable()
 {
 	for(auto c : qAsConst(m_channels)) {
 		if(c->enabled())
-			return m_src->sampleRateAvailable();
+			return m_node->source()->sampleRateAvailable();
 	}
 	return false;
 }
 
-double GRDeviceComponent::sampleRate() { return m_src->readSampleRate(); }
+double DeviceComponent::sampleRate() { return m_node->source()->readSampleRate(); }
 
-void GRDeviceComponent::setBufferSize(uint32_t bufferSize) { m_src->setBuffersize(bufferSize); }
+void DeviceComponent::setBufferSize(uint32_t bufferSize) { m_node->source()->setBufferSize(bufferSize); }
 
-GRDeviceComponent::~GRDeviceComponent() {}
+DeviceComponent::~DeviceComponent() {}
 
-void GRDeviceComponent::onStart() {}
+void DeviceComponent::onStart() {}
 
-void GRDeviceComponent::onStop() {}
+void DeviceComponent::onStop() {}
 
-void GRDeviceComponent::onInit() {}
+void DeviceComponent::onInit() {}
 
-void GRDeviceComponent::onDeinit() {}
+void DeviceComponent::onDeinit() {}
 
-void GRDeviceComponent::addChannel(ChannelComponent *c) { m_channels.append(c); }
+void DeviceComponent::addChannel(ChannelComponent *c) { m_channels.append(c); }
 
-void GRDeviceComponent::removeChannel(ChannelComponent *c) { m_channels.removeAll(c); }
+void DeviceComponent::removeChannel(ChannelComponent *c) { m_channels.removeAll(c); }

@@ -29,7 +29,7 @@
 #include "grproxyblock.h"
 
 #include "grlog.h"
-#include "grtopblock.h"
+#include "topblock.h"
 
 using namespace scopy::grutil;
 GRProxyBlock::GRProxyBlock(QObject *parent)
@@ -39,11 +39,11 @@ GRProxyBlock::GRProxyBlock(QObject *parent)
 
 GRProxyBlock::~GRProxyBlock() {}
 
-void GRProxyBlock::build_blks(GRTopBlock *top) {}
+void GRProxyBlock::build_blks(TopBlock *top) {}
 
-void GRProxyBlock::destroy_blks(GRTopBlock *top) { start_blk.clear(); }
+void GRProxyBlock::destroy_blks(TopBlock *top) { start_blk.clear(); }
 
-void GRProxyBlock::connect_blk(GRTopBlock *top, GRProxyBlock *src)
+void GRProxyBlock::connect_blk(TopBlock *top, GRProxyBlock *src)
 {
 	qInfo() << "created grfftfloatproc";
 	if(src == nullptr) // block is a source
@@ -64,7 +64,7 @@ void GRProxyBlock::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 	}
 }
 
-void GRProxyBlock::disconnect_blk(GRTopBlock *top)
+void GRProxyBlock::disconnect_blk(TopBlock *top)
 {
 	for(int i = 0; i < start_blk.count(); i++)
 		top->getGrBlock()->disconnect(start_blk[i]);

@@ -24,7 +24,7 @@
 #include "griiocomplexchannelsrc.h"
 #include "griiofloatchannelsrc.h"
 #include "grlog.h"
-#include "grtopblock.h"
+#include "topblock.h"
 
 using namespace scopy::grutil;
 QString GRIIODeviceSource::findAttribute(QStringList possibleNames, iio_device *dev)
@@ -156,7 +156,7 @@ double GRIIODeviceSource::readSampleRate()
 	}
 }
 
-void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
+void GRIIODeviceSource::matchChannelToBlockOutputs(TopBlock *top)
 {
 	QMap<GRIIOChannel *, int> map;
 	for(GRIIOChannel *ch : qAsConst(m_list)) {
@@ -185,7 +185,7 @@ void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
 	}
 }
 
-void GRIIODeviceSource::build_blks(GRTopBlock *top)
+void GRIIODeviceSource::build_blks(TopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL) << "Building GRIIODeviceSource";
 	if(m_list.count() == 0)
@@ -203,7 +203,7 @@ void GRIIODeviceSource::build_blks(GRTopBlock *top)
 	end_blk = src;
 }
 
-void GRIIODeviceSource::destroy_blks(GRTopBlock *top)
+void GRIIODeviceSource::destroy_blks(TopBlock *top)
 {
 	m_list.clear();
 	m_channelNames.clear();
@@ -211,9 +211,9 @@ void GRIIODeviceSource::destroy_blks(GRTopBlock *top)
 	end_blk = nullptr;
 }
 
-void GRIIODeviceSource::connect_blk(GRTopBlock *top, GRProxyBlock *) { matchChannelToBlockOutputs(top); }
+void GRIIODeviceSource::connect_blk(TopBlock *top, GRProxyBlock *) { matchChannelToBlockOutputs(top); }
 
-void GRIIODeviceSource::disconnect_blk(GRTopBlock *top) { top->getGrBlock()->disconnect(src); }
+void GRIIODeviceSource::disconnect_blk(TopBlock *top) { top->getGrBlock()->disconnect(src); }
 
 void GRIIODeviceSource::addChannel(GRIIOChannel *ch) { m_list.append(ch); }
 

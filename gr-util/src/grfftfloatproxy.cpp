@@ -20,7 +20,7 @@
  */
 
 #include "grfftfloatproxy.h"
-#include "grtopblock.h"
+#include "topblock.h"
 #include "qdebug.h"
 
 using namespace scopy::grutil;
@@ -59,7 +59,7 @@ void GRFFTFloatProc::setPowerOffset(double val)
 
 void GRFFTFloatProc::setNrBits(int v) { nrBits = v; }
 
-void GRFFTFloatProc::build_blks(GRTopBlock *top)
+void GRFFTFloatProc::build_blks(TopBlock *top)
 {
 	m_top = top;
 	auto fft_size = top->vlen();
@@ -97,7 +97,7 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 	end_blk = powerOffset;
 }
 
-void GRFFTFloatProc::destroy_blks(GRTopBlock *top)
+void GRFFTFloatProc::destroy_blks(TopBlock *top)
 {
 
 	qInfo() << "destroyed grfftfloatproc";
@@ -150,7 +150,7 @@ void GRFFTComplexProc::setPowerOffset(double val)
 
 void GRFFTComplexProc::setNrBits(int v) { nrBits = v; }
 
-void GRFFTComplexProc::build_blks(GRTopBlock *top)
+void GRFFTComplexProc::build_blks(TopBlock *top)
 {
 	m_top = top;
 	auto fft_size = top->vlen();
@@ -188,7 +188,7 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	end_blk = powerOffset;
 }
 
-void GRFFTComplexProc::destroy_blks(GRTopBlock *top)
+void GRFFTComplexProc::destroy_blks(TopBlock *top)
 {
 	mult_nrbits = nullptr;
 	fft_complex = nullptr;

@@ -60,11 +60,11 @@ class SCOPY_GR_UTIL_EXPORT GRIIODeviceSource : public GRProxyBlock
 public:
 	GRIIODeviceSource(iio_context *ctx, QString deviceName, QString phyDeviceName, unsigned int buffersize = 0x400,
 			  QObject *parent = nullptr);
-	void build_blks(GRTopBlock *top) override;
-	void destroy_blks(GRTopBlock *top) override;
+	void build_blks(TopBlock *top) override;
+	void destroy_blks(TopBlock *top) override;
 
-	void connect_blk(GRTopBlock *top, GRProxyBlock *) override;
-	void disconnect_blk(GRTopBlock *top) override;
+	void connect_blk(TopBlock *top, GRProxyBlock *) override;
+	void disconnect_blk(TopBlock *top) override;
 
 	void addChannel(GRIIOChannel *);
 	void removeChannel(GRIIOChannel *);
@@ -98,7 +98,7 @@ private:
 	QString m_sampleRateAttribute;
 	void computeChannelNames();
 	void addChannelAtIndex(iio_device *dev, QString channelName);
-	void matchChannelToBlockOutputs(GRTopBlock *top);
+	void matchChannelToBlockOutputs(TopBlock *top);
 	int getOutputIndex(QString ch);
 };
 } // namespace scopy::grutil

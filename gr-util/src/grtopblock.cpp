@@ -19,7 +19,7 @@
  *
  */
 
-#include "grtopblock.h"
+#include "topblock.h"
 
 #include "grlog.h"
 
@@ -28,7 +28,7 @@
 Q_LOGGING_CATEGORY(SCOPY_GR_UTIL, "GRManager")
 
 using namespace scopy::grutil;
-GRTopBlock::GRTopBlock(QString name, QObject *parent)
+TopBlock::TopBlock(QString name, QObject *parent)
 	: QObject(parent)
 	, running(false)
 	, built(false)
@@ -43,23 +43,23 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	QObject::connect(this, SIGNAL(requestRebuild()), this, SLOT(rebuild()), Qt::QueuedConnection);
 }
 
-GRTopBlock::~GRTopBlock() {}
+TopBlock::~TopBlock() {}
 
-void GRTopBlock::registerSignalPath(GRSignalPath *sig)
+void TopBlock::registerSignalPath(GRSignalPath *sig)
 {
 	m_signalPaths.append(sig);
 	QObject::connect(sig, SIGNAL(requestRebuild()), this, SLOT(rebuild()));
 	rebuild();
 }
 
-void GRTopBlock::unregisterSignalPath(GRSignalPath *sig)
+void TopBlock::unregisterSignalPath(GRSignalPath *sig)
 {
 	m_signalPaths.removeAll(sig);
 	QObject::disconnect(sig, SIGNAL(requestRebuild()), this, SLOT(rebuild()));
 	rebuild();
 }
 
-void GRTopBlock::registerIIODeviceSource(GRIIODeviceSource *dev)
+void TopBlock::registerIIODeviceSource(GRIIODeviceSource *dev)
 {
 	if(m_iioDeviceSources.contains(dev))
 		return;
@@ -67,17 +67,17 @@ void GRTopBlock::registerIIODeviceSource(GRIIODeviceSource *dev)
 	rebuild();
 }
 
-void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
+void TopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 {
 	m_iioDeviceSources.removeAll(dev);
 	rebuild();
 }
 
-void GRTopBlock::setVLen(size_t vlen) { m_vlen = vlen; }
+void TopBlock::setVLen(size_t vlen) { m_vlen = vlen; }
 
-size_t GRTopBlock::vlen() { return m_vlen; }
+size_t TopBlock::vlen() { return m_vlen; }
 
-void GRTopBlock::build()
+void TopBlock::build()
 {
 	top->disconnect_all();
 	Q_EMIT aboutToBuild();
@@ -96,7 +96,7 @@ void GRTopBlock::build()
 	built = true;
 }
 
-void GRTopBlock::teardown()
+void TopBlock::teardown()
 {
 	Q_EMIT aboutToTeardown();
 	built = false;
@@ -116,7 +116,7 @@ void GRTopBlock::teardown()
 	Q_EMIT teardownSignalPaths();
 }
 
-void GRTopBlock::start()
+void TopBlock::start()
 {
 	qInfo(SCOPY_GR_UTIL) << "Starting top block";
 	running = true;
@@ -130,7 +130,7 @@ void GRTopBlock::start()
 	//	});
 }
 
-void GRTopBlock::stop()
+void TopBlock::stop()
 {
 	qInfo(SCOPY_GR_UTIL) << "Stopping top block";
 	Q_EMIT aboutToStop();
@@ -140,23 +140,23 @@ void GRTopBlock::stop()
 	Q_EMIT stopped();
 }
 
-void GRTopBlock::run()
+void TopBlock::run()
 {
 	start();
 	top->wait();
 }
 
-QString GRTopBlock::name() const { return m_name; }
+QString TopBlock::name() const { return m_name; }
 
-void GRTopBlock::suspendBuild() { m_suspended = true; }
+void TopBlock::suspendBuild() { m_suspended = true; }
 
-void GRTopBlock::unsuspendBuild()
+void TopBlock::unsuspendBuild()
 {
 	m_suspended = false;
 	rebuild();
 }
 
-void GRTopBlock::rebuild()
+void TopBlock::rebuild()
 {
 	if(m_suspended)
 		return;
@@ -181,13 +181,13 @@ void GRTopBlock::rebuild()
 	}
 }
 
-void GRTopBlock::connect(gr::basic_block_sptr src, int srcPort, gr::basic_block_sptr dst, int dstPort)
+void TopBlock::connect(gr::basic_block_sptr src, int srcPort, gr::basic_block_sptr dst, int dstPort)
 {
 	qDebug(SCOPY_GR_UTIL) << "Connecting " << QString::fromStdString(src->symbol_name()) << ":" << srcPort << "to"
 			      << QString::fromStdString(dst->symbol_name()) << ":" << dstPort;
 	top->connect(src, srcPort, dst, dstPort);
 }
 
-gr::top_block_sptr GRTopBlock::getGrBlock() { return top; }
+gr::top_block_sptr TopBlock::getGrBlock() { return top; }
 
-#include "moc_grtopblock.cpp"
+#include "moc_topblock.cpp"

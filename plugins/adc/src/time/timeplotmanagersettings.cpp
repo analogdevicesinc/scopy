@@ -20,6 +20,7 @@
  */
 
 #include "timeplotmanagersettings.h"
+#include <cfloat>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>

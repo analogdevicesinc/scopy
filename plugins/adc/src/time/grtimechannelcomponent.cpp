@@ -449,13 +449,13 @@ void GRTimeChannelComponent::setSamplingInfo(SamplingInfo p)
 	m_measureMgr->getModel()->setSampleRate(p.sampleRate);
 }
 
-YMode GRTimeChannelComponent::ymode() const { return m_ymode; }
+// YMode GRTimeChannelComponent::ymode() const { return m_ymode; }
 
-void GRTimeChannelComponent::setYMode(YMode newYmode)
-{
-	if(m_ymode == newYmode)
-		return;
-	m_ymode = newYmode;
-	setYModeHelper(newYmode);
-	Q_EMIT yModeChanged();
-}
+// void GRTimeChannelComponent::setYMode(YMode newYmode)
+// {
+// 	if(m_ymode == newYmode)
+// 		return;
+// 	m_ymode = newYmode;
+// 	setYModeHelper(newYmode);
+// 	Q_EMIT yModeChanged();
+// }

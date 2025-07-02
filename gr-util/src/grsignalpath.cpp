@@ -22,7 +22,7 @@
 #include "grsignalpath.h"
 
 #include "grlog.h"
-#include "grtopblock.h"
+#include "topblock.h"
 
 using namespace scopy::grutil;
 
@@ -63,7 +63,7 @@ gr::basic_block_sptr GRSignalPath::getGrEndPoint()
 	return nullptr;
 }
 
-void GRSignalPath::connect_blk(GRTopBlock *top, GRProxyBlock *src)
+void GRSignalPath::connect_blk(TopBlock *top, GRProxyBlock *src)
 {
 	qDebug(SCOPY_GR_UTIL) << "Start connecting GRSignalPath" << name();
 	GRProxyBlock *prevBlk = src;
@@ -80,7 +80,7 @@ void GRSignalPath::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 	qDebug(SCOPY_GR_UTIL) << "End connecting GRSignalPath";
 }
 
-void GRSignalPath::disconnect_blk(GRTopBlock *top)
+void GRSignalPath::disconnect_blk(TopBlock *top)
 {
 	for(GRProxyBlock *blk : qAsConst(list)) {
 		if(blk->built()) {

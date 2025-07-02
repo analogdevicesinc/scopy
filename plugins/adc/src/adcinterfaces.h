@@ -26,22 +26,12 @@
 #include <QString>
 // #include <signalpath.h>
 #include "measurementcontroller.h"
-#include <gr-util/grsignalpath.h>
 #include <gui/plotmarkercontroller.h>
 #include <gui/interfaces.h>
 #include <timechannelsigpath.h>
 
 namespace scopy {
-
-using namespace grutil;
-
 namespace adc {
-
-class SCOPY_ADC_EXPORT GRChannel : public DataProcessor
-{
-public:
-	virtual GRSignalPath *sigpath() = 0;
-};
 
 class SCOPY_ADC_EXPORT Channel : public DataProcessor
 {

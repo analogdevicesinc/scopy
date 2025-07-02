@@ -139,7 +139,7 @@ void ADCInstrumentController::updateFrameRate()
 {
 	Preferences *p = Preferences::GetInstance();
 	double framerate = p->get("general_plot_target_fps").toDouble();
-	setFrameRate(framerate);
+	m_blockManager->setTargetFPS(framerate);
 }
 
 void ADCInstrumentController::setFrameRate(double val) { m_blockManager->setTargetFPS(val); }

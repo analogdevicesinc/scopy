@@ -21,7 +21,7 @@
 
 #include "gr-util/grproxyblock.h"
 #include "gr-util/grsignalpath.h"
-#include "gr-util/grtopblock.h"
+#include "gr-util/topblock.h"
 
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/stream_to_vector.h>
@@ -38,7 +38,7 @@
 #include <gr-util/grscaleoffsetproc.h>
 #include <gr-util/grsignalpath.h>
 #include <gr-util/grsignalsrc.h>
-#include <gr-util/grtopblock.h>
+#include <gr-util/topblock.h>
 
 using namespace scopy::grutil;
 
@@ -58,7 +58,7 @@ public Q_SLOTS:			   // these are actual slots
 						float freq, float scale_1, float offset_1);
 
 private:
-	void connectVectorSinks(GRTopBlock *top); // return vec sinks
+	void connectVectorSinks(TopBlock *top); // return vec sinks
 	struct test1Params
 	{
 		const int nr_samples = 100;
@@ -80,11 +80,11 @@ private:
 
 void TST_GRBlocks::connectVectorSinks()
 {
-	GRTopBlock *sender = dynamic_cast<GRTopBlock *>(QObject::sender());
+	TopBlock *sender = dynamic_cast<TopBlock *>(QObject::sender());
 	connectVectorSinks(sender);
 }
 
-void TST_GRBlocks::connectVectorSinks(GRTopBlock *top)
+void TST_GRBlocks::connectVectorSinks(TopBlock *top)
 {
 
 	testOutputs.clear();
@@ -153,7 +153,7 @@ void TST_GRBlocks::test1()
 	qInfo() << "We create a signal path with a simple source, scale and offset, run it, and verify results";
 	qInfo() << "We then destroy the top block, disable the scale and offset, and rerun the flowgraph";
 
-	GRTopBlock top("aa", this);
+	TopBlock top("aa", this);
 	top.setVLen(t1.nr_samples);
 	GRSignalPath *ch1;
 	GRSignalSrc *sin1;
@@ -225,7 +225,7 @@ void TST_GRBlocks::test2()
 {
 	qInfo() << "This testcase verifies if one can use a signal path as a source for a different signal path";
 
-	GRTopBlock top("aa", this);
+	TopBlock top("aa", this);
 	top.setVLen(t1.nr_samples);
 	GRSignalPath *ch1;
 	GRSignalPath *ch2;
@@ -283,7 +283,7 @@ void TST_GRBlocks::test3()
 {
 
 	qInfo() << "This testcase verifies if multiple signalpaths work for the same topblock";
-	GRTopBlock top("aa", this);
+	TopBlock top("aa", this);
 	top.setVLen(t1.nr_samples);
 	GRSignalPath *ch1, *ch2, *ch3;
 	GRSignalSrc *sin1, *sin2;
@@ -461,7 +461,7 @@ void TST_GRBlocks::test4()
 
 	qInfo() << "This testcase verifies signal emission on building/teardown and how it can be leveraged to build "
 		   "sinks on demand";
-	GRTopBlock top("aa", this);
+	TopBlock top("aa", this);
 	top.setVLen(t1.nr_samples);
 	GRSignalPath *ch1, *ch2, *ch3;
 	GRSignalSrc *sin1, *sin2;
@@ -644,7 +644,7 @@ void TST_GRBlocks::test5()
 {
 
 	qInfo() << "This testcase verifies iio-source";
-	GRTopBlock top("aa", this);
+	TopBlock top("aa", this);
 	top.setVLen(t1.nr_samples);
 	GRSignalPath *ch1, *ch2;
 	GRSignalPath *ch3;

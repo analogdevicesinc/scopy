@@ -1,4 +1,5 @@
 #include <include/data-sink/blockManager.h>
+#include <iostream>
 
 Q_LOGGING_CATEGORY(CAT_BLOCKMANAGER, "BLOCKMANAGER");
 using namespace scopy::datasink;
@@ -89,7 +90,10 @@ BlockManager::BlockManager(QString name, bool waitforAllSources)
 		this, &BlockManager::sentAllData, this,
 		[this]() {
 			if(m_running && m_fps != 0) {
-				auto ms_to_wait = std::abs((1000 / m_fps) - (m_fpsTimer->elapsed() - m_fpsTimeElapsed));
+				// std::cout << "time elapsed: " << m_fpsTimer->elapsed() - m_fpsTimeElapsed << "     ";
+				// std::cout << "time target: " << 1000 / m_fps << "     ";
+				auto ms_to_wait = std::max((long long)0, (1000 / m_fps) - (m_fpsTimer->elapsed() - m_fpsTimeElapsed));
+				// std::cout << ms_to_wait << std::endl;
 				QThread::msleep(ms_to_wait);
 			}
 			m_fpsTimer->restart();
@@ -241,7 +245,9 @@ void BlockManager::setBufferSize(size_t size)
 
 QString BlockManager::name() { return m_name; }
 
-bool BlockManager::singleShot() { return m_singleShot; }
+bool BlockManager::singleShot() {
+	return m_singleShot;
+}
 
 void BlockManager::connectBlockToFilter(BasicBlock *block, uint block_ch, uint filter_ch, FilterBlock *filter)
 {
@@ -266,6 +272,12 @@ void BlockManager::disconnectBlockToFilter(BasicBlock *block, uint block_ch, uin
 
 bool BlockManager::start()
 {
+	// a single shot is requested while running
+	// if(m_running && m_singleShot) {
+	// 	Q_EMIT stopped();
+	// 	m_running = false;
+	// }
+
 	Q_EMIT started();
 	m_running = !m_singleShot;
 

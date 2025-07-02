@@ -30,7 +30,7 @@
 
 namespace scopy::grutil {
 
-class GRTopBlock;
+class TopBlock;
 
 class SCOPY_GR_UTIL_EXPORT GRProxyBlock : public QObject
 {
@@ -39,10 +39,10 @@ public:
 	GRProxyBlock(QObject *parent = nullptr);
 	virtual ~GRProxyBlock();
 
-	virtual void build_blks(GRTopBlock *top);
-	virtual void destroy_blks(GRTopBlock *top);
-	virtual void connect_blk(GRTopBlock *top, GRProxyBlock *src);
-	virtual void disconnect_blk(GRTopBlock *top);
+	virtual void build_blks(TopBlock *top);
+	virtual void destroy_blks(TopBlock *top);
+	virtual void connect_blk(TopBlock *top, GRProxyBlock *src);
+	virtual void disconnect_blk(TopBlock *top);
 
 	void setEnabled(bool v);
 	bool enabled();

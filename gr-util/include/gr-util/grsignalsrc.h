@@ -42,8 +42,8 @@ public:
 	void setAmplitude(double ampl);
 	void setOffset(double off);
 
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
+	void build_blks(TopBlock *top);
+	void destroy_blks(TopBlock *top);
 
 protected:
 	gr::analog::sig_source_f::sptr sig;

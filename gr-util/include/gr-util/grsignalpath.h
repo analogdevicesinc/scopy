@@ -27,7 +27,7 @@
 #include <QObject>
 
 namespace scopy::grutil {
-class GRTopBlock;
+class TopBlock;
 class GRProxyBlock;
 
 class SCOPY_GR_UTIL_EXPORT GRSignalPath : public GRProxyBlock
@@ -40,8 +40,8 @@ public:
 	void destroy_blks();
 	virtual QList<gr::basic_block_sptr> getGrStartPoint();
 	virtual gr::basic_block_sptr getGrEndPoint();
-	virtual void connect_blk(GRTopBlock *top, GRProxyBlock *src);
-	virtual void disconnect_blk(GRTopBlock *top);
+	virtual void connect_blk(TopBlock *top, GRProxyBlock *src);
+	virtual void disconnect_blk(TopBlock *top);
 	QString name() const;
 	QList<GRProxyBlock *> path();
 
