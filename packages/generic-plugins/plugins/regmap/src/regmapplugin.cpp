@@ -205,7 +205,7 @@ bool RegmapPlugin::onConnect()
 	Utils::applyJsonConfig();
 
 	if(m_deviceList && !m_deviceList->isEmpty()) {
-		QDir xmlsPath = Utils::setXmlPath();
+		QFileInfoList xmlFiles = Utils::setXmlPath();
 		registerMapTool = new RegisterMapTool();
 		layout->addWidget(registerMapTool);
 
@@ -222,7 +222,13 @@ bool RegmapPlugin::onConnect()
 
 			if(templatePaths) {
 				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
-				templatePath = xmlsPath.absoluteFilePath(templatePaths->getFileName());
+				// Find the XML file with matching filename
+				for(const QFileInfo &xmlFile : xmlFiles) {
+					if(xmlFile.fileName() == templatePaths->getFileName()) {
+						templatePath = xmlFile.absoluteFilePath();
+						break;
+					}
+				}
 				if(templatePaths->getIsAxiCompatible()) {
 					uint32_t axiAddressSpace = Utils::convertQStringToUint32("80000000");
 					iioReadStrategy->setAddressSpace(axiAddressSpace);

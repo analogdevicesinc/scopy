@@ -35,8 +35,6 @@
 
 #include <pluginbase/preferences.h>
 
-#include <pkg-manager/pkgmanager.h>
-
 using namespace scopy::regmap;
 
 QMap<QString, JsonFormatedElement *> *Utils::spiJson{new QMap<QString, JsonFormatedElement *>()};
@@ -73,19 +71,16 @@ void Utils::removeLayoutMargins(QLayout *layout)
 	layout->setContentsMargins(0, 0, 0, 0);
 }
 
-QDir Utils::setXmlPath()
+QFileInfoList Utils::setXmlPath()
 {
 	QFileInfoList files = PkgManager::listFilesInfo(QStringList() << "regmap-xml", QStringList() << "*.xml");
-	QString defaultPath = (files.isEmpty()) ? PkgManager::packagesPath() : files.first().absolutePath();
-	QDir xmlsPath(defaultPath);
-
-	qDebug(CAT_REGMAP) << "XML folder found: " << xmlsPath;
-	if(!xmlsPath.entryList().empty()) {
-		return xmlsPath;
+	qDebug(CAT_REGMAP) << "XML files found: " << files.size();
+	if(!files.empty()) {
+		return files;
 	}
 
-	qDebug(CAT_REGMAP) << "No XML folder found";
-	return QDir("");
+	qDebug(CAT_REGMAP) << "No XML files found";
+	return {};
 }
 
 int Utils::getBitsPerRowDetailed() { return bitsPerRowDetailed; }
@@ -127,9 +122,18 @@ JsonFormatedElement *Utils::getTemplate(QString devName)
 
 void Utils::applyJsonConfig()
 {
-	QDir xmlsPath = Utils::setXmlPath();
-	QString filePath = xmlsPath.filePath("regmap-config.json");
-	generateJsonTemplate(filePath);
+	// Get all JSON config files
+	QFileInfoList jsonFiles = PkgManager::listFilesInfo(QStringList() << "regmap-xml", QStringList() << "*.json");
+
+	// Process each JSON config file
+	for(const QFileInfo &jsonFile : jsonFiles) {
+		QString filePath = jsonFile.absoluteFilePath();
+		qDebug(CAT_REGMAP) << "Processing JSON config file: " << filePath;
+		getConfigurationFromJson(filePath);
+	}
+
+	// Process XML files for auto-discovery
+	processXmlFiles();
 }
 
 void Utils::getConfigurationFromJson(QString filePath)
@@ -187,11 +191,11 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi)
 	}
 }
 
-void Utils::generateJsonTemplate(QString filePath)
+void Utils::processXmlFiles()
 {
-	getConfigurationFromJson(filePath);
-
-	foreach(const QString &xmlName, Utils::setXmlPath().entryList()) {
+	QFileInfoList xmlFiles = Utils::setXmlPath();
+	for(const QFileInfo &xmlFile : xmlFiles) {
+		QString xmlName = xmlFile.fileName();
 		if(xmlName.contains(".xml")) {
 			auto deviceName = xmlName.toLower();
 			deviceName.chop(4);
