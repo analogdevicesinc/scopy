@@ -28,7 +28,13 @@ endif()
 %if emu_xml:
 include_emu_xml(${"${CMAKE_CURRENT_SOURCE_DIR}"}/emu-xml ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/emu-xml)
 %endif
+include_resources(${"${CMAKE_CURRENT_SOURCE_DIR}"}/resources ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/resources)
 message("Including plugins")
 if(EXISTS ${"${CMAKE_CURRENT_SOURCE_DIR}"}/plugins)
 	add_plugins(${"${CMAKE_CURRENT_SOURCE_DIR}"}/plugins ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/plugins)
+	install_plugins(
+		${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"}/plugins
+		${"${SCOPY_PACKAGE_INSTALL_PATH}"}/${"${SCOPY_MODULE}"}/plugins "scopy"
+	)
 endif()
+install_pkg(${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${SCOPY_MODULE}"} ${"${SCOPY_PACKAGE_INSTALL_PATH}"}/${"${SCOPY_MODULE}"})
