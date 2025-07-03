@@ -100,7 +100,12 @@ QString scopy::config::pcSpecs()
 
 QString scopy::config::pkgFolderPath()
 {
-	return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + QDir::separator() + "packages";
+	QString defaultPath =
+		QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + QDir::separator() + "packages";
+#ifdef WIN32
+	defaultPath = defaultPkgFolderPath();
+#endif
+	return defaultPath;
 }
 
 QString scopy::config::dump()
