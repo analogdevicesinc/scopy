@@ -99,6 +99,7 @@ def get_args():
     parser.add_argument("--src", help="Path to the source directory for the archive. If not specified, the current directory will be used")
     parser.add_argument("--dest", help="Path to the destination directory. If not specified, the current directory will be used")
     parser.add_argument("--emu", help="Generate emu-xml structure.", action='store_true')
+    parser.add_argument("--resources", help="Generate resources directory.", action='store_true')
     parser.add_argument("-s", "--scopy_path", help="Path to the Scopy repository")
     parser.add_argument("-c", "--config_file_path", help="Path to the configuration file")
     return parser.parse_args()
@@ -410,7 +411,7 @@ def handle_cmakelists(pkg_path, config, args):
         id=config["id"],
         en_translation=args.translation or args.all,
         en_style=args.style or args.all,
-        emu_xml=args.emu).splitlines(keepends=True) 
+        emu_xml=args.emu or args.all).splitlines(keepends=True) 
 
     if os.path.exists(cmakelists_path):
         with open(cmakelists_path, "r") as existing_file:
@@ -438,7 +439,7 @@ def handle_cmakelists(pkg_path, config, args):
             id=config["id"],
             en_translation=args.translation or args.all,
             en_style=args.style or args.all,
-            emu_xml=args.emu
+            emu_xml=args.emu or args.all
         )
 
 
@@ -483,9 +484,11 @@ def generate_pkg(packages_path, config, args):
     if args.style or args.all:
         generate_style(pkg_path)  
         
-    if args.emu:
+    if args.emu or args.all:
         generate_emu_xml(pkg_path)
         
+    if args.resources or args.all:
+        generate_resources(pkg_path)
     if os.path.exists(pkg_path):
         generate_manifest(pkg_path, config)
         
@@ -508,7 +511,24 @@ def generate_emu_xml(pkg_path):
         with open(emu_setup_file, "w") as f:
             f.write("[]")
         log_created_file(emu_setup_file)
+        
+def generate_resources(pkg_path):
+    """"
+    Generates the resources directory for the package.
 
+    Args:
+        pkg_path (str): Path to the package directory.
+
+    Functionality:
+        - Creates the `resources` directory.
+    """
+    print("Generating resources...")
+    resources_path = os.path.join(pkg_path, "resources")
+    if os.path.exists(resources_path):
+        print(f"{resources_path} already exists!")
+        return
+    create_directory(resources_path)
+    
 def console_log(config):
     if DIRS_CREATED:
         print("\nGenerated directories:")
@@ -517,7 +537,7 @@ def console_log(config):
     if FILES_CREATED:
         print("\nGenerated files:")
         print(*sorted(FILES_CREATED), sep="\n")
- 
+
 def pdk(config, args):
     """
     Generates a Plugin Development Kit (PDK) project and optionally creates a plugin within it.
@@ -714,6 +734,6 @@ if __name__ == "__main__":
             print("Git is not installed or not available in PATH.")
             exit(1)
         add_existing_git_submodule(packages_path, args.add_submodule)
-    elif args.plugin or args.style or args.translation:
+    else:
         generate_pkg(packages_path, config, args)
         console_log(config)
