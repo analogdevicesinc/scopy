@@ -23,6 +23,7 @@
 #define UTILS_HPP
 
 #include <QObject>
+#include <pkg-manager/pkgmanager.h>
 
 class QDir;
 class QPushButton;
@@ -41,7 +42,7 @@ public:
 	static uint32_t convertQStringToUint32(QString value);
 	static uint32_t getBitMask(int offset, int width);
 	static void removeLayoutMargins(QLayout *layout);
-	static QDir setXmlPath();
+	static QFileInfoList setXmlPath();
 
 	static int getBitsPerRowDetailed();
 
@@ -56,7 +57,7 @@ private:
 	static QMap<QString, JsonFormatedElement *> *axiJson;
 	static void getConfigurationFromJson(QString filePath);
 	static void populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi);
-	static void generateJsonTemplate(QString filePath);
+	static void processXmlFiles();
 
 signals:
 };
