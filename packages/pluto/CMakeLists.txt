@@ -30,6 +30,7 @@ project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
 include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
+include_resources(${CMAKE_CURRENT_SOURCE_DIR}/resources ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/resources)
 message("Including plugins")
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
