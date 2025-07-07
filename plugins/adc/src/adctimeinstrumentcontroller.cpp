@@ -133,7 +133,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	m_blockManager = grtbn->manager();
 	m_blockManager->setBufferSize(m_timePlotSettingsComponent->bufferSize());
 	updateFrameRate();
-	connect(m_blockManager, &datasink::BlockManager::sentAllData, this, &ADCInstrumentController::update);
+	connect(m_blockManager, &datasink::BlockManager::sentAllData, this, &ADCInstrumentController::update, Qt::QueuedConnection);
 
 	// c->init();
 

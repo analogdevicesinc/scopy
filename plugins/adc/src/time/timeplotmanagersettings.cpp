@@ -186,11 +186,11 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 		m_sampleRateSpin->setVisible(false);
 		if(xcb->itemData(idx) == XMODE_SAMPLES) {
 			m_sampleRateSpin->setValue(1);
-			m_xmin->setUnit("samples");
+			m_xmin->setUnit("s");
 			m_xmin->setScaleRange(1, 1e6);
-			m_xmax->setUnit("samples");
+			m_xmax->setUnit("s");
 			m_xmax->setScaleRange(1, 1e6);
-			m_plotManager->setXUnit("samples");
+			m_plotManager->setXUnit("s");
 			for(PlotComponent *plt : m_plotManager->plots()) {
 				auto p = dynamic_cast<TimePlotComponent *>(plt);
 				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);

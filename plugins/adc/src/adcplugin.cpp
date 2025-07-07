@@ -439,6 +439,7 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 		}
 		found->stop();
 		m_ctrls.removeAll(found);
+		delete found;
 		tool->setTool(nullptr);
 		delete(w);
 	}

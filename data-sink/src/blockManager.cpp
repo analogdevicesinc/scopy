@@ -143,7 +143,10 @@ void BlockManager::emitOutputData(SourceBlock *source)
 	}
 }
 
-BlockManager::~BlockManager(){};
+BlockManager::~BlockManager()
+{
+	m_thread->exit();
+};
 
 int BlockManager::addOutputLink(SourceBlock *source, BasicBlock *final, uint final_ch, uint out_ch)
 {
@@ -160,7 +163,7 @@ int BlockManager::addOutputLink(SourceBlock *source, BasicBlock *final, uint fin
 	QMetaObject::Connection conn = connect(
 		final, &BasicBlock::newData, this,
 		[=](ChannelDataVector *data, uint block_ch) {
-			if(block_ch != final_ch)
+			if(block_ch != final_ch || (!m_running && !m_singleShot))
 				return;
 
 			Q_EMIT newData(data, out_ch);
@@ -278,7 +281,6 @@ bool BlockManager::start()
 	// 	m_running = false;
 	// }
 
-	Q_EMIT started();
 	m_running = !m_singleShot;
 
 	if(m_running) {
@@ -290,11 +292,12 @@ bool BlockManager::start()
 		Q_EMIT it->first->requestData();
 	}
 
+	Q_EMIT started();
 	return true;
 }
 
 void BlockManager::stop()
 {
-	Q_EMIT stopped();
 	m_running = false;
+	Q_EMIT stopped();
 }

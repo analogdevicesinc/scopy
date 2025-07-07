@@ -264,6 +264,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 {
+	m_blockManager = new datasink::BlockManager("name");
 	// TopBlockNode *grtbn = dynamic_cast<TopBlockNode *>(node);
 	// GRFFTSinkComponent *c = new GRFFTSinkComponent(m_name + "_fft", grtbn, this);
 
