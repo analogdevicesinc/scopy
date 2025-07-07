@@ -43,20 +43,15 @@ void SourceBlock::onRequestData()
 {
 	m_cancelRequested.store(false);
 	QMutexLocker locker(&m_mutex); // Lock the mutex during data creation
-	BlockData *data = createData();
+	BlockData data = createData();
 
 	if(m_size <= 0) {
 		qDebug() << m_name << ": invalid buffer size: " << m_size << Qt::endl;
 		return;
 	}
 
-	if(!data) {
-		qDebug() << m_name << ": data created is null" << Qt::endl;
-		return;
-	}
-
-	for(auto it = data->begin(); it != data->end(); ++it) {
-		if(it.value()->data.empty()) {
+	for(auto it = data.begin(); it != data.end(); ++it) {
+		if(it.value().data.empty()) {
 			qDebug() << m_name << ": empty data for channel " << it.key() << Qt::endl;
 			continue;
 		}

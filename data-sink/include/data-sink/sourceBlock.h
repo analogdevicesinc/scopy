@@ -20,14 +20,14 @@ public:
 
 public Q_SLOTS:
 	virtual void enChannel(bool en, uint id);
-	bool isChannelEn(uint id);
-	void setBufferSize(size_t size);
+	virtual bool isChannelEn(uint id);
+	virtual void setBufferSize(size_t size);
 	void onRequestData();
 
 private:
 	QMutex m_mutex;
 	std::atomic_bool m_cancelRequested = false;
-	virtual BlockData *createData() = 0; // <channel, buffer>
+	virtual BlockData createData() = 0; // <channel, buffer>
 
 Q_SIGNALS:
 	void requestData();

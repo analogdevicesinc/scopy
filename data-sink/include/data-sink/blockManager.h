@@ -80,7 +80,7 @@ private:
 	void emitOutputData(SourceBlock *source = nullptr);
 
 Q_SIGNALS:
-	void newData(ChannelDataVector *data, uint ch);
+	void newData(ChannelDataVector data, uint ch);
 	void sentAllData();
 	void doDisconnectBlockToFilter();
 	void requestSingleShot(bool);

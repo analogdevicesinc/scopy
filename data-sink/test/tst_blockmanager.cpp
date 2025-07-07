@@ -67,10 +67,10 @@ void TST_BlockManager::testAddFilter1()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, &loop](ChannelDataVector *data, uint ch) {
+		[=, &loop](ChannelDataVector data, uint ch) {
 			m_test_success = 1;
-			for(int i = 0; i < data->data.size(); i++) {
-				if(data->data[i] != i + i * 10) {
+			for(int i = 0; i < data.data.size(); i++) {
+				if(data.data[i] != i + i * 10) {
 					m_test_success = 0;
 					break;
 				}
@@ -109,7 +109,7 @@ void TST_BlockManager::testAddFilter2()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, &loop](ChannelDataVector *data, uint ch) {
+		[=, &loop](ChannelDataVector data, uint ch) {
 			m_test_success = 0;
 			loop.quit();
 		},
@@ -143,10 +143,10 @@ void TST_BlockManager::testAddFilter3()
 
 	connect(
 		filter, &AddFilterBlock::newData, this,
-		[=, &loop](ChannelDataVector *data, uint ch) {
+		[=, &loop](ChannelDataVector data, uint ch) {
 			m_test_success = 1;
-			for(int i = 0; i < data->data.size(); i++) {
-				if(data->data[i] != i) {
+			for(int i = 0; i < data.data.size(); i++) {
+				if(data.data[i] != i) {
 					m_test_success = 0;
 					break;
 				}
@@ -207,10 +207,10 @@ void TST_BlockManager::testAddFilter4()
 
 	connect(
 		manager, &BlockManager::newData, this,
-		[this](ChannelDataVector *data, uint ch) {
+		[this](ChannelDataVector data, uint ch) {
 			counter++;
-			for(int i = 0; i < data->data.size(); i++) {
-				if(data->data[i] != i + i * 10) {
+			for(int i = 0; i < data.data.size(); i++) {
+				if(data.data[i] != i + i * 10) {
 					m_test_success = 0;
 					return;
 				}
@@ -284,7 +284,7 @@ void TST_BlockManager::testAddFilter5()
 
 	connect(
 		manager, &BlockManager::newData, this,
-		[this](ChannelDataVector *data, uint ch) {
+		[this](ChannelDataVector data, uint ch) {
 			if(ch != 0)
 				return;
 
@@ -293,7 +293,7 @@ void TST_BlockManager::testAddFilter5()
 		Qt::QueuedConnection);
 	connect(
 		manager, &BlockManager::newData, this,
-		[this](ChannelDataVector *data, uint ch) {
+		[this](ChannelDataVector data, uint ch) {
 			if(ch != 1)
 				return;
 

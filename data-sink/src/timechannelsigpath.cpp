@@ -1,3 +1,4 @@
+#include "include/data-sink/customSourceBlocks.h"
 #include <include/data-sink/timechannelsigpath.h>
 
 using namespace scopy::datasink;
@@ -17,37 +18,37 @@ double OffsetFilter::getOffset() const { return m_offset; }
 
 double OffsetFilter::getScale() const { return m_scale; }
 
-ChannelDataVector *OffsetFilter::createData()
+ChannelDataVector OffsetFilter::createData()
 {
-	if(!m_data || m_data->isEmpty()) {
-		return new ChannelDataVector();
+	if(m_data.isEmpty()) {
+		return ChannelDataVector();
 	}
 
 	// Get the first available channel data (assuming single channel processing)
 	// You might need to modify this based on your specific channel handling
-	auto it = m_data->begin();
-	if(it == m_data->end()) {
-		return new ChannelDataVector();
+	auto it = m_data.begin();
+	if(it == m_data.end()) {
+		return ChannelDataVector();
 	}
 
-	ChannelDataVector *inputData = it.value();
-	if(!inputData || inputData->data.empty()) {
-		return new ChannelDataVector();
+	ChannelDataVector inputData = it.value();
+	if(inputData.data.empty()) {
+		return ChannelDataVector();
 	}
 	// return new ChannelDataVector(inputData->data.size());
 
 	// Create output data with same size
-	ChannelDataVector *outputData = new ChannelDataVector(inputData->data.size());
+	ChannelDataVector outputData = ChannelDataVector(inputData.data.size());
 
 	// return outputData;
 
 	// Apply scale and offset: output = (input * scale) + offset
 	// outputData->data.resize(inputData->data.size());
-	for(int i = 0; i < inputData->data.size(); i++) {
-		outputData->data.push_back((inputData->data[i] * m_scale) + m_offset);
+	for(int i = 0; i < inputData.data.size(); i++) {
+		outputData.data.push_back((inputData.data[i] * m_scale) + m_offset);
 	}
-	// std::transform(inputData->data.begin(), inputData->data.end(),
-	// 	       outputData->data.begin(),
+	// std::transform(inputData.data.begin(), inputData.data.end(),
+	// 	       outputData.data.begin(),
 	// 	       [this](float value) {
 	// 		       return (value * m_scale) + m_offset;
 	// 	       });
@@ -204,48 +205,18 @@ uint TimeChannelSigpath::sourceChannel() const { return m_sourceChannel; }
 
 uint TimeChannelSigpath::outputChannel() const { return m_outputChannel; }
 
-void TimeChannelSigpath::onManagerNewData(ChannelDataVector *data, uint ch)
+void TimeChannelSigpath::onManagerNewData(ChannelDataVector data, uint ch)
 {
-	// Forward data to channel component if this is our output channel
 	if(ch == m_outputChannel && m_ch) {
-		// forwardDataToChannel(data);
+		forwardDataToChannel(data);
 	}
 }
 
-void TimeChannelSigpath::forwardDataToChannel(ChannelDataVector *data)
+void TimeChannelSigpath::forwardDataToChannel(ChannelDataVector data)
 {
-	// Forward the processed data to the channel component
-	// This depends on your ChannelComponent interface
-	// Since the original code called m_ch->chData()->onNewData(xData, yData, size, copy)
-	// and now we have ChannelDataVector, you'll need to adapt this based on your
-	// ChannelComponent's expected interface
-
-	if(m_ch && data && !data->data.empty()) {
-		// Example implementation - you'll need to adapt this to your actual interface:
-		// If your ChannelComponent expects separate X and Y data:
-		//
-		// Option 1: If data contains interleaved X,Y pairs
-		// size_t numSamples = data->data.size() / 2;
-		// const float* xData = data->data.data();
-		// const float* yData = data->data.data() + numSamples;
-		// m_ch->chData()->onNewData(xData, yData, numSamples, false);
-		//
-		// Option 2: If data is Y-only and X is generated (time domain)
-		// You might generate X data or use existing time base
-		// std::vector<float> xData; // generate time values
-		// m_ch->chData()->onNewData(xData.data(), data->data.data(), data->data.size(), false);
-		//
-		// Option 3: If ChannelComponent now accepts ChannelDataVector directly
-		// m_ch->chData()->onNewData(data);
-
-		// Placeholder - implement based on your actual ChannelComponent interface
-		// For now, assuming you need to implement this based on your specific needs
-		float *xData = new float[data->data.size()];
-		for(int i = 0; i < data->data.size(); ++i) {
-			xData[i] = static_cast<float>(i);
-		}
-		m_ch->chData()->onNewData(xData, data->data.data(), data->data.size(), true);
-		// delete data;
-		delete[] xData;
+	if(m_ch && !data.data.empty()) {
+		m_ch->chData()->onNewData(static_cast<IIOSourceBlock *>(m_sourceBlock)->getTimeAxis().data(),
+					  data.data.data(), data.data.size(), true);
+		data.clear();
 	}
 }

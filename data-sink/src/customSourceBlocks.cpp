@@ -2,7 +2,6 @@
 #include <cmath>
 #include <include/data-sink/customSourceBlocks.h>
 #include <QDateTime>
-#include <iostream>
 #include <qfile.h>
 using namespace scopy::datasink;
 
@@ -13,7 +12,7 @@ FileSourceBlock::FileSourceBlock(QString filename, QString name)
 
 FileSourceBlock::~FileSourceBlock() {}
 
-BlockData *FileSourceBlock::createData()
+BlockData FileSourceBlock::createData()
 {
 	QFile file = QFile(m_filename);
 	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -23,7 +22,7 @@ BlockData *FileSourceBlock::createData()
 
 	QTextStream m_stream(&file);
 
-	BlockData *map = new BlockData();
+	BlockData map = BlockData();
 	int numRows = 0;
 
 	while(!m_stream.atEnd()) {
@@ -31,7 +30,7 @@ BlockData *FileSourceBlock::createData()
 		QStringList values = line.split(',');
 
 		for(int col = 0; col < values.size(); ++col) {
-			if(!m_channels.value(col) && !map->contains(col))
+			if(!m_channels.value(col) && !map.contains(col))
 				continue;
 
 			if(m_size <= numRows) {
@@ -43,11 +42,11 @@ BlockData *FileSourceBlock::createData()
 			float num = values[col].toFloat();
 
 			if(numRows == 0) {
-				ChannelDataVector *data = new ChannelDataVector(m_size);
-				map->insert(col, data);
-				data->data.push_back(num);
+				ChannelDataVector data = ChannelDataVector(m_size);
+				map.insert(col, data);
+				data.data.push_back(num);
 			} else {
-				map->value(col)->data.push_back(num);
+				map[col].data.push_back(num);
 			}
 		}
 		numRows++;
@@ -62,18 +61,18 @@ TestSourceBlock::TestSourceBlock(QString name)
 
 TestSourceBlock::~TestSourceBlock() {}
 
-BlockData *TestSourceBlock::createData()
+BlockData TestSourceBlock::createData()
 {
-	BlockData *map = new BlockData();
+	BlockData map = BlockData();
 
 	for(int ch = 0; ch < m_channels.size(); ++ch) {
 		if(m_channels.value(ch)) {
-			ChannelDataVector *data = new ChannelDataVector(m_size);
+			ChannelDataVector data = ChannelDataVector(m_size);
 
 			for(int i = 0; i < m_size; i++) {
-				data->data.push_back(i * pow(10, ch));
+				data.data.push_back(i * pow(10, ch));
 			}
-			map->insert(ch, data);
+			map.insert(ch, data);
 		}
 	}
 
@@ -86,24 +85,37 @@ IIOSourceBlock::IIOSourceBlock(iio_device *dev, QString name)
 	, m_current_buf_size(-1)
 {
 	m_dev = dev;
-	m_sampleRateAttribute = findAttribute(
-		{
-			"sample_rate",
-			"sampling_rate",
-			"sample_frequency",
-			"sampling_frequency",
-		},
-		m_dev);
+	findSRAttribute();
 }
 
 IIOSourceBlock::~IIOSourceBlock() {}
 
-QString IIOSourceBlock::findAttribute(QStringList possibleNames, iio_device *dev)
+void IIOSourceBlock::setBufferSize(size_t size)
 {
+	SourceBlock::setBufferSize(size);
+	generateTimeAxis();
+}
 
+void IIOSourceBlock::findSRAttribute()
+{
+	QStringList list({
+		"sample_rate",
+		"sampling_rate",
+		"sample_frequency",
+		"sampling_frequency",
+	});
+
+	m_devSampleRateAttribute = findDevAttribute(list);
+	if(m_devSampleRateAttribute.isEmpty()) {
+		m_chSampleRateAttribute = findChAttribute(list);
+	}
+}
+
+QString IIOSourceBlock::findDevAttribute(QStringList possibleNames)
+{
 	const char *attr = nullptr;
 	for(const QString &name : possibleNames) {
-		attr = iio_device_find_attr(dev, name.toStdString().c_str());
+		attr = iio_device_find_attr(m_dev, name.toStdString().c_str());
 		if(attr)
 			break;
 	}
@@ -111,19 +123,38 @@ QString IIOSourceBlock::findAttribute(QStringList possibleNames, iio_device *dev
 	return attributeName;
 }
 
+QPair<QString, struct iio_channel *> IIOSourceBlock::findChAttribute(QStringList possibleNames)
+{
+	const char *attr = nullptr;
+	unsigned int num_channels = iio_device_get_channels_count(m_dev);
+
+	for(unsigned int i = 0; i < num_channels; ++i) {
+		struct iio_channel *chn = iio_device_get_channel(m_dev, i);
+		for(const QString &name : possibleNames) {
+			attr = iio_channel_find_attr(chn, name.toStdString().c_str());
+			if(attr) {
+				return QPair<QString, struct iio_channel *>(QString(attr), chn);
+			}
+		}
+	}
+
+	return QPair<QString, struct iio_channel *>(QString(), nullptr);
+}
+
 void IIOSourceBlock::enChannel(bool en, uint id)
 {
 	SourceBlock::enChannel(en, id);
 
-	if(en)
+	if(en) {
 		iio_channel_enable(iio_device_get_channel(m_dev, id));
-	else
+	} else {
 		iio_channel_disable(iio_device_get_channel(m_dev, id));
+	}
 }
 
 bool IIOSourceBlock::sampleRateAvailable()
 {
-	if(m_sampleRateAttribute.isEmpty())
+	if(m_devSampleRateAttribute.isEmpty() && m_chSampleRateAttribute.first.isEmpty())
 		return false;
 	return true;
 }
@@ -136,7 +167,12 @@ double IIOSourceBlock::readSampleRate()
 	if(!sampleRateAvailable())
 		return -1;
 
-	iio_device_attr_read(m_dev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	if(!m_devSampleRateAttribute.isEmpty())
+		iio_device_attr_read(m_dev, m_devSampleRateAttribute.toStdString().c_str(), buffer, 20);
+	if(!m_chSampleRateAttribute.first.isEmpty())
+		iio_channel_attr_read(m_chSampleRateAttribute.second, m_chSampleRateAttribute.first.toStdString().c_str(),
+				      buffer, 20);
+
 	QString str(buffer);
 	sr = str.toDouble(&ok);
 	if(ok) {
@@ -148,13 +184,23 @@ double IIOSourceBlock::readSampleRate()
 
 iio_device *IIOSourceBlock::iioDev() { return m_dev; }
 
-BlockData *IIOSourceBlock::createData()
+std::vector<float> IIOSourceBlock::getTimeAxis()
+{
+	if(m_timeAxis.empty()) {
+		// this should never happen
+		generateTimeAxis();
+	}
+
+	return m_timeAxis;
+}
+
+BlockData IIOSourceBlock::createData()
 {
 	iio_channel *rx0_i = iio_device_find_channel(m_dev, m_channels.value(0) ? "voltage0" : "voltage1", false);
 	// QElapsedTimer timer;
 	// QThread::msleep(60);
-	// std::cout << "before: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() << '\n';
-	// timer.start();
+	// std::cout << "before: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() <<
+	// '\n'; timer.start();
 
 	if(m_current_buf_size != m_size) {
 		if(m_buf)
@@ -164,7 +210,7 @@ BlockData *IIOSourceBlock::createData()
 	}
 	// std::cout << "buff: " << timer.elapsed() << " of size: " << m_size << std::endl;
 
-	BlockData *map = new BlockData();
+	BlockData map = BlockData();
 	ssize_t nbytes_rx;
 	char *p_dat, *p_end;
 	ptrdiff_t p_inc;
@@ -187,7 +233,7 @@ BlockData *IIOSourceBlock::createData()
 	int i;
 	for(auto it = m_channels.begin(); it != m_channels.end(); ++it) {
 		if(it.value()) {
-			ChannelDataVector *data = new ChannelDataVector(m_size);
+			ChannelDataVector data = ChannelDataVector(m_size);
 
 			i = 0;
 			for(p_dat = (char *)iio_buffer_first(m_buf, rx0_i); p_dat < p_end; p_dat += p_inc) {
@@ -196,18 +242,30 @@ BlockData *IIOSourceBlock::createData()
 				// const int16_t q = ((int16_t*)p_dat)[1]; // Imag (Q)
 				// ((int16_t*)p_dat)[0] = q;
 				// ((int16_t*)p_dat)[1] = i;
-				data->data.push_back((float)((int16_t *)p_dat)[it.key()]);
+				data.data.push_back((float)((int16_t *)p_dat)[it.key()]);
 				i++;
 			}
 
-			map->insert(it.key(), data);
+			map.insert(it.key(), data);
 		}
 	}
 
 	// iio_buffer_destroy(m_buf);
 	count++;
 	// std::cout << "iio source:" << count << std::endl;
-	// std::cout << "after: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() << '\n';
+	// std::cout << "after: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() <<
+	// '\n';
 
 	return map;
+}
+
+void IIOSourceBlock::generateTimeAxis()
+{
+	double sr = readSampleRate();
+	double timeoffset = 0;
+	m_timeAxis.clear();
+
+	for(int i = 0; i <= bufferSize(); i++) {
+		m_timeAxis.push_back(timeoffset + i / sr);
+	}
 }

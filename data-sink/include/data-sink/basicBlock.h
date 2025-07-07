@@ -27,7 +27,7 @@ public:
 	std::vector<float> data;
 };
 
-class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelDataVector *>
+class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelDataVector >
 {
 public:
 	BlockData()
@@ -43,7 +43,7 @@ public:
 	void clearVectors()
 	{
 		for(auto it = begin(); it != end(); ++it) {
-			it.value()->clear();
+			it.value().clear();
 		}
 	}
 };
@@ -63,7 +63,7 @@ public:
 	void setName(QString name) { m_name = name; }
 
 Q_SIGNALS:
-	void newData(ChannelDataVector *data, uint ch);
+	void newData(ChannelDataVector data, uint ch);
 
 protected:
 	QString m_name;

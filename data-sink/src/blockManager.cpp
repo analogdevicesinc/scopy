@@ -1,8 +1,9 @@
 #include <include/data-sink/blockManager.h>
-#include <iostream>
+#include <QMetaType>
 
 Q_LOGGING_CATEGORY(CAT_BLOCKMANAGER, "BLOCKMANAGER");
 using namespace scopy::datasink;
+Q_DECLARE_METATYPE(ChannelDataVector);
 
 SourceBlockLink::SourceBlockLink(SourceBlock *sourceBlock, bool threaded)
 	: QObject()
@@ -162,7 +163,7 @@ int BlockManager::addOutputLink(SourceBlock *source, BasicBlock *final, uint fin
 
 	QMetaObject::Connection conn = connect(
 		final, &BasicBlock::newData, this,
-		[=](ChannelDataVector *data, uint block_ch) {
+		[=](ChannelDataVector data, uint block_ch) {
 			if(block_ch != final_ch || (!m_running && !m_singleShot))
 				return;
 
@@ -256,7 +257,7 @@ void BlockManager::connectBlockToFilter(BasicBlock *block, uint block_ch, uint f
 {
 	connect(
 		block, &SourceBlock::newData, filter,
-		[=](ChannelDataVector *data, uint ch) {
+		[=](ChannelDataVector data, uint ch) {
 			if(block_ch == ch) {
 				filter->onNewData(data, filter_ch);
 			}

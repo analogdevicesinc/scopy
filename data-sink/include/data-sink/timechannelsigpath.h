@@ -25,7 +25,7 @@ public:
 	double getScale() const;
 
 protected:
-	ChannelDataVector* createData() override;
+	ChannelDataVector createData() override;
 
 private:
 	double m_offset;
@@ -102,7 +102,7 @@ public:
 	OffsetFilter *offsetFilter() const;
 
 private Q_SLOTS:
-	void onManagerNewData(ChannelDataVector *data, uint ch);
+	void onManagerNewData(ChannelDataVector data, uint ch);
 
 private:
 	QString m_name;
@@ -116,7 +116,7 @@ private:
 	bool m_enabled;
 	bool m_filterConnected;
 
-	void forwardDataToChannel(ChannelDataVector *data);
+	void forwardDataToChannel(ChannelDataVector data);
 };
 }
 

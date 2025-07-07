@@ -34,6 +34,7 @@
 #include <core/crashreport.h>
 #include <gui/utils.h>
 #include <gui/docking/docksettings.h>
+#include <data-sink/include/data-sink/basicBlock.h>
 
 using namespace scopy;
 
@@ -98,6 +99,9 @@ void printRuntimeEnvironmentInfo()
 
 int main(int argc, char *argv[])
 {
+	// MOVE THIS ??
+	qRegisterMetaType<scopy::datasink::ChannelDataVector>("ChannelDataVector");
+
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
 	QCoreApplication::setApplicationName("Scopy-v2");

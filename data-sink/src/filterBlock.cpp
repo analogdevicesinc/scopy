@@ -5,8 +5,7 @@ using namespace scopy::datasink;
 FilterBlock::FilterBlock(bool copy, QString name)
 	: BasicBlock(name)
 	, m_copy(true)
-	, m_data(new BlockData())
-
+	, m_data(BlockData())
 {
 	doCopy(copy);
 }
@@ -34,28 +33,28 @@ void FilterBlock::resetChannels()
 	// m_data->clearVectors();
 }
 
-void FilterBlock::onNewData(ChannelDataVector *chData, uint ch)
+void FilterBlock::onNewData(ChannelDataVector chData, uint ch)
 {
-	// ChannelDataVector *new_data = createData();
+	// ChannelDataVector new_data = createData();
 	// Q_EMIT newData(new_data, 0);
 	// return;
 
 	if(m_copy) {
-		chData->setCopiedData(chData->data);
+		chData.setCopiedData(chData.data);
 	}
 
-	if(m_data->contains(ch))
-		m_data->value(ch)->data = chData->data;
+	if(m_data.contains(ch))
+		m_data[ch].data = chData.data;
 	else
-		m_data->insert(ch, chData);
+		m_data.insert(ch, chData);
 
 	m_connectedChannels[ch] = true;
 	if(areChannelsReady()) {
-		ChannelDataVector *new_data = createData();
+		ChannelDataVector new_data = createData();
 		// new_data->clear();
 		// delete new_data;
 
-		if(new_data->data.empty()) {
+		if(new_data.data.empty()) {
 			qWarning() << m_name << ": Empty buffer from filter!";
 		} else {
 			Q_EMIT newData(new_data, 0); // FORCED TO CH0 SINCE FILTERS ONLY SUPPORT 1 OUTPUT
