@@ -34,6 +34,8 @@
 #include <plotbufferpreviewer.h>
 #include <plotcomponent.h>
 #include "scopy-datalogger_export.h"
+#include <gui/docking/dockwrapperinterface.h>
+#include <gui/docking/dockableareainterface.h>
 
 namespace scopy {
 
@@ -104,6 +106,10 @@ private:
 	double m_xAxisIntervalMax;
 
 	QLabel *startTimeLabel;
+
+	DockableAreaInterface *m_dockableArea;
+	DockWrapperInterface *m_dockWidet;
+	QWidget *m_monitorPlotWidget;
 };
 } // namespace datamonitor
 } // namespace scopy

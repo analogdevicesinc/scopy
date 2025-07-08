@@ -32,6 +32,8 @@
 #include <plotnavigator.hpp>
 #include <style.h>
 #include <pluginbase/preferences.h>
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -41,7 +43,7 @@ MonitorPlot::MonitorPlot(QString name, uint32_t uuid, QWidget *parent)
 {
 	layout = new QVBoxLayout();
 	setLayout(layout);
-	layout->setContentsMargins(0, 0, 0, 10);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	Preferences *p = Preferences::GetInstance();
 	dateTimeFormat = p->get("dataloggerplugin_date_time_format").toString();
@@ -53,7 +55,18 @@ MonitorPlot::MonitorPlot(QString name, uint32_t uuid, QWidget *parent)
 		}
 	});
 
-	m_plot = new PlotWidget(this);
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
+	layout->addWidget(dockableAreaWidget);
+
+	m_monitorPlotWidget = new QWidget(this);
+	m_monitorPlotWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QVBoxLayout *monitorPlotWidgetLayout = new QVBoxLayout(m_monitorPlotWidget);
+	monitorPlotWidgetLayout->setContentsMargins(0, 0, 0, 10);
+
+	m_plot = new PlotWidget(m_monitorPlotWidget);
+	m_plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	auto nameLbl = m_plot->getPlotInfo()->addLabelInfo(IP_LEFT, IP_TOP);
 	nameLbl->setText(m_name);
@@ -72,7 +85,7 @@ MonitorPlot::MonitorPlot(QString name, uint32_t uuid, QWidget *parent)
 
 	startTimeLabel = new QLabel(this);
 
-	HoverWidget *startTime = new HoverWidget(nullptr, m_plot, this);
+	HoverWidget *startTime = new HoverWidget(nullptr, m_plot, m_monitorPlotWidget);
 	startTime->setContent(startTimeLabel);
 	startTime->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	startTime->setContentPos(HoverPosition::HP_BOTTOMLEFT);
@@ -82,9 +95,14 @@ MonitorPlot::MonitorPlot(QString name, uint32_t uuid, QWidget *parent)
 
 	setStartTime();
 	setupXAxis();
+
 	generateBufferPreviewer();
 
-	layout->addWidget(m_plot);
+	m_dockWidet = createDockWrapper("Data Monitor Plot");
+	m_dockWidet->setInnerWidget(m_monitorPlotWidget);
+	m_dockableArea->addDockWrapper(m_dockWidet);
+
+	m_monitorPlotWidget->layout()->addWidget(m_plot);
 	m_plotLayout->addLayout(layout);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
@@ -296,7 +314,7 @@ void MonitorPlot::generateBufferPreviewer()
 		updateBufferPreviewer(time);
 	});
 	m_plot->navigator()->setResetOnNewBase(false);
-	layout->addWidget(m_bufferPreviewer);
+	m_monitorPlotWidget->layout()->addWidget(m_bufferPreviewer);
 }
 
 #include "moc_monitorplot.cpp"
