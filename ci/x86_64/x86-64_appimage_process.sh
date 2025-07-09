@@ -394,56 +394,42 @@ build_scopy() {
 	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION
+		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION \
+		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr
 		"
 	build_with_cmake OFF
 	popd
 }
 
 create_appdir(){
-	pushd ${STAGING_AREA}
-	BUILD_FOLDER=$SRC_DIR/build
-	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	PLUGINS=$BUILD_FOLDER/plugins/plugins
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
-	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
-	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
-	APOLLO_FILTERS=$SRC_DIR/plugins/ad9084/res/ad9084
-	PLUTO_FILTERS=$SRC_DIR/plugins/pluto/res/ad936x
-	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
-	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
-	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
-	STYLE_FOLDER=$BUILD_FOLDER/style
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib
-	DLL_FOLDER=${STAGING_AREA}/dll_folder
-	COPY_DEPS=${SRC_DIR}/ci/x86_64/copy-deps.sh
-	export PATH=$QT_LOCATION:$PATH
-	sudo ldconfig
 
 	rm -rf $APP_DIR
-	rm -rf $DLL_FOLDER
-	mkdir $DLL_FOLDER
-	cp $SCOPY_DLL $DLL_FOLDER
-	cp $PLUGINS/*.so $DLL_FOLDER
+
+	pushd ${SRC_DIR}/build
+	make install
+	popd
+
+	pushd ${STAGING_AREA}
+	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
+	LIBS=$(find $APP_DIR/usr -type f -name "libscopy*.so")
+	COPY_DEPS=${SRC_DIR}/ci/x86_64/copy-deps.sh
 
 	export QMAKE=$QMAKE_BIN # this is needed for deploy-plugin-qt.AppImage
 	# inside a docker image you can't run an appimage executable without privileges
 	# so the solution is to extract the appimage first and only then to run it
+	export PATH=$QT_LOCATION:$PATH
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib:$APP_DIR/usr/lib
+	sudo ldconfig
 	export APPIMAGE_EXTRACT_AND_RUN=1
 	${STAGING_AREA}/linuxdeploy-x86_64.AppImage \
 		--appdir  $APP_DIR \
-		--executable $SRC_DIR/build/scopy \
+		--executable $APP_DIR/usr/bin/scopy \
 		--custom-apprun $SRC_DIR/ci/general/AppRun \
 		--desktop-file $SRC_DIR/ci/general/scopy.desktop \
 		--icon-file $SRC_DIR/gui/res/scopy.png \
-		--deploy-deps-only $DLL_FOLDER \
 		--plugin qt
 
-	$COPY_DEPS "$DLL_FOLDER/*" $APP_DIR/usr/lib
-	rm -rf $DLL_FOLDER
-	cp $SCOPY_DLL $APP_DIR/usr/lib
-	mkdir -p $APP_DIR/usr/lib/scopy/plugins
-	cp $PLUGINS/*.so $APP_DIR/usr/lib/scopy/plugins
+	$COPY_DEPS "$LIBS" $APP_DIR/usr/lib
 
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
@@ -461,26 +447,6 @@ create_appdir(){
 		echo  "No decoders for libsigrokdecode found"
 		exit 1
 	fi
-	
-	mkdir -p $APP_DIR/usr/lib/scopy/translations
-	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
-	
-	cp -R $STYLE_FOLDER $APP_DIR/usr/lib/scopy/style
-
-	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
-	fi
-
-	if [ -d $PLUTO_FILTERS ]; then
-		cp -r $PLUTO_FILTERS $APP_DIR/usr/lib/scopy/plugins
-	fi
-
-	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
-	cp -r $APOLLO_FILTERS $APP_DIR/usr/lib/scopy/plugins
-
-	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
-	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
-	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
