@@ -23,11 +23,13 @@ if(DEFINED __INCLUDED_SCOPY_WINDOWS_CMAKE)
 endif()
 set(__INCLUDED_SCOPY_WINDOWS_CMAKE TRUE)
 
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qt.conf DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 # Env variables
 set(ENV_WORKDIR $ENV{WORKDIR})
 set(ENV_DEST_FOLDER $ENV{DEST_FOLDER})
 
-configure_file(windows/scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-64.iss @ONLY)
+configure_file(ci/windows/scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-64.iss @ONLY)
 
 macro(duplicate_target ORIGINAL NEW)
 	get_target_property(original_libraries ${ORIGINAL} LINK_LIBRARIES)

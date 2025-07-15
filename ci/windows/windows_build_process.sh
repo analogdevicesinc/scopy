@@ -30,7 +30,8 @@ install_packages() {
 		base-devel\
 		mingw-w64-${ARCH}-autotools\
 		libtool\
-		mingw-w64-${ARCH}-boost
+		mingw-w64-${ARCH}-boost\
+		mingw-w64-${ARCH}-ccache
 	"
 	PACMAN_SYNC_DEPS="\
 		mingw-w64-${ARCH}-fftw\
@@ -364,14 +365,14 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	CURRENT_BUILD=KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=OFF -DKDDockWidgets_TESTS=OFF"
 	build_with_cmake $1
 }
 
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	CURRENT_BUILD=extra-cmake-modules
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
 	build_with_cmake $1
 }
 
