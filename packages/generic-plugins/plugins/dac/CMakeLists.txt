@@ -93,9 +93,4 @@ target_link_libraries(
 	       scopy-pkg-manager
 )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(INSTALLER_DESCRIPTION "${PLUGIN_DISPLAY_NAME} ${PLUGIN_DESCRIPTION}")
-	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} FALSE)
-endif()
-
 set(DAC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

@@ -20,18 +20,13 @@ USE_STAGING=OFF
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/mingw_toolchain.sh $USE_STAGING
 
+INSTALL_FOLDER=$STAGING_AREA/scopy-install
 BUILD_FOLDER=$WORKDIR/build_$ARCH
 ARTIFACT_FOLDER=$SRC_FOLDER/artifacts
 export DEST_FOLDER=$ARTIFACT_FOLDER/scopy-$ARCH # the export is needed for the packaging step
 DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
-REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
-DAC_WAVEFORM_CSV=$SRC_FOLDER/plugins/dac/res/csv
-APOLLO_FILTERS=$SRC_FOLDER/plugins/ad9084/res/ad9084
-PLUTO_FILTERS=$SRC_FOLDER/plugins/pluto/res/ad936x
-EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
-EMU_CONFIG=$SRC_FOLDER/resources/scopy_emu_options_config.json
 
 download_tools() {
 	mkdir -p $STAGING_AREA
@@ -68,7 +63,7 @@ build_scopy(){
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
 	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe \
-				-DENABLE_TESTING=OFF \
+				-DENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER \
 				$SRC_FOLDER
 	$MAKE_BIN $JOBS
 	ls -la $BUILD_FOLDER
@@ -90,56 +85,59 @@ build_iio-emu(){
 	popd
 }
 
+bundle_drivers(){
+	echo "### Bundling drivers"
+	cp -R $SRC_FOLDER/ci/windows/drivers $DEST_FOLDER
+	if [[ $ARCH_BIT == "64" ]]; then
+		cp -R $STAGING_AREA/dfu-util-static-amd64.exe $DEST_FOLDER/drivers/dfu-util.exe
+		cp -R $STAGING_AREA/dpinst_amd64.exe $DEST_FOLDER/drivers/dpinst.exe
+	else
+		cp -R $STAGING_AREA/dfu-util-static.exe $DEST_FOLDER/drivers/dfu-util.exe
+		cp -R $STAGING_AREA/dpinst.exe $DEST_FOLDER/drivers/dpinst.exe
+	fi
+}
+
 deploy_app(){
 	echo "### Deploying application and dependencies"
-	if [ -d $DEST_FOLDER ]; then
-		rm -rf $DEST_FOLDER
-	fi
+
+	rm -rf $INSTALL_FOLDER
+	pushd $BUILD_FOLDER
+	make $JOBS install
+	popd
+
 	rm -rf $DEST_FOLDER
 	mkdir -p $DEST_FOLDER
-	cp $BUILD_FOLDER/Scopy.exe $DEST_FOLDER/
-	cp $BUILD_FOLDER/qt.conf $DEST_FOLDER/
-	cp $BUILD_FOLDER/Scopy-console.exe $DEST_FOLDER/
+	cp -v $INSTALL_FOLDER/bin/Scopy.exe $DEST_FOLDER/
+	cp -v $INSTALL_FOLDER/bin/Scopy-console.exe $DEST_FOLDER/
+	cp -v $INSTALL_FOLDER/bin/qt.conf $DEST_FOLDER/
+	cp -v $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER/
+	cp -v $EMU_BUILD_FOLDER/tools/iio-emu_gen_xml.exe $DEST_FOLDER/
 
-	mkdir $DEST_FOLDER/resources
-	$STAGING_DIR/bin/windeployqt.exe --dir $DEST_FOLDER --no-translations --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport $BUILD_FOLDER/Scopy.exe
+	$STAGING_DIR/bin/windeployqt.exe \
+		--dir $DEST_FOLDER \
+		--no-translations \
+		--no-system-d3d-compiler \
+		--no-compiler-runtime \
+		--no-quick-import \
+		--opengl \
+		--printsupport \
+		$DEST_FOLDER/Scopy.exe
 
-	cp -r $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
+	cp -vr $INSTALL_FOLDER/lib/libscopy*.dll $DEST_FOLDER
+	cp -vr $INSTALL_FOLDER/lib/scopy/* $DEST_FOLDER
+	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
+	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 
 	pushd $STAGING_DIR/bin
 	DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
-	cp -n $DLL_DEPS $DEST_FOLDER/
-	cp -n iio_*.exe $DEST_FOLDER/
+	cp -vn $DLL_DEPS $DEST_FOLDER/
+	cp -nv iio_*.exe $DEST_FOLDER/
 	popd
 
-	cp $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER
 	cp -r $PYTHON_FILES $DEST_FOLDER
 	cp $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss $DEST_FOLDER
-	cp -v $BUILD_FOLDER/libscopy-*.dll $DEST_FOLDER
 
-	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins/plugins -type f -name "*.dll")
-	mkdir -p $DEST_FOLDER/plugins
-	cp -v $PLUGINS_DLL $DEST_FOLDER/plugins
-
-	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
-	mkdir -p $DEST_FOLDER/translations
-	cp $TRANSLATIONS_QM $DEST_FOLDER/translations
-	
-	cp -R $BUILD_FOLDER/style $DEST_FOLDER/style
-
-	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins
-	fi
-
-	if [ -d $PLUTO_FILTERS ]; then
-		cp -r $PLUTO_FILTERS $DEST_FOLDER/plugins
-	fi
-
-	cp -r $DAC_WAVEFORM_CSV $DEST_FOLDER/plugins
-	cp -r $APOLLO_FILTERS $DEST_FOLDER/plugins
-	cp -r $EMU_XMLS $DEST_FOLDER/plugins
-	mkdir -p $DEST_FOLDER/plugins/resources
-	cp $EMU_CONFIG $DEST_FOLDER/plugins/resources
+	bundle_drivers
 }
 
 extract_debug_symbols(){
@@ -148,21 +146,8 @@ extract_debug_symbols(){
 	mkdir -p $DEBUG_FOLDER
 	cp -r $DEST_FOLDER/* $DEBUG_FOLDER/
 	echo "### Stripping bundle for installer"
-	/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.exe
-	/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/*.dll
-	/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded $DEST_FOLDER/plugins/*.dll
-}
-
-bundle_drivers(){
-	echo "### Bundling drivers"
-	cp -R $SRC_FOLDER/windows/drivers $DEST_FOLDER
-	if [[ $ARCH_BIT == "64" ]]; then
-		cp -R $STAGING_AREA/dfu-util-static-amd64.exe $DEST_FOLDER/drivers/dfu-util.exe
-		cp -R $STAGING_AREA/dpinst_amd64.exe $DEST_FOLDER/drivers/dpinst.exe
-	else
-		cp -R $STAGING_AREA/dfu-util-static.exe $DEST_FOLDER/drivers/dfu-util.exe
-		cp -R $STAGING_AREA/dpinst.exe $DEST_FOLDER/drivers/dpinst.exe
-	fi
+	/$MINGW_VERSION/bin/strip.exe --verbose --strip-debug --strip-unneeded $(find $DEST_FOLDER -name "*.exe" -type f)
+	/$MINGW_VERSION/bin/strip.exe --verbose --strip-debug --strip-unneeded $(find $DEST_FOLDER -name "*.dll" -type f)
 }
 
 create_installer() {
@@ -204,12 +189,9 @@ run_workflow(){
 	build_scopy
 	build_iio-emu
 	deploy_app
-	bundle_drivers
 	extract_debug_symbols
 	create_installer
 }
-
-# run_workflow
 
 for arg in $@; do
 	$arg

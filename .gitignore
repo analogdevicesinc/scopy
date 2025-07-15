@@ -74,3 +74,5 @@ gui/include/gui/style_attributes.h
 *style_attributes.h
 compile_commands.json
 .venv/*
+artifacts/*
+build-*

@@ -126,8 +126,4 @@ target_link_libraries(
 	       Qt5::Test
 )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
-endif()
-
 set(REGNMAP_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
