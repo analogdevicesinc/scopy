@@ -26,9 +26,6 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
-set(PLUGIN_DISPLAY_NAME "ADC")
-set(PLUGIN_DESCRIPTION "Analog to Digital Converter")
-
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
@@ -96,10 +93,5 @@ target_link_libraries(
 	       scopy-gr-util
 	       scopy-iio-widgets
 )
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(INSTALLER_DESCRIPTION "${PLUGIN_DISPLAY_NAME} ${PLUGIN_DESCRIPTION}")
-	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} FALSE)
-endif()
 
 set(ADC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
