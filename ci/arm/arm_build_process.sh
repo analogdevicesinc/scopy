@@ -345,6 +345,7 @@ build_scopy() {
 		-DENABLE_PLUGIN_TEST=OFF \
 		-DENABLE_TESTING=ON \
 		-DPYTHON_EXECUTABLE=$SYSROOT/bin/python3 \
+		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr \
 		"
 	build_with_cmake
 	popd
@@ -353,19 +354,14 @@ build_scopy() {
 create_appdir(){
 	BUILD_FOLDER=$SRC_DIR/build
 	EMU_BUILD_FOLDER=$STAGING_AREA/iio-emu/build
-	PLUGINS=$BUILD_FOLDER/plugins/plugins
-	SCOPY_DLL=$(find $BUILD_FOLDER -maxdepth 1 -type f -name "libscopy*")
-	REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
-	PLUTO_FILTERS=$SRC_DIR/plugins/pluto/res/ad936x
-	DAC_WAVEFORM_CSV=$SRC_DIR/plugins/dac/res/csv
-	APOLLO_FILTERS=$SRC_DIR/plugins/ad9084/res/ad9084
-	EMU_XMLS=$BUILD_FOLDER/plugins/emu_xml
-	EMU_CONFIG=$SRC_DIR/resources/scopy_emu_options_config.json
-	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
-	STYLE_FOLDER=$BUILD_FOLDER/style
 	COPY_DEPS=$SRC_DIR/ci/arm/copy-deps.sh
 
 	rm -rf $APP_DIR
+
+	pushd ${BUILD_FOLDER}
+	make install
+	popd
+
 	mkdir -p $APP_DIR
 	mkdir -p $APP_DIR/usr/bin
 	mkdir -p $APP_DIR/usr/lib
@@ -379,30 +375,6 @@ create_appdir(){
 	cp $APP_DESKTOP $APP_DIR/usr/share/applications
 
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
-	cp $BUILD_FOLDER/scopy $APP_DIR/usr/bin
-
-	cp $SCOPY_DLL $APP_DIR/usr/lib
-	mkdir -p $APP_DIR/usr/lib/scopy/plugins
-	cp $PLUGINS/*.so $APP_DIR/usr/lib/scopy/plugins
-
-	mkdir -p $APP_DIR/usr/lib/scopy/translations
-	cp $TRANSLATIONS_QM $APP_DIR/usr/lib/scopy/translations
-	
-	cp -R $STYLE_FOLDER $APP_DIR/usr/lib/scopy/style
-
-	if [ -d $REGMAP_XMLS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
-	fi
-
-	if [ -d $PLUTO_FILTERS ]; then
-		cp -r $REGMAP_XMLS $APP_DIR/usr/lib/scopy/plugins
-	fi
-	
-	cp -r $DAC_WAVEFORM_CSV $APP_DIR/usr/lib/scopy/plugins
-	cp -r $EMU_XMLS $APP_DIR/usr/lib/scopy/plugins
-	cp -r $APOLLO_FILTERS $APP_DIR/usr/lib/scopy/plugins
-	mkdir -p $APP_DIR/usr/lib/scopy/plugins/resources
-	cp $EMU_CONFIG $APP_DIR/usr/lib/scopy/plugins/resources
 
 	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
 		sudo rm -rfv ${SYSROOT}/usr/lib/arm-linux-gnueabihf/libQt5*
@@ -410,8 +382,7 @@ create_appdir(){
 
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
 	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
-	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
-	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib "$APP_DIR/usr/lib/scopy/plugins/*.so"
+	$COPY_DEPS --lib-dir ${SYSROOT}:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib "$(find $APP_DIR/usr -type f -name "libscopy*.so")"
 	cp -r $QT_LOCATION/plugins $APP_DIR/usr
 
 	# search for the python version linked by cmake and copy inside the appimage the same version
@@ -526,25 +497,28 @@ dev_setup(){
 	# after that, a temporary docker volume is created to bridge the local environment and the docker container
 	# and the compiling is done inside the container unsing the already prepared filesystem
 
-	# for example, if you want to develop for ARMHF architecture, you would execute:
+	[ "$ARCHITECTURE" == "armhf" ] && ARCH=armhf || ARCH=arm64
 
-	docker pull cristianbindea/scopy2-armhf-appimage:latest # to download the image
+	# for example, you would execute:
+
+	docker pull cristianbindea/scopy2-$ARCH-appimage:latest # to download the image
 
 	# and to run the image, while creating a docker volume, you would run:
 	docker run -it \
 		--mount type=bind,source="$SRC_DIR",target=/home/runner/scopy \
-		cristianbindea/scopy2-armhf-appimage:latest
+		cristianbindea/scopy2-$ARCH-appimage:latest
 
 
 	# now this repository folder it shared with the docker container
 
 	# to compile and package the application use "scopy/ci/arm/arm_build_process.sh arm32 run_workflow"
+	# or "scopy/ci/arm/arm_build_process.sh arm64 run_workflow", depending on the architecture
 	
 	# to continue using the same docker container use "docker start (container id)" and "docker attach (container id)"
 
 	# finally after the development is done use this to clean the system
 	# "docker container rm -v (container id)"
-	# "docker image rm cristianbindea/scopy2-armhf-appimage:latest"
+	# "docker image rm cristianbindea/scopy2-$ARCH-appimage:latest"
 
 	# **to get the container id use "docker container ls -a"
 }
