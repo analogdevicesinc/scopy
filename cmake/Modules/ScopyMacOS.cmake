@@ -49,6 +49,7 @@ foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
 	set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
 endforeach()
 
+# needs revising
 install(
 	CODE "
 	set(BU_CHMOD_BUNDLE_ITEMS ON)
@@ -63,13 +64,21 @@ set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
-file(GLOB_RECURSE DECODERS ${LIBSIGROK_DECODERS_DIR}/*.py)
-foreach(_decoder ${DECODERS})
-	file(RELATIVE_PATH _file ${LIBSIGROK_DECODERS_DIR} ${_decoder})
-	get_filename_component(_path ${_file} DIRECTORY)
-	set_property(SOURCE ${_decoder} PROPERTY MACOSX_PACKAGE_LOCATION MacOS/decoders/${_path})
-	set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${_decoder})
-endforeach()
+
+macro(set_macosx_package_location source_dir location extension)
+	file(GLOB_RECURSE files ${source_dir}/*${extension})
+	foreach(_file ${files})
+		file(RELATIVE_PATH _relative_path ${source_dir} ${_file})
+		get_filename_component(parent_directory ${_relative_path} DIRECTORY)
+		message(parent_directory: ${parent_directory})
+		set_property(SOURCE ${_file} PROPERTY MACOSX_PACKAGE_LOCATION ${location}/${parent_directory})
+		message(location/parent_directory ${location}/${parent_directory})
+		set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${_file})
+	endforeach()
+endmacro()
+
+set_macosx_package_location(${LIBSIGROK_DECODERS_DIR} "MacOS/decoders" "py")
+set_macosx_package_location(${CMAKE_BINARY_DIR}/style "MacOS/style" "")
 
 set(EXTRA_BUNDLE_FILES
     ${EXTRA_BUNDLE_FILES}

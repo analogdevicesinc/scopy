@@ -39,10 +39,6 @@ function(add_subdirectories_with_options base_dir output_dir prefix)
 				# Set output directories based on platform
 				if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 					set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_dir})
-				elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-					set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-					    "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/${output_dir}"
-					)
 				else()
 					set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${output_dir})
 				endif()
