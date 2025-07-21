@@ -32,7 +32,7 @@ endif()
 
 # set default install path to /usr/local if not set externally
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "/usr/local")
+	set_property(CACHE CMAKE_INSTALL_PREFIX PROPERTY VALUE "/usr/local")
 endif()
 
 find_program(CCACHE_FOUND ccache)
@@ -290,9 +290,15 @@ configure_file(resources/qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf COP
 configure_file(resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
 
 if(DEFINED ENV{APPIMAGE})
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ci/general/scopy.desktop DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/applications)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/scopy.png DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/512x512/apps RENAME scopy.png)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ci/general/scopy.desktop
+		DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/applications
+	)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/scopy.png
+		DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/512x512/apps RENAME scopy.png
+	)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg
+		DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg
+	)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/applications)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg
