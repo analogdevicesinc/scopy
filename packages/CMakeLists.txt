@@ -35,6 +35,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 include(PackageUtils)
 
+set(ENABLE_PACKAGE_TEST-PLUGINS OFF)
 if(DISABLE_ALL_PACKAGES)
 	enable_all_packages(${CMAKE_CURRENT_SOURCE_DIR} OFF)
 	message(STATUS "DISABLE_ALL_PACKAGES is set.")
