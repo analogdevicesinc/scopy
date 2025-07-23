@@ -1,0 +1,13 @@
+{
+    "id": "qiq",
+    "title": "QIQ Package",
+    "version": "@PROJECT_VERSION@",
+    "description": "QIQ Package for Scopy",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  

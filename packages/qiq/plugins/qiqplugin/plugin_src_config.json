@@ -1,0 +1,40 @@
+{
+    "baseplugin": false,
+    "plugin_name": "qiqplugin",
+    "plugin_display_name": "QIQ",
+    "plugin_description": "A new plugin",
+    "class_name": "QIQPlugin",
+    "namespace": "scopy::qiqplugin",
+    "device_category": "iio",
+    "tools": [
+        {
+            "id": "qiqinstrument",
+            "tool_name": "QIQInstrument",
+            "file_name": "qiqinstrument",
+            "class_name": "QIQInstrument",
+            "namespace": "scopy::qiqplugin"
+        }
+    ],
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "style": {
+        "qss": true,
+        "json": false
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true,
+    "pdk": {
+        "deps_path": "",
+        "project_path": ""
+    }
+}
