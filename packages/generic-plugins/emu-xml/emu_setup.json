@@ -1,0 +1,11 @@
+[
+    {
+	"device": "adalm2000",
+	"uri": "ip:127.0.0.1",
+	"emu-type": "adalm2000"
+    },
+    {
+	"device": "generic",
+	"uri": "ip:127.0.0.1"
+    }
+]
