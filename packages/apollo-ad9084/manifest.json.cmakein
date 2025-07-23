@@ -8,6 +8,6 @@
     "download_link": "",
     "zip_checksum": "",
     "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
-    "category": ["iio", "plugin"]
+    "category": ["iio", "plugin", "base-pkg"]
   }
   
