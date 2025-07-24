@@ -18,7 +18,7 @@ Package Manager - Test Suite
          - 
 
 
-Test 1 - PKG_MANAGER.DISCOVERY.LOAD
+Test 1 - Package Discovery Load
 -----------------------------------
 
 **UID:** PKG_MANAGER.DISCOVERY.LOAD
@@ -35,23 +35,13 @@ Test 1 - PKG_MANAGER.DISCOVERY.LOAD
             - All packages in the designated directories are listed and loaded without errors.
             - The following packages are expected to be loaded:
 
-              * core
-              * common
-              * gui
-              * gr-util
-              * iioutil
-              * iio-widgets
-              * pluginbase
-              * packages/generic-plugins
-              * packages/ad936x
-              * packages/dac
-              * packages/m2k
-              * packages/pluto
-              * packages/pqm
-              * packages/regmap
-              * packages/swiot
-              * packages/test
-              * packages/test2
+              * ad936x, 
+              * apollo ad9084, 
+              * generic plugins, 
+              * adalm2000, 
+              * power quality monitor, 
+              * ad-swiot1l-sl
+
         - **Actual result:**
 
 ..
@@ -76,11 +66,10 @@ Test 1 - PKG_MANAGER.DISCOVERY.LOAD
   The result of the test goes here (PASS/FAIL).
 ..
 
-Test 2 - PKG_MANAGER.RESOURCE.ACCESS
+Test 2 - Package Resource Access
 --------------------------------------
 
 **UID:** PKG_MANAGER.RESOURCE.ACCESS
-
 **Description:** Ensure that resources (XML, CSV, etc.) within packages are accessible and used by the application.
 
 **Preconditions:**
@@ -117,7 +106,7 @@ Test 2 - PKG_MANAGER.RESOURCE.ACCESS
   The result of the test goes here (PASS/FAIL).
 ..
 
-Test 3 - PKG_MANAGER.CREATE
+Test 3 - Package Create
 -----------------------------
 
 **UID:** PKG_MANAGER.CREATE
@@ -133,15 +122,32 @@ Test 3 - PKG_MANAGER.CREATE
 
 **Steps:**
     1. Prepare a `pkg.json` configuration file for the new package (see example in the developer guide).
-    2. Run the following command to generate the package structure:
+    2. Run the following command to generate the package template:
 
         .. code-block:: bash
 
             ./package_generator.py --all --config_file_path=path/to/pkg.json
 
-    3. Verify that a new folder for "test_pkg" is created in the appropriate location with the expected structure and files (including a manifest file).
-    4. (Optional) If using the package manager UI, check that "test_pkg" appears in the list of available packages (but not yet installed).
-        - **Expected result:** The "test_pkg" package is created with the correct structure and metadata, and is available for installation.
+    3. Verify that a new folder for "test_pkg" is created as a development template in `scopy/packages/` with the expected structure and files (including a manifest file).
+        - Folder hierarchy when using the `--all` flag should look like:
+
+          ├── CMakeLists.txt
+          ├── include
+          │   └── newpackage
+          ├── manifest.json.cmakein
+          ├── plugins
+          │   └── newplugin
+          ├── resources
+          │   ├── translations
+          │   └── translations.qrc
+          └── style
+              ├── json
+              └── qss
+                  ├── generic
+                  └── properties
+
+    4. If a build is performed, the new package should be present in the build folder as well.
+        - **Expected result:** The "test_pkg" package template is created in `scopy/packages/` with the correct structure and metadata, and after build, it appears in the build folder.
         - **Actual result:**
 
 ..
@@ -167,7 +173,7 @@ Test 3 - PKG_MANAGER.CREATE
 ..
 
 
-Test 4 - PKG_MANAGER.INSTALL
+Test 4 - Package Install
 ------------------------------
 
 **UID:** PKG_MANAGER.INSTALL
@@ -179,9 +185,10 @@ Test 4 - PKG_MANAGER.INSTALL
     - Scopy running with package manager UI accessible.
 
 **Steps:**
-    1. In the package manager UI, search for the package named "test_pkg" .
-    2. Install the "test_pkg" package.
-    3. Check that "test_pkg" appears in the package list and is enabled/usable.
+    1. Create a zip file of the "test_pkg" package or ensure it is in the correct format for installation.
+    2. In the package manager UI, search for the zipped package named "test_pkg".
+    3. Install the "test_pkg" package.
+    4. Check that "test_pkg" appears in the package list and is enabled/usable.
         - **Expected result:** The "test_pkg" package appears in the list and its features are available in Scopy.
         - **Actual result:**
 
@@ -207,7 +214,7 @@ Test 4 - PKG_MANAGER.INSTALL
 ..
 
 
-Test 5 - PKG_MANAGER.UNINSTALL
+Test 5 - Package Uninstall
 --------------------------------
 
 **UID:** PKG_MANAGER.UNINSTALL
@@ -221,9 +228,12 @@ Test 5 - PKG_MANAGER.UNINSTALL
 **Steps:**
     1. In the package manager UI, locate the "test_pkg" package.
     2. Uninstall the "test_pkg" package.
-    3. Check that "test_pkg" is removed from the package list and its features are no longer available in Scopy.
+    3. A button should appear for a Restart.
+    4. Press the Restart button.
+    5. After Scopy restarts, check that "test_pkg" is removed from the package list and its features are no longer available in Scopy.
         - **Expected result:** The "test_pkg" package is removed from the list and its features are not available.
         - **Actual result:**
+
 
 ..
   Actual test result goes here.
@@ -297,11 +307,13 @@ Test 7 - Error handling
 **Description:** Ensure that errors (e.g., missing/corrupt package, bad resource) are handled gracefully.
 
 **Preconditions:**
-    - At least one broken or incomplete package present.
+    - Scopy running with package manager UI accessible.
 
 **Steps:**
-    1. Start Scopy with a broken package in the directory.
-        - **Expected result:** Error is reported to the user, but Scopy remains stable.
+    1. Create an archive (zip) of a package but omit the manifest file (e.g., remove `manifest.json` before archiving).
+    2. Attempt to install the corrupted package using the package manager UI.
+    3. Observe the result.
+        - **Expected result:** An error is reported and Scopy remains stable without crashing or freezing.
         - **Actual result:**
 
 ..
@@ -411,19 +423,19 @@ Test 10 - Plugin info About page
 
 **UID:** PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE
 
-**Description:** Ensure that the About page for each package/plugin displays correct and updated information. Use the ADC generic plugin as a concrete example, which provides an `about.md` file.
+**Description:** Ensure that the "Plugins Info" tab in the About section lists all plugins that are currently loaded (i.e., have the "loaded" label).
 
 **Preconditions:**
-    - The ADC plugin is installed and enabled in Scopy.
+    - Multiple plugins installed and enabled in Scopy.
 
 **Steps:**
-    1. Open the About page for the ADC plugin (e.g., via the plugin manager or plugin UI).
-        - **Expected result:** The page displays the content from `plugins/adc/res/about.md`, including the correct name, version, and other metadata.
+    1. Open the About section in Scopy.
+    2. Navigate to the "Plugins Info" tab.
+    3. Verify that all plugins which are loaded are listed and have the "loaded" label.
+        - **Expected result:** The "Plugins Info" tab displays all loaded plugins with the correct label, reflecting the actual state of the application.
         - **Actual result:**
 
-
-
-..  
+..
   Actual test result goes here.
 ..
 
