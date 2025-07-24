@@ -21,6 +21,7 @@ Contents
    instrument_detaching_tests
    general_preferences_tests
    package_manager_tests
+   scripting_tool
    
 ..
  add the path to each core feature test case here
