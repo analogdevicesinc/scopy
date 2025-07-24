@@ -724,3 +724,69 @@ Test 8: The log window from the debugger correctly displays the operations
   The result of the test goes here (PASS/FAIL).
 
 
+.. _tst-dbg-codegen:
+
+Test 9: Code Generator
+----------------------------------------------------------------------------------------------------------------------------
+
+**UID**: TST.DBG.CODEGEN
+
+**Description**: This test verifies that the Debugger tool can generate correct libiio C code for connecting to a device.
+
+**Preconditions**:
+        - Pluto device is connected
+        - Scopy is installed on the system
+        - OS: ANY
+
+**Steps**:
+        1. Connect a Pluto device to the computer.
+        2. Open the Debugger tool in Scopy.
+        3. Select `iio:device0: ad9361-phy` from the navigation tree.
+        4. Go to the libiio code tab.
+        5. Verify that the following code is displayed:
+
+            .. code-block:: c
+
+                #include <iio.h>
+                #include <stdio.h>
+                #include <errno.h>
+
+                int main(int argc, char *argv[]) {
+                  char buffer[1024];
+                  ssize_t ret;
+                  struct iio_context *ctx = iio_create_context_from_uri("ip:192.168.2.1");
+                  if (!ctx) {
+                    printf("Error %d: Failed to create context\n", errno);
+                    return -1;
+                  }
+                  struct iio_device *ad9361_phy = iio_context_find_device(ctx, "ad9361-phy");
+                  if (!ad9361_phy) {
+                    printf("Error: Could not find device ad9361-phy\n");
+                  }
+                  iio_context_destroy(ctx);
+                  return 0;
+                }
+
+            - **Expected result:** The code tab displays the correct libiio C code for connecting to ad9361-phy.
+            - **Actual result:**
+
+..
+        Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+

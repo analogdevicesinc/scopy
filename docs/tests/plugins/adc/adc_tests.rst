@@ -1499,3 +1499,49 @@ Test 6 - Default YMode
 
 ..
   The result of the test goes here (PASS/FAIL).
+
+
+Test 7 - Channel Averaging
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _TST.ADC_FREQ.CHANNEL_AVERAGING:
+
+**UID:** TST.ADC_FREQ.CHANNEL_AVERAGING
+
+**Description:** Verify channel averaging functionality in ADC-Frequency
+
+**Preconditions:**
+   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
+   - OS: ANY
+
+**Steps:**
+   1. Connect to a Pluto device
+   2. Open ADC-Frequency
+   3. Enable only voltage1 channel
+   4. Select voltage1 channel to open channel settings
+   5. Enable averaging for the channel
+   6. Set averaging size to 10
+       - **Expected result:** The curve value for voltage1 should change according to the averaging setting
+       - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+..
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+..
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+
