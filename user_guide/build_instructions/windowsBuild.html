@@ -4,12 +4,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="In order to emulate a UNIX-like environment for building Scopy on Windows, we use MSYS2." name="description" />
 
     <title>Windows Build Instructions &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=25ed7d6a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=33d8ff8e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
-    <script defer="" src="../../_static/app.umd.js?v=80d097f0"></script>
+    <script async="async" src="../../_static/app.umd.js?v=cd58f2cb"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -60,7 +61,7 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com"></a>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
         <a id="logo" href="../../index.html">
@@ -275,7 +276,7 @@ Content on this topic
 <section id="building-scopy">
 <h2>Building Scopy<a class="headerlink" href="#building-scopy" title="Link to this heading"></a></h2>
 <p>In order to emulate a UNIX-like environment for building Scopy on Windows, we use MSYS2.</p>
-<p>To install MSYS2, follow these instructions: <a class="reference external" href="https://www.msys2.org/#installation">MSYS2 Installation</a>.
+<p>To install MSYS2, follow these instructions: <a class="icon link reference external" href="https://www.msys2.org/#installation" target="_blank">MSYS2 Installation</a>.
 We suggest installing the MSYS2 in root of the <strong>C:\</strong> partition. In this tutorial the MSYS2 install path is <strong>C:\msys64</strong>, if you choose a different install directory, make sure to also update the paths.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -372,7 +373,7 @@ The option “Edit environment variables for your account” should appear; Clic
 <ol class="arabic">
 <li><p>Install Qt Creator:</p>
 <ul class="simple">
-<li><p>Download the Qt Creator installer (offline or online) from the official <a class="reference external" href="https://www.qt.io/download-dev">Qt Downloads page</a>.</p></li>
+<li><p>Download the Qt Creator installer (offline or online) from the official <a class="icon link reference external" href="https://www.qt.io/download-dev" target="_blank">Qt Downloads page</a>.</p></li>
 <li><p>During the installation process, select only the <strong>Qt Creator</strong> option. This ensures that only the Qt Creator IDE is installed. The necessary Qt libraries will be sourced from the MSYS2 folder.</p></li>
 <li><p>Once the installation is complete, open Qt Creator.</p></li>
 </ul>
@@ -400,7 +401,7 @@ The option “Edit environment variables for your account” should appear; Clic
 </section>
 <section id="creating-an-installer">
 <h2>Creating an Installer<a class="headerlink" href="#creating-an-installer" title="Link to this heading"></a></h2>
-<p>To create an installer, the first step is to install the <a class="reference external" href="https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe">Inno Setup Compiler</a>.</p>
+<p>To create an installer, the first step is to install the <a class="icon link reference external" href="https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" target="_blank">Inno Setup Compiler</a>.</p>
 <p>After that, there is only one more step:</p>
 <ul>
 <li><p>Run the command:</p>
@@ -419,12 +420,12 @@ The option “Edit environment variables for your account” should appear; Clic
 is essentially a snapshot of an operating system that includes all the libraries and dependencies required to build the application.</p>
 <p>This tutorial has only two requirements:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://git-scm.com/downloads/win">Git</a>: Used to download the source code from GitHub.</p></li>
-<li><p><a class="reference external" href="https://docs.docker.com/desktop/setup/install/windows-install/">Docker Desktop</a>: Used to download and run the Docker image.</p></li>
+<li><p><a class="icon link reference external" href="https://git-scm.com/downloads/win" target="_blank">Git</a>: Used to download the source code from GitHub.</p></li>
+<li><p><a class="icon link reference external" href="https://docs.docker.com/desktop/setup/install/windows-install/" target="_blank">Docker Desktop</a>: Used to download and run the Docker image.</p></li>
 </ul>
 <p>To simplify the process, you can download a pre-configured Docker image specifically set
-up to build and package the Scopy application. These Docker images are hosted on <a class="reference external" href="https://hub.docker.com/u/cristianbindea">Docker Hub</a>
-and are free to download. Additionally, the recipe for each image is available in the <a class="reference external" href="https://github.com/analogdevicesinc/scopy/tree/main/ci">Scopy repository</a>.</p>
+up to build and package the Scopy application. These Docker images are hosted on <a class="icon link reference external" href="https://hub.docker.com/u/cristianbindea" target="_blank">Docker Hub</a>
+and are free to download. Additionally, the recipe for each image is available in the <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/tree/main/ci" target="_blank">Scopy repository</a>.</p>
 <p>After you have installed Docker Desktop, the next steps will be run inside a powershell terminal.</p>
 <ol class="arabic">
 <li><p>Clone the Scopy repository</p>

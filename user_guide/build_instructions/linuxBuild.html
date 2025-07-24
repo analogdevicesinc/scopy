@@ -4,12 +4,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Before building Scopy on a Linux system, ensure all necessary requirements are installed. One key prerequisite is installing the Qt Framework (LTS version 5.15), which can be done using either the online or offline installer available on the official Qt Downloads page." name="description" />
 
     <title>Linux Build Instructions &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=25ed7d6a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=33d8ff8e" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
-    <script defer="" src="../../_static/app.umd.js?v=80d097f0"></script>
+    <script async="async" src="../../_static/app.umd.js?v=cd58f2cb"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -60,7 +61,7 @@
     </div>
     <div id="right">
       <span>
-        <a id="logo-org" href="https://analog.com"></a>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
         <div class="vertical-divider"></div>
         <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
         <a id="logo" href="../../index.html">
@@ -283,10 +284,10 @@ Content on this topic
 <section id="qt-setup-instructions">
 <h2>Qt Setup Instructions<a class="headerlink" href="#qt-setup-instructions" title="Link to this heading"></a></h2>
 <p>Before building Scopy on a Linux system, ensure all necessary requirements are installed.
-One key prerequisite is installing the Qt Framework (LTS version 5.15), which can be done using either the online or offline installer available on the official <a class="reference external" href="https://www.qt.io/download-dev">Qt Downloads page</a>.</p>
+One key prerequisite is installing the Qt Framework (LTS version 5.15), which can be done using either the online or offline installer available on the official <a class="icon link reference external" href="https://www.qt.io/download-dev" target="_blank">Qt Downloads page</a>.</p>
 <p>If you want to continue the development of the Scopy application, we recommend using the Qt Creator.
-This can be installed with the official installer from <a class="reference external" href="https://www.qt.io/download-dev">Qt Downloads page</a>, just make sure to also select the Qt Creator, alongside the Qt libraries, in the Qt Maintenance tool.</p>
-<p>Another way to install the Qt Framework is to use the unofficial Qt CLI Installer <a class="reference external" href="https://github.com/miurahr/aqtinstall">aqtinstall</a>.
+This can be installed with the official installer from <a class="icon link reference external" href="https://www.qt.io/download-dev" target="_blank">Qt Downloads page</a>, just make sure to also select the Qt Creator, alongside the Qt libraries, in the Qt Maintenance tool.</p>
+<p>Another way to install the Qt Framework is to use the unofficial Qt CLI Installer <a class="icon link reference external" href="https://github.com/miurahr/aqtinstall" target="_blank">aqtinstall</a>.
 Note that this method is not recommended if you want to continue developing the Scopy application or any other application that uses the Qt Framework. For a more secure method use the official installer.</p>
 <p>To use aqtinstall, first clone the Scopy repository. With Python3 installed, execute the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>scopy/ci/ubuntu/ubuntu_build_process.sh<span class="w"> </span>install_qt
@@ -347,7 +348,7 @@ To speed up the process, you can run make with <code class="docutils literal not
 </section>
 <section id="qt-creator-project-configuration">
 <h2>Qt Creator project configuration<a class="headerlink" href="#qt-creator-project-configuration" title="Link to this heading"></a></h2>
-<p>In order to streamline the development of the Scopy application, we recommend using the <a class="reference external" href="https://www.qt.io/product/development-tools">Qt Creator IDE</a>.</p>
+<p>In order to streamline the development of the Scopy application, we recommend using the <a class="icon link reference external" href="https://www.qt.io/product/development-tools" target="_blank">Qt Creator IDE</a>.</p>
 <p>To start using Qt Creator for development, you have to first install all dependencies needed to build Scopy. To make sure you have this done right, follow the <a class="reference internal" href="#building-scopy">Building Scopy</a> tutorial from above.</p>
 <p>After that, open Qt Creator and click <strong>Open Project</strong>. Navigate to the location where you cloned Scopy and select the <strong>CMakeLists.txt</strong> file. Last step is to click <strong>configure</strong>, and Qt Creator should be able to build the application at the press of a button.
 If there are errors at the building phase, try to first make a build manually from the terminal using the steps in <a class="reference internal" href="#building-scopy">Building Scopy</a>, and inside the Qt Creator, select the build folder and click <strong>Configure</strong>.</p>
@@ -358,7 +359,7 @@ If there are errors at the building phase, try to first make a build manually fr
 <p>If you want to create a Scopy installer for the Linux x86_64 architecture, you have two options: <cite>AppImage</cite> or <cite>Flatpak</cite>.</p>
 <section id="appimage">
 <h3>AppImage<a class="headerlink" href="#appimage" title="Link to this heading"></a></h3>
-<p>An <a class="reference external" href="https://docs.appimage.org/index.html">AppImage</a> is a self-contained file that includes all the necessary components for an application to run.
+<p>An <a class="icon link reference external" href="https://docs.appimage.org/index.html" target="_blank">AppImage</a> is a self-contained file that includes all the necessary components for an application to run.
 Once made executable and launched, the AppImage directly opens the application.</p>
 <ul class="simple">
 <li><p>To create a Scopy AppImage you will need the Scopy build dependencies to be already build and installed. If they are not installed, run the commad</p></li>
@@ -376,8 +377,8 @@ Once made executable and launched, the AppImage directly opens the application.<
 </section>
 <section id="flatpak">
 <h3>Flatpak<a class="headerlink" href="#flatpak" title="Link to this heading"></a></h3>
-<p>A <a class="reference external" href="https://docs.flatpak.org/en/latest">Flatpak</a>
-- To use a Flatpak application, you first want to install the flatpak cli using the <a class="reference external" href="https://flatpak.org/setup">instructions</a>.</p>
+<p>A <a class="icon link reference external" href="https://docs.flatpak.org/en/latest" target="_blank">Flatpak</a>
+- To use a Flatpak application, you first want to install the flatpak cli using the <a class="icon link reference external" href="https://flatpak.org/setup" target="_blank">instructions</a>.</p>
 <ul class="simple">
 <li><p>After that to use Flatpak for building an installer you will need to install the following packages and runtimes.</p></li>
 </ul>
@@ -402,7 +403,7 @@ $<span class="w"> </span>sudo<span class="w"> </span>flatpak<span class="w"> </s
 The tutorial for building an installer for <cite>x86_64</cite> was presented above.</p>
 <p>The Scopy installer for other architectures can be done locally on the host operating system, but it is out of the scope of this tutorial.
 A shortcut that can be taken here is to download the Docker Image that is already configured to build and package the Scopy application.
-All Docker Images are hosted on <a class="reference external" href="https://hub.docker.com/u/cristianbindea">Dockerhub</a>, and can be freely downloaded. The recipe for each image can be found inside the <a class="reference external" href="https://github.com/analogdevicesinc/scopy/tree/main/ci">Scopy</a> repository.</p>
+All Docker Images are hosted on <a class="icon link reference external" href="https://hub.docker.com/u/cristianbindea" target="_blank">Dockerhub</a>, and can be freely downloaded. The recipe for each image can be found inside the <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/tree/main/ci" target="_blank">Scopy</a> repository.</p>
 <p>Next, a temporary Docker volume is created to link the local environment with the Docker container.
 The compilation process takes place inside the container using the pre-configured filesystem.
 This Docker volume will include the previously cloned Scopy repository.</p>
