@@ -16,56 +16,19 @@ to provide all the specific functionalities of this system.
    For an overview of the AD-SWIOT1L-SL system, check the complete user guide: `AD-SWIOT1L-SL User <https://wiki.analog.com/resources/eval/user-guides/ad-swiot1l-sl>`_
 
 .. warning::
-   The Scopy application is in the process of a major rework so a mismatch
-   between some parts of the documentation and the actual application may
-   exist. The new Scopy version is not officially released, so the
-   installers for Scopy with AD-SWIOT1L-SL plugin will be available at the
-   links provided below.
+   For maximum compatibility, please use Scopy v2.0 or newer.
+   The AD-SWIOT1L-SL system is not compatible with Scopy v1.4.1 or older.
 
+.. note::
+   Check the following `AD-SWIOT1L-SL video series <https://www.analog.com/en/resources/media-center/videos/video-series/getting-up-running-ad-swiot1l-sl-series.html>`_
 
 Software setup
 ---------------------------------------------------------------------
 
-**Scopy for Windows**
-`Download: Installer for latest release (Windows 64/32-bit); Updated: November
-2023 <https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-setup.zip>`_
+Download the installer for your Operating System from the Scopy `latest release <https://github.com/analogdevicesinc/scopy/releases/tag/v2.0.0>`_.
 
-**Scopy for Windows portable**
-`Download: Portable version for latest release (Windows 64/32-bit); Updated: November
-2023 <https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-portable.zip>`_
+Use the :ref:`install guide <user_guide>` for detailed information.
 
-**Scopy for Linux**
-`Download: Scopy Flatpak installer; Updated: November 2023 
-<https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-linux.zip>`_
-
-**Scopy for OSX**
-`Download: Scopy MacOS installer
-<https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-prealpha-swiot1l/scopy-prealpha-macos.zip>`_
-
-Software installation
----------------------------------------------------------------------
-**Windows** 
-
- Once you downloaded the installer, run it and follow all the required steps.
- After completion, system reboot is required.
-
-**Linux** 
-
- Setup Flatpak using `the setup guide <https://flatpak.org/setup/Ubuntu>`_ for your Linux distribution.
-
- After Flatpak is setup get the **Scopy.flatpak** file from the downloaded archive and run:
-
- **flatpak install scopy–flatpak.flatpak**
-
-**MacOS**
-
- Double click the downloaded .dmg to make its content available. “Scopy” will 
- show up in the Finder sidebar and a window showing the content should open up. 
- Drag the application from the .dmg window into Applications to install and wait 
- for the process to finish.
-
-.. warning::
-   The AD-SWIOT1L-SL system is not compatible with Scopy v1.4.1 or older
 
 Launching the application
 ---------------------------------------------------------------------
@@ -83,7 +46,10 @@ available in the list, but the IP is known, the user can manually write
 the IP in the URI textbox and proceed forward.
 
 .. note::
-   The default static IP for all the boards is **169.254.97.40** .
+   The default static IP for all the boards is **192.168.97.40**
+
+.. note::
+   Please check the no-OS documentation for details on the `network configuration for AD-SWIOT1L-SL <https://github.com/analogdevicesinc/no-OS/tree/main/projects/swiot1l#network-connection-for-the-swiot1l-default-firmware>`_
 
 Once found and verified Scopy will present a list of compatible
 instruments. The list of instruments is explained below, but during this
