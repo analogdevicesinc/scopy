@@ -245,8 +245,16 @@ double PlotChannel::getValueAt(double pos)
 		int left = 0;
 		int right = n - 1;
 
-		if(curve_data->sample(right).x() < pos || curve_data->sample(left).x() > pos) {
+		double right_s = curve_data->sample(right).x();
+		double left_s = curve_data->sample(left).x();
+		if(pos < std::min(right_s, left_s) || pos > std::max(right_s, left_s)) {
 			return -1;
+		}
+
+		// this is used in Frequency complex mode
+		bool reversed = false;
+		if(right_s < left_s) {
+			reversed = true;
 		}
 
 		while(left <= right) {
@@ -259,7 +267,7 @@ double PlotChannel::getValueAt(double pos)
 					rightIndex = mid;
 				}
 				break;
-			} else if(xData < pos) {
+			} else if((xData < pos) ^ reversed) {
 				left = mid + 1;
 			} else {
 				right = mid - 1;
