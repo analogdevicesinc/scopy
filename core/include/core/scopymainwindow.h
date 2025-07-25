@@ -28,6 +28,7 @@
 #include "licenseoverlay.h"
 #include "scanbuttoncontroller.h"
 #include "scopyhomepage.h"
+#include "scriptingtool.h"
 #include "devicemanager.h"
 #include "scannediiocontextcollector.h"
 #include "detachedtoolwindowmanager.h"
@@ -82,6 +83,10 @@ public Q_SLOTS:
 	void saveSession(QSettings &s);
 	void loadSession(QSettings &s);
 
+private Q_SLOTS:
+	void handleScriptingToolDetach();
+	void handleScriptingToolRequest();
+
 private:
 	ScopyAboutPage *about;
 	ScopyPreferencesPage *prefPage;
@@ -102,6 +107,11 @@ private:
 	ToolMenuManager *m_toolMenuManager;
 	ScanButtonController *m_sbc;
 
+	// Scripting tool detach/attach logic
+	ScriptingTool *m_scriptingTool;
+	QWidget *m_detachedScriptingWindow;
+	bool m_scriptingToolDetached;
+
 	void loadOpenGL();
 	void initPythonWIN32();
 	void loadDecoders();
@@ -113,9 +123,12 @@ private:
 	void highlightMenuItem(ToolStack *ts, int idx);
 	void collapseToolMenu(bool collapse);
 	void showWhatsNew();
+	void detachScriptingTool();
+	void attachScriptingTool();
 
 protected:
 	void closeEvent(QCloseEvent *event) override;
+	bool eventFilter(QObject *watched, QEvent *event) override;
 };
 } // namespace scopy
 #endif // SCOPYMAINWINDOW_H

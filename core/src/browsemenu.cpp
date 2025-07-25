@@ -21,8 +21,10 @@
 
 #include "browsemenu.h"
 #include "style.h"
+#include <pluginbase/preferences.h>
 
 #include <QPushButton>
+#include <QMouseEvent>
 #include <stylehelper.h>
 
 using namespace scopy;
@@ -68,6 +70,31 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 		[this, homeBtn](bool collapsed) { hideBtnText(homeBtn, tr("Home"), collapsed); });
 	m_btnsMap[HOME_ID] = homeBtn;
 
+	// Scripting button (availability controlled by preference)
+	m_scriptingBtn = createBtn("Scripting", ":/gui/icons/tool_scripting.svg", m_content);
+	Style::setStyle(m_scriptingBtn, style::properties::button::toolButton);
+	m_scriptingBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
+	m_scriptingBtn->setStyleSheet("text-align: left");
+	m_scriptingBtn->setIconSize(QSize(32, 32));
+	m_scriptingBtn->setCheckable(true);
+	m_scriptingBtn->setChecked(false);
+
+	m_btnsMap[SCRIPTING_ID] = m_scriptingBtn;
+	connect(m_scriptingBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(SCRIPTING_ID); });
+	bool scriptingEnabled = Preferences::get("general_scripting_enabled").toBool();
+	m_scriptingBtn->setVisible(scriptingEnabled);
+
+	m_scriptingBtn->installEventFilter(this);
+
+	// Connect to preference changes for scripting button
+	Preferences *prefs = Preferences::GetInstance();
+	connect(prefs, &Preferences::preferenceChanged, this, [=](QString key, QVariant val) {
+		if(key == "general_scripting_enabled") {
+			bool enabled = val.toBool();
+			m_scriptingBtn->setVisible(enabled);
+		}
+	});
+
 	QWidget *saveLoadWidget = new QWidget(m_content);
 	saveLoadWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	saveLoadWidget->setLayout(new QHBoxLayout(saveLoadWidget));
@@ -103,6 +130,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	preferencesBtn->setCheckable(true);
 	m_btnsMap[PREFERENCES_ID] = preferencesBtn;
 
+	// About button
 	QPushButton *aboutBtn = createBtn(
 		"About", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/info.svg",
 		m_content);
@@ -116,11 +144,13 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	btnGroup->addButton(homeBtn);
 	btnGroup->addButton(pkgBtn);
+	btnGroup->addButton(m_scriptingBtn);
 	btnGroup->addButton(preferencesBtn);
 	btnGroup->addButton(aboutBtn);
 
 	add(createHLine(m_content), "headerLine", MA_TOPLAST);
 	add(homeBtn, "homeBtn", MA_TOPLAST);
+	add(m_scriptingBtn, "scriptingBtn", MA_TOPLAST);
 	add(createHLine(m_content), "toolMenuLine1", MA_TOPLAST);
 	add(m_toolMenu, "toolMenu", MA_TOPLAST);
 
@@ -165,6 +195,18 @@ void BrowseMenu::toggleCollapsed()
 	m_collapsed = !m_collapsed;
 	m_btnCollapse->setHidden(m_collapsed);
 	Q_EMIT collapsed(m_collapsed);
+}
+
+bool BrowseMenu::eventFilter(QObject *watched, QEvent *event)
+{
+	if(watched == m_scriptingBtn && event->type() == QEvent::MouseButtonDblClick) {
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+		if(mouseEvent->button() == Qt::LeftButton) {
+			Q_EMIT scriptingToolDetach();
+			return true;
+		}
+	}
+	return QWidget::eventFilter(watched, event);
 }
 
 void BrowseMenu::hideBtnText(QPushButton *btn, QString name, bool hide)

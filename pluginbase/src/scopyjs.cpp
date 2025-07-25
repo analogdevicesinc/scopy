@@ -147,7 +147,11 @@ void ScopyJS::msleep(unsigned long ms)
 	}
 }
 
-void ScopyJS::printToConsole(const QString &text) { cout << text.toStdString() << std::endl; }
+QString ScopyJS::printToConsole(const QString &text)
+{
+	cout << text.toStdString() << std::endl;
+	return text;
+}
 
 QString ScopyJS::readFromConsole(const QString &request)
 {
