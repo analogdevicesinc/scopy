@@ -92,7 +92,6 @@
 <li><a class="reference internal" href="#">AD-SWIOT1L-SL plugin</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#software-setup">Software setup</a></li>
-<li><a class="reference internal" href="#software-installation">Software installation</a></li>
 <li><a class="reference internal" href="#launching-the-application">Launching the application</a></li>
 <li><a class="reference internal" href="#power-supply-options">Power Supply Options</a></li>
 <li><a class="reference internal" href="#system-operation-modes">System operation modes</a></li>
@@ -286,50 +285,18 @@ to provide all the specific functionalities of this system.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>The Scopy application is in the process of a major rework so a mismatch
-between some parts of the documentation and the actual application may
-exist. The new Scopy version is not officially released, so the
-installers for Scopy with AD-SWIOT1L-SL plugin will be available at the
-links provided below.</p>
+<p>For maximum compatibility, please use Scopy v2.0 or newer.
+The AD-SWIOT1L-SL system is not compatible with Scopy v1.4.1 or older.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Check the following <a class="icon link reference external" href="https://www.analog.com/en/resources/media-center/videos/video-series/getting-up-running-ad-swiot1l-sl-series.html" target="_blank">AD-SWIOT1L-SL video series</a></p>
 </div>
 </section>
 <section id="software-setup">
 <h2>Software setup<a class="headerlink" href="#software-setup" title="Link to this heading"></a></h2>
-<p><strong>Scopy for Windows</strong>
-<a class="icon link reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-setup.zip" target="_blank">Download: Installer for latest release (Windows 64/32-bit); Updated: November
-2023</a></p>
-<p><strong>Scopy for Windows portable</strong>
-<a class="icon link reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-windows-portable.zip" target="_blank">Download: Portable version for latest release (Windows 64/32-bit); Updated: November
-2023</a></p>
-<p><strong>Scopy for Linux</strong>
-<a class="icon link reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-alpha-swiot1l/scopy-alpha-linux.zip" target="_blank">Download: Scopy Flatpak installer; Updated: November 2023</a></p>
-<p><strong>Scopy for OSX</strong>
-<a class="icon link reference external" href="https://swdownloads.analog.com/cse/ad-swiot1l-sl/scopy-prealpha-swiot1l/scopy-prealpha-macos.zip" target="_blank">Download: Scopy MacOS installer</a></p>
-</section>
-<section id="software-installation">
-<h2>Software installation<a class="headerlink" href="#software-installation" title="Link to this heading"></a></h2>
-<p><strong>Windows</strong></p>
-<blockquote>
-<div><p>Once you downloaded the installer, run it and follow all the required steps.
-After completion, system reboot is required.</p>
-</div></blockquote>
-<p><strong>Linux</strong></p>
-<blockquote>
-<div><p>Setup Flatpak using <a class="icon link reference external" href="https://flatpak.org/setup/Ubuntu" target="_blank">the setup guide</a> for your Linux distribution.</p>
-<p>After Flatpak is setup get the <strong>Scopy.flatpak</strong> file from the downloaded archive and run:</p>
-<p><strong>flatpak install scopy–flatpak.flatpak</strong></p>
-</div></blockquote>
-<p><strong>MacOS</strong></p>
-<blockquote>
-<div><p>Double click the downloaded .dmg to make its content available. “Scopy” will
-show up in the Finder sidebar and a window showing the content should open up.
-Drag the application from the .dmg window into Applications to install and wait
-for the process to finish.</p>
-</div></blockquote>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The AD-SWIOT1L-SL system is not compatible with Scopy v1.4.1 or older</p>
-</div>
+<p>Download the installer for your Operating System from the Scopy <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/releases/tag/v2.0.0" target="_blank">latest release</a>.</p>
+<p>Use the <a class="reference internal" href="../../user_guide/index.html#user-guide"><span class="std std-ref">install guide</span></a> for detailed information.</p>
 </section>
 <section id="launching-the-application">
 <h2>Launching the application<a class="headerlink" href="#launching-the-application" title="Link to this heading"></a></h2>
@@ -346,7 +313,11 @@ available in the list, but the IP is known, the user can manually write
 the IP in the URI textbox and proceed forward.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The default static IP for all the boards is <strong>169.254.97.40</strong> .</p>
+<p>The default static IP for all the boards is <strong>192.168.97.40</strong></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please check the no-OS documentation for details on the <a class="icon link reference external" href="https://github.com/analogdevicesinc/no-OS/tree/main/projects/swiot1l#network-connection-for-the-swiot1l-default-firmware" target="_blank">network configuration for AD-SWIOT1L-SL</a></p>
 </div>
 <p>Once found and verified Scopy will present a list of compatible
 instruments. The list of instruments is explained below, but during this
