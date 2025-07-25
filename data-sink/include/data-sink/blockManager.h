@@ -64,6 +64,7 @@ public:
 	void setTargetFPS(uint fps); // set to 0 for inf fps target
 	void setSingleShot(bool single);
 	void setBufferSize(size_t size);
+	void setPlotSize(size_t size);
 	QString name();
 	bool singleShot();
 
@@ -78,20 +79,26 @@ private:
 	// avoids connecting same output multiple times
 	int addOutputLink(SourceBlock *source, BasicBlock *final, uint final_ch, uint out_ch);
 	void emitOutputData(SourceBlock *source = nullptr);
+	void onRequestData(SourceBlock *source);
+	void refilAqcCounter();
 
 Q_SIGNALS:
 	void newData(ChannelDataVector data, uint ch);
-	void sentAllData();
+	void sentBufferData();
+	void sentAllData(); // full plot size
 	void doDisconnectBlockToFilter();
 	void requestSingleShot(bool);
 	void requestBufferSize(uint32_t);
 	void started();
 	void stopped();
+	void requestStop();
 
 private:
 	QString m_name;
+	int m_aqcCounter;
 	bool m_running = false;
 	bool m_singleShot = false;
+	// bool m_runningSingleShot = false;
 	uint m_fps;
 	bool m_waitforAllSources;
 	QElapsedTimer *m_fpsTimer;
@@ -99,6 +106,7 @@ private:
 	QThread *m_thread;
 	QMap<SourceBlock *, SourceBlockLink *> m_blockLinks;
 	size_t m_globalBufferSize;
+	size_t m_globalPlotSize;
 
 	// QMap<output_ch, QPair<final_block, final_ch>> only used to avoid connecting requestData signal to
 	// sourceBlocks multiple times

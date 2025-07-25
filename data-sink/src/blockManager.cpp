@@ -1,4 +1,5 @@
 #include <include/data-sink/blockManager.h>
+#include <iostream>
 #include <QMetaType>
 
 Q_LOGGING_CATEGORY(CAT_BLOCKMANAGER, "BLOCKMANAGER");
@@ -82,7 +83,9 @@ BlockManager::BlockManager(QString name, bool waitforAllSources)
 	, m_fpsTimeElapsed(0)
 	, m_thread(new QThread())
 	, m_globalBufferSize(0)
+	, m_globalPlotSize(0)
 	, m_name(name)
+	, m_aqcCounter(0)
 {
 	moveToThread(m_thread);
 	m_thread->start();
@@ -118,14 +121,29 @@ void BlockManager::emitOutputData(SourceBlock *source)
 
 		// request data to all sources and reset counters
 		if(do_request) {
-			Q_EMIT sentAllData();
+			Q_EMIT sentBufferData();
+
+			// if(m_aqcCounter > 1) {
+				m_aqcCounter--;
+				if(m_aqcCounter == 0) {
+					if(m_singleShot) {
+						m_running = false;
+						Q_EMIT requestStop();
+					} else {
+						refilAqcCounter();
+					}
+					Q_EMIT sentAllData();
+				}
+			// }
 
 			for(auto link : m_blockLinks) {
 				link->finished_outputs = 0;
 
 				if(m_running && link->active_outputs > 0)
-					Q_EMIT m_blockLinks.key(link)->requestData();
+					onRequestData(m_blockLinks.key(link));
+					// Q_EMIT m_blockLinks.key(link)->requestData();
 			}
+
 		}
 
 	} else {
@@ -135,10 +153,14 @@ void BlockManager::emitOutputData(SourceBlock *source)
 			   m_blockLinks[source]->active_outputs > 0) {
 				m_blockLinks[source]->finished_outputs = 0;
 
-				if(m_running)
-					Q_EMIT source->requestData();
+				if(!m_singleShot && m_running)
+					onRequestData(source);
+					// Q_EMIT source->requestData();
 
+				Q_EMIT sentBufferData();
 				Q_EMIT sentAllData();
+				if(m_singleShot)
+					Q_EMIT requestStop();
 			}
 		}
 	}
@@ -148,6 +170,20 @@ BlockManager::~BlockManager()
 {
 	m_thread->exit();
 };
+
+void BlockManager::onRequestData(SourceBlock *source)
+{
+	// m_aqcCounter = (m_globalPlotSize + m_globalBufferSize - 1) / m_globalBufferSize;
+	// int tmpAqcCounter = m_aqcCounter;
+	// while(tmpAqcCounter > 0) {
+	// 	tmpAqcCounter--;
+	// if(m_aqcCounter > 0)
+	// 	m_aqcCounter--;
+
+	// for(int i = 0; i < m_aqcCounter; i++)
+		Q_EMIT source->requestData();
+	// }
+}
 
 int BlockManager::addOutputLink(SourceBlock *source, BasicBlock *final, uint final_ch, uint out_ch)
 {
@@ -164,15 +200,25 @@ int BlockManager::addOutputLink(SourceBlock *source, BasicBlock *final, uint fin
 	QMetaObject::Connection conn = connect(
 		final, &BasicBlock::newData, this,
 		[=](ChannelDataVector data, uint block_ch) {
-			if(block_ch != final_ch || (!m_running && !m_singleShot))
+			if(block_ch != final_ch)
+				return;
+			// std::cout << "------ sent newData: " << data.data.size() << "  on ch: " << out_ch << "  ss: " << m_runningSingleShot << std::endl;
+
+			if(!m_running && !m_singleShot)
 				return;
 
+
+			std::cout << "------ actially sent newData: " << data.data.size() << "  on ch: " << out_ch << std::endl;
 			Q_EMIT newData(data, out_ch);
+
+			// if(--m_aqcCounter > 0)
+			// 	return;
+
 			m_blockLinks[source]->finished_outputs++;
 
 			emitOutputData(source);
 		},
-		Qt::QueuedConnection);
+		Qt::DirectConnection);
 	m_requestDataConnections.insert(out_ch, new OutputConnection(final, final_ch, conn));
 
 	return out_ch;
@@ -203,6 +249,8 @@ void BlockManager::addLink(SourceBlock *source, uint source_ch, BasicBlock *fina
 	// add new link to list
 	if(m_blockLinks.contains(source)) {
 		m_blockLinks[source]->addSource(out_ch, source_ch);
+
+
 	} else {
 		SourceBlockLink *link = new SourceBlockLink(source, threaded);
 		link->addSource(out_ch, source_ch);
@@ -215,16 +263,26 @@ void BlockManager::addLink(SourceBlock *source, uint source_ch, BasicBlock *fina
 
 				// if running and a ch from a source with no enabled channels is enabled, start the
 				// request cycle again
-				if(m_running && en && m_blockLinks[source]->enabledSourceChCount() == 1) {
-					Q_EMIT source->requestData();
+				if(!m_singleShot && m_running && en && m_blockLinks[source]->enabledSourceChCount() == 1) {
+					onRequestData(source);
+					// Q_EMIT source->requestData();
 				}
 			},
 			Qt::QueuedConnection);
 
-		if(source->bufferSize() == 0) {
-			source->setBufferSize(m_globalBufferSize);
-		}
+
+		connect(this, &BlockManager::sentAllData, source, &SourceBlock::resetPlotBuffer);
+		// if(source->bufferSize() == 0) {
+			// source->setBufferSize(m_globalBufferSize);
+		// }
+
+		// if(source->plotSize() == 0) {
+			// source->setPlotSize(m_globalPlotSize);
+		// }
 	}
+
+	source->setBufferSize(m_globalBufferSize);
+	source->setPlotSize(m_globalPlotSize);
 
 	// if input already exists, the threaded status cannot be changed
 	if(m_blockLinks[source]->thread) {
@@ -245,6 +303,14 @@ void BlockManager::setBufferSize(size_t size)
 		it->first->setBufferSize(size);
 	}
 	m_globalBufferSize = size;
+}
+
+void BlockManager::setPlotSize(size_t size)
+{
+	for(auto it = m_blockLinks.keyValueBegin(); it != m_blockLinks.keyValueEnd(); ++it) {
+		it->first->setPlotSize(size);
+	}
+	m_globalPlotSize = size;
 }
 
 QString BlockManager::name() { return m_name; }
@@ -274,6 +340,16 @@ void BlockManager::disconnectBlockToFilter(BasicBlock *block, uint block_ch, uin
 	filter->removeConnectedChannel(filter_ch);
 }
 
+void BlockManager::refilAqcCounter()
+{
+	// if(!m_singleShot) {
+	// 	m_aqcCounter = -1;
+	// 	return;
+	// }
+
+	m_aqcCounter = (m_globalPlotSize + m_globalBufferSize - 1) / m_globalBufferSize;
+}
+
 bool BlockManager::start()
 {
 	// a single shot is requested while running
@@ -282,16 +358,26 @@ bool BlockManager::start()
 	// 	m_running = false;
 	// }
 
-	m_running = !m_singleShot;
+	m_running = true;
+
+	// if(m_singleShot) {
+	// } else {
+		// m_aqcCounter = 1;
+	// }
+	// m_runningSingleShot = m_singleShot;
 
 	if(m_running) {
 		m_fpsTimer->restart();
 		m_fpsTimeElapsed = m_fpsTimer->elapsed();
 	}
 
-	for(auto it = m_blockLinks.keyValueBegin(); it != m_blockLinks.keyValueEnd(); ++it) {
-		Q_EMIT it->first->requestData();
-	}
+	refilAqcCounter();
+	int tmpCounter = m_aqcCounter;
+	for(int i = 0; i < tmpCounter; i++)
+		for(auto it = m_blockLinks.keyValueBegin(); it != m_blockLinks.keyValueEnd(); ++it) {
+			onRequestData(it->first);
+			// Q_EMIT it->first->requestData();
+		}
 
 	Q_EMIT started();
 	return true;

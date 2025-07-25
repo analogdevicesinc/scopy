@@ -33,7 +33,7 @@ BlockData FileSourceBlock::createData()
 			if(!m_channels.value(col) && !map.contains(col))
 				continue;
 
-			if(m_size <= numRows) {
+			if(m_bufferSize <= numRows) {
 				break;
 			}
 
@@ -42,7 +42,7 @@ BlockData FileSourceBlock::createData()
 			float num = values[col].toFloat();
 
 			if(numRows == 0) {
-				ChannelDataVector data = ChannelDataVector(m_size);
+				ChannelDataVector data = ChannelDataVector(m_bufferSize);
 				map.insert(col, data);
 				data.data.push_back(num);
 			} else {
@@ -67,9 +67,9 @@ BlockData TestSourceBlock::createData()
 
 	for(int ch = 0; ch < m_channels.size(); ++ch) {
 		if(m_channels.value(ch)) {
-			ChannelDataVector data = ChannelDataVector(m_size);
+			ChannelDataVector data = ChannelDataVector(m_bufferSize);
 
-			for(int i = 0; i < m_size; i++) {
+			for(int i = 0; i < m_bufferSize; i++) {
 				data.data.push_back(i * pow(10, ch));
 			}
 			map.insert(ch, data);
@@ -83,9 +83,10 @@ IIOSourceBlock::IIOSourceBlock(iio_device *dev, QString name)
 	: SourceBlock(name)
 	, m_buf(nullptr)
 	, m_current_buf_size(-1)
+	, m_timeAxisSR(-1)
 {
 	m_dev = dev;
-	findSRAttribute();
+	findDevSampleRateAttribute();
 }
 
 IIOSourceBlock::~IIOSourceBlock() {}
@@ -96,49 +97,10 @@ void IIOSourceBlock::setBufferSize(size_t size)
 	generateTimeAxis();
 }
 
-void IIOSourceBlock::findSRAttribute()
+void IIOSourceBlock::setPlotSize(size_t size)
 {
-	QStringList list({
-		"sample_rate",
-		"sampling_rate",
-		"sample_frequency",
-		"sampling_frequency",
-	});
-
-	m_devSampleRateAttribute = findDevAttribute(list);
-	if(m_devSampleRateAttribute.isEmpty()) {
-		m_chSampleRateAttribute = findChAttribute(list);
-	}
-}
-
-QString IIOSourceBlock::findDevAttribute(QStringList possibleNames)
-{
-	const char *attr = nullptr;
-	for(const QString &name : possibleNames) {
-		attr = iio_device_find_attr(m_dev, name.toStdString().c_str());
-		if(attr)
-			break;
-	}
-	QString attributeName = QString(attr);
-	return attributeName;
-}
-
-QPair<QString, struct iio_channel *> IIOSourceBlock::findChAttribute(QStringList possibleNames)
-{
-	const char *attr = nullptr;
-	unsigned int num_channels = iio_device_get_channels_count(m_dev);
-
-	for(unsigned int i = 0; i < num_channels; ++i) {
-		struct iio_channel *chn = iio_device_get_channel(m_dev, i);
-		for(const QString &name : possibleNames) {
-			attr = iio_channel_find_attr(chn, name.toStdString().c_str());
-			if(attr) {
-				return QPair<QString, struct iio_channel *>(QString(attr), chn);
-			}
-		}
-	}
-
-	return QPair<QString, struct iio_channel *>(QString(), nullptr);
+	SourceBlock::setPlotSize(size);
+	generateTimeAxis();
 }
 
 void IIOSourceBlock::enChannel(bool en, uint id)
@@ -152,42 +114,13 @@ void IIOSourceBlock::enChannel(bool en, uint id)
 	}
 }
 
-bool IIOSourceBlock::sampleRateAvailable()
-{
-	if(m_devSampleRateAttribute.isEmpty() && m_chSampleRateAttribute.first.isEmpty())
-		return false;
-	return true;
-}
-
-double IIOSourceBlock::readSampleRate()
-{
-	char buffer[20];
-	bool ok = false;
-	double sr;
-	if(!sampleRateAvailable())
-		return -1;
-
-	if(!m_devSampleRateAttribute.isEmpty())
-		iio_device_attr_read(m_dev, m_devSampleRateAttribute.toStdString().c_str(), buffer, 20);
-	if(!m_chSampleRateAttribute.first.isEmpty())
-		iio_channel_attr_read(m_chSampleRateAttribute.second, m_chSampleRateAttribute.first.toStdString().c_str(),
-				      buffer, 20);
-
-	QString str(buffer);
-	sr = str.toDouble(&ok);
-	if(ok) {
-		return sr;
-	} else {
-		return -1;
-	}
-}
+struct iio_channel *IIOSourceBlock::getIIOChannel(uint id) { return iio_device_get_channel(m_dev, id); }
 
 iio_device *IIOSourceBlock::iioDev() { return m_dev; }
 
 std::vector<float> IIOSourceBlock::getTimeAxis()
 {
 	if(m_timeAxis.empty()) {
-		// this should never happen
 		generateTimeAxis();
 	}
 
@@ -202,13 +135,13 @@ BlockData IIOSourceBlock::createData()
 	// std::cout << "before: " << QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss,zzz").toStdString() <<
 	// '\n'; timer.start();
 
-	if(m_current_buf_size != m_size) {
+	if(m_current_buf_size != m_bufferSize) {
 		if(m_buf)
 			iio_buffer_destroy(m_buf);
-		m_buf = iio_device_create_buffer(m_dev, m_size, false);
-		m_current_buf_size = m_size;
+		m_buf = iio_device_create_buffer(m_dev, m_bufferSize, false);
+		m_current_buf_size = m_bufferSize;
 	}
-	// std::cout << "buff: " << timer.elapsed() << " of size: " << m_size << std::endl;
+	// std::cout << "buff: " << timer.elapsed() << " of size: " << m_bufferSize << std::endl;
 
 	BlockData map = BlockData();
 	ssize_t nbytes_rx;
@@ -233,7 +166,7 @@ BlockData IIOSourceBlock::createData()
 	int i;
 	for(auto it = m_channels.begin(); it != m_channels.end(); ++it) {
 		if(it.value()) {
-			ChannelDataVector data = ChannelDataVector(m_size);
+			ChannelDataVector data = ChannelDataVector(m_bufferSize);
 
 			i = 0;
 			for(p_dat = (char *)iio_buffer_first(m_buf, rx0_i); p_dat < p_end; p_dat += p_inc) {
@@ -261,11 +194,174 @@ BlockData IIOSourceBlock::createData()
 
 void IIOSourceBlock::generateTimeAxis()
 {
-	double sr = readSampleRate();
+	double sr = m_timeAxisSR;
+	// sample rate is not found
+	if(sr == -1) {
+		sr = 1;
+	}
+
 	double timeoffset = 0;
 	m_timeAxis.clear();
 
-	for(int i = 0; i <= bufferSize(); i++) {
+	for(int i = 0; i <= plotSize(); i++) {
 		m_timeAxis.push_back(timeoffset + i / sr);
 	}
+}
+
+void IIOSourceBlock::findDevSampleRateAttribute()
+{
+	QStringList list = {"sample_rate", "sampling_rate", "sample_frequency", "sampling_frequency"};
+	for(const QString &name : list) {
+		const char *attr = iio_device_find_attr(m_dev, name.toStdString().c_str());
+		if(attr) {
+			m_devSampleRateAttr = QString(attr);
+			break;
+		}
+	}
+}
+
+void IIOSourceBlock::populateChannelInfo(uint id)
+{
+	iio_channel *ch = iio_device_get_channel(m_dev, id);
+	if(!ch)
+		return;
+
+	QStringList srNames = {"sample_rate", "sampling_rate", "sample_frequency", "sampling_frequency"};
+	QStringList scaleNames = {"scale"};
+
+	ChannelInfo info;
+	info.fmt = iio_channel_get_data_format(ch);
+
+	for(const QString &name : srNames) {
+		const char *attr = iio_channel_find_attr(ch, name.toStdString().c_str());
+		if(attr) {
+			info.sampleRateAttr = QString(attr);
+			break;
+		}
+	}
+	for(const QString &name : scaleNames) {
+		const char *attr = iio_channel_find_attr(ch, name.toStdString().c_str());
+		if(attr) {
+			info.scaleAttr = QString(attr);
+			break;
+		}
+	}
+
+	m_channelInfoMap[id] = info;
+	generateTimeAxis();
+}
+
+void IIOSourceBlock::removeChannelInfo(uint id) { m_channelInfoMap.remove(id); }
+
+bool IIOSourceBlock::sampleRateAvailable(int id)
+{
+	if(id >= 0) {
+		const ChannelInfo info = m_channelInfoMap.value(id);
+		return info.hasSampleRateAttr();
+	}
+
+	if(!m_devSampleRateAttr.isEmpty())
+		return true;
+
+	for(const auto &info : m_channelInfoMap) {
+		if(info.hasSampleRateAttr())
+			return true;
+	}
+
+	return false;
+}
+
+bool IIOSourceBlock::scaleAttributeAvailable(uint id)
+{
+	const ChannelInfo info = m_channelInfoMap.value(id);
+	return info.hasScaleAttr();
+}
+
+QString IIOSourceBlock::getDevSampleRateAttr() { return m_devSampleRateAttr; }
+
+QString IIOSourceBlock::getChSampleRateAttr(uint id)
+{
+	if(!m_channelInfoMap.contains(id))
+		return QString();
+
+	return m_channelInfoMap[id].sampleRateAttr;
+}
+
+double IIOSourceBlock::readSampleRate(int id)
+{
+	char buffer[32];
+	bool ok = false;
+
+	// if id is specified read from that channel,
+	// if not, ready any channel
+	if(id != -1) {
+		iio_channel *ch = iio_device_get_channel(m_dev, id);
+		if(ch && m_channelInfoMap[id].hasSampleRateAttr()) {
+			iio_channel_attr_read(ch, m_channelInfoMap[id].sampleRateAttr.toStdString().c_str(), buffer,
+					      sizeof(buffer));
+			double val = QString(buffer).toDouble(&ok);
+			if(ok)
+				return val;
+		}
+	} else {
+		for(int i = 0; i <= m_channelInfoMap.count(); i++) {
+			iio_channel *ch = iio_device_get_channel(m_dev, i);
+			if(ch && m_channelInfoMap[i].hasSampleRateAttr()) {
+				iio_channel_attr_read(ch, m_channelInfoMap[i].sampleRateAttr.toStdString().c_str(),
+						      buffer, sizeof(buffer));
+				double val = QString(buffer).toDouble(&ok);
+				if(ok)
+					return val;
+			}
+		}
+	}
+
+	// some devices may have it as a device attr
+	if(!m_devSampleRateAttr.isEmpty()) {
+		iio_device_attr_read(m_dev, m_devSampleRateAttr.toStdString().c_str(), buffer, sizeof(buffer));
+		double val = QString(buffer).toDouble(&ok);
+		if(ok)
+			return val;
+	}
+
+	return -1;
+}
+
+double IIOSourceBlock::readChannelScale(uint id)
+{
+	char buffer[32];
+	bool ok = false;
+
+	if(m_channelInfoMap.contains(id)) {
+		iio_channel *ch = iio_device_get_channel(m_dev, id);
+		if(ch && m_channelInfoMap[id].hasScaleAttr()) {
+			iio_channel_attr_read(ch, m_channelInfoMap[id].scaleAttr.toStdString().c_str(), buffer,
+					      sizeof(buffer));
+			double val = QString(buffer).toDouble(&ok);
+			if(ok)
+				return val;
+		}
+	}
+	return -1;
+}
+
+QString IIOSourceBlock::getChScaleAttr(uint id)
+{
+	if(!m_channelInfoMap.contains(id))
+		return QString();
+
+	return m_channelInfoMap[id].scaleAttr;
+}
+
+void IIOSourceBlock::setTimeAxisSR(double sr) {
+	m_timeAxisSR = sr;
+	generateTimeAxis();
+}
+
+const iio_data_format *IIOSourceBlock::getFmt(uint id) const
+{
+	if(!m_channelInfoMap.contains(id))
+		return nullptr;
+
+	return m_channelInfoMap[id].fmt;
 }

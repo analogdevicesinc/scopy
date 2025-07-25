@@ -1,260 +1,260 @@
-/*
- * Copyright (c) 2024 Analog Devices Inc.
- *
- * This file is part of Scopy
- * (see https://www.github.com/analogdevicesinc/scopy).
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
- */
+// /*
+//  * Copyright (c) 2024 Analog Devices Inc.
+//  *
+//  * This file is part of Scopy
+//  * (see https://www.github.com/analogdevicesinc/scopy).
+//  *
+//  * This program is free software: you can redistribute it and/or modify
+//  * it under the terms of the GNU General Public License as published by
+//  * the Free Software Foundation, either version 3 of the License, or
+//  * (at your option) any later version.
+//  *
+//  * This program is distributed in the hope that it will be useful,
+//  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  * GNU General Public License for more details.
+//  *
+//  * You should have received a copy of the GNU General Public License
+//  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+//  *
+//  */
 
-#ifndef GRFFTCHANNELCOMPONENT_H
-#define GRFFTCHANNELCOMPONENT_H
+// #ifndef GRFFTCHANNELCOMPONENT_H
+// #define GRFFTCHANNELCOMPONENT_H
 
-#include "grfftsinkcomponent.h"
-#include "scopy-adc_export.h"
-#include <gui/channelcomponent.h>
-#include <gui/plotautoscaler.h>
-#include <gui/widgets/menuonoffswitch.h>
-#include <gui/widgets/menucombo.h>
-#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
-#include <gui/widgets/menuplotaxisrangecontrol.h>
-#include <gui/widgets/menucontrolbutton.h>
-#include "adcinterfaces.h"
-#include <iio-widgets/iiowidget.h>
-#include <gui/widgets/menuwidget.h>
-#include <freq/fftplotcomponentchannel.h>
-#include <freq/fftplotcomponent.h>
-#include <gr-util/grsignalpath.h>
-#include <gr-util/grfftfloatproxy.h>
-#include <gr-util/griiocomplexchannelsrc.h>
-#include <gui/plotmarkercontroller.h>
+// #include "grfftsinkcomponent.h"
+// #include "scopy-adc_export.h"
+// #include <gui/channelcomponent.h>
+// #include <gui/plotautoscaler.h>
+// #include <gui/widgets/menuonoffswitch.h>
+// #include <gui/widgets/menucombo.h>
+// #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+// #include <gui/widgets/menuplotaxisrangecontrol.h>
+// #include <gui/widgets/menucontrolbutton.h>
+// #include "adcinterfaces.h"
+// #include <iio-widgets/iiowidget.h>
+// #include <gui/widgets/menuwidget.h>
+// #include <freq/fftplotcomponentchannel.h>
+// #include <freq/fftplotcomponent.h>
+// #include <gr-util/grsignalpath.h>
+// #include <gr-util/grfftfloatproxy.h>
+// #include <gr-util/griiocomplexchannelsrc.h>
+// #include <gui/plotmarkercontroller.h>
 
-namespace scopy {
-namespace adc {
+// namespace scopy {
+// namespace adc {
 
-using namespace scopy::gui;
+// using namespace scopy::gui;
 
-class GRDeviceAddon;
+// class GRDeviceAddon;
 
-class GRFFTComplexChannelSigpath : public QObject, public GRChannel, public FFTChannel
-{
-public:
-	GRFFTComplexChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOComplexChannelSrc *src,
-				   QObject *parent)
-		: QObject(parent)
-	{
-		m_ch = ch;
-		m_grch = src;
-		m_signalPath = new GRSignalPath(
-			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
-		m_signalPath->append(m_grch);
-		m_fft = new GRFFTComplexProc(m_signalPath);
-		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
-		m_fft->setNrBits(nrBits);
-		m_signalPath->append(m_fft);
-		m_avg = new GRFFTAvgProc(true, m_signalPath);
-		m_signalPath->append(m_avg);
-		m_signalPath->setEnabled(false);
-		m_top = top;
-		m_top->registerSignalPath(m_signalPath);
-	}
-	~GRFFTComplexChannelSigpath() { m_top->unregisterSignalPath(m_signalPath); }
+// class GRFFTComplexChannelSigpath : public QObject, public GRChannel, public FFTChannel
+// {
+// public:
+// 	GRFFTComplexChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOComplexChannelSrc *src,
+// 				   QObject *parent)
+// 		: QObject(parent)
+// 	{
+// 		m_ch = ch;
+// 		m_grch = src;
+// 		m_signalPath = new GRSignalPath(
+// 			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
+// 		m_signalPath->append(m_grch);
+// 		m_fft = new GRFFTComplexProc(m_signalPath);
+// 		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
+// 		m_fft->setNrBits(nrBits);
+// 		m_signalPath->append(m_fft);
+// 		m_avg = new GRFFTAvgProc(true, m_signalPath);
+// 		m_signalPath->append(m_avg);
+// 		m_signalPath->setEnabled(false);
+// 		m_top = top;
+// 		m_top->registerSignalPath(m_signalPath);
+// 	}
+// 	~GRFFTComplexChannelSigpath() { m_top->unregisterSignalPath(m_signalPath); }
 
-	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
-	{
-		m_ch->chData()->onNewData(xData, yData, size, copy);
-	}
+// 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
+// 	{
+// 		m_ch->chData()->onNewData(xData, yData, size, copy);
+// 	}
 
-	GRSignalPath *sigpath() override { return m_signalPath; }
+// 	GRSignalPath *sigpath() override { return m_signalPath; }
 
-	void setPowerOffset(double val) override
-	{
-		m_powerOffset = val;
-		m_fft->setPowerOffset(val);
-	}
+// 	void setPowerOffset(double val) override
+// 	{
+// 		m_powerOffset = val;
+// 		m_fft->setPowerOffset(val);
+// 	}
 
-	void setAveragingSize(int size) override { m_avg->setSize(size); }
+// 	void setAveragingSize(int size) override { m_avg->setSize(size); }
 
-	double powerOffset() { return m_powerOffset; }
+// 	double powerOffset() { return m_powerOffset; }
 
-	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
+// 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
-	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
+// 	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
 
-	GRTopBlock *m_top;
-	ChannelComponent *m_ch;
-	GRSignalPath *m_signalPath;
-	GRFFTComplexProc *m_fft;
-	GRFFTAvgProc *m_avg;
-	GRIIOComplexChannelSrc *m_grch;
-	double m_powerOffset;
-};
+// 	GRTopBlock *m_top;
+// 	ChannelComponent *m_ch;
+// 	GRSignalPath *m_signalPath;
+// 	GRFFTComplexProc *m_fft;
+// 	GRFFTAvgProc *m_avg;
+// 	GRIIOComplexChannelSrc *m_grch;
+// 	double m_powerOffset;
+// };
 
-class GRFFTChannelSigpath : public QObject, public GRChannel, public FFTChannel
-{
-public:
-	GRFFTChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOFloatChannelSrc *src,
-			    QObject *parent)
-		: QObject(parent)
-	{
-		m_powerOffset = 0;
-		m_ch = ch;
-		m_grch = src;
-		m_signalPath = new GRSignalPath(
-			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
-		m_signalPath->append(m_grch);
-		m_fft = new GRFFTFloatProc(m_signalPath);
-		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
-		m_fft->setNrBits(nrBits);
-		m_signalPath->append(m_fft);
-		m_avg = new GRFFTAvgProc(false, m_signalPath);
-		m_signalPath->append(m_avg);
-		m_signalPath->setEnabled(false);
-		m_top = top;
-		m_top->registerSignalPath(m_signalPath);
-	}
-	~GRFFTChannelSigpath() { m_top->unregisterSignalPath(m_signalPath); }
+// class GRFFTChannelSigpath : public QObject, public GRChannel, public FFTChannel
+// {
+// public:
+// 	GRFFTChannelSigpath(QString m_name, ChannelComponent *ch, GRTopBlock *top, GRIIOFloatChannelSrc *src,
+// 			    QObject *parent)
+// 		: QObject(parent)
+// 	{
+// 		m_powerOffset = 0;
+// 		m_ch = ch;
+// 		m_grch = src;
+// 		m_signalPath = new GRSignalPath(
+// 			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
+// 		m_signalPath->append(m_grch);
+// 		m_fft = new GRFFTFloatProc(m_signalPath);
+// 		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
+// 		m_fft->setNrBits(nrBits);
+// 		m_signalPath->append(m_fft);
+// 		m_avg = new GRFFTAvgProc(false, m_signalPath);
+// 		m_signalPath->append(m_avg);
+// 		m_signalPath->setEnabled(false);
+// 		m_top = top;
+// 		m_top->registerSignalPath(m_signalPath);
+// 	}
+// 	~GRFFTChannelSigpath() { m_top->unregisterSignalPath(m_signalPath); }
 
-	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
-	{
-		m_ch->chData()->onNewData(xData, yData, size, copy);
-	}
+// 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override
+// 	{
+// 		m_ch->chData()->onNewData(xData, yData, size, copy);
+// 	}
 
-	GRSignalPath *sigpath() override { return m_signalPath; }
+// 	GRSignalPath *sigpath() override { return m_signalPath; }
 
-	void setPowerOffset(double val) override
-	{
-		m_powerOffset = val;
-		m_fft->setPowerOffset(val);
-	}
+// 	void setPowerOffset(double val) override
+// 	{
+// 		m_powerOffset = val;
+// 		m_fft->setPowerOffset(val);
+// 	}
 
-	void setAveragingSize(int size) override { m_avg->setSize(size); }
+// 	void setAveragingSize(int size) override { m_avg->setSize(size); }
 
-	double powerOffset() { return m_powerOffset; }
+// 	double powerOffset() { return m_powerOffset; }
 
-	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
+// 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
-	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
+// 	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
 
-	GRTopBlock *m_top;
-	ChannelComponent *m_ch;
-	GRSignalPath *m_signalPath;
-	GRFFTFloatProc *m_fft;
-	GRFFTAvgProc *m_avg;
-	GRIIOFloatChannelSrc *m_grch;
-	double m_powerOffset;
-};
+// 	GRTopBlock *m_top;
+// 	ChannelComponent *m_ch;
+// 	GRSignalPath *m_signalPath;
+// 	GRFFTFloatProc *m_fft;
+// 	GRFFTAvgProc *m_avg;
+// 	GRIIOFloatChannelSrc *m_grch;
+// 	double m_powerOffset;
+// };
 
-class SCOPY_ADC_EXPORT GRFFTChannelComponent : public ChannelComponent,
-					       public GRChannel,
-					       public MeasurementProvider,
-					       public SampleRateProvider,
-					       public FFTChannel
-{
-	Q_OBJECT
-public:
-	GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRIIOFloatChannelNode *node_Q, FFTPlotComponent *m_plot,
-			      GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent = nullptr);
-	GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlotComponent *m_plot, GRFFTSinkComponent *grtsc,
-			      QPen pen, QWidget *parent = nullptr);
-	~GRFFTChannelComponent();
+// class SCOPY_ADC_EXPORT GRFFTChannelComponent : public ChannelComponent,
+// 					       public GRChannel,
+// 					       public MeasurementProvider,
+// 					       public SampleRateProvider,
+// 					       public FFTChannel
+// {
+// 	Q_OBJECT
+// public:
+// 	GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRIIOFloatChannelNode *node_Q, FFTPlotComponent *m_plot,
+// 			      GRFFTSinkComponent *grtsc, QPen pen, QWidget *parent = nullptr);
+// 	GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlotComponent *m_plot, GRFFTSinkComponent *grtsc,
+// 			      QPen pen, QWidget *parent = nullptr);
+// 	~GRFFTChannelComponent();
 
-	MeasureManagerInterface *getMeasureManager() override;
-	PlotMarkerController *markerController();
+// 	MeasureManagerInterface *getMeasureManager() override;
+// 	PlotMarkerController *markerController();
 
-	GRSignalPath *sigpath() override;
-	QVBoxLayout *menuLayout();
+// 	GRSignalPath *sigpath() override;
+// 	QVBoxLayout *menuLayout();
 
-	double powerOffset();
-	void setPowerOffset(double) override;
-	void setWindow(int) override;
-	void setAveragingSize(int) override;
-	void setSamplingInfo(SamplingInfo p) override;
-	int window() const;
-	bool windowCorrection() const;
-	void setWindowCorrection(bool newWindowCorr) override;
-	virtual bool enabled() const override;
+// 	double powerOffset();
+// 	void setPowerOffset(double) override;
+// 	void setWindow(int) override;
+// 	void setAveragingSize(int) override;
+// 	void setSamplingInfo(SamplingInfo p) override;
+// 	int window() const;
+// 	bool windowCorrection() const;
+// 	void setWindowCorrection(bool newWindowCorr) override;
+// 	virtual bool enabled() const override;
 
-public Q_SLOTS:
-	void enable() override;
-	void disable() override;
-	void onStart() override;
-	void onStop() override;
-	void onInit() override;
-	void onDeinit() override;
+// public Q_SLOTS:
+// 	void enable() override;
+// 	void disable() override;
+// 	void onStart() override;
+// 	void onStop() override;
+// 	void onInit() override;
+// 	void onDeinit() override;
 
-	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override;
+// 	void onNewData(const float *xData, const float *yData, size_t size, bool copy) override;
 
-	bool sampleRateAvailable() override;
-	double sampleRate() override;
+// 	bool sampleRateAvailable() override;
+// 	double sampleRate() override;
 
-	void addChannelToPlot() override;
-	void removeChannelFromPlot() override;
+// 	void addChannelToPlot() override;
+// 	void removeChannelFromPlot() override;
 
-Q_SIGNALS:
-	void yModeChanged();
-	void fftSizeChanged();
-	void powerOffsetChanged(double);
-	void windowChanged(int);
-	void windowCorrectionChanged(bool);
+// Q_SIGNALS:
+// 	void yModeChanged();
+// 	void fftSizeChanged();
+// 	void powerOffsetChanged(double);
+// 	void windowChanged(int);
+// 	void windowCorrectionChanged(bool);
 
-private:
-	double m_powerOffset;
-	int m_window;
-	bool m_windowCorrection;
+// private:
+// 	double m_powerOffset;
+// 	int m_window;
+// 	bool m_windowCorrection;
 
-	GRIIOFloatChannelNode *m_node;
-	GRIIOChannel *m_src;
+// 	GRIIOFloatChannelNode *m_node;
+// 	GRIIOChannel *m_src;
 
-	GRIIOFloatChannelSrc *m_src_I;
-	GRIIOFloatChannelSrc *m_src_Q;
+// 	GRIIOFloatChannelSrc *m_src_I;
+// 	GRIIOFloatChannelSrc *m_src_Q;
 
-	GRChannel *m_grtch;
-	QVBoxLayout *m_layScroll;
+// 	GRChannel *m_grtch;
+// 	QVBoxLayout *m_layScroll;
 
-	// FFTMeasureManager *m_measureMgr;
-	MenuPlotAxisRangeControl *m_yCtrl;
-	MenuCombo *m_ymodeCb;
-	IIOWidget *m_scaleWidget;
+// 	// FFTMeasureManager *m_measureMgr;
+// 	MenuPlotAxisRangeControl *m_yCtrl;
+// 	MenuCombo *m_ymodeCb;
+// 	IIOWidget *m_scaleWidget;
 
-	MenuPlotChannelCurveStyleControl *m_curvemenu;
-	MenuSectionCollapseWidget *m_yaxisMenu;
-	FFTPlotComponentChannel *m_fftPlotComponentChannel;
+// 	MenuPlotChannelCurveStyleControl *m_curvemenu;
+// 	MenuSectionCollapseWidget *m_yaxisMenu;
+// 	FFTPlotComponentChannel *m_fftPlotComponentChannel;
 
-	QPushButton *m_snapBtn;
+// 	QPushButton *m_snapBtn;
 
-	bool m_running;
-	bool m_scaleAvailable;
-	bool m_complex;
+// 	bool m_running;
+// 	bool m_scaleAvailable;
+// 	bool m_complex;
 
-	QWidget *createMenu(QWidget *parent = nullptr);
-	QWidget *createChAttrMenu(iio_channel *ch, QString title, QWidget *parent);
-	QWidget *createMarkerMenu(QWidget *parent);
-	QWidget *createYAxisMenu(QWidget *parent);
-	QWidget *createCurveMenu(QWidget *parent);
-	QWidget *createAveragingMenu(QWidget *parent);
-	QPushButton *createSnapshotButton(QWidget *parent);
+// 	QWidget *createMenu(QWidget *parent = nullptr);
+// 	QWidget *createChAttrMenu(iio_channel *ch, QString title, QWidget *parent);
+// 	QWidget *createMarkerMenu(QWidget *parent);
+// 	QWidget *createYAxisMenu(QWidget *parent);
+// 	QWidget *createCurveMenu(QWidget *parent);
+// 	QWidget *createAveragingMenu(QWidget *parent);
+// 	QPushButton *createSnapshotButton(QWidget *parent);
 
-	YMode m_ymode;
-	void _init();
+// 	YMode m_ymode;
+// 	void _init();
 
-	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
-	Q_PROPERTY(int window READ window WRITE setWindow NOTIFY windowChanged)
-	Q_PROPERTY(bool windowCorrection READ windowCorrection WRITE setWindowCorrection NOTIFY windowCorrectionChanged)
-};
+// 	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
+// 	Q_PROPERTY(int window READ window WRITE setWindow NOTIFY windowChanged)
+// 	Q_PROPERTY(bool windowCorrection READ windowCorrection WRITE setWindowCorrection NOTIFY windowCorrectionChanged)
+// };
 
-} // namespace adc
-} // namespace scopy
-#endif // GRFFTCHANNELCOMPONENT_H
+// } // namespace adc
+// } // namespace scopy
+// #endif // GRFFTCHANNELCOMPONENT_H

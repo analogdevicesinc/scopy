@@ -35,29 +35,57 @@ public:
 	~IIOSourceBlock();
 
 	void setBufferSize(size_t size) override;
-	bool sampleRateAvailable();
-	double readSampleRate();
+	void setPlotSize(size_t size) override;
+
+	void findDevSampleRateAttribute();
+	void populateChannelInfo(uint id);
+	void removeChannelInfo(uint id);
+
+	bool sampleRateAvailable(int id = -1);
+	bool scaleAttributeAvailable(uint id);
+	QString getDevSampleRateAttr();
+	QString getChSampleRateAttr(uint id);
+
+	double readSampleRate(int id = -1);
+	double readChannelScale(uint id);
+	QString getChScaleAttr(uint id);
+
+	void setTimeAxisSR(double sr);
+
 	struct iio_device *iioDev();
 	std::vector<float> getTimeAxis();
+	iio_channel *getIIOChannel(uint id);
+
+	const iio_data_format *getFmt(uint id) const;
 
 public Q_SLOTS:
 	void enChannel(bool en, uint id) override;
 
 private:
-	void findSRAttribute();
-	QString findDevAttribute(QStringList possibleNames);
-	QPair<QString, struct iio_channel *> findChAttribute(QStringList possibleNames);
 	void generateTimeAxis();
 
 private:
 	iio_device *m_dev;
 	BlockData createData() override;
 	int count = 0;
-	QString m_devSampleRateAttribute;
-	QPair<QString, struct iio_channel *> m_chSampleRateAttribute;
+	QString m_chSampleRateAttribute;
+	QString m_scaleAttribute;
 	iio_buffer *m_buf;
 	size_t m_current_buf_size;
 	std::vector<float> m_timeAxis;
+
+	struct ChannelInfo {
+		QString sampleRateAttr;
+		QString scaleAttr;
+		const iio_data_format *fmt = nullptr;
+
+		bool hasSampleRateAttr() const { return !sampleRateAttr.isEmpty(); }
+		bool hasScaleAttr() const { return !scaleAttr.isEmpty(); }
+	};
+
+	QString m_devSampleRateAttr;
+	QMap<uint, ChannelInfo> m_channelInfoMap;
+	double m_timeAxisSR; // this may not always be the iio samplerate. Depends on the XMode used
 };
 } // namespace scopy::datasink
 

@@ -17,11 +17,13 @@ public:
 	~SourceBlock();
 	QString name();
 	size_t bufferSize();
+	size_t plotSize();
 
 public Q_SLOTS:
 	virtual void enChannel(bool en, uint id);
 	virtual bool isChannelEn(uint id);
 	virtual void setBufferSize(size_t size);
+	virtual void setPlotSize(size_t size);
 	void onRequestData();
 
 private:
@@ -30,11 +32,14 @@ private:
 	virtual BlockData createData() = 0; // <channel, buffer>
 
 Q_SIGNALS:
+	void plotSizeChanged(size_t size);
 	void requestData();
 	void toggledCh(uint ch, bool en);
+	void resetPlotBuffer();
 
 protected:
-	size_t m_size;
+	size_t m_bufferSize;
+	size_t m_plotSize;
 	QMap<uint, bool> m_channels; // <channel, enabled>
 };
 } // namespace scopy::datasink

@@ -12,9 +12,12 @@ public:
 	ChannelDataVector(std::vector<float> data)
 		: data(std::move(data))
 	{}
-	ChannelDataVector(int size = 0) { /*data.reserve(size);*/ }
-
-	~ChannelDataVector() { clear(); };
+	ChannelDataVector(int size = 0) {
+		if (size > 0) {
+			data.reserve(size);
+		}
+	}
+	~ChannelDataVector() = default;
 
 	void clear()
 	{
@@ -23,17 +26,16 @@ public:
 	}
 
 	void setCopiedData(const std::vector<float> &new_data) { data = new_data; }
+	void setMovedData(std::vector<float> &&new_data) { data = std::move(new_data); }
 
 	std::vector<float> data;
 };
 
-class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelDataVector >
+
+class SCOPY_DATA_SINK_EXPORT BlockData : public QMap<uint, ChannelDataVector>
 {
 public:
-	BlockData()
-		: QMap()
-	{}
-
+	BlockData() = default;
 	~BlockData()
 	{
 		clearVectors();

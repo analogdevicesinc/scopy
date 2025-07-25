@@ -195,7 +195,7 @@ void DeviceComponent::createMenuControlButton(QWidget *parent)
 	setupDeviceOnOffSwitch();
 }
 
-void GRDeviceComponent::setupDeviceOnOffSwitch()
+void DeviceComponent::setupDeviceOnOffSwitch()
 {
 	m_ctrl->enableOnOffSwitch(true);
 	connect(m_ctrl->onOffSwitch(), &SmallOnOffSwitch::toggled, this, [=](bool en) {
@@ -226,8 +226,6 @@ bool DeviceComponent::sampleRateAvailable()
 }
 
 double DeviceComponent::sampleRate() { return m_node->source()->readSampleRate(); }
-
-void DeviceComponent::setBufferSize(uint32_t bufferSize) { m_node->source()->setBufferSize(bufferSize); }
 
 DeviceComponent::~DeviceComponent() {}
 

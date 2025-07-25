@@ -1,8 +1,129 @@
 #include "include/data-sink/customSourceBlocks.h"
 #include <include/data-sink/timechannelsigpath.h>
+#include <iostream>
 
 using namespace scopy::datasink;
 using namespace scopy;
+
+RollingBufferFilter::RollingBufferFilter(SourceBlock* source, QString name)
+	: FilterBlock(false, name)
+	, m_plotSize(0)
+	, m_rollingMode(false)
+	, m_currentPosition(0)
+	, m_bufferFull(false)
+	, m_source(source)
+{
+	connect(source, &IIOSourceBlock::plotSizeChanged, this, &RollingBufferFilter::setPlotSize);
+	connect(source, &IIOSourceBlock::resetPlotBuffer, this, &RollingBufferFilter::resetPlotBuffer);
+}
+
+void RollingBufferFilter::setPlotSize(size_t plotSize)
+{
+	if(plotSize == 0) {
+		return;
+	}
+	m_plotSize = plotSize;
+	resetPlotBuffer();
+}
+
+void RollingBufferFilter::setRollingMode(bool rolling)
+{
+	if(m_rollingMode != rolling) {
+		m_rollingMode = rolling;
+		resetPlotBuffer();
+	}
+}
+
+size_t RollingBufferFilter::getPlotSize() const { return m_plotSize; }
+
+bool RollingBufferFilter::isRollingMode() const { return m_rollingMode; }
+
+void RollingBufferFilter::resetPlotBuffer()
+{
+	m_plotBuffer.data.clear();
+	if(m_plotSize > 0) {
+		m_plotBuffer.data.reserve(m_plotSize);
+	}
+	m_currentPosition = 0;
+	m_bufferFull = false;
+}
+
+ChannelDataVector RollingBufferFilter::createData()
+{
+	if(m_plotSize == 0) {
+		return ChannelDataVector();
+	}
+
+	// Check if channel 0 exists in m_data
+	if(!m_data.contains(0)) {
+		return ChannelDataVector(m_plotBuffer.data);
+	}
+
+	const auto &newData = m_data[0].data;
+
+	if(newData.empty()) {
+		return ChannelDataVector(m_plotBuffer.data);
+	}
+
+	// Check if bufferSize == plotSize for direct optimization
+	if(newData.size() == m_plotSize) {
+		// Direct reference - no copying needed, no reversal in rolling mode
+		return ChannelDataVector(newData);
+	}
+
+	// Original logic for when bufferSize != plotSize
+	if(!m_rollingMode) {
+		// Non-rolling mode: append until full, then clear and start again
+		for(const float &sample : newData) {
+			if(m_plotBuffer.data.size() >= m_plotSize) {
+				m_plotBuffer.data.clear();
+				m_plotBuffer.data.reserve(m_plotSize);
+				m_bufferFull = false;
+			}
+			m_plotBuffer.data.push_back(sample);
+		}
+		std::cout << "--- non rolling: " << m_plotBuffer.data.size() << std::endl;
+		return ChannelDataVector(m_plotBuffer.data);
+	} else {
+		// Rolling mode with circular buffer (most efficient)
+		// Ensure buffer is allocated to full size
+		if(m_plotBuffer.data.size() < m_plotSize) {
+			m_plotBuffer.data.resize(m_plotSize, 0.0f);
+		}
+
+		for(const float &sample : newData) {
+			m_plotBuffer.data[m_currentPosition] = sample;
+			m_currentPosition = (m_currentPosition + 1) % m_plotSize;
+			if(m_currentPosition == 0) {
+				m_bufferFull = true;
+			}
+		}
+
+		// Return data in correct order (oldest to newest)
+		if(m_bufferFull) {
+			std::vector<float> orderedData;
+			orderedData.reserve(m_plotSize);
+
+			// Copy from current position to end (oldest data)
+			for(size_t i = m_currentPosition; i < m_plotSize; ++i) {
+				orderedData.push_back(m_plotBuffer.data[i]);
+			}
+			// Copy from start to current position (newest data)
+			for(size_t i = 0; i < m_currentPosition; ++i) {
+				orderedData.push_back(m_plotBuffer.data[i]);
+			}
+
+			std::cout << "--- full rolling sent: " << orderedData.size() << std::endl;
+			return ChannelDataVector(std::move(orderedData));
+		} else {
+			// Buffer not full yet, return what we have in order
+			std::vector<float> orderedData(m_plotBuffer.data.begin(),
+						       m_plotBuffer.data.begin() + m_currentPosition);
+			std::cout << "--- rolling sent: " << orderedData.size() << std::endl;
+			return ChannelDataVector(std::move(orderedData));
+		}
+	}
+}
 
 OffsetFilter::OffsetFilter(QString name)
 	: FilterBlock(false, name)
@@ -53,6 +174,7 @@ ChannelDataVector OffsetFilter::createData()
 	// 		       return (value * m_scale) + m_offset;
 	// 	       });
 
+	std::cout << "sent offset: " << outputData.data.size() << std::endl;
 	return outputData;
 }
 
@@ -115,8 +237,10 @@ TimeChannelSigpath::TimeChannelSigpath(QString name, ChannelComponent *ch, Sourc
 	m_signalPath = new SignalPath(name + "_sigpath", this);
 	m_signalPath->setManager(manager);
 
-	// Create offset filter
+	// Create filters
+	m_rollingFilter = new RollingBufferFilter(m_sourceBlock, "rolling_" + name + QString::number(sourceChannel));
 	m_offsetFilter = new OffsetFilter("offset_" + name);
+	m_signalPath->addFilter(m_rollingFilter);
 	m_signalPath->addFilter(m_offsetFilter);
 
 	// Connect to manager's newData signal
@@ -124,7 +248,8 @@ TimeChannelSigpath::TimeChannelSigpath(QString name, ChannelComponent *ch, Sourc
 
 	if(manager) {
 		if(!m_filterConnected) {
-			BlockManager::connectBlockToFilter(m_sourceBlock, m_sourceChannel, 0, m_offsetFilter);
+			BlockManager::connectBlockToFilter(m_sourceBlock, m_sourceChannel, 0, m_rollingFilter);
+			BlockManager::connectBlockToFilter(m_rollingFilter, 0, 0, m_offsetFilter);
 			m_filterConnected = true;
 		}
 		m_manager->addLink(m_sourceBlock, m_sourceChannel, m_offsetFilter, 0, m_outputChannel, true);
@@ -133,14 +258,18 @@ TimeChannelSigpath::TimeChannelSigpath(QString name, ChannelComponent *ch, Sourc
 
 TimeChannelSigpath::~TimeChannelSigpath()
 {
-	if(m_enabled) {
-		disable();
-	}
+	// if(m_enabled) {
+	// 	disable();
+	// }
 
 	// Clean up the offset filter
 	if(m_offsetFilter) {
 		delete m_offsetFilter;
 		m_offsetFilter = nullptr;
+	}
+	if(m_rollingFilter) {
+		delete m_rollingFilter;
+		m_rollingFilter = nullptr;
 	}
 }
 
@@ -184,6 +313,13 @@ void TimeChannelSigpath::setOffset(double offset)
 	}
 }
 
+void TimeChannelSigpath::setRollingMode(bool mode)
+{
+	if(m_rollingFilter) {
+		m_rollingFilter->setRollingMode(mode);
+	}
+}
+
 void TimeChannelSigpath::setScale(double scale)
 {
 	if(m_offsetFilter) {
@@ -215,6 +351,7 @@ void TimeChannelSigpath::onManagerNewData(ChannelDataVector data, uint ch)
 void TimeChannelSigpath::forwardDataToChannel(ChannelDataVector data)
 {
 	if(m_ch && !data.data.empty()) {
+		// time axis samp rate should be the one in GUI, not actual SR. it should be updatd on every change
 		m_ch->chData()->onNewData(static_cast<IIOSourceBlock *>(m_sourceBlock)->getTimeAxis().data(),
 					  data.data.data(), data.data.size(), true);
 		data.clear();

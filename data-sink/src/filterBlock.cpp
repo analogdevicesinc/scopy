@@ -1,3 +1,4 @@
+#include "include/data-sink/sourceBlock.h"
 #include <include/data-sink/basicBlock.h>
 #include <include/data-sink/filterBlock.h>
 using namespace scopy::datasink;

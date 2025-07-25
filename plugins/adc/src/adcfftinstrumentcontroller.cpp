@@ -131,7 +131,7 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 	addComponent(d);
 
 	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this,
-		[=](SamplingInfo p) { d->setBufferSize(p.bufferSize); });
+		[=](SamplingInfo p) { griiodsn->source()->setBufferSize(p.bufferSize); });
 }
 
 void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)

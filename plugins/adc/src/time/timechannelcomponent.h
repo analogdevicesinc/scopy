@@ -35,6 +35,8 @@
 #include "adcinterfaces.h"
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
+#include <QDoubleSpinBox>
+#include <customSourceBlocks.h>
 #include <timechannelsigpath.h>
 #include "time/timeplotcomponent.h"
 
@@ -54,7 +56,7 @@ class SCOPY_ADC_EXPORT TimeChannelComponent : public ChannelComponent,
 {
 	Q_OBJECT
 public:
-	TimeChannelComponent(SourceBlock *sourceBlock, uint sourceChannel, uint outputChannel, BlockManager *manager,
+	TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sourceChannel, uint outputChannel, BlockManager *manager,
 			     TimePlotComponent *m_plot, QPen pen, QWidget *parent = nullptr);
 
 	~TimeChannelComponent();
@@ -93,11 +95,13 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
+	void setRollingMode(bool mode);
+
 Q_SIGNALS:
 	void yModeChanged();
 
 private:
-	SourceBlock *m_sourceBlock;
+	IIOSourceBlock *m_sourceBlock;
 	uint m_sourceChannel;
 	BlockManager *m_manager;
 	TimeChannelSigpath *m_tch;
@@ -109,6 +113,8 @@ private:
 	MenuOnOffSwitch *m_autoscaleBtn;
 	MenuCombo *m_ymodeCb;
 	IIOWidget *m_scaleWidget;
+	QWidget *m_scaleOverrideWidget;
+	QDoubleSpinBox *m_scaleSpin;
 
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuSectionCollapseWidget *m_yaxisMenu;

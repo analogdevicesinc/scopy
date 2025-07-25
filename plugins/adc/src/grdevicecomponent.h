@@ -55,7 +55,6 @@ public Q_SLOTS:
 	void onStop() override;
 	void onInit() override;
 	void onDeinit() override;
-	void setBufferSize(uint32_t bufferSize);
 
 	void removeChannel(ChannelComponent *c);
 	void addChannel(ChannelComponent *c);

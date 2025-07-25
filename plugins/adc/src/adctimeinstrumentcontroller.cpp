@@ -125,15 +125,13 @@ void ADCTimeInstrumentController::init()
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 {
 	TopBlockNode *grtbn = dynamic_cast<TopBlockNode *>(node);
-	// GRTimeSinkComponent *c = new GRTimeSinkComponent(m_name + "_time", grtbn, this);
-
-	//		m_acqNodeComponentMap[grtbn] = (c);
-	// addComponent(c);
 
 	m_blockManager = grtbn->manager();
 	m_blockManager->setBufferSize(m_timePlotSettingsComponent->bufferSize());
+	m_blockManager->setPlotSize(m_timePlotSettingsComponent->plotSize());
 	updateFrameRate();
-	connect(m_blockManager, &datasink::BlockManager::sentAllData, this, &ADCInstrumentController::update, Qt::QueuedConnection);
+	connect(m_blockManager, &datasink::BlockManager::sentBufferData, this, &ADCInstrumentController::update,
+		Qt::QueuedConnection);
 
 	// c->init();
 
@@ -141,10 +139,11 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	// connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent,
 	// 	&TimePlotManagerSettings::setBufferSize);
 
-	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, this,
-		[=](SamplingInfo info) {
-			m_blockManager->setBufferSize(info.bufferSize);
-		});
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, this,
+		[=](uint32_t size) { m_blockManager->setBufferSize(size); });
+
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::plotSizeChanged, this,
+		[=](uint32_t size) { m_blockManager->setPlotSize(size); });
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
 		setSingleShot(b);
@@ -162,12 +161,16 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	// connect(c, SIGNAL(arm()), this, SLOT(onStart()));
 	// connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
 
-	connect(m_blockManager, &BlockManager::sentAllData, this, [=](){
+	connect(m_blockManager, &BlockManager::requestStop, this, [=]() {
+		Q_EMIT m_ui->requestStop();
+	});
+
+	connect(m_blockManager, &BlockManager::sentBufferData, this, [=]() {
 		count++;
 		// std::cout << "draw: " << count << std::endl;
-		if(m_blockManager->singleShot()) {
-			Q_EMIT m_ui->requestStop();
-		}
+		// if(m_blockManager->singleShot()) {
+			// Q_EMIT m_ui->requestStop();
+		// }
 	});
 	// connect(m_blockManager, &BlockManager::stopped, this, &ADCInstrumentController::stopUpdates);
 }
@@ -184,8 +187,10 @@ void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
 	m_timePlotSettingsComponent->addSampleRateProvider(d);
 	addComponent(d);
 
-	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, d,
-		&DeviceComponent::setBufferSize);
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::bufferSizeChanged, griiodsn->source(),
+		&IIOSourceBlock::setBufferSize);
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::sampleRateChanged, griiodsn->source(),
+		&IIOSourceBlock::setTimeAxisSR);
 }
 
 void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
@@ -193,12 +198,13 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	int idx = chIdP->next();
 	IIOFloatChannelNode *griiofcn = dynamic_cast<IIOFloatChannelNode *>(node);
 
-
 	// Create TimeChannelComponent (replaces all your manual setup)
 	TimeChannelComponent *c = new TimeChannelComponent(
-		griiofcn->source(), idx, idx, static_cast<datasink::BlockManager *>(m_blockManager),
+		static_cast<IIOSourceBlock *>(griiofcn->source()), idx, idx,
+		static_cast<datasink::BlockManager *>(m_blockManager),
 		dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)), chIdP->pen(idx), m_ui->rightStack);
 
+	static_cast<IIOSourceBlock *>(griiofcn->source())->populateChannelInfo(idx);
 	// Start the manager
 	// manager->start();
 
@@ -237,6 +243,8 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		m_defaultCh = c;
 		m_plotComponentManager->selectChannel(c);
 	}
+
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c, &TimeChannelComponent::setRollingMode);
 }
 
 void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)

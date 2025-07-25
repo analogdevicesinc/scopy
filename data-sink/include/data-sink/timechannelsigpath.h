@@ -12,6 +12,31 @@
  * Time channel signal path - manages a complete signal processing chain for a single channel
  */
 namespace scopy::datasink {
+class SCOPY_DATA_SINK_EXPORT RollingBufferFilter : public FilterBlock {
+	Q_OBJECT
+public:
+	RollingBufferFilter(SourceBlock* source, QString name = "RollingBufferFilter");
+
+	void setPlotSize(size_t plotSize);
+	void setRollingMode(bool rolling);
+
+	size_t getPlotSize() const;
+	bool isRollingMode() const;
+
+protected:
+	ChannelDataVector createData() override;
+
+private:
+	size_t m_plotSize;
+	bool m_rollingMode;
+	ChannelDataVector m_plotBuffer;
+	size_t m_currentPosition;
+	bool m_bufferFull;
+
+	void resetPlotBuffer();
+	SourceBlock *m_source;
+};
+
 // Offset filter implementation
 class SCOPY_DATA_SINK_EXPORT OffsetFilter : public FilterBlock
 {
@@ -87,9 +112,10 @@ public:
 	void disable();
 	bool isEnabled() const;
 
-	// Offset control
+	// filters control
 	void setOffset(double offset);
 	void setScale(double scale);
+	void setRollingMode(bool mode);
 	double getOffset() const;
 	double getScale() const;
 
@@ -113,6 +139,7 @@ private:
 	BlockManager *m_manager;
 	SignalPath *m_signalPath;
 	OffsetFilter *m_offsetFilter;
+	RollingBufferFilter *m_rollingFilter;
 	bool m_enabled;
 	bool m_filterConnected;
 

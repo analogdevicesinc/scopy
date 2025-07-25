@@ -19,6 +19,7 @@
  *
  */
 
+#include "customSourceBlocks.h"
 #include <pluginbase/preferences.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -31,6 +32,7 @@
 #include <timechannelcomponent.h>
 #include <timeplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_TIMECHANNELCOMPONENT, "TimeChannelComponent");
 
@@ -38,36 +40,33 @@ using namespace scopy;
 using namespace scopy::datasink;
 using namespace scopy::adc;
 
-TimeChannelComponent::TimeChannelComponent(SourceBlock *sourceBlock, uint sourceChannel, uint outputChannel,
-					   BlockManager *manager, TimePlotComponent *m_plot,
-					   QPen pen, QWidget *parent)
+TimeChannelComponent::TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sourceChannel, uint outputChannel,
+					   BlockManager *manager, TimePlotComponent *m_plot, QPen pen, QWidget *parent)
 	: ChannelComponent(sourceBlock->name() + "_ch" + QString::number(sourceChannel), pen, parent)
 {
 	m_plotChannelCmpt = new TimePlotComponentChannel(this, m_plot, this);
 	m_timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel *>(m_plotChannelCmpt);
-	connect(m_chData, &scopy::ChannelData::newData, m_timePlotComponentChannel, &TimePlotComponentChannel::onNewData);
+	connect(m_chData, &scopy::ChannelData::newData, m_timePlotComponentChannel,
+		&TimePlotComponentChannel::onNewData);
 
-	// Replace the old GR-specific parts with new infrastructure
 	m_sourceBlock = sourceBlock;
 	m_sourceChannel = sourceChannel;
 	m_manager = manager;
 
-	// Create the new TimeChannelSigpath instead of GRTimeChannelSigpath
-	m_tch = new TimeChannelSigpath(sourceBlock->name() + "_sigpath", this, sourceBlock, sourceChannel, outputChannel, manager, this);
+	m_tch = new TimeChannelSigpath(sourceBlock->name() + "_sigpath", this, sourceBlock, sourceChannel,
+				       outputChannel, manager, this);
 
 	m_running = false;
 	m_autoscaleEnabled = false;
 
-	// You'll need to get scale availability and unit from your source block or another way
-	// m_scaleAvailable = m_sourceBlock->scaleAttributeAvailable(); // implement this in your SourceBlock
-	// m_unit = m_sourceBlock->unit(); // implement this in your SourceBlock
-	m_scaleAvailable = false; // placeholder
-	// m_unit = IIOUnitsManager::iioChannelTypes().value(iio_channel_get_type(m_iioCh), {"Adimensional", ".", 1});
+	m_sourceBlock->populateChannelInfo(sourceChannel);
+	m_scaleAvailable = m_sourceBlock->scaleAttributeAvailable(sourceChannel);
+	// m_unit = m_sourceBlock->unit(); // implement this
 
 	m_channelName = sourceBlock->name() + "_ch" + QString::number(sourceChannel);
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
-	// m_measureMgr->getModel()->setAdcBitCount(m_sourceBlock->getBitCount()); // implement this
+	m_measureMgr->getModel()->setAdcBitCount(m_sourceBlock->getFmt(sourceChannel)->bits);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
@@ -81,26 +80,44 @@ TimeChannelComponent::TimeChannelComponent(SourceBlock *sourceBlock, uint source
 
 TimeChannelComponent::~TimeChannelComponent() {}
 
+void TimeChannelComponent::setRollingMode(bool mode) { m_tch->setRollingMode(mode); }
+
 QWidget *TimeChannelComponent::createYAxisMenu(QWidget *parent)
 {
 	m_yaxisMenu = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF,
 						    MenuCollapseSection::MHW_BASEWIDGET, parent);
+	m_yaxisMenu->contentLayout()->setSpacing(6);
 
 	// Y-MODE
 	m_ymodeCb = new MenuCombo("YMODE", m_yaxisMenu);
+	InfoIconWidget::addHoveringInfoToWidget(m_ymodeCb->label(),
+						"Set Y axis scaling mode\nThis does not affect the data", m_ymodeCb);
 	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);
+	cb->addItem("Scale override", YMODE_SCALE_OVERRIDE);
 
 	m_scaleWidget = nullptr;
-	// if(m_scaleAvailable) {
-	// 	cb->addItem(m_unit.name, YMODE_SCALE);
-	// 	m_scaleWidget = IIOWidgetBuilder(m_yaxisMenu)
-	// 				.channel(m_src->channel())
-	// 				.attribute(m_src->scaleAttribute())
-	// 				.buildSingle();
-	// }
-	// TODO
+	if(m_scaleAvailable) {
+		cb->addItem(m_unit.name, YMODE_SCALE);
+		m_scaleWidget = IIOWidgetBuilder(m_yaxisMenu)
+					.device(m_sourceBlock->iioDev())
+					.attribute(m_sourceBlock->getChScaleAttr(m_sourceChannel))
+					.buildSingle();
+	}
+
+	m_scaleOverrideWidget = new QWidget(m_yaxisMenu);
+	auto layout = new QVBoxLayout();
+	m_scaleOverrideWidget->setLayout(layout);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	QLabel *scaleLabel = new QLabel("Scale", this);
+	Style::setStyle(scaleLabel, style::properties::label::subtle);
+	m_scaleSpin = new QDoubleSpinBox(m_scaleOverrideWidget);
+	m_scaleSpin->setRange(0, 1000);
+	m_scaleSpin->setValue(1);
+	layout->addWidget(scaleLabel);
+	layout->addWidget(m_scaleSpin);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotComponentChannel->m_timePlotYAxis, m_yaxisMenu);
 	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), m_yaxisMenu, false);
@@ -128,8 +145,12 @@ QWidget *TimeChannelComponent::createYAxisMenu(QWidget *parent)
 	m_yaxisMenu->contentLayout()->addWidget(m_autoscaleBtn);
 	m_yaxisMenu->contentLayout()->addWidget(m_yCtrl);
 	m_yaxisMenu->contentLayout()->addWidget(m_ymodeCb);
+	m_yaxisMenu->contentLayout()->addWidget(m_scaleOverrideWidget);
 	if(m_scaleWidget)
 		m_yaxisMenu->contentLayout()->addWidget(m_scaleWidget);
+
+	connect(m_scaleSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+		[=](double value) { setYModeHelper(YMODE_SCALE_OVERRIDE); });
 
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto mode = cb->itemData(idx).toInt();
@@ -178,7 +199,7 @@ QPushButton *TimeChannelComponent::createSnapshotButton(QWidget *parent)
 		// AcqTreeNode *treeRoot = m_node->treeRoot();
 		// ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec, treeRoot);
 		// treeRoot->addTreeChild(snap);
-		//TODO
+		// TODO
 	});
 
 	snapBtn->setEnabled(false);
@@ -260,12 +281,8 @@ void TimeChannelComponent::setYModeHelper(YMode mode)
 	double offset = 0;
 	double ymin = -1;
 	double ymax = 1;
-
-	// You'll need to get format info from your source block or store it differently
-	// const iio_data_format *fmt = m_sourceBlock->getFmt(); // implement this in your SourceBlock
-	// For now, using placeholder values
-	bool is_signed = true;
-	int bits = 16;
+	bool is_signed = m_sourceBlock->getFmt(m_sourceChannel)->is_signed;
+	int bits = m_sourceBlock->getFmt(m_sourceChannel)->bits;
 
 	switch(mode) {
 	case YMODE_COUNT:
@@ -324,10 +341,8 @@ void TimeChannelComponent::setYModeHelper(YMode mode)
 	}
 	m_yCtrl->setMin(ymin);
 	m_yCtrl->setMax(ymax);
-
-	// Replace the old GR scale/offset calls with new ones
-	m_tch->setScale(scale);   // This replaces m_grtch->m_scOff->setScale(scale);
-	m_tch->setOffset(offset); // This replaces m_grtch->m_scOff->setOffset(offset);
+	m_tch->setScale(scale);
+	m_tch->setOffset(offset);
 }
 
 void TimeChannelComponent::addChannelToPlot()
@@ -372,7 +387,8 @@ double TimeChannelComponent::yMax() const { return m_yCtrl->max(); }
 
 MeasureManagerInterface *TimeChannelComponent::getMeasureManager() { return m_measureMgr; }
 
-SignalPath *TimeChannelComponent::sigpath() {
+SignalPath *TimeChannelComponent::sigpath()
+{
 	return m_tch->sigpath(); // This replaces return m_grtch->sigpath();
 }
 
@@ -404,9 +420,9 @@ void TimeChannelComponent::onNewData(const float *xData, const float *yData, siz
 	m_snapBtn->setEnabled(true);
 }
 
-bool TimeChannelComponent::sampleRateAvailable() { return 0; } // TODO
+bool TimeChannelComponent::sampleRateAvailable() { return m_sourceBlock->sampleRateAvailable(m_sourceChannel); }
 
-double TimeChannelComponent::sampleRate() { return 100; } // TODO
+double TimeChannelComponent::sampleRate() { return m_sourceBlock->readSampleRate(); }
 
 void TimeChannelComponent::setSamplingInfo(SamplingInfo p)
 {

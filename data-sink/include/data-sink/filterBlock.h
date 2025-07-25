@@ -8,6 +8,8 @@
 #include <QObject>
 
 namespace scopy::datasink {
+
+class SourceBlock;
 class SCOPY_DATA_SINK_EXPORT FilterBlock : public BasicBlock
 {
     Q_OBJECT
@@ -30,6 +32,7 @@ protected:
     bool m_copy;
     BlockData m_data; // <channel, <buffer, size>>
     QMap<uint, bool> m_connectedChannels; // <channel, data_recieved>
+    SourceBlock *m_source = nullptr;
 };
 }
 
