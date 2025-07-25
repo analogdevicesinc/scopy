@@ -30,19 +30,15 @@ Scripting Examples
 
     // Find and connect to the first available device
     let devices = scopy.getDevicesName();
-    if (devices.length === 0) {
-        print("No devices found.");
-    } else {
+    if (devices.length !== 0) {
         let devID = scopy.addDevice(devices[0], "");
         let connected = scopy.connectDevice(devID);
         if (connected) {
             let tools = scopy.getTools();
             for (let i = 0; i < tools.length; i++) {
-                print("Tool " + i + ": " + tools[i]);
+                // Tool iteration
             }
             scopy.disconnectDevice(devID);
-        } else {
-            print("Failed to connect to device.");
         }
     }
 
@@ -52,22 +48,16 @@ Scripting Examples
 
     // Find and connect to the first available device, switch to RegMap, and read register 0x00
     let devices = scopy.getDevicesName();
-    if (devices.length === 0) {
-        print("No devices found.");
-    } else {
+    if (devices.length !== 0) {
         let devID = scopy.addDevice(devices[0], "");
         let connected = scopy.connectDevice(devID);
         if (connected) {
             let switched = scopy.switchTool(devID, "RegMap");
             if (switched) {
                 let value = regmap.read(0x00);
-                print("Register 0x00 value: " + value);
-            } else {
-                print("Failed to switch to RegMap tool.");
+                // Register value read
             }
             scopy.disconnectDevice(devID);
-        } else {
-            print("Failed to connect to device.");
         }
     }
 
@@ -77,19 +67,16 @@ Scripting Examples
 
     // Assumes device is already connected and RegMap tool is active
     let originalValue = regmap.read(0x00);
-    print("Original value: " + originalValue);
 
     regmap.write(0x00, 1);
     scopy.msleep(1000);
 
     let newValue = regmap.read(0x00);
-    print("Value after write: " + newValue);
 
     regmap.write(0x00, originalValue);
     scopy.msleep(1000);
 
     let restoredValue = regmap.read(0x00);
-    print("Restored value: " + restoredValue);
 
 Command Line Scripting
 ----------------------

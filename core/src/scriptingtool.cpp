@@ -96,8 +96,12 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 	Style::setStyle(m_inputLine, style::properties::widget::basicComponent);
 	Style::setStyle(m_inputLine, style::properties::widget::border_interactive);
 
-	m_tool->addWidgetToCentralContainerHelper(m_codeEditor);
-	m_tool->addWidgetToCentralContainerHelper(m_console);
+	QSplitter *splitter = new QSplitter(Qt::Vertical, m_tool);
+	splitter->addWidget(m_codeEditor);
+	splitter->addWidget(m_console);
+	splitter->setStretchFactor(0, 2); // Editor gets more space by default
+	splitter->setStretchFactor(1, 1); // Console gets less
+	m_tool->addWidgetToCentralContainerHelper(splitter);
 	m_tool->addWidgetToCentralContainerHelper(m_inputLine);
 
 	connect(m_inputLine, &QLineEdit::returnPressed, this, [this, m_inputLine]() {
