@@ -18,6 +18,9 @@ Contents
    m2k/index
    registermap/index
    debugger/index
+   jesd/index
+   ad936x/index
+   ad9084/index
 
 ..
  add the path to each plugin test case here
