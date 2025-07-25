@@ -29,6 +29,7 @@ AlwaysRestart=yes
 DisableDirPage=no
 MinVersion=6.2
 PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 SetupIconFile="@SCOPY_ICON_ICO@"
 WizardStyle=modern
 
