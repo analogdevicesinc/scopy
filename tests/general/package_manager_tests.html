@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Tester" name="description" />
+
+    <title>Package Manager - Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=04bde29a" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script async="async" src="../../_static/app.umd.js?v=fd5ab216"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Scripting Tool - Test Suite" href="scripting_tool.html" />
+    <link rel="prev" title="General Preferences - Test Suite" href="general_preferences_tests.html" />
+   
+  
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head><body>
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div>
+          <div class="localtoc-header"></div>
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Package Manager - Test Suite</a><ul>
+<li><a class="reference internal" href="#test-1-package-discovery-load">Test 1 - Package Discovery Load</a></li>
+<li><a class="reference internal" href="#test-2-package-resource-access">Test 2 - Package Resource Access</a></li>
+<li><a class="reference internal" href="#test-3-package-create">Test 3 - Package Create</a></li>
+<li><a class="reference internal" href="#test-4-package-install">Test 4 - Package Install</a></li>
+<li><a class="reference internal" href="#test-5-package-uninstall">Test 5 - Package Uninstall</a></li>
+<li><a class="reference internal" href="#test-6-backward-compatibility">Test 6 - Backward compatibility</a></li>
+<li><a class="reference internal" href="#test-7-error-handling">Test 7 - Error handling</a></li>
+<li><a class="reference internal" href="#test-8-ui-ux">Test 8 - UI/UX</a></li>
+<li><a class="reference internal" href="#test-9-manual-package-deletion">Test 9 - Manual package deletion</a></li>
+<li><a class="reference internal" href="#test-10-plugin-info-about-page">Test 10 - Plugin info About page</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img class="only-light" src="../../_static/scopy.png"/>
+      <img class="only-dark" src="../../_static/scopy.png"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../../plugins/ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../../plugins/ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../plugins/ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../plugins/scripting/scripting.html">Scripting Tool</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/package_generator.html">Package Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/plugin_developer_guide.html">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-9" id="toctree-collapse-4-1-9"/><div class="collapse"><a class="reference internal" href="../plugins/jesd/index.html">JESD STATUS</a><label for="toctree-collapse-4-1-9"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/jesd/jesd_status_tests.html">JESD STATUS Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-10" id="toctree-collapse-4-1-10"/><div class="collapse"><a class="reference internal" href="../plugins/ad936x/index.html">AD936X</a><label for="toctree-collapse-4-1-10"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/ad936x/ad936x_tests.html">AD936x Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-11" id="toctree-collapse-4-1-11"/><div class="collapse"><a class="reference internal" href="../plugins/ad9084/index.html">AD9084</a><label for="toctree-collapse-4-1-11"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../plugins/ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2" checked=""/><div class="collapse"><a class="reference internal" href="index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="general_preferences_tests.html">General Preferences - Test Suite</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Package Manager - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripting_tool.html">Scripting Tool - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../index.html">Test Cases</a></li><li><a href="index.html">General Test Cases</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="package-manager-test-suite">
+<span id="package-manager-tests"></span><h1>Package Manager - Test Suite<a class="headerlink" href="#package-manager-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>Tester</p></td>
+<td><p>Test Date</p></td>
+<td><p>Scopy version</p></td>
+<td><p>Plugin version (N/A if not applicable)</p></td>
+<td><p>Comments</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="test-1-package-discovery-load">
+<h2>Test 1 - Package Discovery Load<a class="headerlink" href="#test-1-package-discovery-load" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.DISCOVERY.LOAD</p>
+<p><strong>Description:</strong> Verify that all available packages are discovered and loaded correctly at startup.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy started with default package locations.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Start Scopy.</p></li>
+<li><dl class="simple">
+<dt>Open the package manager UI or check logs for loaded packages.</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt><strong>Expected result:</strong></dt><dd><ul>
+<li><p>All packages in the designated directories are listed and loaded without errors.</p></li>
+<li><p>The following packages are expected to be loaded:</p>
+<ul>
+<li><p>ad936x,</p></li>
+<li><p>apollo ad9084,</p></li>
+<li><p>generic plugins,</p></li>
+<li><p>adalm2000,</p></li>
+<li><p>power quality monitor,</p></li>
+<li><p>ad-swiot1l-sl</p></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-package-resource-access">
+<h2>Test 2 - Package Resource Access<a class="headerlink" href="#test-2-package-resource-access" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.RESOURCE.ACCESS</p>
+<p><strong>Description:</strong> Ensure that resources (XML, CSV, etc.) within packages are accessible and used by the application.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>At least one package with resources installed.</p></li>
+<li><p>Registermap tests were passed and the tool is working properly.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Connect a physical Pluto device or start Pluto in emulation mode.</p></li>
+<li><p>Open the Register Map tool in Scopy.</p></li>
+<li><p>Select the connected Pluto device.</p></li>
+<li><dl class="simple">
+<dt>Check if the register table loads and displays correctly.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The register table is loaded from the XML resource and displayed without errors.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-package-create">
+<h2>Test 3 - Package Create<a class="headerlink" href="#test-3-package-create" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.CREATE</p>
+<p><strong>Description:</strong> Test creating a new package (named “test_pkg”) using the official package generator script (<cite>package_generator.py</cite>).</p>
+<p><strong>Reference:</strong> See <a class="reference internal" href="../../developer_guide/package_generator.html#package-generator"><span class="std std-ref">Package Generator</span></a></p>
+<dl>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Python 3 and all prerequisites installed (see developer guide).</p></li>
+<li><p>Scopy repository cloned and accessible.</p></li>
+<li><p>In a terminal, working directory is <cite>scopy/tools/packagegenerator</cite>.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic">
+<li><p>Prepare a <cite>pkg.json</cite> configuration file for the new package (see example in the developer guide).</p></li>
+<li><p>Run the following command to generate the package template:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./package_generator.py<span class="w"> </span>--all<span class="w"> </span>--config_file_path<span class="o">=</span>path/to/pkg.json
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><dl>
+<dt>Verify that a new folder for “test_pkg” is created as a development template in <cite>scopy/packages/</cite> with the expected structure and files (including a manifest file).</dt><dd><ul>
+<li><p>Folder hierarchy when using the <cite>–all</cite> flag should look like:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>├── CMakeLists.txt
+├── include
+│   └── newpackage
+├── manifest.json.cmakein
+├── plugins
+│   └── newplugin
+├── resources
+│   ├── translations
+│   └── translations.qrc
+└── style
+    ├── json
+    └── qss
+  ├── generic
+  └── properties
+</pre></div>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>If a build is performed, the new package should be present in the build folder as well.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “test_pkg” package template is created in <cite>scopy/packages/</cite> with the correct structure and metadata, and after build, it appears in the build folder.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-package-install">
+<h2>Test 4 - Package Install<a class="headerlink" href="#test-4-package-install" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.INSTALL</p>
+<p><strong>Description:</strong> Test installing the previously created package (“test_pkg”) via the package manager and verifying it appears in the list and is usable.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Test 3 (PKG_MANAGER.CREATE) was passed.</p></li>
+<li><p>Scopy running with package manager UI accessible.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Create a zip file of the “test_pkg” package or ensure it is in the correct format for installation.</p></li>
+<li><p>In the package manager UI, search for the zipped package named “test_pkg”.</p></li>
+<li><p>Install the “test_pkg” package.</p></li>
+<li><dl class="simple">
+<dt>Check that “test_pkg” appears in the package list and is enabled/usable.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “test_pkg” package appears in the list and its features are available in Scopy.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-package-uninstall">
+<h2>Test 5 - Package Uninstall<a class="headerlink" href="#test-5-package-uninstall" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.UNINSTALL</p>
+<p><strong>Description:</strong> Test uninstalling the previously created and installed package (“test_pkg”) via the package manager and verifying it is removed.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Test 4 (PKG_MANAGER.INSTALL) was passed.</p></li>
+<li><p>Scopy running with package manager UI accessible.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>In the package manager UI, locate the “test_pkg” package.</p></li>
+<li><p>Uninstall the “test_pkg” package.</p></li>
+<li><p>A button should appear for a Restart.</p></li>
+<li><p>Press the Restart button.</p></li>
+<li><dl class="simple">
+<dt>After Scopy restarts, check that “test_pkg” is removed from the package list and its features are no longer available in Scopy.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “test_pkg” package is removed from the list and its features are not available.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-backward-compatibility">
+<h2>Test 6 - Backward compatibility<a class="headerlink" href="#test-6-backward-compatibility" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.BACKWARD_COMPAT</p>
+<p><strong>Description:</strong> Verify that legacy plugins/packages are still recognized and function as expected, specifically by running a test from the m2k plugin.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Legacy plugin/package (e.g., m2k) present in the package directory.</p></li>
+<li><p>Scopy built with support for legacy plugins.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Start Scopy with the legacy m2k plugin/package installed. See <a class="reference internal" href="../../plugins/m2k/index.html#m2k-index"><span class="std std-ref">M2k Plugin</span></a> for plugin details and usage.</p></li>
+<li><p>Open the m2k plugin UI or access its features.</p></li>
+<li><dl class="simple">
+<dt>Run a basic test or operation provided by the m2k plugin (e.g., connect to an m2k device and perform a simple acquisition).</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The m2k plugin loads, its UI/features are accessible, and the test operation completes successfully without errors.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-error-handling">
+<h2>Test 7 - Error handling<a class="headerlink" href="#test-7-error-handling" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.ERROR.HANDLING</p>
+<p><strong>Description:</strong> Ensure that errors (e.g., missing/corrupt package, bad resource) are handled gracefully.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy running with package manager UI accessible.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Create an archive (zip) of a package but omit the manifest file (e.g., remove <cite>manifest.json</cite> before archiving).</p></li>
+<li><p>Attempt to install the corrupted package using the package manager UI.</p></li>
+<li><dl class="simple">
+<dt>Observe the result.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> An error is reported and Scopy remains stable without crashing or freezing.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-ui-ux">
+<h2>Test 8 - UI/UX<a class="headerlink" href="#test-8-ui-ux" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.UIUX</p>
+<p><strong>Description:</strong> Check that the package manager UI is clear, responsive, and provides necessary feedback.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy running with package manager UI enabled.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the package manager UI.</p></li>
+<li><dl class="simple">
+<dt>Perform install/uninstall and observe feedback.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> UI updates in real time, shows status, and is user-friendly.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-manual-package-deletion">
+<h2>Test 9 - Manual package deletion<a class="headerlink" href="#test-9-manual-package-deletion" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.MANUAL.DELETE</p>
+<p><strong>Description:</strong> Test deleting a package manually from the filesystem and observe Scopy’s behavior, using the AD936X package as the test subject.</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>The AD936X package is installed.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Close Scopy.</p></li>
+<li><p>Delete the <cite>ad936x</cite> package folder from the package directory.</p></li>
+<li><dl class="simple">
+<dt>Restart Scopy.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The AD936X package is no longer listed or loaded, and no errors occur.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-plugin-info-about-page">
+<h2>Test 10 - Plugin info About page<a class="headerlink" href="#test-10-plugin-info-about-page" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE</p>
+<p><strong>Description:</strong> Ensure that the “Plugins Info” tab in the About section lists all plugins that are currently loaded (i.e., have the “loaded” label).</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Multiple plugins installed and enabled in Scopy.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the About section in Scopy.</p></li>
+<li><p>Navigate to the “Plugins Info” tab.</p></li>
+<li><dl class="simple">
+<dt>Verify that all plugins which are loaded are listed and have the “loaded” label.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The “Plugins Info” tab displays all loaded plugins with the correct label, reflecting the actual state of the application.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="general_preferences_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">General Preferences - Test Suite</a>
+    <a href="scripting_tool.html" title="Next document (Alt+Shift+RightArrow)" class="next">Scripting Tool - Test Suite</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

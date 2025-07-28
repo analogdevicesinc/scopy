@@ -1,5 +1,6 @@
 .. _datalogger_tests:
 
+
 Datalogger Test Suite
 ================================================================================
 
@@ -1825,3 +1826,187 @@ date time format for the X Axis
 
 ..
   The result of the test goes here (PASS/FAIL).
+
+
+.. _TST_DATALOGGER_USE_MULTIPLOT:
+
+
+Test 35: Use Multiplot Feature
+---------------------------------
+
+**UID:** TST.DATALOGGER.USE_MULTIPLOT
+
+**Description:** Verify that the user can enable multiplot in preferences, create multiple plots, and assign channels to different plots in the Data Logger plugin.
+
+**OS:** ANY
+
+**Preconditions:**
+    - Connect to :ref:`AdalmPluto.Emu <datalogger_adalm_pluto_emu_setup>` or :ref:`AdalmPluto.Device <datalogger_adalm_pluto_device_setup>`
+
+**Prerequisites:**
+    - :ref:`Run and Stop Data Logging <TST_DATALOGGER_RUN_STOP_DATA_LOGGING>` is passed
+
+**Steps:**
+    1. Open Preferences
+    2. Go to the "DataLoggerPlugin" tab
+    3. Enable the **Multiplot** option (toggle or checkbox)
+        - **Expected result:** Multiplot feature is enabled in Data Logger
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    4. Open Data Logger plugin
+    5. Enable channel **voltage0** of **xadc** device
+    6. Press **Run** button
+    7. Open the settings menu 
+    8. Press **Add Plot**  button
+    9. Assign channel **voltage1** of **xadc** device to the new plot
+        - **Expected result:** Two plots are visible, each displaying data from their assigned channels
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    10. Remove the second plot
+    
+        - **Expected result:** Only the first plot remains, and its data is unaffected
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+..
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+..
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+..
+
+.. _TST_DATALOGGER_USE_KDOCKS:
+
+Test 36: Use Docking/Layout (Kdocks) Feature
+----------------------------------------------
+
+**UID:** TST.DATALOGGER.USE_KDOCKS
+
+**Description:** Verify that the Data Logger tool window can be docked, undocked, and rearranged using the application's docking/layout system.
+
+**OS:** ANY
+
+**Preconditions:**
+    - Scopy application supports docking/layout for tool windows
+
+**Steps:**
+    1. Open Data Logger plugin
+    2. Attempt to drag the Data Logger window to a new position in the main application window
+        - **Expected result:** Data Logger window can be docked to different areas (e.g., left, right, bottom, floating)
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Undock the Data Logger window (make it floating)
+        - **Expected result:** Data Logger window is now floating and can be moved independently
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    4. Dock the Data Logger window back to the main window
+        - **Expected result:** Data Logger window is re-docked and integrated with the main layout
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+..
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+..
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+..
+
+.. _TST_DATALOGGER_USE_CHANNEL_SCALING:
+
+Test 37: Use Channel Scaling Settings
+---------------------------------------
+
+**UID:** TST.DATALOGGER.USE_CHANNEL_SCALING
+
+**Description:** Verify that the user can adjust channel scaling (gain/offset) using the channel settings menu and that the changes are reflected in the plot.
+
+**OS:** ANY
+
+**Preconditions:**
+    - Connect to :ref:`AdalmPluto.Emu <datalogger_adalm_pluto_emu_setup>` or :ref:`AdalmPluto.Device <datalogger_adalm_pluto_device_setup>`
+
+**Prerequisites:**
+    - :ref:`Run and Stop Data Logging <TST_DATALOGGER_RUN_STOP_DATA_LOGGING>` is passed
+
+**Steps:**
+    1. Open Data Logger plugin
+    2. Enable channel **voltage0** of **xadc** device
+    3. Press **Run** button
+    4. Open the channel settings or attributes menu for **voltage0**
+    5. Change the scaling (e.g., set gain to 2.0, offset to 1.0)
+        - **Expected result:** The plot for **voltage0** updates to reflect the new scaling (values are doubled and offset by 1)
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    6. Reset scaling to default values
+        - **Expected result:** The plot returns to displaying the original data values
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+..
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+..
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+..
