@@ -31,7 +31,7 @@
 #include <preferenceshelper.h>
 #include <stylehelper.h>
 #include <pluginbase/preferences.h>
-
+#include <pluginbase/scopy-pluginbase_config.h>
 using namespace scopy;
 
 WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
@@ -60,7 +60,12 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	optionsControlLayout->addWidget(showAgain);
 
 	Preferences *p = Preferences::GetInstance();
-	connect(showAgain, &QCheckBox::toggled, this, [=](bool en) { p->set("general_dont_show_whats_new", en); });
+	connect(showAgain, &QCheckBox::toggled, this, [=](bool en) {
+		p->set("general_dont_show_whats_new", en);
+		if(en) {
+			p->set("scopy_git_version", QString(SCOPY_VERSION_GIT));
+		}
+	});
 
 	showAgain->setChecked(true);
 
