@@ -1,10 +1,3 @@
-def print_progress_bar(iteration, total, prefix='', suffix='', length=40):
-    percent = f"{100 * (iteration / float(total)):.1f}" if total else "0.0"
-    filled_length = int(length * iteration // total) if total else 0
-    bar = '█' * filled_length + '-' * (length - filled_length)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='\r')
-    if iteration == total:
-        print()
 import argparse
 import sys
 import os
@@ -14,6 +7,14 @@ import subprocess
 import stat
 import datetime
 import zipfile
+
+def print_progress_bar(iteration, total, prefix='', suffix='', length=40):
+    percent = f"{100 * (iteration / float(total)):.1f}" if total else "0.0"
+    filled_length = int(length * iteration // total) if total else 0
+    bar = '█' * filled_length + '-' * (length - filled_length)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='\r')
+    if iteration == total:
+        print()
 
 def autodetect_platform():
     sys_platform = platform.system().lower()
