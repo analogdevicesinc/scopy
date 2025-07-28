@@ -70,6 +70,7 @@ Test 2 - Package Resource Access
 --------------------------------------
 
 **UID:** PKG_MANAGER.RESOURCE.ACCESS
+
 **Description:** Ensure that resources (XML, CSV, etc.) within packages are accessible and used by the application.
 
 **Preconditions:**
@@ -240,8 +241,6 @@ Test 5 - Package Uninstall
 ..
   Actual test result goes here.
 ..
-
-**Tested OS:**
 
 **Tested OS:**
 

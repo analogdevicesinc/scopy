@@ -61,7 +61,7 @@ Test 2: Link Status Display
     - AD9084 device is connected
 
 **Steps:**
-    1. Externally set the link status to ON (enable the link on AD9084)
+    1. Using the emulated device, open the Debugger Plugin and modify the actual link status string to set the link status to ON (enable the link on AD9084)
         - **Expected result:** Status changes to "enabled" and is shown in green
         - **Actual result:**
 
@@ -69,7 +69,7 @@ Test 2: Link Status Display
   Actual test result goes here.
 ..
 
-    2. Externally set the link status to OFF (disable the link on AD9084)
+    2. Using the emulated device, open the Debugger Plugin and modify the actual link status string to set the link status to OFF (disable the link on AD9084)
         - **Expected result:** Status changes to "disabled" and is shown in red
         - **Actual result:**
 
@@ -95,46 +95,7 @@ Test 2: Link Status Display
   The result of the test goes here (PASS/FAIL).
 ..
 
-Test 3: Clock Values Accuracy
--------------------------------
-
-**UID:** TST.JESD_STATUS.CLOCK_VALUES_ACCURACY
-
-**Description:** Verify that measured/reported Link and Device Clock (MHz) values are displayed and accurate.
-
-**OS:** ANY
-
-**Preconditions:**
-    - AD9084 device is connected
-
-**Steps:**
-    1. Verify Measured/Reported Link and Device Clock (MHz) values
-        - **Expected result:** All clock values are displayed and match expected device values
-        - **Actual result:**
-
-..
-  Actual test result goes here.
-..
-
-**Tested OS:**
-
-..
-  Details about the tested OS goes here.
-..
-
-**Comments:**
-
-..
-  Any comments about the test goes here.
-..
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
-..
-
-Test 4: Lane Status Table
+Test 3: Lane Status Table
 ----------------------------
 
 **UID:** TST.JESD_STATUS.LANE_STATUS_TABLE
@@ -173,7 +134,7 @@ Test 4: Lane Status Table
   The result of the test goes here (PASS/FAIL).
 ..
 
-Test 5: SYSREF and Alignment Error Reporting
+Test 4: SYSREF and Alignment Error Reporting
 -----------------------------------------------
 
 **UID:** TST.JESD_STATUS.SYSREF_ALIGNMENT_ERROR_REPORTING
@@ -212,7 +173,7 @@ Test 5: SYSREF and Alignment Error Reporting
   The result of the test goes here (PASS/FAIL).
 ..
 
-Test 6: Real-Time Updates
+Test 5: Real-Time Updates
 ----------------------------
 
 **UID:** TST.JESD_STATUS.REAL_TIME_UPDATES
@@ -267,7 +228,7 @@ Test 6: Real-Time Updates
   The result of the test goes here (PASS/FAIL).
 ..
 
-Test 7: UI/UX and Color Coding
+Test 6: UI/UX and Color Coding
 -------------------------------
 
 **UID:** TST.JESD_STATUS.UI_UX_COLOR_CODING

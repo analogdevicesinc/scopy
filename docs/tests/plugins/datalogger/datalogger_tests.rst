@@ -1871,6 +1871,7 @@ Test 35: Use Multiplot Feature
 ..
 
     10. Remove the second plot
+    
         - **Expected result:** Only the first plot remains, and its data is unaffected
         - **Actual result:**
 
