@@ -34,6 +34,7 @@
 #include <QScrollArea>
 #include <stylehelper.h>
 #include <verticaltabwidget.h>
+#include <whatsnewoverlay.h>
 
 using namespace scopy;
 ScopyAboutPage::ScopyAboutPage(QWidget *parent)
@@ -42,7 +43,9 @@ ScopyAboutPage::ScopyAboutPage(QWidget *parent)
 	, layout(new QVBoxLayout(this))
 {
 	initUI();
-	addHorizontalTab(buildPage(QString("qrc:/about.html")), "Scopy");
+	QWidget *scopyAboutPage = buildPage(QString("qrc:/about.html"));
+	buildWhatsNewButton(scopyAboutPage);
+	addHorizontalTab(scopyAboutPage, "Scopy");
 }
 
 void ScopyAboutPage::initUI()
@@ -99,6 +102,23 @@ void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 	hover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
 	hover->setAnchorOffset(QPoint(-10, 0));
 	hover->show();
+}
+
+void ScopyAboutPage::buildWhatsNewButton(QWidget *parent)
+{
+	// Add HoverWidget button "What's new"
+	QPushButton *whatsNewBtn = new QPushButton("What's new", parent);
+	Style::setStyle(whatsNewBtn, style::properties::button::basicButton, true, true);
+	HoverWidget *whatsNewHover = new HoverWidget(whatsNewBtn, parent, parent);
+	whatsNewHover->setAnchorPos(HP_BOTTOMRIGHT);
+	whatsNewHover->setContentPos(HP_BOTTOMRIGHT);
+	whatsNewHover->setAnchorOffset(QPoint(-110, -50));
+	whatsNewHover->show();
+	connect(whatsNewBtn, &QPushButton::clicked, this, [this]() {
+		WhatsNewOverlay *whatsNew = new WhatsNewOverlay(this);
+		whatsNew->move(this->rect().center() - whatsNew->rect().center());
+		QMetaObject::invokeMethod(whatsNew, &WhatsNewOverlay::showOverlay, Qt::QueuedConnection);
+	});
 }
 
 void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) { tabWidget->addTab(w, text); }
