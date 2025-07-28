@@ -50,6 +50,9 @@
    * - general_use_docking_if_available
      - Use docking elements if available
      - If the application was built with the docking feature, enable it. This will make some plots and elements detachable, thus enabling the user to configure the position of these elements in the application.
+   * - general_scripting_enabled
+     - Enable the use of Scripting Tool
+     - When disabled, the Scripting Tool will not be accessible.
    * - autoconnect_previous
      - Auto-connect to previous session
      - Automatically use the saved URI to connect to previous devices,       if available, when the application starts. This speeds up the       connection process and reduces the number of necessary steps.
