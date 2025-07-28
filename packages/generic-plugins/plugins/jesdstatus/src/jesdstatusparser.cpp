@@ -111,7 +111,10 @@ QPair<QString, VISUAL_STATUS> JesdStatusParser::getLaneLatency(unsigned int lane
 		ret.second = C_GOOD;
 	}
 
-	ret.first = QString("%1/%2").arg(currentLane.lane_latency_multiframes).arg(currentLane.lane_latency_octets);
+	ret.first = QString("%1 (%2/%3)")
+			    .arg(currentLane.lane_latency)
+			    .arg(currentLane.lane_latency_multiframes)
+			    .arg(currentLane.lane_latency_octets);
 	return ret;
 }
 
@@ -417,18 +420,12 @@ void JesdStatusParser::readLaneStatus(QString laneAttr)
 	m_jesd204_lanestatus.init_frame_sync =
 		regexMatch(laneStatus, QRegularExpression("Initial Frame Synchronization: (\\S+)[ \\n]?"));
 
-	QList<QString> multi_frames_and_octets = regexMatchMultiple(
-		laneStatus, QRegularExpression("Lane Latency: (\\S+) Multi-frames and  (\\S+) Octets[ \\n]?"), 2);
-	if(multi_frames_and_octets.size() == 2) {
-		bool ok = false;
-		unsigned int multiframes = multi_frames_and_octets.at(0).toUInt(&ok);
-		if(ok) {
-			m_jesd204_lanestatus.lane_latency_multiframes = multiframes;
-		}
-		unsigned int octets = multi_frames_and_octets.at(1).toUInt(&ok);
-		if(ok) {
-			m_jesd204_lanestatus.lane_latency_octets = octets;
-		}
+	QList<unsigned int> multi_frames_and_octets = regexMatchMultipleUInt(
+		laneStatus, QRegularExpression("Lane Latency: (\\S+) \\(min\\/max (\\S+)\\/(\\S+)\\)?[ \n]*$"), 3);
+	if(multi_frames_and_octets.size() == 3) {
+		m_jesd204_lanestatus.lane_latency = multi_frames_and_octets.at(0);
+		m_jesd204_lanestatus.lane_latency_multiframes = multi_frames_and_octets.at(1);
+		m_jesd204_lanestatus.lane_latency_octets = multi_frames_and_octets.at(2);
 	} else {
 		qDebug(CAT_JESDPARSER) << "There is an issue reading the JESD204 lane status latency.";
 	}
@@ -614,7 +611,7 @@ QList<QString> JesdStatusParser::regexMatchMultiple(QString container, QRegularE
 	QList<QString> capture = {};
 	QRegularExpressionMatch match = regex.match(container);
 	if(match.hasMatch()) {
-		for(int i = 1; i < count; i++) {
+		for(int i = 1; i <= count; i++) {
 			if(i <= match.capturedLength()) {
 				capture.push_back(match.captured(i));
 			}

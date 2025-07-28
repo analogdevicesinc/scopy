@@ -193,10 +193,10 @@ void JesdStatusView::initLaneStatusValues(QWidget *laneContainer)
 
 	laneLabels->contentLayout()->addWidget(new QLabel("Lane#", laneLabels));
 	laneLabels->contentLayout()->addWidget(new QLabel("Errors", laneLabels));
+	laneLabels->contentLayout()->addWidget(new QLabel("Latency (Multiframes/Octets)", laneLabels));
 	if(m_parser->getEncoder() == JESD204_64B66B) {
 		laneLabels->contentLayout()->addWidget(new QLabel("Extended multiblock alignment", laneLabels));
 	} else {
-		laneLabels->contentLayout()->addWidget(new QLabel("Latency (Multiframes/Octets)", laneLabels));
 		laneLabels->contentLayout()->addWidget(new QLabel("CGS State", laneLabels));
 		laneLabels->contentLayout()->addWidget(new QLabel("Initial Frame Sync", laneLabels));
 		laneLabels->contentLayout()->addWidget(new QLabel("Initial Lane Alignment Sequence", laneLabels));
@@ -211,12 +211,12 @@ void JesdStatusView::initLaneStatusValues(QWidget *laneContainer)
 		lane->contentLayout()->addWidget(new QLabel(QString::number(i), lane));
 		appendToLaneValues(
 			i, [this, i](unsigned int) { return m_parser->getErrors(i); }, lane);
+		appendToLaneValues(
+			i, [this, i](unsigned int) { return m_parser->getLaneLatency(i); }, lane);
 		if(m_parser->getEncoder() == JESD204_64B66B) {
 			appendToLaneValues(
 				i, [this, i](unsigned int) { return m_parser->getExtMultiBlockAlignment(i); }, lane);
 		} else {
-			appendToLaneValues(
-				i, [this, i](unsigned int) { return m_parser->getLaneLatency(i); }, lane);
 			appendToLaneValues(
 				i, [this, i](unsigned int) { return m_parser->getCgsState(i); }, lane);
 			appendToLaneValues(

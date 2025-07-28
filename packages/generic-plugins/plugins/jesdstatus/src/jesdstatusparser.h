@@ -137,6 +137,7 @@ private:
 		unsigned long fc;
 
 		int lane_errors = -1;
+		int lane_latency = -1;
 		int lane_latency_multiframes = -1;
 		int lane_latency_octets = -1;
 
