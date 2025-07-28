@@ -3,28 +3,12 @@ import sys
 import os
 import requests
 import platform
-import subprocess
-import stat
-import datetime
-import zipfile
-
-def print_progress_bar(iteration, total, prefix='', suffix='', length=40):
-    percent = f"{100 * (iteration / float(total)):.1f}" if total else "0.0"
-    filled_length = int(length * iteration // total) if total else 0
-    bar = '█' * filled_length + '-' * (length - filled_length)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='\r')
-    if iteration == total:
-        print()
 
 def autodetect_platform():
     sys_platform = platform.system().lower()
     if 'windows' in sys_platform:
         return 'windows'
     elif 'linux' in sys_platform:
-        # Try to detect arm64
-        machine = platform.machine().lower()
-        if 'aarch64' in machine or 'arm64' in machine:
-            return 'arm64'
         return 'linux'
     else:
         return None
@@ -78,6 +62,7 @@ def get_workflow_run(owner, repo, commit_sha, workflow_name, headers):
     except Exception as e:
         print(f"Error connecting to GitHub API: {e}")
         sys.exit(1)
+    total_count = data.get("total_count", 0)
     runs = [run for run in data.get("workflow_runs", []) if run.get("name") == workflow_name and run.get("head_sha", "").startswith(commit_sha)]
     # If no runs and short SHA, retry without head_sha filter and search for partial matches
     if not runs and len(commit_sha) < 40:
@@ -141,6 +126,7 @@ def filter_artifacts(artifacts, workflow_name, platform_value=None):
         return []
 
 def download_artifact(artifact, commit_sha, headers):
+    import datetime
     artifact_name = artifact['name']
     created_at = artifact['created_at']
     try:
@@ -157,18 +143,10 @@ def download_artifact(artifact, commit_sha, headers):
     try:
         with requests.get(download_url, headers=headers, stream=True) as r:
             r.raise_for_status()
-            total = int(r.headers.get('content-length', 0))
-            downloaded = 0
-            chunk_size = 8192
             with open(zip_path, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=chunk_size):
+                for chunk in r.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
-                        downloaded += len(chunk)
-                        print_progress_bar(downloaded, total, prefix='Downloading', suffix='Complete', length=40)
-            # Ensure progress bar completes if total is unknown
-            if total == 0:
-                print_progress_bar(1, 1, prefix='Downloading', suffix='Complete', length=40)
         print(f"Download complete: {zip_path}")
         return zip_path, folder_name
     except Exception as e:
@@ -176,14 +154,11 @@ def download_artifact(artifact, commit_sha, headers):
         return None, folder_name
 
 def extract_zip(zip_path, extract_to):
+    import zipfile
     print(f"Extracting {zip_path} to {extract_to}")
     try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            members = zip_ref.namelist()
-            total = len(members)
-            for i, member in enumerate(members, 1):
-                zip_ref.extract(member, extract_to)
-                print_progress_bar(i, total, prefix='Extracting', suffix='Complete', length=40)
+            zip_ref.extractall(extract_to)
         print(f"Extraction complete: {extract_to}")
         os.remove(zip_path)
     except Exception as e:
@@ -197,11 +172,7 @@ def extract_zip(zip_path, extract_to):
                 print(f"Found nested zip: {nested_zip_path}, extracting to {extract_to}")
                 try:
                     with zipfile.ZipFile(nested_zip_path, 'r') as zip_ref:
-                        members = zip_ref.namelist()
-                        total = len(members)
-                        for i, member in enumerate(members, 1):
-                            zip_ref.extract(member, extract_to)
-                            print_progress_bar(i, total, prefix='Extracting', suffix='Complete', length=40)
+                        zip_ref.extractall(extract_to)
                     os.remove(nested_zip_path)
                     print(f"Nested extraction complete: {extract_to}")
                 except Exception as e:
@@ -221,7 +192,7 @@ def main():
     args = parse_arguments()
 
     if not validate_commit_sha(args.commit_sha):
-        print("Error: commit_sha must be a hex string (of 7 characters (short sha), or 40 characters (full sha)).")
+        print("Error: commit_sha must be a hex string (at least 7 characters, up to 40).")
         print("Example: ad5758d37c9e0021591013d3ca4a6e6529be839f or ad6bd6b")
         sys.exit(1)
 
@@ -232,6 +203,7 @@ def main():
         sys.exit(1)
 
     print(f"Commit SHA: {args.commit_sha}")
+    print(f"Token: {'***' + token[-6:] if len(token) > 10 else token}")
 
     # Auto-detect platform if not provided
     platform_value = args.platform if args.platform else autodetect_platform()
@@ -273,7 +245,7 @@ def main():
 
     # Determine exe_name based on platform
     if platform_value == "windows":
-        exe_name = "scopy.exe"
+        exe_name = "Scopy-console.exe"
     elif platform_value == "linux":
         exe_name = "Scopy-x86_64.AppImage"
     elif platform_value == "arm64":
@@ -288,6 +260,8 @@ def main():
     print(f"Found executable: {exe_path}")
 
     # Launch the executable
+    import subprocess
+    import stat
     try:
         if platform_value == "windows":
             os.startfile(exe_path)
@@ -303,3 +277,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    
