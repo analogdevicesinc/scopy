@@ -46,6 +46,7 @@ private:
 	QWidget *buildPageColors();
 	QTabWidget *tabWidget;
 	QVBoxLayout *layout;
+	void buildWhatsNewButton(QWidget *parent);
 };
 } // namespace scopy
 
