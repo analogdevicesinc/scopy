@@ -64,9 +64,9 @@ if [ -z "$COMMIT_SHA" ]; then
 fi
 
 # Validate commit SHA format (40 character hex string)
-if [[ ! "$COMMIT_SHA" =~ ^[a-fA-F0-9]{${COMMIT_SHA_LENGTH}}$ ]]; then
-    echo -e "${RED}Error: Invalid commit SHA format. Must be ${COMMIT_SHA_LENGTH} character hex string.${NC}"
-    echo -e "${YELLOW}Example: ad5758d37c9e0021591013d3ca4a6e6529be839f${NC}"
+if [[ ! "$COMMIT_SHA" =~ ^[a-fA-F0-9]{7,40}$ ]]; then
+    echo -e "${RED}Error: Invalid commit SHA format. Must be 7-40 character hex string.${NC}"
+    echo -e "${YELLOW}Example: ad5758d37c9e0021591013d3ca4a6e6529be839f or 40558f0${NC}"
     exit 1
 fi
 
@@ -93,7 +93,7 @@ print_color() {
     echo -e "${color}${message}${NC}"
 }
 
-# Function to check dependencies
+# Check dependencies
 check_dependencies() {
     local missing_deps=()
     
@@ -138,35 +138,6 @@ get_macos_version() {
     fi
 }
 
-# Function to get matching build and download artifact
-get_matching_build() {
-    local url="${API_URL}/build/builds?api-version=${API_VERSION}&sourceVersion=${COMMIT_SHA}"
-    print_color $YELLOW "Getting builds for commit: $COMMIT_SHA"
-    
-    local response=$(make_api_call "$url")
-    local total_count=$(echo "$response" | jq -r '.count')
-    
-    print_color $CYAN "Found $total_count builds for this commit"
-    
-    # Filter by pipeline name AND exact commit SHA
-    local filtered_builds=$(echo "$response" | jq -r --arg pipeline "$PIPELINE_NAME" --arg sha "$COMMIT_SHA" '.value[] | select(.definition.name == $pipeline and .sourceVersion == $sha)')
-    
-    if [ -n "$filtered_builds" ]; then
-        local build_id=$(echo "$filtered_builds" | jq -r '.id' | head -1)
-        local build_status=$(echo "$filtered_builds" | jq -r '.status' | head -1)
-        local build_result=$(echo "$filtered_builds" | jq -r '.result' | head -1)
-        
-        print_color $GREEN "Found matching build: $build_id (Status: $build_status, Result: $build_result)"
-        
-        download_artifacts "$build_id"
-        return 0
-    else
-        print_color $RED "No matching build found for '$PIPELINE_NAME' with commit $COMMIT_SHA"
-        return 1
-    fi
-}
-
-
 # Helper function to find matching artifact for current macOS version
 find_matching_artifact() {
     local response="$1"
@@ -174,12 +145,6 @@ find_matching_artifact() {
     local matching_artifact=""
     if [ "$current_macos" != "unknown" ]; then
         matching_artifact=$(echo "$response" | jq -c --arg version "$current_macos" '.value[] | select(.name | contains("macOS_" + $version))' | head -1)
-        if [ -z "$matching_artifact" ]; then
-            matching_artifact=$(echo "$response" | jq -c --arg version "$current_macos" '.value[] | select(.name | contains("macOS" + $version))' | head -1)
-        fi
-        if [ -z "$matching_artifact" ]; then
-            matching_artifact=$(echo "$response" | jq -c --arg version "$current_macos" '.value[] | select(.name | contains($version))' | head -1)
-        fi
     fi
     # Use first artifact if no match found
     if [ -z "$matching_artifact" ] || [ "$matching_artifact" = "null" ]; then
@@ -189,63 +154,6 @@ find_matching_artifact() {
     echo "$matching_artifact"
 }
 
-# Function to download artifacts
-download_artifacts() {
-    local build_id=$1
-    local url="${API_URL}/build/builds/${build_id}/artifacts?api-version=${API_VERSION}"
-    local response=$(make_api_call "$url")
-    local artifact_count=$(echo "$response" | jq -r '.count')
-    if [ "$artifact_count" -eq 0 ]; then
-        print_color $YELLOW "No artifacts found for build $build_id"
-        return 1
-    fi
-    print_color $GREEN "Found $artifact_count artifacts"
-    local matching_artifact=$(find_matching_artifact "$response")
-    # Validate matching_artifact is not empty/null and is valid JSON
-    if [ -z "$matching_artifact" ] || [ "$matching_artifact" = "null" ]; then
-        print_color $RED "Error: No valid artifact found to download."
-        return 1
-    fi
-    # Check if matching_artifact is valid JSON (jq will fail if not)
-    echo "$matching_artifact" | jq empty 2>/dev/null
-    if [ $? -ne 0 ]; then
-        print_color $RED "Error: matching_artifact is not valid JSON. Value: $matching_artifact"
-        return 1
-    fi
-    local artifact_name=$(echo "$matching_artifact" | jq -r '.name')
-    local download_url=$(echo "$matching_artifact" | jq -r '.resource.downloadUrl')
-    if [ -z "$artifact_name" ] || [ -z "$download_url" ] || [ "$artifact_name" = "null" ] || [ "$download_url" = "null" ]; then
-        print_color $RED "Error: Artifact name or download URL is missing."
-        print_color $RED "artifact_name: $artifact_name"
-        print_color $RED "download_url: $download_url"
-        return 1
-    fi
-    # Get build finish date for folder name
-    local build_finish_time=$(echo "$matching_artifact" | jq -r '.resource.data.finishTime')
-    if [ -z "$build_finish_time" ] || [ "$build_finish_time" = "null" ]; then
-        build_finish_time=$(date +"%Y-%m-%dT%H:%M:%S")
-    fi
-    local date_folder=$(date -j -f "%Y-%m-%dT%H:%M:%S" "${build_finish_time:0:19}" +"%m_%d_%Y_%H_%M_%S" 2>/dev/null)
-    if [ -z "$date_folder" ]; then
-        date_folder=$(date +"%m_%d_%Y_%H_%M_%S")
-    fi
-    local folder_name="${date_folder}_${COMMIT_SHA}"
-    mkdir -p "$folder_name"
-    print_color $GREEN "Downloading artifact: $artifact_name"
-    local filename="$folder_name/${artifact_name}.zip"
-    local auth_header=$(echo -n ":$TOKEN" | base64)
-    curl -L -H "Authorization: Basic $auth_header" \
-         -H "Accept: application/zip" \
-         --progress-bar \
-         -o "$filename" \
-         "$download_url"
-    if [ $? -eq 0 ]; then
-        print_color $GREEN "Downloaded successfully!"
-        extract_and_launch "$filename" "$artifact_name" "$folder_name"
-    else
-        print_color $RED "Download failed!"
-    fi
-}
 
 # Function to extract and launch Scopy
 extract_and_launch() {
@@ -255,13 +163,6 @@ extract_and_launch() {
     local extract_dir="$folder_name/${artifact_name}"
 
     print_color $YELLOW "Extracting to: $extract_dir"
-    # Debug: print file size and type
-    if command -v stat >/dev/null 2>&1; then
-        print_color $CYAN "Zip file size: $(stat -c %s "$zip_file" 2>/dev/null || stat -f %z "$zip_file") bytes"
-    fi
-    if command -v file >/dev/null 2>&1; then
-        print_color $CYAN "Zip file type: $(file "$zip_file")"
-    fi
     print_color $CYAN "Listing zip contents:"
     unzip -l "$zip_file"
     # Extract
@@ -302,7 +203,7 @@ launch_scopy() {
     local scopy_exe=$(find "$search_path" -name "scopy" -o -name "Scopy" -o -name "scopy.app" -o -name "Scopy.app" -type f | head -1)
     if [ -n "$scopy_exe" ]; then
         print_color $GREEN "Found Scopy executable: $scopy_exe"
-        # Make executable and remove quarantine
+        # Make executable and remove quarantine to be able to run it
         chmod +x "$scopy_exe"
         xattr -d com.apple.quarantine "$scopy_exe" 2>/dev/null || true
         if [[ "$scopy_exe" == *.app ]]; then
@@ -314,6 +215,82 @@ launch_scopy() {
         print_color $GREEN "Scopy launched successfully!"
     else
         print_color $YELLOW "Scopy executable not found in extracted files"
+    fi
+}
+
+download_artifacts() {
+    local build_id=$1
+    local url="${API_URL}/build/builds/${build_id}/artifacts?api-version=${API_VERSION}"
+    local response=$(make_api_call "$url")
+    local artifact_count=$(echo "$response" | jq -r '.count')
+    
+    if [ "$artifact_count" -eq 0 ]; then
+        print_color $YELLOW "No artifacts found for build $build_id"
+        return 1
+    fi
+
+    print_color $GREEN "Found $artifact_count artifacts"
+    local matching_artifact=$(find_matching_artifact "$response")
+    # Validate matching_artifact is not empty/null and is valid JSON
+    if [ -z "$matching_artifact" ] || [ "$matching_artifact" = "null" ]; then
+        print_color $RED "Error: No valid artifact found to download."
+        return 1
+    fi
+    # Extract artifact name and download URL
+    local artifact_name=$(echo "$matching_artifact" | jq -r '.name')
+    local download_url=$(echo "$matching_artifact" | jq -r '.resource.downloadUrl')
+    if [ -z "$artifact_name" ] || [ -z "$download_url" ] || [ "$artifact_name" = "null" ] || [ "$download_url" = "null" ]; then
+        print_color $RED "Error: Artifact name or download URL is missing."
+        print_color $RED "artifact_name: $artifact_name"
+        print_color $RED "download_url: $download_url"
+        return 1
+    fi
+    # Use current local date and time for folder name
+    local date_folder=$(date +"%m_%d_%Y_%H:%M")
+    local folder_name="${date_folder}_${COMMIT_SHA}"
+    mkdir -p "$folder_name"
+    print_color $GREEN "Downloading artifact: $artifact_name"
+    local filename="$folder_name/${artifact_name}.zip"
+    local auth_header=$(echo -n ":$TOKEN" | base64)
+    curl -L -H "Authorization: Basic $auth_header" \
+         -H "Accept: application/zip" \
+         --progress-bar \
+         -o "$filename" \
+         "$download_url"
+    if [ $? -eq 0 ]; then
+        print_color $GREEN "Downloaded successfully!"
+        extract_and_launch "$filename" "$artifact_name" "$folder_name"
+    else
+        print_color $RED "Download failed!"
+    fi
+}
+
+
+# Function to get matching build and download artifact
+get_matching_build() {
+    local url="${API_URL}/build/builds?api-version=${API_VERSION}&sourceVersion=${COMMIT_SHA}"
+    print_color $YELLOW "Getting builds for commit: $COMMIT_SHA"
+    
+    local response=$(make_api_call "$url")
+    local total_count=$(echo "$response" | jq -r '.count')
+    
+    print_color $CYAN "Found $total_count builds for this commit"
+    
+    # Filter by pipeline name AND partial commit SHA match
+    local filtered_builds=$(echo "$response" | jq -r --arg pipeline "$PIPELINE_NAME" --arg sha "$COMMIT_SHA" '.value[] | select(.definition.name == $pipeline and (.sourceVersion | startswith($sha)))')
+
+    if [ -n "$filtered_builds" ]; then
+        local build_id=$(echo "$filtered_builds" | jq -r '.id' | head -1)
+        local build_status=$(echo "$filtered_builds" | jq -r '.status' | head -1)
+        local build_result=$(echo "$filtered_builds" | jq -r '.result' | head -1)
+
+        print_color $GREEN "Found matching build: $build_id (Status: $build_status, Result: $build_result)"
+
+        download_artifacts "$build_id"
+        return 0
+    else
+        print_color $RED "No matching build found for '$PIPELINE_NAME' with commit $COMMIT_SHA"
+        return 1
     fi
 }
 

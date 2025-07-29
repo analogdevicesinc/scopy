@@ -26,6 +26,7 @@ def parse_arguments():
     parser.add_argument("commit_sha", type=str, help="Commit SHA to search for (required)")
     parser.add_argument("--token", type=str, required=False, help="GitHub personal access token (optional, fallback to github_token.txt)")
     parser.add_argument("--platform", type=str, choices=["windows", "linux", "arm64"], required=False, help="Target platform (windows, linux, arm64)")
+    parser.add_argument("--script", type=str, required=False, help="Optional path to a script to use or run after extraction")
     return parser.parse_args()
 
 def validate_commit_sha(commit_sha):
@@ -128,12 +129,8 @@ def filter_artifacts(artifacts, workflow_name, platform_value=None):
 def download_artifact(artifact, commit_sha, headers):
     import datetime
     artifact_name = artifact['name']
-    created_at = artifact['created_at']
-    try:
-        dt = datetime.datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-    except Exception:
-        dt = datetime.datetime.now()
-    date_folder = dt.strftime('%d_%m_%Y:%H:%M')
+    dt = datetime.datetime.now()
+    date_folder = dt.strftime('%m_%d_%Y_%H:%M')
     folder_name = f"{date_folder}_{commit_sha}"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
@@ -203,7 +200,6 @@ def main():
         sys.exit(1)
 
     print(f"Commit SHA: {args.commit_sha}")
-    print(f"Token: {'***' + token[-6:] if len(token) > 10 else token}")
 
     # Auto-detect platform if not provided
     platform_value = args.platform if args.platform else autodetect_platform()
@@ -259,17 +255,21 @@ def main():
         sys.exit(1)
     print(f"Found executable: {exe_path}")
 
-    # Launch the executable
+    # Launch the executable, optionally with a script
     import subprocess
     import stat
     try:
+        launch_args = [exe_path]
+        if args.script:
+            launch_args += ["--script", args.script]
         if platform_value == "windows":
-            os.startfile(exe_path)
-        elif platform_value == "linux":
+            # os.startfile does not support arguments, so use subprocess
+            subprocess.Popen(launch_args, shell=True)
+        elif platform_value == "linux" or platform_value == "arm64":
             st = os.stat(exe_path)
             if not (st.st_mode & stat.S_IXUSR):
                 os.chmod(exe_path, st.st_mode | stat.S_IXUSR)
-            subprocess.Popen([exe_path])
+            subprocess.Popen(launch_args)
         else:
             print(f"Platform '{platform_value}' is not supported for launching.")
     except Exception as e:
