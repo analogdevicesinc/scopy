@@ -101,69 +101,6 @@ bool QIQPlugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	// tests
-	QVariantMap configMap;
-	configMap["sample_count"] = 128;
-	configMap["channel_count"] = 0;
-	configMap["sampling_frequency"] = 1024;
-	configMap["frequency_offset"] = 0;
-	configMap["input_file"] = "";
-	configMap["input_file_format"] = "binary-interleaved";
-	configMap["chnls_format"] = QStringList();
-
-	InputConfig config;
-	config.fromVariantMap(configMap);
-
-	QVariantMap outputInfoMap = {
-		{"channel_count", 3},
-		{"channel_names", QStringList{"magnitude", "magnitude", "magnitude"}},
-		{"channel_format", QStringList{"int16", "int16", "int16"}},
-	};
-
-	QList<QIQPlotInfo> plotInfoList;
-
-	// Plot 0: Add
-	QVariantMap plot0;
-	plot0["id"] = 0;
-	plot0["title"] = "Add";
-	plot0["xLabel"] = "time[s]";
-	plot0["yLabel"] = "magnitude[dB]";
-	plot0["type"] = "time";
-	plot0["xyValues"] = false;
-	plot0["ch"] = QVariantList{QVariantMap{{"y", 0}}};
-	plotInfoList.append(QIQPlotInfo::fromVariantMap(plot0));
-
-	// Plot 1: Sub
-	QVariantMap plot1;
-	plot1["id"] = 1;
-	plot1["title"] = "Sub";
-	plot1["xLabel"] = "time[s]";
-	plot1["yLabel"] = "magnitude[dB]";
-	plot1["type"] = "time";
-	plot1["xyValues"] = false;
-	plot1["ch"] = QVariantList{QVariantMap{{"y", 1}}};
-	plotInfoList.append(QIQPlotInfo::fromVariantMap(plot1));
-
-	// Plot 2: Mul
-	QVariantMap plot2;
-	plot2["id"] = 2;
-	plot2["title"] = "Mul";
-	plot2["xLabel"] = "time[s]";
-	plot2["yLabel"] = "magnitude[dB]";
-	plot2["type"] = "time";
-	plot2["xyValues"] = false;
-	plot2["ch"] = QVariantList{QVariantMap{{"y", 2}}};
-	plotInfoList.append(QIQPlotInfo::fromVariantMap(plot2));
-
-	OutputInfo outInfo;
-	outInfo.fromVariantMap(outputInfoMap);
-	QStringList analysis{"psk", "fft", "addition"};
-
-	qiqInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
-	qiqInstrument->onAnalysisTypes(analysis);
-	qiqInstrument->onInputFormatChanged(config);
-	qiqInstrument->onAnalysisInfo("psk", pskMap, outInfo, plotInfoList);
-
 	connect(m_iioManager, &IIOManager::inputFormatChanged, qiqInstrument, &QIQInstrument::onInputFormatChanged);
 	connect(m_iioManager, &IIOManager::dataReady, qiqInstrument, &QIQInstrument::bufferDataReady);
 	connect(qiqInstrument, &QIQInstrument::bufferParamsChanged, m_iioManager, &IIOManager::onBufferParamsChanged);
