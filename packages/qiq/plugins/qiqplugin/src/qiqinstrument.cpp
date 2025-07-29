@@ -9,7 +9,6 @@ using namespace scopy::qiqplugin;
 
 QIQInstrument::QIQInstrument(QWidget *parent)
 	: QWidget(parent)
-	, m_cliProcess(new QProcess)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -40,36 +39,9 @@ QIQInstrument::QIQInstrument(QWidget *parent)
 	setupConnections();
 	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
 	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
-
-	// to be deleted
-	connect(m_cliProcess, &QProcess::readyReadStandardOutput, this, [this]() {
-		QString output = m_cliProcess->readAllStandardOutput();
-		if(output.contains("FAIL")) {
-			m_runBtn->setChecked(false);
-		}
-		if(output.contains("OK")) {
-			m_plotManager->onDataIsProcessed(0, m_xAxis.size());
-		}
-	});
-	connect(m_cliProcess, &QProcess::readyReadStandardError, this, [this]() {
-		QString output = m_cliProcess->readAllStandardError();
-		qInfo() << "Error:" << output;
-	});
 }
 
-QIQInstrument::~QIQInstrument()
-{
-	if(m_cliProcess) {
-		m_cliProcess->kill();
-	}
-}
-
-void QIQInstrument::processData()
-{
-	QString cmd("p " + QString::number(m_inputPlot->getChannels().size()));
-	m_cliProcess->write(cmd.toStdString().c_str());
-	m_cliProcess->write("\n");
-}
+QIQInstrument::~QIQInstrument() {}
 
 void QIQInstrument::setAvailableChannels(QMap<QString, QStringList> channels)
 {
@@ -132,16 +104,12 @@ void QIQInstrument::setupConnections()
 		if(data.isEmpty()) {
 			return;
 		}
-		if(!m_cliProcess->isOpen()) {
-			runProcess();
-		}
 		int i = 0;
 		for(PlotChannel *ch : m_inputPlot->getChannels()) {
 			ch->curve()->setSamples(m_xAxis, data[i]);
 			i++;
 		}
 		m_inputPlot->replot();
-		processData();
 	});
 	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
 }
@@ -221,30 +189,4 @@ void QIQInstrument::updateChannels(int chnlCount)
 		addPlotChannel("ch" + QString::number(i), StyleHelper::getChannelColor(i));
 	}
 	m_inputPlot->replot();
-}
-
-// to be deleted
-
-void QIQInstrument::runProcess()
-{
-
-	if(m_cliProcess->state() == QProcess::Running) {
-		m_cliProcess->kill();
-		m_cliProcess->waitForFinished();
-	}
-
-	QString program =
-		"/home/andrei/git_repositories/scopy/process_data/build/Desktop_Qt_5_15_2_GCC_64bit-Debug/process_data";
-	m_cliProcess->start(program,
-			    QStringList() << scopy::config::executableFolderPath() + QDir::separator() + "data.in"
-					  << scopy::config::executableFolderPath() + QDir::separator() + "data.out");
-
-	if(!m_cliProcess->waitForStarted()) {
-		qWarning() << "Running C error!";
-		return;
-	}
-
-	qInfo() << "Process started";
-	qInfo() << m_cliProcess->readAllStandardOutput();
-	qInfo() << m_cliProcess->readAllStandardError();
 }

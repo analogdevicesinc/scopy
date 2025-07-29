@@ -52,11 +52,6 @@ private:
 	QGridLayout *m_plotsLay;
 	PlotWidget *m_inputPlot = nullptr;
 	QVector<double> m_xAxis;
-
-	// To be deleted
-	QProcess *m_cliProcess;
-	void runProcess();
-	void processData();
 };
 } // namespace scopy::qiqplugin
 #endif // QIQINSTRUMENT_H
