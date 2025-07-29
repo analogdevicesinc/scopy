@@ -452,7 +452,8 @@ void ScopyMainWindow::setupPreferences()
 	if(!p->get("general_dont_show_whats_new").toBool() && !p->get("general_first_run").toBool()) {
 		showWhatsNew();
 		// we check if a new version of scopy is installed
-	} else if(p->get("scopy_git_version").toString() != QString(SCOPY_VERSION_GIT)) {
+	} else if(!p->get("general_first_run").toBool() &&
+		  (p->get("scopy_git_version").toString() != QString(SCOPY_VERSION_GIT))) {
 		showWhatsNew();
 	}
 #endif
@@ -502,6 +503,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("packages_path", scopy::config::pkgFolderPath());
 	p->init("general_use_docking_if_available", true);
 	p->init("general_scripting_enabled", false);
+	p->init("scopy_git_version", "");
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
