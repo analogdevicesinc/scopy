@@ -260,18 +260,29 @@ def main():
     import stat
     try:
         launch_args = [exe_path]
+        script_path = None
         if args.script:
-            launch_args += ["--script", args.script]
+            script_path = args.script
+            print(f"Script path: {script_path}")
+        # Launch Scopy process
         if platform_value == "windows":
-            # os.startfile does not support arguments, so use subprocess
-            subprocess.Popen(launch_args, shell=True)
+            proc = subprocess.Popen(launch_args, shell=True, stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
         elif platform_value == "linux" or platform_value == "arm64":
             st = os.stat(exe_path)
             if not (st.st_mode & stat.S_IXUSR):
                 os.chmod(exe_path, st.st_mode | stat.S_IXUSR)
-            subprocess.Popen(launch_args)
+            proc = subprocess.Popen(launch_args, stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
         else:
             print(f"Platform '{platform_value}' is not supported for launching.")
+            return
+        # If script is provided, send the command to Scopy's console
+        if args.script and proc.stdin:
+            import time
+            time.sleep(200)  # Wait a bit for Scopy to initialize (adjust as needed)
+            cmd = f'scopy.runScript("{script_path}")\n'
+            print(f"Sending to Scopy console: {cmd.strip()}")
+            proc.stdin.write(cmd)
+            proc.stdin.flush()
     except Exception as e:
         print(f"Error launching executable: {e}")
 
