@@ -10,7 +10,7 @@ RunResults::RunResults()
 bool RunResults::isValid()
 {
 	// TODO: Check if results are valid
-	return false;
+	return true;
 }
 
 QVariantMap RunResults::getResultForAnalysis(QString type)

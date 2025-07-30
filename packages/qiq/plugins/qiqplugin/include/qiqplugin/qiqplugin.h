@@ -8,6 +8,7 @@
 #include <iiomanager.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <qiqcontroller/qiqcontroller.h>
 
 namespace scopy::qiqplugin {
 class SCOPY_QIQPLUGIN_EXPORT QIQPlugin : public QObject, public PluginBase
@@ -29,37 +30,8 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	QIQController *m_qiqController;
 	IIOManager *m_iioManager;
-
-	// test
-	QVariantMap pskMap = {
-		{"symbols_type",
-		 QVariantMap{{"type", "string"},
-			     {"required", true},
-			     {"description", "Type of symbols to demodulate"},
-			     {"available_values", QStringList{"BPSK", "QPSK", "8-PSK"}}}},
-		{"filter_type",
-		 QVariantMap{{"type", "string"},
-			     {"required", false},
-			     {"default", "None"},
-			     {"description", "Type of filter to apply"},
-			     {"available_values", QStringList{"None", "Raised Cosine", "Root Raised Cosine"}}}},
-		{"symbol_rate",
-		 QVariantMap{{"type", "int"},
-			     {"required", true},
-			     {"default", 1000000},
-			     {"description", "Symbol rate"},
-			     {"min", 1000},
-			     {"max", 1000000000},
-			     {"step", 1000}}},
-		{"alpha",
-		 QVariantMap{{"type", "double"},
-			     {"required", false},
-			     {"default", 0.3},
-			     {"description", "Alpha parameter for filter"},
-			     {"min", 0.0},
-			     {"max", 1.0},
-			     {"step", 0.1}}}};
 };
 } // namespace scopy::qiqplugin
 #endif // QIQPLUGIN_H

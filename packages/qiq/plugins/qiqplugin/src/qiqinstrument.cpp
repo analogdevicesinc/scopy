@@ -58,6 +58,19 @@ void QIQInstrument::onInputFormatChanged(const InputConfig &inConfig)
 	m_runBtn->setEnabled(inConfig.channelCount() > 0);
 }
 
+void QIQInstrument::onOutputConfig(const OutputConfig &outConfig)
+{
+
+}
+
+void QIQInstrument::onRunResponse(const RunResults &runResults)
+{
+	QVariantMap resultsMap = runResults.getResults();
+	int offset = resultsMap.value("offset", 0).toInt();
+	int samples = resultsMap.value("sample_count", m_xAxis.size()).toInt();
+	m_plotManager->onDataIsProcessed(offset, samples);
+}
+
 void QIQInstrument::onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
 				   const QList<QIQPlotInfo> plotInfoList)
 {
@@ -65,9 +78,12 @@ void QIQInstrument::onAnalysisInfo(const QString &type, const QVariantMap &param
 	m_plotManager->onAvailableInfo(outputInfo, plotInfoList);
 	addPlots();
 }
-
+// must be implemented
 void QIQInstrument::onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo)
-{}
+{
+	m_settings->validateAnalysisParams(type, config);
+	m_plotManager->onAnalysisConfig(type, config, outputInfo);
+}
 
 // TBD
 void QIQInstrument::addPlots()
@@ -112,6 +128,7 @@ void QIQInstrument::setupConnections()
 		m_inputPlot->replot();
 	});
 	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
+	connect(m_plotManager, &PlotManager::configOutput, this, &QIQInstrument::outputConfigured);
 }
 
 QWidget *QIQInstrument::createCentralWidget(QWidget *parent)

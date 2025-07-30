@@ -17,7 +17,7 @@ public:
 	void setAvailableChannels(const QMap<QString, QStringList> &channels);
 	void setAnalysisTypes(const QStringList &types);
 	void setAnalysisParams(const QString &type, const QVariantMap &params);
-
+	void validateAnalysisParams(const QString &type, const QVariantMap &config);
 Q_SIGNALS:
 	void analysisChanged(const QString &type);
 	void analysisConfig(const QString &type, const QVariantMap &inConfig);

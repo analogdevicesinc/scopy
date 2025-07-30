@@ -27,9 +27,9 @@ public:
 
 	// Configuration methods
 	void setCmdFormat(CommandFormat *cmdFormat);
-	void configureInput(InputConfig &config);
-	void configureAnalysis(QString &type, QVariantMap &config);
-	void configureOutput(OutputConfig &config);
+	void configureInput(const InputConfig &config);
+	void configureAnalysis(const QString &type, const QVariantMap &config);
+	void configureOutput(const OutputConfig &config);
 
 	// Control methods
 	void runAnalysis();
@@ -39,12 +39,12 @@ public:
 	bool isReady();
 
 Q_SIGNALS:
-	void inputConfigured(InputConfig config);
+	void inputConfigured(const InputConfig &config);
 	// maybe plot info ??
-	void analysisConfigured(QString type, QVariantMap config, OutputInfo outputInfo);
-	void analysisInfo(QString type, QVariantMap param, OutputInfo outputInfo,
-			  QList<QIQPlotInfo> plotInfo); // plot info
-	void outputConfigured(OutputConfig config);
+	void analysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);
+	void analysisInfo(const QString &type, const QVariantMap &param, const OutputInfo &outputInfo,
+			  const QList<QIQPlotInfo> plotInfo); // plot info
+	void outputConfigured(const OutputConfig &config);
 	void processDataStarted();
 	void processDataCompleted(RunResults results);
 	void analysisTypesReceived(QStringList types);

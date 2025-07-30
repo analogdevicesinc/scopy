@@ -31,7 +31,7 @@ void InputConfig::fromVariantMap(const QVariantMap &params)
 	m_chnlsFormat = params.value(KeysInputConfig::CHANNEL_FORMAT, {}).toStringList();
 }
 
-QVariantMap InputConfig::toVariantMap()
+QVariantMap InputConfig::toVariantMap() const
 {
 	QVariantMap map;
 	map[KeysInputConfig::SAMPLE_COUNT] = m_sampleCount;

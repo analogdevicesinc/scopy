@@ -16,7 +16,7 @@ public:
 
 	bool isValid();
 	void fromVariantMap(const QVariantMap &params);
-	QVariantMap toVariantMap();
+	QVariantMap toVariantMap() const;
 
 	int sampleCount() const;
 	void setSampleCount(int newSampleCount);

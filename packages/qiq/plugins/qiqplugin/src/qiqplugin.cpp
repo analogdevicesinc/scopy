@@ -7,6 +7,8 @@
 
 #include <iioutil/connectionprovider.h>
 
+#include <qiqcontroller/jsonformat.h>
+
 Q_LOGGING_CATEGORY(CAT_QIQPLUGIN, "QIQPlugin")
 using namespace scopy::qiqplugin;
 
@@ -94,19 +96,47 @@ bool QIQPlugin::onConnect()
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
-	m_iioManager = new IIOManager(conn->context());
-
 	QIQInstrument *qiqInstrument = new QIQInstrument();
 	m_toolList[0]->setTool(qiqInstrument);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	connect(m_iioManager, &IIOManager::inputFormatChanged, qiqInstrument, &QIQInstrument::onInputFormatChanged);
+	m_iioManager = new IIOManager(conn->context());
+
+	qiqInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
+
+	// The format isn't necessary to be declared here
+	CommandFormat *cmdFormat = new JsonFormat();
+	m_qiqController = new QIQController(cmdFormat);
+
+	// connect(m_iioManager, &IIOManager::inputFormatChanged, qiqInstrument, &QIQInstrument::onInputFormatChanged);
 	connect(m_iioManager, &IIOManager::dataReady, qiqInstrument, &QIQInstrument::bufferDataReady);
+
+	// input config
+	connect(m_iioManager, &IIOManager::inputFormatChanged, m_qiqController, &QIQController::configureInput);
+	connect(m_qiqController, &QIQController::inputConfigured, qiqInstrument, &QIQInstrument::onInputFormatChanged);
+	// analysis config
+	connect(qiqInstrument, &QIQInstrument::analysisConfigChanged, m_qiqController,
+		&QIQController::configureAnalysis);
+	connect(m_qiqController, &QIQController::analysisConfigured, qiqInstrument,
+		&QIQInstrument::onAnalysisConfigured);
+	// output config
+	connect(qiqInstrument, &QIQInstrument::outputConfigured, m_qiqController, &QIQController::configureOutput);
+	connect(m_qiqController, &QIQController::outputConfigured, qiqInstrument, &QIQInstrument::onOutputConfig);
+	// run
+	connect(m_iioManager, &IIOManager::dataReady, m_qiqController, &QIQController::runAnalysis);
+	connect(m_qiqController, &QIQController::processDataCompleted, qiqInstrument, &QIQInstrument::onRunResponse);
+	// analysis types
+	connect(m_qiqController, &QIQController::analysisTypesReceived, qiqInstrument, &QIQInstrument::onAnalysisTypes);
+	// analysis info
+	connect(qiqInstrument, &QIQInstrument::requestAnalysisInfo, m_qiqController, &QIQController::getAnalysisInfo);
+	connect(m_qiqController, &QIQController::analysisInfo, qiqInstrument, &QIQInstrument::onAnalysisInfo);
+
 	connect(qiqInstrument, &QIQInstrument::bufferParamsChanged, m_iioManager, &IIOManager::onBufferParamsChanged);
 	connect(qiqInstrument, &QIQInstrument::runPressed, m_iioManager, &IIOManager::startAcq);
-
 	connect(qiqInstrument, &QIQInstrument::requestNewData, m_iioManager, &IIOManager::onDataRequest);
+
+	m_qiqController->getAnalysisTypes();
 
 	return true;
 }

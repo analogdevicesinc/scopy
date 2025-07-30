@@ -18,23 +18,25 @@ QIQController::QIQController(CommandFormat *cmdFormat, QObject *parent)
 	connect(m_cmdHandler, &CmdHandler::responseReceived, this, &QIQController::onResponseReceived);
 	connect(m_cmdHandler, &CmdHandler::errorOccurred, this, &QIQController::onCommunicationError);
 	connect(m_cmdHandler, &CmdHandler::processFinished, this, &QIQController::onProcessFinished);
+
+	m_cmdHandler->startProcess("/home/andrei/git_repositories/qiqcli/qiq/build/json_cli", {});
 }
 
 void QIQController::setCmdFormat(CommandFormat *cmdFormat) { m_cmdHandler->setCmdFormat(cmdFormat); }
 
-void QIQController::configureInput(InputConfig &config)
+void QIQController::configureInput(const InputConfig &config)
 {
 	const QString stringCmd = m_cmdHandler->cmdFormat()->sendSetInputConfig(config);
 	m_cmdHandler->sendCommand(stringCmd);
 }
 
-void QIQController::configureAnalysis(QString &type, QVariantMap &config)
+void QIQController::configureAnalysis(const QString &type, const QVariantMap &config)
 {
 	const QString stringCmd = m_cmdHandler->cmdFormat()->sendSetAnalysisConfig(type, config);
 	m_cmdHandler->sendCommand(stringCmd);
 }
 
-void QIQController::configureOutput(OutputConfig &config)
+void QIQController::configureOutput(const OutputConfig &config)
 {
 	const QString stringCmd = m_cmdHandler->cmdFormat()->sendSetOutputConfig(config);
 	m_cmdHandler->sendCommand(stringCmd);

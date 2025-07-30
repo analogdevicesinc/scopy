@@ -5,6 +5,9 @@
 #include <menuheader.h>
 #include <style.h>
 #include <menusectionwidget.h>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_QIQ_SETTINGS, "QIQSettingsMenu");
 
 using namespace scopy::qiqplugin;
 
@@ -67,6 +70,24 @@ void SettingsMenu::setAnalysisParams(const QString &type, const QVariantMap &par
 {
 	if(type == m_analysisCb->combo()->currentText()) {
 		m_analysisMenu->createMenu(params);
+	}
+}
+
+void SettingsMenu::validateAnalysisParams(const QString &type, const QVariantMap &config)
+{
+	QString currentType = m_analysisCb->combo()->currentText();
+	QVariantMap currentConfig = m_analysisMenu->getAnalysisConfig();
+	if(type != currentType) {
+		qWarning(CAT_QIQ_SETTINGS) << "The current type is:" << currentType << "not" << type;
+	}
+
+	for(auto it = config.begin(); it != config.end(); ++it) {
+		if(!currentConfig.contains(it.key())) {
+			continue;
+		}
+		if(currentConfig[it.key()] != it.value()) {
+			qWarning(CAT_QIQ_SETTINGS) << "Different values for the field:" << it.key();
+		}
 	}
 }
 

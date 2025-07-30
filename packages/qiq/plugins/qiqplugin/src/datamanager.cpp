@@ -23,6 +23,23 @@ void DataManager::config(QMap<int, QList<QPair<int, int>>> chnlsMap, const QStri
 	m_dataReader->setChannelCount(channelCount);
 }
 
+void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &config, const OutputInfo &info)
+{
+	// do someting with config;
+	if(m_dataReader->channelCount() == 0) {
+		m_dataReader->setChannelCount(info.channelCount());
+	}
+	if(m_dataReader->channelFormat().isEmpty()) {
+		m_dataReader->setChannelFormat(info.channelFormat());
+	}
+	OutputConfig outConfig;
+	outConfig.setOutputFile(DEFAULT_FILE_PATH);
+	outConfig.setOutputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
+	outConfig.setEnabledAnalysis({type});
+
+	Q_EMIT configOutput(outConfig);
+}
+
 void DataManager::readData(int64_t startSample, int64_t sampleCount)
 {
 	m_dataReader->readData(startSample, sampleCount);

@@ -5,8 +5,10 @@
 #include <QMap>
 #include <QObject>
 #include <datareader.h>
+#include <outputconfig.h>
 #include <common/scopyconfig.h>
 #include <QDir>
+#include <outputinfo.h>
 
 namespace scopy::qiqplugin {
 
@@ -18,12 +20,14 @@ public:
 	~DataManager();
 
 	void config(QMap<int, QList<QPair<int, int>>> chnlsMap, const QStringList &chnlsFormat, const int channelCount);
+	void onConfigAnalysis(const QString &type, const QVariantMap &config, const OutputInfo &info);
 	void readData(int64_t startSample, int64_t sampleCount);
 	QList<CurveData> dataForPlot(int id);
 
 	QString getDefaultFilePath() const;
 
 Q_SIGNALS:
+	void configOutput(const OutputConfig &outConfig);
 	void dataIsReady();
 
 private Q_SLOTS:

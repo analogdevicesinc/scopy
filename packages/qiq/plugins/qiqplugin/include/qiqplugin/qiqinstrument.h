@@ -5,10 +5,12 @@
 #include <QWidget>
 #include <inputconfig.h>
 #include <outputinfo.h>
+#include <outputconfig.h>
 #include <plotmanager.h>
 #include <settingsmenu.h>
 #include <toolbuttons.h>
 #include <QProcess>
+#include <qiqcontroller/runresults.h>
 
 namespace scopy::qiqplugin {
 class SCOPY_QIQPLUGIN_EXPORT QIQInstrument : public QWidget
@@ -22,6 +24,7 @@ public:
 Q_SIGNALS:
 	void bufferParamsChanged(const BufferParams &params);
 	void requestAnalysisInfo(const QString &type);
+	void outputConfigured(const OutputConfig &outConfig);
 	void analysisConfigChanged(const QString &type, const QVariantMap &config);
 	void bufferDataReady(QVector<QVector<double>> &inputData);
 	void runPressed(bool en);
@@ -30,6 +33,8 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void onAnalysisTypes(const QStringList &types);
 	void onInputFormatChanged(const InputConfig &inConfig);
+	void onOutputConfig(const OutputConfig &outConfig);
+	void onRunResponse(const RunResults &runResults);
 	void onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
 			    const QList<QIQPlotInfo> plotInfoList);
 	void onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);

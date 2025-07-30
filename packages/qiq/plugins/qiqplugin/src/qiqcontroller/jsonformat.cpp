@@ -6,14 +6,14 @@
 
 using namespace scopy::qiqplugin;
 
-QString JsonFormat::sendSetInputConfig(InputConfig &config)
+QString JsonFormat::sendSetInputConfig(const InputConfig &config)
 {
 	QVariantMap map;
 	map.insert("config", config.toVariantMap());
 	return buildJsonCommand(CommandNames::SET_INPUT_CONFIG, map);
 }
 
-QString JsonFormat::sendSetAnalysisConfig(QString &type, QVariantMap &config)
+QString JsonFormat::sendSetAnalysisConfig(const QString &type, const QVariantMap &config)
 {
 	QVariantMap map;
 	map.insert(KeysAnalysisConfig::ANALYSIS_TYPE, type);
@@ -21,7 +21,7 @@ QString JsonFormat::sendSetAnalysisConfig(QString &type, QVariantMap &config)
 	return buildJsonCommand(CommandNames::SET_ANALYSIS_CONFIG, map);
 }
 
-QString JsonFormat::sendSetOutputConfig(OutputConfig &config)
+QString JsonFormat::sendSetOutputConfig(const OutputConfig &config)
 {
 	QVariantMap map;
 	map.insert("config", config.toVariantMap());
@@ -32,7 +32,7 @@ QString JsonFormat::sendRun() { return buildJsonCommand(CommandNames::RUN, {}); 
 
 QString JsonFormat::sendGetAnalysisTypes() { return buildJsonCommand(CommandNames::GET_ANALYSIS_TYPES, {}); }
 
-QString JsonFormat::sendGetAnalysisInfo(QString type)
+QString JsonFormat::sendGetAnalysisInfo(const QString &type)
 {
 	QVariantMap map;
 	map[KeysAnalysisConfig::ANALYSIS_TYPE] = type;
@@ -43,7 +43,7 @@ QVariantMap JsonFormat::parseResponse(const QString &data) { return parseJsonRes
 
 QString JsonFormat::getProtocolName() { return PROTOCOL_NAME; }
 
-QString JsonFormat::buildJsonCommand(const QString &cmd, QVariantMap param)
+QString JsonFormat::buildJsonCommand(const QString &cmd, const QVariantMap &param)
 {
 	QJsonObject root;
 	const QStringList keys = param.keys();
@@ -54,6 +54,9 @@ QString JsonFormat::buildJsonCommand(const QString &cmd, QVariantMap param)
 	}
 
 	QJsonDocument doc(root);
+	if(!doc.isObject()) {
+		return {};
+	}
 	return QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
 }
 

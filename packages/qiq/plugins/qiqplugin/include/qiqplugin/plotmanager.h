@@ -19,11 +19,13 @@ public:
 	QList<QWidget *> getPlotW();
 
 Q_SIGNALS:
+	void configOutput(const OutputConfig &outConfig);
 	void requestNewData();
 
 public Q_SLOTS:
 	void samplingFreqAvailable(int samplingFreq);
 	void onAvailableInfo(const OutputInfo &outInfo, QList<QIQPlotInfo> plotInfoList);
+	void onAnalysisConfig(const QString &type, const QVariantMap &config, const OutputInfo &outInfo);
 	void onDataIsProcessed(int samplesOffset, int samplesCount);
 	void updatePlots();
 

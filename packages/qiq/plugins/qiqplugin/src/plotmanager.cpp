@@ -11,6 +11,7 @@ PlotManager::PlotManager(QObject *parent)
 	m_dataManager = new DataManager(this);
 
 	connect(m_dataManager, &DataManager::dataIsReady, this, &PlotManager::updatePlots);
+	connect(m_dataManager, &DataManager::configOutput, this, &PlotManager::configOutput);
 }
 
 PlotManager::~PlotManager() {}
@@ -41,6 +42,11 @@ void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<QIQPlotInfo> 
 	QMap<int, QList<QPair<int, int>>> plotDataMap = getPlotDataChMap(plotInfoList);
 	setupDataManager(outInfo, plotDataMap);
 	setupPlots(plotInfoList);
+}
+
+void PlotManager::onAnalysisConfig(const QString &type, const QVariantMap &config, const OutputInfo &outInfo)
+{
+	m_dataManager->onConfigAnalysis(type, config, outInfo);
 }
 
 void PlotManager::onDataIsProcessed(int samplesOffset, int samplesCount)
