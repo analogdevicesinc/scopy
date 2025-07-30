@@ -39,10 +39,10 @@ QWidget *MenuItemFactory::createSpinBox(const QString &field, const QVariantMap 
 	MenuSpinbox *spinBox = new MenuSpinbox(field, defaultVal, "", params.value("min", 0).toInt(),
 					       params.value("max", 100).toInt());
 	spinBox->setIncrementMode(gui::MenuSpinbox::IS_FIXED); //?
-
 	connect(spinBox, &MenuSpinbox::valueChanged, this,
 		[this, field](double value) { Q_EMIT itemParamChanged(field, value); });
 
+	Q_EMIT itemParamChanged(field, spinBox->value());
 	return spinBox;
 }
 
@@ -64,6 +64,7 @@ QWidget *MenuItemFactory::createLineEdit(const QString &field, const QVariantMap
 	connect(lineEdit, &QLineEdit::textChanged, this,
 		[this, field](const QString &text) { Q_EMIT itemParamChanged(field, text); });
 
+	Q_EMIT itemParamChanged(field, lineEdit->text());
 	return w;
 }
 
@@ -78,6 +79,7 @@ QWidget *MenuItemFactory::createCombo(const QString &field, const QVariantMap &p
 	connect(combo->combo(), &QComboBox::currentTextChanged, this,
 		[this, field](const QString &text) { Q_EMIT itemParamChanged(field, text); });
 
+	Q_EMIT itemParamChanged(field, combo->combo()->currentText());
 	return combo;
 }
 
@@ -88,6 +90,7 @@ QWidget *MenuItemFactory::createCheckBox(const QString &field, const QVariantMap
 	connect(checkBox->onOffswitch(), &QCheckBox::toggled, this,
 		[this, field](bool checked) { Q_EMIT itemParamChanged(field, checked); });
 
+	Q_EMIT itemParamChanged(field, checkBox->onOffswitch()->isChecked());
 	return checkBox;
 }
 

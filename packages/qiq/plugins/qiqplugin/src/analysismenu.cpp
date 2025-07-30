@@ -12,7 +12,6 @@ AnalysisMenu::AnalysisMenu(QWidget *parent)
 {
 	m_factory = new MenuItemFactory(this);
 	setupUI();
-
 	connect(m_factory, &MenuItemFactory::itemParamChanged, this, &AnalysisMenu::updateAnalysisConfig);
 }
 
