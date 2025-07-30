@@ -72,7 +72,7 @@ void PluginsTab::addCards()
 	const QList<PluginInfo> plugins = PluginRepository::getPluginsInfo();
 	for(const PluginInfo &p : plugins) {
 		QString pkgName = PkgManager::reverseSearch(p.filePath()).baseName().toUpper();
-		QString id = p.name() + "_" + pkgName;
+		QString id = p.name() + "_" + pkgName + "_" + QString::number(m_uuid++);
 		QString subtitle = (pkgName.isEmpty()) ? pkgName : "from " + pkgName;
 		CardWidget *pluginCard = createPluginCard(id, p.name(), subtitle, p.description());
 		QLabel *label;

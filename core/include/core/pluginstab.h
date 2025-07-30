@@ -42,6 +42,7 @@ private:
 	CardWidget *createPluginCard(const QString &id, const QString &title, const QString &subtitle,
 				     const QString &description, const QString &version = "");
 
+	int m_uuid = 0;
 	GridWidget *m_pluginsGrid;
 };
 } // namespace scopy
