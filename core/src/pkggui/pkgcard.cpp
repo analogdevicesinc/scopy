@@ -83,7 +83,7 @@ void PkgCard::fillMetadata(QVariantMap metadata, bool installed)
 	title()->setText(pkgTitle);
 	subtitle()->setText("by " + metadata[PkgManifest::PKG_AUTHOR].toString());
 	versCb()->insertItem(0, "version " + metadata[PkgManifest::PKG_VERSION].toString());
-	description()->setText(metadata[PkgManifest::PKG_DESCRIPTION].toString());
+	description()->setText(metadata[PkgManifest::PKG_PATH].toString());
 	m_installBtn->setVisible(!installed);
 	m_uninstallBtn->setVisible(installed && !basePkg);
 	fillCategories(categories);

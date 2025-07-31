@@ -27,6 +27,7 @@
 #include <QJsonArray>
 #include <QLoggingCategory>
 #include <pluginfilter.h>
+#include <QCoreApplication>
 
 #include <algorithm>
 
@@ -191,6 +192,9 @@ Plugin *PluginManager::loadPlugin(QString file)
 	ret = qp.load();
 	if(!ret) {
 		errorMsg = "Cannot load library " + qp.fileName() + "- err: " + qp.errorString();
+		qWarning() << qp.loadHints();
+		qWarning() << QCoreApplication::libraryPaths();
+
 		state = PluginInfo::PLUGIN_LOAD_FAILED;
 		goto finish;
 	}
