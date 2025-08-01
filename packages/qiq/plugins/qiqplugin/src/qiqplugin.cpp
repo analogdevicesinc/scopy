@@ -96,13 +96,12 @@ bool QIQPlugin::onConnect()
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
+	m_iioManager = new IIOManager(conn->context());
+
 	QIQInstrument *qiqInstrument = new QIQInstrument();
 	m_toolList[0]->setTool(qiqInstrument);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
-
-	m_iioManager = new IIOManager(conn->context());
-
 	qiqInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
 
 	// The format isn't necessary to be declared here
@@ -129,8 +128,8 @@ bool QIQPlugin::onConnect()
 	// analysis types
 	connect(m_qiqController, &QIQController::analysisTypesReceived, qiqInstrument, &QIQInstrument::onAnalysisTypes);
 	// analysis info
-	connect(qiqInstrument, &QIQInstrument::requestAnalysisInfo, m_qiqController, &QIQController::getAnalysisInfo);
 	connect(m_qiqController, &QIQController::analysisInfo, qiqInstrument, &QIQInstrument::onAnalysisInfo);
+	connect(qiqInstrument, &QIQInstrument::requestAnalysisInfo, m_qiqController, &QIQController::getAnalysisInfo);
 
 	connect(qiqInstrument, &QIQInstrument::bufferParamsChanged, m_iioManager, &IIOManager::onBufferParamsChanged);
 	connect(qiqInstrument, &QIQInstrument::runPressed, m_iioManager, &IIOManager::startAcq);
