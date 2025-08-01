@@ -48,6 +48,13 @@ struct CommandNames
 	static constexpr auto GET_ANALYSIS_INFO = "get_analysis_info";
 };
 
+struct DataManagerKeys
+{
+	static constexpr auto INPUT = "input";
+	static constexpr auto TIME = "time";
+	static constexpr auto FREQ = "freq";
+};
+
 } // namespace scopy::qiqplugin
 
 #endif // QIQUTILS_H

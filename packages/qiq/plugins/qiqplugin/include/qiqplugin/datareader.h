@@ -28,8 +28,12 @@ public:
 
 	void readData(int64_t startSample, int64_t sampleCount);
 
+	void setChannelsName(const QStringList &newChannelsName);
+
+	QStringList channelsName() const;
+
 Q_SIGNALS:
-	void dataReady(QMap<int, QVector<double>> &processedData);
+	void dataReady(QMap<QString, QVector<double>> &processedData);
 
 private:
 	int getFormatSize(const QString &format) const;
@@ -43,6 +47,7 @@ private:
 	int64_t m_dataSize;
 	int m_channelCount;
 	QStringList m_channelFormat;
+	QStringList m_channelsName;
 	QString m_filePath;
 };
 

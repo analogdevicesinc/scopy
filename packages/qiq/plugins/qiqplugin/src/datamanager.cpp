@@ -15,23 +15,26 @@ DataManager::DataManager(QObject *parent)
 
 DataManager::~DataManager() {}
 
-void DataManager::config(QMap<int, QList<QPair<int, int>>> chnlsMap, const QStringList &chnlsFormat,
-			 const int channelCount)
+void DataManager::config(const QStringList &chnlsName, const QStringList &chnlsFormat, const int channelCount)
 {
-	m_chnlsMap = chnlsMap;
+	m_dataReader->setChannelsName(chnlsName);
 	m_dataReader->setChannelFormat(chnlsFormat);
 	m_dataReader->setChannelCount(channelCount);
 }
 
 void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &config, const OutputInfo &info)
 {
-	// do someting with config;
+
 	if(m_dataReader->channelCount() == 0) {
 		m_dataReader->setChannelCount(info.channelCount());
 	}
 	if(m_dataReader->channelFormat().isEmpty()) {
 		m_dataReader->setChannelFormat(info.channelFormat());
 	}
+	if(m_dataReader->channelsName().isEmpty()) {
+		m_dataReader->setChannelsName(info.channelNames());
+	}
+
 	OutputConfig outConfig;
 	outConfig.setOutputFile(DEFAULT_FILE_PATH);
 	outConfig.setOutputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
@@ -42,30 +45,52 @@ void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &confi
 
 void DataManager::readData(int64_t startSample, int64_t sampleCount)
 {
+	// redo
+	computeXFreq(m_samplingFreq, sampleCount);
+	computeXTime(m_samplingFreq, sampleCount);
+	//
 	m_dataReader->readData(startSample, sampleCount);
 }
 
-QList<CurveData> DataManager::dataForPlot(int id) { return m_plotsData.value(id, {}); }
+void DataManager::setSamplingFreq(int samplingFreq) { m_samplingFreq = samplingFreq; }
 
-void DataManager::onDataReady(QMap<int, QVector<double>> &data)
+QVector<double> DataManager::dataForKey(const QString &key) { return m_plotsData.value(key, {}); }
+
+void DataManager::onDataReady(QMap<QString, QVector<double>> &data)
 {
-	m_plotsData.clear();
-	for(auto it = m_chnlsMap.begin(); it != m_chnlsMap.end(); ++it) {
-		QList<CurveData> plotData;
-		const QList<QPair<int, int>> chPairs = it.value();
-		for(const QPair<int, int> &ch : chPairs) {
-			CurveData curve;
-			if(ch.first >= 0) {
-				curve.x = data.value(ch.first, {});
-			}
-			curve.y = data.value(ch.second, {});
-			plotData.push_back(curve);
-		}
-		m_plotsData.insert(it.key(), plotData);
+	for(auto it = data.begin(); it != data.end(); it++) {
+		m_plotsData.insert(it.key(), it.value());
 	}
 	Q_EMIT dataIsReady();
 }
 
 QString DataManager::getDefaultFilePath() const { return DEFAULT_FILE_PATH; }
 
+void DataManager::onInputData(QVector<QVector<double>> bufferData)
+{
+	for(int chIdx = 0; chIdx < bufferData.size(); chIdx++) {
+		QString inName = DataManagerKeys::INPUT + QString::number(chIdx);
+		m_plotsData.insert(inName, bufferData[chIdx]);
+	}
+}
+
 void DataManager::setupConnections() { connect(m_dataReader, &DataReader::dataReady, this, &DataManager::onDataReady); }
+
+void DataManager::computeXTime(int samplingFreq, int samples)
+{
+	QVector<double> xTime;
+	for(int i = 0; i < samples; i++) {
+		xTime.push_back((double)i / m_samplingFreq);
+	}
+	m_plotsData.insert(DataManagerKeys::TIME, xTime);
+}
+
+void DataManager::computeXFreq(int samplingFreq, int samples)
+{
+	QVector<double> xFreq;
+	double deltaF = (double)samplingFreq / samples;
+	for(int i = 0; i < samples; ++i) {
+		xFreq.push_back((i - samples / 2) * deltaF);
+	}
+	m_plotsData.insert(DataManagerKeys::FREQ, xFreq);
+}

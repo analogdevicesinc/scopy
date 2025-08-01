@@ -59,8 +59,7 @@ struct KeysPlotInfo
 	static constexpr auto TYPE = "type";
 	static constexpr auto XYVALUES = "xyValues";
 	static constexpr auto CHANNELS = "ch";
-	static constexpr auto CH_X = "x";
-	static constexpr auto CH_Y = "y";
+	static constexpr auto FLAGS = "flags";
 };
 
 } // namespace scopy::qiqplugin

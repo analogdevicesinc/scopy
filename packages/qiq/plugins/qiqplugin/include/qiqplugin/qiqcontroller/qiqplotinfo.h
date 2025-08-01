@@ -14,29 +14,28 @@ class QIQPlotInfo
 public:
 	enum PlotType
 	{
-		TIME,
-		FREQ,
-		XY,
+		PLOT_WIDGET,
 		INVALID_TYPE
 	};
+
+	typedef struct
+	{
+		QString x;
+		QString y;
+	} PlotInfoCh;
+
 	int id = -1;
 	QString title;
 	QString xLabel;
 	QString yLabel;
 	PlotType type;
-	bool xyValues = false;
-	QList<QPair<int, int>> channels;
+	QList<PlotInfoCh> channels;
+	QStringList flags;
 
 	static PlotType plotTypeFromString(const QString &typeStr)
 	{
-		if(typeStr == "time") {
-			return TIME;
-		}
-		if(typeStr == "freq") {
-			return FREQ;
-		}
-		if(typeStr == "xy") {
-			return XY;
+		if(typeStr == "plot") {
+			return PLOT_WIDGET;
 		}
 		return INVALID_TYPE;
 	}
@@ -49,16 +48,17 @@ public:
 		info.xLabel = map.value(KeysPlotInfo::XLABEL).toString();
 		info.yLabel = map.value(KeysPlotInfo::YLABEL).toString();
 		info.type = plotTypeFromString(map.value(KeysPlotInfo::TYPE).toString());
-		info.xyValues = map.value(KeysPlotInfo::XYVALUES).toBool();
+		info.flags = map.value(KeysPlotInfo::FLAGS).toStringList();
 
 		const QVariantList chList = map.value(KeysPlotInfo::CHANNELS).toList();
 		for(const QVariant &chVar : chList) {
-			QVariantMap chMap = chVar.toMap();
-			int x = chMap.contains(KeysPlotInfo::CH_X) ? chMap.value(KeysPlotInfo::CH_X).toInt() : -1;
-			int y = chMap.contains(KeysPlotInfo::CH_Y) ? chMap.value(KeysPlotInfo::CH_Y).toInt() : -1;
-			info.channels.append({x, y});
+			QVariantList chPair = chVar.toList();
+			if(chPair.size() >= 2) {
+				QString x = chPair[0].toString();
+				QString y = chPair[1].toString();
+				info.channels.append({x, y});
+			}
 		}
-
 		return info;
 	}
 
@@ -73,14 +73,8 @@ public:
 		}
 
 		for(const auto &ch : channels) {
-			if(xyValues) {
-				if(ch.first < 0 || ch.second < 0) {
-					return false;
-				}
-			} else {
-				if(ch.second < 0) {
-					return false;
-				}
+			if(ch.x.isEmpty() || ch.y.isEmpty()) {
+				return false;
 			}
 		}
 

@@ -1,6 +1,8 @@
 #include "plotmanager.h"
+#include "plotaxis.h"
 #include <QLoggingCategory>
 #include <plotfactory.h>
+#include <stylehelper.h>
 
 Q_LOGGING_CATEGORY(CAT_PLOT_MANAGER, "PlotManager");
 using namespace scopy::qiqplugin;
@@ -10,27 +12,26 @@ PlotManager::PlotManager(QObject *parent)
 {
 	m_dataManager = new DataManager(this);
 
+	connect(this, &PlotManager::bufferDataReady, m_dataManager, &DataManager::onInputData);
 	connect(m_dataManager, &DataManager::dataIsReady, this, &PlotManager::updatePlots);
 	connect(m_dataManager, &DataManager::configOutput, this, &PlotManager::configOutput);
 }
 
 PlotManager::~PlotManager() {}
 
-QList<QWidget *> PlotManager::getPlotW()
+QVector<QWidget *> PlotManager::getPlotW()
 {
-	QList<QWidget *> plotList;
-	for(IPlot *p : qAsConst(m_plots)) {
-		plotList.push_back(p->widget());
+	QVector<QWidget *> plots;
+	for(PlotWidget *plot : m_plots) {
+		plots.push_back(plot);
 	}
-	return plotList;
+	return plots;
 }
 
 void PlotManager::samplingFreqAvailable(int samplingFreq)
 {
 	m_samplingFreq = samplingFreq;
-	for(IPlot *p : m_plots) {
-		p->setSamplingFreq(samplingFreq);
-	}
+	m_dataManager->setSamplingFreq(samplingFreq);
 }
 
 void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<QIQPlotInfo> plotInfoList)
@@ -39,8 +40,7 @@ void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<QIQPlotInfo> 
 		qDeleteAll(m_plots);
 		m_plots.clear();
 	}
-	QMap<int, QList<QPair<int, int>>> plotDataMap = getPlotDataChMap(plotInfoList);
-	setupDataManager(outInfo, plotDataMap);
+	setupDataManager(outInfo);
 	setupPlots(plotInfoList);
 }
 
@@ -56,35 +56,82 @@ void PlotManager::onDataIsProcessed(int samplesOffset, int samplesCount)
 
 void PlotManager::updatePlots()
 {
-	for(IPlot *plot : qAsConst(m_plots)) {
-		int id = plot->id();
-		QList<CurveData> curves = m_dataManager->dataForPlot(id);
-		plot->updateData(curves);
+	for(int plotIdx = 0; plotIdx < m_plots.size(); plotIdx++) {
+		const QList<QIQPlotInfo::PlotInfoCh> channels = m_plotsInfo[plotIdx].channels;
+		QList<PlotChannel *> plotChnls = m_plots[plotIdx]->getChannels();
+		int chIdx = 0;
+		double xFirst = 0, xLast = 0;
+		for(const QIQPlotInfo::PlotInfoCh &ch : channels) {
+			QVector<double> xData = m_dataManager->dataForKey(ch.x);
+			QVector<double> yData = m_dataManager->dataForKey(ch.y);
+			plotChnls[chIdx]->curve()->setSamples(xData, yData);
+			chIdx++;
+			if(xFirst == 0 && xLast == 0) {
+				xFirst = xData.first();
+				xLast = xData.last();
+			}
+		}
+		if(!m_plotsInfo[plotIdx].flags.contains("points")) {
+			m_plots[plotIdx]->xAxis()->setInterval(xFirst, xLast);
+		}
+		m_plots[plotIdx]->replot();
 	}
+
 	Q_EMIT requestNewData();
 }
 
-QMap<int, QList<QPair<int, int>>> PlotManager::getPlotDataChMap(const QList<QIQPlotInfo> plotInfoList)
+scopy::PlotWidget *PlotManager::createPlotWidget(QIQPlotInfo plotInfo)
 {
-	QMap<int, QList<QPair<int, int>>> plotDataMap;
-	for(const QIQPlotInfo &info : plotInfoList) {
-		plotDataMap.insert(info.id, info.channels);
+	PlotWidget *plot = new PlotWidget();
+	bool showLabels = plotInfo.flags.contains("labels");
+	plot->plot()->setTitle(plotInfo.title);
+	int i = 0;
+	for(QIQPlotInfo::PlotInfoCh plotCh : plotInfo.channels) {
+		QString chId = "ch" + QString::number(i);
+		QPen pen(StyleHelper::getChannelColor(i));
+		PlotChannel *ch = new PlotChannel(chId, pen, plot->xAxis(), plot->yAxis(), plot);
+		plot->addPlotChannel(ch);
+		ch->setEnabled(true);
+		i++;
+		if(plotInfo.flags.contains("points")) {
+			ch->setThickness(3);
+			ch->setStyle(PlotChannel::PlotCurveStyle::PCS_DOTS);
+		}
 	}
-	return plotDataMap;
+
+	plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	plot->xAxis()->scaleDraw()->setFloatPrecision(2);
+	if(plotInfo.flags.contains("points")) {
+		plot->xAxis()->setInterval(-200, 200);
+	}
+
+	plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	plot->yAxis()->scaleDraw()->setFloatPrecision(2);
+	plot->yAxis()->setInterval(-200, 200);
+
+	plot->setShowXAxisLabels(true);
+	plot->setShowYAxisLabels(true);
+	plot->showAxisLabels();
+	plot->replot();
+
+	return plot;
 }
 
 void PlotManager::setupPlots(QList<QIQPlotInfo> plotInfoList)
 {
+	m_plots.clear();
+	m_plotsInfo.clear();
 	for(const QIQPlotInfo &info : qAsConst(plotInfoList)) {
-		IPlot *plot = PlotFactory::createPlot(info.type);
-		plot->init(info, m_samplingFreq);
+		PlotWidget *plot = createPlotWidget(info);
 		m_plots.push_back(plot);
+		m_plotsInfo.push_back(info);
 	}
 }
 
-void PlotManager::setupDataManager(const OutputInfo &outInfo, QMap<int, QList<QPair<int, int>>> plotDataMap)
+void PlotManager::setupDataManager(const OutputInfo &outInfo)
 {
 	int channelCount = outInfo.channelCount();
 	const QStringList chnlsFormat = outInfo.channelFormat();
-	m_dataManager->config(plotDataMap, chnlsFormat, channelCount);
+	const QStringList chnlsName = outInfo.channelNames();
+	m_dataManager->config(chnlsName, chnlsFormat, channelCount);
 }

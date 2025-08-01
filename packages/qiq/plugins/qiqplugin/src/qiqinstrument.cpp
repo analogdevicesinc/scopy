@@ -58,16 +58,13 @@ void QIQInstrument::onInputFormatChanged(const InputConfig &inConfig)
 	m_runBtn->setEnabled(inConfig.channelCount() > 0);
 }
 
-void QIQInstrument::onOutputConfig(const OutputConfig &outConfig)
-{
-
-}
+void QIQInstrument::onOutputConfig(const OutputConfig &outConfig) {}
 
 void QIQInstrument::onRunResponse(const RunResults &runResults)
 {
 	QVariantMap resultsMap = runResults.getResults();
 	int offset = resultsMap.value("offset", 0).toInt();
-	int samples = resultsMap.value("sample_count", m_xAxis.size()).toInt();
+	int samples = resultsMap.value("samples_size", m_xAxis.size()).toInt();
 	m_plotManager->onDataIsProcessed(offset, samples);
 }
 
@@ -88,7 +85,7 @@ void QIQInstrument::onAnalysisConfigured(const QString &type, const QVariantMap 
 // TBD
 void QIQInstrument::addPlots()
 {
-	const QList<QWidget *> plotList = m_plotManager->getPlotW();
+	const QVector<QWidget *> plotList = m_plotManager->getPlotW();
 	int row = 0, col = 0;
 	if(m_plotsLay->count() == 1) {
 		row = 1;
@@ -105,7 +102,7 @@ void QIQInstrument::addPlots()
 
 void QIQInstrument::removePlots()
 {
-	const QList<QWidget *> plotList = m_plotManager->getPlotW();
+	const QVector<QWidget *> plotList = m_plotManager->getPlotW();
 	for(QWidget *p : plotList) {
 		m_plotsLay->removeWidget(p);
 	}
@@ -116,6 +113,7 @@ void QIQInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &QIQInstrument::bufferParamsChanged);
+	connect(this, &QIQInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(this, &QIQInstrument::bufferDataReady, this, [this](QVector<QVector<double>> data) {
 		if(data.isEmpty()) {
 			return;
@@ -162,6 +160,7 @@ void QIQInstrument::createInputPlot()
 
 	m_inputPlot->setShowXAxisLabels(true);
 	m_inputPlot->setShowYAxisLabels(true);
+	m_inputPlot->showAxisLabels();
 
 	m_inputPlot->replot();
 

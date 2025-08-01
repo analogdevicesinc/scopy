@@ -25,6 +25,7 @@ void AnalysisMenu::setupUI()
 
 	// Scroll area for analysis parameters
 	QScrollArea *scrollArea = new QScrollArea();
+	scrollArea->setMinimumHeight(100);
 	QWidget *scrollContent = new QWidget();
 	scrollContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	scrollContent->setLayout(new QVBoxLayout());

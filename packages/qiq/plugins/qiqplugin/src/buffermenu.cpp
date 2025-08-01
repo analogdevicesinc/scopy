@@ -33,6 +33,7 @@ void BufferMenu::setupUI()
 	// Channel list
 	layout->addWidget(new QLabel("Channels:"));
 	QScrollArea *scrollArea = new QScrollArea();
+	scrollArea->setMinimumHeight(80);
 	m_chnList = new QWidget();
 	m_chnList->setLayout(new QVBoxLayout());
 	scrollArea->setWidget(m_chnList);

@@ -1,11 +1,10 @@
 #ifndef PLOTFACTORY_H
 #define PLOTFACTORY_H
 
-#include <freqplot.h>
+#include "timeplot.h"
 #include <qiqutils.h>
 #include <iplot.h>
-#include <timeplot.h>
-#include <xyplot.h>
+#include <plotwidget.h>
 
 namespace scopy::qiqplugin {
 class PlotFactory
@@ -14,15 +13,12 @@ public:
 	static IPlot *createPlot(QIQPlotInfo::PlotType type)
 	{
 		switch(type) {
-		case QIQPlotInfo::PlotType::TIME:
+		case QIQPlotInfo::PlotType::PLOT_WIDGET:
 			return new TimePlot();
-		case QIQPlotInfo::PlotType::FREQ:
-			return new FreqPlot();
-		case QIQPlotInfo::PlotType::XY:
-			return new XYPlot();
 		default:
 			return nullptr;
 		}
+		return nullptr;
 	}
 };
 } // namespace scopy::qiqplugin

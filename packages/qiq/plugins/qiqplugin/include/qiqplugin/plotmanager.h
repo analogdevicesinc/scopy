@@ -16,11 +16,12 @@ public:
 	PlotManager(QObject *parent = nullptr);
 	~PlotManager();
 
-	QList<QWidget *> getPlotW();
+	QVector<QWidget *> getPlotW();
 
 Q_SIGNALS:
 	void configOutput(const OutputConfig &outConfig);
 	void requestNewData();
+	void bufferDataReady(QVector<QVector<double>> data);
 
 public Q_SLOTS:
 	void samplingFreqAvailable(int samplingFreq);
@@ -30,13 +31,15 @@ public Q_SLOTS:
 	void updatePlots();
 
 private:
-	QMap<int, QList<QPair<int, int>>> getPlotDataChMap(const QList<QIQPlotInfo> plotInfoList);
+	void updateAxis(int samples);
+	PlotWidget *createPlotWidget(QIQPlotInfo plotInfo);
 	void setupPlots(QList<QIQPlotInfo> plotInfoList);
-	void setupDataManager(const OutputInfo &outInfo, QMap<int, QList<QPair<int, int>>> chnlsMap);
+	void setupDataManager(const OutputInfo &outInfo);
 
 	int m_samplingFreq = 512;
 	DataManager *m_dataManager;
-	QList<IPlot *> m_plots;
+	QVector<QIQPlotInfo> m_plotsInfo;
+	QVector<PlotWidget *> m_plots;
 };
 
 } // namespace scopy::qiqplugin

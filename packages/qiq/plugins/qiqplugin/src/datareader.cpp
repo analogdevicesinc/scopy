@@ -113,7 +113,11 @@ int DataReader::getFormatSize(const QString &format) const
 
 void DataReader::readData(int64_t startSample, int64_t sampleCount)
 {
-	if(!m_data || m_channelFormat.isEmpty()) {
+	if(!m_data) {
+		return;
+	}
+
+	if(m_channelCount != m_channelsName.size() || m_channelCount != m_channelFormat.size()) {
 		return;
 	}
 
@@ -123,10 +127,10 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 		}
 	}
 
-	QMap<int, QVector<double>> processedData;
+	QMap<QString, QVector<double>> processedData;
 
 	// Initialize vectors for each channel
-	for(int ch = 0; ch < m_channelCount; ch++) {
+	for(const QString &ch : qAsConst(m_channelsName)) {
 		processedData[ch] = QVector<double>();
 		processedData[ch].reserve(sampleCount);
 	}
@@ -143,11 +147,12 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 		int channelOffset = 0;
 		for(int ch = 0; ch < m_channelCount; ch++) {
 			int channelBytes = getBytesPerChannel(ch);
+			QString chName = m_channelsName[ch];
 			QByteArray channelData = QByteArray(
 				reinterpret_cast<const char *>(m_data + sampleOffset + channelOffset), channelBytes);
 
 			double value = convertToDouble(channelData, m_channelFormat[ch]);
-			processedData[ch].append(value);
+			processedData[chName].append(value);
 
 			channelOffset += channelBytes;
 		}
@@ -179,6 +184,10 @@ void DataReader::createFile(const QString &path)
 	}
 	file.close();
 }
+
+QStringList DataReader::channelsName() const { return m_channelsName; }
+
+void DataReader::setChannelsName(const QStringList &newChannelsName) { m_channelsName = newChannelsName; }
 
 double DataReader::convertToDouble(const QByteArray &data, const QString &format) const
 {
