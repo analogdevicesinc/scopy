@@ -1,4 +1,7 @@
 #include "qiqcontroller/cmdhandler.h"
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_QIQ_CMD_HANDLER, "QIQCmdHandler")
@@ -46,6 +49,14 @@ void CmdHandler::sendCommand(const QString &cmd)
 	if(isProcessRunning()) {
 		m_cliProcess->write(cmd.toUtf8() + "\n");
 		m_cliProcess->waitForBytesWritten();
+
+		QFile file("/home/andrei/Desktop/commands.json");
+		if(file.open(QIODevice::Append | QIODevice::Text)) {
+			file.write("[REQUEST]\n");
+			file.write(cmd.trimmed().toUtf8());
+			file.write("\n\n");
+			file.close();
+		}
 	}
 }
 
@@ -66,6 +77,14 @@ void CmdHandler::onProcessReadyReadStandardOutput()
 	QByteArray data = m_cliProcess->readAllStandardOutput();
 	QString output = QString::fromUtf8(data);
 	processData(output);
+
+	QFile file("/home/andrei/Desktop/commands.json");
+	if(file.open(QIODevice::Append | QIODevice::Text)) {
+		file.write("[RESPOND]\n");
+		file.write(output.trimmed().toUtf8());
+		file.write("\n\n");
+		file.close();
+	}
 }
 
 void CmdHandler::onProcessReadyReadStandardError()
