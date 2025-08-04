@@ -28,6 +28,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QLoggingCategory>
+#include <devicemanager.h>
 #include <stylehelper.h>
 
 #include <QJsonObject>
@@ -297,6 +298,16 @@ bool EmuWidget::startIioEmuProcess(QString processPath, QStringList arg)
 
 void EmuWidget::killEmuProcess()
 {
+	// Disconnect all connected emu devices before killing the process
+	DeviceManager *dm = DeviceManager::GetInstance();
+	const auto connectedIds = dm->getConnectedDev();
+	for(const QString &id : connectedIds) {
+		Device *dev = dm->getDevice(id);
+		if(dev && dev->displayParam().startsWith("ip:127.0")) {
+			dev->disconnectDev();
+		}
+	}
+
 	m_emuProcess->kill();
 	stopEnableBtn("Enable");
 	setEnableDemo(!m_enableDemo);

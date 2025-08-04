@@ -36,15 +36,23 @@ class SCOPY_CORE_EXPORT DeviceManager : public QObject
 	Q_OBJECT
 	friend class ScopyMainWindow_API;
 
-public:
-	explicit DeviceManager(QObject *parent = nullptr);
+protected:
+	DeviceManager(QObject *parent = nullptr);
 	~DeviceManager();
+
+public:
+	DeviceManager(DeviceManager &other) = delete;
+	void operator=(const DeviceManager &) = delete;
+	static DeviceManager *GetInstance();
+
 	Device *getDevice(QString id);
 	void setExclusive(bool);
 	bool getExclusive() const;
 	bool busy();
 	int connectedDeviceCount();
 	void saveSessionDevices();
+
+	QStringList getConnectedDev() const;
 
 public Q_SLOTS:
 
@@ -91,6 +99,7 @@ private:
 	void disconnectDeviceFromManager(DeviceImpl *d);
 
 private:
+	static DeviceManager *pinstance_;
 	bool exclusive = false;
 	QStringList scannedDev;
 	QStringList connectedDev;

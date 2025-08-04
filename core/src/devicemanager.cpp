@@ -35,8 +35,20 @@
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace scopy;
+
+DeviceManager *DeviceManager::pinstance_{nullptr};
+
+DeviceManager *DeviceManager::GetInstance()
+{
+	if(pinstance_ == nullptr) {
+		pinstance_ = new DeviceManager(QApplication::instance()); // singleton has the app as parent
+	} else {
+		qDebug(CAT_DEVICEMANAGER) << "Got instance from singleton";
+	}
+	return pinstance_;
+}
 DeviceManager::DeviceManager(QObject *parent)
-	: QObject{parent}
+	: QObject(parent)
 {}
 
 DeviceManager::~DeviceManager() {}
@@ -154,6 +166,8 @@ void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d)
 	disconnect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
 	disconnect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
 }
+
+QStringList DeviceManager::getConnectedDev() const { return connectedDev; }
 
 QString DeviceManager::restartDevice(QString id)
 {

@@ -155,7 +155,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
 
 	DeviceAutoConnect::initPreferences();
-	dm = new DeviceManager(this);
+	dm = DeviceManager::GetInstance();
 	bool general_connect_to_multiple_devices = Preferences::get("general_connect_to_multiple_devices").toBool();
 	dm->setExclusive(!general_connect_to_multiple_devices);
 
