@@ -667,7 +667,7 @@ MeasureModel::MeasureModel(const float *buffer, size_t length, QObject *parent)
 	, m_adc_bit_count(0)
 	, m_cross_level(0)
 	, m_hysteresis_span(0)
-	, m_histogram(nullptr)
+	, m_histogram(std::map<int, int>())
 	, m_cross_detect(nullptr)
 	, m_gatingEnabled(false)
 
@@ -743,31 +743,25 @@ TimeMeasureModel::~TimeMeasureModel() {}
 bool TimeMeasureModel::highLowFromHistogram(double &low, double &high, double min, double max)
 {
 	bool success = false;
-	int *hist = m_histogram;
-	int adc_span = 1 << m_adc_bit_count;
-	int hlf_scale = adc_span / 2;
+	std::map<int, int> &hist = m_histogram;
 	int minRaw = min;
 	int maxRaw = max;
-
-	minRaw += hlf_scale;
-	maxRaw += hlf_scale;
-
 	int middleRaw = minRaw + (maxRaw - minRaw) / 2;
 
-	auto lowIt = std::max_element(hist + minRaw, hist + middleRaw + 1);
-	int lowRaw = std::distance(hist, lowIt);
+	auto lowIt = std::max_element(hist.lower_bound(minRaw), hist.upper_bound(middleRaw),
+				      [](const auto &a, const auto &b) { return a.second < b.second; });
+	int lowRaw = (lowIt != hist.end()) ? lowIt->first : minRaw;
 
-	auto highIt = std::max_element(hist + middleRaw, hist + maxRaw + 1);
-	int highRaw = std::distance(hist, highIt);
+	auto highIt = std::max_element(hist.lower_bound(middleRaw), hist.upper_bound(maxRaw),
+				       [](const auto &a, const auto &b) { return a.second < b.second; });
+	int highRaw = (highIt != hist.end()) ? highIt->first : maxRaw;
 
 	/* Use histogram results if High and Low settling levels can be
 	   clearly identified (weight of a level should be 5 times
 	   greater than a peak weight - there probably is a better method) */
-
 	if(hist[lowRaw] / 5.0 >= hist[minRaw] && hist[highRaw] / 5.0 >= hist[maxRaw]) {
-		low = lowRaw - hlf_scale;
-		high = highRaw - hlf_scale;
-
+		low = lowRaw;
+		high = highRaw;
 		success = true;
 	}
 
@@ -871,9 +865,6 @@ void TimeMeasureModel::measureTime()
 		endIndex = data_length;
 	}
 
-	if(using_histogram_method)
-		m_histogram = new int[adc_span]{};
-
 	for(ssize_t i = startIndex; i < endIndex; i++) {
 
 		if(qIsNaN(data[i])) {
@@ -899,10 +890,9 @@ void TimeMeasureModel::measureTime()
 		// Build histogram
 		if(using_histogram_method) {
 			int raw = data[i];
-			raw += hlf_scale;
 
-			if(raw >= 0 && raw < adc_span)
-				m_histogram[raw] += 1;
+			if(raw >= -hlf_scale && raw <= hlf_scale)
+				m_histogram[raw]++;
 		}
 	}
 
@@ -948,10 +938,7 @@ void TimeMeasureModel::measureTime()
 	overshoot_n = (low - min) / amplitude * 100;
 	m_measurements[N_OVER]->setValue(overshoot_n);
 
-	if(m_histogram != NULL) {
-		delete[] m_histogram;
-		m_histogram = NULL;
-	}
+	m_histogram.clear();
 
 	// Find Period / Frequency
 	m_cross_level = middle;
