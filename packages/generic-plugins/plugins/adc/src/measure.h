@@ -149,7 +149,7 @@ protected:
 	int m_startIndex;
 	int m_endIndex;
 	int m_gatingEnabled;
-	int *m_histogram;
+	std::map<int, int> m_histogram;
 	CrossingDetection *m_cross_detect;
 
 	QList<std::shared_ptr<MeasurementData>> m_measurements;
