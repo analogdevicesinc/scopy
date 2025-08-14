@@ -39,7 +39,7 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	, QWidget{parent}
 {
 	// main layout vertical
-	this->resize(400, 600);
+	this->resize(420, 600);
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	this->setLayout(mainLayout);
 
@@ -67,7 +67,7 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 		}
 	});
 
-	showAgain->setChecked(true);
+	showAgain->setChecked(p->get("general_dont_show_whats_new").toBool());
 
 	// version picker
 	m_versionCb = new QComboBox(optionsoverlayControlWidget);
