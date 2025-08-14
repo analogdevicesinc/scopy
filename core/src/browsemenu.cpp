@@ -74,7 +74,6 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_scriptingBtn = createBtn("Scripting", ":/gui/icons/tool_scripting.svg", m_content);
 	Style::setStyle(m_scriptingBtn, style::properties::button::toolButton);
 	m_scriptingBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
-	m_scriptingBtn->setStyleSheet("text-align: left");
 	m_scriptingBtn->setIconSize(QSize(32, 32));
 	m_scriptingBtn->setCheckable(true);
 	m_scriptingBtn->setChecked(false);
@@ -150,11 +149,12 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	add(createHLine(m_content), "headerLine", MA_TOPLAST);
 	add(homeBtn, "homeBtn", MA_TOPLAST);
-	add(m_scriptingBtn, "scriptingBtn", MA_TOPLAST);
 	add(createHLine(m_content), "toolMenuLine1", MA_TOPLAST);
 	add(m_toolMenu, "toolMenu", MA_TOPLAST);
 
 	add(createHLine(m_content), "toolMenuLine2", MA_BOTTOMLAST);
+	add(m_scriptingBtn, "scriptingBtn", MA_BOTTOMLAST);
+	add(createHLine(m_content), "toolMenuLine3", MA_BOTTOMLAST);
 	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
 	add(pkgBtn, "pkgBtn", MA_BOTTOMLAST);
 	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
