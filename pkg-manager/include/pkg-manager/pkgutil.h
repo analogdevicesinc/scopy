@@ -51,6 +51,7 @@ private:
 	static void addExtraField(QJsonObject &metadata, const QString &field, const QJsonValue &value);
 	static void addFileMetadata(QJsonObject &metadata, const QString &path);
 	static QString getFileSize(const QString &path);
+	static QString getFolderSize(const QString &path);
 };
 } // namespace scopy
 
