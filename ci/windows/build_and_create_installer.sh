@@ -127,6 +127,7 @@ deploy_app(){
 	cp -vr $INSTALL_FOLDER/lib/scopy/* $DEST_FOLDER
 	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
 	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
+	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
 
 	pushd $STAGING_DIR/bin
 	DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
