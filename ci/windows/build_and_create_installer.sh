@@ -130,8 +130,8 @@ deploy_app(){
 	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
 
 	pushd $STAGING_DIR/bin
-	DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
-	cp -vn $DLL_DEPS $DEST_FOLDER/
+	source $SRC_FOLDER/ci/windows/mingw_dll_deps
+	cp -vn "${DLL_DEPS[@]}" $DEST_FOLDER/
 	cp -nv iio_*.exe $DEST_FOLDER/
 	popd
 
