@@ -187,7 +187,11 @@ void PkgUtil::addExtraField(QJsonObject &metadata, const QString &field, const Q
 void PkgUtil::addFileMetadata(QJsonObject &metadata, const QString &path)
 {
 	QFileInfo pkgInfo(path);
+#ifdef WIN32
+	QString size = getFolderSize(path);
+#else
 	QString size = getFileSize(path);
+#endif
 	QString lastModifiedDate = pkgInfo.lastModified().toString();
 	addExtraField(metadata, "size", size);
 	addExtraField(metadata, "last_modified", lastModifiedDate);
@@ -198,6 +202,21 @@ QString PkgUtil::getFileSize(const QString &path)
 {
 	QString result;
 	int fileSizeBytes = QFileInfo(path).size();
+	MetricPrefixFormatter formatter;
+	result = formatter.format(fileSizeBytes, "B", 2);
+
+	return result;
+}
+
+QString PkgUtil::getFolderSize(const QString &path)
+{
+	QString result;
+	quint64 fileSizeBytes = 0;
+	QDirIterator it(path, QDir::Files, QDirIterator::Subdirectories);
+	while(it.hasNext()) {
+		fileSizeBytes += QFileInfo(it.next()).size();
+	}
+
 	MetricPrefixFormatter formatter;
 	result = formatter.format(fileSizeBytes, "B", 2);
 
