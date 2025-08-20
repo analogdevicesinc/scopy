@@ -106,8 +106,4 @@ target_link_libraries(
 	       scopy-iio-widgets
 )
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
-endif()
-
 set(QIQPLUGIN_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
