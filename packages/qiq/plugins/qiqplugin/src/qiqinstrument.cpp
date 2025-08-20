@@ -77,7 +77,8 @@ void QIQInstrument::onInputFormatChanged(const InputConfig &inConfig)
 	updateXAxis(inConfig.sampleCount(), inConfig.samplingFrequency());
 	updateChannels(inConfig.channelCount());
 	m_plotManager->samplingFreqAvailable(inConfig.samplingFrequency());
-	m_runBtn->setEnabled(inConfig.channelCount() > 0);
+	m_inputFormatConfigured = inConfig.channelCount() > 0;
+	m_runBtn->setEnabled(m_outputConfigured && m_inputFormatConfigured);
 }
 
 void QIQInstrument::onOutputConfig(const OutputConfig &outConfig) {}
@@ -149,6 +150,10 @@ void QIQInstrument::setupConnections()
 	});
 	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
 	connect(m_plotManager, &PlotManager::configOutput, this, &QIQInstrument::outputConfigured);
+	connect(m_plotManager, &PlotManager::configOutput, this, [this]() {
+		m_outputConfigured = true;
+		m_runBtn->setEnabled(m_outputConfigured && m_inputFormatConfigured);
+	});
 }
 
 QWidget *QIQInstrument::createCentralWidget(QWidget *parent)

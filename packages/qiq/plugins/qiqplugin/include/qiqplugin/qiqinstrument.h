@@ -78,6 +78,9 @@ private:
 	QGridLayout *m_plotsLay;
 	PlotWidget *m_inputPlot = nullptr;
 	QVector<double> m_xAxis;
+
+	bool m_inputFormatConfigured = false;
+	bool m_outputConfigured = false;
 };
 } // namespace scopy::qiqplugin
 #endif // QIQINSTRUMENT_H
