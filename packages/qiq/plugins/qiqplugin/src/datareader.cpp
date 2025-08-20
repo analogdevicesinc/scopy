@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2025 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "datareader.h"
 #include <QLoggingCategory>
 #include <qiqutils.h>
@@ -28,8 +49,9 @@ bool DataReader::openFile(const QString &path)
 		return false;
 	}
 
-	m_dataSize = m_file.size();
-	m_data = m_file.map(0, 1024);
+	double fileSize = m_file.size();
+	m_dataSize = (fileSize > 0) ? fileSize : 1024;
+	m_data = m_file.map(0, m_dataSize);
 	if(!m_data) {
 		qWarning(CAT_DATA_READER) << "Failed to map file:" << path;
 		m_file.close();
