@@ -4,7 +4,7 @@ set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
 
-PACKAGES="${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
+PACKAGES="${QT_FORMULAE} volk spdlog ${BOOST_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"

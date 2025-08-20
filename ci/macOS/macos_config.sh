@@ -6,8 +6,16 @@ REPO_SRC=$(git rev-parse --show-toplevel)
 BUILDDIR=$REPO_SRC/build
 JOBS=-j8
 QT_FORMULAE=qt@5
+
+# In the Boost 1.89.0 release,
+# the Boost.System library, needed by GNU Radio, has been removed
+# Issue explained here: https://github.com/powerdns/pdns/issues/15972
+# Workaround is to use Boost 1.85 for now
+BOOST_FORMULAE=boost@1.85
+
 QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
-export PATH="${QT_PATH}:$PATH"
+BOOST_PATH="$(brew --prefix ${BOOST_FORMULAE})/bin"
+export PATH="${QT_PATH}:${BOOST_PATH}:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH;$STAGING_AREA_DEPS;$STAGING_AREA_DEPS/lib"
 
 
