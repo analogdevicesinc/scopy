@@ -24,6 +24,7 @@
 #include "qiqutils.h"
 #include <QLoggingCategory>
 #include <analysisconfig.h>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_QIQ_CONTROLLER, "QIQController");
 
@@ -40,7 +41,7 @@ QIQController::QIQController(CommandFormat *cmdFormat, QObject *parent)
 	connect(m_cmdHandler, &CmdHandler::errorOccurred, this, &QIQController::onCommunicationError);
 	connect(m_cmdHandler, &CmdHandler::processFinished, this, &QIQController::onProcessFinished);
 
-	m_cmdHandler->startProcess("/home/andrei/git_repositories/qiqcli/qiq/build/json_cli", {});
+	m_cmdHandler->startProcess(Preferences::get("qiq_cli_path").toString(), {});
 }
 
 void QIQController::setCmdFormat(CommandFormat *cmdFormat) { m_cmdHandler->setCmdFormat(cmdFormat); }

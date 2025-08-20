@@ -40,6 +40,8 @@ class SCOPY_QIQPLUGIN_EXPORT QIQPlugin : public QObject, public PluginBase
 public:
 	bool compatible(QString m_param, QString category) override;
 	bool loadPage() override;
+	void initPreferences() override;
+	bool loadPreferencesPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
@@ -53,6 +55,8 @@ public Q_SLOTS:
 private:
 	QIQController *m_qiqController;
 	IIOManager *m_iioManager;
+
+	const QString CLI_PROGRAM = "json_cli";
 };
 } // namespace scopy::qiqplugin
 #endif // QIQPLUGIN_H

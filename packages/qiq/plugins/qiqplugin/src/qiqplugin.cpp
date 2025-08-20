@@ -23,12 +23,12 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
-
+#include <menusectionwidget.h>
+#include "preferenceshelper.h"
 #include "qiqinstrument.h"
-
 #include <iioutil/connectionprovider.h>
-
 #include <qiqcontroller/jsonformat.h>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_QIQPLUGIN, "QIQPlugin")
 using namespace scopy::qiqplugin;
@@ -89,6 +89,36 @@ bool QIQPlugin::loadPage()
 	return true;
 	*/
 	return false;
+}
+
+void QIQPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("qiq_cli_path", "");
+}
+
+bool QIQPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *generalSection = new MenuCollapseSection(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->setMargin(0);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_FILE_BROWSER(p, "qiq_cli_path", "CLI path", "Select the external processing tool.",
+					FileBrowserWidget::OPEN_FILE, generalSection));
+
+	return true;
 }
 
 bool QIQPlugin::loadIcon()
