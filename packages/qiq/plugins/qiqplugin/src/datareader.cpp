@@ -39,25 +39,35 @@ DataReader::~DataReader() { unmap(); }
 bool DataReader::openFile(const QString &path)
 {
 	m_filePath = path;
+	bool isNewFile = false;
 	if(!QFile::exists(m_filePath)) {
 		createFile(path);
+		isNewFile = true;
 	}
-
 	m_file.setFileName(path);
-	if(!m_file.open(QIODevice::ReadOnly)) {
-		qWarning(CAT_DATA_READER) << "Failed to open file:" << path;
-		return false;
+	QIODevice::OpenModeFlag mode = isNewFile ? QIODevice::ReadWrite : QIODevice::ReadOnly;
+	if(!m_file.open(mode)) {
+		if(!isNewFile && !m_file.open(QIODevice::ReadWrite)) {
+			qWarning(CAT_DATA_READER) << "Failed to open file:" << path;
+			return false;
+		}
 	}
 
 	double fileSize = m_file.size();
-	m_dataSize = (fileSize > 0) ? fileSize : 1024;
+	if(fileSize == 0) {
+		qWarning(CAT_DATA_READER) << "Cannot map empty file:" << path;
+		m_file.close();
+		return false;
+	}
+
+	m_dataSize = fileSize;
 	m_data = m_file.map(0, m_dataSize);
 	if(!m_data) {
 		qWarning(CAT_DATA_READER) << "Failed to map file:" << path;
 		m_file.close();
 		return false;
 	}
-	m_file.close(); // may be deleted
+	m_file.close();
 	qDebug(CAT_DATA_READER) << "Successfully opened and mapped file:" << path << "Size:" << m_dataSize;
 	return true;
 }
@@ -68,7 +78,9 @@ void DataReader::unmap()
 		m_file.unmap(m_data);
 		m_data = nullptr;
 	}
-	m_file.close();
+	if(m_file.isOpen()) {
+		m_file.close();
+	}
 }
 
 void DataReader::setChannelCount(int count) { m_channelCount = count; }
@@ -200,11 +212,17 @@ bool DataReader::checkForRemapping()
 void DataReader::createFile(const QString &path)
 {
 	QFile file(path);
-	if(!file.open(QIODevice::ReadWrite)) {
-		qInfo() << "Cannot create file: " << path;
+	if(!file.open(QIODevice::WriteOnly)) {
+		qWarning(CAT_DATA_READER) << "Cannot create file:" << path;
 		return;
 	}
+
+	// Empty files cannot be mapped on windows
+	file.write("\0", 1);
+	file.flush();
 	file.close();
+
+	qDebug(CAT_DATA_READER) << "Created file with initial size:" << path;
 }
 
 QStringList DataReader::channelsName() const { return m_channelsName; }
@@ -256,23 +274,35 @@ bool DataReader::remapFile()
 		m_file.unmap(m_data);
 		m_data = nullptr;
 	}
-	m_file.close();
+	if(m_file.isOpen()) {
+		m_file.close();
+	}
 
 	// Reopen and remap
 	m_file.setFileName(m_filePath);
-	if(!m_file.open(QIODevice::ReadOnly)) {
+	if(!m_file.open(QIODevice::ReadWrite)) {
 		qWarning(CAT_DATA_READER) << "Failed to reopen file for remapping:" << m_filePath;
 		return false;
 	}
 
-	m_dataSize = m_file.size();
+	double fileSize = m_file.size();
+
+	if(fileSize == 0) {
+		qWarning(CAT_DATA_READER) << "Cannot remap empty file:" << m_filePath;
+		m_file.close();
+		return false;
+	}
+
+	m_dataSize = fileSize;
 	m_data = m_file.map(0, m_dataSize);
+
 	if(!m_data) {
 		qWarning(CAT_DATA_READER) << "Failed to remap file:" << m_filePath;
 		m_file.close();
 		return false;
 	}
-
+	m_file.close();
 	qDebug(CAT_DATA_READER) << "Successfully remapped file. New size:" << m_dataSize;
+
 	return true;
 }
