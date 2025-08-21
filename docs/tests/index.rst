@@ -18,3 +18,4 @@ Contents
    testing_guide
    plugins/index
    general/index
+   test_report/index
