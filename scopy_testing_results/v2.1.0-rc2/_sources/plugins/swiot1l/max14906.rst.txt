@@ -1,0 +1,106 @@
+.. _max14906:
+
+
+MAX14906
+=======================================================================
+
+Overview
+---------------------------------------------------------------------
+
+The MAX14906 instrument is only available in the runtime mode of
+AD-SWIOT1L-SL, alongside AD74413R and Faults instruments. It represents
+the main interface for the MAX14906 chip and it dynamically shows all
+the channels configured for this specific device.
+
+
+Instrument layout
+---------------------------------------------------------------------
+.. image:: https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/swiot1l/max14906.png?raw=true
+   :align: center
+
+1. Run button
+
+ The run button will start a polling task at a set time (1 second) for 
+ all channels configured as MAX14906. 
+ The plot will be cleared in all channels every time the run button is pressed.
+
+2. Settings page
+
+ In the settings page the timespan can be changed, this will 
+ change it for all channels.
+
+3. Channels
+
+ Each channel will appear in this area. The layout might change 
+ depending on how many channels are configured as MAX14906.
+ Channels can be detached and reattached by pressing the 
+ arrow in the top-right corner of each channel.
+
+4. Config button
+
+ When pressing the config button, Scopy will switch the SWIOT1L 
+ mode to config. The device will temporarily close while 
+ the switch is being made. After that it will automatically 
+ reconnect to the SWIOT1L board, in config mode, 
+ so that the device can be configured again.
+
+Channel Layout
+---------------------------------------------------------------------
+
+The channel layout can be detached and reattached to Scopy by 
+clicking the arrow on the upper right side.
+
+1. Name and placeholder
+
+ Channel name, as displayed in the IIO Context.
+ Input for custom channel name, it has no functional use, except 
+ for differentiating the channels based on the purpose given by the user.
+
+2. Channel Type
+
+ INPUT/OUTPUT based on the channel configuration.
+
+3. Plot
+
+ Displays the polled channel values. The plot history size is 
+ given by the Timespan control.
+
+4. Output Mode
+
+ Shows the function configured on the respective channel, the 
+ available functions change based on whether the
+ channel is configured as INPUT or OUTPUT. The functions can 
+ be changed without switching to config mode.
+
+5. Read Value
+
+ Represents the read value on the specific channel.
+
+6. Current Limit
+
+ Only available for the channels configured as OUTPUT.
+
+7. Set Value
+
+ Only available for the channels configured as OUTPUT. Shows 
+ the value that will be written to the channel (the
+ value is written on the hardware only once, when the switch is toggled).
+
+Settings tab
+---------------------------------------------------------------------
+
+1. Timespan for polling
+
+ This control changes the plot timespan for all the enabled channels.
+
+2. Config Button
+
+ Pressing the config button sets the device mode to configuration. 
+ After that, the device will disconnect briefly, reconnect and the 
+ Config Instrument will be automatically opened.
+
+Tutorial 
+--------------------------------------------------------------------------------
+
+A tutorial will automatically start first time the tool is open. It can
+be restarted from tool Preferences.
