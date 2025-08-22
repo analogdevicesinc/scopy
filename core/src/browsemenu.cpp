@@ -85,12 +85,15 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	m_scriptingBtn->installEventFilter(this);
 
+	auto scriptingMenuLine = createHLine(m_content);
+
 	// Connect to preference changes for scripting button
 	Preferences *prefs = Preferences::GetInstance();
 	connect(prefs, &Preferences::preferenceChanged, this, [=](QString key, QVariant val) {
 		if(key == "general_scripting_enabled") {
 			bool enabled = val.toBool();
 			m_scriptingBtn->setVisible(enabled);
+			scriptingMenuLine->setVisible(enabled);
 		}
 	});
 
@@ -154,7 +157,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	add(createHLine(m_content), "toolMenuLine2", MA_BOTTOMLAST);
 	add(m_scriptingBtn, "scriptingBtn", MA_BOTTOMLAST);
-	add(createHLine(m_content), "toolMenuLine3", MA_BOTTOMLAST);
+	add(scriptingMenuLine, "toolMenuLine3", MA_BOTTOMLAST);
 	add(saveLoadWidget, "saveLoad", MA_BOTTOMLAST);
 	add(pkgBtn, "pkgBtn", MA_BOTTOMLAST);
 	add(preferencesBtn, "preferencesBtn", MA_BOTTOMLAST);
