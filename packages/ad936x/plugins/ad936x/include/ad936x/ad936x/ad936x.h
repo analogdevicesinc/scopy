@@ -34,6 +34,7 @@
 
 namespace scopy {
 namespace ad936x {
+
 class SCOPY_AD936X_EXPORT AD936X : public QWidget
 {
 	Q_OBJECT

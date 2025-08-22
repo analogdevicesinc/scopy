@@ -47,8 +47,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc)
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(GLOB SRC_LIST src/*.cpp src/*.cc
+	        src/ad936x/*.cpp src/ad936x/*.cc
+		src/fmcomms5/*.cpp src/ad936x/*.cc)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp
+include/${SCOPY_MODULE}/ad936x/*.h include/${SCOPY_MODULE}/ad936x/*.hpp
+include/${SCOPY_MODULE}/fmcomms5/*.h include/${SCOPY_MODULE}/fmcomms5/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
 set(ENABLE_TESTING ON)
