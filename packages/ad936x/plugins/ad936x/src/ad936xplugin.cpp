@@ -26,9 +26,10 @@
 #include <deviceiconbuilder.h>
 #include <style.h>
 #include "scopy-ad936x_config.h"
+#include <iioutil/connectionprovider.h>
 
-#include "ad936x.h"
-#include "ad963xadvanced.h"
+#include "ad936x/ad936x.h"
+#include "ad936x/ad963xadvanced.h"
 
 #include <iioutil/connectionprovider.h>
 
