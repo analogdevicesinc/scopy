@@ -19,7 +19,7 @@
  *
  */
 
-#include "ad936x.h"
+#include "ad936x/ad936x.h"
 
 #include <QLabel>
 #include <QTabWidget>
