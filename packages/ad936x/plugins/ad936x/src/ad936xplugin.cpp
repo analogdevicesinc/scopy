@@ -31,7 +31,8 @@
 #include "ad936x/ad936x.h"
 #include "ad936x/ad963xadvanced.h"
 
-#include <iioutil/connectionprovider.h>
+#include <fmcomms5/fmcomms5.h>
+#include <fmcomms5/fmcomms5advanced.h>
 
 Q_LOGGING_CATEGORY(CAT_AD936XPLUGIN, "Ad936xPlugin")
 using namespace scopy::ad936x;
@@ -85,8 +86,8 @@ bool Ad936xPlugin::loadIcon()
 void Ad936xPlugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X",
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+	                                          ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+	                                                  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xAdvancedTool", "AD936X Advanced",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/gear_wheel.svg"));
@@ -107,15 +108,43 @@ bool Ad936xPlugin::onConnect()
 		return false;
 	}
 
-	AD936X *ad936X = new AD936X(conn->context());
-	m_toolList[0]->setTool(ad936X);
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
+	bool isFmcomms5 = false;
+	int device_count = iio_context_get_devices_count(conn->context());
+	for(int i = 0; i < device_count; ++i) {
+		iio_device *dev = iio_context_get_device(conn->context(), i);
+		const char *dev_name = iio_device_get_name(dev);
+		if(dev_name && QString(dev_name).contains("ad9361-phy-B", Qt::CaseInsensitive)) {
+			isFmcomms5 = true;
+			break;
+		}
+	}
 
-	AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context());
-	m_toolList[1]->setTool(ad936XAdvanced);
-	m_toolList[1]->setEnabled(true);
-	m_toolList[1]->setRunBtnVisible(true);
+	if (isFmcomms5) {
+		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context());
+		m_toolList[0]->setTool(fmcomms5);
+		m_toolList[0]->setName("FMCOMMS5");
+		m_toolList[0]->setEnabled(true);
+		m_toolList[0]->setRunBtnVisible(true);
+
+		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context());
+		m_toolList[1]->setTool(fmcomms5Advanced);
+		m_toolList[1]->setName("FMCOMMS5 Advanced");
+		m_toolList[1]->setEnabled(true);
+		m_toolList[1]->setRunBtnVisible(true);
+
+	} else {
+		AD936X *ad936X = new AD936X(conn->context());
+		m_toolList[0]->setTool(ad936X);
+		m_toolList[0]->setEnabled(true);
+		m_toolList[0]->setRunBtnVisible(true);
+
+		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context());
+		m_toolList[1]->setTool(ad936XAdvanced);
+		m_toolList[1]->setEnabled(true);
+		m_toolList[1]->setRunBtnVisible(true);
+	}
+
+
 	return true;
 }
 
