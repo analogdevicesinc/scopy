@@ -23,6 +23,7 @@
 #define QIQCONTROLLER_H
 
 #include "qiqcontroller/qiqplotinfo.h"
+#include "qiqconfiguration.h"
 #include "cmdhandler.h"
 #include "outputconfig.h"
 #include "outputinfo.h"
@@ -37,7 +38,7 @@ class QIQController : public QObject
 
 private:
 	CmdHandler *m_cmdHandler;
-	// QIQConfiguration *m_qiqConfig;
+	QIQConfiguration *m_qiqConfig;
 
 public:
 	// Constructor
@@ -56,7 +57,7 @@ public:
 	void runAnalysis();
 	void getAnalysisTypes();
 	void getAnalysisInfo(QString type);
-	// QIQConfiguration getCurrentConfig();
+	QIQConfiguration *getCurrentConfig();
 	bool isReady();
 
 Q_SIGNALS:

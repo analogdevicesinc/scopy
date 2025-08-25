@@ -33,9 +33,10 @@ using namespace scopy::qiqplugin;
 QIQController::QIQController(CommandFormat *cmdFormat, QObject *parent)
 	: QObject(parent)
 	, m_cmdHandler(nullptr)
-// , m_qiqConfig(nullptr)
+	, m_qiqConfig(nullptr)
 {
 	m_cmdHandler = new CmdHandler(cmdFormat, this);
+	m_qiqConfig = new QIQConfiguration(this);
 
 	connect(m_cmdHandler, &CmdHandler::responseReceived, this, &QIQController::onResponseReceived);
 	connect(m_cmdHandler, &CmdHandler::errorOccurred, this, &QIQController::onCommunicationError);
@@ -83,18 +84,9 @@ void QIQController::getAnalysisInfo(QString type)
 	m_cmdHandler->sendCommand(stringCmd);
 }
 
-// QIQConfiguration QIQController::getCurrentConfig()
-// {
-// 	// TODO: Return current configuration
-// 	return QIQConfiguration();
-// }
+QIQConfiguration *QIQController::getCurrentConfig() { return m_qiqConfig; }
 
-bool QIQController::isReady()
-{
-	// TODO: Check if ready for run command
-	// input config must be send, output_config must be recieved, analysis response also
-	return false;
-}
+bool QIQController::isReady() { return m_qiqConfig->isComplete(); }
 
 void QIQController::onCommunicationError(QString error)
 {
@@ -129,6 +121,7 @@ void QIQController::handleSetInputConfigResponse(QVariantMap response)
 	QVariantMap config = response.value("config", {}).toMap();
 	inputConfig.fromVariantMap(config);
 	if(inputConfig.isValid()) {
+		m_qiqConfig->setInputConfig(inputConfig);
 		Q_EMIT inputConfigured(inputConfig);
 	} else {
 		qWarning(CAT_QIQ_CONTROLLER) << "Invalid input config response!";
@@ -148,6 +141,7 @@ void QIQController::handleSetAnalysisConfigResponse(QVariantMap response)
 	analysis.setParams(config);
 
 	if(analysis.isValid()) {
+		m_qiqConfig->setAnalysis(analysis);
 		Q_EMIT analysisConfigured(type, config, outInfo);
 	} else {
 		qWarning(CAT_QIQ_CONTROLLER) << "Invalid analysis config response!";
@@ -160,6 +154,7 @@ void QIQController::handleSetOutputConfigResponse(QVariantMap response)
 	OutputConfig outConfig;
 	outConfig.fromVariantMap(configMap);
 	if(outConfig.isValid()) {
+		m_qiqConfig->setOutputConfig(outConfig);
 		Q_EMIT outputConfigured(outConfig);
 	} else {
 		qWarning(CAT_QIQ_CONTROLLER) << "Invalid output config response!";
