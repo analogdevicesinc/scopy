@@ -149,10 +149,11 @@ bool QIQPlugin::onConnect()
 
 	m_iioManager = new IIOManager(conn->context());
 
-	QIQInstrument *qiqInstrument = new QIQInstrument();
-	m_toolList[0]->setTool(qiqInstrument);
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
+	ToolMenuEntry *tme = m_toolList[0];
+	QIQInstrument *qiqInstrument = new QIQInstrument(tme);
+	tme->setTool(qiqInstrument);
+	tme->setEnabled(true);
+	tme->setRunBtnVisible(true);
 	qiqInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
 
 	// The format isn't necessary to be declared here

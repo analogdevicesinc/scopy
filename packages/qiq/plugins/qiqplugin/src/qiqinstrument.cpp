@@ -28,8 +28,9 @@
 
 using namespace scopy::qiqplugin;
 
-QIQInstrument::QIQInstrument(QWidget *parent)
+QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
+	, m_tme(tme)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -60,6 +61,8 @@ QIQInstrument::QIQInstrument(QWidget *parent)
 	setupConnections();
 	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
 	connect(m_runBtn, &RunBtn::toggled, m_settings, &SettingsMenu::setDisabled);
+	connect(m_runBtn, &RunBtn::toggled, tme, &ToolMenuEntry::setRunning);
+	connect(m_tme, &ToolMenuEntry::runClicked, this, &QIQInstrument::tmeToggled);
 	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 }
 
@@ -103,6 +106,15 @@ void QIQInstrument::onAnalysisConfigured(const QString &type, const QVariantMap 
 {
 	m_settings->validateAnalysisParams(type, config);
 	m_plotManager->onAnalysisConfig(type, config, outputInfo);
+}
+
+void QIQInstrument::tmeToggled(bool checked)
+{
+	if(!m_runBtn->isEnabled()) {
+		m_tme->setRunning(false);
+		return;
+	}
+	m_runBtn->setChecked(checked);
 }
 
 // TBD

@@ -32,13 +32,14 @@
 #include <toolbuttons.h>
 #include <QProcess>
 #include <qiqcontroller/runresults.h>
+#include <pluginbase/toolmenuentry.h>
 
 namespace scopy::qiqplugin {
 class SCOPY_QIQPLUGIN_EXPORT QIQInstrument : public QWidget
 {
 	Q_OBJECT
 public:
-	QIQInstrument(QWidget *parent = nullptr);
+	QIQInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~QIQInstrument();
 
 	void setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels);
@@ -59,6 +60,7 @@ public Q_SLOTS:
 	void onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
 			    const QList<QIQPlotInfo> plotInfoList);
 	void onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);
+	void tmeToggled(bool checked);
 	// void onProcessDataCompleted(const RunResults &result);
 
 private:
@@ -72,6 +74,7 @@ private:
 	void removePlotChannels();
 	void updateChannels(int chnlCount);
 
+	ToolMenuEntry *m_tme;
 	RunBtn *m_runBtn;
 	PlotManager *m_plotManager;
 	SettingsMenu *m_settings;
