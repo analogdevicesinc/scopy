@@ -76,7 +76,7 @@ void SettingsMenu::setupUI()
 	connect(m_analysisMenu, &AnalysisMenu::applyPressed, this, &SettingsMenu::onAnalysisApply);
 }
 
-void SettingsMenu::setAvailableChannels(const QMap<QString, QStringList> &channels)
+void SettingsMenu::setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels)
 {
 	m_bufferMenu->setAvailableChannels(channels);
 }

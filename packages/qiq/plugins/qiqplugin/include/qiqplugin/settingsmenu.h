@@ -35,7 +35,7 @@ class SettingsMenu : public QWidget
 public:
 	explicit SettingsMenu(QWidget *parent = nullptr);
 
-	void setAvailableChannels(const QMap<QString, QStringList> &channels);
+	void setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels);
 	void setAnalysisTypes(const QStringList &types);
 	void setAnalysisParams(const QString &type, const QVariantMap &params);
 	void validateAnalysisParams(const QString &type, const QVariantMap &config);

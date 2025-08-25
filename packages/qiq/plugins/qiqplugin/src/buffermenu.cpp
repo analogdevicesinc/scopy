@@ -69,7 +69,20 @@ void BufferMenu::setupUI()
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, &BufferMenu::onParamsChanged);
 }
 
-void BufferMenu::setAvailableChannels(const QMap<QString, QStringList> &channels)
+QStringList BufferMenu::getEnChannels()
+{
+	QStringList result;
+	QString currentDevice = m_deviceCombo->combo()->currentText();
+	QList<ChannelInfo> &channels = m_availableChannels[currentDevice];
+	for(ChannelInfo &channel : channels) {
+		if(channel.enable) {
+			result.push_back(channel.name);
+		}
+	}
+	return result;
+}
+
+void BufferMenu::setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels)
 {
 	m_availableChannels = channels;
 
@@ -82,7 +95,6 @@ void BufferMenu::setAvailableChannels(const QMap<QString, QStringList> &channels
 
 void BufferMenu::updateChnList()
 {
-	m_enChannels.clear();
 	// Clear existing checkboxes
 	QLayout *layout = m_chnList->layout();
 	while(QLayoutItem *item = layout->takeAt(0)) {
@@ -94,18 +106,16 @@ void BufferMenu::updateChnList()
 	// Add new checkboxes for current device
 	QString currentDevice = m_deviceCombo->combo()->currentText();
 	if(m_availableChannels.contains(currentDevice)) {
-		const QStringList &channels = m_availableChannels[currentDevice];
-		for(const QString &channel : channels) {
-			MenuOnOffSwitch *onOffSwitch = new MenuOnOffSwitch(channel);
+		for(int i = 0; i < m_availableChannels[currentDevice].size(); i++) {
+			ChannelInfo chInfo = m_availableChannels[currentDevice].at(i);
+			MenuOnOffSwitch *onOffSwitch = new MenuOnOffSwitch(chInfo.name);
 			layout->addWidget(onOffSwitch);
-			connect(onOffSwitch->onOffswitch(), &QCheckBox::toggled, this, [this, channel](bool checked) {
-				if(checked) {
-					m_enChannels.append(channel);
-				} else {
-					m_enChannels.removeAll(channel);
-				}
-				onParamsChanged();
-			});
+			connect(onOffSwitch->onOffswitch(), &QCheckBox::toggled, this,
+				[this, i, currentDevice](bool checked) {
+					m_availableChannels[currentDevice][i].enable = checked;
+					onParamsChanged();
+				});
+			onOffSwitch->onOffswitch()->setChecked(chInfo.enable);
 		}
 	}
 }
@@ -115,7 +125,7 @@ void BufferMenu::onParamsChanged()
 	BufferParams params;
 	params.samplesCount = m_bufferSizeSpin->value();
 	params.deviceName = m_deviceCombo->combo()->currentText();
-	params.enChnls = m_enChannels;
+	params.enChnls = getEnChannels();
 
 	Q_EMIT bufferParamsChanged(params);
 }

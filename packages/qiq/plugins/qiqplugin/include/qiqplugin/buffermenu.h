@@ -42,23 +42,23 @@ public:
 	BufferMenu(QWidget *parent = nullptr);
 	~BufferMenu();
 
-	void setAvailableChannels(const QMap<QString, QStringList> &channels);
+	void setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels);
 	void updateChnList();
 
 Q_SIGNALS:
 	void bufferParamsChanged(BufferParams &params);
 
-private Q_SLOTS:
+public Q_SLOTS:
 	void onParamsChanged();
 
 private:
-	QStringList m_enChannels;
-	QMap<QString, QStringList> m_availableChannels;
+	QMap<QString, QList<ChannelInfo>> m_availableChannels;
 	MenuCombo *m_deviceCombo;
 	MenuSpinbox *m_bufferSizeSpin;
 	QWidget *m_chnList;
 
 	void setupUI();
+	QStringList getEnChannels();
 };
 
 } // namespace scopy::qiqplugin

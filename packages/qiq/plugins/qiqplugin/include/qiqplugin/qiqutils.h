@@ -29,6 +29,12 @@ namespace scopy::qiqplugin {
 
 typedef struct
 {
+	QString name;
+	bool enable;
+} ChannelInfo;
+
+typedef struct
+{
 	int samplesCount;
 	QString deviceName;
 	QStringList enChnls;

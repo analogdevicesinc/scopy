@@ -65,7 +65,7 @@ QIQInstrument::QIQInstrument(QWidget *parent)
 
 QIQInstrument::~QIQInstrument() {}
 
-void QIQInstrument::setAvailableChannels(QMap<QString, QStringList> channels)
+void QIQInstrument::setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels)
 {
 	m_settings->setAvailableChannels(channels);
 }

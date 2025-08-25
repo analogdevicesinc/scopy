@@ -50,7 +50,7 @@ public:
 	IIOManager(iio_context *ctx, QObject *parent = nullptr);
 	~IIOManager();
 
-	QMap<QString, QStringList> getAvailableChannels();
+	QMap<QString, QList<ChannelInfo>> getAvailableChannels();
 
 public Q_SLOTS:
 	void startAcq(bool en);
@@ -62,12 +62,10 @@ Q_SIGNALS:
 	void dataReady(QVector<QVector<double>> &inputData);
 
 private:
-	void init();
 	void computeDevMap();
 	void destroyBuffer();
 	void readBuffer();
 	int enChannels(QString deviceName, QStringList enChnls);
-	void onReadBufferData();
 	QStringList getChannelsFormat(iio_device *dev);
 	double getSamplingFrequency(iio_device *dev);
 	InputConfig createInputConfig(iio_device *dev, int channelCount, int64_t bufferSamplesSize);

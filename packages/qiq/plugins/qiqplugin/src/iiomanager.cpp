@@ -44,14 +44,20 @@ IIOManager::IIOManager(iio_context *ctx, QObject *parent)
 
 IIOManager::~IIOManager() {}
 
-QMap<QString, QStringList> IIOManager::getAvailableChannels()
+QMap<QString, QList<ChannelInfo>> IIOManager::getAvailableChannels()
 {
-	QMap<QString, QStringList> avlChnls;
-	for(auto it = m_devMap.begin(); it != m_devMap.end(); ++it) {
-		avlChnls.insert(it.key(), it.value().keys());
+	QMap<QString, QList<ChannelInfo>> result;
+	for(auto it = m_devMap.constBegin(); it != m_devMap.constEnd(); ++it) {
+		QList<ChannelInfo> devChnls;
+		for(auto chIt = it.value().constBegin(); chIt != it.value().constEnd(); ++chIt) {
+			ChannelInfo chInfo{chIt.key(), iio_channel_is_enabled(chIt.value())};
+			devChnls.push_back(chInfo);
+		}
+		result.insert(it.key(), devChnls);
 	}
-	return avlChnls;
+	return result;
 }
+
 // must handle single
 void IIOManager::startAcq(bool en)
 {
@@ -89,8 +95,6 @@ void IIOManager::onBufferParamsChanged(BufferParams params)
 	}
 }
 
-void IIOManager::init() {}
-
 void IIOManager::computeDevMap()
 {
 	for(int i = 0; i < iio_context_get_devices_count(m_ctx); i++) {
@@ -101,7 +105,6 @@ void IIOManager::computeDevMap()
 			if(!iio_channel_is_output(chn) && iio_channel_is_scan_element(chn)) {
 				QString chnlId = iio_channel_get_id(chn);
 				m_devMap[deviceName].insert(chnlId, chn);
-				iio_channel_disable(chn);
 			}
 		}
 	}
@@ -209,8 +212,6 @@ int IIOManager::enChannels(QString deviceName, QStringList enChnls)
 	}
 	return chnls;
 }
-
-void IIOManager::onReadBufferData() {}
 
 QString channelDataFormat(struct iio_channel *chnl)
 {
