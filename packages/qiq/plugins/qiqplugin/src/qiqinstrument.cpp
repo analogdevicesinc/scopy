@@ -21,8 +21,6 @@
 
 #include "qiqinstrument.h"
 #include "plotaxis.h"
-
-#include <plotfactory.h>
 #include <stylehelper.h>
 #include <tooltemplate.h>
 

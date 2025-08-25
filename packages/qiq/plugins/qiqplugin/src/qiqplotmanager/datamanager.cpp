@@ -19,7 +19,7 @@
  *
  */
 
-#include "datamanager.h"
+#include "qiqplotmanager/datamanager.h"
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_DATA_MANAGER, "DataManager");

@@ -19,7 +19,7 @@
  *
  */
 
-#include "datareader.h"
+#include "qiqplotmanager/datareader.h"
 #include <QLoggingCategory>
 #include <qiqutils.h>
 

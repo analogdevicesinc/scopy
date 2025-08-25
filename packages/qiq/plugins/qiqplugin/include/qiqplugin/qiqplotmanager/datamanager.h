@@ -25,7 +25,7 @@
 #include "qiqutils.h"
 #include <QMap>
 #include <QObject>
-#include <datareader.h>
+#include <qiqplotmanager/datareader.h>
 #include <outputconfig.h>
 #include <common/scopyconfig.h>
 #include <QDir>

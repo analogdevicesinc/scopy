@@ -52,12 +52,14 @@ file(
 	src/*.cpp
 	src/*.cc
 	src/qiqcontroller/*.cpp
+	src/qiqplotmanager/*.cpp
 )
 file(
 	GLOB
 	HEADER_LIST
 	include/${SCOPY_MODULE}/*.h
 	include/${SCOPY_MODULE}/qiqcontroller/*.h
+	include/${SCOPY_MODULE}/qiqplotmanager/*.h
 	include/${SCOPY_MODULE}/*.hpp
 )
 file(GLOB UI_LIST ui/*.ui)

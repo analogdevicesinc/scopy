@@ -27,7 +27,7 @@
 #include <inputconfig.h>
 #include <outputinfo.h>
 #include <outputconfig.h>
-#include <plotmanager.h>
+#include <qiqplotmanager/plotmanager.h>
 #include <settingsmenu.h>
 #include <toolbuttons.h>
 #include <QProcess>

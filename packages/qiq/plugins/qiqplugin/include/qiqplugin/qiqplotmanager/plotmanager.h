@@ -23,12 +23,20 @@
 #define PLOTMANAGER_H
 
 #include "outputinfo.h"
+#include "plotcreator.h"
 #include <QObject>
-#include <datamanager.h>
-#include <iplot.h>
+#include <qiqplotmanager/datamanager.h>
+#include <qiqcontroller/qiqplotinfo.h>
 #include <gui/plotwidget.h>
 
 namespace scopy::qiqplugin {
+
+struct PlotContainer
+{
+	QWidget *widget;
+	QIQPlotInfo info;
+	PlotCreatorBase *creator;
+};
 
 class PlotManager : public QObject
 {
@@ -52,15 +60,13 @@ public Q_SLOTS:
 	void updatePlots();
 
 private:
-	void updateAxis(int samples);
-	PlotWidget *createPlotWidget(QIQPlotInfo plotInfo);
-	void setupPlots(QList<QIQPlotInfo> plotInfoList);
+	void createPlots(QList<QIQPlotInfo> &plotInfoList);
 	void setupDataManager(const OutputInfo &outInfo);
+	void clearPlots();
 
 	int m_samplingFreq = 512;
 	DataManager *m_dataManager;
-	QVector<QIQPlotInfo> m_plotsInfo;
-	QVector<PlotWidget *> m_plots;
+	QVector<PlotContainer> m_plotContainers;
 };
 
 } // namespace scopy::qiqplugin
