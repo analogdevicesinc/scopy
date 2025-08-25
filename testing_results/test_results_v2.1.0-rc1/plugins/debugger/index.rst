@@ -1,12 +1,7 @@
-.. _tests_scopy:
+.. _tests_debugger:
 
-Test Cases
+Debugger
 ===============================================================================
-
-Current reports
-------------------------
-
-.. include:: test_report.rst
 
 Contents
 ---------------------------------------------------------------------
@@ -15,7 +10,5 @@ Contents
    :includehidden:
    :maxdepth: 3
 
-   testing_guide
-   plugins/index
-   general/index
-   test_report/index
+   debugger_tests
+   debugger_preferences_tests

@@ -1,12 +1,7 @@
-.. _tests_scopy:
+.. _tests_registermap:
 
-Test Cases
+Register Map
 ===============================================================================
-
-Current reports
-------------------------
-
-.. include:: test_report.rst
 
 Contents
 ---------------------------------------------------------------------
@@ -15,7 +10,4 @@ Contents
    :includehidden:
    :maxdepth: 3
 
-   testing_guide
-   plugins/index
-   general/index
-   test_report/index
+   registermap_tests
