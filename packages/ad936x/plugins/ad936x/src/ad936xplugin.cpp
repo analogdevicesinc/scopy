@@ -86,8 +86,8 @@ bool Ad936xPlugin::loadIcon()
 void Ad936xPlugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xTool", "AD936X",
-	                                          ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-	                                                  "/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad963xAdvancedTool", "AD936X Advanced",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/gear_wheel.svg"));
@@ -119,7 +119,7 @@ bool Ad936xPlugin::onConnect()
 		}
 	}
 
-	if (isFmcomms5) {
+	if(isFmcomms5) {
 		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context());
 		m_toolList[0]->setTool(fmcomms5);
 		m_toolList[0]->setName("FMCOMMS5");
@@ -143,7 +143,6 @@ bool Ad936xPlugin::onConnect()
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(true);
 	}
-
 
 	return true;
 }

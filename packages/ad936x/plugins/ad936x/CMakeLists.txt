@@ -47,12 +47,26 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-file(GLOB SRC_LIST src/*.cpp src/*.cc
-	        src/ad936x/*.cpp src/ad936x/*.cc
-		src/fmcomms5/*.cpp src/ad936x/*.cc)
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp
-include/${SCOPY_MODULE}/ad936x/*.h include/${SCOPY_MODULE}/ad936x/*.hpp
-include/${SCOPY_MODULE}/fmcomms5/*.h include/${SCOPY_MODULE}/fmcomms5/*.hpp)
+file(
+	GLOB
+	SRC_LIST
+	src/*.cpp
+	src/*.cc
+	src/ad936x/*.cpp
+	src/ad936x/*.cc
+	src/fmcomms5/*.cpp
+	src/ad936x/*.cc
+)
+file(
+	GLOB
+	HEADER_LIST
+	include/${SCOPY_MODULE}/*.h
+	include/${SCOPY_MODULE}/*.hpp
+	include/${SCOPY_MODULE}/ad936x/*.h
+	include/${SCOPY_MODULE}/ad936x/*.hpp
+	include/${SCOPY_MODULE}/fmcomms5/*.h
+	include/${SCOPY_MODULE}/fmcomms5/*.hpp
+)
 file(GLOB UI_LIST ui/*.ui)
 
 set(ENABLE_TESTING ON)
@@ -62,6 +76,9 @@ endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
+
+find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
+find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
 
 set(AD936X_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad936x-filters)
 
@@ -96,6 +113,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-iio-widgets
 	       scopy-pkg-manager
+	       ${AD9361_LIBRARIES}
 )
 
 set(PLUTO_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
