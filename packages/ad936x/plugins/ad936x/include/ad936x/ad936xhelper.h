@@ -19,46 +19,33 @@
  *
  */
 
-#ifndef AD936X_H
-#define AD936X_H
+#ifndef AD936X_HELPER_H
+#define AD936X_HELPER_H
 
 #include "scopy-ad936x_export.h"
-#include <QBoxLayout>
 #include <QWidget>
-#include <tooltemplate.h>
-
 #include <iio-widgets/iiowidgetbuilder.h>
-
-#include <animatedrefreshbtn.h>
 
 namespace scopy {
 namespace ad936x {
-class SCOPY_AD936X_EXPORT AD936X : public QWidget
+
+class SCOPY_AD936X_EXPORT AD936xHelper : public QWidget
 {
 	Q_OBJECT
 public:
-	AD936X(iio_context *ctx, QWidget *parent = nullptr);
-	~AD936X();
+	AD936xHelper(QWidget *parent = nullptr);
+
+	QWidget *generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent);
+
+	QWidget *generateRxDeviceWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateRxChannelWidget(iio_channel *chn, QString title, QWidget *parent);
+
+	QWidget *generateTxDeviceWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateTxChannelWidget(iio_channel *chn, QString title, QWidget *parent);
 
 Q_SIGNALS:
 	void readRequested();
-
-private:
-	iio_context *m_ctx = nullptr;
-	ToolTemplate *m_tool;
-	QVBoxLayout *m_mainLayout;
-	QWidget *m_controlsWidget;
-	QWidget *m_blockDiagramWidget;
-	AnimatedRefreshBtn *m_refreshButton;
-
-	QWidget *generateGlobalSettingsWidget(QWidget *parent);
-
-	QWidget *generateRxChainWidget(QWidget *parent);
-	QWidget *generateRxWidget(iio_channel *chn, QString title, QWidget *parent);
-
-	QWidget *generateTxChainWidget(QWidget *parent);
-	QWidget *generateTxWidget(iio_channel *chn, QString title, QWidget *parent);
 };
 } // namespace ad936x
 } // namespace scopy
-#endif // AD936X_H
+#endif // AD936X_HELPER_H
