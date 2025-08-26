@@ -59,29 +59,33 @@ ChannelDataVector RollingBufferFilter::createData()
 		return ChannelDataVector(m_plotBuffer.data);
 	}
 
-	const auto &newData = m_data[0].data;
+	std::vector<float> &newData = m_data[0].data;
 
 	if(newData.empty()) {
 		return ChannelDataVector(m_plotBuffer.data);
 	}
 
 	// Check if bufferSize == plotSize for direct optimization
-	if(newData.size() == m_plotSize) {
+	if(newData.size() >= m_plotSize) {
+		newData.resize(m_plotSize);
 		// Direct reference - no copying needed, no reversal in rolling mode
 		return ChannelDataVector(newData);
 	}
 
 	// Original logic for when bufferSize != plotSize
 	if(!m_rollingMode) {
+		if(m_plotBuffer.data.size() >= m_plotSize) {
+			resetPlotBuffer();
+		}
+
 		// Non-rolling mode: append until full, then clear and start again
 		for(const float &sample : newData) {
-			if(m_plotBuffer.data.size() >= m_plotSize) {
-				m_plotBuffer.data.clear();
-				m_plotBuffer.data.reserve(m_plotSize);
-				m_bufferFull = false;
-			}
 			m_plotBuffer.data.push_back(sample);
 		}
+		if(m_plotBuffer.data.size() > m_plotSize) {
+			m_plotBuffer.data.resize(m_plotSize);
+		}
+
 		std::cout << "--- non rolling: " << m_plotBuffer.data.size() << std::endl;
 		return ChannelDataVector(m_plotBuffer.data);
 	} else {
@@ -92,6 +96,10 @@ ChannelDataVector RollingBufferFilter::createData()
 		}
 
 		for(const float &sample : newData) {
+			if(m_currentPosition >= m_plotSize) {
+				break;
+			}
+
 			m_plotBuffer.data[m_currentPosition] = sample;
 			m_currentPosition = (m_currentPosition + 1) % m_plotSize;
 			if(m_currentPosition == 0) {

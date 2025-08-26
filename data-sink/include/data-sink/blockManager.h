@@ -78,20 +78,19 @@ public Q_SLOTS:
 private:
 	// avoids connecting same output multiple times
 	int addOutputLink(SourceBlock *source, BasicBlock *final, uint final_ch, uint out_ch);
-	void emitOutputData(SourceBlock *source = nullptr);
+	void emitOutputData(bool aqcFinished, SourceBlock *source = nullptr);
 	void onRequestData(SourceBlock *source);
 	void refilAqcCounter();
+	bool sourceDataFinished(SourceBlock *source);
 
 Q_SIGNALS:
 	void newData(ChannelDataVector data, uint ch);
-	void sentBufferData();
 	void sentAllData(); // full plot size
 	void doDisconnectBlockToFilter();
 	void requestSingleShot(bool);
 	void requestBufferSize(uint32_t);
 	void started();
 	void stopped();
-	void requestStop();
 
 private:
 	QString m_name;
@@ -112,7 +111,6 @@ private:
 	// sourceBlocks multiple times
 	QMap<uint, OutputConnection *> m_requestDataConnections;
 
-	// DataProvider interface
 public:
 	size_t updateData() { return 0; };
 	bool finished() { return true; };

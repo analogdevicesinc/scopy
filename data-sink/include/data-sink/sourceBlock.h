@@ -18,6 +18,9 @@ public:
 	QString name();
 	size_t bufferSize();
 	size_t plotSize();
+	// int getAqcCounter();
+	void setSingleShot(bool single);
+	bool getAqcFinished();
 
 public Q_SLOTS:
 	virtual void enChannel(bool en, uint id);
@@ -30,6 +33,7 @@ private:
 	QMutex m_mutex;
 	std::atomic_bool m_cancelRequested = false;
 	virtual BlockData createData() = 0; // <channel, buffer>
+	void refilAqcCounter();
 
 Q_SIGNALS:
 	void plotSizeChanged(size_t size);
@@ -41,6 +45,9 @@ protected:
 	size_t m_bufferSize;
 	size_t m_plotSize;
 	QMap<uint, bool> m_channels; // <channel, enabled>
+	int m_aqcCounter = 0;
+	bool m_singleShot = false;
+	bool m_aqcFinished;
 };
 } // namespace scopy::datasink
 

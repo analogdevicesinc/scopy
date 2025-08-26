@@ -1,11 +1,12 @@
 #include <include/data-sink/sourceBlock.h>
-#include <iostream>
+
 using namespace scopy::datasink;
 
 SourceBlock::SourceBlock(QString name)
 	: BasicBlock(name)
 	, m_bufferSize(0)
 	, m_plotSize(m_bufferSize)
+	, m_aqcFinished(true)
 {
 	QObject::connect(this, &SourceBlock::requestData, this, &SourceBlock::onRequestData, Qt::QueuedConnection);
 }
@@ -51,34 +52,41 @@ void SourceBlock::setPlotSize(size_t size)
 
 void SourceBlock::onRequestData()
 {
+	if(m_aqcCounter == 0) {
+		refilAqcCounter();
+	}
+	m_aqcCounter--;
+
 	m_cancelRequested.store(false);
 	QMutexLocker locker(&m_mutex); // Lock the mutex during data creation
+	BlockData data = createData();
 
-	// uint aqcCounter = (m_plotSize + m_bufferSize - 1) / m_bufferSize;
-	// if(aqcCounter > 1) {
-	// 	disconnect(this, &SourceBlock::requestData, this, &SourceBlock::onRequestData);
-	// }
+	if(m_bufferSize <= 0) {
+		qDebug() << m_name << ": invalid buffer size: " << m_bufferSize << Qt::endl;
+		return;
+	}
 
-	// for(int i = 1; i <= aqcCounter; i++) {
-		// if(i ==  aqcCounter) {
-		// 	QObject::connect(this, &SourceBlock::requestData, this, &SourceBlock::onRequestData, Qt::QueuedConnection);
-		// }
-
-		BlockData data = createData();
-
-		if(m_bufferSize <= 0) {
-			qDebug() << m_name << ": invalid buffer size: " << m_bufferSize << Qt::endl;
-			return;
+	for(auto it = data.begin(); it != data.end(); ++it) {
+		if(it.value().data.empty()) {
+			qDebug() << m_name << ": empty data for channel " << it.key() << Qt::endl;
+			continue;
 		}
 
-		for(auto it = data.begin(); it != data.end(); ++it) {
-			if(it.value().data.empty()) {
-				qDebug() << m_name << ": empty data for channel " << it.key() << Qt::endl;
-				continue;
-			}
-
-			// std::cout << "newData ch " << it.key() << "       of size " << it.value().data.size() << "         counter " << i << std::endl;
-			Q_EMIT newData(it.value(), it.key());
-		}
+		// std::cout << "newData ch " << it.key() << "       of size " << it.value().data.size() << " counter "
+		// << i << std::endl;
+		Q_EMIT newData(it.value(), it.key());
+	}
 	// }
+	if(m_aqcCounter > 0) {
+		Q_EMIT requestData();
+	}
 }
+
+bool SourceBlock::getAqcFinished() { return m_aqcFinished; }
+
+void SourceBlock::refilAqcCounter()
+{
+	m_aqcCounter = m_singleShot ? (m_plotSize + m_bufferSize - 1) / m_bufferSize : 1;
+}
+
+void SourceBlock::setSingleShot(bool single) { m_singleShot = single; }

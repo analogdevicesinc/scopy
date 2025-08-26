@@ -130,7 +130,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	m_blockManager->setBufferSize(m_timePlotSettingsComponent->bufferSize());
 	m_blockManager->setPlotSize(m_timePlotSettingsComponent->plotSize());
 	updateFrameRate();
-	connect(m_blockManager, &datasink::BlockManager::sentBufferData, this, &ADCInstrumentController::update,
+	connect(m_blockManager, &datasink::BlockManager::sentAllData, this, &ADCInstrumentController::update,
 		Qt::QueuedConnection);
 
 	// c->init();
@@ -158,19 +158,16 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 
 	// connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
-	// connect(c, SIGNAL(arm()), this, SLOT(onStart()));
-	// connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+	connect(m_blockManager, &BlockManager::started, this, &ADCTimeInstrumentController::onStart);
+	connect(m_blockManager, &BlockManager::stopped, this, &ADCTimeInstrumentController::onStop);
 
-	connect(m_blockManager, &BlockManager::requestStop, this, [=]() {
-		Q_EMIT m_ui->requestStop();
-	});
 
-	connect(m_blockManager, &BlockManager::sentBufferData, this, [=]() {
-		count++;
+	connect(m_blockManager, &BlockManager::sentAllData, this, [=]() {
+		// count++;
 		// std::cout << "draw: " << count << std::endl;
-		// if(m_blockManager->singleShot()) {
-			// Q_EMIT m_ui->requestStop();
-		// }
+		if(m_blockManager->singleShot()) {
+			Q_EMIT m_ui->requestStop();
+		}
 	});
 	// connect(m_blockManager, &BlockManager::stopped, this, &ADCInstrumentController::stopUpdates);
 }

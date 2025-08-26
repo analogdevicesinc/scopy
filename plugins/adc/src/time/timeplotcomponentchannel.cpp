@@ -127,7 +127,9 @@ void adc::TimePlotComponentChannel ::onNewData(const float *xData_, const float 
 	// Q_EMIT m_plotComponent->timePlot()->newData();
 }
 
-void adc::TimePlotComponentChannel ::setXyXData(const float *xyxdata) { m_xyXData = xyxdata; }
+void adc::TimePlotComponentChannel ::setXyXData(const float *xyxdata) {
+	m_xyXData = xyxdata;
+}
 
 void adc::TimePlotComponentChannel ::lockYAxis(bool b)
 {
