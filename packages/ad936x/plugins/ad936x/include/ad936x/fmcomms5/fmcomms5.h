@@ -15,28 +15,26 @@ namespace scopy {
 namespace ad936x {
 class SCOPY_AD936X_EXPORT FMCOMMS5 : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit FMCOMMS5(iio_context *ctx, QWidget *parent = nullptr);
-    ~FMCOMMS5();
-
+	explicit FMCOMMS5(iio_context *ctx, QWidget *parent = nullptr);
+	~FMCOMMS5();
 
 Q_SIGNALS:
-        void readRequested();
-
+	void readRequested();
 
 private:
-        iio_context *m_ctx = nullptr;
-        ToolTemplate *m_tool;
-        QVBoxLayout *m_mainLayout;
-        QWidget *m_controlsWidget;
-        QWidget *m_blockDiagramWidget;
-        AnimatedRefreshBtn *m_refreshButton;
+	iio_context *m_ctx = nullptr;
+	ToolTemplate *m_tool;
+	QVBoxLayout *m_mainLayout;
+	QWidget *m_controlsWidget;
+	QWidget *m_blockDiagramWidget;
+	AnimatedRefreshBtn *m_refreshButton;
 
-        QWidget *generateRxChainWidget(iio_device *dev, QString title, QWidget *parent);
-        QWidget *generateTxChainWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateRxChainWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateTxChainWidget(iio_device *dev, QString title, QWidget *parent);
 
-        AD936xHelper *m_helper;
+	AD936xHelper *m_helper;
 };
 } // namespace ad936x
 } // namespace scopy
