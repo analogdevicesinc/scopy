@@ -43,10 +43,26 @@ void DeviceLoader::init(bool async)
 
 void DeviceLoader::asyncInit()
 {
+#ifdef __ANDROID__
+
+	QThread *th = new QThread();
+	connect(
+		th, &QThread::started, d,
+		[=]() {
+			// initializer thread
+			d->init();
+			th->quit(); // this replicates QThread::create behaviour of exiting the event loop after
+				    // executing the lambda function
+		},
+		Qt::QueuedConnection);
+
+#else
 	QThread *th = QThread::create([=] {
 		// initializer thread
 		d->init();
 	});
+#endif
+
 	oldParent = d->parent();
 	d->setParent(nullptr);
 	d->moveToThread(th);
