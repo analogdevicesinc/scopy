@@ -20,6 +20,7 @@
  */
 
 #include "qiqplotmanager/plotmanager.h"
+#include "plotaxis.h"
 #include <QLoggingCategory>
 #include <stylehelper.h>
 
@@ -28,8 +29,10 @@ using namespace scopy::qiqplugin;
 
 PlotManager::PlotManager(QObject *parent)
 	: QObject(parent)
+	, m_inputPlot(nullptr)
 {
 	m_dataManager = new DataManager(this);
+	createInputPlot();
 
 	connect(this, &PlotManager::bufferDataReady, m_dataManager, &DataManager::onInputData);
 	connect(m_dataManager, &DataManager::dataIsReady, this, &PlotManager::updatePlots);
@@ -41,17 +44,16 @@ PlotManager::~PlotManager() { clearPlots(); }
 QVector<QWidget *> PlotManager::getPlotW()
 {
 	QVector<QWidget *> widgets;
+	if(m_inputPlot) {
+		widgets.push_back(m_inputPlot);
+	}
 	for(const auto &container : qAsConst(m_plotContainers)) {
 		widgets.push_back(container.widget);
 	}
 	return widgets;
 }
 
-void PlotManager::samplingFreqAvailable(int samplingFreq)
-{
-	m_samplingFreq = samplingFreq;
-	m_dataManager->setSamplingFreq(samplingFreq);
-}
+void PlotManager::samplingFreqAvailable(int samplingFreq) { m_dataManager->setSamplingFreq(samplingFreq); }
 
 void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<QIQPlotInfo> plotInfoList)
 {
@@ -72,6 +74,7 @@ void PlotManager::onDataIsProcessed(int samplesOffset, int samplesCount)
 
 void PlotManager::updatePlots()
 {
+	updateInputData();
 	for(auto &container : m_plotContainers) {
 		QMap<QString, QVector<double>> data;
 		const QList<QIQPlotInfo::PlotInfoCh> chnlsInfo = container.info.channels;
@@ -106,3 +109,67 @@ void PlotManager::setupDataManager(const OutputInfo &outInfo)
 }
 
 void PlotManager::clearPlots() { m_plotContainers.clear(); }
+
+// input plot
+void PlotManager::createInputPlot()
+{
+	m_inputPlot = new PlotWidget();
+	m_inputPlot->plot()->setTitle("Input waveform");
+	m_inputPlot->xAxis()->setUnits("Time");
+	m_inputPlot->yAxis()->setUnits("Magnitude");
+
+	m_inputPlot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	m_inputPlot->xAxis()->scaleDraw()->setFloatPrecision(2);
+	m_inputPlot->yAxis()->setInterval(0, 1);
+
+	m_inputPlot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	m_inputPlot->yAxis()->scaleDraw()->setFloatPrecision(2);
+	m_inputPlot->yAxis()->setInterval(-200, 200);
+
+	m_inputPlot->setShowXAxisLabels(true);
+	m_inputPlot->setShowYAxisLabels(true);
+	m_inputPlot->showAxisLabels();
+
+	m_inputPlot->replot();
+}
+
+void PlotManager::updateInputPlot(int chnlCount)
+{
+	removePlotChannels();
+	for(int i = 0; i < chnlCount; i++) {
+		addPlotChannel("ch" + QString::number(i), StyleHelper::getChannelColor(i));
+	}
+	m_inputPlot->replot();
+}
+
+void PlotManager::removePlotChannels()
+{
+	const QList<PlotChannel *> chnls = m_inputPlot->getChannels();
+	for(PlotChannel *ch : chnls) {
+		m_inputPlot->removePlotChannel(ch);
+		delete ch;
+	}
+	m_inputPlot->replot();
+}
+
+void PlotManager::updateInputData()
+{
+	int chIdx = 0;
+	const QList<PlotChannel *> plotChnls = m_inputPlot->getChannels();
+	for(const PlotChannel *ch : plotChnls) {
+		QVector<double> xTime = m_dataManager->dataForKey(DataManagerKeys::TIME);
+		QVector<double> inputData = m_dataManager->dataForKey(DataManagerKeys::INPUT + QString::number(chIdx));
+		ch->curve()->setSamples(xTime, inputData);
+		chIdx++;
+	}
+	m_inputPlot->xAxis()->setInterval(0, m_dataManager->sampleCount() / m_dataManager->samplingFreq());
+	m_inputPlot->replot();
+}
+
+void PlotManager::addPlotChannel(const QString &label, const QColor &color)
+{
+	QPen pen(color, 1);
+	PlotChannel *channel = new PlotChannel(label, pen, m_inputPlot->xAxis(), m_inputPlot->yAxis(), this);
+	m_inputPlot->addPlotChannel(channel);
+	channel->setEnabled(true);
+}

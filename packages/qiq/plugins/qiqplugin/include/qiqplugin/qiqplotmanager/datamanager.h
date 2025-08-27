@@ -48,6 +48,10 @@ public:
 	QVector<double> dataForKey(const QString &key);
 	QString getDefaultFilePath() const;
 
+	double sampleCount() const;
+
+	double samplingFreq() const;
+
 Q_SIGNALS:
 	void configOutput(const OutputConfig &outConfig);
 	void dataIsReady();
@@ -63,8 +67,8 @@ private:
 	void computeXTime(int samplingFreq, int samples);
 	void computeXFreq(int samplingFreq, int samples);
 
-	int m_samplingFreq;
-	int m_sampleCount;
+	double m_samplingFreq;
+	double m_sampleCount;
 	DataReader *m_dataReader;
 	QMap<QString, QVector<double>> m_plotsData;
 

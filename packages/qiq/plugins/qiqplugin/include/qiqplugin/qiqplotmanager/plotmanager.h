@@ -46,6 +46,7 @@ public:
 	~PlotManager();
 
 	QVector<QWidget *> getPlotW();
+	void updateInputPlot(int chnlCount);
 
 Q_SIGNALS:
 	void configOutput(const OutputConfig &outConfig);
@@ -63,8 +64,13 @@ private:
 	void createPlots(QList<QIQPlotInfo> &plotInfoList);
 	void setupDataManager(const OutputInfo &outInfo);
 	void clearPlots();
+	// input plot
+	void createInputPlot();
+	void removePlotChannels();
+	void updateInputData();
+	void addPlotChannel(const QString &label, const QColor &color);
 
-	int m_samplingFreq = 512;
+	PlotWidget *m_inputPlot;
 	DataManager *m_dataManager;
 	QVector<PlotContainer> m_plotContainers;
 };

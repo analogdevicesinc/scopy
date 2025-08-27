@@ -66,10 +66,9 @@ void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &confi
 
 void DataManager::readData(int64_t startSample, int64_t sampleCount)
 {
-	// redo
+	m_sampleCount = sampleCount;
 	computeXFreq(m_samplingFreq, sampleCount);
 	computeXTime(m_samplingFreq, sampleCount);
-	//
 	m_dataReader->readData(startSample, sampleCount);
 }
 
@@ -115,3 +114,7 @@ void DataManager::computeXFreq(int samplingFreq, int samples)
 	}
 	m_plotsData.insert(DataManagerKeys::FREQ, xFreq);
 }
+
+double DataManager::samplingFreq() const { return m_samplingFreq; }
+
+double DataManager::sampleCount() const { return m_sampleCount; }

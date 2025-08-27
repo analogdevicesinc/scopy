@@ -68,19 +68,12 @@ private:
 	void removePlots();
 	void setupConnections();
 	QWidget *createCentralWidget(QWidget *parent = nullptr);
-	void createInputPlot();
-	void updateXAxis(int samples, int sampleRate);
-	void addPlotChannel(const QString &label, const QColor &color);
-	void removePlotChannels();
-	void updateChannels(int chnlCount);
 
 	ToolMenuEntry *m_tme;
 	RunBtn *m_runBtn;
 	PlotManager *m_plotManager;
 	SettingsMenu *m_settings;
 	QGridLayout *m_plotsLay;
-	PlotWidget *m_inputPlot = nullptr;
-	QVector<double> m_xAxis;
 
 	bool m_inputFormatConfigured = false;
 	bool m_outputConfigured = false;

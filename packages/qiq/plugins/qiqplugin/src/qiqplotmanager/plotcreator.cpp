@@ -108,8 +108,9 @@ void StandardPlotCreator::updatePlot(QWidget *plotWidget, const QIQPlotInfo &plo
 		plotChnls[chIdx]->curve()->setSamples(xData, yData);
 
 		if(xFirst == 0 && xLast == 0 && !xData.isEmpty()) {
+			double delta = (xData.size() > 2) ? (xData.at(1) - xData.at(0)) : 0;
 			xFirst = xData.first();
-			xLast = xData.last();
+			xLast = xData.last() + delta;
 		}
 	}
 
