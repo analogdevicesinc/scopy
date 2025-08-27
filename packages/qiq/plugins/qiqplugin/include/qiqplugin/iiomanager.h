@@ -55,7 +55,7 @@ public:
 public Q_SLOTS:
 	void startAcq(bool en);
 	void onDataRequest();
-	void onBufferParamsChanged(BufferParams params);
+	void onBufferParamsChanged(const BufferParams &params);
 
 Q_SIGNALS:
 	void inputFormatChanged(const InputConfig &config);
@@ -69,17 +69,19 @@ private:
 	QStringList getChannelsFormat(iio_device *dev);
 	double getSamplingFrequency(iio_device *dev);
 	InputConfig createInputConfig(iio_device *dev, int channelCount, int64_t bufferSamplesSize);
-	double calculateBufferSamples(iio_channel *ch, iio_buffer *buffer);
 	void chnlRead(iio_channel *chnl, QByteArray &dst);
 	QVector<double> toDouble(QByteArray dst);
 	void readAllChannels(QString deviceName);
+	void updateBufferParams(const BufferParams &params);
+	void notifyInputConfigChanged();
 
 	iio_buffer *createMmapIioBuffer(struct iio_device *dev, size_t samples, void **originalBufferPtr = nullptr);
 
+	int m_enChnlSize = 0;
+	BufferParams m_params;
 	iio_context *m_ctx;
 	iio_buffer *m_buffer = nullptr;
 	void *m_originalBufferPtr = nullptr;
-	int m_bufferSamples = 0;
 	DataWriter *m_dataWriter;
 	QFutureWatcher<void> *m_readFw;
 	QVector<QVector<double>> m_bufferData;

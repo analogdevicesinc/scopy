@@ -65,6 +65,11 @@ void IIOManager::startAcq(bool en)
 		m_readFw->waitForFinished();
 	}
 	m_readFw->setPaused(!en);
+	if(!en) {
+		destroyBuffer();
+	} else if(!m_buffer) {
+		updateBufferParams(m_params);
+	}
 	onDataRequest();
 }
 
@@ -76,20 +81,35 @@ void IIOManager::onDataRequest()
 	}
 }
 
-void IIOManager::onBufferParamsChanged(BufferParams params)
+void IIOManager::onBufferParamsChanged(const BufferParams &params)
 {
+	updateBufferParams(params);
+	notifyInputConfigChanged();
+}
+
+void IIOManager::updateBufferParams(const BufferParams &params)
+{
+	m_params = params;
 	QString devName = params.deviceName;
 	iio_device *dev = iio_context_find_device(m_ctx, devName.toStdString().c_str());
 	if(!dev) {
-		return;
 		qWarning(CAT_IIO_MANAGER) << "The device doesn't exist:" << params.deviceName;
+		return;
 	}
-	if(m_buffer) {
-		destroyBuffer();
-	}
-	int enChnlSize = enChannels(devName, params.enChnls);
+	destroyBuffer();
+	m_enChnlSize = enChannels(devName, params.enChnls);
 	m_buffer = createMmapIioBuffer(dev, params.samplesCount, &m_originalBufferPtr);
-	InputConfig inputConfig = createInputConfig(dev, enChnlSize, m_bufferSamples);
+}
+
+void IIOManager::notifyInputConfigChanged()
+{
+	QString devName = m_params.deviceName;
+	iio_device *dev = iio_context_find_device(m_ctx, devName.toStdString().c_str());
+	if(!dev) {
+		qWarning(CAT_IIO_MANAGER) << "The device doesn't exist:" << m_params.deviceName;
+		return;
+	}
+	InputConfig inputConfig = createInputConfig(dev, m_enChnlSize, m_params.samplesCount);
 	if(inputConfig.isValid()) {
 		Q_EMIT inputFormatChanged(inputConfig);
 	}
@@ -131,10 +151,10 @@ void IIOManager::chnlRead(iio_channel *chnl, QByteArray &dst)
 		return;
 	}
 	unsigned int length = iio_channel_get_data_format(chnl)->length / 8;
-	dst.resize(m_bufferSamples * length);
+	dst.resize(m_params.samplesCount * length);
 
 	uintptr_t src_ptr, dst_ptr = (uintptr_t)dst.data();
-	uintptr_t end = dst_ptr + m_bufferSamples * length;
+	uintptr_t end = dst_ptr + m_params.samplesCount * length;
 	uintptr_t buf_end = (uintptr_t)iio_buffer_end(m_buffer);
 	ptrdiff_t buf_step = iio_buffer_step(m_buffer);
 
@@ -147,11 +167,11 @@ void IIOManager::chnlRead(iio_channel *chnl, QByteArray &dst)
 QVector<double> IIOManager::toDouble(QByteArray dst)
 {
 	const char *data = dst.data();
-	int length = dst.size() / m_bufferSamples;
+	int length = dst.size() / m_params.samplesCount;
 	QVector<double> chData;
-	chData.resize(m_bufferSamples);
+	chData.resize(m_params.samplesCount);
 
-	for(int i = 0; i < m_bufferSamples; ++i) {
+	for(int i = 0; i < m_params.samplesCount; ++i) {
 		double value = 0.0;
 		if(length == 4) {
 			const int *intPtr = reinterpret_cast<const int *>(data + i * length);
@@ -285,18 +305,6 @@ InputConfig IIOManager::createInputConfig(iio_device *dev, int channelCount, int
 	return inputConfig;
 }
 
-double IIOManager::calculateBufferSamples(iio_channel *ch, iio_buffer *buffer)
-{
-	double bufferSamples = 0.0;
-	if(buffer && ch) {
-		ptrdiff_t buf_step = iio_buffer_step(buffer);
-		uintptr_t buf_end = (uintptr_t)iio_buffer_end(buffer);
-		uintptr_t buf_start = (uintptr_t)iio_buffer_first(buffer, ch);
-		bufferSamples = (buf_end - buf_start) / buf_step;
-	}
-	return bufferSamples;
-}
-
 iio_buffer *IIOManager::createMmapIioBuffer(struct iio_device *dev, size_t samples, void **originalBufferPtr)
 {
 	union iio_buffer_hack hackBuffer;
@@ -305,9 +313,7 @@ iio_buffer *IIOManager::createMmapIioBuffer(struct iio_device *dev, size_t sampl
 		qWarning(CAT_IIO_MANAGER) << "Failed to create IIO buffer";
 		return nullptr;
 	}
-	QString devName = iio_device_get_name(dev);
-	m_bufferSamples = calculateBufferSamples(m_devMap[devName].first(), hackBuffer.buffer);
-	int64_t bufferDataSize = iio_device_get_sample_size(dev) * m_bufferSamples;
+	int64_t bufferDataSize = iio_device_get_sample_size(dev) * m_params.samplesCount;
 	if(!m_dataWriter->openFile(DEFAULT_FILE_PATH, bufferDataSize)) {
 		qWarning(CAT_IIO_MANAGER) << "Failed to map:" << DEFAULT_FILE_PATH;
 		return nullptr;
