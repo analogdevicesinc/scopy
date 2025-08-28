@@ -44,27 +44,9 @@ Q_SIGNALS:
 private:
 	iio_context *m_ctx;
 	QVBoxLayout *m_layout;
-	iio_device *m_device = nullptr;
-	iio_device *m_deviceB = nullptr;
-	QCheckBox *m_silentCalibration;
 	QProgressBar *m_calibProgressBar;
 	QPushButton *m_calibrateBtn;
-
-	void initDevices();
-
-	void calibrate();
-	void trxPhaseRottation(iio_device *dev, double val);
-
-	void resetCalibration();
-	void callSwitchPortsEnableCb(int val);
-	double tuneTrxPhaseOffset(iio_device *ldev, int *ret, long long cal_freq, long long cal_tone, double sign,
-				  double abort, std::function<void(iio_device *, double)> tune);
-
-	// helper functions TODO MOVE TO CLASS
-	double scalePhase0360(double val);
-	double calcPhaseOffset(double fsample, double dds_freq, double offset, double mag);
-	void getMarkers(double *offset, double *mag);
-	int getCalSamples(long long calTone, long long calFreq);
+	QPushButton *m_resetCalibrationBtn;
 };
 } // namespace ad936x
 } // namespace scopy
