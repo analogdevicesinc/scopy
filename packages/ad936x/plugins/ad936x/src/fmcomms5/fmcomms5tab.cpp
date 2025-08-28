@@ -84,7 +84,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, QWidget *parent)
 	}
 
 	IIOWidget *calSwitchControl = IIOWidgetBuilder(widget)
-					      .device(m_device)
+					      .device(m_mainDevice)
 					      .attribute("calibration_switch_control")
 					      .uiStrategy(IIOWidgetBuilder::ComboUi)
 					      .optionsValues(optionasData)
@@ -133,7 +133,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, QWidget *parent)
 
 	// TX Phase
 	IIOWidget *txPhase = IIOWidgetBuilder(widget)
-				     .device(m_device)
+				     .device(m_mainDevice)
 				     .attribute("calibration_switch_control")
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 0.1 360]")
@@ -148,20 +148,20 @@ Fmcomms5Tab::~Fmcomms5Tab() {}
 
 void Fmcomms5Tab::initDevices()
 {
-	iio_device *plutoDevice = nullptr;
-	iio_device *plutoDeviceB = nullptr;
+	iio_device *mainDevice = nullptr;
+	iio_device *secondDevice = nullptr;
 	int foundDevices = 0;
 	int device_count = iio_context_get_devices_count(m_ctx);
 	for(int i = 0; i < device_count; ++i) {
 		iio_device *dev = iio_context_get_device(m_ctx, i);
 		const char *dev_name = iio_device_get_name(dev);
 		if(dev_name && QString(dev_name).compare("ad9361-phy", Qt::CaseInsensitive) == 0) {
-			plutoDevice = dev;
+			mainDevice = dev;
 			foundDevices++;
 		}
 
 		if(dev_name && QString(dev_name).compare("ad9361-phy-B", Qt::CaseInsensitive) == 0) {
-			plutoDeviceB = dev;
+			secondDevice = dev;
 			foundDevices++;
 		}
 
@@ -169,43 +169,46 @@ void Fmcomms5Tab::initDevices()
 			break;
 		}
 	}
-	if(plutoDevice == nullptr) {
+	if(mainDevice == nullptr) {
 		qWarning(CAT_FMCOMMS5_TAB) << "No ad9361-phy device found in context!";
 		return;
 	}
 
-	if(plutoDeviceB == nullptr) {
+	if(secondDevice == nullptr) {
 		qWarning(CAT_FMCOMMS5_TAB) << "No ad9361-phy-B device found in context!";
 		return;
 	}
 
-	m_device = plutoDevice;
-	m_deviceB = plutoDeviceB;
+	// find capture core
+	m_cf_ad9361_lpc = iio_context_find_device(m_ctx, CAP_DEVICE_ALT);
+	m_cf_ad9361_hpc = iio_context_find_device(m_ctx, CAP_SLAVE_DEVICE);
+
+	if(!m_cf_ad9361_lpc || !m_cf_ad9361_hpc) {
+		qWarning(CAT_FMCOMMS5_TAB) << "Could not find capture cores";
+		return;
+	}
+
+	m_mainDevice = mainDevice;
+	m_secondDevice = secondDevice;
 }
 
 void Fmcomms5Tab::calibrate()
 {
-	// https://github.com/analogdevicesinc/iio-oscilloscope/blob/7a672e3e3e86aeb4fea2e594acff844010afe6fa/plugins/fmcomms2_adv.c#L897C13-L897C23
-
 	m_calibrateBtn->setEnabled(false);
 	int ret = 0;
 	double rx_phase_lpc = 0, rx_phase_hpc = 0, tx_phase_hpc = 0;
 	long long cal_tone = 0, cal_freq = 0;
 	int samples = 0;
 
-	iio_channel *in0 = iio_device_find_channel(m_device, "voltage0", false);
-	iio_channel *in0B = iio_device_find_channel(m_deviceB, "voltage0", false);
+	iio_channel *in0 = iio_device_find_channel(m_mainDevice, "voltage0", false);
+	iio_channel *in0B = iio_device_find_channel(m_mainDeviceB, "voltage0", false);
 
 	if(!in0 || !in0B) {
 		qWarning(CAT_FMCOMMS5_TAB) << "Could not find channels";
 		return;
 	}
 
-	// find caputre core
-	iio_device *cf_ad9361_lpc = iio_context_find_device(m_ctx, CAP_DEVICE_ALT);
-	iio_device *cf_ad9361_hpc = iio_context_find_device(m_ctx, CAP_SLAVE_DEVICE);
-
-	if(!cf_ad9361_lpc || !cf_ad9361_hpc) {
+	if(!m_cf_ad9361_lpc || !m_cf_ad9361_hpc) {
 		qWarning(CAT_FMCOMMS5_TAB) << "Could not find capture cores";
 		return;
 	}
@@ -231,15 +234,15 @@ void Fmcomms5Tab::calibrate()
 	iio_channel_attr_read_longlong(dds_ch, "frequency", &cal_tone);
 	iio_channel_attr_read_longlong(dds_ch, "sampling_frequency", &cal_freq);
 
-	samples = getCalSamples(cal_tone, cal_freq); // Implement this helper
+	samples = getCalSamples(cal_tone, cal_freq);
 
 	// Turn off quadrature tracking
 	iio_channel_attr_write(in0, "quadrature_tracking_en", "0");
 	iio_channel_attr_write(in0B, "quadrature_tracking_en", "0");
 
 	// Reset any Tx rotation to zero
-	trxPhaseRottation(cf_ad9361_lpc, 0.0);
-	trxPhaseRottation(cf_ad9361_hpc, 0.0);
+	trxPhaseRottation(m_cf_ad9361_lpc, 0.0);
+	trxPhaseRottation(m_cf_ad9361_hpc, 0.0);
 
 	m_calibProgressBar->setValue(16);
 
@@ -247,12 +250,12 @@ void Fmcomms5Tab::calibrate()
 	// 1. Calibrate RX: TX1B_B (HPC) -> RX1C_B (HPC)
 	callSwitchPortsEnableCb(1);
 	rx_phase_hpc =
-		tuneTrxPhaseOffset(cf_ad9361_hpc, // cf_ad9361_hpc
-				   &ret,	  // Error/status pointer
-				   cal_freq,	  // Calibration frequency
-				   cal_tone,	  // Calibration tone
-				   1.0,		  // Sign
-				   0.01,	  // Abort threshold
+		tuneTrxPhaseOffset(m_cf_ad9361_hpc, // cf_ad9361_hpc
+				   &ret,	    // Error/status pointer
+				   cal_freq,	    // Calibration frequency
+				   cal_tone,	    // Calibration tone
+				   1.0,		    // Sign
+				   0.01,	    // Abort threshold
 				   [this](iio_device *dev, double phase) { this->trxPhaseRottation(dev, phase); });
 
 	if(ret < 0) {
@@ -264,14 +267,14 @@ void Fmcomms5Tab::calibrate()
 
 	// 2. Calibrate RX: TX1B_B (HPC) -> RX1C_A (LPC)
 	callSwitchPortsEnableCb(3);
-	trxPhaseRottation(m_device, 0.0);
+	trxPhaseRottation(m_mainDevice, 0.0);
 	rx_phase_lpc =
-		tuneTrxPhaseOffset(cf_ad9361_lpc, // cf_ad9361_lpc
-				   &ret,	  // Error/status pointer
-				   cal_freq,	  // Calibration frequency
-				   cal_tone,	  // Calibration tone
-				   1.0,		  // Sign
-				   0.01,	  // Abort threshold
+		tuneTrxPhaseOffset(m_cf_ad9361_lpc, // cf_ad9361_lpc
+				   &ret,	    // Error/status pointer
+				   cal_freq,	    // Calibration frequency
+				   cal_tone,	    // Calibration tone
+				   1.0,		    // Sign
+				   0.01,	    // Abort threshold
 				   [this](iio_device *dev, double phase) { this->trxPhaseRottation(dev, phase); });
 
 	if(ret < 0) {
@@ -283,7 +286,7 @@ void Fmcomms5Tab::calibrate()
 
 	// 3. Calibrate TX: TX1B_A (LPC) -> RX1C_A (LPC)
 	callSwitchPortsEnableCb(4);
-	trxPhaseRottation(m_device, 0.0);
+	trxPhaseRottation(m_mainDevice, 0.0);
 	tx_phase_hpc =
 		tuneTrxPhaseOffset(dev_dds_B, // dev_dds_B
 				   &ret,      // Error/status pointer
@@ -301,7 +304,7 @@ void Fmcomms5Tab::calibrate()
 	m_calibProgressBar->setValue(88);
 
 	// Restore phase rotation
-	trxPhaseRottation(cf_ad9361_hpc, rx_phase_hpc);
+	trxPhaseRottation(m_cf_ad9361_hpc, rx_phase_hpc);
 
 	// Restore calibration switch matrix to default
 	callSwitchPortsEnableCb(0);
@@ -345,12 +348,11 @@ void Fmcomms5Tab::calibrate()
 
 void Fmcomms5Tab::trxPhaseRottation(iio_device *dev, double val)
 {
-	// https://github.com/analogdevicesinc/iio-oscilloscope/blob/7a672e3e3e86aeb4fea2e594acff844010afe6fa/plugins/fmcomms2_adv.c#L526
 	double phase = val * 2 * M_PI / 360.0;
 	double vcos = std::cos(phase);
 	double vsin = std::sin(phase);
 
-	bool output = (dev == m_device) || (dev == m_deviceB);
+	bool output = (dev == m_mainDevice) || (dev == m_secondDevice);
 
 	// Correction factor for output devices
 	if(output) {
@@ -378,7 +380,6 @@ void Fmcomms5Tab::trxPhaseRottation(iio_device *dev, double val)
 int Fmcomms5Tab::getCalSamples(long long calTone, long long calFreq)
 {
 	int samples, env_samples;
-	/// ????
 	const char *cal_samples = getenv("CAL_SAMPLES");
 
 	samples = std::exp2(std::ceil(log2(calFreq / calTone)) + 2);
@@ -394,10 +395,31 @@ int Fmcomms5Tab::getCalSamples(long long calTone, long long calFreq)
 	return env_samples;
 }
 
+void Fmcomms5Tab::nearEndLoopbackCtrl(unsigned int channel, bool enable)
+{
+	unsigned tmp;
+	struct iio_device *dev = (channel > 3) ? m_cf_ad9361_lpc : m_cf_ad9361_hpc;
+	if(!dev)
+		return;
+
+	if(channel > 3)
+		channel -= 4;
+
+	if(iio_device_reg_read(dev, 0x80000418 + channel * 0x40, &tmp))
+		return;
+
+	if(enable)
+		tmp |= 0x1;
+	else
+		tmp &= ~0xF;
+
+	iio_device_reg_write(dev, 0x80000418 + channel * 0x40, tmp);
+}
+
 void Fmcomms5Tab::resetCalibration()
 {
-	iio_channel *in0 = iio_device_find_channel(m_device, "voltage0", false);
-	iio_channel *in0B = iio_device_find_channel(m_deviceB, "voltage0", false);
+	iio_channel *in0 = iio_device_find_channel(m_mainDevice, "voltage0", false);
+	iio_channel *in0B = iio_device_find_channel(m_secondDevice, "voltage0", false);
 
 	// Reset calibration corrections to zero/default
 	iio_channel_attr_write(in0, "calibphase", "0");
@@ -406,71 +428,84 @@ void Fmcomms5Tab::resetCalibration()
 	iio_channel_attr_write(in0B, "calibscale", "0");
 
 	// Optionally reset calibration switch matrix as well
-	iio_device_attr_write(m_device, "calibration_switch_control", "0");
+	iio_device_attr_write(m_mainDevice, "calibration_switch_control", "0");
 }
 
 void Fmcomms5Tab::callSwitchPortsEnableCb(int val)
 {
-	// unsigned lp_slave, lp_master, sw;
-	//         char *rx_port, *tx_port;
+	// Map input value to switch settings
+	unsigned lp_slave = 0, lp_master = 0, sw = 0;
+	QString tx_port = "A";
+	QString rx_port = "A_BALANCED";
 
-	//         /*
-	//         *  0 DISABLE
-	//         *  1 TX1B_B (HPC) -> RX1C_B (HPC) : BIST_LOOPBACK on A
-	//         *  2 TX1B_A (LPC) -> RX1C_B (HPC) : BIST_LOOPBACK on A
-	//         *  3 TX1B_B (HPC) -> RX1C_A (LPC) : BIST_LOOPBACK on B
-	//         *  4 TX1B_A (LPC) -> RX1C_A (LPC) : BIST_LOOPBACK on B
-	//         *
-	//         */
-	//         switch (val) {
-	//         default:
-	//         case 0:
-	//                 lp_slave = 0;
-	//                 lp_master = 0;
-	//                 sw = 0;
-	//                 tx_port = "A";
-	//                 rx_port = "A_BALANCED";
-	//                 break;
-	//         case 1:
-	//         case 2:
-	//                 lp_slave = 0;
-	//                 lp_master = 1;
-	//                 sw = val - 1;
-	//                 tx_port = "B";
-	//                 rx_port = "C_BALANCED";
-	//                 break;
-	//         case 3:
-	//         case 4:
-	//                 lp_slave = 1;
-	//                 lp_master = 0;
-	//                 sw = val - 1;
-	//                 tx_port = "B";
-	//                 rx_port = "C_BALANCED";
-	//                 break;
-	//         }
+	/*
+	 *  0 DISABLE
+	 *  1 TX1B_B (HPC) -> RX1C_B (HPC) : BIST_LOOPBACK on A
+	 *  2 TX1B_A (LPC) -> RX1C_B (HPC) : BIST_LOOPBACK on A
+	 *  3 TX1B_B (HPC) -> RX1C_A (LPC) : BIST_LOOPBACK on B
+	 *  4 TX1B_A (LPC) -> RX1C_A (LPC) : BIST_LOOPBACK on B
+	 *
+	 */
 
-	// #if 0
-	//         iio_device_debug_attr_write_bool(dev, "loopback", lp_master);
-	//         iio_device_debug_attr_write_bool(dev_slave, "loopback", lp_slave);
-	// #else
-	//         near_end_loopback_ctrl(0, lp_slave); /* HPC */
-	//         near_end_loopback_ctrl(1, lp_slave); /* HPC */
+	switch(val) {
+	default:
+	case 0:
+		lp_slave = 0;
+		lp_master = 0;
+		sw = 0;
+		tx_port = "A";
+		rx_port = "A_BALANCED";
+		break;
+	case 1:
+	case 2:
+		lp_slave = 0;
+		lp_master = 1;
+		sw = val - 1;
+		tx_port = "B";
+		rx_port = "C_BALANCED";
+		break;
+	case 3:
+	case 4:
+		lp_slave = 1;
+		lp_master = 0;
+		sw = val - 1;
+		tx_port = "B";
+		rx_port = "C_BALANCED";
+		break;
+	}
 
-	//         near_end_loopback_ctrl(4, lp_master); /* LPC */
-	//         near_end_loopback_ctrl(5, lp_master); /* LPC */
-	// #endif
-	//         iio_device_debug_attr_write_longlong(dev, "calibration_switch_control", sw);
-	//         iio_channel_attr_write(iio_device_find_channel(dev, "voltage0", false),
-	//                                "rf_port_select", rx_port);
-	//         iio_channel_attr_write(iio_device_find_channel(dev, "voltage0", true),
-	//                                "rf_port_select", tx_port);
+/// WHY in iio-osc if 0 ?? this never happens
+#if 0
+	iio_device_debug_attr_write_bool(m_cf_ad9361_hpc, "loopback", lp_master);
+	iio_device_debug_attr_write_bool(m_cf_ad9361_lpc, "loopback", lp_slave);
 
-	//         if (dev_slave) {
-	//                 iio_channel_attr_write(iio_device_find_channel(dev_slave, "voltage0", false),
-	//                                 "rf_port_select", rx_port);
-	//                 iio_channel_attr_write(iio_device_find_channel(dev_slave, "voltage0", true),
-	//                                 "rf_port_select", tx_port);
-	//         }
+#else
+	nearEndLoopbackCtrl(0, lp_slave);  // HPC
+	nearEndLoopbackCtrl(1, lp_slave);  // HPC
+	nearEndLoopbackCtrl(4, lp_master); // LPC
+	nearEndLoopbackCtrl(5, lp_master); // LPC
+#endif
+
+	// Set calibration switch control
+	iio_device_attr_write(m_mainDevice, "calibration_switch_control", QString::number(sw).toUtf8().constData());
+
+	// Set RF port select for RX and TX on master device
+	iio_channel *rx_ch = iio_device_find_channel(m_mainDevice, "voltage0", false);
+	iio_channel *tx_ch = iio_device_find_channel(m_mainDevice, "voltage0", true);
+	if(rx_ch)
+		iio_channel_attr_write(rx_ch, "rf_port_select", rx_port.toUtf8().constData());
+	if(tx_ch)
+		iio_channel_attr_write(tx_ch, "rf_port_select", tx_port.toUtf8().constData());
+
+	// Set RF port select for RX and TX on slave device
+	if(m_secondDevice) {
+		iio_channel *rx_chB = iio_device_find_channel(m_secondDevice, "voltage0", false);
+		iio_channel *tx_chB = iio_device_find_channel(m_secondDevice, "voltage0", true);
+		if(rx_chB)
+			iio_channel_attr_write(rx_chB, "rf_port_select", rx_port.toUtf8().constData());
+		if(tx_chB)
+			iio_channel_attr_write(tx_chB, "rf_port_select", tx_port.toUtf8().constData());
+	}
 }
 
 double Fmcomms5Tab::tuneTrxPhaseOffset(iio_device *ldev, int *ret, long long cal_freq, long long cal_tone, double sign,

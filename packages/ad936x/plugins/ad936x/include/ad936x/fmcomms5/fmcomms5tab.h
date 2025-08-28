@@ -44,8 +44,10 @@ Q_SIGNALS:
 private:
 	iio_context *m_ctx;
 	QVBoxLayout *m_layout;
-	iio_device *m_device = nullptr;
-	iio_device *m_deviceB = nullptr;
+	iio_device *m_mainDevice = nullptr;
+	iio_device *m_secondDevice = nullptr;
+	iio_device *m_cf_ad9361_lpc = nullptr;
+	iio_device *cf_ad9361_hpc = nullptr;
 	QCheckBox *m_silentCalibration;
 	QProgressBar *m_calibProgressBar;
 	QPushButton *m_calibrateBtn;
@@ -65,6 +67,7 @@ private:
 	double calcPhaseOffset(double fsample, double dds_freq, double offset, double mag);
 	void getMarkers(double *offset, double *mag);
 	int getCalSamples(long long calTone, long long calFreq);
+	void nearEndLoopbackCtrl(unsigned channel, bool enable);
 };
 } // namespace ad936x
 } // namespace scopy

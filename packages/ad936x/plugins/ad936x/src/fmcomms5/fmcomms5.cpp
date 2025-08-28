@@ -96,13 +96,13 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 
 	if(m_ctx != nullptr) {
 
-		iio_device *plutoDevice = nullptr;
+		iio_device *mainDevice = nullptr;
 		int device_count = iio_context_get_devices_count(m_ctx);
 		for(int i = 0; i < device_count; ++i) {
 			iio_device *dev = iio_context_get_device(m_ctx, i);
 			const char *dev_name = iio_device_get_name(dev);
-			if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
-				plutoDevice = dev;
+			if(dev_name && QString(dev_name).compare("ad9361-phy", Qt::CaseInsensitive) == 0) {
+				mainDevice = dev;
 				break;
 			}
 		}
@@ -111,16 +111,16 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 		connect(this, &FMCOMMS5::readRequested, m_helper, &AD936xHelper::readRequested);
 
 		///  first widget the global settings can be created with iiowigets only
-		controlWidgetLayout->addWidget(m_helper->generateGlobalSettingsWidget(
-			plutoDevice, "FMCOMMS5 Global Settings", controlsWidget));
+		controlWidgetLayout->addWidget(
+			m_helper->generateGlobalSettingsWidget(mainDevice, "FMCOMMS5 Global Settings", controlsWidget));
 
 		/// second is Rx ( receive chain)
 		controlWidgetLayout->addWidget(
-			generateRxChainWidget(plutoDevice, "FMCOMMS5 Receive Chain", controlsWidget));
+			generateRxChainWidget(mainDevice, "FMCOMMS5 Receive Chain", controlsWidget));
 
-		/// third is Tx (transimt chain)
+		/// third is Tx (transmit chain)
 		controlWidgetLayout->addWidget(
-			generateTxChainWidget(plutoDevice, "FMCOMMS5 Transmit Chain", controlsWidget));
+			generateTxChainWidget(mainDevice, "FMCOMMS5 Transmit Chain", controlsWidget));
 
 		controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 	}
@@ -143,8 +143,9 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 	QLabel *blockDiagram = new QLabel(m_blockDiagramWidget);
 	blockDiagramWidgetLayout->addWidget(blockDiagram);
 	blockDiagram->setAlignment(Qt::AlignCenter);
-	// todo replace
-	QPixmap pixmap(":/pluto/ad936x.svg");
+
+	// TODO ADD AD9361 diagram also another
+	QPixmap pixmap(":/pluto/AD_FMCOMMS5_EBZ.jpg");
 	blockDiagram->setPixmap(pixmap);
 
 	centralWidget->addWidget(m_controlsWidget);
@@ -155,11 +156,11 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 	QButtonGroup *centralWidgetButtons = new QButtonGroup(this);
 	centralWidgetButtons->setExclusive(true);
 
-	QPushButton *ad963xBtn = new QPushButton("Controls", this);
-	ad963xBtn->setCheckable(true);
-	ad963xBtn->setChecked(true);
-	Style::setStyle(ad963xBtn, style::properties::button::blueGrayButton);
-	connect(ad963xBtn, &QPushButton::clicked, this,
+	QPushButton *controlsBtn = new QPushButton("Controls", this);
+	controlsBtn->setCheckable(true);
+	controlsBtn->setChecked(true);
+	Style::setStyle(controlsBtn, style::properties::button::blueGrayButton);
+	connect(controlsBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(m_controlsWidget); });
 
 	QPushButton *blockDiagramBtn = new QPushButton("Block Diagram", this);
@@ -168,10 +169,10 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 	connect(blockDiagramBtn, &QPushButton::clicked, this,
 		[=, this]() { centralWidget->setCurrentWidget(m_blockDiagramWidget); });
 
-	centralWidgetButtons->addButton(ad963xBtn);
+	centralWidgetButtons->addButton(controlsBtn);
 	centralWidgetButtons->addButton(blockDiagramBtn);
 
-	m_tool->addWidgetToTopContainerHelper(ad963xBtn, TTA_LEFT);
+	m_tool->addWidgetToTopContainerHelper(controlsBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(blockDiagramBtn, TTA_LEFT);
 }
 
@@ -289,7 +290,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 	for(int i = 0; i < device_count; ++i) {
 		iio_device *aux = iio_context_get_device(m_ctx, i);
 		const char *dev_name = iio_device_get_name(aux);
-		if(dev_name && QString(dev_name).contains("ad9361-phy-b", Qt::CaseInsensitive)) {
+		if(dev_name && QString(dev_name).contains("ad9361-phy-B", Qt::CaseInsensitive)) {
 			dev2 = aux;
 			break;
 		}
