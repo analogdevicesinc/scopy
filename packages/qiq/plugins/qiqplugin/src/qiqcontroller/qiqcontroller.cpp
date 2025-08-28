@@ -25,6 +25,7 @@
 #include <QLoggingCategory>
 #include <analysisconfig.h>
 #include <pluginbase/preferences.h>
+#include <pluginbase/statusbarmanager.h>
 
 Q_LOGGING_CATEGORY(CAT_QIQ_CONTROLLER, "QIQController");
 
@@ -91,6 +92,7 @@ bool QIQController::isReady() { return m_qiqConfig->isComplete(); }
 void QIQController::onCommunicationError(QString error)
 {
 	qWarning(CAT_QIQ_CONTROLLER) << "Communication error:" << error;
+	StatusBarManager::pushMessage("CLI error: " + error, 3000);
 }
 
 void QIQController::onProcessFinished(int exitCode) {}
