@@ -77,6 +77,9 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
+find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
+find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
+
 set(AD936X_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad936x-filters)
 
 file(GLOB FIR_FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/resources/ad936x-filters/*)
@@ -110,6 +113,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-iio-widgets
 	       scopy-pkg-manager
+	       ${AD9361_LIBRARIES}
 )
 
 set(PLUTO_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

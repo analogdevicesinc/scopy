@@ -30,6 +30,8 @@
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
 
+#include <ad9361.h>
+
 Q_LOGGING_CATEGORY(CAT_FMCOMMS5_ADVANCED, "FMCOMMS5_ADVANCED")
 
 using namespace scopy;
@@ -83,21 +85,38 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 
 	if(m_ctx != nullptr) {
 		iio_device *plutoDevice = nullptr;
-		int device_count = iio_context_get_devices_count(ctx);
+		iio_device *plutoDeviceB = nullptr;
+		int foundDevices = 0;
+		int device_count = iio_context_get_devices_count(m_ctx);
 		for(int i = 0; i < device_count; ++i) {
-			iio_device *dev = iio_context_get_device(ctx, i);
+			iio_device *dev = iio_context_get_device(m_ctx, i);
 			const char *dev_name = iio_device_get_name(dev);
 			if(dev_name && QString(dev_name).compare("ad9361-phy", Qt::CaseInsensitive) == 0) {
 				plutoDevice = dev;
+				foundDevices++;
+			}
+
+			if(dev_name && QString(dev_name).compare("ad9361-phy-B", Qt::CaseInsensitive) == 0) {
+				plutoDeviceB = dev;
+				foundDevices++;
+			}
+
+			if(foundDevices == 2) {
 				break;
 			}
 		}
 		if(plutoDevice == nullptr) {
-			qWarning(CAT_FMCOMMS5_ADVANCED) << "No AD936x device found in context!";
+			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy device found in context!";
+			return;
+		}
+
+		if(plutoDeviceB == nullptr) {
+			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy-B device found in context!";
 			return;
 		}
 
 		m_plutoDevice = plutoDevice;
+		m_plutoDeviceB = plutoDeviceB;
 		m_centralWidget = centralWidget;
 
 		// Create buttons
@@ -154,13 +173,12 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
 		m_syncBtn->setCheckable(true);
-
-		m_saveSettingsBtn = new QPushButton("Save Settings", this);
-		Style::setStyle(m_saveSettingsBtn, style::properties::button::basicButton);
-		m_saveSettingsBtn->setCheckable(true);
+		connect(m_syncBtn, &QPushButton::clicked, this, [=]() {
+			ad9361_multichip_sync(m_plutoDevice, &m_plutoDeviceB, 1,
+					      FIXUP_INTERFACE_TIMING | CHECK_SAMPLE_RATES);
+		});
 
 		m_tool->addWidgetToBottomContainerHelper(m_syncBtn, TTA_LEFT);
-		m_tool->addWidgetToBottomContainerHelper(m_saveSettingsBtn, TTA_LEFT);
 
 		bool useLazyLoading = scopy::Preferences::get("iiowidgets_use_lazy_loading").toBool();
 		if(!useLazyLoading) {
@@ -240,3 +258,5 @@ void Fmcomms5Advanced::init()
 
 	m_isToolInitialized = true;
 }
+
+void Fmcomms5Advanced::ad9361MultichipSync() {}
