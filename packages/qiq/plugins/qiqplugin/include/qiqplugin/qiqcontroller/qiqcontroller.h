@@ -70,7 +70,7 @@ Q_SIGNALS:
 	void processDataStarted();
 	void processDataCompleted(RunResults results);
 	void analysisTypesReceived(QStringList types);
-	void errorOccurred(QString operation, QString error);
+	void processFinished(int exitCode);
 	void configurationChanged();
 
 private Q_SLOTS:
@@ -78,7 +78,7 @@ private Q_SLOTS:
 	void onCommunicationError(QString error);
 
 	// Response handlers from CommandFormat
-	void onProcessFinished(int exitCode);
+	void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 	void onResponseReceived(QVariantMap response);
 	void handleSetInputConfigResponse(QVariantMap response);
 	void handleSetAnalysisConfigResponse(QVariantMap response);

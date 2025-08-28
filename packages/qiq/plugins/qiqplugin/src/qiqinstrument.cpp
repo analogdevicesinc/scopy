@@ -113,6 +113,16 @@ void QIQInstrument::tmeToggled(bool checked)
 	m_runBtn->setChecked(checked);
 }
 
+void QIQInstrument::onProcessFinished(int exitCode)
+{
+	if(m_runBtn->isChecked()) {
+		m_runBtn->setChecked(false);
+		m_runBtn->setEnabled(false);
+		m_inputFormatConfigured = false;
+		m_outputConfigured = false;
+	}
+}
+
 void QIQInstrument::addPlots()
 {
 	const QVector<QWidget *> plotList = m_plotManager->getPlotW();

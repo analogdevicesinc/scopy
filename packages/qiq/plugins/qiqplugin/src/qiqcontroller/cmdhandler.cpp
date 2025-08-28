@@ -115,7 +115,10 @@ void CmdHandler::onProcessReadyReadStandardError()
 	Q_EMIT errorOccurred(error);
 }
 
-void CmdHandler::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus) { Q_EMIT processFinished(exitCode); }
+void CmdHandler::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	Q_EMIT processFinished(exitCode, exitStatus);
+}
 
 void CmdHandler::onProcessError(QProcess::ProcessError error)
 {

@@ -52,7 +52,7 @@ public:
 Q_SIGNALS:
 	void responseReceived(QVariantMap response);
 	void errorOccurred(QString error);
-	void processFinished(int exitCode);
+	void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private Q_SLOTS:
 	void onProcessReadyReadStandardOutput();

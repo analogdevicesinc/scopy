@@ -61,6 +61,7 @@ public Q_SLOTS:
 			    const QList<QIQPlotInfo> plotInfoList);
 	void onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);
 	void tmeToggled(bool checked);
+	void onProcessFinished(int exitCode);
 	// void onProcessDataCompleted(const RunResults &result);
 
 private:

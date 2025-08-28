@@ -183,6 +183,8 @@ bool QIQPlugin::onConnect()
 	connect(m_qiqController, &QIQController::analysisInfo, qiqInstrument, &QIQInstrument::onAnalysisInfo);
 	connect(qiqInstrument, &QIQInstrument::requestAnalysisInfo, m_qiqController, &QIQController::getAnalysisInfo);
 
+	connect(m_qiqController, &QIQController::processFinished, qiqInstrument, &QIQInstrument::onProcessFinished);
+
 	connect(qiqInstrument, &QIQInstrument::bufferParamsChanged, m_iioManager, &IIOManager::onBufferParamsChanged);
 	connect(qiqInstrument, &QIQInstrument::runPressed, m_iioManager, &IIOManager::startAcq);
 	connect(qiqInstrument, &QIQInstrument::requestNewData, m_iioManager, &IIOManager::onDataRequest);

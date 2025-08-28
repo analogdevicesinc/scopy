@@ -95,7 +95,14 @@ void QIQController::onCommunicationError(QString error)
 	StatusBarManager::pushMessage("CLI error: " + error, 3000);
 }
 
-void QIQController::onProcessFinished(int exitCode) {}
+void QIQController::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	Q_EMIT processFinished(exitCode);
+	if(exitStatus == QProcess::CrashExit) {
+		StatusBarManager::pushMessage("Trying to relaunch the CLI", 3000);
+		m_cmdHandler->startProcess(Preferences::get("qiq_cli_path").toString(), {});
+	}
+}
 
 void QIQController::onResponseReceived(QVariantMap response)
 {
