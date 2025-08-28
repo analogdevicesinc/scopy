@@ -201,6 +201,7 @@ void QIQController::handleGetAnalysisInfoResponse(QVariantMap response)
 	QVariantMap parameters = response.value(KeysAnalysisInfo::PARAMETERS, {}).toMap();
 	const QList<QVariant> plotInfoVar = response.value(KeysAnalysisInfo::PLOT_INFO, {}).toList();
 	QVariantMap outInfoMap = response.value(KeysAnalysisInfo::OUT_INFO, {}).toMap();
+	QStringList measurements = response.value(KeysAnalysisInfo::MEASUREMENTS, {}).toStringList();
 	OutputInfo outInfo;
 	outInfo.fromVariantMap(outInfoMap);
 
@@ -212,7 +213,7 @@ void QIQController::handleGetAnalysisInfoResponse(QVariantMap response)
 	}
 
 	if(outInfo.isValid() && !type.isEmpty() && !parameters.isEmpty() && !plotInfoList.isEmpty()) {
-		Q_EMIT analysisInfo(type, parameters, outInfo, plotInfoList);
+		Q_EMIT analysisInfo(type, parameters, outInfo, plotInfoList, measurements);
 	} else {
 		qWarning(CAT_QIQ_CONTROLLER) << "Analysis info is not available!";
 	}

@@ -62,10 +62,9 @@ public:
 
 Q_SIGNALS:
 	void inputConfigured(const InputConfig &config);
-	// maybe plot info ??
 	void analysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);
 	void analysisInfo(const QString &type, const QVariantMap &param, const OutputInfo &outputInfo,
-			  const QList<QIQPlotInfo> plotInfo); // plot info
+			  const QList<QIQPlotInfo> plotInfo, QStringList measurementsLabels);
 	void outputConfigured(const OutputConfig &config);
 	void processDataStarted();
 	void processDataCompleted(RunResults results);

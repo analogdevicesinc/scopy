@@ -31,6 +31,8 @@
 #include <settingsmenu.h>
 #include <toolbuttons.h>
 #include <QProcess>
+#include <measurementpanel.h>
+#include <tooltemplate.h>
 #include <qiqcontroller/runresults.h>
 #include <pluginbase/toolmenuentry.h>
 
@@ -58,7 +60,7 @@ public Q_SLOTS:
 	void onOutputConfig(const OutputConfig &outConfig);
 	void onRunResponse(const RunResults &runResults);
 	void onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
-			    const QList<QIQPlotInfo> plotInfoList);
+			    const QList<QIQPlotInfo> plotInfoList, QStringList measurements);
 	void onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);
 	void tmeToggled(bool checked);
 	void onProcessFinished(int exitCode);
@@ -68,8 +70,13 @@ private:
 	void addPlots();
 	void removePlots();
 	void setupConnections();
+	void clearMeasurementLabels();
+	void updateMeasurements(const QVariantMap &measurements);
+	void fillMeasurementsPanel(const QStringList &measurements);
 	QWidget *createCentralWidget(QWidget *parent = nullptr);
 
+	QMap<QString, MeasurementLabel *> m_labels;
+	MeasurementsPanel *m_panel;
 	ToolMenuEntry *m_tme;
 	RunBtn *m_runBtn;
 	PlotManager *m_plotManager;
@@ -78,6 +85,8 @@ private:
 
 	bool m_inputFormatConfigured = false;
 	bool m_outputConfigured = false;
+
+	const QString MEASURE_PANEL_ID = "measure";
 };
 } // namespace scopy::qiqplugin
 #endif // QIQINSTRUMENT_H

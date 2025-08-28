@@ -20,8 +20,11 @@
  */
 
 #include "qiqinstrument.h"
+#include <measurementlabel.h>
+#include <menucontrolbutton.h>
 #include <stylehelper.h>
 #include <tooltemplate.h>
+#include <style.h>
 
 using namespace scopy::qiqplugin;
 
@@ -33,10 +36,21 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	layout->setMargin(0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
+
 	tool->topContainer()->setVisible(true);
+	tool->topCentral()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
+	tool->bottomContainer()->setVisible(true);
+
 	tool->setRightContainerWidth(280);
+
+	m_panel = new MeasurementsPanel(tool);
+
+	QPushButton *measure = new QPushButton("Measure", tool);
+	measure->setCheckable(true);
+	measure->setChecked(true);
+	Style::setStyle(measure, style::properties::button::toolButton);
 
 	QWidget *centralW = createCentralWidget(tool);
 	m_plotManager = new PlotManager(this);
@@ -51,11 +65,15 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->addWidgetToCentralContainerHelper(centralW);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
+	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
+
+	tool->topStack()->add(MEASURE_PANEL_ID, m_panel);
 	tool->rightStack()->add("settings", m_settings);
 
 	layout->addWidget(tool);
 
 	setupConnections();
+	connect(measure, &QPushButton::toggled, this, [tool](bool b) { tool->openTopContainerHelper(b); });
 	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
 	connect(m_runBtn, &RunBtn::toggled, m_settings, &SettingsMenu::setDisabled);
 	connect(m_runBtn, &RunBtn::toggled, tme, &ToolMenuEntry::setRunning);
@@ -88,13 +106,15 @@ void QIQInstrument::onRunResponse(const RunResults &runResults)
 	int offset = resultsMap.value("offset", 0).toInt();
 	int samples = resultsMap.value("samples_size", 0).toInt();
 	m_plotManager->onDataIsProcessed(offset, samples);
+	updateMeasurements(runResults.getMeasurements());
 }
 
 void QIQInstrument::onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
-				   const QList<QIQPlotInfo> plotInfoList)
+				   const QList<QIQPlotInfo> plotInfoList, QStringList measurements)
 {
 	m_settings->setAnalysisParams(type, params);
 	m_plotManager->onAvailableInfo(outputInfo, plotInfoList);
+	fillMeasurementsPanel(measurements);
 	addPlots();
 }
 
@@ -157,6 +177,40 @@ void QIQInstrument::setupConnections()
 		m_outputConfigured = true;
 		m_runBtn->setEnabled(m_outputConfigured && m_inputFormatConfigured);
 	});
+}
+
+void QIQInstrument::clearMeasurementLabels()
+{
+	if(m_labels.isEmpty()) {
+		return;
+	}
+	m_labels.clear();
+	m_panel->clear();
+}
+
+void QIQInstrument::updateMeasurements(const QVariantMap &measurements)
+{
+	for(auto it = measurements.cbegin(); it != measurements.cend(); ++it) {
+		const QString type = it.key();
+		if(!m_labels.contains(type)) {
+			return;
+		}
+		QVariantMap typeMap = it.value().toMap();
+		m_labels[type]->setValue(typeMap.value("value", 0).toDouble());
+		m_labels[type]->setUnit(typeMap.value("units", "").toString());
+	}
+}
+
+void QIQInstrument::fillMeasurementsPanel(const QStringList &measurements)
+{
+	clearMeasurementLabels();
+	for(const QString &l : measurements) {
+		MeasurementLabel *ml = new MeasurementLabel(m_panel);
+		ml->setPrecision(6);
+		ml->setName(l);
+		m_labels.insert(l, ml);
+		m_panel->addMeasurement(ml);
+	}
 }
 
 QWidget *QIQInstrument::createCentralWidget(QWidget *parent)

@@ -69,6 +69,7 @@ struct KeysAnalysisInfo
 	static constexpr auto PARAMETERS = "parameters";
 	static constexpr auto OUT_INFO = "output_info";
 	static constexpr auto PLOT_INFO = "plot_info";
+	static constexpr auto MEASUREMENTS = "measurements";
 };
 
 struct KeysPlotInfo
