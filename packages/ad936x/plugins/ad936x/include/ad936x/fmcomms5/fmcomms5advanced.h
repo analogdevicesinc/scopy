@@ -70,6 +70,7 @@ private:
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;
+
 	EnsmModeClocksWidget *m_ensmModeClocks;
 	ElnaWidget *m_elna;
 	RssiWidget *m_rssi;
@@ -80,8 +81,8 @@ private:
 	BistWidget *m_bist;
 	Fmcomms5Tab *m_fmcomms5;
 
-	iio_device *m_plutoDevice = nullptr;
-	iio_device *m_plutoDeviceB = nullptr;
+	iio_device *m_mainDevice = nullptr;
+	iio_device *m_secondDevice = nullptr;
 	QStackedWidget *m_centralWidget = nullptr;
 
 	bool m_isToolInitialized;

@@ -84,20 +84,20 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 	navigationButtons->setExclusive(true);
 
 	if(m_ctx != nullptr) {
-		iio_device *plutoDevice = nullptr;
-		iio_device *plutoDeviceB = nullptr;
+		iio_device *mainDevice = nullptr;
+		iio_device *secondDevice = nullptr;
 		int foundDevices = 0;
 		int device_count = iio_context_get_devices_count(m_ctx);
 		for(int i = 0; i < device_count; ++i) {
 			iio_device *dev = iio_context_get_device(m_ctx, i);
 			const char *dev_name = iio_device_get_name(dev);
 			if(dev_name && QString(dev_name).compare("ad9361-phy", Qt::CaseInsensitive) == 0) {
-				plutoDevice = dev;
+				mainDevice = dev;
 				foundDevices++;
 			}
 
 			if(dev_name && QString(dev_name).compare("ad9361-phy-B", Qt::CaseInsensitive) == 0) {
-				plutoDeviceB = dev;
+				secondDevice = dev;
 				foundDevices++;
 			}
 
@@ -105,18 +105,18 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 				break;
 			}
 		}
-		if(plutoDevice == nullptr) {
+		if(mainDevice == nullptr) {
 			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy device found in context!";
 			return;
 		}
 
-		if(plutoDeviceB == nullptr) {
+		if(secondDevice == nullptr) {
 			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy-B device found in context!";
 			return;
 		}
 
-		m_plutoDevice = plutoDevice;
-		m_plutoDeviceB = plutoDeviceB;
+		m_mainDevice = mainDevice;
+		m_secondDevice = secondDevice;
 		m_centralWidget = centralWidget;
 
 		// Create buttons
@@ -145,7 +145,6 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 		m_bistBtn = new QPushButton("BIST", this);
 		Style::setStyle(m_bistBtn, style::properties::button::blueGrayButton);
 		m_bistBtn->setCheckable(true);
-
 		m_fmcomms5Btn = new QPushButton("FMCOMMS5", this);
 		Style::setStyle(m_fmcomms5Btn, style::properties::button::blueGrayButton);
 		m_fmcomms5Btn->setCheckable(true);
@@ -172,9 +171,9 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
-		m_syncBtn->setCheckable(true);
 		connect(m_syncBtn, &QPushButton::clicked, this, [=]() {
-			ad9361_multichip_sync(m_plutoDevice, &m_plutoDeviceB, 1,
+			// call to lib ad9361
+			ad9361_multichip_sync(m_mainDevice, &m_secondDevice, 1,
 					      FIXUP_INTERFACE_TIMING | CHECK_SAMPLE_RATES);
 		});
 
@@ -205,46 +204,46 @@ void Fmcomms5Advanced::init()
 {
 
 	// ENSM Mode Clocks
-	m_ensmModeClocks = new EnsmModeClocksWidget(m_plutoDevice, m_centralWidget);
+	m_ensmModeClocks = new EnsmModeClocksWidget(m_mainDevice, m_centralWidget);
 	m_centralWidget->addWidget(m_ensmModeClocks);
 	connect(this, &Fmcomms5Advanced::readRequested, m_ensmModeClocks, &EnsmModeClocksWidget::readRequested);
 	connect(m_ensmModeClocksBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_ensmModeClocks); });
 	// eLNA
-	m_elna = new ElnaWidget(m_plutoDevice, m_centralWidget);
+	m_elna = new ElnaWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_elna, &ElnaWidget::readRequested);
 	m_centralWidget->addWidget(m_elna);
 	connect(m_eLnaBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_elna); });
 	// RSSI
-	m_rssi = new RssiWidget(m_plutoDevice, m_centralWidget);
+	m_rssi = new RssiWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_rssi, &RssiWidget::readRequested);
 	m_centralWidget->addWidget(m_rssi);
 	connect(m_rssiBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_rssi); });
 	// GAIN
-	m_gainWidget = new GainWidget(m_plutoDevice, m_centralWidget);
+	m_gainWidget = new GainWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_gainWidget, &GainWidget::readRequested);
 	m_centralWidget->addWidget(m_gainWidget);
 	connect(m_gainBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_gainWidget); });
 	// TX MONITOR
-	m_txMonitor = new TxMonitorWidget(m_plutoDevice, m_centralWidget);
+	m_txMonitor = new TxMonitorWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_txMonitor, &TxMonitorWidget::readRequested);
 	m_centralWidget->addWidget(m_txMonitor);
 	connect(m_txMonitorBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_txMonitor); });
 	// AUX ADC/DAC/IIO
-	m_auxAdcDacIo = new AuxAdcDacIoWidget(m_plutoDevice, m_centralWidget);
+	m_auxAdcDacIo = new AuxAdcDacIoWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
 	m_centralWidget->addWidget(m_auxAdcDacIo);
 	connect(m_auxAdcDacIioBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_auxAdcDacIo); });
 	// MISC
-	m_misc = new MiscWidget(m_plutoDevice, m_centralWidget);
+	m_misc = new MiscWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_misc, &MiscWidget::readRequested);
 	m_centralWidget->addWidget(m_misc);
 	connect(m_miscBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_misc); });
 	// BIST
-	m_bist = new BistWidget(m_plutoDevice, m_centralWidget);
+	m_bist = new BistWidget(m_mainDevice, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_bist, &BistWidget::readRequested);
 	m_centralWidget->addWidget(m_bist);
 	connect(m_bistBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_bist); });

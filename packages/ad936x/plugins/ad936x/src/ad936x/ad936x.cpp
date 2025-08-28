@@ -120,7 +120,7 @@ AD936X::AD936X(iio_context *ctx, QWidget *parent)
 		controlWidgetLayout->addWidget(
 			generateRxChainWidget(plutoDevice, "AD9361 / AD9364 Receive Chain", controlsWidget));
 
-		/// third is Tx (transimt chain)
+		/// third is Tx (transmit chain)
 		controlWidgetLayout->addWidget(
 			generateTxChainWidget(plutoDevice, "AD9361 / AD9364 Transmit Chain", controlsWidget));
 
