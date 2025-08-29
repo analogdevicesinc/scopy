@@ -171,7 +171,6 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
-		m_syncBtn->setCheckable(true);
 		connect(m_syncBtn, &QPushButton::clicked, this, [=]() {
 			// call to lib ad9361
 			ad9361_multichip_sync(m_mainDevice, &m_secondDevice, 1,

@@ -125,31 +125,50 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 		controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 	}
 
-	m_blockDiagramWidget = new QWidget(this);
-	Style::setBackgroundColor(m_blockDiagramWidget, json::theme::background_primary);
-	QVBoxLayout *blockDiagramLayout = new QVBoxLayout(m_blockDiagramWidget);
-	m_blockDiagramWidget->setLayout(blockDiagramLayout);
+	// Block Diagram Stack Widget with Next/Prev buttons
+	QWidget *blockDiagramStackWidget = new QWidget(this);
+	Style::setBackgroundColor(blockDiagramStackWidget, json::theme::background_primary);
+	QVBoxLayout *blockDiagramStackLayout = new QVBoxLayout(blockDiagramStackWidget);
+	blockDiagramStackWidget->setLayout(blockDiagramStackLayout);
 
-	QWidget *blockDiagramWidget = new QWidget(this);
-	QVBoxLayout *blockDiagramWidgetLayout = new QVBoxLayout(blockDiagramWidget);
-	blockDiagramWidget->setLayout(blockDiagramWidgetLayout);
+	QStackedWidget *imageStack = new QStackedWidget(blockDiagramStackWidget);
 
-	QScrollArea *blockDiagramWidgetScrollArea = new QScrollArea(this);
-	blockDiagramWidgetScrollArea->setWidgetResizable(true);
-	blockDiagramWidgetScrollArea->setWidget(blockDiagramWidget);
+	// Add images as QLabel widgets
+	QLabel *imageLabel1 = new QLabel(blockDiagramStackWidget);
+	imageLabel1->setAlignment(Qt::AlignCenter);
+	imageLabel1->setPixmap(QPixmap(":/pluto/ad936x.svg"));
+	imageStack->addWidget(imageLabel1);
 
-	blockDiagramLayout->addWidget(blockDiagramWidgetScrollArea);
+	QLabel *imageLabel2 = new QLabel(blockDiagramStackWidget);
+	imageLabel2->setAlignment(Qt::AlignCenter);
+	imageLabel2->setPixmap(QPixmap(":/pluto/AD_FMCOMMS5_EBZ.jpg"));
+	imageStack->addWidget(imageLabel2);
 
-	QLabel *blockDiagram = new QLabel(m_blockDiagramWidget);
-	blockDiagramWidgetLayout->addWidget(blockDiagram);
-	blockDiagram->setAlignment(Qt::AlignCenter);
+	blockDiagramStackLayout->addWidget(imageStack);
 
-	// TODO ADD AD9361 diagram also another
-	QPixmap pixmap(":/pluto/AD_FMCOMMS5_EBZ.jpg");
-	blockDiagram->setPixmap(pixmap);
+	QHBoxLayout *buttonLayout = new QHBoxLayout();
+	QPushButton *prevBtn = new QPushButton("Prev", blockDiagramStackWidget);
+	Style::setStyle(prevBtn, style::properties::button::basicButton);
+	QPushButton *nextBtn = new QPushButton("Next", blockDiagramStackWidget);
+	Style::setStyle(nextBtn, style::properties::button::basicButton);
+	buttonLayout->addWidget(prevBtn);
+	buttonLayout->addWidget(nextBtn);
+	blockDiagramStackLayout->addLayout(buttonLayout);
+
+	// Navigation logic
+	connect(prevBtn, &QPushButton::clicked, this, [imageStack]() {
+		int idx = imageStack->currentIndex();
+		if(idx > 0)
+			imageStack->setCurrentIndex(idx - 1);
+	});
+	connect(nextBtn, &QPushButton::clicked, this, [imageStack]() {
+		int idx = imageStack->currentIndex();
+		if(idx < imageStack->count() - 1)
+			imageStack->setCurrentIndex(idx + 1);
+	});
 
 	centralWidget->addWidget(m_controlsWidget);
-	centralWidget->addWidget(m_blockDiagramWidget);
+	centralWidget->addWidget(blockDiagramStackWidget);
 
 	m_tool->addWidgetToCentralContainerHelper(centralWidget);
 
@@ -167,7 +186,7 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 	blockDiagramBtn->setCheckable(true);
 	Style::setStyle(blockDiagramBtn, style::properties::button::blueGrayButton);
 	connect(blockDiagramBtn, &QPushButton::clicked, this,
-		[=, this]() { centralWidget->setCurrentWidget(m_blockDiagramWidget); });
+		[=, this]() { centralWidget->setCurrentWidget(blockDiagramStackWidget); });
 
 	centralWidgetButtons->addButton(controlsBtn);
 	centralWidgetButtons->addButton(blockDiagramBtn);

@@ -70,34 +70,18 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, QWidget *parent)
 
 	initDevices();
 
-	QMap<QString, QString> *calSwitchControlOptions = new QMap<QString, QString>();
-	calSwitchControlOptions->insert("0", "DISABLE");
-	calSwitchControlOptions->insert("1", "TX1B_B->RX1C_B");
-	calSwitchControlOptions->insert("2", "TX1B_A->RX1C_B");
-	calSwitchControlOptions->insert("3", "TX1B_B->RX1C_A");
-	calSwitchControlOptions->insert("4", "TX1B_A->RX1C_A");
+	QComboBox *calSwitchControl = new QComboBox(widget);
 
-	auto values = calSwitchControlOptions->values();
-	QString optionasData = "";
-	for(int i = 0; i < values.size(); i++) {
-		optionasData += " " + values.at(i);
-	}
+	calSwitchControl->addItem("DISABLE");
+	calSwitchControl->addItem("TX1B_B->RX1C_B");
+	calSwitchControl->addItem("TX1B_A->RX1C_B");
+	calSwitchControl->addItem("TX1B_B->RX1C_A");
+	calSwitchControl->addItem("TX1B_A->RX1C_A");
 
-	IIOWidget *calSwitchControl = IIOWidgetBuilder(widget)
-					      .device(m_mainDevice)
-					      .attribute("calibration_switch_control")
-					      .uiStrategy(IIOWidgetBuilder::ComboUi)
-					      .optionsValues(optionasData)
-					      .title("")
-					      .buildSingle();
 	layout->addWidget(calSwitchControl);
 
-	calSwitchControl->setUItoDataConversion([this, calSwitchControlOptions](QString data) {
-		return IIOWidgetUtils::comboUiToDataConversionFunction(data, calSwitchControlOptions);
-	});
-	calSwitchControl->setDataToUIConversion([this, calSwitchControlOptions](QString data) {
-		return IIOWidgetUtils::comboDataToUiConversionFunction(data, calSwitchControlOptions);
-	});
+	connect(calSwitchControl, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), this,
+		[=](const QString &idx) { callSwitchPortsEnableCb(idx.toInt()); });
 
 	m_calibrateBtn = new QPushButton("Calibrate", this);
 	Style::setStyle(m_calibrateBtn, style::properties::button::basicButton);
@@ -201,7 +185,7 @@ void Fmcomms5Tab::calibrate()
 	int samples = 0;
 
 	iio_channel *in0 = iio_device_find_channel(m_mainDevice, "voltage0", false);
-	iio_channel *in0B = iio_device_find_channel(m_mainDeviceB, "voltage0", false);
+	iio_channel *in0B = iio_device_find_channel(m_secondDevice, "voltage0", false);
 
 	if(!in0 || !in0B) {
 		qWarning(CAT_FMCOMMS5_TAB) << "Could not find channels";
@@ -474,7 +458,7 @@ void Fmcomms5Tab::callSwitchPortsEnableCb(int val)
 		break;
 	}
 
-/// WHY in iio-osc if 0 ?? this never happens
+/// WHY in iio-osc if 0 ?? this never happens ????????????????????
 #if 0
 	iio_device_debug_attr_write_bool(m_cf_ad9361_hpc, "loopback", lp_master);
 	iio_device_debug_attr_write_bool(m_cf_ad9361_lpc, "loopback", lp_slave);

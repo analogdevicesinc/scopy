@@ -47,7 +47,7 @@ private:
 	iio_device *m_mainDevice = nullptr;
 	iio_device *m_secondDevice = nullptr;
 	iio_device *m_cf_ad9361_lpc = nullptr;
-	iio_device *cf_ad9361_hpc = nullptr;
+	iio_device *m_cf_ad9361_hpc = nullptr;
 	QCheckBox *m_silentCalibration;
 	QProgressBar *m_calibProgressBar;
 	QPushButton *m_calibrateBtn;
