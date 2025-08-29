@@ -161,7 +161,6 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	connect(m_blockManager, &BlockManager::started, this, &ADCTimeInstrumentController::onStart);
 	connect(m_blockManager, &BlockManager::stopped, this, &ADCTimeInstrumentController::onStop);
 
-
 	connect(m_blockManager, &BlockManager::sentAllData, this, [=]() {
 		// count++;
 		// std::cout << "draw: " << count << std::endl;
@@ -197,7 +196,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	// Create TimeChannelComponent (replaces all your manual setup)
 	TimeChannelComponent *c = new TimeChannelComponent(
-		static_cast<IIOSourceBlock *>(griiofcn->source()), idx, idx,
+		griiofcn, static_cast<IIOSourceBlock *>(griiofcn->source()), idx, idx,
 		static_cast<datasink::BlockManager *>(m_blockManager),
 		dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(0)), chIdP->pen(idx), m_ui->rightStack);
 
@@ -241,7 +240,8 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		m_plotComponentManager->selectChannel(c);
 	}
 
-	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c, &TimeChannelComponent::setRollingMode);
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::rollingModeChanged, c,
+		&TimeChannelComponent::setRollingMode);
 }
 
 void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)

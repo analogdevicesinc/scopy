@@ -85,20 +85,19 @@ BlockManager::BlockManager(QString name, bool waitforAllSources)
 	, m_globalBufferSize(0)
 	, m_globalPlotSize(0)
 	, m_name(name)
-	, m_aqcCounter(0)
 {
 	moveToThread(m_thread);
 	m_thread->start();
 
 	connect(
 		this, &BlockManager::sentAllData, this,
-		[this]() { // (m_blockLinks.first()->source->getAqcCounter() == 0 &&
+		[this]() {
 			if(m_running && m_fps != 0) {
-				// std::cout << "time elapsed: " << m_fpsTimer->elapsed() - m_fpsTimeElapsed << "     ";
-				// std::cout << "time target: " << 1000 / m_fps << "     ";
-				auto ms_to_wait = std::max((long long)0, (1000 / m_fps) - (m_fpsTimer->elapsed() - m_fpsTimeElapsed));
-				// std::cout << ms_to_wait << std::endl;
-				QThread::msleep(ms_to_wait);
+				double no_replots = !m_singleShot ? (m_globalPlotSize + m_globalBufferSize - 1) / m_globalBufferSize : 1;
+				double sleep_time = (double)((1000 / m_fps) - (m_fpsTimer->elapsed() - m_fpsTimeElapsed)) / no_replots;
+
+				std::cout << "\n\nSLEEP: " << sleep_time << " / " << no_replots << std::endl;
+				QThread::msleep(std::max((double)0, sleep_time));
 			}
 			m_fpsTimer->restart();
 		},
@@ -192,9 +191,6 @@ int BlockManager::addOutputLink(SourceBlock *source, BasicBlock *final, uint fin
 
 			std::cout << "------ actially sent newData: " << data.data.size() << "  on ch: " << out_ch << std::endl;
 			Q_EMIT newData(data, out_ch);
-
-			// if(--m_aqcCounter > 0)
-			// 	return;
 
 			m_blockLinks[source]->finished_outputs++;
 
@@ -317,20 +313,9 @@ void BlockManager::disconnectBlockToFilter(BasicBlock *block, uint block_ch, uin
 	filter->removeConnectedChannel(filter_ch);
 }
 
-void BlockManager::refilAqcCounter()
-{
-	// if(!m_singleShot) {
-	// 	m_aqcCounter = -1;
-	// 	return;
-	// }
-
-	m_aqcCounter = (m_globalPlotSize + m_globalBufferSize - 1) / m_globalBufferSize;
-}
-
 bool BlockManager::start()
 {
 	m_running = !m_singleShot;
-	refilAqcCounter();
 
 	if(m_running) {
 		m_fpsTimer->restart();

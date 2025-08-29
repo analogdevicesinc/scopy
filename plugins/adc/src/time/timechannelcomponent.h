@@ -36,6 +36,7 @@
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menuwidget.h>
 #include <QDoubleSpinBox>
+#include <adcacquisitionmanager.h>
 #include <customSourceBlocks.h>
 #include <timechannelsigpath.h>
 #include "time/timeplotcomponent.h"
@@ -56,8 +57,9 @@ class SCOPY_ADC_EXPORT TimeChannelComponent : public ChannelComponent,
 {
 	Q_OBJECT
 public:
-	TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sourceChannel, uint outputChannel, BlockManager *manager,
-			     TimePlotComponent *m_plot, QPen pen, QWidget *parent = nullptr);
+	TimeChannelComponent(IIOFloatChannelNode *node, IIOSourceBlock *sourceBlock, uint sourceChannel,
+			     uint outputChannel, BlockManager *manager, TimePlotComponent *m_plot, QPen pen,
+			     QWidget *parent = nullptr);
 
 	~TimeChannelComponent();
 

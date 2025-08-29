@@ -40,10 +40,13 @@ using namespace scopy;
 using namespace scopy::datasink;
 using namespace scopy::adc;
 
-TimeChannelComponent::TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sourceChannel, uint outputChannel,
-					   BlockManager *manager, TimePlotComponent *m_plot, QPen pen, QWidget *parent)
-	: ChannelComponent(sourceBlock->name() + "_ch" + QString::number(sourceChannel), pen, parent)
+TimeChannelComponent::TimeChannelComponent(IIOFloatChannelNode *node, IIOSourceBlock *sourceBlock, uint sourceChannel,
+					   uint outputChannel, BlockManager *manager, TimePlotComponent *m_plot,
+					   QPen pen, QWidget *parent)
+	: ChannelComponent(node->name(), pen, parent)
 {
+	m_channelName = node->name();
+
 	m_plotChannelCmpt = new TimePlotComponentChannel(this, m_plot, this);
 	m_timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &scopy::ChannelData::newData, m_timePlotComponentChannel,
@@ -53,8 +56,8 @@ TimeChannelComponent::TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sou
 	m_sourceChannel = sourceChannel;
 	m_manager = manager;
 
-	m_tch = new TimeChannelSigpath(sourceBlock->name() + "_sigpath", this, sourceBlock, sourceChannel,
-				       outputChannel, manager, this);
+	m_tch = new TimeChannelSigpath(m_channelName + "_sigpath", this, sourceBlock, sourceChannel, outputChannel,
+				       manager, this);
 
 	m_running = false;
 	m_autoscaleEnabled = false;
@@ -63,7 +66,6 @@ TimeChannelComponent::TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sou
 	m_scaleAvailable = m_sourceBlock->scaleAttributeAvailable(sourceChannel);
 	// m_unit = m_sourceBlock->unit(); // implement this
 
-	m_channelName = sourceBlock->name() + "_ch" + QString::number(sourceChannel);
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
 	m_measureMgr->getModel()->setAdcBitCount(m_sourceBlock->getFmt(sourceChannel)->bits);
@@ -76,6 +78,8 @@ TimeChannelComponent::TimeChannelComponent(IIOSourceBlock *sourceBlock, uint sou
 	m_lay->addWidget(widget);
 	setLayout(m_lay);
 	createMenuControlButton(this);
+
+	connect(m_tch->channelComponent()->chData(), &ChannelData::newData, this, &TimeChannelComponent::onNewData);
 }
 
 TimeChannelComponent::~TimeChannelComponent() {}

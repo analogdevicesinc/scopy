@@ -80,7 +80,6 @@ private:
 	int addOutputLink(SourceBlock *source, BasicBlock *final, uint final_ch, uint out_ch);
 	void emitOutputData(bool aqcFinished, SourceBlock *source = nullptr);
 	void onRequestData(SourceBlock *source);
-	void refilAqcCounter();
 	bool sourceDataFinished(SourceBlock *source);
 
 Q_SIGNALS:
@@ -94,10 +93,8 @@ Q_SIGNALS:
 
 private:
 	QString m_name;
-	int m_aqcCounter;
 	bool m_running = false;
 	bool m_singleShot = false;
-	// bool m_runningSingleShot = false;
 	uint m_fps;
 	bool m_waitforAllSources;
 	QElapsedTimer *m_fpsTimer;

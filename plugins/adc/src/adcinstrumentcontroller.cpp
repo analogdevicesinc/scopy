@@ -123,6 +123,8 @@ void ADCInstrumentController::startUpdates()
 {
 	// updateFrameRate();
 	// m_refreshTimerRunning = true;
+	// update();
+	// m_plotTimer->start();
 	// m_ui->started();
 }
 

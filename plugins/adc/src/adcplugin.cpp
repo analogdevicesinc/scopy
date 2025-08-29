@@ -270,7 +270,7 @@ void ADCPlugin::createGRIIOTreeNode(TopBlockNode *ctxNode, iio_context *ctx)
 
 		datasink::IIOSourceBlock *iioSource = new datasink::IIOSourceBlock(dev, dev_name);
 
-		IIODeviceSourceNode *d = new IIODeviceSourceNode(iioSource, ctxNode, name());
+		IIODeviceSourceNode *d = new IIODeviceSourceNode(iioSource, ctxNode, dev_name);
 
 		ctxNode->addTreeChild(d);
 		// ctxNode->src()->registerIIODeviceSource(gr_dev);
