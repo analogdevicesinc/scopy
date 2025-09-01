@@ -22,6 +22,7 @@
 #include "qiqplotmanager/plotcreator.h"
 #include <plotaxis.h>
 #include <stylehelper.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy::qiqplugin;
 
@@ -32,8 +33,10 @@ StandardPlotCreator::StandardPlotCreator(QObject *parent)
 QWidget *StandardPlotCreator::createPlot(const QIQPlotInfo &plotInfo)
 {
 	auto plot = new PlotWidget();
-	plot->plot()->setTitle(plotInfo.title);
-
+	bool useDock = Preferences::get("general_use_docking_if_available").toBool();
+	if(!useDock) {
+		plot->plot()->setTitle(plotInfo.title);
+	}
 	setupPlotChannels(plot, plotInfo);
 	configurePlotAxis(plot, plotInfo);
 	applyPlotFlags(plot, plotInfo);

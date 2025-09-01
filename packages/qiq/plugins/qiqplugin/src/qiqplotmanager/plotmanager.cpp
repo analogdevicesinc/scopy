@@ -20,9 +20,11 @@
  */
 
 #include "qiqplotmanager/plotmanager.h"
+#include "dockwrapper.h"
 #include "plotaxis.h"
 #include <QLoggingCategory>
 #include <stylehelper.h>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_PLOT_MANAGER, "PlotManager");
 using namespace scopy::qiqplugin;
@@ -39,19 +41,7 @@ PlotManager::PlotManager(QObject *parent)
 	connect(m_dataManager, &DataManager::configOutput, this, &PlotManager::configOutput);
 }
 
-PlotManager::~PlotManager() { clearPlots(); }
-
-QVector<QWidget *> PlotManager::getPlotW()
-{
-	QVector<QWidget *> widgets;
-	if(m_inputPlot) {
-		widgets.push_back(m_inputPlot);
-	}
-	for(const auto &container : qAsConst(m_plotContainers)) {
-		widgets.push_back(container.widget);
-	}
-	return widgets;
-}
+PlotManager::~PlotManager() {}
 
 void PlotManager::samplingFreqAvailable(int samplingFreq) { m_dataManager->setSamplingFreq(samplingFreq); }
 
@@ -82,7 +72,7 @@ void PlotManager::updatePlots()
 			data.insert(ch.x, m_dataManager->dataForKey(ch.x));
 			data.insert(ch.y, m_dataManager->dataForKey(ch.y));
 		}
-		container.creator->updatePlot(container.widget, container.info, data);
+		container.creator->updatePlot(container.plot, container.info, data);
 	}
 	Q_EMIT requestNewData();
 }
@@ -92,11 +82,14 @@ void PlotManager::createPlots(QList<QIQPlotInfo> &plotInfoList)
 	m_plotContainers.clear();
 	for(const auto &plotInfo : plotInfoList) {
 		auto creator = PlotCreatorFactory::createPlotCreator(plotInfo);
-		auto widget = creator->createPlot(plotInfo);
-		if(widget) {
-			PlotContainer container(widget, plotInfo, creator);
-			m_plotContainers.push_back(container);
+		auto plot = creator->createPlot(plotInfo);
+		if(!plot) {
+			continue;
 		}
+		DockWrapperInterface *plotWrapper = createDockWrapper(plotInfo.title);
+		plotWrapper->setInnerWidget(plot);
+		PlotContainer container(plot, plotWrapper, plotInfo, creator);
+		m_plotContainers.push_back(container);
 	}
 }
 
@@ -108,13 +101,26 @@ void PlotManager::setupDataManager(const OutputInfo &outInfo)
 	m_dataManager->config(chnlsName, chnlsFormat, channelCount);
 }
 
-void PlotManager::clearPlots() { m_plotContainers.clear(); }
+void PlotManager::clearPlots()
+{
+	for(const PlotContainer &c : qAsConst(m_plotContainers)) {
+		delete c.creator;
+		QWidget *w = dynamic_cast<QWidget *>(c.plotWrapper);
+		if(w) {
+			delete w;
+		}
+	}
+	m_plotContainers.clear();
+}
 
 // input plot
 void PlotManager::createInputPlot()
 {
+	bool useDock = Preferences::get("general_use_docking_if_available").toBool();
 	m_inputPlot = new PlotWidget();
-	m_inputPlot->plot()->setTitle("Input waveform");
+	if(!useDock) {
+		m_inputPlot->plot()->setTitle(INPUT_PLOT_TITLE);
+	}
 	m_inputPlot->xAxis()->setUnits("Time");
 	m_inputPlot->yAxis()->setUnits("Magnitude");
 
@@ -172,4 +178,21 @@ void PlotManager::addPlotChannel(const QString &label, const QColor &color)
 	PlotChannel *channel = new PlotChannel(label, pen, m_inputPlot->xAxis(), m_inputPlot->yAxis(), this);
 	m_inputPlot->addPlotChannel(channel);
 	channel->setEnabled(true);
+}
+
+QWidget *PlotManager::inputPlot() const
+{
+	DockWrapperInterface *plotWrapper = createDockWrapper(INPUT_PLOT_TITLE);
+	plotWrapper->setInnerWidget(m_inputPlot);
+	QWidget *w = dynamic_cast<QWidget *>(plotWrapper);
+	return w;
+}
+
+QVector<scopy::DockWrapperInterface *> PlotManager::plotWrappers() const
+{
+	QVector<DockWrapperInterface *> wrappers;
+	for(const PlotContainer &c : m_plotContainers) {
+		wrappers.push_back(c.plotWrapper);
+	}
+	return wrappers;
 }

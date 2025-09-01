@@ -25,15 +25,18 @@
 #include "outputinfo.h"
 #include "plotcreator.h"
 #include <QObject>
+#include <dockwrapperinterface.h>
 #include <qiqplotmanager/datamanager.h>
 #include <qiqcontroller/qiqplotinfo.h>
 #include <gui/plotwidget.h>
 
+#define INPUT_PLOT_TITLE "Input Waveform"
 namespace scopy::qiqplugin {
 
 struct PlotContainer
 {
-	QWidget *widget;
+	QWidget *plot;
+	DockWrapperInterface *plotWrapper;
 	QIQPlotInfo info;
 	PlotCreatorBase *creator;
 };
@@ -45,8 +48,10 @@ public:
 	PlotManager(QObject *parent = nullptr);
 	~PlotManager();
 
-	QVector<QWidget *> getPlotW();
 	void updateInputPlot(int chnlCount);
+	QWidget *inputPlot() const;
+
+	QVector<DockWrapperInterface *> plotWrappers() const;
 
 Q_SIGNALS:
 	void configOutput(const OutputConfig &outConfig);

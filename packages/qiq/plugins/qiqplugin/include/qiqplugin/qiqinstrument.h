@@ -33,6 +33,7 @@
 #include <QProcess>
 #include <measurementpanel.h>
 #include <tooltemplate.h>
+#include <dockableareainterface.h>
 #include <qiqcontroller/runresults.h>
 #include <pluginbase/toolmenuentry.h>
 
@@ -68,12 +69,11 @@ public Q_SLOTS:
 
 private:
 	void addPlots();
-	void removePlots();
+	void addInputPlot();
 	void setupConnections();
 	void clearMeasurementLabels();
 	void updateMeasurements(const QVariantMap &measurements);
 	void fillMeasurementsPanel(const QStringList &measurements);
-	QWidget *createCentralWidget(QWidget *parent = nullptr);
 
 	QMap<QString, MeasurementLabel *> m_labels;
 	MeasurementsPanel *m_panel;
@@ -81,7 +81,8 @@ private:
 	RunBtn *m_runBtn;
 	PlotManager *m_plotManager;
 	SettingsMenu *m_settings;
-	QGridLayout *m_plotsLay;
+
+	DockableAreaInterface *m_dockableArea;
 
 	bool m_inputFormatConfigured = false;
 	bool m_outputConfigured = false;

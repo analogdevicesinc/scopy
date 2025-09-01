@@ -20,6 +20,8 @@
  */
 
 #include "qiqinstrument.h"
+#include "dockablearea.h"
+#include "dockwrapper.h"
 #include <measurementlabel.h>
 #include <menucontrolbutton.h>
 #include <stylehelper.h>
@@ -46,13 +48,11 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->setRightContainerWidth(280);
 
 	m_panel = new MeasurementsPanel(tool);
-
 	QPushButton *measure = new QPushButton("Measure", tool);
 	measure->setCheckable(true);
 	measure->setChecked(true);
 	Style::setStyle(measure, style::properties::button::toolButton);
 
-	QWidget *centralW = createCentralWidget(tool);
 	m_plotManager = new PlotManager(this);
 
 	m_settings = new SettingsMenu(this);
@@ -62,7 +62,12 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	m_runBtn = new RunBtn(this);
 	m_runBtn->setDisabled(true);
 
-	tool->addWidgetToCentralContainerHelper(centralW);
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
+	addInputPlot();
+
+	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
@@ -145,24 +150,17 @@ void QIQInstrument::onProcessFinished(int exitCode)
 
 void QIQInstrument::addPlots()
 {
-	const QVector<QWidget *> plotList = m_plotManager->getPlotW();
-	int row = 0, col = 0;
-	for(QWidget *p : plotList) {
-		m_plotsLay->addWidget(p, row, col);
-		col++;
-		if(col > 1) {
-			col = 0;
-			row++;
-		}
+	const QVector<DockWrapperInterface *> dockList = m_plotManager->plotWrappers();
+	for(DockWrapperInterface *w : dockList) {
+		m_dockableArea->addDockWrapper(w, DockableAreaInterface::Direction_BOTTOM);
 	}
 }
 
-void QIQInstrument::removePlots()
+void QIQInstrument::addInputPlot()
 {
-	const QVector<QWidget *> plotList = m_plotManager->getPlotW();
-	for(QWidget *p : plotList) {
-		m_plotsLay->removeWidget(p);
-	}
+	DockWrapperInterface *plotWrapper = createDockWrapper(INPUT_PLOT_TITLE);
+	plotWrapper->setInnerWidget(m_plotManager->inputPlot());
+	m_dockableArea->addDockWrapper(plotWrapper, DockableAreaInterface::Direction_TOP);
 }
 
 void QIQInstrument::setupConnections()
@@ -211,15 +209,4 @@ void QIQInstrument::fillMeasurementsPanel(const QStringList &measurements)
 		m_labels.insert(l, ml);
 		m_panel->addMeasurement(ml);
 	}
-}
-
-QWidget *QIQInstrument::createCentralWidget(QWidget *parent)
-{
-	QWidget *central = new QWidget(parent);
-	central->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	m_plotsLay = new QGridLayout(central);
-	m_plotsLay->setMargin(0);
-	central->setLayout(m_plotsLay);
-
-	return central;
 }
