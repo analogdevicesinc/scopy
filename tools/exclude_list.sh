@@ -50,6 +50,8 @@ OMIT_FILES_LIST=(
     \*.md
     \*.png
     \*.rst
+    \*.jpg
+    \*.JPG
     \*.ftr
     azure-pipelines.yml
     requirements.txt
