@@ -14,7 +14,7 @@ FileSourceBlock::~FileSourceBlock() {}
 
 BlockData FileSourceBlock::createData()
 {
-	QFile file = QFile(m_filename);
+	QFile file(m_filename);
 	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		qWarning() << "Error: Could not open file";
 		return {};
@@ -25,23 +25,53 @@ BlockData FileSourceBlock::createData()
 	BlockData map = BlockData();
 	int numRows = 0;
 
-	while(!m_stream.atEnd()) {
+	       // --- Always read first line ---
+	QString firstLine = m_stream.readLine();
+	QStringList values = firstLine.split(',');
+
+	       // If header is present, skip it. getNumChannels() will handle detection.
+	bool headerIsChannels = true;
+	for (int i = 0; i < values.size(); ++i) {
+		bool ok;
+		int val = values[i].toInt(&ok);
+		if (!ok || val != i) {
+			headerIsChannels = false;
+			break;
+		}
+	}
+
+	if (!headerIsChannels) {
+		// process first line as data
+		for (int col = 0; col < values.size(); ++col) {
+			if (!m_channels.value(col) && !map.contains(col))
+				continue;
+
+			if (m_bufferSize <= numRows)
+				break;
+
+			float num = values[col].toFloat();
+			ChannelDataVector data = ChannelDataVector(m_bufferSize);
+			map.insert(col, data);
+			data.data.push_back(num);
+		}
+		numRows++;
+	}
+
+	       // --- Process rest of file ---
+	while (!m_stream.atEnd()) {
 		QString line = m_stream.readLine();
 		QStringList values = line.split(',');
 
-		for(int col = 0; col < values.size(); ++col) {
-			if(!m_channels.value(col) && !map.contains(col))
+		for (int col = 0; col < values.size(); ++col) {
+			if (!m_channels.value(col) && !map.contains(col))
 				continue;
 
-			if(m_bufferSize <= numRows) {
+			if (m_bufferSize <= numRows)
 				break;
-			}
 
-			// REMOVE THIS
-			// + rand() % 20
 			float num = values[col].toFloat();
 
-			if(numRows == 0) {
+			if (numRows == 0) {
 				ChannelDataVector data = ChannelDataVector(m_bufferSize);
 				map.insert(col, data);
 				data.data.push_back(num);
@@ -54,6 +84,34 @@ BlockData FileSourceBlock::createData()
 
 	return map;
 }
+
+int FileSourceBlock::getNumChannels() const
+{
+	QFile file(m_filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qWarning() << "Error: Could not open file for channel detection";
+		return 0;
+	}
+
+	QTextStream stream(&file);
+	if (stream.atEnd())
+		return 0;
+
+	QString firstLine = stream.readLine();
+	QStringList values = firstLine.split(',');
+
+	for (int i = 0; i < values.size(); ++i) {
+		bool ok;
+		int val = values[i].toInt(&ok);
+		if (!ok || val != i) {
+			return 0; // not a proper channel header
+		}
+	}
+
+	return values.size(); // number of channels
+}
+
+
 
 TestSourceBlock::TestSourceBlock(QString name)
 	: SourceBlock(name)

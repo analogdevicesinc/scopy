@@ -7,6 +7,7 @@ SourceBlock::SourceBlock(QString name)
 	, m_bufferSize(0)
 	, m_plotSize(m_bufferSize)
 	, m_aqcFinished(true)
+	, m_timeAxis(std::vector<float>())
 {
 	QObject::connect(this, &SourceBlock::requestData, this, &SourceBlock::onRequestData, Qt::QueuedConnection);
 }
@@ -83,6 +84,18 @@ void SourceBlock::onRequestData()
 }
 
 bool SourceBlock::getAqcFinished() { return m_aqcFinished; }
+
+std::vector<float> SourceBlock::getTimeAxis()
+{
+	if(m_timeAxis.size() != m_plotSize) {
+
+		m_timeAxis.clear();
+		m_timeAxis = std::vector<float>(m_plotSize);
+		std::iota(m_timeAxis.begin(), m_timeAxis.end(), 0.0f);
+	}
+
+	return m_timeAxis;
+}
 
 void SourceBlock::refilAqcCounter()
 {

@@ -12,8 +12,11 @@ public:
 	FileSourceBlock(QString filename, QString name = QString());
 	~FileSourceBlock();
 
+	int getNumChannels() const;
+
 private:
 	QString m_filename;
+	int m_numChannels;
 
 	BlockData createData() override;
 };
@@ -53,7 +56,7 @@ public:
 	void setTimeAxisSR(double sr);
 
 	struct iio_device *iioDev();
-	std::vector<float> getTimeAxis();
+	std::vector<float> getTimeAxis() override;
 	iio_channel *getIIOChannel(uint id);
 
 	const iio_data_format *getFmt(uint id) const;
@@ -95,13 +98,11 @@ public:
 	~StaticSourceBlock();
 
 	void setData(std::vector<float> xdata, std::vector<float> ydata);
-	std::vector<float> getTimeAxis();
+	std::vector<float> getTimeAxis() override;
 	std::vector<float> getCurrentData();
 
 private:
 	BlockData createData() override;
-
-	std::vector<float> m_timeAxis;
 	BlockData m_map;
 };
 } // namespace scopy::datasink

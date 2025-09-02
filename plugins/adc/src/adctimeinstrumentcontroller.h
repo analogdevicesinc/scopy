@@ -42,7 +42,7 @@ public:
 	void createIIOFloatChannel(AcqTreeNode *node);
 	void createImportFloatChannel(AcqTreeNode *node);
 	void setEnableAddRemovePlot(bool b) override;
-
+	void createFileFloatChannels(AcqTreeNode *node);
 private:
 	TimePlotManagerSettings *m_timePlotSettingsComponent;
 	ChannelComponent *m_defaultCh;

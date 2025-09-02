@@ -25,7 +25,7 @@
 #include "importchannelcomponent.h"
 
 #include <customSourceBlocks.h>
-#include <iostream>
+#include <filechannelcomponent.h>
 #include <timechannelcomponent.h>
 
 using namespace scopy;
@@ -244,6 +244,38 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		&TimeChannelComponent::setRollingMode);
 }
 
+void ADCTimeInstrumentController::createFileFloatChannels(AcqTreeNode *node)
+{
+	ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
+
+	FileSourceBlock *source = new FileSourceBlock("sinewave_0.9_2ch.csv", node->name());
+
+	for(int i = 0; i < source->getNumChannels(); i++) {
+		int idx = chIdP->next();
+		FileChannelComponent *c = new FileChannelComponent(source, m_blockManager, idx, i, ifcn, chIdP->pen(idx));
+
+		m_plotComponentManager->addChannel(c);
+		c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);
+
+		m_otherCMCB->show();
+		CompositeWidget *cw = m_otherCMCB;
+		m_acqNodeComponentMap[ifcn] = c;
+		m_ui->addChannel(c->ctrl(), c, cw);
+
+		connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+
+		c->ctrl()->animateClick();
+
+		m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
+
+		addComponent(c);
+		setupChannelMeasurement(m_plotComponentManager, c);
+
+		connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
+			[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
+	}
+}
+
 void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 {
 	int idx = chIdP->next();
@@ -290,7 +322,10 @@ void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
 	}
 
 	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
-		createImportFloatChannel(node);
+		// createImportFloatChannel(node);
+
+		       // FOR TESTING
+		createFileFloatChannels(node);
 	}
 	m_plotComponentManager->replot();
 }

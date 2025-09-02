@@ -21,6 +21,7 @@ public:
 	// int getAqcCounter();
 	void setSingleShot(bool single);
 	bool getAqcFinished();
+	virtual std::vector<float> getTimeAxis();
 
 public Q_SLOTS:
 	virtual void enChannel(bool en, uint id);
@@ -48,6 +49,7 @@ protected:
 	int m_aqcCounter = 0;
 	bool m_singleShot = false;
 	bool m_aqcFinished;
+	std::vector<float> m_timeAxis;
 };
 } // namespace scopy::datasink
 
