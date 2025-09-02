@@ -108,6 +108,7 @@ private:
 	BlockManager *m_manager;
 	TimeChannelSigpath *m_tch;
 	QVBoxLayout *m_layScroll;
+	IIOFloatChannelNode *m_node;
 
 	TimeMeasureManager *m_measureMgr;
 	MenuPlotAxisRangeControl *m_yCtrl;

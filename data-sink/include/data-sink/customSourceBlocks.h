@@ -87,6 +87,23 @@ private:
 	QMap<uint, ChannelInfo> m_channelInfoMap;
 	double m_timeAxisSR; // this may not always be the iio samplerate. Depends on the XMode used
 };
+
+class SCOPY_DATA_SINK_EXPORT StaticSourceBlock : public SourceBlock
+{
+public:
+	StaticSourceBlock(QString name = QString());
+	~StaticSourceBlock();
+
+	void setData(std::vector<float> xdata, std::vector<float> ydata);
+	std::vector<float> getTimeAxis();
+	std::vector<float> getCurrentData();
+
+private:
+	BlockData createData() override;
+
+	std::vector<float> m_timeAxis;
+	BlockData m_map;
+};
 } // namespace scopy::datasink
 
 #endif

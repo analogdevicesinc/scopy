@@ -353,7 +353,8 @@ QString IIOSourceBlock::getChScaleAttr(uint id)
 	return m_channelInfoMap[id].scaleAttr;
 }
 
-void IIOSourceBlock::setTimeAxisSR(double sr) {
+void IIOSourceBlock::setTimeAxisSR(double sr)
+{
 	m_timeAxisSR = sr;
 	generateTimeAxis();
 }
@@ -365,3 +366,28 @@ const iio_data_format *IIOSourceBlock::getFmt(uint id) const
 
 	return m_channelInfoMap[id].fmt;
 }
+
+StaticSourceBlock::StaticSourceBlock(QString name)
+	: SourceBlock(name)
+	, m_map(BlockData())
+{}
+
+StaticSourceBlock::~StaticSourceBlock() {}
+
+void StaticSourceBlock::setData(std::vector<float> xdata, std::vector<float> ydata)
+{
+	m_map.clear();
+	m_map.insert(0, std::move(ydata));
+	m_timeAxis = std::move(xdata);
+}
+
+std::vector<float> StaticSourceBlock::getTimeAxis() { return m_timeAxis; }
+
+std::vector<float> StaticSourceBlock::getCurrentData()
+{
+	if(m_map.empty())
+		return std::vector<float>();
+	return m_map.first().data;
+}
+
+BlockData StaticSourceBlock::createData() { return m_map; }

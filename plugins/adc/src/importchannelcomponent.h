@@ -28,6 +28,8 @@
 #include <gui/widgets/menuplotaxisrangecontrol.h>
 
 #include <adcacquisitionmanager.h>
+#include <blockManager.h>
+#include <importchannelsigpath.h>
 #include <timeplotcomponentchannel.h>
 
 namespace scopy {
@@ -36,7 +38,8 @@ class SCOPY_ADC_EXPORT ImportChannelComponent : public ChannelComponent
 {
 	Q_OBJECT
 public:
-	ImportChannelComponent(ImportFloatChannelNode *ifcn, QPen pen, QWidget *parent = nullptr);
+	ImportChannelComponent(datasink::StaticSourceBlock *source, datasink::BlockManager *manager, uint outputChannel,
+			       ImportFloatChannelNode *ifcn, QPen pen, QWidget *parent = nullptr);
 	~ImportChannelComponent();
 
 	virtual void onInit() override;
@@ -49,13 +52,16 @@ private:
 
 	QVBoxLayout *m_layScroll;
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
+	// TimeMeasureManager *m_measureMgr;
 
 	MenuPlotAxisRangeControl *m_yCtrl;
 	PlotAutoscaler *m_autoscaler;
 	QPushButton *m_autoscaleBtn;
 	TimePlotComponentChannel *m_timePlotChannelComponent;
+	datasink::ImportChannelSigpath *m_sigpath;
 
 	bool m_yLock;
+	datasink::StaticSourceBlock *m_source;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);

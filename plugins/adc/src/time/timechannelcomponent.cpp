@@ -45,6 +45,7 @@ TimeChannelComponent::TimeChannelComponent(IIOFloatChannelNode *node, IIOSourceB
 					   QPen pen, QWidget *parent)
 	: ChannelComponent(node->name(), pen, parent)
 {
+	m_node = node;
 	m_channelName = node->name();
 
 	m_plotChannelCmpt = new TimePlotComponentChannel(this, m_plot, this);
@@ -64,7 +65,7 @@ TimeChannelComponent::TimeChannelComponent(IIOFloatChannelNode *node, IIOSourceB
 
 	m_sourceBlock->populateChannelInfo(sourceChannel);
 	m_scaleAvailable = m_sourceBlock->scaleAttributeAvailable(sourceChannel);
-	// m_unit = m_sourceBlock->unit(); // implement this
+	// m_unit = m_sourceBlock->unit(); // TODO
 
 	m_measureMgr = new TimeMeasureManager(this);
 	m_measureMgr->initMeasure(m_pen);
@@ -200,9 +201,9 @@ QPushButton *TimeChannelComponent::createSnapshotButton(QWidget *parent)
 			y.push_back(data->sample(i).y());
 		}
 		SnapshotRecipe rec{x, y, m_timePlotComponentChannel->m_plotComponent, "REF - " + m_channelName};
-		// AcqTreeNode *treeRoot = m_node->treeRoot();
-		// ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec, treeRoot);
-		// treeRoot->addTreeChild(snap);
+		AcqTreeNode *treeRoot = m_node->treeRoot();
+		ImportFloatChannelNode *snap = new ImportFloatChannelNode(rec, treeRoot);
+		treeRoot->addTreeChild(snap);
 		// TODO
 	});
 

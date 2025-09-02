@@ -248,7 +248,9 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 {
 	int idx = chIdP->next();
 	ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
-	ImportChannelComponent *c = new ImportChannelComponent(ifcn, chIdP->pen(idx));
+
+	StaticSourceBlock *source = new StaticSourceBlock(node->name());
+	ImportChannelComponent *c = new ImportChannelComponent(source, m_blockManager, idx, ifcn, chIdP->pen(idx));
 
 	m_plotComponentManager->addChannel(c);
 	c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);

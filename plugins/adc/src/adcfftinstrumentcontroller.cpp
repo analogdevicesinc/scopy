@@ -319,29 +319,29 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 
 void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 {
-	int idx = chIdP->next();
-	ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
-	ImportChannelComponent *c = new ImportChannelComponent(ifcn, chIdP->pen(idx));
+	// int idx = chIdP->next();
+	// ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
+	// ImportChannelComponent *c = new ImportChannelComponent(ifcn, chIdP->pen(idx));
 
-	m_plotComponentManager->addChannel(c);
-	c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);
+	// m_plotComponentManager->addChannel(c);
+	// c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);
 
-	m_otherCMCB->show();
-	CompositeWidget *cw = m_otherCMCB;
-	m_acqNodeComponentMap[ifcn] = c;
-	m_ui->addChannel(c->ctrl(), c, cw);
+	// m_otherCMCB->show();
+	// CompositeWidget *cw = m_otherCMCB;
+	// m_acqNodeComponentMap[ifcn] = c;
+	// m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	// connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
 
-	c->ctrl()->animateClick();
+	// c->ctrl()->animateClick();
 
-	m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
+	// m_fftPlotSettingsComponent->addChannel(c); // SingleY/etc
 
-	addComponent(c);
-	setupChannelMeasurement(m_plotComponentManager, c);
+	// addComponent(c);
+	// setupChannelMeasurement(m_plotComponentManager, c);
 
-	connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
-		[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
+	// connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
+	// 	[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
 }
 
 bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q)
@@ -401,14 +401,16 @@ void ADCFFTInstrumentController::addChannel(AcqTreeNode *node)
 void ADCFFTInstrumentController::removeChannel(AcqTreeNode *node)
 {
 	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
-		ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
-		ImportChannelComponent *c = dynamic_cast<ImportChannelComponent *>(m_acqNodeComponentMap[ifcn]);
+		// ImportFloatChannelNode *ifcn = dynamic_cast<ImportFloatChannelNode *>(node);
+		// ImportChannelComponent *c = dynamic_cast<ImportChannelComponent *>(m_acqNodeComponentMap[ifcn]);
 
-		m_otherCMCB->remove(c->ctrl());
-		m_plotComponentManager->removeChannel(c);
-		m_fftPlotSettingsComponent->removeChannel(c);
-		removeComponent(c);
-		delete c;
+		// m_otherCMCB->remove(c->ctrl());
+		// m_plotComponentManager->removeChannel(c);
+		// m_fftPlotSettingsComponent->removeChannel(c);
+		// removeComponent(c);
+		// delete c;
+
+		// JUST UNCOMMENT THIS
 	}
 
 	if(m_otherCMCB->count() <= 0) {

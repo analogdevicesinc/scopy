@@ -28,13 +28,19 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPen pen, QWidget *parent)
+ImportChannelComponent::ImportChannelComponent(datasink::StaticSourceBlock *source, datasink::BlockManager *manager,
+					       uint outputChannel, ImportFloatChannelNode *node, QPen pen,
+					       QWidget *parent)
 	: ChannelComponent(node->recipe().name, pen, parent)
+	, m_source(source)
 {
 
 	m_plotChannelCmpt = new TimePlotComponentChannel(this, node->recipe().targetPlot, this);
 	m_timePlotChannelComponent = dynamic_cast<TimePlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &ChannelData::newData, m_timePlotChannelComponent, &TimePlotComponentChannel::onNewData);
+
+	m_sigpath = new datasink::ImportChannelSigpath(m_channelName + "_sigpath", this, source, 0, outputChannel,
+						       manager, this);
 
 	m_node = node;
 	m_channelName = node->name();
@@ -56,9 +62,10 @@ void ImportChannelComponent::onInit()
 	m_yCtrl->setMax(1024);
 
 	auto rec = m_node->recipe();
-	addChannelToPlot();
+	m_source->setData(rec.x, rec.y);
+	m_sigpath->init();
 
-	chData()->onNewData(rec.x.data(), rec.y.data(), rec.x.size(), true);
+	addChannelToPlot();
 	m_timePlotChannelComponent->refreshData(true);
 }
 
@@ -67,7 +74,9 @@ QWidget *ImportChannelComponent::createMenu(QWidget *parent)
 	initMenu(parent);
 	QWidget *yaxismenu = createYAxisMenu(m_menu);
 	QWidget *curvemenu = createCurveMenu(m_menu);
-	// QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
+	m_curvemenu->addChannels(m_plotChannelCmpt->plotChannel());
+	// QWidget *measuremenu = m_measureMgr->createMeasurementMenu(m_menu);
+
 	m_menu->header()->title()->setEnabled(true);
 	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, [=](QString s) { m_ctrl->setName(s); });
 
@@ -86,6 +95,7 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 {
 	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_ONOFF,
 									   MenuCollapseSection::MHW_BASEWIDGET, parent);
+	section->collapseSection()->header()->setChecked(false); // init on y-axis disabled
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_timePlotChannelComponent->m_timePlotYAxis, section);
 	m_autoscaleBtn = new QPushButton(tr("AUTOSCALE"), section);
