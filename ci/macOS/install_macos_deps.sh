@@ -24,7 +24,9 @@ install_packages() {
 	brew update
 	# Workaround for brew taking a long time to upgrade existing packages
 	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
-	if (( $(echo "$(sw_vers -productVersion) > 13.0" | bc -l) )); then
+	macos_version=$(sw_vers -productVersion)
+	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
+	if [ "$major_version" -gt 12 ]; then
 		brew upgrade --display-times || true #ignore homebrew upgrade errors
 		# Workaround: Install or update libtool package only if macOS version is greater than 12
 		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
