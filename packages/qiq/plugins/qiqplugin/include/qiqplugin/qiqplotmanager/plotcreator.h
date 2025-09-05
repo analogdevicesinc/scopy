@@ -38,6 +38,7 @@ public:
 	virtual ~PlotCreatorBase() = default;
 
 	virtual QWidget *createPlot(const QIQPlotInfo &plotInfo) = 0;
+	virtual QWidget *settingsMenu() = 0;
 	virtual void updatePlot(QWidget *plot, const QIQPlotInfo &plotInfo,
 				const QMap<QString, QVector<double>> &data) = 0;
 	virtual QString plotType() const = 0;
@@ -50,6 +51,7 @@ public:
 	explicit StandardPlotCreator(QObject *parent = nullptr);
 
 	QWidget *createPlot(const QIQPlotInfo &plotInfo) override;
+	QWidget *settingsMenu() override;
 	void updatePlot(QWidget *plot, const QIQPlotInfo &plotInfo,
 			const QMap<QString, QVector<double>> &data) override;
 	QString plotType() const override { return "plotWidget"; }
@@ -58,6 +60,10 @@ private:
 	void setupPlotChannels(PlotWidget *plot, const QIQPlotInfo &plotInfo);
 	void configurePlotAxis(PlotWidget *plot, const QIQPlotInfo &plotInfo);
 	void applyPlotFlags(PlotWidget *plot, const QIQPlotInfo &plotInfo);
+
+	void createPlotSettings(PlotWidget *plot, const QIQPlotInfo &plotInfo);
+
+	QWidget *m_plotSettings;
 };
 
 class PlotCreatorFactory

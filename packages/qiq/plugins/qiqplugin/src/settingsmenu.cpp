@@ -40,7 +40,8 @@ SettingsMenu::SettingsMenu(QWidget *parent)
 
 void SettingsMenu::setupUI()
 {
-	QVBoxLayout *layout = new QVBoxLayout(this);
+	QWidget *contentWidget = new QWidget();
+	QVBoxLayout *layout = new QVBoxLayout(contentWidget);
 	layout->setMargin(0);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(
@@ -48,29 +49,55 @@ void SettingsMenu::setupUI()
 
 	// Buffer menu
 	MenuSectionCollapseWidget *bufferAcq = new MenuSectionCollapseWidget(
-		"Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, this);
+		"Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 	m_bufferMenu = new BufferMenu();
 	bufferAcq->add(m_bufferMenu);
 
 	// Analysis cb
 	MenuSectionCollapseWidget *analysisCb = new MenuSectionCollapseWidget(
-		"Select analysis", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, this);
+		"Select analysis", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 	m_analysisCb = new MenuCombo("Analysis");
 	analysisCb->add(m_analysisCb);
 
 	// Analysis menu
-	MenuSectionCollapseWidget *analysisMenu = new MenuSectionCollapseWidget(
-		"Analysis settings", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, this);
+	MenuSectionCollapseWidget *analysisMenu =
+		new MenuSectionCollapseWidget("Analysis settings", MenuCollapseSection::MHCW_NONE,
+					      MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 	m_analysisMenu = new AnalysisMenu();
 	analysisMenu->add(m_analysisMenu);
 
-	layout->addWidget(header);
+	// Plot settings
+	MenuSectionCollapseWidget *plotSettings =
+		new MenuSectionCollapseWidget("Select plot settings", MenuCollapseSection::MHCW_NONE,
+					      MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
+	m_selectPlotCb = new QComboBox(plotSettings);
+	plotSettings->add(m_selectPlotCb);
+
+	m_plotSettings = new QWidget(contentWidget);
+	m_plotSettings->setLayout(new QVBoxLayout());
+	m_plotSettings->layout()->setMargin(0);
+
 	layout->addWidget(bufferAcq);
 	layout->addWidget(analysisCb);
 	layout->addWidget(analysisMenu);
+	layout->addWidget(plotSettings);
+	layout->addWidget(m_plotSettings);
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
+	QScrollArea *scrollArea = new QScrollArea(this);
+	scrollArea->setWidget(contentWidget);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scrollArea->setFrameShape(QFrame::NoFrame);
+
+	QVBoxLayout *mainLayout = new QVBoxLayout(this);
+	mainLayout->setMargin(0);
+	mainLayout->addWidget(header);
+	mainLayout->addWidget(scrollArea);
+
 	// Connections
+	connect(m_selectPlotCb, &QComboBox::currentTextChanged, this, &SettingsMenu::plotSettings);
 	connect(m_analysisCb->combo(), &QComboBox::currentTextChanged, this, &SettingsMenu::analysisChanged);
 	connect(m_bufferMenu, &BufferMenu::bufferParamsChanged, this, &SettingsMenu::bufferParamsChanged);
 	connect(m_analysisMenu, &AnalysisMenu::applyPressed, this, &SettingsMenu::onAnalysisApply);
@@ -85,6 +112,12 @@ void SettingsMenu::setAnalysisTypes(const QStringList &types)
 {
 	m_analysisCb->combo()->clear();
 	m_analysisCb->combo()->addItems(types);
+}
+
+void SettingsMenu::setPlotTitle(const QStringList &title)
+{
+	m_selectPlotCb->clear();
+	m_selectPlotCb->addItems(title);
 }
 
 void SettingsMenu::setAnalysisParams(const QString &type, const QVariantMap &params)
@@ -110,6 +143,24 @@ void SettingsMenu::validateAnalysisParams(const QString &type, const QVariantMap
 			qWarning(CAT_QIQ_SETTINGS) << "Different values for the field:" << it.key();
 		}
 	}
+}
+
+QString SettingsMenu::getCrtAnalysisType() { return m_analysisCb->combo()->currentText(); }
+
+void SettingsMenu::onSettingsMenu(QWidget *w)
+{
+	QVBoxLayout *lay = dynamic_cast<QVBoxLayout *>(m_plotSettings->layout());
+	QLayoutItem *item;
+	while((item = lay->takeAt(0)) != nullptr) {
+		if(item->widget()) {
+			item->widget()->setParent(nullptr);
+		}
+		delete item;
+	}
+	if(!w) {
+		return;
+	}
+	lay->addWidget(w);
 }
 
 void SettingsMenu::onAnalysisApply()

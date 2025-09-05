@@ -45,6 +45,7 @@ Q_SIGNALS:
 	void applyPressed();
 
 private:
+	QWidget *m_w;
 	MenuItemFactory *m_factory;
 	QVariantMap m_analysisConfig;
 

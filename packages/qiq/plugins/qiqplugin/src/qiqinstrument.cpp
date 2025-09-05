@@ -49,9 +49,9 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 
 	m_panel = new MeasurementsPanel(tool);
 	QPushButton *measure = new QPushButton("Measure", tool);
+	Style::setStyle(measure, style::properties::button::blueGrayButton);
 	measure->setCheckable(true);
 	measure->setChecked(true);
-	Style::setStyle(measure, style::properties::button::toolButton);
 
 	m_plotManager = new PlotManager(this);
 
@@ -117,9 +117,10 @@ void QIQInstrument::onRunResponse(const RunResults &runResults)
 void QIQInstrument::onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
 				   const QList<QIQPlotInfo> plotInfoList, QStringList measurements)
 {
-	m_settings->setAnalysisParams(type, params);
 	m_plotManager->onAvailableInfo(outputInfo, plotInfoList);
 	fillMeasurementsPanel(measurements);
+	m_settings->setAnalysisParams(type, params);
+	m_settings->setPlotTitle(m_plotManager->plotTitle());
 	addPlots();
 }
 
@@ -168,6 +169,8 @@ void QIQInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &QIQInstrument::bufferParamsChanged);
+	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
+	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(this, &QIQInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
 	connect(m_plotManager, &PlotManager::configOutput, this, &QIQInstrument::outputConfigured);

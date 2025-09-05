@@ -37,20 +37,29 @@ public:
 
 	void setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels);
 	void setAnalysisTypes(const QStringList &types);
+	void setPlotTitle(const QStringList &title);
 	void setAnalysisParams(const QString &type, const QVariantMap &params);
 	void validateAnalysisParams(const QString &type, const QVariantMap &config);
+
+	QString getCrtAnalysisType();
 Q_SIGNALS:
+	void plotSettings(const QString &plot);
 	void analysisChanged(const QString &type);
 	void analysisConfig(const QString &type, const QVariantMap &inConfig);
 	void bufferParamsChanged(const BufferParams &params);
+
+public Q_SLOTS:
+	void onSettingsMenu(QWidget *w);
 
 private Q_SLOTS:
 	void onAnalysisApply();
 
 private:
+	QWidget *m_plotSettings;
 	BufferMenu *m_bufferMenu;
 	AnalysisMenu *m_analysisMenu;
 	MenuCombo *m_analysisCb;
+	QComboBox *m_selectPlotCb;
 
 	void setupUI();
 };

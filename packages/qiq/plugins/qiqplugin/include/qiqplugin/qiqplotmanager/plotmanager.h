@@ -26,6 +26,7 @@
 #include "plotcreator.h"
 #include <QObject>
 #include <dockwrapperinterface.h>
+#include <menuplotchannelcurvestylecontrol.h>
 #include <qiqplotmanager/datamanager.h>
 #include <qiqcontroller/qiqplotinfo.h>
 #include <gui/plotwidget.h>
@@ -50,18 +51,20 @@ public:
 
 	void updateInputPlot(int chnlCount);
 	QWidget *inputPlot() const;
-
 	QVector<DockWrapperInterface *> plotWrappers() const;
+	QStringList plotTitle() const;
 
 Q_SIGNALS:
 	void configOutput(const OutputConfig &outConfig);
 	void requestNewData();
 	void bufferDataReady(QVector<QVector<double>> data);
+	void plotSettings(QWidget *settings);
 
 public Q_SLOTS:
 	void samplingFreqAvailable(int samplingFreq);
 	void onAvailableInfo(const OutputInfo &outInfo, QList<QIQPlotInfo> plotInfoList);
 	void onAnalysisConfig(const QString &type, const QVariantMap &config, const OutputInfo &outInfo);
+	void plotSettingsRequest(const QString &plot);
 	void onDataIsProcessed(int samplesOffset, int samplesCount);
 	void updatePlots();
 
@@ -71,11 +74,14 @@ private:
 	void clearPlots();
 	// input plot
 	void createInputPlot();
+	void createInputPlotSettings();
 	void removePlotChannels();
 	void updateInputData();
 	void addPlotChannel(const QString &label, const QColor &color);
 
+	gui::MenuPlotChannelCurveStyleControl *m_inputCurveControl;
 	PlotWidget *m_inputPlot;
+	QWidget *m_inputSettings;
 	DataManager *m_dataManager;
 	QVector<PlotContainer> m_plotContainers;
 };

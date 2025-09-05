@@ -44,15 +44,11 @@ void AnalysisMenu::setupUI()
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	layout->setMargin(0);
 
-	// Scroll area for analysis parameters
-	QScrollArea *scrollArea = new QScrollArea();
-	scrollArea->setMinimumHeight(100);
-	QWidget *scrollContent = new QWidget();
-	scrollContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	scrollContent->setLayout(new QVBoxLayout());
-	scrollArea->setWidget(scrollContent);
-	scrollArea->setWidgetResizable(true);
-	layout->addWidget(scrollArea);
+	m_w = new QWidget(this);
+	m_w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_w->setLayout(new QVBoxLayout);
+	m_w->layout()->setMargin(0);
+	layout->addWidget(m_w);
 
 	// Apply button
 	QPushButton *applyButton = new QPushButton("Apply");
@@ -65,10 +61,7 @@ QVariantMap AnalysisMenu::getAnalysisConfig() { return m_analysisConfig; }
 
 void AnalysisMenu::createMenu(const QVariantMap &params)
 {
-	QScrollArea *scrollArea = findChild<QScrollArea *>();
-	QWidget *scrollContent = scrollArea->widget();
-	QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(scrollContent->layout());
-
+	QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(m_w->layout());
 	// Clear existing items
 	while(QLayoutItem *item = layout->takeAt(0)) {
 		if(item->widget()) {

@@ -20,10 +20,15 @@
  */
 
 #include "qiqplotmanager/plotcreator.h"
+#include "menuplotchannelcurvestylecontrol.h"
+#include <menuonoffswitch.h>
+#include <menuplotaxisrangecontrol.h>
+#include <menusectionwidget.h>
 #include <plotaxis.h>
 #include <stylehelper.h>
 #include <pluginbase/preferences.h>
 
+using namespace scopy::gui;
 using namespace scopy::qiqplugin;
 
 StandardPlotCreator::StandardPlotCreator(QObject *parent)
@@ -40,10 +45,13 @@ QWidget *StandardPlotCreator::createPlot(const QIQPlotInfo &plotInfo)
 	setupPlotChannels(plot, plotInfo);
 	configurePlotAxis(plot, plotInfo);
 	applyPlotFlags(plot, plotInfo);
+	createPlotSettings(plot, plotInfo);
 	plot->replot();
 
 	return plot;
 }
+
+QWidget *StandardPlotCreator::settingsMenu() { return m_plotSettings; }
 
 void StandardPlotCreator::setupPlotChannels(PlotWidget *plot, const QIQPlotInfo &plotInfo)
 {
@@ -54,15 +62,6 @@ void StandardPlotCreator::setupPlotChannels(PlotWidget *plot, const QIQPlotInfo 
 		auto ch = new PlotChannel(chId, pen, plot->xAxis(), plot->yAxis(), plot);
 		plot->addPlotChannel(ch);
 		ch->setEnabled(true);
-
-		// Apply channel-specific flags
-		if(plotInfo.flags.contains("points")) {
-			ch->setThickness(3);
-			ch->setStyle(PlotChannel::PlotCurveStyle::PCS_DOTS);
-		}
-		if(plotInfo.flags.contains("sticks")) {
-			ch->setStyle(PlotChannel::PlotCurveStyle::PCS_STICKS);
-		}
 		i++;
 	}
 }
@@ -89,6 +88,49 @@ void StandardPlotCreator::applyPlotFlags(PlotWidget *plot, const QIQPlotInfo &pl
 	plot->setShowXAxisLabels(showLabels);
 	plot->setShowYAxisLabels(showLabels);
 	plot->showAxisLabels();
+}
+
+void StandardPlotCreator::createPlotSettings(PlotWidget *plot, const QIQPlotInfo &plotInfo)
+{
+	m_plotSettings = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_plotSettings);
+	lay->setMargin(0);
+
+	MenuSectionCollapseWidget *yAxis = new MenuSectionCollapseWidget(
+		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, m_plotSettings);
+	MenuPlotAxisRangeControl *yCtrl = new MenuPlotAxisRangeControl(plot->yAxis(), yAxis);
+	yCtrl->setMin(plot->yAxis()->min());
+	yCtrl->setMax(plot->yAxis()->max());
+	yAxis->add(yCtrl);
+
+	MenuSectionCollapseWidget *plotMenu = new MenuSectionCollapseWidget(
+		"SETTINGS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, m_plotSettings);
+
+	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
+	labelsSwitch->onOffswitch()->setChecked(plot->showXAxisLabels() && plot->showYAxisLabels());
+	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, this, [plot](bool en) {
+		if(en) {
+			plot->showAxisLabels();
+		} else {
+			plot->hideAxisLabels();
+		}
+	});
+
+	MenuPlotChannelCurveStyleControl *curveControl = new MenuPlotChannelCurveStyleControl(plotMenu);
+	const QList<PlotChannel *> channels = plot->getChannels();
+	for(PlotChannel *ch : channels) {
+		curveControl->addChannels(ch);
+		if(plotInfo.flags.contains("points")) {
+			ch->setThickness(3);
+			ch->setStyle(PlotChannel::PlotCurveStyle::PCS_DOTS);
+		}
+	}
+
+	plotMenu->add(labelsSwitch);
+	plotMenu->add(curveControl);
+
+	lay->addWidget(yAxis);
+	lay->addWidget(plotMenu);
 }
 
 void StandardPlotCreator::updatePlot(QWidget *plotWidget, const QIQPlotInfo &plotInfo,
