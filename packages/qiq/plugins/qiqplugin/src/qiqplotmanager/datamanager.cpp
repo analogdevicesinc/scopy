@@ -30,7 +30,7 @@ DataManager::DataManager(QObject *parent)
 	: QObject(parent)
 {
 	m_dataReader = new DataReader(this);
-	m_dataReader->openFile(DEFAULT_FILE_PATH);
+	m_dataReader->openFile(QIQUtils::dataOutPath());
 	setupConnections();
 }
 
@@ -45,7 +45,6 @@ void DataManager::config(const QStringList &chnlsName, const QStringList &chnlsF
 
 void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &config, const OutputInfo &info)
 {
-
 	if(m_dataReader->channelCount() == 0) {
 		m_dataReader->setChannelCount(info.channelCount());
 	}
@@ -55,13 +54,6 @@ void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &confi
 	if(m_dataReader->channelsName().isEmpty()) {
 		m_dataReader->setChannelsName(info.channelNames());
 	}
-
-	OutputConfig outConfig;
-	outConfig.setOutputFile(DEFAULT_FILE_PATH);
-	outConfig.setOutputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
-	outConfig.setEnabledAnalysis({type});
-
-	Q_EMIT configOutput(outConfig);
 }
 
 void DataManager::readData(int64_t startSample, int64_t sampleCount)
@@ -83,8 +75,6 @@ void DataManager::onDataReady(QMap<QString, QVector<double>> &data)
 	}
 	Q_EMIT dataIsReady();
 }
-
-QString DataManager::getDefaultFilePath() const { return DEFAULT_FILE_PATH; }
 
 void DataManager::onInputData(QVector<QVector<double>> bufferData)
 {

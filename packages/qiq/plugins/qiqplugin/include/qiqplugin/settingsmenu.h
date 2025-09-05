@@ -50,6 +50,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void onSettingsMenu(QWidget *w);
+	void disableCriticalWidgets(bool en);
 
 private Q_SLOTS:
 	void onAnalysisApply();

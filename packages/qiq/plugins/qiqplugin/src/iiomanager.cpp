@@ -58,7 +58,6 @@ QMap<QString, QList<ChannelInfo>> IIOManager::getAvailableChannels()
 	return result;
 }
 
-// must handle single
 void IIOManager::startAcq(bool en)
 {
 	if(m_readFw->isRunning()) {
@@ -296,7 +295,7 @@ double IIOManager::getSamplingFrequency(iio_device *dev)
 InputConfig IIOManager::createInputConfig(iio_device *dev, int channelCount, int64_t bufferSamplesSize)
 {
 	InputConfig inputConfig;
-	inputConfig.setInputFile(DEFAULT_FILE_PATH);
+	inputConfig.setInputFile(QIQUtils::dataInPath());
 	inputConfig.setInputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
 	inputConfig.setChnlsFormat(getChannelsFormat(dev));
 	inputConfig.setChannelCount(channelCount);
@@ -314,8 +313,8 @@ iio_buffer *IIOManager::createMmapIioBuffer(struct iio_device *dev, size_t sampl
 		return nullptr;
 	}
 	int64_t bufferDataSize = iio_device_get_sample_size(dev) * m_params.samplesCount;
-	if(!m_dataWriter->openFile(DEFAULT_FILE_PATH, bufferDataSize)) {
-		qWarning(CAT_IIO_MANAGER) << "Failed to map:" << DEFAULT_FILE_PATH;
+	if(!m_dataWriter->openFile(QIQUtils::dataInPath(), bufferDataSize)) {
+		qWarning(CAT_IIO_MANAGER) << "Failed to map:" << QIQUtils::dataInPath();
 		return nullptr;
 	}
 

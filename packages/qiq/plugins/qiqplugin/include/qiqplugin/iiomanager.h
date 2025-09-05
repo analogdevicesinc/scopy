@@ -86,7 +86,6 @@ private:
 	QFutureWatcher<void> *m_readFw;
 	QVector<QVector<double>> m_bufferData;
 	QMap<QString, QMap<QString, iio_channel *>> m_devMap;
-	const QString DEFAULT_FILE_PATH = scopy::config::executableFolderPath() + QDir::separator() + "data.in";
 };
 
 } // namespace scopy::qiqplugin

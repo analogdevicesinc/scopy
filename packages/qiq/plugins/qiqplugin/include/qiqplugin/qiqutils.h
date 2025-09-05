@@ -22,8 +22,10 @@
 #ifndef QIQUTILS_H
 #define QIQUTILS_H
 
+#include <QDir>
 #include <QString>
 #include <QStringList>
+#include "common/scopyconfig.h"
 
 namespace scopy::qiqplugin {
 
@@ -80,6 +82,12 @@ struct DataManagerKeys
 	static constexpr auto INPUT = "input";
 	static constexpr auto TIME = "time";
 	static constexpr auto FREQ = "freq";
+};
+class QIQUtils
+{
+public:
+	static QString dataOutPath() { return scopy::config::executableFolderPath() + QDir::separator() + "data.out"; }
+	static QString dataInPath() { return scopy::config::executableFolderPath() + QDir::separator() + "data.in"; }
 };
 
 } // namespace scopy::qiqplugin

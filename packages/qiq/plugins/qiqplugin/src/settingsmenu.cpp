@@ -163,6 +163,13 @@ void SettingsMenu::onSettingsMenu(QWidget *w)
 	lay->addWidget(w);
 }
 
+void SettingsMenu::disableCriticalWidgets(bool en)
+{
+	m_bufferMenu->setDisabled(en);
+	m_analysisMenu->setDisabled(en);
+	m_analysisCb->setDisabled(en);
+}
+
 void SettingsMenu::onAnalysisApply()
 {
 	QString analysisType = m_analysisCb->combo()->currentText();

@@ -55,7 +55,6 @@ public:
 	QStringList plotTitle() const;
 
 Q_SIGNALS:
-	void configOutput(const OutputConfig &outConfig);
 	void requestNewData();
 	void bufferDataReady(QVector<QVector<double>> data);
 	void plotSettings(QWidget *settings);

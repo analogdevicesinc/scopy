@@ -83,11 +83,7 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 
 	setupConnections();
 	connect(measure, &QPushButton::toggled, this, [tool](bool b) { tool->openTopContainerHelper(b); });
-	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
-	connect(m_runBtn, &RunBtn::toggled, m_settings, &SettingsMenu::setDisabled);
-	connect(m_runBtn, &RunBtn::toggled, tme, &ToolMenuEntry::setRunning);
-	connect(m_tme, &ToolMenuEntry::runClicked, this, &QIQInstrument::tmeToggled);
-	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
+	connect(settingsBtn, &QPushButton::toggled, this, [tool](bool b) { tool->openRightContainerHelper(b); });
 }
 
 QIQInstrument::~QIQInstrument() {}
@@ -105,10 +101,15 @@ void QIQInstrument::onInputFormatChanged(const InputConfig &inConfig)
 	m_plotManager->updateInputPlot(inConfig.channelCount());
 	m_inputFormatConfigured = inConfig.channelCount() > 0;
 	enableAcquisition();
-	m_runBtn->setEnabled(m_outputConfigured && m_inputFormatConfigured);
+	// must be deleted
+	configureOutput();
 }
 
-void QIQInstrument::onOutputConfig(const OutputConfig &outConfig) {}
+void QIQInstrument::onOutputConfig(const OutputConfig &outConfig)
+{
+	m_outputConfigured = true;
+	enableAcquisition();
+}
 
 void QIQInstrument::onRunResponse(const RunResults &runResults)
 {
@@ -136,6 +137,7 @@ void QIQInstrument::onAnalysisConfigured(const QString &type, const QVariantMap 
 {
 	m_settings->validateAnalysisParams(type, config);
 	m_plotManager->onAnalysisConfig(type, config, outputInfo);
+	configureOutput();
 }
 
 void QIQInstrument::tmeToggled(bool checked)
@@ -177,9 +179,14 @@ void QIQInstrument::addInputPlot()
 
 void QIQInstrument::setupConnections()
 {
+	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
+	connect(m_runBtn, &RunBtn::toggled, m_settings, &SettingsMenu::disableCriticalWidgets);
+	connect(m_runBtn, &RunBtn::toggled, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &RunBtn::toggled, m_singleBtn, &SingleShotBtn::setDisabled);
 	connect(m_singleBtn, &SingleShotBtn::toggled, this, &QIQInstrument::runPressed);
 	connect(m_singleBtn, &SingleShotBtn::toggled, m_runBtn, &RunBtn::setDisabled);
+	connect(m_singleBtn, &SingleShotBtn::toggled, m_settings, &SettingsMenu::disableCriticalWidgets);
+	connect(m_tme, &ToolMenuEntry::runClicked, this, &QIQInstrument::tmeToggled);
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &QIQInstrument::bufferParamsChanged);
@@ -187,11 +194,6 @@ void QIQInstrument::setupConnections()
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(this, &QIQInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
-	connect(m_plotManager, &PlotManager::configOutput, this, &QIQInstrument::outputConfigured);
-	connect(m_plotManager, &PlotManager::configOutput, this, [this]() {
-		m_outputConfigured = true;
-		m_runBtn->setEnabled(m_outputConfigured && m_inputFormatConfigured);
-	});
 }
 
 void QIQInstrument::clearMeasurementLabels()
@@ -201,6 +203,17 @@ void QIQInstrument::clearMeasurementLabels()
 	}
 	m_labels.clear();
 	m_panel->clear();
+}
+
+void QIQInstrument::configureOutput()
+{
+	QString type = m_settings->getCrtAnalysisType();
+	OutputConfig outConfig;
+	outConfig.setOutputFile(QIQUtils::dataOutPath());
+	outConfig.setOutputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
+	outConfig.setEnabledAnalysis({type});
+
+	Q_EMIT outputConfigured(outConfig);
 }
 
 void QIQInstrument::enableAcquisition()

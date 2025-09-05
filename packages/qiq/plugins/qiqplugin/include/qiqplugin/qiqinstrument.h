@@ -72,6 +72,7 @@ private:
 	void addInputPlot();
 	void setupConnections();
 	void clearMeasurementLabels();
+	void configureOutput();
 	void enableAcquisition();
 	void updateMeasurements(const QVariantMap &measurements);
 	void fillMeasurementsPanel(const QStringList &measurements);

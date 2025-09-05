@@ -46,14 +46,12 @@ public:
 
 	void setSamplingFreq(int samplingFreq);
 	QVector<double> dataForKey(const QString &key);
-	QString getDefaultFilePath() const;
 
 	double sampleCount() const;
 
 	double samplingFreq() const;
 
 Q_SIGNALS:
-	void configOutput(const OutputConfig &outConfig);
 	void dataIsReady();
 
 public Q_SLOTS:
@@ -71,8 +69,6 @@ private:
 	double m_sampleCount;
 	DataReader *m_dataReader;
 	QMap<QString, QVector<double>> m_plotsData;
-
-	const QString DEFAULT_FILE_PATH = scopy::config::executableFolderPath() + QDir::separator() + "data.out";
 };
 
 } // namespace scopy::qiqplugin
