@@ -62,6 +62,9 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	m_runBtn = new RunBtn(this);
 	m_runBtn->setDisabled(true);
 
+	m_singleBtn = new SingleShotBtn(this);
+	m_singleBtn->setDisabled(true);
+
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
 	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
@@ -69,6 +72,7 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 
 	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
@@ -100,6 +104,7 @@ void QIQInstrument::onInputFormatChanged(const InputConfig &inConfig)
 	m_plotManager->samplingFreqAvailable(inConfig.samplingFrequency());
 	m_plotManager->updateInputPlot(inConfig.channelCount());
 	m_inputFormatConfigured = inConfig.channelCount() > 0;
+	enableAcquisition();
 	m_runBtn->setEnabled(m_outputConfigured && m_inputFormatConfigured);
 }
 
@@ -112,6 +117,9 @@ void QIQInstrument::onRunResponse(const RunResults &runResults)
 	int samples = resultsMap.value("samples_size", 0).toInt();
 	m_plotManager->onDataIsProcessed(offset, samples);
 	updateMeasurements(runResults.getMeasurements());
+	if(m_singleBtn->isChecked()) {
+		m_singleBtn->setChecked(false);
+	}
 }
 
 void QIQInstrument::onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
@@ -143,10 +151,13 @@ void QIQInstrument::onProcessFinished(int exitCode)
 {
 	if(m_runBtn->isChecked()) {
 		m_runBtn->setChecked(false);
-		m_runBtn->setEnabled(false);
-		m_inputFormatConfigured = false;
-		m_outputConfigured = false;
 	}
+	if(m_singleBtn->isChecked()) {
+		m_runBtn->setChecked(false);
+	}
+	m_inputFormatConfigured = false;
+	m_outputConfigured = false;
+	enableAcquisition();
 }
 
 void QIQInstrument::addPlots()
@@ -166,6 +177,9 @@ void QIQInstrument::addInputPlot()
 
 void QIQInstrument::setupConnections()
 {
+	connect(m_runBtn, &RunBtn::toggled, m_singleBtn, &SingleShotBtn::setDisabled);
+	connect(m_singleBtn, &SingleShotBtn::toggled, this, &QIQInstrument::runPressed);
+	connect(m_singleBtn, &SingleShotBtn::toggled, m_runBtn, &RunBtn::setDisabled);
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &QIQInstrument::bufferParamsChanged);
@@ -187,6 +201,13 @@ void QIQInstrument::clearMeasurementLabels()
 	}
 	m_labels.clear();
 	m_panel->clear();
+}
+
+void QIQInstrument::enableAcquisition()
+{
+	bool enAcq = m_outputConfigured && m_inputFormatConfigured;
+	m_runBtn->setEnabled(enAcq);
+	m_singleBtn->setEnabled(enAcq);
 }
 
 void QIQInstrument::updateMeasurements(const QVariantMap &measurements)

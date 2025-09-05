@@ -72,6 +72,7 @@ private:
 	void addInputPlot();
 	void setupConnections();
 	void clearMeasurementLabels();
+	void enableAcquisition();
 	void updateMeasurements(const QVariantMap &measurements);
 	void fillMeasurementsPanel(const QStringList &measurements);
 
@@ -79,6 +80,7 @@ private:
 	MeasurementsPanel *m_panel;
 	ToolMenuEntry *m_tme;
 	RunBtn *m_runBtn;
+	SingleShotBtn *m_singleBtn;
 	PlotManager *m_plotManager;
 	SettingsMenu *m_settings;
 
