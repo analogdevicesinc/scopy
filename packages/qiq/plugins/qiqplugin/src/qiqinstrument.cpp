@@ -21,7 +21,6 @@
 
 #include "qiqinstrument.h"
 #include "dockablearea.h"
-#include "dockwrapper.h"
 #include <measurementlabel.h>
 #include <menucontrolbutton.h>
 #include <stylehelper.h>
@@ -69,7 +68,6 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
 	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
-	addInputPlot();
 
 	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
@@ -91,6 +89,25 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 }
 
 QIQInstrument::~QIQInstrument() {}
+
+void QIQInstrument::setupConnections()
+{
+	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
+	connect(m_runBtn, &RunBtn::toggled, m_settings->acqW(), &QWidget::setDisabled);
+	connect(m_runBtn, &RunBtn::toggled, m_tme, &ToolMenuEntry::setRunning);
+	connect(m_runBtn, &RunBtn::toggled, m_singleBtn, &SingleShotBtn::setDisabled);
+	connect(m_singleBtn, &SingleShotBtn::toggled, this, &QIQInstrument::runPressed);
+	connect(m_singleBtn, &SingleShotBtn::toggled, m_runBtn, &RunBtn::setDisabled);
+	connect(m_singleBtn, &SingleShotBtn::toggled, m_settings->acqW(), &QWidget::setDisabled);
+	connect(m_tme, &ToolMenuEntry::runClicked, this, &QIQInstrument::tmeToggled);
+	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
+	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
+	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &QIQInstrument::bufferParamsChanged);
+	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
+	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
+	connect(this, &QIQInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
+	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
+}
 
 void QIQInstrument::setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels)
 {
@@ -172,32 +189,6 @@ void QIQInstrument::addPlots()
 	for(DockWrapperInterface *w : dockList) {
 		m_dockableArea->addDockWrapper(w, DockableAreaInterface::Direction_BOTTOM);
 	}
-}
-
-void QIQInstrument::addInputPlot()
-{
-	DockWrapperInterface *plotWrapper = createDockWrapper(INPUT_PLOT_TITLE);
-	plotWrapper->setInnerWidget(m_plotManager->inputPlot());
-	m_dockableArea->addDockWrapper(plotWrapper, DockableAreaInterface::Direction_TOP);
-}
-
-void QIQInstrument::setupConnections()
-{
-	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
-	connect(m_runBtn, &RunBtn::toggled, m_settings->acqW(), &QWidget::setDisabled);
-	connect(m_runBtn, &RunBtn::toggled, m_tme, &ToolMenuEntry::setRunning);
-	connect(m_runBtn, &RunBtn::toggled, m_singleBtn, &SingleShotBtn::setDisabled);
-	connect(m_singleBtn, &SingleShotBtn::toggled, this, &QIQInstrument::runPressed);
-	connect(m_singleBtn, &SingleShotBtn::toggled, m_runBtn, &RunBtn::setDisabled);
-	connect(m_singleBtn, &SingleShotBtn::toggled, m_settings->acqW(), &QWidget::setDisabled);
-	connect(m_tme, &ToolMenuEntry::runClicked, this, &QIQInstrument::tmeToggled);
-	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
-	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
-	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &QIQInstrument::bufferParamsChanged);
-	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
-	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
-	connect(this, &QIQInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
-	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
 }
 
 void QIQInstrument::clearMeasurementLabels()

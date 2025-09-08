@@ -62,6 +62,8 @@ private:
 	void applyPlotFlags(PlotWidget *plot, const QIQPlotInfo &plotInfo);
 
 	void createPlotSettings(PlotWidget *plot, const QIQPlotInfo &plotInfo);
+	void updatePlotChannels(PlotWidget *plot, const QIQPlotInfo &plotInfo);
+	void clearPlotChannels(PlotWidget *plot);
 
 	QWidget *m_plotSettings;
 };

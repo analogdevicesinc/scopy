@@ -45,7 +45,7 @@ public:
 		QString y;
 	} PlotInfoCh;
 
-	int id = -1;
+	QString id;
 	QString title;
 	QString xLabel;
 	QString yLabel;
@@ -64,7 +64,7 @@ public:
 	static QIQPlotInfo fromVariantMap(const QVariantMap &map)
 	{
 		QIQPlotInfo info;
-		info.id = map.value(KeysPlotInfo::ID, -1).toInt();
+		info.id = map.value(KeysPlotInfo::ID).toString();
 		info.title = map.value(KeysPlotInfo::TITLE).toString();
 		info.xLabel = map.value(KeysPlotInfo::XLABEL).toString();
 		info.yLabel = map.value(KeysPlotInfo::YLABEL).toString();

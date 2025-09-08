@@ -26,12 +26,11 @@
 #include "plotcreator.h"
 #include <QObject>
 #include <dockwrapperinterface.h>
-#include <menuplotchannelcurvestylecontrol.h>
 #include <qiqplotmanager/datamanager.h>
 #include <qiqcontroller/qiqplotinfo.h>
-#include <gui/plotwidget.h>
 
 #define INPUT_PLOT_TITLE "Input Waveform"
+#define INPUT_PLOT_ID "0"
 namespace scopy::qiqplugin {
 
 struct PlotContainer
@@ -50,7 +49,6 @@ public:
 	~PlotManager();
 
 	void updateInputPlot(int chnlCount);
-	QWidget *inputPlot() const;
 	QVector<DockWrapperInterface *> plotWrappers() const;
 	QStringList plotTitle() const;
 
@@ -71,18 +69,10 @@ private:
 	void createPlots(QList<QIQPlotInfo> &plotInfoList);
 	void setupDataManager(const OutputInfo &outInfo);
 	void clearPlots();
-	// input plot
-	void createInputPlot();
-	void createInputPlotSettings();
-	void removePlotChannels();
-	void updateInputData();
-	void addPlotChannel(const QString &label, const QColor &color);
+	QIQPlotInfo inputPlot();
 
-	gui::MenuPlotChannelCurveStyleControl *m_inputCurveControl;
-	PlotWidget *m_inputPlot;
-	QWidget *m_inputSettings;
 	DataManager *m_dataManager;
-	QVector<PlotContainer> m_plotContainers;
+	QMap<QString, PlotContainer> m_plotContainers;
 };
 
 } // namespace scopy::qiqplugin

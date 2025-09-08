@@ -133,6 +133,27 @@ void StandardPlotCreator::createPlotSettings(PlotWidget *plot, const QIQPlotInfo
 	lay->addWidget(plotMenu);
 }
 
+void StandardPlotCreator::updatePlotChannels(PlotWidget *plot, const QIQPlotInfo &plotInfo)
+{
+	const auto &channels = plotInfo.channels;
+	auto plotChnls = plot->getChannels();
+	if(channels.size() == plotChnls.size()) {
+		return;
+	}
+	clearPlotChannels(plot);
+	setupPlotChannels(plot, plotInfo);
+}
+
+void StandardPlotCreator::clearPlotChannels(PlotWidget *plot)
+{
+	const auto channels = plot->getChannels();
+	for(auto ch : channels) {
+		plot->removePlotChannel(ch);
+		ch->deleteLater();
+	}
+	plot->replot();
+}
+
 void StandardPlotCreator::updatePlot(QWidget *plotWidget, const QIQPlotInfo &plotInfo,
 				     const QMap<QString, QVector<double>> &data)
 {
@@ -140,10 +161,9 @@ void StandardPlotCreator::updatePlot(QWidget *plotWidget, const QIQPlotInfo &plo
 	if(!plot) {
 		return;
 	}
-
+	updatePlotChannels(plot, plotInfo);
 	const auto &channels = plotInfo.channels;
 	auto plotChnls = plot->getChannels();
-
 	double xFirst = 0, xLast = 0;
 	for(int chIdx = 0; chIdx < channels.size() && chIdx < plotChnls.size(); chIdx++) {
 		const auto &ch = channels[chIdx];

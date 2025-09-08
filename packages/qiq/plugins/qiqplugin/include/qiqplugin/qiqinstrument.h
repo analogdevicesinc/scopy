@@ -69,7 +69,6 @@ public Q_SLOTS:
 
 private:
 	void addPlots();
-	void addInputPlot();
 	void setupConnections();
 	void clearMeasurementLabels();
 	void configureOutput();
