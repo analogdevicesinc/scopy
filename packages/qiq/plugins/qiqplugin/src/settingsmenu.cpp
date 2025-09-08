@@ -32,69 +32,19 @@ Q_LOGGING_CATEGORY(CAT_QIQ_SETTINGS, "QIQSettingsMenu");
 
 using namespace scopy::qiqplugin;
 
-SettingsMenu::SettingsMenu(QWidget *parent)
-	: QWidget(parent)
+SettingsMenu::SettingsMenu(QObject *parent)
+	: QObject(parent)
+	, m_plotW(nullptr)
+	, m_acqW(nullptr)
 {
 	setupUI();
 }
 
 void SettingsMenu::setupUI()
 {
-	QWidget *contentWidget = new QWidget();
-	QVBoxLayout *layout = new QVBoxLayout(contentWidget);
-	layout->setMargin(0);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget(
-		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), this);
-
-	// Buffer menu
-	MenuSectionCollapseWidget *bufferAcq = new MenuSectionCollapseWidget(
-		"Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
-	m_bufferMenu = new BufferMenu();
-	bufferAcq->add(m_bufferMenu);
-
-	// Analysis cb
-	MenuSectionCollapseWidget *analysisCb = new MenuSectionCollapseWidget(
-		"Select analysis", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
-	m_analysisCb = new MenuCombo("Analysis");
-	analysisCb->add(m_analysisCb);
-
-	// Analysis menu
-	MenuSectionCollapseWidget *analysisMenu =
-		new MenuSectionCollapseWidget("Analysis settings", MenuCollapseSection::MHCW_NONE,
-					      MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
-	m_analysisMenu = new AnalysisMenu();
-	analysisMenu->add(m_analysisMenu);
-
-	// Plot settings
-	MenuSectionCollapseWidget *plotSettings =
-		new MenuSectionCollapseWidget("Select plot settings", MenuCollapseSection::MHCW_NONE,
-					      MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
-	m_selectPlotCb = new QComboBox(plotSettings);
-	plotSettings->add(m_selectPlotCb);
-
-	m_plotSettings = new QWidget(contentWidget);
-	m_plotSettings->setLayout(new QVBoxLayout());
-	m_plotSettings->layout()->setMargin(0);
-
-	layout->addWidget(bufferAcq);
-	layout->addWidget(analysisCb);
-	layout->addWidget(analysisMenu);
-	layout->addWidget(plotSettings);
-	layout->addWidget(m_plotSettings);
-	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-	QScrollArea *scrollArea = new QScrollArea(this);
-	scrollArea->setWidget(contentWidget);
-	scrollArea->setWidgetResizable(true);
-	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	scrollArea->setFrameShape(QFrame::NoFrame);
-
-	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
-	mainLayout->addWidget(header);
-	mainLayout->addWidget(scrollArea);
+	createAcqMenu();
+	createPlotMenu();
 
 	// Connections
 	connect(m_selectPlotCb, &QComboBox::currentTextChanged, this, &SettingsMenu::plotSettings);
@@ -102,6 +52,95 @@ void SettingsMenu::setupUI()
 	connect(m_bufferMenu, &BufferMenu::bufferParamsChanged, this, &SettingsMenu::bufferParamsChanged);
 	connect(m_analysisMenu, &AnalysisMenu::applyPressed, this, &SettingsMenu::onAnalysisApply);
 }
+
+void SettingsMenu::createAcqMenu()
+{
+	m_acqW = createMenuW("Acquisition Setup");
+
+	QWidget *acqWidget = new QWidget();
+	QVBoxLayout *acqLay = new QVBoxLayout(acqWidget);
+	acqLay->setMargin(0);
+
+	// Buffer menu
+	MenuSectionCollapseWidget *bufferAcq = new MenuSectionCollapseWidget(
+		"Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
+	m_bufferMenu = new BufferMenu();
+	bufferAcq->add(m_bufferMenu);
+
+	// Analysis cb
+	MenuSectionCollapseWidget *analysisCb = new MenuSectionCollapseWidget(
+		"Select analysis", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
+	m_analysisCb = new MenuCombo("Analysis");
+	analysisCb->add(m_analysisCb);
+
+	// Analysis menu
+	MenuSectionCollapseWidget *analysisMenu = new MenuSectionCollapseWidget(
+		"Analysis settings", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
+	m_analysisMenu = new AnalysisMenu();
+	analysisMenu->add(m_analysisMenu);
+
+	acqLay->addWidget(bufferAcq);
+	acqLay->addWidget(analysisCb);
+	acqLay->addWidget(analysisMenu);
+	acqLay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	QScrollArea *scrollArea = createScrollArea(acqWidget);
+	m_acqW->layout()->addWidget(scrollArea);
+}
+
+void SettingsMenu::createPlotMenu()
+{
+	m_plotW = createMenuW("Plot Settings");
+
+	QWidget *plotWidget = new QWidget();
+	QVBoxLayout *plotLay = new QVBoxLayout(plotWidget);
+	plotLay->setMargin(0);
+
+	// Plot settings
+	MenuSectionCollapseWidget *plotSettings = new MenuSectionCollapseWidget(
+		"Select plot", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, plotWidget);
+	m_selectPlotCb = new QComboBox(plotSettings);
+	plotSettings->add(m_selectPlotCb);
+
+	m_plotSettings = new QWidget(plotWidget);
+	m_plotSettings->setLayout(new QVBoxLayout());
+	m_plotSettings->layout()->setMargin(0);
+
+	plotLay->addWidget(plotSettings);
+	plotLay->addWidget(m_plotSettings);
+	plotLay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	QScrollArea *scrollArea = createScrollArea(plotWidget);
+	m_plotW->layout()->addWidget(scrollArea);
+}
+
+QScrollArea *SettingsMenu::createScrollArea(QWidget *contentWidget)
+{
+	QScrollArea *scrollArea = new QScrollArea();
+	scrollArea->setWidget(contentWidget);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scrollArea->setFrameShape(QFrame::NoFrame);
+
+	return scrollArea;
+}
+
+QWidget *SettingsMenu::createMenuW(const QString &title, QWidget *parent)
+{
+	QWidget *menu = new QWidget(parent);
+	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QVBoxLayout *lay = new QVBoxLayout(menu);
+	lay->setMargin(0);
+	MenuHeaderWidget *header =
+		new MenuHeaderWidget(title, QPen(Style::getAttribute(json::theme::interactive_primary_idle)), menu);
+	lay->addWidget(header);
+	return menu;
+}
+
+QWidget *SettingsMenu::plotW() const { return m_plotW; }
+
+QWidget *SettingsMenu::acqW() const { return m_acqW; }
 
 void SettingsMenu::setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels)
 {
@@ -161,13 +200,6 @@ void SettingsMenu::onSettingsMenu(QWidget *w)
 		return;
 	}
 	lay->addWidget(w);
-}
-
-void SettingsMenu::disableCriticalWidgets(bool en)
-{
-	m_bufferMenu->setDisabled(en);
-	m_analysisMenu->setDisabled(en);
-	m_analysisCb->setDisabled(en);
 }
 
 void SettingsMenu::onAnalysisApply()

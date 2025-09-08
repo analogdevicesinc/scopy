@@ -43,15 +43,16 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->topCentral()->setVisible(true);
 	tool->centralContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
+	tool->leftContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(true);
 
-	tool->setRightContainerWidth(280);
+	tool->setRightContainerWidth(240);
+	tool->setLeftContainerWidth(240);
 
 	m_panel = new MeasurementsPanel(tool);
-	QPushButton *measure = new QPushButton("Measure", tool);
-	Style::setStyle(measure, style::properties::button::blueGrayButton);
-	measure->setCheckable(true);
-	measure->setChecked(true);
+	QPushButton *measure = createMenuButton("Measure", tool);
+
+	QPushButton *acqSettingsBtn = createMenuButton("Acquisition", tool);
 
 	m_plotManager = new PlotManager(this);
 
@@ -74,16 +75,19 @@ QIQInstrument::QIQInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
+	tool->addWidgetToBottomContainerHelper(acqSettingsBtn, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
 	tool->topStack()->add(MEASURE_PANEL_ID, m_panel);
-	tool->rightStack()->add("settings", m_settings);
+	tool->rightStack()->add("settings", m_settings->plotW());
+	tool->leftStack()->add("acqSettings", m_settings->acqW());
 
 	layout->addWidget(tool);
 
 	setupConnections();
 	connect(measure, &QPushButton::toggled, this, [tool](bool b) { tool->openTopContainerHelper(b); });
 	connect(settingsBtn, &QPushButton::toggled, this, [tool](bool b) { tool->openRightContainerHelper(b); });
+	connect(acqSettingsBtn, &QPushButton::toggled, this, [tool](bool b) { tool->openLeftContainerHelper(b); });
 }
 
 QIQInstrument::~QIQInstrument() {}
@@ -180,12 +184,12 @@ void QIQInstrument::addInputPlot()
 void QIQInstrument::setupConnections()
 {
 	connect(m_runBtn, &RunBtn::toggled, this, &QIQInstrument::runPressed);
-	connect(m_runBtn, &RunBtn::toggled, m_settings, &SettingsMenu::disableCriticalWidgets);
+	connect(m_runBtn, &RunBtn::toggled, m_settings->acqW(), &QWidget::setDisabled);
 	connect(m_runBtn, &RunBtn::toggled, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &RunBtn::toggled, m_singleBtn, &SingleShotBtn::setDisabled);
 	connect(m_singleBtn, &SingleShotBtn::toggled, this, &QIQInstrument::runPressed);
 	connect(m_singleBtn, &SingleShotBtn::toggled, m_runBtn, &RunBtn::setDisabled);
-	connect(m_singleBtn, &SingleShotBtn::toggled, m_settings, &SettingsMenu::disableCriticalWidgets);
+	connect(m_singleBtn, &SingleShotBtn::toggled, m_settings->acqW(), &QWidget::setDisabled);
 	connect(m_tme, &ToolMenuEntry::runClicked, this, &QIQInstrument::tmeToggled);
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &QIQInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &QIQInstrument::analysisConfigChanged);
@@ -246,4 +250,13 @@ void QIQInstrument::fillMeasurementsPanel(const QStringList &measurements)
 		m_labels.insert(l, ml);
 		m_panel->addMeasurement(ml);
 	}
+}
+
+QPushButton *QIQInstrument::createMenuButton(const QString &name, QWidget *parent)
+{
+	QPushButton *btn = new QPushButton(name, parent);
+	Style::setStyle(btn, style::properties::button::blueGrayButton);
+	btn->setCheckable(true);
+	btn->setChecked(true);
+	return btn;
 }

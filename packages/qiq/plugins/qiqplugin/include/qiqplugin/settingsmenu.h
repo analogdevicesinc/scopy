@@ -22,18 +22,19 @@
 #ifndef SETTINGSMENU_H
 #define SETTINGSMENU_H
 
+#include <QScrollArea>
 #include <QWidget>
 #include <analysismenu.h>
 #include <buffermenu.h>
 
 namespace scopy::qiqplugin {
 
-class SettingsMenu : public QWidget
+class SettingsMenu : public QObject
 {
 	Q_OBJECT
 
 public:
-	explicit SettingsMenu(QWidget *parent = nullptr);
+	explicit SettingsMenu(QObject *parent = nullptr);
 
 	void setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels);
 	void setAnalysisTypes(const QStringList &types);
@@ -42,6 +43,10 @@ public:
 	void validateAnalysisParams(const QString &type, const QVariantMap &config);
 
 	QString getCrtAnalysisType();
+	QWidget *acqW() const;
+
+	QWidget *plotW() const;
+
 Q_SIGNALS:
 	void plotSettings(const QString &plot);
 	void analysisChanged(const QString &type);
@@ -50,19 +55,26 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void onSettingsMenu(QWidget *w);
-	void disableCriticalWidgets(bool en);
 
 private Q_SLOTS:
 	void onAnalysisApply();
 
 private:
+	void setupUI();
+	void createAcqMenu();
+	void createPlotMenu();
+	QScrollArea *createScrollArea(QWidget *contentWidget);
+	QWidget *createMenuW(const QString &title, QWidget *parent = nullptr);
+
+	// plot settings
+	QWidget *m_plotW;
 	QWidget *m_plotSettings;
+	QComboBox *m_selectPlotCb;
+	// acquisition settings
+	QWidget *m_acqW;
 	BufferMenu *m_bufferMenu;
 	AnalysisMenu *m_analysisMenu;
 	MenuCombo *m_analysisCb;
-	QComboBox *m_selectPlotCb;
-
-	void setupUI();
 };
 } // namespace scopy::qiqplugin
 #endif // SETTINGSMENU_H

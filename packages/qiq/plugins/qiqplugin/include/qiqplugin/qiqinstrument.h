@@ -76,6 +76,7 @@ private:
 	void enableAcquisition();
 	void updateMeasurements(const QVariantMap &measurements);
 	void fillMeasurementsPanel(const QStringList &measurements);
+	QPushButton *createMenuButton(const QString &name, QWidget *parent = nullptr);
 
 	QMap<QString, MeasurementLabel *> m_labels;
 	MeasurementsPanel *m_panel;
