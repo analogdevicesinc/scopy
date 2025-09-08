@@ -107,6 +107,7 @@ void QIQInstrument::setupConnections()
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(this, &QIQInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &QIQInstrument::requestNewData);
+	connect(m_plotManager, &PlotManager::changeSettings, m_settings, &SettingsMenu::changeSettings);
 }
 
 void QIQInstrument::setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels)

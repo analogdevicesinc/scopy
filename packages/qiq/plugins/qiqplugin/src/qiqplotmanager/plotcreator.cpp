@@ -25,6 +25,7 @@
 #include <menuplotaxisrangecontrol.h>
 #include <menusectionwidget.h>
 #include <plotaxis.h>
+#include <style.h>
 #include <stylehelper.h>
 #include <pluginbase/preferences.h>
 
@@ -42,10 +43,27 @@ QWidget *StandardPlotCreator::createPlot(const QIQPlotInfo &plotInfo)
 	if(!useDock) {
 		plot->plot()->setTitle(plotInfo.title);
 	}
+
 	setupPlotChannels(plot, plotInfo);
 	configurePlotAxis(plot, plotInfo);
 	applyPlotFlags(plot, plotInfo);
 	createPlotSettings(plot, plotInfo);
+
+	QPushButton *settingsPlotHover = new QPushButton("");
+	settingsPlotHover->setMaximumSize(16, 16);
+	settingsPlotHover->setIcon(
+		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg"));
+
+	connect(settingsPlotHover, &QAbstractButton::clicked, this,
+		[this, plotInfo]() { Q_EMIT requestSettings(plotInfo.title); });
+
+	QWidget *paddingW = new QWidget();
+	paddingW->setVisible(false);
+
+	plot->plotButtonManager()->add(settingsPlotHover);
+	plot->plotButtonManager()->add(paddingW);
+	plot->plotButtonManager()->setVisible(true);
+
 	plot->replot();
 
 	return plot;

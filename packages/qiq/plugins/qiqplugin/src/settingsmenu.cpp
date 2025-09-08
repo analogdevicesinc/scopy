@@ -202,6 +202,8 @@ void SettingsMenu::onSettingsMenu(QWidget *w)
 	lay->addWidget(w);
 }
 
+void SettingsMenu::changeSettings(const QString &plotTitle) { m_selectPlotCb->setCurrentText(plotTitle); }
+
 void SettingsMenu::onAnalysisApply()
 {
 	QString analysisType = m_analysisCb->combo()->currentText();

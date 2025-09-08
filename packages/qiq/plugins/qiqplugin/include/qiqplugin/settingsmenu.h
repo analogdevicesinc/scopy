@@ -55,6 +55,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void onSettingsMenu(QWidget *w);
+	void changeSettings(const QString &plotTitle);
 
 private Q_SLOTS:
 	void onAnalysisApply();

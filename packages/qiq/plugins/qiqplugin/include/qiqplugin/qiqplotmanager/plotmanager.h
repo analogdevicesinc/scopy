@@ -53,6 +53,7 @@ public:
 	QStringList plotTitle() const;
 
 Q_SIGNALS:
+	void changeSettings(const QString &plotTitle);
 	void requestNewData();
 	void bufferDataReady(QVector<QVector<double>> data);
 	void plotSettings(QWidget *settings);

@@ -42,6 +42,7 @@ public:
 	virtual void updatePlot(QWidget *plot, const QIQPlotInfo &plotInfo,
 				const QMap<QString, QVector<double>> &data) = 0;
 	virtual QString plotType() const = 0;
+	virtual void requestSettings(const QString &title) = 0;
 };
 
 class StandardPlotCreator : public PlotCreatorBase
@@ -55,6 +56,9 @@ public:
 	void updatePlot(QWidget *plot, const QIQPlotInfo &plotInfo,
 			const QMap<QString, QVector<double>> &data) override;
 	QString plotType() const override { return "plotWidget"; }
+
+Q_SIGNALS:
+	void requestSettings(const QString &title) override;
 
 private:
 	void setupPlotChannels(PlotWidget *plot, const QIQPlotInfo &plotInfo);

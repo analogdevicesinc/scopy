@@ -96,6 +96,7 @@ void PlotManager::createPlots(QList<QIQPlotInfo> &plotInfoList)
 		plotWrapper->setInnerWidget(plot);
 		PlotContainer container(plot, plotWrapper, plotInfo, creator);
 		m_plotContainers.insert(plotInfo.id, container);
+		connect(creator, SIGNAL(requestSettings(QString)), this, SIGNAL(changeSettings(QString)));
 	}
 }
 
