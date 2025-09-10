@@ -6,7 +6,6 @@ SourceBlock::SourceBlock(QString name)
 	: BasicBlock(name)
 	, m_bufferSize(0)
 	, m_plotSize(m_bufferSize)
-	, m_aqcFinished(true)
 	, m_timeAxis(std::vector<float>())
 {
 	QObject::connect(this, &SourceBlock::requestData, this, &SourceBlock::onRequestData, Qt::QueuedConnection);
@@ -82,8 +81,6 @@ void SourceBlock::onRequestData()
 		Q_EMIT requestData();
 	}
 }
-
-bool SourceBlock::getAqcFinished() { return m_aqcFinished; }
 
 std::vector<float> SourceBlock::getTimeAxis()
 {

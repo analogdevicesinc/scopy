@@ -20,7 +20,6 @@ public:
 	size_t plotSize();
 	// int getAqcCounter();
 	void setSingleShot(bool single);
-	bool getAqcFinished();
 	virtual std::vector<float> getTimeAxis();
 
 public Q_SLOTS:
@@ -48,7 +47,6 @@ protected:
 	QMap<uint, bool> m_channels; // <channel, enabled>
 	int m_aqcCounter = 0;
 	bool m_singleShot = false;
-	bool m_aqcFinished;
 	std::vector<float> m_timeAxis;
 };
 } // namespace scopy::datasink

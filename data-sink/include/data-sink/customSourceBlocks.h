@@ -13,10 +13,16 @@ public:
 	~FileSourceBlock();
 
 	int getNumChannels() const;
+	void setCyclic(bool enable);
+	void setContinuous(bool enable);
 
 private:
 	QString m_filename;
 	int m_numChannels;
+
+	bool m_cyclic = true;
+	bool m_continuous = true;
+	qint64 m_lastPos = 0;   // byte offset in file (efficient resume point)
 
 	BlockData createData() override;
 };

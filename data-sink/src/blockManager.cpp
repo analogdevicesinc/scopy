@@ -123,12 +123,14 @@ void BlockManager::emitOutputData(bool aqcFinished, SourceBlock *source)
 			Q_EMIT sentAllData();
 
 			for(auto link : m_blockLinks) {
-				link->finished_outputs = 0;
 
-				if(m_running && link->active_outputs > 0)
+				if(m_running && link->active_outputs > 0) {
 					// if(sourceDataFinished(m_blockLinks.key(link)))
 						// std::cout << "\n re requested!!! with  " << m_blockLinks.key(link)->getAqcCounter() << std::endl;
 					onRequestData(m_blockLinks.key(link));
+					link->finished_outputs = 0;
+				}
+				link->updateActiveOutputs();
 			}
 
 		}
@@ -153,12 +155,6 @@ BlockManager::~BlockManager()
 {
 	m_thread->exit();
 };
-
-// in case plot size is larger then buffer size and it required multiple aquisitions per source
-bool BlockManager::sourceDataFinished(SourceBlock *source)
-{
-	return source->getAqcFinished();
-}
 
 void BlockManager::onRequestData(SourceBlock *source)
 {
@@ -237,12 +233,13 @@ void BlockManager::addLink(SourceBlock *source, uint source_ch, BasicBlock *fina
 		connect(
 			source, &SourceBlock::toggledCh, this,
 			[=](uint ch, bool en) {
-				m_blockLinks[source]->updateActiveOutputs();
+				// m_blockLinks[source]->updateActiveOutputs();
 
 				// if running and a ch from a source with no enabled channels is enabled, start the
 				// request cycle again
-				if(m_running && en && m_blockLinks[source]->enabledSourceChCount() == 1)
-					onRequestData(source);
+
+				// if(m_running && en && source->isChannelEn(ch))
+				// 	onRequestData(source);
 			},
 			Qt::QueuedConnection);
 

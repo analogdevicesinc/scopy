@@ -172,7 +172,7 @@ void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, s
 	xyXData = yData_;
 	for(PlotComponentChannel *ch : qAsConst(m_channels)) {
 		auto pcc = dynamic_cast<TimePlotComponentChannel *>(ch);
-		// pcc->setXyXData(xyXData);
+		pcc->setXyXData(xyXData);
 		pcc->refreshData(copy);
 	}
 }

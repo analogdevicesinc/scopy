@@ -12,6 +12,20 @@ FileSourceBlock::FileSourceBlock(QString filename, QString name)
 
 FileSourceBlock::~FileSourceBlock() {}
 
+void FileSourceBlock::setCyclic(bool enable)
+{
+	m_cyclic = enable;
+}
+
+void FileSourceBlock::setContinuous(bool enable)
+{
+	m_continuous = enable;
+	if (!enable) {
+		m_lastPos = 0; // reset pointer if disabled
+	}
+}
+
+// --- Main data loader ---
 BlockData FileSourceBlock::createData()
 {
 	QFile file(m_filename);
@@ -22,43 +36,76 @@ BlockData FileSourceBlock::createData()
 
 	QTextStream m_stream(&file);
 
+	       // --- If continuous, seek to last file position ---
+	if (m_continuous && m_lastPos > 0) {
+		file.seek(m_lastPos);
+	} else {
+		m_lastPos = 0;
+	}
+
 	BlockData map = BlockData();
 	int numRows = 0;
 
-	       // --- Always read first line ---
-	QString firstLine = m_stream.readLine();
-	QStringList values = firstLine.split(',');
+	       // --- First line: skip header if present ---
+	if (m_lastPos == 0) {  // only check header at fresh start
+		QString firstLine = m_stream.readLine();
+		QStringList values = firstLine.split(',');
 
-	       // If header is present, skip it. getNumChannels() will handle detection.
-	bool headerIsChannels = true;
-	for (int i = 0; i < values.size(); ++i) {
-		bool ok;
-		int val = values[i].toInt(&ok);
-		if (!ok || val != i) {
-			headerIsChannels = false;
-			break;
-		}
-	}
-
-	if (!headerIsChannels) {
-		// process first line as data
-		for (int col = 0; col < values.size(); ++col) {
-			if (!m_channels.value(col) && !map.contains(col))
-				continue;
-
-			if (m_bufferSize <= numRows)
+		bool headerIsChannels = true;
+		for (int i = 0; i < values.size(); ++i) {
+			bool ok;
+			int val = values[i].toInt(&ok);
+			if (!ok || val != i) {
+				headerIsChannels = false;
 				break;
-
-			float num = values[col].toFloat();
-			ChannelDataVector data = ChannelDataVector(m_bufferSize);
-			map.insert(col, data);
-			data.data.push_back(num);
+			}
 		}
-		numRows++;
+
+		if (!headerIsChannels) {
+			// process first line as data
+			for (int col = 0; col < values.size(); ++col) {
+				if (!m_channels.value(col) && !map.contains(col))
+					continue;
+
+				if (m_bufferSize <= numRows)
+					break;
+
+				float num = values[col].toFloat();
+				ChannelDataVector data = ChannelDataVector(m_bufferSize);
+				map.insert(col, data);
+				data.data.push_back(num);
+			}
+			numRows++;
+		}
 	}
 
-	       // --- Process rest of file ---
-	while (!m_stream.atEnd()) {
+	       // --- Process file until buffer full ---
+	while (numRows < m_bufferSize) {
+		if (m_stream.atEnd()) {
+			if (m_cyclic) {
+				// restart from beginning (after header if exists)
+				file.seek(0);
+				m_stream.seek(0);
+
+				       // Skip header if present
+				QString firstLine = m_stream.readLine();
+				QStringList values = firstLine.split(',');
+				bool headerIsChannels = true;
+				for (int i = 0; i < values.size(); ++i) {
+					bool ok;
+					int val = values[i].toInt(&ok);
+					if (!ok || val != i) {
+						headerIsChannels = false;
+						break;
+					}
+				}
+				if (headerIsChannels)
+					continue; // skip header on wrap
+			} else {
+				break; // not cyclic, just stop
+			}
+		}
+
 		QString line = m_stream.readLine();
 		QStringList values = line.split(',');
 
@@ -80,6 +127,13 @@ BlockData FileSourceBlock::createData()
 			}
 		}
 		numRows++;
+	}
+
+	       // --- Save position if continuous ---
+	if (m_continuous) {
+		m_lastPos = file.pos(); // store exact byte offset for next run
+	} else {
+		m_lastPos = 0; // reset
 	}
 
 	return map;

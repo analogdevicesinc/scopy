@@ -80,7 +80,6 @@ private:
 	int addOutputLink(SourceBlock *source, BasicBlock *final, uint final_ch, uint out_ch);
 	void emitOutputData(bool aqcFinished, SourceBlock *source = nullptr);
 	void onRequestData(SourceBlock *source);
-	bool sourceDataFinished(SourceBlock *source);
 
 Q_SIGNALS:
 	void newData(ChannelDataVector data, uint ch);

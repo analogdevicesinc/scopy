@@ -252,7 +252,7 @@ void ADCTimeInstrumentController::createFileFloatChannels(AcqTreeNode *node)
 
 	for(int i = 0; i < source->getNumChannels(); i++) {
 		int idx = chIdP->next();
-		FileChannelComponent *c = new FileChannelComponent(source, m_blockManager, idx, i, ifcn, chIdP->pen(idx));
+		FileChannelComponent *c = new FileChannelComponent(source, m_blockManager, i, idx, ifcn, chIdP->pen(idx));
 
 		m_plotComponentManager->addChannel(c);
 		c->menu()->add(m_plotComponentManager->plotCombo(c), "plot", gui::MenuWidget::MA_BOTTOMFIRST);
@@ -322,10 +322,10 @@ void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
 	}
 
 	if(dynamic_cast<ImportFloatChannelNode *>(node) != nullptr) {
-		// createImportFloatChannel(node);
+		createImportFloatChannel(node);
 
-		       // FOR TESTING
-		createFileFloatChannels(node);
+		// FOR TESTING
+		// createFileFloatChannels(node);
 	}
 	m_plotComponentManager->replot();
 }
