@@ -145,9 +145,8 @@ ExtProcPlotInfo PlotManager::inputPlot()
 QStringList PlotManager::plotTitle() const
 {
 	QStringList titleList;
-	titleList.push_back(INPUT_PLOT_TITLE);
 	for(const PlotContainer &c : m_plotContainers) {
-		titleList.push_back(c.info.title);
+		titleList.push_back(c.creator->plotInfo().title);
 	}
 	return titleList;
 }
