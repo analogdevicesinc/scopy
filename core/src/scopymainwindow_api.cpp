@@ -518,7 +518,7 @@ bool ScopyMainWindow_API::runAllTools(bool flag)
 	return true;
 }
 
-bool ScopyMainWindow_API::isToolRunning(QString tool, bool flag)
+bool ScopyMainWindow_API::isToolRunning(QString tool)
 {
 
 	Q_ASSERT(m_w->dm != nullptr);
@@ -534,32 +534,45 @@ bool ScopyMainWindow_API::isToolRunning(QString tool, bool flag)
 		QList<ToolMenuEntry *> toolList = dev->toolList();
 		for(int i = 0; i < toolList.size(); i++) {
 			if(toolList[i]->name() == tool) {
-				flag = toolList[i]->running();
-				return true;
+				return toolList[i]->running();
 			}
 		}
 	} else {
 		qWarning(CAT_SCOPY_API) << "Device with id " << devID << " is not available!";
 	}
+	qWarning(CAT_SCOPY_API) << "Error checking " << tool << " running state!";
 	return false;
-
 }
 
-QStringList ScopyMainWindow_API::runningTools()
+QStringList ScopyMainWindow_API::getRunningTools()
 {
-	QStringList runningTools;
+	QStringList tools;
 	bool toolState;
 	const QStringList toolList = getTools();
 	for(const QString &tool : toolList) {
-		if(isToolRunning(tool, toolState)) {
-			if(toolState)
-				runningTools.append(tool);
-		}
-		else {
-			qWarning(CAT_SCOPY_API) << "Error checking " << tool << " running state!";
+		if(isToolRunning(tool)) {
+			tools << tool;
 		}
 	}
+	return tools;
 }
+
+void ScopyMainWindow_API::saveRunningTools()
+{
+	runningTools = getRunningTools();
+	qDebug(CAT_SCOPY_API) << "Running tools: " << runningTools;
+}
+
+void ScopyMainWindow_API::restoreRunningTools()
+{
+	for(const QString &tool : runningTools) {
+		if (runTool(tool, true))
+			qDebug(CAT_SCOPY_API) << "Started tool: " << runningTools;
+		else
+			qWarning(CAT_SCOPY_API) << "Could not start tool: " << tool;
+	}
+}
+
 
 bool ScopyMainWindow_API::loadSetup(QString filename, QString path)
 {
