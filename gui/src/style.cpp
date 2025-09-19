@@ -155,7 +155,7 @@ QString Style::getColorTransparent(const char *key, double transparency)
 	return color;
 }
 
-QString Style::getTheme() { return QFileInfo(m_themeJsonPath).fileName().replace(".json", ""); }
+QString Style::getTheme() { return QFileInfo(m_themeJsonPath).filePath().split(QDir::separator()).last().replace(".json", ""); }
 
 bool Style::setTheme(QString theme, float fontScale)
 {
