@@ -63,8 +63,10 @@ public:
 	Q_INVOKABLE bool getToolBtnState(QString tool);
 	Q_INVOKABLE bool runTool(QString tool, bool flag);
 	Q_INVOKABLE bool runAllTools(bool flag);
-	Q_INVOKABLE bool isToolRunning(QString tool, bool flag);
-	Q_INVOKABLE QStringList runningTools();
+	Q_INVOKABLE bool isToolRunning(QString tool);
+	Q_INVOKABLE QStringList getRunningTools();
+	Q_INVOKABLE void saveRunningTools();
+	Q_INVOKABLE void restoreRunningTools();
 	Q_INVOKABLE bool loadSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 	Q_INVOKABLE bool saveSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 
@@ -82,6 +84,7 @@ private:
 	QStringList availablePlugins(QString param, QString cat, Device *dev);
 	Device *getDevice(int idx);
 	ScopyMainWindow *m_w;
+	QStringList runningTools;
 };
 
 } // namespace scopy

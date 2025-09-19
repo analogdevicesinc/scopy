@@ -45,6 +45,13 @@
 
 #include "toolmenumanager.h"
 
+#ifdef __ANDROID__
+	#include <jni.h>
+	#include <QAndroidJniObject>
+	#include <QAndroidJniEnvironment>
+	#include <QtAndroidExtras/QtAndroid>
+#endif
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class ScopyMainWindow;
@@ -69,7 +76,16 @@ public:
 	void loadPluginsFromRepository();
 
 	void showEvent(QShowEvent *event) override;
-
+#ifdef __ANDROID__
+	static void saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/);
+	static void saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thiz*/);
+	static void saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
+	static void restoreRunningToolsJNI(JNIEnv *env, QObject /*thiz*/);
+	static int nrOfToolsRunningJNI(JNIEnv *env, jobject /*thiz*/);
+	static int nrOfToolsSavedJNI(JNIEnv *env, jobject /*thiz*/);
+	static bool hasCtxJNI(JNIEnv *env, jobject /*thiz*/);
+	static void registerNativeMethods();
+#endif
 public Q_SLOTS:
 	void requestTools(QString id);
 	void receiveVersionDocument(QJsonDocument document);
