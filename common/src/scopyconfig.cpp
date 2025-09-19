@@ -52,9 +52,10 @@ QString scopy::config::defaultStyleFolderPath()
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/style";
 #elif __ANDROID__
-	return QCoreApplication::applicationDirPath() + "/style";
+	return "assets:/style";
 #endif
 	return SCOPY_STYLE_INSTALL_PATH;
+
 }
 
 QString scopy::config::localStyleFolderPath() { return SCOPY_STYLE_BUILD_PATH; }
@@ -119,6 +120,7 @@ QString scopy::config::dump()
 	ret = QString("ScopyConfig");
 	ret += QString("\n") + "DefaultPackageFolderPath: " + defaultPkgFolderPath();
 	ret += QString("\n") + "PreferencesPluginFolderPath: " + preferencesFolderPath();
+	ret += QString("\n") + "DefaultStyleFolderPath: " + defaultStyleFolderPath();
 	ret += QString("\n") + "SettingsFolderPath: " + settingsFolderPath();
 	ret += QString("\n") + "ExecutableFolderPath: " + executableFolderPath();
 	ret += QString("\n") + "version: " + version();
