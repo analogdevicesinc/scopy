@@ -78,3 +78,5 @@ Additional Resources
 
    ad936x
    ad936x_advanced
+   fmcomms5
+   fmcomms5_advanced
