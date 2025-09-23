@@ -60,7 +60,7 @@ public:
 
 Q_SIGNALS:
 	void calibrationFailed();
-	void updateCalibrationProgress(double progress);
+	void updateCalibrationProgress(int progress);
 
 private:
 	iio_context *m_ctx;
@@ -70,6 +70,8 @@ private:
 	iio_device *m_cf_ad9361_hpc = nullptr;
 	iio_device *m_ddsMain = nullptr;
 	iio_device *m_ddsSecond = nullptr;
+
+	void doCalibbrationInThread();
 
 	const char *ddsChannelNames[8] = {"altvoltage0", "altvoltage1", "altvoltage2", "altvoltage3",
 					  "altvoltage4", "altvoltage5", "altvoltage6", "altvoltage7"};
@@ -88,8 +90,6 @@ private:
 	void ddsTxPhaseRotation(struct iio_device *dev, double val);
 	void trxPhaseRottation(iio_device *dev, double val);
 	unsigned int getCalTone();
-
-	int getCalSamples(long long calTone, long long calFreq);
 
 	void nearEndLoopbackCtrl(unsigned channel, bool enable);
 };

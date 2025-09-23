@@ -323,7 +323,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	rxDevice2Widget->layout()->addWidget(m_helper->generateRxChannelWidget(voltage0B, "RX 3", rxDevice2Widget));
 	iio_channel *voltage1B = iio_device_find_channel(dev2, "voltage1", isOutput);
-	if(voltage1 && iio_channel_find_attr(voltage1B, "hardwaregain")) {
+	if(voltage1B && iio_channel_find_attr(voltage1B, "hardwaregain")) {
 		rxDevice2Widget->layout()->addWidget(
 			m_helper->generateRxChannelWidget(voltage1B, "RX 4", rxDevice2Widget));
 	}
