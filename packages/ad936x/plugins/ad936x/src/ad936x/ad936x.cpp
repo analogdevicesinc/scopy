@@ -283,10 +283,8 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 			m_helper->generateRxChannelWidget(voltage1, "RX 2", rxDeviceWidget));
 	}
 
-	rxDeviceLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
-
+	rxDeviceLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
 	mainLayout->addLayout(rxDeviceLayout);
-
 	mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return widget;
@@ -346,6 +344,8 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 	layout->addLayout(lay);
 
 	QHBoxLayout *txWidgetsLayout = new QHBoxLayout();
+	txWidgetsLayout->setMargin(0);
+	txWidgetsLayout->setSpacing(10);
 
 	QWidget *txDeviceWidget = m_helper->generateTxDeviceWidget(dev, "ad9361-phy", widget);
 
@@ -358,8 +358,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 	}
 
 	txWidgetsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Preferred));
-	layout->addWidget(txDeviceWidget);
-
+	layout->addLayout(txWidgetsLayout);
 	layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return widget;

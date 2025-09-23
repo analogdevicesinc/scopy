@@ -218,11 +218,11 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 	layout->addWidget(rssi);
 	rssi->setEnabled(false);
 
-	QTimer timer;
+	QTimer *timer = new QTimer(rxWidget);
 
-	QObject::connect(&timer, &QTimer::timeout, [&]() { rssi->readAsync(); });
+	QObject::connect(timer, &QTimer::timeout, rssi, &IIOWidget::readAsync);
 
-	timer.start(1000);
+	timer->start(1000);
 
 	// voltage: gain_control_mode
 	IIOWidget *gainControlMode = IIOWidgetBuilder(rxWidget)

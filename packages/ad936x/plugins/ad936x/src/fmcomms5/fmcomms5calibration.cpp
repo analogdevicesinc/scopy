@@ -22,6 +22,8 @@
 #include "fmcomms5/fmcomms5calibration.h"
 #include <QLoggingCategory>
 #include <cmath>
+#include <QtConcurrent>
+#include <QThread>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -68,12 +70,13 @@ Fmcomms5Calibration::Fmcomms5Calibration(iio_context *ctx, QObject *parent)
 	}
 }
 
-void Fmcomms5Calibration::calibrate()
+void Fmcomms5Calibration::calibrate() { QtConcurrent::run(this, &Fmcomms5Calibration::doCalibbrationInThread); }
+
+void Fmcomms5Calibration::doCalibbrationInThread()
 {
 	int ret = 0;
 	double rx_phase_lpc = 0, rx_phase_hpc = 0, tx_phase_hpc = 0;
 	long long cal_tone = 0, cal_freq = 0;
-	int samples = 0;
 
 	iio_channel *in0 = iio_device_find_channel(m_mainDevice, "voltage0", false);
 	iio_channel *in0B = iio_device_find_channel(m_secondDevice, "voltage0", false);
@@ -119,8 +122,6 @@ void Fmcomms5Calibration::calibrate()
 	}
 	iio_channel_attr_read_longlong(dds_ch, "frequency", &cal_tone);
 	iio_channel_attr_read_longlong(dds_ch, "sampling_frequency", &cal_freq);
-
-	samples = getCalSamples(cal_tone, cal_freq);
 
 	// Turn off quadrature tracking
 	iio_channel_attr_write(in0, "quadrature_tracking_en", "0");
@@ -499,24 +500,6 @@ unsigned int Fmcomms5Calibration::getCalTone()
 		return freq;
 
 	return CAL_TONE;
-}
-
-int Fmcomms5Calibration::getCalSamples(long long calTone, long long calFreq)
-{
-	int samples, env_samples;
-	const char *cal_samples = getenv("CAL_SAMPLES");
-
-	samples = std::exp2(std::ceil(log2(calFreq / calTone)) + 2);
-
-	if(!cal_samples)
-		return samples;
-
-	env_samples = std::atoi(cal_samples);
-
-	if(env_samples < samples)
-		return samples;
-
-	return env_samples;
 }
 
 void Fmcomms5Calibration::callSwitchPortsEnableCb(int val)
