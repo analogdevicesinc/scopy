@@ -94,7 +94,9 @@ void SettingsMenu::createPlotMenu()
 
 	QWidget *plotWidget = new QWidget();
 	QVBoxLayout *plotLay = new QVBoxLayout(plotWidget);
-	plotLay->setMargin(0);
+	// The right margin is used to avoid the scroll bar overlapping
+	QMargins rightMargin(0, 0, 2, 0);
+	plotLay->setContentsMargins(rightMargin);
 
 	// Plot settings
 	MenuSectionCollapseWidget *plotSettings = new MenuSectionCollapseWidget(

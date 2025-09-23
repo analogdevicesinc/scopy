@@ -35,9 +35,7 @@ namespace scopy::extprocplugin {
 
 struct PlotContainer
 {
-	QWidget *plot;
 	DockWrapperInterface *plotWrapper;
-	ExtProcPlotInfo info;
 	PlotCreatorBase *creator;
 };
 
@@ -74,6 +72,9 @@ private:
 
 	DataManager *m_dataManager;
 	QMap<QString, PlotContainer> m_plotContainers;
+
+Q_SIGNALS:
+	void dataManagerEntries(const QStringList &entries);
 };
 
 } // namespace scopy::extprocplugin

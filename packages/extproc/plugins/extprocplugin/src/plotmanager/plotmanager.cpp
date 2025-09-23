@@ -20,8 +20,10 @@
  */
 
 #include "plotmanager/plotmanager.h"
+#include "extprocutils.h"
 #include "dockwrapper.h"
 #include <QLoggingCategory>
+#include <controller/extprocplotinfo.h>
 
 Q_LOGGING_CATEGORY(CAT_PLOT_MANAGER, "PlotManager");
 using namespace scopy::extprocplugin;
@@ -41,8 +43,8 @@ void PlotManager::samplingFreqAvailable(int samplingFreq) { m_dataManager->setSa
 void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<ExtProcPlotInfo> plotInfoList)
 {
 	clearPlots();
-	setupDataManager(outInfo);
 	createPlots(plotInfoList);
+	setupDataManager(outInfo);
 }
 
 void PlotManager::onAnalysisConfig(const QString &type, const QVariantMap &config, const OutputInfo &outInfo)
@@ -54,7 +56,7 @@ void PlotManager::plotSettingsRequest(const QString &plot)
 {
 	QWidget *w = nullptr;
 	for(const PlotContainer &c : qAsConst(m_plotContainers)) {
-		if(c.info.title == plot) {
+		if(c.creator->plotInfo().title == plot) {
 			w = c.creator->settingsMenu();
 			break;
 		}
@@ -71,33 +73,38 @@ void PlotManager::updatePlots()
 {
 	for(auto &container : m_plotContainers) {
 		QMap<QString, QVector<double>> data;
-		const QList<ExtProcPlotInfo::PlotInfoCh> chnlsInfo = container.info.channels;
+		const QList<ExtProcPlotInfo::PlotInfoCh> chnlsInfo = container.creator->plotInfo().channels;
 		for(const ExtProcPlotInfo::PlotInfoCh &ch : chnlsInfo) {
 			data.insert(ch.x, m_dataManager->dataForKey(ch.x));
 			data.insert(ch.y, m_dataManager->dataForKey(ch.y));
 		}
-		container.creator->updatePlot(container.plot, container.info, data);
+		container.creator->updatePlot(data);
 	}
 	Q_EMIT requestNewData();
 }
 
 void PlotManager::createPlots(QList<ExtProcPlotInfo> &plotInfoList)
 {
+	QSet<QString> dmEntries;
 	QList<ExtProcPlotInfo> list = {inputPlot()};
 	list.append(plotInfoList);
 	m_plotContainers.clear();
 	for(const auto &plotInfo : list) {
-		auto creator = PlotCreatorFactory::createPlotCreator(plotInfo);
-		auto plot = creator->createPlot(plotInfo);
-		if(!plot) {
-			continue;
+		for(const ExtProcPlotInfo::PlotInfoCh &ch : plotInfo.channels) {
+			dmEntries.insert(ch.x);
+			dmEntries.insert(ch.y);
 		}
+		auto creator = PlotCreatorFactory::createPlotCreator(plotInfo);
 		DockWrapperInterface *plotWrapper = createDockWrapper(plotInfo.title);
-		plotWrapper->setInnerWidget(plot);
-		PlotContainer container(plot, plotWrapper, plotInfo, creator);
+		plotWrapper->setInnerWidget(creator->plot());
+		PlotContainer container(plotWrapper, creator);
 		m_plotContainers.insert(plotInfo.id, container);
 		connect(creator, SIGNAL(requestSettings(QString)), this, SIGNAL(changeSettings(QString)));
+		connect(this, SIGNAL(dataManagerEntries(QStringList)), creator,
+			SIGNAL(dataManagerEntries(QStringList)));
 	}
+	m_plotContainers.value(INPUT_PLOT_ID).creator->enableChannelAdd(false);
+	Q_EMIT dataManagerEntries(dmEntries.values());
 }
 
 void PlotManager::setupDataManager(const OutputInfo &outInfo)
@@ -124,9 +131,12 @@ void PlotManager::updateInputPlot(int chnlCount)
 {
 	QList<ExtProcPlotInfo::PlotInfoCh> inputChannels;
 	for(int i = 0; i < chnlCount; i++) {
-		inputChannels.append({"time", DataManagerKeys::INPUT + QString::number(i)});
+		inputChannels.append({DataManagerKeys::TIME, DataManagerKeys::INPUT + QString::number(i)});
 	}
-	m_plotContainers[INPUT_PLOT_ID].info.channels = inputChannels;
+	PlotCreatorBase *inputCreator = m_plotContainers[INPUT_PLOT_ID].creator;
+	ExtProcPlotInfo plotInfo = m_plotContainers[INPUT_PLOT_ID].creator->plotInfo();
+	plotInfo.channels = inputChannels;
+	inputCreator->setPlotInfo(plotInfo);
 }
 
 ExtProcPlotInfo PlotManager::inputPlot()
@@ -138,7 +148,7 @@ ExtProcPlotInfo PlotManager::inputPlot()
 	info.yLabel = "amplitude[V]";
 	info.type = ExtProcPlotInfo::PLOT_WIDGET;
 	info.flags = QStringList("labels");
-	info.channels = {{"time", DataManagerKeys::INPUT + QString::number(0)}};
+	info.channels = {{DataManagerKeys::TIME, DataManagerKeys::INPUT + QString::number(0)}};
 	return info;
 }
 

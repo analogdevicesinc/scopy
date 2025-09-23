@@ -22,10 +22,13 @@
 #ifndef PLOTCREATOR_H
 #define PLOTCREATOR_H
 
+#include "menuplotchannelcurvestylecontrol.h"
 #include <QObject>
+#include <plotautoscaler.h>
 #include <controller/extprocplotinfo.h>
 #include <gui/plotwidget.h>
 
+using namespace scopy::gui;
 namespace scopy::extprocplugin {
 
 class PlotCreatorBase : public QObject
@@ -37,39 +40,75 @@ public:
 	{}
 	virtual ~PlotCreatorBase() = default;
 
-	virtual QWidget *createPlot(const ExtProcPlotInfo &plotInfo) = 0;
 	virtual QWidget *settingsMenu() = 0;
-	virtual void updatePlot(QWidget *plot, const ExtProcPlotInfo &plotInfo,
-				const QMap<QString, QVector<double>> &data) = 0;
+	virtual void updatePlot(const QMap<QString, QVector<double>> &data) = 0;
 	virtual QString plotType() const = 0;
 	virtual void requestSettings(const QString &title) = 0;
+	virtual void dataManagerEntries(const QStringList &entries) = 0;
+
+	virtual void enableChannelAdd(bool en) = 0;
+	virtual QWidget *plot() const = 0;
+	virtual ExtProcPlotInfo plotInfo() const { return m_plotInfo; };
+
+	void setPlotInfo(const ExtProcPlotInfo &newPlotInfo) { m_plotInfo = newPlotInfo; };
+
+protected:
+	ExtProcPlotInfo m_plotInfo;
 };
 
 class StandardPlotCreator : public PlotCreatorBase
 {
 	Q_OBJECT
 public:
-	explicit StandardPlotCreator(QObject *parent = nullptr);
+	explicit StandardPlotCreator(const ExtProcPlotInfo &plotInfo, QObject *parent = nullptr);
 
-	QWidget *createPlot(const ExtProcPlotInfo &plotInfo) override;
+	QWidget *plot() const override;
 	QWidget *settingsMenu() override;
-	void updatePlot(QWidget *plot, const ExtProcPlotInfo &plotInfo,
-			const QMap<QString, QVector<double>> &data) override;
+	void updatePlot(const QMap<QString, QVector<double>> &data) override;
 	QString plotType() const override { return "plotWidget"; }
+	void enableChannelAdd(bool en) override;
 
 Q_SIGNALS:
 	void requestSettings(const QString &title) override;
+	void dataManagerEntries(const QStringList &entries) override;
+	void plotChnlsUpdated(const QStringList &chnls);
+
+private Q_SLOTS:
+	void onNewMin(double min);
+	void onNewMax(double max);
 
 private:
-	void setupPlotChannels(PlotWidget *plot, const ExtProcPlotInfo &plotInfo);
-	void configurePlotAxis(PlotWidget *plot, const ExtProcPlotInfo &plotInfo);
-	void applyPlotFlags(PlotWidget *plot, const ExtProcPlotInfo &plotInfo);
+	void init(const ExtProcPlotInfo &plotInfo);
+	void setupPlotChannels();
+	void configurePlotAxis();
+	void applyPlotFlags();
 
-	void createPlotSettings(PlotWidget *plot, const ExtProcPlotInfo &plotInfo);
-	void updatePlotChannels(PlotWidget *plot, const ExtProcPlotInfo &plotInfo);
-	void clearPlotChannels(PlotWidget *plot);
+	void createPlotSettings();
+	QWidget *createYAxisSection();
+	QWidget *createDataManagerSection();
+	QWidget *createGeneralSettingsSection();
 
-	QWidget *m_plotSettings;
+	void updatePlotChannels(const ExtProcPlotInfo &plotInfo);
+	void clearPlotChannels();
+
+	void updateChnlsTab();
+	void updateOnDmEntries(QComboBox *xCombo, QComboBox *yCombo, int chnlIdx);
+	QWidget *createTabEntryW(QTabWidget *parent, int chnlIdx);
+	void initPlotChnlsTab(QWidget *parent = nullptr);
+	QStringList getChnlsList();
+
+	void autoscaleX();
+	void autoscaleY();
+	void addPlotChannel();
+	void rmPlotChannel(int chnlIdx);
+
+	bool m_first = true;
+	QStringList m_dmEntries;
+	PlotWidget *m_plotWidget{nullptr};
+	QWidget *m_plotSettings{nullptr};
+	QTabWidget *m_chnlsTab{nullptr};
+	PlotAutoscaler *m_plotAutoscaler{nullptr};
+	MenuPlotChannelCurveStyleControl *m_curveControl;
 };
 
 class PlotCreatorFactory

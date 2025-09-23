@@ -45,7 +45,7 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->leftContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(true);
 
-	tool->setRightContainerWidth(240);
+	tool->setRightContainerWidth(260);
 	tool->setLeftContainerWidth(240);
 
 	m_panel = new MeasurementsPanel(tool);
@@ -146,7 +146,7 @@ void ExtProcInstrument::onRunResponse(const RunResults &runResults)
 }
 
 void ExtProcInstrument::onAnalysisInfo(const QString &type, const QVariantMap &params, const OutputInfo &outputInfo,
-				   const QList<ExtProcPlotInfo> plotInfoList, QStringList measurements)
+				       const QList<ExtProcPlotInfo> plotInfoList, QStringList measurements)
 {
 	m_plotManager->onAvailableInfo(outputInfo, plotInfoList);
 	fillMeasurementsPanel(measurements);
@@ -155,7 +155,8 @@ void ExtProcInstrument::onAnalysisInfo(const QString &type, const QVariantMap &p
 	addPlots();
 }
 
-void ExtProcInstrument::onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo)
+void ExtProcInstrument::onAnalysisConfigured(const QString &type, const QVariantMap &config,
+					     const OutputInfo &outputInfo)
 {
 	m_settings->validateAnalysisParams(type, config);
 	m_plotManager->onAnalysisConfig(type, config, outputInfo);

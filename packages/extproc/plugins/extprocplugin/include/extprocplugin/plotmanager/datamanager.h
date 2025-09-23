@@ -22,7 +22,6 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
-#include "extprocutils.h"
 #include <QMap>
 #include <QObject>
 #include <plotmanager/datareader.h>
@@ -53,6 +52,7 @@ public:
 
 Q_SIGNALS:
 	void dataIsReady();
+	void newDataEntries(const QStringList &entries);
 
 public Q_SLOTS:
 	void onInputData(QVector<QVector<double>> bufferData);

@@ -20,6 +20,7 @@
  */
 
 #include "plotmanager/datamanager.h"
+#include "extprocutils.h"
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_DATA_MANAGER, "DataManager");
@@ -33,6 +34,8 @@ DataManager::DataManager(QObject *parent)
 	m_dataReader->openFile(QIQUtils::dataOutPath());
 	setupConnections();
 }
+
+void DataManager::setupConnections() { connect(m_dataReader, &DataReader::dataReady, this, &DataManager::onDataReady); }
 
 DataManager::~DataManager() {}
 
@@ -83,8 +86,6 @@ void DataManager::onInputData(QVector<QVector<double>> bufferData)
 		m_plotsData.insert(inName, bufferData[chIdx]);
 	}
 }
-
-void DataManager::setupConnections() { connect(m_dataReader, &DataReader::dataReady, this, &DataManager::onDataReady); }
 
 void DataManager::computeXTime(int samplingFreq, int samples)
 {
