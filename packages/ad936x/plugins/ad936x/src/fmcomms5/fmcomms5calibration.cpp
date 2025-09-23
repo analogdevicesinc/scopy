@@ -351,21 +351,21 @@ std::vector<MarkerResult> Fmcomms5Calibration::getMarkersFromCrossCorrelation()
 	for(int pair = 0; pair < 2; ++pair) {
 		const std::vector<double> &dataA = data[pair * 2];
 		const std::vector<double> &dataB = data[pair * 2 + 1];
-		std::vector<double> xcorr(BUFFER_SAMPLES, 0.0);
+		std::vector<double> xcorr_data(BUFFER_SAMPLES, 0.0);
 
 		for(size_t lag = 0; lag < BUFFER_SAMPLES; ++lag) {
 			double sum = 0.0;
 			for(size_t n = 0; n < BUFFER_SAMPLES - lag; ++n) {
 				sum += dataA[n] * dataB[n + lag];
 			}
-			xcorr[lag] = sum;
+			xcorr_data[lag] = sum;
 		}
 
 		// Find peak in cross-correlation
 		double max_val = 0.0;
 		size_t max_idx = 0;
 		for(size_t j = 0; j < BUFFER_SAMPLES; ++j) {
-			double val = std::abs(xcorr[j]);
+			double val = std::abs(xcorr_data[j]);
 			if(val > max_val) {
 				max_val = val;
 				max_idx = j;
