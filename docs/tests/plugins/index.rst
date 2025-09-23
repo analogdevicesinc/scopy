@@ -21,6 +21,7 @@ Contents
    jesd/index
    ad936x/index
    ad9084/index
+   fmcomms5/index
 
 ..
  add the path to each plugin test case here
