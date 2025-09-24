@@ -84,9 +84,7 @@ void TxChannel::resetToneScales()
 {
 	auto keys = m_tones.keys();
 	for(unsigned int idx : keys) {
-		if(idx > m_nbTonesMode) {
-			m_tones[idx]->updateScale("0");
-		}
+		m_tones[idx]->updateScale("0");
 	}
 }
 
