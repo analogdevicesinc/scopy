@@ -202,12 +202,12 @@ int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_i
 	for(int i = 0; i < m_nconnections; i++) {
 		for(int j = 0; j < noutput_items * m_vlen; j++) {
 			if(m_buffers[i].size() >= m_size) {
-				m_buffers[i].pop_back();
+				m_buffers[i].pop_front();
 			}
 
 			const float *in;
 			in = (const float *)input_items[i];
-			m_buffers[i].push_front(in[j]);
+			m_buffers[i].push_back(in[j]);
 		}
 	}
 
