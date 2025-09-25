@@ -21,8 +21,8 @@
 cmake_minimum_required(VERSION 3.9)
 enable_testing()
 
-project(scopy VERSION 2.1.0 LANGUAGES CXX)
-set(SCOPY_RELEASE_PHASE -rc2)
+project(scopy VERSION 2.2.0 LANGUAGES CXX)
+set(SCOPY_RELEASE_PHASE -dev)
 set(SCOPY_VERSION ${PROJECT_VERSION}${SCOPY_RELEASE_PHASE})
 
 # set CMAKE_BUILD_TYPE if not set externally
