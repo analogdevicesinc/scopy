@@ -32,6 +32,41 @@
 
 namespace scopy::extprocplugin {
 
+class DataManagerMap : public QObject
+{
+	Q_OBJECT
+public:
+	// Insert a key-value pair
+	void insert(const QString &key, const QVector<double> &value)
+	{
+		bool keyExist = map.contains(key);
+		map.insert(key, value);
+		if(!keyExist) {
+			Q_EMIT keysChanged(map.keys());
+		}
+	}
+
+	// Get a value (returns default if not found)
+	QVector<double> get(const QString &key, const QVector<double> &defaultValue = QVector<double>()) const
+	{
+		return map.value(key, defaultValue);
+	}
+
+	// Check if a key exists
+	bool contains(const QString &key) const { return map.contains(key); }
+
+	// Remove a key
+	bool remove(const QString &key) { return map.remove(key) > 0; }
+
+Q_SIGNALS:
+	void keysChanged(const QList<QString> &keys);
+
+private:
+	// Implement a frequency list to track active entries.
+	// Entries that are not updated for a certain period should be removed from DataManager.
+	QMap<QString, QVector<double>> map;
+};
+
 class DataManager : public QObject
 {
 	Q_OBJECT
@@ -52,7 +87,7 @@ public:
 
 Q_SIGNALS:
 	void dataIsReady();
-	void newDataEntries(const QStringList &entries);
+	void newDataEntries(const QList<QString> &entries);
 
 public Q_SLOTS:
 	void onInputData(QVector<QVector<double>> bufferData);
@@ -68,7 +103,7 @@ private:
 	double m_samplingFreq;
 	double m_sampleCount;
 	DataReader *m_dataReader;
-	QMap<QString, QVector<double>> m_plotsData;
+	DataManagerMap m_plotsData;
 };
 
 } // namespace scopy::extprocplugin

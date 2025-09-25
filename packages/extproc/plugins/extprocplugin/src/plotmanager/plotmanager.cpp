@@ -34,6 +34,7 @@ PlotManager::PlotManager(QObject *parent)
 	m_dataManager = new DataManager(this);
 	connect(this, &PlotManager::bufferDataReady, m_dataManager, &DataManager::onInputData);
 	connect(m_dataManager, &DataManager::dataIsReady, this, &PlotManager::updatePlots);
+	connect(m_dataManager, &DataManager::newDataEntries, this, &PlotManager::dataManagerEntries);
 }
 
 PlotManager::~PlotManager() {}

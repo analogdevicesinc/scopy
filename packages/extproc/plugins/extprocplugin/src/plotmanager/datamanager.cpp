@@ -35,7 +35,11 @@ DataManager::DataManager(QObject *parent)
 	setupConnections();
 }
 
-void DataManager::setupConnections() { connect(m_dataReader, &DataReader::dataReady, this, &DataManager::onDataReady); }
+void DataManager::setupConnections()
+{
+	connect(m_dataReader, &DataReader::dataReady, this, &DataManager::onDataReady);
+	connect(&m_plotsData, &DataManagerMap::keysChanged, this, &DataManager::newDataEntries);
+}
 
 DataManager::~DataManager() {}
 
@@ -69,7 +73,7 @@ void DataManager::readData(int64_t startSample, int64_t sampleCount)
 
 void DataManager::setSamplingFreq(int samplingFreq) { m_samplingFreq = samplingFreq; }
 
-QVector<double> DataManager::dataForKey(const QString &key) { return m_plotsData.value(key, {}); }
+QVector<double> DataManager::dataForKey(const QString &key) { return m_plotsData.get(key, {}); }
 
 void DataManager::onDataReady(QMap<QString, QVector<double>> &data)
 {
