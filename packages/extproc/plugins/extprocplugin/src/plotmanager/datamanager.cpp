@@ -65,9 +65,6 @@ void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &confi
 
 void DataManager::readData(int64_t startSample, int64_t sampleCount)
 {
-	m_sampleCount = sampleCount;
-	computeXFreq(m_samplingFreq, sampleCount);
-	computeXTime(m_samplingFreq, sampleCount);
 	m_dataReader->readData(startSample, sampleCount);
 }
 
@@ -85,9 +82,18 @@ void DataManager::onDataReady(QMap<QString, QVector<double>> &data)
 
 void DataManager::onInputData(QVector<QVector<double>> bufferData)
 {
+	int sampleCount = 0;
 	for(int chIdx = 0; chIdx < bufferData.size(); chIdx++) {
 		QString inName = DataManagerKeys::INPUT + QString::number(chIdx);
 		m_plotsData.insert(inName, bufferData[chIdx]);
+		if(sampleCount == 0) {
+			sampleCount = bufferData[chIdx].size();
+		}
+	}
+	if(sampleCount != m_sampleCount) {
+		m_sampleCount = sampleCount;
+		computeXFreq(m_samplingFreq, sampleCount);
+		computeXTime(m_samplingFreq, sampleCount);
 	}
 }
 
