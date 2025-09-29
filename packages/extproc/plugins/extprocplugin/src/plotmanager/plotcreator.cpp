@@ -212,23 +212,26 @@ void StandardPlotCreator::initPlotChnlsTab(QWidget *parent)
 {
 	m_chnlsTab = new QTabWidget(parent);
 	m_chnlsTab->setTabPosition(QTabWidget::South);
-	m_chnlsTab->setTabsClosable(true);
 	Style::setStyle(m_chnlsTab->tabBar(), style::properties::tabwidget::smallTabItem);
 
-	int iconSize = Style::getDimension(json::global::unit_0_5);
 	QPushButton *plusBtn = new QPushButton("");
 	plusBtn->setIcon(Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
 	Style::setStyle(plusBtn, style::properties::button::spinboxButton);
-	plusBtn->setIconSize(QSize(iconSize, iconSize));
+	plusBtn->setFixedSize(plusBtn->iconSize());
 	plusBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	connect(plusBtn, &QPushButton::pressed, this, &StandardPlotCreator::addPlotChannel);
 
-	m_chnlsTab->setCornerWidget(plusBtn, Qt::TopRightCorner);
+	// Create container widget for corner to ensure proper positioning
+	QWidget *cornerContainer = new QWidget();
+	QHBoxLayout *cornerLayout = new QHBoxLayout(cornerContainer);
+	cornerLayout->setMargin(0);
+	cornerLayout->addWidget(plusBtn);
+
+	m_chnlsTab->setCornerWidget(cornerContainer, Qt::TopRightCorner);
 
 	const QStringList chnls = getChnlsList();
 	updateChnlsTab();
 	connect(this, &StandardPlotCreator::plotChnlsUpdated, this, &StandardPlotCreator::updateChnlsTab);
-	connect(m_chnlsTab->tabBar(), &QTabBar::tabCloseRequested, this, &StandardPlotCreator::rmPlotChannel);
 }
 
 void StandardPlotCreator::updateChnlsTab()
@@ -242,7 +245,11 @@ void StandardPlotCreator::updateChnlsTab()
 	}
 	m_chnlsTab->clear();
 	for(int i = 0; i < chnls.size(); i++) {
-		m_chnlsTab->addTab(createTabEntryW(m_chnlsTab, i), chnls[i]);
+		int tabIndex = m_chnlsTab->addTab(createTabEntryW(m_chnlsTab, i), chnls[i]);
+		addTabCloseBtn(tabIndex);
+	}
+	if(chnls.size() < 2) {
+		enableTabCloseBtn(false);
 	}
 }
 
@@ -332,6 +339,23 @@ void StandardPlotCreator::clearPlotChannels()
 	m_plotWidget->replot();
 }
 
+void StandardPlotCreator::enableTabCloseBtn(bool en)
+{
+	for(int idx = 0; idx < m_chnlsTab->count(); idx++) {
+		m_chnlsTab->tabBar()->tabButton(idx, QTabBar::RightSide)->setVisible(en);
+	}
+}
+
+void StandardPlotCreator::addTabCloseBtn(int tabIndex)
+{
+	QPushButton *closeBtn = new QPushButton();
+	closeBtn->setIcon(QPixmap(":/gui/icons/orange_close.svg"));
+	closeBtn->setFixedSize(closeBtn->iconSize());
+	closeBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	m_chnlsTab->tabBar()->setTabButton(tabIndex, QTabBar::RightSide, closeBtn);
+	connect(closeBtn, &QPushButton::clicked, this, [this, tabIndex]() { rmPlotChannel(tabIndex); });
+}
+
 QStringList StandardPlotCreator::getChnlsList()
 {
 	QStringList plotChnls;
@@ -403,7 +427,7 @@ void StandardPlotCreator::updatePlot(const QMap<QString, QVector<double>> &data)
 void StandardPlotCreator::enableChannelAdd(bool en)
 {
 	m_chnlsTab->cornerWidget()->setVisible(en);
-	m_chnlsTab->setTabsClosable(en);
+	enableTabCloseBtn(en);
 }
 
 PlotCreatorBase *PlotCreatorFactory::createPlotCreator(const ExtProcPlotInfo &plotInfo)

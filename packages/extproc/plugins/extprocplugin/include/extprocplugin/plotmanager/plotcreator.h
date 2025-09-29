@@ -91,6 +91,8 @@ private:
 	void updatePlotChannels(const ExtProcPlotInfo &plotInfo);
 	void clearPlotChannels();
 
+	void enableTabCloseBtn(bool en);
+	void addTabCloseBtn(int tabIndex);
 	void updateChnlsTab();
 	void updateOnDmEntries(QComboBox *xCombo, QComboBox *yCombo, int chnlIdx);
 	QWidget *createTabEntryW(QTabWidget *parent, int chnlIdx);

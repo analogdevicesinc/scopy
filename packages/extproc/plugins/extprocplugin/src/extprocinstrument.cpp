@@ -45,7 +45,7 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->leftContainer()->setVisible(true);
 	tool->bottomContainer()->setVisible(true);
 
-	tool->setRightContainerWidth(260);
+	tool->setRightContainerWidth(300);
 	tool->setLeftContainerWidth(240);
 
 	m_panel = new MeasurementsPanel(tool);
