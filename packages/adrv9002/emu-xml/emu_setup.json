@@ -1,0 +1,7 @@
+[
+    {
+        "device": "adrv9002-phy",
+        "xml_path": "adrv9002.xml",
+        "uri": "ip:127.0.0.1"
+    }
+]
