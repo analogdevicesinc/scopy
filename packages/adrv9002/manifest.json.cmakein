@@ -1,0 +1,13 @@
+{
+    "id": "adrv9002",
+    "title": "ADRV9002 Package",
+    "version": "@PROJECT_VERSION@",
+    "description": "ADRV9002 device support package ported from iio-oscilloscope",
+    "license": "GPL-3.0",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio"]
+  }
+  
