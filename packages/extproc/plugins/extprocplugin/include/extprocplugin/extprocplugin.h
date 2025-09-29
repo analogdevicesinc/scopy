@@ -54,7 +54,7 @@ public Q_SLOTS:
 
 private:
 	CMDController *m_qiqController;
-	IIOManager *m_iioManager;
+	IIOManager *m_iioManager = nullptr;
 
 	const QString CLI_PROGRAM = "json_cli";
 };

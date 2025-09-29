@@ -24,6 +24,7 @@
 #include <QLoggingCategory>
 #include <QLabel>
 #include <menusectionwidget.h>
+#include <iqbinreader.h>
 #include "preferenceshelper.h"
 #include "extprocinstrument.h"
 #include <iioutil/connectionprovider.h>
@@ -96,6 +97,7 @@ void ExtProcPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("qiq_cli_path", "");
+	p->init("qiq_file_acq_path", "");
 }
 
 bool ExtProcPlugin::loadPreferencesPage()
@@ -118,6 +120,10 @@ bool ExtProcPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->addWidget(
 		PREFERENCE_FILE_BROWSER(p, "qiq_cli_path", "CLI path", "Select the external processing tool.",
 					FileBrowserWidget::OPEN_FILE, generalSection));
+
+	generalSection->contentLayout()->addWidget(PREFERENCE_FILE_BROWSER(
+		p, "qiq_file_acq_path", "Data file", "Select an iqbin file for reading the data.",
+		FileBrowserWidget::OPEN_FILE, generalSection));
 
 	return true;
 }
@@ -148,14 +154,24 @@ bool ExtProcPlugin::onConnect()
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
-	m_iioManager = new IIOManager(conn->context());
+	// test purpose
+	IQBinReader *iqBinReader = nullptr;
+	QString acqFile = Preferences::get("qiq_file_acq_path").toString();
+
+	if(!acqFile.isEmpty() && QFile::exists(acqFile)) {
+		iqBinReader = new IQBinReader();
+	} else {
+		m_iioManager = new IIOManager(conn->context());
+	}
 
 	ToolMenuEntry *tme = m_toolList[0];
 	ExtProcInstrument *extInstrument = new ExtProcInstrument(tme);
 	tme->setTool(extInstrument);
 	tme->setEnabled(true);
 	tme->setRunBtnVisible(true);
-	extInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
+	if(m_iioManager) {
+		extInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
+	}
 
 	// The format isn't necessary to be declared here
 	CommandFormat *cmdFormat = new JsonFormat();
@@ -163,10 +179,16 @@ bool ExtProcPlugin::onConnect()
 
 	// connect(m_iioManager, &IIOManager::inputFormatChanged, extInstrument,
 	// &ExtProcInstrument::onInputFormatChanged);
-	connect(m_iioManager, &IIOManager::dataReady, extInstrument, &ExtProcInstrument::bufferDataReady);
 
-	// input config
-	connect(m_iioManager, &IIOManager::inputFormatChanged, m_qiqController, &CMDController::configureInput);
+	if(m_iioManager) {
+		connect(m_iioManager, &IIOManager::dataReady, extInstrument, &ExtProcInstrument::bufferDataReady);
+		// input config
+		connect(m_iioManager, &IIOManager::inputFormatChanged, m_qiqController, &CMDController::configureInput);
+	} else {
+		connect(iqBinReader, &IQBinReader::dataReady, extInstrument, &ExtProcInstrument::bufferDataReady);
+		connect(iqBinReader, &IQBinReader::inputFormatChanged, m_qiqController, &CMDController::configureInput);
+	}
+
 	connect(m_qiqController, &CMDController::inputConfigured, extInstrument,
 		&ExtProcInstrument::onInputFormatChanged);
 	// analysis config
@@ -178,7 +200,11 @@ bool ExtProcPlugin::onConnect()
 	connect(extInstrument, &ExtProcInstrument::outputConfigured, m_qiqController, &CMDController::configureOutput);
 	connect(m_qiqController, &CMDController::outputConfigured, extInstrument, &ExtProcInstrument::onOutputConfig);
 	// run
-	connect(m_iioManager, &IIOManager::dataReady, m_qiqController, &CMDController::runAnalysis);
+	if(m_iioManager) {
+		connect(m_iioManager, &IIOManager::dataReady, m_qiqController, &CMDController::runAnalysis);
+	} else {
+		connect(iqBinReader, &IQBinReader::dataReady, m_qiqController, &CMDController::runAnalysis);
+	}
 	connect(m_qiqController, &CMDController::processDataCompleted, extInstrument,
 		&ExtProcInstrument::onRunResponse);
 	// analysis types
@@ -191,12 +217,22 @@ bool ExtProcPlugin::onConnect()
 
 	connect(m_qiqController, &CMDController::processFinished, extInstrument, &ExtProcInstrument::onProcessFinished);
 
-	connect(extInstrument, &ExtProcInstrument::bufferParamsChanged, m_iioManager,
-		&IIOManager::onBufferParamsChanged);
-	connect(extInstrument, &ExtProcInstrument::runPressed, m_iioManager, &IIOManager::startAcq);
-	connect(extInstrument, &ExtProcInstrument::requestNewData, m_iioManager, &IIOManager::onDataRequest);
-
+	if(m_iioManager) {
+		connect(extInstrument, &ExtProcInstrument::bufferParamsChanged, m_iioManager,
+			&IIOManager::onBufferParamsChanged);
+		connect(extInstrument, &ExtProcInstrument::runPressed, m_iioManager, &IIOManager::startAcq);
+		connect(extInstrument, &ExtProcInstrument::requestNewData, m_iioManager, &IIOManager::onDataRequest);
+	} else {
+		connect(extInstrument, &ExtProcInstrument::bufferParamsChanged, iqBinReader,
+			&IQBinReader::onBufferParamsChanged);
+		connect(extInstrument, &ExtProcInstrument::runPressed, iqBinReader, &IQBinReader::startAcq);
+		connect(extInstrument, &ExtProcInstrument::requestNewData, iqBinReader, &IQBinReader::onDataRequest);
+	}
 	m_qiqController->getAnalysisTypes();
+	if(iqBinReader) {
+		connect(m_qiqController, &CMDController::analysisInfo, this,
+			[iqBinReader, acqFile]() { iqBinReader->openFile(acqFile); });
+	}
 
 	return true;
 }
@@ -216,8 +252,8 @@ bool ExtProcPlugin::onDisconnect()
 		}
 	}
 
-	m_iioManager->deleteLater();
-	m_iioManager = nullptr;
+	// m_iioManager->deleteLater();
+	// m_iioManager = nullptr;
 
 	ConnectionProvider::GetInstance()->close(m_param);
 
