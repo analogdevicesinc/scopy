@@ -81,6 +81,7 @@ OMIT_FILES_LIST=(
     \*.user
     ad9084\*.txt
     \*/cjson/cJSON.\*
+    \*.stream
 )
 OMIT_FILES_LIST=("${OMIT_FILES_LIST[@]/#/*\/}")
 GITINORE_FILES_LIST=(

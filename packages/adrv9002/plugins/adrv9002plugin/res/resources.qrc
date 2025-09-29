@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/adrv9002">
+        <file>../resources/adrv9002-profiles/lte_5_cmos_api_68_16_2.json</file>
+        <file>../resources/adrv9002-profiles/lte_5_cmos_api_68_16_2.stream</file>
+        <file>../resources/adrv9002-profiles/lte_10_lvds_nco_api_68_16_2.json</file>
+        <file>../resources/adrv9002-profiles/lte_10_lvds_nco_api_68_16_2.stream</file>
+        <file>../resources/adrv9002-profiles/lte_20_lvds_api_68_16_2.json</file>
+        <file>../resources/adrv9002-profiles/lte_20_lvds_api_68_16_2.stream</file>
+        <file>../resources/adrv9002-profiles/lte_40_lvds_api_68_16_2.json</file>
+        <file>../resources/adrv9002-profiles/lte_40_lvds_api_68_16_2.stream</file>
+    </qresource>
+</RCC>
