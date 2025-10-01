@@ -58,6 +58,7 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, M
 		m_measurementPanelInterface->enableMeasurementPanel(m_measureSettings->measurementEnabled() && b);
 		m_measurementPanelInterface->enableStatsPanel(m_measureSettings->statsEnabled() && b);
 		m_measurementPanelInterface->enableMarkerPanel(m_measureSettings->markerEnabled() && b);
+		m_measurementPanelInterface->enableGenalyzerPanel(m_measureSettings->genalyzerEnabled() && b);
 	});
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
@@ -70,6 +71,8 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, M
 		SLOT(enableStatsPanel(bool)));
 	connect(m_measureSettings, SIGNAL(enableMarkerPanel(bool)), dynamic_cast<QObject *>(p),
 		SLOT(enableMarkerPanel(bool)));
+	connect(m_measureSettings, SIGNAL(enableGenalyzerPanel(bool)), dynamic_cast<QObject *>(p),
+		SLOT(enableGenalyzerPanel(bool)));
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 }
