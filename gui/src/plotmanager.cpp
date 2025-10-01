@@ -30,24 +30,39 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	, MetaComponent()
 	, m_plotIdx(0)
 {
-	m_lay = new QVBoxLayout(this);
+	// Main horizontal layout to position genalyzer panel to the right
+	QHBoxLayout *mainLayout = new QHBoxLayout(this);
+	mainLayout->setMargin(0);
+	mainLayout->setSpacing(6);
+
+	// Left side: plots and panels (vertical layout)
+	QWidget *leftWidget = new QWidget(this);
+	m_lay = new QVBoxLayout(leftWidget);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
 
-	m_measurePanel = new MeasurementsPanel(this);
+	m_measurePanel = new MeasurementsPanel(leftWidget);
 	m_measurePanel->setFixedHeight(110);
 	m_measurePanel->setVisible(false);
 
-	m_statsPanel = new StatsPanel(this);
+	m_statsPanel = new StatsPanel(leftWidget);
 	m_statsPanel->setFixedHeight(100);
 	m_statsPanel->setVisible(false);
 
-	m_markerPanel = new MarkerPanel(this);
+	m_markerPanel = new MarkerPanel(leftWidget);
 	m_markerPanel->setVisible(false);
 
 	m_lay->addWidget(m_measurePanel);
 	m_lay->addWidget(m_statsPanel);
 	m_lay->addWidget(m_markerPanel);
+
+	// Right side: genalyzer panel
+	m_genalyzerPanel = new GenalyzerPanel(this);
+	m_genalyzerPanel->setVisible(false);
+
+	// Add to main horizontal layout
+	mainLayout->addWidget(leftWidget, 1); // Give plots area more space
+	mainLayout->addWidget(m_genalyzerPanel, 0); // Fixed width panel
 }
 
 PlotManager::~PlotManager() {}
@@ -57,6 +72,8 @@ void PlotManager::enableMeasurementPanel(bool b) { m_measurePanel->setVisible(b)
 void PlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
 
 void PlotManager::enableMarkerPanel(bool b) { m_markerPanel->setVisible(b); }
+
+void PlotManager::enableGenalyzerPanel(bool b) { m_genalyzerPanel->setVisible(b); }
 
 void PlotManager::setXInterval(double xMin, double xMax)
 {
@@ -89,6 +106,8 @@ MeasurementsPanel *PlotManager::measurePanel() const { return m_measurePanel; }
 StatsPanel *PlotManager::statsPanel() const { return m_statsPanel; }
 
 MarkerPanel *PlotManager::markerPanel() const { return m_markerPanel; }
+
+GenalyzerPanel *PlotManager::genalyzerPanel() const { return m_genalyzerPanel; }
 
 QWidget *PlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
 

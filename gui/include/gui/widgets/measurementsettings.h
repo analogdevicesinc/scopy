@@ -46,12 +46,15 @@ public:
 	bool measurementEnabled();
 	bool statsEnabled();
 	bool markerEnabled();
+	bool genalyzerEnabled();
 
 	MenuSectionWidget *getMarkerSection() const;
 
 	MenuSectionWidget *getStatsSection() const;
 
 	MenuSectionWidget *getMeasureSection() const;
+
+	MenuSectionWidget *getGenalyzerSection() const;
 
 Q_SIGNALS:
 	void toggleAllMeasurements(bool);
@@ -61,15 +64,18 @@ Q_SIGNALS:
 	void enableMeasurementPanel(bool b);
 	void enableStatsPanel(bool b);
 	void enableMarkerPanel(bool b);
+	void enableGenalyzerPanel(bool b);
 
 private:
 	MenuOnOffSwitch *measurePanelSwitch;
 	MenuOnOffSwitch *statsPanelSwitch;
 	MenuOnOffSwitch *markerPanelSwitch;
+	MenuOnOffSwitch *genalyzerPanelSwitch;
 
 	MenuSectionWidget *markerSection;
 	MenuSectionWidget *statsSection;
 	MenuSectionWidget *measureSection;
+	MenuSectionWidget *genalyzerSection;
 };
 } // namespace scopy
 

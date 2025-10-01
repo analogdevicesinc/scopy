@@ -43,6 +43,7 @@ public:
 	virtual void removePlot(uint32_t uuid) override;
 	FFTPlotComponent *plot(uint32_t uuid);
 	void enableMeasurementPanel(bool) override;
+	void enableGenalyzerPanel(bool) override;
 
 private:
 	PlotComponent *m_primary;
