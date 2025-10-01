@@ -1,0 +1,422 @@
+/*
+ * Copyright (c) 2025 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include <profileclimanager.h>
+
+Q_LOGGING_CATEGORY(CAT_PROFILECLIMANAGER, "ProfileCliManager")
+
+using namespace scopy::adrv9002;
+
+// Static constants
+const QString ProfileCliManager::CLI_NAME = "adrv9002-iio-cli";
+const int ProfileCliManager::CLI_TIMEOUT_MS = 30000; // 30 seconds
+
+ProfileCliManager::ProfileCliManager(iio_device *device, QObject *parent)
+	: QObject(parent)
+	, m_device(device)
+	, m_cliAvailable(false)
+	, m_cliPath("")
+	, m_cliVersion("unknown")
+{
+	// Detect CLI availability on construction
+	m_cliAvailable = detectCli();
+
+	if(m_cliAvailable) {
+		qInfo(CAT_PROFILECLIMANAGER)
+			<< "Profile Generator CLI detected:" << m_cliPath << "Version:" << m_cliVersion;
+	} else {
+		qWarning(CAT_PROFILECLIMANAGER) << "Profile Generator CLI not available";
+	}
+}
+
+ProfileCliManager::~ProfileCliManager() = default;
+
+bool ProfileCliManager::isCliAvailable() const { return m_cliAvailable; }
+
+QString ProfileCliManager::getCliVersion() const { return m_cliVersion; }
+
+QString ProfileCliManager::getCliPath() const { return m_cliPath; }
+
+// CLI Detection (based on iio-oscilloscope profile_gen_cli_get_cmd)
+bool ProfileCliManager::detectCli()
+{
+	// Search for CLI tool in common locations
+	QStringList searchPaths = {"/usr/bin/", "/usr/local/bin/", "/opt/analog/bin/",
+				   QCoreApplication::applicationDirPath() + "/", QDir::homePath() + "/.local/bin/"};
+
+	for(const QString &path : searchPaths) {
+		QString fullPath = path + CLI_NAME;
+		if(QFile::exists(fullPath) && QFileInfo(fullPath).isExecutable()) {
+			m_cliPath = fullPath;
+			return validateCliVersion();
+		}
+	}
+
+	// Also check PATH environment variable (like iio-oscilloscope)
+	QProcess process;
+	process.start("which", QStringList() << CLI_NAME);
+	process.waitForFinished(3000);
+	if(process.exitCode() == 0) {
+		m_cliPath = process.readAllStandardOutput().trimmed();
+		return validateCliVersion();
+	}
+
+	return false;
+}
+
+bool ProfileCliManager::validateCliVersion()
+{
+	QProcess process;
+	process.start(m_cliPath, QStringList() << "--version");
+	process.waitForFinished(5000);
+
+	if(process.exitCode() != 0) {
+		// Try alternative version check
+		process.start(m_cliPath, QStringList() << "-v");
+		process.waitForFinished(5000);
+		if(process.exitCode() != 0) {
+			return false;
+		}
+	}
+
+	m_cliVersion = process.readAllStandardOutput().trimmed();
+	if(m_cliVersion.isEmpty()) {
+		m_cliVersion = "unknown";
+	}
+
+	return true;
+}
+
+// Profile Operations
+ProfileCliManager::OperationResult ProfileCliManager::saveProfileToFile(const QString &filename,
+									const RadioConfig &config)
+{
+	if(!m_cliAvailable) {
+		Q_EMIT operationError("Profile Generator CLI not available");
+		return CliNotAvailable;
+	}
+
+	// Create temporary config file
+	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+	QString configFile = tempDir + "/adrv9002_config.json";
+
+	if(!writeConfigToTempFile(configFile, config)) {
+		Q_EMIT operationError("Failed to write configuration file");
+		return ConfigGenerationFailed;
+	}
+
+	// Execute CLI command (following iio-oscilloscope pattern)
+	QStringList arguments;
+	arguments << "--config" << configFile << "--profile" << filename;
+
+	QString output, errorOutput;
+	bool success = executeCli(arguments, output, errorOutput);
+
+	// Cleanup temp file
+	cleanupTempFiles(QStringList() << configFile);
+
+	if(!success) {
+		Q_EMIT operationError(QString("CLI execution failed: %1").arg(errorOutput));
+		return CliExecutionFailed;
+	}
+
+	Q_EMIT operationProgress("Profile saved successfully");
+	return Success;
+}
+
+ProfileCliManager::OperationResult ProfileCliManager::saveStreamToFile(const QString &filename,
+								       const RadioConfig &config)
+{
+	if(!m_cliAvailable) {
+		Q_EMIT operationError("Profile Generator CLI not available");
+		return CliNotAvailable;
+	}
+
+	// Create temporary config file
+	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+	QString configFile = tempDir + "/adrv9002_config.json";
+
+	if(!writeConfigToTempFile(configFile, config)) {
+		Q_EMIT operationError("Failed to write configuration file");
+		return ConfigGenerationFailed;
+	}
+
+	// Execute CLI command for stream image
+	QStringList arguments;
+	arguments << "--config" << configFile << "--stream" << filename;
+
+	QString output, errorOutput;
+	bool success = executeCli(arguments, output, errorOutput);
+
+	// Cleanup temp file
+	cleanupTempFiles(QStringList() << configFile);
+
+	if(!success) {
+		Q_EMIT operationError(QString("CLI execution failed: %1").arg(errorOutput));
+		return CliExecutionFailed;
+	}
+
+	Q_EMIT operationProgress("Stream image saved successfully");
+	return Success;
+}
+
+ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
+{
+	if(!m_cliAvailable) {
+		Q_EMIT operationError("Profile Generator CLI not available");
+		return CliNotAvailable;
+	}
+
+	// Create temporary files (following iio-oscilloscope pattern exactly)
+	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+	QString configFile = tempDir + "/adrv9002_config.json";
+	QString profileFile = tempDir + "/adrv9002_profile.json";
+	QString streamFile = tempDir + "/adrv9002_stream.json";
+
+	QStringList tempFiles = {configFile, profileFile, streamFile};
+
+	// Write config to temp file
+	if(!writeConfigToTempFile(configFile, config)) {
+		Q_EMIT operationError("Failed to write configuration file");
+		cleanupTempFiles(tempFiles);
+		return ConfigGenerationFailed;
+	}
+
+	Q_EMIT operationProgress("Generating profile and stream files...");
+
+	// Execute CLI command to generate both profile and stream
+	QStringList arguments;
+	arguments << "--config" << configFile << "--profile" << profileFile << "--stream" << streamFile;
+
+	QString output, errorOutput;
+	bool success = executeCli(arguments, output, errorOutput);
+
+	if(!success) {
+		Q_EMIT operationError(QString("CLI execution failed: %1").arg(errorOutput));
+		cleanupTempFiles(tempFiles);
+		return CliExecutionFailed;
+	}
+
+	Q_EMIT operationProgress("Loading profile to device...");
+
+	// Read generated profile file
+	QByteArray profileData = readFileContents(profileFile);
+	if(profileData.isEmpty()) {
+		Q_EMIT operationError("Failed to read generated profile file");
+		cleanupTempFiles(tempFiles);
+		return FileOperationFailed;
+	}
+
+	// Write profile to device
+	if(!writeDeviceAttribute("profile_config", profileData)) {
+		Q_EMIT operationError("Failed to write profile to device");
+		cleanupTempFiles(tempFiles);
+		return DeviceWriteFailed;
+	}
+
+	Q_EMIT operationProgress("Loading stream image to device...");
+
+	// Read generated stream file
+	QByteArray streamData = readFileContents(streamFile);
+	if(streamData.isEmpty()) {
+		Q_EMIT operationError("Failed to read generated stream image file");
+		cleanupTempFiles(tempFiles);
+		return FileOperationFailed;
+	}
+
+	// Write stream to device
+	if(!writeDeviceAttribute("stream_config", streamData)) {
+		Q_EMIT operationError("Failed to write stream image to device");
+		cleanupTempFiles(tempFiles);
+		return DeviceWriteFailed;
+	}
+
+	// Cleanup temp files
+	cleanupTempFiles(tempFiles);
+
+	Q_EMIT operationProgress("Profile and stream loaded to device successfully");
+	return Success;
+}
+
+// Config JSON Generation (simple format for CLI input)
+QString ProfileCliManager::generateConfigPreview(const RadioConfig &config) { return createConfigJson(config); }
+
+QString ProfileCliManager::createConfigJson(const RadioConfig &config)
+{
+	QJsonObject configJson;
+
+	// Radio configuration (matching iio-oscilloscope format)
+	QJsonObject radioCfg;
+	radioCfg["ssi_lanes"] = static_cast<int>(config.ssi_lanes);
+	radioCfg["ddr"] = 1; // Always enabled
+	radioCfg["short_strobe"] = true;
+	radioCfg["lvds"] = config.lvds;
+	radioCfg["adc_rate_mode"] = 3; // High performance
+	radioCfg["fdd"] = config.fdd;
+
+	// RX configuration array
+	QJsonArray rxConfigArray;
+	for(int i = 0; i < 2; i++) {
+		QJsonObject rxCh;
+		rxCh["enabled"] = config.rx_config[i].enabled;
+		rxCh["adc_high_performance_mode"] = true;
+		rxCh["frequency_offset_correction_enable"] = config.rx_config[i].freqOffsetCorrection;
+		rxCh["analog_filter_power_mode"] = 2; // High power
+		rxCh["analog_filter_biquad"] = false;
+		rxCh["analog_filter_bandwidth_hz"] = 0;
+		rxCh["channel_bandwidth_hz"] = config.rx_config[i].bandwidth.toInt();
+		rxCh["sample_rate_hz"] = config.rx_config[i].sampleRate.toInt();
+		rxCh["nco_enable"] = false;
+		rxCh["nco_frequency_hz"] = 0;
+
+		// Map RF input to port number
+		int rfPort = 0;
+		if(config.rx_config[i].rfInput == "Rx1A" || config.rx_config[i].rfInput == "Rx2A") {
+			rfPort = 0;
+		} else {
+			rfPort = 1;
+		}
+		rxCh["rf_port"] = rfPort;
+
+		rxConfigArray.append(rxCh);
+	}
+	radioCfg["rx_config"] = rxConfigArray;
+
+	// TX configuration array
+	QJsonArray txConfigArray;
+	for(int i = 0; i < 2; i++) {
+		QJsonObject txCh;
+		txCh["enabled"] = config.tx_config[i].enabled;
+		txCh["sample_rate_hz"] = config.tx_config[i].sampleRate.toInt();
+		txCh["frequency_offset_correction_enable"] = config.tx_config[i].freqOffsetCorrection;
+		txCh["analog_filter_power_mode"] = 2; // High power
+		txCh["channel_bandwidth_hz"] = config.tx_config[i].bandwidth.toInt();
+		txCh["orx_enabled"] = config.orx_enabled[i];
+		txCh["elb_type"] = 2; // Default value
+
+		txConfigArray.append(txCh);
+	}
+	radioCfg["tx_config"] = txConfigArray;
+
+	configJson["radio_cfg"] = radioCfg;
+
+	// Clock configuration (matching iio-oscilloscope format)
+	QJsonObject clkCfg;
+	clkCfg["device_clock_frequency_khz"] = 38400;
+	clkCfg["device_clock_output_enable"] = 0; // Default disabled
+	clkCfg["device_clock_output_divider"] = 1;
+	clkCfg["clock_pll_high_performance_enable"] = true;
+	clkCfg["clock_pll_power_mode"] = 2; // High power
+	clkCfg["processor_clock_divider"] = 1;
+
+	configJson["clk_cfg"] = clkCfg;
+
+	QJsonDocument doc(configJson);
+	return doc.toJson(QJsonDocument::Compact);
+}
+
+bool ProfileCliManager::writeConfigToTempFile(const QString &filename, const RadioConfig &config)
+{
+	QString jsonConfig = createConfigJson(config);
+
+	QFile file(filename);
+	if(!file.open(QIODevice::WriteOnly)) {
+		qWarning(CAT_PROFILECLIMANAGER) << "Failed to write config file:" << filename;
+		return false;
+	}
+
+	file.write(jsonConfig.toUtf8());
+	file.close();
+
+	qDebug(CAT_PROFILECLIMANAGER) << "Config written to:" << filename;
+	return true;
+}
+
+// CLI Execution
+bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output, QString &errorOutput)
+{
+	QProcess process;
+	process.start(m_cliPath, arguments);
+
+	if(!process.waitForFinished(CLI_TIMEOUT_MS)) {
+		errorOutput = "CLI execution timeout";
+		return false;
+	}
+
+	output = process.readAllStandardOutput();
+	errorOutput = process.readAllStandardError();
+
+	if(process.exitCode() != 0) {
+		qWarning(CAT_PROFILECLIMANAGER)
+			<< "CLI command failed with exit code:" << process.exitCode() << "Error:" << errorOutput;
+		return false;
+	}
+
+	qDebug(CAT_PROFILECLIMANAGER) << "CLI command executed successfully";
+	return true;
+}
+
+// File Operations
+QByteArray ProfileCliManager::readFileContents(const QString &filename)
+{
+	QFile file(filename);
+	if(!file.open(QIODevice::ReadOnly)) {
+		qWarning(CAT_PROFILECLIMANAGER) << "Failed to read file:" << filename;
+		return QByteArray();
+	}
+
+	QByteArray data = file.readAll();
+	file.close();
+
+	qDebug(CAT_PROFILECLIMANAGER) << "Read" << data.size() << "bytes from:" << filename;
+	return data;
+}
+
+bool ProfileCliManager::writeDeviceAttribute(const QString &attribute, const QByteArray &data)
+{
+	if(!m_device) {
+		qWarning(CAT_PROFILECLIMANAGER) << "No device available for writing attribute:" << attribute;
+		return false;
+	}
+
+	int ret = iio_device_attr_write_raw(m_device, attribute.toLocal8Bit().data(), data.constData(), data.size());
+
+	if(ret > 0) {
+		qDebug(CAT_PROFILECLIMANAGER)
+			<< "Successfully wrote" << data.size() << "bytes to attribute:" << attribute;
+		return true;
+	} else {
+		qWarning(CAT_PROFILECLIMANAGER)
+			<< "Failed to write attribute:" << attribute << "expected:" << data.size() << "written:" << ret;
+		return false;
+	}
+}
+
+void ProfileCliManager::cleanupTempFiles(const QStringList &files)
+{
+	for(const QString &file : files) {
+		if(QFile::exists(file)) {
+			QFile::remove(file);
+			qDebug(CAT_PROFILECLIMANAGER) << "Cleaned up temp file:" << file;
+		}
+	}
+}
+
+#include "moc_profileclimanager.cpp"

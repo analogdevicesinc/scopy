@@ -159,13 +159,13 @@ QWidget *ProfileManager::createDeviceInfoPanel()
 
 QString ProfileManager::getAttributeValue(const QString &attributeName)
 {
-	if (!m_device) return "Device not available";
+	if(!m_device)
+		return "Device not available";
 
-	char buffer[8192];  // Large buffer for profile_config
-	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(),
-	                              buffer, sizeof(buffer));
+	char buffer[8192]; // Large buffer for profile_config
+	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(), buffer, sizeof(buffer));
 
-	if (ret < 0) {
+	if(ret < 0) {
 		return QString("Error reading %1: %2").arg(attributeName).arg(ret);
 	}
 
@@ -176,14 +176,13 @@ void ProfileManager::updateDeviceInfo()
 {
 	QString profileConfig = getAttributeValue("profile_config");
 
-	if (profileConfig.startsWith("Error") || profileConfig.startsWith("Device not")) {
+	if(profileConfig.startsWith("Error") || profileConfig.startsWith("Device not")) {
 		m_deviceInfoText->setPlainText("Device information unavailable:\n" + profileConfig);
 	} else {
 		// Display the profile_config content directly (like iio-oscilloscope)
 		m_deviceInfoText->setPlainText(profileConfig);
 	}
 }
-
 
 void ProfileManager::refreshStatus() { updateStatus(); }
 
@@ -416,14 +415,12 @@ bool ProfileManager::writeDeviceAttribute(const QString &attributeName, const QB
 
 	if(ret < 0) {
 		// Negative return value indicates an error
-		qWarning(CAT_PROFILEMANAGER) << "Failed to write attribute:" << attributeName
-					     << "error code:" << ret;
+		qWarning(CAT_PROFILEMANAGER) << "Failed to write attribute:" << attributeName << "error code:" << ret;
 		return false;
 	} else {
 		// Positive return value indicates success (bytes written)
-		qDebug(CAT_PROFILEMANAGER)
-			<< "Successfully wrote" << ret << "bytes to attribute:" << attributeName
-			<< "(expected:" << data.size() << ")";
+		qDebug(CAT_PROFILEMANAGER) << "Successfully wrote" << ret << "bytes to attribute:" << attributeName
+					   << "(expected:" << data.size() << ")";
 		return true;
 	}
 }
