@@ -32,14 +32,28 @@
 
 namespace scopy::extprocplugin {
 
+/**
+ * @brief Union hack to access and modify internal iio_buffer structure
+ *
+ * This union allows us to bypass the opaque iio_buffer API and directly
+ * manipulate the internal buffer pointer. This is necessary to redirect
+ * IIO buffer data to memory-mapped files for efficient streaming and logging.
+ *
+ * WARNING: This hack depends on the internal layout of iio_buffer remaining
+ * stable. It assumes the buffer structure contains:
+ * - iio_device pointer at offset 0
+ * - void* buffer pointer at offset sizeof(void*)
+ *
+ * The padding ensures proper alignment for the structure overlay.
+ */
 union iio_buffer_hack
 {
-	struct iio_buffer *buffer;
+	struct iio_buffer *buffer; // Standard IIO buffer pointer
 	struct
 	{
-		const struct iio_device *dev;
-		void *buffer;
-		char padding[40];
+		const struct iio_device *dev; // Device pointer (first field)
+		void *buffer;		      // Internal buffer pointer we want to modify
+		char padding[40];	      // Padding to match internal structure size
 	} * fields;
 };
 
