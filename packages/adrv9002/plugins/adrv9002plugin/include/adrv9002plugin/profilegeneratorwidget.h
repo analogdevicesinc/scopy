@@ -46,6 +46,7 @@
 #include <QUrl>
 #include <iio.h>
 #include <pluginbase/statusbarmanager.h>
+#include <iiowidget.h>
 #include <style.h>
 
 namespace scopy::adrv9002 {
@@ -65,6 +66,58 @@ struct ChannelConfig
 	QString bandwidth;
 	QString sampleRate;
 	QString rfInput; // For RX only
+};
+
+// Frequency table from iio-oscilloscope (exact Hz values)
+class FrequencyTable
+{
+public:
+	// Sample rates in Hz (from freq_table[0])
+	static const QStringList SAMPLE_RATES_HZ;
+	// Corresponding bandwidths in Hz (from freq_table[1])
+	static const QStringList BANDWIDTHS_HZ;
+
+	// Helper functions
+	static int getIndexOfSampleRate(const QString &sampleRate);
+	static QString getBandwidthForSampleRate(const QString &sampleRate);
+	static QStringList getSampleRatesForSSILanes(int ssiLanes);
+};
+
+// RF Input options (descriptive names from screenshots)
+class RFInputOptions
+{
+public:
+	static const QStringList RX1_OPTIONS;
+	static const QStringList RX2_OPTIONS;
+};
+
+// LTE defaults from lte_defaults() function
+struct LTEDefaults
+{
+	// Channel defaults (Hz values)
+	static const int SAMPLE_RATE_HZ;
+	static const int BANDWIDTH_HZ;
+	static const bool ENABLED;
+	static const bool FREQ_OFFSET_CORRECTION;
+	static const int RF_PORT;
+
+	// Radio defaults
+	static const QString SSI_INTERFACE;
+	static const QString DUPLEX_MODE;
+	static const int SSI_LANES;
+
+	// Clock defaults
+	static const int DEVICE_CLOCK_FREQUENCY_KHZ;
+	static const bool DEVICE_CLOCK_OUTPUT_ENABLE;
+	static const int DEVICE_CLOCK_OUTPUT_DIVIDER;
+};
+
+// Interface options
+class IOOOptions
+{
+public:
+	static const QStringList SSI_INTERFACE_OPTIONS;
+	static const QStringList DUPLEX_MODE_OPTIONS;
 };
 
 struct OrxConfig
@@ -106,6 +159,12 @@ private Q_SLOTS:
 	void updateProfileData();
 	void onDownloadCLI();
 
+	// Signal dependency handlers
+	void onTxEnableChanged();
+	void onTddModeChanged();
+	void onInterfaceChanged();
+	void onChannelEnableChanged();
+
 private:
 	// UI Creation Methods
 	void setupUi();
@@ -131,6 +190,35 @@ private:
 	void setupConnections();
 	void updateConfigFromUI();
 	void updateUIFromConfig();
+
+	// Preset Management
+	void applyLTEDefaults();
+	bool validateConfiguration();
+
+	// Channel Config Components structure
+	struct ChannelWidgets
+	{
+		QCheckBox *enabledCb;
+		QCheckBox *freqOffsetCb;
+		QComboBox *bandwidthCombo;
+		QComboBox *sampleRateCombo;
+		QComboBox *rfInputCombo; // Only for RX
+	};
+
+	// Signal Dependencies
+	void updateOrxVisibility();
+	void updateChannelControlsVisibility();
+	void updateOrxControlsState();
+	bool getTxChannelEnabled(int channel);
+	bool getTddModeEnabled();
+
+	// Channel control helpers
+	ChannelWidgets* getChannelWidgets(ChannelType channel);
+	bool getChannelEnabled(ChannelType channel);
+	void setChannelControlsEnabled(ChannelType channel, bool enabled);
+
+	// Frequency table helpers
+	void onSampleRateChanged(ChannelType channel);
 
 	// Profile Operations (require CLI)
 	bool generateProfile();
@@ -171,15 +259,6 @@ private:
 	QComboBox *m_duplexModeCombo;
 
 	// Channel Config Components (RX1, RX2, TX1, TX2)
-	struct ChannelWidgets
-	{
-		QCheckBox *enabledCb;
-		QCheckBox *freqOffsetCb;
-		QComboBox *bandwidthCombo;
-		QComboBox *sampleRateCombo;
-		QComboBox *rfInputCombo; // Only for RX
-	};
-
 	ChannelWidgets m_rx1Widgets;
 	ChannelWidgets m_rx2Widgets;
 	ChannelWidgets m_tx1Widgets;
@@ -195,6 +274,10 @@ private:
 	// Current file paths
 	QString m_currentProfilePath;
 	QString m_currentStreamPath;
+
+	// State management
+	QString m_lastAppliedPreset;
+	bool m_updatingFromPreset;
 };
 
 } // namespace scopy::adrv9002

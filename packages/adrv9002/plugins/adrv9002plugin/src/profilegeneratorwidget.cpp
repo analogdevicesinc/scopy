@@ -30,12 +30,84 @@ Q_LOGGING_CATEGORY(CAT_PROFILEGENERATORWIDGET, "ProfileGeneratorWidget")
 using namespace scopy::adrv9002;
 using namespace scopy;
 
+// Frequency table from iio-oscilloscope (exact Hz values)
+const QStringList FrequencyTable::SAMPLE_RATES_HZ = {
+	"1920000", "3840000", "7680000", "15360000", "30720000", "61440000"
+};
+
+const QStringList FrequencyTable::BANDWIDTHS_HZ = {
+	"1008000", "2700000", "4500000", "9000000", "18000000", "38000000"
+};
+
+// RF Input options (descriptive names from screenshots)
+const QStringList RFInputOptions::RX1_OPTIONS = {
+        "Rx1A", "Rx1B"
+};
+
+const QStringList RFInputOptions::RX2_OPTIONS = {
+        "Rx2A", "Rx2B"
+};
+
+// LTE defaults from lte_defaults() function (exact values)
+const int LTEDefaults::SAMPLE_RATE_HZ = 61440000;
+const int LTEDefaults::BANDWIDTH_HZ = 38000000;
+const bool LTEDefaults::ENABLED = true;
+const bool LTEDefaults::FREQ_OFFSET_CORRECTION = false;
+const int LTEDefaults::RF_PORT = 0; // Maps to Rx1A/Rx2A
+
+const QString LTEDefaults::SSI_INTERFACE = "LVDS";
+const QString LTEDefaults::DUPLEX_MODE = "TDD";
+const int LTEDefaults::SSI_LANES = 2;
+
+const int LTEDefaults::DEVICE_CLOCK_FREQUENCY_KHZ = 38400;
+const bool LTEDefaults::DEVICE_CLOCK_OUTPUT_ENABLE = true;
+const int LTEDefaults::DEVICE_CLOCK_OUTPUT_DIVIDER = 2;
+
+// Interface options
+const QStringList IOOOptions::SSI_INTERFACE_OPTIONS = {
+	"CMOS", "LVDS"
+};
+
+const QStringList IOOOptions::DUPLEX_MODE_OPTIONS = {
+	"TDD", "FDD"
+};
+
+// Frequency table helper functions
+int FrequencyTable::getIndexOfSampleRate(const QString &sampleRate)
+{
+	return SAMPLE_RATES_HZ.indexOf(sampleRate);
+}
+
+QString FrequencyTable::getBandwidthForSampleRate(const QString &sampleRate)
+{
+	int index = getIndexOfSampleRate(sampleRate);
+	if (index >= 0 && index < BANDWIDTHS_HZ.size()) {
+		return BANDWIDTHS_HZ[index];
+	}
+	return "38000000"; // Default fallback
+}
+
+QStringList FrequencyTable::getSampleRatesForSSILanes(int ssiLanes)
+{
+	// Based on iio-oscilloscope logic in profile_gen_config_set_LTE()
+	if (ssiLanes == 1) {
+		return QStringList(); // No options for 1 lane
+	} else if (ssiLanes == 2) {
+		return SAMPLE_RATES_HZ; // All 6 options for 2 lanes (LVDS)
+	} else if (ssiLanes == 4) {
+		return QStringList() << SAMPLE_RATES_HZ.first(); // Only first option for 4 lanes (CMOS)
+	}
+	return SAMPLE_RATES_HZ; // Default to all options
+}
+
 ProfileGeneratorWidget::ProfileGeneratorWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_cliAvailable(false)
 	, m_statusLabel(nullptr)
 	, m_contentWidget(nullptr)
+	, m_lastAppliedPreset("")
+	, m_updatingFromPreset(false)
 {
 	setupUi();
 }
@@ -80,6 +152,9 @@ void ProfileGeneratorWidget::setupUi()
 		setupConnections();
 		// Initialize with default LTE preset
 		loadPresetData("LTE");
+		// Initialize control states
+		updateChannelControlsVisibility();
+		updateOrxControlsState();
 	}
 }
 
@@ -202,7 +277,7 @@ QWidget *ProfileGeneratorWidget::createProfileActionBar()
 	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
 	layout->setSpacing(15);
 
-	// Preset dropdown with styling
+	// Preset dropdown with styling - matching iio-oscilloscope exactly
 	QLabel *presetLabel = new QLabel("Preset:");
 	Style::setStyle(presetLabel, style::properties::label::menuSmall);
 
@@ -225,7 +300,7 @@ QWidget *ProfileGeneratorWidget::createProfileActionBar()
 	m_saveToFileBtn->setMinimumWidth(120);
 	m_loadToDeviceBtn->setMinimumWidth(130);
 
-	// Layout with proper spacing
+	// Layout with proper spacing - matching iio-oscilloscope exactly
 	layout->addWidget(presetLabel);
 	layout->addWidget(m_presetCombo);
 	layout->addWidget(m_refreshProfileBtn);
@@ -252,16 +327,16 @@ QWidget *ProfileGeneratorWidget::createRadioConfigSection()
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title, 0, 0, 1, 4);
 
-	// SSI Interface
+	// SSI Interface - using correct IOO options
 	layout->addWidget(new QLabel("SSI Interface:"), 1, 0);
 	m_ssiInterfaceCombo = new QComboBox();
-	m_ssiInterfaceCombo->addItems({"LVDS", "CMOS"});
+	m_ssiInterfaceCombo->addItems(IOOOptions::SSI_INTERFACE_OPTIONS);
 	layout->addWidget(m_ssiInterfaceCombo, 1, 1);
 
-	// Duplex mode
+	// Duplex mode - using correct IOO options
 	layout->addWidget(new QLabel("Duplex mode:"), 1, 2);
 	m_duplexModeCombo = new QComboBox();
-	m_duplexModeCombo->addItems({"TDD", "FDD"});
+	m_duplexModeCombo->addItems(IOOOptions::DUPLEX_MODE_OPTIONS);
 	layout->addWidget(m_duplexModeCombo, 1, 3);
 
 	return section;
@@ -328,25 +403,27 @@ QWidget *ProfileGeneratorWidget::createChannelConfigWidget(const QString &title,
 	widgets->freqOffsetCb = new QCheckBox("Frequency Offset Correction");
 	layout->addWidget(widgets->freqOffsetCb, 2, 0, 1, 2);
 
-	// Bandwidth
+	// Bandwidth (Hz) - matching iio-oscilloscope exactly
 	layout->addWidget(new QLabel("Bandwidth (Hz):"), 3, 0);
 	widgets->bandwidthCombo = new QComboBox();
-	widgets->bandwidthCombo->addItems({"38000000", "76000000", "100000000"});
+	widgets->bandwidthCombo->addItems(FrequencyTable::BANDWIDTHS_HZ);
 	layout->addWidget(widgets->bandwidthCombo, 3, 1);
 
-	// Interface Sample Rate
+	// Interface Sample Rate (Hz) - matching iio-oscilloscope exactly
 	layout->addWidget(new QLabel("Interface Sample Rate (Hz):"), 4, 0);
 	widgets->sampleRateCombo = new QComboBox();
-	widgets->sampleRateCombo->addItems({"61440000", "122880000", "245760000"});
+	widgets->sampleRateCombo->addItems(FrequencyTable::SAMPLE_RATES_HZ);
 	layout->addWidget(widgets->sampleRateCombo, 4, 1);
 
-	// RX RF Input (only for RX channels)
+	// RX RF Input (only for RX channels) - using descriptive names
 	if(type == CHANNEL_RX1 || type == CHANNEL_RX2) {
 		layout->addWidget(new QLabel("RX RF Input:"), 5, 0);
 		widgets->rfInputCombo = new QComboBox();
-		widgets->rfInputCombo->addItems({type == CHANNEL_RX1 ? "Rx1A" : "Rx2A",
-						 type == CHANNEL_RX1 ? "Rx1B" : "Rx2B",
-						 type == CHANNEL_RX1 ? "Rx1C" : "Rx2C"});
+		if(type == CHANNEL_RX1) {
+			widgets->rfInputCombo->addItems(RFInputOptions::RX1_OPTIONS);
+		} else {
+			widgets->rfInputCombo->addItems(RFInputOptions::RX2_OPTIONS);
+		}
 		layout->addWidget(widgets->rfInputCombo, 5, 1);
 	} else {
 		widgets->rfInputCombo = nullptr;
@@ -435,17 +512,35 @@ void ProfileGeneratorWidget::setupConnections()
 	connect(m_saveToFileBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onSaveToFile);
 	connect(m_loadToDeviceBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onLoadToDevice);
 
+	// Sample rate change signals for bandwidth updates
+	connect(m_rx1Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
+		this, [this]() { onSampleRateChanged(CHANNEL_RX1); });
+	connect(m_rx2Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
+		this, [this]() { onSampleRateChanged(CHANNEL_RX2); });
+	connect(m_tx1Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
+		this, [this]() { onSampleRateChanged(CHANNEL_TX1); });
+	connect(m_tx2Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
+		this, [this]() { onSampleRateChanged(CHANNEL_TX2); });
+
 	// Data change signals
 	connect(m_ssiInterfaceCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
 		&ProfileGeneratorWidget::updateProfileData);
 	connect(m_duplexModeCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
 		&ProfileGeneratorWidget::updateProfileData);
 
-	// Channel configuration changes
-	connect(m_rx1Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
-	connect(m_rx2Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
-	connect(m_tx1Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
-	connect(m_tx2Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
+	// Signal dependencies (critical for iio-oscilloscope compatibility)
+	connect(m_duplexModeCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
+		&ProfileGeneratorWidget::onTddModeChanged);
+	connect(m_ssiInterfaceCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
+		&ProfileGeneratorWidget::onInterfaceChanged);
+
+	// Channel enable changes affect UI controls and ORX state
+	connect(m_rx1Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onChannelEnableChanged);
+	connect(m_rx2Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onChannelEnableChanged);
+	connect(m_tx1Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onTxEnableChanged);
+	connect(m_tx2Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onTxEnableChanged);
+
+	// ORX enable changes
 	connect(m_orx1EnabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
 	connect(m_orx2EnabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
 }
@@ -453,9 +548,8 @@ void ProfileGeneratorWidget::setupConnections()
 void ProfileGeneratorWidget::loadPresetData(const QString &presetName)
 {
 	if(presetName == "LTE") {
-		// Load LTE preset values (matching iio-oscilloscope)
-		m_ssiInterfaceCombo->setCurrentText("LVDS");
-		m_duplexModeCombo->setCurrentText("TDD");
+		// Apply LTE defaults exactly matching lte_defaults() function
+		applyLTEDefaults();
 
 		// Enable RX1 and RX2
 		m_rx1Widgets.enabledCb->setChecked(true);
@@ -903,6 +997,251 @@ QJsonObject ProfileGeneratorWidget::createFullConfigJson()
 	config["clk_cfg"] = clkCfg;
 
 	return config;
+}
+
+// Signal Dependencies Implementation
+
+void ProfileGeneratorWidget::onTxEnableChanged()
+{
+	// 1. Update TX channel controls (enable/disable fields)
+	updateChannelControlsVisibility();
+
+	// 2. Update ORX controls (both visibility and enable state)
+	updateOrxControlsState();
+
+	// 3. Update profile data
+	updateProfileData();
+}
+
+void ProfileGeneratorWidget::onTddModeChanged()
+{
+	// TDD/FDD mode change affects ORX availability
+	updateOrxControlsState();
+	updateProfileData();
+}
+
+void ProfileGeneratorWidget::onInterfaceChanged()
+{
+	// Interface changed - update profile data
+	updateProfileData();
+}
+
+void ProfileGeneratorWidget::onChannelEnableChanged()
+{
+	// Handle both RX and TX channel enable changes
+	updateChannelControlsVisibility();
+	updateOrxControlsState();  // TX changes affect ORX
+	updateProfileData();
+}
+
+void ProfileGeneratorWidget::onSampleRateChanged(ChannelType channel)
+{
+	if (m_updatingFromPreset) return;
+
+	// Get the channel widgets
+	ChannelWidgets *widgets = nullptr;
+	switch(channel) {
+	case CHANNEL_RX1: widgets = &m_rx1Widgets; break;
+	case CHANNEL_RX2: widgets = &m_rx2Widgets; break;
+	case CHANNEL_TX1: widgets = &m_tx1Widgets; break;
+	case CHANNEL_TX2: widgets = &m_tx2Widgets; break;
+	}
+
+	if (!widgets || !widgets->sampleRateCombo || !widgets->bandwidthCombo) return;
+
+	// Update bandwidth based on sample rate (iio-oscilloscope logic)
+	QString sampleRate = widgets->sampleRateCombo->currentText();
+	QString correspondingBandwidth = FrequencyTable::getBandwidthForSampleRate(sampleRate);
+
+	widgets->bandwidthCombo->blockSignals(true);
+	widgets->bandwidthCombo->setCurrentText(correspondingBandwidth);
+	widgets->bandwidthCombo->blockSignals(false);
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate changed for channel" << channel
+	                                   << "to" << sampleRate << "-> bandwidth" << correspondingBandwidth;
+}
+
+// LTE Defaults Implementation
+
+void ProfileGeneratorWidget::applyLTEDefaults()
+{
+	qInfo(CAT_PROFILEGENERATORWIDGET) << "Applying LTE defaults from lte_defaults() function";
+
+	m_updatingFromPreset = true;
+
+	// Radio config - exact values from lte_defaults()
+	m_ssiInterfaceCombo->setCurrentText(LTEDefaults::SSI_INTERFACE); // "LVDS"
+	m_duplexModeCombo->setCurrentText(LTEDefaults::DUPLEX_MODE); // "TDD"
+
+	// Apply to all channels - exact values from lte_defaults()
+	QString sampleRateStr = QString::number(LTEDefaults::SAMPLE_RATE_HZ); // "61440000"
+	QString bandwidthStr = QString::number(LTEDefaults::BANDWIDTH_HZ); // "38000000"
+
+	// RX1 and RX2
+	m_rx1Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
+	m_rx1Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
+	m_rx1Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
+	m_rx1Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
+	if (m_rx1Widgets.rfInputCombo) {
+		m_rx1Widgets.rfInputCombo->setCurrentIndex(LTEDefaults::RF_PORT); // 0 = Rx1A
+	}
+
+	m_rx2Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
+	m_rx2Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
+	m_rx2Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
+	m_rx2Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
+	if (m_rx2Widgets.rfInputCombo) {
+		m_rx2Widgets.rfInputCombo->setCurrentIndex(LTEDefaults::RF_PORT); // 0 = Rx2A
+	}
+
+	// TX1 and TX2
+	m_tx1Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
+	m_tx1Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
+	m_tx1Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
+	m_tx1Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
+
+	m_tx2Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
+	m_tx2Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
+	m_tx2Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
+	m_tx2Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
+
+	// ORX disabled by default in LTE preset
+	m_orx1EnabledCb->setChecked(false);
+	m_orx2EnabledCb->setChecked(false);
+
+	m_lastAppliedPreset = "LTE";
+	m_updatingFromPreset = false;
+
+	// Update dependent UI elements
+	updateOrxVisibility();
+	updateChannelControlsVisibility();
+
+	StatusBarManager::pushMessage("Applied LTE defaults", 3000);
+}
+
+// Signal Dependencies Helper Methods
+
+void ProfileGeneratorWidget::updateOrxVisibility()
+{
+	bool tx1Enabled = getTxChannelEnabled(0);
+	bool tx2Enabled = getTxChannelEnabled(1);
+	bool tddMode = getTddModeEnabled();
+
+	// ORX only visible when TX enabled + TDD mode (matching iio-oscilloscope)
+	bool orxShouldBeVisible = (tx1Enabled || tx2Enabled) && tddMode;
+
+	// Find ORX widgets and update visibility
+	if (m_orx1EnabledCb) {
+		m_orx1EnabledCb->parentWidget()->setVisible(orxShouldBeVisible);
+	}
+	if (m_orx2EnabledCb) {
+		m_orx2EnabledCb->parentWidget()->setVisible(orxShouldBeVisible);
+	}
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "ORX visibility:" << orxShouldBeVisible
+	                                   << "(TX1:" << tx1Enabled << "TX2:" << tx2Enabled << "TDD:" << tddMode << ")";
+}
+
+void ProfileGeneratorWidget::updateOrxControlsState()
+{
+	bool tx1Enabled = getChannelEnabled(CHANNEL_TX1);
+	bool tx2Enabled = getChannelEnabled(CHANNEL_TX2);
+	bool tddMode = getTddModeEnabled();
+
+	// ORX1 logic: TX1 enabled AND TDD mode
+	bool orx1CanBeEnabled = tx1Enabled && tddMode;
+	if (!orx1CanBeEnabled && m_orx1EnabledCb && m_orx1EnabledCb->isChecked()) {
+		m_orx1EnabledCb->setChecked(false);  // Force disable
+	}
+	if (m_orx1EnabledCb) {
+		m_orx1EnabledCb->setEnabled(orx1CanBeEnabled);
+	}
+
+	// ORX2 logic: TX2 enabled AND TDD mode
+	bool orx2CanBeEnabled = tx2Enabled && tddMode;
+	if (!orx2CanBeEnabled && m_orx2EnabledCb && m_orx2EnabledCb->isChecked()) {
+		m_orx2EnabledCb->setChecked(false);  // Force disable
+	}
+	if (m_orx2EnabledCb) {
+		m_orx2EnabledCb->setEnabled(orx2CanBeEnabled);
+	}
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "ORX controls state - ORX1 can be enabled:" << orx1CanBeEnabled
+	                                   << "ORX2 can be enabled:" << orx2CanBeEnabled;
+}
+
+
+void ProfileGeneratorWidget::updateChannelControlsVisibility()
+{
+	// Update all channel controls based on their enable state
+	setChannelControlsEnabled(CHANNEL_RX1, getChannelEnabled(CHANNEL_RX1));
+	setChannelControlsEnabled(CHANNEL_RX2, getChannelEnabled(CHANNEL_RX2));
+	setChannelControlsEnabled(CHANNEL_TX1, getChannelEnabled(CHANNEL_TX1));
+	setChannelControlsEnabled(CHANNEL_TX2, getChannelEnabled(CHANNEL_TX2));
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Updated channel controls visibility";
+}
+
+bool ProfileGeneratorWidget::getTxChannelEnabled(int channel)
+{
+	if (channel == 0) {
+		return m_tx1Widgets.enabledCb ? m_tx1Widgets.enabledCb->isChecked() : false;
+	} else if (channel == 1) {
+		return m_tx2Widgets.enabledCb ? m_tx2Widgets.enabledCb->isChecked() : false;
+	}
+	return false;
+}
+
+bool ProfileGeneratorWidget::getTddModeEnabled()
+{
+	return m_duplexModeCombo ? m_duplexModeCombo->currentText() == "TDD" : false;
+}
+
+bool ProfileGeneratorWidget::validateConfiguration()
+{
+	// Basic validation - can be extended
+	return true;
+}
+
+// Channel Control Helper Methods
+
+ProfileGeneratorWidget::ChannelWidgets* ProfileGeneratorWidget::getChannelWidgets(ChannelType channel)
+{
+	switch(channel) {
+	case CHANNEL_RX1: return &m_rx1Widgets;
+	case CHANNEL_RX2: return &m_rx2Widgets;
+	case CHANNEL_TX1: return &m_tx1Widgets;
+	case CHANNEL_TX2: return &m_tx2Widgets;
+	}
+	return nullptr;
+}
+
+bool ProfileGeneratorWidget::getChannelEnabled(ChannelType channel)
+{
+	ChannelWidgets* widgets = getChannelWidgets(channel);
+	return widgets && widgets->enabledCb ? widgets->enabledCb->isChecked() : false;
+}
+
+void ProfileGeneratorWidget::setChannelControlsEnabled(ChannelType channel, bool enabled)
+{
+	ChannelWidgets* widgets = getChannelWidgets(channel);
+	if (!widgets) return;
+
+	// Enable/disable all channel controls except the enable checkbox itself
+	if (widgets->freqOffsetCb) {
+		widgets->freqOffsetCb->setEnabled(enabled);
+	}
+	if (widgets->bandwidthCombo) {
+		widgets->bandwidthCombo->setEnabled(enabled);
+	}
+	if (widgets->sampleRateCombo) {
+		widgets->sampleRateCombo->setEnabled(enabled);
+	}
+	if (widgets->rfInputCombo) {  // RX only
+		widgets->rfInputCombo->setEnabled(enabled);
+	}
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Channel" << channel << "controls enabled:" << enabled;
 }
 
 #include "moc_profilegeneratorwidget.cpp"
