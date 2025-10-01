@@ -59,6 +59,7 @@ public:
 	virtual void setWindow(int) = 0;
 	virtual void setWindowCorrection(bool) = 0;
 	virtual void setAveragingSize(int) = 0;
+	virtual void setSampleRate(double){}; // only used for complex mode genalyzer analysis
 };
 
 class SCOPY_GUI_EXPORT SampleRateProvider
