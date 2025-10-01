@@ -63,6 +63,7 @@ public:
 		m_fft = new GRFFTComplexProc(m_signalPath);
 		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
 		m_fft->setNrBits(nrBits);
+		m_fft->setSampleRate(ch->samplingInfo().sampleRate);
 		m_signalPath->append(m_fft);
 		m_avg = new GRFFTAvgProc(true, m_signalPath);
 		m_signalPath->append(m_avg);
@@ -92,6 +93,10 @@ public:
 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
 	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
+
+	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
+
+	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
