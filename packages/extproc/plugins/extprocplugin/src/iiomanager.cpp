@@ -134,12 +134,17 @@ void IIOManager::destroyBuffer()
 	if(!m_buffer) {
 		return;
 	}
+
+	// If we used the buffer hack, restore the original buffer pointer before cleanup
+	// This ensures iio_buffer_destroy() operates on the correct internal state
 	if(m_originalBufferPtr) {
 		union iio_buffer_hack hackBuffer;
 		hackBuffer.buffer = m_buffer;
+		// Restore the original buffer pointer that was saved during createMmapIioBuffer()
 		hackBuffer.fields->buffer = m_originalBufferPtr;
 		m_originalBufferPtr = nullptr;
 	}
+
 	iio_buffer_destroy(m_buffer);
 	m_buffer = nullptr;
 }
@@ -306,18 +311,22 @@ InputConfig IIOManager::createInputConfig(iio_device *dev, int channelCount, int
 
 iio_buffer *IIOManager::createMmapIioBuffer(struct iio_device *dev, size_t samples, void **originalBufferPtr)
 {
+	// Create a standard IIO buffer, then hack it to use memory-mapped file storage
 	union iio_buffer_hack hackBuffer;
 	hackBuffer.buffer = iio_device_create_buffer(dev, samples, false);
 	if(!hackBuffer.buffer) {
 		qWarning(CAT_IIO_MANAGER) << "Failed to create IIO buffer";
 		return nullptr;
 	}
+
+	// Calculate required buffer size and create memory-mapped file
 	int64_t bufferDataSize = iio_device_get_sample_size(dev) * m_params.samplesCount;
 	if(!m_dataWriter->openFile(ExtProcUtils::dataInPath(), bufferDataSize)) {
 		qWarning(CAT_IIO_MANAGER) << "Failed to map:" << ExtProcUtils::dataInPath();
 		return nullptr;
 	}
 
+	// Save the original buffer pointer so we can restore it during cleanup
 	void *original_buffer = hackBuffer.fields->buffer;
 	if(originalBufferPtr) {
 		*originalBufferPtr = original_buffer;
@@ -326,8 +335,11 @@ iio_buffer *IIOManager::createMmapIioBuffer(struct iio_device *dev, size_t sampl
 	qInfo(CAT_IIO_MANAGER) << "Original buffer pointer:" << original_buffer;
 	qInfo(CAT_IIO_MANAGER) << "Mapped memory pointer:" << (void *)m_dataWriter->mappedData();
 
+	// HACK: Replace the internal buffer pointer with our memory-mapped data
+	// This redirects all IIO buffer operations to use the memory-mapped file
 	hackBuffer.fields->buffer = m_dataWriter->mappedData();
 
+	// Verify the hack worked by checking if buffer start returns our mapped pointer
 	if(iio_buffer_start(hackBuffer.buffer) == m_dataWriter->mappedData()) {
 		qDebug(CAT_IIO_MANAGER) << "SUCCESS: Buffer hack working correctly!";
 	} else {
