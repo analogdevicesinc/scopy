@@ -74,6 +74,8 @@ void ADCFFTInstrumentController::init()
 	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_ui->getHoverMenuBtnGroup(),
 						  m_plotComponentManager, this);
 	m_measureComponent->measureSettings()->getMeasureSection()->setVisible(false);
+	// Initially hide genalyzer section since complex mode is off by default
+	m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(false);
 	// m_measureComponent->addPlotComponent(m_plotComponentManager);
 
 	addComponent(m_measureComponent);
@@ -260,6 +262,24 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
 		Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
 	});
+
+	// Connect genalyzer data updates for complex channels only
+	connect(c, &GRFFTChannelComponent::genalyzerDataUpdated,
+		m_plotComponentManager->genalyzerPanel(), &GenalyzerPanel::updateResults);
+
+	// Connect newData signal to trigger genalyzer analysis only when panel is enabled
+	connect(c->chData(), &ChannelData::newData, this,
+		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
+			// Only perform expensive genalyzer analysis when:
+			// 1. We're in complex mode
+			// 2. The genalyzer toggle is enabled
+			// 3. The genalyzer panel is visible
+			if(m_ui->m_complex->isChecked() &&
+			   m_measureComponent->measureSettings()->genalyzerEnabled() &&
+			   m_plotComponentManager->genalyzerPanel()->isVisible()) {
+				c->triggerGenalyzerAnalysis();
+			}
+		});
 }
 
 void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
@@ -287,13 +307,21 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
 		&FFTPlotManagerSettings::setComplexMode);
 	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
-		if(m_ui->m_complex->isChecked()) {
+		bool isComplex = m_ui->m_complex->isChecked();
+		if(isComplex) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
 		} else {
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);
+
+			// Clear genalyzer panel data and hide it when switching to non-complex mode
+			m_plotComponentManager->genalyzerPanel()->clear();
+			m_plotComponentManager->enableGenalyzerPanel(false);
 		}
+
+		// Show/hide genalyzer section based on complex mode
+		m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(isComplex);
 	});
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {

@@ -171,9 +171,19 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 
 	markerPanelSwitch->onOffswitch()->setChecked(false);
 
+	genalyzerSection = new MenuSectionWidget(this);
+	Style::setStyle(genalyzerSection, style::properties::widget::border);
+	genalyzerPanelSwitch = new MenuOnOffSwitch("Genalyzer analysis", this);
+	connect(genalyzerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
+		[=](bool b) { Q_EMIT enableGenalyzerPanel(b); });
+	genalyzerSection->contentLayout()->addWidget(genalyzerPanelSwitch);
+
+	genalyzerPanelSwitch->onOffswitch()->setChecked(false);
+
 	lay->addWidget(measureSection);
 	lay->addWidget(statsSection);
 	lay->addWidget(markerSection);
+	lay->addWidget(genalyzerSection);
 }
 
 MeasurementSettings::~MeasurementSettings() {}
@@ -181,11 +191,14 @@ MeasurementSettings::~MeasurementSettings() {}
 bool MeasurementSettings::measurementEnabled() { return measurePanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::statsEnabled() { return statsPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::markerEnabled() { return markerPanelSwitch->onOffswitch()->isChecked(); }
+bool MeasurementSettings::genalyzerEnabled() { return genalyzerPanelSwitch->onOffswitch()->isChecked(); }
 
 MenuSectionWidget *MeasurementSettings::getMarkerSection() const { return markerSection; }
 
 MenuSectionWidget *MeasurementSettings::getStatsSection() const { return statsSection; }
 
 MenuSectionWidget *MeasurementSettings::getMeasureSection() const { return measureSection; }
+
+MenuSectionWidget *MeasurementSettings::getGenalyzerSection() const { return genalyzerSection; }
 
 #include "moc_measurementsettings.cpp"
