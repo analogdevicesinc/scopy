@@ -341,7 +341,34 @@ QWidget *Adrv9002::generateGlobalSettingsWidget(QWidget *parent)
 	// Temperature (separate from profile management)
 	iio_channel *tempCh = iio_device_find_channel(m_iio_dev, "temp0", false);
 	if(tempCh) {
-		layout->addWidget(createReadOnlyLabel(tempCh, "input", 1000, "Temperature (°C)"));
+		IIOWidget *tempWidget = IIOWidgetBuilder(this)
+						.device(m_iio_dev)
+						.channel(tempCh)
+						.attribute("input")
+						.uiStrategy(IIOWidgetBuilder::TemperatureUi)
+						.title("Temperature")
+						.buildSingle();
+
+		if(tempWidget) {
+			// Access the TemperatureGuiStrategy to set critical temperature
+			auto *tempStrategy = dynamic_cast<TemperatureGuiStrategy *>(tempWidget->getUiStrategy());
+			if(tempStrategy) {
+				tempStrategy->setCriticalTemperature(
+					80.0, "ADRV9002 temperature critical! Risk of thermal shutdown.");
+				tempStrategy->setWarningOffset(5.0); // Warn at 75°C (80°C - 5°C)
+				// Optional: Configure periodic updates (default is 5 seconds)
+				// tempStrategy->setPeriodicUpdates(true, 5); // Update every 5 second
+			}
+
+			connect(this, &Adrv9002::readRequested, tempWidget, &IIOWidget::readAsync);
+
+			section->add(tempWidget);
+		}
+	}
+
+	// Initial Calibrations section (if supported)
+	if(m_initialCalibrationsWidget) {
+		section->add(m_initialCalibrationsWidget);
 	}
 
 	return globalSettingsWidget;

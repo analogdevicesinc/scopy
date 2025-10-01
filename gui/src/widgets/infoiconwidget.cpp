@@ -84,4 +84,9 @@ QWidget *InfoIconWidget::addHoveringInfoToWidget(QWidget *w, QString infoMessage
 	return hover;
 }
 
+QLabel *InfoIconWidget::infoIcon() const
+{
+	return m_infoIcon;
+}
+
 #include "moc_infoiconwidget.cpp"
