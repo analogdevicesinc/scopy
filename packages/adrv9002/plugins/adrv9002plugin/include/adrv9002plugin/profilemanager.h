@@ -25,13 +25,23 @@
 #include <QWidget>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QTextEdit>
 #include <QString>
 #include <gui/widgets/filebrowserwidget.h>
+#include <gui/widgets/smallprogressbar.h>
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/statusbarmanager.h>
 #include <iio.h>
 
 namespace scopy::adrv9002 {
+
+enum ProgressBarState
+{
+	SUCCESS,
+	ERROR,
+	BUSY
+};
 
 class SCOPY_ADRV9002PLUGIN_EXPORT ProfileManager : public QWidget
 {
@@ -52,6 +62,9 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void refreshStatus();
+	void updateDeviceInfo();
+	void updateProfileStatus(ProgressBarState status);
+	void updateStreamStatus(ProgressBarState status);
 
 private Q_SLOTS:
 	void onProfileFileChanged();
@@ -65,6 +78,10 @@ private:
 	QString readDeviceAttribute(const QString &attributeName);
 	bool writeDeviceAttribute(const QString &attributeName, const QByteArray &data);
 
+	// Device info panel
+	QWidget *createDeviceInfoPanel();
+	QString getAttributeValue(const QString &attributeName);
+
 	// Device communication
 	iio_device *m_device;
 
@@ -74,10 +91,15 @@ private:
 	// Profile section
 	QLabel *m_profileLabel;
 	scopy::FileBrowserWidget *m_profileFileBrowser;
+	scopy::SmallProgressBar *m_profileProgressBar;
 
 	// Stream section
 	QLabel *m_streamLabel;
 	scopy::FileBrowserWidget *m_streamFileBrowser;
+	scopy::SmallProgressBar *m_streamProgressBar;
+
+	// Device info panel
+	QTextEdit *m_deviceInfoText;
 
 	// Current file paths
 	QString m_currentProfilePath;
