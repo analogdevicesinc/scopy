@@ -30,6 +30,7 @@
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
+#include "guistrategy/temperatureguistrategy.h"
 #include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
@@ -443,6 +444,9 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 		break;
 	case UIS::CheckBoxUi:
 		ui = new CheckBoxAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
+		break;
+	case UIS::TemperatureUi:
+		ui = new TemperatureGuiStrategy(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
 	default:
 		break;
