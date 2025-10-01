@@ -462,7 +462,19 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 
 	if(loCh) {
 		QString loAttr = QString("RX%1_LO_frequency").arg(channel + 1);
-		layout->addWidget(createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)"), row + 5, 1);
+		auto loWidget = createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)");
+
+		// Add MHz ↔ Hz conversion (device uses Hz, UI shows MHz)
+		loWidget->setDataToUIConversion([](QString data) {
+			// Device → UI: Hz to MHz (3200000000 → 3200)
+			return QString::number(data.toDouble() / 1e6, 'f', 0);
+		});
+		loWidget->setUItoDataConversion([](QString data) {
+			// UI → Device: MHz to Hz (3200 → 3200000000)
+			return QString::number(data.toDouble() * 1e6, 'f', 0);
+		});
+
+		layout->addWidget(loWidget, row + 5, 1);
 	}
 
 	layout->addWidget(createReadOnlyLabel(rxCh, "rssi", 1.0, "RSSI (dB)"), row + 6, 1);
@@ -527,7 +539,19 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 
 	if(loCh) {
 		QString loAttr = QString("TX%1_LO_frequency").arg(channel + 1);
-		layout->addWidget(createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)"), row + 2, 0);
+		auto loWidget = createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)");
+
+		// Add MHz ↔ Hz conversion (device uses Hz, UI shows MHz)
+		loWidget->setDataToUIConversion([](QString data) {
+			// Device → UI: Hz to MHz (3200000000 → 3200)
+			return QString::number(data.toDouble() / 1e6, 'f', 0);
+		});
+		loWidget->setUItoDataConversion([](QString data) {
+			// UI → Device: MHz to Hz (3200 → 3200000000)
+			return QString::number(data.toDouble() * 1e6, 'f', 0);
+		});
+
+		layout->addWidget(loWidget, row + 2, 0);
 	}
 
 	layout->addWidget(createRangeWidget(txCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), row + 3, 0);
@@ -647,6 +671,11 @@ IIOWidget *Adrv9002::createRangeWidget(iio_channel *ch, const QString &attr, con
 				    .buildSingle();
 
 	if(widget) {
+		// Apply stripUnits to ALL range widgets - safe for all values
+		widget->setDataToUIConversion([](QString data) {
+			return data.split(" ").first();  // Safe for all numeric attributes
+		});
+
 		connect(this, &Adrv9002::readRequested, widget, &IIOWidget::readAsync);
 	}
 	return widget;
@@ -681,9 +710,10 @@ QLabel *Adrv9002::createReadOnlyLabel(iio_channel *ch, const QString &attr, doub
 	int ret = iio_channel_attr_read(ch, attr.toLocal8Bit().data(), value, sizeof(value));
 
 	if(ret > 0) {
-		// Parse the value and apply divisor
+		// Parse the value and apply divisor - strip units first
+		QString valueStr = QString(value).split(" ").first(); // Remove units like " dB"
 		bool ok;
-		double numValue = QString(value).toDouble(&ok);
+		double numValue = valueStr.toDouble(&ok);
 		if(ok) {
 			// Apply divisor and format to appropriate precision
 			double displayValue = numValue / divisor;
@@ -709,8 +739,10 @@ QLabel *Adrv9002::createReadOnlyLabel(iio_channel *ch, const QString &attr, doub
 		int ret = iio_channel_attr_read(ch, attr.toLocal8Bit().data(), value, sizeof(value));
 
 		if(ret > 0) {
+			// Parse the value and apply divisor - strip units first
+			QString valueStr = QString(value).split(" ").first(); // Remove units like " dB"
 			bool ok;
-			double numValue = QString(value).toDouble(&ok);
+			double numValue = valueStr.toDouble(&ok);
 			if(ok) {
 				double displayValue = numValue / divisor;
 
