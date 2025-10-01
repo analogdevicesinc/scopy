@@ -45,6 +45,8 @@ public:
 	static QWidget *addHoveringInfoToWidget(QWidget *w, QString infoMessage, QWidget *parent,
 						HoverPosition pos = HP_RIGHT);
 
+	QLabel *infoIcon() const;
+
 private:
 	QVBoxLayout *m_layout;
 	QLabel *m_infoIcon;
