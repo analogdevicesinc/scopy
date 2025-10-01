@@ -66,6 +66,8 @@ private:
 	QWidget *createProfileGeneratorWidget();
 
 	// UI Section Generation (ad936x pattern)
+	QWidget *generateDeviceDriverAPIWidget(QWidget *parent);
+	QString getDeviceDriverVersion();
 	QWidget *generateGlobalSettingsWidget(QWidget *parent);
 	QWidget *generateReceiveChainWidget(QWidget *parent);
 	QWidget *generateTransmitChainWidget(QWidget *parent);
