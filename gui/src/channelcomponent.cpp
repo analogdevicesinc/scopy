@@ -119,6 +119,10 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 
 SamplingInfo ChannelComponent::samplingInfo() { return m_samplingInfo; }
 
-void ChannelComponent::setSamplingInfo(SamplingInfo p) { m_samplingInfo = p; }
+void ChannelComponent::setSamplingInfo(SamplingInfo p)
+{
+	m_samplingInfo = p;
+	Q_EMIT updatedSamplingInfo(p);
+}
 
 #include "moc_channelcomponent.cpp"
