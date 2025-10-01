@@ -51,7 +51,8 @@ public:
 		ComboUi,
 		SwitchUi,
 		RangeUi,
-		CheckBoxUi
+		CheckBoxUi,
+		TemperatureUi
 	};
 
 	explicit IIOWidgetBuilder(QWidget *parent = nullptr);
