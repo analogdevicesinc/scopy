@@ -22,6 +22,7 @@
 #ifndef GRFFTPROC_H
 #define GRFFTPROC_H
 
+#include "genalyzer.h"
 #include "grproxyblock.h"
 #include "scopy-gr-util_export.h"
 
@@ -37,6 +38,7 @@
 #include <gnuradio/blocks/multiply_const.h>
 #include <gnuradio/blocks/add_const_v.h>
 #include <QMap>
+#include <cgenalyzer.h>
 
 namespace scopy::grutil {
 class SCOPY_GR_UTIL_EXPORT GRFFTFloatProc : public GRProxyBlock
@@ -74,6 +76,8 @@ public:
 	void setPowerOffset(double);
 	void setWindowCorrection(bool b);
 	void setNrBits(int);
+	void setSampleRate(double sr);
+	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
@@ -81,16 +85,19 @@ protected:
 	double m_powerOffset;
 	int nrBits;
 	bool m_windowCorr;
-	gr::fft::fft_v<gr_complex, true>::sptr fft_complex;
+	double m_sr;
 	gr::blocks::multiply_const_cc::sptr mult_nrbits;
 	gr::blocks::complex_to_mag_squared::sptr ctm;
-	gr::blocks::multiply_const_cc::sptr mult_wind_corr;
 	gr::blocks::multiply_const_ff::sptr mult_const1;
 	gr::blocks::nlog10_ff::sptr nlog10;
 	gr::blocks::add_const_vff::sptr powerOffset;
+	genalyzer_fft_vcc::sptr genalyzer_fft;
 
 	gr::fft::window::win_type m_fftwindow;
 	GRTopBlock *m_top;
+
+private:
+	GnWindow convertToGnWindow(gr::fft::window::win_type window_type);
 };
 
 class SCOPY_GR_UTIL_EXPORT GRFFTAvgProc : public GRProxyBlock
