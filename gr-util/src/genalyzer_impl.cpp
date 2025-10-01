@@ -36,19 +36,14 @@ genalyzer_fft_vcc_impl::~genalyzer_fft_vcc_impl() { cleanup_buffers(); }
 
 void genalyzer_fft_vcc_impl::allocate_buffers()
 {
-	try {
-		// Don't allocate d_fft_out here - genalyzer will allocate it
-		d_fft_out = nullptr;
+	// Don't allocate d_fft_out here - genalyzer will allocate it
+	d_fft_out = nullptr;
 
-		d_qwfi = new int32_t[d_npts];
-		d_qwfq = new int32_t[d_npts];
+	d_qwfi = new int32_t[d_npts];
+	d_qwfq = new int32_t[d_npts];
 
-		std::memset(d_qwfi, 0, sizeof(int32_t) * d_npts);
-		std::memset(d_qwfq, 0, sizeof(int32_t) * d_npts);
-	} catch(std::bad_alloc &e) {
-		cleanup_buffers();
-		throw std::runtime_error("Failed to allocate buffers for genalyzer_fft_vcc");
-	}
+	std::memset(d_qwfi, 0, sizeof(int32_t) * d_npts);
+	std::memset(d_qwfq, 0, sizeof(int32_t) * d_npts);
 }
 
 void genalyzer_fft_vcc_impl::cleanup_buffers()
