@@ -24,6 +24,7 @@
 #include <QFileInfo>
 #include <style.h>
 #include <stylehelper.h>
+#include <smallprogressbar.h>
 
 Q_LOGGING_CATEGORY(CAT_PROFILEMANAGER, "ProfileManager")
 
@@ -38,13 +39,23 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 	, m_profileFileBrowser(nullptr)
 	, m_streamLabel(nullptr)
 	, m_streamFileBrowser(nullptr)
+	, m_deviceInfoText(nullptr)
 {
-	// Create main layout following FastlockProfilesWidget pattern
-	QVBoxLayout *layout = new QVBoxLayout(this);
+	// Create main layout with horizontal split like iio-oscilloscope
+	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
 	// Title
 	m_title = new QLabel("Profile & Stream Configuration", this);
-	layout->addWidget(m_title);
+	mainLayout->addWidget(m_title);
+
+	// Create horizontal layout for Profile controls (left) and Device Info (right)
+	QHBoxLayout *contentLayout = new QHBoxLayout();
+	mainLayout->addLayout(contentLayout);
+
+	// Left side: Profile and Stream controls
+	QWidget *profileControlsWidget = new QWidget();
+	QVBoxLayout *leftLayout = new QVBoxLayout(profileControlsWidget);
+	leftLayout->setContentsMargins(0, 0, 10, 0); // Add right margin for spacing
 
 	// Get embedded resources directory
 	QFileInfoList profiles = scopy::PkgManager::listFilesInfo(QStringList() << "adrv9002-profiles");
@@ -53,25 +64,61 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 
 	// Profile section
 	m_profileLabel = new QLabel("Load Profile:", this);
-	layout->addWidget(m_profileLabel);
+	leftLayout->addWidget(m_profileLabel);
 
-	m_profileFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, this);
+	// Create profile container with progress bar (following data logger pattern)
+	QWidget *profileContainer = new QWidget();
+	QVBoxLayout *profileLayout = new QVBoxLayout(profileContainer);
+	profileLayout->setMargin(0);
+	profileLayout->setSpacing(1);
+
+	m_profileFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, profileContainer);
 	m_profileFileBrowser->setFilter("Profile files (*.json)");
 	m_profileFileBrowser->setBaseDirectory(defaultDir);
 	m_profileFileBrowser->lineEdit()->setReadOnly(true);
 	m_profileFileBrowser->lineEdit()->setPlaceholderText("(None)");
-	layout->addWidget(m_profileFileBrowser);
+
+	m_profileProgressBar = new scopy::SmallProgressBar(profileContainer);
+
+	profileLayout->addWidget(m_profileFileBrowser);
+	profileLayout->addWidget(m_profileProgressBar);
+	leftLayout->addWidget(profileContainer);
 
 	// Stream section
 	m_streamLabel = new QLabel("Load Stream:", this);
-	layout->addWidget(m_streamLabel);
+	leftLayout->addWidget(m_streamLabel);
 
-	m_streamFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, this);
+	// Create stream container with progress bar (following data logger pattern)
+	QWidget *streamContainer = new QWidget();
+	QVBoxLayout *streamLayout = new QVBoxLayout(streamContainer);
+	streamLayout->setMargin(0);
+	streamLayout->setSpacing(1);
+
+	m_streamFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, streamContainer);
 	m_streamFileBrowser->setFilter("Stream files (*.stream)");
 	m_streamFileBrowser->setBaseDirectory(defaultDir);
 	m_streamFileBrowser->lineEdit()->setReadOnly(true);
 	m_streamFileBrowser->lineEdit()->setPlaceholderText("(None)");
-	layout->addWidget(m_streamFileBrowser);
+
+	m_streamProgressBar = new scopy::SmallProgressBar(streamContainer);
+
+	streamLayout->addWidget(m_streamFileBrowser);
+	streamLayout->addWidget(m_streamProgressBar);
+	leftLayout->addWidget(streamContainer);
+
+	// Add spacer to push profile controls to top
+	leftLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+
+	// Right side: Device Information Panel (matching iio-oscilloscope)
+	QWidget *deviceInfoPanel = createDeviceInfoPanel();
+
+	// Add both sides to horizontal layout
+	contentLayout->addWidget(profileControlsWidget);
+	contentLayout->addWidget(deviceInfoPanel);
+
+	// Set proportions: 50% profile controls, 50% device info
+	contentLayout->setStretch(0, 50);
+	contentLayout->setStretch(1, 50);
 
 	// Connect FileBrowserWidget signals
 	connect(m_profileFileBrowser->lineEdit(), &QLineEdit::textChanged, this, &ProfileManager::onProfileFileChanged);
@@ -87,6 +134,57 @@ QString ProfileManager::title() const { return m_title->text(); }
 
 void ProfileManager::setTitle(const QString &newTitle) { m_title->setText(newTitle); }
 
+QWidget *ProfileManager::createDeviceInfoPanel()
+{
+	QWidget *panel = new QWidget();
+	Style::setStyle(panel, style::properties::widget::border_interactive);
+
+	QVBoxLayout *layout = new QVBoxLayout(panel);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(5);
+
+	// Device info text box - scrollable display showing profile_config
+	m_deviceInfoText = new QTextEdit();
+	m_deviceInfoText->setReadOnly(true);
+	m_deviceInfoText->setFont(QFont("monospace", 9));
+	m_deviceInfoText->setMinimumHeight(200);
+
+	layout->addWidget(m_deviceInfoText);
+
+	// Initial update of device info
+	updateDeviceInfo();
+
+	return panel;
+}
+
+QString ProfileManager::getAttributeValue(const QString &attributeName)
+{
+	if (!m_device) return "Device not available";
+
+	char buffer[8192];  // Large buffer for profile_config
+	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(),
+	                              buffer, sizeof(buffer));
+
+	if (ret < 0) {
+		return QString("Error reading %1: %2").arg(attributeName).arg(ret);
+	}
+
+	return QString(buffer);
+}
+
+void ProfileManager::updateDeviceInfo()
+{
+	QString profileConfig = getAttributeValue("profile_config");
+
+	if (profileConfig.startsWith("Error") || profileConfig.startsWith("Device not")) {
+		m_deviceInfoText->setPlainText("Device information unavailable:\n" + profileConfig);
+	} else {
+		// Display the profile_config content directly (like iio-oscilloscope)
+		m_deviceInfoText->setPlainText(profileConfig);
+	}
+}
+
+
 void ProfileManager::refreshStatus() { updateStatus(); }
 
 void ProfileManager::onProfileFileChanged()
@@ -101,16 +199,35 @@ void ProfileManager::onProfileFileChanged()
 
 	qDebug(CAT_PROFILEMANAGER) << "Loading profile from:" << filename;
 
+	// Set BUSY state while loading
+	updateProfileStatus(ProgressBarState::BUSY);
+
 	if(loadProfileFromFile(filename)) {
 		m_currentProfilePath = filename;
 		updateStatus();
 		Q_EMIT profileLoaded(filename);
 		qInfo(CAT_PROFILEMANAGER) << "Profile loaded successfully:" << filename;
+
+		// Show SUCCESS state
+		updateProfileStatus(ProgressBarState::SUCCESS);
+
+		// Additional feedback
+		QFileInfo fileInfo(filename);
+		QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
+		profileEdit->setToolTip(QString("Profile loaded successfully: %1").arg(fileInfo.fileName()));
+		scopy::StatusBarManager::pushMessage(QString("Profile loaded: %1").arg(fileInfo.fileName()), 3000);
 	} else {
 		QString errorMsg = QString("Failed to load profile from: %1").arg(filename);
 		Q_EMIT profileError(errorMsg);
 		qWarning(CAT_PROFILEMANAGER) << errorMsg;
 		scopy::StatusBarManager::pushMessage(errorMsg, 5000);
+
+		// Show ERROR state
+		updateProfileStatus(ProgressBarState::ERROR);
+
+		// Additional feedback
+		QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
+		profileEdit->setToolTip(errorMsg);
 	}
 }
 
@@ -126,16 +243,35 @@ void ProfileManager::onStreamFileChanged()
 
 	qDebug(CAT_PROFILEMANAGER) << "Loading stream from:" << filename;
 
+	// Set BUSY state while loading
+	updateStreamStatus(ProgressBarState::BUSY);
+
 	if(loadStreamFromFile(filename)) {
 		m_currentStreamPath = filename;
 		updateStatus();
 		Q_EMIT streamLoaded(filename);
 		qInfo(CAT_PROFILEMANAGER) << "Stream loaded successfully:" << filename;
+
+		// Show SUCCESS state
+		updateStreamStatus(ProgressBarState::SUCCESS);
+
+		// Additional feedback
+		QFileInfo fileInfo(filename);
+		QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
+		streamEdit->setToolTip(QString("Stream loaded successfully: %1").arg(fileInfo.fileName()));
+		scopy::StatusBarManager::pushMessage(QString("Stream loaded: %1").arg(fileInfo.fileName()), 3000);
 	} else {
 		QString errorMsg = QString("Failed to load stream from: %1").arg(filename);
 		Q_EMIT streamError(errorMsg);
 		qWarning(CAT_PROFILEMANAGER) << errorMsg;
 		scopy::StatusBarManager::pushMessage(errorMsg, 5000);
+
+		// Show ERROR state
+		updateStreamStatus(ProgressBarState::ERROR);
+
+		// Additional feedback
+		QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
+		streamEdit->setToolTip(errorMsg);
 	}
 }
 
@@ -149,7 +285,6 @@ void ProfileManager::updateStatus()
 		if(status.isEmpty() || status == "ERROR") {
 			if(profileEdit->text().isEmpty()) {
 				profileEdit->setPlaceholderText("(None)");
-				profileEdit->setStyleSheet("color: gray;");
 			}
 		} else {
 			// Show current file path if available, otherwise show status
@@ -159,7 +294,6 @@ void ProfileManager::updateStatus()
 				if(profileEdit->text().isEmpty()) {
 					profileEdit->setText(fileInfo.fileName());
 				}
-				profileEdit->setStyleSheet("color: black;");
 			}
 		}
 	}
@@ -172,7 +306,6 @@ void ProfileManager::updateStatus()
 		if(status.isEmpty() || status == "ERROR") {
 			if(streamEdit->text().isEmpty()) {
 				streamEdit->setPlaceholderText("(None)");
-				streamEdit->setStyleSheet("color: gray;");
 			}
 		} else {
 			// Show current file path if available, otherwise show status
@@ -182,7 +315,6 @@ void ProfileManager::updateStatus()
 				if(streamEdit->text().isEmpty()) {
 					streamEdit->setText(fileInfo.fileName());
 				}
-				streamEdit->setStyleSheet("color: black;");
 			}
 		}
 	}
@@ -228,7 +360,7 @@ bool ProfileManager::loadStreamFromFile(const QString &filename)
 		return false;
 	}
 
-	// Read file content
+	// Read file content - ensure binary mode for .stream files
 	QFile file(filename);
 	if(!file.open(QIODevice::ReadOnly)) {
 		qWarning(CAT_PROFILEMANAGER) << "Failed to open stream file:" << filename;
@@ -278,16 +410,48 @@ bool ProfileManager::writeDeviceAttribute(const QString &attributeName, const QB
 		return false;
 	}
 
+	// Follow the original iio-oscilloscope pattern for error checking
 	int ret =
 		iio_device_attr_write_raw(m_device, attributeName.toLocal8Bit().data(), data.constData(), data.size());
 
-	if(ret == data.size()) {
-		qDebug(CAT_PROFILEMANAGER)
-			<< "Successfully wrote" << data.size() << "bytes to attribute:" << attributeName;
-		return true;
-	} else {
+	if(ret < 0) {
+		// Negative return value indicates an error
 		qWarning(CAT_PROFILEMANAGER) << "Failed to write attribute:" << attributeName
-					     << "expected:" << data.size() << "written:" << ret;
+					     << "error code:" << ret;
 		return false;
+	} else {
+		// Positive return value indicates success (bytes written)
+		qDebug(CAT_PROFILEMANAGER)
+			<< "Successfully wrote" << ret << "bytes to attribute:" << attributeName
+			<< "(expected:" << data.size() << ")";
+		return true;
+	}
+}
+
+void ProfileManager::updateProfileStatus(ProgressBarState status)
+{
+	if(status == ProgressBarState::SUCCESS) {
+		m_profileProgressBar->setBarColor(Style::getAttribute(json::theme::content_success));
+	}
+	if(status == ProgressBarState::ERROR) {
+		m_profileProgressBar->setBarColor(Style::getAttribute(json::theme::content_error));
+	}
+	if(status == ProgressBarState::BUSY) {
+		m_profileProgressBar->startProgress();
+		m_profileProgressBar->setBarColor(Style::getAttribute(json::theme::content_busy));
+	}
+}
+
+void ProfileManager::updateStreamStatus(ProgressBarState status)
+{
+	if(status == ProgressBarState::SUCCESS) {
+		m_streamProgressBar->setBarColor(Style::getAttribute(json::theme::content_success));
+	}
+	if(status == ProgressBarState::ERROR) {
+		m_streamProgressBar->setBarColor(Style::getAttribute(json::theme::content_error));
+	}
+	if(status == ProgressBarState::BUSY) {
+		m_streamProgressBar->startProgress();
+		m_streamProgressBar->setBarColor(Style::getAttribute(json::theme::content_busy));
 	}
 }
