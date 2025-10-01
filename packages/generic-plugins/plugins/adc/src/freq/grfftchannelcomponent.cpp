@@ -77,18 +77,10 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 			dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSampleRate(p.sampleRate);
 		});
 
-	m_complex = true;
+	// Connect genalyzer data updates for complex channels - but we'll add the actual logic in the controller
+	// to avoid expensive analysis when panel is not enabled
 
-	connect(m_chData, &ChannelData::newData, this,
-		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
-			gn_analysis_results *gn_analysis =
-				static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
-			if(gn_analysis) {
-				printf("\nAll Fourier Analysis Results:\n");
-				for(size_t i = 0; i < gn_analysis->results_size; i++)
-					printf("%4zu%20s%20.6f\n", i, gn_analysis->rkeys[i], gn_analysis->rvalues[i]);
-			}
-		});
+	m_complex = true;
 
 	_init();
 }
@@ -488,4 +480,18 @@ void GRFFTChannelComponent::setWindowCorrection(bool newWindowCorr)
 		return;
 	m_windowCorrection = newWindowCorr;
 	Q_EMIT windowCorrectionChanged(newWindowCorr);
+}
+
+void GRFFTChannelComponent::triggerGenalyzerAnalysis()
+{
+	// Only perform analysis for complex channels that have genalyzer capabilities
+	if(m_complex) {
+		gn_analysis_results *gn_analysis =
+			static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
+		if(gn_analysis) {
+			// Emit signal for genalyzer panel updates with channel name and color
+			Q_EMIT genalyzerDataUpdated(this->name(), this->pen().color(),
+				gn_analysis->results_size, gn_analysis->rkeys, gn_analysis->rvalues);
+		}
+	}
 }

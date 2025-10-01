@@ -98,6 +98,12 @@ void FFTPlotManager::enableMeasurementPanel(bool)
 	// are implemented. This is just a placeholder.
 }
 
+void FFTPlotManager::enableGenalyzerPanel(bool b)
+{
+	// Only show genalyzer panel in complex mode - this will be handled by the settings
+	m_genalyzerPanel->setVisible(b);
+}
+
 void FFTPlotManager::multiPlotUpdate()
 {
 	bool b = m_plots.count() > 1;
