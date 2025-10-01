@@ -19,6 +19,8 @@
  */
 
 #include <profilegeneratorwidget.h>
+#include <channelconfigwidget.h>
+#include <profilegeneratorconstants.h>
 
 #include <QLoggingCategory>
 #include <QFileDialog>
@@ -30,85 +32,118 @@ Q_LOGGING_CATEGORY(CAT_PROFILEGENERATORWIDGET, "ProfileGeneratorWidget")
 using namespace scopy::adrv9002;
 using namespace scopy;
 
-// Frequency table from iio-oscilloscope (exact Hz values)
-const QStringList FrequencyTable::SAMPLE_RATES_HZ = {
-	"1920000", "3840000", "7680000", "15360000", "30720000", "61440000"
-};
-
-const QStringList FrequencyTable::BANDWIDTHS_HZ = {
-	"1008000", "2700000", "4500000", "9000000", "18000000", "38000000"
-};
-
-// RF Input options (descriptive names from screenshots)
-const QStringList RFInputOptions::RX1_OPTIONS = {
-        "Rx1A", "Rx1B"
-};
-
-const QStringList RFInputOptions::RX2_OPTIONS = {
-        "Rx2A", "Rx2B"
-};
-
-// LTE defaults from lte_defaults() function (exact values)
-const int LTEDefaults::SAMPLE_RATE_HZ = 61440000;
-const int LTEDefaults::BANDWIDTH_HZ = 38000000;
-const bool LTEDefaults::ENABLED = true;
-const bool LTEDefaults::FREQ_OFFSET_CORRECTION = false;
-const int LTEDefaults::RF_PORT = 0; // Maps to Rx1A/Rx2A
-
-const QString LTEDefaults::SSI_INTERFACE = "LVDS";
-const QString LTEDefaults::DUPLEX_MODE = "TDD";
-const int LTEDefaults::SSI_LANES = 2;
-
-const int LTEDefaults::DEVICE_CLOCK_FREQUENCY_KHZ = 38400;
-const bool LTEDefaults::DEVICE_CLOCK_OUTPUT_ENABLE = true;
-const int LTEDefaults::DEVICE_CLOCK_OUTPUT_DIVIDER = 2;
-
-// Interface options
-const QStringList IOOOptions::SSI_INTERFACE_OPTIONS = {
-	"CMOS", "LVDS"
-};
-
-const QStringList IOOOptions::DUPLEX_MODE_OPTIONS = {
-	"TDD", "FDD"
-};
-
-// Frequency table helper functions
-int FrequencyTable::getIndexOfSampleRate(const QString &sampleRate)
+// DeviceConfigurationParser implementation (Phase 1)
+QString DeviceConfigurationParser::extractValueBetween(const QString &text, const QString &begin, const QString &end)
 {
-	return SAMPLE_RATES_HZ.indexOf(sampleRate);
+	// Port from iio-oscilloscope extract_value_between() function (line 1365-1383)
+	int beginPos = text.indexOf(begin);
+	if(beginPos == -1) {
+		return QString();
+	}
+
+	beginPos += begin.length();
+	int endPos = end.isEmpty() ? text.length() : text.indexOf(end, beginPos);
+	if(endPos == -1) {
+		endPos = text.length();
+	}
+
+	return text.mid(beginPos, endPos - beginPos).trimmed();
 }
 
-QString FrequencyTable::getBandwidthForSampleRate(const QString &sampleRate)
+QString DeviceConfigurationParser::mapRfPortFromDevice(const QString &devicePort, int channel)
 {
-	int index = getIndexOfSampleRate(sampleRate);
-	if (index >= 0 && index < BANDWIDTHS_HZ.size()) {
-		return BANDWIDTHS_HZ[index];
+	// Map device RF port numbers to UI strings
+	// Based on iio-oscilloscope rf_port mapping: 0=RxA, 1=RxB
+	bool ok;
+	int portNum = devicePort.toInt(&ok);
+	if(!ok) {
+		return (channel == 0) ? "Rx1A" : "Rx2A"; // Default fallback
 	}
-	return "38000000"; // Default fallback
+
+	if(channel == 0) {
+		return (portNum == 0) ? "Rx1A" : "Rx1B";
+	} else {
+		return (portNum == 0) ? "Rx2A" : "Rx2B";
+	}
 }
 
-QStringList FrequencyTable::getSampleRatesForSSILanes(int ssiLanes)
+DeviceConfigurationParser::ParsedDeviceConfig
+DeviceConfigurationParser::parseProfileConfig(const QString &profileConfigText)
 {
-	// Based on iio-oscilloscope logic in profile_gen_config_set_LTE()
-	if (ssiLanes == 1) {
-		return QStringList(); // No options for 1 lane
-	} else if (ssiLanes == 2) {
-		return SAMPLE_RATES_HZ; // All 6 options for 2 lanes (LVDS)
-	} else if (ssiLanes == 4) {
-		return QStringList() << SAMPLE_RATES_HZ.first(); // Only first option for 4 lanes (CMOS)
+	ParsedDeviceConfig config;
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Parsing device profile configuration";
+
+	// Parse duplex mode - look for "Duplex Mode:" line
+	QString duplexMode = extractValueBetween(profileConfigText, "Duplex Mode:", "\n");
+	config.duplexMode = duplexMode.contains("TDD", Qt::CaseInsensitive) ? "TDD" : "FDD";
+
+	// Parse SSI interface - look for "SSI interface:" line
+	QString ssiInterface = extractValueBetween(profileConfigText, "SSI interface:", "\n");
+	config.ssiInterface = ssiInterface.contains("LVDS", Qt::CaseInsensitive) ? "LVDS" : "CMOS";
+	config.ssiLanes = ssiInterface.contains("LVDS", Qt::CaseInsensitive) ? 2 : 4;
+
+	// Parse device clock info
+	config.deviceClock = extractValueBetween(profileConfigText, "Device clk(Hz):", "\n");
+	config.clockDivider = extractValueBetween(profileConfigText, "ARM Power Saving Clk Divider:", "\n");
+
+	// Parse channel configurations (matching iio-oscilloscope logic)
+	for(int ch = 0; ch < 2; ch++) {
+		// RX channel parsing
+		QString rxPrefix = QString("RX%1").arg(ch + 1);
+		config.rxChannels[ch].enabled =
+			extractValueBetween(profileConfigText, rxPrefix + " enabled:", "\n").contains("1");
+		config.rxChannels[ch].sampleRate =
+			extractValueBetween(profileConfigText, rxPrefix + " sample rate(Hz):", "\n");
+		config.rxChannels[ch].bandwidth =
+			extractValueBetween(profileConfigText, rxPrefix + " channel bandwidth(Hz):", "\n");
+		config.rxChannels[ch].freqOffsetCorrection =
+			extractValueBetween(profileConfigText, rxPrefix + " frequency offset correction enable:", "\n")
+				.contains("1");
+
+		QString rxRfPort = extractValueBetween(profileConfigText, rxPrefix + " RF port:", "\n");
+		config.rxChannels[ch].rfPort = mapRfPortFromDevice(rxRfPort, ch);
+
+		// TX channel parsing
+		QString txPrefix = QString("TX%1").arg(ch + 1);
+		config.txChannels[ch].enabled =
+			extractValueBetween(profileConfigText, txPrefix + " enabled:", "\n").contains("1");
+		config.txChannels[ch].sampleRate =
+			extractValueBetween(profileConfigText, txPrefix + " sample rate(Hz):", "\n");
+		config.txChannels[ch].bandwidth =
+			extractValueBetween(profileConfigText, txPrefix + " channel bandwidth(Hz):", "\n");
+		config.txChannels[ch].freqOffsetCorrection =
+			extractValueBetween(profileConfigText, txPrefix + " frequency offset correction enable:", "\n")
+				.contains("1");
+		config.txChannels[ch].orxEnabled =
+			extractValueBetween(profileConfigText, txPrefix + " ORx enabled:", "\n").contains("1");
 	}
-	return SAMPLE_RATES_HZ; // Default to all options
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Parsed device config - Duplex:" << config.duplexMode
+					   << "SSI:" << config.ssiInterface << "Lanes:" << config.ssiLanes;
+
+	return config;
 }
 
 ProfileGeneratorWidget::ProfileGeneratorWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_cliManager(nullptr)
 	, m_cliAvailable(false)
-	, m_statusLabel(nullptr)
 	, m_contentWidget(nullptr)
 	, m_lastAppliedPreset("")
 	, m_updatingFromPreset(false)
 {
+	// Initialize CLI manager
+	m_cliManager = new ProfileCliManager(m_device, this);
+	m_cliAvailable = m_cliManager->isCliAvailable();
+
+	// Connect CLI manager signals for user feedback
+	connect(m_cliManager, &ProfileCliManager::operationProgress, this,
+		[](const QString &msg) { StatusBarManager::pushMessage(msg, 3000); });
+	connect(m_cliManager, &ProfileCliManager::operationError, this,
+		[](const QString &error) { StatusBarManager::pushMessage(error, 5000); });
+
 	setupUi();
 }
 
@@ -117,23 +152,20 @@ ProfileGeneratorWidget::~ProfileGeneratorWidget() {}
 void ProfileGeneratorWidget::setupUi()
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setSpacing(15); // Increased section spacing from prompt pattern
-	mainLayout->setContentsMargins(10, 10, 10, 10);
+	mainLayout->setSpacing(15);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 
-	// Step 1: Detect CLI availability
-	m_cliAvailable = detectProfileGeneratorCLI();
-
-	// Step 2: Create status notification (always at top)
-	m_statusLabel = new QLabel(this);
-	mainLayout->addWidget(m_statusLabel);
-
-	// Step 3: Create content widget (all controls go here)
+	// Create content widget (all controls go here)
 	m_contentWidget = new QWidget(this);
 	QVBoxLayout *contentLayout = new QVBoxLayout(m_contentWidget);
-	contentLayout->setSpacing(15); // Standard section spacing from prompt pattern
+	contentLayout->setSpacing(15);
+	contentLayout->setContentsMargins(0, 0, 0, 0);
 
-	// Add all the profile generator controls to content widget
-	contentLayout->addWidget(createProfileActionBar());
+	// Step 3: Create status notification
+	mainLayout->addWidget(generateDeviceDriverAPIWidget(this));
+
+	// Add all the profile generator collapsible sections to content widget
+	contentLayout->addWidget(createProfileActionSection());
 	contentLayout->addWidget(createRadioConfigSection());
 	contentLayout->addWidget(createChannelConfigSection());
 	contentLayout->addWidget(createOrxConfigSection());
@@ -144,137 +176,30 @@ void ProfileGeneratorWidget::setupUi()
 
 	mainLayout->addWidget(m_contentWidget);
 
-	// Step 4: Configure UI based on CLI availability
-	setupUIBasedOnCLIAvailability();
-
-	// Step 5: Setup connections (only if CLI available)
+	// Step 5: Setup enhanced signal connections and initialize preset system
 	if(m_cliAvailable) {
-		setupConnections();
-		// Initialize with default LTE preset
+		setupEnhancedConnections();
+
+		m_ssiInterfaceLabel->setText(LTEDefaults::SSI_INTERFACE);
+		m_radioConfig.lvds = true;
+		m_radioConfig.ssi_lanes = LTEDefaults::SSI_LANES;
+
+		m_presetCombo->setCurrentText("LTE");
 		loadPresetData("LTE");
-		// Initialize control states
-		updateChannelControlsVisibility();
-		updateOrxControlsState();
+
+		// Perform complete UI state refresh after preset initialization
+		refreshAllUIStates();
 	}
 }
 
-bool ProfileGeneratorWidget::detectProfileGeneratorCLI()
+MenuSectionCollapseWidget *ProfileGeneratorWidget::createProfileActionSection()
 {
-	// Search for CLI tool in common locations
-	QStringList searchPaths = {"/usr/bin/", "/usr/local/bin/", "/opt/analog/bin/",
-				   QCoreApplication::applicationDirPath() + "/", QDir::homePath() + "/.local/bin/"};
+	auto section = new MenuSectionCollapseWidget("Profile Actions", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, this);
 
-	QStringList cliNames = {"adrv9002-iio-cli", // Primary CLI tool found on this system
-				"adrv9002_profile_generator", "profile_gen_cli", "adrv9002-profile-gen"};
-
-	for(const QString &path : searchPaths) {
-		for(const QString &cliName : cliNames) {
-			QString fullPath = path + cliName;
-			if(QFile::exists(fullPath) && QFileInfo(fullPath).isExecutable()) {
-				m_cliPath = fullPath;
-				return validateCLIVersion();
-			}
-		}
-	}
-
-	// Also check PATH environment variable
-	QProcess process;
-	for(const QString &cliName : cliNames) {
-		process.start("which", QStringList() << cliName);
-		process.waitForFinished(3000);
-		if(process.exitCode() == 0) {
-			m_cliPath = process.readAllStandardOutput().trimmed();
-			return validateCLIVersion();
-		}
-	}
-
-	return false;
-}
-
-bool ProfileGeneratorWidget::validateCLIVersion()
-{
-	QProcess process;
-	process.start(m_cliPath, QStringList() << "--version");
-	process.waitForFinished(5000);
-
-	if(process.exitCode() != 0) {
-		// Try alternative version check
-		process.start(m_cliPath, QStringList() << "-v");
-		process.waitForFinished(5000);
-		if(process.exitCode() != 0) {
-			return false;
-		}
-	}
-
-	m_cliVersion = process.readAllStandardOutput().trimmed();
-	if(m_cliVersion.isEmpty()) {
-		m_cliVersion = "unknown";
-	}
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Found Profile Generator CLI:" << m_cliPath << "Version:" << m_cliVersion;
-	return true;
-}
-
-void ProfileGeneratorWidget::setupUIBasedOnCLIAvailability()
-{
-	m_statusLabel->setWordWrap(true);
-	m_statusLabel->setMargin(10);
-
-	if(m_cliAvailable) {
-		// CLI available - show success status
-		m_statusLabel->setText(QString("✓ Profile Generator CLI detected: %1 (%2)")
-					       .arg(QFileInfo(m_cliPath).fileName())
-					       .arg(m_cliVersion));
-		m_statusLabel->setStyleSheet("QLabel { "
-					     "background-color: #d4edda; "
-					     "color: #155724; "
-					     "border: 1px solid #c3e6cb; "
-					     "border-radius: 4px; "
-					     "padding: 8px; "
-					     "}");
-
-		// Enable all functionality
-		m_contentWidget->setEnabled(true);
-
-	} else {
-		// CLI not available - show error status
-		m_statusLabel->setText(
-			"⚠ Profile Generator CLI not found. "
-			"Advanced profile generation features are disabled. "
-			"Please install the ADRV9002 Profile Generator CLI tool to enable this functionality. "
-			"Refer to the ADI documentation for installation instructions.");
-		m_statusLabel->setStyleSheet("QLabel { "
-					     "background-color: #f8d7da; "
-					     "color: #721c24; "
-					     "border: 1px solid #f5c6cb; "
-					     "border-radius: 4px; "
-					     "padding: 8px; "
-					     "}");
-
-		// Disable all controls
-		m_contentWidget->setEnabled(false);
-
-		// Add download info button with proper Scopy styling right under the error message
-		QPushButton *infoBtn = new QPushButton("Download Profile Generator CLI", this);
-		Style::setStyle(infoBtn, style::properties::button::basicButton);
-		infoBtn->setMinimumWidth(250);
-		infoBtn->setMaximumWidth(300);
-		connect(infoBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onDownloadCLI);
-
-		// Insert button right after the status label (position 1 in mainLayout)
-		static_cast<QVBoxLayout *>(layout())->insertWidget(1, infoBtn);
-	}
-}
-
-QWidget *ProfileGeneratorWidget::createProfileActionBar()
-{
 	QWidget *actionBar = new QWidget();
-	// Apply prompt pattern: section background and border styling
-	Style::setBackgroundColor(actionBar, json::theme::background_primary);
-	Style::setStyle(actionBar, style::properties::widget::border_interactive);
-
 	QHBoxLayout *layout = new QHBoxLayout(actionBar);
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
+	layout->setContentsMargins(10, 10, 10, 10);
 	layout->setSpacing(15);
 
 	// Preset dropdown with styling - matching iio-oscilloscope exactly
@@ -308,146 +233,106 @@ QWidget *ProfileGeneratorWidget::createProfileActionBar()
 	layout->addWidget(m_saveToFileBtn);
 	layout->addWidget(m_loadToDeviceBtn);
 
-	return actionBar;
-}
-
-QWidget *ProfileGeneratorWidget::createRadioConfigSection()
-{
-	QWidget *section = new QWidget();
-	// Apply prompt pattern: individual section background and border
-	Style::setBackgroundColor(section, json::theme::background_primary);
-	Style::setStyle(section, style::properties::widget::border_interactive);
-
-	QGridLayout *layout = new QGridLayout(section);
-	layout->setSpacing(10);			    // Standard Scopy spacing from prompt
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
-
-	// Title
-	QLabel *title = new QLabel("Radio Config");
-	Style::setStyle(title, style::properties::label::menuBig);
-	layout->addWidget(title, 0, 0, 1, 4);
-
-	// SSI Interface - using correct IOO options
-	layout->addWidget(new QLabel("SSI Interface:"), 1, 0);
-	m_ssiInterfaceCombo = new QComboBox();
-	m_ssiInterfaceCombo->addItems(IOOOptions::SSI_INTERFACE_OPTIONS);
-	layout->addWidget(m_ssiInterfaceCombo, 1, 1);
-
-	// Duplex mode - using correct IOO options
-	layout->addWidget(new QLabel("Duplex mode:"), 1, 2);
-	m_duplexModeCombo = new QComboBox();
-	m_duplexModeCombo->addItems(IOOOptions::DUPLEX_MODE_OPTIONS);
-	layout->addWidget(m_duplexModeCombo, 1, 3);
-
+	section->add(actionBar);
 	return section;
 }
 
-QWidget *ProfileGeneratorWidget::createChannelConfigSection()
+MenuSectionCollapseWidget *ProfileGeneratorWidget::createRadioConfigSection()
 {
-	QWidget *section = new QWidget();
-	// Apply prompt pattern: section background and border
-	Style::setBackgroundColor(section, json::theme::background_primary);
-	Style::setStyle(section, style::properties::widget::border_interactive);
+	auto section = new MenuSectionCollapseWidget("Radio Configuration", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, this);
 
-	QGridLayout *layout = new QGridLayout(section);
+	QWidget *radioConfigWidget = new QWidget();
+	QGridLayout *layout = new QGridLayout(radioConfigWidget);
+	layout->setSpacing(10);
+	layout->setContentsMargins(10, 10, 10, 10);
+
+	// SSI Interface - READ-ONLY LABEL like iio-oscilloscope (device-determined)
+	layout->addWidget(new QLabel("SSI Interface:"), 0, 0);
+	m_ssiInterfaceLabel = new QLabel("Reading...");
+	Style::setStyle(m_ssiInterfaceLabel, style::properties::label::menuSmall);
+	layout->addWidget(m_ssiInterfaceLabel, 0, 1);
+
+	// Duplex mode - using correct IOO options
+	layout->addWidget(new QLabel("Duplex mode:"), 0, 2);
+	m_duplexModeCombo = new QComboBox();
+	m_duplexModeCombo->addItems(IOOOptions::DUPLEX_MODE_OPTIONS);
+	layout->addWidget(m_duplexModeCombo, 0, 3);
+
+	section->add(radioConfigWidget);
+	return section;
+}
+
+MenuSectionCollapseWidget *ProfileGeneratorWidget::createChannelConfigSection()
+{
+	auto section = new MenuSectionCollapseWidget("Channel Configuration", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, this);
+
+	QWidget *channelConfigWidget = new QWidget();
+	QGridLayout *layout = new QGridLayout(channelConfigWidget);
 	layout->setSpacing(15);
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
+	layout->setContentsMargins(10, 10, 10, 10);
 
 	// Create 2x2 grid: RX1, RX2, TX1, TX2
-	layout->addWidget(createChannelConfigWidget("RX 1", CHANNEL_RX1), 0, 0);
-	layout->addWidget(createChannelConfigWidget("RX 2", CHANNEL_RX2), 0, 1);
-	layout->addWidget(createChannelConfigWidget("TX 1", CHANNEL_TX1), 1, 0);
-	layout->addWidget(createChannelConfigWidget("TX 2", CHANNEL_TX2), 1, 1);
+	QWidget *rx1Frame = createChannelConfigWidget("RX 1", CHANNEL_RX1);
+	QWidget *rx2Frame = createChannelConfigWidget("RX 2", CHANNEL_RX2);
+	QWidget *tx1Frame = createChannelConfigWidget("TX 1", CHANNEL_TX1);
+	QWidget *tx2Frame = createChannelConfigWidget("TX 2", CHANNEL_TX2);
 
+	layout->addWidget(rx1Frame, 0, 0);
+	layout->addWidget(rx2Frame, 0, 1);
+	layout->addWidget(tx1Frame, 1, 0);
+	layout->addWidget(tx2Frame, 1, 1);
+
+	section->add(channelConfigWidget);
 	return section;
 }
 
 QWidget *ProfileGeneratorWidget::createChannelConfigWidget(const QString &title, ChannelType type)
 {
-	QWidget *widget = new QWidget();
-	Style::setBackgroundColor(widget, json::theme::background_primary);
-	Style::setStyle(widget, style::properties::widget::border_interactive);
+	// Determine channel mode and RF input options
+	ChannelConfigWidget::ChannelMode mode = (type == CHANNEL_RX1 || type == CHANNEL_RX2)
+		? ChannelConfigWidget::RX_MODE
+		: ChannelConfigWidget::TX_MODE;
 
-	QGridLayout *layout = new QGridLayout(widget);
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
-	layout->setSpacing(10);			    // Standard spacing from prompt
-
-	// Title
-	QLabel *titleLabel = new QLabel(title);
-	Style::setStyle(titleLabel, style::properties::label::menuBig);
-	layout->addWidget(titleLabel, 0, 0, 1, 2);
-
-	// Get widgets for this channel
-	ChannelWidgets *widgets = nullptr;
-	switch(type) {
-	case CHANNEL_RX1:
-		widgets = &m_rx1Widgets;
-		break;
-	case CHANNEL_RX2:
-		widgets = &m_rx2Widgets;
-		break;
-	case CHANNEL_TX1:
-		widgets = &m_tx1Widgets;
-		break;
-	case CHANNEL_TX2:
-		widgets = &m_tx2Widgets;
-		break;
+	QStringList rfOptions;
+	if(type == CHANNEL_RX1) {
+		rfOptions = RFInputOptions::RX1_OPTIONS;
+	} else if(type == CHANNEL_RX2) {
+		rfOptions = RFInputOptions::RX2_OPTIONS;
 	}
 
-	// Enabled checkbox
-	widgets->enabledCb = new QCheckBox("Enabled");
-	widgets->enabledCb->setChecked(true); // Default enabled
-	layout->addWidget(widgets->enabledCb, 1, 0, 1, 2);
+	// Create unified channel widget
+	ChannelConfigWidget *channelWidget = new ChannelConfigWidget(title, mode, rfOptions, this);
+	m_channelWidgets[type] = channelWidget;
 
-	// Frequency Offset Correction
-	widgets->freqOffsetCb = new QCheckBox("Frequency Offset Correction");
-	layout->addWidget(widgets->freqOffsetCb, 2, 0, 1, 2);
+	// Connect unified signals for immediate updates
+	connect(channelWidget, &ChannelConfigWidget::sampleRateChanged, this,
+		[this](const QString &rate) { onSampleRateChangedSynchronized(rate); });
+	connect(channelWidget, &ChannelConfigWidget::enabledChanged, this,
+		&ProfileGeneratorWidget::onChannelEnableChanged);
+	connect(channelWidget, &ChannelConfigWidget::channelDataChanged, this,
+		&ProfileGeneratorWidget::updateProfileData);
 
-	// Bandwidth (Hz) - matching iio-oscilloscope exactly
-	layout->addWidget(new QLabel("Bandwidth (Hz):"), 3, 0);
-	widgets->bandwidthCombo = new QComboBox();
-	widgets->bandwidthCombo->addItems(FrequencyTable::BANDWIDTHS_HZ);
-	layout->addWidget(widgets->bandwidthCombo, 3, 1);
-
-	// Interface Sample Rate (Hz) - matching iio-oscilloscope exactly
-	layout->addWidget(new QLabel("Interface Sample Rate (Hz):"), 4, 0);
-	widgets->sampleRateCombo = new QComboBox();
-	widgets->sampleRateCombo->addItems(FrequencyTable::SAMPLE_RATES_HZ);
-	layout->addWidget(widgets->sampleRateCombo, 4, 1);
-
-	// RX RF Input (only for RX channels) - using descriptive names
-	if(type == CHANNEL_RX1 || type == CHANNEL_RX2) {
-		layout->addWidget(new QLabel("RX RF Input:"), 5, 0);
-		widgets->rfInputCombo = new QComboBox();
-		if(type == CHANNEL_RX1) {
-			widgets->rfInputCombo->addItems(RFInputOptions::RX1_OPTIONS);
-		} else {
-			widgets->rfInputCombo->addItems(RFInputOptions::RX2_OPTIONS);
-		}
-		layout->addWidget(widgets->rfInputCombo, 5, 1);
-	} else {
-		widgets->rfInputCombo = nullptr;
-	}
-
-	return widget;
+	return channelWidget;
 }
 
-QWidget *ProfileGeneratorWidget::createOrxConfigSection()
+MenuSectionCollapseWidget *ProfileGeneratorWidget::createOrxConfigSection()
 {
-	QWidget *section = new QWidget();
-	// Apply prompt pattern: section background and border
-	Style::setBackgroundColor(section, json::theme::background_primary);
-	Style::setStyle(section, style::properties::widget::border_interactive);
+	auto section = new MenuSectionCollapseWidget("ORX Configuration", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, this);
 
-	QHBoxLayout *layout = new QHBoxLayout(section);
+	QWidget *orxConfigWidget = new QWidget();
+	QHBoxLayout *layout = new QHBoxLayout(orxConfigWidget);
 	layout->setSpacing(15);
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
+	layout->setContentsMargins(10, 10, 10, 10);
 
 	// ORX 1
 	layout->addWidget(createOrxWidget("ORX 1"));
 	// ORX 2
 	layout->addWidget(createOrxWidget("ORX 2"));
 
+	section->add(orxConfigWidget);
 	return section;
 }
 
@@ -458,8 +343,8 @@ QWidget *ProfileGeneratorWidget::createOrxWidget(const QString &title)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
-	layout->setSpacing(10);			    // Standard spacing from prompt
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
 
 	QLabel *titleLabel = new QLabel(title);
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
@@ -479,70 +364,25 @@ QWidget *ProfileGeneratorWidget::createOrxWidget(const QString &title)
 	return widget;
 }
 
-QWidget *ProfileGeneratorWidget::createDebugInfoSection()
+MenuSectionCollapseWidget *ProfileGeneratorWidget::createDebugInfoSection()
 {
-	QWidget *section = new QWidget();
-	// Apply prompt pattern: section background and border
-	Style::setBackgroundColor(section, json::theme::background_primary);
-	Style::setStyle(section, style::properties::widget::border_interactive);
+	auto section = new MenuSectionCollapseWidget("Debug Information", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, this);
 
-	QVBoxLayout *layout = new QVBoxLayout(section);
-	layout->setContentsMargins(15, 15, 15, 15); // Standard margins from prompt
-	layout->setSpacing(10);			    // Standard spacing from prompt
-
-	QLabel *title = new QLabel("Debug Info");
-	Style::setStyle(title, style::properties::label::menuBig);
-	layout->addWidget(title);
+	section->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	QWidget *debugInfoWidget = new QWidget();
+	debugInfoWidget->setMinimumHeight(500);
+	QVBoxLayout *layout = new QVBoxLayout(debugInfoWidget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
 
 	m_debugInfoText = new QTextEdit();
 	m_debugInfoText->setReadOnly(true);
-	m_debugInfoText->setMaximumHeight(200);
 	m_debugInfoText->setFont(QFont("monospace"));
 	layout->addWidget(m_debugInfoText);
 
+	section->add(debugInfoWidget);
 	return section;
-}
-
-void ProfileGeneratorWidget::setupConnections()
-{
-	// Action buttons
-	connect(m_presetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&ProfileGeneratorWidget::onPresetChanged);
-	connect(m_refreshProfileBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onRefreshProfile);
-	connect(m_saveToFileBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onSaveToFile);
-	connect(m_loadToDeviceBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onLoadToDevice);
-
-	// Sample rate change signals for bandwidth updates
-	connect(m_rx1Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
-		this, [this]() { onSampleRateChanged(CHANNEL_RX1); });
-	connect(m_rx2Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
-		this, [this]() { onSampleRateChanged(CHANNEL_RX2); });
-	connect(m_tx1Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
-		this, [this]() { onSampleRateChanged(CHANNEL_TX1); });
-	connect(m_tx2Widgets.sampleRateCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged),
-		this, [this]() { onSampleRateChanged(CHANNEL_TX2); });
-
-	// Data change signals
-	connect(m_ssiInterfaceCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
-		&ProfileGeneratorWidget::updateProfileData);
-	connect(m_duplexModeCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
-		&ProfileGeneratorWidget::updateProfileData);
-
-	// Signal dependencies (critical for iio-oscilloscope compatibility)
-	connect(m_duplexModeCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
-		&ProfileGeneratorWidget::onTddModeChanged);
-	connect(m_ssiInterfaceCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this,
-		&ProfileGeneratorWidget::onInterfaceChanged);
-
-	// Channel enable changes affect UI controls and ORX state
-	connect(m_rx1Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onChannelEnableChanged);
-	connect(m_rx2Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onChannelEnableChanged);
-	connect(m_tx1Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onTxEnableChanged);
-	connect(m_tx2Widgets.enabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::onTxEnableChanged);
-
-	// ORX enable changes
-	connect(m_orx1EnabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
-	connect(m_orx2EnabledCb, &QCheckBox::toggled, this, &ProfileGeneratorWidget::updateProfileData);
 }
 
 void ProfileGeneratorWidget::loadPresetData(const QString &presetName)
@@ -550,26 +390,22 @@ void ProfileGeneratorWidget::loadPresetData(const QString &presetName)
 	if(presetName == "LTE") {
 		// Apply LTE defaults exactly matching lte_defaults() function
 		applyLTEDefaults();
+	} else if(presetName == "Live Device") {
+		// Read current device configuration and populate UI
+		qInfo(CAT_PROFILEGENERATORWIDGET) << "Loading Live Device preset from device configuration";
 
-		// Enable RX1 and RX2
-		m_rx1Widgets.enabledCb->setChecked(true);
-		m_rx2Widgets.enabledCb->setChecked(true);
-		m_rx1Widgets.bandwidthCombo->setCurrentText("38000000");
-		m_rx2Widgets.bandwidthCombo->setCurrentText("38000000");
-		m_rx1Widgets.sampleRateCombo->setCurrentText("61440000");
-		m_rx2Widgets.sampleRateCombo->setCurrentText("61440000");
-
-		// Enable TX1 and TX2
-		m_tx1Widgets.enabledCb->setChecked(true);
-		m_tx2Widgets.enabledCb->setChecked(true);
-		m_tx1Widgets.bandwidthCombo->setCurrentText("38000000");
-		m_tx2Widgets.bandwidthCombo->setCurrentText("38000000");
-		m_tx1Widgets.sampleRateCombo->setCurrentText("61440000");
-		m_tx2Widgets.sampleRateCombo->setCurrentText("61440000");
-
-		// Disable ORX by default
-		m_orx1EnabledCb->setChecked(false);
-		m_orx2EnabledCb->setChecked(false);
+		if(isDeviceConfigurationAvailable()) {
+			if(readDeviceConfiguration()) {
+				populateUIFromDeviceConfig(m_deviceConfig);
+				StatusBarManager::pushMessage("Live Device configuration loaded successfully", 3000);
+			} else {
+				qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read device configuration";
+				StatusBarManager::pushMessage("Failed to read Live Device configuration", 5000);
+			}
+		} else {
+			qWarning(CAT_PROFILEGENERATORWIDGET) << "Device configuration not available";
+			StatusBarManager::pushMessage("Live Device configuration not available", 5000);
+		}
 	}
 
 	updateProfileData();
@@ -583,38 +419,30 @@ void ProfileGeneratorWidget::updateProfileData()
 
 void ProfileGeneratorWidget::updateConfigFromUI()
 {
-	// Radio config
-	m_radioConfig.lvds = (m_ssiInterfaceCombo->currentText() == "LVDS");
+	// Radio config - read from device-determined SSI interface label
+	QString ssiInterface = m_ssiInterfaceLabel->text();
+	m_radioConfig.lvds = (ssiInterface == "LVDS");
 	m_radioConfig.fdd = (m_duplexModeCombo->currentText() == "FDD");
 	m_radioConfig.ssi_lanes = m_radioConfig.lvds ? 2 : 4;
 
-	// RX channels
-	m_radioConfig.rx_config[0].enabled = m_rx1Widgets.enabledCb->isChecked();
-	m_radioConfig.rx_config[0].freqOffsetCorrection = m_rx1Widgets.freqOffsetCb->isChecked();
-	m_radioConfig.rx_config[0].bandwidth = m_rx1Widgets.bandwidthCombo->currentText();
-	m_radioConfig.rx_config[0].sampleRate = m_rx1Widgets.sampleRateCombo->currentText();
-	if(m_rx1Widgets.rfInputCombo) {
-		m_radioConfig.rx_config[0].rfInput = m_rx1Widgets.rfInputCombo->currentText();
+	// Channel configs - unified processing using loop
+	for(int i = 0; i < 4; ++i) {
+		auto data = m_channelWidgets[i]->getChannelData();
+
+		if(i < 2) { // RX channels (RX1, RX2)
+			m_radioConfig.rx_config[i].enabled = data.enabled;
+			m_radioConfig.rx_config[i].freqOffsetCorrection = data.freqOffsetCorrection;
+			m_radioConfig.rx_config[i].bandwidth = data.bandwidth;
+			m_radioConfig.rx_config[i].sampleRate = data.sampleRate;
+			m_radioConfig.rx_config[i].rfInput = data.rfInput;
+		} else { // TX channels (TX1, TX2)
+			int txIndex = i - 2;
+			m_radioConfig.tx_config[txIndex].enabled = data.enabled;
+			m_radioConfig.tx_config[txIndex].freqOffsetCorrection = data.freqOffsetCorrection;
+			m_radioConfig.tx_config[txIndex].bandwidth = data.bandwidth;
+			m_radioConfig.tx_config[txIndex].sampleRate = data.sampleRate;
+		}
 	}
-
-	m_radioConfig.rx_config[1].enabled = m_rx2Widgets.enabledCb->isChecked();
-	m_radioConfig.rx_config[1].freqOffsetCorrection = m_rx2Widgets.freqOffsetCb->isChecked();
-	m_radioConfig.rx_config[1].bandwidth = m_rx2Widgets.bandwidthCombo->currentText();
-	m_radioConfig.rx_config[1].sampleRate = m_rx2Widgets.sampleRateCombo->currentText();
-	if(m_rx2Widgets.rfInputCombo) {
-		m_radioConfig.rx_config[1].rfInput = m_rx2Widgets.rfInputCombo->currentText();
-	}
-
-	// TX channels
-	m_radioConfig.tx_config[0].enabled = m_tx1Widgets.enabledCb->isChecked();
-	m_radioConfig.tx_config[0].freqOffsetCorrection = m_tx1Widgets.freqOffsetCb->isChecked();
-	m_radioConfig.tx_config[0].bandwidth = m_tx1Widgets.bandwidthCombo->currentText();
-	m_radioConfig.tx_config[0].sampleRate = m_tx1Widgets.sampleRateCombo->currentText();
-
-	m_radioConfig.tx_config[1].enabled = m_tx2Widgets.enabledCb->isChecked();
-	m_radioConfig.tx_config[1].freqOffsetCorrection = m_tx2Widgets.freqOffsetCb->isChecked();
-	m_radioConfig.tx_config[1].bandwidth = m_tx2Widgets.bandwidthCombo->currentText();
-	m_radioConfig.tx_config[1].sampleRate = m_tx2Widgets.sampleRateCombo->currentText();
 
 	// ORX
 	m_radioConfig.orx_enabled[0] = m_orx1EnabledCb->isChecked();
@@ -623,54 +451,88 @@ void ProfileGeneratorWidget::updateConfigFromUI()
 
 void ProfileGeneratorWidget::updateDebugInfo()
 {
-	QJsonObject config = generateBasicProfile();
-	QJsonDocument doc(config);
-	m_debugInfoText->setPlainText(doc.toJson(QJsonDocument::Indented));
-}
+	QJsonObject debugInfo;
 
-QJsonObject ProfileGeneratorWidget::generateBasicProfile()
-{
-	QJsonObject profile;
+	// Add current preset information
+	QString currentPreset = m_presetCombo->currentText();
+	debugInfo["current_preset"] = currentPreset;
+	debugInfo["cli_available"] = m_cliAvailable;
 
-	// Radio configuration section
-	QJsonObject radioConfig;
-	radioConfig["ssi_type"] = m_radioConfig.lvds ? "LVDS" : "CMOS";
-	radioConfig["ssi_lanes"] = m_radioConfig.ssi_lanes;
-	radioConfig["duplex_mode"] = m_radioConfig.fdd ? "FDD" : "TDD";
-	radioConfig["ddr"] = 1;
+	// Add Live Device configuration if available and preset is Live Device
+	if(isLiveDeviceModeActive() && isDeviceConfigurationAvailable()) {
+		QJsonObject deviceConfig;
+		deviceConfig["duplex_mode"] = m_deviceConfig.duplexMode;
+		deviceConfig["ssi_interface"] = m_deviceConfig.ssiInterface;
+		deviceConfig["ssi_lanes"] = m_deviceConfig.ssiLanes;
+		deviceConfig["device_clock"] = m_deviceConfig.deviceClock;
+		deviceConfig["clock_divider"] = m_deviceConfig.clockDivider;
 
-	// Channel configurations
-	QJsonArray rxChannels, txChannels;
-	for(int i = 0; i < 2; i++) {
-		QJsonObject rxCh;
-		rxCh["enabled"] = m_radioConfig.rx_config[i].enabled;
-		rxCh["bandwidth_hz"] = m_radioConfig.rx_config[i].bandwidth.toInt();
-		rxCh["sample_rate_hz"] = m_radioConfig.rx_config[i].sampleRate.toInt();
-		rxCh["frequency_offset_correction"] = m_radioConfig.rx_config[i].freqOffsetCorrection;
-		rxCh["rf_input"] = m_radioConfig.rx_config[i].rfInput;
-		rxChannels.append(rxCh);
+		// RX channels from device
+		QJsonArray rxChannelsDevice;
+		for(int i = 0; i < 2; i++) {
+			QJsonObject rxCh;
+			rxCh["enabled"] = m_deviceConfig.rxChannels[i].enabled;
+			rxCh["bandwidth"] = m_deviceConfig.rxChannels[i].bandwidth;
+			rxCh["sample_rate"] = m_deviceConfig.rxChannels[i].sampleRate;
+			rxCh["freq_offset_correction"] = m_deviceConfig.rxChannels[i].freqOffsetCorrection;
+			rxCh["rf_port"] = m_deviceConfig.rxChannels[i].rfPort;
+			rxChannelsDevice.append(rxCh);
+		}
+		deviceConfig["rx_channels"] = rxChannelsDevice;
 
-		QJsonObject txCh;
-		txCh["enabled"] = m_radioConfig.tx_config[i].enabled;
-		txCh["bandwidth_hz"] = m_radioConfig.tx_config[i].bandwidth.toInt();
-		txCh["sample_rate_hz"] = m_radioConfig.tx_config[i].sampleRate.toInt();
-		txCh["frequency_offset_correction"] = m_radioConfig.tx_config[i].freqOffsetCorrection;
-		txCh["orx_enabled"] = m_radioConfig.orx_enabled[i];
-		txChannels.append(txCh);
+		// TX channels from device
+		QJsonArray txChannelsDevice;
+		for(int i = 0; i < 2; i++) {
+			QJsonObject txCh;
+			txCh["enabled"] = m_deviceConfig.txChannels[i].enabled;
+			txCh["bandwidth"] = m_deviceConfig.txChannels[i].bandwidth;
+			txCh["sample_rate"] = m_deviceConfig.txChannels[i].sampleRate;
+			txCh["freq_offset_correction"] = m_deviceConfig.txChannels[i].freqOffsetCorrection;
+			txCh["orx_enabled"] = m_deviceConfig.txChannels[i].orxEnabled;
+			txChannelsDevice.append(txCh);
+		}
+		deviceConfig["tx_channels"] = txChannelsDevice;
+
+		debugInfo["device_configuration"] = deviceConfig;
 	}
 
-	profile["radio_cfg"] = radioConfig;
-	profile["rx_channels"] = rxChannels;
-	profile["tx_channels"] = txChannels;
+	// Add CLI configuration preview (shows what will be sent to CLI tool)
+	if(m_cliAvailable && m_cliManager) {
+		QString configPreview = m_cliManager->generateConfigPreview(m_radioConfig);
+		QJsonDocument configDoc = QJsonDocument::fromJson(configPreview.toUtf8());
+		debugInfo["cli_configuration"] = configDoc.object();
+	}
 
-	return profile;
+	QJsonDocument doc(debugInfo);
+	m_debugInfoText->setPlainText(doc.toJson(QJsonDocument::Indented));
 }
 
 // Slot implementations
 void ProfileGeneratorWidget::onPresetChanged()
 {
 	QString presetName = m_presetCombo->currentText();
-	loadPresetData(presetName);
+
+	// This fixes the Live Device → LTE → Live Device transition bug
+	if(presetName == "Live Device") {
+		// Switching TO Live Device mode: Restore full bandwidth options for all channels
+		for(int i = 0; i < 4; ++i) {
+			m_channelWidgets[i]->setBandwidthOptions(FrequencyTable::BANDWIDTHS_HZ);
+		}
+	}
+
+	// Update all channel widgets based on preset mode
+	bool isLTEMode = isLTEModeActive();
+	for(int i = 0; i < 4; ++i) {
+		m_channelWidgets[i]->updateControlsVisibility(isLTEMode);
+	}
+
+	if(presetName == "Live Device") {
+		// Live Device preset: Auto-refresh from device like iio-oscilloscope
+		onRefreshProfile();
+	} else {
+		// LTE preset: Apply static configuration
+		loadPresetData(presetName);
+	}
 }
 
 void ProfileGeneratorWidget::onRefreshProfile()
@@ -680,9 +542,38 @@ void ProfileGeneratorWidget::onRefreshProfile()
 		return;
 	}
 
-	// Refresh current configuration
-	updateProfileData();
-	StatusBarManager::pushMessage("Profile refreshed", 3000);
+	// Step 1: Reset all internal state (like iio-oscilloscope)
+	resetPresetTracking();
+
+	// Step 2: Always read from device first (regardless of preset)
+	qInfo(CAT_PROFILEGENERATORWIDGET) << "Refreshing profile from device (iio-oscilloscope style)";
+
+	if(!isDeviceConfigurationAvailable()) {
+		StatusBarManager::pushMessage("Device configuration not available", 5000);
+		return;
+	}
+
+	if(!readAndApplyDeviceConfiguration()) {
+		StatusBarManager::pushMessage("Failed to read device configuration", 5000);
+		return;
+	}
+
+	// Step 3: Apply device data to current preset mode
+	QString currentPreset = m_presetCombo->currentText();
+	if(isLTEModeActive()) {
+		// For LTE preset: Apply device data but enforce LTE constraints
+		applyLTEConstraintsToDeviceData();
+		qInfo(CAT_PROFILEGENERATORWIDGET) << "Applied LTE constraints to device data";
+	}
+	// For Live Device: Keep device data as-is (already applied)
+
+	// Step 4: Force complete UI refresh
+	refreshAllUIStates();
+
+	// Step 5: EXPLICITLY update debug info with fresh device data
+	updateDebugInfo();
+
+	StatusBarManager::pushMessage("Profile refreshed from device", 3000);
 }
 
 void ProfileGeneratorWidget::onSaveToFile()
@@ -727,145 +618,33 @@ void ProfileGeneratorWidget::onDownloadCLI()
 void ProfileGeneratorWidget::refreshProfileData() { onRefreshProfile(); }
 
 // CLI-based operations following iio-oscilloscope pattern
-bool ProfileGeneratorWidget::generateProfile()
-{
-	if(!m_cliAvailable) {
-		return false;
-	}
-
-	// Create temp files
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
-	QString profileFile = tempDir + "/adrv9002_profile.json";
-	QString streamFile = tempDir + "/adrv9002_stream.json";
-
-	// Write config to temp file
-	if(!writeConfigToFile(configFile)) {
-		return false;
-	}
-
-	// Run CLI command
-	QString command = QString("%1 --config %2 --profile %3 --stream %4")
-				  .arg(m_cliPath)
-				  .arg(configFile)
-				  .arg(profileFile)
-				  .arg(streamFile);
-
-	QProcess process;
-	process.start(command);
-	process.waitForFinished(30000); // 30 second timeout
-
-	// Cleanup config file
-	QFile::remove(configFile);
-
-	if(process.exitCode() != 0) {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "CLI command failed:" << process.readAllStandardError();
-		return false;
-	}
-
-	// Store file paths for later use
-	m_currentProfilePath = profileFile;
-	m_currentStreamPath = streamFile;
-
-	return true;
-}
 
 bool ProfileGeneratorWidget::loadProfileToDevice()
 {
-	if(!generateProfile()) {
+	if(!m_cliManager || !m_cliAvailable) {
 		return false;
 	}
 
-	// Read generated profile file
-	QFile profileFile(m_currentProfilePath);
-	if(!profileFile.open(QIODevice::ReadOnly)) {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read generated profile file";
-		return false;
-	}
-	QByteArray profileData = profileFile.readAll();
-	profileFile.close();
+	// Update config from current UI state
+	updateConfigFromUI();
 
-	// Read generated stream file
-	QFile streamFile(m_currentStreamPath);
-	if(!streamFile.open(QIODevice::ReadOnly)) {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read generated stream file";
-		return false;
-	}
-	QByteArray streamData = streamFile.readAll();
-	streamFile.close();
-
-	// Write to device
-	bool success = writeDeviceProfile(profileData) && writeDeviceStream(streamData);
-
-	// Cleanup temp files
-	QFile::remove(m_currentProfilePath);
-	QFile::remove(m_currentStreamPath);
-
-	if(success) {
-		qInfo(CAT_PROFILEGENERATORWIDGET) << "Successfully loaded profile and stream to device";
-	}
-
-	return success;
+	// Use CLI manager to load profile to device
+	auto result = m_cliManager->loadProfileToDevice(m_radioConfig);
+	return (result == ProfileCliManager::Success);
 }
 
 bool ProfileGeneratorWidget::saveProfileToFile(const QString &filename)
 {
-	if(!m_cliAvailable) {
-		// Fallback: save the basic JSON representation
-		QJsonObject profile = generateBasicProfile();
-		QJsonDocument doc(profile);
-
-		QFile file(filename);
-		if(file.open(QIODevice::WriteOnly)) {
-			file.write(doc.toJson());
-			return true;
-		}
+	if(!m_cliManager || !m_cliAvailable) {
 		return false;
 	}
 
-	// Use CLI to generate profile file (following iio-oscilloscope pattern)
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
+	// Update config from current UI state
+	updateConfigFromUI();
 
-	// Write config to temp file
-	if(!writeConfigToFile(configFile)) {
-		return false;
-	}
-
-	// Determine if saving profile or stream based on filename extension
-	bool isProfile = filename.endsWith(".json", Qt::CaseInsensitive);
-
-	// Run CLI command
-	QString command;
-	if(isProfile) {
-		command = QString("%1 --config %2 --profile %3").arg(m_cliPath).arg(configFile).arg(filename);
-	} else {
-		command = QString("%1 --config %2 --stream %3").arg(m_cliPath).arg(configFile).arg(filename);
-	}
-
-	QProcess process;
-	process.start(command);
-	process.waitForFinished(30000); // 30 second timeout
-
-	// Cleanup config file
-	QFile::remove(configFile);
-
-	if(process.exitCode() != 0) {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "CLI save command failed:" << process.readAllStandardError();
-		return false;
-	}
-
-	return true;
-}
-
-bool ProfileGeneratorWidget::writeDeviceProfile(const QByteArray &profileData)
-{
-	return writeDeviceAttribute("profile_config", profileData);
-}
-
-bool ProfileGeneratorWidget::writeDeviceStream(const QByteArray &streamData)
-{
-	return writeDeviceAttribute("stream_config", streamData);
+	// Use CLI manager to save profile to file
+	auto result = m_cliManager->saveProfileToFile(filename, m_radioConfig);
+	return (result == ProfileCliManager::Success);
 }
 
 QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName)
@@ -886,179 +665,63 @@ QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName
 	}
 }
 
-bool ProfileGeneratorWidget::writeDeviceAttribute(const QString &attributeName, const QByteArray &data)
-{
-	if(!m_device) {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "No device available for writing attribute:" << attributeName;
-		return false;
-	}
-
-	int ret =
-		iio_device_attr_write_raw(m_device, attributeName.toLocal8Bit().data(), data.constData(), data.size());
-
-	if(ret == data.size()) {
-		qDebug(CAT_PROFILEGENERATORWIDGET)
-			<< "Successfully wrote" << data.size() << "bytes to attribute:" << attributeName;
-		return true;
-	} else {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to write attribute:" << attributeName
-						     << "expected:" << data.size() << "written:" << ret;
-		return false;
-	}
-}
-
-void ProfileGeneratorWidget::updateUIFromConfig()
-{
-	// Update UI widgets from m_radioConfig
-	m_ssiInterfaceCombo->setCurrentText(m_radioConfig.lvds ? "LVDS" : "CMOS");
-	m_duplexModeCombo->setCurrentText(m_radioConfig.fdd ? "FDD" : "TDD");
-
-	// Update channel widgets...
-	// This can be implemented when needed for reading from device
-}
-
-bool ProfileGeneratorWidget::writeConfigToFile(const QString &filename)
-{
-	QJsonObject config = createFullConfigJson();
-	QJsonDocument doc(config);
-
-	QFile file(filename);
-	if(!file.open(QIODevice::WriteOnly)) {
-		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to write config file:" << filename;
-		return false;
-	}
-
-	file.write(doc.toJson());
-	file.close();
-	return true;
-}
-
-QJsonObject ProfileGeneratorWidget::createFullConfigJson()
-{
-	QJsonObject config;
-
-	// Radio configuration (matching iio-oscilloscope format)
-	QJsonObject radioCfg;
-	radioCfg["ssi_lanes"] = m_radioConfig.ssi_lanes;
-	radioCfg["ddr"] = 1; // Always enabled
-	radioCfg["short_strobe"] = true;
-	radioCfg["lvds"] = m_radioConfig.lvds;
-	radioCfg["adc_rate_mode"] = 3; // High performance
-	radioCfg["fdd"] = m_radioConfig.fdd;
-
-	// RX configuration array
-	QJsonArray rxConfigArray;
-	for(int i = 0; i < 2; i++) {
-		QJsonObject rxCh;
-		rxCh["enabled"] = m_radioConfig.rx_config[i].enabled;
-		rxCh["adc_high_performance_mode"] = true;
-		rxCh["frequency_offset_correction_enable"] = m_radioConfig.rx_config[i].freqOffsetCorrection;
-		rxCh["analog_filter_power_mode"] = 2; // High power
-		rxCh["analog_filter_biquad"] = false;
-		rxCh["analog_filter_bandwidth_hz"] = 0;
-		rxCh["channel_bandwidth_hz"] = m_radioConfig.rx_config[i].bandwidth.toInt();
-		rxCh["sample_rate_hz"] = m_radioConfig.rx_config[i].sampleRate.toInt();
-		rxCh["nco_enable"] = false;
-		rxCh["nco_frequency_hz"] = 0;
-		rxCh["rf_port"] =
-			m_radioConfig.rx_config[i].rfInput == "Rx1A" || m_radioConfig.rx_config[i].rfInput == "Rx2A"
-			? 0
-			: 1;
-		rxConfigArray.append(rxCh);
-	}
-	radioCfg["rx_config"] = rxConfigArray;
-
-	// TX configuration array
-	QJsonArray txConfigArray;
-	for(int i = 0; i < 2; i++) {
-		QJsonObject txCh;
-		txCh["enabled"] = m_radioConfig.tx_config[i].enabled;
-		txCh["sample_rate_hz"] = m_radioConfig.tx_config[i].sampleRate.toInt();
-		txCh["frequency_offset_correction_enable"] = m_radioConfig.tx_config[i].freqOffsetCorrection;
-		txCh["analog_filter_power_mode"] = 2; // High power
-		txCh["channel_bandwidth_hz"] = m_radioConfig.tx_config[i].bandwidth.toInt();
-		txCh["orx_enabled"] = m_radioConfig.orx_enabled[i];
-		txCh["elb_type"] = 2; // Default value
-		txConfigArray.append(txCh);
-	}
-	radioCfg["tx_config"] = txConfigArray;
-
-	config["radio_cfg"] = radioCfg;
-
-	// Clock configuration (matching iio-oscilloscope format exactly)
-	QJsonObject clkCfg;
-	clkCfg["device_clock_frequency_khz"] = 38400;
-	clkCfg["device_clock_output_enable"] = 0; // Default disabled
-	clkCfg["device_clock_output_divider"] = 1;
-	clkCfg["clock_pll_high_performance_enable"] = true;
-	clkCfg["clock_pll_power_mode"] = 2; // High power
-	clkCfg["processor_clock_divider"] = 1;
-
-	config["clk_cfg"] = clkCfg;
-
-	return config;
-}
-
-// Signal Dependencies Implementation
-
-void ProfileGeneratorWidget::onTxEnableChanged()
-{
-	// 1. Update TX channel controls (enable/disable fields)
-	updateChannelControlsVisibility();
-
-	// 2. Update ORX controls (both visibility and enable state)
-	updateOrxControlsState();
-
-	// 3. Update profile data
-	updateProfileData();
-}
-
-void ProfileGeneratorWidget::onTddModeChanged()
-{
-	// TDD/FDD mode change affects ORX availability
-	updateOrxControlsState();
-	updateProfileData();
-}
-
-void ProfileGeneratorWidget::onInterfaceChanged()
-{
-	// Interface changed - update profile data
-	updateProfileData();
-}
-
 void ProfileGeneratorWidget::onChannelEnableChanged()
 {
 	// Handle both RX and TX channel enable changes
-	updateChannelControlsVisibility();
-	updateOrxControlsState();  // TX changes affect ORX
+	// updateChannelControlsVisibility() removed - ChannelConfigWidget handles this automatically
+	updateOrxControls(); // TX changes affect ORX
 	updateProfileData();
 }
 
-void ProfileGeneratorWidget::onSampleRateChanged(ChannelType channel)
-{
-	if (m_updatingFromPreset) return;
+// onSampleRateChanged(ChannelType) method removed - functionality now handled by ChannelConfigWidget signals
 
-	// Get the channel widgets
-	ChannelWidgets *widgets = nullptr;
-	switch(channel) {
-	case CHANNEL_RX1: widgets = &m_rx1Widgets; break;
-	case CHANNEL_RX2: widgets = &m_rx2Widgets; break;
-	case CHANNEL_TX1: widgets = &m_tx1Widgets; break;
-	case CHANNEL_TX2: widgets = &m_tx2Widgets; break;
+// onBandwidthChanged(ChannelType) method removed - functionality now handled by ChannelConfigWidget signals
+
+// onSSIInterfaceChanged() removed - SSI Interface is now read-only like iio-oscilloscope
+
+void ProfileGeneratorWidget::updateSampleRateOptionsForSSI()
+{
+	// Skip sample rate restrictions in Live Device mode - preserve device values
+	if(isLiveDeviceModeActive()) {
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Live Device mode - skipping SSI sample rate restrictions";
+		return;
 	}
 
-	if (!widgets || !widgets->sampleRateCombo || !widgets->bandwidthCombo) return;
+	// Get available sample rates for current SSI lanes configuration
+	QStringList availableRates = FrequencyTable::getSampleRatesForSSILanes(m_radioConfig.ssi_lanes);
 
-	// Update bandwidth based on sample rate (iio-oscilloscope logic)
-	QString sampleRate = widgets->sampleRateCombo->currentText();
-	QString correspondingBandwidth = FrequencyTable::getBandwidthForSampleRate(sampleRate);
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Updating sample rate options for SSI lanes:" << m_radioConfig.ssi_lanes
+					   << "Available rates:" << availableRates.size();
 
-	widgets->bandwidthCombo->blockSignals(true);
-	widgets->bandwidthCombo->setCurrentText(correspondingBandwidth);
-	widgets->bandwidthCombo->blockSignals(false);
+	// Block signals to prevent cascade updates
+	m_updatingFromPreset = true;
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate changed for channel" << channel
-	                                   << "to" << sampleRate << "-> bandwidth" << correspondingBandwidth;
+	// Update all channel sample rate combo boxes using unified system
+	for(int i = 0; i < 4; i++) {
+		if(!m_channelWidgets[i])
+			continue;
+
+		// Store current selection before updating options
+		QString currentRate = m_channelWidgets[i]->getSampleRateCombo()->currentText();
+
+		// Update sample rate options through the ChannelConfigWidget
+		m_channelWidgets[i]->setSampleRateOptions(availableRates);
+
+		// If current rate is no longer valid, update bandwidth accordingly
+		if(!availableRates.contains(currentRate) && !availableRates.isEmpty()) {
+			QString newBandwidth = FrequencyTable::getBandwidthForSampleRate(availableRates.first());
+			m_channelWidgets[i]->setBandwidthOptions(QStringList() << newBandwidth);
+		}
+	}
+
+	m_updatingFromPreset = false;
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate options update complete";
+}
+
+QString ProfileGeneratorWidget::calculateBandwidthForSampleRate(const QString &sampleRate) const
+{
+	return FrequencyTable::getBandwidthForSampleRate(sampleRate);
 }
 
 // LTE Defaults Implementation
@@ -1069,127 +732,113 @@ void ProfileGeneratorWidget::applyLTEDefaults()
 
 	m_updatingFromPreset = true;
 
-	// Radio config - exact values from lte_defaults()
-	m_ssiInterfaceCombo->setCurrentText(LTEDefaults::SSI_INTERFACE); // "LVDS"
-	m_duplexModeCombo->setCurrentText(LTEDefaults::DUPLEX_MODE); // "TDD"
-
-	// Apply to all channels - exact values from lte_defaults()
-	QString sampleRateStr = QString::number(LTEDefaults::SAMPLE_RATE_HZ); // "61440000"
-	QString bandwidthStr = QString::number(LTEDefaults::BANDWIDTH_HZ); // "38000000"
-
-	// RX1 and RX2
-	m_rx1Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
-	m_rx1Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
-	m_rx1Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
-	m_rx1Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
-	if (m_rx1Widgets.rfInputCombo) {
-		m_rx1Widgets.rfInputCombo->setCurrentIndex(LTEDefaults::RF_PORT); // 0 = Rx1A
-	}
-
-	m_rx2Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
-	m_rx2Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
-	m_rx2Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
-	m_rx2Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
-	if (m_rx2Widgets.rfInputCombo) {
-		m_rx2Widgets.rfInputCombo->setCurrentIndex(LTEDefaults::RF_PORT); // 0 = Rx2A
-	}
-
-	// TX1 and TX2
-	m_tx1Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
-	m_tx1Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
-	m_tx1Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
-	m_tx1Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
-
-	m_tx2Widgets.enabledCb->setChecked(LTEDefaults::ENABLED);
-	m_tx2Widgets.freqOffsetCb->setChecked(LTEDefaults::FREQ_OFFSET_CORRECTION);
-	m_tx2Widgets.sampleRateCombo->setCurrentText(sampleRateStr);
-	m_tx2Widgets.bandwidthCombo->setCurrentText(bandwidthStr);
-
-	// ORX disabled by default in LTE preset
-	m_orx1EnabledCb->setChecked(false);
-	m_orx2EnabledCb->setChecked(false);
+	// Apply the pure LTE preset logic
+	applyLTEPresetLogic();
 
 	m_lastAppliedPreset = "LTE";
 	m_updatingFromPreset = false;
 
 	// Update dependent UI elements
-	updateOrxVisibility();
-	updateChannelControlsVisibility();
+	updateAllDependentControls();
 
-	StatusBarManager::pushMessage("Applied LTE defaults", 3000);
+	StatusBarManager::pushMessage("Applied LTE defaults (preserved channel states)", 3000);
+}
+
+void ProfileGeneratorWidget::applyLTEPresetLogic()
+{
+	// Radio config - exact values from lte_defaults()
+	m_ssiInterfaceLabel->setText(LTEDefaults::SSI_INTERFACE);    // "LVDS"
+	m_duplexModeCombo->setCurrentText(LTEDefaults::DUPLEX_MODE); // "TDD"
+
+	// Apply LTE defaults while PRESERVING current enabled states
+	for(int i = 0; i < 4; ++i) {
+		// Get current enabled state to preserve it
+		bool currentEnabledState = m_channelWidgets[i]->getChannelData().enabled;
+
+		// Create LTE channel data with preserved enabled state
+		ChannelConfigWidget::ChannelData lteData;
+		lteData.enabled = currentEnabledState; // PRESERVE current enabled state
+		lteData.freqOffsetCorrection = LTEDefaults::FREQ_OFFSET_CORRECTION;
+		lteData.sampleRate = QString::number(LTEDefaults::SAMPLE_RATE_HZ);
+		lteData.bandwidth = QString::number(LTEDefaults::BANDWIDTH_HZ);
+
+		// Set RF input for RX channels only
+		if(i < 2) { // RX channels (RX1, RX2)
+			lteData.rfInput = (i == 0) ? "Rx1A" : "Rx2A";
+		}
+
+		m_channelWidgets[i]->setChannelData(lteData);
+		m_channelWidgets[i]->updateControlsVisibility(true); // Bandwidth read-only, sample rate selectable
+	}
+}
+
+bool ProfileGeneratorWidget::isLTEModeActive() const { return m_presetCombo && m_presetCombo->currentText() == "LTE"; }
+
+bool ProfileGeneratorWidget::isLiveDeviceModeActive() const
+{
+	return m_presetCombo && m_presetCombo->currentText() == "Live Device";
 }
 
 // Signal Dependencies Helper Methods
 
-void ProfileGeneratorWidget::updateOrxVisibility()
+void ProfileGeneratorWidget::validateChannelConfiguration()
 {
-	bool tx1Enabled = getTxChannelEnabled(0);
-	bool tx2Enabled = getTxChannelEnabled(1);
+	// Channel validation logic - currently minimal as per iio-oscilloscope approach
+	// In Live Device mode - accept any device values without validation
+	if(isLiveDeviceModeActive()) {
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Live Device mode - skipping channel validation";
+		return;
+	}
+
+	// Basic channel dependency validation for LTE mode
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Validating channel configuration for LTE mode";
+}
+
+bool ProfileGeneratorWidget::isOrxAvailable(int orxIndex)
+{
+	bool txEnabled = getChannelEnabled(orxIndex == 0 ? CHANNEL_TX1 : CHANNEL_TX2);
 	bool tddMode = getTddModeEnabled();
-
-	// ORX only visible when TX enabled + TDD mode (matching iio-oscilloscope)
-	bool orxShouldBeVisible = (tx1Enabled || tx2Enabled) && tddMode;
-
-	// Find ORX widgets and update visibility
-	if (m_orx1EnabledCb) {
-		m_orx1EnabledCb->parentWidget()->setVisible(orxShouldBeVisible);
-	}
-	if (m_orx2EnabledCb) {
-		m_orx2EnabledCb->parentWidget()->setVisible(orxShouldBeVisible);
-	}
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "ORX visibility:" << orxShouldBeVisible
-	                                   << "(TX1:" << tx1Enabled << "TX2:" << tx2Enabled << "TDD:" << tddMode << ")";
+	return txEnabled && tddMode;
 }
 
-void ProfileGeneratorWidget::updateOrxControlsState()
+void ProfileGeneratorWidget::updateOrxControls()
 {
-	bool tx1Enabled = getChannelEnabled(CHANNEL_TX1);
-	bool tx2Enabled = getChannelEnabled(CHANNEL_TX2);
-	bool tddMode = getTddModeEnabled();
+	QCheckBox *orxCheckboxes[2] = {m_orx1EnabledCb, m_orx2EnabledCb};
 
-	// ORX1 logic: TX1 enabled AND TDD mode
-	bool orx1CanBeEnabled = tx1Enabled && tddMode;
-	if (!orx1CanBeEnabled && m_orx1EnabledCb && m_orx1EnabledCb->isChecked()) {
-		m_orx1EnabledCb->setChecked(false);  // Force disable
-	}
-	if (m_orx1EnabledCb) {
-		m_orx1EnabledCb->setEnabled(orx1CanBeEnabled);
-	}
+	for(int i = 0; i < 2; ++i) {
+		if(!orxCheckboxes[i])
+			continue;
 
-	// ORX2 logic: TX2 enabled AND TDD mode
-	bool orx2CanBeEnabled = tx2Enabled && tddMode;
-	if (!orx2CanBeEnabled && m_orx2EnabledCb && m_orx2EnabledCb->isChecked()) {
-		m_orx2EnabledCb->setChecked(false);  // Force disable
-	}
-	if (m_orx2EnabledCb) {
-		m_orx2EnabledCb->setEnabled(orx2CanBeEnabled);
-	}
+		bool orxAvailable = isOrxAvailable(i);
+		if(QWidget *orxFrame = orxCheckboxes[i]->parentWidget()) {
+			orxFrame->setEnabled(orxAvailable);
+		}
+		orxCheckboxes[i]->setEnabled(orxAvailable);
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "ORX controls state - ORX1 can be enabled:" << orx1CanBeEnabled
-	                                   << "ORX2 can be enabled:" << orx2CanBeEnabled;
+		if(!orxAvailable) {
+			orxCheckboxes[i]->setChecked(false);
+		}
+	}
 }
 
-
-void ProfileGeneratorWidget::updateChannelControlsVisibility()
+void ProfileGeneratorWidget::updateAllDependentControls()
 {
-	// Update all channel controls based on their enable state
-	setChannelControlsEnabled(CHANNEL_RX1, getChannelEnabled(CHANNEL_RX1));
-	setChannelControlsEnabled(CHANNEL_RX2, getChannelEnabled(CHANNEL_RX2));
-	setChannelControlsEnabled(CHANNEL_TX1, getChannelEnabled(CHANNEL_TX1));
-	setChannelControlsEnabled(CHANNEL_TX2, getChannelEnabled(CHANNEL_TX2));
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Updated channel controls visibility";
+	// Coordinate all UI updates that depend on configuration changes
+	validateChannelConfiguration();
+	updateOrxControls();
 }
 
-bool ProfileGeneratorWidget::getTxChannelEnabled(int channel)
+// Phase 2: Complete UI Refresh System
+void ProfileGeneratorWidget::refreshAllUIStates()
 {
-	if (channel == 0) {
-		return m_tx1Widgets.enabledCb ? m_tx1Widgets.enabledCb->isChecked() : false;
-	} else if (channel == 1) {
-		return m_tx2Widgets.enabledCb ? m_tx2Widgets.enabledCb->isChecked() : false;
-	}
-	return false;
+	// Match iio-oscilloscope's profile_gen_preset_update() logic
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Performing complete UI state refresh";
+
+	// Use extracted coordination method
+	updateAllDependentControls();
+	updateProfileData();
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Completed full UI state refresh";
 }
 
 bool ProfileGeneratorWidget::getTddModeEnabled()
@@ -1197,51 +846,335 @@ bool ProfileGeneratorWidget::getTddModeEnabled()
 	return m_duplexModeCombo ? m_duplexModeCombo->currentText() == "TDD" : false;
 }
 
-bool ProfileGeneratorWidget::validateConfiguration()
+bool ProfileGeneratorWidget::getChannelEnabled(ChannelType channel)
 {
-	// Basic validation - can be extended
+	if(channel >= 0 && channel < 4 && m_channelWidgets[channel]) {
+		return m_channelWidgets[channel]->getChannelData().enabled;
+	}
+	return false;
+}
+
+void ProfileGeneratorWidget::setupEnhancedConnections()
+{
+	// Direct signal connections matching iio-oscilloscope behavior exactly
+
+	// Action buttons - immediate execution
+	connect(m_presetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+		&ProfileGeneratorWidget::onPresetChanged);
+	connect(m_refreshProfileBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onRefreshProfile);
+	connect(m_saveToFileBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onSaveToFile);
+	connect(m_loadToDeviceBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onLoadToDevice);
+
+	// Channel connections - simplified through ChannelConfigWidget signals
+	// (Already connected in createChannelConfigWidget)
+	// Special TX → ORX connections for immediate updates
+	connect(m_channelWidgets[TX1], &ChannelConfigWidget::enabledChanged, this, [this]() {
+		updateOrxControls(); // TX changes affect ORX immediately
+	});
+	connect(m_channelWidgets[TX2], &ChannelConfigWidget::enabledChanged, this, [this]() {
+		updateOrxControls(); // TX changes affect ORX immediately
+	});
+
+	// Radio configuration changes - immediate updates matching iio-oscilloscope
+	// SSI Interface is read-only label (device-determined) - no user interaction
+	connect(m_duplexModeCombo, QOverload<const QString &>::of(&QComboBox::currentTextChanged), this, [this]() {
+		updateOrxControls(); // Duplex mode immediately affects ORX availability
+		updateProfileData();
+	});
+
+	// ORX changes - simple immediate updates (no user preference tracking like iio-oscilloscope)
+	connect(m_orx1EnabledCb, &QCheckBox::toggled, this, [this]() { updateProfileData(); });
+	connect(m_orx2EnabledCb, &QCheckBox::toggled, this, [this]() { updateProfileData(); });
+
+	qInfo(CAT_PROFILEGENERATORWIDGET) << "Simplified signal connections established (iio-oscilloscope compatible)";
+}
+
+void ProfileGeneratorWidget::onSampleRateChangedSynchronized(const QString &newSampleRate)
+{
+	// Critical iio-oscilloscope compatibility: Sample rate synchronization
+	// When ANY channel sample rate changes, ALL channels update to same value
+	// Matches set_all_cb_to_same_text() from iio-oscilloscope exactly
+
+	if(m_updatingFromPreset) {
+		return; // Prevent recursive updates during preset loading
+	}
+
+	// Only synchronize in LTE mode - Live Device mode preserves individual values
+	if(isLiveDeviceModeActive()) {
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Live Device mode - skipping sample rate synchronization";
+		updateProfileData();
+		return;
+	}
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Synchronizing sample rate:" << newSampleRate;
+
+	// Block signals to prevent recursive calls during bulk update
+	m_updatingFromPreset = true;
+
+	// Update ALL channel sample rates to the same value (iio-oscilloscope behavior)
+	for(int i = 0; i < 4; ++i) {
+		QComboBox *sampleRateCombo = m_channelWidgets[i]->getSampleRateCombo();
+		if(sampleRateCombo && sampleRateCombo->currentText() != newSampleRate) {
+			sampleRateCombo->setCurrentText(newSampleRate);
+		}
+	}
+
+	// Auto-update corresponding bandwidths for each channel (LTE mode only)
+	QString correspondingBandwidth = calculateBandwidthForSampleRate(newSampleRate);
+
+	for(int i = 0; i < 4; ++i) {
+		// In LTE mode: clear bandwidth combo and set only the calculated value
+		m_channelWidgets[i]->setBandwidthOptions(QStringList() << correspondingBandwidth);
+		m_channelWidgets[i]->setBandwidthReadOnly(true); // Read-only like iio-oscilloscope
+	}
+
+	m_updatingFromPreset = false;
+
+	// Update profile data after all changes complete
+	updateProfileData();
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate synchronization complete";
+}
+
+// Phase 1: Device Configuration Reading Methods
+bool ProfileGeneratorWidget::readDeviceConfiguration()
+{
+	QString profileConfigText = readDeviceAttribute("profile_config");
+	if(profileConfigText.isEmpty()) {
+		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read profile_config from device";
+		return false;
+	}
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Read profile_config from device, length:" << profileConfigText.length();
+
+	try {
+		m_deviceConfig = DeviceConfigurationParser::parseProfileConfig(profileConfigText);
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Successfully parsed device configuration";
+		return true;
+	} catch(const std::exception &e) {
+		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to parse device configuration:" << e.what();
+		return false;
+	}
+}
+
+void ProfileGeneratorWidget::populateUIFromDeviceConfig(const DeviceConfigurationParser::ParsedDeviceConfig &config)
+{
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Populating UI from device configuration";
+
+	// Block signals during bulk update to prevent cascading updates
+	m_updatingFromPreset = true;
+
+	// Update radio configuration - SSI interface from device configuration
+	m_ssiInterfaceLabel->setText(config.ssiInterface); // Read-only label like iio-oscilloscope
+	m_duplexModeCombo->setCurrentText(config.duplexMode);
+
+	// Update internal config to match device values
+	m_radioConfig.lvds = (config.ssiInterface == "LVDS");
+	m_radioConfig.ssi_lanes = config.ssiLanes;
+
+	// FIRST: Set all channels to Live Device mode to prepare for device data
+	for(int i = 0; i < 4; ++i) {
+		m_channelWidgets[i]->updateControlsVisibility(false); // Live Device mode - bandwidth editable
+	}
+
+	// THEN: Populate channel data from device configuration while PRESERVING enabled states
+	for(int i = 0; i < 4; ++i) {
+
+		ChannelConfigWidget::ChannelData data;
+		if(i < 2) { // RX channels (RX1, RX2)
+			const auto &rxConfig = config.rxChannels[i];
+			data.freqOffsetCorrection = rxConfig.freqOffsetCorrection;
+			data.bandwidth = rxConfig.bandwidth;
+			data.sampleRate = rxConfig.sampleRate;
+			data.rfInput = rxConfig.rfPort;
+		} else { // TX channels (TX1, TX2)
+			int txIndex = i - 2;
+			const auto &txConfig = config.txChannels[txIndex];
+			data.freqOffsetCorrection = txConfig.freqOffsetCorrection;
+			data.bandwidth = txConfig.bandwidth;
+			data.sampleRate = txConfig.sampleRate;
+		}
+
+		// Set channel data - mode already set above
+		m_channelWidgets[i]->setChannelData(data);
+	}
+
+	m_updatingFromPreset = false;
+
+	// Trigger UI state updates after populating data
+	updateOrxControls();
+	updateProfileData();
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "UI population from device config completed";
+}
+
+bool ProfileGeneratorWidget::isDeviceConfigurationAvailable()
+{
+	// Test if we can read profile_config attribute from device
+	QString profileConfig = readDeviceAttribute("profile_config");
+	bool available = !profileConfig.isEmpty();
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Device configuration available:" << available;
+	return available;
+}
+
+void ProfileGeneratorWidget::resetPresetTracking()
+{
+	// Reset internal state like iio-oscilloscope does
+	m_lastAppliedPreset = "";
+	m_updatingFromPreset = false;
+	// Clear any cached device config
+	m_deviceConfig = DeviceConfigurationParser::ParsedDeviceConfig();
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Reset preset tracking and internal state";
+}
+
+void ProfileGeneratorWidget::forceUpdateAllUIControls()
+{
+	// Force update ALL UI controls without preserving any state (like iio-oscilloscope)
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Forcing complete UI update from device configuration";
+
+	m_updatingFromPreset = true;
+
+	// Update radio configuration from device
+	m_ssiInterfaceLabel->setText(m_deviceConfig.ssiInterface);
+	m_duplexModeCombo->setCurrentText(m_deviceConfig.duplexMode);
+
+	// Update internal config to match device values
+	m_radioConfig.lvds = (m_deviceConfig.ssiInterface == "LVDS");
+	m_radioConfig.ssi_lanes = m_deviceConfig.ssiLanes;
+	m_radioConfig.fdd = (m_deviceConfig.duplexMode == "FDD");
+
+	// Force update all 4 channel widgets with device data (enabled states completely ignored)
+	for(int i = 0; i < 4; ++i) {
+		ChannelConfigWidget::ChannelData data;
+		if(i < 2) { // RX channels (RX1, RX2)
+			const auto &rxConfig = m_deviceConfig.rxChannels[i];
+			// Don't set data.enabled - let UI checkbox maintain its state naturally
+			data.freqOffsetCorrection = rxConfig.freqOffsetCorrection;
+			data.bandwidth = rxConfig.bandwidth;
+			data.sampleRate = rxConfig.sampleRate;
+			data.rfInput = rxConfig.rfPort;
+		} else { // TX channels (TX1, TX2)
+			int txIndex = i - 2;
+			const auto &txConfig = m_deviceConfig.txChannels[txIndex];
+			// Don't set data.enabled - let UI checkbox maintain its state naturally
+			data.freqOffsetCorrection = txConfig.freqOffsetCorrection;
+			data.bandwidth = txConfig.bandwidth;
+			data.sampleRate = txConfig.sampleRate;
+		}
+
+		// Update channel data (enabled state untouched by design)
+		m_channelWidgets[i]->setChannelData(data);
+
+		// Force update the actual UI combo boxes with device values (like populate_combo_box)
+		updateChannelUIControls(i, data);
+	}
+
+	// Preserve current ORX enabled states (user-controlled only) - don't update from device
+	// ORX enabled states are also user-controlled and should not be changed by refresh
+
+	m_updatingFromPreset = false;
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Complete UI force update finished";
+}
+
+bool ProfileGeneratorWidget::readAndApplyDeviceConfiguration()
+{
+	// Always read from device like iio-oscilloscope
+	if(!readDeviceConfiguration()) {
+		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read device configuration";
+		return false;
+	}
+
+	// Apply to current UI state without preserving anything
+	forceUpdateAllUIControls();
 	return true;
 }
 
-// Channel Control Helper Methods
-
-ProfileGeneratorWidget::ChannelWidgets* ProfileGeneratorWidget::getChannelWidgets(ChannelType channel)
+void ProfileGeneratorWidget::applyLTEConstraintsToDeviceData()
 {
-	switch(channel) {
-	case CHANNEL_RX1: return &m_rx1Widgets;
-	case CHANNEL_RX2: return &m_rx2Widgets;
-	case CHANNEL_TX1: return &m_tx1Widgets;
-	case CHANNEL_TX2: return &m_tx2Widgets;
+	// Apply LTE constraints to device-read data:
+	// - Force bandwidth read-only mode
+	// - Apply sample rate restrictions for SSI lanes
+	// - Maintain LTE UI control visibility
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Applying LTE constraints to device data";
+
+	for(int i = 0; i < 4; ++i) {
+		m_channelWidgets[i]->updateControlsVisibility(true); // LTE mode - bandwidth read-only
 	}
-	return nullptr;
+
+	// Apply sample rate restrictions for current SSI configuration
+	updateSampleRateOptionsForSSI();
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "LTE constraints applied";
 }
 
-bool ProfileGeneratorWidget::getChannelEnabled(ChannelType channel)
+void ProfileGeneratorWidget::updateChannelUIControls(int channelIndex, const ChannelConfigWidget::ChannelData &data)
 {
-	ChannelWidgets* widgets = getChannelWidgets(channel);
-	return widgets && widgets->enabledCb ? widgets->enabledCb->isChecked() : false;
+	// Update actual combo box contents like iio-oscilloscope's populate_combo_box()
+	// This ensures the UI visually shows device values, not just internal data
+
+	if(!m_channelWidgets[channelIndex]) {
+		return;
+	}
+
+	// Force device values (like iio-oscilloscope populate_combo_box with TRUE parameter)
+	QStringList bandwidthOptions = QStringList() << data.bandwidth;
+	m_channelWidgets[channelIndex]->setBandwidthOptions(bandwidthOptions, true);
+
+	QStringList sampleRateOptions = QStringList() << data.sampleRate;
+	m_channelWidgets[channelIndex]->setSampleRateOptions(sampleRateOptions, true);
 }
 
-void ProfileGeneratorWidget::setChannelControlsEnabled(ChannelType channel, bool enabled)
+QWidget *ProfileGeneratorWidget::generateDeviceDriverAPIWidget(QWidget *parent)
 {
-	ChannelWidgets* widgets = getChannelWidgets(channel);
-	if (!widgets) return;
+	QWidget *driverAPIWidget = new QWidget(parent);
+	Style::setBackgroundColor(driverAPIWidget, json::theme::background_primary);
+	Style::setStyle(driverAPIWidget, style::properties::widget::border_interactive);
 
-	// Enable/disable all channel controls except the enable checkbox itself
-	if (widgets->freqOffsetCb) {
-		widgets->freqOffsetCb->setEnabled(enabled);
-	}
-	if (widgets->bandwidthCombo) {
-		widgets->bandwidthCombo->setEnabled(enabled);
-	}
-	if (widgets->sampleRateCombo) {
-		widgets->sampleRateCombo->setEnabled(enabled);
-	}
-	if (widgets->rfInputCombo) {  // RX only
-		widgets->rfInputCombo->setEnabled(enabled);
+	QVBoxLayout *layout = new QVBoxLayout(driverAPIWidget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(2);
+
+	// Title
+	QLabel *title = new QLabel("Profile Generator CLI detected: ", driverAPIWidget);
+	Style::setStyle(title, style::properties::label::menuSmall);
+	layout->addWidget(title);
+
+	if(m_cliAvailable) {
+
+		// Enable all functionality
+		m_contentWidget->setEnabled(true);
+
+		// Version label - simple display matching iio-oscilloscope
+		QString cliVersion = m_cliManager ? m_cliManager->getCliVersion() : "unknown";
+		QLabel *versionLabel = new QLabel(cliVersion, driverAPIWidget);
+		Style::setStyle(versionLabel, style::properties::label::subtle);
+		layout->addWidget(versionLabel);
+
+	} else {
+		// CLI not available - show error status
+		title->setText("Profile Generator CLI not found. "
+			       "Advanced profile generation features are disabled. "
+			       "Please install the ADRV9002 Profile Generator CLI tool to enable this functionality. "
+			       "Refer to the ADI documentation for installation instructions.");
+
+		Style::setStyle(title, style::properties::label::warning);
+
+		// Disable all controls
+		m_contentWidget->setEnabled(false);
+
+		// Add download info button with proper Scopy styling right under the error message
+		QPushButton *infoBtn = new QPushButton("Download Profile Generator CLI", this);
+		infoBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+		Style::setStyle(infoBtn, style::properties::button::basicButton);
+		connect(infoBtn, &QPushButton::clicked, this, &ProfileGeneratorWidget::onDownloadCLI);
+
+		// Insert button right after the status label (position 1 in mainLayout)
+		layout->addWidget(infoBtn);
 	}
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Channel" << channel << "controls enabled:" << enabled;
+	return driverAPIWidget;
 }
 
 #include "moc_profilegeneratorwidget.cpp"

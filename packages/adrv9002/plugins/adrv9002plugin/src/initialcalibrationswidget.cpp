@@ -45,12 +45,12 @@ InitialCalibrationsWidget::~InitialCalibrationsWidget() {}
 
 bool InitialCalibrationsWidget::isSupported(iio_device *device)
 {
-	if (!device) return false;
+	if(!device)
+		return false;
 
 	// Check if device has initial_calibrations_available attribute
 	char buffer[256];
-	int ret = iio_device_attr_read(device, "initial_calibrations_available",
-	                              buffer, sizeof(buffer));
+	int ret = iio_device_attr_read(device, "initial_calibrations_available", buffer, sizeof(buffer));
 	return (ret > 0);
 }
 
@@ -79,20 +79,21 @@ void InitialCalibrationsWidget::setupUI()
 	controlsLayout->addWidget(m_modeLabel);
 
 	// Create calibration mode combo widget with custom options (off, auto only)
-	if (m_device) {
-		m_modeComboWidget = IIOWidgetBuilder(this)
-					    .device(m_device)
-					    .attribute("initial_calibrations")
-					    .optionsValues("off auto")  // Custom options - space separated string
-					    .title("")  // No title as we have a separate label
-					    .uiStrategy(IIOWidgetBuilder::ComboUi)
-					    .infoMessage("off: Initial calibrations won't run automatically.\n"
-					               "auto: Initial calibrations will run automatically for "
-					               "Carrier changes bigger or equal to 100MHz.\n\n"
-					               "To manually run the calibrations, press the \"Calibrate now\" button!")
-					    .buildSingle();
+	if(m_device) {
+		m_modeComboWidget =
+			IIOWidgetBuilder(this)
+				.device(m_device)
+				.attribute("initial_calibrations")
+				.optionsValues("off auto") // Custom options - space separated string
+				.title("")		   // No title as we have a separate label
+				.uiStrategy(IIOWidgetBuilder::ComboUi)
+				.infoMessage("off: Initial calibrations won't run automatically.\n"
+					     "auto: Initial calibrations will run automatically for "
+					     "Carrier changes bigger or equal to 100MHz.\n\n"
+					     "To manually run the calibrations, press the \"Calibrate now\" button!")
+				.buildSingle();
 
-		if (m_modeComboWidget) {
+		if(m_modeComboWidget) {
 			controlsLayout->addWidget(m_modeComboWidget);
 		}
 	}
@@ -112,15 +113,14 @@ void InitialCalibrationsWidget::setupUI()
 void InitialCalibrationsWidget::connectSignals()
 {
 	// Connect calibrate button
-	if (m_calibrateBtn) {
-		connect(m_calibrateBtn, &QPushButton::clicked,
-		        this, &InitialCalibrationsWidget::onCalibrateNowClicked);
+	if(m_calibrateBtn) {
+		connect(m_calibrateBtn, &QPushButton::clicked, this, &InitialCalibrationsWidget::onCalibrateNowClicked);
 	}
 }
 
 void InitialCalibrationsWidget::onCalibrateNowClicked()
 {
-	if (!m_device) {
+	if(!m_device) {
 		Q_EMIT calibrationError("Device not available");
 		return;
 	}
@@ -130,7 +130,7 @@ void InitialCalibrationsWidget::onCalibrateNowClicked()
 	// Write "run" to initial_calibrations attribute (like iio-oscilloscope)
 	bool success = writeAttributeValue("initial_calibrations", "run");
 
-	if (success) {
+	if(success) {
 		StatusBarManager::pushMessage("Initial Calibrations started", 3000);
 		Q_EMIT calibrationStarted();
 		qInfo(CAT_INITIALCALIBRATIONSWIDGET) << "Manual calibration started successfully";
@@ -145,22 +145,20 @@ void InitialCalibrationsWidget::onCalibrateNowClicked()
 void InitialCalibrationsWidget::refreshStatus()
 {
 	// Refresh the IIO widget if available
-	if (m_modeComboWidget) {
+	if(m_modeComboWidget) {
 		m_modeComboWidget->readAsync();
 	}
 }
 
-
-
 QString InitialCalibrationsWidget::getAttributeValue(const QString &attributeName)
 {
-	if (!m_device) return "";
+	if(!m_device)
+		return "";
 
 	char buffer[256];
-	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(),
-	                              buffer, sizeof(buffer));
+	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(), buffer, sizeof(buffer));
 
-	if (ret < 0) {
+	if(ret < 0) {
 		qWarning(CAT_INITIALCALIBRATIONSWIDGET) << "Failed to read attribute" << attributeName << ":" << ret;
 		return "";
 	}
@@ -170,15 +168,15 @@ QString InitialCalibrationsWidget::getAttributeValue(const QString &attributeNam
 
 bool InitialCalibrationsWidget::writeAttributeValue(const QString &attributeName, const QString &value)
 {
-	if (!m_device) return false;
+	if(!m_device)
+		return false;
 
 	QByteArray valueBytes = value.toUtf8();
-	int ret = iio_device_attr_write(m_device, attributeName.toUtf8().constData(),
-	                               valueBytes.constData());
+	int ret = iio_device_attr_write(m_device, attributeName.toUtf8().constData(), valueBytes.constData());
 
-	if (ret < 0) {
-		qWarning(CAT_INITIALCALIBRATIONSWIDGET) << "Failed to write attribute" << attributeName
-		                                       << "with value" << value << ":" << ret;
+	if(ret < 0) {
+		qWarning(CAT_INITIALCALIBRATIONSWIDGET)
+			<< "Failed to write attribute" << attributeName << "with value" << value << ":" << ret;
 		return false;
 	}
 
