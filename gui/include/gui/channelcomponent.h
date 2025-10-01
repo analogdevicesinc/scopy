@@ -64,6 +64,7 @@ public:
 
 Q_SIGNALS:
 	void requestChannelMenu(bool force = true);
+	void updatedSamplingInfo(SamplingInfo p);
 
 protected:
 	QString m_channelName;

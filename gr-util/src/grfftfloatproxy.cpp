@@ -119,6 +119,7 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	nrBits = 12;
 	m_powerOffset = 0;
 	m_windowCorr = true;
+	m_sr = 0;
 }
 
 void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
@@ -148,7 +149,22 @@ void GRFFTComplexProc::setPowerOffset(double val)
 	}
 }
 
-void GRFFTComplexProc::setNrBits(int v) { nrBits = v; }
+void GRFFTComplexProc::setNrBits(int v) {
+	nrBits = v;
+}
+
+void GRFFTComplexProc::setSampleRate(double sr) {
+	m_sr = sr;
+}
+
+gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
+{
+	if(genalyzer_fft) {
+		return genalyzer_fft->getGnAnalysis();
+	}
+
+	return nullptr;
+}
 
 void GRFFTComplexProc::build_blks(GRTopBlock *top)
 {
@@ -162,38 +178,64 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	}
 	auto corr = (m_windowCorr) ? window.size() / window_sum : 1;
 
+	// Create blocks
 	mult_nrbits = gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1 << nrBits), 0), fft_size);
-	fft_complex = gr::fft::fft_v<gr_complex, true>::make(fft_size, window, true);
 
-	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr, 0), fft_size);
+	// Replace GNU Radio FFT with your genalyzer FFT
+	// Use factory function (you need to create this)
+	genalyzer_fft = genalyzer_fft_vcc::make(fft_size, // npts - number of points
+						nrBits,	  // qres - quantization resolution
+						1,	  // navg - number of averages (set to 1 for real-time)
+						fft_size, // nfft - FFT size
+						convertToGnWindow(m_fftwindow), // Convert your window type to GnWindow
+						m_sr			// sample rate
+	);
+
+	// The genalyzer FFT likely outputs power/magnitude directly
+	// so we may not need all the post-processing blocks
+	// Check what your genalyzer FFT outputs - if it's already in dB, skip some blocks
+
 	ctm = gr::blocks::complex_to_mag_squared::make(fft_size);
 	mult_const1 = gr::blocks::multiply_const_ff::make(1.0 / ((float)fft_size * (float)fft_size), fft_size);
 	nlog10 = gr::blocks::nlog10_ff::make(10.0, fft_size);
 
+	// Power offset
 	std::vector<float> k;
 	for(int i = 0; i < fft_size; i++) {
 		k.push_back(m_powerOffset);
 	}
-
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	top->connect(mult_nrbits, 0, fft_complex, 0);
-	top->connect(fft_complex, 0, mult_wind_corr, 0);
-	top->connect(mult_wind_corr, 0, ctm, 0);
+	// Connect the chain - assuming genalyzer outputs complex data
+	// top->connect(mult_nrbits, 0, genalyzer_fft, 0);
+	top->connect(genalyzer_fft, 0, ctm, 0);
 	top->connect(ctm, 0, mult_const1, 0);
 	top->connect(mult_const1, 0, nlog10, 0);
 	top->connect(nlog10, 0, powerOffset, 0);
 
-	start_blk.append(mult_nrbits);
+	start_blk.append(genalyzer_fft);
 	end_blk = powerOffset;
+}
+
+GnWindow GRFFTComplexProc::convertToGnWindow(gr::fft::window::win_type window_type)
+{
+	switch(window_type) {
+	case gr::fft::window::WIN_RECTANGULAR:
+		return GnWindow::GnWindowNoWindow;
+	case gr::fft::window::WIN_HANN:
+		return GnWindow::GnWindowHann;
+	case gr::fft::window::WIN_BLACKMAN_hARRIS:
+		return GnWindow::GnWindowBlackmanHarris;
+	default:
+		return GnWindow::GnWindowNoWindow;
+	}
 }
 
 void GRFFTComplexProc::destroy_blks(GRTopBlock *top)
 {
 	mult_nrbits = nullptr;
-	fft_complex = nullptr;
+	genalyzer_fft = nullptr;
 	ctm = nullptr;
-	mult_wind_corr = nullptr;
 	mult_const1 = nullptr;
 	powerOffset = nullptr;
 	nlog10 = nullptr;
