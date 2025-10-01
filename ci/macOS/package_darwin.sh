@@ -9,8 +9,8 @@ SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOS/packages -name "*.dylib" 
 SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
 
 echo "### Copy DLLs to Frameworks folder"
-cp -R $STAGING_AREA/libiio/build/iio.framework Scopy.app/Contents/Frameworks/
-cp -R $STAGING_AREA/libad9361/build/ad9361.framework Scopy.app/Contents/Frameworks/
+cp -R $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
+cp -R $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/resources
 cp -R $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS
 
