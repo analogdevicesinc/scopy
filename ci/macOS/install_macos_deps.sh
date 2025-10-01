@@ -118,7 +118,7 @@ build_libserialport(){
 	./autogen.sh
 	./configure --prefix $STAGING_AREA_DEPS
 	make $JOBS
-	sudo make install
+	make install
 	popd
 }
 
@@ -138,13 +138,15 @@ build_libiio() {
 		-DINSTALL_UDEV_RULE:BOOL=OFF \
 		-DWITH_SERIAL_BACKEND:BOOL=ON \
 		-DENABLE_IPV6:BOOL=OFF \
-		-DOSX_PACKAGE:BOOL=OFF
 		"
 	build_with_cmake
-	sudo make install
-	sudo chmod -R 775 $STAGING_AREA_DEPS
-	sudo chmod 664 $STAGING_AREA_DEPS/lib/pkgconfig/libiio.pc
-	cp -R $STAGING_AREA/libiio/build/iio.framework $STAGING_AREA_DEPS/lib
+
+	# manually install framework
+	mkdir -p $STAGING_AREA_DEPS/include
+	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+	cp -v $STAGING_AREA/libiio/iio.h $STAGING_AREA_DEPS/include
+	cp -vr $STAGING_AREA/libiio/build/iio.framework $STAGING_AREA_DEPS/lib
+	cp -v $STAGING_AREA/libiio/build/libiio.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
 }
 
@@ -173,7 +175,13 @@ build_libad9361() {
 	pushd $STAGING_AREA/libad9361
 	save_version_info
 	build_with_cmake
-	make install
+
+	# manually install framework
+	mkdir -p $STAGING_AREA_DEPS/include
+	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+	cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
+	cp -vr $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
+	cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
 }
 
