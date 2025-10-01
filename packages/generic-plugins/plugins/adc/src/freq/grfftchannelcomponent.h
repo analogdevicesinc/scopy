@@ -208,12 +208,16 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
+	// Method to trigger genalyzer analysis (only when needed)
+	void triggerGenalyzerAnalysis();
+
 Q_SIGNALS:
 	void yModeChanged();
 	void fftSizeChanged();
 	void powerOffsetChanged(double);
 	void windowChanged(int);
 	void windowCorrectionChanged(bool);
+	void genalyzerDataUpdated(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys, double *rvalues);
 
 private:
 	double m_powerOffset;
