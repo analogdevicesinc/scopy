@@ -38,6 +38,7 @@
 #include <initialcalibrationswidget.h>
 #include <gui/tooltemplate.h>
 #include <gui/widgets/animatedrefreshbtn.h>
+#include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 
 namespace scopy::adrv9002 {
@@ -62,15 +63,14 @@ private:
 	// Tab creation methods
 	void setupTabButtons();
 	QWidget *createControlsWidget();
-	QWidget *createBlockDiagramWidget();
 	QWidget *createProfileGeneratorWidget();
 
-	// UI Section Generation (ad936x pattern)
+	// UI Section Generation (refactored to use MenuSectionCollapseWidget)
 	QWidget *generateDeviceDriverAPIWidget(QWidget *parent);
 	QString getDeviceDriverVersion();
-	QWidget *generateGlobalSettingsWidget(QWidget *parent);
-	QWidget *generateReceiveChainWidget(QWidget *parent);
-	QWidget *generateTransmitChainWidget(QWidget *parent);
+	MenuSectionCollapseWidget *createGlobalSettingsSection(QWidget *parent);
+	MenuSectionCollapseWidget *createReceiveChainSection(QWidget *parent);
+	MenuSectionCollapseWidget *createTransmitChainSection(QWidget *parent);
 
 	// Channel Control Creation
 	QWidget *createRxChannelControls(const QString &title, int channel);
@@ -98,12 +98,10 @@ private:
 
 	// Tab widgets
 	QWidget *m_controlsWidget;
-	QWidget *m_blockDiagramWidget;
 	QWidget *m_profileGeneratorWidget;
 
 	// Tab buttons
 	QPushButton *m_controlsBtn;
-	QPushButton *m_blockDiagramBtn;
 	QPushButton *m_profileGeneratorBtn;
 
 	// Central content area (scrollable) - for Controls tab
