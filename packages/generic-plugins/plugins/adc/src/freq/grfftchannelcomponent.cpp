@@ -52,7 +52,6 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 
 	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(m_plotChannelCmpt);
 	connect(m_chData, &ChannelData::newData, m_fftPlotComponentChannel, &FFTPlotComponentChannel::onNewData);
-
 	m_node = node_I;
 	m_channelName = node_I->name() + "-" + node_Q->name();
 	m_src_I = node_I->src();
@@ -73,7 +72,24 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
 		[=](bool b) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
 
+	connect(m_fftPlotComponentChannel->channelComponent(), &ChannelComponent::updatedSamplingInfo, this,
+		[=](SamplingInfo p) {
+			dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSampleRate(p.sampleRate);
+		});
+
 	m_complex = true;
+
+	connect(m_chData, &ChannelData::newData, this,
+		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
+			gn_analysis_results *gn_analysis =
+				static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
+			if(gn_analysis) {
+				printf("\nAll Fourier Analysis Results:\n");
+				for(size_t i = 0; i < gn_analysis->results_size; i++)
+					printf("%4zu%20s%20.6f\n", i, gn_analysis->rkeys[i], gn_analysis->rvalues[i]);
+			}
+		});
+
 	_init();
 }
 

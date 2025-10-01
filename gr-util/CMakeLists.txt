@@ -71,6 +71,26 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
+# --------------------------
+# Add Genalyzer dependency
+# --------------------------
+find_path(GENALYZER_INCLUDE_DIR
+    NAMES cgenalyzer_simplified_beta.h
+    PATHS /usr/local/include /usr/include
+)
+find_library(GENALYZER_LIB
+    NAMES genalyzer
+    PATHS /usr/local/lib /usr/lib
+)
+
+if(NOT GENALYZER_INCLUDE_DIR OR NOT GENALYZER_LIB)
+    message(FATAL_ERROR "Genalyzer not found")
+endif()
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${GENALYZER_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${GENALYZER_LIB})
+# --------------------------
+
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(
 	${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${IIO_INCLUDE_DIRS} scopy-gui
