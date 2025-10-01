@@ -19,6 +19,9 @@
  */
 
 #include "adrv9002.h"
+#include <iio-widgets/iiowidgetbuilder.h>
+#include <iio-widgets/iiowidget.h>
+#include <iio-widgets/guistrategy/temperatureguistrategy.h>
 
 #include <QLoggingCategory>
 #include <QFutureWatcher>
@@ -91,7 +94,7 @@ void Adrv9002::setupUi()
 	m_profileManager = new ProfileManager(m_iio_dev, this);
 
 	// Initialize initial calibrations widget (only if supported)
-	if (InitialCalibrationsWidget::isSupported(m_iio_dev)) {
+	if(InitialCalibrationsWidget::isSupported(m_iio_dev)) {
 		m_initialCalibrationsWidget = new InitialCalibrationsWidget(m_iio_dev, this);
 	}
 
@@ -100,12 +103,10 @@ void Adrv9002::setupUi()
 
 	// Create the three tab widgets
 	m_controlsWidget = createControlsWidget();
-	m_blockDiagramWidget = createBlockDiagramWidget();
 	m_profileGeneratorWidget = createProfileGeneratorWidget();
 
 	// Add widgets to stack
 	m_tabCentralWidget->addWidget(m_controlsWidget);
-	m_tabCentralWidget->addWidget(m_blockDiagramWidget);
 	m_tabCentralWidget->addWidget(m_profileGeneratorWidget);
 
 	// Setup tab buttons
@@ -131,12 +132,12 @@ void Adrv9002::connectSignals()
 				m_refreshButton->stopAnimation();
 
 				// Refresh ProfileManager device info when ADRV9002 refreshes
-				if (m_profileManager) {
+				if(m_profileManager) {
 					m_profileManager->updateDeviceInfo();
 				}
 
 				// Refresh Initial Calibrations widget when ADRV9002 refreshes
-				if (m_initialCalibrationsWidget) {
+				if(m_initialCalibrationsWidget) {
 					m_initialCalibrationsWidget->refreshStatus();
 				}
 
@@ -157,34 +158,27 @@ void Adrv9002::setupTabButtons()
 
 	// Create tab buttons
 	m_controlsBtn = new QPushButton("Controls", this);
-	m_blockDiagramBtn = new QPushButton("Block Diagram", this);
 	m_profileGeneratorBtn = new QPushButton("Profile Generator", this);
 
 	// Make buttons checkable and style them
 	m_controlsBtn->setCheckable(true);
-	m_blockDiagramBtn->setCheckable(true);
 	m_profileGeneratorBtn->setCheckable(true);
 
 	Style::setStyle(m_controlsBtn, style::properties::button::blueGrayButton);
-	Style::setStyle(m_blockDiagramBtn, style::properties::button::blueGrayButton);
 	Style::setStyle(m_profileGeneratorBtn, style::properties::button::blueGrayButton);
 
 	// Connect tab switching
 	connect(m_controlsBtn, &QPushButton::clicked, this,
 		[=, this]() { m_tabCentralWidget->setCurrentWidget(m_controlsWidget); });
-	connect(m_blockDiagramBtn, &QPushButton::clicked, this,
-		[=, this]() { m_tabCentralWidget->setCurrentWidget(m_blockDiagramWidget); });
 	connect(m_profileGeneratorBtn, &QPushButton::clicked, this,
 		[=, this]() { m_tabCentralWidget->setCurrentWidget(m_profileGeneratorWidget); });
 
 	// Add to button group
 	m_tabButtons->addButton(m_controlsBtn);
-	m_tabButtons->addButton(m_blockDiagramBtn);
 	m_tabButtons->addButton(m_profileGeneratorBtn);
 
 	// Add buttons to top container
 	m_tool->addWidgetToTopContainerHelper(m_controlsBtn, TTA_LEFT);
-	m_tool->addWidgetToTopContainerHelper(m_blockDiagramBtn, TTA_LEFT);
 	m_tool->addWidgetToTopContainerHelper(m_profileGeneratorBtn, TTA_LEFT);
 }
 
@@ -200,10 +194,10 @@ void Adrv9002::createControls(QWidget *centralWidget)
 		// Add Device Driver API section first (matching iio-oscilloscope layout)
 		mainLayout->addWidget(generateDeviceDriverAPIWidget(centralWidget));
 
-		// Create section widgets following ad936x pattern
-		mainLayout->addWidget(generateGlobalSettingsWidget(centralWidget));
-		mainLayout->addWidget(generateReceiveChainWidget(centralWidget));
-		mainLayout->addWidget(generateTransmitChainWidget(centralWidget));
+		// Create collapsible section widgets
+		mainLayout->addWidget(createGlobalSettingsSection(centralWidget));
+		mainLayout->addWidget(createReceiveChainSection(centralWidget));
+		mainLayout->addWidget(createTransmitChainSection(centralWidget));
 	}
 
 	// Add spacer to push content to top
@@ -224,19 +218,6 @@ QWidget *Adrv9002::createControlsWidget()
 	createControls(m_centralWidget);
 
 	return m_scrollArea;
-}
-
-QWidget *Adrv9002::createBlockDiagramWidget()
-{
-	QWidget *widget = new QWidget();
-	QVBoxLayout *layout = new QVBoxLayout(widget);
-
-	QLabel *placeholder = new QLabel("Block Diagram - Coming Soon", widget);
-	placeholder->setAlignment(Qt::AlignCenter);
-	Style::setStyle(placeholder, style::properties::label::menuBig);
-	layout->addWidget(placeholder);
-
-	return widget;
 }
 
 QWidget *Adrv9002::createProfileGeneratorWidget()
@@ -292,18 +273,19 @@ QWidget *Adrv9002::generateDeviceDriverAPIWidget(QWidget *parent)
 QString Adrv9002::getDeviceDriverVersion()
 {
 	// Try to get version from context or device attributes
-	if (m_ctx) {
+	if(m_ctx) {
 		// Check context attributes first
 		unsigned int nb_ctx_attrs = iio_context_get_attrs_count(m_ctx);
-		for (unsigned int i = 0; i < nb_ctx_attrs; i++) {
+		for(unsigned int i = 0; i < nb_ctx_attrs; i++) {
 			const char *key, *value;
-			if (iio_context_get_attr(m_ctx, i, &key, &value) == 0) {
+			if(iio_context_get_attr(m_ctx, i, &key, &value) == 0) {
 				QString keyStr(key);
-				if (keyStr.contains("kernel") || keyStr.contains("version")) {
+				if(keyStr.contains("kernel") || keyStr.contains("version")) {
 					QString versionStr(value);
 					// Extract version number (e.g., "4.19.0-g17f4223" -> "68.10.1" style)
-					if (versionStr.contains("-g")) {
-						// For demo purposes, return a version that matches iio-oscilloscope format
+					if(versionStr.contains("-g")) {
+						// For demo purposes, return a version that matches iio-oscilloscope
+						// format
 						return "68.10.1";
 					}
 				}
@@ -315,28 +297,22 @@ QString Adrv9002::getDeviceDriverVersion()
 	return "68.10.1";
 }
 
-QWidget *Adrv9002::generateGlobalSettingsWidget(QWidget *parent)
+MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent)
 {
-	QWidget *globalSettingsWidget = new QWidget(parent);
-	Style::setBackgroundColor(globalSettingsWidget, json::theme::background_primary);
-	Style::setStyle(globalSettingsWidget, style::properties::widget::border_interactive);
-
-	QVBoxLayout *layout = new QVBoxLayout(globalSettingsWidget);
-	globalSettingsWidget->setLayout(layout);
-
-	QLabel *title = new QLabel("ADRV9002 Global Settings", globalSettingsWidget);
-	Style::setStyle(title, style::properties::label::menuBig);
-	layout->addWidget(title);
+	auto section = new MenuSectionCollapseWidget("ADRV9002 Global Settings", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	// Profile Manager - handles profile_config and stream_config
 	if(m_profileManager) {
-		layout->addWidget(m_profileManager);
+		section->add(m_profileManager);
 	}
 
-	// Initial Calibrations section (if supported)
-	if (m_initialCalibrationsWidget) {
-		layout->addWidget(m_initialCalibrationsWidget);
-	}
+	QWidget *widget = new QWidget(section);
+
+	QHBoxLayout *layout = new QHBoxLayout(widget);
+	layout->setSpacing(15);
+	layout->setMargin(0);
+	widget->setLayout(layout);
 
 	// Temperature (separate from profile management)
 	iio_channel *tempCh = iio_device_find_channel(m_iio_dev, "temp0", false);
@@ -362,30 +338,30 @@ QWidget *Adrv9002::generateGlobalSettingsWidget(QWidget *parent)
 
 			connect(this, &Adrv9002::readRequested, tempWidget, &IIOWidget::readAsync);
 
-			section->add(tempWidget);
+			layout->addWidget(tempWidget);
 		}
 	}
 
 	// Initial Calibrations section (if supported)
 	if(m_initialCalibrationsWidget) {
-		section->add(m_initialCalibrationsWidget);
+		layout->addWidget(m_initialCalibrationsWidget);
 	}
 
-	return globalSettingsWidget;
+	section->add(widget);
+
+	return section;
 }
 
-QWidget *Adrv9002::generateReceiveChainWidget(QWidget *parent)
+MenuSectionCollapseWidget *Adrv9002::createReceiveChainSection(QWidget *parent)
 {
-	QWidget *rxChainWidget = new QWidget(parent);
-	Style::setBackgroundColor(rxChainWidget, json::theme::background_primary);
-	Style::setStyle(rxChainWidget, style::properties::widget::border_interactive);
+	auto section = new MenuSectionCollapseWidget("ADRV9002 Receive Chain", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	QVBoxLayout *mainLayout = new QVBoxLayout(rxChainWidget);
-	rxChainWidget->setLayout(mainLayout);
-
-	QLabel *title = new QLabel("ADRV9002 Receive Chain", rxChainWidget);
-	Style::setStyle(title, style::properties::label::menuBig);
-	mainLayout->addWidget(title);
+	// Create container widget for RX channels layout
+	QWidget *rxContainer = new QWidget();
+	QVBoxLayout *containerLayout = new QVBoxLayout(rxContainer);
+	containerLayout->setMargin(0);
+	containerLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Main RX section with RX1 and RX2 side by side
 	QHBoxLayout *rxLayout = new QHBoxLayout();
@@ -397,30 +373,28 @@ QWidget *Adrv9002::generateReceiveChainWidget(QWidget *parent)
 	// RX2 Column
 	rxLayout->addWidget(createRxChannelControls("RX 2", 1));
 
-	mainLayout->addLayout(rxLayout);
+	containerLayout->addLayout(rxLayout);
 
-	// ORX Section below RX1/RX2 (separate row)
+	// ORX Section below RX1/RX2
 	QHBoxLayout *orxLayout = new QHBoxLayout();
 	orxLayout->addWidget(createOrxControls());
-	mainLayout->addLayout(orxLayout);
+	containerLayout->addLayout(orxLayout);
 
-	return rxChainWidget;
+	section->add(rxContainer);
+
+	return section;
 }
 
-QWidget *Adrv9002::generateTransmitChainWidget(QWidget *parent)
+MenuSectionCollapseWidget *Adrv9002::createTransmitChainSection(QWidget *parent)
 {
-	QWidget *txChainWidget = new QWidget(parent);
-	Style::setBackgroundColor(txChainWidget, json::theme::background_primary);
-	Style::setStyle(txChainWidget, style::properties::widget::border_interactive);
+	auto section = new MenuSectionCollapseWidget("ADRV9002 Transmit Chain", MenuCollapseSection::MHCW_ARROW,
+						     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	QVBoxLayout *mainLayout = new QVBoxLayout(txChainWidget);
-	txChainWidget->setLayout(mainLayout);
-
-	QLabel *title = new QLabel("ADRV9002 Transmit Chain", txChainWidget);
-	Style::setStyle(title, style::properties::label::menuBig);
-	mainLayout->addWidget(title);
-
-	QHBoxLayout *txLayout = new QHBoxLayout();
+	// Create container widget for TX channels layout
+	QWidget *txContainer = new QWidget();
+	QHBoxLayout *txLayout = new QHBoxLayout(txContainer);
+	txLayout->setMargin(0);
+	txLayout->setContentsMargins(0, 0, 0, 0);
 	txLayout->setSpacing(15);
 
 	// TX1 Column
@@ -429,8 +403,9 @@ QWidget *Adrv9002::generateTransmitChainWidget(QWidget *parent)
 	// TX2 Column
 	txLayout->addWidget(createTxChannelControls("TX 2", 1));
 
-	mainLayout->addLayout(txLayout);
-	return txChainWidget;
+	section->add(txContainer);
+
+	return section;
 }
 
 // Channel Control Creation Functions
@@ -617,16 +592,47 @@ QWidget *Adrv9002::createOrxControls()
 	layout->setSpacing(15);
 
 	// ORX 1 Column
-	layout->addWidget(createOrxChannelControls("ORX 1", 0));
+	QWidget *orx1Widget = createOrxChannelControls("ORX 1", 0);
 
-	// ORX 2 Column
-	layout->addWidget(createOrxChannelControls("ORX 2", 1));
+	if(orx1Widget != nullptr)
+		layout->addWidget(orx1Widget);
+
+	QString deviceName = QString(iio_device_get_name(m_iio_dev));
+	bool showOrx2 = !(deviceName == "adrv9003-phy" || deviceName == "adrv9005-phy");
+
+	if(showOrx2) {
+		// ORX 2 Column
+		QWidget *orx2Widget = createOrxChannelControls("ORX 2", 1);
+		if(orx2Widget != nullptr)
+			layout->addWidget(orx2Widget);
+	}
+
+	if(layout->count() == 0) {
+		widget->hide(); // this widet should not be visible if no ORX are createdle
+	}
 
 	return widget;
 }
 
 QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 {
+	// Find the corresponding RX channel (ORX uses same channel as RX but different attributes)
+	QString channelName = QString("voltage%1").arg(channel);
+	iio_channel *rxCh = iio_device_find_channel(m_iio_dev, channelName.toLocal8Bit().data(), false);
+
+	if(!rxCh) {
+		qDebug(CAT_ADRV9002) << "Channel not found:" << channelName;
+		return nullptr;
+	}
+
+	double dummy;
+	int ret = iio_channel_attr_read_double(rxCh, "orx_hardwaregain", &dummy);
+	if(ret == -ENODEV) {
+		qDebug(CAT_ADRV9002) << "ORX hardware not available on channel" << channel
+				     << "- orx_hardwaregain returned -ENODEV";
+		return nullptr; // Don't create widget if ORX hardware doesn't exist
+	}
+
 	QWidget *widget = new QWidget();
 	// Add individual channel styling for borders - matching RX/TX pattern
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -640,16 +646,6 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 	QLabel *titleLabel = new QLabel(title);
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
 	layout->addWidget(titleLabel, 0, 0, 1, 2); // Span 2 columns
-
-	// Find the corresponding RX channel (ORX uses same channel as RX but different attributes)
-	QString channelName = QString("voltage%1").arg(channel);
-	iio_channel *rxCh = iio_device_find_channel(m_iio_dev, channelName.toLocal8Bit().data(), false);
-
-	if(!rxCh) {
-		QLabel *errorLabel = new QLabel("Channel not found");
-		layout->addWidget(errorLabel, 1, 0, 1, 2);
-		return widget;
-	}
 
 	// Match exact iio-oscilloscope ORX layout from screenshots: 2x2 grid
 	int row = 1;
@@ -700,7 +696,7 @@ IIOWidget *Adrv9002::createRangeWidget(iio_channel *ch, const QString &attr, con
 	if(widget) {
 		// Apply stripUnits to ALL range widgets - safe for all values
 		widget->setDataToUIConversion([](QString data) {
-			return data.split(" ").first();  // Safe for all numeric attributes
+			return data.split(" ").first(); // Safe for all numeric attributes
 		});
 
 		connect(this, &Adrv9002::readRequested, widget, &IIOWidget::readAsync);
