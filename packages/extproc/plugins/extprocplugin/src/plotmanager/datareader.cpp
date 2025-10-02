@@ -161,11 +161,11 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 		}
 	}
 
-	QMap<QString, QVector<double>> processedData;
+	QMap<QString, QVector<float>> processedData;
 
 	// Initialize vectors for each channel
 	for(const QString &ch : qAsConst(m_channelsName)) {
-		processedData[ch] = QVector<double>();
+		processedData[ch] = QVector<float>();
 		processedData[ch].reserve(sampleCount);
 	}
 
@@ -185,7 +185,7 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 			QByteArray channelData = QByteArray(
 				reinterpret_cast<const char *>(m_data + sampleOffset + channelOffset), channelBytes);
 
-			double value = convertToDouble(channelData, m_channelFormat[ch]);
+			float value = convertToFloat(channelData, m_channelFormat[ch]);
 			processedData[chName].append(value);
 
 			channelOffset += channelBytes;
@@ -229,7 +229,7 @@ QStringList DataReader::channelsName() const { return m_channelsName; }
 
 void DataReader::setChannelsName(const QStringList &newChannelsName) { m_channelsName = newChannelsName; }
 
-double DataReader::convertToDouble(const QByteArray &data, const QString &format) const
+float DataReader::convertToFloat(const QByteArray &data, const QString &format) const
 {
 	if(data.isEmpty()) {
 		return 0.0;
@@ -238,25 +238,19 @@ double DataReader::convertToDouble(const QByteArray &data, const QString &format
 	const char *ptr = data.constData();
 
 	if(format == ChannelFormatTypes::FLOAT32) {
-		return static_cast<double>(*reinterpret_cast<const float *>(ptr));
-	} else if(format == ChannelFormatTypes::FLOAT64) {
-		return *reinterpret_cast<const double *>(ptr);
+		return *reinterpret_cast<const float *>(ptr);
 	} else if(format == ChannelFormatTypes::INT8) {
-		return static_cast<double>(*reinterpret_cast<const int8_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const int8_t *>(ptr));
 	} else if(format == ChannelFormatTypes::UINT8) {
-		return static_cast<double>(*reinterpret_cast<const uint8_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const uint8_t *>(ptr));
 	} else if(format == ChannelFormatTypes::INT16) {
-		return static_cast<double>(*reinterpret_cast<const int16_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const int16_t *>(ptr));
 	} else if(format == ChannelFormatTypes::UINT16) {
-		return static_cast<double>(*reinterpret_cast<const uint16_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const uint16_t *>(ptr));
 	} else if(format == ChannelFormatTypes::INT32) {
-		return static_cast<double>(*reinterpret_cast<const int32_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const int32_t *>(ptr));
 	} else if(format == ChannelFormatTypes::UINT32) {
-		return static_cast<double>(*reinterpret_cast<const uint32_t *>(ptr));
-	} else if(format == ChannelFormatTypes::INT64) {
-		return static_cast<double>(*reinterpret_cast<const int64_t *>(ptr));
-	} else if(format == ChannelFormatTypes::UINT64) {
-		return static_cast<double>(*reinterpret_cast<const uint64_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const uint32_t *>(ptr));
 	}
 
 	qWarning(CAT_DATA_READER) << "Unknown format for conversion:" << format;

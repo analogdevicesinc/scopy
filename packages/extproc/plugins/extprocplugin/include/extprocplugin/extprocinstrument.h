@@ -51,7 +51,7 @@ Q_SIGNALS:
 	void requestAnalysisInfo(const QString &type);
 	void outputConfigured(const OutputConfig &outConfig);
 	void analysisConfigChanged(const QString &type, const QVariantMap &config);
-	void bufferDataReady(QVector<QVector<double>> &inputData);
+	void bufferDataReady(QVector<QVector<float>> &inputData);
 	void runPressed(bool en);
 	void requestNewData();
 

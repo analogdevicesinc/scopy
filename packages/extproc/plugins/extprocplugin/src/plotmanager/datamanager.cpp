@@ -70,9 +70,9 @@ void DataManager::readData(int64_t startSample, int64_t sampleCount)
 
 void DataManager::setSamplingFreq(int samplingFreq) { m_samplingFreq = samplingFreq; }
 
-QVector<double> DataManager::dataForKey(const QString &key) { return m_plotsData.get(key, {}); }
+QVector<float> DataManager::dataForKey(const QString &key) { return m_plotsData.get(key, {}); }
 
-void DataManager::onDataReady(QMap<QString, QVector<double>> &data)
+void DataManager::onDataReady(QMap<QString, QVector<float>> &data)
 {
 	for(auto it = data.begin(); it != data.end(); it++) {
 		m_plotsData.insert(it.key(), it.value());
@@ -80,7 +80,7 @@ void DataManager::onDataReady(QMap<QString, QVector<double>> &data)
 	Q_EMIT dataIsReady();
 }
 
-void DataManager::onInputData(QVector<QVector<double>> bufferData)
+void DataManager::onInputData(QVector<QVector<float>> bufferData)
 {
 	int sampleCount = 0;
 	for(int chIdx = 0; chIdx < bufferData.size(); chIdx++) {
@@ -98,9 +98,9 @@ void DataManager::onInputData(QVector<QVector<double>> bufferData)
 
 void DataManager::computeXTime(int samplingFreq, int samples)
 {
-	QVector<double> xTime;
+	QVector<float> xTime;
 	for(int i = 0; i < samples; i++) {
-		xTime.push_back((double)i / m_samplingFreq);
+		xTime.push_back((float)i / m_samplingFreq);
 	}
 	m_plotsData.insert(DataManagerKeys::TIME, xTime);
 }
