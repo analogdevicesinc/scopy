@@ -20,12 +20,12 @@
  */
 
 #include "settingsmenu.h"
+#include "pluginbase/statusbarmanager.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QTabWidget>
 #include <menuheader.h>
 #include <style.h>
-#include <menusectionwidget.h>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_QIQ_SETTINGS, "QIQSettingsMenu");
@@ -51,6 +51,9 @@ void SettingsMenu::setupUI()
 	connect(m_analysisCb->combo(), &QComboBox::currentTextChanged, this, &SettingsMenu::analysisChanged);
 	connect(m_bufferMenu, &BufferMenu::bufferParamsChanged, this, &SettingsMenu::bufferParamsChanged);
 	connect(m_analysisMenu, &AnalysisMenu::applyPressed, this, &SettingsMenu::onAnalysisApply);
+	connect(m_fileAcqBrowser->lineEdit(), &QLineEdit::textChanged, this, &SettingsMenu::acqFileSelected);
+	connect(m_fileAcqSection->collapseSection()->header(), &QPushButton::clicked, this,
+		&SettingsMenu::handleFileAcqSectionToggle);
 }
 
 void SettingsMenu::createAcqMenu()
@@ -60,6 +63,15 @@ void SettingsMenu::createAcqMenu()
 	QWidget *acqWidget = new QWidget();
 	QVBoxLayout *acqLay = new QVBoxLayout(acqWidget);
 	acqLay->setMargin(0);
+
+	// File Acquisition
+	m_fileAcqSection = new MenuSectionCollapseWidget("File Acquisition", MenuCollapseSection::MHCW_ONOFF,
+							 MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
+	m_fileAcqSection->setCollapsed(true);
+	m_fileAcqBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, m_fileAcqSection);
+	m_fileAcqBrowser->lineEdit()->setReadOnly(true);
+	m_fileAcqBrowser->lineEdit()->setPlaceholderText("Select an iqbin file");
+	m_fileAcqSection->add(m_fileAcqBrowser);
 
 	// Buffer menu
 	MenuSectionCollapseWidget *bufferAcq = new MenuSectionCollapseWidget(
@@ -79,6 +91,7 @@ void SettingsMenu::createAcqMenu()
 	m_analysisMenu = new AnalysisMenu();
 	analysisMenu->add(m_analysisMenu);
 
+	acqLay->addWidget(m_fileAcqSection);
 	acqLay->addWidget(bufferAcq);
 	acqLay->addWidget(analysisCb);
 	acqLay->addWidget(analysisMenu);
@@ -142,6 +155,17 @@ QWidget *SettingsMenu::createMenuW(const QString &title, QWidget *parent)
 
 QWidget *SettingsMenu::plotW() const { return m_plotW; }
 
+void SettingsMenu::onAcqFileCheck(bool isValid)
+{
+	if(isValid) {
+		return;
+	}
+	if(!m_fileAcqSection->collapsed()) {
+		m_fileAcqSection->setCollapsed(!isValid);
+		m_fileAcqBrowser->lineEdit()->clear();
+		StatusBarManager::pushMessage("Invalid file!");
+	}
+}
 QWidget *SettingsMenu::acqW() const { return m_acqW; }
 
 void SettingsMenu::setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels)
@@ -211,4 +235,14 @@ void SettingsMenu::onAnalysisApply()
 	QString analysisType = m_analysisCb->combo()->currentText();
 	QVariantMap config = m_analysisMenu->getAnalysisConfig();
 	Q_EMIT analysisConfig(analysisType, config);
+}
+
+void SettingsMenu::handleFileAcqSectionToggle()
+{
+	QString lineEditText = m_fileAcqBrowser->lineEdit()->text();
+	if(m_fileAcqSection->collapsed()) {
+		Q_EMIT acqFileSelected("");
+	} else if(!lineEditText.isEmpty()) {
+		Q_EMIT acqFileSelected(lineEditText);
+	}
 }

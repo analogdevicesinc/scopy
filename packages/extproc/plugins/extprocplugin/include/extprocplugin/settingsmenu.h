@@ -26,6 +26,8 @@
 #include <QWidget>
 #include <analysismenu.h>
 #include <buffermenu.h>
+#include <filebrowserwidget.h>
+#include <menusectionwidget.h>
 
 namespace scopy::extprocplugin {
 
@@ -48,17 +50,20 @@ public:
 	QWidget *plotW() const;
 
 Q_SIGNALS:
+	void acqFileSelected(const QString &path);
 	void plotSettings(const QString &plot);
 	void analysisChanged(const QString &type);
 	void analysisConfig(const QString &type, const QVariantMap &inConfig);
 	void bufferParamsChanged(const BufferParams &params);
 
 public Q_SLOTS:
+	void onAcqFileCheck(bool isValid);
 	void onSettingsMenu(QWidget *w);
 	void changeSettings(const QString &plotTitle);
 
 private Q_SLOTS:
 	void onAnalysisApply();
+	void handleFileAcqSectionToggle();
 
 private:
 	void setupUI();
@@ -72,6 +77,8 @@ private:
 	QWidget *m_plotSettings;
 	QComboBox *m_selectPlotCb;
 	// acquisition settings
+	MenuSectionCollapseWidget *m_fileAcqSection;
+	FileBrowserWidget *m_fileAcqBrowser;
 	QWidget *m_acqW;
 	BufferMenu *m_bufferMenu;
 	AnalysisMenu *m_analysisMenu;

@@ -200,6 +200,19 @@ bool ExtProcPlugin::onConnect()
 		&AcquisitionManager::startAcquisition);
 	connect(extInstrument, &ExtProcInstrument::requestNewData, m_acquisitionManager,
 		&AcquisitionManager::onDataRequest);
+	connect(extInstrument, &ExtProcInstrument::acqFileSelected, this, [this, extInstrument](const QString &path) {
+		bool fileValid = false;
+		if(!path.isEmpty() && QFile::exists(path)) {
+			m_acquisitionManager->setActiveSource(AcquisitionManager::IQ_FILE);
+			fileValid = m_acquisitionManager->getFileReader()->openFile(path);
+		}
+		if(!fileValid) {
+			m_acquisitionManager->setActiveSource(AcquisitionManager::IIO_DEVICE);
+		}
+
+		extInstrument->setAvailableChannels(m_acquisitionManager->getAvailableChannels());
+		Q_EMIT extInstrument->acqFileCheck(fileValid);
+	});
 	m_qiqController->getAnalysisTypes();
 
 	return true;

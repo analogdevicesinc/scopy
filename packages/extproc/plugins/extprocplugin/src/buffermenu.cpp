@@ -22,9 +22,7 @@
 #include "buffermenu.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QCheckBox>
-#include <QScrollArea>
 #include <menuonoffswitch.h>
 
 using namespace scopy::extprocplugin;
@@ -52,7 +50,8 @@ void BufferMenu::setupUI()
 	layout->addWidget(m_deviceCombo);
 
 	// Channel list
-	layout->addWidget(new QLabel("Channels:"));
+	QLabel *chnlsLabel = new QLabel("Channels:");
+	layout->addWidget(chnlsLabel);
 	QScrollArea *scrollArea = new QScrollArea();
 	scrollArea->setMinimumHeight(80);
 	m_chnList = new QWidget();
@@ -67,6 +66,9 @@ void BufferMenu::setupUI()
 	connect(m_deviceCombo->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this,
 		&BufferMenu::onParamsChanged);
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, &BufferMenu::onParamsChanged);
+	connect(this, &BufferMenu::channelsAvailable, this, &BufferMenu::updateChnList);
+	connect(this, &BufferMenu::channelsAvailable, this,
+		[this, chnlsLabel, scrollArea]() { updateWidgetVisibility(chnlsLabel, scrollArea); });
 }
 
 QStringList BufferMenu::getEnChannels()
@@ -84,13 +86,13 @@ QStringList BufferMenu::getEnChannels()
 
 void BufferMenu::setAvailableChannels(const QMap<QString, QList<ChannelInfo>> &channels)
 {
+	m_availableChannels.clear();
 	m_availableChannels = channels;
-
 	m_deviceCombo->combo()->clear();
 	for(auto it = channels.begin(); it != channels.end(); ++it) {
 		m_deviceCombo->combo()->addItem(it.key());
 	}
-	updateChnList();
+	Q_EMIT channelsAvailable();
 }
 
 void BufferMenu::updateChnList()
@@ -128,4 +130,14 @@ void BufferMenu::onParamsChanged()
 	params.enChnls = getEnChannels();
 
 	Q_EMIT bufferParamsChanged(params);
+}
+
+void BufferMenu::updateWidgetVisibility(QLabel *channelsLabel, QScrollArea *scrollArea)
+{
+	bool hasValidChannels = !m_availableChannels.isEmpty() &&
+		!(m_availableChannels.size() == 1 && m_availableChannels.first().isEmpty());
+
+	channelsLabel->setVisible(hasValidChannels);
+	scrollArea->setVisible(hasValidChannels);
+	m_deviceCombo->setVisible(hasValidChannels);
 }
