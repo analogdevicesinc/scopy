@@ -1730,6 +1730,14 @@
   <g
      transform="translate(-335.89352,247.83673)"
      id="layer1">
+    <!-- Full canvas white background for all text labels -->
+    <rect
+       width="1128.3628"
+       height="782"
+       x="335.89352"
+       y="-247.83673"
+       id="canvas-background"
+       style="fill:#ffffff;fill-opacity:1;stroke:none" />
     <rect
        width="939.2597"
        height="759.99915"
@@ -1737,7 +1745,7 @@
        x="424.41556"
        y="-236.83629"
        id="rect3195"
-       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:2.00088286;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.00088286;stroke-miterlimit:0;stroke-opacity:1;stroke-dasharray:none" />
     <path
        d="m 549.99996,173.37499 c 0,-37 0,-37 0,-37"
        id="path5884-8"

@@ -19,7 +19,7 @@
  *
  */
 
-#include "ad963xadvanced.h"
+#include "ad936x/ad963xadvanced.h"
 
 #include <QFutureWatcher>
 #include <QtConcurrent>
