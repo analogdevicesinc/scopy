@@ -84,6 +84,16 @@ struct DataManagerKeys
 	static constexpr auto TIME = "time";
 	static constexpr auto FREQ = "freq";
 };
+
+struct IQBinHeader
+{
+	int version;
+	int num_points;
+	double sample_rate;
+	double start_time;
+	double center_freq;
+};
+
 class QIQUtils
 {
 public:

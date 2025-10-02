@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QFile>
 #include <QStringList>
+#include "../extprocutils.h"
 
 namespace scopy::extprocplugin {
 class DataReader : public QObject
@@ -53,15 +54,24 @@ public:
 
 	QStringList channelsName() const;
 
+	// IQ binary file header support
+	bool hasIQHeader() const;
+	IQBinHeader getIQHeader() const;
+
+	// Direct memory access to data section
+	const uchar *mappedData() const;
+
 Q_SIGNALS:
-	void dataReady(QMap<QString, QVector<double>> &processedData);
+	void dataReady(QMap<QString, QVector<float>> &processedData);
 
 private:
 	int getFormatSize(const QString &format) const;
-	double convertToDouble(const QByteArray &data, const QString &format) const;
+	float convertToFloat(const QByteArray &data, const QString &format) const;
 	bool remapFile();
 	bool checkForRemapping();
 	void createFile(const QString &path);
+	bool detectAndParseIQHeader(const uchar *mappedData, int64_t fileSize);
+	int64_t getDataOffset() const;
 
 	QFile m_file;
 	uchar *m_data;
@@ -70,6 +80,11 @@ private:
 	QStringList m_channelFormat;
 	QStringList m_channelsName;
 	QString m_filePath;
+
+	// IQ binary header support
+	bool m_hasIQHeader = false;
+	IQBinHeader m_iqHeader = {};
+	static const int HEADER_EXTRA_V2_SIZE = 1024;
 };
 
 } // namespace scopy::extprocplugin

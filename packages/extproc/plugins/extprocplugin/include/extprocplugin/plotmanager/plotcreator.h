@@ -42,7 +42,7 @@ public:
 	virtual ~PlotCreatorBase() = default;
 
 	virtual QWidget *settingsMenu() = 0;
-	virtual void updatePlot(const QMap<QString, QVector<double>> &data) = 0;
+	virtual void updatePlot(const QMap<QString, QVector<float>> &data) = 0;
 	virtual QString plotType() const = 0;
 	virtual void requestSettings(const QString &title) = 0;
 	virtual void dataManagerEntries(const QStringList &entries) = 0;
@@ -65,7 +65,7 @@ public:
 
 	QWidget *plot() const override;
 	QWidget *settingsMenu() override;
-	void updatePlot(const QMap<QString, QVector<double>> &data) override;
+	void updatePlot(const QMap<QString, QVector<float>> &data) override;
 	QString plotType() const override { return "plotWidget"; }
 	void enableChannelAdd(bool en) override;
 
