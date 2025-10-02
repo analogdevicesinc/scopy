@@ -23,6 +23,7 @@
 #define DATAWRITER_H
 
 #include "common/scopyconfig.h"
+#include "extprocutils.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QObject>
@@ -34,17 +35,33 @@ class DataWriter : public QObject
 	Q_OBJECT
 public:
 	DataWriter(QObject *parent = nullptr);
+	DataWriter(bool withHeader, QObject *parent = nullptr);
 	~DataWriter();
 
+	// Memory-mapped data access (points to data section, skipping header if present)
 	uchar *mappedData();
 	bool openFile(const QString &path, int64_t dataSize);
 	void unmap();
 	QFileInfo getFileInfo();
 
+	// IQ binary file header support
+	void setWithHeader(bool withHeader);
+	bool hasHeader() const;
+	void setIQHeader(const IQBinHeader &header);
+	IQBinHeader getIQHeader() const;
+
 private:
+	bool writeHeader();
+	int64_t getHeaderSize() const;
+
+	bool m_withHeader = false;
+	IQBinHeader m_iqHeader = {};
 	QFile m_file;
-	uchar *m_data = nullptr;
-	int64_t m_dataSize = 0;
+	uchar *m_mappedFileData = nullptr;  // Points to start of file (including header)
+	uchar *m_mappedDataOnly = nullptr;  // Points to data section only (what mappedData() returns)
+	int64_t m_dataSize = 0;             // Size of data section only
+	int64_t m_totalFileSize = 0;        // Total file size (header + data)
+	static const int HEADER_EXTRA_V2_SIZE = 1024;
 };
 } // namespace scopy::extprocplugin
 

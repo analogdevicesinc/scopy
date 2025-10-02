@@ -400,7 +400,7 @@ void StandardPlotCreator::rmPlotChannel(int chnlIdx)
 	updatePlotChannels(newPlotInfo);
 }
 
-void StandardPlotCreator::updatePlot(const QMap<QString, QVector<double>> &data)
+void StandardPlotCreator::updatePlot(const QMap<QString, QVector<float>> &data)
 {
 	if(m_first) {
 		m_plotAutoscaler->start();
@@ -413,12 +413,8 @@ void StandardPlotCreator::updatePlot(const QMap<QString, QVector<double>> &data)
 		const auto &ch = channels[chIdx];
 		auto xData = data.value(ch.x);
 		auto yData = data.value(ch.y);
-
 		plotChnls[chIdx]->curve()->setSamples(xData, yData);
-
-		QVector<float> xDataFloat = QVector<float>(xData.begin(), xData.end());
-		QVector<float> yDataFloat = QVector<float>(yData.begin(), yData.end());
-		m_plotAutoscaler->onNewData(xDataFloat.data(), yDataFloat.data(), xDataFloat.size(), false);
+		m_plotAutoscaler->onNewData(xData.data(), yData.data(), xData.size(), false);
 	}
 	m_plotWidget->replot();
 	m_first = false;

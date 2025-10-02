@@ -32,15 +32,6 @@
 
 namespace scopy::extprocplugin {
 
-struct IQBinHeader
-{
-	int version;
-	int num_points;
-	double sample_rate;
-	double start_time;
-	double center_freq;
-};
-
 class IQBinReader : public QObject
 {
 	Q_OBJECT
@@ -59,19 +50,19 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void inputFormatChanged(const InputConfig &config);
-	void dataReady(QVector<QVector<double>> &inputData);
+	void dataReady(QVector<QVector<float>> &inputData);
 
 private:
 	bool parseHeader();
 	void readData();
 	InputConfig createInputConfig();
-	QVector<QVector<double>> convertIQData(const QByteArray &rawData, int numSamples);
+	QVector<QVector<float>> convertIQData(const QByteArray &rawData, int numSamples);
 
 	QFile m_file;
 	IQBinHeader m_header;
 	QFutureWatcher<void> *m_readFw;
 	DataWriter *m_dataWriter;
-	QVector<QVector<double>> m_bufferData;
+	QVector<QVector<float>> m_bufferData;
 	BufferParams m_params;
 	bool m_isFileOpen = false;
 	int64_t m_dataStartOffset = 0;

@@ -22,6 +22,7 @@
 #include "plotmanager/datareader.h"
 #include <QLoggingCategory>
 #include <extprocutils.h>
+#include <QDataStream>
 
 Q_LOGGING_CATEGORY(CAT_DATA_READER, "DataReader");
 
@@ -60,13 +61,23 @@ bool DataReader::openFile(const QString &path)
 		return false;
 	}
 
-	m_dataSize = fileSize;
-	m_data = m_file.map(0, m_dataSize);
-	if(!m_data) {
+	// Memory map the entire file first
+	uchar *mappedFile = m_file.map(0, fileSize);
+	if(!mappedFile) {
 		qWarning(CAT_DATA_READER) << "Failed to map file:" << path;
 		m_file.close();
 		return false;
 	}
+
+	// Detect IQ header from mapped memory
+	detectAndParseIQHeader(mappedFile, fileSize);
+
+	// Calculate data section size (excluding header)
+	int64_t dataOffset = getDataOffset();
+	m_dataSize = fileSize - dataOffset;
+
+	// Point to data section (after header)
+	m_data = mappedFile + dataOffset;
 	m_file.close();
 	qDebug(CAT_DATA_READER) << "Successfully opened and mapped file:" << path << "Size:" << m_dataSize;
 	return true;
@@ -161,11 +172,11 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 		}
 	}
 
-	QMap<QString, QVector<double>> processedData;
+	QMap<QString, QVector<float>> processedData;
 
 	// Initialize vectors for each channel
 	for(const QString &ch : qAsConst(m_channelsName)) {
-		processedData[ch] = QVector<double>();
+		processedData[ch] = QVector<float>();
 		processedData[ch].reserve(sampleCount);
 	}
 
@@ -185,7 +196,7 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 			QByteArray channelData = QByteArray(
 				reinterpret_cast<const char *>(m_data + sampleOffset + channelOffset), channelBytes);
 
-			double value = convertToDouble(channelData, m_channelFormat[ch]);
+			float value = convertToFloat(channelData, m_channelFormat[ch]);
 			processedData[chName].append(value);
 
 			channelOffset += channelBytes;
@@ -229,7 +240,7 @@ QStringList DataReader::channelsName() const { return m_channelsName; }
 
 void DataReader::setChannelsName(const QStringList &newChannelsName) { m_channelsName = newChannelsName; }
 
-double DataReader::convertToDouble(const QByteArray &data, const QString &format) const
+float DataReader::convertToFloat(const QByteArray &data, const QString &format) const
 {
 	if(data.isEmpty()) {
 		return 0.0;
@@ -238,25 +249,19 @@ double DataReader::convertToDouble(const QByteArray &data, const QString &format
 	const char *ptr = data.constData();
 
 	if(format == ChannelFormatTypes::FLOAT32) {
-		return static_cast<double>(*reinterpret_cast<const float *>(ptr));
-	} else if(format == ChannelFormatTypes::FLOAT64) {
-		return *reinterpret_cast<const double *>(ptr);
+		return *reinterpret_cast<const float *>(ptr);
 	} else if(format == ChannelFormatTypes::INT8) {
-		return static_cast<double>(*reinterpret_cast<const int8_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const int8_t *>(ptr));
 	} else if(format == ChannelFormatTypes::UINT8) {
-		return static_cast<double>(*reinterpret_cast<const uint8_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const uint8_t *>(ptr));
 	} else if(format == ChannelFormatTypes::INT16) {
-		return static_cast<double>(*reinterpret_cast<const int16_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const int16_t *>(ptr));
 	} else if(format == ChannelFormatTypes::UINT16) {
-		return static_cast<double>(*reinterpret_cast<const uint16_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const uint16_t *>(ptr));
 	} else if(format == ChannelFormatTypes::INT32) {
-		return static_cast<double>(*reinterpret_cast<const int32_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const int32_t *>(ptr));
 	} else if(format == ChannelFormatTypes::UINT32) {
-		return static_cast<double>(*reinterpret_cast<const uint32_t *>(ptr));
-	} else if(format == ChannelFormatTypes::INT64) {
-		return static_cast<double>(*reinterpret_cast<const int64_t *>(ptr));
-	} else if(format == ChannelFormatTypes::UINT64) {
-		return static_cast<double>(*reinterpret_cast<const uint64_t *>(ptr));
+		return static_cast<float>(*reinterpret_cast<const uint32_t *>(ptr));
 	}
 
 	qWarning(CAT_DATA_READER) << "Unknown format for conversion:" << format;
@@ -305,4 +310,53 @@ bool DataReader::remapFile()
 	qDebug(CAT_DATA_READER) << "Successfully remapped file. New size:" << m_dataSize;
 
 	return true;
+}
+
+bool DataReader::hasIQHeader() const { return m_hasIQHeader; }
+
+IQBinHeader DataReader::getIQHeader() const { return m_iqHeader; }
+
+const uchar *DataReader::mappedData() const
+{
+	return m_data;
+}
+
+bool DataReader::detectAndParseIQHeader(const uchar *mappedData, int64_t fileSize)
+{
+	// Check if file is large enough to contain a basic header
+	if(fileSize < static_cast<int64_t>(sizeof(IQBinHeader))) {
+		m_hasIQHeader = false;
+		return false;
+	}
+
+	// Direct memory access to header - much more efficient than QDataStream!
+	const IQBinHeader *headerPtr = reinterpret_cast<const IQBinHeader *>(mappedData);
+
+	// Basic validation of header values
+	if(headerPtr->version < 1 || headerPtr->version > 2 || headerPtr->num_points < 0 ||
+	   headerPtr->sample_rate <= 0) {
+		m_hasIQHeader = false;
+		return false;
+	}
+
+	// Valid header detected - copy it
+	m_hasIQHeader = true;
+	m_iqHeader = *headerPtr;
+
+	qInfo(CAT_DATA_READER) << "Detected IQ binary header - Version:" << m_iqHeader.version
+			       << "Samples:" << m_iqHeader.num_points << "Sample rate:" << m_iqHeader.sample_rate;
+	return true;
+}
+
+int64_t DataReader::getDataOffset() const
+{
+	if(!m_hasIQHeader) {
+		return 0;
+	}
+
+	int64_t headerSize = sizeof(IQBinHeader);
+	if(m_iqHeader.version == 2) {
+		headerSize += HEADER_EXTRA_V2_SIZE;
+	}
+	return headerSize;
 }

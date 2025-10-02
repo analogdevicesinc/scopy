@@ -215,10 +215,10 @@ InputConfig IQBinReader::createInputConfig()
 	return config;
 }
 
-QVector<QVector<double>> IQBinReader::convertIQData(const QByteArray &rawData, int numSamples)
+QVector<QVector<float>> IQBinReader::convertIQData(const QByteArray &rawData, int numSamples)
 {
-	QVector<QVector<double>> result;
-	QVector<double> iData, qData;
+	QVector<QVector<float>> result;
+	QVector<float> iData, qData;
 
 	iData.reserve(numSamples);
 	qData.reserve(numSamples);
@@ -226,8 +226,8 @@ QVector<QVector<double>> IQBinReader::convertIQData(const QByteArray &rawData, i
 	const float *floatData = reinterpret_cast<const float *>(rawData.data());
 
 	for(int i = 0; i < numSamples; ++i) {
-		iData.append(static_cast<double>(floatData[i * 2]));
-		qData.append(static_cast<double>(floatData[i * 2 + 1]));
+		iData.append(floatData[i * 2]);
+		qData.append(floatData[i * 2 + 1]);
 	}
 
 	result.append(iData);
