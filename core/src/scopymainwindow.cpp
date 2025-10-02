@@ -33,6 +33,7 @@
 #if __ANDROID__
 #include <QtAndroidExtras/QtAndroid>
 #include <QAndroidJniEnvironment>
+#include <libusb.h>
 #endif
 
 #include "logging_categories.h"
@@ -74,12 +75,20 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ScopyMainWindow)
 	, m_glLoader(nullptr)
+#ifdef __ANDROID__
+	,jnienv(new QAndroidJniEnvironment())
+#endif
 {
 	QElapsedTimer timer;
 	timer.start();
 
 #ifdef __ANDROID__ // JNI hooks
 	registerNativeMethods();
+#endif
+
+#ifdef __ANDROID__ // LIBUSB WEAK_AUTHORITY
+	libusb_set_option(NULL,LIBUSB_OPTION_ANDROID_JAVAVM,jnienv->javaVM());
+	libusb_set_option(NULL,LIBUSB_OPTION_WEAK_AUTHORITY,NULL);
 #endif
 
 	initPreferences();
