@@ -38,7 +38,7 @@ QString scopy::config::defaultTranslationFolderPath()
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
 #elif __ANDROID__
-	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
+	return qgetenv("APPDATA") + "/translations";
 #endif
 	return SCOPY_TRANSLATION_INSTALL_PATH;
 }
