@@ -43,8 +43,9 @@ QString scopy::config::defaultPluginFolderPath()
 #elif defined(__appimage__)
 	// usr/lib/plugins
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/plugins";
+#elif __ANDROID__
+	return qgetenv("APPDATA") + "/scopy-plugins";
 #endif
-
 	return SCOPY_PLUGIN_INSTALL_PATH;
 }
 

@@ -33,6 +33,13 @@
 #include <QLibrary>
 #include <QLoggingCategory>
 #include <QtGlobal>
+#include <QStandardPaths>
+
+
+#ifdef __ANDROID__
+#include <QtAndroidExtras/QtAndroid>
+#endif
+
 
 Q_LOGGING_CATEGORY(CAT_PLUGINREPOSTIORY, "PluginRepository");
 
@@ -47,13 +54,19 @@ PluginRepository::~PluginRepository() {}
 
 void PluginRepository::init(QString location)
 {
+
 	qInfo(CAT_PLUGINREPOSTIORY) << "initializing plugins from: " << location;
+
 	const QString pluginMetaFileName = "plugin.json";
 	QString pluginMetaFilePath = "";
 	QDir loc(location);
 
 	QFileInfoList plugins = loc.entryInfoList(QDir::Files);
 	QStringList pluginFiles;
+
+
+	if(plugins.isEmpty())
+		qWarning(CAT_PLUGINREPOSTIORY)<<"Could not access any files at: " << location;
 
 	for(const QFileInfo &p : plugins) {
 		if(p.fileName() == pluginMetaFileName) {
