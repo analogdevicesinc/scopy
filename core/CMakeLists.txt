@@ -167,6 +167,13 @@ target_link_libraries(
 
 if(ANDROID)
 	target_link_libraries(${PROJECT_NAME} PUBLIC EGL GLESv2)
+	find_library(LIBUSB_LIBRARIES NAMES usb-1.0 usb)
+	find_path(LIBUSB_INCLUDE_DIRS NAMES libusb.h)
+	target_include_directories(${PROJECT_NAME} PUBLIC ${LIBUSB_INCLUDE_DIRS})
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBUSB_LIBRARIES})
+	message(STATUS "LIBUSB_LIBRARIES: " ${LIBUSB_LIBRARIES})
+	message(STATUS "LIBUSB_INCLUDE_DIRS: " ${LIBUSB_INCLUDE_DIRS})
+
 endif()
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH}
