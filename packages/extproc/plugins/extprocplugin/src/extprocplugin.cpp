@@ -148,25 +148,27 @@ bool ExtProcPlugin::onConnect()
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
-	m_iioManager = new IIOManager(conn->context());
+	// Create unified acquisition manager
+	m_acquisitionManager = new AcquisitionManager(conn->context());
+	m_acquisitionManager->setActiveSource(AcquisitionManager::IIO_DEVICE);
 
 	ToolMenuEntry *tme = m_toolList[0];
 	ExtProcInstrument *extInstrument = new ExtProcInstrument(tme);
 	tme->setTool(extInstrument);
 	tme->setEnabled(true);
 	tme->setRunBtnVisible(true);
-	extInstrument->setAvailableChannels(m_iioManager->getAvailableChannels());
+	extInstrument->setAvailableChannels(m_acquisitionManager->getAvailableChannels());
 
 	// The format isn't necessary to be declared here
 	CommandFormat *cmdFormat = new JsonFormat();
 	m_qiqController = new CMDController(cmdFormat);
 
-	// connect(m_iioManager, &IIOManager::inputFormatChanged, extInstrument,
-	// &ExtProcInstrument::onInputFormatChanged);
-	connect(m_iioManager, &IIOManager::dataReady, extInstrument, &ExtProcInstrument::bufferDataReady);
+	// Connect unified acquisition manager signals
+	connect(m_acquisitionManager, &AcquisitionManager::dataReady, extInstrument,
+		&ExtProcInstrument::bufferDataReady);
+	connect(m_acquisitionManager, &AcquisitionManager::inputFormatChanged, m_qiqController,
+		&CMDController::configureInput);
 
-	// input config
-	connect(m_iioManager, &IIOManager::inputFormatChanged, m_qiqController, &CMDController::configureInput);
 	connect(m_qiqController, &CMDController::inputConfigured, extInstrument,
 		&ExtProcInstrument::onInputFormatChanged);
 	// analysis config
@@ -178,7 +180,7 @@ bool ExtProcPlugin::onConnect()
 	connect(extInstrument, &ExtProcInstrument::outputConfigured, m_qiqController, &CMDController::configureOutput);
 	connect(m_qiqController, &CMDController::outputConfigured, extInstrument, &ExtProcInstrument::onOutputConfig);
 	// run
-	connect(m_iioManager, &IIOManager::dataReady, m_qiqController, &CMDController::runAnalysis);
+	connect(m_acquisitionManager, &AcquisitionManager::dataReady, m_qiqController, &CMDController::runAnalysis);
 	connect(m_qiqController, &CMDController::processDataCompleted, extInstrument,
 		&ExtProcInstrument::onRunResponse);
 	// analysis types
@@ -191,11 +193,13 @@ bool ExtProcPlugin::onConnect()
 
 	connect(m_qiqController, &CMDController::processFinished, extInstrument, &ExtProcInstrument::onProcessFinished);
 
-	connect(extInstrument, &ExtProcInstrument::bufferParamsChanged, m_iioManager,
-		&IIOManager::onBufferParamsChanged);
-	connect(extInstrument, &ExtProcInstrument::runPressed, m_iioManager, &IIOManager::startAcq);
-	connect(extInstrument, &ExtProcInstrument::requestNewData, m_iioManager, &IIOManager::onDataRequest);
-
+	// Connect control signals to unified acquisition manager
+	connect(extInstrument, &ExtProcInstrument::bufferParamsChanged, m_acquisitionManager,
+		&AcquisitionManager::onBufferParamsChanged);
+	connect(extInstrument, &ExtProcInstrument::runPressed, m_acquisitionManager,
+		&AcquisitionManager::startAcquisition);
+	connect(extInstrument, &ExtProcInstrument::requestNewData, m_acquisitionManager,
+		&AcquisitionManager::onDataRequest);
 	m_qiqController->getAnalysisTypes();
 
 	return true;
@@ -215,9 +219,6 @@ bool ExtProcPlugin::onDisconnect()
 			delete(w);
 		}
 	}
-
-	m_iioManager->deleteLater();
-	m_iioManager = nullptr;
 
 	ConnectionProvider::GetInstance()->close(m_param);
 

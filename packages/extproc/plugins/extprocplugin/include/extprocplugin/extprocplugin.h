@@ -26,7 +26,7 @@
 
 #include "scopy-extprocplugin_export.h"
 #include <QObject>
-#include <iiomanager.h>
+#include <acquisitionmanager.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 #include <controller/cmdcontroller.h>
@@ -54,7 +54,7 @@ public Q_SLOTS:
 
 private:
 	CMDController *m_qiqController;
-	IIOManager *m_iioManager;
+	AcquisitionManager *m_acquisitionManager = nullptr;
 
 	const QString CLI_PROGRAM = "json_cli";
 };

@@ -42,6 +42,7 @@ uchar *DataWriter::mappedData() { return m_mappedDataOnly; }
 
 bool DataWriter::openFile(const QString &path, int64_t dataSize)
 {
+	unmap();
 	m_file.setFileName(path);
 	if(!m_file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
 		return false;
@@ -50,11 +51,12 @@ bool DataWriter::openFile(const QString &path, int64_t dataSize)
 	m_dataSize = dataSize;
 	int64_t headerSize = m_withHeader ? getHeaderSize() : 0;
 	m_totalFileSize = headerSize + dataSize;
-
 	// Resize file to accommodate header + data
-	if(!m_file.resize(m_totalFileSize)) {
-		m_file.close();
-		return false;
+	if(m_file.size() < m_totalFileSize) {
+		if(!m_file.resize(m_totalFileSize)) {
+			m_file.close();
+			return false;
+		}
 	}
 
 	// Write header if enabled

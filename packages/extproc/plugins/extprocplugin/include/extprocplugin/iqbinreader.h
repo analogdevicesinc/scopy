@@ -25,6 +25,7 @@
 #include "extprocutils.h"
 #include "inputconfig.h"
 #include "datawriter.h"
+#include "plotmanager/datareader.h"
 
 #include <QObject>
 #include <QFile>
@@ -53,21 +54,17 @@ Q_SIGNALS:
 	void dataReady(QVector<QVector<float>> &inputData);
 
 private:
-	bool parseHeader();
 	void readData();
 	InputConfig createInputConfig();
-	QVector<QVector<float>> convertIQData(const QByteArray &rawData, int numSamples);
+	QVector<QVector<float>> convertIQData(const uchar *data, int numSamples);
 
-	QFile m_file;
-	IQBinHeader m_header;
-	QFutureWatcher<void> *m_readFw;
+	DataReader *m_dataReader;
 	DataWriter *m_dataWriter;
+	QFutureWatcher<void> *m_readFw;
 	QVector<QVector<float>> m_bufferData;
 	BufferParams m_params;
 	bool m_isFileOpen = false;
-	int64_t m_dataStartOffset = 0;
 	int64_t m_currentPosition = 0;
-	static const int HEADER_EXTRA_V2_SIZE = 1024;
 };
 
 } // namespace scopy::extprocplugin
