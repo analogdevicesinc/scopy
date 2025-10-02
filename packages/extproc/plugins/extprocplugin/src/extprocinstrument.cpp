@@ -103,11 +103,13 @@ void ExtProcInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &ExtProcInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &ExtProcInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &ExtProcInstrument::bufferParamsChanged);
+	connect(m_settings, &SettingsMenu::acqFileSelected, this, &ExtProcInstrument::acqFileSelected);
 	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(this, &ExtProcInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &ExtProcInstrument::requestNewData);
 	connect(m_plotManager, &PlotManager::changeSettings, m_settings, &SettingsMenu::changeSettings);
+	connect(this, &ExtProcInstrument::acqFileCheck, m_settings, &SettingsMenu::onAcqFileCheck);
 }
 
 void ExtProcInstrument::setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels)

@@ -28,6 +28,8 @@
 #include <QMap>
 #include <QStringList>
 #include <QSpinBox>
+#include <QLabel>
+#include <QScrollArea>
 #include <menucombo.h>
 #include <menuspinbox.h>
 
@@ -52,13 +54,18 @@ public Q_SLOTS:
 	void onParamsChanged();
 
 private:
+	void setupUI();
+	QStringList getEnChannels();
+	void updateWidgetVisibility(QLabel *channelsLabel, QScrollArea *scrollArea);
+
+Q_SIGNALS:
+	void channelsAvailable();
+
+private:
 	QMap<QString, QList<ChannelInfo>> m_availableChannels;
 	MenuCombo *m_deviceCombo;
 	MenuSpinbox *m_bufferSizeSpin;
 	QWidget *m_chnList;
-
-	void setupUI();
-	QStringList getEnChannels();
 };
 
 } // namespace scopy::extprocplugin

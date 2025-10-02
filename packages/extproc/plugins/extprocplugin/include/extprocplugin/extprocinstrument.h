@@ -47,6 +47,8 @@ public:
 
 	void setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels);
 Q_SIGNALS:
+	void acqFileCheck(bool isValid);
+	void acqFileSelected(const QString &path);
 	void bufferParamsChanged(const BufferParams &params);
 	void requestAnalysisInfo(const QString &type);
 	void outputConfigured(const OutputConfig &outConfig);
