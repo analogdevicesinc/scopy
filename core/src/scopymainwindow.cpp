@@ -639,8 +639,6 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 		Q_EMIT p->restartRequired();
 	} else if(str == "packages_path") {
 		Q_EMIT p->restartRequired();
-	} else if(str == "qiq_file_acq_path") {
-		Q_EMIT p->restartRequired();
 	}
 }
 

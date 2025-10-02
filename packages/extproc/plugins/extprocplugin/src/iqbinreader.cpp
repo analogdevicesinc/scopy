@@ -32,6 +32,7 @@ IQBinReader::IQBinReader(QObject *parent)
 	: QObject(parent)
 {
 	m_params = {1024, "name", {"ch0", "ch1"}};
+	m_dataReader = new DataReader(this);
 	m_dataWriter = new DataWriter(this);
 	m_readFw = new QFutureWatcher<void>();
 
@@ -52,14 +53,15 @@ bool IQBinReader::openFile(const QString &filePath)
 {
 	closeFile();
 
-	m_file.setFileName(filePath);
-	if(!m_file.open(QIODevice::ReadOnly)) {
+	// Use DataReader to handle file opening and header detection automatically
+	if(!m_dataReader->openFile(filePath)) {
 		qWarning(CAT_IQBIN_READER) << "Failed to open file:" << filePath;
 		return false;
 	}
 
-	if(!parseHeader()) {
-		qWarning(CAT_IQBIN_READER) << "Failed to parse header from:" << filePath;
+	// Verify it has IQ header
+	if(!m_dataReader->hasIQHeader()) {
+		qWarning(CAT_IQBIN_READER) << "File does not contain valid IQ header:" << filePath;
 		closeFile();
 		return false;
 	}
@@ -70,9 +72,10 @@ bool IQBinReader::openFile(const QString &filePath)
 	InputConfig config = createInputConfig();
 	Q_EMIT inputFormatChanged(config);
 
+	IQBinHeader header = m_dataReader->getIQHeader();
 	qInfo(CAT_IQBIN_READER) << "Successfully opened iqbin file:" << filePath;
-	qInfo(CAT_IQBIN_READER) << "Version:" << m_header.version << "Samples:" << m_header.num_points
-				<< "Sample rate:" << m_header.sample_rate << "Center freq:" << m_header.center_freq;
+	qInfo(CAT_IQBIN_READER) << "Version:" << header.version << "Samples:" << header.num_points
+				<< "Sample rate:" << header.sample_rate << "Center freq:" << header.center_freq;
 
 	return true;
 }
@@ -83,10 +86,7 @@ void IQBinReader::closeFile()
 		m_readFw->waitForFinished();
 	}
 
-	if(m_file.isOpen()) {
-		m_file.close();
-	}
-
+	m_dataReader->unmap();
 	m_dataWriter->unmap();
 
 	m_isFileOpen = false;
@@ -122,35 +122,6 @@ void IQBinReader::onBufferParamsChanged(const BufferParams &params)
 	Q_EMIT inputFormatChanged(config);
 }
 
-bool IQBinReader::parseHeader()
-{
-	if(!m_file.isOpen()) {
-		return false;
-	}
-
-	m_file.seek(0);
-	QDataStream stream(&m_file);
-	stream.setByteOrder(QDataStream::LittleEndian);
-
-	stream >> m_header.version;
-	stream >> m_header.num_points;
-	stream >> m_header.sample_rate;
-	stream >> m_header.start_time;
-	stream >> m_header.center_freq;
-
-	if(stream.status() != QDataStream::Ok) {
-		qWarning(CAT_IQBIN_READER) << "Failed to read header";
-		return false;
-	}
-
-	m_dataStartOffset = sizeof(IQBinHeader);
-	if(m_header.version == 2) {
-		m_dataStartOffset += HEADER_EXTRA_V2_SIZE;
-	}
-
-	return true;
-}
-
 void IQBinReader::readData()
 {
 	if(!m_isFileOpen) {
@@ -162,50 +133,46 @@ void IQBinReader::readData()
 		samplesPerChannel = 1024;
 	}
 
-	int64_t samplesRemaining = m_header.num_points - m_currentPosition;
+	IQBinHeader header = m_dataReader->getIQHeader();
+	int64_t samplesRemaining = header.num_points - m_currentPosition;
 	int samplesToRead = qMin(static_cast<int64_t>(samplesPerChannel), samplesRemaining);
 
 	if(samplesToRead <= 0) {
 		m_currentPosition = 0;
-		samplesToRead =
-			qMin(static_cast<int64_t>(samplesPerChannel), static_cast<int64_t>(m_header.num_points));
+		samplesToRead = qMin(static_cast<int64_t>(samplesPerChannel), static_cast<int64_t>(header.num_points));
 	}
 
 	int64_t bytesToRead = samplesToRead * 2 * sizeof(float);
-	int64_t fileOffset = m_dataStartOffset + (m_currentPosition * 2 * sizeof(float));
 
 	if(!m_dataWriter->openFile(QIQUtils::dataInPath(), bytesToRead)) {
 		qWarning(CAT_IQBIN_READER) << "Failed to open DataWriter file for mapping";
 		return;
 	}
 
-	m_file.seek(fileOffset);
-	QByteArray rawData = m_file.read(bytesToRead);
-
-	if(rawData.size() != bytesToRead) {
-		qWarning(CAT_IQBIN_READER) << "Failed to read expected amount of data";
-		m_dataWriter->unmap();
-		return;
-	}
-
+	// Direct memory access - much more efficient!
+	int64_t dataOffset = m_currentPosition * 2 * sizeof(float);
+	const uchar *sourceData = m_dataReader->mappedData() + dataOffset;
 	uchar *mappedMemory = m_dataWriter->mappedData();
-	if(mappedMemory) {
-		memcpy(mappedMemory, rawData.data(), bytesToRead);
+
+	if(mappedMemory && sourceData) {
+		memcpy(mappedMemory, sourceData, bytesToRead);
 	}
 
-	m_bufferData = convertIQData(rawData, samplesToRead);
+	m_bufferData = convertIQData(sourceData, samplesToRead);
 	m_currentPosition += samplesToRead;
 }
 
 InputConfig IQBinReader::createInputConfig()
 {
+	IQBinHeader header = m_dataReader->getIQHeader();
+
 	InputConfig config;
 	config.setInputFile(QIQUtils::dataInPath());
 	config.setInputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
 	config.setChannelCount(2);
 	config.setSampleCount(m_params.samplesCount);
-	config.setSamplingFrequency(m_header.sample_rate);
-	config.setFrequencyOffset(m_header.center_freq);
+	config.setSamplingFrequency(header.sample_rate);
+	config.setFrequencyOffset(header.center_freq);
 
 	QStringList formats;
 	formats << ChannelFormatTypes::FLOAT32;
@@ -215,7 +182,7 @@ InputConfig IQBinReader::createInputConfig()
 	return config;
 }
 
-QVector<QVector<float>> IQBinReader::convertIQData(const QByteArray &rawData, int numSamples)
+QVector<QVector<float>> IQBinReader::convertIQData(const uchar *data, int numSamples)
 {
 	QVector<QVector<float>> result;
 	QVector<float> iData, qData;
@@ -223,7 +190,7 @@ QVector<QVector<float>> IQBinReader::convertIQData(const QByteArray &rawData, in
 	iData.reserve(numSamples);
 	qData.reserve(numSamples);
 
-	const float *floatData = reinterpret_cast<const float *>(rawData.data());
+	const float *floatData = reinterpret_cast<const float *>(data);
 
 	for(int i = 0; i < numSamples; ++i) {
 		iData.append(floatData[i * 2]);
