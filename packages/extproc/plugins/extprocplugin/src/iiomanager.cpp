@@ -97,7 +97,13 @@ void IIOManager::updateBufferParams(const BufferParams &params)
 	}
 	destroyBuffer();
 	m_enChnlSize = enChannels(devName, params.enChnls);
-	m_buffer = createMmapIioBuffer(dev, params.samplesCount, &m_originalBufferPtr);
+	m_buffer = iio_device_create_buffer(dev, params.samplesCount, false);
+	int64_t dataSize = m_enChnlSize * params.samplesCount * sizeof(float);
+	if(!m_dataWriter->openFile(ExtProcUtils::dataInPath(), dataSize)) {
+		qWarning(CAT_IIO_MANAGER) << "Failed to map:" << ExtProcUtils::dataInPath();
+		return;
+	}
+	// m_buffer = createMmapIioBuffer(dev, params.samplesCount, &m_originalBufferPtr);
 }
 
 void IIOManager::notifyInputConfigChanged()
@@ -134,7 +140,6 @@ void IIOManager::destroyBuffer()
 	if(!m_buffer) {
 		return;
 	}
-
 	// If we used the buffer hack, restore the original buffer pointer before cleanup
 	// This ensures iio_buffer_destroy() operates on the correct internal state
 	if(m_originalBufferPtr) {
@@ -168,26 +173,22 @@ void IIOManager::chnlRead(iio_channel *chnl, QByteArray &dst)
 	}
 }
 
-QVector<double> IIOManager::toDouble(QByteArray dst)
+QVector<float> IIOManager::toFloat(QByteArray dst)
 {
 	const char *data = dst.data();
 	int length = dst.size() / m_params.samplesCount;
-	QVector<double> chData;
+	QVector<float> chData;
 	chData.resize(m_params.samplesCount);
 
 	for(int i = 0; i < m_params.samplesCount; ++i) {
-		double value = 0.0;
+		float value = 0.0;
 		if(length == 4) {
 			const int *intPtr = reinterpret_cast<const int *>(data + i * length);
-			value = static_cast<double>(*intPtr);
+			value = static_cast<float>(*intPtr);
 		} else if(length == 2) { // int16
 			const short *int16Ptr = reinterpret_cast<const short *>(data + i * length);
-			value = static_cast<double>(*int16Ptr);
-		} else if(length == 8) { // double
-			const double *doublePtr = reinterpret_cast<const double *>(data + i * length);
-			value = *doublePtr;
+			value = static_cast<float>(*int16Ptr);
 		}
-
 		chData[i] = value;
 	}
 
@@ -204,9 +205,28 @@ void IIOManager::readAllChannels(QString deviceName)
 		}
 		QByteArray rawData;
 		chnlRead(ch, rawData);
-		QVector<double> values = toDouble(rawData);
+		QVector<float> values = toFloat(rawData);
 		if(!values.isEmpty()) {
 			m_bufferData.push_back(values);
+		}
+	}
+}
+
+void IIOManager::writeToMappedFile()
+{
+	if(m_bufferData.isEmpty() || m_bufferData.first().isEmpty()) {
+		qWarning(CAT_IIO_MANAGER) << "Data is not available!";
+		return;
+	}
+	if(!m_dataWriter->mappedData()) {
+		qWarning(CAT_IIO_MANAGER) << "Couldn't access the DataWriteer mapped data!";
+		return;
+	}
+	int dataIdx = 0;
+	float *interleaved = reinterpret_cast<float *>(m_dataWriter->mappedData());
+	for(int sample = 0; sample < m_params.samplesCount; sample++) {
+		for(int chIdx = 0; chIdx < m_enChnlSize; chIdx++) {
+			interleaved[dataIdx++] = m_bufferData[chIdx][sample];
 		}
 	}
 }
@@ -220,6 +240,7 @@ void IIOManager::readBuffer()
 	QString devName = iio_device_get_name(dev);
 	iio_buffer_refill(m_buffer);
 	readAllChannels(devName);
+	writeToMappedFile();
 }
 
 int IIOManager::enChannels(QString deviceName, QStringList enChnls)
@@ -257,7 +278,7 @@ QString channelDataFormat(struct iio_channel *chnl)
 	return formatString;
 }
 
-QStringList IIOManager::getChannelsFormat(iio_device *dev)
+QStringList IIOManager::getChannelsFormat(iio_device *dev, bool floatFormat)
 {
 	QStringList formatList;
 	if(!dev) {
@@ -272,7 +293,7 @@ QStringList IIOManager::getChannelsFormat(iio_device *dev)
 		}
 
 		if(iio_channel_is_enabled(chnl)) {
-			QString dataFormat = channelDataFormat(chnl);
+			QString dataFormat = floatFormat ? ChannelFormatTypes::FLOAT32 : channelDataFormat(chnl);
 			if(!dataFormat.isEmpty()) {
 				formatList.append(dataFormat);
 			}
@@ -302,7 +323,7 @@ InputConfig IIOManager::createInputConfig(iio_device *dev, int channelCount, int
 	InputConfig inputConfig;
 	inputConfig.setInputFile(ExtProcUtils::dataInPath());
 	inputConfig.setInputFileFormat(FileFormatTypes::BINARY_INTERLEAVED);
-	inputConfig.setChnlsFormat(getChannelsFormat(dev));
+	inputConfig.setChnlsFormat(getChannelsFormat(dev, true));
 	inputConfig.setChannelCount(channelCount);
 	inputConfig.setSampleCount(bufferSamplesSize);
 	inputConfig.setSamplingFrequency(getSamplingFrequency(dev));

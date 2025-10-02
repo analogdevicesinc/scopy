@@ -73,33 +73,36 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void inputFormatChanged(const InputConfig &config);
-	void dataReady(QVector<QVector<double>> &inputData);
+	void dataReady(QVector<QVector<float>> &inputData);
 
 private:
 	void computeDevMap();
 	void destroyBuffer();
 	void readBuffer();
 	int enChannels(QString deviceName, QStringList enChnls);
-	QStringList getChannelsFormat(iio_device *dev);
+	QStringList getChannelsFormat(iio_device *dev, bool floatFormat = false);
 	double getSamplingFrequency(iio_device *dev);
 	InputConfig createInputConfig(iio_device *dev, int channelCount, int64_t bufferSamplesSize);
 	void chnlRead(iio_channel *chnl, QByteArray &dst);
-	QVector<double> toDouble(QByteArray dst);
+	QVector<float> toFloat(QByteArray dst);
 	void readAllChannels(QString deviceName);
+	void writeToMappedFile();
 	void updateBufferParams(const BufferParams &params);
 	void notifyInputConfigChanged();
-
-	iio_buffer *createMmapIioBuffer(struct iio_device *dev, size_t samples, void **originalBufferPtr = nullptr);
 
 	int m_enChnlSize = 0;
 	BufferParams m_params;
 	iio_context *m_ctx;
 	iio_buffer *m_buffer = nullptr;
-	void *m_originalBufferPtr = nullptr;
 	DataWriter *m_dataWriter;
 	QFutureWatcher<void> *m_readFw;
-	QVector<QVector<double>> m_bufferData;
+	QVector<QVector<float>> m_bufferData;
 	QMap<QString, QMap<QString, iio_channel *>> m_devMap;
+
+	// DEPRECATED: Memory-mapped buffer functionality no longer used in current implementation
+	// The iio_buffer_hack union and this method are retained for reference/proof-of-concept purposes
+	iio_buffer *createMmapIioBuffer(struct iio_device *dev, size_t samples, void **originalBufferPtr = nullptr);
+	void *m_originalBufferPtr = nullptr;
 };
 
 } // namespace scopy::extprocplugin

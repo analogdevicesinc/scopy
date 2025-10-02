@@ -37,7 +37,7 @@ class DataManagerMap : public QObject
 	Q_OBJECT
 public:
 	// Insert a key-value pair
-	void insert(const QString &key, const QVector<double> &value)
+	void insert(const QString &key, const QVector<float> &value)
 	{
 		bool keyExist = map.contains(key);
 		map.insert(key, value);
@@ -47,7 +47,7 @@ public:
 	}
 
 	// Get a value (returns default if not found)
-	QVector<double> get(const QString &key, const QVector<double> &defaultValue = QVector<double>()) const
+	QVector<float> get(const QString &key, const QVector<float> &defaultValue = QVector<float>()) const
 	{
 		return map.value(key, defaultValue);
 	}
@@ -64,7 +64,7 @@ Q_SIGNALS:
 private:
 	// Implement a frequency list to track active entries.
 	// Entries that are not updated for a certain period should be removed from DataManager.
-	QMap<QString, QVector<double>> map;
+	QMap<QString, QVector<float>> map;
 };
 
 class DataManager : public QObject
@@ -79,7 +79,7 @@ public:
 	void readData(int64_t startSample, int64_t sampleCount);
 
 	void setSamplingFreq(int samplingFreq);
-	QVector<double> dataForKey(const QString &key);
+	QVector<float> dataForKey(const QString &key);
 
 	double sampleCount() const;
 
@@ -90,10 +90,10 @@ Q_SIGNALS:
 	void newDataEntries(const QList<QString> &entries);
 
 public Q_SLOTS:
-	void onInputData(QVector<QVector<double>> bufferData);
+	void onInputData(QVector<QVector<float>> bufferData);
 
 private Q_SLOTS:
-	void onDataReady(QMap<QString, QVector<double>> &data);
+	void onDataReady(QMap<QString, QVector<float>> &data);
 
 private:
 	void setupConnections();

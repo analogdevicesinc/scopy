@@ -54,11 +54,11 @@ public:
 	QStringList channelsName() const;
 
 Q_SIGNALS:
-	void dataReady(QMap<QString, QVector<double>> &processedData);
+	void dataReady(QMap<QString, QVector<float>> &processedData);
 
 private:
 	int getFormatSize(const QString &format) const;
-	double convertToDouble(const QByteArray &data, const QString &format) const;
+	float convertToFloat(const QByteArray &data, const QString &format) const;
 	bool remapFile();
 	bool checkForRemapping();
 	void createFile(const QString &path);

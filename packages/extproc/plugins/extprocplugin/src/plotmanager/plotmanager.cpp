@@ -73,7 +73,7 @@ void PlotManager::onDataIsProcessed(int samplesOffset, int samplesCount)
 void PlotManager::updatePlots()
 {
 	for(auto &container : m_plotContainers) {
-		QMap<QString, QVector<double>> data;
+		QMap<QString, QVector<float>> data;
 		const QList<ExtProcPlotInfo::PlotInfoCh> chnlsInfo = container.creator->plotInfo().channels;
 		for(const ExtProcPlotInfo::PlotInfoCh &ch : chnlsInfo) {
 			data.insert(ch.x, m_dataManager->dataForKey(ch.x));
