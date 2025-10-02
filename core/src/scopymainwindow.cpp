@@ -40,6 +40,7 @@
 #if __ANDROID__
 #include <QtAndroidExtras/QtAndroid>
 #include <QAndroidJniEnvironment>
+#include <libusb.h>
 #endif
 
 #include <common/debugtimer.h>
@@ -85,11 +86,19 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, m_scriptingTool(nullptr)
 	, m_detachedScriptingWindow(nullptr)
 	, m_scriptingToolDetached(false)
+#ifdef __ANDROID__
+	,jnienv(new QAndroidJniEnvironment())
+#endif
 {
 	DebugTimer benchmark;
 
 #ifdef __ANDROID__ // JNI hooks
 	registerNativeMethods();
+#endif
+
+#ifdef __ANDROID__ // LIBUSB WEAK_AUTHORITY
+	libusb_set_option(NULL,LIBUSB_OPTION_ANDROID_JAVAVM,jnienv->javaVM());
+	libusb_set_option(NULL,LIBUSB_OPTION_WEAK_AUTHORITY,NULL);
 #endif
 
 	initPreferences();
