@@ -53,7 +53,7 @@ public:
 Q_SIGNALS:
 	void changeSettings(const QString &plotTitle);
 	void requestNewData();
-	void bufferDataReady(QVector<QVector<double>> data);
+	void bufferDataReady(QVector<QVector<float>> data);
 	void plotSettings(QWidget *settings);
 
 public Q_SLOTS:
