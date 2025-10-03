@@ -37,6 +37,8 @@
 #include <gnuradio/blocks/nlog10_ff.h>
 #include <gnuradio/blocks/multiply_const.h>
 #include <gnuradio/blocks/add_const_v.h>
+#include <gnuradio/blocks/float_to_int.h>
+#include <gnuradio/blocks/complex_to_float.h>
 #include <QMap>
 #include <cgenalyzer.h>
 
@@ -79,7 +81,6 @@ public:
 	void setSampleRate(double sr);
 	gn_analysis_results *getGnAnalysis();
 	void setAnalysisEnabled(bool enabled);
-	bool analysisEnabled() const;
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
@@ -89,11 +90,12 @@ protected:
 	bool m_windowCorr;
 	double m_sr;
 	gr::blocks::multiply_const_cc::sptr mult_nrbits;
-	gr::blocks::complex_to_mag_squared::sptr ctm;
-	gr::blocks::multiply_const_ff::sptr mult_const1;
-	gr::blocks::nlog10_ff::sptr nlog10;
+	gr::blocks::float_to_int::sptr float_to_int_i;
+	gr::blocks::float_to_int::sptr float_to_int_q;
+	gr::blocks::complex_to_float::sptr complex_to_float;
+	gr::blocks::multiply_const_cc::sptr mult_wind_corr;
 	gr::blocks::add_const_vff::sptr powerOffset;
-	genalyzer_fft_vcc::sptr genalyzer_fft;
+	genalyzer_fft_vii::sptr genalyzer_fft;
 
 	gr::fft::window::win_type m_fftwindow;
 	GRTopBlock *m_top;

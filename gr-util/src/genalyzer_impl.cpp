@@ -1,24 +1,24 @@
 #include "genalyzer.h"
 #include "genalyzer_impl.h"
 #include <gnuradio/io_signature.h>
-#include <stdexcept>
 #include <cstring>
 #include <cgenalyzer_simplified_beta.h>
+#include <cgenalyzer.h>
 
 using namespace scopy::grutil;
 
 // Define static mutex for thread safety across all instances
-std::mutex genalyzer_fft_vcc_impl::s_genalyzer_mutex;
+std::mutex genalyzer_fft_vii_impl::s_genalyzer_mutex;
 
-genalyzer_fft_vcc::sptr genalyzer_fft_vcc::make(int npts, int qres, int navg, int nfft, GnWindow win,
+genalyzer_fft_vii::sptr genalyzer_fft_vii::make(int npts, int qres, int navg, int nfft, GnWindow win,
 						double sample_rate)
 {
-	return std::make_shared<genalyzer_fft_vcc_impl>(npts, qres, navg, nfft, win, sample_rate);
+	return std::make_shared<genalyzer_fft_vii_impl>(npts, qres, navg, nfft, win, sample_rate);
 }
 
-genalyzer_fft_vcc_impl::genalyzer_fft_vcc_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate)
-	: genalyzer_fft_vcc("genalyzer_fft_vcc", gr::io_signature::make(1, 1, sizeof(gr_complex) * npts),
-			    gr::io_signature::make(1, 1, sizeof(gr_complex) * nfft))
+genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate)
+	: genalyzer_fft_vii("genalyzer_fft_vii", gr::io_signature::make(2, 2, sizeof(int32_t) * npts),
+			    gr::io_signature::make(1, 1, sizeof(float) * nfft))
 	, d_npts(npts)
 	, d_qres(qres)
 	, d_navg(navg)
@@ -30,19 +30,15 @@ genalyzer_fft_vcc_impl::genalyzer_fft_vcc_impl(int npts, int qres, int navg, int
 	, d_qwfq(nullptr)
 	, d_config(nullptr)
 	, d_analysis(new gn_analysis_results)
-	, d_previous_rkeys(nullptr)
-	, d_previous_rvalues(nullptr)
 	, d_analysis_enabled(false) // Default to disabled to avoid unnecessary computation
 {
 	allocate_buffers();
-	configure_genalyzer();
 }
 
-genalyzer_fft_vcc_impl::~genalyzer_fft_vcc_impl() { cleanup_buffers(); }
+genalyzer_fft_vii_impl::~genalyzer_fft_vii_impl() { cleanup_buffers(); }
 
-void genalyzer_fft_vcc_impl::allocate_buffers()
+void genalyzer_fft_vii_impl::allocate_buffers()
 {
-	// Don't allocate d_fft_out here - genalyzer will allocate it
 	d_fft_out = nullptr;
 
 	d_qwfi = new int32_t[d_npts];
@@ -52,11 +48,9 @@ void genalyzer_fft_vcc_impl::allocate_buffers()
 	std::memset(d_qwfq, 0, sizeof(int32_t) * d_npts);
 }
 
-void genalyzer_fft_vcc_impl::cleanup_buffers()
+void genalyzer_fft_vii_impl::cleanup_buffers()
 {
 	if(d_fft_out) {
-		// Use genalyzer's memory free function if it exists
-		// Otherwise use standard free() since genalyzer likely uses malloc
 		free(d_fft_out);
 		d_fft_out = nullptr;
 	}
@@ -69,48 +63,24 @@ void genalyzer_fft_vcc_impl::cleanup_buffers()
 		d_qwfq = nullptr;
 	}
 
-	// Free previous analysis results memory
-	cleanup_analysis_results();
-
 	if(d_analysis) {
 		delete d_analysis;
 		d_analysis = nullptr;
 	}
-
 	if(d_config) {
-		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 		gn_config_free(&d_config);
 		d_config = nullptr;
 	}
 }
 
-void genalyzer_fft_vcc_impl::cleanup_analysis_results()
+int genalyzer_fft_vii_impl::configure_genalyzer()
 {
-	// Free previously allocated analysis results to prevent memory leaks
-	if(d_previous_rkeys) {
-		// Free each string in the rkeys array
-		for(size_t i = 0; i < d_analysis->results_size; i++) {
-			if(d_previous_rkeys[i]) {
-				free(d_previous_rkeys[i]);
-			}
-		}
-		free(d_previous_rkeys);
-		d_previous_rkeys = nullptr;
+	if(d_config) {
+		gn_config_free(&d_config);
+		d_config = nullptr;
 	}
 
-	if(d_previous_rvalues) {
-		free(d_previous_rvalues);
-		d_previous_rvalues = nullptr;
-	}
-}
-
-int genalyzer_fft_vcc_impl::configure_genalyzer()
-{
-	std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
-
-	int err_code = 0;
-
-	err_code = gn_config_fftz(d_npts, d_qres, d_navg, d_nfft, d_win, &d_config);
+	int err_code = gn_config_fftz(d_npts, d_qres, d_navg, d_nfft, d_win, &d_config);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_config_fftz failed with error code: " + std::to_string(err_code));
 		return err_code;
@@ -125,62 +95,45 @@ int genalyzer_fft_vcc_impl::configure_genalyzer()
 	return 0;
 }
 
-bool genalyzer_fft_vcc_impl::start()
-{
-	return true;
-}
+bool genalyzer_fft_vii_impl::start() { return true; }
 
-bool genalyzer_fft_vcc_impl::stop() { return true; }
+bool genalyzer_fft_vii_impl::stop() { return true; }
 
-void genalyzer_fft_vcc_impl::set_sample_rate(double sample_rate)
-{
-	d_sample_rate = sample_rate;
-	if(d_config) {
-		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
-		int err_code = gn_config_set_sample_rate(d_sample_rate, &d_config);
-		if(err_code != 0) {
-			GR_LOG_ERROR(d_logger, "Failed to update sample rate");
-		}
-	}
-}
+void genalyzer_fft_vii_impl::set_sample_rate(double sample_rate) { d_sample_rate = sample_rate; }
 
-double genalyzer_fft_vcc_impl::sample_rate() const { return d_sample_rate; }
+double genalyzer_fft_vii_impl::sample_rate() const { return d_sample_rate; }
 
-void genalyzer_fft_vcc_impl::set_window(GnWindow win)
-{
-	d_win = win;
-	// Reconfigure if needed
-	if(d_config) {
-		configure_genalyzer();
-	}
-}
+void genalyzer_fft_vii_impl::set_window(GnWindow win) { d_win = win; }
 
-int genalyzer_fft_vcc_impl::window() const { return d_win; }
+int genalyzer_fft_vii_impl::window() const { return d_win; }
 
-int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &input_items,
+int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &input_items,
 				 gr_vector_void_star &output_items)
 {
-	const gr_complex *in = (const gr_complex *)input_items[0];
-	gr_complex *out = (gr_complex *)output_items[0];
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 
-	for(int i = 0; i < noutput_items; i++) {
-		// Get pointer to current input vector
-		const gr_complex *in_vec = in + (i * d_npts);
+		configure_genalyzer();
 
-		// Convert gr_complex input to separate I/Q int32_t arrays
-		// CRITICAL: Need to scale the float values to int32 range based on qres
-		// Assuming input is normalized between -1.0 and 1.0
-		double scale = (1 << (d_qres)); // 2^(qres-1) for signed integers
+		// Input 0: I channel (int32_t), Input 1: Q channel (int32_t)
+		const int32_t *in_i = (const int32_t *)input_items[0];
+		const int32_t *in_q = (const int32_t *)input_items[1];
+		float *out = (float *)output_items[0];
 
-		for(size_t j = 0; j < d_npts; j++) {
-			// Scale and quantize the input samples
-			d_qwfi[j] = static_cast<int32_t>(in_vec[j].real() * scale);
-			d_qwfq[j] = static_cast<int32_t>(in_vec[j].imag() * scale);
-		}
+		// Allocate buffers for shifted output and dB conversion
+		double *shifted_output = (double *)calloc(2 * d_nfft, sizeof(double));
+		double *db_output = (double *)calloc(d_nfft, sizeof(double));
 
-		// Perform genalyzer FFT with thread protection
-		{
-			std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
+		for(int i = 0; i < noutput_items; i++) {
+			// Get pointers to current input vectors
+			const int32_t *in_i_vec = in_i + (i * d_npts);
+			const int32_t *in_q_vec = in_q + (i * d_npts);
+
+			// Copy int32_t data directly - no conversion needed!
+			for(size_t j = 0; j < d_npts; j++) {
+				d_qwfi[j] = in_i_vec[j];
+				d_qwfq[j] = in_q_vec[j];
+			}
 
 			// Validate config before calling gn_fftz
 			if(!d_config) {
@@ -212,84 +165,79 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 				GR_LOG_ERROR(d_logger, "gn_fftz failed to allocate output buffer");
 				return -1;
 			}
+
+			// Get pointer to current output vector
+			float *out_vec = out + (i * d_nfft);
+
+			// Use genalyzer's ifftshift function for proper FFT shifting
+			int err_code_shift = gn_ifftshift(shifted_output, 2 * d_nfft, d_fft_out, 2 * d_nfft);
+
+			if(err_code_shift != 0) {
+				GR_LOG_ERROR(d_logger, "gn_ifftshift failed with error code: " + std::to_string(err_code_shift));
+				free(shifted_output);
+				free(db_output);
+				return -1;
+			}
+
+			// Apply gn_db() to convert complex data to magnitude in dB
+			int err_code_db = gn_db(db_output, d_nfft, shifted_output, 2 * d_nfft);
+
+			if(err_code_db != 0) {
+				GR_LOG_ERROR(d_logger, "gn_db failed with error code: " + std::to_string(err_code_db));
+				free(shifted_output);
+				free(db_output);
+				return -1;
+			}
+
+			// Convert dB magnitude values to float
+			for(size_t j = 0; j < d_nfft; j++) {
+				out_vec[j] = static_cast<float>(db_output[j]);
+			}
 		}
 
-		// Get pointer to current output vector
-		gr_complex *out_vec = out + (i * d_nfft);
+		// Only compute Fourier analysis if explicitly enabled (use shifted_output for analysis)
+		if(true) {
+			size_t results_size = 0;
+			char **rkeys = nullptr;
+			double *rvalues = nullptr;
 
-		// Convert interleaved Re/Im FFT output back to gr_complex
-		// AND perform FFT shift: move second half to beginning, first half to end
-		// This puts negative frequencies on left, DC in center, positive frequencies on right
-		size_t half = d_nfft / 2;
+			// Use appropriate SSB width based on window type (not quantization resolution!)
+			uint8_t ssb_width = (d_win == GnWindowNoWindow) ? 0 : 4;
+			int err_code = gn_config_fa_auto(ssb_width, &d_config);
+			if(err_code == 0) {
+				err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, shifted_output, &d_config);
+			} else {
+				GR_LOG_ERROR(d_logger,
+					     "Failed to run gn_config_fa_auto. Error code: " +
+						     std::to_string(err_code));
+			}
 
-		// Copy second half of FFT output to first half of output
-		for(size_t j = 0; j < half; j++) {
-			size_t src_idx = (half + j) * 2; // Start from middle of FFT output
-			double real_part = d_fft_out[src_idx];
-			double imag_part = d_fft_out[src_idx + 1];
-			out_vec[j] = gr_complex(static_cast<float>(real_part), static_cast<float>(imag_part));
+			if(err_code != 0) {
+				GR_LOG_ERROR(d_logger,
+					     "Failed to compute Genalyzer analysis. Error code: " +
+						     std::to_string(err_code));
+
+				// Reset analysis results on error to prevent stale data
+				d_analysis->results_size = 0;
+				d_analysis->rkeys = nullptr;
+				d_analysis->rvalues = nullptr;
+			} else {
+				d_analysis->results_size = results_size;
+				d_analysis->rkeys = rkeys;
+				d_analysis->rvalues = rvalues;
+			}
 		}
 
-		// Copy first half of FFT output to second half of output
-		for(size_t j = 0; j < half; j++) {
-			size_t src_idx = j * 2; // Start from beginning of FFT output
-			double real_part = d_fft_out[src_idx];
-			double imag_part = d_fft_out[src_idx + 1];
-			out_vec[half + j] = gr_complex(static_cast<float>(real_part), static_cast<float>(imag_part));
-		}
-
-		// Handle odd FFT size (middle element stays in place)
-		if(d_nfft % 2 != 0) {
-			size_t mid_idx = half * 2;
-			out_vec[half] = gr_complex(static_cast<float>(d_fft_out[mid_idx]),
-						   static_cast<float>(d_fft_out[mid_idx + 1]));
-		}
-	}
-
-	// Only compute Fourier analysis if explicitly enabled
-	if(d_analysis_enabled) {
-		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
-
-		size_t results_size;
-		char **rkeys;
-		double *rvalues;
-
-		// Free previous analysis results before allocating new ones
-		cleanup_analysis_results();
-
-		int err_code = gn_config_fa_auto(d_qres - 1, &d_config);
-		if(err_code == 0) {
-			err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
-		}
-
-		if(err_code != 0) {
-			GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
-			// Reset analysis results on error to prevent stale data
-			d_analysis->results_size = 0;
-			d_analysis->rkeys = nullptr;
-			d_analysis->rvalues = nullptr;
-		} else {
-			// Store references to current results for cleanup later
-			d_previous_rkeys = rkeys;
-			d_previous_rvalues = rvalues;
-
-			d_analysis->results_size = results_size;
-			d_analysis->rkeys = rkeys;
-			d_analysis->rvalues = rvalues;
-		}
+		// Clean up allocated buffers
+		free(shifted_output);
+		free(db_output);
 	}
 
 	return noutput_items;
 }
 
-gn_analysis_results *genalyzer_fft_vcc_impl::getGnAnalysis() { return d_analysis; }
+gn_analysis_results *genalyzer_fft_vii_impl::getGnAnalysis() { return d_analysis; }
 
-void genalyzer_fft_vcc_impl::setAnalysisEnabled(bool enabled)
-{
-	d_analysis_enabled = enabled;
-}
+void genalyzer_fft_vii_impl::setAnalysisEnabled(bool enabled) { d_analysis_enabled = enabled; }
 
-bool genalyzer_fft_vcc_impl::analysisEnabled() const
-{
-	return d_analysis_enabled;
-}
+bool genalyzer_fft_vii_impl::analysisEnabled() const { return d_analysis_enabled; }

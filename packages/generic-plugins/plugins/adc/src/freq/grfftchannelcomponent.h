@@ -61,7 +61,8 @@ public:
 			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
 		m_signalPath->append(m_grch);
 		m_fft = new GRFFTComplexProc(m_signalPath);
-		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
+		int nrBits = src->getFmt()->bits; // removed  "- src->getFmt()->is_signed" since genalyzer can be
+						  // adjusted directly for signed/unsigned values
 		m_fft->setNrBits(nrBits);
 		m_fft->setSampleRate(ch->samplingInfo().sampleRate);
 		m_signalPath->append(m_fft);
@@ -97,6 +98,7 @@ public:
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
+	void setAnalysisEnabled(bool enabled) { m_fft->setAnalysisEnabled(enabled); }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -191,6 +193,8 @@ public:
 	bool windowCorrection() const;
 	void setWindowCorrection(bool newWindowCorr) override;
 	virtual bool enabled() const override;
+	bool isComplex();
+	void setAnalysisEnabled(bool b);
 
 public Q_SLOTS:
 	void enable() override;
@@ -217,7 +221,8 @@ Q_SIGNALS:
 	void powerOffsetChanged(double);
 	void windowChanged(int);
 	void windowCorrectionChanged(bool);
-	void genalyzerDataUpdated(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys, double *rvalues);
+	void genalyzerDataUpdated(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
+				  double *rvalues);
 
 private:
 	double m_powerOffset;

@@ -14,15 +14,15 @@ struct gn_analysis_results
 	double *rvalues = nullptr;
 };
 
-class SCOPY_GR_UTIL_EXPORT genalyzer_fft_vcc : public gr::sync_block
+class SCOPY_GR_UTIL_EXPORT genalyzer_fft_vii : public gr::sync_block
 {
 public:
-	typedef std::shared_ptr<genalyzer_fft_vcc> sptr;
+	typedef std::shared_ptr<genalyzer_fft_vii> sptr;
 
 	/*!
-	 * \brief Create a new instance of genalyzer_fft_vcc
+	 * \brief Create a new instance of genalyzer_fft_vii (int32 input, complex output)
 	 * \param npts Number of points in FFT
-	 * \param qres Quantizer resolution (bits)
+	 * \param qres Quantizer resolution (bits) for genalyzer internal processing
 	 * \param navg Number of averages
 	 * \param nfft FFT size
 	 * \param win Window type (GN_WINDOW_*)
@@ -39,7 +39,7 @@ public:
 	virtual bool analysisEnabled() const = 0;
 
 protected:
-	genalyzer_fft_vcc(const std::string &name, gr::io_signature::sptr input_signature,
+	genalyzer_fft_vii(const std::string &name, gr::io_signature::sptr input_signature,
 			  gr::io_signature::sptr output_signature)
 		: gr::sync_block(name, input_signature, output_signature)
 	{}
