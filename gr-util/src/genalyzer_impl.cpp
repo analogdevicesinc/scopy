@@ -7,6 +7,9 @@
 
 using namespace scopy::grutil;
 
+// Define static mutex for thread safety across all instances
+std::mutex genalyzer_fft_vcc_impl::s_genalyzer_mutex;
+
 genalyzer_fft_vcc::sptr genalyzer_fft_vcc::make(int npts, int qres, int navg, int nfft, GnWindow win,
 						double sample_rate)
 {
@@ -29,6 +32,7 @@ genalyzer_fft_vcc_impl::genalyzer_fft_vcc_impl(int npts, int qres, int navg, int
 	, d_analysis(new gn_analysis_results)
 	, d_previous_rkeys(nullptr)
 	, d_previous_rvalues(nullptr)
+	, d_analysis_enabled(false) // Default to disabled to avoid unnecessary computation
 {
 	allocate_buffers();
 	configure_genalyzer();
@@ -74,6 +78,7 @@ void genalyzer_fft_vcc_impl::cleanup_buffers()
 	}
 
 	if(d_config) {
+		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 		gn_config_free(&d_config);
 		d_config = nullptr;
 	}
@@ -101,6 +106,8 @@ void genalyzer_fft_vcc_impl::cleanup_analysis_results()
 
 int genalyzer_fft_vcc_impl::configure_genalyzer()
 {
+	std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
+
 	int err_code = 0;
 
 	err_code = gn_config_fftz(d_npts, d_qres, d_navg, d_nfft, d_win, &d_config);
@@ -129,6 +136,7 @@ void genalyzer_fft_vcc_impl::set_sample_rate(double sample_rate)
 {
 	d_sample_rate = sample_rate;
 	if(d_config) {
+		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 		int err_code = gn_config_set_sample_rate(d_sample_rate, &d_config);
 		if(err_code != 0) {
 			GR_LOG_ERROR(d_logger, "Failed to update sample rate");
@@ -170,15 +178,40 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 			d_qwfq[j] = static_cast<int32_t>(in_vec[j].imag() * scale);
 		}
 
-		// Perform genalyzer FFT
-		if(d_fft_out) {
-			free(d_fft_out);
-			d_fft_out = nullptr;
-		}
-		int err_code = gn_fftz(&d_fft_out, d_qwfi, d_qwfq, &d_config);
-		if(err_code != 0) {
-			GR_LOG_ERROR(d_logger, "gn_fftz failed with error code: " + std::to_string(err_code));
-			return -1; // Signal error to GNU Radio
+		// Perform genalyzer FFT with thread protection
+		{
+			std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
+
+			// Validate config before calling gn_fftz
+			if(!d_config) {
+				GR_LOG_ERROR(d_logger, "genalyzer config is null - reinitializing");
+				if(configure_genalyzer() != 0) {
+					GR_LOG_ERROR(d_logger, "Failed to reinitialize genalyzer config");
+					return -1;
+				}
+			}
+
+			// Validate input buffers
+			if(!d_qwfi || !d_qwfq) {
+				GR_LOG_ERROR(d_logger, "Input quantization buffers are null");
+				return -1;
+			}
+
+			if(d_fft_out) {
+				free(d_fft_out);
+				d_fft_out = nullptr;
+			}
+			int err_code = gn_fftz(&d_fft_out, d_qwfi, d_qwfq, &d_config);
+			if(err_code != 0) {
+				GR_LOG_ERROR(d_logger, "gn_fftz failed with error code: " + std::to_string(err_code));
+				return -1; // Signal error to GNU Radio
+			}
+
+			// Critical: Check if gn_fftz actually allocated the output buffer
+			if(!d_fft_out) {
+				GR_LOG_ERROR(d_logger, "gn_fftz failed to allocate output buffer");
+				return -1;
+			}
 		}
 
 		// Get pointer to current output vector
@@ -213,30 +246,50 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 		}
 	}
 
-	// Configure Fourier analysis
-	size_t results_size;
-	char **rkeys;
-	double *rvalues;
+	// Only compute Fourier analysis if explicitly enabled
+	if(d_analysis_enabled) {
+		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 
-	// Free previous analysis results before allocating new ones
-	cleanup_analysis_results();
+		size_t results_size;
+		char **rkeys;
+		double *rvalues;
 
-	int err_code = gn_config_fa_auto(d_qres - 1, &d_config);
-	err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+		// Free previous analysis results before allocating new ones
+		cleanup_analysis_results();
 
-	if(err_code != 0) {
-		GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis.");
-	} else {
-		// Store references to current results for cleanup later
-		d_previous_rkeys = rkeys;
-		d_previous_rvalues = rvalues;
+		int err_code = gn_config_fa_auto(d_qres - 1, &d_config);
+		if(err_code == 0) {
+			err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+		}
 
-		d_analysis->results_size = results_size;
-		d_analysis->rkeys = rkeys;
-		d_analysis->rvalues = rvalues;
+		if(err_code != 0) {
+			GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
+			// Reset analysis results on error to prevent stale data
+			d_analysis->results_size = 0;
+			d_analysis->rkeys = nullptr;
+			d_analysis->rvalues = nullptr;
+		} else {
+			// Store references to current results for cleanup later
+			d_previous_rkeys = rkeys;
+			d_previous_rvalues = rvalues;
+
+			d_analysis->results_size = results_size;
+			d_analysis->rkeys = rkeys;
+			d_analysis->rvalues = rvalues;
+		}
 	}
 
 	return noutput_items;
 }
 
 gn_analysis_results *genalyzer_fft_vcc_impl::getGnAnalysis() { return d_analysis; }
+
+void genalyzer_fft_vcc_impl::setAnalysisEnabled(bool enabled)
+{
+	d_analysis_enabled = enabled;
+}
+
+bool genalyzer_fft_vcc_impl::analysisEnabled() const
+{
+	return d_analysis_enabled;
+}
