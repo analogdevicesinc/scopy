@@ -3,6 +3,7 @@
 
 #include "genalyzer.h"
 #include <cgenalyzer_simplified_beta.h>
+#include <mutex>
 
 namespace scopy::grutil {
 
@@ -23,6 +24,9 @@ private:
 	gn_analysis_results *d_analysis;
 	char **d_previous_rkeys;
 	double *d_previous_rvalues;
+	bool d_analysis_enabled; // Flag to control when analysis is computed
+
+	static std::mutex s_genalyzer_mutex; // Protect against library-level threading issues
 
 	void cleanup_buffers();
 	void cleanup_analysis_results();
@@ -43,6 +47,9 @@ public:
 	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) override;
 
 	gn_analysis_results *getGnAnalysis() override;
+
+	void setAnalysisEnabled(bool enabled);
+	bool analysisEnabled() const;
 };
 
 } // namespace scopy::grutil

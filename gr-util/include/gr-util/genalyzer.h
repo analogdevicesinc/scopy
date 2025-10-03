@@ -35,6 +35,8 @@ public:
 	virtual void set_window(GnWindow win) = 0;
 	virtual int window() const = 0;
 	virtual gn_analysis_results *getGnAnalysis() = 0;
+	virtual void setAnalysisEnabled(bool enabled) = 0;
+	virtual bool analysisEnabled() const = 0;
 
 protected:
 	genalyzer_fft_vcc(const std::string &name, gr::io_signature::sptr input_signature,

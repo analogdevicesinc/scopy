@@ -78,6 +78,8 @@ public:
 	void setNrBits(int);
 	void setSampleRate(double sr);
 	gn_analysis_results *getGnAnalysis();
+	void setAnalysisEnabled(bool enabled);
+	bool analysisEnabled() const;
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
