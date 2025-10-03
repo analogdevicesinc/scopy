@@ -27,6 +27,8 @@ genalyzer_fft_vcc_impl::genalyzer_fft_vcc_impl(int npts, int qres, int navg, int
 	, d_qwfq(nullptr)
 	, d_config(nullptr)
 	, d_analysis(new gn_analysis_results)
+	, d_previous_rkeys(nullptr)
+	, d_previous_rvalues(nullptr)
 {
 	allocate_buffers();
 	configure_genalyzer();
@@ -63,9 +65,37 @@ void genalyzer_fft_vcc_impl::cleanup_buffers()
 		d_qwfq = nullptr;
 	}
 
+	// Free previous analysis results memory
+	cleanup_analysis_results();
+
+	if(d_analysis) {
+		delete d_analysis;
+		d_analysis = nullptr;
+	}
+
 	if(d_config) {
 		gn_config_free(&d_config);
 		d_config = nullptr;
+	}
+}
+
+void genalyzer_fft_vcc_impl::cleanup_analysis_results()
+{
+	// Free previously allocated analysis results to prevent memory leaks
+	if(d_previous_rkeys) {
+		// Free each string in the rkeys array
+		for(size_t i = 0; i < d_analysis->results_size; i++) {
+			if(d_previous_rkeys[i]) {
+				free(d_previous_rkeys[i]);
+			}
+		}
+		free(d_previous_rkeys);
+		d_previous_rkeys = nullptr;
+	}
+
+	if(d_previous_rvalues) {
+		free(d_previous_rvalues);
+		d_previous_rvalues = nullptr;
 	}
 }
 
@@ -90,9 +120,6 @@ int genalyzer_fft_vcc_impl::configure_genalyzer()
 
 bool genalyzer_fft_vcc_impl::start()
 {
-	if(configure_genalyzer() != 0) {
-		return false;
-	}
 	return true;
 }
 
@@ -144,7 +171,10 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 		}
 
 		// Perform genalyzer FFT
-		// d_fft_out might be reused by genalyzer, don't free it here
+		if(d_fft_out) {
+			free(d_fft_out);
+			d_fft_out = nullptr;
+		}
 		int err_code = gn_fftz(&d_fft_out, d_qwfi, d_qwfq, &d_config);
 		if(err_code != 0) {
 			GR_LOG_ERROR(d_logger, "gn_fftz failed with error code: " + std::to_string(err_code));
@@ -157,7 +187,6 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 		// Convert interleaved Re/Im FFT output back to gr_complex
 		// AND perform FFT shift: move second half to beginning, first half to end
 		// This puts negative frequencies on left, DC in center, positive frequencies on right
-
 		size_t half = d_nfft / 2;
 
 		// Copy second half of FFT output to first half of output
@@ -189,15 +218,23 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 	char **rkeys;
 	double *rvalues;
 
+	// Free previous analysis results before allocating new ones
+	cleanup_analysis_results();
+
 	int err_code = gn_config_fa_auto(d_qres - 1, &d_config);
 	err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
 
-	if(err_code != 0)
+	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis.");
+	} else {
+		// Store references to current results for cleanup later
+		d_previous_rkeys = rkeys;
+		d_previous_rvalues = rvalues;
 
-	d_analysis->results_size = results_size;
-	d_analysis->rkeys = rkeys;
-	d_analysis->rvalues = rvalues;
+		d_analysis->results_size = results_size;
+		d_analysis->rkeys = rkeys;
+		d_analysis->rvalues = rvalues;
+	}
 
 	return noutput_items;
 }
