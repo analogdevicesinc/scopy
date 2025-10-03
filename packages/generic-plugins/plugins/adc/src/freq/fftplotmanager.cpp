@@ -21,6 +21,7 @@
 
 #include "fftplotmanager.h"
 #include <plotaxis.h>
+#include "grfftchannelcomponent.h"
 #include "plotnavigator.hpp"
 #include <gui/plotmanagercombobox.h>
 #include <freq/fftplotcomponentchannel.h>
@@ -100,8 +101,13 @@ void FFTPlotManager::enableMeasurementPanel(bool)
 
 void FFTPlotManager::enableGenalyzerPanel(bool b)
 {
-	// Only show genalyzer panel in complex mode - this will be handled by the settings
 	m_genalyzerPanel->setVisible(b);
+	for(PlotComponentChannel *pcc : qAsConst(m_channels)) {
+		GRFFTChannelComponent *fftChannel = dynamic_cast<GRFFTChannelComponent *>(pcc->channelComponent());
+		if(fftChannel && fftChannel->isComplex()) {
+			fftChannel->setAnalysisEnabled(b);
+		}
+	}
 }
 
 void FFTPlotManager::multiPlotUpdate()
