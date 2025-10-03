@@ -30,6 +30,7 @@ import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+import android.view.View;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -42,6 +43,11 @@ import android.widget.Toast;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 //import androidx.core.app.NotificationCompat;
 
@@ -77,8 +83,7 @@ public class ScopyActivity extends QtActivity
 
 	}
 
-        public void createNotification(String message)
-	{
+  public void createNotification(String message) {
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
 		createNotificationChannel();
 
@@ -98,34 +103,52 @@ public class ScopyActivity extends QtActivity
 		notificationManager.notify(SCOPY_WAKELOCK_NOTIFICATION_ID, notification);
 	}
 
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		System.out.println("-- ScopyActivity: onCreate");
-		initialized = false;
-		super.onCreate(savedInstanceState);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	private void hideBars(){
+		WindowInsetsControllerCompat windowInsetsController = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+		windowInsetsController.setSystemBarsBehavior(
+			WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+		);
+		windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+  }
 
-		PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-		        "Scopy::ScopyWakelockTag");
+  private void requirePermissions() {
+    String[] requiredPermissions = {"Manifest.permission.READ_EXTERNAL_STORAGE",
+      "Manifest.permission.WRITE_EXTERNAL_STORAGE",
+      "Manifest.permission.MANAGE_EXTERNAL_STORAGE",
+      "Manifest.permission.DELETE_CACHE_FILES",
+      "Manifest.permission.ACCESS_NETWORK_STATE",
+      "Manifest.permission.INTERNET",
+    };
 
-	}
+    ActivityCompat.requestPermissions(this, requiredPermissions, 0);
+  }
 
-	@Override
-	protected void onStart()
-	{
-		System.out.println("-- ScopyActivity: onStart");
-		super.onStart();
-		if(initialized) {
-			restoreRunningToolsJNI();
-		}
-	}
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    System.out.println("-- ScopyActivity: onCreate");
+    initialized = false;
+    hideBars();
+    super.onCreate(savedInstanceState);
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-	@Override
-	protected void onStop()
-	{
-		System.out.println("-- ScopyActivity: onStop");
+    requirePermissions();
+
+    PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Scopy::ScopyWakelockTag");
+  }
+
+  @Override
+  protected void onStart() {
+    System.out.println("-- ScopyActivity: onStart");
+    super.onStart();
+    if (initialized) {
+      restoreRunningToolsJNI();
+    }
+  }
+
+  @Override
+  protected void onStop() {
+    System.out.println("-- ScopyActivity: onStop");
 		if (initialized) {
 			if (hasCtxJNI()) {
 				saveAndStopRunningInputToolsJNI();
