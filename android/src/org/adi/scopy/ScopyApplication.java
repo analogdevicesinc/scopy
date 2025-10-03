@@ -41,184 +41,173 @@ import android.content.res.AssetManager;
 import android.util.Log;
 
 
-public class ScopyApplication extends QtApplication
-{
-	@Override
-	public void onCreate()
-	{
-		System.out.println("QtApplication started");
-		String apk = getApplicationInfo().sourceDir;
-		String cache = getApplicationContext().getCacheDir().toString();
-		System.out.println("sourcedir: "+ getApplicationInfo().sourceDir);
-		System.out.println("public sourcedir: "+ getApplicationInfo().publicSourceDir);
-		String libdir = getApplicationInfo().nativeLibraryDir;
-		System.out.println("native library dir:" + libdir);
-		System.out.println("applcation cache dir:" + cache);
-		System.out.println("Hello Scopy !");
+public class ScopyApplication extends QtApplication {
+  private static void listAllFiles(Path currentPath, List<Path> allFiles)
+    throws IOException {
+    try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentPath)) {
+      for (Path entry : stream) {
+        if (Files.isDirectory(entry)) {
+          listAllFiles(entry, allFiles);
+        } else {
+          allFiles.add(entry);
+        }
+      }
+    }
+  }
 
-		try {
-		    Os.setenv("PYTHONHOME",".",true);
-		    Os.setenv("PYTHONPATH",apk + "/assets/python3.11",true);
-		    Os.setenv("SIGROKDECODE_DIR", apk + "/assets/libsigrokdecode/decoders",true);
-		    Os.setenv("APPDATA", cache, true);
-		    Os.setenv("LD_LIBRARY_PATH", libdir, true);
-		    Os.setenv("IIOEMU_BIN", libdir + "/iio-emu.so", true);
-		}
+  private static boolean copyAssetFolder(AssetManager assetManager, String fromAssetPath, String toPath) {
 
-		catch(ErrnoException x) {
-		     System.out.println("Cannot set envvars");
-		}
+    try {
+      String[] files = assetManager.list(fromAssetPath);
+      new File(toPath).mkdirs();
+      System.out.println("toPath " + toPath);
+      System.out.println("fromAssetPath " + fromAssetPath);
+      System.out.println("Files length: " + files.length);
+      boolean res = true;
+      for (String file : files) {
+        System.out.println("Files: " + file);
+        if (file.contains(".")) {
+          res &= copyAsset(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
+        } else {
+          res &= copyAssetFolder(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
+        }
+      }
+      return res;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
 
-		super.onCreate();
+  private static boolean copyAsset(AssetManager assetManager, String fromAssetPath, String toPath) {
+    InputStream in = null;
+    OutputStream out = null;
+    try {
 
-		boolean reloadLibs = true;
-		if(reloadLibs) {
-		    clearInstalled();
-		}
+      System.out.println("Copying from " + fromAssetPath + " to " + toPath);
+      in = assetManager.open(fromAssetPath);
+      new File(toPath).createNewFile();
+      out = new FileOutputStream(toPath);
+      copyFile(in, out);
+      in.close();
+      in = null;
+      out.flush();
+      out.close();
+      out = null;
+      if (toPath.endsWith(".so")) {
+        System.out.println("Making " + toPath + "executable !");
+        File f = new File(toPath);
+        f.setReadable(true, false);
+        f.setExecutable(true, false);
+        f.setWritable(true, false);
+      }
+      return true;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
 
-		if (!isInstalled()) {
-			System.out.println("Copying assets to " + cache);
+  private static void copyFile(InputStream in, OutputStream out) throws IOException {
+    byte[] buffer = new byte[1024];
+    int read;
+    while ((read = in.read(buffer)) != -1) {
+      out.write(buffer, 0, read);
+    }
+  }
 
-			String[] folders = null;
-			try {
-			    folders = getAssets().list("");
-			} catch (Exception e) {
-			    e.printStackTrace();
-			}
+  private static void copyFileUsingJava7Files(File source, File dest) throws IOException {
+    Files.copy(source.toPath(), dest.toPath());
+  }
 
-			for (String folder : folders){
-				System.out.println("Folder found: " + folder);
-			}
+  @Override
+  public void onCreate() {
+    System.out.println("QtApplication started");
+    String apk = getApplicationInfo().sourceDir;
+    String cache = getApplicationContext().getCacheDir().toString();
+    System.out.println("sourcedir: " + getApplicationInfo().sourceDir);
+    System.out.println("public sourcedir: " + getApplicationInfo().publicSourceDir);
+    String libdir = getApplicationInfo().nativeLibraryDir;
+    System.out.println("native library dir:" + libdir);
+    System.out.println("applcation cache dir:" + cache);
+    System.out.println("Hello Scopy !");
 
-			// make a method to copy all files from Assets to Cache
-			copyAssetFolder(getAssets(), "scopy-plugins", cache+"/scopy-plugins");
-			copyAssetFolder(getAssets(), "style", cache+"/style");
-			copyAssetFolder(getAssets(), "translations", cache+"/translations");
-			copyAssetFolder(getAssets(), "decoders", cache+"/decoders");
-			copyAssetFolder(getAssets(), "python3.11", cache+"/decoders");
+    try {
+      Os.setenv("PYTHONHOME", ".", true);
+      Os.setenv("PYTHONPATH", apk + "/assets/python3.11", true);
+      Os.setenv("SIGROKDECODE_DIR", apk + "/assets/libsigrokdecode/decoders", true);
+      Os.setenv("APPDATA", cache, true);
+      Os.setenv("LD_LIBRARY_PATH", libdir, true);
+      Os.setenv("IIOEMU_BIN", libdir + "/iio-emu.so", true);
+    } catch (ErrnoException x) {
+      System.out.println("Cannot set envvars");
+    }
 
-			Path rootPath = Paths.get(cache);
-			List<Path> allFiles = new ArrayList<>();
-			try {
-				System.out.println("List files hrere::: !");
-				listAllFiles(rootPath, allFiles);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			System.out.println("Found files:");
-			allFiles.forEach(System.out::println);
+    super.onCreate();
 
-			System.out.println("Setting installed flag " + cache);
-			setInstalled();
-		} else {
-			System.out.println("Already installed");
-		}
+    boolean reloadLibs = true;
+    if (reloadLibs) {
+      clearInstalled();
+    }
 
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-		public void uncaughtException(Thread t, Throwable e) {
-			Log.e("Scopy-Crash", "Uncaught exception: ", e);
-			System.exit(1);
-		}
-		});
+    if (!isInstalled()) {
+      System.out.println("Copying assets to " + cache);
 
+      String[] folders = null;
+      try {
+        folders = getAssets().list("");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
 
-	}
+      for (String folder : folders) {
+        System.out.println("Folder found: " + folder);
+      }
 
-	private static void listAllFiles(Path currentPath, List<Path> allFiles)
-	throws IOException
-	{
-		try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentPath))
-		{
-		for (Path entry : stream) {
-			if (Files.isDirectory(entry)) {
-			listAllFiles(entry, allFiles);
-			} else {
-			allFiles.add(entry);
-			}
-		}
-		}
-	}
+      // make a method to copy all files from Assets to Cache
+      copyAssetFolder(getAssets(), "scopy-plugins", cache + "/scopy-plugins");
+      copyAssetFolder(getAssets(), "style", cache + "/style");
+      copyAssetFolder(getAssets(), "translations", cache + "/translations");
+      copyAssetFolder(getAssets(), "decoders", cache + "/decoders");
+      copyAssetFolder(getAssets(), "python3.11", cache + "/decoders");
 
+      Path rootPath = Paths.get(cache);
+      List<Path> allFiles = new ArrayList<>();
+      try {
+        System.out.println("List files hrere::: !");
+        listAllFiles(rootPath, allFiles);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      System.out.println("Found files:");
+      allFiles.forEach(System.out::println);
 
-	private boolean isInstalled() {
-	    return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("installed", false);
-	}
+      System.out.println("Setting installed flag " + cache);
+      setInstalled();
+    } else {
+      System.out.println("Already installed");
+    }
 
-	private void setInstalled() {
-	    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("installed", true).commit();
-	}
-
-	private void clearInstalled() {
-	    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("installed", false).commit();
-	}
-
-
-	private static boolean copyAssetFolder(AssetManager assetManager, String fromAssetPath, String toPath) {
-
-	    try {
-			String[] files = assetManager.list(fromAssetPath);
-			new File(toPath).mkdirs();
-			System.out.println("toPath " + toPath);
-			System.out.println("fromAssetPath " + fromAssetPath);
-			System.out.println("Files length: " + files.length);
-			boolean res = true;
-			for (String file : files) {
-				System.out.println("Files: " + file);
-				if (file.contains(".")) {
-					res &= copyAsset(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
-				} else {
-					res &= copyAssetFolder(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
-				}
-			}
-			return res;
-		}
-
-		catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
+    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+      public void uncaughtException(Thread t, Throwable e) {
+        Log.e("Scopy-Crash", "Uncaught exception: ", e);
+        System.exit(1);
+      }
+    });
 
 
-	private static boolean copyAsset(AssetManager assetManager, String fromAssetPath, String toPath) {
-	    InputStream in = null;
-	    OutputStream out = null;
-	    try {
+  }
 
-	      System.out.println("Copying from " + fromAssetPath + " to " + toPath);
-	      in = assetManager.open(fromAssetPath);
-	      new File(toPath).createNewFile();
-	      out = new FileOutputStream(toPath);
-	      copyFile(in, out);
-	      in.close();
-	      in = null;
-	      out.flush();
-	      out.close();
-	      out = null;
-	      if(toPath.endsWith(".so")) {
-			System.out.println("Making " + toPath + "executable !");
-			File f = new File(toPath);
-			f.setReadable(true, false);
-			f.setExecutable(true, false);
-			f.setWritable(true, false);
-		  }
-	      return true;
-	    } catch(Exception e) {
-			e.printStackTrace();
-			return false;
-	    }
-	}
+  private boolean isInstalled() {
+    return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("installed", false);
+  }
 
-	private static void copyFile(InputStream in, OutputStream out) throws IOException {
-	    byte[] buffer = new byte[1024];
-	    int read;
-	    while((read = in.read(buffer)) != -1){
-	      out.write(buffer, 0, read);
-	    }
-	}
+  private void setInstalled() {
+    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("installed", true).commit();
+  }
 
-	private static void copyFileUsingJava7Files(File source, File dest) throws IOException {
-	    Files.copy(source.toPath(), dest.toPath());
-	}
+  private void clearInstalled() {
+    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("installed", false).commit();
+  }
 
 }
