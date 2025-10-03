@@ -7,11 +7,12 @@
 
 namespace scopy::grutil {
 
-class SCOPY_GR_UTIL_EXPORT genalyzer_fft_vcc_impl : public genalyzer_fft_vcc
+class SCOPY_GR_UTIL_EXPORT genalyzer_fft_vii_impl : public genalyzer_fft_vii
 {
 private:
 	size_t d_npts;
 	int d_qres;
+	// Removed d_nrbits since scaling is handled externally now
 	size_t d_navg;
 	size_t d_nfft;
 	GnWindow d_win;
@@ -22,20 +23,20 @@ private:
 	int32_t *d_qwfq;
 
 	gn_analysis_results *d_analysis;
-	char **d_previous_rkeys;
-	double *d_previous_rvalues;
 	bool d_analysis_enabled; // Flag to control when analysis is computed
 
-	static std::mutex s_genalyzer_mutex; // Protect against library-level threading issues
+	// Protect against library-level threading issues
+	// genalyzer uses fftw3 library which cannot be used simultaniously from
+	// different threads from different gr::sync_block instances
+	static std::mutex s_genalyzer_mutex;
 
 	void cleanup_buffers();
-	void cleanup_analysis_results();
 	void allocate_buffers();
 	int configure_genalyzer();
 
 public:
-	genalyzer_fft_vcc_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate);
-	~genalyzer_fft_vcc_impl();
+	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate);
+	~genalyzer_fft_vii_impl();
 
 	void set_sample_rate(double sample_rate) override;
 	double sample_rate() const override;
