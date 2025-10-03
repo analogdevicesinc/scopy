@@ -173,14 +173,6 @@ void GRFFTComplexProc::setAnalysisEnabled(bool enabled)
 	}
 }
 
-bool GRFFTComplexProc::analysisEnabled() const
-{
-	if(genalyzer_fft) {
-		return genalyzer_fft->analysisEnabled();
-	}
-	return false;
-}
-
 void GRFFTComplexProc::build_blks(GRTopBlock *top)
 {
 	m_top = top;
@@ -193,26 +185,22 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	}
 	auto corr = (m_windowCorr) ? window.size() / window_sum : 1;
 
-	// Create blocks
-	mult_nrbits = gr::blocks::multiply_const_cc::make(gr_complex(1.0 / (1 << nrBits), 0), fft_size);
+	// Create conversion blocks for complex to separate I/Q int32 streams
+	complex_to_float = gr::blocks::complex_to_float::make(fft_size);
+	float_to_int_i = gr::blocks::float_to_int::make(fft_size);
+	float_to_int_q = gr::blocks::float_to_int::make(fft_size);
 
-	// Replace GNU Radio FFT with your genalyzer FFT
-	// Use factory function (you need to create this)
-	genalyzer_fft = genalyzer_fft_vcc::make(fft_size, // npts - number of points
-						nrBits,	  // qres - quantization resolution
+	// Create genalyzer FFT with int32 inputs
+	genalyzer_fft = genalyzer_fft_vii::make(fft_size, // npts - number of points
+						nrBits,	  // qres - quantization resolution for genalyzer
 						1,	  // navg - number of averages (set to 1 for real-time)
 						fft_size, // nfft - FFT size
 						convertToGnWindow(m_fftwindow), // Convert your window type to GnWindow
 						m_sr			// sample rate
 	);
 
-	// The genalyzer FFT likely outputs power/magnitude directly
-	// so we may not need all the post-processing blocks
-	// Check what your genalyzer FFT outputs - if it's already in dB, skip some blocks
-
-	ctm = gr::blocks::complex_to_mag_squared::make(fft_size);
-	mult_const1 = gr::blocks::multiply_const_ff::make(1.0 / ((float)fft_size * (float)fft_size), fft_size);
-	nlog10 = gr::blocks::nlog10_ff::make(10.0, fft_size);
+	// Genalyzer now outputs dB values directly as float, so we don't need
+	// complex-to-magnitude conversion or nlog10 conversion blocks
 
 	// Power offset
 	std::vector<float> k;
@@ -221,14 +209,29 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	}
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	// Connect the chain - assuming genalyzer outputs complex data
-	// top->connect(mult_nrbits, 0, genalyzer_fft, 0);
-	top->connect(genalyzer_fft, 0, ctm, 0);
-	top->connect(ctm, 0, mult_const1, 0);
-	top->connect(mult_const1, 0, nlog10, 0);
-	top->connect(nlog10, 0, powerOffset, 0);
+	// Calculate correct scaling to match GRFFTFloatProc output
+	// GRFFTFloatProc total scaling: (1/(1<<nrBits)) * (1/(fft_size^2))
+	// Genalyzer internal scaling: (2.0/(1<<nrBits)) * (1/fft_size)
+	// To match float mode output levels:
+	float float_mode_scaling = (1.0 / (1 << nrBits)) * (1.0 / (fft_size * fft_size));
+	float genalyzer_scaling = (2.0 / (1 << nrBits)) * (1.0 / fft_size);
+	float compensation = float_mode_scaling / genalyzer_scaling;
 
-	start_blk.append(genalyzer_fft);
+	// Convert [-1,1] to ADC codes and apply compensation
+	float adc_scale = (1 << (nrBits - 1));  // Convert to ADC codes [-2048, 2047] for 12-bit
+	float scale = 1;
+
+	mult_nrbits = gr::blocks::multiply_const_cc::make(gr_complex(scale, 0), fft_size);
+	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr, corr), fft_size);
+
+	// Signal chain: complex input → complex_to_float → float_to_int → genalyzer → float dB output → powerOffset
+	top->connect(complex_to_float, 0, float_to_int_i, 0);  // I channel
+	top->connect(complex_to_float, 1, float_to_int_q, 0);  // Q channel
+	top->connect(float_to_int_i, 0, genalyzer_fft, 0);     // I to genalyzer input 0
+	top->connect(float_to_int_q, 0, genalyzer_fft, 1);     // Q to genalyzer input 1
+	top->connect(genalyzer_fft, 0, powerOffset, 0);        // genalyzer float output → powerOffset
+
+	start_blk.append(complex_to_float);
 	end_blk = powerOffset;
 }
 
@@ -248,12 +251,13 @@ GnWindow GRFFTComplexProc::convertToGnWindow(gr::fft::window::win_type window_ty
 
 void GRFFTComplexProc::destroy_blks(GRTopBlock *top)
 {
-	mult_nrbits = nullptr;
 	genalyzer_fft = nullptr;
-	ctm = nullptr;
-	mult_const1 = nullptr;
+	mult_nrbits = nullptr;
+	complex_to_float = nullptr;
+	float_to_int_i = nullptr;
+	float_to_int_q = nullptr;
+	mult_wind_corr = nullptr;
 	powerOffset = nullptr;
-	nlog10 = nullptr;
 	start_blk.clear();
 	end_blk = nullptr;
 }
