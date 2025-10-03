@@ -166,6 +166,21 @@ gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
 	return nullptr;
 }
 
+void GRFFTComplexProc::setAnalysisEnabled(bool enabled)
+{
+	if(genalyzer_fft) {
+		genalyzer_fft->setAnalysisEnabled(enabled);
+	}
+}
+
+bool GRFFTComplexProc::analysisEnabled() const
+{
+	if(genalyzer_fft) {
+		return genalyzer_fft->analysisEnabled();
+	}
+	return false;
+}
+
 void GRFFTComplexProc::build_blks(GRTopBlock *top)
 {
 	m_top = top;
