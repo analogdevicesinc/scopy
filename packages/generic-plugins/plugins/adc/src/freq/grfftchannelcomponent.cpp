@@ -384,6 +384,18 @@ void GRFFTChannelComponent::removeChannelFromPlot()
 
 bool GRFFTChannelComponent::enabled() const { return m_enabled && !(m_complex ^ m_samplingInfo.complexMode); }
 
+bool GRFFTChannelComponent::isComplex() { return m_complex; }
+
+void GRFFTChannelComponent::setAnalysisEnabled(bool b)
+{
+	if(isComplex()) {
+		auto sigpath = dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch);
+		if(sigpath) {
+			sigpath->setAnalysisEnabled(b);
+		}
+	}
+}
+
 void GRFFTChannelComponent::setSamplingInfo(SamplingInfo p)
 {
 	ChannelComponent::setSamplingInfo(p);
@@ -486,12 +498,11 @@ void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 {
 	// Only perform analysis for complex channels that have genalyzer capabilities
 	if(m_complex) {
-		gn_analysis_results *gn_analysis =
-			static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
+		gn_analysis_results *gn_analysis = static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
 		if(gn_analysis) {
 			// Emit signal for genalyzer panel updates with channel name and color
-			Q_EMIT genalyzerDataUpdated(this->name(), this->pen().color(),
-				gn_analysis->results_size, gn_analysis->rkeys, gn_analysis->rvalues);
+			Q_EMIT genalyzerDataUpdated(this->name(), this->pen().color(), gn_analysis->results_size,
+						    gn_analysis->rkeys, gn_analysis->rvalues);
 		}
 	}
 }
