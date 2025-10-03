@@ -17,12 +17,15 @@ private:
 	double d_sample_rate;
 	gn_config d_config;
 	double *d_fft_out;
-	int32_t *d_qwfi; // Quantized waveform I
-	int32_t *d_qwfq; // Quantized waveform Q
+	int32_t *d_qwfi;
+	int32_t *d_qwfq;
 
 	gn_analysis_results *d_analysis;
+	char **d_previous_rkeys;
+	double *d_previous_rvalues;
 
 	void cleanup_buffers();
+	void cleanup_analysis_results();
 	void allocate_buffers();
 	int configure_genalyzer();
 
