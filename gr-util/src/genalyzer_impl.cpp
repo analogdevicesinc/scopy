@@ -250,9 +250,9 @@ int genalyzer_fft_vcc_impl::work(int noutput_items, gr_vector_const_void_star &i
 	if(d_analysis_enabled) {
 		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 
-		size_t results_size;
-		char **rkeys;
-		double *rvalues;
+		size_t results_size = 0;
+		char **rkeys = nullptr;
+		double *rvalues = nullptr;
 
 		// Free previous analysis results before allocating new ones
 		cleanup_analysis_results();

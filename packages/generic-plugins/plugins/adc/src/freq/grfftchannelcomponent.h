@@ -97,6 +97,8 @@ public:
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
+	bool isComplex() const { return m_complex; }
+	void setAnalysisEnabled(bool enabled) { m_fft->setAnalysisEnabled(enabled); }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
