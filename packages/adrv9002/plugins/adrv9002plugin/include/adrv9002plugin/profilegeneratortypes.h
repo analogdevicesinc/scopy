@@ -34,8 +34,6 @@ enum ChannelType
 	CHANNEL_TX2
 };
 
-// Simplified for iio-oscilloscope compatibility - UpdateBatcher system removed
-
 struct ChannelConfig
 {
 	bool enabled;
