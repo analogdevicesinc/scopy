@@ -25,6 +25,7 @@
 #include <QLoggingCategory>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QApplication>
 #include <stylehelper.h>
 
 Q_LOGGING_CATEGORY(CAT_PROFILEGENERATORWIDGET, "ProfileGeneratorWidget")
@@ -139,10 +140,12 @@ ProfileGeneratorWidget::ProfileGeneratorWidget(iio_device *device, QWidget *pare
 	m_cliAvailable = m_cliManager->isCliAvailable();
 
 	// Connect CLI manager signals for user feedback
-	connect(m_cliManager, &ProfileCliManager::operationProgress, this,
-		[](const QString &msg) { StatusBarManager::pushMessage(msg, 3000); });
-	connect(m_cliManager, &ProfileCliManager::operationError, this,
-		[](const QString &error) { StatusBarManager::pushMessage(error, 5000); });
+	connect(
+		m_cliManager, &ProfileCliManager::operationProgress, this,
+		[](const QString &msg) { StatusBarManager::pushMessage(msg, 3000); }, Qt::QueuedConnection);
+	connect(
+		m_cliManager, &ProfileCliManager::operationError, this,
+		[](const QString &error) { StatusBarManager::pushMessage(error, 5000); }, Qt::QueuedConnection);
 
 	setupUi();
 }
@@ -161,7 +164,6 @@ void ProfileGeneratorWidget::setupUi()
 	contentLayout->setSpacing(15);
 	contentLayout->setContentsMargins(0, 0, 0, 0);
 
-	// Step 3: Create status notification
 	mainLayout->addWidget(generateDeviceDriverAPIWidget(this));
 
 	// Add all the profile generator collapsible sections to content widget
@@ -176,7 +178,6 @@ void ProfileGeneratorWidget::setupUi()
 
 	mainLayout->addWidget(m_contentWidget);
 
-	// Step 5: Setup enhanced signal connections and initialize preset system
 	if(m_cliAvailable) {
 		setupEnhancedConnections();
 
@@ -212,8 +213,10 @@ MenuSectionCollapseWidget *ProfileGeneratorWidget::createProfileActionSection()
 
 	// Action buttons with proper Scopy styling
 	m_refreshProfileBtn = new QPushButton("Refresh");
-	m_saveToFileBtn = new QPushButton("Save to file");
-	m_loadToDeviceBtn = new QPushButton("Load to device");
+
+	m_saveToFileBtn = new AnimatedLoadingButton("Save to file", this);
+
+	m_loadToDeviceBtn = new AnimatedLoadingButton("Load to device", this);
 
 	// Apply Scopy button styling from prompt patterns
 	Style::setStyle(m_refreshProfileBtn, style::properties::button::basicButton);
@@ -392,12 +395,12 @@ void ProfileGeneratorWidget::loadPresetData(const QString &presetName)
 		applyLTEDefaults();
 	} else if(presetName == "Live Device") {
 		// Read current device configuration and populate UI
-		qInfo(CAT_PROFILEGENERATORWIDGET) << "Loading Live Device preset from device configuration";
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Loading Live Device preset from device configuration";
 
 		if(isDeviceConfigurationAvailable()) {
 			if(readDeviceConfiguration()) {
 				populateUIFromDeviceConfig(m_deviceConfig);
-				StatusBarManager::pushMessage("Live Device configuration loaded successfully", 3000);
+				qDebug(CAT_PROFILEGENERATORWIDGET) << "Live Device configuration loaded successfully";
 			} else {
 				qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read device configuration";
 				StatusBarManager::pushMessage("Failed to read Live Device configuration", 5000);
@@ -542,72 +545,86 @@ void ProfileGeneratorWidget::onRefreshProfile()
 		return;
 	}
 
-	// Step 1: Reset all internal state (like iio-oscilloscope)
 	resetPresetTracking();
 
-	// Step 2: Always read from device first (regardless of preset)
-	qInfo(CAT_PROFILEGENERATORWIDGET) << "Refreshing profile from device (iio-oscilloscope style)";
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Refreshing profile from device (iio-oscilloscope style)";
 
 	if(!isDeviceConfigurationAvailable()) {
-		StatusBarManager::pushMessage("Device configuration not available", 5000);
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Device configuration not available", 5000;
 		return;
 	}
 
 	if(!readAndApplyDeviceConfiguration()) {
-		StatusBarManager::pushMessage("Failed to read device configuration", 5000);
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Failed to read device configuration";
 		return;
 	}
 
-	// Step 3: Apply device data to current preset mode
 	QString currentPreset = m_presetCombo->currentText();
 	if(isLTEModeActive()) {
-		// For LTE preset: Apply device data but enforce LTE constraints
 		applyLTEConstraintsToDeviceData();
-		qInfo(CAT_PROFILEGENERATORWIDGET) << "Applied LTE constraints to device data";
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Applied LTE constraints to device data";
 	}
-	// For Live Device: Keep device data as-is (already applied)
-
-	// Step 4: Force complete UI refresh
 	refreshAllUIStates();
 
-	// Step 5: EXPLICITLY update debug info with fresh device data
 	updateDebugInfo();
-
-	StatusBarManager::pushMessage("Profile refreshed from device", 3000);
 }
 
 void ProfileGeneratorWidget::onSaveToFile()
 {
 	if(!m_cliAvailable) {
-		StatusBarManager::pushMessage("Profile Generator CLI not available - cannot generate profile files",
-					      5000);
+		qDebug(CAT_PROFILEGENERATORWIDGET)
+			<< "Profile Generator CLI not available - cannot generate profile files";
 		return;
 	}
 
-	QString fileName = QFileDialog::getSaveFileName(
-		this, "Save Profile", QDir::homePath() + "/adrv9002_profile.json", "JSON Files (*.json)");
+	// UI stuff stays on main thread (file dialog)
+	QString filter = "Profile files (*.json);;Stream files (*.stream)";
+	QString defaultName = QDir::homePath() + "/adrv9002_profile.json";
+	QString fileName = QFileDialog::getSaveFileName(this, "Save File", defaultName, filter);
 
 	if(!fileName.isEmpty()) {
-		if(saveProfileToFile(fileName)) {
-			StatusBarManager::pushMessage("Profile saved successfully", 3000);
-		} else {
-			StatusBarManager::pushMessage("Failed to save profile", 5000);
-		}
+		// UPDATE CONFIG ON MAIN THREAD BEFORE THREADING!
+		updateConfigFromUI();
+
+		// Copy data for safe worker thread access
+		ProfileCliManager *cliManager = m_cliManager;
+		RadioConfig configCopy = m_radioConfig;
+
+		// Determine file type and operation based on extension
+		bool isStreamFile = fileName.toLower().endsWith(".stream");
+		QString fileType = isStreamFile ? "Stream" : "Profile";
+
+		// Execute heavy work with animation
+		executeWithAnimation(m_saveToFileBtn, [cliManager, fileName, configCopy, isStreamFile, fileType]() {
+			// Only CLI/file operations in worker thread
+			if(isStreamFile) {
+				cliManager->saveStreamToFile(fileName, configCopy);
+			} else {
+				cliManager->saveProfileToFile(fileName, configCopy);
+			}
+		});
 	}
 }
 
 void ProfileGeneratorWidget::onLoadToDevice()
 {
 	if(!m_cliAvailable) {
-		StatusBarManager::pushMessage("Profile Generator CLI not available - cannot load to device", 5000);
+		qDebug(CAT_PROFILEGENERATORWIDGET) << "Profile Generator CLI not available - cannot load to device";
 		return;
 	}
 
-	if(loadProfileToDevice()) {
-		StatusBarManager::pushMessage("Profile loaded to device successfully", 3000);
-	} else {
-		StatusBarManager::pushMessage("Failed to load profile to device", 5000);
-	}
+	// UPDATE CONFIG ON MAIN THREAD BEFORE THREADING!
+	updateConfigFromUI();
+
+	// Copy data for safe worker thread access
+	ProfileCliManager *cliManager = m_cliManager;
+	RadioConfig configCopy = m_radioConfig;
+
+	// Execute heavy work with animation
+	executeWithAnimation(m_loadToDeviceBtn, [cliManager, configCopy]() {
+		// Only CLI/device operations in worker thread
+		cliManager->loadProfileToDevice(configCopy);
+	});
 }
 
 void ProfileGeneratorWidget::onDownloadCLI()
@@ -625,9 +642,6 @@ bool ProfileGeneratorWidget::loadProfileToDevice()
 		return false;
 	}
 
-	// Update config from current UI state
-	updateConfigFromUI();
-
 	// Use CLI manager to load profile to device
 	auto result = m_cliManager->loadProfileToDevice(m_radioConfig);
 	return (result == ProfileCliManager::Success);
@@ -639,12 +653,26 @@ bool ProfileGeneratorWidget::saveProfileToFile(const QString &filename)
 		return false;
 	}
 
-	// Update config from current UI state
-	updateConfigFromUI();
-
 	// Use CLI manager to save profile to file
 	auto result = m_cliManager->saveProfileToFile(filename, m_radioConfig);
 	return (result == ProfileCliManager::Success);
+}
+
+void ProfileGeneratorWidget::executeWithAnimation(AnimatedLoadingButton *button, std::function<void()> work)
+{
+	button->startAnimation();
+
+	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+	connect(
+		watcher, &QFutureWatcher<void>::finished, this,
+		[this, watcher, button]() {
+			button->stopAnimation();
+			watcher->deleteLater();
+		},
+		Qt::QueuedConnection);
+
+	auto future = QtConcurrent::run(work);
+	watcher->setFuture(future);
 }
 
 QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName)
@@ -667,17 +695,9 @@ QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName
 
 void ProfileGeneratorWidget::onChannelEnableChanged()
 {
-	// Handle both RX and TX channel enable changes
-	// updateChannelControlsVisibility() removed - ChannelConfigWidget handles this automatically
-	updateOrxControls(); // TX changes affect ORX
+	updateOrxControls();
 	updateProfileData();
 }
-
-// onSampleRateChanged(ChannelType) method removed - functionality now handled by ChannelConfigWidget signals
-
-// onBandwidthChanged(ChannelType) method removed - functionality now handled by ChannelConfigWidget signals
-
-// onSSIInterfaceChanged() removed - SSI Interface is now read-only like iio-oscilloscope
 
 void ProfileGeneratorWidget::updateSampleRateOptionsForSSI()
 {
@@ -728,7 +748,7 @@ QString ProfileGeneratorWidget::calculateBandwidthForSampleRate(const QString &s
 
 void ProfileGeneratorWidget::applyLTEDefaults()
 {
-	qInfo(CAT_PROFILEGENERATORWIDGET) << "Applying LTE defaults from lte_defaults() function";
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Applying LTE defaults from lte_defaults() function";
 
 	m_updatingFromPreset = true;
 
@@ -740,8 +760,6 @@ void ProfileGeneratorWidget::applyLTEDefaults()
 
 	// Update dependent UI elements
 	updateAllDependentControls();
-
-	StatusBarManager::pushMessage("Applied LTE defaults (preserved channel states)", 3000);
 }
 
 void ProfileGeneratorWidget::applyLTEPresetLogic()
@@ -828,7 +846,6 @@ void ProfileGeneratorWidget::updateAllDependentControls()
 	updateOrxControls();
 }
 
-// Phase 2: Complete UI Refresh System
 void ProfileGeneratorWidget::refreshAllUIStates()
 {
 	// Match iio-oscilloscope's profile_gen_preset_update() logic
@@ -936,7 +953,6 @@ void ProfileGeneratorWidget::onSampleRateChangedSynchronized(const QString &newS
 	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate synchronization complete";
 }
 
-// Phase 1: Device Configuration Reading Methods
 bool ProfileGeneratorWidget::readDeviceConfiguration()
 {
 	QString profileConfigText = readDeviceAttribute("profile_config");

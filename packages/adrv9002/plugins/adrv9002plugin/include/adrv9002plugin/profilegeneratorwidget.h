@@ -45,6 +45,9 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QTimer>
+#include <QFutureWatcher>
+#include <QtConcurrent>
+#include <functional>
 #include <array>
 #include <iio.h>
 #include <pluginbase/statusbarmanager.h>
@@ -52,6 +55,8 @@
 #include <style.h>
 #include <channelconfigwidget.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/animatedrefreshbtn.h>
+#include <gui/widgets/animatedloadingbutton.h>
 #include <profilegeneratorconstants.h>
 #include <profilegeneratortypes.h>
 #include <profileclimanager.h>
@@ -173,6 +178,9 @@ private:
 	bool loadProfileToDevice();
 	bool saveProfileToFile(const QString &filename);
 
+	// Animation helper for threaded operations
+	void executeWithAnimation(AnimatedLoadingButton *button, std::function<void()> work);
+
 	// Device Communication
 	QString readDeviceAttribute(const QString &attributeName);
 
@@ -204,8 +212,8 @@ private:
 	// Action Bar Components
 	QComboBox *m_presetCombo;
 	QPushButton *m_refreshProfileBtn;
-	QPushButton *m_saveToFileBtn;
-	QPushButton *m_loadToDeviceBtn;
+	AnimatedLoadingButton *m_saveToFileBtn;
+	AnimatedLoadingButton *m_loadToDeviceBtn;
 
 	// Radio Config Components
 	QLabel *m_ssiInterfaceLabel; // Read-only like iio-oscilloscope

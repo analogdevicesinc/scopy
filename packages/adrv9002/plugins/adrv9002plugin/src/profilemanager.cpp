@@ -25,6 +25,8 @@
 #include <style.h>
 #include <stylehelper.h>
 #include <smallprogressbar.h>
+#include <QtConcurrent>
+#include <QThread>
 
 Q_LOGGING_CATEGORY(CAT_PROFILEMANAGER, "ProfileManager")
 
@@ -188,90 +190,102 @@ void ProfileManager::refreshStatus() { updateStatus(); }
 
 void ProfileManager::onProfileFileChanged()
 {
-	if(!m_profileFileBrowser)
+	if(!m_profileFileBrowser || !m_profileFileBrowser->lineEdit()) {
 		return;
+	}
 
 	QString filename = m_profileFileBrowser->lineEdit()->text();
 	if(filename.isEmpty() || filename == "(None)") {
 		return;
 	}
 
-	qDebug(CAT_PROFILEMANAGER) << "Loading profile from:" << filename;
+	// Execute heavy work with progress indication
+	executeWithProgress(true, [this, filename]() -> bool {
+		// Move existing load logic to worker thread
+		bool success = loadProfileFromFile(filename);
 
-	// Set BUSY state while loading
-	updateProfileStatus(ProgressBarState::BUSY);
+		// UI feedback via main thread
+		QMetaObject::invokeMethod(
+			this,
+			[this, success, filename]() {
+				if(success) {
+					m_currentProfilePath = filename;
+					Q_EMIT profileLoaded(filename);
+					updateStatus();
 
-	if(loadProfileFromFile(filename)) {
-		m_currentProfilePath = filename;
-		updateStatus();
-		Q_EMIT profileLoaded(filename);
-		qInfo(CAT_PROFILEMANAGER) << "Profile loaded successfully:" << filename;
+					// Additional feedback
+					QFileInfo fileInfo(filename);
+					QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
+					profileEdit->setToolTip(
+						QString("Profile loaded successfully: %1").arg(fileInfo.fileName()));
+					scopy::StatusBarManager::pushMessage(
+						QString("Profile loaded: %1").arg(fileInfo.fileName()), 3000);
+					qInfo(CAT_PROFILEMANAGER) << "Profile loaded successfully:" << filename;
+				} else {
+					QString errorMsg = QString("Failed to load profile from: %1").arg(filename);
+					Q_EMIT profileError(errorMsg);
+					qWarning(CAT_PROFILEMANAGER) << errorMsg;
+					scopy::StatusBarManager::pushMessage(errorMsg, 5000);
 
-		// Show SUCCESS state
-		updateProfileStatus(ProgressBarState::SUCCESS);
+					// Additional feedback
+					QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
+					profileEdit->setToolTip(errorMsg);
+				}
+			},
+			Qt::QueuedConnection);
 
-		// Additional feedback
-		QFileInfo fileInfo(filename);
-		QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
-		profileEdit->setToolTip(QString("Profile loaded successfully: %1").arg(fileInfo.fileName()));
-		scopy::StatusBarManager::pushMessage(QString("Profile loaded: %1").arg(fileInfo.fileName()), 3000);
-	} else {
-		QString errorMsg = QString("Failed to load profile from: %1").arg(filename);
-		Q_EMIT profileError(errorMsg);
-		qWarning(CAT_PROFILEMANAGER) << errorMsg;
-		scopy::StatusBarManager::pushMessage(errorMsg, 5000);
-
-		// Show ERROR state
-		updateProfileStatus(ProgressBarState::ERROR);
-
-		// Additional feedback
-		QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
-		profileEdit->setToolTip(errorMsg);
-	}
+		return success;
+	});
 }
 
 void ProfileManager::onStreamFileChanged()
 {
-	if(!m_streamFileBrowser)
+	if(!m_streamFileBrowser || !m_streamFileBrowser->lineEdit()) {
 		return;
+	}
 
 	QString filename = m_streamFileBrowser->lineEdit()->text();
 	if(filename.isEmpty() || filename == "(None)") {
 		return;
 	}
 
-	qDebug(CAT_PROFILEMANAGER) << "Loading stream from:" << filename;
+	// Execute heavy work with progress indication
+	executeWithProgress(false, [this, filename]() -> bool {
+		// Move existing load logic to worker thread
+		bool success = loadStreamFromFile(filename);
 
-	// Set BUSY state while loading
-	updateStreamStatus(ProgressBarState::BUSY);
+		// UI feedback via main thread
+		QMetaObject::invokeMethod(
+			this,
+			[this, success, filename]() {
+				if(success) {
+					m_currentStreamPath = filename;
+					Q_EMIT streamLoaded(filename);
+					updateStatus();
 
-	if(loadStreamFromFile(filename)) {
-		m_currentStreamPath = filename;
-		updateStatus();
-		Q_EMIT streamLoaded(filename);
-		qInfo(CAT_PROFILEMANAGER) << "Stream loaded successfully:" << filename;
+					// Additional feedback
+					QFileInfo fileInfo(filename);
+					QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
+					streamEdit->setToolTip(
+						QString("Stream loaded successfully: %1").arg(fileInfo.fileName()));
+					scopy::StatusBarManager::pushMessage(
+						QString("Stream loaded: %1").arg(fileInfo.fileName()), 3000);
+					qInfo(CAT_PROFILEMANAGER) << "Stream loaded successfully:" << filename;
+				} else {
+					QString errorMsg = QString("Failed to load stream from: %1").arg(filename);
+					Q_EMIT streamError(errorMsg);
+					qWarning(CAT_PROFILEMANAGER) << errorMsg;
+					scopy::StatusBarManager::pushMessage(errorMsg, 5000);
 
-		// Show SUCCESS state
-		updateStreamStatus(ProgressBarState::SUCCESS);
+					// Additional feedback
+					QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
+					streamEdit->setToolTip(errorMsg);
+				}
+			},
+			Qt::QueuedConnection);
 
-		// Additional feedback
-		QFileInfo fileInfo(filename);
-		QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
-		streamEdit->setToolTip(QString("Stream loaded successfully: %1").arg(fileInfo.fileName()));
-		scopy::StatusBarManager::pushMessage(QString("Stream loaded: %1").arg(fileInfo.fileName()), 3000);
-	} else {
-		QString errorMsg = QString("Failed to load stream from: %1").arg(filename);
-		Q_EMIT streamError(errorMsg);
-		qWarning(CAT_PROFILEMANAGER) << errorMsg;
-		scopy::StatusBarManager::pushMessage(errorMsg, 5000);
-
-		// Show ERROR state
-		updateStreamStatus(ProgressBarState::ERROR);
-
-		// Additional feedback
-		QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
-		streamEdit->setToolTip(errorMsg);
-	}
+		return success;
+	});
 }
 
 void ProfileManager::updateStatus()
@@ -451,4 +465,34 @@ void ProfileManager::updateStreamStatus(ProgressBarState status)
 		m_streamProgressBar->startProgress();
 		m_streamProgressBar->setBarColor(Style::getAttribute(json::theme::content_busy));
 	}
+}
+
+void ProfileManager::executeWithProgress(bool isProfile, std::function<bool()> work)
+{
+	// Set progress bar to BUSY state (equivalent to startAnimation)
+	if(isProfile) {
+		updateProfileStatus(ProgressBarState::BUSY);
+	} else {
+		updateStreamStatus(ProgressBarState::BUSY);
+	}
+
+	QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
+	connect(
+		watcher, &QFutureWatcher<bool>::finished, this,
+		[this, watcher, isProfile]() {
+			bool success = watcher->result();
+
+			// Set progress bar to final state (equivalent to stopAnimation)
+			if(isProfile) {
+				updateProfileStatus(success ? ProgressBarState::SUCCESS : ProgressBarState::ERROR);
+			} else {
+				updateStreamStatus(success ? ProgressBarState::SUCCESS : ProgressBarState::ERROR);
+			}
+
+			watcher->deleteLater();
+		},
+		Qt::QueuedConnection);
+
+	auto future = QtConcurrent::run(work);
+	watcher->setFuture(future);
 }
