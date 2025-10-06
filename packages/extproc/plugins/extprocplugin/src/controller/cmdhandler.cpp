@@ -47,9 +47,11 @@ void CmdHandler::startProcess(const QString &program, const QStringList &argumen
 	if(m_cliProcess->state() != QProcess::NotRunning) {
 		stopProcess();
 	}
-
 	m_cliProcess->start(program, arguments);
-	m_cliProcess->waitForStarted();
+	bool started = m_cliProcess->waitForStarted();
+	if(started) {
+		qWarning(CAT_QIQ_CMD_HANDLER) << "The cli failed to start!";
+	}
 }
 
 void CmdHandler::stopProcess()

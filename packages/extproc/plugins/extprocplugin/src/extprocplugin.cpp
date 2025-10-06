@@ -59,6 +59,14 @@ finish:
 	return ret;
 }
 
+void ExtProcPlugin::preload()
+{
+	QString activationCode = Preferences::get("qiq_code").toString();
+	CommandFormat *cmdFormat = new JsonFormat();
+	m_qiqController = new CMDController(cmdFormat, this);
+	m_qiqController->setActivationCode(activationCode);
+}
+
 bool ExtProcPlugin::loadPage()
 {
 	// Here you must write the code for the plugin info page
@@ -96,6 +104,7 @@ void ExtProcPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("qiq_cli_path", "");
+	p->init("qiq_code", "");
 }
 
 bool ExtProcPlugin::loadPreferencesPage()
@@ -114,6 +123,15 @@ bool ExtProcPlugin::loadPreferencesPage()
 	lay->setMargin(0);
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT_VALIDATION(
+		p, "qiq_code", "Client code", "Insert the cli client code.",
+		[](const QString &input) {
+			QString normalized = input.toUpper();
+			static const QRegularExpression pattern("^[A-Z0-9]{4}(?:-[A-Z0-9]{4}){3}$");
+			return pattern.match(normalized).hasMatch();
+		},
+		generalSection));
 
 	generalSection->contentLayout()->addWidget(PREFERENCE_FILE_BROWSER(
 		p, "qiq_cli_path", "CLI path", "Select the directory for the external processing tool.",
@@ -135,7 +153,11 @@ void ExtProcPlugin::loadToolList()
 }
 
 void ExtProcPlugin::unload()
-{ /*delete m_infoPage;*/
+{
+	if(m_qiqController) {
+		delete m_qiqController;
+		m_qiqController = nullptr;
+	}
 }
 
 QString ExtProcPlugin::description() { return EXTPROCPLUGIN_PLUGIN_DESCRIPTION; }
@@ -147,6 +169,9 @@ bool ExtProcPlugin::onConnect()
 	// In case of success the function must return true and false otherwise
 
 	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
+	if(!conn) {
+		return false;
+	}
 
 	// Create unified acquisition manager
 	m_acquisitionManager = new AcquisitionManager(conn->context());
@@ -158,10 +183,7 @@ bool ExtProcPlugin::onConnect()
 	tme->setEnabled(true);
 	tme->setRunBtnVisible(true);
 	extInstrument->setAvailableChannels(m_acquisitionManager->getAvailableChannels());
-
-	// The format isn't necessary to be declared here
-	CommandFormat *cmdFormat = new JsonFormat();
-	m_qiqController = new CMDController(cmdFormat);
+	extInstrument->setInactive(!m_qiqController->isActivated());
 
 	// Connect unified acquisition manager signals
 	connect(m_acquisitionManager, &AcquisitionManager::dataReady, extInstrument,
@@ -232,6 +254,10 @@ bool ExtProcPlugin::onDisconnect()
 			delete(w);
 		}
 	}
+	m_acquisitionManager->deleteLater();
+	m_acquisitionManager = nullptr;
+
+	QObject::disconnect(m_qiqController);
 
 	ConnectionProvider::GetInstance()->close(m_param);
 

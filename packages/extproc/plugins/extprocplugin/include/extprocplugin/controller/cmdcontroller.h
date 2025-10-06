@@ -43,6 +43,7 @@ public:
 	~CMDController() = default;
 
 	// Configuration methods
+	void setActivationCode(const QString &code);
 	void setCmdFormat(CommandFormat *cmdFormat);
 	void configureInput(const InputConfig &config);
 	void configureAnalysis(const QString &type, const QVariantMap &config);
@@ -54,6 +55,8 @@ public:
 	void getAnalysisInfo(QString type);
 	ProcConfiguration *getCurrentConfig();
 	bool isReady();
+
+	bool isActivated() const;
 
 Q_SIGNALS:
 	void inputConfigured(const InputConfig &config);
@@ -74,6 +77,7 @@ private Q_SLOTS:
 	// Response handlers from CommandFormat
 	void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 	void onResponseReceived(QVariantMap response);
+	void handleSetActivationCode(QVariantMap response);
 	void handleSetInputConfigResponse(QVariantMap response);
 	void handleSetAnalysisConfigResponse(QVariantMap response);
 	void handleSetOutputConfigResponse(QVariantMap response);
@@ -90,6 +94,7 @@ private:
 	QString buildCliPath(QString dirPath);
 	QString findCli();
 
+	bool m_isActivated;
 	CmdHandler *m_cmdHandler;
 	ProcConfiguration *m_qiqConfig;
 };

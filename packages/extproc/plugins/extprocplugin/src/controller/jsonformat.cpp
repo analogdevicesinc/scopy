@@ -27,6 +27,13 @@
 
 using namespace scopy::extprocplugin;
 
+QString JsonFormat::sendSetActivCode(const QString &code)
+{
+	QVariantMap map;
+	map.insert(GenericKeys::ACTIV_CODE, code);
+	return buildJsonCommand(CommandNames::SET_ACTIVATION_CODE, map);
+}
+
 QString JsonFormat::sendSetInputConfig(const InputConfig &config)
 {
 	QVariantMap map;

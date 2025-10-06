@@ -24,6 +24,11 @@
 
 namespace scopy::extprocplugin {
 
+struct GenericKeys
+{
+	static constexpr auto ACTIV_CODE = "activation_code";
+};
+
 struct KeysInputConfig
 {
 	static constexpr auto SAMPLE_COUNT = "sample_count";

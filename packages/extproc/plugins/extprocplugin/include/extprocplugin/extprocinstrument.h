@@ -45,6 +45,7 @@ public:
 	ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~ExtProcInstrument();
 
+	void setInactive(bool dis);
 	void setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels);
 Q_SIGNALS:
 	void acqFileCheck(bool isValid);
@@ -70,6 +71,8 @@ public Q_SLOTS:
 	// void onProcessDataCompleted(const RunResults &result);
 
 private:
+	void deletePopup();
+	void activationCodePopup();
 	void addPlots();
 	void setupConnections();
 	void clearMeasurementLabels();
@@ -79,6 +82,7 @@ private:
 	void fillMeasurementsPanel(const QStringList &measurements);
 	QPushButton *createMenuButton(const QString &name, QWidget *parent = nullptr);
 
+	ToolTemplate *m_tool;
 	QMap<QString, MeasurementLabel *> m_labels;
 	MeasurementsPanel *m_panel;
 	ToolMenuEntry *m_tme;
@@ -88,6 +92,7 @@ private:
 	SettingsMenu *m_settings;
 
 	DockableAreaInterface *m_dockableArea;
+	PopupWidget *m_popupWidget;
 
 	bool m_inputFormatConfigured = false;
 	bool m_outputConfigured = false;

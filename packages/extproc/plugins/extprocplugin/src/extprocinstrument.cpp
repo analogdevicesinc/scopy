@@ -33,20 +33,22 @@ using namespace scopy::extprocplugin;
 ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
 	, m_tme(tme)
+	, m_popupWidget(nullptr)
+	, m_tool(nullptr)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 
-	ToolTemplate *tool = new ToolTemplate(this);
+	m_tool = new ToolTemplate(this);
 
-	tool->topContainer()->setVisible(true);
-	tool->centralContainer()->setVisible(true);
-	tool->rightContainer()->setVisible(true);
-	tool->leftContainer()->setVisible(true);
-	tool->bottomContainer()->setVisible(true);
+	m_tool->topContainer()->setVisible(true);
+	m_tool->centralContainer()->setVisible(true);
+	m_tool->rightContainer()->setVisible(true);
+	m_tool->leftContainer()->setVisible(true);
+	m_tool->bottomContainer()->setVisible(true);
 
-	tool->setRightContainerWidth(300);
-	tool->setLeftContainerWidth(240);
+	m_tool->setRightContainerWidth(300);
+	m_tool->setLeftContainerWidth(240);
 
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
@@ -56,10 +58,10 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	m_panel = new MeasurementsPanel(dockableAreaWidget);
 	m_panel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	panelWrapper->setInnerWidget(m_panel);
-	QPushButton *measure = createMenuButton("Measure", tool);
+	QPushButton *measure = createMenuButton("Measure", m_tool);
 	m_dockableArea->addDockWrapper(panelWrapper);
 
-	QPushButton *acqSettingsBtn = createMenuButton("Acquisition", tool);
+	QPushButton *acqSettingsBtn = createMenuButton("Acquisition", m_tool);
 
 	m_plotManager = new PlotManager(this);
 
@@ -73,25 +75,39 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	m_singleBtn = new SingleShotBtn(this);
 	m_singleBtn->setDisabled(true);
 
-	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
-	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
-	tool->addWidgetToBottomContainerHelper(acqSettingsBtn, TTA_RIGHT);
-	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
+	m_tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
+	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
+	m_tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
+	m_tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
+	m_tool->addWidgetToBottomContainerHelper(acqSettingsBtn, TTA_RIGHT);
+	m_tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
-	tool->rightStack()->add("settings", m_settings->plotW());
-	tool->leftStack()->add("acqSettings", m_settings->acqW());
+	m_tool->rightStack()->add("settings", m_settings->plotW());
+	m_tool->leftStack()->add("acqSettings", m_settings->acqW());
 
-	layout->addWidget(tool);
+	layout->addWidget(m_tool);
 
 	setupConnections();
 	connect(measure, &QPushButton::toggled, this, [panelWrapper](bool b) { panelWrapper->setActivated(b); });
-	connect(settingsBtn, &QPushButton::toggled, this, [tool](bool b) { tool->openRightContainerHelper(b); });
-	connect(acqSettingsBtn, &QPushButton::toggled, this, [tool](bool b) { tool->openLeftContainerHelper(b); });
+	connect(settingsBtn, &QPushButton::toggled, this, [this](bool b) { m_tool->openRightContainerHelper(b); });
+	connect(acqSettingsBtn, &QPushButton::toggled, this, [this](bool b) { m_tool->openLeftContainerHelper(b); });
 }
 
-ExtProcInstrument::~ExtProcInstrument() {}
+ExtProcInstrument::~ExtProcInstrument() {
+	deletePopup();
+	if(m_tool) {
+		m_tool->deleteLater();
+		m_tool = nullptr;
+	}
+}
+
+void ExtProcInstrument::setInactive(bool dis)
+{
+	if(dis) {
+		m_tool->setVisible(false);
+		activationCodePopup();
+	}
+}
 
 void ExtProcInstrument::setupConnections()
 {
@@ -188,6 +204,33 @@ void ExtProcInstrument::onProcessFinished(int exitCode)
 	m_inputFormatConfigured = false;
 	m_outputConfigured = false;
 	enableAcquisition();
+}
+
+void ExtProcInstrument::deletePopup()
+{
+	if(m_popupWidget) {
+		delete m_popupWidget;
+		m_popupWidget = nullptr;
+	}
+}
+
+void ExtProcInstrument::activationCodePopup()
+{
+	if(m_popupWidget){
+		return;
+	}
+	m_popupWidget = new PopupWidget(this);
+	m_popupWidget->enableCenterOnParent(true);
+	m_popupWidget->setTitle("Activation Code Required");
+	m_popupWidget->setDescription("To unlock the plugin features, enter your activation code in the preferences.");
+	m_popupWidget->enableCloseButton(false);
+	m_popupWidget->getContinueBtn()->setVisible(false);
+
+	connect(m_popupWidget, &PopupWidget::exitButtonClicked, this, &ExtProcInstrument::deletePopup);
+
+	m_popupWidget->enableTintedOverlay(true);
+	m_popupWidget->show();
+	m_popupWidget->raise();
 }
 
 void ExtProcInstrument::addPlots()

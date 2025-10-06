@@ -39,8 +39,8 @@ public:
 	explicit CmdHandler(CommandFormat *cmdFormat, QObject *parent = nullptr);
 	~CmdHandler() = default;
 
-	void setCmdFormat(CommandFormat *cmdFormat);
 	void startProcess(const QString &program, const QStringList &arguments);
+	void setCmdFormat(CommandFormat *cmdFormat);
 	void stopProcess();
 	bool isProcessRunning();
 	void sendCommand(const QString &cmd);

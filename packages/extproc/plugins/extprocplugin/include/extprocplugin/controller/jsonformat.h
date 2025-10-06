@@ -29,6 +29,7 @@ namespace scopy::extprocplugin {
 class JsonFormat : public CommandFormat
 {
 public:
+	QString sendSetActivCode(const QString &code) override;
 	QString sendSetInputConfig(const InputConfig &config) override;
 	QString sendSetAnalysisConfig(const QString &type, const QVariantMap &config) override;
 	QString sendSetOutputConfig(const OutputConfig &config) override;

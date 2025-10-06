@@ -70,6 +70,7 @@ struct ChannelFormatTypes
 
 struct CommandNames
 {
+	static constexpr auto SET_ACTIVATION_CODE = "set_activation_code";
 	static constexpr auto SET_INPUT_CONFIG = "set_input_config";
 	static constexpr auto SET_ANALYSIS_CONFIG = "set_analysis_config";
 	static constexpr auto SET_OUTPUT_CONFIG = "set_output_config";

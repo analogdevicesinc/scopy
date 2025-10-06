@@ -34,6 +34,7 @@ class CommandFormat
 public:
 	virtual ~CommandFormat() {}
 
+	virtual QString sendSetActivCode(const QString &code) = 0;
 	virtual QString sendSetInputConfig(const InputConfig &config) = 0;
 	virtual QString sendSetAnalysisConfig(const QString &type, const QVariantMap &config) = 0;
 	virtual QString sendSetOutputConfig(const OutputConfig &config) = 0;

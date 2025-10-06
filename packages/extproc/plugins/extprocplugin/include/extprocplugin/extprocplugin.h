@@ -39,6 +39,7 @@ class SCOPY_EXTPROCPLUGIN_EXPORT ExtProcPlugin : public QObject, public PluginBa
 
 public:
 	bool compatible(QString m_param, QString category) override;
+	void preload() override;
 	bool loadPage() override;
 	void initPreferences() override;
 	bool loadPreferencesPage() override;
@@ -53,7 +54,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
-	CMDController *m_qiqController;
+	CMDController *m_qiqController = nullptr;
 	AcquisitionManager *m_acquisitionManager = nullptr;
 
 	const QString CLI_PROGRAM = "json_cli";

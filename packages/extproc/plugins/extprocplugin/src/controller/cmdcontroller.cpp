@@ -35,6 +35,7 @@ CMDController::CMDController(CommandFormat *cmdFormat, QObject *parent)
 	: QObject(parent)
 	, m_cmdHandler(nullptr)
 	, m_qiqConfig(nullptr)
+	, m_isActivated(false)
 {
 	m_cmdHandler = new CmdHandler(cmdFormat, this);
 	m_qiqConfig = new ProcConfiguration(this);
@@ -44,6 +45,12 @@ CMDController::CMDController(CommandFormat *cmdFormat, QObject *parent)
 	connect(m_cmdHandler, &CmdHandler::processFinished, this, &CMDController::onProcessFinished);
 
 	m_cmdHandler->startProcess(findCli(), {});
+}
+
+void CMDController::setActivationCode(const QString &code)
+{
+	const QString stringCmd = m_cmdHandler->cmdFormat()->sendSetActivCode(code);
+	m_cmdHandler->sendCommand(stringCmd);
 }
 
 void CMDController::setCmdFormat(CommandFormat *cmdFormat) { m_cmdHandler->setCmdFormat(cmdFormat); }
@@ -107,7 +114,9 @@ void CMDController::onProcessFinished(int exitCode, QProcess::ExitStatus exitSta
 void CMDController::onResponseReceived(QVariantMap response)
 {
 	QString cmd = response["command"].toString();
-	if(cmd == CommandNames::SET_INPUT_CONFIG) {
+	if(cmd == CommandNames::SET_ACTIVATION_CODE) {
+		handleSetActivationCode(response);
+	} else if(cmd == CommandNames::SET_INPUT_CONFIG) {
 		handleSetInputConfigResponse(response);
 	} else if(cmd == CommandNames::SET_ANALYSIS_CONFIG) {
 		handleSetAnalysisConfigResponse(response);
@@ -123,6 +132,8 @@ void CMDController::onResponseReceived(QVariantMap response)
 		qWarning() << "Unknown command" << cmd;
 	}
 }
+
+void CMDController::handleSetActivationCode(QVariantMap response) { m_isActivated = true; }
 
 void CMDController::handleSetInputConfigResponse(QVariantMap response)
 {
@@ -249,6 +260,8 @@ QString CMDController::buildCliPath(QString dirPath)
 	}
 	return cliPath;
 }
+
+bool CMDController::isActivated() const { return m_isActivated; }
 
 // void CMDController::updateConfiguration(QString responseType, QVariantMap data)
 // {
