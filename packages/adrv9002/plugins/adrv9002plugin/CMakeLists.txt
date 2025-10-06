@@ -1,3 +1,23 @@
+#
+# Copyright (c) 2025 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE adrv9002plugin)
@@ -6,22 +26,15 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
-set(PLUGIN_DISPLAY_NAME ADRV9002 (NAVASSA))
-set(PLUGIN_DESCRIPTION
-    ADRV9002
-    RF
-    TRANSCEIVER
-    PLUGIN
-    PORTED
-    FROM
-    IIO-OSCILLOSCOPE
-)
+set(PLUGIN_NAME ADRV9002Plugin)
+set(PLUGIN_DISPLAY_NAME "ADRV9002")
+set(PLUGIN_DESCRIPTION " ADRV9002 RF TRANSCEIVER PLUGIN")
 
 include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -60,14 +73,6 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-message("Generate plugin style:")
-include(ScopyStyle)
-file(MAKE_DIRECTORY ${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}/style/qss)
-generate_style(
-	"--plugin" ${CMAKE_CURRENT_SOURCE_DIR}/style ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
-	${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}
-)
-
 configure_file(
 	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
@@ -76,8 +81,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CURRENT_PKG_PATH}/include)
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -89,9 +93,5 @@ target_link_libraries(
 	       scopy-iio-widgets
 	       scopy-pkg-manager
 )
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
-endif()
 
 set(ADRV9002PLUGIN_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

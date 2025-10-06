@@ -96,6 +96,7 @@ void ChannelConfigWidget::setupUI()
 	// Interface Sample Rate (Hz) - matching iio-oscilloscope exactly
 	m_layout->addWidget(new QLabel("Interface Sample Rate (Hz):"), 4, 0);
 	m_sampleRateCombo = new QComboBox();
+	m_sampleRateCombo->setEnabled(true);
 	m_sampleRateCombo->addItems(FrequencyTable::SAMPLE_RATES_HZ);
 	m_layout->addWidget(m_sampleRateCombo, 4, 1);
 
@@ -174,6 +175,8 @@ void ChannelConfigWidget::updateControlsVisibility(bool lteMode)
 		m_bandwidthCombo->setEnabled(channelEnabled);
 
 		m_sampleRateCombo->setEditable(true);
+		// this is a woraround caused by how Qt treats enable / disable logic for QCombobox
+		Style::setBackgroundColor(m_sampleRateCombo, json::theme::background_primary);
 		m_sampleRateCombo->setEnabled(channelEnabled);
 	}
 

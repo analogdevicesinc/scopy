@@ -25,7 +25,7 @@
 
 #include <QLoggingCategory>
 #include <QFutureWatcher>
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent>
 #include <style.h>
 #include <stylehelper.h>
 
@@ -130,22 +130,11 @@ void Adrv9002::connectSignals()
 			watcher, &QFutureWatcher<void>::finished, this,
 			[this, watcher]() {
 				m_refreshButton->stopAnimation();
-
-				// Refresh ProfileManager device info when ADRV9002 refreshes
-				if(m_profileManager) {
-					m_profileManager->updateDeviceInfo();
-				}
-
-				// Refresh Initial Calibrations widget when ADRV9002 refreshes
-				if(m_initialCalibrationsWidget) {
-					m_initialCalibrationsWidget->refreshStatus();
-				}
-
 				watcher->deleteLater();
 			},
 			Qt::QueuedConnection);
 
-		auto future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
+		QFuture<void> future = QtConcurrent::run([this]() { Q_EMIT readRequested(); });
 		watcher->setFuture(future);
 	});
 }
@@ -305,6 +294,7 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 	// Profile Manager - handles profile_config and stream_config
 	if(m_profileManager) {
 		section->add(m_profileManager);
+		connect(this, &Adrv9002::readRequested, m_profileManager, &ProfileManager::updateDeviceInfo);
 	}
 
 	QWidget *widget = new QWidget(section);
@@ -345,6 +335,8 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 	// Initial Calibrations section (if supported)
 	if(m_initialCalibrationsWidget) {
 		layout->addWidget(m_initialCalibrationsWidget);
+		connect(this, &Adrv9002::readRequested, m_initialCalibrationsWidget,
+			&InitialCalibrationsWidget::refreshStatus);
 	}
 
 	section->add(widget);
