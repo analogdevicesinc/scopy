@@ -231,8 +231,6 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 		return DeviceWriteFailed;
 	}
 
-	Q_EMIT operationProgress("Loading stream image to device...");
-
 	// Read generated stream file
 	QByteArray streamData = readFileContents(streamFile);
 	if(streamData.isEmpty()) {
@@ -248,10 +246,11 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 		return DeviceWriteFailed;
 	}
 
+	Q_EMIT operationProgress("Stream_config write completed successfully");
+
 	// Cleanup temp files
 	cleanupTempFiles(tempFiles);
 
-	Q_EMIT operationProgress("Profile and stream loaded to device successfully");
 	return Success;
 }
 

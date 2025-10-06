@@ -32,6 +32,8 @@
 #include <gui/widgets/smallprogressbar.h>
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/statusbarmanager.h>
+#include <QFutureWatcher>
+#include <functional>
 #include <iio.h>
 
 namespace scopy::adrv9002 {
@@ -68,6 +70,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void onProfileFileChanged();
+	void doOnProfileFileChangedInThread();
 	void onStreamFileChanged();
 	void updateStatus();
 
@@ -81,6 +84,9 @@ private:
 	// Device info panel
 	QWidget *createDeviceInfoPanel();
 	QString getAttributeValue(const QString &attributeName);
+
+	// Progress bar animation helper for threaded operations
+	void executeWithProgress(bool isProfile, std::function<bool()> work);
 
 	// Device communication
 	iio_device *m_device;
