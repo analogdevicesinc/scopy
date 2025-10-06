@@ -33,7 +33,6 @@
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/statusbarmanager.h>
 #include <QFutureWatcher>
-#include <QtConcurrent>
 #include <functional>
 #include <iio.h>
 

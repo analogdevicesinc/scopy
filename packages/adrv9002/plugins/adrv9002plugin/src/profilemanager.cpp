@@ -493,6 +493,6 @@ void ProfileManager::executeWithProgress(bool isProfile, std::function<bool()> w
 		},
 		Qt::QueuedConnection);
 
-	auto future = QtConcurrent::run(work);
+	QFuture<bool> future = QtConcurrent::run([work]() { return work(); });
 	watcher->setFuture(future);
 }

@@ -46,7 +46,6 @@
 #include <QUrl>
 #include <QTimer>
 #include <QFutureWatcher>
-#include <QtConcurrent>
 #include <functional>
 #include <array>
 #include <iio.h>
@@ -105,6 +104,13 @@ public:
 	~ProfileGeneratorWidget();
 
 Q_SIGNALS:
+	// Worker thread operation signals
+	void saveProfileSuccess(const QString &fileName);
+	void saveProfileFailed(const QString &error);
+	void saveStreamSuccess(const QString &fileName);
+	void saveStreamFailed(const QString &error);
+	void loadToDeviceSuccess();
+	void loadToDeviceFailed(const QString &error);
 
 public Q_SLOTS:
 	void refreshProfileData();
@@ -174,12 +180,10 @@ private:
 	void updateSampleRateOptionsForSSI();
 	QString calculateBandwidthForSampleRate(const QString &sampleRate) const;
 
-	// Profile Operations (require CLI)
-	bool loadProfileToDevice();
-	bool saveProfileToFile(const QString &filename);
-
-	// Animation helper for threaded operations
-	void executeWithAnimation(AnimatedLoadingButton *button, std::function<void()> work);
+	// Worker functions for threaded operations
+	void doSaveProfileWork(const QString &fileName, const RadioConfig &config);
+	void doSaveStreamWork(const QString &fileName, const RadioConfig &config);
+	void doLoadToDeviceWork(const RadioConfig &config);
 
 	// Device Communication
 	QString readDeviceAttribute(const QString &attributeName);

@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QApplication>
+#include <QtConcurrent>
 #include <stylehelper.h>
 
 Q_LOGGING_CATEGORY(CAT_PROFILEGENERATORWIDGET, "ProfileGeneratorWidget")
@@ -587,22 +588,20 @@ void ProfileGeneratorWidget::onSaveToFile()
 		updateConfigFromUI();
 
 		// Copy data for safe worker thread access
-		ProfileCliManager *cliManager = m_cliManager;
 		RadioConfig configCopy = m_radioConfig;
 
 		// Determine file type and operation based on extension
 		bool isStreamFile = fileName.toLower().endsWith(".stream");
-		QString fileType = isStreamFile ? "Stream" : "Profile";
 
-		// Execute heavy work with animation
-		executeWithAnimation(m_saveToFileBtn, [cliManager, fileName, configCopy, isStreamFile, fileType]() {
-			// Only CLI/file operations in worker thread
-			if(isStreamFile) {
-				cliManager->saveStreamToFile(fileName, configCopy);
-			} else {
-				cliManager->saveProfileToFile(fileName, configCopy);
-			}
-		});
+		// Start animation
+		m_saveToFileBtn->startAnimation();
+
+		// Execute appropriate worker function - fire and forget
+		if(isStreamFile) {
+			QtConcurrent::run(this, &ProfileGeneratorWidget::doSaveStreamWork, fileName, configCopy);
+		} else {
+			QtConcurrent::run(this, &ProfileGeneratorWidget::doSaveProfileWork, fileName, configCopy);
+		}
 	}
 }
 
@@ -617,14 +616,13 @@ void ProfileGeneratorWidget::onLoadToDevice()
 	updateConfigFromUI();
 
 	// Copy data for safe worker thread access
-	ProfileCliManager *cliManager = m_cliManager;
 	RadioConfig configCopy = m_radioConfig;
 
-	// Execute heavy work with animation
-	executeWithAnimation(m_loadToDeviceBtn, [cliManager, configCopy]() {
-		// Only CLI/device operations in worker thread
-		cliManager->loadProfileToDevice(configCopy);
-	});
+	// Start animation
+	m_loadToDeviceBtn->startAnimation();
+
+	// Execute worker function - fire and forget
+	QtConcurrent::run(this, &ProfileGeneratorWidget::doLoadToDeviceWork, configCopy);
 }
 
 void ProfileGeneratorWidget::onDownloadCLI()
@@ -634,45 +632,54 @@ void ProfileGeneratorWidget::onDownloadCLI()
 
 void ProfileGeneratorWidget::refreshProfileData() { onRefreshProfile(); }
 
-// CLI-based operations following iio-oscilloscope pattern
 
-bool ProfileGeneratorWidget::loadProfileToDevice()
+// Worker functions for threaded operations
+void ProfileGeneratorWidget::doSaveProfileWork(const QString &fileName, const RadioConfig &config)
 {
 	if(!m_cliManager || !m_cliAvailable) {
-		return false;
-	}
-
-	// Use CLI manager to load profile to device
-	auto result = m_cliManager->loadProfileToDevice(m_radioConfig);
-	return (result == ProfileCliManager::Success);
-}
-
-bool ProfileGeneratorWidget::saveProfileToFile(const QString &filename)
-{
-	if(!m_cliManager || !m_cliAvailable) {
-		return false;
+		Q_EMIT saveProfileFailed("Profile Generator CLI not available");
+		return;
 	}
 
 	// Use CLI manager to save profile to file
-	auto result = m_cliManager->saveProfileToFile(filename, m_radioConfig);
-	return (result == ProfileCliManager::Success);
+	auto result = m_cliManager->saveProfileToFile(fileName, config);
+	if(result == ProfileCliManager::Success) {
+		Q_EMIT saveProfileSuccess(fileName);
+	} else {
+		Q_EMIT saveProfileFailed("CLI operation failed");
+	}
 }
 
-void ProfileGeneratorWidget::executeWithAnimation(AnimatedLoadingButton *button, std::function<void()> work)
+void ProfileGeneratorWidget::doSaveStreamWork(const QString &fileName, const RadioConfig &config)
 {
-	button->startAnimation();
+	if(!m_cliManager || !m_cliAvailable) {
+		Q_EMIT saveStreamFailed("Profile Generator CLI not available");
+		return;
+	}
 
-	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-	connect(
-		watcher, &QFutureWatcher<void>::finished, this,
-		[this, watcher, button]() {
-			button->stopAnimation();
-			watcher->deleteLater();
-		},
-		Qt::QueuedConnection);
+	// Use CLI manager to save stream to file
+	auto result = m_cliManager->saveStreamToFile(fileName, config);
+	if(result == ProfileCliManager::Success) {
+		Q_EMIT saveStreamSuccess(fileName);
+	} else {
+		Q_EMIT saveStreamFailed("CLI operation failed");
+	}
+}
 
-	auto future = QtConcurrent::run(work);
-	watcher->setFuture(future);
+void ProfileGeneratorWidget::doLoadToDeviceWork(const RadioConfig &config)
+{
+	if(!m_cliManager || !m_cliAvailable) {
+		Q_EMIT loadToDeviceFailed("Profile Generator CLI not available");
+		return;
+	}
+
+	// Use CLI manager to load profile to device
+	auto result = m_cliManager->loadProfileToDevice(config);
+	if(result == ProfileCliManager::Success) {
+		Q_EMIT loadToDeviceSuccess();
+	} else {
+		Q_EMIT loadToDeviceFailed("CLI operation failed");
+	}
 }
 
 QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName)
@@ -903,7 +910,37 @@ void ProfileGeneratorWidget::setupEnhancedConnections()
 	connect(m_orx1EnabledCb, &QCheckBox::toggled, this, [this]() { updateProfileData(); });
 	connect(m_orx2EnabledCb, &QCheckBox::toggled, this, [this]() { updateProfileData(); });
 
-	qInfo(CAT_PROFILEGENERATORWIDGET) << "Simplified signal connections established (iio-oscilloscope compatible)";
+	// Worker thread signals - animation control and user feedback
+	connect(this, &ProfileGeneratorWidget::saveProfileSuccess, this, [this](const QString &fileName) {
+		m_saveToFileBtn->stopAnimation();
+		QFileInfo fileInfo(fileName);
+		StatusBarManager::pushMessage("Profile saved: " + fileInfo.fileName(), 3000);
+	});
+	connect(this, &ProfileGeneratorWidget::saveProfileFailed, this, [this](const QString &error) {
+		m_saveToFileBtn->stopAnimation();
+		StatusBarManager::pushMessage("Save failed: " + error, 5000);
+	});
+
+	connect(this, &ProfileGeneratorWidget::saveStreamSuccess, this, [this](const QString &fileName) {
+		m_saveToFileBtn->stopAnimation();
+		QFileInfo fileInfo(fileName);
+		StatusBarManager::pushMessage("Stream saved: " + fileInfo.fileName(), 3000);
+	});
+	connect(this, &ProfileGeneratorWidget::saveStreamFailed, this, [this](const QString &error) {
+		m_saveToFileBtn->stopAnimation();
+		StatusBarManager::pushMessage("Save failed: " + error, 5000);
+	});
+
+	connect(this, &ProfileGeneratorWidget::loadToDeviceSuccess, this, [this]() {
+		m_loadToDeviceBtn->stopAnimation();
+		StatusBarManager::pushMessage("Profile loaded to device successfully", 3000);
+	});
+	connect(this, &ProfileGeneratorWidget::loadToDeviceFailed, this, [this](const QString &error) {
+		m_loadToDeviceBtn->stopAnimation();
+		StatusBarManager::pushMessage("Load failed: " + error, 5000);
+	});
+
+	qInfo(CAT_PROFILEGENERATORWIDGET) << "Signal connections established with worker thread communication";
 }
 
 void ProfileGeneratorWidget::onSampleRateChangedSynchronized(const QString &newSampleRate)
