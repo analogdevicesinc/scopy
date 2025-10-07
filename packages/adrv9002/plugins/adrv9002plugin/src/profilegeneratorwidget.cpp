@@ -74,8 +74,6 @@ DeviceConfigurationParser::parseProfileConfig(const QString &profileConfigText)
 {
 	ParsedDeviceConfig config;
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Parsing device profile configuration";
-
 	// Parse duplex mode - look for "Duplex Mode:" line
 	QString duplexMode = extractValueBetween(profileConfigText, "Duplex Mode:", "\n");
 	config.duplexMode = duplexMode.contains("TDD", Qt::CaseInsensitive) ? "TDD" : "FDD";
@@ -120,9 +118,6 @@ DeviceConfigurationParser::parseProfileConfig(const QString &profileConfigText)
 		config.txChannels[ch].orxEnabled =
 			extractValueBetween(profileConfigText, txPrefix + " ORx enabled:", "\n").contains("1");
 	}
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Parsed device config - Duplex:" << config.duplexMode
-					   << "SSI:" << config.ssiInterface << "Lanes:" << config.ssiLanes;
 
 	return config;
 }
@@ -396,12 +391,10 @@ void ProfileGeneratorWidget::loadPresetData(const QString &presetName)
 		applyLTEDefaults();
 	} else if(presetName == "Live Device") {
 		// Read current device configuration and populate UI
-		qDebug(CAT_PROFILEGENERATORWIDGET) << "Loading Live Device preset from device configuration";
 
 		if(isDeviceConfigurationAvailable()) {
 			if(readDeviceConfiguration()) {
 				populateUIFromDeviceConfig(m_deviceConfig);
-				qDebug(CAT_PROFILEGENERATORWIDGET) << "Live Device configuration loaded successfully";
 			} else {
 				qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to read device configuration";
 				StatusBarManager::pushMessage("Failed to read Live Device configuration", 5000);
@@ -548,8 +541,6 @@ void ProfileGeneratorWidget::onRefreshProfile()
 
 	resetPresetTracking();
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Refreshing profile from device (iio-oscilloscope style)";
-
 	if(!isDeviceConfigurationAvailable()) {
 		qDebug(CAT_PROFILEGENERATORWIDGET) << "Device configuration not available", 5000;
 		return;
@@ -563,7 +554,6 @@ void ProfileGeneratorWidget::onRefreshProfile()
 	QString currentPreset = m_presetCombo->currentText();
 	if(isLTEModeActive()) {
 		applyLTEConstraintsToDeviceData();
-		qDebug(CAT_PROFILEGENERATORWIDGET) << "Applied LTE constraints to device data";
 	}
 	refreshAllUIStates();
 
@@ -580,7 +570,7 @@ void ProfileGeneratorWidget::onSaveToFile()
 
 	// UI stuff stays on main thread (file dialog)
 	QString filter = "Profile files (*.json);;Stream files (*.stream)";
-	QString defaultName = QDir::homePath() + "/adrv9002_profile.json";
+	QString defaultName = QDir::home().filePath("adrv9002_profile.json");
 	QString fileName = QFileDialog::getSaveFileName(this, "Save File", defaultName, filter);
 
 	if(!fileName.isEmpty()) {
@@ -631,7 +621,6 @@ void ProfileGeneratorWidget::onDownloadCLI()
 }
 
 void ProfileGeneratorWidget::refreshProfileData() { onRefreshProfile(); }
-
 
 // Worker functions for threaded operations
 void ProfileGeneratorWidget::doSaveProfileWork(const QString &fileName, const RadioConfig &config)
@@ -717,9 +706,6 @@ void ProfileGeneratorWidget::updateSampleRateOptionsForSSI()
 	// Get available sample rates for current SSI lanes configuration
 	QStringList availableRates = FrequencyTable::getSampleRatesForSSILanes(m_radioConfig.ssi_lanes);
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Updating sample rate options for SSI lanes:" << m_radioConfig.ssi_lanes
-					   << "Available rates:" << availableRates.size();
-
 	// Block signals to prevent cascade updates
 	m_updatingFromPreset = true;
 
@@ -742,8 +728,6 @@ void ProfileGeneratorWidget::updateSampleRateOptionsForSSI()
 	}
 
 	m_updatingFromPreset = false;
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate options update complete";
 }
 
 QString ProfileGeneratorWidget::calculateBandwidthForSampleRate(const QString &sampleRate) const
@@ -755,7 +739,6 @@ QString ProfileGeneratorWidget::calculateBandwidthForSampleRate(const QString &s
 
 void ProfileGeneratorWidget::applyLTEDefaults()
 {
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Applying LTE defaults from lte_defaults() function";
 
 	m_updatingFromPreset = true;
 
@@ -816,7 +799,6 @@ void ProfileGeneratorWidget::validateChannelConfiguration()
 	}
 
 	// Basic channel dependency validation for LTE mode
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Validating channel configuration for LTE mode";
 }
 
 bool ProfileGeneratorWidget::isOrxAvailable(int orxIndex)
@@ -856,13 +838,10 @@ void ProfileGeneratorWidget::updateAllDependentControls()
 void ProfileGeneratorWidget::refreshAllUIStates()
 {
 	// Match iio-oscilloscope's profile_gen_preset_update() logic
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Performing complete UI state refresh";
 
 	// Use extracted coordination method
 	updateAllDependentControls();
 	updateProfileData();
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Completed full UI state refresh";
 }
 
 bool ProfileGeneratorWidget::getTddModeEnabled()
@@ -960,8 +939,6 @@ void ProfileGeneratorWidget::onSampleRateChangedSynchronized(const QString &newS
 		return;
 	}
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Synchronizing sample rate:" << newSampleRate;
-
 	// Block signals to prevent recursive calls during bulk update
 	m_updatingFromPreset = true;
 
@@ -986,8 +963,6 @@ void ProfileGeneratorWidget::onSampleRateChangedSynchronized(const QString &newS
 
 	// Update profile data after all changes complete
 	updateProfileData();
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Sample rate synchronization complete";
 }
 
 bool ProfileGeneratorWidget::readDeviceConfiguration()
@@ -998,11 +973,8 @@ bool ProfileGeneratorWidget::readDeviceConfiguration()
 		return false;
 	}
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Read profile_config from device, length:" << profileConfigText.length();
-
 	try {
 		m_deviceConfig = DeviceConfigurationParser::parseProfileConfig(profileConfigText);
-		qDebug(CAT_PROFILEGENERATORWIDGET) << "Successfully parsed device configuration";
 		return true;
 	} catch(const std::exception &e) {
 		qWarning(CAT_PROFILEGENERATORWIDGET) << "Failed to parse device configuration:" << e.what();
@@ -1012,7 +984,6 @@ bool ProfileGeneratorWidget::readDeviceConfiguration()
 
 void ProfileGeneratorWidget::populateUIFromDeviceConfig(const DeviceConfigurationParser::ParsedDeviceConfig &config)
 {
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Populating UI from device configuration";
 
 	// Block signals during bulk update to prevent cascading updates
 	m_updatingFromPreset = true;
@@ -1057,8 +1028,6 @@ void ProfileGeneratorWidget::populateUIFromDeviceConfig(const DeviceConfiguratio
 	// Trigger UI state updates after populating data
 	updateOrxControls();
 	updateProfileData();
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "UI population from device config completed";
 }
 
 bool ProfileGeneratorWidget::isDeviceConfigurationAvailable()
@@ -1067,7 +1036,6 @@ bool ProfileGeneratorWidget::isDeviceConfigurationAvailable()
 	QString profileConfig = readDeviceAttribute("profile_config");
 	bool available = !profileConfig.isEmpty();
 
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Device configuration available:" << available;
 	return available;
 }
 
@@ -1078,13 +1046,11 @@ void ProfileGeneratorWidget::resetPresetTracking()
 	m_updatingFromPreset = false;
 	// Clear any cached device config
 	m_deviceConfig = DeviceConfigurationParser::ParsedDeviceConfig();
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Reset preset tracking and internal state";
 }
 
 void ProfileGeneratorWidget::forceUpdateAllUIControls()
 {
 	// Force update ALL UI controls without preserving any state (like iio-oscilloscope)
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Forcing complete UI update from device configuration";
 
 	m_updatingFromPreset = true;
 
@@ -1127,8 +1093,6 @@ void ProfileGeneratorWidget::forceUpdateAllUIControls()
 	// ORX enabled states are also user-controlled and should not be changed by refresh
 
 	m_updatingFromPreset = false;
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Complete UI force update finished";
 }
 
 bool ProfileGeneratorWidget::readAndApplyDeviceConfiguration()
@@ -1150,7 +1114,6 @@ void ProfileGeneratorWidget::applyLTEConstraintsToDeviceData()
 	// - Force bandwidth read-only mode
 	// - Apply sample rate restrictions for SSI lanes
 	// - Maintain LTE UI control visibility
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "Applying LTE constraints to device data";
 
 	for(int i = 0; i < 4; ++i) {
 		m_channelWidgets[i]->updateControlsVisibility(true); // LTE mode - bandwidth read-only
@@ -1158,8 +1121,6 @@ void ProfileGeneratorWidget::applyLTEConstraintsToDeviceData()
 
 	// Apply sample rate restrictions for current SSI configuration
 	updateSampleRateOptionsForSSI();
-
-	qDebug(CAT_PROFILEGENERATORWIDGET) << "LTE constraints applied";
 }
 
 void ProfileGeneratorWidget::updateChannelUIControls(int channelIndex, const ChannelConfigWidget::ChannelData &data)

@@ -114,8 +114,8 @@ ProfileCliManager::OperationResult ProfileCliManager::saveProfileToFile(const QS
 	}
 
 	// Create temporary config file
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
+	QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+	QString configFile = tempDir.filePath("adrv9002_config.json");
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
@@ -150,8 +150,8 @@ ProfileCliManager::OperationResult ProfileCliManager::saveStreamToFile(const QSt
 	}
 
 	// Create temporary config file
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
+	QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+	QString configFile = tempDir.filePath("adrv9002_config.json");
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
@@ -185,10 +185,10 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	}
 
 	// Create temporary files (following iio-oscilloscope pattern exactly)
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
-	QString profileFile = tempDir + "/adrv9002_profile.json";
-	QString streamFile = tempDir + "/adrv9002_stream.json";
+	QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+	QString configFile = tempDir.filePath("adrv9002_config.json");
+	QString profileFile = tempDir.filePath("adrv9002_profile.json");
+	QString streamFile = tempDir.filePath("adrv9002_stream.json");
 
 	QStringList tempFiles = {configFile, profileFile, streamFile};
 
@@ -344,7 +344,6 @@ bool ProfileCliManager::writeConfigToTempFile(const QString &filename, const Rad
 	file.write(jsonConfig.toUtf8());
 	file.close();
 
-	qDebug(CAT_PROFILECLIMANAGER) << "Config written to:" << filename;
 	return true;
 }
 
@@ -368,7 +367,6 @@ bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output
 		return false;
 	}
 
-	qDebug(CAT_PROFILECLIMANAGER) << "CLI command executed successfully";
 	return true;
 }
 
@@ -384,7 +382,6 @@ QByteArray ProfileCliManager::readFileContents(const QString &filename)
 	QByteArray data = file.readAll();
 	file.close();
 
-	qDebug(CAT_PROFILECLIMANAGER) << "Read" << data.size() << "bytes from:" << filename;
 	return data;
 }
 
@@ -398,8 +395,6 @@ bool ProfileCliManager::writeDeviceAttribute(const QString &attribute, const QBy
 	int ret = iio_device_attr_write_raw(m_device, attribute.toLocal8Bit().data(), data.constData(), data.size());
 
 	if(ret > 0) {
-		qDebug(CAT_PROFILECLIMANAGER)
-			<< "Successfully wrote" << data.size() << "bytes to attribute:" << attribute;
 		return true;
 	} else {
 		qWarning(CAT_PROFILECLIMANAGER)
@@ -413,7 +408,6 @@ void ProfileCliManager::cleanupTempFiles(const QStringList &files)
 	for(const QString &file : files) {
 		if(QFile::exists(file)) {
 			QFile::remove(file);
-			qDebug(CAT_PROFILECLIMANAGER) << "Cleaned up temp file:" << file;
 		}
 	}
 }

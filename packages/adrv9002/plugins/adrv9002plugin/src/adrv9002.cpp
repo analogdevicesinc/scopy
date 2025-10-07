@@ -714,7 +714,7 @@ IIOWidget *Adrv9002::createCheckboxWidget(iio_channel *ch, const QString &attr, 
 
 QLabel *Adrv9002::createReadOnlyLabel(iio_channel *ch, const QString &attr, double divisor, const QString &title)
 {
-	QLabel *label = new QLabel(title + ": N/A");
+	QLabel *label = new QLabel(QString("%1: N/A").arg(title));
 
 	if(!ch) {
 		return label;
@@ -735,17 +735,17 @@ QLabel *Adrv9002::createReadOnlyLabel(iio_channel *ch, const QString &attr, doub
 
 			// Format based on the magnitude - temperature typically 4 decimal places
 			if(title.contains("Temperature", Qt::CaseInsensitive)) {
-				label->setText(title + ": " + QString::number(displayValue, 'f', 4));
+				label->setText(QString("%1: %2").arg(title).arg(displayValue, 0, 'f', 4));
 			} else if(divisor == 1000000.0) { // MHz values
-				label->setText(title + ": " + QString::number(displayValue, 'f', 3));
+				label->setText(QString("%1: %2").arg(title).arg(displayValue, 0, 'f', 3));
 			} else {
-				label->setText(title + ": " + QString::number(displayValue, 'f', 2));
+				label->setText(QString("%1: %2").arg(title).arg(displayValue, 0, 'f', 2));
 			}
 		} else {
-			label->setText(title + ": " + QString(value)); // Show as-is if not numeric
+			label->setText(QString("%1: %2").arg(title, value)); // Show as-is if not numeric
 		}
 	} else {
-		label->setText(title + ": Error");
+		label->setText(QString("%1: Error").arg(title));
 	}
 
 	// Connect to refresh signal for periodic updates
@@ -762,17 +762,17 @@ QLabel *Adrv9002::createReadOnlyLabel(iio_channel *ch, const QString &attr, doub
 				double displayValue = numValue / divisor;
 
 				if(title.contains("Temperature", Qt::CaseInsensitive)) {
-					label->setText(title + ": " + QString::number(displayValue, 'f', 4));
+					label->setText(QString("%1: %2").arg(title).arg(displayValue, 0, 'f', 4));
 				} else if(divisor == 1000000.0) {
-					label->setText(title + ": " + QString::number(displayValue, 'f', 3));
+					label->setText(QString("%1: %2").arg(title).arg(displayValue, 0, 'f', 3));
 				} else {
-					label->setText(title + ": " + QString::number(displayValue, 'f', 2));
+					label->setText(QString("%1: %2").arg(title).arg(displayValue, 0, 'f', 2));
 				}
 			} else {
-				label->setText(title + ": " + QString(value));
+				label->setText(QString("%1: %2").arg(title, value));
 			}
 		} else {
-			label->setText(title + ": Error");
+			label->setText(QString("%1: Error").arg(title));
 		}
 	});
 
