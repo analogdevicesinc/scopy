@@ -23,6 +23,7 @@
 
 #include <QString>
 #include <QStringList>
+#include "profilegeneratortypes.h"
 
 namespace scopy::adrv9002 {
 
@@ -76,6 +77,15 @@ class IOOOptions
 public:
 	static const QStringList SSI_INTERFACE_OPTIONS;
 	static const QStringList DUPLEX_MODE_OPTIONS;
+};
+
+class ProfileGeneratorConstants
+{
+public:
+	// Create complete lte_defaults configuration template
+	static RadioConfig lteDefaults();
+	// Create complete lte_lvs_3072_MHz_10 configuration template
+	static RadioConfig lte_lvs3072MHz10();
 };
 
 } // namespace scopy::adrv9002

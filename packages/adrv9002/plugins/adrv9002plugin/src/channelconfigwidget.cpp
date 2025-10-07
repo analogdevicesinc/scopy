@@ -97,7 +97,7 @@ void ChannelConfigWidget::setupUI()
 	m_layout->addWidget(new QLabel("Interface Sample Rate (Hz):"), 4, 0);
 	m_sampleRateCombo = new QComboBox();
 	m_sampleRateCombo->setEnabled(true);
-	m_sampleRateCombo->addItems(FrequencyTable::SAMPLE_RATES_HZ);
+	// m_sampleRateCombo->addItems(FrequencyTable::SAMPLE_RATES_HZ);
 	m_layout->addWidget(m_sampleRateCombo, 4, 1);
 
 	// RX RF Input (only for RX channels) - using descriptive names
@@ -107,8 +107,6 @@ void ChannelConfigWidget::setupUI()
 		m_rfInputCombo->addItems(m_rfInputOptions);
 		m_layout->addWidget(m_rfInputCombo, 5, 1);
 	}
-
-	updateControlsVisibility(m_isLTEMode);
 }
 
 void ChannelConfigWidget::connectSignals()
@@ -129,29 +127,27 @@ void ChannelConfigWidget::setChannelData(const ChannelData &data)
 	m_updatingData = true;
 
 	m_enabledCb->setChecked(data.enabled);
-	m_freqOffsetCb->setChecked(data.freqOffsetCorrection);
-	m_bandwidthCombo->setCurrentText(data.bandwidth);
-	m_sampleRateCombo->setCurrentText(data.sampleRate);
+	m_freqOffsetCb->setChecked(data.freqOffsetCorrectionEnable);
+	m_bandwidthCombo->setCurrentText(QString::number(data.channelBandwidthHz));
+	m_sampleRateCombo->setCurrentText(QString::number(data.sampleRateHz));
 
 	if(m_rfInputCombo && m_mode == RX_MODE) {
-		m_rfInputCombo->setCurrentText(data.rfInput);
+		m_rfInputCombo->setCurrentIndex(data.rfPort);
 	}
 
 	m_updatingData = false;
-
-	updateControlsVisibility(m_isLTEMode);
 }
 
 ChannelConfigWidget::ChannelData ChannelConfigWidget::getChannelData() const
 {
 	ChannelData data;
 	data.enabled = m_enabledCb->isChecked();
-	data.freqOffsetCorrection = m_freqOffsetCb->isChecked();
-	data.bandwidth = m_bandwidthCombo->currentText();
-	data.sampleRate = m_sampleRateCombo->currentText();
+	data.freqOffsetCorrectionEnable = m_freqOffsetCb->isChecked();
+	data.channelBandwidthHz = m_bandwidthCombo->currentText().toUInt();
+	data.sampleRateHz = m_sampleRateCombo->currentText().toUInt();
 
 	if(m_rfInputCombo && m_mode == RX_MODE) {
-		data.rfInput = m_rfInputCombo->currentText();
+		data.rfPort = m_rfInputCombo->currentIndex();
 	}
 
 	return data;
@@ -170,14 +166,19 @@ void ChannelConfigWidget::updateControlsVisibility(bool lteMode)
 		m_sampleRateCombo->setEditable(false);
 		m_sampleRateCombo->setEnabled(channelEnabled);
 
+		// this is a woraround caused by how Qt treats enable / disable editable logic for QCombobox
+		m_sampleRateCombo->clear();
+		m_sampleRateCombo->addItems(FrequencyTable::SAMPLE_RATES_HZ);
+
 	} else {
 		// Live Device Mode: Both sample rate and bandwidth can be edited
 		m_bandwidthCombo->setEnabled(channelEnabled);
 
 		m_sampleRateCombo->setEditable(true);
-		// this is a woraround caused by how Qt treats enable / disable logic for QCombobox
-		Style::setBackgroundColor(m_sampleRateCombo, json::theme::background_primary);
 		m_sampleRateCombo->setEnabled(channelEnabled);
+
+		// this is a woraround caused by how Qt treats enable / disable editable logic for QCombobox
+		Style::setBackgroundColor(m_sampleRateCombo, json::theme::background_primary);
 	}
 
 	// These always follow channel state regardless of mode

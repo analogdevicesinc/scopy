@@ -34,29 +34,105 @@ enum ChannelType
 	CHANNEL_TX2
 };
 
-struct ChannelConfig
+struct RxChannelConfig
 {
+	//  Enable channel
 	bool enabled;
-	bool freqOffsetCorrection;
-	QString bandwidth;
-	QString sampleRate;
-	QString rfInput; // For RX only
+	// Enable high performance ADC, otherwise use low-power ADC
+	bool adcHighPerformanceMode;
+	// Enable ADC frequency offset correction
+	bool freqOffsetCorrectionEnable;
+	// Power mode of front-end analog filter Options are:
+	// 	0 - Low power
+	// 	1 - Medium power
+	// 	2 - High power
+	uint8_t analogFilterPowerMode;
+	// Use second order (Biquad) analog filter, otherwise first order TIA is used
+	bool analogFilterBiquad;
+	// Front-end analog filter 1dB (Biquad) or 3 dB (TIA) bandwidth in Hz
+	uint32_t analogFilterBandwidthHz;
+	// Channel bandwidth of interest at ADC in Hz
+	uint32_t channelBandwidthHz;
+	// RX channel sample rate at digital interface
+	uint32_t sampleRateHz;
+	// Enable NCO to perform frequency translation
+	bool ncoEnable;
+	// NCO frequency in Hz
+	int32_t ncoFrequencyHz;
+	// RF port source used for channel Options are:
+	//        0 - RX_A
+	//        1 - RX_B
+	uint8_t rfPort;
 };
 
-struct OrxConfig
+struct TxChannelConfig
 {
+	// Enable channel
 	bool enabled;
+	// Data rate at digital interface in Hz
+	uint32_t sampleRateHz;
+	// Enable DAC frequency offset correction
+	bool freqOffsetCorrectionEnable;
+	// Power mode of front-end analog filter Options are:
+	// 	0 - Low power
+	// 	1 - Medium power
+	// 	2 - High power
+	uint8_t analogFilterPowerMode;
+	// Channel bandwidth of interest at DAC in Hz
+	uint32_t channelBandwidthHz;
+	// Enable observation path
+	bool orxEnabled;
+	// Set external loopback mode. Options are:
+	//        0 - Disabled
+	//        1 - Before PA
+	//        2 - After PA
+	uint8_t elbType;
+};
+
+struct ClockConfig
+{
+	// Template-based parameters (from iio-oscilloscope clock_config)
+	uint32_t deviceClockFrequencyKhz;
+	bool deviceClockOutputEnable;
+	uint8_t deviceClockOutputDivider;
+	//  Enable high performance PLL mode, otherwise low-power mode is used
+	bool clockPllHighPerformanceEnable;
+	//  PLL power mode. Options:
+	//    0 = low power
+	//    1 = medium performance
+	//    2 = high performance
+	uint8_t clockPllPowerMode;
+	// Processor clock divider. Valid values are 1, 2, 4, 8, 16, 32, 64, 128, 256
+	uint8_t processorClockDivider;
 };
 
 struct RadioConfig
 {
-	bool fdd;	   // Duplex mode (false=TDD, true=FDD)
-	bool lvds;	   // SSI interface (true=LVDS, false=CMOS)
+	// SSI lanes to use Valid cases:
+	//          1 (CMOS/LVDS)
+	//          2 (LVDS)
+	//          4 (CMOS)
 	uint8_t ssi_lanes; // 1, 2, or 4 lanes
+	// Use DDR mode at digital interface, false will use SDR
+	bool ddr;
+	// Use short strobe mode at digital interface, false will use long strobe
+	bool shortStrobe;
+	// Use LVDS mode at digital interface, false will use CMOS
+	bool lvds;
+	// ADC clock rate mode select. Options are:
+	// 	1 = LOW
+	// 	2 = MEDIUM
+	// 	3 = HIGH
+	uint8_t adcRateMode;
+	//  Use FDD duplex mode, false will use TDD
+	bool fdd;
 
-	ChannelConfig rx_config[2]; // RX1, RX2
-	ChannelConfig tx_config[2]; // TX1, TX2
-	bool orx_enabled[2];	    // ORX1, ORX2
+	// Channel configurations
+	RxChannelConfig rx_config[2]; // RX1, RX2
+	TxChannelConfig tx_config[2]; // TX1, TX2
+
+	// Clock configuration
+	ClockConfig clk_config;
 };
 
 } // namespace scopy::adrv9002

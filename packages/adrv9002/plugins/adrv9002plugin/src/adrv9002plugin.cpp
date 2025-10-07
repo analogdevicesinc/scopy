@@ -133,7 +133,7 @@ bool Adrv9002Plugin::onConnect()
 	Adrv9002 *adrv9002 = new Adrv9002(conn->context());
 	m_toolList[0]->setTool(adrv9002);
 	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setRunBtnVisible(true);
+	m_toolList[0]->setRunBtnVisible(false);
 	return true;
 }
 

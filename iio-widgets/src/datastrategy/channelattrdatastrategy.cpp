@@ -106,7 +106,6 @@ QPair<QString, QString> ChannelAttrDataStrategy::read()
 	}
 
 	// the members that contain data need to be refreshed before the signals are emitted
-	QString oldData = m_data;
 	m_data = currentValue;
 	m_optionalData = options;
 
