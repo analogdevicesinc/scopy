@@ -83,8 +83,9 @@ private:
 				     const QString &title);
 	IIOWidget *createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title);
 	IIOWidget *createCheckboxWidget(iio_channel *ch, const QString &attr, const QString &label);
-	QLabel *createReadOnlyLabel(iio_channel *ch, const QString &attr, double divisor = 1.0,
-				    const QString &title = QString());
+
+	IIOWidget *createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
+	IIOWidget *createContinuousReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
 
 	// Standard Scopy tool components
 	iio_context *m_ctx = nullptr;

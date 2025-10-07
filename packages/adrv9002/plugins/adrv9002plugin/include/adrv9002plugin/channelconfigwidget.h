@@ -48,10 +48,10 @@ public:
 	struct ChannelData
 	{
 		bool enabled = true;
-		bool freqOffsetCorrection = false;
-		QString bandwidth = "38000000";
-		QString sampleRate = "61440000";
-		QString rfInput = "Rx1A"; // Only used for RX channels
+		bool freqOffsetCorrectionEnable = false;
+		uint32_t channelBandwidthHz = 38000000;
+		uint32_t sampleRateHz = 61440000;
+		uint8_t rfPort = 0; // Only used for RX channels
 	};
 
 	explicit ChannelConfigWidget(const QString &title, ChannelMode mode, const QStringList &rfInputOptions = {},

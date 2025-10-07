@@ -20,6 +20,8 @@
 
 #include <profilegeneratorconstants.h>
 
+#include <profilegeneratortypes.h>
+
 using namespace scopy::adrv9002;
 
 // Frequency table from iio-oscilloscope (exact Hz values)
@@ -76,4 +78,102 @@ QStringList FrequencyTable::getSampleRatesForSSILanes(int ssiLanes)
 		return QStringList() << SAMPLE_RATES_HZ.first(); // Only first option for 4 lanes (CMOS)
 	}
 	return SAMPLE_RATES_HZ; // Default to all options
+}
+
+RadioConfig ProfileGeneratorConstants::lteDefaults()
+{
+	RadioConfig config;
+
+	// TX Channel configurations
+	for(int i = 0; i < 2; i++) {
+		config.tx_config[i].enabled = true;
+		config.tx_config[i].sampleRateHz = 61440000;
+		config.tx_config[i].freqOffsetCorrectionEnable = false;
+		config.tx_config[i].analogFilterPowerMode = 2; // High power
+		config.tx_config[i].channelBandwidthHz = 38000000;
+		config.tx_config[i].elbType = 0;
+		config.tx_config[i].orxEnabled = false;
+	}
+
+	// RX Channel configurations
+	for(int i = 0; i < 2; i++) {
+		config.rx_config[i].enabled = true;
+		config.rx_config[i].sampleRateHz = 61440000;
+		config.rx_config[i].freqOffsetCorrectionEnable = false;
+		config.rx_config[i].analogFilterPowerMode = 2; // High power
+		config.rx_config[i].channelBandwidthHz = 38000000;
+		config.rx_config[i].adcHighPerformanceMode = true;
+		config.rx_config[i].analogFilterBiquad = false;		// from default cfg
+		config.rx_config[i].analogFilterBandwidthHz = 18000000; // from default cfg
+		config.rx_config[i].ncoEnable = false;
+		config.rx_config[i].ncoFrequencyHz = 0;
+		config.rx_config[i].rfPort = 0; // RxA ports
+	}
+
+	// Radio configuration
+	config.ssi_lanes = 2;
+	config.ddr = true; // needs logic
+	config.shortStrobe = true;
+	config.lvds = true;
+	config.adcRateMode = 3; // HIGH
+	config.fdd = false;	// TDD mode
+
+	// Clock configuration
+	config.clk_config.deviceClockFrequencyKhz = 38400;
+	config.clk_config.deviceClockOutputEnable = true;
+	config.clk_config.deviceClockOutputDivider = 2;
+	config.clk_config.clockPllHighPerformanceEnable = false;
+	config.clk_config.clockPllPowerMode = 2; // High power
+	config.clk_config.processorClockDivider = 1;
+
+	return config;
+}
+
+RadioConfig ProfileGeneratorConstants::lte_lvs3072MHz10()
+{
+	RadioConfig config;
+
+	// TX Channel configurations
+	for(int i = 0; i < 2; i++) {
+		config.tx_config[i].enabled = true;
+		config.tx_config[i].sampleRateHz = 30720000;
+		config.tx_config[i].freqOffsetCorrectionEnable = false;
+		config.tx_config[i].analogFilterPowerMode = 2; // High power
+		config.tx_config[i].channelBandwidthHz = 18000000;
+		config.tx_config[i].elbType = 2;
+		config.tx_config[i].orxEnabled = true;
+	}
+
+	// RX Channel configurations
+	for(int i = 0; i < 2; i++) {
+		config.rx_config[i].enabled = true;
+		config.rx_config[i].sampleRateHz = 30720000;
+		config.rx_config[i].freqOffsetCorrectionEnable = false;
+		config.rx_config[i].analogFilterPowerMode = 2; // High power
+		config.rx_config[i].channelBandwidthHz = 18000000;
+		config.rx_config[i].adcHighPerformanceMode = true;
+		config.rx_config[i].analogFilterBiquad = false;	 // from default cfg
+		config.rx_config[i].analogFilterBandwidthHz = 0; // TODO: not used?
+		config.rx_config[i].ncoEnable = false;
+		config.rx_config[i].ncoFrequencyHz = 0;
+		config.rx_config[i].rfPort = 0; // RxA ports
+	}
+
+	// Radio configuration
+	config.ssi_lanes = 2;
+	config.ddr = true; // needs logic
+	config.shortStrobe = true;
+	config.lvds = true;
+	config.adcRateMode = 3; // HIGH
+	config.fdd = false;	// TDD mode
+
+	// Clock configuration
+	config.clk_config.deviceClockFrequencyKhz = 38400;
+	config.clk_config.deviceClockOutputEnable = false;
+	config.clk_config.deviceClockOutputDivider = 0; // TODO: not used?
+	config.clk_config.clockPllHighPerformanceEnable = true;
+	config.clk_config.clockPllPowerMode = 2; // High power
+	config.clk_config.processorClockDivider = 1;
+
+	return config;
 }
