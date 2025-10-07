@@ -65,15 +65,29 @@ namespace scopy::adrv9002 {
 // Device Configuration Parser (Phase 1 addition)
 class DeviceConfigurationParser
 {
+
 public:
 	struct ParsedChannelData
 	{
+		//  Enable channel
 		bool enabled;
-		QString bandwidth;
-		QString sampleRate;
-		bool freqOffsetCorrection;
-		QString rfPort;	 // RX only
+		uint32_t analogFilterBandwidthHz;
+		// Channel bandwidth of interest at ADC in Hz
+		uint32_t channelBandwidthHz;
+		// RX channel sample rate at digital interface
+		uint32_t sampleRateHz;
+		// Enable ADC frequency offset correction
+		bool freqOffsetCorrectionEnable;
+		// RF port source used for channel Options are:
+		//        0 - RX_A
+		//        1 - RX_B
+		uint8_t rfPort; // RX only
+		// Enable observation path
 		bool orxEnabled; // TX only
+
+		// Data source tracking (NEW)
+		bool hasChannelData; // indicates if IIO channel attributes were read
+		QString dataSource;  // "profile_config", "iio_attributes", or "unavailable"
 	};
 
 	struct ParsedDeviceConfig
@@ -86,11 +100,11 @@ public:
 		ParsedChannelData txChannels[2];
 
 		// Clock config
-		QString deviceClock;
-		QString clockDivider;
+		uint32_t deviceClock;
+		uint32_t clockDivider;
 	};
 
-	static ParsedDeviceConfig parseProfileConfig(const QString &profileConfigText);
+	static ParsedDeviceConfig parseProfileConfig(iio_device *dev, const QString &profileConfigText);
 	static QString extractValueBetween(const QString &text, const QString &begin, const QString &end);
 	static QString mapRfPortFromDevice(const QString &devicePort, int channel);
 };
@@ -118,7 +132,7 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void onPresetChanged();
 	void onRefreshProfile();
-	void onSaveToFile();
+	void onSaveToFile(bool isStreamFile);
 	void onLoadToDevice();
 	void updateProfileData();
 	void onDownloadCLI();
@@ -141,10 +155,15 @@ private:
 	void loadPresetData(const QString &presetName);
 	void updateDebugInfo();
 	void updateConfigFromUI();
+	int getConfigFromCurrent(RadioConfig &config);
+	int getConfigFromDefault(RadioConfig &config);
+	int getConfigFromDevice(RadioConfig &config);
+	void populateConfigFromUI(RadioConfig &config);
+	void populateConfigFromDeviceData(RadioConfig &config,
+					  const DeviceConfigurationParser::ParsedDeviceConfig &deviceConfig);
 
 	// Preset Management
 	void applyLTEDefaults();
-	void applyLTEPresetLogic();
 	bool isLTEModeActive() const;
 	bool isLiveDeviceModeActive() const;
 
@@ -161,10 +180,6 @@ private:
 	void updateOrxControls();
 	bool getTddModeEnabled();
 	bool isOrxAvailable(int orxIndex);
-
-	// Validation helpers
-	void validateChannelConfiguration();
-	void updateAllDependentControls();
 
 	// Phase 2: Complete UI Refresh System
 	void refreshAllUIStates();
@@ -187,11 +202,12 @@ private:
 
 	// Device Communication
 	QString readDeviceAttribute(const QString &attributeName);
+	QString getDeviceDriverVersion();
 
 	// Phase 1: Device Configuration Reading
 	bool readDeviceConfiguration();
+	iio_channel *findIIOChannel(const QString &channelName, bool isOutput);
 	void populateUIFromDeviceConfig(const DeviceConfigurationParser::ParsedDeviceConfig &config);
-	bool isDeviceConfigurationAvailable();
 	void resetPresetTracking();
 	void forceUpdateAllUIControls();
 	bool readAndApplyDeviceConfiguration();
@@ -216,7 +232,8 @@ private:
 	// Action Bar Components
 	QComboBox *m_presetCombo;
 	QPushButton *m_refreshProfileBtn;
-	AnimatedLoadingButton *m_saveToFileBtn;
+	AnimatedLoadingButton *m_saveStreamToFileBtn;
+	AnimatedLoadingButton *m_saveProfileToFileBtn;
 	AnimatedLoadingButton *m_loadToDeviceBtn;
 
 	// Radio Config Components
