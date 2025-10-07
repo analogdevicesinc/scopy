@@ -70,7 +70,6 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void onProfileFileChanged();
-	void doOnProfileFileChangedInThread();
 	void onStreamFileChanged();
 	void updateStatus();
 

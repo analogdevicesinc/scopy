@@ -87,6 +87,7 @@ void InitialCalibrationsWidget::setupUI()
 				.optionsValues("off auto") // Custom options - space separated string
 				.title("")		   // No title as we have a separate label
 				.uiStrategy(IIOWidgetBuilder::ComboUi)
+				.compactMode(true)
 				.infoMessage("off: Initial calibrations won't run automatically.\n"
 					     "auto: Initial calibrations will run automatically for "
 					     "Carrier changes bigger or equal to 100MHz.\n\n"

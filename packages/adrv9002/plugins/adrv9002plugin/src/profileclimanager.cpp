@@ -28,6 +28,9 @@ using namespace scopy::adrv9002;
 const QString ProfileCliManager::CLI_NAME = "adrv9002-iio-cli";
 const int ProfileCliManager::CLI_TIMEOUT_MS = 30000; // 30 seconds
 
+// Helper function for boolean to numeric conversion (matching iio-oscilloscope cJSON_AddNumberToObject)
+static int boolToInt(bool value) { return value ? 1 : 0; }
+
 ProfileCliManager::ProfileCliManager(iio_device *device, QObject *parent)
 	: QObject(parent)
 	, m_device(device)
@@ -114,8 +117,8 @@ ProfileCliManager::OperationResult ProfileCliManager::saveProfileToFile(const QS
 	}
 
 	// Create temporary config file
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
+	QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+	QString configFile = tempDir.filePath("adrv9002_config.json");
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
@@ -150,8 +153,8 @@ ProfileCliManager::OperationResult ProfileCliManager::saveStreamToFile(const QSt
 	}
 
 	// Create temporary config file
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
+	QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+	QString configFile = tempDir.filePath("adrv9002_config.json");
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
@@ -185,10 +188,10 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	}
 
 	// Create temporary files (following iio-oscilloscope pattern exactly)
-	QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-	QString configFile = tempDir + "/adrv9002_config.json";
-	QString profileFile = tempDir + "/adrv9002_profile.json";
-	QString streamFile = tempDir + "/adrv9002_stream.json";
+	QDir tempDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+	QString configFile = tempDir.filePath("adrv9002_config.json");
+	QString profileFile = tempDir.filePath("adrv9002_profile.json");
+	QString streamFile = tempDir.filePath("adrv9002_stream.json");
 
 	QStringList tempFiles = {configFile, profileFile, streamFile};
 
@@ -240,6 +243,8 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	}
 
 	// Write stream to device
+	// int ret = iio_device_attr_write_raw(m_device, "profile_config", streamData, sizeof(streamData));
+
 	if(!writeDeviceAttribute("stream_config", streamData)) {
 		Q_EMIT operationError("Failed to write stream image to device");
 		cleanupTempFiles(tempFiles);
@@ -261,54 +266,46 @@ QString ProfileCliManager::createConfigJson(const RadioConfig &config)
 {
 	QJsonObject configJson;
 
-	// Radio configuration (matching iio-oscilloscope format)
+	// Radio configuration - USE NUMERIC VALUES LIKE IOO (matching cJSON_AddNumberToObject)
 	QJsonObject radioCfg;
 	radioCfg["ssi_lanes"] = static_cast<int>(config.ssi_lanes);
-	radioCfg["ddr"] = 1; // Always enabled
-	radioCfg["short_strobe"] = true;
-	radioCfg["lvds"] = config.lvds;
-	radioCfg["adc_rate_mode"] = 3; // High performance
-	radioCfg["fdd"] = config.fdd;
+	radioCfg["ddr"] = boolToInt(config.ddr);		  // 1/0 not true/false
+	radioCfg["short_strobe"] = boolToInt(config.shortStrobe); // 1/0 not true/false
+	radioCfg["lvds"] = boolToInt(config.lvds);		  // 1/0 not true/false
+	radioCfg["adc_rate_mode"] = config.adcRateMode;
+	radioCfg["fdd"] = boolToInt(config.fdd); // 1/0 not true/false
 
-	// RX configuration array
+	// RX configuration array - ALL BOOLEAN VALUES AS NUMERIC (matching iio-oscilloscope)
 	QJsonArray rxConfigArray;
 	for(int i = 0; i < 2; i++) {
 		QJsonObject rxCh;
-		rxCh["enabled"] = config.rx_config[i].enabled;
-		rxCh["adc_high_performance_mode"] = true;
-		rxCh["frequency_offset_correction_enable"] = config.rx_config[i].freqOffsetCorrection;
-		rxCh["analog_filter_power_mode"] = 2; // High power
-		rxCh["analog_filter_biquad"] = false;
-		rxCh["analog_filter_bandwidth_hz"] = 0;
-		rxCh["channel_bandwidth_hz"] = config.rx_config[i].bandwidth.toInt();
-		rxCh["sample_rate_hz"] = config.rx_config[i].sampleRate.toInt();
-		rxCh["nco_enable"] = false;
-		rxCh["nco_frequency_hz"] = 0;
-
-		// Map RF input to port number
-		int rfPort = 0;
-		if(config.rx_config[i].rfInput == "Rx1A" || config.rx_config[i].rfInput == "Rx2A") {
-			rfPort = 0;
-		} else {
-			rfPort = 1;
-		}
-		rxCh["rf_port"] = rfPort;
+		rxCh["enabled"] = boolToInt(config.rx_config[i].enabled);
+		rxCh["adc_high_performance_mode"] = boolToInt(config.rx_config[i].adcHighPerformanceMode);
+		rxCh["frequency_offset_correction_enable"] = boolToInt(config.rx_config[i].freqOffsetCorrectionEnable);
+		rxCh["analog_filter_power_mode"] = config.rx_config[i].analogFilterPowerMode;
+		rxCh["analog_filter_biquad"] = boolToInt(config.rx_config[i].analogFilterBiquad);
+		rxCh["analog_filter_bandwidth_hz"] = static_cast<qint32>(config.rx_config[i].analogFilterBandwidthHz);
+		rxCh["channel_bandwidth_hz"] = static_cast<qint32>(config.rx_config[i].channelBandwidthHz);
+		rxCh["sample_rate_hz"] = static_cast<qint32>(config.rx_config[i].sampleRateHz);
+		rxCh["nco_enable"] = boolToInt(config.rx_config[i].ncoEnable);
+		rxCh["nco_frequency_hz"] = config.rx_config[i].ncoFrequencyHz;
+		rxCh["rf_port"] = config.rx_config[i].rfPort;
 
 		rxConfigArray.append(rxCh);
 	}
 	radioCfg["rx_config"] = rxConfigArray;
 
-	// TX configuration array
+	// TX configuration array - ALL BOOLEAN VALUES AS NUMERIC (matching iio-oscilloscope)
 	QJsonArray txConfigArray;
 	for(int i = 0; i < 2; i++) {
 		QJsonObject txCh;
-		txCh["enabled"] = config.tx_config[i].enabled;
-		txCh["sample_rate_hz"] = config.tx_config[i].sampleRate.toInt();
-		txCh["frequency_offset_correction_enable"] = config.tx_config[i].freqOffsetCorrection;
-		txCh["analog_filter_power_mode"] = 2; // High power
-		txCh["channel_bandwidth_hz"] = config.tx_config[i].bandwidth.toInt();
-		txCh["orx_enabled"] = config.orx_enabled[i];
-		txCh["elb_type"] = 2; // Default value
+		txCh["enabled"] = boolToInt(config.tx_config[i].enabled);
+		txCh["sample_rate_hz"] = static_cast<qint32>(config.tx_config[i].sampleRateHz);
+		txCh["frequency_offset_correction_enable"] = boolToInt(config.tx_config[i].freqOffsetCorrectionEnable);
+		txCh["analog_filter_power_mode"] = config.tx_config[i].analogFilterPowerMode;
+		txCh["channel_bandwidth_hz"] = static_cast<qint32>(config.tx_config[i].channelBandwidthHz);
+		txCh["orx_enabled"] = boolToInt(config.tx_config[i].orxEnabled);
+		txCh["elb_type"] = config.tx_config[i].elbType;
 
 		txConfigArray.append(txCh);
 	}
@@ -316,14 +313,14 @@ QString ProfileCliManager::createConfigJson(const RadioConfig &config)
 
 	configJson["radio_cfg"] = radioCfg;
 
-	// Clock configuration (matching iio-oscilloscope format)
+	// Clock configuration - ALL BOOLEAN VALUES AS NUMERIC (matching iio-oscilloscope)
 	QJsonObject clkCfg;
-	clkCfg["device_clock_frequency_khz"] = 38400;
-	clkCfg["device_clock_output_enable"] = 0; // Default disabled
-	clkCfg["device_clock_output_divider"] = 1;
-	clkCfg["clock_pll_high_performance_enable"] = true;
-	clkCfg["clock_pll_power_mode"] = 2; // High power
-	clkCfg["processor_clock_divider"] = 1;
+	clkCfg["device_clock_frequency_khz"] = static_cast<qint32>(config.clk_config.deviceClockFrequencyKhz);
+	clkCfg["device_clock_output_enable"] = boolToInt(config.clk_config.deviceClockOutputEnable);
+	clkCfg["device_clock_output_divider"] = config.clk_config.deviceClockOutputDivider;
+	clkCfg["clock_pll_high_performance_enable"] = boolToInt(config.clk_config.clockPllHighPerformanceEnable);
+	clkCfg["clock_pll_power_mode"] = config.clk_config.clockPllPowerMode;
+	clkCfg["processor_clock_divider"] = config.clk_config.processorClockDivider;
 
 	configJson["clk_cfg"] = clkCfg;
 
@@ -344,7 +341,6 @@ bool ProfileCliManager::writeConfigToTempFile(const QString &filename, const Rad
 	file.write(jsonConfig.toUtf8());
 	file.close();
 
-	qDebug(CAT_PROFILECLIMANAGER) << "Config written to:" << filename;
 	return true;
 }
 
@@ -368,7 +364,6 @@ bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output
 		return false;
 	}
 
-	qDebug(CAT_PROFILECLIMANAGER) << "CLI command executed successfully";
 	return true;
 }
 
@@ -384,7 +379,6 @@ QByteArray ProfileCliManager::readFileContents(const QString &filename)
 	QByteArray data = file.readAll();
 	file.close();
 
-	qDebug(CAT_PROFILECLIMANAGER) << "Read" << data.size() << "bytes from:" << filename;
 	return data;
 }
 
@@ -398,8 +392,6 @@ bool ProfileCliManager::writeDeviceAttribute(const QString &attribute, const QBy
 	int ret = iio_device_attr_write_raw(m_device, attribute.toLocal8Bit().data(), data.constData(), data.size());
 
 	if(ret > 0) {
-		qDebug(CAT_PROFILECLIMANAGER)
-			<< "Successfully wrote" << data.size() << "bytes to attribute:" << attribute;
 		return true;
 	} else {
 		qWarning(CAT_PROFILECLIMANAGER)
@@ -413,7 +405,6 @@ void ProfileCliManager::cleanupTempFiles(const QStringList &files)
 	for(const QString &file : files) {
 		if(QFile::exists(file)) {
 			QFile::remove(file);
-			qDebug(CAT_PROFILECLIMANAGER) << "Cleaned up temp file:" << file;
 		}
 	}
 }

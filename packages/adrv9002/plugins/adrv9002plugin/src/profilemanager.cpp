@@ -145,6 +145,10 @@ QWidget *ProfileManager::createDeviceInfoPanel()
 	layout->setContentsMargins(10, 10, 10, 10);
 	layout->setSpacing(5);
 
+	QLabel *title = new QLabel("Profile config attribute value: ", panel);
+	Style::setStyle(title, style::properties::label::menuSmall);
+	layout->addWidget(title);
+
 	// Device info text box - scrollable display showing profile_config
 	m_deviceInfoText = new QTextEdit();
 	m_deviceInfoText->setReadOnly(true);
@@ -178,7 +182,8 @@ void ProfileManager::updateDeviceInfo()
 {
 	QString profileConfig = getAttributeValue("profile_config");
 
-	if(profileConfig.startsWith("Error") || profileConfig.startsWith("Device not")) {
+	if(profileConfig.startsWith("error", Qt::CaseInsensitive) ||
+	   profileConfig.startsWith("Device not", Qt::CaseInsensitive)) {
 		m_deviceInfoText->setPlainText("Device information unavailable:\n" + profileConfig);
 	} else {
 		// Display the profile_config content directly (like iio-oscilloscope)

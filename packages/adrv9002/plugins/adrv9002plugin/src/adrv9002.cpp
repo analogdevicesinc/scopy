@@ -94,9 +94,8 @@ void Adrv9002::setupUi()
 	m_profileManager = new ProfileManager(m_iio_dev, this);
 
 	// Initialize initial calibrations widget (only if supported)
-	if(InitialCalibrationsWidget::isSupported(m_iio_dev)) {
-		m_initialCalibrationsWidget = new InitialCalibrationsWidget(m_iio_dev, this);
-	}
+	m_initialCalibrationsWidget = new InitialCalibrationsWidget(m_iio_dev, this);
+	m_initialCalibrationsWidget->setEnabled(InitialCalibrationsWidget::isSupported(m_iio_dev));
 
 	// Create tab system
 	m_tabCentralWidget = new QStackedWidget(this);
@@ -263,27 +262,16 @@ QString Adrv9002::getDeviceDriverVersion()
 {
 	// Try to get version from context or device attributes
 	if(m_ctx) {
-		// Check context attributes first
-		unsigned int nb_ctx_attrs = iio_context_get_attrs_count(m_ctx);
-		for(unsigned int i = 0; i < nb_ctx_attrs; i++) {
-			const char *key, *value;
-			if(iio_context_get_attr(m_ctx, i, &key, &value) == 0) {
-				QString keyStr(key);
-				if(keyStr.contains("kernel") || keyStr.contains("version")) {
-					QString versionStr(value);
-					// Extract version number (e.g., "4.19.0-g17f4223" -> "68.10.1" style)
-					if(versionStr.contains("-g")) {
-						// For demo purposes, return a version that matches iio-oscilloscope
-						// format
-						return "68.10.1";
-					}
-				}
-			}
+		char api_version[16];
+		auto ret = iio_device_debug_attr_read(m_iio_dev, "api_version", api_version, sizeof(api_version));
+		if(ret < 0) {
+			return "";
+		} else {
+			return QString(api_version);
 		}
 	}
 
-	// Fallback version
-	return "68.10.1";
+	return "";
 }
 
 MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent)
@@ -316,6 +304,7 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 						.buildSingle();
 
 		if(tempWidget) {
+			tempWidget->showProgressBar(false);
 			// Access the TemperatureGuiStrategy to set critical temperature
 			auto *tempStrategy = dynamic_cast<TemperatureGuiStrategy *>(tempWidget->getUiStrategy());
 			if(tempStrategy) {
@@ -430,66 +419,100 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 		return widget;
 	}
 
-	// Match exact iio-oscilloscope layout: 2 columns from original columns 2&4
-	int row = 1;
-
 	// Column 0 (Left) - from iio-oscilloscope column 2
-	layout->addWidget(createRangeWidget(rxCh, "hardwaregain", "[0 0.5 36]", "Hardware Gain (dB)"), row, 0);
+	layout->addWidget(createRangeWidget(rxCh, "hardwaregain", "[0 0.5 36]", "Hardware Gain (dB)"), 1, 0);
 	layout->addWidget(createComboWidget(rxCh, "gain_control_mode", "gain_control_mode_available", "Gain Control"),
-			  row + 1, 0);
-	layout->addWidget(createComboWidget(rxCh, "ensm_mode", "ensm_mode_available", "ENSM"), row + 2, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "en", "Powerdown"), row + 3, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "bbdc_rejection_en", "BBDC Rejection"), row + 4, 0);
-	layout->addWidget(createRangeWidget(rxCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), row + 5, 0);
-	layout->addWidget(createReadOnlyLabel(rxCh, "decimated_power", 1.0, "Decimated Power (dB)"), row + 6, 0);
-	layout->addWidget(createReadOnlyLabel(rxCh, "rf_bandwidth", 1000000, "Bandwidth (MHz)"), row + 7, 0);
+			  2, 0);
+	layout->addWidget(createComboWidget(rxCh, "ensm_mode", "ensm_mode_available", "ENSM"), 3, 0);
+	IIOWidget *rxEn = createCheckboxWidget(rxCh, "en", "Powerdown");
+	// logic needed to match functionality
+	rxEn->setDataToUIConversion([](QString data) {
+		if(data == "0") {
+			return "1";
+		}
+		return "0";
+	});
+	rxEn->setUItoDataConversion([](QString data) {
+		if(data == "0") {
+			return "1";
+		}
+		return "0";
+	});
+	layout->addWidget(rxEn, 4, 0);
+
+	layout->addWidget(createCheckboxWidget(rxCh, "bbdc_rejection_en", "BBDC Rejection"), 5, 0);
+
+	// Only create NCO widget if supported
+	double dummy;
+	int ret = iio_channel_attr_read_double(rxCh, "nco_frequency", &dummy);
+	if(ret == 0) {
+		layout->addWidget(createRangeWidget(rxCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), 6, 0);
+	}
+
+	layout->addWidget(createReadOnlyWidget(rxCh, "decimated_power", "Decimated Power (dB)"), 7, 0);
+	IIOWidget *rfBandwidth = createReadOnlyWidget(rxCh, "rf_bandwidth", "Bandwidth (MHz)");
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	layout->addWidget(rfBandwidth, 8, 0);
 
 	// Column 1 (Right) - from iio-oscilloscope column 4
 	layout->addWidget(createComboWidget(rxCh, "digital_gain_control_mode", "digital_gain_control_mode_available",
 					    "Digital Gain Control"),
-			  row, 1);
+			  1, 1);
 	layout->addWidget(createComboWidget(rxCh, "interface_gain", "interface_gain_available", "Interface Gain (dB)"),
-			  row + 1, 1);
-	layout->addWidget(createComboWidget(rxCh, "port_en_mode", "port_en_mode_available", "Port Enable"), row + 2, 1);
-	layout->addWidget(createCheckboxWidget(rxCh, "dynamic_adc_switch_en", "Dynamic Adc Switch"), row + 3, 1);
-	layout->addWidget(createRangeWidget(rxCh, "bbdc_loop_gain", "[-20 1 20]", "BBDC Loop Gain (dB)"), row + 4, 1);
+			  2, 1);
+	layout->addWidget(createComboWidget(rxCh, "port_en_mode", "port_en_mode_available", "Port Enable"), 3, 1);
+	layout->addWidget(createCheckboxWidget(rxCh, "dynamic_adc_switch_en", "Dynamic Adc Switch"), 4, 1);
+
+	//////   BBDC Loop Gain ////
+	static constexpr uint32_t BBDC_LOOP_GAIN_RES = 2147483648U; // 2^31
+	static const double bbdc_adjust_min = 1.0 / BBDC_LOOP_GAIN_RES;
+	static const double bbdc_adjust_max = 1.0 / BBDC_LOOP_GAIN_RES * UINT32_MAX;
+	QString bbdcRange = QString("[%1 0.0001 %2]").arg(bbdc_adjust_min, 0, 'f', 15).arg(bbdc_adjust_max, 0, 'f', 15);
+
+	IIOWidget *bbdcWidget = createRangeWidget(rxCh, "bbdc_loop_gain_raw", bbdcRange, "BBDC Loop Gain (dB)");
+	// Add conversion functions similar to iio-oscilloscope
+	bbdcWidget->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / BBDC_LOOP_GAIN_RES, 'f', 15); });
+	bbdcWidget->setUItoDataConversion(
+		[](QString data) { return QString::number(round(data.toDouble() * BBDC_LOOP_GAIN_RES), 'f', 0); });
+	layout->addWidget(bbdcWidget, 5, 1);
 
 	if(loCh) {
 		QString loAttr = QString("RX%1_LO_frequency").arg(channel + 1);
 		auto loWidget = createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)");
 
-		// Add MHz ↔ Hz conversion (device uses Hz, UI shows MHz)
-		loWidget->setDataToUIConversion([](QString data) {
-			// Device → UI: Hz to MHz (3200000000 → 3200)
-			return QString::number(data.toDouble() / 1e6, 'f', 0);
-		});
-		loWidget->setUItoDataConversion([](QString data) {
-			// UI → Device: MHz to Hz (3200 → 3200000000)
-			return QString::number(data.toDouble() * 1e6, 'f', 0);
-		});
+		// Add MHz ↔ Hz conversion
+		loWidget->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		loWidget->setUItoDataConversion(
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
 
-		layout->addWidget(loWidget, row + 5, 1);
+		layout->addWidget(loWidget, 6, 1);
 	}
 
-	layout->addWidget(createReadOnlyLabel(rxCh, "rssi", 1.0, "RSSI (dB)"), row + 6, 1);
-	layout->addWidget(createReadOnlyLabel(rxCh, "sampling_frequency", 1000000, "Sampling Rate (MSPS)"), row + 7, 1);
+	layout->addWidget(createContinuousReadOnlyWidget(rxCh, "rssi", "RSSI (dB)"), 7, 1);
 
-	// Tracking section at bottom spanning both columns (like iio-oscilloscope)
-	int trackingStartRow = row + 9;
+	IIOWidget *samplingFreq = createReadOnlyWidget(rxCh, "sampling_frequency", "Sampling Rate (MSPS)");
+	// Add MSPS ↔ SPS conversion
+	samplingFreq->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	samplingFreq->setUItoDataConversion(
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	layout->addWidget(samplingFreq, 8, 1);
+
+	// Tracking section at bottom spanning both columns
 	QLabel *trackingLabel = new QLabel("Tracking:");
 	Style::setStyle(trackingLabel, style::properties::label::menuBig);
-	layout->addWidget(trackingLabel, trackingStartRow, 0, 1, 2);
+	layout->addWidget(trackingLabel, 10, 0, 1, 2);
 
 	// Create tracking checkboxes in 2x3 grid layout matching iio-oscilloscope
-	layout->addWidget(createCheckboxWidget(rxCh, "quadrature_fic_tracking_en", "Quadrature FIC"),
-			  trackingStartRow + 1, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "agc_tracking_en", "AGC"), trackingStartRow + 1, 1);
-	layout->addWidget(createCheckboxWidget(rxCh, "bbdc_rejection_tracking_en", "BBDC Rejection"),
-			  trackingStartRow + 2, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "quadrature_w_poly_tracking_en", "Quadrature Poly"),
-			  trackingStartRow + 2, 1);
-	layout->addWidget(createCheckboxWidget(rxCh, "hd_tracking_en", "HD2"), trackingStartRow + 3, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "rssi_tracking_en", "RSSI"), trackingStartRow + 3, 1);
+	layout->addWidget(createCheckboxWidget(rxCh, "quadrature_fic_tracking_en", "Quadrature FIC"), 11, 0);
+	layout->addWidget(createCheckboxWidget(rxCh, "agc_tracking_en", "AGC"), 11, 1);
+	layout->addWidget(createCheckboxWidget(rxCh, "bbdc_rejection_tracking_en", "BBDC Rejection"), 12, 0);
+	layout->addWidget(createCheckboxWidget(rxCh, "quadrature_w_poly_tracking_en", "Quadrature Poly"), 12, 1);
+	layout->addWidget(createCheckboxWidget(rxCh, "hd_tracking_en", "HD2"), 13, 0);
+	layout->addWidget(createCheckboxWidget(rxCh, "rssi_tracking_en", "RSSI"), 13, 1);
 
 	return widget;
 }
@@ -522,57 +545,76 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 		return widget;
 	}
 
-	// Match exact iio-oscilloscope TX layout: 2 columns from original columns 2&4
-	int row = 1;
-
 	// Column 0 (Left) - from iio-oscilloscope TX column 2
-	layout->addWidget(createRangeWidget(txCh, "hardwaregain", "[-41.95 0.05 0]", "Attenuation (dB)"), row, 0);
+	layout->addWidget(createRangeWidget(txCh, "hardwaregain", "[-41.95 0.05 0]", "Attenuation (dB)"), 1, 0);
 	layout->addWidget(
-		createComboWidget(txCh, "atten_control_mode", "atten_control_mode_available", "Attenuation Control"),
-		row + 1, 0);
+		createComboWidget(txCh, "atten_control_mode", "atten_control_mode_available", "Attenuation Control"), 2,
+		0);
 
 	if(loCh) {
 		QString loAttr = QString("TX%1_LO_frequency").arg(channel + 1);
 		auto loWidget = createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)");
 
-		// Add MHz ↔ Hz conversion (device uses Hz, UI shows MHz)
-		loWidget->setDataToUIConversion([](QString data) {
-			// Device → UI: Hz to MHz (3200000000 → 3200)
-			return QString::number(data.toDouble() / 1e6, 'f', 0);
-		});
-		loWidget->setUItoDataConversion([](QString data) {
-			// UI → Device: MHz to Hz (3200 → 3200000000)
-			return QString::number(data.toDouble() * 1e6, 'f', 0);
-		});
+		// Add MHz ↔ Hz conversion
+		loWidget->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		loWidget->setUItoDataConversion(
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
 
-		layout->addWidget(loWidget, row + 2, 0);
+		layout->addWidget(loWidget, 3, 0);
 	}
 
-	layout->addWidget(createRangeWidget(txCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), row + 3, 0);
-	layout->addWidget(createReadOnlyLabel(txCh, "rf_bandwidth", 1000000, "Bandwidth (MHz)"), row + 4, 0);
+	// Only create NCO widget if supported
+	double dummy;
+	int ret = iio_channel_attr_read_double(txCh, "nco_frequency", &dummy);
+	if(ret == 0) {
+		layout->addWidget(createRangeWidget(txCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), 4, 0);
+	}
+
+	IIOWidget *rfBandwidth = createReadOnlyWidget(txCh, "rf_bandwidth", "Bandwidth (MHz)");
+
+	// Add MHz ↔ Hz conversion
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	layout->addWidget(rfBandwidth, 5, 0);
 
 	// Column 1 (Right) - from iio-oscilloscope TX column 4
-	layout->addWidget(createComboWidget(txCh, "port_en_mode", "port_en_mode_available", "Port Enable"), row, 1);
-	layout->addWidget(createComboWidget(txCh, "ensm_mode", "ensm_mode_available", "ENSM"), row + 1, 1);
-	layout->addWidget(createCheckboxWidget(txCh, "en", "Powerdown"), row + 2, 1);
+	layout->addWidget(createComboWidget(txCh, "port_en_mode", "port_en_mode_available", "Port Enable"), 1, 1);
+	layout->addWidget(createComboWidget(txCh, "ensm_mode", "ensm_mode_available", "ENSM"), 2, 1);
+	IIOWidget *txEn = createCheckboxWidget(txCh, "en", "Powerdown");
+	// logic needed to match functionality
+	txEn->setDataToUIConversion([](QString data) {
+		if(data == "0") {
+			return "1";
+		}
+		return "0";
+	});
+	txEn->setUItoDataConversion([](QString data) {
+		if(data == "0") {
+			return "1";
+		}
+		return "0";
+	});
+	layout->addWidget(txEn, 3, 1);
 	// Row+3 is empty in iio-oscilloscope
-	layout->addWidget(createReadOnlyLabel(txCh, "sampling_frequency", 1000000, "Sampling Rate (MSPS)"), row + 4, 1);
+	IIOWidget *samplingFreq = createReadOnlyWidget(txCh, "sampling_frequency", "Sampling Rate (MSPS)");
+	// Add MSPS ↔ SPS conversion
+	samplingFreq->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	samplingFreq->setUItoDataConversion(
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	layout->addWidget(samplingFreq, 5, 1);
 
-	// Tracking section at bottom spanning both columns (like iio-oscilloscope)
-	int trackingStartRow = row + 6;
 	QLabel *trackingLabel = new QLabel("Tracking:");
 	Style::setStyle(trackingLabel, style::properties::label::menuBig);
-	layout->addWidget(trackingLabel, trackingStartRow, 0, 1, 2);
+	layout->addWidget(trackingLabel, 7, 0, 1, 2);
 
 	// Create tracking checkboxes in 2x3 grid layout matching iio-oscilloscope
-	layout->addWidget(createCheckboxWidget(txCh, "quadrature_tracking_en", "Quadrature"), trackingStartRow + 1, 0);
-	layout->addWidget(createCheckboxWidget(txCh, "close_loop_gain_tracking_en", "Close Loop Gain"),
-			  trackingStartRow + 1, 1);
-	layout->addWidget(createCheckboxWidget(txCh, "pa_correction_tracking_en", "PA Correction"),
-			  trackingStartRow + 2, 0);
-	layout->addWidget(createCheckboxWidget(txCh, "loopback_delay_tracking_en", "Loopback Delay"),
-			  trackingStartRow + 2, 1);
-	layout->addWidget(createCheckboxWidget(txCh, "lo_leakage_tracking_en", "LO Leakage"), trackingStartRow + 3, 0);
+	layout->addWidget(createCheckboxWidget(txCh, "quadrature_tracking_en", "Quadrature"), 8, 0);
+	layout->addWidget(createCheckboxWidget(txCh, "close_loop_gain_tracking_en", "Close Loop Gain"), 8, 1);
+	layout->addWidget(createCheckboxWidget(txCh, "pa_correction_tracking_en", "PA Correction"), 9, 0);
+	layout->addWidget(createCheckboxWidget(txCh, "loopback_delay_tracking_en", "Loopback Delay"), 9, 1);
+	layout->addWidget(createCheckboxWidget(txCh, "lo_leakage_tracking_en", "LO Leakage"), 9, 0);
 
 	return widget;
 }
@@ -600,7 +642,7 @@ QWidget *Adrv9002::createOrxControls()
 	}
 
 	if(layout->count() == 0) {
-		widget->hide(); // this widet should not be visible if no ORX are createdle
+		widget->hide();
 	}
 
 	return widget;
@@ -639,17 +681,13 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
 	layout->addWidget(titleLabel, 0, 0, 1, 2); // Span 2 columns
 
-	// Match exact iio-oscilloscope ORX layout from screenshots: 2x2 grid
-	int row = 1;
-
 	// Row 1: Hardware Gain (Left) and BBDC Rejection (Right)
-	layout->addWidget(createRangeWidget(rxCh, "orx_hardwaregain", "[4 1 36]", "Hardware Gain (dB)"), row, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_bbdc_rejection_en", "BBDC Rejection"), row, 1);
+	layout->addWidget(createRangeWidget(rxCh, "orx_hardwaregain", "[4 1 36]", "Hardware Gain (dB)"), 1, 0);
+	layout->addWidget(createCheckboxWidget(rxCh, "orx_bbdc_rejection_en", "BBDC Rejection"), 1, 1);
 
 	// Row 2: Tracking (Left) and Powerdown (Right)
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_quadrature_w_poly_tracking_en", "Quadrature Poly"), row + 1,
-			  0);
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_en", "Powerdown"), row + 1, 1);
+	layout->addWidget(createCheckboxWidget(rxCh, "orx_quadrature_w_poly_tracking_en", "Quadrature Poly"), 2, 0);
+	layout->addWidget(createCheckboxWidget(rxCh, "orx_en", "Powerdown"), 2, 1);
 
 	return widget;
 }
@@ -708,73 +746,50 @@ IIOWidget *Adrv9002::createCheckboxWidget(iio_channel *ch, const QString &attr, 
 
 	if(widget) {
 		connect(this, &Adrv9002::readRequested, widget, &IIOWidget::readAsync);
+		widget->showProgressBar(false);
 	}
 	return widget;
 }
 
-QLabel *Adrv9002::createReadOnlyLabel(iio_channel *ch, const QString &attr, double divisor, const QString &title)
+IIOWidget *Adrv9002::createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title)
 {
-	QLabel *label = new QLabel(title + ": N/A");
+	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
+				    .device(m_iio_dev)
+				    .channel(ch)
+				    .attribute(attr)
+				    .title(title)
+				    .compactMode(true)
+				    .buildSingle();
 
-	if(!ch) {
-		return label;
+	if(widget) {
+		widget->setEnabled(false);
+		widget->showProgressBar(false);
+
+		connect(this, &Adrv9002::readRequested, widget, &IIOWidget::readAsync);
+	}
+	return widget;
+}
+
+IIOWidget *Adrv9002::createContinuousReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title)
+{
+	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
+				    .device(m_iio_dev)
+				    .channel(ch)
+				    .attribute(attr)
+				    .title(title)
+				    .compactMode(true)
+				    .buildSingle();
+
+	if(widget) {
+		widget->setEnabled(false);
+		widget->showProgressBar(false);
+
+		connect(this, &Adrv9002::readRequested, widget, &IIOWidget::readAsync);
+		QTimer *timer = new QTimer(widget);
+
+		QObject::connect(timer, &QTimer::timeout, [widget]() { widget->readAsync(); });
+		timer->start(10000);
 	}
 
-	// Read the attribute value
-	char value[64];
-	int ret = iio_channel_attr_read(ch, attr.toLocal8Bit().data(), value, sizeof(value));
-
-	if(ret > 0) {
-		// Parse the value and apply divisor - strip units first
-		QString valueStr = QString(value).split(" ").first(); // Remove units like " dB"
-		bool ok;
-		double numValue = valueStr.toDouble(&ok);
-		if(ok) {
-			// Apply divisor and format to appropriate precision
-			double displayValue = numValue / divisor;
-
-			// Format based on the magnitude - temperature typically 4 decimal places
-			if(title.contains("Temperature", Qt::CaseInsensitive)) {
-				label->setText(title + ": " + QString::number(displayValue, 'f', 4));
-			} else if(divisor == 1000000.0) { // MHz values
-				label->setText(title + ": " + QString::number(displayValue, 'f', 3));
-			} else {
-				label->setText(title + ": " + QString::number(displayValue, 'f', 2));
-			}
-		} else {
-			label->setText(title + ": " + QString(value)); // Show as-is if not numeric
-		}
-	} else {
-		label->setText(title + ": Error");
-	}
-
-	// Connect to refresh signal for periodic updates
-	connect(this, &Adrv9002::readRequested, this, [this, label, ch, attr, divisor, title]() {
-		char value[64];
-		int ret = iio_channel_attr_read(ch, attr.toLocal8Bit().data(), value, sizeof(value));
-
-		if(ret > 0) {
-			// Parse the value and apply divisor - strip units first
-			QString valueStr = QString(value).split(" ").first(); // Remove units like " dB"
-			bool ok;
-			double numValue = valueStr.toDouble(&ok);
-			if(ok) {
-				double displayValue = numValue / divisor;
-
-				if(title.contains("Temperature", Qt::CaseInsensitive)) {
-					label->setText(title + ": " + QString::number(displayValue, 'f', 4));
-				} else if(divisor == 1000000.0) {
-					label->setText(title + ": " + QString::number(displayValue, 'f', 3));
-				} else {
-					label->setText(title + ": " + QString::number(displayValue, 'f', 2));
-				}
-			} else {
-				label->setText(title + ": " + QString(value));
-			}
-		} else {
-			label->setText(title + ": Error");
-		}
-	});
-
-	return label;
+	return widget;
 }
