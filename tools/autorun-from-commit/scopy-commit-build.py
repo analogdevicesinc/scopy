@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import argparse
 import sys
 import os
@@ -9,7 +10,7 @@ def autodetect_platform():
     if 'windows' in sys_platform:
         return 'windows'
     elif 'linux' in sys_platform:
-        return 'linux'
+        return 'x86'
     else:
         return None
 
@@ -19,13 +20,48 @@ def read_token_from_file(token_file="github_token.txt"):
             return f.readline().strip()
     return None
 
+def read_token_from_git_credentials():
+    """Read GitHub token from ~/.git-credentials file."""
+    credentials_path = os.path.expanduser("~/.git-credentials")
+    if not os.path.isfile(credentials_path):
+        return None
+
+    try:
+        with open(credentials_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                # Look for GitHub credentials: https://username:token@github.com
+                if "github.com" in line and "://" in line:
+                    # Parse URL to extract token
+                    if "@github.com" in line:
+                        # Extract the part before @github.com
+                        auth_part = line.split("@github.com")[0]
+                        if "://" in auth_part:
+                            # Extract credentials part after protocol
+                            credentials = auth_part.split("://", 1)[1]
+                            if ":" in credentials:
+                                # Split username:token
+                                username, token = credentials.split(":", 1)
+                                # GitHub tokens typically start with ghp_, gho_, ghu_, etc.
+                                if token and (token.startswith("ghp_") or token.startswith("gho_") or token.startswith("ghu_") or token.startswith("github_pat_")):
+                                    return token
+                            else:
+                                # Handle case where only token is present (no username)
+                                token = credentials
+                                if token and (token.startswith("ghp_") or token.startswith("gho_") or token.startswith("ghu_") or token.startswith("github_pat_")):
+                                    return token
+    except Exception as e:
+        print(f"Warning: Error reading ~/.git-credentials: {e}")
+
+    return None
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Scopy Build Downloader: Downloads and launches Scopy build from GitHub Actions artifacts for a given commit SHA."
     )
     parser.add_argument("commit_sha", type=str, help="Commit SHA to search for (required)")
-    parser.add_argument("--token", type=str, required=False, help="GitHub personal access token (optional, fallback to github_token.txt)")
-    parser.add_argument("--platform", type=str, choices=["windows", "linux", "arm64"], required=False, help="Target platform (windows, linux, arm64)")
+    parser.add_argument("--token", type=str, required=False, help="GitHub personal access token (optional, fallback to github_token.txt or ~/.git-credentials)")
+    parser.add_argument("--platform", type=str, choices=["windows", "x86", "arm64", "arm32"], required=False, help="Target platform (windows, x86, arm64, arm32)")
     parser.add_argument("--script", type=str, required=False, help="Optional path to a script to use or run after extraction")
     return parser.parse_args()
 
@@ -34,15 +70,31 @@ def validate_commit_sha(commit_sha):
     return commit_sha and (7 <= len(commit_sha) <= 40) and all(c in "0123456789abcdefABCDEF" for c in commit_sha)
 
 def get_token(token_arg):
-    return token_arg or read_token_from_file()
+    if token_arg:
+        print("Using token from command line argument")
+        return token_arg
+
+    file_token = read_token_from_file()
+    if file_token:
+        print("Using token from github_token.txt")
+        return file_token
+
+    git_creds_token = read_token_from_git_credentials()
+    if git_creds_token:
+        print("Using token from ~/.git-credentials")
+        return git_creds_token
+
+    return None
 
 def get_workflow_name(platform):
     if platform == "windows":
         return "windows-mingw build"
-    elif platform == "linux":
+    elif platform == "x86":
         return "Scopy x86_64 AppImage Build"
     elif platform == "arm64":
         return "Scopy arm64 AppImage Build"
+    elif platform == "arm32":
+        return "Scopy armhf AppImage Build"
     else:
         return None
 
@@ -67,16 +119,42 @@ def get_workflow_run(owner, repo, commit_sha, workflow_name, headers):
     runs = [run for run in data.get("workflow_runs", []) if run.get("name") == workflow_name and run.get("head_sha", "").startswith(commit_sha)]
     # If no runs and short SHA, retry without head_sha filter and search for partial matches
     if not runs and len(commit_sha) < 40:
-        print(f"No workflow runs found for commit {commit_sha}, retrying with all recent runs...")
-        api_url_all = f"https://api.github.com/repos/{owner}/{repo}/actions/runs"
-        try:
-            response_all = requests.get(api_url_all, headers=headers)
-            response_all.raise_for_status()
-            data_all = response_all.json()
-        except Exception as e:
-            print(f"Error connecting to GitHub API (all runs): {e}")
-            sys.exit(1)
-        partial_matches = [run for run in data_all.get("workflow_runs", []) if run.get("name") == workflow_name and commit_sha in run.get("head_sha", "")]
+        print(f"No workflow runs found for commit {commit_sha}, searching through historical runs...")
+
+        # Try multiple pages to find older commits
+        all_runs = []
+        page = 1
+        max_pages = 5  # Limit to 5 pages (150 runs) to avoid excessive API calls
+
+        while page <= max_pages:
+            api_url_all = f"https://api.github.com/repos/{owner}/{repo}/actions/runs?page={page}&per_page=30"
+            try:
+                response_all = requests.get(api_url_all, headers=headers)
+                response_all.raise_for_status()
+                data_all = response_all.json()
+                runs_batch = data_all.get("workflow_runs", [])
+
+                if not runs_batch:  # No more runs available
+                    break
+
+                all_runs.extend(runs_batch)
+                print(f"Fetched page {page}: {len(runs_batch)} runs")
+                page += 1
+
+            except Exception as e:
+                print(f"Error connecting to GitHub API (page {page}): {e}")
+                break
+
+        # Create data_all structure for compatibility with existing code
+        data_all = {"workflow_runs": all_runs}
+        # Debug: show SHAs being checked for partial matching
+        target_workflows = [run for run in data_all.get("workflow_runs", []) if run.get("name") == workflow_name]
+        print(f"Found {len(target_workflows)} '{workflow_name}' workflows in {len(all_runs)} total runs:")
+        for i, run in enumerate(target_workflows[:10]):  # Show first 10
+            head_sha = run.get("head_sha", "N/A")
+            print(f"  {i+1}. {head_sha} | Status: {run.get('status')}")
+
+        partial_matches = [run for run in target_workflows if commit_sha in run.get("head_sha", "")]
         if partial_matches:
             print(f"Found {len(partial_matches)} workflow runs partially matching SHA '{commit_sha}':")
             for idx, run in enumerate(partial_matches):
@@ -84,16 +162,13 @@ def get_workflow_run(owner, repo, commit_sha, workflow_name, headers):
             # Always use the first match
             return partial_matches[0]
         else:
-            print(f"No '{workflow_name}' workflow found for commit {commit_sha}")
-            print("Available workflows for this commit:")
-            for run in data_all.get("workflow_runs", []):
-                print(f"  - {run.get('name')} (Status: {run.get('status')})")
+            print(f"")
+            print(f"WARNING: No '{workflow_name}' workflow found for commit {commit_sha} in {len(all_runs)} workflow runs checked.")
+            print(f" Try using a full commit SHA or check if the commit has a '{workflow_name}' workflow.")
             sys.exit(1)
     elif not runs:
-        print(f"No '{workflow_name}' workflow found for commit {commit_sha}")
-        print("Available workflows for this commit:")
-        for run in data.get("workflow_runs", []):
-            print(f"  - {run.get('name')} (Status: {run.get('status')})")
+        print(f"No '{workflow_name}' workflow found for exact commit {commit_sha}")
+        print(f"Try using a shorter SHA for partial matching or check if the commit has a '{workflow_name}' workflow.")
         sys.exit(1)
     return runs[0]
 
@@ -123,6 +198,9 @@ def filter_artifacts(artifacts, workflow_name, platform_value=None):
     # arm64: artifact name starts with 'scopy-arm64'
     elif workflow_name == "Scopy arm64 AppImage Build":
         return [a for a in artifacts if a["name"].startswith("scopy-arm64")]
+    # arm32/armhf: artifact name starts with 'scopy-armhf'
+    elif workflow_name == "Scopy armhf AppImage Build":
+        return [a for a in artifacts if a["name"].startswith("scopy-armhf")]
     else:
         return []
 
@@ -130,7 +208,7 @@ def download_artifact(artifact, commit_sha, headers):
     import datetime
     artifact_name = artifact['name']
     dt = datetime.datetime.now()
-    date_folder = dt.strftime('%m_%d_%Y_%H:%M')
+    date_folder = dt.strftime('%m_%d_%Y_%H-%M')
     folder_name = f"{date_folder}_{commit_sha}"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
@@ -195,8 +273,8 @@ def main():
 
     token = get_token(args.token)
     if not token:
-        print("Error: GitHub token not provided and github_token.txt not found.")
-        print("Please provide a token with --token or create github_token.txt with your token.")
+        print("Error: GitHub token not provided and no token found in fallback sources.")
+        print("Please provide a token with --token, create github_token.txt, or configure ~/.git-credentials.")
         sys.exit(1)
 
     print(f"Commit SHA: {args.commit_sha}")
@@ -209,7 +287,7 @@ def main():
     repo = "scopy"
     workflow_name = get_workflow_name(platform_value)
     if not workflow_name:
-        print("Error: Only Windows and Linux platforms are supported in this script version.")
+        print("Error: Only Windows, x86, ARM64, and ARM32 platforms are supported in this script version.")
         sys.exit(1)
 
     headers = get_github_api_headers(token)
@@ -242,10 +320,12 @@ def main():
     # Determine exe_name based on platform
     if platform_value == "windows":
         exe_name = "Scopy-console.exe"
-    elif platform_value == "linux":
+    elif platform_value == "x86":
         exe_name = "Scopy-x86_64.AppImage"
     elif platform_value == "arm64":
         exe_name = "Scopy-arm64.AppImage"
+    elif platform_value == "arm32":
+        exe_name = "Scopy-armhf.AppImage"
     else:
         exe_name = None
 
@@ -267,7 +347,7 @@ def main():
         # Launch Scopy process
         if platform_value == "windows":
             proc = subprocess.Popen(launch_args, shell=True, stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
-        elif platform_value == "linux" or platform_value == "arm64":
+        elif platform_value == "x86" or platform_value == "arm64" or platform_value == "arm32":
             st = os.stat(exe_path)
             if not (st.st_mode & stat.S_IXUSR):
                 os.chmod(exe_path, st.st_mode | stat.S_IXUSR)
@@ -288,5 +368,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-    
+
