@@ -97,7 +97,7 @@ AD936X::AD936X(iio_context *ctx, QWidget *parent)
 	controlsLayout->addWidget(scrollArea);
 
 	if(m_ctx != nullptr) {
-
+		// this should work for any device from AD936x family
 		iio_device *plutoDevice = nullptr;
 		int device_count = iio_context_get_devices_count(m_ctx);
 		for(int i = 0; i < device_count; ++i) {

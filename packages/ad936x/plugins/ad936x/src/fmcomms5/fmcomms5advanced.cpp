@@ -86,30 +86,14 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, QWidget *parent)
 	if(m_ctx != nullptr) {
 		iio_device *mainDevice = nullptr;
 		iio_device *secondDevice = nullptr;
-		int foundDevices = 0;
-		int device_count = iio_context_get_devices_count(m_ctx);
-		for(int i = 0; i < device_count; ++i) {
-			iio_device *dev = iio_context_get_device(m_ctx, i);
-			const char *dev_name = iio_device_get_name(dev);
-			if(dev_name && QString(dev_name).compare("ad9361-phy", Qt::CaseInsensitive) == 0) {
-				mainDevice = dev;
-				foundDevices++;
-			}
 
-			if(dev_name && QString(dev_name).compare("ad9361-phy-B", Qt::CaseInsensitive) == 0) {
-				secondDevice = dev;
-				foundDevices++;
-			}
-
-			if(foundDevices == 2) {
-				break;
-			}
-		}
+		mainDevice = iio_context_find_device(m_ctx, "ad9361-phy");
 		if(mainDevice == nullptr) {
 			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy device found in context!";
 			return;
 		}
 
+		secondDevice = iio_context_find_device(m_ctx, "ad9361-phy-B");
 		if(secondDevice == nullptr) {
 			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy-B device found in context!";
 			return;
