@@ -51,6 +51,7 @@ bool Ad936xPlugin::compatible(QString m_param, QString category)
 
 	ret = false;
 	int device_count = iio_context_get_devices_count(conn->context());
+	// this should work for any device from AD936x family
 	for(int i = 0; i < device_count; ++i) {
 		iio_device *dev = iio_context_get_device(conn->context(), i);
 		const char *dev_name = iio_device_get_name(dev);
@@ -108,16 +109,8 @@ bool Ad936xPlugin::onConnect()
 		return false;
 	}
 
-	bool isFmcomms5 = false;
-	int device_count = iio_context_get_devices_count(conn->context());
-	for(int i = 0; i < device_count; ++i) {
-		iio_device *dev = iio_context_get_device(conn->context(), i);
-		const char *dev_name = iio_device_get_name(dev);
-		if(dev_name && QString(dev_name).contains("ad9361-phy-B", Qt::CaseInsensitive)) {
-			isFmcomms5 = true;
-			break;
-		}
-	}
+	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
+	bool isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
 
 	if(isFmcomms5) {
 		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context());

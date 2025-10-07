@@ -96,16 +96,7 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 
 	if(m_ctx != nullptr) {
 
-		iio_device *mainDevice = nullptr;
-		int device_count = iio_context_get_devices_count(m_ctx);
-		for(int i = 0; i < device_count; ++i) {
-			iio_device *dev = iio_context_get_device(m_ctx, i);
-			const char *dev_name = iio_device_get_name(dev);
-			if(dev_name && QString(dev_name).compare("ad9361-phy", Qt::CaseInsensitive) == 0) {
-				mainDevice = dev;
-				break;
-			}
-		}
+		iio_device *mainDevice = iio_context_find_device(m_ctx, "ad9361-phy");
 
 		m_helper = new AD936xHelper();
 		connect(this, &FMCOMMS5::readRequested, m_helper, &AD936xHelper::readRequested);
@@ -304,16 +295,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	//////// second device for fmcomms5 RX
 
-	iio_device *dev2 = nullptr;
-	int device_count = iio_context_get_devices_count(m_ctx);
-	for(int i = 0; i < device_count; ++i) {
-		iio_device *aux = iio_context_get_device(m_ctx, i);
-		const char *dev_name = iio_device_get_name(aux);
-		if(dev_name && QString(dev_name).contains("ad9361-phy-B", Qt::CaseInsensitive)) {
-			dev2 = aux;
-			break;
-		}
-	}
+	iio_device *dev2 = iio_context_find_device(m_ctx, "ad9361-phy-B");
 
 	QWidget *rxDevice2Widget = m_helper->generateRxDeviceWidget(dev2, "ad9361-phy-B", widget);
 
@@ -406,16 +388,7 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 
 	//////// second device for fmcomms5 TX
 
-	iio_device *dev2 = nullptr;
-	int device_count = iio_context_get_devices_count(m_ctx);
-	for(int i = 0; i < device_count; ++i) {
-		iio_device *aux = iio_context_get_device(m_ctx, i);
-		const char *dev_name = iio_device_get_name(aux);
-		if(dev_name && QString(dev_name).contains("ad9361-phy-b", Qt::CaseInsensitive)) {
-			dev2 = aux;
-			break;
-		}
-	}
+	iio_device *dev2 = iio_context_find_device(m_ctx, "ad9361-phy-B");
 
 	QWidget *txDevice2Widget = m_helper->generateTxDeviceWidget(dev2, "ad9361-phy-B", widget);
 

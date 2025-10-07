@@ -81,6 +81,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
 	navigationButtons->setExclusive(true);
 
 	if(m_ctx != nullptr) {
+		// this should work for any device from AD936x family
 		iio_device *plutoDevice = nullptr;
 		int device_count = iio_context_get_devices_count(ctx);
 		for(int i = 0; i < device_count; ++i) {
