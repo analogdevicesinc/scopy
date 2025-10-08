@@ -30,6 +30,7 @@
 #include <gui/flexgridlayout.hpp>
 #include <QTableWidget>
 #include <QWidget>
+#include <dockableareainterface.h>
 #include <pqmdatalogger.h>
 #include <gui/widgets/measurementlabel.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -68,13 +69,14 @@ private:
 	void initTable();
 	void initPlot();
 	void setupPlotChannels();
-	QWidget *createThdWidget();
+	QWidget *createThdWidget(QWidget *parent = nullptr);
 	QWidget *createSettingsMenu(QWidget *parent);
 	QWidget *createMenuGeneralSection(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
 	bool selectedFromSameCol(QModelIndexList list);
 	QPushButton *createPQEventsBtn(QWidget *parent);
 
+	DockableAreaInterface *m_dockableArea;
 	QString m_uri;
 	bool m_running;
 	QString m_harmonicsType;
