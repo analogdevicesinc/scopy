@@ -67,6 +67,8 @@ private:
 	void initData();
 	void initPlot(PlotWidget *plot, QString unitType, int yMin = -650, int yMax = 650);
 	void setupChannels(PlotWidget *plot, QMap<QString, QString> chnls);
+	void resourceManagerCheck(bool en);
+	void concurrentEnable(QString pref, QVariant value);
 	QWidget *createSettMenu(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
 	QWidget *createMenuPlotSection(QWidget *parent);
@@ -76,6 +78,7 @@ private:
 	void deletePlottingStrategy();
 	void createTriggeredStrategy(QString triggerChnl);
 
+	bool m_concurrentAcq = false;
 	bool m_running;
 	PlotWidget *m_voltagePlot;
 	PlotWidget *m_currentPlot;

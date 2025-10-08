@@ -42,6 +42,7 @@
 #include <gui/widgets/menuheader.h>
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy::pqm;
 
@@ -52,6 +53,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	, m_running(false)
 {
 	initData();
+	m_concurrentAcq = Preferences::get("pqm_concurrent").toBool();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	setLayout(layout);
@@ -114,6 +116,8 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
 	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
+	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
+		&WaveformInstrument::concurrentEnable);
 }
 
 WaveformInstrument::~WaveformInstrument()
@@ -262,15 +266,33 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 	return logSection;
 }
 
+void WaveformInstrument::resourceManagerCheck(bool en)
+{
+	if(en) {
+		ResourceManager::open("pqm" + m_uri, this);
+	} else {
+		ResourceManager::close("pqm" + m_uri);
+	}
+}
+
+void WaveformInstrument::concurrentEnable(QString pref, QVariant value)
+{
+	if(pref != "pqm_concurrent") {
+		return;
+	}
+	m_concurrentAcq = value.toBool();
+	if(!m_concurrentAcq) {
+		m_runBtn->setChecked(false);
+	}
+}
+
 void WaveformInstrument::stop() { m_runBtn->setChecked(false); }
 
 void WaveformInstrument::toggleWaveform(bool en)
 {
 	m_running = en;
-	if(en) {
-		ResourceManager::open("pqm" + m_uri, this);
-	} else {
-		ResourceManager::close("pqm" + m_uri);
+	if(!m_concurrentAcq) {
+		resourceManagerCheck(en);
 	}
 	m_plottingStrategy->clearSamples();
 	Q_EMIT enableTool(en);
