@@ -95,6 +95,7 @@ private:
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
 	bool m_hasFwVers = false;
+	bool m_concurrentAcq = false;
 	const int THREAD_FINISH_TIMEOUT = 10000;
 };
 } // namespace scopy::pqm

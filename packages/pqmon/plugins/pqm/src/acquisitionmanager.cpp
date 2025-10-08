@@ -23,6 +23,7 @@
 #include "qtconcurrentrun.h"
 #include <QLoggingCategory>
 #include <QTimer>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_ACQ, "PqmAqcManager");
 using namespace scopy::pqm;
@@ -34,6 +35,8 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 	, m_buffer(nullptr)
 	, m_pqmLog(nullptr)
 {
+	Preferences *p = Preferences::GetInstance();
+	m_concurrentAcq = p->get("pqm_concurrent").toBool();
 	m_readFw = new QFutureWatcher<void>(this);
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
@@ -53,6 +56,11 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
 			Qt::QueuedConnection);
 		connect(this, &AcquisitionManager::logData, m_pqmLog, &PqmDataLogger::logPressed);
+		connect(p, &Preferences::preferenceChanged, this, [this](QString pref, QVariant value) {
+			if(pref == "pqm_concurrent") {
+				m_concurrentAcq = value.toBool();
+			}
+		});
 	} else {
 		qWarning(CAT_PQM_ACQ) << "The PQM device is not available!";
 	}

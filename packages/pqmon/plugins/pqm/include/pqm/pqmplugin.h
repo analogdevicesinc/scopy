@@ -41,6 +41,8 @@ class SCOPY_PQM_EXPORT PQMPlugin : public QObject, public PluginBase
 public:
 	void preload() override;
 	bool compatible(QString m_param, QString category) override;
+	void initPreferences() override;
+	bool loadPreferencesPage() override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
