@@ -20,6 +20,8 @@
  */
 
 #include "harmonicsinstrument.h"
+#include "dockablearea.h"
+#include "dockwrapper.h"
 #include "plotaxis.h"
 #include "qheaderview.h"
 
@@ -64,20 +66,38 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/harmonics.html"));
 	});
 
-	// central widget components
-	m_thdWidget = createThdWidget();
-	tool->addWidgetToCentralContainerHelper(m_thdWidget);
+	// create dockable area
+	m_dockableArea = createDockableArea(this);
+	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 
-	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, this);
+	// central widget components
+	DockWrapperInterface *tableDock = createDockWrapper("Table");
+	QWidget *tableWrapper = new QWidget(dockableAreaWidget);
+	tableWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QVBoxLayout *tableWrapLay = new QVBoxLayout(tableWrapper);
+	tableWrapLay->setMargin(0);
+	tableWrapLay->setSpacing(0);
+
+	m_thdWidget = createThdWidget(tableWrapper);
+
+	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, dockableAreaWidget);
+	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
 	Style::setBackgroundColor(m_table, Style::getAttribute(json::theme::background_primary), true);
 	initTable();
-	tool->addWidgetToCentralContainerHelper(m_table);
 
-	m_plot = new PlotWidget(this);
+	tableWrapLay->addWidget(m_thdWidget);
+	tableWrapLay->addWidget(m_table);
+	tableDock->setInnerWidget(tableWrapper);
+
+	DockWrapperInterface *plotDock = createDockWrapper("Plot");
+	m_plot = new PlotWidget(dockableAreaWidget);
 	initPlot();
 	setupPlotChannels();
-	tool->addWidgetToCentralContainerHelper(m_plot);
+	plotDock->setInnerWidget(m_plot);
 
+	m_dockableArea->addDockWrapper(tableDock, DockableAreaInterface::Direction_BOTTOM);
+	m_dockableArea->addDockWrapper(plotDock, DockableAreaInterface::Direction_BOTTOM);
 	// instrument menu
 	GearBtn *settingsMenuBtn = new GearBtn(this);
 	settingsMenuBtn->setChecked(true);
@@ -93,6 +113,7 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 		}
 	});
 
+	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
@@ -130,6 +151,7 @@ void HarmonicsInstrument::initData()
 void HarmonicsInstrument::initTable()
 {
 	m_table->setVerticalHeaderLabels(m_chnls.keys());
+	m_table->verticalHeader()->setMinimumWidth(50);
 	m_table->verticalHeader()->setDefaultAlignment(Qt::AlignCenter);
 	m_table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_table->setFixedHeight(220);
@@ -190,18 +212,18 @@ void HarmonicsInstrument::setupPlotChannels()
 	}
 }
 
-QWidget *HarmonicsInstrument::createThdWidget()
+QWidget *HarmonicsInstrument::createThdWidget(QWidget *parent)
 {
-	QWidget *thdWidget = new QWidget(this);
+	QWidget *thdWidget = new QWidget(parent);
 	thdWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	QGridLayout *layout = new QGridLayout(thdWidget);
 
-	QLabel *title = new QLabel("THD:", this);
+	QLabel *title = new QLabel("THD:", thdWidget);
 	layout->addWidget(title);
 	int row = 1;
 	int chnlIdx = 0;
 	for(const QString &ch : m_chnls) {
-		MeasurementLabel *ml = new MeasurementLabel(this);
+		MeasurementLabel *ml = new MeasurementLabel(thdWidget);
 		QString color = StyleHelper::getChannelColor(chnlIdx);
 		ml->setColor(QColor(color));
 		ml->setName(m_chnls.key(ch));
