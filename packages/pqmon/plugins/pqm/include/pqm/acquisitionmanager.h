@@ -66,6 +66,8 @@ private:
 	double convertFromHwToHost(int value, QString chnlId);
 	void enableBufferChnls(iio_device *dev);
 	void readData();
+	void readAttrData();
+	void readBuffData();
 	bool readPqmAttributes();
 	bool readBufferedData();
 	void setData(QMap<QString, QMap<QString, QString>>);
@@ -96,6 +98,7 @@ private:
 	bool m_buffHaveBeenRead = false;
 	bool m_hasFwVers = false;
 	bool m_concurrentAcq = false;
+	bool m_alternateExecution = false;
 	const int THREAD_FINISH_TIMEOUT = 10000;
 };
 } // namespace scopy::pqm
