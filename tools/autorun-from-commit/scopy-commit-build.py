@@ -14,6 +14,30 @@ def autodetect_platform():
     else:
         return None
 
+def validate_platform_compatibility(target_platform, current_platform):
+    """
+    Check if the target platform executable can run on the current platform.
+    Returns True if compatible, False otherwise.
+    """
+    if not current_platform:
+        print("Warning: Could not detect current platform, skipping compatibility check")
+        return True
+
+    # Same platform is always compatible
+    if target_platform == current_platform:
+        return True
+
+    # Cross-platform compatibility rules
+    compatibility_matrix = {
+        'windows': ['windows'],
+        'x86': ['x86'],  # Linux x86 only runs x86 executables
+        'arm64': ['arm64'],
+        'arm32': ['arm32']
+    }
+
+    compatible_platforms = compatibility_matrix.get(current_platform, [])
+    return target_platform in compatible_platforms
+
 def read_token_from_file(token_file="github_token.txt"):
     if os.path.isfile(token_file):
         with open(token_file, "r") as f:
@@ -198,9 +222,9 @@ def filter_artifacts(artifacts, workflow_name, platform_value=None):
     # arm64: artifact name starts with 'scopy-arm64'
     elif workflow_name == "Scopy arm64 AppImage Build":
         return [a for a in artifacts if a["name"].startswith("scopy-arm64")]
-    # arm32/armhf: artifact name starts with 'scopy-armhf'
+    # arm32/armhf: artifact name starts with 'scopy-linux-armhf'
     elif workflow_name == "Scopy armhf AppImage Build":
-        return [a for a in artifacts if a["name"].startswith("scopy-armhf")]
+        return [a for a in artifacts if a["name"].startswith("scopy-linux-armhf")]
     else:
         return []
 
@@ -280,8 +304,18 @@ def main():
     print(f"Commit SHA: {args.commit_sha}")
 
     # Auto-detect platform if not provided
-    platform_value = args.platform if args.platform else autodetect_platform()
+    current_platform = autodetect_platform()
+    platform_value = args.platform if args.platform else current_platform
     print(f"Platform: {platform_value}")
+
+    # Validate platform compatibility for execution
+    if args.platform and not validate_platform_compatibility(args.platform, current_platform):
+        print(f"Error: Cannot run {args.platform} executable on {current_platform} platform.")
+        print("The executable will be downloaded but not launched.")
+        # Set a flag to skip execution later
+        skip_execution = True
+    else:
+        skip_execution = False
 
     owner = "analogdevicesinc"
     repo = "scopy"
@@ -334,6 +368,12 @@ def main():
         print(f"Executable not found for platform '{platform_value}'. Searched for: {exe_name}")
         sys.exit(1)
     print(f"Found executable: {exe_path}")
+
+    # Check if we should skip execution due to platform incompatibility
+    if skip_execution:
+        print(f"Skipping execution of {platform_value} executable on {current_platform} platform.")
+        print(f"Executable downloaded to: {exe_path}")
+        return
 
     # Launch the executable, optionally with a script
     import subprocess
