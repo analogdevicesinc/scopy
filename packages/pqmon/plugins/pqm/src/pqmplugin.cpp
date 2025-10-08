@@ -20,6 +20,7 @@
  */
 
 #include "pqmplugin.h"
+#include "preferenceshelper.h"
 #include "scopy-pqm_config.h"
 
 #include <QLoggingCategory>
@@ -28,6 +29,7 @@
 #include <acquisitionmanager.h>
 #include <deviceiconbuilder.h>
 #include <harmonicsinstrument.h>
+#include <menusectionwidget.h>
 #include <pqmdatalogger.h>
 #include <rmsinstrument.h>
 #include <settingsinstrument.h>
@@ -60,6 +62,33 @@ bool PQMPlugin::compatible(QString m_param, QString category)
 	cp->close(m_param);
 
 	return ret;
+}
+
+void PQMPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("pqm_concurrent", false);
+}
+
+bool PQMPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *layout = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET);
+	generalSection->contentLayout()->setSpacing(10);
+	layout->addWidget(generalSection);
+	layout->setSpacing(0);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	auto concurrentAcq =
+		PREFERENCE_CHECK_BOX(p, "pqm_concurrent", "Enable Concurrent Acquisition (EXPERIMENTAL)",
+				     "Enable concurrent acquisition for PQMPlugin instruments.", generalSection);
+
+	generalSection->contentLayout()->addWidget(concurrentAcq);
+	return true;
 }
 
 bool PQMPlugin::loadPage()

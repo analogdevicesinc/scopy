@@ -47,6 +47,8 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	, m_running(false)
 {
 	initData();
+	m_concurrentAcq = Preferences::get("pqm_concurrent").toBool();
+
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
 	setLayout(instrumentLayout);
@@ -125,6 +127,9 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
 	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
+
+	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
+		&HarmonicsInstrument::concurrentEnable);
 }
 
 HarmonicsInstrument::~HarmonicsInstrument()
@@ -209,6 +214,26 @@ void HarmonicsInstrument::setupPlotChannels()
 			first = false;
 		}
 		chNumber++;
+	}
+}
+
+void HarmonicsInstrument::resourceManagerCheck(bool en)
+{
+	if(en) {
+		ResourceManager::open("pqm" + m_uri, this);
+	} else {
+		ResourceManager::close("pqm" + m_uri);
+	}
+}
+
+void HarmonicsInstrument::concurrentEnable(QString pref, QVariant value)
+{
+	if(pref != "pqm_concurrent") {
+		return;
+	}
+	m_concurrentAcq = value.toBool();
+	if(!m_concurrentAcq) {
+		m_runBtn->setChecked(false);
 	}
 }
 
@@ -346,10 +371,8 @@ void HarmonicsInstrument::stop() { m_runBtn->setChecked(false); }
 void HarmonicsInstrument::toggleHarmonics(bool en)
 {
 	m_running = en;
-	if(en) {
-		ResourceManager::open("pqm" + m_uri, this);
-	} else {
-		ResourceManager::close("pqm" + m_uri);
+	if(!m_concurrentAcq) {
+		resourceManagerCheck(en);
 	}
 	Q_EMIT enableTool(en);
 }

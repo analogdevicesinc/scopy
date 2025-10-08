@@ -69,6 +69,8 @@ private:
 	void initTable();
 	void initPlot();
 	void setupPlotChannels();
+	void resourceManagerCheck(bool en);
+	void concurrentEnable(QString pref, QVariant value);
 	QWidget *createThdWidget(QWidget *parent = nullptr);
 	QWidget *createSettingsMenu(QWidget *parent);
 	QWidget *createMenuGeneralSection(QWidget *parent);
@@ -76,6 +78,7 @@ private:
 	bool selectedFromSameCol(QModelIndexList list);
 	QPushButton *createPQEventsBtn(QWidget *parent);
 
+	bool m_concurrentAcq = false;
 	DockableAreaInterface *m_dockableArea;
 	QString m_uri;
 	bool m_running;
