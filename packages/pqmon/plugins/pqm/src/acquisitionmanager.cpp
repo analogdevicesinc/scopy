@@ -59,6 +59,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 		connect(p, &Preferences::preferenceChanged, this, [this](QString pref, QVariant value) {
 			if(pref == "pqm_concurrent") {
 				m_concurrentAcq = value.toBool();
+				m_alternateExecution = !m_concurrentAcq;
 			}
 		});
 	} else {
@@ -140,19 +141,41 @@ void AcquisitionManager::futureReadData()
 void AcquisitionManager::readData()
 {
 	QMutexLocker locker(&m_mutex);
-	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
-		if(!m_processData.load()) {
-			setProcessData(true);
+
+	bool needsAttrData = m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"];
+	bool needsBufferData = m_tools["waveform"];
+	if(m_concurrentAcq && needsAttrData && needsBufferData) {
+		if(m_alternateExecution) {
+			readBuffData();
+		} else {
+			readAttrData();
 		}
-		m_attrHaveBeenRead = readPqmAttributes();
-		adjustMap("angle", &AcquisitionManager::computeAdjustedAngle);
-	}
-	if(m_tools["waveform"]) {
-		if(m_processData.load()) {
-			setProcessData(false);
+		m_alternateExecution = !m_alternateExecution;
+	} else {
+		if(needsAttrData) {
+			readAttrData();
 		}
-		m_buffHaveBeenRead = readBufferedData();
+		if(needsBufferData) {
+			readBuffData();
+		}
 	}
+}
+
+void AcquisitionManager::readAttrData()
+{
+	if(!m_processData.load()) {
+		setProcessData(true);
+	}
+	m_attrHaveBeenRead = readPqmAttributes();
+	adjustMap("angle", &AcquisitionManager::computeAdjustedAngle);
+}
+
+void AcquisitionManager::readBuffData()
+{
+	if(m_processData.load()) {
+		setProcessData(false);
+	}
+	m_buffHaveBeenRead = readBufferedData();
 }
 
 bool AcquisitionManager::readPqmAttributes()
