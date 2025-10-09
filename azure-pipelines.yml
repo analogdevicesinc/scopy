@@ -25,15 +25,21 @@ pr:
 stages:
 - stage: Builds
   jobs:
+  # Import cache logic from separate file
+  - template: azure-pipelines-cache-logic.yml
+
   - job: macOSBuilds
+    dependsOn: PrepareDepencies
     strategy:
       matrix:
         macOS_14:
           vmImage: 'macOS-14'
           artifactName: 'macOS-14'
+          depsArtifactName: 'deps-macOS-14'
         macOS_15:
           vmImage: 'macOS-15'
           artifactName: 'macOS-15'
+          depsArtifactName: 'deps-macOS-15'
 
     pool:
       vmImage: $[ variables['vmImage'] ]
@@ -41,9 +47,48 @@ stages:
     - checkout: self
       fetchDepth: 0
       clean: true
-    - script: ./ci/macOS/install_macos_deps.sh
-      displayName: 'Build and Install Dependencies'
+
+    # Download cached dependencies from cache job
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download cached dependencies'
+      inputs:
+        artifactName: '$(depsArtifactName)'
+        targetPath: '$(Build.Repository.LocalPath)'
+
+    # Extract dependencies
+    - script: |
+        set -e
+        echo "Extracting dependencies artifact..."
+        if [ -f "dependencies-$(vmImage).tar.gz" ]; then
+          tar -xzf "dependencies-$(vmImage).tar.gz"
+          echo "Dependencies extracted successfully"
+          ls -la staging/ || echo "No staging directory"
+        else
+          echo "Dependencies artifact not found, this may cause build issues"
+          exit 1
+        fi
+      displayName: 'Extract dependencies'
       workingDirectory: $(Build.Repository.LocalPath)
+
+    # Set up Homebrew environment (dependencies already cached)
+    - script: |
+        echo "Setting up Homebrew environment..."
+        export PATH="/usr/local/bin:$PATH"
+        export PATH="/usr/local/opt/bison/bin:$PATH"
+        QT_PATH="$(brew --prefix qt@5)/bin"
+        export PATH="${QT_PATH}:$PATH"
+        echo "##vso[task.setvariable variable=PATH]$PATH"
+
+        # Verify cached dependencies
+        if [ -d "staging/dependencies" ]; then
+          echo "Dependencies found in staging area"
+          ls -la staging/dependencies/lib/ | head -10
+        else
+          echo "Warning: Dependencies not found in expected location"
+        fi
+      displayName: 'Setup cached environment'
+      workingDirectory: $(Build.Repository.LocalPath)
+
     - script: |
             export BUILD_HOST="$(vmImage)"
             export ACCOUNT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $1}'`

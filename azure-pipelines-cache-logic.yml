@@ -1,0 +1,125 @@
+jobs:
+- job: PrepareDepencies
+  displayName: 'Prepare and Cache Dependencies'
+  strategy:
+    matrix:
+      macOS_14:
+        vmImage: 'macOS-14'
+        artifactName: 'deps-macOS-14'
+      macOS_15:
+        vmImage: 'macOS-15'
+        artifactName: 'deps-macOS-15'
+
+  pool:
+    vmImage: $[ variables['vmImage'] ]
+
+  steps:
+  - checkout: self
+    fetchDepth: 1
+    clean: true
+
+  # Cache Homebrew packages
+  - task: Cache@2
+    displayName: 'Cache Homebrew packages'
+    inputs:
+      key: 'homebrew-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
+      restoreKeys: |
+        homebrew-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
+        homebrew-v1 | "$(Agent.OS)" | $(vmImage)
+      path: |
+        /usr/local/Cellar
+        /usr/local/opt
+        /usr/local/lib/pkgconfig
+        /usr/local/include
+      cacheHitVar: HOMEBREW_CACHE_RESTORED
+
+  # Cache source-built dependencies
+  - task: Cache@2
+    displayName: 'Cache source dependencies'
+    inputs:
+      key: 'deps-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
+      restoreKeys: |
+        deps-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
+        deps-v1 | "$(Agent.OS)" | $(vmImage)
+      path: |
+        $(STAGING_AREA_DEPS)
+        $(Build.Repository.LocalPath)/staging
+      cacheHitVar: DEPS_CACHE_RESTORED
+
+  # Install dependencies (only if not cached)
+  - script: |
+      set -e
+      echo "Homebrew cache status: $HOMEBREW_CACHE_RESTORED"
+      echo "Dependencies cache status: $DEPS_CACHE_RESTORED"
+
+      # Set environment flags for selective installation
+      export SKIP_HOMEBREW_INSTALL=${HOMEBREW_CACHE_RESTORED:-false}
+      export SKIP_DEPS_BUILD=${DEPS_CACHE_RESTORED:-false}
+
+      echo "Skip Homebrew install: $SKIP_HOMEBREW_INSTALL"
+      echo "Skip dependencies build: $SKIP_DEPS_BUILD"
+
+      # Run dependency installation script
+      ./ci/macOS/install_macos_deps_cached.sh
+    displayName: 'Install and build dependencies'
+    workingDirectory: $(Build.Repository.LocalPath)
+
+  # Validate cache contents
+  - script: |
+      set -e
+      echo "=== Homebrew packages validation ==="
+      if [ "$HOMEBREW_CACHE_RESTORED" = "true" ]; then
+        brew list --versions | head -10
+        echo "Homebrew packages count: $(brew list | wc -l)"
+      fi
+
+      echo "=== Source dependencies validation ==="
+      if [ "$DEPS_CACHE_RESTORED" = "true" ]; then
+        find $(STAGING_AREA_DEPS) -name "*.dylib" -o -name "*.framework" | head -10
+        echo "Dependencies size: $(du -sh $(STAGING_AREA_DEPS) 2>/dev/null || echo 'N/A')"
+      fi
+
+      echo "=== Staging area contents ==="
+      ls -la $(Build.Repository.LocalPath)/staging/ || echo "Staging area not found"
+    displayName: 'Validate dependencies'
+    workingDirectory: $(Build.Repository.LocalPath)
+    condition: always()
+
+  # Create tarball of dependencies for artifact sharing
+  - script: |
+      set -e
+      cd $(Build.Repository.LocalPath)
+
+      # Create dependencies artifact
+      if [ -d "staging" ]; then
+        echo "Creating dependencies artifact..."
+        tar -czf dependencies-$(vmImage).tar.gz staging/
+        echo "Artifact size: $(du -sh dependencies-$(vmImage).tar.gz)"
+      else
+        echo "No staging directory found, creating empty artifact"
+        mkdir -p staging
+        tar -czf dependencies-$(vmImage).tar.gz staging/
+      fi
+    displayName: 'Create dependencies artifact'
+    workingDirectory: $(Build.Repository.LocalPath)
+
+  # Publish artifact for build jobs
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish dependencies artifact'
+    inputs:
+      targetPath: '$(Build.Repository.LocalPath)/dependencies-$(vmImage).tar.gz'
+      artifactName: '$(artifactName)'
+
+  # Debug information
+  - script: |
+      echo "=== System information ==="
+      sw_vers
+      echo "=== Disk usage ==="
+      df -h /usr/local
+      echo "=== Build variables ==="
+      echo "vmImage: $(vmImage)"
+      echo "artifactName: $(artifactName)"
+      echo "STAGING_AREA: $(STAGING_AREA)"
+      echo "STAGING_AREA_DEPS: $(STAGING_AREA_DEPS)"
+    displayName: 'Debug information'
+    condition: always()

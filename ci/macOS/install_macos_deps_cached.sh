@@ -1,0 +1,443 @@
+#!/bin/bash
+
+set -ex
+REPO_SRC=$(git rev-parse --show-toplevel)
+source $REPO_SRC/ci/macOS/macos_config.sh
+
+PACKAGES="${QT_FORMULAE} volk spdlog ${BOOST_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
+
+OS_VERSION=${1:-$(sw_vers -productVersion)}
+echo "MacOS version $OS_VERSION"
+
+source ${REPO_SRC}/ci/macOS/before_install_lib.sh
+
+validate_homebrew_cache() {
+	echo "=== Validating Homebrew cache ==="
+	local missing_packages=()
+
+	# Check critical packages exist and are functional
+	for package in qt@5 boost@1.85 cmake pkg-config; do
+		if ! brew list "$package" >/dev/null 2>&1; then
+			missing_packages+=("$package")
+		fi
+	done
+
+	if [ ${#missing_packages[@]} -gt 0 ]; then
+		echo "Missing critical packages: ${missing_packages[*]}"
+		return 1
+	fi
+
+	# Quick functionality test
+	if ! command -v cmake >/dev/null 2>&1; then
+		echo "cmake not in PATH, cache invalid"
+		return 1
+	fi
+
+	echo "Homebrew cache validation passed"
+	return 0
+}
+
+install_packages() {
+	echo "=== Installing Homebrew packages ==="
+
+	# Check if we should skip Homebrew installation
+	if [ "$SKIP_HOMEBREW_INSTALL" = "true" ] && validate_homebrew_cache; then
+		echo "Using cached Homebrew packages, skipping installation"
+		return 0
+	fi
+
+	echo "Installing Homebrew packages from scratch..."
+
+	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
+	rm -v /usr/local/bin/2to3* || true
+	rm -v /usr/local/bin/idle3* || true
+	rm -v /usr/local/bin/pydoc3* || true
+	rm -v /usr/local/bin/python3* || true
+	rm -v /usr/local/bin/python3-config || true
+	rm -v /usr/local/bin/pip3.13 || true
+
+	# uninstall cmake before installing other dependencies https://github.com/actions/runner-images/issues/12912
+	brew uninstall --force cmake || true
+
+	brew update
+	# Workaround for brew taking a long time to upgrade existing packages
+	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
+	macos_version=$(sw_vers -productVersion)
+	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
+	if [ "$major_version" -gt 12 ]; then
+		brew upgrade --display-times || true #ignore homebrew upgrade errors
+		# Workaround: Install or update libtool package only if macOS version is greater than 12
+		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
+		PACKAGES="$PACKAGES libtool"
+	else
+		export HOMEBREW_NO_AUTO_UPDATE=1
+	fi
+
+	brew install --overwrite --display-times $PACKAGES
+
+	pip3 install --break-system-packages mako
+}
+
+export_paths(){
+	QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
+	export PATH="/usr/local/bin:$PATH"
+	export PATH="/usr/local/opt/bison/bin:$PATH"
+	export PATH="${QT_PATH}:$PATH"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGING_AREA_DEPS/lib/pkgconfig"
+
+	QMAKE="$(command -v qmake)"
+	CMAKE_BIN="$(command -v cmake)"
+	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+	CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
+
+	echo -- USING CMAKE COMMAND:
+	echo $CMAKE
+	echo -- USING QT: $QT_PATH
+	echo -- USING QMAKE: $QMAKE
+	echo -- PATH: $PATH
+	echo -- PKG_CONFIG_PATH: $PKG_CONFIG_PATH
+}
+
+validate_deps_cache() {
+	echo "=== Validating source dependencies cache ==="
+
+	if [ ! -d "$STAGING_AREA_DEPS" ]; then
+		echo "Dependencies directory not found: $STAGING_AREA_DEPS"
+		return 1
+	fi
+
+	# Check for critical dependency libraries
+	local required_libs=("libiio" "libad9361" "libm2k")
+	for lib in "${required_libs[@]}"; do
+		if ! find "$STAGING_AREA_DEPS" -name "*${lib}*" -type f | grep -q .; then
+			echo "Missing dependency: $lib"
+			return 1
+		fi
+	done
+
+	echo "Source dependencies cache validation passed"
+	return 0
+}
+
+clone() {
+	echo "#######CLONE#######"
+	mkdir -p $STAGING_AREA
+	pushd $STAGING_AREA
+	git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
+	git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+	git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
+	git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
+	git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
+	git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+	git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
+	git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
+	git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	popd
+}
+
+generate_status_file(){
+	# Generate build status info for the about page
+	BUILD_STATUS_FILE=${REPO_SRC}/build-status
+	brew list --versions $PACKAGES > $BUILD_STATUS_FILE
+}
+
+save_version_info() {
+	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
+	>> $BUILD_STATUS_FILE
+}
+
+build_with_cmake() {
+	echo $PWD
+	BUILD_FOLDER=$PWD/build
+	rm -rf $BUILD_FOLDER
+	git clean -xdf
+	mkdir -p $BUILD_FOLDER
+	cd $BUILD_FOLDER
+	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
+	make $JOBS
+
+	#clear variable
+	CURRENT_BUILD_CMAKE_OPTS=""
+}
+
+build_libserialport(){
+	CURRENT_BUILD=libserialport
+	pushd $STAGING_AREA/$CURRENT_BUILD
+	save_version_info
+	git clean -xdf
+	./autogen.sh
+	./configure --prefix $STAGING_AREA_DEPS
+	make $JOBS
+	make install
+	popd
+}
+
+build_libiio() {
+	echo "### Building libiio - version $LIBIIO_VERSION"
+	CURRENT_BUILD=libiio
+	pushd $STAGING_AREA/libiio
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DWITH_TESTS:BOOL=OFF \
+		-DWITH_DOC:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=ON \
+		-DENABLE_DNS_SD:BOOL=ON \
+		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
+		-DCSHARP_BINDINGS:BOOL=OFF \
+		-DPYTHON_BINDINGS:BOOL=OFF \
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DENABLE_IPV6:BOOL=OFF \
+		"
+	build_with_cmake
+
+	# manually install framework
+	mkdir -p $STAGING_AREA_DEPS/include
+	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+	cp -v $STAGING_AREA/libiio/iio.h $STAGING_AREA_DEPS/include
+	cp -vr $STAGING_AREA/libiio/build/iio.framework $STAGING_AREA_DEPS/lib
+	cp -v $STAGING_AREA/libiio/build/libiio.pc $STAGING_AREA_DEPS/lib/pkgconfig
+	popd
+}
+
+build_libm2k() {
+	echo "### Building libm2k - branch $LIBM2K_BRANCH"
+	pushd $STAGING_AREA/libm2k
+	CURRENT_BUILD=libm2k
+	save_version_info
+
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF \
+		-DENABLE_CSHARP=OFF \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_TOOLS=OFF \
+		-DINSTALL_UDEV_RULES=OFF \
+		-DENABLE_LOG=OFF\
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_libad9361() {
+	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
+	CURRENT_BUILD=libad9361-iio
+	pushd $STAGING_AREA/libad9361
+	save_version_info
+	build_with_cmake
+
+	# manually install framework
+	mkdir -p $STAGING_AREA_DEPS/include
+	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+	cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
+	cp -vr $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
+	cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
+	popd
+}
+
+build_gnuradio() {
+	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
+	CURRENT_BUILD=gnuradio
+	pushd $STAGING_AREA/gnuradio
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
+		-DENABLE_DEFAULT=OFF \
+		-DENABLE_GNURADIO_RUNTIME=ON \
+		-DENABLE_GR_ANALOG=ON \
+		-DENABLE_GR_BLOCKS=ON \
+		-DENABLE_GR_FFT=ON \
+		-DENABLE_GR_FILTER=ON \
+		-DENABLE_GR_IIO=ON \
+		-DENABLE_POSTINSTALL=OFF
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_grm2k() {
+	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
+	CURRENT_BUILD=gr-m2k
+	pushd $STAGING_AREA/gr-m2k
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF \
+		-DDIGITAL=OFF
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_grscopy() {
+	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
+	CURRENT_BUILD=gr-scopy
+	pushd $STAGING_AREA/gr-scopy
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="-DWITH_PYTHON=OFF "
+	build_with_cmake
+	make install
+	popd
+}
+
+build_libsigrokdecode() {
+	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
+	CURRENT_BUILD=libsigrokdecode
+	pushd $STAGING_AREA/libsigrokdecode
+	save_version_info
+	git reset --hard
+	git clean -xdf
+	./autogen.sh
+	./configure --prefix $STAGING_AREA_DEPS
+	make $JOBS install
+	popd
+}
+
+patch_qwt() {
+	patch -p1 <<-EOF
+--- a/qwtconfig.pri
++++ b/qwtconfig.pri
+@@ -19,7 +19,7 @@ QWT_VERSION      = \$\${QWT_VER_MAJ}.\$\${QWT_VER_MIN}.\$\${QWT_VER_PAT}
+ QWT_INSTALL_PREFIX = \$\$[QT_INSTALL_PREFIX]
+
+ unix {
+-    QWT_INSTALL_PREFIX    = /usr/local/qwt-\$\$QWT_VERSION-ma
++    QWT_INSTALL_PREFIX    = $STAGING_AREA_DEPS
+     # QWT_INSTALL_PREFIX = /usr/local/qwt-\$\$QWT_VERSION-ma-qt-\$\$QT_VERSION
+ }
+
+@@ -42,7 +42,7 @@ QWT_INSTALL_LIBS      = \$\${QWT_INSTALL_PREFIX}/lib
+ # runtime environment of designer/creator.
+ ######################################################################
+
+-QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
++#QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
+
+ # linux distributors often organize the Qt installation
+ # their way and QT_INSTALL_PREFIX doesn't offer a good
+@@ -164,7 +164,7 @@ QWT_CONFIG     += QwtTests
+
+ macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
+
+-    QWT_CONFIG += QwtFramework
++#    QWT_CONFIG += QwtFramework
+ }
+
+ ######################################################################
+--- a/src/src.pro
++++ b/src/src.pro
+@@ -36,6 +36,7 @@ contains(QWT_CONFIG, QwtDll) {
+             QMAKE_LFLAGS_SONAME=
+         }
+     }
++    macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt.dylib
+ }
+ else {
+     CONFIG += staticlib
+EOF
+}
+
+
+build_qwt() {
+	echo "### Building qwt - branch qwt-multiaxes"
+	CURRENT_BUILD=qwt
+	pushd $STAGING_AREA/qwt
+	save_version_info
+	git clean -xdf
+	git reset --hard
+	patch_qwt
+	$QMAKE INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+	make $JOBS
+	make install
+	popd
+}
+
+build_libtinyiiod() {
+	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
+	CURRENT_BUILD=libtinyiiod
+	pushd $STAGING_AREA/libtinyiiod
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_kddock () {
+	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
+	pushd $STAGING_AREA/KDDockWidgets
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_ecm() {
+	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
+	pushd $STAGING_AREA/extra-cmake-modules
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_karchive () {
+	echo "### Building karchive - version $KARCHIVE_BRANCH"
+	pushd $STAGING_AREA/karchive
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF"
+	build_with_cmake
+	make install
+	popd
+}
+
+build_deps_cached(){
+	echo "=== Building source dependencies ==="
+
+	# Check if we should skip dependencies build
+	if [ "$SKIP_DEPS_BUILD" = "true" ] && validate_deps_cache; then
+		echo "Using cached source dependencies, skipping build"
+		return 0
+	fi
+
+	echo "Building source dependencies from scratch..."
+
+	# Build all dependencies
+	build_libserialport
+	build_libiio
+	build_libad9361
+	build_libm2k
+	build_gnuradio
+	build_grscopy
+	build_grm2k
+	build_qwt
+	build_libsigrokdecode
+	build_libtinyiiod
+	build_kddock
+	build_ecm
+	build_karchive
+}
+
+# Main execution
+echo "=== Starting cache-aware dependency installation ==="
+echo "SKIP_HOMEBREW_INSTALL: ${SKIP_HOMEBREW_INSTALL:-false}"
+echo "SKIP_DEPS_BUILD: ${SKIP_DEPS_BUILD:-false}"
+
+install_packages
+export_paths
+
+# Only clone if we need to build dependencies
+if [ "$SKIP_DEPS_BUILD" != "true" ] || ! validate_deps_cache; then
+	clone
+fi
+
+generate_status_file
+build_deps_cached
+
+echo "=== Dependency installation completed ==="
