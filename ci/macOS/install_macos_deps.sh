@@ -12,6 +12,19 @@ echo "MacOS version $OS_VERSION"
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
+	# Check if we should skip Homebrew installation (cache hit)
+	if [ "$SKIP_HOMEBREW_INSTALL" = "true" ]; then
+		echo "Homebrew cache restored, skipping package installation"
+		# Quick validation that key packages exist
+		if brew list qt@5 >/dev/null 2>&1 && command -v cmake >/dev/null 2>&1; then
+			echo "Homebrew cache validation successful"
+			return 0
+		else
+			echo "Homebrew cache validation failed, proceeding with installation"
+		fi
+	fi
+
+	echo "Installing Homebrew packages from scratch..."
 
 	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
 	rm -v /usr/local/bin/2to3* || true

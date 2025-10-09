@@ -26,59 +26,47 @@ jobs:
       restoreKeys: |
         homebrew-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
         homebrew-v1 | "$(Agent.OS)" | $(vmImage)
-      path: 
-        - /usr/local/Cellar
-        - /usr/local/opt
-        - /usr/local/lib/pkgconfig
-        - /usr/local/include
+      path: /usr/local
       cacheHitVar: HOMEBREW_CACHE_RESTORED
 
+  # TODO: Re-enable after Homebrew cache works
   # Cache source-built dependencies
-  - task: Cache@2
-    displayName: 'Cache source dependencies'
-    inputs:
-      key: 'deps-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
-      restoreKeys: |
-        deps-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
-        deps-v1 | "$(Agent.OS)" | $(vmImage)
-      path: $(STAGING_AREA)
-      cacheHitVar: DEPS_CACHE_RESTORED
+  # - task: Cache@2
+  #   displayName: 'Cache source dependencies'
+  #   inputs:
+  #     key: 'deps-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
+  #     path: $(STAGING_AREA)
+  #     cacheHitVar: DEPS_CACHE_RESTORED
 
-  # Install dependencies (only if not cached)
+  # Install dependencies with Homebrew cache awareness
   - script: |
       set -e
       echo "Homebrew cache status: $HOMEBREW_CACHE_RESTORED"
-      echo "Dependencies cache status: $DEPS_CACHE_RESTORED"
 
-      # Set environment flags for selective installation
+      # Set environment flag for Homebrew installation
       export SKIP_HOMEBREW_INSTALL=${HOMEBREW_CACHE_RESTORED:-false}
-      export SKIP_DEPS_BUILD=${DEPS_CACHE_RESTORED:-false}
-
       echo "Skip Homebrew install: $SKIP_HOMEBREW_INSTALL"
-      echo "Skip dependencies build: $SKIP_DEPS_BUILD"
 
-      # Run dependency installation script
-      ./ci/macOS/install_macos_deps_cached.sh
+      # Use original script with cache flag
+      ./ci/macOS/install_macos_deps.sh
     displayName: 'Install and build dependencies'
     workingDirectory: $(Build.Repository.LocalPath)
 
-  # Validate cache contents
+  # Validate Homebrew cache
   - script: |
       set -e
-      echo "=== Homebrew packages validation ==="
+      echo "=== Homebrew cache validation ==="
       if [ "$HOMEBREW_CACHE_RESTORED" = "true" ]; then
+        echo "Cache was restored, validating packages..."
         brew list --versions | head -10
-        echo "Homebrew packages count: $(brew list | wc -l)"
+        echo "Total Homebrew packages: $(brew list | wc -l)"
+      else
+        echo "No cache restored, packages will be installed fresh"
       fi
 
-      echo "=== Source dependencies validation ==="
-      if [ "$DEPS_CACHE_RESTORED" = "true" ]; then
-        find staging/dependencies -name "*.dylib" -o -name "*.framework" | head -10
-        echo "Dependencies size: $(du -sh staging/dependencies 2>/dev/null || echo 'N/A')"
-      fi
-
-      echo "=== Staging area contents ==="
-      ls -la staging/ || echo "Staging area not found"
+      echo "=== Post-install verification ==="
+      echo "Qt version: $(brew list --versions qt@5 || echo 'Not found')"
+      echo "CMake version: $(cmake --version | head -1 || echo 'Not found')"
     displayName: 'Validate dependencies'
     workingDirectory: $(Build.Repository.LocalPath)
     condition: always()
