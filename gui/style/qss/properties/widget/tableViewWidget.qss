@@ -1,9 +1,18 @@
-QHeaderView::section[&&property&&=true] {
-	border: 1px solid &content_default&;
-	background-color: &background_primary&;
+QTableWidget QHeaderView::section {
+    background-color: &background_primary&;
+    border: 1px solid &background_secondary&;
 }
 
-QTableWidget::item[&&property&&=true] {
-	border-right: 1px dashed &content_default&;
-	border-bottom: 1px dashed &content_default&;
+QTableWidget QTableCornerButton::section {
+    background-color: &background_primary&;
+    border: 1px solid &background_secondary&;
+}
+
+QTableWidget {
+    gridline-color: &background_secondary&;
+}
+
+QTableWidget::item:selected {
+    background-color: &interactive_primary_hover&;
+    color: &content_inverse&;
 }
