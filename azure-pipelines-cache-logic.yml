@@ -26,11 +26,11 @@ jobs:
       restoreKeys: |
         homebrew-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
         homebrew-v1 | "$(Agent.OS)" | $(vmImage)
-      path: |
-        /usr/local/Cellar
-        /usr/local/opt
-        /usr/local/lib/pkgconfig
-        /usr/local/include
+      path: 
+        - /usr/local/Cellar
+        - /usr/local/opt
+        - /usr/local/lib/pkgconfig
+        - /usr/local/include
       cacheHitVar: HOMEBREW_CACHE_RESTORED
 
   # Cache source-built dependencies
