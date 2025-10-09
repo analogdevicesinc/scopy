@@ -84,8 +84,8 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	m_thdWidget = createThdWidget(tableWrapper);
 
 	m_table = new QTableWidget(MAX_CHNLS, NUMBER_OF_HARMONICS, dockableAreaWidget);
+	Style::setBackgroundColor(m_table, Style::getAttribute(json::theme::background_plot), true);
 	Style::setStyle(m_table, style::properties::widget::tableViewWidget);
-	Style::setBackgroundColor(m_table, Style::getAttribute(json::theme::background_primary), true);
 	initTable();
 
 	tableWrapLay->addWidget(m_thdWidget);
@@ -169,7 +169,6 @@ void HarmonicsInstrument::initTable()
 	for(int i = 0; i < HARMONICS_MIN_DEGREE; i++) {
 		m_table->horizontalHeader()->hideSection(i);
 	}
-	Style::setStyle(m_table->parentWidget(), style::properties::widget::tableViewWidget, true, true);
 	for(int i = 0; i < MAX_CHNLS; i++) {
 		for(int j = 0; j < NUMBER_OF_HARMONICS; j++) {
 			QTableWidgetItem *tableItem = new QTableWidgetItem();
