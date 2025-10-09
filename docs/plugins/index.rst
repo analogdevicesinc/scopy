@@ -62,6 +62,9 @@ Application Specific plugins
 * AD9084
     * :ref:`AD9084 <ad9084>`
 
+* ADRV9002
+    * :ref:`ADRV9002 (Jupiter) <adrv9002>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -79,6 +82,7 @@ Contents
    swiot1l/index
    ad936x/index
    ad9084/index
+   adrv9002/adrv9002
    jesdstatus/index
    scripting/scripting
 
