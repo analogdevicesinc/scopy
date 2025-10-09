@@ -41,9 +41,7 @@ jobs:
       restoreKeys: |
         deps-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
         deps-v1 | "$(Agent.OS)" | $(vmImage)
-      path: |
-        $(STAGING_AREA_DEPS)
-        $(Build.Repository.LocalPath)/staging
+      path: $(STAGING_AREA)
       cacheHitVar: DEPS_CACHE_RESTORED
 
   # Install dependencies (only if not cached)
@@ -75,12 +73,12 @@ jobs:
 
       echo "=== Source dependencies validation ==="
       if [ "$DEPS_CACHE_RESTORED" = "true" ]; then
-        find $(STAGING_AREA_DEPS) -name "*.dylib" -o -name "*.framework" | head -10
-        echo "Dependencies size: $(du -sh $(STAGING_AREA_DEPS) 2>/dev/null || echo 'N/A')"
+        find staging/dependencies -name "*.dylib" -o -name "*.framework" | head -10
+        echo "Dependencies size: $(du -sh staging/dependencies 2>/dev/null || echo 'N/A')"
       fi
 
       echo "=== Staging area contents ==="
-      ls -la $(Build.Repository.LocalPath)/staging/ || echo "Staging area not found"
+      ls -la staging/ || echo "Staging area not found"
     displayName: 'Validate dependencies'
     workingDirectory: $(Build.Repository.LocalPath)
     condition: always()
@@ -119,7 +117,7 @@ jobs:
       echo "=== Build variables ==="
       echo "vmImage: $(vmImage)"
       echo "artifactName: $(artifactName)"
-      echo "STAGING_AREA: $(STAGING_AREA)"
-      echo "STAGING_AREA_DEPS: $(STAGING_AREA_DEPS)"
+      echo "Working directory: $(pwd)"
+      echo "Staging area: $(ls -la staging/ 2>/dev/null || echo 'Not found')"
     displayName: 'Debug information'
     condition: always()

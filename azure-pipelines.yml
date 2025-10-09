@@ -1,5 +1,7 @@
 variables:
     QT_FORMULAE: qt@5
+    STAGING_AREA: $(Build.Repository.LocalPath)/staging
+    STAGING_AREA_DEPS: $(Build.Repository.LocalPath)/staging/dependencies
     REPO_SLUG: $(Build.Repository.Name)
     CURRENT_COMMIT: $(Build.SourceVersion)
 
