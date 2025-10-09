@@ -1,0 +1,35 @@
+<h1>ADRV9002 (Jupiter) Plugin</h1>
+
+<p>Scopy now offers dedicated support for the ADRV9002 (Jupiter) dual-channel RF transceiver.</p>
+
+<p>The new <b>ADRV9002 (Jupiter) Tool</b> enables you to integrate and control ADRV9002-based devices within Scopy. It provides comprehensive features including device configuration, dual-channel RX/TX control, tracking calibrations, and an integrated profile generator.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>Device Global Settings:</b> System-wide configuration and status monitoring including profile management and temperature monitoring</li>
+  <li><b>Dual RX/TX Channels:</b> Independent control of receive and transmit signal paths with advanced gain control and calibration options</li>
+  <li><b>Profile Generator:</b> Integrated tool for creating and managing ADRV9002 profiles with support for external TES integration</li>
+  <li><b>Tracking Calibrations:</b> Real-time calibration controls for optimal RF performance</li>
+</ul>
+
+<h2>Profile Generator</h2>
+<p>The integrated <b>Profile Generator</b> provides a user-friendly interface for creating ADRV9002 device profiles. This feature requires the external <b>libadrv9002-iio</b> library and offers:</p>
+<ul>
+  <li>Preset profile templates</li>
+  <li>Channel configuration for RX1/RX2, TX1/TX2, and ORX channels</li>
+  <li>Real-time JSON configuration preview</li>
+  <li>Direct device loading and file export capabilities</li>
+</ul>
+
+<h2>External Tool Requirement</h2>
+<p><b>Note:</b> The Profile Generator functionality requires the <b>libadrv9002-iio</b> library to be installed. Without this external tool, the Profile Generator will be disabled. The library is available at: <a href="https://analogdevicesinc.github.io/libadrv9002-iio" target="_blank">https://analogdevicesinc.github.io/libadrv9002-iio</a></p>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Connect your ADRV9002 device to your computer.</li>
+  <li>Ensure the ADRV9002 IIO drivers are properly installed.</li>
+  <li>Open Scopy and select the <b>ADRV9002</b> tool from the available instruments.</li>
+  <li>(Optional) Install the <b>libadrv9002-iio</b> library to enable Profile Generator functionality.</li>
+</ol>
+
+<p>For more detailed information, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/adrv9002/adrv9002.html" target="_blank">official documentation</a>.</p>
