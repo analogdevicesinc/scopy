@@ -25,7 +25,7 @@ jobs:
       key: 'homebrew-downloads-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/macos_config.sh'
       restoreKeys: |
         homebrew-downloads-v1 | "$(Agent.OS)" | $(vmImage)
-      path: ~/Library/Caches/Homebrew
+      path: /Users/runner/Library/Caches/Homebrew
       cacheHitVar: HOMEBREW_CACHE_RESTORED
 
   # TODO: Re-enable after Homebrew cache works
