@@ -18,14 +18,14 @@ jobs:
     fetchDepth: 1
     clean: true
 
-  # Cache Homebrew downloads (bottles, source, metadata)
+  # Cache Homebrew installed packages (Cellar directory)
   - task: Cache@2
-    displayName: 'Cache Homebrew downloads'
+    displayName: 'Cache Homebrew packages'
     inputs:
-      key: 'homebrew-downloads-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/macos_config.sh'
+      key: 'homebrew-cellar-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/macos_config.sh'
       restoreKeys: |
-        homebrew-downloads-v1 | "$(Agent.OS)" | $(vmImage)
-      path: /Users/runner/Library/Caches/Homebrew
+        homebrew-cellar-v1 | "$(Agent.OS)" | $(vmImage)
+      path: /usr/local/Cellar
       cacheHitVar: HOMEBREW_CACHE_RESTORED
 
   # TODO: Re-enable after Homebrew cache works
@@ -37,41 +37,44 @@ jobs:
   #     path: $(STAGING_AREA)
   #     cacheHitVar: DEPS_CACHE_RESTORED
 
-  # Install dependencies with Homebrew download cache optimization
+  # Install dependencies with Homebrew package cache optimization
   - script: |
       set -e
-      echo "Homebrew download cache status: $HOMEBREW_CACHE_RESTORED"
+      echo "Homebrew package cache status: $HOMEBREW_CACHE_RESTORED"
 
-      # Optimize Homebrew operations based on cache
+      # Set environment flags based on cache status
       if [ "$HOMEBREW_CACHE_RESTORED" = "true" ]; then
-        echo "Download cache restored, optimizing Homebrew operations"
+        echo "Homebrew packages restored from cache"
+        export HOMEBREW_PACKAGES_CACHED=true
         export HOMEBREW_NO_AUTO_UPDATE=1  # Skip brew update
-        export HOMEBREW_CACHE_AVAILABLE=true
       else
-        echo "No download cache, running full Homebrew operations"
-        export HOMEBREW_CACHE_AVAILABLE=false
+        echo "No package cache, will install packages fresh"
+        export HOMEBREW_PACKAGES_CACHED=false
       fi
 
-      # Run optimized installation script
+      # Run installation script with cache awareness
       ./ci/macOS/install_macos_deps.sh
     displayName: 'Install and build dependencies'
     workingDirectory: $(Build.Repository.LocalPath)
 
-  # Validate Homebrew cache
+  # Validate Homebrew packages
   - script: |
       set -e
-      echo "=== Homebrew cache validation ==="
+      echo "=== Homebrew package validation ==="
+      echo "Cellar directory contents: $(ls /usr/local/Cellar | wc -l) packages"
+
       if [ "$HOMEBREW_CACHE_RESTORED" = "true" ]; then
-        echo "Cache was restored, validating packages..."
-        brew list --versions | head -10
-        echo "Total Homebrew packages: $(brew list | wc -l)"
+        echo "Package cache was restored"
+        echo "Sample cached packages:"
+        ls /usr/local/Cellar | head -5
       else
-        echo "No cache restored, packages will be installed fresh"
+        echo "No package cache, packages installed fresh"
       fi
 
-      echo "=== Post-install verification ==="
-      echo "Qt version: $(brew list --versions qt@5 || echo 'Not found')"
-      echo "CMake version: $(cmake --version | head -1 || echo 'Not found')"
+      echo "=== Post-setup verification ==="
+      echo "Qt status: $(brew list --versions qt@5 2>/dev/null || echo 'Not linked')"
+      echo "CMake status: $(cmake --version 2>/dev/null | head -1 || echo 'Not available')"
+      echo "Total linked packages: $(brew list | wc -l)"
     displayName: 'Validate dependencies'
     workingDirectory: $(Build.Repository.LocalPath)
     condition: always()

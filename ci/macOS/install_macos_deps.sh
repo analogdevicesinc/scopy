@@ -12,15 +12,27 @@ echo "MacOS version $OS_VERSION"
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
-	echo "Installing Homebrew packages..."
+	echo "Setting up Homebrew packages..."
 
-	# Show cache status
-	if [ "$HOMEBREW_CACHE_AVAILABLE" = "true" ]; then
-		echo "Using cached downloads (bottles/source) - installation will be faster"
-		echo "Cache size: $(du -sh ~/Library/Caches/Homebrew 2>/dev/null || echo 'Unknown')"
-	else
-		echo "No download cache available - will download packages fresh"
+	# Check if packages are cached (in Cellar)
+	if [ "$HOMEBREW_PACKAGES_CACHED" = "true" ]; then
+		echo "Homebrew packages restored from cache"
+		echo "Cached packages: $(ls /usr/local/Cellar | wc -l) packages found"
+
+		# Recreate symlinks for cached packages
+		echo "Recreating package symlinks..."
+		for package in $PACKAGES; do
+			if [ -d "/usr/local/Cellar/$package" ]; then
+				echo "Linking $package"
+				brew link --overwrite "$package" || true
+			fi
+		done
+
+		echo "Package linking completed - skipping installation"
+		return 0
 	fi
+
+	echo "No cached packages found - installing fresh..."
 
 	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
 	rm -v /usr/local/bin/2to3* || true
