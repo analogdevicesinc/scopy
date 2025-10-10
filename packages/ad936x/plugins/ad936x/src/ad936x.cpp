@@ -79,6 +79,9 @@ AD936X::AD936X(iio_context *ctx, QWidget *parent)
 		watcher->setFuture(future);
 	});
      
+
+	/////////tesrasdasda
+
 	QStackedWidget *centralWidget = new QStackedWidget(this);
 
 	m_controlsWidget = new QWidget(this);
