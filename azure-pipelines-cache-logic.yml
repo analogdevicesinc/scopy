@@ -18,15 +18,14 @@ jobs:
     fetchDepth: 1
     clean: true
 
-  # Cache Homebrew packages
+  # Cache Homebrew downloads (bottles, source, metadata)
   - task: Cache@2
-    displayName: 'Cache Homebrew packages'
+    displayName: 'Cache Homebrew downloads'
     inputs:
-      key: 'homebrew-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
+      key: 'homebrew-downloads-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/macos_config.sh'
       restoreKeys: |
-        homebrew-v1 | "$(Agent.OS)" | $(vmImage) | ci/macOS/install_macos_deps.sh
-        homebrew-v1 | "$(Agent.OS)" | $(vmImage)
-      path: /usr/local
+        homebrew-downloads-v1 | "$(Agent.OS)" | $(vmImage)
+      path: ~/Library/Caches/Homebrew
       cacheHitVar: HOMEBREW_CACHE_RESTORED
 
   # TODO: Re-enable after Homebrew cache works
@@ -38,16 +37,22 @@ jobs:
   #     path: $(STAGING_AREA)
   #     cacheHitVar: DEPS_CACHE_RESTORED
 
-  # Install dependencies with Homebrew cache awareness
+  # Install dependencies with Homebrew download cache optimization
   - script: |
       set -e
-      echo "Homebrew cache status: $HOMEBREW_CACHE_RESTORED"
+      echo "Homebrew download cache status: $HOMEBREW_CACHE_RESTORED"
 
-      # Set environment flag for Homebrew installation
-      export SKIP_HOMEBREW_INSTALL=${HOMEBREW_CACHE_RESTORED:-false}
-      echo "Skip Homebrew install: $SKIP_HOMEBREW_INSTALL"
+      # Optimize Homebrew operations based on cache
+      if [ "$HOMEBREW_CACHE_RESTORED" = "true" ]; then
+        echo "Download cache restored, optimizing Homebrew operations"
+        export HOMEBREW_NO_AUTO_UPDATE=1  # Skip brew update
+        export HOMEBREW_CACHE_AVAILABLE=true
+      else
+        echo "No download cache, running full Homebrew operations"
+        export HOMEBREW_CACHE_AVAILABLE=false
+      fi
 
-      # Use original script with cache flag
+      # Run optimized installation script
       ./ci/macOS/install_macos_deps.sh
     displayName: 'Install and build dependencies'
     workingDirectory: $(Build.Repository.LocalPath)

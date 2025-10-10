@@ -12,19 +12,15 @@ echo "MacOS version $OS_VERSION"
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
-	# Check if we should skip Homebrew installation (cache hit)
-	if [ "$SKIP_HOMEBREW_INSTALL" = "true" ]; then
-		echo "Homebrew cache restored, skipping package installation"
-		# Quick validation that key packages exist
-		if brew list qt@5 >/dev/null 2>&1 && command -v cmake >/dev/null 2>&1; then
-			echo "Homebrew cache validation successful"
-			return 0
-		else
-			echo "Homebrew cache validation failed, proceeding with installation"
-		fi
-	fi
+	echo "Installing Homebrew packages..."
 
-	echo "Installing Homebrew packages from scratch..."
+	# Show cache status
+	if [ "$HOMEBREW_CACHE_AVAILABLE" = "true" ]; then
+		echo "Using cached downloads (bottles/source) - installation will be faster"
+		echo "Cache size: $(du -sh ~/Library/Caches/Homebrew 2>/dev/null || echo 'Unknown')"
+	else
+		echo "No download cache available - will download packages fresh"
+	fi
 
 	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
 	rm -v /usr/local/bin/2to3* || true
@@ -37,18 +33,23 @@ install_packages() {
 	# uninstall cmake before installing other dependencies https://github.com/actions/runner-images/issues/12912
 	brew uninstall --force cmake || true
 
-	brew update
-	# Workaround for brew taking a long time to upgrade existing packages
-	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
+	# Conditionally run brew update based on cache status
+	if [ "$HOMEBREW_NO_AUTO_UPDATE" != "1" ]; then
+		echo "Running brew update (no cache or cache miss)"
+		brew update
+	else
+		echo "Skipping brew update (download cache available)"
+	fi
+
+	# Simplified macOS version handling
 	macos_version=$(sw_vers -productVersion)
 	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
 	if [ "$major_version" -gt 12 ]; then
+		echo "macOS $major_version detected - will upgrade existing packages"
 		brew upgrade --display-times || true #ignore homebrew upgrade errors
-		# Workaround: Install or update libtool package only if macOS version is greater than 12
-		# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
 		PACKAGES="$PACKAGES libtool"
 	else
-		export HOMEBREW_NO_AUTO_UPDATE=1
+		echo "macOS $major_version detected - skipping upgrades"
 	fi
 
 	brew install --overwrite --display-times $PACKAGES
