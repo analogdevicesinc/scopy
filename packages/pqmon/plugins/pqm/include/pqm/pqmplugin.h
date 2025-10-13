@@ -28,6 +28,7 @@
 
 #include <QObject>
 #include <acquisitionmanager.h>
+#include <attrinstrumenthandler.h>
 #include <gui/infopage.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
@@ -63,6 +64,7 @@ private:
 
 	InfoPage *m_infoPage;
 	AcquisitionManager *m_acqManager;
+	AttrInstrumentHandler *m_attrHandler;
 };
 } // namespace scopy::pqm
 

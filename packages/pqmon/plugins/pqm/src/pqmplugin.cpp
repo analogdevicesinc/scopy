@@ -175,6 +175,8 @@ bool PQMPlugin::onConnect()
 	m_acqManager = new AcquisitionManager(ctx, m_pingTask, this);
 	bool hasFwVers = m_acqManager->hasFwVers();
 
+	m_attrHandler = new AttrInstrumentHandler(m_param, this);
+
 	ToolMenuEntry *rmsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "pqmrms");
 	RmsInstrument *rms = new RmsInstrument(rmsTme, m_param);
 	rmsTme->setTool(rms);
@@ -212,6 +214,9 @@ bool PQMPlugin::onConnect()
 		&SettingsInstrument::attributeAvailable);
 	connect(settings, &SettingsInstrument::setAttributes, m_acqManager, &AcquisitionManager::setConfigAttr);
 
+	m_attrHandler->setRmsInstrument(rms);
+	m_attrHandler->setHarmonicsInstrument(harmonics);
+
 	for(auto &tool : m_toolList) {
 		connect(tool->tool(), SIGNAL(enableTool(bool, QString)), m_acqManager,
 			SLOT(toolEnabled(bool, QString)));
@@ -233,6 +238,8 @@ bool PQMPlugin::onDisconnect()
 	}
 	delete(m_acqManager);
 	m_acqManager = nullptr;
+	delete(m_attrHandler);
+	m_attrHandler = nullptr;
 	clearPingTask();
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
