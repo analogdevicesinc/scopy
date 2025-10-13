@@ -35,15 +35,15 @@
 #include <gui/widgets/measurementlabel.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/toolbuttons.h>
-#include <pluginbase/resourcemanager.h>
 
 #define NUMBER_OF_HARMONICS 51
 #define HARMONICS_MIN_DEGREE 0
 #define HARMONICS_MAX_DEGREE 50
 #define MAX_CHNLS 6
+#define HARMONICS_TOOL "harmonics"
 
 namespace scopy::pqm {
-class SCOPY_PQM_EXPORT HarmonicsInstrument : public QWidget, public ResourceUser
+class SCOPY_PQM_EXPORT HarmonicsInstrument : public QWidget
 {
 	Q_OBJECT
 public:
@@ -51,12 +51,13 @@ public:
 	~HarmonicsInstrument();
 
 	void showThdWidget(bool show);
+
 public Q_SLOTS:
-	void stop() override;
+	void stop();
 	void toggleHarmonics(bool en);
 	void onAttrAvailable(QMap<QString, QMap<QString, QString>> attr);
 Q_SIGNALS:
-	void enableTool(bool en, QString toolName = "harmonics");
+	void enableTool(bool en, QString toolName = HARMONICS_TOOL);
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 	void pqEvent();
 	void showPlots(bool show);
@@ -73,7 +74,6 @@ private:
 	void createCurrentPlots(QWidget *parent = nullptr);
 	QMap<QString, PlotChannel *> setupPlotChannels(PlotWidget *plot, const QMap<QString, QString> &channels,
 						       int startChIndex = 0);
-	void resourceManagerCheck(bool en);
 	void concurrentEnable(QString pref, QVariant value);
 	QWidget *createThdWidget(QWidget *parent = nullptr);
 	QWidget *createSettingsMenu(QWidget *parent);
@@ -82,7 +82,6 @@ private:
 	bool selectedFromSameCol(QModelIndexList list);
 	QPushButton *createPQEventsBtn(QWidget *parent);
 
-	bool m_concurrentAcq = false;
 	DockableAreaInterface *m_dockableArea;
 	QString m_uri;
 	bool m_running;
