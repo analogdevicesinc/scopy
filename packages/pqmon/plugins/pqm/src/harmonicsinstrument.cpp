@@ -22,6 +22,7 @@
 #include "harmonicsinstrument.h"
 #include "dockablearea.h"
 #include "dockwrapper.h"
+#include "menuonoffswitch.h"
 #include "plotaxis.h"
 #include "qheaderview.h"
 
@@ -38,6 +39,7 @@
 #include <style.h>
 #include <gui/widgets/filebrowserwidget.h>
 
+using namespace scopy;
 using namespace scopy::pqm;
 
 HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
@@ -72,6 +74,10 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
 	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
+	QScrollArea *scrollArea = new QScrollArea(this);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setWidget(dockableAreaWidget);
+	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	// central widget components
 	DockWrapperInterface *tableDock = createDockWrapper("Table");
@@ -92,14 +98,18 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	tableWrapLay->addWidget(m_table);
 	tableDock->setInnerWidget(tableWrapper);
 
-	DockWrapperInterface *plotDock = createDockWrapper("Plot");
+	DockWrapperInterface *plotDock = createDockWrapper("Harmonics Overview");
 	m_plot = new PlotWidget(dockableAreaWidget);
-	initPlot();
-	setupPlotChannels();
+	initPlot(m_plot);
+	m_plotChnls = setupPlotChannels(m_plot, m_chnls);
 	plotDock->setInnerWidget(m_plot);
 
-	m_dockableArea->addDockWrapper(tableDock, DockableAreaInterface::Direction_BOTTOM);
-	m_dockableArea->addDockWrapper(plotDock, DockableAreaInterface::Direction_BOTTOM);
+	// Create individual current plots for ia, ib, ic
+	createCurrentPlots(dockableAreaWidget);
+	m_dockableArea->addDockWrapper(plotDock, DockableAreaInterface::Direction_TOP);
+	plotDock->setActivated(false);
+	m_dockableArea->addDockWrapper(tableDock, DockableAreaInterface::Direction_TOP);
+
 	// instrument menu
 	GearBtn *settingsMenuBtn = new GearBtn(this);
 	settingsMenuBtn->setChecked(true);
@@ -115,12 +125,13 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 		}
 	});
 
-	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
+	tool->addWidgetToCentralContainerHelper(scrollArea);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(pqEventsBtn, TTA_LEFT);
 
+	connect(this, &HarmonicsInstrument::showPlots, this, [plotDock](bool en) { plotDock->setActivated(en); });
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &HarmonicsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
@@ -178,42 +189,62 @@ void HarmonicsInstrument::initTable()
 	}
 }
 
-void HarmonicsInstrument::initPlot()
+void HarmonicsInstrument::initPlot(PlotWidget *plot)
 {
-	m_plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
-	m_plot->yAxis()->scaleDraw()->setFloatPrecision(2);
-	m_plot->yAxis()->scaleDraw()->setUnitType("%");
-	m_plot->yAxis()->setInterval(0, 100);
+	plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	plot->yAxis()->scaleDraw()->setFloatPrecision(2);
+	plot->yAxis()->scaleDraw()->setUnitType("%");
+	plot->yAxis()->setInterval(0, 100);
 
-	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
-	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
-	m_plot->xAxis()->scaleDraw()->setUnitType("");
-	m_plot->xAxis()->setInterval(HARMONICS_MIN_DEGREE, HARMONICS_MAX_DEGREE);
+	plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	plot->xAxis()->scaleDraw()->setFloatPrecision(0);
+	plot->xAxis()->scaleDraw()->setUnitType("");
+	plot->xAxis()->setInterval(HARMONICS_MIN_DEGREE, HARMONICS_MAX_DEGREE);
 
-	m_plot->setShowYAxisLabels(true);
-	m_plot->setShowXAxisLabels(true);
-	m_plot->replot();
+	plot->setShowYAxisLabels(true);
+	plot->setShowXAxisLabels(true);
+	plot->replot();
 }
 
-void HarmonicsInstrument::setupPlotChannels()
+void HarmonicsInstrument::createCurrentPlots(QWidget *parent)
 {
-	int chNumber = 0;
+	QStringList currentChannels = {"ia", "ib", "ic"};
+	int chIdx = 0;
+	for(const QString &channel : currentChannels) {
+		DockWrapperInterface *currentDock = createDockWrapper(m_chnls.key(channel));
+		PlotWidget *currentPlot = new PlotWidget(parent);
+		initPlot(currentPlot);
+		QMap<QString, QString> singleChannel = {{m_chnls.key(channel), channel}};
+		setupPlotChannels(currentPlot, singleChannel, chIdx);
+		currentDock->setInnerWidget(currentPlot);
+		m_currentPlots[channel] = currentPlot;
+		m_dockableArea->addDockWrapper(currentDock, DockableAreaInterface::Direction_BOTTOM);
+		chIdx++;
+	}
+}
+
+QMap<QString, PlotChannel *>
+HarmonicsInstrument::setupPlotChannels(PlotWidget *plot, const QMap<QString, QString> &channels, int startChIndex)
+{
+	QMap<QString, PlotChannel *> plotChannels;
+	int chNumber = startChIndex;
 	bool first = true;
-	for(const QString &ch : m_chnls) {
+	for(const QString &ch : channels) {
 		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chNumber)), 1);
-		PlotChannel *plotCh = new PlotChannel(m_chnls.key(ch), chPen, m_plot->xAxis(), m_plot->yAxis(), this);
-		m_plot->addPlotChannel(plotCh);
+		PlotChannel *plotCh = new PlotChannel(channels.key(ch), chPen, plot->xAxis(), plot->yAxis(), this);
+		plot->addPlotChannel(plotCh);
 		plotCh->setStyle(PlotChannel::PCS_STICKS);
 		plotCh->setThickness(10);
 		plotCh->curve()->setRawSamples(m_xTime.data(), m_yValues[ch].data(), m_xTime.size());
-		m_plotChnls[ch] = plotCh;
+		plotChannels.insert(ch, plotCh);
 		if(first) {
 			plotCh->setEnabled(true);
-			m_plot->selectChannel(plotCh);
+			plot->selectChannel(plotCh);
 			first = false;
 		}
 		chNumber++;
 	}
+	return plotChannels;
 }
 
 void HarmonicsInstrument::resourceManagerCheck(bool en)
@@ -297,6 +328,11 @@ QWidget *HarmonicsInstrument::createMenuGeneralSection(QWidget *parent)
 		activeChnlCb->combo()->addItem(m_chnls.key(ch));
 	}
 	m_table->selectRow(0);
+
+	MenuOnOffSwitch *showCurrentPlots = new MenuOnOffSwitch(tr("Show overview plot"), generalSection);
+	showCurrentPlots->onOffswitch()->setChecked(false);
+
+	connect(showCurrentPlots->onOffswitch(), &QAbstractButton::toggled, this, &HarmonicsInstrument::showPlots);
 	connect(activeChnlCb->combo(), &QComboBox::currentTextChanged, this,
 		&HarmonicsInstrument::onActiveChnlChannged);
 	connect(activeChnlCb->combo(), QOverload<int>::of(&QComboBox::activated), m_table, &QTableView::selectRow);
@@ -307,6 +343,7 @@ QWidget *HarmonicsInstrument::createMenuGeneralSection(QWidget *parent)
 
 	generalSection->add(harmonicType);
 	generalSection->add(activeChnlCb);
+	generalSection->add(showCurrentPlots);
 
 	return generalSection;
 }
@@ -415,10 +452,12 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 		m_yValues[ch].clear();
 		for(const QString &val : qAsConst(harmonics)) {
 			double hValue = val.toDouble(&ok);
-			if(!ok)
+			if(!ok) {
 				continue;
-			if(m_yValues[ch].size() >= NUMBER_OF_HARMONICS)
+			}
+			if(m_yValues[ch].size() >= NUMBER_OF_HARMONICS) {
 				break;
+			}
 			m_yValues[ch].push_back(hValue);
 		}
 		// thd labels update
@@ -426,6 +465,9 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 	}
 	updateTable();
 	m_plot->replot();
+	for(PlotWidget *plot : m_currentPlots) {
+		plot->replot();
+	}
 	if(m_singleBtn->isChecked()) {
 		m_singleBtn->setChecked(false);
 	}

@@ -59,6 +59,8 @@ Q_SIGNALS:
 	void enableTool(bool en, QString toolName = "harmonics");
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 	void pqEvent();
+	void showPlots(bool show);
+
 private Q_SLOTS:
 	void updateTable();
 	void onActiveChnlChannged(QString chnlId);
@@ -67,8 +69,10 @@ private Q_SLOTS:
 private:
 	void initData();
 	void initTable();
-	void initPlot();
-	void setupPlotChannels();
+	void initPlot(PlotWidget *plot);
+	void createCurrentPlots(QWidget *parent = nullptr);
+	QMap<QString, PlotChannel *> setupPlotChannels(PlotWidget *plot, const QMap<QString, QString> &channels,
+						       int startChIndex = 0);
 	void resourceManagerCheck(bool en);
 	void concurrentEnable(QString pref, QVariant value);
 	QWidget *createThdWidget(QWidget *parent = nullptr);
@@ -88,6 +92,7 @@ private:
 	SingleShotBtn *m_singleBtn;
 	QTableWidget *m_table;
 	PlotWidget *m_plot;
+	QMap<QString, PlotWidget *> m_currentPlots;
 	std::vector<double> m_xTime;
 	QMap<QString, std::vector<double>> m_yValues;
 	QMap<QString, MeasurementLabel *> m_labels;
