@@ -48,6 +48,8 @@ AD936X::AD936X(iio_context *ctx, QWidget *parent)
 	, m_ctx(ctx)
 {
 
+	//// test macos build 
+
 	m_mainLayout = new QVBoxLayout(this);
 	m_mainLayout->setMargin(0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
