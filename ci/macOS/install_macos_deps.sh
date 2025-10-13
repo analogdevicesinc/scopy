@@ -13,6 +13,18 @@ source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
 
+	# Configure Homebrew cache directory for Azure Pipeline
+	if [ -n "${HOMEBREW_CACHE_RESTORED}" ]; then
+		echo "✅ Homebrew cache restored from Azure Pipeline"
+		export HOMEBREW_NO_AUTO_UPDATE=1
+	else
+		echo "ℹ️  No Homebrew cache - downloading fresh packages"
+	fi
+	
+	# Set Homebrew cache location
+	export HOMEBREW_CACHE="${PIPELINE_WORKSPACE}/.homebrew-cache"
+	mkdir -p "$HOMEBREW_CACHE"
+
 	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
 	rm -v /usr/local/bin/2to3* || true
 	rm -v /usr/local/bin/idle3* || true

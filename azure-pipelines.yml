@@ -41,6 +41,18 @@ stages:
     - checkout: self
       fetchDepth: 0
       clean: true
+    
+    # Phase 1: Homebrew cache for macOS-14 testing only
+    - task: Cache@2
+      inputs:
+        key: 'homebrew-v1 | "macOS-14" | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
+        restoreKeys: |
+          homebrew-v1 | "macOS-14"
+        path: '$(Pipeline.Workspace)/.homebrew-cache'
+        cacheHitVar: 'HOMEBREW_CACHE_RESTORED'
+      displayName: 'Cache Homebrew Downloads (macOS-14 Testing)'
+      condition: eq(variables['vmImage'], 'macOS-14')
+    
     - script: ./ci/macOS/install_macos_deps.sh
       displayName: 'Build and Install Dependencies'
       workingDirectory: $(Build.Repository.LocalPath)
