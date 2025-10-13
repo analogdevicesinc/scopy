@@ -45,7 +45,7 @@ stages:
     # Phase 1: Homebrew cache for macOS-14 testing only
     - task: Cache@2
       inputs:
-        key: 'homebrew-v1 | "test-session-001" | "macOS-14" | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
+        key: 'homebrew-test | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh'
         path: '$(Pipeline.Workspace)/.homebrew-cache'
         cacheHitVar: 'HOMEBREW_CACHE_RESTORED'
       displayName: 'Cache Homebrew Downloads (macOS-14 Testing)'
