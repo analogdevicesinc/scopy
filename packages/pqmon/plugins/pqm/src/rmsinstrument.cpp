@@ -56,7 +56,6 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	setLayout(instrumentLayout);
 	instrumentLayout->setMargin(0);
 
-	m_concurrentAcq = Preferences::get("pqm_concurrent").toBool();
 	m_dockableArea = createDockableArea(this);
 
 	ToolTemplate *tool = new ToolTemplate(this);
@@ -143,14 +142,12 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleRms(bool)));
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
 	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleRms(bool)));
-	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this, &RmsInstrument::concurrentEnable);
 }
 
 RmsInstrument::~RmsInstrument()
 {
 	m_labels.clear();
 	m_attributes.clear();
-	ResourceManager::close("pqm" + m_uri);
 }
 
 void RmsInstrument::createLabels(MeasurementsPanel *mPanel, QStringList chnls, QStringList labels, QString color)
@@ -251,34 +248,11 @@ void RmsInstrument::updatePlot(PolarPlotWidget *plot, QString type)
 	plot->setData(plotData);
 }
 
-void RmsInstrument::resourceManagerCheck(bool en)
-{
-	if(en) {
-		ResourceManager::open("pqm" + m_uri, this);
-	} else {
-		ResourceManager::close("pqm" + m_uri);
-	}
-}
-
-void RmsInstrument::concurrentEnable(QString pref, QVariant value)
-{
-	if(pref != "pqm_concurrent") {
-		return;
-	}
-	m_concurrentAcq = value.toBool();
-	if(!m_concurrentAcq) {
-		m_runBtn->setChecked(false);
-	}
-}
-
 void RmsInstrument::stop() { m_runBtn->setChecked(false); }
 
 void RmsInstrument::toggleRms(bool en)
 {
 	m_running = en;
-	if(!m_concurrentAcq) {
-		resourceManagerCheck(en);
-	}
 	Q_EMIT enableTool(en);
 }
 

@@ -31,13 +31,13 @@
 #include <gui/widgets/measurementlabel.h>
 #include <gui/docking/dockwrapperinterface.h>
 #include <gui/docking/dockableareainterface.h>
-#include <pluginbase/resourcemanager.h>
 #include <pluginbase/toolmenuentry.h>
 
 #define DEVICE_NAME "pqm"
+#define RMS_TOOL "rms"
 
 namespace scopy::pqm {
-class SCOPY_PQM_EXPORT RmsInstrument : public QWidget, public ResourceUser
+class SCOPY_PQM_EXPORT RmsInstrument : public QWidget
 {
 	Q_OBJECT
 public:
@@ -46,11 +46,11 @@ public:
 
 Q_SIGNALS:
 	void pqEvent();
-	void enableTool(bool en, QString toolName = "rms");
+	void enableTool(bool en, QString toolName = RMS_TOOL);
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 
 public Q_SLOTS:
-	void stop() override;
+	void stop();
 	void toggleRms(bool en);
 	void onAttrAvailable(QMap<QString, QMap<QString, QString>> data);
 
@@ -60,8 +60,6 @@ private:
 	void initPlot(PolarPlotWidget *plot);
 	void setupPlotChannels(PolarPlotWidget *plot, QMap<QString, QString> channels, int thickness = 5);
 	void updatePlot(PolarPlotWidget *plot, QString type);
-	void resourceManagerCheck(bool en);
-	void concurrentEnable(QString pref, QVariant value);
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 	QWidget *createSettingsMenu(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
@@ -71,7 +69,6 @@ private:
 	DockWrapperInterface *m_voltageDockWrapper;
 	DockWrapperInterface *m_currentDockWrapper;
 
-	bool m_concurrentAcq = false;
 	QString m_uri;
 	ToolMenuEntry *m_tme;
 	bool m_running;
