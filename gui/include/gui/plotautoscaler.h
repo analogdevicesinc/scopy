@@ -39,6 +39,7 @@ public:
 	PlotAutoscaler(QObject *parent = nullptr);
 	~PlotAutoscaler();
 
+	bool isActive() const;
 	bool xAxisMode() const;
 	double tolerance() const;
 	int timeout() const;
