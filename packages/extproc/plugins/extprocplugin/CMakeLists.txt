@@ -72,6 +72,16 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
+# FFTW
+find_path(FFTW3F_INCLUDE_DIR fftw3.h)
+find_library(FFTW3F_LIBRARY NAMES fftw3f libfftw3f)
+
+if(FFTW3F_INCLUDE_DIR AND FFTW3F_LIBRARY)
+	message(STATUS "Found FFTW3F: ${FFTW3F_LIBRARY}")
+else()
+	message(FATAL_ERROR "FFTW3F not found! Please install fftw3f or set FFTW3F_INCLUDE_DIR and FFTW3F_LIBRARY.")
+endif()
+
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
@@ -97,6 +107,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CURRENT_PKG_PATH}/include)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+
+# FFTW include + link
+target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW3F_INCLUDE_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FFTW3F_LIBRARY})
 
 target_link_libraries(
 	${PROJECT_NAME}
