@@ -49,6 +49,11 @@ Q_SIGNALS:
 	void enableTool(bool en, QString toolName = RMS_TOOL);
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 
+	// Emitted when this instrument requests other instruments to reset their event buttons
+	void resetEventsRequest();
+	// Received signal to reset this instrument's event button
+	void resetEventsBtn();
+
 public Q_SLOTS:
 	void stop();
 	void toggleRms(bool en);
