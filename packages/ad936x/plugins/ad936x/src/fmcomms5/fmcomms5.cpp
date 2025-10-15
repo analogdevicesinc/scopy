@@ -132,7 +132,7 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, QWidget *parent)
 
 	QLabel *imageLabel2 = new QLabel(blockDiagramStackWidget);
 	imageLabel2->setAlignment(Qt::AlignCenter);
-	imageLabel2->setPixmap(QPixmap(":/pluto/AD_FMCOMMS5_EBZ.jpg"));
+	imageLabel2->setPixmap(QPixmap(":/pluto/ad_fmcomms5_ebz.jpg"));
 	imageStack->addWidget(imageLabel2);
 
 	blockDiagramStackLayout->addWidget(imageStack);
