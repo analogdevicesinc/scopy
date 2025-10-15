@@ -55,7 +55,7 @@ bool Ad936xPlugin::compatible(QString m_param, QString category)
 	for(int i = 0; i < device_count; ++i) {
 		iio_device *dev = iio_context_get_device(conn->context(), i);
 		const char *dev_name = iio_device_get_name(dev);
-		if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+		if(dev_name && QString(dev_name).startsWith("ad936", Qt::CaseInsensitive)) {
 			ret = true;
 			break;
 		}
@@ -117,13 +117,13 @@ bool Ad936xPlugin::onConnect()
 		m_toolList[0]->setTool(fmcomms5);
 		m_toolList[0]->setName("FMCOMMS5");
 		m_toolList[0]->setEnabled(true);
-		m_toolList[0]->setRunBtnVisible(true);
+		m_toolList[0]->setRunBtnVisible(false);
 
 		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context());
 		m_toolList[1]->setTool(fmcomms5Advanced);
 		m_toolList[1]->setName("FMCOMMS5 Advanced");
 		m_toolList[1]->setEnabled(true);
-		m_toolList[1]->setRunBtnVisible(true);
+		m_toolList[1]->setRunBtnVisible(false);
 
 	} else {
 		AD936X *ad936X = new AD936X(conn->context());
