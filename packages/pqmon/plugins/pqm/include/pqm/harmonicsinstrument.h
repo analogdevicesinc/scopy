@@ -56,11 +56,17 @@ public Q_SLOTS:
 	void stop();
 	void toggleHarmonics(bool en);
 	void onAttrAvailable(QMap<QString, QMap<QString, QString>> attr);
+
 Q_SIGNALS:
 	void enableTool(bool en, QString toolName = HARMONICS_TOOL);
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 	void pqEvent();
 	void showPlots(bool show);
+
+	// Emitted when this instrument requests other instruments to reset their event buttons
+	void resetEventsRequest();
+	// Received signal to reset this instrument's event button
+	void resetEventsBtn();
 
 private Q_SLOTS:
 	void updateTable();

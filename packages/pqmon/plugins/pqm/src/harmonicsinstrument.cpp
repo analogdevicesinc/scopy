@@ -122,6 +122,11 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 			pqEventsBtn->setChecked(m_running);
 		}
 	});
+	connect(this, &HarmonicsInstrument::resetEventsBtn, this, [this, pqEventsBtn]() {
+		if(pqEventsBtn->isChecked()) {
+			pqEventsBtn->setChecked(false);
+		}
+	});
 
 	tool->addWidgetToCentralContainerHelper(scrollArea);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
@@ -462,6 +467,7 @@ QPushButton *HarmonicsInstrument::createPQEventsBtn(QWidget *parent)
 	btn->setIcon(bellIcon);
 	btn->setLayoutDirection(Qt::RightToLeft);
 	connect(btn, &QPushButton::toggled, btn, &QPushButton::setEnabled);
+	connect(btn, &QPushButton::clicked, this, &HarmonicsInstrument::resetEventsRequest);
 
 	return btn;
 }

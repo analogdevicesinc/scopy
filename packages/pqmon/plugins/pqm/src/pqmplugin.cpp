@@ -214,6 +214,9 @@ bool PQMPlugin::onConnect()
 		&SettingsInstrument::attributeAvailable);
 	connect(settings, &SettingsInstrument::setAttributes, m_acqManager, &AcquisitionManager::setConfigAttr);
 
+	connect(rms, &RmsInstrument::resetEventsRequest, harmonics, &HarmonicsInstrument::resetEventsBtn);
+	connect(harmonics, &HarmonicsInstrument::resetEventsRequest, rms, &RmsInstrument::resetEventsBtn);
+
 	m_attrHandler->setRmsInstrument(rms);
 	m_attrHandler->setHarmonicsInstrument(harmonics);
 

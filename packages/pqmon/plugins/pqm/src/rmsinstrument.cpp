@@ -130,6 +130,11 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 			pqEventsBtn->setChecked(m_running);
 		}
 	});
+	connect(this, &RmsInstrument::resetEventsBtn, this, [this, pqEventsBtn]() {
+		if(pqEventsBtn->isChecked()) {
+			pqEventsBtn->setChecked(false);
+		}
+	});
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
@@ -334,6 +339,7 @@ QPushButton *RmsInstrument::createPQEventsBtn(QWidget *parent)
 	btn->setIcon(bellIcon);
 	btn->setLayoutDirection(Qt::RightToLeft);
 	connect(btn, &QPushButton::toggled, btn, &QPushButton::setEnabled);
+	connect(btn, &QPushButton::clicked, this, &RmsInstrument::resetEventsRequest);
 
 	return btn;
 }
