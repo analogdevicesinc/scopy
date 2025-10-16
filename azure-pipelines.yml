@@ -49,7 +49,7 @@ stages:
         path: '$(Pipeline.Workspace)/.homebrew-cache'
         cacheHitVar: 'HOMEBREW_CACHE_RESTORED'
       displayName: 'Cache Homebrew Downloads'
-      condition: eq(variables['vmImage'], 'macOS-14')
+      condition: or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15'))
 
     # Git Repositories Cache
     - task: Cache@2
@@ -58,16 +58,16 @@ stages:
         path: '$(Pipeline.Workspace)/.git-cache'
         cacheHitVar: 'GIT_REPOS_CACHE_RESTORED'
       displayName: 'Cache Git Repositories'
-      condition: eq(variables['vmImage'], 'macOS-14')
+      condition: or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15'))
 
     # Built Dependencies Cache
     - task: Cache@2
       inputs:
-        key: 'built-deps-v1 | ci/macOS/macos_config.sh | ci/macOS/install_macos_deps.sh | "$(date +%Y-%m)"'
+        key: 'built-deps-v1 | "$(vmImage)" | ci/macOS/macos_config.sh | ci/macOS/install_macos_deps.sh | "$(date +%Y-%m)"'
         path: '$(Build.Repository.LocalPath)/staging/dependencies'
         cacheHitVar: 'BUILT_DEPS_CACHE_RESTORED'
       displayName: 'Cache Built Dependencies'
-      condition: eq(variables['vmImage'], 'macOS-14')
+      condition: or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15'))
 
     - script: ./ci/macOS/install_macos_deps.sh
       displayName: 'Build and Install Dependencies'
