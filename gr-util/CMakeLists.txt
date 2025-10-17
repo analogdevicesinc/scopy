@@ -76,15 +76,20 @@ generate_export_header(
 # --------------------------
 find_path(GENALYZER_INCLUDE_DIR
     NAMES cgenalyzer_simplified_beta.h
-    PATHS /usr/local/include /usr/include
+    HINTS ${CMAKE_PREFIX_PATH}
+    PATH_SUFFIXES include
 )
 find_library(GENALYZER_LIB
     NAMES genalyzer
-    PATHS /usr/local/lib /usr/lib
+    HINTS ${CMAKE_PREFIX_PATH}
+    PATH_SUFFIXES lib lib64
 )
 
 if(NOT GENALYZER_INCLUDE_DIR OR NOT GENALYZER_LIB)
-    message(FATAL_ERROR "Genalyzer not found")
+    message(STATUS "GENALYZER_INCLUDE_DIR: ${GENALYZER_INCLUDE_DIR}")
+    message(STATUS "GENALYZER_LIB: ${GENALYZER_LIB}")
+    message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+    message(FATAL_ERROR "Genalyzer not found. Please ensure genalyzer is installed and CMAKE_PREFIX_PATH is set correctly.")
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GENALYZER_INCLUDE_DIR})
