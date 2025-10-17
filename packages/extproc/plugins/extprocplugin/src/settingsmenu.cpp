@@ -27,6 +27,7 @@
 #include <style.h>
 #include <menusectionwidget.h>
 #include <QLoggingCategory>
+#include <menuonoffswitch.h>
 
 Q_LOGGING_CATEGORY(CAT_EXT_SETTINGS, "ExtSettingsMenu");
 
@@ -61,6 +62,14 @@ void SettingsMenu::createAcqMenu()
 	QVBoxLayout *acqLay = new QVBoxLayout(acqWidget);
 	acqLay->setMargin(0);
 
+	// Post-processing
+	MenuSectionCollapseWidget *postProcSection = new MenuSectionCollapseWidget(
+		"Post-processing", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
+	MenuOnOffSwitch *fftSwitch = new MenuOnOffSwitch("FFT");
+	fftSwitch->onOffswitch()->setChecked(true);
+	connect(fftSwitch->onOffswitch(), &QPushButton::toggled, this, &SettingsMenu::fftEnabled);
+	postProcSection->add(fftSwitch);
+
 	// Buffer menu
 	MenuSectionCollapseWidget *bufferAcq = new MenuSectionCollapseWidget(
 		"Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
@@ -79,6 +88,7 @@ void SettingsMenu::createAcqMenu()
 	m_analysisMenu = new AnalysisMenu();
 	analysisMenu->add(m_analysisMenu);
 
+	acqLay->addWidget(postProcSection);
 	acqLay->addWidget(bufferAcq);
 	acqLay->addWidget(analysisCb);
 	acqLay->addWidget(analysisMenu);
