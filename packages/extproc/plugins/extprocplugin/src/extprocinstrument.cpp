@@ -107,6 +107,7 @@ void ExtProcInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &ExtProcInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &ExtProcInstrument::bufferParamsChanged);
 	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
+	connect(m_settings, &SettingsMenu::fftEnabled, m_plotManager, &PlotManager::fftEnabled);
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(this, &ExtProcInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &ExtProcInstrument::requestNewData);
