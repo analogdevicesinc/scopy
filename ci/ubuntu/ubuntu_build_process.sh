@@ -27,6 +27,7 @@ IIOEMU_BRANCH=main
 KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
+GENALYZER_BRANCH=v0.1.2
 
 QT=/opt/Qt/5.15.2/gcc_64
 QMAKE_BIN=$QT/bin/qmake
@@ -54,7 +55,7 @@ if [ "$USE_STAGING" == "ON" ]
 		STAGING_AREA_DEPS=/usr/local
 		export LD_LIBRARY_PATH=$QT/lib:$LD_LIBRARY_PATH:
 		CMAKE_OPTS=(\
-			-DCMAKE_PREFIX_PATH=$QT \
+			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 			-DCMAKE_VERBOSE_MAKEFILE=ON \
 			-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
@@ -87,6 +88,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 
@@ -320,6 +322,17 @@ build_karchive () {
 	popd
 }
 
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	pushd $STAGING_AREA/genalyzer
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
 build_iio-emu() {
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	pushd $STAGING_AREA/iio-emu
@@ -360,6 +373,7 @@ build_deps(){
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON
+	build_genalyzer ON
 	build_iio-emu ON
 }
 
