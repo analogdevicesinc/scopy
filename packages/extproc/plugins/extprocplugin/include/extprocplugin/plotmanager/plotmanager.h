@@ -55,6 +55,7 @@ Q_SIGNALS:
 	void requestNewData();
 	void bufferDataReady(QVector<QVector<float>> data);
 	void plotSettings(QWidget *settings);
+	void fftEnabled(bool en);
 
 public Q_SLOTS:
 	void samplingFreqAvailable(int samplingFreq);

@@ -52,6 +52,7 @@ Q_SIGNALS:
 	void analysisChanged(const QString &type);
 	void analysisConfig(const QString &type, const QVariantMap &inConfig);
 	void bufferParamsChanged(const BufferParams &params);
+	void fftEnabled(bool en);
 
 public Q_SLOTS:
 	void onSettingsMenu(QWidget *w);

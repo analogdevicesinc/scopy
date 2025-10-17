@@ -29,6 +29,7 @@ using namespace scopy::extprocplugin;
 
 DataManager::DataManager(QObject *parent)
 	: QObject(parent)
+	, m_computeFFT(true)
 {
 	m_dataReader = new DataReader(this);
 	m_dataReader->openFile(ExtProcUtils::dataOutPath());
@@ -98,6 +99,8 @@ void DataManager::onInputData(QVector<QVector<float>> bufferData)
 	}
 }
 
+void DataManager::onFftEnabled(bool en) { m_computeFFT = en; }
+
 void DataManager::computeXTime(int samplingFreq, int samples)
 {
 	QVector<float> xTime;
@@ -109,6 +112,9 @@ void DataManager::computeXTime(int samplingFreq, int samples)
 
 void DataManager::computeFFT(QVector<QVector<float>> bufferData)
 {
+	if(!m_computeFFT) {
+		return;
+	}
 	if(bufferData.size() == 2) {
 		FFTResult fftResult = m_dataProcessor->computeComplexFFT(bufferData[0], bufferData[1], m_samplingFreq);
 		m_plotsData.insert(DataManagerKeys::FFT_FREQUENCY, fftResult.frequency);

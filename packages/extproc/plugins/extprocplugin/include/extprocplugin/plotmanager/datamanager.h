@@ -92,6 +92,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void onInputData(QVector<QVector<float>> bufferData);
+	void onFftEnabled(bool en);
 
 private Q_SLOTS:
 	void onDataReady(QMap<QString, QVector<float>> &data);
@@ -101,6 +102,7 @@ private:
 	void computeXTime(int samplingFreq, int samples);
 	void computeFFT(QVector<QVector<float>> bufferData);
 
+	bool m_computeFFT;
 	double m_samplingFreq;
 	double m_sampleCount;
 	DataReader *m_dataReader;
