@@ -93,7 +93,8 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	connect(acqSettingsBtn, &QPushButton::toggled, this, [this](bool b) { m_tool->openLeftContainerHelper(b); });
 }
 
-ExtProcInstrument::~ExtProcInstrument() {
+ExtProcInstrument::~ExtProcInstrument()
+{
 	deletePopup();
 	if(m_tool) {
 		m_tool->deleteLater();
@@ -124,6 +125,7 @@ void ExtProcInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &ExtProcInstrument::bufferParamsChanged);
 	connect(m_settings, &SettingsMenu::acqFileSelected, this, &ExtProcInstrument::acqFileSelected);
 	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
+	connect(m_settings, &SettingsMenu::fftEnabled, m_plotManager, &PlotManager::fftEnabled);
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(this, &ExtProcInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &ExtProcInstrument::requestNewData);
@@ -216,7 +218,7 @@ void ExtProcInstrument::deletePopup()
 
 void ExtProcInstrument::activationCodePopup()
 {
-	if(m_popupWidget){
+	if(m_popupWidget) {
 		return;
 	}
 	m_popupWidget = new PopupWidget(this);

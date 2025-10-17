@@ -27,6 +27,7 @@
 #include <menuheader.h>
 #include <style.h>
 #include <QLoggingCategory>
+#include <menuonoffswitch.h>
 
 Q_LOGGING_CATEGORY(CAT_QIQ_SETTINGS, "QIQSettingsMenu");
 
@@ -73,6 +74,14 @@ void SettingsMenu::createAcqMenu()
 	m_fileAcqBrowser->lineEdit()->setPlaceholderText("Select an iqbin file");
 	m_fileAcqSection->add(m_fileAcqBrowser);
 
+	// Post-processing
+	MenuSectionCollapseWidget *postProcSection = new MenuSectionCollapseWidget(
+		"Post-processing", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
+	MenuOnOffSwitch *fftSwitch = new MenuOnOffSwitch("FFT");
+	fftSwitch->onOffswitch()->setChecked(true);
+	connect(fftSwitch->onOffswitch(), &QPushButton::toggled, this, &SettingsMenu::fftEnabled);
+	postProcSection->add(fftSwitch);
+
 	// Buffer menu
 	MenuSectionCollapseWidget *bufferAcq = new MenuSectionCollapseWidget(
 		"Acquisition", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, acqWidget);
@@ -92,6 +101,7 @@ void SettingsMenu::createAcqMenu()
 	analysisMenu->add(m_analysisMenu);
 
 	acqLay->addWidget(m_fileAcqSection);
+	acqLay->addWidget(postProcSection);
 	acqLay->addWidget(bufferAcq);
 	acqLay->addWidget(analysisCb);
 	acqLay->addWidget(analysisMenu);
