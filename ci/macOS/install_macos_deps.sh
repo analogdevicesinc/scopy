@@ -74,21 +74,9 @@ setup_git_cache() {
 setup_dependencies_cache() {
     echo "🔧 Setting up dependencies cache..."
 
-    if [ "${BUILT_DEPS_CACHE_RESTORED}" = "true" ]; then
-        echo "✅ Built dependencies cache restored"
-        # Validate cache isn't corrupted
-        if [ -d "$STAGING_AREA_DEPS" ] && [ "$(ls -A $STAGING_AREA_DEPS 2>/dev/null)" ]; then
-            echo "📦 Found cached dependencies in $STAGING_AREA_DEPS"
-            export DEPENDENCIES_CACHED=true
-        else
-            echo "⚠️  Dependencies cache directory empty or corrupted - clearing and rebuilding"
-            rm -rf "$STAGING_AREA_DEPS"
-            export DEPENDENCIES_CACHED=false
-        fi
-    else
-        echo "ℹ️  No dependencies cache - building fresh"
-        export DEPENDENCIES_CACHED=false
-    fi
+    # TESTING: Force fresh build to test if cache is the root cause
+    echo "🧪 TESTING: Forcing fresh dependency build (cache disabled)"
+    export DEPENDENCIES_CACHED=false
 }
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
