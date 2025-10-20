@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STAGING_AREA=$PWD/staging
+STAGING_AREA=${BUILD_REPOSITORY_LOCALPATH:-$PWD}/staging
 STAGING_AREA_DEPS=$STAGING_AREA/dependencies
 REPO_SRC=$(git rev-parse --show-toplevel)
 BUILDDIR=$REPO_SRC/build
