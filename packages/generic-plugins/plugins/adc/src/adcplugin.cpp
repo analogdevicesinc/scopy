@@ -87,6 +87,7 @@ void ADCPlugin::initPreferences()
 	p->init("adc_add_remove_plot", false);
 	p->init("adc_add_remove_instrument", false);
 	p->init("adc_acquisition_timeout", 10000);
+	p->init("adc_enable_iio_context_ping", true);
 }
 
 bool ADCPlugin::loadPreferencesPage()
@@ -178,6 +179,11 @@ bool ADCPlugin::loadPreferencesPage()
 				     "instruments, providing an easy way to switch between different run scenarios "
 				     "without affecting previous settings.",
 				     m_preferencesPage);
+	auto adc_enable_iio_context_ping =
+		PREFERENCE_CHECK_BOX(p, "adc_enable_iio_context_ping", "Enable automatic IIO context ping",
+				     "When enabled, a ping may be called before some ADC operations to verify if the "
+				     "context is working as expected.",
+				     m_preferencesPage);
 
 	generalSection->contentLayout()->addWidget(adc_plot_xaxis_label_position);
 	generalSection->contentLayout()->addWidget(adc_plot_yaxis_label_position);
@@ -186,6 +192,7 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->addWidget(adc_plot_ycursor_position);
 	generalSection->contentLayout()->addWidget(adc_default_y_mode);
 	generalSection->contentLayout()->addWidget(adc_acquisition_timeout);
+	generalSection->contentLayout()->addWidget(adc_enable_iio_context_ping);
 	generalSection->contentLayout()->addWidget(adc_plot_labels);
 	generalSection->contentLayout()->addWidget(adc_add_remove_plot);
 	generalSection->contentLayout()->addWidget(adc_add_remove_instrument);

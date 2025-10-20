@@ -177,7 +177,8 @@ bool GRTimeSinkComponent::start()
 		timeout = 1000;
 
 	iio_context_set_timeout(m_node->ctx(), 1000);
-	if(!IIOPingTask::pingCtx(m_node->ctx()))
+	bool pingEnabled = Preferences::get("adc_enable_iio_context_ping").toBool();
+	if(pingEnabled && !IIOPingTask::pingCtx(m_node->ctx()))
 		return false;
 	iio_context_set_timeout(m_node->ctx(), timeout);
 	m_sync->setBufferSize(this, m_samplingInfo.bufferSize);
