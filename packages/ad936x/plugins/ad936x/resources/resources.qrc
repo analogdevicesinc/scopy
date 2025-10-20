@@ -5,6 +5,6 @@
         <file>ad936x-filters/AD936x_LP_256kHz_768kSPS.ftr</file>
         <file>ad936x-filters/AD936x_LP_333kHz_1MSPS.ftr</file>
         <file>ad936x-filters/AD936x_LP_666kHz_2MSPS.ftr</file>
-        <file>ad_fmcomms5_ebz.jpg</file>
+        <file>ad_fmcomms5_ebz.png</file>
     </qresource>
 </RCC>
