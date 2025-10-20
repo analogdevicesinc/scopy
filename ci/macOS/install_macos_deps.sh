@@ -137,33 +137,26 @@ install_packages() {
 
 	# Install packages and handle failures
 	if ! brew install --overwrite --display-times $PACKAGES; then
-		echo "❌ Package installation failed!"
-
-		# Check which specific packages are missing
-		echo "🔍 Checking which packages failed to install..."
-		FAILED_PACKAGES=""
-		for package in $PACKAGES; do
-			if ! brew list "$package" &>/dev/null; then
-				FAILED_PACKAGES="$FAILED_PACKAGES $package"
-			fi
-		done
-
-		if [ -n "$FAILED_PACKAGES" ]; then
-			echo "⚠️  Missing packages:$FAILED_PACKAGES"
-			echo "🧹 Clearing homebrew cache and restarting installation..."
-
-			# Clear homebrew cache
-			rm -rf "$HOMEBREW_CACHE_DIR"
-			mkdir -p "$HOMEBREW_CACHE_DIR"
-
-			# Restart installation without cache
-			export HOMEBREW_CACHE_RESTORED="false"
-			brew update
-			brew install --overwrite --display-times $PACKAGES
-		fi
+		echo "Error: Failed to install required Homebrew packages"
+		echo "Check which packages failed to install above"
+		exit 1
 	fi
 
-	pip3 install --break-system-packages mako
+	pip3 install --break-system-packages mako || {
+		echo "Error: Failed to install mako python package"
+		exit 1
+	}
+}
+
+validate_packages() {
+	echo "Validating package installation..."
+	for package in $PACKAGES; do
+		if ! brew list "$package" &>/dev/null; then
+			echo "Error: Package '$package' failed to install"
+			exit 1
+		fi
+	done
+	echo "All packages installed successfully"
 }
 
 export_paths(){
@@ -531,6 +524,7 @@ setup_dependencies_cache
 check_cache_sizes
 
 install_packages
+validate_packages
 export_paths
 clone
 generate_status_file
