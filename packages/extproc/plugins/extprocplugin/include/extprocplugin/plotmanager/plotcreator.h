@@ -24,6 +24,7 @@
 
 #include "menuplotchannelcurvestylecontrol.h"
 #include <QObject>
+#include <menuonoffswitch.h>
 #include <plotautoscaler.h>
 #include <controller/extprocplotinfo.h>
 #include <gui/plotwidget.h>
@@ -101,10 +102,11 @@ private:
 
 	void autoscaleX();
 	void autoscaleY();
+	void handleAutoscale();
 	void addPlotChannel();
 	void rmPlotChannel(int chnlIdx);
 
-	bool m_first = true;
+	MenuOnOffSwitch *m_autoscalerSwitch;
 	QStringList m_dmEntries;
 	PlotWidget *m_plotWidget{nullptr};
 	QWidget *m_plotSettings{nullptr};

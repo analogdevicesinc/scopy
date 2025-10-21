@@ -22,7 +22,6 @@
 #include "plotmanager/plotcreator.h"
 #include "menuplotchannelcurvestylecontrol.h"
 #include <extprocutils.h>
-#include <menuonoffswitch.h>
 #include <menuplotaxisrangecontrol.h>
 #include <menusectionwidget.h>
 #include <plotaxis.h>
@@ -132,20 +131,9 @@ void StandardPlotCreator::createPlotSettings()
 	m_plotSettings = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_plotSettings);
 	lay->setMargin(0);
-
-	QPushButton *xAutoScaleBtn = new QPushButton("Autoscale X", m_plotSettings);
-	Style::setStyle(xAutoScaleBtn, style::properties::button::basicButton);
-	connect(xAutoScaleBtn, &QPushButton::pressed, this, &StandardPlotCreator::autoscaleX);
-
-	QPushButton *yAutoScaleBtn = new QPushButton("Autoscale Y", m_plotSettings);
-	Style::setStyle(yAutoScaleBtn, style::properties::button::basicButton);
-	connect(yAutoScaleBtn, &QPushButton::pressed, this, &StandardPlotCreator::autoscaleY);
-
 	lay->addWidget(createYAxisSection());
 	lay->addWidget(createDataManagerSection());
 	lay->addWidget(createGeneralSettingsSection());
-	lay->addWidget(xAutoScaleBtn);
-	lay->addWidget(yAutoScaleBtn);
 }
 
 QWidget *StandardPlotCreator::createYAxisSection()
@@ -175,6 +163,9 @@ QWidget *StandardPlotCreator::createGeneralSettingsSection()
 		new MenuSectionCollapseWidget("General Settings", MenuCollapseSection::MHCW_NONE,
 					      MenuCollapseSection::MHW_BASEWIDGET, m_plotSettings);
 
+	m_autoscalerSwitch = new MenuOnOffSwitch("Autoscale X/Y", plotMenu);
+	m_autoscalerSwitch->onOffswitch()->setChecked(true);
+
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
 	labelsSwitch->onOffswitch()->setChecked(m_plotWidget->showXAxisLabels() && m_plotWidget->showYAxisLabels());
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, this, [this](bool en) {
@@ -184,6 +175,7 @@ QWidget *StandardPlotCreator::createGeneralSettingsSection()
 			m_plotWidget->hideAxisLabels();
 		}
 	});
+	plotMenu->add(m_autoscalerSwitch);
 	plotMenu->add(labelsSwitch);
 	plotMenu->add(m_curveControl);
 	return plotMenu;
@@ -369,14 +361,33 @@ QStringList StandardPlotCreator::getChnlsList()
 
 void StandardPlotCreator::autoscaleX()
 {
+	if(m_plotAutoscaler->isActive()) {
+		return;
+	}
 	m_plotAutoscaler->setXAxisMode(true);
 	m_plotAutoscaler->start();
 }
 
 void StandardPlotCreator::autoscaleY()
 {
+	if(m_plotAutoscaler->isActive()) {
+		return;
+	}
 	m_plotAutoscaler->setXAxisMode(false);
 	m_plotAutoscaler->start();
+}
+
+void StandardPlotCreator::handleAutoscale()
+{
+	bool autoscaleEnabled = m_autoscalerSwitch->onOffswitch()->isChecked();
+	if(!autoscaleEnabled || m_plotAutoscaler->isActive()) {
+		return;
+	}
+	if(m_plotAutoscaler->xAxisMode()) {
+		autoscaleY();
+	} else {
+		autoscaleX();
+	}
 }
 
 void StandardPlotCreator::addPlotChannel()
@@ -403,9 +414,7 @@ void StandardPlotCreator::rmPlotChannel(int chnlIdx)
 
 void StandardPlotCreator::updatePlot(const QMap<QString, QVector<double>> &data)
 {
-	if(m_first) {
-		m_plotAutoscaler->start();
-	}
+	handleAutoscale();
 	updatePlotChannels(m_plotInfo);
 	const auto &channels = m_plotInfo.channels;
 	auto plotChnls = m_plotWidget->getChannels();
@@ -422,7 +431,6 @@ void StandardPlotCreator::updatePlot(const QMap<QString, QVector<double>> &data)
 		m_plotAutoscaler->onNewData(xDataFloat.data(), yDataFloat.data(), xDataFloat.size(), false);
 	}
 	m_plotWidget->replot();
-	m_first = false;
 }
 
 void StandardPlotCreator::enableChannelAdd(bool en)
