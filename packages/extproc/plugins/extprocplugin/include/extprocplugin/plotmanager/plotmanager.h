@@ -53,21 +53,16 @@ public:
 Q_SIGNALS:
 	void changeSettings(const QString &plotTitle);
 	void requestNewData();
-	void bufferDataReady(QVector<QVector<float>> data);
 	void plotSettings(QWidget *settings);
-	void fftEnabled(bool en);
 
 public Q_SLOTS:
 	void samplingFreqAvailable(int samplingFreq);
 	void onAvailableInfo(const OutputInfo &outInfo, QList<ExtProcPlotInfo> plotInfoList);
-	void onAnalysisConfig(const QString &type, const QVariantMap &config, const OutputInfo &outInfo);
 	void plotSettingsRequest(const QString &plot);
-	void onDataIsProcessed(int samplesOffset, int samplesCount);
 	void updatePlots();
 
 private:
 	void createPlots(QList<ExtProcPlotInfo> &plotInfoList);
-	void setupDataManager(const OutputInfo &outInfo);
 	void clearPlots();
 	ExtProcPlotInfo inputPlot();
 

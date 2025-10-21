@@ -163,7 +163,7 @@ bool ExtProcPlugin::onConnect()
 
 	// connect(m_iioManager, &IIOManager::inputFormatChanged, extInstrument,
 	// &ExtProcInstrument::onInputFormatChanged);
-	connect(m_iioManager, &IIOManager::dataReady, extInstrument, &ExtProcInstrument::bufferDataReady);
+	connect(m_iioManager, &IIOManager::dataReady, extInstrument, &ExtProcInstrument::onBufferDataReady);
 
 	// input config
 	connect(m_iioManager, &IIOManager::inputFormatChanged, m_cmdController, &CMDController::configureInput);

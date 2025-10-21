@@ -31,14 +31,15 @@ using namespace scopy::extprocplugin;
 PlotManager::PlotManager(QObject *parent)
 	: QObject(parent)
 {
-	m_dataManager = new DataManager(this);
-	connect(this, &PlotManager::bufferDataReady, m_dataManager, &DataManager::onInputData);
-	connect(this, &PlotManager::fftEnabled, m_dataManager, &DataManager::onFftEnabled);
-	connect(m_dataManager, &DataManager::dataIsReady, this, &PlotManager::updatePlots);
+	m_dataManager = DataManager::GetInstance();
 	connect(m_dataManager, &DataManager::newDataEntries, this, &PlotManager::dataManagerEntries);
 }
 
-PlotManager::~PlotManager() {}
+PlotManager::~PlotManager()
+{
+	// Temporary solution — not the proper approach for an app-focused data manager.
+	m_dataManager->clearData();
+}
 
 void PlotManager::samplingFreqAvailable(int samplingFreq) { m_dataManager->setSamplingFreq(samplingFreq); }
 
@@ -46,12 +47,6 @@ void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<ExtProcPlotIn
 {
 	clearPlots();
 	createPlots(plotInfoList);
-	setupDataManager(outInfo);
-}
-
-void PlotManager::onAnalysisConfig(const QString &type, const QVariantMap &config, const OutputInfo &outInfo)
-{
-	m_dataManager->onConfigAnalysis(type, config, outInfo);
 }
 
 void PlotManager::plotSettingsRequest(const QString &plot)
@@ -64,11 +59,6 @@ void PlotManager::plotSettingsRequest(const QString &plot)
 		}
 	}
 	Q_EMIT plotSettings(w);
-}
-
-void PlotManager::onDataIsProcessed(int samplesOffset, int samplesCount)
-{
-	m_dataManager->readData(samplesOffset, samplesCount);
 }
 
 void PlotManager::updatePlots()
@@ -107,14 +97,6 @@ void PlotManager::createPlots(QList<ExtProcPlotInfo> &plotInfoList)
 	}
 	m_plotContainers.value(INPUT_PLOT_ID).creator->enableChannelAdd(false);
 	Q_EMIT dataManagerEntries(dmEntries.values());
-}
-
-void PlotManager::setupDataManager(const OutputInfo &outInfo)
-{
-	int channelCount = outInfo.channelCount();
-	const QStringList chnlsFormat = outInfo.channelFormat();
-	const QStringList chnlsName = outInfo.channelNames();
-	m_dataManager->config(chnlsName, chnlsFormat, channelCount);
 }
 
 void PlotManager::clearPlots()
