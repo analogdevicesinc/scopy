@@ -84,7 +84,8 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 			<< availableAttributeValue << ") and will try to partially initialize.";
 
 		bool ok;
-		double value = currentData.toDouble(&ok);
+		QString unit;
+		double value = tryParse(currentData, &ok, &unit);
 		if(!ok) {
 			qCritical(CAT_ATTR_GUI_STRATEGY)
 				<< "Cannot partially initialize, something is very wrong here. " << currentData
@@ -93,11 +94,19 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 			return;
 		}
 
+		if(!unit.isEmpty()) {
+			QString currentTitle = m_spinBox->name();
+			if(!currentTitle.contains("(")) {
+				m_spinBox->setName(currentTitle + " (" + unit + ")");
+			}
+		}
+
 		m_spinBox->setValue(value);
 		return;
 	}
 
 	bool ok = true, finalOk = true;
+	QString unit;
 
 	double min = tryParse(optionsList[0], &ok);
 	finalOk &= ok;
@@ -108,7 +117,7 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 	double max = tryParse(optionsList[2], &ok);
 	finalOk &= ok;
 
-	double currentNum = tryParse(currentData, &ok);
+	double currentNum = tryParse(currentData, &ok, &unit);
 	finalOk &= ok;
 
 	if(!finalOk) {
@@ -121,13 +130,21 @@ void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 		m_spinBox->setMinValue(min);
 		m_spinBox->setMaxValue(max);
 		m_spinBox->incrementStrategy()->setScale(step);
+
+		if(!unit.isEmpty()) {
+			QString currentTitle = m_spinBox->name();
+			if(!currentTitle.contains("(")) {
+				m_spinBox->setName(currentTitle + " (" + unit + ")");
+			}
+		}
+
 		m_spinBox->setValue(currentNum);
 	}
 
 	Q_EMIT displayedNewData(currentData, optionalData);
 }
 
-double RangeAttrUi::tryParse(QString number, bool *success)
+double RangeAttrUi::tryParse(QString number, bool *success, QString *unit)
 {
 	// Try to parse as double first
 	bool ok = true;
@@ -143,6 +160,42 @@ double RangeAttrUi::tryParse(QString number, bool *success)
 		*success = true;
 		result = static_cast<double>(result_int);
 		return result;
+	}
+
+	if(unit) {
+		// Try to parse value with unit suffix (e.g., "100 dB", "50 Hz")
+		QString trimmed = number.trimmed();
+		int unitStartIndex = -1;
+		for(int i = 0; i < trimmed.length(); ++i) {
+			QChar ch = trimmed.at(i);
+			if(ch.isSpace()) {
+				unitStartIndex = i;
+				break;
+			}
+			if(ch.isLetter() && i > 0) {
+				unitStartIndex = i;
+				break;
+			}
+		}
+
+		if(unitStartIndex > 0) {
+			QString numberPart = trimmed.left(unitStartIndex).trimmed();
+			QString unitPart = trimmed.mid(unitStartIndex).trimmed();
+			*unit = unitPart;
+
+			// Try to parse the number part
+			double unitResult = numberPart.toDouble(&ok);
+			if(ok) {
+				*success = true;
+				return unitResult;
+			}
+			// Try as int
+			int intVal = numberPart.toInt(&ok);
+			if(ok) {
+				*success = true;
+				return static_cast<double>(intVal);
+			}
+		}
 	}
 
 	*success = false;

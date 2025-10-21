@@ -69,9 +69,10 @@ private:
 	 * @param number A QString that represents a double or an int.
 	 * @param success This will be set to false if the QString parse fails and true if the
 	 * number is parsed successfully.
+	 * @param unit Optional pointer to store the unit found in the string
 	 * @return The double that was extracted from the QString.
 	 */
-	double tryParse(QString number, bool *success);
+	double tryParse(QString number, bool *success, QString *unit = nullptr);
 
 	QWidget *m_ui;
 	gui::MenuSpinbox *m_spinBox;
