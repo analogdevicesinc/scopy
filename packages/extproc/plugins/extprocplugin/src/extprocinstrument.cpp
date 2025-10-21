@@ -22,6 +22,7 @@
 #include "extprocinstrument.h"
 #include "dockablearea.h"
 #include "dockwrapper.h"
+#include "extprocutils.h"
 #include <measurementlabel.h>
 #include <menucontrolbutton.h>
 #include <stylehelper.h>
@@ -64,6 +65,9 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	QPushButton *acqSettingsBtn = createMenuButton("Acquisition", m_tool);
 
 	m_plotManager = new PlotManager(this);
+
+	m_dataReader = new DataReader(this);
+	m_dataReader->openFile(QIQUtils::dataOutPath());
 
 	m_settings = new SettingsMenu(this);
 	GearBtn *settingsBtn = new GearBtn(this);
@@ -127,10 +131,15 @@ void ExtProcInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
 	connect(m_settings, &SettingsMenu::fftEnabled, m_plotManager, &PlotManager::fftEnabled);
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
-	connect(this, &ExtProcInstrument::bufferDataReady, m_plotManager, &PlotManager::bufferDataReady);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &ExtProcInstrument::requestNewData);
 	connect(m_plotManager, &PlotManager::changeSettings, m_settings, &SettingsMenu::changeSettings);
 	connect(this, &ExtProcInstrument::acqFileCheck, m_settings, &SettingsMenu::onAcqFileCheck);
+
+	// Connect DataReader to DataManager singleton and trigger plot updates
+	connect(m_dataReader, &DataReader::dataReady, this, [this](QMap<QString, QVector<float>> &data) {
+		DataManager::GetInstance()->registerData(data);
+		m_plotManager->updatePlots();
+	});
 }
 
 void ExtProcInstrument::setAvailableChannels(QMap<QString, QList<ChannelInfo>> channels)
@@ -161,7 +170,7 @@ void ExtProcInstrument::onRunResponse(const RunResults &runResults)
 	QVariantMap resultsMap = runResults.getResults();
 	int offset = resultsMap.value("offset", 0).toInt();
 	int samples = resultsMap.value("samples_size", 0).toInt();
-	m_plotManager->onDataIsProcessed(offset, samples);
+	m_dataReader->readData(offset, samples);
 	updateMeasurements(runResults.getMeasurements());
 	if(m_singleBtn->isChecked()) {
 		m_singleBtn->setChecked(false);
@@ -172,6 +181,7 @@ void ExtProcInstrument::onAnalysisInfo(const QString &type, const QVariantMap &p
 				       const QList<ExtProcPlotInfo> plotInfoList, QStringList measurements)
 {
 	m_plotManager->onAvailableInfo(outputInfo, plotInfoList);
+	setupDataReader(outputInfo);
 	fillMeasurementsPanel(measurements);
 	m_settings->setAnalysisParams(type, params);
 	m_settings->setPlotTitle(m_plotManager->plotTitle());
@@ -182,7 +192,6 @@ void ExtProcInstrument::onAnalysisConfigured(const QString &type, const QVariant
 					     const OutputInfo &outputInfo)
 {
 	m_settings->validateAnalysisParams(type, config);
-	m_plotManager->onAnalysisConfig(type, config, outputInfo);
 	configureOutput();
 }
 
@@ -206,6 +215,17 @@ void ExtProcInstrument::onProcessFinished(int exitCode)
 	m_inputFormatConfigured = false;
 	m_outputConfigured = false;
 	enableAcquisition();
+}
+
+void ExtProcInstrument::onBufferDataReady(QVector<QVector<float>> &inputData)
+{
+	if(inputData.isEmpty()) {
+		return;
+	}
+	for(int chIdx = 0; chIdx < inputData.size(); chIdx++) {
+		QString inName = DataManagerKeys::INPUT + QString::number(chIdx);
+		DataManager::GetInstance()->registerData(inName, inputData[chIdx]);
+	}
 }
 
 void ExtProcInstrument::deletePopup()
@@ -293,6 +313,17 @@ void ExtProcInstrument::fillMeasurementsPanel(const QStringList &measurements)
 		m_labels.insert(l, ml);
 		m_panel->addMeasurement(ml);
 	}
+}
+
+void ExtProcInstrument::setupDataReader(const OutputInfo &outInfo)
+{
+	int channelCount = outInfo.channelCount();
+	const QStringList chnlsFormat = outInfo.channelFormat();
+	const QStringList chnlsName = outInfo.channelNames();
+
+	m_dataReader->setChannelCount(channelCount);
+	m_dataReader->setChannelFormat(chnlsFormat);
+	m_dataReader->setChannelsName(chnlsName);
 }
 
 QPushButton *ExtProcInstrument::createMenuButton(const QString &name, QWidget *parent)

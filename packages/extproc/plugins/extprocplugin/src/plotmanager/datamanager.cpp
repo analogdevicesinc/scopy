@@ -27,88 +27,66 @@ Q_LOGGING_CATEGORY(CAT_DATA_MANAGER, "DataManager");
 
 using namespace scopy::extprocplugin;
 
+DataManager *DataManager::pinstance_ = nullptr;
+
+DataManager *DataManager::GetInstance()
+{
+	if(!pinstance_) {
+		pinstance_ = new DataManager();
+	}
+	return pinstance_;
+}
+
 DataManager::DataManager(QObject *parent)
 	: QObject(parent)
+	, m_samplingFreq(0)
+	, m_sampleCount(0)
 	, m_computeFFT(true)
 {
-	m_dataReader = new DataReader(this);
-	m_dataReader->openFile(QIQUtils::dataOutPath());
 	m_dataProcessor = new DataProcessor(this);
 	setupConnections();
 }
 
 void DataManager::setupConnections()
 {
-	connect(m_dataReader, &DataReader::dataReady, this, &DataManager::onDataReady);
 	connect(&m_plotsData, &DataManagerMap::keysChanged, this, &DataManager::newDataEntries);
 }
 
 DataManager::~DataManager() {}
 
-void DataManager::config(const QStringList &chnlsName, const QStringList &chnlsFormat, const int channelCount)
+void DataManager::registerData(const QString &key, const QVector<float> &data)
 {
-	m_dataReader->setChannelsName(chnlsName);
-	m_dataReader->setChannelFormat(chnlsFormat);
-	m_dataReader->setChannelCount(channelCount);
+	m_plotsData.insert(key, data);
+	Q_EMIT dataIsReady(QStringList() << key);
 }
 
-void DataManager::onConfigAnalysis(const QString &type, const QVariantMap &config, const OutputInfo &info)
+void DataManager::registerData(const QMap<QString, QVector<float>> &data)
 {
-	if(m_dataReader->channelCount() == 0) {
-		m_dataReader->setChannelCount(info.channelCount());
+	QStringList keys;
+	for(auto it = data.begin(); it != data.end(); ++it) {
+		m_plotsData.insert(it.key(), it.value());
+		keys << it.key();
 	}
-	if(m_dataReader->channelFormat().isEmpty()) {
-		m_dataReader->setChannelFormat(info.channelFormat());
-	}
-	if(m_dataReader->channelsName().isEmpty()) {
-		m_dataReader->setChannelsName(info.channelNames());
-	}
-}
-
-void DataManager::readData(int64_t startSample, int64_t sampleCount)
-{
-	m_dataReader->readData(startSample, sampleCount);
+	Q_EMIT dataIsReady(keys);
 }
 
 void DataManager::setSamplingFreq(int samplingFreq) { m_samplingFreq = samplingFreq; }
 
+void DataManager::setSampleCount(int sampleCount) { m_sampleCount = sampleCount; }
+
 QVector<float> DataManager::dataForKey(const QString &key) { return m_plotsData.get(key, {}); }
 
-void DataManager::onDataReady(QMap<QString, QVector<float>> &data)
+void DataManager::clearData()
 {
-	for(auto it = data.begin(); it != data.end(); it++) {
-		m_plotsData.insert(it.key(), it.value());
-	}
-	Q_EMIT dataIsReady();
-}
-
-void DataManager::onInputData(QVector<QVector<float>> bufferData)
-{
-	int sampleCount = 0;
-	for(int chIdx = 0; chIdx < bufferData.size(); chIdx++) {
-		QString inName = DataManagerKeys::INPUT + QString::number(chIdx);
-		m_plotsData.insert(inName, bufferData[chIdx]);
-		if(sampleCount == 0) {
-			sampleCount = bufferData[chIdx].size();
-		}
-	}
 	computeFFT(bufferData);
-	if(sampleCount != m_sampleCount) {
-		m_sampleCount = sampleCount;
-		computeXTime(m_samplingFreq, sampleCount);
-	}
+	m_plotsData.clear();
+	m_sampleCount = 0;
 }
 
+bool DataManager::hasDataForKey(const QString &key) const { return m_plotsData.contains(key); }
 void DataManager::onFftEnabled(bool en) { m_computeFFT = en; }
 
-void DataManager::computeXTime(int samplingFreq, int samples)
-{
-	QVector<float> xTime;
-	for(int i = 0; i < samples; i++) {
-		xTime.push_back((float)i / m_samplingFreq);
-	}
-	m_plotsData.insert(DataManagerKeys::TIME, xTime);
-}
+QStringList DataManager::availableKeys() const { return QStringList(); }
 
 void DataManager::computeFFT(QVector<QVector<float>> bufferData)
 {

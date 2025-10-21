@@ -28,6 +28,7 @@
 #include <outputinfo.h>
 #include <outputconfig.h>
 #include <plotmanager/plotmanager.h>
+#include <plotmanager/datareader.h>
 #include <settingsmenu.h>
 #include <toolbuttons.h>
 #include <QProcess>
@@ -54,7 +55,6 @@ Q_SIGNALS:
 	void requestAnalysisInfo(const QString &type);
 	void outputConfigured(const OutputConfig &outConfig);
 	void analysisConfigChanged(const QString &type, const QVariantMap &config);
-	void bufferDataReady(QVector<QVector<float>> &inputData);
 	void runPressed(bool en);
 	void requestNewData();
 
@@ -68,6 +68,7 @@ public Q_SLOTS:
 	void onAnalysisConfigured(const QString &type, const QVariantMap &config, const OutputInfo &outputInfo);
 	void tmeToggled(bool checked);
 	void onProcessFinished(int exitCode);
+	void onBufferDataReady(QVector<QVector<float>> &inputData);
 	// void onProcessDataCompleted(const RunResults &result);
 
 private:
@@ -80,6 +81,7 @@ private:
 	void enableAcquisition();
 	void updateMeasurements(const QVariantMap &measurements);
 	void fillMeasurementsPanel(const QStringList &measurements);
+	void setupDataReader(const OutputInfo &outInfo);
 	QPushButton *createMenuButton(const QString &name, QWidget *parent = nullptr);
 
 	ToolTemplate *m_tool;
@@ -89,6 +91,7 @@ private:
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	PlotManager *m_plotManager;
+	DataReader *m_dataReader;
 	SettingsMenu *m_settings;
 
 	DockableAreaInterface *m_dockableArea;
