@@ -187,7 +187,7 @@ bool ExtProcPlugin::onConnect()
 
 	// Connect unified acquisition manager signals
 	connect(m_acquisitionManager, &AcquisitionManager::dataReady, extInstrument,
-		&ExtProcInstrument::bufferDataReady);
+		&ExtProcInstrument::onBufferDataReady);
 	connect(m_acquisitionManager, &AcquisitionManager::inputFormatChanged, m_qiqController,
 		&CMDController::configureInput);
 

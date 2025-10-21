@@ -54,7 +54,6 @@ Q_SIGNALS:
 	void changeSettings(const QString &plotTitle);
 	void requestNewData();
 	void plotSettings(QWidget *settings);
-	void fftEnabled(bool en);
 
 public Q_SLOTS:
 	void samplingFreqAvailable(int samplingFreq);

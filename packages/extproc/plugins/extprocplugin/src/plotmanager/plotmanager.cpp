@@ -31,7 +31,6 @@ using namespace scopy::extprocplugin;
 PlotManager::PlotManager(QObject *parent)
 	: QObject(parent)
 {
-	connect(this, &PlotManager::fftEnabled, m_dataManager, &DataManager::onFftEnabled);
 	m_dataManager = DataManager::GetInstance();
 	connect(m_dataManager, &DataManager::newDataEntries, this, &PlotManager::dataManagerEntries);
 }

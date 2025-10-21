@@ -20,7 +20,6 @@
  */
 
 #include "plotmanager/datamanager.h"
-#include "extprocutils.h"
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_DATA_MANAGER, "DataManager");
@@ -41,9 +40,7 @@ DataManager::DataManager(QObject *parent)
 	: QObject(parent)
 	, m_samplingFreq(0)
 	, m_sampleCount(0)
-	, m_computeFFT(true)
 {
-	m_dataProcessor = new DataProcessor(this);
 	setupConnections();
 }
 
@@ -78,34 +75,13 @@ QVector<float> DataManager::dataForKey(const QString &key) { return m_plotsData.
 
 void DataManager::clearData()
 {
-	computeFFT(bufferData);
 	m_plotsData.clear();
 	m_sampleCount = 0;
 }
 
 bool DataManager::hasDataForKey(const QString &key) const { return m_plotsData.contains(key); }
-void DataManager::onFftEnabled(bool en) { m_computeFFT = en; }
 
 QStringList DataManager::availableKeys() const { return QStringList(); }
-
-void DataManager::computeFFT(QVector<QVector<float>> bufferData)
-{
-	if(!m_computeFFT) {
-		return;
-	}
-	if(bufferData.size() == 2) {
-		FFTResult fftResult = m_dataProcessor->computeComplexFFT(bufferData[0], bufferData[1], m_samplingFreq);
-		m_plotsData.insert(DataManagerKeys::FFT_FREQUENCY, fftResult.frequency);
-		m_plotsData.insert(DataManagerKeys::FFT_MAGNITUDE_DB, fftResult.magnitudeDB);
-	} else {
-		for(int chIdx = 0; chIdx < bufferData.size(); chIdx++) {
-			FFTResult fftResult = m_dataProcessor->computeFFT(bufferData[chIdx], m_samplingFreq);
-			QString channelSuffix = QString::number(chIdx);
-			m_plotsData.insert(DataManagerKeys::FFT_FREQUENCY + channelSuffix, fftResult.frequency);
-			m_plotsData.insert(DataManagerKeys::FFT_MAGNITUDE_DB + channelSuffix, fftResult.magnitudeDB);
-		}
-	}
-}
 
 double DataManager::samplingFreq() const { return m_samplingFreq; }
 

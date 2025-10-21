@@ -24,7 +24,6 @@
 
 #include <QMap>
 #include <QObject>
-#include <plotmanager/dataprocessor.h>
 
 namespace scopy::extprocplugin {
 
@@ -96,18 +95,14 @@ Q_SIGNALS:
 	void dataIsReady(const QStringList &keys);
 	void newDataEntries(const QList<QString> &entries);
 
-	void onFftEnabled(bool en);
-
 private:
 	void setupConnections();
-	void computeFFT(QVector<QVector<float>> bufferData);
 
 	static DataManager *pinstance_;
-	bool m_computeFFT;
+
 	double m_samplingFreq;
 	double m_sampleCount;
 	DataManagerMap m_plotsData;
-	DataProcessor *m_dataProcessor;
 };
 
 } // namespace scopy::extprocplugin

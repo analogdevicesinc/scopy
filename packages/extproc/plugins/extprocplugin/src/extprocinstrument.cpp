@@ -69,6 +69,8 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	m_dataReader = new DataReader(this);
 	m_dataReader->openFile(QIQUtils::dataOutPath());
 
+	m_dataProcessingService = new DataProcessingService(this);
+
 	m_settings = new SettingsMenu(this);
 	GearBtn *settingsBtn = new GearBtn(this);
 	settingsBtn->setChecked(true);
@@ -129,7 +131,7 @@ void ExtProcInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &ExtProcInstrument::bufferParamsChanged);
 	connect(m_settings, &SettingsMenu::acqFileSelected, this, &ExtProcInstrument::acqFileSelected);
 	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
-	connect(m_settings, &SettingsMenu::fftEnabled, m_plotManager, &PlotManager::fftEnabled);
+	connect(m_settings, &SettingsMenu::fftEnabled, m_dataProcessingService, &DataProcessingService::setFFTEnabled);
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
 	connect(m_plotManager, &PlotManager::requestNewData, this, &ExtProcInstrument::requestNewData);
 	connect(m_plotManager, &PlotManager::changeSettings, m_settings, &SettingsMenu::changeSettings);
@@ -152,6 +154,7 @@ void ExtProcInstrument::onAnalysisTypes(const QStringList &types) { m_settings->
 void ExtProcInstrument::onInputFormatChanged(const InputConfig &inConfig)
 {
 	m_plotManager->samplingFreqAvailable(inConfig.samplingFrequency());
+	m_dataProcessingService->setSamplingFreq(inConfig.samplingFrequency());
 	m_plotManager->updateInputPlot(inConfig.channelCount());
 	m_inputFormatConfigured = inConfig.channelCount() > 0;
 	enableAcquisition();
@@ -226,6 +229,7 @@ void ExtProcInstrument::onBufferDataReady(QVector<QVector<float>> &inputData)
 		QString inName = DataManagerKeys::INPUT + QString::number(chIdx);
 		DataManager::GetInstance()->registerData(inName, inputData[chIdx]);
 	}
+	m_dataProcessingService->processBufferData(inputData);
 }
 
 void ExtProcInstrument::deletePopup()

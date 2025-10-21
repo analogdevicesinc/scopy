@@ -29,6 +29,7 @@
 #include <outputconfig.h>
 #include <plotmanager/plotmanager.h>
 #include <plotmanager/datareader.h>
+#include "dataprocessingservice.h"
 #include <settingsmenu.h>
 #include <toolbuttons.h>
 #include <QProcess>
@@ -92,6 +93,7 @@ private:
 	SingleShotBtn *m_singleBtn;
 	PlotManager *m_plotManager;
 	DataReader *m_dataReader;
+	DataProcessingService *m_dataProcessingService;
 	SettingsMenu *m_settings;
 
 	DockableAreaInterface *m_dockableArea;
