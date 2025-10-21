@@ -24,12 +24,6 @@
 
 #include <QMap>
 #include <QObject>
-#include <plotmanager/datareader.h>
-#include <plotmanager/dataprocessor.h>
-#include <outputconfig.h>
-#include <common/scopyconfig.h>
-#include <QDir>
-#include <outputinfo.h>
 
 namespace scopy::extprocplugin {
 
@@ -59,6 +53,12 @@ public:
 	// Remove a key
 	bool remove(const QString &key) { return map.remove(key) > 0; }
 
+	// Clear all
+	void clear() { return map.clear(); }
+
+	// Get available keys
+	QStringList availableKeys() { return map.keys(); }
+
 Q_SIGNALS:
 	void keysChanged(const QList<QString> &keys);
 
@@ -71,43 +71,41 @@ private:
 class DataManager : public QObject
 {
 	Q_OBJECT
-public:
-	DataManager(QObject *parent = nullptr);
+protected:
+	explicit DataManager(QObject *parent = nullptr);
 	~DataManager();
 
-	void config(const QStringList &chnlsName, const QStringList &chnlsFormat, const int channelCount);
-	void onConfigAnalysis(const QString &type, const QVariantMap &config, const OutputInfo &info);
-	void readData(int64_t startSample, int64_t sampleCount);
+public:
+	DataManager(DataManager &other) = delete;
+	void operator=(const DataManager &) = delete;
+	static DataManager *GetInstance();
+
+	void registerData(const QString &key, const QVector<float> &data);
+	void registerData(const QMap<QString, QVector<float>> &data);
 
 	void setSamplingFreq(int samplingFreq);
+	void setSampleCount(int sampleCount);
 	QVector<float> dataForKey(const QString &key);
 
 	double sampleCount() const;
-
 	double samplingFreq() const;
 
+	void clearData();
+	bool hasDataForKey(const QString &key) const;
+	QStringList availableKeys();
+
 Q_SIGNALS:
-	void dataIsReady();
+	void dataIsReady(const QStringList &keys);
 	void newDataEntries(const QList<QString> &entries);
-
-public Q_SLOTS:
-	void onInputData(QVector<QVector<float>> bufferData);
-	void onFftEnabled(bool en);
-
-private Q_SLOTS:
-	void onDataReady(QMap<QString, QVector<float>> &data);
 
 private:
 	void setupConnections();
-	void computeXTime(int samplingFreq, int samples);
-	void computeFFT(QVector<QVector<float>> bufferData);
 
-	bool m_computeFFT;
+	static DataManager *pinstance_;
+
 	double m_samplingFreq;
 	double m_sampleCount;
-	DataReader *m_dataReader;
 	DataManagerMap m_plotsData;
-	DataProcessor *m_dataProcessor;
 };
 
 } // namespace scopy::extprocplugin
