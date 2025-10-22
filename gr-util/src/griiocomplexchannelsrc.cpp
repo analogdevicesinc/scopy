@@ -24,6 +24,9 @@
 #include "griiodevicesource.h"
 #include "grlog.h"
 #include "grtopblock.h"
+#include <gnuradio/blocks/short_to_float.h>
+#include <gnuradio/blocks/int_to_float.h>
+#include "gnuradio/blocks/copy.h"
 
 #include <QDebug>
 
@@ -42,17 +45,30 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL) << "Building GRIIOComplexChannelSrc";
 	m_dev->addChannel(this);
-	s2f[0] = gr::blocks::short_to_float::make();
-	s2f[1] = gr::blocks::short_to_float::make();
-	f2c = gr::blocks::float_to_complex::make();
+	switch(fmt->length) {
+	case 16:
+		x2f[0] = gr::blocks::short_to_float::make();
+		x2f[1] = gr::blocks::short_to_float::make();
+		break;
+	case 32:
+		x2f[0] = gr::blocks::int_to_float::make();
+		x2f[1] = gr::blocks::int_to_float::make();
+		break;
+	default:
+		qInfo(SCOPY_GR_UTIL) << "creating copy block of size " << fmt->length / 8;
+		x2f[0] = gr::blocks::copy::make(fmt->length / 8);
+		x2f[1] = gr::blocks::copy::make(fmt->length / 8);
+		break;
+	}
 
+	f2c = gr::blocks::float_to_complex::make();
 	s2v = gr::blocks::stream_to_vector::make(sizeof(gr_complex), top->vlen());
 
-	top->connect(s2f[0], 0, f2c, 0);
-	top->connect(s2f[1], 0, f2c, 1);
+	top->connect(x2f[0], 0, f2c, 0);
+	top->connect(x2f[1], 0, f2c, 1);
 	top->connect(f2c, 0, s2v, 0);
-	start_blk.append(s2f[0]);
-	start_blk.append(s2f[1]);
+	start_blk.append(x2f[0]);
+	start_blk.append(x2f[1]);
 	end_blk = s2v;
 }
 
@@ -60,7 +76,7 @@ void GRIIOComplexChannelSrc::destroy_blks(GRTopBlock *top)
 {
 	m_dev->removeChannel(this);
 	end_blk = nullptr;
-	s2f[0] = s2f[1] = nullptr;
+	x2f[0] = x2f[1] = nullptr;
 	f2c = nullptr;
 	s2v = nullptr;
 	start_blk.clear();
