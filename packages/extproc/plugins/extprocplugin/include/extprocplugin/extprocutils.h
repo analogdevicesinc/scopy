@@ -82,6 +82,8 @@ struct DataManagerKeys
 {
 	static constexpr auto INPUT = "input";
 	static constexpr auto TIME = "time";
+	static constexpr auto FFT_FREQUENCY = "fft_frequency";
+	static constexpr auto FFT_MAGNITUDE_DB = "fft_magnitude_db";
 };
 class ExtProcUtils
 {

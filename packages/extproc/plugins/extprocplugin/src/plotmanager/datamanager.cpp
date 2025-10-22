@@ -32,6 +32,7 @@ DataManager::DataManager(QObject *parent)
 {
 	m_dataReader = new DataReader(this);
 	m_dataReader->openFile(ExtProcUtils::dataOutPath());
+	m_dataProcessor = new DataProcessor(this);
 	setupConnections();
 }
 
@@ -90,6 +91,7 @@ void DataManager::onInputData(QVector<QVector<float>> bufferData)
 			sampleCount = bufferData[chIdx].size();
 		}
 	}
+	computeFFT(bufferData);
 	if(sampleCount != m_sampleCount) {
 		m_sampleCount = sampleCount;
 		computeXTime(m_samplingFreq, sampleCount);
@@ -103,6 +105,22 @@ void DataManager::computeXTime(int samplingFreq, int samples)
 		xTime.push_back((float)i / m_samplingFreq);
 	}
 	m_plotsData.insert(DataManagerKeys::TIME, xTime);
+}
+
+void DataManager::computeFFT(QVector<QVector<float>> bufferData)
+{
+	if(bufferData.size() == 2) {
+		FFTResult fftResult = m_dataProcessor->computeComplexFFT(bufferData[0], bufferData[1], m_samplingFreq);
+		m_plotsData.insert(DataManagerKeys::FFT_FREQUENCY, fftResult.frequency);
+		m_plotsData.insert(DataManagerKeys::FFT_MAGNITUDE_DB, fftResult.magnitudeDB);
+	} else {
+		for(int chIdx = 0; chIdx < bufferData.size(); chIdx++) {
+			FFTResult fftResult = m_dataProcessor->computeFFT(bufferData[chIdx], m_samplingFreq);
+			QString channelSuffix = QString::number(chIdx);
+			m_plotsData.insert(DataManagerKeys::FFT_FREQUENCY + channelSuffix, fftResult.frequency);
+			m_plotsData.insert(DataManagerKeys::FFT_MAGNITUDE_DB + channelSuffix, fftResult.magnitudeDB);
+		}
+	}
 }
 
 double DataManager::samplingFreq() const { return m_samplingFreq; }
