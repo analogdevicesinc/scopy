@@ -25,6 +25,7 @@
 #include <QMap>
 #include <QObject>
 #include <plotmanager/datareader.h>
+#include <plotmanager/dataprocessor.h>
 #include <outputconfig.h>
 #include <common/scopyconfig.h>
 #include <QDir>
@@ -98,11 +99,13 @@ private Q_SLOTS:
 private:
 	void setupConnections();
 	void computeXTime(int samplingFreq, int samples);
+	void computeFFT(QVector<QVector<float>> bufferData);
 
 	double m_samplingFreq;
 	double m_sampleCount;
 	DataReader *m_dataReader;
 	DataManagerMap m_plotsData;
+	DataProcessor *m_dataProcessor;
 };
 
 } // namespace scopy::extprocplugin
