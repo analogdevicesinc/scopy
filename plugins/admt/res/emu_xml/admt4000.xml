@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE context [
+	<!ELEMENT context (device | context-attribute)*>
+	<!ELEMENT context-attribute EMPTY>
+	<!ELEMENT device (channel | attribute | debug-attribute | buffer-attribute)*>
+	<!ELEMENT channel (scan-element?, attribute*)>
+	<!ELEMENT attribute EMPTY>
+	<!ELEMENT scan-element EMPTY>
+	<!ELEMENT debug-attribute EMPTY>
+	<!ELEMENT buffer-attribute EMPTY>
+	<!ATTLIST context name CDATA #REQUIRED description CDATA #IMPLIED>
+	<!ATTLIST context-attribute name CDATA #REQUIRED value CDATA #REQUIRED>
+	<!ATTLIST device id CDATA #REQUIRED name CDATA #IMPLIED>
+	<!ATTLIST channel id CDATA #REQUIRED type (input|output) #REQUIRED name CDATA #IMPLIED>
+	<!ATTLIST scan-element index CDATA #REQUIRED format CDATA #REQUIRED scale CDATA #IMPLIED>
+	<!ATTLIST attribute name CDATA #REQUIRED filename CDATA #IMPLIED value CDATA #IMPLIED>
+	<!ATTLIST debug-attribute name CDATA #REQUIRED value CDATA #IMPLIED>
+	<!ATTLIST buffer-attribute name CDATA #REQUIRED value CDATA #IMPLIED>
+]>
+<context name="serial"
+         description="no-OS/projects/project feature/restructure_2-9f56ce9">
+	<context-attribute name="uri"
+	                   value="serial:COM4,115200,8n1n"/>
+	<context-attribute name="serial,port"
+	                   value="COM4"/>
+	<context-attribute name="serial,description"
+	                   value="USB Serial Device (COM4)"/>
+	<device id="iio:device0"
+	        name="admt4000">
+		<channel id="rot"
+		         type="input">
+			<scan-element index="0"
+			              format="le:u10/16&gt;&gt;0"/>
+			<attribute name="scale"
+			           filename="in_rot_scale"
+			           value="0.351562500"/>
+			<attribute name="offset"
+			           filename="in_rot_offset"
+			           value="0"/>
+		</channel>
+		<channel id="angl"
+		         type="input">
+			<scan-element index="1"
+			              format="le:u12/16&gt;&gt;0"/>
+			<attribute name="scale"
+			           filename="in_angl_scale"
+			           value="0.087890625"/>
+			<attribute name="offset"
+			           filename="in_angl_offset"
+			           value="0"/>
+		</channel>
+		<channel id="count"
+		         type="input">
+			<scan-element index="2"
+			              format="le:s6/16&gt;&gt;0"/>
+			<attribute name="scale"
+			           filename="in_count_scale"
+			           value="1"/>
+			<attribute name="offset"
+			           filename="in_count_offset"
+			           value="0"/>
+		</channel>
+		<channel id="temp"
+		         type="input">
+			<scan-element index="3"
+			              format="le:u12/16&gt;&gt;0"/>
+			<attribute name="scale"
+			           filename="in_temp_scale"
+			           value="0.061274509"/>
+			<attribute name="offset"
+			           filename="in_temp_offset"
+			           value="1150"/>
+		</channel>
+		<attribute name="page"
+		           value="0"/>
+		<attribute name="sequencer_mode"
+		           value="0"/>
+		<attribute name="angle_filt"
+		           value="1"/>
+		<attribute name="conversion_mode"
+		           value="0"/>
+		<attribute name="h8_ctrl"
+		           value="0"/>
+		<attribute name="sdp_gpio_ctrl"
+		           value="ERROR"/>
+		<attribute name="sdp_gpio0_busy"
+		           value="622855424"/>
+		<attribute name="sdp_coil_rs"
+		           value="ERROR"/>
+		<attribute name="throw_early_samples"
+		           value="1"/>
+		<attribute name="regmap_dump"
+		           value="ERROR"/>
+		<debug-attribute name="direct_reg_access"
+		                 value="ERROR"/>
+	</device>
+	<device id="iio:device1"
+	        name="tmc5240">
+		<attribute name="amax"
+		           value="0"/>
+		<attribute name="rotate_vmax"
+		           value="0"/>
+		<attribute name="dmax"
+		           value="0"/>
+		<attribute name="disable"
+		           value="ERROR"/>
+		<attribute name="target_pos"
+		           value="0"/>
+		<attribute name="current_pos"
+		           value="0"/>
+		<attribute name="ramp_mode"
+		           value="0"/>
+		<debug-attribute name="direct_reg_access"
+		                 value="2"/>
+	</device>
+</context>
