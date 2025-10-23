@@ -120,6 +120,7 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	m_powerOffset = 0;
 	m_windowCorr = true;
 	m_sr = 0;
+	m_navg = 1; // Default to no averaging
 }
 
 void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
@@ -149,12 +150,19 @@ void GRFFTComplexProc::setPowerOffset(double val)
 	}
 }
 
-void GRFFTComplexProc::setNrBits(int v) {
-	nrBits = v;
-}
+void GRFFTComplexProc::setNrBits(int v) { nrBits = v; }
 
-void GRFFTComplexProc::setSampleRate(double sr) {
-	m_sr = sr;
+void GRFFTComplexProc::setSigned(bool sig) { m_signed = sig; }
+
+void GRFFTComplexProc::setSampleRate(double sr) { m_sr = sr; }
+
+void GRFFTComplexProc::setNavg(int navg)
+{
+	m_navg = navg;
+	if(genalyzer_fft) {
+		genalyzer_fft->set_navg(navg);
+	}
+	// No need to rebuild blocks - averaging is handled internally in genalyzer
 }
 
 gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
@@ -191,16 +199,13 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	float_to_int_q = gr::blocks::float_to_int::make(fft_size);
 
 	// Create genalyzer FFT with int32 inputs
-	genalyzer_fft = genalyzer_fft_vii::make(fft_size, // npts - number of points
-						nrBits,	  // qres - quantization resolution for genalyzer
-						1,	  // navg - number of averages (set to 1 for real-time)
+	genalyzer_fft = genalyzer_fft_vii::make(fft_size * m_navg, // npts - number of points (FFT size * averages)
+						nrBits + !m_signed, // qres - quantization resolution for genalyzer
+						m_navg,		    // navg - number of averages
 						fft_size, // nfft - FFT size
 						convertToGnWindow(m_fftwindow), // Convert your window type to GnWindow
-						m_sr			// sample rate
+						m_sr				// sample rate
 	);
-
-	// Genalyzer now outputs dB values directly as float, so we don't need
-	// complex-to-magnitude conversion or nlog10 conversion blocks
 
 	// Power offset
 	std::vector<float> k;
@@ -209,27 +214,11 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	}
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	// Calculate correct scaling to match GRFFTFloatProc output
-	// GRFFTFloatProc total scaling: (1/(1<<nrBits)) * (1/(fft_size^2))
-	// Genalyzer internal scaling: (2.0/(1<<nrBits)) * (1/fft_size)
-	// To match float mode output levels:
-	float float_mode_scaling = (1.0 / (1 << nrBits)) * (1.0 / (fft_size * fft_size));
-	float genalyzer_scaling = (2.0 / (1 << nrBits)) * (1.0 / fft_size);
-	float compensation = float_mode_scaling / genalyzer_scaling;
-
-	// Convert [-1,1] to ADC codes and apply compensation
-	float adc_scale = (1 << (nrBits - 1));  // Convert to ADC codes [-2048, 2047] for 12-bit
-	float scale = 1;
-
-	mult_nrbits = gr::blocks::multiply_const_cc::make(gr_complex(scale, 0), fft_size);
-	mult_wind_corr = gr::blocks::multiply_const_cc::make(gr_complex(corr, corr), fft_size);
-
-	// Signal chain: complex input → complex_to_float → float_to_int → genalyzer → float dB output → powerOffset
-	top->connect(complex_to_float, 0, float_to_int_i, 0);  // I channel
-	top->connect(complex_to_float, 1, float_to_int_q, 0);  // Q channel
-	top->connect(float_to_int_i, 0, genalyzer_fft, 0);     // I to genalyzer input 0
-	top->connect(float_to_int_q, 0, genalyzer_fft, 1);     // Q to genalyzer input 1
-	top->connect(genalyzer_fft, 0, powerOffset, 0);        // genalyzer float output → powerOffset
+	top->connect(complex_to_float, 0, float_to_int_i, 0); // I channel
+	top->connect(complex_to_float, 1, float_to_int_q, 0); // Q channel
+	top->connect(float_to_int_i, 0, genalyzer_fft, 0);    // I to genalyzer input 0
+	top->connect(float_to_int_q, 0, genalyzer_fft, 1);    // Q to genalyzer input 1
+	top->connect(genalyzer_fft, 0, powerOffset, 0);	      // genalyzer float output → powerOffset
 
 	start_blk.append(complex_to_float);
 	end_blk = powerOffset;
@@ -252,11 +241,9 @@ GnWindow GRFFTComplexProc::convertToGnWindow(gr::fft::window::win_type window_ty
 void GRFFTComplexProc::destroy_blks(GRTopBlock *top)
 {
 	genalyzer_fft = nullptr;
-	mult_nrbits = nullptr;
 	complex_to_float = nullptr;
 	float_to_int_i = nullptr;
 	float_to_int_q = nullptr;
-	mult_wind_corr = nullptr;
 	powerOffset = nullptr;
 	start_blk.clear();
 	end_blk = nullptr;
