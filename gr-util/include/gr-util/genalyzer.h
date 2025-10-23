@@ -34,6 +34,8 @@ public:
 	virtual double sample_rate() const = 0;
 	virtual void set_window(GnWindow win) = 0;
 	virtual int window() const = 0;
+	virtual void set_navg(int navg) = 0;
+	virtual int navg() const = 0;
 	virtual gn_analysis_results *getGnAnalysis() = 0;
 	virtual void setAnalysisEnabled(bool enabled) = 0;
 	virtual bool analysisEnabled() const = 0;
