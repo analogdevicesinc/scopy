@@ -79,6 +79,8 @@ public:
 	void setWindowCorrection(bool b);
 	void setNrBits(int);
 	void setSampleRate(double sr);
+	void setSigned(bool sig);
+	void setNavg(int navg);
 	gn_analysis_results *getGnAnalysis();
 	void setAnalysisEnabled(bool enabled);
 	void build_blks(GRTopBlock *top);
@@ -89,11 +91,11 @@ protected:
 	int nrBits;
 	bool m_windowCorr;
 	double m_sr;
-	gr::blocks::multiply_const_cc::sptr mult_nrbits;
+	bool m_signed;
+	int m_navg;
 	gr::blocks::float_to_int::sptr float_to_int_i;
 	gr::blocks::float_to_int::sptr float_to_int_q;
 	gr::blocks::complex_to_float::sptr complex_to_float;
-	gr::blocks::multiply_const_cc::sptr mult_wind_corr;
 	gr::blocks::add_const_vff::sptr powerOffset;
 	genalyzer_fft_vii::sptr genalyzer_fft;
 

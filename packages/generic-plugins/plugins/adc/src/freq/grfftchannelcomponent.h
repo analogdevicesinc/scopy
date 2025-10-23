@@ -64,10 +64,10 @@ public:
 		int nrBits = src->getFmt()->bits; // removed  "- src->getFmt()->is_signed" since genalyzer can be
 						  // adjusted directly for signed/unsigned values
 		m_fft->setNrBits(nrBits);
+		m_fft->setSigned(src->getFmt()->is_signed);
 		m_fft->setSampleRate(ch->samplingInfo().sampleRate);
 		m_signalPath->append(m_fft);
-		m_avg = new GRFFTAvgProc(true, m_signalPath);
-		m_signalPath->append(m_avg);
+		// Removed GRFFTAvgProc - averaging now handled inside genalyzer_impl.cpp
 		m_signalPath->setEnabled(false);
 		m_top = top;
 		m_top->registerSignalPath(m_signalPath);
@@ -87,7 +87,7 @@ public:
 		m_fft->setPowerOffset(val);
 	}
 
-	void setAveragingSize(int size) override { m_avg->setSize(size); }
+	void setAveragingSize(int size) override { m_fft->setNavg(size); }
 
 	double powerOffset() { return m_powerOffset; }
 
@@ -104,7 +104,6 @@ public:
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTComplexProc *m_fft;
-	GRFFTAvgProc *m_avg;
 	GRIIOComplexChannelSrc *m_grch;
 	double m_powerOffset;
 };
