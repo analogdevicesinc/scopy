@@ -69,6 +69,9 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
+# Build CLI analyzer tool
+add_subdirectory(res/cli)
+
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
