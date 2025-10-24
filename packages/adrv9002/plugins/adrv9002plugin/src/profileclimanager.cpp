@@ -19,6 +19,7 @@
  */
 
 #include <profileclimanager.h>
+#include <QStandardPaths>
 
 Q_LOGGING_CATEGORY(CAT_PROFILECLIMANAGER, "ProfileCliManager")
 
@@ -60,24 +61,40 @@ QString ProfileCliManager::getCliPath() const { return m_cliPath; }
 // CLI Detection (based on iio-oscilloscope profile_gen_cli_get_cmd)
 bool ProfileCliManager::detectCli()
 {
-	// Search for CLI tool in common locations
-	QStringList searchPaths = {"/usr/bin/", "/usr/local/bin/", "/opt/analog/bin/",
-				   QCoreApplication::applicationDirPath() + "/", QDir::homePath() + "/.local/bin/"};
+	QStringList searchPaths;
+// Search for CLI tool in common locations
+#ifdef Q_OS_WIN
+	// Windows-specific paths
+	searchPaths.append("C:/Program Files/Analog Devices/bin/");
+	searchPaths.append("C:/Program Files (x86)/Analog Devices/bin/");
+	searchPaths.append(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) + "/");
+	searchPaths.append(QCoreApplication::applicationDirPath() + "/");
+#else
+	// Unix-like systems (Linux, macOS)
+	searchPaths.append("/usr/bin/");
+	searchPaths.append("/usr/local/bin/");
+	searchPaths.append("/opt/analog/bin/");
+	searchPaths.append(QCoreApplication::applicationDirPath() + "/");
+	searchPaths.append(QDir::homePath() + "/.local/bin/");
+#endif
 
 	for(const QString &path : searchPaths) {
 		QString fullPath = path + CLI_NAME;
+#ifdef Q_OS_WIN
+		if(!fullPath.endsWith(".exe")) {
+			fullPath += ".exe";
+		}
+#endif
 		if(QFile::exists(fullPath) && QFileInfo(fullPath).isExecutable()) {
-			m_cliPath = fullPath;
+			m_cliPath = QDir::toNativeSeparators(fullPath);
 			return validateCliVersion();
 		}
 	}
 
-	// Also check PATH environment variable (like iio-oscilloscope)
-	QProcess process;
-	process.start("which", QStringList() << CLI_NAME);
-	process.waitForFinished(3000);
-	if(process.exitCode() == 0) {
-		m_cliPath = process.readAllStandardOutput().trimmed();
+	// Also check PATH environment variable
+	QString pathResult = QStandardPaths::findExecutable(CLI_NAME);
+	if(!pathResult.isEmpty()) {
+		m_cliPath = QDir::toNativeSeparators(pathResult);
 		return validateCliVersion();
 	}
 
@@ -347,10 +364,24 @@ bool ProfileCliManager::writeConfigToTempFile(const QString &filename, const Rad
 // CLI Execution
 bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output, QString &errorOutput)
 {
+	QString workingDir = QFileInfo(m_cliPath).absolutePath();
+
 	QProcess process;
-	process.start(m_cliPath, arguments);
+	process.setProgram(m_cliPath);
+	process.setArguments(arguments);
+	process.setWorkingDirectory(workingDir);
+	process.start();
+
+	if(!process.waitForStarted(5000)) {
+		errorOutput = QString("Failed to start CLI: %1").arg(process.errorString());
+		return false;
+	}
 
 	if(!process.waitForFinished(CLI_TIMEOUT_MS)) {
+		process.kill();
+		if(!process.waitForFinished(3000)) { // Give it time to cleanup
+			process.terminate();	     // Force terminate if kill didn't work
+		}
 		errorOutput = "CLI execution timeout";
 		return false;
 	}
