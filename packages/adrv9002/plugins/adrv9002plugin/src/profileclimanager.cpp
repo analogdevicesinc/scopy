@@ -391,7 +391,7 @@ bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output
 
 	if(process.exitCode() != 0) {
 		qWarning(CAT_PROFILECLIMANAGER)
-			<< "CLI command failed with exit code:" << process.exitCode() << "Error:" << errorOutput;
+			<< "CLI command failed with exit code:" << process.exitCode() << "Error:" << output;
 		return false;
 	}
 
