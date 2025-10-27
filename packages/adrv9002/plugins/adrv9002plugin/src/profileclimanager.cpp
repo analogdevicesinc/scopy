@@ -125,12 +125,10 @@ bool ProfileCliManager::validateCliVersion()
 }
 
 // Profile Operations
-ProfileCliManager::OperationResult ProfileCliManager::saveProfileToFile(const QString &filename,
-									const RadioConfig &config)
+void ProfileCliManager::saveProfileToFile(const QString &filename, const RadioConfig &config)
 {
 	if(!m_cliAvailable) {
 		Q_EMIT operationError("Profile Generator CLI not available");
-		return CliNotAvailable;
 	}
 
 	// Create temporary config file
@@ -139,34 +137,31 @@ ProfileCliManager::OperationResult ProfileCliManager::saveProfileToFile(const QS
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
-		return ConfigGenerationFailed;
+		return;
 	}
 
 	// Execute CLI command (following iio-oscilloscope pattern)
 	QStringList arguments;
 	arguments << "--config" << configFile << "--profile" << filename;
 
-	QString output, errorOutput;
-	bool success = executeCli(arguments, output, errorOutput);
+	QString output;
+	bool success = executeCli(arguments, output);
 
 	// Cleanup temp file
 	cleanupTempFiles(QStringList() << configFile);
 
 	if(!success) {
-		Q_EMIT operationError(QString("CLI execution failed: %1").arg(errorOutput));
-		return CliExecutionFailed;
+		Q_EMIT operationError(QString("CLI execution failed: %1").arg(output));
+		return;
 	}
 
 	Q_EMIT operationProgress("Profile saved successfully");
-	return Success;
 }
 
-ProfileCliManager::OperationResult ProfileCliManager::saveStreamToFile(const QString &filename,
-								       const RadioConfig &config)
+void ProfileCliManager::saveStreamToFile(const QString &filename, const RadioConfig &config)
 {
 	if(!m_cliAvailable) {
 		Q_EMIT operationError("Profile Generator CLI not available");
-		return CliNotAvailable;
 	}
 
 	// Create temporary config file
@@ -175,33 +170,32 @@ ProfileCliManager::OperationResult ProfileCliManager::saveStreamToFile(const QSt
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
-		return ConfigGenerationFailed;
+		return;
 	}
 
 	// Execute CLI command for stream image
 	QStringList arguments;
 	arguments << "--config" << configFile << "--stream" << filename;
 
-	QString output, errorOutput;
-	bool success = executeCli(arguments, output, errorOutput);
+	QString output;
+	bool success = executeCli(arguments, output);
 
 	// Cleanup temp file
 	cleanupTempFiles(QStringList() << configFile);
 
 	if(!success) {
-		Q_EMIT operationError(QString("CLI execution failed: %1").arg(errorOutput));
-		return CliExecutionFailed;
+		Q_EMIT operationError(QString("CLI execution failed: %1").arg(output));
+		return;
 	}
 
 	Q_EMIT operationProgress("Stream image saved successfully");
-	return Success;
 }
 
-ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
+void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
 {
 	if(!m_cliAvailable) {
 		Q_EMIT operationError("Profile Generator CLI not available");
-		return CliNotAvailable;
+		return;
 	}
 
 	// Create temporary files (following iio-oscilloscope pattern exactly)
@@ -216,7 +210,7 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
 		cleanupTempFiles(tempFiles);
-		return ConfigGenerationFailed;
+		return;
 	}
 
 	Q_EMIT operationProgress("Generating profile and stream files...");
@@ -225,13 +219,13 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	QStringList arguments;
 	arguments << "--config" << configFile << "--profile" << profileFile << "--stream" << streamFile;
 
-	QString output, errorOutput;
-	bool success = executeCli(arguments, output, errorOutput);
+	QString output;
+	bool success = executeCli(arguments, output);
 
 	if(!success) {
-		Q_EMIT operationError(QString("CLI execution failed: %1").arg(errorOutput));
+		Q_EMIT operationError(QString("CLI execution failed: %1").arg(output));
 		cleanupTempFiles(tempFiles);
-		return CliExecutionFailed;
+		return;
 	}
 
 	Q_EMIT operationProgress("Loading profile to device...");
@@ -241,14 +235,14 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	if(profileData.isEmpty()) {
 		Q_EMIT operationError("Failed to read generated profile file");
 		cleanupTempFiles(tempFiles);
-		return FileOperationFailed;
+		return;
 	}
 
 	// Write profile to device
 	if(!writeDeviceAttribute("profile_config", profileData)) {
 		Q_EMIT operationError("Failed to write profile to device");
 		cleanupTempFiles(tempFiles);
-		return DeviceWriteFailed;
+		return;
 	}
 
 	// Read generated stream file
@@ -256,7 +250,7 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	if(streamData.isEmpty()) {
 		Q_EMIT operationError("Failed to read generated stream image file");
 		cleanupTempFiles(tempFiles);
-		return FileOperationFailed;
+		return;
 	}
 
 	// Write stream to device
@@ -265,15 +259,13 @@ ProfileCliManager::OperationResult ProfileCliManager::loadProfileToDevice(const 
 	if(!writeDeviceAttribute("stream_config", streamData)) {
 		Q_EMIT operationError("Failed to write stream image to device");
 		cleanupTempFiles(tempFiles);
-		return DeviceWriteFailed;
+		return;
 	}
 
 	Q_EMIT operationProgress("Stream_config write completed successfully");
 
 	// Cleanup temp files
 	cleanupTempFiles(tempFiles);
-
-	return Success;
 }
 
 // Config JSON Generation (simple format for CLI input)
@@ -362,7 +354,7 @@ bool ProfileCliManager::writeConfigToTempFile(const QString &filename, const Rad
 }
 
 // CLI Execution
-bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output, QString &errorOutput)
+bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output)
 {
 	QString workingDir = QFileInfo(m_cliPath).absolutePath();
 
@@ -373,7 +365,7 @@ bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output
 	process.start();
 
 	if(!process.waitForStarted(5000)) {
-		errorOutput = QString("Failed to start CLI: %1").arg(process.errorString());
+		output = QString("Failed to start CLI: %1").arg(process.errorString());
 		return false;
 	}
 
@@ -382,12 +374,11 @@ bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output
 		if(!process.waitForFinished(3000)) { // Give it time to cleanup
 			process.terminate();	     // Force terminate if kill didn't work
 		}
-		errorOutput = "CLI execution timeout";
+		output = "CLI execution timeout";
 		return false;
 	}
 
 	output = process.readAllStandardOutput();
-	errorOutput = process.readAllStandardError();
 
 	if(process.exitCode() != 0) {
 		qWarning(CAT_PROFILECLIMANAGER)
