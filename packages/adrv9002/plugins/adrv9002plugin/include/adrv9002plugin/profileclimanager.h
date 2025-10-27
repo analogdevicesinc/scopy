@@ -48,16 +48,6 @@ class SCOPY_ADRV9002PLUGIN_EXPORT ProfileCliManager : public QObject
 	Q_OBJECT
 
 public:
-	enum OperationResult
-	{
-		Success,
-		CliNotAvailable,
-		CliExecutionFailed,
-		FileOperationFailed,
-		DeviceWriteFailed,
-		ConfigGenerationFailed
-	};
-
 	explicit ProfileCliManager(iio_device *device, QObject *parent = nullptr);
 	~ProfileCliManager();
 
@@ -67,9 +57,9 @@ public:
 	QString getCliPath() const;
 
 	// Profile operations following iio-oscilloscope pattern
-	OperationResult saveProfileToFile(const QString &filename, const RadioConfig &config);
-	OperationResult saveStreamToFile(const QString &filename, const RadioConfig &config);
-	OperationResult loadProfileToDevice(const RadioConfig &config);
+	void saveProfileToFile(const QString &filename, const RadioConfig &config);
+	void saveStreamToFile(const QString &filename, const RadioConfig &config);
+	void loadProfileToDevice(const RadioConfig &config);
 
 	// Configuration preview for debug display
 	QString generateConfigPreview(const RadioConfig &config);
@@ -88,7 +78,7 @@ private:
 	QString createConfigJson(const RadioConfig &config);
 
 	// CLI execution (based on iio-oscilloscope pattern)
-	bool executeCli(const QStringList &arguments, QString &output, QString &errorOutput);
+	bool executeCli(const QStringList &arguments, QString &output);
 
 	// File operations
 	QByteArray readFileContents(const QString &filename);

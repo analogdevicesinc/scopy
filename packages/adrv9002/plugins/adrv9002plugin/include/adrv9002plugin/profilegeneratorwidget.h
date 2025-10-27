@@ -190,6 +190,9 @@ private:
 	// Enhanced Signal Connection Architecture (simplified)
 	void setupEnhancedConnections();
 
+	// Operation completion helper
+	void handleOperationComplete(const QString &message, bool isSuccess);
+
 	// Frequency table helpers
 	void onSampleRateChangedSynchronized(const QString &newSampleRate); // iio-oscilloscope compatibility
 	void updateSampleRateOptionsForSSI();
