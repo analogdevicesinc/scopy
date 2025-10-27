@@ -174,6 +174,8 @@ RadioConfig ProfileGeneratorConstants::lte_lvs3072MHz10()
 	config.clk_config.clockPllHighPerformanceEnable = true;
 	config.clk_config.clockPllPowerMode = 2; // High power
 	config.clk_config.processorClockDivider = 1;
+	config.clk_config.deviceClockOutputDivider = 0; // TODO: not used?
+	config.clk_config.deviceClockOutputEnable = 0;
 
 	return config;
 }
