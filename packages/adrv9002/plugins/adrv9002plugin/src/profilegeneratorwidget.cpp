@@ -169,10 +169,10 @@ ProfileGeneratorWidget::ProfileGeneratorWidget(iio_device *device, QWidget *pare
 	// Connect CLI manager signals for user feedback
 	connect(
 		m_cliManager, &ProfileCliManager::operationProgress, this,
-		[](const QString &msg) { StatusBarManager::pushMessage(msg, 3000); }, Qt::QueuedConnection);
+		[this](const QString &msg) { handleOperationComplete(msg, true); }, Qt::QueuedConnection);
 	connect(
 		m_cliManager, &ProfileCliManager::operationError, this,
-		[](const QString &error) { StatusBarManager::pushMessage(error, 5000); }, Qt::QueuedConnection);
+		[this](const QString &error) { handleOperationComplete(error, false); }, Qt::QueuedConnection);
 
 	setupUi();
 }
@@ -754,6 +754,18 @@ void ProfileGeneratorWidget::onDownloadCLI()
 
 void ProfileGeneratorWidget::refreshProfileData() { onRefreshProfile(); }
 
+void ProfileGeneratorWidget::handleOperationComplete(const QString &message, bool isSuccess)
+{
+	// Stop all animations
+	m_saveProfileToFileBtn->stopAnimation();
+	m_saveStreamToFileBtn->stopAnimation();
+	m_loadToDeviceBtn->stopAnimation();
+
+	// Update debug panel
+	QString prefix = isSuccess ? "Operation Success" : "Operation Failed";
+	m_debugInfoText->setPlainText(QString("%1:\n%2").arg(prefix, message));
+}
+
 // Worker functions for threaded operations
 void ProfileGeneratorWidget::doSaveProfileWork(const QString &fileName, const RadioConfig &config)
 {
@@ -763,12 +775,7 @@ void ProfileGeneratorWidget::doSaveProfileWork(const QString &fileName, const Ra
 	}
 
 	// Use CLI manager to save profile to file
-	auto result = m_cliManager->saveProfileToFile(fileName, config);
-	if(result == ProfileCliManager::Success) {
-		Q_EMIT saveProfileSuccess(fileName);
-	} else {
-		Q_EMIT saveProfileFailed("CLI operation failed");
-	}
+	m_cliManager->saveProfileToFile(fileName, config);
 }
 
 void ProfileGeneratorWidget::doSaveStreamWork(const QString &fileName, const RadioConfig &config)
@@ -779,12 +786,7 @@ void ProfileGeneratorWidget::doSaveStreamWork(const QString &fileName, const Rad
 	}
 
 	// Use CLI manager to save stream to file
-	auto result = m_cliManager->saveStreamToFile(fileName, config);
-	if(result == ProfileCliManager::Success) {
-		Q_EMIT saveStreamSuccess(fileName);
-	} else {
-		Q_EMIT saveStreamFailed("CLI operation failed");
-	}
+	m_cliManager->saveStreamToFile(fileName, config);
 }
 
 void ProfileGeneratorWidget::doLoadToDeviceWork(const RadioConfig &config)
@@ -795,12 +797,7 @@ void ProfileGeneratorWidget::doLoadToDeviceWork(const RadioConfig &config)
 	}
 
 	// Use CLI manager to load profile to device
-	auto result = m_cliManager->loadProfileToDevice(config);
-	if(result == ProfileCliManager::Success) {
-		Q_EMIT loadToDeviceSuccess();
-	} else {
-		Q_EMIT loadToDeviceFailed("CLI operation failed");
-	}
+	m_cliManager->loadProfileToDevice(config);
 }
 
 QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName)
