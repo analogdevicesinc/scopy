@@ -338,6 +338,24 @@ QWidget *ProfileGeneratorWidget::createChannelConfigWidget(const QString &title,
 	ChannelConfigWidget *channelWidget = new ChannelConfigWidget(title, mode, rfOptions, this);
 	m_channelWidgets[type] = channelWidget;
 
+	ChannelConfigWidget::ChannelData data;
+	if(type < 2) { // RX channels
+		data.enabled = m_radioConfig.rx_config[type].enabled;
+		data.freqOffsetCorrectionEnable = m_radioConfig.rx_config[type].freqOffsetCorrectionEnable;
+		data.channelBandwidthHz = m_radioConfig.rx_config[type].channelBandwidthHz;
+		data.sampleRateHz = m_radioConfig.rx_config[type].sampleRateHz;
+		data.rfPort = m_radioConfig.rx_config[type].rfPort;
+	} else { // TX channels
+		int txIndex = type - 2;
+		data.enabled = m_radioConfig.tx_config[txIndex].enabled;
+		data.freqOffsetCorrectionEnable = m_radioConfig.tx_config[txIndex].freqOffsetCorrectionEnable;
+		data.channelBandwidthHz = m_radioConfig.tx_config[txIndex].channelBandwidthHz;
+		data.sampleRateHz = m_radioConfig.tx_config[txIndex].sampleRateHz;
+	}
+
+	channelWidget->setChannelData(data);
+	channelWidget->updateControlsVisibility(true); // LTE mode
+
 	// Connect unified signals for immediate updates
 	connect(channelWidget, &ChannelConfigWidget::sampleRateChanged, this,
 		[this](const QString &rate) { onSampleRateChangedSynchronized(rate); });
@@ -682,7 +700,9 @@ void ProfileGeneratorWidget::onSaveToFile(bool isStreamFile)
 
 	if(!fileName.isEmpty()) {
 		// UPDATE CONFIG ON MAIN THREAD BEFORE THREADING!
-		m_radioConfig = ProfileGeneratorConstants::lteDefaults();
+
+		// matching iio-oscilloscope behaviour
+		m_radioConfig = ProfileGeneratorConstants::lte_lvs3072MHz10();
 		updateConfigFromUI();
 
 		// Copy data for safe worker thread access
