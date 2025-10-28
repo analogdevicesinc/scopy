@@ -30,9 +30,8 @@ private:
 	size_t d_allocated_frames;     // Number of frame buffers actually allocated
 
 	gn_analysis_results *d_analysis;
-	bool d_analysis_enabled; // Flag to control when analysis is computed
 
-	// Protect against library-level threading issues
+	       // Protect against library-level threading issues
 	// genalyzer uses fftw3 library which cannot be used simultaniously from
 	// different threads from different gr::sync_block instances
 	static std::mutex s_genalyzer_mutex;
@@ -61,9 +60,6 @@ public:
 	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) override;
 
 	gn_analysis_results *getGnAnalysis() override;
-
-	void setAnalysisEnabled(bool enabled) override;
-	bool analysisEnabled() const override;
 };
 
 } // namespace scopy::grutil
