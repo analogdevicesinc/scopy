@@ -82,7 +82,6 @@ public:
 	void setSigned(bool sig);
 	void setNavg(int navg);
 	gn_analysis_results *getGnAnalysis();
-	void setAnalysisEnabled(bool enabled);
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 

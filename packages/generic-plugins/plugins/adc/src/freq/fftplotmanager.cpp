@@ -99,16 +99,7 @@ void FFTPlotManager::enableMeasurementPanel(bool)
 	// are implemented. This is just a placeholder.
 }
 
-void FFTPlotManager::enableGenalyzerPanel(bool b)
-{
-	m_genalyzerPanel->setVisible(b);
-	for(PlotComponentChannel *pcc : qAsConst(m_channels)) {
-		GRFFTChannelComponent *fftChannel = dynamic_cast<GRFFTChannelComponent *>(pcc->channelComponent());
-		if(fftChannel && fftChannel->isComplex()) {
-			fftChannel->setAnalysisEnabled(b);
-		}
-	}
-}
+void FFTPlotManager::enableGenalyzerPanel(bool b) { m_genalyzerPanel->setVisible(b); }
 
 void FFTPlotManager::multiPlotUpdate()
 {
