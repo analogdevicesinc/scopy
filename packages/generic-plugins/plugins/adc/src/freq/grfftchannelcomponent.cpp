@@ -386,16 +386,6 @@ bool GRFFTChannelComponent::enabled() const { return m_enabled && !(m_complex ^ 
 
 bool GRFFTChannelComponent::isComplex() { return m_complex; }
 
-void GRFFTChannelComponent::setAnalysisEnabled(bool b)
-{
-	if(isComplex()) {
-		auto sigpath = dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch);
-		if(sigpath) {
-			sigpath->setAnalysisEnabled(b);
-		}
-	}
-}
-
 void GRFFTChannelComponent::setSamplingInfo(SamplingInfo p)
 {
 	ChannelComponent::setSamplingInfo(p);
@@ -500,8 +490,15 @@ void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 	if(m_complex) {
 		gn_analysis_results *gn_analysis = static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
 		if(gn_analysis) {
-			// Emit signal for genalyzer panel updates with channel name and color
-			Q_EMIT genalyzerDataUpdated(this->name(), this->pen().color(), gn_analysis->results_size,
+			// Create unique channel name by including device name to avoid conflicts with multiple devices
+			QString uniqueChannelName = this->name();
+			if(m_node && m_node->treeParent()) {
+				QString deviceName = m_node->treeParent()->name();
+				uniqueChannelName = deviceName + ":" + this->name();
+			}
+
+			// Emit signal for genalyzer panel updates with unique channel name and color
+			Q_EMIT genalyzerDataUpdated(uniqueChannelName, this->pen().color(), gn_analysis->results_size,
 						    gn_analysis->rkeys, gn_analysis->rvalues);
 		}
 	}
