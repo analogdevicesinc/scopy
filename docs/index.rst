@@ -2,7 +2,14 @@ Scopy
 ===============================================================================
 
 `Analog Devices Inc. <https://www.analog.com>`__
-This repository contains Scopy plugins information
+Scopy is a multi-functional software toolset with strong capabilities for
+signal analysis.
+
+.. image:: sources/screenshot-light.png
+   :class: only-light window
+
+.. image:: sources/screenshot-dark.png
+   :class: only-dark window
 
 .. note::
 
@@ -11,10 +18,6 @@ This repository contains Scopy plugins information
    to :git-scopy:`/`.
 
    We apologize for any inconvenience that may occur due to this migration.
-
-.. image:: sources/scopy.png
-   :class: only-light
-   :width: 70%
 
 .. hdl-build-status::
 

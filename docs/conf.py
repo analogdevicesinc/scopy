@@ -45,6 +45,6 @@ html_css_files = ["custom.css"]
 html_favicon = path.join("sources", "scopy.png")
 
 html_theme_options = {
-    "light_logo": "scopy.png",
-    "dark_logo": "scopy.png",
+    "light_logo": "logo.svg",
 }
+
