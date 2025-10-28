@@ -145,7 +145,7 @@ build_libiio() {
 	mkdir -p $STAGING_AREA_DEPS/include
 	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
 	cp -v $STAGING_AREA/libiio/iio.h $STAGING_AREA_DEPS/include
-	cp -vr $STAGING_AREA/libiio/build/iio.framework $STAGING_AREA_DEPS/lib
+	cp -avR $STAGING_AREA/libiio/build/iio.framework $STAGING_AREA_DEPS/lib
 	cp -v $STAGING_AREA/libiio/build/libiio.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
 }
@@ -180,7 +180,7 @@ build_libad9361() {
 	mkdir -p $STAGING_AREA_DEPS/include
 	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
 	cp -v $STAGING_AREA/libad9361/ad9361.h $STAGING_AREA_DEPS/include
-	cp -vr $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
+	cp -avR $STAGING_AREA/libad9361/build/ad9361.framework $STAGING_AREA_DEPS/lib
 	cp -v $STAGING_AREA/libad9361/build/libad9361.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
 }
