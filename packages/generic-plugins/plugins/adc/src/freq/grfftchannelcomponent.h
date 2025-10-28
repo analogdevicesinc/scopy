@@ -98,7 +98,6 @@ public:
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
-	void setAnalysisEnabled(bool enabled) { m_fft->setAnalysisEnabled(enabled); }
 
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
@@ -193,7 +192,6 @@ public:
 	void setWindowCorrection(bool newWindowCorr) override;
 	virtual bool enabled() const override;
 	bool isComplex();
-	void setAnalysisEnabled(bool b);
 
 public Q_SLOTS:
 	void enable() override;

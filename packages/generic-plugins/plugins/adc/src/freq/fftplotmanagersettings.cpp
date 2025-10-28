@@ -310,6 +310,15 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 		m_menu->scrollTo(m_plotCb);
 		Q_EMIT requestOpenMenu();
 	});
+
+	// Connect complex mode changes to the plot settings
+	connect(this, &FFTPlotManagerSettings::samplingInfoChanged, p->plotMenu(),
+		[=](SamplingInfo info) {
+			p->plotMenu()->setComplexMode(info.complexMode);
+		});
+
+	// Set initial complex mode state
+	p->plotMenu()->setComplexMode(m_samplingInfo.complexMode);
 }
 
 void FFTPlotManagerSettings::setPlotComboVisible()

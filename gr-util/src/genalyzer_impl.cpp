@@ -2,6 +2,7 @@
 #include "genalyzer_impl.h"
 #include <gnuradio/io_signature.h>
 #include <cstring>
+#include <cmath>
 #include <cgenalyzer_simplified_beta.h>
 #include <cgenalyzer.h>
 
@@ -35,7 +36,6 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_allocated_frames(0)
 	, d_config(nullptr)
 	, d_analysis(new gn_analysis_results)
-	, d_analysis_enabled(false) // Default to disabled to avoid unnecessary computation
 {
 	allocate_buffers();
 }
@@ -314,23 +314,15 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 				d_fft_out = nullptr;
 			}
 
-			int err_code;
+			int err_code = 0;
 			double *fft_of_in =
 				(double *)calloc(2 * d_nfft, sizeof(double));
 
-			int resolution = d_qres;
 			err_code = gn_fft32(fft_of_in, 2 * d_nfft, d_qwfi, current_npts, d_qwfq,
-					    current_npts, resolution, frames_to_process, d_nfft,
+					    current_npts, d_qres, frames_to_process, d_nfft,
 					    d_win, GnCodeFormatTwosComplement);
 			d_fft_out = fft_of_in;
 
-			// int err_code = gn_fftz(&d_fft_out, d_qwfi, d_qwfq, &d_config);
-			if(err_code != 0) {
-				GR_LOG_ERROR(d_logger, "gn_fftz failed with error code: " + std::to_string(err_code));
-				return -1; // Signal error to GNU Radio
-			}
-
-			// Critical: Check if gn_fftz actually allocated the output buffer
 			if(!d_fft_out) {
 				GR_LOG_ERROR(d_logger, "gn_fftz failed to allocate output buffer");
 				return -1;
@@ -359,43 +351,39 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 				return -1;
 			}
 
-			// Convert dB magnitude values to float
 			for(size_t j = 0; j < d_nfft; j++) {
 				out_vec[j] = static_cast<float>(db_output[j]);
 			}
 		}
 
-		// Only compute Fourier analysis if explicitly enabled (use shifted_output for analysis)
-		if(true) {
-			size_t results_size = 0;
-			char **rkeys = nullptr;
-			double *rvalues = nullptr;
+		// Analysis
+		size_t results_size = 0;
+		char **rkeys = nullptr;
+		double *rvalues = nullptr;
 
-			// Use appropriate SSB width based on window type (not quantization resolution!)
-			uint8_t ssb_width = d_sample_rate/2;
-			int err_code = gn_config_fa_auto(ssb_width, &d_config);
-			if(err_code == 0) {
-				err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
-			} else {
-				GR_LOG_ERROR(d_logger,
-					     "Failed to run gn_config_fa_auto. Error code: " +
-						     std::to_string(err_code));
-			}
+		uint8_t ssb_width = 120;
+		int err_code = gn_config_fa_auto(ssb_width, &d_config);
+		if(err_code == 0) {
+			err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+		} else {
+			GR_LOG_ERROR(d_logger,
+				     "Failed to run gn_config_fa_auto. Error code: " +
+					     std::to_string(err_code));
+		}
 
-			if(err_code != 0) {
-				GR_LOG_ERROR(d_logger,
-					     "Failed to compute Genalyzer analysis. Error code: " +
-						     std::to_string(err_code));
+		if(err_code != 0) {
+			GR_LOG_ERROR(d_logger,
+				     "Failed to compute Genalyzer analysis. Error code: " +
+					     std::to_string(err_code));
 
-				// Reset analysis results on error to prevent stale data
-				d_analysis->results_size = 0;
-				d_analysis->rkeys = nullptr;
-				d_analysis->rvalues = nullptr;
-			} else {
-				d_analysis->results_size = results_size;
-				d_analysis->rkeys = rkeys;
-				d_analysis->rvalues = rvalues;
-			}
+			// Reset analysis results on error to prevent stale data
+			d_analysis->results_size = 0;
+			d_analysis->rkeys = nullptr;
+			d_analysis->rvalues = nullptr;
+		} else {
+			d_analysis->results_size = results_size;
+			d_analysis->rkeys = rkeys;
+			d_analysis->rvalues = rvalues;
 		}
 
 		// Clean up allocated buffers
@@ -407,7 +395,3 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 }
 
 gn_analysis_results *genalyzer_fft_vii_impl::getGnAnalysis() { return d_analysis; }
-
-void genalyzer_fft_vii_impl::setAnalysisEnabled(bool enabled) { d_analysis_enabled = enabled; }
-
-bool genalyzer_fft_vii_impl::analysisEnabled() const { return d_analysis_enabled; }
