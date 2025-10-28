@@ -173,25 +173,10 @@ gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
 
 	return nullptr;
 }
-
-void GRFFTComplexProc::setAnalysisEnabled(bool enabled)
-{
-	if(genalyzer_fft) {
-		genalyzer_fft->setAnalysisEnabled(enabled);
-	}
-}
-
 void GRFFTComplexProc::build_blks(GRTopBlock *top)
 {
 	m_top = top;
 	auto fft_size = top->vlen();
-	std::vector<float> window = gr::fft::window::build(m_fftwindow, fft_size);
-
-	float window_sum = 0;
-	for(auto v : window) {
-		window_sum += v;
-	}
-	auto corr = (m_windowCorr) ? window.size() / window_sum : 1;
 
 	// Create conversion blocks for complex to separate I/Q int32 streams
 	complex_to_float = gr::blocks::complex_to_float::make(fft_size);
@@ -227,8 +212,6 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 GnWindow GRFFTComplexProc::convertToGnWindow(gr::fft::window::win_type window_type)
 {
 	switch(window_type) {
-	case gr::fft::window::WIN_RECTANGULAR:
-		return GnWindow::GnWindowNoWindow;
 	case gr::fft::window::WIN_HANN:
 		return GnWindow::GnWindowHann;
 	case gr::fft::window::WIN_BLACKMAN_hARRIS:
