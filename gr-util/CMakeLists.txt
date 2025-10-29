@@ -71,9 +71,6 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-# --------------------------
-# Add Genalyzer dependency
-# --------------------------
 find_path(GENALYZER_INCLUDE_DIR
     NAMES cgenalyzer_simplified_beta.h
     HINTS ${CMAKE_PREFIX_PATH}
@@ -89,12 +86,11 @@ if(NOT GENALYZER_INCLUDE_DIR OR NOT GENALYZER_LIB)
     message(STATUS "GENALYZER_INCLUDE_DIR: ${GENALYZER_INCLUDE_DIR}")
     message(STATUS "GENALYZER_LIB: ${GENALYZER_LIB}")
     message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-    message(FATAL_ERROR "Genalyzer not found. Please ensure genalyzer is installed and CMAKE_PREFIX_PATH is set correctly.")
+    message(FATAL_ERROR "Genalyzer not found.")
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GENALYZER_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${GENALYZER_LIB})
-# --------------------------
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(

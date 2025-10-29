@@ -313,9 +313,7 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 
 	// Connect complex mode changes to the plot settings
 	connect(this, &FFTPlotManagerSettings::samplingInfoChanged, p->plotMenu(),
-		[=](SamplingInfo info) {
-			p->plotMenu()->setComplexMode(info.complexMode);
-		});
+		[=](SamplingInfo info) { p->plotMenu()->setComplexMode(info.complexMode); });
 
 	// Set initial complex mode state
 	p->plotMenu()->setComplexMode(m_samplingInfo.complexMode);

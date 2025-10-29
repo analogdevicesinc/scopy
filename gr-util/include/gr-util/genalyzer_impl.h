@@ -25,13 +25,13 @@ private:
 	// Moving average buffer management - circular buffer approach
 	int32_t **d_frame_buffers_i;  // Array of pointers to I channel frame buffers
 	int32_t **d_frame_buffers_q;  // Array of pointers to Q channel frame buffers
-	size_t d_current_frame_index;  // Current frame index in circular buffer
-	size_t d_frames_filled;        // Number of frames filled (0 to d_navg)
-	size_t d_allocated_frames;     // Number of frame buffers actually allocated
+	size_t d_current_frame_index; // Current frame index in circular buffer
+	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
+	size_t d_allocated_frames;    // Number of frame buffers actually allocated
 
 	gn_analysis_results *d_analysis;
 
-	       // Protect against library-level threading issues
+	// Protect against library-level threading issues
 	// genalyzer uses fftw3 library which cannot be used simultaniously from
 	// different threads from different gr::sync_block instances
 	static std::mutex s_genalyzer_mutex;
@@ -40,7 +40,7 @@ private:
 	std::mutex d_buffer_mutex;
 
 	void cleanup_buffers();
-	void cleanup_frame_buffers();  // Clean only circular buffer frames
+	void cleanup_frame_buffers(); // Clean only circular buffer frames
 	void allocate_buffers();
 	int configure_genalyzer();
 

@@ -68,7 +68,7 @@ private:
 
 	// Window mode management
 	bool m_complexMode;
-	int m_floatModeWindow;  // Store float mode window selection
+	int m_floatModeWindow; // Store float mode window selection
 	QPushButton *m_deletePlot;
 	QPushButton *m_deletePlotHover;
 	QPushButton *m_settingsPlotHover;
