@@ -126,6 +126,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 
@@ -325,6 +326,18 @@ build_karchive () {
 	popd
 }
 
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	pushd $STAGING_AREA/genalyzer
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake
+	sudo make install
+	popd
+}
+
 build_iio-emu(){
 	echo "### Building iio-emu - branch $IIOEMU_BRANCH"
 	pushd $STAGING_AREA
@@ -391,6 +404,7 @@ create_appdir(){
 	cp -r $python_path $APP_DIR/usr/lib
 
 	cp -r $SYSROOT/share/libsigrokdecode/decoders  $APP_DIR/usr/lib
+	cp $SYSROOT/lib/libgenalyzer.so* $APP_DIR/usr/lib
 
 	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
@@ -466,6 +480,7 @@ build_deps(){
 	build_kddock
 	build_ecm
 	build_karchive
+	build_genalyzer
 }
 
 run_workflow(){
