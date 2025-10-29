@@ -63,15 +63,16 @@ public:
 	~GenalyzerPanel();
 
 public Q_SLOTS:
-	void updateResults(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys, double *rvalues);
+	void updateResults(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
+			   double *rvalues);
 	void clear();
 	void clearChannel(const QString &channelName);
 
 private:
-	GenalyzerChannelDisplay* findOrCreateChannelDisplay(const QString &channelName, QColor channelColor);
+	GenalyzerChannelDisplay *findOrCreateChannelDisplay(const QString &channelName, QColor channelColor);
 
 	QVBoxLayout *panelLayout;
-	QMap<QString, GenalyzerChannelDisplay*> m_channelDisplays;
+	QMap<QString, GenalyzerChannelDisplay *> m_channelDisplays;
 	QScrollArea *scrollArea;
 	QWidget *m_panel;
 };

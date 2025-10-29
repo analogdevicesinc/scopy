@@ -48,21 +48,19 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 
 {
 
-	m_plotChannelCmpt = new FFTPlotComponentChannel(this, m_plot, this);
-
-	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(m_plotChannelCmpt);
+	m_fftPlotComponentChannel = new FFTPlotComponentChannel(this, m_plot, this);
+	m_plotChannelCmpt = m_fftPlotComponentChannel;
 	connect(m_chData, &ChannelData::newData, m_fftPlotComponentChannel, &FFTPlotComponentChannel::onNewData);
 	m_node = node_I;
 	m_channelName = node_I->name() + "-" + node_Q->name();
 	m_src_I = node_I->src();
 	m_src_Q = node_Q->src();
 
-	GRIIOComplexChannelSrc *m_src_complex = new GRIIOComplexChannelSrc(
-		m_channelName, m_src_I->getDeviceSrc(), m_src_I->getChannelName(), m_src_Q->getChannelName(), this);
-	m_src = m_src_complex;
+	m_src = new GRIIOComplexChannelSrc(m_channelName, m_src_I->getDeviceSrc(), m_src_I->getChannelName(),
+					   m_src_Q->getChannelName(), this);
 
-	m_grtch = new GRFFTComplexChannelSigpath(grtsc->name(), this, m_node->top()->src(), m_src_complex,
-						 this); // change prototype here (?)
+	m_grtch = new GRFFTComplexChannelSigpath(grtsc->name(), this, m_node->top()->src(),
+						 static_cast<GRIIOComplexChannelSrc *>(m_src), this);
 	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
 		[=](double v) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setPowerOffset(v); });
 
@@ -77,9 +75,6 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 			dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSampleRate(p.sampleRate);
 		});
 
-	// Connect genalyzer data updates for complex channels - but we'll add the actual logic in the controller
-	// to avoid expensive analysis when panel is not enabled
-
 	m_complex = true;
 
 	_init();
@@ -90,16 +85,14 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 	: ChannelComponent(node->name(), pen, parent)
 
 {
-	m_plotChannelCmpt = new FFTPlotComponentChannel(this, m_plot, this);
-
-	m_fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(m_plotChannelCmpt);
+	m_fftPlotComponentChannel = new FFTPlotComponentChannel(this, m_plot, this);
+	m_plotChannelCmpt = m_fftPlotComponentChannel;
 	connect(m_chData, &ChannelData::newData, m_fftPlotComponentChannel, &FFTPlotComponentChannel::onNewData);
 
 	m_node = node;
 	m_src = node->src();
 	m_channelName = node->name();
 	m_grtch = new GRFFTChannelSigpath(grtsc->name(), this, m_node->top()->src(), node->src(), this);
-
 	m_complex = false;
 
 	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
@@ -486,18 +479,15 @@ void GRFFTChannelComponent::setWindowCorrection(bool newWindowCorr)
 
 void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 {
-	// Only perform analysis for complex channels that have genalyzer capabilities
 	if(m_complex) {
 		gn_analysis_results *gn_analysis = static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
 		if(gn_analysis) {
-			// Create unique channel name by including device name to avoid conflicts with multiple devices
 			QString uniqueChannelName = this->name();
 			if(m_node && m_node->treeParent()) {
 				QString deviceName = m_node->treeParent()->name();
 				uniqueChannelName = deviceName + ":" + this->name();
 			}
 
-			// Emit signal for genalyzer panel updates with unique channel name and color
 			Q_EMIT genalyzerDataUpdated(uniqueChannelName, this->pen().color(), gn_analysis->results_size,
 						    gn_analysis->rkeys, gn_analysis->rvalues);
 		}
