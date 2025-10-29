@@ -117,7 +117,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		// Store float mode window selection when not in complex mode
-		if (!m_complexMode) {
+		if(!m_complexMode) {
 			m_floatModeWindow = m_windowCb->combo()->itemData(idx).toInt();
 		}
 
@@ -255,7 +255,7 @@ void FFTPlotComponentSettings::onStop()
 
 void FFTPlotComponentSettings::setComplexMode(bool complexMode)
 {
-	if (m_complexMode == complexMode) {
+	if(m_complexMode == complexMode) {
 		return;
 	}
 
@@ -263,7 +263,7 @@ void FFTPlotComponentSettings::setComplexMode(bool complexMode)
 	updateWindowComboForMode();
 
 	m_windowChkb->onOffswitch()->setEnabled(!complexMode);
-	if (complexMode) {
+	if(complexMode) {
 		m_windowChkb->onOffswitch()->setChecked(false);
 	} else {
 		m_windowChkb->onOffswitch()->setChecked(true);
@@ -278,7 +278,7 @@ void FFTPlotComponentSettings::updateWindowComboForMode()
 	// Clear the combo box
 	m_windowCb->combo()->clear();
 
-	if (m_complexMode) {
+	if(m_complexMode) {
 		// Complex mode: only add windows supported by genalyzer
 		m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
 		m_windowCb->combo()->addItem("Blackman-Harris", gr::fft::window::WIN_BLACKMAN_hARRIS);
@@ -296,8 +296,8 @@ void FFTPlotComponentSettings::updateWindowComboForMode()
 		m_windowCb->combo()->addItem("Bartlett", gr::fft::window::WIN_BARTLETT);
 
 		// Restore the previously selected float mode window
-		for (int i = 0; i < m_windowCb->combo()->count(); ++i) {
-			if (m_windowCb->combo()->itemData(i).toInt() == m_floatModeWindow) {
+		for(int i = 0; i < m_windowCb->combo()->count(); ++i) {
+			if(m_windowCb->combo()->itemData(i).toInt() == m_floatModeWindow) {
 				m_windowCb->combo()->setCurrentIndex(i);
 				break;
 			}
@@ -307,7 +307,7 @@ void FFTPlotComponentSettings::updateWindowComboForMode()
 	// Reconnect the signal
 	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		// Store float mode window selection when not in complex mode
-		if (!m_complexMode) {
+		if(!m_complexMode) {
 			m_floatModeWindow = m_windowCb->combo()->itemData(idx).toInt();
 		}
 
@@ -320,7 +320,7 @@ void FFTPlotComponentSettings::updateWindowComboForMode()
 	});
 
 	// Apply the currently selected window to all channels
-	if (m_windowCb->combo()->count() > 0) {
+	if(m_windowCb->combo()->count() > 0) {
 		int currentWindow = m_windowCb->combo()->currentData().toInt();
 		for(auto c : qAsConst(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
