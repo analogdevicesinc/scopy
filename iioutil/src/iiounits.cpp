@@ -37,7 +37,8 @@ IIOUnitsManager::IIOUnitsManager(QObject *parent)
 		{IIO_PRESSURE, {"Pascal", "Pa", 1000}},
 		{IIO_ACCEL, {"Metre per second squared", "m/s2", 1}},
 		{IIO_ANGL_VEL, {"Radian per second", "rad/s", 1}},
-		{IIO_MAGN, {"Gauss", "Gs", 1}}
+		{IIO_MAGN, {"Gauss", "Gs", 1}},
+		{IIO_POWER, {"Watt", "W", 0.000001}}
 		/// and others
 	});
 
