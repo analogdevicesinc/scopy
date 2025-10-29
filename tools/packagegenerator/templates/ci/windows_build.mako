@@ -24,7 +24,7 @@ jobs:
         with:
           repository: analogdevicesinc/scopy
           path: scopy
-          ref: main-pkg-manager
+          ref: ${ref_branch}
 
       - name: Pull the Docker Image
         run: docker pull cristianbindea/scopy2-mingw64:latest
