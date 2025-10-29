@@ -1,0 +1,13 @@
+{
+    "id": "extproc",
+    "title": "External Process Package",
+    "version": "@PROJECT_VERSION@",
+    "description": "Package for external processing tools",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  

@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2025 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+#ifndef IIOMANAGER_H
+#define IIOMANAGER_H
+
+#include "extprocutils.h"
+
+#include <iio.h>
+#include <QObject>
+#include <QFutureWatcher>
+#include <datawriter.h>
+#include <inputconfig.h>
+
+namespace scopy::extprocplugin {
+
+/**
+ * @brief Union hack to access and modify internal iio_buffer structure
+ *
+ * This union allows us to bypass the opaque iio_buffer API and directly
+ * manipulate the internal buffer pointer. This is necessary to redirect
+ * IIO buffer data to memory-mapped files for efficient streaming and logging.
+ *
+ * WARNING: This hack depends on the internal layout of iio_buffer remaining
+ * stable. It assumes the buffer structure contains:
+ * - iio_device pointer at offset 0
+ * - void* buffer pointer at offset sizeof(void*)
+ *
+ * The padding ensures proper alignment for the structure overlay.
+ */
+union iio_buffer_hack
+{
+	struct iio_buffer *buffer; // Standard IIO buffer pointer
+	struct
+	{
+		const struct iio_device *dev; // Device pointer (first field)
+		void *buffer;		      // Internal buffer pointer we want to modify
+		char padding[40];	      // Padding to match internal structure size
+	} * fields;
+};
+
+class IIOManager : public QObject
+{
+	Q_OBJECT
+public:
+	IIOManager(iio_context *ctx, QObject *parent = nullptr);
+	~IIOManager();
+
+	QMap<QString, QList<ChannelInfo>> getAvailableChannels();
+
+public Q_SLOTS:
+	void startAcq(bool en);
+	void onDataRequest();
+	void onBufferParamsChanged(const BufferParams &params);
+
+Q_SIGNALS:
+	void inputFormatChanged(const InputConfig &config);
+	void dataReady(QVector<QVector<float>> &inputData);
+
+private:
+	void computeDevMap();
+	void destroyBuffer();
+	void readBuffer();
+	int enChannels(QString deviceName, QStringList enChnls);
+	QStringList getChannelsFormat(iio_device *dev, bool floatFormat = false);
+	double getSamplingFrequency(iio_device *dev);
+	InputConfig createInputConfig(iio_device *dev, int channelCount, int64_t bufferSamplesSize);
+	void chnlRead(iio_channel *chnl, QByteArray &dst);
+	QVector<float> toFloat(QByteArray dst);
+	void readAllChannels(QString deviceName);
+	void writeToMappedFile();
+	void updateBufferParams(const BufferParams &params);
+	void notifyInputConfigChanged();
+
+	int m_enChnlSize = 0;
+	BufferParams m_params;
+	iio_context *m_ctx;
+	iio_buffer *m_buffer = nullptr;
+	DataWriter *m_dataWriter;
+	QFutureWatcher<void> *m_readFw;
+	QVector<QVector<float>> m_bufferData;
+	QMap<QString, QMap<QString, iio_channel *>> m_devMap;
+
+	// DEPRECATED: Memory-mapped buffer functionality no longer used in current implementation
+	// The iio_buffer_hack union and this method are retained for reference/proof-of-concept purposes
+	iio_buffer *createMmapIioBuffer(struct iio_device *dev, size_t samples, void **originalBufferPtr = nullptr);
+	void *m_originalBufferPtr = nullptr;
+};
+
+} // namespace scopy::extprocplugin
+
+#endif // IIOMANAGER_H
