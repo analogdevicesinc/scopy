@@ -184,10 +184,10 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	float_to_int_q = gr::blocks::float_to_int::make(fft_size);
 
 	// Create genalyzer FFT with int32 inputs
-	genalyzer_fft = genalyzer_fft_vii::make(fft_size * m_navg, // npts - number of points (FFT size * averages)
+	genalyzer_fft = genalyzer_fft_vii::make(fft_size * m_navg,  // npts - number of points (FFT size * averages)
 						nrBits + !m_signed, // qres - quantization resolution for genalyzer
 						m_navg,		    // navg - number of averages
-						fft_size, // nfft - FFT size
+						fft_size,	    // nfft - FFT size
 						convertToGnWindow(m_fftwindow), // Convert your window type to GnWindow
 						m_sr				// sample rate
 	);
