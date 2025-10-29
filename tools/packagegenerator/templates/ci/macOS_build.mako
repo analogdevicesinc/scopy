@@ -9,7 +9,7 @@ resources:
     type: github
     endpoint: put_endpoint_here
     name: analogdevicesinc/scopy
-    ref: pkg-man-test
+    ref: ${ref_branch}
 
 trigger:
   branches:

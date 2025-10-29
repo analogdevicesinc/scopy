@@ -26,7 +26,7 @@ jobs:
           set-safe-directory: 'true'
           repository: analogdevicesinc/scopy
           path: scopy
-          ref: main-pkg-manager
+          ref: ${ref_branch}
 
       - name: Check package generator
         run: |

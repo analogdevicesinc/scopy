@@ -641,7 +641,7 @@ def init_submodule_and_generate_pkg(packages_path, config, args):
     # Generate the package in the submodule
     generate_pkg(packages_path, config, args)
     # Generate workflows
-    generate_workflows(submodule_path)
+    generate_workflows(submodule_path, config)
     
 def add_existing_git_submodule(packages_path, repo_url):
     """
@@ -673,7 +673,7 @@ def add_existing_git_submodule(packages_path, repo_url):
 
     print(f"Added existing repository as submodule at {submodule_path}.")
 
-def generate_workflows(package_path):
+def generate_workflows(package_path, config):
     """
     Generates GitHub Actions workflow files from Mako templates.    
     Args:
@@ -704,7 +704,7 @@ def generate_workflows(package_path):
     }   
     for template_path, output_path in workflows.items():
         # Generate the workflow file from the template
-        create_file_from_template(template_path, output_path)
+        create_file_from_template(template_path, output_path, ref_branch = config["ref_branch"])
 
 if __name__ == "__main__":
     args = get_args()

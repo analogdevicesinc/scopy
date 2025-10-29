@@ -31,7 +31,7 @@ jobs:
         with:
           repository: analogdevicesinc/scopy
           path: scopy
-          ref: main-pkg-manager
+          ref: ${ref_branch}
 
       - name: Check package generator
         run: |
@@ -49,7 +49,7 @@ jobs:
           git config --global --add safe.directory $GITHUB_WORKSPACE/scopy
           cd scopy
           mkdir -p build && cd build
-          cmake .. -DCMAKE_PREFIX_PATH=/opt/Qt/5.15.2/gcc_64/lib/cmake/Qt5
+          cmake .. -DCMAKE_PREFIX_PATH=/opt/Qt/5.15.2/gcc_64
           make -j$(nproc)
           cp -r packages/$REPO_NAME $GITHUB_WORKSPACE || echo "Package directory not found!"
       

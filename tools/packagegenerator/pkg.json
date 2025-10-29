@@ -4,5 +4,6 @@
     "description": "A new package",
     "author": "Analog Devices Inc.",
     "license": "LGPL",
-    "category": ["iio", "plugin"]
+    "category": ["iio", "plugin"],
+    "ref_branch": "main"
 }
