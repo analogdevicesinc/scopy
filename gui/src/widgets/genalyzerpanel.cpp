@@ -66,14 +66,11 @@ void GenalyzerChannelDisplay::setChannelColor(QColor color)
 	setStyleSheet("QTextBrowser { color: " + color.name() + "; border: none; background: transparent; }");
 }
 
-QString GenalyzerChannelDisplay::channelName() const
-{
-	return m_channelName;
-}
+QString GenalyzerChannelDisplay::channelName() const { return m_channelName; }
 
 QString GenalyzerChannelDisplay::formatResultsText(size_t results_size, char **rkeys, double *rvalues)
 {
-	if (results_size == 0) {
+	if(results_size == 0) {
 		return "No results";
 	}
 
@@ -85,7 +82,7 @@ QString GenalyzerChannelDisplay::formatResultsText(size_t results_size, char **r
 	const int valueWidth = 12;
 
 	// Build each key/value pair on a single row
-	for (size_t i = 0; i < results_size; i++) {
+	for(size_t i = 0; i < results_size; i++) {
 		QString key = QString(rkeys[i]) + ":";
 		QString value = QString::number(rvalues[i], 'f', 3);
 
@@ -111,15 +108,12 @@ GenalyzerPanel::GenalyzerPanel(QWidget *parent)
 	Style::setBackgroundColor(this, json::theme::background_subtle);
 }
 
-GenalyzerPanel::~GenalyzerPanel()
-{
-	clear();
-}
+GenalyzerPanel::~GenalyzerPanel() { clear(); }
 
-GenalyzerChannelDisplay* GenalyzerPanel::findOrCreateChannelDisplay(const QString &channelName, QColor channelColor)
+GenalyzerChannelDisplay *GenalyzerPanel::findOrCreateChannelDisplay(const QString &channelName, QColor channelColor)
 {
 	// Check if display for this channel already exists
-	if (m_channelDisplays.contains(channelName)) {
+	if(m_channelDisplays.contains(channelName)) {
 		return m_channelDisplays[channelName];
 	}
 
@@ -131,7 +125,8 @@ GenalyzerChannelDisplay* GenalyzerPanel::findOrCreateChannelDisplay(const QStrin
 	return display;
 }
 
-void GenalyzerPanel::updateResults(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys, double *rvalues)
+void GenalyzerPanel::updateResults(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
+				   double *rvalues)
 {
 	// Find or create display for this channel (no flashing - reuses existing!)
 	GenalyzerChannelDisplay *display = findOrCreateChannelDisplay(channelName, channelColor);
@@ -142,7 +137,7 @@ void GenalyzerPanel::updateResults(const QString &channelName, QColor channelCol
 
 void GenalyzerPanel::clearChannel(const QString &channelName)
 {
-	if (m_channelDisplays.contains(channelName)) {
+	if(m_channelDisplays.contains(channelName)) {
 		GenalyzerChannelDisplay *display = m_channelDisplays.take(channelName);
 		panelLayout->removeWidget(display);
 		display->deleteLater();
@@ -152,7 +147,7 @@ void GenalyzerPanel::clearChannel(const QString &channelName)
 void GenalyzerPanel::clear()
 {
 	// Delete all channel displays
-	for (auto it = m_channelDisplays.begin(); it != m_channelDisplays.end(); ++it) {
+	for(auto it = m_channelDisplays.begin(); it != m_channelDisplays.end(); ++it) {
 		it.value()->deleteLater();
 	}
 	m_channelDisplays.clear();

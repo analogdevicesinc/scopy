@@ -61,7 +61,7 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	m_genalyzerPanel->setVisible(false);
 
 	// Add to main horizontal layout
-	mainLayout->addWidget(leftWidget, 1); // Give plots area more space
+	mainLayout->addWidget(leftWidget, 1);	    // Give plots area more space
 	mainLayout->addWidget(m_genalyzerPanel, 0); // Fixed width panel
 }
 
