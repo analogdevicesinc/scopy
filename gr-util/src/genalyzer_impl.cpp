@@ -210,8 +210,6 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 	{
 		std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
 
-		configure_genalyzer();
-
 		const int32_t *in_i = (const int32_t *)input_items[0];
 		const int32_t *in_q = (const int32_t *)input_items[1];
 		float *out = (float *)output_items[0];
@@ -226,50 +224,40 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 
 			size_t frames_to_process, current_npts;
 
-			{
-				std::lock_guard<std::mutex> lock(d_buffer_mutex);
+			if(!d_frame_buffers_i || !d_frame_buffers_q || d_navg == 0) {
+				std::memset(out_vec, 0, d_nfft * sizeof(float));
+				continue;
+			}
 
-				if(!d_frame_buffers_i || !d_frame_buffers_q || d_navg == 0) {
-					std::memset(out_vec, 0, d_nfft * sizeof(float));
-					continue;
-				}
+			for(size_t j = 0; j < d_nfft; j++) {
+				d_frame_buffers_i[d_current_frame_index][j] = in_i_vec[j];
+				d_frame_buffers_q[d_current_frame_index][j] = in_q_vec[j];
+			}
+
+			d_current_frame_index = (d_current_frame_index + 1) % d_navg;
+			if(d_frames_filled < d_navg) {
+				d_frames_filled++;
+			}
+
+			frames_to_process = std::min(d_frames_filled, d_navg);
+			if(frames_to_process == 0) {
+				std::memset(out_vec, 0, d_nfft * sizeof(float));
+				continue;
+			}
+
+			// Copy frames chronologically from oldest
+			size_t oldest_frame_index = (d_frames_filled < d_navg) ? 0 : d_current_frame_index;
+
+			for(size_t frame = 0; frame < frames_to_process; frame++) {
+				size_t source_frame_index = (oldest_frame_index + frame) % d_navg;
+				size_t dest_offset = frame * d_nfft;
 
 				for(size_t j = 0; j < d_nfft; j++) {
-					d_frame_buffers_i[d_current_frame_index][j] = in_i_vec[j];
-					d_frame_buffers_q[d_current_frame_index][j] = in_q_vec[j];
+					d_qwfi[dest_offset + j] = d_frame_buffers_i[source_frame_index][j];
+					d_qwfq[dest_offset + j] = d_frame_buffers_q[source_frame_index][j];
 				}
-
-				d_current_frame_index = (d_current_frame_index + 1) % d_navg;
-				if(d_frames_filled < d_navg) {
-					d_frames_filled++;
-				}
-
-				frames_to_process = std::min(d_frames_filled, d_navg);
-				if(frames_to_process == 0) {
-					std::memset(out_vec, 0, d_nfft * sizeof(float));
-					continue;
-				}
-
-				// Copy frames chronologically from oldest
-				size_t oldest_frame_index = (d_frames_filled < d_navg) ? 0 : d_current_frame_index;
-
-				for(size_t frame = 0; frame < frames_to_process; frame++) {
-					size_t source_frame_index = (oldest_frame_index + frame) % d_navg;
-					size_t dest_offset = frame * d_nfft;
-
-					for(size_t j = 0; j < d_nfft; j++) {
-						d_qwfi[dest_offset + j] = d_frame_buffers_i[source_frame_index][j];
-						d_qwfq[dest_offset + j] = d_frame_buffers_q[source_frame_index][j];
-					}
-				}
-
-				current_npts = frames_to_process * d_nfft;
 			}
-
-			if(!d_config && configure_genalyzer() != 0) {
-				GR_LOG_ERROR(d_logger, "Failed to configure genalyzer");
-				return -1;
-			}
+			current_npts = frames_to_process * d_nfft;
 
 			if(!d_qwfi || !d_qwfq) {
 				GR_LOG_ERROR(d_logger, "Input quantization buffers are null");
@@ -310,6 +298,7 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 		char **rkeys = nullptr;
 		double *rvalues = nullptr;
 
+		configure_genalyzer();
 		uint8_t ssb_width = 120;
 		int err_code = gn_config_fa_auto(ssb_width, &d_config);
 		if(err_code == 0) {
