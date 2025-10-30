@@ -82,7 +82,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
-	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	[ -d 'genalyzer' ] || git clone --recursive https://github.com/andrei47w/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 
@@ -421,9 +421,10 @@ build_deps() {
 	build_genalyzer ON
 }
 
+clone
+build_genalyzer
 
 for arg in $@; do
 	$arg
 done
 
-build_deps
