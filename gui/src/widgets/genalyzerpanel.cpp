@@ -56,8 +56,15 @@ GenalyzerChannelDisplay::GenalyzerChannelDisplay(const QString &channelName, QCo
 
 void GenalyzerChannelDisplay::updateResults(size_t results_size, char **rkeys, double *rvalues)
 {
+	// Save current scroll position
+	QScrollBar *vScrollBar = verticalScrollBar();
+	int scrollPosition = vScrollBar->value();
+
 	// Use setPlainText for maximum performance - no HTML parsing
 	setPlainText(formatResultsText(results_size, rkeys, rvalues));
+
+	// Restore scroll position
+	vScrollBar->setValue(scrollPosition);
 }
 
 void GenalyzerChannelDisplay::setChannelColor(QColor color)
