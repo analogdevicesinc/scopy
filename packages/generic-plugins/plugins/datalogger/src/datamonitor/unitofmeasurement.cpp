@@ -35,4 +35,16 @@ QString UnitOfMeasurement::getSymbol() const { return symbol; }
 
 QString UnitOfMeasurement::getNameAndSymbol() { return QString(name + " ( " + symbol + " )"); }
 
+void UnitOfMeasurement::setName(const QString &newName)
+{
+	name = newName;
+	Q_EMIT unitChanged();
+}
+
+void UnitOfMeasurement::setSymbol(const QString &newSymbol)
+{
+	symbol = newSymbol;
+	Q_EMIT unitChanged();
+}
+
 #include "moc_unitofmeasurement.cpp"
