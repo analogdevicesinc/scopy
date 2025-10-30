@@ -39,7 +39,10 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget(model->getName(), model->getColor(), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget(model->getDisplayName(), model->getColor(), this);
+	header->title()->setEnabled(true);
+	connect(header->title(), &QLineEdit::textChanged, model, &DataMonitorModel::setDisplayName);
+
 	mainLayout->addWidget(header);
 
 	QWidget *settingsBody = new QWidget(this);
