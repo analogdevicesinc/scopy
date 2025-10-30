@@ -43,7 +43,7 @@ DLL_DEPS=(
     tinyiiod.dll
     libm2k.dll
     libvolk.dll
-    libfftw3f*.dll
+    libfftw3*.dll
     Qt5Widgets.dll
     libicudt*.dll
     libffi-*.dll

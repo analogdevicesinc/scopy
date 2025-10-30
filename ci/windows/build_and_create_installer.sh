@@ -140,6 +140,13 @@ deploy_app(){
 	cp -nv iio_*.exe $DEST_FOLDER/
 	popd
 
+	# Copy genalyzer DLL
+	if [ "$USE_STAGING" == "ON" ]; then
+		cp -v $STAGING_DIR/bin/libgenalyzer.dll $DEST_FOLDER/ || echo "Warning: genalyzer DLL not found in staging"
+	else
+		cp -v /$MINGW_VERSION/bin/libgenalyzer.dll $DEST_FOLDER/ || echo "Warning: genalyzer DLL not found in system"
+	fi
+
 	cp -r $PYTHON_FILES $DEST_FOLDER
 	cp $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss $DEST_FOLDER
 
