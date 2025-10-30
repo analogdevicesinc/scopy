@@ -26,6 +26,7 @@ stages:
 - stage: Builds
   jobs:
   - job: macOSBuilds
+    timeoutInMinutes: 90
     strategy:
       matrix:
         macOS_14:
