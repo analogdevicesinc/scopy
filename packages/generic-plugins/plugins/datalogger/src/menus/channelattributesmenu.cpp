@@ -248,6 +248,31 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	plotSelectorContainer->contentLayout()->addWidget(plotSelectorSection);
 	layout->addWidget(plotSelectorContainer);
 
+	////////////////Override UM settings  ///////////////////
+	MenuSectionWidget *umContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *um = new MenuCollapseSection("Unit Of Measurement", MenuCollapseSection::MHCW_NONE,
+							  MenuCollapseSection::MHW_BASEWIDGET, umContainer);
+
+	QVBoxLayout *umLayout = new QVBoxLayout();
+	umLayout->setSpacing(10);
+	umLayout->setMargin(0);
+	umLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
+
+	QLineEdit *umName = new QLineEdit(model->getUnitOfMeasure()->getName(), um);
+	QLineEdit *umSymbol = new QLineEdit(model->getUnitOfMeasure()->getSymbol(), um);
+
+	connect(umName, &QLineEdit::textChanged, this, [=](QString text) { model->getUnitOfMeasure()->setName(text); });
+
+	connect(umSymbol, &QLineEdit::textChanged, this,
+		[=](QString text) { model->getUnitOfMeasure()->setSymbol(text); });
+
+	umLayout->addWidget(umName);
+	umLayout->addWidget(umSymbol);
+
+	um->contentLayout()->addLayout(umLayout);
+	umContainer->contentLayout()->addWidget(um);
+	layout->addWidget(umContainer);
+
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);
 }

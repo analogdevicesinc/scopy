@@ -43,6 +43,9 @@ SevenSegmentMonitor::SevenSegmentMonitor(DataMonitorModel *model, QWidget *paren
 		[this]() { name->setText(m_model->getDisplayName()); });
 
 	unitOfMeasurement = new QLabel(model->getUnitOfMeasure()->getNameAndSymbol(), this);
+	// update ui if the unit is changed
+	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this,
+		[this]() { unitOfMeasurement->setText(m_model->getUnitOfMeasure()->getNameAndSymbol()); });
 
 	header->addWidget(name, Qt::AlignLeft);
 	header->addWidget(unitOfMeasurement);
