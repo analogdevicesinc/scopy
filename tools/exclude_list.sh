@@ -80,6 +80,7 @@ OMIT_FILES_LIST=(
     \*.mat
     \*.user
     ad9084\*.txt
+    \*.stream
 )
 OMIT_FILES_LIST=("${OMIT_FILES_LIST[@]/#/*\/}")
 GITINORE_FILES_LIST=(
