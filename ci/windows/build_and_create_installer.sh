@@ -201,6 +201,8 @@ run_workflow(){
 	create_installer
 }
 
+$SCRIPT_DIR/windows_build_process.sh
+
 for arg in $@; do
 	$arg
 done
