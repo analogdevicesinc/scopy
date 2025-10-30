@@ -37,7 +37,11 @@ SevenSegmentMonitor::SevenSegmentMonitor(DataMonitorModel *model, QWidget *paren
 	header->setMargin(10);
 	header->setSpacing(10);
 
-	name = new QLabel(model->getName(), this);
+	name = new QLabel(model->getDisplayName(), this);
+	// update ui
+	connect(model, &DataMonitorModel::displayNameChanged, this,
+		[this]() { name->setText(m_model->getDisplayName()); });
+
 	unitOfMeasurement = new QLabel(model->getUnitOfMeasure()->getNameAndSymbol(), this);
 
 	header->addWidget(name, Qt::AlignLeft);
