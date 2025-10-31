@@ -124,12 +124,14 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(monitor->getDeviceName()));
 	monitorChannel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	deviceMap.value(monitor->getDeviceName())->add(monitorChannel);
-	monitorChannel->setName(monitor->getShortName());
+	monitorChannel->setName(monitor->getDisplayName());
 	monitorChannel->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
 	monitorChannel->setOpenMenuChecksThis(true);
 	monitorChannel->setColor(monitor->getColor());
 	monitorChannel->button()->setVisible(false);
 	monitorChannel->setCheckable(true);
+
+	connect(monitor, &DataMonitorModel::displayNameChanged, monitorChannel, &MenuControlButton::setName);
 
 	monitorChannel->setToolTip(monitor->getName());
 

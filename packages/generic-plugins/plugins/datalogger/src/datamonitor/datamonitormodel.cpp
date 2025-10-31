@@ -50,6 +50,7 @@ DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement
 	m_minValue = std::numeric_limits<double>::max();
 	m_maxValue = std::numeric_limits<double>::min();
 	setName(name);
+	displayName = "";
 
 	if(unitOfMeasure) {
 		this->unitOfMeasure = unitOfMeasure;
@@ -75,7 +76,7 @@ void DataMonitorModel::setName(QString newName)
 	auto nameList = name.split(":");
 	setDeviceName(nameList[0]);
 	setShortName(nameList[1]);
-	displayName = name;
+	setDisplayName(nameList[1]);
 }
 
 QColor DataMonitorModel::getColor() const { return color; }
