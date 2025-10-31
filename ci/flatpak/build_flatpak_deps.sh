@@ -9,5 +9,8 @@ cp /home/runner/config/* /home/runner/flatpak_tools
 git clone https://github.com/flathub/shared-modules.git
 make preprocess
 
+# Force rebuild genalyzer every time by cleaning its build directory
+rm -rf build/genalyzer 2>/dev/null || true
+
 flatpak-builder --verbose --keep-build-dirs --ccache --user --disable-rofiles-fuse --force-clean --arch=x86_64 --stop-at=scopy build org.adi.Scopy.json
 popd
