@@ -548,6 +548,23 @@
 			]
 		},
 		{
+			"name": "genalyzer",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DBUILD_TESTING=OFF",
+				"-DBUILD_SHARED_LIBS=ON"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/genalyzer.git",
+					"branch": "v0.1.2"
+				}
+			]
+		},
+		{
 			"name": "iio-emu",
 			"builddir": true,
 			"buildsystem": "cmake",
