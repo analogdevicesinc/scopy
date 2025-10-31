@@ -96,11 +96,15 @@ public:
 	uint32_t plotUuid() const;
 	void setPlotUuid(uint32_t newPlotUuid);
 
+	QString getDisplayName() const;
+	void setDisplayName(const QString &newDisplayName);
+
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
 	void minValueUpdated(double value);
 	void maxValueUpdated(double value);
 	void dataCleared();
+	void displayNameChanged(const QString &newDisplayName);
 
 protected:
 	void setDataStorageSize();
@@ -109,6 +113,7 @@ private:
 	QString name;
 	QString shortName;
 	QString deviceName;
+	QString displayName;
 	QColor color;
 	double m_minValue;
 	double m_maxValue;

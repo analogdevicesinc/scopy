@@ -82,6 +82,11 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				channelModel->setHasOffset(hasOffset);
 				channelModel->setHasScale(hasScale);
 
+				const char *channelName = iio_channel_get_name(chn);
+				if(channelName && strlen(channelName) > 0) {
+					channelModel->setDisplayName(QString::fromStdString(channelName));
+				}
+
 				result.push_back(channelModel);
 			}
 		}

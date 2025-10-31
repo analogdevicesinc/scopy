@@ -184,7 +184,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 		textMonitors->clear();
 		foreach(QString monitorName, dataAcquisitionManager->getActiveMonitors()) {
 			auto *monitor = dataAcquisitionManager->getDataMonitorMap()->value(monitorName);
-			textMonitors->append(monitor->getName() + ":  " +
+			textMonitors->append(monitor->getDisplayName() + ":  " +
 					     QString::number(monitor->getLastReadValue().second) + "  " +
 					     monitor->getUnitOfMeasure()->getNameAndSymbol());
 		}

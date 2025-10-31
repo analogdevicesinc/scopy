@@ -39,7 +39,10 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
-	MenuHeaderWidget *header = new MenuHeaderWidget(model->getName(), model->getColor(), this);
+	MenuHeaderWidget *header = new MenuHeaderWidget(model->getDisplayName(), model->getColor(), this);
+	header->title()->setEnabled(true);
+	connect(header->title(), &QLineEdit::textChanged, model, &DataMonitorModel::setDisplayName);
+
 	mainLayout->addWidget(header);
 
 	QWidget *settingsBody = new QWidget(this);
@@ -244,6 +247,31 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	plotSelectorSection->contentLayout()->addLayout(plotSelectorLayout);
 	plotSelectorContainer->contentLayout()->addWidget(plotSelectorSection);
 	layout->addWidget(plotSelectorContainer);
+
+	////////////////Override UM settings  ///////////////////
+	MenuSectionWidget *umContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *um = new MenuCollapseSection("Unit Of Measurement", MenuCollapseSection::MHCW_NONE,
+							  MenuCollapseSection::MHW_BASEWIDGET, umContainer);
+
+	QVBoxLayout *umLayout = new QVBoxLayout();
+	umLayout->setSpacing(10);
+	umLayout->setMargin(0);
+	umLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
+
+	QLineEdit *umName = new QLineEdit(model->getUnitOfMeasure()->getName(), um);
+	QLineEdit *umSymbol = new QLineEdit(model->getUnitOfMeasure()->getSymbol(), um);
+
+	connect(umName, &QLineEdit::textChanged, this, [=](QString text) { model->getUnitOfMeasure()->setName(text); });
+
+	connect(umSymbol, &QLineEdit::textChanged, this,
+		[=](QString text) { model->getUnitOfMeasure()->setSymbol(text); });
+
+	umLayout->addWidget(umName);
+	umLayout->addWidget(umSymbol);
+
+	um->contentLayout()->addLayout(umLayout);
+	umContainer->contentLayout()->addWidget(um);
+	layout->addWidget(umContainer);
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);

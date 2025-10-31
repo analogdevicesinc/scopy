@@ -38,6 +38,13 @@ public:
 	QString getSymbol() const;
 	QString getNameAndSymbol();
 
+	void setName(const QString &newName);
+
+	void setSymbol(const QString &newSymbol);
+
+Q_SIGNALS:
+	void unitChanged();
+
 private:
 	QString name;
 	QString symbol;
