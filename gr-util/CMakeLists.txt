@@ -71,22 +71,24 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-find_path(GENALYZER_INCLUDE_DIR
-    NAMES cgenalyzer_simplified_beta.h
-    HINTS ${CMAKE_PREFIX_PATH}
-    PATH_SUFFIXES include
+find_path(
+	GENALYZER_INCLUDE_DIR
+	NAMES cgenalyzer_simplified_beta.h
+	HINTS ${CMAKE_PREFIX_PATH}
+	PATH_SUFFIXES include
 )
-find_library(GENALYZER_LIB
-    NAMES genalyzer
-    HINTS ${CMAKE_PREFIX_PATH}
-    PATH_SUFFIXES lib lib64
+find_library(
+	GENALYZER_LIB
+	NAMES genalyzer
+	HINTS ${CMAKE_PREFIX_PATH}
+	PATH_SUFFIXES lib lib64
 )
 
 if(NOT GENALYZER_INCLUDE_DIR OR NOT GENALYZER_LIB)
-    message(STATUS "GENALYZER_INCLUDE_DIR: ${GENALYZER_INCLUDE_DIR}")
-    message(STATUS "GENALYZER_LIB: ${GENALYZER_LIB}")
-    message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-    message(FATAL_ERROR "Genalyzer not found.")
+	message(STATUS "GENALYZER_INCLUDE_DIR: ${GENALYZER_INCLUDE_DIR}")
+	message(STATUS "GENALYZER_LIB: ${GENALYZER_LIB}")
+	message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+	message(FATAL_ERROR "Genalyzer not found.")
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GENALYZER_INCLUDE_DIR})
