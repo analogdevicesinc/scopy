@@ -219,6 +219,11 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 					 .title("RF Bandwidth(MHz)")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+
 	layout->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &FMCOMMS5::readRequested, rfBandwidth, &IIOWidget::readAsync);
 
@@ -230,6 +235,13 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 					       .title("Sampling Rate(MSPS)")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .buildSingle();
+	samplingFrequency->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	samplingFrequency->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	samplingFrequency->setUItoDataConversion(
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+
 	layout->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &FMCOMMS5::readRequested, samplingFrequency, &IIOWidget::readAsync);
 
@@ -344,6 +356,11 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .title("RF Bandwidth(MHz)")
 					 .buildSingle();
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+
 	lay->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &FMCOMMS5::readRequested, rfBandwidth, &IIOWidget::readAsync);
 
@@ -355,6 +372,13 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .title("Sampling Rate(MSPS)")
 					       .buildSingle();
+	samplingFrequency->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	samplingFrequency->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	samplingFrequency->setUItoDataConversion(
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+
 	lay->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &FMCOMMS5::readRequested, samplingFrequency, &IIOWidget::readAsync);
 

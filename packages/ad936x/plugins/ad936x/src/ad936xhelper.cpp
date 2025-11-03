@@ -160,6 +160,13 @@ QWidget *AD936xHelper::generateRxDeviceWidget(iio_device *dev, QString title, QW
 						  .title("RX LO Frequency(MHz)")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .buildSingle();
+	altVoltage0Frequency->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	altVoltage0Frequency->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	altVoltage0Frequency->setUItoDataConversion(
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+
 	connect(this, &AD936xHelper::readRequested, altVoltage0Frequency, &IIOWidget::readAsync);
 
 	MenuOnOffSwitch *useExternalRxLo = new MenuOnOffSwitch("External Rx LO", widget, false);
@@ -273,6 +280,13 @@ QWidget *AD936xHelper::generateTxDeviceWidget(iio_device *dev, QString title, QW
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .title("TX LO Frequency(MHz)")
 						  .buildSingle();
+	altVoltage1Frequency->setDataToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	altVoltage1Frequency->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	altVoltage1Frequency->setUItoDataConversion(
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+
 	connect(this, &AD936xHelper::readRequested, altVoltage1Frequency, &IIOWidget::readAsync);
 
 	MenuOnOffSwitch *useExternalTxLo = new MenuOnOffSwitch("External Tx LO", widget, false);
