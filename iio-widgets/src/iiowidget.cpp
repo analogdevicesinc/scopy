@@ -193,11 +193,13 @@ void IIOWidget::convertDStoUI(QString data, QString optionalData)
 		cleanData.remove('[').remove(']'); // Remove brackets
 		QStringList values = cleanData.split(" ", Qt::SkipEmptyParts);
 		QStringList converted;
-		for(const QString &value : values) {
-			converted.append(m_RangetoUI(value)); // Apply to each value
+		if(values.length() == 3) {
+			converted.append(m_RangetoUI(values[0]));
+			converted.append(values[1]); // do not convert the step
+			converted.append(m_RangetoUI(values[2]));
+			optionalData = converted.join(" ");
+			optionalData = "[" + optionalData + "]";
 		}
-		optionalData = converted.join(" ");
-		optionalData = "[" + optionalData + "]";
 	}
 
 	m_uiStrategy->receiveData(data, optionalData);
