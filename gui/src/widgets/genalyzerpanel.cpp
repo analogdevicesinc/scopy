@@ -160,4 +160,12 @@ void GenalyzerPanel::clear()
 	m_channelDisplays.clear();
 }
 
+void GenalyzerPanel::setChannelVisible(const QString &channelName, bool visible)
+{
+	if(m_channelDisplays.contains(channelName)) {
+		GenalyzerChannelDisplay *display = m_channelDisplays[channelName];
+		display->setVisible(visible);
+	}
+}
+
 #include "moc_genalyzerpanel.cpp"
