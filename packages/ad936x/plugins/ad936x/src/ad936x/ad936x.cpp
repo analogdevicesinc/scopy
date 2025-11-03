@@ -213,7 +213,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
 	rfBandwidth->setRangeToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
-	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	layout->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
@@ -232,7 +232,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 	samplingFrequency->setRangeToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
 	samplingFrequency->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	layout->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);
@@ -334,7 +334,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
 	rfBandwidth->setRangeToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
-	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	lay->addWidget(rfBandwidth, 0, 0, 2, 1);
 	connect(this, &AD936X::readRequested, rfBandwidth, &IIOWidget::readAsync);
@@ -352,7 +352,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 	samplingFrequency->setRangeToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
 	samplingFrequency->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	lay->addWidget(samplingFrequency, 0, 1, 2, 1);
 	connect(this, &AD936X::readRequested, samplingFrequency, &IIOWidget::readAsync);

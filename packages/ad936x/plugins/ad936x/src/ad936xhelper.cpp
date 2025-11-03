@@ -165,7 +165,7 @@ QWidget *AD936xHelper::generateRxDeviceWidget(iio_device *dev, QString title, QW
 	altVoltage0Frequency->setRangeToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
 	altVoltage0Frequency->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	connect(this, &AD936xHelper::readRequested, altVoltage0Frequency, &IIOWidget::readAsync);
 
@@ -285,7 +285,7 @@ QWidget *AD936xHelper::generateTxDeviceWidget(iio_device *dev, QString title, QW
 	altVoltage1Frequency->setRangeToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
 	altVoltage1Frequency->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	connect(this, &AD936xHelper::readRequested, altVoltage1Frequency, &IIOWidget::readAsync);
 
