@@ -264,6 +264,16 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 	connect(c, &GRFFTChannelComponent::genalyzerDataUpdated, m_plotComponentManager->genalyzerPanel(),
 		&GenalyzerPanel::updateResults);
 
+	// Connect channel enable/disable signals to update genalyzer panel visibility
+	connect(c, &GRFFTChannelComponent::genalyzerChannelEnabled, m_plotComponentManager->genalyzerPanel(),
+		[=](const QString &channelName) {
+			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, true);
+		});
+	connect(c, &GRFFTChannelComponent::genalyzerChannelDisabled, m_plotComponentManager->genalyzerPanel(),
+		[=](const QString &channelName) {
+			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, false);
+		});
+
 	connect(c->chData(), &ChannelData::newData, this,
 		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
 			if(m_ui->m_complex->isChecked() && m_measureComponent->measureSettings()->genalyzerEnabled() &&
@@ -302,6 +312,15 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 		if(isComplex) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
+
+			// Show all enabled complex channels in genalyzer panel
+			for(auto component : components()) {
+				GRFFTChannelComponent *channelComponent =
+					dynamic_cast<GRFFTChannelComponent *>(component);
+				if(channelComponent) {
+					channelComponent->emitGenalyzerEnabledIfAppropriate();
+				}
+			}
 		} else {
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);

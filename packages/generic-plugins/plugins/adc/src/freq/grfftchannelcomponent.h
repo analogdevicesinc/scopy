@@ -212,6 +212,9 @@ public Q_SLOTS:
 	// Method to trigger genalyzer analysis (only when needed)
 	void triggerGenalyzerAnalysis();
 
+	// Method to emit genalyzer channel enabled signal if channel is complex and enabled
+	void emitGenalyzerEnabledIfAppropriate();
+
 Q_SIGNALS:
 	void yModeChanged();
 	void fftSizeChanged();
@@ -220,6 +223,8 @@ Q_SIGNALS:
 	void windowCorrectionChanged(bool);
 	void genalyzerDataUpdated(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
 				  double *rvalues);
+	void genalyzerChannelEnabled(const QString &channelName);
+	void genalyzerChannelDisabled(const QString &channelName);
 
 private:
 	double m_powerOffset;

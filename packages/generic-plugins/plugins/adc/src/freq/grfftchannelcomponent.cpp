@@ -401,6 +401,16 @@ void GRFFTChannelComponent::enable()
 		m_grtch->sigpath()->setEnabled(true);
 	}
 	Q_EMIT m_node->top()->src()->requestRebuild(); // sigpath()->requestRebuild();
+
+	// Emit signal for genalyzer panel to show this channel
+	if(m_complex && enabled()) {
+		QString uniqueChannelName = this->name();
+		if(m_node && m_node->treeParent()) {
+			QString deviceName = m_node->treeParent()->name();
+			uniqueChannelName = deviceName + ":" + this->name();
+		}
+		Q_EMIT genalyzerChannelEnabled(uniqueChannelName);
+	}
 }
 
 void GRFFTChannelComponent::disable()
@@ -411,6 +421,16 @@ void GRFFTChannelComponent::disable()
 		m_grtch->sigpath()->setEnabled(false);
 	}
 	Q_EMIT m_node->top()->src()->requestRebuild(); // sigpath()->requestRebuild();
+
+	// Emit signal for genalyzer panel to hide this channel
+	if(m_complex) {
+		QString uniqueChannelName = this->name();
+		if(m_node && m_node->treeParent()) {
+			QString deviceName = m_node->treeParent()->name();
+			uniqueChannelName = deviceName + ":" + this->name();
+		}
+		Q_EMIT genalyzerChannelDisabled(uniqueChannelName);
+	}
 }
 
 // MeasureManagerInterface *GRFFTChannelComponent::getMeasureManager() { return m_measureMgr; }
@@ -491,5 +511,17 @@ void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 			Q_EMIT genalyzerDataUpdated(uniqueChannelName, this->pen().color(), gn_analysis->results_size,
 						    gn_analysis->rkeys, gn_analysis->rvalues);
 		}
+	}
+}
+
+void GRFFTChannelComponent::emitGenalyzerEnabledIfAppropriate()
+{
+	if(m_complex && enabled()) {
+		QString uniqueChannelName = this->name();
+		if(m_node && m_node->treeParent()) {
+			QString deviceName = m_node->treeParent()->name();
+			uniqueChannelName = deviceName + ":" + this->name();
+		}
+		Q_EMIT genalyzerChannelEnabled(uniqueChannelName);
 	}
 }
