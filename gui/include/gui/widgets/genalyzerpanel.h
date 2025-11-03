@@ -67,6 +67,7 @@ public Q_SLOTS:
 			   double *rvalues);
 	void clear();
 	void clearChannel(const QString &channelName);
+	void setChannelVisible(const QString &channelName, bool visible);
 
 private:
 	GenalyzerChannelDisplay *findOrCreateChannelDisplay(const QString &channelName, QColor channelColor);
