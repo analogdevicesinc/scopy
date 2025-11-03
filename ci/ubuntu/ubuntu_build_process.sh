@@ -383,6 +383,9 @@ configure_system(){
 	build_deps
 }
 
+clone
+build_genalyzer
+
 for arg in $@; do
 	$arg
 done

@@ -532,6 +532,8 @@ build_deps(){
 
 run_workflow(){
 	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
+	clone
+	build_genalyzer
 	build_iio-emu
 	build_scopy
 	create_appdir

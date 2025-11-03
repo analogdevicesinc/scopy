@@ -194,6 +194,8 @@ move_tools(){
 
 run_workflow(){
 	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
+	$SCRIPT_DIR/windows_build_process.sh
+
 	build_scopy
 	build_iio-emu
 	deploy_app
@@ -201,7 +203,6 @@ run_workflow(){
 	create_installer
 }
 
-$SCRIPT_DIR/windows_build_process.sh
 
 for arg in $@; do
 	$arg
