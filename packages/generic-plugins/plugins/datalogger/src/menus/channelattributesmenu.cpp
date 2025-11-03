@@ -259,7 +259,9 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	umLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	QLineEdit *umName = new QLineEdit(model->getUnitOfMeasure()->getName(), um);
+	umName->setPlaceholderText("Name ");
 	QLineEdit *umSymbol = new QLineEdit(model->getUnitOfMeasure()->getSymbol(), um);
+	umSymbol->setPlaceholderText("Symbol");
 
 	connect(umName, &QLineEdit::textChanged, this, [=](QString text) { model->getUnitOfMeasure()->setName(text); });
 
