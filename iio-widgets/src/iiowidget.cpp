@@ -37,6 +37,7 @@ IIOWidget::IIOWidget(GuiStrategyInterface *uiStrategy, DataStrategyInterface *da
 	, m_lastReturnCode(0)
 	, m_UItoDS(nullptr)
 	, m_DStoUI(nullptr)
+	, m_RangetoUI(nullptr)
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
@@ -154,6 +155,8 @@ void IIOWidget::setUItoDataConversion(std::function<QString(QString)> func) { m_
 
 void IIOWidget::setDataToUIConversion(std::function<QString(QString)> func) { m_DStoUI = func; }
 
+void IIOWidget::setRangeToUIConversion(std::function<QString(QString)> func) { m_RangetoUI = func; }
+
 void IIOWidget::showProgressBar(bool show) { Q_EMIT progressBarVisible(show); }
 
 void IIOWidget::startTimer(QString data)
@@ -184,6 +187,19 @@ void IIOWidget::convertDStoUI(QString data, QString optionalData)
 	if(m_DStoUI) { // only the data should be converted
 		data = m_DStoUI(data);
 	}
+
+	if(m_RangetoUI && !optionalData.isEmpty()) { // the range conversion is done with it's own function
+		QString cleanData = optionalData;
+		cleanData.remove('[').remove(']'); // Remove brackets
+		QStringList values = cleanData.split(" ", Qt::SkipEmptyParts);
+		QStringList converted;
+		for(const QString &value : values) {
+			converted.append(m_RangetoUI(value)); // Apply to each value
+		}
+		optionalData = converted.join(" ");
+		optionalData = "[" + optionalData + "]";
+	}
+
 	m_uiStrategy->receiveData(data, optionalData);
 }
 
