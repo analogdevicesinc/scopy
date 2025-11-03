@@ -82,6 +82,7 @@ clone() {
 	git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	git clone --recursive https://github.com/andrei47w/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 
@@ -341,6 +342,20 @@ build_karchive () {
 	popd
 }
 
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	CURRENT_BUILD=genalyzer
+	pushd $STAGING_AREA/genalyzer
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
 build_deps(){
 	build_libserialport
 	build_libiio
@@ -354,7 +369,8 @@ build_deps(){
 	build_libtinyiiod
 	build_kddock
 	build_ecm
-	build_karchive	
+	build_karchive
+	build_genalyzer
 }
 
 install_packages
