@@ -209,8 +209,9 @@ clone() {
 		git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+		git clone --recursive https://github.com/andrei47w/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 
-		DEPENDENCY_REPOS="libserialport libiio libad9361 libm2k gr-scopy gr-m2k gnuradio qwt libsigrokdecode libtinyiiod KDDockWidgets extra-cmake-modules karchive"
+		DEPENDENCY_REPOS="libserialport libiio libad9361 libm2k gr-scopy gr-m2k gnuradio qwt libsigrokdecode libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer"
 		# Save to cache for next time
 		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
 			mkdir -p "$GIT_CACHE_DIR"
@@ -479,6 +480,20 @@ build_karchive () {
 	popd
 }
 
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	CURRENT_BUILD=genalyzer
+	pushd $STAGING_AREA/genalyzer
+	save_version_info
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
 build_deps(){
 	if [ "${CACHING_ENABLED}" == "true" ] && [ "$DEPENDENCIES_CACHED" == "true" ]; then
 		echo "Found cached dependencies in $STAGING_AREA_DEPS"
@@ -499,7 +514,8 @@ build_deps(){
 	build_libtinyiiod
 	build_kddock
 	build_ecm
-	build_karchive	
+	build_karchive
+	build_genalyzer
 }
 
 # Setup cache management
