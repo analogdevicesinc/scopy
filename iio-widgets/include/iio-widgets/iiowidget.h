@@ -128,6 +128,7 @@ public:
 
 	void setUItoDataConversion(std::function<QString(QString)> func);
 	void setDataToUIConversion(std::function<QString(QString)> func);
+	void setRangeToUIConversion(std::function<QString(QString)> func);
 
 	void showProgressBar(bool show);
 
@@ -169,6 +170,7 @@ protected:
 	/* Conversion functions */
 	std::function<QString(QString)> m_UItoDS;
 	std::function<QString(QString)> m_DStoUI;
+	std::function<QString(QString)> m_RangetoUI;
 };
 } // namespace scopy
 
