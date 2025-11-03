@@ -9,8 +9,9 @@ SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOS/packages -name "*.dylib" 
 SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
 
 echo "### Copy DLLs to Frameworks folder"
-cp -R $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
-cp -R $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
+cp -avR $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
+cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
+cp -avR $STAGING_AREA_DEPS/lib/genalyzer.framework Scopy.app/Contents/Frameworks/
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/resources
 cp -R $BUILDDIR/translations $BUILDDIR/Scopy.app/Contents/MacOS
 
@@ -68,6 +69,13 @@ do
 		--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
 done
 
+echo "### Fixing Genalyzer"
+echo $STAGING_AREA_DEPS/lib | dylibbundler --no-codesign --overwrite-files --bundle-deps --create-dir \
+	--fix-file $BUILDDIR/Scopy.app/Contents/Frameworks/genalyzer.framework/genalyzer \
+	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
+	--install-path @executable_path/../Frameworks/ \
+	--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
+
 
 echo "### Fixing Scopy binary"
 echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
@@ -75,6 +83,7 @@ echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
 	-d $BUILDDIR/Scopy.app/Contents/Frameworks  \
 	-p @executable_path/../Frameworks \
 	-s $BUILDDIR/Scopy.app/Contents/Frameworks
+
 
 echo "### Fixing the frameworks dylibbundler failed to copy"
 echo "=== Fixing iio.framework"
