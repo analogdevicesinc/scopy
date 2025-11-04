@@ -210,9 +210,9 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .buildSingle();
 
-	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	rfBandwidth->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	layout->addWidget(rfBandwidth, 0, 0, 2, 1);
@@ -228,9 +228,9 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 					       .buildSingle();
 
 	samplingFrequency->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	samplingFrequency->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	samplingFrequency->setUItoDataConversion(
 		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
@@ -331,9 +331,9 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 					 .title("RF Bandwidth(MHz)")
 					 .buildSingle();
 
-	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	rfBandwidth->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 	lay->addWidget(rfBandwidth, 0, 0, 2, 1);
@@ -348,9 +348,9 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 					       .title("Sampling Rate(MSPS)")
 					       .buildSingle();
 	samplingFrequency->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	samplingFrequency->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	samplingFrequency->setUItoDataConversion(
 		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
