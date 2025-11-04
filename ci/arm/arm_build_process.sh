@@ -487,6 +487,8 @@ run_workflow(){
 	install_packages
 	move_tools
 	move_sysroot
+	clone
+	build_genalyzer
 	build_iio-emu
 	build_scopy
 	create_appdir
