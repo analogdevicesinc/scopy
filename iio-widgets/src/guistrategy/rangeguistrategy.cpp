@@ -20,6 +20,7 @@
 
 #include "guistrategy/rangeguistrategy.h"
 #include <QSpinBox>
+#include <QTimer>
 
 using namespace scopy;
 
@@ -42,10 +43,10 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	m_spinBox->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_spinBox->setScaleRange(1, 1);
 	m_spinBox->setScalingEnabled(false);
+	m_spinBox->enableRangeLimits(false);
 	m_ui->layout()->addWidget(m_spinBox);
 
-	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this,
-		[&](double value) { Q_EMIT emitData(Util::doubleToQString(value)); });
+	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this, &RangeAttrUi::onValueChanged);
 	Q_EMIT requestData();
 }
 
@@ -200,6 +201,26 @@ double RangeAttrUi::tryParse(QString number, bool *success, QString *unit)
 
 	*success = false;
 	return -1;
+}
+
+void RangeAttrUi::onValueChanged(double value)
+{
+	m_currentValueToProcess = value;
+	Q_EMIT requestData();
+
+	// we use QTimer::singleShot to execute processValueChange() after the event loop finished,
+	// to make sure the data was updated
+	QTimer::singleShot(0, this, SLOT(processValueChange()));
+}
+
+void RangeAttrUi::processValueChange()
+{
+	// manually clamp value since clamping within meniSpinBox is disabled
+	double clampedValue = std::min(std::max(m_spinBox->min(), m_currentValueToProcess), m_spinBox->max());
+
+	// set the value in UI again after it was updated from requestData()
+	m_spinBox->setValueSilent(clampedValue);
+	Q_EMIT emitData(Util::doubleToQString(clampedValue));
 }
 
 #include "moc_rangeguistrategy.cpp"

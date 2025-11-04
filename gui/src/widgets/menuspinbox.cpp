@@ -30,6 +30,7 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 			 bool large_widget, QWidget *parent)
 	: m_min(min)
 	, m_max(max)
+	, m_rangeLimits(true)
 	, QWidget(parent)
 {
 	m_large_widget = large_widget;
@@ -211,6 +212,12 @@ double MenuSpinbox::value() const { return m_value; }
 
 void MenuSpinbox::setValue(double newValue) { setValueForce(newValue, 0); }
 
+void MenuSpinbox::setValueSilent(double newValue)
+{
+	m_value = clamp(newValue, m_min, m_max);
+	populateWidgets();
+}
+
 void MenuSpinbox::setValueForce(double newValue, bool force)
 {
 	if(qFuzzyCompare(m_value, newValue) && !force) {
@@ -220,8 +227,7 @@ void MenuSpinbox::setValueForce(double newValue, bool force)
 		return;
 	}
 
-	m_value = clamp(newValue, m_min, m_max);
-	populateWidgets();
+	setValueSilent(newValue);
 	Q_EMIT valueChanged(m_value);
 }
 
@@ -376,6 +382,14 @@ void MenuSpinbox::setScaleRange(double min, double max)
 	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 }
 
+void MenuSpinbox::enableRangeLimits(bool en)
+{
+	m_rangeLimits = en;
+
+	m_plus->setEnabled(true);
+	m_minus->setEnabled(true);
+}
+
 int MenuSpinbox::findLastDigit(QString str)
 {
 	for(int i = str.length() - 1; i >= 0; --i) {
@@ -388,6 +402,10 @@ int MenuSpinbox::findLastDigit(QString str)
 
 double MenuSpinbox::clamp(double val, double min, double max)
 {
+	if(!m_rangeLimits) {
+		return val;
+	}
+
 	val = std::max(val, min);
 	val = std::min(val, max);
 
@@ -454,6 +472,10 @@ void MenuSpinbox::decrementValue()
 QString MenuSpinbox::name() const { return m_name; }
 
 QLabel *MenuSpinbox::label() const { return m_label; }
+
+double MenuSpinbox::min() const { return m_min; }
+
+double MenuSpinbox::max() const { return m_max; }
 
 void MenuSpinbox::setName(const QString &newName)
 {
