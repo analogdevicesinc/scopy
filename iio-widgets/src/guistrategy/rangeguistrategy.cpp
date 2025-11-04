@@ -42,10 +42,19 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidget 
 	m_spinBox->setIncrementMode(gui::MenuSpinbox::IS_FIXED);
 	m_spinBox->setScaleRange(1, 1);
 	m_spinBox->setScalingEnabled(false);
+	m_spinBox->enableRangeLimits(false);
 	m_ui->layout()->addWidget(m_spinBox);
 
-	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this,
-		[&](double value) { Q_EMIT emitData(Util::doubleToQString(value)); });
+	connect(m_spinBox, &gui::MenuSpinbox::valueChanged, this, [&](double value) {
+		Q_EMIT requestData();
+
+		// manually clamp value since clamping within meniSpinBox is disabled
+		value = std::min(std::max(m_spinBox->min(), value), m_spinBox->max());
+
+		// set the value in UI again after it was updated from requestData()
+		m_spinBox->setValueSilent(value);
+		Q_EMIT emitData(Util::doubleToQString(value));
+	});
 	Q_EMIT requestData();
 }
 

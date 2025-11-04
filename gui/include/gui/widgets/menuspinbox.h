@@ -158,8 +158,11 @@ public:
 	IncrementStrategy *incrementStrategy() const;
 	QString name() const;
 	QLabel *label() const;
+	double min() const;
+	double max() const;
 
 	void setScaleRange(double min, double max);
+	void enableRangeLimits(bool en);
 
 public Q_SLOTS:
 	void setName(const QString &newName);
@@ -170,6 +173,7 @@ public Q_SLOTS:
 	void setValueForce(double newValue, bool force = true);
 	void setValueString(QString s);
 	void setValue(double newValue);
+	void setValueSilent(double newValue);
 	void setIncrementMode(IncrementMode is);
 	void setScalingEnabled(bool en);
 	void setScaleList(QList<UnitPrefix> scales);
@@ -216,6 +220,7 @@ private:
 	// QMap<QString, double> m_scaleMap;
 	double getScaleForPrefix(QString prefix, Qt::CaseSensitivity s = Qt::CaseSensitive);
 	bool m_scalingEnabled;
+	bool m_rangeLimits;
 };
 } // namespace gui
 } // namespace scopy
