@@ -37,44 +37,46 @@ cleanup_old_caches() {
 }
 
 setup_homebrew_cache() {
-    echo "Setting up Homebrew cache..."
-    mkdir -p "$HOMEBREW_CACHE_DIR"
+	if [ "${CACHING_ENABLED}" = "true" ]; then
+		echo "Setting up Homebrew cache..."
+		mkdir -p "$HOMEBREW_CACHE_DIR"
 
-    export HOMEBREW_CACHE="$HOMEBREW_CACHE_DIR"
-	#check if cache for homebrew exists
-    if [ "${HOMEBREW_CACHE}" = "true" ]; then
-        echo "Homebrew cache found, restoring cached packages"
-        export HOMEBREW_NO_AUTO_UPDATE=1
-    else
-        echo "No Homebrew cache - downloading fresh packages"
-    fi
+		export HOMEBREW_CACHE="$HOMEBREW_CACHE_DIR"
+		#check if cache for homebrew exists
+		if [ "${HOMEBREW_CACHE}" = "true" ]; then
+			echo "Homebrew cache found, restoring cached packages"
+			export HOMEBREW_NO_AUTO_UPDATE=1
+		else
+			echo "No Homebrew cache - downloading fresh packages"
+		fi
+	fi
 }
 
 setup_git_cache() {
-    echo "Setting up Git cache..."
-    mkdir -p "$GIT_CACHE_DIR"
+	if [ "${CACHING_ENABLED}" = "true" ]; then
+		echo "Setting up Git cache..."
+		mkdir -p "$GIT_CACHE_DIR"
 
-    if [ "${GIT_REPOS_CACHE}" = "true" ]; then
-        echo "Git repositories cache found, restoring cached repositories"
-        # Validate cache isn't corrupted
-        if [ -d "$GIT_CACHE_DIR" ] && [ "$(ls -A $GIT_CACHE_DIR 2>/dev/null)" ]; then
-            export GIT_CACHE_ENABLED=true
-        else
-            echo "Git cache directory empty - clearing and rebuilding"
-            rm -rf "$GIT_CACHE_DIR"
-            mkdir -p "$GIT_CACHE_DIR"
-            export GIT_CACHE_ENABLED=false
-        fi
-    else
-        echo "No Git cache - cloning fresh repositories"
-        export GIT_CACHE_ENABLED=false
-    fi
+		if [ "${GIT_REPOS_CACHE}" = "true" ]; then
+			echo "Git repositories cache found, restoring cached repositories"
+			# Validate cache isn't corrupted
+			if [ -d "$GIT_CACHE_DIR" ] && [ "$(ls -A $GIT_CACHE_DIR 2>/dev/null)" ]; then
+				export GIT_CACHE_ENABLED=true
+			else
+				echo "Git cache directory empty - clearing and rebuilding"
+				rm -rf "$GIT_CACHE_DIR"
+				mkdir -p "$GIT_CACHE_DIR"
+				export GIT_CACHE_ENABLED=false
+			fi
+		else
+			echo "No Git cache - cloning fresh repositories"
+			export GIT_CACHE_ENABLED=false
+		fi
+	fi
 }
 
 setup_dependencies_cache() {
-    echo "Setting up dependencies cache..."
-
-    if [ "${BUILT_DEPS_CACHE}" = "true" ]; then
+    if [ "${CACHING_ENABLED}" = "true" ] && [ "${BUILT_DEPS_CACHE}" = "true" ]; then
         echo "Built dependencies cache found, restoring cached dependencies"
         # Validate cache isn't corrupted
         if [ -d "$STAGING_AREA_DEPS" ] && [ "$(ls -A $STAGING_AREA_DEPS 2>/dev/null)" ]; then
@@ -116,7 +118,7 @@ install_packages() {
 	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
 	
 	# Package installation based on cache status
-	if [ "${HOMEBREW_CACHE}" = "true" ]; then
+	if [ "${CACHING_ENABLED}" = "true" ] && [ "${HOMEBREW_CACHE}" = "true" ]; then
 		echo "Installing packages with cache optimization (skipping update/upgrade)..."
 		export HOMEBREW_NO_AUTO_UPDATE=1
 	else
@@ -164,7 +166,7 @@ clone() {
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
 
-	if [ "$GIT_CACHE_ENABLED" = "true" ]; then
+	if [ "${CACHING_ENABLED}" = "true" ] && [ "$GIT_CACHE_ENABLED" = "true" ]; then
 		echo "Using cached repositories..."
 
 		# If cache directory has content, use it
