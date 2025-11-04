@@ -37,27 +37,38 @@ cleanup_old_caches() {
 }
 
 setup_homebrew_cache() {
-	if [ "${CACHING_ENABLED}" = "true" ]; then
+	if [ "${CACHING_ENABLED}" == "true" ]; then
 		echo "Setting up Homebrew cache..."
-		mkdir -p "$HOMEBREW_CACHE_DIR"
+        mkdir -p "$HOMEBREW_CACHE_DIR"
 
-		export HOMEBREW_CACHE="$HOMEBREW_CACHE_DIR"
-		#check if cache for homebrew exists
-		if [ "${HOMEBREW_CACHE}" = "true" ]; then
-			echo "Homebrew cache found, restoring cached packages"
-			export HOMEBREW_NO_AUTO_UPDATE=1
-		else
-			echo "No Homebrew cache - downloading fresh packages"
-		fi
+        if [ "${HOMEBREW_PACKAGES_CACHE}" == "true" ]; then
+                echo "Homebrew cache found, restoring cached packages"
+                # Validate cache isn't corrupted
+                if [ -d "$HOMEBREW_CACHE_DIR" ] && [ "$(ls -A $HOMEBREW_CACHE_DIR 2>/dev/null)" ]; then
+                        echo "Found cached Homebrew packages in $HOMEBREW_CACHE_DIR"
+                        export HOMEBREW_CACHE_ENABLED=true
+                        export HOMEBREW_NO_AUTO_UPDATE=1
+                else
+                        echo "Homebrew cache directory empty or corrupted - clearing and rebuilding"
+                        rm -rf "$HOMEBREW_CACHE_DIR"
+                        mkdir -p "$HOMEBREW_CACHE_DIR"
+                        export HOMEBREW_CACHE_ENABLED=false
+                fi
+        else
+                echo "No Homebrew cache - downloading fresh packages"
+                export HOMEBREW_CACHE_ENABLED=false
+        fi
+
+        export HOMEBREW_CACHE="$HOMEBREW_CACHE_DIR"
 	fi
 }
 
 setup_git_cache() {
-	if [ "${CACHING_ENABLED}" = "true" ]; then
+	if [ "${CACHING_ENABLED}" == "true" ]; then
 		echo "Setting up Git cache..."
 		mkdir -p "$GIT_CACHE_DIR"
 
-		if [ "${GIT_REPOS_CACHE}" = "true" ]; then
+		if [ "${GIT_REPOS_CACHE}" == "true" ]; then
 			echo "Git repositories cache found, restoring cached repositories"
 			# Validate cache isn't corrupted
 			if [ -d "$GIT_CACHE_DIR" ] && [ "$(ls -A $GIT_CACHE_DIR 2>/dev/null)" ]; then
@@ -76,7 +87,7 @@ setup_git_cache() {
 }
 
 setup_dependencies_cache() {
-    if [ "${CACHING_ENABLED}" = "true" ] && [ "${BUILT_DEPS_CACHE}" = "true" ]; then
+    if [ "${CACHING_ENABLED}" == "true" ] && [ "${BUILT_DEPS_CACHE}" == "true" ]; then
         echo "Built dependencies cache found, restoring cached dependencies"
         # Validate cache isn't corrupted
         if [ -d "$STAGING_AREA_DEPS" ] && [ "$(ls -A $STAGING_AREA_DEPS 2>/dev/null)" ]; then
@@ -118,7 +129,7 @@ install_packages() {
 	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
 	
 	# Package installation based on cache status
-	if [ "${CACHING_ENABLED}" = "true" ] && [ "${HOMEBREW_CACHE}" = "true" ]; then
+	if [ "${CACHING_ENABLED}" = "true" ] && [ "${HOMEBREW_CACHE_ENABLED}" = "true" ]; then
 		echo "Installing packages with cache optimization (skipping update/upgrade)..."
 		export HOMEBREW_NO_AUTO_UPDATE=1
 	else
@@ -166,7 +177,7 @@ clone() {
 	mkdir -p $STAGING_AREA
 	pushd $STAGING_AREA
 
-	if [ "${CACHING_ENABLED}" = "true" ] && [ "$GIT_CACHE_ENABLED" = "true" ]; then
+	if [ "${CACHING_ENABLED}" == "true" ] && [ "$GIT_CACHE_ENABLED" == "true" ]; then
 		echo "Using cached repositories..."
 
 		# If cache directory has content, use it
@@ -177,9 +188,12 @@ clone() {
 			echo "Git cache directory empty - cloning fresh"
 			export GIT_CACHE_ENABLED=false
 		fi
+	else
+			echo "Git cache disabled - cloning fresh"
+			export GIT_CACHE_ENABLED=false
 	fi
 
-	if [ "$GIT_CACHE_ENABLED" = "false" ]; then
+	if [ "$GIT_CACHE_ENABLED" == "false" ]; then
 		echo "Cloning all repositories fresh..."
 
 		git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
@@ -198,7 +212,7 @@ clone() {
 
 		DEPENDENCY_REPOS="libserialport libiio libad9361 libm2k gr-scopy gr-m2k gnuradio qwt libsigrokdecode libtinyiiod KDDockWidgets extra-cmake-modules karchive"
 		# Save to cache for next time
-		if [ -n "$GIT_CACHE_DIR" ]; then
+		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
 			mkdir -p "$GIT_CACHE_DIR"
 			for repo in $DEPENDENCY_REPOS; do
 				cp -r "$repo" "$GIT_CACHE_DIR/"
@@ -466,7 +480,7 @@ build_karchive () {
 }
 
 build_deps(){
-	if [ "$DEPENDENCIES_CACHED" = "true" ]; then
+	if [ "${CACHING_ENABLED}" == "true" ] && [ "$DEPENDENCIES_CACHED" == "true" ]; then
 		echo "Found cached dependencies in $STAGING_AREA_DEPS"
 		return 0
 	fi
