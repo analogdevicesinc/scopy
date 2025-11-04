@@ -2,6 +2,7 @@ variables:
     QT_FORMULAE: qt@5
     REPO_SLUG: $(Build.Repository.Name)
     CURRENT_COMMIT: $(Build.SourceVersion)
+    CACHING_ENABLED: 'true'
 
 trigger:
   branches:
@@ -50,7 +51,7 @@ stages:
         path: '$(Pipeline.Workspace)/.homebrew-cache'
         cacheHitVar: 'HOMEBREW_CACHE'
       displayName: 'Cache Homebrew Downloads'
-      condition: or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15'))
+      condition:  and(or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15')), eq(variables['CACHING_ENABLED'], 'true'))
 
     # Git Repositories Cache
     - task: Cache@2
@@ -59,7 +60,7 @@ stages:
         path: '$(Pipeline.Workspace)/.git-cache'
         cacheHitVar: 'GIT_REPOS_CACHE'
       displayName: 'Cache Git Repositories'
-      condition: or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15'))
+      condition: and(or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15')),  eq(variables['CACHING_ENABLED'], 'true'))
 
     # Built Dependencies Cache
     - task: Cache@2
@@ -68,7 +69,7 @@ stages:
         path: '$(Build.Repository.LocalPath)/staging/dependencies'
         cacheHitVar: 'BUILT_DEPS_CACHE'
       displayName: 'Cache Built Dependencies'
-      condition: or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15'))
+      condition: and(or(eq(variables['vmImage'], 'macOS-14'), eq(variables['vmImage'], 'macOS-15')), eq(variables['CACHING_ENABLED'], 'true'))
 
 
     - script: ./ci/macOS/install_macos_deps.sh
