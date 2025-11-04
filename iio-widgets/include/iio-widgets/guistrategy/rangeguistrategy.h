@@ -57,6 +57,10 @@ public:
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 
+private Q_SLOTS:
+	void onValueChanged(double value);
+	void processValueChange();
+
 Q_SIGNALS:
 	void displayedNewData(QString data, QString optionalData) override;
 	void emitData(QString data) override;
@@ -76,6 +80,9 @@ private:
 
 	QWidget *m_ui;
 	gui::MenuSpinbox *m_spinBox;
+	double m_pendingValue;
+	bool m_hasPendingValue;
+	double m_currentValueToProcess;
 };
 } // namespace scopy
 
