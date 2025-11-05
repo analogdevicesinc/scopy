@@ -61,6 +61,11 @@ public:
 	Q_INVOKABLE void continuousLogAtPathForTool(QString toolName, QString path);
 	Q_INVOKABLE void stopContinuousLogForTool(QString toolName);
 	Q_INVOKABLE void importDataFromPathForTool(QString toolName, QString path);
+	Q_INVOKABLE void setMonitorDisplayName(QString toolName, QString monitor, QString displayName);
+	Q_INVOKABLE void setMonitorUnitOfMeasurementName(QString toolName, QString monitor, QString name);
+	Q_INVOKABLE void setMonitorUnitOfMeasurementSymbol(QString toolName, QString monitor, QString symbol);
+	Q_INVOKABLE void setDisplayMode(QString toolName, int mode);
+	Q_INVOKABLE void setToolName(QString currentToolName, QString newToolName);
 
 private:
 	DataLoggerPlugin *m_dataLoggerPlugin;
