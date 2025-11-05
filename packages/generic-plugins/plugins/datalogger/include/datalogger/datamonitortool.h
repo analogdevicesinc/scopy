@@ -58,6 +58,7 @@ public:
 	RunBtn *getRunButton() const;
 	void setEnableAddRemovePlot(bool);
 	void setEnableAddRemoveInstrument(bool);
+	void setDisplayMode(int mode);
 
 Q_SIGNALS:
 	void requestNewTool();
