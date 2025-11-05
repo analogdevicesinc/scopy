@@ -265,13 +265,13 @@ QString Adrv9002::getDeviceDriverVersion()
 		char api_version[16];
 		auto ret = iio_device_debug_attr_read(m_iio_dev, "api_version", api_version, sizeof(api_version));
 		if(ret < 0) {
-			return "";
+			return "Unable to read version ";
 		} else {
 			return QString(api_version);
 		}
 	}
 
-	return "";
+	return "No version found";
 }
 
 MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent)
@@ -279,12 +279,7 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 	auto section = new MenuSectionCollapseWidget("ADRV9002 Global Settings", MenuCollapseSection::MHCW_ARROW,
 						     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	// Profile Manager - handles profile_config and stream_config
-	if(m_profileManager) {
-		section->add(m_profileManager);
-		connect(this, &Adrv9002::readRequested, m_profileManager, &ProfileManager::updateDeviceInfo);
-	}
-
+	section->layout()->setMargin(0);
 	QWidget *widget = new QWidget(section);
 
 	QHBoxLayout *layout = new QHBoxLayout(widget);
@@ -311,8 +306,6 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 				tempStrategy->setCriticalTemperature(
 					80.0, "ADRV9002 temperature critical! Risk of thermal shutdown.");
 				tempStrategy->setWarningOffset(5.0); // Warn at 75°C (80°C - 5°C)
-				// Optional: Configure periodic updates (default is 5 seconds)
-				// tempStrategy->setPeriodicUpdates(true, 5); // Update every 5 second
 			}
 
 			connect(this, &Adrv9002::readRequested, tempWidget, &IIOWidget::readAsync);
@@ -329,6 +322,12 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 	}
 
 	section->add(widget);
+
+	// Profile Manager - handles profile_config and stream_config
+	if(m_profileManager) {
+		section->add(m_profileManager);
+		connect(this, &Adrv9002::readRequested, m_profileManager, &ProfileManager::updateDeviceInfo);
+	}
 
 	return section;
 }
@@ -358,6 +357,7 @@ MenuSectionCollapseWidget *Adrv9002::createReceiveChainSection(QWidget *parent)
 
 	// ORX Section below RX1/RX2
 	QHBoxLayout *orxLayout = new QHBoxLayout();
+	orxLayout->setMargin(0);
 	orxLayout->addWidget(createOrxControls());
 	containerLayout->addLayout(orxLayout);
 
@@ -424,21 +424,7 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 	layout->addWidget(createComboWidget(rxCh, "gain_control_mode", "gain_control_mode_available", "Gain Control"),
 			  2, 0);
 	layout->addWidget(createComboWidget(rxCh, "ensm_mode", "ensm_mode_available", "ENSM"), 3, 0);
-	IIOWidget *rxEn = createCheckboxWidget(rxCh, "en", "Powerdown");
-	// logic needed to match functionality
-	rxEn->setDataToUIConversion([](QString data) {
-		if(data == "0") {
-			return "1";
-		}
-		return "0";
-	});
-	rxEn->setUItoDataConversion([](QString data) {
-		if(data == "0") {
-			return "1";
-		}
-		return "0";
-	});
-	layout->addWidget(rxEn, 4, 0);
+	layout->addWidget(createCheckboxWidget(rxCh, "en", "Enabled"), 4, 0);
 
 	layout->addWidget(createCheckboxWidget(rxCh, "bbdc_rejection_en", "BBDC Rejection"), 5, 0);
 
@@ -451,8 +437,10 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 
 	layout->addWidget(createReadOnlyWidget(rxCh, "decimated_power", "Decimated Power (dB)"), 7, 0);
 	IIOWidget *rfBandwidth = createReadOnlyWidget(rxCh, "rf_bandwidth", "Bandwidth (MHz)");
-	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
-	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+	rfBandwidth->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 	layout->addWidget(rfBandwidth, 8, 0);
 
 	// Column 1 (Right) - from iio-oscilloscope column 4
@@ -484,9 +472,11 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 
 		// Add MHz ↔ Hz conversion
 		loWidget->setDataToUIConversion(
-			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		loWidget->setRangeToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 		loWidget->setUItoDataConversion(
-			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 		layout->addWidget(loWidget, 6, 1);
 	}
@@ -496,9 +486,11 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 	IIOWidget *samplingFreq = createReadOnlyWidget(rxCh, "sampling_frequency", "Sampling Rate (MSPS)");
 	// Add MSPS ↔ SPS conversion
 	samplingFreq->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+	samplingFreq->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	samplingFreq->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 	layout->addWidget(samplingFreq, 8, 1);
 
 	// Tracking section at bottom spanning both columns
@@ -557,9 +549,11 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 
 		// Add MHz ↔ Hz conversion
 		loWidget->setDataToUIConversion(
-			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		loWidget->setRangeToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 		loWidget->setUItoDataConversion(
-			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
 		layout->addWidget(loWidget, 3, 0);
 	}
@@ -574,35 +568,23 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 	IIOWidget *rfBandwidth = createReadOnlyWidget(txCh, "rf_bandwidth", "Bandwidth (MHz)");
 
 	// Add MHz ↔ Hz conversion
-	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
-	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+	rfBandwidth->setRangeToUIConversion(
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 	layout->addWidget(rfBandwidth, 5, 0);
 
 	// Column 1 (Right) - from iio-oscilloscope TX column 4
 	layout->addWidget(createComboWidget(txCh, "port_en_mode", "port_en_mode_available", "Port Enable"), 1, 1);
 	layout->addWidget(createComboWidget(txCh, "ensm_mode", "ensm_mode_available", "ENSM"), 2, 1);
-	IIOWidget *txEn = createCheckboxWidget(txCh, "en", "Powerdown");
-	// logic needed to match functionality
-	txEn->setDataToUIConversion([](QString data) {
-		if(data == "0") {
-			return "1";
-		}
-		return "0";
-	});
-	txEn->setUItoDataConversion([](QString data) {
-		if(data == "0") {
-			return "1";
-		}
-		return "0";
-	});
-	layout->addWidget(txEn, 3, 1);
+	layout->addWidget(createCheckboxWidget(txCh, "en", "Enable"), 3, 1);
 	// Row+3 is empty in iio-oscilloscope
 	IIOWidget *samplingFreq = createReadOnlyWidget(txCh, "sampling_frequency", "Sampling Rate (MSPS)");
 	// Add MSPS ↔ SPS conversion
 	samplingFreq->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 	samplingFreq->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 4); });
+		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 	layout->addWidget(samplingFreq, 5, 1);
 
 	QLabel *trackingLabel = new QLabel("Tracking:");
@@ -623,6 +605,7 @@ QWidget *Adrv9002::createOrxControls()
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout(widget);
+	layout->setMargin(0);
 	layout->setSpacing(15);
 
 	// ORX 1 Column
@@ -685,9 +668,9 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 	layout->addWidget(createRangeWidget(rxCh, "orx_hardwaregain", "[4 1 36]", "Hardware Gain (dB)"), 1, 0);
 	layout->addWidget(createCheckboxWidget(rxCh, "orx_bbdc_rejection_en", "BBDC Rejection"), 1, 1);
 
-	// Row 2: Tracking (Left) and Powerdown (Right)
+	// Row 2: Tracking (Left) and Enabled (Right)
 	layout->addWidget(createCheckboxWidget(rxCh, "orx_quadrature_w_poly_tracking_en", "Quadrature Poly"), 2, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_en", "Powerdown"), 2, 1);
+	layout->addWidget(createCheckboxWidget(rxCh, "orx_en", "Enabled"), 2, 1);
 
 	return widget;
 }
@@ -724,11 +707,6 @@ IIOWidget *Adrv9002::createRangeWidget(iio_channel *ch, const QString &attr, con
 				    .buildSingle();
 
 	if(widget) {
-		// Apply stripUnits to ALL range widgets - safe for all values
-		widget->setDataToUIConversion([](QString data) {
-			return data.split(" ").first(); // Safe for all numeric attributes
-		});
-
 		connect(this, &Adrv9002::readRequested, widget, &IIOWidget::readAsync);
 	}
 	return widget;

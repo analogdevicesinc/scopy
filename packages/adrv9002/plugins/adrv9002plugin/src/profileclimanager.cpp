@@ -253,9 +253,6 @@ void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
 		return;
 	}
 
-	// Write stream to device
-	// int ret = iio_device_attr_write_raw(m_device, "profile_config", streamData, sizeof(streamData));
-
 	if(!writeDeviceAttribute("stream_config", streamData)) {
 		Q_EMIT operationError("Failed to write stream image to device");
 		cleanupTempFiles(tempFiles);
