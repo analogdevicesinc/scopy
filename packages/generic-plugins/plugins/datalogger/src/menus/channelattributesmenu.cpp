@@ -42,6 +42,11 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	MenuHeaderWidget *header = new MenuHeaderWidget(model->getDisplayName(), model->getColor(), this);
 	header->title()->setEnabled(true);
 	connect(header->title(), &QLineEdit::textChanged, model, &DataMonitorModel::setDisplayName);
+	connect(model, &DataMonitorModel::displayNameChanged, header, [=](QString name) {
+		header->blockSignals(true);
+		header->title()->setText(name);
+		header->blockSignals(false);
+	});
 
 	mainLayout->addWidget(header);
 

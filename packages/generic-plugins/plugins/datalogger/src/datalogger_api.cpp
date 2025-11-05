@@ -311,4 +311,87 @@ void DataLogger_API::importDataFromPathForTool(QString toolName, QString path)
 	}
 }
 
+void DataLogger_API::setMonitorDisplayName(QString toolName, QString monitor, QString displayName)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
+			return;
+		} else {
+			monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->setDisplayName(
+				displayName);
+		}
+	}
+}
+
+void DataLogger_API::setMonitorUnitOfMeasurementName(QString toolName, QString monitor, QString name)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
+			return;
+		} else {
+			monitorTool->m_dataAcquisitionManager->getDataMonitorMap()
+				->value(monitor)
+				->getUnitOfMeasure()
+				->setName(name);
+		}
+	}
+}
+
+void DataLogger_API::setMonitorUnitOfMeasurementSymbol(QString toolName, QString monitor, QString symbol)
+{
+	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
+			return;
+		} else {
+			monitorTool->m_dataAcquisitionManager->getDataMonitorMap()
+				->value(monitor)
+				->getUnitOfMeasure()
+				->setSymbol(symbol);
+		}
+	}
+}
+
+void DataLogger_API::setDisplayMode(QString toolName, int mode)
+{
+	// mode: 0 = plot, 1 = text, 2 = seven segment
+	if(mode < 0 || mode > 2) {
+		qWarning() << "Invalid display mode:" << mode;
+		return;
+	}
+
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
+	if(!tool) {
+		qWarning() << "Tool not found:" << toolName;
+		return;
+	}
+
+	DatamonitorTool *monitorTool = qobject_cast<DatamonitorTool *>(tool->tool());
+	if(monitorTool) {
+		monitorTool->setDisplayMode(mode);
+	}
+}
+
+void DataLogger_API::setToolName(QString currentToolName, QString newToolName)
+{
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, currentToolName);
+	if(!tool) {
+		qWarning() << "Tool not found:" << currentToolName;
+		return;
+	}
+
+	tool->setName(newToolName);
+}
+
 #include "moc_datalogger_api.cpp"

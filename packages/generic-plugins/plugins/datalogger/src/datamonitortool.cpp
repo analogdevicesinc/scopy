@@ -395,4 +395,20 @@ void DatamonitorTool::setEnableAddRemovePlot(bool en) { m_dataMonitorSettings->s
 
 void DatamonitorTool::setEnableAddRemoveInstrument(bool en) { addMonitorToolButton->setVisible(en); }
 
+void DatamonitorTool::setDisplayMode(int mode)
+{
+	if(mode == 0) {
+		Q_EMIT showPlot->clicked();
+		return;
+	}
+	if(mode == 1) {
+		Q_EMIT showText->clicked();
+		return;
+	}
+	if(mode == 2) {
+		Q_EMIT showSegments->clicked();
+		return;
+	}
+}
+
 #include "moc_datamonitortool.cpp"
