@@ -61,16 +61,17 @@ void InitialCalibrationsWidget::setupUI()
 	Style::setStyle(this, style::properties::widget::border_interactive);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setContentsMargins(15, 15, 15, 15);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10);
 
 	// Title
 	m_titleLabel = new QLabel("Initial Calibrations", this);
-	Style::setStyle(m_titleLabel, style::properties::label::menuBig);
+	Style::setStyle(m_titleLabel, style::properties::label::menuMedium);
 	mainLayout->addWidget(m_titleLabel);
 
 	// Controls layout (horizontal)
 	QHBoxLayout *controlsLayout = new QHBoxLayout();
+	controlsLayout->setMargin(0);
 	controlsLayout->setSpacing(10);
 
 	// Calibrations Mode label

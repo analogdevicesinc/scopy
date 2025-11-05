@@ -183,13 +183,13 @@ void ProfileGeneratorWidget::setupUi()
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->setSpacing(15);
-	mainLayout->setContentsMargins(0, 0, 0, 0);
+	mainLayout->setMargin(0);
 
 	// Create content widget (all controls go here)
 	m_contentWidget = new QWidget(this);
 	QVBoxLayout *contentLayout = new QVBoxLayout(m_contentWidget);
 	contentLayout->setSpacing(15);
-	contentLayout->setContentsMargins(0, 0, 0, 0);
+	contentLayout->setMargin(0);
 
 	mainLayout->addWidget(generateDeviceDriverAPIWidget(this));
 
@@ -225,8 +225,8 @@ MenuSectionCollapseWidget *ProfileGeneratorWidget::createProfileActionSection()
 
 	QWidget *actionBar = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout(actionBar);
-	layout->setContentsMargins(10, 10, 10, 10);
 	layout->setSpacing(15);
+	layout->setMargin(0);
 
 	// Preset dropdown with styling - matching iio-oscilloscope exactly
 	QLabel *presetLabel = new QLabel("Preset:");
@@ -276,8 +276,8 @@ MenuSectionCollapseWidget *ProfileGeneratorWidget::createRadioConfigSection()
 
 	QWidget *radioConfigWidget = new QWidget();
 	QGridLayout *layout = new QGridLayout(radioConfigWidget);
-	layout->setSpacing(10);
-	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(15);
+	layout->setMargin(0);
 
 	// SSI Interface - READ-ONLY LABEL like iio-oscilloscope (device-determined)
 	layout->addWidget(new QLabel("SSI Interface:"), 0, 0);
@@ -303,7 +303,7 @@ MenuSectionCollapseWidget *ProfileGeneratorWidget::createChannelConfigSection()
 	QWidget *channelConfigWidget = new QWidget();
 	QGridLayout *layout = new QGridLayout(channelConfigWidget);
 	layout->setSpacing(15);
-	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setMargin(0);
 
 	// Create 2x2 grid: RX1, RX2, TX1, TX2
 	QWidget *rx1Frame = createChannelConfigWidget("RX 1", CHANNEL_RX1);
@@ -375,7 +375,7 @@ MenuSectionCollapseWidget *ProfileGeneratorWidget::createOrxConfigSection()
 	QWidget *orxConfigWidget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout(orxConfigWidget);
 	layout->setSpacing(15);
-	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setMargin(0);
 
 	// ORX 1
 	layout->addWidget(createOrxWidget("ORX 1"));
@@ -393,8 +393,8 @@ QWidget *ProfileGeneratorWidget::createOrxWidget(const QString &title)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setContentsMargins(10, 10, 10, 10);
-	layout->setSpacing(10);
+	layout->setSpacing(15);
+	layout->setMargin(10);
 
 	QLabel *titleLabel = new QLabel(title);
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
@@ -423,8 +423,8 @@ MenuSectionCollapseWidget *ProfileGeneratorWidget::createDebugInfoSection()
 	QWidget *debugInfoWidget = new QWidget();
 	debugInfoWidget->setMinimumHeight(500);
 	QVBoxLayout *layout = new QVBoxLayout(debugInfoWidget);
-	layout->setContentsMargins(10, 10, 10, 10);
-	layout->setSpacing(10);
+	layout->setSpacing(15);
+	layout->setMargin(0);
 
 	m_debugInfoText = new QTextEdit();
 	m_debugInfoText->setReadOnly(true);

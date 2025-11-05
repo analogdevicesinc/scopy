@@ -45,19 +45,23 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 {
 	// Create main layout with horizontal split like iio-oscilloscope
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
+	mainLayout->setMargin(0);
 
 	// Title
 	m_title = new QLabel("Profile & Stream Configuration", this);
+	Style::setStyle(m_title, style::properties::label::menuMedium);
 	mainLayout->addWidget(m_title);
 
 	// Create horizontal layout for Profile controls (left) and Device Info (right)
 	QHBoxLayout *contentLayout = new QHBoxLayout();
+	contentLayout->setMargin(0);
+	contentLayout->setSpacing(15);
 	mainLayout->addLayout(contentLayout);
 
 	// Left side: Profile and Stream controls
 	QWidget *profileControlsWidget = new QWidget();
 	QVBoxLayout *leftLayout = new QVBoxLayout(profileControlsWidget);
-	leftLayout->setContentsMargins(0, 0, 10, 0); // Add right margin for spacing
+	leftLayout->setMargin(0);
 
 	// Get embedded resources directory
 	QFileInfoList profiles = scopy::PkgManager::listFilesInfo(QStringList() << "adrv9002-profiles");
@@ -72,7 +76,6 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 	QWidget *profileContainer = new QWidget();
 	QVBoxLayout *profileLayout = new QVBoxLayout(profileContainer);
 	profileLayout->setMargin(0);
-	profileLayout->setSpacing(1);
 
 	m_profileFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, profileContainer);
 	m_profileFileBrowser->setFilter("Profile files (*.json)");
