@@ -269,10 +269,19 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	umSymbol->setPlaceholderText("Symbol");
 
 	connect(umName, &QLineEdit::textChanged, this, [=](QString text) { model->getUnitOfMeasure()->setName(text); });
+	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this, [=]() {
+		umName->blockSignals(true);
+		umName->setText(model->getUnitOfMeasure()->getName());
+		umName->blockSignals(false);
+	});
 
 	connect(umSymbol, &QLineEdit::textChanged, this,
 		[=](QString text) { model->getUnitOfMeasure()->setSymbol(text); });
-
+	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this, [=]() {
+		umSymbol->blockSignals(true);
+		umSymbol->setText(model->getUnitOfMeasure()->getSymbol());
+		umSymbol->blockSignals(false);
+	});
 	umLayout->addWidget(umName);
 	umLayout->addWidget(umSymbol);
 

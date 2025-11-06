@@ -1,0 +1,13 @@
+{
+    "id": "rfpowermeter",
+    "title": "RF Power Meter",
+    "version": "@PROJECT_VERSION@",
+    "description": "RF Power Meter plugin package",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  
