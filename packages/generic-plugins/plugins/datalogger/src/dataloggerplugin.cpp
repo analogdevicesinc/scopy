@@ -129,7 +129,6 @@ bool DataLoggerPlugin::onConnect()
 	removeTool("DataMonitorPreview");
 	addNewTool();
 	initApi();
-
 	return true;
 }
 
