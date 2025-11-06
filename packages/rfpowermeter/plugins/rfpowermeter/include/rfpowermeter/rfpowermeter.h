@@ -19,43 +19,36 @@
  *
  */
 
-#ifndef CHANNELATTRIBUTESMENU_HPP
-#define CHANNELATTRIBUTESMENU_HPP
+#ifndef RFPOWERMETERPLUGIN_H
+#define RFPOWERMETERPLUGIN_H
 
-#include <QBoxLayout>
-#include <QWidget>
-#include <datamonitor/dmmdatamonitormodel.hpp>
-#include <datamonitor/unitofmeasurement.hpp>
-#include "scopy-datalogger_export.h"
-#include <QComboBox>
-#include <monitorplotmanager.h>
+#define SCOPY_PLUGIN_NAME RFPowerMeterPlugin
+
+#include "scopy-rfpowermeter_export.h"
+#include <QObject>
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
 
 namespace scopy {
-namespace datamonitor {
-class SCOPY_DATALOGGER_EXPORT ChannelAttributesMenu : public QWidget
+namespace rfpowermeter {
+class SCOPY_RFPOWERMETER_EXPORT RFPowerMeterPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
+	SCOPY_PLUGIN;
+
 public:
-	typedef enum
-	{
-		SCALE_RAW,
-		SCALE_SCALED,
-		SCALE_OVERRIDE
-	} ScaleMode;
+	bool compatible(QString m_param, QString category) override;
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
+	void unload() override;
+	void initMetadata() override;
+	QString description() override;
 
-	typedef enum
-	{
-		OFFSET_RAW,
-		OFFSET_OFFSETED,
-		OFFSET_OVERRIDE
-	} OffsetMode;
-
-	explicit ChannelAttributesMenu(DataMonitorModel *model, MonitorPlotManager *plotManager,
-				       QWidget *parent = nullptr);
-
-private:
-	QComboBox *m_plotSelector;
+public Q_SLOTS:
+	bool onConnect() override;
+	bool onDisconnect() override;
 };
-} // namespace datamonitor
+} // namespace rfpowermeter
 } // namespace scopy
-#endif // CHANNELATTRIBUTESMENU_HPP
+#endif // RFPOWERMETERPLUGIN_H

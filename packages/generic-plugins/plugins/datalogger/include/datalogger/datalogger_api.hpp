@@ -23,12 +23,11 @@
 #define DATALOGGER_API_H
 
 #include "scopy-datalogger_export.h"
-
-#include <dataloggerplugin.h>
-#include <sevensegmentdisplay.hpp>
-#include <sevensegmentmonitorsettings.hpp>
+#include <pluginbase/apiobject.h>
 
 namespace scopy::datamonitor {
+
+class DataLoggerPlugin;
 
 class SCOPY_DATALOGGER_EXPORT DataLogger_API : public ApiObject
 {

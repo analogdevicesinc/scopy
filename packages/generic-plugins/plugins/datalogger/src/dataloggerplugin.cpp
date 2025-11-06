@@ -129,7 +129,6 @@ bool DataLoggerPlugin::onConnect()
 	removeTool("DataMonitorPreview");
 	addNewTool();
 	initApi();
-
 	return true;
 }
 
@@ -256,6 +255,8 @@ void DataLoggerPlugin::initApi()
 	api->setObjectName("datalogger");
 	js->registerApi(api);
 }
+
+DataLogger_API *DataLoggerPlugin::getApi() const { return api; }
 
 void DataLoggerPlugin::initMetadata()
 {

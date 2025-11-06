@@ -55,6 +55,8 @@ public:
 	QString description() override;
 	QString pkgName() override;
 
+	DataLogger_API *getApi() const;
+
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
