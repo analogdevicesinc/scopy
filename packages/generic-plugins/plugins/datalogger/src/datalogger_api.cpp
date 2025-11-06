@@ -21,6 +21,9 @@
 
 #include "datalogger_api.hpp"
 #include "menus/datamonitorsettings.hpp"
+#include <dataloggerplugin.h>
+#include <sevensegmentdisplay.hpp>
+#include <sevensegmentmonitorsettings.hpp>
 
 using namespace scopy::datamonitor;
 

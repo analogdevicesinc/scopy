@@ -398,15 +398,15 @@ void DatamonitorTool::setEnableAddRemoveInstrument(bool en) { addMonitorToolButt
 void DatamonitorTool::setDisplayMode(int mode)
 {
 	if(mode == 0) {
-		Q_EMIT showPlot->clicked();
+		showPlot->click();
 		return;
 	}
 	if(mode == 1) {
-		Q_EMIT showText->clicked();
+		showText->click();
 		return;
 	}
 	if(mode == 2) {
-		Q_EMIT showSegments->clicked();
+		showSegments->click();
 		return;
 	}
 }
