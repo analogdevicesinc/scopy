@@ -43,7 +43,7 @@ private Q_SLOTS:
 	void metadata();
 };
 
-#define PLUGIN_LOCATION "../../plugins"
+#define PLUGIN_LOCATION "../.."
 #define FILENAME PLUGIN_LOCATION "/libscopy-rfpowermeter.so"
 
 void TST_RFPowerMeterPlugin::fileExists()

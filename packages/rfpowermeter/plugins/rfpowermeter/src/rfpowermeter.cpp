@@ -24,7 +24,8 @@
 #include <QLoggingCategory>
 #include <QLabel>
 #include <iioutil/connectionprovider.h>
-#include <pluginbase/scopyjs.h>
+#include <pluginbase/apilist.h>
+#include <datalogger/datalogger_api.hpp>
 
 Q_LOGGING_CATEGORY(CAT_RFPOWERMETER, "RFPowerMeterPlugin")
 using namespace scopy::rfpowermeter;
@@ -108,23 +109,57 @@ bool RFPowerMeterPlugin::onConnect()
 
 	iio_device *powrmsDevice = iio_context_find_device(ctx, "powrms");
 	if(powrmsDevice != nullptr) {
-		qDebug(CAT_RFPOWERMETER) << "Found rf powermeter device, applying configuration via JavaScript";
+		qDebug(CAT_RFPOWERMETER) << "Found rf powermeter device, configuring via DataLogger API";
 
-		// Execute the JavaScript configuration script
-		ScopyJS *js = ScopyJS::GetInstance();
-		if(!js) {
-			qWarning(CAT_RFPOWERMETER) << "ScopyJS instance not available";
+		// Get DataLogger API using ApiList
+		auto *dataloggerApi = scopy::ApiList::getApi<scopy::datamonitor::DataLogger_API>("datalogger");
+		if(!dataloggerApi) {
+			qWarning(CAT_RFPOWERMETER) << "DataLogger API not available";
 			return false;
 		}
 
-		QJSValue result = js->evaluateFile(":/rfpowermeter/rfpowermeter_config.js");
-		if(result.isError()) {
-			qWarning(CAT_RFPOWERMETER)
-				<< "Error executing RF power meter configuration script:" << result.toString();
-			return false;
-		}
+		// Configure DataLogger for RF Power Meter (matching original JavaScript)
+		dataloggerApi->setToolName("Data Logger ", "RF Power Meter");
+		dataloggerApi->setDisplayMode("RF Power Meter", 2);
 
-		qInfo(CAT_RFPOWERMETER) << "RF power meter configuration script executed successfully";
+		// Configure power5 (Power Forward)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:power5", "Power Forward");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:power5", "");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:power5", "dBm");
+		dataloggerApi->enableMonitorOfTool("RF Power Meter", "powrms:power5");
+
+		// Configure power6 (Power Reverse)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:power6", "Power reverse");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:power6", "");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:power6", "dBm");
+		dataloggerApi->enableMonitorOfTool("RF Power Meter", "powrms:power6");
+
+		// Configure voltage0 (Voltage in corrected)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage0", "Voltage in corrected");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage0", "Voltage");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage0", "mV");
+
+		// Configure voltage1 (Voltage out corrected)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage1", "Voltage out corrected");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage1", "Voltage");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage1", "mV");
+
+		// Configure voltage2 (Temperature)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage2", "Temperature");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage2", "Voltage");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage2", "mV");
+
+		// Configure voltage3 (Voltage in)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage3", "Voltage in");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage3", "Voltage");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage3", "mV");
+
+		// Configure voltage4 (Voltage out)
+		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage4", "Voltage out");
+		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage4", "Voltage");
+		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage4", "mV");
+
+		qInfo(CAT_RFPOWERMETER) << "RF power meter configuration completed successfully";
 	}
 
 	return true;
