@@ -80,6 +80,7 @@ Q_SIGNALS:
 	void requestTool(QString) override;
 	void connectionFailed();
 	void forget();
+	void requestReload(QString id, QStringList plugins);
 
 protected:
 	void removeDisabledPlugins();
@@ -92,10 +93,13 @@ protected:
 	void setPingPlugin(Plugin *plugin);
 	void bindPing();
 	void unbindPing();
+	void loadCompatiblePluginsTab(QWidget *pluginsTab);
+	QStringList getPluginsName();
 
 protected:
 	QList<Plugin *> m_plugins;
 	QList<Plugin *> m_connectedPlugins;
+	QSet<QString> m_reloadPluginsSet;
 	DeviceState_t m_state;
 	QString m_id;
 	QString m_category;

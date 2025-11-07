@@ -35,6 +35,7 @@
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
 #include <deviceiconbuilder.h>
+#include <pluginenablewidget.h>
 #include <pluginrepository.h>
 #include <style.h>
 
@@ -51,6 +52,7 @@ DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
 	: QObject{parent}
 	, m_param(param)
 	, m_category(category)
+	, m_reloadPluginsSet({})
 {
 	m_state = DEV_INIT;
 	m_id = "dev_" + category + "_" + param + "_" + scopy::config::getUuid();
@@ -182,10 +184,11 @@ void DeviceImpl::loadPages()
 	m_page->setProperty("device_page", true);
 	connbtn = new QPushButton("Connect", m_page);
 	discbtn = new QPushButton("Disconnect", m_page);
+	QPushButton *reloadBtn = new QPushButton("Reload", m_page);
 	auto m_buttonLayout = ui->m_buttonLayout;
-	auto m_scrollArea = ui->m_scrollArea;
-	auto m_scrollAreaContents = ui->m_scrollAreaContents;
 	auto m_scrollAreaLayout = ui->m_scrollAreaLayout;
+	auto pluginsTabContent = ui->m_pluginsTabContent;
+	auto pluginsBtnLay = ui->m_pluginsBtnLay;
 
 	Style::setStyle(connbtn, style::properties::button::basicButton);
 	connbtn->setAutoDefault(true);
@@ -196,8 +199,15 @@ void DeviceImpl::loadPages()
 	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
+	Style::setStyle(reloadBtn, style::properties::button::basicButton);
+	reloadBtn->setAutoDefault(true);
+	pluginsBtnLay->addWidget(reloadBtn);
+	pluginsBtnLay->addSpacerItem(new QSpacerItem(20, 0, QSizePolicy::Expanding));
+
 	connect(connbtn, &QPushButton::clicked, this, &DeviceImpl::connectDev);
 	connect(discbtn, &QPushButton::clicked, this, &DeviceImpl::disconnectDev);
+	connect(reloadBtn, &QPushButton::clicked, this,
+		[this]() { Q_EMIT requestReload(m_id, m_reloadPluginsSet.values()); });
 	connect(this, &DeviceImpl::connectionFailed, this, &DeviceImpl::onConnectionFailed, Qt::QueuedConnection);
 
 	for(auto &&p : plugins()) {
@@ -217,6 +227,7 @@ void DeviceImpl::loadPages()
 			break; // Only display the page from the plugin with the highest priority
 		}
 	}
+	loadCompatiblePluginsTab(pluginsTabContent);
 }
 
 void DeviceImpl::loadConfigPage()
@@ -303,6 +314,41 @@ void DeviceImpl::unbindPing()
 	m_pingPlugin->stopPingTask();
 	disconnect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
 	m_pingPlugin = nullptr;
+}
+
+void DeviceImpl::loadCompatiblePluginsTab(QWidget *pluginsTab)
+{
+	QList<Plugin *> plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
+	QStringList enabledPlugins = getPluginsName();
+	for(Plugin *p : qAsConst(plugins)) {
+		PluginEnableWidget *pluginDescription = new PluginEnableWidget(pluginsTab);
+		bool pluginEnabled = enabledPlugins.contains(p->name());
+		pluginDescription->setDescription(p->description());
+		pluginDescription->checkBox()->setText(p->name());
+		pluginDescription->checkBox()->setChecked(pluginEnabled);
+		pluginsTab->layout()->addWidget(pluginDescription);
+		if(pluginEnabled) {
+			m_reloadPluginsSet.insert(p->name());
+		}
+		connect(pluginDescription->checkBox(), &QCheckBox::toggled, this, [this, p](bool en) {
+			QString pluginName = p->name();
+			if(en) {
+				m_reloadPluginsSet.insert(pluginName);
+			} else {
+				m_reloadPluginsSet.remove(pluginName);
+			}
+		});
+	}
+	pluginsTab->layout()->addItem(new QSpacerItem(0, 20, QSizePolicy::Expanding, QSizePolicy::Expanding));
+}
+
+QStringList DeviceImpl::getPluginsName()
+{
+	QStringList pluginsName;
+	for(Plugin *p : qAsConst(m_plugins)) {
+		pluginsName.push_back(p->name());
+	}
+	return pluginsName;
 }
 
 void DeviceImpl::onConnectionFailed()

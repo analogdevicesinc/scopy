@@ -80,9 +80,8 @@ QString DeviceManager::createDevice(QString category, QString param, bool async,
 		QList<Plugin *> availablePlugins = d->plugins();
 		if(!plugins.isEmpty()) {
 			for(Plugin *p : qAsConst(availablePlugins)) {
-				if(!plugins.contains(p->name())) {
-					p->setEnabled(false);
-				}
+				bool enablePlugin = plugins.contains(p->name());
+				p->setEnabled(enablePlugin);
 			}
 		}
 		addDevice(d);
@@ -131,6 +130,15 @@ void DeviceManager::removeDeviceById(QString id)
 	Q_EMIT deviceRemoved(id);
 }
 
+QString DeviceManager::reloadDevice(QString id, QStringList plugins)
+{
+	QString cat = map[id]->category();
+	QString params = map[id]->param();
+	removeDeviceById(id);
+	QString newId = createDevice(cat, params, true, plugins);
+	return newId;
+}
+
 void DeviceManager::connectDeviceToManager(DeviceImpl *d)
 {
 	connect(d, &DeviceImpl::connecting, this, [=]() { connectingDevice(d->id()); });
@@ -138,6 +146,7 @@ void DeviceManager::connectDeviceToManager(DeviceImpl *d)
 	connect(d, &DeviceImpl::disconnecting, this, [=]() { disconnectingDevice(d->id()); });
 	connect(d, &DeviceImpl::disconnected, this, [=]() { disconnectDevice(d->id()); });
 	connect(d, &DeviceImpl::forget, this, [=]() { removeDeviceById(d->id()); });
+	connect(d, &DeviceImpl::requestReload, this, &DeviceManager::reloadDevice);
 	connect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
 	connect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
 	connect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
@@ -150,6 +159,7 @@ void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d)
 	disconnect(d, SIGNAL(disconnecting()));
 	disconnect(d, SIGNAL(disconnected()));
 	disconnect(d, SIGNAL(forget()));
+	disconnect(d, SIGNAL(requestReload(QString, QStringList)));
 	disconnect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
 	disconnect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
 	disconnect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));

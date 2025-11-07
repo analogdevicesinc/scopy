@@ -55,6 +55,7 @@ public Q_SLOTS:
 
 	void removeDeviceById(QString id);
 	QString restartDevice(QString id);
+	QString reloadDevice(QString id, QStringList plugins);
 	void disconnectAll();
 
 	void save(QSettings &s);
