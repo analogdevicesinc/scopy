@@ -30,9 +30,9 @@ using namespace scopy;
 QMap<QString, QPointer<ApiObject>> ApiList::s_apis;
 QMutex ApiList::s_mutex;
 
-void ApiList::registerApi(ApiObject* api)
+void ApiList::registerApi(ApiObject *api)
 {
-	if (!api) {
+	if(!api) {
 		qWarning(CAT_APILIST) << "Cannot register null API";
 		return;
 	}
@@ -40,7 +40,7 @@ void ApiList::registerApi(ApiObject* api)
 	QMutexLocker locker(&s_mutex);
 	const QString objectName = api->objectName();
 
-	if (s_apis.contains(objectName)) {
+	if(s_apis.contains(objectName)) {
 		qWarning(CAT_APILIST) << "API already registered for object:" << objectName << "- overriding";
 	}
 
@@ -51,21 +51,21 @@ void ApiList::registerApi(ApiObject* api)
 	QObject::connect(api, &QObject::destroyed, &ApiList::onApiDestroyed);
 }
 
-void ApiList::unregisterApi(ApiObject* api)
+void ApiList::unregisterApi(ApiObject *api)
 {
-	if (!api) {
+	if(!api) {
 		return;
 	}
 
 	QMutexLocker locker(&s_mutex);
 	const QString objectName = api->objectName();
 
-	if (s_apis.remove(objectName) > 0) {
+	if(s_apis.remove(objectName) > 0) {
 		qInfo(CAT_APILIST) << "Unregistered API:" << objectName;
 	}
 }
 
-bool ApiList::isAvailable(const QString& objectName)
+bool ApiList::isAvailable(const QString &objectName)
 {
 	QMutexLocker locker(&s_mutex);
 	auto it = s_apis.find(objectName);
@@ -76,8 +76,8 @@ QStringList ApiList::availableApis()
 {
 	QMutexLocker locker(&s_mutex);
 	QStringList available;
-	for (auto it = s_apis.begin(); it != s_apis.end(); ++it) {
-		if (!it->isNull()) {
+	for(auto it = s_apis.begin(); it != s_apis.end(); ++it) {
+		if(!it->isNull()) {
 			available << it.key();
 		}
 	}
@@ -89,8 +89,8 @@ void ApiList::onApiDestroyed()
 	QMutexLocker locker(&s_mutex);
 	// Clean up null pointers from the map
 	auto it = s_apis.begin();
-	while (it != s_apis.end()) {
-		if (it->isNull()) {
+	while(it != s_apis.end()) {
+		if(it->isNull()) {
 			qInfo(CAT_APILIST) << "Auto-cleaned destroyed API:" << it.key();
 			it = s_apis.erase(it);
 		} else {

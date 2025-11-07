@@ -38,24 +38,25 @@ class SCOPY_PLUGINBASE_EXPORT ApiList
 {
 public:
 	// Register API (similar to ScopyJS::registerApi)
-	static void registerApi(ApiObject* api);
+	static void registerApi(ApiObject *api);
 
 	// Unregister API (similar to ScopyJS::unregisterApi)
-	static void unregisterApi(ApiObject* api);
+	static void unregisterApi(ApiObject *api);
 
 	// Type-safe API access with availability checking
-	template<typename T>
-	static T* getApi(const QString& objectName) {
+	template <typename T>
+	static T *getApi(const QString &objectName)
+	{
 		QMutexLocker locker(&s_mutex);
 		auto it = s_apis.find(objectName);
-		if (it == s_apis.end() || it->isNull()) {
+		if(it == s_apis.end() || it->isNull()) {
 			return nullptr;
 		}
-		return qobject_cast<T*>(it->data());
+		return qobject_cast<T *>(it->data());
 	}
 
 	// Check if API is available
-	static bool isAvailable(const QString& objectName);
+	static bool isAvailable(const QString &objectName);
 
 	// Get list of available APIs
 	static QStringList availableApis();
