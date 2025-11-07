@@ -40,6 +40,7 @@
 #include <gui/preferenceshelper.h>
 
 #include <pluginbase/scopyjs.h>
+#include <pluginbase/apilist.h>
 #include <scopy-datalogger_config.h>
 
 Q_LOGGING_CATEGORY(CAT_DATALOGGERLUGIN, "DataLoggerPlugin")
@@ -164,6 +165,9 @@ bool DataLoggerPlugin::onDisconnect()
 
 	Q_EMIT toolListChanged();
 
+	// Unregister API
+	scopy::ApiList::unregisterApi(api);
+
 	toolIndex = 0;
 	return true;
 }
@@ -254,6 +258,9 @@ void DataLoggerPlugin::initApi()
 	ScopyJS *js = ScopyJS::GetInstance();
 	api->setObjectName("datalogger");
 	js->registerApi(api);
+
+	// Register API
+	scopy::ApiList::registerApi(api);
 }
 
 void DataLoggerPlugin::initMetadata()
