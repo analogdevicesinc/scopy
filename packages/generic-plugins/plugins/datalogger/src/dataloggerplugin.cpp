@@ -166,7 +166,7 @@ bool DataLoggerPlugin::onDisconnect()
 	Q_EMIT toolListChanged();
 
 	// Unregister API
-	scopy::ApiList::unregisterApi(api);
+	scopy::ApiList::unregisterApi(m_param, "datalogger");
 
 	toolIndex = 0;
 	return true;
@@ -260,7 +260,7 @@ void DataLoggerPlugin::initApi()
 	js->registerApi(api);
 
 	// Register API
-	scopy::ApiList::registerApi(api);
+	scopy::ApiList::registerApi(m_param, "datalogger", api);
 }
 
 void DataLoggerPlugin::initMetadata()

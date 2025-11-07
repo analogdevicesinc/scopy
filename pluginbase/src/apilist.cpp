@@ -27,10 +27,10 @@ Q_LOGGING_CATEGORY(CAT_APILIST, "ApiList")
 using namespace scopy;
 
 // Static member definitions
-QMap<QString, QPointer<ApiObject>> ApiList::s_apis;
+QMap<QString, QMap<QString, QPointer<ApiObject>>> ApiList::s_deviceApis;
 QMutex ApiList::s_mutex;
 
-void ApiList::registerApi(ApiObject *api)
+void ApiList::registerApi(const QString &deviceUri, const QString &apiName, ApiObject *api)
 {
 	if(!api) {
 		qWarning(CAT_APILIST) << "Cannot register null API";
@@ -38,63 +38,80 @@ void ApiList::registerApi(ApiObject *api)
 	}
 
 	QMutexLocker locker(&s_mutex);
-	const QString objectName = api->objectName();
 
-	if(s_apis.contains(objectName)) {
-		qWarning(CAT_APILIST) << "API already registered for object:" << objectName << "- overriding";
+	if(s_deviceApis[deviceUri].contains(apiName)) {
+		qWarning(CAT_APILIST) << "API already registered for device:" << deviceUri << "API:" << apiName
+				      << "- overriding";
 	}
 
-	s_apis[objectName] = QPointer<ApiObject>(api);
-	qInfo(CAT_APILIST) << "Registered API:" << objectName;
+	s_deviceApis[deviceUri][apiName] = QPointer<ApiObject>(api);
+	qInfo(CAT_APILIST) << "Registered API:" << apiName << "for device:" << deviceUri;
 
 	// Connect to destroyed signal for automatic cleanup
 	QObject::connect(api, &QObject::destroyed, &ApiList::onApiDestroyed);
 }
 
-void ApiList::unregisterApi(ApiObject *api)
+void ApiList::unregisterApi(const QString &deviceUri, const QString &apiName)
 {
-	if(!api) {
-		return;
-	}
-
 	QMutexLocker locker(&s_mutex);
-	const QString objectName = api->objectName();
 
-	if(s_apis.remove(objectName) > 0) {
-		qInfo(CAT_APILIST) << "Unregistered API:" << objectName;
+	auto deviceIt = s_deviceApis.find(deviceUri);
+	if(deviceIt != s_deviceApis.end()) {
+		if(deviceIt->remove(apiName) > 0) {
+			qInfo(CAT_APILIST) << "Unregistered API:" << apiName << "for device:" << deviceUri;
+		}
 	}
 }
 
-bool ApiList::isAvailable(const QString &objectName)
+bool ApiList::isAvailable(const QString &deviceUri, const QString &apiName)
 {
 	QMutexLocker locker(&s_mutex);
-	auto it = s_apis.find(objectName);
-	return it != s_apis.end() && !it->isNull();
+	auto deviceIt = s_deviceApis.find(deviceUri);
+	if(deviceIt == s_deviceApis.end()) {
+		return false;
+	}
+	auto apiIt = deviceIt->find(apiName);
+	return apiIt != deviceIt->end() && !apiIt->isNull();
 }
 
-QStringList ApiList::availableApis()
+QStringList ApiList::availableApis(const QString &deviceUri)
 {
 	QMutexLocker locker(&s_mutex);
 	QStringList available;
-	for(auto it = s_apis.begin(); it != s_apis.end(); ++it) {
-		if(!it->isNull()) {
-			available << it.key();
+	auto deviceIt = s_deviceApis.find(deviceUri);
+	if(deviceIt != s_deviceApis.end()) {
+		for(auto it = deviceIt->begin(); it != deviceIt->end(); ++it) {
+			if(!it->isNull()) {
+				available << it.key();
+			}
 		}
 	}
 	return available;
 }
 
+void ApiList::removeDevice(const QString &deviceUri)
+{
+	QMutexLocker locker(&s_mutex);
+	int removedApis = s_deviceApis.remove(deviceUri);
+	if(removedApis > 0) {
+		qInfo(CAT_APILIST) << "Removed device and all APIs:" << deviceUri;
+	}
+}
+
 void ApiList::onApiDestroyed()
 {
 	QMutexLocker locker(&s_mutex);
-	// Clean up null pointers from the map
-	auto it = s_apis.begin();
-	while(it != s_apis.end()) {
-		if(it->isNull()) {
-			qInfo(CAT_APILIST) << "Auto-cleaned destroyed API:" << it.key();
-			it = s_apis.erase(it);
-		} else {
-			++it;
+	// Clean up null pointers from all device maps
+	for(auto deviceIt = s_deviceApis.begin(); deviceIt != s_deviceApis.end(); ++deviceIt) {
+		auto apiIt = deviceIt->begin();
+		while(apiIt != deviceIt->end()) {
+			if(apiIt->isNull()) {
+				qInfo(CAT_APILIST) << "Auto-cleaned destroyed API:" << apiIt.key()
+						   << "for device:" << deviceIt.key();
+				apiIt = deviceIt->erase(apiIt);
+			} else {
+				++apiIt;
+			}
 		}
 	}
 }

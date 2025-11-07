@@ -37,32 +37,41 @@ namespace scopy {
 class SCOPY_PLUGINBASE_EXPORT ApiList
 {
 public:
-	// Register API (similar to ScopyJS::registerApi)
-	static void registerApi(ApiObject *api);
+	// Device-scoped API registration
+	static void registerApi(const QString &deviceUri, const QString &apiName, ApiObject *api);
 
-	// Unregister API (similar to ScopyJS::unregisterApi)
-	static void unregisterApi(ApiObject *api);
+	// Device-scoped API unregistration
+	static void unregisterApi(const QString &deviceUri, const QString &apiName);
 
-	// Type-safe API access with availability checking
+	// Type-safe device-scoped API access with availability checking
 	template <typename T>
-	static T *getApi(const QString &objectName)
+	static T *getApi(const QString &deviceUri, const QString &apiName)
 	{
 		QMutexLocker locker(&s_mutex);
-		auto it = s_apis.find(objectName);
-		if(it == s_apis.end() || it->isNull()) {
+		auto deviceIt = s_deviceApis.find(deviceUri);
+		if(deviceIt == s_deviceApis.end()) {
 			return nullptr;
 		}
-		return qobject_cast<T *>(it->data());
+
+		auto apiIt = deviceIt->find(apiName);
+		if(apiIt == deviceIt->end() || apiIt->isNull()) {
+			return nullptr;
+		}
+		return qobject_cast<T *>(apiIt->data());
 	}
 
-	// Check if API is available
-	static bool isAvailable(const QString &objectName);
+	// Check if API is available for specific device
+	static bool isAvailable(const QString &deviceUri, const QString &apiName);
 
-	// Get list of available APIs
-	static QStringList availableApis();
+	// Get list of available APIs for specific device
+	static QStringList availableApis(const QString &deviceUri);
+
+	// Manual device cleanup
+	static void removeDevice(const QString &deviceUri);
 
 private:
-	static QMap<QString, QPointer<ApiObject>> s_apis;
+	// Device URI -> (API Name -> API Object)
+	static QMap<QString, QMap<QString, QPointer<ApiObject>>> s_deviceApis;
 	static QMutex s_mutex;
 
 	// Auto-cleanup when API object is destroyed
