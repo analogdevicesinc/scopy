@@ -1,27 +1,30 @@
 <?xml version="1.0"?>
-<manifest package="org.adi.scopy" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionName="1.4.1" android:versionCode="0104010000" android:installLocation="auto">
+<manifest package="org.adi.scopy" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionName="2.2.0" android:versionCode="0104010000" android:installLocation="auto">
 <!-- 01.04.00.0003-->
 <!-- versioning: major.minor.patch.build -->
-     
+
         <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
 	 Remove the comment if you do not require these default permissions. -->
     <!-- %%INSERT_PERMISSIONS -->
-<uses-permission android:name="android.permission.CLEAR_APP_USER_DATA"/>
+    <uses-permission android:name="android.permission.CLEAR_APP_USER_DATA"/>
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.DELETE_CACHE_FILES"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.DELETE_CACHE_FILES"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 
     <!-- The following comment will be replaced upon deployment with default features based on the dependencies of the application.
          Remove the comment if you do not require these default features. -->
     <!-- %%INSERT_FEATURES -->
+    <meta-data android:name="android.app.dump_native_crash" android:value="true"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
     <application android:hardwareAccelerated="true" android:name="org.adi.scopy.ScopyApplication" android:label="Scopy" android:extractNativeLibs="true" android:icon="@drawable/icon">
 	<receiver android:name="libusb.android.USB_PERMISSION"/>
-	<activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.adi.scopy.ScopyActivity" android:label="Scopy" android:screenOrientation="userLandscape" tools:ignore="LockedOrientationActivity" android:launchMode="singleTop" android:theme="@style/splashScreenTheme">
+	<activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.adi.scopy.ScopyActivity" android:label="Scopy" android:screenOrientation="userLandscape" tools:ignore="LockedOrientationActivity" android:launchMode="singleTop" android:theme="@style/splashScreenTheme" android:exported="true">
 	    <intent-filter>
 		<action android:name="libusb.android.USB_PERMISSION"/>
 		<action android:name="android.intent.action.MAIN"/>
@@ -80,7 +83,8 @@
 		* minimal - useful for Quick Controls 2 apps, it is much faster than "full"
 		* none - useful for apps that don't use any of the above Qt modules
 		-->
-		<meta-data android:name="android.app.extract_android_style" android:value="default"/>
+		<meta-data android:name="android.app.extract_android_style" android:value="none"/>
+		<meta-data android:name="android.app.use_local_qt_libs" android:value="1"/>
 	    <!-- extract android style -->
 	    <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/splashscreen"/>
 	    <meta-data android:name="android.app.splash_screen_drawable_portrait" android:resource="@drawable/splashscreen_port"/>
