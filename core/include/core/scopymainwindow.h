@@ -104,6 +104,7 @@ private Q_SLOTS:
 	void handleScriptingToolRequest();
 
 private:
+	static ScopyMainWindow *staticScopyMainWindow;
 	ScopyAboutPage *about;
 	ScopyPreferencesPage *prefPage;
 	ScopyHomePage *hp;
@@ -122,6 +123,9 @@ private:
 	QOpenGLWidget *m_glLoader;
 	ToolMenuManager *m_toolMenuManager;
 	ScanButtonController *m_sbc;
+#if __ANDROID__
+	QAndroidJniEnvironment *jnienv;
+#endif
 
 	// Scripting tool detach/attach logic
 	ScriptingTool *m_scriptingTool;
