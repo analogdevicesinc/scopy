@@ -302,6 +302,33 @@ void* map_file_for_writing(const char* path, size_t size, int* fd_out) {
 }
 #endif
 
+void cleanup_channel_format() {
+    if (g_state.input_config.channel_format) {
+        for (int i = 0; i < g_state.input_config.channel_count; i++) {
+            if (g_state.input_config.channel_format[i]) {
+                free(g_state.input_config.channel_format[i]);
+                g_state.input_config.channel_format[i] = NULL;
+            }
+        }
+        free(g_state.input_config.channel_format);
+        g_state.input_config.channel_format = NULL;
+    }
+}
+
+void cleanup_enabled_analysis() {
+    if (g_state.output_config.enabled_analysis) {
+        for (int i = 0; i < g_state.output_config.enabled_analysis_count; i++) {
+            if (g_state.output_config.enabled_analysis[i]) {
+                free(g_state.output_config.enabled_analysis[i]);
+                g_state.output_config.enabled_analysis[i] = NULL;
+            }
+        }
+        free(g_state.output_config.enabled_analysis);
+        g_state.output_config.enabled_analysis = NULL;
+        g_state.output_config.enabled_analysis_count = 0;
+    }
+}
+
 // Channel format parsing functions (unchanged)
 int parse_channel_format(const char *format, int *bits, int *is_signed, int *shift) {
     *bits = 16; // default
@@ -422,6 +449,8 @@ void handle_set_input_config(cJSON *request) {
     cJSON *channel_format = cJSON_GetObjectItem(config, "channel_format");
     cJSON *sample_count = cJSON_GetObjectItem(config, "sample_count");
 
+    cleanup_channel_format();
+
     if (input_file) strcpy(g_state.input_config.input_file, input_file->valuestring);
     if (sampling_freq) g_state.input_config.sampling_frequency = sampling_freq->valueint;
     if (freq_offset) g_state.input_config.frequency_offset = freq_offset->valueint;
@@ -433,9 +462,22 @@ void handle_set_input_config(cJSON *request) {
     if (channel_format && cJSON_IsArray(channel_format)) {
         int array_size = cJSON_GetArraySize(channel_format);
         g_state.input_config.channel_format = malloc(array_size * sizeof(char*));
+        if (!g_state.input_config.channel_format) {
+            fprintf(stderr, "Error: Failed to allocate memory for channel_format\n");
+            return;
+        }
         for (int i = 0; i < array_size; i++) {
             cJSON *format_item = cJSON_GetArrayItem(channel_format, i);
             g_state.input_config.channel_format[i] = malloc(64);
+            if (!g_state.input_config.channel_format[i]) {
+                fprintf(stderr, "Error: Failed to allocate memory for channel_format[%d]\n", i);
+                for (int j = 0; j < i; j++) {
+                    free(g_state.input_config.channel_format[j]);
+                }
+                free(g_state.input_config.channel_format);
+                g_state.input_config.channel_format = NULL;
+                return;
+            }
             strcpy(g_state.input_config.channel_format[i], format_item->valuestring);
         }
     }
@@ -545,12 +587,27 @@ void handle_set_output_config(cJSON *request) {
     if (output_format) strcpy(g_state.output_config.output_file_format, output_format->valuestring);
 
     if (enabled_analysis && cJSON_IsArray(enabled_analysis)) {
+        cleanup_enabled_analysis();
         int array_size = cJSON_GetArraySize(enabled_analysis);
         g_state.output_config.enabled_analysis = malloc(array_size * sizeof(char*));
+        if (!g_state.output_config.enabled_analysis) {
+            fprintf(stderr, "Error: Failed to allocate memory for enabled_analysis\n");
+            return;
+        }
         g_state.output_config.enabled_analysis_count = array_size;
         for (int i = 0; i < array_size; i++) {
             cJSON *analysis_item = cJSON_GetArrayItem(enabled_analysis, i);
             g_state.output_config.enabled_analysis[i] = malloc(64);
+            if (!g_state.output_config.enabled_analysis[i]) {
+                fprintf(stderr, "Error: Failed to allocate memory for enabled_analysis[%d]\n", i);
+                for (int j = 0; j < i; j++) {
+                    free(g_state.output_config.enabled_analysis[j]);
+                }
+                free(g_state.output_config.enabled_analysis);
+                g_state.output_config.enabled_analysis = NULL;
+                g_state.output_config.enabled_analysis_count = 0;
+                return;
+            }
             strcpy(g_state.output_config.enabled_analysis[i], analysis_item->valuestring);
         }
     }
@@ -867,6 +924,10 @@ int main(int argc, char **argv) {
     memset(&g_state, 0, sizeof(g_state));
     g_state.analysis_config.samples_size = 1024; // Default value
     g_state.analysis_config.gain = 1; // Default gain value
+    g_state.input_config.channel_format = NULL;
+    g_state.input_config.channel_count = 0;
+    g_state.output_config.enabled_analysis = NULL;
+    g_state.output_config.enabled_analysis_count = 0;
 
     while ((read = getline(&line, &len, stdin)) != -1) {
         // Remove newline
@@ -885,7 +946,11 @@ int main(int argc, char **argv) {
 
     // Cleanup
     if (line) free(line);
-    
+
+    // Clean up dynamically allocated arrays
+    cleanup_channel_format();
+    cleanup_enabled_analysis();
+
     if (g_state.readMap && g_state.readMap != MAP_FAILED) {
 #ifdef _WIN32
         cleanup_mapping(g_state.readMap, g_state.inputMapHandle, g_state.inputFileHandle);
