@@ -20,6 +20,8 @@
 
 package org.adi.scopy;
 
+import static java.lang.System.in;
+
 import org.qtproject.qt5.android.bindings.QtApplication;
 
 import java.io.File;
@@ -33,6 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import android.system.Os;
 import android.system.ErrnoException;
@@ -146,60 +150,39 @@ public class ScopyApplication extends QtApplication {
     super.onCreate();
 
     boolean reloadLibs = true;
-    if (reloadLibs) {
-      clearInstalled();
+
+    System.out.println("Copying assets to " + cache);
+
+    String[] folders = null;
+    try {
+      folders = getAssets().list("");
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
-    if (!isInstalled()) {
-      System.out.println("Copying assets to " + cache);
-
-      String[] folders = null;
-      try {
-        folders = getAssets().list("");
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-
-      for (String folder : folders) {
-        System.out.println("Folder found: " + folder);
-      }
-
-      // make a method to copy all files from Assets to Cache
-      copyAssetFolder(getAssets(), "scopy-plugins", cache + "/scopy-plugins");
-      copyAssetFolder(getAssets(), "style", cache + "/style");
-      copyAssetFolder(getAssets(), "translations", cache + "/translations");
-      copyAssetFolder(getAssets(), "decoders", cache + "/decoders");
-      copyAssetFolder(getAssets(), "python3.11", cache + "/decoders");
-
-      Path rootPath = Paths.get(cache);
-      List<Path> allFiles = new ArrayList<>();
-      try {
-        System.out.println("List files hrere::: !");
-        listAllFiles(rootPath, allFiles);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      System.out.println("Found files:");
-      allFiles.forEach(System.out::println);
-
-      System.out.println("Setting installed flag " + cache);
-      setInstalled();
-    } else {
-      System.out.println("Already installed");
+    for (String folder : folders) {
+      System.out.println("Folder found: " + folder);
+      copyAssetFolder(getAssets(), folder, cache + "/" + folder);
     }
 
-    Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-      public void uncaughtException(Thread t, Throwable e) {
-        Log.e("Scopy-Crash", "Uncaught exception: ", e);
-        System.exit(1);
-      }
-    });
+//    System.out.println("Copy Files here:");
+//    for (File file : Objects.requireNonNull(new File(cache).listFiles())) {
+//      System.out.println("File found: " + file.getName());
+//      copyAssetFolder(getAssets(), file.getName(), cache + file.getName());
+//    }
 
-
+    // make a method to copy all files from Assets to Cache
+//    copyAssetFolder(getAssets(), "scopy-plugins", cache + "/scopy-plugins");
+//    copyAssetFolder(getAssets(), "style", cache + "/style");
+//    copyAssetFolder(getAssets(), "translations", cache + "/translations");
+//    copyAssetFolder(getAssets(), "decoders", cache + "/decoders");
+//    copyAssetFolder(getAssets(), "python3.11", cache + "/decoders");
+//      copyAsset(getAssets(), "scopy_emu_options_config.json", cache + "/scopy_emu_options_config.json");+
   }
 
   private boolean isInstalled() {
-    return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("installed", false);
+    //return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("installed", false);
+    return false;
   }
 
   private void setInstalled() {
