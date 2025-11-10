@@ -72,3 +72,5 @@ gui/include/gui/style_attributes.h
 *style_properties.h
 *style_attributes.h
 compile_commands.json
+android/.gradle
+android/assets
