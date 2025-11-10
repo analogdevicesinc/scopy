@@ -76,3 +76,5 @@ compile_commands.json
 .venv/*
 artifacts/*
 build-*
+android/.gradle
+android/assets
