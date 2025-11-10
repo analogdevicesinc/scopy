@@ -451,7 +451,7 @@ void ScopyMainWindow::setupPreferences()
 		m_glLoader = new QOpenGLWidget(this);
 	}
 	if(p->get("general_load_decoders").toBool()) {
-		// loadDecoders();
+		loadDecoders();
 	}
 	if(p->get("general_show_status_bar").toBool()) {
 		StatusBarManager::GetInstance()->setEnabled(true);
@@ -704,6 +704,8 @@ void ScopyMainWindow::loadDecoders()
 	QString path = QCoreApplication::applicationDirPath() + "/decoders";
 #elif defined(__appimage__)
 	QString path = QCoreApplication::applicationDirPath() + "/../lib/decoders";
+#elif __ANDROID__
+	QString path = qgetenv("SIGROKDECODE_DIR");
 #else
 	QString path = "decoders";
 #endif
@@ -715,7 +717,7 @@ void ScopyMainWindow::loadDecoders()
 	}
 
 	if(srd_init(path.toStdString().c_str()) != SRD_OK) {
-		qInfo(CAT_SCOPY) << "ERROR: libsigrokdecode init failed.";
+		qWarning(CAT_SCOPY) << "ERROR: libsigrokdecode init failed.";
 		success = false;
 	} else {
 		srd_loaded = true;
@@ -725,7 +727,7 @@ void ScopyMainWindow::loadDecoders()
 
 		if(decoder == nullptr) {
 			success = false;
-			qInfo(CAT_SCOPY) << "ERROR: libsigrokdecode load the protocol decoders failed.";
+			qWarning(CAT_SCOPY) << "ERROR: libsigrokdecode load the protocol decoders failed.";
 		}
 	}
 
