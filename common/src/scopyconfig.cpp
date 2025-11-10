@@ -28,6 +28,7 @@
 #include <QStandardPaths>
 #include <QSysInfo>
 #include <QUuid>
+#include <QDebug>
 
 QString scopy::config::tempLogFilePath() { return QDir::cleanPath(settingsFolderPath() + "/" + SCOPY_TEMP_LOG_FILE); }
 
@@ -52,10 +53,9 @@ QString scopy::config::defaultStyleFolderPath()
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/style";
 #elif __ANDROID__
-	return "assets:/style";
+	return qgetenv("APPDATA") + "/style";
 #endif
 	return SCOPY_STYLE_INSTALL_PATH;
-
 }
 
 QString scopy::config::localStyleFolderPath() { return SCOPY_STYLE_BUILD_PATH; }
