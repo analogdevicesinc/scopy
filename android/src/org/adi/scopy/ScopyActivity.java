@@ -22,7 +22,9 @@ package org.adi.scopy;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.qtproject.qt5.android.bindings.QtActivity;
+
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.content.Context;
@@ -44,6 +46,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
 import android.Manifest;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -52,63 +55,68 @@ import androidx.core.view.WindowInsetsControllerCompat;
 //import androidx.core.app.NotificationCompat;
 
 
-public class ScopyActivity extends QtActivity
-{
-	public static native void saveSessionJavaHelper();
-	public static native void saveAndStopRunningToolsJNI();
-	public static native void saveAndStopRunningInputToolsJNI();
-	public static native void restoreRunningToolsJNI();
-	public static native int nrOfToolsSavedJNI();
-	public static native int nrOfToolsRunningJNI();
-	public static native boolean hasCtxJNI();
-	private static final int SCOPY_WAKELOCK_NOTIFICATION_ID = 1;
-	private static final String SCOPY_NOTIFICATION_CHANNEL_ID = "scopy";
-	boolean initialized;
-	private WakeLock wakeLock;
+public class ScopyActivity extends QtActivity {
+  private static final int SCOPY_WAKELOCK_NOTIFICATION_ID = 1;
+  private static final String SCOPY_NOTIFICATION_CHANNEL_ID = "scopy";
+  boolean initialized;
+  private WakeLock wakeLock;
 
+  public static native void saveSessionJavaHelper();
 
-	private void createNotificationChannel() {
-	    // Create the NotificationChannel, but only on API 26+ because
-	    // the NotificationChannel class is new and not in the support library
+  public static native void saveAndStopRunningToolsJNI();
 
-	        CharSequence name = "Scopy notifications";
-		String description = "Various messages from Scopy";
-		int importance = NotificationManager.IMPORTANCE_DEFAULT;
-		NotificationChannel scopyNotificationChannel = new NotificationChannel(SCOPY_NOTIFICATION_CHANNEL_ID, name, importance);
-		scopyNotificationChannel.setDescription(description);
-		// Register the channel with the system; you can't change the importance
-		// or other notification behaviors after this
-		NotificationManager notificationManager = getSystemService(NotificationManager.class);
-		notificationManager.createNotificationChannel(scopyNotificationChannel);
+  public static native void saveAndStopRunningInputToolsJNI();
 
-	}
+  public static native void restoreRunningToolsJNI();
+
+  public static native int nrOfToolsSavedJNI();
+
+  public static native int nrOfToolsRunningJNI();
+
+  public static native boolean hasCtxJNI();
+
+  private void createNotificationChannel() {
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+
+    CharSequence name = "Scopy notifications";
+    String description = "Various messages from Scopy";
+    int importance = NotificationManager.IMPORTANCE_DEFAULT;
+    NotificationChannel scopyNotificationChannel = new NotificationChannel(SCOPY_NOTIFICATION_CHANNEL_ID, name, importance);
+    scopyNotificationChannel.setDescription(description);
+    // Register the channel with the system; you can't change the importance
+    // or other notification behaviors after this
+    NotificationManager notificationManager = getSystemService(NotificationManager.class);
+    notificationManager.createNotificationChannel(scopyNotificationChannel);
+
+  }
 
   public void createNotification(String message) {
-		NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
-		createNotificationChannel();
+    NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
+    createNotificationChannel();
 
-		Intent notificationIntent = new Intent(this, ScopyActivity.class);
-		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    Intent notificationIntent = new Intent(this, ScopyActivity.class);
+    notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-		PendingIntent openAppOnTapIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    PendingIntent openAppOnTapIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-		Notification notification = new Notification.Builder(this,SCOPY_NOTIFICATION_CHANNEL_ID)
-		        .setSmallIcon(R.drawable.icon)
-			.setContentText(message)
-			.setPriority(Notification.PRIORITY_DEFAULT)
-			.setContentIntent(openAppOnTapIntent)
-			.setOngoing(true)
-			.build();
+    Notification notification = new Notification.Builder(this, SCOPY_NOTIFICATION_CHANNEL_ID)
+      .setSmallIcon(R.drawable.icon)
+      .setContentText(message)
+      .setPriority(Notification.PRIORITY_DEFAULT)
+      .setContentIntent(openAppOnTapIntent)
+      .setOngoing(true)
+      .build();
 
-		notificationManager.notify(SCOPY_WAKELOCK_NOTIFICATION_ID, notification);
-	}
+    notificationManager.notify(SCOPY_WAKELOCK_NOTIFICATION_ID, notification);
+  }
 
-	private void hideBars(){
-		WindowInsetsControllerCompat windowInsetsController = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
-		windowInsetsController.setSystemBarsBehavior(
-			WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-		);
-		windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+  private void hideBars() {
+    WindowInsetsControllerCompat windowInsetsController = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+    windowInsetsController.setSystemBarsBehavior(
+      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    );
+    windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
   }
 
   private void requirePermissions() {
@@ -149,80 +157,79 @@ public class ScopyActivity extends QtActivity
   @Override
   protected void onStop() {
     System.out.println("-- ScopyActivity: onStop");
-		if (initialized) {
-			if (hasCtxJNI()) {
-				saveAndStopRunningInputToolsJNI();
-				if (nrOfToolsRunningJNI() != 0) {
-					System.out.println("-- Creating Notification");
-					wakeLock.acquire();
-					createNotification("Scopy is still running in the background. Device outputs are still enabled.");
-				}
-			}
-		}
-		super.onStop();
-	}
+    if (initialized) {
+      if (hasCtxJNI()) {
+        saveAndStopRunningInputToolsJNI();
+        if (nrOfToolsRunningJNI() != 0) {
+          System.out.println("-- Creating Notification");
+          wakeLock.acquire();
+          createNotification("Scopy is still running in the background. Device outputs are still enabled.");
+        }
+      }
+    }
+    super.onStop();
+  }
 
-        @Override
-	protected void onResume()
-	{
-		cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
-		if (wakeLock.isHeld()) {
-			wakeLock.release();
-		}
+  @Override
+  protected void onResume() {
+    cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
+    if (wakeLock.isHeld()) {
+      wakeLock.release();
+    }
 
-		super.onResume();
-	}
+    super.onResume();
+  }
 
-	protected void onPause(){
-		System.out.println("-- ScopyActivity: onPause - saving application state to ini file ");
-		if (initialized) {
-			saveSessionJavaHelper(); // actually save the data
-		}
+  protected void onPause() {
+    System.out.println("-- ScopyActivity: onPause - saving application state to ini file ");
+    if (initialized) {
+      saveSessionJavaHelper(); // actually save the data
+    }
 
-		super.onPause();
-	}
+    super.onPause();
+  }
 
-	protected void onDestroy(){
-		System.out.println("-- ScopyActivity: onDestroy ");
-		cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
-		if (wakeLock.isHeld()) {
-			wakeLock.release();
-		}
-		if(initialized) {
-			saveAndStopRunningToolsJNI();
-		}
+  protected void onDestroy() {
+    System.out.println("-- ScopyActivity: onDestroy ");
+    cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
+    if (wakeLock.isHeld()) {
+      wakeLock.release();
+    }
+    if (initialized) {
+      saveAndStopRunningToolsJNI();
+    }
 
-		super.onDestroy();
-	}
+    super.onDestroy();
+  }
 
-	public void restart() {
-		saveSessionJavaHelper();
-		System.out.println("-- ScopyActivity: Restarting ");
-		Context context = getApplicationContext();
-		PackageManager packageManager = context.getPackageManager();
-		Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
-		ComponentName componentName = intent.getComponent();
-		Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-		context.startActivity(mainIntent);
-		Runtime.getRuntime().exit(0);
-	}
+  public void restart() {
+    saveSessionJavaHelper();
+    System.out.println("-- ScopyActivity: Restarting ");
+    Context context = getApplicationContext();
+    PackageManager packageManager = context.getPackageManager();
+    Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+    ComponentName componentName = intent.getComponent();
+    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+    context.startActivity(mainIntent);
+    Runtime.getRuntime().exit(0);
+  }
 
-	public String getScaleFactor() {
-		initialized = true;
-		DisplayMetrics displayMetrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+  public String getScaleFactor() {
+    initialized = true;
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-		double scaleFactor = ((double)displayMetrics.widthPixels/displayMetrics.heightPixels)
-								/displayMetrics.scaledDensity;
-		String formattedScaleFactor = String.format("%.02f", scaleFactor);
-		System.out.println("-- ScopyActivity: scale factor is: " + formattedScaleFactor);
+    double scaleFactor = ((double) displayMetrics.widthPixels / displayMetrics.heightPixels)
+      / displayMetrics.scaledDensity;
+    String formattedScaleFactor = String.format("%.02f", scaleFactor);
+    System.out.println("-- ScopyActivity: scale factor is: " + formattedScaleFactor);
 
 
-		return formattedScaleFactor.replace(",",".");
-	}
+    return formattedScaleFactor.replace(",", ".");
+  }
 
-        private void cancelNotification(int id){
-		NotificationManager nMgr = (NotificationManager) this.getSystemService(NotificationManager.class);
-		nMgr.cancel(id);
-	}
+  private void cancelNotification(int id) {
+    NotificationManager nMgr = (NotificationManager) this.getSystemService(NotificationManager.class);
+    nMgr.cancel(id);
+  }
 }

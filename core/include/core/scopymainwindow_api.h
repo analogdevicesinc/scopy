@@ -69,6 +69,7 @@ public:
 	Q_INVOKABLE void restoreRunningTools();
 	Q_INVOKABLE bool loadSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 	Q_INVOKABLE bool saveSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
+	QStringList runningTools;
 
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);
@@ -76,7 +77,6 @@ private:
 	QStringList availablePlugins(QString param, QString cat, Device *dev);
 	Device *getDevice(int idx);
 	ScopyMainWindow *m_w;
-	QStringList runningTools;
 };
 
 } // namespace scopy

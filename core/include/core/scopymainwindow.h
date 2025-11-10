@@ -97,6 +97,7 @@ public Q_SLOTS:
 	void saveSession(QSettings &s);
 	void loadSession(QSettings &s);
 private:
+	static ScopyMainWindow *staticScopyMainWindow;
 	ScopyAboutPage *about;
 	ScopyPreferencesPage *prefPage;
 	PluginRepository *pr;
@@ -116,6 +117,9 @@ private:
 	QOpenGLWidget *m_glLoader;
 	ToolMenuManager *m_toolMenuManager;
 	ScanButtonController *m_sbc;
+#if __ANDROID__
+	QAndroidJniEnvironment *jnienv;
+#endif
 
 	void loadOpenGL();
 	void initPythonWIN32();

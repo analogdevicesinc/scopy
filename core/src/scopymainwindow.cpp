@@ -71,6 +71,8 @@ using namespace scopy::gui;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY, "Scopy")
 
+ScopyMainWindow *ScopyMainWindow::staticScopyMainWindow{nullptr};
+
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ScopyMainWindow)
@@ -79,6 +81,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	,jnienv(new QAndroidJniEnvironment())
 #endif
 {
+	staticScopyMainWindow=this;
+
 	QElapsedTimer timer;
 	timer.start();
 
@@ -709,12 +713,17 @@ void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)
 #ifdef __ANDROID__
 
 void ScopyMainWindow::saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/) {
-	qDebug()<<"-- Saving session JNI";
-	// ScopyMainWindow::saveSession();
+	qDebug(CAT_SCOPY)<<"-- Saving session JNI";
+	staticScopyMainWindow->save(scopy::config::preferencesFolderPath() + "/preferences.ini");
+	Preferences::GetInstance()->save();
+
 }
 
 void ScopyMainWindow::saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thiz*/) {
-	qDebug()<<"-- Saving and stopping input tools JNI";
+	qDebug(CAT_SCOPY)<<"-- Saving and stopping input tools JNI";
+	staticScopyMainWindow->api->saveRunningTools();
+	staticScopyMainWindow->api->runAllTools(false); //stop all tools
+
 	// ToolLauncher* tl = getToolLauncherInstance();
 	// if(tl)
 	// {
@@ -724,7 +733,7 @@ void ScopyMainWindow::saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thi
 }
 
 void ScopyMainWindow::saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
-	qDebug()<<"-- Saving and stopping tools JNI";
+	qDebug(CAT_SCOPY)<<"-- Saving and stopping tools JNI";
 	// ToolLauncher* tl = getToolLauncherInstance();
 	// if(tl)
 	// {
@@ -734,7 +743,9 @@ void ScopyMainWindow::saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) 
 }
 
 void ScopyMainWindow::restoreRunningToolsJNI(JNIEnv *env, QObject /*thiz*/) {
-	qDebug()<<"-- Saving and stopping tools JNI";
+	qDebug(CAT_SCOPY)<<"-- Saving and stopping tools JNI";
+	staticScopyMainWindow->api->restoreRunningTools();
+
 	// ToolLauncher* tl = getToolLauncherInstance();
 	// if(tl)
 	// {
@@ -743,32 +754,22 @@ void ScopyMainWindow::restoreRunningToolsJNI(JNIEnv *env, QObject /*thiz*/) {
 }
 
 int ScopyMainWindow::nrOfToolsSavedJNI(JNIEnv *env, jobject /*thiz*/) {
-	qDebug()<<"-- Getting number of stopped tools JNI";
-	// ToolLauncher* tl = getToolLauncherInstance();
-	// if(tl)
-	// {
-	// 	int val = getToolLauncherInstance()->running_tools.size();
-	// 	qDebug()<<"saved: "<<val;
-	// 	return val;
-	// }
-	return 0;
+	qDebug(CAT_SCOPY)<<"-- Getting number of stopped tools JNI";
+	int number = staticScopyMainWindow->api->runningTools.size();
+	qDebug(CAT_SCOPY)<<"Saved: "<<number<<"tools";
+	return number;
 }
 
 int ScopyMainWindow::nrOfToolsRunningJNI(JNIEnv *env, jobject /*thiz*/) {
-	qDebug()<<"-- Getting number of stopped tools JNI";
-	// ToolLauncher* tl = getToolLauncherInstance();
-	// if(tl)
-	// {
-	// 	int val = getToolLauncherInstance()->getRunningToolsCount();
-	// 	qDebug()<<"saved: "<<val;
-	// 	return val;
-	// }
-	return 0;
+	qDebug(CAT_SCOPY)<<"-- Getting number of stopped tools JNI";
+	int number = staticScopyMainWindow->api->getRunningTools().length();
+	qDebug(CAT_SCOPY)<<"Running tools: "<<number<<"tools";
+	return number;
 }
 
 bool ScopyMainWindow::hasCtxJNI(JNIEnv *env, jobject /*thiz*/)
 {
-	qDebug()<<"-- Getting number of stopped tools JNI";
+	qDebug(CAT_SCOPY)<<"-- Getting number of stopped tools JNI";
 	// ToolLauncher* tl = getToolLauncherInstance();
 	// if(tl)
 	// {
