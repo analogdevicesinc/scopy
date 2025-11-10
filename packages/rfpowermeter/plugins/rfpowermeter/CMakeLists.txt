@@ -81,7 +81,7 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CURRENT_PKG_PATH}/include)
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-core)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-core scopy-datalogger)
 target_include_directories(${PROJECT_NAME} PRIVATE ${IIO_INCLUDE_DIRS} scopy-gui scopy-iioutil)
 
 target_link_libraries(
@@ -94,6 +94,9 @@ target_link_libraries(
 	       scopy-core
 	       scopy-datalogger
 )
+
+# Set RPATH to find scopy-datalogger in generic-plugins directory
+set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/../../generic-plugins/plugins")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
