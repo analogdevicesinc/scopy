@@ -244,12 +244,24 @@ QString EmuWidget::findEmuPath()
 		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu path from preferences:" << emuPath;
 		return emuPath;
 	}
+
+	#ifdef  __ANDROID__
+	//Android: cache path + "iio-emu"
+	emuPath = qgetenv("IIOEMU_BIN");
+	qWarning(CAT_EMU_ADD_PAGE) << "try iio-emu path: " << emuPath;
+	if(!emuPath.isEmpty() && QFile::exists(emuPath)) {
+		qInfo() << "iio-emu path:" << emuPath;
+		return emuPath;
+	}
+	#endif
+
 	// Search iio-emu next to scopy executable.
 	emuPath = buildEmuPath(scopy::config::executableFolderPath());
 	if(!emuPath.isEmpty() && QFile::exists(emuPath)) {
 		qInfo(CAT_EMU_ADD_PAGE) << "iio-emu path:" << emuPath;
 		return emuPath;
 	}
+
 	// Search iio-emu in system.
 	emuPath = "iio-emu";
 	if(startIioEmuProcess(emuPath)) {
@@ -257,6 +269,7 @@ QString EmuWidget::findEmuPath()
 		return emuPath;
 	}
 
+	qWarning(CAT_EMU_ADD_PAGE)<<"Could not find iio-emu!";
 	return "";
 }
 
@@ -286,9 +299,20 @@ bool EmuWidget::startIioEmuProcess(QString processPath, QStringList arg)
 	m_emuProcess->start();
 
 	auto started = m_emuProcess->waitForStarted();
+
+	m_emuProcess->waitForBytesWritten();
+	m_emuProcess->waitForReadyRead();
+
+	qWarning(CAT_EMU_ADD_PAGE) << "Standard output :";
+	qWarning(CAT_EMU_ADD_PAGE) << m_emuProcess->readAllStandardOutput();
+	qWarning(CAT_EMU_ADD_PAGE) << "Standard error :";
+	qWarning(CAT_EMU_ADD_PAGE) << m_emuProcess->readAllStandardError();
+	qWarning(CAT_EMU_ADD_PAGE) << "gata";
+
 	if(!started) {
 		setStatusMessage("Server failed to start!");
-		qDebug(CAT_EMU_ADD_PAGE) << "Process failed to start";
+		qWarning(CAT_EMU_ADD_PAGE) << "Process failed to start";
+		qWarning(CAT_EMU_ADD_PAGE)<<m_emuProcess->error();
 	} else {
 		qDebug(CAT_EMU_ADD_PAGE) << "Process " << m_emuPath << "started";
 	}
