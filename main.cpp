@@ -70,23 +70,26 @@ void SetScopyQDebugMessagePattern()
 
 void initLogging()
 {
-	if(!getenv("QT_LOGGING_RULES")) {
-		QLoggingCategory::setFilterRules(""
-						 "*.debug=false\n"
-						 "ToolStack.debug=true\n"
-						 "ToolManager.debug=true\n"
-						 "DeviceManager.debug=true\n"
-						 "Device.debug=true\n"
-						 "TestPlugin.debug=true\n"
-						 "Plugin.debug=true\n"
-						 "swiotConfig.debug=true\n"
-						 "CyclicalTask.debug=false\n"
-						 "SWIOTPlugin.debug=true\n"
-						 "AD74413R.debug=true\n"
-						 "ScopyTranslations.debug=true\n"
-						 "GRTimeSinkComponent.debug=true\n"
-						 "GRManager.debug=true\n");
-	}
+	QLoggingCategory::setFilterRules(""
+					 "*.debug=false\n"
+					 "CyclicalTask.debug=false\n"
+					 "ToolStack.debug=true\n"
+					 "ToolManager.debug=true\n"
+					 "DeviceManager.debug=true\n"
+					 "Device.debug=true\n"
+					 "Plugin.debug=true\n"
+					 "PluginManager.debug=true\n"
+					 "PluginRepository.debug=true\n"
+					 "Scopy_API.debug=true\n"
+					 "RuntimeEnvironmentInfo.debug=true\n"
+					 "Style.debug=true\n"
+					 "EmuAddPage.debug=true\n"
+					 "Scopy.debug=true\n"
+					 "ScopyPreferencesPage.debug=true\n");
+
+
+
+
 	if(!getenv("QT_MESSAGE_PATTERN")) {
 		SetScopyQDebugMessagePattern();
 	}
@@ -97,6 +100,14 @@ void printRuntimeEnvironmentInfo()
 	QStringList infoList = scopy::config::dump().split("\n");
 	for(const QString &info : infoList) {
 		qInfo(CAT_RUNTIME_ENVIRONMENT_INFO) << info;
+	}
+}
+
+void printEnv()
+{
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	for (const QString &key: env.keys()) {
+		qDebug() << "-=-" << key <<"  "<< env.value(key);
 	}
 }
 
@@ -138,6 +149,8 @@ int main(int argc, char *argv[])
 	QCoreApplication::setApplicationName("Scopy-v2");
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
+	printRuntimeEnvironmentInfo();
+	printEnv();
 	initLogging();
 	CrashReport::initSignalHandler();
 
@@ -178,14 +191,13 @@ int main(int argc, char *argv[])
 	});
 
 	parser.process(a);
-	CmdLineHandler::withLogFileOption(parser);
-
-	printRuntimeEnvironmentInfo();
+	// CmdLineHandler::withLogFileOption(parser);
 	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
 	scopy::initDockWidgets();
 	ScopyMainWindow w;
 	w.show();
+
 
 	ScopyMainWindow_API scopyApi(&w);
 	int retHandler = CmdLineHandler::handle(parser, scopyApi);
