@@ -100,6 +100,37 @@ void printRuntimeEnvironmentInfo()
 	}
 }
 
+#ifdef __ANDROID__
+void reqPermissions()
+{
+	const QVector<QString> Permissions({"android.permission.CLEAR_APP_USER_DATA",
+					    "android.permission.CLEAR_APP_CACHE",
+					    "android.permission.READ_EXTERNAL_STORAGE",
+					    "android.permission.WRITE_EXTERNAL_STORAGE",
+					    "android.permission.DELETE_CACHE_FILES",
+					    "android.permission.ACCESS_NETWORK_STATE",
+					    "android.permission.INTERNET",
+					    "android.permission.WAKE_LOCK",
+					    "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"});
+
+	for (const QString &Permission : Permissions) {
+		switch(QtAndroid::checkPermission(Permission)) {
+		case QtAndroid::PermissionResult::Denied: {
+			qDebug() << Permission + " requested";
+			QtAndroid::requestPermissionsSync(QStringList({Permission}));
+			switch(QtAndroid::checkPermission(Permission)) {
+			case QtAndroid::PermissionResult::Denied: qDebug() << Permission + " denied"; break;
+			case QtAndroid::PermissionResult::Granted: qDebug() << Permission + " already granted"; break;
+			}
+			break;
+		}
+		case QtAndroid::PermissionResult::Granted: qDebug() << Permission + " already granted"; break;
+		}
+	}
+
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	QCoreApplication::setOrganizationName("ADI");
