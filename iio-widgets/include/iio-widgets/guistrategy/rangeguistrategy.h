@@ -76,6 +76,8 @@ private:
 
 	QWidget *m_ui;
 	gui::MenuSpinbox *m_spinBox;
+	double m_pendingValue;
+	bool m_hasPendingValue;
 };
 } // namespace scopy
 
