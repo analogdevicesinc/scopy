@@ -1,0 +1,13 @@
+{
+    "id": "adrv9009",
+    "title": "ADRV9009 Package",
+    "version": "@PROJECT_VERSION@",
+    "description": "ADRV9009 RF Transceiver control package for Scopy",
+    "license": "GPL-3.0",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio"]
+  }
+  
