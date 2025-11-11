@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The ADRV9002 (Jupiter) plugin provides a comprehensive interface for controlling and configuring the ADRV9002 dual-channel RF transceiver. This plugin enables users to manage both receive and transmit signal paths, configure device settings, and control FPGA-based signal generation features. The ADRV9002 is a dual-channel RF transceiver designed for software-defined radio applications with wide bandwidth and high performance." name="description" />
+
+    <title>ADRV9002 (Jupiter) Plugin &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=31a9e0ba" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
+    <script async="async" src="../../_static/app.umd.js?v=3a4867e9"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="JESD Status" href="../jesdstatus/index.html" />
+    <link rel="prev" title="AD9084" href="../ad9084/ad9084.html" />
+   
+  
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">ADRV9002 (Jupiter) Plugin</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#compatible-devices">Compatible Devices</a></li>
+<li><a class="reference internal" href="#device-global-settings">Device Global Settings</a></li>
+<li><a class="reference internal" href="#receive-chain-configuration">Receive Chain Configuration</a></li>
+<li><a class="reference internal" href="#transmit-chain-configuration">Transmit Chain Configuration</a></li>
+<li><a class="reference internal" href="#profile-generator">Profile Generator</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img src="../../_static/logo.svg"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/fmcomms5.html">FMCOMMS5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/fmcomms5_advanced.html">FMCOMMS5 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/scripting.html">Scripting Tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/scripting.html#supported-commands">Supported Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/package_generator.html">Package Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/plugin_developer_guide.html">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-9" id="toctree-collapse-4-1-9"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/jesd/index.html">JESD STATUS</a><label for="toctree-collapse-4-1-9"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/jesd/jesd_status_tests.html">JESD STATUS Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-10" id="toctree-collapse-4-1-10"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/ad936x/index.html">AD936X</a><label for="toctree-collapse-4-1-10"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/ad936x/ad936x_tests.html">AD936x Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-11" id="toctree-collapse-4-1-11"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/ad9084/index.html">AD9084</a><label for="toctree-collapse-4-1-11"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/fmcomms5/index.html">FMCOMMS5</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/fmcomms5/fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-13" id="toctree-collapse-4-1-13"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adrv9002/index.html">ADRV9002 (Jupiter)</a><label for="toctree-collapse-4-1-13"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9002/adrv9002_tests.html">ADRV9002 (Jupiter) Plugin - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9002/profile_generator_tests.html">ADRV9002 Profile Generator - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/package_manager_tests.html">Package Manager - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/scripting_tool.html">Scripting Tool - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="adrv9002-jupiter-plugin">
+<span id="adrv9002"></span><h1>ADRV9002 (Jupiter) Plugin<a class="headerlink" href="#adrv9002-jupiter-plugin" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>The ADRV9002 (Jupiter) plugin provides a comprehensive interface for controlling and
+configuring the ADRV9002 dual-channel RF transceiver. This plugin enables users to
+manage both receive and transmit signal paths, configure device settings, and control
+FPGA-based signal generation features. The ADRV9002 is a dual-channel RF transceiver
+designed for software-defined radio applications with wide bandwidth and high performance.</p>
+<p>The plugin is organized into four main sections providing complete control over the device
+functionality:</p>
+<ul class="simple">
+<li><p><strong>Device Global Settings</strong> - System-wide configuration and status monitoring</p></li>
+<li><p><strong>Receive Chain</strong> - RX channel configuration and signal path control</p></li>
+<li><p><strong>Transmit Chain</strong> - TX channel configuration and signal path control</p></li>
+<li><p><strong>Profile Generator</strong> - Integrated tools for creating and managing device profiles</p></li>
+</ul>
+</section>
+<section id="compatible-devices">
+<h2>Compatible Devices<a class="headerlink" href="#compatible-devices" title="Link to this heading"></a></h2>
+<p>The ADRV9002 plugin is compatible with:</p>
+<ul class="simple">
+<li><p>ADRV9002 dual-channel RF transceiver platforms</p></li>
+<li><p>Systems implementing the ADRV9002 IIO driver interface</p></li>
+<li><p>Hardware platforms with ADRV9002 integrated designs</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This plugin requires a compatible IIO context with ADRV9002 device support. Ensure that
+the appropriate device drivers are installed and the hardware is properly connected.</p>
+</div>
+</section>
+<section id="device-global-settings">
+<h2>Device Global Settings<a class="headerlink" href="#device-global-settings" title="Link to this heading"></a></h2>
+<p>The Device Global Settings section provides system-wide controls and monitoring capabilities:</p>
+<dl>
+<dt><strong>Profile Configuration</strong></dt><dd><p>Allows loading of profile configurations from external files. Profiles define the operational
+parameters including sampling rates, bandwidths, and signal path configurations.</p>
+<ul class="simple">
+<li><p><strong>Load Profile</strong>: Browse and select profile configuration files</p></li>
+<li><p><strong>Profile Status</strong>: Displays current profile information</p></li>
+</ul>
+<p>For detailed information about profiles, see the <a class="icon link reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/adrv9002#profiles" target="_blank">ADRV9002 Driver Documentation</a>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The plugin includes an integrated <strong>Profile Generator</strong> tab for creating profiles. This feature
+requires the external libadrv9002-iio library to be installed.</p>
+</div>
+<dl class="simple">
+<dt><strong>Temperature Monitoring</strong></dt><dd><p>Reports the current device temperature for thermal monitoring and protection.</p>
+<ul class="simple">
+<li><p><strong>Temperature Display</strong>: Real-time device temperature in degrees Celsius</p></li>
+<li><p><strong>Temperature Status</strong>: Indicates normal operation or thermal warnings</p></li>
+</ul>
+</dd>
+<dt><strong>Device Information</strong></dt><dd><p>Displays device identification and version information:</p>
+<ul class="simple">
+<li><p><strong>Device Driver Version</strong>: Current driver version information</p></li>
+<li><p><strong>Hardware Revision</strong>: Device hardware revision details</p></li>
+<li><p><strong>Firmware Version</strong>: Loaded firmware version</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="receive-chain-configuration">
+<h2>Receive Chain Configuration<a class="headerlink" href="#receive-chain-configuration" title="Link to this heading"></a></h2>
+<p>The Receive Chain section provides comprehensive control over the RX signal path for both channels:</p>
+<p><strong>Signal Path Parameters</strong></p>
+<dl class="simple">
+<dt><strong>RF Bandwidth (MHz)</strong></dt><dd><p>Displays the Primary Signal Bandwidth of the currently loaded profile. This parameter defines
+the usable signal bandwidth for the receive path.</p>
+</dd>
+<dt><strong>Sampling Rate (MSPS)</strong></dt><dd><p>Shows the RX Sample Rate configured in the current profile. This determines the digital sampling
+frequency for received signals.</p>
+</dd>
+</dl>
+<p><strong>Gain Control Settings</strong></p>
+<dl class="simple">
+<dt><strong>Gain Control Mode</strong></dt><dd><p>Selects the gain control mechanism:</p>
+<ul class="simple">
+<li><p><strong>SPI</strong>: Manual gain control via software interface</p></li>
+<li><p><strong>PIN</strong>: Hardware pin-controlled gain adjustment</p></li>
+<li><p><strong>Automatic</strong>: Automatic gain control (AGC) mode</p></li>
+</ul>
+</dd>
+<dt><strong>Hardware Gain (dB)</strong></dt><dd><p>Controls the RX gain when in SPI or PIN mode. This setting adjusts the analog gain in the receive signal path.</p>
+</dd>
+</dl>
+<p><strong>Signal Monitoring</strong></p>
+<dl class="simple">
+<dt><strong>RSSI (dB)</strong></dt><dd><p>Displays the Received Signal Strength Indicator, providing real-time measurement of input signal level.</p>
+</dd>
+<dt><strong>Decimated Power (dB)</strong></dt><dd><p>Shows the decimated power measurement, useful for signal analysis and monitoring.</p>
+</dd>
+</dl>
+<p><strong>Frequency Control</strong></p>
+<dl class="simple">
+<dt><strong>NCO (Hz)</strong></dt><dd><p>Controls the Numerically Controlled Oscillator for frequency offset correction. This setting is only
+available if the loaded profile supports NCO correction.</p>
+</dd>
+<dt><strong>Local Oscillator (MHz)</strong></dt><dd><p>Controls the carrier frequency for the receive chain. This sets the center frequency for signal reception.</p>
+</dd>
+</dl>
+<p><strong>Channel Control</strong></p>
+<dl class="simple">
+<dt><strong>Powerdown</strong></dt><dd><p>Disables the selected channel completely, stopping all signal processing and reducing power consumption.</p>
+</dd>
+<dt><strong>Dynamic ADC Switch</strong></dt><dd><p>Enables dynamic ADC switching functionality for optimized power management and performance.</p>
+</dd>
+<dt><strong>ENSM (Enable State Machine)</strong></dt><dd><p>Selects the operational mode for the Enable State Machine:</p>
+<ul class="simple">
+<li><p><strong>Calibrated</strong>: Normal operation with calibrations enabled</p></li>
+<li><p><strong>Primed</strong>: Standby mode ready for quick activation</p></li>
+<li><p><strong>RF Enabled</strong>: Full RF operation mode</p></li>
+</ul>
+</dd>
+<dt><strong>Port Enable</strong></dt><dd><p>Configures how the port can be enabled:</p>
+<ul class="simple">
+<li><p><strong>SPI</strong>: Software-controlled port enable</p></li>
+<li><p><strong>PIN</strong>: Hardware pin-controlled port enable</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Digital Signal Processing</strong></p>
+<dl class="simple">
+<dt><strong>Digital Gain Control</strong></dt><dd><p>Selects the digital gain control mode for fine-tuning signal levels in the digital domain.</p>
+</dd>
+<dt><strong>Interface Gain (dB)</strong></dt><dd><p>Controls the Slicer block gain for digital signal processing optimization.</p>
+</dd>
+<dt><strong>Tracking Calibrations</strong></dt><dd><p>Enable/disable various tracking calibration algorithms:</p>
+<ul class="simple">
+<li><p><strong>Quadrature FIC</strong>: Quadrature frequency image correction</p></li>
+<li><p><strong>BBDC Rejection</strong>: Baseband DC offset rejection</p></li>
+<li><p><strong>HD2</strong>: Second harmonic distortion correction</p></li>
+<li><p><strong>AGC</strong>: Automatic gain control calibration</p></li>
+<li><p><strong>Quadrature Poly</strong>: Quadrature polynomial correction</p></li>
+<li><p><strong>RSSI</strong>: RSSI calibration</p></li>
+<li><p><strong>RDFC</strong>: Receive data formatting correction</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="transmit-chain-configuration">
+<h2>Transmit Chain Configuration<a class="headerlink" href="#transmit-chain-configuration" title="Link to this heading"></a></h2>
+<p>The Transmit Chain section provides control over the TX signal path for both channels:</p>
+<p><strong>Signal Path Parameters</strong></p>
+<dl class="simple">
+<dt><strong>RF Bandwidth (MHz)</strong></dt><dd><p>Displays the Primary Signal Bandwidth for the transmit path as defined in the current profile.</p>
+</dd>
+<dt><strong>Sampling Rate (MSPS)</strong></dt><dd><p>Shows the TX Sample Rate configured in the current profile, determining the digital sampling
+frequency for transmitted signals.</p>
+</dd>
+</dl>
+<p><strong>Power Control</strong></p>
+<dl class="simple">
+<dt><strong>Attenuation (dB)</strong></dt><dd><p>Controls the TX output power attenuation. Higher values reduce output power.</p>
+</dd>
+<dt><strong>Attenuation Control Mode</strong></dt><dd><p>Selects the attenuation control mechanism:</p>
+<ul class="simple">
+<li><p><strong>SPI</strong>: Software-controlled attenuation</p></li>
+<li><p><strong>PIN</strong>: Hardware pin-controlled attenuation</p></li>
+<li><p><strong>Bypass</strong>: Bypass attenuation control</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Channel Control</strong></p>
+<dl class="simple">
+<dt><strong>ENSM (Enable State Machine)</strong></dt><dd><p>Configures the transmit channel operational mode similar to the receive chain.</p>
+</dd>
+<dt><strong>Port Enable</strong></dt><dd><p>Selects port enable control method (SPI or PIN) for the transmit channel.</p>
+</dd>
+<dt><strong>Powerdown</strong></dt><dd><p>Disables the transmit channel, stopping signal transmission and reducing power consumption.</p>
+</dd>
+</dl>
+<p><strong>Frequency Control</strong></p>
+<dl class="simple">
+<dt><strong>NCO (Hz)</strong></dt><dd><p>Controls frequency offset correction for the transmit path when supported by the loaded profile.</p>
+</dd>
+<dt><strong>Local Oscillator (MHz)</strong></dt><dd><p>Sets the carrier frequency for signal transmission.</p>
+</dd>
+<dt><strong>Tracking Calibrations</strong></dt><dd><p>Enable/disable transmit-specific calibration algorithms:</p>
+<ul class="simple">
+<li><p><strong>Quadrature</strong>: Quadrature correction for TX path</p></li>
+<li><p><strong>PA Correction</strong>: Power amplifier linearity correction</p></li>
+<li><p><strong>LO Leakage</strong>: Local oscillator leakage correction</p></li>
+<li><p><strong>Close Loop Gain</strong>: Closed-loop gain calibration</p></li>
+<li><p><strong>Loopback Delay</strong>: Loopback delay calibration</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="profile-generator">
+<h2>Profile Generator<a class="headerlink" href="#profile-generator" title="Link to this heading"></a></h2>
+<p>The ADRV9002 plugin includes an integrated <strong>Profile Generator</strong> tab that provides
+a graphical interface for creating and managing ADRV9002 device profiles. This
+functionality requires an external dependency to be installed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The Profile Generator functionality requires the <strong>libadrv9002-iio</strong> library to be
+installed. If this external tool is missing, the Profile Generator functionality will
+be disabled. The library can be obtained from: <a class="icon link reference external" href="https://analogdevicesinc.github.io/libadrv9002-iio" target="_blank">https://analogdevicesinc.github.io/libadrv9002-iio</a></p>
+</div>
+<p><strong>Profile Generator Interface</strong></p>
+<p>The Profile Generator tab is accessible through the main plugin interface and provides
+the following sections:</p>
+<dl class="simple">
+<dt><strong>Profile Generator CLI Detection</strong></dt><dd><p>Displays the status of the external profile generator tool:</p>
+</dd>
+<dt><strong>Profile Actions</strong></dt><dd><ul class="simple">
+<li><p><strong>Preset Dropdown</strong>: Select from predefined profile templates (“LTE” or “Live Device”)</p></li>
+<li><p><strong>Refresh Button</strong>: Reload available presets and update the interface</p></li>
+<li><p><strong>Save Stream to file</strong>: Export the generated stream configuration to a file</p></li>
+<li><p><strong>Save Profile to file</strong>: Export the profile configuration to a file</p></li>
+<li><p><strong>Load to device</strong>: Apply the current profile configuration to the connected ADRV9002 device</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Radio Configuration</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>SSI Interface</strong>: Show the Serial Synchronous Interface type (LVDS/CMOS)</p></li>
+<li><p><strong>Duplex mode</strong>: Choose between TDD (Time Division Duplex) and FDD (Frequency Division Duplex)</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt><strong>Channel Configuration</strong></dt><dd><p>The interface provides separate configuration sections for each channel:</p>
+</dd>
+<dt><strong>RX Channels (RX 1 / RX 2)</strong></dt><dd><p>For each receive channel, the following options are available:</p>
+<ul class="simple">
+<li><p><strong>Enabled</strong>: Checkbox to enable/disable the RX channel</p></li>
+<li><p><strong>Frequency Offset Correction</strong>: Enable frequency offset correction capability</p></li>
+<li><p><strong>Bandwidth (Hz)</strong>: Set the channel bandwidth (e.g., 38000000)</p></li>
+<li><p><strong>Interface Sample Rate (Hz)</strong>: Configure the sample rate (e.g., 61440000)</p></li>
+<li><p><strong>RX RF Input</strong>: Select the RF input path (RxA/RxB)</p></li>
+</ul>
+</dd>
+<dt><strong>TX Channels (TX 1 / TX 2)</strong></dt><dd><p>For each transmit channel, the following options are available:</p>
+<ul class="simple">
+<li><p><strong>Enabled</strong>: Checkbox to enable/disable the TX channel</p></li>
+<li><p><strong>Frequency Offset Correction</strong>: Enable frequency offset correction capability</p></li>
+<li><p><strong>Bandwidth (Hz)</strong>: Set the channel bandwidth (e.g., 38000000)</p></li>
+<li><p><strong>Interface Sample Rate (Hz)</strong>: Configure the sample rate (e.g., 61440000)</p></li>
+</ul>
+</dd>
+<dt><strong>ORX Configuration</strong></dt><dd><p>Observation Receiver channels for monitoring and calibration</p>
+</dd>
+<dt><strong>Debug Information</strong></dt><dd><p>Displays the JSON configuration being generated:</p>
+<ul class="simple">
+<li><p><strong>Configuration Preview</strong>: Shows the profile configuration in JSON format</p></li>
+<li><p><strong>Real-time Updates</strong>: Updates automatically as parameters are changed</p></li>
+<li><p><strong>Technical Details</strong>: Displays low-level configuration parameters</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>External Tool Dependency</strong></p>
+<p>The Profile Generator relies on the <strong>libadrv9002-iio</strong> library:</p>
+<ul class="simple">
+<li><p><strong>Installation Required</strong>: Must be installed separately from Scopy</p></li>
+<li><p><strong>Version Compatibility</strong>: Different versions support different ADRV9002 API versions</p></li>
+<li><p><strong>CLI Integration</strong>: Scopy interfaces with the command-line tool provided by the library</p></li>
+<li><p><strong>Automatic Detection</strong>: Scopy automatically detects if the tool is available</p></li>
+</ul>
+<p><strong>Supported API Versions</strong></p>
+<p>The external tool supports multiple ADRV9002 API versions:</p>
+<ul class="simple">
+<li><p><strong>v68.8.1 (v0.24)</strong>: Supported in libadrv9002-iio v0.1.0 and v0.2.0</p></li>
+<li><p><strong>v68.10.1 (v0.25)</strong>: Supported in libadrv9002-iio v0.2.0 and later</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the Profile Generator tab appears grayed out or disabled, check that the libadrv9002-iio
+library is properly installed and accessible in the system PATH.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Profile configurations are device-specific and must match the connected ADRV9002 hardware
+capabilities. Invalid configurations will be rejected when loaded to the device.</p>
+</div>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../ad9084/ad9084.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD9084</a>
+    <a href="../jesdstatus/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">JESD Status</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
