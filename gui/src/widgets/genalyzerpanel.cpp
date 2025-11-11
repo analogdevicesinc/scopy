@@ -20,9 +20,7 @@
  */
 
 #include "genalyzerpanel.h"
-#include <iostream>
 #include <style.h>
-#include <QScrollArea>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QSpacerItem>
@@ -104,11 +102,11 @@ QString GenalyzerChannelDisplay::formatResultsText(size_t results_size, char **r
 GenalyzerPanel::GenalyzerPanel(QWidget *parent)
 	: QWidget(parent)
 {
-	panelLayout = new QVBoxLayout(this);
-	setLayout(panelLayout);
-	panelLayout->setMargin(6);
-	panelLayout->setSpacing(6);
-	panelLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+	m_panelLayout = new QVBoxLayout(this);
+	setLayout(m_panelLayout);
+	m_panelLayout->setMargin(6);
+	m_panelLayout->setSpacing(6);
+	m_panelLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 	setFixedWidth(250); // Fixed width for right panel
@@ -127,7 +125,7 @@ GenalyzerChannelDisplay *GenalyzerPanel::findOrCreateChannelDisplay(const QStrin
 	// Create new display for this channel
 	GenalyzerChannelDisplay *display = new GenalyzerChannelDisplay(channelName, channelColor, this);
 	m_channelDisplays[channelName] = display;
-	panelLayout->addWidget(display);
+	m_panelLayout->addWidget(display);
 
 	return display;
 }
@@ -146,7 +144,7 @@ void GenalyzerPanel::clearChannel(const QString &channelName)
 {
 	if(m_channelDisplays.contains(channelName)) {
 		GenalyzerChannelDisplay *display = m_channelDisplays.take(channelName);
-		panelLayout->removeWidget(display);
+		m_panelLayout->removeWidget(display);
 		display->deleteLater();
 	}
 }

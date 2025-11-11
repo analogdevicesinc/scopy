@@ -24,7 +24,6 @@
 
 #include "scopy-gui_export.h"
 #include "utils.h"
-#include "measurementpanel.h"
 
 #include <QGridLayout>
 #include <QScrollBar>
@@ -72,9 +71,8 @@ public Q_SLOTS:
 private:
 	GenalyzerChannelDisplay *findOrCreateChannelDisplay(const QString &channelName, QColor channelColor);
 
-	QVBoxLayout *panelLayout;
+	QVBoxLayout *m_panelLayout;
 	QMap<QString, GenalyzerChannelDisplay *> m_channelDisplays;
-	QScrollArea *scrollArea;
 	QWidget *m_panel;
 };
 

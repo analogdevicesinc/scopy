@@ -33,7 +33,6 @@ class SCOPY_GR_UTIL_EXPORT genalyzer_fft_vii_impl : public genalyzer_fft_vii
 private:
 	size_t d_npts;
 	int d_qres;
-	// Removed d_nrbits since scaling is handled externally now
 	size_t d_navg;
 	size_t d_nfft;
 	GnWindow d_win;

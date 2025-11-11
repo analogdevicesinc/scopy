@@ -162,7 +162,6 @@ void GRFFTComplexProc::setNavg(int navg)
 	if(genalyzer_fft) {
 		genalyzer_fft->set_navg(navg);
 	}
-	// No need to rebuild blocks - averaging is handled internally in genalyzer
 }
 
 gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
