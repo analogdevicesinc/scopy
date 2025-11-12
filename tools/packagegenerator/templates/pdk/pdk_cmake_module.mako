@@ -6,7 +6,7 @@ function(inlcude_dirs root_dir)
 	foreach(item ${"${all_items}"})
 		# Check if the item is a directory
 		if(IS_DIRECTORY ${"${item}"})
-			message(${"${item}"})
+			message(STATUS ${"${item}"})
 			target_include_directories(${"${PROJECT_NAME}"} PRIVATE ${"${item}"})
 		endif()
 	endforeach()
@@ -19,7 +19,7 @@ function(link_libs root_dir)
 	# Loop through each library found
 	foreach(lib ${"${all_libs}"})
 		# Link libraries
-		message(${"${lib}"})
+		message(STATUS ${"${lib}"})
 		target_link_libraries(${"${PROJECT_NAME}"} PRIVATE ${"${lib}"})
 	endforeach()
 endfunction()

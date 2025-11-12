@@ -22,8 +22,6 @@ cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE swiot)
 
-message(STATUS "building plugin: " ${SCOPY_MODULE})
-
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 set(PLUGIN_DISPLAY_NAME "AD-SWIOT1L-SL")

@@ -113,7 +113,7 @@ find_package(KDDockWidgets QUIET)
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
-message(STATUS "Building " ${PROJECT_NAME})
+message(STATUS "Building: " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(

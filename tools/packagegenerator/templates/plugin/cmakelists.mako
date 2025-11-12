@@ -6,8 +6,6 @@ cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE ${scopy_module})
 
-message(STATUS "building plugin: " ${"${SCOPY_MODULE}"})
-
 project(scopy-${"${SCOPY_MODULE}"} VERSION 0.1 LANGUAGES CXX) 
 
 set(PLUGIN_DISPLAY_NAME ${plugin_display_name.upper()})
@@ -58,7 +56,7 @@ generate_export_header(
 )
 
 %if not pdk_en and (style_qss or style_json):  
-message("Generate plugin style:")
+message(STATUS "Generate plugin style:")
 include(ScopyStyle)
 %if style_qss:
 file(MAKE_DIRECTORY ${"${SCOPY_PACKAGE_BUILD_PATH}"}/${"${PACKAGE_NAME}"}/style/qss)

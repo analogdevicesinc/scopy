@@ -110,7 +110,7 @@ function(configure_about ABOUT_RESOURCES_DIR)
 		set(BUILD_INFO ${BUILD_INFO}job_link:\ ${CI_JOB_LINK}\n)
 
 		if(EXISTS ${CMAKE_SOURCE_DIR}/build-status)
-			message("build-status found in ${CMAKE_SOURCE_DIR}.. populating")
+			message(STATUS "build-status found in ${CMAKE_SOURCE_DIR}.. populating")
 			file(READ ${CMAKE_SOURCE_DIR}/build-status SCOPY_BUILD_STATUS_INFO)
 		endif()
 	else()
@@ -144,6 +144,6 @@ function(configure_about ABOUT_RESOURCES_DIR)
 	endforeach()
 
 	configure_file(${ABOUT_RESOURCES_DIR}/aboutpage.qrc.cmakein ${ABOUT_RESOURCES_TARGET_DIR}/aboutpage.qrc @ONLY)
-	message(STATUS "built about page in - " ${ABOUT_RESOURCES_TARGET_DIR}/aboutpage.qrc)
+	message(STATUS "Built about page in - " ${ABOUT_RESOURCES_TARGET_DIR}/aboutpage.qrc)
 
 endfunction()

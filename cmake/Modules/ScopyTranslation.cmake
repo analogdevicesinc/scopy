@@ -30,7 +30,6 @@ function(generate_translations OUTPUT_LOC)
 	)
 	qt_add_translation(QM_FILES ${TS_FILES})
 
-	message("Translations QM: " ${QM_FILES})
 	set(TRANSLATIONS)
 	foreach(file ${TS_FILES})
 		get_filename_component(file_name ${file} NAME_WE)

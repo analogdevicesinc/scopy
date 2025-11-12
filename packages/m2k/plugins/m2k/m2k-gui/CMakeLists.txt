@@ -80,7 +80,7 @@ else()
 		      /opt/local/lib64
 		      REQUIRED
 	)
-	message("QWT LIBRARIES: " ${QWT_LIBRARIES})
+	message(STATUS "QWT LIBRARIES: " ${QWT_LIBRARIES})
 
 endif()
 
