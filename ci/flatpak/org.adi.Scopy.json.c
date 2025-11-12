@@ -531,6 +531,23 @@
 			]
 		},
 		{
+			"name": "genalyzer",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DBUILD_TESTING=OFF",
+				"-DBUILD_SHARED_LIBS=ON"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/andrei47w/genalyzer.git",
+					"branch": "main"
+				}
+			]
+		},
+		{
 			"name": "iio-emu",
 			"builddir": true,
 			"buildsystem": "cmake",

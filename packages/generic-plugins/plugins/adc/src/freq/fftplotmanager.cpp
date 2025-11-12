@@ -21,6 +21,7 @@
 
 #include "fftplotmanager.h"
 #include <plotaxis.h>
+#include "grfftchannelcomponent.h"
 #include "plotnavigator.hpp"
 #include <gui/plotmanagercombobox.h>
 #include <freq/fftplotcomponentchannel.h>
@@ -97,6 +98,8 @@ void FFTPlotManager::enableMeasurementPanel(bool)
 	// TODO: Remove this whole function once the measurements for fft
 	// are implemented. This is just a placeholder.
 }
+
+void FFTPlotManager::enableGenalyzerPanel(bool b) { m_genalyzerPanel->setVisible(b); }
 
 void FFTPlotManager::multiPlotUpdate()
 {

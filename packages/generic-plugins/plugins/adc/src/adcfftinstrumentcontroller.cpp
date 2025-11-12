@@ -74,7 +74,7 @@ void ADCFFTInstrumentController::init()
 	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_ui->getHoverMenuBtnGroup(),
 						  m_plotComponentManager, this);
 	m_measureComponent->measureSettings()->getMeasureSection()->setVisible(false);
-	// m_measureComponent->addPlotComponent(m_plotComponentManager);
+	m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(false);
 
 	addComponent(m_measureComponent);
 
@@ -260,6 +260,27 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
 		Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
 	});
+
+	connect(c, &GRFFTChannelComponent::genalyzerDataUpdated, m_plotComponentManager->genalyzerPanel(),
+		&GenalyzerPanel::updateResults);
+
+	// Connect channel enable/disable signals to update genalyzer panel visibility
+	connect(c, &GRFFTChannelComponent::genalyzerChannelEnabled, m_plotComponentManager->genalyzerPanel(),
+		[=](const QString &channelName) {
+			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, true);
+		});
+	connect(c, &GRFFTChannelComponent::genalyzerChannelDisabled, m_plotComponentManager->genalyzerPanel(),
+		[=](const QString &channelName) {
+			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, false);
+		});
+
+	connect(c->chData(), &ChannelData::newData, this,
+		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
+			if(m_ui->m_complex->isChecked() && m_measureComponent->measureSettings()->genalyzerEnabled() &&
+			   m_plotComponentManager->genalyzerPanel()->isVisible()) {
+				c->triggerGenalyzerAnalysis();
+			}
+		});
 }
 
 void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
@@ -287,13 +308,28 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
 		&FFTPlotManagerSettings::setComplexMode);
 	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
-		if(m_ui->m_complex->isChecked()) {
+		bool isComplex = m_ui->m_complex->isChecked();
+		if(isComplex) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
+
+			// Show all enabled complex channels in genalyzer panel
+			for(auto component : components()) {
+				GRFFTChannelComponent *channelComponent =
+					dynamic_cast<GRFFTChannelComponent *>(component);
+				if(channelComponent) {
+					channelComponent->emitGenalyzerEnabledIfAppropriate();
+				}
+			}
 		} else {
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);
+
+			m_plotComponentManager->genalyzerPanel()->clear();
+			m_plotComponentManager->enableGenalyzerPanel(false);
 		}
+
+		m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(isComplex);
 	});
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {

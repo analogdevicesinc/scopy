@@ -61,11 +61,13 @@ public:
 			m_name + m_grch->getDeviceSrc()->deviceName() + m_grch->getChannelName(), this);
 		m_signalPath->append(m_grch);
 		m_fft = new GRFFTComplexProc(m_signalPath);
-		int nrBits = src->getFmt()->bits - src->getFmt()->is_signed;
+		int nrBits = src->getFmt()->bits; // removed  "- src->getFmt()->is_signed" since genalyzer can be
+						  // adjusted directly for signed/unsigned values
 		m_fft->setNrBits(nrBits);
+		m_fft->setSigned(src->getFmt()->is_signed);
+		m_fft->setSampleRate(ch->samplingInfo().sampleRate);
 		m_signalPath->append(m_fft);
-		m_avg = new GRFFTAvgProc(true, m_signalPath);
-		m_signalPath->append(m_avg);
+		// Removed GRFFTAvgProc - averaging now handled inside genalyzer_impl.cpp
 		m_signalPath->setEnabled(false);
 		m_top = top;
 		m_top->registerSignalPath(m_signalPath);
@@ -85,7 +87,7 @@ public:
 		m_fft->setPowerOffset(val);
 	}
 
-	void setAveragingSize(int size) override { m_avg->setSize(size); }
+	void setAveragingSize(int size) override { m_fft->setNavg(size); }
 
 	double powerOffset() { return m_powerOffset; }
 
@@ -93,11 +95,14 @@ public:
 
 	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
 
+	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
+
+	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
+
 	GRTopBlock *m_top;
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTComplexProc *m_fft;
-	GRFFTAvgProc *m_avg;
 	GRIIOComplexChannelSrc *m_grch;
 	double m_powerOffset;
 };
@@ -186,6 +191,7 @@ public:
 	bool windowCorrection() const;
 	void setWindowCorrection(bool newWindowCorr) override;
 	virtual bool enabled() const override;
+	bool isComplex();
 
 public Q_SLOTS:
 	void enable() override;
@@ -203,12 +209,22 @@ public Q_SLOTS:
 	void addChannelToPlot() override;
 	void removeChannelFromPlot() override;
 
+	// Method to trigger genalyzer analysis (only when needed)
+	void triggerGenalyzerAnalysis();
+
+	// Method to emit genalyzer channel enabled signal if channel is complex and enabled
+	void emitGenalyzerEnabledIfAppropriate();
+
 Q_SIGNALS:
 	void yModeChanged();
 	void fftSizeChanged();
 	void powerOffsetChanged(double);
 	void windowChanged(int);
 	void windowCorrectionChanged(bool);
+	void genalyzerDataUpdated(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
+				  double *rvalues);
+	void genalyzerChannelEnabled(const QString &channelName);
+	void genalyzerChannelDisabled(const QString &channelName);
 
 private:
 	double m_powerOffset;
