@@ -21,7 +21,7 @@ Package Manager - Test Suite
 Test 1 - Package Discovery Load
 -----------------------------------
 
-**UID:** PKG_MANAGER.DISCOVERY.LOAD
+**UID:** TST.PKG_MANAGER.DISCOVERY.LOAD
 
 **RBP:** P0
 
@@ -71,7 +71,7 @@ Test 1 - Package Discovery Load
 Test 2 - Package Resource Access
 --------------------------------------
 
-**UID:** PKG_MANAGER.RESOURCE.ACCESS
+**UID:** TST.PKG_MANAGER.RESOURCE.ACCESS
 
 **RBP:** P1
 
@@ -114,7 +114,7 @@ Test 2 - Package Resource Access
 Test 3 - Package Create
 -----------------------------
 
-**UID:** PKG_MANAGER.CREATE
+**UID:** TST.PKG_MANAGER.CREATE
 
 **RBP:** P2
 
@@ -185,14 +185,14 @@ Test 3 - Package Create
 Test 4 - Package Install
 ------------------------------
 
-**UID:** PKG_MANAGER.INSTALL
+**UID:** TST.PKG_MANAGER.INSTALL
 
 **RBP:** P2
 
 **Description:** Test installing the previously created package ("test_pkg") via the package manager and verifying it appears in the list and is usable.
 
 **Preconditions:**
-    - Test 3 (PKG_MANAGER.CREATE) was passed.
+    - Test 3 (TST.PKG_MANAGER.CREATE) was passed.
     - Scopy running with package manager UI accessible.
 
 **Steps:**
@@ -228,14 +228,14 @@ Test 4 - Package Install
 Test 5 - Package Uninstall
 --------------------------------
 
-**UID:** PKG_MANAGER.UNINSTALL
+**UID:** TST.PKG_MANAGER.UNINSTALL
 
 **RBP:** P2
 
 **Description:** Test uninstalling the previously created and installed package ("test_pkg") via the package manager and verifying it is removed.
 
 **Preconditions:**
-    - Test 4 (PKG_MANAGER.INSTALL) was passed.
+    - Test 4 (TST.PKG_MANAGER.INSTALL) was passed.
     - Scopy running with package manager UI accessible.
 
 **Steps:**
@@ -273,7 +273,7 @@ Test 5 - Package Uninstall
 Test 6 - Backward compatibility
 ----------------------------------
 
-**UID:** PKG_MANAGER.BACKWARD_COMPAT
+**UID:** TST.PKG_MANAGER.BACKWARD_COMPAT
 
 **RBP:** P3
 
@@ -315,7 +315,7 @@ Test 6 - Backward compatibility
 Test 7 - Error handling
 ---------------------------------
 
-**UID:** PKG_MANAGER.ERROR.HANDLING
+**UID:** TST.PKG_MANAGER.ERROR.HANDLING
 
 **RBP:** P3
 
@@ -356,7 +356,7 @@ Test 7 - Error handling
 Test 8 - UI/UX
 ----------------------
 
-**UID:** PKG_MANAGER.UIUX
+**UID:** TST.PKG_MANAGER.UIUX
 
 **RBP:** P3
 
@@ -397,7 +397,7 @@ Test 8 - UI/UX
 Test 9 - Manual package deletion
 -----------------------------------
 
-**UID:** PKG_MANAGER.MANUAL.DELETE
+**UID:** TST.PKG_MANAGER.MANUAL.DELETE
 
 **RBP:** P3
 
@@ -440,7 +440,7 @@ Test 9 - Manual package deletion
 Test 10 - Plugin info About page
 -----------------------------------------
 
-**UID:** PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE
+**UID:** TST.PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE
 
 **RBP:** P3
 
