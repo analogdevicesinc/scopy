@@ -332,8 +332,7 @@ build_scopy() {
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PLUGIN_TEST=ON \
-		-DENABLE_TESTING=ON
+		-DENABLE_ALL_PACKAGES=ON
 		"
 	build_with_cmake OFF
 	popd
