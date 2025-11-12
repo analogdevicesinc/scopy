@@ -151,7 +151,7 @@ find_library(
 	      /opt/local/lib64
 	      REQUIRED
 )
-message("IIO LIBRARIES: " ${IIO_LIBRARIES})
+message(STATUS "IIO LIBRARIES: " ${IIO_LIBRARIES})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(SCOPY_DLL_BUILD_PATH ${CMAKE_BINARY_DIR}/Scopy.app/Contents/Frameworks)

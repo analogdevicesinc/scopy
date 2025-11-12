@@ -61,7 +61,7 @@ if(QWT_INCLUDE_DIRS)
 	if(NOT QWT_WRONG_VERSION)
 		set(QWT_FOUND TRUE)
 	else(NOT QWT_WRONG_VERSION)
-		message(STATUS "QWT Version must be >= 5.2 and <= 6.2.0, Found ${QWT_VERSION}")
+		message(NOTICE "QWT Version must be >= 5.2 and <= 6.2.0, Found ${QWT_VERSION}")
 	endif(NOT QWT_WRONG_VERSION)
 
 endif(QWT_INCLUDE_DIRS)
