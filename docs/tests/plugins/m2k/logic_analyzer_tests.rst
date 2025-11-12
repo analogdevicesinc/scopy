@@ -56,6 +56,8 @@ Test 1 - Channel Trigger Function
 
 **UID:** TST.LOGIC.CHN_TRIGGER
 
+**RBP:** P0
+
 **Description:** This test verifies the basic trigger functionality on individual 
 digital channels - rising edge, falling edge, high, low, any edge.
 
@@ -153,6 +155,8 @@ Test 2 - External Channel Trigger Function
 .. _TST.LOGIC.EXT_CHN_TRIGGER:
 
 **UID:** TST.LOGIC.EXT_CHN_TRIGGER
+
+**RBP:** P3
 
 **Description:** This test verifies the external trigger functionality.
 
@@ -256,6 +260,8 @@ Test 3 - Oscilloscope Source External Trigger
 
 **UID:** TST.LOGIC.OSC_EXT_TRIGGER
 
+**RBP:** P3
+
 **Description:** This test verifies the external trigger functionality using the 
 Oscilloscope as the source.
 
@@ -352,6 +358,8 @@ Test 4 - Trigger Modes
 
 **UID:** TST.LOGIC.TRIGGER_MODES
 
+**RBP:** P3
+
 **Description:** This test verifies the trigger modes (and/or) of the Logic Analyzer.
 
 **Preconditions:**
@@ -435,6 +443,8 @@ Test 5 - Clock signal measurement accuracy
 .. _TST.LOGIC.CLOCK_SIGNAL:
 
 **UID:** TST.LOGIC.CLOCK_SIGNAL
+
+**RBP:** P3
 
 **Description:** This test verifies the accuracy of the clock signal measurement.
 
@@ -548,6 +558,8 @@ Test 6 - Parallel Decoder
 
 **UID:** TST.LOGIC.PARALLEL_DECODER
 
+**RBP:** P3
+
 **Description:** This test verifies the parallel decoder functionality.
 
 **Preconditions:**
@@ -607,6 +619,8 @@ Test 7 - SPI decoder
 
 **UID:** TST.LOGIC.SPI_DECODER
 
+**RBP:** P3
+
 **Description:** This test verifies the SPI decoder functionality.
 
 **Preconditions:**
@@ -662,6 +676,8 @@ Test 8 - UART decoder
 .. _TST.LOGIC.UART_DECODER:
 
 **UID:** TST.LOGIC.UART_DECODER
+
+**RBP:** P3
 
 **Description:** This test verifies the UART decoder functionality.
 
@@ -741,6 +757,8 @@ Test 9 - PWM Decoder
 
 **UID:** TST.LOGIC.PWM_DECODER
 
+**RBP:** P3
+
 **Description:** This test verifies the PWM decoder functionality.
 
 **Preconditions:**
@@ -788,6 +806,8 @@ Test 10 - Channel visual representation
 .. _TST.LOGIC.CHN_VISUAL:
 
 **UID:** TST.LOGIC.CHN_VISUAL
+
+**RBP:** P3
 
 **Description:** This test verifies changing the channel name, 
 trace height and plot color.
@@ -846,6 +866,8 @@ Test 11 - Export Functionality
 .. _TST.LOGIC.EXPORT:
 
 **UID:** TST.LOGIC.EXPORT
+
+**RBP:** P3
 
 **Description:** This test verifies the data export functionality 
 of the Logic Analyzer.
@@ -943,6 +965,8 @@ Test 12 - Print Plot
 
 **UID:** TST.LOGIC.PRINT_PLOT
 
+**RBP:** P3
+
 **Description:** This test verifies the print plot functionality 
 of the Logic Analyzer.
 
@@ -996,6 +1020,8 @@ Test 13 - Decoder Table
 .. _TST.LOGIC.DECODER_TABLE:
 
 **UID:** TST.LOGIC.DECODER_TABLE
+
+**RBP:** P3
 
 **Description:** This test verifies the decoder table functionality of the Logic Analyzer.
 

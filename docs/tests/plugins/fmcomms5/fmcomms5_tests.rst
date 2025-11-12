@@ -14,6 +14,8 @@ Test 1: Plugin Loads
 
 **UID:** TST.FMCOMMS5.PLUGIN_LOADS
 
+**RBP:** P3
+
 **Description:** Verify that the FMCOMMS5 plugin loads in Scopy.
 
 **OS:** ANY
@@ -61,6 +63,8 @@ Test 2: Device Detection and Display
 
 **UID:** TST.FMCOMMS5.DEVICE_DETECTION_AND_DISPLAY
 
+**RBP:** P3
+
 **Description:** Verify that the FMCOMMS5 plugin detects and displays both AD9361-phy and AD9361-phy-B devices and their status panels.
 
 **OS:** ANY
@@ -99,6 +103,8 @@ Test 3: Change and Validate Global Settings
 --------------------------------------------
 
 **UID:** TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS
+
+**RBP:** P3
 
 **Description:** Change global settings (e.g., ENSM mode, calibration, rate governor) and verify changes are applied and reflected in hardware for both devices.
 
@@ -146,6 +152,8 @@ Test 4: RX and TX Chain Configuration
 
 **UID:** TST.FMCOMMS5.RX_TX_CHAIN_CONFIG
 
+**RBP:** P3
+
 **Description:** Change RX/TX bandwidth, sampling rate, LO frequency, and verify correct application for all four channels (RX1-4, TX1-4).
 
 **OS:** ANY
@@ -192,6 +200,8 @@ Test 5: Advanced Plugin Detection and Display
 
 **UID:** TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY
 
+**RBP:** P3
+
 **Description:** Verify that the FMCOMMS5 Advanced plugin detects and displays the connected FMCOMMS5 device and its advanced configuration panels.
 
 **OS:** ANY
@@ -230,6 +240,8 @@ Test 6: FMCOMMS5 Calibration
 ---------------------------------------------------------
 
 **UID:** TST.FMCOMMS5.CALIBRATION
+
+**RBP:** P3
 
 **Description:** Verify that calibration completes successfully and a sinusoidal signal appears in the ADC plugin after calibration.
 

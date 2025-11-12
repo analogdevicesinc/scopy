@@ -63,6 +63,8 @@ Test 1 - X-AXIS
 
 **UID:** TST.ADC_TIME.X_AXIS
 
+**RBP:** P0
+
 **Description:** Verify X-axis behavior under different configurations
 
 **Preconditions:**
@@ -131,6 +133,8 @@ Test 2 - Y-AXIS
 
 **UID:** TST.ADC_TIME.Y_AXIS
 
+**RBP:** P3
+
 **Description:** Verify Y-axis behavior under different configurations
 
 **Preconditions:**
@@ -183,6 +187,8 @@ Test 3 - XY PLOT
 .. _TST.ADC_TIME.XY_PLOT:
 
 **UID:** TST.ADC_TIME.XY_PLOT
+
+**RBP:** P3
 
 **Description:** Verify XY plot functionality and visualization
 
@@ -259,6 +265,8 @@ Test 4 - Settings
 
 **UID:** TST.ADC_TIME.SETTINGS
 
+**RBP:** P3
+
 **Description:** Change Plot Title and toggle various plot settings
 
 **Preconditions:**
@@ -315,6 +323,8 @@ Test 5 - Print
 
 **UID:** TST.ADC_TIME.PRINT
 
+**RBP:** P3
+
 **Description:** Save the plot as a PDF file via the print functionality
 
 **Preconditions:**
@@ -359,6 +369,8 @@ Test 6 - Info
 
 **UID:** TST.ADC_TIME.INFO
 
+**RBP:** P3
+
 **Description:** Open the ADC plugin documentation via the info button
 
 **Preconditions:**
@@ -398,6 +410,8 @@ Test 7 - Plot Navigation
 .. _TST.PLOT_NAVIGATION:
 
 **UID:** TST.PLOT_NAVIGATION
+
+**RBP:** P3
 
 **Description:** Test plot zooming, panning, and undo features
 
@@ -471,6 +485,8 @@ Test 8 - ADC-Time Channel Settings
 
 **UID:** TST.ADC_TIME_CHANNEL_SETTINGS
 
+**RBP:** P3
+
 **Description:** Test Y-axis settings and adjustments for the ADC-Time tool
 
 **Preconditions:**
@@ -520,6 +536,8 @@ Test 9 - Measure
 .. _TST.MEASURE:
 
 **UID:** TST.MEASURE
+
+**RBP:** P3
 
 **Description:** Test the Measure functionality, enabling panels 
 and checking frequency and stats
@@ -573,6 +591,8 @@ Test 10 - Cursors
 .. _TST.CURSORS:
 
 **UID:** TST.CURSORS
+
+**RBP:** P3
 
 **Description:** Test cursor functionality including synchronization, 
 tracking, and moving readouts
@@ -664,6 +684,8 @@ Test 1 - X-Axis settings
 
 **UID:** TST.ADC_FREQ.X_AXIS_SETTINGS
 
+**RBP:** P3
+
 **Description:** Adjust X-axis settings for frequency and sample-based 
 plotting in the ADC plugin
 
@@ -721,6 +743,8 @@ Test 2 - Y-Axis settings
 .. _TST.ADC_FREQ.Y_AXIS_SETTINGS:
 
 **UID:** TST.ADC_FREQ.Y_AXIS_SETTINGS
+
+**RBP:** P3
 
 **Description:** Adjust Y-axis settings, including autoscaling and manual 
 range settings
@@ -788,6 +812,8 @@ Test 3 - Settings adjustment
 
 **UID:** TST.ADC_FREQ.SETTINGS_ADJUSTMENT
 
+**RBP:** P3
+
 **Description:** Adjust plot settings such as title, labels, thickness, 
 and style
 
@@ -844,6 +870,8 @@ Test 4 - Print plot
 
 **UID:** TST.ADC_FREQ.PRINT_PLOT
 
+**RBP:** P3
+
 **Description:** Print the current plot to a PDF file
 
 **Preconditions:**
@@ -886,6 +914,8 @@ Test 5 - View plugin documentation
 
 **UID:** TST.ADC_FREQ.VIEW_PLUGIN_DOC
 
+**RBP:** P3
+
 **Description:** Open the ADC plugin documentation
 
 **Preconditions:**
@@ -925,6 +955,8 @@ Test 6 - Y-Axis channel settings
 .. _TST.ADC_FREQ.Y_AXIS_CHANNEL_SETTINGS:
 
 **UID:** TST.ADC_FREQ.Y_AXIS_CHANNEL_SETTINGS
+
+**RBP:** P3
 
 **Description:** Adjust the Y-axis for individual channel curve manipulation
 
@@ -966,6 +998,8 @@ Test 7 - Marker settings
 .. _TST.ADC_FREQ.MARKER_SETTINGS:
 
 **UID:** TST.ADC_FREQ.MARKER_SETTINGS
+
+**RBP:** P3
 
 **Description:** Use markers to identify peaks on channel curves
 
@@ -1040,6 +1074,8 @@ Test 8 - Cursor settings
 .. _TST.ADC_FREQ.CURSOR_SETTINGS:
 
 **UID:** TST.ADC_FREQ.CURSOR_SETTINGS
+
+**RBP:** P3
 
 **Description:** Use cursors to measure specific points on channel curves.
 
@@ -1120,6 +1156,8 @@ Test 1 - X Scale Position
 
 **UID:** TST.PREF.X_SCALE_POS
 
+**RBP:** P3
+
 **Description:** Change the X-axis scale position and verify the label's position on the plot
 
 **Test prerequisites:**
@@ -1185,6 +1223,8 @@ Test 2 - Y Scale Position
 .. _TST.PREF.Y_SCALE_POS:
 
 **UID:** TST.PREF.Y_SCALE_POS
+
+**RBP:** P3
 
 **Description:** Change the Y-axis scale position and verify the label's 
 position on the plot
@@ -1252,6 +1292,8 @@ Test 3 - Channel Handle Position
 .. _TST.PREF.CH_HANDLE_POS:
 
 **UID:** TST.PREF.CH_HANDLE_POS
+
+**RBP:** P3
 
 **Description:** Change the Y-handle position and verify the appearance of the handle
 
@@ -1324,6 +1366,8 @@ Test 4 - X Cursor Position
 
 **UID:** TST.PREF.X_CURSOR_POS
 
+**RBP:** P3
+
 **Description:** Change the X-cursor position and verify the cursor's appearance.
 
 **Test prerequisites:**
@@ -1390,6 +1434,8 @@ Test 5 - Y Cursor Position
 .. _TST.PREF.Y_CURSOR_POS:
 
 **UID:** TST.PREF.Y_CURSOR_POS
+
+**RBP:** P3
 
 **Description:** Change the Y-cursor position and verify the cursor's appearance
 
@@ -1458,6 +1504,8 @@ Test 6 - Default YMode
 
 **UID:** TST.PREF.DEFAULT_YMODE
 
+**RBP:** P3
+
 **Description:** Set the default Y-mode and verify its behavior in ADC-Time
 
 **Test prerequisites:**
@@ -1506,6 +1554,8 @@ Test 7 - Channel Averaging
 .. _TST.ADC_FREQ.CHANNEL_AVERAGING:
 
 **UID:** TST.ADC_FREQ.CHANNEL_AVERAGING
+
+**RBP:** P3
 
 **Description:** Verify channel averaging functionality in ADC-Frequency
 
