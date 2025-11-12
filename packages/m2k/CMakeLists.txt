@@ -27,14 +27,12 @@ set(PACKAGE_NAME ${SCOPY_MODULE})
 set(PACKAGE_DISPLAY_NAME "ADALM2000")
 set(PACKAGE_DESCRIPTION "Plugin for ADALM2000 (M2K).")
 
-message(STATUS "building package: " ${SCOPY_MODULE})
-
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
 include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
 include_resources(${CMAKE_CURRENT_SOURCE_DIR}/resources ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/resources)
-message("Including plugins")
+message(STATUS "Including plugins for ${SCOPY_MODULE}")
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 	install_plugins(

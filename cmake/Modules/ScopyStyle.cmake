@@ -39,6 +39,6 @@ function(
 	if(NOT ret EQUAL "0")
 		message(FATAL_ERROR "Failed to generate style files! error: ${ret}")
 	else()
-		message("-- Generated style files")
+		message(STATUS "Generated style files")
 	endif()
 endfunction()
