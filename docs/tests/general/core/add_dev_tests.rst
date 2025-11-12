@@ -38,7 +38,9 @@ Test 1: Verifying the device scanning functionality.
 
 **UID:** TST.ADD.SCAN_ALL
 
-**Description:** This test checks that the device scan correctly detects and 
+**RBP:** P0
+
+**Description:** This test checks that the device scan correctly detects and
 lists available devices when initiated.
 
 **Preconditions:**
@@ -80,6 +82,8 @@ Test 2: Verifying the local device scanning functionality.
 ----------------------------------------------------------
 
 **UID:** TST.ADD.SCAN_LOCAL
+
+**RBP:** P3
 
 **Description:** This test checks that the device scan correctly detects and 
 lists available local devices when initiated.
@@ -125,7 +129,9 @@ Test 3: Verifying the ip device scanning functionality.
 
 **UID:** TST.ADD.SCAN_IP
 
-**Description:** This test checks that the device scan correctly detects and 
+**RBP:** P0
+
+**Description:** This test checks that the device scan correctly detects and
 lists available ip devices when initiated.
 
 **Preconditions:**
@@ -169,7 +175,9 @@ Test 4: Verifying the usb device scanning functionality.
 
 **UID:** TST.ADD.SCAN_USB
 
-**Description:** This test checks that the device scan correctly detects and 
+**RBP:** P0
+
+**Description:** This test checks that the device scan correctly detects and
 lists available usb devices when initiated.
 
 **Preconditions:**
@@ -210,6 +218,8 @@ Test 5: Verifying the serial device scanning functionality.
 -----------------------------------------------------------
 
 **UID:** TST.ADD.SCAN_SERIAL
+
+**RBP:** P3
 
 **Description:** This test checks that the device scan correctly detects and 
 lists available serial devices when initiated.
@@ -256,7 +266,9 @@ Test 6: Scanning with no device.
 
 **UID:** TST.ADD.SCAN_EMPTY
 
-**Description:** This test checks whether an appropriate message is displayed 
+**RBP:** P0
+
+**Description:** This test checks whether an appropriate message is displayed
 when no device is found.
 
 **Preconditions:**
@@ -298,6 +310,8 @@ Test 7: Device validation.
 --------------------------
 
 **UID:** TST.ADD.VERIFY
+
+**RBP:** P0
 
 **Description:** This test verifies that the device validation works correctly.
 
@@ -341,6 +355,8 @@ Test 8: Verify the "BACK" button from compatible plugin page.
 -------------------------------------------------------------
 
 **UID:** TST.ADD.PLUGINS_BACK
+
+**RBP:** P3
 
 **Description:** This test checks if the **BACK** button works correctly.
 
@@ -387,7 +403,9 @@ Test 9: Verify the "ADD DEVICE" button from compatible plugin page (single plugi
 
 **UID:** TST.ADD.PLUGINS_ADD_SINGLE
 
-**Description:** This test checks if the **ADD DEVICE** button works correctly. 
+**RBP:** P1
+
+**Description:** This test checks if the **ADD DEVICE** button works correctly.
 Only the main plugin of the device is used.
 
 **Test prerequisites:**
@@ -441,7 +459,9 @@ Test 10: Verify the "ADD DEVICE" button from compatible plugin page (multiple pl
 
 **UID:** TST.ADD.PLUGINS_ADD_MULTIPLE
 
-**Description:** This test checks if the **ADD DEVICE** button works correctly. 
+**RBP:** P1
+
+**Description:** This test checks if the **ADD DEVICE** button works correctly.
 Multiple plugins are used.
 
 **Test prerequisites:**
@@ -495,6 +515,8 @@ Test 11: Verify the "ADD DEVICE" button from compatible plugin page with no plug
 --------------------------------------------------------------------------------------------
 
 **UID:** TST.ADD.PLUGINS_EMPTY
+
+**RBP:** P1
 
 **Description:** This test checks if the **ADD DEVICE** button works correctly.
 

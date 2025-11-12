@@ -39,6 +39,8 @@ Test 1: Channel 1 Operation
 
 **UID:** TST.M2K.SG.CHANNEL_1_OPERATION
 
+**RBP:** P0
+
 **Description:** This test case verifies the operation of the channel 1 of the signal generator.
 
 **Preconditions:**
@@ -342,6 +344,8 @@ Test 2: Channel 2 Operation
 
 **UID:** TST.M2K.SG.CHANNEL_2_OPERATION
 
+**RBP:** P3
+
 **Description:** This test case verifies the operation of the channel 2 of the signal generator.
 
 **Preconditions:**
@@ -644,6 +648,8 @@ Test 3: Channel 1 and Channel 2 Operation
 
 **UID:** TST.M2K.SG.CHANNEL_1_AND_CHANNEL_2_OPERATION
 
+**RBP:** P3
+
 **Description:** This test case verifies the operation of the channel 1 and channel 2 of the signal generator.
 
 **Preconditions:**
@@ -711,6 +717,8 @@ Test 4: Additional Features
 -------------------------------------------------------
 
 **UID:** TST.M2K.SG.ADDITIONAL_FEATURES
+
+**RBP:** P3
 
 **Description:** This test case verifies the additional features of the signal generator.
 

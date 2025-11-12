@@ -13,6 +13,8 @@ Test 1: Plugin Loads
 
 **UID:** TST.AD9084.PLUGIN_LOADS
 
+**RBP:** P0
+
 **Description:** Verify that the AD9084 plugin loads in Scopy and is accessible in the UI.
 
 **OS:** ANY
@@ -53,6 +55,8 @@ Test 2: Device Detection and Display
 
 **UID:** TST.AD9084.DEVICE_DETECTION_AND_DISPLAY
 
+**RBP:** P3
+
 **Description:** Verify that the plugin detects and displays the connected AD9084 device and its status panels.
 
 **OS:** ANY
@@ -91,6 +95,8 @@ Test 3: Channel Configuration
 ------------------------------
 
 **UID:** TST.AD9084.CHANNEL_CONFIGURATION
+
+**RBP:** P3
 
 **Description:** Enable and disable individual channels; verify that channel status and data display update accordingly.
 
@@ -138,6 +144,8 @@ Test 4: Disable and Enable RX/TX Tabs
 --------------------------------------
 
 **UID:** TST.AD9084.DISABLE_ENABLE_RX_TX_TABS
+
+**RBP:** P3
 
 **Description:** Disable then enable RX and TX tabs; verify that tab status and controls update accordingly.
 
