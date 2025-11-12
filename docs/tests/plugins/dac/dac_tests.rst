@@ -61,6 +61,8 @@ Test 1 - Compatibility with device
 
 **UID:** TST.DAC.COMPAT
 
+**RBP:** P0
+
 **Description:** This test verifies that the DAC plugin is compatible with the selected device
 and that the plugin is able to correctly parse it.
 
@@ -110,6 +112,8 @@ Test 2 - Buffer mode file loading
 .. _TST.DAC.BUFFER_LOAD:
 
 **UID:** TST.DAC.BUFFER_LOAD
+
+**RBP:** P3
 
 **Description:** This test verifies that the DAC plugin is able to load a file in buffer mode.
 
@@ -196,6 +200,8 @@ Test 3 - Buffer mode channel selection
 
 **UID:** TST.DAC.BUFFER_CHANNEL_SELECT
 
+**RBP:** P3
+
 **Description:** This test verifies that the DAC plugin is able to validate channel selection in buffer mode.
 
 **Preconditions:**
@@ -275,6 +281,8 @@ Test 4 - Buffer mode file size validation
 .. _TST.DAC.BUFFER_FILE_SIZE:
 
 **UID:** TST.DAC.BUFFER_FILE_SIZE
+
+**RBP:** P3
 
 **Description:** This test verifies that the DAC plugin is able to validate the file 
 size in buffer mode.
@@ -357,6 +365,8 @@ Test 5 - Cyclic buffer mode
 
 **UID:** TST.DAC.BUFFER_CYCLIC
 
+**RBP:** P3
+
 **Description:** This test verifies the DAC plugin buffer generation in cyclic mode.
 
 **Depends on::**
@@ -424,6 +434,8 @@ Test 6 -  DDS modes
 
 **UID:** TST.DAC.DDS_MODES
 
+**RBP:** P3
+
 **Description:** This test verifies the DAC plugin DDS modes.
 
 **Preconditions:**
@@ -490,8 +502,9 @@ Test 7 - DDS mode sinewave generation
 
 .. _TST.DAC.DDS_SINEWAVE:
 
-**UID:**
-    TST.DAC.DDS_SINEWAVE
+**UID:** TST.DAC.DDS_SINEWAVE
+
+**RBP:** P3
 
 **Description:**
     This test verifies the DAC plugin DDS mode sinewave generation.
@@ -559,6 +572,8 @@ Test 8 - DDS mode attributes refresh
 
 **UID:** TST.DAC.DDS_ATTRS
 
+**RBP:** P3
+
 **Description:** This test verifies the DAC plugin DDS mode attributes refresh.
 
 **Depends on::**
@@ -608,6 +623,8 @@ Test 9 - Plugin tutorial
 .. _TST.DAC.TUTORIAL:
 
 **UID:** TST.DAC.TUTORIAL
+
+**RBP:** P3
 
 **Description:** This test verifies the DAC plugin tutorial.
 
@@ -667,6 +684,8 @@ Test 10 - Channel attributes
 
 **UID:** TST.DAC.CHANNEL_ATTRS
 
+**RBP:** P3
+
 **Description:** This test verifies the DAC plugin channel attributes.
 
 **Preconditions:**
@@ -715,6 +734,8 @@ Test 11 - Repeat data option
 .. _TST.DAC.REPEAT_DATA:
 
 **UID:** TST.DAC.REPEAT_DATA
+
+**RBP:** P3
 
 **Description:** This test verifies the DAC plugin repeat data option.
 The data sets loaded from the file should be repeated to fill in all the enabled

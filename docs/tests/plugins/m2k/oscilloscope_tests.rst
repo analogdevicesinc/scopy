@@ -57,7 +57,9 @@ Test 1 - Time base and Volts/div Knobs
 
 **UID:** TST.OSC.TIME_VOLTS_1
 
-**Description:** Check the increment/decrement operation of the time base and 
+**RBP:** P0
+
+**Description:** Check the increment/decrement operation of the time base and
 volts/div knobs.
 
 **Preconditions:**
@@ -115,6 +117,8 @@ Test 2 - Position Knob
 .. _TST.OSC.POSITION_1:
 
 **UID:** TST.OSC.POSITION_1
+
+**RBP:** P3
 
 **Description:** Check the increment/decrement operation of the position knob 
 which depends on the value of the Time Base.
@@ -186,6 +190,8 @@ Test 3 - Constant Signal Check
 
 **UID:** TST.OSC.CONSTANT_SIGNAL_1
 
+**RBP:** P3
+
 **Description:** Check the constant signal from the signal generator on the 
 oscilloscope using Channel 1.
 
@@ -240,6 +246,8 @@ Test 4 - Sine Wave Signal Check
 .. _TST.OSC.SINE_WAVE_SIGNAL_1:
 
 **UID:** TST.OSC.SINE_WAVE_SIGNAL_1
+
+**RBP:** P3
 
 **Description:** Check the sine wave signal from the signal generator on the oscilloscope
 using Channel 1.
@@ -302,6 +310,8 @@ Test 5 - Square Wave Signal Check
 .. _TST.OSC.SQUARE_WAVE_SIGNAL_1:
 
 **UID:** TST.OSC.SQUARE_WAVE_SIGNAL_1
+
+**RBP:** P3
 
 **Description:** Check the square wave signal from the signal generator on 
 the oscilloscope using Channel 1.
@@ -368,6 +378,8 @@ Test 6 - Triangle Wave Signal Check
 
 **UID:** TST.OSC.TRIANGLE_WAVE_SIGNAL_1
 
+**RBP:** P3
+
 **Description:** Check the triangle wave signal from the signal generator on 
 the oscilloscope using Channel 1.
 
@@ -433,6 +445,8 @@ Test 7 - Rising/Falling Ramp Sawtooth Wave
 
 **UID:** TST.OSC.RAMP_SAWTOOTH_WAVE_SIGNAL_1
 
+**RBP:** P3
+
 **Description:** Check the rising and falling ramp sawtooth wave signal from 
 the signal generator on the oscilloscope using Channel 1.
 
@@ -494,6 +508,8 @@ Test 8 - Cursor Reading Check
 .. _TST.OSC.CURSOR_READING_1:
 
 **UID:** TST.OSC.CURSOR_READING_1
+
+**RBP:** P3
 
 **Description:** Check the cursor reading value on the oscilloscope using 
 Channel 1.
@@ -578,6 +594,8 @@ Test 9 - Trigger Function Check
 .. _TST.OSC.TRIGGER_FUNCTION_1:
 
 **UID:** TST.OSC.TRIGGER_FUNCTION_1
+
+**RBP:** P3
 
 **Description:** Check the trigger function on the oscilloscope using Channel 1
 with different trigger configurations.
@@ -694,6 +712,8 @@ Test 10 - Math Channel Operations
 
 **UID:** TST.OSC.MATH_CHANNEL
 
+**RBP:** P3
+
 **Description:** Check the math channel operations on the oscilloscope using Channel 1.
 
 **Preconditions:**
@@ -768,6 +788,8 @@ Test 11 - FFT Function
 
 **UID:** TST.OSC.FFT_FUNCTION
 
+**RBP:** P3
+
 **Description:** Check the FFT function on the oscilloscope.
 
 **Preconditions:**
@@ -813,6 +835,8 @@ Test 12 - XY Function
 .. _TST.OSC.XY_FUNCTION:
 
 **UID:** TST.OSC.XY_FUNCTION
+
+**RBP:** P3
 
 **Description:** Check the XY function on the oscilloscope.
 The plot displays the current vs voltage characteristics of a PN junction diode.
@@ -888,6 +912,8 @@ Test 13 - Export feature
 .. _TST.OSC.EXPORT_FEATURE:
 
 **UID:** TST.OSC.EXPORT_FEATURE
+
+**RBP:** P3
 
 **Description:** Check the data export feature on the oscilloscope.
 
@@ -973,6 +999,8 @@ Test 14 - Software AC coupling
 
 **UID:** TST.OSC.SOFTWARE_AC_COUPLING
 
+**RBP:** P3
+
 **Description:** Check the software AC coupling feature on the oscilloscope.
 The Signal Generator will output a sine wave with a 3V DC offset and 
 the Oscilloscope should be able to center the trace at 0V.
@@ -1031,6 +1059,8 @@ Test 15 - Probe Attenuation
 .. _TST.OSC.PROBE_ATTENUATION:
 
 **UID:** TST.OSC.PROBE_ATTENUATION
+
+**RBP:** P3
 
 **Description:** Check the probe attenuation feature on the oscilloscope.
 
@@ -1099,6 +1129,8 @@ Test 16 - External Trigger
 .. _TST.OSC.EXTERNAL_TRIGGER:
 
 **UID:** TST.OSC.EXTERNAL_TRIGGER
+
+**RBP:** P3
 
 **Description:** Check the external trigger feature on the oscilloscope 
 using the TI pin and the digital DIO1 pin of the ADALM2000 device.
@@ -1189,6 +1221,8 @@ Test 17 - Autoset
 
 **UID:** TST.OSC.AUTOSET
 
+**RBP:** P3
+
 **Description:** Check the Autoset feature on the oscilloscope.
 A sinewave is fed by the Signal Generator, captured with the Oscilloscope 
 using a configuration that displays too many periods on the plot.
@@ -1241,6 +1275,8 @@ Test 18 - Print Plot
 .. _TST.OSC.PRINT_PLOT:
 
 **UID:** TST.OSC.PRINT_PLOT
+
+**RBP:** P3
 
 **Description:** Check the Print feature on the oscilloscope.
 
@@ -1296,6 +1332,8 @@ Test 19 - Curve style
 .. _TST.OSC.CURVE_STYLE:
 
 **UID:** TST.OSC.CURVE_STYLE
+
+**RBP:** P3
 
 **Description:** Check the curve style feature on the oscilloscope 
 and plot the signal using lines, dots, sticks or steps.
@@ -1362,6 +1400,8 @@ Test 20 - Gating
 
 **UID:** TST.OSC.GATING
 
+**RBP:** P3
+
 **Description:** Check the Gating feature on the oscilloscope.
 Apply the measurements on a gated portion of the acquired signal.
 
@@ -1421,6 +1461,8 @@ Test 21 - Histogram
 
 **UID:** TST.OSC.HISTOGRAM
 
+**RBP:** P3
+
 **Description:** Check the Histogram feature on the oscilloscope.
 
 **Preconditions:**
@@ -1475,6 +1517,8 @@ Test 22 - ADC Digital Filters
 .. _TST.OSC.ADC_DIGITAL_FILTERS:
 
 **UID:** TST.OSC.ADC_DIGITAL_FILTERS
+
+**RBP:** P3
 
 **Description:** Check the ADC digital Filter calibration.
 

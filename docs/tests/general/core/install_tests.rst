@@ -24,6 +24,8 @@ Test 1: Check Scopy AppImage x86_64
 
 **UID:** TST.START.APPIMAGE.X86_64
 
+**RBP:** P3
+
 **Description:** This test verifies if the Scopy AppImage starts correctly on an
 Linux Operating System with x86_64 architecture.
 
@@ -105,6 +107,8 @@ Test 2: Check Scopy AppImage arm32
 -----------------------------------
 
 **UID:** TST.START.APPIMAGE.X86_64
+
+**RBP:** P3
 
 **Description:** This test verifies if the Scopy AppImage starts correctly on an
 Linux Operating System with arm32 architecture.
@@ -188,6 +192,8 @@ Test 3: Check if Scopy AppImage arm64 opens correctly
 
 **UID:** TST.START.APPIMAGE.X86_64
 
+**RBP:** P3
+
 **Description:** This test verifies if the Scopy AppImage starts correctly on an
 Linux Operating System with arm64 architecture.
 
@@ -270,6 +276,8 @@ Test 4: Check Scopy macOS
 --------------------------
 
 **UID:** TST.START.MACOS
+
+**RBP:** P3
 
 **Precondition:**
     - OS: macOS intel
@@ -363,6 +371,8 @@ Test 5: Check Scopy Windows installer
 -------------------------------------
 
 **UID:** TST.START.WINDOWS
+
+**RBP:** P3
 
 **Precondition:**
     - OS: Windows

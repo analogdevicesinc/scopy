@@ -48,6 +48,8 @@ Test 1: Verify the connection flow.
 
 **UID:** TST.CONN.SUCC
 
+**RBP:** P0
+
 **Description:** This test checks if the **Connect** button works correctly.
 
 **Test prerequisites:** 
@@ -94,7 +96,9 @@ Test 2: Unplug the device while connecting (AUTO-SCAN).
 
 **UID:** TST.CONN.UNPLUG_AUTO
 
-**Description:** This test verifies Scopy's behavior when the device is 
+**RBP:** P0
+
+**Description:** This test verifies Scopy's behavior when the device is
 unplugged during the connection process.
 
 **Test prerequisites:** 
@@ -138,6 +142,8 @@ Test 3: Unplug the device while connecting (MANUAL-SCAN).
 ---------------------------------------------------------
 
 **UID:** TST.CONN.UNPLUG_AUTO
+
+**RBP:** P3
 
 **Description:** This test verifies Scopy's behavior when the device is 
 unplugged during the connection process.
@@ -187,7 +193,9 @@ Test 4: Unplug the device before connecting.
 
 **UID:** TST.CONN.UNPLUG_BEFORE
 
-**Description:** This test verifies Scopy's behavior when the device is 
+**RBP:** P0
+
+**Description:** This test verifies Scopy's behavior when the device is
 unplugged before the connection process.
 
 **Test prerequisites:**
@@ -232,6 +240,8 @@ Test 5: Disconnecting a device.
 -------------------------------
 
 **UID:** TST.CONN.DISCONN
+
+**RBP:** P0
 
 **Description:** This test checks if the **Disconnect** button works correctly.
 

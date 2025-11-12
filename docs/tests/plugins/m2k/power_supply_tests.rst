@@ -57,6 +57,8 @@ Test 1 - Check positive voltage output
 
 **UID:** TST.PS.POSITIVE
 
+**RBP:** P0
+
 **Description:** This test verifies that the positive voltage output 
 is working correctly.
 
@@ -114,6 +116,8 @@ Test 2 - Check negative voltage output
 .. _TST.PS.NEGATIVE:
 
 **UID:** TST.PS.NEGATIVE
+
+**RBP:** P3
 
 **Description:** This test verifies that the negative voltage output 
 is working correctly.
@@ -173,6 +177,8 @@ Test 3 - Check fine tuning
 
 **UID:** TST.PS.FINE_TUNING
 
+**RBP:** P3
+
 **Description:** This test verifies that the fine tuning of the power supply 
 is working correctly.
 
@@ -223,6 +229,8 @@ Test 4 - Check Tracking mode
 .. _TST.PS.TRACKING:
 
 **UID:** TST.PS.TRACKING
+
+**RBP:** P3
 
 **Description:** This test verifies that the Tracking mode of the power supply 
 is working correctly.

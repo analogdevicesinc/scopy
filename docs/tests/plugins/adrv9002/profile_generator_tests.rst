@@ -59,6 +59,8 @@ Test 1: CLI Not Available
 
 **UID:** TST.ADRV9002.PROFILE_GEN.CLI_NOT_AVAILABLE
 
+**RBP:** P3
+
 **Description:** Verify profile generator behavior when CLI tool is not available.
 
 **OS:** ANY
@@ -109,6 +111,8 @@ Test 2: CLI Available but Not Compatible
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.PROFILE_GEN.CLI_NOT_COMPATIBLE
+
+**RBP:** P3
 
 **Description:** Verify profile generator behavior when CLI tool is available but not compatible version.
 
@@ -173,6 +177,8 @@ Test 3: CLI Available
 
 **UID:** TST.ADRV9002.PROFILE_GEN.CLI_AVAILABLE
 
+**RBP:** P3
+
 **Description:** Verify profile generator behavior when CLI tool is available.
 
 **OS:** ANY
@@ -228,6 +234,8 @@ Test 4: LTE Default Configuration
 
 **UID:** TST.ADRV9002.PROFILE_GEN.LTE_DEFAULT_CONFIG
 
+**RBP:** P3
+
 **Description:** Test LTE preset configuration application and constraints.
 
 **OS:** ANY
@@ -277,6 +285,8 @@ Test 5: LTE Configuration Modification
 
 **UID:** TST.ADRV9002.PROFILE_GEN.LTE_CONFIG_MODIFY
 
+**RBP:** P3
+
 **Description:** Test modification of LTE configuration parameters.
 
 **OS:** ANY
@@ -324,6 +334,8 @@ Test 6: Live Device Configuration Read
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.PROFILE_GEN.LIVE_DEVICE_READ
+
+**RBP:** P3
 
 **Description:** Test reading current device configuration into profile generator.
 
@@ -389,6 +401,8 @@ Test 7: Stream File Generation
 
 **UID:** TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION
 
+**RBP:** P3
+
 **Description:** Test generation of profile configuration file.
 
 **OS:** ANY
@@ -442,6 +456,8 @@ Test 8: Profile File Generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION
+
+**RBP:** P3
 
 **Description:** Test generation of profile configuration file.
 
@@ -505,6 +521,8 @@ Test 9: Load to Device
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.PROFILE_GEN.LOAD_TO_DEVICE
+
+**RBP:** P3
 
 **Description:** Test loading generated profile to connected device.
 
