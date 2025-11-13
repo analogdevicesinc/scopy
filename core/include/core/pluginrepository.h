@@ -53,6 +53,9 @@ public:
 	static QList<Plugin *> getCompatiblePlugins(const QString &param, const QString &category = "");
 	static QList<PluginInfo> getPluginsInfo();
 
+	static Plugin *getCompatiblePluginByName(const QString &param, const QString &category,
+						 const QString &pluginName);
+
 private:
 	static PluginRepository *pinstance_;
 	PluginManager *pm;
