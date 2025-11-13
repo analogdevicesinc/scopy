@@ -37,6 +37,8 @@
 
 namespace scopy {
 
+class DeviceImpl;
+
 /**
  * @brief The Plugin interface
  * Implement this interface to make a plugin loadable in scopy-core
@@ -344,6 +346,13 @@ public:
 	 * Default implementation in PluginBase
 	 */
 	virtual QString pkgName() = 0;
+
+	/**
+	 * @brief setDevice
+	 * @param device Pointer to the parent DeviceImpl instance
+	 * Default implementation in PluginBase - override not recommended
+	 */
+	virtual void setDevice(DeviceImpl *) = 0;
 
 public Q_SLOTS:
 	/**
