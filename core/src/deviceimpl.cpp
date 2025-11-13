@@ -103,6 +103,7 @@ void DeviceImpl::loadPlugins()
 		connect(dynamic_cast<QObject *>(p), SIGNAL(requestToolByUuid(QString)), this,
 			SIGNAL(requestTool(QString)));
 		p->postload();
+		p->setDevice(this);
 	}
 	m_state = DEV_IDLE;
 	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins load took:");
@@ -355,6 +356,16 @@ void DeviceImpl::onConnectionFailed()
 {
 	m_state = DEV_ERROR;
 	disconnectDev();
+}
+
+Plugin *DeviceImpl::getPluginByName(const QString &pluginName)
+{
+	for(Plugin *p : qAsConst(m_plugins)) {
+		if(p->name() == pluginName) {
+			return p;
+		}
+	}
+	return nullptr;
 }
 
 QList<Plugin *> DeviceImpl::plugins() const { return m_plugins; }
