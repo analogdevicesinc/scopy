@@ -351,4 +351,6 @@ QString DataLoggerPlugin::description() { return "Use IIO raw and scale attribut
 
 QString DataLoggerPlugin::pkgName() { return DATALOGGER_PKG_NAME; }
 
+DataLogger_API *DataLoggerPlugin::getApi() { return api; }
+
 #include "moc_dataloggerplugin.cpp"

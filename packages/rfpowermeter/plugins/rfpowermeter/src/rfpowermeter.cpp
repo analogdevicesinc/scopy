@@ -20,12 +20,15 @@
  */
 
 #include "rfpowermeter.h"
+#include "core/deviceimpl.h"
+#include "datalogger/dataloggerplugin.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/apilist.h>
 #include <datalogger/datalogger_api.hpp>
+#include <core/pluginrepository.h>
 
 Q_LOGGING_CATEGORY(CAT_RFPOWERMETER, "RFPowerMeterPlugin")
 using namespace scopy::rfpowermeter;
@@ -112,7 +115,12 @@ bool RFPowerMeterPlugin::onConnect()
 		qDebug(CAT_RFPOWERMETER) << "Found rf powermeter device, configuring via DataLogger API";
 
 		// Get DataLogger API
-		auto *dataloggerApi = scopy::ApiList::getApi<scopy::datamonitor::DataLogger_API>(m_param, "datalogger");
+		datamonitor::DataLogger_API *dataloggerApi = nullptr;
+		if(m_device) {
+			datamonitor::DataLoggerPlugin *dataLogger = dynamic_cast<datamonitor::DataLoggerPlugin *>(
+				m_device->getPluginByName("DataLoggerPlugin"));
+			dataloggerApi = dataLogger->getApi();
+		}
 		if(!dataloggerApi) {
 			qWarning(CAT_RFPOWERMETER) << "DataLogger API not available for device:" << m_param;
 			return false;

@@ -84,6 +84,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CURRENT_PKG_PATH}/include)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-core scopy-datalogger)
 target_include_directories(${PROJECT_NAME} PRIVATE ${IIO_INCLUDE_DIRS} scopy-gui scopy-iioutil)
 
+# Add datalogger include path for internal headers
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/packages/generic-plugins/plugins/datalogger/include
+    ${CMAKE_SOURCE_DIR}/packages/generic-plugins/plugins/datalogger/include/datalogger)
+
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt::Widgets

@@ -54,6 +54,7 @@ public:
 	bool loadPreferencesPage() override;
 	QString description() override;
 	QString pkgName() override;
+	DataLogger_API *getApi();
 
 public Q_SLOTS:
 	bool onConnect() override;
