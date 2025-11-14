@@ -8,6 +8,8 @@ Usage:
     python3 setup_test_environment.py v3.0.0 --rbp P0 P1              # Copy P0/P1 tests only
     python3 setup_test_environment.py v3.0.0 --component adc dac      # Copy adc/dac tests only
     python3 setup_test_environment.py v3.0.0 --rbp P0 --component m2k # Combined filtering
+    python3 setup_test_environment.py v3.0.0 --new-since v2.1.0       # New tests since v2.1.0
+    python3 setup_test_environment.py v3.0.0 --rbp P0 --new-since v2.1.0 # P0 + new tests
 """
 
 import os
@@ -15,7 +17,76 @@ import sys
 import shutil
 import argparse
 import re
+import subprocess
+import tempfile
 from pathlib import Path
+
+
+def get_git_root():
+    """Get the git repository root directory."""
+    try:
+        result = subprocess.run(['git', 'rev-parse', '--show-toplevel'],
+                              capture_output=True, check=True, text=True)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        return None
+
+
+def validate_git_repository():
+    """Ensure we're in a git repository."""
+    return get_git_root() is not None
+
+
+def git_tag_exists(tag_name):
+    """Check if a git tag exists."""
+    git_root = get_git_root()
+    if not git_root:
+        return False
+
+    try:
+        result = subprocess.run(['git', 'tag', '-l', tag_name],
+                              cwd=git_root, capture_output=True, check=True, text=True)
+        return tag_name in result.stdout.strip().split('\n')
+    except subprocess.CalledProcessError:
+        return False
+
+
+def detect_new_tests(baseline_version):
+    """Detect new test UIDs since baseline version."""
+    git_root = get_git_root()
+    if not git_root:
+        raise RuntimeError("Not in a git repository")
+
+    temp_dir = tempfile.mkdtemp()
+
+    try:
+        # Extract docs/tests directory at baseline version from git root
+        cmd = ['git', 'archive', baseline_version, 'docs/tests']
+        with subprocess.Popen(cmd, cwd=git_root, stdout=subprocess.PIPE) as git_proc:
+            subprocess.run(['tar', '-x', '-C', temp_dir],
+                         stdin=git_proc.stdout, check=True)
+
+        # Scan extracted files for UIDs
+        baseline_tests_dir = os.path.join(temp_dir, 'docs', 'tests')
+        if not os.path.exists(baseline_tests_dir):
+            raise FileNotFoundError(f"docs/tests not found in {baseline_version}")
+
+        baseline_files = scan_test_files(baseline_tests_dir)
+
+        baseline_uids = set()
+        for file_info in baseline_files:
+            for test in file_info['tests']:
+                if test['uid'] != 'MISSING':
+                    baseline_uids.add(test['uid'])
+
+        print(f"Baseline version {baseline_version}: {len(baseline_uids)} tests")
+        return baseline_uids
+
+    except Exception as e:
+        print(f"Error extracting baseline UIDs: {e}")
+        raise
+    finally:
+        shutil.rmtree(temp_dir)
 
 
 def scan_test_files(source_dir):
@@ -90,22 +161,30 @@ def extract_component_from_path(relative_path):
         return 'other'
 
 
-def filter_by_component(test_files, component_filter):
-    """Simple file-level filtering by component."""
+def filter_by_component(test_files, component_filter, new_uids=None):
+    """Simple file-level filtering by component, with new-since support."""
     if not component_filter:
         return test_files
 
     filtered = []
     for tf in test_files:
+        include_file = False
+
         # Include files from specified components
         if tf['component'] in component_filter:
-            filtered.append(tf)
+            include_file = True
+        # Include files containing new tests (bypass component filter)
+        elif new_uids and any(test['uid'] in new_uids for test in tf['tests']):
+            include_file = True
         # Include only top-level index files, not component-specific ones
         elif 'index.rst' in tf['relative_path']:
             path_parts = tf['relative_path'].split('/')
             # Include plugins/index.rst, general/index.rst but not plugins/m2k/index.rst
             if len(path_parts) == 2 and path_parts[1] == 'index.rst':
-                filtered.append(tf)
+                include_file = True
+
+        if include_file:
+            filtered.append(tf)
 
     return filtered
 
@@ -173,8 +252,8 @@ def rebuild_rst_file(header, filtered_tests):
     return result
 
 
-def filter_rst_content(file_path, rbp_filter):
-    """Parse RST file and keep only tests matching RBP filter."""
+def filter_rst_content(file_path, rbp_filter, new_uids=None):
+    """Parse RST file and keep only tests matching RBP filter or new tests."""
 
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -182,9 +261,23 @@ def filter_rst_content(file_path, rbp_filter):
     # Split into header + test sections
     structure = parse_rst_structure(content)
 
-    # Filter tests by RBP
-    filtered_tests = [test for test in structure['tests']
-                     if test['rbp'] in rbp_filter]
+    # Filter tests by RBP or new-since
+    filtered_tests = []
+    for test in structure['tests']:
+        include_test = False
+
+        # Include if it's a new test (always)
+        if new_uids and test['uid'] in new_uids:
+            include_test = True
+        # Include if matches RBP filter
+        elif rbp_filter and test['rbp'] in rbp_filter:
+            include_test = True
+        # Include if no filters specified
+        elif not rbp_filter and not new_uids:
+            include_test = True
+
+        if include_test:
+            filtered_tests.append(test)
 
     # Reconstruct file
     return rebuild_rst_file(structure['header'], filtered_tests)
@@ -268,16 +361,16 @@ def copy_files_unchanged(test_files, dest_dir, component_filter=None):
     return copied_count
 
 
-def filter_by_rbp_content(test_files, rbp_filter, dest_dir, component_filter=None):
-    """Content-level filtering: modify files to keep only specified RBP tests."""
-    if not rbp_filter:
-        # No RBP filter - copy files as-is
+def filter_by_rbp_content(test_files, rbp_filter, dest_dir, component_filter=None, new_uids=None):
+    """Content-level filtering: modify files to keep only specified RBP tests or new tests."""
+    if not rbp_filter and not new_uids:
+        # No filters - copy files as-is
         return copy_files_unchanged(test_files, dest_dir, component_filter)
 
     copied_count = 0
     copied_components = get_copied_components(test_files) if component_filter else None
 
-    # RBP filter active - parse and modify content
+    # Filter active - parse and modify content
     for test_file in test_files:
         dest_path = os.path.join(dest_dir, test_file['relative_path'])
 
@@ -285,7 +378,7 @@ def filter_by_rbp_content(test_files, rbp_filter, dest_dir, component_filter=Non
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
 
         if test_file['tests']:  # File contains tests
-            filtered_content = filter_rst_content(test_file['file_path'], rbp_filter)
+            filtered_content = filter_rst_content(test_file['file_path'], rbp_filter, new_uids)
             with open(dest_path, 'w', encoding='utf-8') as f:
                 f.write(filtered_content)
         elif component_filter and 'index.rst' in test_file['relative_path']:
@@ -316,8 +409,19 @@ def main():
                        help='Filter by RBP priority levels')
     parser.add_argument('--component', nargs='+',
                        help='Filter by component names (adc, m2k, core, etc.)')
+    parser.add_argument('--new-since',
+                       help='Include tests added since specified version (e.g., v2.1.0)')
 
     args = parser.parse_args()
+
+    # Validate git requirements for --new-since
+    if args.new_since:
+        if not validate_git_repository():
+            print("Error: Not in a git repository. --new-since requires git.")
+            sys.exit(1)
+        if not git_tag_exists(args.new_since):
+            print(f"Error: Git tag '{args.new_since}' not found.")
+            sys.exit(1)
 
     # Setup paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -350,21 +454,44 @@ def main():
     all_files = scan_test_files(source_dir)
     print(f"Found {len(all_files)} files total")
 
-    # Stage 1: Component filtering (file-level)
+    # Detect new tests if --new-since specified
+    new_uids = None
+    if args.new_since:
+        print(f"Detecting new tests since {args.new_since}...")
+        baseline_uids = detect_new_tests(args.new_since)
+
+        # Get current UIDs
+        current_uids = set()
+        for file_info in all_files:
+            for test in file_info['tests']:
+                if test['uid'] != 'MISSING':
+                    current_uids.add(test['uid'])
+
+        # Calculate new UIDs
+        new_uids = current_uids - baseline_uids
+        print(f"Current version: {len(current_uids)} tests")
+        print(f"New tests detected: {len(new_uids)} tests")
+
+    # Stage 1: Component filtering (file-level) with new-since support
     if args.component:
         print(f"Filtering by components: {args.component}")
-        component_filtered = filter_by_component(all_files, args.component)
+        component_filtered = filter_by_component(all_files, args.component, new_uids)
     else:
         component_filtered = all_files
 
     print(f"After component filter: {len(component_filtered)} files")
 
-    # Stage 2: RBP filtering (content-level) + copying
-    if args.rbp:
-        print(f"Filtering content by RBP: {args.rbp}")
-        copied_count = filter_by_rbp_content(component_filtered, args.rbp, dest_dir, args.component)
+    # Stage 2: Content-level filtering + copying
+    if args.rbp or args.new_since:
+        filter_desc = []
+        if args.rbp:
+            filter_desc.append(f"RBP: {args.rbp}")
+        if args.new_since:
+            filter_desc.append(f"new since {args.new_since}")
+        print(f"Filtering content by {' + '.join(filter_desc)}")
+        copied_count = filter_by_rbp_content(component_filtered, args.rbp, dest_dir, args.component, new_uids)
     else:
-        print("No RBP filter - copying files unchanged")
+        print("No content filters - copying files unchanged")
         copied_count = copy_files_unchanged(component_filtered, dest_dir, args.component)
 
     print(f"\n✓ Setup complete! {copied_count} files copied to {dest_dir}")
