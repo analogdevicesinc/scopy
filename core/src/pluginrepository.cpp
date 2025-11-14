@@ -140,4 +140,17 @@ QList<PluginInfo> PluginRepository::getPluginsInfo()
 	return pm->getPluginsInfo();
 }
 
+Plugin *PluginRepository::getCompatiblePluginByName(const QString &param, const QString &category,
+						    const QString &pluginName)
+{
+	PluginManager *pm = getPluginManager();
+	const QList<Plugin *> plugins = pm->getCompatiblePlugins(param, category);
+	for(Plugin *p : plugins) {
+		if(p->name() == pluginName) {
+			return p;
+		}
+	}
+	return nullptr;
+}
+
 #include "moc_pluginrepository.cpp"

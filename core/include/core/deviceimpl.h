@@ -61,6 +61,8 @@ public:
 
 	QList<Plugin *> plugins() const;
 	DeviceImpl::DeviceState_t state() override;
+	Plugin *getPluginByName(const QString &pluginName);
+
 public Q_SLOTS:
 	virtual void connectDev() override;
 	virtual void disconnectDev() override;

@@ -135,6 +135,8 @@ void PluginBase::cloneExtra(Plugin *) {}
 
 PingTask *PluginBase::pingTask() { return m_pingTask; }
 
+void PluginBase::setDevice(DeviceImpl *device) { m_device = device; }
+
 void PluginBase::initMetadata()
 {
 	loadMetadata(

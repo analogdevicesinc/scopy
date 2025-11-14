@@ -84,6 +84,8 @@ public:
 
 	virtual PingTask *pingTask() override;
 
+	virtual void setDevice(DeviceImpl *device) override;
+
 public Q_SLOTS:
 	virtual void showPageCallback() override;
 	virtual void hidePageCallback() override;
@@ -109,6 +111,7 @@ protected:
 	bool m_enabled;
 	PingTask *m_pingTask = nullptr;
 	CyclicalTask *m_cyclicalTask = nullptr;
+	DeviceImpl *m_device = nullptr;
 };
 } // namespace scopy
 
