@@ -78,7 +78,7 @@ def get_all_tests():
     """Get all tests from RST files."""
     # Base directory for tests (relative to this script's location)
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    scopy_root = os.path.dirname(script_dir)  # we assume script is in tools/
+    scopy_root = os.path.dirname(os.path.dirname(script_dir))  # script is in tools/testing/
     test_base_dir = os.path.join(scopy_root, "docs", "tests")
 
     all_tests = []
@@ -215,7 +215,7 @@ def main():
 
     # Generate Excel file
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    scopy_root = os.path.dirname(script_dir)
+    scopy_root = os.path.dirname(os.path.dirname(script_dir))
     excel_path = os.path.join(scopy_root, "scopy_tests_tracking.xlsx")
 
     success = generate_excel_output(all_tests, excel_path, args.version)
