@@ -20,25 +20,18 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-project(scopy-packages VERSION 0.1 LANGUAGES CXX)
+project(cli_analyzer VERSION 1.0 LANGUAGES C)
 
-# If DEV_MODE, remove all previously built packages
-if(SCOPY_DEV_MODE)
-	file(REMOVE_RECURSE ${SCOPY_PACKAGE_BUILD_PATH})
-endif()
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# Include utils
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+# Create the executable with bundled cJSON
+add_executable(cli_analyzer main.c cjson/cJSON.c)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	include(ScopyWindowsInstaller)
-endif()
-include(PackageUtils)
+# Set up include directories - cJSON.h is in the same directory
+target_include_directories(cli_analyzer PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(ENABLE_PACKAGE_TEST-PLUGINS OFF)
-set(ENABLE_PACKAGE_EXTPROC OFF)
-if(DISABLE_ALL_PACKAGES)
-	enable_all_packages(${CMAKE_CURRENT_SOURCE_DIR} OFF)
-	message(STATUS "DISABLE_ALL_PACKAGES is set.")
-endif()
-add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})
+target_compile_options(cli_analyzer PRIVATE -Wall -Wextra)
+
+# Set output directory to be alongside scopy executable
+set_target_properties(cli_analyzer PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

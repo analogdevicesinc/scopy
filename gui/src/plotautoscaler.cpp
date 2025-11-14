@@ -46,6 +46,8 @@ PlotAutoscaler::PlotAutoscaler(QObject *parent)
 
 PlotAutoscaler::~PlotAutoscaler() {}
 
+bool PlotAutoscaler::isActive() const { return m_autoScaleTimer->isActive(); }
+
 void PlotAutoscaler::start() { m_autoScaleTimer->start(); }
 
 void PlotAutoscaler::stop() { m_autoScaleTimer->stop(); }
