@@ -78,6 +78,7 @@ private:
 	void updateMeasurements(const QVariantMap &measurements);
 	void fillMeasurementsPanel(const QStringList &measurements);
 	void setupDataReader(const OutputInfo &outInfo);
+	void verifyBufferParams(const BufferParams &params);
 	QPushButton *createMenuButton(const QString &name, QWidget *parent = nullptr);
 
 	QMap<QString, MeasurementLabel *> m_labels;

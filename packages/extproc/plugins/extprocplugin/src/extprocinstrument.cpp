@@ -112,6 +112,7 @@ void ExtProcInstrument::setupConnections()
 	connect(m_settings, &SettingsMenu::analysisChanged, this, &ExtProcInstrument::requestAnalysisInfo);
 	connect(m_settings, &SettingsMenu::analysisConfig, this, &ExtProcInstrument::analysisConfigChanged);
 	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &ExtProcInstrument::bufferParamsChanged);
+	connect(m_settings, &SettingsMenu::bufferParamsChanged, this, &ExtProcInstrument::verifyBufferParams);
 	connect(m_settings, &SettingsMenu::plotSettings, m_plotManager, &PlotManager::plotSettingsRequest);
 	connect(m_settings, &SettingsMenu::fftEnabled, m_dataProcessingService, &DataProcessingService::setFFTEnabled);
 	connect(m_plotManager, &PlotManager::plotSettings, m_settings, &SettingsMenu::onSettingsMenu);
@@ -282,6 +283,14 @@ void ExtProcInstrument::setupDataReader(const OutputInfo &outInfo)
 	m_dataReader->setChannelCount(channelCount);
 	m_dataReader->setChannelFormat(chnlsFormat);
 	m_dataReader->setChannelsName(chnlsName);
+}
+
+void ExtProcInstrument::verifyBufferParams(const BufferParams &params)
+{
+	if(params.enChnls.isEmpty()) {
+		m_runBtn->setDisabled(true);
+		m_singleBtn->setDisabled(true);
+	}
 }
 
 QPushButton *ExtProcInstrument::createMenuButton(const QString &name, QWidget *parent)
