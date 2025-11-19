@@ -560,7 +560,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/genalyzer.git",
-					"branch": "v0.1.2"
+					"branch": "main"
 				}
 			]
 		},

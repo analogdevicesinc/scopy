@@ -209,7 +209,7 @@ clone() {
 		git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
-		git clone --recursive https://github.com/andrei47w/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 
 		DEPENDENCY_REPOS="libserialport libiio libad9361 libm2k gr-scopy gr-m2k gnuradio qwt libsigrokdecode libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer"
 		# Save to cache for next time
