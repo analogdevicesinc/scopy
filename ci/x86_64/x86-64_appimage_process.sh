@@ -33,7 +33,7 @@ IIOEMU_BRANCH=master
 KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
-GENALYZER_BRANCH=v0.1.2
+GENALYZER_BRANCH=main
 
 # default python version used in CI scripts, can be changed to match locally installed python
 PYTHON_VERSION=python3.8
