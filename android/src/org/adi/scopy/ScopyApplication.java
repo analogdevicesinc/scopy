@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.system.Os;
 import android.system.ErrnoException;
 import android.preference.PreferenceManager;
@@ -46,37 +48,28 @@ import android.util.Log;
 
 
 public class ScopyApplication extends QtApplication {
-  private static void listAllFiles(Path currentPath, List<Path> allFiles)
-    throws IOException {
-    try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentPath)) {
-      for (Path entry : stream) {
-        if (Files.isDirectory(entry)) {
-          listAllFiles(entry, allFiles);
-        } else {
-          allFiles.add(entry);
-        }
-      }
-    }
-  }
-
   private static boolean copyAssetFolder(AssetManager assetManager, String fromAssetPath, String toPath) {
-
     try {
       String[] files = assetManager.list(fromAssetPath);
-      new File(toPath).mkdirs();
-      System.out.println("toPath " + toPath);
-      System.out.println("fromAssetPath " + fromAssetPath);
-      System.out.println("Files length: " + files.length);
-      boolean res = true;
+      if (files == null) {
+        System.out.println("No file found");
+        return false;
+      }
+      boolean ret = new File(toPath).mkdirs();
+      if (!ret) {
+        System.out.println("Can't create folder");
+        return false;
+      }
+
       for (String file : files) {
         System.out.println("Files: " + file);
         if (file.contains(".")) {
-          res &= copyAsset(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
+          ret &= copyAsset(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
         } else {
-          res &= copyAssetFolder(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
+          ret &= copyAssetFolder(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
         }
       }
-      return res;
+      return ret;
     } catch (Exception e) {
       e.printStackTrace();
       return false;
@@ -87,11 +80,9 @@ public class ScopyApplication extends QtApplication {
     InputStream in = null;
     OutputStream out = null;
     try {
-
       System.out.println("Copying from " + fromAssetPath + " to " + toPath);
       in = assetManager.open(fromAssetPath);
-      new File(toPath).createNewFile();
-      out = new FileOutputStream(toPath);
+      out = Files.newOutputStream(Paths.get(toPath));
       copyFile(in, out);
       in.close();
       in = null;
@@ -120,26 +111,22 @@ public class ScopyApplication extends QtApplication {
     }
   }
 
-  private static void copyFileUsingJava7Files(File source, File dest) throws IOException {
-    Files.copy(source.toPath(), dest.toPath());
-  }
-
   @Override
   public void onCreate() {
     System.out.println("QtApplication started");
     String apk = getApplicationInfo().sourceDir;
     String cache = getApplicationContext().getCacheDir().toString();
-    System.out.println("sourcedir: " + getApplicationInfo().sourceDir);
-    System.out.println("public sourcedir: " + getApplicationInfo().publicSourceDir);
+    System.out.println("SourceDir: " + getApplicationInfo().sourceDir);
+    System.out.println("Public SourceDir: " + getApplicationInfo().publicSourceDir);
     String libdir = getApplicationInfo().nativeLibraryDir;
-    System.out.println("native library dir:" + libdir);
-    System.out.println("applcation cache dir:" + cache);
+    System.out.println("Native Library dir:" + libdir);
+    System.out.println("Application Cache dir:" + cache);
     System.out.println("Hello Scopy !");
 
     try {
       Os.setenv("PYTHONHOME", ".", true);
       Os.setenv("PYTHONPATH", apk + "/assets/python3.11", true);
-      Os.setenv("SIGROKDECODE_DIR", apk + "/assets/libsigrokdecode/decoders", true);
+      Os.setenv("SIGROKDECODE_DIR", cache + "/decoders", true);
       Os.setenv("APPDATA", cache, true);
       Os.setenv("LD_LIBRARY_PATH", libdir, true);
       Os.setenv("IIOEMU_BIN", libdir + "/iio-emu.so", true);
@@ -149,21 +136,30 @@ public class ScopyApplication extends QtApplication {
 
     super.onCreate();
 
-    boolean reloadLibs = true;
+    boolean reloadLibs = false;
+    SharedPreferences prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
 
-    System.out.println("Copying assets to " + cache);
+    if (!isInstalled(prefs)) {
+      setInstalled(prefs);
+      System.out.println("Copying all assets to " + cache);
+      String[] folders = null;
+      try {
+        folders = getAssets().list("");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
 
-    String[] folders = null;
-    try {
-      folders = getAssets().list("");
-    } catch (Exception e) {
-      e.printStackTrace();
+      for (String folder : folders) {
+        System.out.println("Folder found: " + folder);
+        copyAssetFolder(getAssets(), folder, cache + "/" + folder);
+      }
+    } else {
+      System.out.println("All assets are copied to: " + cache);
     }
 
-    for (String folder : folders) {
-      System.out.println("Folder found: " + folder);
-      copyAssetFolder(getAssets(), folder, cache + "/" + folder);
-    }
+    if (reloadLibs)
+      clearInstalled(prefs);
+
 
 //    System.out.println("Copy Files here:");
 //    for (File file : Objects.requireNonNull(new File(cache).listFiles())) {
@@ -178,19 +174,20 @@ public class ScopyApplication extends QtApplication {
 //    copyAssetFolder(getAssets(), "decoders", cache + "/decoders");
 //    copyAssetFolder(getAssets(), "python3.11", cache + "/decoders");
 //      copyAsset(getAssets(), "scopy_emu_options_config.json", cache + "/scopy_emu_options_config.json");+
+
+
   }
 
-  private boolean isInstalled() {
-    //return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("installed", false);
-    return false;
+  private boolean isInstalled(SharedPreferences prefs) {
+    return prefs.getBoolean("installed", false);
   }
 
-  private void setInstalled() {
-    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("installed", true).commit();
+  private void setInstalled(SharedPreferences prefs) {
+    prefs.edit().putBoolean("installed", true).apply();
   }
 
-  private void clearInstalled() {
-    PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putBoolean("installed", false).commit();
+  private void clearInstalled(SharedPreferences prefs) {
+    prefs.edit().putBoolean("installed", false).apply();
   }
 
 }
