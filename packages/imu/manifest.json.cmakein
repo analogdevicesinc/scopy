@@ -1,0 +1,13 @@
+{
+    "id": "imu",
+    "title": "IMU Analyzer",
+    "version": "@PROJECT_VERSION@",
+    "description": "IMU Evaluation Software Package",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+  }
+  
