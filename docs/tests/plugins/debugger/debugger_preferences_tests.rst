@@ -34,6 +34,8 @@ Test 1: Control debugger version
 
 **UID**: TST.DBG.PREF.CHANGE_VERSION
 
+**RBP:** P1
+
 **Description**: This option allows you to use the new debugger plugin. The new plugin is more stable and has more features than the old plugin. The old plugin is still available for use, but it is recommended to use the new plugin. When this option is checked, the new plugin is used. When it is unchecked, the old plugin is used. After changing this option, a restart of Scopy is required for the change to take effect.
 
 **Preconditions**:
@@ -101,6 +103,8 @@ Test 2: Include debug attributes in IIO Explorer
 ----------------------------------------------------------------------------------------------------
 
 **UID**: TST.DBG.PREF.INCLUDE_DEBUG_ATTRIBUTES
+
+**RBP:** P2
 
 **Description**: This option allows you to include IIO debug attributes in the IIO Explorer. When this option is checked, debug attributes are included in the IIO Explorer. When it is unchecked, debug attributes are not included in the IIO Explorer. After changing this option, a restart of Scopy is required for the change to take effect.
 
