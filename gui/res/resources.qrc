@@ -180,6 +180,8 @@
         <file>icons/uninstall-icon.svg</file>
         <file>icons/install-icon.svg</file>
         <file>icons/tool_scripting.svg</file>
+        <file>icons/scopy-default/icons/tool_imuanalyzer.svg</file>
+        <file>icons/scopy-light/icons/tool_imuanalyzer.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>icons/scopy-default/icons/search.svg</file>
