@@ -33,7 +33,7 @@ IIOEMU_BRANCH=master
 KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
-GENALYZER_BRANCH=v0.1.2
+GENALYZER_BRANCH=main
 
 if [ -f /etc/os-release ]; then
     . /etc/os-release
