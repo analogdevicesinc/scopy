@@ -1,6 +1,6 @@
 # Scopy Testing Tools
 
-A comprehensive set of Python tools for managing Scopy's manual testing workflow. These tools automate test environment setup, result parsing, and Excel report generation for release testing processes.
+A comprehensive set of Python tools for managing Scopy's manual testing workflow. These tools automate test environment setup, result parsing, and CSV template generation for release testing processes.
 
 ## Quick Start
 
@@ -25,9 +25,9 @@ Edit the generated RST files in `testing_results/testing_results_v3.0.0/` and fi
 - **Comments:** Test execution notes
 - **Result:** PASS or FAIL
 
-### 3. **Generate Excel Report**
+### 3. **CSV Template Auto-Generated**
+The CSV template is automatically created during step 1. You can also generate it manually:
 ```bash
-# Parse completed test results and create Excel report
 python3 parseTestResults.py v3.0.0
 ```
 
@@ -74,9 +74,9 @@ python3 setup_test_environment.py v3.0.0 --new-since v2.5.0
 - Contains filtered RST files ready for manual testing
 - Preserves RST structure for documentation compilation
 
-### `parseTestResults.py` - Excel Report Generation
+### `parseTestResults.py` - CSV Template Generation
 
-**Purpose:** Parses completed test results and generates Excel reports with execution statistics.
+**Purpose:** Generates CSV templates from testing directories for manual test execution tracking.
 
 **Basic Usage:**
 ```bash
@@ -97,9 +97,9 @@ python3 parseTestResults.py v3.0.0 --output /path/to/custom_results.xlsx
 ```
 
 **Output:**
-- Creates/updates `testing_results/scopy_test_results.xlsx`
-- Each version gets its own worksheet
-- Columns: Test UID | Component | RBP | Result | Tested OS | Comments | File
+- Creates `testing_results/testing_results_{version}.csv`
+- Template with empty result fields for manual completion
+- Columns: Test UID | Component | RBP | Result | Tested OS | Comments | Tester | File
 
 ### `generateTestsTable.py` - Source Documentation Tracking
 
@@ -153,23 +153,16 @@ cd testing_results/testing_results_v3.0.0/
 **Result:** PASS
 ```
 
-**3. Generate Report**
-```bash
-# Parse results and create Excel report
-python3 parseTestResults.py v3.0.0
-```
+**3. Track Test Execution**
+- Edit the auto-generated CSV template: `testing_results/testing_results_v3.0.0.csv`
+- Fill in Result, Tested OS, Comments, and Tester columns for each test
 
 **4. Review Results**
-- Open `testing_results/scopy_test_results.xlsx`
-- Check "v3.0.0" worksheet for complete test execution summary
+- Open `testing_results/testing_results_v3.0.0.csv`
+- Use spreadsheet software for analysis and reporting
 
 
 ##  Requirements
-
-### Dependencies
-```bash
-pip install openpyxl  # For Excel file generation
-```
 
 ### Git Requirements
 - Git repository (required for `--new-since` functionality)
@@ -183,21 +176,22 @@ scopy/
 └── tools/testing/        # This toolset
 ```
 
-## Excel Report Format
+## CSV Template Format
 
 ### Columns
 - **Test UID** - Unique test identifier
 - **Component** - Test component (adc, dac, m2k, core, etc.)
 - **RBP** - Risk-based priority (P0, P1, P2, P3)
-- **Result** - Test outcome (PASSED, FAILED, SKIPPED)
-- **Tested OS** - Operating system used for testing
-- **Comments** - Test execution notes
+- **Result** - Test outcome (empty template field for PASSED/FAILED/SKIPPED)
+- **Tested OS** - Operating system used for testing (empty template field)
+- **Comments** - Test execution notes (empty template field)
+- **Tester** - Person executing the tests (empty template field)
 - **File** - Source RST filename
 
 ### Multiple Versions
-- Each version gets its own worksheet in the Excel file
+- Each version gets its own CSV file: `testing_results_{version}.csv`
 - Historical test data preserved across versions
-- Easy comparison between releases
+- Easy import into spreadsheet tools for analysis
 
 ## Troubleshooting
 

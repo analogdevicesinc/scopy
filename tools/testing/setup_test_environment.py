@@ -56,6 +56,20 @@ def main():
     # Setup paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
     scopy_root = os.path.dirname(os.path.dirname(script_dir))  # tools/testing -> root
+
+    # Validate component names
+    if args.component:
+        plugins_dir = os.path.join(scopy_root, 'docs', 'tests', 'plugins')
+        if os.path.exists(plugins_dir):
+            valid_components = [d for d in os.listdir(plugins_dir)
+                              if os.path.isdir(os.path.join(plugins_dir, d))]
+
+            for component in args.component:
+                if component not in valid_components:
+                    print(f"Error: Component '{component}' not found.")
+                    sys.exit(1)
+
+    # Continue with paths
     source_dir = os.path.join(scopy_root, 'docs', 'tests')
     testing_results_base = os.path.join(scopy_root, 'testing_results')
     dest_dir = os.path.join(testing_results_base, f'testing_results_{args.version}')
@@ -121,6 +135,28 @@ def main():
         copied_count = copy_files_unchanged(component_filtered, dest_dir, args.component)
 
     print(f"\n✓ Setup complete! {copied_count} files copied to {dest_dir}")
+
+    # Generate CSV template after successful setup
+    print("\nGenerating CSV template...")
+    try:
+        import subprocess
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        parse_script = os.path.join(script_dir, 'parseTestResults.py')
+
+        result = subprocess.run([
+            'python3', parse_script, args.version
+        ], capture_output=True, text=True, check=True)
+
+        print("✓ CSV template generated successfully")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Warning: CSV generation failed: {e.stderr.strip()}")
+        print("You can manually generate it later with:")
+        print(f"  python3 parseTestResults.py {args.version}")
+    except Exception as e:
+        print(f"Warning: Could not generate CSV template: {e}")
+        print("You can manually generate it later with:")
+        print(f"  python3 parseTestResults.py {args.version}")
 
 
 if __name__ == "__main__":

@@ -1,31 +1,19 @@
 #!/usr/bin/env python3
 """
-Parse completed test results from testing_results directories and generate Excel reports.
-Creates version-specific worksheets in a master Excel file for tracking test execution.
+Generate CSV templates from testing_results directories for manual test execution.
+Creates version-specific CSV files with test metadata for tracking test execution.
 
 Usage:
-    python3 parseTestResults.py v3.0.0                    # Parse v3.0.0 results
-    python3 parseTestResults.py v3.0.0 --output custom.xlsx  # Custom output file
-
-Requirements:
-    pip install openpyxl
+    python3 parseTestResults.py v3.0.0                    # Generate v3.0.0 CSV template
+    python3 parseTestResults.py v3.0.0 --output custom.csv  # Custom output file
 """
 
 import os
 import sys
 import re
 import argparse
+import csv
 from pathlib import Path
-
-# Import Excel dependencies
-try:
-    from openpyxl import Workbook, load_workbook
-    from openpyxl.styles import Font, PatternFill
-    from openpyxl.utils import get_column_letter
-except ImportError:
-    print("ERROR: openpyxl library is required for this script.")
-    print("Install with: pip install openpyxl")
-    sys.exit(1)
 
 
 def build_testing_results_path(version):
@@ -35,14 +23,14 @@ def build_testing_results_path(version):
     return os.path.join(scopy_root, "testing_results", f"testing_results_{version}")
 
 
-def get_output_excel_path(custom_path=None):
-    """Get Excel output path (default: testing_results/scopy_test_results.xlsx)."""
+def get_output_csv_path(version, custom_path=None):
+    """Get CSV output path (default: testing_results/testing_results_v{version}.csv)."""
     if custom_path:
         return custom_path
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     scopy_root = os.path.dirname(os.path.dirname(script_dir))  # tools/testing/ → scopy/
-    return os.path.join(scopy_root, "testing_results", "scopy_test_results.xlsx")
+    return os.path.join(scopy_root, "testing_results", f"testing_results_{version}.csv")
 
 
 def scan_testing_results_files(results_dir):
@@ -91,7 +79,7 @@ def extract_component_from_testing_path(relative_path):
 
 def parse_rst_structure(content):
     """Parse RST into header section + individual test sections."""
-    # Find test boundaries using pattern: "Test N - " followed by underline
+    # Find test boundaries using pattern: "Test N " followed by underline
     test_pattern = r'^(Test \d+[^\n]*\n[\^=-]+\n)'
 
     # Split content at test boundaries
@@ -104,7 +92,7 @@ def parse_rst_structure(content):
     header = parts[0]  # Everything before first test
     tests = []
 
-    # Process test sections (parts[1], parts[2], parts[3], parts[4], ...)
+    # Process test sections 
     for i in range(1, len(parts), 2):
         if i + 1 < len(parts):
             heading = parts[i]
@@ -114,17 +102,11 @@ def parse_rst_structure(content):
             uid = extract_uid_from_content(content_block)
             rbp = extract_rbp_from_content(content_block)
 
-            # Extract result metadata
-            result_data = extract_result_metadata(content_block)
-
             tests.append({
                 'heading': heading,
                 'content': content_block,
                 'uid': uid,
-                'rbp': rbp,
-                'result': result_data['result'],
-                'tested_os': result_data['tested_os'],
-                'comments': result_data['comments']
+                'rbp': rbp
             })
 
     return {'header': header, 'tests': tests}
@@ -144,53 +126,10 @@ def extract_rbp_from_content(content):
     return match.group(1) if match else 'MISSING'
 
 
-def extract_result_metadata(content):
-    """Extract result fields from test content."""
-    result_data = {
-        'result': None,
-        'tested_os': None,
-        'comments': None
-    }
-
-    # Parse **Result:** PASS/FAIL (treat "PASS/FAIL" as SKIPPED)
-    result_pattern = r'\*\*Result:\*\*\s+([^\n]+)'
-    result_match = re.search(result_pattern, content)
-    if result_match:
-        result_value = result_match.group(1).strip()
-        if result_value == 'PASS/FAIL':
-            result_data['result'] = None  # Will become SKIPPED
-        elif result_value in ['PASS', 'FAIL']:
-            result_data['result'] = result_value
-        else:
-            result_data['result'] = None  # Unknown format, treat as SKIPPED
-
-    # Parse **Tested OS:** value
-    os_pattern = r'\*\*Tested OS:\*\*\s+([^\n]+)'
-    os_match = re.search(os_pattern, content)
-    if os_match:
-        result_data['tested_os'] = os_match.group(1).strip()
-
-    # Parse **Comments:** value
-    comments_pattern = r'\*\*Comments:\*\*\s+([^\n]+)'
-    comments_match = re.search(comments_pattern, content)
-    if comments_match:
-        result_data['comments'] = comments_match.group(1).strip()
-
-    return result_data
 
 
-def normalize_result_status(raw_status):
-    """Convert PASS/FAIL to PASSED/FAILED, handle missing."""
-    if raw_status == 'PASS':
-        return 'PASSED'
-    elif raw_status == 'FAIL':
-        return 'FAILED'
-    else:
-        return 'SKIPPED'
-
-
-def parse_test_results_from_rst(file_path):
-    """Parse RST file and extract all test results."""
+def parse_test_metadata_from_rst(file_path):
+    """Parse RST file and extract test metadata (UID, RBP only)."""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -204,7 +143,7 @@ def parse_test_results_from_rst(file_path):
 
 
 def process_all_test_data(results_dir):
-    """Main processing function - parse all test data from directory."""
+    """Main processing function - extract test metadata from directory."""
     all_test_data = []
 
     rst_files = scan_testing_results_files(results_dir)
@@ -214,16 +153,17 @@ def process_all_test_data(results_dir):
         if 'index.rst' in rst_file['filename']:
             continue
 
-        tests = parse_test_results_from_rst(rst_file['file_path'])
+        tests = parse_test_metadata_from_rst(rst_file['file_path'])
 
         for test in tests:
             test_data = {
                 'uid': test['uid'],
                 'component': rst_file['component'],
                 'rbp': test['rbp'],
-                'result': normalize_result_status(test['result']),
-                'tested_os': test['tested_os'] or 'N/A',
-                'comments': test['comments'] or 'N/A',
+                'result': '',
+                'tested_os': '',
+                'comments': '',
+                'tester': '',
                 'file': rst_file['filename']
             }
             all_test_data.append(test_data)
@@ -232,144 +172,65 @@ def process_all_test_data(results_dir):
 
 
 def validate_and_fill_missing_data(test_data):
-    """Ensure all fields have values (N/A for missing)."""
+    """Ensure all fields have values (empty strings for missing)."""
     for test in test_data:
         for key, value in test.items():
-            if value is None or value == '' or value == 'MISSING':
-                if key == 'result':
-                    test[key] = 'SKIPPED'
-                else:
-                    test[key] = 'N/A'
+            if value is None :
+                test[key] = ''
 
     return test_data
 
 
-def setup_worksheet_formatting(worksheet):
-    """Apply Excel formatting (headers, column widths, etc.)."""
-    # Format header row
-    for col in range(1, 8):  # A through G
-        cell = worksheet.cell(row=1, column=col)
-        cell.font = Font(bold=True)
-        cell.fill = PatternFill(start_color="CCCCCC", end_color="CCCCCC", fill_type="solid")
-
-    # Auto-size columns
-    for col in range(1, 8):
-        column_letter = get_column_letter(col)
-        worksheet.column_dimensions[column_letter].auto_size = True
 
 
-def generate_excel_report(test_data, excel_path, version):
-    """Generate or update Excel file with version worksheet."""
+def generate_csv(test_data, csv_path):
+    """Generate CSV file with test data template."""
 
-    # Load existing workbook or create new one
-    if os.path.exists(excel_path):
-        wb = load_workbook(excel_path)
-    else:
-        wb = Workbook()
-        # Remove default sheet
-        if 'Sheet' in wb.sheetnames:
-            wb.remove(wb['Sheet'])
+    # Check if file exists and prompt user
+    if os.path.exists(csv_path):
+        response = input(f"File {csv_path} exists. Overwrite? (y/N): ")
+        if response.lower() != 'y':
+            print("Aborted.")
+            return False
+      
 
-    # Create or get worksheet for this version
-    if version in wb.sheetnames:
-        ws = wb[version]
-        # Clear existing content
-        ws.delete_rows(1, ws.max_row)
-    else:
-        ws = wb.create_sheet(version)
+    # CSV file header 
+    headers = ['Test UID', 'Component', 'RBP', 'Result', 'Tested OS', 'Comments', 'Tester', 'File']
 
-    # Write headers
-    headers = ['Test UID', 'Component', 'RBP', 'Result', 'Tested OS', 'Comments', 'File']
-    for col, header in enumerate(headers, 1):
-        ws.cell(row=1, column=col, value=header)
+    with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
 
-    # Write test data
-    for row_idx, test in enumerate(test_data, 2):  # Start from row 2
-        ws.cell(row=row_idx, column=1, value=test['uid'])
-        ws.cell(row=row_idx, column=2, value=test['component'])
-        ws.cell(row=row_idx, column=3, value=test['rbp'])
-        ws.cell(row=row_idx, column=4, value=test['result'])
-        ws.cell(row=row_idx, column=5, value=test['tested_os'])
-        ws.cell(row=row_idx, column=6, value=test['comments'])
-        ws.cell(row=row_idx, column=7, value=test['file'])
+        # Write header row
+        writer.writerow(headers)
 
-    # Apply formatting
-    setup_worksheet_formatting(ws)
+        # Write test data rows
+        for test in test_data:
+            writer.writerow([
+                test['uid'],
+                test['component'],
+                test['rbp'],
+                test['result'],
+                test['tested_os'],
+                test['comments'],
+                test['tester'],
+                test['file']
+            ])
 
-    # Save workbook
-    wb.save(excel_path)
     return True
-
-
-def get_test_summary_stats(test_data):
-    """Generate summary statistics for reporting."""
-    total_tests = len(test_data)
-
-    # Count by status
-    status_counts = {}
-    for test in test_data:
-        status = test['result']
-        status_counts[status] = status_counts.get(status, 0) + 1
-
-    # Count by component
-    component_counts = {}
-    for test in test_data:
-        component = test['component']
-        component_counts[component] = component_counts.get(component, 0) + 1
-
-    return {
-        'total': total_tests,
-        'by_status': status_counts,
-        'by_component': component_counts
-    }
-
-
-def print_summary_report(test_data, excel_path, version, stats):
-    """Print detailed summary report."""
-    print(f"\n=== Test Results Parsing Summary ===")
-    print(f"Version: {version}")
-    print(f"Excel Report: {excel_path}")
-    print(f"Worksheet: \"{version}\" ({stats['total']} tests)")
-
-    # Component breakdown
-    print(f"\nProcessing by component:")
-    for component, count in stats['by_component'].items():
-        # Calculate component-specific status breakdown
-        comp_tests = [t for t in test_data if t['component'] == component]
-        comp_stats = get_test_summary_stats(comp_tests)
-
-        passed = comp_stats['by_status'].get('PASSED', 0)
-        failed = comp_stats['by_status'].get('FAILED', 0)
-        skipped = comp_stats['by_status'].get('SKIPPED', 0)
-
-        print(f"├── {component.title()} Plugin: {count} tests ({passed} PASSED, {failed} FAILED, {skipped} SKIPPED)")
-
-    # Overall summary
-    print(f"\n=== Overall Summary ===")
-    print(f"Total Tests: {stats['total']}")
-
-    for status in ['PASSED', 'FAILED', 'SKIPPED']:
-        count = stats['by_status'].get(status, 0)
-        percentage = (count / stats['total'] * 100) if stats['total'] > 0 else 0
-        print(f"├── {status}: {count} ({percentage:.0f}%)")
-
-    print(f"\n✓ Test results parsing completed successfully!")
-
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Parse Scopy test results and generate Excel report',
-        epilog='Requires: openpyxl (pip install openpyxl)',
+        description='Generate CSV template from Scopy test metadata',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument('version', help='Version to parse (e.g., v3.0.0)')
-    parser.add_argument('--output', help='Custom output Excel file path')
+    parser.add_argument('version', help='Version to process (e.g., v3.0.0)')
+    parser.add_argument('--output', help='Custom output CSV file path')
 
     args = parser.parse_args()
 
     # Build paths
     results_dir = build_testing_results_path(args.version)
-    excel_path = get_output_excel_path(args.output)
+    csv_path = get_output_csv_path(args.version, args.output)
 
     # Validate input directory exists
     if not os.path.exists(results_dir):
@@ -378,12 +239,9 @@ def main():
         sys.exit(1)
 
     # Create output directory if needed
-    output_dir = os.path.dirname(excel_path)
+    output_dir = os.path.dirname(csv_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
-    print(f"Parsing test results for version: {args.version}")
-    print(f"Source directory: {results_dir}")
 
     # Process all test data
     test_data = process_all_test_data(results_dir)
@@ -391,21 +249,16 @@ def main():
 
     if not test_data:
         print("Warning: No test data found in the specified directory.")
-        print("Make sure the directory contains RST files with test results.")
+        print("Make sure the directory contains RST files with test metadata.")
         sys.exit(1)
 
-    print(f"Found {len(test_data)} tests total")
-
-    # Generate Excel report
-    success = generate_excel_report(test_data, excel_path, args.version)
+    # Generate CSV report
+    success = generate_csv(test_data, csv_path)
 
     if not success:
-        print("Failed to generate Excel report")
         sys.exit(1)
 
-    # Generate and print summary
-    stats = get_test_summary_stats(test_data)
-    print_summary_report(test_data, excel_path, args.version, stats)
+    print("CSV generated successfully")
 
 
 if __name__ == "__main__":
