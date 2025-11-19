@@ -33,7 +33,7 @@ IIOEMU_BRANCH=master
 KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
-GENALYZER_BRANCH=v0.1.2
+GENALYZER_BRANCH=main
 
 # default python version used in CI scripts, can be changed to match locally installed python
 PYTHON_VERSION=python3.8
@@ -102,7 +102,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
-	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	[ -d 'genalyzer' ] || git clone --recursive https://github.com/andrei47w/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 

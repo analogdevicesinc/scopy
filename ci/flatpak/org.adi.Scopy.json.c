@@ -542,8 +542,8 @@
 			"sources": [
 				{
 					"type": "git",
-					"url": "https://github.com/analogdevicesinc/genalyzer.git",
-					"branch": "v0.1.2"
+					"url": "https://github.com/andrei47w/genalyzer.git",
+					"branch": "main"
 				}
 			]
 		},
