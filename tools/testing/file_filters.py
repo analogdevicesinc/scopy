@@ -15,6 +15,10 @@ from rst_parser import parse_rst_structure, rebuild_rst_file
 
 def _should_include_file(test_file, component_filter, new_uids):
     """Determine if file should be included based on filters."""
+    # Skip all index files - they're not needed for CSV workflow
+    if 'index.rst' in test_file['relative_path']:
+        return False
+
     # Include files from specified components
     if test_file['component'] in component_filter:
         return True
@@ -22,12 +26,6 @@ def _should_include_file(test_file, component_filter, new_uids):
     # Include files containing new tests (bypass component filter)
     if new_uids and any(test['uid'] in new_uids for test in test_file['tests']):
         return True
-
-    # Include only top-level index files, not component-specific ones
-    if 'index.rst' in test_file['relative_path']:
-        path_parts = test_file['relative_path'].split('/')
-        # Include plugins/index.rst, general/index.rst but not plugins/m2k/index.rst
-        return len(path_parts) == 2 and path_parts[1] == 'index.rst'
 
     return False
 
