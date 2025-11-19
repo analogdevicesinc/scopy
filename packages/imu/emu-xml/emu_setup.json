@@ -1,0 +1,7 @@
+[
+    {
+	"device": "adis",
+	"xml_path": "adis.xml",
+	"uri": "ip:127.0.0.1"
+    }
+]
