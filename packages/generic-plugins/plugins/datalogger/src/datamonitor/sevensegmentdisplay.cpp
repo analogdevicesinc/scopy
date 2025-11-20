@@ -92,4 +92,6 @@ void SevenSegmentDisplay::togglePeakHolder(bool toggle)
 	}
 }
 
+QVBoxLayout *SevenSegmentDisplay::getLayout() const { return layout; }
+
 #include "moc_sevensegmentdisplay.cpp"
