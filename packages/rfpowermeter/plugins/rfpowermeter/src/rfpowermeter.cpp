@@ -23,12 +23,15 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
+#include <iiowidgetbuilder.h>
 #include <iioutil/connectionprovider.h>
+#include <style.h>
 
 #include "core/deviceimpl.h"
 #include <datalogger/datalogger_api.hpp>
 #include <datalogger/dataloggerplugin.h>
 #include <core/pluginrepository.h>
+#include <datamonitor/sevensegmentdisplay.hpp>
 
 Q_LOGGING_CATEGORY(CAT_RFPOWERMETER, "RFPowerMeterPlugin")
 using namespace scopy::rfpowermeter;
@@ -120,55 +123,79 @@ bool RFPowerMeterPlugin::onConnect()
 			datamonitor::DataLoggerPlugin *dataLogger = dynamic_cast<datamonitor::DataLoggerPlugin *>(
 				m_device->getPluginByName("DataLoggerPlugin"));
 			dataloggerApi = dataLogger->getApi();
+
+			datamonitor::DatamonitorTool *tool =
+				dynamic_cast<datamonitor::DatamonitorTool *>(dataLogger->toolList().first()->tool());
+
+			if(tool != nullptr) {
+				QWidget *widget = new QWidget(tool);
+				QHBoxLayout *layout = new QHBoxLayout();
+				layout->setMargin(5);
+				layout->setSpacing(0);
+				widget->setLayout(layout);
+
+				Style::setBackgroundColor(widget, json::theme::background_primary, true);
+
+				IIOWidget *frequency = IIOWidgetBuilder(tool)
+							       .device(powrmsDevice)
+							       .attribute("frequency_MHz")
+							       .buildSingle();
+
+				layout->addWidget(frequency);
+
+				tool->getSevenSegmetMonitors()->getLayout()->addWidget(widget);
+			}
+
+			if(!dataloggerApi) {
+				qWarning(CAT_RFPOWERMETER) << "DataLogger API not available for device:" << m_param;
+				return false;
+			}
+
+			// Configure DataLogger for RF Power Meter (matching original JavaScript)
+			dataloggerApi->setToolName("Data Logger ", "RF Power Meter");
+			dataloggerApi->setDisplayMode("RF Power Meter", 2);
+
+			// Configure power5 (Power Forward)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:power5", "Power Forward");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:power5", "");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:power5", "dBm");
+			dataloggerApi->enableMonitorOfTool("RF Power Meter", "powrms:power5");
+
+			// Configure power6 (Power Reverse)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:power6", "Power Reverse");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:power6", "");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:power6", "dBm");
+			dataloggerApi->enableMonitorOfTool("RF Power Meter", "powrms:power6");
+
+			// Configure voltage0 (Voltage in corrected)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage0",
+							     "Voltage In Corrected");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage0", "Voltage");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage0", "mV");
+
+			// Configure voltage1 (Voltage out corrected)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage1",
+							     "Voltage Out Corrected");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage1", "Voltage");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage1", "mV");
+
+			// Configure voltage2 (Temperature)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage2", "Temperature");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage2", "Voltage");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage2", "mV");
+
+			// Configure voltage3 (Voltage in)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage3", "Voltage In");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage3", "Voltage");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage3", "mV");
+
+			// Configure voltage4 (Voltage out)
+			dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage4", "Voltage Out");
+			dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage4", "Voltage");
+			dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage4", "mV");
+
+			qInfo(CAT_RFPOWERMETER) << "RF power meter configuration completed successfully";
 		}
-
-		if(!dataloggerApi) {
-			qWarning(CAT_RFPOWERMETER) << "DataLogger API not available for device:" << m_param;
-			return false;
-		}
-
-		// Configure DataLogger for RF Power Meter (matching original JavaScript)
-		dataloggerApi->setToolName("Data Logger ", "RF Power Meter");
-		dataloggerApi->setDisplayMode("RF Power Meter", 2);
-
-		// Configure power5 (Power Forward)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:power5", "Power Forward");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:power5", "");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:power5", "dBm");
-		dataloggerApi->enableMonitorOfTool("RF Power Meter", "powrms:power5");
-
-		// Configure power6 (Power Reverse)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:power6", "Power Reverse");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:power6", "");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:power6", "dBm");
-		dataloggerApi->enableMonitorOfTool("RF Power Meter", "powrms:power6");
-
-		// Configure voltage0 (Voltage in corrected)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage0", "Voltage In Corrected");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage0", "Voltage");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage0", "mV");
-
-		// Configure voltage1 (Voltage out corrected)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage1", "Voltage Out Corrected");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage1", "Voltage");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage1", "mV");
-
-		// Configure voltage2 (Temperature)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage2", "Temperature");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage2", "Voltage");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage2", "mV");
-
-		// Configure voltage3 (Voltage in)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage3", "Voltage In");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage3", "Voltage");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage3", "mV");
-
-		// Configure voltage4 (Voltage out)
-		dataloggerApi->setMonitorDisplayName("RF Power Meter", "powrms:voltage4", "Voltage Out");
-		dataloggerApi->setMonitorUnitOfMeasurementName("RF Power Meter", "powrms:voltage4", "Voltage");
-		dataloggerApi->setMonitorUnitOfMeasurementSymbol("RF Power Meter", "powrms:voltage4", "mV");
-
-		qInfo(CAT_RFPOWERMETER) << "RF power meter configuration completed successfully";
 	}
 
 	return true;
