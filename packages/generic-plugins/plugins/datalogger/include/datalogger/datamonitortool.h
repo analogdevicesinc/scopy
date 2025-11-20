@@ -60,6 +60,8 @@ public:
 	void setEnableAddRemoveInstrument(bool);
 	void setDisplayMode(int mode);
 
+	SevenSegmentDisplay *getSevenSegmetMonitors() const;
+
 Q_SIGNALS:
 	void requestNewTool();
 	void runToggled(bool toggled);

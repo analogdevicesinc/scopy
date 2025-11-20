@@ -366,6 +366,8 @@ void DatamonitorTool::resetStartTime()
 	Q_EMIT m_plotManager->requestSetStartTime();
 }
 
+SevenSegmentDisplay *DatamonitorTool::getSevenSegmetMonitors() const { return sevenSegmetMonitors; }
+
 void DatamonitorTool::initTutorialProperties()
 {
 	runBtn->setProperty("tutorial_name", "RUN_BUTTON");
