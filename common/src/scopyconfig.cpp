@@ -109,6 +109,8 @@ QString scopy::config::pkgFolderPath()
 		QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + QDir::separator() + "packages";
 #ifdef WIN32
 	defaultPath = defaultPkgFolderPath();
+#elif __ANDROID__
+	defaultPath = defaultPkgFolderPath();
 #endif
 	return defaultPath;
 }
@@ -167,6 +169,9 @@ QString scopy::config::defaultPkgFolderPath()
 #elif defined(__appimage__)
 	// usr/lib/packages
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/packages";
+#elif __ANDROID__
+	// org.adi.scopy/cache/packages
+	return qgetenv("APPDATA") + "/packages";
 #endif
 
 	return SCOPY_PACKAGE_INSTALL_PATH;
