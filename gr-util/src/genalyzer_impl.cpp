@@ -33,12 +33,12 @@ using namespace scopy::grutil;
 std::mutex genalyzer_fft_vii_impl::s_genalyzer_mutex;
 
 genalyzer_fft_vii::sptr genalyzer_fft_vii::make(int npts, int qres, int navg, int nfft, GnWindow win,
-						double sample_rate)
+						double sample_rate, bool do_shift)
 {
-	return std::make_shared<genalyzer_fft_vii_impl>(npts, qres, navg, nfft, win, sample_rate);
+	return std::make_shared<genalyzer_fft_vii_impl>(npts, qres, navg, nfft, win, sample_rate, do_shift);
 }
 
-genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate)
+genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift)
 	: genalyzer_fft_vii("genalyzer_fft_vii", gr::io_signature::make(2, 2, sizeof(int32_t) * nfft),
 			    gr::io_signature::make(1, 1, sizeof(float) * nfft))
 	, d_npts(npts)
@@ -47,6 +47,7 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_nfft(nfft)
 	, d_win(win)
 	, d_sample_rate(sample_rate)
+	, d_do_shift(do_shift)
 	, d_fft_out(nullptr)
 	, d_qwfi(nullptr)
 	, d_qwfq(nullptr)
@@ -275,18 +276,27 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 				return -1;
 			}
 
-			if(gn_ifftshift(shifted_output, 2 * d_nfft, d_fft_out, 2 * d_nfft) != 0) {
-				GR_LOG_ERROR(d_logger, "gn_ifftshift failed");
-				free(shifted_output);
-				free(db_output);
-				return -1;
-			}
-
-			if(gn_db(db_output, d_nfft, shifted_output, 2 * d_nfft) != 0) {
-				GR_LOG_ERROR(d_logger, "gn_db failed");
-				free(shifted_output);
-				free(db_output);
-				return -1;
+			if(d_do_shift) {
+				if(gn_ifftshift(shifted_output, 2 * d_nfft, d_fft_out, 2 * d_nfft) != 0) {
+					GR_LOG_ERROR(d_logger, "gn_ifftshift failed");
+					free(shifted_output);
+					free(db_output);
+					return -1;
+				}
+				if(gn_db(db_output, d_nfft, shifted_output, 2 * d_nfft) != 0) {
+					GR_LOG_ERROR(d_logger, "gn_db failed");
+					free(shifted_output);
+					free(db_output);
+					return -1;
+				}
+			} else {
+				// For float mode, no shift - directly convert to dB
+				if(gn_db(db_output, d_nfft, d_fft_out, 2 * d_nfft) != 0) {
+					GR_LOG_ERROR(d_logger, "gn_db failed");
+					free(shifted_output);
+					free(db_output);
+					return -1;
+				}
 			}
 
 			for(size_t j = 0; j < d_nfft; j++) {
@@ -294,31 +304,38 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 			}
 		}
 
-		size_t results_size = 0;
-		char **rkeys = nullptr;
-		double *rvalues = nullptr;
+		// Only perform analysis for complex mode
+		if(d_do_shift) {
+			size_t results_size = 0;
+			char **rkeys = nullptr;
+			double *rvalues = nullptr;
 
-		configure_genalyzer();
-		uint8_t ssb_width = 120;
-		int err_code = gn_config_fa_auto(ssb_width, &d_config);
-		if(err_code == 0) {
-			err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+			configure_genalyzer();
+			uint8_t ssb_width = 120;
+			int err_code = gn_config_fa_auto(ssb_width, &d_config);
+			if(err_code == 0) {
+				err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+			} else {
+				GR_LOG_ERROR(d_logger,
+					     "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
+			}
+
+			if(err_code != 0) {
+				GR_LOG_ERROR(d_logger,
+					     "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
+
+				d_analysis->results_size = 0;
+				d_analysis->rkeys = nullptr;
+				d_analysis->rvalues = nullptr;
+			} else {
+				d_analysis->results_size = results_size;
+				d_analysis->rkeys = rkeys;
+				d_analysis->rvalues = rvalues;
+			}
 		} else {
-			GR_LOG_ERROR(d_logger,
-				     "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
-		}
-
-		if(err_code != 0) {
-			GR_LOG_ERROR(d_logger,
-				     "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
-
 			d_analysis->results_size = 0;
 			d_analysis->rkeys = nullptr;
 			d_analysis->rvalues = nullptr;
-		} else {
-			d_analysis->results_size = results_size;
-			d_analysis->rkeys = rkeys;
-			d_analysis->rvalues = rvalues;
 		}
 
 		free(shifted_output);

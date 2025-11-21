@@ -40,7 +40,6 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	, m_autoscaleEnabled(false)
 	, m_running(false)
 	, m_complexMode(false)
-	, m_floatModeWindow(gr::fft::window::WIN_HANN)
 
 {
 	// This could be refactored in it's own class
@@ -107,20 +106,13 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_windowCb = new MenuCombo("Window", yaxis);
 	InfoIconWidget::addHoveringInfoToWidget(m_windowCb->label(), "Set applied FFT window function", m_windowCb);
 
+	// Only genalyzer-supported windows
 	m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
-	m_windowCb->combo()->addItem("Blackman", gr::fft::window::WIN_BLACKMAN);
-	m_windowCb->combo()->addItem("Rectangular", gr::fft::window::WIN_RECTANGULAR);
-	m_windowCb->combo()->addItem("Flattop", gr::fft::window::WIN_FLATTOP);
 	m_windowCb->combo()->addItem("Blackman-Harris", gr::fft::window::WIN_BLACKMAN_hARRIS);
-	m_windowCb->combo()->addItem("Bartlett", gr::fft::window::WIN_BARTLETT);
+	m_windowCb->combo()->addItem("No Window", gr::fft::window::WIN_RECTANGULAR);
 	m_windowCb->combo()->setCurrentIndex(0);
 
 	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		// Store float mode window selection when not in complex mode
-		if(!m_complexMode) {
-			m_floatModeWindow = m_windowCb->combo()->itemData(idx).toInt();
-		}
-
 		for(auto c : qAsConst(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
@@ -260,7 +252,6 @@ void FFTPlotComponentSettings::setComplexMode(bool complexMode)
 	}
 
 	m_complexMode = complexMode;
-	updateWindowComboForMode();
 
 	m_windowChkb->onOffswitch()->setEnabled(!complexMode);
 	if(complexMode) {
@@ -270,65 +261,5 @@ void FFTPlotComponentSettings::setComplexMode(bool complexMode)
 	}
 }
 
-void FFTPlotComponentSettings::updateWindowComboForMode()
-{
-	// Disconnect to avoid triggering window changes during combo update
-	disconnect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), nullptr, nullptr);
-
-	// Clear the combo box
-	m_windowCb->combo()->clear();
-
-	if(m_complexMode) {
-		// Complex mode: only add windows supported by genalyzer
-		m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
-		m_windowCb->combo()->addItem("Blackman-Harris", gr::fft::window::WIN_BLACKMAN_hARRIS);
-		m_windowCb->combo()->addItem("No Window", gr::fft::window::WIN_RECTANGULAR);
-
-		// Set default to Hann for complex mode
-		m_windowCb->combo()->setCurrentIndex(0);
-	} else {
-		// Float mode: add all available windows (excluding Hanning since it's same as Hann)
-		m_windowCb->combo()->addItem("Hann", gr::fft::window::WIN_HANN);
-		m_windowCb->combo()->addItem("Blackman", gr::fft::window::WIN_BLACKMAN);
-		m_windowCb->combo()->addItem("Rectangular", gr::fft::window::WIN_RECTANGULAR);
-		m_windowCb->combo()->addItem("Flattop", gr::fft::window::WIN_FLATTOP);
-		m_windowCb->combo()->addItem("Blackman-Harris", gr::fft::window::WIN_BLACKMAN_hARRIS);
-		m_windowCb->combo()->addItem("Bartlett", gr::fft::window::WIN_BARTLETT);
-
-		// Restore the previously selected float mode window
-		for(int i = 0; i < m_windowCb->combo()->count(); ++i) {
-			if(m_windowCb->combo()->itemData(i).toInt() == m_floatModeWindow) {
-				m_windowCb->combo()->setCurrentIndex(i);
-				break;
-			}
-		}
-	}
-
-	// Reconnect the signal
-	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		// Store float mode window selection when not in complex mode
-		if(!m_complexMode) {
-			m_floatModeWindow = m_windowCb->combo()->itemData(idx).toInt();
-		}
-
-		for(auto c : qAsConst(m_channels)) {
-			if(dynamic_cast<FFTChannel *>(c)) {
-				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
-				fc->setWindow(m_windowCb->combo()->itemData(idx).toInt());
-			}
-		}
-	});
-
-	// Apply the currently selected window to all channels
-	if(m_windowCb->combo()->count() > 0) {
-		int currentWindow = m_windowCb->combo()->currentData().toInt();
-		for(auto c : qAsConst(m_channels)) {
-			if(dynamic_cast<FFTChannel *>(c)) {
-				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
-				fc->setWindow(currentWindow);
-			}
-		}
-	}
-}
 
 #include "moc_fftplotcomponentsettings.cpp"
