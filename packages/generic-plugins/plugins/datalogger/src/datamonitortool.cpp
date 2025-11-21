@@ -366,6 +366,8 @@ void DatamonitorTool::resetStartTime()
 	Q_EMIT m_plotManager->requestSetStartTime();
 }
 
+SevenSegmentDisplay *DatamonitorTool::getSevenSegmetMonitors() const { return sevenSegmetMonitors; }
+
 void DatamonitorTool::initTutorialProperties()
 {
 	runBtn->setProperty("tutorial_name", "RUN_BUTTON");
@@ -394,5 +396,21 @@ void DatamonitorTool::startTutorial()
 void DatamonitorTool::setEnableAddRemovePlot(bool en) { m_dataMonitorSettings->setEnableAddRemovePlot(en); }
 
 void DatamonitorTool::setEnableAddRemoveInstrument(bool en) { addMonitorToolButton->setVisible(en); }
+
+void DatamonitorTool::setDisplayMode(int mode)
+{
+	if(mode == 0) {
+		showPlot->click();
+		return;
+	}
+	if(mode == 1) {
+		showText->click();
+		return;
+	}
+	if(mode == 2) {
+		showSegments->click();
+		return;
+	}
+}
 
 #include "moc_datamonitortool.cpp"

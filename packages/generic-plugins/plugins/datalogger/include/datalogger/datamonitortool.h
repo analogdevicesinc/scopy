@@ -58,6 +58,9 @@ public:
 	RunBtn *getRunButton() const;
 	void setEnableAddRemovePlot(bool);
 	void setEnableAddRemoveInstrument(bool);
+	void setDisplayMode(int mode);
+
+	SevenSegmentDisplay *getSevenSegmetMonitors() const;
 
 Q_SIGNALS:
 	void requestNewTool();
