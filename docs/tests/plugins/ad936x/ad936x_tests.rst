@@ -14,6 +14,8 @@ Test 1: Plugin Loads
 
 **UID:** TST.AD936X.PLUGIN_LOADS
 
+**RBP:** P0
+
 **Description:** Verify that the AD936x plugin loads in Scopy.
 
 **OS:** ANY
@@ -60,6 +62,8 @@ Test 2: Device Detection and Display
 
 **UID:** TST.AD936X.DEVICE_DETECTION_AND_DISPLAY
 
+**RBP:** P3
+
 **Description:** Verify that the AD936x plugin detects and displays the connected AD936x device and its status panels.
 
 **OS:** ANY
@@ -98,6 +102,8 @@ Test 3: Change and Validate Device Global Settings
 ---------------------------------------------------
 
 **UID:** TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS
+
+**RBP:** P3
 
 **Description:** Change ENSM mode, calibration, and rate governor; verify changes are applied and reflected in hardware.
 
@@ -145,6 +151,8 @@ Test 4: RX and TX Chain Configuration
 
 **UID:** TST.AD936X.RX_TX_CHAIN_CONFIG
 
+**RBP:** P3
+
 **Description:** Change RX/TX bandwidth, sampling rate, LO frequency, and verify correct application.
 
 **OS:** ANY
@@ -191,6 +199,8 @@ Test 5: Advanced Plugin Detection and Display
 -----------------------------------------------
 
 **UID:** TST.AD936X_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY
+
+**RBP:** P3
 
 **Description:** Verify that the AD936x Advanced plugin detects and displays the connected AD936x device and its advanced configuration panels.
 

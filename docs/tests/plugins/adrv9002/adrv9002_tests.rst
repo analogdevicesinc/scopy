@@ -65,6 +65,8 @@ Test 1: Plugin Loading and Device Detection
 
 **UID:** TST.ADRV9002.CONTROLS.PLUGIN_LOADS
 
+**RBP:** P0
+
 **Description:** Verify that the ADRV9002 plugin loads and detects device with Controls tab accessible.
 
 **OS:** ANY
@@ -106,6 +108,8 @@ Test 2: Device Driver API Display
 
 **UID:** TST.ADRV9002.CONTROLS.DEVICE_DRIVER_API
 
+**RBP:** P3
+
 **Description:** Verify Device Driver API section displays correct version information.
 
 **OS:** ANY
@@ -146,6 +150,8 @@ Test 3: Global Settings Section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.CONTROLS.GLOBAL_SETTINGS
+
+**RBP:** P3
 
 **Description:** Verify global settings controls: profile management, temperature monitoring, initial calibrations.
 
@@ -203,6 +209,8 @@ Test 4: RX Channel Controls
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG
+
+**RBP:** P3
 
 **Description:** Test RX1 and RX2 channel control functionality.
 
@@ -277,6 +285,8 @@ Test 5: TX Channel Controls
 
 **UID:** TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG
 
+**RBP:** P3
+
 **Description:** Test TX1 and TX2 channel control functionality.
 
 **OS:** ANY
@@ -342,6 +352,8 @@ Test 6: ORX Controls
 
 **UID:** TST.ADRV9002.CONTROLS.ORX_CONFIG
 
+**RBP:** P3
+
 **Description:** Test ORX observation path controls (if available on device).
 
 **OS:** ANY
@@ -406,6 +418,8 @@ Test 7: Refresh Functionality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **UID:** TST.ADRV9002.CONTROLS.REFRESH_FUNCTION
+
+**RBP:** P3
 
 **Description:** Test refresh button updates all control values from device.
 

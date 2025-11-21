@@ -24,6 +24,8 @@ Test 1: Check license pop-up
 
 **UID:** TST.LICENSE.POPUP
 
+**RBP:** P3
+
 **Preconditions:**
     - OS: Any
 
@@ -80,6 +82,8 @@ Test 2: Check links from About Page
 -------------------------------------
 
 **UID:** TST.ABOUT.PAGE
+
+**RBP:** P3
 
 **Preconditions:**
     - OS: Any

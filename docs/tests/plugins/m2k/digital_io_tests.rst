@@ -63,6 +63,8 @@ Test 1 - Check individual digital pin state
 
 **UID:** TST.DIO.INDIVIDUAL
 
+**RBP:** P3
+
 **Description:** This test verifies that the individual digital pins are working correctly.
 
 **Preconditions:**
@@ -119,6 +121,8 @@ Test 2 - Checking grouped digital pin states
 .. _TST.DIO.GROUP:
 
 **UID:** TST.DIO.GROUP
+
+**RBP:** P3
 
 **Description:** This test verifies that the grouped digital pins DIO 0-7 and DIO 8-15
 are working correctly.
@@ -186,6 +190,8 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
 .. _TST.DIO.INDIVIDUAL.VOLTMETER:
 
 **UID:** TST.DIO.INDIVIDUAL.VOLTMETER
+
+**RBP:** P3
 
 **Description:** This test verifies that the individual digital pins are working correctly using voltmeter and power supply. 
 

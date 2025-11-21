@@ -28,6 +28,8 @@ Test 1: The homepage displays correctly when running the application.
 
 **UID:** TST.HP.RUN
 
+**RBP:** P3
+
 **Description:** This test checks if the homepage is displayed correctly.
 
 **Preconditions:**
@@ -65,6 +67,8 @@ Test 2: Verifying the "Add device" (+) button.
 ----------------------------------------------
 
 **UID:** TST.HP.ADD
+
+**RBP:** P3
 
 **Description:** This test checks if the **Add device** button works correctly.
 
@@ -107,6 +111,8 @@ Test 3: Verifying the auto-scan feature (ON).
 ---------------------------------------------
 
 **UID:** TST.HP.AUTO_SCAN_ON
+
+**RBP:** P3
 
 **Description:** This test checks if the auto-scan feature detects and lists all
  available devices correctly.
@@ -154,6 +160,8 @@ Test 4: Verifying the auto-scan feature (OFF).
 
 **UID:** TST.HP.AUTO_SCAN_OFF
 
+**RBP:** P3
+
 **Description:** This test checks the behavior of the application when the auto-
 scan is turned off.
 
@@ -200,6 +208,8 @@ Test 5: Verifying the manual scan feature.
 
 **UID:** TST.HP.MANUAL_SCAN
 
+**RBP:** P3
+
 **Description:** This test checks if the manual scan feature detects and lists 
 all available devices correctly.
 
@@ -244,6 +254,8 @@ Test 6: Navigation using the buttons in the info page.
 ------------------------------------------------------
 
 **UID:** TST.HP.NAV
+
+**RBP:** P3
 
 **Description:** This test checks if the navigation buttons work correctly.
 
@@ -308,6 +320,8 @@ Test 7: Auto-scan behavior when the device is unplugged.
 --------------------------------------------------------
 
 **UID:** TST.HP.UNPLUGGED
+
+**RBP:** P3
 
 **Description:** This test checks if the auto-scan feature detects and lists all 
 available devices correctly.

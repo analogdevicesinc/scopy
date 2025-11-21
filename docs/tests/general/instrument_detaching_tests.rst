@@ -35,6 +35,8 @@ Test 1: Detach and reattach an instrument
 
 **UID:** TST.GEN.INST.DETACH_REATTACH
 
+**RBP:** P3
+
 **Description:** This test checks if the user can detach and reattach an instrument from the main window. The user can detach the instrument by double clicking the tool name from the tool menu (left side of scopy). The user can reattach the instrument either by clicking the X button from the detached window title bar or by double clicking the tool name from the tool menu. The minimize and maximize buttons are also available on the detached window title bar and should work as expected. When reattaching the instrument, the reattached instrument will be the one currently selected.
 
 **Preconditions:**

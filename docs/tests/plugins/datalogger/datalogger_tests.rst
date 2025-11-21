@@ -61,6 +61,8 @@ Test 1: Enable and Disable Data Logger Channel
 
 **UID:** TST.DATALOGGER.ENABLE_DISABLE_DATA_LOGGER_CHANNEL
 
+**RBP:** P0
+
 **Description:** Enable the channel and check if the channel is enabled
 
 **OS:** ANY
@@ -111,6 +113,8 @@ Test 2: Run and Stop Data Logging
 ------------------------------------
 
 **UID:** TST.DATALOGGER.RUN_STOP_DATA_LOGGING
+
+**RBP:** P2
 
 **Description:** Start the Data Logger and check if the data is being collected
 
@@ -169,6 +173,8 @@ Test 3: Clear Collected Data
 
 **UID:** TST.DATALOGGER.CLEAR_COLLECTED_DATA
 
+**RBP:** P3
+
 **Description:** Clear the data and check if the data is removed from the plot
 
 **OS:** ANY
@@ -217,6 +223,8 @@ Test 4: Clear data while running
 ----------------------------------
 
 **UID:** TST.DATALOGGER.CLEAR_DATA_WHILE_RUNNING
+
+**RBP:** P3
 
 **Description:** Clear the data while running and check if the data is removed from the plot
 
@@ -267,6 +275,8 @@ Test 5: Create a New Data Logger Tool
 
 **UID:** TST.DATALOGGER.CREATE_NEW_DATA_LOGGER_TOOL
 
+**RBP:** P3
+
 **Description:** Create a new tool and check if the new tool is created
 
 **OS:** ANY
@@ -311,6 +321,8 @@ Test 6: Remove a Created Tool
 ---------------------------------
 
 **UID:** TST.DATALOGGER.REMOVE_A_CREATED_TOOL
+
+**RBP:** P3
 
 **Description:** Remove the tool and check if the tool is removed
 
@@ -357,6 +369,8 @@ Test 7: Verify Removal Disabled for Default Tool
 --------------------------------------------------
 
 **UID:** TST.DATALOGGER.VERIFY_REMOVAL_DISABLED_FOR_DEFAULT_TOOL
+
+**RBP:** P3
 
 **Description:** Check if the remove tool is disabled for the first tool
 
@@ -409,6 +423,8 @@ Test 8: Print Collected Data
 
 **UID:** TST.DATALOGGER.PRINT_COLLECTED_DATA
 
+**RBP:** P3
+
 **Description:** Print the data and check if the data is printed
 
 **OS:** ANY
@@ -459,6 +475,8 @@ Test 9: Info button documentation
 
 **UID:** TST.DATALOGGER.INFO_BUTTON_DOCUMENTATION
 
+**RBP:** P3
+
 **Description:** Check if the info documentation option works
 
 **OS:** ANY
@@ -503,6 +521,8 @@ Test 10: Info button tutorial
 
 **UID:** TST.DATALOGGER.INFO_BUTTON_TUTORIAL
 
+**RBP:** P3
+
 **Description:** Check if the info tutorial option works
 
 **OS:** ANY
@@ -545,6 +565,8 @@ Test 11: Settings Change Data Logger Tool Name
 
 **UID:** TST.DATALOGGER.SETTINGS_CHANGE_DATA_LOGGER_TOOL_NAME
 
+**RBP:** P3
+
 **Description:** Change the tool name and check if the tool name is changed
 
 **OS:** ANY
@@ -586,6 +608,8 @@ Test 12: Set Valid X-Axis Delta Value
 -----------------------------------------
 
 **UID:** TST.DATALOGGER.SET_VALID_X_AXIS_DELTA_VALUE
+
+**RBP:** P3
 
 **Description:** Change the X-Axis Delta Value to a valid input and check if the X-Axis Delta Value is changed
 
@@ -635,6 +659,8 @@ Test 13: Handle Invalid X-Axis Delta Value Input
 
 **UID:** TST.DATALOGGER.HANDLE_INVALID_X_AXIS_DELTA_VALUE_INPUT
 
+**RBP:** P3
+
 **Description:** Change the X-Axis Delta Value to an invalid input and check if the X-Axis Delta Value is not changed
 
 **OS:** ANY
@@ -682,6 +708,8 @@ Test 14: Adjust X-Axis Delta Value Using Buttons
 ----------------------------------------------------
 
 **UID:** TST.DATALOGGER.ADJUST_X_AXIS_DELTA_VALUE_USING_BUTTONS
+
+**RBP:** P3
 
 **Description:** Change the X-Axis Delta Value using the + / - buttons and check if the X-Axis Delta Value is changed
 
@@ -740,6 +768,8 @@ Test 15: Toggle X-Axis UTC Time Display
 
 **UID:** TST.DATALOGGER.TOGGLE_X_AXIS_UTC_TIME_DISPLAY
 
+**RBP:** P3
+
 **Description:** Enable the X-Axis UTC Time setting and check if the X-Axis displays UTC time instead of delta value.
 
 **OS:** ANY
@@ -794,6 +824,8 @@ Test 16: Toggle X-Axis Live Plotting
 ---------------------------------------
 
 **UID:** TST.DATALOGGER.TOGGLE_X_AXIS_LIVE_PLOTTING
+
+**RBP:** P3
 
 **Description:** Toggle the X-Axis Live plotting off/on and check if the X-Axis displays live data
 
@@ -850,6 +882,8 @@ Test 17: Toggle Y-Axis Autoscale
 ------------------------------------
 
 **UID:** TST.DATALOGGER.TOGGLE_Y_AXIS_AUTOSCALE
+
+**RBP:** P3
 
 **Description:** Toggle the Y-Axis autoscale off/on and check if the Y-Axis displays data with autoscale
 
@@ -910,6 +944,8 @@ Test 18: Set Y-Axis Minimum and Maximum Values
 
 **UID:** TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES
 
+**RBP:** P3
+
 **Description:** Change the Y-Axis min and max value and check if the Y-Axis displays data with the new min and max value
 
 **OS:** ANY
@@ -966,6 +1002,8 @@ Test 19: Adjust Curve Thickness
 
 **UID:** TST.DATALOGGER.ADJUST_CURVE_THICKNESS
 
+**RBP:** P3
+
 **Description:** Change the curve thickness and check if the curve thickness is changed
 
 **OS:** ANY
@@ -1013,6 +1051,8 @@ Test 20: Change Curve Style
 
 **UID:** TST.DATALOGGER.CHANGE_CURVE_STYLE
 
+**RBP:** P3
+
 **Description:** Change the curve style and check if the curve style is changed
 
 **OS:** ANY
@@ -1059,6 +1099,8 @@ Test 21: Adjust Plot Display Settings
 ------------------------------------------
 
 **UID:** TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS
+
+**RBP:** P3
 
 **Description:** Change the plot settings and check if the plot settings are changed
 
@@ -1145,6 +1187,8 @@ Test 22: Verify Plot Display Method
 
 **UID:** TST.DATALOGGER.VERIFY_PLOT_DISPLAY_METHOD
 
+**RBP:** P3
+
 **Description:** Verify that the application displays data in the “Plot” mode correctly
 
 **OS:** ANY
@@ -1189,6 +1233,8 @@ Test 23: Verify Plain Text Display Method
 -------------------------------------------
 
 **UID:** TST.DATALOGGER.VERIFY_PLAIN_TEXT_DISPLAY_METHOD
+
+**RBP:** P3
 
 **Description:** Verify that the application displays data in the “Plain Text” mode correctly
 
@@ -1236,6 +1282,8 @@ Test 24: Verify 7 Segment Display Method
 
 **UID:** TST.DATALOGGER.VERIFY_7_SEGMENT_DISPLAY_METHOD
 
+**RBP:** P3
+
 **Description:** Verify that the application displays data in the “7 Segment” mode correctly
 
 **OS:** ANY
@@ -1281,6 +1329,8 @@ Test 25: Toggle Between Display Methods
 ------------------------------------------
 
 **UID:** TST.DATALOGGER.TOGGLE_BETWEEN_DISPLAY_METHODS
+
+**RBP:** P3
 
 **Description:** Verify that the application toggles between the display methods correctly
 
@@ -1345,6 +1395,8 @@ Test 26: Set 7 Segment Display Precision
 
 **UID:** TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION
 
+**RBP:** P3
+
 **Description:** Change the 7 Segment precision and check if the 7 Segment precision is changed
 
 **OS:** ANY
@@ -1392,6 +1444,8 @@ Test 27: Toggle 7 Segment Min/Max Display
 --------------------------------------------
 
 **UID:** TST.DATALOGGER.TOGGLE_7_SEGMENT_MIN_MAX_DISPLAY
+
+**RBP:** P3
 
 **Description:** Toggle 7 Segment min/max off/on and check if the 7 Segment displays data with min/max values
 
@@ -1449,6 +1503,8 @@ Test 28: Choose File for Data Logging
 
 **UID:** TST.DATALOGGER.CHOOSE_FILE_FOR_DATA_LOGGING
 
+**RBP:** P3
+
 **Description:** Verify that the application allows the user to choose a file to save data to
 
 **OS:** ANY
@@ -1498,6 +1554,8 @@ Test 29: Save Collected Data to File
 --------------------------------------
 
 **UID:** TST.DATALOGGER.SAVE_COLLECTED_DATA_TO_FILE
+
+**RBP:** P3
 
 **Description:**  Verify that the application saves all 
 collected data to a file when the “Save Data” function is triggered.
@@ -1550,6 +1608,8 @@ Test 30: Enable Live Data Logging
 
 **UID:** TST.DATALOGGER.ENABLE_LIVE_DATA_LOGGING
 
+**RBP:** P3
+
 **Description:** Verify that the application saves all collected data to a 
 file when the “Live Data Logging” function is triggered.
 
@@ -1600,6 +1660,8 @@ Test 31: Import Data from File
 -----------------------------------
 
 **UID:** TST.DATALOGGER.IMPORT_DATA_FROM_FILE
+
+**RBP:** P3
 
 **Description:** Verify that the application allows 
 the user to import data from a file
@@ -1668,6 +1730,8 @@ Test 32: Set Maximum Channel Data Storage
 
 **UID:** TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE
 
+**RBP:** P3
+
 **Description:** Verify that the application allows the 
 user to set the maximum channel data storage
 
@@ -1710,6 +1774,8 @@ Test 33: Set Data Logger Read Interval
 ----------------------------------------
 
 **UID:** TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL
+
+**RBP:** P3
 
 **Description:** Verify that the application allows the 
 user to set the read interval
@@ -1768,6 +1834,8 @@ Test 34: Set X-Axis Date Time Format
 ----------------------------------------
 
 **UID:** TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT
+
+**RBP:** P3
 
 **Description:** Verify that the application allows the user to set the 
 date time format for the X Axis
@@ -1835,6 +1903,8 @@ Test 35: Use Multiplot Feature
 ---------------------------------
 
 **UID:** TST.DATALOGGER.USE_MULTIPLOT
+
+**RBP:** P3
 
 **Description:** Verify that the user can enable multiplot in preferences, create multiple plots, and assign channels to different plots in the Data Logger plugin.
 
@@ -1904,6 +1974,8 @@ Test 36: Use Docking/Layout (Kdocks) Feature
 
 **UID:** TST.DATALOGGER.USE_KDOCKS
 
+**RBP:** P3
+
 **Description:** Verify that the Data Logger tool window can be docked, undocked, and rearranged using the application's docking/layout system.
 
 **OS:** ANY
@@ -1961,6 +2033,8 @@ Test 37: Use Channel Scaling Settings
 ---------------------------------------
 
 **UID:** TST.DATALOGGER.USE_CHANNEL_SCALING
+
+**RBP:** P3
 
 **Description:** Verify that the user can adjust channel scaling (gain/offset) using the channel settings menu and that the changes are reflected in the plot.
 

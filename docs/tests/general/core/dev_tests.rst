@@ -46,7 +46,9 @@ Test 1: Verifying the device button.
 
 **UID:** TST.HP.DEV_BTN
 
-**Description:** To verify that clicking on the device button triggers the 
+**RBP:** P0
+
+**Description:** To verify that clicking on the device button triggers the
 expected action: displaying device details and device tools.
 
 **Test prerequisites:**
@@ -92,6 +94,8 @@ Test 2: Remove a device from device browser.
 
 **UID:** TST.DEV.FORGET
 
+**RBP:** P0
+
 **Description:** This test checks if the "Forget" (x) button work correctly.
 
 **Test prerequisites:**
@@ -132,6 +136,8 @@ Test 3: Remove a device from device browser while it is connected.
 ------------------------------------------------------------------
 
 **UID:** TST.DEV.FORGET_CONN
+
+**RBP:** P3
 
 **Description:** This test verifies whether Scopy properly handles the removal 
 of a connected device.
@@ -177,6 +183,8 @@ Test 4: Edit the name of the device.
 ------------------------------------
 
 **UID:** TST.DEV.EDIT_NAME
+
+**RBP:** P3
 
 **Description:** This test checks if the **Edit pen** button work correctly.
 
@@ -224,6 +232,8 @@ Test 5: Select a tool.
 ----------------------
 
 **UID:** TST.DEV.SELECT_TOOL
+
+**RBP:** P1
 
 **Description:** This test checks if the tool infrastructure works correctly.
 
@@ -278,6 +288,8 @@ Test 6: Detach a tool.
 ----------------------
 
 **UID:** TST.DEV.DETACH_TOOL
+
+**RBP:** P3
 
 **Description:** This test checks if the tool detachment mechanism is working 
 correctly.
@@ -343,6 +355,8 @@ Test 7: Reopen the app with a detached tool.
 
 **UID:** TST.DEV.DETACH_TOOL_RE
 
+**RBP:** P3
+
 **Description:** This test checks whether detached tools retain their state upon 
 reconnection.
 
@@ -386,7 +400,9 @@ Test 8: Collapse device tools in the tool menu.
 
 **UID:** TST.DEV.COLLAPSE
 
-**Description:** This test verifies if the collapse feature works properly in 
+**RBP:** P1
+
+**Description:** This test verifies if the collapse feature works properly in
 the tool menu.
 
 **Test prerequisites:**
@@ -438,6 +454,8 @@ Test 9: Connecting to multiple devices.
 ---------------------------------------
 
 **UID:** TST.DEV.MULTI_CONN
+
+**RBP:** P1
 
 **Description:** This test checks if connecting to multiple devices is working 
 properly.
@@ -498,7 +516,9 @@ Test 10: Resource manager with multiple devices.
 
 **UID:** TST.DEV.RM_MULTI
 
-**Description:** This test verifies that the resource manager is being used 
+**RBP:** P1
+
+**Description:** This test verifies that the resource manager is being used
 properly.
 
 **Test prerequisites:**
@@ -555,7 +575,9 @@ Test 11: Devices order in device browser.
 
 **UID:** TST.DEV.ADD_ORDER
 
-**Description:** This test verifies that each newly added device is finally 
+**RBP:** P0
+
+**Description:** This test verifies that each newly added device is finally
 entered into the device browser.
 
 **Test prerequisites:**

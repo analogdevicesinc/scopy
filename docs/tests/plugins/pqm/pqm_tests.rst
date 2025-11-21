@@ -45,6 +45,8 @@ Test 1: Open Rms tool.
 
 **UID:** TST.PQM.RMS_OPEN
 
+**RBP:** P3
+
 **Description:** This test verifies that the Rms tool opens correctly and is 
 accessible without errors.
 
@@ -93,6 +95,8 @@ Test 2: Info button check.
 
 **UID:** TST.PQM.RMS_INFO
 
+**RBP:** P3
+
 **Description:** This test verifies if the Info button works correctly.
 
 **Test prerequisites:**
@@ -136,6 +140,8 @@ Test 3: Single acquisition.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_SINGLE
+
+**RBP:** P3
 
 **Description:** This test verifies if the single acquisition works correctly.
 
@@ -182,6 +188,8 @@ Test 4: Data acquisition.
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_RUN
+
+**RBP:** P3
 
 **Description:** This test verifies if the data acquisition works correctly.
 
@@ -235,6 +243,8 @@ Test 5: Settings button check.
 
 **UID:** TST.PQM.RMS_SETTINGS
 
+**RBP:** P3
+
 **Description:** This test verifies if the Settings button works correctly.
 
 **Test prerequisites:**
@@ -278,6 +288,8 @@ Test 6: Data logging.
 ^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_LOG
+
+**RBP:** P3
 
 **Description:** This test verifies if the logging mechanism works correctly.
 
@@ -362,6 +374,8 @@ Test 7: Data logging wrong path.
 
 **UID:** TST.PQM.RMS_LOG_WRONG
 
+**RBP:** P3
+
 **Description:** This test verifies if the logging mechanism works correctly.
 
 **Test prerequisites:**
@@ -425,6 +439,8 @@ Test 8: PQEvents.
 ^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_PQEVENTS
+
+**RBP:** P3
 
 **Description:** This test verifies if the PQEvents indicator works correctly.
 
@@ -524,6 +540,8 @@ Test 1: Open Harmonics tool.
 
 **UID:** TST.PQM.HARMONICS_OPEN
 
+**RBP:** P3
+
 **Description:** This test verifies that the Harmonics tool opens correctly 
 and is accessible without errors.
 
@@ -572,6 +590,8 @@ Test 2: Info button check.
 
 **UID:** TST.PQM.HARMONICS_INFO
 
+**RBP:** P3
+
 **Description:** This test verifies if the Info button works correctly.
 
 **Test prerequisites:**
@@ -617,6 +637,8 @@ Test 3: Single acquisition.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_SINGLE
+
+**RBP:** P3
 
 **Description:** This test verifies if the single acquisition works correctly.
 
@@ -664,6 +686,8 @@ Test 4: Data acquisition.
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_RUN
+
+**RBP:** P3
 
 **Description:** This test verifies if the data acquisition works correctly.
 
@@ -717,6 +741,8 @@ Test 5: The features of the table.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_TABLE
+
+**RBP:** P3
 
 **Description:** This test verifies if the table functionalities works correctly.
 
@@ -782,6 +808,8 @@ Test 6: Settings button check.
 
 **UID:** TST.PQM.HARMONICS_SETTINGS
 
+**RBP:** P3
+
 **Description:** This test verifies if the Settings button works correctly.
 
 **Test prerequisites:**
@@ -846,6 +874,8 @@ Test 7: Data logging.
 ^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_LOG
+
+**RBP:** P3
 
 **Description:** This test verifies if the logging mechanism works correctly.
 
@@ -928,6 +958,8 @@ Test 8: Data logging wrong path.
 
 **UID:** TST.PQM.HARMONICS_LOG_WRONG
 
+**RBP:** P3
+
 **Description:** This test verifies if the logging mechanism works correctly.
 
 **Test prerequisites:**
@@ -990,6 +1022,8 @@ Test 9: PQEvents.
 ^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_PQEVENTS
+
+**RBP:** P3
 
 **Description:** This test verifies if the PQEvents indicator works correctly.
 
@@ -1087,6 +1121,8 @@ Test 1: Open Waveform tool.
 
 **UID:** TST.PQM.WAVEFORM_OPEN
 
+**RBP:** P3
+
 **Description:** This test verifies that the Waveform tool opens correctly and 
 is accessible without errors.
 
@@ -1134,6 +1170,8 @@ Test 2: Info button check.
 
 **UID:** TST.PQM.WAVEFORM_INFO
 
+**RBP:** P3
+
 **Description:** This test verifies if the Info button works correctly.
 
 **Test prerequisites:**
@@ -1177,6 +1215,8 @@ Test 3: Settings button check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_SETTINGS
+
+**RBP:** P3
 
 **Description:** This test verifies if the Settings button works correctly.
 
@@ -1230,6 +1270,8 @@ Test 4: Settings timespan check.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_SETTINGS_TIMESPAN
+
+**RBP:** P3
 
 **Description:** This test verifies if the timespan spin box works correctly.
 
@@ -1285,6 +1327,8 @@ Test 5: Settings rolling switch check.
 
 **UID:** TST.PQM.WAVEFORM_SETTINGS_ROLLING
 
+**RBP:** P3
+
 **Description:** This test verifies if the rolling mode switch works correctly.
 
 **Test prerequisites:**
@@ -1329,6 +1373,8 @@ Test 6: Single acquisition triggered.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_SINGLE_TRIG
+
+**RBP:** P3
 
 **Description:** This test verifies if the single acquisition works correctly 
 (triggered mode).
@@ -1376,6 +1422,8 @@ Test 7: Single acquisition rolling.
 
 **UID:** TST.PQM.WAVEFORM_SINGLE_ROLL
 
+**RBP:** P3
+
 **Description:** This test verifies if the single acquisition works correctly 
 (rolling mode).
 
@@ -1422,6 +1470,8 @@ Test 8: Data acquisition triggered.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_RUN_TRIG
+
+**RBP:** P3
 
 **Description:** This test verifies if the data acquisition works correctly 
 (triggered mode).
@@ -1479,6 +1529,8 @@ Test 9: Data acquisition rolling.
 
 **UID:** TST.PQM.WAVEFORM_RUN_ROLL
 
+**RBP:** P3
+
 **Description:** This test verifies if the data acquisition works correctly 
 (rolling mode).
 
@@ -1534,6 +1586,8 @@ Test 10: Plot zoom.
 
 **UID:** TST.PQM.WAVEFORM_PLOT_ZOOM
 
+**RBP:** P3
+
 **Description:** This test verifies if, when zooming in on one plot, the x-axis 
 range of the other plot is modified and matches the zoom range.
 
@@ -1578,6 +1632,8 @@ Test 11: Data logging.
 ^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_LOG
+
+**RBP:** P3
 
 **Description:** This test verifies if the logging mechanism works correctly.
 
@@ -1660,6 +1716,8 @@ Test 12: Data logging wrong path.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_LOG_WRONG
+
+**RBP:** P3
 
 **Description:** This test verifies if the logging mechanism works correctly.
 
@@ -1760,6 +1818,8 @@ Test 1: Open Settings tool.
 
 **UID:** TST.PQM.SETTINGS_OPEN
 
+**RBP:** P3
+
 **Description:** This test verifies that the Settings tool opens correctly and 
 is accessible without errors.
 
@@ -1804,6 +1864,8 @@ Test 2: Read config values.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.SETTINGS_READ
+
+**RBP:** P3
 
 **Description:** This test verifies if the device attribute reading is done 
 correctly.
@@ -1850,6 +1912,8 @@ Test 3: Write config values.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.SETTINGS_WRITE
+
+**RBP:** P3
 
 **Description:** This test verifies if the device attribute writing is done 
 correctly.

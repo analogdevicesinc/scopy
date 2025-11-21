@@ -38,6 +38,8 @@ Test 1: Loading the debugger
 
 **UID**: TST.DBG.EXPLR.LOAD
 
+**RBP:** P0
+
 **Description**: This test checks if the debugger plugin is loaded when any device is connected to Scopy.
 
 **Preconditions**:
@@ -109,6 +111,8 @@ Test 2: The navigation tree from the debugger displays the correct information
 ----------------------------------------------------------------------------------------------------------------------------
 
 **UID**: TST.DBG.EXPLR.NAV
+
+**RBP:** P1
 
 **Description**: This test checks if the navigation tree from the debugger displays the correct information.
 
@@ -234,6 +238,8 @@ Test 3: The Filter Bar from the debugger works correctly
 
 **UID**: TST.DBG.EXPLR.FILTER
 
+**RBP:** P2
+
 **Description**: This test checks if the Filter Bar from the debugger works correctly.
 
 **Test prerequisites**:
@@ -308,6 +314,8 @@ Test 4: The title bar updates when selecting different elements from the navigat
 ----------------------------------------------------------------------------------------------------------------------------
 
 **UID**: TST.DBG.EXPLR.TITLE
+
+**RBP:** P3
 
 **Description**: This test checks if the title bar updates when selecting different elements from the navigation tree.
 
@@ -392,6 +400,8 @@ Test 5: The watch list from the debugger works correctly
 ----------------------------------------------------------------------------------------------------------------------------
 
 **UID**: TST.DBG.EXPLR.WATCH
+
+**RBP:** P1
 
 **Description**: This test checks if the watch list from the debugger works correctly.
 
@@ -494,6 +504,8 @@ Test 6: The details view from the debugger work correctly
 
 **UID**: TST.DBG.EXPLR.DETAILS
 
+**RBP:** P2
+
 **Description**: This test checks if the details view from the debugger work correctly.
 
 **Test prerequisites**:
@@ -582,6 +594,8 @@ Test 7: The read all button correctly reads all visible attributes
 
 **UID**: TST.DBG.EXPLR.READ_ALL
 
+**RBP:** P2
+
 **Description**: This test checks if the read all button correctly reads all visible attributes.
 
 **Test prerequisites**:
@@ -653,6 +667,8 @@ Test 8: The log window from the debugger correctly displays the operations
 ----------------------------------------------------------------------------------------------------------------------------
 
 **UID**: TST.DBG.EXPLR.LOG
+
+**RBP:** P3
 
 **Description**: This test checks if the log window from the debugger correctly displays the operations.
 
@@ -730,6 +746,8 @@ Test 9: Code Generator
 ----------------------------------------------------------------------------------------------------------------------------
 
 **UID**: TST.DBG.CODEGEN
+
+**RBP:** P3
 
 **Description**: This test verifies that the Debugger tool can generate correct libiio C code for connecting to a device.
 

@@ -49,6 +49,8 @@ Test 1 - Low Pass Filter CH1 340Hz
 
 **UID:** TST.NA.LOWPASS_CH1_340HZ
 
+**RBP:** P3
+
 **Description:** This test verifies the functionality of the Network Analyzer
 using a Low Pass Filter.
 
@@ -151,6 +153,8 @@ Test 2 - Low Pass Filter CH2 340Hz
 .. _TST.NA.LOWPASS_CH2_340HZ:
 
 **UID:** TST.NA.LOWPASS_CH2_340HZ
+
+**RBP:** P3
 
 **Description:** This test verifies the functionality of the Network Analyzer
 using a Low Pass Filter.
@@ -255,6 +259,8 @@ Test 3 - Low Pass Filter CH1 1.59MHz
 
 **UID:** TST.NA.LOWPASS_CH1_1_59MHZ
 
+**RBP:** P3
+
 **Description:** This test verifies the functionality of the Network Analyzer
 using a Low Pass Filter.
 
@@ -339,6 +345,8 @@ Test 4 - High Pass Filter CH1 340Hz
 
 **UID:** TST.NA.HIGHPASS_CH1_340HZ
 
+**RBP:** P3
+
 **Description:** This test verifies the functionality of the Network Analyzer
 using a High Pass Filter.
 
@@ -416,6 +424,8 @@ Test 5 - Band Pass Filter CH1
 .. _TST.NA.BANDPASS_CH1:
 
 **UID:** TST.NA.BANDPASS_CH1
+
+**RBP:** P3
 
 **Description:** This test verifies the functionality of the Network Analyzer
 using a Band Pass Filter with a low cutoff frequency of 1.59kHz and a high cutoff
@@ -502,6 +512,8 @@ Test 6 - Band Stop Filter CH1
 
 **UID:** TST.NA.BANDSTOP_CH1
 
+**RBP:** P3
+
 **Description:** This test verifies the functionality of the Network Analyzer
 using a Band Stop notch Filter with a notch frequency of 795Hz.
 
@@ -585,7 +597,9 @@ Test 7 - Print Plot
 
 .. _TST.NA.PRINT_PLOT:
 
-**UID**: TST.NA.PRINT_PLOT
+**UID:** TST.NA.PRINT_PLOT
+
+**RBP:** P3
 
 **Description:** Check the print plot feature of the Network Analyzer 
 by exporting the low pass filter plot screenshot to a PDF file.
@@ -637,7 +651,9 @@ Test 8 - Buffer Previewer
 
 .. _TST.NA.BUFFER_PREVIEWER:
 
-**UID**: TST.NA.BUFFER_PREVIEWER
+**UID:** TST.NA.BUFFER_PREVIEWER
+
+**RBP:** P3
 
 **Description:** Check the buffer previewer feature of the Network Analyzer 
 by viewing the acquired data in the Oscilloscope and analyzing measurements.

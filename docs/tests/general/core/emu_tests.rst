@@ -30,6 +30,8 @@ Test 1: Enable the emulator.
 
 **UID:** TST.EMU.EN
 
+**RBP:** P3
+
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly.
 
@@ -83,6 +85,8 @@ Test 2: EMU is not installed.
 
 **UID:** TST.EMU.NOT
 
+**RBP:** P3
+
 **Description:** This test verifies if Scopy handles the situation correctly 
 when the IIO emulator is not found.
 
@@ -125,6 +129,8 @@ Test 3: Disable the emulator.
 -----------------------------
 
 **UID:** TST.EMU.DIS
+
+**RBP:** P3
 
 **Description:** This test verifies if stopping the emulator in Scopy works 
 correctly.
@@ -173,6 +179,8 @@ Test 4: Disable the emulator while the emulated device is connected.
 --------------------------------------------------------------------
 
 **UID:** TST.EMU.DIS_CONN
+
+**RBP:** P3
 
 **Description:** The test verifies if Scopy handles the situation correctly 
 when an emulated device is connected and the "iio-emu" process is stopped.
@@ -224,6 +232,8 @@ Test 5: Verify adalm2000 emu device.
 
 **UID:** TST.EMU.EN_ADALM2000
 
+**RBP:** P3
+
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly (using adalm2000 device).
 
@@ -271,6 +281,8 @@ Test 6: Verify pluto emu device.
 --------------------------------
 
 **UID:** TST.EMU.EN_PLUTO
+
+**RBP:** P3
 
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly (using pluto device).
@@ -320,6 +332,8 @@ Test 7: Verify pqm emu device.
 
 **UID:** TST.EMU.EN_PQM
 
+**RBP:** P3
+
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly (using pqm device).
 
@@ -368,6 +382,8 @@ Test 8: Verify swiot_config emu device.
 
 **UID:** TST.EMU.EN_SWIOT_CONFIG
 
+**RBP:** P3
+
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly (using swiot_config device).
 
@@ -414,6 +430,8 @@ Test 9: Verify swiot_runtime emu device.
 ----------------------------------------
 
 **UID:** TST.EMU.EN_SWIOT_RUNTIME
+
+**RBP:** P3
 
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly (using swiot_runtime device).
@@ -462,6 +480,8 @@ Test 10: Verify generic emu device.
 -----------------------------------
 
 **UID:** TST.EMU.EN_GENERIC
+
+**RBP:** P3
 
 **Description:** This test verifies if starting the emulator in Scopy works 
 correctly (using generic device).

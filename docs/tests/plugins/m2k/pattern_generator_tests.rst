@@ -39,6 +39,8 @@ Test 1: Individual Channel Operation
 
 **UID:** TST.M2K.PG.INDIVIDUAL_CHANNEL_OPERATION
 
+**RBP:** P0
+
 **Description:** This test case verifies the functionality of the pattern generator in individual channel operation mode.
 
 **Preconditions:**
@@ -181,6 +183,8 @@ Test 2: Group Channel Operation
 ----------------------------------------------------------------------------------------------------
 
 **UID:** TST.M2K.PG.GROUP_CHANNEL_OPERATION
+
+**RBP:** P3
 
 **Description:** This test case verifies the functionality of the pattern generator in group channel operation mode.
 
@@ -491,6 +495,8 @@ Test 3: Simultaneous Group and Individual Channels Operation
 
 **UID:** TST.M2K.PG.SIMULTANEOUS_GROUP_AND_INDIVIDUAL_CHANNELS_OPERATION
 
+**RBP:** P3
+
 **Description:** This test case verifies the functionality of the pattern generator in simultaneous group and individual channels operation mode.
 
 **Preconditions:**
@@ -556,6 +562,8 @@ Test 4: Other Features
 ----------------------------------------------------------------------------------------------------
 
 **UID:** TST.M2K.PG.OTHER_FEATURES
+
+**RBP:** P3
 
 **Description:** This test case verifies the functionality of the pattern generator in other features.
 
