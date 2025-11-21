@@ -156,15 +156,12 @@ ChannelConfigWidget::ChannelData ChannelConfigWidget::getChannelData() const
 void ChannelConfigWidget::updateControlsVisibility(bool lteMode)
 {
 	m_isLTEMode = lteMode; // Store mode state for mode-aware control logic
-	bool channelEnabled = m_enabledCb->isChecked();
 
 	// Apply mode-specific control settings
 	if(m_isLTEMode) {
 		// LTE Mode: Sample rate from predefined list (combo), bandwidth read-only
 		m_bandwidthCombo->setEnabled(false);
-
 		m_sampleRateCombo->setEditable(false);
-		m_sampleRateCombo->setEnabled(channelEnabled);
 
 		// this is a woraround caused by how Qt treats enable / disable editable logic for QCombobox
 		m_sampleRateCombo->clear();
@@ -172,19 +169,12 @@ void ChannelConfigWidget::updateControlsVisibility(bool lteMode)
 
 	} else {
 		// Live Device Mode: Both sample rate and bandwidth can be edited
-		m_bandwidthCombo->setEnabled(channelEnabled);
-
 		m_sampleRateCombo->setEditable(true);
-		m_sampleRateCombo->setEnabled(channelEnabled);
+		m_bandwidthCombo->setEnabled(true);
+		m_sampleRateCombo->setEnabled(true);
 
 		// this is a woraround caused by how Qt treats enable / disable editable logic for QCombobox
 		Style::setBackgroundColor(m_sampleRateCombo, json::theme::background_primary);
-	}
-
-	// These always follow channel state regardless of mode
-	m_freqOffsetCb->setEnabled(channelEnabled);
-	if(m_rfInputCombo) {
-		m_rfInputCombo->setEnabled(channelEnabled);
 	}
 }
 
@@ -237,9 +227,22 @@ void ChannelConfigWidget::onEnabledChanged()
 	if(m_updatingData)
 		return;
 
-	updateControlsVisibility(m_isLTEMode);
+	bool channelEnabled = m_enabledCb->isChecked();
+
+	m_sampleRateCombo->setEnabled(channelEnabled);
+
+	if(m_isLTEMode) {
+		m_bandwidthCombo->setEnabled(false);
+	} else {
+		m_bandwidthCombo->setEnabled(channelEnabled);
+	}
+
+	m_freqOffsetCb->setEnabled(channelEnabled);
+	if(m_rfInputCombo) {
+		m_rfInputCombo->setEnabled(channelEnabled);
+	}
+
 	Q_EMIT enabledChanged(m_enabledCb->isChecked());
-	Q_EMIT channelDataChanged();
 }
 
 void ChannelConfigWidget::onSampleRateChanged()
