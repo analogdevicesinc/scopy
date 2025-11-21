@@ -22,6 +22,8 @@
 #define FFT_BLOCK_HPP
 
 #include <gnuradio/hier_block2.h>
+#include <gnuradio/fft/fft_v.h>
+
 
 namespace scopy {
 class fft_block : public gr::hier_block2
@@ -35,7 +37,8 @@ public:
 
 private:
 	bool d_complex;
-	gr::basic_block_sptr d_fft;
+	std::shared_ptr<gr::fft::fft_v<float, true>> d_fft_f;
+	std::shared_ptr<gr::fft::fft_v<gr_complex, true>> d_fft_c;
 	gr::basic_block_sptr d_s2v_overlap;
 };
 } // namespace scopy
