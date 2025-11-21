@@ -24,7 +24,6 @@
 
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/blocks/vector_to_stream.h>
-#include <gnuradio/fft/fft_v.h>
 #include <gnuradio/fft/window.h>
 
 using namespace scopy;
@@ -43,16 +42,17 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 	/* We use a Hamming window for now */
 	auto window = fft::window::hamming(fft_size);
 
-	// basic_block_sptr fft;
-	if(use_complex)
-		d_fft = fft::fft_v<gr_complex, true>::make(fft_size, window, false, nbthreads);
-	else
-		d_fft = fft::fft_v<float, true>::make(fft_size, window, false, nbthreads);
-
 	/* Connect everything */
 	hier_block2::connect(this->self(), 0, d_s2v_overlap, 0);
-	hier_block2::connect(d_s2v_overlap, 0, d_fft, 0);
-	hier_block2::connect(d_fft, 0, v2s, 0);
+	if(use_complex) {
+		d_fft_c = fft::fft_v<gr_complex, true>::make(fft_size, window, false, nbthreads);
+		hier_block2::connect(d_s2v_overlap, 0, d_fft_c, 0);
+		hier_block2::connect(d_fft_c, 0, v2s, 0);
+	} else {
+		d_fft_f = fft::fft_v<float, true>::make(fft_size, window, false, nbthreads);
+		hier_block2::connect(d_s2v_overlap, 0, d_fft_f, 0);
+		hier_block2::connect(d_fft_f, 0, v2s, 0);
+	}
 	hier_block2::connect(v2s, 0, this->self(), 0);
 }
 
@@ -66,8 +66,8 @@ void fft_block::set_overlap_factor(double overlap_factor)
 void fft_block::set_window(const std::vector<float> &window)
 {
 	if(d_complex) {
-		std::dynamic_pointer_cast<fft::fft_v<gr_complex, true>>(d_fft)->set_window(window);
+		d_fft_c->set_window(window);
 	} else {
-		std::dynamic_pointer_cast<fft::fft_v<float, true>>(d_fft)->set_window(window);
+		d_fft_f->set_window(window);
 	}
 }
