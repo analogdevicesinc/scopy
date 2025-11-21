@@ -45,10 +45,10 @@ endif()
 
 # Default disabled packages
 if(NOT DEFINED ENABLE_PACKAGE_TEST-PLUGINS)
-	set(ENABLE_PACKAGE_TEST-PLUGINS ON CACHE BOOL "Enable test plugins package" FORCE)
+	set(ENABLE_PACKAGE_TEST-PLUGINS OFF CACHE BOOL "Enable test plugins package" FORCE)
 endif()
 
 if(NOT DEFINED ENABLE_PACKAGE_EXTPROC)
-	set(ENABLE_PACKAGE_EXTPROC ON CACHE BOOL "Enable extproc package" FORCE)
+	set(ENABLE_PACKAGE_EXTPROC OFF CACHE BOOL "Enable extproc package" FORCE)
 endif()
 add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})
