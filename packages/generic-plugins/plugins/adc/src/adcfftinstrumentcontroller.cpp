@@ -321,6 +321,11 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 					channelComponent->emitGenalyzerEnabledIfAppropriate();
 				}
 			}
+
+			// Restore genalyzer panel visibility if it was enabled
+			if(m_measureComponent->measureSettings()->genalyzerEnabled()) {
+				m_plotComponentManager->enableGenalyzerPanel(true);
+			}
 		} else {
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);

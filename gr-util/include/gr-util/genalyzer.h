@@ -48,8 +48,9 @@ public:
 	 * \param nfft FFT size
 	 * \param win Window type (GN_WINDOW_*)
 	 * \param sample_rate Sample rate in Hz
+	 * \param do_shift Whether to apply FFT shift (true for complex, false for float)
 	 */
-	static sptr make(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate);
+	static sptr make(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);
 
 	virtual void set_sample_rate(double sample_rate) = 0;
 	virtual double sample_rate() const = 0;

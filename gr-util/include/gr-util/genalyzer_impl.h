@@ -48,6 +48,7 @@ private:
 	size_t d_current_frame_index; // Current frame index in circular buffer
 	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
 	size_t d_allocated_frames;    // Number of frame buffers actually allocated
+	bool d_do_shift;              // Whether to apply FFT shift
 
 	gn_analysis_results *d_analysis;
 
@@ -65,7 +66,7 @@ private:
 	int configure_genalyzer();
 
 public:
-	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate);
+	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);
 	~genalyzer_fft_vii_impl();
 
 	void set_sample_rate(double sample_rate) override;
