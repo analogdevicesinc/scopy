@@ -63,6 +63,7 @@ GRIIODeviceSource::GRIIODeviceSource(iio_context *ctx, QString deviceName, QStri
 	, m_deviceName(deviceName)
 	, m_phyDeviceName(phyDeviceName)
 	, m_buffersize(buffersize)
+	, m_channelNames(QList<std::string>())
 {
 
 	m_iioDev = iio_context_find_device(m_ctx, m_deviceName.toStdString().c_str());
@@ -76,52 +77,65 @@ GRIIODeviceSource::GRIIODeviceSource(iio_context *ctx, QString deviceName, QStri
 		m_iioDev);
 }
 
-void GRIIODeviceSource::addChannelAtIndex(iio_device *iio_dev, QString channelName)
+void GRIIODeviceSource::addChannel(QString channelName)
 {
 	std::string channel_name = channelName.toStdString();
-	iio_channel *iio_ch = iio_device_find_channel(iio_dev, channel_name.c_str(), false);
-	int idx = iio_channel_get_index(iio_ch);
 
-	while(idx < m_channelNames.size() && m_channelNames[idx] != "" &&
-	      QString::fromStdString(m_channelNames[idx]) != channelName) {
-		idx++;
+	if(!channelName.isEmpty() && !m_channelNames.contains(channel_name)) {
+		m_channelNames.append(channel_name);
 	}
-	m_channelNames[idx] = channel_name;
 }
 
 void GRIIODeviceSource::computeChannelNames()
 {
-
-	int max_channels = iio_device_get_channels_count(m_iioDev);
-
-	for(int i = 0; i < max_channels; i++) {
-		m_channelNames.push_back(std::string());
-	}
-
 	for(GRIIOChannel *ch : qAsConst(m_list)) {
 		GRIIOFloatChannelSrc *floatCh = dynamic_cast<GRIIOFloatChannelSrc *>(ch);
 		if(floatCh) {
-			addChannelAtIndex(m_iioDev, floatCh->getChannelName());
+			addChannel(floatCh->getChannelName());
 		}
 
 		GRIIOComplexChannelSrc *complexCh = dynamic_cast<GRIIOComplexChannelSrc *>(ch);
 		if(complexCh) {
-			addChannelAtIndex(m_iioDev, complexCh->getChannelNameI());
-			addChannelAtIndex(m_iioDev, complexCh->getChannelNameQ());
+			addChannel(complexCh->getChannelNameI());
+			addChannel(complexCh->getChannelNameQ());
 		}
 	}
 
-	m_channelNames.erase(
-		std::remove_if(m_channelNames.begin(), m_channelNames.end(), [=](std::string x) { return x.empty(); }),
-		m_channelNames.end()); // clear empty channels
+	// Sort m_channelNames by channel index, then by name alphabetically
+	std::sort(m_channelNames.begin(), m_channelNames.end(), [this](const std::string &a, const std::string &b) {
+		iio_channel *ch_a = iio_device_find_channel(m_iioDev, a.c_str(), false);
+		iio_channel *ch_b = iio_device_find_channel(m_iioDev, b.c_str(), false);
+
+		if(!ch_a || !ch_b) {
+			return a < b;
+		}
+
+		int idx_a = iio_channel_get_index(ch_a);
+		int idx_b = iio_channel_get_index(ch_b);
+
+		if(idx_a != idx_b) {
+			return idx_a < idx_b;
+		}
+
+		// sort by numbers inside ch name
+		bool ok_a, ok_b;
+		int id_a = QString::fromStdString(a).remove(QRegExp("[^0-9]")).toInt(&ok_a);
+		int id_b = QString::fromStdString(a).remove(QRegExp("[^0-9]")).toInt(&ok_b);
+		if(ok_a && ok_b) {
+			return id_a < id_b;
+		}
+
+		// Same index, sort alphabetically
+		return a < b;
+	});
 }
 
 int GRIIODeviceSource::getOutputIndex(QString ch)
 {
-	for(int i = 0; i < m_channelNames.size(); i++) {
-		if(ch.toStdString() == m_channelNames[i])
-			return i;
+	if(m_channelNames.contains(ch.toStdString())) {
+		return m_channelNames.indexOf(ch.toStdString());
 	}
+
 	return -1;
 }
 
@@ -192,8 +206,9 @@ void GRIIODeviceSource::build_blks(GRTopBlock *top)
 		return;
 
 	computeChannelNames();
+
 	// create block
-	src = gr::iio::device_source::make_from(m_ctx, m_deviceName.toStdString(), m_channelNames,
+	src = gr::iio::device_source::make_from(m_ctx, m_deviceName.toStdString(), channelNames(),
 						m_phyDeviceName.toStdString(), gr::iio::iio_param_vec_t(),
 						m_buffersize);
 	src->set_output_multiple(m_buffersize);
@@ -227,6 +242,9 @@ void GRIIODeviceSource::setBuffersize(unsigned int newBuffersize)
 	Q_EMIT requestRebuild();
 }
 
-std::vector<std::string> GRIIODeviceSource::channelNames() const { return m_channelNames; }
+std::vector<std::string> GRIIODeviceSource::channelNames() const
+{
+	return std::vector<std::string>(m_channelNames.constBegin(), m_channelNames.constEnd());
+}
 
 QString GRIIODeviceSource::deviceName() const { return m_deviceName; }

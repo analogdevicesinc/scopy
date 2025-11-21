@@ -85,7 +85,7 @@ public:
 
 protected:
 	QList<GRIIOChannel *> m_list;
-	std::vector<std::string> m_channelNames;
+	QList<std::string> m_channelNames;
 	QString m_deviceName;
 	QString m_phyDeviceName;
 	iio_context *m_ctx;
@@ -97,7 +97,7 @@ protected:
 private:
 	QString m_sampleRateAttribute;
 	void computeChannelNames();
-	void addChannelAtIndex(iio_device *dev, QString channelName);
+	void addChannel(QString channelName);
 	void matchChannelToBlockOutputs(GRTopBlock *top);
 	int getOutputIndex(QString ch);
 };
