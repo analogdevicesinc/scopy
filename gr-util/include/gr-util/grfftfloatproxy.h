@@ -39,6 +39,7 @@
 #include <gnuradio/blocks/add_const_v.h>
 #include <gnuradio/blocks/float_to_int.h>
 #include <gnuradio/blocks/complex_to_float.h>
+#include <gnuradio/blocks/vector_source.h>
 #include <QMap>
 #include <cgenalyzer.h>
 
@@ -51,23 +52,29 @@ public:
 	void setWindowCorrection(bool b);
 	void setPowerOffset(double);
 	void setNrBits(int);
+	void setSampleRate(double sr);
+	void setSigned(bool sig);
+	void setNavg(int navg);
+	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
 protected:
 	double m_powerOffset;
 	int nrBits;
-	gr::fft::fft_v<float, true>::sptr fft;
 	bool m_windowCorr;
-	gr::blocks::multiply_const_ff::sptr mult_nrbits;
-	gr::blocks::complex_to_mag_squared::sptr ctm;
-	gr::blocks::multiply_const_cc::sptr mult_wind_corr;
-	gr::blocks::multiply_const_ff::sptr mult_const1;
-	gr::blocks::nlog10_ff::sptr nlog10;
+	double m_sr;
+	bool m_signed;
+	int m_navg;
+	gr::blocks::float_to_int::sptr float_to_int_i;
 	gr::blocks::add_const_vff::sptr powerOffset;
+	genalyzer_fft_vii::sptr genalyzer_fft;
 
 	gr::fft::window::win_type m_fftwindow;
 	GRTopBlock *m_top;
+
+private:
+	GnWindow convertToGnWindow(gr::fft::window::win_type window_type);
 };
 
 class SCOPY_GR_UTIL_EXPORT GRFFTComplexProc : public GRProxyBlock
@@ -103,24 +110,6 @@ protected:
 
 private:
 	GnWindow convertToGnWindow(gr::fft::window::win_type window_type);
-};
-
-class SCOPY_GR_UTIL_EXPORT GRFFTAvgProc : public GRProxyBlock
-{
-public:
-	// if complex is false, it uses float blocks
-	GRFFTAvgProc(bool complex, QObject *parent = nullptr);
-	void setSize(int size);
-	int size();
-	void build_blks(GRTopBlock *top);
-	void destroy_blks(GRTopBlock *top);
-
-protected:
-	bool m_complex;
-	int m_size;
-
-	gr::block_sptr m_avg;
-	GRTopBlock *m_top;
 };
 
 } // namespace scopy::grutil

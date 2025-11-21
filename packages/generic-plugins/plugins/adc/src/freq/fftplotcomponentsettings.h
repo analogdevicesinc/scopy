@@ -66,9 +66,7 @@ private:
 
 	QList<ChannelComponent *> m_channels;
 
-	// Window mode management
 	bool m_complexMode;
-	int m_floatModeWindow; // Store float mode window selection
 	QPushButton *m_deletePlot;
 	QPushButton *m_deletePlotHover;
 	QPushButton *m_settingsPlotHover;
@@ -82,7 +80,6 @@ public Q_SLOTS:
 private:
 	void toggleAutoScale();
 	void updateYModeCombo();
-	void updateWindowComboForMode();
 
 	QMap<ChannelComponent *, QList<QMetaObject::Connection>> connections;
 };
