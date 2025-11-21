@@ -468,7 +468,7 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 
 	if(loCh) {
 		QString loAttr = QString("RX%1_LO_frequency").arg(channel + 1);
-		auto loWidget = createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)");
+		auto loWidget = createRangeWidget(loCh, loAttr, "[30000000 1 6000000000]", "Local Oscillator (MHz)");
 
 		// Add MHz ↔ Hz conversion
 		loWidget->setDataToUIConversion(
@@ -545,7 +545,7 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 
 	if(loCh) {
 		QString loAttr = QString("TX%1_LO_frequency").arg(channel + 1);
-		auto loWidget = createRangeWidget(loCh, loAttr, "[30 1 6000]", "Local Oscillator (MHz)");
+		auto loWidget = createRangeWidget(loCh, loAttr, "[30000000 1 6000000000]", "Local Oscillator (MHz)");
 
 		// Add MHz ↔ Hz conversion
 		loWidget->setDataToUIConversion(
@@ -596,7 +596,7 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 	layout->addWidget(createCheckboxWidget(txCh, "close_loop_gain_tracking_en", "Close Loop Gain"), 8, 1);
 	layout->addWidget(createCheckboxWidget(txCh, "pa_correction_tracking_en", "PA Correction"), 9, 0);
 	layout->addWidget(createCheckboxWidget(txCh, "loopback_delay_tracking_en", "Loopback Delay"), 9, 1);
-	layout->addWidget(createCheckboxWidget(txCh, "lo_leakage_tracking_en", "LO Leakage"), 9, 0);
+	layout->addWidget(createCheckboxWidget(txCh, "lo_leakage_tracking_en", "LO Leakage"), 10, 0);
 
 	return widget;
 }

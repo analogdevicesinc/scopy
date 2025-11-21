@@ -1248,6 +1248,9 @@ void ProfileGeneratorWidget::forceUpdateAllUIControls()
 
 	// Force update all 4 channel widgets with device data (enabled states completely ignored)
 	for(int i = 0; i < 4; ++i) {
+		// set channels to live device mode
+		m_channelWidgets[i]->updateControlsVisibility(false);
+
 		ChannelConfigWidget::ChannelData data;
 		if(i < 2) { // RX channels (RX1, RX2)
 			const auto &rxConfig = m_deviceConfig.rxChannels[i];
