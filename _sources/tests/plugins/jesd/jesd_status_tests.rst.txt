@@ -14,6 +14,8 @@ Test 1: Plugin Loads and Displays JESD Device
 
 **UID:** TST.JESD_STATUS.PLUGIN_LOADS_AND_DISPLAYS_DEVICE
 
+**RBP:** P3
+
 **Description:** Verify that the JESD STATUS tool loads and displays the connected JESD204 Link Layer Device and its status panels.
 
 **OS:** ANY
@@ -52,6 +54,8 @@ Test 2: Link Status Display
 -----------------------------
 
 **UID:** TST.JESD_STATUS.LINK_STATUS_DISPLAY
+
+**RBP:** P3
 
 **Description:** Verify that the tool displays the correct link status fields and color coding.
 
@@ -100,6 +104,8 @@ Test 3: Lane Status Table
 
 **UID:** TST.JESD_STATUS.LANE_STATUS_TABLE
 
+**RBP:** P3
+
 **Description:** Verify that the Lane Status table displays error count and extended multiblock alignment for all lanes (0-7).
 
 **OS:** ANY
@@ -139,6 +145,8 @@ Test 4: SYSREF and Alignment Error Reporting
 
 **UID:** TST.JESD_STATUS.SYSREF_ALIGNMENT_ERROR_REPORTING
 
+**RBP:** P3
+
 **Description:** Verify that SYSREF captured and SYSREF alignment error fields are displayed and update according to device state.
 
 **OS:** ANY
@@ -177,6 +185,8 @@ Test 5: Real-Time Updates
 ----------------------------
 
 **UID:** TST.JESD_STATUS.REAL_TIME_UPDATES
+
+**RBP:** P3
 
 **Description:** Verify that the JESD STATUS panel updates in real time when device state changes (e.g., enable/disable link, induce errors).
 
@@ -232,6 +242,8 @@ Test 6: UI/UX and Color Coding
 -------------------------------
 
 **UID:** TST.JESD_STATUS.UI_UX_COLOR_CODING
+
+**RBP:** P3
 
 **Description:** Verify that status fields use correct color coding and the UI is clear and responsive.
 

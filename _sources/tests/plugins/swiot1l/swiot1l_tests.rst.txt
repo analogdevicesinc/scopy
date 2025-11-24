@@ -99,6 +99,8 @@ Test 1 - SWIOT compatibility
 
 **UID**: TST.SWIOT.COMPAT
 
+**RBP:** P0
+
 **Description**: This test verifies that the SWIOT plugin is compatible 
 with the selected device and that the plugin is able to correctly parse it. 
 
@@ -140,6 +142,8 @@ Test 2 - Mode switching
 .. _TST.SWIOT.MODES:
 
 **UID**: TST.SWIOT.MODES
+
+**RBP:** P0
 
 **Description**: This test verifies that the SWIOT plugin is able 
 to switch between Config and Runtime modes.
@@ -251,6 +255,8 @@ Test 3 - SWIOT config mode
 
 **UID**: TST.SWIOT.CONFIG
 
+**RBP:** P1
+
 **Description:** This test verifies that the SWIOT plugin 
 is able to configure the device correctly.
 
@@ -333,6 +339,8 @@ Test 4 - AD74413R plot operations
 
 **UID**: TST.AD74413R.PLOT
 
+**RBP:** P1
+
 **Description:** This test verifies that the AD74413R instrument
 plot changes such as labels and timestamp are correctly modified.
 
@@ -398,6 +406,8 @@ Test 5 - AD74413R channel operations
 .. _TST.AD74413R.CHANNEL:
 
 **UID**: TST.AD74413R.CHANNEL
+
+**RBP:** P1
 
 **Description:** This test verifies that AD74413R 
 channels can correctly output and acquire accurate data as 
@@ -519,6 +529,8 @@ Test 6 - AD74413R diagnostic channels
 
 **UID**: TST.AD74413R.DIAG
 
+**RBP:** P2
+
 **Description:** This test verifies that the AD74413R
 diagnostic channels can be correctly configured and 
 displayed on the instrument.
@@ -591,6 +603,8 @@ Test 7 - AD74413R sampling frequency
 
 **UID**: TST.AD74413R.SAMPLING
 
+**RBP:** P2
+
 **Description:** This test verifies that the AD74413R
 instrument can correctly compute the acquisition rate based on 
 the number of enabled channels.
@@ -647,6 +661,8 @@ Test 8 - AD74413R tutorial & docs
 .. _TST.AD74413R.TUTORIAL:
 
 **UID**: TST.AD74413R.TUTORIAL
+
+**RBP:** P3
 
 **Description:** This test verifies that the AD74413R
 instrument tutorial can be correctly started, followed 
@@ -734,6 +750,8 @@ Test 9 - MAX14906 plot operations
 
 **UID**: TST.MAX14906.PLOT
 
+**RBP:** P1
+
 **Description:** This test verifies that the MAX14906 instrument
 time span can be correctly modified.
 
@@ -786,6 +804,8 @@ Test 10 - MAX14906 channel operations
 .. _TST.MAX14906.CHANNEL:
 
 **UID**: TST.MAX14906.CHANNEL
+
+**RBP:** P1
 
 **Description:** This test verifies that MAX14906
 channels can correctly output and acquire accurate data as
@@ -842,6 +862,8 @@ Test 11 - MAX14906 tutorial & docs
 .. _TST.MAX14906.TUTORIAL:
 
 **UID**: TST.MAX14906.TUTORIAL
+
+**RBP:** P3
 
 **Description:** This test verifies that the MAX14906
 instrument tutorial can be correctly started, followed
@@ -930,6 +952,8 @@ Test 12 - Faults Run Single
 
 **UID**: TST.FAULTS.RUN_SINGLE
 
+**RBP:** P1
+
 **Description:** This test verifies that the Faults instrument
 can poll faults values for both devices.
 
@@ -992,6 +1016,8 @@ Test 13 - Faults clear and reset
 
 **UID**: TST.FAULTS.CLEAR_RESET
 
+**RBP:** P2
+
 **Description:** This test verifies that the Faults instrument
 can reset the polled values after a capture.
 
@@ -1048,6 +1074,8 @@ Test 14 - Faults Run continuous
 
 **UID**: TST.FAULTS.RUN_CONTINUOUS
 
+**RBP:** P2
+
 **Description:** This test verifies that the Faults instrument
 can poll faults values for both devices in continuous mode.
 
@@ -1101,6 +1129,8 @@ Test 15 - Faults tutorial & docs
 .. _TST.FAULTS.TUTORIAL:
 
 **UID**: TST.FAULTS.TUTORIAL
+
+**RBP:** P3
 
 **Description:** This test verifies that the Faults
 instrument tutorial can be correctly started, followed
@@ -1188,6 +1218,8 @@ Test 16 - SWIOT external supply
 .. _TST.SWIOT.EXTERNAL_SUPPLY:
 
 **UID**: TST.SWIOT.EXTERNAL_SUPPLY
+
+**RBP:** P2
 
 **Description:** This test verifies that the SWIOT plugin
 can correctly detect and notify the user that the external 

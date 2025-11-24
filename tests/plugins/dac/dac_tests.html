@@ -377,6 +377,7 @@ If the test case has special requirements, they will be listed in the test case 
 <section id="test-1-compatibility-with-device">
 <h2>Test 1 - Compatibility with device<a class="headerlink" href="#test-1-compatibility-with-device" title="Link to this heading"></a></h2>
 <p id="tst-dac-compat"><strong>UID:</strong> TST.DAC.COMPAT</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test verifies that the DAC plugin is compatible with the selected device
 and that the plugin is able to correctly parse it.</p>
 <dl class="simple">
@@ -418,6 +419,7 @@ and <strong>cf-ad9361-dds-core-lpc:voltage1</strong>.</p></li>
 <section id="test-2-buffer-mode-file-loading">
 <h2>Test 2 - Buffer mode file loading<a class="headerlink" href="#test-2-buffer-mode-file-loading" title="Link to this heading"></a></h2>
 <p id="tst-dac-buffer-load"><strong>UID:</strong> TST.DAC.BUFFER_LOAD</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies that the DAC plugin is able to load a file in buffer mode.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -513,6 +515,7 @@ Failed to load: [file name]</em>.</p></li>
 <section id="test-3-buffer-mode-channel-selection">
 <h2>Test 3 - Buffer mode channel selection<a class="headerlink" href="#test-3-buffer-mode-channel-selection" title="Link to this heading"></a></h2>
 <p id="tst-dac-buffer-channel-select"><strong>UID:</strong> TST.DAC.BUFFER_CHANNEL_SELECT</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies that the DAC plugin is able to validate channel selection in buffer mode.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -608,6 +611,7 @@ Failed to load: [file name]</em>.</p></li>
 <section id="test-4-buffer-mode-file-size-validation">
 <h2>Test 4 - Buffer mode file size validation<a class="headerlink" href="#test-4-buffer-mode-file-size-validation" title="Link to this heading"></a></h2>
 <p id="tst-dac-buffer-file-size"><strong>UID:</strong> TST.DAC.BUFFER_FILE_SIZE</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies that the DAC plugin is able to validate the file
 size in buffer mode.</p>
 <dl class="simple">
@@ -693,6 +697,7 @@ the maximum number of samples in the file.</p></li>
 <section id="test-5-cyclic-buffer-mode">
 <h2>Test 5 - Cyclic buffer mode<a class="headerlink" href="#test-5-cyclic-buffer-mode" title="Link to this heading"></a></h2>
 <p id="tst-dac-buffer-cyclic"><strong>UID:</strong> TST.DAC.BUFFER_CYCLIC</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies the DAC plugin buffer generation in cyclic mode.</p>
 <dl class="simple">
 <dt><strong>Depends on::</strong></dt><dd><ul class="simple">
@@ -753,6 +758,7 @@ and <strong>altvoltage0 RX_LO</strong> channels to 2450000000.</p></li>
 <section id="test-6-dds-modes">
 <h2>Test 6 -  DDS modes<a class="headerlink" href="#test-6-dds-modes" title="Link to this heading"></a></h2>
 <p id="tst-dac-dds-modes"><strong>UID:</strong> TST.DAC.DDS_MODES</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies the DAC plugin DDS modes.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -835,9 +841,9 @@ and <strong>altvoltage0 RX_LO</strong> channels to 2450000000.</p></li>
 </section>
 <section id="test-7-dds-mode-sinewave-generation">
 <h2>Test 7 - DDS mode sinewave generation<a class="headerlink" href="#test-7-dds-mode-sinewave-generation" title="Link to this heading"></a></h2>
-<dl class="simple" id="tst-dac-dds-sinewave">
-<dt><strong>UID:</strong></dt><dd><p>TST.DAC.DDS_SINEWAVE</p>
-</dd>
+<p id="tst-dac-dds-sinewave"><strong>UID:</strong> TST.DAC.DDS_SINEWAVE</p>
+<p><strong>RBP:</strong> P3</p>
+<dl class="simple">
 <dt><strong>Description:</strong></dt><dd><p>This test verifies the DAC plugin DDS mode sinewave generation.</p>
 </dd>
 <dt><strong>Depends on::</strong></dt><dd><ul class="simple">
@@ -900,6 +906,7 @@ and <strong>altvoltage0 RX_LO</strong> channels to 2450000000.</p></li>
 <section id="test-8-dds-mode-attributes-refresh">
 <h2>Test 8 - DDS mode attributes refresh<a class="headerlink" href="#test-8-dds-mode-attributes-refresh" title="Link to this heading"></a></h2>
 <p id="tst-dac-dds-attrs"><strong>UID:</strong> TST.DAC.DDS_ATTRS</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies the DAC plugin DDS mode attributes refresh.</p>
 <dl class="simple">
 <dt><strong>Depends on::</strong></dt><dd><ul class="simple">
@@ -937,6 +944,7 @@ for the <strong>altvoltage0 TX1_I_F1</strong> to 2000000.</p></li>
 <section id="test-9-plugin-tutorial">
 <h2>Test 9 - Plugin tutorial<a class="headerlink" href="#test-9-plugin-tutorial" title="Link to this heading"></a></h2>
 <p id="tst-dac-tutorial"><strong>UID:</strong> TST.DAC.TUTORIAL</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies the DAC plugin tutorial.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -995,6 +1003,7 @@ should appear.</p></li>
 <section id="test-10-channel-attributes">
 <h2>Test 10 - Channel attributes<a class="headerlink" href="#test-10-channel-attributes" title="Link to this heading"></a></h2>
 <p id="tst-dac-channel-attrs"><strong>UID:</strong> TST.DAC.CHANNEL_ATTRS</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies the DAC plugin channel attributes.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -1035,6 +1044,7 @@ should appear.</p></li>
 <section id="test-11-repeat-data-option">
 <h2>Test 11 - Repeat data option<a class="headerlink" href="#test-11-repeat-data-option" title="Link to this heading"></a></h2>
 <p id="tst-dac-repeat-data"><strong>UID:</strong> TST.DAC.REPEAT_DATA</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies the DAC plugin repeat data option.
 The data sets loaded from the file should be repeated to fill in all the enabled
 channels.</p>

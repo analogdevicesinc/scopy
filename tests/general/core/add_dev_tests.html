@@ -356,6 +356,7 @@ Content on this topic
 <section id="test-1-verifying-the-device-scanning-functionality">
 <h2>Test 1: Verifying the device scanning functionality.<a class="headerlink" href="#test-1-verifying-the-device-scanning-functionality" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.SCAN_ALL</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test checks that the device scan correctly detects and
 lists available devices when initiated.</p>
 <dl class="simple">
@@ -390,6 +391,7 @@ are listed, each item containing the device name/description and URI. The
 <section id="test-2-verifying-the-local-device-scanning-functionality">
 <h2>Test 2: Verifying the local device scanning functionality.<a class="headerlink" href="#test-2-verifying-the-local-device-scanning-functionality" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.SCAN_LOCAL</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test checks that the device scan correctly detects and
 lists available local devices when initiated.</p>
 <dl class="simple">
@@ -425,6 +427,7 @@ is displayed.</p></li>
 <section id="test-3-verifying-the-ip-device-scanning-functionality">
 <h2>Test 3: Verifying the ip device scanning functionality.<a class="headerlink" href="#test-3-verifying-the-ip-device-scanning-functionality" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.SCAN_IP</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test checks that the device scan correctly detects and
 lists available ip devices when initiated.</p>
 <dl class="simple">
@@ -460,6 +463,7 @@ is displayed.</p></li>
 <section id="test-4-verifying-the-usb-device-scanning-functionality">
 <h2>Test 4: Verifying the usb device scanning functionality.<a class="headerlink" href="#test-4-verifying-the-usb-device-scanning-functionality" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.SCAN_USB</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test checks that the device scan correctly detects and
 lists available usb devices when initiated.</p>
 <dl class="simple">
@@ -493,6 +497,7 @@ and URI. The <strong>ADALM2000</strong> device must appear in the list.</p></li>
 <section id="test-5-verifying-the-serial-device-scanning-functionality">
 <h2>Test 5: Verifying the serial device scanning functionality.<a class="headerlink" href="#test-5-verifying-the-serial-device-scanning-functionality" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.SCAN_SERIAL</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test checks that the device scan correctly detects and
 lists available serial devices when initiated.</p>
 <dl class="simple">
@@ -529,6 +534,7 @@ available!” message is displayed.</p></li>
 <section id="test-6-scanning-with-no-device">
 <h2>Test 6: Scanning with no device.<a class="headerlink" href="#test-6-scanning-with-no-device" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.SCAN_EMPTY</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test checks whether an appropriate message is displayed
 when no device is found.</p>
 <dl class="simple">
@@ -561,6 +567,7 @@ displayed.</p></li>
 <section id="test-7-device-validation">
 <span id="tst-add-verify"></span><h2>Test 7: Device validation.<a class="headerlink" href="#test-7-device-validation" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.VERIFY</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test verifies that the device validation works correctly.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
@@ -596,6 +603,7 @@ a page with device details and compatible plugins is displayed.</p></li>
 <section id="test-8-verify-the-back-button-from-compatible-plugin-page">
 <h2>Test 8: Verify the “BACK” button from compatible plugin page.<a class="headerlink" href="#test-8-verify-the-back-button-from-compatible-plugin-page" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.PLUGINS_BACK</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test checks if the <strong>BACK</strong> button works correctly.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
@@ -631,6 +639,7 @@ a page with device details and compatible plugins is displayed.</p></li>
 <section id="test-9-verify-the-add-device-button-from-compatible-plugin-page-single-plugin">
 <span id="tst-add-plugins-add"></span><h2>Test 9: Verify the “ADD DEVICE” button from compatible plugin page (single plugin).<a class="headerlink" href="#test-9-verify-the-add-device-button-from-compatible-plugin-page-single-plugin" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.PLUGINS_ADD_SINGLE</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test checks if the <strong>ADD DEVICE</strong> button works correctly.
 Only the main plugin of the device is used.</p>
 <dl class="simple">
@@ -681,6 +690,7 @@ tool menu.</p></li>
 <section id="test-10-verify-the-add-device-button-from-compatible-plugin-page-multiple-plugins">
 <h2>Test 10: Verify the “ADD DEVICE” button from compatible plugin page (multiple plugins).<a class="headerlink" href="#test-10-verify-the-add-device-button-from-compatible-plugin-page-multiple-plugins" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.PLUGINS_ADD_MULTIPLE</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test checks if the <strong>ADD DEVICE</strong> button works correctly.
 Multiple plugins are used.</p>
 <dl class="simple">
@@ -732,6 +742,7 @@ to the tool menu.</p></li>
 <section id="test-11-verify-the-add-device-button-from-compatible-plugin-page-with-no-plugin-selected">
 <h2>Test 11: Verify the “ADD DEVICE” button from compatible plugin page with no plugin selected.<a class="headerlink" href="#test-11-verify-the-add-device-button-from-compatible-plugin-page-with-no-plugin-selected" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.ADD.PLUGINS_EMPTY</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test checks if the <strong>ADD DEVICE</strong> button works correctly.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">

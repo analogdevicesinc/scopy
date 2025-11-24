@@ -39,6 +39,8 @@ Test 1: Channel 1 Operation
 
 **UID:** TST.M2K.VOLTMETER.CHANNEL_1_OPERATION
 
+**RBP:** P0
+
 **Description:** This test case verifies the functionality of the M2K voltmeter channel 1 operation.
 
 **Preconditions:**
@@ -337,6 +339,8 @@ Test 2: Channel 2 Operation
 
 **UID:** TST.M2K.VOLTMETER.CHANNEL_2_OPERATION
 
+**RBP:** P3
+
 **Description:** This test case verifies the functionality of the M2K voltmeter channel 2 operation.
 
 **Preconditions:**
@@ -596,6 +600,8 @@ Test 3: Channel 1 and Channel 2 Operation
 
 **UID:** TST.M2K.VOLTMETER.CHANNEL_1_AND_CHANNEL_2_OPERATION
 
+**RBP:** P3
+
 **Description:** This test case verifies the functionality of the M2K voltmeter channel 1 and channel 2 operation.
 
 **Preconditions:**
@@ -809,6 +815,8 @@ Test 4: Additional Features
 -------------------------------------------------------------------------------
 
 **UID:** TST.M2K.VOLTMETER.ADDITIONAL_FEATURES
+
+**RBP:** P3
 
 **Description:** This test case verifies the functionality of the M2K voltmeter additional features.
 

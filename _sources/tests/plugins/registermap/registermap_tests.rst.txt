@@ -67,6 +67,8 @@ Test 1 : Read
 
 **UID:** TST.REGMAP.READ
 
+**RBP:** P2
+
 **Description:** Verify that the user can read the register value.
 
 **OS:** ANY
@@ -108,6 +110,8 @@ Test 2 : Write
 ^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.WRITE
+
+**RBP:** P2
 
 **Description:** Verify that the user can write the register value.
 
@@ -154,6 +158,8 @@ Test 3 : Write wrong value
 
 **UID:** TST.REGMAP.WRITE_WRONG_VALUE  
 
+**RBP:** P3
+
 **Description:** Verify that the user can not write the wrong value to the register.
 
 **OS:** ANY
@@ -198,6 +204,8 @@ Test 4 : Change device
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.CHANGE_DEVICE  
+
+**RBP:** P3
 
 **Description:** Verify that the user can change the device.
 
@@ -248,6 +256,8 @@ Test 5 : Show register map table
 
 **UID:** TST.REGMAP.SHOW_TABLE
 
+**RBP:** P3
+
 **Description:** Verify that the user can see the register map table.
 
 **OS:** ANY
@@ -287,6 +297,8 @@ Test 6 : Search register
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.SEARCH
+
+**RBP:** P3
 
 **Description:** Verify that the user can search the for a register.
 
@@ -366,6 +378,8 @@ Test 7 : Simple Register value updated on read
 
 **UID:** TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_READ
 
+**RBP:** P3
+
 **Description:** Verify that the user can see the register value in the table updated 
     on read.
 
@@ -411,6 +425,8 @@ Test 8 : Simple Register value updated on write
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_WRITE
+
+**RBP:** P3
 
 **Description:** Verify that the user can see the register value in the table updated 
     on write.
@@ -461,6 +477,8 @@ Test 9 : Detailed Register value updated on read
 
 **UID:** TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_READ
 
+**RBP:** P3
+
 **Description:** Verify that the detailed register bitfields value is updated on read.
 
 **OS:** ANY
@@ -506,6 +524,8 @@ Test 10 : Detailed Register value updated on write
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_WRITE
+
+**RBP:** P3
 
 **Description:** Verify that the detailed register bitfields value is updated on write.
 
@@ -553,6 +573,8 @@ Test 11 : Change value of the bitfield inside the detailed register
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.CHANGE_BITFIELD_VALUE
+
+**RBP:** P3
 
 **Description:** Verify that when value of the bitfield is changed the **Value** field is 
     updated. Changing the bitfield value should not change the value of the 
@@ -610,6 +632,8 @@ Test 12 : Change **Value** field updates detailed register bitfields
 
 **UID:** TST.REGMAP.CHANGE_VALUE_FIELD
 
+**RBP:** P3
+
 **Description:** Verify that when value of the **Value** field is changed the detailed 
     register bitfields are updated.
 
@@ -656,6 +680,8 @@ Test 13 : Change selected register
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.CHANGE_SELECTED_REGISTER
+
+**RBP:** P3
 
 **Description:** Verify that when the register is changed the detailed register bitfields 
     are updated.
@@ -726,6 +752,8 @@ Test 14 : Toggle detailed register visible
 
 **UID:** TST.REGMAP.TOGGLE_DETAILED_REGISTER_VISIBLE
 
+**RBP:** P3
+
 **Description:** Verify that the user can toggle the detailed register visibility.
 
 **OS:** ANY
@@ -778,6 +806,8 @@ Test 15 : Settings autoread
 
 **UID:** TST.REGMAP.SETTINGS_AUTOREAD
 
+**RBP:** P3
+
 **Description:** Verify that the autoread setting is working.
 
 **OS:** ANY
@@ -824,6 +854,8 @@ Test 16 : Settings read interval
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.SETTINGS_READ_INTERVAL
+
+**RBP:** P3
 
 **Description:** Verify that the read interval setting is working.
 
@@ -873,6 +905,8 @@ Test 17 : Settings read interval with wrong interval
 
 **UID:** TST.REGMAP.SETTINGS_READ_INTERVAL_WRONG_INTERVAL
 
+**RBP:** P3
+
 **Description:** Verify that the read interval setting is not working with wrong 
     interval.
 
@@ -920,6 +954,8 @@ Test 18 : Settings register dump
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.SETTINGS_REGISTER_DUMP
+
+**RBP:** P3
 
 **Description:** Verify that the register dump is working.
 
@@ -979,6 +1015,8 @@ Test 19 : Settings write values
 
 **UID:** TST.REGMAP.SETTINGS_WRITE_VALUES
 
+**RBP:** P3
+
 **Description:** Verify that the write values setting is working.
 
 **Precondition:**
@@ -1024,6 +1062,8 @@ Test 20 : Settings Dump register and write values disabled
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED
+
+**RBP:** P3
 
 **Description:** Verify that the **Register dump** and **Write values** buttons are disabled 
     when the file path is not selected.
@@ -1084,6 +1124,8 @@ Tests 21 : Preferences color coding background color
 
 **UID:** TST.REGMAP.PREFERENCES_COLOR_CODING_BACKGROUND_COLOR
 
+**RBP:** P3
+
 **Description:** Verify that the background color of the register in the table is 
     changing to reflect the value of the register.
 
@@ -1138,6 +1180,8 @@ Test 22 : Preferences color coding text color
 
 **UID:** TST.REGMAP.PREFERENCES_COLOR_CODING_TEXT_COLOR
 
+**RBP:** P3
+
 **Description:** Verify that the text color of the register in the table is changing to 
     reflect the value of the register.
 
@@ -1190,6 +1234,8 @@ Test 23 : Preferences color for value
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.PREFERENCES_COLORS_VALUE_RANGE
+
+**RBP:** P3
 
 **Description:** Verify that the colors used for the values are corect.
 
@@ -1245,6 +1291,8 @@ Test 24 : Preferences color coding dynamic change
 
 **UID:** TST.REGMAP.PREFERENCES_COLOR_CODING_DYNAMIC_CHANGE
 
+**RBP:** P3
+
 **Description:** Verify that the color coding is changing dynamically.
 
 **OS:** ANY
@@ -1296,6 +1344,8 @@ Test 25 : Preference settings save on close
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.PREFERENCES_SETTINGS_SAVE_ON_CLOSE
+
+**RBP:** P3
 
 **Description:** Verify that the preferences are saved on close.
 
@@ -1352,6 +1402,8 @@ Test 26 : Info button documentation
 
 **UID:** TST.REGMAP.INFO_BUTTON_DOCUMENTATION
 
+**RBP:** P3
+
 **Description:** Verify that the user can see the documentation for the register.
 
 **OS:** ANY
@@ -1394,6 +1446,8 @@ Test 27 : Info button tutorial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.INFO_BUTTON_TUTORIAL
+
+**RBP:** P3
 
 **Description:** Verify that the user can see the tutorial for the register.
 
@@ -1438,6 +1492,8 @@ Test 28 : Info button tutorial no XML
 
 **UID:** TST.REGMAP.INFO_BUTTON_TUTORIAL_NO_XML
 
+**RBP:** P3
+
 **Description:** Verify that the user can see the tutorial for the register when no XML 
     file is present.
 
@@ -1480,6 +1536,8 @@ Test 29 : Custom XML file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.REGMAP.CUSTOM_XML_FILE
+
+**RBP:** P3
 
 **Description:** Verify that the user can use a custom XML file.
 

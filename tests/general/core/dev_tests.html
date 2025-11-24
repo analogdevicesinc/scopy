@@ -365,6 +365,7 @@ Content on this topic
 <section id="test-1-verifying-the-device-button">
 <h2>Test 1: Verifying the device button.<a class="headerlink" href="#test-1-verifying-the-device-button" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.HP.DEV_BTN</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> To verify that clicking on the device button triggers the
 expected action: displaying device details and device tools.</p>
 <dl class="simple">
@@ -402,6 +403,7 @@ cannot be accessed).</p></li>
 <section id="test-2-remove-a-device-from-device-browser">
 <h2>Test 2: Remove a device from device browser.<a class="headerlink" href="#test-2-remove-a-device-from-device-browser" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.FORGET</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test checks if the “Forget” (x) button work correctly.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
@@ -434,6 +436,7 @@ cannot be accessed).</p></li>
 <section id="test-3-remove-a-device-from-device-browser-while-it-is-connected">
 <h2>Test 3: Remove a device from device browser while it is connected.<a class="headerlink" href="#test-3-remove-a-device-from-device-browser-while-it-is-connected" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.FORGET_CONN</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies whether Scopy properly handles the removal
 of a connected device.</p>
 <dl class="simple">
@@ -470,6 +473,7 @@ successfully removed from the device browser.</p></li>
 <section id="test-4-edit-the-name-of-the-device">
 <h2>Test 4: Edit the name of the device.<a class="headerlink" href="#test-4-edit-the-name-of-the-device" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.EDIT_NAME</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test checks if the <strong>Edit pen</strong> button work correctly.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
@@ -508,6 +512,7 @@ browser and in the tool menu.</p></li>
 <section id="test-5-select-a-tool">
 <h2>Test 5: Select a tool.<a class="headerlink" href="#test-5-select-a-tool" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.SELECT_TOOL</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test checks if the tool infrastructure works correctly.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
@@ -555,6 +560,7 @@ item is highlighted.</p></li>
 <section id="test-6-detach-a-tool">
 <span id="tst-dev-detach-tool"></span><h2>Test 6: Detach a tool.<a class="headerlink" href="#test-6-detach-a-tool" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.DETACH_TOOL</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test checks if the tool detachment mechanism is working
 correctly.</p>
 <dl class="simple">
@@ -617,6 +623,7 @@ separate window from the application. The window title should be:
 <section id="test-7-reopen-the-app-with-a-detached-tool">
 <h2>Test 7: Reopen the app with a detached tool.<a class="headerlink" href="#test-7-reopen-the-app-with-a-detached-tool" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.DETACH_TOOL_RE</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test checks whether detached tools retain their state upon
 reconnection.</p>
 <dl class="simple">
@@ -651,6 +658,7 @@ reconnection.</p>
 <section id="test-8-collapse-device-tools-in-the-tool-menu">
 <h2>Test 8: Collapse device tools in the tool menu.<a class="headerlink" href="#test-8-collapse-device-tools-in-the-tool-menu" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.COLLAPSE</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test verifies if the collapse feature works properly in
 the tool menu.</p>
 <dl class="simple">
@@ -697,6 +705,7 @@ the tool menu.</p>
 <section id="test-9-connecting-to-multiple-devices">
 <span id="tst-dev-multi-conn"></span><h2>Test 9: Connecting to multiple devices.<a class="headerlink" href="#test-9-connecting-to-multiple-devices" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.MULTI_CONN</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test checks if connecting to multiple devices is working
 properly.</p>
 <dl class="simple">
@@ -750,6 +759,7 @@ entries, then the scroll bar will become visible.</p></li>
 <section id="test-10-resource-manager-with-multiple-devices">
 <h2>Test 10: Resource manager with multiple devices.<a class="headerlink" href="#test-10-resource-manager-with-multiple-devices" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.RM_MULTI</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> This test verifies that the resource manager is being used
 properly.</p>
 <dl class="simple">
@@ -802,6 +812,7 @@ and the oscilloscope button (of the emu device) remains the same.</p></li>
 <section id="test-11-devices-order-in-device-browser">
 <h2>Test 11: Devices order in device browser.<a class="headerlink" href="#test-11-devices-order-in-device-browser" title="Link to this heading"></a></h2>
 <p><strong>UID:</strong> TST.DEV.ADD_ORDER</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> This test verifies that each newly added device is finally
 entered into the device browser.</p>
 <dl class="simple">

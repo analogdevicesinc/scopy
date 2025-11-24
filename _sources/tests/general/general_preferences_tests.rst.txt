@@ -49,8 +49,10 @@ Test 1 - Save/Load Scopy session
 .. _TST.PREF.SAVE_LOAD_SESSION:
 
 **UID:** TST.PREF.SAVE_LOAD_SESSION
-  
-**Description:** Manage sessions to retain or load overall application 
+
+**RBP:** P0
+
+**Description:** Manage sessions to retain or load overall application
 states (only applies to plugins which have this implemented).
 
 **Test prerequisites:**
@@ -111,9 +113,11 @@ Test 2 - Double click to attach/detach tool
 
 .. _TST.PREF.DOUBLECLICK_ATTACH_DETACH:
 
-**UID:** TST.PREF.DOUBLECLICK_ATTACH_DETACH  
+**UID:** TST.PREF.DOUBLECLICK_ATTACH_DETACH
 
-**Description:** Tools can be detached from the main window by 
+**RBP:** P1
+
+**Description:** Tools can be detached from the main window by
 double clicking them in the left menu.  
 
 **Test prerequisites:**
@@ -164,6 +168,8 @@ Test 3 - Save/Load tool attached state
 .. _TST.PREF.SAVE_LOAD_TOOL_STATE:
 
 **UID:** TST.PREF.SAVE_LOAD_TOOL_STATE  
+
+**RBP:** P3
 
 **Description:** Manage sessions to retain tool attached states.  
 
@@ -217,6 +223,8 @@ Test 4 - Double click control buttons to open menu
 .. _TST.PREF.DOUBLECLICK_CONTROL_MENU:
 
 **UID:** TST.PREF.DOUBLECLICK_CONTROL_MENU  
+
+**RBP:** P3
 
 **Description:** Open menu from MenuControlButtons by double clicking them.  
 
@@ -272,6 +280,8 @@ Test 5 - Enable OpenGL plotting
 
 **UID:** TST.PREF.ENABLE_OPENGL_PLOTTING  
 
+**RBP:** P3
+
 **Description:** Use GPU acceleration for rendering plots (OpenGL-based).  
 
 **Test prerequisites:**
@@ -326,6 +336,8 @@ Test 6 - Enable menu animations
 
 **UID:** TST.PREF.ENABLE_MENU_ANIMATIONS  
 
+**RBP:** P3
+
 **Description:** Toggle visual animations for menu transitions.  
 
 **Test prerequisites:**
@@ -376,6 +388,8 @@ Test 7 - Enable the status bar for displaying important messages
 .. _TST.PREF.ENABLE_STATUS_BAR:
 
 **UID:** TST.PREF.ENABLE_STATUS_BAR  
+
+**RBP:** P3
 
 **Description:** Show status messages on the bottom of the app window.  
 
@@ -428,6 +442,8 @@ Test 8 - Show Grid
 
 **UID:** TST.PREF.SHOW_GRID
 
+**RBP:** P3
+
 **Description:** Display grid lines for better visual referencing on plots.  
 
 **Test prerequisites:**
@@ -478,6 +494,8 @@ Test 9 - Show Graticule
 .. _TST.PREF.SHOW_GRATICULE:
 
 **UID:** TST.PREF.SHOW_GRATICULE
+
+**RBP:** P3
 
 **Description:** Display lines for axes centered on 0 points on plots.
 
@@ -532,6 +550,8 @@ Test 10 - Use Lazy Loading
 
 **UID:** TST.PREF.USE_LAZY_LOADING
 
+**RBP:** P1
+
 **Description:** Load IIO resources as needed to improve initial load performance.
 
 **Test prerequisites:**
@@ -580,6 +600,8 @@ Test 11 - Use native dialogs
 
 **UID:** TST.PREF.USE_NATIVE_DIALOGS
 
+**RBP:** P1
+
 **Description:** Use system-native dialog windows.
 
 **Preconditions:**
@@ -627,6 +649,8 @@ Test 12 - Auto-connect to previous session
 .. _TST.PREF.AUTO_CONNECT_PREVIOUS_SESSION:
 
 **UID:** TST.PREF.AUTO_CONNECT_PREVIOUS_SESSION
+
+**RBP:** P0
 
 **Description:** Automatically reconnect to the last used devices on startup.
 
@@ -680,6 +704,8 @@ Test 13 - Font scale
 
 **UID:** TST.PREF.FONT_SCALE
 
+**RBP:** P3
+
 **Description:** Adjust font size within the app (this is experimental, 
 so some layout artifacts may appear).  
 
@@ -731,6 +757,8 @@ Test 14 - Theme
 
 **UID:** TST.PREF.THEME
 
+**RBP:** P2
+
 **Description:** Change application theme.  
 
 **Test prerequisites:**
@@ -774,6 +802,8 @@ Test 15 - Language
 
 **UID:** TST.PREF.LANGUAGE
 
+**RBP:** P2
+
 **Description:** Change the language of the application interface.
 
 **Test prerequisites:**
@@ -814,6 +844,8 @@ Test 16 - Connect to multiple devices
 .. _TST.PREF.CONNECT_MULTIPLE_DEVICES:
 
 **UID:** TST.PREF.CONNECT_MULTIPLE_DEVICES
+
+**RBP:** P3
 
 **Description:** Enable connections to multiple hardware and emulator 
 
@@ -865,7 +897,9 @@ Test 17 - Regularly scan for new devices
 
 .. _TST.PREF.REGULARLY_SCAN_NEW_DEVICES:
 
-**UID:** TST.PREF.REGULARLY_SCAN_NEW_DEVICES  
+**UID:** TST.PREF.REGULARLY_SCAN_NEW_DEVICES
+
+**RBP:** P1
 
 **Description:** Continuously scan and recognize newly connected devices.
 
@@ -920,6 +954,8 @@ Test 18 - Session devices
 
 **UID:** TST.PREF.SESSION_DEVICES
 
+**RBP:** P3
+
 **Description:** Automatically connect to saved devices.
 
 **Preconditions:**
@@ -963,6 +999,8 @@ Test 19 - Show plot FPS
 .. _TST.PREF.SHOW_PLOT_FPS:
 
 **UID:** TST.PREF.SHOW_PLOT_FPS
+
+**RBP:** P3
 
 **Description:** Show FPS on plots.
 
@@ -1016,6 +1054,8 @@ Test 20 - Plot target FPS
 
 **UID:** TST.PREF.PLOT_TARGET_FPS
 
+**RBP:** P3
+
 **Description:** Manage the maximum FPS plots should run at 
 (this may also affect the IIO acquisition).
 
@@ -1058,6 +1098,8 @@ Test 21 - Reset settings and plugins to default
 .. _TST.PREF.RESET_SETTINGS_DEFAULT:
 
 **UID:** TST.PREF.RESET_SETTINGS_DEFAULT
+
+**RBP:** P0
 
 **Description:** Resets all settings and plugins to default values.
 

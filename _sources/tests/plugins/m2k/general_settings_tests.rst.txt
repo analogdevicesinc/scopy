@@ -40,6 +40,8 @@ Test 1: M2K Connection and Calibration
 
 **UID:** TST.GEN.SETUP.M2KCONN
 
+**RBP:** P3
+
 **Description:** This test verifies the connection and calibration of the M2K board using both local and remote connections. It checks the auto and manual calibration features of the M2K board.
 
 **Preconditions:**
@@ -146,6 +148,8 @@ Test 2: Save and Load Profile
 -----------------------------------------------
 
 **UID:** TST.GEN.SETUP.SAVELOAD
+
+**RBP:** P3
 
 **Description:** This test verifies the save and load profile feature of Scopy. It checks the ability to save and load profiles for each instrument and the ability to save and load the default profile.
 
@@ -258,6 +262,8 @@ Test 3: Preferences
 -----------------------------------------------
 
 **UID:** TST.GEN.SETUP.PREFERENCES
+
+**RBP:** P3
 
 **Description:** This test verifies the preferences feature of Scopy. It checks the sections of the preferences menu and the options available in each section.
 

@@ -21,7 +21,9 @@ Package Manager - Test Suite
 Test 1 - Package Discovery Load
 -----------------------------------
 
-**UID:** PKG_MANAGER.DISCOVERY.LOAD
+**UID:** TST.PKG_MANAGER.DISCOVERY.LOAD
+
+**RBP:** P0
 
 **Description:** Verify that all available packages are discovered and loaded correctly at startup.
 
@@ -69,7 +71,9 @@ Test 1 - Package Discovery Load
 Test 2 - Package Resource Access
 --------------------------------------
 
-**UID:** PKG_MANAGER.RESOURCE.ACCESS
+**UID:** TST.PKG_MANAGER.RESOURCE.ACCESS
+
+**RBP:** P1
 
 **Description:** Ensure that resources (XML, CSV, etc.) within packages are accessible and used by the application.
 
@@ -110,7 +114,9 @@ Test 2 - Package Resource Access
 Test 3 - Package Create
 -----------------------------
 
-**UID:** PKG_MANAGER.CREATE
+**UID:** TST.PKG_MANAGER.CREATE
+
+**RBP:** P2
 
 **Description:** Test creating a new package (named "test_pkg") using the official package generator script (`package_generator.py`).
 
@@ -179,12 +185,14 @@ Test 3 - Package Create
 Test 4 - Package Install
 ------------------------------
 
-**UID:** PKG_MANAGER.INSTALL
+**UID:** TST.PKG_MANAGER.INSTALL
+
+**RBP:** P2
 
 **Description:** Test installing the previously created package ("test_pkg") via the package manager and verifying it appears in the list and is usable.
 
 **Preconditions:**
-    - Test 3 (PKG_MANAGER.CREATE) was passed.
+    - Test 3 (TST.PKG_MANAGER.CREATE) was passed.
     - Scopy running with package manager UI accessible.
 
 **Steps:**
@@ -220,12 +228,14 @@ Test 4 - Package Install
 Test 5 - Package Uninstall
 --------------------------------
 
-**UID:** PKG_MANAGER.UNINSTALL
+**UID:** TST.PKG_MANAGER.UNINSTALL
+
+**RBP:** P2
 
 **Description:** Test uninstalling the previously created and installed package ("test_pkg") via the package manager and verifying it is removed.
 
 **Preconditions:**
-    - Test 4 (PKG_MANAGER.INSTALL) was passed.
+    - Test 4 (TST.PKG_MANAGER.INSTALL) was passed.
     - Scopy running with package manager UI accessible.
 
 **Steps:**
@@ -263,7 +273,9 @@ Test 5 - Package Uninstall
 Test 6 - Backward compatibility
 ----------------------------------
 
-**UID:** PKG_MANAGER.BACKWARD_COMPAT
+**UID:** TST.PKG_MANAGER.BACKWARD_COMPAT
+
+**RBP:** P3
 
 **Description:** Verify that legacy plugins/packages are still recognized and function as expected, specifically by running a test from the m2k plugin.
 
@@ -303,7 +315,9 @@ Test 6 - Backward compatibility
 Test 7 - Error handling
 ---------------------------------
 
-**UID:** PKG_MANAGER.ERROR.HANDLING
+**UID:** TST.PKG_MANAGER.ERROR.HANDLING
+
+**RBP:** P3
 
 **Description:** Ensure that errors (e.g., missing/corrupt package, bad resource) are handled gracefully.
 
@@ -342,7 +356,9 @@ Test 7 - Error handling
 Test 8 - UI/UX
 ----------------------
 
-**UID:** PKG_MANAGER.UIUX
+**UID:** TST.PKG_MANAGER.UIUX
+
+**RBP:** P3
 
 **Description:** Check that the package manager UI is clear, responsive, and provides necessary feedback.
 
@@ -381,9 +397,11 @@ Test 8 - UI/UX
 Test 9 - Manual package deletion
 -----------------------------------
 
-**UID:** PKG_MANAGER.MANUAL.DELETE
+**UID:** TST.PKG_MANAGER.MANUAL.DELETE
 
-**Description:** Test deleting a package manually from the filesystem and observe Scopy’s behavior, using the AD936X package as the test subject.
+**RBP:** P3
+
+**Description:** Test deleting a package manually from the filesystem and observe Scopy's behavior, using the AD936X package as the test subject.
 
 **Preconditions:**
     - The AD936X package is installed.
@@ -422,7 +440,9 @@ Test 9 - Manual package deletion
 Test 10 - Plugin info About page
 -----------------------------------------
 
-**UID:** PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE
+**UID:** TST.PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE
+
+**RBP:** P3
 
 **Description:** Ensure that the "Plugins Info" tab in the About section lists all plugins that are currently loaded (i.e., have the "loaded" label).
 

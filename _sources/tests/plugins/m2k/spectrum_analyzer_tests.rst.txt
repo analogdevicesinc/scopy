@@ -39,6 +39,8 @@ Test 1: Channel 1 Operation
 
 **UID:** TST.M2K.SA.CHANNEL_1_OPERATION
 
+**RBP:** P0
+
 **Description:** This test case verifies the functionality of the Spectrum Analyzer plugin on channel 1.
 
 **Preconditions:**
@@ -284,6 +286,8 @@ Test 2: Channel 2 Operation
 --------------------------------------------
 
 **UID:** TST.M2K.SA.CHANNEL_2_OPERATION
+
+**RBP:** P3
 
 **Description:** This test case verifies the functionality of the Spectrum Analyzer plugin on channel 2.
 
@@ -537,6 +541,8 @@ Test 3: Channel 1 and 2 Operation
 
 **UID:** TST.M2K.SA.CHANNEL_1_AND_2_OPERATION
 
+**RBP:** P3
+
 **Description:** This test case verifies the functionality of the Spectrum Analyzer plugin on channel 1 and 2.
 
 **Preconditions:**
@@ -781,6 +787,8 @@ Test 4: Additional Features
 --------------------------------------------
 
 **UID:** TST.M2K.SA.ADDITIONAL_FEATURES
+
+**RBP:** P3
 
 **Description:** This test case verifies the additional features of the Spectrum Analyzer plugin.
 

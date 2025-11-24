@@ -329,7 +329,8 @@ Content on this topic
 </div>
 <section id="test-1-package-discovery-load">
 <h2>Test 1 - Package Discovery Load<a class="headerlink" href="#test-1-package-discovery-load" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.DISCOVERY.LOAD</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.DISCOVERY.LOAD</p>
+<p><strong>RBP:</strong> P0</p>
 <p><strong>Description:</strong> Verify that all available packages are discovered and loaded correctly at startup.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -371,7 +372,8 @@ Content on this topic
 </section>
 <section id="test-2-package-resource-access">
 <h2>Test 2 - Package Resource Access<a class="headerlink" href="#test-2-package-resource-access" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.RESOURCE.ACCESS</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.RESOURCE.ACCESS</p>
+<p><strong>RBP:</strong> P1</p>
 <p><strong>Description:</strong> Ensure that resources (XML, CSV, etc.) within packages are accessible and used by the application.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -400,7 +402,8 @@ Content on this topic
 </section>
 <section id="test-3-package-create">
 <h2>Test 3 - Package Create<a class="headerlink" href="#test-3-package-create" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.CREATE</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.CREATE</p>
+<p><strong>RBP:</strong> P2</p>
 <p><strong>Description:</strong> Test creating a new package (named “test_pkg”) using the official package generator script (<cite>package_generator.py</cite>).</p>
 <p><strong>Reference:</strong> See <a class="reference internal" href="../../developer_guide/package_generator.html#package-generator"><span class="std std-ref">Package Generator</span></a></p>
 <dl>
@@ -460,11 +463,12 @@ Content on this topic
 </section>
 <section id="test-4-package-install">
 <h2>Test 4 - Package Install<a class="headerlink" href="#test-4-package-install" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.INSTALL</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.INSTALL</p>
+<p><strong>RBP:</strong> P2</p>
 <p><strong>Description:</strong> Test installing the previously created package (“test_pkg”) via the package manager and verifying it appears in the list and is usable.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
-<li><p>Test 3 (PKG_MANAGER.CREATE) was passed.</p></li>
+<li><p>Test 3 (TST.PKG_MANAGER.CREATE) was passed.</p></li>
 <li><p>Scopy running with package manager UI accessible.</p></li>
 </ul>
 </dd>
@@ -489,11 +493,12 @@ Content on this topic
 </section>
 <section id="test-5-package-uninstall">
 <h2>Test 5 - Package Uninstall<a class="headerlink" href="#test-5-package-uninstall" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.UNINSTALL</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.UNINSTALL</p>
+<p><strong>RBP:</strong> P2</p>
 <p><strong>Description:</strong> Test uninstalling the previously created and installed package (“test_pkg”) via the package manager and verifying it is removed.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
-<li><p>Test 4 (PKG_MANAGER.INSTALL) was passed.</p></li>
+<li><p>Test 4 (TST.PKG_MANAGER.INSTALL) was passed.</p></li>
 <li><p>Scopy running with package manager UI accessible.</p></li>
 </ul>
 </dd>
@@ -519,7 +524,8 @@ Content on this topic
 </section>
 <section id="test-6-backward-compatibility">
 <h2>Test 6 - Backward compatibility<a class="headerlink" href="#test-6-backward-compatibility" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.BACKWARD_COMPAT</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.BACKWARD_COMPAT</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> Verify that legacy plugins/packages are still recognized and function as expected, specifically by running a test from the m2k plugin.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -547,7 +553,8 @@ Content on this topic
 </section>
 <section id="test-7-error-handling">
 <h2>Test 7 - Error handling<a class="headerlink" href="#test-7-error-handling" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.ERROR.HANDLING</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.ERROR.HANDLING</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> Ensure that errors (e.g., missing/corrupt package, bad resource) are handled gracefully.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -574,7 +581,8 @@ Content on this topic
 </section>
 <section id="test-8-ui-ux">
 <h2>Test 8 - UI/UX<a class="headerlink" href="#test-8-ui-ux" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.UIUX</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.UIUX</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> Check that the package manager UI is clear, responsive, and provides necessary feedback.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -600,7 +608,8 @@ Content on this topic
 </section>
 <section id="test-9-manual-package-deletion">
 <h2>Test 9 - Manual package deletion<a class="headerlink" href="#test-9-manual-package-deletion" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.MANUAL.DELETE</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.MANUAL.DELETE</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> Test deleting a package manually from the filesystem and observe Scopy’s behavior, using the AD936X package as the test subject.</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
@@ -627,7 +636,8 @@ Content on this topic
 </section>
 <section id="test-10-plugin-info-about-page">
 <h2>Test 10 - Plugin info About page<a class="headerlink" href="#test-10-plugin-info-about-page" title="Link to this heading"></a></h2>
-<p><strong>UID:</strong> PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE</p>
+<p><strong>UID:</strong> TST.PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE</p>
+<p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> Ensure that the “Plugins Info” tab in the About section lists all plugins that are currently loaded (i.e., have the “loaded” label).</p>
 <dl class="simple">
 <dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
