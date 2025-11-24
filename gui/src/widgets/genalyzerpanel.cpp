@@ -20,7 +20,6 @@
  */
 
 #include "genalyzerpanel.h"
-#include <iostream>
 #include <style.h>
 #include <QScrollArea>
 #include <QVBoxLayout>

@@ -119,13 +119,11 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 	}
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	// For float mode, we only have one channel, so we'll connect it to I and feed zeros to Q
-	// Create a constant source block for zeros to feed Q channel
 	auto zero_source = gr::blocks::vector_source<int32_t>::make(std::vector<int32_t>(fft_size, 0), true, fft_size);
 
-	top->connect(float_to_int_i, 0, genalyzer_fft, 0);  // Real signal to I channel
-	top->connect(zero_source, 0, genalyzer_fft, 1);     // Zeros to Q channel
-	top->connect(genalyzer_fft, 0, powerOffset, 0);     // genalyzer float output → powerOffset
+	top->connect(float_to_int_i, 0, genalyzer_fft, 0);
+	top->connect(zero_source, 0, genalyzer_fft, 1);
+	top->connect(genalyzer_fft, 0, powerOffset, 0);
 
 	start_blk.append(float_to_int_i);
 	end_blk = powerOffset;
@@ -191,7 +189,6 @@ void GRFFTComplexProc::setNavg(int navg)
 	if(genalyzer_fft) {
 		genalyzer_fft->set_navg(navg);
 	}
-	// No need to rebuild blocks - averaging is handled internally in genalyzer
 }
 
 gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
@@ -229,11 +226,11 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 	}
 	powerOffset = gr::blocks::add_const_v<float>::make(k);
 
-	top->connect(complex_to_float, 0, float_to_int_i, 0); // I channel
-	top->connect(complex_to_float, 1, float_to_int_q, 0); // Q channel
-	top->connect(float_to_int_i, 0, genalyzer_fft, 0);    // I to genalyzer input 0
-	top->connect(float_to_int_q, 0, genalyzer_fft, 1);    // Q to genalyzer input 1
-	top->connect(genalyzer_fft, 0, powerOffset, 0);	      // genalyzer float output → powerOffset
+	top->connect(complex_to_float, 0, float_to_int_i, 0);
+	top->connect(complex_to_float, 1, float_to_int_q, 0);
+	top->connect(float_to_int_i, 0, genalyzer_fft, 0);
+	top->connect(float_to_int_q, 0, genalyzer_fft, 1);
+	top->connect(genalyzer_fft, 0, powerOffset, 0);
 
 	start_blk.append(complex_to_float);
 	end_blk = powerOffset;
