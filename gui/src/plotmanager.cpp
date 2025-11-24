@@ -56,13 +56,7 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	m_lay->addWidget(m_statsPanel);
 	m_lay->addWidget(m_markerPanel);
 
-	// Right side: genalyzer panel
-	m_genalyzerPanel = new GenalyzerPanel(this);
-	m_genalyzerPanel->setVisible(false);
-
-	// Add to main horizontal layout
-	mainLayout->addWidget(leftWidget, 1);	    // Give plots area more space
-	mainLayout->addWidget(m_genalyzerPanel, 0); // Fixed width panel
+	mainLayout->addWidget(leftWidget, 1);
 }
 
 PlotManager::~PlotManager() {}
@@ -73,7 +67,7 @@ void PlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
 
 void PlotManager::enableMarkerPanel(bool b) { m_markerPanel->setVisible(b); }
 
-void PlotManager::enableGenalyzerPanel(bool b) { m_genalyzerPanel->setVisible(b); }
+void PlotManager::enableGenalyzerPanel(bool b) {}
 
 void PlotManager::setXInterval(double xMin, double xMax)
 {
@@ -107,7 +101,7 @@ StatsPanel *PlotManager::statsPanel() const { return m_statsPanel; }
 
 MarkerPanel *PlotManager::markerPanel() const { return m_markerPanel; }
 
-GenalyzerPanel *PlotManager::genalyzerPanel() const { return m_genalyzerPanel; }
+GenalyzerPanel *PlotManager::genalyzerPanel() const { return nullptr; }
 
 QWidget *PlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
 
