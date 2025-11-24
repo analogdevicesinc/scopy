@@ -71,8 +71,9 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_btnsMap[HOME_ID] = homeBtn;
 
 	// Scripting button (availability controlled by preference)
-	m_scriptingBtn = createBtn("Scripting", ":/gui/icons/tool_scripting.svg", m_content);
-	Style::setStyle(m_scriptingBtn, style::properties::button::toolButton);
+	m_scriptingBtn = createBtn("Scripting", "", m_content);
+	m_scriptingBtn->setIcon(
+		Style::getPixmap(":/gui/icons/tool_scripting.svg", Style::getColor(json::theme::content_default)));
 	m_scriptingBtn->setFixedHeight(Style::getDimension(json::global::unit_4));
 	m_scriptingBtn->setIconSize(QSize(32, 32));
 	m_scriptingBtn->setCheckable(true);
