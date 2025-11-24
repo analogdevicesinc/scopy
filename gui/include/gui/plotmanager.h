@@ -25,13 +25,13 @@
 #include "scopy-gui_export.h"
 #include <QWidget>
 #include "measurementpanel.h"
-#include "genalyzerpanel.h"
 #include "channelcomponent.h"
 #include "toolcomponent.h"
 #include "plotmarkercontroller.h"
 
 namespace scopy {
 
+class GenalyzerPanel;
 class PlotManagerCombobox;
 class SCOPY_GUI_EXPORT PlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent
 {
@@ -54,7 +54,7 @@ public:
 	MeasurementsPanel *measurePanel() const override;
 	StatsPanel *statsPanel() const override;
 	MarkerPanel *markerPanel() const override;
-	GenalyzerPanel *genalyzerPanel() const override;
+	virtual GenalyzerPanel *genalyzerPanel() const override;
 
 	QWidget *createMenu(QWidget *parent);
 	QWidget *plotCombo(ChannelComponent *c);
@@ -65,7 +65,7 @@ public Q_SLOTS:
 	void enableMeasurementPanel(bool) override;
 	void enableStatsPanel(bool) override;
 	void enableMarkerPanel(bool) override;
-	void enableGenalyzerPanel(bool) override;
+	virtual void enableGenalyzerPanel(bool) override;
 
 	void setXInterval(double xMin, double xMax);
 	void setXUnit(QString);
@@ -83,8 +83,6 @@ protected:
 	QList<PlotComponentChannel *> m_channels;
 	MeasurementsPanel *m_measurePanel;
 	MarkerPanel *m_markerPanel;
-	GenalyzerPanel *m_genalyzerPanel;
-
 	StatsPanel *m_statsPanel;
 	QMap<ChannelComponent *, PlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;

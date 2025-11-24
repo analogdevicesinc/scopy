@@ -34,6 +34,14 @@ FFTPlotManager::FFTPlotManager(QString name, QWidget *parent)
 	: PlotManager(name, parent)
 {
 	m_primary = nullptr;
+
+	m_genalyzerPanel = new GenalyzerPanel(this);
+	m_genalyzerPanel->setVisible(false);
+
+	QHBoxLayout *mainLayout = qobject_cast<QHBoxLayout *>(layout());
+	if(mainLayout) {
+		mainLayout->addWidget(m_genalyzerPanel, 0);
+	}
 }
 
 FFTPlotManager::~FFTPlotManager() {}
@@ -100,6 +108,8 @@ void FFTPlotManager::enableMeasurementPanel(bool)
 }
 
 void FFTPlotManager::enableGenalyzerPanel(bool b) { m_genalyzerPanel->setVisible(b); }
+
+GenalyzerPanel *FFTPlotManager::genalyzerPanel() const { return m_genalyzerPanel; }
 
 void FFTPlotManager::multiPlotUpdate()
 {

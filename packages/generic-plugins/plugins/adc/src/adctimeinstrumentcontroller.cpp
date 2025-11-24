@@ -118,6 +118,7 @@ void ADCTimeInstrumentController::init()
 	m_ui->sync()->setVisible(false);
 
 	m_measureComponent->measureSettings()->getMarkerSection()->setVisible(false);
+	m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(false);
 }
 
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
