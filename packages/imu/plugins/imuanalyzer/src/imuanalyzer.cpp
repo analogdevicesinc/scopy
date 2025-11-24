@@ -47,7 +47,8 @@ bool IMUAnalyzer::compatible(QString m_param, QString category)
 
 	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
 		iio_device *dev = iio_context_get_device(conn->context(), i);
-		std::string name = iio_device_get_name(dev);
+		const char *rawName = iio_device_get_name(dev);
+		std::string name = rawName ? rawName : "";
 		if(name.find("adis") != std::string::npos) {
 			ret = true;
 			goto finish;
