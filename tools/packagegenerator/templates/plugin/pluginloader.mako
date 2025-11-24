@@ -43,7 +43,7 @@ private Q_SLOTS:
 	void metadata();
 };
 
-#define PLUGIN_LOCATION "../../plugins"
+#define PLUGIN_LOCATION "../.."
 #define FILENAME PLUGIN_LOCATION "/libscopy-${plugin_name}.so"
 
 void ${tst_classname}::fileExists()
