@@ -25,7 +25,7 @@ set(CURRENT_PKG_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set(PACKAGE_NAME ${SCOPY_MODULE})
 
 set(PACKAGE_DISPLAY_NAME "IMU Analyzer")
-set(PACKAGE_DESCRIPTION "This package provides support for adis.")
+set(PACKAGE_DESCRIPTION "This package provides support for adis")
 message(STATUS "building package: " ${SCOPY_MODULE})
 
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -33,7 +33,7 @@ project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
 
 include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
-message(STATUS "Including plugins for ${SCOPY_MODULE}")
+message("Including plugins")
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 	install_plugins(
@@ -44,6 +44,6 @@ endif()
 
 install_pkg(${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE} ${SCOPY_PACKAGE_INSTALL_PATH}/${SCOPY_MODULE})
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(INSTALLER_DESCRIPTION "${PACKAGE_DISPLAY_NAME} ${PACKAGE_DESCRIPTION}")
-	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} TRUE)
+	set(INSTALLER_DESCRIPTION "${PACKAGE_DISPLAY_NAME} - ${PACKAGE_DESCRIPTION}")
+	configureinstallersettings(${SCOPY_MODULE} ${INSTALLER_DESCRIPTION} FALSE)
 endif()
