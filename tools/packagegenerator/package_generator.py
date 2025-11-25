@@ -408,7 +408,9 @@ def generate_manifest(path, config):
 def handle_cmakelists(pkg_path, config, args):
     cmakelists_path = os.path.join(pkg_path, "CMakeLists.txt")
     new_cmakelists_content = Template(filename=TEMPLATES["pkg_cmake"]).render(
-        id=config["id"],
+        id=config.get("id", ""),
+        title=config.get("title", ""),
+        description=config.get("description", ""),
         en_translation=args.translation or args.all,
         en_style=args.style or args.all,
         emu_xml=args.emu or args.all).splitlines(keepends=True) 
@@ -436,7 +438,9 @@ def handle_cmakelists(pkg_path, config, args):
         create_file_from_template(
             TEMPLATES["pkg_cmake"], 
             cmakelists_path,
-            id=config["id"],
+            id=config.get("id", ""),
+            title=config.get("title", ""),
+            description=config.get("description", ""),
             en_translation=args.translation or args.all,
             en_style=args.style or args.all,
             emu_xml=args.emu or args.all
