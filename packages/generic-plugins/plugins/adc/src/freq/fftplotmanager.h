@@ -44,12 +44,9 @@ public:
 	virtual void removePlot(uint32_t uuid) override;
 	FFTPlotComponent *plot(uint32_t uuid);
 	void enableMeasurementPanel(bool) override;
-	void enableGenalyzerPanel(bool) override;
-	GenalyzerPanel *genalyzerPanel() const override;
 
 private:
 	PlotComponent *m_primary;
-	GenalyzerPanel *m_genalyzerPanel;
 	void multiPlotUpdate();
 
 	void syncNavigatorAndCursors(PlotComponent *);

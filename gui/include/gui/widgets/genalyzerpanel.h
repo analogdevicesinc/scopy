@@ -24,7 +24,6 @@
 
 #include "scopy-gui_export.h"
 #include "utils.h"
-#include "measurementpanel.h"
 
 #include <QGridLayout>
 #include <QScrollBar>
@@ -33,8 +32,11 @@
 #include <QPen>
 #include <QScrollArea>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QColor>
 #include <QTextBrowser>
+#include <QDockWidget>
+#include <QMainWindow>
 
 namespace scopy {
 
@@ -70,12 +72,12 @@ public Q_SLOTS:
 	void setChannelVisible(const QString &channelName, bool visible);
 
 private:
-	GenalyzerChannelDisplay *findOrCreateChannelDisplay(const QString &channelName, QColor channelColor);
+	QDockWidget *findOrCreateChannelDock(const QString &channelName, QColor channelColor);
 
-	QVBoxLayout *panelLayout;
+	QVBoxLayout *m_mainLayout;
+	QMainWindow *m_embeddedMainWindow;
+	QMap<QString, QDockWidget *> m_channelDocks;
 	QMap<QString, GenalyzerChannelDisplay *> m_channelDisplays;
-	QScrollArea *scrollArea;
-	QWidget *m_panel;
 };
 
 } // namespace scopy

@@ -30,12 +30,10 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	, MetaComponent()
 	, m_plotIdx(0)
 {
-	// Main horizontal layout to position genalyzer panel to the right
 	QHBoxLayout *mainLayout = new QHBoxLayout(this);
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(6);
 
-	// Left side: plots and panels (vertical layout)
 	QWidget *leftWidget = new QWidget(this);
 	m_lay = new QVBoxLayout(leftWidget);
 	m_lay->setMargin(0);
@@ -56,7 +54,11 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	m_lay->addWidget(m_statsPanel);
 	m_lay->addWidget(m_markerPanel);
 
+	m_genalyzerPanel = new GenalyzerPanel(this);
+	m_genalyzerPanel->setVisible(false);
+
 	mainLayout->addWidget(leftWidget, 1);
+	mainLayout->addWidget(m_genalyzerPanel, 0);
 }
 
 PlotManager::~PlotManager() {}
@@ -67,7 +69,7 @@ void PlotManager::enableStatsPanel(bool b) { m_statsPanel->setVisible(b); }
 
 void PlotManager::enableMarkerPanel(bool b) { m_markerPanel->setVisible(b); }
 
-void PlotManager::enableGenalyzerPanel(bool b) {}
+void PlotManager::enableGenalyzerPanel(bool b) { m_genalyzerPanel->setVisible(b); }
 
 void PlotManager::setXInterval(double xMin, double xMax)
 {
@@ -101,7 +103,7 @@ StatsPanel *PlotManager::statsPanel() const { return m_statsPanel; }
 
 MarkerPanel *PlotManager::markerPanel() const { return m_markerPanel; }
 
-GenalyzerPanel *PlotManager::genalyzerPanel() const { return nullptr; }
+GenalyzerPanel *PlotManager::genalyzerPanel() const { return m_genalyzerPanel; }
 
 QWidget *PlotManager::plotCombo(ChannelComponent *c) { return m_channelPlotcomboMap[c]; }
 
