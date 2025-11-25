@@ -60,6 +60,7 @@ public:
 	bool onConnect() override;
 	bool onDisconnect() override;
 	bool loadIcon() override;
+	QString description() override;
 
 private:
 	IMUAnalyzerInterface *m_imuInterface;

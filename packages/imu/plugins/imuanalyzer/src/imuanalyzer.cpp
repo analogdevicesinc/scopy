@@ -115,6 +115,8 @@ bool IMUAnalyzer::loadIcon()
 	return true;
 }
 
+QString IMUAnalyzer::description() { return "This plugin provides analysis and visualization for IMU sensor data"; }
+
 void IMUAnalyzer::initMetadata() // not actually needed - putting it here to set priority
 {
 	loadMetadata(
