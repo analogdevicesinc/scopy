@@ -34,13 +34,13 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QColor>
-#include <QTextBrowser>
+#include <QTableWidget>
 #include <QDockWidget>
 #include <QMainWindow>
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT GenalyzerChannelDisplay : public QTextBrowser
+class SCOPY_GUI_EXPORT GenalyzerChannelDisplay : public QTableWidget
 {
 	Q_OBJECT
 public:
@@ -48,10 +48,9 @@ public:
 	void updateResults(size_t results_size, char **rkeys, double *rvalues);
 	void setChannelColor(QColor color);
 	QString channelName() const;
+	QString getTableContent() const;
 
 private:
-	QString formatResultsText(size_t results_size, char **rkeys, double *rvalues);
-
 	QString m_channelName;
 	QColor m_channelColor;
 };
