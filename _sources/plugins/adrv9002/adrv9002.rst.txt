@@ -110,8 +110,8 @@ The Receive Chain section provides comprehensive control over the RX signal path
 
 **Channel Control**
 
-**Powerdown**
-  Disables the selected channel completely, stopping all signal processing and reducing power consumption.
+**Enable**
+  While off disables the transmit channel, stopping signal transmission and reducing power consumption.
 
 **Dynamic ADC Switch**
   Enables dynamic ADC switching functionality for optimized power management and performance.
@@ -182,8 +182,8 @@ The Transmit Chain section provides control over the TX signal path for both cha
 **Port Enable**
   Selects port enable control method (SPI or PIN) for the transmit channel.
 
-**Powerdown**
-  Disables the transmit channel, stopping signal transmission and reducing power consumption.
+**Enable**
+  While off disables the transmit channel, stopping signal transmission and reducing power consumption.
 
 **Frequency Control**
 
