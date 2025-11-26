@@ -20,17 +20,24 @@
 
 package org.adi.scopy;
 
+import static android.content.ContentValues.TAG;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.qtproject.qt5.android.bindings.QtActivity;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.content.Context;
 import android.content.ComponentName;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 import android.view.View;
 
@@ -91,6 +98,20 @@ public class ScopyActivity extends QtActivity {
 
   }
 
+  private void showDummyUsbPermissionDialog() {
+    new AlertDialog.Builder(this)
+      .setTitle("Allow access to USB device?")
+      .setMessage("An app wants to access the connected USB device.")
+      .setPositiveButton("Allow", null)
+      .setNegativeButton("Deny", null)
+      .show();
+
+
+//    PendingIntent dummy = PendingIntent.getActivity(this, 0, new Intent(this, Manifest.class), );
+  }
+
+
+
   public void createNotification(String message) {
     NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
     createNotificationChannel();
@@ -98,7 +119,7 @@ public class ScopyActivity extends QtActivity {
     Intent notificationIntent = new Intent(this, ScopyActivity.class);
     notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-    PendingIntent openAppOnTapIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    PendingIntent openAppOnTapIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
     Notification notification = new Notification.Builder(this, SCOPY_NOTIFICATION_CHANNEL_ID)
       .setSmallIcon(R.drawable.icon)
@@ -139,11 +160,14 @@ public class ScopyActivity extends QtActivity {
     super.onCreate(savedInstanceState);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-    requirePermissions();
+//    requirePermissions();
 
     PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
     wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Scopy::ScopyWakelockTag");
   }
+
+
+
 
   @Override
   protected void onStart() {
@@ -160,11 +184,9 @@ public class ScopyActivity extends QtActivity {
     if (initialized) {
       if (hasCtxJNI()) {
         saveAndStopRunningInputToolsJNI();
-        if (nrOfToolsRunningJNI() != 0) {
-          System.out.println("-- Creating Notification");
-          wakeLock.acquire();
-          createNotification("Scopy is still running in the background. Device outputs are still enabled.");
-        }
+        System.out.println("-- Creating Notification");
+        wakeLock.acquire();
+        createNotification("Scopy is still running in the background. Device outputs are still enabled.");
       }
     }
     super.onStop();
@@ -172,6 +194,7 @@ public class ScopyActivity extends QtActivity {
 
   @Override
   protected void onResume() {
+    System.out.println("-- ScopyActivity: onResume");
     cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
     if (wakeLock.isHeld()) {
       wakeLock.release();
@@ -208,10 +231,19 @@ public class ScopyActivity extends QtActivity {
     Context context = getApplicationContext();
     PackageManager packageManager = context.getPackageManager();
     Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
-    ComponentName componentName = intent.getComponent();
-    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-    context.startActivity(mainIntent);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+//    ComponentName componentName = intent.getComponent();
+//    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+//    context.startActivity(mainIntent);
+
+
+    int mPendingIntentId = 223344;
+    PendingIntent mPendingIntent = PendingIntent.getActivity(this, mPendingIntentId, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    AlarmManager mgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
     Runtime.getRuntime().exit(0);
+
   }
 
   public String getScaleFactor() {
@@ -219,8 +251,7 @@ public class ScopyActivity extends QtActivity {
     DisplayMetrics displayMetrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-    double scaleFactor = ((double) displayMetrics.widthPixels / displayMetrics.heightPixels)
-      / displayMetrics.scaledDensity;
+    double scaleFactor = ((double) displayMetrics.widthPixels / displayMetrics.heightPixels) / displayMetrics.scaledDensity;
     String formattedScaleFactor = String.format("%.02f", scaleFactor);
     System.out.println("-- ScopyActivity: scale factor is: " + formattedScaleFactor);
 

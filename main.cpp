@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 	QAndroidJniObject jniObject = QtAndroid::androidActivity().callObjectMethod("getScaleFactor", "()Ljava/lang/String;");
 	QString scaleFactor = jniObject.toString();
 	qDebug()<<"-=-== QT scaleFactor :"<<scaleFactor;
-	scaleFactor="1"; // din Qt: scale factor is: 1.18
+	//scaleFactor="1"; // din Qt: scale factor is: 1.18
 
 	qputenv("QT_SCALE_FACTOR", scaleFactor.toUtf8());
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

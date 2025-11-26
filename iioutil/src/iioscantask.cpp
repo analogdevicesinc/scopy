@@ -60,11 +60,11 @@ int IIOScanTask::scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams
 
 	QElapsedTimer et;
 	et.start();
-	if(scanParams.isEmpty()) {
-		scan_ctx = iio_create_scan_context(NULL, 0);
-	} else {
-		scan_ctx = iio_create_scan_context(scanParams.toStdString().c_str(), 0);
-	}
+	// if(scanParams.isEmpty()) {
+		scan_ctx = iio_create_scan_context("usb", 0);
+	// } else {
+	// 	scan_ctx = iio_create_scan_context(scanParams.toStdString().c_str(), 0);
+	// }
 
 	if(!scan_ctx) {
 		qWarning(CAT_IIOSCANCTX) << "no scan context - " << errno << " " << strerror(errno);
