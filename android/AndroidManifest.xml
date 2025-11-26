@@ -49,6 +49,7 @@ Remove the comment if you do not require these default permissions. -->
       android:exported="true"
       android:label="Scopy"
       android:launchMode="singleTop"
+      android:windowSoftInputMode="adjustResize"
       android:screenOrientation="userLandscape"
       android:theme="@style/splashScreenTheme"
       tools:ignore="LockedOrientationActivity">

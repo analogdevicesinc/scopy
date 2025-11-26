@@ -348,6 +348,7 @@ build_libusb() {
 	APP_PLATFORM := android-31
 
 	APP_CFLAGS := \
+	-g \
 	-std=gnu11 \
 	-Wall \
 	-Wextra \
@@ -734,7 +735,7 @@ copy_deps()
 	cp -vfr $STAGING_DEPSS/lib/scopy/packages $ASSETSSS
 	cp -vfr $BUILDD/translations $ASSETSSS
 	cp -vfr /home/cristian/git/android/scopy-android/ci/android/staging/dependencies/share/libsigrokdecode/decoders $ASSETSSS
-	cp -vfr /home/cristian/git/android/scopy-android/ci/android/staging/dependencies/lib/python3.11 $ASSETSSS
+	[ -f $ASSETSSS/python3.11 ] || cp -vfr /home/cristian/git/android/scopy-android/ci/android/staging/dependencies/lib/python3.11 $ASSETSSS
 	echo "Copied dependencies to assets"
 
 }
@@ -761,14 +762,14 @@ build_deps()
 #     build_libzmq ON
 #     build_fftw ON
 #     build_libgmp ON
-#     build_libusb ON
+     build_libusb ON
 #     build_libserialport ON
-#     build_libiio ON
+#     build_libsndfile ON
+     build_libiio ON
 #     build_libad9361 ON
 #     build_spdlog ON
 #     build_libm2k ON
 #     build_volk ON
-#     build_libsndfile ON
 #     build_gnuradio ON # am facut modificari in cod si trebuie puse sus
 #     build_grscopy ON
 #     build_grm2k ON

@@ -95,13 +95,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	DebugTimer benchmark;
 	staticScopyMainWindow=this;
 
-#ifdef __ANDROID__ // JNI hooks
-	registerNativeMethods();
-#endif
-
 #ifdef __ANDROID__ // LIBUSB WEAK_AUTHORITY
 	libusb_set_option(NULL,LIBUSB_OPTION_ANDROID_JAVAVM,jnienv->javaVM());
 	libusb_set_option(NULL,LIBUSB_OPTION_WEAK_AUTHORITY,NULL);
+#endif
+
+#ifdef __ANDROID__ // JNI hooks
+	registerNativeMethods();
 #endif
 
 	initPreferences();
@@ -454,24 +454,24 @@ void ScopyMainWindow::setupPreferences()
 		loadDecoders();
 	}
 	if(p->get("general_show_status_bar").toBool()) {
-		StatusBarManager::GetInstance()->setEnabled(true);
+		// StatusBarManager::GetInstance()->setEnabled(true);
 	}
 
 	if(p->get("general_first_run").toBool()) {
-		license = new LicenseOverlay(this);
-		auto versionCheckInfo = new VersionCheckMessage(this);
+		// license = new LicenseOverlay(this);
+		// auto versionCheckInfo = new VersionCheckMessage(this);
 
-		StatusBarManager::pushWidget(versionCheckInfo, "Should Scopy check for online versions?");
+		// StatusBarManager::pushWidget(versionCheckInfo, "Should Scopy check for online versions?");
 
-		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
+		// QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 
-		connect(license->getContinueBtn(), &QPushButton::clicked, this, &ScopyMainWindow::showWhatsNew,
-			Qt::QueuedConnection);
+		// connect(license->getContinueBtn(), &QPushButton::clicked, this, &ScopyMainWindow::showWhatsNew,
+		// 	Qt::QueuedConnection);
 	}
 
 #ifndef SCOPY_DEV_MODE
 	if(!p->get("general_dont_show_whats_new").toBool() && !p->get("general_first_run").toBool()) {
-		showWhatsNew();
+		// showWhatsNew();
 		// we check if a new version of scopy is installed
 	} else if(!p->get("general_first_run").toBool() &&
 		  (p->get("scopy_git_version").toString() != QString(SCOPY_VERSION_GIT))) {
@@ -955,7 +955,7 @@ bool ScopyMainWindow::hasCtxJNI(JNIEnv *env, jobject /*thiz*/)
 	// 	qDebug()<<"has Ctx : "<<val;
 	// 	return val;
 	// }
-	return false;
+	return true;
 }
 
 
