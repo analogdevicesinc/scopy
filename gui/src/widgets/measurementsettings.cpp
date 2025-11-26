@@ -41,6 +41,8 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	measureSection = new MenuSectionWidget(this);
 	Style::setStyle(measureSection, style::properties::widget::border);
 	measurePanelSwitch = new MenuOnOffSwitch("Measure Panel", this);
+	Style::setStyle(measurePanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(measurePanelSwitch->label(), style::properties::label::defaultLabel);
 	measurePanelSwitch->onOffswitch()->setChecked(true);
 	QHBoxLayout *hlay1 = new QHBoxLayout();
 	hlay1->setContentsMargins(0, 6, 0, 6);
@@ -102,6 +104,8 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	statsSection = new MenuSectionWidget(this);
 	Style::setStyle(statsSection, style::properties::widget::border);
 	statsPanelSwitch = new MenuOnOffSwitch("Stats Panel", this);
+	Style::setStyle(statsPanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(statsPanelSwitch->label(), style::properties::label::defaultLabel);
 	connect(statsPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableStatsPanel(b); });
 	statsSection->contentLayout()->addWidget(statsPanelSwitch);
