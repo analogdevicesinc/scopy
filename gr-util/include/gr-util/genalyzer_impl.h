@@ -66,6 +66,13 @@ private:
 	void allocate_buffers();
 	int configure_genalyzer();
 
+	// Helper functions for work()
+	void store_frame_to_circular_buffer(const int32_t *in_i_vec, const int32_t *in_q_vec);
+	size_t prepare_frames_for_processing(size_t &current_npts);
+	int perform_fft_and_convert_to_db(size_t frames_to_process, size_t current_npts,
+					   double *shifted_output, double *db_output, float *out_vec);
+	void perform_genalyzer_analysis();
+
 public:
 	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);
 	~genalyzer_fft_vii_impl();
