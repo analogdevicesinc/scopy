@@ -49,7 +49,6 @@
 #include <QStackedLayout>
 #include <measurementpanel.h>
 #include <math.h>
-#include <chrono>
 
 namespace scopy {
 
@@ -60,7 +59,11 @@ public:
 	IMUAnalyzerInterface(QString uri, QWidget *parent = nullptr);
 	~IMUAnalyzerInterface();
 
+public Q_SLOTS:
+	void runToggled(bool toggled);
+
 Q_SIGNALS:
+	void runBtnPressed(bool toggled);
 	void generateRot(data3P rot);
 	void updateValues(data3P rot, data3P pos, float temp);
 

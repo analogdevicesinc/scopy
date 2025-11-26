@@ -99,6 +99,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 		} else {
 			t.join();
 		}
+		Q_EMIT runBtnPressed(toggled);
 	});
 
 	m_bubbleLevelRenderer = new BubbleLevelRenderer(tabWidget);
@@ -142,6 +143,8 @@ IMUAnalyzerInterface::~IMUAnalyzerInterface()
 		t.join();
 	}
 }
+
+void IMUAnalyzerInterface::runToggled(bool toggled) { m_runBtn->setChecked(toggled); }
 
 void IMUAnalyzerInterface::generateRotation()
 {

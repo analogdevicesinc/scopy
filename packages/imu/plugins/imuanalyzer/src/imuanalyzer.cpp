@@ -27,6 +27,7 @@
 #include <QLoggingCategory>
 #include <QPushButton>
 #include <QSpacerItem>
+#include <style.h>
 
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
@@ -62,7 +63,7 @@ finish:
 
 void IMUAnalyzer::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IMUAnalyzer_tool", "imuanalyzer",
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("imuanalyzer", "IMUAnalyzer",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_imuanalyzer.svg"));
 }
@@ -75,24 +76,34 @@ bool IMUAnalyzer::onConnect()
 	if(conn == nullptr) {
 		return false;
 	}
-
-	m_toolList[0]->setEnabled(true);
+	ToolMenuEntry *imuTme = m_toolList[0];
 
 	m_imuInterface = new IMUAnalyzerInterface(m_param);
 
-	QString tool_name = QString("IMUAnalyzer");
+	imuTme->setEnabled(true);
+	imuTme->setTool(m_imuInterface);
+	imuTme->setVisible(true);
+	imuTme->setRunBtnVisible(true);
 
-	m_toolList.last()->setTool(m_imuInterface);
-	m_toolList.last()->setVisible(true);
+	connect(imuTme, &ToolMenuEntry::runToggled, m_imuInterface, &IMUAnalyzerInterface::runToggled);
+	connect(m_imuInterface, &IMUAnalyzerInterface::runBtnPressed, imuTme, &ToolMenuEntry::setRunning);
 
 	return true;
 }
 
 bool IMUAnalyzer::onDisconnect()
 {
-	m_toolList[0]->setEnabled(false);
-	m_toolList[0]->setTool(nullptr);
-
+	for(auto &tool : m_toolList) {
+		tool->setEnabled(false);
+		tool->setRunning(false);
+		tool->setRunBtnVisible(false);
+		QWidget *w = tool->tool();
+		if(w) {
+			tool->setTool(nullptr);
+			delete(w);
+		}
+	}
+	m_imuInterface = nullptr;
 	ConnectionProvider::GetInstance()->close(m_param);
 
 	return true;
