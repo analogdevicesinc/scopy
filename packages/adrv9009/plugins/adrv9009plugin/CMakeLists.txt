@@ -66,6 +66,13 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
+set(ADRV9009_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/adrv9009-filters)
+
+file(GLOB FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/resources/adrv9009-filters/*)
+foreach(_filter ${FILTERS})
+	file(COPY ${_filter} DESTINATION ${ADRV9009_FILTERS_BUILD_PATH})
+endforeach()
+
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
@@ -82,7 +89,14 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CURRENT_PKG_PATH}/include)
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-iioutil scopy-iio-widgets)
+target_include_directories(
+	${PROJECT_NAME}
+	PUBLIC scopy-pluginbase
+	       scopy-gui
+	       scopy-iioutil
+	       scopy-iio-widgets
+	       scopy-pkg-manager
+)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -92,6 +106,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       scopy-pkg-manager
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
