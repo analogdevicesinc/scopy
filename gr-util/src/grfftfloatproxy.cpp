@@ -33,7 +33,7 @@ GRFFTFloatProc::GRFFTFloatProc(QObject *parent)
 	m_windowCorr = true;
 	m_sr = 0;
 	m_signed = true;
-	m_navg = 1; // Default to no averaging
+	m_navg = 1;
 }
 
 void GRFFTFloatProc::setWindow(gr::fft::window::win_type w)
@@ -69,8 +69,13 @@ void GRFFTFloatProc::setSampleRate(double sr) { m_sr = sr; }
 void GRFFTFloatProc::setNavg(int navg)
 {
 	m_navg = navg;
+	requestRebuild();
+}
+
+void GRFFTFloatProc::setSsbWidth(uint8_t ssb_width)
+{
 	if(genalyzer_fft) {
-		genalyzer_fft->set_navg(navg);
+		genalyzer_fft->set_ssb_width(ssb_width);
 	}
 }
 
@@ -143,11 +148,13 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	: GRProxyBlock(parent)
 {
 	m_fftwindow = gr::fft::window::WIN_HANNING;
-	nrBits = 12;
 	m_powerOffset = 0;
+	nrBits = 12;
 	m_windowCorr = true;
 	m_sr = 0;
-	m_navg = 1; // Default to no averaging
+	m_signed = true;
+	m_navg = 1;
+	m_ssb_width = 120;
 }
 
 void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
@@ -186,8 +193,14 @@ void GRFFTComplexProc::setSampleRate(double sr) { m_sr = sr; }
 void GRFFTComplexProc::setNavg(int navg)
 {
 	m_navg = navg;
+	requestRebuild();
+}
+
+void GRFFTComplexProc::setSsbWidth(uint8_t ssb_width)
+{
+	m_ssb_width = ssb_width;
 	if(genalyzer_fft) {
-		genalyzer_fft->set_navg(navg);
+		genalyzer_fft->set_ssb_width(ssb_width);
 	}
 }
 
@@ -218,6 +231,7 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 						m_sr,				// sample rate
 						true				// do_shift = true for complex mode
 	);
+	genalyzer_fft->set_ssb_width(m_ssb_width);
 
 	// Power offset
 	std::vector<float> k;

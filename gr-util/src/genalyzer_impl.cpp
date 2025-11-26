@@ -48,6 +48,7 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_win(win)
 	, d_sample_rate(sample_rate)
 	, d_do_shift(do_shift)
+	, d_ssb_width(120)
 	, d_fft_out(nullptr)
 	, d_qwfi(nullptr)
 	, d_qwfq(nullptr)
@@ -166,44 +167,11 @@ void genalyzer_fft_vii_impl::set_window(GnWindow win) { d_win = win; }
 
 int genalyzer_fft_vii_impl::window() const { return d_win; }
 
-void genalyzer_fft_vii_impl::set_navg(int navg)
-{
-	if(navg <= 0) {
-		GR_LOG_ERROR(d_logger, "Invalid navg value: " + std::to_string(navg));
-		return;
-	}
-
-	std::lock_guard<std::mutex> lock(d_buffer_mutex);
-	d_navg = navg;
-	d_npts = navg * d_nfft;
-
-	if(d_qwfi) {
-		delete[] d_qwfi;
-		d_qwfi = nullptr;
-	}
-	if(d_qwfq) {
-		delete[] d_qwfq;
-		d_qwfq = nullptr;
-	}
-	cleanup_frame_buffers();
-
-	d_qwfi = new int32_t[d_npts]();
-	d_qwfq = new int32_t[d_npts]();
-
-	d_frame_buffers_i = new int32_t *[navg];
-	d_frame_buffers_q = new int32_t *[navg];
-
-	for(int i = 0; i < navg; i++) {
-		d_frame_buffers_i[i] = new int32_t[d_nfft]();
-		d_frame_buffers_q[i] = new int32_t[d_nfft]();
-	}
-
-	d_current_frame_index = 0;
-	d_frames_filled = 0;
-	d_allocated_frames = navg;
-}
-
 int genalyzer_fft_vii_impl::navg() const { return d_navg; }
+
+void genalyzer_fft_vii_impl::set_ssb_width(uint8_t ssb_width) { d_ssb_width = ssb_width; }
+
+uint8_t genalyzer_fft_vii_impl::ssb_width() const { return d_ssb_width; }
 
 int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &input_items,
 				 gr_vector_void_star &output_items)
@@ -311,8 +279,8 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 			double *rvalues = nullptr;
 
 			configure_genalyzer();
-			uint8_t ssb_width = 120;
-			int err_code = gn_config_fa_auto(ssb_width, &d_config);
+			int err_code = gn_config_fa_auto(d_ssb_width, &d_config);
+
 			if(err_code == 0) {
 				err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
 			} else {

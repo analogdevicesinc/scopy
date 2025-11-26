@@ -24,6 +24,9 @@
 #include <widgets/menuonoffswitch.h>
 #include <widgets/menusectionwidget.h>
 #include <style.h>
+#include <QSpinBox>
+#include <QLabel>
+#include <QHBoxLayout>
 
 using namespace scopy;
 
@@ -165,6 +168,9 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	markerSection = new MenuSectionWidget(this);
 	Style::setStyle(markerSection, style::properties::widget::border);
 	markerPanelSwitch = new MenuOnOffSwitch("Marker Panel", this);
+	Style::setStyle(markerPanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(markerPanelSwitch->label(), style::properties::label::defaultLabel, true, true);
+
 	connect(markerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableMarkerPanel(b); });
 	markerSection->contentLayout()->addWidget(markerPanelSwitch);
@@ -174,9 +180,32 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	genalyzerSection = new MenuSectionWidget(this);
 	Style::setStyle(genalyzerSection, style::properties::widget::border);
 	genalyzerPanelSwitch = new MenuOnOffSwitch("Genalyzer analysis", this);
+	Style::setStyle(genalyzerPanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(genalyzerPanelSwitch->label(), style::properties::label::defaultLabel);
+
 	connect(genalyzerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableGenalyzerPanel(b); });
 	genalyzerSection->contentLayout()->addWidget(genalyzerPanelSwitch);
+
+	// Add SSB Width spinbox
+	QWidget *ssbWidthContainer = new QWidget(this);
+	QHBoxLayout *ssbLayout = new QHBoxLayout(ssbWidthContainer);
+	ssbLayout->setContentsMargins(0, 0, 0, 0);
+
+	QLabel *ssbLabel = new QLabel("SSB Width:", ssbWidthContainer);
+	Style::setStyle(ssbLabel, style::properties::label::subtle);
+	ssbWidthSpinbox = new QSpinBox(ssbWidthContainer);
+	ssbWidthSpinbox->setRange(0, 255); // max uint8_t value
+	ssbWidthSpinbox->setValue(120);
+
+	ssbLayout->addWidget(ssbLabel);
+	ssbLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	ssbLayout->addWidget(ssbWidthSpinbox);
+	ssbLayout->addStretch();
+
+	connect(ssbWidthSpinbox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+		[=](int value) { Q_EMIT ssbWidthChanged(static_cast<uint8_t>(value)); });
+	genalyzerSection->contentLayout()->addWidget(ssbWidthContainer);
 
 	genalyzerPanelSwitch->onOffswitch()->setChecked(false);
 
@@ -192,6 +221,7 @@ bool MeasurementSettings::measurementEnabled() { return measurePanelSwitch->onOf
 bool MeasurementSettings::statsEnabled() { return statsPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::markerEnabled() { return markerPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::genalyzerEnabled() { return genalyzerPanelSwitch->onOffswitch()->isChecked(); }
+uint8_t MeasurementSettings::ssbWidth() const { return static_cast<uint8_t>(ssbWidthSpinbox->value()); }
 
 MenuSectionWidget *MeasurementSettings::getMarkerSection() const { return markerSection; }
 
