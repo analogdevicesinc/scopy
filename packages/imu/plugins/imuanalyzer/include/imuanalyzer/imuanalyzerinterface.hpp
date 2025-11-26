@@ -85,6 +85,7 @@ private:
 	data3P m_rot = {0.0f, 0.0f, 0.0f};
 	data3P m_dist = {0.0f, 0.0f, 0.0f};
 
+	std::atomic<bool> m_runThread{false};
 	std::thread t;
 	QString m_uri;
 
