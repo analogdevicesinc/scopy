@@ -49,6 +49,7 @@ private:
 	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
 	size_t d_allocated_frames;    // Number of frame buffers actually allocated
 	bool d_do_shift;              // Whether to apply FFT shift
+	uint8_t d_ssb_width;          // SSB width for genalyzer analysis
 
 	gn_analysis_results *d_analysis;
 
@@ -73,8 +74,9 @@ public:
 	double sample_rate() const override;
 	void set_window(GnWindow win) override;
 	int window() const override;
-	void set_navg(int navg) override;
 	int navg() const override;
+	void set_ssb_width(uint8_t ssb_width) override;
+	uint8_t ssb_width() const override;
 
 	bool start() override;
 	bool stop() override;

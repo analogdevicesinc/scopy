@@ -95,6 +95,8 @@ public:
 
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
+	void setSsbWidth(uint8_t ssb_width) { m_fft->setSsbWidth(ssb_width); }
+
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
 
 	GRTopBlock *m_top;
@@ -152,6 +154,8 @@ public:
 	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
 
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
+
+	void setSsbWidth(uint8_t ssb_width) { m_fft->setSsbWidth(ssb_width); }
 
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
 
@@ -215,6 +219,9 @@ public Q_SLOTS:
 
 	// Method to emit genalyzer channel enabled signal if channel is complex and enabled
 	void emitGenalyzerEnabledIfAppropriate();
+
+	// Set SSB width for genalyzer analysis
+	void setSsbWidth(uint8_t ssb_width);
 
 Q_SIGNALS:
 	void yModeChanged();

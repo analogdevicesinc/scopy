@@ -525,3 +525,10 @@ void GRFFTChannelComponent::emitGenalyzerEnabledIfAppropriate()
 		Q_EMIT genalyzerChannelEnabled(uniqueChannelName);
 	}
 }
+
+void GRFFTChannelComponent::setSsbWidth(uint8_t ssb_width)
+{
+	if(m_complex) {
+		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSsbWidth(ssb_width);
+	}
+}

@@ -55,6 +55,7 @@ public:
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
 	void setNavg(int navg);
+	void setSsbWidth(uint8_t ssb_width);
 	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
@@ -88,6 +89,7 @@ public:
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
 	void setNavg(int navg);
+	void setSsbWidth(uint8_t ssb_width);
 	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
@@ -99,6 +101,7 @@ protected:
 	double m_sr;
 	bool m_signed;
 	int m_navg;
+	uint8_t m_ssb_width;
 	gr::blocks::float_to_int::sptr float_to_int_i;
 	gr::blocks::float_to_int::sptr float_to_int_q;
 	gr::blocks::complex_to_float::sptr complex_to_float;

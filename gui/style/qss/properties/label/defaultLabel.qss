@@ -1,0 +1,5 @@
+QLabel[&&property&&=true] {
+	font-weight: normal;
+	color: &content_default&;
+	font-size: &font_size_1&;
+}

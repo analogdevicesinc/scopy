@@ -264,6 +264,12 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 	connect(c, &GRFFTChannelComponent::genalyzerDataUpdated, m_plotComponentManager->genalyzerPanel(),
 		&GenalyzerPanel::updateResults);
 
+	// Connect SSB width control from UI to channel
+	connect(m_measureComponent->measureSettings(), &MeasurementSettings::ssbWidthChanged, c,
+		&GRFFTChannelComponent::setSsbWidth);
+	// Send initial SSB width value from UI to channel
+	c->setSsbWidth(m_measureComponent->measureSettings()->ssbWidth());
+
 	// Connect channel enable/disable signals to update genalyzer panel visibility
 	connect(c, &GRFFTChannelComponent::genalyzerChannelEnabled, m_plotComponentManager->genalyzerPanel(),
 		[=](const QString &channelName) {
