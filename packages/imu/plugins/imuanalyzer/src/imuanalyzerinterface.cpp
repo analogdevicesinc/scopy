@@ -24,8 +24,6 @@ using namespace scopy;
 
 Q_DECLARE_METATYPE(data3P)
 
-std::atomic<bool> m_runThread(false);
-
 IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	: QWidget{parent}
 {
@@ -137,7 +135,13 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	});
 }
 
-IMUAnalyzerInterface::~IMUAnalyzerInterface() { t.join(); }
+IMUAnalyzerInterface::~IMUAnalyzerInterface()
+{
+	m_runThread = false;
+	if(t.joinable()) {
+		t.join();
+	}
+}
 
 void IMUAnalyzerInterface::generateRotation()
 {
