@@ -38,7 +38,8 @@ genalyzer_fft_vii::sptr genalyzer_fft_vii::make(int npts, int qres, int navg, in
 	return std::make_shared<genalyzer_fft_vii_impl>(npts, qres, navg, nfft, win, sample_rate, do_shift);
 }
 
-genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift)
+genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate,
+					       bool do_shift)
 	: genalyzer_fft_vii("genalyzer_fft_vii", gr::io_signature::make(2, 2, sizeof(int32_t) * nfft),
 			    gr::io_signature::make(1, 1, sizeof(float) * nfft))
 	, d_npts(npts)
@@ -173,6 +174,119 @@ void genalyzer_fft_vii_impl::set_ssb_width(uint8_t ssb_width) { d_ssb_width = ss
 
 uint8_t genalyzer_fft_vii_impl::ssb_width() const { return d_ssb_width; }
 
+void genalyzer_fft_vii_impl::store_frame_to_circular_buffer(const int32_t *in_i_vec, const int32_t *in_q_vec)
+{
+	for(size_t j = 0; j < d_nfft; j++) {
+		d_frame_buffers_i[d_current_frame_index][j] = in_i_vec[j];
+		d_frame_buffers_q[d_current_frame_index][j] = in_q_vec[j];
+	}
+
+	d_current_frame_index = (d_current_frame_index + 1) % d_navg;
+	if(d_frames_filled < d_navg) {
+		d_frames_filled++;
+	}
+}
+
+size_t genalyzer_fft_vii_impl::prepare_frames_for_processing(size_t &current_npts)
+{
+	size_t frames_to_process = std::min(d_frames_filled, d_navg);
+	if(frames_to_process == 0) {
+		return 0;
+	}
+
+	// Copy frames chronologically from oldest
+	size_t oldest_frame_index = (d_frames_filled < d_navg) ? 0 : d_current_frame_index;
+
+	for(size_t frame = 0; frame < frames_to_process; frame++) {
+		size_t source_frame_index = (oldest_frame_index + frame) % d_navg;
+		size_t dest_offset = frame * d_nfft;
+
+		for(size_t j = 0; j < d_nfft; j++) {
+			d_qwfi[dest_offset + j] = d_frame_buffers_i[source_frame_index][j];
+			d_qwfq[dest_offset + j] = d_frame_buffers_q[source_frame_index][j];
+		}
+	}
+	current_npts = frames_to_process * d_nfft;
+	return frames_to_process;
+}
+
+int genalyzer_fft_vii_impl::perform_fft_and_convert_to_db(size_t frames_to_process, size_t current_npts,
+							  double *shifted_output, double *db_output, float *out_vec)
+{
+	if(!d_qwfi || !d_qwfq) {
+		GR_LOG_ERROR(d_logger, "Input quantization buffers are null");
+		return -1;
+	}
+
+	free(d_fft_out);
+	d_fft_out = (double *)calloc(2 * d_nfft, sizeof(double));
+
+	if(gn_fft32(d_fft_out, 2 * d_nfft, d_qwfi, current_npts, d_qwfq, current_npts, d_qres, frames_to_process,
+		    d_nfft, d_win, GnCodeFormatTwosComplement) != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fft32 failed");
+		return -1;
+	}
+
+	// Apply FFT shift for complex mode or convert directly to dB for float mode
+	if(d_do_shift) {
+		if(gn_ifftshift(shifted_output, 2 * d_nfft, d_fft_out, 2 * d_nfft) != 0) {
+			GR_LOG_ERROR(d_logger, "gn_ifftshift failed");
+			return -1;
+		}
+		if(gn_db(db_output, d_nfft, shifted_output, 2 * d_nfft) != 0) {
+			GR_LOG_ERROR(d_logger, "gn_db failed");
+			return -1;
+		}
+	} else {
+		if(gn_db(db_output, d_nfft, d_fft_out, 2 * d_nfft) != 0) {
+			GR_LOG_ERROR(d_logger, "gn_db failed");
+			return -1;
+		}
+	}
+
+	// Convert to float output
+	for(size_t j = 0; j < d_nfft; j++) {
+		out_vec[j] = static_cast<float>(db_output[j]);
+	}
+
+	return 0;
+}
+
+void genalyzer_fft_vii_impl::perform_genalyzer_analysis()
+{
+	if(!d_do_shift) {
+		// Only perform analysis for complex mode
+		d_analysis->results_size = 0;
+		d_analysis->rkeys = nullptr;
+		d_analysis->rvalues = nullptr;
+		return;
+	}
+
+	size_t results_size = 0;
+	char **rkeys = nullptr;
+	double *rvalues = nullptr;
+
+	configure_genalyzer();
+	int err_code = gn_config_fa_auto(d_ssb_width, &d_config);
+
+	if(err_code == 0) {
+		err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+	} else {
+		GR_LOG_ERROR(d_logger, "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
+	}
+
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
+		d_analysis->results_size = 0;
+		d_analysis->rkeys = nullptr;
+		d_analysis->rvalues = nullptr;
+	} else {
+		d_analysis->results_size = results_size;
+		d_analysis->rkeys = rkeys;
+		d_analysis->rvalues = rvalues;
+	}
+}
+
 int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &input_items,
 				 gr_vector_void_star &output_items)
 {
@@ -191,120 +305,33 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 			const int32_t *in_q_vec = in_q + (i * d_nfft);
 			float *out_vec = out + (i * d_nfft);
 
-			size_t frames_to_process, current_npts;
-
 			if(!d_frame_buffers_i || !d_frame_buffers_q || d_navg == 0) {
 				std::memset(out_vec, 0, d_nfft * sizeof(float));
 				continue;
 			}
 
-			for(size_t j = 0; j < d_nfft; j++) {
-				d_frame_buffers_i[d_current_frame_index][j] = in_i_vec[j];
-				d_frame_buffers_q[d_current_frame_index][j] = in_q_vec[j];
-			}
+			// Store new frame to circular buffer
+			store_frame_to_circular_buffer(in_i_vec, in_q_vec);
 
-			d_current_frame_index = (d_current_frame_index + 1) % d_navg;
-			if(d_frames_filled < d_navg) {
-				d_frames_filled++;
-			}
-
-			frames_to_process = std::min(d_frames_filled, d_navg);
+			// Prepare frames for FFT processing
+			size_t current_npts;
+			size_t frames_to_process = prepare_frames_for_processing(current_npts);
 			if(frames_to_process == 0) {
 				std::memset(out_vec, 0, d_nfft * sizeof(float));
 				continue;
 			}
 
-			// Copy frames chronologically from oldest
-			size_t oldest_frame_index = (d_frames_filled < d_navg) ? 0 : d_current_frame_index;
-
-			for(size_t frame = 0; frame < frames_to_process; frame++) {
-				size_t source_frame_index = (oldest_frame_index + frame) % d_navg;
-				size_t dest_offset = frame * d_nfft;
-
-				for(size_t j = 0; j < d_nfft; j++) {
-					d_qwfi[dest_offset + j] = d_frame_buffers_i[source_frame_index][j];
-					d_qwfq[dest_offset + j] = d_frame_buffers_q[source_frame_index][j];
-				}
-			}
-			current_npts = frames_to_process * d_nfft;
-
-			if(!d_qwfi || !d_qwfq) {
-				GR_LOG_ERROR(d_logger, "Input quantization buffers are null");
-				return -1;
-			}
-
-			free(d_fft_out);
-			d_fft_out = (double *)calloc(2 * d_nfft, sizeof(double));
-
-			if(gn_fft32(d_fft_out, 2 * d_nfft, d_qwfi, current_npts, d_qwfq, current_npts, d_qres,
-				    frames_to_process, d_nfft, d_win, GnCodeFormatTwosComplement) != 0) {
-				GR_LOG_ERROR(d_logger, "gn_fft32 failed");
+			// Perform FFT and convert to dB
+			if(perform_fft_and_convert_to_db(frames_to_process, current_npts, shifted_output, db_output,
+							 out_vec) < 0) {
 				free(shifted_output);
 				free(db_output);
 				return -1;
 			}
-
-			if(d_do_shift) {
-				if(gn_ifftshift(shifted_output, 2 * d_nfft, d_fft_out, 2 * d_nfft) != 0) {
-					GR_LOG_ERROR(d_logger, "gn_ifftshift failed");
-					free(shifted_output);
-					free(db_output);
-					return -1;
-				}
-				if(gn_db(db_output, d_nfft, shifted_output, 2 * d_nfft) != 0) {
-					GR_LOG_ERROR(d_logger, "gn_db failed");
-					free(shifted_output);
-					free(db_output);
-					return -1;
-				}
-			} else {
-				// For float mode, no shift - directly convert to dB
-				if(gn_db(db_output, d_nfft, d_fft_out, 2 * d_nfft) != 0) {
-					GR_LOG_ERROR(d_logger, "gn_db failed");
-					free(shifted_output);
-					free(db_output);
-					return -1;
-				}
-			}
-
-			for(size_t j = 0; j < d_nfft; j++) {
-				out_vec[j] = static_cast<float>(db_output[j]);
-			}
 		}
 
-		// Only perform analysis for complex mode
-		if(d_do_shift) {
-			size_t results_size = 0;
-			char **rkeys = nullptr;
-			double *rvalues = nullptr;
-
-			configure_genalyzer();
-			int err_code = gn_config_fa_auto(d_ssb_width, &d_config);
-
-			if(err_code == 0) {
-				err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
-			} else {
-				GR_LOG_ERROR(d_logger,
-					     "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
-			}
-
-			if(err_code != 0) {
-				GR_LOG_ERROR(d_logger,
-					     "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
-
-				d_analysis->results_size = 0;
-				d_analysis->rkeys = nullptr;
-				d_analysis->rvalues = nullptr;
-			} else {
-				d_analysis->results_size = results_size;
-				d_analysis->rkeys = rkeys;
-				d_analysis->rvalues = rvalues;
-			}
-		} else {
-			d_analysis->results_size = 0;
-			d_analysis->rkeys = nullptr;
-			d_analysis->rvalues = nullptr;
-		}
+		// Perform genalyzer analysis (only for complex mode)
+		perform_genalyzer_analysis();
 
 		free(shifted_output);
 		free(db_output);
