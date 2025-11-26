@@ -36,11 +36,9 @@
 #include <QWidget>
 #include <toolbuttons.h>
 #include <tooltemplate.h>
-#include "qloggingcategory.h"
 
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "style.h"
 
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
@@ -63,7 +61,7 @@ public:
 	QString description() override;
 
 private:
-	IMUAnalyzerInterface *m_imuInterface;
+	IMUAnalyzerInterface *m_imuInterface = nullptr;
 };
 
 } // namespace scopy
