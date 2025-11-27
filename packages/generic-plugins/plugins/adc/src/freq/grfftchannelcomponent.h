@@ -230,9 +230,6 @@ public Q_SLOTS:
 	// Set complete genalyzer configuration
 	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config);
 
-	// Set configuration from QVariantMap (for UI integration)
-	void setGenalyzerConfig(const QVariantMap& config);
-
 Q_SIGNALS:
 	void yModeChanged();
 	void fftSizeChanged();
