@@ -29,7 +29,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <menuonoffswitch.h>
-#include <QSpinBox>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT MeasurementSettings : public QWidget
@@ -48,7 +47,9 @@ public:
 	bool statsEnabled();
 	bool markerEnabled();
 	bool genalyzerEnabled();
-	uint8_t ssbWidth() const;
+
+	// Add external widget to genalyzer section
+	void addGenalyzerWidget(QWidget* widget);
 
 	MenuSectionWidget *getMarkerSection() const;
 
@@ -67,14 +68,12 @@ Q_SIGNALS:
 	void enableStatsPanel(bool b);
 	void enableMarkerPanel(bool b);
 	void enableGenalyzerPanel(bool b);
-	void ssbWidthChanged(uint8_t value);
 
 private:
 	MenuOnOffSwitch *measurePanelSwitch;
 	MenuOnOffSwitch *statsPanelSwitch;
 	MenuOnOffSwitch *markerPanelSwitch;
 	MenuOnOffSwitch *genalyzerPanelSwitch;
-	QSpinBox *ssbWidthSpinbox;
 
 	MenuSectionWidget *markerSection;
 	MenuSectionWidget *statsSection;

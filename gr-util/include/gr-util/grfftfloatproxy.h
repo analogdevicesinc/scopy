@@ -55,7 +55,9 @@ public:
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
 	void setNavg(int navg);
-	void setSsbWidth(uint8_t ssb_width);
+	void setSsbWidth(uint8_t ssb_width);  // Deprecated
+	void setGenalyzerConfig(const GenalyzerConfig& config);
+	GenalyzerConfig getGenalyzerConfig() const;
 	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
@@ -67,6 +69,7 @@ protected:
 	double m_sr;
 	bool m_signed;
 	int m_navg;
+	GenalyzerConfig m_genalyzer_config;  // Store configuration for when block is created
 	gr::blocks::float_to_int::sptr float_to_int_i;
 	gr::blocks::add_const_vff::sptr powerOffset;
 	genalyzer_fft_vii::sptr genalyzer_fft;
@@ -89,7 +92,9 @@ public:
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
 	void setNavg(int navg);
-	void setSsbWidth(uint8_t ssb_width);
+	void setSsbWidth(uint8_t ssb_width);  // Deprecated
+	void setGenalyzerConfig(const GenalyzerConfig& config);
+	GenalyzerConfig getGenalyzerConfig() const;
 	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
@@ -101,7 +106,7 @@ protected:
 	double m_sr;
 	bool m_signed;
 	int m_navg;
-	uint8_t m_ssb_width;
+	GenalyzerConfig m_genalyzer_config;  // Store configuration for when block is created
 	gr::blocks::float_to_int::sptr float_to_int_i;
 	gr::blocks::float_to_int::sptr float_to_int_q;
 	gr::blocks::complex_to_float::sptr complex_to_float;
