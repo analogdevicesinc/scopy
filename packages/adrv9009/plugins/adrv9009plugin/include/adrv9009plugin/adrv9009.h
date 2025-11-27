@@ -23,11 +23,15 @@
 
 #include "scopy-adrv9009plugin_export.h"
 #include <QBoxLayout>
+#include <QMap>
+#include <QPushButton>
+#include <QTabWidget>
 #include <QWidget>
 #include <tooltemplate.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <animatedrefreshbtn.h>
 #include <gui/widgets/menuspinbox.h>
+#include <gui/widgets/menusectionwidget.h>
 
 namespace scopy::adrv9009 {
 
@@ -47,20 +51,31 @@ private:
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_centralWidget;
 	AnimatedRefreshBtn *m_refreshButton;
+	QPushButton *m_mcsButton = nullptr;
 
-	iio_device *m_iio_dev = nullptr;
+	QMap<QString, iio_device *> m_adrv9009DeviceMap;
+	bool m_multiDeviceMode = false;
 
 	void setupUi();
+	void detectAndStoreDevices();
+	void performMcsSync();
 
 	void loadProfileFromFile(QString filePath);
-	QWidget *generateCalibrationWidget(QWidget *parent);
+	QWidget *generateCalibrationWidget(iio_device *device, QWidget *parent);
 
 	// Simple section generators
-	QWidget *generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateRxChainWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateTxChainWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateObsRxChainWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateFpgaSettingsWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateGlobalSettingsWidget(QString title, QWidget *parent);
+	QWidget *generateRxChainWidget(QString title, QWidget *parent);
+	QWidget *generateTxChainWidget(QString title, QWidget *parent);
+	QWidget *generateObsRxChainWidget(QString title, QWidget *parent);
+	QWidget *generateFpgaSettingsWidget(QString title, QWidget *parent);
+
+	// Device-specific content creators
+	QWidget *createGlobalSettingsContentForDevice(iio_device *device, QWidget *parent);
+	QWidget *createRxChainContentForDevice(iio_device *device, QWidget *parent);
+	QWidget *createTxChainContentForDevice(iio_device *device, QWidget *parent);
+	QWidget *createObsRxChainContentForDevice(iio_device *device, QWidget *parent);
+	QWidget *createFpgaSettingsContentForDevice(iio_device *device, QWidget *parent);
 
 	// RX channel helper
 	QWidget *createRxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent);
