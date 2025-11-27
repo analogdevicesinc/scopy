@@ -50,7 +50,6 @@ private:
 	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
 	size_t d_allocated_frames;    // Number of frame buffers actually allocated
 	bool d_do_shift;              // Whether to apply FFT shift
-	uint8_t d_ssb_width;          // SSB width for genalyzer analysis (deprecated)
 	GenalyzerConfig d_genalyzer_config;     // Complete genalyzer configuration
 	char* d_fa_key = nullptr;     // Fourier analysis configuration key
 
@@ -67,7 +66,6 @@ private:
 	void cleanup_buffers();
 	void cleanup_frame_buffers(); // Clean only circular buffer frames
 	void allocate_buffers();
-	int configure_genalyzer();
 
 	// Helper functions for work()
 	void store_frame_to_circular_buffer(const int32_t *in_i_vec, const int32_t *in_q_vec);
@@ -76,10 +74,21 @@ private:
 					   double *shifted_output, double *db_output, float *out_vec);
 	void perform_genalyzer_analysis();
 
-	// Fixed tone analysis functions
+	// Analysis result helpers
+	void clear_analysis_results();
+	void set_analysis_results(size_t results_size, char **rkeys, double *rvalues);
+	void free_analysis_keys(char **rkeys, size_t count);
+
+	// auto analysis
+	void perform_auto_analysis();
+	int configure_auto_analysis();
+
+	// fixed tone analysis
 	int configure_fixed_tone_analysis();
 	void perform_fixed_tone_analysis();
+
 	void cleanup_fa_config();
+	void cleanup_auto_config();
 
 public:
 	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);

@@ -553,7 +553,7 @@ void GRFFTChannelComponent::setGenalyzerConfig(const QVariantMap& configMap)
 
 	// Set auto mode parameters
 	if (configMap.contains("auto_ssb_width")) {
-		config.auto_ssb_width = configMap["auto_ssb_width"].toUInt();
+		config.auto_params.ssb_width = configMap["auto_ssb_width"].toUInt();
 	}
 
 	// Set fixed tone parameters

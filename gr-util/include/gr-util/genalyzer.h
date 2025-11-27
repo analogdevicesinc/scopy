@@ -41,7 +41,10 @@ struct SCOPY_GR_UTIL_EXPORT GenalyzerConfig {
 	GenalyzerMode mode = GenalyzerMode::AUTO;
 
 	// Auto mode parameters
-	uint8_t auto_ssb_width = 120;  // SSB width for automatic mode
+	struct AutoParams {
+		uint8_t ssb_width = 120;  // SSB width for automatic mode
+		// Can be extended with more auto-specific parameters in the future
+	} auto_params;
 
 	// Fixed tone mode parameters
 	struct FixedToneParams {
