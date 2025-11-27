@@ -25,8 +25,48 @@
 #include "scopy-gr-util_export.h"
 #include <gnuradio/sync_block.h>
 #include <cgenalyzer_simplified_beta.h>
+#include <cgenalyzer.h>
+#include <cstdint>
+#include <string>
 
 namespace scopy::grutil {
+
+enum class GenalyzerMode {
+	AUTO = 0,       // Automatic tone detection (current mode)
+	FIXED_TONE = 1  // Fixed tone analysis with expected frequency
+};
+
+struct SCOPY_GR_UTIL_EXPORT GenalyzerConfig {
+	// Common parameters
+	GenalyzerMode mode = GenalyzerMode::AUTO;
+
+	// Auto mode parameters
+	struct AutoParams {
+		uint8_t ssb_width = 120;  // SSB width for automatic mode
+		// Can be extended with more auto-specific parameters in the future
+	} auto_params;
+
+	// Fixed tone mode parameters
+	struct FixedToneParams {
+		double expected_freq = 1e6;        // Expected signal frequency in Hz
+		std::string component_label = "A"; // Component label (e.g., "A", "B")
+		int harmonic_order = 10;           // Max harmonic to analyze (0 = disabled)
+		int ssb_fundamental = 4;           // SSB for fundamental tone
+		int ssb_harmonics = 3;             // SSB for harmonics
+		int ssb_default = 3;               // Default SSB for other components
+		int ssb_dc = -1;                   // DC component SSB (-1 = use default)
+		int ssb_wo = -1;                   // Worst-other SSB (-1 = use default)
+		bool coherent_sampling = false;    // Whether sampling is coherent
+
+		// Advanced parameters (can be extended later)
+		double fshift = 0.0;               // Frequency shift for complex demodulation
+		bool conv_offset = false;          // Converter offset compensation
+	} fixed_tone;
+
+	// Helper methods
+	bool isAutoMode() const { return mode == GenalyzerMode::AUTO; }
+	bool isFixedToneMode() const { return mode == GenalyzerMode::FIXED_TONE; }
+};
 
 struct gn_analysis_results
 {
@@ -57,8 +97,10 @@ public:
 	virtual void set_window(GnWindow win) = 0;
 	virtual int window() const = 0;
 	virtual int navg() const = 0;
-	virtual void set_ssb_width(uint8_t ssb_width) = 0;
-	virtual uint8_t ssb_width() const = 0;
+	virtual void set_ssb_width(uint8_t ssb_width) = 0;  // Deprecated, use set_config
+	virtual uint8_t ssb_width() const = 0;               // Deprecated, use get_config
+	virtual void set_config(const GenalyzerConfig& config) = 0;
+	virtual GenalyzerConfig get_config() const = 0;
 	virtual gn_analysis_results *getGnAnalysis() = 0;
 
 protected:

@@ -33,6 +33,7 @@
 #include <freq/fftplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <QSpinBox>
+#include <QVariantMap>
 #include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_GRFFTChannelComponent, "GRFFTChannelComponent");
@@ -530,5 +531,12 @@ void GRFFTChannelComponent::setSsbWidth(uint8_t ssb_width)
 {
 	if(m_complex) {
 		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSsbWidth(ssb_width);
+	}
+}
+
+void GRFFTChannelComponent::setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config)
+{
+	if(m_complex) {
+		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setGenalyzerConfig(config);
 	}
 }

@@ -28,6 +28,7 @@
 #include "freq/fftplotmanager.h"
 #include "freq/fftplotmanagersettings.h"
 #include "adcinterfaces.h"
+#include "genalyzersettings.h"
 #include "importchannelcomponent.h"
 
 using namespace scopy;
@@ -264,11 +265,11 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 	connect(c, &GRFFTChannelComponent::genalyzerDataUpdated, m_plotComponentManager->genalyzerPanel(),
 		&GenalyzerPanel::updateResults);
 
-	// Connect SSB width control from UI to channel
-	connect(m_measureComponent->measureSettings(), &MeasurementSettings::ssbWidthChanged, c,
-		&GRFFTChannelComponent::setSsbWidth);
-	// Send initial SSB width value from UI to channel
-	c->setSsbWidth(m_measureComponent->measureSettings()->ssbWidth());
+	// Connect genalyzer configuration control from UI to channel
+	connect(m_measureComponent->genalyzerSettings(), &adc::GenalyzerSettings::configChanged, c,
+		qOverload<const scopy::grutil::GenalyzerConfig&>(&GRFFTChannelComponent::setGenalyzerConfig));
+	// Send initial genalyzer configuration from UI to channel
+	c->setGenalyzerConfig(m_measureComponent->genalyzerSettings()->getConfig());
 
 	// Connect channel enable/disable signals to update genalyzer panel visibility
 	connect(c, &GRFFTChannelComponent::genalyzerChannelEnabled, m_plotComponentManager->genalyzerPanel(),

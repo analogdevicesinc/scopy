@@ -49,7 +49,8 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_win(win)
 	, d_sample_rate(sample_rate)
 	, d_do_shift(do_shift)
-	, d_ssb_width(120)
+	, d_genalyzer_config() // Initialize with default config
+	, d_fa_key(nullptr)
 	, d_fft_out(nullptr)
 	, d_qwfi(nullptr)
 	, d_qwfq(nullptr)
@@ -61,6 +62,8 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_config(nullptr)
 	, d_analysis(new gn_analysis_results)
 {
+	// Initialize config with default ssb_width
+	d_genalyzer_config.auto_params.ssb_width = 120;
 	allocate_buffers();
 }
 
@@ -122,24 +125,19 @@ void genalyzer_fft_vii_impl::cleanup_buffers()
 		d_qwfq = nullptr;
 	}
 
-	cleanup_frame_buffers();
-
 	if(d_analysis) {
 		delete d_analysis;
 		d_analysis = nullptr;
 	}
-	if(d_config) {
-		gn_config_free(&d_config);
-		d_config = nullptr;
-	}
+
+	cleanup_frame_buffers();
+	cleanup_fa_config(); // Clean up fixed tone analysis configuration
+	cleanup_auto_config();
 }
 
-int genalyzer_fft_vii_impl::configure_genalyzer()
+int genalyzer_fft_vii_impl::configure_auto_analysis()
 {
-	if(d_config) {
-		gn_config_free(&d_config);
-		d_config = nullptr;
-	}
+	cleanup_auto_config();
 
 	int err_code = gn_config_fftz(d_npts, d_qres, d_navg, d_nfft, d_win, &d_config);
 	if(err_code != 0) {
@@ -150,6 +148,12 @@ int genalyzer_fft_vii_impl::configure_genalyzer()
 	err_code = gn_config_set_sample_rate(d_sample_rate, &d_config);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_config_set_sample_rate failed with error code: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	err_code = gn_config_fa_auto(d_genalyzer_config.auto_params.ssb_width, &d_config);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
 		return err_code;
 	}
 
@@ -170,9 +174,55 @@ int genalyzer_fft_vii_impl::window() const { return d_win; }
 
 int genalyzer_fft_vii_impl::navg() const { return d_navg; }
 
-void genalyzer_fft_vii_impl::set_ssb_width(uint8_t ssb_width) { d_ssb_width = ssb_width; }
+void genalyzer_fft_vii_impl::set_ssb_width(uint8_t ssb_width)
+{
+	d_genalyzer_config.auto_params.ssb_width = ssb_width;
 
-uint8_t genalyzer_fft_vii_impl::ssb_width() const { return d_ssb_width; }
+	cleanup_auto_config();
+	configure_auto_analysis();
+}
+
+uint8_t genalyzer_fft_vii_impl::ssb_width() const { return d_genalyzer_config.auto_params.ssb_width; }
+
+void genalyzer_fft_vii_impl::set_config(const GenalyzerConfig &config)
+{
+	// Always clean up previous FA config when configuration changes
+	// This ensures the FA config is recreated with new parameters
+	cleanup_fa_config();
+
+	d_genalyzer_config = config;
+
+	// Don't configure immediately - let it be configured on first use in perform_genalyzer_analysis()
+	// This avoids unnecessary configuration if analysis is not performed
+}
+
+GenalyzerConfig genalyzer_fft_vii_impl::get_config() const { return d_genalyzer_config; }
+
+void genalyzer_fft_vii_impl::clear_analysis_results()
+{
+	d_analysis->results_size = 0;
+	d_analysis->rkeys = nullptr;
+	d_analysis->rvalues = nullptr;
+}
+
+void genalyzer_fft_vii_impl::set_analysis_results(size_t results_size, char **rkeys, double *rvalues)
+{
+	d_analysis->results_size = results_size;
+	d_analysis->rkeys = rkeys;
+	d_analysis->rvalues = rvalues;
+}
+
+void genalyzer_fft_vii_impl::free_analysis_keys(char **rkeys, size_t count)
+{
+	if(rkeys) {
+		for(size_t i = 0; i < count; ++i) {
+			if(rkeys[i]) {
+				free(rkeys[i]);
+			}
+		}
+		free(rkeys);
+	}
+}
 
 void genalyzer_fft_vii_impl::store_frame_to_circular_buffer(const int32_t *in_i_vec, const int32_t *in_q_vec)
 {
@@ -252,13 +302,133 @@ int genalyzer_fft_vii_impl::perform_fft_and_convert_to_db(size_t frames_to_proce
 	return 0;
 }
 
-void genalyzer_fft_vii_impl::perform_genalyzer_analysis()
+void genalyzer_fft_vii_impl::cleanup_fa_config()
 {
-	if(!d_do_shift) {
-		// Only perform analysis for complex mode
-		d_analysis->results_size = 0;
-		d_analysis->rkeys = nullptr;
-		d_analysis->rvalues = nullptr;
+	if(d_fa_key) {
+		// Note: genalyzer doesn't provide a destroy function for FA configs
+		// They are managed internally, so we just clear our key
+		gn_fa_reset(d_fa_key);
+		free(d_fa_key);
+		d_fa_key = nullptr;
+	}
+}
+
+void genalyzer_fft_vii_impl::cleanup_auto_config()
+{
+	if(d_config) {
+		gn_config_free(&d_config);
+		d_config = nullptr;
+	}
+}
+
+int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
+{
+
+	// Clean up any existing configuration
+	cleanup_fa_config();
+
+	// Create unique key for this configuration
+	d_fa_key = strdup("fa");
+
+	int err_code = 0;
+
+	// Create FA configuration
+	err_code = gn_fa_create(d_fa_key);
+	const auto &ft = d_genalyzer_config.fixed_tone;
+
+	// Define fixed tone (fundamental)
+	err_code = gn_fa_fixed_tone(d_fa_key, ft.component_label.c_str(), GnFACompTagSignal, ft.expected_freq,
+				    ft.coherent_sampling ? 0 : ft.ssb_fundamental);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_fixed_tone failed: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	// Configure harmonic distortion analysis if enabled
+	if(ft.harmonic_order > 0) {
+		err_code = gn_fa_hd(d_fa_key, ft.harmonic_order);
+		if(err_code != 0) {
+			GR_LOG_ERROR(d_logger, "gn_fa_hd failed: " + std::to_string(err_code));
+			return err_code;
+		}
+	}
+
+	// Configure SSB groups
+	err_code = gn_fa_ssb(d_fa_key, GnFASsbDefault, ft.ssb_default);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_ssb Default failed: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	if(ft.ssb_dc >= 0) {
+		err_code = gn_fa_ssb(d_fa_key, GnFASsbDC, ft.ssb_dc);
+		if(err_code != 0) {
+			GR_LOG_ERROR(d_logger, "gn_fa_ssb DC failed: " + std::to_string(err_code));
+			return err_code;
+		}
+	}
+
+	if(ft.ssb_wo >= 0) {
+		err_code = gn_fa_ssb(d_fa_key, GnFASsbWO, ft.ssb_wo);
+		if(err_code != 0) {
+			GR_LOG_ERROR(d_logger, "gn_fa_ssb WO failed: " + std::to_string(err_code));
+			return err_code;
+		}
+	}
+
+	// Set frequency parameters
+	err_code = gn_fa_fsample(d_fa_key, d_sample_rate);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_fsample failed: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	err_code = gn_fa_fdata(d_fa_key, d_sample_rate); // Assuming no decimation
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_fdata failed: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	err_code = gn_fa_fshift(d_fa_key, ft.fshift);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_fshift failed: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	err_code = gn_fa_conv_offset(d_fa_key, ft.conv_offset);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_conv_offset failed: " + std::to_string(err_code));
+		return err_code;
+	}
+
+	// Debug: Print FA configuration preview (commented out for production)
+	// size_t fa_preview_size = 0;
+	// int result = 0;
+	// char *fa_preview = NULL;
+	// result += gn_fa_preview_size(&fa_preview_size, d_fa_key, true);
+	// fa_preview = (char *)malloc(fa_preview_size);
+	// result += gn_fa_preview(fa_preview, fa_preview_size, d_fa_key, true);
+	// printf("%s\n", fa_preview);
+	// free(fa_preview);
+
+	return 0;
+}
+
+void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
+{
+	// Configure fixed tone analysis only if not already configured
+	if(!d_fa_key) {
+		int config_result = configure_fixed_tone_analysis();
+		if(config_result != 0) {
+			GR_LOG_ERROR(d_logger, "Failed to configure fixed tone analysis");
+			clear_analysis_results();
+			cleanup_fa_config();
+			return;
+		}
+	}
+
+	if(!d_do_shift || !d_fa_key) {
+		clear_analysis_results();
 		return;
 	}
 
@@ -266,24 +436,90 @@ void genalyzer_fft_vii_impl::perform_genalyzer_analysis()
 	char **rkeys = nullptr;
 	double *rvalues = nullptr;
 
-	configure_genalyzer();
-	int err_code = gn_config_fa_auto(d_ssb_width, &d_config);
-
-	if(err_code == 0) {
-		err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
-	} else {
-		GR_LOG_ERROR(d_logger, "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
+	// Get results size first
+	int err_code = gn_fft_analysis_results_size(&results_size, d_fa_key, 2 * d_nfft, d_nfft);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fft_analysis_results_size failed: " + std::to_string(err_code));
+		clear_analysis_results();
+		return;
 	}
 
+	// Allocate memory for results
+	rkeys = (char **)malloc(results_size * sizeof(char *));
+	rvalues = (double *)malloc(results_size * sizeof(double));
+
+	// Get key sizes
+	size_t *rkey_sizes = (size_t *)malloc(results_size * sizeof(size_t));
+	err_code = gn_fft_analysis_results_key_sizes(rkey_sizes, results_size, d_fa_key, 2 * d_nfft, d_nfft);
 	if(err_code != 0) {
-		GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
-		d_analysis->results_size = 0;
-		d_analysis->rkeys = nullptr;
-		d_analysis->rvalues = nullptr;
+		GR_LOG_ERROR(d_logger, "gn_fft_analysis_results_key_sizes failed: " + std::to_string(err_code));
+		free(rkeys);
+		free(rvalues);
+		free(rkey_sizes);
+		clear_analysis_results();
+		return;
+	}
+
+	// Allocate memory for each key
+	for(size_t i = 0; i < results_size; ++i) {
+		rkeys[i] = (char *)malloc(rkey_sizes[i]);
+	}
+	free(rkey_sizes);
+
+	// Execute analysis
+	// Use DC on left for unshifted FFT output
+	err_code = gn_fft_analysis(rkeys, results_size, rvalues, results_size, d_fa_key, d_fft_out, 2 * d_nfft, d_nfft,
+				   GnFreqAxisTypeDcLeft);
+
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fft_analysis failed: " + std::to_string(err_code));
+		free_analysis_keys(rkeys, results_size);
+		free(rvalues);
+		clear_analysis_results();
 	} else {
-		d_analysis->results_size = results_size;
-		d_analysis->rkeys = rkeys;
-		d_analysis->rvalues = rvalues;
+		set_analysis_results(results_size, rkeys, rvalues);
+	}
+}
+
+void genalyzer_fft_vii_impl::perform_auto_analysis()
+{
+	size_t results_size = 0;
+	char **rkeys = nullptr;
+	double *rvalues = nullptr;
+
+	// Configure genalyzer for auto mode only if not already configured
+	if(!d_config) {
+		int config_err = configure_auto_analysis();
+		if(config_err != 0) {
+			GR_LOG_ERROR(d_logger,
+				     "Failed to configure genalyzer. Error code: " + std::to_string(config_err));
+			clear_analysis_results();
+			cleanup_auto_config();
+			return;
+		}
+	}
+
+	int err_code = gn_get_fa_results(&rkeys, &rvalues, &results_size, d_fft_out, &d_config);
+	if(err_code == 0) {
+		set_analysis_results(results_size, rkeys, rvalues);
+	} else {
+		GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
+		clear_analysis_results();
+	}
+}
+
+void genalyzer_fft_vii_impl::perform_genalyzer_analysis()
+{
+	if(!d_do_shift) {
+		// Only perform analysis for complex mode
+		clear_analysis_results();
+		return;
+	}
+
+	if(d_genalyzer_config.isFixedToneMode()) {
+		perform_fixed_tone_analysis();
+	} else {
+		perform_auto_analysis();
 	}
 }
 

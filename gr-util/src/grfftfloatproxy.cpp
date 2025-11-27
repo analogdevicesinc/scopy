@@ -34,6 +34,9 @@ GRFFTFloatProc::GRFFTFloatProc(QObject *parent)
 	m_sr = 0;
 	m_signed = true;
 	m_navg = 1;
+	// Initialize with default genalyzer config
+	m_genalyzer_config = GenalyzerConfig();
+	m_genalyzer_config.auto_params.ssb_width = 120; // Default SSB width
 }
 
 void GRFFTFloatProc::setWindow(gr::fft::window::win_type w)
@@ -74,9 +77,30 @@ void GRFFTFloatProc::setNavg(int navg)
 
 void GRFFTFloatProc::setSsbWidth(uint8_t ssb_width)
 {
+	// Update the stored config
+	m_genalyzer_config.auto_params.ssb_width = ssb_width;
+
 	if(genalyzer_fft) {
 		genalyzer_fft->set_ssb_width(ssb_width);
 	}
+}
+
+void GRFFTFloatProc::setGenalyzerConfig(const GenalyzerConfig& config)
+{
+	// Store the configuration locally
+	m_genalyzer_config = config;
+
+	// Apply to block if it exists
+	if(genalyzer_fft) {
+		genalyzer_fft->set_config(config);
+	}
+}
+
+GenalyzerConfig GRFFTFloatProc::getGenalyzerConfig() const
+{
+	// Always return the stored configuration
+	// It should be in sync with the block's config if the block exists
+	return m_genalyzer_config;
 }
 
 gn_analysis_results *GRFFTFloatProc::getGnAnalysis()
@@ -117,6 +141,9 @@ void GRFFTFloatProc::build_blks(GRTopBlock *top)
 						false				// do_shift = false for float mode
 	);
 
+	// Apply the stored configuration
+	genalyzer_fft->set_config(m_genalyzer_config);
+
 	// Power offset
 	std::vector<float> k;
 	for(int i = 0; i < fft_size; i++) {
@@ -154,7 +181,9 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	m_sr = 0;
 	m_signed = true;
 	m_navg = 1;
-	m_ssb_width = 120;
+	// Initialize with default genalyzer config
+	m_genalyzer_config = GenalyzerConfig();
+	m_genalyzer_config.auto_params.ssb_width = 120; // Default SSB width
 }
 
 void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
@@ -198,10 +227,30 @@ void GRFFTComplexProc::setNavg(int navg)
 
 void GRFFTComplexProc::setSsbWidth(uint8_t ssb_width)
 {
-	m_ssb_width = ssb_width;
+	// Update the stored config
+	m_genalyzer_config.auto_params.ssb_width = ssb_width;
+
 	if(genalyzer_fft) {
 		genalyzer_fft->set_ssb_width(ssb_width);
 	}
+}
+
+void GRFFTComplexProc::setGenalyzerConfig(const GenalyzerConfig& config)
+{
+	// Store the configuration locally
+	m_genalyzer_config = config;
+
+	// Apply to block if it exists
+	if(genalyzer_fft) {
+		genalyzer_fft->set_config(config);
+	}
+}
+
+GenalyzerConfig GRFFTComplexProc::getGenalyzerConfig() const
+{
+	// Always return the stored configuration
+	// It should be in sync with the block's config if the block exists
+	return m_genalyzer_config;
 }
 
 gn_analysis_results *GRFFTComplexProc::getGnAnalysis()
@@ -231,7 +280,9 @@ void GRFFTComplexProc::build_blks(GRTopBlock *top)
 						m_sr,				// sample rate
 						true				// do_shift = true for complex mode
 	);
-	genalyzer_fft->set_ssb_width(m_ssb_width);
+
+	// Apply the stored configuration
+	genalyzer_fft->set_config(m_genalyzer_config);
 
 	// Power offset
 	std::vector<float> k;

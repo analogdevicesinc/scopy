@@ -32,15 +32,19 @@
 namespace scopy {
 namespace adc {
 
+class GenalyzerSettings;
+
 class SCOPY_ADC_EXPORT MeasureComponent : public QObject, public ToolComponent
 {
 public:
 	MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, MeasurementPanelInterface *p, QObject *parent);
 	MeasurementSettings *measureSettings();
+	GenalyzerSettings *genalyzerSettings();
 
 private:
 	void setupMeasureButtonHelper(MenuControlButton *);
 	MeasurementSettings *m_measureSettings;
+	GenalyzerSettings *m_genalyzerSettings;
 	QButtonGroup *hoverBtnGroup;
 
 	QString measureMenuId = "measure";

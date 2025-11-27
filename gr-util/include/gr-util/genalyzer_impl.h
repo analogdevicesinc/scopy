@@ -49,7 +49,8 @@ private:
 	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
 	size_t d_allocated_frames;    // Number of frame buffers actually allocated
 	bool d_do_shift;              // Whether to apply FFT shift
-	uint8_t d_ssb_width;          // SSB width for genalyzer analysis
+	GenalyzerConfig d_genalyzer_config;     // Complete genalyzer configuration
+	char* d_fa_key = nullptr;     // Fourier analysis configuration key
 
 	gn_analysis_results *d_analysis;
 
@@ -64,7 +65,6 @@ private:
 	void cleanup_buffers();
 	void cleanup_frame_buffers(); // Clean only circular buffer frames
 	void allocate_buffers();
-	int configure_genalyzer();
 
 	// Helper functions for work()
 	void store_frame_to_circular_buffer(const int32_t *in_i_vec, const int32_t *in_q_vec);
@@ -72,6 +72,22 @@ private:
 	int perform_fft_and_convert_to_db(size_t frames_to_process, size_t current_npts,
 					   double *shifted_output, double *db_output, float *out_vec);
 	void perform_genalyzer_analysis();
+
+	// Analysis result helpers
+	void clear_analysis_results();
+	void set_analysis_results(size_t results_size, char **rkeys, double *rvalues);
+	void free_analysis_keys(char **rkeys, size_t count);
+
+	// auto analysis
+	void perform_auto_analysis();
+	int configure_auto_analysis();
+
+	// fixed tone analysis
+	int configure_fixed_tone_analysis();
+	void perform_fixed_tone_analysis();
+
+	void cleanup_fa_config();
+	void cleanup_auto_config();
 
 public:
 	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);
@@ -82,8 +98,10 @@ public:
 	void set_window(GnWindow win) override;
 	int window() const override;
 	int navg() const override;
-	void set_ssb_width(uint8_t ssb_width) override;
-	uint8_t ssb_width() const override;
+	void set_ssb_width(uint8_t ssb_width) override;  // Deprecated
+	uint8_t ssb_width() const override;               // Deprecated
+	void set_config(const GenalyzerConfig& config) override;
+	GenalyzerConfig get_config() const override;
 
 	bool start() override;
 	bool stop() override;
