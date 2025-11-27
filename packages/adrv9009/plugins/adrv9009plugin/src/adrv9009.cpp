@@ -32,6 +32,7 @@
 #include <style.h>
 #include <QFutureWatcher>
 #include <QLoggingCategory>
+#include <QTimer>
 #include <qtconcurrentrun.h>
 #include <filebrowserwidget.h>
 #include <pkg-manager/pkgmanager.h>
@@ -47,7 +48,6 @@ Adrv9009::Adrv9009(iio_context *ctx, QWidget *parent)
 	, m_tool(nullptr)
 	, m_refreshButton(nullptr)
 	, m_centralWidget(nullptr)
-	, m_iio_dev(nullptr)
 {
 	setupUi();
 	qDebug(CAT_ADRV9009) << "ADRV9009 tool initialized successfully";
@@ -112,64 +112,142 @@ void Adrv9009::setupUi()
 		return;
 	}
 
-	m_iio_dev = iio_context_find_device(m_ctx, "adrv9009-phy");
+	detectAndStoreDevices();
 
-	if(m_iio_dev != nullptr) {
-		// Global Settings - Collapsible Section
-		MenuSectionCollapseWidget *globalSection =
-			new MenuSectionCollapseWidget("ADRV9009 Global Settings", MenuCollapseSection::MHCW_ARROW,
-						      MenuCollapseSection::MHW_BASEWIDGET, controlsScrollWidget);
-		globalSection->contentLayout()->addWidget(
-			generateGlobalSettingsWidget(m_iio_dev, "ADRV9009 Global Settings", globalSection));
-		controlsScrollLayout->addWidget(globalSection);
-
-		// Receive Chain - Collapsible Section
-		MenuSectionCollapseWidget *rxSection =
-			new MenuSectionCollapseWidget("ADRV9009 Receive Chain", MenuCollapseSection::MHCW_ARROW,
-						      MenuCollapseSection::MHW_BASEWIDGET, controlsScrollWidget);
-		rxSection->contentLayout()->addWidget(
-			generateRxChainWidget(m_iio_dev, "ADRV9009 Receive Chain", rxSection));
-		controlsScrollLayout->addWidget(rxSection);
-
-		// Transmit Chain - Collapsible Section
-		MenuSectionCollapseWidget *txSection =
-			new MenuSectionCollapseWidget("ADRV9009 Transmit Chain", MenuCollapseSection::MHCW_ARROW,
-						      MenuCollapseSection::MHW_BASEWIDGET, controlsScrollWidget);
-		txSection->contentLayout()->addWidget(
-			generateTxChainWidget(m_iio_dev, "ADRV9009 Transmit Chain", txSection));
-		controlsScrollLayout->addWidget(txSection);
-
-		// Observation RX - Collapsible Section
-		MenuSectionCollapseWidget *obsSection =
-			new MenuSectionCollapseWidget("ADRV9009 Observation RX", MenuCollapseSection::MHCW_ARROW,
-						      MenuCollapseSection::MHW_BASEWIDGET, controlsScrollWidget);
-		obsSection->contentLayout()->addWidget(
-			generateObsRxChainWidget(m_iio_dev, "ADRV9009 Observation RX", obsSection));
-		controlsScrollLayout->addWidget(obsSection);
-
-		// FPGA Settings - Collapsible Section
-		iio_device *fpga_dev = iio_context_find_device(m_ctx, "axi-adrv9009-rx-hpc");
-		if(fpga_dev != nullptr) {
-			MenuSectionCollapseWidget *fpgaSection = new MenuSectionCollapseWidget(
-				"FPGA Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET,
-				controlsScrollWidget);
-			fpgaSection->contentLayout()->addWidget(
-				generateFpgaSettingsWidget(fpga_dev, "FPGA Settings", fpgaSection));
-			controlsScrollLayout->addWidget(fpgaSection);
-		} else {
-			qWarning(CAT_ADRV9009) << "FPGA device (axi-adrv9009-rx-hpc) not found in context";
-		}
+	if(!m_adrv9009DeviceMap.isEmpty()) {
+		controlsScrollLayout->addWidget(
+			generateGlobalSettingsWidget("ADRV9009 Global Settings", controlsScrollWidget));
+		controlsScrollLayout->addWidget(generateRxChainWidget("ADRV9009 Receive Chain", controlsScrollWidget));
+		controlsScrollLayout->addWidget(generateTxChainWidget("ADRV9009 Transmit Chain", controlsScrollWidget));
+		controlsScrollLayout->addWidget(
+			generateObsRxChainWidget("ADRV9009 Observation RX", controlsScrollWidget));
+		controlsScrollLayout->addWidget(generateFpgaSettingsWidget("FPGA Settings", controlsScrollWidget));
 
 		controlsScrollLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
+
+		// Add MCS Sync button for multi-device mode (exact iio-osc behavior)
+		if(m_multiDeviceMode) {
+			m_tool->bottomContainer()->setVisible(true);
+
+			m_mcsButton = new QPushButton("MCS Sync", this);
+			Style::setStyle(m_mcsButton, style::properties::button::basicButton);
+			connect(m_mcsButton, &QPushButton::clicked, this, &Adrv9009::performMcsSync);
+			m_tool->addWidgetToBottomContainerHelper(m_mcsButton, TTA_LEFT);
+
+			qDebug(CAT_ADRV9009) << "MCS Sync button added for" << m_adrv9009DeviceMap.size() << "devices";
+
+			// Auto-sync after initialization (like iio-osc)
+			QTimer::singleShot(100, this, [this]() { performMcsSync(); });
+		}
 	} else {
-		qWarning(CAT_ADRV9009) << "ADRV9009 device not found in context";
+		qWarning(CAT_ADRV9009) << "No ADRV9009 devices found in context";
 		return;
 	}
 
 	m_tool->addWidgetToCentralContainerHelper(m_centralWidget);
 }
 
-QWidget *Adrv9009::generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent)
+void Adrv9009::detectAndStoreDevices()
+{
+	m_adrv9009DeviceMap.clear();
+
+	if(!m_ctx) {
+		qWarning(CAT_ADRV9009) << "No context provided";
+		return;
+	}
+
+	unsigned int deviceCount = iio_context_get_devices_count(m_ctx);
+
+	for(unsigned int i = 0; i < deviceCount; i++) {
+		iio_device *dev = iio_context_get_device(m_ctx, i);
+		const char *deviceName = iio_device_get_name(dev);
+
+		if(deviceName && QString(deviceName).startsWith("adrv9009-phy")) {
+			m_adrv9009DeviceMap[QString(deviceName)] = dev;
+			qDebug(CAT_ADRV9009) << "Found ADRV9009 device:" << deviceName;
+		}
+	}
+
+	m_multiDeviceMode = (m_adrv9009DeviceMap.size() > 1);
+	qDebug(CAT_ADRV9009) << "Total ADRV9009 devices found:" << m_adrv9009DeviceMap.size();
+	qDebug(CAT_ADRV9009) << "Multi-device mode:" << m_multiDeviceMode;
+}
+
+void Adrv9009::performMcsSync()
+{
+	// 1. Skip if single device (exact iio-osc check)
+	if(!m_multiDeviceMode) {
+		return;
+	}
+
+	qDebug(CAT_ADRV9009) << "Starting MCS sync for" << m_adrv9009DeviceMap.size() << "devices";
+
+	// 2. Try JESD204-FSM automatic sync (exact magic number from iio-osc!)
+	QStringList deviceNames = m_adrv9009DeviceMap.keys();
+	iio_device *firstDevice = m_adrv9009DeviceMap[deviceNames.first()];
+	int ret = iio_device_attr_write_longlong(firstDevice, "multichip_sync", 424242);
+	if(ret != -EINVAL) {
+		qDebug(CAT_ADRV9009) << "JESD204-FSM automatic sync successful";
+		Q_EMIT readRequested(); // Refresh all widgets
+		return;
+	}
+
+	qDebug(CAT_ADRV9009) << "JESD204-FSM not available, using manual sync";
+
+	// 3. Configure HMC7044 clock distributor (exact iio-osc logic)
+	iio_device *hmc7044_dev = iio_context_find_device(m_ctx, "hmc7044");
+	if(hmc7044_dev) {
+		unsigned int val;
+		int ret = iio_device_reg_read(hmc7044_dev, 0x5a, &val);
+		// Is continuous mode?
+		if(!ret && val == 7) {
+			iio_device_reg_write(hmc7044_dev, 0x5a, 0);
+			qDebug(CAT_ADRV9009) << "HMC7044 REG 0x5A set to level sensitive GPI SYSREF request";
+		}
+	}
+
+	// 4. Manual sync sequence for all devices (exact iio-osc sequence)
+	for(int i = 0; i <= 11; i++) {
+		for(const QString &deviceName : deviceNames) {
+			iio_device *device = m_adrv9009DeviceMap[deviceName];
+			iio_device_attr_write_longlong(device, "multichip_sync", i);
+		}
+	}
+
+	qDebug(CAT_ADRV9009) << "Manual MCS sync sequence completed";
+	Q_EMIT readRequested(); // Refresh all widgets
+}
+
+QWidget *Adrv9009::generateGlobalSettingsWidget(QString title, QWidget *parent)
+{
+	MenuSectionCollapseWidget *globalSection = new MenuSectionCollapseWidget(
+		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	if(!m_multiDeviceMode) {
+		// Single device mode - use first (and only) device
+		iio_device *device = m_adrv9009DeviceMap.first();
+		QWidget *content = createGlobalSettingsContentForDevice(device, globalSection);
+		globalSection->contentLayout()->addWidget(content);
+	} else {
+		// Multi-device mode - create tabs
+		QTabWidget *deviceTabs = new QTabWidget(globalSection);
+
+		QStringList deviceNames = m_adrv9009DeviceMap.keys();
+		for(int i = 0; i < deviceNames.size(); i++) {
+			QString deviceName = deviceNames[i];
+			iio_device *device = m_adrv9009DeviceMap[deviceName];
+
+			QWidget *deviceContent = createGlobalSettingsContentForDevice(device, deviceTabs);
+			deviceTabs->addTab(deviceContent, deviceName);
+		}
+
+		globalSection->contentLayout()->addWidget(deviceTabs);
+	}
+
+	return globalSection;
+}
+
+QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -177,9 +255,6 @@ QWidget *Adrv9009::generateGlobalSettingsWidget(iio_device *dev, QString title, 
 
 	QVBoxLayout *mainLayout = new QVBoxLayout(widget);
 	widget->setLayout(mainLayout);
-
-	// Title is now handled by the collapsible section header
-	// No need for individual section titles
 
 	if(dev == nullptr) {
 		qWarning(CAT_ADRV9009) << "No ADRV9009 device found";
@@ -240,7 +315,7 @@ QWidget *Adrv9009::generateGlobalSettingsWidget(iio_device *dev, QString title, 
 
 	layout->addWidget(trxLoWidget, 2, 0);
 
-	layout->addWidget(generateCalibrationWidget(widget), 2, 1);
+	layout->addWidget(generateCalibrationWidget(dev, widget), 2, 1);
 
 	mainLayout->addLayout(layout);
 
@@ -260,8 +335,9 @@ void Adrv9009::loadProfileFromFile(QString filePath)
 		QByteArray buffer = file.readAll();
 		file.close();
 
-		// Write profile to device
-		int ret = iio_device_attr_write_raw(m_iio_dev, "profile_config", buffer.constData(), buffer.size());
+		// Write profile to device (use first device)
+		iio_device *device = m_adrv9009DeviceMap.first();
+		int ret = iio_device_attr_write_raw(device, "profile_config", buffer.constData(), buffer.size());
 
 		if(ret < 0) {
 			qWarning(CAT_ADRV9009) << "Profile loading failed, error:" << ret;
@@ -275,7 +351,7 @@ void Adrv9009::loadProfileFromFile(QString filePath)
 	}
 }
 
-QWidget *Adrv9009::generateCalibrationWidget(QWidget *parent)
+QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent)
 {
 	QWidget *calibrationsWidget = new QWidget(parent);
 	Style::setBackgroundColor(calibrationsWidget, json::theme::background_primary);
@@ -315,7 +391,7 @@ QWidget *Adrv9009::generateCalibrationWidget(QWidget *parent)
 
 	connect(calibrateButton, &QPushButton::clicked, this, [=] {
 		// Trigger calibration
-		int ret = iio_device_attr_write_bool(m_iio_dev, "calibrate", true);
+		int ret = iio_device_attr_write_bool(device, "calibrate", true);
 		if(ret < 0) {
 			qWarning(CAT_ADRV9009) << "Calibration failed:" << ret;
 		} else {
@@ -329,7 +405,36 @@ QWidget *Adrv9009::generateCalibrationWidget(QWidget *parent)
 	return calibrationsWidget;
 }
 
-QWidget *Adrv9009::generateRxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *Adrv9009::generateRxChainWidget(QString title, QWidget *parent)
+{
+	MenuSectionCollapseWidget *rxSection = new MenuSectionCollapseWidget(
+		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	if(!m_multiDeviceMode) {
+		// Single device mode - use first (and only) device
+		iio_device *device = m_adrv9009DeviceMap.first();
+		QWidget *content = createRxChainContentForDevice(device, rxSection);
+		rxSection->contentLayout()->addWidget(content);
+	} else {
+		// Multi-device mode - create tabs
+		QTabWidget *deviceTabs = new QTabWidget(rxSection);
+
+		QStringList deviceNames = m_adrv9009DeviceMap.keys();
+		for(int i = 0; i < deviceNames.size(); i++) {
+			QString deviceName = deviceNames[i];
+			iio_device *device = m_adrv9009DeviceMap[deviceName];
+
+			QWidget *deviceContent = createRxChainContentForDevice(device, deviceTabs);
+			deviceTabs->addTab(deviceContent, deviceName);
+		}
+
+		rxSection->contentLayout()->addWidget(deviceTabs);
+	}
+
+	return rxSection;
+}
+
+QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -337,9 +442,6 @@ QWidget *Adrv9009::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	QVBoxLayout *mainLayout = new QVBoxLayout(widget);
 	widget->setLayout(mainLayout);
-
-	// Title is now handled by the collapsible section header
-	// No need for individual section titles
 
 	if(dev == nullptr) {
 		qWarning(CAT_ADRV9009) << "No ADRV9009 device found for RX chain";
@@ -390,7 +492,36 @@ QWidget *Adrv9009::generateRxChainWidget(iio_device *dev, QString title, QWidget
 	return widget;
 }
 
-QWidget *Adrv9009::generateTxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *Adrv9009::generateTxChainWidget(QString title, QWidget *parent)
+{
+	MenuSectionCollapseWidget *txSection = new MenuSectionCollapseWidget(
+		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	if(!m_multiDeviceMode) {
+		// Single device mode - use first (and only) device
+		iio_device *device = m_adrv9009DeviceMap.first();
+		QWidget *content = createTxChainContentForDevice(device, txSection);
+		txSection->contentLayout()->addWidget(content);
+	} else {
+		// Multi-device mode - create tabs
+		QTabWidget *deviceTabs = new QTabWidget(txSection);
+
+		QStringList deviceNames = m_adrv9009DeviceMap.keys();
+		for(int i = 0; i < deviceNames.size(); i++) {
+			QString deviceName = deviceNames[i];
+			iio_device *device = m_adrv9009DeviceMap[deviceName];
+
+			QWidget *deviceContent = createTxChainContentForDevice(device, deviceTabs);
+			deviceTabs->addTab(deviceContent, deviceName);
+		}
+
+		txSection->contentLayout()->addWidget(deviceTabs);
+	}
+
+	return txSection;
+}
+
+QWidget *Adrv9009::createTxChainContentForDevice(iio_device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -398,9 +529,6 @@ QWidget *Adrv9009::generateTxChainWidget(iio_device *dev, QString title, QWidget
 
 	QVBoxLayout *mainLayout = new QVBoxLayout(widget);
 	widget->setLayout(mainLayout);
-
-	// Title is now handled by the collapsible section header
-	// No need for individual section titles
 
 	if(dev == nullptr) {
 		qWarning(CAT_ADRV9009) << "No ADRV9009 device found for TX chain";
@@ -450,7 +578,36 @@ QWidget *Adrv9009::generateTxChainWidget(iio_device *dev, QString title, QWidget
 	return widget;
 }
 
-QWidget *Adrv9009::generateObsRxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *Adrv9009::generateObsRxChainWidget(QString title, QWidget *parent)
+{
+	MenuSectionCollapseWidget *obsSection = new MenuSectionCollapseWidget(
+		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	if(!m_multiDeviceMode) {
+		// Single device mode - use first (and only) device
+		iio_device *device = m_adrv9009DeviceMap.first();
+		QWidget *content = createObsRxChainContentForDevice(device, obsSection);
+		obsSection->contentLayout()->addWidget(content);
+	} else {
+		// Multi-device mode - create tabs
+		QTabWidget *deviceTabs = new QTabWidget(obsSection);
+
+		QStringList deviceNames = m_adrv9009DeviceMap.keys();
+		for(int i = 0; i < deviceNames.size(); i++) {
+			QString deviceName = deviceNames[i];
+			iio_device *device = m_adrv9009DeviceMap[deviceName];
+
+			QWidget *deviceContent = createObsRxChainContentForDevice(device, deviceTabs);
+			deviceTabs->addTab(deviceContent, deviceName);
+		}
+
+		obsSection->contentLayout()->addWidget(deviceTabs);
+	}
+
+	return obsSection;
+}
+
+QWidget *Adrv9009::createObsRxChainContentForDevice(iio_device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -458,9 +615,6 @@ QWidget *Adrv9009::generateObsRxChainWidget(iio_device *dev, QString title, QWid
 
 	QVBoxLayout *mainLayout = new QVBoxLayout(widget);
 	widget->setLayout(mainLayout);
-
-	// Title is now handled by the collapsible section header
-	// No need for individual section titles
 
 	if(dev == nullptr) {
 		qWarning(CAT_ADRV9009) << "No ADRV9009 device found for OBS RX chain";
@@ -522,7 +676,36 @@ QWidget *Adrv9009::generateObsRxChainWidget(iio_device *dev, QString title, QWid
 	return widget;
 }
 
-QWidget *Adrv9009::generateFpgaSettingsWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *Adrv9009::generateFpgaSettingsWidget(QString title, QWidget *parent)
+{
+	MenuSectionCollapseWidget *fpgaSection = new MenuSectionCollapseWidget(
+		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	if(!m_multiDeviceMode) {
+		// Single device mode - use first (and only) device
+		iio_device *device = m_adrv9009DeviceMap.first();
+		QWidget *content = createFpgaSettingsContentForDevice(device, fpgaSection);
+		fpgaSection->contentLayout()->addWidget(content);
+	} else {
+		// Multi-device mode - create tabs
+		QTabWidget *deviceTabs = new QTabWidget(fpgaSection);
+
+		QStringList deviceNames = m_adrv9009DeviceMap.keys();
+		for(int i = 0; i < deviceNames.size(); i++) {
+			QString deviceName = deviceNames[i];
+			iio_device *device = m_adrv9009DeviceMap[deviceName];
+
+			QWidget *deviceContent = createFpgaSettingsContentForDevice(device, deviceTabs);
+			deviceTabs->addTab(deviceContent, deviceName);
+		}
+
+		fpgaSection->contentLayout()->addWidget(deviceTabs);
+	}
+
+	return fpgaSection;
+}
+
+QWidget *Adrv9009::createFpgaSettingsContentForDevice(iio_device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -531,11 +714,10 @@ QWidget *Adrv9009::generateFpgaSettingsWidget(iio_device *dev, QString title, QW
 	QVBoxLayout *mainLayout = new QVBoxLayout(widget);
 	widget->setLayout(mainLayout);
 
-	// Title is now handled by the collapsible section header
-	// No need for individual section titles
-
-	if(dev == nullptr) {
-		qWarning(CAT_ADRV9009) << "No FPGA device found for FPGA settings";
+	// Find FPGA device corresponding to this ADRV9009 device
+	iio_device *fpga_dev = iio_context_find_device(m_ctx, "axi-adrv9009-rx-hpc");
+	if(fpga_dev == nullptr) {
+		qWarning(CAT_ADRV9009) << "FPGA device (axi-adrv9009-rx-hpc) not found in context";
 		return widget;
 	}
 
@@ -695,7 +877,7 @@ QWidget *Adrv9009::createObsChannelWidget(iio_device *dev, QString title, int ch
 	QFormLayout *formLayout = new QFormLayout();
 
 	// Hardware Gain(dB)
-	IIOWidget *gainWidget = createRangeWidget(obsChannel, "hardwaregain", "[0.0 1 30.0]", "Hardware Gain(dB)");
+	IIOWidget *gainWidget = createRangeWidget(obsChannel, "hardwaregain", "[0 1 30]", "Hardware Gain(dB)");
 	formLayout->addRow("Hardware Gain(dB):", gainWidget);
 
 	// Tracking: Quadrature checkbox only
@@ -816,7 +998,6 @@ scopy::IIOWidget *Adrv9009::createComboWidget(iio_channel *ch, const QString &at
 					      const QString &title)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
 				    .channel(ch)
 				    .attribute(attr)
 				    .optionsAttribute(availableAttr)
@@ -834,7 +1015,6 @@ scopy::IIOWidget *Adrv9009::createRangeWidget(iio_channel *ch, const QString &at
 					      const QString &title)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
 				    .channel(ch)
 				    .attribute(attr)
 				    .optionsValues(range)
@@ -851,7 +1031,6 @@ scopy::IIOWidget *Adrv9009::createRangeWidget(iio_channel *ch, const QString &at
 scopy::IIOWidget *Adrv9009::createCheckboxWidget(iio_channel *ch, const QString &attr, const QString &label)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
 				    .channel(ch)
 				    .attribute(attr)
 				    .title(label)
@@ -869,7 +1048,6 @@ scopy::IIOWidget *Adrv9009::createReadOnlyWidget(iio_channel *ch, const QString 
 						 bool compactMode)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
 				    .channel(ch)
 				    .attribute(attr)
 				    .title(title)
