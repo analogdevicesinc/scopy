@@ -55,7 +55,9 @@ public:
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
 	void setNavg(int navg);
-	void setSsbWidth(uint8_t ssb_width);
+	void setSsbWidth(uint8_t ssb_width);  // Deprecated
+	void setGenalyzerConfig(const GenalyzerConfig& config);
+	GenalyzerConfig getGenalyzerConfig() const;
 	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
@@ -89,7 +91,9 @@ public:
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
 	void setNavg(int navg);
-	void setSsbWidth(uint8_t ssb_width);
+	void setSsbWidth(uint8_t ssb_width);  // Deprecated
+	void setGenalyzerConfig(const GenalyzerConfig& config);
+	GenalyzerConfig getGenalyzerConfig() const;
 	gn_analysis_results *getGnAnalysis();
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);

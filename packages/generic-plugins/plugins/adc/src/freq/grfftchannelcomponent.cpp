@@ -33,6 +33,7 @@
 #include <freq/fftplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <QSpinBox>
+#include <QVariantMap>
 #include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_GRFFTChannelComponent, "GRFFTChannelComponent");
@@ -531,4 +532,53 @@ void GRFFTChannelComponent::setSsbWidth(uint8_t ssb_width)
 	if(m_complex) {
 		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSsbWidth(ssb_width);
 	}
+}
+
+void GRFFTChannelComponent::setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config)
+{
+	if(m_complex) {
+		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setGenalyzerConfig(config);
+	}
+}
+
+void GRFFTChannelComponent::setGenalyzerConfig(const QVariantMap& configMap)
+{
+	// Convert QVariantMap to GenalyzerConfig
+	scopy::grutil::GenalyzerConfig config;
+
+	// Set mode
+	if (configMap.contains("mode")) {
+		config.mode = static_cast<scopy::grutil::GenalyzerMode>(configMap["mode"].toInt());
+	}
+
+	// Set auto mode parameters
+	if (configMap.contains("auto_ssb_width")) {
+		config.auto_ssb_width = configMap["auto_ssb_width"].toUInt();
+	}
+
+	// Set fixed tone parameters
+	if (configMap.contains("expected_freq")) {
+		config.fixed_tone.expected_freq = configMap["expected_freq"].toDouble();
+	}
+	if (configMap.contains("harmonic_order")) {
+		config.fixed_tone.harmonic_order = configMap["harmonic_order"].toInt();
+	}
+	if (configMap.contains("ssb_fundamental")) {
+		config.fixed_tone.ssb_fundamental = configMap["ssb_fundamental"].toInt();
+	}
+	if (configMap.contains("ssb_harmonics")) {
+		config.fixed_tone.ssb_harmonics = configMap["ssb_harmonics"].toInt();
+	}
+	if (configMap.contains("ssb_default")) {
+		config.fixed_tone.ssb_default = configMap["ssb_default"].toInt();
+	}
+	if (configMap.contains("coherent_sampling")) {
+		config.fixed_tone.coherent_sampling = configMap["coherent_sampling"].toBool();
+	}
+	if (configMap.contains("component_label")) {
+		config.fixed_tone.component_label = configMap["component_label"].toString().toStdString();
+	}
+
+	// Call the original function with the converted config
+	setGenalyzerConfig(config);
 }

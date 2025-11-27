@@ -79,6 +79,21 @@ void GRFFTFloatProc::setSsbWidth(uint8_t ssb_width)
 	}
 }
 
+void GRFFTFloatProc::setGenalyzerConfig(const GenalyzerConfig& config)
+{
+	if(genalyzer_fft) {
+		genalyzer_fft->set_config(config);
+	}
+}
+
+GenalyzerConfig GRFFTFloatProc::getGenalyzerConfig() const
+{
+	if(genalyzer_fft) {
+		return genalyzer_fft->get_config();
+	}
+	return GenalyzerConfig();
+}
+
 gn_analysis_results *GRFFTFloatProc::getGnAnalysis()
 {
 	if(genalyzer_fft) {
@@ -202,6 +217,23 @@ void GRFFTComplexProc::setSsbWidth(uint8_t ssb_width)
 	if(genalyzer_fft) {
 		genalyzer_fft->set_ssb_width(ssb_width);
 	}
+}
+
+void GRFFTComplexProc::setGenalyzerConfig(const GenalyzerConfig& config)
+{
+	if(genalyzer_fft) {
+		genalyzer_fft->set_config(config);
+		// Update local ssb_width for backward compatibility
+		m_ssb_width = config.auto_ssb_width;
+	}
+}
+
+GenalyzerConfig GRFFTComplexProc::getGenalyzerConfig() const
+{
+	if(genalyzer_fft) {
+		return genalyzer_fft->get_config();
+	}
+	return GenalyzerConfig();
 }
 
 gn_analysis_results *GRFFTComplexProc::getGnAnalysis()

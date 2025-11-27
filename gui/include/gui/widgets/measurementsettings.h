@@ -30,6 +30,9 @@
 #include <QWidget>
 #include <menuonoffswitch.h>
 #include <QSpinBox>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QCheckBox>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT MeasurementSettings : public QWidget
@@ -48,7 +51,12 @@ public:
 	bool statsEnabled();
 	bool markerEnabled();
 	bool genalyzerEnabled();
-	uint8_t ssbWidth() const;
+	uint8_t ssbWidth() const;  // Deprecated
+
+	// Get complete genalyzer configuration as variant map
+	QVariantMap getGenalyzerConfig() const;
+	// Set configuration from external source
+	void setGenalyzerConfig(const QVariantMap& config);
 
 	MenuSectionWidget *getMarkerSection() const;
 
@@ -67,7 +75,12 @@ Q_SIGNALS:
 	void enableStatsPanel(bool b);
 	void enableMarkerPanel(bool b);
 	void enableGenalyzerPanel(bool b);
-	void ssbWidthChanged(uint8_t value);
+	void ssbWidthChanged(uint8_t value);  // Deprecated
+	void genalyzerConfigChanged(const QVariantMap& config);
+
+private Q_SLOTS:
+	void onGenalyzerUIChanged();
+	void updateUIFromConfig();
 
 private:
 	MenuOnOffSwitch *measurePanelSwitch;
@@ -75,6 +88,25 @@ private:
 	MenuOnOffSwitch *markerPanelSwitch;
 	MenuOnOffSwitch *genalyzerPanelSwitch;
 	QSpinBox *ssbWidthSpinbox;
+
+	// Fixed tone UI controls
+	QComboBox *modeCombo;
+	QLineEdit *expectedFreqEdit;
+	QSpinBox *harmonicOrderSpinbox;
+	QSpinBox *ssbFundamentalSpinbox;
+	QSpinBox *ssbHarmonicsSpinbox;
+	QSpinBox *ssbDefaultSpinbox;
+	QCheckBox *coherentSamplingCheckbox;
+
+	// Store configuration values individually to avoid circular dependency
+	int m_mode;  // 0 = AUTO, 1 = FIXED_TONE
+	uint8_t m_auto_ssb_width;
+	double m_expected_freq;
+	int m_harmonic_order;
+	int m_ssb_fundamental;
+	int m_ssb_harmonics;
+	int m_ssb_default;
+	bool m_coherent_sampling;
 
 	MenuSectionWidget *markerSection;
 	MenuSectionWidget *statsSection;

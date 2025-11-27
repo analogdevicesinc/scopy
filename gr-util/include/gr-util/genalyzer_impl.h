@@ -50,7 +50,9 @@ private:
 	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
 	size_t d_allocated_frames;    // Number of frame buffers actually allocated
 	bool d_do_shift;              // Whether to apply FFT shift
-	uint8_t d_ssb_width;          // SSB width for genalyzer analysis
+	uint8_t d_ssb_width;          // SSB width for genalyzer analysis (deprecated)
+	GenalyzerConfig d_genalyzer_config;     // Complete genalyzer configuration
+	char* d_fa_key = nullptr;     // Fourier analysis configuration key
 
 	gn_analysis_results *d_analysis;
 
@@ -74,6 +76,11 @@ private:
 					   double *shifted_output, double *db_output, float *out_vec);
 	void perform_genalyzer_analysis();
 
+	// Fixed tone analysis functions
+	int configure_fixed_tone_analysis();
+	void perform_fixed_tone_analysis();
+	void cleanup_fa_config();
+
 public:
 	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);
 	~genalyzer_fft_vii_impl();
@@ -83,8 +90,10 @@ public:
 	void set_window(GnWindow win) override;
 	int window() const override;
 	int navg() const override;
-	void set_ssb_width(uint8_t ssb_width) override;
-	uint8_t ssb_width() const override;
+	void set_ssb_width(uint8_t ssb_width) override;  // Deprecated
+	uint8_t ssb_width() const override;               // Deprecated
+	void set_config(const GenalyzerConfig& config) override;
+	GenalyzerConfig get_config() const override;
 
 	bool start() override;
 	bool stop() override;
