@@ -62,9 +62,7 @@ private:
 	QLineEdit *m_expectedFreqEdit;
 	QSpinBox *m_harmonicOrderSpinbox;
 	QSpinBox *m_ssbFundamentalSpinbox;
-	QSpinBox *m_ssbHarmonicsSpinbox;
 	QSpinBox *m_ssbDefaultSpinbox;
-	QCheckBox *m_coherentSamplingCheckbox;
 
 	grutil::GenalyzerConfig m_config;
 };

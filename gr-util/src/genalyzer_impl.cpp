@@ -62,8 +62,6 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_config(nullptr)
 	, d_analysis(new gn_analysis_results)
 {
-	// Initialize config with default ssb_width
-	d_genalyzer_config.auto_params.ssb_width = 120;
 	allocate_buffers();
 }
 
@@ -131,7 +129,7 @@ void genalyzer_fft_vii_impl::cleanup_buffers()
 	}
 
 	cleanup_frame_buffers();
-	cleanup_fa_config(); // Clean up fixed tone analysis configuration
+	cleanup_fa_config();
 	cleanup_auto_config();
 }
 
@@ -186,14 +184,12 @@ uint8_t genalyzer_fft_vii_impl::ssb_width() const { return d_genalyzer_config.au
 
 void genalyzer_fft_vii_impl::set_config(const GenalyzerConfig &config)
 {
-	// Always clean up previous FA config when configuration changes
-	// This ensures the FA config is recreated with new parameters
+	std::lock_guard<std::mutex> lock(s_genalyzer_mutex);
+
 	cleanup_fa_config();
+	cleanup_auto_config();
 
 	d_genalyzer_config = config;
-
-	// Don't configure immediately - let it be configured on first use in perform_genalyzer_analysis()
-	// This avoids unnecessary configuration if analysis is not performed
 }
 
 GenalyzerConfig genalyzer_fft_vii_impl::get_config() const { return d_genalyzer_config; }
@@ -305,8 +301,6 @@ int genalyzer_fft_vii_impl::perform_fft_and_convert_to_db(size_t frames_to_proce
 void genalyzer_fft_vii_impl::cleanup_fa_config()
 {
 	if(d_fa_key) {
-		// Note: genalyzer doesn't provide a destroy function for FA configs
-		// They are managed internally, so we just clear our key
 		gn_fa_reset(d_fa_key);
 		free(d_fa_key);
 		d_fa_key = nullptr;
@@ -338,7 +332,7 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 
 	// Define fixed tone (fundamental)
 	err_code = gn_fa_fixed_tone(d_fa_key, ft.component_label.c_str(), GnFACompTagSignal, ft.expected_freq,
-				    ft.coherent_sampling ? 0 : ft.ssb_fundamental);
+				    ft.ssb_fundamental);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_fixed_tone failed: " + std::to_string(err_code));
 		return err_code;
@@ -359,21 +353,20 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 		GR_LOG_ERROR(d_logger, "gn_fa_ssb Default failed: " + std::to_string(err_code));
 		return err_code;
 	}
-
-	if(ft.ssb_dc >= 0) {
-		err_code = gn_fa_ssb(d_fa_key, GnFASsbDC, ft.ssb_dc);
-		if(err_code != 0) {
-			GR_LOG_ERROR(d_logger, "gn_fa_ssb DC failed: " + std::to_string(err_code));
-			return err_code;
-		}
+	err_code = gn_fa_ssb(d_fa_key, GnFASsbDC, -1);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_ssb DC failed: " + std::to_string(err_code));
+		return err_code;
 	}
-
-	if(ft.ssb_wo >= 0) {
-		err_code = gn_fa_ssb(d_fa_key, GnFASsbWO, ft.ssb_wo);
-		if(err_code != 0) {
-			GR_LOG_ERROR(d_logger, "gn_fa_ssb WO failed: " + std::to_string(err_code));
-			return err_code;
-		}
+	err_code = gn_fa_ssb(d_fa_key, GnFASsbSignal, -1);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_ssb Signal failed: " + std::to_string(err_code));
+		return err_code;
+	}
+	err_code = gn_fa_ssb(d_fa_key, GnFASsbWO, -1);
+	if(err_code != 0) {
+		GR_LOG_ERROR(d_logger, "gn_fa_ssb WO failed: " + std::to_string(err_code));
+		return err_code;
 	}
 
 	// Set frequency parameters
@@ -395,21 +388,11 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 		return err_code;
 	}
 
-	err_code = gn_fa_conv_offset(d_fa_key, ft.conv_offset);
+	err_code = gn_fa_conv_offset(d_fa_key, 0.0 != ft.fshift);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_conv_offset failed: " + std::to_string(err_code));
 		return err_code;
 	}
-
-	// Debug: Print FA configuration preview (commented out for production)
-	// size_t fa_preview_size = 0;
-	// int result = 0;
-	// char *fa_preview = NULL;
-	// result += gn_fa_preview_size(&fa_preview_size, d_fa_key, true);
-	// fa_preview = (char *)malloc(fa_preview_size);
-	// result += gn_fa_preview(fa_preview, fa_preview_size, d_fa_key, true);
-	// printf("%s\n", fa_preview);
-	// free(fa_preview);
 
 	return 0;
 }
@@ -427,14 +410,7 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 		}
 	}
 
-	if(!d_do_shift || !d_fa_key) {
-		clear_analysis_results();
-		return;
-	}
-
 	size_t results_size = 0;
-	char **rkeys = nullptr;
-	double *rvalues = nullptr;
 
 	// Get results size first
 	int err_code = gn_fft_analysis_results_size(&results_size, d_fa_key, 2 * d_nfft, d_nfft);
@@ -444,21 +420,19 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 		return;
 	}
 
-	// Allocate memory for results
-	rkeys = (char **)malloc(results_size * sizeof(char *));
-	rvalues = (double *)malloc(results_size * sizeof(double));
-
 	// Get key sizes
 	size_t *rkey_sizes = (size_t *)malloc(results_size * sizeof(size_t));
 	err_code = gn_fft_analysis_results_key_sizes(rkey_sizes, results_size, d_fa_key, 2 * d_nfft, d_nfft);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft_analysis_results_key_sizes failed: " + std::to_string(err_code));
-		free(rkeys);
-		free(rvalues);
 		free(rkey_sizes);
 		clear_analysis_results();
 		return;
 	}
+
+	// Allocate memory for results
+	char **rkeys = (char **)malloc(results_size * sizeof(char *));
+	double *rvalues = (double *)malloc(results_size * sizeof(double));
 
 	// Allocate memory for each key
 	for(size_t i = 0; i < results_size; ++i) {
@@ -467,13 +441,12 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 	free(rkey_sizes);
 
 	// Execute analysis
-	// Use DC on left for unshifted FFT output
 	err_code = gn_fft_analysis(rkeys, results_size, rvalues, results_size, d_fa_key, d_fft_out, 2 * d_nfft, d_nfft,
-				   GnFreqAxisTypeDcLeft);
+				   GnFreqAxisTypeDcLeft); // data is unshifter so we use left DC
 
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft_analysis failed: " + std::to_string(err_code));
-		free_analysis_keys(rkeys, results_size);
+		free(rkeys);
 		free(rvalues);
 		clear_analysis_results();
 	} else {
@@ -510,12 +483,6 @@ void genalyzer_fft_vii_impl::perform_auto_analysis()
 
 void genalyzer_fft_vii_impl::perform_genalyzer_analysis()
 {
-	if(!d_do_shift) {
-		// Only perform analysis for complex mode
-		clear_analysis_results();
-		return;
-	}
-
 	if(d_genalyzer_config.isFixedToneMode()) {
 		perform_fixed_tone_analysis();
 	} else {
@@ -566,9 +533,10 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 			}
 		}
 
-		// Perform genalyzer analysis (only for complex mode)
-		perform_genalyzer_analysis();
-
+		if(d_genalyzer_config.enabled) {
+			// unshifted raw fft data from gn_fft32() is used in analysis (d_fft_out)
+			perform_genalyzer_analysis();
+		}
 		free(shifted_output);
 		free(db_output);
 	}
