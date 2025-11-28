@@ -62,8 +62,6 @@ genalyzer_fft_vii_impl::genalyzer_fft_vii_impl(int npts, int qres, int navg, int
 	, d_config(nullptr)
 	, d_analysis(new gn_analysis_results)
 {
-	// Initialize config with default ssb_width
-	d_genalyzer_config.auto_params.ssb_width = 120;
 	allocate_buffers();
 }
 
@@ -510,12 +508,6 @@ void genalyzer_fft_vii_impl::perform_auto_analysis()
 
 void genalyzer_fft_vii_impl::perform_genalyzer_analysis()
 {
-	if(!d_do_shift) {
-		// Only perform analysis for complex mode
-		clear_analysis_results();
-		return;
-	}
-
 	if(d_genalyzer_config.isFixedToneMode()) {
 		perform_fixed_tone_analysis();
 	} else {
@@ -566,9 +558,9 @@ int genalyzer_fft_vii_impl::work(int noutput_items, gr_vector_const_void_star &i
 			}
 		}
 
-		// Perform genalyzer analysis (only for complex mode)
-		perform_genalyzer_analysis();
-
+		if(d_genalyzer_config.enabled) {
+			perform_genalyzer_analysis();
+		}
 		free(shifted_output);
 		free(db_output);
 	}

@@ -37,6 +37,8 @@ enum class GenalyzerMode {
 };
 
 struct SCOPY_GR_UTIL_EXPORT GenalyzerConfig {
+	bool enabled = 0;
+
 	// Common parameters
 	GenalyzerMode mode = GenalyzerMode::AUTO;
 
