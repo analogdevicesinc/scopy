@@ -129,6 +129,9 @@ deploy_app(){
 	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
 
+	cp -vr  $STAGING_DIR/share/qt5/plugins/renderers $DEST_FOLDER/
+	cp -vr  $STAGING_DIR/share/qt5/plugins/sceneparsers $DEST_FOLDER/
+
 	pushd $STAGING_DIR/bin
 	source $SRC_FOLDER/ci/windows/mingw_dll_deps
 	cp -vn "${DLL_DEPS[@]}" $DEST_FOLDER/
