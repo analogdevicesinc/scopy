@@ -82,6 +82,7 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, M
 		SLOT(enableMarkerPanel(bool)));
 	connect(m_measureSettings, SIGNAL(enableGenalyzerPanel(bool)), dynamic_cast<QObject *>(p),
 		SLOT(enableGenalyzerPanel(bool)));
+	connect(m_measureSettings, SIGNAL(enableGenalyzerPanel(bool)), m_genalyzerSettings, SLOT(enableAnalysis(bool)));
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 }
