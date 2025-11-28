@@ -32,6 +32,7 @@
 #include <animatedrefreshbtn.h>
 #include <gui/widgets/menuspinbox.h>
 #include <gui/widgets/menusectionwidget.h>
+#include "adrv9009widgetfactory.h"
 
 namespace scopy::adrv9009 {
 
@@ -88,15 +89,6 @@ private:
 
 	// FPGA phase rotation channel helper
 	QWidget *createFpgaRxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent);
-
-	// Widget Creation Helpers
-	IIOWidget *createComboWidget(iio_channel *ch, const QString &attr, const QString &availableAttr,
-				     const QString &title);
-	IIOWidget *createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title);
-	IIOWidget *createCheckboxWidget(iio_channel *ch, const QString &attr, const QString &label);
-
-	IIOWidget *createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title,
-					bool compactMode = true);
 
 	// FPGA Widget Creation Helpers (for different device)
 	IIOWidget *createFpgaRangeWidget(iio_device *dev, iio_channel *ch, const QString &attr, const QString &range,
