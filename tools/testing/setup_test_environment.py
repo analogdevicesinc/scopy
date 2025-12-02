@@ -59,15 +59,26 @@ def main():
 
     # Validate component names
     if args.component:
+        valid_components = []
+        
+        # Check plugins directory
         plugins_dir = os.path.join(scopy_root, 'docs', 'tests', 'plugins')
         if os.path.exists(plugins_dir):
-            valid_components = [d for d in os.listdir(plugins_dir)
-                              if os.path.isdir(os.path.join(plugins_dir, d))]
+            valid_components.extend([d for d in os.listdir(plugins_dir)
+                                    if os.path.isdir(os.path.join(plugins_dir, d))])
+        
+        # Check general directory
+        general_dir = os.path.join(scopy_root, 'docs', 'tests', 'general')
+        if os.path.exists(general_dir):
+            general_components = [d for d in os.listdir(general_dir)
+                                 if os.path.isdir(os.path.join(general_dir, d))]
+            valid_components.extend(general_components)
+            valid_components.append('general')  # 'general' itself is also valid
 
-            for component in args.component:
-                if component not in valid_components:
-                    print(f"Error: Component '{component}' not found.")
-                    sys.exit(1)
+        for component in args.component:
+            if component not in valid_components:
+                print(f"Error: Component '{component}' not found.")
+                sys.exit(1)
 
     # Continue with paths
     source_dir = os.path.join(scopy_root, 'docs', 'tests')
@@ -83,13 +94,19 @@ def main():
     if not os.path.exists(testing_results_base):
         os.makedirs(testing_results_base)
 
+    # Check for existing directory and CSV file
+    csv_path = os.path.join(testing_results_base, f'testing_results_{args.version}.csv')
+    
     # Create destination directory
     if os.path.exists(dest_dir):
-        response = input(f"Directory {dest_dir} exists. Overwrite? (y/N): ")
+        response = input(f"Directory {dest_dir} exists. This will also override the CSV file. Overwrite? (y/N): ")
         if response.lower() != 'y':
             print("Aborted.")
             sys.exit(1)
         shutil.rmtree(dest_dir)
+        # Also remove CSV file if it exists
+        if os.path.exists(csv_path):
+            os.remove(csv_path)
 
     os.makedirs(dest_dir)
 
@@ -144,7 +161,7 @@ def main():
         parse_script = os.path.join(script_dir, 'parseTestResults.py')
 
         result = subprocess.run([
-            'python3', parse_script, args.version
+            'python3', parse_script, args.version, '--force'
         ], capture_output=True, text=True, check=True)
 
         print("✓ CSV template generated successfully")

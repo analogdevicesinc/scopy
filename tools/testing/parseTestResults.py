@@ -183,11 +183,11 @@ def validate_and_fill_missing_data(test_data):
 
 
 
-def generate_csv(test_data, csv_path):
+def generate_csv(test_data, csv_path, force=False):
     """Generate CSV file with test data template."""
 
-    # Check if file exists and prompt user
-    if os.path.exists(csv_path):
+    # Check if file exists and prompt user (unless force is True)
+    if os.path.exists(csv_path) and not force:
         response = input(f"File {csv_path} exists. Overwrite? (y/N): ")
         if response.lower() != 'y':
             print("Aborted.")
@@ -225,6 +225,7 @@ def main():
     )
     parser.add_argument('version', help='Version to process (e.g., v3.0.0)')
     parser.add_argument('--output', help='Custom output CSV file path')
+    parser.add_argument('--force', action='store_true', help='Force overwrite without prompting')
 
     args = parser.parse_args()
 
@@ -253,7 +254,7 @@ def main():
         sys.exit(1)
 
     # Generate CSV report
-    success = generate_csv(test_data, csv_path)
+    success = generate_csv(test_data, csv_path, args.force)
 
     if not success:
         sys.exit(1)
