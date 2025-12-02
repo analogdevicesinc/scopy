@@ -94,7 +94,7 @@ void GenalyzerSettings::setupUI()
 	Style::setStyle(freqLabel, style::properties::label::subtle);
 
 	m_expectedFreqEdit = new QLineEdit(freqContainer);
-	m_expectedFreqEdit->setValidator(new QDoubleValidator(0, 1e12, 6, this));
+	m_expectedFreqEdit->setValidator(new QDoubleValidator(-1000000000, 1000000000, 0, this));
 
 	freqLayout->addWidget(freqLabel);
 	freqLayout->addWidget(m_expectedFreqEdit);
@@ -130,21 +130,6 @@ void GenalyzerSettings::setupUI()
 	ssbFundLayout->addWidget(m_ssbFundamentalSpinbox);
 	ftLayout->addWidget(ssbFundContainer);
 
-	// SSB Harmonics
-	QWidget *ssbHarmContainer = new QWidget(m_fixedToneContainer);
-	QHBoxLayout *ssbHarmLayout = new QHBoxLayout(ssbHarmContainer);
-	ssbHarmLayout->setContentsMargins(0, 0, 0, 0);
-
-	QLabel *ssbHarmLabel = new QLabel("SSB Harmonics:", ssbHarmContainer);
-	Style::setStyle(ssbHarmLabel, style::properties::label::subtle);
-
-	m_ssbHarmonicsSpinbox = new QSpinBox(ssbHarmContainer);
-	m_ssbHarmonicsSpinbox->setRange(0, 50);
-
-	ssbHarmLayout->addWidget(ssbHarmLabel);
-	ssbHarmLayout->addWidget(m_ssbHarmonicsSpinbox);
-	ftLayout->addWidget(ssbHarmContainer);
-
 	// SSB Default
 	QWidget *ssbDefContainer = new QWidget(m_fixedToneContainer);
 	QHBoxLayout *ssbDefLayout = new QHBoxLayout(ssbDefContainer);
@@ -159,11 +144,6 @@ void GenalyzerSettings::setupUI()
 	ssbDefLayout->addWidget(ssbDefLabel);
 	ssbDefLayout->addWidget(m_ssbDefaultSpinbox);
 	ftLayout->addWidget(ssbDefContainer);
-
-	// Coherent sampling checkbox
-	m_coherentSamplingCheckbox = new QCheckBox("Coherent Sampling", m_fixedToneContainer);
-	ftLayout->addWidget(m_coherentSamplingCheckbox);
-
 	mainLayout->addWidget(m_fixedToneContainer);
 
 	// Connect mode change to show/hide appropriate controls
@@ -181,11 +161,8 @@ void GenalyzerSettings::setupUI()
 		&GenalyzerSettings::onUIChanged);
 	connect(m_ssbFundamentalSpinbox, QOverload<int>::of(&QSpinBox::valueChanged), this,
 		&GenalyzerSettings::onUIChanged);
-	connect(m_ssbHarmonicsSpinbox, QOverload<int>::of(&QSpinBox::valueChanged), this,
-		&GenalyzerSettings::onUIChanged);
 	connect(m_ssbDefaultSpinbox, QOverload<int>::of(&QSpinBox::valueChanged), this,
 		&GenalyzerSettings::onUIChanged);
-	connect(m_coherentSamplingCheckbox, &QCheckBox::toggled, this, &GenalyzerSettings::onUIChanged);
 
 	// Initialize visibility
 	m_fixedToneContainer->setVisible(false);
@@ -216,9 +193,7 @@ void GenalyzerSettings::onUIChanged()
 		m_config.fixed_tone.expected_freq = m_expectedFreqEdit->text().toDouble();
 		m_config.fixed_tone.harmonic_order = m_harmonicOrderSpinbox->value();
 		m_config.fixed_tone.ssb_fundamental = m_ssbFundamentalSpinbox->value();
-		m_config.fixed_tone.ssb_harmonics = m_ssbHarmonicsSpinbox->value();
 		m_config.fixed_tone.ssb_default = m_ssbDefaultSpinbox->value();
-		m_config.fixed_tone.coherent_sampling = m_coherentSamplingCheckbox->isChecked();
 	}
 
 	Q_EMIT configChanged(m_config);
@@ -231,18 +206,14 @@ void GenalyzerSettings::updateUIFromConfig()
 	m_expectedFreqEdit->blockSignals(true);
 	m_harmonicOrderSpinbox->blockSignals(true);
 	m_ssbFundamentalSpinbox->blockSignals(true);
-	m_ssbHarmonicsSpinbox->blockSignals(true);
 	m_ssbDefaultSpinbox->blockSignals(true);
-	m_coherentSamplingCheckbox->blockSignals(true);
 
 	m_modeCombo->setCurrentIndex(m_modeCombo->findData(static_cast<int>(m_config.mode)));
 	m_ssbWidthSpinbox->setValue(m_config.auto_params.ssb_width);
 	m_expectedFreqEdit->setText(QString::number(m_config.fixed_tone.expected_freq));
 	m_harmonicOrderSpinbox->setValue(m_config.fixed_tone.harmonic_order);
 	m_ssbFundamentalSpinbox->setValue(m_config.fixed_tone.ssb_fundamental);
-	m_ssbHarmonicsSpinbox->setValue(m_config.fixed_tone.ssb_harmonics);
 	m_ssbDefaultSpinbox->setValue(m_config.fixed_tone.ssb_default);
-	m_coherentSamplingCheckbox->setChecked(m_config.fixed_tone.coherent_sampling);
 
 	bool isFixedTone = (m_config.mode == GenalyzerMode::FIXED_TONE);
 	m_fixedToneContainer->setVisible(isFixedTone);
@@ -253,7 +224,5 @@ void GenalyzerSettings::updateUIFromConfig()
 	m_expectedFreqEdit->blockSignals(false);
 	m_harmonicOrderSpinbox->blockSignals(false);
 	m_ssbFundamentalSpinbox->blockSignals(false);
-	m_ssbHarmonicsSpinbox->blockSignals(false);
 	m_ssbDefaultSpinbox->blockSignals(false);
-	m_coherentSamplingCheckbox->blockSignals(false);
 }
