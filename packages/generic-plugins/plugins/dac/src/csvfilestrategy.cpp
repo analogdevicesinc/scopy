@@ -120,7 +120,7 @@ short CSVFileStrategy::convert(double value)
 	double offset = 0.0;
 	double full_scale = DacUtils::dbFullScaleConvert(m_recipe.scale, false);
 	if(!m_recipe.scaled) {
-		scale = 16.0;
+		scale = 1.0;
 	}
 	if(scale == 0.0) {
 		scale = 32767.0 * full_scale / m_max;
