@@ -35,7 +35,7 @@ class SCOPY_DAC_EXPORT CSVFileStrategy : public QObject, public DataBufferStrate
 public:
 	explicit CSVFileStrategy(QString filename, QWidget *parent = nullptr);
 	~CSVFileStrategy(){};
-	QVector<QVector<short>> data() override;
+	QVector<QVector<double>> data() override;
 
 public Q_SLOTS:
 	void recipeUpdated(DataBufferRecipe) override;
@@ -51,9 +51,9 @@ private:
 	QString m_filename;
 	QString m_separator;
 	QVector<QVector<double>> m_data;
-	QVector<QVector<short>> m_dataConverted;
+	QVector<QVector<double>> m_dataConverted;
 	DataBufferRecipe m_recipe;
-	short convert(double value);
+	double convert(double value);
 	void applyConversion();
 };
 } // namespace dac
