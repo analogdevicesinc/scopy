@@ -37,7 +37,7 @@ CSVFileStrategy::CSVFileStrategy(QString filename, QWidget *parent)
 	m_recipe = {.scale = 0.0, .scaled = false};
 }
 
-QVector<QVector<short>> CSVFileStrategy::data()
+QVector<QVector<double>> CSVFileStrategy::data()
 {
 	qDebug(CAT_DAC_DATASTRATEGY) << "Retrieve data.";
 	return m_dataConverted;
@@ -114,17 +114,12 @@ void CSVFileStrategy::applyConversion()
 	qDebug(CAT_DAC_DATASTRATEGY) << "Apply conversion on all samples";
 }
 
-short CSVFileStrategy::convert(double value)
+double CSVFileStrategy::convert(double value)
 {
 	double scale = 0.0;
-	double offset = 0.0;
 	double full_scale = DacUtils::dbFullScaleConvert(m_recipe.scale, false);
-	if(!m_recipe.scaled) {
-		scale = 16.0;
+	if(m_recipe.scaled) {
+		return value * full_scale;
 	}
-	if(scale == 0.0) {
-		scale = 32767.0 * full_scale / m_max;
-	}
-
-	return (value * scale + offset);
+	return value;
 }

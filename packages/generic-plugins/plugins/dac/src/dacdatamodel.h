@@ -55,7 +55,7 @@ public:
 	void setDecimation(double decimation);
 	void setBuffersize(unsigned int buffersize);
 	bool setFilesize(unsigned int filesize);
-	void setData(QVector<QVector<int16_t>> data);
+	void setData(QVector<QVector<double>> data);
 	void setSamplingFrequency(unsigned int sr);
 
 	void enableBufferChannel(QString uuid, bool enable);
@@ -104,7 +104,7 @@ private:
 	QMap<QString, TxNode *> m_ddsTxs;
 	QMap<QString, TxNode *> m_bufferTxs;
 
-	QVector<QVector<int16_t>> m_data;
+	QVector<QVector<double>> m_data;
 	QFuture<void> m_pushThd;
 	bool m_interrupted;
 

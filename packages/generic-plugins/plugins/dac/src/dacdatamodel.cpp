@@ -205,7 +205,7 @@ unsigned int DacDataModel::getEnabledChannelsCount()
 	return enChannelsCount;
 }
 
-void DacDataModel::setData(QVector<QVector<int16_t>> data)
+void DacDataModel::setData(QVector<QVector<double>> data)
 {
 	requestInterruption();
 	m_data.clear();
@@ -328,7 +328,7 @@ void DacDataModel::push()
 	qDebug(CAT_DAC_DATA) << "Start push thread";
 	unsigned int totalSize = 0;
 	m_interrupted = false;
-	QVector<QVector<int16_t>> allDataC = {};
+	QVector<QVector<int32_t>> allDataC = {};
 	unsigned int enChannelsCount = getEnabledChannelsCount();
 	bool valid = validateBufferParams();
 	if(!valid) {
@@ -362,7 +362,8 @@ void DacDataModel::push()
 		allDataC.push_back({});
 		for(unsigned int i = 0; i < m_filesize + additionalSamples; i += m_decimation) {
 			sampleIdx = std::min(i, m_filesize - 1);
-			allDataC[ch].append(m_data[sampleIdx][ch % available_data_columns]);
+			// Convert double to int32_t - this handles any device bit depth
+			allDataC[ch].append(static_cast<int32_t>(m_data[sampleIdx][ch % available_data_columns]));
 		}
 		totalSize += allDataC[ch].size();
 	}
@@ -376,11 +377,11 @@ void DacDataModel::push()
 			if(!iio_channel_is_enabled(ch->getChannel())) {
 				continue;
 			}
+			unsigned int ch_len = sizeof(int32_t);
 			uintptr_t dst_ptr, src_ptr = (uintptr_t)(allDataC[chnIdx].data()),
-					   end = src_ptr + allDataC[chnIdx].size() * sizeof(int16_t);
+					   end = src_ptr + allDataC[chnIdx].size() * ch_len;
 			uintptr_t buf_end = (uintptr_t)iio_buffer_end(m_buffer);
 			ptrdiff_t buf_step = iio_buffer_step(m_buffer);
-			unsigned int ch_len = iio_channel_get_data_format(ch->getChannel())->length / 8;
 
 			for(dst_ptr = (uintptr_t)iio_buffer_first(m_buffer, ch->getChannel());
 			    dst_ptr < buf_end && src_ptr + ch_len <= end; dst_ptr += buf_step, src_ptr += ch_len) {
