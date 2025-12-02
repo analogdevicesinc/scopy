@@ -34,7 +34,7 @@ class SCOPY_DAC_EXPORT DataBufferStrategyInterface
 public:
 	virtual ~DataBufferStrategyInterface() = default;
 
-	virtual QVector<QVector<short>> data() = 0;
+	virtual QVector<QVector<double>> data() = 0;
 public Q_SLOTS:
 	virtual void recipeUpdated(DataBufferRecipe) = 0;
 	virtual void loadData() = 0;
