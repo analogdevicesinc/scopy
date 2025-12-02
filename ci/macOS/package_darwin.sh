@@ -145,9 +145,17 @@ dylibbundler -ns -of -b \
 	--install-path @executable_path/../Frameworks/ \
 	"${PREFIXED_SEARCH_PATHS[@]}"
 
+echo "=== Adding Qt5 3D plugins"
+# Find Qt5 installation path
+QT5_PLUGINS_PATH="$(brew --prefix qt@5)/plugins"
+# Copy Qt5 3D specific plugins
+mkdir -p "$BUILDDIR/Scopy.app/Contents/PlugIns/renderers"
+cp -R "$QT5_PLUGINS_PATH/renderers"/* "$BUILDDIR/Scopy.app/Contents/PlugIns/renderers/"
+mkdir -p "$BUILDDIR/Scopy.app/Contents/PlugIns/sceneparsers"
+cp -R "$QT5_PLUGINS_PATH/sceneparsers"/* "$BUILDDIR/Scopy.app/Contents/PlugIns/sceneparsers/"
+
 echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 macdeployqt Scopy.app -verbose=3
-
 
 echo "=== Removing duplicated LC_RPATH"
 list=$(find Scopy.app -name "*.dylib")
