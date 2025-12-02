@@ -8,6 +8,13 @@ pushd $BUILDDIR
 SCOPYPLUGINS=$(find $BUILDDIR/Scopy.app/Contents/MacOS/packages -name "*.dylib" -type f)
 SCOPYLIBS=$(find $BUILDDIR/Scopy.app/Contents/Frameworks -name "*.dylib" -type f)
 
+IFS=$'\n' SEARCH_PATHS=($(find "$BUILDDIR/Scopy.app/Contents/MacOS/packages" -name "plugins" -type d 2>/dev/null))
+SEARCH_PATHS+=($STAGING_AREA_DEPS/lib)
+SEARCH_PATHS+=($BUILDDIR/Scopy.app/Contents/Frameworks/)
+PREFIXED_SEARCH_PATHS=()
+for p in "${SEARCH_PATHS[@]}"; do
+    PREFIXED_SEARCH_PATHS+=(--search-path $p)
+done
 echo "### Copy DLLs to Frameworks folder"
 cp -R $STAGING_AREA_DEPS/lib/iio.framework Scopy.app/Contents/Frameworks/
 cp -R $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
@@ -36,6 +43,7 @@ ad9361id=${ad9361rpath#"@rpath/"}
 libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libusb | cut -d " " -f 1 | awk '{$1=$1};1')"
 libusbid="$(echo ${libusbpath} | rev | cut -d "/" -f 1 | rev)"
 cp ${libusbpath} ./Scopy.app/Contents/Frameworks/
+chmod 755 ./Scopy.app/Contents/Frameworks/libusb*dylib
 
 m2kpath=${STAGING_AREA_DEPS}/lib/libm2k.?.?.?.dylib
 m2krpath="$(otool -D ${m2kpath} | grep @rpath)"
@@ -61,20 +69,20 @@ echo "### Fixing scopy libraries and plugins "
 for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
 do
 	echo "--- FIXING LIB: ${dylib##*/}"
-	echo $STAGING_AREA_DEPS/lib | dylibbundler --no-codesign --overwrite-files --bundle-deps --create-dir \
+	dylibbundler --no-codesign --overwrite-files --bundle-deps --create-dir \
 		--fix-file $dylib \
 		--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
 		--install-path @executable_path/../Frameworks/ \
-		--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
+		"${PREFIXED_SEARCH_PATHS[@]}"
 done
 
 
 echo "### Fixing Scopy binary"
-echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
-	-x $BUILDDIR/Scopy.app/Contents/MacOS/Scopy \
-	-d $BUILDDIR/Scopy.app/Contents/Frameworks  \
-	-p @executable_path/../Frameworks \
-	-s $BUILDDIR/Scopy.app/Contents/Frameworks
+dylibbundler -ns -of -b \
+	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/Scopy \
+	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks  \
+	--install-path @executable_path/../Frameworks \
+	"${PREFIXED_SEARCH_PATHS[@]}"
 
 echo "### Fixing the frameworks dylibbundler failed to copy"
 echo "=== Fixing iio.framework"
@@ -131,11 +139,11 @@ fi
 
 echo "=== Fixing iio-emu + libtinyiiod"
 cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
-echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
+dylibbundler -ns -of -b \
 	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/iio-emu \
 	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
 	--install-path @executable_path/../Frameworks/ \
-	--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
+	"${PREFIXED_SEARCH_PATHS[@]}"
 
 echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 macdeployqt Scopy.app -verbose=3
