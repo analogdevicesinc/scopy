@@ -18,18 +18,15 @@ python3 setup_test_environment.py v3.0.0 --rbp P0 P1
 # Release testing: P0 tests + new features since last version
 python3 setup_test_environment.py v3.0.0 --rbp P0 --new-since v2.5.0
 ```
-
-### 2. **Execute Tests Manually**
-Edit the generated RST files in `testing_results/testing_results_v3.0.0/` and fill in:
-- **Tested OS:** Your operating system
-- **Comments:** Test execution notes
-- **Result:** PASS or FAIL
-
-### 3. **CSV Template Auto-Generated**
+### 2. **CSV Template Auto-Generated**
 The CSV template is automatically created during step 1. You can also generate it manually:
 ```bash
 python3 parseTestResults.py v3.0.0
 ```
+
+### 3. **Execute Tests Manually**
+Edit the generated csv file to add test results based on provided columns
+
 
 ## Detailed Usage
 
@@ -46,7 +43,19 @@ python3 setup_test_environment.py <version> [OPTIONS]
 - `version` - Version name for the test directory (e.g., v3.0.0)
 - `--rbp` - Filter by RBP priority levels (P0, P1, P2, P3)
 - `--component` - Filter by component names (adc, dac, m2k, core, etc.)
-- `--new-since` - Include tests added since specified git version
+- `--new-since` - Include tests added since specified git version (overrides all other filters so that all new tests are added)
+
+**Available Components:**
+Components are determined by folder structure in `docs/tests/`:
+- **Plugin components:** Any subdirectory in `docs/tests/plugins/` (e.g., adc, dac, m2k, ad936x, ad9084, adrv9002, fmcomms5, swiot1l, datalogger, debugger, jesd, pqm, registermap)
+- **Core component:** Files in `docs/tests/general/core/` subdirectory
+- **General meta-component:** Using `--component general` includes ALL files from the `general/` directory, including both core files and other general test files
+
+**Filter Logic:**
+- When using `--component` and/or `--rbp` without `--new-since`: Tests must match ALL specified filters (AND logic)
+- When using `--new-since`: Filter logic becomes `(component AND rbp) OR new-since`
+  - This means all new tests are included regardless of component/rbp filters
+  - Plus any existing tests matching the component/rbp criteria
 
 **Examples:**
 ```bash
@@ -59,10 +68,16 @@ python3 setup_test_environment.py v3.0.0 --rbp P0 P1
 # Only ADC and DAC component tests
 python3 setup_test_environment.py v3.0.0 --component adc dac
 
+# Core component tests only
+python3 setup_test_environment.py v3.0.0 --component core
+
+# All general tests (includes core and all other general/ files)
+python3 setup_test_environment.py v3.0.0 --component general
+
 # Combined filters: M2K component with P0 priority
 python3 setup_test_environment.py v3.0.0 --component m2k --rbp P0
 
-# Release testing: All P0 tests + new tests since v2.5.0
+# Release testing: All P0 tests + All new tests since v2.5.0
 python3 setup_test_environment.py v3.0.0 --rbp P0 --new-since v2.5.0
 
 # Only new features testing
@@ -72,7 +87,8 @@ python3 setup_test_environment.py v3.0.0 --new-since v2.5.0
 **Output:**
 - Creates `testing_results/testing_results_v3.0.0/` directory
 - Contains filtered RST files ready for manual testing
-- Preserves RST structure for documentation compilation
+- Automatically generates CSV template
+- If directory exists, prompts to overwrite (this will also delete and regenerate the CSV file)
 
 ### `parseTestResults.py` - CSV Template Generation
 
@@ -85,7 +101,8 @@ python3 parseTestResults.py <version> [OPTIONS]
 
 **Parameters:**
 - `version` - Version to parse (must match testing_results directory)
-- `--output` - Custom output Excel file path (optional)
+- `--output` - Custom output CSV file path (optional)
+- `--force` - Force overwrite without prompting (optional)
 
 **Examples:**
 ```bash
@@ -93,40 +110,16 @@ python3 parseTestResults.py <version> [OPTIONS]
 python3 parseTestResults.py v3.0.0
 
 # Custom output location
-python3 parseTestResults.py v3.0.0 --output /path/to/custom_results.xlsx
+python3 parseTestResults.py v3.0.0 --output /path/to/custom_results.csv
+
+# Force overwrite without prompting
+python3 parseTestResults.py v3.0.0 --force
 ```
 
 **Output:**
 - Creates `testing_results/testing_results_{version}.csv`
 - Template with empty result fields for manual completion
 - Columns: Test UID | Component | RBP | Result | Tested OS | Comments | Tester | File
-
-### `generateTestsTable.py` - Source Documentation Tracking
-
-**Purpose:** Generates Excel tracking tables directly from source documentation (before test execution).
-
-**Basic Usage:**
-```bash
-python3 generateTestsTable.py <version> [OPTIONS]
-```
-
-**Parameters:**
-- `version` - Version name for Excel worksheet
-- `--sort` - Sort tests by RBP priority instead of UID
-- `--filter` - Filter tests by RBP levels (e.g., P0,P1)
-
-**Examples:**
-```bash
-# Generate tracking table for v3.0.0
-python3 generateTestsTable.py v3.0.0
-
-# Only P0 and P1 tests, sorted by priority
-python3 generateTestsTable.py v3.0.0 --filter P0,P1 --sort
-```
-
-**Output:**
-- Creates/updates `scopy_tests_tracking.xlsx` in scopy root
-- Columns: Test UID | Test RBP | Test Pass/Fail (empty for manual entry)
 
 ## Complete Testing Workflow
 
@@ -138,28 +131,19 @@ python3 generateTestsTable.py v3.0.0 --filter P0,P1 --sort
 python3 setup_test_environment.py v3.0.0 --rbp P0 --new-since v2.5.0
 ```
 
-**2. Execute Tests**
-```bash
-cd testing_results/testing_results_v3.0.0/
-# Manually edit RST files with test results:
-```
+**2. Execute Tests and Track Results**
+- Open the auto-generated CSV template: `testing_results/testing_results_v3.0.0.csv`
+- For each test, fill in:
+  - **Result:** PASS, FAIL, or SKIP
+  - **Tested OS:** Operating system used
+  - **Comments:** Any observations or notes
+  - **Tester:** Your name or identifier
 
-**Example test result format:**
-```rst
-**Tested OS:** Windows 11
-
-**Comments:** Test passed successfully. Minor UI lag observed but within acceptable range.
-
-**Result:** PASS
-```
-
-**3. Track Test Execution**
-- Edit the auto-generated CSV template: `testing_results/testing_results_v3.0.0.csv`
-- Fill in Result, Tested OS, Comments, and Tester columns for each test
-
-**4. Review Results**
-- Open `testing_results/testing_results_v3.0.0.csv`
+**3. Review and Analyze**
+- Save the completed CSV file
 - Use spreadsheet software for analysis and reporting
+- Historical data is preserved across versions
+
 
 
 ##  Requirements

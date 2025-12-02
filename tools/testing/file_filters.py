@@ -19,6 +19,12 @@ def _should_include_file(test_file, component_filter, new_uids):
     if 'index.rst' in test_file['relative_path']:
         return False
 
+    # Special handling: 'general' meta-component includes entire general/ directory
+    # This includes both 'core' subdirectory and 'general' files
+    if 'general' in component_filter:
+        if test_file['relative_path'].startswith('general/'):
+            return True
+
     # Include files from specified components
     if test_file['component'] in component_filter:
         return True

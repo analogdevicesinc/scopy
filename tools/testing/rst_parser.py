@@ -73,14 +73,6 @@ def extract_component_from_path(relative_path):
     elif parts[0] == 'general':
         if len(parts) >= 2 and parts[1] == 'core':
             return 'core'
-        elif 'preferences' in parts[-1]:
-            return 'preferences'
-        elif 'package_manager' in parts[-1]:
-            return 'package_manager'
-        elif 'scripting' in parts[-1]:
-            return 'scripting'
-        elif 'instrument_detaching' in parts[-1]:
-            return 'instrument_detaching'
         else:
             return 'general'
     else:
