@@ -82,8 +82,7 @@ DLL_DEPS=(
     Qt53DCore.dll
     Qt53DExtras.dll
     Qt53DRender.dll
-    Qt53DInput.dll
     Qt53DLogic.dll
-    Qt53DConcurrent.dll
     Qt5Gamepad.dll
+    Qt53DInput.dll
 )
