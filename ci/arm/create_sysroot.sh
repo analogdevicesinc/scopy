@@ -5,8 +5,6 @@ SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 source $SRC_SCRIPT/arm_build_config.sh $1
 
-IMAGE_FILE=2023-12-13-ADI-Kuiper-full.img
-
 install_packages(){
 	sudo apt update
 	sudo apt -y install git wget unzip python3 python-is-python3 2to3
@@ -17,36 +15,47 @@ download_kuiper(){
 	pushd ${STAGING_AREA}
 
 	if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
-		echo "Waiting for a arm64 Kuiper linux release"
-		exit
-	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-		if [ ! -f image_2023-12-13-ADI-Kuiper-full.zip ]; then
+		echo "Downloading Linux Kuiper arm64 image"
+		if [ ! -f "image_$IMAGE_NAME.zip" ]; then
 			wget \
-			--progress=bar:force:noscroll \
-			--progress=dot:giga \
-			--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
-			--header='Accept-Language: en-US,en;q=0.5' \
-			--header='Accept-Encoding: gzip, deflate, br' \
-			--header='Connection: keep-alive' \
-			--header='Upgrade-Insecure-Requests: 1' \
-			--header='Sec-Fetch-Dest: document' \
-			--header='Sec-Fetch-Mode: navigate' \
-			--header='Sec-Fetch-Site: none' \
-			--header='Sec-Fetch-User: ?1' \
-			--header='Pragma: no-cache' \
-			--header='Cache-Control: no-cache' \
-			${KUIPER_DOWNLOAD_LINK}
+				--progress=bar:force:noscroll \
+				--progress=dot:giga \
+				${KUIPER_DOWNLOAD_LINK}
+		else
+			echo "image_$IMAGE_NAME.zip already downloaded"
 		fi
+		[ -f image_$IMAGE_NAME.img ] || unzip "image_$IMAGE_NAME.zip"
+	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+		echo "Downloading Linux Kuiper arm32 image"
+		if [ ! -f "image_$IMAGE_NAME.zip" ]; then
+			wget \
+				--progress=bar:force:noscroll \
+				--progress=dot:giga \
+				--header='User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0' \
+				--header='Accept-Language: en-US,en;q=0.5' \
+				--header='Accept-Encoding: gzip, deflate, br' \
+				--header='Connection: keep-alive' \
+				--header='Upgrade-Insecure-Requests: 1' \
+				--header='Sec-Fetch-Dest: document' \
+				--header='Sec-Fetch-Mode: navigate' \
+				--header='Sec-Fetch-Site: none' \
+				--header='Sec-Fetch-User: ?1' \
+				--header='Pragma: no-cache' \
+				--header='Cache-Control: no-cache' \
+				${KUIPER_DOWNLOAD_LINK}
+		else
+			echo "image_$IMAGE_NAME.zip already downloaded"
+		fi
+		[ -f image_$IMAGE_NAME.img ] || unzip image_$IMAGE_NAME.zip
+		[ -f $IMAGE_NAME.img ] && mv $IMAGE_NAME.img image_$IMAGE_NAME.img
 	fi
-
-	[ -f $IMAGE_FILE ] || unzip image*.zip
 	popd
 }
 
 # install qemu needed for the sysroot configuration
 install_qemu(){
 	sudo apt update
-	sudo apt -y install qemu qemu-system qemu-user-static qemu-user
+	sudo apt -y install qemu-system qemu-user-static qemu-user
 }
 
 # mount the Kuiper image and copy the entire rootfs partition
