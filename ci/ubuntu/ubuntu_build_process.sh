@@ -31,9 +31,11 @@ GENALYZER_BRANCH=main
 
 QT=/opt/Qt/5.15.2/gcc_64
 QMAKE_BIN=$QT/bin/qmake
-CMAKE_BIN=/bin/cmake
 JOBS=-j14
 STAGING_AREA=$SRC_SCRIPT/staging_ubuntu20
+
+CMAKE_DOWNLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
+CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
 
 if [ "$USE_STAGING" == "ON" ]
 	then
@@ -67,6 +69,19 @@ echo -- USING CMAKE COMMAND:
 echo $CMAKE
 echo -- USING QT: $QT
 echo -- USING QMAKE: $QMAKE_BIN
+
+download_cmake() {
+	mkdir -p ${STAGING_AREA}
+	pushd ${STAGING_AREA}
+	if [ ! -d cmake ];then
+		wget ${CMAKE_DOWNLOAD_LINK}
+		# unzip and rename
+		tar -xf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake
+	else
+		echo "Cmake already downloaded"
+	fi
+	popd
+}
 
 clone() {
 	echo "#######CLONE#######"
@@ -356,6 +371,7 @@ build_scopy() {
 #
 
 build_deps(){
+	download_cmake
 	clone
 	build_libserialport ON
 	build_libiio ON
