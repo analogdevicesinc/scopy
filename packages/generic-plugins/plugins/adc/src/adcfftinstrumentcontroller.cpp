@@ -314,6 +314,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 
 	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
+	connect(c, SIGNAL(requestForceStop()), this, SLOT(stop()));
 }
 
 void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
