@@ -79,4 +79,10 @@ DLL_DEPS=(
     libngtcp2-*.dll
     libngtcp2_crypto_ossl.dll
     libunistring-*.dll
+    Qt53DCore.dll
+    Qt53DExtras.dll
+    Qt53DRender.dll
+    Qt53DLogic.dll
+    Qt5Gamepad.dll
+    Qt53DInput.dll
 )

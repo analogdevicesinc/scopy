@@ -140,6 +140,36 @@ echo $STAGING_AREA_DEPS/lib | dylibbundler -ns -of -b \
 echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 macdeployqt Scopy.app -verbose=3
 
+echo "=== Adding Qt5 3D plugins"
+# Find Qt5 installation path
+QT5_PLUGINS_PATH="$(brew --prefix qt@5)/plugins"
+
+# Copy Qt5 3D specific plugins
+if [ -d "$QT5_PLUGINS_PATH/renderers" ]; then
+	echo "Copying Qt5 3D renderers plugins..."
+	mkdir -p "$BUILDDIR/Scopy.app/Contents/PlugIns/renderers"
+	cp -R "$QT5_PLUGINS_PATH/renderers"/* "$BUILDDIR/Scopy.app/Contents/PlugIns/renderers/"
+fi
+
+if [ -d "$QT5_PLUGINS_PATH/sceneparsers" ]; then
+	echo "Copying Qt5 3D sceneparsers plugins..."
+	mkdir -p "$BUILDDIR/Scopy.app/Contents/PlugIns/sceneparsers"
+	cp -R "$QT5_PLUGINS_PATH/sceneparsers"/* "$BUILDDIR/Scopy.app/Contents/PlugIns/sceneparsers/"
+fi
+
+# Fix library paths for the copied plugins
+echo "=== Fixing Qt5 3D plugin library paths"
+QT5_3D_PLUGINS=$(find "$BUILDDIR/Scopy.app/Contents/PlugIns" -name "*.dylib" -path "*/renderers/*" -o -path "*/sceneparsers/*")
+
+for plugin in $QT5_3D_PLUGINS; do
+	echo "Fixing plugin: ${plugin##*/}"
+	# Use dylibbundler to fix dependencies
+	dylibbundler --no-codesign --overwrite-files --bundle-deps --create-dir \
+		--fix-file "$plugin" \
+		--dest-dir "$BUILDDIR/Scopy.app/Contents/Frameworks/" \
+		--install-path @executable_path/../Frameworks/ \
+		--search-path "$BUILDDIR/Scopy.app/Contents/Frameworks/"
+done
 
 echo "=== Removing duplicated LC_RPATH"
 list=$(find Scopy.app -name "*.dylib")
