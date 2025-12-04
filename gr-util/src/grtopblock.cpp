@@ -24,6 +24,7 @@
 #include "grlog.h"
 
 #include <QtConcurrent>
+#include <QFuture>
 
 Q_LOGGING_CATEGORY(SCOPY_GR_UTIL, "GRManager")
 
@@ -124,10 +125,20 @@ void GRTopBlock::start()
 	top->start();
 	Q_EMIT started();
 
-	//	QtConcurrent::run([=]() { - this causes a race condition
-	//		top->wait();
-	//		Q_EMIT finished();
-	//	});
+	QtConcurrent::run([this]() {
+		top->wait();
+		onFinished();
+	});
+}
+
+void GRTopBlock::onFinished()
+{
+	if(!running) {
+		return;
+	}
+
+	qInfo(SCOPY_GR_UTIL) << "Block flow ended unexpectedly";
+	Q_EMIT forceStop();
 }
 
 void GRTopBlock::stop()
@@ -140,11 +151,7 @@ void GRTopBlock::stop()
 	Q_EMIT stopped();
 }
 
-void GRTopBlock::run()
-{
-	start();
-	top->wait();
-}
+void GRTopBlock::run() { start(); }
 
 QString GRTopBlock::name() const { return m_name; }
 

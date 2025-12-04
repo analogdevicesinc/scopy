@@ -155,6 +155,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 
 	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
+	connect(c, SIGNAL(requestForceStop()), this, SLOT(stop()));
 }
 
 void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
