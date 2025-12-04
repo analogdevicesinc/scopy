@@ -39,6 +39,10 @@ namespace scopy::adrv9009 {
 class TxSettingsWidget;
 class RxSettingsWidget;
 class OrxSettingsWidget;
+class FhmSetupWidget;
+class PaProtectionWidget;
+class GainSetupWidget;
+class ArmGpioWidget;
 class ClkSettingsWidget;
 class AgcSetupWidget;
 
@@ -84,11 +88,11 @@ private:
 	// Content widgets (placeholders for Phase 1)
 	ClkSettingsWidget *m_clkSettings = nullptr;
 	CalibrationWidget *m_calibrations = nullptr;
-	QWidget *m_fhmSetup = nullptr;
-	QWidget *m_paProtection = nullptr;
-	QWidget *m_gainSetup = nullptr;
 	AgcSetupWidget *m_agcSetup = nullptr;
-	QWidget *m_gpioConfig = nullptr;
+	FhmSetupWidget *m_fhmSetup = nullptr;
+	PaProtectionWidget *m_paProtection = nullptr;
+	GainSetupWidget *m_gainSetup = nullptr;
+	ArmGpioWidget *m_gpioConfig = nullptr;
 	TxSettingsWidget *m_txSettings = nullptr;
 	RxSettingsWidget *m_rxSettings = nullptr;
 	OrxSettingsWidget *m_orxSettings = nullptr;
