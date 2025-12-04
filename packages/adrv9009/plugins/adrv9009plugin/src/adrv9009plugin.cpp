@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <iio.h>
 #include <adrv9009.h>
+#include <adrv9009advanced.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -97,6 +98,8 @@ void Adrv9009Plugin::loadToolList()
 {
 	m_toolList.append(
 		SCOPY_NEW_TOOLMENUENTRY("adrv9009tool", "ADRV9009", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ADRV9009 Advanced", "ADRV9009 Advanced",
+						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
 }
 
 void Adrv9009Plugin::unload()
@@ -115,13 +118,72 @@ bool Adrv9009Plugin::onConnect()
 		return false;
 	}
 
-	// Create tool with IIO context
+	// Create basic ADRV9009 tool with IIO context
 	Adrv9009 *adrv9009 = new Adrv9009(conn->context());
 	m_toolList[0]->setTool(adrv9009);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
-	qDebug(CAT_ADRV9009PLUGIN) << "ADRV9009 plugin connected successfully";
+	// Iterate through devices to set up ADRV9009 Advanced tools
+	iio_context *ctx = conn->context();
+	unsigned int deviceCount = iio_context_get_devices_count(ctx);
+	bool first = true;
+
+	for(unsigned int i = 0; i < deviceCount; i++) {
+		iio_device *device = iio_context_get_device(ctx, i);
+		const char *deviceName = iio_device_get_name(device);
+
+		if(deviceName && QString(deviceName).startsWith("adrv9009-phy")) {
+			if(first) {
+				// Set up existing "ADRV9009 Advanced" tool (m_toolList[1])
+				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device);
+				m_toolList[1]->setTool(adrv9009Advanced);
+				m_toolList[1]->setEnabled(true);
+				m_toolList[1]->setRunBtnVisible(true);
+
+				qDebug(CAT_ADRV9009PLUGIN)
+					<< "Set up ADRV9009 Advanced for first device:" << deviceName;
+				first = false;
+			} else {
+				// Determine advanced tool name based on device
+				QString advancedToolName;
+
+				// Extract suffix (e.g., "adrv9009-phy-b" -> "ADRV9009 Advanced-B")
+				QString suffix = QString(deviceName).mid(12); // Remove "adrv9009-phy"
+				if(!suffix.isEmpty() && suffix.startsWith("-")) {
+					suffix = suffix.mid(1).toUpper(); // Remove "-" and uppercase
+					advancedToolName = QString("ADRV9009 Advanced-%1").arg(suffix);
+				} else {
+					advancedToolName = "ADRV9009 Advanced";
+				}
+
+				// Create advanced tool menu entry (using same string for ID and name)
+				ToolMenuEntry *advancedEntry =
+					SCOPY_NEW_TOOLMENUENTRY(advancedToolName, advancedToolName,
+								":/gui/icons/scopy-default/icons/gear_wheel.svg");
+
+				// Create advanced tool widget
+				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device);
+
+				// Configure tool entry
+				advancedEntry->setTool(adrv9009Advanced);
+				advancedEntry->setEnabled(true);
+				advancedEntry->setRunBtnVisible(true);
+
+				// Add to tool list
+				m_toolList.append(advancedEntry);
+
+				qDebug(CAT_ADRV9009PLUGIN)
+					<< "Created" << advancedToolName << "for device:" << deviceName;
+			}
+		}
+	}
+
+	qDebug(CAT_ADRV9009PLUGIN) << "ADRV9009 plugin connected successfully with" << (m_toolList.size() - 1)
+				   << "advanced tools";
+
+	// Emit signal to notify system about tool list changes
+	Q_EMIT toolListChanged();
 	return true;
 }
 
