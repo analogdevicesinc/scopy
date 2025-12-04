@@ -20,6 +20,7 @@
 
 #include "adrv9009widgetfactory.h"
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <iio-widgets/iiowidgetutils.h>
 
 using namespace scopy;
 using namespace scopy::adrv9009;
@@ -60,6 +61,39 @@ IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_device *device, QString 
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .buildSingle();
+	return widget;
+}
+
+IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QString attr,
+							  QMap<QString, QString> *optionsMap, QString title,
+							  QWidget *parent)
+{
+	// Build space-separated display string from optionsMap values
+	auto values = optionsMap->values();
+	QString optionsValues = "";
+	for(int i = 0; i < values.size(); i++) {
+		optionsValues += " " + values.at(i);
+	}
+
+	// Create widget with ComboUi strategy
+	IIOWidget *widget = IIOWidgetBuilder(parent)
+				    .device(device)
+				    .attribute(attr)
+				    .title(title)
+				    .uiStrategy(IIOWidgetBuilder::ComboUi)
+				    .optionsValues(optionsValues)
+				    .buildSingle();
+
+	// Set bidirectional conversion functions
+	if(widget) {
+		widget->setUItoDataConversion([optionsMap](QString data) {
+			return IIOWidgetUtils::comboUiToDataConversionFunction(data, optionsMap);
+		});
+		widget->setDataToUIConversion([optionsMap](QString data) {
+			return IIOWidgetUtils::comboDataToUiConversionFunction(data, optionsMap);
+		});
+	}
+
 	return widget;
 }
 
