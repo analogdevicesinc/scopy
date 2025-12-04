@@ -64,6 +64,7 @@ Q_SIGNALS:
 	void stopped();
 	void finished();
 	void requestRebuild();
+	void forceStop();
 
 public Q_SLOTS:
 	void build();
@@ -74,6 +75,7 @@ public Q_SLOTS:
 	void run();
 	void suspendBuild();
 	void unsuspendBuild();
+	void onFinished();
 
 private:
 	bool m_suspended;
