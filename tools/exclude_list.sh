@@ -80,6 +80,7 @@ OMIT_FILES_LIST=(
     \*.mat
     \*.user
     ad9084\*.txt
+    adrv9009-filters\*.txt
     \*/cjson/cJSON.\*
 )
 OMIT_FILES_LIST=("${OMIT_FILES_LIST[@]/#/*\/}")
