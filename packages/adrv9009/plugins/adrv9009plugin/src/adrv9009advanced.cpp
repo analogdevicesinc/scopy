@@ -19,6 +19,10 @@
  */
 
 #include "adrv9009advanced.h"
+#include "advanced/fhmsetupwidget.h"
+#include "advanced/paprotectionwidget.h"
+#include "advanced/gainsetupwidget.h"
+#include "advanced/armgpiowidget.h"
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
@@ -136,7 +140,7 @@ void Adrv9009Advanced::createNavigationButtons()
 	Style::setStyle(m_agcSetupBtn, style::properties::button::blueGrayButton);
 	m_agcSetupBtn->setCheckable(true);
 
-	m_gpioConfigBtn = new QPushButton("GPIO Config", this);
+	m_gpioConfigBtn = new QPushButton("ARM GPIO", this);
 	Style::setStyle(m_gpioConfigBtn, style::properties::button::blueGrayButton);
 	m_gpioConfigBtn->setCheckable(true);
 
@@ -234,11 +238,11 @@ void Adrv9009Advanced::createContentWidgets()
 	m_txSettings = createPlaceholderWidget("TX Settings");
 	m_rxSettings = createPlaceholderWidget("RX Settings");
 	m_orxSettings = createPlaceholderWidget("ORX Settings");
-	m_fhmSetup = createPlaceholderWidget("FHM Setup");
-	m_paProtection = createPlaceholderWidget("PA Protection");
-	m_gainSetup = createPlaceholderWidget("GAIN Setup");
 	m_agcSetup = createPlaceholderWidget("AGC Setup");
-	m_gpioConfig = createPlaceholderWidget("GPIO Config");
+	m_fhmSetup = new FhmSetupWidget(m_device, this);
+	m_paProtection = new PaProtectionWidget(m_device, this);
+	m_gainSetup = new GainSetupWidget(m_device, this);
+	m_gpioConfig = new ArmGpioWidget(m_device, this);
 	m_auxDac = createPlaceholderWidget("AUX DAC");
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
 	m_bist = createPlaceholderWidget("BIST");
@@ -260,6 +264,18 @@ void Adrv9009Advanced::createContentWidgets()
 
 	// Set first widget as current (CLK Settings)
 	m_centralWidget->setCurrentWidget(m_clkSettings);
+	if(m_fhmSetup) {
+		connect(this, &Adrv9009Advanced::readRequested, m_fhmSetup, &FhmSetupWidget::readRequested);
+	}
+	if(m_paProtection) {
+		connect(this, &Adrv9009Advanced::readRequested, m_paProtection, &PaProtectionWidget::readRequested);
+	}
+	if(m_gainSetup) {
+		connect(this, &Adrv9009Advanced::readRequested, m_gainSetup, &GainSetupWidget::readRequested);
+	}
+	if(m_gpioConfig) {
+		connect(this, &Adrv9009Advanced::readRequested, m_gpioConfig, &ArmGpioWidget::readRequested);
+	}
 }
 
 QWidget *Adrv9009Advanced::createPlaceholderWidget(const QString &sectionName)
