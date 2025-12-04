@@ -44,6 +44,8 @@ public:
 
 	void updatePrecision(int precision);
 	void togglePeakHolder(bool toggle);
+	QVBoxLayout *getLayout() const;
+
 signals:
 
 private:

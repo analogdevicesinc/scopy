@@ -23,12 +23,11 @@
 #define DATALOGGER_API_H
 
 #include "scopy-datalogger_export.h"
-
-#include <dataloggerplugin.h>
-#include <sevensegmentdisplay.hpp>
-#include <sevensegmentmonitorsettings.hpp>
+#include <pluginbase/apiobject.h>
 
 namespace scopy::datamonitor {
+
+class DataLoggerPlugin;
 
 class SCOPY_DATALOGGER_EXPORT DataLogger_API : public ApiObject
 {
@@ -61,6 +60,11 @@ public:
 	Q_INVOKABLE void continuousLogAtPathForTool(QString toolName, QString path);
 	Q_INVOKABLE void stopContinuousLogForTool(QString toolName);
 	Q_INVOKABLE void importDataFromPathForTool(QString toolName, QString path);
+	Q_INVOKABLE void setMonitorDisplayName(QString toolName, QString monitor, QString displayName);
+	Q_INVOKABLE void setMonitorUnitOfMeasurementName(QString toolName, QString monitor, QString name);
+	Q_INVOKABLE void setMonitorUnitOfMeasurementSymbol(QString toolName, QString monitor, QString symbol);
+	Q_INVOKABLE void setDisplayMode(QString toolName, int mode);
+	Q_INVOKABLE void setToolName(QString currentToolName, QString newToolName);
 
 private:
 	DataLoggerPlugin *m_dataLoggerPlugin;
