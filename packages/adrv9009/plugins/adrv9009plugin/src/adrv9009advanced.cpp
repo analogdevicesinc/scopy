@@ -23,6 +23,7 @@
 #include "advanced/rxsettingswidget.h"
 #include "advanced/orxsettingswidget.h"
 #include "advanced/clksettingswidget.h"
+#include "advanced/agcsetupwidget.h"
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
@@ -249,7 +250,7 @@ void Adrv9009Advanced::createContentWidgets()
 	m_fhmSetup = createPlaceholderWidget("FHM Setup");
 	m_paProtection = createPlaceholderWidget("PA Protection");
 	m_gainSetup = createPlaceholderWidget("GAIN Setup");
-	m_agcSetup = createPlaceholderWidget("AGC Setup");
+	m_agcSetup = new AgcSetupWidget(m_device, this);
 	m_gpioConfig = createPlaceholderWidget("GPIO Config");
 	m_txSettings = new TxSettingsWidget(m_device, this);
 	m_rxSettings = new RxSettingsWidget(m_device, this);
@@ -293,6 +294,10 @@ void Adrv9009Advanced::createContentWidgets()
 	}
 	if(m_orxSettings) {
 		connect(this, &Adrv9009Advanced::readRequested, m_orxSettings, &OrxSettingsWidget::readRequested);
+	}
+
+	if(m_agcSetup) {
+		connect(this, &Adrv9009Advanced::readRequested, m_agcSetup, &AgcSetupWidget::readRequested);
 	}
 }
 
