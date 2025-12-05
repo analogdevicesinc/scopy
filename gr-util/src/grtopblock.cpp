@@ -22,9 +22,11 @@
 #include "grtopblock.h"
 
 #include "grlog.h"
+#include "grlogforward.h"
 
 #include <QtConcurrent>
 #include <QFuture>
+#include <pluginbase/statusbarmanager.h>
 
 Q_LOGGING_CATEGORY(SCOPY_GR_UTIL, "GRManager")
 
@@ -35,6 +37,9 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	, built(false)
 	, m_suspended(false)
 {
+	// Initialize GNU Radio log forwarding and connect to StatusBarManager
+	QObject::connect(GRLogForward::GetInstance(), &GRLogForward::newLogMessage, this, &GRTopBlock::newGRLogMessage);
+
 	m_name = name;
 	static int topblockid = 0;
 	QString topblockname = m_name + QString::number(topblockid);
@@ -196,5 +201,7 @@ void GRTopBlock::connect(gr::basic_block_sptr src, int srcPort, gr::basic_block_
 }
 
 gr::top_block_sptr GRTopBlock::getGrBlock() { return top; }
+
+void GRTopBlock::newGRLogMessage(QString message) { StatusBarManager::pushUrgentMessage(message, 5000); }
 
 #include "moc_grtopblock.cpp"
