@@ -32,6 +32,7 @@ Contents
    plugins/index
    developer_guide/index
    tests/index
+   architecture/index
 
 
    user_guide/preferences

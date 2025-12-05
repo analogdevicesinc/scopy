@@ -1,0 +1,2418 @@
+{
+  "configuration" : { },
+  "description" : "CI/CD and deployment architecture for Scopy multi-platform builds",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedDate" : "2025-12-04T15:00:13Z",
+  "model" : {
+    "deploymentNodes" : [ {
+      "children" : [ {
+        "children" : [ {
+          "containerInstances" : [ {
+            "containerId" : "30",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "156",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "1ca395ec-ba7a-4eb6-8911-c34af3b60b4b"
+            },
+            "tags" : "Container Instance"
+          }, {
+            "containerId" : "5",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "157",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "d8731c40-c7fe-4350-a2b0-c6588742d53a"
+            },
+            "tags" : "Container Instance"
+          } ],
+          "description" : "cristianbindea/scopy2-mingw64",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "155",
+          "instances" : "1",
+          "name" : "MinGW Docker Container",
+          "properties" : {
+            "structurizr.dsl.identifier" : "c934bc81-b3a9-4174-ac41-8ff39d9ce45a"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "MSYS2/MinGW64"
+        } ],
+        "description" : "Windows 2022",
+        "environment" : "Multi-Platform Build Environment",
+        "id" : "154",
+        "instances" : "1",
+        "name" : "Windows Runner",
+        "properties" : {
+          "structurizr.dsl.identifier" : "8544c432-0b2c-4928-bd7c-17cd2ccb1a54"
+        },
+        "tags" : "Element,Deployment Node",
+        "technology" : "Microsoft Windows"
+      }, {
+        "children" : [ {
+          "containerInstances" : [ {
+            "containerId" : "31",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "160",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "01b3198b-2e5e-40e0-8dac-8a0aba6a2ddf"
+            },
+            "tags" : "Container Instance"
+          }, {
+            "containerId" : "5",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "161",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "b8fa59ac-487a-4b54-a002-292775ee72c2"
+            },
+            "tags" : "Container Instance"
+          } ],
+          "description" : "cristianbindea/scopy2-flatpak",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "159",
+          "instances" : "1",
+          "name" : "Flatpak Container",
+          "properties" : {
+            "structurizr.dsl.identifier" : "10fdef65-200a-497f-8918-ccd97ef4dc0d"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "Flatpak Runtime"
+        }, {
+          "containerInstances" : [ {
+            "containerId" : "32",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "163",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "26bea8a5-ed65-464d-9b80-0efdf6807c4d"
+            },
+            "tags" : "Container Instance"
+          }, {
+            "containerId" : "5",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "164",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "3b7d99bd-433a-47c1-83c3-e98c13c458fe"
+            },
+            "tags" : "Container Instance"
+          } ],
+          "description" : "cristianbindea/scopy2-x86_64-appimage",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "162",
+          "instances" : "1",
+          "name" : "AppImage Container",
+          "properties" : {
+            "structurizr.dsl.identifier" : "26685c22-63d3-4012-95b7-d9ab2538c0a7"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "Ubuntu Container"
+        }, {
+          "containerInstances" : [ {
+            "containerId" : "35",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "166",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "2bfc2e1e-89a6-4107-9a50-9ac946268c6e"
+            },
+            "tags" : "Container Instance"
+          }, {
+            "containerId" : "5",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "167",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "b6733013-94a4-4067-9e99-86169226f1f4"
+            },
+            "tags" : "Container Instance"
+          } ],
+          "description" : "cristianbindea/scopy2-ubuntu",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "165",
+          "instances" : "1",
+          "name" : "Ubuntu Container",
+          "properties" : {
+            "structurizr.dsl.identifier" : "10c0a929-bf42-4092-bcfb-684241be7f8f"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "Development Environment"
+        }, {
+          "children" : [ {
+            "containerInstances" : [ {
+              "containerId" : "33",
+              "deploymentGroups" : [ "Default" ],
+              "environment" : "Multi-Platform Build Environment",
+              "id" : "170",
+              "instanceId" : 1,
+              "properties" : {
+                "structurizr.dsl.identifier" : "c5b54562-d04d-4692-a277-2c57024be251"
+              },
+              "tags" : "Container Instance"
+            }, {
+              "containerId" : "5",
+              "deploymentGroups" : [ "Default" ],
+              "environment" : "Multi-Platform Build Environment",
+              "id" : "171",
+              "instanceId" : 1,
+              "properties" : {
+                "structurizr.dsl.identifier" : "10779ab4-faab-4d3b-8c6d-1356782003d6"
+              },
+              "tags" : "Container Instance"
+            } ],
+            "description" : "aarch64-linux-gnu",
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "169",
+            "instances" : "1",
+            "name" : "ARM64 Sysroot",
+            "properties" : {
+              "structurizr.dsl.identifier" : "742b702d-7889-4311-932b-e7279761719a"
+            },
+            "tags" : "Element,Deployment Node",
+            "technology" : "Chroot Environment"
+          } ],
+          "description" : "cristianbindea/scopy2-arm64-appimage",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "168",
+          "instances" : "1",
+          "name" : "ARM64 Container",
+          "properties" : {
+            "structurizr.dsl.identifier" : "bfcf6c9d-2ca2-45db-a973-fded9693f3a8"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "Cross-compilation"
+        }, {
+          "children" : [ {
+            "containerInstances" : [ {
+              "containerId" : "34",
+              "deploymentGroups" : [ "Default" ],
+              "environment" : "Multi-Platform Build Environment",
+              "id" : "174",
+              "instanceId" : 1,
+              "properties" : {
+                "structurizr.dsl.identifier" : "1b756827-701c-4a78-901e-0167588d26d9"
+              },
+              "tags" : "Container Instance"
+            }, {
+              "containerId" : "5",
+              "deploymentGroups" : [ "Default" ],
+              "environment" : "Multi-Platform Build Environment",
+              "id" : "175",
+              "instanceId" : 1,
+              "properties" : {
+                "structurizr.dsl.identifier" : "c222eb20-1acc-4ea3-9df4-cd2e2577df1b"
+              },
+              "tags" : "Container Instance"
+            } ],
+            "description" : "arm-linux-gnueabihf",
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "173",
+            "instances" : "1",
+            "name" : "ARMHF Sysroot",
+            "properties" : {
+              "structurizr.dsl.identifier" : "f4c82f29-26e4-4b46-9b37-2e90b3bdffc3"
+            },
+            "tags" : "Element,Deployment Node",
+            "technology" : "Chroot Environment"
+          } ],
+          "description" : "cristianbindea/scopy2-armhf-appimage",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "172",
+          "instances" : "1",
+          "name" : "ARMHF Container",
+          "properties" : {
+            "structurizr.dsl.identifier" : "6721ffff-0654-4890-8b05-0d012ddbd378"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "Cross-compilation"
+        } ],
+        "description" : "Ubuntu 22.04",
+        "environment" : "Multi-Platform Build Environment",
+        "id" : "158",
+        "instances" : "1",
+        "name" : "Linux Runner",
+        "properties" : {
+          "structurizr.dsl.identifier" : "46e89f6d-aeed-4b97-b7e2-2fe9c0a887cb"
+        },
+        "tags" : "Element,Deployment Node",
+        "technology" : "Ubuntu Linux"
+      } ],
+      "description" : "GitHub-hosted CI/CD platform",
+      "environment" : "Multi-Platform Build Environment",
+      "id" : "153",
+      "instances" : "1",
+      "name" : "GitHub Actions Infrastructure",
+      "properties" : {
+        "structurizr.dsl.identifier" : "ba39a521-93e6-48e7-99e9-a7e3e56e6ca0"
+      },
+      "tags" : "Element,Deployment Node",
+      "technology" : "GitHub Actions"
+    }, {
+      "children" : [ {
+        "children" : [ {
+          "containerInstances" : [ {
+            "containerId" : "36",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "179",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "f8f0725f-12ed-462e-a755-b633ae8d7629"
+            },
+            "tags" : "Container Instance"
+          }, {
+            "containerId" : "5",
+            "deploymentGroups" : [ "Default" ],
+            "environment" : "Multi-Platform Build Environment",
+            "id" : "180",
+            "instanceId" : 1,
+            "properties" : {
+              "structurizr.dsl.identifier" : "113ff438-b371-4afe-8655-af76f178f159"
+            },
+            "tags" : "Container Instance"
+          } ],
+          "description" : "Package Manager",
+          "environment" : "Multi-Platform Build Environment",
+          "id" : "178",
+          "instances" : "1",
+          "name" : "Homebrew Environment",
+          "properties" : {
+            "structurizr.dsl.identifier" : "d3ffebea-e6b8-4c1d-8bb9-63b718ea9c99"
+          },
+          "tags" : "Element,Deployment Node",
+          "technology" : "macOS Native"
+        } ],
+        "description" : "macOS",
+        "environment" : "Multi-Platform Build Environment",
+        "id" : "177",
+        "instances" : "1",
+        "name" : "macOS Agent",
+        "properties" : {
+          "structurizr.dsl.identifier" : "f1090127-4148-46c4-8062-d98bf1272c5f"
+        },
+        "tags" : "Element,Deployment Node",
+        "technology" : "macOS x86_64"
+      } ],
+      "description" : "Microsoft cloud CI/CD platform",
+      "environment" : "Multi-Platform Build Environment",
+      "id" : "176",
+      "instances" : "1",
+      "name" : "Azure DevOps Infrastructure",
+      "properties" : {
+        "structurizr.dsl.identifier" : "0508bed8-36a3-4801-86e9-3b8d8adca475"
+      },
+      "tags" : "Element,Deployment Node",
+      "technology" : "Azure DevOps"
+    }, {
+      "containerInstances" : [ {
+        "containerId" : "38",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "182",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "8e0a793a-010c-4c17-9025-baa9f0bfc974"
+        },
+        "tags" : "Container Instance"
+      }, {
+        "containerId" : "39",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "183",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "b02c842c-96c1-4d25-85f9-f7a4629930e5"
+        },
+        "tags" : "Container Instance"
+      }, {
+        "containerId" : "40",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "184",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "59f7bded-bc04-4d61-b1b0-156642c6ddff"
+        },
+        "tags" : "Container Instance"
+      }, {
+        "containerId" : "41",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "185",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "49d126ba-7985-452c-90ce-b209853a958b"
+        },
+        "tags" : "Container Instance"
+      }, {
+        "containerId" : "42",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "186",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "d0295511-900b-4179-9cde-266aed0f34b4"
+        },
+        "tags" : "Container Instance"
+      }, {
+        "containerId" : "43",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "187",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "16ce0e39-3ead-4e3b-8f43-16767f2af081"
+        },
+        "tags" : "Container Instance"
+      }, {
+        "containerId" : "44",
+        "deploymentGroups" : [ "Default" ],
+        "environment" : "Artifact Distribution Environment",
+        "id" : "188",
+        "instanceId" : 1,
+        "properties" : {
+          "structurizr.dsl.identifier" : "4e489d22-7157-4e29-89c2-9330da38d1e2"
+        },
+        "tags" : "Container Instance"
+      } ],
+      "description" : "Artifact Storage and Distribution",
+      "environment" : "Artifact Distribution Environment",
+      "id" : "181",
+      "instances" : "1",
+      "name" : "GitHub Releases",
+      "properties" : {
+        "structurizr.dsl.identifier" : "f474dfb6-5325-42c2-8e2e-435c968ba6ae"
+      },
+      "tags" : "Element,Deployment Node",
+      "technology" : "GitHub"
+    } ],
+    "people" : [ {
+      "description" : "Scopy developer",
+      "id" : "148",
+      "name" : "Developer",
+      "properties" : {
+        "structurizr.dsl.identifier" : "developer"
+      },
+      "relationships" : [ {
+        "description" : "Commits code",
+        "destinationId" : "1",
+        "id" : "150",
+        "sourceId" : "148",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Develops",
+        "destinationId" : "4",
+        "id" : "151",
+        "sourceId" : "148",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "Engineer using Scopy for signal analysis",
+      "id" : "149",
+      "name" : "End User",
+      "properties" : {
+        "structurizr.dsl.identifier" : "endUser"
+      },
+      "relationships" : [ {
+        "description" : "Downloads",
+        "destinationId" : "3",
+        "id" : "152",
+        "sourceId" : "149",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "description" : "Source code repository",
+      "documentation" : { },
+      "id" : "1",
+      "name" : "GitHub",
+      "properties" : {
+        "structurizr.dsl.identifier" : "github"
+      },
+      "relationships" : [ {
+        "description" : "Triggers on push/PR",
+        "destinationId" : "12",
+        "id" : "45",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Triggers on push/PR",
+        "destinationId" : "11",
+        "id" : "46",
+        "linkedRelationshipId" : "45",
+        "sourceId" : "1"
+      }, {
+        "description" : "Triggers on push/PR",
+        "destinationId" : "13",
+        "id" : "47",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Software System,External"
+    }, {
+      "description" : "Container image registry",
+      "documentation" : { },
+      "id" : "2",
+      "name" : "Docker Hub",
+      "properties" : {
+        "structurizr.dsl.identifier" : "dockerhub"
+      },
+      "tags" : "Element,Software System,External"
+    }, {
+      "description" : "Artifact storage and distribution",
+      "documentation" : { },
+      "id" : "3",
+      "name" : "GitHub Releases",
+      "properties" : {
+        "structurizr.dsl.identifier" : "artifactStore"
+      },
+      "tags" : "Element,Software System,External"
+    }, {
+      "containers" : [ {
+        "description" : "Main Qt-based GUI application",
+        "documentation" : { },
+        "id" : "5",
+        "name" : "Scopy Application",
+        "properties" : {
+          "structurizr.dsl.identifier" : "scopyApp"
+        },
+        "relationships" : [ {
+          "description" : "Uses for hardware communication",
+          "destinationId" : "6",
+          "id" : "143",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses for signal processing",
+          "destinationId" : "7",
+          "id" : "144",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses for ADALM2000 support",
+          "destinationId" : "8",
+          "id" : "145",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses for plotting",
+          "destinationId" : "9",
+          "id" : "146",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses for protocol decoding",
+          "destinationId" : "10",
+          "id" : "147",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++/Qt"
+      }, {
+        "description" : "Industrial I/O library for ADI hardware",
+        "documentation" : { },
+        "id" : "6",
+        "name" : "libiio",
+        "properties" : {
+          "structurizr.dsl.identifier" : "libiio"
+        },
+        "tags" : "Element,Container",
+        "technology" : "C"
+      }, {
+        "description" : "Signal processing framework",
+        "documentation" : { },
+        "id" : "7",
+        "name" : "GNU Radio",
+        "properties" : {
+          "structurizr.dsl.identifier" : "gnuradio"
+        },
+        "tags" : "Element,Container",
+        "technology" : "C++/Python"
+      }, {
+        "description" : "ADALM2000 support library",
+        "documentation" : { },
+        "id" : "8",
+        "name" : "libm2k",
+        "properties" : {
+          "structurizr.dsl.identifier" : "libm2k"
+        },
+        "tags" : "Element,Container",
+        "technology" : "C++"
+      }, {
+        "description" : "Technical plotting widgets",
+        "documentation" : { },
+        "id" : "9",
+        "name" : "Qwt",
+        "properties" : {
+          "structurizr.dsl.identifier" : "qwt"
+        },
+        "tags" : "Element,Container",
+        "technology" : "C++/Qt"
+      }, {
+        "description" : "Protocol decoder library",
+        "documentation" : { },
+        "id" : "10",
+        "name" : "libsigrokdecode",
+        "properties" : {
+          "structurizr.dsl.identifier" : "libsigrok"
+        },
+        "tags" : "Element,Container",
+        "technology" : "C"
+      } ],
+      "description" : "Signal analysis and device control software for ADI hardware",
+      "documentation" : { },
+      "id" : "4",
+      "name" : "Scopy",
+      "properties" : {
+        "structurizr.dsl.identifier" : "scopy"
+      },
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "GitHub-hosted CI/CD runners and workflow execution",
+        "documentation" : { },
+        "id" : "12",
+        "name" : "GitHub Actions",
+        "properties" : {
+          "structurizr.dsl.identifier" : "githubActions"
+        },
+        "relationships" : [ {
+          "description" : "Runs",
+          "destinationId" : "15",
+          "id" : "48",
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "14",
+          "id" : "49",
+          "linkedRelationshipId" : "48",
+          "sourceId" : "12"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "16",
+          "id" : "52",
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "17",
+          "id" : "54",
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "18",
+          "id" : "56",
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "19",
+          "id" : "58",
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "20",
+          "id" : "60",
+          "sourceId" : "12",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Platform"
+      }, {
+        "description" : "Microsoft cloud CI/CD platform",
+        "documentation" : { },
+        "id" : "13",
+        "name" : "Azure DevOps",
+        "properties" : {
+          "structurizr.dsl.identifier" : "azureDevOps"
+        },
+        "relationships" : [ {
+          "description" : "Runs",
+          "destinationId" : "21",
+          "id" : "62",
+          "sourceId" : "13",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Runs",
+          "destinationId" : "14",
+          "id" : "63",
+          "linkedRelationshipId" : "62",
+          "sourceId" : "13"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Azure Platform"
+      } ],
+      "description" : "CI/CD platform orchestration layer",
+      "documentation" : { },
+      "id" : "11",
+      "name" : "CI/CD Platform",
+      "properties" : {
+        "structurizr.dsl.identifier" : "cicdPlatform"
+      },
+      "relationships" : [ {
+        "description" : "Runs",
+        "destinationId" : "15",
+        "id" : "50",
+        "linkedRelationshipId" : "48",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "14",
+        "id" : "51",
+        "linkedRelationshipId" : "48",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "16",
+        "id" : "53",
+        "linkedRelationshipId" : "52",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "17",
+        "id" : "55",
+        "linkedRelationshipId" : "54",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "18",
+        "id" : "57",
+        "linkedRelationshipId" : "56",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "19",
+        "id" : "59",
+        "linkedRelationshipId" : "58",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "20",
+        "id" : "61",
+        "linkedRelationshipId" : "60",
+        "sourceId" : "11"
+      }, {
+        "description" : "Runs",
+        "destinationId" : "21",
+        "id" : "64",
+        "linkedRelationshipId" : "62",
+        "sourceId" : "11"
+      } ],
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "Builds Windows installer",
+        "documentation" : { },
+        "id" : "15",
+        "name" : "Windows MinGW Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "windowsWorkflow"
+        },
+        "relationships" : [ {
+          "description" : "Pulls MinGW container",
+          "destinationId" : "2",
+          "id" : "66",
+          "sourceId" : "15",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "23",
+          "id" : "73",
+          "sourceId" : "15",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "22",
+          "id" : "74",
+          "linkedRelationshipId" : "73",
+          "sourceId" : "15"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Actions"
+      }, {
+        "description" : "Builds Flatpak package",
+        "documentation" : { },
+        "id" : "16",
+        "name" : "Linux Flatpak Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "linuxFlatpakWorkflow"
+        },
+        "relationships" : [ {
+          "description" : "Pulls Flatpak container",
+          "destinationId" : "2",
+          "id" : "67",
+          "sourceId" : "16",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "24",
+          "id" : "77",
+          "sourceId" : "16",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "22",
+          "id" : "78",
+          "linkedRelationshipId" : "77",
+          "sourceId" : "16"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Actions"
+      }, {
+        "description" : "Builds AppImage packages",
+        "documentation" : { },
+        "id" : "17",
+        "name" : "Linux AppImage Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "linuxAppImageWorkflow"
+        },
+        "relationships" : [ {
+          "description" : "Pulls AppImage container",
+          "destinationId" : "2",
+          "id" : "68",
+          "sourceId" : "17",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "25",
+          "id" : "80",
+          "sourceId" : "17",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "22",
+          "id" : "81",
+          "linkedRelationshipId" : "80",
+          "sourceId" : "17"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Actions"
+      }, {
+        "description" : "Cross-compiles for ARM64 platforms",
+        "documentation" : { },
+        "id" : "18",
+        "name" : "ARM64 Build Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "arm64Workflow"
+        },
+        "relationships" : [ {
+          "description" : "Pulls ARM64 container",
+          "destinationId" : "2",
+          "id" : "69",
+          "sourceId" : "18",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "26",
+          "id" : "83",
+          "sourceId" : "18",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "22",
+          "id" : "84",
+          "linkedRelationshipId" : "83",
+          "sourceId" : "18"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Actions"
+      }, {
+        "description" : "Cross-compiles for ARMHF platforms",
+        "documentation" : { },
+        "id" : "19",
+        "name" : "ARMHF Build Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "armhfWorkflow"
+        },
+        "relationships" : [ {
+          "description" : "Pulls ARMHF container",
+          "destinationId" : "2",
+          "id" : "70",
+          "sourceId" : "19",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "27",
+          "id" : "86",
+          "sourceId" : "19",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "22",
+          "id" : "87",
+          "linkedRelationshipId" : "86",
+          "sourceId" : "19"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Actions"
+      }, {
+        "description" : "Build on ubuntu",
+        "documentation" : { },
+        "id" : "20",
+        "name" : "Ubuntu Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ubuntuWorkflow"
+        },
+        "relationships" : [ {
+          "description" : "Pulls Ubuntu container",
+          "destinationId" : "2",
+          "id" : "71",
+          "sourceId" : "20",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "28",
+          "id" : "89",
+          "sourceId" : "20",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Uses",
+          "destinationId" : "22",
+          "id" : "90",
+          "linkedRelationshipId" : "89",
+          "sourceId" : "20"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "GitHub Actions"
+      }, {
+        "description" : "Builds macOS DMG package",
+        "documentation" : { },
+        "id" : "21",
+        "name" : "macOS Build Workflow",
+        "properties" : {
+          "structurizr.dsl.identifier" : "macosWorkflow"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "36",
+          "id" : "110",
+          "sourceId" : "21",
+          "tags" : "Relationship,workflow"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "111",
+          "linkedRelationshipId" : "110",
+          "sourceId" : "21"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Azure DevOps"
+      } ],
+      "description" : "Continuous integration and deployment system",
+      "documentation" : { },
+      "id" : "14",
+      "name" : "CI/CD Infrastructure",
+      "properties" : {
+        "structurizr.dsl.identifier" : "cicd"
+      },
+      "relationships" : [ {
+        "description" : "Pulls container images",
+        "destinationId" : "2",
+        "id" : "65",
+        "sourceId" : "14",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "23",
+        "id" : "75",
+        "linkedRelationshipId" : "73",
+        "sourceId" : "14"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "22",
+        "id" : "76",
+        "linkedRelationshipId" : "73",
+        "sourceId" : "14"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "24",
+        "id" : "79",
+        "linkedRelationshipId" : "77",
+        "sourceId" : "14"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "25",
+        "id" : "82",
+        "linkedRelationshipId" : "80",
+        "sourceId" : "14"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "26",
+        "id" : "85",
+        "linkedRelationshipId" : "83",
+        "sourceId" : "14"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "27",
+        "id" : "88",
+        "linkedRelationshipId" : "86",
+        "sourceId" : "14"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "28",
+        "id" : "91",
+        "linkedRelationshipId" : "89",
+        "sourceId" : "14"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "36",
+        "id" : "112",
+        "linkedRelationshipId" : "110",
+        "sourceId" : "14"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "29",
+        "id" : "113",
+        "linkedRelationshipId" : "110",
+        "sourceId" : "14"
+      } ],
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "Windows build environment with MSYS2",
+        "documentation" : { },
+        "id" : "23",
+        "name" : "mingw64 container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "mingwContainer"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "30",
+          "id" : "92",
+          "sourceId" : "23",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "93",
+          "linkedRelationshipId" : "92",
+          "sourceId" : "23"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "cristianbindea/scopy2-mingw64"
+      }, {
+        "description" : "Linux Flatpak build environment",
+        "documentation" : { },
+        "id" : "24",
+        "name" : "flatpak container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "flatpakContainer"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "31",
+          "id" : "95",
+          "sourceId" : "24",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "96",
+          "linkedRelationshipId" : "95",
+          "sourceId" : "24"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "cristianbindea/scopy2-flatpak"
+      }, {
+        "description" : "x86_64 AppImage build environment",
+        "documentation" : { },
+        "id" : "25",
+        "name" : "x86_64-appimage container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "x86Container"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "32",
+          "id" : "98",
+          "sourceId" : "25",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "99",
+          "linkedRelationshipId" : "98",
+          "sourceId" : "25"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "cristianbindea/scopy2-x86_64-appimage"
+      }, {
+        "description" : "ARM64 cross-compilation environment",
+        "documentation" : { },
+        "id" : "26",
+        "name" : "arm64-appimage container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "arm64Container"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "33",
+          "id" : "101",
+          "sourceId" : "26",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "102",
+          "linkedRelationshipId" : "101",
+          "sourceId" : "26"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "cristianbindea/scopy2-arm64-appimage"
+      }, {
+        "description" : "ARMHF cross-compilation environment",
+        "documentation" : { },
+        "id" : "27",
+        "name" : "armhf-appimage container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "armhfContainer"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "34",
+          "id" : "104",
+          "sourceId" : "27",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "105",
+          "linkedRelationshipId" : "104",
+          "sourceId" : "27"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "cristianbindea/scopy2-armhf-appimage"
+      }, {
+        "description" : "Development build environment",
+        "documentation" : { },
+        "id" : "28",
+        "name" : "ubuntu-22 container",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ubuntuContainer"
+        },
+        "relationships" : [ {
+          "description" : "Executes",
+          "destinationId" : "35",
+          "id" : "107",
+          "sourceId" : "28",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Executes",
+          "destinationId" : "29",
+          "id" : "108",
+          "linkedRelationshipId" : "107",
+          "sourceId" : "28"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "cristianbindea/scopy2-ubuntu22"
+      } ],
+      "description" : "Pre-configured build environments",
+      "documentation" : { },
+      "id" : "22",
+      "name" : "Docker Build Infrastructure",
+      "properties" : {
+        "structurizr.dsl.identifier" : "dockerInfra"
+      },
+      "relationships" : [ {
+        "description" : "Executes",
+        "destinationId" : "29",
+        "id" : "72",
+        "sourceId" : "22",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "30",
+        "id" : "94",
+        "linkedRelationshipId" : "92",
+        "sourceId" : "22"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "31",
+        "id" : "97",
+        "linkedRelationshipId" : "95",
+        "sourceId" : "22"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "32",
+        "id" : "100",
+        "linkedRelationshipId" : "98",
+        "sourceId" : "22"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "33",
+        "id" : "103",
+        "linkedRelationshipId" : "101",
+        "sourceId" : "22"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "34",
+        "id" : "106",
+        "linkedRelationshipId" : "104",
+        "sourceId" : "22"
+      }, {
+        "description" : "Executes",
+        "destinationId" : "35",
+        "id" : "109",
+        "linkedRelationshipId" : "107",
+        "sourceId" : "22"
+      } ],
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "MSYS2/MinGW build process",
+        "documentation" : { },
+        "id" : "30",
+        "name" : "Windows Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "windowsScript"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "38",
+          "id" : "118",
+          "sourceId" : "30",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "119",
+          "linkedRelationshipId" : "118",
+          "sourceId" : "30"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/windows/windows_build_process.sh"
+      }, {
+        "description" : "Sandboxed Flatpak build",
+        "documentation" : { },
+        "id" : "31",
+        "name" : "Flatpak Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "flatpakScript"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "39",
+          "id" : "121",
+          "sourceId" : "31",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "122",
+          "linkedRelationshipId" : "121",
+          "sourceId" : "31"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/flatpak/flatpak_build_process.sh"
+      }, {
+        "description" : "AppImage packaging process",
+        "documentation" : { },
+        "id" : "32",
+        "name" : "AppImage Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "appimageScript"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "40",
+          "id" : "124",
+          "sourceId" : "32",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "125",
+          "linkedRelationshipId" : "124",
+          "sourceId" : "32"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/x86_64/x86-64_appimage_process.sh"
+      }, {
+        "description" : "Cross-compilation for ARM64",
+        "documentation" : { },
+        "id" : "33",
+        "name" : "ARM64 Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "arm64Script"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "41",
+          "id" : "127",
+          "sourceId" : "33",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "128",
+          "linkedRelationshipId" : "127",
+          "sourceId" : "33"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/arm64/arm64_build_process.sh"
+      }, {
+        "description" : "Cross-compilation for ARMHF",
+        "documentation" : { },
+        "id" : "34",
+        "name" : "ARMHF Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "armhfScript"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "42",
+          "id" : "130",
+          "sourceId" : "34",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "131",
+          "linkedRelationshipId" : "130",
+          "sourceId" : "34"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/armhf/armhf_build_process.sh"
+      }, {
+        "description" : "Ubuntu development builds",
+        "documentation" : { },
+        "id" : "35",
+        "name" : "Ubuntu Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ubuntuScript"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "43",
+          "id" : "114",
+          "sourceId" : "35",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "115",
+          "linkedRelationshipId" : "114",
+          "sourceId" : "35"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/ubuntu/ubuntu_build_process.sh"
+      }, {
+        "description" : "Homebrew-based macOS build",
+        "documentation" : { },
+        "id" : "36",
+        "name" : "macOS Build Script",
+        "properties" : {
+          "structurizr.dsl.identifier" : "macosScript"
+        },
+        "relationships" : [ {
+          "description" : "Generates",
+          "destinationId" : "44",
+          "id" : "133",
+          "sourceId" : "36",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Generates",
+          "destinationId" : "37",
+          "id" : "134",
+          "linkedRelationshipId" : "133",
+          "sourceId" : "36"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "ci/macOS/build_azure_macos.sh"
+      } ],
+      "description" : "Platform-specific build automation",
+      "documentation" : { },
+      "id" : "29",
+      "name" : "Build Scripts",
+      "properties" : {
+        "structurizr.dsl.identifier" : "buildScripts"
+      },
+      "relationships" : [ {
+        "description" : "Generates",
+        "destinationId" : "43",
+        "id" : "116",
+        "linkedRelationshipId" : "114",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "37",
+        "id" : "117",
+        "linkedRelationshipId" : "114",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "38",
+        "id" : "120",
+        "linkedRelationshipId" : "118",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "39",
+        "id" : "123",
+        "linkedRelationshipId" : "121",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "40",
+        "id" : "126",
+        "linkedRelationshipId" : "124",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "41",
+        "id" : "129",
+        "linkedRelationshipId" : "127",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "42",
+        "id" : "132",
+        "linkedRelationshipId" : "130",
+        "sourceId" : "29"
+      }, {
+        "description" : "Generates",
+        "destinationId" : "44",
+        "id" : "135",
+        "linkedRelationshipId" : "133",
+        "sourceId" : "29"
+      } ],
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "Scopy Windows setup executable",
+        "documentation" : { },
+        "id" : "38",
+        "name" : "Windows Installer",
+        "properties" : {
+          "structurizr.dsl.identifier" : "windowsInstaller"
+        },
+        "relationships" : [ {
+          "description" : "Uploads to (continuous release)",
+          "destinationId" : "3",
+          "id" : "136",
+          "sourceId" : "38",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".exe"
+      }, {
+        "description" : "Sandboxed Linux package",
+        "documentation" : { },
+        "id" : "39",
+        "name" : "Linux Flatpak",
+        "properties" : {
+          "structurizr.dsl.identifier" : "linuxFlatpak"
+        },
+        "relationships" : [ {
+          "description" : "Uploads to (continuous release)",
+          "destinationId" : "3",
+          "id" : "138",
+          "sourceId" : "39",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".flatpak"
+      }, {
+        "description" : "Portable Linux application",
+        "documentation" : { },
+        "id" : "40",
+        "name" : "Linux AppImage",
+        "properties" : {
+          "structurizr.dsl.identifier" : "linuxAppImage"
+        },
+        "relationships" : [ {
+          "description" : "Uploads to (artifacts)",
+          "destinationId" : "3",
+          "id" : "139",
+          "sourceId" : "40",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".AppImage"
+      }, {
+        "description" : "ARM64 portable application",
+        "documentation" : { },
+        "id" : "41",
+        "name" : "ARM64 AppImage",
+        "properties" : {
+          "structurizr.dsl.identifier" : "arm64AppImage"
+        },
+        "relationships" : [ {
+          "description" : "Uploads to (artifacts)",
+          "destinationId" : "3",
+          "id" : "140",
+          "sourceId" : "41",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".AppImage"
+      }, {
+        "description" : "ARMHF portable application",
+        "documentation" : { },
+        "id" : "42",
+        "name" : "ARMHF AppImage",
+        "properties" : {
+          "structurizr.dsl.identifier" : "armhfAppImage"
+        },
+        "relationships" : [ {
+          "description" : "Uploads to (artifacts)",
+          "destinationId" : "3",
+          "id" : "141",
+          "sourceId" : "42",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".AppImage"
+      }, {
+        "description" : "Development build",
+        "documentation" : { },
+        "id" : "43",
+        "name" : "Ubuntu build",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ubuntuPackage"
+        },
+        "tags" : "Element,Container",
+        "technology" : "test build"
+      }, {
+        "description" : "macOS disk image package",
+        "documentation" : { },
+        "id" : "44",
+        "name" : "macOS DMG",
+        "properties" : {
+          "structurizr.dsl.identifier" : "macosDMG"
+        },
+        "relationships" : [ {
+          "description" : "Uploads to (artifacts)",
+          "destinationId" : "3",
+          "id" : "142",
+          "sourceId" : "44",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".dmg"
+      } ],
+      "description" : "Final deployment destinations",
+      "documentation" : { },
+      "id" : "37",
+      "name" : "Deployment Targets",
+      "properties" : {
+        "structurizr.dsl.identifier" : "deploymentTargets"
+      },
+      "relationships" : [ {
+        "description" : "Uploads to (continuous release)",
+        "destinationId" : "3",
+        "id" : "137",
+        "linkedRelationshipId" : "136",
+        "sourceId" : "37"
+      } ],
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Scopy Deployment Architecture",
+  "properties" : {
+    "structurizr.inspection.error" : "155",
+    "structurizr.dsl" : "d29ya3NwYWNlICJTY29weSBEZXBsb3ltZW50IEFyY2hpdGVjdHVyZSIgIkNJL0NEIGFuZCBkZXBsb3ltZW50IGFyY2hpdGVjdHVyZSBmb3IgU2NvcHkgbXVsdGktcGxhdGZvcm0gYnVpbGRzIiB7CgogICAgbW9kZWwgewogICAgICAgICMgRXh0ZXJuYWwgc3lzdGVtcwogICAgICAgIGdpdGh1YiA9IHNvZnR3YXJlU3lzdGVtICJHaXRIdWIiICJTb3VyY2UgY29kZSByZXBvc2l0b3J5IiAiRXh0ZXJuYWwiCiAgICAgICAgZG9ja2VyaHViID0gc29mdHdhcmVTeXN0ZW0gIkRvY2tlciBIdWIiICJDb250YWluZXIgaW1hZ2UgcmVnaXN0cnkiICJFeHRlcm5hbCIKICAgICAgICBhcnRpZmFjdFN0b3JlID0gc29mdHdhcmVTeXN0ZW0gIkdpdEh1YiBSZWxlYXNlcyIgIkFydGlmYWN0IHN0b3JhZ2UgYW5kIGRpc3RyaWJ1dGlvbiIgIkV4dGVybmFsIgoKICAgICAgICAjIE1haW4gc29mdHdhcmUgc3lzdGVtCiAgICAgICAgc2NvcHkgPSBzb2Z0d2FyZVN5c3RlbSAiU2NvcHkiICJTaWduYWwgYW5hbHlzaXMgYW5kIGRldmljZSBjb250cm9sIHNvZnR3YXJlIGZvciBBREkgaGFyZHdhcmUiIHsKICAgICAgICAgICAgIyBDb3JlIGFwcGxpY2F0aW9uCiAgICAgICAgICAgIHNjb3B5QXBwID0gY29udGFpbmVyICJTY29weSBBcHBsaWNhdGlvbiIgIk1haW4gUXQtYmFzZWQgR1VJIGFwcGxpY2F0aW9uIiAiQysrL1F0IgoKICAgICAgICAgICAgIyBEZXBlbmRlbmNpZXMKICAgICAgICAgICAgbGliaWlvID0gY29udGFpbmVyICJsaWJpaW8iICJJbmR1c3RyaWFsIEkvTyBsaWJyYXJ5IGZvciBBREkgaGFyZHdhcmUiICJDIgogICAgICAgICAgICBnbnVyYWRpbyA9IGNvbnRhaW5lciAiR05VIFJhZGlvIiAiU2lnbmFsIHByb2Nlc3NpbmcgZnJhbWV3b3JrIiAiQysrL1B5dGhvbiIKICAgICAgICAgICAgbGlibTJrID0gY29udGFpbmVyICJsaWJtMmsiICJBREFMTTIwMDAgc3VwcG9ydCBsaWJyYXJ5IiAiQysrIgogICAgICAgICAgICBxd3QgPSBjb250YWluZXIgIlF3dCIgIlRlY2huaWNhbCBwbG90dGluZyB3aWRnZXRzIiAiQysrL1F0IgogICAgICAgICAgICBsaWJzaWdyb2sgPSBjb250YWluZXIgImxpYnNpZ3Jva2RlY29kZSIgIlByb3RvY29sIGRlY29kZXIgbGlicmFyeSIgIkMiCiAgICAgICAgfQoKICAgICAgICAjIENJL0NEIFBsYXRmb3JtIAogICAgICAgIGNpY2RQbGF0Zm9ybSA9IHNvZnR3YXJlU3lzdGVtICJDSS9DRCBQbGF0Zm9ybSIgIkNJL0NEIHBsYXRmb3JtIG9yY2hlc3RyYXRpb24gbGF5ZXIiIHsKICAgICAgICAgICAgIyBHaXRIdWIgQWN0aW9ucyBQbGF0Zm9ybQogICAgICAgICAgICBnaXRodWJBY3Rpb25zID0gY29udGFpbmVyICJHaXRIdWIgQWN0aW9ucyIgIkdpdEh1Yi1ob3N0ZWQgQ0kvQ0QgcnVubmVycyBhbmQgd29ya2Zsb3cgZXhlY3V0aW9uIiAiR2l0SHViIFBsYXRmb3JtIiAKICAgICAgICAgICAgYXp1cmVEZXZPcHMgPSBjb250YWluZXIgIkF6dXJlIERldk9wcyIgIk1pY3Jvc29mdCBjbG91ZCBDSS9DRCBwbGF0Zm9ybSIgIkF6dXJlIFBsYXRmb3JtIgogICAgICAgIH0KCiAgICAgICAgIyBDSS9DRCBJbmZyYXN0cnVjdHVyZQogICAgICAgIGNpY2QgPSBzb2Z0d2FyZVN5c3RlbSAiQ0kvQ0QgSW5mcmFzdHJ1Y3R1cmUiICJDb250aW51b3VzIGludGVncmF0aW9uIGFuZCBkZXBsb3ltZW50IHN5c3RlbSIgewoKICAgICAgICAgICAgIyBHaXRIdWIgQWN0aW9ucyB3b3JrZmxvd3MKICAgICAgICAgICAgd2luZG93c1dvcmtmbG93ID0gY29udGFpbmVyICJXaW5kb3dzIE1pbkdXIFdvcmtmbG93IiAiQnVpbGRzIFdpbmRvd3MgaW5zdGFsbGVyIiAiR2l0SHViIEFjdGlvbnMiCiAgICAgICAgICAgIGxpbnV4RmxhdHBha1dvcmtmbG93ID0gY29udGFpbmVyICJMaW51eCBGbGF0cGFrIFdvcmtmbG93IiAiQnVpbGRzIEZsYXRwYWsgcGFja2FnZSIgIkdpdEh1YiBBY3Rpb25zIgogICAgICAgICAgICBsaW51eEFwcEltYWdlV29ya2Zsb3cgPSBjb250YWluZXIgIkxpbnV4IEFwcEltYWdlIFdvcmtmbG93IiAiQnVpbGRzIEFwcEltYWdlIHBhY2thZ2VzIiAiR2l0SHViIEFjdGlvbnMiCiAgICAgICAgICAgIGFybTY0V29ya2Zsb3cgPSBjb250YWluZXIgIkFSTTY0IEJ1aWxkIFdvcmtmbG93IiAiQ3Jvc3MtY29tcGlsZXMgZm9yIEFSTTY0IHBsYXRmb3JtcyIgIkdpdEh1YiBBY3Rpb25zIgogICAgICAgICAgICBhcm1oZldvcmtmbG93ID0gY29udGFpbmVyICJBUk1IRiBCdWlsZCBXb3JrZmxvdyIgIkNyb3NzLWNvbXBpbGVzIGZvciBBUk1IRiBwbGF0Zm9ybXMiICJHaXRIdWIgQWN0aW9ucyIKICAgICAgICAgICAgdWJ1bnR1V29ya2Zsb3cgPSBjb250YWluZXIgIlVidW50dSBXb3JrZmxvdyIgIkJ1aWxkIG9uIHVidW50dSIgIkdpdEh1YiBBY3Rpb25zIgogICAgICAgICAgICBtYWNvc1dvcmtmbG93ID0gY29udGFpbmVyICJtYWNPUyBCdWlsZCBXb3JrZmxvdyIgIkJ1aWxkcyBtYWNPUyBETUcgcGFja2FnZSIgIkF6dXJlIERldk9wcyIKICAgICAgICB9CgogICAgICAgICMgRG9ja2VyIEJ1aWxkIEVudmlyb25tZW50cwogICAgICAgIGRvY2tlckluZnJhID0gc29mdHdhcmVTeXN0ZW0gIkRvY2tlciBCdWlsZCBJbmZyYXN0cnVjdHVyZSIgIlByZS1jb25maWd1cmVkIGJ1aWxkIGVudmlyb25tZW50cyIgewogICAgICAgICAgICBtaW5nd0NvbnRhaW5lciA9IGNvbnRhaW5lciAibWluZ3c2NCBjb250YWluZXIiICJXaW5kb3dzIGJ1aWxkIGVudmlyb25tZW50IHdpdGggTVNZUzIiICJjcmlzdGlhbmJpbmRlYS9zY29weTItbWluZ3c2NCIKICAgICAgICAgICAgZmxhdHBha0NvbnRhaW5lciA9IGNvbnRhaW5lciAiZmxhdHBhayBjb250YWluZXIiICJMaW51eCBGbGF0cGFrIGJ1aWxkIGVudmlyb25tZW50IiAiY3Jpc3RpYW5iaW5kZWEvc2NvcHkyLWZsYXRwYWsiCiAgICAgICAgICAgIHg4NkNvbnRhaW5lciA9IGNvbnRhaW5lciAieDg2XzY0LWFwcGltYWdlIGNvbnRhaW5lciIgIng4Nl82NCBBcHBJbWFnZSBidWlsZCBlbnZpcm9ubWVudCIgImNyaXN0aWFuYmluZGVhL3Njb3B5Mi14ODZfNjQtYXBwaW1hZ2UiCiAgICAgICAgICAgIGFybTY0Q29udGFpbmVyID0gY29udGFpbmVyICJhcm02NC1hcHBpbWFnZSBjb250YWluZXIiICJBUk02NCBjcm9zcy1jb21waWxhdGlvbiBlbnZpcm9ubWVudCIgImNyaXN0aWFuYmluZGVhL3Njb3B5Mi1hcm02NC1hcHBpbWFnZSIKICAgICAgICAgICAgYXJtaGZDb250YWluZXIgPSBjb250YWluZXIgImFybWhmLWFwcGltYWdlIGNvbnRhaW5lciIgIkFSTUhGIGNyb3NzLWNvbXBpbGF0aW9uIGVudmlyb25tZW50IiAiY3Jpc3RpYW5iaW5kZWEvc2NvcHkyLWFybWhmLWFwcGltYWdlIgogICAgICAgICAgICB1YnVudHVDb250YWluZXIgPSBjb250YWluZXIgInVidW50dS0yMiBjb250YWluZXIiICJEZXZlbG9wbWVudCBidWlsZCBlbnZpcm9ubWVudCIgImNyaXN0aWFuYmluZGVhL3Njb3B5Mi11YnVudHUyMiIKICAgICAgICB9CgogICAgICAgICMgQnVpbGQgU2NyaXB0cyBhbmQgQ29uZmlndXJhdGlvbgogICAgICAgIGJ1aWxkU2NyaXB0cyA9IHNvZnR3YXJlU3lzdGVtICJCdWlsZCBTY3JpcHRzIiAiUGxhdGZvcm0tc3BlY2lmaWMgYnVpbGQgYXV0b21hdGlvbiIgewogICAgICAgICAgICB3aW5kb3dzU2NyaXB0ID0gY29udGFpbmVyICJXaW5kb3dzIEJ1aWxkIFNjcmlwdCIgIk1TWVMyL01pbkdXIGJ1aWxkIHByb2Nlc3MiICJjaS93aW5kb3dzL3dpbmRvd3NfYnVpbGRfcHJvY2Vzcy5zaCIKICAgICAgICAgICAgZmxhdHBha1NjcmlwdCA9IGNvbnRhaW5lciAiRmxhdHBhayBCdWlsZCBTY3JpcHQiICJTYW5kYm94ZWQgRmxhdHBhayBidWlsZCIgImNpL2ZsYXRwYWsvZmxhdHBha19idWlsZF9wcm9jZXNzLnNoIgogICAgICAgICAgICBhcHBpbWFnZVNjcmlwdCA9IGNvbnRhaW5lciAiQXBwSW1hZ2UgQnVpbGQgU2NyaXB0IiAiQXBwSW1hZ2UgcGFja2FnaW5nIHByb2Nlc3MiICJjaS94ODZfNjQveDg2LTY0X2FwcGltYWdlX3Byb2Nlc3Muc2giCiAgICAgICAgICAgIGFybTY0U2NyaXB0ID0gY29udGFpbmVyICJBUk02NCBCdWlsZCBTY3JpcHQiICJDcm9zcy1jb21waWxhdGlvbiBmb3IgQVJNNjQiICJjaS9hcm02NC9hcm02NF9idWlsZF9wcm9jZXNzLnNoIgogICAgICAgICAgICBhcm1oZlNjcmlwdCA9IGNvbnRhaW5lciAiQVJNSEYgQnVpbGQgU2NyaXB0IiAiQ3Jvc3MtY29tcGlsYXRpb24gZm9yIEFSTUhGIiAiY2kvYXJtaGYvYXJtaGZfYnVpbGRfcHJvY2Vzcy5zaCIKICAgICAgICAgICAgdWJ1bnR1U2NyaXB0ID0gY29udGFpbmVyICJVYnVudHUgQnVpbGQgU2NyaXB0IiAiVWJ1bnR1IGRldmVsb3BtZW50IGJ1aWxkcyIgImNpL3VidW50dS91YnVudHVfYnVpbGRfcHJvY2Vzcy5zaCIKICAgICAgICAgICAgbWFjb3NTY3JpcHQgPSBjb250YWluZXIgIm1hY09TIEJ1aWxkIFNjcmlwdCIgIkhvbWVicmV3LWJhc2VkIG1hY09TIGJ1aWxkIiAiY2kvbWFjT1MvYnVpbGRfYXp1cmVfbWFjb3Muc2giCiAgICAgICAgfQoKICAgICAgICAjIERlcGxveW1lbnQgdGFyZ2V0cwogICAgICAgIGRlcGxveW1lbnRUYXJnZXRzID0gc29mdHdhcmVTeXN0ZW0gIkRlcGxveW1lbnQgVGFyZ2V0cyIgIkZpbmFsIGRlcGxveW1lbnQgZGVzdGluYXRpb25zIiB7CiAgICAgICAgICAgIHdpbmRvd3NJbnN0YWxsZXIgPSBjb250YWluZXIgIldpbmRvd3MgSW5zdGFsbGVyIiAiU2NvcHkgV2luZG93cyBzZXR1cCBleGVjdXRhYmxlIiAiLmV4ZSIKICAgICAgICAgICAgbGludXhGbGF0cGFrID0gY29udGFpbmVyICJMaW51eCBGbGF0cGFrIiAiU2FuZGJveGVkIExpbnV4IHBhY2thZ2UiICIuZmxhdHBhayIKICAgICAgICAgICAgbGludXhBcHBJbWFnZSA9IGNvbnRhaW5lciAiTGludXggQXBwSW1hZ2UiICJQb3J0YWJsZSBMaW51eCBhcHBsaWNhdGlvbiIgIi5BcHBJbWFnZSIKICAgICAgICAgICAgYXJtNjRBcHBJbWFnZSA9IGNvbnRhaW5lciAiQVJNNjQgQXBwSW1hZ2UiICJBUk02NCBwb3J0YWJsZSBhcHBsaWNhdGlvbiIgIi5BcHBJbWFnZSIKICAgICAgICAgICAgYXJtaGZBcHBJbWFnZSA9IGNvbnRhaW5lciAiQVJNSEYgQXBwSW1hZ2UiICJBUk1IRiBwb3J0YWJsZSBhcHBsaWNhdGlvbiIgIi5BcHBJbWFnZSIKICAgICAgICAgICAgdWJ1bnR1UGFja2FnZSA9IGNvbnRhaW5lciAiVWJ1bnR1IGJ1aWxkIiAiRGV2ZWxvcG1lbnQgYnVpbGQiICJ0ZXN0IGJ1aWxkIgogICAgICAgICAgICBtYWNvc0RNRyA9IGNvbnRhaW5lciAibWFjT1MgRE1HIiAibWFjT1MgZGlzayBpbWFnZSBwYWNrYWdlIiAiLmRtZyIKICAgICAgICB9CgogICAgICAgICMgR2l0SHViIHRyaWdnZXJzIGluZGl2aWR1YWwgd29ya2Zsb3dzCiAgICAgICAgZ2l0aHViIC0+IGdpdGh1YkFjdGlvbnMgIlRyaWdnZXJzIG9uIHB1c2gvUFIiCiAgICAgICAgZ2l0aHViIC0+IGF6dXJlRGV2T3BzICJUcmlnZ2VycyBvbiBwdXNoL1BSIgogICAgICAgIGdpdGh1YkFjdGlvbnMgLT4gd2luZG93c1dvcmtmbG93ICJSdW5zIgogICAgICAgIGdpdGh1YkFjdGlvbnMgLT4gbGludXhGbGF0cGFrV29ya2Zsb3cgIlJ1bnMiCiAgICAgICAgZ2l0aHViQWN0aW9ucyAtPiBsaW51eEFwcEltYWdlV29ya2Zsb3cgIlJ1bnMiCiAgICAgICAgZ2l0aHViQWN0aW9ucyAtPiBhcm02NFdvcmtmbG93ICJSdW5zIgogICAgICAgIGdpdGh1YkFjdGlvbnMgLT4gYXJtaGZXb3JrZmxvdyAiUnVucyIKICAgICAgICBnaXRodWJBY3Rpb25zIC0+IHVidW50dVdvcmtmbG93ICJSdW5zIgogICAgICAgIGF6dXJlRGV2T3BzIC0+IG1hY29zV29ya2Zsb3cgIlJ1bnMiCgoKICAgICAgICAjIFdvcmtmbG93IHJlbGF0aW9uc2hpcHMKICAgICAgICBjaWNkIC0+IGRvY2tlcmh1YiAiUHVsbHMgY29udGFpbmVyIGltYWdlcyIKICAgICAgICB3aW5kb3dzV29ya2Zsb3cgLT4gZG9ja2VyaHViICJQdWxscyBNaW5HVyBjb250YWluZXIiCiAgICAgICAgbGludXhGbGF0cGFrV29ya2Zsb3cgLT4gZG9ja2VyaHViICJQdWxscyBGbGF0cGFrIGNvbnRhaW5lciIKICAgICAgICBsaW51eEFwcEltYWdlV29ya2Zsb3cgLT4gZG9ja2VyaHViICJQdWxscyBBcHBJbWFnZSBjb250YWluZXIiCiAgICAgICAgYXJtNjRXb3JrZmxvdyAtPiBkb2NrZXJodWIgIlB1bGxzIEFSTTY0IGNvbnRhaW5lciIKICAgICAgICBhcm1oZldvcmtmbG93IC0+IGRvY2tlcmh1YiAiUHVsbHMgQVJNSEYgY29udGFpbmVyIgogICAgICAgIHVidW50dVdvcmtmbG93IC0+IGRvY2tlcmh1YiAiUHVsbHMgVWJ1bnR1IGNvbnRhaW5lciIKICAgICAgICBkb2NrZXJJbmZyYSAtPiBidWlsZFNjcmlwdHMgIkV4ZWN1dGVzIgoKICAgICAgICB3aW5kb3dzV29ya2Zsb3cgLT4gbWluZ3dDb250YWluZXIgIlVzZXMiCiAgICAgICAgbGludXhGbGF0cGFrV29ya2Zsb3cgLT4gZmxhdHBha0NvbnRhaW5lciAiVXNlcyIKICAgICAgICBsaW51eEFwcEltYWdlV29ya2Zsb3cgLT4geDg2Q29udGFpbmVyICJVc2VzIgogICAgICAgIGFybTY0V29ya2Zsb3cgLT4gYXJtNjRDb250YWluZXIgIlVzZXMiCiAgICAgICAgYXJtaGZXb3JrZmxvdyAtPiBhcm1oZkNvbnRhaW5lciAiVXNlcyIKICAgICAgICB1YnVudHVXb3JrZmxvdyAtPiB1YnVudHVDb250YWluZXIgIlVzZXMiCgoKICAgICAgICBtaW5nd0NvbnRhaW5lciAtPiB3aW5kb3dzU2NyaXB0ICJFeGVjdXRlcyIKICAgICAgICBmbGF0cGFrQ29udGFpbmVyIC0+IGZsYXRwYWtTY3JpcHQgIkV4ZWN1dGVzIgogICAgICAgIHg4NkNvbnRhaW5lciAtPiBhcHBpbWFnZVNjcmlwdCAiRXhlY3V0ZXMiCiAgICAgICAgYXJtNjRDb250YWluZXIgLT4gYXJtNjRTY3JpcHQgIkV4ZWN1dGVzIgogICAgICAgIGFybWhmQ29udGFpbmVyIC0+IGFybWhmU2NyaXB0ICJFeGVjdXRlcyIKICAgICAgICB1YnVudHVDb250YWluZXIgLT4gdWJ1bnR1U2NyaXB0ICJFeGVjdXRlcyIKICAgICAgIAogICAgICAgICMgQnVpbGQgc2NyaXB0IGV4ZWN1dGlvbgogICAgICAgIG1hY29zV29ya2Zsb3cgLT4gbWFjb3NTY3JpcHQgIkV4ZWN1dGVzIiB7CiAgICAgICAgICAgIHRhZyAid29ya2Zsb3ciCiAgICAgICAgfQoKCiAgICAgICAgIyBCdWlsZCBvdXRwdXRzCiAgICAgICAgdWJ1bnR1U2NyaXB0IC0+IHVidW50dVBhY2thZ2UgIkdlbmVyYXRlcyIKICAgICAgICB3aW5kb3dzU2NyaXB0IC0+IHdpbmRvd3NJbnN0YWxsZXIgIkdlbmVyYXRlcyIKICAgICAgICBmbGF0cGFrU2NyaXB0IC0+IGxpbnV4RmxhdHBhayAiR2VuZXJhdGVzIgogICAgICAgIGFwcGltYWdlU2NyaXB0IC0+IGxpbnV4QXBwSW1hZ2UgIkdlbmVyYXRlcyIKICAgICAgICBhcm02NFNjcmlwdCAtPiBhcm02NEFwcEltYWdlICJHZW5lcmF0ZXMiCiAgICAgICAgYXJtaGZTY3JpcHQgLT4gYXJtaGZBcHBJbWFnZSAiR2VuZXJhdGVzIgogICAgICAgIG1hY29zU2NyaXB0IC0+IG1hY29zRE1HICJHZW5lcmF0ZXMiCgogICAgICAgICMgQXJ0aWZhY3Qgc3RvcmFnZQogICAgICAgIHdpbmRvd3NJbnN0YWxsZXIgLT4gYXJ0aWZhY3RTdG9yZSAiVXBsb2FkcyB0byAoY29udGludW91cyByZWxlYXNlKSIKICAgICAgICBsaW51eEZsYXRwYWsgLT4gYXJ0aWZhY3RTdG9yZSAiVXBsb2FkcyB0byAoY29udGludW91cyByZWxlYXNlKSIKICAgICAgICBsaW51eEFwcEltYWdlIC0+IGFydGlmYWN0U3RvcmUgIlVwbG9hZHMgdG8gKGFydGlmYWN0cykiCiAgICAgICAgYXJtNjRBcHBJbWFnZSAtPiBhcnRpZmFjdFN0b3JlICJVcGxvYWRzIHRvIChhcnRpZmFjdHMpIgogICAgICAgIGFybWhmQXBwSW1hZ2UgLT4gYXJ0aWZhY3RTdG9yZSAiVXBsb2FkcyB0byAoYXJ0aWZhY3RzKSIKICAgICAgICBtYWNvc0RNRyAtPiBhcnRpZmFjdFN0b3JlICJVcGxvYWRzIHRvIChhcnRpZmFjdHMpIgoKICAgICAgICAjIERlcGVuZGVuY2llcyB3aXRoaW4gU2NvcHkKICAgICAgICBzY29weUFwcCAtPiBsaWJpaW8gIlVzZXMgZm9yIGhhcmR3YXJlIGNvbW11bmljYXRpb24iCiAgICAgICAgc2NvcHlBcHAgLT4gZ251cmFkaW8gIlVzZXMgZm9yIHNpZ25hbCBwcm9jZXNzaW5nIgogICAgICAgIHNjb3B5QXBwIC0+IGxpYm0yayAiVXNlcyBmb3IgQURBTE0yMDAwIHN1cHBvcnQiCiAgICAgICAgc2NvcHlBcHAgLT4gcXd0ICJVc2VzIGZvciBwbG90dGluZyIKICAgICAgICBzY29weUFwcCAtPiBsaWJzaWdyb2sgIlVzZXMgZm9yIHByb3RvY29sIGRlY29kaW5nIgoKCiAgICAgICAgIyBVc2VycwogICAgICAgIGRldmVsb3BlciA9IHBlcnNvbiAiRGV2ZWxvcGVyIiAiU2NvcHkgZGV2ZWxvcGVyIgogICAgICAgIGVuZFVzZXIgPSBwZXJzb24gIkVuZCBVc2VyIiAiRW5naW5lZXIgdXNpbmcgU2NvcHkgZm9yIHNpZ25hbCBhbmFseXNpcyIKCiAgICAgICAgZGV2ZWxvcGVyIC0+IGdpdGh1YiAiQ29tbWl0cyBjb2RlIgogICAgICAgIGRldmVsb3BlciAtPiBzY29weSAiRGV2ZWxvcHMiCiAgICAgICAgZW5kVXNlciAtPiBhcnRpZmFjdFN0b3JlICJEb3dubG9hZHMiCgogICAgICAgICMgRGVwbG95bWVudCBlbnZpcm9ubWVudHMKICAgICAgICBidWlsZEVudmlyb25tZW50ID0gZGVwbG95bWVudEVudmlyb25tZW50ICJNdWx0aS1QbGF0Zm9ybSBCdWlsZCBFbnZpcm9ubWVudCIgewogICAgICAgICAgICBkZXBsb3ltZW50Tm9kZSAiR2l0SHViIEFjdGlvbnMgSW5mcmFzdHJ1Y3R1cmUiICJHaXRIdWItaG9zdGVkIENJL0NEIHBsYXRmb3JtIiAiR2l0SHViIEFjdGlvbnMiIHsKICAgICAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJXaW5kb3dzIFJ1bm5lciIgIldpbmRvd3MgMjAyMiIgIk1pY3Jvc29mdCBXaW5kb3dzIiB7CiAgICAgICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIk1pbkdXIERvY2tlciBDb250YWluZXIiICJjcmlzdGlhbmJpbmRlYS9zY29weTItbWluZ3c2NCIgIk1TWVMyL01pbkdXNjQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY29udGFpbmVySW5zdGFuY2Ugd2luZG93c1NjcmlwdAogICAgICAgICAgICAgICAgICAgICAgICBjb250YWluZXJJbnN0YW5jZSBzY29weUFwcCAiV2luZG93cyBCdWlsZCIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBkZXBsb3ltZW50Tm9kZSAiTGludXggUnVubmVyIiAiVWJ1bnR1IDIyLjA0IiAiVWJ1bnR1IExpbnV4IiB7CiAgICAgICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIkZsYXRwYWsgQ29udGFpbmVyIiAiY3Jpc3RpYW5iaW5kZWEvc2NvcHkyLWZsYXRwYWsiICJGbGF0cGFrIFJ1bnRpbWUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY29udGFpbmVySW5zdGFuY2UgZmxhdHBha1NjcmlwdAogICAgICAgICAgICAgICAgICAgICAgICBjb250YWluZXJJbnN0YW5jZSBzY29weUFwcCAiRmxhdHBhayBCdWlsZCIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIkFwcEltYWdlIENvbnRhaW5lciIgImNyaXN0aWFuYmluZGVhL3Njb3B5Mi14ODZfNjQtYXBwaW1hZ2UiICJVYnVudHUgQ29udGFpbmVyIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIGFwcGltYWdlU2NyaXB0CiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIHNjb3B5QXBwICJBcHBJbWFnZSBCdWlsZCIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIlVidW50dSBDb250YWluZXIiICJjcmlzdGlhbmJpbmRlYS9zY29weTItdWJ1bnR1IiAiRGV2ZWxvcG1lbnQgRW52aXJvbm1lbnQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY29udGFpbmVySW5zdGFuY2UgdWJ1bnR1U2NyaXB0CiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIHNjb3B5QXBwICJVYnVudHUgQnVpbGQiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJBUk02NCBDb250YWluZXIiICJjcmlzdGlhbmJpbmRlYS9zY29weTItYXJtNjQtYXBwaW1hZ2UiICJDcm9zcy1jb21waWxhdGlvbiIgewogICAgICAgICAgICAgICAgICAgICAgICBkZXBsb3ltZW50Tm9kZSAiQVJNNjQgU3lzcm9vdCIgImFhcmNoNjQtbGludXgtZ251IiAiQ2hyb290IEVudmlyb25tZW50IiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb250YWluZXJJbnN0YW5jZSBhcm02NFNjcmlwdCAiQVJNNjQgQnVpbGQiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb250YWluZXJJbnN0YW5jZSBzY29weUFwcCAiQVJNNjQgQmluYXJ5IgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJBUk1IRiBDb250YWluZXIiICJjcmlzdGlhbmJpbmRlYS9zY29weTItYXJtaGYtYXBwaW1hZ2UiICJDcm9zcy1jb21waWxhdGlvbiIgewogICAgICAgICAgICAgICAgICAgICAgICBkZXBsb3ltZW50Tm9kZSAiQVJNSEYgU3lzcm9vdCIgImFybS1saW51eC1nbnVlYWJpaGYiICJDaHJvb3QgRW52aXJvbm1lbnQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIGFybWhmU2NyaXB0ICJBUk1IRiBCdWlsZCIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIHNjb3B5QXBwICJBUk1IRiBCaW5hcnkiCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIkF6dXJlIERldk9wcyBJbmZyYXN0cnVjdHVyZSIgIk1pY3Jvc29mdCBjbG91ZCBDSS9DRCBwbGF0Zm9ybSIgIkF6dXJlIERldk9wcyIgewogICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIm1hY09TIEFnZW50IiAibWFjT1MiICJtYWNPUyB4ODZfNjQiIHsKICAgICAgICAgICAgICAgICAgICBkZXBsb3ltZW50Tm9kZSAiSG9tZWJyZXcgRW52aXJvbm1lbnQiICJQYWNrYWdlIE1hbmFnZXIiICJtYWNPUyBOYXRpdmUiIHsKICAgICAgICAgICAgICAgICAgICAgICAgY29udGFpbmVySW5zdGFuY2UgbWFjb3NTY3JpcHQKICAgICAgICAgICAgICAgICAgICAgICAgY29udGFpbmVySW5zdGFuY2Ugc2NvcHlBcHAgIm1hY09TIEJ1aWxkIgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgZGlzdHJpYnV0aW9uRW52aXJvbm1lbnQgPSBkZXBsb3ltZW50RW52aXJvbm1lbnQgIkFydGlmYWN0IERpc3RyaWJ1dGlvbiBFbnZpcm9ubWVudCIgewogICAgICAgICAgICBkZXBsb3ltZW50Tm9kZSAiR2l0SHViIFJlbGVhc2VzIiAiQXJ0aWZhY3QgU3RvcmFnZSBhbmQgRGlzdHJpYnV0aW9uIiAiR2l0SHViIiB7CiAgICAgICAgICAgICAgICBjb250YWluZXJJbnN0YW5jZSB3aW5kb3dzSW5zdGFsbGVyCiAgICAgICAgICAgICAgICBjb250YWluZXJJbnN0YW5jZSBsaW51eEZsYXRwYWsKICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIGxpbnV4QXBwSW1hZ2UKICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIGFybTY0QXBwSW1hZ2UKICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIGFybWhmQXBwSW1hZ2UKICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIHVidW50dVBhY2thZ2UKICAgICAgICAgICAgICAgIGNvbnRhaW5lckluc3RhbmNlIG1hY29zRE1HCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9CgogICAgdmlld3MgewogICAgICAgIHN5c3RlbUxhbmRzY2FwZSAiU3lzdGVtTGFuZHNjYXBlIiAiT3ZlcmFsbCBTY29weSBkZXBsb3ltZW50IGVjb3N5c3RlbSIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSAicmVsYXRpb25zaGlwLnRhZz09d29ya2Zsb3ciCiAgICAgICAgfQoKICAgICAgICBjb250YWluZXIgY2ljZFBsYXRmb3JtICJDSUNEUGxhdGZvcm0iICJDSS9DRCBydW5uaW5nIHBsYXRmb3JtcyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICB9CgogICAgICAgIGNvbnRhaW5lciBjaWNkICJDSUNEQ29udGFpbmVycyIgIkNJL0NEIHdvcmtmbG93IGNvbnRhaW5lcnMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgY2ljZFBsYXRmb3JtCiAgICAgICAgICAgIGluY2x1ZGUgZ2l0aHViQWN0aW9ucyBhenVyZURldk9wcwogICAgICAgIH0KCiAgICAgICAgY29udGFpbmVyIGRlcGxveW1lbnRUYXJnZXRzICJEZXBsb3ltZW50VGFyZ2V0cyIgIkZpbmFsIGRlcGxveW1lbnQgYXJ0aWZhY3RzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgIH0KCiAgICAgICAgZGVwbG95bWVudCBzY29weSBidWlsZEVudmlyb25tZW50ICJCdWlsZERlcGxveW1lbnQiICJNdWx0aS1wbGF0Zm9ybSBidWlsZCBpbmZyYXN0cnVjdHVyZSBzaG93aW5nIGFsbCBjb21waWxhdGlvbiBlbnZpcm9ubWVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgfQoKICAgICAgICBkZXBsb3ltZW50ICogZGlzdHJpYnV0aW9uRW52aXJvbm1lbnQgIkFydGlmYWN0RGlzdHJpYnV0aW9uIiAiRmluYWwgYXJ0aWZhY3QgZGlzdHJpYnV0aW9uIHNob3dpbmcgYWxsIGdlbmVyYXRlZCBwYWNrYWdlcyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICB9CgogICAgICAgIGR5bmFtaWMgY2ljZCAiQnVpbGRQcm9jZXNzIiAiQnVpbGQgcHJvY2VzcyBmbG93IiB7CiAgICAgICAgICAgIGRldmVsb3BlciAtPiBnaXRodWIgIlB1c2ggY29kZSIKCiAgICAgICAgICAgIGdpdGh1YiAtPiBnaXRodWJBY3Rpb25zICJ0cmlnZ2VycyBHaXRIdWIgQWN0aW9ucyB3b3JrZmxvd3MiCiAgICAgICAgICAgIGdpdGh1YiAtPiBhenVyZURldk9wcyAidHJpZ2dlcnMgQXp1cmUgd29ya2Zsb3dzIgoKICAgICAgICAgICAgZ2l0aHViQWN0aW9ucyAtPiB3aW5kb3dzV29ya2Zsb3cgIlRyaWdnZXIgV2luZG93cyBidWlsZCIKICAgICAgICAgICAgZ2l0aHViQWN0aW9ucyAtPiBsaW51eEZsYXRwYWtXb3JrZmxvdyAiVHJpZ2dlciBMaW51eCBidWlsZHMiCiAgICAgICAgICAgIGdpdGh1YkFjdGlvbnMgLT4gbGludXhBcHBJbWFnZVdvcmtmbG93ICJUcmlnZ2VyIExpbnV4IEFwcEltYWdlIGJ1aWxkcyIKICAgICAgICAgICAgZ2l0aHViQWN0aW9ucyAtPiB1YnVudHVXb3JrZmxvdyAiVHJpZ2dlciBVYnVudHUgYnVpbGRzIgogICAgICAgICAgICBnaXRodWJBY3Rpb25zIC0+IGFybTY0V29ya2Zsb3cgIlRyaWdnZXIgQVJNNjQgYnVpbGRzIgogICAgICAgICAgICBnaXRodWJBY3Rpb25zIC0+IGFybWhmV29ya2Zsb3cgIlRyaWdnZXIgQVJNSEYgYnVpbGRzIgogICAgICAgICAgICBhenVyZURldk9wcyAtPiBtYWNvc1dvcmtmbG93ICJUcmlnZ2VyIE1hY09TIGJ1aWxkcyIKCiAgICAgICAgICAgIHdpbmRvd3NXb3JrZmxvdyAtPiBtaW5nd0NvbnRhaW5lciAiVXNlcyIKICAgICAgICAgICAgbWluZ3dDb250YWluZXIgLT4gd2luZG93c1NjcmlwdCAiRXhlY3V0ZSBXaW5kb3dzIGJ1aWxkIgogICAgICAgICAgICBsaW51eEZsYXRwYWtXb3JrZmxvdyAtPiBmbGF0cGFrQ29udGFpbmVyICJVc2VzIgogICAgICAgICAgICBmbGF0cGFrQ29udGFpbmVyIC0+IGZsYXRwYWtTY3JpcHQgIkV4ZWN1dGUgRmxhdHBhayBidWlsZCIKICAgICAgICAgICAgbGludXhBcHBJbWFnZVdvcmtmbG93IC0+IHg4NkNvbnRhaW5lciAiVXNlcyIKICAgICAgICAgICAgeDg2Q29udGFpbmVyIC0+IGFwcGltYWdlU2NyaXB0ICJFeGVjdXRlIEFwcEltYWdlIGJ1aWxkIgogICAgICAgICAgICB1YnVudHVXb3JrZmxvdyAtPiB1YnVudHVDb250YWluZXIgIlVzZXMiCiAgICAgICAgICAgIHVidW50dUNvbnRhaW5lciAtPiB1YnVudHVTY3JpcHQgIkV4ZWN1dGUgVWJ1bnR1IGJ1aWxkIgogICAgICAgICAgICBhcm02NFdvcmtmbG93IC0+IGFybTY0Q29udGFpbmVyICJVc2VzIgogICAgICAgICAgICBhcm02NENvbnRhaW5lciAtPiBhcm02NFNjcmlwdCAiRXhlY3V0ZSBBUk02NCBidWlsZHMiCiAgICAgICAgICAgIGFybWhmV29ya2Zsb3cgLT4gYXJtaGZDb250YWluZXIgIlVzZXMiCiAgICAgICAgICAgIGFybWhmQ29udGFpbmVyIC0+IGFybWhmU2NyaXB0ICJFeGVjdXRlIEFSTUhGIGJ1aWxkcyIKICAgICAgICAgICAgbWFjb3NXb3JrZmxvdyAtPiBtYWNvc1NjcmlwdCAiRXhlY3V0ZSBtYWNPUyBidWlsZCIKICAgICAgICAgICAgCiAgICAgICAgICAgIHdpbmRvd3NTY3JpcHQgLT4gd2luZG93c0luc3RhbGxlciAiR2VuZXJhdGUgaW5zdGFsbGVyIgogICAgICAgICAgICBhcHBpbWFnZVNjcmlwdCAtPiBsaW51eEFwcEltYWdlICJHZW5lcmF0ZSBBcHBJbWFnZSIKICAgICAgICAgICAgdWJ1bnR1U2NyaXB0IC0+IHVidW50dVBhY2thZ2UgIkdlbmVyYXRlIFVidW50dSBidWlsZCIKICAgICAgICAgICAgZmxhdHBha1NjcmlwdCAtPiBsaW51eEZsYXRwYWsgIkdlbmVyYXRlIEZsYXRwYWsiCiAgICAgICAgICAgIGFybTY0U2NyaXB0IC0+IGFybTY0QXBwSW1hZ2UgIkdlbmVyYXRlIEFSTTY0IEFwcEltYWdlIgogICAgICAgICAgICBhcm1oZlNjcmlwdCAtPiBhcm1oZkFwcEltYWdlICJHZW5lcmF0ZSBBUk1IRiBBcHBJbWFnZSIKICAgICAgICAgICAgbWFjb3NTY3JpcHQgLT4gbWFjb3NETUcgIkdlbmVyYXRlIERNRyIKICAgICAgICAgICAgCiAgICAgICAgICAgIHdpbmRvd3NJbnN0YWxsZXIgLT4gYXJ0aWZhY3RTdG9yZSAiVXBsb2FkIGFydGlmYWN0cyIKICAgICAgICAgICAgbGludXhBcHBJbWFnZSAtPiBhcnRpZmFjdFN0b3JlICJVcGxvYWQgYXJ0aWZhY3RzIgogICAgICAgICAgICBhcm02NEFwcEltYWdlIC0+IGFydGlmYWN0U3RvcmUgIlVwbG9hZCBhcnRpZmFjdHMiCiAgICAgICAgICAgIGFybWhmQXBwSW1hZ2UgLT4gYXJ0aWZhY3RTdG9yZSAiVXBsb2FkIGFydGlmYWN0cyIKICAgICAgICAgICAgbGludXhGbGF0cGFrIC0+IGFydGlmYWN0U3RvcmUgIlVwbG9hZCBhcnRpZmFjdHMiCiAgICAgICAgICAgIG1hY29zRE1HIC0+IGFydGlmYWN0U3RvcmUgIlVwbG9hZCBtYWNPUyBhcnRpZmFjdHMiCiAgICAgICAgICAgIAogICAgICAgIH0KCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiU29mdHdhcmUgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMxMTY4YmQKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgICAgIHNoYXBlIFJvdW5kZWRCb3gKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJDb250YWluZXIiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzQzOGRkNQogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICAgICAgc2hhcGUgUm91bmRlZEJveAogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIlBlcnNvbiIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMDg0MjdiCiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgICAgICBzaGFwZSBQZXJzb24KICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJFeHRlcm5hbCIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjOTk5OTk5CiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIHJlbGF0aW9uc2hpcCAiUmVsYXRpb25zaGlwIiB7CiAgICAgICAgICAgICAgICBkYXNoZWQgZmFsc2UKICAgICAgICAgICAgfQogICAgICAgICAgICByZWxhdGlvbnNoaXAgIkFzeW5jIiB7CiAgICAgICAgICAgICAgICBkYXNoZWQgdHJ1ZQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQp9",
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.warning" : "0"
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "CICDContainers",
+      "styles" : {
+        "elements" : [ {
+          "background" : "#438dd5",
+          "color" : "#ffffff",
+          "shape" : "RoundedBox",
+          "tag" : "Container"
+        }, {
+          "background" : "#999999",
+          "color" : "#ffffff",
+          "tag" : "External"
+        }, {
+          "background" : "#08427b",
+          "color" : "#ffffff",
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "shape" : "RoundedBox",
+          "tag" : "Software System"
+        } ],
+        "relationships" : [ {
+          "dashed" : true,
+          "tag" : "Async"
+        }, {
+          "dashed" : false,
+          "tag" : "Relationship"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "description" : "CI/CD running platforms",
+      "dimensions" : {
+        "height" : 1916,
+        "width" : 1858
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 704,
+        "y" : 208
+      }, {
+        "id" : "12",
+        "x" : 1079,
+        "y" : 808
+      }, {
+        "id" : "13",
+        "x" : 329,
+        "y" : 808
+      }, {
+        "id" : "14",
+        "x" : 704,
+        "y" : 1408
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "CICDPlatform",
+      "name" : "Container View: CI/CD Platform",
+      "order" : 2,
+      "paperSize" : "A4_Portrait",
+      "relationships" : [ {
+        "id" : "45"
+      }, {
+        "id" : "47"
+      }, {
+        "id" : "49"
+      }, {
+        "id" : "63"
+      } ],
+      "softwareSystemId" : "11"
+    }, {
+      "description" : "CI/CD workflow containers",
+      "dimensions" : {
+        "height" : 2705,
+        "width" : 5281
+      },
+      "elements" : [ {
+        "id" : "2",
+        "x" : 226,
+        "y" : 1713
+      }, {
+        "id" : "12",
+        "x" : 2085,
+        "y" : 163
+      }, {
+        "id" : "13",
+        "x" : 4601,
+        "y" : 200
+      }, {
+        "id" : "15",
+        "x" : 220,
+        "y" : 1061
+      }, {
+        "id" : "16",
+        "x" : 970,
+        "y" : 1061
+      }, {
+        "id" : "17",
+        "x" : 1720,
+        "y" : 1061
+      }, {
+        "id" : "18",
+        "x" : 2470,
+        "y" : 1061
+      }, {
+        "id" : "19",
+        "x" : 3220,
+        "y" : 1061
+      }, {
+        "id" : "20",
+        "x" : 3970,
+        "y" : 1061
+      }, {
+        "id" : "21",
+        "x" : 4611,
+        "y" : 1078
+      }, {
+        "id" : "22",
+        "x" : 4281,
+        "y" : 1698
+      }, {
+        "id" : "29",
+        "x" : 4281,
+        "y" : 2148
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "CICDContainers",
+      "name" : "Container View: CI/CD Infrastructure",
+      "order" : 3,
+      "relationships" : [ {
+        "id" : "111",
+        "vertices" : [ {
+          "x" : 4835,
+          "y" : 2300
+        } ]
+      }, {
+        "id" : "48"
+      }, {
+        "id" : "52"
+      }, {
+        "id" : "54"
+      }, {
+        "id" : "56"
+      }, {
+        "id" : "58"
+      }, {
+        "id" : "60"
+      }, {
+        "id" : "62"
+      }, {
+        "id" : "66"
+      }, {
+        "id" : "67",
+        "vertices" : [ {
+          "x" : 1166,
+          "y" : 1683
+        } ]
+      }, {
+        "id" : "68",
+        "vertices" : [ {
+          "x" : 1851,
+          "y" : 1668
+        } ]
+      }, {
+        "id" : "69",
+        "vertices" : [ {
+          "x" : 2491,
+          "y" : 1688
+        } ]
+      }, {
+        "id" : "70",
+        "vertices" : [ {
+          "x" : 2651,
+          "y" : 1753
+        } ]
+      }, {
+        "id" : "71",
+        "vertices" : [ {
+          "x" : 2666,
+          "y" : 1838
+        } ]
+      }, {
+        "id" : "72"
+      }, {
+        "id" : "74"
+      }, {
+        "id" : "78"
+      }, {
+        "id" : "81"
+      }, {
+        "id" : "84"
+      }, {
+        "id" : "87"
+      }, {
+        "id" : "90"
+      } ],
+      "softwareSystemId" : "14"
+    }, {
+      "description" : "Final deployment artifacts",
+      "dimensions" : {
+        "height" : 1916,
+        "width" : 5608
+      },
+      "elements" : [ {
+        "id" : "3",
+        "x" : 2579,
+        "y" : 1408
+      }, {
+        "id" : "29",
+        "x" : 2579,
+        "y" : 208
+      }, {
+        "id" : "38",
+        "x" : 4829,
+        "y" : 808
+      }, {
+        "id" : "39",
+        "x" : 4079,
+        "y" : 808
+      }, {
+        "id" : "40",
+        "x" : 3329,
+        "y" : 808
+      }, {
+        "id" : "41",
+        "x" : 2579,
+        "y" : 808
+      }, {
+        "id" : "42",
+        "x" : 1829,
+        "y" : 808
+      }, {
+        "id" : "43",
+        "x" : 1079,
+        "y" : 808
+      }, {
+        "id" : "44",
+        "x" : 329,
+        "y" : 808
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "DeploymentTargets",
+      "name" : "Container View: Deployment Targets",
+      "order" : 4,
+      "paperSize" : "A2_Landscape",
+      "relationships" : [ {
+        "id" : "116",
+        "vertices" : [ {
+          "x" : 1679,
+          "y" : 704
+        } ]
+      }, {
+        "id" : "120",
+        "vertices" : [ {
+          "x" : 4679,
+          "y" : 704
+        } ]
+      }, {
+        "id" : "123",
+        "vertices" : [ {
+          "x" : 3929,
+          "y" : 704
+        } ]
+      }, {
+        "id" : "126"
+      }, {
+        "id" : "129"
+      }, {
+        "id" : "132"
+      }, {
+        "id" : "135",
+        "vertices" : [ {
+          "x" : 929,
+          "y" : 704
+        } ]
+      }, {
+        "id" : "136",
+        "vertices" : [ {
+          "x" : 4679,
+          "y" : 1212
+        } ]
+      }, {
+        "id" : "138",
+        "vertices" : [ {
+          "x" : 3929,
+          "y" : 1212
+        } ]
+      }, {
+        "id" : "139"
+      }, {
+        "id" : "140"
+      }, {
+        "id" : "141"
+      }, {
+        "id" : "142",
+        "vertices" : [ {
+          "x" : 929,
+          "y" : 1212
+        } ]
+      } ],
+      "softwareSystemId" : "37"
+    } ],
+    "deploymentViews" : [ {
+      "description" : "Multi-platform build infrastructure showing all compilation environments",
+      "dimensions" : {
+        "height" : 1642,
+        "width" : 3400
+      },
+      "elements" : [ {
+        "id" : "153",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "154",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "155",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "157",
+        "x" : 2015,
+        "y" : 518
+      }, {
+        "id" : "158",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "159",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "161",
+        "x" : 1420,
+        "y" : 788
+      }, {
+        "id" : "162",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "164",
+        "x" : 855,
+        "y" : 788
+      }, {
+        "id" : "165",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "167",
+        "x" : 260,
+        "y" : 788
+      }, {
+        "id" : "168",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "169",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "171",
+        "x" : 1120,
+        "y" : 228
+      }, {
+        "id" : "172",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "173",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "175",
+        "x" : 500,
+        "y" : 223
+      }, {
+        "id" : "176",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "177",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "178",
+        "x" : 175,
+        "y" : 175
+      }, {
+        "id" : "180",
+        "x" : 2625,
+        "y" : 465
+      } ],
+      "environment" : "Multi-Platform Build Environment",
+      "key" : "BuildDeployment",
+      "name" : "Deployment View: Scopy - Multi-Platform Build Environment",
+      "order" : 5,
+      "softwareSystemId" : "4"
+    }, {
+      "description" : "Final artifact distribution showing all generated packages",
+      "dimensions" : {
+        "height" : 1204,
+        "width" : 1875
+      },
+      "elements" : [ {
+        "id" : "181",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "182",
+        "x" : 715,
+        "y" : 163
+      }, {
+        "id" : "183",
+        "x" : 220,
+        "y" : 168
+      }, {
+        "id" : "184",
+        "x" : 715,
+        "y" : 548
+      }, {
+        "id" : "185",
+        "x" : 1210,
+        "y" : 165
+      }, {
+        "id" : "186",
+        "x" : 220,
+        "y" : 545
+      }, {
+        "id" : "187",
+        "x" : 1205,
+        "y" : 548
+      }, {
+        "id" : "188",
+        "x" : 1205,
+        "y" : 548
+      } ],
+      "environment" : "Artifact Distribution Environment",
+      "key" : "ArtifactDistribution",
+      "name" : "Deployment View: Artifact Distribution Environment",
+      "order" : 6
+    } ],
+    "dynamicViews" : [ {
+      "description" : "Build process flow",
+      "dimensions" : {
+        "height" : 4558,
+        "width" : 6066
+      },
+      "elementId" : "14",
+      "elements" : [ {
+        "id" : "1",
+        "x" : 908,
+        "y" : 2429
+      }, {
+        "id" : "3",
+        "x" : 5408,
+        "y" : 1829
+      }, {
+        "id" : "12",
+        "x" : 1658,
+        "y" : 2129
+      }, {
+        "id" : "13",
+        "x" : 1658,
+        "y" : 2729
+      }, {
+        "id" : "15",
+        "x" : 2408,
+        "y" : 329
+      }, {
+        "id" : "16",
+        "x" : 2408,
+        "y" : 929
+      }, {
+        "id" : "17",
+        "x" : 2408,
+        "y" : 1529
+      }, {
+        "id" : "18",
+        "x" : 2408,
+        "y" : 2129
+      }, {
+        "id" : "19",
+        "x" : 2408,
+        "y" : 2729
+      }, {
+        "id" : "20",
+        "x" : 2408,
+        "y" : 3329
+      }, {
+        "id" : "21",
+        "x" : 2408,
+        "y" : 3929
+      }, {
+        "id" : "23",
+        "x" : 3158,
+        "y" : 329
+      }, {
+        "id" : "24",
+        "x" : 3158,
+        "y" : 929
+      }, {
+        "id" : "25",
+        "x" : 3158,
+        "y" : 1529
+      }, {
+        "id" : "26",
+        "x" : 3158,
+        "y" : 2129
+      }, {
+        "id" : "27",
+        "x" : 3158,
+        "y" : 2729
+      }, {
+        "id" : "28",
+        "x" : 3158,
+        "y" : 3329
+      }, {
+        "id" : "30",
+        "x" : 3908,
+        "y" : 329
+      }, {
+        "id" : "31",
+        "x" : 3908,
+        "y" : 929
+      }, {
+        "id" : "32",
+        "x" : 3908,
+        "y" : 1529
+      }, {
+        "id" : "33",
+        "x" : 3908,
+        "y" : 2129
+      }, {
+        "id" : "34",
+        "x" : 3908,
+        "y" : 2729
+      }, {
+        "id" : "35",
+        "x" : 3908,
+        "y" : 3329
+      }, {
+        "id" : "36",
+        "x" : 3908,
+        "y" : 3929
+      }, {
+        "id" : "38",
+        "x" : 4658,
+        "y" : 329
+      }, {
+        "id" : "39",
+        "x" : 4658,
+        "y" : 929
+      }, {
+        "id" : "40",
+        "x" : 4658,
+        "y" : 1529
+      }, {
+        "id" : "41",
+        "x" : 4658,
+        "y" : 2129
+      }, {
+        "id" : "42",
+        "x" : 4658,
+        "y" : 2729
+      }, {
+        "id" : "43",
+        "x" : 4658,
+        "y" : 3329
+      }, {
+        "id" : "44",
+        "x" : 4658,
+        "y" : 3929
+      }, {
+        "id" : "148",
+        "x" : 208,
+        "y" : 2379
+      } ],
+      "externalBoundariesVisible" : false,
+      "key" : "BuildProcess",
+      "name" : "Dynamic View: CI/CD Infrastructure",
+      "order" : 7,
+      "paperSize" : "A2_Landscape",
+      "relationships" : [ {
+        "description" : "Push code",
+        "id" : "150",
+        "order" : "1",
+        "response" : false
+      }, {
+        "description" : "triggers GitHub Actions workflows",
+        "id" : "45",
+        "order" : "2",
+        "response" : false
+      }, {
+        "description" : "triggers Azure workflows",
+        "id" : "47",
+        "order" : "3",
+        "response" : false
+      }, {
+        "description" : "Trigger Windows build",
+        "id" : "48",
+        "order" : "4",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 2304,
+          "y" : 779
+        } ]
+      }, {
+        "description" : "Trigger Linux builds",
+        "id" : "52",
+        "order" : "5",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 2304,
+          "y" : 1379
+        } ]
+      }, {
+        "description" : "Trigger Linux AppImage builds",
+        "id" : "54",
+        "order" : "6",
+        "response" : false
+      }, {
+        "description" : "Trigger Ubuntu builds",
+        "id" : "60",
+        "order" : "7",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 2212,
+          "y" : 2579
+        }, {
+          "x" : 2304,
+          "y" : 3179
+        } ]
+      }, {
+        "description" : "Trigger ARM64 builds",
+        "id" : "56",
+        "order" : "8",
+        "response" : false
+      }, {
+        "description" : "Trigger ARMHF builds",
+        "id" : "58",
+        "order" : "9",
+        "response" : false
+      }, {
+        "description" : "Trigger MacOS builds",
+        "id" : "62",
+        "order" : "10",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 2304,
+          "y" : 3779
+        } ]
+      }, {
+        "description" : "Uses",
+        "id" : "73",
+        "order" : "11",
+        "response" : false
+      }, {
+        "description" : "Execute Windows build",
+        "id" : "92",
+        "order" : "12",
+        "response" : false
+      }, {
+        "description" : "Uses",
+        "id" : "77",
+        "order" : "13",
+        "response" : false
+      }, {
+        "description" : "Execute Flatpak build",
+        "id" : "95",
+        "order" : "14",
+        "response" : false
+      }, {
+        "description" : "Uses",
+        "id" : "80",
+        "order" : "15",
+        "response" : false
+      }, {
+        "description" : "Execute AppImage build",
+        "id" : "98",
+        "order" : "16",
+        "response" : false
+      }, {
+        "description" : "Uses",
+        "id" : "89",
+        "order" : "17",
+        "response" : false
+      }, {
+        "description" : "Execute Ubuntu build",
+        "id" : "107",
+        "order" : "18",
+        "response" : false
+      }, {
+        "description" : "Uses",
+        "id" : "83",
+        "order" : "19",
+        "response" : false
+      }, {
+        "description" : "Execute ARM64 builds",
+        "id" : "101",
+        "order" : "20",
+        "response" : false
+      }, {
+        "description" : "Uses",
+        "id" : "86",
+        "order" : "21",
+        "response" : false
+      }, {
+        "description" : "Execute ARMHF builds",
+        "id" : "104",
+        "order" : "22",
+        "response" : false
+      }, {
+        "description" : "Execute macOS build",
+        "id" : "110",
+        "order" : "23",
+        "response" : false
+      }, {
+        "description" : "Generate installer",
+        "id" : "118",
+        "order" : "24",
+        "response" : false
+      }, {
+        "description" : "Generate AppImage",
+        "id" : "124",
+        "order" : "25",
+        "response" : false
+      }, {
+        "description" : "Generate Ubuntu build",
+        "id" : "114",
+        "order" : "26",
+        "response" : false
+      }, {
+        "description" : "Generate Flatpak",
+        "id" : "121",
+        "order" : "27",
+        "response" : false
+      }, {
+        "description" : "Generate ARM64 AppImage",
+        "id" : "127",
+        "order" : "28",
+        "response" : false
+      }, {
+        "description" : "Generate ARMHF AppImage",
+        "id" : "130",
+        "order" : "29",
+        "response" : false
+      }, {
+        "description" : "Generate DMG",
+        "id" : "133",
+        "order" : "30",
+        "response" : false
+      }, {
+        "description" : "Upload artifacts",
+        "id" : "136",
+        "order" : "31",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 5212,
+          "y" : 779
+        } ]
+      }, {
+        "description" : "Upload artifacts",
+        "id" : "139",
+        "order" : "32",
+        "response" : false
+      }, {
+        "description" : "Upload artifacts",
+        "id" : "140",
+        "order" : "33",
+        "response" : false
+      }, {
+        "description" : "Upload artifacts",
+        "id" : "141",
+        "order" : "34",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 5212,
+          "y" : 2579
+        } ]
+      }, {
+        "description" : "Upload artifacts",
+        "id" : "138",
+        "order" : "35",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 5212,
+          "y" : 1379
+        } ]
+      }, {
+        "description" : "Upload macOS artifacts",
+        "id" : "142",
+        "order" : "36",
+        "response" : false,
+        "vertices" : [ {
+          "x" : 5212,
+          "y" : 3779
+        } ]
+      } ]
+    } ],
+    "systemLandscapeViews" : [ {
+      "description" : "Overall Scopy deployment ecosystem",
+      "dimensions" : {
+        "height" : 1716,
+        "width" : 6116
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 958,
+        "y" : 608
+      }, {
+        "id" : "2",
+        "x" : 3208,
+        "y" : 308
+      }, {
+        "id" : "3",
+        "x" : 5458,
+        "y" : 583
+      }, {
+        "id" : "4",
+        "x" : 958,
+        "y" : 1208
+      }, {
+        "id" : "11",
+        "x" : 1710,
+        "y" : 605
+      }, {
+        "id" : "14",
+        "x" : 2458,
+        "y" : 608
+      }, {
+        "id" : "22",
+        "x" : 3208,
+        "y" : 908
+      }, {
+        "id" : "29",
+        "x" : 3958,
+        "y" : 908
+      }, {
+        "id" : "37",
+        "x" : 4708,
+        "y" : 908
+      }, {
+        "id" : "148",
+        "x" : 233,
+        "y" : 858
+      }, {
+        "id" : "149",
+        "x" : 4733,
+        "y" : 208
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "SystemLandscape",
+      "name" : "System Landscape View",
+      "order" : 1,
+      "paperSize" : "A2_Landscape",
+      "relationships" : [ {
+        "id" : "117"
+      }, {
+        "id" : "137"
+      }, {
+        "id" : "150"
+      }, {
+        "id" : "151"
+      }, {
+        "id" : "152"
+      }, {
+        "id" : "46"
+      }, {
+        "id" : "51"
+      }, {
+        "id" : "65"
+      }, {
+        "id" : "72"
+      }, {
+        "id" : "76"
+      } ]
+    } ]
+  }
+}

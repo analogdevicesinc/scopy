@@ -1,0 +1,5 @@
+diagrams/_build
+diagrams/app_diagrams/.structurizr
+diagrams/deployment_diagrams/.structurizr
+diagrams/lib
+diagrams/structurizr*
