@@ -45,12 +45,23 @@ jobs:
         echo "test_report_folder=$TEST_REPORT_FOLDER" >> "$GITHUB_ENV"
         # python3 test_report_generator.py ../testing_results/ tests/test_report/ "${{ github.sha }}"
 
+    - name: Setup Java for Structurizr
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Build doc
       working-directory: docs
       run: |
         python3 extract_macros.py ../ user_guide/preferences_table.rst
         export ADOC_DOC_VERSION=${{ github.ref_name }}
         make html SPHINXOPTS='-W --keep-going'
+
+    - name: Build Structurizr diagrams
+      working-directory: docs/architecture/diagrams
+      run: |
+        ./export-structurizr.sh
 
     - name: Store the generated doc
       uses: actions/upload-artifact@v4

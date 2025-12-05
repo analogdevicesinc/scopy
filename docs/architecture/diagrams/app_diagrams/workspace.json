@@ -1,0 +1,2104 @@
+{
+  "configuration" : { },
+  "description" : "Description",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedAgent" : "structurizr-ui",
+  "lastModifiedDate" : "2025-12-09T06:54:57Z",
+  "model" : {
+    "people" : [ {
+      "id" : "1",
+      "name" : "Engineer",
+      "properties" : {
+        "structurizr.dsl.identifier" : "engineerUser"
+      },
+      "relationships" : [ {
+        "description" : "uses GUI for device control and analysis",
+        "destinationId" : "10",
+        "id" : "152",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      }, {
+        "description" : "uses GUI for device control and analysis",
+        "destinationId" : "9",
+        "id" : "153",
+        "linkedRelationshipId" : "152",
+        "sourceId" : "1"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "id" : "2",
+      "name" : "Student",
+      "properties" : {
+        "structurizr.dsl.identifier" : "student"
+      },
+      "relationships" : [ {
+        "description" : "uses for learning and experiments",
+        "destinationId" : "10",
+        "id" : "154",
+        "sourceId" : "2",
+        "tags" : "Relationship"
+      }, {
+        "description" : "uses for learning and experiments",
+        "destinationId" : "9",
+        "id" : "155",
+        "linkedRelationshipId" : "154",
+        "sourceId" : "2"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "description" : "Signal processing backend for advanced operations",
+      "documentation" : { },
+      "id" : "3",
+      "name" : "GNU Radio Ecosystem",
+      "properties" : {
+        "structurizr.dsl.identifier" : "gnuRadioEcosystem"
+      },
+      "tags" : "Element,Software System,System Dependency"
+    }, {
+      "description" : "Local and network storage for data, configurations, and logs",
+      "documentation" : { },
+      "id" : "4",
+      "name" : "File System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "fileSystem"
+      },
+      "tags" : "Element,Software System,System Dependency"
+    }, {
+      "description" : "Linux, Windows, macOS providing hardware access and system services",
+      "documentation" : { },
+      "id" : "5",
+      "name" : "Operating System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "operatingSystem"
+      },
+      "tags" : "Element,Software System,System Dependency"
+    }, {
+      "description" : "Linux Industrial I/O subsystem for hardware abstraction",
+      "documentation" : { },
+      "id" : "6",
+      "name" : "IIO Framework",
+      "properties" : {
+        "structurizr.dsl.identifier" : "iioFramework"
+      },
+      "relationships" : [ {
+        "description" : "abstracts hardware communication to",
+        "destinationId" : "7",
+        "id" : "174",
+        "sourceId" : "6",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Software System,System Dependency"
+    }, {
+      "description" : "Analog Devices evaluation boards and other devices",
+      "documentation" : { },
+      "id" : "7",
+      "name" : "Hardware Devices",
+      "properties" : {
+        "structurizr.dsl.identifier" : "adiHardware"
+      },
+      "tags" : "Element,Software System,System Dependency"
+    }, {
+      "description" : "Hardware device emulation system providing virtualized IIO devices for development and testing",
+      "documentation" : { },
+      "id" : "8",
+      "name" : "IIO Emulator (iio-emu)",
+      "properties" : {
+        "structurizr.dsl.identifier" : "iioEmu"
+      },
+      "tags" : "Element,Software System,System Dependency"
+    }, {
+      "containers" : [ {
+        "components" : [ {
+          "description" : "Application startup/shutdown coordination, initialization sequences, and graceful termination handling",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "11",
+          "name" : "Application Coordinator",
+          "properties" : {
+            "structurizr.dsl.identifier" : "applicationCoordinator",
+            "Splash screen management" : "ScopySplashscreen startup feedback and progress messaging (gui/include/gui/widgets/scopysplashscreen.h)",
+            "Command line processing" : "CmdLineHandler for argument parsing, script execution, device auto-connection (core/include/core/cmdlinehandler.h)",
+            "Application initialization" : "QApplication setup, Qt attributes, logging, crash handling coordination (main.cpp)",
+            "Application restart coordination" : "ApplicationRestarter singleton for graceful restart handling (core/include/core/application_restarter.h)"
+          },
+          "relationships" : [ {
+            "description" : "loads application settings",
+            "destinationId" : "16",
+            "id" : "34",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "initializes logging",
+            "destinationId" : "17",
+            "id" : "35",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "sets up crash handlers",
+            "destinationId" : "12",
+            "id" : "36",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "initializes localization",
+            "destinationId" : "15",
+            "id" : "37",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "initializes device system",
+            "destinationId" : "18",
+            "id" : "38",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "initializes plugin system",
+            "destinationId" : "20",
+            "id" : "39",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "initializes package management",
+            "destinationId" : "19",
+            "id" : "40",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          }, {
+            "description" : "initializes main window",
+            "destinationId" : "27",
+            "id" : "41",
+            "sourceId" : "11",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "Crash detection, error report generation, and stack trace collection",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "12",
+          "name" : "Crash Reporting System",
+          "properties" : {
+            "structurizr.dsl.identifier" : "crashReporting"
+          },
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "CLI argument parsing and command execution",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "13",
+          "name" : "Command Line Handler",
+          "properties" : {
+            "structurizr.dsl.identifier" : "commandLineHandler"
+          },
+          "relationships" : [ {
+            "description" : "overrides default settings",
+            "destinationId" : "16",
+            "id" : "42",
+            "sourceId" : "13",
+            "tags" : "Relationship"
+          }, {
+            "description" : "configures log verbosity",
+            "destinationId" : "17",
+            "id" : "43",
+            "sourceId" : "13",
+            "tags" : "Relationship"
+          }, {
+            "description" : "triggers startup sequence",
+            "destinationId" : "11",
+            "id" : "44",
+            "sourceId" : "13",
+            "tags" : "Relationship"
+          }, {
+            "description" : "executes script files",
+            "destinationId" : "14",
+            "id" : "45",
+            "sourceId" : "13",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "JavaScript runtime, script execution, automation interface, and programmatic API access",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "14",
+          "name" : "Scripting Engine",
+          "properties" : {
+            "structurizr.dsl.identifier" : "scriptingEngine"
+          },
+          "relationships" : [ {
+            "description" : "accesses application services",
+            "destinationId" : "11",
+            "id" : "46",
+            "sourceId" : "14",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "Internationalization support and language pack management",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "15",
+          "name" : "Translation Service",
+          "properties" : {
+            "structurizr.dsl.identifier" : "translationService"
+          },
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "Centralized configuration storage, user preferences, plugin settings, and persistent application state",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "16",
+          "name" : "Preferences Management",
+          "properties" : {
+            "structurizr.dsl.identifier" : "preferencesManagement"
+          },
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "Centralized logging, debug output, error tracking, benchmark, and diagnostic information collection",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "17",
+          "name" : "Logging System",
+          "properties" : {
+            "structurizr.dsl.identifier" : "loggingSystem"
+          },
+          "tags" : "Element,Component,Infrastructure"
+        }, {
+          "description" : "Device discovery, connection lifecycle, hardware abstraction, and unified device interface",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "18",
+          "name" : "Device Management",
+          "properties" : {
+            "structurizr.dsl.identifier" : "deviceManagement",
+            "Device management" : "Device creation, connection, disconnection, restart, reload with state tracking (core/include/core/devicemanager.h)",
+            "Device abstraction" : "DeviceImpl and Device classes providing unified hardware interface (core/include/core/device.h; core/include/core/deviceimpl.h)"
+          },
+          "relationships" : [ {
+            "description" : "reads device preferences",
+            "destinationId" : "16",
+            "id" : "47",
+            "sourceId" : "18",
+            "tags" : "Relationship"
+          }, {
+            "description" : "logs device operations",
+            "destinationId" : "17",
+            "id" : "48",
+            "sourceId" : "18",
+            "tags" : "Relationship"
+          }, {
+            "description" : "loads device specific plugins",
+            "destinationId" : "20",
+            "id" : "49",
+            "sourceId" : "18",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,CoreBusiness"
+        }, {
+          "description" : "Manages packages installation and distribution",
+          "documentation" : { },
+          "group" : "pkg-manager",
+          "id" : "19",
+          "name" : "Package Manager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "packageManager"
+          },
+          "tags" : "Element,Component,CoreBusiness"
+        }, {
+          "description" : "Dynamic plugin loading, lifecycle management, dependency resolution, and plugin architecture foundation",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "20",
+          "name" : "Plugin System",
+          "properties" : {
+            "structurizr.dsl.identifier" : "pluginSystem",
+            "Plugin manager" : "PluginManager for dynamic loading, sorting, filtering, and lifecycle control (core/include/core/pluginmanager.h)",
+            "Plugin interface" : "Plugin base interface defining compatible(), onConnect(), onDisconnect() and other contracts (pluginbase/include/pluginbase/plugin.h)",
+            "Plugin repository" : "PluginRepository singleton for plugin management, metadata handling, plugin discovery (core/include/core/pluginrepository.h)"
+          },
+          "relationships" : [ {
+            "description" : "manages plugins from packages",
+            "destinationId" : "19",
+            "id" : "50",
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          }, {
+            "description" : "reads plugin configurations",
+            "destinationId" : "16",
+            "id" : "51",
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          }, {
+            "description" : "logs plugin operations",
+            "destinationId" : "17",
+            "id" : "52",
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          }, {
+            "description" : "uses for device communication",
+            "destinationId" : "31",
+            "id" : "53",
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          }, {
+            "description" : "specific plugins use processing services",
+            "destinationId" : "33",
+            "id" : "54",
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          }, {
+            "description" : "specific plugins use",
+            "destinationId" : "32",
+            "id" : "55",
+            "sourceId" : "20",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,CoreBusiness"
+        }, {
+          "description" : "Storage and management of available plugins and their metadata",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "21",
+          "name" : "Plugin Repository",
+          "properties" : {
+            "structurizr.dsl.identifier" : "pluginRepository"
+          },
+          "tags" : "Element,Component,PluginSystem"
+        }, {
+          "description" : "Dynamic loading and instantiation of plugin libraries",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "22",
+          "name" : "Plugin Manager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "pluginManager"
+          },
+          "relationships" : [ {
+            "description" : "queries available plugins",
+            "destinationId" : "21",
+            "id" : "24",
+            "sourceId" : "22",
+            "tags" : "Relationship"
+          }, {
+            "description" : "instantiates plugins",
+            "destinationId" : "23",
+            "id" : "25",
+            "sourceId" : "22",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,PluginSystem"
+        }, {
+          "description" : "Common API contract that all plugins must implement",
+          "documentation" : { },
+          "group" : "pluginbase",
+          "id" : "23",
+          "name" : "Plugin Interface",
+          "properties" : {
+            "structurizr.dsl.identifier" : "pluginInterface"
+          },
+          "tags" : "Element,Component,PluginSystem"
+        }, {
+          "description" : "Common UI widgets, plot widgets, style management",
+          "documentation" : { },
+          "group" : "gui",
+          "id" : "26",
+          "name" : "UI Framework",
+          "properties" : {
+            "structurizr.dsl.identifier" : "uiFramework",
+            "Plot widgets" : "Plotting widgets, measurement displays, signal visualization (gui/include/gui)",
+            "Common components" : "Menu section widgets, collapse headers, custom controls for patameters, enhanced input widgets, etc. (gui/include/gui; gui/include/gui/widgets)",
+            "Style management" : "QSS-based styling with dynamic theme switching (gui/style)"
+          },
+          "relationships" : [ {
+            "description" : "manages styles elements from packages",
+            "destinationId" : "19",
+            "id" : "67",
+            "sourceId" : "26",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Presentation"
+        }, {
+          "description" : "Main window coordination, detached tool windows, and workspace management",
+          "documentation" : { },
+          "group" : "gui",
+          "id" : "27",
+          "name" : "Window Management",
+          "properties" : {
+            "structurizr.dsl.identifier" : "windowManagement",
+            "Advanced docking system" : "KDDockWidgets backend for professional docking layouts (gui/include/gui/docking)",
+            "Detached tool management" : "DetachedToolWindowManager for separate tool windows, multi-monitor support (core/include/core/detachedtoolwindowmanager.h)",
+            "Main window coordination" : "ScopyMainWindow lifecycle, application initialization, event handling (core/include/core/scopymainwindow.h)"
+          },
+          "relationships" : [ {
+            "description" : "uses common UI components",
+            "destinationId" : "26",
+            "id" : "56",
+            "sourceId" : "27",
+            "tags" : "Relationship"
+          }, {
+            "description" : "persists window state",
+            "destinationId" : "16",
+            "id" : "57",
+            "sourceId" : "27",
+            "tags" : "Relationship"
+          }, {
+            "description" : "manages page containers",
+            "destinationId" : "30",
+            "id" : "58",
+            "sourceId" : "27",
+            "tags" : "Relationship"
+          }, {
+            "description" : "manages tool windows",
+            "destinationId" : "28",
+            "id" : "59",
+            "sourceId" : "27",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Presentation"
+        }, {
+          "description" : "Tool registration, menu organization, tool lifecycle coordination, and unified tool interface",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "28",
+          "name" : "Tool Manager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "toolManager"
+          },
+          "relationships" : [ {
+            "description" : "coordinates available plugin tools",
+            "destinationId" : "20",
+            "id" : "60",
+            "sourceId" : "28",
+            "tags" : "Relationship"
+          }, {
+            "description" : "uses UI components",
+            "destinationId" : "26",
+            "id" : "61",
+            "sourceId" : "28",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Presentation"
+        }, {
+          "description" : "Real-time status display, device connectivity indicators, operation progress, and system notifications",
+          "documentation" : { },
+          "group" : "gui",
+          "id" : "29",
+          "name" : "Status Bar",
+          "properties" : {
+            "structurizr.dsl.identifier" : "statusBar"
+          },
+          "relationships" : [ {
+            "description" : "subscribes to device status",
+            "destinationId" : "18",
+            "id" : "62",
+            "sourceId" : "29",
+            "tags" : "Relationship"
+          }, {
+            "description" : "receives plugin notifications",
+            "destinationId" : "20",
+            "id" : "63",
+            "sourceId" : "29",
+            "tags" : "Relationship"
+          }, {
+            "description" : "uses status widgets",
+            "destinationId" : "26",
+            "id" : "64",
+            "sourceId" : "29",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Presentation"
+        }, {
+          "description" : "Page navigation, home page, device browser, preferences pages, packages page, and application flow control",
+          "documentation" : { },
+          "group" : "core",
+          "id" : "30",
+          "name" : "Application Pages",
+          "properties" : {
+            "structurizr.dsl.identifier" : "applicationPages",
+            "Navigation coordination" : "Tool selection flow, page switching, menu state management (core/include/core)",
+            "Tool stack management" : "ToolStack container extending MapStackedWidget for key-based page switching (core/include/core/toolstack.h)",
+            "Home page system" : "ScopyHomePage for device scanning, connection management, device browser (core/include/core)",
+            "Preferences integration" : "ScopyPreferencesPage, settings management, configuration dialogs (core/include/core/scopypreferencespage.h)",
+            "About and info pages" : "ScopyAboutPage, version information, system details (core/include/core/scopyaboutpage.h)"
+          },
+          "relationships" : [ {
+            "description" : "uses page components",
+            "destinationId" : "26",
+            "id" : "65",
+            "sourceId" : "30",
+            "tags" : "Relationship"
+          }, {
+            "description" : "reads page preferences",
+            "destinationId" : "16",
+            "id" : "66",
+            "sourceId" : "30",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Presentation"
+        }, {
+          "description" : "Industrial I/O communication, command queuing, and connection management",
+          "documentation" : { },
+          "group" : "iio-util",
+          "id" : "31",
+          "name" : "IIO Utilities",
+          "properties" : {
+            "structurizr.dsl.identifier" : "iioUtilities"
+          },
+          "tags" : "Element,Component,Library"
+        }, {
+          "description" : "Specialized UI components for IIO devices, parameter controls, and device-specific interfaces",
+          "documentation" : { },
+          "group" : "iio-widgets",
+          "id" : "32",
+          "name" : "IIO Widgets",
+          "properties" : {
+            "structurizr.dsl.identifier" : "iioWidgets"
+          },
+          "relationships" : [ {
+            "description" : "uses IIO communication",
+            "destinationId" : "31",
+            "id" : "68",
+            "sourceId" : "32",
+            "tags" : "Relationship"
+          }, {
+            "description" : "extends UI framework",
+            "destinationId" : "26",
+            "id" : "69",
+            "sourceId" : "32",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Library"
+        }, {
+          "description" : "GNU Radio specific components and signal processing controls",
+          "documentation" : { },
+          "group" : "gr-util",
+          "id" : "33",
+          "name" : "GNU Radio Utilities",
+          "properties" : {
+            "structurizr.dsl.identifier" : "gnuRadioWidgets"
+          },
+          "tags" : "Element,Component,Library"
+        } ],
+        "description" : "Monolithic Qt-based desktop application",
+        "documentation" : { },
+        "id" : "10",
+        "name" : "Scopy Application",
+        "properties" : {
+          "structurizr.dsl.identifier" : "scopyApplication"
+        },
+        "relationships" : [ {
+          "description" : "sends commands and receives data via",
+          "destinationId" : "6",
+          "id" : "156",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "uses for signal processing and DSP operations",
+          "destinationId" : "3",
+          "id" : "158",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "read/write data files and configurations",
+          "destinationId" : "4",
+          "id" : "160",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "runs on cross-platform OS",
+          "destinationId" : "5",
+          "id" : "162",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "launches and communicates with via TCP/IP",
+          "destinationId" : "8",
+          "id" : "164",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "70",
+          "id" : "166",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "98",
+          "id" : "167",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "106",
+          "id" : "168",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "114",
+          "id" : "169",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "122",
+          "id" : "170",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "130",
+          "id" : "171",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "136",
+          "id" : "172",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        }, {
+          "description" : "loads resources from",
+          "destinationId" : "144",
+          "id" : "173",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,MainContainer",
+        "technology" : "C++, Qt, Qwt"
+      }, {
+        "components" : [ {
+          "description" : "The ADC plugin is used to interface with IIO ADCs that implement an IIO buffer mechanism",
+          "documentation" : { },
+          "id" : "71",
+          "name" : "ADC Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "adcPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "77",
+            "sourceId" : "71",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "78",
+            "linkedRelationshipId" : "77",
+            "sourceId" : "71"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "81",
+            "sourceId" : "71",
+            "tags" : "Relationship"
+          }, {
+            "description" : "use",
+            "destinationId" : "33",
+            "id" : "83",
+            "sourceId" : "71",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        }, {
+          "description" : "The DAC plugin is used to interface with IIO DACs that implement the IIO buffer mechanism or a DDS mechanism",
+          "documentation" : { },
+          "id" : "72",
+          "name" : "DAC Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "dacPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "85",
+            "sourceId" : "72",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "86",
+            "linkedRelationshipId" : "85",
+            "sourceId" : "72"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "87",
+            "sourceId" : "72",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        }, {
+          "description" : "Used to monitor and log data",
+          "documentation" : { },
+          "id" : "73",
+          "name" : "DataLogger Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "dataloggerPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "88",
+            "sourceId" : "73",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "89",
+            "linkedRelationshipId" : "88",
+            "sourceId" : "73"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "90",
+            "sourceId" : "73",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        }, {
+          "description" : "The debugger plugin is used to examine IIO contexts and modify individual IIO attributes, as well as examining the structure of an IIO context",
+          "documentation" : { },
+          "id" : "74",
+          "name" : "Debugger Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "debuggerPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "91",
+            "sourceId" : "74",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "92",
+            "linkedRelationshipId" : "91",
+            "sourceId" : "74"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "93",
+            "sourceId" : "74",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        }, {
+          "description" : "The JESD Status utility plugin provides a graphical interface to monitor the status of JESD204 in Scopy",
+          "documentation" : { },
+          "id" : "75",
+          "name" : "JESD Status Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "jesdPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "94",
+            "sourceId" : "75",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "95",
+            "linkedRelationshipId" : "94",
+            "sourceId" : "75"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        }, {
+          "description" : "The Register Map allow access to reading and writing registers for devices connected to Scopy",
+          "documentation" : { },
+          "id" : "76",
+          "name" : "Register Map Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "regmapPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "96",
+            "sourceId" : "76",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "97",
+            "linkedRelationshipId" : "96",
+            "sourceId" : "76"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "Standard IIO device plugins for common functionality",
+        "documentation" : { },
+        "id" : "70",
+        "name" : "Generic Plugins Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "genericPluginsPackage"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "79",
+          "linkedRelationshipId" : "77",
+          "sourceId" : "70"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "80",
+          "linkedRelationshipId" : "77",
+          "sourceId" : "70"
+        }, {
+          "description" : "use",
+          "destinationId" : "32",
+          "id" : "82",
+          "linkedRelationshipId" : "81",
+          "sourceId" : "70"
+        }, {
+          "description" : "use",
+          "destinationId" : "33",
+          "id" : "84",
+          "linkedRelationshipId" : "83",
+          "sourceId" : "70"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "Plugin for ADALM2000 (M2K)",
+          "documentation" : { },
+          "id" : "99",
+          "name" : "M2K Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "m2kPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "100",
+            "sourceId" : "99",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "101",
+            "linkedRelationshipId" : "100",
+            "sourceId" : "99"
+          }, {
+            "description" : "use",
+            "destinationId" : "33",
+            "id" : "104",
+            "sourceId" : "99",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "ADALM2000 device support package",
+        "documentation" : { },
+        "id" : "98",
+        "name" : "M2K Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "m2kPackage"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "102",
+          "linkedRelationshipId" : "100",
+          "sourceId" : "98"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "103",
+          "linkedRelationshipId" : "100",
+          "sourceId" : "98"
+        }, {
+          "description" : "use",
+          "destinationId" : "33",
+          "id" : "105",
+          "linkedRelationshipId" : "104",
+          "sourceId" : "98"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "The Scopy AD-SWIOT1L-SL plugin is responsible with the operation and control of the AD-SWIOT1L-SL platform",
+          "documentation" : { },
+          "id" : "107",
+          "name" : "SWIOT1L Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "swiotPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "108",
+            "sourceId" : "107",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "109",
+            "linkedRelationshipId" : "108",
+            "sourceId" : "107"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "112",
+            "sourceId" : "107",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "AD-SWIOT1L-SL platform support package",
+        "documentation" : { },
+        "id" : "106",
+        "name" : "SWIOT Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "swiotPackage"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "110",
+          "linkedRelationshipId" : "108",
+          "sourceId" : "106"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "111",
+          "linkedRelationshipId" : "108",
+          "sourceId" : "106"
+        }, {
+          "description" : "use",
+          "destinationId" : "32",
+          "id" : "113",
+          "linkedRelationshipId" : "112",
+          "sourceId" : "106"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "The AD936x plugins for Scopy enable integration and control of AD936x-based devices within the Scopy software environment",
+          "documentation" : { },
+          "id" : "115",
+          "name" : "AD936X Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "ad936xPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "116",
+            "sourceId" : "115",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "117",
+            "linkedRelationshipId" : "116",
+            "sourceId" : "115"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "120",
+            "sourceId" : "115",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "AD936X transceiver support package",
+        "documentation" : { },
+        "id" : "114",
+        "name" : "AD936X Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ad936xPackage"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "118",
+          "linkedRelationshipId" : "116",
+          "sourceId" : "114"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "119",
+          "linkedRelationshipId" : "116",
+          "sourceId" : "114"
+        }, {
+          "description" : "use",
+          "destinationId" : "32",
+          "id" : "121",
+          "linkedRelationshipId" : "120",
+          "sourceId" : "114"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "Apollo MXFE QUAD AD9084 interaction",
+          "documentation" : { },
+          "id" : "123",
+          "name" : "AD9084 Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "ad9084Plugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "124",
+            "sourceId" : "123",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "125",
+            "linkedRelationshipId" : "124",
+            "sourceId" : "123"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "128",
+            "sourceId" : "123",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "Apollo MXFE QUAD AD9084 support package",
+        "documentation" : { },
+        "id" : "122",
+        "name" : "Apollo AD9084 Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "apolloAd9084Package"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "126",
+          "linkedRelationshipId" : "124",
+          "sourceId" : "122"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "127",
+          "linkedRelationshipId" : "124",
+          "sourceId" : "122"
+        }, {
+          "description" : "use",
+          "destinationId" : "32",
+          "id" : "129",
+          "linkedRelationshipId" : "128",
+          "sourceId" : "122"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "Power Quality Monitor plugin",
+          "documentation" : { },
+          "id" : "131",
+          "name" : "PQMON Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "pqmPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "132",
+            "sourceId" : "131",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "133",
+            "linkedRelationshipId" : "132",
+            "sourceId" : "131"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "Power Quality Monitor support package",
+        "documentation" : { },
+        "id" : "130",
+        "name" : "PQMon Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "pqmonPackage"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "134",
+          "linkedRelationshipId" : "132",
+          "sourceId" : "130"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "135",
+          "linkedRelationshipId" : "132",
+          "sourceId" : "130"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "IMU evaluation and analysis functionality",
+          "documentation" : { },
+          "id" : "137",
+          "name" : "IMU Analyzer Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "imuAnalyzerPlugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "138",
+            "sourceId" : "137",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "139",
+            "linkedRelationshipId" : "138",
+            "sourceId" : "137"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "142",
+            "sourceId" : "137",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "IMU Evaluation Software Package",
+        "documentation" : { },
+        "id" : "136",
+        "name" : "IMU Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "imuPackage"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "140",
+          "linkedRelationshipId" : "138",
+          "sourceId" : "136"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "141",
+          "linkedRelationshipId" : "138",
+          "sourceId" : "136"
+        }, {
+          "description" : "use",
+          "destinationId" : "32",
+          "id" : "143",
+          "linkedRelationshipId" : "142",
+          "sourceId" : "136"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      }, {
+        "components" : [ {
+          "description" : "The ADRV9002 (Jupiter) plugin provides a comprehensive interface for controlling and configuring the ADRV9002 dual-channel RF transceiver",
+          "documentation" : { },
+          "id" : "145",
+          "name" : "ADRV9002 Plugin",
+          "properties" : {
+            "structurizr.dsl.identifier" : "adrv9002Plugin"
+          },
+          "relationships" : [ {
+            "description" : "implements",
+            "destinationId" : "23",
+            "id" : "146",
+            "sourceId" : "145",
+            "tags" : "Relationship,PluginImplementation"
+          }, {
+            "description" : "implements",
+            "destinationId" : "10",
+            "id" : "147",
+            "linkedRelationshipId" : "146",
+            "sourceId" : "145"
+          }, {
+            "description" : "use",
+            "destinationId" : "32",
+            "id" : "150",
+            "sourceId" : "145",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component,Plugin"
+        } ],
+        "description" : "ADRV9002 Jupiter transceiver support package",
+        "documentation" : { },
+        "id" : "144",
+        "name" : "ADRV9002 Package",
+        "properties" : {
+          "structurizr.dsl.identifier" : "adrv9002Package"
+        },
+        "relationships" : [ {
+          "description" : "implements",
+          "destinationId" : "23",
+          "id" : "148",
+          "linkedRelationshipId" : "146",
+          "sourceId" : "144"
+        }, {
+          "description" : "implements",
+          "destinationId" : "10",
+          "id" : "149",
+          "linkedRelationshipId" : "146",
+          "sourceId" : "144"
+        }, {
+          "description" : "use",
+          "destinationId" : "32",
+          "id" : "151",
+          "linkedRelationshipId" : "150",
+          "sourceId" : "144"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "C++, Qt"
+      } ],
+      "description" : "Multi-functional software toolset with strong capabilities for signal analysis",
+      "documentation" : { },
+      "id" : "9",
+      "name" : "Scopy",
+      "properties" : {
+        "structurizr.dsl.identifier" : "scopySystem"
+      },
+      "relationships" : [ {
+        "description" : "sends commands and receives data via",
+        "destinationId" : "6",
+        "id" : "157",
+        "linkedRelationshipId" : "156",
+        "sourceId" : "9"
+      }, {
+        "description" : "uses for signal processing and DSP operations",
+        "destinationId" : "3",
+        "id" : "159",
+        "linkedRelationshipId" : "158",
+        "sourceId" : "9"
+      }, {
+        "description" : "read/write data files and configurations",
+        "destinationId" : "4",
+        "id" : "161",
+        "linkedRelationshipId" : "160",
+        "sourceId" : "9"
+      }, {
+        "description" : "runs on cross-platform OS",
+        "destinationId" : "5",
+        "id" : "163",
+        "linkedRelationshipId" : "162",
+        "sourceId" : "9"
+      }, {
+        "description" : "launches and communicates with via TCP/IP",
+        "destinationId" : "8",
+        "id" : "165",
+        "linkedRelationshipId" : "164",
+        "sourceId" : "9"
+      } ],
+      "tags" : "Element,Software System,Scopy System"
+    } ]
+  },
+  "name" : "Scopy ADI",
+  "properties" : {
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.error" : "128",
+    "structurizr.inspection.warning" : "0",
+    "structurizr.dsl" : "d29ya3NwYWNlICJTY29weSBBREkiIHsKCiAgICBtb2RlbCB7CgogICAgICAgIC8vIFVzZXJzCiAgICAgICAgZW5naW5lZXJVc2VyID0gcGVyc29uICJFbmdpbmVlciIKICAgICAgICBzdHVkZW50ID0gcGVyc29uICJTdHVkZW50IgoKICAgICAgICAvLyBFeHRlcm5hbCBTeXN0ZW1zCiAgICAgICAgZ251UmFkaW9FY29zeXN0ZW0gPSBzb2Z0d2FyZVN5c3RlbSAiR05VIFJhZGlvIEVjb3N5c3RlbSIgewogICAgICAgICAgICBkZXNjcmlwdGlvbiAiU2lnbmFsIHByb2Nlc3NpbmcgYmFja2VuZCBmb3IgYWR2YW5jZWQgb3BlcmF0aW9ucyIKICAgICAgICAgICAgdGFncyAiU3lzdGVtIERlcGVuZGVuY3kiCiAgICAgICAgfQogICAgICAgIAogICAgICAgIGZpbGVTeXN0ZW0gPSBzb2Z0d2FyZVN5c3RlbSAiRmlsZSBTeXN0ZW0iIHsKICAgICAgICAgICAgZGVzY3JpcHRpb24gIkxvY2FsIGFuZCBuZXR3b3JrIHN0b3JhZ2UgZm9yIGRhdGEsIGNvbmZpZ3VyYXRpb25zLCBhbmQgbG9ncyIKICAgICAgICAgICAgdGFncyAiU3lzdGVtIERlcGVuZGVuY3kiCiAgICAgICAgfQogICAgICAgIAogICAgICAgIG9wZXJhdGluZ1N5c3RlbSA9IHNvZnR3YXJlU3lzdGVtICJPcGVyYXRpbmcgU3lzdGVtIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJMaW51eCwgV2luZG93cywgbWFjT1MgcHJvdmlkaW5nIGhhcmR3YXJlIGFjY2VzcyBhbmQgc3lzdGVtIHNlcnZpY2VzIgogICAgICAgICAgICB0YWdzICJTeXN0ZW0gRGVwZW5kZW5jeSIKICAgICAgICB9CiAgICAgICAgCiAgICAgICAgaWlvRnJhbWV3b3JrID0gc29mdHdhcmVTeXN0ZW0gIklJTyBGcmFtZXdvcmsiIHsKICAgICAgICAgICAgZGVzY3JpcHRpb24gIkxpbnV4IEluZHVzdHJpYWwgSS9PIHN1YnN5c3RlbSBmb3IgaGFyZHdhcmUgYWJzdHJhY3Rpb24iCiAgICAgICAgICAgIHRhZ3MgIlN5c3RlbSBEZXBlbmRlbmN5IgogICAgICAgIH0KICAgICAgICAKICAgICAgICBhZGlIYXJkd2FyZSA9IHNvZnR3YXJlU3lzdGVtICJIYXJkd2FyZSBEZXZpY2VzIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBbmFsb2cgRGV2aWNlcyBldmFsdWF0aW9uIGJvYXJkcyBhbmQgb3RoZXIgZGV2aWNlcyIKICAgICAgICAgICAgdGFncyAiU3lzdGVtIERlcGVuZGVuY3kiCiAgICAgICAgfSAKCiAgICAgICAgaWlvRW11ID0gc29mdHdhcmVTeXN0ZW0gIklJTyBFbXVsYXRvciAoaWlvLWVtdSkiIHsKICAgICAgICAgICAgZGVzY3JpcHRpb24gIkhhcmR3YXJlIGRldmljZSBlbXVsYXRpb24gc3lzdGVtIHByb3ZpZGluZyB2aXJ0dWFsaXplZCBJSU8gZGV2aWNlcyBmb3IgZGV2ZWxvcG1lbnQgYW5kIHRlc3RpbmciCiAgICAgICAgICAgIHRhZ3MgIlN5c3RlbSBEZXBlbmRlbmN5IgogICAgICAgIH0KCiAgICAgICAgLy8gTWFpbiBTeXN0ZW0KICAgICAgICAgc2NvcHlTeXN0ZW0gPSBzb2Z0d2FyZVN5c3RlbSAiU2NvcHkiICJNdWx0aS1mdW5jdGlvbmFsIHNvZnR3YXJlIHRvb2xzZXQgd2l0aCBzdHJvbmcgY2FwYWJpbGl0aWVzIGZvciBzaWduYWwgYW5hbHlzaXMiIHsKICAgICAgICAgICAgdGFncyAiU2NvcHkgU3lzdGVtIgogICAgICAgICAgICAvLyBTaW5nbGUgTWFpbiBDb250YWluZXIKICAgICAgICAgICAgc2NvcHlBcHBsaWNhdGlvbiA9IGNvbnRhaW5lciAiU2NvcHkgQXBwbGljYXRpb24iIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJNb25vbGl0aGljIFF0LWJhc2VkIGRlc2t0b3AgYXBwbGljYXRpb24iCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJDKyssIFF0LCBRd3QiCiAgICAgICAgICAgICAgICB0YWdzICJNYWluQ29udGFpbmVyIgoKICAgICAgICAgICAgICAgIC8vIElORlJBU1RSVUNUVVJFIExBWUVSCiAgICAgICAgICAgICAgICBhcHBsaWNhdGlvbkNvb3JkaW5hdG9yID0gY29tcG9uZW50ICJBcHBsaWNhdGlvbiBDb29yZGluYXRvciIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBcHBsaWNhdGlvbiBzdGFydHVwL3NodXRkb3duIGNvb3JkaW5hdGlvbiwgaW5pdGlhbGl6YXRpb24gc2VxdWVuY2VzLCBhbmQgZ3JhY2VmdWwgdGVybWluYXRpb24gaGFuZGxpbmciCiAgICAgICAgICAgICAgICAgICAgdGFncyAiSW5mcmFzdHJ1Y3R1cmUiCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImNvcmUiCiAgICAgICAgICAgICAgICAgICAgcHJvcGVydGllcyB7CiAgICAgICAgICAgICAgICAgICAgICAgICJBcHBsaWNhdGlvbiBpbml0aWFsaXphdGlvbiIgIlFBcHBsaWNhdGlvbiBzZXR1cCwgUXQgYXR0cmlidXRlcywgbG9nZ2luZywgY3Jhc2ggaGFuZGxpbmcgY29vcmRpbmF0aW9uIChtYWluLmNwcCkiCiAgICAgICAgICAgICAgICAgICAgICAgICJDb21tYW5kIGxpbmUgcHJvY2Vzc2luZyIgIkNtZExpbmVIYW5kbGVyIGZvciBhcmd1bWVudCBwYXJzaW5nLCBzY3JpcHQgZXhlY3V0aW9uLCBkZXZpY2UgYXV0by1jb25uZWN0aW9uIChjb3JlL2luY2x1ZGUvY29yZS9jbWRsaW5laGFuZGxlci5oKSIKICAgICAgICAgICAgICAgICAgICAgICAgIkFwcGxpY2F0aW9uIHJlc3RhcnQgY29vcmRpbmF0aW9uIiAiQXBwbGljYXRpb25SZXN0YXJ0ZXIgc2luZ2xldG9uIGZvciBncmFjZWZ1bCByZXN0YXJ0IGhhbmRsaW5nIChjb3JlL2luY2x1ZGUvY29yZS9hcHBsaWNhdGlvbl9yZXN0YXJ0ZXIuaCkiCiAgICAgICAgICAgICAgICAgICAgICAgICJTcGxhc2ggc2NyZWVuIG1hbmFnZW1lbnQiICJTY29weVNwbGFzaHNjcmVlbiBzdGFydHVwIGZlZWRiYWNrIGFuZCBwcm9ncmVzcyBtZXNzYWdpbmcgKGd1aS9pbmNsdWRlL2d1aS93aWRnZXRzL3Njb3B5c3BsYXNoc2NyZWVuLmgpIgogICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgY3Jhc2hSZXBvcnRpbmcgPSBjb21wb25lbnQgIkNyYXNoIFJlcG9ydGluZyBTeXN0ZW0iIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQ3Jhc2ggZGV0ZWN0aW9uLCBlcnJvciByZXBvcnQgZ2VuZXJhdGlvbiwgYW5kIHN0YWNrIHRyYWNlIGNvbGxlY3Rpb24iCiAgICAgICAgICAgICAgICAgICAgdGFncyAiSW5mcmFzdHJ1Y3R1cmUiCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImNvcmUiCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgY29tbWFuZExpbmVIYW5kbGVyID0gY29tcG9uZW50ICJDb21tYW5kIExpbmUgSGFuZGxlciIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJDTEkgYXJndW1lbnQgcGFyc2luZyBhbmQgY29tbWFuZCBleGVjdXRpb24iCiAgICAgICAgICAgICAgICAgICAgdGFncyAiSW5mcmFzdHJ1Y3R1cmUiCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImNvcmUiCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgc2NyaXB0aW5nRW5naW5lID0gY29tcG9uZW50ICJTY3JpcHRpbmcgRW5naW5lIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkphdmFTY3JpcHQgcnVudGltZSwgc2NyaXB0IGV4ZWN1dGlvbiwgYXV0b21hdGlvbiBpbnRlcmZhY2UsIGFuZCBwcm9ncmFtbWF0aWMgQVBJIGFjY2VzcyIKICAgICAgICAgICAgICAgICAgICB0YWdzICJJbmZyYXN0cnVjdHVyZSIKICAgICAgICAgICAgICAgICAgICBncm91cCAiY29yZSIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgdHJhbnNsYXRpb25TZXJ2aWNlID0gY29tcG9uZW50ICJUcmFuc2xhdGlvbiBTZXJ2aWNlIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkludGVybmF0aW9uYWxpemF0aW9uIHN1cHBvcnQgYW5kIGxhbmd1YWdlIHBhY2sgbWFuYWdlbWVudCIKICAgICAgICAgICAgICAgICAgICB0YWdzICJJbmZyYXN0cnVjdHVyZSIKICAgICAgICAgICAgICAgICAgICBncm91cCAiY29yZSIKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBwcmVmZXJlbmNlc01hbmFnZW1lbnQgPSBjb21wb25lbnQgIlByZWZlcmVuY2VzIE1hbmFnZW1lbnQiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQ2VudHJhbGl6ZWQgY29uZmlndXJhdGlvbiBzdG9yYWdlLCB1c2VyIHByZWZlcmVuY2VzLCBwbHVnaW4gc2V0dGluZ3MsIGFuZCBwZXJzaXN0ZW50IGFwcGxpY2F0aW9uIHN0YXRlIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkluZnJhc3RydWN0dXJlIgogICAgICAgICAgICAgICAgICAgIGdyb3VwICJjb3JlIgogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIGxvZ2dpbmdTeXN0ZW0gPSBjb21wb25lbnQgIkxvZ2dpbmcgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkNlbnRyYWxpemVkIGxvZ2dpbmcsIGRlYnVnIG91dHB1dCwgZXJyb3IgdHJhY2tpbmcsIGJlbmNobWFyaywgYW5kIGRpYWdub3N0aWMgaW5mb3JtYXRpb24gY29sbGVjdGlvbiIKICAgICAgICAgICAgICAgICAgICB0YWdzICJJbmZyYXN0cnVjdHVyZSIKICAgICAgICAgICAgICAgICAgICBncm91cCAiY29yZSIKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAvLyBDT1JFIEJVU0lORVNTIExPR0lDCiAgICAgICAgICAgICAgICBkZXZpY2VNYW5hZ2VtZW50ID0gY29tcG9uZW50ICJEZXZpY2UgTWFuYWdlbWVudCIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJEZXZpY2UgZGlzY292ZXJ5LCBjb25uZWN0aW9uIGxpZmVjeWNsZSwgaGFyZHdhcmUgYWJzdHJhY3Rpb24sIGFuZCB1bmlmaWVkIGRldmljZSBpbnRlcmZhY2UiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiQ29yZUJ1c2luZXNzIgogICAgICAgICAgICAgICAgICAgIGdyb3VwICJjb3JlIgogICAgICAgICAgICAgICAgICAgIHByb3BlcnRpZXMgewogICAgICAgICAgICAgICAgICAgICAgICAiRGV2aWNlIG1hbmFnZW1lbnQiICJEZXZpY2UgY3JlYXRpb24sIGNvbm5lY3Rpb24sIGRpc2Nvbm5lY3Rpb24sIHJlc3RhcnQsIHJlbG9hZCB3aXRoIHN0YXRlIHRyYWNraW5nIChjb3JlL2luY2x1ZGUvY29yZS9kZXZpY2VtYW5hZ2VyLmgpIgogICAgICAgICAgICAgICAgICAgICAgICAiRGV2aWNlIGFic3RyYWN0aW9uIiAiRGV2aWNlSW1wbCBhbmQgRGV2aWNlIGNsYXNzZXMgcHJvdmlkaW5nIHVuaWZpZWQgaGFyZHdhcmUgaW50ZXJmYWNlIChjb3JlL2luY2x1ZGUvY29yZS9kZXZpY2UuaDsgY29yZS9pbmNsdWRlL2NvcmUvZGV2aWNlaW1wbC5oKSIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgcGFja2FnZU1hbmFnZXIgPSBjb21wb25lbnQgIlBhY2thZ2UgTWFuYWdlciIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJNYW5hZ2VzIHBhY2thZ2VzIGluc3RhbGxhdGlvbiBhbmQgZGlzdHJpYnV0aW9uIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkNvcmVCdXNpbmVzcyIKICAgICAgICAgICAgICAgICAgICBncm91cCAicGtnLW1hbmFnZXIiCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgcGx1Z2luU3lzdGVtID0gY29tcG9uZW50ICJQbHVnaW4gU3lzdGVtIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkR5bmFtaWMgcGx1Z2luIGxvYWRpbmcsIGxpZmVjeWNsZSBtYW5hZ2VtZW50LCBkZXBlbmRlbmN5IHJlc29sdXRpb24sIGFuZCBwbHVnaW4gYXJjaGl0ZWN0dXJlIGZvdW5kYXRpb24iCiAgICAgICAgICAgICAgICAgICAgdGFncyAiQ29yZUJ1c2luZXNzIgogICAgICAgICAgICAgICAgICAgIGdyb3VwICJjb3JlIgogICAgICAgICAgICAgICAgICAgIHByb3BlcnRpZXMgewogICAgICAgICAgICAgICAgICAgICAgICAiUGx1Z2luIHJlcG9zaXRvcnkiICJQbHVnaW5SZXBvc2l0b3J5IHNpbmdsZXRvbiBmb3IgcGx1Z2luIG1hbmFnZW1lbnQsIG1ldGFkYXRhIGhhbmRsaW5nLCBwbHVnaW4gZGlzY292ZXJ5IChjb3JlL2luY2x1ZGUvY29yZS9wbHVnaW5yZXBvc2l0b3J5LmgpIgogICAgICAgICAgICAgICAgICAgICAgICAiUGx1Z2luIG1hbmFnZXIiICJQbHVnaW5NYW5hZ2VyIGZvciBkeW5hbWljIGxvYWRpbmcsIHNvcnRpbmcsIGZpbHRlcmluZywgYW5kIGxpZmVjeWNsZSBjb250cm9sIChjb3JlL2luY2x1ZGUvY29yZS9wbHVnaW5tYW5hZ2VyLmgpIgogICAgICAgICAgICAgICAgICAgICAgICAiUGx1Z2luIGludGVyZmFjZSIgIlBsdWdpbiBiYXNlIGludGVyZmFjZSBkZWZpbmluZyBjb21wYXRpYmxlKCksIG9uQ29ubmVjdCgpLCBvbkRpc2Nvbm5lY3QoKSBhbmQgb3RoZXIgY29udHJhY3RzIChwbHVnaW5iYXNlL2luY2x1ZGUvcGx1Z2luYmFzZS9wbHVnaW4uaCkiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAvLyBQbHVnaW4gU3lzdGVtIGNvbXBvbmVudHMKICAgICAgICAgICAgICAgIHBsdWdpblJlcG9zaXRvcnkgPSBjb21wb25lbnQgIlBsdWdpbiBSZXBvc2l0b3J5IiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlN0b3JhZ2UgYW5kIG1hbmFnZW1lbnQgb2YgYXZhaWxhYmxlIHBsdWdpbnMgYW5kIHRoZWlyIG1ldGFkYXRhIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW5TeXN0ZW0iICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImNvcmUiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBwbHVnaW5NYW5hZ2VyID0gY29tcG9uZW50ICJQbHVnaW4gTWFuYWdlciIgeyAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkR5bmFtaWMgbG9hZGluZyBhbmQgaW5zdGFudGlhdGlvbiBvZiBwbHVnaW4gbGlicmFyaWVzIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luU3lzdGVtIiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImNvcmUiIAogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgcGx1Z2luSW50ZXJmYWNlID0gY29tcG9uZW50ICJQbHVnaW4gSW50ZXJmYWNlIiB7ICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQ29tbW9uIEFQSSBjb250cmFjdCB0aGF0IGFsbCBwbHVnaW5zIG11c3QgaW1wbGVtZW50IiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luU3lzdGVtIiAKICAgICAgICAgICAgICAgICAgICBncm91cCAicGx1Z2luYmFzZSIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgfSAgCiAgICAgICAgICAgICAgICBwbHVnaW5NYW5hZ2VyIC0+IHBsdWdpblJlcG9zaXRvcnkgInF1ZXJpZXMgYXZhaWxhYmxlIHBsdWdpbnMiCiAgICAgICAgICAgICAgICBwbHVnaW5NYW5hZ2VyIC0+IHBsdWdpbkludGVyZmFjZSAiaW5zdGFudGlhdGVzIHBsdWdpbnMiCgogICAgICAgICAgICAgICAgLy8gVUkgQU5EIFBSRVNFTlRBVElPTiBMQVlFUgogICAgICAgICAgICAgICAgdWlGcmFtZXdvcmsgPSBjb21wb25lbnQgIlVJIEZyYW1ld29yayIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJDb21tb24gVUkgd2lkZ2V0cywgcGxvdCB3aWRnZXRzLCBzdHlsZSBtYW5hZ2VtZW50IgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlByZXNlbnRhdGlvbiIKICAgICAgICAgICAgICAgICAgICBncm91cCAiZ3VpIgogICAgICAgICAgICAgICAgICAgIHByb3BlcnRpZXMgewogICAgICAgICAgICAgICAgICAgICAgICAiQ29tbW9uIGNvbXBvbmVudHMiICJNZW51IHNlY3Rpb24gd2lkZ2V0cywgY29sbGFwc2UgaGVhZGVycywgY3VzdG9tIGNvbnRyb2xzIGZvciBwYXRhbWV0ZXJzLCBlbmhhbmNlZCBpbnB1dCB3aWRnZXRzLCBldGMuIChndWkvaW5jbHVkZS9ndWk7IGd1aS9pbmNsdWRlL2d1aS93aWRnZXRzKSIKICAgICAgICAgICAgICAgICAgICAgICAgIlBsb3Qgd2lkZ2V0cyIgIlBsb3R0aW5nIHdpZGdldHMsIG1lYXN1cmVtZW50IGRpc3BsYXlzLCBzaWduYWwgdmlzdWFsaXphdGlvbiAoZ3VpL2luY2x1ZGUvZ3VpKSIKICAgICAgICAgICAgICAgICAgICAgICAgIlN0eWxlIG1hbmFnZW1lbnQiICJRU1MtYmFzZWQgc3R5bGluZyB3aXRoIGR5bmFtaWMgdGhlbWUgc3dpdGNoaW5nIChndWkvc3R5bGUpIgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICB3aW5kb3dNYW5hZ2VtZW50ID0gY29tcG9uZW50ICJXaW5kb3cgTWFuYWdlbWVudCIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJNYWluIHdpbmRvdyBjb29yZGluYXRpb24sIGRldGFjaGVkIHRvb2wgd2luZG93cywgYW5kIHdvcmtzcGFjZSBtYW5hZ2VtZW50IgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlByZXNlbnRhdGlvbiIKICAgICAgICAgICAgICAgICAgICBncm91cCAiZ3VpIgogICAgICAgICAgICAgICAgICAgIHByb3BlcnRpZXMgewogICAgICAgICAgICAgICAgICAgICAgICAiTWFpbiB3aW5kb3cgY29vcmRpbmF0aW9uIiAiU2NvcHlNYWluV2luZG93IGxpZmVjeWNsZSwgYXBwbGljYXRpb24gaW5pdGlhbGl6YXRpb24sIGV2ZW50IGhhbmRsaW5nIChjb3JlL2luY2x1ZGUvY29yZS9zY29weW1haW53aW5kb3cuaCkiCiAgICAgICAgICAgICAgICAgICAgICAgICJEZXRhY2hlZCB0b29sIG1hbmFnZW1lbnQiICJEZXRhY2hlZFRvb2xXaW5kb3dNYW5hZ2VyIGZvciBzZXBhcmF0ZSB0b29sIHdpbmRvd3MsIG11bHRpLW1vbml0b3Igc3VwcG9ydCAoY29yZS9pbmNsdWRlL2NvcmUvZGV0YWNoZWR0b29sd2luZG93bWFuYWdlci5oKSIKICAgICAgICAgICAgICAgICAgICAgICAgIkFkdmFuY2VkIGRvY2tpbmcgc3lzdGVtIiAiS0REb2NrV2lkZ2V0cyBiYWNrZW5kIGZvciBwcm9mZXNzaW9uYWwgZG9ja2luZyBsYXlvdXRzIChndWkvaW5jbHVkZS9ndWkvZG9ja2luZykiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIHRvb2xNYW5hZ2VyID0gY29tcG9uZW50ICJUb29sIE1hbmFnZXIiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiVG9vbCByZWdpc3RyYXRpb24sIG1lbnUgb3JnYW5pemF0aW9uLCB0b29sIGxpZmVjeWNsZSBjb29yZGluYXRpb24sIGFuZCB1bmlmaWVkIHRvb2wgaW50ZXJmYWNlIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlByZXNlbnRhdGlvbiIKICAgICAgICAgICAgICAgICAgICBncm91cCAiY29yZSIKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBzdGF0dXNCYXIgPSBjb21wb25lbnQgIlN0YXR1cyBCYXIiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiUmVhbC10aW1lIHN0YXR1cyBkaXNwbGF5LCBkZXZpY2UgY29ubmVjdGl2aXR5IGluZGljYXRvcnMsIG9wZXJhdGlvbiBwcm9ncmVzcywgYW5kIHN5c3RlbSBub3RpZmljYXRpb25zIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlByZXNlbnRhdGlvbiIKICAgICAgICAgICAgICAgICAgICBncm91cCAiZ3VpIgogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIGFwcGxpY2F0aW9uUGFnZXMgPSBjb21wb25lbnQgIkFwcGxpY2F0aW9uIFBhZ2VzIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlBhZ2UgbmF2aWdhdGlvbiwgaG9tZSBwYWdlLCBkZXZpY2UgYnJvd3NlciwgcHJlZmVyZW5jZXMgcGFnZXMsIHBhY2thZ2VzIHBhZ2UsIGFuZCBhcHBsaWNhdGlvbiBmbG93IGNvbnRyb2wiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiUHJlc2VudGF0aW9uIgogICAgICAgICAgICAgICAgICAgIGdyb3VwICJjb3JlIgogICAgICAgICAgICAgICAgICAgIHByb3BlcnRpZXMgewogICAgICAgICAgICAgICAgICAgICAgICAiVG9vbCBzdGFjayBtYW5hZ2VtZW50IiAiVG9vbFN0YWNrIGNvbnRhaW5lciBleHRlbmRpbmcgTWFwU3RhY2tlZFdpZGdldCBmb3Iga2V5LWJhc2VkIHBhZ2Ugc3dpdGNoaW5nIChjb3JlL2luY2x1ZGUvY29yZS90b29sc3RhY2suaCkiCiAgICAgICAgICAgICAgICAgICAgICAgICJQcmVmZXJlbmNlcyBpbnRlZ3JhdGlvbiIgIlNjb3B5UHJlZmVyZW5jZXNQYWdlLCBzZXR0aW5ncyBtYW5hZ2VtZW50LCBjb25maWd1cmF0aW9uIGRpYWxvZ3MgKGNvcmUvaW5jbHVkZS9jb3JlL3Njb3B5cHJlZmVyZW5jZXNwYWdlLmgpIgogICAgICAgICAgICAgICAgICAgICAgICAiQWJvdXQgYW5kIGluZm8gcGFnZXMiICJTY29weUFib3V0UGFnZSwgdmVyc2lvbiBpbmZvcm1hdGlvbiwgc3lzdGVtIGRldGFpbHMgKGNvcmUvaW5jbHVkZS9jb3JlL3Njb3B5YWJvdXRwYWdlLmgpIgogICAgICAgICAgICAgICAgICAgICAgICAiSG9tZSBwYWdlIHN5c3RlbSIgIlNjb3B5SG9tZVBhZ2UgZm9yIGRldmljZSBzY2FubmluZywgY29ubmVjdGlvbiBtYW5hZ2VtZW50LCBkZXZpY2UgYnJvd3NlciAoY29yZS9pbmNsdWRlL2NvcmUpIgogICAgICAgICAgICAgICAgICAgICAgICAiTmF2aWdhdGlvbiBjb29yZGluYXRpb24iICJUb29sIHNlbGVjdGlvbiBmbG93LCBwYWdlIHN3aXRjaGluZywgbWVudSBzdGF0ZSBtYW5hZ2VtZW50IChjb3JlL2luY2x1ZGUvY29yZSkiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIC8vIFNVUFBPUlRJTkcgTElCUkFSSUVTCiAgICAgICAgICAgICAgICBpaW9VdGlsaXRpZXMgPSBjb21wb25lbnQgIklJTyBVdGlsaXRpZXMiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiSW5kdXN0cmlhbCBJL08gY29tbXVuaWNhdGlvbiwgY29tbWFuZCBxdWV1aW5nLCBhbmQgY29ubmVjdGlvbiBtYW5hZ2VtZW50IgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkxpYnJhcnkiCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImlpby11dGlsIgogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIGlpb1dpZGdldHMgPSBjb21wb25lbnQgIklJTyBXaWRnZXRzIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlNwZWNpYWxpemVkIFVJIGNvbXBvbmVudHMgZm9yIElJTyBkZXZpY2VzLCBwYXJhbWV0ZXIgY29udHJvbHMsIGFuZCBkZXZpY2Utc3BlY2lmaWMgaW50ZXJmYWNlcyIKICAgICAgICAgICAgICAgICAgICB0YWdzICJMaWJyYXJ5IgogICAgICAgICAgICAgICAgICAgIGdyb3VwICJpaW8td2lkZ2V0cyIKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBnbnVSYWRpb1dpZGdldHMgPSBjb21wb25lbnQgIkdOVSBSYWRpbyBVdGlsaXRpZXMiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiR05VIFJhZGlvIHNwZWNpZmljIGNvbXBvbmVudHMgYW5kIHNpZ25hbCBwcm9jZXNzaW5nIGNvbnRyb2xzIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkxpYnJhcnkiCiAgICAgICAgICAgICAgICAgICAgZ3JvdXAgImdyLXV0aWwiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIC8vIENPTVBPTkVOVCBSRUxBVElPTlNISVBTCgogICAgICAgICAgICAgICAgLy8gSW5mcmFzdHJ1Y3R1cmUgRGVwZW5kZW5jaWVzCiAgCiAgICAgICAgICAgICAgICAvLyBBcHBsaWNhdGlvbiBDb29yZGluYXRvciBvcmNoZXN0cmF0ZXMgc3lzdGVtIGluaXRpYWxpemF0aW9uCiAgICAgICAgICAgICAgICBhcHBsaWNhdGlvbkNvb3JkaW5hdG9yIC0+IHByZWZlcmVuY2VzTWFuYWdlbWVudCAibG9hZHMgYXBwbGljYXRpb24gc2V0dGluZ3MiCiAgICAgICAgICAgICAgICBhcHBsaWNhdGlvbkNvb3JkaW5hdG9yIC0+IGxvZ2dpbmdTeXN0ZW0gImluaXRpYWxpemVzIGxvZ2dpbmciCiAgICAgICAgICAgICAgICBhcHBsaWNhdGlvbkNvb3JkaW5hdG9yIC0+IGNyYXNoUmVwb3J0aW5nICJzZXRzIHVwIGNyYXNoIGhhbmRsZXJzIgogICAgICAgICAgICAgICAgYXBwbGljYXRpb25Db29yZGluYXRvciAtPiB0cmFuc2xhdGlvblNlcnZpY2UgImluaXRpYWxpemVzIGxvY2FsaXphdGlvbiIKICAgICAgICAgICAgICAgIGFwcGxpY2F0aW9uQ29vcmRpbmF0b3IgLT4gZGV2aWNlTWFuYWdlbWVudCAiaW5pdGlhbGl6ZXMgZGV2aWNlIHN5c3RlbSIKICAgICAgICAgICAgICAgIGFwcGxpY2F0aW9uQ29vcmRpbmF0b3IgLT4gcGx1Z2luU3lzdGVtICJpbml0aWFsaXplcyBwbHVnaW4gc3lzdGVtIgogICAgICAgICAgICAgICAgYXBwbGljYXRpb25Db29yZGluYXRvciAtPiBwYWNrYWdlTWFuYWdlciAiaW5pdGlhbGl6ZXMgcGFja2FnZSBtYW5hZ2VtZW50IgogICAgICAgICAgICAgICAgYXBwbGljYXRpb25Db29yZGluYXRvciAtPiB3aW5kb3dNYW5hZ2VtZW50ICJpbml0aWFsaXplcyBtYWluIHdpbmRvdyIKCgogICAgICAgICAgICAgICAgLy8gQ29tbWFuZCBMaW5lIEhhbmRsZXIgcHJvY2Vzc2VzIHN0YXJ0dXAgYXJndW1lbnRzCiAgICAgICAgICAgICAgICBjb21tYW5kTGluZUhhbmRsZXIgLT4gcHJlZmVyZW5jZXNNYW5hZ2VtZW50ICJvdmVycmlkZXMgZGVmYXVsdCBzZXR0aW5ncyIKICAgICAgICAgICAgICAgIGNvbW1hbmRMaW5lSGFuZGxlciAtPiBsb2dnaW5nU3lzdGVtICJjb25maWd1cmVzIGxvZyB2ZXJib3NpdHkiCiAgICAgICAgICAgICAgICBjb21tYW5kTGluZUhhbmRsZXIgLT4gYXBwbGljYXRpb25Db29yZGluYXRvciAidHJpZ2dlcnMgc3RhcnR1cCBzZXF1ZW5jZSIKICAgICAgICAgICAgICAgIGNvbW1hbmRMaW5lSGFuZGxlciAtPiBzY3JpcHRpbmdFbmdpbmUgImV4ZWN1dGVzIHNjcmlwdCBmaWxlcyIKICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgc2NyaXB0aW5nRW5naW5lIC0+IGFwcGxpY2F0aW9uQ29vcmRpbmF0b3IgImFjY2Vzc2VzIGFwcGxpY2F0aW9uIHNlcnZpY2VzIgoKICAgICAgICAgICAgICAgIC8vIENvcmUgQnVzaW5lc3MgTG9naWMgRGVwZW5kZW5jaWVzCiAgICAgICAgICAgICAgICBkZXZpY2VNYW5hZ2VtZW50IC0+IHByZWZlcmVuY2VzTWFuYWdlbWVudCAicmVhZHMgZGV2aWNlIHByZWZlcmVuY2VzIgogICAgICAgICAgICAgICAgZGV2aWNlTWFuYWdlbWVudCAtPiBsb2dnaW5nU3lzdGVtICJsb2dzIGRldmljZSBvcGVyYXRpb25zIgogICAgICAgICAgICAgICAgZGV2aWNlTWFuYWdlbWVudCAtPiAgcGx1Z2luU3lzdGVtICJsb2FkcyBkZXZpY2Ugc3BlY2lmaWMgcGx1Z2lucyIKCiAgICAgICAgICAgICAgICBwbHVnaW5TeXN0ZW0gLT4gcGFja2FnZU1hbmFnZXIgIm1hbmFnZXMgcGx1Z2lucyBmcm9tIHBhY2thZ2VzIgogICAgICAgICAgICAgICAgcGx1Z2luU3lzdGVtIC0+IHByZWZlcmVuY2VzTWFuYWdlbWVudCAicmVhZHMgcGx1Z2luIGNvbmZpZ3VyYXRpb25zIgogICAgICAgICAgICAgICAgcGx1Z2luU3lzdGVtIC0+IGxvZ2dpbmdTeXN0ZW0gImxvZ3MgcGx1Z2luIG9wZXJhdGlvbnMiCiAgICAgICAgICAgICAgICBwbHVnaW5TeXN0ZW0gLT4gaWlvVXRpbGl0aWVzICJ1c2VzIGZvciBkZXZpY2UgY29tbXVuaWNhdGlvbiIKICAgICAgICAgICAgICAgIHBsdWdpblN5c3RlbSAtPiBnbnVSYWRpb1dpZGdldHMgInNwZWNpZmljIHBsdWdpbnMgdXNlIHByb2Nlc3Npbmcgc2VydmljZXMiCiAgICAgICAgICAgICAgICBwbHVnaW5TeXN0ZW0gLT4gaWlvV2lkZ2V0cyAic3BlY2lmaWMgcGx1Z2lucyB1c2UiCgogICAgICAgICAgICAgICAgLy8gVUkgYW5kIFByZXNlbnRhdGlvbiBEZXBlbmRlbmNpZXMKICAgICAgICAgICAgICAgIHdpbmRvd01hbmFnZW1lbnQgLT4gdWlGcmFtZXdvcmsgInVzZXMgY29tbW9uIFVJIGNvbXBvbmVudHMiCiAgICAgICAgICAgICAgICB3aW5kb3dNYW5hZ2VtZW50IC0+IHByZWZlcmVuY2VzTWFuYWdlbWVudCAicGVyc2lzdHMgd2luZG93IHN0YXRlIgogICAgICAgICAgICAgICAgd2luZG93TWFuYWdlbWVudCAtPiBhcHBsaWNhdGlvblBhZ2VzICJtYW5hZ2VzIHBhZ2UgY29udGFpbmVycyIKICAgICAgICAgICAgICAgIHdpbmRvd01hbmFnZW1lbnQgLT4gdG9vbE1hbmFnZXIgIm1hbmFnZXMgdG9vbCB3aW5kb3dzIgoKICAgICAgICAgICAgICAgIHRvb2xNYW5hZ2VyIC0+IHBsdWdpblN5c3RlbSAiY29vcmRpbmF0ZXMgYXZhaWxhYmxlIHBsdWdpbiB0b29scyIKICAgICAgICAgICAgICAgIHRvb2xNYW5hZ2VyIC0+IHVpRnJhbWV3b3JrICJ1c2VzIFVJIGNvbXBvbmVudHMiCgogICAgICAgICAgICAgICAgc3RhdHVzQmFyIC0+IGRldmljZU1hbmFnZW1lbnQgInN1YnNjcmliZXMgdG8gZGV2aWNlIHN0YXR1cyIKICAgICAgICAgICAgICAgIHN0YXR1c0JhciAtPiBwbHVnaW5TeXN0ZW0gInJlY2VpdmVzIHBsdWdpbiBub3RpZmljYXRpb25zIgogICAgICAgICAgICAgICAgc3RhdHVzQmFyIC0+IHVpRnJhbWV3b3JrICJ1c2VzIHN0YXR1cyB3aWRnZXRzIgoKICAgICAgICAgICAgICAgIGFwcGxpY2F0aW9uUGFnZXMgLT4gdWlGcmFtZXdvcmsgInVzZXMgcGFnZSBjb21wb25lbnRzIgogICAgICAgICAgICAgICAgYXBwbGljYXRpb25QYWdlcyAtPiBwcmVmZXJlbmNlc01hbmFnZW1lbnQgInJlYWRzIHBhZ2UgcHJlZmVyZW5jZXMiCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIHVpRnJhbWV3b3JrIC0+IHBhY2thZ2VNYW5hZ2VyICJtYW5hZ2VzIHN0eWxlcyBlbGVtZW50cyBmcm9tIHBhY2thZ2VzIgoKICAgICAgICAgICAgICAgIC8vIExpYnJhcnkgRGVwZW5kZW5jaWVzCiAgICAgICAgICAgICAgICBpaW9XaWRnZXRzIC0+IGlpb1V0aWxpdGllcyAidXNlcyBJSU8gY29tbXVuaWNhdGlvbiIKICAgICAgICAgICAgICAgIGlpb1dpZGdldHMgLT4gdWlGcmFtZXdvcmsgImV4dGVuZHMgVUkgZnJhbWV3b3JrIgoKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gR0VORVJJQyBQTFVHSU5TIFBBQ0tBR0UKICAgICAgICAgICAgZ2VuZXJpY1BsdWdpbnNQYWNrYWdlID0gY29udGFpbmVyICJHZW5lcmljIFBsdWdpbnMgUGFja2FnZSIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlN0YW5kYXJkIElJTyBkZXZpY2UgcGx1Z2lucyBmb3IgY29tbW9uIGZ1bmN0aW9uYWxpdHkiCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJDKyssIFF0IgoKICAgICAgICAgICAgICAgIGFkY1BsdWdpbiA9IGNvbXBvbmVudCAiQURDIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgQURDIHBsdWdpbiBpcyB1c2VkIHRvIGludGVyZmFjZSB3aXRoIElJTyBBRENzIHRoYXQgaW1wbGVtZW50IGFuIElJTyBidWZmZXIgbWVjaGFuaXNtIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGRhY1BsdWdpbiA9IGNvbXBvbmVudCAiREFDIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgREFDIHBsdWdpbiBpcyB1c2VkIHRvIGludGVyZmFjZSB3aXRoIElJTyBEQUNzIHRoYXQgaW1wbGVtZW50IHRoZSBJSU8gYnVmZmVyIG1lY2hhbmlzbSBvciBhIEREUyBtZWNoYW5pc20iCiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgZGF0YWxvZ2dlclBsdWdpbiA9IGNvbXBvbmVudCAiRGF0YUxvZ2dlciBQbHVnaW4iIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiVXNlZCB0byBtb25pdG9yIGFuZCBsb2cgZGF0YSIKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW4iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBkZWJ1Z2dlclBsdWdpbiA9IGNvbXBvbmVudCAiRGVidWdnZXIgUGx1Z2luIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlRoZSBkZWJ1Z2dlciBwbHVnaW4gaXMgdXNlZCB0byBleGFtaW5lIElJTyBjb250ZXh0cyBhbmQgbW9kaWZ5IGluZGl2aWR1YWwgSUlPIGF0dHJpYnV0ZXMsIGFzIHdlbGwgYXMgZXhhbWluaW5nIHRoZSBzdHJ1Y3R1cmUgb2YgYW4gSUlPIGNvbnRleHQiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luIgogICAgICAgICAgICAgICAgfSAKICAgICAgICAgICAgICAgIGplc2RQbHVnaW4gPSBjb21wb25lbnQgIkpFU0QgU3RhdHVzIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgSkVTRCBTdGF0dXMgdXRpbGl0eSBwbHVnaW4gcHJvdmlkZXMgYSBncmFwaGljYWwgaW50ZXJmYWNlIHRvIG1vbml0b3IgdGhlIHN0YXR1cyBvZiBKRVNEMjA0IGluIFNjb3B5IgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHJlZ21hcFBsdWdpbiA9IGNvbXBvbmVudCAiUmVnaXN0ZXIgTWFwIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgUmVnaXN0ZXIgTWFwIGFsbG93IGFjY2VzcyB0byByZWFkaW5nIGFuZCB3cml0aW5nIHJlZ2lzdGVycyBmb3IgZGV2aWNlcyBjb25uZWN0ZWQgdG8gU2NvcHkiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICBhZGNQbHVnaW4gLT4gcGx1Z2luSW50ZXJmYWNlICJpbXBsZW1lbnRzIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luSW1wbGVtZW50YXRpb24iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBhZGNQbHVnaW4gLT4gaWlvV2lkZ2V0cyAidXNlIgogICAgICAgICAgICAgICAgYWRjUGx1Z2luIC0+IGdudVJhZGlvV2lkZ2V0cyAidXNlIgogICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICBkYWNQbHVnaW4gLT4gcGx1Z2luSW50ZXJmYWNlICJpbXBsZW1lbnRzIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luSW1wbGVtZW50YXRpb24iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBkYWNQbHVnaW4gLT4gaWlvV2lkZ2V0cyAidXNlIgogICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICBkYXRhbG9nZ2VyUGx1Z2luIC0+IHBsdWdpbkludGVyZmFjZSAiaW1wbGVtZW50cyIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbkltcGxlbWVudGF0aW9uIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgZGF0YWxvZ2dlclBsdWdpbiAtPiBpaW9XaWRnZXRzICJ1c2UiCiAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIGRlYnVnZ2VyUGx1Z2luIC0+IHBsdWdpbkludGVyZmFjZSAiaW1wbGVtZW50cyIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbkltcGxlbWVudGF0aW9uIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgZGVidWdnZXJQbHVnaW4gLT4gaWlvV2lkZ2V0cyAidXNlIgoKICAgICAgICAgICAgICAgIGplc2RQbHVnaW4gLT4gcGx1Z2luSW50ZXJmYWNlICJpbXBsZW1lbnRzIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luSW1wbGVtZW50YXRpb24iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICByZWdtYXBQbHVnaW4gLT4gcGx1Z2luSW50ZXJmYWNlICJpbXBsZW1lbnRzIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luSW1wbGVtZW50YXRpb24iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIC8vIE0ySyBQQUNLQUdFCiAgICAgICAgICAgIG0ya1BhY2thZ2UgPSBjb250YWluZXIgIk0ySyBQYWNrYWdlIiB7CiAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQURBTE0yMDAwIGRldmljZSBzdXBwb3J0IHBhY2thZ2UiCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJDKyssIFF0IgoKICAgICAgICAgICAgICAgIG0ya1BsdWdpbiA9IGNvbXBvbmVudCAiTTJLIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQbHVnaW4gZm9yIEFEQUxNMjAwMCAoTTJLKSIKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW4iCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgLy8gUmVsYXRpb25zCiAgICAgICAgICAgICAgICBtMmtQbHVnaW4gLT4gcGx1Z2luSW50ZXJmYWNlICJpbXBsZW1lbnRzIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luSW1wbGVtZW50YXRpb24iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBtMmtQbHVnaW4gLT4gZ251UmFkaW9XaWRnZXRzICJ1c2UiCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIC8vIFNXSU9UIFBBQ0tBR0UKICAgICAgICAgICAgc3dpb3RQYWNrYWdlID0gY29udGFpbmVyICJTV0lPVCBQYWNrYWdlIiB7CiAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQUQtU1dJT1QxTC1TTCBwbGF0Zm9ybSBzdXBwb3J0IHBhY2thZ2UiCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJDKyssIFF0IgoKICAgICAgICAgICAgICAgIHN3aW90UGx1Z2luID0gY29tcG9uZW50ICJTV0lPVDFMIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgU2NvcHkgQUQtU1dJT1QxTC1TTCBwbHVnaW4gaXMgcmVzcG9uc2libGUgd2l0aCB0aGUgb3BlcmF0aW9uIGFuZCBjb250cm9sIG9mIHRoZSBBRC1TV0lPVDFMLVNMIHBsYXRmb3JtIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbiIKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAvLyBSZWxhdGlvbnMKICAgICAgICAgICAgICAgIHN3aW90UGx1Z2luIC0+IHBsdWdpbkludGVyZmFjZSAiaW1wbGVtZW50cyIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbkltcGxlbWVudGF0aW9uIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgc3dpb3RQbHVnaW4gLT4gaWlvV2lkZ2V0cyAidXNlIgogICAgICAgICAgICB9CgogICAgICAgICAgICAvLyBBRDkzNlggUEFDS0FHRQogICAgICAgICAgICBhZDkzNnhQYWNrYWdlID0gY29udGFpbmVyICJBRDkzNlggUGFja2FnZSIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkFEOTM2WCB0cmFuc2NlaXZlciBzdXBwb3J0IHBhY2thZ2UiCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJDKyssIFF0IgoKICAgICAgICAgICAgICAgIGFkOTM2eFBsdWdpbiA9IGNvbXBvbmVudCAiQUQ5MzZYIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgQUQ5MzZ4IHBsdWdpbnMgZm9yIFNjb3B5IGVuYWJsZSBpbnRlZ3JhdGlvbiBhbmQgY29udHJvbCBvZiBBRDkzNngtYmFzZWQgZGV2aWNlcyB3aXRoaW4gdGhlIFNjb3B5IHNvZnR3YXJlIGVudmlyb25tZW50IgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAvLyBSZWxhdGlvbnMKICAgICAgICAgICAgICAgIGFkOTM2eFBsdWdpbiAtPiBwbHVnaW5JbnRlcmZhY2UgImltcGxlbWVudHMiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW5JbXBsZW1lbnRhdGlvbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGFkOTM2eFBsdWdpbiAtPiBpaW9XaWRnZXRzICJ1c2UiICAKCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIC8vIEFQT0xMTyBBRDkwODQgUEFDS0FHRQogICAgICAgICAgICBhcG9sbG9BZDkwODRQYWNrYWdlID0gY29udGFpbmVyICJBcG9sbG8gQUQ5MDg0IFBhY2thZ2UiIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBcG9sbG8gTVhGRSBRVUFEIEFEOTA4NCBzdXBwb3J0IHBhY2thZ2UiCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJDKyssIFF0IgoKICAgICAgICAgICAgICAgIGFkOTA4NFBsdWdpbiA9IGNvbXBvbmVudCAiQUQ5MDg0IFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBcG9sbG8gTVhGRSBRVUFEIEFEOTA4NCBpbnRlcmFjdGlvbiIKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW4iCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgLy8gUmVsYXRpb25zCiAgICAgICAgICAgICAgICBhZDkwODRQbHVnaW4gLT4gcGx1Z2luSW50ZXJmYWNlICJpbXBsZW1lbnRzIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiUGx1Z2luSW1wbGVtZW50YXRpb24iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBhZDkwODRQbHVnaW4gLT4gaWlvV2lkZ2V0cyAidXNlIgogICAgICAgICAgICB9CgogICAgICAgICAgICAvLyBQT1dFUiBRVUFMSVRZIE1PTklUT1IgUEFDS0FHRQogICAgICAgICAgICBwcW1vblBhY2thZ2UgPSBjb250YWluZXIgIlBRTW9uIFBhY2thZ2UiIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQb3dlciBRdWFsaXR5IE1vbml0b3Igc3VwcG9ydCBwYWNrYWdlIgogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQysrLCBRdCIKCiAgICAgICAgICAgICAgICBwcW1QbHVnaW4gPSBjb21wb25lbnQgIlBRTU9OIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQb3dlciBRdWFsaXR5IE1vbml0b3IgcGx1Z2luIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHBxbVBsdWdpbiAtPiBwbHVnaW5JbnRlcmZhY2UgImltcGxlbWVudHMiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW5JbXBsZW1lbnRhdGlvbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gSU1VIFBBQ0tBR0UKICAgICAgICAgICAgaW11UGFja2FnZSA9IGNvbnRhaW5lciAiSU1VIFBhY2thZ2UiIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJJTVUgRXZhbHVhdGlvbiBTb2Z0d2FyZSBQYWNrYWdlIgogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQysrLCBRdCIKCiAgICAgICAgICAgICAgICBpbXVBbmFseXplclBsdWdpbiA9IGNvbXBvbmVudCAiSU1VIEFuYWx5emVyIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJJTVUgZXZhbHVhdGlvbiBhbmQgYW5hbHlzaXMgZnVuY3Rpb25hbGl0eSIKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW4iCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgLy8gUmVsYXRpb25zCiAgICAgICAgICAgICAgICBpbXVBbmFseXplclBsdWdpbiAtPiBwbHVnaW5JbnRlcmZhY2UgImltcGxlbWVudHMiIHsKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW5JbXBsZW1lbnRhdGlvbiIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGltdUFuYWx5emVyUGx1Z2luIC0+IGlpb1dpZGdldHMgInVzZSIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gQURSVjkwMDIgUEFDS0FHRQogICAgICAgICAgICBhZHJ2OTAwMlBhY2thZ2UgPSBjb250YWluZXIgIkFEUlY5MDAyIFBhY2thZ2UiIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBRFJWOTAwMiBKdXBpdGVyIHRyYW5zY2VpdmVyIHN1cHBvcnQgcGFja2FnZSIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkMrKywgUXQiCgogICAgICAgICAgICAgICAgYWRydjkwMDJQbHVnaW4gPSBjb21wb25lbnQgIkFEUlY5MDAyIFBsdWdpbiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgQURSVjkwMDIgKEp1cGl0ZXIpIHBsdWdpbiBwcm92aWRlcyBhIGNvbXByZWhlbnNpdmUgaW50ZXJmYWNlIGZvciBjb250cm9sbGluZyBhbmQgY29uZmlndXJpbmcgdGhlIEFEUlY5MDAyIGR1YWwtY2hhbm5lbCBSRiB0cmFuc2NlaXZlciIKICAgICAgICAgICAgICAgICAgICB0YWdzICJQbHVnaW4iCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgLy9SZWxhdGlvbnMKICAgICAgICAgICAgICAgIGFkcnY5MDAyUGx1Z2luIC0+IHBsdWdpbkludGVyZmFjZSAiaW1wbGVtZW50cyIgewogICAgICAgICAgICAgICAgICAgIHRhZ3MgIlBsdWdpbkltcGxlbWVudGF0aW9uIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgYWRydjkwMDJQbHVnaW4gLT4gaWlvV2lkZ2V0cyAidXNlIgoKICAgICAgICAgICAgfQoKCiAgICAgICAgICAgIC8vIFVzZXIgUmVsYXRpb25zaGlwcwogICAgICAgICAgICBlbmdpbmVlclVzZXIgLT4gc2NvcHlBcHBsaWNhdGlvbiAidXNlcyBHVUkgZm9yIGRldmljZSBjb250cm9sIGFuZCBhbmFseXNpcyIKICAgICAgICAgICAgc3R1ZGVudCAtPiBzY29weUFwcGxpY2F0aW9uICJ1c2VzIGZvciBsZWFybmluZyBhbmQgZXhwZXJpbWVudHMiCgogICAgICAgICAgICAvLyBFeHRlcm5hbCBDb250YWluZXIgUmVsYXRpb25zaGlwcwogICAgICAgICAgICBzY29weUFwcGxpY2F0aW9uIC0+IGlpb0ZyYW1ld29yayAic2VuZHMgY29tbWFuZHMgYW5kIHJlY2VpdmVzIGRhdGEgdmlhIgogICAgICAgICAgICBzY29weUFwcGxpY2F0aW9uIC0+IGdudVJhZGlvRWNvc3lzdGVtICJ1c2VzIGZvciBzaWduYWwgcHJvY2Vzc2luZyBhbmQgRFNQIG9wZXJhdGlvbnMiCiAgICAgICAgICAgIHNjb3B5QXBwbGljYXRpb24gLT4gZmlsZVN5c3RlbSAicmVhZC93cml0ZSBkYXRhIGZpbGVzIGFuZCBjb25maWd1cmF0aW9ucyIKICAgICAgICAgICAgc2NvcHlBcHBsaWNhdGlvbiAtPiBvcGVyYXRpbmdTeXN0ZW0gInJ1bnMgb24gY3Jvc3MtcGxhdGZvcm0gT1MiCiAgICAgICAgICAgIHNjb3B5QXBwbGljYXRpb24gLT4gaWlvRW11ICJsYXVuY2hlcyBhbmQgY29tbXVuaWNhdGVzIHdpdGggdmlhIFRDUC9JUCIKICAgICAgICAgICAgc2NvcHlBcHBsaWNhdGlvbiAtPiBnZW5lcmljUGx1Z2luc1BhY2thZ2UgImxvYWRzIHJlc291cmNlcyBmcm9tIgogICAgICAgICAgICBzY29weUFwcGxpY2F0aW9uIC0+IG0ya1BhY2thZ2UgImxvYWRzIHJlc291cmNlcyBmcm9tIgogICAgICAgICAgICBzY29weUFwcGxpY2F0aW9uIC0+IHN3aW90UGFja2FnZSAibG9hZHMgcmVzb3VyY2VzIGZyb20iCiAgICAgICAgICAgIHNjb3B5QXBwbGljYXRpb24gLT4gYWQ5MzZ4UGFja2FnZSAibG9hZHMgcmVzb3VyY2VzIGZyb20iCiAgICAgICAgICAgIHNjb3B5QXBwbGljYXRpb24gLT4gYXBvbGxvQWQ5MDg0UGFja2FnZSAibG9hZHMgcmVzb3VyY2VzIGZyb20iCiAgICAgICAgICAgIHNjb3B5QXBwbGljYXRpb24gLT4gcHFtb25QYWNrYWdlICJsb2FkcyByZXNvdXJjZXMgZnJvbSIKICAgICAgICAgICAgc2NvcHlBcHBsaWNhdGlvbiAtPiBpbXVQYWNrYWdlICJsb2FkcyByZXNvdXJjZXMgZnJvbSIKICAgICAgICAgICAgc2NvcHlBcHBsaWNhdGlvbiAtPiBhZHJ2OTAwMlBhY2thZ2UgImxvYWRzIHJlc291cmNlcyBmcm9tIgogICAgICAgIH0gICAgICAgIAogICAgICAgIAogICAgICAgIGlpb0ZyYW1ld29yayAtPiBhZGlIYXJkd2FyZSAiYWJzdHJhY3RzIGhhcmR3YXJlIGNvbW11bmljYXRpb24gdG8iCiAgICAgICAgCiAgICB9CiAgICAKICAgIHZpZXdzIHsKCiAgICAgICAgLy8gU1lTVEVNIENPTlRFWFQgVklFVwogICAgICAgIHN5c3RlbUNvbnRleHQgc2NvcHlTeXN0ZW0gIlN5c3RlbUNvbnRleHQiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGluY2x1ZGUgYWRpSGFyZHdhcmUKICAgICAgICAgICAgdGl0bGUgIlNjb3B5IgogICAgICAgICAgICBkZXNjcmlwdGlvbiAiSGlnaC1sZXZlbCB2aWV3IHNob3dpbmcgU2NvcHkncyBpbnRlcmFjdGlvbnMgd2l0aCB1c2VycyBhbmQgZXh0ZXJuYWwgc3lzdGVtcyIKICAgICAgICB9CgogICAgICAgIC8vIENPTlRBSU5FUiBWSUVXCiAgICAgICAgY29udGFpbmVyIHNjb3B5U3lzdGVtICJDb250YWluZXJWaWV3IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1QbHVnaW5JbXBsZW1lbnRhdGlvbiIKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PVN5c3RlbSBEZXBlbmRlbmN5IgogICAgICAgICAgICB0aXRsZSAiU2NvcHkgQXJjaGl0ZWN0dXJlIgogICAgICAgICAgICBkZXNjcmlwdGlvbiAiQ29udGFpbmVyIHJlbGF0aW9uc2hpcHMgc2hvd2luZyBob3cgY29yZSBhcHBsaWNhdGlvbiBsb2FkcyBwbHVnaW5zIGZyb20gcGFja2FnZXMiCiAgICAgICAgfQogICAgICAgIAogICAgICAgIC8vIEluZnJhc3RydWN0dXJlIFZpZXcKICAgICAgICBjb21wb25lbnQgc2NvcHlBcHBsaWNhdGlvbiAiSW5mcmFzdHJ1Y3R1cmVDb21wb25lbnRzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgYXBwbGljYXRpb25Db29yZGluYXRvcgogICAgICAgICAgICBpbmNsdWRlIGNyYXNoUmVwb3J0aW5nCiAgICAgICAgICAgIGluY2x1ZGUgdHJhbnNsYXRpb25TZXJ2aWNlCiAgICAgICAgICAgIGluY2x1ZGUgc2NyaXB0aW5nRW5naW5lCiAgICAgICAgICAgIGluY2x1ZGUgcHJlZmVyZW5jZXNNYW5hZ2VtZW50CiAgICAgICAgICAgIGluY2x1ZGUgbG9nZ2luZ1N5c3RlbQogICAgICAgICAgICB0aXRsZSAiSW5mcmFzdHJ1Y3R1cmUgQ29tcG9uZW50cyIKICAgICAgICAgICAgZGVzY3JpcHRpb24gIkNvcmUgYXBwbGljYXRpb24gaW5mcmFzdHJ1Y3R1cmUiCiAgICAgICAgfQoKICAgICAgICAvLyBDb3JlIEJ1c2luZXNzIFZpZXcKICAgICAgICBjb21wb25lbnQgc2NvcHlBcHBsaWNhdGlvbiAiQ29yZUJ1c2luZXNzQ29tcG9uZW50cyIgewogICAgICAgICAgICBpbmNsdWRlIGRldmljZU1hbmFnZW1lbnQKICAgICAgICAgICAgaW5jbHVkZSBwbHVnaW5TeXN0ZW0KICAgICAgICAgICAgaW5jbHVkZSBwYWNrYWdlTWFuYWdlcgogICAgICAgICAgICB0aXRsZSAiQ29yZSBCdXNpbmVzcyBDb21wb25lbnRzIgogICAgICAgICAgICBkZXNjcmlwdGlvbiAiTWFpbiBidXNpbmVzcyBsb2dpYyBjb21wb25lbnRzIgogICAgICAgIH0KCiAgICAgICAgLy8gVUkgTGF5ZXIgVmlldwogICAgICAgIGNvbXBvbmVudCBzY29weUFwcGxpY2F0aW9uICJVSUNvbXBvbmVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSB1aUZyYW1ld29yawogICAgICAgICAgICBpbmNsdWRlIHdpbmRvd01hbmFnZW1lbnQKICAgICAgICAgICAgaW5jbHVkZSB0b29sTWFuYWdlcgogICAgICAgICAgICBpbmNsdWRlIHN0YXR1c0JhcgogICAgICAgICAgICBpbmNsdWRlIGFwcGxpY2F0aW9uUGFnZXMKICAgICAgICAgICAgdGl0bGUgIlVJIENvbXBvbmVudHMiCiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJVc2VyIGludGVyZmFjZSBsYXllciBjb21wb25lbnRzIgogICAgICAgIH0KCiAgICAgICAgLy8gTGlicmFyeSBWaWV3CiAgICAgICAgY29tcG9uZW50IHNjb3B5QXBwbGljYXRpb24gIkxpYnJhcnlDb21wb25lbnRzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgaWlvVXRpbGl0aWVzCiAgICAgICAgICAgIGluY2x1ZGUgaWlvV2lkZ2V0cwogICAgICAgICAgICBpbmNsdWRlIGdudVJhZGlvV2lkZ2V0cwogICAgICAgICAgICB0aXRsZSAiU3VwcG9ydGluZyBMaWJyYXJpZXMiCiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJSZXVzYWJsZSBsaWJyYXJ5IGNvbXBvbmVudHMiCiAgICAgICAgfQoKICAgICAgICAvLyBPdmVyYWxsIFZpZXcKICAgICAgICBjb21wb25lbnQgc2NvcHlBcHBsaWNhdGlvbiAiQ29yZUNvbXBvbmVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSBhcHBsaWNhdGlvbkNvb3JkaW5hdG9yCiAgICAgICAgICAgIGluY2x1ZGUgZGV2aWNlTWFuYWdlbWVudAogICAgICAgICAgICBpbmNsdWRlIHBsdWdpblN5c3RlbQogICAgICAgICAgICBpbmNsdWRlIHVpRnJhbWV3b3JrCiAgICAgICAgICAgIGluY2x1ZGUgd2luZG93TWFuYWdlbWVudAogICAgICAgICAgICBpbmNsdWRlIGlpb1V0aWxpdGllcwogICAgICAgICAgICBpbmNsdWRlIHBhY2thZ2VNYW5hZ2VyCiAgICAgICAgICAgIGluY2x1ZGUgdG9vbE1hbmFnZXIKICAgICAgICAgICAgaW5jbHVkZSBnbnVSYWRpb1dpZGdldHMKICAgICAgICAgICAgaW5jbHVkZSBpaW9XaWRnZXRzCiAgICAgICAgICAgIHRpdGxlICJDb21wb25lbnRzIE92ZXJ2aWV3IgogICAgICAgICAgICBkZXNjcmlwdGlvbiAiS2V5IGNvbXBvbmVudHMgYW5kIHRoZWlyIHJlbGF0aW9uc2hpcHMiCiAgICAgICAgfQoKICAgICAgICAvLyBQbHVnaW4gVmlldwogICAgICAgIGNvbXBvbmVudCBzY29weUFwcGxpY2F0aW9uICJQbHVnaW5Db21wb25lbnRzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgcGx1Z2luUmVwb3NpdG9yeQogICAgICAgICAgICBpbmNsdWRlIHBsdWdpbk1hbmFnZXIKICAgICAgICAgICAgaW5jbHVkZSBwbHVnaW5JbnRlcmZhY2UKCiAgICAgICAgICAgIHRpdGxlICJQbHVnaW4gQ29tcG9uZW50cyIKICAgICAgICAgICAgZGVzY3JpcHRpb24gIlBsdWdpbiBzeXN0ZW0gY29tcG9uZW50cyIKICAgICAgICB9CgogICAgICAgIC8vIEdlbmVyaWMtcGx1Z2lucyBQYWNrYWdlCiAgICAgICAgY29tcG9uZW50IGdlbmVyaWNQbHVnaW5zUGFja2FnZSAiR2VuZXJpYy1wbHVnaW5zQ29tcG9uZW50cyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSBzY29weUFwcGxpY2F0aW9uCiAgICAgICAgICAgIGluY2x1ZGUgcGx1Z2luSW50ZXJmYWNlCiAgICAgICAgICAgIGluY2x1ZGUgaWlvV2lkZ2V0cwogICAgICAgICAgICBpbmNsdWRlIGdudVJhZGlvV2lkZ2V0cwogICAgICAgICAgICB0aXRsZSAiR2VuZXJpYy1wbHVnaW5zIFBhY2thZ2UiCiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgcGx1Z2lucyBmcm9tIGdlbmVyaWMtcGx1Z2lucyBwYWNrYWdlIgogICAgICAgIH0KCiAgICAgICAgLy8gTTJLIFBhY2thZ2UKICAgICAgICBjb21wb25lbnQgbTJrUGFja2FnZSAiTTJLQ29tcG9uZW50cyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSBzY29weUFwcGxpY2F0aW9uCiAgICAgICAgICAgIGluY2x1ZGUgcGx1Z2luSW50ZXJmYWNlCiAgICAgICAgICAgIGluY2x1ZGUgZ251UmFkaW9XaWRnZXRzCiAgICAgICAgICAgIHRpdGxlICJNMksgUGFja2FnZSIKICAgICAgICAgICAgZGVzY3JpcHRpb24gIlRoZSBwbHVnaW5zIGZyb20gTTJLIHBhY2thZ2UiCiAgICAgICAgfQoKICAgICAgICAvLyBTV0lPVCBQYWNrYWdlCiAgICAgICAgY29tcG9uZW50IHN3aW90UGFja2FnZSAiU1dJT1RDb21wb25lbnRzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBleGNsdWRlIHNjb3B5QXBwbGljYXRpb24KICAgICAgICAgICAgaW5jbHVkZSBwbHVnaW5JbnRlcmZhY2UKICAgICAgICAgICAgaW5jbHVkZSBpaW9XaWRnZXRzCiAgICAgICAgICAgIHRpdGxlICJTV0lPVCBQYWNrYWdlIgogICAgICAgICAgICBkZXNjcmlwdGlvbiAiVGhlIHBsdWdpbnMgZnJvbSBTV0lPVCBwYWNrYWdlIgogICAgICAgIH0KCiAgICAgICAgLy8gQUQ5MzZYIFBhY2thZ2UKICAgICAgICBjb21wb25lbnQgYWQ5MzZ4UGFja2FnZSAiQUQ5MzZYQ29tcG9uZW50cyIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgZXhjbHVkZSBzY29weUFwcGxpY2F0aW9uCiAgICAgICAgICAgIGluY2x1ZGUgcGx1Z2luSW50ZXJmYWNlCiAgICAgICAgICAgIGluY2x1ZGUgaWlvV2lkZ2V0cwogICAgICAgICAgICB0aXRsZSAiQUQ5MzZYIFBhY2thZ2UiCiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgcGx1Z2lucyBmcm9tIEFEOTM2WCBwYWNrYWdlIgogICAgICAgIH0KCiAgICAgICAgLy8gQXBvbGxvIEFEOTA4NCBQYWNrYWdlCiAgICAgICAgY29tcG9uZW50IGFwb2xsb0FkOTA4NFBhY2thZ2UgIkFwb2xsby1BRDkwODRDb21wb25lbnRzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBleGNsdWRlIHNjb3B5QXBwbGljYXRpb24KICAgICAgICAgICAgaW5jbHVkZSBwbHVnaW5JbnRlcmZhY2UKICAgICAgICAgICAgaW5jbHVkZSBpaW9XaWRnZXRzCiAgICAgICAgICAgIHRpdGxlICJBcG9sbG8gQUQ5MDg0IFBhY2thZ2UiCiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgcGx1Z2lucyBmcm9tIEFwb2xsbyBBRDkwODQgcGFja2FnZSIKICAgICAgICB9CgogICAgICAgIC8vIFBRTW9uIFBhY2thZ2UKICAgICAgICBjb21wb25lbnQgcHFtb25QYWNrYWdlICJQUU1vbkNvbXBvbmVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgc2NvcHlBcHBsaWNhdGlvbgogICAgICAgICAgICBpbmNsdWRlIHBsdWdpbkludGVyZmFjZQogICAgICAgICAgICB0aXRsZSAiUFFNb24gUGFja2FnZSIKICAgICAgICAgICAgZGVzY3JpcHRpb24gIlRoZSBwbHVnaW5zIGZyb20gUFFNb24gcGFja2FnZSIKICAgICAgICB9CgogICAgICAgIC8vIElNVSBQYWNrYWdlCiAgICAgICAgY29tcG9uZW50IGltdVBhY2thZ2UgIklNVUNvbXBvbmVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgc2NvcHlBcHBsaWNhdGlvbgogICAgICAgICAgICBpbmNsdWRlIHBsdWdpbkludGVyZmFjZQogICAgICAgICAgICBpbmNsdWRlIGlpb1dpZGdldHMKICAgICAgICAgICAgdGl0bGUgIklNVSBQYWNrYWdlIgogICAgICAgICAgICBkZXNjcmlwdGlvbiAiVGhlIHBsdWdpbnMgZnJvbSBJTVUgcGFja2FnZSIKICAgICAgICB9CgogICAgICAgIC8vIEFEUlY5MDAyIFBhY2thZ2UKICAgICAgICBjb21wb25lbnQgYWRydjkwMDJQYWNrYWdlICJBRFJWOTAwMkNvbXBvbmVudHMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGV4Y2x1ZGUgc2NvcHlBcHBsaWNhdGlvbgogICAgICAgICAgICBpbmNsdWRlIHBsdWdpbkludGVyZmFjZQogICAgICAgICAgICBpbmNsdWRlIGlpb1dpZGdldHMKICAgICAgICAgICAgdGl0bGUgIkFEUlY5MDAyIFBhY2thZ2UiCiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJUaGUgcGx1Z2lucyBmcm9tIEFEUlY5MDAyIHBhY2thZ2UiCiAgICAgICAgfQoKCiAgICAgICAgc3R5bGVzIHsgICAgICAgICAgICAKICAgICAgICAgICAgZWxlbWVudCAiU2NvcHkgU3lzdGVtIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICIjMDA3N2I2IgogICAgICAgICAgICAgICAgY29sb3IgIldoaXRlIgogICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICBlbGVtZW50ICJDb250YWluZXIiIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIiMwMDc3YjYiCiAgICAgICAgICAgICAgICBjb2xvciAiV2hpdGUiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgCiAgICAgICAgICAgIGVsZW1lbnQgIlBlcnNvbiIgewogICAgICAgICAgICAgICAgc2hhcGUgIlBlcnNvbiIKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIiMwMjMwNDciCiAgICAgICAgICAgICAgICBjb2xvciAiV2hpdGUiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgCiAgICAgICAgICAgIGVsZW1lbnQgIkluZnJhc3RydWN0dXJlIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICNmZjZiNmIKICAgICAgICAgICAgICAgIGNvbG9yICJCbGFjayIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgZWxlbWVudCAiQ29yZUJ1c2luZXNzIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM0ZWNkYzQKICAgICAgICAgICAgICAgIGNvbG9yICJCbGFjayIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgZWxlbWVudCAiUHJlc2VudGF0aW9uIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICNmOWNhMjQKICAgICAgICAgICAgICAgIGNvbG9yICJCbGFjayIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgZWxlbWVudCAiTGlicmFyeSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjNmM1Y2U3CiAgICAgICAgICAgICAgICBjb2xvciAiQmxhY2siCiAgICAgICAgICAgIH0KICAgICAgICAgICAgCiAgICAgICAgICAgIGVsZW1lbnQgIlBsdWdpblN5c3RlbSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAiIzAwODk3YiIKICAgICAgICAgICAgICAgIGNvbG9yICJCbGFjayIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgZWxlbWVudCAiUGx1Z2luIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICIjZmZiODZiIgogICAgICAgICAgICAgICAgY29sb3IgIkJsYWNrIgogICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICBlbGVtZW50ICJTeXN0ZW0gRGVwZW5kZW5jeSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAiI2UwZTBlMCIKICAgICAgICAgICAgICAgIGNvbG9yICIjNjY2NjY2IgogICAgICAgICAgICAgICAgb3BhY2l0eSA1MAogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKfQ=="
+  },
+  "views" : {
+    "componentViews" : [ {
+      "containerId" : "10",
+      "description" : "Core application infrastructure",
+      "dimensions" : {
+        "height" : 1631,
+        "width" : 2640
+      },
+      "elements" : [ {
+        "id" : "11",
+        "x" : 1095,
+        "y" : 203
+      }, {
+        "id" : "12",
+        "x" : 830,
+        "y" : 788
+      }, {
+        "id" : "14",
+        "x" : 1925,
+        "y" : 208
+      }, {
+        "id" : "15",
+        "x" : 1930,
+        "y" : 788
+      }, {
+        "id" : "16",
+        "x" : 260,
+        "y" : 793
+      }, {
+        "id" : "17",
+        "x" : 1380,
+        "y" : 788
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "InfrastructureComponents",
+      "name" : "Component View: Scopy - Scopy Application",
+      "order" : 3,
+      "relationships" : [ {
+        "id" : "34"
+      }, {
+        "id" : "35"
+      }, {
+        "id" : "36"
+      }, {
+        "id" : "37"
+      }, {
+        "id" : "46"
+      } ],
+      "title" : "Infrastructure Components"
+    }, {
+      "containerId" : "10",
+      "description" : "Main business logic components",
+      "dimensions" : {
+        "height" : 1566,
+        "width" : 1750
+      },
+      "elements" : [ {
+        "id" : "18",
+        "x" : 259,
+        "y" : 203
+      }, {
+        "id" : "19",
+        "x" : 1039,
+        "y" : 718
+      }, {
+        "id" : "20",
+        "x" : 259,
+        "y" : 728
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "CoreBusinessComponents",
+      "name" : "Component View: Scopy - Scopy Application",
+      "order" : 4,
+      "relationships" : [ {
+        "id" : "49"
+      }, {
+        "id" : "50"
+      } ],
+      "title" : "Core Business Components"
+    }, {
+      "containerId" : "10",
+      "description" : "User interface layer components",
+      "dimensions" : {
+        "height" : 2134,
+        "width" : 1720
+      },
+      "elements" : [ {
+        "id" : "26",
+        "x" : 1010,
+        "y" : 816
+      }, {
+        "id" : "27",
+        "x" : 260,
+        "y" : 816
+      }, {
+        "id" : "28",
+        "x" : 263,
+        "y" : 206
+      }, {
+        "id" : "29",
+        "x" : 1008,
+        "y" : 1296
+      }, {
+        "id" : "30",
+        "x" : 1010,
+        "y" : 203
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "UIComponents",
+      "name" : "Component View: Scopy - Scopy Application",
+      "order" : 5,
+      "relationships" : [ {
+        "id" : "56"
+      }, {
+        "id" : "58",
+        "vertices" : [ {
+          "x" : 1103,
+          "y" : 651
+        } ]
+      }, {
+        "id" : "59"
+      }, {
+        "id" : "61",
+        "vertices" : [ {
+          "x" : 583,
+          "y" : 656
+        } ]
+      }, {
+        "id" : "64"
+      }, {
+        "id" : "65",
+        "vertices" : [ {
+          "x" : 1235,
+          "y" : 557
+        }, {
+          "x" : 1235,
+          "y" : 761
+        } ]
+      } ],
+      "title" : "UI Components"
+    }, {
+      "containerId" : "10",
+      "description" : "Reusable library components",
+      "dimensions" : {
+        "height" : 1654,
+        "width" : 1720
+      },
+      "elements" : [ {
+        "id" : "31",
+        "x" : 260,
+        "y" : 815
+      }, {
+        "id" : "32",
+        "x" : 1010,
+        "y" : 815
+      }, {
+        "id" : "33",
+        "x" : 1010,
+        "y" : 202
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "LibraryComponents",
+      "name" : "Component View: Scopy - Scopy Application",
+      "order" : 6,
+      "relationships" : [ {
+        "id" : "68"
+      } ],
+      "title" : "Supporting Libraries"
+    }, {
+      "containerId" : "10",
+      "description" : "Key components and their relationships",
+      "dimensions" : {
+        "height" : 2908,
+        "width" : 2662
+      },
+      "elements" : [ {
+        "id" : "11",
+        "x" : 1140,
+        "y" : 1255
+      }, {
+        "id" : "18",
+        "x" : 292,
+        "y" : 1248
+      }, {
+        "id" : "19",
+        "x" : 1876,
+        "y" : 1235
+      }, {
+        "id" : "20",
+        "x" : 1137,
+        "y" : 663
+      }, {
+        "id" : "26",
+        "x" : 1875,
+        "y" : 2060
+      }, {
+        "id" : "27",
+        "x" : 1150,
+        "y" : 2080
+      }, {
+        "id" : "28",
+        "x" : 290,
+        "y" : 1610
+      }, {
+        "id" : "31",
+        "x" : 1947,
+        "y" : 213
+      }, {
+        "id" : "32",
+        "x" : 1952,
+        "y" : 693
+      }, {
+        "id" : "33",
+        "x" : 1147,
+        "y" : 203
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "CoreComponents",
+      "name" : "Component View: Scopy - Scopy Application",
+      "order" : 7,
+      "relationships" : [ {
+        "id" : "38"
+      }, {
+        "id" : "39"
+      }, {
+        "id" : "40"
+      }, {
+        "id" : "41"
+      }, {
+        "id" : "49"
+      }, {
+        "id" : "50"
+      }, {
+        "id" : "53"
+      }, {
+        "id" : "54"
+      }, {
+        "id" : "55"
+      }, {
+        "id" : "56"
+      }, {
+        "id" : "59",
+        "vertices" : [ {
+          "x" : 1270,
+          "y" : 2050
+        }, {
+          "x" : 1265,
+          "y" : 1940
+        }, {
+          "x" : 885,
+          "y" : 1770
+        } ]
+      }, {
+        "id" : "60",
+        "vertices" : [ {
+          "x" : 282,
+          "y" : 1808
+        }, {
+          "x" : 287,
+          "y" : 818
+        } ]
+      }, {
+        "id" : "61",
+        "vertices" : [ {
+          "x" : 525,
+          "y" : 2505
+        }, {
+          "x" : 2100,
+          "y" : 2505
+        } ]
+      }, {
+        "id" : "67"
+      }, {
+        "id" : "68"
+      }, {
+        "id" : "69",
+        "vertices" : [ {
+          "x" : 2372,
+          "y" : 1163
+        }, {
+          "x" : 2375,
+          "y" : 1690
+        } ]
+      } ],
+      "title" : "Components Overview"
+    }, {
+      "containerId" : "10",
+      "description" : "Plugin system components",
+      "dimensions" : {
+        "height" : 1594,
+        "width" : 1659
+      },
+      "elements" : [ {
+        "id" : "21",
+        "x" : 949,
+        "y" : 755
+      }, {
+        "id" : "22",
+        "x" : 265,
+        "y" : 747
+      }, {
+        "id" : "23",
+        "x" : 260,
+        "y" : 202
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "PluginComponents",
+      "name" : "Component View: Scopy - Scopy Application",
+      "order" : 8,
+      "relationships" : [ {
+        "id" : "24"
+      }, {
+        "id" : "25"
+      } ],
+      "title" : "Plugin Components"
+    }, {
+      "containerId" : "70",
+      "description" : "The plugins from generic-plugins package",
+      "dimensions" : {
+        "height" : 1921,
+        "width" : 5600
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 1514,
+        "y" : 1082
+      }, {
+        "id" : "32",
+        "x" : 3989,
+        "y" : 1082
+      }, {
+        "id" : "33",
+        "x" : 4889,
+        "y" : 1082
+      }, {
+        "id" : "71",
+        "x" : 4364,
+        "y" : 182
+      }, {
+        "id" : "72",
+        "x" : 3239,
+        "y" : 182
+      }, {
+        "id" : "73",
+        "x" : 2489,
+        "y" : 182
+      }, {
+        "id" : "74",
+        "x" : 1739,
+        "y" : 182
+      }, {
+        "id" : "75",
+        "x" : 989,
+        "y" : 182
+      }, {
+        "id" : "76",
+        "x" : 239,
+        "y" : 182
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "Generic-pluginsComponents",
+      "name" : "Component View: Scopy - Generic Plugins Package",
+      "order" : 9,
+      "relationships" : [ {
+        "id" : "77"
+      }, {
+        "id" : "81"
+      }, {
+        "id" : "83"
+      }, {
+        "id" : "85"
+      }, {
+        "id" : "87"
+      }, {
+        "id" : "88"
+      }, {
+        "id" : "90"
+      }, {
+        "id" : "91"
+      }, {
+        "id" : "93"
+      }, {
+        "id" : "94"
+      }, {
+        "id" : "96"
+      } ],
+      "title" : "Generic-plugins Package"
+    }, {
+      "containerId" : "98",
+      "description" : "The plugins from M2K package",
+      "dimensions" : {
+        "height" : 1641,
+        "width" : 1700
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 989,
+        "y" : 202
+      }, {
+        "id" : "33",
+        "x" : 989,
+        "y" : 802
+      }, {
+        "id" : "99",
+        "x" : 239,
+        "y" : 502
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "M2KComponents",
+      "name" : "Component View: Scopy - M2K Package",
+      "order" : 10,
+      "relationships" : [ {
+        "id" : "100"
+      }, {
+        "id" : "104"
+      } ],
+      "title" : "M2K Package"
+    }, {
+      "containerId" : "106",
+      "description" : "The plugins from SWIOT package",
+      "dimensions" : {
+        "height" : 1641,
+        "width" : 1700
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 989,
+        "y" : 202
+      }, {
+        "id" : "32",
+        "x" : 989,
+        "y" : 802
+      }, {
+        "id" : "107",
+        "x" : 239,
+        "y" : 502
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "SWIOTComponents",
+      "name" : "Component View: Scopy - SWIOT Package",
+      "order" : 11,
+      "relationships" : [ {
+        "id" : "108"
+      }, {
+        "id" : "112"
+      } ],
+      "title" : "SWIOT Package"
+    }, {
+      "containerId" : "114",
+      "description" : "The plugins from AD936X package",
+      "dimensions" : {
+        "height" : 1641,
+        "width" : 1700
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 989,
+        "y" : 202
+      }, {
+        "id" : "32",
+        "x" : 989,
+        "y" : 802
+      }, {
+        "id" : "115",
+        "x" : 239,
+        "y" : 502
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "AD936XComponents",
+      "name" : "Component View: Scopy - AD936X Package",
+      "order" : 12,
+      "relationships" : [ {
+        "id" : "116"
+      }, {
+        "id" : "120"
+      } ],
+      "title" : "AD936X Package"
+    }, {
+      "containerId" : "122",
+      "description" : "The plugins from Apollo AD9084 package",
+      "dimensions" : {
+        "height" : 1641,
+        "width" : 1700
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 989,
+        "y" : 202
+      }, {
+        "id" : "32",
+        "x" : 989,
+        "y" : 802
+      }, {
+        "id" : "123",
+        "x" : 239,
+        "y" : 502
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "Apollo-AD9084Components",
+      "name" : "Component View: Scopy - Apollo AD9084 Package",
+      "order" : 13,
+      "relationships" : [ {
+        "id" : "124"
+      }, {
+        "id" : "128"
+      } ],
+      "title" : "Apollo AD9084 Package"
+    }, {
+      "containerId" : "130",
+      "description" : "The plugins from PQMon package",
+      "dimensions" : {
+        "height" : 1041,
+        "width" : 1700
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 990,
+        "y" : 203
+      }, {
+        "id" : "131",
+        "x" : 240,
+        "y" : 203
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "PQMonComponents",
+      "name" : "Component View: Scopy - PQMon Package",
+      "order" : 14,
+      "relationships" : [ {
+        "id" : "132"
+      } ],
+      "title" : "PQMon Package"
+    }, {
+      "containerId" : "136",
+      "description" : "The plugins from IMU package",
+      "dimensions" : {
+        "height" : 1641,
+        "width" : 1700
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 989,
+        "y" : 202
+      }, {
+        "id" : "32",
+        "x" : 989,
+        "y" : 802
+      }, {
+        "id" : "137",
+        "x" : 239,
+        "y" : 502
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "IMUComponents",
+      "name" : "Component View: Scopy - IMU Package",
+      "order" : 15,
+      "relationships" : [ {
+        "id" : "138"
+      }, {
+        "id" : "142"
+      } ],
+      "title" : "IMU Package"
+    }, {
+      "containerId" : "144",
+      "description" : "The plugins from ADRV9002 package",
+      "dimensions" : {
+        "height" : 1654,
+        "width" : 1746
+      },
+      "elements" : [ {
+        "id" : "23",
+        "x" : 1035,
+        "y" : 816
+      }, {
+        "id" : "32",
+        "x" : 1035,
+        "y" : 203
+      }, {
+        "id" : "145",
+        "x" : 239,
+        "y" : 511
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "ADRV9002Components",
+      "name" : "Component View: Scopy - ADRV9002 Package",
+      "order" : 16,
+      "relationships" : [ {
+        "id" : "146"
+      }, {
+        "id" : "150"
+      } ],
+      "title" : "ADRV9002 Package"
+    } ],
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "CoreComponents",
+      "metadataSymbols" : "SquareBrackets",
+      "styles" : {
+        "elements" : [ {
+          "background" : "#0077b6",
+          "color" : "#ffffff",
+          "tag" : "Container"
+        }, {
+          "background" : "#4ecdc4",
+          "color" : "#000000",
+          "tag" : "CoreBusiness"
+        }, {
+          "background" : "#ff6b6b",
+          "color" : "#000000",
+          "tag" : "Infrastructure"
+        }, {
+          "background" : "#6c5ce7",
+          "color" : "#000000",
+          "tag" : "Library"
+        }, {
+          "background" : "#023047",
+          "color" : "#ffffff",
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "background" : "#ffb86b",
+          "color" : "#000000",
+          "tag" : "Plugin"
+        }, {
+          "background" : "#00897b",
+          "color" : "#000000",
+          "tag" : "PluginSystem"
+        }, {
+          "background" : "#f9ca24",
+          "color" : "#000000",
+          "tag" : "Presentation"
+        }, {
+          "background" : "#0077b6",
+          "color" : "#ffffff",
+          "tag" : "Scopy System"
+        }, {
+          "background" : "#e0e0e0",
+          "color" : "#666666",
+          "opacity" : 50,
+          "tag" : "System Dependency"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "description" : "Container relationships showing how core application loads plugins from packages",
+      "dimensions" : {
+        "height" : 2219,
+        "width" : 2480
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 684,
+        "y" : 142
+      }, {
+        "id" : "2",
+        "x" : 1324,
+        "y" : 142
+      }, {
+        "id" : "10",
+        "x" : 1069,
+        "y" : 930
+      }, {
+        "id" : "70",
+        "x" : 219,
+        "y" : 847
+      }, {
+        "id" : "98",
+        "x" : 219,
+        "y" : 1197
+      }, {
+        "id" : "106",
+        "x" : 229,
+        "y" : 1562
+      }, {
+        "id" : "114",
+        "x" : 769,
+        "y" : 1562
+      }, {
+        "id" : "122",
+        "x" : 1799,
+        "y" : 1560
+      }, {
+        "id" : "130",
+        "x" : 1804,
+        "y" : 1202
+      }, {
+        "id" : "136",
+        "x" : 1809,
+        "y" : 852
+      }, {
+        "id" : "144",
+        "x" : 1289,
+        "y" : 1562
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "ContainerView",
+      "name" : "Container View: Scopy",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "152"
+      }, {
+        "id" : "154"
+      }, {
+        "id" : "166"
+      }, {
+        "id" : "167"
+      }, {
+        "id" : "168"
+      }, {
+        "id" : "169"
+      }, {
+        "id" : "170"
+      }, {
+        "id" : "171"
+      }, {
+        "id" : "172"
+      }, {
+        "id" : "173"
+      } ],
+      "softwareSystemId" : "9",
+      "title" : "Scopy Architecture"
+    } ],
+    "systemContextViews" : [ {
+      "description" : "High-level view showing Scopy's interactions with users and external systems",
+      "dimensions" : {
+        "height" : 1882,
+        "width" : 2575
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 614,
+        "y" : 142
+      }, {
+        "id" : "2",
+        "x" : 1299,
+        "y" : 177
+      }, {
+        "id" : "3",
+        "x" : 1344,
+        "y" : 1319
+      }, {
+        "id" : "4",
+        "x" : 1919,
+        "y" : 1324
+      }, {
+        "id" : "5",
+        "x" : 1924,
+        "y" : 844
+      }, {
+        "id" : "6",
+        "x" : 199,
+        "y" : 849
+      }, {
+        "id" : "7",
+        "x" : 199,
+        "y" : 1324
+      }, {
+        "id" : "8",
+        "x" : 744,
+        "y" : 1324
+      }, {
+        "id" : "9",
+        "x" : 1009,
+        "y" : 817
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "SystemContext",
+      "name" : "System Context View: Scopy",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "153"
+      }, {
+        "id" : "155"
+      }, {
+        "id" : "157"
+      }, {
+        "id" : "159"
+      }, {
+        "id" : "161"
+      }, {
+        "id" : "163"
+      }, {
+        "id" : "165"
+      }, {
+        "id" : "174"
+      } ],
+      "softwareSystemId" : "9",
+      "title" : "Scopy"
+    } ]
+  }
+}
