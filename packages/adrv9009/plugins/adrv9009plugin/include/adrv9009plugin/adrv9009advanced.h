@@ -37,11 +37,8 @@ namespace scopy::adrv9009 {
 class TxSettingsWidget;
 class RxSettingsWidget;
 class OrxSettingsWidget;
-} // namespace scopy::adrv9009
-
-namespace scopy::adrv9009 {
-
 class ClkSettingsWidget;
+class AgcSetupWidget;
 
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 {
@@ -88,7 +85,7 @@ private:
 	QWidget *m_fhmSetup = nullptr;
 	QWidget *m_paProtection = nullptr;
 	QWidget *m_gainSetup = nullptr;
-	QWidget *m_agcSetup = nullptr;
+	AgcSetupWidget *m_agcSetup = nullptr;
 	QWidget *m_gpioConfig = nullptr;
 	TxSettingsWidget *m_txSettings = nullptr;
 	RxSettingsWidget *m_rxSettings = nullptr;
