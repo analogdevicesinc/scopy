@@ -111,6 +111,7 @@ time_sink_f_impl::time_sink_f_impl(int size, size_t vlen, float sampleRate, cons
 	// reserve memory for n buffers
 	m_data.reserve(nconnections);
 
+	// we fill buffer with 0 to avoid sending garbage if buffer isn't completely filled with data
 	for(int i = 0; i < m_nconnections; i++) {
 		m_buffers.push_back(std::deque<float>());
 		m_data.push_back(std::vector<float>());
