@@ -26,16 +26,9 @@ message(STATUS "building plugin: " ${SCOPY_MODULE})
 
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(PLUGIN_NAME ADRV9009Plugin)
 set(PLUGIN_DISPLAY_NAME ADRV9009)
-set(PLUGIN_DESCRIPTION
-    ADRV9009
-    RF
-    TRANSCEIVER
-    CONTROL
-    AND
-    CONFIGURATION
-    PLUGIN
-)
+set(PLUGIN_DESCRIPTION "ADRV9009 RF TRANSCEIVER CONTROL AND CONFIGURATION")
 
 include(GenerateExportHeader)
 
@@ -93,9 +86,5 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-iio-widgets
 )
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
-endif()
 
 set(ADRV9009PLUGIN_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
