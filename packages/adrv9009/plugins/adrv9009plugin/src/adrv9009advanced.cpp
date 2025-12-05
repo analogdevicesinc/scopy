@@ -19,6 +19,9 @@
  */
 
 #include "adrv9009advanced.h"
+#include "advanced/txsettingswidget.h"
+#include "advanced/rxsettingswidget.h"
+#include "advanced/orxsettingswidget.h"
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
@@ -240,14 +243,14 @@ void Adrv9009Advanced::createContentWidgets()
 	// Create placeholder widgets for all 13 sections
 	m_clkSettings = createPlaceholderWidget("CLK Settings");
 	m_calibrations = createPlaceholderWidget("Calibrations");
-	m_txSettings = createPlaceholderWidget("TX Settings");
-	m_rxSettings = createPlaceholderWidget("RX Settings");
-	m_orxSettings = createPlaceholderWidget("ORX Settings");
 	m_fhmSetup = createPlaceholderWidget("FHM Setup");
 	m_paProtection = createPlaceholderWidget("PA Protection");
 	m_gainSetup = createPlaceholderWidget("GAIN Setup");
 	m_agcSetup = createPlaceholderWidget("AGC Setup");
 	m_gpioConfig = createPlaceholderWidget("GPIO Config");
+	m_txSettings = new TxSettingsWidget(m_device, this);
+	m_rxSettings = new RxSettingsWidget(m_device, this);
+	m_orxSettings = new OrxSettingsWidget(m_device, this);
 	m_auxDac = createPlaceholderWidget("AUX DAC");
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
 	m_bist = createPlaceholderWidget("BIST");
@@ -269,6 +272,15 @@ void Adrv9009Advanced::createContentWidgets()
 
 	// Set first widget as current (CLK Settings)
 	m_centralWidget->setCurrentWidget(m_clkSettings);
+	if(m_txSettings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_txSettings, &TxSettingsWidget::readRequested);
+	}
+	if(m_rxSettings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_rxSettings, &RxSettingsWidget::readRequested);
+	}
+	if(m_orxSettings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_orxSettings, &OrxSettingsWidget::readRequested);
+	}
 }
 
 void Adrv9009Advanced::updateNavigationButtonsLayout()

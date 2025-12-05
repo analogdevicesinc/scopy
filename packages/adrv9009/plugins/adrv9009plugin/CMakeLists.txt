@@ -63,7 +63,6 @@ file(
 	include/${SCOPY_MODULE}/advanced/*.h
 	include/${SCOPY_MODULE}/advanced/*.hpp
 )
-
 file(GLOB UI_LIST ui/*.ui)
 
 set(ENABLE_TESTING ON)
