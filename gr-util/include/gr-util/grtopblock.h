@@ -76,6 +76,7 @@ public Q_SLOTS:
 	void suspendBuild();
 	void unsuspendBuild();
 	void onFinished();
+	void newGRLogMessage(QString message);
 
 private:
 	bool m_suspended;
