@@ -31,6 +31,13 @@
 #include <animatedrefreshbtn.h>
 #include <iio.h>
 
+// Forward declarations for section widgets
+namespace scopy::adrv9009 {
+class TxSettingsWidget;
+class RxSettingsWidget;
+class OrxSettingsWidget;
+} // namespace scopy::adrv9009
+
 namespace scopy::adrv9009 {
 
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
@@ -75,14 +82,14 @@ private:
 	// Content widgets (placeholders for Phase 1)
 	QWidget *m_clkSettings = nullptr;
 	QWidget *m_calibrations = nullptr;
-	QWidget *m_txSettings = nullptr;
-	QWidget *m_rxSettings = nullptr;
-	QWidget *m_orxSettings = nullptr;
 	QWidget *m_fhmSetup = nullptr;
 	QWidget *m_paProtection = nullptr;
 	QWidget *m_gainSetup = nullptr;
 	QWidget *m_agcSetup = nullptr;
 	QWidget *m_gpioConfig = nullptr;
+	TxSettingsWidget *m_txSettings = nullptr;
+	RxSettingsWidget *m_rxSettings = nullptr;
+	OrxSettingsWidget *m_orxSettings = nullptr;
 	QWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;
 	QWidget *m_bist = nullptr;
