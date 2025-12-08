@@ -26,6 +26,7 @@
 #include <QString>
 #include <QMap>
 #include <QFuture>
+#include <QFutureWatcher>
 
 #include <iio.h>
 
@@ -100,6 +101,7 @@ private:
 	const int MAX_NB_TONES = 4;
 	const QString Q_CHANNEL = "Q";
 	const QString I_CHANNEL = "I";
+	const int DEBOUNCE_TIME_MS = 65;
 
 	QMap<QString, TxNode *> m_ddsTxs;
 	QMap<QString, TxNode *> m_bufferTxs;
@@ -122,6 +124,8 @@ private:
 	bool txChannelsCheckValidSetup();
 	int getTxChannelEnabledCount(unsigned *enabled_mask);
 	void autoBuffersizeAndKernelBuffers();
+	void tryInitBuffer();
+	void startPushOperation();
 };
 } // namespace dac
 } // namespace scopy

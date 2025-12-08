@@ -28,6 +28,7 @@
 #include <QtConcurrentRun>
 #include <QDebug>
 #include <QThread>
+#include <QTimer>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -123,7 +124,7 @@ void DacDataModel::setRepeatFileBuffer(bool repeat)
 	requestInterruption();
 	m_repeatFileBuffer = repeat;
 	autoBuffersizeAndKernelBuffers();
-	Q_EMIT reqInitBuffer();
+	tryInitBuffer();
 }
 
 void DacDataModel::requestInterruption()
@@ -140,7 +141,7 @@ void DacDataModel::setCyclic(bool cyclic)
 	requestInterruption();
 	m_cyclicBuffer = cyclic;
 	autoBuffersizeAndKernelBuffers();
-	Q_EMIT reqInitBuffer();
+	tryInitBuffer();
 }
 
 void DacDataModel::setKernelBuffersCount(unsigned int kernelCount)
@@ -148,7 +149,7 @@ void DacDataModel::setKernelBuffersCount(unsigned int kernelCount)
 	if(kernelCount != m_userKernelBufferCount) {
 		requestInterruption();
 		m_userKernelBufferCount = kernelCount;
-		Q_EMIT reqInitBuffer();
+		tryInitBuffer();
 	}
 }
 
@@ -156,7 +157,7 @@ void DacDataModel::setDecimation(double decimation)
 {
 	requestInterruption();
 	m_decimation = decimation;
-	Q_EMIT reqInitBuffer();
+	tryInitBuffer();
 }
 
 void DacDataModel::setBuffersize(unsigned int buffersize)
@@ -164,7 +165,7 @@ void DacDataModel::setBuffersize(unsigned int buffersize)
 	if(m_userBuffersize != buffersize) {
 		requestInterruption();
 		m_userBuffersize = buffersize;
-		Q_EMIT reqInitBuffer();
+		tryInitBuffer();
 	}
 }
 
@@ -175,7 +176,7 @@ bool DacDataModel::setFilesize(unsigned int filesize)
 		requestInterruption();
 		m_filesize = filesize;
 		autoBuffersizeAndKernelBuffers();
-		Q_EMIT reqInitBuffer();
+		tryInitBuffer();
 	}
 	return needToUpdate;
 }
@@ -193,7 +194,7 @@ void DacDataModel::enableBufferChannel(QString uuid, bool enable)
 		iio_channel_disable(chn);
 	}
 
-	Q_EMIT reqInitBuffer();
+	tryInitBuffer();
 }
 
 unsigned int DacDataModel::getEnabledChannelsCount()
@@ -215,7 +216,7 @@ void DacDataModel::setData(QVector<QVector<double>> data)
 		updatedAndReqInit = setFilesize(data.size());
 	}
 	if(!updatedAndReqInit) {
-		Q_EMIT reqInitBuffer();
+		tryInitBuffer();
 	}
 }
 
@@ -225,7 +226,7 @@ void DacDataModel::setSamplingFrequency(unsigned int sr)
 		m_samplingFrequency = sr;
 		requestInterruption();
 		autoBuffersizeAndKernelBuffers();
-		Q_EMIT reqInitBuffer();
+		tryInitBuffer();
 	}
 }
 
@@ -255,6 +256,14 @@ void DacDataModel::autoBuffersizeAndKernelBuffers()
 	}
 	Q_EMIT updateBuffersize(m_userBuffersize);
 	Q_EMIT updateKernelBuffers(m_userKernelBufferCount);
+}
+
+void DacDataModel::tryInitBuffer()
+{
+	// Only emit signal if buffer exists
+	if(m_buffer) {
+		Q_EMIT reqInitBuffer();
+	}
 }
 
 bool DacDataModel::validateBufferParams()
@@ -318,9 +327,22 @@ bool DacDataModel::validateBufferParams()
 
 void DacDataModel::initBuffer()
 {
+	static QTimer *debounceTimer = nullptr;
+	if(!debounceTimer) {
+		debounceTimer = new QTimer(this);
+		debounceTimer->setSingleShot(true);
+		debounceTimer->setInterval(DEBOUNCE_TIME_MS);
+		connect(debounceTimer, &QTimer::timeout, this, &DacDataModel::startPushOperation);
+	}
+	// Always restart timer - latest call wins
+	debounceTimer->start();
+}
+
+void DacDataModel::startPushOperation()
+{
 	if(m_pushThd.isRunning()) {
 		m_pushThd.cancel();
-		qDebug(CAT_DAC_DATA) << "Cancel thread and wait in initBuffer";
+		qDebug(CAT_DAC_DATA) << "Cancel thread and wait in startPushOperation";
 		m_pushThd.waitForFinished();
 	}
 	m_pushThd = QtConcurrent::run(this, &DacDataModel::push);
