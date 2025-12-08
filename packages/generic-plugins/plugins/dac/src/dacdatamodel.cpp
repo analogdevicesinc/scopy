@@ -389,8 +389,14 @@ void DacDataModel::push()
 			}
 			chnIdx++;
 		}
-
 		ssize_t bytes = iio_buffer_push(m_buffer);
+		if(bytes < 0) {
+			QString errorMsg =
+				QString("Failed to push buffer: %1 (error code: %2)").arg(strerror(-bytes)).arg(bytes);
+			qDebug(CAT_DAC_DATA) << errorMsg;
+			Q_EMIT log(errorMsg);
+			return;
+		}
 		QString logMsg = QString("Pushed %1 samples, %2 bytes (%3/%4 buffers)")
 					 .arg(m_buffersize)
 					 .arg(bytes)
