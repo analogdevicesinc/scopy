@@ -63,10 +63,17 @@ extract_sysroot(){
 	sudo rm -rf ${STAGING_AREA}/kuiper
 	sudo mkdir -p ${STAGING_AREA}/kuiper
 
+	IMAGE_FILE=image_$IMAGE_NAME.img
 	# with file ${IMAGE_FILE} we can see the start sector (4218880) and the length (19947520) of the second partition contained in the Kuiper image
 	# using this info we can directly mount that partition
-	sudo mount -v -o loop,offset=$((512*4218880)),sizelimit=$((512*19947520)) ${STAGING_AREA}/${IMAGE_FILE} ${STAGING_AREA}/kuiper
 
+	if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+		sudo mount -v -o loop,offset=$((512*4218880)),sizelimit=$((512*3571712)) ${STAGING_AREA}/${IMAGE_FILE} ${STAGING_AREA}/kuiper
+	elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+		sudo mount -v -o loop,offset=$((512*4218880)),sizelimit=$((512*19947520)) ${STAGING_AREA}/${IMAGE_FILE} ${STAGING_AREA}/kuiper
+	fi
+
+	# rm -rf ${SYSROOT}
 	mkdir -p ${SYSROOT}
 	sudo cp -arp ${STAGING_AREA}/kuiper/* ${SYSROOT}
 	sudo cp /etc/resolv.conf ${SYSROOT}/etc/resolv.conf
