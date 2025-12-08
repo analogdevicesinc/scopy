@@ -207,10 +207,13 @@ unsigned int DacDataModel::getEnabledChannelsCount()
 
 void DacDataModel::setData(QVector<QVector<double>> data)
 {
+	bool updatedAndReqInit = false;
 	requestInterruption();
 	m_data.clear();
 	m_data = data;
-	bool updatedAndReqInit = setFilesize(data.size());
+	if((m_filesize == 0) || (m_filesize > data.size())) {
+		updatedAndReqInit = setFilesize(data.size());
+	}
 	if(!updatedAndReqInit) {
 		Q_EMIT reqInitBuffer();
 	}
