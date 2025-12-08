@@ -1,4 +1,7 @@
-FROM ubuntu:22.04
+ARG BASE_IMAGE=ubuntu:latest
+# The default image will be ubuntu:latest
+
+FROM ${BASE_IMAGE}
 SHELL ["/bin/bash", "-c"]
 
 ARG USER=runner
