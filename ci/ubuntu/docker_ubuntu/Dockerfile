@@ -14,8 +14,8 @@ RUN apt-get update && \
 	apt-get -y upgrade && \
 	apt-get install -y apt-utils sudo tzdata keyboard-configuration software-properties-common
 
-RUN groupadd -g 1000 -r $USER && \
-	useradd -u 1000 -g 1000 --create-home -r $USER
+RUN groupadd -g 1001 -r $USER && \
+	useradd -u 1001 -g 1001 --create-home -r $USER
 
 #Change password
 RUN echo "$USER:$USER" | chpasswd

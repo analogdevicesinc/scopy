@@ -11,8 +11,8 @@ RUN apt update && apt -y upgrade && \
 	apt install -y apt-utils software-properties-common sudo
 
 # Create user
-RUN groupadd -g 1000 -r $USER && \
-	useradd -u 1000 -g 1000 --create-home -r $USER
+RUN groupadd -g 1001 -r $USER && \
+	useradd -u 1001 -g 1001 --create-home -r $USER
 
 # Change password
 RUN echo "$USER:$USER" | chpasswd
