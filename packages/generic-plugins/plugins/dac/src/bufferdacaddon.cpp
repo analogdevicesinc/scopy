@@ -26,6 +26,7 @@
 #include "databuffer.h"
 #include "dac_logging_categories.h"
 #include "scopy-dac_config.h"
+#include "filedataguistrategy.h"
 #include <style.h>
 
 #include <menusectionwidget.h>
@@ -367,6 +368,20 @@ void BufferDacAddon::updateGuiStrategyWidget()
 		auto guiStrWidget = m_dataBuffer->getDataGuiStrategyInterface()->ui();
 		if(guiStrWidget) {
 			optGuiStrLay->addWidget(guiStrWidget);
+		}
+
+		// Set channel format information from first available TX channel
+		auto guiStrategy = dynamic_cast<FileDataGuiStrategy *>(m_dataBuffer->getDataGuiStrategyInterface());
+		if(guiStrategy) {
+			auto txList = m_model->getBufferTxs();
+			if(!txList.isEmpty()) {
+				TxNode *firstTx = txList.first();
+				if(firstTx && firstTx->getChannel()) {
+					unsigned int bits = firstTx->getFormatBits();
+					bool isSigned = firstTx->getFormatSigned();
+					guiStrategy->setChannelFormat(bits, isSigned);
+				}
+			}
 		}
 
 		auto fileSize = m_dataBuffer->getDataBufferStrategy()->data().size();

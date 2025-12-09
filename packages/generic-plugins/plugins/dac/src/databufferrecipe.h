@@ -34,6 +34,10 @@ struct SCOPY_DAC_EXPORT DataBufferRecipe
 	bool scaled = false;
 	double phase = 0.0;
 	int frequency = 0;
+
+	// Channel format information for proper data conversion
+	unsigned int targetBits = 12;
+	bool targetSigned = true;
 };
 } // namespace dac
 } // namespace scopy

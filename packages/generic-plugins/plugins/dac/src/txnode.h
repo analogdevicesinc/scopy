@@ -45,6 +45,7 @@ public:
 	struct iio_channel *getChannel();
 	unsigned int getFormatShift() const;
 	unsigned int getFormatBits() const;
+	bool getFormatSigned() const;
 
 	bool enableDds(bool enable);
 
@@ -57,6 +58,7 @@ private:
 	struct iio_channel *m_channel;
 	unsigned int m_fmtShift;
 	unsigned int m_fmtBits;
+	bool m_fmtSigned;
 	QColor m_color;
 };
 } // namespace dac
