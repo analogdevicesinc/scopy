@@ -80,3 +80,13 @@ void FileDataGuiStrategy::init()
 	m_scaleSpin->setValue(0.0);
 	m_scaled->onOffswitch()->setChecked(true);
 }
+
+void FileDataGuiStrategy::setChannelFormat(unsigned int bits, bool isSigned)
+{
+	// Update recipe with channel format information
+	m_recipe.targetBits = bits;
+	m_recipe.targetSigned = isSigned;
+
+	// Emit updated recipe with channel format information
+	Q_EMIT recipeUpdated(m_recipe);
+}

@@ -118,8 +118,13 @@ double CSVFileStrategy::convert(double value)
 {
 	double scale = 0.0;
 	double full_scale = DacUtils::dbFullScaleConvert(m_recipe.scale, false);
-	if(m_recipe.scaled) {
-		return value * full_scale;
+
+	if(!m_recipe.scaled) {
+		return value;
 	}
-	return value;
+
+	double max_target =
+		m_recipe.targetSigned ? ((1LL << (m_recipe.targetBits - 1)) - 1) : ((1LL << m_recipe.targetBits) - 1);
+	scale = max_target * full_scale / m_max;
+	return value * scale;
 }

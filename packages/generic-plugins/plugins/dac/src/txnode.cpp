@@ -30,11 +30,13 @@ TxNode::TxNode(QString uuid, iio_channel *chn, QObject *parent)
 	, m_txUuid(uuid)
 	, m_fmtBits(0)
 	, m_fmtShift(0)
+	, m_fmtSigned(true)
 {
 	if(m_channel) {
 		auto fmt = iio_channel_get_data_format(m_channel);
 		m_fmtShift = fmt->shift;
 		m_fmtBits = fmt->bits;
+		m_fmtSigned = fmt->is_signed;
 	}
 }
 
@@ -66,6 +68,8 @@ iio_channel *TxNode::getChannel() { return m_channel; }
 unsigned int TxNode::getFormatShift() const { return m_fmtShift; }
 
 unsigned int TxNode::getFormatBits() const { return m_fmtBits; }
+
+bool TxNode::getFormatSigned() const { return m_fmtSigned; }
 
 bool TxNode::enableDds(bool enable)
 {

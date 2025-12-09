@@ -43,6 +43,9 @@ public:
 	QWidget *ui() override;
 	void init() override;
 
+	// Method to update recipe with channel format information
+	void setChannelFormat(unsigned int bits, bool isSigned);
+
 Q_SIGNALS:
 	void recipeUpdated(DataBufferRecipe) override;
 
@@ -50,6 +53,7 @@ private:
 	QWidget *m_ui;
 	MenuOnOffSwitch *m_scaled;
 	TitleSpinBox *m_scaleSpin;
+	DataBufferRecipe m_recipe;
 };
 } // namespace dac
 } // namespace scopy
