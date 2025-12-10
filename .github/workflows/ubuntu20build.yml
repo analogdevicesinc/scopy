@@ -17,8 +17,12 @@ jobs:
         image: cristianbindea/scopy2-ubuntu20:${{ needs.docker_tag_workflow.outputs.docker_tag }}
         options: --user root
     steps:
+        - name: check storage space
+          run: df -h
         - uses: actions/checkout@v4
         - name: Build Scopy
           run: |
             /bin/bash -c "git config --global --add safe.directory $GITHUB_WORKSPACE"
             /bin/bash -c "export CI_SCRIPT=ON && $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy"
+        - name: check storage space
+          run: df -h

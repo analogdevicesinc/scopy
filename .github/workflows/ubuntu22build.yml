@@ -17,6 +17,8 @@ jobs:
         image: cristianbindea/scopy2-ubuntu22:${{ needs.docker_tag_workflow.outputs.docker_tag }}
         options: --user root
     steps:
+        - name: check storage space
+          run: df -h
         - uses: actions/checkout@v4
         - name: Build Scopy
           run: |
@@ -41,3 +43,6 @@ jobs:
              fail_on_failure: 'true'
              require_tests: 'true'
              include_passed: 'true'
+
+        - name: check storage space
+          run: df -h
