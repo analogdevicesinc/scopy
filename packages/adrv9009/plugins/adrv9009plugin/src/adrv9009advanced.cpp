@@ -169,6 +169,14 @@ void Adrv9009Advanced::createNavigationButtons()
 	m_jesd204SettingsBtn->setCheckable(true);
 	m_jesd204SettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
+	m_jesdFramerBtn = new QPushButton("JESD Framer", this);
+	Style::setStyle(m_jesdFramerBtn, style::properties::button::blueGrayButton);
+	m_jesdFramerBtn->setCheckable(true);
+
+	m_jesdDeframerBtn = new QPushButton("JESD Deframer", this);
+	Style::setStyle(m_jesdDeframerBtn, style::properties::button::blueGrayButton);
+	m_jesdDeframerBtn->setCheckable(true);
+
 	m_bistBtn = new QPushButton("BIST", this);
 	Style::setStyle(m_bistBtn, style::properties::button::blueGrayButton);
 	m_bistBtn->setCheckable(true);
@@ -187,6 +195,8 @@ void Adrv9009Advanced::createNavigationButtons()
 	navigationButtons->addButton(m_gpioConfigBtn);
 	navigationButtons->addButton(m_auxDacBtn);
 	navigationButtons->addButton(m_jesd204SettingsBtn);
+	navigationButtons->addButton(m_jesdFramerBtn);
+	navigationButtons->addButton(m_jesdDeframerBtn);
 	navigationButtons->addButton(m_bistBtn);
 
 	// Create main navigation widget with vertical layout for rows
@@ -241,6 +251,10 @@ void Adrv9009Advanced::createNavigationButtons()
 	connect(m_auxDacBtn, &QPushButton::clicked, this, [this]() { m_centralWidget->setCurrentWidget(m_auxDac); });
 	connect(m_jesd204SettingsBtn, &QPushButton::clicked, this,
 		[this]() { m_centralWidget->setCurrentWidget(m_jesd204Settings); });
+	connect(m_jesdFramerBtn, &QPushButton::clicked, this,
+		[this]() { m_centralWidget->setCurrentWidget(m_jesdFramer); });
+	connect(m_jesdDeframerBtn, &QPushButton::clicked, this,
+		[this]() { m_centralWidget->setCurrentWidget(m_jesdDeframer); });
 	connect(m_bistBtn, &QPushButton::clicked, this, [this]() { m_centralWidget->setCurrentWidget(m_bist); });
 }
 
@@ -258,11 +272,12 @@ void Adrv9009Advanced::createContentWidgets()
 	m_rxSettings = new RxSettingsWidget(m_device, this);
 	m_orxSettings = new OrxSettingsWidget(m_device, this);
 	m_auxDac = new AuxDacWidget(m_device, this);
-	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
 	m_bist = new BistWidget(m_device, this);
+	m_jesd204Settings = new JesdSettingsWidget(m_device, this);
+	m_jesdFramer = new JesdFramerWidget(m_device, this);
+	m_jesdDeframer = new JesdDeframerWidget(m_device, this);
 
 	if(m_clkSettings) {
-		// Connect clock settings signals
 		connect(this, &Adrv9009Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);
 	}
 
@@ -310,6 +325,18 @@ void Adrv9009Advanced::createContentWidgets()
 		connect(this, &Adrv9009Advanced::readRequested, m_bist, &BistWidget::readRequested);
 	}
 
+	if(m_jesd204Settings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_jesd204Settings, &JesdSettingsWidget::readRequested);
+	}
+
+	if(m_jesdFramer) {
+		connect(this, &Adrv9009Advanced::readRequested, m_jesdFramer, &JesdFramerWidget::readRequested);
+	}
+
+	if(m_jesdDeframer) {
+		connect(this, &Adrv9009Advanced::readRequested, m_jesdDeframer, &JesdDeframerWidget::readRequested);
+	}
+
 	// Add all widgets to stacked widget
 	m_centralWidget->addWidget(m_clkSettings);
 	m_centralWidget->addWidget(m_calibrations);
@@ -323,10 +350,9 @@ void Adrv9009Advanced::createContentWidgets()
 	m_centralWidget->addWidget(m_gpioConfig);
 	m_centralWidget->addWidget(m_auxDac);
 	m_centralWidget->addWidget(m_jesd204Settings);
+	m_centralWidget->addWidget(m_jesdFramer);
+	m_centralWidget->addWidget(m_jesdDeframer);
 	m_centralWidget->addWidget(m_bist);
-
-	// Set first widget as current (CLK Settings)
-	m_centralWidget->setCurrentWidget(m_clkSettings);
 }
 
 void Adrv9009Advanced::updateNavigationButtonsLayout()
@@ -341,7 +367,7 @@ void Adrv9009Advanced::updateNavigationButtonsLayout()
 	QList<QPushButton *> allButtons = {m_clkSettingsBtn, m_calibrationsBtn, m_txSettingsBtn,   m_rxSettingsBtn,
 					   m_orxSettingsBtn, m_fhmSetupBtn,	m_paProtectionBtn, m_gainSetupBtn,
 					   m_agcSetupBtn,    m_gpioConfigBtn,	m_auxDacBtn,	   m_jesd204SettingsBtn,
-					   m_bistBtn};
+					   m_jesdFramerBtn,  m_jesdDeframerBtn, m_bistBtn};
 
 	// Step 2: Calculate button distribution (same logic as before)
 	QList<QPushButton *> firstRowButtons;
