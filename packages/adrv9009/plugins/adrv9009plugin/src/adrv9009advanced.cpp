@@ -148,6 +148,14 @@ void Adrv9009Advanced::createNavigationButtons()
 	Style::setStyle(m_jesd204SettingsBtn, style::properties::button::blueGrayButton);
 	m_jesd204SettingsBtn->setCheckable(true);
 
+	m_jesdFramerBtn = new QPushButton("JESD Framer", this);
+	Style::setStyle(m_jesdFramerBtn, style::properties::button::blueGrayButton);
+	m_jesdFramerBtn->setCheckable(true);
+
+	m_jesdDeframerBtn = new QPushButton("JESD Deframer", this);
+	Style::setStyle(m_jesdDeframerBtn, style::properties::button::blueGrayButton);
+	m_jesdDeframerBtn->setCheckable(true);
+
 	m_bistBtn = new QPushButton("BIST", this);
 	Style::setStyle(m_bistBtn, style::properties::button::blueGrayButton);
 	m_bistBtn->setCheckable(true);
@@ -165,6 +173,8 @@ void Adrv9009Advanced::createNavigationButtons()
 	navigationButtons->addButton(m_gpioConfigBtn);
 	navigationButtons->addButton(m_auxDacBtn);
 	navigationButtons->addButton(m_jesd204SettingsBtn);
+	navigationButtons->addButton(m_jesdFramerBtn);
+	navigationButtons->addButton(m_jesdDeframerBtn);
 	navigationButtons->addButton(m_bistBtn);
 
 	// Create horizontal scrollable navigation widget
@@ -192,6 +202,8 @@ void Adrv9009Advanced::createNavigationButtons()
 	navigationLayout->addWidget(m_gpioConfigBtn);
 	navigationLayout->addWidget(m_auxDacBtn);
 	navigationLayout->addWidget(m_jesd204SettingsBtn);
+	navigationLayout->addWidget(m_jesdFramerBtn);
+	navigationLayout->addWidget(m_jesdDeframerBtn);
 	navigationLayout->addWidget(m_bistBtn);
 
 	navigationScrollArea->setWidget(navigationWidget);
@@ -223,12 +235,16 @@ void Adrv9009Advanced::createNavigationButtons()
 	connect(m_auxDacBtn, &QPushButton::clicked, this, [this]() { m_centralWidget->setCurrentWidget(m_auxDac); });
 	connect(m_jesd204SettingsBtn, &QPushButton::clicked, this,
 		[this]() { m_centralWidget->setCurrentWidget(m_jesd204Settings); });
+	connect(m_jesdFramerBtn, &QPushButton::clicked, this,
+		[this]() { m_centralWidget->setCurrentWidget(m_jesdFramer); });
+	connect(m_jesdDeframerBtn, &QPushButton::clicked, this,
+		[this]() { m_centralWidget->setCurrentWidget(m_jesdDeframer); });
 	connect(m_bistBtn, &QPushButton::clicked, this, [this]() { m_centralWidget->setCurrentWidget(m_bist); });
 }
 
 void Adrv9009Advanced::createContentWidgets()
 {
-	// Create placeholder widgets for all 13 sections
+	// Create widgets (15 sections)
 	m_clkSettings = createPlaceholderWidget("CLK Settings");
 	m_calibrations = createPlaceholderWidget("Calibrations");
 	m_txSettings = createPlaceholderWidget("TX Settings");
@@ -240,7 +256,12 @@ void Adrv9009Advanced::createContentWidgets()
 	m_agcSetup = createPlaceholderWidget("AGC Setup");
 	m_gpioConfig = createPlaceholderWidget("GPIO Config");
 	m_auxDac = createPlaceholderWidget("AUX DAC");
-	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
+
+	// JESD204 widgets (real implementations)
+	m_jesd204Settings = new JesdSettingsWidget(m_device, this);
+	m_jesdFramer = new JesdFramerWidget(m_device, this);
+	m_jesdDeframer = new JesdDeframerWidget(m_device, this);
+
 	m_bist = createPlaceholderWidget("BIST");
 
 	// Add all widgets to stacked widget
@@ -256,10 +277,23 @@ void Adrv9009Advanced::createContentWidgets()
 	m_centralWidget->addWidget(m_gpioConfig);
 	m_centralWidget->addWidget(m_auxDac);
 	m_centralWidget->addWidget(m_jesd204Settings);
+	m_centralWidget->addWidget(m_jesdFramer);
+	m_centralWidget->addWidget(m_jesdDeframer);
 	m_centralWidget->addWidget(m_bist);
 
 	// Set first widget as current (CLK Settings)
 	m_centralWidget->setCurrentWidget(m_clkSettings);
+
+	// Connect JESD widget signals
+	if(m_jesd204Settings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_jesd204Settings, &JesdSettingsWidget::readRequested);
+	}
+	if(m_jesdFramer) {
+		connect(this, &Adrv9009Advanced::readRequested, m_jesdFramer, &JesdFramerWidget::readRequested);
+	}
+	if(m_jesdDeframer) {
+		connect(this, &Adrv9009Advanced::readRequested, m_jesdDeframer, &JesdDeframerWidget::readRequested);
+	}
 }
 
 QWidget *Adrv9009Advanced::createPlaceholderWidget(const QString &sectionName)
