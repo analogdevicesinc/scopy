@@ -33,6 +33,10 @@
 #include <advanced/auxdacwidget.h>
 #include <advanced/bistwidget.h>
 #include <advanced/calibrationwidget.h>
+#include <advanced/jesdsettingswidget.h>
+#include <advanced/jesdframerwidget.h>
+#include <advanced/jesddeframerwidget.h>
+
 
 // Forward declarations for section widgets
 namespace scopy::adrv9009 {
@@ -63,7 +67,7 @@ private:
 	AnimatedRefreshBtn *m_refreshButton;
 	QStackedWidget *m_centralWidget;
 
-	// Navigation buttons (13 sections)
+	// Navigation buttons (15 sections)
 	QPushButton *m_clkSettingsBtn = nullptr;
 	QPushButton *m_calibrationsBtn = nullptr;
 	QPushButton *m_txSettingsBtn = nullptr;
@@ -76,6 +80,8 @@ private:
 	QPushButton *m_gpioConfigBtn = nullptr;
 	QPushButton *m_auxDacBtn = nullptr;
 	QPushButton *m_jesd204SettingsBtn = nullptr;
+	QPushButton *m_jesdFramerBtn = nullptr;
+	QPushButton *m_jesdDeframerBtn = nullptr;
 	QPushButton *m_bistBtn = nullptr;
 
 	// Navigation layout widgets (created once, reused)
@@ -97,9 +103,11 @@ private:
 	RxSettingsWidget *m_rxSettings = nullptr;
 	OrxSettingsWidget *m_orxSettings = nullptr;
 	AuxDacWidget *m_auxDac = nullptr;
-	QWidget *m_jesd204Settings = nullptr;
 	BistWidget *m_bist = nullptr;
-
+	JesdSettingsWidget *m_jesd204Settings = nullptr;
+	JesdFramerWidget *m_jesdFramer = nullptr;
+	JesdDeframerWidget *m_jesdDeframer = nullptr;
+	
 	void setupUi();
 	void createNavigationButtons();
 	void createContentWidgets();
