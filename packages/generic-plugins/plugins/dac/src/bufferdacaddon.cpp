@@ -167,7 +167,11 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	m_fileSizeSpin->setIncrementMode(MenuSpinbox::IS_FIXED);
 	StyleHelper::BackgroundWidget(m_fileSizeSpin);
 	connect(
-		m_fileSizeSpin, &MenuSpinbox::valueChanged, this, [&](double value) { m_model->setFilesize(value); },
+		m_fileSizeSpin, &MenuSpinbox::valueChanged, this,
+		[&](double value) {
+			m_model->setFilesize(value);
+			m_bufferSizeSpin->setMaxValue(value);
+		},
 		Qt::QueuedConnection);
 	m_fileSizeSpin->setScaleRange(1, 16 * 1024 * 1024);
 	m_fileSizeSpin->setValue(16);
