@@ -60,6 +60,8 @@ install_packages() {
 	pacman --noconfirm -S $SYSTEM_PKGS
 	$PACMAN -S $TOOLS_PKGS
 	$PACMAN -S $PACMAN_SYNC_DEPS
+
+	download_cmake
 }
 
 clone() {
@@ -420,7 +422,6 @@ build_deps() {
 	build_karchive ON
 	build_genalyzer ON
 }
-
 
 for arg in $@; do
 	$arg
