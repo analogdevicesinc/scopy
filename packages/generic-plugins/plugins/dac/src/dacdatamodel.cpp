@@ -46,12 +46,16 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	, m_userKernelBufferCount(0)
 	, m_filesize(0)
 	, m_decimation(1)
+	, m_pushWatcher(nullptr)
 {
 	m_dev = dev;
 	m_name = iio_device_get_name(m_dev);
 
 	m_isBufferCapable = initBufferDac();
 	m_isDds = initDdsDac();
+
+	m_pushWatcher = new QFutureWatcher<void>(this);
+	connect(m_pushWatcher, &QFutureWatcher<void>::finished, this, &DacDataModel::onPushCompleted);
 
 	connect(
 		this, &DacDataModel::reqInitBuffer, this,
@@ -346,6 +350,18 @@ void DacDataModel::startPushOperation()
 		m_pushThd.waitForFinished();
 	}
 	m_pushThd = QtConcurrent::run(this, &DacDataModel::push);
+	m_pushWatcher->setFuture(m_pushThd);
+}
+
+void DacDataModel::onPushCompleted()
+{
+	qDebug(CAT_DAC_DATA) << "Push operation completed";
+
+	// If non-cyclic mode and operation completed successfully, emit signal
+	if(!m_interrupted && !m_cyclicBuffer) {
+		Q_EMIT requestStop();
+		qDebug(CAT_DAC_DATA) << "Non-cyclic run completed, signaling UI";
+	}
 }
 
 void DacDataModel::push()
