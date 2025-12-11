@@ -1,5 +1,5 @@
 # select as base image matching your host to get process isolation
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 # this creates an empty file named recycle.bin which essentialy disables the recycle bin
@@ -10,7 +10,7 @@ RUN echo . > 'C:\$RECYCLE.BIN';
 
 # install msys2 and innosetup
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
-    Invoke-WebRequest -UseBasicParsing -uri "https://github.com/msys2/msys2-installer/releases/download/2023-01-27/msys2-base-x86_64-20230127.sfx.exe" -OutFile msys2.exe; \
+    Invoke-WebRequest -UseBasicParsing -uri "https://github.com/msys2/msys2-installer/releases/download/2025-08-30/msys2-base-x86_64-20250830.sfx.exe" -OutFile msys2.exe; \
     .\msys2.exe -y -oC:\\; \
     Remove-Item msys2.exe; \
     Invoke-WebRequest -UseBasicParsing -uri "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -OutFile innosetup-6.2.2.exe; \
