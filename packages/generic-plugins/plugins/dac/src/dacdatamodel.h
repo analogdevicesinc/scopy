@@ -69,6 +69,7 @@ Q_SIGNALS:
 	void invalidRunParams();
 	void updateBuffersize(unsigned int bf);
 	void updateKernelBuffers(unsigned int kb);
+	void requestStop();
 
 public Q_SLOTS:
 	void reset();
@@ -108,6 +109,7 @@ private:
 
 	QVector<QVector<double>> m_data;
 	QFuture<void> m_pushThd;
+	QFutureWatcher<void> *m_pushWatcher;
 	bool m_interrupted;
 
 	bool initBufferDac();
@@ -126,6 +128,7 @@ private:
 	void autoBuffersizeAndKernelBuffers();
 	void tryInitBuffer();
 	void startPushOperation();
+	void onPushCompleted();
 };
 } // namespace dac
 } // namespace scopy

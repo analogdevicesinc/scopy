@@ -134,6 +134,9 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(
 		m_model, &DacDataModel::invalidRunParams, this, [this]() { m_runBtn->setChecked(false); },
 		Qt::QueuedConnection);
+	connect(
+		m_model, &DacDataModel::requestStop, this, [this]() { m_runBtn->setChecked(false); },
+		Qt::QueuedConnection);
 
 	// Repeat file buffer section
 	MenuSectionWidget *repeatFileBufferContainer = new MenuSectionWidget(this);
