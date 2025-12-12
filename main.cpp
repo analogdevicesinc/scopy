@@ -98,6 +98,14 @@ void printRuntimeEnvironmentInfo()
 
 int main(int argc, char *argv[])
 {
+#ifdef __APPLE__
+	// this forces a newer version of OpenGL to work with Qt3DExtras
+	QSurfaceFormat fmt;
+	fmt.setProfile(QSurfaceFormat::CoreProfile);
+	fmt.setVersion(3, 2);
+	QSurfaceFormat::setDefaultFormat(fmt);
+#endif
+
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
 	QCoreApplication::setApplicationName("Scopy-v2");
