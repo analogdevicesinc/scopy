@@ -40,8 +40,6 @@ public:
 	bool compatible(QString m_param, QString category) override;
 	bool loadPage() override;
 	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
 	void initMetadata() override;
 	QString description() override;
 

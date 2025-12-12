@@ -103,8 +103,4 @@ target_link_libraries(
 # Set RPATH to find scopy-datalogger in generic-plugins directory
 set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN/../../generic-plugins/plugins")
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	configureinstallersettings(${SCOPY_MODULE} ${PLUGIN_DESCRIPTION} FALSE)
-endif()
-
 set(RFPOWERMETER_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
