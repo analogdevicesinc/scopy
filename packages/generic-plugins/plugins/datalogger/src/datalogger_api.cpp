@@ -319,15 +319,18 @@ void DataLogger_API::setMonitorDisplayName(QString toolName, QString monitor, QS
 	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
 
 	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
-	if(tool) {
-		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
-		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return;
-		} else {
-			monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->setDisplayName(
-				displayName);
-		}
+	if(tool == nullptr) {
+		return;
 	}
+	DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+
+	if(monitorTool == nullptr)
+		return;
+
+	if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor))
+		return;
+
+	monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->setDisplayName(displayName);
 }
 
 void DataLogger_API::setMonitorUnitOfMeasurementName(QString toolName, QString monitor, QString name)
@@ -335,17 +338,18 @@ void DataLogger_API::setMonitorUnitOfMeasurementName(QString toolName, QString m
 	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
 
 	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
-	if(tool) {
-		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
-		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return;
-		} else {
-			monitorTool->m_dataAcquisitionManager->getDataMonitorMap()
-				->value(monitor)
-				->getUnitOfMeasure()
-				->setName(name);
-		}
+	if(tool == nullptr) {
+		return;
 	}
+	DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+
+	if(monitorTool == nullptr)
+		return;
+
+	if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor))
+		return;
+
+	monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getUnitOfMeasure()->setName(name);
 }
 
 void DataLogger_API::setMonitorUnitOfMeasurementSymbol(QString toolName, QString monitor, QString symbol)
@@ -353,17 +357,19 @@ void DataLogger_API::setMonitorUnitOfMeasurementSymbol(QString toolName, QString
 	Q_ASSERT(!m_dataLoggerPlugin->m_toolList.isEmpty());
 
 	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, toolName);
-	if(tool) {
-		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
-		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return;
-		} else {
-			monitorTool->m_dataAcquisitionManager->getDataMonitorMap()
-				->value(monitor)
-				->getUnitOfMeasure()
-				->setSymbol(symbol);
-		}
-	}
+	if(tool == nullptr)
+		return;
+
+	DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+
+	if(monitorTool == nullptr)
+		return;
+
+	if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor))
+		return;
+
+	monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->value(monitor)->getUnitOfMeasure()->setSymbol(
+		symbol);
 }
 
 void DataLogger_API::setDisplayMode(QString toolName, int mode)
