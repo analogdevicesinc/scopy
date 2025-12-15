@@ -99,9 +99,4 @@ target_link_libraries(
 )
 
 % endif
-
-if(${"${CMAKE_SYSTEM_NAME}"} MATCHES "Windows")
-	configureinstallersettings(${"${SCOPY_MODULE}"} ${"${PLUGIN_DESCRIPTION}"} FALSE)
-endif()
-
 set(${scopy_module.upper()}_TARGET_NAME ${"${PROJECT_NAME}"} PARENT_SCOPE)
