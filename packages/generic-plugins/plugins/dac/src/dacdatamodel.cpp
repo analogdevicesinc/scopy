@@ -436,6 +436,7 @@ void DacDataModel::push()
 				QString("Failed to push buffer: %1 (error code: %2)").arg(strerror(-bytes)).arg(bytes);
 			qDebug(CAT_DAC_DATA) << errorMsg;
 			Q_EMIT log(errorMsg);
+			Q_EMIT requestStop();
 			return;
 		}
 		QString logMsg = QString("Pushed %1 samples, %2 bytes (%3/%4 buffers)")
