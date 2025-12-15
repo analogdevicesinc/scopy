@@ -40,6 +40,8 @@ class OrxSettingsWidget;
 
 namespace scopy::adrv9009 {
 
+class ClkSettingsWidget;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 {
 	Q_OBJECT
@@ -80,7 +82,7 @@ private:
 	QSpacerItem *m_navigationSpacerItem = nullptr;
 
 	// Content widgets (placeholders for Phase 1)
-	QWidget *m_clkSettings = nullptr;
+	ClkSettingsWidget *m_clkSettings = nullptr;
 	QWidget *m_calibrations = nullptr;
 	QWidget *m_fhmSetup = nullptr;
 	QWidget *m_paProtection = nullptr;
