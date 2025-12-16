@@ -133,7 +133,13 @@ stages:
         isPreRelease: true
         addChangeLog: false
     - task: PublishPipelineArtifact@1
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      condition: and(
+                    succeeded(),
+                    or(
+                      eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+                      eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main')
+                      )
+                    ) # push artifacts only if pipeline completed successfully and either the build is for the main branch or there is a PR into main branch
       inputs:
         targetPath: '$(Build.ArtifactStagingDirectory)'
         artifactName: '$(artifactName)'
