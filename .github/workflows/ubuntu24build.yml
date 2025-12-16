@@ -1,9 +1,9 @@
-name: Ubuntu 20 Scopy Build
+name: Ubuntu 24 Scopy Build
 
 on: [push, pull_request]
 
 env:
-  BUILD_HOST: ubuntu-22.04
+  BUILD_HOST: ubuntu-24
   USERNAME: github-actions
 
 jobs:
@@ -11,10 +11,10 @@ jobs:
     uses: ./.github/workflows/get_docker_tag.yml
 
   build_scopy_on_ubuntu20:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: docker_tag_workflow
     container:
-        image: cristianbindea/scopy2-ubuntu20:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+        image: cristianbindea/scopy2-ubuntu24:${{ needs.docker_tag_workflow.outputs.docker_tag }}
         options: --user root
     steps:
         - name: check storage space
