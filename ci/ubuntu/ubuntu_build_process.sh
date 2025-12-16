@@ -28,10 +28,39 @@ KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
 
-QT=/opt/Qt/5.15.2/gcc_64
+STAGING_AREA=$SRC_SCRIPT/staging_ubuntu
+QT_INSTALL_LOCATION=/opt/Qt
+QT=$QT_INSTALL_LOCATION/5.15.2/gcc_64
 QMAKE_BIN=$QT/bin/qmake
 JOBS=-j14
-STAGING_AREA=$SRC_SCRIPT/staging_ubuntu20
+STAGING_AREA=$SRC_SCRIPT/staging_ubuntu
+
+# default python version used in CI scripts, can be changed to match locally installed python
+
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+
+    if [ "$ID" = "ubuntu" ]; then
+        case "$VERSION_ID" in
+            "20.04")
+                PYTHON_VERSION=python3.9
+                ;;
+            "22.04")
+               PYTHON_VERSION=python3.11
+                ;;
+            "24.04")
+                PYTHON_VERSION=python3.12
+                ;;
+            *)
+                echo "Running on Ubuntu, but not 20.04/22.04/24.04 (detected: $VERSION_ID)"
+                ;;
+        esac
+    else
+        echo "Not running on Ubuntu (detected ID=$ID)"
+    fi
+else
+    echo "/etc/os-release not found. Cannot determine OS."
+fi
 
 CMAKE_DOWNLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
 CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
@@ -70,6 +99,7 @@ echo -- USING QT: $QT
 echo -- USING QMAKE: $QMAKE_BIN
 
 download_cmake() {
+	echo "#######DOWNLOAD CMAKE#######"
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
 	if [ ! -d cmake ];then
@@ -106,6 +136,7 @@ clone() {
 }
 
 build_with_cmake() {
+	download_cmake
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
 	BUILD_FOLDER=$PWD/build
@@ -123,20 +154,22 @@ build_with_cmake() {
 install_packages() {
 	sudo apt update
 	sudo apt -y upgrade
-	sudo apt -y --no-install-recommends install autoconf autogen bison build-essential cmake curl doxygen flex g++ git graphviz libaio-dev libavahi-client-dev \
-		libboost-all-dev libfftw3-3 libfftw3-bin libfftw3-dev libgmp3-dev libglib2.0-dev libglibmm-2.4-dev \
-		libgl1-mesa-dev liblog4cpp5-dev liblog4cpp5v5 libmatio-dev liborc-0.4-dev libpython3-all-dev \
-		libsigc++-2.0-dev libsndfile1-dev libtool libusb-1.0-0-dev libxml2-dev libzip-dev \
-		libzmq3-dev mesa-common-dev pkg-config python3-dev python3 python3-numpy python3-pip subversion swig vim wget unzip
-
-	pip3 install --no-cache-dir mako
-	pip3 install --no-cache-dir packaging
+	sudo apt-get -y --no-install-recommends install \
+		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy python3-packaging python3-mako \
+		keyboard-configuration vim git wget unzip\
+		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
+		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
+		libboost-all-dev libfftw3-dev liblog4cpp5v5 liblog4cpp5-dev \
+		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
+		libclang1 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
+		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
+		libxkbcommon-x11-0 libqt5gui5 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev
 }
 
 install_qt() {
 	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
-	sudo pip3 install --no-cache-dir aqtinstall
-	sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
+	sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
+	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 5.15.2
 }
 
 build_libserialport(){
@@ -358,7 +391,6 @@ build_scopy() {
 #
 
 build_deps(){
-	download_cmake
 	clone
 	build_libserialport ON
 	build_libiio ON

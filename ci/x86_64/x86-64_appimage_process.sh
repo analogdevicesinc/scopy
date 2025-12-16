@@ -35,12 +35,13 @@ ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
 
 # default python version used in CI scripts, can be changed to match locally installed python
-PYTHON_VERSION=python3.8
+PYTHON_VERSION=python3.12
 
-QT_LOCATION=/opt/Qt/5.15.2/gcc_64
+QT_INSTALL_LOCATION=/opt/Qt
+QT=$QT_INSTALL_LOCATION/5.15.2/gcc_64
 
 STAGING_AREA=$SRC_SCRIPT/staging
-QMAKE_BIN=$QT_LOCATION/bin/qmake
+QMAKE_BIN=$QT/bin/qmake
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
 JOBS=-j14
 
@@ -54,11 +55,11 @@ if [ "$USE_STAGING" == "ON" ]
 	then
 		echo -- USING STAGING FOLDER: $STAGING_AREA_DEPS
 		STAGING_AREA_DEPS=$STAGING_AREA/dependencies
-		export LD_LIBRARY_PATH=$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib:$LD_LIBRARY_PATH
+		export LD_LIBRARY_PATH=$STAGING_AREA_DEPS/lib:$QT/lib:$LD_LIBRARY_PATH
 		CMAKE_OPTS=(\
 			-DCMAKE_LIBRARY_PATH=$STAGING_AREA_DEPS \
 			-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
-			-DCMAKE_PREFIX_PATH=$QT_LOCATION\;$STAGING_AREA_DEPS \
+			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
 			-DCMAKE_EXE_LINKER_FLAGS=-L$STAGING_AREA_DEPS\;-L$STAGING_AREA_DEPS/lib \
 			-DCMAKE_SHARED_LINKER_FLAGS=-L$STAGING_AREA_DEPS\;-L$STAGING_AREA_DEPS/lib \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -68,9 +69,9 @@ if [ "$USE_STAGING" == "ON" ]
 	else
 		echo -- NO STAGING: INSTALLING IN SYSTEM
 		STAGING_AREA_DEPS=/usr/local
-		export LD_LIBRARY_PATH=$QT_LOCATION/lib:$LD_LIBRARY_PATH:
+		export LD_LIBRARY_PATH=$QT/lib:$LD_LIBRARY_PATH:
 		CMAKE_OPTS=(\
-			-DCMAKE_PREFIX_PATH=$QT_LOCATION \
+			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 			-DCMAKE_VERBOSE_MAKEFILE=ON \
 		)
@@ -79,7 +80,7 @@ fi
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
-echo -- USING QT: $QT_LOCATION
+echo -- USING QT: $QT
 echo -- USING QMAKE: $QMAKE_BIN
 
 clone() {
@@ -106,8 +107,8 @@ clone() {
 
 install_qt() {
 	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
-	sudo pip3 install --no-cache-dir aqtinstall
-	sudo python3 -m aqt install-qt --outputdir /opt/Qt linux desktop 5.15.2
+	sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
+	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 5.15.2
 }
 
 download_tools() {
@@ -161,18 +162,15 @@ install_packages() {
 	sudo apt-get update
 	sudo apt-get -y upgrade
 	sudo apt-get -y --no-install-recommends install \
-		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy \
+		$PYTHON_VERSION-full python3-pip lib$PYTHON_VERSION-dev python3-numpy python3-packaging python3-mako \
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
-		libboost-all-dev libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev \
+		libboost-all-dev libfftw3-dev liblog4cpp5v5 liblog4cpp5-dev \
 		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
-		libclang1-9 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
+		libclang1 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
-		libxkbcommon-x11-0 libqt5gui5 libncurses5 libtool libaio-dev libzmq3-dev libxml2-dev
-
-	pip3 install --no-cache-dir mako
-	pip3 install --no-cache-dir packaging
+		libxkbcommon-x11-0 libqt5gui5 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev
 }
 
 build_libserialport(){
@@ -417,8 +415,8 @@ create_appdir(){
 	export QMAKE=$QMAKE_BIN # this is needed for deploy-plugin-qt.AppImage
 	# inside a docker image you can't run an appimage executable without privileges
 	# so the solution is to extract the appimage first and only then to run it
-	export PATH=$QT_LOCATION:$PATH
-	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT_LOCATION/lib:$APP_DIR/usr/lib
+	export PATH=$QT:$PATH
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT/lib:$APP_DIR/usr/lib
 	sudo ldconfig
 	export APPIMAGE_EXTRACT_AND_RUN=1
 	${STAGING_AREA}/linuxdeploy-x86_64.AppImage \
@@ -449,11 +447,11 @@ create_appdir(){
 	fi
 
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
-	cp -r $QT_LOCATION/plugins $APP_DIR/usr
-	cp $QT_LOCATION/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
-	cp $QT_LOCATION/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
-	cp $QT_LOCATION/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
-	cp $QT_LOCATION/lib/libQt5DBus.so* $APP_DIR/usr/lib
+	cp -r $QT/plugins $APP_DIR/usr
+	cp $QT/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt5DBus.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXdmcp.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libbsd.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXau.so* $APP_DIR/usr/lib
