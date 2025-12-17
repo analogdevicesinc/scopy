@@ -28,10 +28,10 @@
 #include "channelcomponent.h"
 #include "toolcomponent.h"
 #include "plotmarkercontroller.h"
+#include "widgets/genalyzerpanel.h"
 
 namespace scopy {
 
-class GenalyzerPanel;
 class PlotManagerCombobox;
 class SCOPY_GUI_EXPORT PlotManager : public QWidget, public MeasurementPanelInterface, public MetaComponent
 {
@@ -84,6 +84,7 @@ protected:
 	MeasurementsPanel *m_measurePanel;
 	MarkerPanel *m_markerPanel;
 	StatsPanel *m_statsPanel;
+	GenalyzerPanel *m_genalyzerPanel;
 	QMap<ChannelComponent *, PlotManagerCombobox *> m_channelPlotcomboMap;
 	// PlotSettings *m_plotSettings;
 };

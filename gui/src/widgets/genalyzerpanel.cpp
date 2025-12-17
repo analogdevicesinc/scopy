@@ -26,6 +26,9 @@
 #include <QSpacerItem>
 #include <QFont>
 #include <QTextBrowser>
+#include <QDockWidget>
+#include <QApplication>
+#include <QLabel>
 
 using namespace scopy;
 
@@ -35,33 +38,24 @@ GenalyzerChannelDisplay::GenalyzerChannelDisplay(const QString &channelName, QCo
 	, m_channelColor(channelColor)
 {
 	setObjectName("GenalyzerChannelDisplay");
-
-	// Disable editing and make it read-only
 	setReadOnly(true);
-
-	// Enable vertical scrolling but disable horizontal scrolling
 	setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	// Use monospace font for perfect alignment
 	QFont font;
 	font.setPixelSize(Style::getDimension(json::global::font_size));
 	setFont(font);
 
-	// Set channel color
 	setChannelColor(channelColor);
 }
 
 void GenalyzerChannelDisplay::updateResults(size_t results_size, char **rkeys, double *rvalues)
 {
-	// Save current scroll position
 	QScrollBar *vScrollBar = verticalScrollBar();
 	int scrollPosition = vScrollBar->value();
 
-	// Use setPlainText for maximum performance - no HTML parsing
 	setPlainText(formatResultsText(results_size, rkeys, rvalues));
 
-	// Restore scroll position
 	vScrollBar->setValue(scrollPosition);
 }
 
@@ -79,19 +73,16 @@ QString GenalyzerChannelDisplay::formatResultsText(size_t results_size, char **r
 		return "No results";
 	}
 
-	// Use fast string building with pre-allocated size
 	QString result;
-	result.reserve(results_size * 30); // Pre-allocate to avoid reallocs
+	result.reserve(results_size * 30);
 
 	const int keyWidth = 18;
 	const int valueWidth = 12;
 
-	// Build each key/value pair on a single row
 	for(size_t i = 0; i < results_size; i++) {
 		QString key = QString(rkeys[i]) + ":";
 		QString value = QString::number(rvalues[i], 'f', 3);
 
-		// Format: "key_name:         value"
 		QString line = key.leftJustified(keyWidth) + value.rightJustified(valueWidth);
 		result += line + '\n';
 	}
@@ -102,67 +93,100 @@ QString GenalyzerChannelDisplay::formatResultsText(size_t results_size, char **r
 GenalyzerPanel::GenalyzerPanel(QWidget *parent)
 	: QWidget(parent)
 {
-	m_panelLayout = new QVBoxLayout(this);
-	setLayout(m_panelLayout);
-	m_panelLayout->setMargin(6);
-	m_panelLayout->setSpacing(6);
-	m_panelLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
-	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-	setFixedWidth(250); // Fixed width for right panel
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+	setMinimumWidth(200);
+	setMaximumWidth(400);
 	Style::setBackgroundColor(this, json::theme::background_subtle);
+
+	m_mainLayout = new QVBoxLayout(this);
+	m_mainLayout->setMargin(0);
+	m_mainLayout->setSpacing(0);
+
+	m_embeddedMainWindow = new QMainWindow(this);
+	m_embeddedMainWindow->setWindowFlags(Qt::Widget);
+
+	QWidget *centralWidget = new QWidget(m_embeddedMainWindow);
+	centralWidget->setFixedSize(0, 0);
+	m_embeddedMainWindow->setCentralWidget(centralWidget);
+
+	m_embeddedMainWindow->setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowTabbedDocks |
+					     QMainWindow::VerticalTabs);
+
+	m_mainLayout->addWidget(m_embeddedMainWindow);
 }
 
 GenalyzerPanel::~GenalyzerPanel() { clear(); }
 
-GenalyzerChannelDisplay *GenalyzerPanel::findOrCreateChannelDisplay(const QString &channelName, QColor channelColor)
+QDockWidget *GenalyzerPanel::findOrCreateChannelDock(const QString &channelName, QColor channelColor)
 {
-	// Check if display for this channel already exists
-	if(m_channelDisplays.contains(channelName)) {
-		return m_channelDisplays[channelName];
+	if(m_channelDocks.contains(channelName)) {
+		return m_channelDocks[channelName];
 	}
 
-	// Create new display for this channel
 	GenalyzerChannelDisplay *display = new GenalyzerChannelDisplay(channelName, channelColor, this);
 	m_channelDisplays[channelName] = display;
-	m_panelLayout->addWidget(display);
 
-	return display;
+	QDockWidget *dock = new QDockWidget(channelName, m_embeddedMainWindow);
+	dock->setWidget(display);
+
+	dock->setFeatures(QDockWidget::DockWidgetMovable);
+	dock->setAllowedAreas(Qt::TopDockWidgetArea);
+	dock->setFeatures(QDockWidget::DockWidgetFloatable);
+
+	dock->setMinimumHeight(100);
+	display->setMinimumHeight(25);
+
+	display->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+	if(m_channelDocks.isEmpty()) {
+		m_embeddedMainWindow->addDockWidget(Qt::TopDockWidgetArea, dock);
+	} else {
+		QDockWidget *lastDock = m_channelDocks.values().last();
+		m_embeddedMainWindow->splitDockWidget(lastDock, dock, Qt::Vertical);
+	}
+
+	m_channelDocks[channelName] = dock;
+
+	return dock;
 }
 
 void GenalyzerPanel::updateResults(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
 				   double *rvalues)
 {
-	// Find or create display for this channel (no flashing - reuses existing!)
-	GenalyzerChannelDisplay *display = findOrCreateChannelDisplay(channelName, channelColor);
+	findOrCreateChannelDock(channelName, channelColor);
 
-	// Update results in one operation - prevents flashing
-	display->updateResults(results_size, rkeys, rvalues);
+	if(m_channelDisplays.contains(channelName)) {
+		m_channelDisplays[channelName]->updateResults(results_size, rkeys, rvalues);
+	}
 }
 
 void GenalyzerPanel::clearChannel(const QString &channelName)
 {
+	if(m_channelDocks.contains(channelName)) {
+		QDockWidget *dock = m_channelDocks.take(channelName);
+		m_embeddedMainWindow->removeDockWidget(dock);
+		dock->deleteLater();
+	}
+
 	if(m_channelDisplays.contains(channelName)) {
-		GenalyzerChannelDisplay *display = m_channelDisplays.take(channelName);
-		m_panelLayout->removeWidget(display);
-		display->deleteLater();
+		m_channelDisplays.remove(channelName);
 	}
 }
 
 void GenalyzerPanel::clear()
 {
-	// Delete all channel displays
-	for(auto it = m_channelDisplays.begin(); it != m_channelDisplays.end(); ++it) {
+	for(auto it = m_channelDocks.begin(); it != m_channelDocks.end(); ++it) {
+		m_embeddedMainWindow->removeDockWidget(it.value());
 		it.value()->deleteLater();
 	}
+	m_channelDocks.clear();
 	m_channelDisplays.clear();
 }
 
 void GenalyzerPanel::setChannelVisible(const QString &channelName, bool visible)
 {
-	if(m_channelDisplays.contains(channelName)) {
-		GenalyzerChannelDisplay *display = m_channelDisplays[channelName];
-		display->setVisible(visible);
+	if(m_channelDocks.contains(channelName)) {
+		m_channelDocks[channelName]->setVisible(visible);
 	}
 }
 
