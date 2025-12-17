@@ -152,7 +152,7 @@ void GRTopBlock::stop()
 	Q_EMIT aboutToStop();
 	running = false;
 	top->stop();
-	top->wait(); // ??
+	top->wait(); // wait for flow to stop and then request rebuild or other actions
 	Q_EMIT stopped();
 }
 
