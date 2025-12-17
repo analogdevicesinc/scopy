@@ -28,7 +28,6 @@
 #include <QtConcurrentRun>
 #include <QDebug>
 #include <QThread>
-#include <QTimer>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -47,6 +46,7 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	, m_filesize(0)
 	, m_decimation(1)
 	, m_pushWatcher(nullptr)
+	, m_debounceTimer(nullptr)
 {
 	m_dev = dev;
 	m_name = iio_device_get_name(m_dev);
@@ -56,6 +56,11 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 
 	m_pushWatcher = new QFutureWatcher<void>(this);
 	connect(m_pushWatcher, &QFutureWatcher<void>::finished, this, &DacDataModel::onPushCompleted);
+
+	m_debounceTimer = new QTimer(this);
+	m_debounceTimer->setSingleShot(true);
+	m_debounceTimer->setInterval(DEBOUNCE_TIME_MS);
+	connect(m_debounceTimer, &QTimer::timeout, this, &DacDataModel::startPushOperation);
 
 	connect(
 		this, &DacDataModel::reqInitBuffer, this,
@@ -331,15 +336,8 @@ bool DacDataModel::validateBufferParams()
 
 void DacDataModel::initBuffer()
 {
-	static QTimer *debounceTimer = nullptr;
-	if(!debounceTimer) {
-		debounceTimer = new QTimer(this);
-		debounceTimer->setSingleShot(true);
-		debounceTimer->setInterval(DEBOUNCE_TIME_MS);
-		connect(debounceTimer, &QTimer::timeout, this, &DacDataModel::startPushOperation);
-	}
 	// Always restart timer - latest call wins
-	debounceTimer->start();
+	m_debounceTimer->start();
 }
 
 void DacDataModel::startPushOperation()
