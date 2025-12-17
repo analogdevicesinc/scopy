@@ -22,6 +22,7 @@
 #include "plotmanager.h"
 #include "plotmanagercombobox.h"
 #include "plotaxis.h"
+#include <QSplitter>
 
 using namespace scopy;
 
@@ -57,8 +58,13 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	m_genalyzerPanel = new GenalyzerPanel(this);
 	m_genalyzerPanel->setVisible(false);
 
-	mainLayout->addWidget(leftWidget, 1);
-	mainLayout->addWidget(m_genalyzerPanel, 0);
+	QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
+	splitter->addWidget(leftWidget);
+	splitter->addWidget(m_genalyzerPanel);
+	splitter->setStretchFactor(0, 1);
+	splitter->setStretchFactor(1, 0);
+
+	mainLayout->addWidget(splitter);
 }
 
 PlotManager::~PlotManager() {}
