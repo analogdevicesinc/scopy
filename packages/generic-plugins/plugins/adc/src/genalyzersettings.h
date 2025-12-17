@@ -41,10 +41,10 @@ public:
 	~GenalyzerSettings();
 
 	grutil::GenalyzerConfig getConfig() const;
-	void setConfig(const grutil::GenalyzerConfig& config);
+	void setConfig(const grutil::GenalyzerConfig &config);
 
 Q_SIGNALS:
-	void configChanged(const grutil::GenalyzerConfig& config);
+	void configChanged(const grutil::GenalyzerConfig &config);
 
 private Q_SLOTS:
 	void onUIChanged();

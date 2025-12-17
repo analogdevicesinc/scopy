@@ -267,7 +267,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	// Connect genalyzer configuration control from UI to channel
 	connect(m_measureComponent->genalyzerSettings(), &adc::GenalyzerSettings::configChanged, c,
-		qOverload<const scopy::grutil::GenalyzerConfig&>(&GRFFTChannelComponent::setGenalyzerConfig));
+		qOverload<const scopy::grutil::GenalyzerConfig &>(&GRFFTChannelComponent::setGenalyzerConfig));
 	// Send initial genalyzer configuration from UI to channel
 	c->setGenalyzerConfig(m_measureComponent->genalyzerSettings()->getConfig());
 
