@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QTimer>
 
 #include <iio.h>
 
@@ -110,6 +111,7 @@ private:
 	QVector<QVector<double>> m_data;
 	QFuture<void> m_pushThd;
 	QFutureWatcher<void> *m_pushWatcher;
+	QTimer *m_debounceTimer;
 	bool m_interrupted;
 
 	bool initBufferDac();
