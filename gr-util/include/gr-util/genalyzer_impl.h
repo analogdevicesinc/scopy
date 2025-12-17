@@ -43,14 +43,14 @@ private:
 	int32_t *d_qwfq;
 
 	// Moving average buffer management - circular buffer approach
-	int32_t **d_frame_buffers_i;  // Array of pointers to I channel frame buffers
-	int32_t **d_frame_buffers_q;  // Array of pointers to Q channel frame buffers
-	size_t d_current_frame_index; // Current frame index in circular buffer
-	size_t d_frames_filled;	      // Number of frames filled (0 to d_navg)
-	size_t d_allocated_frames;    // Number of frame buffers actually allocated
-	bool d_do_shift;              // Whether to apply FFT shift
-	GenalyzerConfig d_genalyzer_config;     // Complete genalyzer configuration
-	char* d_fa_key = nullptr;     // Fourier analysis configuration key
+	int32_t **d_frame_buffers_i;	    // Array of pointers to I channel frame buffers
+	int32_t **d_frame_buffers_q;	    // Array of pointers to Q channel frame buffers
+	size_t d_current_frame_index;	    // Current frame index in circular buffer
+	size_t d_frames_filled;		    // Number of frames filled (0 to d_navg)
+	size_t d_allocated_frames;	    // Number of frame buffers actually allocated
+	bool d_do_shift;		    // Whether to apply FFT shift
+	GenalyzerConfig d_genalyzer_config; // Complete genalyzer configuration
+	char *d_fa_key = nullptr;	    // Fourier analysis configuration key
 
 	gn_analysis_results *d_analysis;
 
@@ -69,8 +69,8 @@ private:
 	// Helper functions for work()
 	void store_frame_to_circular_buffer(const int32_t *in_i_vec, const int32_t *in_q_vec);
 	size_t prepare_frames_for_processing(size_t &current_npts);
-	int perform_fft_and_convert_to_db(size_t frames_to_process, size_t current_npts,
-					   double *shifted_output, double *db_output, float *out_vec);
+	int perform_fft_and_convert_to_db(size_t frames_to_process, size_t current_npts, double *shifted_output,
+					  double *db_output, float *out_vec);
 	void perform_genalyzer_analysis();
 
 	// Analysis result helpers
@@ -90,7 +90,8 @@ private:
 	void cleanup_auto_config();
 
 public:
-	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate, bool do_shift = true);
+	genalyzer_fft_vii_impl(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate,
+			       bool do_shift = true);
 	~genalyzer_fft_vii_impl();
 
 	void set_sample_rate(double sample_rate) override;
@@ -98,9 +99,7 @@ public:
 	void set_window(GnWindow win) override;
 	int window() const override;
 	int navg() const override;
-	void set_ssb_width(uint8_t ssb_width) override;  // Deprecated
-	uint8_t ssb_width() const override;               // Deprecated
-	void set_config(const GenalyzerConfig& config) override;
+	void set_config(const GenalyzerConfig &config) override;
 	GenalyzerConfig get_config() const override;
 
 	bool start() override;

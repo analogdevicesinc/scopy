@@ -75,17 +75,7 @@ void GRFFTFloatProc::setNavg(int navg)
 	requestRebuild();
 }
 
-void GRFFTFloatProc::setSsbWidth(uint8_t ssb_width)
-{
-	// Update the stored config
-	m_genalyzer_config.auto_params.ssb_width = ssb_width;
-
-	if(genalyzer_fft) {
-		genalyzer_fft->set_ssb_width(ssb_width);
-	}
-}
-
-void GRFFTFloatProc::setGenalyzerConfig(const GenalyzerConfig& config)
+void GRFFTFloatProc::setGenalyzerConfig(const GenalyzerConfig &config)
 {
 	// Store the configuration locally
 	m_genalyzer_config = config;
@@ -225,17 +215,7 @@ void GRFFTComplexProc::setNavg(int navg)
 	requestRebuild();
 }
 
-void GRFFTComplexProc::setSsbWidth(uint8_t ssb_width)
-{
-	// Update the stored config
-	m_genalyzer_config.auto_params.ssb_width = ssb_width;
-
-	if(genalyzer_fft) {
-		genalyzer_fft->set_ssb_width(ssb_width);
-	}
-}
-
-void GRFFTComplexProc::setGenalyzerConfig(const GenalyzerConfig& config)
+void GRFFTComplexProc::setGenalyzerConfig(const GenalyzerConfig &config)
 {
 	// Store the configuration locally
 	m_genalyzer_config = config;

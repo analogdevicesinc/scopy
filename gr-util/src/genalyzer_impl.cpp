@@ -172,16 +172,6 @@ int genalyzer_fft_vii_impl::window() const { return d_win; }
 
 int genalyzer_fft_vii_impl::navg() const { return d_navg; }
 
-void genalyzer_fft_vii_impl::set_ssb_width(uint8_t ssb_width)
-{
-	d_genalyzer_config.auto_params.ssb_width = ssb_width;
-
-	cleanup_auto_config();
-	configure_auto_analysis();
-}
-
-uint8_t genalyzer_fft_vii_impl::ssb_width() const { return d_genalyzer_config.auto_params.ssb_width; }
-
 void genalyzer_fft_vii_impl::set_config(const GenalyzerConfig &config)
 {
 	std::lock_guard<std::mutex> lock(s_genalyzer_mutex);

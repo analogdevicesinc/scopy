@@ -527,14 +527,7 @@ void GRFFTChannelComponent::emitGenalyzerEnabledIfAppropriate()
 	}
 }
 
-void GRFFTChannelComponent::setSsbWidth(uint8_t ssb_width)
-{
-	if(m_complex) {
-		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSsbWidth(ssb_width);
-	}
-}
-
-void GRFFTChannelComponent::setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config)
+void GRFFTChannelComponent::setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config)
 {
 	if(m_complex) {
 		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setGenalyzerConfig(config);

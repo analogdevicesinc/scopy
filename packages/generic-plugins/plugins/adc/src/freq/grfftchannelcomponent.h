@@ -95,9 +95,7 @@ public:
 
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
-	void setSsbWidth(uint8_t ssb_width) { m_fft->setSsbWidth(ssb_width); }  // Deprecated
-
-	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config) { m_fft->setGenalyzerConfig(config); }
+	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config) { m_fft->setGenalyzerConfig(config); }
 
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
 
@@ -157,9 +155,7 @@ public:
 
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
-	void setSsbWidth(uint8_t ssb_width) { m_fft->setSsbWidth(ssb_width); }  // Deprecated
-
-	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config) { m_fft->setGenalyzerConfig(config); }
+	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config) { m_fft->setGenalyzerConfig(config); }
 
 	gn_analysis_results *getGnAnalysis() { return m_fft->getGnAnalysis(); }
 
@@ -224,11 +220,8 @@ public Q_SLOTS:
 	// Method to emit genalyzer channel enabled signal if channel is complex and enabled
 	void emitGenalyzerEnabledIfAppropriate();
 
-	// Set SSB width for genalyzer analysis (deprecated, use setGenalyzerConfig)
-	void setSsbWidth(uint8_t ssb_width);
-
 	// Set complete genalyzer configuration
-	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig& config);
+	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config);
 
 Q_SIGNALS:
 	void yModeChanged();

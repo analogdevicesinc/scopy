@@ -96,8 +96,6 @@ public:
 	virtual void set_window(GnWindow win) = 0;
 	virtual int window() const = 0;
 	virtual int navg() const = 0;
-	virtual void set_ssb_width(uint8_t ssb_width) = 0; // Deprecated, use set_config
-	virtual uint8_t ssb_width() const = 0;		   // Deprecated, use get_config
 	virtual void set_config(const GenalyzerConfig &config) = 0;
 	virtual GenalyzerConfig get_config() const = 0;
 	virtual gn_analysis_results *getGnAnalysis() = 0;
