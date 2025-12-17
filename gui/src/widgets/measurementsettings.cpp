@@ -206,9 +206,9 @@ bool MeasurementSettings::statsEnabled() { return statsPanelSwitch->onOffswitch(
 bool MeasurementSettings::markerEnabled() { return markerPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::genalyzerEnabled() { return genalyzerPanelSwitch->onOffswitch()->isChecked(); }
 
-void MeasurementSettings::addGenalyzerWidget(QWidget* widget)
+void MeasurementSettings::addGenalyzerWidget(QWidget *widget)
 {
-	if (widget && genalyzerSection) {
+	if(widget && genalyzerSection) {
 		genalyzerSection->contentLayout()->addWidget(widget);
 	}
 }

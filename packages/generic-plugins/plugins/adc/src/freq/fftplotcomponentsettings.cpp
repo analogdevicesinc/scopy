@@ -261,5 +261,4 @@ void FFTPlotComponentSettings::setComplexMode(bool complexMode)
 	}
 }
 
-
 #include "moc_fftplotcomponentsettings.cpp"
