@@ -167,37 +167,52 @@ void Adrv9009Advanced::createNavigationButtons()
 	navigationButtons->addButton(m_jesd204SettingsBtn);
 	navigationButtons->addButton(m_bistBtn);
 
-	// Create horizontal scrollable navigation widget
-	QScrollArea *navigationScrollArea = new QScrollArea(this);
-	navigationScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	navigationScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	navigationScrollArea->setWidgetResizable(true);
-	// navigationScrollArea->setFixedHeight(50); // Set appropriate height for buttons
+	// Create main navigation widget with vertical layout for rows
+	QWidget *navigationWidget = new QWidget(this);
+	navLayout = new QVBoxLayout(navigationWidget);
+	navLayout->setMargin(0);
+	navLayout->setSpacing(2);
 
-	QWidget *navigationWidget = new QWidget();
-	QHBoxLayout *navigationLayout = new QHBoxLayout(navigationWidget);
-	navigationLayout->setMargin(0);
-	navigationLayout->setSpacing(5);
+	// Create persistent row widgets that will be reused
+	m_firstRow = new QWidget();
+	m_firstRowLayout = new QHBoxLayout(m_firstRow);
+	m_firstRowLayout->setMargin(0);
+	m_firstRowLayout->setSpacing(5);
 
-	// Add all navigation buttons to horizontal layout
-	navigationLayout->addWidget(m_clkSettingsBtn);
-	navigationLayout->addWidget(m_calibrationsBtn);
-	navigationLayout->addWidget(m_txSettingsBtn);
-	navigationLayout->addWidget(m_rxSettingsBtn);
-	navigationLayout->addWidget(m_orxSettingsBtn);
-	navigationLayout->addWidget(m_fhmSetupBtn);
-	navigationLayout->addWidget(m_paProtectionBtn);
-	navigationLayout->addWidget(m_gainSetupBtn);
-	navigationLayout->addWidget(m_agcSetupBtn);
-	navigationLayout->addWidget(m_gpioConfigBtn);
-	navigationLayout->addWidget(m_auxDacBtn);
-	navigationLayout->addWidget(m_jesd204SettingsBtn);
-	navigationLayout->addWidget(m_bistBtn);
+	m_secondRow = new QWidget();
+	m_secondRowLayout = new QHBoxLayout(m_secondRow);
+	m_secondRowLayout->setMargin(0);
+	m_secondRowLayout->setSpacing(5);
 
-	navigationScrollArea->setWidget(navigationWidget);
+	// Create expand button once
+	m_expandBtn = new QPushButton("⋯", this);
+	m_expandBtn->setCheckable(true);
+	Style::setStyle(m_expandBtn, style::properties::button::blueGrayButton);
 
-	// Add scrollable navigation to top container (left of refresh button)
-	m_tool->addWidgetToTopContainerHelper(navigationScrollArea, TTA_LEFT);
+	// Connect expand/collapse logic once (not repeatedly in updateNavigationButtonsLayout)
+	connect(m_expandBtn, &QPushButton::clicked, [this]() {
+		bool isVisible = m_secondRow->isVisible();
+		m_secondRow->setVisible(!isVisible);
+
+		// Change top container height: 44px single row, 88px double row
+		if(!isVisible) {
+			m_tool->topContainer()->setFixedHeight(88);
+		} else {
+			m_tool->topContainer()->setFixedHeight(44);
+		}
+	});
+
+	// Add persistent row widgets to main navigation layout
+	navLayout->addWidget(m_firstRow);
+	navLayout->addWidget(m_secondRow);
+
+	// Initially hide second row
+	m_secondRow->setVisible(false);
+
+	updateNavigationButtonsLayout();
+
+	// Add main navigation widget to top container
+	m_tool->addWidgetToTopContainerHelper(navigationWidget, TTA_LEFT);
 
 	// Connect button clicks to content switching
 	connect(m_clkSettingsBtn, &QPushButton::clicked, this,
@@ -262,6 +277,57 @@ void Adrv9009Advanced::createContentWidgets()
 	m_centralWidget->setCurrentWidget(m_clkSettings);
 }
 
+void Adrv9009Advanced::updateNavigationButtonsLayout()
+{
+	// Step 1: Calculate available width (same as before)
+	int containerWidth = m_tool->width();
+	int refreshButtonWidth = m_refreshButton->width();
+	int expandButtonWidth = m_expandBtn->width(); // Approximate width for expand button
+	int availableWidth = containerWidth - expandButtonWidth - refreshButtonWidth;
+
+	// Create list of all navigation buttons in order (same as before)
+	QList<QPushButton *> allButtons = {m_clkSettingsBtn, m_calibrationsBtn, m_txSettingsBtn,   m_rxSettingsBtn,
+					   m_orxSettingsBtn, m_fhmSetupBtn,	m_paProtectionBtn, m_gainSetupBtn,
+					   m_agcSetupBtn,    m_gpioConfigBtn,	m_auxDacBtn,	   m_jesd204SettingsBtn,
+					   m_bistBtn};
+
+	// Step 2: Calculate button distribution (same logic as before)
+	QList<QPushButton *> firstRowButtons;
+	QList<QPushButton *> remainingButtons;
+	int currentWidth = 0;
+
+	for(QPushButton *button : allButtons) {
+		int buttonWidth = button->sizeHint().width();
+
+		if(currentWidth + buttonWidth <= availableWidth || firstRowButtons.isEmpty()) {
+			firstRowButtons.append(button);
+			currentWidth += buttonWidth;
+		} else {
+			remainingButtons.append(button);
+		}
+	}
+
+	// Step 3: MOVE buttons to existing layouts (reuse existing widgets!)
+	for(QPushButton *button : firstRowButtons) {
+		m_firstRowLayout->addWidget(button);
+	}
+
+	if(!remainingButtons.isEmpty()) {
+		m_expandBtn->setVisible(true);
+		m_firstRowLayout->addWidget(m_expandBtn);
+
+		for(QPushButton *button : remainingButtons) {
+			m_secondRowLayout->addWidget(button);
+		}
+
+		// Step 4: Show/hide second row and expand button based on expand button state
+		bool isExpandingEnabled = m_expandBtn->isChecked();
+		m_secondRow->setVisible(isExpandingEnabled); // Always start hidden
+	} else {
+		m_expandBtn->setVisible(false);
+	}
+}
+
 QWidget *Adrv9009Advanced::createPlaceholderWidget(const QString &sectionName)
 {
 	QWidget *widget = new QWidget();
@@ -293,6 +359,12 @@ QWidget *Adrv9009Advanced::createPlaceholderWidget(const QString &sectionName)
 	layout->addItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	return widget;
+}
+
+void Adrv9009Advanced::resizeEvent(QResizeEvent *event)
+{
+	QWidget::resizeEvent(event);
+	updateNavigationButtonsLayout();
 }
 
 #include "moc_adrv9009advanced.cpp"
