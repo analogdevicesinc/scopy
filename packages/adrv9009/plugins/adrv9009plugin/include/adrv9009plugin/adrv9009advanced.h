@@ -65,6 +65,13 @@ private:
 	QPushButton *m_jesd204SettingsBtn = nullptr;
 	QPushButton *m_bistBtn = nullptr;
 
+	// Navigation layout widgets (created once, reused)
+	QWidget *m_firstRow = nullptr;
+	QWidget *m_secondRow = nullptr;
+	QHBoxLayout *m_firstRowLayout = nullptr;
+	QHBoxLayout *m_secondRowLayout = nullptr;
+	QPushButton *m_expandBtn = nullptr;
+
 	// Content widgets (placeholders for Phase 1)
 	QWidget *m_clkSettings = nullptr;
 	QWidget *m_calibrations = nullptr;
@@ -83,7 +90,11 @@ private:
 	void setupUi();
 	void createNavigationButtons();
 	void createContentWidgets();
+	void updateNavigationButtonsLayout();
+	QVBoxLayout *navLayout = nullptr;
 	QWidget *createPlaceholderWidget(const QString &sectionName);
+
+	void resizeEvent(QResizeEvent *event) override;
 };
 
 } // namespace scopy::adrv9009
