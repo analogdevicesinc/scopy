@@ -19,6 +19,7 @@
  */
 
 #include "adrv9009advanced.h"
+#include "clksettingswidget.h"
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
@@ -260,8 +261,10 @@ void Adrv9009Advanced::createNavigationButtons()
 
 void Adrv9009Advanced::createContentWidgets()
 {
-	// Create placeholder widgets for all 13 sections
-	m_clkSettings = createPlaceholderWidget("CLK Settings");
+	// Create clock settings widget
+	m_clkSettings = new ClkSettingsWidget(m_device, this);
+
+	// Create other placeholder widgets
 	m_calibrations = createPlaceholderWidget("Calibrations");
 	m_txSettings = createPlaceholderWidget("TX Settings");
 	m_rxSettings = createPlaceholderWidget("RX Settings");
@@ -274,6 +277,11 @@ void Adrv9009Advanced::createContentWidgets()
 	m_auxDac = createPlaceholderWidget("AUX DAC");
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
 	m_bist = createPlaceholderWidget("BIST");
+
+	if (m_clkSettings) {
+	// Connect clock settings signals
+		connect(this, &Adrv9009Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);
+	}
 
 	// Add all widgets to stacked widget
 	m_centralWidget->addWidget(m_clkSettings);
