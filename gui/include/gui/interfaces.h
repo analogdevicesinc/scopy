@@ -24,6 +24,7 @@
 
 #include "scopy-gui_export.h"
 #include <measurementpanel.h>
+#include <genalyzerpanel.h>
 #include <menuwidget.h>
 #include <plotwidget.h>
 #include <iioutil/iiounits.h>
@@ -59,6 +60,7 @@ public:
 	virtual void setWindow(int) = 0;
 	virtual void setWindowCorrection(bool) = 0;
 	virtual void setAveragingSize(int) = 0;
+	virtual void setSampleRate(double){}; // only used for complex mode genalyzer analysis
 };
 
 class SCOPY_GUI_EXPORT SampleRateProvider
@@ -94,9 +96,11 @@ public:
 	virtual MeasurementsPanel *measurePanel() const = 0;
 	virtual StatsPanel *statsPanel() const = 0;
 	virtual MarkerPanel *markerPanel() const = 0;
+	virtual GenalyzerPanel *genalyzerPanel() const = 0;
 	virtual void enableMeasurementPanel(bool) = 0;
 	virtual void enableStatsPanel(bool) = 0;
 	virtual void enableMarkerPanel(bool) = 0;
+	virtual void enableGenalyzerPanel(bool) = 0;
 };
 } // namespace scopy
 

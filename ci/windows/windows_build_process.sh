@@ -82,6 +82,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 
@@ -383,6 +384,16 @@ build_karchive () {
 	build_with_cmake $1
 }
 
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	CURRENT_BUILD=genalyzer
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake $1
+}
+
 #
 # Helper functions
 #
@@ -407,6 +418,7 @@ build_deps() {
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON
+	build_genalyzer ON
 }
 
 
