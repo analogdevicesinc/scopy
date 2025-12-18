@@ -145,6 +145,7 @@ void GRTimeSinkComponent::onArm()
 	connect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 	connect(m_top, SIGNAL(started()), this, SIGNAL(ready()));
 	connect(m_top, SIGNAL(aboutToStop()), this, SIGNAL(finish()));
+	connect(m_top, SIGNAL(forceStop()), this, SIGNAL(requestForceStop()));
 	Q_EMIT arm();
 	m_armed = true;
 }
@@ -158,6 +159,7 @@ void GRTimeSinkComponent::onDisarm()
 	disconnect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 	disconnect(m_top, SIGNAL(started()), this, SIGNAL(ready()));
 	disconnect(m_top, SIGNAL(aboutToStop()), this, SIGNAL(finish()));
+	disconnect(m_top, SIGNAL(forceStop()), this, SIGNAL(requestForceStop()));
 }
 
 void GRTimeSinkComponent::init()

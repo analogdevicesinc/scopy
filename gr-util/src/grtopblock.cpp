@@ -22,8 +22,11 @@
 #include "grtopblock.h"
 
 #include "grlog.h"
+#include "grlogforward.h"
 
 #include <QtConcurrent>
+#include <QFuture>
+#include <pluginbase/statusbarmanager.h>
 
 Q_LOGGING_CATEGORY(SCOPY_GR_UTIL, "GRManager")
 
@@ -34,6 +37,9 @@ GRTopBlock::GRTopBlock(QString name, QObject *parent)
 	, built(false)
 	, m_suspended(false)
 {
+	// Initialize GNU Radio log forwarding and connect to StatusBarManager
+	QObject::connect(GRLogForward::GetInstance(), &GRLogForward::newLogMessage, this, &GRTopBlock::newGRLogMessage);
+
 	m_name = name;
 	static int topblockid = 0;
 	QString topblockname = m_name + QString::number(topblockid);
@@ -124,10 +130,20 @@ void GRTopBlock::start()
 	top->start();
 	Q_EMIT started();
 
-	//	QtConcurrent::run([=]() { - this causes a race condition
-	//		top->wait();
-	//		Q_EMIT finished();
-	//	});
+	QtConcurrent::run([this]() {
+		top->wait();
+		onFinished();
+	});
+}
+
+void GRTopBlock::onFinished()
+{
+	if(!running) {
+		return;
+	}
+
+	qInfo(SCOPY_GR_UTIL) << "Block flow ended unexpectedly";
+	Q_EMIT forceStop();
 }
 
 void GRTopBlock::stop()
@@ -136,15 +152,11 @@ void GRTopBlock::stop()
 	Q_EMIT aboutToStop();
 	running = false;
 	top->stop();
-	top->wait(); // ??
+	top->wait(); // wait for flow to stop and then request rebuild or other actions
 	Q_EMIT stopped();
 }
 
-void GRTopBlock::run()
-{
-	start();
-	top->wait();
-}
+void GRTopBlock::run() { start(); }
 
 QString GRTopBlock::name() const { return m_name; }
 
@@ -189,5 +201,7 @@ void GRTopBlock::connect(gr::basic_block_sptr src, int srcPort, gr::basic_block_
 }
 
 gr::top_block_sptr GRTopBlock::getGrBlock() { return top; }
+
+void GRTopBlock::newGRLogMessage(QString message) { StatusBarManager::pushUrgentMessage(message, 5000); }
 
 #include "moc_grtopblock.cpp"

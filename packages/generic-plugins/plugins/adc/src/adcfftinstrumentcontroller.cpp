@@ -300,6 +300,8 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 		setSingleShot(b);
 		if(b && !m_started) {
 			Q_EMIT requestStart();
+		} else if(!b && m_started) {
+			Q_EMIT requestStop();
 		}
 	});
 	connect(m_ui, &ADCInstrument::requestStart, this, &ADCInstrumentController::requestStart);
@@ -314,6 +316,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 
 	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
+	connect(c, SIGNAL(requestForceStop()), this, SLOT(stop()));
 }
 
 void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
