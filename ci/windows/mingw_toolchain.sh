@@ -67,7 +67,7 @@ export CMAKE_OPTS=( \
 	-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 )
 
-export CMAKE="${STAGING_DIR}/bin/cmake ${CMAKE_OPTS[@]} "
+export CMAKE="${STAGING_AREA}/cmake/bin/cmake ${CMAKE_OPTS[@]} "
 
 AUTOCONF_OPTS="--prefix=$STAGING_DIR \
 	--host=${ARCH}-w64-mingw32 \
@@ -84,3 +84,18 @@ echo -- PATH:$PATH
 echo -- USING CMAKE COMMAND
 echo $CMAKE
 echo
+
+# an older version of cmake was needed to fix some gnuradio and boost build errors
+download_cmake() {
+	echo "#######DOWNLOAD CMAKE#######"
+	mkdir -p ${STAGING_AREA}
+	pushd ${STAGING_AREA}
+	if [ ! -d cmake ];then
+		wget https://github.com/Kitware/CMake/releases/download/v4.1.1/cmake-4.1.1-windows-x86_64.zip
+		# unzip and rename
+		unzip cmake*.zip && rm cmake*.zip && mv cmake* cmake
+	else
+		echo "Cmake already downloaded"
+	fi
+	popd
+}

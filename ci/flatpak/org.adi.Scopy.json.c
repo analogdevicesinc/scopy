@@ -167,8 +167,8 @@
 			"sources": [
 				{
 					"type": "archive",
-					"url": "https://github.com/tbeu/matio/releases/download/v1.5.12/matio-1.5.12.tar.gz",
-					"sha1": "cb05a4a9a3af992890237b3f7a87f01cd8819528"
+					"url": "https://github.com/tbeu/matio/releases/download/v1.5.29/matio-1.5.29.tar.gz",
+					"sha256": "d9e5f7a2f2c594eff15f550e34729b01991cdd5a028a558be8ce595b32233afb"
 				}
 			]
 		},
@@ -258,7 +258,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/gnuradio/volk",
-					"branch": "v2.5.1"
+					"branch": "main"
 				}
 			]
 		},
@@ -275,7 +275,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/gabime/spdlog",
-					"branch": "v1.10.0"
+					"branch": "v1.x"
 				}
 			]
 		},
@@ -464,7 +464,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/sigrokproject/libsigrokdecode",
-					"commit": "e556e1168af7027df08622ecfe11309811249e81"
+					"branch" : "master"
 				}
 			]
 		},
@@ -481,7 +481,7 @@
 				{
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/libtinyiiod",
-					"commit": "15e79e7c0064b0476ab4608d02d5efb988b93fc9"
+					"branch" : "master"
 				}
 			]
 		},
@@ -565,7 +565,7 @@
 			{
 				"type": "git",
 				"url": "https://github.com/analogdevicesinc/scopy",
-				"branch": "dev"
+				"branch": "main"
 			}
 		]
 	}

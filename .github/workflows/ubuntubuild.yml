@@ -1,21 +1,28 @@
-name: Ubuntu 22 Scopy Build
+name: Ubuntu Scopy Build
 
 on: [push, pull_request]
 
 env:
-  BUILD_HOST: ubuntu-22.04
+  BUILD_HOST: ubuntu
   USERNAME: github-actions
 
 jobs:
   docker_tag_workflow:
     uses: ./.github/workflows/get_docker_tag.yml
 
-  build_scopy_on_ubuntu22:
+  build_scopy_on_ubuntu:
+    runs-on: ubuntu-latest
     needs: docker_tag_workflow
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        ubuntu:
+          - cristianbindea/scopy2-ubuntu22:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+          - cristianbindea/scopy2-ubuntu24:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+
     container:
-        image: cristianbindea/scopy2-ubuntu22:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+        image: ${{ matrix.ubuntu }}
         options: --user root
+
     steps:
         - name: check storage space
           run: df -h
@@ -29,7 +36,7 @@ jobs:
           run: |
             sudo ldconfig
             cd $GITHUB_WORKSPACE/build
-            QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu22.xml
+            QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu.xml
 
         - name: Report
           uses: mikepenz/action-junit-report@v4
@@ -38,7 +45,7 @@ jobs:
              job_name: Verify Results
              check_name: 'Scopy Test'
              check_title_template: '{{TEST_NAME}}'
-             report_paths: '${{github.workspace}}/test-result-ubuntu22.xml'
+             report_paths: '${{github.workspace}}/test-result-ubuntu.xml'
              detailed_summary: 'true'
              fail_on_failure: 'true'
              require_tests: 'true'

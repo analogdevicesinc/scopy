@@ -59,6 +59,7 @@ download_tools() {
 
 build_scopy(){
 	echo "### Building Scopy"
+	download_cmake
 	[ -f $HOME/build-status ] && cp $HOME/build-status $SRC_FOLDER/build-status
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
@@ -71,6 +72,7 @@ build_scopy(){
 
 build_iio-emu(){
 	echo "### Building IIO-EMU"
+	download_cmake
 	if [ ! -d "$WORKDIR/iio-emu" ]; then
 		git clone https://github.com/analogdevicesinc/iio-emu $WORKDIR/iio-emu
 	fi

@@ -94,7 +94,14 @@ elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
 fi
 
 CMAKE_DOWNLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
-KUIPER_DOWNLOAD_LINK=https://swdownloads.analog.com/cse/kuiper/image_2023-12-13-ADI-Kuiper-full.zip
+
+if [ $TOOLCHAIN_HOST == "aarch64-linux-gnu"  ]; then
+	KUIPER_DOWNLOAD_LINK=https://github.com/analogdevicesinc/adi-kuiper-gen/releases/download/v2.0.0/image_2025-04-03-ADI-Kuiper-Linux-arm64.zip
+	IMAGE_NAME="2025-04-03-ADI-Kuiper-Linux-arm64"
+elif [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+	KUIPER_DOWNLOAD_LINK=https://swdownloads.analog.com/cse/kuiper/image_2023-12-13-ADI-Kuiper-full.zip
+	IMAGE_NAME="2023-12-13-ADI-Kuiper-full"
+fi
 
 QT_DOWNLOAD_LINK=https://download.qt.io/archive/qt/5.15/5.15.16/single/qt-everywhere-opensource-src-5.15.16.tar.xz
 
