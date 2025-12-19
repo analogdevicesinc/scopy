@@ -135,23 +135,27 @@ void genalyzer_fft_vii_impl::cleanup_buffers()
 
 int genalyzer_fft_vii_impl::configure_auto_analysis()
 {
+	static gr::logger logger("genalyzer_fft_vii_impl::configure_auto_analysis");
 	cleanup_auto_config();
 
 	int err_code = gn_config_fftz(d_npts, d_qres, d_navg, d_nfft, d_win, &d_config);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_config_fftz failed with error code: " + std::to_string(err_code));
+		logger.warn("gn_config_fftz failed with error code: {}", std::to_string(err_code));
 		return err_code;
 	}
 
 	err_code = gn_config_set_sample_rate(d_sample_rate, &d_config);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_config_set_sample_rate failed with error code: " + std::to_string(err_code));
+		logger.warn("gn_config_set_sample_rate failed with error code: {}", std::to_string(err_code));
 		return err_code;
 	}
 
 	err_code = gn_config_fa_auto(d_genalyzer_config.auto_params.ssb_width, &d_config);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "Failed to run gn_config_fa_auto. Error code: " + std::to_string(err_code));
+		logger.warn("Failed to run gn_config_fa_auto. Error code: {}", std::to_string(err_code));
 		return err_code;
 	}
 
@@ -249,6 +253,8 @@ size_t genalyzer_fft_vii_impl::prepare_frames_for_processing(size_t &current_npt
 int genalyzer_fft_vii_impl::perform_fft_and_convert_to_db(size_t frames_to_process, size_t current_npts,
 							  double *shifted_output, double *db_output, float *out_vec)
 {
+	static gr::logger logger("genalyzer_fft_vii_impl::perform_fft_and_convert_to_db");
+
 	if(!d_qwfi || !d_qwfq) {
 		GR_LOG_ERROR(d_logger, "Input quantization buffers are null");
 		return -1;
@@ -260,6 +266,7 @@ int genalyzer_fft_vii_impl::perform_fft_and_convert_to_db(size_t frames_to_proce
 	if(gn_fft32(d_fft_out, 2 * d_nfft, d_qwfi, current_npts, d_qwfq, current_npts, d_qres, frames_to_process,
 		    d_nfft, d_win, GnCodeFormatTwosComplement) != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft32 failed");
+		logger.error("gn_fft32 failed");
 		return -1;
 	}
 
@@ -267,15 +274,18 @@ int genalyzer_fft_vii_impl::perform_fft_and_convert_to_db(size_t frames_to_proce
 	if(d_do_shift) {
 		if(gn_ifftshift(shifted_output, 2 * d_nfft, d_fft_out, 2 * d_nfft) != 0) {
 			GR_LOG_ERROR(d_logger, "gn_ifftshift failed");
+			logger.error("gn_ifftshift failed");
 			return -1;
 		}
 		if(gn_db(db_output, d_nfft, shifted_output, 2 * d_nfft) != 0) {
 			GR_LOG_ERROR(d_logger, "gn_db failed");
+			logger.error("gn_db failed");
 			return -1;
 		}
 	} else {
 		if(gn_db(db_output, d_nfft, d_fft_out, 2 * d_nfft) != 0) {
 			GR_LOG_ERROR(d_logger, "gn_db failed");
+			logger.error("gn_db failed");
 			return -1;
 		}
 	}
@@ -307,6 +317,7 @@ void genalyzer_fft_vii_impl::cleanup_auto_config()
 
 int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 {
+	static gr::logger logger("genalyzer_fft_vii_impl::configure_fixed_tone_analysis");
 
 	// Clean up any existing configuration
 	cleanup_fa_config();
@@ -325,6 +336,7 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 				    ft.ssb_fundamental);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_fixed_tone failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_fixed_tone failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 
@@ -333,6 +345,7 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 		err_code = gn_fa_hd(d_fa_key, ft.harmonic_order);
 		if(err_code != 0) {
 			GR_LOG_ERROR(d_logger, "gn_fa_hd failed: " + std::to_string(err_code));
+			logger.warn("gn_fa_hd failed: {}", std::to_string(err_code));
 			return err_code;
 		}
 	}
@@ -341,21 +354,25 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 	err_code = gn_fa_ssb(d_fa_key, GnFASsbDefault, ft.ssb_default);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_ssb Default failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_ssb Default failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 	err_code = gn_fa_ssb(d_fa_key, GnFASsbDC, -1);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_ssb DC failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_ssb DC failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 	err_code = gn_fa_ssb(d_fa_key, GnFASsbSignal, -1);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_ssb Signal failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_ssb Signal failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 	err_code = gn_fa_ssb(d_fa_key, GnFASsbWO, -1);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_ssb WO failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_ssb WO failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 
@@ -363,24 +380,28 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 	err_code = gn_fa_fsample(d_fa_key, d_sample_rate);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_fsample failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_fsample failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 
 	err_code = gn_fa_fdata(d_fa_key, d_sample_rate); // Assuming no decimation
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_fdata failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_fdata failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 
 	err_code = gn_fa_fshift(d_fa_key, ft.fshift);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_fshift failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_fshift failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 
 	err_code = gn_fa_conv_offset(d_fa_key, 0.0 != ft.fshift);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fa_conv_offset failed: " + std::to_string(err_code));
+		logger.warn("gn_fa_conv_offset failed: {}", std::to_string(err_code));
 		return err_code;
 	}
 
@@ -389,6 +410,8 @@ int genalyzer_fft_vii_impl::configure_fixed_tone_analysis()
 
 void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 {
+	static gr::logger logger("genalyzer_fft_vii_impl::perform_fixed_tone_analysis");
+
 	// Configure fixed tone analysis only if not already configured
 	if(!d_fa_key) {
 		int config_result = configure_fixed_tone_analysis();
@@ -406,6 +429,7 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 	int err_code = gn_fft_analysis_results_size(&results_size, d_fa_key, 2 * d_nfft, d_nfft);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft_analysis_results_size failed: " + std::to_string(err_code));
+		logger.warn("gn_fft_analysis_results_size failed: {}", std::to_string(err_code));
 		clear_analysis_results();
 		return;
 	}
@@ -415,6 +439,7 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 	err_code = gn_fft_analysis_results_key_sizes(rkey_sizes, results_size, d_fa_key, 2 * d_nfft, d_nfft);
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft_analysis_results_key_sizes failed: " + std::to_string(err_code));
+		logger.warn("gn_fft_analysis_results_key_sizes failed: {}", std::to_string(err_code));
 		free(rkey_sizes);
 		clear_analysis_results();
 		return;
@@ -436,6 +461,7 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft_analysis failed: " + std::to_string(err_code));
+		logger.warn("gn_fft_analysis failed: {}", std::to_string(err_code));
 		free(rkeys);
 		free(rvalues);
 		clear_analysis_results();
@@ -446,6 +472,8 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 
 void genalyzer_fft_vii_impl::perform_auto_analysis()
 {
+	static gr::logger logger("genalyzer_fft_vii_impl::perform_auto_analysis");
+
 	size_t results_size = 0;
 	char **rkeys = nullptr;
 	double *rvalues = nullptr;
@@ -456,6 +484,7 @@ void genalyzer_fft_vii_impl::perform_auto_analysis()
 		if(config_err != 0) {
 			GR_LOG_ERROR(d_logger,
 				     "Failed to configure genalyzer. Error code: " + std::to_string(config_err));
+			logger.error("Failed to configure genalyzer. Error code: {}", std::to_string(config_err));
 			clear_analysis_results();
 			cleanup_auto_config();
 			return;
@@ -467,6 +496,7 @@ void genalyzer_fft_vii_impl::perform_auto_analysis()
 		set_analysis_results(results_size, rkeys, rvalues);
 	} else {
 		GR_LOG_ERROR(d_logger, "Failed to compute Genalyzer analysis. Error code: " + std::to_string(err_code));
+		logger.error("Failed to compute Genalyzer analysis. Error code: {}", std::to_string(err_code));
 		clear_analysis_results();
 	}
 }
