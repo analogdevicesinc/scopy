@@ -33,6 +33,7 @@
 #include <freq/fftplotcomponentchannel.h>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <QSpinBox>
+#include <QVariantMap>
 #include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_GRFFTChannelComponent, "GRFFTChannelComponent");
@@ -523,5 +524,12 @@ void GRFFTChannelComponent::emitGenalyzerEnabledIfAppropriate()
 			uniqueChannelName = deviceName + ":" + this->name();
 		}
 		Q_EMIT genalyzerChannelEnabled(uniqueChannelName);
+	}
+}
+
+void GRFFTChannelComponent::setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config)
+{
+	if(m_complex) {
+		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setGenalyzerConfig(config);
 	}
 }

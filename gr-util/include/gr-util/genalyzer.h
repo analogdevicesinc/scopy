@@ -25,8 +25,46 @@
 #include "scopy-gr-util_export.h"
 #include <gnuradio/sync_block.h>
 #include <cgenalyzer_simplified_beta.h>
+#include <cgenalyzer.h>
+#include <cstdint>
+#include <string>
 
 namespace scopy::grutil {
+
+enum class GenalyzerMode
+{
+	AUTO = 0,      // Automatic tone detection (current mode)
+	FIXED_TONE = 1 // Fixed tone analysis with expected frequency
+};
+
+struct SCOPY_GR_UTIL_EXPORT GenalyzerConfig
+{
+	bool enabled = 0;
+
+	// Common parameters
+	GenalyzerMode mode = GenalyzerMode::AUTO;
+
+	// Auto mode parameters
+	struct AutoParams
+	{
+		uint8_t ssb_width = 120;
+	} auto_params;
+
+	// Fixed tone mode parameters
+	struct FixedToneParams
+	{
+		double expected_freq = 1000000;
+		std::string component_label = "A";
+		int harmonic_order = 3;
+		int ssb_fundamental = 4;
+		int ssb_default = 3;
+		double fshift = 0.0;
+	} fixed_tone;
+
+	// Helper methods
+	bool isAutoMode() const { return mode == GenalyzerMode::AUTO; }
+	bool isFixedToneMode() const { return mode == GenalyzerMode::FIXED_TONE; }
+};
 
 struct gn_analysis_results
 {
@@ -48,15 +86,18 @@ public:
 	 * \param nfft FFT size
 	 * \param win Window type (GN_WINDOW_*)
 	 * \param sample_rate Sample rate in Hz
+	 * \param do_shift Whether to apply FFT shift (true for complex, false for float)
 	 */
-	static sptr make(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate);
+	static sptr make(int npts, int qres, int navg, int nfft, GnWindow win, double sample_rate,
+			 bool do_shift = true);
 
 	virtual void set_sample_rate(double sample_rate) = 0;
 	virtual double sample_rate() const = 0;
 	virtual void set_window(GnWindow win) = 0;
 	virtual int window() const = 0;
-	virtual void set_navg(int navg) = 0;
 	virtual int navg() const = 0;
+	virtual void set_config(const GenalyzerConfig &config) = 0;
+	virtual GenalyzerConfig get_config() const = 0;
 	virtual gn_analysis_results *getGnAnalysis() = 0;
 
 protected:

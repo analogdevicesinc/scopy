@@ -22,6 +22,7 @@
 #include "plotmanager.h"
 #include "plotmanagercombobox.h"
 #include "plotaxis.h"
+#include <QSplitter>
 
 using namespace scopy;
 
@@ -30,12 +31,10 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	, MetaComponent()
 	, m_plotIdx(0)
 {
-	// Main horizontal layout to position genalyzer panel to the right
 	QHBoxLayout *mainLayout = new QHBoxLayout(this);
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(6);
 
-	// Left side: plots and panels (vertical layout)
 	QWidget *leftWidget = new QWidget(this);
 	m_lay = new QVBoxLayout(leftWidget);
 	m_lay->setMargin(0);
@@ -56,13 +55,16 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	m_lay->addWidget(m_statsPanel);
 	m_lay->addWidget(m_markerPanel);
 
-	// Right side: genalyzer panel
 	m_genalyzerPanel = new GenalyzerPanel(this);
 	m_genalyzerPanel->setVisible(false);
 
-	// Add to main horizontal layout
-	mainLayout->addWidget(leftWidget, 1);	    // Give plots area more space
-	mainLayout->addWidget(m_genalyzerPanel, 0); // Fixed width panel
+	QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
+	splitter->addWidget(leftWidget);
+	splitter->addWidget(m_genalyzerPanel);
+	splitter->setStretchFactor(0, 1);
+	splitter->setStretchFactor(1, 0);
+
+	mainLayout->addWidget(splitter);
 }
 
 PlotManager::~PlotManager() {}

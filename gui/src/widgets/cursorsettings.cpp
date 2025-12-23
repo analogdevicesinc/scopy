@@ -52,6 +52,8 @@ void CursorSettings::initUI()
 	xControls->contentLayout()->setSpacing(10);
 
 	xEn = new MenuOnOffSwitch(tr("Enable X"), xControls, false);
+	Style::setStyle(xEn->label(), style::properties::label::subtle, false);
+	Style::setStyle(xEn->label(), style::properties::label::defaultLabel, true, true);
 	xEn->onOffswitch()->setChecked(true);
 	xControls->contentLayout()->addWidget(xEn);
 	xLock = new MenuOnOffSwitch(tr("Lock"), xControls, false);
@@ -66,6 +68,8 @@ void CursorSettings::initUI()
 	yControls->contentLayout()->setSpacing(10);
 
 	yEn = new MenuOnOffSwitch(tr("Enable Y"), yControls, false);
+	Style::setStyle(yEn->label(), style::properties::label::subtle, false);
+	Style::setStyle(yEn->label(), style::properties::label::defaultLabel, true, true);
 	yEn->onOffswitch()->setChecked(true);
 	yControls->contentLayout()->addWidget(yEn);
 	yLock = new MenuOnOffSwitch(tr("Lock"), yControls, false);

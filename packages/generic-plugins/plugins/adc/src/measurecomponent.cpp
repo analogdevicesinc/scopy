@@ -22,6 +22,8 @@
 #include "measurecomponent.h"
 #include "menucontrolbutton.h"
 #include "measurementsettings.h"
+#include "genalyzersettings.h"
+#include <gr-util/genalyzer.h>
 #include <QButtonGroup>
 using namespace scopy;
 using namespace scopy::adc;
@@ -38,6 +40,13 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, M
 	setupMeasureButtonHelper(measure);
 
 	m_measureSettings = new MeasurementSettings(tool);
+
+	// Create and add GenalyzerSettings with default values from GenalyzerConfig
+	m_genalyzerSettings = new GenalyzerSettings(tool);
+	scopy::grutil::GenalyzerConfig defaultConfig;
+	m_genalyzerSettings->setConfig(defaultConfig);
+	m_measureSettings->addGenalyzerWidget(m_genalyzerSettings);
+
 	HoverWidget *measurePanelManagerHover = new HoverWidget(nullptr, measure, tool);
 	measurePanelManagerHover->setContent(m_measureSettings);
 	measurePanelManagerHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
@@ -73,6 +82,7 @@ MeasureComponent::MeasureComponent(ToolTemplate *tool, QButtonGroup *btngroup, M
 		SLOT(enableMarkerPanel(bool)));
 	connect(m_measureSettings, SIGNAL(enableGenalyzerPanel(bool)), dynamic_cast<QObject *>(p),
 		SLOT(enableGenalyzerPanel(bool)));
+	connect(m_measureSettings, SIGNAL(enableGenalyzerPanel(bool)), m_genalyzerSettings, SLOT(enableAnalysis(bool)));
 	connect(m_measureSettings, &MeasurementSettings::sortMeasurements, m_measurePanel, &MeasurementsPanel::sort);
 	connect(m_measureSettings, &MeasurementSettings::sortStats, m_statsPanel, &StatsPanel::sort);
 }
@@ -101,3 +111,5 @@ void MeasureComponent::setupMeasureButtonHelper(MenuControlButton *btn)
 }
 
 MeasurementSettings *MeasureComponent::measureSettings() { return m_measureSettings; }
+
+GenalyzerSettings *MeasureComponent::genalyzerSettings() { return m_genalyzerSettings; }

@@ -24,10 +24,13 @@
 #include <widgets/menuonoffswitch.h>
 #include <widgets/menusectionwidget.h>
 #include <style.h>
+#include <QLabel>
+#include <QHBoxLayout>
 
 using namespace scopy;
 
 MeasurementSettings::MeasurementSettings(QWidget *parent)
+	: QWidget(parent)
 {
 
 	QVBoxLayout *lay = new QVBoxLayout(this);
@@ -38,6 +41,8 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	measureSection = new MenuSectionWidget(this);
 	Style::setStyle(measureSection, style::properties::widget::border);
 	measurePanelSwitch = new MenuOnOffSwitch("Measure Panel", this);
+	Style::setStyle(measurePanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(measurePanelSwitch->label(), style::properties::label::defaultLabel);
 	measurePanelSwitch->onOffswitch()->setChecked(true);
 	QHBoxLayout *hlay1 = new QHBoxLayout();
 	hlay1->setContentsMargins(0, 6, 0, 6);
@@ -99,6 +104,8 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	statsSection = new MenuSectionWidget(this);
 	Style::setStyle(statsSection, style::properties::widget::border);
 	statsPanelSwitch = new MenuOnOffSwitch("Stats Panel", this);
+	Style::setStyle(statsPanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(statsPanelSwitch->label(), style::properties::label::defaultLabel);
 	connect(statsPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableStatsPanel(b); });
 	statsSection->contentLayout()->addWidget(statsPanelSwitch);
@@ -165,6 +172,9 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	markerSection = new MenuSectionWidget(this);
 	Style::setStyle(markerSection, style::properties::widget::border);
 	markerPanelSwitch = new MenuOnOffSwitch("Marker Panel", this);
+	Style::setStyle(markerPanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(markerPanelSwitch->label(), style::properties::label::defaultLabel, true, true);
+
 	connect(markerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableMarkerPanel(b); });
 	markerSection->contentLayout()->addWidget(markerPanelSwitch);
@@ -174,6 +184,9 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	genalyzerSection = new MenuSectionWidget(this);
 	Style::setStyle(genalyzerSection, style::properties::widget::border);
 	genalyzerPanelSwitch = new MenuOnOffSwitch("Genalyzer analysis", this);
+	Style::setStyle(genalyzerPanelSwitch->label(), style::properties::label::subtle, false);
+	Style::setStyle(genalyzerPanelSwitch->label(), style::properties::label::defaultLabel);
+
 	connect(genalyzerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { Q_EMIT enableGenalyzerPanel(b); });
 	genalyzerSection->contentLayout()->addWidget(genalyzerPanelSwitch);
@@ -192,6 +205,13 @@ bool MeasurementSettings::measurementEnabled() { return measurePanelSwitch->onOf
 bool MeasurementSettings::statsEnabled() { return statsPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::markerEnabled() { return markerPanelSwitch->onOffswitch()->isChecked(); }
 bool MeasurementSettings::genalyzerEnabled() { return genalyzerPanelSwitch->onOffswitch()->isChecked(); }
+
+void MeasurementSettings::addGenalyzerWidget(QWidget *widget)
+{
+	if(widget && genalyzerSection) {
+		genalyzerSection->contentLayout()->addWidget(widget);
+	}
+}
 
 MenuSectionWidget *MeasurementSettings::getMarkerSection() const { return markerSection; }
 

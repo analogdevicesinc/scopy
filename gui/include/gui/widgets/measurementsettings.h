@@ -48,6 +48,9 @@ public:
 	bool markerEnabled();
 	bool genalyzerEnabled();
 
+	// Add external widget to genalyzer section
+	void addGenalyzerWidget(QWidget *widget);
+
 	MenuSectionWidget *getMarkerSection() const;
 
 	MenuSectionWidget *getStatsSection() const;
