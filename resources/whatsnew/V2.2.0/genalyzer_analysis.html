@@ -1,0 +1,44 @@
+<h1>Genalyzer FFT Analysis</h1>
+
+<p>Scopy now integrates the <b>Genalyzer library</b> for advanced data converter testing and FFT analysis in the ADC plugin.</p>
+<p>The Genalyzer integration provides comprehensive Fourier analysis capabilities, enabling detailed characterization of ADC performance metrics directly within the Frequency tool.</p>
+
+<h2>Analysis Modes</h2>
+
+<h3>Auto Mode</h3>
+<p>In <b>Auto mode</b>, Genalyzer automatically detects the fundamental tone in the spectrum and computes analysis metrics. Configure the SSB width parameter to control the bin search range for tone detection.</p>
+
+<h3>Fixed Tone Mode</h3>
+<p>In <b>Fixed Tone mode</b>, specify a known signal frequency for precise analysis. This mode provides additional parameters:</p>
+<ul>
+  <li><b>Expected Frequency:</b> The frequency of the signal tone in Hz</li>
+  <li><b>Harmonic Order:</b> Maximum harmonic order for distortion analysis (HD2, HD3, etc.)</li>
+  <li><b>SSB Fundamental:</b> Number of single-side bins for the fundamental tone</li>
+  <li><b>SSB Default:</b> Default single-side bins for other components</li>
+</ul>
+
+<h2>Analysis Metrics</h2>
+<p>The Genalyzer analysis provides comprehensive ADC performance metrics including:</p>
+<ul>
+  <li><b>SNR:</b> Signal-to-Noise Ratio</li>
+  <li><b>FSNR:</b> Full-Scale-to-Noise Ratio</li>
+  <li><b>SINAD:</b> Signal-to-Noise-and-Distortion Ratio</li>
+  <li><b>SFDR:</b> Spurious-Free Dynamic Range</li>
+  <li><b>ABN:</b> Average Bin Noise</li>
+  <li><b>NSD:</b> Noise Spectral Density</li>
+  <li><b>Carrier/Harmonic levels:</b> Individual tone magnitudes in dBFS and dBc</li>
+</ul>
+
+<h2>External Library</h2>
+<p><b>Note:</b> The Genalyzer analysis feature requires the <b>libgenalyzer</b> library to be installed. This library is developed by Analog Devices for data converter testing and characterization. More information is available at: <a href="https://github.com/analogdevicesinc/genalyzer" target="_blank">https://github.com/analogdevicesinc/genalyzer</a></p>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Open the Frequency tool in the ADC plugin</li>
+  <li>Enable Genalyzer analysis from the settings panel</li>
+  <li>Select the analysis mode (Auto or Fixed Tone)</li>
+  <li>Configure the analysis parameters as needed</li>
+  <li>Start acquisition to see real-time analysis results</li>
+</ol>
+
+<p>For more detailed information about Genalyzer metrics and analysis methodology, please visit the <a href="https://analogdevicesinc.github.io/genalyzer/" target="_blank">Genalyzer documentation</a>.</p>
