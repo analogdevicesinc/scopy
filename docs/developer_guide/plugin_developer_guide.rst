@@ -16,7 +16,7 @@ Chapters
    :local:
    :depth: 1
 
-1. **Using Connection Provider**
+Using Connection Provider
 --------------------------------------------------------------------------------
 
 Understand how to use the connection provider to interact with external
@@ -50,7 +50,7 @@ To be able to access the context from the connection, use the following code:
 
     conn->context();
 
-2. **How Do We Determine When the Plugin Will Show (Compatibility Condition)**
+How Do We Determine When the Plugin Will Show (Compatibility Condition)
 --------------------------------------------------------------------------------
 
 To determine if the plugin you created will show as an option for a device,
@@ -83,7 +83,7 @@ This function checks if the device context contains `"ad9361-phy"`. If it
 does, the plugin will be marked as compatible and will show as an option for
 the device.
 
-3. **How to Filter Between Compatible Plugins**
+How to Filter Between Compatible Plugins
 --------------------------------------------------------------------------------
 
 Inside the `initMetadata()` function, you can define specific metadata to
@@ -123,7 +123,7 @@ filter and prioritize plugins. This metadata includes the following fields:
 By setting these fields appropriately, you can control the visibility and
 priority of your plugin relative to others.
 
-4. **Setting Tool Icon and Title**
+Setting Tool Icon and Title
 --------------------------------------------------------------------------------
 
 To have your plugin's tools appear in the left menu among others, you need to
@@ -161,7 +161,7 @@ This will:
 By following these steps, you can ensure that your plugin's tools are
 properly displayed and functional in the Scopy interface.
 
-5. **How to Add Resources**
+How to Add Resources
 --------------------------------------------------------------------------------
 
 To add resource files to your plugin, you first need to place the file in the
@@ -189,7 +189,7 @@ by referencing it as follows:
 By following these steps, you can include and use additional resource files,
 such as images, or other assets, in your plugin.
 
-6. **How to Create / Edit Preferences for the Plugin**
+How to Create / Edit Preferences for the Plugin
 --------------------------------------------------------------------------------
 
 Plugin preferences are settings that retain their values between runs. These
@@ -284,7 +284,7 @@ preference called `myplugin_test`, you can do the following:
 If you want to update your code when the value of a preference changes, you
 can use the `preferenceChanged` signal from the `Preferences` class.
 
-7. **How to Add Compatible Plugins**
+How to Add Compatible Plugins
 --------------------------------------------------------------------------------
 
 If you want to use parts of other plugins in your plugin, you first need to
@@ -315,7 +315,7 @@ can access its functionality in your plugin.
 Ensure that the library you are linking is available and properly configured
 in your Scopy environment.
 
-8. **Useful Tools**
+Useful Tools
 --------------------------------------------------------------------------------
 
 We have a couple of tools designed to make some of your work easier. Among
@@ -341,7 +341,7 @@ To run it, use the following command:
 
     ./tools/format.sh
 
-9. **IIOWidgets**
+IIOWidgets
 --------------------------------------------------------------------------------
 
 `IIOWidgets` are modular UI components in Scopy designed to facilitate
@@ -436,7 +436,7 @@ grouped `IIOWidgets` to suit their specific use cases.
 By leveraging `IIOWidgets`, developers can create powerful and user-friendly
 interfaces for interacting with IIO devices in Scopy.
 
-10. **Menu UI Items**
+Menu UI Items
 --------------------------------------------------------------------------------
 
 Scopy provides a variety of `Menu` UI components to help developers build
@@ -444,7 +444,7 @@ menus, settings panels, and other hierarchical UI structures. For details on
 available menu components and their usage, please refer to the relevant
 documentation or code examples.
 
-11. **How to Create a Device Icon**
+How to Create a Device Icon
 --------------------------------------------------------------------------------
 
 To create a custom device icon for your plugin, you can use the
@@ -483,7 +483,7 @@ In this example:
 You can customize the icon by changing the image, label text, or shape as
 needed for your device.
 
-12. **How to Create a Tutorial for Your Plugin**
+How to Create a Tutorial for Your Plugin
 --------------------------------------------------------------------------------
 
 Scopy supports interactive tutorials for plugins, allowing you to guide users
