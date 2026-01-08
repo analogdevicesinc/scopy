@@ -7,15 +7,9 @@ Package Generator
 
 Chapters
 
-- `1. Overview <#overview>`_
-- `2. Platform <#platform>`_
-- `3. Running the Script <#running-the-script>`_
-- `4. Configuration Files <#configuration-files>`_
-- `5. Manifest File <#manifest-file>`_
-- `6. Packages development flow <#packages-development-flow>`_
-- `7. Scopy PDK <#scopy-pdk>`_
-- `8. Adding New Config Specifications <#adding-new-config-specifications>`_
-
+.. contents::
+   :local:
+   :depth: 1
 
 Overview
 --------------------------------------------------------------------------------

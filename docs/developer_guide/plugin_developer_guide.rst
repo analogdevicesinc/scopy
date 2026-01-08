@@ -12,18 +12,9 @@ and enhance Scopy plugins efficiently and according to best practices.
 
 Chapters
 
-- `1. Using Connection Provider <#using-connection-provider>`_
-- `2. How Do We Determine When the Plugin Will Show (Compatibility Condition) <#how-do-we-determine-when-the-plugin-will-show-compatibility-condition>`_
-- `3. How to Filter Between Compatible Plugins <#how-to-filter-between-compatible-plugins>`_
-- `4. Setting Tool Icon and Title <#setting-tool-icon-and-title>`_
-- `5. How to Add Resources <#how-to-add-resources>`_
-- `6. How to Create / Edit Preferences for the Plugin <#how-to-create--edit-preferences-for-the-plugin>`_
-- `7. How to Add Compatible Plugins <#how-to-add-compatible-plugins>`_
-- `8. Useful Tools <#useful-tools>`_
-- `9. IIOWidgets <#iiowidgets>`_
-- `10. Menu UI Items <#menu-ui-items>`_
-- `11. How to Create a Device Icon <#how-to-create-a-device-icon>`_
-- `12. How to Create a Tutorial for Your Plugin <#how-to-create-a-tutorial-for-your-plugin>`_
+.. contents::
+   :local:
+   :depth: 1
 
 1. **Using Connection Provider**
 --------------------------------------------------------------------------------
