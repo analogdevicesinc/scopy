@@ -1,7 +1,12 @@
 [
     {
         "device": "adrv9009-phy",
-        "xml_path": "adrv9009.xml",
+        "xml_path": "adrv_9009.xml",
+        "uri": "ip:127.0.0.1"
+    },
+     {
+        "device": "adrv9009-multidevice",
+        "xml_path": "adrv9009_multidevice.xml",
         "uri": "ip:127.0.0.1"
     }
 ]
