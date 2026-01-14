@@ -168,7 +168,9 @@ install_packages() {
 
 install_qt() {
 	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
-	sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
+	[ "$PYTHON_VERSION" == "python3.12" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
+	[ "$PYTHON_VERSION" == "python3.11" ] && sudo pip3 install --no-cache-dir aqtinstall
+	[ "$PYTHON_VERSION" == "python3.9" ]  && sudo pip3 install --no-cache-dir aqtinstall
 	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 5.15.2
 }
 

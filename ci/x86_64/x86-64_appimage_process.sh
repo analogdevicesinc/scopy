@@ -34,8 +34,30 @@ KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
 
-# default python version used in CI scripts, can be changed to match locally installed python
-PYTHON_VERSION=python3.12
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+
+    if [ "$ID" = "ubuntu" ]; then
+        case "$VERSION_ID" in
+            "20.04")
+                PYTHON_VERSION=python3.9
+                ;;
+            "22.04")
+               PYTHON_VERSION=python3.11
+                ;;
+            "24.04")
+                PYTHON_VERSION=python3.12
+                ;;
+            *)
+                echo "Running on Ubuntu, but not 20.04/22.04/24.04 (detected: $VERSION_ID)"
+                ;;
+        esac
+    else
+        echo "Not running on Ubuntu (detected ID=$ID)"
+    fi
+else
+    echo "/etc/os-release not found. Cannot determine OS."
+fi
 
 QT_INSTALL_LOCATION=/opt/Qt
 QT=$QT_INSTALL_LOCATION/5.15.2/gcc_64
@@ -47,7 +69,15 @@ JOBS=-j14
 
 APP_DIR_NAME=scopy.AppDir
 APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
-APP_IMAGE=$SRC_SCRIPT/Scopy-x86_64.AppImage
+
+APP_IMAGE_FOLDER=Scopy-x86_64
+[ "$VERSION_ID" == "20.04" ] && APP_IMAGE_FOLDER=Scopy-x86_64-ubuntu20
+
+APP_IMAGE_NAME=${APP_IMAGE_FOLDER}.AppImage
+APP_IMAGE=$SRC_SCRIPT/$APP_IMAGE_NAME
+
+[ $CI_SCRIPT ] && echo "app_image_folder=$APP_IMAGE_FOLDER" >> "$GITHUB_ENV"
+[ $CI_SCRIPT ] && echo "app_image_name=$APP_IMAGE_NAME" >> "$GITHUB_ENV"
 
 BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
 
@@ -107,7 +137,9 @@ clone() {
 
 install_qt() {
 	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
-	sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
+	[ "$PYTHON_VERSION" == "python3.12" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
+	[ "$PYTHON_VERSION" == "python3.11" ] && sudo pip3 install --no-cache-dir aqtinstall
+	[ "$PYTHON_VERSION" == "python3.9" ]  && sudo pip3 install --no-cache-dir aqtinstall
 	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 5.15.2
 }
 
