@@ -31,6 +31,7 @@
 #include <animatedrefreshbtn.h>
 #include <iio.h>
 #include <advanced/auxdacwidget.h>
+#include <advanced/bistwidget.h>
 
 // Forward declarations for section widgets
 namespace scopy::adrv9009 {
@@ -92,7 +93,7 @@ private:
 	OrxSettingsWidget *m_orxSettings = nullptr;
 	AuxDacWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;
-	QWidget *m_bist = nullptr;
+	BistWidget *m_bist = nullptr;
 
 	void setupUi();
 	void createNavigationButtons();

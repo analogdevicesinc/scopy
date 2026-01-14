@@ -257,7 +257,11 @@ void Adrv9009Advanced::createContentWidgets()
 	m_orxSettings = new OrxSettingsWidget(m_device, this);
 	m_auxDac = new AuxDacWidget(m_device, this);
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
-	m_bist = createPlaceholderWidget("BIST");
+	m_bist = new BistWidget(m_device, this);
+
+	if(m_bist != nullptr) {
+		connect(this, &Adrv9009Advanced::readRequested, m_bist, &BistWidget::readRequested);
+	}
 
 	if(m_clkSettings) {
 		// Connect clock settings signals
