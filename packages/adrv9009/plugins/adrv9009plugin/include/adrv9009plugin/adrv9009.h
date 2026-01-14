@@ -57,6 +57,9 @@ private:
 	QMap<QString, iio_device *> m_adrv9009DeviceMap;
 	bool m_multiDeviceMode = false;
 
+	// magic number from iio-osc
+	const int multichipSyncValue = 424242;
+
 	void setupUi();
 	void detectAndStoreDevices();
 	void performMcsSync();
