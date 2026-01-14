@@ -185,7 +185,7 @@ void Adrv9009::performMcsSync()
 	// 2. Try JESD204-FSM automatic sync (exact magic number from iio-osc!)
 	QStringList deviceNames = m_adrv9009DeviceMap.keys();
 	iio_device *firstDevice = m_adrv9009DeviceMap[deviceNames.first()];
-	int ret = iio_device_attr_write_longlong(firstDevice, "multichip_sync", 424242);
+	int ret = iio_device_attr_write_longlong(firstDevice, "multichip_sync", multichipSyncValue);
 	if(ret != -EINVAL) {
 		qDebug(CAT_ADRV9009) << "JESD204-FSM automatic sync successful";
 		Q_EMIT readRequested(); // Refresh all widgets
