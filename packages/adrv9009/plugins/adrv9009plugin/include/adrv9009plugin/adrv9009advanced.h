@@ -30,6 +30,7 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio.h>
+#include <advanced/bistwidget.h>
 
 namespace scopy::adrv9009 {
 
@@ -85,7 +86,7 @@ private:
 	QWidget *m_gpioConfig = nullptr;
 	QWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;
-	QWidget *m_bist = nullptr;
+	BistWidget *m_bist = nullptr;
 
 	void setupUi();
 	void createNavigationButtons();
