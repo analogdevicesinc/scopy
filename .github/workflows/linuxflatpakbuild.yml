@@ -1,4 +1,4 @@
-name: linux-flatpak build
+name: Scopy Flatpak Build
 
 on:
     workflow_call:
@@ -13,7 +13,7 @@ env:
   CI_SCRIPT: "ON"
 
 jobs:
-  make-flatpak:
+  make_flatpak:
     runs-on: ubuntu-latest
     steps:
 

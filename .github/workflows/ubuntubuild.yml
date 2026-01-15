@@ -13,13 +13,16 @@ env:
   CI_SCRIPT: "ON"
 
 jobs:
-  build_scopy_on_ubuntu:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ubuntu:
-          - cristianbindea/scopy2-ubuntu22:${{ inputs.docker_tag }}
-          - cristianbindea/scopy2-ubuntu24:${{ inputs.docker_tag }}
+          include:
+            - ubuntu: cristianbindea/scopy2-ubuntu24:${{ inputs.docker_tag }}
+              os_name: Ubuntu 24
+            - ubuntu: cristianbindea/scopy2-ubuntu22:${{ inputs.docker_tag }}
+              os_name: Ubuntu 22
+    name: ${{ matrix.os_name }}
 
     container:
         image: ${{ matrix.ubuntu }}

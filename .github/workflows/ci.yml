@@ -1,4 +1,4 @@
-name: CI
+name: Build & Test
 
 on: [push, pull_request]
 
@@ -37,7 +37,7 @@ jobs:
       with:
         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
 
-    ubuntu:
+    ubuntu-build:
       needs: docker_tag
       uses: ./.github/workflows/ubuntubuild.yml
       with:

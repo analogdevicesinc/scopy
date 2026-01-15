@@ -1,4 +1,4 @@
-name: license-headers
+name: License Header Check
 
 on: [push, pull_request]
 
