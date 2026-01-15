@@ -1,0 +1,44 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+    docker_tag:
+      uses: ./.github/workflows/get_docker_tag.yml
+
+    appimage-x86_64:
+      needs: docker_tag
+      uses: ./.github/workflows/appimage-x86_64.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+
+    appimage-arm64:
+      needs: docker_tag
+      uses: ./.github/workflows/appimage-arm64.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+
+    appimage-armhf:
+      needs: docker_tag
+      uses: ./.github/workflows/appimage-armhf.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+
+    mingw:
+      needs: docker_tag
+      uses: ./.github/workflows/mingwbuild.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+
+    ubuntu:
+      needs: docker_tag
+      uses: ./.github/workflows/ubuntubuild.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+
+    flatpak:
+      needs: docker_tag
+      uses: ./.github/workflows/linuxflatpakbuild.yml
+      with:
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+

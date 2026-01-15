@@ -1,23 +1,24 @@
 name: Scopy x86_64 AppImage Build
 
-on: [push, pull_request]
+on:
+    workflow_call:
+      inputs:
+        docker_tag:
+          required: true
+          type: string
 
 env:
   BUILD_HOST: ubuntu-22.04
   USERNAME: github-actions
 
 jobs:
-  docker_tag_workflow:
-    uses: ./.github/workflows/get_docker_tag.yml
-
   build_scopy_x86-64_appimage:
     runs-on: ubuntu-latest
-    needs: docker_tag_workflow
     strategy:
       matrix:
         ubuntu:
-        - cristianbindea/scopy2-x86_64-appimage:${{ needs.docker_tag_workflow.outputs.docker_tag }}
-        - cristianbindea/scopy2-x86_64-appimage-ubuntu20:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+        - cristianbindea/scopy2-x86_64-appimage:${{ inputs.docker_tag }}
+        - cristianbindea/scopy2-x86_64-appimage-ubuntu20:${{ inputs.docker_tag }}
     name : Build Scopy x86_64 AppImage on ${{ matrix.ubuntu }}
 
     container:

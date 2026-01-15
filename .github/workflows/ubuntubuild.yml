@@ -1,23 +1,24 @@
 name: Ubuntu Scopy Build
 
-on: [push, pull_request]
+on:
+    workflow_call:
+      inputs:
+        docker_tag:
+          required: true
+          type: string
 
 env:
   BUILD_HOST: ubuntu
   USERNAME: github-actions
 
 jobs:
-  docker_tag_workflow:
-    uses: ./.github/workflows/get_docker_tag.yml
-
   build_scopy_on_ubuntu:
     runs-on: ubuntu-latest
-    needs: docker_tag_workflow
     strategy:
       matrix:
         ubuntu:
-          - cristianbindea/scopy2-ubuntu22:${{ needs.docker_tag_workflow.outputs.docker_tag }}
-          - cristianbindea/scopy2-ubuntu24:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+          - cristianbindea/scopy2-ubuntu22:${{ inputs.docker_tag }}
+          - cristianbindea/scopy2-ubuntu24:${{ inputs.docker_tag }}
 
     container:
         image: ${{ matrix.ubuntu }}

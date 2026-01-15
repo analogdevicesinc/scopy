@@ -1,21 +1,22 @@
 name: windows-mingw build
 
-on: [push, pull_request]
+on:
+    workflow_call:
+      inputs:
+        docker_tag:
+          required: true
+          type: string
 
 jobs:
-  docker_tag_workflow:
-    uses: ./.github/workflows/get_docker_tag.yml
-
   build-scopy-mingw64:
     runs-on: windows-2022
-    needs: docker_tag_workflow
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: '0'
 
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy2-mingw64:${{ needs.docker_tag_workflow.outputs.docker_tag }}
+      run: docker pull cristianbindea/scopy2-mingw64:${{ inputs.docker_tag }}
 
     - name: Run Docker Image
       shell: cmd
@@ -49,7 +50,7 @@ jobs:
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
                 -e CI_SCRIPT=ON ^
-                cristianbindea/scopy2-mingw64:${{ needs.docker_tag_workflow.outputs.docker_tag }} C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
+                cristianbindea/scopy2-mingw64:${{ inputs.docker_tag }} C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
 
     - name: Set short git commit SHA
       shell: bash
