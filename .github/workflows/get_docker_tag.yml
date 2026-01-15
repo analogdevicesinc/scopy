@@ -6,6 +6,9 @@ on:
       docker_tag:
         value: ${{ jobs.get_docker_tag.outputs.docker_tag }}
 
+permissions:
+  contents: read
+
 jobs:
    get_docker_tag:
     name: Get Docker Tag
