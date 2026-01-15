@@ -10,6 +10,7 @@ on:
 env:
   BUILD_HOST: ubuntu-22.04
   USERNAME: github-actions
+  CI_SCRIPT: "ON"
 
 jobs:
   build_scopy_arm64_appimage:

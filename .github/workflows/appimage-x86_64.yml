@@ -8,8 +8,9 @@ on:
           type: string
 
 env:
-  BUILD_HOST: ubuntu-22.04
+  BUILD_HOST: ubuntu-latest
   USERNAME: github-actions
+  CI_SCRIPT: "ON"
 
 jobs:
   build_scopy_x86-64_appimage:
@@ -40,7 +41,6 @@ jobs:
         - name: Create Scopy AppImage
           shell: bash
           run: |
-                export CI_SCRIPT=ON
                 cd $GITHUB_WORKSPACE
                 ./ci/x86_64/x86-64_appimage_process.sh run_workflow
 
