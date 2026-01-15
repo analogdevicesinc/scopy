@@ -244,9 +244,7 @@ void Adrv9009Advanced::createContentWidgets()
 {
 	// Create clock settings widget
 	m_clkSettings = new ClkSettingsWidget(m_device, this);
-
-	// Create other placeholder widgets
-	m_calibrations = createPlaceholderWidget("Calibrations");
+	m_calibrations = new CalibrationWidget(m_device, this);
 	m_fhmSetup = createPlaceholderWidget("FHM Setup");
 	m_paProtection = createPlaceholderWidget("PA Protection");
 	m_gainSetup = createPlaceholderWidget("GAIN Setup");
@@ -266,6 +264,8 @@ void Adrv9009Advanced::createContentWidgets()
 	if(m_clkSettings) {
 		// Connect clock settings signals
 		connect(this, &Adrv9009Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);
+	if(m_calibrations != nullptr) {
+		connect(this, &Adrv9009Advanced::readRequested, m_calibrations, &CalibrationWidget::readRequested);
 	}
 
 	// Add all widgets to stacked widget
