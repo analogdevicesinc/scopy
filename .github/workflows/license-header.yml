@@ -2,6 +2,9 @@ name: license-headers
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 env:
   BUILD_HOST: ubuntu-22.04
   USERNAME: github-actions

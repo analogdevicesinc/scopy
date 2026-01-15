@@ -2,6 +2,13 @@ name: CI
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  packages: write # Needed to upload artifacts.
+  artifact-metadata: write
+  checks: write
+  actions: write
+
 jobs:
     docker_tag:
       uses: ./.github/workflows/get_docker_tag.yml
