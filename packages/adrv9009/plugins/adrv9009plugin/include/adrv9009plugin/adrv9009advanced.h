@@ -32,6 +32,7 @@
 #include <iio.h>
 #include <advanced/auxdacwidget.h>
 #include <advanced/bistwidget.h>
+#include <advanced/calibrationwidget.h>
 
 // Forward declarations for section widgets
 namespace scopy::adrv9009 {
@@ -82,7 +83,7 @@ private:
 
 	// Content widgets (placeholders for Phase 1)
 	ClkSettingsWidget *m_clkSettings = nullptr;
-	QWidget *m_calibrations = nullptr;
+	CalibrationWidget *m_calibrations = nullptr;
 	QWidget *m_fhmSetup = nullptr;
 	QWidget *m_paProtection = nullptr;
 	QWidget *m_gainSetup = nullptr;
