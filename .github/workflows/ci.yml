@@ -2,7 +2,33 @@ name: Build & Test
 
 on:
     push:
+      paths-ignore:
+        - 'docs/**'
+        - '**.md'
+        - '**.rst'
+        - 'testing_results/**'
+        - '.clang-format'
+        - '.cmake-format'
+        - '.gitignore'
+        - '**/.gitignore'
+        - '.github/workflows/license-header.yml'
+        - '.github/workflows/generate_doc.yml'
+        - '.github/workflows/clang-format.yml'
+
     pull_request:
+      paths-ignore:
+        - 'docs/**'
+        - '**.md'
+        - '**.rst'
+        - 'testing_results/**'
+        - '.clang-format'
+        - '.cmake-format'
+        - '.gitignore'
+        - '**/.gitignore'
+        - '.github/workflows/license-header.yml'
+        - '.github/workflows/generate_doc.yml'
+        - '.github/workflows/clang-format.yml'
+
     workflow_dispatch:
       inputs:
         docker_tag:
