@@ -31,6 +31,7 @@
 #include <animatedrefreshbtn.h>
 #include <iio.h>
 #include <advanced/bistwidget.h>
+#include <advanced/calibrationwidget.h>
 
 namespace scopy::adrv9009 {
 
@@ -75,7 +76,7 @@ private:
 
 	// Content widgets (placeholders for Phase 1)
 	QWidget *m_clkSettings = nullptr;
-	QWidget *m_calibrations = nullptr;
+	CalibrationWidget *m_calibrations = nullptr;
 	QWidget *m_txSettings = nullptr;
 	QWidget *m_rxSettings = nullptr;
 	QWidget *m_orxSettings = nullptr;
