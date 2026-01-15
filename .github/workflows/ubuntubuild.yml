@@ -10,6 +10,7 @@ on:
 env:
   BUILD_HOST: ubuntu
   USERNAME: github-actions
+  CI_SCRIPT: "ON"
 
 jobs:
   build_scopy_on_ubuntu:
@@ -31,7 +32,7 @@ jobs:
         - name: Build Scopy
           run: |
             git config --global --add safe.directory $GITHUB_WORKSPACE
-            export CI_SCRIPT=ON && $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy
+            $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy
 
         - name: Run Tests
           run: |

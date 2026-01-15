@@ -6,8 +6,9 @@ permissions:
   contents: read
 
 env:
-  BUILD_HOST: ubuntu-22.04
+  BUILD_HOST: ubuntu-latest
   USERNAME: github-actions
+  CI_SCRIPT: "ON"
 
 jobs:
   check-license-headers:
@@ -22,6 +23,5 @@ jobs:
       - name: Run License Scanner Utility
         shell: bash
         run: |
-          export CI_SCRIPT=ON
           cd $GITHUB_WORKSPACE
           ./tools/license.sh

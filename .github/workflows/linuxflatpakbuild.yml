@@ -10,6 +10,7 @@ on:
 env:
   BUILD_HOST: ubuntu-latest
   USERNAME: github-actions
+  CI_SCRIPT: "ON"
 
 jobs:
   make-flatpak:
