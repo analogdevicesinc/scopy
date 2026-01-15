@@ -1,4 +1,4 @@
-name: windows-mingw build
+name: Scopy Windows Build
 
 on:
     workflow_call:
@@ -8,7 +8,7 @@ on:
           type: string
 
 jobs:
-  build-scopy-mingw64:
+  make_windows_installer:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4

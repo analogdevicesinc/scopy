@@ -1,4 +1,4 @@
-name: Get Docker Tag reusable workflow
+name: Get Docker Tag
 
 on:
   workflow_call:

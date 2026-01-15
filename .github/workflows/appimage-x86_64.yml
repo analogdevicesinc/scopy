@@ -13,14 +13,16 @@ env:
   CI_SCRIPT: "ON"
 
 jobs:
-  build_scopy_x86-64_appimage:
+  make_x86-64_appimage:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ubuntu:
-        - cristianbindea/scopy2-x86_64-appimage:${{ inputs.docker_tag }}
-        - cristianbindea/scopy2-x86_64-appimage-ubuntu20:${{ inputs.docker_tag }}
-    name : Build Scopy x86_64 AppImage on ${{ matrix.ubuntu }}
+          include:
+            - ubuntu: cristianbindea/scopy2-x86_64-appimage:${{ inputs.docker_tag }}
+              os_name: Ubuntu 24
+            - ubuntu: cristianbindea/scopy2-x86_64-appimage-ubuntu20:${{ inputs.docker_tag }}
+              os_name: Ubuntu 20
+    name: ${{ matrix.os_name }}
 
     container:
         image: ${{ matrix.ubuntu }}
