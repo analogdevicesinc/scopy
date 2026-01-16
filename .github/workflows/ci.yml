@@ -1,6 +1,19 @@
 name: Build & Test
 
-on: [push, pull_request]
+on:
+    push:
+    pull_request:
+    workflow_dispatch:
+      inputs:
+        docker_tag:
+          description: 'Docker image tag'
+          required: true
+          default: 'latest'
+          type: choice
+          options:
+            - latest
+            - testing
+
 
 permissions:
   contents: read
@@ -11,41 +24,49 @@ permissions:
 
 jobs:
     docker_tag:
+      # Only run this job if not manually triggered
+      if: github.event_name != 'workflow_dispatch'
       uses: ./.github/workflows/get_docker_tag.yml
 
     appimage-x86_64:
       needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/appimage-x86_64.yml
       with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
     appimage-arm64:
       needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/appimage-arm64.yml
       with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
     appimage-armhf:
       needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/appimage-armhf.yml
       with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
     mingw:
       needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/mingwbuild.yml
       with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
     ubuntu-build:
       needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/ubuntubuild.yml
       with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
     flatpak:
       needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/linuxflatpakbuild.yml
       with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
