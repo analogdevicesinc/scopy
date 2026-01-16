@@ -22,6 +22,7 @@
 	],
 
 	"build-options" : {
+		"build-args": ["--share=network"],
 		"cflags": "-O2 -g",
 		"cxxflags": "-O2 -g",
 		"env": {
@@ -242,6 +243,22 @@
 					"type": "archive",
 					"url": "https://gstreamer.freedesktop.org/data/src/orc/orc-0.4.28.tar.xz",
 					"sha256": "bfcd7c6563b05672386c4eedfc4c0d4a0a12b4b4775b74ec6deb88fc2bcd83ce"
+				}
+			]
+		},
+		{
+			"name": "fmt",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DFMT_TEST=OFF"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/fmtlib/fmt.git",
+					"tag": "10.2.1"
 				}
 			]
 		},
