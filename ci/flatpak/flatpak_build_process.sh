@@ -5,6 +5,16 @@ SCOPY_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../.
 
 SCOPY_JSON=$SCOPY_DIR/ci/flatpak/org.adi.Scopy.json
 
+pushd $SCOPY_DIR/ci/flatpak
+git submodule update --init
+
+# Run the preprocess step to generate org.adi.Scopy.json
+make preprocess
+
+# Disable the preprocess step; The Json file will now be modified and
+# we don't want to re-generate it at the build step
+export EN_PREPROCESS=false
+
 if [ "$CI_SCRIPT" == "ON" ];
 	then
 		SOURCE_DIR=$GITHUB_WORKSPACE
@@ -15,17 +25,6 @@ if [ "$CI_SCRIPT" == "ON" ];
 	else
 		SOURCE_DIR=$SCOPY_DIR
 fi
-
-pushd $SCOPY_DIR/ci/flatpak
-
-git submodule update --init
-
-# Run the preprocess step to generate org.adi.Scopy.json
-make preprocess
-
-# Disable the preprocess step; The Json file will now be modified and
-# we don't want to re-generate it at the build step
-export EN_PREPROCESS=false
 
 # check the number of elements in the json file in order to get the last element, which is Scopy
 cnt=$( echo $(jq '.modules | length' $SCOPY_JSON) )
