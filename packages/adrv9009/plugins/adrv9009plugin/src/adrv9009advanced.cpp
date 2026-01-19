@@ -251,7 +251,7 @@ void Adrv9009Advanced::createContentWidgets()
 	m_txSettings = new TxSettingsWidget(m_device, this);
 	m_rxSettings = new RxSettingsWidget(m_device, this);
 	m_orxSettings = new OrxSettingsWidget(m_device, this);
-	m_auxDac = createPlaceholderWidget("AUX DAC");
+	m_auxDac = new AuxDacWidget(m_device, this);
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
 	m_bist = createPlaceholderWidget("BIST");
 
@@ -269,6 +269,11 @@ void Adrv9009Advanced::createContentWidgets()
 	m_centralWidget->addWidget(m_auxDac);
 	m_centralWidget->addWidget(m_jesd204Settings);
 	m_centralWidget->addWidget(m_bist);
+
+	// Connect auxDac widget readRequested signal
+	if(m_auxDac) {
+		connect(this, &Adrv9009Advanced::readRequested, m_auxDac, &AuxDacWidget::readRequested);
+	}
 
 	// Set first widget as current (CLK Settings)
 	m_centralWidget->setCurrentWidget(m_clkSettings);

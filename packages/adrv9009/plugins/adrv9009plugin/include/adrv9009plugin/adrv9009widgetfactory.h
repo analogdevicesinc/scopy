@@ -58,6 +58,15 @@ public:
 	static IIOWidget *createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
 					       bool compactMode = true, QWidget *parent = nullptr);
 
+	// Debug attribute widgets (for advanced plugin features like aux DAC)
+	static IIOWidget *createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
+						 QWidget *parent = nullptr);
+	static IIOWidget *createDebugCustomComboWidget(iio_device *device, QString attr,
+						       QMap<QString, QString> *optionsMap, QString title,
+						       QWidget *parent = nullptr);
+	static IIOWidget *createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
+						    QWidget *parent = nullptr);
+
 private:
 	Adrv9009WidgetFactory() = delete; // Static class, no instances
 };
