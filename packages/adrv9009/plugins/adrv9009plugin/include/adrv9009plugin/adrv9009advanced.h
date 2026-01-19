@@ -30,6 +30,7 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio.h>
+#include <advanced/auxdacwidget.h>
 
 // Forward declarations for section widgets
 namespace scopy::adrv9009 {
@@ -90,7 +91,7 @@ private:
 	TxSettingsWidget *m_txSettings = nullptr;
 	RxSettingsWidget *m_rxSettings = nullptr;
 	OrxSettingsWidget *m_orxSettings = nullptr;
-	QWidget *m_auxDac = nullptr;
+	AuxDacWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;
 	QWidget *m_bist = nullptr;
 

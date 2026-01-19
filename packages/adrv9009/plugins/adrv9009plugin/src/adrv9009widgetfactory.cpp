@@ -195,3 +195,72 @@ IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_channel *channel, QSt
 	}
 	return widget;
 }
+
+// Debug attribute widgets (following proper porting rules)
+IIOWidget *Adrv9009WidgetFactory::createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
+							 QWidget *parent)
+{
+	IIOWidget *widget = IIOWidgetBuilder(parent)
+				    .device(device)
+				    .attribute(attr)
+				    .optionsValues(range)
+				    .title(title)
+				    .uiStrategy(IIOWidgetBuilder::RangeUi) // UI strategy auto-sets data strategy
+				    .includeDebugAttributes(true)
+				    .buildSingle();
+	return widget;
+}
+
+IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *device, QString attr,
+							       QMap<QString, QString> *optionsMap, QString title,
+							       QWidget *parent)
+{
+	// Build space-separated display string from optionsMap values (following Template 2B)
+	auto values = optionsMap->values();
+	QString optionsValues = "";
+	for(int i = 0; i < values.size(); i++) {
+		if(i > 0)
+			optionsValues += " ";
+		// Use underscores in display values as per porting rules
+		QString value = values.at(i);
+		optionsValues += value.replace(" ", "_");
+	}
+
+	// Create widget with ComboUi strategy (following porting rules)
+	IIOWidget *widget = IIOWidgetBuilder(parent)
+				    .device(device)
+				    .attribute(attr)
+				    .title(title)
+				    .uiStrategy(IIOWidgetBuilder::ComboUi) // UI strategy auto-sets data strategy
+				    .optionsValues(optionsValues)
+				    .includeDebugAttributes(true)
+				    .buildSingle();
+
+	// Set bidirectional conversion functions using IIOWidgetUtils (as per Template 2B)
+	if(widget) {
+		widget->setUItoDataConversion([optionsMap](QString data) {
+			return IIOWidgetUtils::comboUiToDataConversionFunction(data, optionsMap);
+		});
+		widget->setDataToUIConversion([optionsMap](QString data) {
+			return IIOWidgetUtils::comboDataToUiConversionFunction(data, optionsMap);
+		});
+	}
+
+	return widget;
+}
+
+IIOWidget *Adrv9009WidgetFactory::createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
+							    QWidget *parent)
+{
+	IIOWidget *widget = IIOWidgetBuilder(parent)
+				    .device(device)
+				    .attribute(attr)
+				    .title(title)
+				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi) // UI strategy auto-sets data strategy
+				    .includeDebugAttributes(true)
+				    .buildSingle();
+	if(widget) {
+		widget->showProgressBar(false);
+	}
+	return widget;
+}
