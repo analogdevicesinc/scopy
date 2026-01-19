@@ -30,6 +30,7 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio.h>
+#include <advanced/auxdacwidget.h>
 
 namespace scopy::adrv9009 {
 
@@ -83,7 +84,7 @@ private:
 	QWidget *m_gainSetup = nullptr;
 	QWidget *m_agcSetup = nullptr;
 	QWidget *m_gpioConfig = nullptr;
-	QWidget *m_auxDac = nullptr;
+	AuxDacWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;
 	QWidget *m_bist = nullptr;
 
