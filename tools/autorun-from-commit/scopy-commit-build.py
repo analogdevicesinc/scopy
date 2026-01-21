@@ -4,6 +4,7 @@ import sys
 import os
 import requests
 import platform
+from urllib.parse import urlparse
 
 def autodetect_platform():
     sys_platform = platform.system().lower()
@@ -55,25 +56,33 @@ def read_token_from_git_credentials():
             for line in f:
                 line = line.strip()
                 # Look for GitHub credentials: https://username:token@github.com
-                if "github.com" in line and "://" in line:
-                    # Parse URL to extract token
-                    if "@github.com" in line:
-                        # Extract the part before @github.com
-                        auth_part = line.split("@github.com")[0]
-                        if "://" in auth_part:
-                            # Extract credentials part after protocol
-                            credentials = auth_part.split("://", 1)[1]
-                            if ":" in credentials:
-                                # Split username:token
-                                username, token = credentials.split(":", 1)
-                                # GitHub tokens typically start with ghp_, gho_, ghu_, etc.
-                                if token and (token.startswith("ghp_") or token.startswith("gho_") or token.startswith("ghu_") or token.startswith("github_pat_")):
-                                    return token
-                            else:
-                                # Handle case where only token is present (no username)
-                                token = credentials
-                                if token and (token.startswith("ghp_") or token.startswith("gho_") or token.startswith("ghu_") or token.startswith("github_pat_")):
-                                    return token
+                if "://" in line:
+                    try:
+                        # Parse URL securely to validate domain
+                        parsed_url = urlparse(line)
+                        # Validate that this is exactly github.com with https protocol
+                        if parsed_url.netloc == "github.com" and parsed_url.scheme == "https":
+                            # Parse URL to extract token
+                            if "@github.com" in line:
+                                # Extract the part before @github.com
+                                auth_part = line.split("@github.com")[0]
+                                if "://" in auth_part:
+                                    # Extract credentials part after protocol
+                                    credentials = auth_part.split("://", 1)[1]
+                                    if ":" in credentials:
+                                        # Split username:token
+                                        username, token = credentials.split(":", 1)
+                                        # GitHub tokens typically start with ghp_, gho_, ghu_, etc.
+                                        if token and (token.startswith("ghp_") or token.startswith("gho_") or token.startswith("ghu_") or token.startswith("github_pat_")):
+                                            return token
+                                    else:
+                                        # Handle case where only token is present (no username)
+                                        token = credentials
+                                        if token and (token.startswith("ghp_") or token.startswith("gho_") or token.startswith("ghu_") or token.startswith("github_pat_")):
+                                            return token
+                    except Exception as e:
+                        # Skip malformed URLs and continue processing
+                        continue
     except Exception as e:
         print(f"Warning: Error reading ~/.git-credentials: {e}")
 
