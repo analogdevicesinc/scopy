@@ -57,7 +57,7 @@ jobs:
 
         - uses: actions/upload-artifact@v4
           with:
-            name: scopy-linux-arm64-${{ env.commit_sha }}
+            name: scopy-arm64-appimage-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy-arm64.AppImage
 
         - name: check storage space
