@@ -57,7 +57,7 @@ jobs:
 
         - uses: actions/upload-artifact@v4
           with:
-            name: scopy-linux-armhf-${{ env.commit_sha }}
+            name: scopy-armhf-appimage-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy-armhf.AppImage
 
         - name: check storage space

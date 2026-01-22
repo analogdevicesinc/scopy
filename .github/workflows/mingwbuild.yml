@@ -58,7 +58,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: scopy-windows-x86_64-${{ env.commit_sha }}
+        name: scopy-windows-portable-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-x86_64.zip
         compression-level: 0
 
@@ -70,7 +70,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: scopy-windows-x86_64-setup-${{ env.commit_sha }}
+        name: scopy-windows-setup-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.zip
         compression-level: 0
 
