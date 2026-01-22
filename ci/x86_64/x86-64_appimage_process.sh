@@ -33,6 +33,7 @@ IIOEMU_BRANCH=master
 KDDOCK_BRANCH=2.1
 ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
+GENALYZER_BRANCH=v0.1.2
 
 if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -132,6 +133,7 @@ clone() {
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
+	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 	popd
 }
 
@@ -418,6 +420,18 @@ build_karchive () {
 	popd
 }
 
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	pushd $STAGING_AREA/genalyzer
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
+		-DBUILD_TESTING=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
 build_scopy() {
 	echo "### Building scopy"
 	pushd $SRC_DIR
@@ -484,6 +498,7 @@ create_appdir(){
 	cp $QT/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
 	cp $QT/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT/lib/libQt5DBus.so* $APP_DIR/usr/lib
+	cp $STAGING_AREA_DEPS/lib/libgenalyzer.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXdmcp.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libbsd.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXau.so* $APP_DIR/usr/lib
@@ -542,6 +557,7 @@ build_deps(){
 	build_kddock ON
 	build_ecm ON
 	build_karchive ON
+	build_genalyzer ON
 }
 
 run_workflow(){
