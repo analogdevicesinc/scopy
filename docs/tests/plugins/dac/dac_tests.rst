@@ -5,7 +5,7 @@ DAC Plugin - Test suite
 
 .. note::
 
-   User guide: :ref:`DAC Plugin user Guide<dac>`
+   User guide: :doc:`DAC Plugin user Guide <../../../plugins/dac/dac>`
 
 The DAC plugin tests are a set of tests that are run to verify the DAC plugin in Scopy.
 

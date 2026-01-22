@@ -5,7 +5,7 @@ Oscilloscope - Test Suite
 
 .. note::
 
-   User guide: :ref:`Oscilloscope user guide<oscilloscope>`
+   User guide: :doc:`Oscilloscope user guide <../../../plugins/m2k/oscilloscope>`
 
 The following test cases are designed to verify the functionality of 
 the Oscilloscope plugin.

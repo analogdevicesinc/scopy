@@ -5,7 +5,7 @@ Register Map - Test suite
 
 .. note::
 
-    :ref:`User guide<registermap>` 
+    :doc:`User guide <../../../plugins/registermap/registermap>` 
 
 The following apply for all tests bellow, any special requirements will be mentioned. 
 

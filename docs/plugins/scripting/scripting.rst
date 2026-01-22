@@ -1,5 +1,3 @@
-.. _scripting_tool:
-
 Scripting Tool
 ==============
 

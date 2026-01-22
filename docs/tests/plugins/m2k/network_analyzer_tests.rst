@@ -5,7 +5,7 @@ Network Analyzer - Test Suite
 
 .. note::
 
-    User guide: :ref:`Network Analyzer user guide<network_analyzer>`
+    User guide: :doc:`Network Analyzer user guide <../../../plugins/m2k/network_analyzer>`
 
 
 .. note::

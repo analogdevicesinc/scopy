@@ -5,7 +5,7 @@ Logic Analyzer - Test Suite
 
 .. note::
 
-   User guide: :ref:`Logic Analyzer user guide<logic_analyzer>`
+   User guide: :doc:`Logic Analyzer user guide <../../../plugins/m2k/logic_analyzer>`
 
 The Logic Analyzer tests are a set of tests that are run to verify the 
 Logic Analyzer instrument of the ADALM2000 plugin in Scopy.
@@ -75,14 +75,14 @@ digital channels - rising edge, falling edge, high, low, any edge.
     3. Set the following parameters:
         - Sample rate to 50ksps.
         - Sample delay of -142 samples.
-    4. Open the :ref:`Pattern Generator<pattern_generator>` instrument and enable DIO 1.
+    4. Open the :doc:`Pattern Generator <../../../plugins/m2k/pattern_generator>` instrument and enable DIO 1.
        Set the following parameters:
         
         - Pattern: clock.
         - Frequency: 100Hz.
         - Phase: 0 degrees.
         - Duty Cycle: 50%.
-    5. Open the :ref:`Digital IO<digitalio>` instrument and set DIO 0 as output.
+    5. Open the :doc:`Digital IO <../../../plugins/m2k/digitalio>` instrument and set DIO 0 as output.
     6. In the Logic Analyzer set DIO0’s trigger to **rising edge** configuration.
     7. Run the Digital IO, Pattern Generator and Logic Analyzer instrument.
     8. In the Digital IO, change DIO0’s output from 0 to 1.
@@ -174,14 +174,14 @@ Test 2 - External Channel Trigger Function
     3. Set the following parameters:
         - Sample rate to 50ksps.
         - Sample delay of -142 samples.
-    4. Open the :ref:`Pattern Generator<pattern_generator>` instrument and enable DIO 1.
+    4. Open the :doc:`Pattern Generator <../../../plugins/m2k/pattern_generator>` instrument and enable DIO 1.
        Set the following parameters:
         
         - Pattern: clock.
         - Frequency: 100Hz.
         - Phase: 0 degrees.
         - Duty Cycle: 50%.
-    5. Open the :ref:`Digital IO<digitalio>` instrument and set DIO 0 as output.
+    5. Open the :doc:`Digital IO <../../../plugins/m2k/digitalio>` instrument and set DIO 0 as output.
     6. Open the Logic Analyzer trigger menu and turn on the External trigger.
        Select the source as **External Trigger In**.
 
@@ -277,12 +277,12 @@ Oscilloscope as the source.
         - Sample delay of -142 samples.
     4. Open the Logic Analyzer trigger menu and turn on the External trigger.
        Select the source as **Oscilloscope**.
-    5. Open the :ref:`Signal Generator<signal_generator>` instrument and generate a sinewave
+    5. Open the :doc:`Signal Generator <../../../plugins/m2k/signal_generator>` instrument and generate a sinewave
        with the following parameters:
         
         - Peak-to-peak: 2V.
         - Frequency: 200Hz.
-    6. Open the :ref:`Oscilloscope<oscilloscope>` instrument and set the trigger to **normal**
+    6. Open the :doc:`Oscilloscope <../../../plugins/m2k/oscilloscope>` instrument and set the trigger to **normal**
        and condition to **rising edge**.
     7. Run the Signal Generator, Oscilloscope and Logic Analyzer instrument and verify if the
        Logic Analyzer is triggered at the same time with the Oscilloscope.
@@ -376,12 +376,12 @@ Test 4 - Trigger Modes
     3. Set the following parameters:
         - Sample rate to 50ksps.
         - Sample delay of -142 samples.
-    4. Open the :ref:`Pattern Generator<pattern_generator>` instrument and enable DIO 2.
+    4. Open the :doc:`Pattern Generator <../../../plugins/m2k/pattern_generator>` instrument and enable DIO 2.
        Set the following parameters:
     
         - Pattern: clock.
         - Frequency: 5KHz.
-    5. Open the :ref:`Digital IO<digitalio>` instrument and set DIO 0 and DIO 1 as output.
+    5. Open the :doc:`Digital IO <../../../plugins/m2k/digitalio>` instrument and set DIO 0 and DIO 1 as output.
     6. In the Logic Analyzer trigger settings set DIO 0 and DIO 1 trigger conditions 
        to **HIGH** and disable the External trigger.
     7. In the Logic Analyzer trigger configuration, set the trigger logic to **OR**.
@@ -461,7 +461,7 @@ Test 5 - Clock signal measurement accuracy
     3. Set the following parameters:
         - Sample rate to 50ksps.
         - Enable the cursor.
-    4. Open the :ref:`Pattern Generator<pattern_generator>` instrument and enable DIO 0.
+    4. Open the :doc:`Pattern Generator <../../../plugins/m2k/pattern_generator>` instrument and enable DIO 0.
        Set the following parameters:
           
           - Pattern: clock.

@@ -5,7 +5,7 @@ ADC Plugin - Test Suite
 
 .. note::
 
-   User guide: :ref:`ADC user guide<adc>`
+   User guide: :doc:`ADC user guide <../../../plugins/adc/adc>`
 
 .. note::
     .. list-table:: 

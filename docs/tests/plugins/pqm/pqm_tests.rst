@@ -8,7 +8,7 @@ Rms tool
 
 .. note::
 
-    User guide: :ref:`Rms <pqm-rms>`.
+    User guide: :doc:`Rms <../../../plugins/pqm/rms>`.
 
 
 .. note::
@@ -27,8 +27,8 @@ Rms tool
          - 
          - 
 
-Setup environment:
-^^^^^^^^^^^^^^^^^^
+Setup environment (Rms):
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _pqm-emu-rms:
 
@@ -90,8 +90,8 @@ accessible without errors.
   The result of the test goes here (PASS/FAIL).
  
 
-Test 2: Info button check.
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 2: Info button check (Rms).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_INFO
 
@@ -136,8 +136,8 @@ Test 2: Info button check.
   The result of the test goes here (PASS/FAIL).
 
 
-Test 3: Single acquisition.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 3: Single acquisition (Rms).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_SINGLE
 
@@ -184,8 +184,8 @@ Test 3: Single acquisition.
 
 .. _tst-pqm-rms-run:
 
-Test 4: Data acquisition.
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 4: Data acquisition (Rms).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.RMS_RUN
 
@@ -503,7 +503,7 @@ Harmonics tool
 
 .. note::
 
-    User guide: :ref:`Harmonics <pqm-harmonics>`.
+    User guide: :doc:`Harmonics <../../../plugins/pqm/harmonics>`.
 
 
 .. note::
@@ -522,8 +522,8 @@ Harmonics tool
          - 
          - 
 
-Setup environment:
-^^^^^^^^^^^^^^^^^^
+Setup environment (Harmonics):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _pqm-emu-harmonics:
 
@@ -585,8 +585,8 @@ and is accessible without errors.
   The result of the test goes here (PASS/FAIL).
 
 
-Test 2: Info button check.
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 2: Info button check (Harmonics).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_INFO
 
@@ -633,8 +633,8 @@ Test 2: Info button check.
 
 .. _tst-pqm-harmonics-single:
 
-Test 3: Single acquisition.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 3: Single acquisition (Harmonics).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_SINGLE
 
@@ -682,8 +682,8 @@ Test 3: Single acquisition.
 
 .. _tst-pqm-harmonics-run:
 
-Test 4: Data acquisition.
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 4: Data acquisition (Harmonics).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.HARMONICS_RUN
 
@@ -1085,7 +1085,7 @@ Waveform tool
 
 .. note::
 
-    User guide: :ref:`Waveform <pqm-waveform>`.
+    User guide: :doc:`Waveform <../../../plugins/pqm/waveform>`.
 
 
 .. note::
@@ -1104,8 +1104,8 @@ Waveform tool
          - 
          - 
 
-Setup environment:
-^^^^^^^^^^^^^^^^^^
+Setup environment (Waveform):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _pqm-emu-waveform:
 
@@ -1165,8 +1165,8 @@ is accessible without errors.
   The result of the test goes here (PASS/FAIL).
 
 
-Test 2: Info button check.
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 2: Info button check (Waveform).
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **UID:** TST.PQM.WAVEFORM_INFO
 
@@ -1782,7 +1782,7 @@ Settings tool
 
 .. note::
 
-    User guide: :ref:`Settings <pqm-settings>`.
+    User guide: :doc:`Settings <../../../plugins/pqm/settings>`.
 
 
 .. note::
@@ -1801,8 +1801,8 @@ Settings tool
          - 
          - 
 
-Setup environment:
-^^^^^^^^^^^^^^^^^^
+Setup environment (Settings):
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _pqm-emu-settings:
 

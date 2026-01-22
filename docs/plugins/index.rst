@@ -1,5 +1,3 @@
-.. _plugins:
-
 Plugins
 ================================================================================
 
@@ -12,58 +10,58 @@ that's intuitive and easy to understand.
 
 General IIO plugins
 
-* :ref:`ADC Plugin <adc>`
+* :doc:`ADC plugin <adc/adc>`
 
-* :ref:`DAC plugin <dac>`
+* :doc:`DAC plugin <dac/dac>`
 
-* :ref:`Datalogger <datalogger>`
+* :doc:`Datalogger <datalogger/datalogger>`
 
-* :ref:`Debugger <debugger>`
+* :doc:`Debugger <debugger/index>`
 
-* :ref:`Register Map <registermap>`
+* :doc:`Register Map <registermap/registermap>`
 
-* :ref:`JESD204 Status <jesd_status>`
+* :doc:`JESD Status <jesdstatus/index>`
 
-* :ref:`Scripting tool <scripting_tool>`
+* :doc:`Scripting Tool <scripting/scripting>`
 
 
 Application Specific plugins
 
 * ADALM2000 plugins :
 
-    * :ref:`Oscilloscope <oscilloscope>`
-    * :ref:`Spectrum Analyzer <spectrum_analyzer>`
-    * :ref:`Network Analyzer <network_analyzer>`
-    * :ref:`Signal Generator <signal_generator>`
-    * :ref:`Logic Analyzer <logic_analyzer>`
-    * :ref:`Pattern Generator <pattern_generator>`
-    * :ref:`Digital IO <digitalio>`
-    * :ref:`Voltmeter <voltmeter>`
-    * :ref:`Power Supply <power_supply>`
+    * :doc:`Oscilloscope <m2k/oscilloscope>`
+    * :doc:`Spectrum Analyzer <m2k/spectrum_analyzer>`
+    * :doc:`Network Analyzer <m2k/network_analyzer>`
+    * :doc:`Signal Generator <m2k/signal_generator>`
+    * :doc:`Logic Analyzer <m2k/logic_analyzer>`
+    * :doc:`Pattern Generator <m2k/pattern_generator>`
+    * :doc:`Digital IO <m2k/digitalio>`
+    * :doc:`Voltmeter <m2k/voltmeter>`
+    * :doc:`Power Supply <m2k/power_supply>`
 
 
 * AD-SWIOT1L-SL
 
-    * :ref:`Config <swiot_config>`
-    * :ref:`AD74413R <ad74413r>`
-    * :ref:`MAX14906 <max14906>`
-    * :ref:`Faults <faults>`
+    * :doc:`Configuration <swiot1l/swiot_config>`
+    * :doc:`AD74413R <swiot1l/ad74413r>`
+    * :doc:`MAX14906 <swiot1l/max14906>`
+    * :doc:`Faults <swiot1l/faults>`
 
 * PQM
-    * :ref:`RMS <pqm-rms>`
-    * :ref:`Harmonics <pqm-harmonics>`
-    * :ref:`Waveform <pqm-waveform>`
-    * :ref:`Settings <pqm-settings>`
+    * :doc:`RMS <pqm/rms>`
+    * :doc:`Harmonics <pqm/harmonics>`
+    * :doc:`Waveform <pqm/waveform>`
+    * :doc:`System settings <pqm/settings>`
 
 * AD936X
-    * :ref:`AD936X <ad936x>`
-    * :ref:`AD936X Advanced <ad936x_advanced>`
+    * :doc:`AD936x <ad936x/index>`
+    * :doc:`AD936X Advanced <ad936x/ad936x_advanced>`
 
 * AD9084
-    * :ref:`AD9084 <ad9084>`
+    * :doc:`AD9084 <ad9084/ad9084>`
 
 * ADRV9002
-    * :ref:`ADRV9002 (Jupiter) <adrv9002>`
+    * :doc:`ADRV9002 (Jupiter) Plugin <adrv9002/adrv9002>`
 
 Contents
 ---------------------------------------------------------------------

@@ -5,7 +5,7 @@ Power Supply - Test Suite
 
 .. note::
 
-    User guide :ref:`Power Supply user guide<power_supply>`
+    User guide :doc:`Power Supply user guide <../../../plugins/m2k/power_supply>`
 
 The Power Supply tests are a set of tests that are run to verify the Power Supply 
 instrument of the ADALM2000 plugin in Scopy.

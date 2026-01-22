@@ -1,6 +1,3 @@
-.. _debugger_index:
-
-
 Debugger
 =====================================================================
 The debugger plugin is used to examine IIO contexts and modify individual IIO attributes,

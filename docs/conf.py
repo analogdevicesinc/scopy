@@ -13,6 +13,7 @@ author = 'Analog Devices, Inc.'
 
 extensions = [
     "sphinx.ext.todo",
+    "sphinx.ext.autosectionlabel",
     "adi_doctools"
 ]
 
@@ -36,6 +37,12 @@ validate_links = False
 
 todo_include_todos = True
 todo_emit_warnings = True
+
+# -- autosectionlabel prefix configuration -------------------------------------------------------
+# Use filename prefix to avoid section name collisions across different files
+autosectionlabel_prefix_document = True
+# Maximum depth for auto-labeling sections
+autosectionlabel_maxdepth = 3
 
 # -- Options for HTML output --------------------------------------------------
 

@@ -463,7 +463,7 @@ Instruments Overview
 ---------------------------------------------------------------------
 
 Scopy provides a list of plugins and instruments
-described :ref:`in the Plugins page <plugins>`
+described :ref:`in the Plugins page <plugins/index:Plugins>`
 
 
 Scripting

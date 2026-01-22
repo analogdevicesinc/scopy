@@ -1,6 +1,3 @@
-.. _faults:
-
-
 Faults
 ============================================================================
 
@@ -58,7 +55,8 @@ Instrument layout
  The explanations are highlighted for the faults that have the active bit set
  (i.e. were active on the last read).
 
-Faults
+
+Faults section
 ---------------------------------------------------------------------
 
 Each fault has 3 sections:

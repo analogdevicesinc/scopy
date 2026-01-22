@@ -284,7 +284,7 @@ Test 6 - Backward compatibility
     - Scopy built with support for legacy plugins.
 
 **Steps:**
-    1. Start Scopy with the legacy m2k plugin/package installed. See :ref:`M2k Plugin <m2k_index>` for plugin details and usage.
+    1. Start Scopy with the legacy m2k plugin/package installed. See :doc:`M2k Plugin <../../plugins/m2k/index>` for plugin details and usage.
     2. Open the m2k plugin UI or access its features.
     3. Run a basic test or operation provided by the m2k plugin (e.g., connect to an m2k device and perform a simple acquisition).
         - **Expected result:** The m2k plugin loads, its UI/features are accessible, and the test operation completes successfully without errors.

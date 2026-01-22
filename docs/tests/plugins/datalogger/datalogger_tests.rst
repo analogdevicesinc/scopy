@@ -6,7 +6,7 @@ Datalogger Test Suite
 
 .. note::
 
-  User guide :ref:`Data Logger user guide <datalogger>`
+  User guide :doc:`Data Logger user guide <../../../plugins/datalogger/datalogger>`
 
 The following apply to all tests below, any special requirements will be mentioned.
 

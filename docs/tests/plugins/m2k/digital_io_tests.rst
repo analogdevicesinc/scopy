@@ -5,7 +5,7 @@ Digital IO - Test Suite
 
 .. note::
 
-   User guide: :ref:`Digital IO user guide<digitalio>`
+   User guide: :doc:`Digital IO user guide <../../../plugins/m2k/digitalio>`
 
 The Digital IO tests are a set of tests that are run to verify the 
 Digital IO instrument of the ADALM2000 plugin in Scopy.
@@ -207,7 +207,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
     4. Set DIO Channel 8 as **input**.
     5. Connect DIO 0 to the analog pin **1+** and DIO 8 to the positive power 
        supply **V+** using the pinout diagram attached in resources.
-    6. Set DIO 0 to logic 0 and open the :ref:`Voltmeter<voltmeter>` instrument.
+    6. Set DIO 0 to logic 0 and open the :doc:`Voltmeter <../../../plugins/m2k/voltmeter>` instrument.
        Start the instrument and monitor the voltage value on Channel 1.
 
         - **Expected Result**: The voltage displayed on the voltmeter is between -0.050V and 0.4V.
@@ -225,7 +225,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
   Actual test result goes here.
 ..
 
-    8. Open the :ref:`Power Supply instrument<power_supply>` and set the positive 
+    8. Open the :doc:`Power Supply instrument <../../../plugins/m2k/power_supply>` and set the positive 
        power supply to a voltage level between 0V and 0.8V.
        Monitor the DIO 8 logic state.
 
@@ -236,7 +236,7 @@ Test 3 - Checking individual digital pin state voltmeter and power supply
   Actual test result goes here.
 ..
 
-    9. Open the :ref:`Power Supply instrument<power_supply>` and set the positive
+    9. Open the :doc:`Power Supply instrument <../../../plugins/m2k/power_supply>` and set the positive
        power supply to a voltage level between 2V and 3.3V.
        Monitor the DIO 8 logic state.
 
