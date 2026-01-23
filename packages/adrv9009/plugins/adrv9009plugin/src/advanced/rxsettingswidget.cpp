@@ -95,6 +95,15 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	MenuSectionCollapseWidget *rxProfileSection = new MenuSectionCollapseWidget(
 		"RX Profile", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	rxProfileSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// RX FIR Decimation - Combobox [1,2,4]
 	QMap<QString, QString> *firDecimationOptions = new QMap<QString, QString>();
 	firDecimationOptions->insert("1", "1");
@@ -103,7 +112,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto firDecimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,rx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation");
 	if(firDecimation) {
-		rxProfileSection->contentLayout()->addWidget(firDecimation);
+		layout->addWidget(firDecimation);
 		connect(this, &RxSettingsWidget::readRequested, firDecimation, &IIOWidget::readAsync);
 	}
 
@@ -114,7 +123,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto dec5Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,rx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation");
 	if(dec5Decimation) {
-		rxProfileSection->contentLayout()->addWidget(dec5Decimation);
+		layout->addWidget(dec5Decimation);
 		connect(this, &RxSettingsWidget::readRequested, dec5Decimation, &IIOWidget::readAsync);
 	}
 
@@ -125,7 +134,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-profile-rhb1-decimation",
 									     rhb1DecimationOptions, "RHB1 Decimation");
 	if(rhb1Decimation) {
-		rxProfileSection->contentLayout()->addWidget(rhb1Decimation);
+		layout->addWidget(rhb1Decimation);
 		connect(this, &RxSettingsWidget::readRequested, rhb1Decimation, &IIOWidget::readAsync);
 	}
 
@@ -133,7 +142,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto outputRate = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rx-output-rate_khz",
 								   "[25000 1 370000]", "RX Output Rate (kHz)");
 	if(outputRate) {
-		rxProfileSection->contentLayout()->addWidget(outputRate);
+		layout->addWidget(outputRate);
 		connect(this, &RxSettingsWidget::readRequested, outputRate, &IIOWidget::readAsync);
 	}
 
@@ -141,7 +150,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto rfBandwidth = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rf-bandwidth_hz",
 								    "[5000000 1 200000000]", "RF Bandwidth (Hz)");
 	if(rfBandwidth) {
-		rxProfileSection->contentLayout()->addWidget(rfBandwidth);
+		layout->addWidget(rfBandwidth);
 		connect(this, &RxSettingsWidget::readRequested, rfBandwidth, &IIOWidget::readAsync);
 	}
 
@@ -149,7 +158,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto bbf3dCorner = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rx-bbf3d-bcorner_khz",
 								    "[5000 1 200000]", "RX BBF3D BCorner (kHz)");
 	if(bbf3dCorner) {
-		rxProfileSection->contentLayout()->addWidget(bbf3dCorner);
+		layout->addWidget(bbf3dCorner);
 		connect(this, &RxSettingsWidget::readRequested, bbf3dCorner, &IIOWidget::readAsync);
 	}
 
@@ -166,7 +175,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto ddcMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-profile-rx-ddc-mode",
 								      ddcModeOptions, "RX DDC Mode");
 	if(ddcMode) {
-		rxProfileSection->contentLayout()->addWidget(ddcMode);
+		layout->addWidget(ddcMode);
 		connect(this, &RxSettingsWidget::readRequested, ddcMode, &IIOWidget::readAsync);
 	}
 
@@ -179,12 +188,21 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 	MenuSectionCollapseWidget *ncoSection = new MenuSectionCollapseWidget(
 		"NCO Shifter Config", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	ncoSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// Band A - Input Band Width (kHz) - Range Widget
 	auto bandAInputBW =
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-input-band-width_khz",
 							 "[0 1 4294967295]", "Band A Input Band Width (kHz)");
 	if(bandAInputBW) {
-		ncoSection->contentLayout()->addWidget(bandAInputBW);
+		layout->addWidget(bandAInputBW);
 		connect(this, &RxSettingsWidget::readRequested, bandAInputBW, &IIOWidget::readAsync);
 	}
 
@@ -193,7 +211,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		m_device, "adi,rx-nco-shifter-band-a-input-center-freq_khz", "[-2147483647 1 2147483647]",
 		"Band A Input Center Freq (kHz)");
 	if(bandAInputCenter) {
-		ncoSection->contentLayout()->addWidget(bandAInputCenter);
+		layout->addWidget(bandAInputCenter);
 		connect(this, &RxSettingsWidget::readRequested, bandAInputCenter, &IIOWidget::readAsync);
 	}
 
@@ -202,7 +220,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-nco1-freq_khz",
 							 "[-2147483647 1 2147483647]", "Band A NCO1 Freq (kHz)");
 	if(bandANCO1) {
-		ncoSection->contentLayout()->addWidget(bandANCO1);
+		layout->addWidget(bandANCO1);
 		connect(this, &RxSettingsWidget::readRequested, bandANCO1, &IIOWidget::readAsync);
 	}
 
@@ -211,7 +229,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-nco2-freq_khz",
 							 "[-2147483647 1 2147483647]", "Band A NCO2 Freq (kHz)");
 	if(bandANCO2) {
-		ncoSection->contentLayout()->addWidget(bandANCO2);
+		layout->addWidget(bandANCO2);
 		connect(this, &RxSettingsWidget::readRequested, bandANCO2, &IIOWidget::readAsync);
 	}
 
@@ -220,7 +238,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-binput-band-width_khz",
 							 "[0 1 4294967295]", "Band B Input Band Width (kHz)");
 	if(bandBInputBW) {
-		ncoSection->contentLayout()->addWidget(bandBInputBW);
+		layout->addWidget(bandBInputBW);
 		connect(this, &RxSettingsWidget::readRequested, bandBInputBW, &IIOWidget::readAsync);
 	}
 
@@ -229,7 +247,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		m_device, "adi,rx-nco-shifter-band-binput-center-freq_khz", "[-2147483647 1 2147483647]",
 		"Band B Input Center Freq (kHz)");
 	if(bandBInputCenter) {
-		ncoSection->contentLayout()->addWidget(bandBInputCenter);
+		layout->addWidget(bandBInputCenter);
 		connect(this, &RxSettingsWidget::readRequested, bandBInputCenter, &IIOWidget::readAsync);
 	}
 
@@ -238,7 +256,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-bnco1-freq_khz",
 							 "[-2147483647 1 2147483647]", "Band B NCO1 Freq (kHz)");
 	if(bandBNCO1) {
-		ncoSection->contentLayout()->addWidget(bandBNCO1);
+		layout->addWidget(bandBNCO1);
 		connect(this, &RxSettingsWidget::readRequested, bandBNCO1, &IIOWidget::readAsync);
 	}
 
@@ -247,7 +265,7 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-bnco2-freq_khz",
 							 "[-2147483647 1 2147483647]", "Band B NCO2 Freq (kHz)");
 	if(bandBNCO2) {
-		ncoSection->contentLayout()->addWidget(bandBNCO2);
+		layout->addWidget(bandBNCO2);
 		connect(this, &RxSettingsWidget::readRequested, bandBNCO2, &IIOWidget::readAsync);
 	}
 
@@ -259,6 +277,15 @@ QWidget *RxSettingsWidget::createRxGpioPinControlSection(QWidget *parent)
 	// RX GPIO PIN Control section with two-column layout
 	MenuSectionCollapseWidget *gpioSection = new MenuSectionCollapseWidget(
 		"GPIO PIN Control", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	gpioSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// Create horizontal layout for two columns
 	QHBoxLayout *columnsLayout = new QHBoxLayout();
@@ -278,7 +305,7 @@ QWidget *RxSettingsWidget::createRxGpioPinControlSection(QWidget *parent)
 	columnsContainer->setLayout(columnsLayout);
 
 	// Add columns container to section
-	gpioSection->contentLayout()->addWidget(columnsContainer);
+	layout->addWidget(columnsContainer);
 
 	return gpioSection;
 }
@@ -287,7 +314,8 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 {
 	// Create container widget for RX channel GPIO controls
 	QWidget *channelWidget = new QWidget(parent);
-	Style::setStyle(channelWidget, style::properties::widget::border);
+	Style::setBackgroundColor(channelWidget, json::theme::background_primary);
+	Style::setStyle(channelWidget, style::properties::widget::border_interactive);
 
 	// Create vertical layout for this channel
 	QVBoxLayout *channelLayout = new QVBoxLayout(channelWidget);
@@ -311,6 +339,7 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 	auto enableWidget = Adrv9009WidgetFactory::createCheckboxWidget(m_device, enableAttr, "ENABLE");
 	if(enableWidget) {
 		channelLayout->addWidget(enableWidget);
+		enableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &RxSettingsWidget::readRequested, enableWidget, &IIOWidget::readAsync);
 	}
 
@@ -369,6 +398,15 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	MenuSectionCollapseWidget *rxConfigSection = new MenuSectionCollapseWidget(
 		"RX Configuration", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	rxConfigSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// RX Channels - Combobox with iio-osc mappings [0,1,2,3] -> [RXOFF,RX1,RX2,RX1_and_RX2]
 	QMap<QString, QString> *rxChannelsOptions = new QMap<QString, QString>();
 	rxChannelsOptions->insert("0", "RXOFF");
@@ -378,7 +416,7 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	auto rxChannels = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-settings-rx-channels",
 									 rxChannelsOptions, "RX Channel Enable");
 	if(rxChannels) {
-		rxConfigSection->contentLayout()->addWidget(rxChannels);
+		layout->addWidget(rxChannels);
 		connect(this, &RxSettingsWidget::readRequested, rxChannels, &IIOWidget::readAsync);
 	}
 
@@ -390,7 +428,7 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-settings-framer-sel",
 									framerSelOptions, "JESD204 Framer Selection");
 	if(framerSel) {
-		rxConfigSection->contentLayout()->addWidget(framerSel);
+		layout->addWidget(framerSel);
 		connect(this, &RxSettingsWidget::readRequested, framerSel, &IIOWidget::readAsync);
 	}
 
