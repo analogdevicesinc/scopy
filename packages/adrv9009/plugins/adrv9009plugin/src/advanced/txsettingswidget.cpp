@@ -92,6 +92,15 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	MenuSectionCollapseWidget *txProfileSection = new MenuSectionCollapseWidget(
 		"TX Profile", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	txProfileSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// DAC Div - Combobox [1,2] → ["1","2"]
 	QMap<QString, QString> *dacDivOptions = new QMap<QString, QString>();
 	dacDivOptions->insert("1", "1");
@@ -99,7 +108,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto dacDivWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,tx-profile-dac-div",
 									   dacDivOptions, "DAC Div");
 	if(dacDivWidget) {
-		txProfileSection->contentLayout()->addWidget(dacDivWidget);
+		layout->addWidget(dacDivWidget);
 		connect(this, &TxSettingsWidget::readRequested, dacDivWidget, &IIOWidget::readAsync);
 	}
 
@@ -111,7 +120,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto txFirInterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-tx-fir-interpolation", txFirInterpOptions, "TX FIR Interpolation");
 	if(txFirInterpWidget) {
-		txProfileSection->contentLayout()->addWidget(txFirInterpWidget);
+		layout->addWidget(txFirInterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, txFirInterpWidget, &IIOWidget::readAsync);
 	}
 
@@ -122,7 +131,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto thb1InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-thb1-interpolation", thb1InterpOptions, "THB1 Interpolation");
 	if(thb1InterpWidget) {
-		txProfileSection->contentLayout()->addWidget(thb1InterpWidget);
+		layout->addWidget(thb1InterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, thb1InterpWidget, &IIOWidget::readAsync);
 	}
 
@@ -133,7 +142,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto thb2InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-thb2-interpolation", thb2InterpOptions, "THB2 Interpolation");
 	if(thb2InterpWidget) {
-		txProfileSection->contentLayout()->addWidget(thb2InterpWidget);
+		layout->addWidget(thb2InterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, thb2InterpWidget, &IIOWidget::readAsync);
 	}
 
@@ -144,7 +153,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto thb3InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-thb3-interpolation", thb3InterpOptions, "THB3 Interpolation");
 	if(thb3InterpWidget) {
-		txProfileSection->contentLayout()->addWidget(thb3InterpWidget);
+		layout->addWidget(thb3InterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, thb3InterpWidget, &IIOWidget::readAsync);
 	}
 
@@ -155,7 +164,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto txInt5InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-tx-int5-interpolation", txInt5InterpOptions, "TX INT5 Interpolation");
 	if(txInt5InterpWidget) {
-		txProfileSection->contentLayout()->addWidget(txInt5InterpWidget);
+		layout->addWidget(txInt5InterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, txInt5InterpWidget, &IIOWidget::readAsync);
 	}
 
@@ -164,7 +173,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-profile-primary-sig-bandwidth_hz",
 							 "[20000000 1000 200000000]", "Primary Signal Bandwidth (Hz)");
 	if(primSigBwWidget) {
-		txProfileSection->contentLayout()->addWidget(primSigBwWidget);
+		layout->addWidget(primSigBwWidget);
 		connect(this, &TxSettingsWidget::readRequested, primSigBwWidget, &IIOWidget::readAsync);
 	}
 
@@ -172,7 +181,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto inputRateWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-profile-tx-input-rate_khz",
 									"[30720 1 491520]", "TX Input Rate (kHz)");
 	if(inputRateWidget) {
-		txProfileSection->contentLayout()->addWidget(inputRateWidget);
+		layout->addWidget(inputRateWidget);
 		connect(this, &TxSettingsWidget::readRequested, inputRateWidget, &IIOWidget::readAsync);
 	}
 
@@ -180,7 +189,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto rfBwWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-profile-rf-bandwidth_hz",
 								   "[20000000 1000 200000000]", "RF Bandwidth (Hz)");
 	if(rfBwWidget) {
-		txProfileSection->contentLayout()->addWidget(rfBwWidget);
+		layout->addWidget(rfBwWidget);
 		connect(this, &TxSettingsWidget::readRequested, rfBwWidget, &IIOWidget::readAsync);
 	}
 
@@ -188,7 +197,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto dac3dBCornerWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,tx-profile-tx-dac3d-bcorner_khz", "[50000 1000 750000]", "TX DAC3D BCorner (kHz)");
 	if(dac3dBCornerWidget) {
-		txProfileSection->contentLayout()->addWidget(dac3dBCornerWidget);
+		layout->addWidget(dac3dBCornerWidget);
 		connect(this, &TxSettingsWidget::readRequested, dac3dBCornerWidget, &IIOWidget::readAsync);
 	}
 
@@ -196,7 +205,7 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto bbf3dbWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-profile-tx-bbf3d-bcorner_khz",
 								     "[50000 1000 750000]", "TX BBF 3dB Corner (kHz)");
 	if(bbf3dbWidget) {
-		txProfileSection->contentLayout()->addWidget(bbf3dbWidget);
+		layout->addWidget(bbf3dbWidget);
 		connect(this, &TxSettingsWidget::readRequested, bbf3dbWidget, &IIOWidget::readAsync);
 	}
 
@@ -209,6 +218,15 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	MenuSectionCollapseWidget *txConfigSection = new MenuSectionCollapseWidget(
 		"TX Configuration", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	txConfigSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// TX Channels - Combobox with iio-osc mappings [0,1,2,3] -> [TXOFF,TX1,TX2,TX1_and_TX2]
 	QMap<QString, QString> *txChannelsOptions = new QMap<QString, QString>();
 	txChannelsOptions->insert("0", "TXOFF");
@@ -218,7 +236,7 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	auto txChannelsWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,tx-settings-tx-channels",
 									       txChannelsOptions, "TX Channels Enable");
 	if(txChannelsWidget) {
-		txConfigSection->contentLayout()->addWidget(txChannelsWidget);
+		layout->addWidget(txChannelsWidget);
 		connect(this, &TxSettingsWidget::readRequested, txChannelsWidget, &IIOWidget::readAsync);
 	}
 
@@ -230,7 +248,7 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	auto deframerWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-settings-deframer-sel", deframerOptions, "JESD204 DEFRAMER SELECT");
 	if(deframerWidget) {
-		txConfigSection->contentLayout()->addWidget(deframerWidget);
+		layout->addWidget(deframerWidget);
 		connect(this, &TxSettingsWidget::readRequested, deframerWidget, &IIOWidget::readAsync);
 	}
 
@@ -243,7 +261,7 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	auto attenStepWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-settings-tx-atten-step-size", attenStepOptions, "TX ATTEN STEP SIZE");
 	if(attenStepWidget) {
-		txConfigSection->contentLayout()->addWidget(attenStepWidget);
+		layout->addWidget(attenStepWidget);
 		connect(this, &TxSettingsWidget::readRequested, attenStepWidget, &IIOWidget::readAsync);
 	}
 
@@ -251,7 +269,7 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	auto tx1AttenWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-settings-tx1-atten_md-b",
 								       "[0 250 41950]", "TX1 Attenuation (mdB)");
 	if(tx1AttenWidget) {
-		txConfigSection->contentLayout()->addWidget(tx1AttenWidget);
+		layout->addWidget(tx1AttenWidget);
 		connect(this, &TxSettingsWidget::readRequested, tx1AttenWidget, &IIOWidget::readAsync);
 	}
 
@@ -259,7 +277,7 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	auto tx2AttenWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-settings-tx2-atten_md-b",
 								       "[0 250 41950]", "TX2 Attenuation (mdB)");
 	if(tx2AttenWidget) {
-		txConfigSection->contentLayout()->addWidget(tx2AttenWidget);
+		layout->addWidget(tx2AttenWidget);
 		connect(this, &TxSettingsWidget::readRequested, tx2AttenWidget, &IIOWidget::readAsync);
 	}
 
@@ -272,7 +290,7 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 		Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,tx-settings-dis-tx-data-if-pll-unlock",
 							       disableTxDataOptions, "Disable TX Data If PLL Unlock");
 	if(disableTxDataWidget) {
-		txConfigSection->contentLayout()->addWidget(disableTxDataWidget);
+		layout->addWidget(disableTxDataWidget);
 		connect(this, &TxSettingsWidget::readRequested, disableTxDataWidget, &IIOWidget::readAsync);
 	}
 
@@ -284,6 +302,15 @@ QWidget *TxSettingsWidget::createTxGpioPinControlSection(QWidget *parent)
 	// TX GPIO PIN Control section with two-column layout
 	MenuSectionCollapseWidget *gpioSection = new MenuSectionCollapseWidget(
 		"GPIO PIN Control", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	gpioSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// Create horizontal layout for two columns
 	QHBoxLayout *columnsLayout = new QHBoxLayout();
@@ -303,7 +330,7 @@ QWidget *TxSettingsWidget::createTxGpioPinControlSection(QWidget *parent)
 	columnsContainer->setLayout(columnsLayout);
 
 	// Add columns container to section
-	gpioSection->contentLayout()->addWidget(columnsContainer);
+	layout->addWidget(columnsContainer);
 
 	return gpioSection;
 }
@@ -312,7 +339,8 @@ QWidget *TxSettingsWidget::createTxChannelGpioGroup(int channel, QWidget *parent
 {
 	// Create container widget for TX channel GPIO controls
 	QWidget *channelWidget = new QWidget(parent);
-	Style::setStyle(channelWidget, style::properties::widget::border);
+	Style::setBackgroundColor(channelWidget, json::theme::background_primary);
+	Style::setStyle(channelWidget, style::properties::widget::border_interactive);
 
 	// Create vertical layout for this channel
 	QVBoxLayout *channelLayout = new QVBoxLayout(channelWidget);
@@ -335,6 +363,7 @@ QWidget *TxSettingsWidget::createTxChannelGpioGroup(int channel, QWidget *parent
 	auto enableWidget = Adrv9009WidgetFactory::createCheckboxWidget(m_device, enableAttr, "ENABLE");
 	if(enableWidget) {
 		channelLayout->addWidget(enableWidget);
+		enableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &TxSettingsWidget::readRequested, enableWidget, &IIOWidget::readAsync);
 	}
 
