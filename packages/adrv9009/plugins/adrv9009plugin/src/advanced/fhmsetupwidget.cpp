@@ -26,6 +26,7 @@
 #include <QSpacerItem>
 #include <QScrollArea>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_FHMSETUP, "FHMSetup")
 
@@ -90,10 +91,20 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	MenuSectionCollapseWidget *settingsSection = new MenuSectionCollapseWidget(
 		"Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	settingsSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// FHM Enable - Checkbox
 	auto fhmEnable = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-enable", "FHM ENABLE");
 	if(fhmEnable) {
-		settingsSection->contentLayout()->addWidget(fhmEnable);
+		layout->addWidget(fhmEnable);
+		fhmEnable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &FhmSetupWidget::readRequested, fhmEnable, &IIOWidget::readAsync);
 	}
 
@@ -101,7 +112,8 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	auto mcsSyncEnable = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-enable-mcs-sync",
 									 "ENABLE MCS SYNC");
 	if(mcsSyncEnable) {
-		settingsSection->contentLayout()->addWidget(mcsSyncEnable);
+		layout->addWidget(mcsSyncEnable);
+		mcsSyncEnable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &FhmSetupWidget::readRequested, mcsSyncEnable, &IIOWidget::readAsync);
 	}
 
@@ -109,7 +121,8 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	auto triggerMode = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-trigger-mode",
 								       "FHM TRIGGER MODE");
 	if(triggerMode) {
-		settingsSection->contentLayout()->addWidget(triggerMode);
+		layout->addWidget(triggerMode);
+		triggerMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &FhmSetupWidget::readRequested, triggerMode, &IIOWidget::readAsync);
 	}
 
@@ -117,7 +130,8 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	auto exitMode =
 		Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-exit-mode", "FHM EXIT MODE");
 	if(exitMode) {
-		settingsSection->contentLayout()->addWidget(exitMode);
+		layout->addWidget(exitMode);
+		exitMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &FhmSetupWidget::readRequested, exitMode, &IIOWidget::readAsync);
 	}
 
@@ -125,7 +139,7 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	auto initFreq = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-mode-fhm-init-frequency_hz",
 								 "[100000000 1 6000000000]", "FHM INIT FREQUENCY (Hz)");
 	if(initFreq) {
-		settingsSection->contentLayout()->addWidget(initFreq);
+		layout->addWidget(initFreq);
 		connect(this, &FhmSetupWidget::readRequested, initFreq, &IIOWidget::readAsync);
 	}
 
@@ -138,11 +152,20 @@ QWidget *FhmSetupWidget::createConfigSection(QWidget *parent)
 	MenuSectionCollapseWidget *configSection = new MenuSectionCollapseWidget(
 		"Config", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	configSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// FHM GPIO Pin - Range Widget [0 1 15]
 	auto gpioPin = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-config-fhm-gpio-pin", "[0 1 15]",
 								"FHM GPIO PIN");
 	if(gpioPin) {
-		configSection->contentLayout()->addWidget(gpioPin);
+		layout->addWidget(gpioPin);
 		connect(this, &FhmSetupWidget::readRequested, gpioPin, &IIOWidget::readAsync);
 	}
 
@@ -150,7 +173,7 @@ QWidget *FhmSetupWidget::createConfigSection(QWidget *parent)
 	auto minFreq = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-config-fhm-min-freq_mhz",
 								"[100 1 6000]", "FHM MIN FREQ (MHz)");
 	if(minFreq) {
-		configSection->contentLayout()->addWidget(minFreq);
+		layout->addWidget(minFreq);
 		connect(this, &FhmSetupWidget::readRequested, minFreq, &IIOWidget::readAsync);
 	}
 
@@ -158,7 +181,7 @@ QWidget *FhmSetupWidget::createConfigSection(QWidget *parent)
 	auto maxFreq = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-config-fhm-max-freq_mhz",
 								"[100 1 6000]", "FHM MAX FREQ (MHz)");
 	if(maxFreq) {
-		configSection->contentLayout()->addWidget(maxFreq);
+		layout->addWidget(maxFreq);
 		connect(this, &FhmSetupWidget::readRequested, maxFreq, &IIOWidget::readAsync);
 	}
 
