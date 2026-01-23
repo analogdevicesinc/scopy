@@ -26,6 +26,7 @@
 #include <QSpacerItem>
 #include <QScrollArea>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_ORXSETTINGS, "ORXSettings")
 
@@ -90,6 +91,15 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	MenuSectionCollapseWidget *orxProfileSection = new MenuSectionCollapseWidget(
 		"ORX Profile", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	orxProfileSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// RX FIR Decimation - Combobox [1,2,4]
 	QMap<QString, QString> *firDecimationOptions = new QMap<QString, QString>();
 	firDecimationOptions->insert("1", "1");
@@ -98,7 +108,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto firDecimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,orx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation");
 	if(firDecimation) {
-		orxProfileSection->contentLayout()->addWidget(firDecimation);
+		layout->addWidget(firDecimation);
 		connect(this, &OrxSettingsWidget::readRequested, firDecimation, &IIOWidget::readAsync);
 	}
 
@@ -109,7 +119,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto dec5Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,orx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation");
 	if(dec5Decimation) {
-		orxProfileSection->contentLayout()->addWidget(dec5Decimation);
+		layout->addWidget(dec5Decimation);
 		connect(this, &OrxSettingsWidget::readRequested, dec5Decimation, &IIOWidget::readAsync);
 	}
 
@@ -120,7 +130,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,orx-profile-rhb1-decimation", rhb1DecimationOptions, "RHB1 Decimation");
 	if(rhb1Decimation) {
-		orxProfileSection->contentLayout()->addWidget(rhb1Decimation);
+		layout->addWidget(rhb1Decimation);
 		connect(this, &OrxSettingsWidget::readRequested, rhb1Decimation, &IIOWidget::readAsync);
 	}
 
@@ -128,7 +138,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto outputRate = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-orx-output-rate_khz",
 								   "[30625 1 500000]", "ORX Output Rate (kHz)");
 	if(outputRate) {
-		orxProfileSection->contentLayout()->addWidget(outputRate);
+		layout->addWidget(outputRate);
 		connect(this, &OrxSettingsWidget::readRequested, outputRate, &IIOWidget::readAsync);
 	}
 
@@ -136,7 +146,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto rfBandwidth = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-rf-bandwidth_hz",
 								    "[5000000 1 450000000]", "RF Bandwidth (Hz)");
 	if(rfBandwidth) {
-		orxProfileSection->contentLayout()->addWidget(rfBandwidth);
+		layout->addWidget(rfBandwidth);
 		connect(this, &OrxSettingsWidget::readRequested, rfBandwidth, &IIOWidget::readAsync);
 	}
 
@@ -144,7 +154,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto bbf3dCorner = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-rx-bbf3d-bcorner_khz",
 								    "[10000 1 400000]", "RX BBF3D BCorner (kHz)");
 	if(bbf3dCorner) {
-		orxProfileSection->contentLayout()->addWidget(bbf3dCorner);
+		layout->addWidget(bbf3dCorner);
 		connect(this, &OrxSettingsWidget::readRequested, bbf3dCorner, &IIOWidget::readAsync);
 	}
 
@@ -154,7 +164,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	auto ddcMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,orx-profile-orx-ddc-mode",
 								      ddcModeOptions, "ORX DDC Mode");
 	if(ddcMode) {
-		orxProfileSection->contentLayout()->addWidget(ddcMode);
+		layout->addWidget(ddcMode);
 		connect(this, &OrxSettingsWidget::readRequested, ddcMode, &IIOWidget::readAsync);
 	}
 
@@ -167,6 +177,15 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	MenuSectionCollapseWidget *orxConfigSection = new MenuSectionCollapseWidget(
 		"ORX Configuration", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	orxConfigSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// ORX Channels Enable - Combobox [0,1,2,3] → [OFF,ORX1,ORX2,ORX1_and_ORX2]
 	QMap<QString, QString> *orxChannelsOptions = new QMap<QString, QString>();
 	orxChannelsOptions->insert("0", "OFF");
@@ -176,7 +195,7 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	auto orxChannels = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,obs-settings-obs-rx-channels-enable", orxChannelsOptions, "ORX Channels Enable");
 	if(orxChannels) {
-		orxConfigSection->contentLayout()->addWidget(orxChannels);
+		layout->addWidget(orxChannels);
 		connect(this, &OrxSettingsWidget::readRequested, orxChannels, &IIOWidget::readAsync);
 	}
 
@@ -188,7 +207,7 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,obs-settings-framer-sel",
 									framerSelOptions, "JESD204 Framer Selection");
 	if(framerSel) {
-		orxConfigSection->contentLayout()->addWidget(framerSel);
+		layout->addWidget(framerSel);
 		connect(this, &OrxSettingsWidget::readRequested, framerSel, &IIOWidget::readAsync);
 	}
 
@@ -199,7 +218,7 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	auto loSource = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,obs-settings-obs-rx-lo-source",
 								       loSourceOptions, "ORX LO Source");
 	if(loSource) {
-		orxConfigSection->contentLayout()->addWidget(loSource);
+		layout->addWidget(loSource);
 		connect(this, &OrxSettingsWidget::readRequested, loSource, &IIOWidget::readAsync);
 	}
 
@@ -212,11 +231,20 @@ QWidget *OrxSettingsWidget::createAuxPllSection(QWidget *parent)
 	MenuSectionCollapseWidget *auxPllSection = new MenuSectionCollapseWidget(
 		"AUX PLL", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	auxPllSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// GPIO Select - Range Widget
 	auto gpioSelect = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-lo-cfg-gpio-select", "[0 1 19]",
 								   "GPIO Select");
 	if(gpioSelect) {
-		auxPllSection->contentLayout()->addWidget(gpioSelect);
+		layout->addWidget(gpioSelect);
 		connect(this, &OrxSettingsWidget::readRequested, gpioSelect, &IIOWidget::readAsync);
 	}
 
@@ -224,7 +252,8 @@ QWidget *OrxSettingsWidget::createAuxPllSection(QWidget *parent)
 	auto disableAuxPllRelock = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, "adi,orx-lo-cfg-disable-aux-pll-relocking", "Disable AUX PLL Relocking");
 	if(disableAuxPllRelock) {
-		auxPllSection->contentLayout()->addWidget(disableAuxPllRelock);
+		layout->addWidget(disableAuxPllRelock);
+		disableAuxPllRelock->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &OrxSettingsWidget::readRequested, disableAuxPllRelock, &IIOWidget::readAsync);
 	}
 
