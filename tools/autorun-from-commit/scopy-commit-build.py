@@ -111,16 +111,7 @@ def get_token(token_arg):
     return None
 
 def get_workflow_name(platform):
-    if platform == "windows":
-        return "windows-mingw build"
-    elif platform == "x86":
-        return "Scopy x86_64 AppImage Build"
-    elif platform == "arm64":
-        return "Scopy arm64 AppImage Build"
-    elif platform == "arm32":
-        return "Scopy armhf AppImage Build"
-    else:
-        return None
+    return "Build & Test"
 
 def get_github_api_headers(token):
     return {
@@ -213,20 +204,20 @@ def get_artifacts(owner, repo, run_id, headers):
     return artifacts
 
 def filter_artifacts(artifacts, workflow_name, platform_value=None):
-    # Windows: artifact name starts with 'scopy-windows-x86_64' and does not contain 'setup'
-    if workflow_name == "windows-mingw build":
-        return [a for a in artifacts if a["name"].startswith("scopy-windows-x86_64") and "setup" not in a["name"]]
-    # Linux: artifact name starts with 'scopy-linux-x86_64-'
-    elif workflow_name == "Scopy x86_64 AppImage Build":
-        return [a for a in artifacts if a["name"].startswith("scopy-linux-x86_64-")]
-    # arm64: artifact name starts with 'scopy-arm64'
-    elif workflow_name == "Scopy arm64 AppImage Build":
+    if platform_value == "windows":
+        # Windows: artifact name starts with 'scopy-windows-x86_64' and does not contain 'setup'
+        return [a for a in artifacts if "scopy-windows-portable" in a["name"]]
+    elif platform_value == "x86":
+        # Linux: artifact name starts with 'scopy-linux-x86_64-'
+        ubuntu24 = [a for a in artifacts if a["name"].startswith("scopy-x86_64-appimage") and "ubuntu20" not in a["name"]]
+        ubuntu20 = [a for a in artifacts if a["name"].startswith("scopy-x86_64-appimage-ubuntu20")]
+        return ubuntu24 + ubuntu20  # Prefer Ubuntu 24, fallback to Ubuntu 20
+    elif platform_value == "arm64":
+        # arm64: artifact name starts with 'scopy-arm64'
         return [a for a in artifacts if a["name"].startswith("scopy-arm64")]
-    # arm32/armhf: artifact name starts with 'scopy-linux-armhf'
-    elif workflow_name == "Scopy armhf AppImage Build":
-        return [a for a in artifacts if a["name"].startswith("scopy-linux-armhf")]
-    else:
-        return []
+    elif platform_value == "arm32":
+        # arm32/armhf: artifact name starts with 'scopy-linux-armhf'
+        return [a for a in artifacts if a["name"].startswith("scopy-armhf")]
 
 def download_artifact(artifact, commit_sha, headers):
     import datetime
@@ -320,9 +311,6 @@ def main():
     owner = "analogdevicesinc"
     repo = "scopy"
     workflow_name = get_workflow_name(platform_value)
-    if not workflow_name:
-        print("Error: Only Windows, x86, ARM64, and ARM32 platforms are supported in this script version.")
-        sys.exit(1)
 
     headers = get_github_api_headers(token)
     run = get_workflow_run(owner, repo, args.commit_sha, workflow_name, headers)
@@ -355,7 +343,7 @@ def main():
     if platform_value == "windows":
         exe_name = "Scopy-console.exe"
     elif platform_value == "x86":
-        exe_name = "Scopy-x86_64.AppImage"
+        exe_name = "scopy-x86_64-appimage.AppImage"
     elif platform_value == "arm64":
         exe_name = "Scopy-arm64.AppImage"
     elif platform_value == "arm32":
