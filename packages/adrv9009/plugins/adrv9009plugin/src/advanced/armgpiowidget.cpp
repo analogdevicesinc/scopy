@@ -70,6 +70,10 @@ void ArmGpioWidget::setupUi()
 
 	// Create content widget for scroll area
 	QWidget *contentWidget = new QWidget();
+
+	Style::setBackgroundColor(contentWidget, json::theme::background_primary);
+	Style::setStyle(contentWidget, style::properties::widget::border_interactive);
+
 	QGridLayout *contentLayout = new QGridLayout(contentWidget);
 	contentLayout->setContentsMargins(10, 10, 10, 10);
 	contentLayout->setSpacing(5);
@@ -85,6 +89,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-enable", "Enable", contentWidget);
 	if(orx1Sel0EnableWidget) {
 		contentLayout->addWidget(orx1Sel0EnableWidget, 0, 1);
+		orx1Sel0EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx1Sel0EnableWidget, &IIOWidget::readAsync);
 	}
 
@@ -102,6 +107,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-polarity", "Polarity", contentWidget);
 	if(orx1Sel0PolarityWidget) {
 		contentLayout->addWidget(orx1Sel0PolarityWidget, 0, 3);
+		orx1Sel0PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx1Sel0PolarityWidget, &IIOWidget::readAsync);
 	}
 
@@ -116,6 +122,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-enable", "Enable", contentWidget);
 	if(orx1Sel1EnableWidget) {
 		contentLayout->addWidget(orx1Sel1EnableWidget, 1, 1);
+		orx1Sel1EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx1Sel1EnableWidget, &IIOWidget::readAsync);
 	}
 
@@ -133,6 +140,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-polarity", "Polarity", contentWidget);
 	if(orx1Sel1PolarityWidget) {
 		contentLayout->addWidget(orx1Sel1PolarityWidget, 1, 3);
+		orx1Sel1PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx1Sel1PolarityWidget, &IIOWidget::readAsync);
 	}
 
@@ -147,6 +155,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-enable", "Enable", contentWidget);
 	if(orx2Sel0EnableWidget) {
 		contentLayout->addWidget(orx2Sel0EnableWidget, 2, 1);
+		orx2Sel0EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx2Sel0EnableWidget, &IIOWidget::readAsync);
 	}
 
@@ -164,6 +173,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-polarity", "Polarity", contentWidget);
 	if(orx2Sel0PolarityWidget) {
 		contentLayout->addWidget(orx2Sel0PolarityWidget, 2, 3);
+		orx2Sel0PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx2Sel0PolarityWidget, &IIOWidget::readAsync);
 	}
 
@@ -178,6 +188,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-enable", "Enable", contentWidget);
 	if(orx2Sel1EnableWidget) {
 		contentLayout->addWidget(orx2Sel1EnableWidget, 3, 1);
+		orx2Sel1EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx2Sel1EnableWidget, &IIOWidget::readAsync);
 	}
 
@@ -195,6 +206,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-polarity", "Polarity", contentWidget);
 	if(orx2Sel1PolarityWidget) {
 		contentLayout->addWidget(orx2Sel1PolarityWidget, 3, 3);
+		orx2Sel1PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, orx2Sel1PolarityWidget, &IIOWidget::readAsync);
 	}
 
@@ -209,6 +221,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-enable", "Enable", contentWidget);
 	if(trackingEnableWidget) {
 		contentLayout->addWidget(trackingEnableWidget, 4, 1);
+		trackingEnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, trackingEnableWidget, &IIOWidget::readAsync);
 	}
 
@@ -226,6 +239,7 @@ void ArmGpioWidget::setupUi()
 		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-polarity", "Polarity", contentWidget);
 	if(trackingPolarityWidget) {
 		contentLayout->addWidget(trackingPolarityWidget, 4, 3);
+		trackingPolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ArmGpioWidget::readRequested, trackingPolarityWidget, &IIOWidget::readAsync);
 	}
 

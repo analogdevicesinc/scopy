@@ -25,6 +25,7 @@
 #include <QSpacerItem>
 #include <QScrollArea>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_GAINSETUP, "GainSetup")
 
@@ -60,6 +61,7 @@ void GainSetupWidget::setupUi()
 
 	// Create content widget for scroll area
 	QWidget *contentWidget = new QWidget();
+
 	QVBoxLayout *contentLayout = new QVBoxLayout(contentWidget);
 	contentLayout->setContentsMargins(10, 10, 10, 10);
 	contentLayout->setSpacing(15);
@@ -86,6 +88,15 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	MenuSectionCollapseWidget *rxGainSection = new MenuSectionCollapseWidget(
 		"RX", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	rxGainSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// Gain Mode - Combobox [0,1,2,3] → [MGC,AGC_FAST,AGC_SLOW,HYBRID]
 	QMap<QString, QString> *gainModeOptions = new QMap<QString, QString>();
 	gainModeOptions->insert("0", "MGC");
@@ -95,7 +106,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto gainMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-gain-control-gain-mode",
 								       gainModeOptions, "Gain Mode");
 	if(gainMode) {
-		rxGainSection->contentLayout()->addWidget(gainMode);
+		layout->addWidget(gainMode);
 		connect(this, &GainSetupWidget::readRequested, gainMode, &IIOWidget::readAsync);
 	}
 
@@ -103,7 +114,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx1GainIndex = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-gain-control-rx1-gain-index",
 								     "[0 1 255]", "RX1 Gain Index");
 	if(rx1GainIndex) {
-		rxGainSection->contentLayout()->addWidget(rx1GainIndex);
+		layout->addWidget(rx1GainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx1GainIndex, &IIOWidget::readAsync);
 	}
 
@@ -111,7 +122,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx2GainIndex = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-gain-control-rx2-gain-index",
 								     "[0 1 255]", "RX2 Gain Index");
 	if(rx2GainIndex) {
-		rxGainSection->contentLayout()->addWidget(rx2GainIndex);
+		layout->addWidget(rx2GainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx2GainIndex, &IIOWidget::readAsync);
 	}
 
@@ -119,7 +130,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx1MaxGain = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-gain-control-rx1-max-gain-index",
 								   "[0 1 255]", "RX1 Max Gain Index");
 	if(rx1MaxGain) {
-		rxGainSection->contentLayout()->addWidget(rx1MaxGain);
+		layout->addWidget(rx1MaxGain);
 		connect(this, &GainSetupWidget::readRequested, rx1MaxGain, &IIOWidget::readAsync);
 	}
 
@@ -127,7 +138,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx1MinGain = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-gain-control-rx1-min-gain-index",
 								   "[0 1 255]", "RX1 Min Gain Index");
 	if(rx1MinGain) {
-		rxGainSection->contentLayout()->addWidget(rx1MinGain);
+		layout->addWidget(rx1MinGain);
 		connect(this, &GainSetupWidget::readRequested, rx1MinGain, &IIOWidget::readAsync);
 	}
 
@@ -135,7 +146,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx2MaxGain = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-gain-control-rx2-max-gain-index",
 								   "[0 1 255]", "RX2 Max Gain Index");
 	if(rx2MaxGain) {
-		rxGainSection->contentLayout()->addWidget(rx2MaxGain);
+		layout->addWidget(rx2MaxGain);
 		connect(this, &GainSetupWidget::readRequested, rx2MaxGain, &IIOWidget::readAsync);
 	}
 
@@ -143,7 +154,7 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx2MinGain = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-gain-control-rx2-min-gain-index",
 								   "[0 1 255]", "RX2 Min Gain Index");
 	if(rx2MinGain) {
-		rxGainSection->contentLayout()->addWidget(rx2MinGain);
+		layout->addWidget(rx2MinGain);
 		connect(this, &GainSetupWidget::readRequested, rx2MinGain, &IIOWidget::readAsync);
 	}
 
@@ -156,6 +167,15 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	MenuSectionCollapseWidget *obsGainSection = new MenuSectionCollapseWidget(
 		"Observation", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	obsGainSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// Gain Mode - Combobox [0,1,2,3] → [MGC,AGC_FAST,AGC_SLOW,HYBRID]
 	QMap<QString, QString> *gainModeOptions = new QMap<QString, QString>();
 	gainModeOptions->insert("0", "MGC");
@@ -165,7 +185,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto gainMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,orx-gain-control-gain-mode",
 								       gainModeOptions, "Gain Mode");
 	if(gainMode) {
-		obsGainSection->contentLayout()->addWidget(gainMode);
+		layout->addWidget(gainMode);
 		connect(this, &GainSetupWidget::readRequested, gainMode, &IIOWidget::readAsync);
 	}
 
@@ -173,7 +193,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto orx1GainIndex = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-gain-control-orx1-gain-index",
 								      "[0 1 255]", "ORX1 Gain Index");
 	if(orx1GainIndex) {
-		obsGainSection->contentLayout()->addWidget(orx1GainIndex);
+		layout->addWidget(orx1GainIndex);
 		connect(this, &GainSetupWidget::readRequested, orx1GainIndex, &IIOWidget::readAsync);
 	}
 
@@ -181,7 +201,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto orx2GainIndex = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-gain-control-orx2-gain-index",
 								      "[0 1 255]", "ORX2 Gain Index");
 	if(orx2GainIndex) {
-		obsGainSection->contentLayout()->addWidget(orx2GainIndex);
+		layout->addWidget(orx2GainIndex);
 		connect(this, &GainSetupWidget::readRequested, orx2GainIndex, &IIOWidget::readAsync);
 	}
 
@@ -189,7 +209,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto orx1MaxGain = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,orx-gain-control-orx1-max-gain-index", "[0 1 255]", "ORX1 Max Gain Index");
 	if(orx1MaxGain) {
-		obsGainSection->contentLayout()->addWidget(orx1MaxGain);
+		layout->addWidget(orx1MaxGain);
 		connect(this, &GainSetupWidget::readRequested, orx1MaxGain, &IIOWidget::readAsync);
 	}
 
@@ -197,7 +217,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto orx1MinGain = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,orx-gain-control-orx1-min-gain-index", "[0 1 255]", "ORX1 Min Gain Index");
 	if(orx1MinGain) {
-		obsGainSection->contentLayout()->addWidget(orx1MinGain);
+		layout->addWidget(orx1MinGain);
 		connect(this, &GainSetupWidget::readRequested, orx1MinGain, &IIOWidget::readAsync);
 	}
 
@@ -205,7 +225,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto orx2MaxGain = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,orx-gain-control-orx2-max-gain-index", "[0 1 255]", "ORX2 Max Gain Index");
 	if(orx2MaxGain) {
-		obsGainSection->contentLayout()->addWidget(orx2MaxGain);
+		layout->addWidget(orx2MaxGain);
 		connect(this, &GainSetupWidget::readRequested, orx2MaxGain, &IIOWidget::readAsync);
 	}
 
@@ -213,7 +233,7 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	auto orx2MinGain = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,orx-gain-control-orx2-min-gain-index", "[0 1 255]", "ORX2 Min Gain Index");
 	if(orx2MinGain) {
-		obsGainSection->contentLayout()->addWidget(orx2MinGain);
+		layout->addWidget(orx2MinGain);
 		connect(this, &GainSetupWidget::readRequested, orx2MinGain, &IIOWidget::readAsync);
 	}
 

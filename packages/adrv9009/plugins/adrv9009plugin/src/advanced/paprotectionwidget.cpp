@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QSpacerItem>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_PAPROTECTION, "PAProtection")
 
@@ -51,6 +52,15 @@ void PaProtectionWidget::setupUi()
 	m_section = new MenuSectionCollapseWidget("PA Protection", MenuCollapseSection::MHCW_ARROW,
 						  MenuCollapseSection::MHW_BASEWIDGET, this);
 
+	QWidget *widget = new QWidget(m_section);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	m_section->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// Main layout for this widget
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -65,7 +75,7 @@ void PaProtectionWidget::setupUi()
 	auto avgDuration = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-avg-duration",
 								    "[0 1 14]", "Average Duration");
 	if(avgDuration) {
-		m_section->contentLayout()->addWidget(avgDuration);
+		layout->addWidget(avgDuration);
 		connect(this, &PaProtectionWidget::readRequested, avgDuration, &IIOWidget::readAsync);
 	}
 
@@ -73,7 +83,7 @@ void PaProtectionWidget::setupUi()
 	auto txAttenStep = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-tx-atten-step",
 								    "[0 1 127]", "TX Attenuation Step");
 	if(txAttenStep) {
-		m_section->contentLayout()->addWidget(txAttenStep);
+		layout->addWidget(txAttenStep);
 		connect(this, &PaProtectionWidget::readRequested, txAttenStep, &IIOWidget::readAsync);
 	}
 
@@ -81,7 +91,7 @@ void PaProtectionWidget::setupUi()
 	auto tx1PowerThresh = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,tx-pa-protection-tx1-power-threshold", "[1 1 8191]", "TX1 Power Threshold");
 	if(tx1PowerThresh) {
-		m_section->contentLayout()->addWidget(tx1PowerThresh);
+		layout->addWidget(tx1PowerThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx1PowerThresh, &IIOWidget::readAsync);
 	}
 
@@ -89,7 +99,7 @@ void PaProtectionWidget::setupUi()
 	auto tx2PowerThresh = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,tx-pa-protection-tx2-power-threshold", "[1 1 8191]", "TX2 Power Threshold");
 	if(tx2PowerThresh) {
-		m_section->contentLayout()->addWidget(tx2PowerThresh);
+		layout->addWidget(tx2PowerThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx2PowerThresh, &IIOWidget::readAsync);
 	}
 
@@ -97,7 +107,7 @@ void PaProtectionWidget::setupUi()
 	auto peakCount = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-peak-count",
 								  "[0 1 31]", "Peak Count");
 	if(peakCount) {
-		m_section->contentLayout()->addWidget(peakCount);
+		layout->addWidget(peakCount);
 		connect(this, &PaProtectionWidget::readRequested, peakCount, &IIOWidget::readAsync);
 	}
 
@@ -105,7 +115,7 @@ void PaProtectionWidget::setupUi()
 	auto tx1PeakThresh = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,tx-pa-protection-tx1-peak-threshold", "[1 1 255]", "TX1 Peak Threshold");
 	if(tx1PeakThresh) {
-		m_section->contentLayout()->addWidget(tx1PeakThresh);
+		layout->addWidget(tx1PeakThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx1PeakThresh, &IIOWidget::readAsync);
 	}
 
@@ -113,7 +123,7 @@ void PaProtectionWidget::setupUi()
 	auto tx2PeakThresh = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,tx-pa-protection-tx2-peak-threshold", "[1 1 255]", "TX2 Peak Threshold");
 	if(tx2PeakThresh) {
-		m_section->contentLayout()->addWidget(tx2PeakThresh);
+		layout->addWidget(tx2PeakThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx2PeakThresh, &IIOWidget::readAsync);
 	}
 
