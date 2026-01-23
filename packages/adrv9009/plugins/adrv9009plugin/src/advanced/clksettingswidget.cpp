@@ -25,6 +25,7 @@
 #include <QSpacerItem>
 #include <QScrollArea>
 #include <QLoggingCategory>
+#include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_CLKSETTINGS, "CLKSettings")
 
@@ -83,11 +84,20 @@ QWidget *ClkSettingsWidget::createClkSettingsSection(QWidget *parent)
 	MenuSectionCollapseWidget *clkSection = new MenuSectionCollapseWidget(
 		"CLK Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	clkSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// Device Clock (kHz) - Range Widget [10000 1 1000000]
 	auto deviceClockWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,dig-clocks-device-clock_khz",
 									  "[10000 1 1000000]", "Device Clock (kHz)");
 	if(deviceClockWidget) {
-		clkSection->contentLayout()->addWidget(deviceClockWidget);
+		layout->addWidget(deviceClockWidget);
 		connect(this, &ClkSettingsWidget::readRequested, deviceClockWidget, &IIOWidget::readAsync);
 	}
 
@@ -95,7 +105,7 @@ QWidget *ClkSettingsWidget::createClkSettingsSection(QWidget *parent)
 	auto vcoFreqWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,dig-clocks-clk-pll-vco-freq_khz", "[6000000 1 12000000]", "CLK PLL VCO Frequency (kHz)");
 	if(vcoFreqWidget) {
-		clkSection->contentLayout()->addWidget(vcoFreqWidget);
+		layout->addWidget(vcoFreqWidget);
 		connect(this, &ClkSettingsWidget::readRequested, vcoFreqWidget, &IIOWidget::readAsync);
 	}
 
@@ -109,7 +119,7 @@ QWidget *ClkSettingsWidget::createClkSettingsSection(QWidget *parent)
 	auto hsDivWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,dig-clocks-clk-pll-hs-div",
 									  hsDivOptions, "CLK PLL HS DIV");
 	if(hsDivWidget) {
-		clkSection->contentLayout()->addWidget(hsDivWidget);
+		layout->addWidget(hsDivWidget);
 		connect(this, &ClkSettingsWidget::readRequested, hsDivWidget, &IIOWidget::readAsync);
 	}
 
@@ -123,7 +133,7 @@ QWidget *ClkSettingsWidget::createClkSettingsSection(QWidget *parent)
 	auto phaseSyncModeWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,dig-clocks-rf-pll-phase-sync-mode", phaseSyncModeOptions, "RF PLL Phase Sync Mode");
 	if(phaseSyncModeWidget) {
-		clkSection->contentLayout()->addWidget(phaseSyncModeWidget);
+		layout->addWidget(phaseSyncModeWidget);
 		connect(this, &ClkSettingsWidget::readRequested, phaseSyncModeWidget, &IIOWidget::readAsync);
 	}
 
@@ -131,7 +141,8 @@ QWidget *ClkSettingsWidget::createClkSettingsSection(QWidget *parent)
 	auto useExternalLoWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, "adi,dig-clocks-rf-pll-use-external-lo", "RF PLL Use External LO");
 	if(useExternalLoWidget) {
-		clkSection->contentLayout()->addWidget(useExternalLoWidget);
+		layout->addWidget(useExternalLoWidget);
+		useExternalLoWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &ClkSettingsWidget::readRequested, useExternalLoWidget, &IIOWidget::readAsync);
 	}
 
