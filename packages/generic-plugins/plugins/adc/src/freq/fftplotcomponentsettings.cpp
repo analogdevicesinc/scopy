@@ -27,6 +27,7 @@
 #include "fftplotcomponentchannel.h"
 #include <style.h>
 #include <pluginbase/preferences.h>
+#include <filemanager.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -127,6 +128,13 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
+	QPushButton *exportBtn = new QPushButton("Export plot to CSV");
+	StyleHelper::BasicButton(exportBtn);
+	connect(exportBtn, &QPushButton::clicked, this, [=]() {
+		QString csvData = m_plotComponent->fftPlot()->generateCsvData();
+		FileManagerHelper::saveDataToFile(this, csvData, tr("Export Plot Data"));
+	});
+
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
 	yaxis->contentLayout()->addWidget(m_yCtrl);
 	yaxis->contentLayout()->addWidget(m_yPwrOffset);
@@ -137,6 +145,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
 	plotMenu->contentLayout()->addWidget(m_curve);
+	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);
 
 	v->setSpacing(10);

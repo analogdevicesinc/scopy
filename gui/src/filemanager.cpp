@@ -20,9 +20,12 @@
 
 #include "filemanager.h"
 
-#include <QDate>
+#include <QDateTime>
 #include <QDebug>
 #include <QFile>
+#include <QFileDialog>
+#include <QTextStream>
+#include <pluginbase/preferences.h>
 
 #include <common/common.h>
 #include <common/scopy-common_config.h>
@@ -473,4 +476,34 @@ QStringList ScopyFileHeader::getHeader()
 						    << ";Tool"
 						    << ";Additional Information";
 	return header_elements;
+}
+
+bool FileManagerHelper::saveDataToFile(QWidget *parent, const QString &data, const QString &title,
+				       const QString &filter, const QString &defaultExt)
+{
+	bool useNativeDialogs = Preferences::get("general_use_native_dialogs").toBool();
+	QString defaultName =
+		"plot_export-" + QDateTime::currentDateTime().toString("yyyy_MM_dd-HH_mm_ss") + defaultExt;
+	QString filePath = QFileDialog::getSaveFileName(
+		parent, title, defaultName, filter, nullptr,
+		(useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+	if(filePath.isEmpty()) {
+		return false;
+	}
+
+	if(!filePath.endsWith(defaultExt, Qt::CaseInsensitive)) {
+		filePath += defaultExt;
+	}
+
+	QFile file(filePath);
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		qWarning() << "FileManagerHelper: Failed to open file for writing:" << filePath;
+		return false;
+	}
+
+	QTextStream out(&file);
+	out << data;
+	file.close();
+	return true;
 }
