@@ -317,7 +317,7 @@ void TimePlotComponentSettings::updateYAxis()
 	switch(m_ymode) {
 	case YMODE_COUNT:
 		// Move this to iio_units function
-		timePlotYAxis->setUnits("");
+		timePlotYAxis->setUnits("counts");
 		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
 		timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
