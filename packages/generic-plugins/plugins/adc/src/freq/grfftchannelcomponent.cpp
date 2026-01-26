@@ -68,9 +68,6 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
 		[=](int w) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindow(w); });
 
-	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
-		[=](bool b) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
-
 	connect(m_fftPlotComponentChannel->channelComponent(), &ChannelComponent::updatedSamplingInfo, this,
 		[=](SamplingInfo p) {
 			dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSampleRate(p.sampleRate);
@@ -101,9 +98,6 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
 		[=](int w) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindow(w); });
-
-	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
-		[=](bool b) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
 	_init();
 }
 
@@ -113,7 +107,6 @@ void GRFFTChannelComponent::_init()
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
 	m_powerOffset = 0;
 	m_window = 1;
-	m_windowCorrection = true;
 
 	/*	m_measureMgr = new TimeMeasureManager(this);
 		m_measureMgr->initMeasure(m_pen);
@@ -487,16 +480,6 @@ void GRFFTChannelComponent::setWindow(int newWindow)
 
 // this cannot be implemented since averaging size can only be changed from within the channel signalpath
 void GRFFTChannelComponent::setAveragingSize(int size) {}
-
-bool GRFFTChannelComponent::windowCorrection() const { return m_windowCorrection; }
-
-void GRFFTChannelComponent::setWindowCorrection(bool newWindowCorr)
-{
-	if(m_windowCorrection == newWindowCorr)
-		return;
-	m_windowCorrection = newWindowCorr;
-	Q_EMIT windowCorrectionChanged(newWindowCorr);
-}
 
 void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 {

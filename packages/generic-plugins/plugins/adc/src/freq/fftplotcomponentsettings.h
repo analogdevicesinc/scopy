@@ -62,7 +62,6 @@ private:
 	PlotAutoscaler *m_autoscaler;
 
 	MenuCombo *m_windowCb;
-	MenuOnOffSwitch *m_windowChkb;
 
 	QList<ChannelComponent *> m_channels;
 
