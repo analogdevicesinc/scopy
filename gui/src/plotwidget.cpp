@@ -50,6 +50,8 @@
 
 #include <plotbuttonmanager.h>
 
+#include <QTextStream>
+
 using namespace scopy;
 
 PlotWidget::PlotWidget(QWidget *parent)
@@ -426,6 +428,67 @@ void PlotWidget::printPlot(QPainter *painter, bool useSymbols)
 }
 
 PlotChannel *PlotWidget::selectedChannel() const { return m_selectedChannel; }
+
+QString PlotWidget::generateCsvData()
+{
+	QString result;
+	QTextStream out(&result);
+	out.setRealNumberNotation(QTextStream::FixedNotation);
+	out.setRealNumberPrecision(10);
+
+	QList<PlotChannel *> enabledChannels;
+	for(PlotChannel *ch : m_plotChannels) {
+		if(ch->isEnabled() && ch->curve() && ch->curve()->data() && ch->curve()->data()->size() > 0) {
+			enabledChannels.append(ch);
+		}
+	}
+
+	if(enabledChannels.isEmpty()) {
+		return result;
+	}
+
+	// Write header: X (unit), Ch1_Y (unit), Ch2_Y (unit), ...
+	QString xUnits = enabledChannels.first()->xAxis()->getUnits();
+	if(!xUnits.isEmpty()) {
+		out << "X (" << xUnits << ")";
+	} else {
+		out << "X";
+	}
+	for(PlotChannel *ch : enabledChannels) {
+		QString yUnits = ch->yAxis()->getUnits();
+		if(!yUnits.isEmpty()) {
+			out << "," << ch->name() << " (" << yUnits << ")";
+		} else {
+			out << "," << ch->name();
+		}
+	}
+	out << "\n";
+
+	size_t maxSize = 0;
+	for(PlotChannel *ch : enabledChannels) {
+		maxSize = std::max(maxSize, ch->curve()->data()->size());
+	}
+	for(size_t i = 0; i < maxSize; i++) {
+		// Use X from first channel
+		QwtSeriesData<QPointF> *firstData = enabledChannels.first()->curve()->data();
+		if(i < firstData->size()) {
+			out << firstData->sample(i).x();
+		} else {
+			out << "";
+		}
+
+		for(PlotChannel *ch : enabledChannels) {
+			QwtSeriesData<QPointF> *data = ch->curve()->data();
+			out << ",";
+			if(i < data->size()) {
+				out << data->sample(i).y();
+			}
+		}
+		out << "\n";
+	}
+
+	return result;
+}
 
 // NOTE: Hackish, but the QwtPlot::XAxis enforces a minimumSizeHint if the parent
 // does not provide a strict max size. This means that this widget will always have
