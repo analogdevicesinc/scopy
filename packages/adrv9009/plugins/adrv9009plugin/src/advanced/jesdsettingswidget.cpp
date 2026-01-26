@@ -74,6 +74,15 @@ void JesdSettingsWidget::setupUi()
 	MenuSectionCollapseWidget *settingsSection = new MenuSectionCollapseWidget(
 		"JESD Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 
+	QWidget *widget = new QWidget(settingsSection);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	settingsSection->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	contentLayout->addWidget(settingsSection);
 
 	// All widgets go into the settings section (13 attributes total)
@@ -82,7 +91,7 @@ void JesdSettingsWidget::setupUi()
 	auto serAmplitude = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,jesd204-ser-amplitude", "[0 1 15]",
 								     "SER AMPLITUDE");
 	if(serAmplitude) {
-		settingsSection->contentLayout()->addWidget(serAmplitude);
+		layout->addWidget(serAmplitude);
 		connect(this, &JesdSettingsWidget::readRequested, serAmplitude, &IIOWidget::readAsync);
 	}
 
@@ -90,33 +99,31 @@ void JesdSettingsWidget::setupUi()
 	auto serPreEmphasis = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,jesd204-ser-pre-emphasis",
 								       "[0 1 4]", "SER PRE EMPHASIS");
 	if(serPreEmphasis) {
-		settingsSection->contentLayout()->addWidget(serPreEmphasis);
+		layout->addWidget(serPreEmphasis);
 		connect(this, &JesdSettingsWidget::readRequested, serPreEmphasis, &IIOWidget::readAsync);
 	}
 
 	// SERIALIZER INVERT POLARITY - Grouped lane checkboxes
 	auto serializerLanes = createLaneCheckboxGroup("SERIALIZER INVERT POLARITY",
 						       "adi,jesd204-ser-invert-lane-polarity", settingsSection);
-	settingsSection->contentLayout()->addWidget(serializerLanes);
+	layout->addWidget(serializerLanes);
 
 	// DESERIALIZER INVERT POLARITY - Grouped lane checkboxes
 	auto deserializerLanes = createLaneCheckboxGroup("DESERIALIZER INVERT POLARITY",
 							 "adi,jesd204-des-invert-lane-polarity", settingsSection);
-	settingsSection->contentLayout()->addWidget(deserializerLanes);
+	layout->addWidget(deserializerLanes);
 
 	// DES EQ SETTING - Range Widget [0 1 4]
 	auto desEqSetting = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,jesd204-des-eq-setting", "[0 1 4]",
 								     "DES EQ SETTING");
-	if(desEqSetting) {
-		settingsSection->contentLayout()->addWidget(desEqSetting);
-		connect(this, &JesdSettingsWidget::readRequested, desEqSetting, &IIOWidget::readAsync);
-	}
+	layout->addWidget(desEqSetting);
 
 	// SYSREF LVDS MODE - Checkbox
 	auto sysrefLvdsMode = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,jesd204-sysref-lvds-mode",
 									  "SYSREF LVDS MODE");
 	if(sysrefLvdsMode) {
-		settingsSection->contentLayout()->addWidget(sysrefLvdsMode);
+		layout->addWidget(sysrefLvdsMode);
+		sysrefLvdsMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdSettingsWidget::readRequested, sysrefLvdsMode, &IIOWidget::readAsync);
 	}
 
@@ -124,13 +131,13 @@ void JesdSettingsWidget::setupUi()
 	auto sysrefLvdsPnInvert = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, "adi,jesd204-sysref-lvds-pn-invert", "SYSREF LVDS PN INVERT");
 	if(sysrefLvdsPnInvert) {
-		settingsSection->contentLayout()->addWidget(sysrefLvdsPnInvert);
+		layout->addWidget(sysrefLvdsPnInvert);
+		sysrefLvdsPnInvert->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdSettingsWidget::readRequested, sysrefLvdsPnInvert, &IIOWidget::readAsync);
 	}
 
 	// Add spacer to push content to top
-	settingsSection->contentLayout()->addItem(
-		new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	layout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	// Add spacer to main layout to push settings section to top
 	contentLayout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -166,9 +173,13 @@ QWidget *JesdSettingsWidget::createLaneCheckboxGroup(const QString &groupLabel, 
 
 	// Create switches directly
 	scopy::MenuOnOffSwitch *lane0 = new scopy::MenuOnOffSwitch("LANE0", lanesWidget);
+	lane0->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	scopy::MenuOnOffSwitch *lane1 = new scopy::MenuOnOffSwitch("LANE1", lanesWidget);
+	lane1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	scopy::MenuOnOffSwitch *lane2 = new scopy::MenuOnOffSwitch("LANE2", lanesWidget);
+	lane2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	scopy::MenuOnOffSwitch *lane3 = new scopy::MenuOnOffSwitch("LANE3", lanesWidget);
+	lane3->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	lanesLayout->addWidget(lane0);
 	lanesLayout->addWidget(lane1);

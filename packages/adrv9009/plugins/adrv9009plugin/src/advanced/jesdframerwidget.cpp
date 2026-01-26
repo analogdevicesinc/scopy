@@ -100,11 +100,20 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 									  MenuCollapseSection::MHCW_ARROW,
 									  MenuCollapseSection::MHW_BASEWIDGET, parent);
 
+	QWidget *widget = new QWidget(parent);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	column->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// 1. BANK ID - Range Widget [0 1 15]
 	auto bankIdWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, QString("adi,jesd204-%1-bank-id").arg(attrPrefix), "[0 1 15]", "Bank ID");
 	if(bankIdWidget) {
-		column->contentLayout()->addWidget(bankIdWidget);
+		layout->addWidget(bankIdWidget);
 		connect(this, &JesdFramerWidget::readRequested, bankIdWidget, &IIOWidget::readAsync);
 	}
 
@@ -112,7 +121,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto deviceIdWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, QString("adi,jesd204-%1-device-id").arg(attrPrefix), "[0 1 255]", "Device ID");
 	if(deviceIdWidget) {
-		column->contentLayout()->addWidget(deviceIdWidget);
+		layout->addWidget(deviceIdWidget);
 		connect(this, &JesdFramerWidget::readRequested, deviceIdWidget, &IIOWidget::readAsync);
 	}
 
@@ -120,7 +129,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto lane0IdWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, QString("adi,jesd204-%1-lane0-id").arg(attrPrefix), "[0 1 31]", "Lane0 ID");
 	if(lane0IdWidget) {
-		column->contentLayout()->addWidget(lane0IdWidget);
+		layout->addWidget(lane0IdWidget);
 		connect(this, &JesdFramerWidget::readRequested, lane0IdWidget, &IIOWidget::readAsync);
 	}
 
@@ -132,7 +141,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto mWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), mOptions, "M");
 	if(mWidget) {
-		column->contentLayout()->addWidget(mWidget);
+		layout->addWidget(mWidget);
 		connect(this, &JesdFramerWidget::readRequested, mWidget, &IIOWidget::readAsync);
 		mWidget->getUiStrategy()->setInfoMessage(
 			"Number of ADCs (0, 2, or 4) where 2 ADCs are required per receive chain (I and Q)");
@@ -142,7 +151,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto kWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, QString("adi,jesd204-%1-k").arg(attrPrefix),
 								"[1 1 32]", "K");
 	if(kWidget) {
-		column->contentLayout()->addWidget(kWidget);
+		layout->addWidget(kWidget);
 		connect(this, &JesdFramerWidget::readRequested, kWidget, &IIOWidget::readAsync);
 	}
 
@@ -157,7 +166,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto fWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, QString("adi,jesd204-%1-f").arg(attrPrefix), fOptions, "F");
 	if(fWidget) {
-		column->contentLayout()->addWidget(fWidget);
+		layout->addWidget(fWidget);
 		connect(this, &JesdFramerWidget::readRequested, fWidget, &IIOWidget::readAsync);
 		fWidget->getUiStrategy()->setInfoMessage("Number of bytes(octets) per frame (Valid 1, 2, 4, 8)");
 	}
@@ -170,7 +179,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto npWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), npOptions, "NP");
 	if(npWidget) {
-		column->contentLayout()->addWidget(npWidget);
+		layout->addWidget(npWidget);
 		connect(this, &JesdFramerWidget::readRequested, npWidget, &IIOWidget::readAsync);
 		npWidget->getUiStrategy()->setInfoMessage("converter sample resolution (12, 16, 24)");
 	}
@@ -179,7 +188,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto scrambleWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-scramble").arg(attrPrefix), "Scramble");
 	if(scrambleWidget) {
-		column->contentLayout()->addWidget(scrambleWidget);
+		layout->addWidget(scrambleWidget);
+		scrambleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, scrambleWidget, &IIOWidget::readAsync);
 	}
 
@@ -187,7 +197,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto extSysrefWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-external-sysref").arg(attrPrefix), "External SYSREF");
 	if(extSysrefWidget) {
-		column->contentLayout()->addWidget(extSysrefWidget);
+		layout->addWidget(extSysrefWidget);
+		extSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, extSysrefWidget, &IIOWidget::readAsync);
 	}
 
@@ -196,14 +207,18 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 
 	// Create switches directly
 	scopy::MenuOnOffSwitch *lane0 = new scopy::MenuOnOffSwitch("Serializer Lane 0", column);
+	lane0->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	scopy::MenuOnOffSwitch *lane1 = new scopy::MenuOnOffSwitch("Serializer Lane 1", column);
+	lane1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	scopy::MenuOnOffSwitch *lane2 = new scopy::MenuOnOffSwitch("Serializer Lane 2", column);
+	lane2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	scopy::MenuOnOffSwitch *lane3 = new scopy::MenuOnOffSwitch("Serializer Lane 3", column);
+	lane3->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-	column->contentLayout()->addWidget(lane0);
-	column->contentLayout()->addWidget(lane1);
-	column->contentLayout()->addWidget(lane2);
-	column->contentLayout()->addWidget(lane3);
+	layout->addWidget(lane0);
+	layout->addWidget(lane1);
+	layout->addWidget(lane2);
+	layout->addWidget(lane3);
 
 	// Function to update hardware from all switches
 	auto updateHardware = [this, baseAttr, lane0, lane1, lane2, lane3]() {
@@ -248,7 +263,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-serializer-lane-crossbar").arg(attrPrefix), "[0 1 65535]",
 		"Serializer Lane Crossbar");
 	if(serCrossbarWidget) {
-		column->contentLayout()->addWidget(serCrossbarWidget);
+		layout->addWidget(serCrossbarWidget);
 		connect(this, &JesdFramerWidget::readRequested, serCrossbarWidget, &IIOWidget::readAsync);
 	}
 
@@ -256,7 +271,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto lmfcWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, QString("adi,jesd204-%1-lmfc-offset").arg(attrPrefix), "[0 1 31]", "LMFC Offset");
 	if(lmfcWidget) {
-		column->contentLayout()->addWidget(lmfcWidget);
+		layout->addWidget(lmfcWidget);
 		connect(this, &JesdFramerWidget::readRequested, lmfcWidget, &IIOWidget::readAsync);
 	}
 
@@ -264,7 +279,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto newSysrefWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-new-sysref-on-relink").arg(attrPrefix), "New SYSREF on Relink");
 	if(newSysrefWidget) {
-		column->contentLayout()->addWidget(newSysrefWidget);
+		layout->addWidget(newSysrefWidget);
+		newSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, newSysrefWidget, &IIOWidget::readAsync);
 	}
 
@@ -272,7 +288,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto syncbInWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-syncb-in-select").arg(attrPrefix), "SYNCB In Select");
 	if(syncbInWidget) {
-		column->contentLayout()->addWidget(syncbInWidget);
+		layout->addWidget(syncbInWidget);
+		syncbInWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, syncbInWidget, &IIOWidget::readAsync);
 	}
 
@@ -280,7 +297,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto overSampleWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-over-sample").arg(attrPrefix), "Over Sample");
 	if(overSampleWidget) {
-		column->contentLayout()->addWidget(overSampleWidget);
+		layout->addWidget(overSampleWidget);
+		overSampleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, overSampleWidget, &IIOWidget::readAsync);
 	}
 
@@ -288,7 +306,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto syncbLvdsModeWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-syncb-in-lvds-mode").arg(attrPrefix), "SYNCB In LVDS Mode");
 	if(syncbLvdsModeWidget) {
-		column->contentLayout()->addWidget(syncbLvdsModeWidget);
+		layout->addWidget(syncbLvdsModeWidget);
+		syncbLvdsModeWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, syncbLvdsModeWidget, &IIOWidget::readAsync);
 	}
 
@@ -296,7 +315,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto syncbLvdsPnWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-syncb-in-lvds-pn-invert").arg(attrPrefix), "SYNCB In LVDS PN Invert");
 	if(syncbLvdsPnWidget) {
-		column->contentLayout()->addWidget(syncbLvdsPnWidget);
+		layout->addWidget(syncbLvdsPnWidget);
+		syncbLvdsPnWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, syncbLvdsPnWidget, &IIOWidget::readAsync);
 	}
 
@@ -304,12 +324,13 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	auto enableManualXbarWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-enable-manual-lane-xbar").arg(attrPrefix), "Enable Manual Lane XBAR");
 	if(enableManualXbarWidget) {
-		column->contentLayout()->addWidget(enableManualXbarWidget);
+		layout->addWidget(enableManualXbarWidget);
+		enableManualXbarWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, enableManualXbarWidget, &IIOWidget::readAsync);
 	}
 
 	// Add spacer to push content to top
-	column->contentLayout()->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	layout->addItem(new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	return column;
 }
