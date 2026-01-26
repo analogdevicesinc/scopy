@@ -109,11 +109,17 @@ QWidget *CalibrationWidget::createCalibrationMaskGroup(QWidget *parent)
 
 	// Create calibration checkboxes
 	m_txLoLeakageCal = new MenuOnOffSwitch("TX LO Leakage", widget);
+	m_txLoLeakageCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_txQecCal = new MenuOnOffSwitch("TX QEC", widget);
+	m_txQecCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_txLolExternalCal = new MenuOnOffSwitch("TX LOL External", widget);
+	m_txLolExternalCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_rxQecCal = new MenuOnOffSwitch("RX QEC", widget);
+	m_rxQecCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_rxPhaseCorrectionCal = new MenuOnOffSwitch("RX Phase Coorrection", widget);
+	m_rxPhaseCorrectionCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_fhmCal = new MenuOnOffSwitch("FHM", widget);
+	m_fhmCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	mainLayout->addWidget(m_rxQecCal);
 	mainLayout->addWidget(m_txQecCal);
