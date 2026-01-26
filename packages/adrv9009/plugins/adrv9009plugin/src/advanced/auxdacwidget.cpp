@@ -70,6 +70,15 @@ void AuxDacWidget::setupUi()
 	m_section = new MenuSectionCollapseWidget("AUX DAC", MenuCollapseSection::MHCW_ARROW,
 						  MenuCollapseSection::MHW_BASEWIDGET, this);
 
+	QWidget *widget = new QWidget(m_section);
+	QVBoxLayout *layout = new QVBoxLayout(widget);
+	layout->setContentsMargins(10, 10, 10, 10);
+	layout->setSpacing(10);
+
+	m_section->contentLayout()->addWidget(widget);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
+	Style::setStyle(widget, style::properties::widget::border_interactive);
+
 	// Add CLK Settings section
 	contentLayout->addWidget(m_section);
 
@@ -165,5 +174,5 @@ void AuxDacWidget::setupUi()
 		configGrid->addWidget(new QLabel("N/A"), row, 3);
 	}
 
-	m_section->contentLayout()->addLayout(configGrid);
+	layout->addLayout(configGrid);
 }
