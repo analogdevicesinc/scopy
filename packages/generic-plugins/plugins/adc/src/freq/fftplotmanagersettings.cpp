@@ -110,7 +110,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	m_bufferSizeSpin = new MenuSpinbox("FFT Size", 16, "samples", 0, 4000000, true, false, section);
-	m_bufferSizeSpin->setScaleRange(1, 1e6);
+	m_bufferSizeSpin->setScaleRange(1, 1);
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setBufferSize((uint32_t)val); });
 
 	QWidget *xMinMax = new QWidget(section);

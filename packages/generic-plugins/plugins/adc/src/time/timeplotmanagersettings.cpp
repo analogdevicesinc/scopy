@@ -111,7 +111,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	bufferPlotSize->setLayout(bufferPlotSizeLayout);
 
 	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 16, 4000000, true, false, bufferPlotSize);
-	m_bufferSizeSpin->setScaleRange(1, 1e6);
+	m_bufferSizeSpin->setScaleRange(1, 1);
 
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) {
 		if(m_plotSizeSpin->value() < val) {
@@ -124,7 +124,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	connect(this, &TimePlotManagerSettings::bufferSizeChanged, m_bufferSizeSpin, &MenuSpinbox::setValue);
 
 	m_plotSizeSpin = new MenuSpinbox("Plot Size", 16, "samples", 0, 4000000, true, false, bufferPlotSize);
-	m_plotSizeSpin->setScaleRange(1, 1e6);
+	m_plotSizeSpin->setScaleRange(0, 1);
 
 	connect(m_plotSizeSpin, &MenuSpinbox::valueChanged, this, [=](double val) { setPlotSize((uint32_t)val); });
 
