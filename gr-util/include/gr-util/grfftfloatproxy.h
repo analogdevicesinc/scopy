@@ -49,7 +49,6 @@ class SCOPY_GR_UTIL_EXPORT GRFFTFloatProc : public GRProxyBlock
 public:
 	GRFFTFloatProc(QObject *parent = nullptr);
 	void setWindow(gr::fft::window::win_type w);
-	void setWindowCorrection(bool b);
 	void setPowerOffset(double);
 	void setNrBits(int);
 	void setSampleRate(double sr);
@@ -64,7 +63,6 @@ public:
 protected:
 	double m_powerOffset;
 	int nrBits;
-	bool m_windowCorr;
 	double m_sr;
 	bool m_signed;
 	int m_navg;
@@ -86,7 +84,6 @@ public:
 	GRFFTComplexProc(QObject *parent = nullptr);
 	void setWindow(gr::fft::window::win_type w);
 	void setPowerOffset(double);
-	void setWindowCorrection(bool b);
 	void setNrBits(int);
 	void setSampleRate(double sr);
 	void setSigned(bool sig);
@@ -100,7 +97,6 @@ public:
 protected:
 	double m_powerOffset;
 	int nrBits;
-	bool m_windowCorr;
 	double m_sr;
 	bool m_signed;
 	int m_navg;

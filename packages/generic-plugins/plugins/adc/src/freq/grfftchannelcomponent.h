@@ -91,8 +91,6 @@ public:
 
 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
-	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
-
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
 	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config) { m_fft->setGenalyzerConfig(config); }
@@ -151,8 +149,6 @@ public:
 
 	void setWindow(int w) override { m_fft->setWindow(static_cast<gr::fft::window::win_type>(w)); }
 
-	void setWindowCorrection(bool b) override { m_fft->setWindowCorrection(b); }
-
 	void setSampleRate(double sr) override { m_fft->setSampleRate(sr); }
 
 	void setGenalyzerConfig(const scopy::grutil::GenalyzerConfig &config) { m_fft->setGenalyzerConfig(config); }
@@ -193,8 +189,6 @@ public:
 	void setAveragingSize(int) override;
 	void setSamplingInfo(SamplingInfo p) override;
 	int window() const;
-	bool windowCorrection() const;
-	void setWindowCorrection(bool newWindowCorr) override;
 	virtual bool enabled() const override;
 	bool isComplex();
 
@@ -228,7 +222,6 @@ Q_SIGNALS:
 	void fftSizeChanged();
 	void powerOffsetChanged(double);
 	void windowChanged(int);
-	void windowCorrectionChanged(bool);
 	void genalyzerDataUpdated(const QString &channelName, QColor channelColor, size_t results_size, char **rkeys,
 				  double *rvalues);
 	void genalyzerChannelEnabled(const QString &channelName);
@@ -237,7 +230,6 @@ Q_SIGNALS:
 private:
 	double m_powerOffset;
 	int m_window;
-	bool m_windowCorrection;
 
 	GRIIOFloatChannelNode *m_node;
 	GRIIOChannel *m_src;
@@ -276,7 +268,6 @@ private:
 
 	Q_PROPERTY(double powerOffset READ powerOffset WRITE setPowerOffset NOTIFY powerOffsetChanged)
 	Q_PROPERTY(int window READ window WRITE setWindow NOTIFY windowChanged)
-	Q_PROPERTY(bool windowCorrection READ windowCorrection WRITE setWindowCorrection NOTIFY windowCorrectionChanged)
 };
 
 } // namespace adc
