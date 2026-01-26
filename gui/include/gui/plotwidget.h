@@ -111,6 +111,8 @@ public Q_SLOTS:
 	void hideAxisLabels();
 	void setAlignCanvasToScales(bool alignCanvasToScales);
 
+	QString generateCsvData();
+
 Q_SIGNALS:
 	void canvasSizeChanged();
 	// These are only emitted if you set setMouseTracking(true) (not done by default)
