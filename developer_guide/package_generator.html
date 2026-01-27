@@ -96,14 +96,14 @@
         <nav>
           <ul>
 <li><a class="reference internal" href="#">Package Generator</a><ul>
-<li><a class="reference internal" href="#id2">Overview</a></li>
-<li><a class="reference internal" href="#id3">Platform</a></li>
-<li><a class="reference internal" href="#id4">Running the Script</a></li>
-<li><a class="reference internal" href="#id5">Configuration Files</a></li>
-<li><a class="reference internal" href="#id6">Manifest File</a></li>
-<li><a class="reference internal" href="#id7">Packages development flow</a></li>
-<li><a class="reference internal" href="#id8">Scopy PDK</a></li>
-<li><a class="reference internal" href="#id9">Adding New Config Specifications</a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#platform">Platform</a></li>
+<li><a class="reference internal" href="#running-the-script">Running the Script</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration Files</a></li>
+<li><a class="reference internal" href="#manifest-file">Manifest File</a></li>
+<li><a class="reference internal" href="#packages-development-flow">Packages development flow</a></li>
+<li><a class="reference internal" href="#scopy-pdk">Scopy PDK</a></li>
+<li><a class="reference internal" href="#adding-new-config-specifications">Adding New Config Specifications</a></li>
 </ul>
 </li>
 </ul>
@@ -306,24 +306,26 @@ Content on this topic
   <section id="package-generator">
 <span id="id1"></span><h1>Package Generator<a class="headerlink" href="#package-generator" title="Link to this heading"></a></h1>
 <p>Chapters</p>
+<nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference external" href="#overview">1. Overview</a></p></li>
-<li><p><a class="reference external" href="#platform">2. Platform</a></p></li>
-<li><p><a class="reference external" href="#running-the-script">3. Running the Script</a></p></li>
-<li><p><a class="reference external" href="#configuration-files">4. Configuration Files</a></p></li>
-<li><p><a class="reference external" href="#manifest-file">5. Manifest File</a></p></li>
-<li><p><a class="reference external" href="#packages-development-flow">6. Packages development flow</a></p></li>
-<li><p><a class="reference external" href="#scopy-pdk">7. Scopy PDK</a></p></li>
-<li><p><a class="reference external" href="#adding-new-config-specifications">8. Adding New Config Specifications</a></p></li>
+<li><p><a class="reference internal" href="#overview" id="id2">Overview</a></p></li>
+<li><p><a class="reference internal" href="#platform" id="id3">Platform</a></p></li>
+<li><p><a class="reference internal" href="#running-the-script" id="id4">Running the Script</a></p></li>
+<li><p><a class="reference internal" href="#configuration-files" id="id5">Configuration Files</a></p></li>
+<li><p><a class="reference internal" href="#manifest-file" id="id6">Manifest File</a></p></li>
+<li><p><a class="reference internal" href="#packages-development-flow" id="id7">Packages development flow</a></p></li>
+<li><p><a class="reference internal" href="#scopy-pdk" id="id8">Scopy PDK</a></p></li>
+<li><p><a class="reference internal" href="#adding-new-config-specifications" id="id9">Adding New Config Specifications</a></p></li>
 </ul>
-<section id="id2">
-<h2>Overview<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+</nav>
+<section id="overview">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Overview</a><a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <p>The <cite>package_generator.py</cite> script is a utility for generating and managing packages,
 plugins, and related resources for the Scopy project. It provides functionality to
 create package structures, generate plugins, handle translations, manage styles, and more.</p>
 </section>
-<section id="id3">
-<h2>Platform<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="platform">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Platform</a><a class="headerlink" href="#platform" title="Link to this heading"></a></h2>
 <p>The <cite>package_generator.py</cite> script is designed to work on Linux, Windows, and macOS.
 Below are platform-specific details and instructions:</p>
 <p><strong>Linux</strong></p>
@@ -410,8 +412,8 @@ Below are platform-specific details and instructions:</p>
 - macOS handles file permissions similarly to Linux, so no additional adjustments are needed.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h2>Running the Script<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<section id="running-the-script">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">Running the Script</a><a class="headerlink" href="#running-the-script" title="Link to this heading"></a></h2>
 <p><strong>Basic Usage</strong></p>
 <ol class="arabic">
 <li><p>If the script is run from the <cite>scopy/tools/packagegenerator</cite> directory:</p>
@@ -493,8 +495,8 @@ Below are platform-specific details and instructions:</p>
 </li>
 </ol>
 </section>
-<section id="id5">
-<h2>Configuration Files<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<section id="configuration-files">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Configuration Files</a><a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h2>
 <p><strong>pkg.json</strong></p>
 <p>The <cite>pkg.json</cite> file contains the configuration details for generating packages. Example:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -552,8 +554,8 @@ Below are platform-specific details and instructions:</p>
 </pre></div>
 </div>
 </section>
-<section id="id6">
-<h2>Manifest File<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<section id="manifest-file">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">Manifest File</a><a class="headerlink" href="#manifest-file" title="Link to this heading"></a></h2>
 <p>The <cite>manifest.json.cmakein</cite> file is generated as part of the package structure. It contains metadata about the package and is used during the build process. Example:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newpackage&quot;</span><span class="p">,</span>
@@ -567,8 +569,8 @@ Below are platform-specific details and instructions:</p>
 </div>
 <p>The manifest file is automatically created during the package generation process and ensures that all necessary metadata is included for proper integration with Scopy.</p>
 </section>
-<section id="id7">
-<h2>Packages development flow<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<section id="packages-development-flow">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">Packages development flow</a><a class="headerlink" href="#packages-development-flow" title="Link to this heading"></a></h2>
 <p><strong>New package</strong></p>
 <ol class="arabic">
 <li><p>Clone Scopy using:</p>
@@ -652,8 +654,8 @@ Below are platform-specific details and instructions:</p>
 </li>
 </ol>
 </section>
-<section id="id8">
-<h2>Scopy PDK<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<section id="scopy-pdk">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">Scopy PDK</a><a class="headerlink" href="#scopy-pdk" title="Link to this heading"></a></h2>
 <p><strong>Adding New Modules to the PDK Package</strong></p>
 <p>To include a new module in the PDK package, ensure that the <cite>COMPONENT ${SCOPY_PDK}</cite> option is added when installing libraries or directories in <cite>CMakeLists.txt</cite>.</p>
 <ul>
@@ -706,8 +708,8 @@ Below are platform-specific details and instructions:</p>
 </li>
 </ol>
 </section>
-<section id="id9">
-<h2>Adding New Config Specifications<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<section id="adding-new-config-specifications">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Adding New Config Specifications</a><a class="headerlink" href="#adding-new-config-specifications" title="Link to this heading"></a></h2>
 <p>To add new specifications for fields like <cite>plugin</cite>, <cite>tool</cite>, or <cite>cmakelists</cite>, follow these steps:</p>
 <ol class="arabic simple">
 <li><p>Add the new specification to the desired field in <cite>pkg.json</cite> or <cite>plugin.json</cite>.</p></li>

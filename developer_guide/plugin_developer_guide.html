@@ -96,18 +96,18 @@
         <nav>
           <ul>
 <li><a class="reference internal" href="#">Plugin Developer Guide</a><ul>
-<li><a class="reference internal" href="#id2">1. <strong>Using Connection Provider</strong></a></li>
-<li><a class="reference internal" href="#id3">2. <strong>How Do We Determine When the Plugin Will Show (Compatibility Condition)</strong></a></li>
-<li><a class="reference internal" href="#id4">3. <strong>How to Filter Between Compatible Plugins</strong></a></li>
-<li><a class="reference internal" href="#id5">4. <strong>Setting Tool Icon and Title</strong></a></li>
-<li><a class="reference internal" href="#id6">5. <strong>How to Add Resources</strong></a></li>
-<li><a class="reference internal" href="#id7">6. <strong>How to Create / Edit Preferences for the Plugin</strong></a></li>
-<li><a class="reference internal" href="#id8">7. <strong>How to Add Compatible Plugins</strong></a></li>
-<li><a class="reference internal" href="#id9">8. <strong>Useful Tools</strong></a></li>
-<li><a class="reference internal" href="#id10">9. <strong>IIOWidgets</strong></a></li>
-<li><a class="reference internal" href="#id11">10. <strong>Menu UI Items</strong></a></li>
-<li><a class="reference internal" href="#id12">11. <strong>How to Create a Device Icon</strong></a></li>
-<li><a class="reference internal" href="#id13">12. <strong>How to Create a Tutorial for Your Plugin</strong></a></li>
+<li><a class="reference internal" href="#using-connection-provider">Using Connection Provider</a></li>
+<li><a class="reference internal" href="#how-do-we-determine-when-the-plugin-will-show-compatibility-condition">How Do We Determine When the Plugin Will Show (Compatibility Condition)</a></li>
+<li><a class="reference internal" href="#how-to-filter-between-compatible-plugins">How to Filter Between Compatible Plugins</a></li>
+<li><a class="reference internal" href="#setting-tool-icon-and-title">Setting Tool Icon and Title</a></li>
+<li><a class="reference internal" href="#how-to-add-resources">How to Add Resources</a></li>
+<li><a class="reference internal" href="#how-to-create-edit-preferences-for-the-plugin">How to Create / Edit Preferences for the Plugin</a></li>
+<li><a class="reference internal" href="#how-to-add-compatible-plugins">How to Add Compatible Plugins</a></li>
+<li><a class="reference internal" href="#useful-tools">Useful Tools</a></li>
+<li><a class="reference internal" href="#iiowidgets">IIOWidgets</a></li>
+<li><a class="reference internal" href="#menu-ui-items">Menu UI Items</a></li>
+<li><a class="reference internal" href="#how-to-create-a-device-icon">How to Create a Device Icon</a></li>
+<li><a class="reference internal" href="#how-to-create-a-tutorial-for-your-plugin">How to Create a Tutorial for Your Plugin</a></li>
 <li><a class="reference internal" href="#conclusion">Conclusion</a></li>
 </ul>
 </li>
@@ -317,22 +317,25 @@ handling preferences, and integrating advanced features like IIOWidgets and inte
 Each chapter is designed to help both new and experienced developers build, configure,
 and enhance Scopy plugins efficiently and according to best practices.</p>
 <p>Chapters</p>
+<nav class="contents local" id="contents">
 <ul class="simple">
-<li><p><a class="reference external" href="#using-connection-provider">1. Using Connection Provider</a></p></li>
-<li><p><a class="reference external" href="#how-do-we-determine-when-the-plugin-will-show-compatibility-condition">2. How Do We Determine When the Plugin Will Show (Compatibility Condition)</a></p></li>
-<li><p><a class="reference external" href="#how-to-filter-between-compatible-plugins">3. How to Filter Between Compatible Plugins</a></p></li>
-<li><p><a class="reference external" href="#setting-tool-icon-and-title">4. Setting Tool Icon and Title</a></p></li>
-<li><p><a class="reference external" href="#how-to-add-resources">5. How to Add Resources</a></p></li>
-<li><p><a class="reference external" href="#how-to-create--edit-preferences-for-the-plugin">6. How to Create / Edit Preferences for the Plugin</a></p></li>
-<li><p><a class="reference external" href="#how-to-add-compatible-plugins">7. How to Add Compatible Plugins</a></p></li>
-<li><p><a class="reference external" href="#useful-tools">8. Useful Tools</a></p></li>
-<li><p><a class="reference external" href="#iiowidgets">9. IIOWidgets</a></p></li>
-<li><p><a class="reference external" href="#menu-ui-items">10. Menu UI Items</a></p></li>
-<li><p><a class="reference external" href="#how-to-create-a-device-icon">11. How to Create a Device Icon</a></p></li>
-<li><p><a class="reference external" href="#how-to-create-a-tutorial-for-your-plugin">12. How to Create a Tutorial for Your Plugin</a></p></li>
+<li><p><a class="reference internal" href="#using-connection-provider" id="id2">Using Connection Provider</a></p></li>
+<li><p><a class="reference internal" href="#how-do-we-determine-when-the-plugin-will-show-compatibility-condition" id="id3">How Do We Determine When the Plugin Will Show (Compatibility Condition)</a></p></li>
+<li><p><a class="reference internal" href="#how-to-filter-between-compatible-plugins" id="id4">How to Filter Between Compatible Plugins</a></p></li>
+<li><p><a class="reference internal" href="#setting-tool-icon-and-title" id="id5">Setting Tool Icon and Title</a></p></li>
+<li><p><a class="reference internal" href="#how-to-add-resources" id="id6">How to Add Resources</a></p></li>
+<li><p><a class="reference internal" href="#how-to-create-edit-preferences-for-the-plugin" id="id7">How to Create / Edit Preferences for the Plugin</a></p></li>
+<li><p><a class="reference internal" href="#how-to-add-compatible-plugins" id="id8">How to Add Compatible Plugins</a></p></li>
+<li><p><a class="reference internal" href="#useful-tools" id="id9">Useful Tools</a></p></li>
+<li><p><a class="reference internal" href="#iiowidgets" id="id10">IIOWidgets</a></p></li>
+<li><p><a class="reference internal" href="#menu-ui-items" id="id11">Menu UI Items</a></p></li>
+<li><p><a class="reference internal" href="#how-to-create-a-device-icon" id="id12">How to Create a Device Icon</a></p></li>
+<li><p><a class="reference internal" href="#how-to-create-a-tutorial-for-your-plugin" id="id13">How to Create a Tutorial for Your Plugin</a></p></li>
+<li><p><a class="reference internal" href="#conclusion" id="id14">Conclusion</a></p></li>
 </ul>
-<section id="id2">
-<h2>1. <strong>Using Connection Provider</strong><a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+</nav>
+<section id="using-connection-provider">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Using Connection Provider</a><a class="headerlink" href="#using-connection-provider" title="Link to this heading"></a></h2>
 <p>Understand how to use the connection provider to interact with external
 systems or data sources.</p>
 <p>To access the device, we use the <cite>ConnectionProvider</cite> class. This class is
@@ -355,8 +358,8 @@ code:</p>
 </pre></div>
 </div>
 </section>
-<section id="id3">
-<h2>2. <strong>How Do We Determine When the Plugin Will Show (Compatibility Condition)</strong><a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<section id="how-do-we-determine-when-the-plugin-will-show-compatibility-condition">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">How Do We Determine When the Plugin Will Show (Compatibility Condition)</a><a class="headerlink" href="#how-do-we-determine-when-the-plugin-will-show-compatibility-condition" title="Link to this heading"></a></h2>
 <p>To determine if the plugin you created will show as an option for a device,
 you need to create a compatibility condition. This is done inside the
 <cite>compatible</cite> function, depending on the restrictions of your plugin. Here,
@@ -384,8 +387,8 @@ a device, we would use:</p>
 does, the plugin will be marked as compatible and will show as an option for
 the device.</p>
 </section>
-<section id="id4">
-<h2>3. <strong>How to Filter Between Compatible Plugins</strong><a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<section id="how-to-filter-between-compatible-plugins">
+<h2><a class="toc-backref" href="#id4" role="doc-backlink">How to Filter Between Compatible Plugins</a><a class="headerlink" href="#how-to-filter-between-compatible-plugins" title="Link to this heading"></a></h2>
 <p>Inside the <cite>initMetadata()</cite> function, you can define specific metadata to
 filter and prioritize plugins. This metadata includes the following fields:</p>
 <ul>
@@ -417,8 +420,8 @@ ensure it will show. For example:</p>
 <p>By setting these fields appropriately, you can control the visibility and
 priority of your plugin relative to others.</p>
 </section>
-<section id="id5">
-<h2>4. <strong>Setting Tool Icon and Title</strong><a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<section id="setting-tool-icon-and-title">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink">Setting Tool Icon and Title</a><a class="headerlink" href="#setting-tool-icon-and-title" title="Link to this heading"></a></h2>
 <p>To have your plugin’s tools appear in the left menu among others, you need to
 set a title and an icon for it. Since a plugin can have multiple tools, each
 tool needs to be considered during this process.</p>
@@ -447,8 +450,8 @@ example:</p>
 <p>By following these steps, you can ensure that your plugin’s tools are
 properly displayed and functional in the Scopy interface.</p>
 </section>
-<section id="id6">
-<h2>5. <strong>How to Add Resources</strong><a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<section id="how-to-add-resources">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink">How to Add Resources</a><a class="headerlink" href="#how-to-add-resources" title="Link to this heading"></a></h2>
 <p>To add resource files to your plugin, you first need to place the file in the
 <cite>resources</cite> folder of your project. Then, in the same folder, locate the
 <cite>resources.qrc</cite> file and add the resource name to it.</p>
@@ -469,8 +472,8 @@ by referencing it as follows:</p>
 <p>By following these steps, you can include and use additional resource files,
 such as images, or other assets, in your plugin.</p>
 </section>
-<section id="id7">
-<h2>6. <strong>How to Create / Edit Preferences for the Plugin</strong><a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<section id="how-to-create-edit-preferences-for-the-plugin">
+<h2><a class="toc-backref" href="#id7" role="doc-backlink">How to Create / Edit Preferences for the Plugin</a><a class="headerlink" href="#how-to-create-edit-preferences-for-the-plugin" title="Link to this heading"></a></h2>
 <p>Plugin preferences are settings that retain their values between runs. These
 preferences are available before connecting to a device and are displayed in
 the bottom left corner of the application.</p>
@@ -548,8 +551,8 @@ preference called <cite>myplugin_test</cite>, you can do the following:</p>
 If you want to update your code when the value of a preference changes, you
 can use the <cite>preferenceChanged</cite> signal from the <cite>Preferences</cite> class.</p>
 </section>
-<section id="id8">
-<h2>7. <strong>How to Add Compatible Plugins</strong><a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<section id="how-to-add-compatible-plugins">
+<h2><a class="toc-backref" href="#id8" role="doc-backlink">How to Add Compatible Plugins</a><a class="headerlink" href="#how-to-add-compatible-plugins" title="Link to this heading"></a></h2>
 <p>If you want to use parts of other plugins in your plugin, you first need to
 modify your plugin’s <cite>CMakeLists.txt</cite> file.</p>
 <p>### Adding a Library to Your Plugin</p>
@@ -573,8 +576,8 @@ can access its functionality in your plugin.</p>
 <p>Ensure that the library you are linking is available and properly configured
 in your Scopy environment.</p>
 </section>
-<section id="id9">
-<h2>8. <strong>Useful Tools</strong><a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<section id="useful-tools">
+<h2><a class="toc-backref" href="#id9" role="doc-backlink">Useful Tools</a><a class="headerlink" href="#useful-tools" title="Link to this heading"></a></h2>
 <p>We have a couple of tools designed to make some of your work easier. Among
 these tools are a script for code formatting and a script for license
 headers. It is recommended that, before making a pull request, you run these
@@ -592,8 +595,8 @@ To run it, use the following command:</p>
 </pre></div>
 </div>
 </section>
-<section id="id10">
-<h2>9. <strong>IIOWidgets</strong><a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<section id="iiowidgets">
+<h2><a class="toc-backref" href="#id10" role="doc-backlink">IIOWidgets</a><a class="headerlink" href="#iiowidgets" title="Link to this heading"></a></h2>
 <p><cite>IIOWidgets</cite> are modular UI components in Scopy designed to facilitate
 interaction with IIO (Industrial I/O) devices. They provide a graphical
 interface for displaying and managing data from these devices, making it
@@ -674,15 +677,15 @@ indicators.</p></li>
 <p>By leveraging <cite>IIOWidgets</cite>, developers can create powerful and user-friendly
 interfaces for interacting with IIO devices in Scopy.</p>
 </section>
-<section id="id11">
-<h2>10. <strong>Menu UI Items</strong><a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<section id="menu-ui-items">
+<h2><a class="toc-backref" href="#id11" role="doc-backlink">Menu UI Items</a><a class="headerlink" href="#menu-ui-items" title="Link to this heading"></a></h2>
 <p>Scopy provides a variety of <cite>Menu</cite> UI components to help developers build
 menus, settings panels, and other hierarchical UI structures. For details on
 available menu components and their usage, please refer to the relevant
 documentation or code examples.</p>
 </section>
-<section id="id12">
-<h2>11. <strong>How to Create a Device Icon</strong><a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<section id="how-to-create-a-device-icon">
+<h2><a class="toc-backref" href="#id12" role="doc-backlink">How to Create a Device Icon</a><a class="headerlink" href="#how-to-create-a-device-icon" title="Link to this heading"></a></h2>
 <p>To create a custom device icon for your plugin, you can use the
 <cite>DeviceIconBuilder</cite> class. This allows you to combine images and labels to
 create a visually distinctive icon for your device in the Scopy interface.</p>
@@ -715,8 +718,8 @@ create a visually distinctive icon for your device in the Scopy interface.</p>
 <p>You can customize the icon by changing the image, label text, or shape as
 needed for your device.</p>
 </section>
-<section id="id13">
-<h2>12. <strong>How to Create a Tutorial for Your Plugin</strong><a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<section id="how-to-create-a-tutorial-for-your-plugin">
+<h2><a class="toc-backref" href="#id13" role="doc-backlink">How to Create a Tutorial for Your Plugin</a><a class="headerlink" href="#how-to-create-a-tutorial-for-your-plugin" title="Link to this heading"></a></h2>
 <p>Scopy supports interactive tutorials for plugins, allowing you to guide users
 through your tool’s features step by step. Tutorials are defined using JSON
 files and integrated into the GUI using the tutorial overlay system.</p>
@@ -785,7 +788,7 @@ the JSON.</p></li>
 </ul>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
+<h2><a class="toc-backref" href="#id14" role="doc-backlink">Conclusion</a><a class="headerlink" href="#conclusion" title="Link to this heading"></a></h2>
 <p>By following these chapters, you will gain a comprehensive understanding of how to create,
 customize, and deploy plugins in Scopy.</p>
 </section>
