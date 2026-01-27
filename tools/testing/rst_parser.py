@@ -13,9 +13,10 @@ This module provides the core functionality for:
 import os
 import re
 
-# Regex patterns for UID/RBP extraction
-UID_PATTERN = r'\*\*UID:\*\*\s+([A-Z_][A-Z0-9_.]*)'
-RBP_PATTERN = r'\*\*RBP:\*\*\s+(P[0-3])'
+# Regex patterns for UID/RBP extraction - handle all formats found in docs
+# Formats: **UID:** value and **UID**: value
+UID_PATTERN = r'\*\*UID[\*:]+\s*([A-Z_][A-Z0-9_.]*)'
+RBP_PATTERN = r'\*\*RBP[\*:]+\s*(P[0-3])'
 
 
 def scan_test_files(source_dir):
@@ -83,7 +84,8 @@ def parse_rst_structure(content):
     """Parse RST into header section + individual test sections."""
 
     # Find test boundaries using pattern: "Test N " followed by underline
-    test_pattern = r'^(Test \d+[^\n]*\n[\^=-]+\n)'
+    # Handle all underline types: dashes, tildes, carets, equals
+    test_pattern = r'^(Test \d+[^\n]*\n[\^=\-~]+\n)'
 
     # Split content at test boundaries
     parts = re.split(test_pattern, content, flags=re.MULTILINE)
