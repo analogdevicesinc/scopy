@@ -31,6 +31,11 @@
 #include <animatedrefreshbtn.h>
 #include <iio.h>
 
+// JESD widget includes
+#include "advanced/jesdsettingswidget.h"
+#include "advanced/jesdframerwidget.h"
+#include "advanced/jesddeframerwidget.h"
+
 namespace scopy::adrv9009 {
 
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
@@ -50,7 +55,7 @@ private:
 	AnimatedRefreshBtn *m_refreshButton;
 	QStackedWidget *m_centralWidget;
 
-	// Navigation buttons (13 sections)
+	// Navigation buttons (15 sections)
 	QPushButton *m_clkSettingsBtn = nullptr;
 	QPushButton *m_calibrationsBtn = nullptr;
 	QPushButton *m_txSettingsBtn = nullptr;
@@ -63,6 +68,8 @@ private:
 	QPushButton *m_gpioConfigBtn = nullptr;
 	QPushButton *m_auxDacBtn = nullptr;
 	QPushButton *m_jesd204SettingsBtn = nullptr;
+	QPushButton *m_jesdFramerBtn = nullptr;
+	QPushButton *m_jesdDeframerBtn = nullptr;
 	QPushButton *m_bistBtn = nullptr;
 
 	// Navigation layout widgets (created once, reused)
@@ -84,7 +91,9 @@ private:
 	QWidget *m_agcSetup = nullptr;
 	QWidget *m_gpioConfig = nullptr;
 	QWidget *m_auxDac = nullptr;
-	QWidget *m_jesd204Settings = nullptr;
+	JesdSettingsWidget *m_jesd204Settings = nullptr;
+	JesdFramerWidget *m_jesdFramer = nullptr;
+	JesdDeframerWidget *m_jesdDeframer = nullptr;
 	QWidget *m_bist = nullptr;
 
 	void setupUi();
