@@ -27,6 +27,8 @@ General IIO plugins
 * :ref:`Scripting tool <scripting_tool>`
 
 
+* :ref:`IMU Analyzer <imuanalyzer>`
+
 Application Specific plugins
 
 * ADALM2000 plugins :
@@ -85,4 +87,5 @@ Contents
    adrv9002/adrv9002
    jesdstatus/index
    scripting/scripting
+   imuanalyzer/imuanalyzer
 
