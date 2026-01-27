@@ -1,0 +1,37 @@
+<h1>RF Power Meter Plugin</h1>
+
+<p>Scopy now offers dedicated support for RF power measurement with the new <b>RF Power Meter Plugin</b>. This specialized tool transforms the Scopy Data Logger into a real-time RF power measurement instrument when connected to compatible hardware featuring the <code>powrms</code> IIO device.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>Forward Power Measurement:</b> Real-time monitoring of forward RF power in dBm</li>
+  <li><b>Reverse Power Detection:</b> Simultaneous measurement of reflected power in dBm for bidirectional monitoring</li>
+  <li><b>Corrected Voltage Readings:</b> Temperature and calibration-corrected input/output voltage measurements in millivolts</li>
+  <li><b>Raw Voltage Monitoring:</b> Uncorrected voltage measurements for diagnostic purposes</li>
+  <li><b>Intuitive Display:</b> Seven-segment display interface for easy reading of measurements</li>
+  <li><b>Automatic Detection:</b> Seamless device discovery when connecting compatible hardware</li>
+</ul>
+
+<h2>Hardware Requirements</h2>
+<ul>
+  <li>ADI RF power measurement evaluation boards or compatible devices with <code>powrms</code> IIO interface</li>
+  <li>USB or Ethernet connection to the RF power measurement device</li>
+  <li>Stable IIO context for device communication</li>
+</ul>
+
+<h2>Dependencies</h2>
+<ul>
+  <li><b>Data Logger Plugin:</b> Must be installed and enabled (the RF Power Meter plugin extends Data Logger functionality)</li>
+  <li>IIO drivers for the target hardware</li>
+</ul>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Ensure the Data Logger plugin is installed and enabled.</li>
+  <li>Connect your RF power measurement device to your computer.</li>
+  <li>Open Scopy and the plugin will automatically detect compatible devices.</li>
+  <li>The RF Power Meter interface will transform the Data Logger display to show power and voltage measurements.</li>
+  <li>Monitor real-time forward/reverse power readings and temperature-compensated voltage values.</li>
+</ol>
+
+<p>For more detailed information, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/rfpowermeter/rfpowermeter.html" target="_blank">official documentation</a>.</p>
