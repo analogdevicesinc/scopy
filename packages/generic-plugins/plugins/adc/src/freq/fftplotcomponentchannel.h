@@ -33,6 +33,8 @@
 namespace scopy {
 namespace adc {
 
+class MinMaxHoldController;
+
 class SCOPY_ADC_EXPORT FFTPlotComponentChannel : public QObject, public PlotComponentChannel
 {
 	Q_OBJECT
@@ -45,6 +47,7 @@ public:
 	PlotComponent *plotComponent() override;
 	PlotChannel *plotChannel() override;
 	FFTMarkerController *markerController() const;
+	MinMaxHoldController *minMaxHoldController() const;
 
 public Q_SLOTS:
 	void enable() override;
@@ -68,6 +71,7 @@ public:
 
 private:
 	FFTMarkerController *m_markerController;
+	MinMaxHoldController *m_minMaxHoldController;
 };
 } // namespace adc
 } // namespace scopy

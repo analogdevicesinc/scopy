@@ -31,6 +31,7 @@
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <freq/fftplotcomponentchannel.h>
+#include <minmaxholdcontroller.hpp>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <QSpinBox>
 #include <QVariantMap>
@@ -186,9 +187,11 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	QWidget *markerMenu = createMarkerMenu(m_menu);
 	QWidget *avgMenu = createAveragingMenu(m_menu);
+	QWidget *minMaxHoldMenu = createMinMaxHoldMenu(m_menu);
 	m_menu->add(yaxismenu, "yaxis");
 	m_menu->add(markerMenu, "marker");
 	m_menu->add(avgMenu, "average");
+	m_menu->add(minMaxHoldMenu, "minmaxhold");
 	m_menu->add(curvemenu, "curve");
 
 	if(dynamic_cast<GRIIOComplexChannelSrc *>(m_src) != nullptr) {
@@ -243,6 +246,75 @@ QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
 			ch->setAveragingSize(value);
 		}
 	});
+
+	section->contentLayout()->addLayout(layout);
+	section->setCollapsed(true);
+	return section;
+}
+
+QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
+		"MIN/MAX HOLD", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	auto layout = new QVBoxLayout();
+	layout->setSpacing(5);
+	layout->setMargin(0);
+	int btnSize = Style::getDimension(json::global::unit_2);
+
+	// Min hold row
+	auto minLayout = new QHBoxLayout();
+	minLayout->setSpacing(10);
+	minLayout->setMargin(0);
+	QLabel *minHoldLabel(new QLabel("Min curve"));
+	Style::setStyle(minHoldLabel, style::properties::label::subtle);
+	SmallOnOffSwitch *minHoldSwitch = new SmallOnOffSwitch(section);
+	QPushButton *minResetBtn = new QPushButton("Reset", section);
+	minResetBtn->setIcon(
+		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	minResetBtn->setFixedHeight(btnSize);
+	minResetBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	Style::setStyle(minResetBtn, style::properties::button::grayButton);
+	minLayout->addWidget(minHoldLabel);
+	minLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+	minLayout->addWidget(minResetBtn);
+	minLayout->addWidget(minHoldSwitch);
+
+	// Max hold row
+	auto maxLayout = new QHBoxLayout();
+	maxLayout->setSpacing(10);
+	maxLayout->setMargin(0);
+	QLabel *maxHoldLabel(new QLabel("Max curve"));
+	Style::setStyle(maxHoldLabel, style::properties::label::subtle);
+	SmallOnOffSwitch *maxHoldSwitch = new SmallOnOffSwitch(section);
+	QPushButton *maxResetBtn = new QPushButton("Reset", section);
+	maxResetBtn->setIcon(
+		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	maxResetBtn->setFixedHeight(btnSize);
+	maxResetBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	Style::setStyle(maxResetBtn, style::properties::button::grayButton);
+	maxLayout->addWidget(maxHoldLabel);
+	maxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+	maxLayout->addWidget(maxResetBtn);
+	maxLayout->addWidget(maxHoldSwitch);
+
+	MenuOnOffSwitch *hideMainSwitch = new MenuOnOffSwitch("Hide main curve", section);
+	hideMainSwitch->setEnabled(false);
+
+	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, controller,
+		&MinMaxHoldController::setEnabled);
+	connect(minHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMinEnabled);
+	connect(maxHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMaxEnabled);
+	connect(minResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMin);
+	connect(maxResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMax);
+	connect(hideMainSwitch->onOffswitch(), &QAbstractButton::toggled, controller,
+		&MinMaxHoldController::setMainChannelHidden);
+	connect(controller, &MinMaxHoldController::enabledChanged, hideMainSwitch, &QWidget::setEnabled);
+
+	layout->addLayout(minLayout);
+	layout->addLayout(maxLayout);
+	layout->addWidget(hideMainSwitch);
 
 	section->contentLayout()->addLayout(layout);
 	section->setCollapsed(true);

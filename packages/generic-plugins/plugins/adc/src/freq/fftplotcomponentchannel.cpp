@@ -20,6 +20,7 @@
  */
 
 #include "fftplotcomponentchannel.h"
+#include <minmaxholdcontroller.hpp>
 #include <pluginbase/preferences.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menuplotaxisrangecontrol.h>
@@ -38,6 +39,7 @@ FFTPlotComponentChannel::FFTPlotComponentChannel(ChannelComponent *ch, FFTPlotCo
 	m_ch = ch;
 	m_plotComponent = nullptr;
 	m_markerController = new FFTMarkerController(this, this);
+	m_minMaxHoldController = new MinMaxHoldController(this, this);
 	initPlotComponent(plotComponent);
 
 	m_fftPlotYAxis->setUnits("dBFS");
@@ -62,6 +64,8 @@ void FFTPlotComponentChannel::deinitPlotComponent()
 }
 
 FFTMarkerController *FFTPlotComponentChannel::markerController() const { return m_markerController; }
+
+MinMaxHoldController *FFTPlotComponentChannel::minMaxHoldController() const { return m_minMaxHoldController; }
 
 void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 {
@@ -116,20 +120,23 @@ void FFTPlotComponentChannel::refreshData(bool copy)
 void FFTPlotComponentChannel::onNewData(const float *xData_, const float *yData_, size_t size, bool copy)
 {
 	refreshData(copy);
+
+	m_minMaxHoldController->update(xData_, yData_, size);
 	m_markerController->computeMarkers();
 }
 
 void FFTPlotComponentChannel::lockYAxis(bool b)
 {
 	m_singleYMode = b;
+	PlotAxis *y;
 	if(m_singleYMode) {
-		PlotAxis *y = m_plotComponent->fftPlot()->yAxis();
-		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, y);
+		y = m_plotComponent->fftPlot()->yAxis();
 	} else {
-		PlotAxis *y = m_fftPlotYAxis;
-		m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, y);
+		y = m_fftPlotYAxis;
 	}
 
+	m_plotComponent->fftPlot()->plotChannelChangeYAxis(m_fftPlotCh, y);
+	m_minMaxHoldController->onYAxisChanged(y);
 	m_markerController->setAxes(m_fftPlotCh->xAxis()->axisId(), m_fftPlotCh->yAxis()->axisId());
 
 	m_fftPlotAxisHandle->handle()->setVisible(!b);
@@ -166,6 +173,7 @@ void FFTPlotComponentChannel::enable()
 	}
 	m_enabled = true;
 	m_markerController->setEnabled(true);
+	m_minMaxHoldController->onChannelEnabled();
 }
 
 void FFTPlotComponentChannel::disable()
@@ -176,6 +184,7 @@ void FFTPlotComponentChannel::disable()
 	}
 	m_enabled = false;
 	m_markerController->setEnabled(false);
+	m_minMaxHoldController->onChannelDisabled();
 }
 
 #include "moc_fftplotcomponentchannel.cpp"

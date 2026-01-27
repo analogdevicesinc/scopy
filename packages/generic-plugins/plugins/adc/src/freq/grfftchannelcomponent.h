@@ -261,6 +261,7 @@ private:
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
 	QWidget *createAveragingMenu(QWidget *parent);
+	QWidget *createMinMaxHoldMenu(QWidget *parent);
 	QPushButton *createSnapshotButton(QWidget *parent);
 
 	YMode m_ymode;
