@@ -80,7 +80,7 @@ def extract_component_from_testing_path(relative_path):
 def parse_rst_structure(content):
     """Parse RST into header section + individual test sections."""
     # Find test boundaries using pattern: "Test N " followed by underline
-    test_pattern = r'^(Test \d+[^\n]*\n[\^=-]+\n)'
+    test_pattern = r'^(Test \d+[^\n]*\n[\^=\-~]+\n)'
 
     # Split content at test boundaries
     parts = re.split(test_pattern, content, flags=re.MULTILINE)
@@ -114,7 +114,8 @@ def parse_rst_structure(content):
 
 def extract_uid_from_content(content):
     """Extract UID from test content block."""
-    uid_pattern = r'\*\*UID:\*\*\s+([A-Z_][A-Z0-9_.]*)'
+    # Handle both **UID:** and **UID**: formats
+    uid_pattern = r'\*\*UID[\*:]+\s*([A-Z_][A-Z0-9_.]*)'
     match = re.search(uid_pattern, content)
     return match.group(1) if match else 'MISSING'
 
