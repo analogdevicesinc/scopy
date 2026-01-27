@@ -24,6 +24,7 @@ Contents
    fmcomms5/index
    adrv9002/index
    imuanalyzer/index
+   rfpowermeter/index
 
 ..
  add the path to each plugin test case here
