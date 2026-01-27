@@ -68,6 +68,10 @@ Application Specific plugins
 * ADRV9002
     * :ref:`ADRV9002 (Jupiter) <adrv9002>`
 
+* ADRV9009
+    * :ref:`ADRV9009 <adrv9009>`
+    * :ref:`ADRV9009 Advanced <adrv9009_advanced>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -86,6 +90,7 @@ Contents
    ad936x/index
    ad9084/index
    adrv9002/adrv9002
+   adrv9009/index
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
