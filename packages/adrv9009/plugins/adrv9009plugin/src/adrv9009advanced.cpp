@@ -103,54 +103,67 @@ void Adrv9009Advanced::createNavigationButtons()
 	Style::setStyle(m_clkSettingsBtn, style::properties::button::blueGrayButton);
 	m_clkSettingsBtn->setCheckable(true);
 	m_clkSettingsBtn->setChecked(true); // First button starts selected
+	m_clkSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_calibrationsBtn = new QPushButton("Calibrations", this);
 	Style::setStyle(m_calibrationsBtn, style::properties::button::blueGrayButton);
 	m_calibrationsBtn->setCheckable(true);
+	m_calibrationsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_txSettingsBtn = new QPushButton("TX Settings", this);
 	Style::setStyle(m_txSettingsBtn, style::properties::button::blueGrayButton);
 	m_txSettingsBtn->setCheckable(true);
+	m_txSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_rxSettingsBtn = new QPushButton("RX Settings", this);
 	Style::setStyle(m_rxSettingsBtn, style::properties::button::blueGrayButton);
 	m_rxSettingsBtn->setCheckable(true);
+	m_rxSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_orxSettingsBtn = new QPushButton("ORX Settings", this);
 	Style::setStyle(m_orxSettingsBtn, style::properties::button::blueGrayButton);
 	m_orxSettingsBtn->setCheckable(true);
+	m_orxSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_fhmSetupBtn = new QPushButton("FHM Setup", this);
 	Style::setStyle(m_fhmSetupBtn, style::properties::button::blueGrayButton);
 	m_fhmSetupBtn->setCheckable(true);
+	m_fhmSetupBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_paProtectionBtn = new QPushButton("PA Protection", this);
 	Style::setStyle(m_paProtectionBtn, style::properties::button::blueGrayButton);
 	m_paProtectionBtn->setCheckable(true);
+	m_paProtectionBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_gainSetupBtn = new QPushButton("GAIN Setup", this);
 	Style::setStyle(m_gainSetupBtn, style::properties::button::blueGrayButton);
 	m_gainSetupBtn->setCheckable(true);
+	m_gainSetupBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_agcSetupBtn = new QPushButton("AGC Setup", this);
 	Style::setStyle(m_agcSetupBtn, style::properties::button::blueGrayButton);
 	m_agcSetupBtn->setCheckable(true);
+	m_agcSetupBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_gpioConfigBtn = new QPushButton("GPIO Config", this);
 	Style::setStyle(m_gpioConfigBtn, style::properties::button::blueGrayButton);
 	m_gpioConfigBtn->setCheckable(true);
+	m_gpioConfigBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_auxDacBtn = new QPushButton("AUX DAC", this);
 	Style::setStyle(m_auxDacBtn, style::properties::button::blueGrayButton);
 	m_auxDacBtn->setCheckable(true);
+	m_auxDacBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_jesd204SettingsBtn = new QPushButton("JESD204 Settings", this);
 	Style::setStyle(m_jesd204SettingsBtn, style::properties::button::blueGrayButton);
 	m_jesd204SettingsBtn->setCheckable(true);
+	m_jesd204SettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	m_bistBtn = new QPushButton("BIST", this);
 	Style::setStyle(m_bistBtn, style::properties::button::blueGrayButton);
 	m_bistBtn->setCheckable(true);
+	m_bistBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	// Add buttons to button group
 	navigationButtons->addButton(m_clkSettingsBtn);
@@ -184,30 +197,11 @@ void Adrv9009Advanced::createNavigationButtons()
 	m_secondRowLayout->setMargin(0);
 	m_secondRowLayout->setSpacing(5);
 
-	// Create expand button once
-	m_expandBtn = new QPushButton("⋯", this);
-	m_expandBtn->setCheckable(true);
-	Style::setStyle(m_expandBtn, style::properties::button::blueGrayButton);
-
-	// Connect expand/collapse logic once (not repeatedly in updateNavigationButtonsLayout)
-	connect(m_expandBtn, &QPushButton::clicked, [this]() {
-		bool isVisible = m_secondRow->isVisible();
-		m_secondRow->setVisible(!isVisible);
-
-		// Change top container height: 44px single row, 88px double row
-		if(!isVisible) {
-			m_tool->topContainer()->setFixedHeight(88);
-		} else {
-			m_tool->topContainer()->setFixedHeight(44);
-		}
-	});
+	m_navigationSpacerItem = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	// Add persistent row widgets to main navigation layout
 	navLayout->addWidget(m_firstRow);
 	navLayout->addWidget(m_secondRow);
-
-	// Initially hide second row
-	m_secondRow->setVisible(false);
 
 	updateNavigationButtonsLayout();
 
@@ -282,8 +276,8 @@ void Adrv9009Advanced::updateNavigationButtonsLayout()
 	// Step 1: Calculate available width (same as before)
 	int containerWidth = m_tool->width();
 	int refreshButtonWidth = m_refreshButton->width();
-	int expandButtonWidth = m_expandBtn->width(); // Approximate width for expand button
-	int availableWidth = containerWidth - expandButtonWidth - refreshButtonWidth;
+	int layoutSpacingAndMargins = 50; // consider the spacing when computin so buttons text will not be cropped
+	int availableWidth = containerWidth - layoutSpacingAndMargins - refreshButtonWidth;
 
 	// Create list of all navigation buttons in order (same as before)
 	QList<QPushButton *> allButtons = {m_clkSettingsBtn, m_calibrationsBtn, m_txSettingsBtn,   m_rxSettingsBtn,
@@ -313,18 +307,14 @@ void Adrv9009Advanced::updateNavigationButtonsLayout()
 	}
 
 	if(!remainingButtons.isEmpty()) {
-		m_expandBtn->setVisible(true);
-		m_firstRowLayout->addWidget(m_expandBtn);
-
+		m_tool->topContainer()->setFixedHeight(88);
+		m_secondRowLayout->removeItem(m_navigationSpacerItem);
 		for(QPushButton *button : remainingButtons) {
 			m_secondRowLayout->addWidget(button);
 		}
-
-		// Step 4: Show/hide second row and expand button based on expand button state
-		bool isExpandingEnabled = m_expandBtn->isChecked();
-		m_secondRow->setVisible(isExpandingEnabled); // Always start hidden
+		m_secondRowLayout->addItem(m_navigationSpacerItem);
 	} else {
-		m_expandBtn->setVisible(false);
+		m_tool->topContainer()->setFixedHeight(44);
 	}
 }
 
