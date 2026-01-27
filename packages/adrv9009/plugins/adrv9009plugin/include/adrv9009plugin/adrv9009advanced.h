@@ -33,6 +33,8 @@
 
 namespace scopy::adrv9009 {
 
+class AgcSetupWidget;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 {
 	Q_OBJECT
@@ -81,7 +83,7 @@ private:
 	QWidget *m_fhmSetup = nullptr;
 	QWidget *m_paProtection = nullptr;
 	QWidget *m_gainSetup = nullptr;
-	QWidget *m_agcSetup = nullptr;
+	AgcSetupWidget *m_agcSetup = nullptr;
 	QWidget *m_gpioConfig = nullptr;
 	QWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;

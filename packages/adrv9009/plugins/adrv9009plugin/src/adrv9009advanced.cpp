@@ -19,6 +19,7 @@
  */
 
 #include "adrv9009advanced.h"
+#include "advanced/agcsetupwidget.h"
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
@@ -246,7 +247,7 @@ void Adrv9009Advanced::createContentWidgets()
 	m_fhmSetup = createPlaceholderWidget("FHM Setup");
 	m_paProtection = createPlaceholderWidget("PA Protection");
 	m_gainSetup = createPlaceholderWidget("GAIN Setup");
-	m_agcSetup = createPlaceholderWidget("AGC Setup");
+	m_agcSetup = new AgcSetupWidget(m_device, this);
 	m_gpioConfig = createPlaceholderWidget("GPIO Config");
 	m_auxDac = createPlaceholderWidget("AUX DAC");
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
@@ -269,6 +270,10 @@ void Adrv9009Advanced::createContentWidgets()
 
 	// Set first widget as current (CLK Settings)
 	m_centralWidget->setCurrentWidget(m_clkSettings);
+
+	if(m_agcSetup) {
+		connect(this, &Adrv9009Advanced::readRequested, m_agcSetup, &AgcSetupWidget::readRequested);
+	}
 }
 
 void Adrv9009Advanced::updateNavigationButtonsLayout()
