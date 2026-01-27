@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <h1>IMU Analyzer Plugin</h1>
+    <p>The IMU Analyzer plugin brings advanced Inertial Measurement Unit analysis to Scopy with stunning 3D visualization capabilities.
+       This professional-grade tool provides real-time orientation analysis, multi-axis sensor monitoring, and interactive 3D displays for ADIS family IMU sensors.</p>
+
+    <h2>Key Features</h2>
+    <ul>
+        <li><strong>Real-time 3D Visualization</strong>: Interactive OpenGL-based 3D scene showing device orientation with smooth real-time updates</li>
+        <li><strong>ADIS Family Support</strong>: Compatible with ADIS16550, ADIS16545, ADIS16547, ADIS16505, and other ADIS IMU sensors</li>
+        <li><strong>Multi-Axis Monitoring</strong>: Comprehensive 6-DOF sensing with 3-axis gyroscope and accelerometer data</li>
+        <li><strong>Professional Interface</strong>: Tabbed interface with measurement mode, interactive controls, and detailed data panels</li>
+        <li><strong>Advanced Data Processing</strong>: Delta angle and velocity calculations, temperature compensation, and filtering</li>
+        <li><strong>Interactive Controls</strong>: Pan, zoom, rotate 3D view with mouse controls and one-click view reset</li>
+    </ul>
+
+    <h2>3D Visualization Engine</h2>
+    <p>The plugin features a state-of-the-art 3D rendering engine that displays IMU orientation in real-time:</p>
+    <ul>
+        <li><strong>Scene Renderer</strong>: High-performance OpenGL-based 3D visualization</li>
+        <li><strong>Real-time Updates</strong>: Smooth 60+ FPS orientation display with threaded data acquisition</li>
+        <li><strong>Interactive Navigation</strong>: Mouse-based view manipulation with professional camera controls</li>
+        <li><strong>Visual Clarity</strong>: Color-coded axes and clear orientation representation</li>
+    </ul>
+
+    <h2>Sensor Data Analysis</h2>
+    <p>Comprehensive monitoring and analysis capabilities for all IMU sensor channels:</p>
+    <ul>
+        <li><strong>Angular Velocity</strong>: 3-axis gyroscope data with precision rad/s measurements</li>
+        <li><strong>Linear Acceleration</strong>: 3-axis accelerometer with gravity compensation</li>
+        <li><strong>Delta Measurements</strong>: Advanced delta angle and velocity calculations</li>
+        <li><strong>Temperature Monitoring</strong>: Built-in temperature compensation for accuracy</li>
+        <li><strong>Raw and Processed Data</strong>: Access to both raw sensor values and calculated parameters</li>
+    </ul>
+
+    <h2>Professional Tools</h2>
+    <ul>
+        <li><strong>Measurement Mode</strong>: Toggle detailed numerical data panels with real-time updates</li>
+        <li><strong>Calibration Support</strong>: Sensor bias adjustment and scale factor configuration</li>
+        <li><strong>Filter Controls</strong>: Configurable low-pass filtering for noise reduction</li>
+        <li><strong>High-Speed Sampling</strong>: Support for sampling rates up to 4000 Hz (ADIS16550)</li>
+        <li><strong>Data Export</strong>: Logging and analysis export capabilities</li>
+    </ul>
+
+    <h2>ADIS Device Compatibility</h2>
+    <p>The plugin automatically detects and supports ADIS family IMU sensors:</p>
+    <ul>
+        <li><strong>ADIS16550</strong>: High-performance tactical-grade IMU (primary target)</li>
+        <li><strong>ADIS16545</strong>: Precision industrial IMU with advanced filtering</li>
+        <li><strong>ADIS16547</strong>: Six degrees of freedom IMU for motion sensing</li>
+        <li><strong>ADIS16505</strong>: Cost-effective MEMS IMU for general applications</li>
+        <li><strong>Other ADIS Devices</strong>: Universal compatibility with ADIS family sensors</li>
+    </ul>
+
+    <h2>Advanced Architecture</h2>
+    <p>Built with professional-grade architecture for reliable performance:</p>
+    <ul>
+        <li><strong>Threaded Processing</strong>: Separate threads for UI and data acquisition ensure smooth operation</li>
+        <li><strong>OpenGL Acceleration</strong>: Hardware-accelerated 3D rendering for optimal performance</li>
+        <li><strong>Signal/Slot Communication</strong>: Thread-safe data transfer between components</li>
+        <li><strong>Modular Design</strong>: Separate components for rendering, data processing, and UI management</li>
+    </ul>
+
+    <h2>Requirements</h2>
+    <ul>
+        <li>Scopy v2.2.0 or later</li>
+        <li>ADIS family IMU sensor with IIO support</li>
+        <li>OpenGL-capable graphics hardware for 3D visualization</li>
+        <li>Multi-core processor recommended for optimal performance</li>
+    </ul>
+
+    <h2>More Information</h2>
+    <p>For detailed usage instructions, sensor compatibility, and troubleshooting, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/imuanalyzer/imuanalyzer.html" target="_blank">official documentation</a>.</p>
+
+</body>
+</html>
