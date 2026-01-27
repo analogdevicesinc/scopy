@@ -239,7 +239,7 @@ void Adrv9009Advanced::createContentWidgets()
 {
 	// Create placeholder widgets for all 13 sections
 	m_clkSettings = createPlaceholderWidget("CLK Settings");
-	m_calibrations = createPlaceholderWidget("Calibrations");
+	m_calibrations = new CalibrationWidget(m_device, this);
 	m_txSettings = createPlaceholderWidget("TX Settings");
 	m_rxSettings = createPlaceholderWidget("RX Settings");
 	m_orxSettings = createPlaceholderWidget("ORX Settings");
@@ -250,7 +250,15 @@ void Adrv9009Advanced::createContentWidgets()
 	m_gpioConfig = createPlaceholderWidget("GPIO Config");
 	m_auxDac = createPlaceholderWidget("AUX DAC");
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
-	m_bist = createPlaceholderWidget("BIST");
+	m_bist = new BistWidget(m_device, this);
+
+	if(m_bist != nullptr) {
+		connect(this, &Adrv9009Advanced::readRequested, m_bist, &BistWidget::readRequested);
+	}
+
+	if(m_calibrations != nullptr) {
+		connect(this, &Adrv9009Advanced::readRequested, m_calibrations, &CalibrationWidget::readRequested);
+	}
 
 	// Add all widgets to stacked widget
 	m_centralWidget->addWidget(m_clkSettings);

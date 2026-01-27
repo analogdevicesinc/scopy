@@ -30,6 +30,8 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio.h>
+#include <advanced/bistwidget.h>
+#include <advanced/calibrationwidget.h>
 
 namespace scopy::adrv9009 {
 
@@ -74,7 +76,7 @@ private:
 
 	// Content widgets (placeholders for Phase 1)
 	QWidget *m_clkSettings = nullptr;
-	QWidget *m_calibrations = nullptr;
+	CalibrationWidget *m_calibrations = nullptr;
 	QWidget *m_txSettings = nullptr;
 	QWidget *m_rxSettings = nullptr;
 	QWidget *m_orxSettings = nullptr;
@@ -85,7 +87,7 @@ private:
 	QWidget *m_gpioConfig = nullptr;
 	QWidget *m_auxDac = nullptr;
 	QWidget *m_jesd204Settings = nullptr;
-	QWidget *m_bist = nullptr;
+	BistWidget *m_bist = nullptr;
 
 	void setupUi();
 	void createNavigationButtons();
