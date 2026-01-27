@@ -70,7 +70,7 @@ private:
 	QWidget *m_secondRow = nullptr;
 	QHBoxLayout *m_firstRowLayout = nullptr;
 	QHBoxLayout *m_secondRowLayout = nullptr;
-	QPushButton *m_expandBtn = nullptr;
+	QSpacerItem *m_navigationSpacerItem = nullptr;
 
 	// Content widgets (placeholders for Phase 1)
 	QWidget *m_clkSettings = nullptr;
@@ -99,4 +99,3 @@ private:
 
 } // namespace scopy::adrv9009
 #endif // ADRV9009ADVANCED_H
-
