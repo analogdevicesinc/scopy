@@ -102,7 +102,8 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 	c->m_ctrl->setOpenMenuChecksThis(true);
 	c->m_ctrl->setDoubleClickToOpenMenu(true);
 	c->m_ctrl->setColor(c->pen().color());
-	c->m_ctrl->button()->setVisible(false);
+	c->m_ctrl->button()->setVisible(true);
+	c->m_ctrl->button()->setCheckable(false);
 	c->m_ctrl->setCheckable(true);
 
 	connect(c->m_ctrl->checkBox(), &QCheckBox::toggled, c, [=](bool b) {
