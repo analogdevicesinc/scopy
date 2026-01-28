@@ -83,6 +83,41 @@ To use this option click “7 Segment” button on the bottom right
 
 ---------------------------------------------------------------------
 
+Channel Attributes
+--------------------------------------------------------------------
+
+When you click on a channel in the left menu, the channel attributes panel opens on the right side. 
+This panel provides several customization options for each individual channel:
+
+**Custom Display Names**
+
+You can customize how channels appear in the interface by changing their display names:
+
+1. Click on any channel in the left menu to open its attributes panel
+2. The channel name appears in the header at the top of the attributes panel
+3. Click on the name field to edit it directly
+4. The new display name will be used throughout the interface (plots, seven segment displays, etc.)
+
+
+**Unit of Measurement Customization**
+
+The "Unit Of Measurement" section allows you to override the default units for any channel:
+
+1. In the channel attributes panel, find the "Unit Of Measurement" section
+2. **Name**: Override the full unit name (e.g., "Voltage", "Temperature", "Pressure")
+3. **Symbol**: Override the unit symbol (e.g., "V", "°C", "Pa")
+4. These custom units will be displayed in all views (text, seven segment, and plot legends)
+
+**Other Channel Settings**
+
+The attributes panel also includes:
+
+* **Attributes**: Device-specific channel configuration options
+* **Scaling**: Raw values, device scaling, or custom scale override
+* **Plot Assignment**: Assign channels to different plots (experimental feature)
+
+---------------------------------------------------------------------
+
 Settings
 --------------------------------------------------------------------
 
