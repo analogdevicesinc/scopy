@@ -426,6 +426,38 @@ Window.**
   a warning sign |warning_icon| will appear on the top right side of the
   device icon.
 
+Managing Device Plugins
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once connected to a device, you can manage which plugins are active without
+disconnecting from the device. Device pages now feature a streamlined tabbed
+interface at the bottom that makes it easier to configure device plugins.
+
+New Tabbed Interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Device pages include two dedicated tabs positioned at the bottom:
+
+- **Device Info**: Traditional device information display with Connect/Disconnect controls
+- **Available Plugins**: Complete overview of all compatible plugins for your device
+
+How to Manage Plugins
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To enable or disable plugins for a connected device:
+
+1. Connect your device as usual from the device page.
+2. Click on the **Available plugins** tab at the bottom of the device page.
+3. Check or uncheck plugins to enable or disable them as needed.
+4. Click the **Reload** button to apply your plugin configuration changes.
+5. The device will be recreated with your selected plugins active.
+
+.. note::
+
+  The device reload feature recreates the device connection with the new plugin
+  configuration. Any active measurements or configurations within plugins will be
+  reset during the reload process.
+
 
 User Guides
 ---------------------------------------------------------------------
