@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The RF Power Meter plugin transforms the Scopy Data Logger into a specialized RF power measurement instrument when connected to compatible hardware. This plugin provides real-time monitoring of RF power levels, voltage measurements, and temperature readings through an intuitive seven-segment display interface." name="description" />
+
+    <title>RF Power Meter &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
+    <script async="async" src="../../_static/app.umd.js?v=46a18818"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Scopy developer guide" href="../../developer_guide/index.html" />
+    <link rel="prev" title="IMU Analyzer" href="../imuanalyzer/imuanalyzer.html" />
+   
+  
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs" tabindex="0">Docs</label>
+        
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">RF Power Meter</a><ul>
+<li><a class="reference internal" href="#general-description">General Description</a></li>
+<li><a class="reference internal" href="#key-features">Key Features</a></li>
+<li><a class="reference internal" href="#hardware-requirements">Hardware Requirements</a></li>
+<li><a class="reference internal" href="#plugin-operation">Plugin Operation</a></li>
+<li><a class="reference internal" href="#error-handling-and-troubleshooting">Error Handling and Troubleshooting</a></li>
+<li><a class="reference internal" href="#for-more-information">For More Information</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img src="../../_static/logo.svg"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <html>
+  <body><ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/fmcomms5.html">FMCOMMS5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/fmcomms5_advanced.html">FMCOMMS5 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../adrv9002/adrv9002.html">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/scripting.html">Scripting Tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../scripting/scripting.html#supported-commands">Supported Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imuanalyzer/imuanalyzer.html">IMU Analyzer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RF Power Meter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/package_generator.html">Package Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/plugin_developer_guide.html">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-9" id="toctree-collapse-4-1-9"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/jesd/index.html">JESD STATUS</a><label for="toctree-collapse-4-1-9"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/jesd/jesd_status_tests.html">JESD STATUS Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-10" id="toctree-collapse-4-1-10"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/ad936x/index.html">AD936X</a><label for="toctree-collapse-4-1-10"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/ad936x/ad936x_tests.html">AD936x Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-11" id="toctree-collapse-4-1-11"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/ad9084/index.html">AD9084</a><label for="toctree-collapse-4-1-11"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/fmcomms5/index.html">FMCOMMS5</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/fmcomms5/fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-13" id="toctree-collapse-4-1-13"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adrv9002/index.html">ADRV9002 (Jupiter)</a><label for="toctree-collapse-4-1-13"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9002/adrv9002_tests.html">ADRV9002 (Jupiter) Plugin - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9002/profile_generator_tests.html">ADRV9002 Profile Generator - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-14" id="toctree-collapse-4-1-14"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/imuanalyzer/index.html">IMU Analyzer</a><label for="toctree-collapse-4-1-14"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/imuanalyzer/imuanalyzer_tests.html">IMU Analyzer Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-15" id="toctree-collapse-4-1-15"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/rfpowermeter/index.html">RF Power Meter</a><label for="toctree-collapse-4-1-15"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/rfpowermeter/rfpowermeter_tests.html">RF Power Meter Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/package_manager_tests.html">Package Manager - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/scripting_tool.html">Scripting Tool - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">Software Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+</body>
+</html>
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="rf-power-meter">
+<span id="rfpowermeter"></span><h1>RF Power Meter<a class="headerlink" href="#rf-power-meter" title="Link to this heading"></a></h1>
+<section id="general-description">
+<h2>General Description<a class="headerlink" href="#general-description" title="Link to this heading"></a></h2>
+<p>The RF Power Meter plugin transforms the Scopy Data Logger into a specialized RF power measurement instrument when connected to compatible hardware. This plugin provides real-time monitoring of RF power levels, voltage measurements, and temperature readings through an intuitive seven-segment display interface.</p>
+<p>The RF Power Meter plugin automatically detects devices with the <code class="docutils literal notranslate"><span class="pre">powrms</span></code> IIO device and configures the Data Logger for RF-specific measurements. It displays forward and reverse power readings in dBm, along with corrected and raw voltage measurements in millivolts.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/rfpowermeter/rfpowermeter.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/rfpowermeter/rfpowermeter.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The RF Power Meter plugin requires the Data Logger plugin to be installed and enabled.
+It transforms the Data Logger interface rather than creating a standalone tool.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Ensure proper RF safety precautions when working with RF power measurement equipment.
+Follow device-specific safety guidelines and power handling limitations.</p>
+</div>
+</section>
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Power Measurements</strong></dt><dd><ul class="simple">
+<li><p><strong>Forward Power</strong>: Real-time measurement of forward RF power in dBm</p></li>
+<li><p><strong>Reverse Power</strong>: Detection and measurement of reflected power in dBm</p></li>
+<li><p><strong>Bidirectional Monitoring</strong>: Simultaneous forward and reverse power tracking</p></li>
+</ul>
+</dd>
+<dt><strong>Voltage Monitoring</strong></dt><dd><ul class="simple">
+<li><p><strong>Corrected Voltages</strong>: Temperature and calibration-corrected input/output voltage readings</p></li>
+<li><p><strong>Raw Voltages</strong>: Uncorrected voltage measurements for diagnostic purposes</p></li>
+<li><p><strong>Precision</strong>: Millivolt-level measurement accuracy</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="hardware-requirements">
+<h2>Hardware Requirements<a class="headerlink" href="#hardware-requirements" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Compatible Devices</strong></dt><dd><p>The RF Power Meter plugin requires hardware that exposes a <code class="docutils literal notranslate"><span class="pre">powrms</span></code> Industrial I/O (IIO) device. Compatible devices include:</p>
+<ul class="simple">
+<li><p>ADI RF power measurement evaluation boards</p></li>
+<li><p>Custom RF power meters with IIO interface</p></li>
+<li><p>Development boards with integrated power monitoring</p></li>
+</ul>
+</dd>
+<dt><strong>Software Dependencies</strong></dt><dd><ul class="simple">
+<li><p>Scopy v2.2.0 or later</p></li>
+<li><p><strong>Data Logger Plugin</strong>: Must be installed and enabled</p></li>
+<li><p>IIO drivers for the target hardware</p></li>
+</ul>
+</dd>
+<dt><strong>Connection Requirements</strong></dt><dd><ul class="simple">
+<li><p>USB or Ethernet connection to the RF power measurement device</p></li>
+<li><p>Stable IIO context for device communication</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="plugin-operation">
+<h2>Plugin Operation<a class="headerlink" href="#plugin-operation" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Automatic Detection</strong></dt><dd><p>The plugin automatically detects compatible devices when connecting to hardware with
+a <code class="docutils literal notranslate"><span class="pre">powrms</span></code> IIO device. No manual configuration is required for device recognition.</p>
+</dd>
+<dt><strong>Real-time Operation</strong></dt><dd><p>Once connected and configured, the plugin provides:</p>
+<ul class="simple">
+<li><p>Continuous monitoring of all configured channels</p></li>
+<li><p>Live updates of power and voltage readings</p></li>
+<li><p>Temperature-compensated measurements</p></li>
+<li><p>Frequency-adjustable operation</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="error-handling-and-troubleshooting">
+<h2>Error Handling and Troubleshooting<a class="headerlink" href="#error-handling-and-troubleshooting" title="Link to this heading"></a></h2>
+<p><strong>Common Issues</strong></p>
+<p><strong>Plugin Not Loading</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Symptom</strong>: RF Power Meter plugin doesn’t appear when connecting</p></li>
+<li><p><strong>Cause</strong>: Device doesn’t expose <code class="docutils literal notranslate"><span class="pre">powrms</span></code> IIO device</p></li>
+<li><p><strong>Solution</strong>: Verify hardware compatibility and IIO driver installation</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Data Logger Dependency Error</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Symptom</strong>: Error message about DataLogger plugin not found</p></li>
+<li><p><strong>Cause</strong>: Data Logger plugin not installed or enabled</p></li>
+<li><p><strong>Solution</strong>: Install and enable Data Logger plugin before using RF Power Meter</p></li>
+</ul>
+</div></blockquote>
+<p><strong>No Measurements Displayed</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Symptom</strong>: Seven-segment display shows no data</p></li>
+<li><p><strong>Cause</strong>: Measurement channels not enabled or IIO communication failure</p></li>
+<li><p><strong>Solution</strong>: Check channel enable status and device connection</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="for-more-information">
+<h2>For More Information<a class="headerlink" href="#for-more-information" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Data Logger Guide</strong>: <a class="reference internal" href="../datalogger/datalogger.html#datalogger"><span class="std std-ref">Datalogger</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../imuanalyzer/imuanalyzer.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">IMU Analyzer</a>
+    <a href="../../developer_guide/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">Scopy developer guide</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

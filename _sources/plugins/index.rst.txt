@@ -26,6 +26,7 @@ General IIO plugins
 
 * :ref:`Scripting tool <scripting_tool>`
 
+* :ref:`RF Power Meter <rfpowermeter>`
 
 * :ref:`IMU Analyzer <imuanalyzer>`
 
@@ -88,4 +89,5 @@ Contents
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
+   rfpowermeter/rfpowermeter
 
