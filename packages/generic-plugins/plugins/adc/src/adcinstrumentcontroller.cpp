@@ -132,7 +132,7 @@ void ADCInstrumentController::startUpdates()
 {
 	updateFrameRate();
 	m_refreshTimerRunning = true;
-	update();
+	// update(); // this will cause the initial 0 filled buffer to be displayed
 	m_plotTimer->start();
 	m_ui->started();
 }
