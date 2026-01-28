@@ -10,23 +10,20 @@ CLEAN_BEFORE_BUILD=ON
 
 install_packages() {
     sudo apt-get update
-    sudo apt-get install -y groff
+    sudo apt-get install -y groff gperf meson-1.5
 }
 
-install_jdk() {
+download_jdk() {
     mkdir -p ${STAGING_AREA}
     pushd ${STAGING_AREA}
+    if [ ! -d jdk ];then
+        wget https://download.java.net/openjdk/jdk17.0.0.1/ri/openjdk-17.0.0.1+2_linux-x64_bin.tar.gz
+        # unzip and rename
+        tar xf openjdk-17.0.0.1+2_linux-x64_bin.tar.gz && rm openjdk-17.0.0.1+2_linux-x64_bin.tar.gz && mv jdk-17.0.0.1 jdk
+    else
+        echo "JDK already downloaded"
+    fi
 
-            # check jdk version =-=-=-=-=-=
-
-
-    # we're using gradle 6.3 so we need to use jdk 14 at most
-    # https://docs.gradle.org/current/userguide/compatibility.html
-
-    wget https://download.java.net/openjdk/jdk14/ri/openjdk-14+36_linux-x64_bin.tar.gz
-    tar xf openjdk-*.tar.gz
-    mv jdk-* jdk
-    rm openjdk-*.tar.gz
     popd
 }
 
@@ -243,24 +240,23 @@ build_glib() {
     strip = '$STRIP'
 
     [built-in options]
-    c_std = 'c17'
+    c_std = 'gnu99'
     prefix = '$STAGING_AREA_DEPS'
     c_args = [$(meson_flag_list $CFLAGS)]
-    cpp_args = [$(meson_flag_list $f)]
+    cpp_args = [$(meson_flag_list $CPPFLAGS)]
     c_link_args = [$(meson_flag_list $LDFLAGS)]
     pkg_config_path = '$STAGING_AREA_DEPS/lib/pkgconfig'
     default_library = 'shared'
     " > cross_file.txt
 
-    pip install meson
     mkdir -p ${STAGING_AREA}/glib/build
-    ~/.local/bin/meson setup --cross-file cross_file.txt build
+    meson setup --cross-file cross_file.txt build
     pushd ${STAGING_AREA}/glib/build
-    ~/.local/bin/meson compile
+    meson compile
 
     if [ "$INSTALL" == "ON" ];then
         strip
-        ~/.local/bin/meson install
+        meson install
     fi
 
     popd
@@ -298,7 +294,7 @@ build_libzmq() {
     pushd ${STAGING_AREA}/libzmq
     [ ${CLEAN_BEFORE_BUILD} == "ON" ] && git clean -xdf
 
-    CURRENT_BUILD_CMAKE_OPTS=""
+    CURRENT_BUILD_CMAKE_OPTS="-DWITH_LIBBSD=OFF"
     build_with_cmake $1
 
     popd
@@ -544,6 +540,8 @@ build_qwt() {
 }
 
 build_python() {
+    INSTALL=$1
+    [ -z $INSTALL ] && INSTALL=ON
     pushd ${STAGING_AREA}/python
     # Python should be cross-built with the same version that is available on host, if nothing is available,
     # it should be built with the script ./build_host_python
@@ -565,24 +563,36 @@ build_python() {
     export ac_cv_func_sigaltstack=no
     export ac_cv_func_bind_textdomain_codeset=no
     export ac_cv_lib_intl_textdomain=no
+    export ac_cv_lib_uuid_uuid_generate_time_safe=no
+    export ac_cv_lib_uuid_uuid_generate_time=no
+    export ac_cv_lib_uuid_uuid_create=no
 
     autoreconf
-    build_with_configure $1 \
+
+    set_configure_opts
+    ./configure "${CONFIG_OPTS[@]}" \
 	--disable-ipv6 \
 	--with-build-python \
 	--without-ensurepip \
 	--without-c-locale-coercion \
-	--without-doc-strings \
+	--without-doc-strings
 
+    # Disable _uuid module
+    sed -i 's/^_uuid/#_uuid/' Modules/Setup.stdlib
+    sed -i 's/^MODULE__UUID_STATE=yes/MODULE__UUID_STATE=disabled/' Makefile
+
+    # Enable some modules in Modules/Setup
     sed -i "s/^#zlib/zlib/g" Modules/Setup
-    # 11
     sed -i "s/^#math/math/g" Modules/Setup
     sed -i "s/^#time/time/g" Modules/Setup
     sed -i "s/^#_struct/_struct/g" Modules/Setup
 
     make $JOBS LDFLAGS="$LDFLAGS -liconv -lz -lm"
-    make install
-    rm -rf $STAGING_AREA_DEPS/lib/python3.11/test
+
+    if [ "$INSTALL" == "ON" ]; then
+        make install
+    fi
+    rm -rf $STAGING_AREA_DEPS/lib/python3.12/test
 
     echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
     >> $BUILD_STATUS_FILE
@@ -675,67 +685,63 @@ build_scopy() {
 
 copy_deps()
 {
-	STAGING_DEPSS=/home/cristian/git/android/scopy-android/ci/android/staging/dependencies
-	BUILDD=/home/cristian/git/android/scopy-android/build
-	ASSETSSS=/home/cristian/git/android/scopy-android/android/assets
+	BUILDD=$SRC_DIR/build
+	ASSETSSS=$SRC_DIR/android/assets
 
 	DEPS=(
+		$STAGING_AREA_DEPS/lib/libad9361.so
+		$STAGING_AREA_DEPS/lib/libcharset.so
+		$STAGING_AREA_DEPS/lib/libffi.so
+		$STAGING_AREA_DEPS/lib/libgio-2.0.so
+		$STAGING_AREA_DEPS/lib/libglib-2.0.so
+		$STAGING_AREA_DEPS/lib/libgmodule-2.0.so
+		$STAGING_AREA_DEPS/lib/libgmp.so
+		$STAGING_AREA_DEPS/lib/libgmpxx.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-analog.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-blocks.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-fft.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-filter.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-iio.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-m2k.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-pmt.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-runtime.so
+		$STAGING_AREA_DEPS/lib/libgnuradio-scopy.so
+		$STAGING_AREA_DEPS/lib/libgobject-2.0.so
+		$STAGING_AREA_DEPS/lib/libgthread-2.0.so
+		$STAGING_AREA_DEPS/lib/libiconv.so
+		$STAGING_AREA_DEPS/lib/libiio.so
+		$STAGING_AREA_DEPS/lib/libintl.so
+		$STAGING_AREA_DEPS/lib/libirmp.so
+		$STAGING_AREA_DEPS/lib/libm2k.so
+		$STAGING_AREA_DEPS/lib/libqwt_arm64-v8a.so
+		$STAGING_AREA_DEPS/lib/libserialport.so
+		$STAGING_AREA_DEPS/lib/libsigrokdecode.so
+		$STAGING_AREA_DEPS/lib/libspdlogd.so
+		$STAGING_AREA_DEPS/lib/libusb-1.0.so
+		$STAGING_AREA_DEPS/lib/libusb1.0.so
+		$STAGING_AREA_DEPS/lib/libvolk.so
+		$STAGING_AREA_DEPS/lib/libxml2.so
+		$STAGING_AREA_DEPS/lib/libzmq.so
+		$STAGING_AREA_DEPS/lib/tinyiiod.so
+		$STAGING_AREA_DEPS/lib/libzstd.so
+		$STAGING_AREA_DEPS/lib/libKF5Archive_arm64-v8a.so
+		$STAGING_AREA_DEPS/lib/libmatio.so
+
+		$QT_LOCATION/lib/libQt5OpenGL_arm64-v8a.so
 		$QT_LOCATION/lib/libQt5PrintSupport_arm64-v8a.so
-		$STAGING_DEPSS/lib/libad9361.so
-		$STAGING_DEPSS/lib/libcharset.so
-		$STAGING_DEPSS/lib/libffi.so
-		$STAGING_DEPSS/lib/libgio-2.0.so
-		$STAGING_DEPSS/lib/libglib-2.0.so
-		$STAGING_DEPSS/lib/libgmodule-2.0.so
-		$STAGING_DEPSS/lib/libgmp.so
-		$STAGING_DEPSS/lib/libgmpxx.so
-		$STAGING_DEPSS/lib/libgnuradio-analog.so
-		$STAGING_DEPSS/lib/libgnuradio-blocks.so
-		$STAGING_DEPSS/lib/libgnuradio-fft.so
-		$STAGING_DEPSS/lib/libgnuradio-filter.so
-		$STAGING_DEPSS/lib/libgnuradio-iio.so
-		$STAGING_DEPSS/lib/libgnuradio-m2k.so
-		$STAGING_DEPSS/lib/libgnuradio-pmt.so
-		$STAGING_DEPSS/lib/libgnuradio-runtime.so
-		$STAGING_DEPSS/lib/libgnuradio-scopy.so
-		$STAGING_DEPSS/lib/libgobject-2.0.so
-		$STAGING_DEPSS/lib/libgthread-2.0.so
-		$STAGING_DEPSS/lib/libiconv.so
-		$STAGING_DEPSS/lib/libiio.so
-		$STAGING_DEPSS/lib/libintl.so
-		$STAGING_DEPSS/lib/libirmp.so
-		$STAGING_DEPSS/lib/libm2k.so
-		$STAGING_DEPSS/lib/libqwt_arm64-v8a.so
-		$STAGING_DEPSS/lib/libserialport.so
-		$STAGING_DEPSS/lib/libsigrokdecode.so
-		$STAGING_DEPSS/lib/libspdlogd.so
-		$STAGING_DEPSS/lib/libusb-1.0.so
-		$STAGING_DEPSS/lib/libusb1.0.so
-		$STAGING_DEPSS/lib/libvolk.so
-		$STAGING_DEPSS/lib/libxml2.so
-		$STAGING_DEPSS/lib/libzmq.so
-		$STAGING_DEPSS/lib/tinyiiod.so
-		$STAGING_DEPSS/lib/libzstd.so
-		$STAGING_DEPSS/lib/libKF5Archive_arm64-v8a.so
-		$STAGING_DEPSS/lib/libmatio.so
-
-
-		/mnt/ssd/Qt5-kde-android-arm64/lib/libQt5OpenGL_arm64-v8a.so
-
 	)
-	# $STAGING_DEPSS/lib/preloadable_libiconv.so
-	# $STAGING_DEPSS/lib/libtextstyle.so
+	# $STAGING_AREA_DEPS/lib/preloadable_libiconv.so
+	# $STAGING_AREA_DEPS/lib/libtextstyle.so
 
 	cp -vfr ${DEPS[@]} $BUILDD/android-build/libs/arm64-v8a/
 	# a se copia cu extensia .so ca sa pastrezi flagu de executable
-	cp -vf /home/cristian/git/android/scopy-android/ci/android/staging/iio-emu/build/iio-emu $BUILDD/android-build/libs/arm64-v8a/iio-emu.so
+	cp -vf $STAGING_AREA/iio-emu/build/iio-emu $BUILDD/android-build/libs/arm64-v8a/iio-emu.so
 
-	cp -vfr $BUILDD/libscopy* $BUILDD/android-build/libs/arm64-v8a/
 	cp -vfr $BUILDD/style $ASSETSSS
-	cp -vfr $STAGING_DEPSS/lib/scopy/packages $ASSETSSS
+	cp -vfr $BUILDD/packages $ASSETSSS
 	cp -vfr $BUILDD/translations $ASSETSSS
-	cp -vfr /home/cristian/git/android/scopy-android/ci/android/staging/dependencies/share/libsigrokdecode/decoders $ASSETSSS
-	[ -f $ASSETSSS/python3.11 ] || cp -vfr /home/cristian/git/android/scopy-android/ci/android/staging/dependencies/lib/python3.11 $ASSETSSS
+	cp -vfr $STAGING_AREA_DEPS/share/libsigrokdecode/decoders $ASSETSSS
+	[ -f $ASSETSSS/python3.12 ] || cp -vfr $STAGING_AREA_DEPS/lib/python3.12 $ASSETSSS
 	echo "Copied dependencies to assets"
 
 }
@@ -749,12 +755,11 @@ copy_deps()
 
 build_deps()
 {
-	echo "buildd"
-# #     create_build_status_file
+#     create_build_status_file
 # #     build_openssl ON #  de vazut daca trebe ???
 #     build_libiconv ON
 #     build_libffi ON
-#    # build_gettext ON # disabled for now, gnulib error (oprit de tot ca nu mai e nevoie de el la python)
+# #   build_gettext ON # disabled for now, gnulib error (oprit de tot ca nu mai e nevoie de el la python)
 #     build_libiconv ON # HANDLE CIRCULAR DEP
 #     build_glib ON #### libglib2.0.so.0 ---> libglib2.0.so
 #     build_libxml2 ON
@@ -762,10 +767,10 @@ build_deps()
 #     build_libzmq ON
 #     build_fftw ON
 #     build_libgmp ON
-     build_libusb ON
+#     build_libusb ON
 #     build_libserialport ON
 #     build_libsndfile ON
-     build_libiio ON
+#     build_libiio ON
 #     build_libad9361 ON
 #     build_spdlog ON
 #     build_libm2k ON
@@ -774,13 +779,13 @@ build_deps()
 #     build_grscopy ON
 #     build_grm2k ON
 #     build_qwt ON # am facut modificari in cod si trebuie puse sus
-#     build_python ON # disable locale, nu mai e nevoie de gettext, update la python 3.11
-#     build_libsigrokdecode ON
-#     build_libtinyiiod ON
-#     build_libmatio ON
-#       build_libzstd ON
-#       build_ecm ON
-#       build_karchive ON
+    build_python ON # disable locale, nu mai e nevoie de gettext, update la python 3.12
+    build_libsigrokdecode ON
+    build_libtinyiiod ON
+    build_libmatio ON
+    build_libzstd ON
+    build_ecm ON
+    build_karchive ON
 
 }
 

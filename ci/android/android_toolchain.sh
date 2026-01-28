@@ -22,14 +22,14 @@ SPDLOG="https://github.com/gabime/spdlog | v1.14.1" # trebuie sa nu contina bug 
 GRSCOPY="https://github.com/analogdevicesinc/gr-scopy | 3.10"
 GRM2K="https://github.com/analogdevicesinc/gr-m2k | main"
 VOLK="https://github.com/cseci/volk | 2.5.1-android"
-GNURADIO="https://github.com/analogdevicesinc/gnuradio | android-maint-3.10"
-QWT="https://github.com/cseci/qwt | qwt-multiaxes-updated"
+GNURADIO="https://github.com/analogdevicesinc/gnuradio | scopy2-gr3.10-android"
+QWT="https://github.com/cseci/qwt | qwt-multiaxes-updated-android"
 LIBSIGROKDECODE="https://github.com/sigrokproject/libsigrokdecode | master"
 LIBTINYIIOD="https://github.com/analogdevicesinc/libtinyiiod | master"
 IIOEMU="https://github.com/analogdevicesinc/iio-emu | main"
 KDDOCK="https://github.com/KDAB/KDDockWidgets | 2.1"
 LIBSNDFILE="https://github.com/libsndfile/libsndfile | 1.2.0" # mai nou ca in scopy-android-deps
-PYTHON="https://github.com/cseci/python | 3.8.10"
+PYTHON="https://github.com/python/cpython | 3.12" # acelasi ca versiunea instalata local, mai trebuie adaugate modificari specifice
 GLIB="https://github.com/GNOME/glib | 2.85.4" # mai nou ca in scopy-android-deps
 ANDROIDBOOST="https://github.com/moritz-wundke/Boost-for-Android | master" # mai nou ca in scopy-android-deps
 LIBXML2="https://github.com/GNOME/libxml2 | v2.9.13" # mai nou ca in scopy-android-deps
@@ -56,10 +56,10 @@ LIBZSTD="https://github.com/pexip/os-libzstd | bookworm"
 # NDK_VERSION=26.1.10909125
 NDK_VERSION=25.2.9519653
 # NDK_VERSION=23.2.8568313
-API=31
+API=33
 export APP_PLATFORM=$API
-ANDROID_SDK_BUILD_TOOLS=33.0.1
-# ANDROID_SDK_BUILD_TOOLS=35.0.1
+# ANDROID_SDK_BUILD_TOOLS=33.0.1
+ANDROID_SDK_BUILD_TOOLS=35.0.1
 HOST_ARCH=linux-x86_64
 ARCH=arm64
 ABI=arm64-v8a
@@ -78,11 +78,11 @@ CMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake
 TOOLCHAIN=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST_ARCH
 SYSROOT=$TOOLCHAIN/sysroot
 
-QT_VERSION_STRING=5.15.2
+QT_VERSION_STRING=5.15.17
 ###
 #QT_LOCATION=/opt/Qt/$QT_VERSION_STRING/android
 #QT_LOCATION=$STAGING_AREA/$QT_VERSION_STRING/android
- QT_LOCATION=/mnt/ssd/Qt5-kde-android-arm64
+QT_LOCATION=/media/cristian/ssd/Qt5-kde-android-arm64
 export QT_INSTALL_PREFIX=$QT_LOCATION
 ###
 
@@ -110,9 +110,8 @@ STRIP=$TOOLCHAIN_BIN/llvm-strip
 
 # ############### SYSTEM SPECIFIC DEFINES ###############
 
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-PATH=$JAVA_HOME/bin:$PATH
-PATH=${TOOLCHAIN_BIN}:${PATH}
+export JAVA_HOME=$STAGING_AREA/jdk
+export PATH=${TOOLCHAIN_BIN}:$JAVA_HOME/bin:${PATH}
 # # JDK=/usr/lib/jvm/java-16-openjdk-amd64
 # PYTHON_VERSION=3.8.10
 # SCRIPT_HOME_DIR=$HOME/src/scopy-android-deps

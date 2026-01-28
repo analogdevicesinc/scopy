@@ -105,6 +105,7 @@ void printRuntimeEnvironmentInfo()
 
 void printEnv()
 {
+	qDebug() << "-=-"<<" Environment Variables:";
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	for (const QString &key: env.keys()) {
 		qDebug() << "-=-" << key <<"  "<< env.value(key);
@@ -159,14 +160,20 @@ int main(int argc, char *argv[])
 
 	printRuntimeEnvironmentInfo();
 	printEnv();
-	initLogging();
+
+	qDebug()<<"-=-== __ANDROID__ :"<< __ANDROID__;
+	qDebug()<<"-=-== __ANDROID_API__ :"<< __ANDROID_API__;
+	qDebug()<<"-=-== __ANDROID_NDK__ :"<< __ANDROID_NDK__;
+	qDebug()<<"-=-== __linux__ :"<< __linux__;
+
+	//initLogging();
 	CrashReport::initSignalHandler();
 	#ifdef  __ANDROID__
 
 	QAndroidJniObject jniObject = QtAndroid::androidActivity().callObjectMethod("getScaleFactor", "()Ljava/lang/String;");
 	QString scaleFactor = jniObject.toString();
 	qDebug()<<"-=-== QT scaleFactor :"<<scaleFactor;
-	//scaleFactor="1"; // din Qt: scale factor is: 1.18
+	scaleFactor="1"; // din Qt: scale factor is: 1.18
 
 	qputenv("QT_SCALE_FACTOR", scaleFactor.toUtf8());
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

@@ -48,25 +48,40 @@ import android.util.Log;
 
 
 public class ScopyApplication extends QtApplication {
+  private static boolean isAssetDirectory(AssetManager assetManager, String path) {
+    try {
+      String[] files = assetManager.list(path);
+      return files != null && files.length > 0;
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
   private static boolean copyAssetFolder(AssetManager assetManager, String fromAssetPath, String toPath) {
     try {
       String[] files = assetManager.list(fromAssetPath);
-      if (files == null) {
-        System.out.println("No file found");
+      if (files == null || files.length == 0) {
+        System.out.println("No files found in: " + fromAssetPath);
         return false;
       }
-      boolean ret = new File(toPath).mkdirs();
-      if (!ret) {
-        System.out.println("Can't create folder");
-        return false;
+      File toDir = new File(toPath);
+      if (!toDir.exists()) {
+        boolean created = toDir.mkdirs();
+        if (!created && !toDir.exists()) {
+          System.out.println("Can't create folder: " + toPath);
+          return false;
+        }
       }
 
+      boolean ret = true;
       for (String file : files) {
-        System.out.println("Files: " + file);
-        if (file.contains(".")) {
-          ret &= copyAsset(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
+        String fromChildPath = fromAssetPath + "/" + file;
+        String toChildPath = toPath + "/" + file;
+        System.out.println("Processing: " + fromChildPath);
+        if (isAssetDirectory(assetManager, fromChildPath)) {
+          ret &= copyAssetFolder(assetManager, fromChildPath, toChildPath);
         } else {
-          ret &= copyAssetFolder(assetManager, fromAssetPath + "/" + file, toPath + "/" + file);
+          ret &= copyAsset(assetManager, fromChildPath, toChildPath);
         }
       }
       return ret;
@@ -124,8 +139,8 @@ public class ScopyApplication extends QtApplication {
     System.out.println("Hello Scopy !");
 
     try {
-      Os.setenv("PYTHONHOME", ".", true);
-      Os.setenv("PYTHONPATH", apk + "/assets/python3.11", true);
+      Os.setenv("PYTHONHOME", cache + "/python3.12", true);
+      Os.setenv("PYTHONPATH", cache + "/python3.12", true);
       Os.setenv("SIGROKDECODE_DIR", cache + "/decoders", true);
       Os.setenv("APPDATA", cache, true);
       Os.setenv("LD_LIBRARY_PATH", libdir, true);
@@ -136,8 +151,10 @@ public class ScopyApplication extends QtApplication {
 
     super.onCreate();
 
-    boolean reloadLibs = false;
     SharedPreferences prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+    boolean reloadLibs = true;
+    if (reloadLibs)
+      clearInstalled(prefs);
 
     if (!isInstalled(prefs)) {
       setInstalled(prefs);
@@ -156,10 +173,6 @@ public class ScopyApplication extends QtApplication {
     } else {
       System.out.println("All assets are copied to: " + cache);
     }
-
-    if (reloadLibs)
-      clearInstalled(prefs);
-
 
 //    System.out.println("Copy Files here:");
 //    for (File file : Objects.requireNonNull(new File(cache).listFiles())) {
