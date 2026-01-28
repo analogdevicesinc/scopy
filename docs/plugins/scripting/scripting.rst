@@ -100,12 +100,12 @@ Or run a list of scripts:
 
 
 Supported Commands
-==================
+--------------------
 
 A list of supported commands by the Scopy tool.
 
 General
--------
+~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -131,7 +131,7 @@ General
 
 
 ADALM2000: DigitalIO
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -154,7 +154,7 @@ ADALM2000: DigitalIO
      - Run DigitalIO instrument
 
 ADALM2000: Power Supply
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -183,7 +183,7 @@ ADALM2000: Power Supply
      - Set Negative Power Supply output value.
 
 ADALM2000: Voltmeter
----------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -239,7 +239,7 @@ ADALM2000: Voltmeter
      - Run Voltmeter instrument
 
 ADALM2000: Signal Generator
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -336,7 +336,7 @@ ADALM2000: Signal Generator
      - Run Signal Generator instrument.
 
 ADALM2000: Network Analyzer
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -395,7 +395,7 @@ ADALM2000: Network Analyzer
      - Run Network Analyzer instrument.
 
 ADALM2000: Oscilloscope
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -538,7 +538,7 @@ ADALM2000: Oscilloscope
      - Run Oscilloscope instrument.
 
 ADALM2000: Pattern Generator
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -552,7 +552,7 @@ ADALM2000: Pattern Generator
      - Run Pattern Generator instrument.
 
 ADALM2000: Logic Analyzer
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -566,7 +566,7 @@ ADALM2000: Logic Analyzer
      - Run Logic Analyzer instrument.
 
 ADALM2000: Spectrum Analyzer
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -581,7 +581,7 @@ ADALM2000: Spectrum Analyzer
 
 
 RegMap API
-----------
+~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -640,7 +640,7 @@ RegMap API
      - Get info about a specific bitfield.
 
 DataLogger API
---------------
+~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
