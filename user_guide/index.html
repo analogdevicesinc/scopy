@@ -113,6 +113,11 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#connecting-to-a-device">Connecting to a device</a></li>
+<li><a class="reference internal" href="#managing-device-plugins">Managing Device Plugins</a><ul>
+<li><a class="reference internal" href="#new-tabbed-interface">New Tabbed Interface</a></li>
+<li><a class="reference internal" href="#how-to-manage-plugins">How to Manage Plugins</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#user-guides">User Guides</a><ul>
@@ -700,6 +705,37 @@ corner of the icon and clicking the <img src="https://raw.githubusercontent.com/
 a warning sign <img src="https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/dev/gui/res/icons/warning.svg" alt="Inline image" style="display:inline; width:30px; vertical-align:middle;"> will appear on the top right side of the
 device icon.</p></li>
 </ul>
+</section>
+<section id="managing-device-plugins">
+<h3>Managing Device Plugins<a class="headerlink" href="#managing-device-plugins" title="Link to this heading"></a></h3>
+<p>Once connected to a device, you can manage which plugins are active without
+disconnecting from the device. Device pages now feature a streamlined tabbed
+interface at the bottom that makes it easier to configure device plugins.</p>
+<section id="new-tabbed-interface">
+<h4>New Tabbed Interface<a class="headerlink" href="#new-tabbed-interface" title="Link to this heading"></a></h4>
+<p>Device pages include two dedicated tabs positioned at the bottom:</p>
+<ul class="simple">
+<li><p><strong>Device Info</strong>: Traditional device information display with Connect/Disconnect controls</p></li>
+<li><p><strong>Available Plugins</strong>: Complete overview of all compatible plugins for your device</p></li>
+</ul>
+</section>
+<section id="how-to-manage-plugins">
+<h4>How to Manage Plugins<a class="headerlink" href="#how-to-manage-plugins" title="Link to this heading"></a></h4>
+<p>To enable or disable plugins for a connected device:</p>
+<ol class="arabic simple">
+<li><p>Connect your device as usual from the device page.</p></li>
+<li><p>Click on the <strong>Available plugins</strong> tab at the bottom of the device page.</p></li>
+<li><p>Check or uncheck plugins to enable or disable them as needed.</p></li>
+<li><p>Click the <strong>Reload</strong> button to apply your plugin configuration changes.</p></li>
+<li><p>The device will be recreated with your selected plugins active.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The device reload feature recreates the device connection with the new plugin
+configuration. Any active measurements or configurations within plugins will be
+reset during the reload process.</p>
+</div>
+</section>
 </section>
 </section>
 <section id="user-guides">
