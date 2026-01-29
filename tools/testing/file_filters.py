@@ -84,3 +84,73 @@ def filter_rst_content(file_path, rbp_filter, new_uids=None):
 
     # Reconstruct file
     return rebuild_rst_file(structure['header'], filtered_tests)
+
+
+def _test_to_metadata(test, file_info):
+    """Convert test and file info to metadata dict for filter expression evaluation."""
+    return {
+        'component': file_info['component'],
+        'rbp': test['rbp'],
+        'uid': test['uid'],
+        'file_path': file_info['file_path'],
+        'relative_path': file_info['relative_path']
+    }
+
+
+def filter_by_expression(test_files, filter_expression, dest_dir, component_filter=None):
+    """
+    Filter and copy files using filter expression evaluation.
+
+    Args:
+        test_files: List of file information dictionaries
+        filter_expression: FilterExpression object to evaluate against tests
+        dest_dir: Destination directory for copied files
+        component_filter: Optional component filter for backwards compatibility
+
+    Returns:
+        int: Number of files copied
+    """
+    import os
+    import shutil
+
+    copied_count = 0
+
+    for file_info in test_files:
+        # Skip index files - they're not needed for CSV workflow
+        if 'index.rst' in file_info['relative_path']:
+            continue
+
+        # Read and parse RST structure to get tests with heading/content
+        with open(file_info['file_path'], 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        structure = parse_rst_structure(content)
+
+        # Filter tests using expression evaluation
+        filtered_tests = []
+        for test in structure['tests']:
+            # Convert test to metadata format
+            test_metadata = _test_to_metadata(test, file_info)
+
+            # Evaluate filter expression
+            if filter_expression.evaluate(test_metadata):
+                filtered_tests.append(test)
+
+        # Skip files with no matching tests
+        if not filtered_tests:
+            continue
+
+        # Prepare destination path
+        dest_file_path = os.path.join(dest_dir, file_info['relative_path'])
+        os.makedirs(os.path.dirname(dest_file_path), exist_ok=True)
+
+        # Rebuild RST with filtered tests
+        new_content = rebuild_rst_file(structure['header'], filtered_tests)
+
+        # Write filtered content
+        with open(dest_file_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+
+        copied_count += 1
+
+    return copied_count
