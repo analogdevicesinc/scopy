@@ -191,57 +191,58 @@ SFDR, and harmonic distortion analysis, making it ideal for ADC characterization
 3. On "Measure" enable "Genalyzer analysis" 
 4. The analysis results appear in a separate panel alongside the frequency plot
 
-**Analysis Modes:**
+**Analysis Modes**
+~~~~~~~~~~~~~~~~~~~~~~
 
-Auto Mode
-~~~~~~~~~
+- **Auto Mode**
 
-In **Auto Mode**, Genalyzer automatically detects the fundamental tone in the frequency spectrum
-and computes analysis metrics. This mode is ideal for general-purpose analysis when the signal
-frequency may vary or is unknown.
+  In **Auto Mode**, Genalyzer automatically detects the fundamental tone in the frequency spectrum
+  and computes analysis metrics. This mode is ideal for general-purpose analysis when the signal
+  frequency may vary or is unknown.
 
-**Parameters:**
-- **SSB Width**: Controls the single-side bin search range for automatic tone detection (default: 120 bins)
+  **Parameters:**
+  - **SSB Width**: Controls the single-side bin search range for automatic tone detection (default: 120 bins)
 
-**When to use:** General analysis, unknown signal frequencies, or exploratory measurements.
+  **When to use:** General analysis, unknown signal frequencies, or exploratory measurements.
 
-Fixed Tone Mode
-~~~~~~~~~~~~~~~
+- **Fixed Tone Mode**
 
-In **Fixed Tone Mode**, you specify the expected signal frequency for precise analysis. This mode
-provides additional configuration options and is ideal for characterized test signals.
+  In **Fixed Tone Mode**, you specify the expected signal frequency for precise analysis. This mode
+  provides additional configuration options and is ideal for characterized test signals.
 
-**Parameters:**
-- **Expected Frequency**: The frequency of the signal tone in Hz
-- **Harmonic Order**: Maximum harmonic order for distortion analysis (e.g., HD2, HD3, HD4...)
-- **SSB Fundamental**: Number of single-side bins around the fundamental tone
-- **SSB Default**: Default single-side bins for other spectral components
+  **Parameters:**
+  - **Expected Frequency**: The frequency of the signal tone in Hz
+  - **Harmonic Order**: Maximum harmonic order for distortion analysis (e.g., HD2, HD3, HD4...)
+  - **SSB Fundamental**: Number of single-side bins around the fundamental tone
+  - **SSB Default**: Default single-side bins for other spectral components
 
-**When to use:** Characterized test tones, precise harmonic distortion analysis, or when you need specific bin configurations.
+  **When to use:** Characterized test tones, precise harmonic distortion analysis, or when you need specific bin configurations.
 
-**Analysis Metrics:**
+**Analysis Metrics**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Genalyzer computes the following industry-standard ADC performance metrics:
+  Genalyzer computes the following industry-standard ADC performance metrics:
 
-**Signal Quality Metrics:**
-- **SNR (Signal-to-Noise Ratio)**: Ratio of signal power to noise power
-- **SINAD (Signal-to-Noise-and-Distortion)**: Ratio of signal power to noise plus distortion
-- **FSNR (Full-Scale-to-Noise Ratio)**: Ratio of full-scale signal to noise floor
+  - **Signal Quality Metrics:**
+    - **SNR (Signal-to-Noise Ratio)**: Ratio of signal power to noise power
+    - **SINAD (Signal-to-Noise-and-Distortion)**: Ratio of signal power to noise plus distortion
+    - **FSNR (Full-Scale-to-Noise Ratio)**: Ratio of full-scale signal to noise floor
 
-**Distortion Metrics:**
-- **SFDR (Spurious-Free Dynamic Range)**: Difference between signal and largest spurious component
-- **THD (Total Harmonic Distortion)**: Combined power of all harmonic distortions
-- **Individual Harmonics**: HD2, HD3, HD4... levels in dBc and dBFS
+  - **Distortion Metrics:**
+    - **SFDR (Spurious-Free Dynamic Range)**: Difference between signal and largest spurious component
+    - **THD (Total Harmonic Distortion)**: Combined power of all harmonic distortions
+    - **Individual Harmonics**: HD2, HD3, HD4... levels in dBc and dBFS
 
-**Noise Metrics:**
-- **ABN (Average Bin Noise)**: Average noise level per frequency bin
-- **NSD (Noise Spectral Density)**: Noise power density across the spectrum
+  - **Noise Metrics:**
+    - **ABN (Average Bin Noise)**: Average noise level per frequency bin
+    - **NSD (Noise Spectral Density)**: Noise power density across the spectrum
 
-**Signal Levels:**
-- **Carrier Level**: Fundamental tone magnitude in dBFS
-- **Harmonic Levels**: Individual harmonic magnitudes in dBFS and dBc
+  - **Signal Levels:**
+    - **Carrier Level**: Fundamental tone magnitude in dBFS
+    - **Harmonic Levels**: Individual harmonic magnitudes in dBFS and dBc
 
 **Integration with FFT Workflow:**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Genalyzer analysis works seamlessly with the existing Frequency instrument features:
 
