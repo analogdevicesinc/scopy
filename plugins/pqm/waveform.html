@@ -8,7 +8,7 @@
 
     <title>Waveform &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -310,6 +310,8 @@ Content on this topic
 <p>The main purpose of this instrument is to display the waveform of the voltage
 and current for each phase. In one second, 10 cycles should be displayed at a
 frequency of 50 Hz, or 12 cycles at a frequency of 60 Hz.</p>
+<p>All widgets in the Waveform instrument are dockable, allowing users to
+customize the workspace by arranging and resizing components.</p>
 <p>The instrument is divided into two sections:</p>
 <ol class="arabic simple">
 <li><p>Voltage plot: Shows voltage waveforms (top).</p></li>
@@ -318,12 +320,13 @@ frequency of 50 Hz, or 12 cycles at a frequency of 60 Hz.</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/waveform.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/waveform.png" />
 <section id="user-guide">
 <h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading"></a></h2>
-<p>#. From the menu on the left, you can select the desired instrument. To the
-right of the name, there is a button that allows you to start or stop data
-acquisition.
-#. Clicking the settings button brings up the settings menu.
-#. By pressing the “Single” button, a single batch of data is acquired.
-#. By pressing the “Run” button, continuous data acquisition starts.</p>
+<ol class="arabic simple">
+<li><p>From the menu on the left, you can select the desired instrument. To the right
+of the name, there is a button that allows you to start or stop data acquisition.</p></li>
+<li><p>Clicking the settings button brings up the settings menu.</p></li>
+<li><p>By pressing the “Single” button, a single batch of data is acquired.</p></li>
+<li><p>By pressing the “Run” button, continuous data acquisition starts.</p></li>
+</ol>
 <aside class="topic">
 <p class="topic-title">Settings menu</p>
 <img alt="waveform settings" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/waveformSettings.png" />
@@ -336,6 +339,9 @@ default is the phase Ua). This menu option becomes inactive when rolling mode
 is activated or data acquisition starts.</p></li>
 <li><p>Rolling mode: This switch is used to activate/deactivate rolling
 mode (by default is off).</p></li>
+<li><p>Log: Enable or disable logging for the Waveform instrument. When
+enabled, all acquired data will be saved to a log file for later
+analysis.</p></li>
 </ol>
 </aside>
 </section>

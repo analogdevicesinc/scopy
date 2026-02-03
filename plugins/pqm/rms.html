@@ -8,7 +8,7 @@
 
     <title>RMS &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -97,6 +97,7 @@
           <ul>
 <li><a class="reference internal" href="#">RMS</a><ul>
 <li><a class="reference internal" href="#user-guide">User Guide</a></li>
+<li><a class="reference internal" href="#pq-events">PQ Events</a></li>
 </ul>
 </li>
 </ul>
@@ -312,6 +313,8 @@ RMS and the angle of each phase (for both voltage and current). At the same
 time, information such as voltage and current unbalance or flicker data can
 also be inferred from here. Each time new data is available, the tool updates
 accordingly.</p>
+<p>All widgets in the RMS instrument are dockable, allowing users to customize
+the workspace by arranging and resizing components.</p>
 <p>The instrument is divided into two sections:</p>
 <ol class="arabic simple">
 <li><p>Voltage: Shows the details of the voltage (left side).</p></li>
@@ -324,9 +327,26 @@ accordingly.</p>
 <li><p>From the menu on the left, you can select the desired instrument. To the
 right of the name, there is a button that allows you to start or stop data
 acquisition.</p></li>
+<li><p>Clicking the settings button brings up the settings menu.</p></li>
 <li><p>By pressing the “Single” button, a single batch of data is acquired.</p></li>
 <li><p>By pressing the “Run” button, continuous data acquisition starts.</p></li>
 </ol>
+<aside class="topic">
+<p class="topic-title">Settings menu</p>
+<img alt="RMS settings" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/rmsSettings.png" />
+<ol class="arabic simple">
+<li><p>Log: Enable or disable logging for the RMS instrument. When enabled,
+all acquired data will be saved to a log file for later analysis.</p></li>
+</ol>
+</aside>
+</section>
+<section id="pq-events">
+<h2>PQ Events<a class="headerlink" href="#pq-events" title="Link to this heading"></a></h2>
+<p>The PQEvents button is used to notify the user when a specific power quality
+event has occurred. When the user clicks on the PQEvents button, it resets and
+waits for the next event to occur. All detected events can be viewed in the log
+if logging is enabled for the instrument.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/pqevents.png" class="align-left" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/pqevents.png" />
 </section>
 </section>
 

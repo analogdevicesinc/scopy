@@ -8,7 +8,7 @@
 
     <title>PQM &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -308,15 +308,23 @@ Content on this topic
 contains as main components an ADE9430 and a MAX32650 (MCU). The device is
 exposed through an IIO context, from which we receive and send our necessary
 information.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>RMS and Harmonics instruments support concurrent acquisition, allowing
+simultaneous data collection. Waveform acquisition runs separately.</p>
+</div>
 <p>The plugin contains 4 instruments:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="rms.html">RMS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="rms.html#user-guide">User Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rms.html#pq-events">PQ Events</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="harmonics.html">Harmonics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="harmonics.html#user-guide">User Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="harmonics.html#overview-plot">Overview Plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="harmonics.html#pq-events">PQ Events</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="waveform.html">Waveform</a><ul>

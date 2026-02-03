@@ -8,7 +8,7 @@
 
     <title>Harmonics &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -97,6 +97,8 @@
           <ul>
 <li><a class="reference internal" href="#">Harmonics</a><ul>
 <li><a class="reference internal" href="#user-guide">User Guide</a></li>
+<li><a class="reference internal" href="#overview-plot">Overview Plot</a></li>
+<li><a class="reference internal" href="#pq-events">PQ Events</a></li>
 </ul>
 </li>
 </ul>
@@ -310,22 +312,24 @@ Content on this topic
 <p>The main purpose of this instrument is to display and graphically represent the
 voltage and current harmonics or inter harmonics. Each time new data is
 available, the tool updates accordingly.</p>
-<p>The instrument contains 3 sections:</p>
+<p>All widgets in the Harmonics instrument are dockable, allowing users to
+customize the workspace by arranging and resizing components.</p>
+<p>The instrument contains 4 sections:</p>
 <ol class="arabic simple">
 <li><p>Total Harmonic Distortion (THD).</p></li>
 <li><p>Harmonics table.</p></li>
-<li><p>Harmonics plot.</p></li>
+<li><p>Individual current channel plots (Ia, Ib, Ic) - shown by default.</p></li>
+<li><p>Harmonics overview plot - available through a toggle in the settings menu.</p></li>
 </ol>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonics.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonics.png" />
 <section id="user-guide">
 <h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading"></a></h2>
-<p>#. From the menu on the left, you can select the desired instrument. To the
-right of the name, there is a button that allows you to start or stop data
-acquisition.
-#. Clicking the settings button brings up the settings menu.
-#. Settings menu.
-#. By pressing the “Single” button, a single batch of data is acquired.
-#. By pressing the “Run” button, continuous data acquisition starts.</p>
+<ol class="arabic simple">
+<li><p>From the menu on the left, you can select the desired instrument. To the right of the name, there is a button that allows you to start or stop data acquisition.</p></li>
+<li><p>Clicking the settings button brings up the settings menu.</p></li>
+<li><p>By pressing the “Single” button, a single batch of data is acquired.</p></li>
+<li><p>By pressing the “Run” button, continuous data acquisition starts.</p></li>
+</ol>
 <aside class="topic">
 <p class="topic-title">Settings menu</p>
 <img alt="alternate text" class="align-right" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonicsSettings.png" />
@@ -344,13 +348,29 @@ those values will be displayed on the plot.</p></li>
 </ul>
 </div></blockquote>
 </li>
+<li><p>Log: Enable or disable logging for the Harmonics instrument. When
+enabled, all acquired data will be saved to a log file for later
+analysis.</p></li>
 </ol>
 </aside>
-<p>In the next image, you can see that the plot displays only the harmonic
-values with degree ranging from 3 to 14.</p>
-<blockquote>
-<div><img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonicsRange.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonicsRange.png" />
-</div></blockquote>
+</section>
+<section id="overview-plot">
+<h2>Overview Plot<a class="headerlink" href="#overview-plot" title="Link to this heading"></a></h2>
+<p>The overview plot can be enabled through the settings menu. The user can select
+which channel is displayed on the plot, with only one channel visible at a
+time. The harmonic degrees to be displayed can be selected by choosing one or
+more cells from the harmonics table.</p>
+<p>In the image below, only harmonics with degrees ranging from 3 to 14 are
+displayed.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonicsRange.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonicsRange.png" />
+</section>
+<section id="pq-events">
+<h2>PQ Events<a class="headerlink" href="#pq-events" title="Link to this heading"></a></h2>
+<p>The PQEvents button is used to notify the user when a specific power quality
+event has occurred. When the user clicks on the PQEvents button, it resets and
+waits for the next event to occur. All detected events can be viewed in the log
+if logging is enabled for the instrument.</p>
+<img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/pqevents.png" class="align-left" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/pqevents.png" />
 </section>
 </section>
 

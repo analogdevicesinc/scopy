@@ -8,7 +8,7 @@
 
     <title>PQM Tests &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../../_static/scopy.png"/>
@@ -106,6 +106,7 @@
 <li><a class="reference internal" href="#test-6-data-logging">Test 6: Data logging.</a></li>
 <li><a class="reference internal" href="#test-7-data-logging-wrong-path">Test 7: Data logging wrong path.</a></li>
 <li><a class="reference internal" href="#test-8-pqevents">Test 8: PQEvents.</a></li>
+<li><a class="reference internal" href="#test-9-pqevents-synchronization">Test 9: PQEvents synchronization.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#harmonics-tool">Harmonics tool</a><ul>
@@ -114,11 +115,12 @@
 <li><a class="reference internal" href="#id4">Test 2: Info button check.</a></li>
 <li><a class="reference internal" href="#tst-pqm-harmonics-single">Test 3: Single acquisition.</a></li>
 <li><a class="reference internal" href="#tst-pqm-harmonics-run">Test 4: Data acquisition.</a></li>
-<li><a class="reference internal" href="#test-5-the-features-of-the-table">Test 5: The features of the table.</a></li>
+<li><a class="reference internal" href="#test-5-overview-plot-features">Test 5: Overview plot features.</a></li>
 <li><a class="reference internal" href="#test-6-settings-button-check">Test 6: Settings button check.</a></li>
 <li><a class="reference internal" href="#test-7-data-logging">Test 7: Data logging.</a></li>
 <li><a class="reference internal" href="#test-8-data-logging-wrong-path">Test 8: Data logging wrong path.</a></li>
 <li><a class="reference internal" href="#test-9-pqevents">Test 9: PQEvents.</a></li>
+<li><a class="reference internal" href="#test-10-current-harmonics-plots-data-correspondence">Test 10: Current harmonics plots data correspondence.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#waveform-tool">Waveform tool</a><ul>
@@ -135,6 +137,7 @@
 <li><a class="reference internal" href="#test-10-plot-zoom">Test 10: Plot zoom.</a></li>
 <li><a class="reference internal" href="#test-11-data-logging">Test 11: Data logging.</a></li>
 <li><a class="reference internal" href="#test-12-data-logging-wrong-path">Test 12: Data logging wrong path.</a></li>
+<li><a class="reference internal" href="#test-13-concurrent-acquisition-with-rms-and-harmonics">Test 13: Concurrent acquisition with RMS and Harmonics.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#settings-tool">Settings tool</a><ul>
@@ -759,7 +762,7 @@ file is created.</p></li>
 <p><strong>Result:</strong> PASS/FAIL</p>
 </section>
 <section id="test-8-pqevents">
-<h3>Test 8: PQEvents.<a class="headerlink" href="#test-8-pqevents" title="Link to this heading"></a></h3>
+<span id="tst-pqm-rms-pqevents"></span><h3>Test 8: PQEvents.<a class="headerlink" href="#test-8-pqevents" title="Link to this heading"></a></h3>
 <p><strong>UID:</strong> TST.PQM.RMS_PQEVENTS</p>
 <p><strong>RBP:</strong> P3</p>
 <p><strong>Description:</strong> This test verifies if the PQEvents indicator works correctly.</p>
@@ -815,6 +818,87 @@ file is created.</p></li>
 </div></blockquote>
 <blockquote>
 <div><ol class="arabic simple" start="6">
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">iio_attr</span> <span class="pre">-u</span> <span class="pre">ip:127.0.0.1</span> <span class="pre">-c</span> <span class="pre">pqm</span> <span class="pre">count0</span> <span class="pre">countEvent</span> <span class="pre">0</span></code> command.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-pqevents-synchronization">
+<h3>Test 9: PQEvents synchronization.<a class="headerlink" href="#test-9-pqevents-synchronization" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.PQM.RMS_PQEVENTS_SYNC</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> This test verifies that the PQEvents indicator is synchronized
+between RMS and Harmonics tools. When the PQEvents button is reset in one tool,
+it must also be reset in the other tool.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-pqm-rms-pqevents"><span class="std std-ref">TST.PQM.RMS_PQEVENTS</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#pqm-emu-rms"><span class="std std-ref">PQM.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the <strong>Rms</strong> tool.</p></li>
+<li><p>Click on the <strong>Run</strong> button.</p></li>
+<li><dl class="simple">
+<dt>Run <code class="docutils literal notranslate"><span class="pre">iio_attr</span> <span class="pre">-u</span> <span class="pre">ip:127.0.0.1</span> <span class="pre">-c</span> <span class="pre">pqm</span> <span class="pre">count0</span> <span class="pre">countEvent</span> <span class="pre">1</span></code> command.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The PQEvents indicator becomes active.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Click on the <strong>Harmonics</strong> tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The PQEvents indicator in the Harmonics tool is
+also active.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Click on the <strong>PQEvents</strong> indicator in the Harmonics tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The PQEvents indicator becomes inactive.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Click on the <strong>Rms</strong> tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The PQEvents indicator in the RMS tool is also
+inactive.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><p>Click on the <strong>Stop</strong> button.</p></li>
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">iio_attr</span> <span class="pre">-u</span> <span class="pre">ip:127.0.0.1</span> <span class="pre">-c</span> <span class="pre">pqm</span> <span class="pre">count0</span> <span class="pre">countEvent</span> <span class="pre">0</span></code> command.</p></li>
 </ol>
 </div></blockquote>
@@ -1031,11 +1115,13 @@ be reflected on the plot.</p></li>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
 </section>
-<section id="test-5-the-features-of-the-table">
-<h3>Test 5: The features of the table.<a class="headerlink" href="#test-5-the-features-of-the-table" title="Link to this heading"></a></h3>
-<p><strong>UID:</strong> TST.PQM.HARMONICS_TABLE</p>
+<section id="test-5-overview-plot-features">
+<h3>Test 5: Overview plot features.<a class="headerlink" href="#test-5-overview-plot-features" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.PQM.HARMONICS_OVERVIEW_PLOT</p>
 <p><strong>RBP:</strong> P3</p>
-<p><strong>Description:</strong> This test verifies if the table functionalities works correctly.</p>
+<p><strong>Description:</strong> This test verifies that the overview plot works correctly. On
+the overview plot, the user can select which channel is displayed and which
+harmonic degrees to show by selecting cells from the table.</p>
 <dl class="simple">
 <dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="#tst-pqm-harmonics-single"><span class="std std-ref">TST.PQM.HARMONICS_SINGLE</span></a>.</p></li>
@@ -1050,10 +1136,12 @@ be reflected on the plot.</p></li>
 </dd>
 <dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
 <li><p>Click on the <strong>Harmonics</strong> tool.</p></li>
+<li><p>Open the settings menu and enable the <strong>Overview plot</strong>.</p></li>
 <li><dl class="simple">
 <dt>Click on the <strong>Single</strong> button.</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> The row Ia is highlighted and the corresponding
-values are drawn on the plot.</p></li>
+<li><p><strong>Expected result:</strong> The table and overview plot are populated with
+data. The Ia row is highlighted and the corresponding values are
+drawn on the overview plot.</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1063,12 +1151,13 @@ values are drawn on the plot.</p></li>
 </dd>
 </dl>
 <blockquote>
-<div><ol class="arabic simple" start="3">
-<li><p>Make sure that the settings menu is visible.</p></li>
+<div><ol class="arabic simple" start="4">
 <li><dl class="simple">
-<dt>Click on the <strong>Ib</strong> row from the table.</dt><dd><ul class="simple">
-<li><p><strong>Expected result:</strong> The entire row is selected and the Ib values are
-displayed on the plot. In the setting menu, the active channel is also Ib.</p></li>
+<dt>Click on the <strong>Ub</strong> row from the table.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The entire row is selected and the Ub values are
+displayed on the overview plot. In the settings menu, the active
+channel is also Ub. Only one channel is visible at a time on the
+overview plot.</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1081,8 +1170,21 @@ displayed on the plot. In the setting menu, the active channel is also Ib.</p></
 <li><dl class="simple">
 <dt>Select the first 6 values from row <strong>Ic</strong> (click on the first value and hold it down until you reach column 5).</dt><dd><ul class="simple">
 <li><p><strong>Expected result:</strong> Only the respective values remain highlighted,
-and only the selected columns appear on the plot. The drawing color
-is another one.</p></li>
+and only the selected harmonic degrees (0 to 5) appear on the overview
+plot.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Compare the bar heights on the overview plot with the values in the selected cells.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The bar heights on the overview plot match the
+numeric values displayed in the selected table cells.</p></li>
 <li><p><strong>Actual result:</strong></p></li>
 </ul>
 </dd>
@@ -1375,6 +1477,85 @@ created.</p></li>
 <blockquote>
 <div><ol class="arabic simple" start="5">
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">iio_attr</span> <span class="pre">-u</span> <span class="pre">ip:127.0.0.1</span> <span class="pre">-c</span> <span class="pre">pqm</span> <span class="pre">count0</span> <span class="pre">countEvent</span> <span class="pre">0</span></code> command.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-current-harmonics-plots-data-correspondence">
+<h3>Test 10: Current harmonics plots data correspondence.<a class="headerlink" href="#test-10-current-harmonics-plots-data-correspondence" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.PQM.HARMONICS_CURRENT_PLOTS_DATA</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> This test verifies that the data displayed on the individual
+current harmonics plots (Ia, Ib, Ic) corresponds with the data shown in the
+harmonics table. These plots display all harmonic values.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-pqm-harmonics-single"><span class="std std-ref">TST.PQM.HARMONICS_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#pqm-emu-harmonics"><span class="std std-ref">PQM.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the <strong>Harmonics</strong> tool.</p></li>
+<li><dl class="simple">
+<dt>Click on the <strong>Single</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The table and the individual current harmonics
+plots (Ia, Ib, Ic) are populated with data.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Compare the values in the <strong>Ia</strong> row of the table with the bar heights on the Ia plot.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All bars on the Ia plot correspond to the values
+in the Ia row. The bar heights match the numeric values displayed in
+the table cells.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="4">
+<li><dl class="simple">
+<dt>Compare the values in the <strong>Ib</strong> row of the table with the bar heights on the Ib plot.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All bars on the Ib plot correspond to the values
+in the Ib row. The bar heights match the numeric values displayed in
+the table cells.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Compare the values in the <strong>Ic</strong> row of the table with the bar heights on the Ic plot.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All bars on the Ic plot correspond to the values
+in the Ic row. The bar heights match the numeric values displayed in
+the table cells.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
 </ol>
 </div></blockquote>
 <p><strong>Tested OS:</strong></p>
@@ -2002,6 +2183,101 @@ created.</p></li>
 </dd>
 </dl>
 </li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-concurrent-acquisition-with-rms-and-harmonics">
+<h3>Test 13: Concurrent acquisition with RMS and Harmonics.<a class="headerlink" href="#test-13-concurrent-acquisition-with-rms-and-harmonics" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.PQM.WAVEFORM_CONCURRENT_ACQ</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> This test verifies that when RMS and Harmonics tools are
+running and the user starts acquisition on the Waveform tool, the acquisition
+on RMS and Harmonics stops automatically.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#tst-pqm-rms-run"><span class="std std-ref">TST.PQM.RMS_RUN</span></a>.</p></li>
+<li><p><a class="reference internal" href="#tst-pqm-harmonics-run"><span class="std std-ref">TST.PQM.HARMONICS_RUN</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#pqm-emu-waveform"><span class="std std-ref">PQM.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the <strong>Rms</strong> tool.</p></li>
+<li><dl class="simple">
+<dt>Click on the <strong>Run</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Data acquisition starts on the RMS tool.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Click on the <strong>Harmonics</strong> tool.</p></li>
+<li><dl class="simple">
+<dt>Click on the <strong>Run</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Data acquisition starts on the Harmonics tool.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><p>Click on the <strong>Waveform</strong> tool.</p></li>
+<li><dl class="simple">
+<dt>Click on the <strong>Run</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Data acquisition starts on the Waveform tool.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Click on the <strong>Rms</strong> tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Data acquisition on the RMS tool has stopped. The
+Run button is no longer in the active/pressed state.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="8">
+<li><dl class="simple">
+<dt>Click on the <strong>Harmonics</strong> tool.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Data acquisition on the Harmonics tool has
+stopped. The Run button is no longer in the active/pressed state.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><p>Click on the <strong>Waveform</strong> tool.</p></li>
+<li><p>Click on the <strong>Stop</strong> button.</p></li>
 </ol>
 </div></blockquote>
 <p><strong>Tested OS:</strong></p>

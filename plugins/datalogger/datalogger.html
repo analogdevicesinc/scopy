@@ -8,7 +8,7 @@
 
     <title>Datalogger &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=5d595293" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=22cbc7d3" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=46a18818"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -100,6 +100,7 @@
 <li><a class="reference internal" href="#display-signals">Display Signals</a></li>
 <li><a class="reference internal" href="#display-text">Display Text</a></li>
 <li><a class="reference internal" href="#display-seven-segment">Display Seven Segment</a></li>
+<li><a class="reference internal" href="#channel-attributes">Channel Attributes</a></li>
 <li><a class="reference internal" href="#settings">Settings</a></li>
 <li><a class="reference internal" href="#save-data">Save data</a></li>
 <li><a class="reference internal" href="#import-data">Import data</a></li>
@@ -374,6 +375,35 @@ selected device channels last read value, minimum and maximum recorded values
 and the unit of measurement will be displayed in seven segment display format</p>
 <p>To use this option click “7 Segment” button on the bottom right</p>
 <img alt="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger3.png" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/datalogger/datalogger3.png" />
+</section>
+<hr class="docutils" />
+<section id="channel-attributes">
+<h2>Channel Attributes<a class="headerlink" href="#channel-attributes" title="Link to this heading"></a></h2>
+<p>When you click on a channel in the left menu, the channel attributes panel opens on the right side.
+This panel provides several customization options for each individual channel:</p>
+<p><strong>Custom Display Names</strong></p>
+<p>You can customize how channels appear in the interface by changing their display names:</p>
+<ol class="arabic simple">
+<li><p>Click on any channel in the left menu to open its attributes panel</p></li>
+<li><p>The channel name appears in the header at the top of the attributes panel</p></li>
+<li><p>Click on the name field to edit it directly</p></li>
+<li><p>The new display name will be used throughout the interface (plots, seven segment displays, etc.)</p></li>
+</ol>
+<p><strong>Unit of Measurement Customization</strong></p>
+<p>The “Unit Of Measurement” section allows you to override the default units for any channel:</p>
+<ol class="arabic simple">
+<li><p>In the channel attributes panel, find the “Unit Of Measurement” section</p></li>
+<li><p><strong>Name</strong>: Override the full unit name (e.g., “Voltage”, “Temperature”, “Pressure”)</p></li>
+<li><p><strong>Symbol</strong>: Override the unit symbol (e.g., “V”, “°C”, “Pa”)</p></li>
+<li><p>These custom units will be displayed in all views (text, seven segment, and plot legends)</p></li>
+</ol>
+<p><strong>Other Channel Settings</strong></p>
+<p>The attributes panel also includes:</p>
+<ul class="simple">
+<li><p><strong>Attributes</strong>: Device-specific channel configuration options</p></li>
+<li><p><strong>Scaling</strong>: Raw values, device scaling, or custom scale override</p></li>
+<li><p><strong>Plot Assignment</strong>: Assign channels to different plots (experimental feature)</p></li>
+</ul>
 </section>
 <hr class="docutils" />
 <section id="settings">
