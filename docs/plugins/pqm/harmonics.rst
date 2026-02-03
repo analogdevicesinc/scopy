@@ -7,13 +7,18 @@ The main purpose of this instrument is to display and graphically represent the
 voltage and current harmonics or inter harmonics. Each time new data is 
 available, the tool updates accordingly.
 
-The instrument contains 3 sections: 
+All widgets in the Harmonics instrument are dockable, allowing users to
+customize the workspace by arranging and resizing components.
 
-#. Total Harmonic Distortion (THD). 
+The instrument contains 4 sections:
+
+#. Total Harmonic Distortion (THD).
 
 #. Harmonics table.
 
-#. Harmonics plot.
+#. Individual current channel plots (Ia, Ib, Ic) - shown by default.
+
+#. Harmonics overview plot - available through a toggle in the settings menu.
 
 .. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/pqm/harmonics.png
     :align: center
