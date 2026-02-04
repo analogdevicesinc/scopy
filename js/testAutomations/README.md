@@ -165,6 +165,102 @@ cd scopy/build/
 
 ---
 
+#### 📊 **Spectrum Analyzer Tests**
+**File:** `m2k/spectrumAnalyzer/spectrumAnalyzerTests.js`
+
+**Hardware Setup:**
+- M2K Channel 1 Output (W1) → Oscilloscope/Spectrum Analyzer Channel 1 Input (1+)
+- M2K Channel 2 Output (W2) → Oscilloscope/Spectrum Analyzer Channel 2 Input (2+)
+- Connect grounds (1-, 2-) to GND
+
+**Run Command:**
+```bash
+./scopy --script ../js/testAutomations/m2k/spectrumAnalyzer/spectrumAnalyzerTests.js
+```
+
+**Tests Coverage:**
+- Channel 1 frequency detection (500Hz to 5MHz)
+- Channel 2 frequency detection
+- Dual channel simultaneous operation
+- Peak hold and min hold detector types
+- Marker table functionality
+- Sweep settings verification (start/stop frequency)
+- Display settings (cursors, log scale, waterfall)
+- Channel settings (window functions, averaging types)
+- Single shot acquisition mode
+
+---
+
+#### 📈 **Network Analyzer Tests**
+**File:** `m2k/networkAnalyzer/networkAnalyzerTests.js`
+
+**Hardware Setup (Loopback Mode):**
+- W1 (Signal Generator) → 1+ (Channel 1 Input)
+- 1- → GND
+- 2+ → 2- (Channel 2 terminated)
+- All grounds connected
+
+**Note:** Full filter tests (Low Pass, High Pass, Band Pass, Band Stop) require
+external RC circuits as specified in the test documentation.
+
+**Run Command:**
+```bash
+./scopy --script ../js/testAutomations/m2k/networkAnalyzer/networkAnalyzerTests.js
+```
+
+**Tests Coverage:**
+- Sweep settings (frequency range, sample count, log/linear)
+- Reference settings (channel selection, amplitude, offset)
+- Display settings (magnitude/phase scale)
+- Plot types (Bode, Nyquist, Nichols)
+- Cursor functionality (enable, position, transparency)
+- Averaging and periods settings
+- Line thickness settings
+- Loopback sweep test (Channel 1)
+- Frequency response data validity
+- Logarithmic vs Linear sweep comparison
+- Reference channel comparison
+- Run/Stop control
+- Wide frequency range sweep (10Hz to 10MHz)
+- Notes functionality
+
+---
+
+#### 🔧 **Calibration Tests**
+**File:** `m2k/calibration/calibrationTests.js`
+
+**Hardware Setup:**
+- ADALM2000 device connected (real hardware recommended)
+- Optional: V+ → 1+ for measurement accuracy test
+- No external connections required for basic calibration tests
+
+**Run Command:**
+```bash
+./scopy --script ../js/testAutomations/m2k/calibration/calibrationTests.js
+```
+
+**Tests Coverage:**
+- Calibration API availability
+- Full calibration (ADC + DAC)
+- ADC-only calibration
+- DAC-only calibration
+- Reset calibration to defaults
+- Device temperature reading
+- Manual calibration parameter reading (offsets and gains)
+- Auto calibration via manual calibration API
+- Load default calibration
+- Story-based calibration API structure
+- Calibration parameter ranges verification
+- Calibration persistence between runs
+- Calibration effect on measurements
+- Final recalibration (cleanup)
+
+**Note:** Calibration tests modify device calibration parameters. The test suite
+includes a final recalibration step to ensure the device is properly calibrated
+after testing.
+
+---
+
 #### 🔌 **Digital I/O Tests**
 **File:** `m2k/digitalIO/digitalIOTests.js`
 
@@ -198,6 +294,72 @@ cd scopy/build/
 - Rapid toggle stress testing
 - Grouped pin operations
 - Start/stop control
+
+---
+
+#### 📊 **Logic Analyzer Tests (Partial)**
+**File:** `m2k/logicAnalyzer/logicAnalyzerTests.js`
+
+**Hardware Setup:**
+- No external connections required for configuration tests
+- For signal capture validation (not currently testable), connect DIO pins to signal sources
+
+**Run Command:**
+```bash
+./scopy --script ../js/testAutomations/m2k/logicAnalyzer/logicAnalyzerTests.js
+```
+
+**Tests Coverage:**
+- Sample rate settings (1 kSa/s to 100 MSa/s)
+- Buffer size configuration
+- Delay/time position settings
+- Stream vs one-shot mode toggle
+- Channel enable/disable (0-15)
+- Custom channel names
+- Channel heights for visualization
+- Channel vertical positions
+- Cursors enable/disable
+- Cursor position settings (4 positions)
+- Cursor transparency (0-100%)
+- Channel grouping/bus creation
+- Decoder information reading (read-only)
+- Instrument notes
+
+**Limitations (API constraints):**
+- Cannot start/stop captures (no `running` property exposed)
+- Cannot configure triggers
+- Cannot export captured data
+- Cannot verify actual signal acquisition
+
+---
+
+#### 🔧 **Pattern Generator Tests (Partial)**
+**File:** `m2k/patternGenerator/patternGeneratorTests.js`
+
+**Hardware Setup:**
+- No external connections required for configuration tests
+- For output validation (not currently testable), connect DIO pins to logic analyzer or oscilloscope
+
+**Run Command:**
+```bash
+./scopy --script ../js/testAutomations/m2k/patternGenerator/patternGeneratorTests.js
+```
+
+**Tests Coverage:**
+- Channel enable/disable (0-15)
+- Custom channel names
+- Channel heights for visualization
+- Channel vertical positions
+- Single channel group creation (4-bit, 8-bit buses)
+- Multiple simultaneous groups (nibbles, bytes)
+- Pattern assignment to channels
+- Instrument notes (including multi-line)
+
+**Limitations (API constraints):**
+- Cannot start/stop pattern generation (no `running` property exposed)
+- Cannot set pattern parameters (frequency, duty cycle, baud rate)
+- Cannot verify actual output signals
+- Cannot fully configure protocol patterns (UART, SPI, I2C)
 
 ---
 
@@ -424,5 +586,5 @@ These test suites are part of the Scopy project and follow the same licensing te
 
 ---
 
-*Last Updated: February 2, 2026*
-*Version: 1.0.0*
+*Last Updated: February 4, 2026*
+*Version: 1.2.0*
