@@ -17,8 +17,8 @@
 // Load test framework
 evaluateFile("../js/testAutomations/common/testFramework.js");
 
-// Test Suite: Data Logger 
-TestFramework.init("Data Logger  Tests");
+// Test Suite: Data Logger
+TestFramework.init("Data Logger Tests");
 
 // Connect to device
 if (!TestFramework.connectToDevice()) {
@@ -26,9 +26,9 @@ if (!TestFramework.connectToDevice()) {
     exit(1);
 }
 
-// Switch to Data Logger  tool
-if (!switchToTool("Data Logger ")) {
-    printToConsole("ERROR: Cannot access Data Logger ");
+// Switch to Data Logger tool
+if (!switchToTool("Data Logger")) {
+    printToConsole("ERROR: Cannot access Data Logger");
     exit(1);
 }
 
@@ -118,12 +118,12 @@ TestFramework.runTest("TST.DATALOGGER.ENABLE_MONITORS", function() {
 TestFramework.runTest("TST.DATALOGGER.START_STOP", function() {
     try {
         // Start logging
-        printToConsole("  Starting Data Logger ");
+        printToConsole("  Starting Data Logger");
         datalogger.setRunning(true);
         msleep(2000);
 
         // Stop logging
-        printToConsole("  Stopping Data Logger ");
+        printToConsole("  Stopping Data Logger");
         datalogger.setRunning(false);
         msleep(500);
 
@@ -139,7 +139,7 @@ TestFramework.runTest("TST.DATALOGGER.START_STOP", function() {
 // Test 5: Create Tool
 TestFramework.runTest("TST.DATALOGGER.CREATE_TOOL", function() {
     try {
-        printToConsole("  Creating new Data Logger  tool");
+        printToConsole("  Creating new Data Logger tool");
         datalogger.createTool();
         msleep(500);
 
