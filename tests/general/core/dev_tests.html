@@ -108,6 +108,8 @@
 <li><a class="reference internal" href="#test-9-connecting-to-multiple-devices">Test 9: Connecting to multiple devices.</a></li>
 <li><a class="reference internal" href="#test-10-resource-manager-with-multiple-devices">Test 10: Resource manager with multiple devices.</a></li>
 <li><a class="reference internal" href="#test-11-devices-order-in-device-browser">Test 11: Devices order in device browser.</a></li>
+<li><a class="reference internal" href="#test-12-device-page-tabbed-interface">Test 12: Device page tabbed interface.</a></li>
+<li><a class="reference internal" href="#test-13-device-reload-with-plugin-changes">Test 13: Device reload with plugin changes.</a></li>
 </ul>
 </li>
 </ul>
@@ -853,6 +855,133 @@ device.</p></li>
 </ol>
 </dd>
 </dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-device-page-tabbed-interface">
+<h2>Test 12: Device page tabbed interface.<a class="headerlink" href="#test-12-device-page-tabbed-interface" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.TABS</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> This test verifies that the device page has a tabbed interface
+with Device Info and Available Plugins tabs.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="add_dev_tests.html#tst-add-plugins-add"><span class="std std-ref">TST.ADD.PLUGINS_ADD_SINGLE</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Click on the device icon from device browser.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device page is displayed with two tabs at the
+bottom: <strong>Device Info</strong> and <strong>Available Plugins</strong>.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>Click on the <strong>Available Plugins</strong> tab.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A list of all compatible plugins for the device
+is displayed with checkboxes to enable/disable them.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><dl class="simple">
+<dt>Click on the <strong>Device Info</strong> tab.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The traditional device information page is
+displayed with Connect/Disconnect controls.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-device-reload-with-plugin-changes">
+<h2>Test 13: Device reload with plugin changes.<a class="headerlink" href="#test-13-device-reload-with-plugin-changes" title="Link to this heading"></a></h2>
+<p><strong>UID:</strong> TST.DEV.RELOAD</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> This test verifies that the device reload feature works
+correctly, allowing users to change plugin configuration without disconnecting.</p>
+<dl class="simple">
+<dt><strong>Test prerequisites:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="connection_tests.html#tst-conn-succ"><span class="std std-ref">TST.CONN.SUCC</span></a>.</p></li>
+</ul>
+</dd>
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed on the system.</p></li>
+<li><p>iio-emu is installed on the system.</p></li>
+<li><p>Use <a class="reference internal" href="#m2k-emu-dev"><span class="std std-ref">M2k.Emu</span></a> setup.</p></li>
+<li><p>OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Click on the device icon from device browser.</p></li>
+<li><dl class="simple">
+<dt>Click on <strong>Connect</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device is connected and tools are available.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="3">
+<li><p>Click on the <strong>Available Plugins</strong> tab at the bottom of the device page.</p></li>
+<li><p>Uncheck one of the enabled plugins.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Reload</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device is reloaded with the new plugin
+configuration. The unchecked plugin is no longer available in the
+tool menu.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><p>Click on the <strong>Available Plugins</strong> tab.</p></li>
+<li><p>Re-enable the previously disabled plugin.</p></li>
+<li><dl class="simple">
+<dt>Click the <strong>Reload</strong> button.</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The device is reloaded and the plugin is now
+available again in the tool menu.</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
 <p><strong>Tested OS:</strong></p>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>

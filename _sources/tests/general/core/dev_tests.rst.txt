@@ -594,8 +594,139 @@ entered into the device browser.
 **Steps:**
     1. Add the emu device.
     2. Add the usb device.
-        - **Expected result:** The usb device is on the right side of emu 
-          device. 
+        - **Expected result:** The usb device is on the right side of emu
+          device.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+
+Test 12: Device page tabbed interface.
+--------------------------------------
+
+**UID:** TST.DEV.TABS
+
+**RBP:** P1
+
+**Description:** This test verifies that the device page has a tabbed interface
+with Device Info and Available Plugins tabs.
+
+**Test prerequisites:**
+    - :ref:`TST.ADD.PLUGINS_ADD_SINGLE <tst-add-plugins-add>`.
+
+**Preconditions:**
+    - Scopy is installed on the system.
+    - iio-emu is installed on the system.
+    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup.
+    - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
+
+**Steps:**
+    1. Click on the device icon from device browser.
+        - **Expected result:** The device page is displayed with two tabs at the
+          bottom: **Device Info** and **Available Plugins**.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    2. Click on the **Available Plugins** tab.
+        - **Expected result:** A list of all compatible plugins for the device
+          is displayed with checkboxes to enable/disable them.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Click on the **Device Info** tab.
+        - **Expected result:** The traditional device information page is
+          displayed with Connect/Disconnect controls.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+
+Test 13: Device reload with plugin changes.
+-------------------------------------------
+
+**UID:** TST.DEV.RELOAD
+
+**RBP:** P1
+
+**Description:** This test verifies that the device reload feature works
+correctly, allowing users to change plugin configuration without disconnecting.
+
+**Test prerequisites:**
+    - :ref:`TST.CONN.SUCC <tst-conn-succ>`.
+
+**Preconditions:**
+    - Scopy is installed on the system.
+    - iio-emu is installed on the system.
+    - Use :ref:`M2k.Emu <m2k-emu-dev>` setup.
+    - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
+
+**Steps:**
+    1. Click on the device icon from device browser.
+    2. Click on **Connect** button.
+        - **Expected result:** The device is connected and tools are available.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Click on the **Available Plugins** tab at the bottom of the device page.
+    4. Uncheck one of the enabled plugins.
+    5. Click the **Reload** button.
+        - **Expected result:** The device is reloaded with the new plugin
+          configuration. The unchecked plugin is no longer available in the
+          tool menu.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    6. Click on the **Available Plugins** tab.
+    7. Re-enable the previously disabled plugin.
+    8. Click the **Reload** button.
+        - **Expected result:** The device is reloaded and the plugin is now
+          available again in the tool menu.
         - **Actual result:**
 
 ..
