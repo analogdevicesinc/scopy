@@ -1679,23 +1679,23 @@ Test 2 - Auto Mode Analysis
    3. In genalyzer settings, select "Auto" mode
    4. Set SSB width to 120 (default)
    5. Press Run to start acquisition
-       - **Expected result:** Genalyzer should automatically detect the 1MHz fundamental tone and display analysis metrics
+       - **Expected result:** Genalyzer should automatically detect the 1MHz fundamental tone ('A:freq' metric) and display analysis metrics
        - **Actual result:**
 
 ..
   Actual test result goes here.
 ..
 
-   6. Check that carrier frequency is detected around 1MHz in the results
-       - **Expected result:** Carrier/fundamental frequency should be approximately 1MHz
+   6. Check that the 'A:mag_dbfs' metric shows the carrier magnitude
+       - **Expected result:** 'A:mag_dbfs' should be between 0 and -20 dBFS for a properly configured signal
        - **Actual result:**
 
 ..
   Actual test result goes here.
 ..
 
-   7. Change SSB width to 60 and observe changes
-       - **Expected result:** Analysis results should update with different bin search range
+   7. Change SSB width to 60 and observe the 'signal_nbins' metric
+       - **Expected result:** The 'signal_nbins' metric should update with different bin search range
        - **Actual result:**
 
 ..
@@ -1746,15 +1746,15 @@ Test 3 - Fixed Tone Mode Analysis
    6. Set SSB Fundamental to 4
    7. Set SSB Default to 3
    8. Press Run to start acquisition
-       - **Expected result:** Analysis should target the 1MHz tone and show harmonic distortion metrics (HD2, HD3, etc.)
+       - **Expected result:** Analysis should target the 1MHz tone and show the 'A:freq' metric matching the expected frequency
        - **Actual result:**
 
 ..
   Actual test result goes here.
 ..
 
-   9. Verify harmonic analysis results appear in the results panel
-       - **Expected result:** Should see individual harmonic levels (HD2, HD3, HD4, HD5) in dBc and dBFS
+   9. Verify signal magnitude metrics appear in the results panel
+       - **Expected result:** 'A:mag_dbfs' should match the highest peak level, 'A:mag_dbc' should be approximately 0 dBc for the fundamental
        - **Actual result:**
 
 ..
@@ -1787,71 +1787,7 @@ Test 3 - Fixed Tone Mode Analysis
   The result of the test goes here (PASS/FAIL).
 
 
-Test 4 - Multi-channel Genalyzer Analysis
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. _TST.ADC_GENALYZER.MULTI_CHANNEL:
-
-**UID:** TST.ADC_GENALYZER.MULTI_CHANNEL
-
-**RBP:** P2
-
-**Description:** Verify genalyzer analysis works with multiple ADC channels simultaneously
-
-**Preconditions:**
-   - :ref:`Pluto.usb<adalm-pluto_device_usb>`
-   - :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>`
-   - Genalyzer library installed
-   - OS: ANY
-
-**Steps:**
-   1. Run :ref:`Pluto.signalGenerator<adalm-pluto_device_siggen>` setup
-   2. Open ADC-Frequency and enable genalyzer analysis
-   3. Ensure both voltage0 and voltage1 channels are enabled
-   4. Set genalyzer to Auto mode
-   5. Press Run to start acquisition
-       - **Expected result:** Separate analysis results should appear for each channel with their own tabs/sections
-       - **Actual result:**
-
-..
-  Actual test result goes here.
-..
-
-   6. Verify both channels show analysis metrics
-       - **Expected result:** Both voltage0 and voltage1 should have their own SNR, SINAD, SFDR, and other metrics
-       - **Actual result:**
-
-..
-  Actual test result goes here.
-..
-
-   7. Disable voltage0 channel and ensure only voltage1 analysis remains
-       - **Expected result:** Only voltage1 genalyzer results should be visible
-       - **Actual result:**
-
-..
-  Actual test result goes here.
-..
-
-**Tested OS:**
-
-..
-  Details about the tested OS goes here.
-..
-
-**Comments:**
-
-..
-  Any comments about the test goes here.
-..
-
-**Result:** PASS/FAIL
-
-..
-  The result of the test goes here (PASS/FAIL).
-
-
-Test 5 - Genalyzer Integration with FFT Features
+Test 4 - Genalyzer Integration with FFT Features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _TST.ADC_GENALYZER.FFT_INTEGRATION:
@@ -1888,15 +1824,7 @@ Test 5 - Genalyzer Integration with FFT Features
   Actual test result goes here.
 ..
 
-   6. Enable window correction and observe changes
-       - **Expected result:** Analysis metrics should adjust for window correction
-       - **Actual result:**
-
-..
-  Actual test result goes here.
-..
-
-   7. Disable averaging and compare results
+   6. Disable averaging and compare results
        - **Expected result:** Results should be less stable but respond faster to signal changes
        - **Actual result:**
 

@@ -227,11 +227,7 @@ SFDR, and harmonic distortion analysis, making it ideal for ADC characterization
     - **SNR (Signal-to-Noise Ratio)**: Ratio of signal power to noise power
     - **SINAD (Signal-to-Noise-and-Distortion)**: Ratio of signal power to noise plus distortion
     - **FSNR (Full-Scale-to-Noise Ratio)**: Ratio of full-scale signal to noise floor
-
-  - **Distortion Metrics:**
     - **SFDR (Spurious-Free Dynamic Range)**: Difference between signal and largest spurious component
-    - **THD (Total Harmonic Distortion)**: Combined power of all harmonic distortions
-    - **Individual Harmonics**: HD2, HD3, HD4... levels in dBc and dBFS
 
   - **Noise Metrics:**
     - **ABN (Average Bin Noise)**: Average noise level per frequency bin
