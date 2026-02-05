@@ -24,8 +24,10 @@
 #include <QLabel>
 #include <iioutil/connectionprovider.h>
 #include <iio.h>
+#include <pluginbase/scopyjs.h>
 
 #include "adrv9002.h"
+#include "adrv9002_api.hpp"
 
 Q_LOGGING_CATEGORY(CAT_ADRV9002PLUGIN, "Adrv9002Plugin")
 using namespace scopy::adrv9002;
@@ -134,11 +136,25 @@ bool Adrv9002Plugin::onConnect()
 	m_toolList[0]->setTool(adrv9002);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
+
+	auto *api = new Adrv9002_API(conn->context(), adrv9002, this);
+	api->setObjectName("adrv9002");
+	ScopyJS::GetInstance()->registerApi(api);
+	m_apiObjects.append(api);
 	return true;
 }
 
 bool Adrv9002Plugin::onDisconnect()
 {
+	if(!m_apiObjects.isEmpty()) {
+		auto *js = ScopyJS::GetInstance();
+		for(auto *api : qAsConst(m_apiObjects)) {
+			js->unregisterApi(api);
+			api->deleteLater();
+		}
+		m_apiObjects.clear();
+	}
+
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
 	for(auto &tool : m_toolList) {
