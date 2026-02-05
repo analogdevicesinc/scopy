@@ -19,6 +19,7 @@
  */
 #include "jsfileio.h"
 
+#include <QDir>
 #include <QFile>
 #include <QTextStream>
 
@@ -77,5 +78,7 @@ QString JsFileIo::readLine(const QString &path, const int lineNumber)
 	}
 	return data;
 }
+
+QString JsFileIo::getTempPath() { return QDir::tempPath(); }
 
 #include "moc_jsfileio.cpp"

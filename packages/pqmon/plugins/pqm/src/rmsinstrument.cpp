@@ -27,7 +27,6 @@
 
 #include <stylehelper.h>
 #include <qwt_legend.h>
-#include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/verticalchannelmanager.h>
@@ -39,7 +38,6 @@
 #include <style.h>
 #include <menuheader.h>
 #include <menulineedit.h>
-#include <gui/widgets/filebrowserwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_RMS, "PqmRms")
 
@@ -124,22 +122,14 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	connect(settingsBtn, &QPushButton::toggled, this, [=, this](bool b) { tool->openRightContainerHelper(b); });
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
-	QPushButton *pqEventsBtn = createPQEventsBtn(this);
-	connect(this, &RmsInstrument::pqEvent, this, [this, pqEventsBtn]() {
-		if(!pqEventsBtn->isChecked()) {
-			pqEventsBtn->setChecked(m_running);
-		}
-	});
-	connect(this, &RmsInstrument::resetEventsBtn, this, [this, pqEventsBtn]() {
-		if(pqEventsBtn->isChecked()) {
-			pqEventsBtn->setChecked(false);
-		}
-	});
+	m_pqEventsBtn = createPQEventsBtn(this);
+	connect(this, &RmsInstrument::pqEvent, this, &RmsInstrument::onPQEvents);
+	connect(this, &RmsInstrument::resetEventsBtn, this, &RmsInstrument::onResetPQEvents);
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(pqEventsBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(m_pqEventsBtn, TTA_LEFT);
 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
@@ -246,11 +236,25 @@ void RmsInstrument::updatePlot(PolarPlotWidget *plot, QString type)
 {
 	QwtPointPolar originPoint(0.0, 0.0);
 	QVector<QVector<QwtPointPolar>> plotData;
-	QVector<QwtPointPolar> plotPoints = getPolarPlotPoints(type);
+	const QVector<QwtPointPolar> plotPoints = getPolarPlotPoints(type);
 	for(const QwtPointPolar &point : plotPoints) {
 		plotData.push_back({originPoint, point});
 	}
 	plot->setData(plotData);
+}
+
+void RmsInstrument::onPQEvents()
+{
+	if(!m_pqEventsBtn->isChecked()) {
+		m_pqEventsBtn->setChecked(m_running);
+	}
+}
+
+void RmsInstrument::onResetPQEvents()
+{
+	if(m_pqEventsBtn->isChecked()) {
+		m_pqEventsBtn->setChecked(false);
+	}
 }
 
 void RmsInstrument::stop() { m_runBtn->setChecked(false); }
@@ -284,10 +288,10 @@ QWidget *RmsInstrument::createSettingsMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(
 		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
-	QWidget *logSection = createMenuLogSection(widget);
+	m_logSection = dynamic_cast<MenuSectionCollapseWidget *>(createMenuLogSection(widget));
 
 	layout->addWidget(header);
-	layout->addWidget(logSection);
+	layout->addWidget(m_logSection);
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	return widget;
@@ -300,8 +304,8 @@ QWidget *RmsInstrument::createMenuLogSection(QWidget *parent)
 	logSection->contentLayout()->setSpacing(10);
 	logSection->setCollapsed(true);
 
-	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, logSection);
-	QLineEdit *browserEdit = fileBrowser->lineEdit();
+	m_logFileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, logSection);
+	QLineEdit *browserEdit = m_logFileBrowser->lineEdit();
 	browserEdit->setPlaceholderText("Select log directory");
 
 	connect(this, &RmsInstrument::enableTool, this, [this, browserEdit, logSection](bool en) {
@@ -316,7 +320,7 @@ QWidget *RmsInstrument::createMenuLogSection(QWidget *parent)
 		}
 	});
 
-	logSection->add(fileBrowser);
+	logSection->add(m_logFileBrowser);
 
 	return logSection;
 }

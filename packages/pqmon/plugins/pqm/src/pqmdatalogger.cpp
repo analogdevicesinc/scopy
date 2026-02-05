@@ -185,6 +185,8 @@ void PqmDataLogger::logPressed(ActiveInstrument instr, const QString &filePath)
 	createHeader();
 }
 
+QString PqmDataLogger::getFilePath() const { return m_filePath; }
+
 void PqmDataLogger::createHeader()
 {
 	if(m_crtInstr == None) {

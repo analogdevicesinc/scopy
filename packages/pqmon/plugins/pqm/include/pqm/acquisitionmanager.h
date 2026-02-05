@@ -45,6 +45,7 @@ public:
 	~AcquisitionManager();
 
 	bool hasFwVers() const;
+	QString getLogFilePath() const;
 
 public Q_SLOTS:
 	void toolEnabled(bool en, QString toolName);

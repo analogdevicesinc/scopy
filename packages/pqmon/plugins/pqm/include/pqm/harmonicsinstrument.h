@@ -31,6 +31,8 @@
 #include <QTableWidget>
 #include <QWidget>
 #include <dockableareainterface.h>
+#include <filebrowserwidget.h>
+#include <menusectionwidget.h>
 #include <pqmdatalogger.h>
 #include <gui/widgets/measurementlabel.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -43,9 +45,14 @@
 #define HARMONICS_TOOL "harmonics"
 
 namespace scopy::pqm {
+
+class PQM_API;
+
 class SCOPY_PQM_EXPORT HarmonicsInstrument : public QWidget
 {
 	Q_OBJECT
+	friend class PQM_API;
+
 public:
 	HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~HarmonicsInstrument();
@@ -72,6 +79,8 @@ private Q_SLOTS:
 	void updateTable();
 	void onActiveChnlChannged(QString chnlId);
 	void onSelectionChanged();
+	void onPQEvents();
+	void onResetPQEvents();
 
 private:
 	void initData();
@@ -93,6 +102,7 @@ private:
 	bool m_running;
 	QString m_harmonicsType;
 	QWidget *m_thdWidget;
+	QPushButton *m_pqEventsBtn;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	QTableWidget *m_table;
@@ -103,6 +113,8 @@ private:
 	QMap<QString, MeasurementLabel *> m_labels;
 	QMap<QString, PlotChannel *> m_plotChnls;
 	ToolMenuEntry *m_tme;
+	MenuSectionCollapseWidget *m_logSection;
+	FileBrowserWidget *m_logFileBrowser;
 	// keys - used for UI labels; values - context channels name
 	const QMap<QString, QString> m_chnls = {{"Ia", "ia"}, {"Ib", "ib"}, {"Ic", "ic"},
 						{"Ua", "ua"}, {"Ub", "ub"}, {"Uc", "uc"}};
