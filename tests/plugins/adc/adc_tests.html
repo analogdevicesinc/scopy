@@ -131,6 +131,13 @@
 <li><a class="reference internal" href="#test-7-channel-averaging">Test 7 - Channel Averaging</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#adc-genalyzer-analysis">ADC-Genalyzer Analysis</a><ul>
+<li><a class="reference internal" href="#test-1-genalyzer-analysis-enabling">Test 1 - Genalyzer Analysis Enabling</a></li>
+<li><a class="reference internal" href="#test-2-auto-mode-analysis">Test 2 - Auto Mode Analysis</a></li>
+<li><a class="reference internal" href="#test-3-fixed-tone-mode-analysis">Test 3 - Fixed Tone Mode Analysis</a></li>
+<li><a class="reference internal" href="#test-4-genalyzer-integration-with-fft-features">Test 4 - Genalyzer Integration with FFT Features</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1790,6 +1797,221 @@ ADC-Time, double click voltage0 to open channel settings and enable Y-AXIS</p>
 </ol>
 </dd>
 </dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+<section id="adc-genalyzer-analysis">
+<span id="adc-genalyzer-tests"></span><h2>ADC-Genalyzer Analysis<a class="headerlink" href="#adc-genalyzer-analysis" title="Link to this heading"></a></h2>
+<section id="test-1-genalyzer-analysis-enabling">
+<h3>Test 1 - Genalyzer Analysis Enabling<a class="headerlink" href="#test-1-genalyzer-analysis-enabling" title="Link to this heading"></a></h3>
+<p id="tst-adc-genalyzer-enable"><strong>UID:</strong> TST.ADC_GENALYZER.ENABLE</p>
+<p><strong>RBP:</strong> P0</p>
+<p><strong>Description:</strong> Verify genalyzer analysis can be enabled and results panel appears</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p><a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a></p></li>
+<li><p>Genalyzer library installed</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Open ADC-Frequency</p></li>
+<li><p>Enable the “Complex” button at the bottom right</p></li>
+<li><dl class="simple">
+<dt>On “Measure” enable “Genalyzer analysis”</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> A genalyzer results panel should appear with channel tabs</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Press Run to start acquisition</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Analysis results should populate in real-time with metrics like SNR, SINAD, SFDR, THD</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-auto-mode-analysis">
+<h3>Test 2 - Auto Mode Analysis<a class="headerlink" href="#test-2-auto-mode-analysis" title="Link to this heading"></a></h3>
+<p id="tst-adc-genalyzer-auto-mode"><strong>UID:</strong> TST.ADC_GENALYZER.AUTO_MODE</p>
+<p><strong>RBP:</strong> P2</p>
+<p><strong>Description:</strong> Verify automatic tone detection and analysis in genalyzer auto mode</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p><a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a></p></li>
+<li><p>Genalyzer library installed</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Open ADC-Frequency and enable genalyzer analysis</p></li>
+<li><p>In genalyzer settings, select “Auto” mode</p></li>
+<li><p>Set SSB width to 120 (default)</p></li>
+<li><dl class="simple">
+<dt>Press Run to start acquisition</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Genalyzer should automatically detect the 1MHz fundamental tone (‘A:freq’ metric) and display analysis metrics</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Check that the ‘A:mag_dbfs’ metric shows the carrier magnitude</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> ‘A:mag_dbfs’ should be between 0 and -20 dBFS for a properly configured signal</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="7">
+<li><dl class="simple">
+<dt>Change SSB width to 60 and observe the ‘signal_nbins’ metric</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The ‘signal_nbins’ metric should update with different bin search range</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-fixed-tone-mode-analysis">
+<h3>Test 3 - Fixed Tone Mode Analysis<a class="headerlink" href="#test-3-fixed-tone-mode-analysis" title="Link to this heading"></a></h3>
+<p id="tst-adc-genalyzer-fixed-tone-mode"><strong>UID:</strong> TST.ADC_GENALYZER.FIXED_TONE_MODE</p>
+<p><strong>RBP:</strong> P2</p>
+<p><strong>Description:</strong> Verify fixed tone mode analysis with expected frequency configuration</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p><a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a></p></li>
+<li><p>Genalyzer library installed</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Open ADC-Frequency and enable genalyzer analysis</p></li>
+<li><p>In genalyzer settings, select “Fixed Tone” mode</p></li>
+<li><p>Set Expected Frequency to 1000000 Hz (1MHz)</p></li>
+<li><p>Set Harmonic Order to 5</p></li>
+<li><p>Set SSB Fundamental to 4</p></li>
+<li><p>Set SSB Default to 3</p></li>
+<li><dl class="simple">
+<dt>Press Run to start acquisition</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Analysis should target the 1MHz tone and show the ‘A:freq’ metric matching the expected frequency</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="9">
+<li><dl class="simple">
+<dt>Verify signal magnitude metrics appear in the results panel</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> ‘A:mag_dbfs’ should match the highest peak level, ‘A:mag_dbc’ should be approximately 0 dBc for the fundamental</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="10">
+<li><p>Change Expected Frequency to 500000 Hz (0.5MHz) and observe changes
+- <strong>Expected result:</strong> Analysis should retarget and show different results for the new frequency
+- <strong>Actual result:</strong></p></li>
+</ol>
+</div></blockquote>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-genalyzer-integration-with-fft-features">
+<h3>Test 4 - Genalyzer Integration with FFT Features<a class="headerlink" href="#test-4-genalyzer-integration-with-fft-features" title="Link to this heading"></a></h3>
+<p id="tst-adc-genalyzer-fft-integration"><strong>UID:</strong> TST.ADC_GENALYZER.FFT_INTEGRATION</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> Verify genalyzer analysis works correctly with existing FFT features like averaging and windowing</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="#adalm-pluto-device-usb"><span class="std std-ref">Pluto.usb</span></a></p></li>
+<li><p><a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a></p></li>
+<li><p>Genalyzer library installed</p></li>
+<li><p>OS: ANY</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Run <a class="reference internal" href="#adalm-pluto-device-siggen"><span class="std std-ref">Pluto.signalGenerator</span></a> setup</p></li>
+<li><p>Open ADC-Frequency and enable genalyzer analysis</p></li>
+<li><p>Enable FFT averaging with size 10 for voltage0 channel</p></li>
+<li><dl class="simple">
+<dt>Press Run and note genalyzer results</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Genalyzer results should reflect the averaged FFT data with improved stability</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<blockquote>
+<div><ol class="arabic simple" start="5">
+<li><dl class="simple">
+<dt>Change window function from default to Blackman-Harris</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Genalyzer analysis results should update to reflect the new window function</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><ol class="arabic simple" start="6">
+<li><dl class="simple">
+<dt>Disable averaging and compare results</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Results should be less stable but respond faster to signal changes</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
 <p><strong>Tested OS:</strong></p>
 <p><strong>Comments:</strong></p>
 <p><strong>Result:</strong> PASS/FAIL</p>
