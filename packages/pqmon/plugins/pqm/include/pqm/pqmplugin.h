@@ -34,8 +34,12 @@
 #include <pluginbase/pluginbase.h>
 
 namespace scopy::pqm {
+
+class PQM_API;
+
 class SCOPY_PQM_EXPORT PQMPlugin : public QObject, public PluginBase
 {
+	friend class PQM_API;
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
@@ -61,10 +65,12 @@ public Q_SLOTS:
 
 private:
 	void clearPingTask();
+	void initApi();
 
 	InfoPage *m_infoPage;
 	AcquisitionManager *m_acqManager;
 	AttrInstrumentHandler *m_attrHandler;
+	PQM_API *m_api;
 };
 } // namespace scopy::pqm
 

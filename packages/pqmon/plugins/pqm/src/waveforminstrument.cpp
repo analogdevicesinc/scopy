@@ -27,18 +27,15 @@
 #include <QFileDialog>
 #include <menulineedit.h>
 #include <QDesktopServices>
-#include <menuonoffswitch.h>
 #include <plotnavigator.hpp>
 #include <qwt_legend.h>
 #include <rollingstrategy.h>
 #include <style.h>
 #include <swtriggerstrategy.h>
-#include <gui/widgets/filebrowserwidget.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/plotaxis.h>
 #include <gui/widgets/menucollapsesection.h>
-#include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuheader.h>
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
@@ -181,11 +178,11 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 	MenuHeaderWidget *header = new MenuHeaderWidget(
 		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	QWidget *plotSection = createMenuPlotSection(widget);
-	QWidget *logSection = createMenuLogSection(widget);
+	m_logSection = dynamic_cast<MenuSectionCollapseWidget *>(createMenuLogSection(widget));
 
 	layout->addWidget(header);
 	layout->addWidget(plotSection);
-	layout->addWidget(logSection);
+	layout->addWidget(m_logSection);
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	return widget;
@@ -223,13 +220,13 @@ QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
 	connect(m_triggeredBy->combo(), &QComboBox::currentTextChanged, this,
 		&WaveformInstrument::onTriggeredChnlChanged);
 
-	MenuOnOffSwitch *rollingModeSwitch = new MenuOnOffSwitch("Rolling mode", plottingModeWidget);
-	rollingModeSwitch->onOffswitch()->setChecked(false);
-	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, m_triggeredBy, &MenuCombo::setDisabled);
-	connect(rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, this,
+	m_rollingModeSwitch = new MenuOnOffSwitch("Rolling mode", plottingModeWidget);
+	m_rollingModeSwitch->onOffswitch()->setChecked(false);
+	connect(m_rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, m_triggeredBy, &MenuCombo::setDisabled);
+	connect(m_rollingModeSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		&WaveformInstrument::onRollingSwitch);
 	plottingModeWidget->layout()->addWidget(m_triggeredBy);
-	plottingModeWidget->layout()->addWidget(rollingModeSwitch);
+	plottingModeWidget->layout()->addWidget(m_rollingModeSwitch);
 
 	plotSection->add(m_timespanSpin);
 	plotSection->add(plottingModeWidget);
@@ -244,8 +241,8 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 	logSection->contentLayout()->setSpacing(10);
 	logSection->setCollapsed(true);
 
-	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, this);
-	QLineEdit *browserEdit = fileBrowser->lineEdit();
+	m_logFileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, this);
+	QLineEdit *browserEdit = m_logFileBrowser->lineEdit();
 	browserEdit->setPlaceholderText("Select log directory");
 
 	connect(this, &WaveformInstrument::enableTool, this, [this, browserEdit, logSection](bool en) {
@@ -259,9 +256,9 @@ QWidget *WaveformInstrument::createMenuLogSection(QWidget *parent)
 			Q_EMIT logData(PqmDataLogger::None, "");
 		}
 	});
-	connect(this, &WaveformInstrument::enableTool, fileBrowser, &QWidget::setDisabled);
+	connect(this, &WaveformInstrument::enableTool, m_logFileBrowser, &QWidget::setDisabled);
 
-	logSection->add(fileBrowser);
+	logSection->add(m_logFileBrowser);
 
 	return logSection;
 }

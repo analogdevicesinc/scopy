@@ -22,7 +22,6 @@
 #include "harmonicsinstrument.h"
 #include "dockablearea.h"
 #include "dockwrapper.h"
-#include "menuonoffswitch.h"
 #include "plotaxis.h"
 #include "qheaderview.h"
 
@@ -37,7 +36,7 @@
 #include <menusectionwidget.h>
 #include <QDesktopServices>
 #include <style.h>
-#include <gui/widgets/filebrowserwidget.h>
+#include <menuonoffswitch.h>
 
 using namespace scopy;
 using namespace scopy::pqm;
@@ -116,23 +115,15 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
-	QPushButton *pqEventsBtn = createPQEventsBtn(this);
-	connect(this, &HarmonicsInstrument::pqEvent, this, [this, pqEventsBtn]() {
-		if(!pqEventsBtn->isChecked()) {
-			pqEventsBtn->setChecked(m_running);
-		}
-	});
-	connect(this, &HarmonicsInstrument::resetEventsBtn, this, [this, pqEventsBtn]() {
-		if(pqEventsBtn->isChecked()) {
-			pqEventsBtn->setChecked(false);
-		}
-	});
+	m_pqEventsBtn = createPQEventsBtn(this);
+	connect(this, &HarmonicsInstrument::pqEvent, this, &HarmonicsInstrument::onPQEvents);
+	connect(this, &HarmonicsInstrument::resetEventsBtn, this, &HarmonicsInstrument::onResetPQEvents);
 
 	tool->addWidgetToCentralContainerHelper(scrollArea);
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(pqEventsBtn, TTA_LEFT);
+	tool->addWidgetToTopContainerHelper(m_pqEventsBtn, TTA_LEFT);
 
 	connect(this, &HarmonicsInstrument::showPlots, this, [plotDock](bool en) { plotDock->setActivated(en); });
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
@@ -279,11 +270,11 @@ QWidget *HarmonicsInstrument::createSettingsMenu(QWidget *parent)
 	MenuHeaderWidget *header = new MenuHeaderWidget(
 		"Settings", QPen(Style::getAttribute(json::theme::interactive_primary_idle)), widget);
 	QWidget *generalSection = createMenuGeneralSection(widget);
-	QWidget *logSection = createMenuLogSection(widget);
+	m_logSection = dynamic_cast<MenuSectionCollapseWidget *>(createMenuLogSection(widget));
 
 	layout->addWidget(header);
 	layout->addWidget(generalSection);
-	layout->addWidget(logSection);
+	layout->addWidget(m_logSection);
 	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	return widget;
@@ -334,8 +325,8 @@ QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
 	logSection->contentLayout()->setSpacing(10);
 	logSection->setCollapsed(true);
 
-	FileBrowserWidget *fileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, this);
-	QLineEdit *browserEdit = fileBrowser->lineEdit();
+	m_logFileBrowser = new FileBrowserWidget(FileBrowserWidget::DIRECTORY, this);
+	QLineEdit *browserEdit = m_logFileBrowser->lineEdit();
 	browserEdit->setPlaceholderText("Select log directory");
 
 	connect(this, &HarmonicsInstrument::enableTool, this, [this, browserEdit, logSection](bool en) {
@@ -350,7 +341,7 @@ QWidget *HarmonicsInstrument::createMenuLogSection(QWidget *parent)
 		}
 	});
 
-	logSection->add(fileBrowser);
+	logSection->add(m_logFileBrowser);
 
 	return logSection;
 }
@@ -414,6 +405,20 @@ void HarmonicsInstrument::onSelectionChanged()
 	int lowerIdx = std::min(firstColumnSelected, lastColumnSelected);
 	int minDegree = (lowerIdx < HARMONICS_MIN_DEGREE) ? HARMONICS_MIN_DEGREE : lowerIdx;
 	m_plot->xAxis()->setInterval(minDegree, std::max(firstColumnSelected, lastColumnSelected));
+}
+
+void HarmonicsInstrument::onPQEvents()
+{
+	if(!m_pqEventsBtn->isChecked()) {
+		m_pqEventsBtn->setChecked(m_running);
+	}
+}
+
+void HarmonicsInstrument::onResetPQEvents()
+{
+	if(m_pqEventsBtn->isChecked()) {
+		m_pqEventsBtn->setChecked(false);
+	}
 }
 
 void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> attr)

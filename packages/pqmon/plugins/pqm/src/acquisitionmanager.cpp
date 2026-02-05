@@ -383,4 +383,6 @@ void AcquisitionManager::adjustMap(const QString &attr, std::function<void(QStri
 
 bool AcquisitionManager::hasFwVers() const { return m_hasFwVers; }
 
+QString AcquisitionManager::getLogFilePath() const { return m_pqmLog ? m_pqmLog->getFilePath() : QString(); }
+
 #include "moc_acquisitionmanager.cpp"

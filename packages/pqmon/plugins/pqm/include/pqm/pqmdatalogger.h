@@ -48,6 +48,7 @@ public:
 	void acquirePqEvents(QString event);
 	void log();
 	void writeToFile();
+	QString getFilePath() const;
 public Q_SLOTS:
 	void logPressed(ActiveInstrument instr, const QString &filePath = "");
 
