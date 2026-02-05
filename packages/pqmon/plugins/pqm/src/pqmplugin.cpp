@@ -20,8 +20,11 @@
  */
 
 #include "pqmplugin.h"
+#include "pqm_api.h"
 #include "preferenceshelper.h"
 #include "scopy-pqm_config.h"
+
+#include <pluginbase/scopyjs.h>
 
 #include <QLoggingCategory>
 #include <QPushButton>
@@ -224,6 +227,8 @@ bool PQMPlugin::onConnect()
 		connect(tool->tool(), SIGNAL(enableTool(bool, QString)), m_acqManager,
 			SLOT(toolEnabled(bool, QString)));
 	}
+
+	initApi();
 	return true;
 }
 
@@ -268,6 +273,14 @@ void PQMPlugin::clearPingTask()
 		m_pingTask->deleteLater();
 		m_pingTask = nullptr;
 	}
+}
+
+void PQMPlugin::initApi()
+{
+	m_api = new PQM_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	m_api->setObjectName("pqm");
+	js->registerApi(m_api);
 }
 
 void PQMPlugin::initMetadata()

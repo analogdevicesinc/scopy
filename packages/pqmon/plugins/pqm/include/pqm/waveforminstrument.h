@@ -25,7 +25,10 @@
 #include "scopy-pqm_export.h"
 
 #include <QWidget>
+#include <filebrowserwidget.h>
 #include <menucombo.h>
+#include <menuonoffswitch.h>
+#include <menusectionwidget.h>
 #include <menuspinbox.h>
 #include <plottingstrategy.h>
 #include <pqmdatalogger.h>
@@ -43,14 +46,20 @@
 #define TRIGGER_MODE "trigger"
 
 namespace scopy::pqm {
+
+class PQM_API;
+
 class SCOPY_PQM_EXPORT WaveformInstrument : public QWidget, public ResourceUser
 {
 	Q_OBJECT
+	friend class PQM_API;
+
 public:
 	WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~WaveformInstrument();
 
 	void showOneBuffer(bool hasFwVers);
+
 public Q_SLOTS:
 	void stop() override;
 	void toggleWaveform(bool en);
@@ -87,6 +96,7 @@ private:
 	GearBtn *m_settBtn;
 	gui::MenuSpinbox *m_timespanSpin;
 	MenuCombo *m_triggeredBy;
+	MenuOnOffSwitch *m_rollingModeSwitch;
 
 	DockableAreaInterface *m_dockableArea;
 	DockWrapperInterface *m_voltageDockWrapper;
@@ -98,6 +108,8 @@ private:
 
 	ToolMenuEntry *m_tme;
 	QString m_uri;
+	MenuSectionCollapseWidget *m_logSection;
+	FileBrowserWidget *m_logFileBrowser;
 
 	const double m_plotSampleRate = 5120;
 	const QMap<QString, QMap<QString, QString>> m_chnls = {

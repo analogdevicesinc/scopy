@@ -22,7 +22,9 @@
 #ifndef RMSINSTRUMENT_H
 #define RMSINSTRUMENT_H
 #include <QWidget>
+#include <filebrowserwidget.h>
 #include <measurementpanel.h>
+#include <menusectionwidget.h>
 #include <pqmdatalogger.h>
 #include <scopy-pqm_export.h>
 #include <gui/polarplotwidget.h>
@@ -37,9 +39,14 @@
 #define RMS_TOOL "rms"
 
 namespace scopy::pqm {
+
+class PQM_API;
+
 class SCOPY_PQM_EXPORT RmsInstrument : public QWidget
 {
 	Q_OBJECT
+	friend class PQM_API;
+
 public:
 	RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent = nullptr);
 	~RmsInstrument();
@@ -65,6 +72,8 @@ private:
 	void initPlot(PolarPlotWidget *plot);
 	void setupPlotChannels(PolarPlotWidget *plot, QMap<QString, QString> channels, int thickness = 5);
 	void updatePlot(PolarPlotWidget *plot, QString type);
+	void onPQEvents();
+	void onResetPQEvents();
 	QVector<QwtPointPolar> getPolarPlotPoints(QString chnlType);
 	QWidget *createSettingsMenu(QWidget *parent);
 	QWidget *createMenuLogSection(QWidget *parent);
@@ -77,6 +86,7 @@ private:
 	QString m_uri;
 	ToolMenuEntry *m_tme;
 	bool m_running;
+	QPushButton *m_pqEventsBtn;
 	RunBtn *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	PolarPlotWidget *m_voltagePlot;
@@ -85,6 +95,8 @@ private:
 	QWidget *m_currentLabelWidget;
 	QMap<QString, QList<MeasurementLabel *>> m_labels;
 	QMap<QString, QMap<QString, QString>> m_attributes;
+	MenuSectionCollapseWidget *m_logSection;
+	FileBrowserWidget *m_logFileBrowser;
 	const QMap<QString, QMap<QString, QString>> m_chnls = {
 		{"voltage", {{"Ua", "ua"}, {"Ub", "ub"}, {"Uc", "uc"}}},
 		{"current", {{"Ia", "ia"}, {"Ib", "ib"}, {"Ic", "ic"}, {"In", "in"}}}};

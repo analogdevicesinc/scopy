@@ -28,15 +28,21 @@
 
 #define DEVICE_NAME "pqm"
 namespace scopy::pqm {
+
+class PQM_API;
+
 class SettingsInstrument : public QWidget
 {
 	Q_OBJECT
+	friend class PQM_API;
+
 public:
 	SettingsInstrument(QWidget *parent = nullptr);
 	~SettingsInstrument();
 
 public Q_SLOTS:
 	void attributeAvailable(QMap<QString, QMap<QString, QString>> configAttr);
+
 Q_SIGNALS:
 	void updateUi();
 	void setAttributes(QMap<QString, QMap<QString, QString>> configAttr);
