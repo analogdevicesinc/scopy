@@ -52,9 +52,10 @@ TestFramework.runTest("TST.NA.SWEEP_SETTINGS", function() {
         // Test frequency range settings
         printToConsole("  Testing frequency range settings");
 
+        // Note: M2K max frequency is 25MHz (hardware limit)
         let freqConfigs = [
             {min: 10, max: 500000, desc: "10Hz to 500kHz"},
-            {min: 50, max: 30000000, desc: "50Hz to 30MHz"},
+            {min: 50, max: 25000000, desc: "50Hz to 25MHz"},
             {min: 1, max: 1000000, desc: "1Hz to 1MHz"},
             {min: 20, max: 10000000, desc: "20Hz to 10MHz"}
         ];
@@ -62,7 +63,7 @@ TestFramework.runTest("TST.NA.SWEEP_SETTINGS", function() {
         for (let config of freqConfigs) {
             network.min_freq = config.min;
             network.max_freq = config.max;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actualMin = network.min_freq;
             let actualMax = network.max_freq;
@@ -81,7 +82,7 @@ TestFramework.runTest("TST.NA.SWEEP_SETTINGS", function() {
         let sampleCounts = [10, 50, 100, 200];
         for (let count of sampleCounts) {
             network.samples_count = count;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.samples_count;
             let pass = TestFramework.assertApproxEqual(actual, count, 1,
@@ -93,13 +94,13 @@ TestFramework.runTest("TST.NA.SWEEP_SETTINGS", function() {
         printToConsole("  Testing sweep type (log/linear)");
 
         network.log_freq = true;
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
         let logEnabled = network.log_freq;
         let logPass = TestFramework.assertEqual(logEnabled, true, "Logarithmic sweep enabled");
         allPass = allPass && logPass;
 
         network.log_freq = false;
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
         let linEnabled = !network.log_freq;
         let linPass = TestFramework.assertEqual(linEnabled, true, "Linear sweep enabled");
         allPass = allPass && linPass;
@@ -125,14 +126,14 @@ TestFramework.runTest("TST.NA.REFERENCE_SETTINGS", function() {
 
         // Channel 1 reference
         network.ref_channel = 1;
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
         let refCh1 = network.ref_channel;
         let ch1Pass = TestFramework.assertEqual(refCh1, 1, "Reference channel 1");
         allPass = allPass && ch1Pass;
 
         // Channel 2 reference
         network.ref_channel = 2;
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
         let refCh2 = network.ref_channel;
         let ch2Pass = TestFramework.assertEqual(refCh2, 2, "Reference channel 2");
         allPass = allPass && ch2Pass;
@@ -143,7 +144,7 @@ TestFramework.runTest("TST.NA.REFERENCE_SETTINGS", function() {
         let amplitudes = [0.5, 1, 2, 5];
         for (let amp of amplitudes) {
             network.amplitude = amp;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.amplitude;
             let pass = TestFramework.assertApproxEqual(actual, amp, 0.01,
@@ -157,7 +158,7 @@ TestFramework.runTest("TST.NA.REFERENCE_SETTINGS", function() {
         let offsets = [-2, -1, 0, 1, 2];
         for (let offset of offsets) {
             network.offset = offset;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.offset;
             let pass = TestFramework.assertApproxEqual(actual, offset, 0.01,
@@ -199,7 +200,7 @@ TestFramework.runTest("TST.NA.DISPLAY_SETTINGS", function() {
         for (let config of magConfigs) {
             network.min_mag = config.min;
             network.max_mag = config.max;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actualMin = network.min_mag;
             let actualMax = network.max_mag;
@@ -225,7 +226,7 @@ TestFramework.runTest("TST.NA.DISPLAY_SETTINGS", function() {
         for (let config of phaseConfigs) {
             network.min_phase = config.min;
             network.max_phase = config.max;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actualMin = network.min_phase;
             let actualMax = network.max_phase;
@@ -265,7 +266,7 @@ TestFramework.runTest("TST.NA.PLOT_TYPES", function() {
             printToConsole("  Testing " + plot.name + " plot type");
 
             network.plot_type = plot.type;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.plot_type;
             let pass = TestFramework.assertEqual(actual, plot.type,
@@ -296,24 +297,19 @@ TestFramework.runTest("TST.NA.CURSORS", function() {
         printToConsole("  Testing cursor enable/disable");
 
         network.cursors = true;
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
         let cursorsEnabled = network.cursors;
         let enablePass = TestFramework.assertEqual(cursorsEnabled, true, "Cursors enabled");
         allPass = allPass && enablePass;
 
-        network.cursors = false;
-        msleep(100);
-        let cursorsDisabled = !network.cursors;
-        let disablePass = TestFramework.assertEqual(cursorsDisabled, true, "Cursors disabled");
-        allPass = allPass && disablePass;
-
         // Test cursor position settings (0-3 typically)
+        // Note: Cursors must remain enabled for position/transparency to work
         printToConsole("  Testing cursor position");
 
         let positions = [0, 1, 2, 3];
         for (let pos of positions) {
             network.cursors_position = pos;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.cursors_position;
             let pass = TestFramework.assertEqual(actual, pos,
@@ -327,13 +323,20 @@ TestFramework.runTest("TST.NA.CURSORS", function() {
         let transparencies = [0, 25, 50, 75, 100];
         for (let trans of transparencies) {
             network.cursors_transparency = trans;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.cursors_transparency;
             let pass = TestFramework.assertEqual(actual, trans,
                 "Cursor transparency " + trans + "%");
             allPass = allPass && pass;
         }
+
+        // Now test disable
+        network.cursors = false;
+        msleep(1000);  // Allow hardware to settle
+        let cursorsDisabled = !network.cursors;
+        let disablePass = TestFramework.assertEqual(cursorsDisabled, true, "Cursors disabled");
+        allPass = allPass && disablePass;
 
         return allPass;
 
@@ -357,7 +360,7 @@ TestFramework.runTest("TST.NA.AVERAGING", function() {
         let avgValues = [1, 2, 4, 8];
         for (let avg of avgValues) {
             network.averaging = avg;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.averaging;
             let pass = TestFramework.assertEqual(actual, avg,
@@ -366,12 +369,13 @@ TestFramework.runTest("TST.NA.AVERAGING", function() {
         }
 
         // Test periods settings
+        // Note: Minimum periods is 2 (hardware limit)
         printToConsole("  Testing periods settings");
 
-        let periodValues = [1, 2, 4, 8];
+        let periodValues = [2, 4, 8, 16];
         for (let periods of periodValues) {
             network.periods = periods;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.periods;
             let pass = TestFramework.assertEqual(actual, periods,
@@ -381,7 +385,7 @@ TestFramework.runTest("TST.NA.AVERAGING", function() {
 
         // Reset to defaults
         network.averaging = 1;
-        network.periods = 1;
+        network.periods = 2;
 
         return allPass;
 
@@ -404,7 +408,7 @@ TestFramework.runTest("TST.NA.LINE_THICKNESS", function() {
         let thicknesses = [1, 2, 3, 4, 5];
         for (let thick of thicknesses) {
             network.line_thickness = thick;
-            msleep(100);
+            msleep(1000);  // Allow hardware to settle
 
             let actual = network.line_thickness;
             let pass = TestFramework.assertEqual(actual, thick,
@@ -455,9 +459,11 @@ TestFramework.runTest("TST.NA.LOOPBACK_CH1", function() {
         msleep(500);
 
         // Get measurement data
-        let magData = network.data;
+        // NOTE: API naming quirk - network.data returns X-axis (frequency),
+        // network.freq returns Y-axis (magnitude in dB)
+        let freqData = network.data;   // X-axis = frequency values
+        let magData = network.freq;    // Y-axis = magnitude values (dB)
         let phaseData = network.phase;
-        let freqData = network.freq;
 
         // Verify we got data
         let dataAvailable = (magData && magData.length > 0);
@@ -529,8 +535,10 @@ TestFramework.runTest("TST.NA.DATA_VALIDITY", function() {
         msleep(500);
 
         // Get data
-        let freqData = network.freq;
-        let magData = network.data;
+        // NOTE: API naming quirk - network.data returns X-axis (frequency),
+        // network.freq returns Y-axis (magnitude in dB)
+        let freqData = network.data;   // X-axis = frequency values
+        let magData = network.freq;    // Y-axis = magnitude values (dB)
 
         if (!freqData || freqData.length === 0) {
             printToConsole("    Warning: No frequency data received");
@@ -604,7 +612,8 @@ TestFramework.runTest("TST.NA.SWEEP_COMPARISON", function() {
         network.running = false;
         msleep(500);
 
-        let logFreqData = network.freq.slice(); // Copy array
+        // NOTE: API naming quirk - network.data returns X-axis (frequency)
+        let logFreqData = network.data.slice(); // Copy array
 
         // Run linear sweep
         network.log_freq = false;
@@ -613,7 +622,7 @@ TestFramework.runTest("TST.NA.SWEEP_COMPARISON", function() {
         network.running = false;
         msleep(500);
 
-        let linFreqData = network.freq.slice();
+        let linFreqData = network.data.slice();
 
         if (!logFreqData || logFreqData.length === 0 || !linFreqData || linFreqData.length === 0) {
             printToConsole("    Warning: Could not get sweep data");
@@ -800,8 +809,10 @@ TestFramework.runTest("TST.NA.WIDE_SWEEP", function() {
         msleep(500);
 
         // Verify data
-        let freqData = network.freq;
-        let magData = network.data;
+        // NOTE: API naming quirk - network.data returns X-axis (frequency),
+        // network.freq returns Y-axis (magnitude in dB)
+        let freqData = network.data;   // X-axis = frequency values
+        let magData = network.freq;    // Y-axis = magnitude values (dB)
         let phaseData = network.phase;
 
         let allPass = true;
@@ -850,7 +861,7 @@ TestFramework.runTest("TST.NA.NOTES", function() {
         // Set a note
         let testNote = "Test measurement - Network Analyzer automated test";
         network.notes = testNote;
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
 
         // Read back the note
         let readNote = network.notes;
@@ -860,7 +871,7 @@ TestFramework.runTest("TST.NA.NOTES", function() {
 
         // Clear note
         network.notes = "";
-        msleep(100);
+        msleep(1000);  // Allow hardware to settle
         let clearedNote = network.notes;
         let clearPass = TestFramework.assertEqual(clearedNote, "",
             "Notes cleared correctly");
