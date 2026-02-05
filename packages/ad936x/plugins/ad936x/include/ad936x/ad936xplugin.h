@@ -26,10 +26,14 @@
 
 #include "scopy-ad936x_export.h"
 #include <QObject>
+#include <QList>
+#include <pluginbase/apiobject.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+struct iio_context;
 namespace scopy::ad936x {
+class Ad936x_API;
 class SCOPY_AD936X_EXPORT Ad936xPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
@@ -44,10 +48,20 @@ public:
 	void initMetadata() override;
 	QString description() override;
 	QString displayName() override;
+	struct iio_context *context() const;
+	QWidget *mainTool() const;
+	QWidget *advancedTool() const;
 
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	struct iio_context *m_ctx = nullptr;
+	QWidget *m_mainTool = nullptr;
+	QWidget *m_advTool = nullptr;
+	Ad936x_API *m_apiMain = nullptr;
+	Ad936x_API *m_apiAdv = nullptr;
 };
 } // namespace scopy::ad936x
 #endif // AD936XPLUGIN_H

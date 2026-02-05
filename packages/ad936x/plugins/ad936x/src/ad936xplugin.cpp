@@ -27,9 +27,11 @@
 #include <style.h>
 #include "scopy-ad936x_config.h"
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
 
 #include "ad936x/ad936x.h"
 #include "ad936x/ad963xadvanced.h"
+#include "ad936x_api.hpp"
 
 #include <fmcomms5/fmcomms5.h>
 #include <fmcomms5/fmcomms5advanced.h>
@@ -100,6 +102,12 @@ QString Ad936xPlugin::description() { return "This is a plugin for AD936X"; }
 
 QString Ad936xPlugin::displayName() { return PLUTO_PLUGIN_DISPLAY_NAME; }
 
+struct iio_context *Ad936xPlugin::context() const { return m_ctx; }
+
+QWidget *Ad936xPlugin::mainTool() const { return m_mainTool; }
+
+QWidget *Ad936xPlugin::advancedTool() const { return m_advTool; }
+
 bool Ad936xPlugin::onConnect()
 {
 	Connection *conn = ConnectionProvider::open(m_param);
@@ -111,15 +119,20 @@ bool Ad936xPlugin::onConnect()
 
 	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
 	bool isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
+	m_ctx = conn->context();
+	m_mainTool = nullptr;
+	m_advTool = nullptr;
 
 	if(isFmcomms5) {
 		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context());
+		m_mainTool = fmcomms5;
 		m_toolList[0]->setTool(fmcomms5);
 		m_toolList[0]->setName("FMCOMMS5");
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(false);
 
 		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context());
+		m_advTool = fmcomms5Advanced;
 		m_toolList[1]->setTool(fmcomms5Advanced);
 		m_toolList[1]->setName("FMCOMMS5 Advanced");
 		m_toolList[1]->setEnabled(true);
@@ -127,21 +140,62 @@ bool Ad936xPlugin::onConnect()
 
 	} else {
 		AD936X *ad936X = new AD936X(conn->context());
+		m_mainTool = ad936X;
 		m_toolList[0]->setTool(ad936X);
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(true);
 
 		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context());
+		m_advTool = ad936XAdvanced;
 		m_toolList[1]->setTool(ad936XAdvanced);
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(true);
 	}
+
+	if(m_apiMain || m_apiAdv) {
+		auto *js = ScopyJS::GetInstance();
+		if(m_apiMain) {
+			js->unregisterApi(m_apiMain);
+			m_apiMain->deleteLater();
+			m_apiMain = nullptr;
+		}
+		if(m_apiAdv) {
+			js->unregisterApi(m_apiAdv);
+			m_apiAdv->deleteLater();
+			m_apiAdv = nullptr;
+		}
+	}
+
+	auto *js = ScopyJS::GetInstance();
+	m_apiMain = new Ad936x_API(this);
+	m_apiMain->setToolRole(Ad936x_API::ToolRole::Main);
+	m_apiMain->setObjectName("ad936x");
+	js->registerApi(m_apiMain);
+
+	m_apiAdv = new Ad936x_API(this);
+	m_apiAdv->setToolRole(Ad936x_API::ToolRole::Advanced);
+	m_apiAdv->setObjectName("ad936x_adv");
+	js->registerApi(m_apiAdv);
 
 	return true;
 }
 
 bool Ad936xPlugin::onDisconnect()
 {
+	if(m_apiMain || m_apiAdv) {
+		auto *js = ScopyJS::GetInstance();
+		if(m_apiMain) {
+			js->unregisterApi(m_apiMain);
+			m_apiMain->deleteLater();
+			m_apiMain = nullptr;
+		}
+		if(m_apiAdv) {
+			js->unregisterApi(m_apiAdv);
+			m_apiAdv->deleteLater();
+			m_apiAdv = nullptr;
+		}
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -152,6 +206,10 @@ bool Ad936xPlugin::onDisconnect()
 			delete(w);
 		}
 	}
+
+	m_ctx = nullptr;
+	m_mainTool = nullptr;
+	m_advTool = nullptr;
 
 	ConnectionProvider::close(m_param);
 	return true;
