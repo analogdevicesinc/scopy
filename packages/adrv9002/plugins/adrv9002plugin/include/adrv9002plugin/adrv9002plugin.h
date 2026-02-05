@@ -25,6 +25,8 @@
 
 #include "scopy-adrv9002plugin_export.h"
 #include <QObject>
+#include <QList>
+#include <pluginbase/apiobject.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
@@ -46,6 +48,9 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	QList<scopy::ApiObject *> m_apiObjects;
 };
 } // namespace scopy::adrv9002
 #endif // ADRV9002PLUGIN_H
