@@ -28,7 +28,6 @@
 #include <gui/widgets/searchbar.h>
 #include "iiosortfilterproxymodel.h"
 #include "watchlistview.h"
-#include "pluginbase/apiobject.h"
 #include "savecontextsetup.h"
 #include "iiodebuglogger.h"
 
@@ -39,6 +38,9 @@
 #include <QTabWidget>
 
 namespace scopy::debugger {
+
+class IIOExplorerInstrument_API;
+
 class SCOPY_DEBUGGER_EXPORT IIOExplorerInstrument : public QWidget
 {
 	Q_OBJECT
@@ -104,28 +106,5 @@ private:
 	QSplitter *m_HSplitter;
 };
 
-class SCOPY_DEBUGGER_EXPORT IIOExplorerInstrument_API : public ApiObject
-{
-	Q_OBJECT
-	Q_PROPERTY(QList<int> vSplitter READ vSplitter WRITE setVSplitter FINAL)
-	Q_PROPERTY(QList<int> hSplitter READ hSplitter WRITE setHSplitter FINAL)
-
-public:
-	explicit IIOExplorerInstrument_API(IIOExplorerInstrument *p)
-		: ApiObject(p)
-		, p(p)
-	{
-		setObjectName("IIOExplorerInstrument_API");
-	}
-
-	QList<int> vSplitter() const;
-	void setVSplitter(const QList<int> &newSplitter);
-
-	QList<int> hSplitter() const;
-	void setHSplitter(const QList<int> &newSplitter);
-
-private:
-	IIOExplorerInstrument *p;
-};
 } // namespace scopy::debugger
 #endif // IIOEXPLORERINSTRUMENT_H
