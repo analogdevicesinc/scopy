@@ -30,10 +30,13 @@
 
 namespace scopy::swiot {
 class FaultsDevice;
+class SWIOT_API;
 
 class FaultsPage : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit FaultsPage(QString uri, QWidget *parent = nullptr);
 	~FaultsPage();

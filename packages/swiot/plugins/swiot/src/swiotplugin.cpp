@@ -20,6 +20,7 @@
  */
 
 #include "swiotplugin.h"
+#include "swiot_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -41,6 +42,7 @@
 
 #include <pluginbase/preferences.h>
 #include <pluginbase/statusbarmanager.h>
+#include <pluginbase/scopyjs.h>
 
 using namespace scopy::swiot;
 
@@ -192,6 +194,8 @@ bool SWIOTPlugin::onConnect()
 	m_swiotController->readModeAttribute();
 	m_swiotController->startPowerSupplyTask("ext_psu");
 
+	initApi();
+
 	return true;
 }
 
@@ -237,6 +241,11 @@ bool SWIOTPlugin::onDisconnect()
 	if(m_statusContainer) {
 		delete m_statusContainer;
 		m_statusContainer = nullptr;
+	}
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
 	}
 	clearPingTask();
 	ConnectionProvider::close(m_param);
@@ -379,6 +388,13 @@ void SWIOTPlugin::clearPingTask()
 		m_pingTask->deleteLater();
 		m_pingTask = nullptr;
 	}
+}
+
+void SWIOTPlugin::initApi()
+{
+	m_api = new SWIOT_API(this);
+	m_api->setObjectName("swiot");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 QString SWIOTPlugin::description() { return "Adds functionality specific to SWIOT1L board"; }

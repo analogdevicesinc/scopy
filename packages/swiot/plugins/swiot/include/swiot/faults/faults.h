@@ -29,9 +29,14 @@
 #include <gui/tooltemplate.h>
 
 namespace scopy::swiot {
+
+class SWIOT_API;
+
 class Faults : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit Faults(QString uri, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Faults();

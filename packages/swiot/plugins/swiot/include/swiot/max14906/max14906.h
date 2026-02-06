@@ -38,9 +38,14 @@
 #define MAX14906_POLLING_TIME 1000
 
 namespace scopy::swiot {
+
+class SWIOT_API;
+
 class Max14906 : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Max14906();

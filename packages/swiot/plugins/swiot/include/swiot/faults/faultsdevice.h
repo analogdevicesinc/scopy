@@ -32,10 +32,13 @@
 
 namespace scopy::swiot {
 class FaultsGroup;
+class SWIOT_API;
 
 class FaultsDevice : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit FaultsDevice(const QString &name, QString path, QString uri, QVector<uint32_t> &registers,
 			      QWidget *parent = nullptr);
