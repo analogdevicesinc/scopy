@@ -10,7 +10,7 @@ CLEAN_BEFORE_BUILD=ON
 
 install_packages() {
     sudo apt-get update
-    sudo apt-get install -y groff gperf meson-1.5
+    sudo apt-get install -y groff gperf meson-1.5 ocaml ocamlbuild libnum-ocaml-dev autoconf automake indent libtool
 }
 
 download_jdk() {
@@ -123,7 +123,8 @@ clone() {
     [ -d 'libmatio' ]		|| git clone             ${LIBMATIO%|*}     -b ${LIBMATIO#*|} libmatio
     [ -d 'extra-cmake-modules' ] || git clone --recursive ${ECM%|*}         -b ${ECM#*|} extra-cmake-modules
     [ -d 'karchive' ] 		|| git clone --recursive ${KARCHIVE%|*}     -b ${KARCHIVE#*|} karchive
-    [ -d 'libzstd' ] 		|| git clone --recursive ${LIBZSTD%|*}     -b ${LIBZSTD#*|} libzstd
+    [ -d 'libzstd' ] 		|| git clone --recursive ${LIBZSTD%|*}      -b ${LIBZSTD#*|} libzstd
+    [ -d 'genalyzer' ] 		|| git clone --recursive ${GENALYZER%|*}    -b ${GENALYZER#*|} genalyzer
     [ -d 'iio-emu' ] 		|| git clone --recursive ${IIOEMU%|*}       -b ${IIOEMU#*|} iio-emu
 
 #     git clone https://github.com/openssl/openssl/ -b OpenSSL_1_1_1w
@@ -315,10 +316,25 @@ build_fftw() {
     autoreconf --verbose --install --symlink --force
     rm -rf config.cache
 
+  # build fftw with single precision and neon for gnuradio
     build_with_configure $1 \
-        --enable-shared --enable-threads --enable-single \
-        --enable-float --enable-neon --disable-doc \
-        --disable-shared --enable-maintainer-mode
+        --enable-float \
+        --enable-shared \
+	--enable-threads \
+	--enable-neon \
+	--disable-doc \
+        --enable-maintainer-mode
+
+    make clean
+    rm -rf config.cache
+
+  # build fftw with diouble precision for genalyzer
+    build_with_configure $1 \
+        --enable-shared \
+	--enable-threads \
+	--enable-neon \
+	--disable-doc \
+        --enable-maintainer-mode
 
     popd
 }
@@ -618,7 +634,7 @@ build_libtinyiiod() {
 build_kddock() {
     echo "### Building KDDockWidgets - branch $KDDOCK_BRANCH"
     pushd ${STAGING_AREA}/KDDockWidgets
-    CURRENT_BUILD_CMAKE_OPTS=""
+    CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_X11EXTRAS=OFF -DKDDockWidgets_EXAMPLES=false -DKDDockWidgets_QT6=false"
     build_with_cmake $1
     popd
 }
@@ -641,7 +657,7 @@ build_libzstd() {
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	pushd $STAGING_AREA/extra-cmake-modules
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
 	build_with_cmake $1
 	popd
 }
@@ -649,10 +665,20 @@ build_ecm() {
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
 	pushd $STAGING_AREA/karchive
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF"
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
 	build_with_cmake $1
 	popd
 }
+
+build_genalyzer() {
+	echo "### Building genalyzer - branch $GENALYZER_BRANCH"
+	pushd $STAGING_AREA/genalyzer
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON"
+	build_with_cmake $1
+	popd
+}
+
+
 
 build_iio-emu() {
     echo "### Building iio-emu - branch $IIOEMU_BRANCH"
@@ -743,7 +769,6 @@ copy_deps()
 	cp -vfr $STAGING_AREA_DEPS/share/libsigrokdecode/decoders $ASSETSSS
 	[ -f $ASSETSSS/python3.12 ] || cp -vfr $STAGING_AREA_DEPS/lib/python3.12 $ASSETSSS
 	echo "Copied dependencies to assets"
-
 }
 
 # "
@@ -755,11 +780,12 @@ copy_deps()
 
 build_deps()
 {
+	echo aaa
 #     create_build_status_file
 # #     build_openssl ON #  de vazut daca trebe ???
 #     build_libiconv ON
 #     build_libffi ON
-# #   build_gettext ON # disabled for now, gnulib error (oprit de tot ca nu mai e nevoie de el la python)
+# #     build_gettext ON # disabled for now, gnulib error (oprit de tot ca nu mai e nevoie de el la python)
 #     build_libiconv ON # HANDLE CIRCULAR DEP
 #     build_glib ON #### libglib2.0.so.0 ---> libglib2.0.so
 #     build_libxml2 ON
@@ -779,14 +805,15 @@ build_deps()
 #     build_grscopy ON
 #     build_grm2k ON
 #     build_qwt ON # am facut modificari in cod si trebuie puse sus
-    build_python ON # disable locale, nu mai e nevoie de gettext, update la python 3.12
-    build_libsigrokdecode ON
-    build_libtinyiiod ON
-    build_libmatio ON
-    build_libzstd ON
-    build_ecm ON
-    build_karchive ON
-
+#     build_python ON # disable locale, nu mai e nevoie de gettext, update la python 3.12
+#     build_libsigrokdecode ON
+#     build_libtinyiiod ON
+#     build_libmatio ON
+#     build_libzstd ON
+#     build_ecm ON
+#     build_kddock ON
+#     build_karchive ON
+#     build_genalyzer ON
 }
 
 for arg in "${@}"; do
