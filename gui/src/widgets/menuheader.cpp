@@ -33,18 +33,14 @@ MenuHeaderWidget::MenuHeaderWidget(QString title, QPen pen, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
 	lay->setSpacing(0);
-	lay->setMargin(3);
-	//		lay->setContentsMargins(3,3,3,3);
+	lay->setMargin(0);
 
 	m_title = new QLineEdit(title, this);
 	m_title->setEnabled(false);
 	m_title->setReadOnly(false);
 
-	m_line = new QFrame(this);
 	m_pen = pen;
-
 	lay->addWidget(m_title);
-	lay->addWidget(m_line);
 	applyStylesheet();
 }
 
@@ -55,8 +51,7 @@ QLineEdit *MenuHeaderWidget::title() { return m_title; }
 void MenuHeaderWidget::applyStylesheet()
 {
 	StyleHelper::MenuCollapseHeaderLineEdit(m_title, "menuLabel");
-	StyleHelper::MenuHeaderLine(m_line, m_pen, "menuSeparator");
-	StyleHelper::MenuHeaderWidget(this, "menuHeader");
+	StyleHelper::MenuHeaderWidget(this, m_pen.color(), "menuHeader");
 }
 
 #include "moc_menuheader.cpp"
