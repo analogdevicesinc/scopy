@@ -77,7 +77,7 @@ public:
 	static void MenuControlButton(QPushButton *btn, QString objectName = "", bool checkable = true);
 	static void MenuControlWidget(QWidget *w, QColor color, QString objectName = "");
 	static void MenuHeaderLine(QFrame *line, QPen pen, QString objectName = "");
-	static void MenuHeaderWidget(QWidget *w, QString objectName = "");
+	static void MenuHeaderWidget(QWidget *w, QColor bgColor = QColor(), QString objectName = "");
 	static void MenuSectionWidget(QWidget *w, QString objectName = "");
 	static void MenuCollapseHeaderLineEdit(QLineEdit *w, QString objectName = "");
 	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName = "");

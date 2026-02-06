@@ -42,7 +42,6 @@ public:
 
 private:
 	QLineEdit *m_title;
-	QFrame *m_line;
 	QPen m_pen;
 };
 } // namespace scopy
