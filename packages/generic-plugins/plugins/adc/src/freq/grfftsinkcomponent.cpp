@@ -104,8 +104,6 @@ bool GRFFTSinkComponent::finished() { return (time_sink) ? time_sink->finishedAc
 
 void GRFFTSinkComponent::setData(bool copy)
 {
-	int index = 0;
-
 	for(GRChannel *gr : qAsConst(m_channels)) {
 		int index = time_channel_map.value(gr->sigpath()->name(), -1);
 		if(index == -1)
@@ -113,7 +111,12 @@ void GRFFTSinkComponent::setData(bool copy)
 
 		const float *xdata = time_sink->freq().data();
 		const float *ydata = time_sink->data()[index].data();
-		const size_t size = time_sink->data()[index].size();
+		size_t size = time_sink->data()[index].size();
+
+		// For float mode FFT, only send first half
+		if(!m_samplingInfo.complexMode) {
+			size = size / 2;
+		}
 
 		gr->onNewData(xdata, ydata, size, copy);
 	}

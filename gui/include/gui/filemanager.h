@@ -26,6 +26,7 @@
 #include <QStringList>
 #include <QVector>
 
+#include <QWidget>
 #include <exception>
 #include <iostream>
 
@@ -104,6 +105,13 @@ class SCOPY_GUI_EXPORT ScopyFileHeader
 public:
 	static bool hasValidHeader(QVector<QVector<QString>> data);
 	static QStringList getHeader();
+};
+
+class SCOPY_GUI_EXPORT FileManagerHelper
+{
+public:
+	static bool saveDataToFile(QWidget *parent, const QString &data, const QString &title = "Export Data",
+				   const QString &filter = "CSV Files (*.csv)", const QString &defaultExt = ".csv");
 };
 
 class SCOPY_GUI_EXPORT FileManagerException : public std::runtime_error

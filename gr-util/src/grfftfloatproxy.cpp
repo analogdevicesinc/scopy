@@ -30,7 +30,6 @@ GRFFTFloatProc::GRFFTFloatProc(QObject *parent)
 	m_fftwindow = gr::fft::window::WIN_HANNING;
 	m_powerOffset = 0;
 	nrBits = 12;
-	m_windowCorr = true;
 	m_sr = 0;
 	m_signed = true;
 	m_navg = 1;
@@ -42,12 +41,6 @@ GRFFTFloatProc::GRFFTFloatProc(QObject *parent)
 void GRFFTFloatProc::setWindow(gr::fft::window::win_type w)
 {
 	m_fftwindow = w;
-	Q_EMIT requestRebuild();
-}
-
-void GRFFTFloatProc::setWindowCorrection(bool b)
-{
-	m_windowCorr = b;
 	Q_EMIT requestRebuild();
 }
 
@@ -167,7 +160,6 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 	m_fftwindow = gr::fft::window::WIN_HANNING;
 	m_powerOffset = 0;
 	nrBits = 12;
-	m_windowCorr = true;
 	m_sr = 0;
 	m_signed = true;
 	m_navg = 1;
@@ -179,15 +171,6 @@ GRFFTComplexProc::GRFFTComplexProc(QObject *parent)
 void GRFFTComplexProc::setWindow(gr::fft::window::win_type w)
 {
 	m_fftwindow = w;
-	Q_EMIT requestRebuild();
-
-	/*if(mul)
-		mul->set_k(m_scale);*/
-}
-
-void GRFFTComplexProc::setWindowCorrection(bool b)
-{
-	m_windowCorr = b;
 	Q_EMIT requestRebuild();
 }
 

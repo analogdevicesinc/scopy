@@ -90,7 +90,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	// m_plotLayout->addWidget(m_xyPlot);
 
 	// Need to set this for some reason .. spinboxes should be refactored
-	m_timePlot->yAxis()->setUnits("V");
+	m_timePlot->yAxis()->setUnits("counts");
 
 	m_plotMenu = new TimePlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);

@@ -27,6 +27,7 @@
 #include <timeplotcomponentchannel.h>
 #include <style.h>
 #include <pluginbase/preferences.h>
+#include <filemanager.h>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -140,6 +141,13 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
 
+	QPushButton *exportBtn = new QPushButton("Export plot to CSV");
+	StyleHelper::BasicButton(exportBtn);
+	connect(exportBtn, &QPushButton::clicked, this, [=]() {
+		QString csvData = m_plotComponent->timePlot()->generateCsvData();
+		FileManagerHelper::saveDataToFile(this, csvData, tr("Export Plot Data"));
+	});
+
 	yaxis->contentLayout()->setSpacing(2);
 	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
 	yaxis->contentLayout()->addWidget(m_yCtrl);
@@ -149,6 +157,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
 	plotMenu->contentLayout()->addWidget(m_curve);
+	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);
 
 	xySection->add(m_xAxisSrc);
@@ -317,7 +326,7 @@ void TimePlotComponentSettings::updateYAxis()
 	switch(m_ymode) {
 	case YMODE_COUNT:
 		// Move this to iio_units function
-		timePlotYAxis->setUnits("");
+		timePlotYAxis->setUnits("counts");
 		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
 		timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;

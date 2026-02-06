@@ -31,6 +31,7 @@
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <freq/fftplotcomponentchannel.h>
+#include <minmaxholdcontroller.hpp>
 #include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 #include <QSpinBox>
 #include <QVariantMap>
@@ -68,9 +69,6 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
 		[=](int w) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindow(w); });
 
-	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
-		[=](bool b) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
-
 	connect(m_fftPlotComponentChannel->channelComponent(), &ChannelComponent::updatedSamplingInfo, this,
 		[=](SamplingInfo p) {
 			dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSampleRate(p.sampleRate);
@@ -101,9 +99,6 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
 		[=](int w) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindow(w); });
-
-	connect(this, &GRFFTChannelComponent::windowCorrectionChanged, this,
-		[=](bool b) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindowCorrection(b); });
 	_init();
 }
 
@@ -113,7 +108,6 @@ void GRFFTChannelComponent::_init()
 	m_scaleAvailable = m_src->scaleAttributeAvailable(); // query from GRIIOFloatChannel;
 	m_powerOffset = 0;
 	m_window = 1;
-	m_windowCorrection = true;
 
 	/*	m_measureMgr = new TimeMeasureManager(this);
 		m_measureMgr->initMeasure(m_pen);
@@ -193,9 +187,11 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	QWidget *markerMenu = createMarkerMenu(m_menu);
 	QWidget *avgMenu = createAveragingMenu(m_menu);
+	QWidget *minMaxHoldMenu = createMinMaxHoldMenu(m_menu);
 	m_menu->add(yaxismenu, "yaxis");
 	m_menu->add(markerMenu, "marker");
 	m_menu->add(avgMenu, "average");
+	m_menu->add(minMaxHoldMenu, "minmaxhold");
 	m_menu->add(curvemenu, "curve");
 
 	if(dynamic_cast<GRIIOComplexChannelSrc *>(m_src) != nullptr) {
@@ -250,6 +246,75 @@ QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
 			ch->setAveragingSize(value);
 		}
 	});
+
+	section->contentLayout()->addLayout(layout);
+	section->setCollapsed(true);
+	return section;
+}
+
+QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
+		"MIN/MAX HOLD", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+
+	auto layout = new QVBoxLayout();
+	layout->setSpacing(5);
+	layout->setMargin(0);
+	int btnSize = Style::getDimension(json::global::unit_2);
+
+	// Min hold row
+	auto minLayout = new QHBoxLayout();
+	minLayout->setSpacing(10);
+	minLayout->setMargin(0);
+	QLabel *minHoldLabel(new QLabel("Min curve"));
+	Style::setStyle(minHoldLabel, style::properties::label::subtle);
+	SmallOnOffSwitch *minHoldSwitch = new SmallOnOffSwitch(section);
+	QPushButton *minResetBtn = new QPushButton("Reset", section);
+	minResetBtn->setIcon(
+		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	minResetBtn->setFixedHeight(btnSize);
+	minResetBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	Style::setStyle(minResetBtn, style::properties::button::grayButton);
+	minLayout->addWidget(minHoldLabel);
+	minLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+	minLayout->addWidget(minResetBtn);
+	minLayout->addWidget(minHoldSwitch);
+
+	// Max hold row
+	auto maxLayout = new QHBoxLayout();
+	maxLayout->setSpacing(10);
+	maxLayout->setMargin(0);
+	QLabel *maxHoldLabel(new QLabel("Max curve"));
+	Style::setStyle(maxHoldLabel, style::properties::label::subtle);
+	SmallOnOffSwitch *maxHoldSwitch = new SmallOnOffSwitch(section);
+	QPushButton *maxResetBtn = new QPushButton("Reset", section);
+	maxResetBtn->setIcon(
+		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
+	maxResetBtn->setFixedHeight(btnSize);
+	maxResetBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	Style::setStyle(maxResetBtn, style::properties::button::grayButton);
+	maxLayout->addWidget(maxHoldLabel);
+	maxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
+	maxLayout->addWidget(maxResetBtn);
+	maxLayout->addWidget(maxHoldSwitch);
+
+	MenuOnOffSwitch *hideMainSwitch = new MenuOnOffSwitch("Hide main curve", section);
+	hideMainSwitch->setEnabled(false);
+
+	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, controller,
+		&MinMaxHoldController::setEnabled);
+	connect(minHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMinEnabled);
+	connect(maxHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMaxEnabled);
+	connect(minResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMin);
+	connect(maxResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMax);
+	connect(hideMainSwitch->onOffswitch(), &QAbstractButton::toggled, controller,
+		&MinMaxHoldController::setMainChannelHidden);
+	connect(controller, &MinMaxHoldController::enabledChanged, hideMainSwitch, &QWidget::setEnabled);
+
+	layout->addLayout(minLayout);
+	layout->addLayout(maxLayout);
+	layout->addWidget(hideMainSwitch);
 
 	section->contentLayout()->addLayout(layout);
 	section->setCollapsed(true);
@@ -487,16 +552,6 @@ void GRFFTChannelComponent::setWindow(int newWindow)
 
 // this cannot be implemented since averaging size can only be changed from within the channel signalpath
 void GRFFTChannelComponent::setAveragingSize(int size) {}
-
-bool GRFFTChannelComponent::windowCorrection() const { return m_windowCorrection; }
-
-void GRFFTChannelComponent::setWindowCorrection(bool newWindowCorr)
-{
-	if(m_windowCorrection == newWindowCorr)
-		return;
-	m_windowCorrection = newWindowCorr;
-	Q_EMIT windowCorrectionChanged(newWindowCorr);
-}
 
 void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 {
