@@ -40,10 +40,14 @@
 #include <pluginbase/pluginbase.h>
 
 namespace scopy::swiot {
+
+class SWIOT_API;
+
 class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+	friend class SWIOT_API;
 
 public:
 	void preload() override;
@@ -77,6 +81,7 @@ private:
 	void setupToolList();
 	void clearPingTask();
 	void createStatusContainer();
+	void initApi();
 	QPushButton *m_btnIdentify;
 	QWidget *m_statusContainer;
 	SwiotInfoPage *m_infoPage;
@@ -88,6 +93,7 @@ private:
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
+	SWIOT_API *m_api;
 
 	bool m_isRuntime;
 	bool m_switchCmd = false;

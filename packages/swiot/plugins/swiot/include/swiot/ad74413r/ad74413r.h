@@ -49,9 +49,14 @@
 namespace scopy {
 
 namespace swiot {
+
+class SWIOT_API;
+
 class Ad74413r : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit Ad74413r(QString uri = "", ToolMenuEntry *tme = 0, QWidget *parent = nullptr);
 
@@ -135,6 +140,7 @@ private:
 	QPushButton *m_configBtn;
 	GearBtn *m_settingsBtn;
 	InfoBtn *m_infoBtn;
+	MenuControlButton *m_measureBtn;
 
 	PlotWidget *m_plot;
 	PlotInfo *m_info;

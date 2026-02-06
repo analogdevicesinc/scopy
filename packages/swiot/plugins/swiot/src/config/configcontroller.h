@@ -27,9 +27,13 @@
 
 namespace scopy::swiot {
 
+class SWIOT_API;
+
 class ConfigController : public QObject
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit ConfigController(ConfigChannelView *channelView, ConfigModel *model, int channelId);
 

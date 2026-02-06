@@ -36,9 +36,13 @@
 
 namespace scopy::swiot {
 
+class SWIOT_API;
+
 class SwiotConfig : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	SwiotConfig(QString uri, QWidget *parent = nullptr);
 	~SwiotConfig();
