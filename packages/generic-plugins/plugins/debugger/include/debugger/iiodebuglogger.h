@@ -27,9 +27,14 @@
 #include <QTextBrowser>
 
 namespace scopy::debugger {
+
+class IIOExplorerInstrument_API;
+
 class IIODebugLogger : public QFrame
 {
 	Q_OBJECT
+	friend class IIOExplorerInstrument_API;
+
 public:
 	explicit IIODebugLogger(QWidget *parent = nullptr);
 	void setupUi();

@@ -33,9 +33,14 @@
 #include "pathtitle.h"
 
 namespace scopy::debugger {
+
+class IIOExplorerInstrument_API;
+
 class DetailsView : public QWidget
 {
 	Q_OBJECT
+	friend class IIOExplorerInstrument_API;
+
 public:
 	explicit DetailsView(QString uri, QWidget *parent = nullptr);
 	void setIIOStandardItem(IIOStandardItem *item);
