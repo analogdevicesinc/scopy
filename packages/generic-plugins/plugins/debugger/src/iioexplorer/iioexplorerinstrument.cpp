@@ -27,7 +27,9 @@
 #include <QFileDialog>
 #include <style.h>
 #include <gui/stylehelper.h>
+#include <pluginbase/scopyjs.h>
 #include "iioexplorerinstrument.h"
+#include "iioexplorerinstrument_api.h"
 #include "hoverwidget.h"
 #include "iiostandarditem.h"
 #include "debuggerloggingcategories.h"
@@ -47,10 +49,11 @@ IIOExplorerInstrument::IIOExplorerInstrument(struct iio_context *context, QStrin
 
 	// api object for saving the state of widgets
 	m_apiObject = new IIOExplorerInstrument_API(this);
-	m_apiObject->setObjectName("IIOExplorerInstrument");
+	m_apiObject->setObjectName("iioExplorer");
+	ScopyJS::GetInstance()->registerApi(m_apiObject);
 }
 
-IIOExplorerInstrument::~IIOExplorerInstrument() {}
+IIOExplorerInstrument::~IIOExplorerInstrument() { ScopyJS::GetInstance()->unregisterApi(m_apiObject); }
 
 void IIOExplorerInstrument::saveSettings(QSettings &s)
 {
@@ -494,48 +497,6 @@ void IIOExplorerInstrument::setupCodeGeneratorWindow()
 	hoverWidget->setAnchorOffset(QPoint(-10, 10));
 	hoverWidget->setVisible(true);
 	hoverWidget->raise();
-}
-
-// --------------------------------------------------------
-
-QList<int> IIOExplorerInstrument_API::vSplitter() const { return p->m_VSplitter->sizes(); }
-
-void IIOExplorerInstrument_API::setVSplitter(const QList<int> &newSplitter)
-{
-	if(newSplitter.size() != 2) {
-		qWarning(CAT_DEBUGGERIIOMODEL) << "Invalid splitter size. Expected 2, got" << newSplitter.size();
-		return;
-	}
-
-	// If one of the values is 0, reset to a default value
-	if(newSplitter[0] <= 0 || newSplitter[1] <= 0) {
-		qWarning(CAT_DEBUGGERIIOMODEL) << "Invalid splitter value. Resetting to default.";
-		int sum = newSplitter[0] + newSplitter[1];
-		p->m_VSplitter->setSizes(QList<int>() << (sum * 2) / 3 << sum / 3);
-		return;
-	}
-
-	p->m_VSplitter->setSizes(newSplitter);
-}
-
-QList<int> IIOExplorerInstrument_API::hSplitter() const { return p->m_HSplitter->sizes(); }
-
-void IIOExplorerInstrument_API::setHSplitter(const QList<int> &newSplitter)
-{
-	if(newSplitter.size() != 2) {
-		qWarning(CAT_DEBUGGERIIOMODEL) << "Invalid splitter size. Expected 2, got" << newSplitter.size();
-		return;
-	}
-
-	// If one of the values is 0, reset to a default value
-	if(newSplitter[0] <= 0 || newSplitter[1] <= 0) {
-		qWarning(CAT_DEBUGGERIIOMODEL) << "Invalid splitter value. Resetting to default.";
-		int sum = newSplitter[0] + newSplitter[1];
-		p->m_HSplitter->setSizes(QList<int>() << sum / 4 << (sum * 3) / 4);
-		return;
-	}
-
-	p->m_HSplitter->setSizes(newSplitter);
 }
 
 #include "moc_iioexplorerinstrument.cpp"
