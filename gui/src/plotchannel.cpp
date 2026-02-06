@@ -72,12 +72,14 @@ void PlotChannel::enable()
 {
 	setEnabled(true);
 	m_isEnabled = true;
+	Q_EMIT enabledChanged(true);
 }
 
 void PlotChannel::disable()
 {
 	setEnabled(false);
 	m_isEnabled = false;
+	Q_EMIT enabledChanged(false);
 }
 
 void PlotChannel::setThicknessInternal(int thickness)

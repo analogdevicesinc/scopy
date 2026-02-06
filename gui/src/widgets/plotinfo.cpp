@@ -34,6 +34,8 @@ PlotInfo::PlotInfo(QWidget *parent)
 	, m_spacing(6)
 	, m_leftInfo(new QWidget())
 	, m_rightInfo(new QWidget())
+	, m_bottomLeftInfo(new QWidget())
+	, m_bottomRightInfo(new QWidget())
 {
 	initLayouts();
 }
@@ -42,32 +44,40 @@ PlotInfo::~PlotInfo() {}
 
 void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos)
 {
-	switch(hpos) {
-	case InfoPosition::IP_LEFT:
-		if(vpos == IP_BOTTOM) {
-			m_leftLayout->addWidget(info);
-		} else {
-			m_leftLayout->insertWidget(0, info);
-		}
-		info->setParent(m_leftInfo);
-		break;
+	QVBoxLayout *targetLayout = nullptr;
+	QWidget *targetParent = nullptr;
+	bool alignRight = (hpos == IP_RIGHT);
 
-	case InfoPosition::IP_RIGHT:
-	default:
-		if(vpos == IP_BOTTOM) {
-			m_rightLayout->addWidget(info);
+	if(vpos == IP_BOTTOM) {
+		if(hpos == IP_LEFT) {
+			targetLayout = m_bottomLeftLayout;
+			targetParent = m_bottomLeftInfo;
 		} else {
-			m_rightLayout->insertWidget(0, info);
+			targetLayout = m_bottomRightLayout;
+			targetParent = m_bottomRightInfo;
 		}
-		info->setParent(m_rightInfo);
+		targetLayout->insertWidget(0, info, 0, alignRight ? Qt::AlignRight : Qt::Alignment());
+	} else {
+		if(hpos == IP_LEFT) {
+			targetLayout = m_leftLayout;
+			targetParent = m_leftInfo;
+		} else {
+			targetLayout = m_rightLayout;
+			targetParent = m_rightInfo;
+		}
+		targetLayout->addWidget(info, 0, alignRight ? Qt::AlignRight : Qt::Alignment());
+	}
 
-		// align to right if it's a label
+	info->setParent(targetParent);
+
+	if(alignRight) {
 		QLabel *labelInfo = dynamic_cast<QLabel *>(info);
 		if(labelInfo) {
 			labelInfo->setAlignment(Qt::AlignRight);
+			labelInfo->setAttribute(Qt::WA_TransparentForMouseEvents);
 		}
-		break;
 	}
+
 	info->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
@@ -117,8 +127,7 @@ QWidget *PlotInfo::getInfo(uint index, InfoPosition pos)
 
 void PlotInfo::initLayouts()
 {
-	// left info
-	m_leftInfo->setAttribute(Qt::WA_TransparentForMouseEvents);
+	// top left info
 	m_leftLayout = new QVBoxLayout(m_leftInfo);
 	m_leftLayout->setSpacing(m_spacing);
 	m_leftLayout->setMargin(m_margin);
@@ -126,11 +135,9 @@ void PlotInfo::initLayouts()
 	m_leftHover = new HoverWidget(m_leftInfo, m_parent, m_parent);
 	m_leftHover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	m_leftHover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-	m_leftHover->setAttribute(Qt::WA_TransparentForMouseEvents);
 	m_leftHover->show();
 
-	// right info
-	m_rightInfo->setAttribute(Qt::WA_TransparentForMouseEvents);
+	// top right info
 	m_rightLayout = new QVBoxLayout(m_rightInfo);
 	m_rightLayout->setSpacing(m_spacing);
 	m_rightLayout->setMargin(m_margin);
@@ -138,8 +145,27 @@ void PlotInfo::initLayouts()
 	m_rightHover = new HoverWidget(m_rightInfo, m_parent, m_parent);
 	m_rightHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	m_rightHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	m_rightHover->setAttribute(Qt::WA_TransparentForMouseEvents);
 	m_rightHover->show();
+
+	// bottom left info
+	m_bottomLeftLayout = new QVBoxLayout(m_bottomLeftInfo);
+	m_bottomLeftLayout->setSpacing(m_spacing);
+	m_bottomLeftLayout->setMargin(m_margin);
+
+	m_bottomLeftHover = new HoverWidget(m_bottomLeftInfo, m_parent, m_parent);
+	m_bottomLeftHover->setAnchorPos(HoverPosition::HP_BOTTOMLEFT);
+	m_bottomLeftHover->setContentPos(HoverPosition::HP_TOPRIGHT);
+	m_bottomLeftHover->show();
+
+	// bottom right info
+	m_bottomRightLayout = new QVBoxLayout(m_bottomRightInfo);
+	m_bottomRightLayout->setSpacing(m_spacing);
+	m_bottomRightLayout->setMargin(m_margin);
+
+	m_bottomRightHover = new HoverWidget(m_bottomRightInfo, m_parent, m_parent);
+	m_bottomRightHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
+	m_bottomRightHover->setContentPos(HoverPosition::HP_TOPLEFT);
+	m_bottomRightHover->show();
 }
 
 #include "moc_plotinfo.cpp"

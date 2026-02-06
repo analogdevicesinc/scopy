@@ -22,6 +22,7 @@
 #include <timeplotcomponentsettings.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/plotlegend.h>
 #include <QWidget>
 #include <QLineEdit>
 #include <timeplotcomponentchannel.h>
@@ -63,6 +64,10 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
 		&PlotComponent::showPlotLabels);
+
+	MenuOnOffSwitch *legendSwitch = new MenuOnOffSwitch("Show legend", plotMenu, false);
+	connect(legendSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent->legend(),
+		&PlotLegend::setVisible);
 
 	m_yCtrl = new MenuPlotAxisRangeControl(m_plotComponent->timePlot()->yAxis(), this);
 
@@ -156,6 +161,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
+	plotMenu->contentLayout()->addWidget(legendSwitch);
 	plotMenu->contentLayout()->addWidget(m_curve);
 	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);
