@@ -435,6 +435,8 @@ Test 7: Data logging wrong path.
   The result of the test goes here (PASS/FAIL).
 
 
+.. _tst-pqm-rms-pqevents:
+
 Test 8: PQEvents.
 ^^^^^^^^^^^^^^^^^
 
@@ -481,6 +483,82 @@ Test 8: PQEvents.
 ..
 
     6. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+
+Test 9: PQEvents synchronization.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.PQM.RMS_PQEVENTS_SYNC
+
+**RBP:** P3
+
+**Description:** This test verifies that the PQEvents indicator is synchronized
+between RMS and Harmonics tools. When the PQEvents button is reset in one tool,
+it must also be reset in the other tool.
+
+**Test prerequisites:**
+    - :ref:`TST.PQM.RMS_PQEVENTS <tst-pqm-rms-pqevents>`.
+
+**Preconditions:**
+    - Scopy is installed on the system.
+    - iio-emu is installed on the system.
+    - Use :ref:`PQM.Emu <pqm-emu-rms>` setup.
+    - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
+
+**Steps:**
+    1. Click on the **Rms** tool.
+    2. Click on the **Run** button.
+    3. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 1`` command.
+        - **Expected result:** The PQEvents indicator becomes active.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    4. Click on the **Harmonics** tool.
+        - **Expected result:** The PQEvents indicator in the Harmonics tool is
+          also active.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    5. Click on the **PQEvents** indicator in the Harmonics tool.
+        - **Expected result:** The PQEvents indicator becomes inactive.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    6. Click on the **Rms** tool.
+        - **Expected result:** The PQEvents indicator in the RMS tool is also
+          inactive.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    7. Click on the **Stop** button.
+    8. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
 
 **Tested OS:**
 
@@ -737,14 +815,16 @@ Test 4: Data acquisition.
   The result of the test goes here (PASS/FAIL).
 
 
-Test 5: The features of the table.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Test 5: Overview plot features.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**UID:** TST.PQM.HARMONICS_TABLE
+**UID:** TST.PQM.HARMONICS_OVERVIEW_PLOT
 
 **RBP:** P3
 
-**Description:** This test verifies if the table functionalities works correctly.
+**Description:** This test verifies that the overview plot works correctly. On
+the overview plot, the user can select which channel is displayed and which
+harmonic degrees to show by selecting cells from the table.
 
 **Test prerequisites:**
     - :ref:`TST.PQM.HARMONICS_SINGLE <tst-pqm-harmonics-single>`.
@@ -757,19 +837,22 @@ Test 5: The features of the table.
 
 **Steps:**
     1. Click on the **Harmonics** tool.
-    2. Click on the **Single** button.
-        - **Expected result:** The row Ia is highlighted and the corresponding 
-          values are drawn on the plot.
+    2. Open the settings menu and enable the **Overview plot**.
+    3. Click on the **Single** button.
+        - **Expected result:** The table and overview plot are populated with
+          data. The Ia row is highlighted and the corresponding values are
+          drawn on the overview plot.
         - **Actual result:**
 
 ..
   Actual test result goes here.
 ..
 
-    3. Make sure that the settings menu is visible.
-    4. Click on the **Ib** row from the table.
-        - **Expected result:** The entire row is selected and the Ib values are 
-          displayed on the plot. In the setting menu, the active channel is also Ib.
+    4. Click on the **Ub** row from the table.
+        - **Expected result:** The entire row is selected and the Ub values are
+          displayed on the overview plot. In the settings menu, the active
+          channel is also Ub. Only one channel is visible at a time on the
+          overview plot.
         - **Actual result:**
 
 ..
@@ -777,9 +860,18 @@ Test 5: The features of the table.
 ..
 
     5. Select the first 6 values from row **Ic** (click on the first value and hold it down until you reach column 5).
-        - **Expected result:** Only the respective values remain highlighted, 
-          and only the selected columns appear on the plot. The drawing color 
-          is another one. 
+        - **Expected result:** Only the respective values remain highlighted,
+          and only the selected harmonic degrees (0 to 5) appear on the overview
+          plot.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    6. Compare the bar heights on the overview plot with the values in the selected cells.
+        - **Expected result:** The bar heights on the overview plot match the
+          numeric values displayed in the selected table cells.
         - **Actual result:**
 
 ..
@@ -1063,6 +1155,84 @@ Test 9: PQEvents.
 ..
 
     5. Run ``iio_attr -u ip:127.0.0.1 -c pqm count0 countEvent 0`` command.
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+
+Test 10: Current harmonics plots data correspondence.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.PQM.HARMONICS_CURRENT_PLOTS_DATA
+
+**RBP:** P3
+
+**Description:** This test verifies that the data displayed on the individual
+current harmonics plots (Ia, Ib, Ic) corresponds with the data shown in the
+harmonics table. These plots display all harmonic values.
+
+**Test prerequisites:**
+    - :ref:`TST.PQM.HARMONICS_SINGLE <tst-pqm-harmonics-single>`.
+
+**Preconditions:**
+    - Scopy is installed on the system.
+    - iio-emu is installed on the system.
+    - Use :ref:`PQM.Emu <pqm-emu-harmonics>` setup.
+    - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
+
+**Steps:**
+    1. Click on the **Harmonics** tool.
+    2. Click on the **Single** button.
+        - **Expected result:** The table and the individual current harmonics
+          plots (Ia, Ib, Ic) are populated with data.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Compare the values in the **Ia** row of the table with the bar heights on the Ia plot.
+        - **Expected result:** All bars on the Ia plot correspond to the values
+          in the Ia row. The bar heights match the numeric values displayed in
+          the table cells.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    4. Compare the values in the **Ib** row of the table with the bar heights on the Ib plot.
+        - **Expected result:** All bars on the Ib plot correspond to the values
+          in the Ib row. The bar heights match the numeric values displayed in
+          the table cells.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    5. Compare the values in the **Ic** row of the table with the bar heights on the Ic plot.
+        - **Expected result:** All bars on the Ic plot correspond to the values
+          in the Ic row. The bar heights match the numeric values displayed in
+          the table cells.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
 
 **Tested OS:**
 
@@ -1759,6 +1929,93 @@ Test 12: Data logging wrong path.
 ..
   Actual test result goes here.
 ..
+
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+
+
+Test 13: Concurrent acquisition with RMS and Harmonics.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**UID:** TST.PQM.WAVEFORM_CONCURRENT_ACQ
+
+**RBP:** P3
+
+**Description:** This test verifies that when RMS and Harmonics tools are
+running and the user starts acquisition on the Waveform tool, the acquisition
+on RMS and Harmonics stops automatically.
+
+**Test prerequisites:**
+    - :ref:`TST.PQM.RMS_RUN <tst-pqm-rms-run>`.
+    - :ref:`TST.PQM.HARMONICS_RUN <tst-pqm-harmonics-run>`.
+
+**Preconditions:**
+    - Scopy is installed on the system.
+    - iio-emu is installed on the system.
+    - Use :ref:`PQM.Emu <pqm-emu-waveform>` setup.
+    - OS: Windows, Linux-x86_64, Linux-arm64, Linux-arm32, macOS.
+
+**Steps:**
+    1. Click on the **Rms** tool.
+    2. Click on the **Run** button.
+        - **Expected result:** Data acquisition starts on the RMS tool.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    3. Click on the **Harmonics** tool.
+    4. Click on the **Run** button.
+        - **Expected result:** Data acquisition starts on the Harmonics tool.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    5. Click on the **Waveform** tool.
+    6. Click on the **Run** button.
+        - **Expected result:** Data acquisition starts on the Waveform tool.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    7. Click on the **Rms** tool.
+        - **Expected result:** Data acquisition on the RMS tool has stopped. The
+          Run button is no longer in the active/pressed state.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    8. Click on the **Harmonics** tool.
+        - **Expected result:** Data acquisition on the Harmonics tool has
+          stopped. The Run button is no longer in the active/pressed state.
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+    9. Click on the **Waveform** tool.
+    10. Click on the **Stop** button.
 
 
 **Tested OS:**

@@ -42,6 +42,11 @@ public:
 	Ad9084(struct iio_device *dev, QWidget *parent = nullptr);
 	~Ad9084();
 
+	void setRxTabEnabled(bool enable);
+	void setTxTabEnabled(bool enable);
+	bool isRxTabEnabled() const;
+	bool isTxTabEnabled() const;
+
 Q_SIGNALS:
 	void triggerRead();
 

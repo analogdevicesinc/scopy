@@ -18,40 +18,44 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef AD9084PLUGIN_H
-#define AD9084PLUGIN_H
-
-#define SCOPY_PLUGIN_NAME AD9084Plugin
+#ifndef AD9084_API_HPP
+#define AD9084_API_HPP
 
 #include "scopy-ad9084_export.h"
-#include <QObject>
-#include <QList>
 #include <pluginbase/apiobject.h>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
+#include <QString>
+
+struct iio_device;
+class QWidget;
 
 namespace scopy::ad9084 {
-class SCOPY_AD9084_EXPORT AD9084Plugin : public QObject, public PluginBase
+
+class SCOPY_AD9084_EXPORT Ad9084_API : public ApiObject
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	explicit Ad9084_API(struct iio_device *dev, QWidget *tool = nullptr, QObject *parent = nullptr);
+	~Ad9084_API();
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+	Q_INVOKABLE void show();
+	Q_INVOKABLE void setRxTabEnabled(bool enable);
+	Q_INVOKABLE void setTxTabEnabled(bool enable);
+	Q_INVOKABLE bool getRxTabEnabled();
+	Q_INVOKABLE bool getTxTabEnabled();
+	Q_INVOKABLE bool setNco(double freqHz);
+	Q_INVOKABLE double getNco();
+	Q_INVOKABLE bool setSampleRate(double rateHz);
+	Q_INVOKABLE double getSampleRate();
+	Q_INVOKABLE bool setEnableChannel(int idx, bool enable);
+	Q_INVOKABLE bool getEnableChannel(int idx);
+	Q_INVOKABLE bool applyProfile(const QString &path);
+	Q_INVOKABLE void refresh();
 
 private:
-	struct iio_context *m_ctx;
-	QList<scopy::ApiObject *> m_apiObjects;
+	struct iio_device *m_dev;
+	QWidget *m_tool;
 };
+
 } // namespace scopy::ad9084
-#endif // AD9084PLUGIN_H
+
+#endif // AD9084_API_HPP

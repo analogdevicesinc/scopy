@@ -183,6 +183,26 @@ Ad9084::~Ad9084()
 	}
 }
 
+void Ad9084::setRxTabEnabled(bool enable)
+{
+	if(m_rxChain) {
+		m_rxChain->setChecked(enable);
+		m_rxChain->setEnabled(true);
+	}
+}
+
+void Ad9084::setTxTabEnabled(bool enable)
+{
+	if(m_txChain) {
+		m_txChain->setChecked(enable);
+		m_txChain->setEnabled(true);
+	}
+}
+
+bool Ad9084::isRxTabEnabled() const { return m_rxChain ? m_rxChain->isChecked() : false; }
+
+bool Ad9084::isTxTabEnabled() const { return m_txChain ? m_txChain->isChecked() : false; }
+
 void Ad9084::scanChannels()
 {
 	unsigned int nbChannels = iio_device_get_channels_count(m_device);
