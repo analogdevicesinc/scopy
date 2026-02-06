@@ -217,13 +217,21 @@ void StyleHelper::MenuHeaderLine(QFrame *m_line, QPen pen, QString objectName)
 	m_line->setStyleSheet(style);
 }
 
-void StyleHelper::MenuHeaderWidget(QWidget *w, QString objectName)
+void StyleHelper::MenuHeaderWidget(QWidget *w, QColor bgColor, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 
+	if(QColor() != bgColor) {
+		QString style = QString("background-color: rgb(%1, %2, %3); border-radius: 4px;")
+					.arg(bgColor.red())
+					.arg(bgColor.green())
+					.arg(bgColor.blue());
+		w->setStyleSheet(style);
+	}
+
 	MenuSectionWidget(w);
-	w->setFixedHeight(Style::getDimension(json::global::unit_4));
+	w->setFixedHeight(Style::getDimension(json::global::unit_3));
 }
 
 void StyleHelper::MenuSectionWidget(QWidget *w, QString objectName)
