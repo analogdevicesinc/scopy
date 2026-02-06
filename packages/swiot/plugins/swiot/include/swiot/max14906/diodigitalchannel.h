@@ -30,9 +30,14 @@
 #include <gui/widgets/menucombo.h>
 
 namespace scopy::swiot {
+
+class SWIOT_API;
+
 class DioDigitalChannel : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit DioDigitalChannel(const QString &deviceName, const QString &deviceType, QWidget *parent = nullptr);
 	~DioDigitalChannel() override;

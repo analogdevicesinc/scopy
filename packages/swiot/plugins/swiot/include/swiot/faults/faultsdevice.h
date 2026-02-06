@@ -26,16 +26,20 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QWidget>
+#include <gui/widgets/menucollapsesection.h>
 
 #include <iio.h>
 #include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
 class FaultsGroup;
+class SWIOT_API;
 
 class FaultsDevice : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit FaultsDevice(const QString &name, QString path, QString uri, QVector<uint32_t> &registers,
 			      QWidget *parent = nullptr);
@@ -73,6 +77,7 @@ private:
 	QPushButton *m_resetBtn;
 	QPushButton *m_clearBtn;
 	QWidget *m_faultsExplanation;
+	MenuCollapseSection *m_explanationSection;
 
 	QString m_uri;
 	CommandQueue *m_cmdQueue;

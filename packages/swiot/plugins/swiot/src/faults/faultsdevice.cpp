@@ -322,15 +322,15 @@ QWidget *FaultsDevice::createExplanationSection(QWidget *parent)
 	}
 	m_faultsExplanation->ensurePolished();
 
-	MenuCollapseSection *explanationSection = new MenuCollapseSection(
-		"Faults explanation", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, this);
-	explanationSection->setLayout(new QVBoxLayout());
-	explanationSection->contentLayout()->setSpacing(10);
-	explanationSection->contentLayout()->setMargin(0);
+	m_explanationSection = new MenuCollapseSection("Faults explanation", MenuCollapseSection::MHCW_ONOFF,
+						       MenuCollapseSection::MHW_BASEWIDGET, this);
+	m_explanationSection->setLayout(new QVBoxLayout());
+	m_explanationSection->contentLayout()->setSpacing(10);
+	m_explanationSection->contentLayout()->setMargin(0);
 
-	explanationSection->contentLayout()->addWidget(m_faultsExplanation);
+	m_explanationSection->contentLayout()->addWidget(m_faultsExplanation);
 
-	return explanationSection;
+	return m_explanationSection;
 }
 
 void FaultsDevice::initTutorialProperties()

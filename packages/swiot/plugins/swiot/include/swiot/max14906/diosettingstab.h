@@ -25,9 +25,14 @@
 #include <gui/widgets/menuspinbox.h>
 
 namespace scopy::swiot {
+
+class SWIOT_API;
+
 class DioSettingsTab : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit DioSettingsTab(QWidget *parent = nullptr);
 	~DioSettingsTab();

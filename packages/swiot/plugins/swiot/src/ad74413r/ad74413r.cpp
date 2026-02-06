@@ -625,13 +625,14 @@ void Ad74413r::setupToolTemplate()
 		});
 	});
 
-	MenuControlButton *measure = new MenuControlButton(m_tool->bottomContainer());
-	setupMeasureButtonHelper(measure);
+	m_measureBtn = new MenuControlButton(m_tool->bottomContainer());
+	setupMeasureButtonHelper(m_measureBtn);
 	m_measurePanel = new MeasurementsPanel(m_tool->topStack());
 	m_tool->topStack()->add(measureMenuId, m_measurePanel);
-	connect(measure, &MenuControlButton::toggled, this, [&](bool en) {
-		if(en)
+	connect(m_measureBtn, &MenuControlButton::toggled, this, [&](bool en) {
+		if(en) {
 			m_tool->requestMenu(measureMenuId);
+		}
 		m_tool->openTopContainerHelper(en);
 	});
 
@@ -665,7 +666,7 @@ void Ad74413r::setupToolTemplate()
 	m_rightMenuBtnGrp->addButton(m_settingsBtn);
 
 	m_tool->addWidgetToBottomContainerHelper(m_chnlsMenuBtn, TTA_LEFT);
-	m_tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
+	m_tool->addWidgetToBottomContainerHelper(m_measureBtn, TTA_RIGHT);
 
 	m_tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerMenuControlHelper(m_settingsBtn, TTA_LEFT);

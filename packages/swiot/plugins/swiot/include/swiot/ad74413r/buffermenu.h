@@ -31,9 +31,13 @@
 
 namespace scopy::swiot {
 
+class SWIOT_API;
+
 class BufferMenu : public QWidget
 {
 	Q_OBJECT
+	friend class SWIOT_API;
+
 public:
 	explicit BufferMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
 			    QMap<QString, iio_channel *> chnls = {});
