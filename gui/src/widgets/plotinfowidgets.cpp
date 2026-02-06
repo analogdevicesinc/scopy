@@ -20,10 +20,13 @@
  */
 
 #include "plotinfowidgets.h"
+#include "hoverwidget.h"
 #include "plotaxis.h"
+#include "plotchannel.h"
 #include "plotnavigator.hpp"
 #include "plotwidget.h"
 #include <QDateTime>
+#include <QHBoxLayout>
 #include <style.h>
 #include <stylehelper.h>
 #include <pluginbase/preferences.h>
@@ -170,5 +173,138 @@ TimestampInfo::TimestampInfo(PlotWidget *plot, QWidget *parent)
 }
 
 TimestampInfo::~TimestampInfo() {}
+
+PlotLegendWidget::PlotLegendWidget(PlotWidget *plot, QWidget *parent)
+	: QPushButton("Legend", parent)
+	, m_plot(plot)
+{
+	setCheckable(true);
+	setChecked(false);
+	setContentsMargins(0, 0, 0, 0);
+	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+
+	m_legendPanel = new QWidget(m_plot);
+	m_legendLayout = new QVBoxLayout(m_legendPanel);
+	m_legendLayout->setContentsMargins(6, 6, 6, 6);
+	m_legendLayout->setSpacing(4);
+
+	m_hoverWidget = new HoverWidget(m_legendPanel, this, m_plot);
+	m_hoverWidget->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	m_hoverWidget->setContentPos(HoverPosition::HP_TOPLEFT);
+	m_hoverWidget->setDraggable(true);
+	m_hoverWidget->setRelative(true);
+	m_hoverWidget->setVisible(false);
+
+	connect(this, &QPushButton::toggled, this, &PlotLegendWidget::onToggled);
+	connect(m_plot, &PlotWidget::addedChannel, this, &PlotLegendWidget::addChannel);
+	connect(m_plot, &PlotWidget::removedChannel, this, &PlotLegendWidget::removeChannel);
+
+	for(PlotChannel *ch : m_plot->getChannels()) {
+		addChannel(ch);
+	}
+}
+
+PlotLegendWidget::~PlotLegendWidget() {}
+
+void PlotLegendWidget::addChannel(PlotChannel *ch)
+{
+	if(m_entries.contains(ch)) {
+		return;
+	}
+
+	QWidget *entry = new QWidget(m_legendPanel);
+	Style::setBackgroundColor(entry, QString("transparent"), true);
+	QHBoxLayout *entryLayout = new QHBoxLayout(entry);
+	entryLayout->setContentsMargins(0, 0, 0, 0);
+	entryLayout->setSpacing(6);
+
+	QWidget *colorLine = new QWidget(entry);
+	colorLine->setFixedSize(20, 3);
+
+	QLabel *nameLabel = new QLabel(ch->name(), entry);
+
+	entryLayout->addWidget(colorLine);
+	entryLayout->addWidget(nameLabel);
+	entryLayout->addStretch();
+
+	m_legendLayout->addWidget(entry);
+	m_entries.insert(ch, entry);
+	m_labels.insert(ch, nameLabel);
+	m_colorLines.insert(ch, colorLine);
+
+	updateLineStyle(ch);
+
+	connect(ch, &PlotChannel::enabledChanged, this, &PlotLegendWidget::updateStyles);
+	connect(ch, &PlotChannel::thicknessChanged, this, [this, ch]() { updateLineStyle(ch); });
+	connect(ch, &PlotChannel::styleChanged, this, [this, ch]() { updateLineStyle(ch); });
+}
+
+void PlotLegendWidget::removeChannel(PlotChannel *ch)
+{
+	if(!m_entries.contains(ch)) {
+		return;
+	}
+
+	disconnect(ch, &PlotChannel::enabledChanged, this, &PlotLegendWidget::updateStyles);
+	disconnect(ch, &PlotChannel::thicknessChanged, this, nullptr);
+	disconnect(ch, &PlotChannel::styleChanged, this, nullptr);
+
+	QWidget *entry = m_entries.take(ch);
+	m_labels.remove(ch);
+	m_colorLines.remove(ch);
+	m_legendLayout->removeWidget(entry);
+	entry->deleteLater();
+}
+
+void PlotLegendWidget::updateStyles()
+{
+	for(auto it = m_entries.begin(); it != m_entries.end(); ++it) {
+		it.value()->setVisible(it.key()->isEnabled());
+	}
+}
+
+void PlotLegendWidget::updateLineStyle(PlotChannel *ch)
+{
+	if(!m_colorLines.contains(ch)) {
+		return;
+	}
+
+	QWidget *colorLine = m_colorLines.value(ch);
+	QColor penColor = ch->curve()->pen().color();
+	QString color = QString("rgba(%1, %2, %3, %4)")
+				.arg(penColor.red())
+				.arg(penColor.green())
+				.arg(penColor.blue())
+				.arg(penColor.alpha());
+	int thickness = ch->thickness();
+	int style = ch->style();
+
+	QString borderStyle;
+	switch(style) {
+	case PlotChannel::PCS_DOTS:
+		borderStyle = QString("background-color: transparent; border: %1px dotted %2;").arg(thickness).arg(color);
+		break;
+	case PlotChannel::PCS_STICKS:
+	case PlotChannel::PCS_STEPS:
+		borderStyle = QString("background-color: transparent; border: %1px dashed %2;").arg(thickness).arg(color);
+		break;
+	case PlotChannel::PCS_LINES:
+	case PlotChannel::PCS_SMOOTH:
+	default:
+		borderStyle = QString("background-color: %1;").arg(color);
+		break;
+	}
+
+	colorLine->setFixedHeight(thickness);
+	colorLine->setStyleSheet(borderStyle);
+}
+
+void PlotLegendWidget::onToggled(bool checked)
+{
+	if(checked) {
+		updateStyles();
+	}
+	m_hoverWidget->setVisible(checked);
+}
 
 #include "moc_plotinfowidgets.cpp"

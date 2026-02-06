@@ -66,6 +66,9 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	auto m_timeStampInfo = new TimestampInfo(m_fftPlot, m_fftPlot);
 	m_fftPlot->getPlotInfo()->addCustomInfo(m_timeStampInfo, IP_RIGHT);
 
+	auto legendInfo = new PlotLegendWidget(m_fftPlot, this);
+	m_fftPlot->getPlotInfo()->addCustomInfo(legendInfo, IP_RIGHT, IP_BOTTOM);
+
 	m_plotMenu = new FFTPlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
 	m_dockableArea->addDockWrapper(m_fftDockWrapper);

@@ -82,6 +82,9 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	auto m_timeStampInfo = new TimestampInfo(m_timePlot, m_timePlot);
 	m_timePlot->getPlotInfo()->addCustomInfo(m_timeStampInfo, IP_RIGHT);
 
+	auto legendInfo = new PlotLegendWidget(m_timePlot, this);
+	m_timePlot->getPlotInfo()->addCustomInfo(legendInfo, IP_RIGHT, IP_BOTTOM);
+
 	/*	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this,
 		[=]() { m_info->update(m_currentSamplingInfo); });
 	*/

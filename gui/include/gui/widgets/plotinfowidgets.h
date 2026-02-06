@@ -23,6 +23,9 @@
 #define PLOTINFOWIDGETS_H
 
 #include <QLabel>
+#include <QMap>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QWidget>
 #include <plot_utils.hpp>
 #include <plotwidget.h>
@@ -104,6 +107,34 @@ public:
 
 private:
 	PlotWidget *m_plot;
+};
+
+class PlotChannel;
+class HoverWidget;
+
+class SCOPY_GUI_EXPORT PlotLegendWidget : public QPushButton
+{
+	Q_OBJECT
+public:
+	explicit PlotLegendWidget(PlotWidget *plot, QWidget *parent = nullptr);
+	virtual ~PlotLegendWidget();
+
+private Q_SLOTS:
+	void addChannel(PlotChannel *ch);
+	void removeChannel(PlotChannel *ch);
+	void onToggled(bool checked);
+	void updateLineStyle(PlotChannel *ch);
+
+private:
+	void updateStyles();
+
+	PlotWidget *m_plot;
+	QWidget *m_legendPanel;
+	QVBoxLayout *m_legendLayout;
+	HoverWidget *m_hoverWidget;
+	QMap<PlotChannel *, QWidget *> m_entries;
+	QMap<PlotChannel *, QLabel *> m_labels;
+	QMap<PlotChannel *, QWidget *> m_colorLines;
 };
 
 } // namespace scopy

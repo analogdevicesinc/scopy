@@ -44,8 +44,8 @@ public:
 	PlotInfo(QWidget *parent = nullptr);
 	virtual ~PlotInfo();
 
-	void addCustomInfo(QWidget *info, InfoPosition hpos = IP_LEFT, InfoPosition vpos = IP_BOTTOM);
-	QLabel *addLabelInfo(InfoPosition hpos = IP_LEFT, InfoPosition vpos = IP_BOTTOM);
+	void addCustomInfo(QWidget *info, InfoPosition hpos = IP_LEFT, InfoPosition vpos = IP_TOP);
+	QLabel *addLabelInfo(InfoPosition hpos = IP_LEFT, InfoPosition vpos = IP_TOP);
 
 	void removeInfo(uint index, InfoPosition pos);
 	QWidget *getInfo(uint index, InfoPosition pos);
@@ -65,6 +65,14 @@ private:
 	QWidget *m_rightInfo;
 	HoverWidget *m_rightHover;
 	QVBoxLayout *m_rightLayout;
+
+	QWidget *m_bottomLeftInfo;
+	HoverWidget *m_bottomLeftHover;
+	QVBoxLayout *m_bottomLeftLayout;
+
+	QWidget *m_bottomRightInfo;
+	HoverWidget *m_bottomRightHover;
+	QVBoxLayout *m_bottomRightLayout;
 };
 
 } // namespace scopy
