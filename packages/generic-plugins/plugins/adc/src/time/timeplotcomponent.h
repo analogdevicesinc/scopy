@@ -38,6 +38,7 @@
 #include "plotinfo.h"
 #include <gui/plotcomponent.h>
 #include <gui/widgets/plotinfowidgets.h>
+#include <gui/widgets/plotlegend.h>
 #include <gui/docking/dockwrapperinterface.h>
 #include <gui/docking/dockableareainterface.h>
 
@@ -82,6 +83,7 @@ public:
 	bool singleYMode() const;
 
 	TimeSamplingInfo *timePlotInfo() const;
+	PlotLegend *legend() const;
 
 private Q_SLOTS:
 	void onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy);
@@ -104,6 +106,7 @@ private:
 	DockableAreaInterface *m_dockableArea;
 	DockWrapperInterface *m_timeDockWidget;
 	DockWrapperInterface *m_xyDockWidget;
+	PlotLegend *m_legend;
 
 private:
 	QMetaObject::Connection xyDataConn;
