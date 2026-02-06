@@ -208,6 +208,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, Com
 
 	rightStack->add(id, ch_widget);
 
+	connect(btn->button(), &QPushButton::pressed, this, [=]() { Q_EMIT btn->clicked(true); });
 	connect(btn, &QAbstractButton::clicked, this, [=](bool b) {
 		if(b) {
 			switchToChannelMenu(id, true);
