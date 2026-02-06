@@ -99,8 +99,8 @@ Q_SIGNALS:
 	void newData(const float *xData, const float *yData, size_t size, bool);
 
 	void thicknessChanged();
-
 	void styleChanged();
+	void enabledChanged(bool enabled);
 
 private:
 	PlotAxis *m_xAxis;

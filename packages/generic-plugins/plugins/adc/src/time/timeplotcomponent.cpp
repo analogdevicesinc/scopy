@@ -28,6 +28,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
+#include <gui/widgets/plotlegend.h>
 #include <gui/channelcomponent.h>
 #include <gui/style.h>
 #include <gui/style_attributes.h>
@@ -81,6 +82,9 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 
 	auto m_timeStampInfo = new TimestampInfo(m_timePlot, m_timePlot);
 	m_timePlot->getPlotInfo()->addCustomInfo(m_timeStampInfo, IP_RIGHT);
+
+	m_legend = new PlotLegend(m_timePlot, this);
+	m_legend->hide();
 
 	/*	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this,
 		[=]() { m_info->update(m_currentSamplingInfo); });
@@ -178,6 +182,8 @@ void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, s
 }
 
 TimeSamplingInfo *TimePlotComponent::timePlotInfo() const { return m_timePlotInfo; }
+
+PlotLegend *TimePlotComponent::legend() const { return m_legend; }
 
 void TimePlotComponent::refreshXYXData()
 {

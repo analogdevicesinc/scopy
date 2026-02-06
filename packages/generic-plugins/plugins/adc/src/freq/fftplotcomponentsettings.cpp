@@ -22,6 +22,7 @@
 #include "fftplotcomponentsettings.h"
 #include <widgets/menusectionwidget.h>
 #include <widgets/menucollapsesection.h>
+#include <widgets/plotlegend.h>
 #include <QWidget>
 #include <QLineEdit>
 #include "fftplotcomponentchannel.h"
@@ -66,6 +67,10 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	MenuOnOffSwitch *labelsSwitch = new MenuOnOffSwitch("Show plot labels", plotMenu, false);
 	connect(labelsSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent,
 		&PlotComponent::showPlotLabels);
+
+	MenuOnOffSwitch *legendSwitch = new MenuOnOffSwitch("Show legend", plotMenu, false);
+	connect(legendSwitch->onOffswitch(), &QAbstractButton::toggled, m_plotComponent->legend(),
+		&PlotLegend::setVisible);
 
 	MenuSectionCollapseWidget *yaxis = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE,
 									 MenuCollapseSection::MHW_BASEWIDGET, parent);
@@ -144,6 +149,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
+	plotMenu->contentLayout()->addWidget(legendSwitch);
 	plotMenu->contentLayout()->addWidget(m_curve);
 	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);

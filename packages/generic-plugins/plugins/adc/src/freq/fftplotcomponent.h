@@ -38,6 +38,7 @@
 #include "plotcomponent.h"
 #include "fftplotcomponentsettings.h"
 #include <widgets/plotinfowidgets.h>
+#include <widgets/plotlegend.h>
 #include <gui/docking/dockableareainterface.h>
 #include <gui/docking/dockwrapperinterface.h>
 
@@ -61,6 +62,7 @@ public:
 	FFTPlotComponentSettings *plotMenu();
 
 	FFTSamplingInfo *fftPlotInfo() const;
+	PlotLegend *legend() const;
 
 private:
 	PlotWidget *m_fftPlot;
@@ -68,6 +70,7 @@ private:
 
 	DockableAreaInterface *m_dockableArea;
 	DockWrapperInterface *m_fftDockWrapper;
+	PlotLegend *m_legend;
 
 	FFTPlotComponentSettings *m_plotMenu;
 };

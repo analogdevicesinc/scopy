@@ -29,6 +29,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuplotaxisrangecontrol.h>
+#include <gui/widgets/plotlegend.h>
 
 #include <pluginbase/preferences.h>
 #include <qwt_point_data.h>
@@ -66,6 +67,9 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	auto m_timeStampInfo = new TimestampInfo(m_fftPlot, m_fftPlot);
 	m_fftPlot->getPlotInfo()->addCustomInfo(m_timeStampInfo, IP_RIGHT);
 
+	m_legend = new PlotLegend(m_fftPlot, this);
+	m_legend->hide();
+
 	m_plotMenu = new FFTPlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
 	m_dockableArea->addDockWrapper(m_fftDockWrapper);
@@ -95,5 +99,7 @@ FFTPlotComponentSettings *FFTPlotComponent::createPlotMenu(QWidget *parent) { re
 FFTPlotComponentSettings *FFTPlotComponent::plotMenu() { return m_plotMenu; }
 
 FFTSamplingInfo *FFTPlotComponent::fftPlotInfo() const { return m_fftInfo; }
+
+PlotLegend *FFTPlotComponent::legend() const { return m_legend; }
 
 #include "moc_fftplotcomponent.cpp"
