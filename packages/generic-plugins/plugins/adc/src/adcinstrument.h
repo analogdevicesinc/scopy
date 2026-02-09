@@ -94,7 +94,7 @@ private:
 	AddBtn *addBtn;
 	RemoveBtn *removeBtn;
 	RunBtn *m_runBtn;
-	GearBtn *m_settingsBtn;
+	MenuControlButton *m_settingsBtn;
 	QPushButton *m_complex;
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;

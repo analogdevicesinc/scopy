@@ -22,6 +22,7 @@
 #include "adcinstrument.h"
 #include <pluginbase/resourcemanager.h>
 #include <gui/smallOnOffSwitch.h>
+#include <gui/style_properties.h>
 #include <QDesktopServices>
 #include <QLoggingCategory>
 #include <style.h>
@@ -66,7 +67,12 @@ void ADCInstrument::setupToolLayout()
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
 
-	m_settingsBtn = new GearBtn(this);
+	m_settingsBtn = new MenuControlButton(this);
+	m_settingsBtn->setName("General Settings");
+	m_settingsBtn->setOpenMenuChecksThis(true);
+	m_settingsBtn->setDoubleClickToOpenMenu(false);
+	m_settingsBtn->checkBox()->setVisible(false);
+
 	InfoBtn *infoBtn = new InfoBtn(this);
 	m_printBtn = new PrintBtn(this);
 	printPlotManager = new PrintPlotManager(this);
@@ -99,7 +105,6 @@ void ADCInstrument::setupToolLayout()
 	setupCursorButtonHelper(m_cursor);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerMenuControlHelper(m_settingsBtn, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
@@ -115,14 +120,19 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
-	rightMenuBtnGrp->addButton(m_settingsBtn);
+	rightMenuBtnGrp->addButton(m_settingsBtn->button());
 
 	setupChannelsButtonHelper(channelsBtn);
 	setupRunSingleButtonHelper();
 
 	channelGroup = new QButtonGroup(this);
+	channelGroup->addButton(m_settingsBtn);
 
-	connect(m_settingsBtn, &QPushButton::toggled, this, [=](bool b) {
+	connect(m_settingsBtn->button(), &QAbstractButton::toggled, this, [=](bool b) {
+		if(b)
+			tool->requestMenu(settingsMenuId);
+	});
+	connect(m_settingsBtn, &QAbstractButton::clicked, this, [=](bool b) {
 		if(b)
 			tool->requestMenu(settingsMenuId);
 	});
@@ -163,6 +173,7 @@ void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
 		&MenuHAnim::toggleMenu);
 	m_vcm = new VerticalChannelManager(this);
+	m_vcm->addTop(m_settingsBtn);
 	tool->leftStack()->add(verticalChannelManagerId, m_vcm);
 }
 
@@ -208,6 +219,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, Com
 
 	rightStack->add(id, ch_widget);
 
+	connect(btn->button(), &QPushButton::pressed, this, [=]() { Q_EMIT btn->clicked(true); });
 	connect(btn, &QAbstractButton::clicked, this, [=](bool b) {
 		if(b) {
 			switchToChannelMenu(id, true);

@@ -39,6 +39,7 @@ public:
 	void add(QWidget *ch) override;
 	void remove(QWidget *ch) override;
 	void addEnd(QWidget *ch);
+	void addTop(QWidget *w);
 
 private:
 	QSpacerItem *spacer;
