@@ -67,4 +67,11 @@ void VerticalChannelManager::addEnd(QWidget *ch)
 
 void VerticalChannelManager::remove(QWidget *ch) { m_contLayout->removeWidget(ch); }
 
+void VerticalChannelManager::addTop(QWidget *w)
+{
+	lay->insertWidget(0, w);
+	lay->insertSpacing(1, 5);
+	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+}
+
 #include "moc_verticalchannelmanager.cpp"
