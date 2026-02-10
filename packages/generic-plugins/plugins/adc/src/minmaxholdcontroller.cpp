@@ -241,3 +241,7 @@ void MinMaxHoldController::createChannels()
 		fftplot->addPlotChannel(m_maxCh);
 	}
 }
+
+PlotChannel *MinMaxHoldController::minChannel() const { return m_minCh; }
+
+PlotChannel *MinMaxHoldController::maxChannel() const { return m_maxCh; }
