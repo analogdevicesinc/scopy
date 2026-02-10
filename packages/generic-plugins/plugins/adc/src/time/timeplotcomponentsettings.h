@@ -27,7 +27,6 @@
 #include "scopy-adc_export.h"
 #include "adcinterfaces.h"
 #include <gui/widgets/menuplotaxisrangecontrol.h>
-#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 namespace scopy {
 namespace adc {
@@ -61,7 +60,6 @@ private:
 	MenuCombo *m_yModeCb;
 	MenuCombo *m_xAxisSrc;
 	MenuPlotAxisRangeControl *m_yCtrl;
-	MenuPlotChannelCurveStyleControl *m_curve;
 	MenuOnOffSwitch *m_xAxisShow;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	QList<ChannelComponent *> m_channels;

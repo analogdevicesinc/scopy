@@ -127,8 +127,6 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		}
 	});
 
-	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
-
 	m_deletePlot = new QPushButton("DELETE PLOT");
 	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
@@ -150,7 +148,6 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
 	plotMenu->contentLayout()->addWidget(legendSwitch);
-	plotMenu->contentLayout()->addWidget(m_curve);
 	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);
 
@@ -205,11 +202,7 @@ void FFTPlotComponentSettings::toggleAutoScale()
 
 void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 {
-	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
-
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
-	m_curve->addChannels(fftPlotComponentChannel->plotChannel());
-
 	m_autoscaler->addChannels(fftPlotComponentChannel->m_fftPlotCh);
 	if(dynamic_cast<FFTChannel *>(c)) {
 		FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
@@ -226,9 +219,7 @@ void FFTPlotComponentSettings::removeChannel(ChannelComponent *c)
 	m_channels.removeAll(c);
 
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
-	m_curve->removeChannels(fftPlotComponentChannel->plotChannel());
-
-	m_autoscaler->addChannels(fftPlotComponentChannel->m_fftPlotCh);
+	m_autoscaler->removeChannels(fftPlotComponentChannel->m_fftPlotCh);
 
 	for(const QMetaObject::Connection &c : qAsConst(connections[c])) {
 		QObject::disconnect(c);
