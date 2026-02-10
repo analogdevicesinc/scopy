@@ -20,6 +20,7 @@
  */
 
 #include "qlineedit.h"
+#include <style.h>
 #include <stylehelper.h>
 #include <widgets/menuheader.h>
 
@@ -52,6 +53,7 @@ void MenuHeaderWidget::applyStylesheet()
 {
 	StyleHelper::MenuCollapseHeaderLineEdit(m_title, "menuLabel");
 	StyleHelper::MenuHeaderWidget(this, m_pen.color(), "menuHeader");
+	Style::setStyle(title(), style::properties::label::menuMedium, "selected");
 }
 
 #include "moc_menuheader.cpp"

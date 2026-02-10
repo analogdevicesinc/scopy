@@ -61,8 +61,18 @@ void ADCInstrument::setupToolLayout()
 	tool->setTopContainerHeight(100);
 	tool->setBottomContainerHeight(90);
 
-	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
-	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
+	rightMenuBtnGrp = new SemiExclusiveButtonGroup(this);
+	tool->topContainerMenuControl()->setVisible(false);
+
+	m_leftMenuCollapseBtn =
+		new MenuCollapseBtn(MenuCollapseBtn::Left, dynamic_cast<MenuHAnim *>(tool->leftContainer()), this);
+	m_rightMenuCollapseBtn =
+		new MenuCollapseBtn(MenuCollapseBtn::Right, dynamic_cast<MenuHAnim *>(tool->rightContainer()), this);
+
+	connect(rightMenuBtnGrp, &SemiExclusiveButtonGroup::buttonSelected, this, [=](QAbstractButton *btn) {
+		if(btn && btn->isChecked())
+			m_rightMenuCollapseBtn->setChecked(true);
+	});
 
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
@@ -98,13 +108,16 @@ void ADCInstrument::setupToolLayout()
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
 
-	channelsBtn = new MenuControlButton(this);
-
 	hoverMenuGroup = new SemiExclusiveButtonGroup(this);
 	m_cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(m_cursor);
 
-	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
+	auto contentLayout = dynamic_cast<QHBoxLayout *>(tool->rightContainer()->parentWidget()->layout());
+	if(contentLayout) {
+		contentLayout->setSpacing(0);
+		contentLayout->insertWidget(contentLayout->indexOf(tool->leftContainer()) + 1, m_leftMenuCollapseBtn);
+		contentLayout->insertWidget(contentLayout->indexOf(tool->rightContainer()), m_rightMenuCollapseBtn);
+	}
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
@@ -116,13 +129,12 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
 
-	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
 	rightMenuBtnGrp->addButton(m_settingsBtn->button());
 
-	setupChannelsButtonHelper(channelsBtn);
+	setupChannelMenu();
 	setupRunSingleButtonHelper();
 
 	channelGroup = new QButtonGroup(this);
@@ -155,23 +167,10 @@ void ADCInstrument::setupToolLayout()
 
 void ADCInstrument::setupRunSingleButtonHelper() {}
 
-void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
+void ADCInstrument::setupChannelMenu()
 {
-	channelsBtn->setName("Channels");
-	channelsBtn->setOpenMenuChecksThis(true);
-	channelsBtn->setDoubleClickToOpenMenu(true);
-	channelsBtn->checkBox()->setVisible(false);
-	channelsBtn->setChecked(true);
 	rightStack = new MapStackedWidget(this);
 	tool->rightStack()->add(channelsMenuId, rightStack);
-	connect(channelsBtn->button(), &QAbstractButton::toggled, this, [=](bool b) {
-		if(b)
-			tool->requestMenu(channelsMenuId);
-	});
-	rightMenuBtnGrp->addButton(channelsBtn->button());
-
-	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
-		&MenuHAnim::toggleMenu);
 	m_vcm = new VerticalChannelManager(this);
 	m_vcm->addTop(m_settingsBtn);
 	tool->leftStack()->add(verticalChannelManagerId, m_vcm);
@@ -199,10 +198,7 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 void ADCInstrument::switchToChannelMenu(QString id, bool force)
 {
 	if(force) {
-		if(!channelsBtn->button()->isChecked()) {
-			// Workaround because QButtonGroup and setChecked do not interact programatically
-			channelsBtn->button()->animateClick(1);
-		}
+		m_rightMenuCollapseBtn->setChecked(true);
 		tool->requestMenu(channelsMenuId);
 	}
 	rightStack->show(id);

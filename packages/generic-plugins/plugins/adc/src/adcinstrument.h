@@ -85,9 +85,10 @@ private:
 	ToolTemplate *tool;
 	ToolMenuEntry *m_tme;
 
-	QPushButton *openLastMenuBtn;
+	MenuCollapseBtn *m_rightMenuCollapseBtn;
+	MenuCollapseBtn *m_leftMenuCollapseBtn;
 	MapStackedWidget *rightStack;
-	QButtonGroup *rightMenuBtnGrp;
+	SemiExclusiveButtonGroup *rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
 	QButtonGroup *hoverMenuGroup;
 
@@ -99,7 +100,6 @@ private:
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *m_cursor;
-	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
 	PrintBtn *m_printBtn;
 	PrintPlotManager *printPlotManager;
@@ -107,8 +107,8 @@ private:
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();
 
-	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 	void setupCursorButtonHelper(MenuControlButton *cursor);
+	void setupChannelMenu();
 };
 } // namespace adc
 } // namespace scopy
