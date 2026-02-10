@@ -23,6 +23,7 @@
 #define MENUPLOTCHANNELCURVESTYLECONTROL_H
 
 #include <QWidget>
+#include <QSlider>
 #include "scopy-gui_export.h"
 #include <menucombo.h>
 
@@ -42,14 +43,21 @@ public Q_SLOTS:
 	void removeChannels(PlotChannel *c);
 
 private Q_SLOTS:
-	void setStyleSlot();
-	void setThicknessSlot();
+	void onChannelSelected(int index);
+	void onThicknessChanged(int index);
+	void onStyleChanged(int index);
+	void onAlphaChanged(int value);
+	void updateControlsFromChannel();
 
 private:
 	void createCurveMenu(QWidget *parent);
+	scopy::PlotChannel *currentChannel() const;
+
 	QList<PlotChannel *> m_channels;
-	MenuCombo *cbThicknessW;
-	MenuCombo *cbStyleW;
+	MenuCombo *m_cbChannel;
+	MenuCombo *m_cbThickness;
+	MenuCombo *m_cbStyle;
+	QSlider *m_alphaSlider;
 };
 } // namespace gui
 } // namespace scopy
