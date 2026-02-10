@@ -309,3 +309,26 @@ void UninstallBtn::setUninstalled(bool uninstalled)
 	}
 	setFinished(uninstalled);
 }
+
+MenuCollapseBtn::MenuCollapseBtn(Direction dir, MenuHAnim *menu, QWidget *parent)
+	: QPushButton(parent)
+{
+	setCheckable(true);
+	setChecked(true);
+	setFixedWidth(10);
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+	setIconSize(QSize(9, 9));
+
+	QString arrowLeft = ":/gui/icons/arrow_left.svg";
+	QString arrowRight = ":/gui/icons/arrow_right.svg";
+	QString openIcon = (dir == Left) ? arrowLeft : arrowRight;
+	QString closedIcon = (dir == Left) ? arrowRight : arrowLeft;
+
+	setIcon(Style::getPixmap(openIcon, Style::getColor(json::theme::content_default)));
+
+	connect(this, &QPushButton::toggled, this, [=](bool open) {
+		setIcon(Style::getPixmap(open ? openIcon : closedIcon,
+					 Style::getColor(json::theme::content_default)));
+		menu->toggleMenu(open);
+	});
+}

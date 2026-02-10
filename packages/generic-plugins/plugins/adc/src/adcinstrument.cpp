@@ -51,18 +51,52 @@ void ADCInstrument::setupToolLayout()
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->bottomContainer()->setVisible(true);
 	tool->topContainer()->setVisible(true);
-	tool->leftContainer()->setVisible(true);
-	tool->rightContainer()->setVisible(true);
+	tool->leftContainer()->setVisible(false);
+	tool->rightContainer()->setVisible(false);
 	tool->topCentral()->setVisible(true);
 	tool->bottomCentral()->setVisible(false);
 	lay->addWidget(tool);
-	tool->setLeftContainerWidth(210);
-	tool->setRightContainerWidth(310);
 	tool->setTopContainerHeight(100);
 	tool->setBottomContainerHeight(90);
 
-	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim *>(tool->rightContainer()), true, this);
-	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn *>(openLastMenuBtn)->getButtonGroup();
+	// Create splitter-based layout for left/center/right
+	m_splitter = new QSplitter(Qt::Horizontal, this);
+
+	// Left panel
+	m_leftPanel = new QWidget(m_splitter);
+	QVBoxLayout *leftLayout = new QVBoxLayout(m_leftPanel);
+	leftLayout->setMargin(0);
+	leftLayout->setSpacing(0);
+	m_leftStack = new MapStackedWidget(m_leftPanel);
+	leftLayout->addWidget(m_leftStack);
+
+	// Central widget (placeholder - actual content added by controllers)
+	m_centralWidget = new QWidget(m_splitter);
+	m_centralWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QVBoxLayout *centralLayout = new QVBoxLayout(m_centralWidget);
+	centralLayout->setMargin(0);
+	centralLayout->setSpacing(0);
+
+	// Right panel
+	m_rightPanel = new QWidget(m_splitter);
+	QVBoxLayout *rightLayout = new QVBoxLayout(m_rightPanel);
+	rightLayout->setMargin(0);
+	rightLayout->setSpacing(0);
+	rightStack = new MapStackedWidget(m_rightPanel);
+	rightLayout->addWidget(rightStack);
+
+	m_splitter->addWidget(m_leftPanel);
+	m_splitter->addWidget(m_centralWidget);
+	m_splitter->addWidget(m_rightPanel);
+	m_splitter->setStretchFactor(0, 0);
+	m_splitter->setStretchFactor(1, 1);
+	m_splitter->setStretchFactor(2, 0);
+	m_splitter->setSizes(QList<int>() << 210 << 600 << 310);
+
+	tool->addWidgetToCentralContainerHelper(m_splitter);
+
+	rightMenuBtnGrp = new SemiExclusiveButtonGroup(this);
+	tool->topContainerMenuControl()->setVisible(false);
 
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
@@ -98,13 +132,9 @@ void ADCInstrument::setupToolLayout()
 	m_runBtn = new RunBtn(this);
 	m_singleBtn = new SingleShotBtn(this);
 
-	channelsBtn = new MenuControlButton(this);
-
 	hoverMenuGroup = new SemiExclusiveButtonGroup(this);
 	m_cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(m_cursor);
-
-	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
@@ -116,13 +146,12 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(removeBtn, TTA_LEFT);
 	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
 
-	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
 	rightMenuBtnGrp->addButton(m_settingsBtn->button());
 
-	setupChannelsButtonHelper(channelsBtn);
+	setupChannelMenu();
 	setupRunSingleButtonHelper();
 
 	channelGroup = new QButtonGroup(this);
@@ -130,11 +159,11 @@ void ADCInstrument::setupToolLayout()
 
 	connect(m_settingsBtn->button(), &QAbstractButton::toggled, this, [=](bool b) {
 		if(b)
-			tool->requestMenu(settingsMenuId);
+			rightStack->show(settingsMenuId);
 	});
 	connect(m_settingsBtn, &QAbstractButton::clicked, this, [=](bool b) {
 		if(b)
-			tool->requestMenu(settingsMenuId);
+			rightStack->show(settingsMenuId);
 	});
 
 	connect(m_runBtn, &QAbstractButton::toggled, this, [=](bool b) {
@@ -155,26 +184,11 @@ void ADCInstrument::setupToolLayout()
 
 void ADCInstrument::setupRunSingleButtonHelper() {}
 
-void ADCInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
+void ADCInstrument::setupChannelMenu()
 {
-	channelsBtn->setName("Channels");
-	channelsBtn->setOpenMenuChecksThis(true);
-	channelsBtn->setDoubleClickToOpenMenu(true);
-	channelsBtn->checkBox()->setVisible(false);
-	channelsBtn->setChecked(true);
-	rightStack = new MapStackedWidget(this);
-	tool->rightStack()->add(channelsMenuId, rightStack);
-	connect(channelsBtn->button(), &QAbstractButton::toggled, this, [=](bool b) {
-		if(b)
-			tool->requestMenu(channelsMenuId);
-	});
-	rightMenuBtnGrp->addButton(channelsBtn->button());
-
-	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim *>(tool->leftContainer()),
-		&MenuHAnim::toggleMenu);
 	m_vcm = new VerticalChannelManager(this);
 	m_vcm->addTop(m_settingsBtn);
-	tool->leftStack()->add(verticalChannelManagerId, m_vcm);
+	m_leftStack->add(verticalChannelManagerId, m_vcm);
 }
 
 void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *dev)
@@ -190,7 +204,6 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 
 	connect(b->getControlBtn(), &QPushButton::clicked /* Or ::toggled*/, this, [=](bool b) {
 		if(b) {
-			tool->requestMenu(channelsMenuId);
 			rightStack->show(id);
 		}
 	});
@@ -198,13 +211,7 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 
 void ADCInstrument::switchToChannelMenu(QString id, bool force)
 {
-	if(force) {
-		if(!channelsBtn->button()->isChecked()) {
-			// Workaround because QButtonGroup and setChecked do not interact programatically
-			channelsBtn->button()->animateClick(1);
-		}
-		tool->requestMenu(channelsMenuId);
-	}
+	Q_UNUSED(force);
 	rightStack->show(id);
 }
 
@@ -260,6 +267,8 @@ VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
 ToolTemplate *ADCInstrument::getToolTemplate() { return tool; }
 
 MapStackedWidget *ADCInstrument::getRightStack() { return rightStack; }
+
+QWidget *ADCInstrument::getCentralWidget() { return m_centralWidget; }
 
 QButtonGroup *ADCInstrument::getHoverMenuBtnGroup() { return hoverMenuGroup; }
 

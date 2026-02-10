@@ -67,23 +67,14 @@ void ADCTimeInstrumentController::init()
 	tmp = m_plotComponentManager->addPlot("Time Plot");
 	m_timePlotSettingsComponent->addPlot(m_timePlotComponentManager->plot(tmp));
 
-	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
-	// addComponent(m_cursorComponent);
-
-	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_ui->getHoverMenuBtnGroup(),
-						  m_plotComponentManager, this);
-	// m_measureComponent->addPlotComponent(m_plotComponentManager);
-
-	addComponent(m_measureComponent);
-
 	plotStack = new MapStackedWidget(m_ui);
-	toolLayout->addWidgetToCentralContainerHelper(plotStack);
+	m_ui->getCentralWidget()->layout()->addWidget(plotStack);
 
 	plotStack->add("time", m_plotComponentManager);
-	toolLayout->rightStack()->add(m_ui->settingsMenuId, m_timePlotSettingsComponent);
+	m_ui->getRightStack()->add(m_ui->settingsMenuId, m_timePlotSettingsComponent);
 
 	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::requestOpenMenu, [=]() {
-		toolLayout->requestMenu(m_ui->settingsMenuId);
+		m_ui->getRightStack()->show(m_ui->settingsMenuId);
 		m_ui->m_settingsBtn->setChecked(true);
 	});
 
@@ -116,9 +107,6 @@ void ADCTimeInstrumentController::init()
 
 	m_ui->m_settingsBtn->animateClick();
 	m_ui->sync()->setVisible(false);
-
-	m_measureComponent->measureSettings()->getMarkerSection()->setVisible(false);
-	m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(false);
 }
 
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)

@@ -144,6 +144,14 @@ public:
 	void setUninstalled(bool uninstalled);
 };
 
+class SCOPY_GUI_EXPORT MenuCollapseBtn : public QPushButton
+{
+	Q_OBJECT
+public:
+	enum Direction { Left, Right };
+	MenuCollapseBtn(Direction dir, MenuHAnim *menu, QWidget *parent = nullptr);
+};
+
 } // namespace scopy
 
 #endif

@@ -27,6 +27,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QButtonGroup>
+#include <QSplitter>
 
 #include <gui/tooltemplate.h>
 #include <gui/widgets/toolbuttons.h>
@@ -55,6 +56,7 @@ public:
 
 	ToolTemplate *getToolTemplate();
 	MapStackedWidget *getRightStack();
+	QWidget *getCentralWidget();
 	QButtonGroup *getHoverMenuBtnGroup();
 
 	int uuid = 0;
@@ -85,9 +87,13 @@ private:
 	ToolTemplate *tool;
 	ToolMenuEntry *m_tme;
 
-	QPushButton *openLastMenuBtn;
+	QSplitter *m_splitter;
+	QWidget *m_leftPanel;
+	QWidget *m_rightPanel;
+	QWidget *m_centralWidget;
+	MapStackedWidget *m_leftStack;
 	MapStackedWidget *rightStack;
-	QButtonGroup *rightMenuBtnGrp;
+	SemiExclusiveButtonGroup *rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
 	QButtonGroup *hoverMenuGroup;
 
@@ -99,7 +105,6 @@ private:
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *m_cursor;
-	MenuControlButton *channelsBtn;
 	VerticalChannelManager *m_vcm;
 	PrintBtn *m_printBtn;
 	PrintPlotManager *printPlotManager;
@@ -107,8 +112,8 @@ private:
 	void setupToolLayout();
 	void setupRunSingleButtonHelper();
 
-	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 	void setupCursorButtonHelper(MenuControlButton *cursor);
+	void setupChannelMenu();
 };
 } // namespace adc
 } // namespace scopy
