@@ -135,8 +135,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		updateYAxis();
 	});
 
-	m_curve = new MenuPlotChannelCurveStyleControl(plotMenu);
-
 	m_deletePlot = new QPushButton("DELETE PLOT");
 	StyleHelper::BasicButton(m_deletePlot);
 	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
@@ -156,7 +154,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(plotTitleLabel);
 	plotMenu->contentLayout()->addWidget(plotTitle);
 	plotMenu->contentLayout()->addWidget(labelsSwitch);
-	plotMenu->contentLayout()->addWidget(m_curve);
 	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);
 
@@ -232,8 +229,6 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 		updateYModeCombo();
 	}
 
-	m_curve->addChannels(timePlotComponentChannel->m_timePlotCh);
-
 	m_channels.append(c);
 }
 
@@ -251,7 +246,6 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 		m_scaleProviders.removeAll(sp);
 		updateYModeCombo();
 	}
-	m_curve->removeChannels(chcmpt->m_timePlotCh);
 }
 
 void TimePlotComponentSettings::onInit() {}
