@@ -155,6 +155,26 @@ QWidget *GRFFTChannelComponent::createCurveMenu(QWidget *parent)
 
 	m_curvemenu = new MenuPlotChannelCurveStyleControl(section);
 	section->contentLayout()->addWidget(m_curvemenu);
+
+	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
+	connect(controller, &MinMaxHoldController::enabledChanged, this, [=](bool enabled) {
+		if(enabled) {
+			if(controller->minChannel()) {
+				m_curvemenu->addChannels(controller->minChannel());
+			}
+			if(controller->maxChannel()) {
+				m_curvemenu->addChannels(controller->maxChannel());
+			}
+		} else {
+			if(controller->minChannel()) {
+				m_curvemenu->removeChannels(controller->minChannel());
+			}
+			if(controller->maxChannel()) {
+				m_curvemenu->removeChannels(controller->maxChannel());
+			}
+		}
+	});
+
 	return section;
 }
 
@@ -439,6 +459,14 @@ void GRFFTChannelComponent::removeChannelFromPlot()
 {
 	m_yCtrl->removeAxis(m_fftPlotComponentChannel->m_fftPlotYAxis);
 	m_curvemenu->removeChannels(m_fftPlotComponentChannel->m_fftPlotCh);
+
+	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
+	if(controller->minChannel()) {
+		m_curvemenu->removeChannels(controller->minChannel());
+	}
+	if(controller->maxChannel()) {
+		m_curvemenu->removeChannels(controller->maxChannel());
+	}
 }
 
 bool GRFFTChannelComponent::enabled() const { return m_enabled && !(m_complex ^ m_samplingInfo.complexMode); }

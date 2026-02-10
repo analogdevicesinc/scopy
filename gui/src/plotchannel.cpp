@@ -84,9 +84,8 @@ void PlotChannel::disable()
 
 void PlotChannel::setThicknessInternal(int thickness)
 {
-	QPen pen = m_curve->pen();
-	pen.setWidthF(thickness);
-	m_curve->setPen(pen);
+	m_pen.setWidthF(thickness);
+	m_curve->setPen(m_pen);
 	Q_EMIT doReplot();
 }
 
@@ -230,6 +229,25 @@ void PlotChannel::setStyle(int newStyle)
 	m_style = newStyle;
 	setStyleInternal(newStyle);
 	Q_EMIT styleChanged();
+}
+
+QPen PlotChannel::pen() const { return m_pen; }
+
+void PlotChannel::setPen(const QPen &pen)
+{
+	m_pen = pen;
+	m_curve->setPen(m_pen);
+	symbol->setBrush(QBrush(m_pen.color()));
+	symbol->setPen(QPen(m_pen.color()));
+	Q_EMIT penChanged();
+	Q_EMIT doReplot();
+}
+
+void PlotChannel::setColor(const QColor &color)
+{
+	QPen newPen = m_pen;
+	newPen.setColor(color);
+	setPen(newPen);
 }
 
 double PlotChannel::getValueAt(double pos)
