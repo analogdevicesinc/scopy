@@ -25,11 +25,11 @@
 #include <QWidget>
 #include "scopy-adc_export.h"
 #include "menuspinbox.h"
+#include "menucombo.h"
 #include "plotautoscaler.h"
 #include <toolcomponent.h>
 #include "channelcomponent.h"
 #include <widgets/menuplotaxisrangecontrol.h>
-#include <widgets/menuplotchannelcurvestylecontrol.h>
 
 namespace scopy {
 namespace adc {
@@ -57,7 +57,6 @@ Q_SIGNALS:
 private:
 	FFTPlotComponent *m_plotComponent;
 	MenuPlotAxisRangeControl *m_yCtrl;
-	MenuPlotChannelCurveStyleControl *m_curve;
 	MenuSpinbox *m_yPwrOffset;
 	PlotAutoscaler *m_autoscaler;
 
