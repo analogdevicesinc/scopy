@@ -80,12 +80,12 @@ void ADCFFTInstrumentController::init()
 	addComponent(m_measureComponent);
 
 	plotStack = new MapStackedWidget(m_ui);
-	toolLayout->addWidgetToCentralContainerHelper(plotStack);
+	m_ui->getCentralWidget()->layout()->addWidget(plotStack);
 
 	plotStack->add("fft", m_plotComponentManager);
-	toolLayout->rightStack()->add(m_ui->settingsMenuId, m_fftPlotSettingsComponent);
+	m_ui->getRightStack()->add(m_ui->settingsMenuId, m_fftPlotSettingsComponent);
 	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::requestOpenMenu, [=]() {
-		toolLayout->requestMenu(m_ui->settingsMenuId);
+		m_ui->getRightStack()->show(m_ui->settingsMenuId);
 		m_ui->m_settingsBtn->setChecked(true);
 	});
 
