@@ -74,6 +74,10 @@ public:
 	int style() const;
 	void setStyle(int newStyle);
 
+	QPen pen() const;
+	void setPen(const QPen &pen);
+	void setColor(const QColor &color);
+
 	void setYAxis(PlotAxis *newYAxis);
 
 	void setXAxis(PlotAxis *newXAxis);
@@ -100,6 +104,7 @@ Q_SIGNALS:
 
 	void thicknessChanged();
 	void styleChanged();
+	void penChanged();
 	void enabledChanged(bool enabled);
 
 private:

@@ -23,6 +23,9 @@
 #include "menuplotchannelcurvestylecontrol.h"
 #include <menusectionwidget.h>
 #include <menucollapsesection.h>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 using namespace scopy::gui;
 
@@ -36,91 +39,136 @@ MenuPlotChannelCurveStyleControl::~MenuPlotChannelCurveStyleControl() {}
 
 void MenuPlotChannelCurveStyleControl::createCurveMenu(QWidget *parent)
 {
-	QHBoxLayout *curveSettingsLay = new QHBoxLayout(this);
-	curveSettingsLay->setMargin(0);
-	curveSettingsLay->setSpacing(10);
-	setLayout(curveSettingsLay);
+	QVBoxLayout *mainLay = new QVBoxLayout(this);
+	mainLay->setMargin(0);
+	mainLay->setSpacing(10);
 
-	cbThicknessW = new MenuCombo("Thickness", this);
-	QComboBox *cbThickness = cbThicknessW->combo();
-	cbThickness->addItem("1");
-	cbThickness->addItem("2");
-	cbThickness->addItem("3");
-	cbThickness->addItem("4");
-	cbThickness->addItem("5");
+	m_cbChannel = new MenuCombo("Curve", this);
+	mainLay->addWidget(m_cbChannel);
 
-	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(auto ch : qAsConst(m_channels)) {
-			ch->setThickness(cbThickness->itemText(idx).toFloat());
-		}
-	});
+	QHBoxLayout *styleLay = new QHBoxLayout();
+	styleLay->setMargin(0);
+	styleLay->setSpacing(10);
 
-	cbStyleW = new MenuCombo("Style", this);
-	auto cbStyle = cbStyleW->combo();
-	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
-	cbStyle->addItem("Dots", PlotChannel::PCS_DOTS);
-	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
-	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
-	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
+	m_cbThickness = new MenuCombo("Thickness", this);
+	m_cbThickness->combo()->addItem("1", 1);
+	m_cbThickness->combo()->addItem("2", 2);
+	m_cbThickness->combo()->addItem("3", 3);
+	m_cbThickness->combo()->addItem("4", 4);
+	m_cbThickness->combo()->addItem("5", 5);
 
-	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(auto ch : qAsConst(m_channels)) {
-			ch->setStyle(cbStyle->itemData(idx).toInt());
-		}
-	});
+	m_cbStyle = new MenuCombo("Style", this);
+	m_cbStyle->combo()->addItem("Lines", PlotChannel::PCS_LINES);
+	m_cbStyle->combo()->addItem("Dots", PlotChannel::PCS_DOTS);
+	m_cbStyle->combo()->addItem("Steps", PlotChannel::PCS_STEPS);
+	m_cbStyle->combo()->addItem("Sticks", PlotChannel::PCS_STICKS);
+	m_cbStyle->combo()->addItem("Smooth", PlotChannel::PCS_SMOOTH);
 
-	curveSettingsLay->addWidget(cbThicknessW);
-	curveSettingsLay->addWidget(cbStyleW);
+	styleLay->addWidget(m_cbThickness);
+	styleLay->addWidget(m_cbStyle);
+	mainLay->addLayout(styleLay);
+
+	QHBoxLayout *alphaLay = new QHBoxLayout();
+	alphaLay->setMargin(0);
+	alphaLay->setSpacing(10);
+	QLabel *alphaLabel = new QLabel("Opacity", this);
+	m_alphaSlider = new QSlider(Qt::Horizontal, this);
+	m_alphaSlider->setRange(0, 255);
+	m_alphaSlider->setValue(255);
+	alphaLay->addWidget(alphaLabel);
+	alphaLay->addWidget(m_alphaSlider);
+	mainLay->addLayout(alphaLay);
+
+	connect(m_cbChannel->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&MenuPlotChannelCurveStyleControl::onChannelSelected);
+	connect(m_cbThickness->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&MenuPlotChannelCurveStyleControl::onThicknessChanged);
+	connect(m_cbStyle->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		&MenuPlotChannelCurveStyleControl::onStyleChanged);
+	connect(m_alphaSlider, &QSlider::valueChanged, this, &MenuPlotChannelCurveStyleControl::onAlphaChanged);
+}
+
+scopy::PlotChannel *MenuPlotChannelCurveStyleControl::currentChannel() const
+{
+	int idx = m_cbChannel->combo()->currentIndex();
+	if(idx >= 0 && idx < m_channels.size())
+		return m_channels.at(idx);
+	return nullptr;
 }
 
 void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c)
 {
-	c->setThickness(cbThicknessW->combo()->currentText().toInt());
-	c->setStyle(cbStyleW->combo()->currentIndex());
-
-	connect(c, &PlotChannel::styleChanged, this, &MenuPlotChannelCurveStyleControl::setStyleSlot);
-	connect(c, &PlotChannel::thicknessChanged, this, &MenuPlotChannelCurveStyleControl::setThicknessSlot);
+	if(m_channels.contains(c))
+		return;
 
 	m_channels.append(c);
+	m_cbChannel->combo()->addItem(c->name(), QVariant::fromValue(c));
+
+	if(m_channels.size() == 1) {
+		updateControlsFromChannel();
+	}
 }
 
 void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c)
 {
-	disconnect(c, &PlotChannel::styleChanged, this, &MenuPlotChannelCurveStyleControl::setStyleSlot);
-	disconnect(c, &PlotChannel::thicknessChanged, this, &MenuPlotChannelCurveStyleControl::setThicknessSlot);
-	m_channels.removeAll(c);
+	int idx = m_channels.indexOf(c);
+	if(idx >= 0) {
+		m_channels.removeAt(idx);
+		m_cbChannel->combo()->removeItem(idx);
+	}
 }
 
-void MenuPlotChannelCurveStyleControl::setStyleSlot()
+void MenuPlotChannelCurveStyleControl::onChannelSelected(int index)
 {
-	if(m_channels.count() <= 0)
-		return;
-
-	int style = m_channels[0]->style();
-	for(PlotChannel *c : qAsConst(m_channels)) {
-		if(style != c->style()) {
-			// "Mixed style should be written here"
-			return;
-		}
-	}
-
-	cbStyleW->combo()->setCurrentIndex(cbStyleW->combo()->findData(style));
+	Q_UNUSED(index);
+	updateControlsFromChannel();
 }
 
-void MenuPlotChannelCurveStyleControl::setThicknessSlot()
+void MenuPlotChannelCurveStyleControl::updateControlsFromChannel()
 {
-	if(m_channels.count() <= 0)
+	PlotChannel *ch = currentChannel();
+	if(!ch)
 		return;
 
-	int thickness = m_channels[0]->thickness();
-	for(PlotChannel *c : qAsConst(m_channels)) {
-		if(thickness != c->thickness()) {
-			// "Mixed thickness should be written here"
-			return;
-		}
-	}
+	QSignalBlocker b1(m_cbThickness->combo());
+	QSignalBlocker b2(m_cbStyle->combo());
+	QSignalBlocker b3(m_alphaSlider);
 
-	cbThicknessW->combo()->setCurrentText(QString::number(thickness));
+	int thicknessIdx = m_cbThickness->combo()->findData(ch->thickness());
+	if(thicknessIdx >= 0)
+		m_cbThickness->combo()->setCurrentIndex(thicknessIdx);
+
+	int styleIdx = m_cbStyle->combo()->findData(ch->style());
+	if(styleIdx >= 0)
+		m_cbStyle->combo()->setCurrentIndex(styleIdx);
+
+	m_alphaSlider->setValue(ch->pen().color().alpha());
+}
+
+void MenuPlotChannelCurveStyleControl::onThicknessChanged(int index)
+{
+	PlotChannel *ch = currentChannel();
+	if(!ch)
+		return;
+	ch->setThickness(m_cbThickness->combo()->itemData(index).toInt());
+}
+
+void MenuPlotChannelCurveStyleControl::onStyleChanged(int index)
+{
+	PlotChannel *ch = currentChannel();
+	if(!ch)
+		return;
+	ch->setStyle(m_cbStyle->combo()->itemData(index).toInt());
+}
+
+void MenuPlotChannelCurveStyleControl::onAlphaChanged(int value)
+{
+	PlotChannel *ch = currentChannel();
+	if(!ch)
+		return;
+	QColor color = ch->pen().color();
+	color.setAlpha(value);
+	ch->setColor(color);
 }
 
 #include "moc_menuplotchannelcurvestylecontrol.cpp"

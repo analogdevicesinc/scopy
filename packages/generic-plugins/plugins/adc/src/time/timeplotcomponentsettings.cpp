@@ -239,7 +239,6 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 	}
 
 	m_curve->addChannels(timePlotComponentChannel->m_timePlotCh);
-	m_curve->addChannels(timePlotComponentChannel->m_xyPlotCh);
 
 	m_channels.append(c);
 }
@@ -259,7 +258,6 @@ void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 		updateYModeCombo();
 	}
 	m_curve->removeChannels(chcmpt->m_timePlotCh);
-	m_curve->removeChannels(chcmpt->m_xyPlotCh);
 }
 
 void TimePlotComponentSettings::onInit() {}

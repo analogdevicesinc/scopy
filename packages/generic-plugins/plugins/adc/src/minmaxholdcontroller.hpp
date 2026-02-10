@@ -57,6 +57,9 @@ public:
 	void onChannelDisabled();
 	void onYAxisChanged(PlotAxis *yAxis);
 
+	PlotChannel *minChannel() const;
+	PlotChannel *maxChannel() const;
+
 Q_SIGNALS:
 	void enabledChanged(bool enabled);
 
