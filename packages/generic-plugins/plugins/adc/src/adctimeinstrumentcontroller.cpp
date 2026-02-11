@@ -25,6 +25,7 @@
 #include "grtimechannelcomponent.h"
 #include "importchannelcomponent.h"
 #include "grtimesinkcomponent.h"
+#include "time/xysettings.h"
 
 using namespace scopy;
 using namespace adc;
@@ -54,10 +55,33 @@ void ADCTimeInstrumentController::init()
 
 	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 
+	m_xySettings = new XYSettings();
+	HoverWidget *xyHoverSettings = new HoverWidget(m_xySettings, m_ui->xyBtn(), m_ui);
+	xyHoverSettings->setAnchorPos(HoverPosition::HP_TOPLEFT);
+	xyHoverSettings->setContentPos(HoverPosition::HP_TOPRIGHT);
+	xyHoverSettings->setAnchorOffset(QPoint(0, -10));
+
+	connect(m_ui->xyBtn()->button(), &QAbstractButton::toggled, xyHoverSettings, &HoverWidget::setVisible);
+	m_ui->xyBtn()->setVisible(true);
+
 	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [=](uint32_t uuid) {
 		auto cursorController = m_plotComponentManager->plot(uuid)->cursor();
 		cursorController->connectSignals(m_cursorSettings);
 		connect(m_ui->m_cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
+
+		// Connect XY settings to plot
+		TimePlotComponent *timePlot = dynamic_cast<TimePlotComponent *>(m_plotComponentManager->plot(uuid));
+		if(timePlot) {
+			connect(m_ui->xyBtn(), &QAbstractButton::toggled, this, [=](bool b) {
+				timePlot->xyDockWidget()->setActivated(b);
+			});
+			connect(m_xySettings, &XYSettings::xAxisSourceChanged, this, [=](int idx) {
+				QComboBox *cb = m_xySettings->xAxisSource()->combo();
+				ChannelComponent *c = static_cast<ChannelComponent *>(cb->itemData(idx).value<void *>());
+				timePlot->setXYXChannel(c);
+			});
+			connect(m_xySettings, &XYSettings::showXSourceToggled, timePlot, &TimePlotComponent::showXSourceOnXy);
+		}
 	});
 
 	m_timePlotSettingsComponent = new TimePlotManagerSettings(m_timePlotComponentManager);
@@ -212,6 +236,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	grtsc->addChannel(c);			    // For matching Sink To Channels
 	dc->addChannel(c);			    // used for sample rate computation
 	m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
+	m_xySettings->xAxisSource()->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
@@ -241,6 +266,7 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	c->ctrl()->animateClick();
 
 	m_timePlotSettingsComponent->addChannel(c); // SingleY/etc
+	m_xySettings->xAxisSource()->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 
 	addComponent(c);
 	setupChannelMeasurement(m_plotComponentManager, c);
@@ -280,6 +306,8 @@ void ADCTimeInstrumentController::removeChannel(AcqTreeNode *node)
 		m_otherCMCB->remove(c->ctrl());
 		m_plotComponentManager->removeChannel(c);
 		m_timePlotSettingsComponent->removeChannel(c);
+		int comboId = m_xySettings->xAxisSource()->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
+		m_xySettings->xAxisSource()->combo()->removeItem(comboId);
 		removeComponent(c);
 		delete c;
 	}

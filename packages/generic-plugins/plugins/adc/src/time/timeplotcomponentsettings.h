@@ -58,9 +58,7 @@ private:
 	PlotAutoscaler *m_autoscaler;
 	TimePlotComponent *m_plotComponent;
 	MenuCombo *m_yModeCb;
-	MenuCombo *m_xAxisSrc;
 	MenuPlotAxisRangeControl *m_yCtrl;
-	MenuOnOffSwitch *m_xAxisShow;
 	MenuOnOffSwitch *m_autoscaleBtn;
 	QList<ChannelComponent *> m_channels;
 	QList<ScaleProvider *> m_scaleProviders;

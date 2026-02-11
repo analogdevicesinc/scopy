@@ -68,6 +68,7 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	m_xyPlot->xAxis()->setVisible(true);
 	m_xyDockWidget->setInnerWidget(m_xyPlot);
 	m_dockableArea->addDockWrapper(m_xyDockWidget);
+	m_xyDockWidget->setActivated(false);
 
 	m_plots.append(m_timePlot);
 	m_plots.append(m_xyPlot);

@@ -28,6 +28,8 @@
 
 namespace scopy {
 namespace adc {
+
+class XYSettings;
 class SCOPY_ADC_EXPORT ADCTimeInstrumentController : public ADCInstrumentController
 {
 public:
@@ -46,6 +48,7 @@ public:
 private:
 	TimePlotManagerSettings *m_timePlotSettingsComponent;
 	ChannelComponent *m_defaultCh;
+	XYSettings *m_xySettings;
 };
 
 } // namespace adc

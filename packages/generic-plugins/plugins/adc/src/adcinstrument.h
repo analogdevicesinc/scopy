@@ -65,6 +65,7 @@ public:
 	const QString settingsMenuId = "settings";
 
 	VerticalChannelManager *vcm() const;
+	MenuControlButton *xyBtn() const;
 
 	QPushButton *sync() const;
 public Q_SLOTS:
@@ -100,6 +101,7 @@ private:
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *m_cursor;
+	MenuControlButton *m_xyBtn;
 	VerticalChannelManager *m_vcm;
 	PrintBtn *m_printBtn;
 	PrintPlotManager *printPlotManager;
@@ -108,6 +110,7 @@ private:
 	void setupRunSingleButtonHelper();
 
 	void setupCursorButtonHelper(MenuControlButton *cursor);
+	void setupXYButtonHelper(MenuControlButton *xyBtn);
 	void setupChannelMenu();
 };
 } // namespace adc

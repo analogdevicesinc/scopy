@@ -112,6 +112,10 @@ void ADCInstrument::setupToolLayout()
 	m_cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(m_cursor);
 
+	m_xyBtn = new MenuControlButton(this);
+	setupXYButtonHelper(m_xyBtn);
+	m_xyBtn->setVisible(false);
+
 	auto contentLayout = dynamic_cast<QHBoxLayout *>(tool->rightContainer()->parentWidget()->layout());
 	if(contentLayout) {
 		contentLayout->setSpacing(0);
@@ -130,6 +134,7 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(m_xyBtn, TTA_LEFT);
 	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
 	rightMenuBtnGrp->addButton(m_settingsBtn->button());
@@ -253,6 +258,8 @@ void ADCInstrument::started()
 
 VerticalChannelManager *ADCInstrument::vcm() const { return m_vcm; }
 
+MenuControlButton *ADCInstrument::xyBtn() const { return m_xyBtn; }
+
 ToolTemplate *ADCInstrument::getToolTemplate() { return tool; }
 
 MapStackedWidget *ADCInstrument::getRightStack() { return rightStack; }
@@ -267,4 +274,14 @@ void ADCInstrument::setupCursorButtonHelper(MenuControlButton *cursor)
 	cursor->checkBox()->setVisible(false);
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 	hoverMenuGroup->addButton(cursor->button());
+}
+
+void ADCInstrument::setupXYButtonHelper(MenuControlButton *xyBtn)
+{
+	xyBtn->setName("XY Plot");
+	xyBtn->setOpenMenuChecksThis(true);
+	xyBtn->setDoubleClickToOpenMenu(true);
+	xyBtn->checkBox()->setVisible(false);
+	xyBtn->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+	hoverMenuGroup->addButton(xyBtn->button());
 }

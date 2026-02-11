@@ -95,31 +95,6 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	MenuSectionCollapseWidget *yaxis = new MenuSectionCollapseWidget("Y-AXIS", MenuCollapseSection::MHCW_NONE,
 									 MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	MenuSectionCollapseWidget *xySection = new MenuSectionCollapseWidget(
-		"XY PLOT", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
-	QAbstractButton *xySwitch = xySection->collapseSection()->header();
-
-	m_xAxisSrc = new MenuCombo("XY - X Axis source");
-	InfoIconWidget::addHoveringInfoToWidget(
-		m_xAxisSrc->label(), "Selects which channel provides the X-axis values for the XY plot", m_xAxisSrc);
-	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		QComboBox *cb = m_xAxisSrc->combo();
-		ChannelComponent *c = static_cast<ChannelComponent *>(cb->itemData(idx).value<void *>());
-		m_plotComponent->setXYXChannel(c);
-	});
-
-	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
-	InfoIconWidget::addHoveringInfoToWidget(
-		m_xAxisShow->label(), "Plots selected channel by itself over the current XY plot", m_xAxisShow);
-	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
-		m_plotComponent->xyDockWidget()->setActivated(b);
-		m_xAxisSrc->setVisible(b);
-		m_xAxisShow->setVisible(b);
-	});
-
-	connect(m_xAxisShow->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { m_plotComponent->showXSourceOnXy(b); });
-
 	m_yModeCb = new MenuCombo("YMODE", plotMenu);
 	InfoIconWidget::addHoveringInfoToWidget(m_yModeCb->label(),
 						"Set Y axis scaling mode\nThis does not affect the data", m_yModeCb);
@@ -157,23 +132,16 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	plotMenu->contentLayout()->addWidget(exportBtn);
 	plotMenu->contentLayout()->setSpacing(10);
 
-	xySection->add(m_xAxisSrc);
-	xySection->add(m_xAxisShow);
-
 	v->setSpacing(10);
 	v->addWidget(yaxis);
-	v->addWidget(xySection);
 	v->addWidget(plotMenu);
 	v->addWidget(m_deletePlot);
 	v->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	m_autoscaleBtn->setVisible(true);
 	m_yCtrl->setVisible(true);
-	m_xAxisSrc->setVisible(false);
-	m_xAxisShow->setVisible(false);
 
 	// init
-	xySwitch->setChecked(false);
 	m_yCtrl->setMin(-2048);
 	m_yCtrl->setMax(2048);
 	labelsSwitch->onOffswitch()->setChecked(Preferences::get("adc_plot_labels").toBool());
@@ -221,7 +189,6 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 	// https://stackoverflow.com/questions/44501171/qvariant-with-custom-class-pointer-does-not-return-same-address
 
 	auto timePlotComponentChannel = dynamic_cast<TimePlotComponentChannel *>(c->plotChannelCmpt());
-	m_xAxisSrc->combo()->addItem(c->name(), QVariant::fromValue(static_cast<void *>(c)));
 	m_autoscaler->addChannels(timePlotComponentChannel->m_timePlotCh);
 	ScaleProvider *sp = dynamic_cast<ScaleProvider *>(c);
 	if(sp) {
@@ -235,8 +202,6 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 {
 	m_channels.removeAll(c);
-	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
-	m_xAxisSrc->combo()->removeItem(comboId);
 
 	TimePlotComponentChannel *chcmpt = dynamic_cast<TimePlotComponentChannel *>(c->plotChannelCmpt());
 
