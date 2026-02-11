@@ -442,6 +442,10 @@ void Ad74413r::setupChannelBtn(MenuControlButton *btn, PlotChannel *ch, QString 
 
 void Ad74413r::setupChannel(int chnlIdx, QString function)
 {
+	bool lazyLoading = Preferences::GetInstance()->get("iiowidgets_use_lazy_loading").toBool();
+	if(lazyLoading) {
+		Preferences::GetInstance()->set("iiowidgets_use_lazy_loading", false);
+	}
 	if(function.compare("no_config") != 0) {
 		QString chnlId(function + " " + QString::number(chnlIdx + 1));
 		QPen chPen = QPen(QColor(StyleHelper::getChannelColor(chnlIdx)), 1);
@@ -516,6 +520,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 	if(m_currentChannelSelected == 4) {
 		m_swiotAdLogic->initDiagnosticChannels();
 	}
+	Preferences::GetInstance()->set("iiowidgets_use_lazy_loading", lazyLoading);
 }
 
 void Ad74413r::setupChannelsMenuControlBtn(MenuControlButton *btn, QString name)
