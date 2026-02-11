@@ -25,6 +25,7 @@
 #include <QScrollArea>
 #include <QWidget>
 #include <style.h>
+#include <stylehelper.h>
 
 #include <measurementlabel.h>
 
@@ -34,16 +35,18 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	: QWidget(parent)
 	, m_inhibitUpdates(false)
 {
-	QVBoxLayout *lay = new QVBoxLayout(this);
-	setLayout(lay);
+	m_lay = new QVBoxLayout(this);
+	setLayout(m_lay);
+
+	m_lay->setMargin(0);
+	m_lay->setSpacing(0);
+	m_lay->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+
+	setupControlButtons();
 
 	QScrollBar *scrollBar = new QScrollBar(this);
 	scrollBar->setOrientation(Qt::Horizontal);
-
-	lay->setMargin(0);
-	lay->setSpacing(0);
-	lay->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
 	stackSize = 4;
 
@@ -65,8 +68,8 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	scrollArea->setWidgetResizable(true);
 
 	panelLayout->setAlignment(Qt::AlignLeft);
-	lay->addWidget(scrollBar);
-	lay->addWidget(scrollArea);
+	m_lay->addWidget(scrollBar);
+	m_lay->addWidget(scrollArea);
 
 	connect(scrollArea->horizontalScrollBar(), &QAbstractSlider::rangeChanged, scrollBar,
 		[=](double min, double max) {
@@ -84,6 +87,58 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	m_stacks.append(new VerticalWidgetStack(stackSize, this));
 	panelLayout->insertWidget(idx, m_stacks.last());
 	Style::setBackgroundColor(this, json::theme::background_subtle);
+}
+
+void MeasurementsPanel::setupControlButtons()
+{
+	QHBoxLayout *btnLayout = new QHBoxLayout();
+	btnLayout->setMargin(0);
+	btnLayout->setSpacing(4);
+
+	m_showAllBtn = new QPushButton("Show All", this);
+	m_hideAllBtn = new QPushButton("Hide All", this);
+	m_sortByChannelBtn = new QPushButton("Sort by channel", this);
+	m_sortByTypeBtn = new QPushButton("Sort by type", this);
+
+	Style::setStyle(m_showAllBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_hideAllBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_sortByChannelBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_sortByTypeBtn, style::properties::button::transparentButton);
+
+	m_hideAllBtn->setVisible(false);
+	m_sortByChannelBtn->setVisible(false);
+
+	connect(m_showAllBtn, &QPushButton::clicked, this, [=]() {
+		Q_EMIT toggleAll(true);
+		m_showAllBtn->setVisible(false);
+		m_hideAllBtn->setVisible(true);
+	});
+
+	connect(m_hideAllBtn, &QPushButton::clicked, this, [=]() {
+		Q_EMIT toggleAll(false);
+		m_hideAllBtn->setVisible(false);
+		m_showAllBtn->setVisible(true);
+	});
+
+	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [=]() {
+		sort(0);
+		m_sortByChannelBtn->setVisible(false);
+		m_sortByTypeBtn->setVisible(true);
+	});
+
+	connect(m_sortByTypeBtn, &QPushButton::clicked, this, [=]() {
+		sort(1);
+		m_sortByTypeBtn->setVisible(false);
+		m_sortByChannelBtn->setVisible(true);
+	});
+
+	btnLayout->addWidget(m_showAllBtn);
+	btnLayout->addWidget(m_hideAllBtn);
+	btnLayout->addWidget(m_sortByChannelBtn);
+	btnLayout->addWidget(m_sortByTypeBtn);
+	btnLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+	m_lay->addLayout(btnLayout);
 }
 
 void MeasurementsPanel::addWidget(QWidget *meas)
@@ -123,6 +178,10 @@ void MeasurementsPanel::removeMeasurement(MeasurementLabel *meas)
 	}
 
 	m_labels.removeAll(meas);
+
+	if(m_labels.isEmpty()) {
+		setVisible(false);
+	}
 
 	if(m_inhibitUpdates) {
 		return;
@@ -212,13 +271,15 @@ QWidget *MeasurementsPanel::cursorArea() { return m_cursor; }
 
 StatsPanel::StatsPanel(QWidget *parent)
 {
-	QVBoxLayout *lay = new QVBoxLayout(this);
-	setLayout(lay);
+	m_lay = new QVBoxLayout(this);
+	setLayout(m_lay);
 
-	lay->setMargin(0);
-	lay->setSpacing(0);
-	lay->setAlignment(Qt::AlignTop);
+	m_lay->setMargin(0);
+	m_lay->setSpacing(0);
+	m_lay->setAlignment(Qt::AlignTop);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+	setupControlButtons();
 
 	QScrollArea *scrollArea = new QScrollArea(this);
 	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -231,8 +292,60 @@ StatsPanel::StatsPanel(QWidget *parent)
 	scrollArea->setWidgetResizable(true);
 
 	panelLayout->setAlignment(Qt::AlignLeft);
-	lay->addWidget(scrollArea);
+	m_lay->addWidget(scrollArea);
 	Style::setBackgroundColor(this, json::theme::background_subtle);
+}
+
+void StatsPanel::setupControlButtons()
+{
+	QHBoxLayout *btnLayout = new QHBoxLayout();
+	btnLayout->setMargin(0);
+	btnLayout->setSpacing(4);
+
+	m_showAllBtn = new QPushButton("Show All", this);
+	m_hideAllBtn = new QPushButton("Hide All", this);
+	m_sortByChannelBtn = new QPushButton("Sort by channel", this);
+	m_sortByTypeBtn = new QPushButton("Sort by type", this);
+
+	Style::setStyle(m_showAllBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_hideAllBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_sortByChannelBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_sortByTypeBtn, style::properties::button::transparentButton);
+
+	m_hideAllBtn->setVisible(false);
+	m_sortByChannelBtn->setVisible(false);
+
+	connect(m_showAllBtn, &QPushButton::clicked, this, [=]() {
+		Q_EMIT toggleAll(true);
+		m_showAllBtn->setVisible(false);
+		m_hideAllBtn->setVisible(true);
+	});
+
+	connect(m_hideAllBtn, &QPushButton::clicked, this, [=]() {
+		Q_EMIT toggleAll(false);
+		m_hideAllBtn->setVisible(false);
+		m_showAllBtn->setVisible(true);
+	});
+
+	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [=]() {
+		sort(0);
+		m_sortByChannelBtn->setVisible(false);
+		m_sortByTypeBtn->setVisible(true);
+	});
+
+	connect(m_sortByTypeBtn, &QPushButton::clicked, this, [=]() {
+		sort(1);
+		m_sortByTypeBtn->setVisible(false);
+		m_sortByChannelBtn->setVisible(true);
+	});
+
+	btnLayout->addWidget(m_showAllBtn);
+	btnLayout->addWidget(m_hideAllBtn);
+	btnLayout->addWidget(m_sortByChannelBtn);
+	btnLayout->addWidget(m_sortByTypeBtn);
+	btnLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+	m_lay->addLayout(btnLayout);
 }
 
 StatsPanel::~StatsPanel() {}
@@ -247,6 +360,10 @@ void StatsPanel::removeStat(StatsLabel *stat)
 {
 	m_labels.removeAll(stat);
 	panelLayout->removeWidget(stat);
+
+	if(m_labels.isEmpty()) {
+		setVisible(false);
+	}
 }
 
 void StatsPanel::updateOrder()

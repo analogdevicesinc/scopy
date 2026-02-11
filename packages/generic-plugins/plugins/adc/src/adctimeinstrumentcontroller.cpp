@@ -94,12 +94,6 @@ void ADCTimeInstrumentController::init()
 	// m_cursorComponent = new CursorComponent(m_plotComponentManager, m_tool->getToolTemplate(), this);
 	// addComponent(m_cursorComponent);
 
-	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_ui->getHoverMenuBtnGroup(),
-						  m_plotComponentManager, this);
-	// m_measureComponent->addPlotComponent(m_plotComponentManager);
-
-	addComponent(m_measureComponent);
-
 	plotStack = new MapStackedWidget(m_ui);
 	toolLayout->addWidgetToCentralContainerHelper(plotStack);
 
@@ -140,9 +134,6 @@ void ADCTimeInstrumentController::init()
 
 	m_ui->m_settingsBtn->animateClick();
 	m_ui->sync()->setVisible(false);
-
-	m_measureComponent->measureSettings()->getMarkerSection()->setVisible(false);
-	m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(false);
 }
 
 void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)

@@ -29,6 +29,8 @@ namespace scopy {
 namespace adc {
 
 class FFTPlotManagerSettings;
+class GenalyzerSettings;
+
 class SCOPY_ADC_EXPORT ADCFFTInstrumentController : public ADCInstrumentController
 {
 public:
@@ -51,6 +53,7 @@ public:
 private:
 	QList<AcqTreeNode *> m_complexChannels;
 	FFTPlotManagerSettings *m_fftPlotSettingsComponent;
+	GenalyzerSettings *m_genalyzerSettings;
 	ChannelComponent *m_defaultComplexCh, *m_defaultRealCh;
 };
 
