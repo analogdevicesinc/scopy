@@ -115,7 +115,7 @@ void PlotNavigator::initResetButton()
 	m_resetHover = new HoverWidget(m_resetButton, m_plot->canvas(), m_plot->canvas());
 	m_resetHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
 	m_resetHover->setContentPos(HoverPosition::HP_TOPLEFT);
-	m_resetHover->setAnchorOffset(QPoint(-6, -6));
+	m_resetHover->setAnchorOffset(QPoint(-6, -26));
 	m_resetHover->show();
 }
 
