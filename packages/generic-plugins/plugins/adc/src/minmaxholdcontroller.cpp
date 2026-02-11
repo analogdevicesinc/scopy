@@ -78,15 +78,6 @@ bool MinMaxHoldController::minEnabled() const { return m_minEnabled; }
 
 bool MinMaxHoldController::maxEnabled() const { return m_maxEnabled; }
 
-void MinMaxHoldController::setMainChannelHidden(bool hidden)
-{
-	if(m_mainChannelHidden == hidden)
-		return;
-
-	m_mainChannelHidden = hidden;
-	updateVisibility();
-}
-
 void MinMaxHoldController::resetMin()
 {
 	m_minData.clear();
@@ -185,13 +176,6 @@ void MinMaxHoldController::updateVisibility()
 	bool channelEnabled = m_ch->m_enabled;
 	if(!channelEnabled)
 		return;
-
-	// Main channel: hidden only if hold is enabled AND user chose to hide
-	if(m_enabled && m_mainChannelHidden) {
-		m_ch->m_fftPlotCh->disable();
-	} else {
-		m_ch->m_fftPlotCh->enable();
-	}
 
 	// Min/max channels: visible only if hold is enabled AND individually enabled
 	if(m_minCh) {

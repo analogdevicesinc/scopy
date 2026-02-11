@@ -46,8 +46,6 @@ public:
 	bool minEnabled() const;
 	bool maxEnabled() const;
 
-	void setMainChannelHidden(bool hidden);
-
 	void resetMin();
 	void resetMax();
 
@@ -74,7 +72,6 @@ private:
 	bool m_enabled = false;
 	bool m_minEnabled = false;
 	bool m_maxEnabled = false;
-	bool m_mainChannelHidden = false;
 
 	std::vector<float> m_xData;
 	std::vector<float> m_minData;
