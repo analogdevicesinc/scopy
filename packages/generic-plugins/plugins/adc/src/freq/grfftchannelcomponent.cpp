@@ -318,9 +318,6 @@ QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
 	maxLayout->addWidget(maxResetBtn);
 	maxLayout->addWidget(maxHoldSwitch);
 
-	MenuOnOffSwitch *hideMainSwitch = new MenuOnOffSwitch("Hide main curve", section);
-	hideMainSwitch->setEnabled(false);
-
 	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
 	connect(section->collapseSection()->header(), &QAbstractButton::toggled, controller,
 		&MinMaxHoldController::setEnabled);
@@ -328,13 +325,9 @@ QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
 	connect(maxHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMaxEnabled);
 	connect(minResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMin);
 	connect(maxResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMax);
-	connect(hideMainSwitch->onOffswitch(), &QAbstractButton::toggled, controller,
-		&MinMaxHoldController::setMainChannelHidden);
-	connect(controller, &MinMaxHoldController::enabledChanged, hideMainSwitch, &QWidget::setEnabled);
 
 	layout->addLayout(minLayout);
 	layout->addLayout(maxLayout);
-	layout->addWidget(hideMainSwitch);
 
 	section->contentLayout()->addLayout(layout);
 	section->setCollapsed(true);
