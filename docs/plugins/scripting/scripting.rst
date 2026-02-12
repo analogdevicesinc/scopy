@@ -907,3 +907,192 @@ IIO Explorer (Debugger) API
    * - iioExplorer.getDetailsViewTab()
      - -
      - Get the current details view tab index.
+
+PQM API
+~~~~~~~~~~~
+
+.. rubric:: Tool Selection
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.getTools()
+     - -
+     - Get list of available tool names.
+
+.. rubric:: RMS Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.isRmsRunning()
+     - -
+     - Check if RMS instrument is running.
+   * - pqm.setRmsRunning(running)
+     - true/false
+     - Start or stop the RMS instrument.
+   * - pqm.rmsSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - pqm.isRmsLoggingEnabled()
+     - -
+     - Check if RMS logging is enabled.
+   * - pqm.setRmsLoggingEnabled(enabled)
+     - true/false
+     - Enable or disable RMS logging.
+   * - pqm.getRmsLogPath()
+     - -
+     - Get the RMS log file path.
+   * - pqm.setRmsLogPath(path)
+     - File path
+     - Set the RMS log file path.
+   * - pqm.resetRmsPqEvents()
+     - -
+     - Reset RMS PQ events.
+   * - pqm.isRmsPqEvents()
+     - -
+     - Check if RMS PQ events are active.
+
+.. rubric:: Harmonics Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.isHarmonicsRunning()
+     - -
+     - Check if Harmonics instrument is running.
+   * - pqm.setHarmonicsRunning(running)
+     - true/false
+     - Start or stop the Harmonics instrument.
+   * - pqm.harmonicsSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - pqm.getHarmonicsActiveChannel()
+     - -
+     - Get the active harmonics channel name.
+   * - pqm.setHarmonicsActiveChannel(channel)
+     - Channel name
+     - Set the active harmonics channel.
+   * - pqm.getHarmonicsType()
+     - -
+     - Get the current harmonics type.
+   * - pqm.setHarmonicsType(type)
+     - "harmonics", "inter_harmonics"
+     - Set the harmonics type.
+   * - pqm.isHarmonicsLoggingEnabled()
+     - -
+     - Check if Harmonics logging is enabled.
+   * - pqm.setHarmonicsLoggingEnabled(enabled)
+     - true/false
+     - Enable or disable Harmonics logging.
+   * - pqm.getHarmonicsLogPath()
+     - -
+     - Get the Harmonics log file path.
+   * - pqm.setHarmonicsLogPath(path)
+     - File path
+     - Set the Harmonics log file path.
+   * - pqm.resetHarmonicsPqEvents()
+     - -
+     - Reset Harmonics PQ events.
+   * - pqm.isHarmonicsPqEvents()
+     - -
+     - Check if Harmonics PQ events are active.
+
+.. rubric:: Waveform Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.isWaveformRunning()
+     - -
+     - Check if Waveform instrument is running.
+   * - pqm.setWaveformRunning(running)
+     - true/false
+     - Start or stop the Waveform instrument.
+   * - pqm.waveformSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - pqm.getWaveformTimespan()
+     - -
+     - Get the current timespan value.
+   * - pqm.setWaveformTimespan(value)
+     - Seconds
+     - Set the timespan value.
+   * - pqm.isWaveformRollingMode()
+     - -
+     - Check if rolling mode is enabled.
+   * - pqm.setWaveformRollingMode(enabled)
+     - true/false
+     - Enable or disable rolling mode.
+   * - pqm.getWaveformTriggeredBy()
+     - -
+     - Get the trigger channel name.
+   * - pqm.setWaveformTriggeredBy(channel)
+     - Channel name
+     - Set the trigger channel.
+   * - pqm.isWaveformLoggingEnabled()
+     - -
+     - Check if Waveform logging is enabled.
+   * - pqm.setWaveformLoggingEnabled(enabled)
+     - true/false
+     - Enable or disable Waveform logging.
+   * - pqm.getWaveformLogPath()
+     - -
+     - Get the Waveform log file path.
+   * - pqm.setWaveformLogPath(path)
+     - File path
+     - Set the Waveform log file path.
+
+.. rubric:: Settings Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.settingsRead()
+     - -
+     - Read settings from device.
+   * - pqm.settingsWrite()
+     - -
+     - Write settings to device.
+   * - pqm.getSettingsAttributeValue(attrName)
+     - Attribute name
+     - Get the value of a settings attribute.
+   * - pqm.setSettingsAttributeValue(attrName, value)
+     - Attribute name, Value
+     - Set the value of a settings attribute.
+
+.. rubric:: Utility
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.triggerPqEvent(enable)
+     - true/false
+     - Trigger a PQ event (for testing).
+   * - pqm.getLogFilePath()
+     - -
+     - Get the actual log file path.
