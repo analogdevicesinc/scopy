@@ -47,7 +47,7 @@ stages:
     # Homebrew Cache
     - task: Cache@2
       inputs:
-        key: 'homebrew-v1 | "$(vmImage)" | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh | "$(date +%Y-%m)"'
+        key: 'homebrew-v2 | "$(vmImage)" | ci/macOS/install_macos_deps.sh | ci/macOS/macos_config.sh | "$(date +%Y-%m)"'
         path: '$(Pipeline.Workspace)/.homebrew-cache'
         cacheHitVar: 'HOMEBREW_CACHE'
       displayName: 'Cache Homebrew Downloads'
@@ -56,7 +56,7 @@ stages:
     # Git Repositories Cache
     - task: Cache@2
       inputs:
-        key: 'git-repos-v1 | ci/macOS/macos_config.sh | "$(date +%Y-%m)"'
+        key: 'git-repos-v2 | ci/macOS/macos_config.sh | "$(date +%Y-%m)"'
         path: '$(Pipeline.Workspace)/.git-cache'
         cacheHitVar: 'GIT_REPOS_CACHE'
       displayName: 'Cache Git Repositories'
@@ -65,7 +65,7 @@ stages:
     # Built Dependencies Cache
     - task: Cache@2
       inputs:
-        key: 'built-deps-v1 | "$(vmImage)" | ci/macOS/macos_config.sh | ci/macOS/install_macos_deps.sh | "$(date +%Y-%m)"'
+        key: 'built-deps-v2 | "$(vmImage)" | ci/macOS/macos_config.sh | ci/macOS/install_macos_deps.sh | "$(date +%Y-%m)"'
         path: '$(Build.Repository.LocalPath)/staging/dependencies'
         cacheHitVar: 'BUILT_DEPS_CACHE'
       displayName: 'Cache Built Dependencies'
