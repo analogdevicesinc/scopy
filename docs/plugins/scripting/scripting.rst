@@ -1096,3 +1096,242 @@ PQM API
    * - pqm.getLogFilePath()
      - -
      - Get the actual log file path.
+
+SWIOT API
+~~~~~~~~~~~
+
+.. rubric:: Tool Selection
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.getTools()
+     - -
+     - Get list of available tool names.
+   * - swiot.isRuntimeMode()
+     - -
+     - Check if device is in runtime mode.
+   * - swiot.switchToConfigMode()
+     - -
+     - Switch from runtime mode to config mode.
+
+.. rubric:: Config Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.getConfigChannelCount()
+     - -
+     - Get number of config channels.
+   * - swiot.applyConfig()
+     - -
+     - Apply the current configuration.
+   * - swiot.setChannelEnabled(channelId, enabled)
+     - Channel ID, true/false
+     - Enable or disable a config channel.
+   * - swiot.isChannelEnabled(channelId)
+     - Channel ID
+     - Check if a config channel is enabled.
+   * - swiot.setChannelDevice(channelId, device)
+     - Channel ID, Device name
+     - Set the device for a config channel.
+   * - swiot.getChannelDevice(channelId)
+     - Channel ID
+     - Get the device name of a config channel.
+   * - swiot.getAvailableDevices(channelId)
+     - Channel ID
+     - Get list of available devices for a channel.
+   * - swiot.setChannelFunction(channelId, function)
+     - Channel ID, Function name
+     - Set the function for a config channel.
+   * - swiot.getChannelFunction(channelId)
+     - Channel ID
+     - Get the function name of a config channel.
+   * - swiot.getAvailableFunctions(channelId)
+     - Channel ID
+     - Get list of available functions for a channel.
+
+.. rubric:: AD74413R Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.isAdRunning()
+     - -
+     - Check if AD74413R instrument is running.
+   * - swiot.setAdRunning(running)
+     - true/false
+     - Start or stop the AD74413R instrument.
+   * - swiot.adSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - swiot.getAdTimespan()
+     - -
+     - Get the current timespan value.
+   * - swiot.setAdTimespan(timespan)
+     - Seconds
+     - Set the timespan value.
+   * - swiot.setAdPlotLabelsEnabled(enabled)
+     - true/false
+     - Enable or disable plot labels.
+   * - swiot.isAdPlotLabelsEnabled()
+     - -
+     - Check if plot labels are enabled.
+   * - swiot.setAdMeasurementsEnabled(enabled)
+     - true/false
+     - Enable or disable measurements.
+   * - swiot.isAdMeasurementsEnabled()
+     - -
+     - Check if measurements are enabled.
+   * - swiot.setAdChannelEnabled(channelId, enabled)
+     - Channel ID, true/false
+     - Enable or disable a channel.
+   * - swiot.isAdChannelEnabled(channelId)
+     - Channel ID
+     - Check if a channel is enabled.
+   * - swiot.setAdChannelSamplingFrequency(channelId, frequency)
+     - Channel ID, Frequency
+     - Set the sampling frequency for a channel.
+   * - swiot.getAdChannelSamplingFrequency(channelId)
+     - Channel ID
+     - Get the sampling frequency of a channel.
+   * - swiot.setAdChannelYMin(channelId, value)
+     - Channel ID, Value
+     - Set the Y axis minimum for a channel.
+   * - swiot.setAdChannelYMax(channelId, value)
+     - Channel ID, Value
+     - Set the Y axis maximum for a channel.
+   * - swiot.getAdChannelYMin(channelId)
+     - Channel ID
+     - Get the Y axis minimum of a channel.
+   * - swiot.getAdChannelYMax(channelId)
+     - Channel ID
+     - Get the Y axis maximum of a channel.
+   * - swiot.getAdChannelCount()
+     - -
+     - Get the number of AD74413R channels.
+   * - swiot.getAdChannelNames()
+     - -
+     - Get list of AD74413R channel names.
+   * - swiot.getAdSampleRate()
+     - -
+     - Get the current sample rate.
+
+.. rubric:: MAX14906 Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.isMaxRunning()
+     - -
+     - Check if MAX14906 instrument is running.
+   * - swiot.setMaxRunning(running)
+     - true/false
+     - Start or stop the MAX14906 instrument.
+   * - swiot.getMaxTimespan()
+     - -
+     - Get the current timespan value.
+   * - swiot.setMaxTimespan(timespan)
+     - Seconds
+     - Set the timespan value.
+   * - swiot.setMaxChannelOutput(channelId, value)
+     - Channel ID, true/false
+     - Set a channel output value.
+   * - swiot.getMaxChannelOutput(channelId)
+     - Channel ID
+     - Get a channel output value.
+   * - swiot.getMaxChannelCount()
+     - -
+     - Get the number of MAX14906 channels.
+   * - swiot.getMaxChannelNames()
+     - -
+     - Get list of MAX14906 channel names.
+   * - swiot.getMaxXAxisMin()
+     - -
+     - Get the X axis minimum value.
+   * - swiot.getMaxXAxisMax()
+     - -
+     - Get the X axis maximum value.
+
+.. rubric:: Faults Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.isFaultsRunning()
+     - -
+     - Check if Faults instrument is running.
+   * - swiot.setFaultsRunning(running)
+     - true/false
+     - Start or stop the Faults instrument.
+   * - swiot.faultsSingleShot()
+     - -
+     - Trigger a single shot fault read.
+   * - swiot.resetAdFaultsStored()
+     - -
+     - Reset AD74413R stored faults.
+   * - swiot.resetMaxFaultsStored()
+     - -
+     - Reset MAX14906 stored faults.
+   * - swiot.clearAdFaultsSelection()
+     - -
+     - Clear AD74413R fault bit selection.
+   * - swiot.clearMaxFaultsSelection()
+     - -
+     - Clear MAX14906 fault bit selection.
+   * - swiot.getAdActiveFaultBits()
+     - -
+     - Get list of active AD74413R fault bit indices.
+   * - swiot.getMaxActiveFaultBits()
+     - -
+     - Get list of active MAX14906 fault bit indices.
+   * - swiot.getAdSelectedFaultBits()
+     - -
+     - Get list of selected AD74413R fault bit indices.
+   * - swiot.getMaxSelectedFaultBits()
+     - -
+     - Get list of selected MAX14906 fault bit indices.
+   * - swiot.getAdStoredFaultBits()
+     - -
+     - Get list of stored AD74413R fault bit indices.
+   * - swiot.getMaxStoredFaultBits()
+     - -
+     - Get list of stored MAX14906 fault bit indices.
+   * - swiot.selectAdFaultBit(bitIndex)
+     - Bit index
+     - Select an AD74413R fault bit.
+   * - swiot.selectMaxFaultBit(bitIndex)
+     - Bit index
+     - Select a MAX14906 fault bit.
+   * - swiot.isAdFaultsExplanationEnabled()
+     - -
+     - Check if AD74413R faults explanation is enabled.
+   * - swiot.setAdFaultsExplanationEnabled(enabled)
+     - true/false
+     - Enable or disable AD74413R faults explanation.
+   * - swiot.isMaxFaultsExplanationEnabled()
+     - -
+     - Check if MAX14906 faults explanation is enabled.
+   * - swiot.setMaxFaultsExplanationEnabled(enabled)
+     - true/false
+     - Enable or disable MAX14906 faults explanation.
