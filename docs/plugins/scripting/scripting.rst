@@ -712,3 +712,198 @@ DataLogger API
    * - datalogger.importDataFromPathForTool(toolName, path)
      - Tool, Path
      - Import data from file for tool.
+
+IIO Explorer (Debugger) API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. rubric:: Tab Control
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.setCurrentTab(index)
+     - 0-2
+     - Set the current main tab (0=IIO Attributes, 1=Log, 2=Code Generator).
+   * - iioExplorer.getCurrentTab()
+     - -
+     - Get the current main tab index.
+   * - iioExplorer.showIIOAttributesTab()
+     - -
+     - Switch to the IIO Attributes tab.
+   * - iioExplorer.showLogTab()
+     - -
+     - Switch to the Log tab.
+   * - iioExplorer.showCodeGeneratorTab()
+     - -
+     - Switch to the Code Generator tab.
+
+.. rubric:: Tree Navigation
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.selectItemByPath(path)
+     - Path string
+     - Select a tree item by path (e.g., "context0/ad9361-phy/voltage0/hardwaregain").
+   * - iioExplorer.getSelectedItemPath()
+     - -
+     - Get the path of the currently selected item.
+   * - iioExplorer.getSelectedItemName()
+     - -
+     - Get the name of the currently selected item.
+   * - iioExplorer.getSelectedItemType()
+     - -
+     - Get the type of the currently selected item.
+
+.. rubric:: Tree Expand/Collapse
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.expandItem(path)
+     - Path string
+     - Expand a tree item by path.
+   * - iioExplorer.collapseItem(path)
+     - Path string
+     - Collapse a tree item by path.
+   * - iioExplorer.isItemExpanded(path)
+     - Path string
+     - Check if a tree item is expanded.
+   * - iioExplorer.getChildCount(path)
+     - Path string
+     - Get the number of children for a tree item.
+   * - iioExplorer.getChildNames(path)
+     - Path string
+     - Get list of child names for a tree item.
+
+.. rubric:: Watchlist
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.addCurrentItemToWatchlist()
+     - -
+     - Add the currently selected item to the watchlist.
+   * - iioExplorer.addItemToWatchlistByPath(path)
+     - Path string
+     - Add a tree item to the watchlist by path.
+   * - iioExplorer.removeItemFromWatchlistByPath(path)
+     - Path string
+     - Remove a tree item from the watchlist by path.
+   * - iioExplorer.getWatchlistPaths()
+     - -
+     - Get list of all watchlist item paths.
+   * - iioExplorer.clearWatchlist()
+     - -
+     - Remove all items from the watchlist.
+   * - iioExplorer.refreshWatchlist()
+     - -
+     - Refresh all watchlist entries.
+   * - iioExplorer.writeWatchlistAttributeValue(path, value)
+     - Path, Value
+     - Write a value to a watchlist attribute.
+
+.. rubric:: Attribute Values
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.readAttributeValue(path)
+     - Path string
+     - Read the value of an attribute by path.
+   * - iioExplorer.writeAttributeValue(path, value)
+     - Path, Value
+     - Write a value to an attribute by path.
+   * - iioExplorer.triggerRead()
+     - -
+     - Trigger a read on all child items of the selected item.
+
+.. rubric:: Code Generator
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.getGeneratedCode()
+     - -
+     - Get the generated code content.
+   * - iioExplorer.saveGeneratedCode(filePath)
+     - File path
+     - Save the generated code to a file.
+
+.. rubric:: Log
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.getLogContent()
+     - -
+     - Get the log content.
+   * - iioExplorer.clearLog()
+     - -
+     - Clear the log.
+
+.. rubric:: Search/Filter
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.setSearchText(text)
+     - Search string
+     - Set the search/filter text.
+   * - iioExplorer.getSearchText()
+     - -
+     - Get the current search text.
+   * - iioExplorer.getSearchPlaceholderText()
+     - -
+     - Get the search placeholder text.
+   * - iioExplorer.getVisibleItemCount()
+     - -
+     - Get the number of visible items after filtering.
+
+.. rubric:: Details View
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.setDetailsViewTab(index)
+     - 0-2
+     - Set the details view tab (0=GUI View, 1=IIO View, 2=Generated Code).
+   * - iioExplorer.getDetailsViewTab()
+     - -
+     - Get the current details view tab index.
