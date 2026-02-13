@@ -712,3 +712,626 @@ DataLogger API
    * - datalogger.importDataFromPathForTool(toolName, path)
      - Tool, Path
      - Import data from file for tool.
+
+IIO Explorer (Debugger) API
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. rubric:: Tab Control
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.setCurrentTab(index)
+     - 0-2
+     - Set the current main tab (0=IIO Attributes, 1=Log, 2=Code Generator).
+   * - iioExplorer.getCurrentTab()
+     - -
+     - Get the current main tab index.
+   * - iioExplorer.showIIOAttributesTab()
+     - -
+     - Switch to the IIO Attributes tab.
+   * - iioExplorer.showLogTab()
+     - -
+     - Switch to the Log tab.
+   * - iioExplorer.showCodeGeneratorTab()
+     - -
+     - Switch to the Code Generator tab.
+
+.. rubric:: Tree Navigation
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.selectItemByPath(path)
+     - Path string
+     - Select a tree item by path (e.g., "context0/ad9361-phy/voltage0/hardwaregain").
+   * - iioExplorer.getSelectedItemPath()
+     - -
+     - Get the path of the currently selected item.
+   * - iioExplorer.getSelectedItemName()
+     - -
+     - Get the name of the currently selected item.
+   * - iioExplorer.getSelectedItemType()
+     - -
+     - Get the type of the currently selected item.
+
+.. rubric:: Tree Expand/Collapse
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.expandItem(path)
+     - Path string
+     - Expand a tree item by path.
+   * - iioExplorer.collapseItem(path)
+     - Path string
+     - Collapse a tree item by path.
+   * - iioExplorer.isItemExpanded(path)
+     - Path string
+     - Check if a tree item is expanded.
+   * - iioExplorer.getChildCount(path)
+     - Path string
+     - Get the number of children for a tree item.
+   * - iioExplorer.getChildNames(path)
+     - Path string
+     - Get list of child names for a tree item.
+
+.. rubric:: Watchlist
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.addCurrentItemToWatchlist()
+     - -
+     - Add the currently selected item to the watchlist.
+   * - iioExplorer.addItemToWatchlistByPath(path)
+     - Path string
+     - Add a tree item to the watchlist by path.
+   * - iioExplorer.removeItemFromWatchlistByPath(path)
+     - Path string
+     - Remove a tree item from the watchlist by path.
+   * - iioExplorer.getWatchlistPaths()
+     - -
+     - Get list of all watchlist item paths.
+   * - iioExplorer.clearWatchlist()
+     - -
+     - Remove all items from the watchlist.
+   * - iioExplorer.refreshWatchlist()
+     - -
+     - Refresh all watchlist entries.
+   * - iioExplorer.writeWatchlistAttributeValue(path, value)
+     - Path, Value
+     - Write a value to a watchlist attribute.
+
+.. rubric:: Attribute Values
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.readAttributeValue(path)
+     - Path string
+     - Read the value of an attribute by path.
+   * - iioExplorer.writeAttributeValue(path, value)
+     - Path, Value
+     - Write a value to an attribute by path.
+   * - iioExplorer.triggerRead()
+     - -
+     - Trigger a read on all child items of the selected item.
+
+.. rubric:: Code Generator
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.getGeneratedCode()
+     - -
+     - Get the generated code content.
+   * - iioExplorer.saveGeneratedCode(filePath)
+     - File path
+     - Save the generated code to a file.
+
+.. rubric:: Log
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.getLogContent()
+     - -
+     - Get the log content.
+   * - iioExplorer.clearLog()
+     - -
+     - Clear the log.
+
+.. rubric:: Search/Filter
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.setSearchText(text)
+     - Search string
+     - Set the search/filter text.
+   * - iioExplorer.getSearchText()
+     - -
+     - Get the current search text.
+   * - iioExplorer.getSearchPlaceholderText()
+     - -
+     - Get the search placeholder text.
+   * - iioExplorer.getVisibleItemCount()
+     - -
+     - Get the number of visible items after filtering.
+
+.. rubric:: Details View
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - iioExplorer.setDetailsViewTab(index)
+     - 0-2
+     - Set the details view tab (0=GUI View, 1=IIO View, 2=Generated Code).
+   * - iioExplorer.getDetailsViewTab()
+     - -
+     - Get the current details view tab index.
+
+PQM API
+~~~~~~~~~~~
+
+.. rubric:: Tool Selection
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.getTools()
+     - -
+     - Get list of available tool names.
+
+.. rubric:: RMS Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.isRmsRunning()
+     - -
+     - Check if RMS instrument is running.
+   * - pqm.setRmsRunning(running)
+     - true/false
+     - Start or stop the RMS instrument.
+   * - pqm.rmsSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - pqm.isRmsLoggingEnabled()
+     - -
+     - Check if RMS logging is enabled.
+   * - pqm.setRmsLoggingEnabled(enabled)
+     - true/false
+     - Enable or disable RMS logging.
+   * - pqm.getRmsLogPath()
+     - -
+     - Get the RMS log file path.
+   * - pqm.setRmsLogPath(path)
+     - File path
+     - Set the RMS log file path.
+   * - pqm.resetRmsPqEvents()
+     - -
+     - Reset RMS PQ events.
+   * - pqm.isRmsPqEvents()
+     - -
+     - Check if RMS PQ events are active.
+
+.. rubric:: Harmonics Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.isHarmonicsRunning()
+     - -
+     - Check if Harmonics instrument is running.
+   * - pqm.setHarmonicsRunning(running)
+     - true/false
+     - Start or stop the Harmonics instrument.
+   * - pqm.harmonicsSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - pqm.getHarmonicsActiveChannel()
+     - -
+     - Get the active harmonics channel name.
+   * - pqm.setHarmonicsActiveChannel(channel)
+     - Channel name
+     - Set the active harmonics channel.
+   * - pqm.getHarmonicsType()
+     - -
+     - Get the current harmonics type.
+   * - pqm.setHarmonicsType(type)
+     - "harmonics", "inter_harmonics"
+     - Set the harmonics type.
+   * - pqm.isHarmonicsLoggingEnabled()
+     - -
+     - Check if Harmonics logging is enabled.
+   * - pqm.setHarmonicsLoggingEnabled(enabled)
+     - true/false
+     - Enable or disable Harmonics logging.
+   * - pqm.getHarmonicsLogPath()
+     - -
+     - Get the Harmonics log file path.
+   * - pqm.setHarmonicsLogPath(path)
+     - File path
+     - Set the Harmonics log file path.
+   * - pqm.resetHarmonicsPqEvents()
+     - -
+     - Reset Harmonics PQ events.
+   * - pqm.isHarmonicsPqEvents()
+     - -
+     - Check if Harmonics PQ events are active.
+
+.. rubric:: Waveform Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.isWaveformRunning()
+     - -
+     - Check if Waveform instrument is running.
+   * - pqm.setWaveformRunning(running)
+     - true/false
+     - Start or stop the Waveform instrument.
+   * - pqm.waveformSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - pqm.getWaveformTimespan()
+     - -
+     - Get the current timespan value.
+   * - pqm.setWaveformTimespan(value)
+     - Seconds
+     - Set the timespan value.
+   * - pqm.isWaveformRollingMode()
+     - -
+     - Check if rolling mode is enabled.
+   * - pqm.setWaveformRollingMode(enabled)
+     - true/false
+     - Enable or disable rolling mode.
+   * - pqm.getWaveformTriggeredBy()
+     - -
+     - Get the trigger channel name.
+   * - pqm.setWaveformTriggeredBy(channel)
+     - Channel name
+     - Set the trigger channel.
+   * - pqm.isWaveformLoggingEnabled()
+     - -
+     - Check if Waveform logging is enabled.
+   * - pqm.setWaveformLoggingEnabled(enabled)
+     - true/false
+     - Enable or disable Waveform logging.
+   * - pqm.getWaveformLogPath()
+     - -
+     - Get the Waveform log file path.
+   * - pqm.setWaveformLogPath(path)
+     - File path
+     - Set the Waveform log file path.
+
+.. rubric:: Settings Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.settingsRead()
+     - -
+     - Read settings from device.
+   * - pqm.settingsWrite()
+     - -
+     - Write settings to device.
+   * - pqm.getSettingsAttributeValue(attrName)
+     - Attribute name
+     - Get the value of a settings attribute.
+   * - pqm.setSettingsAttributeValue(attrName, value)
+     - Attribute name, Value
+     - Set the value of a settings attribute.
+
+.. rubric:: Utility
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - pqm.triggerPqEvent(enable)
+     - true/false
+     - Trigger a PQ event (for testing).
+   * - pqm.getLogFilePath()
+     - -
+     - Get the actual log file path.
+
+SWIOT API
+~~~~~~~~~~~
+
+.. rubric:: Tool Selection
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.getTools()
+     - -
+     - Get list of available tool names.
+   * - swiot.isRuntimeMode()
+     - -
+     - Check if device is in runtime mode.
+   * - swiot.switchToConfigMode()
+     - -
+     - Switch from runtime mode to config mode.
+
+.. rubric:: Config Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.getConfigChannelCount()
+     - -
+     - Get number of config channels.
+   * - swiot.applyConfig()
+     - -
+     - Apply the current configuration.
+   * - swiot.setChannelEnabled(channelId, enabled)
+     - Channel ID, true/false
+     - Enable or disable a config channel.
+   * - swiot.isChannelEnabled(channelId)
+     - Channel ID
+     - Check if a config channel is enabled.
+   * - swiot.setChannelDevice(channelId, device)
+     - Channel ID, Device name
+     - Set the device for a config channel.
+   * - swiot.getChannelDevice(channelId)
+     - Channel ID
+     - Get the device name of a config channel.
+   * - swiot.getAvailableDevices(channelId)
+     - Channel ID
+     - Get list of available devices for a channel.
+   * - swiot.setChannelFunction(channelId, function)
+     - Channel ID, Function name
+     - Set the function for a config channel.
+   * - swiot.getChannelFunction(channelId)
+     - Channel ID
+     - Get the function name of a config channel.
+   * - swiot.getAvailableFunctions(channelId)
+     - Channel ID
+     - Get list of available functions for a channel.
+
+.. rubric:: AD74413R Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.isAdRunning()
+     - -
+     - Check if AD74413R instrument is running.
+   * - swiot.setAdRunning(running)
+     - true/false
+     - Start or stop the AD74413R instrument.
+   * - swiot.adSingleShot()
+     - -
+     - Trigger a single shot acquisition.
+   * - swiot.getAdTimespan()
+     - -
+     - Get the current timespan value.
+   * - swiot.setAdTimespan(timespan)
+     - Seconds
+     - Set the timespan value.
+   * - swiot.setAdPlotLabelsEnabled(enabled)
+     - true/false
+     - Enable or disable plot labels.
+   * - swiot.isAdPlotLabelsEnabled()
+     - -
+     - Check if plot labels are enabled.
+   * - swiot.setAdMeasurementsEnabled(enabled)
+     - true/false
+     - Enable or disable measurements.
+   * - swiot.isAdMeasurementsEnabled()
+     - -
+     - Check if measurements are enabled.
+   * - swiot.setAdChannelEnabled(channelId, enabled)
+     - Channel ID, true/false
+     - Enable or disable a channel.
+   * - swiot.isAdChannelEnabled(channelId)
+     - Channel ID
+     - Check if a channel is enabled.
+   * - swiot.setAdChannelSamplingFrequency(channelId, frequency)
+     - Channel ID, Frequency
+     - Set the sampling frequency for a channel.
+   * - swiot.getAdChannelSamplingFrequency(channelId)
+     - Channel ID
+     - Get the sampling frequency of a channel.
+   * - swiot.setAdChannelYMin(channelId, value)
+     - Channel ID, Value
+     - Set the Y axis minimum for a channel.
+   * - swiot.setAdChannelYMax(channelId, value)
+     - Channel ID, Value
+     - Set the Y axis maximum for a channel.
+   * - swiot.getAdChannelYMin(channelId)
+     - Channel ID
+     - Get the Y axis minimum of a channel.
+   * - swiot.getAdChannelYMax(channelId)
+     - Channel ID
+     - Get the Y axis maximum of a channel.
+   * - swiot.getAdChannelCount()
+     - -
+     - Get the number of AD74413R channels.
+   * - swiot.getAdChannelNames()
+     - -
+     - Get list of AD74413R channel names.
+   * - swiot.getAdSampleRate()
+     - -
+     - Get the current sample rate.
+
+.. rubric:: MAX14906 Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.isMaxRunning()
+     - -
+     - Check if MAX14906 instrument is running.
+   * - swiot.setMaxRunning(running)
+     - true/false
+     - Start or stop the MAX14906 instrument.
+   * - swiot.getMaxTimespan()
+     - -
+     - Get the current timespan value.
+   * - swiot.setMaxTimespan(timespan)
+     - Seconds
+     - Set the timespan value.
+   * - swiot.setMaxChannelOutput(channelId, value)
+     - Channel ID, true/false
+     - Set a channel output value.
+   * - swiot.getMaxChannelOutput(channelId)
+     - Channel ID
+     - Get a channel output value.
+   * - swiot.getMaxChannelCount()
+     - -
+     - Get the number of MAX14906 channels.
+   * - swiot.getMaxChannelNames()
+     - -
+     - Get list of MAX14906 channel names.
+   * - swiot.getMaxXAxisMin()
+     - -
+     - Get the X axis minimum value.
+   * - swiot.getMaxXAxisMax()
+     - -
+     - Get the X axis maximum value.
+
+.. rubric:: Faults Instrument
+
+.. list-table::
+   :header-rows: 1
+   :widths: 40 30 70
+
+   * - Command
+     - Values
+     - Description
+   * - swiot.isFaultsRunning()
+     - -
+     - Check if Faults instrument is running.
+   * - swiot.setFaultsRunning(running)
+     - true/false
+     - Start or stop the Faults instrument.
+   * - swiot.faultsSingleShot()
+     - -
+     - Trigger a single shot fault read.
+   * - swiot.resetAdFaultsStored()
+     - -
+     - Reset AD74413R stored faults.
+   * - swiot.resetMaxFaultsStored()
+     - -
+     - Reset MAX14906 stored faults.
+   * - swiot.clearAdFaultsSelection()
+     - -
+     - Clear AD74413R fault bit selection.
+   * - swiot.clearMaxFaultsSelection()
+     - -
+     - Clear MAX14906 fault bit selection.
+   * - swiot.getAdActiveFaultBits()
+     - -
+     - Get list of active AD74413R fault bit indices.
+   * - swiot.getMaxActiveFaultBits()
+     - -
+     - Get list of active MAX14906 fault bit indices.
+   * - swiot.getAdSelectedFaultBits()
+     - -
+     - Get list of selected AD74413R fault bit indices.
+   * - swiot.getMaxSelectedFaultBits()
+     - -
+     - Get list of selected MAX14906 fault bit indices.
+   * - swiot.getAdStoredFaultBits()
+     - -
+     - Get list of stored AD74413R fault bit indices.
+   * - swiot.getMaxStoredFaultBits()
+     - -
+     - Get list of stored MAX14906 fault bit indices.
+   * - swiot.selectAdFaultBit(bitIndex)
+     - Bit index
+     - Select an AD74413R fault bit.
+   * - swiot.selectMaxFaultBit(bitIndex)
+     - Bit index
+     - Select a MAX14906 fault bit.
+   * - swiot.isAdFaultsExplanationEnabled()
+     - -
+     - Check if AD74413R faults explanation is enabled.
+   * - swiot.setAdFaultsExplanationEnabled(enabled)
+     - true/false
+     - Enable or disable AD74413R faults explanation.
+   * - swiot.isMaxFaultsExplanationEnabled()
+     - -
+     - Check if MAX14906 faults explanation is enabled.
+   * - swiot.setMaxFaultsExplanationEnabled(enabled)
+     - true/false
+     - Enable or disable MAX14906 faults explanation.

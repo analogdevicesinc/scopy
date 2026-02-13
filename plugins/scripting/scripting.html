@@ -113,6 +113,9 @@
 <li><a class="reference internal" href="#adalm2000-spectrum-analyzer">ADALM2000: Spectrum Analyzer</a></li>
 <li><a class="reference internal" href="#regmap-api">RegMap API</a></li>
 <li><a class="reference internal" href="#datalogger-api">DataLogger API</a></li>
+<li><a class="reference internal" href="#iio-explorer-debugger-api">IIO Explorer (Debugger) API</a></li>
+<li><a class="reference internal" href="#pqm-api">PQM API</a></li>
+<li><a class="reference internal" href="#swiot-api">SWIOT API</a></li>
 </ul>
 </li>
 </ul>
@@ -1286,6 +1289,1158 @@ Content on this topic
 <tr class="row-even"><td><p>datalogger.importDataFromPathForTool(toolName, path)</p></td>
 <td><p>Tool, Path</p></td>
 <td><p>Import data from file for tool.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="iio-explorer-debugger-api">
+<h3>IIO Explorer (Debugger) API<a class="headerlink" href="#iio-explorer-debugger-api" title="Link to this heading"></a></h3>
+<p class="rubric">Tab Control</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.setCurrentTab(index)</p></td>
+<td><p>0-2</p></td>
+<td><p>Set the current main tab (0=IIO Attributes, 1=Log, 2=Code Generator).</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getCurrentTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current main tab index.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.showIIOAttributesTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch to the IIO Attributes tab.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.showLogTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch to the Log tab.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.showCodeGeneratorTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch to the Code Generator tab.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Tree Navigation</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.selectItemByPath(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Select a tree item by path (e.g., “context0/ad9361-phy/voltage0/hardwaregain”).</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getSelectedItemPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the path of the currently selected item.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.getSelectedItemName()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the name of the currently selected item.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getSelectedItemType()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the type of the currently selected item.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Tree Expand/Collapse</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.expandItem(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Expand a tree item by path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.collapseItem(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Collapse a tree item by path.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.isItemExpanded(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Check if a tree item is expanded.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getChildCount(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Get the number of children for a tree item.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.getChildNames(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Get list of child names for a tree item.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Watchlist</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.addCurrentItemToWatchlist()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Add the currently selected item to the watchlist.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.addItemToWatchlistByPath(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Add a tree item to the watchlist by path.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.removeItemFromWatchlistByPath(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Remove a tree item from the watchlist by path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getWatchlistPaths()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of all watchlist item paths.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.clearWatchlist()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Remove all items from the watchlist.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.refreshWatchlist()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Refresh all watchlist entries.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.writeWatchlistAttributeValue(path, value)</p></td>
+<td><p>Path, Value</p></td>
+<td><p>Write a value to a watchlist attribute.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attribute Values</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.readAttributeValue(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Read the value of an attribute by path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.writeAttributeValue(path, value)</p></td>
+<td><p>Path, Value</p></td>
+<td><p>Write a value to an attribute by path.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.triggerRead()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a read on all child items of the selected item.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Code Generator</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.getGeneratedCode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the generated code content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.saveGeneratedCode(filePath)</p></td>
+<td><p>File path</p></td>
+<td><p>Save the generated code to a file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Log</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.getLogContent()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the log content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.clearLog()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear the log.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Search/Filter</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.setSearchText(text)</p></td>
+<td><p>Search string</p></td>
+<td><p>Set the search/filter text.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getSearchText()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current search text.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.getSearchPlaceholderText()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the search placeholder text.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getVisibleItemCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the number of visible items after filtering.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Details View</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.setDetailsViewTab(index)</p></td>
+<td><p>0-2</p></td>
+<td><p>Set the details view tab (0=GUI View, 1=IIO View, 2=Generated Code).</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getDetailsViewTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current details view tab index.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="pqm-api">
+<h3>PQM API<a class="headerlink" href="#pqm-api" title="Link to this heading"></a></h3>
+<p class="rubric">Tool Selection</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.getTools()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of available tool names.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">RMS Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.isRmsRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if RMS instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setRmsRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the RMS instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.rmsSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isRmsLoggingEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if RMS logging is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setRmsLoggingEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable RMS logging.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getRmsLogPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the RMS log file path.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setRmsLogPath(path)</p></td>
+<td><p>File path</p></td>
+<td><p>Set the RMS log file path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.resetRmsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset RMS PQ events.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.isRmsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if RMS PQ events are active.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Harmonics Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.isHarmonicsRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Harmonics instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setHarmonicsRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the Harmonics instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.harmonicsSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getHarmonicsActiveChannel()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the active harmonics channel name.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsActiveChannel(channel)</p></td>
+<td><p>Channel name</p></td>
+<td><p>Set the active harmonics channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getHarmonicsType()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current harmonics type.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsType(type)</p></td>
+<td><p>“harmonics”, “inter_harmonics”</p></td>
+<td><p>Set the harmonics type.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isHarmonicsLoggingEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Harmonics logging is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsLoggingEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable Harmonics logging.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getHarmonicsLogPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the Harmonics log file path.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsLogPath(path)</p></td>
+<td><p>File path</p></td>
+<td><p>Set the Harmonics log file path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.resetHarmonicsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset Harmonics PQ events.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.isHarmonicsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Harmonics PQ events are active.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Waveform Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.isWaveformRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Waveform instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setWaveformRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the Waveform instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.waveformSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getWaveformTimespan()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current timespan value.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformTimespan(value)</p></td>
+<td><p>Seconds</p></td>
+<td><p>Set the timespan value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isWaveformRollingMode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if rolling mode is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformRollingMode(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable rolling mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getWaveformTriggeredBy()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the trigger channel name.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformTriggeredBy(channel)</p></td>
+<td><p>Channel name</p></td>
+<td><p>Set the trigger channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isWaveformLoggingEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Waveform logging is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformLoggingEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable Waveform logging.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getWaveformLogPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the Waveform log file path.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformLogPath(path)</p></td>
+<td><p>File path</p></td>
+<td><p>Set the Waveform log file path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Settings Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.settingsRead()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Read settings from device.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.settingsWrite()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Write settings to device.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.getSettingsAttributeValue(attrName)</p></td>
+<td><p>Attribute name</p></td>
+<td><p>Get the value of a settings attribute.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setSettingsAttributeValue(attrName, value)</p></td>
+<td><p>Attribute name, Value</p></td>
+<td><p>Set the value of a settings attribute.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Utility</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.triggerPqEvent(enable)</p></td>
+<td><p>true/false</p></td>
+<td><p>Trigger a PQ event (for testing).</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getLogFilePath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the actual log file path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="swiot-api">
+<h3>SWIOT API<a class="headerlink" href="#swiot-api" title="Link to this heading"></a></h3>
+<p class="rubric">Tool Selection</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.getTools()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of available tool names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isRuntimeMode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if device is in runtime mode.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.switchToConfigMode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch from runtime mode to config mode.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Config Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.getConfigChannelCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get number of config channels.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.applyConfig()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Apply the current configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setChannelEnabled(channelId, enabled)</p></td>
+<td><p>Channel ID, true/false</p></td>
+<td><p>Enable or disable a config channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isChannelEnabled(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Check if a config channel is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setChannelDevice(channelId, device)</p></td>
+<td><p>Channel ID, Device name</p></td>
+<td><p>Set the device for a config channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getChannelDevice(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the device name of a config channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAvailableDevices(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get list of available devices for a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setChannelFunction(channelId, function)</p></td>
+<td><p>Channel ID, Function name</p></td>
+<td><p>Set the function for a config channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getChannelFunction(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the function name of a config channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAvailableFunctions(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get list of available functions for a channel.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">AD74413R Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.isAdRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if AD74413R instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the AD74413R instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.adSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdTimespan()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current timespan value.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setAdTimespan(timespan)</p></td>
+<td><p>Seconds</p></td>
+<td><p>Set the timespan value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdPlotLabelsEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable plot labels.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.isAdPlotLabelsEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if plot labels are enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdMeasurementsEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable measurements.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.isAdMeasurementsEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if measurements are enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdChannelEnabled(channelId, enabled)</p></td>
+<td><p>Channel ID, true/false</p></td>
+<td><p>Enable or disable a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.isAdChannelEnabled(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Check if a channel is enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdChannelSamplingFrequency(channelId, frequency)</p></td>
+<td><p>Channel ID, Frequency</p></td>
+<td><p>Set the sampling frequency for a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAdChannelSamplingFrequency(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the sampling frequency of a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdChannelYMin(channelId, value)</p></td>
+<td><p>Channel ID, Value</p></td>
+<td><p>Set the Y axis minimum for a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setAdChannelYMax(channelId, value)</p></td>
+<td><p>Channel ID, Value</p></td>
+<td><p>Set the Y axis maximum for a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdChannelYMin(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the Y axis minimum of a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAdChannelYMax(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the Y axis maximum of a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdChannelCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the number of AD74413R channels.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAdChannelNames()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of AD74413R channel names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdSampleRate()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current sample rate.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">MAX14906 Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.isMaxRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if MAX14906 instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setMaxRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the MAX14906 instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxTimespan()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current timespan value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setMaxTimespan(timespan)</p></td>
+<td><p>Seconds</p></td>
+<td><p>Set the timespan value.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setMaxChannelOutput(channelId, value)</p></td>
+<td><p>Channel ID, true/false</p></td>
+<td><p>Set a channel output value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getMaxChannelOutput(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get a channel output value.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxChannelCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the number of MAX14906 channels.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getMaxChannelNames()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of MAX14906 channel names.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxXAxisMin()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the X axis minimum value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getMaxXAxisMax()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the X axis maximum value.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Faults Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.isFaultsRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Faults instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setFaultsRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the Faults instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.faultsSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot fault read.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.resetAdFaultsStored()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset AD74413R stored faults.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.resetMaxFaultsStored()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset MAX14906 stored faults.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.clearAdFaultsSelection()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear AD74413R fault bit selection.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.clearMaxFaultsSelection()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear MAX14906 fault bit selection.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdActiveFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of active AD74413R fault bit indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxActiveFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of active MAX14906 fault bit indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdSelectedFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of selected AD74413R fault bit indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxSelectedFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of selected MAX14906 fault bit indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdStoredFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of stored AD74413R fault bit indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxStoredFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of stored MAX14906 fault bit indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.selectAdFaultBit(bitIndex)</p></td>
+<td><p>Bit index</p></td>
+<td><p>Select an AD74413R fault bit.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.selectMaxFaultBit(bitIndex)</p></td>
+<td><p>Bit index</p></td>
+<td><p>Select a MAX14906 fault bit.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isAdFaultsExplanationEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if AD74413R faults explanation is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setAdFaultsExplanationEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable AD74413R faults explanation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isMaxFaultsExplanationEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if MAX14906 faults explanation is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setMaxFaultsExplanationEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable MAX14906 faults explanation.</p></td>
 </tr>
 </tbody>
 </table>
