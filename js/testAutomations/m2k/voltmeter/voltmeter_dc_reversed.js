@@ -53,7 +53,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_OPERATION", function() {
 
         // Set ch1 to DC mode, ensure +-25V range
         dmm.mode_ac_ch1 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
         msleep(100);
 
         // V- connected to 1+, so set V- to -3.3V → ch1 reads -3.3V
@@ -72,9 +72,8 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_OPERATION", function() {
             "Ch1 reads V- at -3.3V (reversed wiring)");
         allPass = allPass && pass1;
 
-        // Step 10: Polarity reversal test
-        // With V- connected to 1+, positive voltage from V- rail
-        // V- set to 0V should read ~0V on ch1
+        // Additional validation: verify ch1 reads ~0V when V- is set to 0V
+        // (V- is wired to 1+, so 0V input expected)
         switchToTool("Power Supply");
         power.dac2_value = 0;
         msleep(500);
@@ -109,7 +108,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_2_OPERATION", function() {
         // Set ch2 to DC mode, ensure +-25V range
         switchToTool("Voltmeter");
         dmm.mode_ac_ch2 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
         msleep(100);
 
         // V+ connected to 2+, so set V+ to 3.3V → ch2 reads 3.3V
@@ -150,7 +149,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
         switchToTool("Voltmeter");
         dmm.mode_ac_ch1 = false;
         dmm.mode_ac_ch2 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
         dmm.peak_hold_en = true;
         dmm.running = true;
 
@@ -169,6 +168,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
 
         // Ch1 reads V- → should be ~-2V
         // Ch2 reads V+ → should be ~3V
+        printToConsole("  WARNING: Peak hold value validation requires API additions (peak_min_ch1, peak_max_ch1, etc.). Only enable toggle is verified.");
         let ch1_val = dmm.value_ch1;
         let ch2_val = dmm.value_ch2;
         printToConsole("  Peak hold reversed: Ch1=" + ch1_val + "V, Ch2=" + ch2_val + "V");

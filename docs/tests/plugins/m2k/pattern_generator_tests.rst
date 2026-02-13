@@ -88,7 +88,7 @@ Test 1: Individual Channel Operation
 ..
 
         11. Change frequency: 10 MHz, duty cycle: 70%.
-                - **Expected Result:** You should see a square wave with 10 MHz frequency, 70% duty cycle. In the oscilloscope, Frequency: 1 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 70 %, Duty-: 30%
+                - **Expected Result:** You should see a square wave with 10 MHz frequency, 70% duty cycle. In the oscilloscope, Frequency: 10 MHz, Amplitude: 3.2V to 3.4 V, Duty+: 70 %, Duty-: 30%
                 - **Actual Result:**
 
 ..
@@ -199,7 +199,7 @@ Test 2: Group Channel Operation
         3. Click “Group” and double click on the channel indicators on the plot, DIO 0 to DIO 3
         4. Click “Done”. 
         5. Change pattern to Binary Counter.
-                - **Expected Result:** The plot should show a binary counter from 1 to e. The frequency should be 5 KHz.
+                - **Expected Result:** The plot should show a binary counter from 0 to F. The frequency should be 5 KHz.
                 - **Actual Result:**
 
 ..
@@ -328,7 +328,7 @@ Test 2: Group Channel Operation
         34. Gray Counter
         35. Change pattern to Gray Counter. 
         36. Disable DIO 8.
-                - **Expected Result:** The plot should show a gray counter from 1 to 7. The frequency should be 5 KHz.
+                - **Expected Result:** The plot should show a gray counter from 0 to 7. The frequency should be 5 KHz.
                 - **Actual Result:**
 
 ..

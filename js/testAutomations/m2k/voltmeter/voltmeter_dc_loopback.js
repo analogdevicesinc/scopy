@@ -53,7 +53,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_OPERATION", function() {
 
         // Step 1-2: Set ch1 to DC mode, ensure +-25V range
         dmm.mode_ac_ch1 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range (default may be +-2.5V which clips >2.5V)
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
         msleep(100);
         let pass1 = TestFramework.assertEqual(dmm.mode_ac_ch1, false, "Ch1 DC mode set");
         allPass = allPass && pass1;
@@ -96,7 +96,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_2_OPERATION", function() {
         // Step 1-2: Set ch2 to DC mode, ensure +-25V range
         switchToTool("Voltmeter");
         dmm.mode_ac_ch2 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
         msleep(100);
         let pass1 = TestFramework.assertEqual(dmm.mode_ac_ch2, false, "Ch2 DC mode set");
         allPass = allPass && pass1;
@@ -141,7 +141,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_AND_CHANNEL_2_OPERATION", fun
         switchToTool("Voltmeter");
         dmm.mode_ac_ch1 = false;
         dmm.mode_ac_ch2 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
 
         // Step 2: Set V+=3.3V, V-=-4.5V
         switchToTool("Power Supply");
@@ -165,18 +165,20 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_AND_CHANNEL_2_OPERATION", fun
         // Step 3: Toggle histogram ch1 off, verify readings unchanged
         dmm.histogram_ch1 = false;
         msleep(500);
+        let pass3 = TestFramework.assertEqual(dmm.histogram_ch1, false, "Histogram ch1 disabled");
         m1 = dmm.value_ch1;
-        let pass3 = TestFramework.assertInRange(m1, 3.2, 3.4,
+        let pass3b = TestFramework.assertInRange(m1, 3.2, 3.4,
             "Ch1 reading stable after histogram ch1 off");
-        allPass = allPass && pass3;
+        allPass = allPass && pass3 && pass3b;
 
         // Step 4: Toggle histogram ch2 off, verify readings unchanged
         dmm.histogram_ch2 = false;
         msleep(500);
+        let pass4 = TestFramework.assertEqual(dmm.histogram_ch2, false, "Histogram ch2 disabled");
         m2 = dmm.value_ch2;
-        let pass4 = TestFramework.assertInRange(m2, -4.6, -4.4,
+        let pass4b = TestFramework.assertInRange(m2, -4.6, -4.4,
             "Ch2 reading stable after histogram ch2 off");
-        allPass = allPass && pass4;
+        allPass = allPass && pass4 && pass4b;
 
         // Step 5: Both histograms off, verify readings unchanged
         msleep(500);
@@ -212,7 +214,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
         switchToTool("Voltmeter");
         dmm.mode_ac_ch1 = false;
         dmm.mode_ac_ch2 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range for peak hold tests
+        dmm.gainModes = [1, 1];  // 1 = +-25V range for peak hold tests (0=Auto, 1=+-25V, 2=+-2.5V)
 
         // Step 1: Enable peak hold
         dmm.peak_hold_en = true;
@@ -231,6 +233,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
         msleep(1000);
 
         // Peak hold: ch1 max should be ~2.5V, ch2 min should be ~-3V
+        printToConsole("  WARNING: Peak hold value validation requires API additions (peak_min_ch1, peak_max_ch1, etc.). Only enable toggle is verified.");
         printToConsole("  Peak hold with V+=2.5V, V-=-3V");
         let ch1_val = dmm.value_ch1;
         let ch2_val = dmm.value_ch2;
@@ -269,8 +272,8 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
         switchToTool("Voltmeter");
         // Set range to +-25V (gain mode index for +-25V range)
         // gainModes is QVector<int>, index 0=ch1, index 1=ch2
-        // 0 = +-25V range, 1 = +-2.5V range
-        dmm.gainModes = [0, 0];
+        // 0 = Auto, 1 = +-25V range, 2 = +-2.5V range
+        dmm.gainModes = [1, 1];
         dmm.running = true;
         msleep(1000);
 
@@ -283,10 +286,21 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
         allPass = allPass && pass2 && pass3;
 
         // Step 6: Switch to +-2.5V range without disabling - out of range expected
-        dmm.gainModes = [1, 1];
+        dmm.gainModes = [2, 2];
         msleep(1000);
-        printToConsole("  Switched to +-2.5V range with 3.3V input (out of range expected)");
-        // NOTE: Out of range behavior depends on hardware - just verify no crash
+        // Read out-of-range values: hardware continues measuring beyond selected range
+        // Range setting affects precision, not measurement limits
+        m1 = dmm.value_ch1;
+        m2 = dmm.value_ch2;
+        printToConsole("  Out-of-range test: 3.3V input with +-2.5V range");
+        printToConsole("    Ch1: " + m1 + "V, Ch2: " + m2 + "V");
+        printToConsole("    (Hardware measures beyond range - affects precision, not limits)");
+        // Verify values are still measured (no saturation, no error)
+        let pass_oor1 = TestFramework.assertInRange(m1, 2.8, 3.5,
+            "Ch1 measures 3.3V even with +-2.5V range selected");
+        let pass_oor2 = TestFramework.assertInRange(m2, -3.5, -2.8,
+            "Ch2 measures -3.3V even with +-2.5V range selected");
+        allPass = allPass && pass_oor1 && pass_oor2;
 
         // Step 7: With +-2.5V range, set V+=100mV, V-=-100mV
         switchToTool("Power Supply");
@@ -307,7 +321,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.ADDITIONAL_FEATURES", function() {
         allPass = allPass && pass4 && pass5;
 
         // Step 8: Switch back to +-25V range
-        dmm.gainModes = [0, 0];
+        dmm.gainModes = [1, 1];
         msleep(1000);
         m1 = dmm.value_ch1;
         let pass6 = TestFramework.assertInRange(m1, 0.05, 0.15,

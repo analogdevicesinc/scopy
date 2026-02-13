@@ -55,7 +55,7 @@ if (!switchToTool("Power Supply")) {
 switchToTool("Voltmeter");
 dmm.mode_ac_ch1 = false;
 dmm.mode_ac_ch2 = false;
-dmm.gainModes = [0, 0];
+dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
 switchToTool("Power Supply");
 
 // Helper: read voltage from voltmeter channel (1 or 2)
