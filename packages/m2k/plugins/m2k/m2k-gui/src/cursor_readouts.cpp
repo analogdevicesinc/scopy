@@ -62,6 +62,14 @@ CursorReadouts::CursorReadouts(QwtPlot *plot)
 
 CursorReadouts::~CursorReadouts()
 {
+	// Remove event filter to prevent use-after-free
+	if(parent()) {
+		QwtPlot *parentPlot = qobject_cast<QwtPlot *>(parent());
+		if(parentPlot && parentPlot->canvas()) {
+			parentPlot->canvas()->removeEventFilter(this);
+		}
+	}
+
 	delete anim;
 	delete anim2;
 	delete ui;
@@ -216,7 +224,13 @@ void CursorReadouts::setAxis(QwtAxisId hAxis, QwtAxisId vAxis)
 
 bool CursorReadouts::eventFilter(QObject *object, QEvent *event)
 {
-	if(object == plot()->canvas()) {
+	// Check if parent plot still exists to prevent use-after-free
+	QwtPlot *parentPlot = qobject_cast<QwtPlot *>(parent());
+	if(!parentPlot) {
+		return QObject::eventFilter(object, event);
+	}
+
+	if(object == parentPlot->canvas()) {
 		switch(event->type()) {
 		case QEvent::Resize: {
 			updateSizeAndPosition(true);
@@ -234,8 +248,13 @@ bool CursorReadouts::eventFilter(QObject *object, QEvent *event)
 
 QPoint CursorReadouts::plotPointToPixelPoint(const QPointF &point) const
 {
-	const QwtScaleMap xMap = plot()->canvasMap(hAxis);
-	const QwtScaleMap yMap = plot()->canvasMap(vAxis);
+	const QwtPlot *parentPlot = plot();
+	if(!parentPlot) {
+		return QPoint();
+	}
+
+	const QwtScaleMap xMap = parentPlot->canvasMap(hAxis);
+	const QwtScaleMap yMap = parentPlot->canvasMap(vAxis);
 
 	return QwtScaleMap::transform(xMap, yMap, point).toPoint();
 }
@@ -313,7 +332,11 @@ void CursorReadouts::moveTopRight(bool resize)
 		return;
 
 	d_topLeft.setY(8);
-	d_topLeft.setX(plot()->canvas()->width() - 8);
+	const QwtPlot *parentPlot = plot();
+	if(!parentPlot || !parentPlot->canvas()) {
+		return;
+	}
+	d_topLeft.setX(parentPlot->canvas()->width() - 8);
 
 	QRect timeRect, voltageRect;
 
@@ -357,7 +380,11 @@ void CursorReadouts::moveBottomLeft(bool resize)
 
 	QRect timeRect, voltageRect;
 
-	int value = plot()->canvas()->height() - 8;
+	const QwtPlot *parentPlot = plot();
+	if(!parentPlot || !parentPlot->canvas()) {
+		return;
+	}
+	int value = parentPlot->canvas()->height() - 8;
 	d_topLeft.setY(value);
 	d_topLeft.setX(8);
 
@@ -411,8 +438,12 @@ void CursorReadouts::moveBottomRight(bool resize)
 
 	QRect timeRect, voltageRect;
 
-	d_topLeft.setY(plot()->canvas()->height() - 8);
-	d_topLeft.setX(plot()->canvas()->width() - 8);
+	const QwtPlot *parentPlot = plot();
+	if(!parentPlot || !parentPlot->canvas()) {
+		return;
+	}
+	d_topLeft.setY(parentPlot->canvas()->height() - 8);
+	d_topLeft.setX(parentPlot->canvas()->width() - 8);
 
 	if(freq_delta_visible) {
 		if(d_time_rd_visible && !d_voltage_rd_visible) {

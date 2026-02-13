@@ -58,6 +58,8 @@ SymbolController::SymbolController(QwtPlot *plot)
 
 SymbolController::~SymbolController()
 {
+	// Ensure event filter is removed to prevent use-after-free
+	setEnabled(false);
 	// d_overlay gets destroyed with parent
 }
 
@@ -107,9 +109,9 @@ void SymbolController::updateOverlay() { d_overlay->updateOverlay(); }
 
 bool SymbolController::eventFilter(QObject *object, QEvent *event)
 {
-	QwtPlot *plot = static_cast<QwtPlot *>(parent());
+	QwtPlot *plot = qobject_cast<QwtPlot *>(parent());
 
-	if(plot && object == plot->canvas()) {
+	if(plot && plot->canvas() && object == plot->canvas()) {
 		switch(event->type()) {
 		case QEvent::MouseButtonPress: {
 			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);

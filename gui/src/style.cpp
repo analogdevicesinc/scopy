@@ -45,6 +45,7 @@ Style *Style::pinstance_{nullptr};
 QJsonDocument *Style::m_global_json{new QJsonDocument()};
 QJsonDocument *Style::m_theme_json{new QJsonDocument()};
 QMap<QString, QString> *Style::m_styleMap{new QMap<QString, QString>()};
+QMap<QString, QByteArray> *Style::m_replacedProperties{new QMap<QString, QByteArray>()};
 QFileInfoList Style::m_pkgThemes{};
 QFileInfoList Style::m_pkgQss{};
 
@@ -60,7 +61,12 @@ Style::Style(QObject *parent)
 	initPaths();
 }
 
-Style::~Style() {}
+Style::~Style()
+{
+	if(m_replacedProperties) {
+		m_replacedProperties->clear();
+	}
+}
 
 Style *Style::GetInstance()
 {
@@ -191,6 +197,11 @@ bool Style::setTheme(QString themePath, float fontScale)
 
 		m_theme_json = new QJsonDocument(QJsonDocument::fromJson(theme_data));
 
+		// Clear the replaced properties cache when theme changes
+		if(m_replacedProperties) {
+			m_replacedProperties->clear();
+		}
+
 		adjustJsonForScaling(fontScale);
 		generateStyle();
 		QIcon::setThemeName(getAttribute(json::theme::icon_theme_folder));
@@ -320,11 +331,20 @@ int Style::getDimension(const char *key)
 
 const char *Style::replaceProperty(const char *prop)
 {
+	QString propStr(prop);
+
+	// Check if we already have this property cached
+	if(m_replacedProperties->contains(propStr)) {
+		return m_replacedProperties->value(propStr).constData();
+	}
+
+	// Check if this property needs replacement
 	for(const QString &key : m_theme_json->object().keys()) {
 		if(prop == key) {
 			QJsonValue value = m_theme_json->object().value(key);
-			prop = strdup(value.toString().toLocal8Bit().data());
-			return prop;
+			// Store the replaced value in our map to avoid memory leak
+			(*m_replacedProperties)[propStr] = value.toString().toLocal8Bit();
+			return m_replacedProperties->value(propStr).constData();
 		}
 	}
 
@@ -361,12 +381,12 @@ void Style::generateStyle()
 {
 	QFileInfoList qssList = getQssList(m_qssFolderPath);
 	qssList.append(m_pkgQss);
-	QFile *file;
 	for(const QFileInfo &fInfo : qAsConst(qssList)) {
-		file = new QFile(fInfo.filePath());
-		file->open(QIODevice::ReadOnly);
-		QString data = QString(file->readAll());
-		m_styleMap->insert(fInfo.baseName(), replaceAttributes(data));
+		QFile file(fInfo.filePath());
+		if(file.open(QIODevice::ReadOnly)) {
+			QString data = QString(file.readAll());
+			m_styleMap->insert(fInfo.baseName(), replaceAttributes(data));
+		}
 	}
 	setGlobalStyle();
 }

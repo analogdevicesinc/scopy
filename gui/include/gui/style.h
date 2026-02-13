@@ -116,6 +116,7 @@ private:
 	static QJsonDocument *m_global_json;
 	static QJsonDocument *m_theme_json;
 	static QMap<QString, QString> *m_styleMap;
+	static QMap<QString, QByteArray> *m_replacedProperties;
 	QString m_globalJsonPath;
 	QString m_themeJsonPath;
 	QString m_qssGlobalFile;
