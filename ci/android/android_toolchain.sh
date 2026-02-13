@@ -174,6 +174,8 @@ set_cmake_opts(){
 		-DCMAKE_STRIP="${TOOLCHAIN_BIN}/llvm-strip" \
 		-DCMAKE_SYSTEM_NAME="Android" \
 		-DCMAKE_SYSTEM_VERSION="$API" \
+		-DCMAKE_C_FLAGS="${CFLAGS}" \
+		-DCMAKE_CXX_FLAGS="${CPPFLAGS}" \
 		-DQT_ANDROID=ON \
 		-DQT_DIR="${QT_LOCATION}" \
 		-DQt5_DIR="${QT_LOCATION}" \

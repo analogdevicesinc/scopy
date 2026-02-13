@@ -13,7 +13,8 @@ Remove the comment if you do not require these default permissions. -->
   <!-- %%INSERT_PERMISSIONS -->
   <uses-permission android:name="android.permission.CLEAR_APP_USER_DATA" />
   <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.DELETE_CACHE_FILES" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -36,7 +37,6 @@ Remove the comment if you do not require these default permissions. -->
 
   <application
     android:name="org.adi.scopy.ScopyApplication"
-    android:extractNativeLibs="true"
     android:hardwareAccelerated="true"
     android:icon="@drawable/icon"
     android:label="Scopy">
@@ -156,37 +156,7 @@ are done populating your window with content. -->
       <meta-data
         android:name="android.app.extract_android_style"
         android:value="none" />
-      <meta-data
-        android:name="android.app.use_local_qt_libs"
-        android:value="1" />
       <!-- extract android style -->
-      <meta-data
-        android:name="android.app.splash_screen_drawable"
-        android:resource="@drawable/splashscreen" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable_portrait"
-        android:resource="@drawable/splashscreen_port" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable_landscape"
-        android:resource="@drawable/splashscreen_land" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable"
-        android:resource="@drawable/splashscreen" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable_portrait"
-        android:resource="@drawable/splashscreen_port" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable_landscape"
-        android:resource="@drawable/splashscreen_land" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable"
-        android:resource="@drawable/splashscreen" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable_portrait"
-        android:resource="@drawable/splashscreen_port" />
-      <meta-data
-        android:name="android.app.splash_screen_drawable_landscape"
-        android:resource="@drawable/splashscreen_land" />
       <meta-data
         android:name="android.app.splash_screen_drawable"
         android:resource="@drawable/splashscreen" />

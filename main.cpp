@@ -161,11 +161,6 @@ int main(int argc, char *argv[])
 	printRuntimeEnvironmentInfo();
 	printEnv();
 
-	qDebug()<<"-=-== __ANDROID__ :"<< __ANDROID__;
-	qDebug()<<"-=-== __ANDROID_API__ :"<< __ANDROID_API__;
-	qDebug()<<"-=-== __ANDROID_NDK__ :"<< __ANDROID_NDK__;
-	qDebug()<<"-=-== __linux__ :"<< __linux__;
-
 	//initLogging();
 	CrashReport::initSignalHandler();
 	#ifdef  __ANDROID__
