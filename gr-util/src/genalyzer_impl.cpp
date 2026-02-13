@@ -190,6 +190,12 @@ GenalyzerConfig genalyzer_fft_vii_impl::get_config() const { return d_genalyzer_
 
 void genalyzer_fft_vii_impl::clear_analysis_results()
 {
+	if(d_analysis->rkeys) {
+		free_analysis_keys(d_analysis->rkeys, d_analysis->results_size);
+	}
+	if(d_analysis->rvalues) {
+		free(d_analysis->rvalues);
+	}
 	d_analysis->results_size = 0;
 	d_analysis->rkeys = nullptr;
 	d_analysis->rvalues = nullptr;
@@ -462,7 +468,7 @@ void genalyzer_fft_vii_impl::perform_fixed_tone_analysis()
 	if(err_code != 0) {
 		GR_LOG_ERROR(d_logger, "gn_fft_analysis failed: " + std::to_string(err_code));
 		logger.warn("gn_fft_analysis failed: {}", std::to_string(err_code));
-		free(rkeys);
+		free_analysis_keys(rkeys, results_size);
 		free(rvalues);
 		clear_analysis_results();
 	} else {
