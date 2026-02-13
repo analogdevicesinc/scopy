@@ -44,3 +44,5 @@ void DockWrapper::init()
 }
 
 void DockWrapper::setActivated(bool isActivated) { setVisible(isActivated); }
+
+#include "moc_dockwrapperclassic.cpp"

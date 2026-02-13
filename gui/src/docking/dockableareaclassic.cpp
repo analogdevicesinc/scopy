@@ -74,3 +74,5 @@ void DockableArea::init(Direction direction)
 	layout()->setContentsMargins(0, 0, 0, 0);
 	m_isInitialized = true;
 }
+
+#include "moc_dockableareaclassic.cpp"

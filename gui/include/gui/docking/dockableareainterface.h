@@ -25,6 +25,8 @@
 #include "scopy-gui_export.h"
 #include <QObject>
 
+class QWidget;
+
 namespace scopy {
 class SCOPY_GUI_EXPORT DockableAreaInterface
 {
@@ -39,6 +41,7 @@ public:
 
 	virtual ~DockableAreaInterface() = default;
 	virtual void addDockWrapper(DockWrapperInterface *, Direction = Direction_RIGHT) = 0;
+	virtual QWidget *asWidget() = 0;
 };
 } // namespace scopy
 

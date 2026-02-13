@@ -50,7 +50,7 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	tool->setLeftContainerWidth(240);
 
 	m_dockableArea = createDockableArea(this);
-	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	QWidget *dockableAreaWidget = m_dockableArea->asWidget();
 	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 
 	DockWrapperInterface *panelWrapper = createDockWrapper("Measurements");
