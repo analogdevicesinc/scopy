@@ -56,7 +56,7 @@ MonitorPlot::MonitorPlot(QString name, uint32_t uuid, QWidget *parent)
 	});
 
 	m_dockableArea = createDockableArea(this);
-	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	QWidget *dockableAreaWidget = m_dockableArea->asWidget();
 	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 	layout->addWidget(dockableAreaWidget);
 

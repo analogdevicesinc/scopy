@@ -142,6 +142,10 @@ target_include_directories(
 	${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS}
 			       ${Boost_INCLUDE_DIRS}
 )
+# Link optional libraries
+if(KDDockWidgets_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
+endif()
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -153,11 +157,6 @@ target_link_libraries(
 	       scopy-common
 	       scopy-pluginbase
 )
-
-# Link optional libraries
-if(KDDockWidgets_FOUND)
-	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
-endif()
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}

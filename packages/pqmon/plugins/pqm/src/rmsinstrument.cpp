@@ -70,7 +70,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/rms.html"));
 	});
 
-	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	QWidget *dockableAreaWidget = m_dockableArea->asWidget();
 	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 
 	m_voltageDockWrapper = createDockWrapper("Voltage Plot");
