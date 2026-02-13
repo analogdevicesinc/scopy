@@ -69,19 +69,13 @@ public class ScopyActivity extends QtActivity {
   private WakeLock wakeLock;
 
   public static native void saveSessionJavaHelper();
-
   public static native void saveAndStopRunningToolsJNI();
-
   public static native void saveAndStopRunningInputToolsJNI();
 
   public static native void restoreRunningToolsJNI();
-
   public static native int nrOfToolsSavedJNI();
-
   public static native int nrOfToolsRunningJNI();
-
   public static native boolean hasCtxJNI();
-
   private void createNotificationChannel() {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
