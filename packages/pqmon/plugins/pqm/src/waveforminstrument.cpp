@@ -77,7 +77,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/pqm/waveform.html"));
 	});
 
-	QWidget *dockableAreaWidget = dynamic_cast<QWidget *>(m_dockableArea);
+	QWidget *dockableAreaWidget = m_dockableArea->asWidget();
 	Style::setBackgroundColor(dockableAreaWidget, json::theme::background_subtle, true);
 	tool->addWidgetToCentralContainerHelper(dockableAreaWidget);
 

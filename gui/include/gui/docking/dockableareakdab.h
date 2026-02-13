@@ -40,6 +40,7 @@ public:
 	~DockableArea() override = default;
 
 	void addDockWrapper(DockWrapperInterface *wrapper, Direction direction = Direction_RIGHT) override;
+	QWidget* asWidget() override { return this; }
 
 private:
 	KDDockWidgets::Location translateLocation(Direction direction);

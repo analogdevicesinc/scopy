@@ -289,11 +289,6 @@ if(KF5Archive_FOUND)
 	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
 endif()
 
-# Link optional libraries
-if(KDDockWidgets_FOUND)
-	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
-endif()
-
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 
