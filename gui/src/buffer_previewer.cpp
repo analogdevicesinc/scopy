@@ -50,11 +50,15 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget 
 	, m_leftGateWidth(0)
 	, m_rightGateWidth(0)
 	, m_cursorVisible(true)
-{
-	m_wavePoints = new QPointF();
-}
+	, m_wavePoints(nullptr)
+{}
 
-BufferPreviewer::~BufferPreviewer() { delete m_wavePoints; }
+BufferPreviewer::~BufferPreviewer()
+{
+	if(m_wavePoints) {
+		delete[] m_wavePoints;
+	}
+}
 
 double BufferPreviewer::waveformPos() const { return m_waveformPos; }
 
@@ -157,6 +161,11 @@ void BufferPreviewer::setCursorVisible(bool visible)
 
 void BufferPreviewer::drawBufferWave(QPainter *p, int start, int width, int widget_width)
 {
+
+	if(m_wavePoints == nullptr) {
+		return;
+	}
+
 	if(pixelsPerPeriod() >= widget_width) {
 		p->drawPolyline(m_wavePoints + start, width);
 		return;
@@ -338,6 +347,10 @@ AnalogBufferPreviewer::AnalogBufferPreviewer(int pixelsPerPeriod, double wavePha
 
 void AnalogBufferPreviewer::buildFullWaveform()
 {
+	if(m_wavePoints) {
+		delete[] m_wavePoints;
+	}
+
 	m_wavePoints = new QPointF[pixelsPerPeriod()];
 	int middle = contentsRect().height() / 2;
 	int amplitude = middle - verticalSpacing() / 2;
@@ -368,6 +381,10 @@ double DigitalBufferPreviewer::noOfSteps() { return m_noOfSteps; }
 
 void DigitalBufferPreviewer::buildFullWaveform()
 {
+	if(m_wavePoints) {
+		delete[] m_wavePoints;
+	}
+
 	m_wavePoints = new QPointF[pixelsPerPeriod()];
 	for(int i = 0; i < pixelsPerPeriod(); i++) {
 		qreal y;
