@@ -52,7 +52,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_OPERATION", function() {
 
         // Set ch1 to DC mode, ensure +-25V range
         dmm.mode_ac_ch1 = false;
-        dmm.gainModes = [0, 0];  // 0 = +-25V range
+        dmm.gainModes = [1, 1];  // 1 = +-25V range (0=Auto, 1=+-25V, 2=+-2.5V)
         msleep(100);
 
         // Steps 7-8: V+=5V, V-=-5V → ch1 reads ~10V differential
@@ -86,7 +86,7 @@ TestFramework.runTest("TST.M2K.VOLTMETER.CHANNEL_1_OPERATION", function() {
 
         measured = dmm.value_ch1;
         // With both at 0V: differential should be ~0V
-        let pass2 = TestFramework.assertInRange(measured, -0.5, 0.5,
+        let pass2 = TestFramework.assertInRange(measured, -0.15, 0.15,
             "Ch1 differential: V+(0V) - V-(0V) = ~0V");
         allPass = allPass && pass2;
 
