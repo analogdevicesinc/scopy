@@ -61,36 +61,60 @@ function parseNewlineSeparatedString(str) {
     });
 }
 
-// Helper function to check if file exists
-// NOTE: scopy.runShellCommand() doesn't exist - returning stub values
-function fileExists(path) {
-    // Cannot check file existence without shell access
-    // Assuming file exists if no exceptions were thrown during creation
-    return true;
+// Helper function to check if file exists and has data
+function fileExistsAndHasData(path) {
+    try {
+        var content = fileIO.readAll(path);
+        if (!content || content.length === 0) {
+            return false;
+        }
+
+        // For CSV files, verify we have at least header + one data row
+        var lines = content.split('\n').filter(function (line) {
+            return line.trim().length > 0;
+        });
+
+        return lines.length >= 2; // At least header + 1 data row
+    } catch (e) {
+        return false;
+    }
 }
 
-// Helper function to get file size
-// NOTE: scopy.runShellCommand() doesn't exist - returning stub values
+// Helper function to check if file exists and is not empty
+function fileExists(path) {
+    try {
+        var content = fileIO.readAll(path);
+        return content && content.length > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
+// Helper function to get file size (in characters, not bytes)
 function getFileSize(path) {
-    // Cannot get file size without shell access
-    // Return a positive value to indicate assumed success
-    return 100; // Stub value
+    try {
+        var content = fileIO.readAll(path);
+        return content ? content.length : 0;
+    } catch (e) {
+        return 0;
+    }
 }
 
 // Helper function to read first N lines of file
-// NOTE: scopy.runShellCommand() doesn't exist - returning stub values
 function readFileLines(path, n) {
-    // Cannot read file content without shell access
-    // Return dummy CSV data for validation
-    return "Time,Value\n1,1.0\n2,2.0";
-}
+    try {
+        var content = fileIO.readAll(path);
+        if (!content) return "";
 
-// Helper function to delete test file
-// NOTE: scopy.runShellCommand() doesn't exist - returning stub values
-function deleteTestFile(path) {
-    // Cannot delete files without shell access
-    // Return true to continue test flow
-    return true;
+        var lines = content.split('\n');
+        var result = [];
+        for (var i = 0; i < Math.min(n, lines.length); i++) {
+            result.push(lines[i]);
+        }
+        return result.join('\n');
+    } catch (e) {
+        return "";
+    }
 }
 
 // Helper function to validate CSV format
@@ -99,7 +123,7 @@ function isValidCSV(content) {
         return false;
     }
 
-    let lines = content.split('\n').filter(function(line) {
+    let lines = content.split('\n').filter(function (line) {
         return line.trim().length > 0;
     });
 
@@ -240,7 +264,7 @@ TestFramework.runTest("TST.DATALOGGER.RUN_STOP_DATA_LOGGING", function () {
         msleep(2000);
 
         // Verify running state by attempting to log data
-        let testPath = "/tmp/start_stop_test.csv";
+        let testPath = fileIO.getTempPath() + "/start_stop_test.csv";
         try {
             datalogger.logAtPathForTool(toolName, testPath);
             msleep(500);
@@ -331,7 +355,7 @@ TestFramework.runTest("TST.DATALOGGER.SAVE_COLLECTED_DATA_TO_FILE", function () 
         // Setup for logging
         let toolName = "Data Logger ";
         scopy.switchTool(toolName);
-        let logPath = "/tmp/datalogger_test_single.csv";
+        let logPath = fileIO.getTempPath() + "/datalogger_test_single.csv";
 
         printToConsole("  Single-shot logging to: " + logPath);
 
@@ -356,14 +380,17 @@ TestFramework.runTest("TST.DATALOGGER.SAVE_COLLECTED_DATA_TO_FILE", function () 
             datalogger.logAtPathForTool(toolName, logPath);
             msleep(2000);
 
-            printToConsole("  ✓ Single-shot log command executed");
-            printToConsole("  ✓ File kept at " + logPath + " for import test");
-
             // Stop data acquisition
             datalogger.setRunning(false);
 
-            // NOTE: Not deleting file - will be used by Test 19 (IMPORT_DATA)
-            return true;
+            // Verify the file was created and contains data
+            if (fileExistsAndHasData(logPath)) {
+                printToConsole("  ✓ Verified file exists and contains data");
+                return true;
+            } else {
+                printToConsole("  ✗ File is missing or empty");
+                return false;
+            }
 
         } catch (e) {
             printToConsole("  Error during logging: " + e);
@@ -390,7 +417,7 @@ TestFramework.runTest("TST.DATALOGGER.ENABLE_LIVE_DATA_LOGGING", function () {
         // Setup for logging
         let toolName = "Data Logger ";
         scopy.switchTool(toolName);
-        let logPath = "/tmp/datalogger_test_continuous.csv";
+        let logPath = fileIO.getTempPath() + "/datalogger_test_continuous.csv";
 
         printToConsole("  Starting continuous logging to: " + logPath);
 
@@ -422,7 +449,14 @@ TestFramework.runTest("TST.DATALOGGER.ENABLE_LIVE_DATA_LOGGING", function () {
             msleep(500);
             printToConsole("  ✓ Stopped continuous logging");
 
-            return true;
+            // Verify the file was created and contains data
+            if (fileExistsAndHasData(logPath)) {
+                printToConsole("  ✓ Verified file exists and contains data");
+                return true;
+            } else {
+                printToConsole("  ✗ File is missing or empty");
+                return false;
+            }
 
         } catch (e) {
             printToConsole("  Error during logging: " + e);
@@ -465,25 +499,41 @@ TestFramework.runTest("TST.DATALOGGER.CLEAR_COLLECTED_DATA", function () {
         datalogger.setRunning(false);
 
         // Log data before clear to verify we have data
-        let beforePath = "/tmp/clear_test_before.csv";
+        let beforePath = fileIO.getTempPath() + "/clear_test_before.csv";
         datalogger.logAtPathForTool(toolName, beforePath);
         msleep(500);
-        printToConsole("  ✓ Logged data before clear");
+
+        // Verify the file was created and contains data
+        if (fileExistsAndHasData(beforePath)) {
+            printToConsole("  ✓ Verified file exists and contains data");
+
+        } else {
+            printToConsole("  ✗ File is missing or empty");
+            return false;
+        }
+
 
         // Clear accumulated data
         datalogger.clearData();
         printToConsole("  ✓ Cleared data");
 
-        // Start collecting again briefly to get minimal data
+        // Start collecting again to verify data collection works after clear
         datalogger.setRunning(true);
-        msleep(500);  // Very brief collection
+        msleep(3000);  // Collect enough data to verify clear worked
         datalogger.setRunning(false);
 
         // Try to log after clear - should have minimal data
-        let afterPath = "/tmp/clear_test_after.csv";
+        let afterPath = fileIO.getTempPath() + "/clear_test_after.csv";
         datalogger.logAtPathForTool(toolName, afterPath);
         msleep(500);
-        printToConsole("  ✓ Logged data after clear");
+         // Verify the file was created and contains data
+        if (fileExistsAndHasData(afterPath)) {
+            printToConsole("  ✓ Verified file exists and contains data");
+
+        } else {
+            printToConsole("  ✗ File is missing or empty");
+            return false;
+        }
 
         printToConsole("  ✓ Clear data functionality tested");
         return true;
@@ -528,7 +578,7 @@ TestFramework.runTest("TST.DATALOGGER.CLEAR_DATA_WHILE_RUNNING", function () {
         printToConsole("  ✓ Data logger stopped successfully after clear");
 
         // Verify data collection resumed by logging
-        let verifyPath = "/tmp/clear_while_running_verify.csv";
+        let verifyPath = fileIO.getTempPath() + "/clear_while_running_verify.csv";
         datalogger.logAtPathForTool(toolName, verifyPath);
         msleep(500);
         printToConsole("  ✓ Data collection resumed after clear (logged to " + verifyPath + ")");
@@ -573,7 +623,7 @@ TestFramework.runTest("TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION", function
             try {
                 datalogger.changePrecision(decimals);
                 printToConsole("  ✓ Set precision to " + decimals + " decimals");
-                msleep(200);
+                msleep(500);
             } catch (e) {
                 printToConsole("  ✗ Failed to set precision to " + decimals + ": " + e);
                 allPass = false;
@@ -587,23 +637,29 @@ TestFramework.runTest("TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION", function
 });
 
 // Test 18: Set Y-Axis Minimum and Maximum Values (Doc Test 18)
+// NOTE: Skipped - Requires UI observation. No API methods to verify Y-axis values.
 
 TestFramework.runTest("TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES", function () {
     try {
+        printToConsole("  ⚠ Test requires UI observation - no API getters for Y-axis values");
+        printToConsole("  Manual verification needed:");
+        printToConsole("    1. Check Y-axis displays range -10 to 10");
+        printToConsole("    2. Check Y-axis displays range 0 to 5");
+
         // Test setting negative to positive range
         datalogger.setMinYAxis(-10);
         datalogger.setMaxYAxis(10);
-        printToConsole("  ✓ Set Y-axis range: -10 to 10");
+        printToConsole("  ✓ Set Y-axis range: -10 to 10 (verify visually)");
         msleep(500);
 
         // Test setting positive range only
         datalogger.setMinYAxis(0);
         datalogger.setMaxYAxis(5);
-        printToConsole("  ✓ Set Y-axis range: 0 to 5");
+        printToConsole("  ✓ Set Y-axis range: 0 to 5 (verify visually)");
         msleep(500);
 
-        // If no exceptions, settings were applied
-        return true;
+        // Skip test - requires UI observation
+        return "SKIP";
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -616,7 +672,7 @@ TestFramework.runTest("TST.DATALOGGER.IMPORT_DATA_FROM_FILE", function () {
     try {
         let toolName = "Data Logger ";
         // Use the file created by Test 7 (SINGLE_LOG)
-        let importPath = "/tmp/datalogger_test_single.csv";
+        let importPath = fileIO.getTempPath() + "/datalogger_test_single.csv";
 
         printToConsole("  Using file from Test 7: " + importPath);
         printToConsole("  Note: This test validates both export (Test 7) and import functionality");
@@ -632,7 +688,7 @@ TestFramework.runTest("TST.DATALOGGER.IMPORT_DATA_FROM_FILE", function () {
             msleep(1000);
 
             // Verify import worked by exporting and checking
-            let verifyPath = "/tmp/datalogger_import_verify.csv";
+            let verifyPath = fileIO.getTempPath() + "/datalogger_import_verify.csv";
             datalogger.logAtPathForTool(toolName, verifyPath);
             msleep(500);
 
@@ -798,24 +854,19 @@ TestFramework.runTest("TST.DATALOGGER.SETTINGS_CHANGE_DATA_LOGGER_TOOL_NAME", fu
 });
 
 // Test 32: Set Maximum Channel Data Storage (Doc Test 32)
+// NOTE: Skipped - scopy.getPreference() returns QPair which is not exposed to JavaScript
 TestFramework.runTest("TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE", function () {
     try {
-        // Test setting max data storage preference
+        printToConsole("  ⚠ Test skipped - scopy.getPreference() returns QPair<QString,QVariant>");
+        printToConsole("  JavaScript cannot handle QPair return type");
+        printToConsole("  Preference can be set but not verified programmatically");
+
+        // Can still set the preference, just can't verify it
         let testValue = "1 Mb";
         scopy.setPreference("dataloggerplugin_data_storage_size", testValue);
-        msleep(500);
+        printToConsole("  ✓ Preference set (cannot verify)");
 
-        let result = scopy.getPreference("dataloggerplugin_data_storage_size");
-        printToConsole("  Set max storage to: " + result.second);
-
-        if (result.second === testValue) {
-            printToConsole("  ✓ Max data storage preference set correctly");
-            return true;
-        } else {
-            printToConsole("  ✗ Expected '" + testValue + "' but got '" + result.second + "'");
-            return false;
-        }
-
+        return "SKIP";
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -823,24 +874,19 @@ TestFramework.runTest("TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE", functio
 });
 
 // Test 33: Set Data Logger Read Interval (Doc Test 33)
+// NOTE: Skipped - scopy.getPreference() returns QPair which is not exposed to JavaScript
 TestFramework.runTest("TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL", function () {
     try {
-        // Test setting read interval preference
+        printToConsole("  ⚠ Test skipped - scopy.getPreference() returns QPair<QString,QVariant>");
+        printToConsole("  JavaScript cannot handle QPair return type");
+        printToConsole("  Preference can be set but not verified programmatically");
+
+        // Can still set the preference, just can't verify it
         let testValue = "2";
         scopy.setPreference("dataloggerplugin_read_interval", testValue);
-        msleep(500);
+        printToConsole("  ✓ Preference set (cannot verify)");
 
-        let result = scopy.getPreference("dataloggerplugin_read_interval");
-        printToConsole("  Set read interval to: " + result.second + " seconds");
-
-        if (result.second === testValue) {
-            printToConsole("  ✓ Read interval preference set correctly");
-            return true;
-        } else {
-            printToConsole("  ✗ Expected '" + testValue + "' but got '" + result.second + "'");
-            return false;
-        }
-
+        return "SKIP";
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -848,24 +894,19 @@ TestFramework.runTest("TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL", function (
 });
 
 // Test 34: Set X-Axis Date Time Format (Doc Test 34)
+// NOTE: Skipped - scopy.getPreference() returns QPair which is not exposed to JavaScript
 TestFramework.runTest("TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT", function () {
     try {
-        // Test setting date time format preference
+        printToConsole("  ⚠ Test skipped - scopy.getPreference() returns QPair<QString,QVariant>");
+        printToConsole("  JavaScript cannot handle QPair return type");
+        printToConsole("  Preference can be set but not verified programmatically");
+
+        // Can still set the preference, just can't verify it
         let testValue = "mm:ss";
         scopy.setPreference("dataloggerplugin_date_time_format", testValue);
-        msleep(500);
+        printToConsole("  ✓ Preference set (cannot verify)");
 
-        let result = scopy.getPreference("dataloggerplugin_date_time_format");
-        printToConsole("  Set date time format to: " + result.second);
-
-        if (result.second === testValue) {
-            printToConsole("  ✓ Date time format preference set correctly");
-            return true;
-        } else {
-            printToConsole("  ✗ Expected '" + testValue + "' but got '" + result.second + "'");
-            return false;
-        }
-
+        return "SKIP";
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
