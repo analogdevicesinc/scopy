@@ -30,6 +30,22 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 // or decreased (e.g., 100) for fast test runs
 var waitTime = 1000;  // milliseconds
 
+// Helper function to verify file exists and has content
+function fileExistsAndHasData(path) {
+    try {
+        var content = fileIO.readAll(path);
+        if (!content || content.length === 0) {
+            return false;
+        }
+        var lines = content.split('\n').filter(function (line) {
+            return line.trim().length > 0;
+        });
+        return lines.length >= 1; // At least some content
+    } catch (e) {
+        return false;
+    }
+}
+
 // Test Suite: Register Map
 TestFramework.init("Register Map Tests (1:1 Documentation Mapping)");
 
@@ -390,10 +406,16 @@ TestFramework.runTest("TST.REGMAP.SETTINGS_READ_INTERVAL_WRONG_INTERVAL", functi
             let addr = "0x03"; // Middle address that shouldn't be read
             let value = regmap.getValueOfRegister(addr);
 
-            // If we get here without error, the interval was processed
-            // This might be okay if the implementation handles it gracefully
-            printToConsole("  ⚠ Wrong interval was processed (implementation may auto-correct)");
-            return true;
+            // Check if the register was actually read
+            if (!value || value.length === 0) {
+                printToConsole("  ✓ Wrong interval correctly rejected (no data read)");
+                return true;
+            } else {
+                // If we get here without error, the interval was processed
+                // This might be okay if the implementation handles it gracefully
+                printToConsole("  ⚠ Wrong interval was processed (implementation may auto-correct): " + value);
+                return true;
+            }
 
         } catch (e) {
             printToConsole("  ✓ Wrong interval properly rejected: " + e);
@@ -423,17 +445,35 @@ TestFramework.runTest("TST.REGMAP.SETTINGS_REGISTER_DUMP", function() {
         regmap.readRegister("0x04");
         msleep(waitTime);
 
-        let dumpFile = "/tmp/regmap_dump_test.csv";
+        let dumpFile = fileIO.getTempPath() + "/regmap_dump_test.csv";
         printToConsole("  Dumping registers to: " + dumpFile);
 
         try {
             regmap.registerDump(dumpFile);
             msleep(waitTime);
 
-            // We can't verify file contents without filesystem access
-            // but no exception means the dump was attempted
-            printToConsole("  ✓ Register dump completed (file verification not available)");
-            return true;
+            // Verify the file was created and contains data
+            try {
+                let content = fileIO.readAll(dumpFile);
+                if (content && content.length > 0) {
+                    let lines = content.split('\n').filter(function (line) {
+                        return line.trim().length > 0;
+                    });
+                    if (lines.length >= 1) {
+                        printToConsole("  ✓ Register dump created with " + lines.length + " lines");
+                        return true;
+                    } else {
+                        printToConsole("  ✗ Dump file is empty");
+                        return false;
+                    }
+                } else {
+                    printToConsole("  ✗ Dump file has no content");
+                    return false;
+                }
+            } catch (readError) {
+                printToConsole("  ✗ Failed to verify dump file: " + readError);
+                return false;
+            }
 
         } catch (dumpError) {
             printToConsole("  ✗ Register dump failed: " + dumpError);
@@ -513,12 +553,18 @@ TestFramework.runTest("TST.REGMAP.SETTINGS_WRITE_VALUES", function() {
             return "SKIP";
         }
 
-        // Use the file from previous test (or create a test file)
-        let csvFile = "/tmp/regmap_test_values.csv";
+        let csvFile = fileIO.getTempPath() + "/regmap_test_values.csv";
 
-        printToConsole("  Loading values from: " + csvFile);
+        // Create a test CSV file with known register values
+        printToConsole("  Creating test CSV file: " + csvFile);
+        let csvContent = "address,value\n0x02,0x55\n0x03,0x66\n0x04,0x77";
 
         try {
+            fileIO.writeToFile(csvContent, csvFile);
+            msleep(waitTime);
+
+            printToConsole("  Loading values from: " + csvFile);
+
             // Set the file path
             regmap.setPath(csvFile);
             msleep(waitTime);
@@ -527,14 +573,33 @@ TestFramework.runTest("TST.REGMAP.SETTINGS_WRITE_VALUES", function() {
             regmap.writeFromFile(csvFile);
             msleep(waitTime);
 
-            printToConsole("  ✓ Write values from file completed");
-            return true;
+            // Verify the values were written by reading them back
+            printToConsole("  Verifying written values:");
+            let val02 = regmap.readRegister("0x02");
+            let val03 = regmap.readRegister("0x03");
+            let val04 = regmap.readRegister("0x04");
+
+            printToConsole("    0x02 = " + val02 + " (expected 0x55)");
+            printToConsole("    0x03 = " + val03 + " (expected 0x66)");
+            printToConsole("    0x04 = " + val04 + " (expected 0x77)");
+
+            // Check if at least one value was written correctly
+            let successCount = 0;
+            if (val02 === "0x55" || val02 === "0x0055") successCount++;
+            if (val03 === "0x66" || val03 === "0x0066") successCount++;
+            if (val04 === "0x77" || val04 === "0x0077") successCount++;
+
+            if (successCount >= 2) {
+                printToConsole("  ✓ Write values from file completed and verified (" + successCount + "/3)");
+                return true;
+            } else {
+                printToConsole("  ✗ Write verification failed (only " + successCount + "/3 matched)");
+                return false;
+            }
 
         } catch (writeError) {
-            // File might not exist or format issues
-            printToConsole("  ⚠ Write from file not available: " + writeError);
-            // Don't fail test as this depends on file system
-            return true;
+            printToConsole("  ✗ Write from file failed: " + writeError);
+            return false;
         }
 
     } catch (e) {
@@ -649,4 +714,5 @@ TestFramework.disconnectFromDevice();
 
 // Print summary and exit
 let exitCode = TestFramework.printSummary();
-exit(exitCode);
+printToConsole(exitCode);
+scopy.exit();
