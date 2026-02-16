@@ -24,7 +24,6 @@
 
 #include "scopy-adc_export.h"
 #include "timeplotcomponent.h"
-#include "measurecomponent.h"
 #include <QMap>
 #include <pluginbase/resourcemanager.h>
 #include <pluginbase/toolmenuentry.h>
@@ -96,8 +95,6 @@ protected:
 	ADCInstrument *m_ui;
 	PlotManager *m_plotComponentManager;
 	MapStackedWidget *plotStack;
-
-	MeasureComponent *m_measureComponent;
 
 	ChannelIdProvider *chIdP;
 	CollapsableMenuControlButton *m_otherCMCB;
