@@ -42,6 +42,7 @@ public:
 
 	grutil::GenalyzerConfig getConfig() const;
 	void setConfig(const grutil::GenalyzerConfig &config);
+	void enableAnalysis(bool en);
 
 Q_SIGNALS:
 	void configChanged(const grutil::GenalyzerConfig &config);
@@ -49,7 +50,6 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void onUIChanged();
 	void updateUIFromConfig();
-	void enableAnalysis(bool en);
 
 private:
 	void setupUI();

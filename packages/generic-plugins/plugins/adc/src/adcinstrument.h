@@ -105,6 +105,7 @@ private:
 	SingleShotBtn *m_singleBtn;
 	QPushButton *m_sync;
 	MenuControlButton *m_cursor;
+	MenuControlButton *m_analyze;
 	VerticalChannelManager *m_vcm;
 	PrintBtn *m_printBtn;
 	PrintPlotManager *printPlotManager;
@@ -113,6 +114,7 @@ private:
 	void setupRunSingleButtonHelper();
 
 	void setupCursorButtonHelper(MenuControlButton *cursor);
+	void setupAnalyzeButtonHelper(MenuControlButton *analyze);
 	void setupChannelMenu();
 };
 } // namespace adc

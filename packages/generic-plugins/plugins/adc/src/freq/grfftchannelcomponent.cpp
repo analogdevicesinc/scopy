@@ -578,7 +578,7 @@ void GRFFTChannelComponent::triggerGenalyzerAnalysis()
 {
 	if(m_complex) {
 		gn_analysis_results *gn_analysis = static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->getGnAnalysis();
-		if(gn_analysis) {
+		if(gn_analysis && gn_analysis->results_size > 0) {
 			QString uniqueChannelName = this->name();
 			if(m_node && m_node->treeParent()) {
 				QString deviceName = m_node->treeParent()->name();
