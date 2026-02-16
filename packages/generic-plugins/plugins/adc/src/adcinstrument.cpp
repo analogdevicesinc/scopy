@@ -203,6 +203,7 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 	QWidget *dev_widget = dynamic_cast<QWidget *>(dev);
 	Q_ASSERT(dev_widget);
 
+	b->getControlBtn()->enableToolTip(true);
 	channelGroup->addButton(b->getControlBtn());
 	QString id = dev->name() + QString::number(uuid++);
 	rightStack->add(id, dev_widget);
@@ -224,6 +225,7 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, Com
 {
 	c->add(btn);
 	channelGroup->addButton(btn);
+	btn->enableToolTip(true);
 
 	QString id = ch->name() + QString::number(uuid++);
 	QWidget *ch_widget = dynamic_cast<QWidget *>(ch);
