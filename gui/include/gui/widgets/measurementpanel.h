@@ -26,6 +26,7 @@
 #include "utils.h"
 
 #include <QGridLayout>
+#include <QPushButton>
 #include <QScrollBar>
 #include <QWidget>
 
@@ -115,8 +116,14 @@ public Q_SLOTS:
 	void refreshUi();
 	void sort(int sortType); // hackish
 
+Q_SIGNALS:
+	void toggleAll(bool);
+
 private:
+	void setupControlButtons();
+
 	bool m_inhibitUpdates;
+	QVBoxLayout *m_lay;
 	QHBoxLayout *panelLayout;
 	QList<MeasurementLabel *> m_labels;
 	QList<VerticalWidgetStack *> m_stacks;
@@ -124,6 +131,11 @@ private:
 	QSpacerItem *spacer;
 	void addWidget(QWidget *meas);
 	int stackSize;
+
+	QPushButton *m_showAllBtn;
+	QPushButton *m_hideAllBtn;
+	QPushButton *m_sortByChannelBtn;
+	QPushButton *m_sortByTypeBtn;
 };
 
 class SCOPY_GUI_EXPORT StatsPanel : public QWidget
@@ -138,9 +150,21 @@ public Q_SLOTS:
 	void removeStat(StatsLabel *stat);
 	void updateOrder();
 	void sort(int sortType); // hackish
+
+Q_SIGNALS:
+	void toggleAll(bool);
+
 private:
+	void setupControlButtons();
+
+	QVBoxLayout *m_lay;
 	QHBoxLayout *panelLayout;
 	QList<StatsLabel *> m_labels;
+
+	QPushButton *m_showAllBtn;
+	QPushButton *m_hideAllBtn;
+	QPushButton *m_sortByChannelBtn;
+	QPushButton *m_sortByTypeBtn;
 };
 
 } // namespace scopy
