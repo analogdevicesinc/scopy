@@ -21,6 +21,7 @@
 
 #include "genalyzersettings.h"
 #include <gui/style.h>
+#include <gui/widgets/menusectionwidget.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -41,11 +42,17 @@ GenalyzerSettings::~GenalyzerSettings() {}
 
 void GenalyzerSettings::setupUI()
 {
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 
+	MenuSectionWidget *section = new MenuSectionWidget(this);
+	Style::setStyle(section, style::properties::widget::border);
+	section->contentLayout()->setSpacing(10);
+
 	// Mode selection
-	QWidget *modeContainer = new QWidget(this);
+	QWidget *modeContainer = new QWidget(section);
 	QHBoxLayout *modeLayout = new QHBoxLayout(modeContainer);
 	modeLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -55,15 +62,16 @@ void GenalyzerSettings::setupUI()
 	m_modeCombo = new QComboBox(modeContainer);
 	m_modeCombo->addItem("Auto", static_cast<int>(GenalyzerMode::AUTO));
 	m_modeCombo->addItem("Fixed Tone", static_cast<int>(GenalyzerMode::FIXED_TONE));
+	m_modeCombo->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
 	modeLayout->addWidget(modeLabel);
 	modeLayout->addWidget(m_modeCombo);
 	modeLayout->addStretch();
 
-	mainLayout->addWidget(modeContainer);
+	section->contentLayout()->addWidget(modeContainer);
 
 	// Auto mode container
-	m_autoModeContainer = new QWidget(this);
+	m_autoModeContainer = new QWidget(section);
 	QHBoxLayout *ssbLayout = new QHBoxLayout(m_autoModeContainer);
 	ssbLayout->setContentsMargins(10, 0, 0, 0);
 
@@ -78,10 +86,10 @@ void GenalyzerSettings::setupUI()
 	ssbLayout->addWidget(m_ssbWidthSpinbox);
 	ssbLayout->addStretch();
 
-	mainLayout->addWidget(m_autoModeContainer);
+	section->contentLayout()->addWidget(m_autoModeContainer);
 
 	// Fixed tone container
-	m_fixedToneContainer = new QWidget(this);
+	m_fixedToneContainer = new QWidget(section);
 	QVBoxLayout *ftLayout = new QVBoxLayout(m_fixedToneContainer);
 	ftLayout->setContentsMargins(10, 0, 0, 0);
 
@@ -144,7 +152,9 @@ void GenalyzerSettings::setupUI()
 	ssbDefLayout->addWidget(ssbDefLabel);
 	ssbDefLayout->addWidget(m_ssbDefaultSpinbox);
 	ftLayout->addWidget(ssbDefContainer);
-	mainLayout->addWidget(m_fixedToneContainer);
+	section->contentLayout()->addWidget(m_fixedToneContainer);
+
+	mainLayout->addWidget(section);
 
 	// Connect mode change to show/hide appropriate controls
 	connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int index) {
