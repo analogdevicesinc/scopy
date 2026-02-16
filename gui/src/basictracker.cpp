@@ -43,6 +43,7 @@ BasicTracker::BasicTracker(QwtPlot *plot)
 	m_canvas->setMouseTracking(true);
 	m_canvas->installEventFilter(this);
 	hide();
+	setRenderMode(CopyAlphaMask);
 }
 
 BasicTracker::~BasicTracker() {}

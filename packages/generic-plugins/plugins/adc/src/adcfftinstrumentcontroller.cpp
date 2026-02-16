@@ -76,6 +76,17 @@ void ADCFFTInstrumentController::init()
 	scopy::grutil::GenalyzerConfig defaultConfig;
 	m_genalyzerSettings->setConfig(defaultConfig);
 
+	HoverWidget *analyzeHoverSettings = new HoverWidget(m_genalyzerSettings, m_ui->m_analyze, m_ui);
+	analyzeHoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	analyzeHoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
+	analyzeHoverSettings->setAnchorOffset(QPoint(0, -10));
+
+	connect(m_ui->m_analyze->button(), &QAbstractButton::toggled, analyzeHoverSettings, &HoverWidget::setVisible);
+	connect(m_ui->m_analyze, &QAbstractButton::toggled, this, [=](bool checked) {
+		m_genalyzerSettings->enableAnalysis(checked);
+		m_plotComponentManager->enableGenalyzerPanel(checked);
+	});
+
 	plotStack = new MapStackedWidget(m_ui);
 	m_ui->getCentralWidget()->layout()->addWidget(plotStack);
 
@@ -311,6 +322,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 		&FFTPlotManagerSettings::setComplexMode);
 	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
 		bool isComplex = m_ui->m_complex->isChecked();
+		m_ui->m_analyze->setVisible(isComplex);
 		if(isComplex) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
@@ -324,8 +336,9 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 				}
 			}
 
-			m_plotComponentManager->enableGenalyzerPanel(true);
+			m_plotComponentManager->enableGenalyzerPanel(m_ui->m_analyze->isChecked());
 		} else {
+			m_ui->m_analyze->setChecked(false);
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);
 

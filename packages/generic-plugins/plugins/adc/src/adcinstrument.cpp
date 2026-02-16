@@ -136,6 +136,10 @@ void ADCInstrument::setupToolLayout()
 	m_cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(m_cursor);
 
+	m_analyze = new MenuControlButton(this);
+	setupAnalyzeButtonHelper(m_analyze);
+	m_analyze->setVisible(false);
+
 	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
 
@@ -147,6 +151,7 @@ void ADCInstrument::setupToolLayout()
 	tool->addWidgetToTopContainerHelper(m_sync, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(m_complex, TTA_LEFT);
+	tool->addWidgetToBottomContainerHelper(m_analyze, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(m_cursor, TTA_RIGHT);
 
 	rightMenuBtnGrp->addButton(m_settingsBtn->button());
@@ -280,4 +285,14 @@ void ADCInstrument::setupCursorButtonHelper(MenuControlButton *cursor)
 	cursor->checkBox()->setVisible(false);
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 	hoverMenuGroup->addButton(cursor->button());
+}
+
+void ADCInstrument::setupAnalyzeButtonHelper(MenuControlButton *analyze)
+{
+	analyze->setName("Genalyzer");
+	analyze->setOpenMenuChecksThis(true);
+	analyze->setDoubleClickToOpenMenu(true);
+	analyze->checkBox()->setVisible(false);
+	analyze->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+	hoverMenuGroup->addButton(analyze->button());
 }

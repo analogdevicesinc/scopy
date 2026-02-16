@@ -49,6 +49,10 @@ public:
 	void setChannelColor(QColor color);
 	QString channelName() const;
 	QString getTableContent() const;
+	QString getSelectedContent() const;
+
+protected:
+	void keyPressEvent(QKeyEvent *event) override;
 
 private:
 	QString m_channelName;

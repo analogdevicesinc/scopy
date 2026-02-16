@@ -33,6 +33,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QClipboard>
+#include <QKeyEvent>
 
 using namespace scopy;
 
@@ -46,9 +47,9 @@ GenalyzerChannelDisplay::GenalyzerChannelDisplay(const QString &channelName, QCo
 	setColumnCount(2);
 	setAlternatingRowColors(false);
 	setShowGrid(false);
-	setSelectionMode(QAbstractItemView::NoSelection);
+	setSelectionMode(QAbstractItemView::ExtendedSelection);
 	setEditTriggers(QAbstractItemView::NoEditTriggers);
-	setFocusPolicy(Qt::NoFocus);
+	setFocusPolicy(Qt::ClickFocus);
 
 	horizontalHeader()->hide();
 	verticalHeader()->hide();
@@ -130,6 +131,39 @@ QString GenalyzerChannelDisplay::getTableContent() const
 	return content;
 }
 
+QString GenalyzerChannelDisplay::getSelectedContent() const
+{
+	QList<QTableWidgetItem *> selectedItems = this->selectedItems();
+	if(selectedItems.isEmpty()) {
+		return QString();
+	}
+
+	// Group items by row
+	QMap<int, QStringList> rowContent;
+	for(QTableWidgetItem *item : selectedItems) {
+		rowContent[item->row()].append(item->text());
+	}
+
+	QString content;
+	for(auto it = rowContent.begin(); it != rowContent.end(); ++it) {
+		content += it.value().join(" ") + "\n";
+	}
+	return content;
+}
+
+void GenalyzerChannelDisplay::keyPressEvent(QKeyEvent *event)
+{
+	if(event->matches(QKeySequence::Copy)) {
+		QString content = getSelectedContent();
+		if(!content.isEmpty()) {
+			QApplication::clipboard()->setText(content);
+		}
+		event->accept();
+		return;
+	}
+	QTableWidget::keyPressEvent(event);
+}
+
 GenalyzerPanel::GenalyzerPanel(QWidget *parent)
 	: QWidget(parent)
 {
@@ -162,30 +196,12 @@ QDockWidget *GenalyzerPanel::findOrCreateChannelDock(const QString &channelName,
 		return m_channelDocks[channelName];
 	}
 
-	QWidget *containerWidget = new QWidget();
-	QVBoxLayout *containerLayout = new QVBoxLayout(containerWidget);
-	containerLayout->setMargin(2);
-	containerLayout->setSpacing(2);
-
-	GenalyzerChannelDisplay *display = new GenalyzerChannelDisplay(channelName, channelColor, containerWidget);
+	GenalyzerChannelDisplay *display = new GenalyzerChannelDisplay(channelName, channelColor, this);
 	m_channelDisplays[channelName] = display;
 	display->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-	QPushButton *copyButton = new QPushButton("Copy to clipboard", containerWidget);
-	QFont font;
-	font.setPixelSize(Style::getDimension(json::global::font_size_0_5));
-	copyButton->setFont(font);
-	copyButton->setFocusPolicy(Qt::NoFocus);
-	connect(copyButton, &QPushButton::clicked, [display]() {
-		QString content = display->getTableContent();
-		QApplication::clipboard()->setText(content);
-	});
-
-	containerLayout->addWidget(display);
-	containerLayout->addWidget(copyButton);
-
 	QDockWidget *dock = new QDockWidget(channelName, m_embeddedMainWindow);
-	dock->setWidget(containerWidget);
+	dock->setWidget(display);
 
 	dock->setFeatures(QDockWidget::DockWidgetMovable);
 	dock->setFeatures(QDockWidget::DockWidgetFloatable);
