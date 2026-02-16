@@ -41,11 +41,11 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	m_lay->setSpacing(0);
 
 	m_measurePanel = new MeasurementsPanel(leftWidget);
-	m_measurePanel->setFixedHeight(110);
+	m_measurePanel->setFixedHeight(120);
 	m_measurePanel->setVisible(false);
 
 	m_statsPanel = new StatsPanel(leftWidget);
-	m_statsPanel->setFixedHeight(100);
+	m_statsPanel->setFixedHeight(120);
 	m_statsPanel->setVisible(false);
 
 	m_markerPanel = new MarkerPanel(leftWidget);

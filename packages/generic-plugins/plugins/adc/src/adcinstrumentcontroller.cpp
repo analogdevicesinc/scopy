@@ -34,7 +34,6 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString uri
 	: QObject(parent)
 	, m_refreshTimerRunning(false)
 	, m_plotComponentManager(nullptr)
-	, m_measureComponent(nullptr)
 	, m_started(false)
 	, m_tme(tme)
 	, m_uri(uri)
@@ -192,24 +191,24 @@ void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelCom
 	auto chMeasureManager = chMeasureableChannel->getMeasureManager();
 	if(!chMeasureManager)
 		return;
-	if(m_measureComponent) {
-		auto measureSettings = m_measureComponent->measureSettings();
-		auto measurePanel = c->measurePanel();
-		auto statsPanel = c->statsPanel();
-		connect(chMeasureManager, &MeasureManagerInterface::enableMeasurement, measurePanel,
-			&MeasurementsPanel::addMeasurement);
-		connect(chMeasureManager, &MeasureManagerInterface::disableMeasurement, measurePanel,
-			&MeasurementsPanel::removeMeasurement);
-		connect(measureSettings, &MeasurementSettings::toggleAllMeasurements, this, [=](bool b) {
-			measurePanel->setInhibitUpdates(true);
-			Q_EMIT chMeasureManager->toggleAllMeasurement(b);
-			measurePanel->setInhibitUpdates(false);
-		});
-		connect(measureSettings, &MeasurementSettings::toggleAllStats, this,
-			[=](bool b) { Q_EMIT chMeasureManager->toggleAllStats(b); });
-		connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
-		connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
-	}
+	auto measurePanel = c->measurePanel();
+	auto statsPanel = c->statsPanel();
+	connect(chMeasureManager, &MeasureManagerInterface::enableMeasurement, measurePanel,
+		&MeasurementsPanel::addMeasurement);
+	connect(chMeasureManager, &MeasureManagerInterface::disableMeasurement, measurePanel,
+		&MeasurementsPanel::removeMeasurement);
+	connect(chMeasureManager, &MeasureManagerInterface::enableMeasurement, this,
+		[=]() { c->enableMeasurementPanel(true); });
+	connect(measurePanel, &MeasurementsPanel::toggleAll, this, [=](bool b) {
+		measurePanel->setInhibitUpdates(!b);
+		Q_EMIT chMeasureManager->toggleAllMeasurement(b);
+		measurePanel->setInhibitUpdates(false);
+	});
+	connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
+	connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
+	connect(chMeasureManager, &MeasureManagerInterface::enableStat, this,
+		[=]() { c->enableStatsPanel(true); });
+	connect(statsPanel, &StatsPanel::toggleAll, chMeasureManager, &MeasureManagerInterface::toggleAllStats);
 }
 
 bool ADCInstrumentController::isMainInstrument() const { return m_isMainInstrument; }

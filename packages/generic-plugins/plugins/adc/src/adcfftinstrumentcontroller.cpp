@@ -72,12 +72,9 @@ void ADCFFTInstrumentController::init()
 	tmp = m_plotComponentManager->addPlot("Frequency Plot");
 	m_fftPlotSettingsComponent->addPlot(dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(tmp)));
 
-	m_measureComponent = new MeasureComponent(m_ui->getToolTemplate(), m_ui->getHoverMenuBtnGroup(),
-						  m_plotComponentManager, this);
-	m_measureComponent->measureSettings()->getMeasureSection()->setVisible(false);
-	m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(false);
-
-	addComponent(m_measureComponent);
+	m_genalyzerSettings = new GenalyzerSettings();
+	scopy::grutil::GenalyzerConfig defaultConfig;
+	m_genalyzerSettings->setConfig(defaultConfig);
 
 	plotStack = new MapStackedWidget(m_ui);
 	m_ui->getCentralWidget()->layout()->addWidget(plotStack);
@@ -117,7 +114,6 @@ void ADCFFTInstrumentController::init()
 
 	m_ui->m_settingsBtn->animateClick();
 	m_ui->sync()->setVisible(false);
-	m_measureComponent->measureSettings()->getStatsSection()->setVisible(false);
 }
 
 void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
@@ -196,7 +192,7 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		}
 
 		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
-		Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
+		m_plotComponentManager->enableMarkerPanel(markerCount != 0);
 	});
 }
 
@@ -259,17 +255,17 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		}
 
 		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
-		Q_EMIT m_measureComponent->measureSettings()->enableMarkerPanel(markerCount != 0);
+		m_plotComponentManager->enableMarkerPanel(markerCount != 0);
 	});
 
 	connect(c, &GRFFTChannelComponent::genalyzerDataUpdated, m_plotComponentManager->genalyzerPanel(),
 		&GenalyzerPanel::updateResults);
 
 	// Connect genalyzer configuration control from UI to channel
-	connect(m_measureComponent->genalyzerSettings(), &adc::GenalyzerSettings::configChanged, c,
+	connect(m_genalyzerSettings, &adc::GenalyzerSettings::configChanged, c,
 		qOverload<const scopy::grutil::GenalyzerConfig &>(&GRFFTChannelComponent::setGenalyzerConfig));
 	// Send initial genalyzer configuration from UI to channel
-	c->setGenalyzerConfig(m_measureComponent->genalyzerSettings()->getConfig());
+	c->setGenalyzerConfig(m_genalyzerSettings->getConfig());
 
 	// Connect channel enable/disable signals to update genalyzer panel visibility
 	connect(c, &GRFFTChannelComponent::genalyzerChannelEnabled, m_plotComponentManager->genalyzerPanel(),
@@ -283,8 +279,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	connect(c->chData(), &ChannelData::newData, this,
 		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
-			if(m_ui->m_complex->isChecked() && m_measureComponent->measureSettings()->genalyzerEnabled() &&
-			   m_plotComponentManager->genalyzerPanel()->isVisible()) {
+			if(m_ui->m_complex->isChecked() && m_plotComponentManager->genalyzerPanel()->isVisible()) {
 				c->triggerGenalyzerAnalysis();
 			}
 		});
@@ -329,10 +324,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 				}
 			}
 
-			// Restore genalyzer panel visibility if it was enabled
-			if(m_measureComponent->measureSettings()->genalyzerEnabled()) {
-				m_plotComponentManager->enableGenalyzerPanel(true);
-			}
+			m_plotComponentManager->enableGenalyzerPanel(true);
 		} else {
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);
@@ -340,8 +332,6 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 			m_plotComponentManager->genalyzerPanel()->clear();
 			m_plotComponentManager->enableGenalyzerPanel(false);
 		}
-
-		m_measureComponent->measureSettings()->getGenalyzerSection()->setVisible(isComplex);
 	});
 
 	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
