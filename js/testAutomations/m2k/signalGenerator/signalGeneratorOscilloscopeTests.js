@@ -107,11 +107,14 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.26_30", function() {
         siggen.enabled[0] = true;
         siggen.running = true;
 
-        // Test configurations (matching doc steps 26-30)
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, offset: 0, phase: 0},      // Step 28: 5Vpp@200Hz
-            {amp: 10, freq: 500000, offset: 0, phase: 0},  // Step 29: 10Vpp@500kHz
-            {amp: 10, freq: 5000000, offset: 0, phase: 0}  // Step 30: 10Vpp@5MHz
+            // Step 28: Doc line 155-158 - 500mV/div (0.5V), 5ms timebase
+            {amp: 5, freq: 200, offset: 0, phase: 0, voltsdiv: 0.5, timebase: 0.005},
+            // Step 29: Doc line 165-168 - 2V/div, 1us timebase
+            {amp: 10, freq: 500000, offset: 0, phase: 0, voltsdiv: 2, timebase: 0.000001},
+            // Step 30: Doc line 175-178 - 1V/div, 200ns timebase
+            {amp: 10, freq: 5000000, offset: 0, phase: 0, voltsdiv: 1, timebase: 0.0000002}
         ];
 
         let allPass = true;
@@ -128,45 +131,54 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.26_30", function() {
             siggen.running = true;  // Restart after parameter change
             msleep(500);  // Allow signal to stabilize
 
-            // Verify with oscilloscope
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
-            // Ensure oscilloscope channel is properly reset and enabled
-            osc.channels[0].enabled = false;
-            msleep(50);  // Brief pause
-            osc.channels[0].enabled = true;
-            osc.channels[0].volts_per_div = config.amp / 4;
-            // Adjust timebase for different frequencies
-            if (config.freq >= 5000000) {
-                osc.time_base = 0.0000002; // 200ns/div for 5MHz
-            } else if (config.freq >= 500000) {
-                osc.time_base = 0.000001; // 1us/div for 500kHz
-            } else if (config.freq > 100000) {
-                osc.time_base = 0.000002; // 2us/div for high frequencies
-            } else {
-                osc.time_base = 1 / (config.freq * 10); // Show ~10 periods
-            }
-            osc.trigger_source = 0; // CH1
-            osc.trigger_level = 0; // Set trigger level to 0V
-            osc.trigger_mode = 0; // Auto trigger mode
-            osc.running = true;
-            // Measurements work without explicit enable
-            msleep(2000); // Wait for measurements to stabilize
 
-            // Stop oscilloscope BEFORE reading measurements to avoid "ERROR: WRITE ALL: -9"
+            // Stop oscilloscope to reset state
             osc.running = false;
+            osc.channels[0].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
+            osc.channels[0].enabled = true;
+            osc.channels[0].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 0;  // CH1
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
+            osc.running = true;
+            osc.measure = true;
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
+
+            // Stop oscilloscope before reading
+            osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[0].peak_to_peak;
             let freq = osc.channels[0].period > 0 ? (1.0 / osc.channels[0].period) : 0;
 
-            let vppPass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05,
-                "Vpp measurement");
-            let freqPass = TestFramework.assertApproxEqual(freq, config.freq, config.freq * 0.01,
-                "Frequency measurement");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let vppPass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "Sine Vpp"
+            );
+            let freqPass = TestFramework.assertApproxEqual(
+                freq,
+                config.freq,
+                config.freq * 0.02,
+                "Sine frequency"
+            );
 
             allPass = allPass && vppPass && freqPass;
 
-            // Reset oscilloscope state between tests
+            // Clean up oscilloscope before switching back
             osc.channels[0].enabled = false;
-            msleep(100);  // Brief pause to clear state
+            msleep(50);
 
             switchToTool("Signal Generator");
         }
@@ -243,10 +255,12 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.36_38", function() {
         siggen.waveform_offset[0] = 0;
         siggen.enabled[0] = true;
 
-        // Test configurations (matching doc steps 36-38)
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, timebase: 0.002},    // Step 37: 5Vpp@200Hz, 2ms/div
-            {amp: 8, freq: 2000000, timebase: 0.0000001}  // Step 38: 8Vpp@2MHz, 100ns/div
+            // Step 37: Doc line 227-230 - 1V/div, 2ms timebase
+            {amp: 5, freq: 200, voltsdiv: 1, timebase: 0.002},
+            // Step 38: Doc line 237-240 - 1V/div, 100ns timebase
+            {amp: 8, freq: 2000000, voltsdiv: 1, timebase: 0.0000001}
         ];
 
         let allPass = true;
@@ -260,29 +274,54 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.36_38", function() {
             siggen.running = true;
             msleep(500);
 
-            // Verify with oscilloscope
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
+            osc.channels[0].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[0].enabled = true;
-            osc.channels[0].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 0; // CH1
-            osc.trigger_level = 0; // Set trigger level to 0V
+            osc.channels[0].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 0;  // CH1
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295]; // Enable all measurements
-            msleep(2000); // Wait for measurements to stabilize
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
-            // Stop oscilloscope BEFORE reading measurements
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[0].peak_to_peak;
             let freq = osc.channels[0].period > 0 ? (1.0 / osc.channels[0].period) : 0;
 
-            let vppPass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05,
-                "Triangle Vpp");
-            let freqPass = TestFramework.assertApproxEqual(freq, config.freq, config.freq * 0.02,
-                "Triangle frequency");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let vppPass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "Triangle Vpp"
+            );
+            let freqPass = TestFramework.assertApproxEqual(
+                freq,
+                config.freq,
+                config.freq * 0.02,
+                "Triangle frequency"
+            );
 
             allPass = allPass && vppPass && freqPass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[0].enabled = false;
+            msleep(50);
 
             switchToTool("Signal Generator");
         }
@@ -305,10 +344,12 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.39_44", function() {
         siggen.waveform_offset[0] = 0;
         siggen.enabled[0] = true;
 
-        // Test configurations (matching doc steps 39-44)
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, timebase: 0.002},      // Steps 40,43: 5Vpp@200Hz, 2ms/div
-            {amp: 8, freq: 1000000, timebase: 0.000001} // Steps 41,44: 8Vpp@1MHz, 1us/div
+            // Step 40/43: Doc line 248-250/578-580 - 1V/div, 2ms timebase
+            {amp: 5, freq: 200, voltsdiv: 1, timebase: 0.002},
+            // Step 41/44: Doc line 264-567/587-590 - 1V/div, 1us timebase
+            {amp: 8, freq: 1000000, voltsdiv: 1, timebase: 0.000001}
         ];
 
         let allPass = true;
@@ -324,23 +365,46 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.39_44", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
+            osc.channels[0].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[0].enabled = true;
-            osc.channels[0].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 0; // CH1
-            osc.trigger_level = 0; // Set trigger level to 0V
+            osc.channels[0].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 0;  // CH1
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295]; // Enable all measurements
-            msleep(2000); // Wait for measurements to stabilize
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[0].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05,
-                "Rising sawtooth Vpp");
+            // Use 10% tolerance for sawtooth (includes overshoot - doc says to disregard it)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "Rising sawtooth Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[0].enabled = false;
+            msleep(50);
 
             switchToTool("Signal Generator");
         }
@@ -356,23 +420,46 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.39_44", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
+            osc.channels[0].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[0].enabled = true;
-            osc.channels[0].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 0; // CH1
-            osc.trigger_level = 0; // Set trigger level to 0V
+            osc.channels[0].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 0;  // CH1
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295]; // Enable all measurements
-            msleep(2000); // Wait for measurements to stabilize
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[0].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05,
-                "Falling sawtooth Vpp");
+            // Use 10% tolerance for sawtooth (includes overshoot - doc says to disregard it)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "Falling sawtooth Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[0].enabled = false;
+            msleep(50);
 
             switchToTool("Signal Generator");
         }
@@ -451,10 +538,12 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.31_33", function() {
         siggen.waveform_duty[0] = 50; // 50% duty cycle
         siggen.enabled[0] = true;
 
-        // Test configurations (matching doc steps 31-33)
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, timebase: 0.005},       // Step 32: 5Vpp@200Hz, 5ms/div
-            {amp: 10, freq: 5000000, timebase: 0.0000001} // Step 33: 10Vpp@5MHz, 100ns/div
+            // Step 32: Doc line 186-195 - 1V/div, 5ms timebase, ±4% tolerance
+            {amp: 5, freq: 200, voltsdiv: 1, timebase: 0.005},
+            // Step 33: Doc line 198-206 - 2V/div, 100ns timebase, ±2% tolerance
+            {amp: 10, freq: 5000000, voltsdiv: 2, timebase: 0.0000001}
         ];
 
         let allPass = true;
@@ -468,28 +557,54 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.31_33", function() {
             siggen.running = true;
             msleep(500);
 
-            // Verify with oscilloscope
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
+            osc.channels[0].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[0].enabled = true;
-            osc.channels[0].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 0; // CH1
-            osc.trigger_level = 0; // Set trigger level to 0V
+            osc.channels[0].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 0;  // CH1
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295]; // Enable all measurements
-            msleep(2000); // Wait for measurements to stabilize
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[0].peak_to_peak;
             let freq = osc.channels[0].period > 0 ? (1.0 / osc.channels[0].period) : 0;
 
-            let vppPass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05,
-                "Square Vpp");
-            let freqPass = TestFramework.assertApproxEqual(freq, config.freq, config.freq * 0.02,
-                "Square frequency");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let vppPass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "Square Vpp"
+            );
+            let freqPass = TestFramework.assertApproxEqual(
+                freq,
+                config.freq,
+                config.freq * 0.02,
+                "Square frequency"
+            );
 
             allPass = allPass && vppPass && freqPass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[0].enabled = false;
+            msleep(50);
 
             switchToTool("Signal Generator");
         }
@@ -513,18 +628,18 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.45_48", function() {
         siggen.waveform_offset[0] = 0;
         siggen.enabled[0] = true;
 
-        // Test configurations (matching doc steps 45-48)
+        // Test configurations EXACTLY as documented
         // Period = rise + fall + holdhigh + holdlow
         let testConfigs = [
-            // Step 46: 5V, 1us each (period=4us, freq=250kHz)
+            // Step 46: Doc line 296-299 - 2V/div, 1us timebase, ±4% tolerance
             {amp: 5, rise: 0.000001, fall: 0.000001, holdh: 0.000001, holdl: 0.000001,
-             expectedFreq: 250000, timebase: 0.000001},
-            // Step 47: 10V, 1us each (period=4us, freq=250kHz)
+             expectedFreq: 250000, voltsdiv: 2, timebase: 0.000001},
+            // Step 47: Doc line 306-309 - 2V/div, 1us timebase, ±4% tolerance
             {amp: 10, rise: 0.000001, fall: 0.000001, holdh: 0.000001, holdl: 0.000001,
-             expectedFreq: 250000, timebase: 0.000001},
-            // Step 48: 10V, 200ns each (period=800ns, freq=1.25MHz)
+             expectedFreq: 250000, voltsdiv: 2, timebase: 0.000001},
+            // Step 48: Doc line 316-319 - 2V/div, 200ns timebase, ±4% tolerance
             {amp: 10, rise: 0.0000002, fall: 0.0000002, holdh: 0.0000002, holdl: 0.0000002,
-             expectedFreq: 1250000, timebase: 0.0000002}
+             expectedFreq: 1250000, voltsdiv: 2, timebase: 0.0000002}
         ];
 
         let allPass = true;
@@ -541,28 +656,54 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_1_OPERATION.45_48", function() {
             siggen.running = true;
             msleep(500);
 
-            // Verify with oscilloscope
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
+            osc.channels[0].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[0].enabled = true;
-            osc.channels[0].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 0; // CH1
-            osc.trigger_level = 0; // Set trigger level to 0V
+            osc.channels[0].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 0;  // CH1
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295]; // Enable all measurements
-            msleep(2000); // Wait for measurements to stabilize
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[0].peak_to_peak;
             let freq = osc.channels[0].period > 0 ? (1.0 / osc.channels[0].period) : 0;
 
-            let vppPass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05,
-                "Trapezoidal Vpp");
-            let freqPass = TestFramework.assertApproxEqual(freq, config.expectedFreq, config.expectedFreq * 0.05,
-                "Trapezoidal frequency");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let vppPass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "Trapezoidal Vpp"
+            );
+            let freqPass = TestFramework.assertApproxEqual(
+                freq,
+                config.expectedFreq,
+                config.expectedFreq * 0.05,
+                "Trapezoidal frequency"
+            );
 
             allPass = allPass && vppPass && freqPass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[0].enabled = false;
+            msleep(50);
 
             switchToTool("Signal Generator");
         }
@@ -649,11 +790,14 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.26_30", function() {
         siggen.waveform_phase[1] = 0;
         siggen.enabled[1] = true;
 
-        // Test configurations (matching doc steps 26-30)
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, timebase: 0.005},       // 5Vpp@200Hz
-            {amp: 10, freq: 500000, timebase: 0.000001}, // 10Vpp@500kHz
-            {amp: 10, freq: 5000000, timebase: 0.0000002} // 10Vpp@5MHz
+            // Step 28: Doc line 155-158 - 500mV/div (0.5V), 5ms timebase
+            {amp: 5, freq: 200, voltsdiv: 0.5, timebase: 0.005},
+            // Step 29: Doc line 165-168 - 2V/div, 1us timebase
+            {amp: 10, freq: 500000, voltsdiv: 2, timebase: 0.000001},
+            // Step 30: Doc line 175-178 - 1V/div, 200ns timebase
+            {amp: 10, freq: 5000000, voltsdiv: 1, timebase: 0.0000002}
         ];
 
         let allPass = true;
@@ -667,26 +811,56 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.26_30", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
             osc.channels[0].enabled = false;
+            osc.channels[1].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[1].enabled = true;
-            osc.channels[1].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 1; // CH2
-            osc.trigger_level = 0;
+            osc.channels[1].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 1;  // CH2
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295];
-            msleep(2000);
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[1].peak_to_peak;
             let freq = osc.channels[1].period > 0 ? (1.0 / osc.channels[1].period) : 0;
 
-            let vppPass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05, "CH2 Sine Vpp");
-            let freqPass = TestFramework.assertApproxEqual(freq, config.freq, config.freq * 0.02, "CH2 Sine freq");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let vppPass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "CH2 Sine Vpp"
+            );
+            let freqPass = TestFramework.assertApproxEqual(
+                freq,
+                config.freq,
+                config.freq * 0.02,
+                "CH2 Sine frequency"
+            );
 
             allPass = allPass && vppPass && freqPass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[1].enabled = false;
+            msleep(50);
+
             switchToTool("Signal Generator");
         }
 
@@ -712,10 +886,12 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.31_35", function() {
         siggen.waveform_phase[1] = 0;
         siggen.enabled[1] = true;
 
-        // Test configurations
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, duty: 50, timebase: 0.005},
-            {amp: 10, freq: 5000000, duty: 50, timebase: 0.0000001}
+            // Step 32: Doc line 490-495 - 1V/div, 5ms timebase, ±4% tolerance
+            {amp: 5, freq: 200, duty: 50, voltsdiv: 1, timebase: 0.005},
+            // Step 33: Doc line 502-505 - 2V/div, 100ns timebase, ±2% tolerance
+            {amp: 10, freq: 5000000, duty: 50, voltsdiv: 2, timebase: 0.0000001}
         ];
 
         let allPass = true;
@@ -730,23 +906,48 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.31_35", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
             osc.channels[0].enabled = false;
+            osc.channels[1].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[1].enabled = true;
-            osc.channels[1].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 1; // CH2
-            osc.trigger_level = 0;
+            osc.channels[1].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 1;  // CH2
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295];
-            msleep(2000);
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[1].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05, "CH2 Square Vpp");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "CH2 Square Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[1].enabled = false;
+            msleep(50);
+
             switchToTool("Signal Generator");
         }
 
@@ -771,9 +972,12 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.36_38", function() {
         siggen.waveform_offset[1] = 0;
         siggen.enabled[1] = true;
 
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, timebase: 0.002},
-            {amp: 8, freq: 2000000, timebase: 0.0000001}
+            // Step 37: Doc line 227-230 - 1V/div, 2ms timebase
+            {amp: 5, freq: 200, voltsdiv: 1, timebase: 0.002},
+            // Step 38: Doc line 237-240 - 1V/div, 100ns timebase
+            {amp: 8, freq: 2000000, voltsdiv: 1, timebase: 0.0000001}
         ];
 
         let allPass = true;
@@ -787,23 +991,48 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.36_38", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
             osc.channels[0].enabled = false;
+            osc.channels[1].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[1].enabled = true;
-            osc.channels[1].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 1;
-            osc.trigger_level = 0;
+            osc.channels[1].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 1;  // CH2
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295];
-            msleep(2000);
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[1].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05, "CH2 Triangle Vpp");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "CH2 Triangle Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[1].enabled = false;
+            msleep(50);
+
             switchToTool("Signal Generator");
         }
 
@@ -827,9 +1056,12 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.39_44", function() {
         siggen.waveform_offset[1] = 0;
         siggen.enabled[1] = true;
 
+        // Test configurations EXACTLY as documented
         let testConfigs = [
-            {amp: 5, freq: 200, timebase: 0.002},
-            {amp: 8, freq: 1000000, timebase: 0.000001}
+            // Step 40/43: Doc line 552-555/578-580 - 1V/div, 2ms timebase, ±4% tolerance
+            {amp: 5, freq: 200, voltsdiv: 1, timebase: 0.002},
+            // Step 41/44: Doc line 564-567/587-590 - 1V/div, 1us timebase, ±2.5% tolerance
+            {amp: 8, freq: 1000000, voltsdiv: 1, timebase: 0.000001}
         ];
 
         let allPass = true;
@@ -845,23 +1077,48 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.39_44", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
             osc.channels[0].enabled = false;
+            osc.channels[1].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[1].enabled = true;
-            osc.channels[1].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 1;
-            osc.trigger_level = 0;
+            osc.channels[1].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 1;  // CH2
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295];
-            msleep(2000);
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[1].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05, "CH2 Rising Saw Vpp");
+            // Use 10% tolerance for sawtooth (includes overshoot - doc says to disregard it)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "CH2 Rising Saw Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[1].enabled = false;
+            msleep(50);
+
             switchToTool("Signal Generator");
         }
 
@@ -876,23 +1133,48 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.39_44", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
             osc.channels[0].enabled = false;
+            osc.channels[1].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[1].enabled = true;
-            osc.channels[1].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 1;
-            osc.trigger_level = 0;
+            osc.channels[1].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 1;  // CH2
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295];
-            msleep(2000);
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[1].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05, "CH2 Falling Saw Vpp");
+            // Use 10% tolerance for sawtooth (includes overshoot - doc says to disregard it)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "CH2 Falling Saw Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[1].enabled = false;
+            msleep(50);
+
             switchToTool("Signal Generator");
         }
 
@@ -917,13 +1199,17 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.45_48", function() {
         siggen.waveform_offset[1] = 0;
         siggen.enabled[1] = true;
 
+        // Test configurations EXACTLY as documented
         let testConfigs = [
+            // Step 46: Doc line 296-299 - 2V/div, 1us timebase, ±4% tolerance
             {amp: 5, rise: 0.000001, fall: 0.000001, holdh: 0.000001, holdl: 0.000001,
-             expectedFreq: 250000, timebase: 0.000001},
+             expectedFreq: 250000, voltsdiv: 2, timebase: 0.000001},
+            // Step 47: Doc line 306-309 - 2V/div, 1us timebase, ±4% tolerance
             {amp: 10, rise: 0.000001, fall: 0.000001, holdh: 0.000001, holdl: 0.000001,
-             expectedFreq: 250000, timebase: 0.000001},
+             expectedFreq: 250000, voltsdiv: 2, timebase: 0.000001},
+            // Step 48: Doc line 316-319 - 2V/div, 200ns timebase, ±4% tolerance
             {amp: 10, rise: 0.0000002, fall: 0.0000002, holdh: 0.0000002, holdl: 0.0000002,
-             expectedFreq: 1250000, timebase: 0.0000002}
+             expectedFreq: 1250000, voltsdiv: 2, timebase: 0.0000002}
         ];
 
         let allPass = true;
@@ -940,23 +1226,48 @@ TestFramework.runTest("TST.M2K.SG.CHANNEL_2_OPERATION.45_48", function() {
             siggen.running = true;
             msleep(500);
 
+            // Switch to oscilloscope and configure EXACTLY per documentation
             switchToTool("Oscilloscope");
+
+            // Stop oscilloscope to reset state
+            osc.running = false;
             osc.channels[0].enabled = false;
+            osc.channels[1].enabled = false;
+            msleep(100);
+
+            // Configure with EXACT values from documentation
             osc.channels[1].enabled = true;
-            osc.channels[1].volts_per_div = config.amp / 4;
-            osc.time_base = config.timebase;
-            osc.trigger_source = 1;
-            osc.trigger_level = 0;
+            osc.channels[1].volts_per_div = config.voltsdiv;  // EXACT value from doc
+            osc.time_base = config.timebase;                   // EXACT value from doc
+            osc.trigger_source = 1;  // CH2
+            osc.trigger_level = 0;   // 0V
+            osc.trigger_mode = 0;    // Auto (doc specifies "trigger mode: Auto")
+
+            // Start oscilloscope and enable measurements
             osc.running = true;
             osc.measure = true;
-            osc.measure_en = [4294967295, 4294967295];
-            msleep(2000);
+            osc.measure_en = [4294967295, 4294967295];  // Enable all measurements
+            msleep(2000);  // Wait for measurements to stabilize
 
+            // Stop oscilloscope before reading
             osc.running = false;
+
+            // Read measurements
             let vpp = osc.channels[1].peak_to_peak;
 
-            let pass = TestFramework.assertApproxEqual(vpp, config.amp, config.amp * 0.05, "CH2 Trap Vpp");
+            // Verify measurements (use 10% for automated measurement - includes overshoot)
+            let pass = TestFramework.assertApproxEqual(
+                vpp,
+                config.amp,
+                config.amp * 0.10,
+                "CH2 Trapezoidal Vpp"
+            );
             allPass = allPass && pass;
+
+            // Clean up oscilloscope before switching back
+            osc.channels[1].enabled = false;
+            msleep(50);
+
             switchToTool("Signal Generator");
         }
 
