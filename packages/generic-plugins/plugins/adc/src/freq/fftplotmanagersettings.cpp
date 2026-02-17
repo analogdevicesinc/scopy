@@ -317,6 +317,9 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 
 	// Set initial complex mode state
 	p->plotMenu()->setComplexMode(m_samplingInfo.complexMode);
+
+	updateXAxis();
+	m_plotManager->updateAxisScales();
 }
 
 void FFTPlotManagerSettings::setPlotComboVisible()

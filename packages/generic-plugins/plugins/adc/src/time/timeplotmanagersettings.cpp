@@ -394,6 +394,9 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 		m_menu->scrollTo(m_plotCb);
 		Q_EMIT requestOpenMenu();
 	});
+
+	updateXAxis();
+	m_plotManager->updateAxisScales();
 }
 
 void TimePlotManagerSettings::setPlotComboVisible()
