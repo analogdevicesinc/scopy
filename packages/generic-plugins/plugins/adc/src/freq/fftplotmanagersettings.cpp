@@ -142,60 +142,10 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xcb->addItem("Frequency - override samplerate", XMODE_OVERRIDE);
 
 	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		m_sampleRateSpin->setVisible(false);
-		m_freqOffsetSpin->setVisible(false);
-
-		if(xcb->itemData(idx) == XMODE_SAMPLES) {
-			m_xmin->setUnit("samples");
-			m_xmax->setUnit("samples");
-			m_plotManager->setXUnit("samples");
-			m_sampleRateSpin->setValue(m_samplingInfo.bufferSize);
-			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<FFTPlotComponent *>(plt);
-				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("");
-				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(false);
-				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
-			}
+		for(PlotComponent *plt : m_plotManager->plots()) {
+			auto p = dynamic_cast<FFTPlotComponent *>(plt);
+			updateXMode(idx, p->fftPlot()->xAxis());
 		}
-
-		if(xcb->itemData(idx) == XMODE_TIME) {
-			m_xmin->setUnit("Hz");
-			m_xmax->setUnit("Hz");
-			m_plotManager->setXUnit("Hz");
-			m_sampleRateSpin->setVisible(true);
-			m_sampleRateSpin->setEnabled(false);
-			m_sampleRateSpin->setValue(readSampleRate());
-			m_freqOffsetSpin->setVisible(true);
-			m_freqOffsetSpin->setEnabled(true);
-
-			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<FFTPlotComponent *>(plt);
-				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("Hz");
-				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
-				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
-			}
-		}
-		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
-			m_xmin->setUnit("Hz");
-			m_xmax->setUnit("Hz");
-			m_plotManager->setXUnit("Hz");
-			m_sampleRateSpin->setVisible(true);
-			m_sampleRateSpin->setEnabled(true);
-			m_sampleRateSpin->setValue(readSampleRate());
-			m_freqOffsetSpin->setVisible(true);
-			m_freqOffsetSpin->setEnabled(true);
-			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<FFTPlotComponent *>(plt);
-				p->fftPlot()->xAxis()->scaleDraw()->setUnitType("Hz");
-				p->fftPlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
-				p->fftPlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->fftPlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
-			}
-		}
-		updateXAxis();
-		m_plotManager->updateAxisScales();
 	});
 
 	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 1, DBL_MAX, true, false, section);
@@ -233,6 +183,58 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	section->contentLayout()->setSpacing(10);
 
 	return section;
+}
+
+void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
+{
+	QComboBox *xcb = m_xModeCb->combo();
+	m_sampleRateSpin->setVisible(false);
+	m_freqOffsetSpin->setVisible(false);
+
+	if(xcb->itemData(mode) == XMODE_SAMPLES) {
+		m_xmin->setUnit("samples");
+		m_xmax->setUnit("samples");
+		m_plotManager->setXUnit("samples");
+		m_sampleRateSpin->setValue(m_samplingInfo.bufferSize);
+
+		axis->scaleDraw()->setUnitType("");
+		axis->scaleDraw()->setFloatPrecision(3);
+		axis->scaleDraw()->setUnitsEnabled(false);
+		axis->getFormatter()->setTwoDecimalMode(false);
+	}
+
+	if(xcb->itemData(mode) == XMODE_TIME) {
+		m_xmin->setUnit("Hz");
+		m_xmax->setUnit("Hz");
+		m_plotManager->setXUnit("Hz");
+		m_sampleRateSpin->setVisible(true);
+		m_sampleRateSpin->setEnabled(false);
+		m_sampleRateSpin->setValue(readSampleRate());
+		m_freqOffsetSpin->setVisible(true);
+		m_freqOffsetSpin->setEnabled(true);
+
+		axis->scaleDraw()->setUnitType("Hz");
+		axis->scaleDraw()->setUnitsEnabled(true);
+		axis->scaleDraw()->setFloatPrecision(3);
+		axis->getFormatter()->setTwoDecimalMode(false);
+	}
+	if(xcb->itemData(mode) == XMODE_OVERRIDE) {
+		m_xmin->setUnit("Hz");
+		m_xmax->setUnit("Hz");
+		m_plotManager->setXUnit("Hz");
+		m_sampleRateSpin->setVisible(true);
+		m_sampleRateSpin->setEnabled(true);
+		m_sampleRateSpin->setValue(readSampleRate());
+		m_freqOffsetSpin->setVisible(true);
+		m_freqOffsetSpin->setEnabled(true);
+
+		axis->scaleDraw()->setUnitType("Hz");
+		axis->scaleDraw()->setUnitsEnabled(true);
+		axis->scaleDraw()->setFloatPrecision(3);
+		axis->getFormatter()->setTwoDecimalMode(false);
+	}
+	updateXAxis();
+	m_plotManager->updateAxisScales();
 }
 
 void FFTPlotManagerSettings::onInit()
@@ -317,6 +319,8 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 
 	// Set initial complex mode state
 	p->plotMenu()->setComplexMode(m_samplingInfo.complexMode);
+
+	updateXMode(m_xModeCb->combo()->currentIndex(), p->fftPlot()->xAxis());
 }
 
 void FFTPlotManagerSettings::setPlotComboVisible()

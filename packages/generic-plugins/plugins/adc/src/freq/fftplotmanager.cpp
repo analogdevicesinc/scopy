@@ -105,6 +105,9 @@ void FFTPlotManager::multiPlotUpdate()
 	for(PlotComponent *p : qAsConst(m_plots)) {
 		auto plt = dynamic_cast<FFTPlotComponent *>(p);
 		plt->plotMenu()->showDeleteButtons(b);
+
+		// do not allow users to delete the primary plot
+		plt->plotMenu()->showDeleteButtons(b && plt != m_primary);
 	}
 
 	for(PlotManagerCombobox *cb : qAsConst(m_channelPlotcomboMap)) {

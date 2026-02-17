@@ -182,55 +182,10 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xcb->addItem("Time - override samplerate", XMODE_OVERRIDE);
 
 	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		m_sampleRateSpin->setVisible(false);
-		if(xcb->itemData(idx) == XMODE_SAMPLES) {
-			m_sampleRateSpin->setValue(1);
-			m_xmin->setUnit("s");
-			m_xmin->setScaleRange(1, 1e6);
-			m_xmax->setUnit("s");
-			m_xmax->setScaleRange(1, 1e6);
-			m_plotManager->setXUnit("s");
-			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent *>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(false);
-			}
+		for(PlotComponent *plt : m_plotManager->plots()) {
+			auto p = dynamic_cast<TimePlotComponent *>(plt);
+			updateXMode(idx, p->timePlot()->xAxis());
 		}
-		if(xcb->itemData(idx) == XMODE_TIME) {
-			m_sampleRateSpin->setVisible(true);
-			m_sampleRateSpin->setEnabled(false);
-			m_sampleRateSpin->setValue(readSampleRate());
-			m_xmin->setUnit("s");
-			m_xmin->setScaleRange(0, 1);
-			m_xmax->setUnit("s");
-			m_xmax->setScaleRange(0, 1);
-			m_plotManager->setXUnit("s");
-
-			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent *>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->timePlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
-				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
-			}
-		}
-		if(xcb->itemData(idx) == XMODE_OVERRIDE) {
-			m_sampleRateSpin->setVisible(true);
-			m_sampleRateSpin->setEnabled(true);
-
-			m_xmin->setUnit("s");
-			m_xmin->setScaleRange(0, 1);
-			m_xmax->setUnit("s");
-			m_xmax->setScaleRange(0, 1);
-			m_plotManager->setXUnit("s");
-			for(PlotComponent *plt : m_plotManager->plots()) {
-				auto p = dynamic_cast<TimePlotComponent *>(plt);
-				p->timePlot()->xAxis()->scaleDraw()->setFloatPrecision(3);
-				p->timePlot()->xAxis()->scaleDraw()->setUnitsEnabled(true);
-				p->timePlot()->xAxis()->getFormatter()->setTwoDecimalMode(true);
-			}
-		}
-		updateXAxis();
-		m_plotManager->updateAxisScales();
 	});
 
 	m_sampleRateSpin = new MenuSpinbox("Sample rate", 1, "Hz", 1, DBL_MAX, true, false, section);
@@ -257,6 +212,57 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	section->contentLayout()->setSpacing(10);
 
 	return section;
+}
+
+void TimePlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
+{
+	QComboBox *xcb = m_xModeCb->combo();
+	m_sampleRateSpin->setVisible(false);
+
+	if(xcb->itemData(mode) == XMODE_SAMPLES) {
+		m_sampleRateSpin->setValue(1);
+		m_xmin->setUnit("s");
+		m_xmin->setScaleRange(1, 1e6);
+		m_xmax->setUnit("s");
+		m_xmax->setScaleRange(1, 1e6);
+		m_plotManager->setXUnit("s");
+
+		axis->scaleDraw()->setFloatPrecision(3);
+		axis->getFormatter()->setTwoDecimalMode(false);
+	}
+
+	if(xcb->itemData(mode) == XMODE_TIME) {
+		m_sampleRateSpin->setVisible(true);
+		m_sampleRateSpin->setEnabled(false);
+		m_sampleRateSpin->setValue(readSampleRate());
+		m_xmin->setUnit("s");
+		m_xmin->setScaleRange(0, 1);
+		m_xmax->setUnit("s");
+		m_xmax->setScaleRange(0, 1);
+		m_plotManager->setXUnit("s");
+
+		axis->scaleDraw()->setFloatPrecision(3);
+		axis->scaleDraw()->setUnitsEnabled(true);
+		axis->getFormatter()->setTwoDecimalMode(true);
+	}
+
+	if(xcb->itemData(mode) == XMODE_OVERRIDE) {
+		m_sampleRateSpin->setVisible(true);
+		m_sampleRateSpin->setEnabled(true);
+
+		m_xmin->setUnit("s");
+		m_xmin->setScaleRange(0, 1);
+		m_xmax->setUnit("s");
+		m_xmax->setScaleRange(0, 1);
+		m_plotManager->setXUnit("s");
+
+		axis->scaleDraw()->setFloatPrecision(3);
+		axis->scaleDraw()->setUnitsEnabled(true);
+		axis->getFormatter()->setTwoDecimalMode(true);
+	}
+
+	updateXAxis();
+	m_plotManager->updateAxisScales();
 }
 
 void TimePlotManagerSettings::onInit()
@@ -394,6 +400,8 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 		m_menu->scrollTo(m_plotCb);
 		Q_EMIT requestOpenMenu();
 	});
+
+	updateXMode(m_xModeCb->combo()->currentIndex(), p->timePlot()->xAxis());
 }
 
 void TimePlotManagerSettings::setPlotComboVisible()
