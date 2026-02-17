@@ -1878,7 +1878,6 @@ void SignalGenerator::channelWidgetEnabled(bool en)
 	}
 
 	ui->run_button->setEnabled(enable_run);
-	tme->setEnabled(enable_run);
 	//	setDynamicProperty(run_button, "disabled", !enable_run);
 }
 
