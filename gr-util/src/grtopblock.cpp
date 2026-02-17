@@ -130,7 +130,7 @@ void GRTopBlock::start()
 	top->start();
 	Q_EMIT started();
 
-	QtConcurrent::run([this]() {
+	m_flowWaitThread = QtConcurrent::run([this]() {
 		top->wait();
 		onFinished();
 	});
@@ -152,7 +152,7 @@ void GRTopBlock::stop()
 	Q_EMIT aboutToStop();
 	running = false;
 	top->stop();
-	top->wait(); // wait for flow to stop and then request rebuild or other actions
+	m_flowWaitThread.waitForFinished(); // wait for flow to stop and then request rebuild or other actions
 	Q_EMIT stopped();
 }
 

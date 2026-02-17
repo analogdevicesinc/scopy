@@ -28,6 +28,7 @@
 
 #include <gnuradio/top_block.h>
 
+#include <QFuture>
 #include <QObject>
 
 namespace scopy::grutil {
@@ -87,6 +88,7 @@ private:
 	size_t m_vlen;
 	QList<GRSignalPath *> m_signalPaths;
 	QList<GRIIODeviceSource *> m_iioDeviceSources;
+	QFuture<void> m_flowWaitThread;
 };
 
 } // namespace scopy::grutil
