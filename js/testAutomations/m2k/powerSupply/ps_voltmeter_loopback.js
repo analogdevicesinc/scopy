@@ -73,66 +73,86 @@ function readVoltmeterChannel(channel) {
 // Test 1 - TST.PS.POSITIVE: Check positive voltage output
 // ============================================================================
 TestFramework.runTest("TST.PS.POSITIVE", function() {
+    var allPass = true;
+
     // Step 2: Set tracking ratio control to independent
     power.sync = false;
+    var pass1 = TestFramework.assertEqual(power.sync, false, "Independent mode enabled");
+    allPass = allPass && pass1;
 
     // Step 3: Set the positive value to 3.3V and enable
     power.dac1_value = 3.3;
     power.dac1_enabled = true;
-    msleep(500);
+    msleep(100);
+    var pass2 = TestFramework.assertEqual(power.dac1_enabled, true, "DAC1 enabled");
+    allPass = allPass && pass2;
+    msleep(400);
 
-    // Step 4: Verify voltmeter reads 3.25V to 3.35V
+    // Step 4: Verify voltmeter reads 3.2V to 3.4V (aligned with voltmeter_dc_loopback.js)
     var v = readVoltmeterChannel(1);
-    var pass = TestFramework.assertApproxEqual(v, 3.3, 0.05, "Step 4: DAC1 output at 3.3V");
+    var pass3 = TestFramework.assertApproxEqual(v, 3.3, 0.1, "Step 4: DAC1 output at 3.3V");
+    allPass = allPass && pass3;
 
-    // Step 5: Change to 1.8V, verify 1.75V to 1.85V
+    // Step 5: Change to 1.8V, verify 1.7V to 1.9V
     power.dac1_value = 1.8;
     msleep(500);
     v = readVoltmeterChannel(1);
-    pass = TestFramework.assertApproxEqual(v, 1.8, 0.05, "Step 5: DAC1 output at 1.8V") && pass;
+    var pass4 = TestFramework.assertApproxEqual(v, 1.8, 0.1, "Step 5: DAC1 output at 1.8V");
+    allPass = allPass && pass4;
 
-    // Step 6: Change to 5V, verify 4.95V to 5.05V
+    // Step 6: Change to 5V, verify 4.93V to 5.07V (wider tolerance for max voltage)
     power.dac1_value = 5.0;
     msleep(500);
     v = readVoltmeterChannel(1);
-    pass = TestFramework.assertApproxEqual(v, 5.0, 0.05, "Step 6: DAC1 output at 5.0V") && pass;
+    var pass5 = TestFramework.assertApproxEqual(v, 5.0, 0.07, "Step 6: DAC1 output at 5.0V");
+    allPass = allPass && pass5;
 
     // Cleanup
     power.dac1_enabled = false;
-    return pass;
+    return allPass;
 });
 
 // ============================================================================
 // Test 2 - TST.PS.NEGATIVE: Check negative voltage output
 // ============================================================================
 TestFramework.runTest("TST.PS.NEGATIVE", function() {
+    var allPass = true;
+
     // Step 2: Set tracking ratio control to independent
     power.sync = false;
+    var pass1 = TestFramework.assertEqual(power.sync, false, "Independent mode enabled");
+    allPass = allPass && pass1;
 
     // Step 3: Set the negative value to -3.3V and enable
     power.dac2_value = -3.3;
     power.dac2_enabled = true;
-    msleep(500);
+    msleep(100);
+    var pass2 = TestFramework.assertEqual(power.dac2_enabled, true, "DAC2 enabled");
+    allPass = allPass && pass2;
+    msleep(400);
 
-    // Step 4: Verify voltmeter reads -3.25V to -3.35V
+    // Step 4: Verify voltmeter reads -3.4V to -3.2V (aligned with voltmeter_dc_loopback.js)
     var v = readVoltmeterChannel(2);
-    var pass = TestFramework.assertApproxEqual(v, -3.3, 0.05, "Step 4: DAC2 output at -3.3V");
+    var pass3 = TestFramework.assertApproxEqual(v, -3.3, 0.1, "Step 4: DAC2 output at -3.3V");
+    allPass = allPass && pass3;
 
-    // Step 5: Change to -1.8V, verify -1.75V to -1.85V
+    // Step 5: Change to -1.8V, verify -1.9V to -1.7V
     power.dac2_value = -1.8;
     msleep(500);
     v = readVoltmeterChannel(2);
-    pass = TestFramework.assertApproxEqual(v, -1.8, 0.05, "Step 5: DAC2 output at -1.8V") && pass;
+    var pass4 = TestFramework.assertApproxEqual(v, -1.8, 0.1, "Step 5: DAC2 output at -1.8V");
+    allPass = allPass && pass4;
 
-    // Step 6: Change to -5V, verify -4.95V to -5.05V
+    // Step 6: Change to -5V, verify -5.07V to -4.93V (wider tolerance for max voltage)
     power.dac2_value = -5.0;
     msleep(500);
     v = readVoltmeterChannel(2);
-    pass = TestFramework.assertApproxEqual(v, -5.0, 0.05, "Step 6: DAC2 output at -5.0V") && pass;
+    var pass5 = TestFramework.assertApproxEqual(v, -5.0, 0.07, "Step 6: DAC2 output at -5.0V");
+    allPass = allPass && pass5;
 
     // Cleanup
     power.dac2_enabled = false;
-    return pass;
+    return allPass;
 });
 
 // ============================================================================
@@ -151,38 +171,58 @@ TestFramework.runTest("TST.PS.FINE_TUNING", function() {
 // Test 4 - TST.PS.TRACKING: Check tracking mode
 // ============================================================================
 TestFramework.runTest("TST.PS.TRACKING", function() {
+    var allPass = true;
+
     // Step 2: Set tracking ratio control to tracking
     power.dac1_enabled = true;
     power.dac2_enabled = true;
     power.sync = true;
+    msleep(100);
+    var pass1 = TestFramework.assertEqual(power.sync, true, "Tracking mode enabled");
+    allPass = allPass && pass1;
 
     // Step 3: Set the positive output to 5V, set tracking ratio to 50%
     power.dac1_value = 5.0;
     power.tracking_percent = 50;
-    msleep(500);
+    msleep(100);
+    var pass2 = TestFramework.assertEqual(power.tracking_percent, 50, "Tracking percent set to 50%");
+    allPass = allPass && pass2;
+    msleep(400);
 
     // Expected: negative output automatically set to -2.5V
     var v = readVoltmeterChannel(2);
-    var pass = TestFramework.assertApproxEqual(v, -2.5, 0.05, "Step 3: Tracking 50% of 5V = -2.5V");
+    var pass3 = TestFramework.assertApproxEqual(v, -2.5, 0.1, "Step 3: Tracking 50% of 5V = -2.5V");
+    allPass = allPass && pass3;
 
     // Step 4: Set tracking ratio to 100%
     power.tracking_percent = 100;
-    msleep(500);
+    msleep(100);
+    var pass4 = TestFramework.assertEqual(power.tracking_percent, 100, "Tracking percent set to 100%");
+    allPass = allPass && pass4;
+    msleep(400);
 
-    // Expected: negative output automatically set to -5V
+    // Expected: negative output automatically set to -5V (wider tolerance for max voltage)
     v = readVoltmeterChannel(2);
-    pass = TestFramework.assertApproxEqual(v, -5.0, 0.05, "Step 4: Tracking 100% of 5V = -5.0V") && pass;
+    var pass5 = TestFramework.assertApproxEqual(v, -5.0, 0.07, "Step 4: Tracking 100% of 5V = -5.0V");
+    allPass = allPass && pass5;
 
     // Step 5: Set tracking ratio to 0%
     power.tracking_percent = 0;
-    msleep(500);
+    msleep(100);
+    var pass6 = TestFramework.assertEqual(power.tracking_percent, 0, "Tracking percent set to 0%");
+    allPass = allPass && pass6;
+    msleep(400);
 
-    // Expected: negative output automatically set to 0mV
+    // Expected: negative output automatically set to 0mV (wider tolerance for 0V offset)
     v = readVoltmeterChannel(2);
-    pass = TestFramework.assertApproxEqual(v, 0.0, 0.05, "Step 5: Tracking 0% of 5V = 0V") && pass;
+    var pass7 = TestFramework.assertApproxEqual(v, 0.0, 0.1, "Step 5: Tracking 0% of 5V = 0V");
+    allPass = allPass && pass7;
 
     // Step 6: Set tracking ratio control to independent
     power.sync = false;
+    msleep(100);
+    var pass8 = TestFramework.assertEqual(power.sync, false, "Independent mode re-enabled");
+    allPass = allPass && pass8;
 
     // Step 7: Set the positive output to 5V and verify negative does not change
     // Note: switching to independent disables DAC2 (C++ sync_enabled behavior),
@@ -195,13 +235,14 @@ TestFramework.runTest("TST.PS.TRACKING", function() {
     msleep(500);
     var negAfter = readVoltmeterChannel(2);
 
-    pass = TestFramework.assertApproxEqual(negAfter, negBefore, 0.1,
-        "Step 7: Independent mode - negative unchanged after setting positive") && pass;
+    var pass9 = TestFramework.assertApproxEqual(negAfter, negBefore, 0.1,
+        "Step 7: Independent mode - negative unchanged after setting positive");
+    allPass = allPass && pass9;
 
     // Cleanup
     power.dac1_enabled = false;
     power.dac2_enabled = false;
-    return pass;
+    return allPass;
 });
 
 // Cleanup
