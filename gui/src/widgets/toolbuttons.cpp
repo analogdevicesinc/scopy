@@ -327,8 +327,7 @@ MenuCollapseBtn::MenuCollapseBtn(Direction dir, MenuHAnim *menu, QWidget *parent
 	setIcon(Style::getPixmap(openIcon, Style::getColor(json::theme::content_default)));
 
 	connect(this, &QPushButton::toggled, this, [=](bool open) {
-		setIcon(Style::getPixmap(open ? openIcon : closedIcon,
-					 Style::getColor(json::theme::content_default)));
+		setIcon(Style::getPixmap(open ? openIcon : closedIcon, Style::getColor(json::theme::content_default)));
 		menu->toggleMenu(open);
 	});
 }

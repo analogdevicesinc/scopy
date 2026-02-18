@@ -143,11 +143,13 @@ void PlotLegend::updateLineStyle(PlotChannel *ch)
 	QString borderStyle;
 	switch(style) {
 	case PlotChannel::PCS_DOTS:
-		borderStyle = QString("background-color: transparent; border: %1px dotted %2;").arg(thickness).arg(color);
+		borderStyle =
+			QString("background-color: transparent; border: %1px dotted %2;").arg(thickness).arg(color);
 		break;
 	case PlotChannel::PCS_STICKS:
 	case PlotChannel::PCS_STEPS:
-		borderStyle = QString("background-color: transparent; border: %1px dashed %2;").arg(thickness).arg(color);
+		borderStyle =
+			QString("background-color: transparent; border: %1px dashed %2;").arg(thickness).arg(color);
 		break;
 	case PlotChannel::PCS_LINES:
 	case PlotChannel::PCS_SMOOTH:
