@@ -365,7 +365,7 @@ void Ad9084Channel::init()
 	this->layout()->addWidget(m_chnSection);
 }
 
-void Ad9084Channel::addGroup(SharedAttrCategory attr, IIOWidgetGroup *grp)
+void Ad9084Channel::addGroup(SharedAttrCategory attr, IIOWidgetSyncGroup *grp)
 {
 	if(!m_iioWidgetGroupList.contains(attr)) {
 		m_iioWidgetGroupList.insert(attr, grp);

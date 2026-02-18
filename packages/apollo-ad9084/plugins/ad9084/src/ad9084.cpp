@@ -200,7 +200,7 @@ void Ad9084::scanChannels()
 	}
 	mapPathsUnique();
 
-	IIOWidgetGroup *adcFrequencyGrp = new IIOWidgetGroup(false, this);
+	IIOWidgetSyncGroup *adcFrequencyGrp = new IIOWidgetSyncGroup(false, this);
 	m_iioWidgetGroups.push_back(adcFrequencyGrp);
 	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
 		QString chn = m_rx_coarse_ddc_channel_names.at(i);
@@ -212,7 +212,7 @@ void Ad9084::scanChannels()
 		rxchnWidget->init();
 	}
 
-	IIOWidgetGroup *dacFrequencyGrp = new IIOWidgetGroup(false, this);
+	IIOWidgetSyncGroup *dacFrequencyGrp = new IIOWidgetSyncGroup(false, this);
 	m_iioWidgetGroups.push_back(dacFrequencyGrp);
 	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
 		QString chn = m_tx_coarse_duc_channel_names.at(i);
