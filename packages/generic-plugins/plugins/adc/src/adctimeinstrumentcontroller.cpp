@@ -46,6 +46,11 @@ void ADCTimeInstrumentController::init()
 	m_plotComponentManager = m_timePlotComponentManager;
 	addComponent(m_plotComponentManager);
 
+	m_plotComponentManager->measurePanel()->setSortByTypeVisible(true);
+	m_plotComponentManager->measurePanel()->setHideButtonVisible(true);
+	m_plotComponentManager->statsPanel()->setSortByTypeVisible(true);
+	m_plotComponentManager->statsPanel()->setHideButtonVisible(true);
+
 	CursorSettings *m_cursorSettings = new CursorSettings();
 	HoverWidget *hoverSettings = new HoverWidget(m_cursorSettings, m_ui->m_cursor, m_ui);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);

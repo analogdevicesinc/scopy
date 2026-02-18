@@ -95,30 +95,17 @@ void MeasurementsPanel::setupControlButtons()
 	btnLayout->setMargin(0);
 	btnLayout->setSpacing(4);
 
-	m_showAllBtn = new QPushButton("Show All", this);
-	m_hideAllBtn = new QPushButton("Hide All", this);
 	m_sortByChannelBtn = new QPushButton("Sort by channel", this);
 	m_sortByTypeBtn = new QPushButton("Sort by type", this);
+	m_hideBtn = new QPushButton("Disable All", this);
 
-	Style::setStyle(m_showAllBtn, style::properties::button::transparentButton);
-	Style::setStyle(m_hideAllBtn, style::properties::button::transparentButton);
 	Style::setStyle(m_sortByChannelBtn, style::properties::button::transparentButton);
 	Style::setStyle(m_sortByTypeBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_hideBtn, style::properties::button::transparentButton);
 
-	m_hideAllBtn->setVisible(false);
 	m_sortByChannelBtn->setVisible(false);
-
-	connect(m_showAllBtn, &QPushButton::clicked, this, [=]() {
-		Q_EMIT toggleAll(true);
-		m_showAllBtn->setVisible(false);
-		m_hideAllBtn->setVisible(true);
-	});
-
-	connect(m_hideAllBtn, &QPushButton::clicked, this, [=]() {
-		Q_EMIT toggleAll(false);
-		m_hideAllBtn->setVisible(false);
-		m_showAllBtn->setVisible(true);
-	});
+	m_sortByTypeBtn->setVisible(false);
+	m_hideBtn->setVisible(false);
 
 	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [=]() {
 		sort(0);
@@ -132,14 +119,19 @@ void MeasurementsPanel::setupControlButtons()
 		m_sortByChannelBtn->setVisible(true);
 	});
 
-	btnLayout->addWidget(m_showAllBtn);
-	btnLayout->addWidget(m_hideAllBtn);
+	connect(m_hideBtn, &QPushButton::clicked, this, [=]() { Q_EMIT hideAll(); });
+
 	btnLayout->addWidget(m_sortByChannelBtn);
 	btnLayout->addWidget(m_sortByTypeBtn);
 	btnLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	btnLayout->addWidget(m_hideBtn);
 
 	m_lay->addLayout(btnLayout);
 }
+
+void MeasurementsPanel::setSortByTypeVisible(bool visible) { m_sortByTypeBtn->setVisible(visible); }
+
+void MeasurementsPanel::setHideButtonVisible(bool visible) { m_hideBtn->setVisible(visible); }
 
 void MeasurementsPanel::addWidget(QWidget *meas)
 {
@@ -302,30 +294,17 @@ void StatsPanel::setupControlButtons()
 	btnLayout->setMargin(0);
 	btnLayout->setSpacing(4);
 
-	m_showAllBtn = new QPushButton("Show All", this);
-	m_hideAllBtn = new QPushButton("Hide All", this);
 	m_sortByChannelBtn = new QPushButton("Sort by channel", this);
 	m_sortByTypeBtn = new QPushButton("Sort by type", this);
+	m_hideBtn = new QPushButton("Disable All", this);
 
-	Style::setStyle(m_showAllBtn, style::properties::button::transparentButton);
-	Style::setStyle(m_hideAllBtn, style::properties::button::transparentButton);
 	Style::setStyle(m_sortByChannelBtn, style::properties::button::transparentButton);
 	Style::setStyle(m_sortByTypeBtn, style::properties::button::transparentButton);
+	Style::setStyle(m_hideBtn, style::properties::button::transparentButton);
 
-	m_hideAllBtn->setVisible(false);
 	m_sortByChannelBtn->setVisible(false);
-
-	connect(m_showAllBtn, &QPushButton::clicked, this, [=]() {
-		Q_EMIT toggleAll(true);
-		m_showAllBtn->setVisible(false);
-		m_hideAllBtn->setVisible(true);
-	});
-
-	connect(m_hideAllBtn, &QPushButton::clicked, this, [=]() {
-		Q_EMIT toggleAll(false);
-		m_hideAllBtn->setVisible(false);
-		m_showAllBtn->setVisible(true);
-	});
+	m_sortByTypeBtn->setVisible(false);
+	m_hideBtn->setVisible(false);
 
 	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [=]() {
 		sort(0);
@@ -339,14 +318,19 @@ void StatsPanel::setupControlButtons()
 		m_sortByChannelBtn->setVisible(true);
 	});
 
-	btnLayout->addWidget(m_showAllBtn);
-	btnLayout->addWidget(m_hideAllBtn);
+	connect(m_hideBtn, &QPushButton::clicked, this, [=]() { Q_EMIT hideAll(); });
+
 	btnLayout->addWidget(m_sortByChannelBtn);
 	btnLayout->addWidget(m_sortByTypeBtn);
 	btnLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	btnLayout->addWidget(m_hideBtn);
 
 	m_lay->addLayout(btnLayout);
 }
+
+void StatsPanel::setSortByTypeVisible(bool visible) { m_sortByTypeBtn->setVisible(visible); }
+
+void StatsPanel::setHideButtonVisible(bool visible) { m_hideBtn->setVisible(visible); }
 
 StatsPanel::~StatsPanel() {}
 

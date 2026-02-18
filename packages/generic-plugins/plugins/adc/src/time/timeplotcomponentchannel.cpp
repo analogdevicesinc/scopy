@@ -107,8 +107,7 @@ void adc::TimePlotComponentChannel ::initPlotComponent(PlotComponent *pc)
 	// Sync curve style from time plot channel to XY plot channel
 	connect(m_timePlotCh, &PlotChannel::thicknessChanged, this,
 		[=]() { m_xyPlotCh->setThickness(m_timePlotCh->thickness()); });
-	connect(m_timePlotCh, &PlotChannel::styleChanged, this,
-		[=]() { m_xyPlotCh->setStyle(m_timePlotCh->style()); });
+	connect(m_timePlotCh, &PlotChannel::styleChanged, this, [=]() { m_xyPlotCh->setStyle(m_timePlotCh->style()); });
 	connect(m_timePlotCh, &PlotChannel::penChanged, this,
 		[=]() { m_xyPlotCh->setColor(m_timePlotCh->pen().color()); });
 

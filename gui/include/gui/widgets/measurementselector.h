@@ -38,7 +38,7 @@ class SCOPY_GUI_EXPORT MeasurementSelectorItem : public QWidget
 	friend class StyleHelper;
 
 public:
-	MeasurementSelectorItem(QString name, QString icon, QWidget *parent);
+	MeasurementSelectorItem(QString name, QString icon = QString(), QWidget *parent = nullptr);
 	~MeasurementSelectorItem();
 
 	QCheckBox *measureCheckbox() const;
@@ -62,12 +62,18 @@ public:
 	void removeMeasurement(QString name);
 	MeasurementSelectorItem *measurement(QString name);
 
+public Q_SLOTS:
 	void toggleAllMeasurement(bool b);
 	void toggleAllStats(bool b);
 
 private:
+	void setupToggleAllRow();
+	void updateToggleAllMeasure();
+	void updateToggleAllStats();
+
 	QMap<QString, MeasurementSelectorItem *> m_map;
 	QVBoxLayout *lay;
+	MeasurementSelectorItem *m_toggleAllItem;
 };
 } // namespace scopy
 

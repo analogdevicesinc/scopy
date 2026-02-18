@@ -25,6 +25,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMap>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include <stylehelper.h>
@@ -37,6 +38,19 @@ MeasurementSelector::MeasurementSelector(QWidget *parent)
 	setLayout(lay);
 	lay->setMargin(0);
 	lay->setSpacing(6);
+
+	setupToggleAllRow();
+}
+
+void MeasurementSelector::setupToggleAllRow()
+{
+	m_toggleAllItem = new MeasurementSelectorItem("Toggle All", QString(), this);
+
+	connect(m_toggleAllItem->measureCheckbox(), &QCheckBox::toggled, this,
+		&MeasurementSelector::toggleAllMeasurement);
+	connect(m_toggleAllItem->statsCheckbox(), &QCheckBox::toggled, this, &MeasurementSelector::toggleAllStats);
+
+	lay->addWidget(m_toggleAllItem);
 }
 
 MeasurementSelector::~MeasurementSelector() {}
@@ -46,6 +60,9 @@ void MeasurementSelector::addMeasurement(QString name, QString icon)
 	MeasurementSelectorItem *item = new MeasurementSelectorItem(name, icon, this);
 	lay->addWidget(item);
 	m_map.insert(name, item);
+
+	connect(item->measureCheckbox(), &QCheckBox::toggled, this, &MeasurementSelector::updateToggleAllMeasure);
+	connect(item->statsCheckbox(), &QCheckBox::toggled, this, &MeasurementSelector::updateToggleAllStats);
 }
 
 void MeasurementSelector::removeMeasurement(QString name)
@@ -60,7 +77,7 @@ void MeasurementSelector::toggleAllMeasurement(bool b)
 {
 	for(int i = 0; i < children().count(); i++) {
 		MeasurementSelectorItem *item = dynamic_cast<MeasurementSelectorItem *>(children()[i]);
-		if(!item)
+		if(!item || item == m_toggleAllItem)
 			continue;
 		item->measureCheckbox()->setChecked(b);
 	}
@@ -70,7 +87,7 @@ void MeasurementSelector::toggleAllStats(bool b)
 {
 	for(int i = 0; i < children().count(); i++) {
 		MeasurementSelectorItem *item = dynamic_cast<MeasurementSelectorItem *>(children()[i]);
-		if(!item)
+		if(!item || item == m_toggleAllItem)
 			continue;
 		item->statsCheckbox()->setChecked(b);
 	}
@@ -105,5 +122,31 @@ MeasurementSelectorItem::~MeasurementSelectorItem() {}
 QCheckBox *MeasurementSelectorItem::measureCheckbox() const { return m_measureCheckbox; }
 
 QCheckBox *MeasurementSelectorItem::statsCheckbox() const { return m_statsCheckbox; }
+
+void MeasurementSelector::updateToggleAllMeasure()
+{
+	bool allChecked = true;
+	for(auto *item : qAsConst(m_map)) {
+		if(!item->measureCheckbox()->isChecked()) {
+			allChecked = false;
+			break;
+		}
+	}
+	QSignalBlocker blocker(m_toggleAllItem->measureCheckbox());
+	m_toggleAllItem->measureCheckbox()->setChecked(allChecked);
+}
+
+void MeasurementSelector::updateToggleAllStats()
+{
+	bool allChecked = true;
+	for(auto *item : qAsConst(m_map)) {
+		if(!item->statsCheckbox()->isChecked()) {
+			allChecked = false;
+			break;
+		}
+	}
+	QSignalBlocker blocker(m_toggleAllItem->statsCheckbox());
+	m_toggleAllItem->statsCheckbox()->setChecked(allChecked);
+}
 
 #include "moc_measurementselector.cpp"

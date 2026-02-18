@@ -148,7 +148,11 @@ class SCOPY_GUI_EXPORT MenuCollapseBtn : public QPushButton
 {
 	Q_OBJECT
 public:
-	enum Direction { Left, Right };
+	enum Direction
+	{
+		Left,
+		Right
+	};
 	MenuCollapseBtn(Direction dir, MenuHAnim *menu, QWidget *parent = nullptr);
 };
 
