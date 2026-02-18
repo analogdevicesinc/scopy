@@ -29,14 +29,14 @@
 #include <iiowidgetbuilder.h>
 
 namespace scopy {
-class IIOWidgetManager;
+class IIOWidgetGroup;
 namespace ad936x {
 
 class BistWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit BistWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent = nullptr);
+	explicit BistWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~BistWidget();
 
 Q_SIGNALS:
@@ -46,7 +46,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
-	IIOWidgetManager *m_mgr = nullptr;
+	IIOWidgetGroup *m_mgr = nullptr;
 	void updateBistTone();
 
 	MenuComboWidget *m_bistTone;

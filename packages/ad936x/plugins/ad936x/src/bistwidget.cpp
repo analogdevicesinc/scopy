@@ -28,7 +28,7 @@
 using namespace scopy;
 using namespace ad936x;
 
-BistWidget::BistWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent)
+BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent)
 	: m_device(device)
 	, m_mgr(mgr)
 	, QWidget{parent}
@@ -79,7 +79,7 @@ BistWidget::BistWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .optionsValues(bistOptionasData)
 				      .title("Bist PRBS")
-				      .manager(m_mgr)
+				      .group(m_mgr)
 				      .buildSingle();
 	hLayout1->addWidget(bistPrbs);
 
@@ -107,7 +107,7 @@ BistWidget::BistWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .optionsValues(loopbackOptionasData)
 				      .title("Loopback")
-				      .manager(m_mgr)
+				      .group(m_mgr)
 				      .buildSingle();
 	hLayout1->addWidget(loopback);
 

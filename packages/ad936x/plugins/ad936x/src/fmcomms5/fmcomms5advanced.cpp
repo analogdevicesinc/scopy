@@ -37,7 +37,7 @@ Q_LOGGING_CATEGORY(CAT_FMCOMMS5_ADVANCED, "FMCOMMS5_ADVANCED")
 using namespace scopy;
 using namespace ad936x;
 
-Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetManager *mgr, QWidget *parent)
+Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
 	: m_ctx(ctx)
 	, m_mgr(mgr)
 	, QWidget{parent}
@@ -172,6 +172,24 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetManager *mgr, QWid
 }
 
 Fmcomms5Advanced::~Fmcomms5Advanced() {}
+
+void Fmcomms5Advanced::switchSubtab(const QString &name)
+{
+	QMap<QString, QPushButton *> tabs;
+	tabs["ENSM/Mode/Clocks"] = m_ensmModeClocksBtn;
+	tabs["eLNA"] = m_eLnaBtn;
+	tabs["RSSI"] = m_rssiBtn;
+	tabs["GAIN"] = m_gainBtn;
+	tabs["TX MONITOR"] = m_txMonitorBtn;
+	tabs["Aux ADC/DAC/IIO"] = m_auxAdcDacIioBtn;
+	tabs["MISC"] = m_miscBtn;
+	tabs["BIST"] = m_bistBtn;
+	tabs["FMCOMMS5"] = m_fmcomms5Btn;
+
+	if(tabs.contains(name) && tabs[name]) {
+		tabs[name]->click();
+	}
+}
 
 void Fmcomms5Advanced::showEvent(QShowEvent *event)
 {

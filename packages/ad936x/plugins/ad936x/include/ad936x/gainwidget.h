@@ -27,14 +27,14 @@
 #include <iio.h>
 
 namespace scopy {
-class IIOWidgetManager;
+class IIOWidgetGroup;
 namespace ad936x {
 
 class GainWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit GainWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent = nullptr);
+	explicit GainWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~GainWidget();
 
 Q_SIGNALS:
@@ -43,7 +43,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
-	IIOWidgetManager *m_mgr = nullptr;
+	IIOWidgetGroup *m_mgr = nullptr;
 	QWidget *modeWidget(QWidget *parent);
 	QWidget *mgcWidget(QWidget *parent);
 	QWidget *agcThresholdGainChangesWidget(QWidget *parent);

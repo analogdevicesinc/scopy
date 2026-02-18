@@ -39,14 +39,16 @@
 #include "bistwidget.h"
 
 namespace scopy {
-class IIOWidgetManager;
+class IIOWidgetGroup;
 namespace ad936x {
 class AD936XAdvanced : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit AD936XAdvanced(iio_context *ctx, IIOWidgetManager *mgr = nullptr, QWidget *parent = nullptr);
+	explicit AD936XAdvanced(iio_context *ctx, IIOWidgetGroup *mgr = nullptr, QWidget *parent = nullptr);
 	~AD936XAdvanced();
+
+	void switchSubtab(const QString &name);
 
 Q_SIGNALS:
 	void readRequested();
@@ -64,7 +66,7 @@ private:
 	QPushButton *m_bistBtn = nullptr;
 
 	iio_context *m_ctx = nullptr;
-	IIOWidgetManager *m_mgr = nullptr;
+	IIOWidgetGroup *m_mgr = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;

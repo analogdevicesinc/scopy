@@ -28,7 +28,7 @@
 using namespace scopy;
 using namespace ad936x;
 
-RssiWidget::RssiWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent)
+RssiWidget::RssiWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent)
 	: m_device(device)
 	, m_mgr(mgr)
 	, QWidget{parent}
@@ -62,7 +62,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 					  .optionsValues("[0 1 100000]")
 					  .title("Duration (us)")
 					  .infoMessage("Total RSSI measurement duration")
-					  .manager(m_mgr)
+					  .group(m_mgr)
 					  .buildSingle();
 	layout->addWidget(rssiDuration);
 
@@ -77,7 +77,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 			.infoMessage(
 				"When the RSSI algorithm (re)starts, the AD9361 first waits for the Rx signal path to "
 				"settle. This delay is the RSSI Delay")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(rssiDelay);
 
@@ -91,7 +91,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 				      .infoMessage("After the RSSI Delay the RSSI algorithm alternates between "
 						   "measuring RSSI and waiting "
 						   "RSSI Waitto measure RSSI")
-				      .manager(m_mgr)
+				      .group(m_mgr)
 				      .buildSingle();
 	layout->addWidget(rssiWait);
 
@@ -116,7 +116,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .optionsValues(optionasData)
 					     .title("Restart Mode")
-					     .manager(m_mgr)
+					     .group(m_mgr)
 					     .buildSingle();
 	layout->addWidget(rssiRestartMode);
 

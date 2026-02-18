@@ -28,7 +28,7 @@
 using namespace scopy;
 using namespace ad936x;
 
-MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent)
+MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent)
 	: m_device(device)
 	, m_mgr(mgr)
 	, QWidget{parent}
@@ -65,7 +65,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 							       "the initialization and tracking RF DC offset "
 							       "calibrations. The integrated data shifts by this twos "
 							       "complement value and ranges from -16 to +15.")
-						  .manager(m_mgr)
+						  .group(m_mgr)
 						  .buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationHighRange, 1, 1);
 
@@ -80,7 +80,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 							      "the initialization and tracking RF DC offset "
 							      "calibrations. The integrated data shifts by this twos "
 							      "complement value and ranges from -16 to +15.")
-						 .manager(m_mgr)
+						 .group(m_mgr)
 						 .buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationLowRange, 1, 2);
 
@@ -100,7 +100,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 				     "number of integrated samples and the loop gain. The number of samples equals 256 "
 				     "× RF DC Offset "
 				     "Count[7:0] in ClkRF cycles. Increasing this value increases loop gain.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	dcOffsetTrackingLayout->addWidget(countHighRange, 2, 1);
 
@@ -117,7 +117,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 				     "number of integrated samples and the loop gain. The number of samples equals 256 "
 				     "× RF DC Offset "
 				     "Count[7:0] in ClkRF cycles. Increasing this value increases loop gain.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	dcOffsetTrackingLayout->addWidget(countLowRange, 2, 2);
 
@@ -133,7 +133,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 			.infoMessage("BIT(0) Apply a new tracking word when a gain change occurs. BIT(1) Apply a new "
 				     "tracking word when the received signal is less than the SOI Threshold. BIT(2) "
 				     "Apply a new tracking word after the device exits the receive state")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	dcOffsetTrackingLayout->addWidget(updateEventMask, 3, 1);
 
@@ -158,7 +158,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *paren
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Slow QEC")
 			.infoMessage("Improved RX QEC tracking in case signal of interest is close to DC/LO")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	qecTrackingLayout->addWidget(qecTrackingIio);
 	qecTrackingIio->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);

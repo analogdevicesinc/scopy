@@ -27,13 +27,13 @@
 #include <iio.h>
 
 namespace scopy {
-class IIOWidgetManager;
+class IIOWidgetGroup;
 namespace ad936x {
 class TxMonitorWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit TxMonitorWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent = nullptr);
+	explicit TxMonitorWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~TxMonitorWidget();
 
 Q_SIGNALS:
@@ -42,7 +42,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
-	IIOWidgetManager *m_mgr = nullptr;
+	IIOWidgetGroup *m_mgr = nullptr;
 };
 } // namespace ad936x
 } // namespace scopy
