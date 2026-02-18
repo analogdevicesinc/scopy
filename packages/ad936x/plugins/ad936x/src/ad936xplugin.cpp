@@ -27,6 +27,8 @@
 #include <style.h>
 #include "scopy-ad936x_config.h"
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
+#include <iio-widgets/iiowidgetmanager.h>
 
 #include "ad936x/ad936x.h"
 #include "ad936x/ad963xadvanced.h"
@@ -109,29 +111,31 @@ bool Ad936xPlugin::onConnect()
 		return false;
 	}
 
-	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
-	bool isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
+	m_widgetManager = new IIOWidgetManager(this);
 
-	if(isFmcomms5) {
-		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context());
+	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
+	m_isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
+
+	if(m_isFmcomms5) {
+		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context(), m_widgetManager);
 		m_toolList[0]->setTool(fmcomms5);
 		m_toolList[0]->setName("FMCOMMS5");
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(false);
 
-		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context());
+		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context(), m_widgetManager);
 		m_toolList[1]->setTool(fmcomms5Advanced);
 		m_toolList[1]->setName("FMCOMMS5 Advanced");
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(false);
 
 	} else {
-		AD936X *ad936X = new AD936X(conn->context());
+		AD936X *ad936X = new AD936X(conn->context(), m_widgetManager);
 		m_toolList[0]->setTool(ad936X);
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(true);
 
-		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context());
+		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context(), m_widgetManager);
 		m_toolList[1]->setTool(ad936XAdvanced);
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(true);
@@ -151,6 +155,11 @@ bool Ad936xPlugin::onDisconnect()
 			tool->setTool(nullptr);
 			delete(w);
 		}
+	}
+
+	if(m_widgetManager) {
+		delete m_widgetManager;
+		m_widgetManager = nullptr;
 	}
 
 	ConnectionProvider::close(m_param);
