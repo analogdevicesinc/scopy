@@ -23,7 +23,7 @@
 
 #include "scopy-ad9084_export.h"
 #include <iiowidget.h>
-#include <iiowidgetgroup.h>
+#include <iiowidgetsyncgroup.h>
 #include <QWidget>
 #include <iio.h>
 
@@ -47,7 +47,7 @@ public:
 	QString label() const;
 
 	void init();
-	void addGroup(SharedAttrCategory attr, IIOWidgetGroup *grp);
+	void addGroup(SharedAttrCategory attr, IIOWidgetSyncGroup *grp);
 
 public Q_SLOTS:
 	void readChannel();
@@ -77,7 +77,7 @@ private:
 	IIOWidget *m_frequencyWidget;
 	MenuSectionWidget *m_chnSection;
 	QList<IIOWidget *> m_iioWidgets;
-	QMap<SharedAttrCategory, IIOWidgetGroup *> m_iioWidgetGroupList;
+	QMap<SharedAttrCategory, IIOWidgetSyncGroup *> m_iioWidgetGroupList;
 };
 } // namespace ad9084
 } // namespace scopy

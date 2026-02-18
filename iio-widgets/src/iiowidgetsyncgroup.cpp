@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -16,22 +16,23 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
-#include "iiowidgetgroup.h"
+#include "iiowidgetsyncgroup.h"
 
 using namespace scopy;
 
-IIOWidgetGroup::IIOWidgetGroup(bool singleTrigger, QObject *parent)
+IIOWidgetSyncGroup::IIOWidgetSyncGroup(bool singleTrigger, QObject *parent)
 	: QObject(parent)
 	, m_widgets({})
 	, m_singleTrigger(singleTrigger)
 	, m_trigger(nullptr)
 {}
 
-IIOWidgetGroup::~IIOWidgetGroup() { m_widgets.clear(); }
+IIOWidgetSyncGroup::~IIOWidgetSyncGroup() { m_widgets.clear(); }
 
-void IIOWidgetGroup::add(IIOWidget *widget, bool triggerPoint)
+void IIOWidgetSyncGroup::add(IIOWidget *widget, bool triggerPoint)
 {
 	m_widgets.push_back(widget);
 	bool conn = !m_singleTrigger;
@@ -47,7 +48,7 @@ void IIOWidgetGroup::add(IIOWidget *widget, bool triggerPoint)
 	}
 }
 
-void IIOWidgetGroup::handleStatusChanged(QDateTime date, QString old, QString newD, int ret, bool readop)
+void IIOWidgetSyncGroup::handleStatusChanged(QDateTime date, QString old, QString newD, int ret, bool readop)
 {
 	if(old != newD) {
 		for(auto w : qAsConst(m_widgets)) {
@@ -56,4 +57,4 @@ void IIOWidgetGroup::handleStatusChanged(QDateTime date, QString old, QString ne
 	}
 }
 
-#include "moc_iiowidgetgroup.cpp"
+#include "moc_iiowidgetsyncgroup.cpp"

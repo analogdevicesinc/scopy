@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -16,23 +16,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
-#ifndef SCOPY_IIOWIDGETGROUP_H
-#define SCOPY_IIOWIDGETGROUP_H
+#ifndef SCOPY_IIOWIDGETSYNC_H
+#define SCOPY_IIOWIDGETSYNC_H
 
 #include "scopy-iio-widgets_export.h"
 #include "iiowidget.h"
 #include <QObject>
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetGroup : public QObject
+class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetSyncGroup : public QObject
 {
 	Q_OBJECT
 
 public:
-	IIOWidgetGroup(bool singleTrigger = false, QObject *parent = nullptr);
-	virtual ~IIOWidgetGroup();
+	IIOWidgetSyncGroup(bool singleTrigger = false, QObject *parent = nullptr);
+	virtual ~IIOWidgetSyncGroup();
 
 	void add(IIOWidget *widget, bool triggerPoint = false);
 
@@ -47,4 +48,4 @@ private:
 };
 } // namespace scopy
 
-#endif // SCOPY_IIOWIDGETGROUP_H
+#endif // SCOPY_IIOWIDGETSYNC_H
