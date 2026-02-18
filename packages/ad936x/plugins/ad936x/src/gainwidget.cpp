@@ -27,7 +27,7 @@
 using namespace scopy;
 using namespace ad936x;
 
-GainWidget::GainWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent)
+GainWidget::GainWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent)
 	: m_device(device)
 	, m_mgr(mgr)
 	, QWidget{parent}
@@ -98,7 +98,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 				     .infoMessage("RX1 Gain control operation: Manual gain (0); Fast attack AGC (1); "
 						  "Slow attack AGC (2); "
 						  "Hybrid AGC (3). See register 0x0FA, bits [D4], [D1:D0].")
-				     .manager(m_mgr)
+				     .group(m_mgr)
 				     .buildSingle();
 	modeWidgetLayout->addWidget(rx1Mode, 1, 0);
 
@@ -119,7 +119,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 				     .infoMessage("RX2 Gain control operation: Manual gain (0); Fast attack AGC (1); "
 						  "Slow attack AGC (2); "
 						  "Hybrid AGC (3). See register 0x0FA, bits [D4], [D3:D2].")
-				     .manager(m_mgr)
+				     .group(m_mgr)
 				     .buildSingle();
 	modeWidgetLayout->addWidget(rx2Mode, 1, 1);
 
@@ -147,7 +147,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 				       .optionsValues(tableModeOptionsData)
 				       .title("Table Mode")
 				       .infoMessage("Enable Split Gain Table Mode - default Full Table")
-				       .manager(m_mgr)
+				       .group(m_mgr)
 				       .buildSingle();
 	modeWidgetLayout->addWidget(tableMode, 1, 2);
 
@@ -168,7 +168,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 			.title("Dec PWR mess. duration in MGC and Slow Attack AGC mode")
 			.infoMessage("The power measurement duration used by the gain control algorithm. See register "
 				     "0x15C, bits [D3:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	modeWidgetLayout->addWidget(decpowMeasurement, 2, 0);
 
@@ -183,7 +183,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 			.infoMessage("This threshold is used by the fast AGC to determine if the gain should be "
 				     "increased. It can also be used to trigger a CTRL_OUT signal transition in MGC "
 				     "mode. See register 0x114, bits [D6:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	modeWidgetLayout->addWidget(lowPowerThresh, 3, 0);
 
@@ -199,7 +199,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 				"The AGC Attack Delay prevents the AGC from starting its algorithm until the receive "
 				"path has settled. The delay counter starts when the ENSM enters the Rx state. See "
 				"register 0x022, bits [D5:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	modeWidgetLayout->addWidget(attackDelay, 2, 1);
 
@@ -213,7 +213,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 			.infoMessage(
 				"Set to use the RX FIR output for power measurements. Default/Clear to use the HB1 "
 				"output. See register 0x15C, bits [D6].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	modeWidgetLayout->addWidget(rxFirOut, 3, 1);
 	rxFirOut->showProgressBar(false);
@@ -255,7 +255,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 			.infoMessage(
 				"If this attribute is clear, SPI writes change the RX1 gain. When this attribute is "
 				"set, control input pins control the gain. See register 0x0FB, bit [D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	mgcWidgetLayout->addWidget(mgcRx1Ctrl, 1, 0);
 	mgcRx1Ctrl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -271,7 +271,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 			.infoMessage(
 				"If this attribute is clear, SPI writes change the RX2 gain. When this attribute is "
 				"set, control input pins control the gain. See register 0x0FB, bit [D1].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	mgcWidgetLayout->addWidget(mgcRx2Ctrl, 1, 1);
 	mgcRx2Ctrl->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -289,7 +289,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 				"This attribute applies if the CTRL_IN signals control gain. The gain index increases "
 				"by this value when certain CTRL_IN signals transition high. See register 0x0FC, bits "
 				"[D7:D5]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	mgcWidgetLayout->addWidget(mgcIncGain, 2, 0);
 
@@ -305,7 +305,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 				"This attribute applies if the CTRL_IN signals control gain. The gain index decreases "
 				"by this value when certain CTRL_IN signals transition high. See register 0x0FE, bits "
 				"[D7:D5]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	mgcWidgetLayout->addWidget(mgcDecGain, 2, 1);
 
@@ -328,7 +328,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 					       .title("Split Table Control Input Mode")
 					       .infoMessage("AGC determine this (0); Only in LPF(1); Only in LMT (2). "
 							    "See register 0x0FC, bits [D4], [D3].")
-					       .manager(m_mgr)
+					       .group(m_mgr)
 					       .buildSingle();
 	mgcWidgetLayout->addWidget(mgcSplitTableCtrl, 3, 0);
 
@@ -374,7 +374,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.title("Outer Threshold High (dBFS)")
 			.infoMessage("The outer high threshold equals the inner high threshold plus this value. See "
 				     "register 0x129, bits [D7:D4]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(outerThreshHigh, 1, 0);
 
@@ -388,7 +388,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.title("Decrease Steps")
 			.infoMessage("The slow AGC changes gain by this amount when the outer high threshold is "
 				     "exceeded. See register 0x12A, bits [D7:D4].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(outerThreshHighDecSteps, 1, 1);
 
@@ -403,7 +403,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.infoMessage("Applies to AGC. This attribute specifies the fast AGC lock level or specifies "
 				     "the slow AGC "
 				     "inner high threshold. Resolution is −1 dBFS/LSB. See register 0x101 [D6:D0]).")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(innerThreshHigh, 2, 0);
 
@@ -417,7 +417,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.title("Decrease Steps")
 			.infoMessage("This attribute sets the gain decrease amount when the inner high "
 				     "threshold is exceeded. See register 0x123, bits [D6:D4].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(innerThreshHighDecSteps, 2, 1);
 
@@ -430,7 +430,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 					    .title("Inner Threshold Low (dBFS)")
 					    .infoMessage("This attribute sets the slow AGC inner low window threshold. "
 							 "See register 0x120, bits [D6:D0].")
-					    .manager(m_mgr)
+					    .group(m_mgr)
 					    .buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(innerThreshLow, 3, 0);
 
@@ -444,7 +444,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.title("Increase Steps")
 			.infoMessage("This attribute sets the increase amount used when the gain goes under the "
 				     "inner low threshold. See register 0x123, bits [D2:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(innerThreshLowIncSteps, 3, 1);
 
@@ -458,7 +458,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.title("Outer Threshold Low (dBFS)")
 			.infoMessage("The outer low threshold equals the inner low threshold plus this value. See "
 				     "register 0x129, bits [D3:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(outerThreshLow, 4, 0);
 
@@ -472,7 +472,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 			.title("Increase Steps")
 			.infoMessage("The slow AGC changes gain by this amount when the outer low threshold "
 				     "is exceeded. See register 0x12A, bits [D3:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(outerThreshLowIncSteps, 4, 1);
 
@@ -484,7 +484,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 				  .title("AGC Sync for Gain Counter")
 				  .infoMessage("If this attribute is set, CTRL_IN2 transitioning high resets the "
 					       "counter.See register 0x128, bit D4.")
-				  .manager(m_mgr)
+				  .group(m_mgr)
 				  .buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(sync, 5, 0);
 	sync->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -497,7 +497,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 						.uiStrategy(IIOWidgetBuilder::RangeUi)
 						.optionsValues("[0 10 100000]")
 						.title("Gain Update Interval (us)")
-						.manager(m_mgr)
+						.group(m_mgr)
 						.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(gainUpdateInterval, 6, 0);
 
@@ -540,7 +540,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 			.optionsValues("[0 1 255]")
 			.title("Large Thresh")
 			.infoMessage("This attribute sets the large ADC overload. See register 0x105.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(largeOverloadThresh, 1, 0);
 
@@ -553,7 +553,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 			.optionsValues("[0 1 255]")
 			.title("Small Thresh")
 			.infoMessage("This attribute sets the small ADC overload. See register 0x104.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(smallOverloadThresh, 1, 1);
 
@@ -568,7 +568,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 			.infoMessage("This counter specifies the number of large ADC overloads that must occur before "
 				     "the gain will "
 				     "decrease by the large ADC overload gain step. See register 0x122, bits [D7:D4].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(largeOverloadExceed, 2, 0);
 
@@ -582,7 +582,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 			.title("Small Exceed Counter")
 			.infoMessage("This counter specifies the number of small ADC overloads that must occur to "
 				     "prevent a gain increase. See register 0x122, bits [D3:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(smallOverloadExceed, 2, 1);
 
@@ -598,7 +598,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 				"This attribute applies to AGC and determine how much the gain changes for "
 				"large LPF in split tablemode or the large LMT and large ADC overloads in full table "
 				"mode. See register 0x106, bits [D3:D0]")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(largeDecSteps, 3, 0);
 
@@ -610,7 +610,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 						 .title("Prevent Gain Increase")
 						 .infoMessage("This attribute set the slow AGC inner low window "
 							      "threshold. See register 0x120, bits [D6:D0].")
-						 .manager(m_mgr)
+						 .group(m_mgr)
 						 .buildSingle();
 	adcOverloadWidgetLayout->addWidget(preventGainIncrease, 3, 1);
 	preventGainIncrease->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -627,7 +627,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 			.title("Immediate Gain Change if Large Overload")
 			.infoMessage("Set this attribute to allow large ADC overload to reduce gain immediately. See "
 				     "register 0x123, bit D3.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(immedGainChange, 4, 1);
 	immedGainChange->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -670,7 +670,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 					.infoMessage("This attribute sets the large LMT overload threshold. See "
 						     "register 0x108. This data is "
 						     "processed by the driver.")
-					.manager(m_mgr)
+					.group(m_mgr)
 					.buildSingle();
 	widgetLayout->addWidget(highThresh, 1, 0);
 
@@ -684,7 +684,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 				       .infoMessage("This attribute sets the small LMT overload threshold. See "
 						    "register 0x107. This data is "
 						    "processed by the driver.")
-				       .manager(m_mgr)
+				       .group(m_mgr)
 				       .buildSingle();
 	widgetLayout->addWidget(lowThresh, 1, 1);
 
@@ -699,7 +699,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 			.infoMessage(
 				"This counter specifies the number of large LMT overloads that must occur before gain "
 				"decreases by the LMT Gain Step. See register 0x121, bits [D7:D4].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(largeExced, 2, 0);
 
@@ -714,7 +714,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 			.infoMessage(
 				"This counter specifies the number of small LMT overloads that much occur to prevent a "
 				"gain increase. See register 0x121, bits [D3:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(smallExced, 2, 1);
 
@@ -729,7 +729,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 			.infoMessage(
 				"This attribute determines how much the gain changes for large LMT in split tablemode "
 				"or the small ADC overload for the full table. See register 0x103, bits [D4:D2].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(largeInc, 3, 0);
 
@@ -742,7 +742,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 			.title("Immediate Gain Change if Large Overload")
 			.infoMessage("Set this attribute to allow large LMT overloads to reduce gain immediately. See "
 				     "register 0x123, bit D7.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(immedGain, 3, 1);
 	immedGain->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -784,7 +784,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 			.infoMessage(
 				"This attribute is used in split table mode to enable the digital gain pointer. See "
 				"register 0x0FB, bit D2.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(gainMode, 1, 0);
 	gainMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -800,7 +800,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 			.title("Saturation Exceed Counter")
 			.infoMessage("This counter specifies the number of digital saturation events that much "
 				     "occur to prevent a gain increase. See register 0x128, bits [D3:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(saturationExceedCounter, 2, 0);
 
@@ -815,7 +815,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 			.infoMessage(
 				"This attribute equals the maximum allowable digital gain, and applies to all gain "
 				"control modes. See register 0x100, bits [D4:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	widgetLayout->addWidget(maxDigGain, 1, 1);
 
@@ -828,7 +828,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 					  .title("Decr Step Size")
 					  .infoMessage("If digital saturation occurs, digital gain reduces by this "
 						       "value. See register 0x100, bits [D7:D5].")
-					  .manager(m_mgr)
+					  .group(m_mgr)
 					  .buildSingle();
 	widgetLayout->addWidget(gainStepSize, 2, 1);
 
@@ -889,7 +889,7 @@ QWidget *GainWidget::stateResponseToPeakOverload(QWidget *parent)
 			.infoMessage("The fast AGC delays moving from State 1 to State 2 until no peak overloads are "
 				     "detected for the value of this counter; measured in ClkRF cycles. See register "
 				     "0x117, bits [D4:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(stateWaitTime);
 
@@ -921,7 +921,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 							    "the gain while optimizing the gain index. "
 							    "Clearing it prevents the gain from increasing in any "
 							    "condition. See register 0x110, bit D0.")
-					       .manager(m_mgr)
+					       .group(m_mgr)
 					       .buildSingle();
 	layout->addWidget(allowGainIncrease, 1, 0);
 	allowGainIncrease->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -938,7 +938,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 			.infoMessage("This threshold is used by the fast AGC to determine if the gain should be "
 				     "increased. It can also be used to trigger a CTRL_OUT signal transition in MGC "
 				     "mode. See register 0x114, bits [D6:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(lowPowerThresh, 1, 1);
 
@@ -954,7 +954,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 				     "Power Threshold before "
 				     "the fast AGC will change gain. Also can be used by the MGC. See register 0x11B, "
 				     "bits [D7:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(lowPowerThreshIncrementTime, 2, 0);
 
@@ -971,7 +971,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 				     "Power Threshold and only if the Enable Incr Gain is enabled. See register 0x117, "
 				     "bits [D7:D5]. This "
 				     "data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(lowPowerThreshIncrementSteps, 2, 1);
 
@@ -1009,7 +1009,7 @@ QWidget *GainWidget::agcLockLevelAdjustment(QWidget *parent)
 			.infoMessage("Applies to AGC. This attribute specifies the fast AGC lock level or specifies "
 				     "the slow AGC inner high "
 				     "threshold. Resolution is −1 dBFS/LSB. See register 0x101 [D6:D0]).")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(innerThreshHigh, 1, 0);
 
@@ -1024,7 +1024,7 @@ QWidget *GainWidget::agcLockLevelAdjustment(QWidget *parent)
 			.infoMessage(
 				"This attribute sets the maximum gain index increase that the fast AGC can use for "
 				"the lock level adjustment. See register 0x118, bits [D5:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(lockLevelGain, 2, 0);
 
@@ -1037,7 +1037,7 @@ QWidget *GainWidget::agcLockLevelAdjustment(QWidget *parent)
 			.title("Allow LMT Gain Increase")
 			.infoMessage("Set this attribute to allow the AGC to use LMT gain if the gain index needs to "
 				     "increase when moving to the AGC Lock Level. See register 0x111, bit D6.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(lockLevelLmtGain, 2, 1);
 	lockLevelLmtGain->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1081,7 +1081,7 @@ QWidget *GainWidget::peakDetectors(QWidget *parent)
 								"table is used, the gain may reduce in in the LPF or "
 								"the LMT (fagc_lmt_final_settling_steps). See "
 								"register 0x112, bits [D7:D6].")
-						   .manager(m_mgr)
+						   .group(m_mgr)
 						   .buildSingle();
 	layout->addWidget(lpfFinalSettingsSteps, 1, 0);
 
@@ -1094,7 +1094,7 @@ QWidget *GainWidget::peakDetectors(QWidget *parent)
 			.optionsValues("[0 1 3]")
 			.title("LMT Final Settling Steps")
 			.infoMessage("Post Lock Level Step for LMT Table. See register 0x113, bits [D7:D6].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(lmtFinalSettingsSteps, 1, 1);
 
@@ -1106,7 +1106,7 @@ QWidget *GainWidget::peakDetectors(QWidget *parent)
 					    .optionsValues("[0 1 7]")
 					    .title("Final Overrange Count")
 					    .infoMessage("Final Overrange Count. See register 0x116, bits [D7:D5].")
-					    .manager(m_mgr)
+					    .group(m_mgr)
 					    .buildSingle();
 	layout->addWidget(finalOverrange, 2, 0);
 
@@ -1121,7 +1121,7 @@ QWidget *GainWidget::peakDetectors(QWidget *parent)
 								"must be lower than the low power threshold for longer "
 								"than the increment time duration register. See "
 								"register 0x110, bit D7.")
-						   .manager(m_mgr)
+						   .group(m_mgr)
 						   .buildSingle();
 	layout->addWidget(increaseAfterGainLock, 2, 1);
 	increaseAfterGainLock->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1187,7 +1187,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 					   .infoMessage("MAX Gain (0); Optimized Gain (1); Set Gain (2)."
 							"See register 0x110, bits D4,D2. "
 							"This data is processed by the driver.")
-					   .manager(m_mgr)
+					   .group(m_mgr)
 					   .buildSingle();
 	layout->addWidget(gainIndexType, 1, 1);
 
@@ -1219,7 +1219,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.infoMessage("Set this attribute to use the last gain index of the previous frame for set "
 				     "gain. Clear to use the "
 				     "first gain index of the previous frame. See register 0x111, bit D7.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(increaseAfterGainLock, 2, 1);
 
@@ -1241,7 +1241,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.infoMessage("The offset added to the last gain lock level of the previous frame."
 				     "The result is the optimize gain index."
 				     "See register 0x116, bits [D3:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(optimiezedGainOffset, 2, 2);
 
@@ -1255,7 +1255,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 							    "the gain will not change even if the signal "
 							    "power increase by more than the Stronger Signal "
 							    "Threshold. See register 0x115, bit D7.")
-					       .manager(m_mgr)
+					       .group(m_mgr)
 					       .buildSingle();
 	layout->addWidget(sigThreshExceedEn, 3, 0);
 	sigThreshExceedEn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1274,7 +1274,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 				     "for a duration that is twice the Gain Lock Exit Count, the gain may unlock, "
 				     "depending on other AGC "
 				     "configuration bits. See register 0x113, bits [D5:D0].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(fagcRstGlaStrongerSigThresh, 3, 1);
 
@@ -1289,7 +1289,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 				     "change even if the average "
 				     "signal power decreases more than the Energy Lost Threshold register. See "
 				     "register 0x110, bit D3.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(rstGlaEngLostSigThreshExceedEn, 4, 0);
 	rstGlaEngLostSigThreshExceedEn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1307,7 +1307,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 							   "for a duration that is twice the Gain Lock Exit Count, the "
 							   "gain may unlock, depending on other AGC "
 							   "configuration bits. See register 0x112, bits [D5:D0].")
-					      .manager(m_mgr)
+					      .group(m_mgr)
 					      .buildSingle();
 	layout->addWidget(rstGlaEnergyLost, 4, 1);
 
@@ -1319,7 +1319,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 						.optionsValues("[0 1 63]")
 						.title("for (RX Samples) restart GLA ...")
 						.infoMessage("Gain Lock Exit Count. See register 0x119, bits [D5:D0].")
-						.manager(m_mgr)
+						.group(m_mgr)
 						.buildSingle();
 	layout->addWidget(energyLostStronger, 3, 2);
 
@@ -1331,7 +1331,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("If Large LMT Overload, Do Not Change Gain but Restart GLA")
 			.infoMessage("Unlock Gain if Lg ADC or LMT Ovrg. See register 0x110, bit D1.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(rstGlaLargeLmtOverloadEn, 5, 0);
 	rstGlaLargeLmtOverloadEn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1360,7 +1360,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 				     "optimize gain value if an energy lost state occurs or when the EN_AGC signal "
 				     "goes high. See register "
 				     "0x110, bit D6.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(rstGlaEnergyLostGotoOptimGainEn, 4, 2);
 
@@ -1382,7 +1382,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.title("If Large ADC Overload do not change Gain but restart GLA")
 			.infoMessage("Unlock gain if ADC Ovrg, Lg ADC or LMT Ovrg. See register 0x110, bit D1 and "
 				     "register 0x114, bit D7. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(glaLargeAdcOverloadEn, 6, 0);
 	glaLargeAdcOverloadEn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1397,7 +1397,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.title("If EN_AGC is pulled high restart GLA and goto")
 			.infoMessage(
 				"See fagc_rst_gla_if_en_agc_pulled_high_mode. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(rstGlaEnAgc, 7, 0);
 	rstGlaEnAgc->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -1422,7 +1422,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 						 .title("")
 						 .infoMessage("MAX Gain (0); Optimized Gain (1); Set Gain (2), No gain "
 							      "change. See registers 0x110, 0x111")
-						 .manager(m_mgr)
+						 .group(m_mgr)
 						 .buildSingle();
 	layout->addWidget(rstGlaIfEnAgcPulled, 7, 1);
 
@@ -1444,7 +1444,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 			.infoMessage("The power measurement duration used by the gain control algorithm for State 5 "
 				     "(gain lock) - fast AGC. "
 				     "See register 0x109, bit D7 and 0x10a, bits [D7:D5].")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(powerMeasurementDuration, 8, 1);
 
@@ -1492,7 +1492,7 @@ QWidget *GainWidget::miscWidget(QWidget *parent)
 			.title("Dec PWR mess. duration in fast attack mode")
 			.infoMessage("The power measurement duration used by the gain control algorithm. See register "
 				     "0x15C, bits [D3:D0]. This data is processed by the driver.")
-			.manager(m_mgr)
+			.group(m_mgr)
 			.buildSingle();
 	layout->addWidget(stateWaitTime);
 

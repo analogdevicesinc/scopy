@@ -33,14 +33,14 @@
 #include <ad936xhelper.h>
 
 namespace scopy {
-class IIOWidgetManager;
+class IIOWidgetGroup;
 namespace ad936x {
 
 class SCOPY_AD936X_EXPORT AD936X : public QWidget
 {
 	Q_OBJECT
 public:
-	AD936X(iio_context *ctx, IIOWidgetManager *mgr = nullptr, QWidget *parent = nullptr);
+	AD936X(iio_context *ctx, IIOWidgetGroup *mgr = nullptr, QWidget *parent = nullptr);
 	~AD936X();
 
 Q_SIGNALS:
@@ -48,7 +48,7 @@ Q_SIGNALS:
 
 private:
 	iio_context *m_ctx = nullptr;
-	IIOWidgetManager *m_mgr = nullptr;
+	IIOWidgetGroup *m_mgr = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_controlsWidget;

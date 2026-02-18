@@ -35,7 +35,7 @@ Q_LOGGING_CATEGORY(CAT_AD936x_ADVANCED, "AD936x_ADVANCED")
 using namespace scopy;
 using namespace ad936x;
 
-AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetManager *mgr, QWidget *parent)
+AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
 	: m_ctx(ctx)
 	, m_mgr(mgr)
 	, QWidget{parent}
@@ -154,6 +154,23 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetManager *mgr, QWidget 
 }
 
 AD936XAdvanced::~AD936XAdvanced() {}
+
+void AD936XAdvanced::switchSubtab(const QString &name)
+{
+	QMap<QString, QPushButton *> tabs;
+	tabs["ENSM/Mode/Clocks"] = m_ensmModeClocksBtn;
+	tabs["eLNA"] = m_eLnaBtn;
+	tabs["RSSI"] = m_rssiBtn;
+	tabs["GAIN"] = m_gainBtn;
+	tabs["TX MONITOR"] = m_txMonitorBtn;
+	tabs["Aux ADC/DAC/IIO"] = m_auxAdcDacIioBtn;
+	tabs["MISC"] = m_miscBtn;
+	tabs["BIST"] = m_bistBtn;
+
+	if(tabs.contains(name) && tabs[name]) {
+		tabs[name]->click();
+	}
+}
 
 void AD936XAdvanced::showEvent(QShowEvent *event)
 {
