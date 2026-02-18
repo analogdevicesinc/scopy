@@ -106,6 +106,9 @@ void ADCInstrument::setupToolLayout()
 	m_settingsBtn->setOpenMenuChecksThis(true);
 	m_settingsBtn->setDoubleClickToOpenMenu(false);
 	m_settingsBtn->checkBox()->setVisible(false);
+	m_settingsBtn->button()->setCheckable(true);
+	m_settingsBtn->button()->setAttribute(Qt::WA_TransparentForMouseEvents);
+	connect(m_settingsBtn, &QAbstractButton::toggled, m_settingsBtn->button(), &QAbstractButton::setChecked);
 
 	InfoBtn *infoBtn = new InfoBtn(this);
 	m_printBtn = new PrintBtn(this);
@@ -226,6 +229,9 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, Com
 	c->add(btn);
 	channelGroup->addButton(btn);
 	btn->enableToolTip(true);
+	btn->button()->setCheckable(true);
+	btn->button()->setAttribute(Qt::WA_TransparentForMouseEvents);
+	connect(btn, &QAbstractButton::toggled, btn->button(), &QAbstractButton::setChecked);
 
 	QString id = ch->name() + QString::number(uuid++);
 	QWidget *ch_widget = dynamic_cast<QWidget *>(ch);
