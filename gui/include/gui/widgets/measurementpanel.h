@@ -115,9 +115,11 @@ public Q_SLOTS:
 	void clear();
 	void refreshUi();
 	void sort(int sortType); // hackish
+	void setSortByTypeVisible(bool visible);
+	void setHideButtonVisible(bool visible);
 
 Q_SIGNALS:
-	void toggleAll(bool);
+	void hideAll();
 
 private:
 	void setupControlButtons();
@@ -132,10 +134,9 @@ private:
 	void addWidget(QWidget *meas);
 	int stackSize;
 
-	QPushButton *m_showAllBtn;
-	QPushButton *m_hideAllBtn;
 	QPushButton *m_sortByChannelBtn;
 	QPushButton *m_sortByTypeBtn;
+	QPushButton *m_hideBtn;
 };
 
 class SCOPY_GUI_EXPORT StatsPanel : public QWidget
@@ -150,9 +151,11 @@ public Q_SLOTS:
 	void removeStat(StatsLabel *stat);
 	void updateOrder();
 	void sort(int sortType); // hackish
+	void setSortByTypeVisible(bool visible);
+	void setHideButtonVisible(bool visible);
 
 Q_SIGNALS:
-	void toggleAll(bool);
+	void hideAll();
 
 private:
 	void setupControlButtons();
@@ -161,10 +164,9 @@ private:
 	QHBoxLayout *panelLayout;
 	QList<StatsLabel *> m_labels;
 
-	QPushButton *m_showAllBtn;
-	QPushButton *m_hideAllBtn;
 	QPushButton *m_sortByChannelBtn;
 	QPushButton *m_sortByTypeBtn;
+	QPushButton *m_hideBtn;
 };
 
 } // namespace scopy

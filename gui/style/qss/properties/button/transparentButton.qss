@@ -1,7 +1,7 @@
 QPushButton[&&property&&=true] {
     border-radius: &radius_1&;
     background-color: transparent;
-    color: &content_inverse&;
+    color: &content_subtle&;
     font-weight: bold;
 }
 QPushButton[&&property&&=true]:hover {

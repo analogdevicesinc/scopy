@@ -199,16 +199,16 @@ void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelCom
 		&MeasurementsPanel::removeMeasurement);
 	connect(chMeasureManager, &MeasureManagerInterface::enableMeasurement, this,
 		[=]() { c->enableMeasurementPanel(true); });
-	connect(measurePanel, &MeasurementsPanel::toggleAll, this, [=](bool b) {
-		measurePanel->setInhibitUpdates(!b);
-		Q_EMIT chMeasureManager->toggleAllMeasurement(b);
+	connect(measurePanel, &MeasurementsPanel::hideAll, this, [=]() {
+		measurePanel->setInhibitUpdates(true);
+		Q_EMIT chMeasureManager->toggleAllMeasurement(false);
 		measurePanel->setInhibitUpdates(false);
 	});
 	connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
 	connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
-	connect(chMeasureManager, &MeasureManagerInterface::enableStat, this,
-		[=]() { c->enableStatsPanel(true); });
-	connect(statsPanel, &StatsPanel::toggleAll, chMeasureManager, &MeasureManagerInterface::toggleAllStats);
+	connect(chMeasureManager, &MeasureManagerInterface::enableStat, this, [=]() { c->enableStatsPanel(true); });
+	connect(statsPanel, &StatsPanel::hideAll, chMeasureManager,
+		[=]() { Q_EMIT chMeasureManager->toggleAllStats(false); });
 }
 
 bool ADCInstrumentController::isMainInstrument() const { return m_isMainInstrument; }
