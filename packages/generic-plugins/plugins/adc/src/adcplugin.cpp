@@ -84,7 +84,7 @@ void ADCPlugin::initPreferences()
 	p->init("adc_plot_ycursor_position", HandlePos::NORTH_OR_WEST);
 	p->init("adc_default_y_mode", 0);
 	p->init("adc_plot_labels", true);
-	p->init("adc_add_remove_plot", false);
+	p->init("adc_add_remove_plot", true);
 	p->init("adc_add_remove_instrument", false);
 	p->init("adc_acquisition_timeout", 10000);
 	p->init("adc_enable_iio_context_ping", true);
@@ -168,14 +168,14 @@ bool ADCPlugin::loadPreferencesPage()
 				     "enabled/disabled within the ADC plot settings, overwriting this setting ",
 				     m_preferencesPage);
 	auto adc_add_remove_plot =
-		PREFERENCE_CHECK_BOX(p, "adc_add_remove_plot", "Add/Remove plot feature (EXPERIMENTAL)",
-				     "Experimental feature allowing the user to create multiple time or frequency plots"
+		PREFERENCE_CHECK_BOX(p, "adc_add_remove_plot", "Add/Remove plot feature",
+				     "Allows the user to create multiple time or frequency plots "
 				     "within the ADC instrument. Any channel can be moved between plots to provide "
 				     "visual clarity and separation.",
 				     m_preferencesPage);
 	auto adc_add_remove_instrument =
-		PREFERENCE_CHECK_BOX(p, "adc_add_remove_instrument", "Add/Remove instrument feature (EXPERIMENTAL)",
-				     "Experimental feature allowing the user to create multiple time or frequency "
+		PREFERENCE_CHECK_BOX(p, "adc_add_remove_instrument", "Add/Remove instrument feature",
+				     "Allows the user to create multiple time or frequency "
 				     "instruments, providing an easy way to switch between different run scenarios "
 				     "without affecting previous settings.",
 				     m_preferencesPage);

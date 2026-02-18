@@ -324,10 +324,9 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 				 "Multiple options available, check out the documentation if a new language is needed.",
 				 t->getLanguages(), generalSection));
 	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
-		p, "general_connect_to_multiple_devices", "Connect to multiple devices (EXPERIMENTAL)",
+		p, "general_connect_to_multiple_devices", "Connect to multiple devices",
 		"Allows the application to connect to multiple devices simultaneously, providing a mechanism "
-		"to handle them separately using different sections in the left side menu. "
-		"Due to not being tested using enough scenarios it is still marked as an experimental feature.",
+		"to handle them separately using different sections in the left side menu.",
 		generalSection));
 	generalSection->contentLayout()->addWidget(
 		PREFERENCE_CHECK_BOX(p, "general_scan_for_devices", "Regularly scan for new devices",
