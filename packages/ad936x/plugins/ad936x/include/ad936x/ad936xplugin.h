@@ -29,11 +29,18 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+namespace scopy {
+class IIOWidgetManager;
+}
+
 namespace scopy::ad936x {
+
+
 class SCOPY_AD936X_EXPORT Ad936xPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -48,6 +55,10 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	IIOWidgetManager *m_widgetManager = nullptr;
+	bool m_isFmcomms5 = false;
 };
 } // namespace scopy::ad936x
 #endif // AD936XPLUGIN_H

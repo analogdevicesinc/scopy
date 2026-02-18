@@ -27,13 +27,14 @@
 #include <iio.h>
 
 namespace scopy {
+class IIOWidgetManager;
 namespace ad936x {
 
 class ElnaWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ElnaWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit ElnaWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent = nullptr);
 	~ElnaWidget();
 
 Q_SIGNALS:
@@ -42,6 +43,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
+	IIOWidgetManager *m_mgr = nullptr;
 };
 } // namespace ad936x
 } // namespace scopy

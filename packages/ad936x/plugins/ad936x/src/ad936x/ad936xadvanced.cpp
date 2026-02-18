@@ -35,8 +35,9 @@ Q_LOGGING_CATEGORY(CAT_AD936x_ADVANCED, "AD936x_ADVANCED")
 using namespace scopy;
 using namespace ad936x;
 
-AD936XAdvanced::AD936XAdvanced(iio_context *ctx, QWidget *parent)
+AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetManager *mgr, QWidget *parent)
 	: m_ctx(ctx)
+	, m_mgr(mgr)
 	, QWidget{parent}
 {
 	m_mainLayout = new QVBoxLayout(this);
@@ -170,46 +171,46 @@ void AD936XAdvanced::init()
 {
 
 	// ENSM Mode Clocks
-	m_ensmModeClocks = new EnsmModeClocksWidget(m_plutoDevice, m_centralWidget);
+	m_ensmModeClocks = new EnsmModeClocksWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	m_centralWidget->addWidget(m_ensmModeClocks);
 	connect(this, &AD936XAdvanced::readRequested, m_ensmModeClocks, &EnsmModeClocksWidget::readRequested);
 	connect(m_ensmModeClocksBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_ensmModeClocks); });
 	// eLNA
-	m_elna = new ElnaWidget(m_plutoDevice, m_centralWidget);
+	m_elna = new ElnaWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_elna, &ElnaWidget::readRequested);
 	m_centralWidget->addWidget(m_elna);
 	connect(m_eLnaBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_elna); });
 	// RSSI
-	m_rssi = new RssiWidget(m_plutoDevice, m_centralWidget);
+	m_rssi = new RssiWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_rssi, &RssiWidget::readRequested);
 	m_centralWidget->addWidget(m_rssi);
 	connect(m_rssiBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_rssi); });
 	// GAIN
-	m_gainWidget = new GainWidget(m_plutoDevice, m_centralWidget);
+	m_gainWidget = new GainWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_gainWidget, &GainWidget::readRequested);
 	m_centralWidget->addWidget(m_gainWidget);
 	connect(m_gainBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_gainWidget); });
 	// TX MONITOR
-	m_txMonitor = new TxMonitorWidget(m_plutoDevice, m_centralWidget);
+	m_txMonitor = new TxMonitorWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_txMonitor, &TxMonitorWidget::readRequested);
 	m_centralWidget->addWidget(m_txMonitor);
 	connect(m_txMonitorBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_txMonitor); });
 	// AUX ADC/DAC/IIO
-	m_auxAdcDacIo = new AuxAdcDacIoWidget(m_plutoDevice, m_centralWidget);
+	m_auxAdcDacIo = new AuxAdcDacIoWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
 	m_centralWidget->addWidget(m_auxAdcDacIo);
 	connect(m_auxAdcDacIioBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_auxAdcDacIo); });
 	// MISC
-	m_misc = new MiscWidget(m_plutoDevice, m_centralWidget);
+	m_misc = new MiscWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_misc, &MiscWidget::readRequested);
 	m_centralWidget->addWidget(m_misc);
 	connect(m_miscBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_misc); });
 	// BIST
-	m_bist = new BistWidget(m_plutoDevice, m_centralWidget);
+	m_bist = new BistWidget(m_plutoDevice, m_mgr, m_centralWidget);
 	connect(this, &AD936XAdvanced::readRequested, m_bist, &BistWidget::readRequested);
 	m_centralWidget->addWidget(m_bist);
 	connect(m_bistBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_bist); });

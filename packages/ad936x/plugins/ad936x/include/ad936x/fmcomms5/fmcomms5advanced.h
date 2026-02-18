@@ -39,12 +39,13 @@
 #include "fmcomms5/fmcomms5tab.h"
 
 namespace scopy {
+class IIOWidgetManager;
 namespace ad936x {
 class SCOPY_AD936X_EXPORT Fmcomms5Advanced : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Fmcomms5Advanced(iio_context *ctx, QWidget *parent = nullptr);
+	explicit Fmcomms5Advanced(iio_context *ctx, IIOWidgetManager *mgr = nullptr, QWidget *parent = nullptr);
 	~Fmcomms5Advanced();
 
 Q_SIGNALS:
@@ -67,6 +68,7 @@ private:
 	void ad9361MultichipSync();
 
 	iio_context *m_ctx = nullptr;
+	IIOWidgetManager *m_mgr = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;

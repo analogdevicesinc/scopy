@@ -27,13 +27,14 @@
 #include <iio.h>
 
 namespace scopy {
+class IIOWidgetManager;
 namespace ad936x {
 
 class EnsmModeClocksWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit EnsmModeClocksWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit EnsmModeClocksWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent = nullptr);
 	~EnsmModeClocksWidget();
 
 Q_SIGNALS:
@@ -42,6 +43,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
+	IIOWidgetManager *m_mgr = nullptr;
 	QWidget *generateEnsmModeWidget(QWidget *parent);
 	QWidget *generateModeWidget(QWidget *parent);
 	QWidget *generateClocksWidget(QWidget *parent);

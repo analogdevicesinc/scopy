@@ -27,8 +27,9 @@
 using namespace scopy;
 using namespace ad936x;
 
-ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
+ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetManager *mgr, QWidget *parent)
 	: m_device(device)
+	, m_mgr(mgr)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -74,6 +75,7 @@ ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
 					       "steps. See elna-rx[1|2]-gpo[0|1]-control-enable to route the external "
 					       "LNA gain table bits to the GPO "
 					       "pins.")
+				  .manager(m_mgr)
 				  .buildSingle();
 	layout->addWidget(gain);
 
@@ -99,6 +101,7 @@ ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
 						     "steps. See elna-rx[1|2]-gpo[0|1]-control-enable to route the "
 						     "external LNA gain table bits to the GPO "
 						     "pins.")
+					.manager(m_mgr)
 					.buildSingle();
 	layout->addWidget(bypassLoss);
 
@@ -110,6 +113,7 @@ ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
 					   .optionsValues("[0 1 20000]")
 					   .title("Settling Delay (ns)")
 					   .infoMessage("Settling delay of external LNA in ns")
+					   .manager(m_mgr)
 					   .buildSingle();
 	layout->addWidget(settlingDelay);
 
@@ -121,6 +125,7 @@ ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("RX1 GPO0")
 			.infoMessage("When set, the “Ext LNA Ctrl” bit in the Rx1 gain table sets the GPO0 state")
+			.manager(m_mgr)
 			.buildSingle();
 	layout->addWidget(rx1GPO0Control);
 	rx1GPO0Control->showProgressBar(false);
@@ -134,6 +139,7 @@ ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("RX2 GPO0")
 			.infoMessage("When set, the “Ext LNA Ctrl” bit in the Rx2 gain table sets the GPO1 state")
+			.manager(m_mgr)
 			.buildSingle();
 	layout->addWidget(rx2GPO0Control);
 	rx2GPO0Control->showProgressBar(false);
@@ -147,6 +153,7 @@ ElnaWidget::ElnaWidget(iio_device *device, QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("External LNA enabled for all gain indexes")
 			.infoMessage("The external LNA control bit in the gain tables is set for all indexes")
+			.manager(m_mgr)
 			.buildSingle();
 	layout->addWidget(gaintableAllIndex);
 	gaintableAllIndex->showProgressBar(false);
