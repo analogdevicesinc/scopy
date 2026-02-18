@@ -19,6 +19,7 @@
  */
 
 #include "iiowidgetbuilder.h"
+#include "iiowidgetgroup.h"
 #include "guistrategy/editableguistrategy.h"
 #include "guistrategy/switchguistrategy.h"
 #include "guistrategy/checkboxguistrategy.h"
@@ -110,6 +111,9 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 
 	IIOWidget *widget = new IIOWidget(ui, ds, m_widgetParent);
 	widget->setRecipe(m_generatedRecipe);
+	if(m_group) {
+		m_group->add(widget);
+	}
 	return widget;
 }
 
@@ -242,6 +246,7 @@ void IIOWidgetBuilder::clear()
 	m_widgetParent = nullptr;
 	m_title = "";
 	m_infoMessage = "";
+	m_group = nullptr;
 }
 
 IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
@@ -332,6 +337,12 @@ IIOWidgetBuilder &IIOWidgetBuilder::title(QString title)
 IIOWidgetBuilder &IIOWidgetBuilder::infoMessage(QString infoMessage)
 {
 	m_infoMessage = infoMessage;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::group(IIOWidgetGroup *group)
+{
+	m_group = group;
 	return *this;
 }
 

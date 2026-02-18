@@ -28,6 +28,7 @@
 #include <QTimer>
 #include <iio.h>
 #include "iiowidget.h"
+#include "iiowidgetgroup.h"
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
@@ -185,6 +186,12 @@ public:
 	 */
 	IIOWidgetBuilder &infoMessage(QString infoMessage);
 
+	/**
+	 * @brief Sets the IIOWidgetGroup that will auto-register built widgets.
+	 * @param group
+	 */
+	IIOWidgetBuilder &group(IIOWidgetGroup *group);
+
 private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
@@ -206,6 +213,7 @@ private:
 	IIOWidgetBuilder::UIS m_uiStrategy;
 	QWidget *m_widgetParent;
 	IIOWidgetFactoryRecipe m_generatedRecipe;
+	IIOWidgetGroup *m_group = nullptr;
 };
 } // namespace scopy
 
