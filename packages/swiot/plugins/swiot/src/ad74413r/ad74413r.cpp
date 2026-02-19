@@ -52,6 +52,7 @@ Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	, m_swiotAdLogic(nullptr)
 	, m_readerThread(nullptr)
 	, m_currentChannelSelected(0)
+	, m_widgetGroup(new IIOWidgetGroup(this))
 {
 	initPlotData();
 	setupToolTemplate();
@@ -478,7 +479,7 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		updateMeasurements(chYAxis, chnlIdx);
 
 		QMap<QString, iio_channel *> chnlsMap = m_swiotAdLogic->getIioChnl(chnlIdx);
-		BufferMenuView *menu = new BufferMenuView(chnlsMap, m_conn, this);
+		BufferMenuView *menu = new BufferMenuView(chnlsMap, m_conn, m_widgetGroup, this);
 		menu->init(chnlId, function, chPen, unit, yRange.first, yRange.second);
 		std::pair<double, double> offsetScale = {0, 1};
 		offsetScale = (chnlsMap.size() > 1) ? m_swiotAdLogic->getChnlOffsetScale(chnlIdx + MAX_INPUT_CHNLS_NO)

@@ -31,9 +31,11 @@
 using namespace scopy::swiot;
 using namespace scopy::gui;
 
-BufferMenuView::BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, QWidget *parent)
+BufferMenuView::BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, IIOWidgetGroup *widgetGroup,
+			       QWidget *parent)
 	: QWidget(parent)
 	, m_swiotAdvMenu(nullptr)
+	, m_widgetGroup(widgetGroup)
 	, m_chnls(chnls)
 	, m_connection(conn)
 {
@@ -45,7 +47,7 @@ BufferMenuView::~BufferMenuView() {}
 
 void BufferMenuView::init(QString title, QString function, QPen color, QString unit, double yMin, double yMax)
 {
-	m_swiotAdvMenu = BufferMenuBuilder::newAdvMenu(this, function, m_connection, m_chnls);
+	m_swiotAdvMenu = BufferMenuBuilder::newAdvMenu(this, function, m_connection, m_chnls, m_widgetGroup);
 
 	QScrollArea *scrollArea = new QScrollArea(this);
 	QWidget *scrollWidget = new QWidget(scrollArea);

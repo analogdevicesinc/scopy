@@ -34,7 +34,8 @@ class BufferMenuView : public QWidget
 {
 	Q_OBJECT
 public:
-	BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, QWidget *parent = nullptr);
+	BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, IIOWidgetGroup *widgetGroup = nullptr,
+		       QWidget *parent = nullptr);
 	~BufferMenuView();
 
 	void init(QString title, QString function, QPen color, QString unit, double yMin, double yMax);
@@ -64,6 +65,7 @@ private:
 	QWidget *createVerticalSettingsMenu(QString unit, double yMin, double yMax, QWidget *parent);
 
 	BufferMenu *m_swiotAdvMenu;
+	IIOWidgetGroup *m_widgetGroup;
 	Connection *m_connection;
 	QMap<QString, iio_channel *> m_chnls;
 };

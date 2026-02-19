@@ -41,6 +41,7 @@
 #include <gui/widgets/menuspinbox.h>
 
 #include <iioutil/connection.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #define MAX_CURVES_NUMBER 8
 #define AD_NAME "ad74413r"
 #define SWIOT_DEVICE_NAME "swiot"
@@ -160,6 +161,7 @@ private:
 	QMap<int, QList<MeasurementLabel *>> m_labels;
 
 	QTimer *m_rstAcqTimer;
+	IIOWidgetGroup *m_widgetGroup;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
 };
