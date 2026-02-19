@@ -19,13 +19,16 @@
  */
 
 #include "adrv9002plugin.h"
+#include "adrv9002_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
 #include <iio.h>
 
 #include "adrv9002.h"
+#include <iio-widgets/iiowidgetgroup.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9002PLUGIN, "Adrv9002Plugin")
 using namespace scopy::adrv9002;
@@ -130,17 +133,33 @@ bool Adrv9002Plugin::onConnect()
 		return false;
 	}
 
-	Adrv9002 *adrv9002 = new Adrv9002(conn->context());
+	// Detect the actual device name from the ADRV9002 family
+	const char *adrv9002_devices[] = {"adrv9002-phy", "adrv9003-phy", "adrv9004-phy", "adrv9005-phy",
+					  "adrv9006-phy"};
+	for(const char *device_name : adrv9002_devices) {
+		if(iio_context_find_device(conn->context(), device_name)) {
+			m_devName = QString(device_name);
+			break;
+		}
+	}
+
+	m_widgetGroup = new IIOWidgetGroup(this);
+	Adrv9002 *adrv9002 = new Adrv9002(conn->context(), m_widgetGroup);
 	m_toolList[0]->setTool(adrv9002);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
+
+	initApi();
 	return true;
 }
 
 bool Adrv9002Plugin::onDisconnect()
 {
-	// This method is called when the disconnect button is pressed
-	// It must remove all connections that were established on the connection
+	if(m_api) {
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -152,9 +171,21 @@ bool Adrv9002Plugin::onDisconnect()
 		}
 	}
 
+	if(m_widgetGroup) {
+		delete m_widgetGroup;
+		m_widgetGroup = nullptr;
+	}
+
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 	return true;
+}
+
+void Adrv9002Plugin::initApi()
+{
+	m_api = new ADRV9002_API(this);
+	m_api->setObjectName("adrv9002");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void Adrv9002Plugin::initMetadata()
