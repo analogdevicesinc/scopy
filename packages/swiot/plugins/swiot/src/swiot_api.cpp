@@ -42,6 +42,7 @@
 #include <gui/plotaxis.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_SWIOT_API, "SWIOT_API")
@@ -326,18 +327,18 @@ bool SWIOT_API::isAdMeasurementsEnabled()
 	return false;
 }
 
-void SWIOT_API::setAdChannelEnabled(int channelId, bool enabled)
+void SWIOT_API::setAdPlotChannelEnabled(int idx, bool enabled)
 {
 	Ad74413r *ad = getAd74413rInstrument();
-	if(ad && channelId >= 0 && channelId < ad->m_enabledChannels.size()) {
+	if(ad && idx >= 0 && idx < ad->m_enabledChannels.size()) {
 		// Update the UI checkbox state
 		QList<QAbstractButton *> buttons = ad->m_chnlsBtnGroup->buttons();
-		if(channelId < buttons.size()) {
-			MenuControlButton *btn = dynamic_cast<MenuControlButton *>(buttons.at(channelId));
+		if(idx < buttons.size()) {
+			MenuControlButton *btn = dynamic_cast<MenuControlButton *>(buttons.at(idx));
 			if(btn) {
 				btn->checkBox()->setChecked(enabled);
 			} else {
-				qInfo(CAT_SWIOT_API) << "There is no channel button with index:" << channelId;
+				qInfo(CAT_SWIOT_API) << "There is no channel button with index:" << idx;
 			}
 		}
 	}
@@ -368,7 +369,7 @@ void SWIOT_API::setAdChannelSamplingFrequency(int channelId, int frequency)
 	if(menuView) {
 		BufferMenu *menu = menuView->getAdvMenu();
 		if(menu && menu->m_samplingFreq) {
-			menu->m_samplingFreq->getDataStrategy()->write(QString::number(frequency));
+			menu->m_samplingFreq->writeAsync(QString::number(frequency));
 		}
 	}
 }
@@ -388,8 +389,8 @@ int SWIOT_API::getAdChannelSamplingFrequency(int channelId)
 	if(menuView) {
 		BufferMenu *menu = menuView->getAdvMenu();
 		if(menu && menu->m_samplingFreq) {
-			QString data = menu->m_samplingFreq->getDataStrategy()->data();
-			return data.toInt();
+			menu->m_samplingFreq->readAsync();
+			return menu->m_samplingFreq->getDataStrategy()->data().toInt();
 		}
 	}
 	return -1;
@@ -484,6 +485,43 @@ double SWIOT_API::getAdSampleRate()
 		return ad->m_currentSamplingInfo.sampleRate;
 	}
 	return 0.0;
+}
+
+// AD74413R widget group methods
+QStringList SWIOT_API::getAdWidgetKeys()
+{
+	Ad74413r *ad = getAd74413rInstrument();
+	if(ad && ad->m_widgetGroup) {
+		return ad->m_widgetGroup->keys();
+	}
+	return QStringList();
+}
+
+QString SWIOT_API::getAdWidgetValue(const QString &key)
+{
+	Ad74413r *ad = getAd74413rInstrument();
+	if(ad && ad->m_widgetGroup) {
+		IIOWidget *widget = ad->m_widgetGroup->get(key);
+		if(widget) {
+			widget->readAsync();
+			return widget->getDataStrategy()->data();
+		}
+		qWarning(CAT_SWIOT_API) << "Widget with key" << key << "not found";
+	}
+	return QString();
+}
+
+void SWIOT_API::setAdWidgetValue(const QString &key, const QString &value)
+{
+	Ad74413r *ad = getAd74413rInstrument();
+	if(ad && ad->m_widgetGroup) {
+		IIOWidget *widget = ad->m_widgetGroup->get(key);
+		if(widget) {
+			widget->writeAsync(value);
+			return;
+		}
+		qWarning(CAT_SWIOT_API) << "Widget with key" << key << "not found";
+	}
 }
 
 // MAX14906 instrument methods

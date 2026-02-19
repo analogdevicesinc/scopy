@@ -69,7 +69,7 @@ public:
 	Q_INVOKABLE bool isAdPlotLabelsEnabled();
 	Q_INVOKABLE void setAdMeasurementsEnabled(bool enabled);
 	Q_INVOKABLE bool isAdMeasurementsEnabled();
-	Q_INVOKABLE void setAdChannelEnabled(int channelId, bool enabled);
+	Q_INVOKABLE void setAdPlotChannelEnabled(int idx, bool enabled);
 	Q_INVOKABLE bool isAdChannelEnabled(int channelId);
 	Q_INVOKABLE void setAdChannelSamplingFrequency(int channelId, int frequency);
 	Q_INVOKABLE int getAdChannelSamplingFrequency(int channelId);
@@ -80,6 +80,11 @@ public:
 	Q_INVOKABLE int getAdChannelCount();
 	Q_INVOKABLE QStringList getAdChannelNames();
 	Q_INVOKABLE double getAdSampleRate();
+
+	// AD74413R widget group (generic attribute access)
+	Q_INVOKABLE QStringList getAdWidgetKeys();
+	Q_INVOKABLE QString getAdWidgetValue(const QString &key);
+	Q_INVOKABLE void setAdWidgetValue(const QString &key, const QString &value);
 
 	// MAX14906 instrument
 	Q_INVOKABLE bool isMaxRunning();
