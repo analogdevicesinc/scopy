@@ -413,20 +413,14 @@ void AD936X_ADVANCED_API::setAgcGainUpdateInterval(const QString &value)
 
 // --- TX Monitor ---
 
-QString AD936X_ADVANCED_API::getTxmon1FrontEndGain()
-{
-	return readFromWidget("ad9361-phy/adi,txmon-1-front-end-gain");
-}
+QString AD936X_ADVANCED_API::getTxmon1FrontEndGain() { return readFromWidget("ad9361-phy/adi,txmon-1-front-end-gain"); }
 
 void AD936X_ADVANCED_API::setTxmon1FrontEndGain(const QString &value)
 {
 	writeToWidget("ad9361-phy/adi,txmon-1-front-end-gain", value);
 }
 
-QString AD936X_ADVANCED_API::getTxmon2FrontEndGain()
-{
-	return readFromWidget("ad9361-phy/adi,txmon-2-front-end-gain");
-}
+QString AD936X_ADVANCED_API::getTxmon2FrontEndGain() { return readFromWidget("ad9361-phy/adi,txmon-2-front-end-gain"); }
 
 void AD936X_ADVANCED_API::setTxmon2FrontEndGain(const QString &value)
 {
