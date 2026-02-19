@@ -28,6 +28,9 @@
 #include <iioutil/connectionprovider.h>
 
 #include "ad9084.h"
+#include "ad9084_api.h"
+#include <iio-widgets/iiowidgetgroup.h>
+#include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9084PLUGIN, "AD9084Plugin")
 using namespace scopy::ad9084;
@@ -96,8 +99,10 @@ bool AD9084Plugin::onConnect()
 	}
 
 	m_ctx = conn->context();
+	m_widgetGroup = new IIOWidgetGroup(this);
+
 	struct iio_device *dev = iio_context_find_device(conn->context(), "axi-ad9084-rx-hpc");
-	m_toolList.last()->setTool(new Ad9084(dev));
+	m_toolList.last()->setTool(new Ad9084(dev, m_widgetGroup));
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);
 
@@ -131,16 +136,23 @@ bool AD9084Plugin::onConnect()
 			m_toolList.last()->setEnabled(true);
 			m_toolList.last()->setRunBtnVisible(true);
 			Q_EMIT toolListChanged();
-			Ad9084 *ad9084 = new Ad9084(rxDev);
+			Ad9084 *ad9084 = new Ad9084(rxDev, m_widgetGroup);
 			m_toolList.last()->setTool(ad9084);
 			deviceIdx++;
 		}
 	}
+
+	initApi();
 	return true;
 }
 
 bool AD9084Plugin::onDisconnect()
 {
+	if(m_api) {
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
 	for(auto &tool : m_toolList) {
@@ -156,9 +168,22 @@ bool AD9084Plugin::onDisconnect()
 	}
 	loadToolList();
 	Q_EMIT toolListChanged();
+
+	if(m_widgetGroup) {
+		delete m_widgetGroup;
+		m_widgetGroup = nullptr;
+	}
+
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 	return true;
+}
+
+void AD9084Plugin::initApi()
+{
+	m_api = new AD9084_API(this);
+	m_api->setObjectName("ad9084");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void AD9084Plugin::initMetadata()
