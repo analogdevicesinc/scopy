@@ -32,7 +32,7 @@ Use the :ref:`install guide <user_guide>` for detailed information.
 
 Launching the application
 ---------------------------------------------------------------------
-.. video:: https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/connect.mov
+.. video:: https://github.com/analogdevicesinc/scopy/raw/doc_resources/resources/swiot1l/scopy_connect.mp4
 
 Scopy is able to control and operate multiple devices. In order to use
 it for the AD-SWIOT1L-SL system, the user should click the “Add
