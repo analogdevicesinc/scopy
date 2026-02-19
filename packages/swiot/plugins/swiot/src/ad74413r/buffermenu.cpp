@@ -31,14 +31,17 @@
 #include <guistrategy/rangeguistrategy.h>
 
 using namespace scopy::swiot;
-BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, QMap<QString, iio_channel *> chnls)
+BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction, Connection *conn, QMap<QString, iio_channel *> chnls,
+		       IIOWidgetGroup *widgetGroup)
 	: QWidget(parent)
 	, m_chnlFunction(chnlFunction)
 	, m_connection(conn)
 	, m_chnls(chnls)
+	, m_widgetGroup(widgetGroup)
 {
 	if(m_chnls.contains(INPUT_CHNL)) {
 		m_samplingFreq = IIOWidgetBuilder(this)
+					 .group(m_widgetGroup)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 					 .attribute("sampling_frequency")
@@ -90,11 +93,12 @@ double BufferMenu::convertFromRaw(double rawValue)
 QList<QWidget *> BufferMenu::getWidgetsList() { return m_widgetsList; }
 
 CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Connection *conn,
-				     QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+				     QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	// dac code - output channel
 	IIOWidget *dacCode = IIOWidgetBuilder(this)
+				     .group(m_widgetGroup)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
@@ -144,11 +148,12 @@ void CurrentInLoopMenu::updateCnvtLabel(QString data)
 }
 
 DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Connection *conn,
-				     QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+				     QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	// threshold - input channel
 	m_threshold = IIOWidgetBuilder(this)
+			      .group(m_widgetGroup)
 			      .connection(const_cast<Connection *>(m_connection))
 			      .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 			      .attribute("threshold")
@@ -163,6 +168,7 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	connect(dataStrategy, &CmdQChannelAttrDataStrategy::emitStatus, this, &DigitalInLoopMenu::onEmitStatus);
 	// dac code - output channel
 	IIOWidget *dacCode = IIOWidgetBuilder(this)
+				     .group(m_widgetGroup)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
@@ -237,11 +243,12 @@ void DigitalInLoopMenu::onEmitStatus(QDateTime timestamp, QString oldData, QStri
 }
 
 VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection *conn,
-			       QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+			       QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	// dac code - output channel
 	IIOWidget *dacCode = IIOWidgetBuilder(this)
+				     .group(m_widgetGroup)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
@@ -274,6 +281,7 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 
 	// slew - output channel
 	IIOWidget *slewOptions = IIOWidgetBuilder(this)
+					 .group(m_widgetGroup)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 					 .attribute("slew_en")
@@ -283,6 +291,7 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 
 	// slew step - output channel
 	IIOWidget *slewStep = IIOWidgetBuilder(this)
+				      .group(m_widgetGroup)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_step")
@@ -293,6 +302,7 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 
 	// slew rate - output channel
 	IIOWidget *slewRate = IIOWidgetBuilder(this)
+				      .group(m_widgetGroup)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_rate")
@@ -320,11 +330,12 @@ void VoltageOutMenu::updateCnvtLabel(QString data)
 }
 
 CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection *conn,
-			       QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+			       QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	// dac code - output channel
 	IIOWidget *dacCode = IIOWidgetBuilder(this)
+				     .group(m_widgetGroup)
 				     .connection(const_cast<Connection *>(m_connection))
 				     .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				     .attribute("raw")
@@ -357,6 +368,7 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 
 	// slew - output channel
 	IIOWidget *slewOptions = IIOWidgetBuilder(this)
+					 .group(m_widgetGroup)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 					 .attribute("slew_en")
@@ -366,6 +378,7 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 
 	// slew step - output channel
 	IIOWidget *slewStep = IIOWidgetBuilder(this)
+				      .group(m_widgetGroup)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_step")
@@ -376,6 +389,7 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 
 	// slew rate - output channel
 	IIOWidget *slewRate = IIOWidgetBuilder(this)
+				      .group(m_widgetGroup)
 				      .connection(const_cast<Connection *>(m_connection))
 				      .channel(const_cast<iio_channel *>(m_chnls[OUTPUT_CHNL]))
 				      .attribute("slew_rate")
@@ -403,11 +417,12 @@ void CurrentOutMenu::updateCnvtLabel(QString data)
 }
 
 DiagnosticMenu::DiagnosticMenu(QWidget *parent, QString chnlFunction, Connection *conn,
-			       QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+			       QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	// diag options - input channel
 	IIOWidget *diagOptions = IIOWidgetBuilder(this)
+					 .group(m_widgetGroup)
 					 .connection(const_cast<Connection *>(m_connection))
 					 .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 					 .attribute("diag_function")
@@ -436,8 +451,8 @@ void DiagnosticMenu::onSamplingFreqWrite(QDateTime timestamp, QString oldData, Q
 }
 
 WithoutAdvSettings::WithoutAdvSettings(QWidget *parent, QString chnlFunction, Connection *conn,
-				       QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+				       QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	QLabel *msgLabel = new QLabel("No advanced settings available", this);
 	Style::setStyle(msgLabel, style::properties::label::menuSmall);
@@ -447,11 +462,12 @@ WithoutAdvSettings::WithoutAdvSettings(QWidget *parent, QString chnlFunction, Co
 WithoutAdvSettings::~WithoutAdvSettings() {}
 
 DigitalInMenu::DigitalInMenu(QWidget *parent, QString chnlFunction, Connection *conn,
-			     QMap<QString, iio_channel *> chnls)
-	: BufferMenu(parent, chnlFunction, conn, chnls)
+			     QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup)
+	: BufferMenu(parent, chnlFunction, conn, chnls, widgetGroup)
 {
 	// threshold - input channel
 	m_threshold = IIOWidgetBuilder(this)
+			      .group(m_widgetGroup)
 			      .connection(const_cast<Connection *>(m_connection))
 			      .channel(const_cast<iio_channel *>(m_chnls[INPUT_CHNL]))
 			      .attribute("threshold")

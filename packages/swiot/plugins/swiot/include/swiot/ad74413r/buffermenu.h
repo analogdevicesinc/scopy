@@ -25,6 +25,7 @@
 #include <iio-widgets/iiowidget.h>
 #include <gui/spinbox_a.hpp>
 #include <iioutil/connection.h>
+#include <iio-widgets/iiowidgetgroup.h>
 
 #define OUTPUT_CHNL "output"
 #define INPUT_CHNL "input"
@@ -40,7 +41,7 @@ class BufferMenu : public QWidget
 
 public:
 	explicit BufferMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-			    QMap<QString, iio_channel *> chnls = {});
+			    QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~BufferMenu();
 
 	virtual QString getInfoMessage();
@@ -70,6 +71,7 @@ protected:
 	QString m_chnlFunction;
 	Connection *m_connection;
 	QMap<QString, iio_channel *> m_chnls;
+	IIOWidgetGroup *m_widgetGroup;
 	std::pair<double, double> m_offsetScalePair = {0, 1};
 
 private:
@@ -81,7 +83,7 @@ class CurrentInLoopMenu : public BufferMenu
 	Q_OBJECT
 public:
 	explicit CurrentInLoopMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-				   QMap<QString, iio_channel *> chnls = {});
+				   QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~CurrentInLoopMenu();
 
 	QString getInfoMessage() override;
@@ -98,7 +100,7 @@ class DigitalInLoopMenu : public BufferMenu
 	Q_OBJECT
 public:
 	explicit DigitalInLoopMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-				   QMap<QString, iio_channel *> chnls = {});
+				   QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~DigitalInLoopMenu();
 
 	QString getInfoMessage() override;
@@ -120,7 +122,7 @@ class VoltageOutMenu : public BufferMenu
 	Q_OBJECT
 public:
 	explicit VoltageOutMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-				QMap<QString, iio_channel *> chnls = {});
+				QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~VoltageOutMenu();
 
 	QString getInfoMessage() override;
@@ -137,7 +139,7 @@ class CurrentOutMenu : public BufferMenu
 	Q_OBJECT
 public:
 	explicit CurrentOutMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-				QMap<QString, iio_channel *> chnls = {});
+				QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~CurrentOutMenu();
 
 	QString getInfoMessage() override;
@@ -154,7 +156,7 @@ class DiagnosticMenu : public BufferMenu
 	Q_OBJECT
 public:
 	explicit DiagnosticMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-				QMap<QString, iio_channel *> chnls = {});
+				QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~DiagnosticMenu();
 
 public Q_SLOTS:
@@ -167,7 +169,7 @@ class DigitalInMenu : public BufferMenu
 	Q_OBJECT
 public:
 	explicit DigitalInMenu(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-			       QMap<QString, iio_channel *> chnls = {});
+			       QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~DigitalInMenu();
 
 public Q_SLOTS:
@@ -184,7 +186,7 @@ class WithoutAdvSettings : public BufferMenu
 	Q_OBJECT
 public:
 	explicit WithoutAdvSettings(QWidget *parent = nullptr, QString chnlFunction = "", Connection *conn = nullptr,
-				    QMap<QString, iio_channel *> chnls = {});
+				    QMap<QString, iio_channel *> chnls = {}, IIOWidgetGroup *widgetGroup = nullptr);
 	~WithoutAdvSettings();
 };
 
@@ -240,24 +242,24 @@ public:
 	}
 
 	static BufferMenu *newAdvMenu(QWidget *widget, QString function, Connection *conn,
-				      QMap<QString, iio_channel *> chnls)
+				      QMap<QString, iio_channel *> chnls, IIOWidgetGroup *widgetGroup = nullptr)
 	{
 		int menu_type = decodeFunctionName(function);
 		switch(menu_type) {
 		case CURRENT_IN_LOOP:
-			return new CurrentInLoopMenu(widget, function, conn, chnls);
+			return new CurrentInLoopMenu(widget, function, conn, chnls, widgetGroup);
 		case DIGITAL_IN_LOOP:
-			return new DigitalInLoopMenu(widget, function, conn, chnls);
+			return new DigitalInLoopMenu(widget, function, conn, chnls, widgetGroup);
 		case VOLTAGE_OUT:
-			return new VoltageOutMenu(widget, function, conn, chnls);
+			return new VoltageOutMenu(widget, function, conn, chnls, widgetGroup);
 		case CURRENT_OUT:
-			return new CurrentOutMenu(widget, function, conn, chnls);
+			return new CurrentOutMenu(widget, function, conn, chnls, widgetGroup);
 		case DIGITAL_IN:
-			return new DigitalInMenu(widget, function, conn, chnls);
+			return new DigitalInMenu(widget, function, conn, chnls, widgetGroup);
 		case DIAGNOSTIC:
-			return new DiagnosticMenu(widget, function, conn, chnls);
+			return new DiagnosticMenu(widget, function, conn, chnls, widgetGroup);
 		default:
-			return new WithoutAdvSettings(widget, function, conn, chnls);
+			return new WithoutAdvSettings(widget, function, conn, chnls, widgetGroup);
 		}
 	}
 };
