@@ -28,11 +28,19 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+namespace scopy {
+class IIOWidgetGroup;
+}
+
 namespace scopy::ad9084 {
+
+class AD9084_API;
+
 class SCOPY_AD9084_EXPORT AD9084Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+	friend class AD9084_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -48,7 +56,11 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
+
 	struct iio_context *m_ctx;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
+	AD9084_API *m_api = nullptr;
 };
 } // namespace scopy::ad9084
 #endif // AD9084PLUGIN_H
