@@ -28,11 +28,20 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+namespace scopy {
+class IIOWidgetGroup;
+}
+
 namespace scopy::adrv9002 {
+
+class ADRV9002_API;
+
 class SCOPY_ADRV9002PLUGIN_EXPORT Adrv9002Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	friend class ADRV9002_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -46,6 +55,13 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	void initApi();
+
+	ADRV9002_API *m_api = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
+	QString m_devName;
 };
 } // namespace scopy::adrv9002
 #endif // ADRV9002PLUGIN_H
