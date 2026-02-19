@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -32,6 +32,18 @@ TestFramework.init("SWIOT Plugin Complete Tests");
 if (!TestFramework.connectToDevice("ip:127.0.0.1")) {
     printToConsole("ERROR: Cannot proceed without device connection");
     exit(1);
+}
+
+// Helper: Stop AD74413R capture and disable all enabled channels
+function cleanupAd74413r() {
+    swiot.setAdRunning(false);
+    var channelCount = swiot.getAdChannelCount();
+    for (var i = 0; i < channelCount; i++) {
+        if (swiot.isAdChannelEnabled(i)) {
+            swiot.setAdPlotChannelEnabled(i, false);
+        }
+    }
+    msleep(500);
 }
 
 // ============================================
@@ -319,10 +331,11 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 3: Enable channel voltage_out 1 and run Single capture
             // Expected: Data displayed on plot from right to left
-            swiot.setAdChannelEnabled(0, true);
+            swiot.setAdPlotChannelEnabled(0, true);
             msleep(500);
             if (!swiot.isAdChannelEnabled(0)) {
                 printToConsole("  Warning: Channel 0 not enabled");
+                cleanupAd74413r();
                 return false;
             }
             printToConsole("  Step 3a: Channel voltage_out 1 enabled");
@@ -338,13 +351,16 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             if (!swiot.isAdMeasurementsEnabled()) {
                 printToConsole("  FAIL: Measurements panel not enabled");
+                cleanupAd74413r();
                 return false;
             }
             printToConsole("  Step 4: Measurements enabled - displayed above plot");
 
+            cleanupAd74413r();
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            cleanupAd74413r();
             return false;
         }
     });
@@ -357,7 +373,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 // ============================================
 TestFramework.runTest("TST.AD74413R.CHANNEL", function() {
     printToConsole("\n=== Test 5 - AD74413R channel operations ===\n");
-    printToConsole("  NOTE: TST.AD74413R.CHANNEL requires manual testing (loopback hardware setup and visual plot verification)");
+    printToConsole("  NOTE: Requires supervised execution. Run swiotSupervisedTests.js");
     return "SKIP";
 });
 
@@ -366,7 +382,7 @@ TestFramework.runTest("TST.AD74413R.CHANNEL", function() {
 // ============================================
 TestFramework.runTest("TST.AD74413R.DIAG", function() {
     printToConsole("\n=== Test 6 - AD74413R diagnostic channels ===\n");
-    printToConsole("  NOTE: TST.AD74413R.DIAG requires manual testing (loopback hardware setup and visual plot verification)");
+    printToConsole("  NOTE: Requires supervised execution. Run swiotSupervisedTests.js");
     return "SKIP";
 });
 
@@ -388,7 +404,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Enable all channels
             for (var i = 0; i < channelCount; i++) {
-                swiot.setAdChannelEnabled(i, true);
+                swiot.setAdPlotChannelEnabled(i, true);
                 msleep(300);
             }
             printToConsole("  Step 2a: All " + channelCount + " channels enabled");
@@ -409,6 +425,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
             var expectedRate = 4800 / channelCount;
             if (Math.abs(sampleRate - expectedRate) > 50) {
                 printToConsole("  Warning: Expected ~" + expectedRate + " sps, got " + sampleRate + " sps");
+                cleanupAd74413r();
                 return false;
             } else {
                 printToConsole("  Step 2d: Sample rate verified: " + sampleRate + " sps (expected ~" + expectedRate + " sps)");
@@ -417,8 +434,8 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
             // Step 3: Disable last two diagnostic channels
             // Expected: Status shows 1.2 ksps
             if (channelCount >= 2) {
-                swiot.setAdChannelEnabled(channelCount - 2, false);
-                swiot.setAdChannelEnabled(channelCount - 1, false);
+                swiot.setAdPlotChannelEnabled(channelCount - 2, false);
+                swiot.setAdPlotChannelEnabled(channelCount - 1, false);
                 msleep(500);
                 printToConsole("  Step 3a: Last two diagnostic channels disabled (channels " + (channelCount - 2) + " and " + (channelCount - 1) + ")");
 
@@ -430,6 +447,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
                 if (Math.abs(sampleRate - expectedRate) > 50) {
                     printToConsole("  Warning: Expected ~" + expectedRate + " sps, got " + sampleRate + " sps");
+                    cleanupAd74413r();
                     return false;
                 } else {
                     printToConsole("  Step 3c: Sample rate verified: " + sampleRate + " sps (expected ~" + expectedRate + " sps)");
@@ -438,9 +456,11 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 printToConsole("  Warning: Not enough channels to disable last two");
             }
 
+            cleanupAd74413r();
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            cleanupAd74413r();
             return false;
         }
     });
@@ -614,7 +634,7 @@ if (swiot.isRuntimeMode()) {
             if (switchToTool("AD74413R")) {
                 var adChannelCount = swiot.getAdChannelCount();
                 for (var i = 0; i < adChannelCount; i++) {
-                    swiot.setAdChannelEnabled(i, true);
+                    swiot.setAdPlotChannelEnabled(i, true);
                     msleep(200);
                 }
                 swiot.setAdRunning(true);
@@ -626,7 +646,7 @@ if (swiot.isRuntimeMode()) {
             // Expected: Bit 10 is enabled on the AD74413R device
             if (!switchToTool("Faults")) {
                 printToConsole("  FAIL: Could not switch to Faults tool");
-                swiot.setAdRunning(false);
+                cleanupAd74413r();
                 return false;
             }
 
@@ -660,6 +680,7 @@ if (swiot.isRuntimeMode()) {
                 printToConsole("  Step 4b: AD Faults explanation turned off - section below leds is hidden");
             } else {
                 printToConsole("  Step 4b: Warning: AD Faults explanation still visible");
+                cleanupAd74413r();
                 return false;
             }
 
@@ -667,14 +688,12 @@ if (swiot.isRuntimeMode()) {
             swiot.setAdFaultsExplanationEnabled(true);
 
             // Cleanup
-            if (switchToTool("AD74413R")) {
-                swiot.setAdRunning(false);
-            }
+            cleanupAd74413r();
 
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
-            swiot.setAdRunning(false);
+            cleanupAd74413r();
             return false;
         }
     });
@@ -695,7 +714,7 @@ if (swiot.isRuntimeMode()) {
             if (switchToTool("AD74413R")) {
                 var adChannelCount = swiot.getAdChannelCount();
                 for (var i = 0; i < adChannelCount; i++) {
-                    swiot.setAdChannelEnabled(i, true);
+                    swiot.setAdPlotChannelEnabled(i, true);
                     msleep(200);
                 }
                 swiot.setAdRunning(true);
@@ -705,7 +724,7 @@ if (swiot.isRuntimeMode()) {
 
             // Step 2: Open Faults instrument and run a Single capture
             if (!switchToTool("Faults")) {
-                swiot.setAdRunning(false);
+                cleanupAd74413r();
                 return false;
             }
 
@@ -730,6 +749,7 @@ if (swiot.isRuntimeMode()) {
                 printToConsole("  Step 4b: Verified - no bits selected after clear");
             } else {
                 printToConsole("  Step 4b: Warning - some bits still selected: " + selectedAfter);
+                cleanupAd74413r();
                 return false;
             }
 
@@ -747,18 +767,17 @@ if (swiot.isRuntimeMode()) {
                 printToConsole("  Step 5c: Verified - Bit 10 stored LED is off");
             } else {
                 printToConsole("  Step 5c: Warning - Bit 10 still has stored status");
+                cleanupAd74413r();
                 return false;
             }
 
             // Cleanup
-            if (switchToTool("AD74413R")) {
-                swiot.setAdRunning(false);
-            }
+            cleanupAd74413r();
 
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
-            swiot.setAdRunning(false);
+            cleanupAd74413r();
             return false;
         }
     });
@@ -779,7 +798,7 @@ if (swiot.isRuntimeMode()) {
             if (switchToTool("AD74413R")) {
                 var adChannelCount = swiot.getAdChannelCount();
                 for (var i = 0; i < adChannelCount; i++) {
-                    swiot.setAdChannelEnabled(i, true);
+                    swiot.setAdPlotChannelEnabled(i, true);
                     msleep(200);
                 }
                 swiot.setAdRunning(true);
@@ -790,7 +809,7 @@ if (swiot.isRuntimeMode()) {
             // Step 2: Open Faults instrument and run a Continuous capture
             // Expected: Bit 10 is enabled on the AD74413R device
             if (!switchToTool("Faults")) {
-                swiot.setAdRunning(false);
+                cleanupAd74413r();
                 return false;
             }
 
@@ -798,7 +817,7 @@ if (swiot.isRuntimeMode()) {
             msleep(1000);
             if (!swiot.isFaultsRunning()) {
                 printToConsole("  FAIL: Could not start faults continuous capture");
-                swiot.setAdRunning(false);
+                cleanupAd74413r();
                 return false;
             }
             printToConsole("  Step 2a: Faults continuous capture started");
@@ -834,20 +853,19 @@ if (swiot.isRuntimeMode()) {
             msleep(500);
             if (swiot.isFaultsRunning()) {
                 printToConsole("  FAIL: Could not stop faults capture");
+                cleanupAd74413r();
                 return false;
             }
             printToConsole("  Step 4: Faults capture stopped");
 
             // Cleanup
-            if (switchToTool("AD74413R")) {
-                swiot.setAdRunning(false);
-            }
+            cleanupAd74413r();
 
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
             swiot.setFaultsRunning(false);
-            swiot.setAdRunning(false);
+            cleanupAd74413r();
             return false;
         }
     });
