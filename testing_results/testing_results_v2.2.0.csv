@@ -1,68 +1,68 @@
 Test UID,Component,RBP,Result,Tested OS,Comments,Tester,File
-TST.PKG_MANAGER.DISCOVERY.LOAD,package_manager,P0,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.RESOURCE.ACCESS,package_manager,P1,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.CREATE,package_manager,P2,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.INSTALL,package_manager,P2,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.UNINSTALL,package_manager,P2,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.BACKWARD_COMPAT,package_manager,P3,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.ERROR.HANDLING,package_manager,P3,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.UIUX,package_manager,P3,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.MANUAL.DELETE,package_manager,P3,,,,,package_manager_tests.rst
-TST.PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE,package_manager,P3,,,,,package_manager_tests.rst
+TST.PKG_MANAGER.DISCOVERY.LOAD,package_manager,P0,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.RESOURCE.ACCESS,package_manager,P1,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.CREATE,package_manager,P2,PASS,Ubuntu 24.04,,script,package_manager_tests.rst
+TST.PKG_MANAGER.INSTALL,package_manager,P2,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.UNINSTALL,package_manager,P2,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.BACKWARD_COMPAT,package_manager,P3,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.ERROR.HANDLING,package_manager,P3,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.UIUX,package_manager,P3,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.MANUAL.DELETE,package_manager,P3,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
+TST.PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE,package_manager,P3,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
 TST.PREF.SAVE_LOAD_SESSION,preferences,P0,,,,,general_preferences_tests.rst
 TST.PREF.AUTO_CONNECT_PREVIOUS_SESSION,preferences,P0,,,,,general_preferences_tests.rst
 TST.PREF.RESET_SETTINGS_DEFAULT,preferences,P0,,,,,general_preferences_tests.rst
 TST.CONN.SUCC,core,P0,PASS,Ubuntu 24.04,,script,connection_tests.rst
-TST.CONN.UNPLUG_AUTO,core,P0,,,,,connection_tests.rst
-TST.CONN.UNPLUG_AUTO,core,P3,,,,,connection_tests.rst
-TST.CONN.UNPLUG_BEFORE,core,P0,,,,,connection_tests.rst
+TST.CONN.UNPLUG_AUTO,core,P0,FAIL,Ubuntu 24.04,"connection continues like the device is connected, for m2k the app crashes",Muthi Ionut,connection_tests.rst
+TST.CONN.UNPLUG_AUTO,core,P3,FAIL,Ubuntu 24.04,"connection continues like the device is connected, for m2k the app crashes",Muthi Ionut,connection_tests.rst
+TST.CONN.UNPLUG_BEFORE,core,P0,PASS,Windows 11,,Muthi Ionut,connection_tests.rst
 TST.CONN.DISCONN,core,P0,PASS,Ubuntu 24.04,,script,connection_tests.rst
-TST.HP.RUN,core,P3,,,,,hp_tests.rst
-TST.HP.ADD,core,P3,,,,,hp_tests.rst
-TST.HP.AUTO_SCAN_ON,core,P3,,,,,hp_tests.rst
-TST.HP.AUTO_SCAN_OFF,core,P3,,,,,hp_tests.rst
-TST.HP.MANUAL_SCAN,core,P3,,,,,hp_tests.rst
-TST.HP.NAV,core,P3,,,,,hp_tests.rst
-TST.HP.UNPLUGGED,core,P3,,,,,hp_tests.rst
-TST.LICENSE.POPUP,core,P3,,,,,license_about_page_tests.rst
-TST.ABOUT.PAGE,core,P3,,,,,license_about_page_tests.rst
-TST.ADD.SCAN_ALL,core,P0,,,,,add_dev_tests.rst
-TST.ADD.SCAN_LOCAL,core,P3,,,,,add_dev_tests.rst
+TST.HP.RUN,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.HP.ADD,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.HP.AUTO_SCAN_ON,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.HP.AUTO_SCAN_OFF,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.HP.MANUAL_SCAN,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.HP.NAV,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.HP.UNPLUGGED,core,P3,PASS,Windows 11,,Muthi Ionut,hp_tests.rst
+TST.LICENSE.POPUP,core,P3,PASS,Windows 11,,Muthi Ionut,license_about_page_tests.rst
+TST.ABOUT.PAGE,core,P3,PASS,Windows 11,,Muthi Ionut,license_about_page_tests.rst
+TST.ADD.SCAN_ALL,core,P0,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
+TST.ADD.SCAN_LOCAL,core,P3,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
 TST.ADD.SCAN_IP,core,P0,PASS,Ubuntu 24.04,,script,add_dev_tests.rst
-TST.ADD.SCAN_USB,core,P0,,,,,add_dev_tests.rst
-TST.ADD.SCAN_SERIAL,core,P3,,,,,add_dev_tests.rst
+TST.ADD.SCAN_USB,core,P0,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
+TST.ADD.SCAN_SERIAL,core,P3,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
 TST.ADD.SCAN_EMPTY,core,P0,PASS,Ubuntu 24.04,,script,add_dev_tests.rst
 TST.ADD.VERIFY,core,P0,PASS,Ubuntu 24.04,,script,add_dev_tests.rst
-TST.ADD.PLUGINS_BACK,core,P3,,,,,add_dev_tests.rst
+TST.ADD.PLUGINS_BACK,core,P3,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
 TST.ADD.PLUGINS_ADD_SINGLE,core,P1,PASS,Ubuntu 24.04,,script,add_dev_tests.rst
-TST.ADD.PLUGINS_ADD_MULTIPLE,core,P1,,,,,add_dev_tests.rst
-TST.ADD.PLUGINS_EMPTY,core,P1,,,,,add_dev_tests.rst
+TST.ADD.PLUGINS_ADD_MULTIPLE,core,P1,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
+TST.ADD.PLUGINS_EMPTY,core,P1,PASS,Windows 11,,Muthi Ionut,add_dev_tests.rst
 TST.EMU.EN,core,P3,PASS,Ubuntu 24.04,,script,emu_tests.rst
-TST.EMU.NOT,core,P3,,,,,emu_tests.rst
+TST.EMU.NOT,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
 TST.EMU.DIS,core,P3,PASS,Ubuntu 24.04,,script,emu_tests.rst
 TST.EMU.DIS_CONN,core,P3,PASS,Ubuntu 24.04,,script,emu_tests.rst
-TST.EMU.EN_ADALM2000,core,P3,,,,,emu_tests.rst
-TST.EMU.EN_PLUTO,core,P3,,,,,emu_tests.rst
-TST.EMU.EN_PQM,core,P3,,,,,emu_tests.rst
-TST.EMU.EN_SWIOT_CONFIG,core,P3,,,,,emu_tests.rst
-TST.EMU.EN_SWIOT_RUNTIME,core,P3,,,,,emu_tests.rst
-TST.EMU.EN_GENERIC,core,P3,,,,,emu_tests.rst
-TST.HP.DEV_BTN,core,P0,,,,,dev_tests.rst
-TST.DEV.FORGET,core,P0,,,,,dev_tests.rst
-TST.DEV.FORGET_CONN,core,P3,,,,,dev_tests.rst
-TST.DEV.EDIT_NAME,core,P3,,,,,dev_tests.rst
-TST.DEV.SELECT_TOOL,core,P1,,,,,dev_tests.rst
-TST.DEV.DETACH_TOOL,core,P3,,,,,dev_tests.rst
-TST.DEV.DETACH_TOOL_RE,core,P3,,,,,dev_tests.rst
-TST.DEV.COLLAPSE,core,P1,,,,,dev_tests.rst
-TST.DEV.MULTI_CONN,core,P1,,,,,dev_tests.rst
-TST.DEV.RM_MULTI,core,P1,,,,,dev_tests.rst
-TST.DEV.ADD_ORDER,core,P0,,,,,dev_tests.rst
-TST.START.APPIMAGE.X86_64,core,P3,,,,,install_tests.rst
-TST.START.APPIMAGE.X86_64,core,P3,,,,,install_tests.rst
+TST.EMU.EN_ADALM2000,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
+TST.EMU.EN_PLUTO,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
+TST.EMU.EN_PQM,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
+TST.EMU.EN_SWIOT_CONFIG,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
+TST.EMU.EN_SWIOT_RUNTIME,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
+TST.EMU.EN_GENERIC,core,P3,PASS,Windows 11,,Muthi Ionut,emu_tests.rst
+TST.HP.DEV_BTN,core,P0,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.FORGET,core,P0,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.FORGET_CONN,core,P3,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.EDIT_NAME,core,P3,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.SELECT_TOOL,core,P1,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.DETACH_TOOL,core,P3,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.DETACH_TOOL_RE,core,P3,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.COLLAPSE,core,P1,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.MULTI_CONN,core,P1,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.RM_MULTI,core,P1,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.DEV.ADD_ORDER,core,P0,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
+TST.START.APPIMAGE.X86_64,core,P3,PASS,Ubuntu 24.04,,Muthi Ionut,install_tests.rst
+TST.START.APPIMAGE.X86_64,core,P3,PASS,Ubuntu 24.04,,Muthi Ionut,install_tests.rst
 TST.START.APPIMAGE.X86_64,core,P3,,,,,install_tests.rst
 TST.START.MACOS,core,P3,,,,,install_tests.rst
-TST.START.WINDOWS,core,P3,,,,,install_tests.rst
+TST.START.WINDOWS,core,P3,PASS,Windows 11,,Muthi Ionut,install_tests.rst
 TST.ADC_TIME.X_AXIS,adc,P0,,,,,adc_tests.rst
 TST.ADC_TIME.Y_AXIS,adc,P3,,,,,adc_tests.rst
 TST.ADC_TIME.XY_PLOT,adc,P3,,,,,adc_tests.rst
@@ -99,10 +99,10 @@ TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS,fmcomms5,P3,,,,,fmcomms5_tests.rst
 TST.FMCOMMS5.RX_TX_CHAIN_CONFIG,fmcomms5,P3,,,,,fmcomms5_tests.rst
 TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY,fmcomms5,P3,,,,,fmcomms5_tests.rst
 TST.FMCOMMS5.CALIBRATION,fmcomms5,P3,,,,,fmcomms5_tests.rst
-TST.IMUANALYZER.PLUGIN_DETECTION,imuanalyzer,P0,,,,,imuanalyzer_tests.rst
-TST.IMUANALYZER.3D_VISUALIZATION,imuanalyzer,P1,,,,,imuanalyzer_tests.rst
-TST.IMUANALYZER.VIEW_CONTROLS,imuanalyzer,P2,,,,,imuanalyzer_tests.rst
-TST.IMUANALYZER.MEASUREMENT_MODE,imuanalyzer,P2,,,,,imuanalyzer_tests.rst
+TST.IMUANALYZER.PLUGIN_DETECTION,imuanalyzer,P0,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
+TST.IMUANALYZER.3D_VISUALIZATION,imuanalyzer,P1,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
+TST.IMUANALYZER.VIEW_CONTROLS,imuanalyzer,P2,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
+TST.IMUANALYZER.MEASUREMENT_MODE,imuanalyzer,P2,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
 TST.DATALOGGER.ENABLE_DISABLE_DATA_LOGGER_CHANNEL,datalogger,P0,PASS,Ubuntu 24.04,,script,datalogger_tests.rst
 TST.ADRV9002.PROFILE_GEN.CLI_NOT_AVAILABLE,adrv9002,P3,,,,,profile_generator_tests.rst
 TST.ADRV9002.PROFILE_GEN.CLI_NOT_COMPATIBLE,adrv9002,P3,,,,,profile_generator_tests.rst
@@ -169,12 +169,12 @@ TST.RFPOWERMETER.AUTOMATIC_CONFIGURATION,rfpowermeter,P2,,,,,rfpowermeter_tests.
 TST.RFPOWERMETER.FREQUENCY_CONTROL,rfpowermeter,P3,,,,,rfpowermeter_tests.rst
 TST.AD936X.PLUGIN_LOADS,ad936x,P0,PASS,Ubuntu 24.04,,script,ad936x_tests.rst
 TST.DBG.EXPLR.LOAD,debugger,P0,PASS,Ubuntu 24.04,,script,debugger_tests.rst
-TST.AD9084.PLUGIN_LOADS,ad9084,P0,,,,,ad9084_tests.rst
+TST.AD9084.PLUGIN_LOADS,ad9084,P0,PASS,Ubuntu 24.04,,Muthi Ionut,ad9084_tests.rst
 TST.M2K.SA.CHANNEL_1_OPERATION,m2k,P0,PASS,Ubuntu 24.04,,script,spectrum_analyzer_tests.rst
-TST.NA.PRINT_PLOT,m2k,P3,,,,,network_analyzer_tests.rst
-TST.NA.BUFFER_PREVIEWER,m2k,P3,,,,,network_analyzer_tests.rst
-TST.M2K.PG.INDIVIDUAL_CHANNEL_OPERATION,m2k,P0,,,,,pattern_generator_tests.rst
-TST.LOGIC.CHN_TRIGGER,m2k,P0,,,,,logic_analyzer_tests.rst
+TST.NA.PRINT_PLOT,m2k,P3,PASS,Ubuntu 24.04,,Muthi Ionut,network_analyzer_tests.rst
+TST.NA.BUFFER_PREVIEWER,m2k,P3,PASS,Ubuntu 24.04,,Muthi Ionut,network_analyzer_tests.rst
+TST.M2K.PG.INDIVIDUAL_CHANNEL_OPERATION,m2k,P0,PASS,Ubuntu 24.04,,Muthi Ionut,pattern_generator_tests.rst
+TST.LOGIC.CHN_TRIGGER,m2k,P0,PASS,Ubuntu 24.04,,Muthi Ionut,logic_analyzer_tests.rst
 TST.OSC.TIME_VOLTS_1,m2k,P0,PASS,Ubuntu 24.04,,script,oscilloscope_tests.rst
 TST.M2K.SG.CHANNEL_1_OPERATION,m2k,P0,PASS,Ubuntu 24.04,,script,signal_generator_tests.rst
 TST.PS.POSITIVE,m2k,P0,PASS,Ubuntu 24.04,,script,power_supply_tests.rst
