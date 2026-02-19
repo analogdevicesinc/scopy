@@ -1,0 +1,103 @@
+QCheckBox[&&property&&="ch0"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch1"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch2"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch3"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch4"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch5"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch6"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox[&&property&&="ch7"]::disabled {
+    color: &interactive_subtle_idle&;
+}
+
+QCheckBox::indicator[&&property&&="ch0"]::checked {
+    background-color: &ch0&;
+}
+
+QCheckBox::indicator[&&property&&="ch0"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch0&;
+}
+
+QCheckBox::indicator[&&property&&="ch1"]::checked {
+    background-color: &ch1&;
+}
+
+QCheckBox::indicator[&&property&&="ch1"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch1&;
+}
+
+QCheckBox::indicator[&&property&&="ch2"]::checked {
+    background-color: &ch2&;
+}
+
+QCheckBox::indicator[&&property&&="ch2"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch2&;
+}
+
+QCheckBox::indicator[&&property&&="ch3"]::checked {
+    background-color: &ch3&;
+}
+
+QCheckBox::indicator[&&property&&="ch3"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch3&;
+}
+
+QCheckBox::indicator[&&property&&="ch4"]::checked {
+    background-color: &ch4&;
+}
+
+QCheckBox::indicator[&&property&&="ch4"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch4&;
+}
+
+QCheckBox::indicator[&&property&&="ch5"]::checked {
+    background-color: &ch5&;
+}
+
+QCheckBox::indicator[&&property&&="ch5"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch5&;
+}
+
+QCheckBox::indicator[&&property&&="ch6"]::checked {
+    background-color: &ch6&;
+}
+
+QCheckBox::indicator[&&property&&="ch6"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch6&;
+}
+
+QCheckBox::indicator[&&property&&="ch7"]::checked {
+    background-color: &ch7&;
+}
+
+QCheckBox::indicator[&&property&&="ch7"]::checked::disabled {
+    border: &border_width_interactive& solid &interactive_subtle_idle&;
+    background-color: &ch7&;
+}
