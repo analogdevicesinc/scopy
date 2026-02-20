@@ -30,9 +30,9 @@
 using namespace scopy;
 using namespace ad936x;
 
-EnsmModeClocksWidget::EnsmModeClocksWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent)
+EnsmModeClocksWidget::EnsmModeClocksWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
-	, m_mgr(mgr)
+	, m_group(group)
 	, QWidget{parent}
 {
 	m_layout = new QVBoxLayout(this);
@@ -83,7 +83,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				     .title("FDD/TDD")
 				     .infoMessage("Use FDD mode - default TDD")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	ensmModeWidgetLayout->addWidget(fddMode);
 	fddMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -97,7 +97,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Pin Pulse Mode")
 			.infoMessage("ENSM control Pins (ENABLE/TXNRX) use Pulse mode - default Level Mode")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	ensmModeWidgetLayout->addWidget(ensmEnablePinPulseMode);
 	ensmEnablePinPulseMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -111,7 +111,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("TXNRX Pin Control")
 			.infoMessage("ENSM control Pins (ENABLE/TXNRX) control ENSM state - default SPI writes")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	ensmModeWidgetLayout->addWidget(ensmEnableTxnrx);
 	ensmEnableTxnrx->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -133,7 +133,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Use Dual Synth")
 			.infoMessage("In TDD mode use Dual Synth mode - default only one Synth is enabled")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	ensmHBoxLayout->addWidget(useDualSynth);
 	useDualSynth->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -148,7 +148,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 					    .attribute(useFddVcoTableAttr)
 					    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					    .title("Use FDD VCO tables")
-					    .group(m_mgr)
+					    .group(m_group)
 					    .buildSingle();
 	ensmHBoxLayout->addWidget(useFddVcoTable);
 	useFddVcoTable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -170,7 +170,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Skip VCO cal")
 			.infoMessage("Option to skip VCO cal in TDD mode when moving from TX/RX to Alert")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	ensmHBoxLayout->addWidget(skipVcoCal);
 	skipVcoCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -184,7 +184,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Update Tx Gain in ALERT")
 			.infoMessage("in TDD mode disable immediate TX Gain update and wait until ENSM moves to Alert")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	ensmHBoxLayout->addWidget(updateTxGainInAlert);
 	updateTxGainInAlert->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -245,7 +245,7 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 					 .uiStrategy(IIOWidgetBuilder::ComboUi)
 					 .optionsValues(rxOptionasData)
 					 .title("RX port input")
-					 .group(m_mgr)
+					 .group(m_group)
 					 .buildSingle();
 	modeWidgetLayout->addWidget(rxPortInput);
 
@@ -272,7 +272,7 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 					 .uiStrategy(IIOWidgetBuilder::ComboUi)
 					 .optionsValues(txOptionasData)
 					 .title("TX port input")
-					 .group(m_mgr)
+					 .group(m_group)
 					 .buildSingle();
 	modeWidgetLayout->addWidget(txPortInput);
 
@@ -290,7 +290,7 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 					 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					 .title("RX2 Phase Inversion")
 					 .infoMessage("If enabled RX1 and RX2 are phase aligned")
-					 .group(m_mgr)
+					 .group(m_group)
 					 .buildSingle();
 	modeWidgetLayout->addWidget(rx1Rx2Phase);
 	rx1Rx2Phase->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -331,7 +331,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("XO Disable Use EXT RefCLK")
 			.infoMessage("Disable XO use Ext CLK into XTAL_N - default XO into XTAL")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	layout->addWidget(xoDisableUseExtRefclk, 1, 0);
 	xoDisableUseExtRefclk->showProgressBar(false);
@@ -352,7 +352,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					  .title("Ext RX LO")
 					  .infoMessage("Enables external LO for RX")
-					  .group(m_mgr)
+					  .group(m_group)
 					  .buildSingle();
 	layout->addWidget(externalRxLo, 2, 0);
 	externalRxLo->showProgressBar(false);
@@ -380,7 +380,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 					   .uiStrategy(IIOWidgetBuilder::ComboUi)
 					   .optionsValues(optionasData)
 					   .title("CLOCKOUT")
-					   .group(m_mgr)
+					   .group(m_group)
 					   .buildSingle();
 	layout->addWidget(clkOutputMode, 1, 1);
 
@@ -399,7 +399,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					  .title("Ext TX LO")
 					  .infoMessage("Enables external LO for TX")
-					  .group(m_mgr)
+					  .group(m_group)
 					  .buildSingle();
 	layout->addWidget(externalTxLo, 3, 0);
 	externalTxLo->showProgressBar(false);
@@ -411,7 +411,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("RX Fastlock Pin Control")
 						  .infoMessage("RX fastlock pin control enable")
-						  .group(m_mgr)
+						  .group(m_group)
 						  .buildSingle();
 	layout->addWidget(rxFastlockPincontrol, 4, 0);
 	rxFastlockPincontrol->showProgressBar(false);
@@ -424,7 +424,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 					     .optionsValues("[0 1 63750]")
 					     .title("RX Fastlock Delay (ns)")
 					     .infoMessage("RX fastlock delay in ns")
-					     .group(m_mgr)
+					     .group(m_group)
 					     .buildSingle();
 	layout->addWidget(rxFastLockDelay, 4, 1);
 
@@ -435,7 +435,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("TX Fastlock Pin Control")
 						  .infoMessage("TX fastlock pin control enable")
-						  .group(m_mgr)
+						  .group(m_group)
 						  .buildSingle();
 	layout->addWidget(txFastlockPincontrol, 5, 0);
 	txFastlockPincontrol->showProgressBar(false);
@@ -448,7 +448,7 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 					     .optionsValues("[0 1 63750]")
 					     .title("TX Fastlock Delay (ns)")
 					     .infoMessage("TX fastlock delay in ns")
-					     .group(m_mgr)
+					     .group(m_group)
 					     .buildSingle();
 	layout->addWidget(txFastLockDelay, 5, 1);
 

@@ -37,9 +37,9 @@ Q_LOGGING_CATEGORY(CAT_FMCOMMS5_ADVANCED, "FMCOMMS5_ADVANCED")
 using namespace scopy;
 using namespace ad936x;
 
-Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
+Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: m_ctx(ctx)
-	, m_mgr(mgr)
+	, m_group(group)
 	, QWidget{parent}
 {
 	m_mainLayout = new QVBoxLayout(this);
@@ -207,52 +207,52 @@ void Fmcomms5Advanced::init()
 {
 
 	// ENSM Mode Clocks
-	m_ensmModeClocks = new EnsmModeClocksWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_ensmModeClocks = new EnsmModeClocksWidget(m_mainDevice, m_group, m_centralWidget);
 	m_centralWidget->addWidget(m_ensmModeClocks);
 	connect(this, &Fmcomms5Advanced::readRequested, m_ensmModeClocks, &EnsmModeClocksWidget::readRequested);
 	connect(m_ensmModeClocksBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_ensmModeClocks); });
 	// eLNA
-	m_elna = new ElnaWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_elna = new ElnaWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_elna, &ElnaWidget::readRequested);
 	m_centralWidget->addWidget(m_elna);
 	connect(m_eLnaBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_elna); });
 	// RSSI
-	m_rssi = new RssiWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_rssi = new RssiWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_rssi, &RssiWidget::readRequested);
 	m_centralWidget->addWidget(m_rssi);
 	connect(m_rssiBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_rssi); });
 	// GAIN
-	m_gainWidget = new GainWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_gainWidget = new GainWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_gainWidget, &GainWidget::readRequested);
 	m_centralWidget->addWidget(m_gainWidget);
 	connect(m_gainBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_gainWidget); });
 	// TX MONITOR
-	m_txMonitor = new TxMonitorWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_txMonitor = new TxMonitorWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_txMonitor, &TxMonitorWidget::readRequested);
 	m_centralWidget->addWidget(m_txMonitor);
 	connect(m_txMonitorBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_txMonitor); });
 	// AUX ADC/DAC/IIO
-	m_auxAdcDacIo = new AuxAdcDacIoWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_auxAdcDacIo = new AuxAdcDacIoWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_auxAdcDacIo, &AuxAdcDacIoWidget::readRequested);
 	m_centralWidget->addWidget(m_auxAdcDacIo);
 	connect(m_auxAdcDacIioBtn, &QPushButton::clicked, this,
 		[=, this]() { m_centralWidget->setCurrentWidget(m_auxAdcDacIo); });
 	// MISC
-	m_misc = new MiscWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_misc = new MiscWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_misc, &MiscWidget::readRequested);
 	m_centralWidget->addWidget(m_misc);
 	connect(m_miscBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_misc); });
 	// BIST
-	m_bist = new BistWidget(m_mainDevice, m_mgr, m_centralWidget);
+	m_bist = new BistWidget(m_mainDevice, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_bist, &BistWidget::readRequested);
 	m_centralWidget->addWidget(m_bist);
 	connect(m_bistBtn, &QPushButton::clicked, this, [=, this]() { m_centralWidget->setCurrentWidget(m_bist); });
 
 	// FMCOMMS5
-	m_fmcomms5 = new Fmcomms5Tab(m_ctx, m_mgr, m_centralWidget);
+	m_fmcomms5 = new Fmcomms5Tab(m_ctx, m_group, m_centralWidget);
 	connect(this, &Fmcomms5Advanced::readRequested, m_fmcomms5, &Fmcomms5Tab::readRequested);
 	m_centralWidget->addWidget(m_fmcomms5);
 	connect(m_fmcomms5Btn, &QPushButton::clicked, this,

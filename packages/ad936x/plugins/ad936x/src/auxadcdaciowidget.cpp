@@ -26,9 +26,9 @@
 using namespace scopy;
 using namespace ad936x;
 
-AuxAdcDacIoWidget::AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent)
+AuxAdcDacIoWidget::AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
-	, m_mgr(mgr)
+	, m_group(group)
 	, QWidget{parent}
 {
 
@@ -81,7 +81,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 			.optionsValues("[0 100 20000]")
 			.title("Measurement Interval (ms)")
 			.infoMessage("Measurement interval in ms. This data is processed by the driver.")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	tempSensorLayout->addWidget(tempSenseMeasurementInterval);
 
@@ -93,7 +93,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 					     .optionsValues("[-128 1 127]")
 					     .infoMessage("Offset in signed deg. C, range -128…127")
 					     .title("Offset")
-					     .group(m_mgr)
+					     .group(m_group)
 					     .buildSingle();
 	tempSensorLayout->addWidget(tempSenseOffset);
 
@@ -106,7 +106,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 						 .title("Decimation")
 						 .infoMessage("Decimation of the AuxADC used to derive the "
 							      "temperature. This data is processed by the driver.")
-						 .group(m_mgr)
+						 .group(m_group)
 						 .buildSingle();
 	tempSensorLayout->addWidget(tempSenseDecimation);
 
@@ -117,7 +117,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 							  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 							  .title("Periodic Measurement")
 							  .infoMessage("Enables periodic measurement")
-							  .group(m_mgr)
+							  .group(m_group)
 							  .buildSingle();
 	tempSensorLayout->addWidget(tempSensePeriodicMeasurement);
 	tempSensePeriodicMeasurement->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -157,7 +157,7 @@ QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 			.infoMessage(
 				"This sets the AuxADC clock frequency in Hz. See register 0x01C, bits [D5:D0]. This "
 				"data is processed by the driver.")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	widgetLayout->addWidget(auxAdcRate);
 
@@ -171,7 +171,7 @@ QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 			.title("Decimation")
 			.infoMessage("This sets the AuxADC decimation, See register 0x01D, bits [D3:D1]. This data is "
 				     "processed by the driver.")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	widgetLayout->addWidget(auxAdcDecimation);
 
@@ -200,7 +200,7 @@ QWidget *AuxAdcDacIoWidget::auxDacWidget(QWidget *parent)
 					      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					      .title("Manual Mode Enabled")
 					      .infoMessage("If enabled the Aux DAC doesn't slave the ENSM")
-					      .group(m_mgr)
+					      .group(m_group)
 					      .buildSingle();
 	auxDacWidgetLayout->addWidget(auxDacManualMode);
 	auxDacManualMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -240,7 +240,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
 					     .optionsValues("[306 1 3300]")
 					     .title("Default Value (mV)")
-					     .group(m_mgr)
+					     .group(m_group)
 					     .buildSingle();
 	layout->addWidget(dacDefaultValue, 1, 1);
 
@@ -250,7 +250,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 					      .attribute("adi,aux-dac" + dacx + "-active-in-alert-enable")
 					      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					      .title("Enable ALERT")
-					      .group(m_mgr)
+					      .group(m_group)
 					      .buildSingle();
 	layout->addWidget(dacActiveInAlert, 2, 0);
 	dacActiveInAlert->showProgressBar(false);
@@ -263,7 +263,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 					   .attribute("adi,aux-dac" + dacx + "-active-in-rx-enable")
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					   .title("Enable in RX")
-					   .group(m_mgr)
+					   .group(m_group)
 					   .buildSingle();
 	layout->addWidget(dacActiveInRx, 3, 0);
 	dacActiveInRx->showProgressBar(false);
@@ -274,7 +274,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 					   .attribute("adi,aux-dac" + dacx + "-active-in-tx-enable")
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					   .title("Enable in Tx")
-					   .group(m_mgr)
+					   .group(m_group)
 					   .buildSingle();
 	layout->addWidget(dacActiveInTx, 4, 0);
 	dacActiveInTx->showProgressBar(false);
@@ -286,7 +286,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 255]")
 				     .title(" ")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(rxDelay, 3, 1);
 
@@ -297,7 +297,7 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 255]")
 				     .title(" ")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(txDelay, 4, 1);
 
@@ -331,7 +331,7 @@ QWidget *AuxAdcDacIoWidget::controlsOutWidget(QWidget *parent)
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
 					   .optionsValues("[0 1 31]")
 					   .title("Index")
-					   .group(m_mgr)
+					   .group(m_group)
 					   .buildSingle();
 	controlsOutWidgetLayout->addWidget(ctrlOutsIndex);
 
@@ -342,7 +342,7 @@ QWidget *AuxAdcDacIoWidget::controlsOutWidget(QWidget *parent)
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .optionsValues("[0 1 255]")
 					  .title("Mask")
-					  .group(m_mgr)
+					  .group(m_group)
 					  .buildSingle();
 	controlsOutWidgetLayout->addWidget(ctrlOutsMask);
 
@@ -378,7 +378,7 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 			.title("Enable")
 			.infoMessage(
 				"Enables GPO manual mode, this will conflict with automatic ENSM slave and eLNA mode")
-			.group(m_mgr)
+			.group(m_group)
 			.buildSingle();
 	widgetLayout->addWidget(gpoManualMode, 1, 0);
 	gpoManualMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -454,7 +454,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 					   .attribute("adi,gpo" + gpox + "-inactive-state-high-enable")
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					   .title("Enable Inactive High State")
-					   .group(m_mgr)
+					   .group(m_group)
 					   .buildSingle();
 	layout->addWidget(inactiveState, 0, 0);
 	inactiveState->showProgressBar(false);
@@ -465,7 +465,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 				     .attribute("adi,gpo" + gpox + "-slave-rx-enable")
 				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				     .title("Enable RX State")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(stateRx, 1, 0);
 	stateRx->showProgressBar(false);
@@ -476,7 +476,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 				     .attribute("adi,gpo" + gpox + "-slave-tx-enable")
 				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				     .title("Enable TX State")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(stateTx, 2, 0);
 	stateTx->showProgressBar(false);
@@ -491,7 +491,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 255]")
 				     .title("")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(rxDelay, 1, 1);
 
@@ -502,7 +502,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 255]")
 				     .title("")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(txDelay, 2, 1);
 

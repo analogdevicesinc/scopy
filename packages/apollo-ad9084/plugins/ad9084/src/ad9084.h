@@ -55,7 +55,7 @@ private:
 	void loadPfir(QString path);
 	QString readFile(QString file);
 
-	IIOWidgetGroup *m_mgr;
+	IIOWidgetGroup *m_group;
 	struct iio_device *m_device;
 	ToolTemplate *m_tool;
 	GearBtn *m_settingsBtn;
