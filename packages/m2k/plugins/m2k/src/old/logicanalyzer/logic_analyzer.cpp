@@ -253,6 +253,7 @@ LogicAnalyzer::LogicAnalyzer(libm2k::context::M2k *m2k, Filter *filt, ToolMenuEn
 
 LogicAnalyzer::~LogicAnalyzer()
 {
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 
 	if(m_captureThread) {

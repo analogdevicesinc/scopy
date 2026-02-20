@@ -152,18 +152,22 @@ bool Ad936xPlugin::onConnect()
 bool Ad936xPlugin::onDisconnect()
 {
 	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
 		delete m_api;
 		m_api = nullptr;
 	}
 	if(m_advancedApi) {
+		ScopyJS::GetInstance()->unregisterApi(m_advancedApi);
 		delete m_advancedApi;
 		m_advancedApi = nullptr;
 	}
 	if(m_fmcomms5Api) {
+		ScopyJS::GetInstance()->unregisterApi(m_fmcomms5Api);
 		delete m_fmcomms5Api;
 		m_fmcomms5Api = nullptr;
 	}
 	if(m_fmcomms5AdvancedApi) {
+		ScopyJS::GetInstance()->unregisterApi(m_fmcomms5AdvancedApi);
 		delete m_fmcomms5AdvancedApi;
 		m_fmcomms5AdvancedApi = nullptr;
 	}

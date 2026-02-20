@@ -234,6 +234,12 @@ bool PQMPlugin::onConnect()
 
 bool PQMPlugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);

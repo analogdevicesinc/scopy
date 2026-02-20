@@ -149,6 +149,7 @@ bool AD9084Plugin::onConnect()
 bool AD9084Plugin::onDisconnect()
 {
 	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
 		delete m_api;
 		m_api = nullptr;
 	}

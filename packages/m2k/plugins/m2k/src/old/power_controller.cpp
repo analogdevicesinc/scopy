@@ -123,6 +123,7 @@ PowerController::~PowerController()
 		qDebug(CAT_M2K_POWERCONTROL) << e.what();
 	}
 
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 
 	delete ui;

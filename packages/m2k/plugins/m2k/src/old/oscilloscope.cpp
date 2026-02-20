@@ -1240,6 +1240,7 @@ Oscilloscope::~Oscilloscope()
 	//	if (saveOnExit) {
 	//		api->save(*settings);
 	//	}
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 
 	for(auto it = channels_api.begin(); it != channels_api.end(); ++it) {

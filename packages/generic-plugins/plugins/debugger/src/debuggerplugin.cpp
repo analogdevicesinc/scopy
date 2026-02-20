@@ -23,6 +23,7 @@
 
 #include "debugger/debuggerinstrument.h"
 #include "iioexplorerinstrument.h"
+#include <pluginbase/scopyjs.h>
 #include <scopy-debugger_config.h>
 
 #include <iio.h>
@@ -40,6 +41,7 @@
 #include <core/detachedtoolwindowmanager.h>
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
+#include <pluginbase/scopyjs.h>
 #include <gui/infopage.h>
 #include <gui/deviceinfopage.h>
 
