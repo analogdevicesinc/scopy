@@ -286,6 +286,9 @@ DMM::~DMM()
 	ui->run_button->setChecked(false);
 	disconnectAll();
 
+	ScopyJS::GetInstance()->unregisterApi(api);
+	delete api;
+
 	delete ui;
 }
 

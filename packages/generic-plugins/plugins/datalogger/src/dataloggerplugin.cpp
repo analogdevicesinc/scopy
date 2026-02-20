@@ -134,6 +134,12 @@ bool DataLoggerPlugin::onConnect()
 
 bool DataLoggerPlugin::onDisconnect()
 {
+	if(api) {
+		ScopyJS::GetInstance()->unregisterApi(api);
+		delete api;
+		api = nullptr;
+	}
+
 	auto count = dmmList.count();
 	for(int i = 0; i < count; i++) {
 		delete dmmList.takeLast();

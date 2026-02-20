@@ -796,6 +796,7 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	ui->runSingleWidget->toggle(false);
 	delete sample_timer;
 
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 	for(auto it = ch_api.begin(); it != ch_api.end(); ++it) {
 		delete *it;

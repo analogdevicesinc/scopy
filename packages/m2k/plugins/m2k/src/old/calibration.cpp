@@ -48,7 +48,11 @@ Calibration::Calibration(libm2k::context::M2k *m2k)
 	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
-Calibration::~Calibration() { delete m_api; }
+Calibration::~Calibration()
+{
+	ScopyJS::GetInstance()->unregisterApi(m_api);
+	delete m_api;
+}
 
 bool Calibration::initialize()
 {
