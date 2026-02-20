@@ -50,7 +50,7 @@ class SCOPY_ADRV9002PLUGIN_EXPORT Adrv9002 : public QWidget
 {
 	Q_OBJECT
 public:
-	Adrv9002(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
+	Adrv9002(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~Adrv9002();
 
 Q_SIGNALS:
@@ -93,7 +93,7 @@ private:
 
 	// Standard Scopy tool components
 	iio_context *m_ctx = nullptr;
-	IIOWidgetGroup *m_mgr = nullptr;
+	IIOWidgetGroup *m_group = nullptr;
 	QVBoxLayout *m_mainLayout;
 	ToolTemplate *m_tool;
 	AnimatedRefreshBtn *m_refreshButton;

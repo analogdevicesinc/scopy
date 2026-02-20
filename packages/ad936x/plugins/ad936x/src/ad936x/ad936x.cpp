@@ -40,10 +40,10 @@ Q_LOGGING_CATEGORY(CAT_AD936X, "AD936X");
 using namespace scopy;
 using namespace ad936x;
 
-AD936X::AD936X(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
+AD936X::AD936X(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
-	, m_mgr(mgr)
+	, m_group(group)
 {
 
 	m_mainLayout = new QVBoxLayout(this);
@@ -110,7 +110,7 @@ AD936X::AD936X(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
 			}
 		}
 
-		m_helper = new AD936xHelper(m_mgr);
+		m_helper = new AD936xHelper(m_group);
 		connect(this, &AD936X::readRequested, m_helper, &AD936xHelper::readRequested);
 
 		///  first widget the global settings can be created with iiowigets only
@@ -209,7 +209,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 					 .optionsAttribute("rf_bandwidth_available")
 					 .title("RF Bandwidth(MHz)")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
-					 .group(m_mgr)
+					 .group(m_group)
 					 .buildSingle();
 
 	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -227,7 +227,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 					       .optionsAttribute("sampling_frequency_available")
 					       .title("Sampling Rate(MSPS)")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
-					       .group(m_mgr)
+					       .group(m_group)
 					       .buildSingle();
 
 	samplingFrequency->setDataToUIConversion(
@@ -247,7 +247,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 					  .optionsAttribute("rf_port_select_available")
 					  .title("RF Port Select")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
-					  .group(m_mgr)
+					  .group(m_group)
 					  .buildSingle();
 	layout->addWidget(rfPortSelect, 0, 2, 2, 1);
 	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
@@ -258,7 +258,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 						  .attribute("quadrature_tracking_en")
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("Quadrature")
-						  .group(m_mgr)
+						  .group(m_group)
 						  .buildSingle();
 	layout->addWidget(quadratureTrackingEn, 0, 5);
 	quadratureTrackingEn->showProgressBar(false);
@@ -270,7 +270,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 						  .attribute("rf_dc_offset_tracking_en")
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						  .title("RF DC")
-						  .group(m_mgr)
+						  .group(m_group)
 						  .buildSingle();
 	layout->addWidget(rcDcOffsetTrackingEn, 1, 5);
 	rcDcOffsetTrackingEn->showProgressBar(false);
@@ -282,7 +282,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 						  .attribute("bb_dc_offset_tracking_en")
 						  .title("BB DC")
 						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .group(m_mgr)
+						  .group(m_group)
 						  .buildSingle();
 	layout->addWidget(bbDcOffsetTrackingEn, 2, 5);
 	bbDcOffsetTrackingEn->showProgressBar(false);
@@ -336,7 +336,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 					 .optionsAttribute("rf_bandwidth_available")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .title("RF Bandwidth(MHz)")
-					 .group(m_mgr)
+					 .group(m_group)
 					 .buildSingle();
 
 	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -354,7 +354,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 					       .optionsAttribute("sampling_frequency_available")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .title("Sampling Rate(MSPS)")
-					       .group(m_mgr)
+					       .group(m_group)
 					       .buildSingle();
 	samplingFrequency->setDataToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -373,7 +373,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 					  .optionsAttribute("rf_port_select_available")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .title("RF Port Select")
-					  .group(m_mgr)
+					  .group(m_group)
 					  .buildSingle();
 	lay->addWidget(rfPortSelect, 0, 2, 2, 1);
 	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);

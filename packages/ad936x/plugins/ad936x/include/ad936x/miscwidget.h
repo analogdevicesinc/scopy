@@ -33,7 +33,7 @@ class MiscWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit MiscWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
+	explicit MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~MiscWidget();
 
 Q_SIGNALS:
@@ -42,7 +42,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
-	IIOWidgetGroup *m_mgr = nullptr;
+	IIOWidgetGroup *m_group = nullptr;
 };
 } // namespace ad936x
 } // namespace scopy

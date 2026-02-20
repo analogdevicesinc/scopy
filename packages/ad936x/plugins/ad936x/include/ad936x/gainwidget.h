@@ -34,7 +34,7 @@ class GainWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit GainWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
+	explicit GainWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~GainWidget();
 
 Q_SIGNALS:
@@ -43,7 +43,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
-	IIOWidgetGroup *m_mgr = nullptr;
+	IIOWidgetGroup *m_group = nullptr;
 	QWidget *modeWidget(QWidget *parent);
 	QWidget *mgcWidget(QWidget *parent);
 	QWidget *agcThresholdGainChangesWidget(QWidget *parent);

@@ -69,7 +69,7 @@ private:
 	void setupMainTone(QLayout *lay);
 
 private:
-	IIOWidgetGroup *m_mgr;
+	IIOWidgetGroup *m_group;
 	struct iio_channel *m_channel;
 	struct iio_device *m_device;
 	QString m_channelLabel;

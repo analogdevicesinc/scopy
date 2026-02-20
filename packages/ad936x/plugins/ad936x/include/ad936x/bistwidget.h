@@ -36,7 +36,7 @@ class BistWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit BistWidget(iio_device *device, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
+	explicit BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~BistWidget();
 
 Q_SIGNALS:
@@ -46,7 +46,7 @@ Q_SIGNALS:
 private:
 	QVBoxLayout *m_layout;
 	iio_device *m_device = nullptr;
-	IIOWidgetGroup *m_mgr = nullptr;
+	IIOWidgetGroup *m_group = nullptr;
 	void updateBistTone();
 
 	MenuComboWidget *m_bistTone;
