@@ -58,8 +58,6 @@ SymbolController::SymbolController(QwtPlot *plot)
 
 SymbolController::~SymbolController()
 {
-	// Ensure event filter is removed to prevent use-after-free
-	setEnabled(false);
 	// d_overlay gets destroyed with parent
 }
 
