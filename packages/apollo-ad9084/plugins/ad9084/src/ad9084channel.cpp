@@ -38,9 +38,9 @@ using namespace scopy::ad9084;
 #define PHASE_RANGE "[-180 1 180]"
 #define SCALE_RANGE "[0.0 0.01 1.0]"
 
-Ad9084Channel::Ad9084Channel(iio_channel *chn, unsigned int chnIdx, IIOWidgetGroup *mgr, QWidget *parent)
+Ad9084Channel::Ad9084Channel(iio_channel *chn, unsigned int chnIdx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
-	, m_mgr(mgr)
+	, m_group(group)
 	, m_channel(chn)
 	, m_device(nullptr)
 	, m_input(true)
@@ -85,7 +85,7 @@ void Ad9084Channel::setupFrequency()
 					    .uiStrategy(IIOWidgetBuilder::EditableUi)
 					    .title("ADC Frequency (MHz)")
 					    .parent(this)
-					    .group(m_mgr)
+					    .group(m_group)
 					    .buildSingle();
 		m_iioWidgetGroupList.value(ADC_FREQUENCY)->add(m_frequencyWidget);
 	} else {
@@ -95,7 +95,7 @@ void Ad9084Channel::setupFrequency()
 					    .uiStrategy(IIOWidgetBuilder::EditableUi)
 					    .title("DAC Frequency (MHz)")
 					    .parent(this)
-					    .group(m_mgr)
+					    .group(m_group)
 					    .buildSingle();
 		m_iioWidgetGroupList.value(DAC_FREQUENCY)->add(m_frequencyWidget);
 	}
@@ -116,7 +116,7 @@ void Ad9084Channel::setupChannelNco(QLayout *lay)
 				  .optionsAttribute("channel_nco_frequency_available")
 				  .title("NCO Frequency (MHz)")
 				  .parent(this)
-				  .group(m_mgr)
+				  .group(m_group)
 				  .buildSingle();
 	chnNcoFreq->setUItoDataConversion(std::bind(&Ad9084Channel::frequencyUItoDS, this, std::placeholders::_1));
 	chnNcoFreq->setDataToUIConversion(std::bind(&Ad9084Channel::frequencyDStoUI, this, std::placeholders::_1));
@@ -128,7 +128,7 @@ void Ad9084Channel::setupChannelNco(QLayout *lay)
 				   .optionsValues(PHASE_RANGE)
 				   .title("NCO Phase")
 				   .parent(this)
-				   .group(m_mgr)
+				   .group(m_group)
 				   .buildSingle();
 	chnNcoPhase->setUItoDataConversion(std::bind(&Ad9084Channel::phaseUItoDS, this, std::placeholders::_1));
 	chnNcoPhase->setDataToUIConversion(std::bind(&Ad9084Channel::phaseDStoUI, this, std::placeholders::_1));
@@ -149,7 +149,7 @@ void Ad9084Channel::setupMainNco(QLayout *lay)
 				   .optionsAttribute("main_nco_frequency_available")
 				   .title("Main NCO Frequency")
 				   .parent(this)
-				   .group(m_mgr)
+				   .group(m_group)
 				   .buildSingle();
 	mainNcoFreq->setUItoDataConversion(std::bind(&Ad9084Channel::frequencyUItoDS, this, std::placeholders::_1));
 	mainNcoFreq->setDataToUIConversion(std::bind(&Ad9084Channel::frequencyDStoUI, this, std::placeholders::_1));
@@ -161,7 +161,7 @@ void Ad9084Channel::setupMainNco(QLayout *lay)
 				    .optionsValues(PHASE_RANGE)
 				    .title("Main NCO Phase")
 				    .parent(this)
-				    .group(m_mgr)
+				    .group(m_group)
 				    .buildSingle();
 	mainNcoPhase->setUItoDataConversion(std::bind(&Ad9084Channel::phaseUItoDS, this, std::placeholders::_1));
 	mainNcoPhase->setDataToUIConversion(std::bind(&Ad9084Channel::phaseDStoUI, this, std::placeholders::_1));
@@ -182,7 +182,7 @@ void Ad9084Channel::setupInChannelsAttrs(QLayout *lay)
 				.optionsAttribute("test_mode_available")
 				.title("Test Mode")
 				.parent(this)
-				.group(m_mgr)
+				.group(m_group)
 				.buildSingle();
 
 	auto nyquistZone = IIOWidgetBuilder(this)
@@ -192,7 +192,7 @@ void Ad9084Channel::setupInChannelsAttrs(QLayout *lay)
 				   .optionsAttribute("nyquist_zone_available")
 				   .title("Nyquist Zone")
 				   .parent(this)
-				   .group(m_mgr)
+				   .group(m_group)
 				   .buildSingle();
 
 	auto loopback = IIOWidgetBuilder(this)
@@ -202,7 +202,7 @@ void Ad9084Channel::setupInChannelsAttrs(QLayout *lay)
 				.optionsAttribute("loopback_available")
 				.title("Loopback Mode")
 				.parent(this)
-				.group(m_mgr)
+				.group(m_group)
 				.buildSingle();
 
 	lay->addWidget(testMode);
@@ -223,7 +223,7 @@ void Ad9084Channel::setupChannelTone(QLayout *lay)
 				       .optionsValues(SCALE_RANGE)
 				       .title("Gain Scale")
 				       .parent(this)
-				       .group(m_mgr)
+				       .group(m_group)
 				       .buildSingle();
 
 	auto testToneScale = IIOWidgetBuilder(this)
@@ -233,7 +233,7 @@ void Ad9084Channel::setupChannelTone(QLayout *lay)
 				     .optionsValues(SCALE_RANGE)
 				     .title("Test Tone Scale")
 				     .parent(this)
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 
 	auto chnNcoTestToneEn = IIOWidgetBuilder(this)
@@ -242,7 +242,7 @@ void Ad9084Channel::setupChannelTone(QLayout *lay)
 					.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					.title("Test Tone Enable")
 					.parent(this)
-					.group(m_mgr)
+					.group(m_group)
 					.buildSingle();
 	chnNcoTestToneEn->showProgressBar(false);
 
@@ -264,7 +264,7 @@ void Ad9084Channel::setupMainTone(QLayout *lay)
 					 .optionsValues(SCALE_RANGE)
 					 .title("Main Test Tone Scale")
 					 .parent(this)
-					 .group(m_mgr)
+					 .group(m_group)
 					 .buildSingle();
 
 	auto mainTestToneEn = IIOWidgetBuilder(this)
@@ -273,7 +273,7 @@ void Ad9084Channel::setupMainTone(QLayout *lay)
 				      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				      .title("Test Tone Enable")
 				      .parent(this)
-				      .group(m_mgr)
+				      .group(m_group)
 				      .buildSingle();
 	mainTestToneEn->showProgressBar(false);
 
@@ -313,7 +313,7 @@ void Ad9084Channel::init()
 				       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				       .title("CFIR Enable")
 				       .parent(this)
-				       .group(m_mgr)
+				       .group(m_group)
 				       .buildSingle());
 	m_iioWidgets.last()->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_iioWidgets.last()->showProgressBar(false);
@@ -326,7 +326,7 @@ void Ad9084Channel::init()
 				       .optionsValues("1 2")
 				       .title("CFIR Profile")
 				       .parent(this)
-				       .group(m_mgr)
+				       .group(m_group)
 				       .buildSingle());
 	cfirLay->addWidget(m_iioWidgets.last());
 
@@ -337,7 +337,7 @@ void Ad9084Channel::init()
 				       .compactMode(true)
 				       .title("")
 				       .parent(this)
-				       .group(m_mgr)
+				       .group(m_group)
 				       .buildSingle());
 	m_iioWidgets.last()->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_iioWidgets.last()->showProgressBar(false);

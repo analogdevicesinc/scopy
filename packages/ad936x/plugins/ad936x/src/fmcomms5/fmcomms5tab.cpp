@@ -33,9 +33,9 @@ Q_LOGGING_CATEGORY(CAT_FMCOMMS5_TAB, "FMCOMMS5_TAB")
 using namespace scopy;
 using namespace ad936x;
 
-Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
+Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: m_ctx(ctx)
-	, m_mgr(mgr)
+	, m_group(group)
 	, QWidget{parent}
 {
 
@@ -112,7 +112,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *mgr, QWidget *parent)
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 0.1 360]")
 				     .title("TX Phase")
-				     .group(m_mgr)
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(txPhase);
 
