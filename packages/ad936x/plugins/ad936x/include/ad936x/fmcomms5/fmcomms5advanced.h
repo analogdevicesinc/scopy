@@ -39,13 +39,16 @@
 #include "fmcomms5/fmcomms5tab.h"
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad936x {
 class SCOPY_AD936X_EXPORT Fmcomms5Advanced : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Fmcomms5Advanced(iio_context *ctx, QWidget *parent = nullptr);
+	explicit Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Fmcomms5Advanced();
+
+	void switchSubtab(const QString &name);
 
 Q_SIGNALS:
 	void readRequested();
@@ -67,6 +70,7 @@ private:
 	void ad9361MultichipSync();
 
 	iio_context *m_ctx = nullptr;
+	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;

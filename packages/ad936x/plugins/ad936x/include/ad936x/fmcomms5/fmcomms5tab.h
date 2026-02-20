@@ -30,12 +30,13 @@
 #include <QPushButton>
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad936x {
 class Fmcomms5Tab : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Fmcomms5Tab(iio_context *ctx, QWidget *parent = nullptr);
+	explicit Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Fmcomms5Tab();
 
 Q_SIGNALS:
@@ -43,6 +44,7 @@ Q_SIGNALS:
 
 private:
 	iio_context *m_ctx;
+	IIOWidgetGroup *m_group = nullptr;
 	QVBoxLayout *m_layout;
 	QProgressBar *m_calibProgressBar;
 	QPushButton *m_calibrateBtn;

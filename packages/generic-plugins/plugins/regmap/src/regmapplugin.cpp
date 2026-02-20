@@ -260,7 +260,12 @@ bool RegmapPlugin::onConnect()
 
 bool RegmapPlugin::onDisconnect()
 {
-	// TODO
+	if(api) {
+		ScopyJS::GetInstance()->unregisterApi(api);
+		delete api;
+		api = nullptr;
+	}
+
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 

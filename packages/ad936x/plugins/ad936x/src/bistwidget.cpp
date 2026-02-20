@@ -28,8 +28,9 @@
 using namespace scopy;
 using namespace ad936x;
 
-BistWidget::BistWidget(iio_device *device, QWidget *parent)
+BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
+	, m_group(group)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -78,6 +79,7 @@ BistWidget::BistWidget(iio_device *device, QWidget *parent)
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .optionsValues(bistOptionasData)
 				      .title("Bist PRBS")
+				      .group(m_group)
 				      .buildSingle();
 	hLayout1->addWidget(bistPrbs);
 
@@ -105,6 +107,7 @@ BistWidget::BistWidget(iio_device *device, QWidget *parent)
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .optionsValues(loopbackOptionasData)
 				      .title("Loopback")
+				      .group(m_group)
 				      .buildSingle();
 	hLayout1->addWidget(loopback);
 

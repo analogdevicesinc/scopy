@@ -28,6 +28,7 @@
 #include <iio.h>
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad9084 {
 
 enum SharedAttrCategory
@@ -40,7 +41,7 @@ class SCOPY_AD9084_EXPORT Ad9084Channel : public QWidget
 {
 	Q_OBJECT
 public:
-	Ad9084Channel(struct iio_channel *chn, unsigned int chnIdx, QWidget *parent = nullptr);
+	Ad9084Channel(struct iio_channel *chn, unsigned int chnIdx, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~Ad9084Channel();
 
 	bool isInput() const;
@@ -68,6 +69,7 @@ private:
 	void setupMainTone(QLayout *lay);
 
 private:
+	IIOWidgetGroup *m_group;
 	struct iio_channel *m_channel;
 	struct iio_device *m_device;
 	QString m_channelLabel;

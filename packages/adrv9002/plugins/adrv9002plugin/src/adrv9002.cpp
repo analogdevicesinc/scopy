@@ -21,6 +21,7 @@
 #include "adrv9002.h"
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio-widgets/guistrategy/temperatureguistrategy.h>
 
 #include <QLoggingCategory>
@@ -34,9 +35,10 @@ Q_LOGGING_CATEGORY(CAT_ADRV9002, "ADRV9002")
 using namespace scopy::adrv9002;
 using namespace scopy;
 
-Adrv9002::Adrv9002(iio_context *ctx, QWidget *parent)
+Adrv9002::Adrv9002(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
+	, m_group(group)
 	, m_tool(nullptr)
 	, m_refreshButton(nullptr)
 	, m_scrollArea(nullptr)
@@ -296,6 +298,7 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 						.attribute("input")
 						.uiStrategy(IIOWidgetBuilder::TemperatureUi)
 						.title("Temperature")
+						.group(m_group)
 						.buildSingle();
 
 		if(tempWidget) {
@@ -687,6 +690,7 @@ IIOWidget *Adrv9002::createComboWidget(iio_channel *ch, const QString &attr, con
 				    .optionsAttribute(availableAttr)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
+				    .group(m_group)
 				    .buildSingle();
 
 	if(widget) {
@@ -704,6 +708,7 @@ IIOWidget *Adrv9002::createRangeWidget(iio_channel *ch, const QString &attr, con
 				    .optionsValues(range)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
+				    .group(m_group)
 				    .buildSingle();
 
 	if(widget) {
@@ -720,6 +725,7 @@ IIOWidget *Adrv9002::createCheckboxWidget(iio_channel *ch, const QString &attr, 
 				    .attribute(attr)
 				    .title(label)
 				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+				    .group(m_group)
 				    .buildSingle();
 
 	if(widget) {
@@ -737,6 +743,7 @@ IIOWidget *Adrv9002::createReadOnlyWidget(iio_channel *ch, const QString &attr, 
 				    .attribute(attr)
 				    .title(title)
 				    .compactMode(true)
+				    .group(m_group)
 				    .buildSingle();
 
 	if(widget) {
@@ -756,6 +763,7 @@ IIOWidget *Adrv9002::createContinuousReadOnlyWidget(iio_channel *ch, const QStri
 				    .attribute(attr)
 				    .title(title)
 				    .compactMode(true)
+				    .group(m_group)
 				    .buildSingle();
 
 	if(widget) {

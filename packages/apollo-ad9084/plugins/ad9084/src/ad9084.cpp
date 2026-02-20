@@ -38,8 +38,9 @@ Q_LOGGING_CATEGORY(CAT_AD9084, "AD9084");
 using namespace scopy;
 using namespace scopy::ad9084;
 
-Ad9084::Ad9084(struct iio_device *dev, QWidget *parent)
+Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
+	, m_group(group)
 	, m_device(dev)
 	, m_channelPaths({})
 {
@@ -205,7 +206,7 @@ void Ad9084::scanChannels()
 	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
 		QString chn = m_rx_coarse_ddc_channel_names.at(i);
 		struct iio_channel *rxchn = iio_device_find_channel(m_device, chn.toUtf8(), false);
-		Ad9084Channel *rxchnWidget = new Ad9084Channel(rxchn, i, this);
+		Ad9084Channel *rxchnWidget = new Ad9084Channel(rxchn, i, m_group, this);
 		connect(this, &Ad9084::triggerRead, rxchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsRx.push_back(rxchnWidget);
 		rxchnWidget->addGroup(ad9084::ADC_FREQUENCY, adcFrequencyGrp);
@@ -217,7 +218,7 @@ void Ad9084::scanChannels()
 	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
 		QString chn = m_tx_coarse_duc_channel_names.at(i);
 		struct iio_channel *txchn = iio_device_find_channel(m_device, chn.toUtf8(), true);
-		Ad9084Channel *txchnWidget = new Ad9084Channel(txchn, i, this);
+		Ad9084Channel *txchnWidget = new Ad9084Channel(txchn, i, m_group, this);
 		connect(this, &Ad9084::triggerRead, txchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsTx.push_back(txchnWidget);
 		txchnWidget->addGroup(ad9084::DAC_FREQUENCY, dacFrequencyGrp);

@@ -28,8 +28,9 @@
 using namespace scopy;
 using namespace ad936x;
 
-TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
+TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
+	, m_group(group)
 	, QWidget{parent}
 {
 	Style::setBackgroundColor(this, json::theme::background_primary);
@@ -78,6 +79,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .optionsValues(optionasData)
 					     .title("")
+					     .group(m_group)
 					     .buildSingle();
 	gLayout1->addWidget(tx1FrontendGain, 1, 1);
 
@@ -95,6 +97,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .optionsValues(optionasData)
 					     .title("")
+					     .group(m_group)
 					     .buildSingle();
 	gLayout1->addWidget(tx2FrontendGain, 1, 2);
 
@@ -114,6 +117,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 					     .optionsValues("[0 1 63]")
 					     .title("")
 					     .infoMessage("Please see the manual")
+					     .group(m_group)
 					     .buildSingle();
 	gLayout1->addWidget(tx1LoCommonMode, 2, 1);
 
@@ -126,6 +130,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 					     .optionsValues("[0 1 63]")
 					     .title("")
 					     .infoMessage("Please see the manual")
+					     .group(m_group)
 					     .buildSingle();
 	gLayout1->addWidget(tx2LoCommonMode, 2, 2);
 
@@ -140,6 +145,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 					   .optionsValues("[0 250 63750]")
 					   .title("Low/High Gain Threshold (mdB)")
 					   .infoMessage("Please see the manual")
+					   .group(m_group)
 					   .buildSingle();
 	layout->addWidget(lowHighThresh);
 
@@ -152,6 +158,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 				     .optionsValues("[0 1 31]")
 				     .title("Low Gain (dB)")
 				     .infoMessage("Please see the manual")
+				     .group(m_group)
 				     .buildSingle();
 	layout->addWidget(lowGain);
 
@@ -164,6 +171,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 				      .optionsValues("[0 1 31]")
 				      .title("High Gain (dB)")
 				      .infoMessage("Please see the manual")
+				      .group(m_group)
 				      .buildSingle();
 	layout->addWidget(highGain);
 
@@ -176,6 +184,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 				   .optionsValues("[0 1 255]")
 				   .title("Delay (RX samples)")
 				   .infoMessage("Please see the manual")
+				   .group(m_group)
 				   .buildSingle();
 	layout->addWidget(delay);
 
@@ -188,6 +197,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 				      .optionsValues("[16 16 8192]")
 				      .title("Duration (RX Samples)")
 				      .infoMessage("Please see the manual")
+				      .group(m_group)
 				      .buildSingle();
 	layout->addWidget(duration);
 
@@ -198,6 +208,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					       .title("Enable DC Tracking")
 					       .infoMessage("Please see the manual")
+					       .group(m_group)
 					       .buildSingle();
 	layout->addWidget(dcTrackingEnabled);
 	dcTrackingEnabled->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -210,6 +221,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, QWidget *parent)
 						.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						.title("Enable One Shot Mode")
 						.infoMessage("Please see the manual")
+						.group(m_group)
 						.buildSingle();
 	layout->addWidget(oneShotModeEnabled);
 	oneShotModeEnabled->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);

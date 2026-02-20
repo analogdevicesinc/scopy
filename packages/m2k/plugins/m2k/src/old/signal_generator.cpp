@@ -552,6 +552,9 @@ SignalGenerator::~SignalGenerator()
 {
 	ui->run_button->toggle(false);
 
+	ScopyJS::GetInstance()->unregisterApi(api);
+	delete api;
+
 	delete fileManager;
 
 	delete m_plot;

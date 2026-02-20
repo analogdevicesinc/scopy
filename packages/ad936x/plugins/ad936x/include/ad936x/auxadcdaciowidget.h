@@ -29,13 +29,14 @@
 #include <iiowidgetbuilder.h>
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad936x {
 
 class AuxAdcDacIoWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit AuxAdcDacIoWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~AuxAdcDacIoWidget();
 
 Q_SIGNALS:
@@ -52,6 +53,7 @@ private:
 	QWidget *gposWidget(QWidget *parent);
 	QWidget *gpoWidget(QString gpox, QWidget *parent);
 
+	IIOWidgetGroup *m_group = nullptr;
 	MenuOnOffSwitch *m_gpo0Mask;
 	MenuOnOffSwitch *m_gpo1Mask;
 	MenuOnOffSwitch *m_gpo2Mask;

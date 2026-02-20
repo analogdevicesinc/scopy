@@ -34,8 +34,9 @@ Q_LOGGING_CATEGORY(CAT_AD936X_HELPER, "AD936X_HELPER");
 using namespace scopy;
 using namespace ad936x;
 
-AD936xHelper::AD936xHelper(QWidget *parent)
+AD936xHelper::AD936xHelper(IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
+	, m_group(group)
 {}
 
 QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent)
@@ -60,6 +61,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 				      .optionsAttribute("ensm_mode_available")
 				      .title("ENSM Mode")
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
+				      .group(m_group)
 				      .buildSingle();
 
 	hlayout->addWidget(ensmMode);
@@ -73,6 +75,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 				       .optionsAttribute("calib_mode_available")
 				       .title("Calibration Mode")
 				       .uiStrategy(IIOWidgetBuilder::ComboUi)
+				       .group(m_group)
 				       .buildSingle();
 	hlayout->addWidget(calibMode);
 	connect(this, &AD936xHelper::readRequested, calibMode, &IIOWidget::readAsync);
@@ -86,6 +89,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 					     .optionsAttribute("trx_rate_governor_available")
 					     .title("TRX Rate Governor")
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
+					     .group(m_group)
 					     .buildSingle();
 	hlayout->addWidget(trxRateGovernor);
 	connect(this, &AD936xHelper::readRequested, trxRateGovernor, &IIOWidget::readAsync);
@@ -100,6 +104,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 					 .device(dev)
 					 .attribute("rx_path_rates")
 					 .title("RX Path Rates")
+					 .group(m_group)
 					 .buildSingle();
 	layout->addWidget(rxPathRates);
 	rxPathRates->setEnabled(false);
@@ -110,6 +115,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 					 .device(dev)
 					 .attribute("tx_path_rates")
 					 .title("Tx Path Rates")
+					 .group(m_group)
 					 .buildSingle();
 	layout->addWidget(txPathRates);
 	txPathRates->setEnabled(false);
@@ -127,6 +133,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 					  .optionsAttribute("xo_correction_available")
 					  .title("XO Correction")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
+					  .group(m_group)
 					  .buildSingle();
 	layout->addWidget(xoCorrection);
 	connect(this, &AD936xHelper::readRequested, xoCorrection, &IIOWidget::readAsync);
@@ -159,6 +166,7 @@ QWidget *AD936xHelper::generateRxDeviceWidget(iio_device *dev, QString title, QW
 						  .optionsAttribute("frequency_available")
 						  .title("RX LO Frequency(MHz)")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
+						  .group(m_group)
 						  .buildSingle();
 	altVoltage0Frequency->setDataToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -208,6 +216,7 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .optionsAttribute("hardwaregain_available")
 					  .title("Hardware Gain(dB)")
+					  .group(m_group)
 					  .buildSingle();
 	layout->addWidget(hardwaregain);
 	connect(this, &AD936xHelper::readRequested, hardwaregain, &IIOWidget::readAsync);
@@ -221,7 +230,12 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 	hardwaregain->lastReturnCode();
 
 	// voltage: rssi
-	IIOWidget *rssi = IIOWidgetBuilder(rxWidget).channel(chn).attribute("rssi").title("RSSI(dB)").buildSingle();
+	IIOWidget *rssi = IIOWidgetBuilder(rxWidget)
+				  .channel(chn)
+				  .attribute("rssi")
+				  .title("RSSI(dB)")
+				  .group(m_group)
+				  .buildSingle();
 	layout->addWidget(rssi);
 	rssi->setEnabled(false);
 
@@ -238,6 +252,7 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .optionsAttribute("gain_control_mode_available")
 					     .title("Gain Control Mode")
+					     .group(m_group)
 					     .buildSingle();
 	layout->addWidget(gainControlMode);
 	connect(this, &AD936xHelper::readRequested, gainControlMode, &IIOWidget::readAsync);
@@ -279,6 +294,7 @@ QWidget *AD936xHelper::generateTxDeviceWidget(iio_device *dev, QString title, QW
 						  .optionsAttribute("frequency_available")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .title("TX LO Frequency(MHz)")
+						  .group(m_group)
 						  .buildSingle();
 	altVoltage1Frequency->setDataToUIConversion(
 		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -328,6 +344,7 @@ QWidget *AD936xHelper::generateTxChannelWidget(iio_channel *chn, QString title, 
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
 					   .optionsAttribute("hardwaregain_available")
 					   .title("Attenuation(dB)")
+					   .group(m_group)
 					   .buildSingle();
 	layout->addWidget(txAttenuation);
 	connect(this, &AD936xHelper::readRequested, txAttenuation, &IIOWidget::readAsync);
@@ -338,7 +355,12 @@ QWidget *AD936xHelper::generateTxChannelWidget(iio_channel *chn, QString title, 
 		return result.first();
 	});
 
-	IIOWidget *rssi = IIOWidgetBuilder(txWidget).channel(chn).attribute("rssi").title("RSSI(dB)").buildSingle();
+	IIOWidget *rssi = IIOWidgetBuilder(txWidget)
+				  .channel(chn)
+				  .attribute("rssi")
+				  .title("RSSI(dB)")
+				  .group(m_group)
+				  .buildSingle();
 	layout->addWidget(rssi);
 	rssi->setEnabled(false);
 	connect(this, &AD936xHelper::readRequested, rssi, &IIOWidget::readAsync);

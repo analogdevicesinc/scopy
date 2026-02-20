@@ -29,11 +29,26 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+namespace scopy {
+class IIOWidgetGroup;
+}
+
 namespace scopy::ad936x {
+
+class AD936X_API;
+class AD936X_ADVANCED_API;
+class FMCOMMS5_API;
+class FMCOMMS5_ADVANCED_API;
+
 class SCOPY_AD936X_EXPORT Ad936xPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	friend class AD936X_API;
+	friend class AD936X_ADVANCED_API;
+	friend class FMCOMMS5_API;
+	friend class FMCOMMS5_ADVANCED_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -48,6 +63,16 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	void initApi();
+
+	AD936X_API *m_api = nullptr;
+	AD936X_ADVANCED_API *m_advancedApi = nullptr;
+	FMCOMMS5_API *m_fmcomms5Api = nullptr;
+	FMCOMMS5_ADVANCED_API *m_fmcomms5AdvancedApi = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
+	bool m_isFmcomms5 = false;
 };
 } // namespace scopy::ad936x
 #endif // AD936XPLUGIN_H

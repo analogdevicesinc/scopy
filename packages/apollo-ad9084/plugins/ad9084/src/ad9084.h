@@ -34,12 +34,13 @@
 #include <iio.h>
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad9084 {
 class SCOPY_AD9084_EXPORT Ad9084 : public QWidget
 {
 	Q_OBJECT
 public:
-	Ad9084(struct iio_device *dev, QWidget *parent = nullptr);
+	Ad9084(struct iio_device *dev, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~Ad9084();
 
 Q_SIGNALS:
@@ -54,6 +55,7 @@ private:
 	void loadPfir(QString path);
 	QString readFile(QString file);
 
+	IIOWidgetGroup *m_group;
 	struct iio_device *m_device;
 	ToolTemplate *m_tool;
 	GearBtn *m_settingsBtn;

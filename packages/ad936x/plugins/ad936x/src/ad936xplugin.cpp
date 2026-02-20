@@ -20,6 +20,10 @@
  */
 
 #include "ad936xplugin.h"
+#include "ad936x_api.h"
+#include "ad936x_advanced_api.h"
+#include "fmcomms5_api.h"
+#include "fmcomms5_advanced_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -27,6 +31,8 @@
 #include <style.h>
 #include "scopy-ad936x_config.h"
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
+#include <iio-widgets/iiowidgetgroup.h>
 
 #include "ad936x/ad936x.h"
 #include "ad936x/ad963xadvanced.h"
@@ -109,39 +115,63 @@ bool Ad936xPlugin::onConnect()
 		return false;
 	}
 
-	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
-	bool isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
+	m_widgetGroup = new IIOWidgetGroup(this);
 
-	if(isFmcomms5) {
-		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context());
+	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
+	m_isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
+
+	if(m_isFmcomms5) {
+		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context(), m_widgetGroup);
 		m_toolList[0]->setTool(fmcomms5);
 		m_toolList[0]->setName("FMCOMMS5");
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(false);
 
-		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context());
+		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context(), m_widgetGroup);
 		m_toolList[1]->setTool(fmcomms5Advanced);
 		m_toolList[1]->setName("FMCOMMS5 Advanced");
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(false);
 
 	} else {
-		AD936X *ad936X = new AD936X(conn->context());
+		AD936X *ad936X = new AD936X(conn->context(), m_widgetGroup);
 		m_toolList[0]->setTool(ad936X);
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(true);
 
-		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context());
+		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context(), m_widgetGroup);
 		m_toolList[1]->setTool(ad936XAdvanced);
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(true);
 	}
 
+	initApi();
 	return true;
 }
 
 bool Ad936xPlugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+	if(m_advancedApi) {
+		ScopyJS::GetInstance()->unregisterApi(m_advancedApi);
+		delete m_advancedApi;
+		m_advancedApi = nullptr;
+	}
+	if(m_fmcomms5Api) {
+		ScopyJS::GetInstance()->unregisterApi(m_fmcomms5Api);
+		delete m_fmcomms5Api;
+		m_fmcomms5Api = nullptr;
+	}
+	if(m_fmcomms5AdvancedApi) {
+		ScopyJS::GetInstance()->unregisterApi(m_fmcomms5AdvancedApi);
+		delete m_fmcomms5AdvancedApi;
+		m_fmcomms5AdvancedApi = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -153,8 +183,34 @@ bool Ad936xPlugin::onDisconnect()
 		}
 	}
 
+	if(m_widgetGroup) {
+		delete m_widgetGroup;
+		m_widgetGroup = nullptr;
+	}
+
 	ConnectionProvider::close(m_param);
 	return true;
+}
+
+void Ad936xPlugin::initApi()
+{
+	m_api = new AD936X_API(this);
+	m_api->setObjectName("ad936x");
+	ScopyJS::GetInstance()->registerApi(m_api);
+
+	if(m_isFmcomms5) {
+		m_fmcomms5Api = new FMCOMMS5_API(this);
+		m_fmcomms5Api->setObjectName("fmcomms5");
+		ScopyJS::GetInstance()->registerApi(m_fmcomms5Api);
+
+		m_fmcomms5AdvancedApi = new FMCOMMS5_ADVANCED_API(this);
+		m_fmcomms5AdvancedApi->setObjectName("fmcomms5_advanced");
+		ScopyJS::GetInstance()->registerApi(m_fmcomms5AdvancedApi);
+	} else {
+		m_advancedApi = new AD936X_ADVANCED_API(this);
+		m_advancedApi->setObjectName("ad936x_advanced");
+		ScopyJS::GetInstance()->registerApi(m_advancedApi);
+	}
 }
 
 void Ad936xPlugin::initMetadata()

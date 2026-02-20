@@ -174,6 +174,7 @@ void PatternGenerator::readPreferences()
 
 PatternGenerator::~PatternGenerator()
 {
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 
 	if(m_running) {

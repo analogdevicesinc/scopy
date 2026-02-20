@@ -33,12 +33,13 @@
 #include <ad936xhelper.h>
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad936x {
 class SCOPY_AD936X_EXPORT FMCOMMS5 : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit FMCOMMS5(iio_context *ctx, QWidget *parent = nullptr);
+	explicit FMCOMMS5(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~FMCOMMS5();
 
 Q_SIGNALS:
@@ -46,6 +47,7 @@ Q_SIGNALS:
 
 private:
 	iio_context *m_ctx = nullptr;
+	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_controlsWidget;

@@ -27,13 +27,14 @@
 #include <iio-widgets/iiowidgetbuilder.h>
 
 namespace scopy {
+class IIOWidgetGroup;
 namespace ad936x {
 
 class SCOPY_AD936X_EXPORT AD936xHelper : public QWidget
 {
 	Q_OBJECT
 public:
-	AD936xHelper(QWidget *parent = nullptr);
+	AD936xHelper(IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 
 	QWidget *generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent);
 
@@ -45,6 +46,9 @@ public:
 
 Q_SIGNALS:
 	void readRequested();
+
+private:
+	IIOWidgetGroup *m_group = nullptr;
 };
 } // namespace ad936x
 } // namespace scopy
