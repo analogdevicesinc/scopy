@@ -27,6 +27,7 @@
 #include <QFileDialog>
 #include <style.h>
 #include <gui/stylehelper.h>
+#include <pluginbase/apiobject.h>
 #include <pluginbase/scopyjs.h>
 #include "iioexplorerinstrument.h"
 #include "iioexplorerinstrument_api.h"

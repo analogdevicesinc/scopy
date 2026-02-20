@@ -746,6 +746,7 @@ NetworkAnalyzer::~NetworkAnalyzer()
 		iterationsThread = nullptr;
 	}
 
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 
 	delete ui;

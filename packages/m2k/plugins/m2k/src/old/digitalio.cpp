@@ -203,6 +203,7 @@ DigitalIO::~DigitalIO()
 	if(poll->isActive()) {
 		poll->stop();
 	}
+	ScopyJS::GetInstance()->unregisterApi(api);
 	delete api;
 	delete ui;
 }

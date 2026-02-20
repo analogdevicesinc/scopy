@@ -156,6 +156,7 @@ bool Adrv9002Plugin::onConnect()
 bool Adrv9002Plugin::onDisconnect()
 {
 	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
 		delete m_api;
 		m_api = nullptr;
 	}
