@@ -335,6 +335,11 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 				     "devices. Otherwise, all devices need to be added manually from the Add page.",
 				     generalSection));
 	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "general_show_warning_on_connection_lost", "Show warning before disconnecting on connection lost",
+		"When enabled, shows a warning in the status bar with a disconnect button when "
+		"connection to a device is lost. When disabled, the device will be automatically disconnected.",
+		generalSection));
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
 		p, "device_menu_item", "Show detailed device header in tool menu",
 		"Toggle the display of a detailed device header in the tool menu. "
 		"This header includes the device name, URI, icon, and status indicators. "

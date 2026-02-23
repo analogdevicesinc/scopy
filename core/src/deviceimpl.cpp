@@ -374,6 +374,13 @@ void DeviceImpl::onConnectionLost()
 	if(m_connectionLostWidget) {
 		return;
 	}
+
+	bool showWarning = Preferences::get("general_show_warning_on_connection_lost").toBool();
+	if(!showWarning) {
+		disconnectDev();
+		return;
+	}
+
 	m_connectionLostWidget = new ConnectionLostWidget();
 	connect(m_connectionLostWidget, &ConnectionLostWidget::disconnectClicked, this, &DeviceImpl::disconnectDev);
 	StatusBarManager::pushUrgentWidget(m_connectionLostWidget, "Connection Lost Warning");
