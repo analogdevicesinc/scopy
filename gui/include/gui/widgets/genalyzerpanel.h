@@ -47,6 +47,7 @@ public:
 	GenalyzerChannelDisplay(const QString &channelName, QColor channelColor, QWidget *parent = nullptr);
 	void updateResults(size_t results_size, char **rkeys, double *rvalues);
 	void setChannelColor(QColor color);
+	void setChannelName(const QString &name);
 	QString channelName() const;
 	QString getTableContent() const;
 	QString getSelectedContent() const;
@@ -73,6 +74,7 @@ public Q_SLOTS:
 	void clear();
 	void clearChannel(const QString &channelName);
 	void setChannelVisible(const QString &channelName, bool visible);
+	void renameChannel(const QString &oldName, const QString &newName);
 
 private:
 	QDockWidget *findOrCreateChannelDock(const QString &channelName, QColor channelColor);

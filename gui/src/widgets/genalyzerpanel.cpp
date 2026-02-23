@@ -118,6 +118,8 @@ void GenalyzerChannelDisplay::setChannelColor(QColor color)
 
 QString GenalyzerChannelDisplay::channelName() const { return m_channelName; }
 
+void GenalyzerChannelDisplay::setChannelName(const QString &name) { m_channelName = name; }
+
 QString GenalyzerChannelDisplay::getTableContent() const
 {
 	QString content;
@@ -258,6 +260,25 @@ void GenalyzerPanel::setChannelVisible(const QString &channelName, bool visible)
 {
 	if(m_channelDocks.contains(channelName)) {
 		m_channelDocks[channelName]->setVisible(visible);
+	}
+}
+
+void GenalyzerPanel::renameChannel(const QString &oldName, const QString &newName)
+{
+	if(!m_channelDocks.contains(oldName) || oldName == newName) {
+		return;
+	}
+
+	// Update the dock widget
+	QDockWidget *dock = m_channelDocks.take(oldName);
+	dock->setWindowTitle(newName);
+	m_channelDocks[newName] = dock;
+
+	// Update the display
+	if(m_channelDisplays.contains(oldName)) {
+		GenalyzerChannelDisplay *display = m_channelDisplays.take(oldName);
+		display->setChannelName(newName);
+		m_channelDisplays[newName] = display;
 	}
 }
 

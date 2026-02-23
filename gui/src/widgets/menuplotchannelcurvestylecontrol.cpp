@@ -104,6 +104,13 @@ void MenuPlotChannelCurveStyleControl::addChannels(PlotChannel *c)
 	m_channels.append(c);
 	m_cbChannel->combo()->addItem(c->name(), QVariant::fromValue(c));
 
+	connect(c, &PlotChannel::nameChanged, this, [this, c](const QString &name) {
+		int idx = m_channels.indexOf(c);
+		if(idx >= 0) {
+			m_cbChannel->combo()->setItemText(idx, name);
+		}
+	});
+
 	if(m_channels.size() == 1) {
 		updateControlsFromChannel();
 	}
@@ -113,6 +120,7 @@ void MenuPlotChannelCurveStyleControl::removeChannels(PlotChannel *c)
 {
 	int idx = m_channels.indexOf(c);
 	if(idx >= 0) {
+		disconnect(c, &PlotChannel::nameChanged, this, nullptr);
 		m_channels.removeAt(idx);
 		m_cbChannel->combo()->removeItem(idx);
 	}

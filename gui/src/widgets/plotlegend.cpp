@@ -98,6 +98,11 @@ void PlotLegend::addChannel(PlotChannel *ch)
 	connect(ch, &PlotChannel::enabledChanged, this, &PlotLegend::updateStyles);
 	connect(ch, &PlotChannel::thicknessChanged, this, [this, ch]() { updateLineStyle(ch); });
 	connect(ch, &PlotChannel::styleChanged, this, [this, ch]() { updateLineStyle(ch); });
+	connect(ch, &PlotChannel::nameChanged, this, [this, ch](const QString &name) {
+		if(m_labels.contains(ch)) {
+			m_labels.value(ch)->setText(name);
+		}
+	});
 }
 
 void PlotLegend::removeChannel(PlotChannel *ch)
@@ -109,6 +114,7 @@ void PlotLegend::removeChannel(PlotChannel *ch)
 	disconnect(ch, &PlotChannel::enabledChanged, this, &PlotLegend::updateStyles);
 	disconnect(ch, &PlotChannel::thicknessChanged, this, nullptr);
 	disconnect(ch, &PlotChannel::styleChanged, this, nullptr);
+	disconnect(ch, &PlotChannel::nameChanged, this, nullptr);
 
 	QWidget *entry = m_entries.take(ch);
 	m_labels.remove(ch);

@@ -136,6 +136,17 @@ void PlotChannel::setYAxis(PlotAxis *newYAxis)
 
 QString PlotChannel::name() const { return m_name; }
 
+void PlotChannel::setName(const QString &name)
+{
+	if(m_name == name)
+		return;
+	m_name = name;
+	if(m_curve) {
+		m_curve->setTitle(name);
+	}
+	Q_EMIT nameChanged(name);
+}
+
 QList<QwtPlotMarker *> PlotChannel::markers() { return m_markers; }
 
 QwtPlotMarker *PlotChannel::buildMarker(QString str, QwtSymbol::Style shape, double x, double y)

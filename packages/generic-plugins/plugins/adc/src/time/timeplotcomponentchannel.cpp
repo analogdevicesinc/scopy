@@ -108,8 +108,19 @@ void adc::TimePlotComponentChannel ::initPlotComponent(PlotComponent *pc)
 	connect(m_timePlotCh, &PlotChannel::thicknessChanged, this,
 		[=]() { m_xyPlotCh->setThickness(m_timePlotCh->thickness()); });
 	connect(m_timePlotCh, &PlotChannel::styleChanged, this, [=]() { m_xyPlotCh->setStyle(m_timePlotCh->style()); });
-	connect(m_timePlotCh, &PlotChannel::penChanged, this,
-		[=]() { m_xyPlotCh->setColor(m_timePlotCh->pen().color()); });
+	connect(m_timePlotCh, &PlotChannel::penChanged, this, [=]() {
+		QColor color = m_timePlotCh->pen().color();
+		m_xyPlotCh->setColor(color);
+		m_timePlotAxisHandle->handle()->setColor(color);
+		m_ch->ctrl()->setColor(color);
+	});
+
+	// Sync name changes from ChannelComponent to PlotChannels
+	connect(m_ch, &ChannelComponent::nameChanged, this, [=](const QString &name) {
+		m_timePlotCh->setName(name);
+		m_xyPlotCh->setName(name);
+		m_ch->ctrl()->setName(name);
+	});
 
 	lockYAxis(m_plotComponent->singleYMode());
 	m_timePlotYAxis->setInterval(-2048, 2048);

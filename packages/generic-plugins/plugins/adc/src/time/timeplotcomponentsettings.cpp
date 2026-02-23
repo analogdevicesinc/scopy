@@ -235,12 +235,21 @@ void TimePlotComponentSettings::addChannel(ChannelComponent *c)
 		updateYModeCombo();
 	}
 
+	// Handle channel name changes
+	connect(c, &ChannelComponent::nameChanged, this, [this, c](const QString &name) {
+		int idx = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
+		if(idx >= 0) {
+			m_xAxisSrc->combo()->setItemText(idx, name);
+		}
+	});
+
 	m_channels.append(c);
 }
 
 void TimePlotComponentSettings::removeChannel(ChannelComponent *c)
 {
 	m_channels.removeAll(c);
+	disconnect(c, &ChannelComponent::nameChanged, this, nullptr);
 	int comboId = m_xAxisSrc->combo()->findData(QVariant::fromValue(static_cast<void *>(c)));
 	m_xAxisSrc->combo()->removeItem(comboId);
 

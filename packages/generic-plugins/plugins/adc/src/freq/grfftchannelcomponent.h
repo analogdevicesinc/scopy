@@ -226,6 +226,7 @@ Q_SIGNALS:
 				  double *rvalues);
 	void genalyzerChannelEnabled(const QString &channelName);
 	void genalyzerChannelDisabled(const QString &channelName);
+	void genalyzerChannelRenamed(const QString &oldName, const QString &newName);
 
 private:
 	double m_powerOffset;
@@ -254,6 +255,7 @@ private:
 	bool m_running;
 	bool m_scaleAvailable;
 	bool m_complex;
+	QString m_lastGenalyzerName;
 
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createChAttrMenu(iio_channel *ch, QString title, QWidget *parent);

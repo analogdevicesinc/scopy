@@ -62,7 +62,11 @@ public:
 	virtual SamplingInfo samplingInfo() override;
 	virtual void setSamplingInfo(SamplingInfo p) override;
 
+	QString name() const override;
+	void setName(const QString &name);
+
 Q_SIGNALS:
+	void nameChanged(const QString &name);
 	void requestChannelMenu(bool force = true);
 	void updatedSamplingInfo(SamplingInfo p);
 

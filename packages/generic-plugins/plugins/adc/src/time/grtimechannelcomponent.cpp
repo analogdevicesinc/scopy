@@ -204,6 +204,11 @@ QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 QWidget *GRTimeChannelComponent::createMenu(QWidget *parent)
 {
 	ChannelComponent::initMenu(parent);
+
+	// Enable channel name editing
+	m_menu->header()->title()->setEnabled(true);
+	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, &ChannelComponent::setName);
+
 	QWidget *yaxismenu = createYAxisMenu(m_menu);
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	QWidget *attrmenu = createAttrMenu(m_menu);
