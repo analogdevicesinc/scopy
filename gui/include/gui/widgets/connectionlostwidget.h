@@ -16,20 +16,40 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
  */
 
-#include "pingtask.h"
+#ifndef CONNECTIONLOSTWIDGET_H
+#define CONNECTIONLOSTWIDGET_H
 
-using namespace scopy;
-PingTask::PingTask(QObject *parent)
-	: QThread(parent)
-{}
+#include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include "scopy-gui_export.h"
 
-PingTask::~PingTask() {}
+namespace scopy {
 
-void PingTask::run() {}
+class SCOPY_GUI_EXPORT ConnectionLostWidget : public QWidget
+{
+	Q_OBJECT
+public:
+	explicit ConnectionLostWidget(QWidget *parent = nullptr);
+	explicit ConnectionLostWidget(const QString &message, QWidget *parent = nullptr);
+	~ConnectionLostWidget();
 
-void PingTask::finish() {}
+	void setMessage(const QString &message);
+	void setButtonText(const QString &text);
+	QPushButton *disconnectButton() const;
 
-#include "moc_pingtask.cpp"
+Q_SIGNALS:
+	void disconnectClicked();
+
+private:
+	void setupUi(const QString &message);
+
+	QLabel *m_warningLabel;
+	QPushButton *m_disconnectBtn;
+};
+
+} // namespace scopy
+
+#endif // CONNECTIONLOSTWIDGET_H

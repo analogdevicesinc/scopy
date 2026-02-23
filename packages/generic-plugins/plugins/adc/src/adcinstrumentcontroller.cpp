@@ -107,10 +107,7 @@ void ADCInstrumentController::onStop()
 void ADCInstrumentController::start()
 {
 	ResourceManager::open("adc" + m_uri, this);
-	bool ret = m_dataProvider->start();
-	if(!ret) {
-		Q_EMIT requestDisconnect();
-	}
+	m_dataProvider->start();
 }
 
 void ADCInstrumentController::stop()

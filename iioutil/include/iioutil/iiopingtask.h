@@ -30,7 +30,7 @@
 namespace scopy {
 /**
  * @brief The IIOPingTask class
- * IIOPingTask verifies IIO connection and emits pingSuccess/pingFailed
+ * IIOPingTask verifies IIO connection and emits pingSuccess/connectionLost
  */
 class SCOPY_IIOUTIL_EXPORT IIOPingTask : public PingTask
 {
@@ -38,8 +38,9 @@ class SCOPY_IIOUTIL_EXPORT IIOPingTask : public PingTask
 public:
 	IIOPingTask(iio_context *c, QObject *parent = nullptr);
 	~IIOPingTask();
-	virtual void run() override;
-	virtual bool ping() override;
+
+	void run() override;
+	bool ping() override;
 	static bool pingCtx(iio_context *ctx);
 
 protected:

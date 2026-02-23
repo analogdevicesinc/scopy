@@ -88,6 +88,7 @@ Q_SIGNALS:
 	void requestStartLater();
 	void requestStopLater();
 	void requestDisconnect();
+	void connectionLost();
 
 protected:
 	void setupChannelMeasurement(PlotManager *c, ChannelComponent *ch);

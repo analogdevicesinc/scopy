@@ -32,6 +32,7 @@
 #include <QTabWidget>
 
 namespace scopy {
+class ConnectionLostWidget;
 
 class SCOPY_CORE_EXPORT DeviceImpl : public QObject, public Device
 {
@@ -72,6 +73,7 @@ public Q_SLOTS:
 	virtual void load(QSettings &) override;
 	//	void forgetDev() override;
 	void onConnectionFailed();
+	void onConnectionLost();
 Q_SIGNALS:
 	void toolListChanged() override;
 	void connecting() override;
@@ -113,6 +115,7 @@ protected:
 	QTabWidget *m_configPage;
 	QPushButton *connbtn, *discbtn;
 	Plugin *m_pingPlugin = nullptr;
+	ConnectionLostWidget *m_connectionLostWidget = nullptr;
 };
 } // namespace scopy
 

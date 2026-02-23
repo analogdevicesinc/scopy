@@ -317,6 +317,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(c, &GRFFTSinkComponent::requestSingleShot, this, &ADCFFTInstrumentController::setSingleShot);
 	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent,
 		&FFTPlotManagerSettings::setBufferSize);
+	connect(c, &GRFFTSinkComponent::connectionLost, this, &ADCInstrumentController::connectionLost);
 
 	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
 		&FFTPlotManagerSettings::setComplexMode);

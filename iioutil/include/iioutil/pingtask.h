@@ -31,14 +31,17 @@ class SCOPY_IIOUTIL_EXPORT PingTask : public QThread
 	Q_OBJECT
 public:
 	PingTask(QObject *parent);
-	~PingTask();
+	virtual ~PingTask();
 
 	virtual void run() override;
 	virtual bool ping() = 0;
+	virtual void finish();
 
 Q_SIGNALS:
 	void pingSuccess();
 	void pingFailed();
+	void connectionLost();
+	void forceDisconnect();
 };
 } // namespace scopy
 
