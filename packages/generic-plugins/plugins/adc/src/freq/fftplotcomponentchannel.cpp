@@ -102,6 +102,19 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	fftplot->addPlotChannel(m_fftPlotCh);
 	m_fftPlotCh->setEnabled(true);
 
+	// Sync curve style changes
+	connect(m_fftPlotCh, &PlotChannel::penChanged, this, [=]() {
+		QColor color = m_fftPlotCh->pen().color();
+		m_fftPlotAxisHandle->handle()->setColor(color);
+		m_ch->ctrl()->setColor(color);
+	});
+
+	// Sync name changes from ChannelComponent to PlotChannel
+	connect(m_ch, &ChannelComponent::nameChanged, this, [=](const QString &name) {
+		m_fftPlotCh->setName(name);
+		m_ch->ctrl()->setName(name);
+	});
+
 	lockYAxis(true);
 	m_fftPlotYAxis->setInterval(-2048, 2048);
 	refreshData(true);

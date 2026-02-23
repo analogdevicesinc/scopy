@@ -123,6 +123,19 @@ void GRFFTChannelComponent::_init()
 
 	m_fftPlotComponentChannel->markerController()->setComplex(m_complex);
 	createMenuControlButton(this);
+
+	// Emit genalyzer rename signal when channel name changes
+	connect(this, &ChannelComponent::nameChanged, this, [this](const QString &newName) {
+		QString deviceName = m_node->treeParent() ? m_node->treeParent()->name() : QString();
+		QString oldUniqueName =
+			deviceName.isEmpty() ? m_lastGenalyzerName : deviceName + ":" + m_lastGenalyzerName;
+		QString newUniqueName = deviceName.isEmpty() ? newName : deviceName + ":" + newName;
+		if(!m_lastGenalyzerName.isEmpty() && oldUniqueName != newUniqueName) {
+			Q_EMIT genalyzerChannelRenamed(oldUniqueName, newUniqueName);
+		}
+		m_lastGenalyzerName = newName;
+	});
+	m_lastGenalyzerName = name();
 }
 GRFFTChannelComponent::~GRFFTChannelComponent() {}
 
@@ -203,6 +216,11 @@ QPushButton *GRFFTChannelComponent::createSnapshotButton(QWidget *parent)
 QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 {
 	ChannelComponent::initMenu(parent);
+
+	// Enable channel name editing
+	m_menu->header()->title()->setEnabled(true);
+	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, &ChannelComponent::setName);
+
 	QWidget *yaxismenu = createYAxisMenu(m_menu);
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	QWidget *markerMenu = createMarkerMenu(m_menu);

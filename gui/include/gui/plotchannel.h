@@ -65,6 +65,7 @@ public:
 	void setSamples(const float *xData, const float *yData, size_t size, bool copy = true);
 
 	QString name() const;
+	void setName(const QString &name);
 
 	void init();
 	void deinit();
@@ -106,6 +107,7 @@ Q_SIGNALS:
 	void styleChanged();
 	void penChanged();
 	void enabledChanged(bool enabled);
+	void nameChanged(const QString &name);
 
 private:
 	PlotAxis *m_xAxis;

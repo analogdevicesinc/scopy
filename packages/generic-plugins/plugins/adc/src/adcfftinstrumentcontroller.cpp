@@ -287,6 +287,8 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		[=](const QString &channelName) {
 			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, false);
 		});
+	connect(c, &GRFFTChannelComponent::genalyzerChannelRenamed, m_plotComponentManager->genalyzerPanel(),
+		&GenalyzerPanel::renameChannel);
 
 	connect(c->chData(), &ChannelData::newData, this,
 		[=](const float *xData_, const float *yData_, size_t size, bool copy) {

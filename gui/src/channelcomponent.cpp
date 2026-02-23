@@ -80,6 +80,17 @@ void ChannelComponent::setMenuControlButtonVisible(bool b) { m_ctrl->setVisible(
 
 MenuWidget *ChannelComponent::menu() { return m_menu; }
 
+QString ChannelComponent::name() const { return m_channelName; }
+
+void ChannelComponent::setName(const QString &name)
+{
+	if(m_channelName == name)
+		return;
+	m_channelName = name;
+	m_name = name;
+	Q_EMIT nameChanged(name);
+}
+
 void ChannelComponent::enable()
 {
 	m_plotChannelCmpt->enable();
