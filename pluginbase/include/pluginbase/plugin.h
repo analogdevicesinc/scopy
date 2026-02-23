@@ -461,6 +461,13 @@ public Q_SLOTS:
 	virtual void pausePingTask(bool) = 0;
 
 	virtual void restartDevice() = 0;
+
+	/**
+	 * @brief connectionLost
+	 * Plugin can emit this signal when it detects that the connection to the device was lost.
+	 * DeviceImpl will display a warning widget when this signal is received.
+	 */
+	virtual void connectionLost() = 0;
 };
 } // namespace scopy
 

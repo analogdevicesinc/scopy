@@ -32,6 +32,7 @@
 
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
+#include <pluginbase/statusbarmanager.h>
 #include <gui/preferenceshelper.h>
 #include <gui/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
@@ -367,6 +368,8 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 
 		connect(adc, &ADCInstrumentController::requestDisconnect, this, &ADCPlugin::disconnectDevice,
 			Qt::QueuedConnection);
+		connect(adc, &ADCInstrumentController::connectionLost, this, &ADCPlugin::connectionLost,
+			Qt::QueuedConnection);
 		m_ctrls.append(adc);
 	} else if(t == FREQUENCY) {
 
@@ -405,6 +408,8 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		});
 
 		connect(adc, &ADCInstrumentController::requestDisconnect, this, &ADCPlugin::disconnectDevice,
+			Qt::QueuedConnection);
+		connect(adc, &ADCInstrumentController::connectionLost, this, &ADCPlugin::connectionLost,
 			Qt::QueuedConnection);
 		m_ctrls.append(adc);
 	} else {

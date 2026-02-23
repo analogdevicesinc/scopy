@@ -127,6 +127,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	connect(c, &GRTimeSinkComponent::requestSingleShot, this, &ADCTimeInstrumentController::setSingleShot);
 	connect(c, &GRTimeSinkComponent::requestBufferSize, m_timePlotSettingsComponent,
 		&TimePlotManagerSettings::setBufferSize);
+	connect(c, &GRTimeSinkComponent::connectionLost, this, &ADCInstrumentController::connectionLost);
 
 	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, c,
 		&GRTimeSinkComponent::setSamplingInfo);

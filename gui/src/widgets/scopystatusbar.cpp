@@ -74,7 +74,21 @@ void ScopyStatusBar::addToLeft(QWidget *widget)
 void ScopyStatusBar::displayStatusMessage(StatusMessage *statusMessage)
 {
 	m_messages.append(statusMessage);
-	addToLeft(statusMessage->getWidget());
+	QWidget *widget = statusMessage->getWidget();
+
+	// Adjust status bar height based on widget's fixed height if set
+	int widgetHeight = widget->minimumHeight();
+	if(widgetHeight > 0) {
+		setAnimMax(widgetHeight);
+		setMinimumHeight(widgetHeight);
+		setMaximumHeight(widgetHeight);
+	} else {
+		setAnimMax(20);
+		setMinimumHeight(20);
+		setMaximumHeight(20);
+	}
+
+	addToLeft(widget);
 	this->toggleMenu(true);
 	this->show();
 }
@@ -84,6 +98,12 @@ void ScopyStatusBar::clearStatusMessage()
 	this->toggleMenu(false);
 	m_stackedWidget->removeWidget(m_stackedWidget->currentWidget());
 	removeLastStatusMessage();
+
+	// Reset to default height
+	setAnimMax(20);
+	setMinimumHeight(20);
+	setMaximumHeight(20);
+
 	if(m_stackedWidget->count() > 0) {
 		this->toggleMenu(true);
 		this->show();

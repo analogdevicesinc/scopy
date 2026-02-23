@@ -181,6 +181,7 @@ bool GRTimeSinkComponent::start()
 	iio_context_set_timeout(m_node->ctx(), 1000);
 	bool pingEnabled = Preferences::get("adc_enable_iio_context_ping").toBool();
 	if(pingEnabled && !IIOPingTask::pingCtx(m_node->ctx())) {
+		Q_EMIT connectionLost();
 		return false;
 	}
 	iio_context_set_timeout(m_node->ctx(), timeout);

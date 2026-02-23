@@ -142,6 +142,7 @@ Q_SIGNALS:                                                                      
 	void toolListChanged() override;                                                                               \
 	void requestToolByUuid(QString) override;                                                                      \
 	void pausePingTask(bool) override;                                                                             \
+	void connectionLost() override;                                                                                \
                                                                                                                        \
 private:
 

@@ -43,6 +43,8 @@
 #include <common/scopyconfig.h>
 #include <gui/widgets/hoverwidget.h>
 #include <gui/widgets/connectionloadingbar.h>
+#include <gui/widgets/connectionlostwidget.h>
+#include <iioutil/pingtask.h>
 #include <pluginbase/statusbarmanager.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
@@ -102,6 +104,7 @@ void DeviceImpl::loadPlugins()
 		connect(dynamic_cast<QObject *>(p), SIGNAL(restartDevice()), this, SIGNAL(requestedRestart()));
 		connect(dynamic_cast<QObject *>(p), SIGNAL(requestToolByUuid(QString)), this,
 			SIGNAL(requestTool(QString)));
+		connect(dynamic_cast<QObject *>(p), SIGNAL(connectionLost()), this, SLOT(onConnectionLost()));
 		p->postload();
 		p->setDevice(this);
 	}
@@ -121,6 +124,7 @@ void DeviceImpl::unloadPlugins()
 		disconnect(dynamic_cast<QObject *>(*pI), SIGNAL(restartDevice()), this, SIGNAL(requestedRestart()));
 		disconnect(dynamic_cast<QObject *>(*pI), SIGNAL(requestToolByUuid(QString)), this,
 			   SIGNAL(requestTool(QString)));
+		disconnect(dynamic_cast<QObject *>(*pI), SIGNAL(connectionLost()), this, SLOT(onConnectionLost()));
 		(*pI)->unload();
 		delete(*pI);
 	}
@@ -299,7 +303,10 @@ void DeviceImpl::bindPing()
 		connect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)), dynamic_cast<QObject *>(m_pingPlugin),
 			SLOT(onPausePingTask(bool)));
 	}
-	connect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+
+	PingTask *pingTask = m_pingPlugin->pingTask();
+	connect(pingTask, &PingTask::forceDisconnect, this, &DeviceImpl::disconnectDev, Qt::QueuedConnection);
+	connect(pingTask, &PingTask::connectionLost, this, &DeviceImpl::onConnectionLost, Qt::QueuedConnection);
 	m_pingPlugin->startPingTask();
 }
 
@@ -313,7 +320,11 @@ void DeviceImpl::unbindPing()
 			   dynamic_cast<QObject *>(m_pingPlugin), SLOT(onPausePingTask(bool)));
 	}
 	m_pingPlugin->stopPingTask();
-	disconnect(m_pingPlugin->pingTask(), &PingTask::pingFailed, this, &DeviceImpl::disconnectDev);
+
+	PingTask *pingTask = m_pingPlugin->pingTask();
+	disconnect(pingTask, &PingTask::forceDisconnect, this, &DeviceImpl::disconnectDev);
+	disconnect(pingTask, &PingTask::connectionLost, this, &DeviceImpl::onConnectionLost);
+	pingTask->finish();
 	m_pingPlugin = nullptr;
 }
 
@@ -356,6 +367,16 @@ void DeviceImpl::onConnectionFailed()
 {
 	m_state = DEV_ERROR;
 	disconnectDev();
+}
+
+void DeviceImpl::onConnectionLost()
+{
+	if(m_connectionLostWidget) {
+		return;
+	}
+	m_connectionLostWidget = new ConnectionLostWidget();
+	connect(m_connectionLostWidget, &ConnectionLostWidget::disconnectClicked, this, &DeviceImpl::disconnectDev);
+	StatusBarManager::pushUrgentWidget(m_connectionLostWidget, "Connection Lost Warning");
 }
 
 Plugin *DeviceImpl::getPluginByName(const QString &pluginName)
@@ -477,6 +498,12 @@ void DeviceImpl::disconnectDev()
 	DebugTimer disconnectDevBm;
 	m_state = DEV_DISCONNECTING;
 	Q_EMIT disconnecting();
+
+	if(m_connectionLostWidget) {
+		m_connectionLostWidget->hide();
+		delete m_connectionLostWidget;
+		m_connectionLostWidget = nullptr;
+	}
 
 	unbindPing();
 	connbtn->show();

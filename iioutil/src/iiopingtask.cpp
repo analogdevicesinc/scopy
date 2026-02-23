@@ -37,10 +37,11 @@ void IIOPingTask::run()
 
 	if(isInterruptionRequested())
 		return;
-	if(ret)
+	if(ret) {
 		Q_EMIT pingSuccess();
-	else
-		Q_EMIT pingFailed();
+	} else {
+		Q_EMIT connectionLost();
+	}
 }
 
 bool IIOPingTask::ping() { return pingCtx(m_ctx); }

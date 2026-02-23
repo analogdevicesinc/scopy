@@ -79,6 +79,7 @@ Q_SIGNALS:
 	void ready();
 	void finish();
 	void requestForceStop();
+	void connectionLost();
 
 	void requestRebuild();
 	void requestSingleShot(bool);
