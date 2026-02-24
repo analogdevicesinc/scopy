@@ -29,8 +29,12 @@
 #include <pluginbase/pluginbase.h>
 
 namespace scopy::jesdstatus {
+
+class JesdStatus_API;
+
 class SCOPY_JESDSTATUS_EXPORT JesdStatusPlugin : public QObject, public PluginBase
 {
+	friend class JesdStatus_API;
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
@@ -50,6 +54,8 @@ public Q_SLOTS:
 private:
 	struct iio_context *m_ctx;
 	QList<QString> scanCompatibleDevices(iio_context *ctx);
+	void initApi();
+	JesdStatus_API *m_api = nullptr;
 };
 } // namespace scopy::jesdstatus
 #endif // JESDSTATUSPLUGIN_H
