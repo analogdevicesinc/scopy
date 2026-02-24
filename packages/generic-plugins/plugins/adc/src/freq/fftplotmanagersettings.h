@@ -46,6 +46,7 @@ using namespace scopy::gui;
 
 class SCOPY_ADC_EXPORT FFTPlotManagerSettings : public QWidget, public ToolComponent, public Menu
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	typedef enum

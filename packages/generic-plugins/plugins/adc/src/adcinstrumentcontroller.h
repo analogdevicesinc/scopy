@@ -45,6 +45,8 @@ class SCOPY_ADC_EXPORT ADCInstrumentController : public QObject,
 						 public MetaComponent,
 						 public ResourceUser
 {
+	friend class ADC_API;
+	friend class ADCPlugin;
 	Q_OBJECT
 public:
 	ADCInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
