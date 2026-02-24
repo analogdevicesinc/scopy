@@ -32,8 +32,7 @@ using namespace scopy;
 PlotWidget_API::PlotWidget_API(PlotWidget *plot, QObject *parent)
 	: ApiObject(parent)
 	, m_plot(plot)
-{
-}
+{}
 
 PlotWidget_API::~PlotWidget_API() {}
 

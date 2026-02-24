@@ -30,6 +30,8 @@ namespace scopy {
 namespace adc {
 class SCOPY_ADC_EXPORT ADCTimeInstrumentController : public ADCInstrumentController
 {
+	friend class ADC_API;
+
 public:
 	ADCTimeInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
 				    QObject *parent = nullptr);

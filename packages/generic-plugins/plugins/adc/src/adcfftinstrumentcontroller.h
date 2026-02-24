@@ -33,6 +33,8 @@ class GenalyzerSettings;
 
 class SCOPY_ADC_EXPORT ADCFFTInstrumentController : public ADCInstrumentController
 {
+	friend class ADC_API;
+
 public:
 	ADCFFTInstrumentController(ToolMenuEntry *tme, QString uri, QString name, AcqTreeNode *tree,
 				   QObject *parent = nullptr);
