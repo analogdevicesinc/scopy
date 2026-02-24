@@ -1,6 +1,6 @@
 Create a JavaScript API class for the Scopy plugin: $ARGUMENTS
 
-Follow the instructions in @prompts/scopy_api_agent.md exactly.
+Follow the instructions in @tools/prompts/scopy_api_agent.md exactly.
 
 ## Workflow
 

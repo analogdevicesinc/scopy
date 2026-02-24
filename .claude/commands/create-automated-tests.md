@@ -1,7 +1,7 @@
 Create automated JavaScript test scripts for the Scopy plugin: $ARGUMENTS
 
-Follow the instructions in @prompts/scopy_test_automation_agent.md exactly.
-Also use @prompts/scopy_test_automation_prompt.md as a reference for templates and patterns.
+Follow the instructions in @tools/prompts/scopy_test_automation_agent.md exactly.
+Also use @tools/prompts/scopy_test_automation_prompt.md as a reference for templates and patterns.
 
 ## Workflow
 
