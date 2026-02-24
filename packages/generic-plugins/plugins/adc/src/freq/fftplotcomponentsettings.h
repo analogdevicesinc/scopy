@@ -37,6 +37,7 @@ namespace adc {
 class FFTPlotComponent;
 class SCOPY_ADC_EXPORT FFTPlotComponentSettings : public QWidget, public ToolComponent
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	FFTPlotComponentSettings(FFTPlotComponent *plt, QWidget *parent = nullptr);
