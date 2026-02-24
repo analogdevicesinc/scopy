@@ -1,590 +1,215 @@
-# Scopy Automated Tests Documentation
+# Scopy Automated Tests
 
-## 📋 Overview
+## Running Scripts — Path Requirements
 
-This directory contains automated JavaScript test suites for Scopy's various tools and plugins. These tests validate functionality, API behavior, and cross-tool integration using Scopy's JavaScript scripting interface.
+All test scripts use `evaluateFile()` with paths **relative to the Scopy build directory**. The `evaluateFile()` function resolves paths against the current working directory (CWD), not the script file's location. This means **you must always run Scopy from the `build/` directory**:
 
-## 🔌 General Requirements
+```bash
+cd scopy/build/
+./scopy --script ../js/testAutomations/<path-to-test>.js
+```
 
-### Software Requirements
-- **Scopy**: Built with scripting support (`-DENABLE_SCOPYJS=ON`)
-- **IIO Emulator** or **ADALM2000 (M2K)** hardware device
-- **Operating System**: Linux, Windows, or macOS
+For example:
+```bash
+cd scopy/build/
+./scopy --script ../js/testAutomations/core/pluginLoadTests.js
+./scopy --script ../js/testAutomations/m2k/voltmeter/voltmeter_dc_loopback.js
+```
 
-### Build Scopy with Scripting Support
+Running from any other directory will cause `evaluateFile()` calls inside the scripts to fail, since they all load the shared test framework via:
+```javascript
+evaluateFile("../js/testAutomations/common/testFramework.js");
+```
+This path only resolves correctly when CWD is `build/` (i.e., `build/../js/testAutomations/...`).
+
+---
+
+## Requirements
+
+- **Scopy** built with `-DENABLE_SCOPYJS=ON`
+- **iio-emu** for emulator-based tests (`iio-emu adalm2000`, `iio-emu generic`, etc.)
+- **ADALM2000 hardware** for M2K loopback tests requiring real signal paths
+
 ```bash
 cd scopy/build/
 cmake .. -DENABLE_SCOPYJS=ON
 make -j$(nproc)
 ```
 
-### Device Setup Options
-
-#### Option 1: IIO Emulator (Recommended for Testing)
-```bash
-# Start the M2K emulator
-iio-emu adalm2000
-
-# The emulator will be available at ip:127.0.0.0
-```
-
-#### Option 2: Real ADALM2000 Hardware
-- Connect M2K device via USB
-- Device will be available at `ip:192.168.2.1` (default) or custom URI
-
 ---
 
-## 🧪 Test Suites
+## Directory Structure
 
-### 1. M2K Tool Tests
-
-#### 📊 **Signal Generator Tests**
-**File:** `m2k/signalGenerator/signalGeneratorTests.js`
-
-**Hardware Setup:**
-- M2K Channel 1 Output (W1) → Oscilloscope Channel 1 Input (1+)
-- M2K Channel 2 Output (W2) → Oscilloscope Channel 2 Input (2+)
-- Connect grounds (1-, 2-) to GND
-
-**Run Command:**
-```bash
-cd scopy/build/
-./scopy --script ../js/testAutomations/m2k/signalGenerator/signalGeneratorTests.js
 ```
-
-**Tests Coverage:**
-- Sine wave generation only
-- Frequency range (0.001Hz to 5MHz)
-- Amplitude control (1mV to 10V)
-- Phase adjustment (0-360°)
-- Offset control (-2V to +2V)
-
----
-
-#### 🔬 **Signal Generator + Oscilloscope Integration Tests**
-**File:** `m2k/signalGenerator/signalGeneratorOscilloscopeTests.js`
-
-**Hardware Setup:**
-- Same as Signal Generator Tests (loopback connections)
-- W1 → 1+, W2 → 2+, grounds connected
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/signalGenerator/signalGeneratorOscilloscopeTests.js
-```
-
-**Tests Coverage:**
-- Constant voltage generation (-5V to +5V)
-- Waveform generation (sine, square, triangle, sawtooth/ramp)
-- Square wave duty cycle adjustment
-- Dual-channel synchronization
-- Cross-validation with oscilloscope measurements
-- Measurement accuracy verification
-
----
-
-#### 🔋 **Power Supply + Voltmeter Tests**
-**File:** `m2k/powerSupply/powerSupplyVoltmeterTests.js`
-
-**Hardware Setup:**
-- M2K V+ Output → Voltmeter Channel 1 Input (1+)
-- M2K V- Output → Voltmeter Channel 2 Input (2+)
-- Connect grounds to GND
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/powerSupply/powerSupplyVoltmeterTests.js
-```
-
-**Tests Coverage:**
-- Positive voltage output (V+) accuracy (0V to +5V)
-- Negative voltage output (V-) accuracy (-5V to 0V)
-- Fine voltage tuning with incremental steps
-- Tracking mode validation (positive and negative)
-- Dual-channel independent control
-- Voltage limit verification
-- Enable/disable channel control
-
----
-
-#### 📏 **Voltmeter Tests**
-**File:** `m2k/voltmeter/voltmeterTests.js`
-
-**Hardware Setup:**
-- External voltage source → Channel 1 (1+) and/or Channel 2 (2+)
-- Or use M2K power supply outputs for self-test
-- Connect grounds appropriately
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/voltmeter/voltmeterTests.js
-```
-
-**Tests Coverage:**
-- Mode switching (DC/AC low/AC high)
-- Start/stop control functionality
-
----
-
-#### 📏 **Voltmeter + Power Supply Integration Tests**
-**File:** `m2k/voltmeter/voltmeterPowerSupplyTests.js`
-
-**Hardware Setup:**
-- V+ → 1+, V- → 2+ (loopback for validation)
-- Grounds connected
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/voltmeter/voltmeterPowerSupplyTests.js
-```
-
-**Tests Coverage:**
-- DC voltage measurement (Channel 1 and Channel 2)
-- Dual-channel simultaneous measurement
-- Peak hold functionality
-- Data logging features with CSV export
-
----
-
-#### 📏 **Voltmeter + Signal Generator Integration Tests**
-**File:** `m2k/voltmeter/voltmeterSignalGeneratorTests.js`
-
-**Hardware Setup:**
-- W1 → 1+, W2 → 2+ (signal validation)
-- Grounds connected
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/voltmeter/voltmeterSignalGeneratorTests.js
-```
-
-**Tests Coverage:**
-- AC low frequency measurement (20Hz-8kHz)
-- AC high frequency measurement (8kHz-40kHz)
-- Histogram mode testing with statistical analysis
-
----
-
-#### 📊 **Spectrum Analyzer Tests**
-**File:** `m2k/spectrumAnalyzer/spectrumAnalyzerTests.js`
-
-**Hardware Setup:**
-- M2K Channel 1 Output (W1) → Oscilloscope/Spectrum Analyzer Channel 1 Input (1+)
-- M2K Channel 2 Output (W2) → Oscilloscope/Spectrum Analyzer Channel 2 Input (2+)
-- Connect grounds (1-, 2-) to GND
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/spectrumAnalyzer/spectrumAnalyzerTests.js
-```
-
-**Tests Coverage:**
-- Channel 1 frequency detection (500Hz to 5MHz)
-- Channel 2 frequency detection
-- Dual channel simultaneous operation
-- Peak hold and min hold detector types
-- Marker table functionality
-- Sweep settings verification (start/stop frequency)
-- Display settings (cursors, log scale, waterfall)
-- Channel settings (window functions, averaging types)
-- Single shot acquisition mode
-
----
-
-#### 📈 **Network Analyzer Tests**
-**File:** `m2k/networkAnalyzer/networkAnalyzerTests.js`
-
-**Hardware Setup (Loopback Mode):**
-- W1 (Signal Generator) → 1+ (Channel 1 Input)
-- 1- → GND
-- 2+ → 2- (Channel 2 terminated)
-- All grounds connected
-
-**Note:** Full filter tests (Low Pass, High Pass, Band Pass, Band Stop) require
-external RC circuits as specified in the test documentation.
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/networkAnalyzer/networkAnalyzerTests.js
-```
-
-**Tests Coverage:**
-- Sweep settings (frequency range, sample count, log/linear)
-- Reference settings (channel selection, amplitude, offset)
-- Display settings (magnitude/phase scale)
-- Plot types (Bode, Nyquist, Nichols)
-- Cursor functionality (enable, position, transparency)
-- Averaging and periods settings
-- Line thickness settings
-- Loopback sweep test (Channel 1)
-- Frequency response data validity
-- Logarithmic vs Linear sweep comparison
-- Reference channel comparison
-- Run/Stop control
-- Wide frequency range sweep (10Hz to 10MHz)
-- Notes functionality
-
----
-
-#### 🔧 **Calibration Tests**
-**File:** `m2k/calibration/calibrationTests.js`
-
-**Hardware Setup:**
-- ADALM2000 device connected (real hardware recommended)
-- Optional: V+ → 1+ for measurement accuracy test
-- No external connections required for basic calibration tests
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/calibration/calibrationTests.js
-```
-
-**Tests Coverage:**
-- Calibration API availability
-- Full calibration (ADC + DAC)
-- ADC-only calibration
-- DAC-only calibration
-- Reset calibration to defaults
-- Device temperature reading
-- Manual calibration parameter reading (offsets and gains)
-- Auto calibration via manual calibration API
-- Load default calibration
-- Story-based calibration API structure
-- Calibration parameter ranges verification
-- Calibration persistence between runs
-- Calibration effect on measurements
-- Final recalibration (cleanup)
-
-**Note:** Calibration tests modify device calibration parameters. The test suite
-includes a final recalibration step to ensure the device is properly calibrated
-after testing.
-
----
-
-#### 🔌 **Digital I/O Tests**
-**File:** `m2k/digitalIO/digitalIOTests.js`
-
-**Hardware Setup Options:**
-
-**Option A - Loopback Testing (Recommended):**
-- DIO 0 → DIO 8
-- DIO 1 → DIO 9
-- DIO 2 → DIO 10
-- DIO 3 → DIO 11
-- DIO 4 → DIO 12
-- DIO 5 → DIO 13
-- DIO 6 → DIO 14
-- DIO 7 → DIO 15
-
-**Option B - External Testing:**
-- Connect LEDs with current-limiting resistors to DIO pins
-- Or connect to external digital circuits
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/digitalIO/digitalIOTests.js
-```
-
-**Tests Coverage:**
-- Pin direction configuration (input/output for pins 0-15)
-- Output control (high/low states)
-- Input reading validation with loopback
-- Binary counter pattern generation
-- Walking ones/zeros patterns
-- Rapid toggle stress testing
-- Grouped pin operations
-- Start/stop control
-
----
-
-#### 📊 **Logic Analyzer Tests (Partial)**
-**File:** `m2k/logicAnalyzer/logicAnalyzerTests.js`
-
-**Hardware Setup:**
-- No external connections required for configuration tests
-- For signal capture validation (not currently testable), connect DIO pins to signal sources
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/logicAnalyzer/logicAnalyzerTests.js
-```
-
-**Tests Coverage:**
-- Sample rate settings (1 kSa/s to 100 MSa/s)
-- Buffer size configuration
-- Delay/time position settings
-- Stream vs one-shot mode toggle
-- Channel enable/disable (0-15)
-- Custom channel names
-- Channel heights for visualization
-- Channel vertical positions
-- Cursors enable/disable
-- Cursor position settings (4 positions)
-- Cursor transparency (0-100%)
-- Channel grouping/bus creation
-- Decoder information reading (read-only)
-- Instrument notes
-
-**Limitations (API constraints):**
-- Cannot start/stop captures (no `running` property exposed)
-- Cannot configure triggers
-- Cannot export captured data
-- Cannot verify actual signal acquisition
-
----
-
-#### 🔧 **Pattern Generator Tests (Partial)**
-**File:** `m2k/patternGenerator/patternGeneratorTests.js`
-
-**Hardware Setup:**
-- No external connections required for configuration tests
-- For output validation (not currently testable), connect DIO pins to logic analyzer or oscilloscope
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/m2k/patternGenerator/patternGeneratorTests.js
-```
-
-**Tests Coverage:**
-- Channel enable/disable (0-15)
-- Custom channel names
-- Channel heights for visualization
-- Channel vertical positions
-- Single channel group creation (4-bit, 8-bit buses)
-- Multiple simultaneous groups (nibbles, bytes)
-- Pattern assignment to channels
-- Instrument notes (including multi-line)
-
-**Limitations (API constraints):**
-- Cannot start/stop pattern generation (no `running` property exposed)
-- Cannot set pattern parameters (frequency, duty cycle, baud rate)
-- Cannot verify actual output signals
-- Cannot fully configure protocol patterns (UART, SPI, I2C)
-
----
-
-### 2. Generic Plugin Tests
-
-#### 📋 **Register Map Tests**
-**File:** `generic-plugins/registerMap/registerMapTests.js`
-
-**Hardware Setup:**
-- Any IIO device with register map support
-- M2K device works for basic testing
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/generic-plugins/registerMap/registerMapTests.js
-```
-
-**Tests Coverage:**
-- Device enumeration and selection
-- Register read/write operations
-- Multiple register operations
-- Bit field manipulation
-- Register search functionality
-- Auto-read toggle
-- Register dump functionality
-- Device switching between multiple IIO devices
-- Stress testing with rapid operations
-
----
-
-#### 📊 **Data Logger Tests**
-**File:** `generic-plugins/dataLogger/dataLoggerTests.js`
-
-**Hardware Setup:**
-- Any IIO device with monitor support
-- M2K with active measurements recommended
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/generic-plugins/dataLogger/dataLoggerTests.js
-```
-
-**Tests Coverage:**
-- Monitor listing and device enumeration
-- Monitor enabling/disabling
-- Start/stop control
-- Tool creation from monitors
-- Single-shot data logging
-- Continuous data logging
-- Multi-tool simultaneous logging
-- Monitor configuration and management
-
----
-
-### 3. Master Test Runner
-
-#### 🔄 **Run All Tests**
-**File:** `runAllTests.js`
-
-**Hardware Setup:**
-- Complete loopback setup as described above:
-  - W1 → 1+, W2 → 2+
-  - V+ → 1+, V- → 2+
-  - DIO 0-7 → DIO 8-15
-  - All grounds connected
-
-**Run Command:**
-```bash
-./scopy --script ../js/testAutomations/runAllTests.js
-```
-
-**Note:** This runs all test suites sequentially. Ensure proper hardware connections for all tests.
-
----
-
-## 🔧 Hardware Connection Diagrams
-
-### Basic M2K Loopback Setup
-```
-ADALM2000 (M2K) Device
-┌─────────────────────┐
-│  Signal Generator   │
-│  W1 ──────────┐    │
-│  W2 ────────┐ │    │
-│             │ │    │
-│  Oscilloscope │ │   │
-│  1+ ◄────────┘ │   │
-│  2+ ◄──────────┘   │
-│  1- ──┐            │
-│  2- ──┼── GND      │
-│       │            │
-│  Power Supply      │
-│  V+ ──────────┐    │
-│  V- ────────┐ │    │
-│             │ │    │
-│  Digital I/O │ │    │
-│  DIO0 ──► DIO8 │   │
-│  DIO1 ──► DIO9 │   │
-│  ...          │    │
-│  DIO7 ──► DIO15    │
-└─────────────────────┘
+js/testAutomations/
+├── common/                          # Shared framework and utilities
+│   ├── testFramework.js
+│   └── apiUnregisterTest.js
+├── core/                            # Core Scopy functionality tests
+│   ├── connectionTests.js
+│   ├── emulatorTests.js
+│   ├── packageManagerTests.js
+│   ├── pluginLoadTests.js
+│   └── preferencesTests.js
+├── m2k/                             # ADALM2000 (M2K) tool tests
+│   ├── oscilloscope/
+│   │   └── osc_siggen_loopback.js
+│   ├── signalGenerator/
+│   │   └── signalGeneratorOscilloscopeTests.js
+│   ├── voltmeter/
+│   │   ├── voltmeter_dc_loopback.js
+│   │   ├── voltmeter_dc_differential.js
+│   │   └── voltmeter_dc_reversed.js
+│   ├── powerSupply/
+│   │   └── ps_voltmeter_loopback.js
+│   ├── spectrumAnalyzer/
+│   │   └── sa_loopback.js
+│   ├── digitalIO/
+│   │   ├── dio_loopback.js
+│   │   ├── dio_voltmeter.js
+│   │   └── dio_voltmeter_reversed.js
+│   ├── networkAnalyzerDocTests.js
+│   ├── networkAnalyzerVisualTests.js
+│   ├── patternGeneratorDocTests.js
+│   └── patternGeneratorVisualTests.js
+├── generic-plugins/                 # Generic plugin tests
+│   ├── registerMap/
+│   │   ├── registerMapTests.js
+│   │   └── registerMapVisualTests.js
+│   ├── dataLogger/
+│   │   ├── dataLoggerTests.js
+│   │   └── dataLoggerVisualTests.js
+│   └── debugger/
+│       └── debuggerTests.js
+├── ad9084/                          # AD9084 device plugin tests
+│   ├── ad9084DocTests.js
+│   └── ad9084VisualTests.js
+├── ad936x/                          # AD936x / FMCOMMS5 device plugin tests
+│   ├── ad936xDocTests.js
+│   ├── ad936xVisualTests.js
+│   ├── ad936xAdvancedTests.js
+│   ├── fmcomms5DocTests.js
+│   ├── fmcomms5VisualTests.js
+│   └── fmcomms5AdvancedTests.js
+├── adrv9002/                        # ADRV9002 device plugin tests
+│   ├── adrv9002DocTests.js
+│   └── adrv9002VisualTests.js
+├── pqm/                             # PQM plugin tests
+│   └── pqmTests.js
+├── rfpowermeter/                    # RF Power Meter tests
+│   ├── rfpowermeterDocTests.js
+│   └── rfpowermeterVisualTests.js
+└── swiot/                           # SWIOT plugin tests
+    ├── swiotTests.js
+    └── swiotSupervisedTests.js
 ```
 
 ---
 
-## 📝 Test Output Format
+## Test Types
 
-All tests follow a consistent output format:
+Test files follow a naming convention that indicates what they validate:
 
-```
-========================================
-    TEST SUITE: [Tool Name] Tests
-========================================
-Connecting to device: ip:127.0.0.1...
-✅ Device connected successfully
-
-Test 1: [Test Name]
-----------------------------------------
-[Test steps and validations]
-✅ PASS: [Success message]
-
-Test 2: [Test Name]
-----------------------------------------
-[Test steps and validations]
-❌ FAIL: [Failure reason]
-
-========================================
-    RESULTS SUMMARY
-========================================
-Total Tests: X
-Passed: Y (Z%)
-Failed: A (B%)
-========================================
-```
+- **`*Tests.js`** — Functional/API tests. Exercise Scopy APIs programmatically (read/write properties, call functions, verify return values). Can run unattended.
+- **`*DocTests.js`** — Documentation/configuration tests. Validate that plugin settings, controls, and configurations match expected values. Typically run against an emulator.
+- **`*VisualTests.js`** — Visual validation tests. Capture screenshots or require manual inspection to verify UI rendering. May need human supervision.
+- **`*SupervisedTests.js`** — Tests that require active human observation during execution.
 
 ---
 
-## 🚀 Quick Start Guide
+## Test File Reference
 
-### 1. Minimal Testing (Emulator Only)
-```bash
-# Start emulator
-iio-emu adalm2000
+### Common
 
-# Run basic connectivity test
-cd scopy/build/
-./scopy --script ../js/testAutomations/m2k/signalGenerator/signalGeneratorTests.js
-```
+| File | Description |
+|------|-------------|
+| `common/testFramework.js` | Shared test framework loaded by all test files |
+| `common/apiUnregisterTest.js` | Verifies APIs unregister correctly on disconnect |
 
-### 2. Comprehensive Testing (Real Hardware)
-```bash
-# Connect M2K device with full loopback setup
-# Run all tests
-cd scopy/build/
-./scopy --script ../js/testAutomations/runAllTests.js
-```
+### Core
 
-### 3. Specific Tool Testing
-```bash
-# Test individual tools as needed
-./scopy --script ../js/testAutomations/m2k/voltmeter/voltmeterTests.js
-./scopy --script ../js/testAutomations/m2k/digitalIO/digitalIOTests.js
-```
+| File | Description | Device |
+|------|-------------|--------|
+| `core/connectionTests.js` | Connection lifecycle (add/connect/disconnect/forget) | `ip:192.168.2.1` or emulator |
+| `core/emulatorTests.js` | Emulator enable/disable for various device types | `ip:127.0.0.1` (requires iio-emu) |
+| `core/pluginLoadTests.js` | Plugin detection and tool switching | `ip:192.168.2.1` + `ip:127.0.0.1` |
+| `core/preferencesTests.js` | Save/load session preferences | None |
+| `core/packageManagerTests.js` | Package install/uninstall | None (needs `test_package.zip` in fixtures/) |
 
----
+### M2K Tests
 
-## ⚠️ Important Notes
+All M2K tests require an ADALM2000 at `ip:192.168.2.1` (hardware) or `ip:127.0.0.1` (emulator) unless noted. Loopback tests require real hardware with the specified wiring.
 
-1. **Device URI**: Tests default to `ip:127.0.0.1` for emulator. Modify the connection string in test files for real hardware.
+| File | Description | Hardware Wiring |
+|------|-------------|-----------------|
+| `m2k/oscilloscope/osc_siggen_loopback.js` | Oscilloscope + signal generator loopback | W1->1+, W2->2+ |
+| `m2k/signalGenerator/signalGeneratorOscilloscopeTests.js` | Signal generator + oscilloscope integration | W1->1+, W2->2+ |
+| `m2k/voltmeter/voltmeter_dc_loopback.js` | Voltmeter DC loopback | V+->1+, V-->2+ |
+| `m2k/voltmeter/voltmeter_dc_differential.js` | Voltmeter differential measurement | V+->1+, V-->1- |
+| `m2k/voltmeter/voltmeter_dc_reversed.js` | Voltmeter reversed polarity | V-->1+, V+->2+ |
+| `m2k/powerSupply/ps_voltmeter_loopback.js` | Power supply + voltmeter loopback | V+->1+, V-->2+ |
+| `m2k/spectrumAnalyzer/sa_loopback.js` | Spectrum analyzer loopback | CH1+->W1, CH2+->W2 |
+| `m2k/digitalIO/dio_loopback.js` | Digital I/O loopback | DIO 0-7->DIO 8-15 |
+| `m2k/digitalIO/dio_voltmeter.js` | DIO + voltmeter integration | DIO 0->1+, DIO 8->V+ |
+| `m2k/digitalIO/dio_voltmeter_reversed.js` | DIO + voltmeter reversed | DIO 8->1+, DIO 1->V+ |
+| `m2k/networkAnalyzerDocTests.js` | Network analyzer configuration tests | Emulator |
+| `m2k/networkAnalyzerVisualTests.js` | Network analyzer visual validation | Visual inspection |
+| `m2k/patternGeneratorDocTests.js` | Pattern generator configuration tests | Emulator |
+| `m2k/patternGeneratorVisualTests.js` | Pattern generator visual validation | Visual inspection |
 
-2. **Timing**: Tests include delays (`msleep()`) for hardware synchronization. Do not reduce these without testing.
+### Generic Plugin Tests
 
-3. **Cleanup**: Tests attempt to restore initial state. However, manual device reset may be needed between test runs.
+| File | Description |
+|------|-------------|
+| `generic-plugins/registerMap/registerMapTests.js` | Register map read/write operations |
+| `generic-plugins/registerMap/registerMapVisualTests.js` | Register map visual validation |
+| `generic-plugins/dataLogger/dataLoggerTests.js` | Data logger single-tool tests |
+| `generic-plugins/dataLogger/dataLoggerVisualTests.js` | Data logger visual validation |
+| `generic-plugins/debugger/debuggerTests.js` | Debugger explorer and code generation |
 
-4. **Error Handling**: Tests include try-catch blocks. Check console output for detailed error messages.
+### Device Plugin Tests
 
-5. **Hardware Damage**: Ensure proper connections to avoid hardware damage. Never exceed voltage ratings.
+#### AD9084
 
----
+| File | Description | Device |
+|------|-------------|--------|
+| `ad9084/ad9084DocTests.js` | AD9084 configuration documentation tests | `ip:127.0.0.0` |
+| `ad9084/ad9084VisualTests.js` | AD9084 visual validation | `ip:127.0.0.0` |
 
-## 🐛 Troubleshooting
+#### AD936x / FMCOMMS5
 
-### Common Issues and Solutions
+| File | Description | Device |
+|------|-------------|--------|
+| `ad936x/ad936xDocTests.js` | AD936x configuration documentation tests | `ip:192.168.2.1` |
+| `ad936x/ad936xVisualTests.js` | AD936x visual validation | `ip:192.168.2.1` |
+| `ad936x/ad936xAdvancedTests.js` | AD936x advanced plugin tests | `ip:192.168.2.1` |
+| `ad936x/fmcomms5DocTests.js` | FMCOMMS5 configuration documentation tests | `ip:127.0.0.0` |
+| `ad936x/fmcomms5VisualTests.js` | FMCOMMS5 visual validation | `ip:127.0.0.0` |
+| `ad936x/fmcomms5AdvancedTests.js` | FMCOMMS5 advanced plugin tests | `ip:127.0.0.0` |
 
-| Issue | Solution |
-|-------|----------|
-| "Connection refused" | Ensure IIO emulator is running or device is connected |
-| "Device not found" | Check device URI and USB connection |
-| "Measurement timeout" | Increase delay times in test scripts |
-| "0V readings" | Verify loopback connections and ground references |
-| "IIO Error -9" | Update to latest Scopy version with API fixes |
+#### ADRV9002
 
-### Debug Mode
-Enable verbose output by modifying test files:
-```javascript
-const DEBUG = true;  // Set to true for detailed logging
-```
+| File | Description | Device |
+|------|-------------|--------|
+| `adrv9002/adrv9002DocTests.js` | ADRV9002 configuration documentation tests | `ip:127.0.0.0` |
+| `adrv9002/adrv9002VisualTests.js` | ADRV9002 visual validation | `ip:127.0.0.0` |
 
----
+#### PQM
 
-## 📚 Additional Resources
+| File | Description | Device |
+|------|-------------|--------|
+| `pqm/pqmTests.js` | PQM plugin tests (power quality monitoring) | `ip:127.0.0.1` |
 
-- [Scopy Documentation](https://github.com/analogdevicesinc/scopy)
-- [ADALM2000 Wiki](https://wiki.analog.com/university/tools/m2k)
-- [IIO Emulator Documentation](https://github.com/analogdevicesinc/iio-emu)
-- [Test Development Guide](../../../docs/SCOPY_TEST_AUTOMATION_PLAN.md)
+#### RF Power Meter
 
----
+| File | Description | Device |
+|------|-------------|--------|
+| `rfpowermeter/rfpowermeterDocTests.js` | RF Power Meter documentation tests | Requires `powrms` IIO device |
+| `rfpowermeter/rfpowermeterVisualTests.js` | RF Power Meter visual validation | Requires `powrms` IIO device |
 
-## 👥 Contributing
+#### SWIOT
 
-To add new tests:
-1. Follow the existing test structure pattern
-2. Use the common test framework (`common/testFramework.js`)
-3. Document hardware requirements clearly
-4. Include both positive and negative test cases
-5. Update this README with new test information
-
----
-
-## 📄 License
-
-These test suites are part of the Scopy project and follow the same licensing terms.
-
----
-
-*Last Updated: February 4, 2026*
-*Version: 1.2.0*
+| File | Description | Device |
+|------|-------------|--------|
+| `swiot/swiotTests.js` | SWIOT plugin tests (Config, AD74413R, MAX14906, Faults) | `ip:127.0.0.1` |
+| `swiot/swiotSupervisedTests.js` | SWIOT supervised tests (requires visual supervision) | `ip:127.0.0.1` |
