@@ -146,6 +146,29 @@ Read the RST test file completely. Extract for each test:
 
 Check what tests already exist in `js/testAutomations/<plugin-dir>/` to avoid duplication. If `*DocTests.js` or `*VisualTests.js` already exist, note which test UIDs are already covered.
 
+### 1.4 Generic Scopy API Calls
+
+In addition to plugin-specific `Q_INVOKABLE` methods, every plugin test can use **generic Scopy API calls** that are always available. These are not defined in the plugin's `*_api.h` header — they come from the Scopy core and the test framework. Consider these when classifying tests:
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `scopy.addDevice(uri)` | void | Add a device by URI (e.g., `"ip:192.168.2.1"`) |
+| `scopy.connectDevice(deviceId)` | void | Connect to a previously added device |
+| `scopy.disconnectDevice(deviceId)` | void | Disconnect from a device |
+| `scopy.removeDevice(uri)` | void | Remove a device |
+| `scopy.getTools()` | string list | Get all available tool names for the connected device |
+| `scopy.switchTool(toolName)` | void | Switch to a tool by name |
+| `switchToTool(toolName)` | bool | Switch to a tool — returns `true` if successful, `false` if tool not found or disabled |
+| `<plugin>.getTools()` | QStringList | Get tool names registered by this plugin |
+| `TestFramework.connectToDevice(uri)` | bool | Add + connect to device, returns success |
+| `TestFramework.disconnectFromDevice()` | void | Disconnect + remove device |
+
+**Key insight:** Tests that say "verify tool appears in tool list" or "verify plugin loads" can often be classified as **Category A** (fully automatable) by using:
+- `<plugin>.getTools()` or `scopy.getTools()` → verify tool name is in the returned list
+- `switchToTool("ToolName")` → returns `true` if the tool exists, is enabled, and can be switched to
+
+These are API-verifiable checks — no visual inspection needed.
+
 ---
 
 ## Phase 2: Classification
@@ -163,6 +186,8 @@ The test steps can be performed entirely via API calls AND the expected results 
 - Steps say "read value" → call getter and check non-empty
 - Steps say "write then read back" → write-readback pattern
 - All verification can be done programmatically (comparing strings, ranges, values)
+- Steps say "verify tool is in tool list" → use `getTools()` and check list contains tool name
+- Steps say "verify plugin loads" or "is accessible" → use `switchToTool()` and check returns `true`
 
 **Output file:** `<plugin>DocTests.js`
 
@@ -517,6 +542,62 @@ Each entry should include:
 - **Missing API:** — What functionality is missing
 - **Suggested:** — A proposed API method signature that would enable automation
 - **Affected file:** — Where the API would need to be added
+
+### 3.6 Plugin Detection Test Pattern (Category A)
+
+Most plugins have a "Plugin Detection" or "Plugin Loading" test in the RST documentation. These tests verify that the plugin is detected for compatible devices and appears in the tool list. They are **Category A (Fully Automatable)** because all verification can be done via generic Scopy API calls.
+
+**Pattern:**
+
+```javascript
+// ============================================
+// Test N: Plugin Detection and Compatibility
+// UID: TST.<PLUGIN>.PLUGIN_DETECTION
+// Description: Verify that the plugin is detected and loads for compatible devices
+// ============================================
+printToConsole("\n=== Test N: Plugin Detection ===\n");
+
+TestFramework.runTest("TST.<PLUGIN>.PLUGIN_DETECTION", function() {
+    try {
+        // Step 1: Verify plugin tool is in the tool list
+        var tools = <api_object>.getTools();
+        printToConsole("  Available tools: " + tools);
+        var toolFound = false;
+        for (var i = 0; i < tools.length; i++) {
+            if (tools[i] === "<TOOL_DISPLAY_NAME>") {
+                toolFound = true;
+                break;
+            }
+        }
+        if (!toolFound) {
+            printToConsole("  FAIL: <TOOL_DISPLAY_NAME> not found in tool list");
+            return false;
+        }
+        printToConsole("  PASS: <TOOL_DISPLAY_NAME> found in tool list");
+
+        // Step 2: Verify tool can be switched to (loads and is enabled)
+        if (!switchToTool("<TOOL_DISPLAY_NAME>")) {
+            printToConsole("  FAIL: Cannot switch to <TOOL_DISPLAY_NAME> tool");
+            return false;
+        }
+        printToConsole("  PASS: Successfully switched to <TOOL_DISPLAY_NAME> tool");
+
+        return true;
+    } catch (e) {
+        printToConsole("  Error: " + e);
+        return false;
+    }
+});
+```
+
+**When to use this pattern:**
+- RST test says "verify plugin is detected" or "plugin appears in tool list"
+- RST test says "tool is listed and enabled" or "plugin loads and is accessible"
+- RST test involves connecting to a compatible device and checking plugin availability
+
+**Notes:**
+- Steps requiring an **incompatible device** (to verify the plugin does NOT appear) should be noted as partially Category C — they require a second device that may not be available.
+- The `<api_object>.getTools()` call returns the plugin's registered tools. `switchToTool()` returns `true` only if the tool exists, is enabled, and was successfully switched to.
 
 ---
 
