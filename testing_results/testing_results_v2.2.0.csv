@@ -11,7 +11,7 @@ TST.PKG_MANAGER.MANUAL.DELETE,package_manager,P3,PASS,Windows 11,,Muthi Ionut,pa
 TST.PKG_MANAGER.PLUGIN_INFO.ABOUT_PAGE,package_manager,P3,PASS,Windows 11,,Muthi Ionut,package_manager_tests.rst
 TST.PREF.SAVE_LOAD_SESSION,preferences,P0,,,,,general_preferences_tests.rst
 TST.PREF.AUTO_CONNECT_PREVIOUS_SESSION,preferences,P0,,,,,general_preferences_tests.rst
-TST.PREF.RESET_SETTINGS_DEFAULT,preferences,P0,,,,,general_preferences_tests.rst
+TST.PREF.RESET_SETTINGS_DEFAULT,preferences,P0,PASS,Ubuntu 24.04,,Muthi Ionut,general_preferences_tests.rst
 TST.CONN.SUCC,core,P0,PASS,Ubuntu 24.04,,script,connection_tests.rst
 TST.CONN.UNPLUG_AUTO,core,P0,FAIL,Ubuntu 24.04,"connection continues like the device is connected, for m2k the app crashes",Muthi Ionut,connection_tests.rst
 TST.CONN.UNPLUG_AUTO,core,P3,FAIL,Ubuntu 24.04,"connection continues like the device is connected, for m2k the app crashes",Muthi Ionut,connection_tests.rst
@@ -93,33 +93,33 @@ TST.ADC_GENALYZER.AUTO_MODE,adc,P2,,,,,adc_tests.rst
 TST.ADC_GENALYZER.FIXED_TONE_MODE,adc,P2,,,,,adc_tests.rst
 TST.ADC_GENALYZER.MULTI_CHANNEL,adc,P2,,,,,adc_tests.rst
 TST.ADC_GENALYZER.FFT_INTEGRATION,adc,P3,,,,,adc_tests.rst
-TST.FMCOMMS5.PLUGIN_LOADS,fmcomms5,P3,,,,,fmcomms5_tests.rst
-TST.FMCOMMS5.DEVICE_DETECTION_AND_DISPLAY,fmcomms5,P3,,,,,fmcomms5_tests.rst
-TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS,fmcomms5,P3,,,,,fmcomms5_tests.rst
-TST.FMCOMMS5.RX_TX_CHAIN_CONFIG,fmcomms5,P3,,,,,fmcomms5_tests.rst
-TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY,fmcomms5,P3,,,,,fmcomms5_tests.rst
-TST.FMCOMMS5.CALIBRATION,fmcomms5,P3,,,,,fmcomms5_tests.rst
+TST.FMCOMMS5.PLUGIN_LOADS,fmcomms5,P3,PASS,Ubuntu 24.04,,script,fmcomms5_tests.rst
+TST.FMCOMMS5.DEVICE_DETECTION_AND_DISPLAY,fmcomms5,P3,PASS,Ubuntu 24.04,,script,fmcomms5_tests.rst
+TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS,fmcomms5,P3,PASS,Ubuntu 24.04,,script,fmcomms5_tests.rst
+TST.FMCOMMS5.RX_TX_CHAIN_CONFIG,fmcomms5,P3,PASS,Ubuntu 24.04,,script,fmcomms5_tests.rst
+TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY,fmcomms5,P3,PASS,Ubuntu 24.04,,script,fmcomms5_tests.rst
+TST.FMCOMMS5.CALIBRATION,fmcomms5,P3,PASS,Ubuntu 24.04,,script,fmcomms5_tests.rst
 TST.IMUANALYZER.PLUGIN_DETECTION,imuanalyzer,P0,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
 TST.IMUANALYZER.3D_VISUALIZATION,imuanalyzer,P1,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
 TST.IMUANALYZER.VIEW_CONTROLS,imuanalyzer,P2,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
 TST.IMUANALYZER.MEASUREMENT_MODE,imuanalyzer,P2,PASS,Windows 11,,Muthi Ionut,imuanalyzer_tests.rst
 TST.DATALOGGER.ENABLE_DISABLE_DATA_LOGGER_CHANNEL,datalogger,P0,PASS,Ubuntu 24.04,,script,datalogger_tests.rst
-TST.ADRV9002.PROFILE_GEN.CLI_NOT_AVAILABLE,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.CLI_NOT_COMPATIBLE,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.CLI_AVAILABLE,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.LTE_DEFAULT_CONFIG,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.LTE_CONFIG_MODIFY,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.LIVE_DEVICE_READ,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.LOAD_TO_DEVICE,adrv9002,P3,,,,,profile_generator_tests.rst
-TST.ADRV9002.CONTROLS.PLUGIN_LOADS,adrv9002,P0,,,,,adrv9002_tests.rst
-TST.ADRV9002.CONTROLS.DEVICE_DRIVER_API,adrv9002,P3,,,,,adrv9002_tests.rst
-TST.ADRV9002.CONTROLS.GLOBAL_SETTINGS,adrv9002,P3,,,,,adrv9002_tests.rst
-TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG,adrv9002,P3,,,,,adrv9002_tests.rst
-TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG,adrv9002,P3,,,,,adrv9002_tests.rst
-TST.ADRV9002.CONTROLS.ORX_CONFIG,adrv9002,P3,,,,,adrv9002_tests.rst
-TST.ADRV9002.CONTROLS.REFRESH_FUNCTION,adrv9002,P3,,,,,adrv9002_tests.rst
+TST.ADRV9002.PROFILE_GEN.CLI_NOT_AVAILABLE,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.CLI_NOT_COMPATIBLE,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.CLI_AVAILABLE,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.LTE_DEFAULT_CONFIG,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.LTE_CONFIG_MODIFY,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.LIVE_DEVICE_READ,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.LOAD_TO_DEVICE,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.CONTROLS.PLUGIN_LOADS,adrv9002,P0,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
+TST.ADRV9002.CONTROLS.DEVICE_DRIVER_API,adrv9002,P3,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
+TST.ADRV9002.CONTROLS.GLOBAL_SETTINGS,adrv9002,P3,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
+TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG,adrv9002,P3,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
+TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG,adrv9002,P3,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
+TST.ADRV9002.CONTROLS.ORX_CONFIG,adrv9002,P3,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
+TST.ADRV9002.CONTROLS.REFRESH_FUNCTION,adrv9002,P3,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
 TST.PQM.RMS_OPEN,pqm,P3,PASS,Ubuntu 24.04,,script,pqm_tests.rst
 TST.PQM.RMS_INFO,pqm,P3,,,,,pqm_tests.rst
 TST.PQM.RMS_SINGLE,pqm,P3,PASS,Ubuntu 24.04,,script,pqm_tests.rst
@@ -163,10 +163,10 @@ TST.DAC.DDS_ATTRS,dac,P3,,,,,dac_tests.rst
 TST.DAC.TUTORIAL,dac,P3,,,,,dac_tests.rst
 TST.DAC.CHANNEL_ATTRS,dac,P3,,,,,dac_tests.rst
 TST.DAC.REPEAT_DATA,dac,P3,,,,,dac_tests.rst
-TST.RFPOWERMETER.PLUGIN_DETECTION,rfpowermeter,P0,,,,,rfpowermeter_tests.rst
-TST.RFPOWERMETER.DATALOGGER_DEPENDENCY,rfpowermeter,P1,,,,,rfpowermeter_tests.rst
-TST.RFPOWERMETER.AUTOMATIC_CONFIGURATION,rfpowermeter,P2,,,,,rfpowermeter_tests.rst
-TST.RFPOWERMETER.FREQUENCY_CONTROL,rfpowermeter,P3,,,,,rfpowermeter_tests.rst
+TST.RFPOWERMETER.PLUGIN_DETECTION,rfpowermeter,P0,PASS,Ubuntu 24.04,,Muthi Ionut,rfpowermeter_tests.rst
+TST.RFPOWERMETER.DATALOGGER_DEPENDENCY,rfpowermeter,P1,PASS,Ubuntu 24.04,,Muthi Ionut,rfpowermeter_tests.rst
+TST.RFPOWERMETER.AUTOMATIC_CONFIGURATION,rfpowermeter,P2,PASS,Ubuntu 24.04,,script,rfpowermeter_tests.rst
+TST.RFPOWERMETER.FREQUENCY_CONTROL,rfpowermeter,P3,PASS,Ubuntu 24.04,,script,rfpowermeter_tests.rst
 TST.AD936X.PLUGIN_LOADS,ad936x,P0,PASS,Ubuntu 24.04,,script,ad936x_tests.rst
 TST.DBG.EXPLR.LOAD,debugger,P0,PASS,Ubuntu 24.04,,script,debugger_tests.rst
 TST.AD9084.PLUGIN_LOADS,ad9084,P0,PASS,Ubuntu 24.04,,Muthi Ionut,ad9084_tests.rst
