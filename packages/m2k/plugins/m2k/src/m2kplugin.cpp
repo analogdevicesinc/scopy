@@ -171,9 +171,6 @@ bool M2kPlugin::loadExtraButtons()
 	m_btnCalibrate = new QPushButton("Calibrate");
 	Style::setStyle(m_btnCalibrate, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnCalibrate);
-	m_btnRegister = new QPushButton("Register");
-	Style::setStyle(m_btnRegister, style::properties::button::basicButton);
-	m_extraButtons.append(m_btnRegister);
 
 	m_btnCalibrate->setDisabled(true);
 
@@ -183,13 +180,6 @@ bool M2kPlugin::loadExtraButtons()
 		[=]() { m_btnCalibrate->setEnabled(false); });
 	connect(m_m2kController, &M2kController::calibrationFinished, this,
 		[=]() { m_btnCalibrate->setEnabled(true); });
-	connect(m_btnRegister, &QPushButton::clicked, this, [=]() {
-		;
-		//		QString versionString = QString(m_info_params["Model"].split("Rev")[1][1]);
-		//		QString url =
-		//"https://my.analog.com/en/app/registration/hardware/ADALM2000?sn="+QString(getSerialNumber())+"&v=Rev."+versionString;
-		//		QDesktopServices::openUrl(QUrl(url));
-	});
 
 	return true;
 }
