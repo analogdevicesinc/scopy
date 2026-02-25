@@ -35,9 +35,8 @@
 //   TST.DATALOGGER.TOGGLE_X_AXIS_UTC_TIME_DISPLAY - no UTC toggle API
 //   TST.DATALOGGER.TOGGLE_X_AXIS_LIVE_PLOTTING - no live plotting toggle API
 //   TST.DATALOGGER.TOGGLE_Y_AXIS_AUTOSCALE - no autoscale toggle API
-//   TST.DATALOGGER.ADJUST_CURVE_THICKNESS - no curve thickness API
-//   TST.DATALOGGER.CHANGE_CURVE_STYLE - no curve style API
-//   TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS - no buffer preview/axis label API
+//   TST.DATALOGGER.ADJUST_CURVE_THICKNESS - now automatable (see DocTests)
+//   TST.DATALOGGER.CHANGE_CURVE_STYLE - now automatable (see DocTests)
 //   TST.DATALOGGER.CHOOSE_FILE_FOR_DATA_LOGGING - requires file dialog
 //   TST.DATALOGGER.USE_KDOCKS - requires drag/drop docking interaction
 //   TST.DATALOGGER.USE_CHANNEL_SCALING - no channel scaling API
@@ -818,6 +817,128 @@ TestFramework.runTest("TST.DATALOGGER.USE_MULTIPLOT", function() {
         printToConsole("  Error: " + e);
         datalogger.setRunning(false);
         scopy.setPreference("dataloggerplugin_add_remove_plot", "false");
+        return false;
+    }
+});
+
+// ===========================================================================
+// Test 21: Adjust Plot Display Settings
+// UID: TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS
+// Description: Change the plot settings and check if the plot settings
+//   are changed (Buffer Preview, X-Axis labels, Y-Axis labels).
+// ===========================================================================
+printToConsole("\n=== Test 21: Adjust Plot Display Settings (SUPERVISED) ===\n");
+
+TestFramework.runTest("TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS", function() {
+    try {
+        var monitorsStr = datalogger.showAvailableMonitors();
+        var monitors = parseNewlineSeparatedString(monitorsStr);
+        if (monitors.length === 0) {
+            return "SKIP";
+        }
+
+        // Enable monitor and start
+        datalogger.enableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        // Switch to plot mode
+        datalogger.setDisplayMode(toolName, 0);
+        msleep(500);
+
+        printToConsole("  Starting data acquisition...");
+        datalogger.setRunning(true);
+        msleep(2000);
+
+        // Step 3: Toggle Buffer Preview (Navigator) off
+        printToConsole("  Toggling Buffer Preview off...");
+        datalogger.plot.setNavigatorEnabled(false);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Buffer Preview is NOT displayed below the plot")) {
+            datalogger.plot.setNavigatorEnabled(true);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 4: Toggle Buffer Preview on
+        printToConsole("  Toggling Buffer Preview on...");
+        datalogger.plot.setNavigatorEnabled(true);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Buffer Preview IS displayed below the plot")) {
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 5: Toggle X-Axis label off
+        printToConsole("  Toggling X-Axis labels off...");
+        datalogger.plot.setShowXAxisLabels(false);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify X-Axis labels are NOT displayed")) {
+            datalogger.plot.setShowXAxisLabels(true);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 6: Toggle X-Axis label on
+        printToConsole("  Toggling X-Axis labels on...");
+        datalogger.plot.setShowXAxisLabels(true);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify X-Axis labels ARE displayed")) {
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 7: Toggle Y-Axis label off
+        printToConsole("  Toggling Y-Axis labels off...");
+        datalogger.plot.setShowYAxisLabels(false);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-Axis labels are NOT displayed")) {
+            datalogger.plot.setShowYAxisLabels(true);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 8: Toggle Y-Axis label on
+        printToConsole("  Toggling Y-Axis labels on...");
+        datalogger.plot.setShowYAxisLabels(true);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-Axis labels ARE displayed")) {
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Cleanup
+        datalogger.setRunning(false);
+        datalogger.disableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        return true;
+    } catch (e) {
+        printToConsole("  Error: " + e);
+        datalogger.setRunning(false);
         return false;
     }
 });

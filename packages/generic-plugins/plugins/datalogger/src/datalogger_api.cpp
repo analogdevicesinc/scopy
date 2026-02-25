@@ -32,7 +32,19 @@ Q_LOGGING_CATEGORY(CAT_DATAMONITOR_API, "DataMonitor_API")
 DataLogger_API::DataLogger_API(DataLoggerPlugin *dataLoggerPlugin)
 	: ApiObject()
 	, m_dataLoggerPlugin(dataLoggerPlugin)
-{}
+{
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	if(tool) {
+		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
+		if(monitorTool && monitorTool->m_plotManager) {
+			MonitorPlot *monitorPlot = monitorTool->m_plotManager->plot();
+			if(monitorPlot) {
+				auto *plotApi = new PlotWidget_API(monitorPlot->plot(), this);
+				plotApi->setObjectName("plot");
+			}
+		}
+	}
+}
 
 DataLogger_API::~DataLogger_API() {}
 
