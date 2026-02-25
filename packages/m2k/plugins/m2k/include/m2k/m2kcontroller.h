@@ -62,13 +62,17 @@ Q_SIGNALS:
 	void calibrationFailed();
 	void calibrationFinished();
 
+private Q_SLOTS:
+	void onCalibFinished();
+
 private:
-	M2kReadTemperatureTask *tempTask;
-	M2kIdentifyTask *identifyTask;
-	QString uri;
+	M2kReadTemperatureTask *m_tempTask;
+	M2kIdentifyTask *m_identifyTask;
+	QString m_uri;
 	libm2k::context::M2k *m_m2k;
 
-	CyclicalTask *tempTimer;
+	CyclicalTask *m_tempTimer;
+	QFutureWatcher<bool> *m_calibFw;
 };
 
 } // namespace scopy::m2k

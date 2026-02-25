@@ -236,10 +236,11 @@ void M2kPlugin::storeToolState(QStringList tools)
 void M2kPlugin::restoreToolState(QStringList tools)
 {
 	for(const QString &tool : calibrationToolNames) {
-		if(!toolMenuEntryCalibrationCache.contains(tool))
+		if(!toolMenuEntryCalibrationCache.contains(tool)) {
 			continue;
-		ToolMenuEntry *cachedTme = toolMenuEntryCalibrationCache[tool];
-		auto id = toolMenuEntryCalibrationCache[tool]->id();
+		}
+		ToolMenuEntry *cachedTme = toolMenuEntryCalibrationCache.take(tool);
+		auto id = cachedTme->id();
 		auto tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, id);
 		tme->setName(cachedTme->name());
 		tme->setEnabled(cachedTme->enabled());
@@ -413,6 +414,9 @@ void M2kPlugin::cleanup()
 		delete m_calib;
 		m_calib = nullptr;
 	}
+
+	restoreToolState(calibrationToolNames);
+
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		QWidget *tool = tme->tool();
 		tme->setEnabled(false);

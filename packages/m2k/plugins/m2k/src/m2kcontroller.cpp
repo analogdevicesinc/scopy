@@ -37,27 +37,35 @@ using namespace scopy::m2k;
 
 M2kController::M2kController(QString uri, QObject *parent)
 	: QObject(parent)
-	, uri(uri)
+	, m_uri(uri)
+	, m_identifyTask(nullptr)
+	, m_m2k(nullptr)
+	, m_tempTask(nullptr)
+	, m_tempTimer(nullptr)
+
 {
-	identifyTask = nullptr;
-	m_m2k = nullptr;
+	m_calibFw = new QFutureWatcher<bool>(this);
+	connect(m_calibFw, &QFutureWatcher<bool>::finished, this, &M2kController::onCalibFinished);
 }
 
 M2kController::~M2kController() {}
 
 void M2kController::startTemperatureTask()
 {
-	tempTask = new M2kReadTemperatureTask(uri);
-	tempTimer = new CyclicalTask(tempTask);
-	connect(tempTask, SIGNAL(newTemperature(double)), this, SIGNAL(newTemperature(double)));
-	tempTimer->start();
+	m_tempTask = new M2kReadTemperatureTask(m_uri);
+	m_tempTimer = new CyclicalTask(m_tempTask);
+	connect(m_tempTask, SIGNAL(newTemperature(double)), this, SIGNAL(newTemperature(double)));
+	m_tempTimer->start();
 }
 
 void M2kController::stopTemperatureTask()
 {
-	tempTimer->stop();
-	tempTask->requestInterruption();
-	disconnect(tempTask, SIGNAL(newTemperature(double)), this, SIGNAL(newTemperature(double)));
+	if(!m_tempTimer || !m_tempTask) {
+		return;
+	}
+	m_tempTimer->stop();
+	m_tempTask->requestInterruption();
+	disconnect(m_tempTask, SIGNAL(newTemperature(double)), this, SIGNAL(newTemperature(double)));
 }
 
 void M2kController::connectM2k(libm2k::context::M2k *m2k)
@@ -71,24 +79,23 @@ void M2kController::disconnectM2k()
 	if(!m_m2k) {
 		return;
 	}
-	try {
-		if(identifyTask && identifyTask->isRunning()) {
-			identifyTask->requestInterruption();
-		}
-	} catch(std::exception &ex) {
-		qDebug(CAT_M2KPLUGIN) << ex.what();
+	if(m_calibFw && m_calibFw->isRunning()) {
+		m_calibFw->waitForFinished();
+	}
+	if(m_identifyTask && m_identifyTask->isRunning()) {
+		m_identifyTask->requestInterruption();
 	}
 	m_m2k = nullptr;
 }
 
 void M2kController::identify()
 {
-	if(!identifyTask) {
-		identifyTask = new M2kIdentifyTask(uri);
-		identifyTask->start();
-		connect(identifyTask, &QThread::finished, this, [=]() {
-			delete identifyTask;
-			identifyTask = nullptr;
+	if(!m_identifyTask) {
+		m_identifyTask = new M2kIdentifyTask(m_uri);
+		m_identifyTask->start();
+		connect(m_identifyTask, &QThread::finished, this, [=]() {
+			delete m_identifyTask;
+			m_identifyTask = nullptr;
 		});
 	}
 }
@@ -104,23 +111,29 @@ void M2kController::initialCalibration()
 
 void M2kController::calibrate()
 {
-	QFutureWatcher<bool> *fw = new QFutureWatcher<bool>(this);
+	if(m_calibFw->isRunning()) {
+		qWarning(CAT_M2KPLUGIN) << "Calibration already in progress!";
+		return;
+	}
 	QFuture<bool> f = QtConcurrent::run(std::bind(&libm2k::context::M2k::calibrate, m_m2k));
-	connect(fw, &QFutureWatcher<bool>::finished, this, [=]() {
-		try {
-			if(fw->result()) {
-				Q_EMIT calibrationSuccess();
-			} else {
-				Q_EMIT calibrationFailed();
-			}
-		} catch(...) {
-			Q_EMIT calibrationFailed();
-			qWarning(CAT_M2KPLUGIN) << "An exception occurred during CALIBRATION!";
-		}
-		Q_EMIT calibrationFinished();
-		fw->deleteLater();
-	});
-	fw->setFuture(f);
-
+	m_calibFw->setFuture(f);
 	Q_EMIT calibrationStarted();
+}
+
+void M2kController::onCalibFinished()
+{
+	if(!m_m2k) {
+		return;
+	}
+	try {
+		if(m_calibFw->result()) {
+			Q_EMIT calibrationSuccess();
+		} else {
+			Q_EMIT calibrationFailed();
+		}
+	} catch(...) {
+		Q_EMIT calibrationFailed();
+		qWarning(CAT_M2KPLUGIN) << "An exception occurred during calibration!";
+	}
+	Q_EMIT calibrationFinished();
 }
