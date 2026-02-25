@@ -68,6 +68,24 @@ Look for:
 - `getWidgetKeys()` — returns all widget key strings
 - `readWidget(key)` / `writeWidget(key, value)` — generic widget access
 - `refresh()` — re-reads all widget values from hardware
+- Child `ApiObject` instances created in the API constructor — these become `<apiObject>.<childName>` in JS (e.g., `datalogger.plot.getXMin()`)
+
+### Finding Child/Sub-APIs
+
+After reading the plugin's main API header, check if it includes any sub-API headers (e.g., `#include <gui/plotwidget_api.h>`). Also check the API constructor in the `.cpp` file for child `ApiObject` creation patterns like:
+
+```cpp
+auto *childApi = new SomeWidget_API(widget, this);
+childApi->setObjectName("childName");
+```
+
+These create sub-APIs accessible in JS as `<plugin>.<childName>.<method>()`. Read each child API header to discover its `Q_INVOKABLE` methods and include them in the classification.
+
+**Known reusable sub-APIs:**
+
+| Sub-API Class | Header | JS Access Pattern | Description |
+|---------------|--------|-------------------|-------------|
+| `PlotWidget_API` | `gui/include/gui/plotwidget_api.h` | `<plugin>.plot.*` | Plot axis, channel, grid, navigator, and CSV export controls |
 
 ### Finding Test Documentation
 
@@ -109,6 +127,8 @@ Read and analyze all necessary source material before writing any code.
 ### 1.1 Read the Plugin's API
 
 **For newer plugins:** Read the `*_api.h` header completely. Extract every `Q_INVOKABLE` method with its signature. Group methods by capability (getters, setters, tool management, widget access).
+
+**Child/Sub-APIs:** Also check the API header for `#include` of sub-API headers (e.g., `#include <gui/plotwidget_api.h>`) and read the API constructor in the `.cpp` file for child `ApiObject` creation. For each child API found, read its header and extract all `Q_INVOKABLE` methods. These are accessible in JS as `<plugin>.<childName>.<method>()` (e.g., `datalogger.plot.getXMin()`). Include sub-API methods in the classification report with their full JS path.
 
 **For M2K legacy plugins:** Read the existing test files in `js/testAutomations/m2k/` to discover all available properties and methods.
 
@@ -189,11 +209,14 @@ Before writing any code, present a classification report to the user for approva
 | # | UID | Title | API Methods Used |
 |---|-----|-------|-----------------|
 | 1 | TST.PLUGIN.TEST_1 | Test Title | api.setX(), api.getX() |
+| 2 | TST.PLUGIN.TEST_4 | Plot Axis Test | api.plot.setXInterval(), api.plot.getXMin() |
 
 ### Category B: Supervised (Visual)
 | # | UID | Title | API Methods (steps) | Visual Check (why) |
 |---|-----|-------|--------------------|--------------------|
 | 1 | TST.PLUGIN.TEST_2 | Test Title | api.setX() | "verify plot shows frequency response" |
+
+Note: For sub-API methods, use the full JS path (e.g., `datalogger.plot.getXMin()` not just `getXMin()`).
 
 ### Category C: Not Automatable
 | # | UID | Title | Reason | Missing API |
