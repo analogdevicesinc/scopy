@@ -89,10 +89,10 @@ private:
 	QButtonGroup *m_adcBtnGrp;
 	QButtonGroup *m_dacBtnGrp;
 
-	Calibration *calib;
+	Calibration *m_calib = nullptr;
 
 	M2kController *m_m2kController;
-	m2k_iio_manager *m2k_man;
+	m2k_iio_manager *m2k_man = nullptr;
 	InfoPage *m_m2kInfoPage;
 
 	libm2k::context::M2k *m_m2k;
