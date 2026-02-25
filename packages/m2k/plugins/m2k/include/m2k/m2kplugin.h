@@ -90,11 +90,11 @@ private:
 
 	Calibration *m_calib = nullptr;
 
-	M2kController *m_m2kController;
+	M2kController *m_m2kController = nullptr;
 	m2k_iio_manager *m2k_man = nullptr;
 	InfoPage *m_m2kInfoPage;
 
-	libm2k::context::M2k *m_m2k;
+	libm2k::context::M2k *m_m2k = nullptr;
 
 	const int PING_PERIOD = 5000;
 	const int infoPageTimerTimeout = 1000;
