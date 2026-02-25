@@ -419,9 +419,9 @@ void M2kPlugin::cleanup()
 		delete m2k_man;
 		m2k_man = nullptr;
 	}
-	if(calib) {
-		delete calib;
-		calib = nullptr;
+	if(m_calib) {
+		delete m_calib;
+		m_calib = nullptr;
 	}
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		QWidget *tool = tme->tool();
@@ -488,7 +488,8 @@ bool M2kPlugin::onConnect()
 		Filter *f = new Filter(ctx);
 		QJSEngine *js = ScopyJS::GetInstance()->engine();
 
-		auto calib = new Calibration(m_m2k);
+		m_calib = new Calibration(m_m2k);
+
 		auto diom = new DIOManager(m_m2k, f);
 		auto dmmTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kdmm");
 		auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "m2kcal");
@@ -504,7 +505,7 @@ bool M2kPlugin::onConnect()
 
 		tools.insert("m2kdmm", new DMM(m_m2k, m_param, f, dmmTme, m2k_man));
 		dmmTme->setTool(tools["m2kdmm"]);
-		tools.insert("m2kcal", new ManualCalibration(m_m2k, f, mancalTme, nullptr, calib));
+		tools.insert("m2kcal", new ManualCalibration(m_m2k, f, mancalTme, nullptr, m_calib));
 		mancalTme->setTool(tools["m2kcal"]);
 		tools.insert("m2kdio", new DigitalIO(f, dioTme, diom, js, nullptr));
 		dioTme->setTool(tools["m2kdio"]);
