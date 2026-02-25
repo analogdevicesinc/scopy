@@ -46,6 +46,7 @@ public:
 
 	void connectM2k(libm2k::context::M2k *m2k);
 	void disconnectM2k();
+	bool isCalibrating() const;
 
 public Q_SLOTS:
 	void identify();

@@ -88,6 +88,8 @@ void M2kController::disconnectM2k()
 	m_m2k = nullptr;
 }
 
+bool M2kController::isCalibrating() const { return m_calibFw && m_calibFw->isRunning(); }
+
 void M2kController::identify()
 {
 	if(!m_identifyTask) {
@@ -102,6 +104,10 @@ void M2kController::identify()
 
 void M2kController::initialCalibration()
 {
+	if(m_identifyTask && m_identifyTask->isRunning()) {
+		m_identifyTask->requestInterruption();
+		m_identifyTask->wait();
+	}
 	if(!m_m2k->isCalibrated()) {
 		calibrate();
 	} else {
