@@ -189,6 +189,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::deviceConnected, this, [=]() { handleScanner(); });
 	connect(dm, &DeviceManager::deviceDisconnecting, this, [=]() { handleScanner(); });
 	connect(dm, &DeviceManager::deviceDisconnected, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceConnecting, this, [this](const QString &deviceId) {
+		Device *d = dm->getDevice(deviceId);
+		if(d) {
+			scc->lock(deviceId, d);
+		}
+	});
 
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), scc, SLOT(lock(QString, Device *)));
 	connect(dm, SIGNAL(deviceConnected(QString, Device *)), hp, SLOT(connectDevice(QString)));
