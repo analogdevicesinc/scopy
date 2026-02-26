@@ -1,0 +1,7 @@
+[
+    {
+        "device": "fmcomms11",
+        "xml_path": "fmcomms11.xml",
+        "uri": "ip:127.0.0.1"
+    }
+]
