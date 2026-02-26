@@ -5,7 +5,7 @@ Also use @tools/prompts/scopy_test_automation_prompt.md as a reference for templ
 
 ## Workflow
 
-1. **Discover**: Find the plugin's API header (`*_api.h`) and its test documentation RST file (`*_tests.rst`). Read both completely. Also read the JS API object name from `js/testAutomations/common/apiUnregisterTest.js` or from the plugin source code.
+1. **Discover**: Find the plugin's API header (`*_api.h`) and its test documentation RST file (`*_tests.rst`). Read both completely. Also read the JS API object name from `js/testAutomations/common/apiUnregisterTest.js` or from the plugin source code. **Cross-plugin discovery:** Scan the RST test steps for references to other plugins (e.g., "Open the Debugger", "Check the ADC plot", "Set TX_LO frequency"). For each referenced plugin, find and read its `*_api.h` header to identify available `Q_INVOKABLE` methods that can automate those cross-plugin steps.
 
 2. **Classify**: For every test in the RST documentation, classify it as:
    - **Category A** (Fully Automatable) — steps AND validation via API
@@ -28,3 +28,4 @@ Also use @tools/prompts/scopy_test_automation_prompt.md as a reference for templ
 - Use `TestFramework.supervisedCheck()` for visual validation instead of `msleep(VISUAL_DELAY)`.
 - Use the existing test file patterns in `js/testAutomations/` as references.
 - Use doc UIDs as test names in `TestFramework.runTest()`.
+- When a test step references another plugin (e.g., "Open the Debugger and set TX_LO frequency"), check that plugin's `*_api.h` for `Q_INVOKABLE` methods that can automate the step. Only classify as Category C when the other plugin truly has no API for the needed operation. Use `switchToTool()` to navigate between plugins and call the other plugin's API methods directly (e.g., `iioExplorer.writeAttributeValue()`, `adc.setTimeRunning()`).

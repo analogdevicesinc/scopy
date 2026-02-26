@@ -118,6 +118,37 @@ Check `js/testAutomations/common/apiUnregisterTest.js` which lists all known API
 - Newer plugins: `ad9084`, `adrv9002`, `ad936x`, `ad936x_advanced`, `fmcomms5`, `fmcomms5_advanced`, `pqm`, `datalogger`, `regmap`, `iioExplorer`, `swiot`
 - M2K old tools: `osc`, `spectrum`, `network`, `siggen`, `logic`, `pattern`, `dio`, `dmm`, `power`, `calib`
 
+### Cross-Plugin API Reference
+
+When a test references another plugin, use this table to find its JS API object and key methods for cross-plugin automation:
+
+| Plugin | JS Object | API Header | Key Cross-Plugin Methods |
+|--------|-----------|------------|--------------------------|
+| Debugger / IIO Explorer | `iioExplorer` | `packages/generic-plugins/plugins/debugger/include/debugger/iioexplorerinstrument_api.h` | `readAttributeValue(path)`, `writeAttributeValue(path, value)`, `selectItemByPath(path)` |
+| ADC | `adc` | `packages/generic-plugins/plugins/adc/include/adc/adc_api.h` | `setTimeRunning(bool)`, `isTimeRunning()`, `setTimeSampleRate(rate)`, `setTimeChannelEnabled(ch, bool)`, `getTimeMeasurementValue(ch, meas)` |
+| DAC | `dac` | `packages/generic-plugins/plugins/dac/include/dac/dac_api.h` | `setDacRunning(bool)`, `setDeviceMode(idx, mode)`, `setDdsToneFrequency(idx, ch, tone, freq)`, `setDdsToneScale(idx, ch, tone, scale)`, `loadFile(idx, path)`, `setCyclic(idx, bool)` |
+| DataLogger | `datalogger` | `packages/generic-plugins/plugins/datalogger/include/datalogger/datalogger_api.hpp` | `enableMonitor(monitor)`, `setRunning(bool)`, `continuousLogAtPathForTool(tool, path)` |
+| Register Map | `regmap` | `packages/generic-plugins/plugins/regmap/src/regmap_api.h` | `write(addr, val)`, `readRegister(addr)`, `setDevice(device)`, `enableAutoread(bool)` |
+| Signal Generator (M2K) | `siggen` | Property-based (`src/old/signal_generator_api.hpp`) | `siggen.running = true`, `siggen.waveform_frequency = val`, `siggen.waveform_amplitude = val` |
+| Oscilloscope (M2K) | `osc` | Property-based (`src/old/oscilloscope_api.hpp`) | `osc.running = true`, `osc.time_base = val`, `osc.memory_depth = val` |
+| DMM (M2K) | `dmm` | Property-based (`src/old/dmm_api.hpp`) | `dmm.running = true`, `dmm.value_ch1` (read), `dmm.mode_ac_ch1 = val` |
+| Power Supply (M2K) | `power` | Property-based (`src/old/power_controller_api.hpp`) | `power.dac1_value = val`, `power.dac1_enabled = true`, `power.sync = true` |
+
+**Usage pattern for cross-plugin steps:**
+```javascript
+// Switch to the other plugin's tool
+switchToTool("IIO Explorer");
+msleep(2000);
+
+// Use the other plugin's API
+iioExplorer.writeAttributeValue("context0/ad9361-phy/altvoltage0/frequency", "2400000000");
+msleep(500);
+
+// Switch back to the plugin under test
+switchToTool("ADC");
+msleep(2000);
+```
+
 ---
 
 ## Phase 1: Discovery
@@ -169,6 +200,33 @@ In addition to plugin-specific `Q_INVOKABLE` methods, every plugin test can use 
 
 These are API-verifiable checks — no visual inspection needed.
 
+### 1.5 Cross-Plugin API Discovery
+
+Many RST tests reference other plugins for setup or verification steps (e.g., "Open the Debugger and set TX_LO frequency", "Check the ADC plot for a sinewave"). Before classifying these as Category C, discover what cross-plugin APIs are available:
+
+**Step 1: Scan RST steps for cross-plugin references.** Look for:
+- Plugin names: "Debugger", "IIO Explorer", "ADC", "DAC", "Signal Generator", "Oscilloscope", "DataLogger", "Register Map", "DMM", "Power Supply"
+- Actions on other plugins: "Open the...", "Switch to...", "In the ... plugin", "Set ... in the Debugger"
+- IIO attribute operations: "Set TX_LO frequency", "Write attribute", "Change hardware gain"
+
+**Step 2: Read the other plugin's API header.** Use the Cross-Plugin API Reference table above to find the header path. Read the header and extract `Q_INVOKABLE` methods relevant to the RST step.
+
+**Step 3: Map RST steps to cross-plugin API calls.** Examples:
+
+| RST Step | Cross-Plugin API Call |
+|----------|----------------------|
+| "Open the Debugger and set TX_LO to 2.4 GHz" | `switchToTool("IIO Explorer"); iioExplorer.writeAttributeValue("context0/ad9361-phy/altvoltage0/frequency", "2400000000")` |
+| "Start the ADC capture" | `switchToTool("ADC"); adc.setTimeRunning(true)` |
+| "Set the DAC to generate a 1 MHz sinewave" | `switchToTool("DAC"); dac.setDdsToneFrequency(0, ch, 0, "1000000"); dac.setDacRunning(true)` |
+| "Load a CSV file into the DAC buffer" | `dac.loadFile(0, "/path/to/file.csv"); dac.setCyclic(0, true)` |
+| "Read the register at 0x100" | `switchToTool("Register Map"); regmap.readRegister("0x100")` |
+| "Enable Channel 0 in the ADC" | `adc.setTimeChannelEnabled("channel0", true)` |
+
+**Step 4: Record availability for Phase 2 classification.** For each cross-plugin step, note:
+- Whether the needed API method exists (→ Category A or B)
+- Whether only partial API coverage exists (→ may still be B with supervised check for the uncovered part)
+- Whether no API exists at all (→ Category C, document in Missing API Report)
+
 ---
 
 ## Phase 2: Classification
@@ -188,6 +246,8 @@ The test steps can be performed entirely via API calls AND the expected results 
 - All verification can be done programmatically (comparing strings, ranges, values)
 - Steps say "verify tool is in tool list" → use `getTools()` and check list contains tool name
 - Steps say "verify plugin loads" or "is accessible" → use `switchToTool()` and check returns `true`
+- Steps reference another plugin whose API has full set/get coverage for the needed operation → use `switchToTool()` + cross-plugin API calls
+- Steps say "set IIO attribute" or "write attribute value" → `switchToTool("IIO Explorer"); iioExplorer.writeAttributeValue(path, value)` + readback with `iioExplorer.readAttributeValue(path)`
 
 **Output file:** `<plugin>DocTests.js`
 
@@ -203,6 +263,7 @@ The test steps can be performed via API but the expected result requires human o
 - Steps involve observing colors, layouts, plots, waveforms, or visual feedback
 - Expected result says "frequency response shows..." (plot shape)
 - Expected result references cursor positions, trace shapes, or visual patterns
+- Steps use cross-plugin APIs to set up a scenario (e.g., configure DAC output via `dac` API) but verification requires visual observation of the result in another plugin (e.g., "check the ADC plot for a sinewave")
 
 **Output file:** `<plugin>VisualTests.js`
 
@@ -220,6 +281,10 @@ No API exists for the required action, or the test requires external tools/hardw
 - Steps require restarting Scopy
 - Steps require installing/uninstalling packages with file system dialogs
 - Steps require multi-device scenarios that cannot be scripted
+- Steps reference another plugin that has **no API** or **lacks the specific method** needed for the operation
+
+**NOT a Category C indicator:**
+- Steps reference another plugin that **has** the needed API method — use cross-plugin API calls instead (see Section 1.5 and the Cross-Plugin API Reference table). These are Category A or B depending on whether verification is visual.
 
 **Output:** Document these as a Missing API Report comment block at the top of the DocTests.js file.
 
@@ -543,6 +608,24 @@ Each entry should include:
 - **Suggested:** — A proposed API method signature that would enable automation
 - **Affected file:** — Where the API would need to be added
 
+When a Category C test involves cross-plugin gaps, add a separate subsection:
+
+```javascript
+// --- CROSS-PLUGIN API GAPS ---
+//
+// TST.PLUGIN.TEST_NAME — <Test Title>
+//   Cross-plugin: <plugin name> (JS object: <jsObjectName>)
+//   Available API: <methods that exist but aren't sufficient>
+//   Missing API: <specific method needed that doesn't exist>
+//   Automatable steps: Steps 1-3 can be automated via <jsObjectName>.method()
+//   Blocked step: Step 4 requires <describe what's missing>
+//   Note: If the missing method is added, this test moves to Category A/B
+//
+// ---
+```
+
+**Important:** Only list a test under cross-plugin gaps when the other plugin's API is **partially** insufficient. If the other plugin has full API coverage for all needed steps, the test is Category A or B — not C.
+
 ### 3.6 Plugin Detection Test Pattern (Category A)
 
 Most plugins have a "Plugin Detection" or "Plugin Loading" test in the RST documentation. These tests verify that the plugin is detected for compatible devices and appears in the tool list. They are **Category A (Fully Automatable)** because all verification can be done via generic Scopy API calls.
@@ -620,6 +703,10 @@ Before presenting the code to the user, verify:
 - [ ] File has the GPLv3 copyright header
 - [ ] No C++ source code was modified
 - [ ] No duplicate tests (checked against existing test files)
+- [ ] Identified all cross-plugin references in RST test steps
+- [ ] Read API headers for every referenced plugin (using Cross-Plugin API Reference table)
+- [ ] Cross-plugin steps with available APIs classified as A/B (not C)
+- [ ] Cross-plugin API gaps documented with specific missing methods in the Missing API Report
 
 ---
 
@@ -672,6 +759,35 @@ Before presenting the code to the user, verify:
     var enabled = ad9084.isRxEnabled(0);
     ```
 
+13. **Use cross-plugin APIs instead of marking tests as Category C** — when a test step references another plugin, check that plugin's API before classifying as "not automatable". Many cross-plugin steps can be automated with `switchToTool()` + the other plugin's API calls:
+    ```javascript
+    // Example: DAC buffer cyclic test that needs IIO attribute setup + ADC verification
+    // Step: "Open the Debugger and set TX_LO to 2.4 GHz"
+    switchToTool("IIO Explorer");
+    msleep(2000);
+    iioExplorer.writeAttributeValue(
+        "context0/ad9361-phy/altvoltage0/frequency", "2400000000");
+    msleep(500);
+    var readBack = iioExplorer.readAttributeValue(
+        "context0/ad9361-phy/altvoltage0/frequency");
+    printToConsole("  TX_LO set to: " + readBack);
+
+    // Step: "Start the ADC and verify sinewave"
+    switchToTool("ADC");
+    msleep(2000);
+    adc.setTimeRunning(true);
+    msleep(2000);
+
+    // Visual verification (makes this Category B, not C)
+    if (!TestFramework.supervisedCheck(
+        "Verify the ADC time plot shows a sinewave at the expected frequency")) {
+        adc.setTimeRunning(false);
+        return false;
+    }
+    adc.setTimeRunning(false);
+    ```
+    Only classify as Category C when the other plugin truly has **no API** for the needed operation.
+
 ---
 
 ## Reference Files
@@ -689,6 +805,9 @@ Study these files for patterns before writing tests:
 | `js/testAutomations/m2k/voltmeter/voltmeter_dc_loopback.js` | Loopback test (multi-tool integration) |
 | `js/testAutomations/swiot/swiotSupervisedTests.js` | Supervised test example |
 | `prompts/scopy_test_automation_prompt.md` | Additional templates and patterns reference |
+| `packages/generic-plugins/plugins/debugger/include/debugger/iioexplorerinstrument_api.h` | IIO Explorer / Debugger cross-plugin API |
+| `packages/generic-plugins/plugins/adc/include/adc/adc_api.h` | ADC cross-plugin API |
+| `packages/generic-plugins/plugins/dac/include/dac/dac_api.h` | DAC cross-plugin API |
 
 ---
 
