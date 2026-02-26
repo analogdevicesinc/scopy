@@ -35,7 +35,6 @@
 #include "freq/fftplotcomponentchannel.h"
 #include "timeplotcomponentsettings.h"
 #include "freq/fftplotcomponentsettings.h"
-#include "measurecomponent.h"
 #include "genalyzersettings.h"
 #include "measurementcontroller.h"
 
@@ -765,10 +764,7 @@ void ADC_API::setFreqAutoscaleEnabled(bool enabled)
 	auto *plot = dynamic_cast<FFTPlotComponent *>(ctrl->m_plotComponentManager->plot(0));
 	if(!plot || !plot->plotMenu())
 		return;
-	auto *settings = plot->plotMenu();
-	settings->m_autoscaleEnabled = enabled;
-	settings->m_yCtrl->setEnabled(!enabled);
-	settings->toggleAutoScale();
+	plot->plotMenu()->m_autoscaleBtn->onOffswitch()->setChecked(enabled);
 }
 
 // ==================== X-MODE ====================
@@ -861,17 +857,17 @@ void ADC_API::setFreqChannelAveragingSize(const QString &channel, int size)
 bool ADC_API::isGenalyzerEnabled()
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return false;
-	return ctrl->m_measureComponent->genalyzerSettings()->getConfig().enabled;
+	return ctrl->m_genalyzerSettings->getConfig().enabled;
 }
 
 void ADC_API::setGenalyzerEnabled(bool enabled)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.enabled = enabled;
 	gs->setConfig(config);
@@ -880,17 +876,17 @@ void ADC_API::setGenalyzerEnabled(bool enabled)
 int ADC_API::getGenalyzerMode()
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return 0;
-	return static_cast<int>(ctrl->m_measureComponent->genalyzerSettings()->getConfig().mode);
+	return static_cast<int>(ctrl->m_genalyzerSettings->getConfig().mode);
 }
 
 void ADC_API::setGenalyzerMode(int mode)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.mode = static_cast<grutil::GenalyzerMode>(mode);
 	gs->setConfig(config);
@@ -899,17 +895,17 @@ void ADC_API::setGenalyzerMode(int mode)
 int ADC_API::getGenalyzerSSBWidth()
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return 0;
-	return ctrl->m_measureComponent->genalyzerSettings()->getConfig().auto_params.ssb_width;
+	return ctrl->m_genalyzerSettings->getConfig().auto_params.ssb_width;
 }
 
 void ADC_API::setGenalyzerSSBWidth(int width)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.auto_params.ssb_width = width;
 	gs->setConfig(config);
@@ -918,17 +914,17 @@ void ADC_API::setGenalyzerSSBWidth(int width)
 double ADC_API::getGenalyzerExpectedFreq()
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return 0.0;
-	return ctrl->m_measureComponent->genalyzerSettings()->getConfig().fixed_tone.expected_freq;
+	return ctrl->m_genalyzerSettings->getConfig().fixed_tone.expected_freq;
 }
 
 void ADC_API::setGenalyzerExpectedFreq(double freq)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.fixed_tone.expected_freq = freq;
 	gs->setConfig(config);
@@ -937,17 +933,17 @@ void ADC_API::setGenalyzerExpectedFreq(double freq)
 int ADC_API::getGenalyzerHarmonicOrder()
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return 0;
-	return ctrl->m_measureComponent->genalyzerSettings()->getConfig().fixed_tone.harmonic_order;
+	return ctrl->m_genalyzerSettings->getConfig().fixed_tone.harmonic_order;
 }
 
 void ADC_API::setGenalyzerHarmonicOrder(int order)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.fixed_tone.harmonic_order = order;
 	gs->setConfig(config);
@@ -956,9 +952,9 @@ void ADC_API::setGenalyzerHarmonicOrder(int order)
 void ADC_API::setGenalyzerSSBFundamental(int ssb)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.fixed_tone.ssb_fundamental = ssb;
 	gs->setConfig(config);
@@ -967,9 +963,9 @@ void ADC_API::setGenalyzerSSBFundamental(int ssb)
 void ADC_API::setGenalyzerSSBDefault(int ssb)
 {
 	auto *ctrl = getFreqController();
-	if(!ctrl || !ctrl->m_measureComponent)
+	if(!ctrl || !ctrl->m_genalyzerSettings)
 		return;
-	auto *gs = ctrl->m_measureComponent->genalyzerSettings();
+	auto *gs = ctrl->m_genalyzerSettings;
 	auto config = gs->getConfig();
 	config.fixed_tone.ssb_default = ssb;
 	gs->setConfig(config);

@@ -70,6 +70,7 @@ private:
 	QPushButton *m_deletePlotHover;
 	QPushButton *m_settingsPlotHover;
 
+	MenuOnOffSwitch *m_autoscaleBtn;
 	bool m_autoscaleEnabled;
 	bool m_running;
 

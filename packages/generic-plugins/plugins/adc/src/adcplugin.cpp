@@ -523,6 +523,14 @@ bool ADCPlugin::onDisconnect()
 	Preferences *p = Preferences::GetInstance();
 	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
+
+	delete m_timePlotApi;
+	m_timePlotApi = nullptr;
+	delete m_freqPlotApi;
+	m_freqPlotApi = nullptr;
+	delete m_api;
+	m_api = nullptr;
+
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 
