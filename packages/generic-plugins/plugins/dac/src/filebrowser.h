@@ -34,6 +34,7 @@ namespace scopy {
 namespace dac {
 class SCOPY_DAC_EXPORT FileBrowser : public QWidget
 {
+	friend class DAC_API;
 	Q_OBJECT
 public:
 	explicit FileBrowser(QWidget *parent = nullptr);
