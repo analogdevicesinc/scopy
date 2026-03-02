@@ -676,7 +676,7 @@ bool ADC_API::isTimeXYPlotEnabled()
 	auto *plot = dynamic_cast<TimePlotComponent *>(ctrl->m_plotComponentManager->plot(0));
 	if(!plot || !plot->plotMenu())
 		return false;
-	return plot->plotMenu()->m_xAxisSrc->isVisible();
+	return plot->plotMenu()->m_xySwitch->isChecked();
 }
 
 void ADC_API::setTimeXYPlotEnabled(bool enabled)
@@ -687,9 +687,7 @@ void ADC_API::setTimeXYPlotEnabled(bool enabled)
 	auto *plot = dynamic_cast<TimePlotComponent *>(ctrl->m_plotComponentManager->plot(0));
 	if(!plot || !plot->plotMenu())
 		return;
-	plot->xyDockWidget()->setActivated(enabled);
-	plot->plotMenu()->m_xAxisSrc->setVisible(enabled);
-	plot->plotMenu()->m_xAxisShow->setVisible(enabled);
+	plot->plotMenu()->m_xySwitch->setChecked(enabled);
 }
 
 QString ADC_API::getTimeXYSource()
