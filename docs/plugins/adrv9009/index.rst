@@ -26,7 +26,7 @@ Getting Started
 
 - A supported ADRV9009-based platform or evaluation board
 - Properly installed device drivers (see `ADI Linux Drivers <https://wiki.analog.com/resources/tools-software/linux-drivers>`_)
-- Scopy version 2.3.0 or later
+- Scopy version 2.2.0 or later
 
 **Using the Plugins**
 
