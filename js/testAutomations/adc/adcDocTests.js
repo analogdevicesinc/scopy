@@ -1260,9 +1260,9 @@ try {
 }
 
 // Re-discover freq channels after complex mode change
-var genFreqChannels = [];
+var genComplexChannels = [];
 try {
-    genFreqChannels = adc.getFreqChannels();
+    genComplexChannels = adc.getComplexChannels();
 } catch (e) {
     printToConsole("  Warning: Could not get freq channels for genalyzer: " + e);
 }
@@ -1291,15 +1291,14 @@ TestFramework.runTest("TST.ADC_GENALYZER.ENABLE", function() {
         printToConsole("  Step 4 PASS: Genalyzer enabled");
 
         // Step 5: Run and verify metrics
-        if (genFreqChannels.length > 0) {
-            var ch = genFreqChannels[0];
+        if (genComplexChannels.length > 0) {
+            var ch = genComplexChannels[0];
             adc.setFreqRunning(true);
             msleep(5000);
             adc.triggerGenalyzerAnalysis(ch);
             msleep(1000);
 
             var snr = adc.getGenalyzerMetric(ch, "snr");
-            adc.setFreqRunning(false);
             msleep(500);
             printToConsole("  SNR metric: " + snr);
             if (typeof snr !== "number") {
@@ -1307,6 +1306,7 @@ TestFramework.runTest("TST.ADC_GENALYZER.ENABLE", function() {
                 adc.setGenalyzerEnabled(origEnabled);
                 return false;
             }
+            adc.setFreqRunning(false);
             printToConsole("  Step 5 PASS: Genalyzer analysis produced metrics");
         }
 
@@ -1493,11 +1493,11 @@ printToConsole("\n=== Genalyzer Test 4: FFT Integration ===\n");
 
 TestFramework.runTest("TST.ADC_GENALYZER.FFT_INTEGRATION", function() {
     try {
-        if (genFreqChannels.length === 0) {
+        if (genComplexChannels.length === 0) {
             printToConsole("  No freq channels available");
             return "SKIP";
         }
-        var ch = genFreqChannels[0];
+        var ch = genComplexChannels[0];
 
         // Save original state
         var origGenalyzer = adc.isGenalyzerEnabled();
