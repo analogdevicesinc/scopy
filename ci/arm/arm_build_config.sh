@@ -63,7 +63,7 @@ APP_RUN=$SRC_SCRIPT/../general/AppRun
 APP_DESKTOP=$SRC_SCRIPT/../general/scopy.desktop
 APP_SQUASHFS=$SRC_SCRIPT/scopy.squashfs
 
-# Runetimes downloaded from https://github.com/AppImage/AppImageKit/releases/continuous Mar 9, 2023
+# Runetimes downloaded from https://github.com/AppImage/type2-runtime/releases/tag/20251108  8 Dec 2025
 RUNTIME_ARM=$SRC_SCRIPT/runtime-$ARCHITECTURE
 
 
