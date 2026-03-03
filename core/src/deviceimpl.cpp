@@ -265,6 +265,8 @@ void DeviceImpl::loadBadges()
 	forgetBtn->setMaximumSize(25, 25);
 	forgetBtn->setIcon(QPixmap(":/gui/icons/orange_close.svg"));
 	connect(forgetBtn, &QPushButton::clicked, this, &DeviceImpl::forget);
+	connect(this, &DeviceImpl::connecting, this, [=]() { forgetBtn->setEnabled(false); });
+	connect(this, &DeviceImpl::connected, this, [=]() { forgetBtn->setEnabled(true); });
 	HoverWidget *forgetHover = new HoverWidget(forgetBtn, m_icon, m_icon);
 	forgetHover->setStyleSheet("background-color: transparent; border: 0px;");
 	forgetHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
