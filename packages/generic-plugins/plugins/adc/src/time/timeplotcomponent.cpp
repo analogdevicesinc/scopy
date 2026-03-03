@@ -101,6 +101,10 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 
 	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
 	m_cursor = new CursorController(m_timePlot, this);
+	int xCursorPos = Preferences::get("adc_plot_xcursor_position").toInt();
+	int yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt();
+	m_cursor->getPlotCursors()->setXHandlePos((HandlePos)xCursorPos);
+	m_cursor->getPlotCursors()->setYHandlePos((HandlePos)yCursorPos);
 }
 
 TimePlotComponent::~TimePlotComponent() {}

@@ -96,6 +96,8 @@ bool ADCPlugin::loadPreferencesPage()
 	Preferences *p = Preferences::GetInstance();
 
 	m_preferencesPage = new QWidget();
+	connect(p, &Preferences::preferenceChanged, m_preferencesPage,
+		[this](QString s, QVariant v) { handlePreferences(s, v); });
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
 	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
@@ -474,6 +476,20 @@ void ADCPlugin::preferenceChanged(QString s, QVariant t1)
 		if(!ok) {
 			Preferences::set("adc_acquisition_timeout", 1000);
 		}
+	}
+}
+
+void ADCPlugin::handlePreferences(QString s, QVariant v)
+{
+	Preferences *p = Preferences::GetInstance();
+	if(s == "adc_plot_xcursor_position") {
+		Q_EMIT p->restartRequired();
+	} else if(s == "adc_plot_ycursor_position") {
+		Q_EMIT p->restartRequired();
+	} else if(s == "adc_plot_xaxis_label_position") {
+		Q_EMIT p->restartRequired();
+	} else if(s == "adc_plot_yaxis_label_position") {
+		Q_EMIT p->restartRequired();
 	}
 }
 
