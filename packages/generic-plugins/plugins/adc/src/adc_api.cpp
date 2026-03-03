@@ -107,6 +107,19 @@ GRFFTChannelComponent *ADC_API::findFreqChannel(const QString &name)
 	return nullptr;
 }
 
+GRFFTChannelComponent *ADC_API::findComplexChannel(const QString &name)
+{
+	auto *ctrl = getFreqController();
+	if(!ctrl)
+		return nullptr;
+	for(auto *c : ctrl->m_components) {
+		auto *ch = dynamic_cast<GRFFTChannelComponent *>(c);
+		if(ch && ch->name() == name)
+			return ch;
+	}
+	return nullptr;
+}
+
 // ==================== TOOL LISTING ====================
 
 QStringList ADC_API::getTools()
@@ -158,7 +171,7 @@ void ADC_API::setTimeBufferSize(int size)
 {
 	auto *ctrl = getTimeController();
 	if(ctrl)
-		ctrl->m_timePlotSettingsComponent->setBufferSize(size);
+		ctrl->m_timePlotSettingsComponent->m_bufferSizeSpin->setValue(size);
 }
 
 int ADC_API::getTimePlotSize()
@@ -170,21 +183,30 @@ int ADC_API::getTimePlotSize()
 void ADC_API::setTimePlotSize(int size)
 {
 	auto *ctrl = getTimeController();
-	if(ctrl)
-		ctrl->m_timePlotSettingsComponent->setPlotSize(size);
+	if(!ctrl) {
+		return;
+	}
+	if(ctrl->m_timePlotSettingsComponent->m_plotSizeSpin->isEnabled()) {
+		ctrl->m_timePlotSettingsComponent->m_plotSizeSpin->setValue(size);
+	} else {
+		qWarning(CAT_ADC_API) << "The plot size spin is disabled! Cannot change the plot size value!";
+	}
 }
 
 bool ADC_API::isTimeSyncBufferPlot()
 {
 	auto *ctrl = getTimeController();
-	return ctrl ? ctrl->m_timePlotSettingsComponent->syncBufferPlotSize() : false;
+	if(!ctrl) {
+		return false;
+	}
+	return ctrl->m_timePlotSettingsComponent->m_syncBufferPlot->onOffswitch()->isChecked();
 }
 
 void ADC_API::setTimeSyncBufferPlot(bool sync)
 {
 	auto *ctrl = getTimeController();
 	if(ctrl)
-		ctrl->m_timePlotSettingsComponent->setSyncBufferPlotSize(sync);
+		ctrl->m_timePlotSettingsComponent->m_syncBufferPlot->onOffswitch()->setChecked(sync);
 }
 
 bool ADC_API::isTimeRollingMode()
@@ -196,8 +218,13 @@ bool ADC_API::isTimeRollingMode()
 void ADC_API::setTimeRollingMode(bool rolling)
 {
 	auto *ctrl = getTimeController();
-	if(ctrl)
-		ctrl->m_timePlotSettingsComponent->setRollingMode(rolling);
+	if(!ctrl)
+		return;
+	if(ctrl->m_timePlotSettingsComponent->m_rollingModeSw->onOffswitch()->isEnabled()) {
+		ctrl->m_timePlotSettingsComponent->m_rollingModeSw->onOffswitch()->setChecked(rolling);
+	} else {
+		qWarning(CAT_ADC_API) << "The rolling mode switch is disabled! Cannot change the rolling mode!";
+	}
 }
 
 double ADC_API::getTimeSampleRate()
@@ -209,8 +236,13 @@ double ADC_API::getTimeSampleRate()
 void ADC_API::setTimeSampleRate(double rate)
 {
 	auto *ctrl = getTimeController();
-	if(ctrl)
-		ctrl->m_timePlotSettingsComponent->setSampleRate(rate);
+	if(!ctrl)
+		return;
+	if(ctrl->m_timePlotSettingsComponent->m_sampleRateSpin->isEnabled()) {
+		ctrl->m_timePlotSettingsComponent->m_sampleRateSpin->setValue(rate);
+	} else {
+		qWarning(CAT_ADC_API) << "The sample rate spin is disabled! Cannot change the sample rate value!";
+	}
 }
 
 // ==================== TIME DOMAIN - SINGLE Y MODE ====================
@@ -451,8 +483,13 @@ double ADC_API::getFreqSampleRate()
 void ADC_API::setFreqSampleRate(double rate)
 {
 	auto *ctrl = getFreqController();
-	if(ctrl)
-		ctrl->m_fftPlotSettingsComponent->setSampleRate(rate);
+	if(!ctrl)
+		return;
+	if(ctrl->m_fftPlotSettingsComponent->m_sampleRateSpin->isEnabled()) {
+		ctrl->m_fftPlotSettingsComponent->m_sampleRateSpin->setValue(rate);
+	} else {
+		qWarning(CAT_ADC_API) << "The sample rate spin is disabled! Cannot change the sample rate value!";
+	}
 }
 
 double ADC_API::getFreqOffset()
@@ -496,6 +533,21 @@ QStringList ADC_API::getFreqChannels()
 		auto *ch = dynamic_cast<GRFFTChannelComponent *>(it.value());
 		if(ch)
 			channels.append(ch->name());
+	}
+	return channels;
+}
+
+QStringList ADC_API::getComplexChannels()
+{
+	QStringList channels;
+	auto *ctrl = getFreqController();
+	if(!ctrl)
+		return channels;
+	for(auto *c : ctrl->m_components) {
+		auto *ch = dynamic_cast<GRFFTChannelComponent *>(c);
+		if(ch && ch->isComplex()) {
+			channels.append(ch->name());
+		}
 	}
 	return channels;
 }
@@ -971,7 +1023,7 @@ void ADC_API::setGenalyzerSSBDefault(int ssb)
 
 double ADC_API::getGenalyzerMetric(const QString &channel, const QString &metric)
 {
-	auto *ch = findFreqChannel(channel);
+	auto *ch = findComplexChannel(channel);
 	if(!ch)
 		return 0.0;
 	auto *complexSigpath = dynamic_cast<GRFFTComplexChannelSigpath *>(ch->m_grtch);
@@ -989,9 +1041,10 @@ double ADC_API::getGenalyzerMetric(const QString &channel, const QString &metric
 
 void ADC_API::triggerGenalyzerAnalysis(const QString &channel)
 {
-	auto *ch = findFreqChannel(channel);
-	if(ch)
+	auto *ch = findComplexChannel(channel);
+	if(ch) {
 		ch->triggerGenalyzerAnalysis();
+	}
 }
 
 #include "moc_adc_api.cpp"

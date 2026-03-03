@@ -114,6 +114,7 @@ public:
 
 	// Channels
 	Q_INVOKABLE QStringList getFreqChannels();
+	Q_INVOKABLE QStringList getComplexChannels();
 	Q_INVOKABLE bool isFreqChannelEnabled(const QString &channel);
 	Q_INVOKABLE void setFreqChannelEnabled(const QString &channel, bool enabled);
 
@@ -190,6 +191,7 @@ private:
 	ADCFFTInstrumentController *getFreqController();
 	GRTimeChannelComponent *findTimeChannel(const QString &name);
 	GRFFTChannelComponent *findFreqChannel(const QString &name);
+	GRFFTChannelComponent *findComplexChannel(const QString &name);
 
 	ADCPlugin *m_adcPlugin;
 };
