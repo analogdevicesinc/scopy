@@ -81,6 +81,7 @@ public:
 
 public Q_SLOTS:
 	void preferenceChanged(QString, QVariant t1);
+	void handlePreferences(QString, QVariant);
 
 private:
 	iio_context *m_ctx;
