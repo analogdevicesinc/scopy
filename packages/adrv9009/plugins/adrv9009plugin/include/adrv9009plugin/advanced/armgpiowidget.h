@@ -21,6 +21,7 @@
 #ifndef ARMGPIOWIDGET_H
 #define ARMGPIOWIDGET_H
 
+#include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <iio.h>
 
@@ -31,12 +32,12 @@ class MenuSectionCollapseWidget;
 
 namespace adrv9009 {
 
-class ArmGpioWidget : public QWidget
+class SCOPY_ADRV9009PLUGIN_EXPORT ArmGpioWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit ArmGpioWidget(iio_device *device, QWidget *parent = nullptr);
+	ArmGpioWidget(iio_device *device, QWidget *parent = nullptr);
 	~ArmGpioWidget();
 
 	MenuSectionCollapseWidget *section() const;
