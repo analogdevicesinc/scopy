@@ -38,6 +38,9 @@ using namespace scopy::adrv9009;
 JesdFramerWidget::JesdFramerWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_mOptions(nullptr)
+	, m_fOptions(nullptr)
+	, m_npOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_JESDFRAMER) << "No device provided to JESD Framer widget";
@@ -50,7 +53,15 @@ JesdFramerWidget::JesdFramerWidget(iio_device *device, QWidget *parent)
 	Style::setStyle(this, style::properties::widget::border_interactive);
 }
 
-JesdFramerWidget::~JesdFramerWidget() {}
+JesdFramerWidget::~JesdFramerWidget()
+{
+	m_mOptions = nullptr;
+	delete m_mOptions;
+	m_fOptions = nullptr;
+	delete m_fOptions;
+	m_npOptions = nullptr;
+	delete m_npOptions;
+}
 
 void JesdFramerWidget::setupUi()
 {
@@ -125,12 +136,12 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	}
 
 	// 4. M - Combobox [0,2,4]
-	QMap<QString, QString> *mOptions = new QMap<QString, QString>();
-	mOptions->insert("0", "0");
-	mOptions->insert("2", "2");
-	mOptions->insert("4", "4");
+	m_mOptions = new QMap<QString, QString>();
+	m_mOptions->insert("0", "0");
+	m_mOptions->insert("2", "2");
+	m_mOptions->insert("4", "4");
 	auto mWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), mOptions, "M");
+		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), m_mOptions, "M");
 	if(mWidget) {
 		column->contentLayout()->addWidget(mWidget);
 		connect(this, &JesdFramerWidget::readRequested, mWidget, &IIOWidget::readAsync);
@@ -147,15 +158,15 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	}
 
 	// 6. F - Combobox [1,2,3,4,6,8]
-	QMap<QString, QString> *fOptions = new QMap<QString, QString>();
-	fOptions->insert("1", "1");
-	fOptions->insert("2", "2");
-	fOptions->insert("3", "3");
-	fOptions->insert("4", "4");
-	fOptions->insert("6", "6");
-	fOptions->insert("8", "8");
+	m_fOptions = new QMap<QString, QString>();
+	m_fOptions->insert("1", "1");
+	m_fOptions->insert("2", "2");
+	m_fOptions->insert("3", "3");
+	m_fOptions->insert("4", "4");
+	m_fOptions->insert("6", "6");
+	m_fOptions->insert("8", "8");
 	auto fWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-f").arg(attrPrefix), fOptions, "F");
+		m_device, QString("adi,jesd204-%1-f").arg(attrPrefix), m_fOptions, "F");
 	if(fWidget) {
 		column->contentLayout()->addWidget(fWidget);
 		connect(this, &JesdFramerWidget::readRequested, fWidget, &IIOWidget::readAsync);
@@ -163,12 +174,12 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	}
 
 	// 7. NP - Combobox [12,16,24]
-	QMap<QString, QString> *npOptions = new QMap<QString, QString>();
-	npOptions->insert("12", "12");
-	npOptions->insert("16", "16");
-	npOptions->insert("24", "24");
+	m_npOptions = new QMap<QString, QString>();
+	m_npOptions->insert("12", "12");
+	m_npOptions->insert("16", "16");
+	m_npOptions->insert("24", "24");
 	auto npWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), npOptions, "NP");
+		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), m_npOptions, "NP");
 	if(npWidget) {
 		column->contentLayout()->addWidget(npWidget);
 		connect(this, &JesdFramerWidget::readRequested, npWidget, &IIOWidget::readAsync);
