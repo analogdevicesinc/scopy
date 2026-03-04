@@ -37,7 +37,9 @@ AuxDacWidget::AuxDacWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 {
-	setupUi();
+	if(m_device != nullptr) {
+		setupUi();
+	}
 }
 
 AuxDacWidget::~AuxDacWidget() {}
@@ -103,7 +105,7 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 	configGrid->addWidget(refHeader, 0, 3);
 
 	// DAC 0-9: Full configuration (value + resolution + vref)
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < AUX_DAC_FULL_CONFIG_COUNT; i++) {
 		int row = i + 1;
 
 		// DAC number label
@@ -151,7 +153,7 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 	}
 
 	// DAC 10-11: Value only (no resolution/vref controls per iio-oscilloscope reference)
-	for(int i = 10; i < 12; i++) {
+	for(int i = AUX_DAC_FULL_CONFIG_COUNT; i < AUX_DAC_TOTAL_COUNT; i++) {
 		int row = i + 1;
 
 		QLabel *dacLabel = new QLabel(QString("DAC %1").arg(i));
