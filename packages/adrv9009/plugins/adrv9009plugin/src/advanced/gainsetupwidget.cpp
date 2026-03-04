@@ -35,16 +35,28 @@ using namespace scopy::adrv9009;
 GainSetupWidget::GainSetupWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_gainModeOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_GAINSETUP) << "No device provided to GAIN Setup widget";
 		return;
 	}
 
+	// Gain Mode - Combobox [0,1,2,3] → [MGC,AGC_FAST,AGC_SLOW,HYBRID]
+	m_gainModeOptions = new QMap<QString, QString>();
+	m_gainModeOptions->insert("0", "MGC");
+	m_gainModeOptions->insert("1", "AGC_FAST");
+	m_gainModeOptions->insert("2", "AGC_SLOW");
+	m_gainModeOptions->insert("3", "HYBRID");
+
 	setupUi();
 }
 
-GainSetupWidget::~GainSetupWidget() {}
+GainSetupWidget::~GainSetupWidget()
+{
+	m_gainModeOptions = nullptr;
+	delete m_gainModeOptions;
+}
 
 void GainSetupWidget::setupUi()
 {
@@ -97,14 +109,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
-	// Gain Mode - Combobox [0,1,2,3] → [MGC,AGC_FAST,AGC_SLOW,HYBRID]
-	QMap<QString, QString> *gainModeOptions = new QMap<QString, QString>();
-	gainModeOptions->insert("0", "MGC");
-	gainModeOptions->insert("1", "AGC_FAST");
-	gainModeOptions->insert("2", "AGC_SLOW");
-	gainModeOptions->insert("3", "HYBRID");
 	auto gainMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-gain-control-gain-mode",
-								       gainModeOptions, "Gain Mode");
+								       m_gainModeOptions, "Gain Mode");
 	if(gainMode) {
 		layout->addWidget(gainMode);
 		connect(this, &GainSetupWidget::readRequested, gainMode, &IIOWidget::readAsync);
@@ -176,14 +182,8 @@ QWidget *GainSetupWidget::createObservationGainSection(QWidget *parent)
 	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
-	// Gain Mode - Combobox [0,1,2,3] → [MGC,AGC_FAST,AGC_SLOW,HYBRID]
-	QMap<QString, QString> *gainModeOptions = new QMap<QString, QString>();
-	gainModeOptions->insert("0", "MGC");
-	gainModeOptions->insert("1", "AGC_FAST");
-	gainModeOptions->insert("2", "AGC_SLOW");
-	gainModeOptions->insert("3", "HYBRID");
 	auto gainMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,orx-gain-control-gain-mode",
-								       gainModeOptions, "Gain Mode");
+								       m_gainModeOptions, "Gain Mode");
 	if(gainMode) {
 		layout->addWidget(gainMode);
 		connect(this, &GainSetupWidget::readRequested, gainMode, &IIOWidget::readAsync);
