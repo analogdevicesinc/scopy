@@ -49,6 +49,8 @@ private:
 
 	iio_device *m_device;
 	QList<IIOWidget *> m_iioWidgets;
+	const int AUX_DAC_FULL_CONFIG_COUNT = 10; // DACs 0-9 have value+resolution+vref
+	const int AUX_DAC_TOTAL_COUNT = 12;	  // DACs 10-11 have value only
 };
 
 } // namespace scopy::adrv9009
