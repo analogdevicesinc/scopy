@@ -116,7 +116,7 @@ QWidget *CalibrationWidget::createCalibrationMaskGroup(QWidget *parent)
 	m_txLolExternalCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_rxQecCal = new MenuOnOffSwitch("RX QEC", widget);
 	m_rxQecCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	m_rxPhaseCorrectionCal = new MenuOnOffSwitch("RX Phase Coorrection", widget);
+	m_rxPhaseCorrectionCal = new MenuOnOffSwitch("RX Phase Correction", widget);
 	m_rxPhaseCorrectionCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_fhmCal = new MenuOnOffSwitch("FHM", widget);
 	m_fhmCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -200,8 +200,16 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 		return;
 	}
 
-	// Build calibration mask from UI checkboxes (specific bits: 8, 9, 10, 14, 15, 23)
+	// Read-modify-write: preserve bits not managed by this UI (same as iio-oscilloscope CHECKBOX_MASK)
 	long long mask = 0;
+	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,default-initial-calibrations-mask", &mask);
+	if(ret < 0) {
+		qWarning(CAT_CALIBRATION) << "Failed to read calibration mask before write, error:" << ret;
+		return;
+	}
+
+	// Clear only the 6 managed bits, then apply UI state
+	mask &= ~((1LL << 8) | (1LL << 9) | (1LL << 10) | (1LL << 14) | (1LL << 15) | (1LL << 23));
 
 	if(m_txLoLeakageCal->onOffswitch()->isChecked())
 		mask |= (1LL << 8); // Bit 8: TX LO Leakage
@@ -218,8 +226,7 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 
 	qDebug(CAT_CALIBRATION) << "Writing calibration mask to device:" << QString("0x%1").arg(mask, 0, 16);
 
-	// Write calibration mask to device
-	int ret = iio_device_debug_attr_write_longlong(m_device, "adi,default-initial-calibrations-mask", mask);
+	ret = iio_device_debug_attr_write_longlong(m_device, "adi,default-initial-calibrations-mask", mask);
 	if(ret < 0) {
 		qWarning(CAT_CALIBRATION) << "Failed to write calibration mask, error:" << ret;
 	}

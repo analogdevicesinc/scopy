@@ -64,6 +64,8 @@ private:
 	// Helper methods for composite bist_tone attribute
 	void writeBistToneToDevice();  // Write composite value to device
 	void readBistToneFromDevice(); // Read and parse composite value
+
+	QMap<QString, QString> *m_prbOptions;
 };
 
 } // namespace scopy::adrv9009

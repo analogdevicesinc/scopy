@@ -40,6 +40,7 @@ using namespace scopy::adrv9009;
 BistWidget::BistWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_prbOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_BIST) << "No device provided to BIST widget";
@@ -49,7 +50,13 @@ BistWidget::BistWidget(iio_device *device, QWidget *parent)
 	setupUi();
 }
 
-BistWidget::~BistWidget() {}
+BistWidget::~BistWidget()
+{
+	if(m_prbOptions != nullptr) {
+		m_prbOptions = nullptr;
+		delete m_prbOptions;
+	}
+}
 
 void BistWidget::setupUi()
 {
@@ -121,8 +128,8 @@ QWidget *BistWidget::createTxNcoSection(QWidget *parent)
 	layout->addWidget(m_tx1FreqSpinBox);
 
 	// TX2 Frequency - Custom spinbox (display in MHz, store in kHz like iio-oscilloscope)
-	// MHz range for TX2 (much smaller range)
-	m_tx2FreqSpinBox = new gui::MenuSpinbox("TX2 Tone (MHz)", 0, "", -16, 16, true, false, false, widget);
+	// iio-oscilloscope glade range: -160 to 160 kHz -> displayed as MHz: -0.16 to 0.16
+	m_tx2FreqSpinBox = new gui::MenuSpinbox("TX2 Tone (MHz)", 0, "", -0.16, 0.16, true, false, false, widget);
 	m_tx2FreqSpinBox->setScalingEnabled(false);
 	layout->addWidget(m_tx2FreqSpinBox);
 
@@ -145,35 +152,30 @@ QWidget *BistWidget::createFramerPrbsSection(QWidget *parent)
 	layout->setSpacing(15);
 
 	// Create PRBS options map (from glade file analysis: 11 options, values 0-8, 14-15)
-	auto createPrbsOptionsMap = []() {
-		QMap<QString, QString> *options = new QMap<QString, QString>();
-		options->insert("0", "ADC_DATA");
-		options->insert("1", "CHECKERBOARD");
-		options->insert("2", "TOGGLE0_1");
-		options->insert("3", "PRBS31");
-		options->insert("4", "PRBS23");
-		options->insert("5", "PRBS15");
-		options->insert("6", "PRBS9");
-		options->insert("7", "PRBS7");
-		options->insert("8", "RAMP");
-		options->insert("14", "PATTERN_REPEAT");
-		options->insert("15", "PATTERN_ONCE");
-		return options;
-	};
+	m_prbOptions = new QMap<QString, QString>();
+	m_prbOptions->insert("0", "ADC_DATA");
+	m_prbOptions->insert("1", "CHECKERBOARD");
+	m_prbOptions->insert("2", "TOGGLE0_1");
+	m_prbOptions->insert("3", "PRBS31");
+	m_prbOptions->insert("4", "PRBS23");
+	m_prbOptions->insert("5", "PRBS15");
+	m_prbOptions->insert("6", "PRBS9");
+	m_prbOptions->insert("7", "PRBS7");
+	m_prbOptions->insert("8", "RAMP");
+	m_prbOptions->insert("14", "PATTERN_REPEAT");
+	m_prbOptions->insert("15", "PATTERN_ONCE");
 
 	// Framer A PRBS - Custom Combo Widget
-	auto framerAPrbsOptions = createPrbsOptionsMap();
 	auto framerAWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_a_prbs",
-									    framerAPrbsOptions, "Framer A PRBS");
+									    m_prbOptions, "Framer A PRBS");
 	if(framerAWidget) {
 		layout->addWidget(framerAWidget);
 		connect(this, &BistWidget::readRequested, framerAWidget, &IIOWidget::readAsync);
 	}
 
 	// Framer B PRBS - Custom Combo Widget
-	auto framerBPrbsOptions = createPrbsOptionsMap();
 	auto framerBWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_b_prbs",
-									    framerBPrbsOptions, "Framer B PRBS");
+									    m_prbOptions, "Framer B PRBS");
 	if(framerBWidget) {
 		layout->addWidget(framerBWidget);
 		connect(this, &BistWidget::readRequested, framerBWidget, &IIOWidget::readAsync);
