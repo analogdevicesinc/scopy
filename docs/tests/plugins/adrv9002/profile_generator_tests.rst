@@ -399,7 +399,7 @@ File Generation Tests
 Test 7: Stream File Generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**UID:** TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION
+**UID:** TST.ADRV9002.PROFILE_GEN.STREAM_FILE_GENERATION
 
 **RBP:** P3
 
