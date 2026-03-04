@@ -36,6 +36,8 @@ using namespace scopy::adrv9009;
 ClkSettingsWidget::ClkSettingsWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_hsDivOptions(nullptr)
+	, m_phaseSyncOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_ADRV9009_CLK_SETTINGS) << "No device provided to Clock Settings";
@@ -49,7 +51,13 @@ ClkSettingsWidget::ClkSettingsWidget(iio_device *device, QWidget *parent)
 	setupUi();
 }
 
-ClkSettingsWidget::~ClkSettingsWidget() {}
+ClkSettingsWidget::~ClkSettingsWidget()
+{
+	m_hsDivOptions = nullptr;
+	delete m_hsDivOptions;
+	m_phaseSyncOptions = nullptr;
+	delete m_phaseSyncOptions;
+}
 
 void ClkSettingsWidget::setupUi()
 {
@@ -98,53 +106,53 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 		m_device, "adi,dig-clocks-device-clock_khz", "[10000 1000 500000]", "Device Clock (kHz)");
 	if(deviceClockWidget) {
 		Style::setStyle(deviceClockWidget, style::properties::widget::basicBackground, true, true);
+		parentLayout->addWidget(deviceClockWidget);
 	}
-	parentLayout->addWidget(deviceClockWidget);
 
 	// 2. CLK PLL VCO Freq (kHz) - RangeWidget
 	IIOWidget *pllVcoFreqWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,dig-clocks-clk-pll-vco-freq_khz", "[5000000 1000 12000000]", "CLK PLL VCO Freq (kHz)");
 	if(pllVcoFreqWidget) {
 		Style::setStyle(pllVcoFreqWidget, style::properties::widget::basicBackground, true, true);
+		parentLayout->addWidget(pllVcoFreqWidget);
 	}
-	parentLayout->addWidget(pllVcoFreqWidget);
 
 	// 3. CLK PLL HS Div - ComboWidget
-	QMap<QString, QString> *hsDivOptions = new QMap<QString, QString>();
-	hsDivOptions->insert("0", "2");
-	hsDivOptions->insert("1", "2.5");
-	hsDivOptions->insert("2", "3");
-	hsDivOptions->insert("3", "4");
-	hsDivOptions->insert("4", "5");
+	m_hsDivOptions = new QMap<QString, QString>();
+	m_hsDivOptions->insert("0", "2");
+	m_hsDivOptions->insert("1", "2.5");
+	m_hsDivOptions->insert("2", "3");
+	m_hsDivOptions->insert("3", "4");
+	m_hsDivOptions->insert("4", "5");
 
 	IIOWidget *hsDividerWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,dig-clocks-clk-pll-hs-div", hsDivOptions, "CLK PLL HS Divider");
+		m_device, "adi,dig-clocks-clk-pll-hs-div", m_hsDivOptions, "CLK PLL HS Divider");
 	if(hsDividerWidget) {
 		Style::setStyle(hsDividerWidget, style::properties::widget::basicBackground, true, true);
+		parentLayout->addWidget(hsDividerWidget);
 	}
-	parentLayout->addWidget(hsDividerWidget);
 
 	// 4. RF PLL Phase Sync Mode - ComboWidget
-	QMap<QString, QString> *phaseSyncOptions = new QMap<QString, QString>();
-	phaseSyncOptions->insert("0", "NOSYNC");
-	phaseSyncOptions->insert("1", "INIT_TRACK");
-	phaseSyncOptions->insert("2", "INIT_1TRACK");
-	phaseSyncOptions->insert("3", "INIT_CONTTRACK");
+	m_phaseSyncOptions = new QMap<QString, QString>();
+	m_phaseSyncOptions->insert("0", "NOSYNC");
+	m_phaseSyncOptions->insert("1", "INIT_TRACK");
+	m_phaseSyncOptions->insert("2", "INIT_1TRACK");
+	m_phaseSyncOptions->insert("3", "INIT_CONTTRACK");
 
 	IIOWidget *phaseSyncModeWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,dig-clocks-rf-pll-phase-sync-mode", phaseSyncOptions, "Phase Sync Mode");
+		m_device, "adi,dig-clocks-rf-pll-phase-sync-mode", m_phaseSyncOptions, "Phase Sync Mode");
 	if(phaseSyncModeWidget) {
 		Style::setStyle(phaseSyncModeWidget, style::properties::widget::basicBackground, true, true);
+		parentLayout->addWidget(phaseSyncModeWidget);
 	}
-	parentLayout->addWidget(phaseSyncModeWidget);
 
 	// 5. RF PLL Use External LO - CheckboxWidget
 	IIOWidget *externalLoWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, "adi,dig-clocks-rf-pll-use-external-lo", "Use External LO");
 	if(externalLoWidget) {
 		Style::setStyle(externalLoWidget, style::properties::widget::basicBackground, true, true);
+		parentLayout->addWidget(externalLoWidget);
 	}
-	parentLayout->addWidget(externalLoWidget);
 
 	// Add stretch to push content to top
 	parentLayout->addStretch();
