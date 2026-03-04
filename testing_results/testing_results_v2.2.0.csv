@@ -59,9 +59,9 @@ TST.DEV.MULTI_CONN,core,P1,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
 TST.DEV.RM_MULTI,core,P1,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
 TST.DEV.ADD_ORDER,core,P0,PASS,Windows 11,,Muthi Ionut,dev_tests.rst
 TST.START.APPIMAGE.X86_64,core,P3,PASS,Ubuntu 24.04,,Muthi Ionut,install_tests.rst
-TST.START.APPIMAGE.X86_64,core,P3,PASS,Ubuntu 24.04,,Muthi Ionut,install_tests.rst
-TST.START.APPIMAGE.X86_64,core,P3,,,,,install_tests.rst
-TST.START.MACOS,core,P3,,,,,install_tests.rst
+TST.START.APPIMAGE.ARM32,core,P3,FAIL,Kuiper2 Debian 13,execv error: Exec format error outdated AppImage runtime,Bindea Cristian,install_tests.rst
+TST.START.APPIMAGE.ARM64,core,P3,PASS,Kuiper2 Debian 13,,Bindea Cristian,install_tests.rst
+TST.START.MACOS,core,P3,PASS,macOS 15,Tested both intel and arm,Bindea Cristian,install_tests.rst
 TST.START.WINDOWS,core,P3,PASS,Windows 11,,Muthi Ionut,install_tests.rst
 TST.ADC_TIME.X_AXIS,adc,P0,PASS,Ubuntu 22.10,,script,adc_tests.rst
 TST.ADC_TIME.Y_AXIS,adc,P3,PASS,Ubuntu 22.10,,script,adc_tests.rst
@@ -109,7 +109,7 @@ TST.ADRV9002.PROFILE_GEN.CLI_AVAILABLE,adrv9002,P3,PASS,Ubuntu 24.04,,script,pro
 TST.ADRV9002.PROFILE_GEN.LTE_DEFAULT_CONFIG,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
 TST.ADRV9002.PROFILE_GEN.LTE_CONFIG_MODIFY,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
 TST.ADRV9002.PROFILE_GEN.LIVE_DEVICE_READ,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
-TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
+TST.ADRV9002.PROFILE_GEN.STREAM_FILE_GENERATION,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
 TST.ADRV9002.PROFILE_GEN.PROFILE_FILE_GENERATION,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
 TST.ADRV9002.PROFILE_GEN.LOAD_TO_DEVICE,adrv9002,P3,PASS,Ubuntu 24.04,,script,profile_generator_tests.rst
 TST.ADRV9002.CONTROLS.PLUGIN_LOADS,adrv9002,P0,PASS,Ubuntu 24.04,,script,adrv9002_tests.rst
