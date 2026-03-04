@@ -21,6 +21,7 @@
 #ifndef JESDDEFRAMERWIDGET_H
 #define JESDDEFRAMERWIDGET_H
 
+#include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
@@ -29,7 +30,7 @@
 namespace scopy {
 namespace adrv9009 {
 
-class JesdDeframerWidget : public QWidget
+class SCOPY_ADRV9009PLUGIN_EXPORT JesdDeframerWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -45,6 +46,8 @@ private:
 	QWidget *createDeframerColumn(const QString &columnType, const QString &attrPrefix, QWidget *parent);
 
 	iio_device *m_device;
+	QMap<QString, QString> *m_mOptions;
+	QMap<QString, QString> *m_npOptions;
 };
 
 } // namespace adrv9009
