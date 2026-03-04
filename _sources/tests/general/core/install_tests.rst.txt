@@ -106,7 +106,7 @@ Linux Operating System with x86_64 architecture.
 Test 2: Check Scopy AppImage arm32
 -----------------------------------
 
-**UID:** TST.START.APPIMAGE.X86_64
+**UID:** TST.START.APPIMAGE.ARM32
 
 **RBP:** P3
 
@@ -114,7 +114,7 @@ Test 2: Check Scopy AppImage arm32
 Linux Operating System with arm32 architecture.
 
 **Preconditions:**
-    - OS: Linux intel arm32
+    - OS: Linux arm32
     - libfuse2 is required in order to execute an AppImage, install it using
       **sudo apt-get install**
 
@@ -190,7 +190,7 @@ Linux Operating System with arm32 architecture.
 Test 3: Check if Scopy AppImage arm64 opens correctly
 -------------------------------------------------------
 
-**UID:** TST.START.APPIMAGE.X86_64
+**UID:** TST.START.APPIMAGE.ARM64
 
 **RBP:** P3
 
@@ -198,7 +198,7 @@ Test 3: Check if Scopy AppImage arm64 opens correctly
 Linux Operating System with arm64 architecture.
 
 **Preconditions:**
-    - OS: Linux intel arm64
+    - OS: Linux arm64
     - libfuse2 is required in order to execute an AppImage, install it using
       **sudo apt-get install**
 
