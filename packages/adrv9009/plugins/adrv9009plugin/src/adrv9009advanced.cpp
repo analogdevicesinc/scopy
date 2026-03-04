@@ -264,48 +264,51 @@ void Adrv9009Advanced::createContentWidgets()
 	if(m_clkSettings) {
 		// Connect clock settings signals
 		connect(this, &Adrv9009Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);
-		if(m_calibrations != nullptr) {
-			connect(this, &Adrv9009Advanced::readRequested, m_calibrations,
-				&CalibrationWidget::readRequested);
-		}
+	}
 
-		// Add all widgets to stacked widget
-		m_centralWidget->addWidget(m_clkSettings);
-		m_centralWidget->addWidget(m_calibrations);
-		m_centralWidget->addWidget(m_txSettings);
-		m_centralWidget->addWidget(m_rxSettings);
-		m_centralWidget->addWidget(m_orxSettings);
-		m_centralWidget->addWidget(m_fhmSetup);
-		m_centralWidget->addWidget(m_paProtection);
-		m_centralWidget->addWidget(m_gainSetup);
-		m_centralWidget->addWidget(m_agcSetup);
-		m_centralWidget->addWidget(m_gpioConfig);
-		m_centralWidget->addWidget(m_auxDac);
-		m_centralWidget->addWidget(m_jesd204Settings);
-		m_centralWidget->addWidget(m_bist);
-
-		// Connect auxDac widget readRequested signal
-		if(m_auxDac) {
-			connect(this, &Adrv9009Advanced::readRequested, m_auxDac, &AuxDacWidget::readRequested);
-		}
-
-		// Set first widget as current (CLK Settings)
-		m_centralWidget->setCurrentWidget(m_clkSettings);
-		if(m_txSettings) {
-			connect(this, &Adrv9009Advanced::readRequested, m_txSettings, &TxSettingsWidget::readRequested);
-		}
-		if(m_rxSettings) {
-			connect(this, &Adrv9009Advanced::readRequested, m_rxSettings, &RxSettingsWidget::readRequested);
-		}
-		if(m_orxSettings) {
-			connect(this, &Adrv9009Advanced::readRequested, m_orxSettings,
-				&OrxSettingsWidget::readRequested);
-		}
+	if(m_calibrations != nullptr) {
+		connect(this, &Adrv9009Advanced::readRequested, m_calibrations,
+			&CalibrationWidget::readRequested);
 	}
 
 	if(m_agcSetup) {
 		connect(this, &Adrv9009Advanced::readRequested, m_agcSetup, &AgcSetupWidget::readRequested);
 	}
+
+	if(m_auxDac) {
+		connect(this, &Adrv9009Advanced::readRequested, m_auxDac, &AuxDacWidget::readRequested);
+	}
+
+	if(m_txSettings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_txSettings, &TxSettingsWidget::readRequested);
+	}
+
+	if(m_rxSettings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_rxSettings, &RxSettingsWidget::readRequested);
+	}
+
+	if(m_orxSettings) {
+		connect(this, &Adrv9009Advanced::readRequested, m_orxSettings,
+			&OrxSettingsWidget::readRequested);
+	}
+
+	// Add all widgets to stacked widget
+	m_centralWidget->addWidget(m_clkSettings);
+	m_centralWidget->addWidget(m_calibrations);
+	m_centralWidget->addWidget(m_txSettings);
+	m_centralWidget->addWidget(m_rxSettings);
+	m_centralWidget->addWidget(m_orxSettings);
+	m_centralWidget->addWidget(m_fhmSetup);
+	m_centralWidget->addWidget(m_paProtection);
+	m_centralWidget->addWidget(m_gainSetup);
+	m_centralWidget->addWidget(m_agcSetup);
+	m_centralWidget->addWidget(m_gpioConfig);
+	m_centralWidget->addWidget(m_auxDac);
+	m_centralWidget->addWidget(m_jesd204Settings);
+	m_centralWidget->addWidget(m_bist);
+
+	// Set first widget as current (CLK Settings)
+	m_centralWidget->setCurrentWidget(m_clkSettings);
 }
 
 void Adrv9009Advanced::updateNavigationButtonsLayout()
