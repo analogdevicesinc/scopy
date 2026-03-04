@@ -21,13 +21,14 @@
 #ifndef AGCSETUPWIDGET_H
 #define AGCSETUPWIDGET_H
 
+#include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
 
 namespace scopy::adrv9009 {
 
-class AgcSetupWidget : public QWidget
+class SCOPY_ADRV9009PLUGIN_EXPORT AgcSetupWidget : public QWidget
 {
 	Q_OBJECT
 
