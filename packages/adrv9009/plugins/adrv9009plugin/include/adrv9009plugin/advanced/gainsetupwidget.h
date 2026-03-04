@@ -21,6 +21,7 @@
 #ifndef GAINSETUPWIDGET_H
 #define GAINSETUPWIDGET_H
 
+#include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <iio.h>
 
@@ -31,7 +32,7 @@ class MenuSectionCollapseWidget;
 
 namespace adrv9009 {
 
-class GainSetupWidget : public QWidget
+class SCOPY_ADRV9009PLUGIN_EXPORT GainSetupWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -48,6 +49,7 @@ private:
 	QWidget *createObservationGainSection(QWidget *parent);
 
 	iio_device *m_device;
+	QMap<QString, QString> *m_gainModeOptions;
 };
 
 } // namespace adrv9009

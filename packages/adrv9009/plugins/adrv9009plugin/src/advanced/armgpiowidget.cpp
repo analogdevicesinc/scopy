@@ -119,7 +119,7 @@ void ArmGpioWidget::setupUi()
 
 	// Enable widget
 	auto orx1Sel1EnableWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-enable", "Enable", contentWidget);
+		m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-enable", "Enable", contentWidget);
 	if(orx1Sel1EnableWidget) {
 		contentLayout->addWidget(orx1Sel1EnableWidget, 1, 1);
 		orx1Sel1EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
