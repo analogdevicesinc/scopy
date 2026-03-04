@@ -21,6 +21,7 @@
 #ifndef JESDSETTINGSWIDGET_H
 #define JESDSETTINGSWIDGET_H
 
+#include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
@@ -29,7 +30,7 @@
 namespace scopy {
 namespace adrv9009 {
 
-class JesdSettingsWidget : public QWidget
+class SCOPY_ADRV9009PLUGIN_EXPORT JesdSettingsWidget : public QWidget
 {
 	Q_OBJECT
 

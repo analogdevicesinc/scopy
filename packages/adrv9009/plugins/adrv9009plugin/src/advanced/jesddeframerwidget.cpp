@@ -33,11 +33,13 @@
 Q_LOGGING_CATEGORY(CAT_JESDDEFRAMER, "JesdDeframer")
 
 using namespace scopy;
-using namespace adrv9009;
+using namespace scopy::adrv9009;
 
 JesdDeframerWidget::JesdDeframerWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_mOptions(nullptr)
+	, m_npOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_JESDDEFRAMER) << "No device provided to JESD Deframer widget";
@@ -50,7 +52,13 @@ JesdDeframerWidget::JesdDeframerWidget(iio_device *device, QWidget *parent)
 	Style::setStyle(this, style::properties::widget::border_interactive);
 }
 
-JesdDeframerWidget::~JesdDeframerWidget() {}
+JesdDeframerWidget::~JesdDeframerWidget()
+{
+	m_mOptions = nullptr;
+	delete m_mOptions;
+	m_npOptions = nullptr;
+	delete m_npOptions;
+}
 
 void JesdDeframerWidget::setupUi()
 {
@@ -126,12 +134,12 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	}
 
 	// 4. M - Combobox [0,2,4]
-	QMap<QString, QString> *mOptions = new QMap<QString, QString>();
-	mOptions->insert("0", "0");
-	mOptions->insert("2", "2");
-	mOptions->insert("4", "4");
+	m_mOptions = new QMap<QString, QString>();
+	m_mOptions->insert("0", "0");
+	m_mOptions->insert("2", "2");
+	m_mOptions->insert("4", "4");
 	IIOWidget *mWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), mOptions, "M");
+		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), m_mOptions, "M");
 	if(mWidget) {
 		column->contentLayout()->addWidget(mWidget);
 		connect(this, &JesdDeframerWidget::readRequested, mWidget, &IIOWidget::readAsync);
@@ -251,11 +259,11 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	}
 
 	// 13. NP - Custom Combo [12,16]
-	QMap<QString, QString> *npOptions = new QMap<QString, QString>();
-	npOptions->insert("12", "12");
-	npOptions->insert("16", "16");
+	QMap<QString, QString> *m_m_npOptions = new QMap<QString, QString>();
+	m_npOptions->insert("12", "12");
+	m_npOptions->insert("16", "16");
 	IIOWidget *npWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), npOptions, "NP");
+		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), m_npOptions, "NP");
 	if(npWidget) {
 		column->contentLayout()->addWidget(npWidget);
 		connect(this, &JesdDeframerWidget::readRequested, npWidget, &IIOWidget::readAsync);
