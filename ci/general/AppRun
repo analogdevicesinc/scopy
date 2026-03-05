@@ -35,6 +35,14 @@ elif [ "$UNINSTALL" == "ON" ]; then
 	exit
 fi
 
+if [ "$(uname -m)" == "armv7l" ]; then
+	# Starting with glibc 2.41, libraries requiring an executable stack
+	# cannot be dynamically loaded through the dlopen mechanism from a binary
+	# that does not require an executable stack.
+	# https://lists.debian.org/debian-release/2025/04/msg00206.html
+	# https://lists.gnu.org/archive/html/info-gnu/2025-01/msg00014.html
+	export GLIBC_TUNABLES=glibc.rtld.execstack=2 # needed for libvolk.so
+fi
 
 export QT_PLUGIN_PATH=$HERE/usr/plugins
 export QT_QPA_PLATFORM_PLUGIN_PATH=$HERE/usr/plugins/platforms
