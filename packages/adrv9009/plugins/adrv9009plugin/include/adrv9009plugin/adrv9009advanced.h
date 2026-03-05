@@ -30,13 +30,6 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio.h>
-#include <advanced/auxdacwidget.h>
-#include <advanced/bistwidget.h>
-#include <advanced/calibrationwidget.h>
-#include <advanced/jesdsettingswidget.h>
-#include <advanced/jesdframerwidget.h>
-#include <advanced/jesddeframerwidget.h>
-
 
 // Forward declarations for section widgets
 namespace scopy::adrv9009 {
@@ -49,6 +42,12 @@ class GainSetupWidget;
 class ArmGpioWidget;
 class ClkSettingsWidget;
 class AgcSetupWidget;
+class CalibrationWidget;
+class AuxDacWidget;
+class BistWidget;
+class JesdSettingsWidget;
+class JesdFramerWidget;
+class JesdDeframerWidget;
 
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 {
@@ -107,7 +106,7 @@ private:
 	JesdSettingsWidget *m_jesd204Settings = nullptr;
 	JesdFramerWidget *m_jesdFramer = nullptr;
 	JesdDeframerWidget *m_jesdDeframer = nullptr;
-	
+
 	void setupUi();
 	void createNavigationButtons();
 	void createContentWidgets();

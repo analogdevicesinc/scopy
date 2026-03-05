@@ -55,12 +55,18 @@ JesdFramerWidget::JesdFramerWidget(iio_device *device, QWidget *parent)
 
 JesdFramerWidget::~JesdFramerWidget()
 {
-	m_mOptions = nullptr;
-	delete m_mOptions;
-	m_fOptions = nullptr;
-	delete m_fOptions;
-	m_npOptions = nullptr;
-	delete m_npOptions;
+	if(m_mOptions != nullptr) {
+		m_mOptions = nullptr;
+		delete m_mOptions;
+	}
+	if(m_mOptions != nullptr) {
+		m_fOptions = nullptr;
+		delete m_fOptions;
+	}
+	if(m_mOptions != nullptr) {
+		m_npOptions = nullptr;
+		delete m_npOptions;
+	}
 }
 
 void JesdFramerWidget::setupUi()
@@ -191,6 +197,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-scramble").arg(attrPrefix), "Scramble");
 	if(scrambleWidget) {
 		column->contentLayout()->addWidget(scrambleWidget);
+		scrambleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, scrambleWidget, &IIOWidget::readAsync);
 	}
 
@@ -199,6 +206,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-external-sysref").arg(attrPrefix), "External SYSREF");
 	if(extSysrefWidget) {
 		column->contentLayout()->addWidget(extSysrefWidget);
+		extSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, extSysrefWidget, &IIOWidget::readAsync);
 	}
 
@@ -212,9 +220,13 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 	scopy::MenuOnOffSwitch *lane3 = new scopy::MenuOnOffSwitch("Serializer Lane 3", column);
 
 	column->contentLayout()->addWidget(lane0);
+	lane0->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	column->contentLayout()->addWidget(lane1);
+	lane1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	column->contentLayout()->addWidget(lane2);
+	lane2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	column->contentLayout()->addWidget(lane3);
+	lane3->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	// Function to update hardware from all switches
 	auto updateHardware = [this, baseAttr, lane0, lane1, lane2, lane3]() {
@@ -276,6 +288,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-new-sysref-on-relink").arg(attrPrefix), "New SYSREF on Relink");
 	if(newSysrefWidget) {
 		column->contentLayout()->addWidget(newSysrefWidget);
+		newSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, newSysrefWidget, &IIOWidget::readAsync);
 	}
 
@@ -284,6 +297,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-syncb-in-select").arg(attrPrefix), "SYNCB In Select");
 	if(syncbInWidget) {
 		column->contentLayout()->addWidget(syncbInWidget);
+		syncbInWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, syncbInWidget, &IIOWidget::readAsync);
 	}
 
@@ -292,6 +306,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-over-sample").arg(attrPrefix), "Over Sample");
 	if(overSampleWidget) {
 		column->contentLayout()->addWidget(overSampleWidget);
+		overSampleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, overSampleWidget, &IIOWidget::readAsync);
 	}
 
@@ -300,6 +315,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-syncb-in-lvds-mode").arg(attrPrefix), "SYNCB In LVDS Mode");
 	if(syncbLvdsModeWidget) {
 		column->contentLayout()->addWidget(syncbLvdsModeWidget);
+		syncbLvdsModeWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, syncbLvdsModeWidget, &IIOWidget::readAsync);
 	}
 
@@ -308,6 +324,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-syncb-in-lvds-pn-invert").arg(attrPrefix), "SYNCB In LVDS PN Invert");
 	if(syncbLvdsPnWidget) {
 		column->contentLayout()->addWidget(syncbLvdsPnWidget);
+		syncbLvdsPnWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, syncbLvdsPnWidget, &IIOWidget::readAsync);
 	}
 
@@ -316,6 +333,7 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnType, const Q
 		m_device, QString("adi,jesd204-%1-enable-manual-lane-xbar").arg(attrPrefix), "Enable Manual Lane XBAR");
 	if(enableManualXbarWidget) {
 		column->contentLayout()->addWidget(enableManualXbarWidget);
+		enableManualXbarWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, enableManualXbarWidget, &IIOWidget::readAsync);
 	}
 

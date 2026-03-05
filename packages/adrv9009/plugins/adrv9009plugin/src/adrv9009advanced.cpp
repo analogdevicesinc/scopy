@@ -28,6 +28,12 @@
 #include "advanced/paprotectionwidget.h"
 #include "advanced/gainsetupwidget.h"
 #include "advanced/armgpiowidget.h"
+#include "advanced/auxdacwidget.h"
+#include "advanced/bistwidget.h"
+#include "advanced/calibrationwidget.h"
+#include "advanced/jesdsettingswidget.h"
+#include "advanced/jesdframerwidget.h"
+#include "advanced/jesddeframerwidget.h"
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
