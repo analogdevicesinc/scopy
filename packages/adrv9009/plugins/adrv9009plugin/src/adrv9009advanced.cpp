@@ -23,14 +23,11 @@
 #include "advanced/rxsettingswidget.h"
 #include "advanced/orxsettingswidget.h"
 #include "advanced/clksettingswidget.h"
-<<<<<<< HEAD
 #include "advanced/agcsetupwidget.h"
-=======
 #include "advanced/fhmsetupwidget.h"
 #include "advanced/paprotectionwidget.h"
 #include "advanced/gainsetupwidget.h"
 #include "advanced/armgpiowidget.h"
->>>>>>> 2e4767a20 (adrv9009: adrv9009 advanced fhm, pa protection, gain, arm gpio)
 #include <QFutureWatcher>
 #include <QtConcurrent>
 #include <QLabel>
@@ -264,15 +261,13 @@ void Adrv9009Advanced::createContentWidgets()
 	m_jesd204Settings = createPlaceholderWidget("JESD204 Settings");
 	m_bist = new BistWidget(m_device, this);
 
-
 	if(m_clkSettings) {
 		// Connect clock settings signals
 		connect(this, &Adrv9009Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);
 	}
 
 	if(m_calibrations != nullptr) {
-		connect(this, &Adrv9009Advanced::readRequested, m_calibrations,
-			&CalibrationWidget::readRequested);
+		connect(this, &Adrv9009Advanced::readRequested, m_calibrations, &CalibrationWidget::readRequested);
 	}
 
 	if(m_agcSetup) {
@@ -292,8 +287,7 @@ void Adrv9009Advanced::createContentWidgets()
 	}
 
 	if(m_orxSettings) {
-		connect(this, &Adrv9009Advanced::readRequested, m_orxSettings,
-			&OrxSettingsWidget::readRequested);
+		connect(this, &Adrv9009Advanced::readRequested, m_orxSettings, &OrxSettingsWidget::readRequested);
 	}
 
 	if(m_fhmSetup) {
@@ -307,11 +301,11 @@ void Adrv9009Advanced::createContentWidgets()
 	if(m_gainSetup) {
 		connect(this, &Adrv9009Advanced::readRequested, m_gainSetup, &GainSetupWidget::readRequested);
 	}
-	
+
 	if(m_gpioConfig) {
 		connect(this, &Adrv9009Advanced::readRequested, m_gpioConfig, &ArmGpioWidget::readRequested);
 	}
-	
+
 	if(m_bist != nullptr) {
 		connect(this, &Adrv9009Advanced::readRequested, m_bist, &BistWidget::readRequested);
 	}

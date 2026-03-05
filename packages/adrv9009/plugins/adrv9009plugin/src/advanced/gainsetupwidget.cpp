@@ -54,8 +54,10 @@ GainSetupWidget::GainSetupWidget(iio_device *device, QWidget *parent)
 
 GainSetupWidget::~GainSetupWidget()
 {
-	m_gainModeOptions = nullptr;
-	delete m_gainModeOptions;
+	if(m_gainModeOptions != nullptr) {
+		m_gainModeOptions = nullptr;
+		delete m_gainModeOptions;
+	}
 }
 
 void GainSetupWidget::setupUi()

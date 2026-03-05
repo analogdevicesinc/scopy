@@ -53,10 +53,14 @@ ClkSettingsWidget::ClkSettingsWidget(iio_device *device, QWidget *parent)
 
 ClkSettingsWidget::~ClkSettingsWidget()
 {
-	m_hsDivOptions = nullptr;
-	delete m_hsDivOptions;
-	m_phaseSyncOptions = nullptr;
-	delete m_phaseSyncOptions;
+	if(m_hsDivOptions != nullptr) {
+		m_hsDivOptions = nullptr;
+		delete m_hsDivOptions;
+	}
+	if(m_phaseSyncOptions != nullptr) {
+		m_phaseSyncOptions = nullptr;
+		delete m_phaseSyncOptions;
+	}
 }
 
 void ClkSettingsWidget::setupUi()
