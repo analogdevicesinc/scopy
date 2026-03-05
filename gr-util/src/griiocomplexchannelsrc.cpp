@@ -26,6 +26,7 @@
 #include "grtopblock.h"
 #include <gnuradio/blocks/short_to_float.h>
 #include <gnuradio/blocks/int_to_float.h>
+#include <gnuradio/blocks/char_to_float.h>
 #include "gnuradio/blocks/copy.h"
 
 #include <QDebug>
@@ -46,6 +47,10 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 	qDebug(SCOPY_GR_UTIL) << "Building GRIIOComplexChannelSrc";
 	m_dev->addChannel(this);
 	switch(fmt->length) {
+	case 8:
+		x2f[0] = gr::blocks::char_to_float::make();
+		x2f[1] = gr::blocks::char_to_float::make();
+		break;
 	case 16:
 		x2f[0] = gr::blocks::short_to_float::make();
 		x2f[1] = gr::blocks::short_to_float::make();
@@ -54,11 +59,16 @@ void GRIIOComplexChannelSrc::build_blks(GRTopBlock *top)
 		x2f[0] = gr::blocks::int_to_float::make();
 		x2f[1] = gr::blocks::int_to_float::make();
 		break;
-	default:
-		qInfo(SCOPY_GR_UTIL) << "creating copy block of size " << fmt->length / 8;
-		x2f[0] = gr::blocks::copy::make(fmt->length / 8);
-		x2f[1] = gr::blocks::copy::make(fmt->length / 8);
+	default: {
+		static gr::logger logger("GRIIOComplexChannelSrc::build_blks");
+		std::string msg = "Unsupported IIO channel bit width: " + std::to_string(fmt->length) +
+			" - falling back to float copy block, data may be incorrect";
+		qCritical(SCOPY_GR_UTIL) << QString::fromStdString(msg);
+		logger.crit("{}", msg);
+		x2f[0] = gr::blocks::copy::make(sizeof(float));
+		x2f[1] = gr::blocks::copy::make(sizeof(float));
 		break;
+	}
 	}
 
 	f2c = gr::blocks::float_to_complex::make();
