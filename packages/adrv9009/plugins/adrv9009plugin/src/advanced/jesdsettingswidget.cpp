@@ -117,6 +117,7 @@ void JesdSettingsWidget::setupUi()
 									  "SYSREF LVDS MODE");
 	if(sysrefLvdsMode) {
 		settingsSection->contentLayout()->addWidget(sysrefLvdsMode);
+		sysrefLvdsMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdSettingsWidget::readRequested, sysrefLvdsMode, &IIOWidget::readAsync);
 	}
 
@@ -125,6 +126,7 @@ void JesdSettingsWidget::setupUi()
 		m_device, "adi,jesd204-sysref-lvds-pn-invert", "SYSREF LVDS PN INVERT");
 	if(sysrefLvdsPnInvert) {
 		settingsSection->contentLayout()->addWidget(sysrefLvdsPnInvert);
+		sysrefLvdsPnInvert->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdSettingsWidget::readRequested, sysrefLvdsPnInvert, &IIOWidget::readAsync);
 	}
 

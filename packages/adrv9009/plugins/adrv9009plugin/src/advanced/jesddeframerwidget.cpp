@@ -54,10 +54,14 @@ JesdDeframerWidget::JesdDeframerWidget(iio_device *device, QWidget *parent)
 
 JesdDeframerWidget::~JesdDeframerWidget()
 {
-	m_mOptions = nullptr;
-	delete m_mOptions;
-	m_npOptions = nullptr;
-	delete m_npOptions;
+	if(m_mOptions != nullptr) {
+		m_mOptions = nullptr;
+		delete m_mOptions;
+	}
+	if(m_npOptions != nullptr) {
+		m_npOptions = nullptr;
+		delete m_npOptions;
+	}
 }
 
 void JesdDeframerWidget::setupUi()
@@ -160,6 +164,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		m_device, QString("adi,jesd204-%1-scramble").arg(attrPrefix), "Scramble");
 	if(scrambleWidget) {
 		column->contentLayout()->addWidget(scrambleWidget);
+		scrambleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, scrambleWidget, &IIOWidget::readAsync);
 	}
 
@@ -168,6 +173,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		m_device, QString("adi,jesd204-%1-external-sysref").arg(attrPrefix), "External SYSREF");
 	if(extSysrefWidget) {
 		column->contentLayout()->addWidget(extSysrefWidget);
+		extSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, extSysrefWidget, &IIOWidget::readAsync);
 	}
 
@@ -181,9 +187,13 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	scopy::MenuOnOffSwitch *lane3 = new scopy::MenuOnOffSwitch("Deserializer Lane 3", column);
 
 	column->contentLayout()->addWidget(lane0);
+	lane0->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	column->contentLayout()->addWidget(lane1);
+	lane1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	column->contentLayout()->addWidget(lane2);
+	lane2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	column->contentLayout()->addWidget(lane3);
+	lane3->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
 	// Function to update hardware from all switches
 	auto updateHardware = [this, baseAttr, lane0, lane1, lane2, lane3]() {
@@ -245,6 +255,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		m_device, QString("adi,jesd204-%1-new-sysref-on-relink").arg(attrPrefix), "New SYSREF on Relink");
 	if(newSysrefWidget) {
 		column->contentLayout()->addWidget(newSysrefWidget);
+		newSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, newSysrefWidget, &IIOWidget::readAsync);
 	}
 
@@ -253,13 +264,14 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		m_device, QString("adi,jesd204-%1-syncb-out-select").arg(attrPrefix), "SYNCB Out Select");
 	if(syncbSelectWidget) {
 		column->contentLayout()->addWidget(syncbSelectWidget);
+		syncbSelectWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, syncbSelectWidget, &IIOWidget::readAsync);
 		syncbSelectWidget->getUiStrategy()->setInfoMessage(
 			"Selects deframer SYNCBOUT pin (0 = SYNCBOUT0, 1 = SYNCBOUT1)");
 	}
 
 	// 13. NP - Custom Combo [12,16]
-	QMap<QString, QString> *m_m_npOptions = new QMap<QString, QString>();
+	m_npOptions = new QMap<QString, QString>();
 	m_npOptions->insert("12", "12");
 	m_npOptions->insert("16", "16");
 	IIOWidget *npWidget = Adrv9009WidgetFactory::createCustomComboWidget(
@@ -274,6 +286,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		m_device, QString("adi,jesd204-%1-syncb-out-lvds-mode").arg(attrPrefix), "SYNCB Out LVDS Mode");
 	if(lvdsModeWidget) {
 		column->contentLayout()->addWidget(lvdsModeWidget);
+		lvdsModeWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, lvdsModeWidget, &IIOWidget::readAsync);
 	}
 
@@ -283,6 +296,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		"SYNCB Out LVDS PN Invert");
 	if(lvdsPnInvertWidget) {
 		column->contentLayout()->addWidget(lvdsPnInvertWidget);
+		lvdsPnInvertWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, lvdsPnInvertWidget, &IIOWidget::readAsync);
 	}
 
@@ -301,6 +315,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		"SYNCB Out CMOS Drive Level");
 	if(cmosDriveWidget) {
 		column->contentLayout()->addWidget(cmosDriveWidget);
+		cmosDriveWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, cmosDriveWidget, &IIOWidget::readAsync);
 	}
 
@@ -310,6 +325,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		"Enable Manual Lane Crossbar");
 	if(manualXbarWidget) {
 		column->contentLayout()->addWidget(manualXbarWidget);
+		manualXbarWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, manualXbarWidget, &IIOWidget::readAsync);
 	}
 
