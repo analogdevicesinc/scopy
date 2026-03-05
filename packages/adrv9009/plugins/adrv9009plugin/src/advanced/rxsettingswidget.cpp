@@ -105,10 +105,10 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// RX FIR Decimation - Combobox [1,2,4]
-	QMap<QString, QString> *firDecimationOptions = new QMap<QString, QString>();
-	firDecimationOptions->insert("1", "1");
-	firDecimationOptions->insert("2", "2");
-	firDecimationOptions->insert("4", "4");
+	QMap<QString, QString> firDecimationOptions;
+	firDecimationOptions.insert("1", "1");
+	firDecimationOptions.insert("2", "2");
+	firDecimationOptions.insert("4", "4");
 	auto firDecimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,rx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation");
 	if(firDecimation) {
@@ -117,9 +117,9 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	}
 
 	// RX DEC5 Decimation - Combobox [4,5]
-	QMap<QString, QString> *dec5DecimationOptions = new QMap<QString, QString>();
-	dec5DecimationOptions->insert("4", "4");
-	dec5DecimationOptions->insert("5", "5");
+	QMap<QString, QString> dec5DecimationOptions;
+	dec5DecimationOptions.insert("4", "4");
+	dec5DecimationOptions.insert("5", "5");
 	auto dec5Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,rx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation");
 	if(dec5Decimation) {
@@ -128,9 +128,9 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	}
 
 	// RHB1 Decimation - Combobox [1,2]
-	QMap<QString, QString> *rhb1DecimationOptions = new QMap<QString, QString>();
-	rhb1DecimationOptions->insert("1", "1");
-	rhb1DecimationOptions->insert("2", "2");
+	QMap<QString, QString> rhb1DecimationOptions;
+	rhb1DecimationOptions.insert("1", "1");
+	rhb1DecimationOptions.insert("2", "2");
 	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-profile-rhb1-decimation",
 									     rhb1DecimationOptions, "RHB1 Decimation");
 	if(rhb1Decimation) {
@@ -163,15 +163,15 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	}
 
 	// RX DDC Mode - Combobox with complete iio-osc mappings [0,1,2,3,4,5,6,7]
-	QMap<QString, QString> *ddcModeOptions = new QMap<QString, QString>();
-	ddcModeOptions->insert("0", "BYPASS");
-	ddcModeOptions->insert("1", "FILTERONLY");
-	ddcModeOptions->insert("2", "INT2");
-	ddcModeOptions->insert("3", "DEC2");
-	ddcModeOptions->insert("4", "BYPASS_REALIF");
-	ddcModeOptions->insert("5", "FILTERONLY_REALIF");
-	ddcModeOptions->insert("6", "INT2_REALIF");
-	ddcModeOptions->insert("7", "DEC2_REALIF");
+	QMap<QString, QString> ddcModeOptions;
+	ddcModeOptions.insert("0", "BYPASS");
+	ddcModeOptions.insert("1", "FILTERONLY");
+	ddcModeOptions.insert("2", "INT2");
+	ddcModeOptions.insert("3", "DEC2");
+	ddcModeOptions.insert("4", "BYPASS_REALIF");
+	ddcModeOptions.insert("5", "FILTERONLY_REALIF");
+	ddcModeOptions.insert("6", "INT2_REALIF");
+	ddcModeOptions.insert("7", "DEC2_REALIF");
 	auto ddcMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-profile-rx-ddc-mode",
 								      ddcModeOptions, "RX DDC Mode");
 	if(ddcMode) {
@@ -358,13 +358,13 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 	}
 
 	// Gain inc pin combobox - options depend on channel
-	QMap<QString, QString> *incOptions = new QMap<QString, QString>();
+	QMap<QString, QString> incOptions;
 	if(channel == 1) {
-		incOptions->insert("0", "0");
-		incOptions->insert("10", "10");
+		incOptions.insert("0", "0");
+		incOptions.insert("10", "10");
 	} else { // channel == 2
-		incOptions->insert("3", "3");
-		incOptions->insert("13", "13");
+		incOptions.insert("3", "3");
+		incOptions.insert("13", "13");
 	}
 	auto incPinWidget =
 		Adrv9009WidgetFactory::createCustomComboWidget(m_device, incPinAttr, incOptions, "RX GAIN INC PIN");
@@ -374,13 +374,13 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 	}
 
 	// Gain dec pin combobox - options depend on channel
-	QMap<QString, QString> *decOptions = new QMap<QString, QString>();
+	QMap<QString, QString> decOptions;
 	if(channel == 1) {
-		decOptions->insert("1", "1");
-		decOptions->insert("11", "11");
+		decOptions.insert("1", "1");
+		decOptions.insert("11", "11");
 	} else { // channel == 2
-		decOptions->insert("4", "4");
-		decOptions->insert("14", "14");
+		decOptions.insert("4", "4");
+		decOptions.insert("14", "14");
 	}
 	auto decPinWidget =
 		Adrv9009WidgetFactory::createCustomComboWidget(m_device, decPinAttr, decOptions, "RX GAIN DEC PIN");
@@ -408,11 +408,11 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// RX Channels - Combobox with iio-osc mappings [0,1,2,3] -> [RXOFF,RX1,RX2,RX1_and_RX2]
-	QMap<QString, QString> *rxChannelsOptions = new QMap<QString, QString>();
-	rxChannelsOptions->insert("0", "RXOFF");
-	rxChannelsOptions->insert("1", "RX1");
-	rxChannelsOptions->insert("2", "RX2");
-	rxChannelsOptions->insert("3", "RX1_and_RX2");
+	QMap<QString, QString> rxChannelsOptions;
+	rxChannelsOptions.insert("0", "RXOFF");
+	rxChannelsOptions.insert("1", "RX1");
+	rxChannelsOptions.insert("2", "RX2");
+	rxChannelsOptions.insert("3", "RX1_and_RX2");
 	auto rxChannels = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-settings-rx-channels",
 									 rxChannelsOptions, "RX Channel Enable");
 	if(rxChannels) {
@@ -421,10 +421,10 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	}
 
 	// Framer Selection - Combobox [0,1,2]
-	QMap<QString, QString> *framerSelOptions = new QMap<QString, QString>();
-	framerSelOptions->insert("0", "A");
-	framerSelOptions->insert("1", "B");
-	framerSelOptions->insert("2", "A_and_B");
+	QMap<QString, QString> framerSelOptions;
+	framerSelOptions.insert("0", "A");
+	framerSelOptions.insert("1", "B");
+	framerSelOptions.insert("2", "A_and_B");
 	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-settings-framer-sel",
 									framerSelOptions, "JESD204 Framer Selection");
 	if(framerSel) {

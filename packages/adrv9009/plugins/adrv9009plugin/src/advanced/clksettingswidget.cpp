@@ -36,8 +36,6 @@ using namespace scopy::adrv9009;
 ClkSettingsWidget::ClkSettingsWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
-	, m_hsDivOptions(nullptr)
-	, m_phaseSyncOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_ADRV9009_CLK_SETTINGS) << "No device provided to Clock Settings";
@@ -51,17 +49,7 @@ ClkSettingsWidget::ClkSettingsWidget(iio_device *device, QWidget *parent)
 	setupUi();
 }
 
-ClkSettingsWidget::~ClkSettingsWidget()
-{
-	if(m_hsDivOptions != nullptr) {
-		m_hsDivOptions = nullptr;
-		delete m_hsDivOptions;
-	}
-	if(m_phaseSyncOptions != nullptr) {
-		m_phaseSyncOptions = nullptr;
-		delete m_phaseSyncOptions;
-	}
-}
+ClkSettingsWidget::~ClkSettingsWidget() {}
 
 void ClkSettingsWidget::setupUi()
 {
@@ -122,29 +110,29 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	}
 
 	// 3. CLK PLL HS Div - ComboWidget
-	m_hsDivOptions = new QMap<QString, QString>();
-	m_hsDivOptions->insert("0", "2");
-	m_hsDivOptions->insert("1", "2.5");
-	m_hsDivOptions->insert("2", "3");
-	m_hsDivOptions->insert("3", "4");
-	m_hsDivOptions->insert("4", "5");
+	QMap<QString, QString> hsDivOptions;
+	hsDivOptions.insert("0", "2");
+	hsDivOptions.insert("1", "2.5");
+	hsDivOptions.insert("2", "3");
+	hsDivOptions.insert("3", "4");
+	hsDivOptions.insert("4", "5");
 
 	IIOWidget *hsDividerWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,dig-clocks-clk-pll-hs-div", m_hsDivOptions, "CLK PLL HS Divider");
+		m_device, "adi,dig-clocks-clk-pll-hs-div", hsDivOptions, "CLK PLL HS Divider");
 	if(hsDividerWidget) {
 		Style::setStyle(hsDividerWidget, style::properties::widget::basicBackground, true, true);
 		parentLayout->addWidget(hsDividerWidget);
 	}
 
 	// 4. RF PLL Phase Sync Mode - ComboWidget
-	m_phaseSyncOptions = new QMap<QString, QString>();
-	m_phaseSyncOptions->insert("0", "NOSYNC");
-	m_phaseSyncOptions->insert("1", "INIT_TRACK");
-	m_phaseSyncOptions->insert("2", "INIT_1TRACK");
-	m_phaseSyncOptions->insert("3", "INIT_CONTTRACK");
+	QMap<QString, QString> phaseSyncOptions;
+	phaseSyncOptions.insert("0", "NOSYNC");
+	phaseSyncOptions.insert("1", "INIT_TRACK");
+	phaseSyncOptions.insert("2", "INIT_1TRACK");
+	phaseSyncOptions.insert("3", "INIT_CONTTRACK");
 
 	IIOWidget *phaseSyncModeWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,dig-clocks-rf-pll-phase-sync-mode", m_phaseSyncOptions, "Phase Sync Mode");
+		m_device, "adi,dig-clocks-rf-pll-phase-sync-mode", phaseSyncOptions, "Phase Sync Mode");
 	if(phaseSyncModeWidget) {
 		Style::setStyle(phaseSyncModeWidget, style::properties::widget::basicBackground, true, true);
 		parentLayout->addWidget(phaseSyncModeWidget);

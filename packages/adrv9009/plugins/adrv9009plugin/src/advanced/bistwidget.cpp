@@ -40,7 +40,6 @@ using namespace scopy::adrv9009;
 BistWidget::BistWidget(iio_device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
-	, m_prbOptions(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_BIST) << "No device provided to BIST widget";
@@ -50,13 +49,7 @@ BistWidget::BistWidget(iio_device *device, QWidget *parent)
 	setupUi();
 }
 
-BistWidget::~BistWidget()
-{
-	if(m_prbOptions != nullptr) {
-		m_prbOptions = nullptr;
-		delete m_prbOptions;
-	}
-}
+BistWidget::~BistWidget() {}
 
 void BistWidget::setupUi()
 {
@@ -152,30 +145,30 @@ QWidget *BistWidget::createFramerPrbsSection(QWidget *parent)
 	layout->setSpacing(15);
 
 	// Create PRBS options map (from glade file analysis: 11 options, values 0-8, 14-15)
-	m_prbOptions = new QMap<QString, QString>();
-	m_prbOptions->insert("0", "ADC_DATA");
-	m_prbOptions->insert("1", "CHECKERBOARD");
-	m_prbOptions->insert("2", "TOGGLE0_1");
-	m_prbOptions->insert("3", "PRBS31");
-	m_prbOptions->insert("4", "PRBS23");
-	m_prbOptions->insert("5", "PRBS15");
-	m_prbOptions->insert("6", "PRBS9");
-	m_prbOptions->insert("7", "PRBS7");
-	m_prbOptions->insert("8", "RAMP");
-	m_prbOptions->insert("14", "PATTERN_REPEAT");
-	m_prbOptions->insert("15", "PATTERN_ONCE");
+	QMap<QString, QString> prbOptions;
+	prbOptions.insert("0", "ADC_DATA");
+	prbOptions.insert("1", "CHECKERBOARD");
+	prbOptions.insert("2", "TOGGLE0_1");
+	prbOptions.insert("3", "PRBS31");
+	prbOptions.insert("4", "PRBS23");
+	prbOptions.insert("5", "PRBS15");
+	prbOptions.insert("6", "PRBS9");
+	prbOptions.insert("7", "PRBS7");
+	prbOptions.insert("8", "RAMP");
+	prbOptions.insert("14", "PATTERN_REPEAT");
+	prbOptions.insert("15", "PATTERN_ONCE");
 
 	// Framer A PRBS - Custom Combo Widget
-	auto framerAWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_a_prbs",
-									    m_prbOptions, "Framer A PRBS");
+	auto framerAWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_a_prbs", prbOptions,
+									    "Framer A PRBS");
 	if(framerAWidget) {
 		layout->addWidget(framerAWidget);
 		connect(this, &BistWidget::readRequested, framerAWidget, &IIOWidget::readAsync);
 	}
 
 	// Framer B PRBS - Custom Combo Widget
-	auto framerBWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_b_prbs",
-									    m_prbOptions, "Framer B PRBS");
+	auto framerBWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_b_prbs", prbOptions,
+									    "Framer B PRBS");
 	if(framerBWidget) {
 		layout->addWidget(framerBWidget);
 		connect(this, &BistWidget::readRequested, framerBWidget, &IIOWidget::readAsync);

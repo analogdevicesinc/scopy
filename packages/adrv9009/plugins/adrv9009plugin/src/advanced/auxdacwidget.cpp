@@ -124,10 +124,10 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 
 		// Resolution widget - use CORRECT attribute name and proper Template 2B pattern
 		QString resolutionAttr = QString("adi,aux-dac-resolution%1").arg(i);
-		QMap<QString, QString> *resolutionMap = new QMap<QString, QString>();
-		(*resolutionMap)["0"] = "8_bit";
-		(*resolutionMap)["1"] = "10_bit";
-		(*resolutionMap)["2"] = "12_bit";
+		QMap<QString, QString> resolutionMap;
+		resolutionMap["0"] = "8_bit";
+		resolutionMap["1"] = "10_bit";
+		resolutionMap["2"] = "12_bit";
 		IIOWidget *resolutionWidget = Adrv9009WidgetFactory::createDebugCustomComboWidget(
 			m_device, resolutionAttr, resolutionMap, QString("DAC %1 Resolution").arg(i), this);
 		configGrid->addWidget(resolutionWidget, row, 2);
@@ -138,11 +138,11 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 
 		// Vref widget - use CORRECT attribute name and proper Template 2B pattern
 		QString vrefAttr = QString("adi,aux-dac-vref%1").arg(i);
-		QMap<QString, QString> *vrefMap = new QMap<QString, QString>();
-		(*vrefMap)["0"] = "Internal_1.25V";
-		(*vrefMap)["1"] = "External_Vref";
-		(*vrefMap)["2"] = "Internal_2.5V";
-		(*vrefMap)["3"] = "Reserved";
+		QMap<QString, QString> vrefMap;
+		vrefMap["0"] = "Internal_1.25V";
+		vrefMap["1"] = "External_Vref";
+		vrefMap["2"] = "Internal_2.5V";
+		vrefMap["3"] = "Reserved";
 		IIOWidget *vrefWidget = Adrv9009WidgetFactory::createDebugCustomComboWidget(
 			m_device, vrefAttr, vrefMap, QString("DAC %1 Vref").arg(i), this);
 		configGrid->addWidget(vrefWidget, row, 3);

@@ -102,9 +102,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// DAC Div - Combobox [1,2] → ["1","2"]
-	QMap<QString, QString> *dacDivOptions = new QMap<QString, QString>();
-	dacDivOptions->insert("1", "1");
-	dacDivOptions->insert("2", "2");
+	QMap<QString, QString> dacDivOptions;
+	dacDivOptions.insert("1", "1");
+	dacDivOptions.insert("2", "2");
 	auto dacDivWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,tx-profile-dac-div",
 									   dacDivOptions, "DAC Div");
 	if(dacDivWidget) {
@@ -113,10 +113,10 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	}
 
 	// TX FIR Interpolation - Combobox [1,2,4] → ["1","2","4"]
-	QMap<QString, QString> *txFirInterpOptions = new QMap<QString, QString>();
-	txFirInterpOptions->insert("1", "1");
-	txFirInterpOptions->insert("2", "2");
-	txFirInterpOptions->insert("4", "4");
+	QMap<QString, QString> txFirInterpOptions;
+	txFirInterpOptions.insert("1", "1");
+	txFirInterpOptions.insert("2", "2");
+	txFirInterpOptions.insert("4", "4");
 	auto txFirInterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-tx-fir-interpolation", txFirInterpOptions, "TX FIR Interpolation");
 	if(txFirInterpWidget) {
@@ -125,9 +125,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	}
 
 	// THB1 Interpolation - Combobox [1,2] → ["1","2"]
-	QMap<QString, QString> *thb1InterpOptions = new QMap<QString, QString>();
-	thb1InterpOptions->insert("1", "1");
-	thb1InterpOptions->insert("2", "2");
+	QMap<QString, QString> thb1InterpOptions;
+	thb1InterpOptions.insert("1", "1");
+	thb1InterpOptions.insert("2", "2");
 	auto thb1InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-thb1-interpolation", thb1InterpOptions, "THB1 Interpolation");
 	if(thb1InterpWidget) {
@@ -136,9 +136,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	}
 
 	// THB2 Interpolation - Combobox [1,2] → ["1","2"]
-	QMap<QString, QString> *thb2InterpOptions = new QMap<QString, QString>();
-	thb2InterpOptions->insert("1", "1");
-	thb2InterpOptions->insert("2", "2");
+	QMap<QString, QString> thb2InterpOptions;
+	thb2InterpOptions.insert("1", "1");
+	thb2InterpOptions.insert("2", "2");
 	auto thb2InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-thb2-interpolation", thb2InterpOptions, "THB2 Interpolation");
 	if(thb2InterpWidget) {
@@ -147,9 +147,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	}
 
 	// THB3 Interpolation - Combobox [1,2] → ["1","2"]
-	QMap<QString, QString> *thb3InterpOptions = new QMap<QString, QString>();
-	thb3InterpOptions->insert("1", "1");
-	thb3InterpOptions->insert("2", "2");
+	QMap<QString, QString> thb3InterpOptions;
+	thb3InterpOptions.insert("1", "1");
+	thb3InterpOptions.insert("2", "2");
 	auto thb3InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-thb3-interpolation", thb3InterpOptions, "THB3 Interpolation");
 	if(thb3InterpWidget) {
@@ -158,9 +158,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	}
 
 	// TX INT5 Interpolation - Combobox [1,5] → ["1","5"] (fixed attribute name)
-	QMap<QString, QString> *txInt5InterpOptions = new QMap<QString, QString>();
-	txInt5InterpOptions->insert("1", "1");
-	txInt5InterpOptions->insert("5", "5");
+	QMap<QString, QString> txInt5InterpOptions;
+	txInt5InterpOptions.insert("1", "1");
+	txInt5InterpOptions.insert("5", "5");
 	auto txInt5InterpWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-profile-tx-int5-interpolation", txInt5InterpOptions, "TX INT5 Interpolation");
 	if(txInt5InterpWidget) {
@@ -228,11 +228,11 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// TX Channels - Combobox with iio-osc mappings [0,1,2,3] -> [TXOFF,TX1,TX2,TX1_and_TX2]
-	QMap<QString, QString> *txChannelsOptions = new QMap<QString, QString>();
-	txChannelsOptions->insert("0", "TXOFF");
-	txChannelsOptions->insert("1", "TX1");
-	txChannelsOptions->insert("2", "TX2");
-	txChannelsOptions->insert("3", "TX1_and_TX2");
+	QMap<QString, QString> txChannelsOptions;
+	txChannelsOptions.insert("0", "TXOFF");
+	txChannelsOptions.insert("1", "TX1");
+	txChannelsOptions.insert("2", "TX2");
+	txChannelsOptions.insert("3", "TX1_and_TX2");
 	auto txChannelsWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,tx-settings-tx-channels",
 									       txChannelsOptions, "TX Channels Enable");
 	if(txChannelsWidget) {
@@ -241,10 +241,10 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	}
 
 	// Deframer Selection - Combobox with iio-osc mappings [0,1,2] -> [A,B,A_and_B]
-	QMap<QString, QString> *deframerOptions = new QMap<QString, QString>();
-	deframerOptions->insert("0", "A");
-	deframerOptions->insert("1", "B");
-	deframerOptions->insert("2", "A_and_B");
+	QMap<QString, QString> deframerOptions;
+	deframerOptions.insert("0", "A");
+	deframerOptions.insert("1", "B");
+	deframerOptions.insert("2", "A_and_B");
 	auto deframerWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-settings-deframer-sel", deframerOptions, "JESD204 DEFRAMER SELECT");
 	if(deframerWidget) {
@@ -253,11 +253,11 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	}
 
 	// TX ATTEN STEP SIZE - Combobox with iio-osc mappings [0,1,2,3] -> [0.05,0.1,0.2,0.4]
-	QMap<QString, QString> *attenStepOptions = new QMap<QString, QString>();
-	attenStepOptions->insert("0", "0.05");
-	attenStepOptions->insert("1", "0.1");
-	attenStepOptions->insert("2", "0.2");
-	attenStepOptions->insert("3", "0.4");
+	QMap<QString, QString> attenStepOptions;
+	attenStepOptions.insert("0", "0.05");
+	attenStepOptions.insert("1", "0.1");
+	attenStepOptions.insert("2", "0.2");
+	attenStepOptions.insert("3", "0.4");
 	auto attenStepWidget = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,tx-settings-tx-atten-step-size", attenStepOptions, "TX ATTEN STEP SIZE");
 	if(attenStepWidget) {
@@ -282,10 +282,10 @@ QWidget *TxSettingsWidget::createTxConfigurationSection(QWidget *parent)
 	}
 
 	// Disable TX Data If PLL Unlock - Combobox [0,1,2] → [DISABLED,ZERO_DATA,RAMP_DOWN_TO_ZERO]
-	QMap<QString, QString> *disableTxDataOptions = new QMap<QString, QString>();
-	disableTxDataOptions->insert("0", "DISABLED");
-	disableTxDataOptions->insert("1", "ZERO_DATA");
-	disableTxDataOptions->insert("2", "RAMP_DOWN_TO_ZERO");
+	QMap<QString, QString> disableTxDataOptions;
+	disableTxDataOptions.insert("0", "DISABLED");
+	disableTxDataOptions.insert("1", "ZERO_DATA");
+	disableTxDataOptions.insert("2", "RAMP_DOWN_TO_ZERO");
 	auto disableTxDataWidget =
 		Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,tx-settings-dis-tx-data-if-pll-unlock",
 							       disableTxDataOptions, "Disable TX Data If PLL Unlock");
@@ -375,13 +375,13 @@ QWidget *TxSettingsWidget::createTxChannelGpioGroup(int channel, QWidget *parent
 	}
 
 	// Inc pin combobox - options depend on channel
-	QMap<QString, QString> *incOptions = new QMap<QString, QString>();
+	QMap<QString, QString> incOptions;
 	if(channel == 1) {
-		incOptions->insert("4", "4");
-		incOptions->insert("12", "12");
+		incOptions.insert("4", "4");
+		incOptions.insert("12", "12");
 	} else { // channel == 2
-		incOptions->insert("6", "6");
-		incOptions->insert("14", "14");
+		incOptions.insert("6", "6");
+		incOptions.insert("14", "14");
 	}
 	auto incPinWidget =
 		Adrv9009WidgetFactory::createCustomComboWidget(m_device, incPinAttr, incOptions, "TX ATTEN INC PIN");
@@ -391,13 +391,13 @@ QWidget *TxSettingsWidget::createTxChannelGpioGroup(int channel, QWidget *parent
 	}
 
 	// Dec pin combobox - options depend on channel
-	QMap<QString, QString> *decOptions = new QMap<QString, QString>();
+	QMap<QString, QString> decOptions;
 	if(channel == 1) {
-		decOptions->insert("5", "5");
-		decOptions->insert("13", "13");
+		decOptions.insert("5", "5");
+		decOptions.insert("13", "13");
 	} else { // channel == 2
-		decOptions->insert("7", "7");
-		decOptions->insert("15", "15");
+		decOptions.insert("7", "7");
+		decOptions.insert("15", "15");
 	}
 	auto decPinWidget =
 		Adrv9009WidgetFactory::createCustomComboWidget(m_device, decPinAttr, decOptions, "TX ATTEN DEC PIN");

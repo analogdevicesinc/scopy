@@ -39,8 +39,9 @@ public:
 					       QWidget *parent = nullptr);
 	static IIOWidget *createComboWidget(iio_device *device, QString attr, QString availableAttr, QString title,
 					    QWidget *parent = nullptr);
-	static IIOWidget *createCustomComboWidget(iio_device *device, QString attr, QMap<QString, QString> *optionsMap,
-						  QString title, QWidget *parent = nullptr);
+	static IIOWidget *createCustomComboWidget(iio_device *device, QString attr,
+						  const QMap<QString, QString> &optionsMap, QString title,
+						  QWidget *parent = nullptr);
 	static IIOWidget *createRangeWidget(iio_device *device, QString attr, QString range, QString title,
 					    QWidget *parent = nullptr);
 	static IIOWidget *createReadOnlyWidget(iio_device *device, QString attr, QString title, bool compactMode = true,
@@ -62,7 +63,7 @@ public:
 	static IIOWidget *createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
 						 QWidget *parent = nullptr);
 	static IIOWidget *createDebugCustomComboWidget(iio_device *device, QString attr,
-						       QMap<QString, QString> *optionsMap, QString title,
+						       const QMap<QString, QString> &optionsMap, QString title,
 						       QWidget *parent = nullptr);
 	static IIOWidget *createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
 						    QWidget *parent = nullptr);
