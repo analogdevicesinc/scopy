@@ -46,10 +46,6 @@ private:
 	QWidget *createFramerColumn(const QString &columnType, const QString &attrPrefix, QWidget *parent);
 
 	iio_device *m_device;
-
-	QMap<QString, QString> *m_mOptions;
-	QMap<QString, QString> *m_fOptions;
-	QMap<QString, QString> *m_npOptions;
 };
 
 } // namespace adrv9009

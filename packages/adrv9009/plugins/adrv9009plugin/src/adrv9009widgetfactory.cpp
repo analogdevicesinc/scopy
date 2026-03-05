@@ -65,11 +65,11 @@ IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_device *device, QString 
 }
 
 IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QString attr,
-							  QMap<QString, QString> *optionsMap, QString title,
+							  const QMap<QString, QString> &optionsMap, QString title,
 							  QWidget *parent)
 {
 	// Build space-separated display string from optionsMap values
-	auto values = optionsMap->values();
+	auto values = optionsMap.values();
 	QString optionsValues = "";
 	for(int i = 0; i < values.size(); i++) {
 		optionsValues += " " + values.at(i);
@@ -84,13 +84,14 @@ IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QS
 				    .optionsValues(optionsValues)
 				    .buildSingle();
 
-	// Set bidirectional conversion functions
+	// Set bidirectional conversion functions; capture map by value so the widget
+	// owns its own copy and has no dependency on the caller's lifetime.
 	if(widget) {
-		widget->setUItoDataConversion([optionsMap](QString data) {
-			return IIOWidgetUtils::comboUiToDataConversionFunction(data, optionsMap);
+		widget->setUItoDataConversion([map = QMap<QString, QString>(optionsMap)](QString data) mutable {
+			return IIOWidgetUtils::comboUiToDataConversionFunction(data, &map);
 		});
-		widget->setDataToUIConversion([optionsMap](QString data) {
-			return IIOWidgetUtils::comboDataToUiConversionFunction(data, optionsMap);
+		widget->setDataToUIConversion([map = QMap<QString, QString>(optionsMap)](QString data) mutable {
+			return IIOWidgetUtils::comboDataToUiConversionFunction(data, &map);
 		});
 	}
 
@@ -212,11 +213,11 @@ IIOWidget *Adrv9009WidgetFactory::createDebugRangeWidget(iio_device *device, QSt
 }
 
 IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *device, QString attr,
-							       QMap<QString, QString> *optionsMap, QString title,
+							       const QMap<QString, QString> &optionsMap, QString title,
 							       QWidget *parent)
 {
 	// Build space-separated display string from optionsMap values (following Template 2B)
-	auto values = optionsMap->values();
+	auto values = optionsMap.values();
 	QString optionsValues = "";
 	for(int i = 0; i < values.size(); i++) {
 		if(i > 0)
@@ -236,13 +237,14 @@ IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *devic
 				    .includeDebugAttributes(true)
 				    .buildSingle();
 
-	// Set bidirectional conversion functions using IIOWidgetUtils (as per Template 2B)
+	// Set bidirectional conversion functions; capture map by value so the widget
+	// owns its own copy and has no dependency on the caller's lifetime.
 	if(widget) {
-		widget->setUItoDataConversion([optionsMap](QString data) {
-			return IIOWidgetUtils::comboUiToDataConversionFunction(data, optionsMap);
+		widget->setUItoDataConversion([map = QMap<QString, QString>(optionsMap)](QString data) mutable {
+			return IIOWidgetUtils::comboUiToDataConversionFunction(data, &map);
 		});
-		widget->setDataToUIConversion([optionsMap](QString data) {
-			return IIOWidgetUtils::comboDataToUiConversionFunction(data, optionsMap);
+		widget->setDataToUIConversion([map = QMap<QString, QString>(optionsMap)](QString data) mutable {
+			return IIOWidgetUtils::comboDataToUiConversionFunction(data, &map);
 		});
 	}
 

@@ -101,10 +101,10 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// RX FIR Decimation - Combobox [1,2,4]
-	QMap<QString, QString> *firDecimationOptions = new QMap<QString, QString>();
-	firDecimationOptions->insert("1", "1");
-	firDecimationOptions->insert("2", "2");
-	firDecimationOptions->insert("4", "4");
+	QMap<QString, QString> firDecimationOptions;
+	firDecimationOptions.insert("1", "1");
+	firDecimationOptions.insert("2", "2");
+	firDecimationOptions.insert("4", "4");
 	auto firDecimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,orx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation");
 	if(firDecimation) {
@@ -113,9 +113,9 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	}
 
 	// RX DEC5 Decimation - Combobox [4,5]
-	QMap<QString, QString> *dec5DecimationOptions = new QMap<QString, QString>();
-	dec5DecimationOptions->insert("4", "4");
-	dec5DecimationOptions->insert("5", "5");
+	QMap<QString, QString> dec5DecimationOptions;
+	dec5DecimationOptions.insert("4", "4");
+	dec5DecimationOptions.insert("5", "5");
 	auto dec5Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,orx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation");
 	if(dec5Decimation) {
@@ -124,9 +124,9 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	}
 
 	// RHB1 Decimation - Combobox [1,2]
-	QMap<QString, QString> *rhb1DecimationOptions = new QMap<QString, QString>();
-	rhb1DecimationOptions->insert("1", "1");
-	rhb1DecimationOptions->insert("2", "2");
+	QMap<QString, QString> rhb1DecimationOptions;
+	rhb1DecimationOptions.insert("1", "1");
+	rhb1DecimationOptions.insert("2", "2");
 	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,orx-profile-rhb1-decimation", rhb1DecimationOptions, "RHB1 Decimation");
 	if(rhb1Decimation) {
@@ -159,8 +159,8 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	}
 
 	// ORX DDC Mode - Combobox with iio-osc mapping [7] -> [0]
-	QMap<QString, QString> *ddcModeOptions = new QMap<QString, QString>();
-	ddcModeOptions->insert("7", "0");
+	QMap<QString, QString> ddcModeOptions;
+	ddcModeOptions.insert("7", "0");
 	auto ddcMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,orx-profile-orx-ddc-mode",
 								      ddcModeOptions, "ORX DDC Mode");
 	if(ddcMode) {
@@ -187,11 +187,11 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// ORX Channels Enable - Combobox [0,1,2,3] → [OFF,ORX1,ORX2,ORX1_and_ORX2]
-	QMap<QString, QString> *orxChannelsOptions = new QMap<QString, QString>();
-	orxChannelsOptions->insert("0", "OFF");
-	orxChannelsOptions->insert("1", "ORX1");
-	orxChannelsOptions->insert("2", "ORX2");
-	orxChannelsOptions->insert("3", "ORX1_and_ORX2");
+	QMap<QString, QString> orxChannelsOptions;
+	orxChannelsOptions.insert("0", "OFF");
+	orxChannelsOptions.insert("1", "ORX1");
+	orxChannelsOptions.insert("2", "ORX2");
+	orxChannelsOptions.insert("3", "ORX1_and_ORX2");
 	auto orxChannels = Adrv9009WidgetFactory::createCustomComboWidget(
 		m_device, "adi,obs-settings-obs-rx-channels-enable", orxChannelsOptions, "ORX Channels Enable");
 	if(orxChannels) {
@@ -200,10 +200,10 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	}
 
 	// JESD204 Framer Selection - Combobox [0,1,2] → [A,B,A_and_B]
-	QMap<QString, QString> *framerSelOptions = new QMap<QString, QString>();
-	framerSelOptions->insert("0", "A");
-	framerSelOptions->insert("1", "B");
-	framerSelOptions->insert("2", "A_and_B");
+	QMap<QString, QString> framerSelOptions;
+	framerSelOptions.insert("0", "A");
+	framerSelOptions.insert("1", "B");
+	framerSelOptions.insert("2", "A_and_B");
 	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,obs-settings-framer-sel",
 									framerSelOptions, "JESD204 Framer Selection");
 	if(framerSel) {
@@ -212,9 +212,9 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	}
 
 	// ORX LO Source - Combobox [0,1] → [RFPLL,AUXPLL]
-	QMap<QString, QString> *loSourceOptions = new QMap<QString, QString>();
-	loSourceOptions->insert("0", "RFPLL");
-	loSourceOptions->insert("1", "AUXPLL");
+	QMap<QString, QString> loSourceOptions;
+	loSourceOptions.insert("0", "RFPLL");
+	loSourceOptions.insert("1", "AUXPLL");
 	auto loSource = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,obs-settings-obs-rx-lo-source",
 								       loSourceOptions, "ORX LO Source");
 	if(loSource) {

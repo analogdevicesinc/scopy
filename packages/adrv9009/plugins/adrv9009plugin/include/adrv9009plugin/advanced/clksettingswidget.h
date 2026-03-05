@@ -44,8 +44,6 @@ private:
 	void createClockControls(QVBoxLayout *parentLayout);
 
 	iio_device *m_device;
-	QMap<QString, QString> *m_hsDivOptions;
-	QMap<QString, QString> *m_phaseSyncOptions;
 };
 
 } // namespace scopy::adrv9009
