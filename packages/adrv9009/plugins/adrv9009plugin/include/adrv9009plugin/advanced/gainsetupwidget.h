@@ -49,7 +49,6 @@ private:
 	QWidget *createObservationGainSection(QWidget *parent);
 
 	iio_device *m_device;
-	QMap<QString, QString> *m_gainModeOptions;
 };
 
 } // namespace adrv9009
