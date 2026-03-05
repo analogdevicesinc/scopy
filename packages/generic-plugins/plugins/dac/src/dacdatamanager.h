@@ -41,6 +41,7 @@ class DacDataModel;
 class DacAddon;
 class DacDataManager : public QWidget
 {
+	friend class DAC_API;
 	Q_OBJECT
 public:
 	typedef enum

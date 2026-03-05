@@ -45,8 +45,11 @@
 
 namespace scopy {
 
+class IMUAnalyzer_API;
+
 class SCOPY_IMUANALYZER_EXPORT IMUAnalyzer : public QObject, public PluginBase
 {
+	friend class IMUAnalyzer_API;
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
@@ -62,6 +65,8 @@ public:
 
 private:
 	IMUAnalyzerInterface *m_imuInterface = nullptr;
+	void initApi();
+	IMUAnalyzer_API *m_api = nullptr;
 };
 
 } // namespace scopy

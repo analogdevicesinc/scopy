@@ -19,10 +19,10 @@
  */
 
 // ============================================================================
-// ALL THE FOLLOWING TESTS REQUIRE VISUAL VALIDATION
+// ALL THE FOLLOWING TESTS REQUIRE SUPERVISED VISUAL VALIDATION
 // These tests automate the steps from the manual test documentation but
-// require a human observer to verify UI changes. Each step includes a 3-second
-// pause to allow visual inspection of the application state.
+// require a human observer to verify UI changes. After each visual check,
+// the test will prompt the user to input 'y' (pass) or 'n' (fail).
 // Source: docs/tests/plugins/datalogger/datalogger_tests.rst
 //
 // Not automatable (Category C - skipped entirely):
@@ -35,9 +35,8 @@
 //   TST.DATALOGGER.TOGGLE_X_AXIS_UTC_TIME_DISPLAY - no UTC toggle API
 //   TST.DATALOGGER.TOGGLE_X_AXIS_LIVE_PLOTTING - no live plotting toggle API
 //   TST.DATALOGGER.TOGGLE_Y_AXIS_AUTOSCALE - no autoscale toggle API
-//   TST.DATALOGGER.ADJUST_CURVE_THICKNESS - no curve thickness API
-//   TST.DATALOGGER.CHANGE_CURVE_STYLE - no curve style API
-//   TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS - no buffer preview/axis label API
+//   TST.DATALOGGER.ADJUST_CURVE_THICKNESS - now automatable (see DocTests)
+//   TST.DATALOGGER.CHANGE_CURVE_STYLE - now automatable (see DocTests)
 //   TST.DATALOGGER.CHOOSE_FILE_FOR_DATA_LOGGING - requires file dialog
 //   TST.DATALOGGER.USE_KDOCKS - requires drag/drop docking interaction
 //   TST.DATALOGGER.USE_CHANNEL_SCALING - no channel scaling API
@@ -67,7 +66,6 @@ function arrayContains(arr, item) {
 // Test Suite
 TestFramework.init("Data Logger Visual Validation Tests");
 
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
 var toolName = "Data Logger ";
 
 // Connect to device
@@ -86,11 +84,10 @@ if (!switchToTool("Data Logger ")) {
 // Test 6: Remove a Created Tool
 // UID: TST.DATALOGGER.REMOVE_A_CREATED_TOOL
 // Description: Remove the tool and check if the tool is removed.
-// VISUAL: Verify the X button removes the created tool
 // Note: removeTool() is not exposed in the API. This test creates a tool
 //   via API and requires manual click on the X button.
 // ===========================================================================
-printToConsole("\n=== Test 6: Remove a Created Tool (VISUAL) ===\n");
+printToConsole("\n=== Test 6: Remove a Created Tool (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.REMOVE_A_CREATED_TOOL", function() {
     try {
@@ -121,12 +118,18 @@ TestFramework.runTest("TST.DATALOGGER.REMOVE_A_CREATED_TOOL", function() {
         }
 
         printToConsole("  New tool created: " + newToolName);
-        printToConsole("  VISUAL CHECK: Verify the new tool has an X button next to the + button");
-        msleep(VISUAL_DELAY);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify the new tool '" + newToolName + "' has an X button next to the + button")) {
+            return false;
+        }
 
         printToConsole("  ACTION REQUIRED: Click the X button to remove the tool '" + newToolName + "'");
-        printToConsole("  VISUAL CHECK: Verify the tool is removed from the tools list");
-        msleep(VISUAL_DELAY);
+
+        if (!TestFramework.supervisedCheck(
+            "After clicking the X button: verify the tool '" + newToolName + "' is removed from the tools list")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -140,9 +143,8 @@ TestFramework.runTest("TST.DATALOGGER.REMOVE_A_CREATED_TOOL", function() {
 // UID: TST.DATALOGGER.VERIFY_REMOVAL_DISABLED_FOR_DEFAULT_TOOL
 // Description: Check if the remove tool button is disabled for the
 //   default (first) tool.
-// VISUAL: Verify X button is only on new tools, not on the default tool
 // ===========================================================================
-printToConsole("\n=== Test 7: Verify Removal Disabled for Default Tool (VISUAL) ===\n");
+printToConsole("\n=== Test 7: Verify Removal Disabled for Default Tool (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.VERIFY_REMOVAL_DISABLED_FOR_DEFAULT_TOOL", function() {
     try {
@@ -156,12 +158,17 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_REMOVAL_DISABLED_FOR_DEFAULT_TOOL",
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify the NEW tool has an X button available");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify the NEW tool has an X button available")) {
+            return false;
+        }
 
         printToConsole("  ACTION REQUIRED: Switch to the original/default Data Logger tool");
-        printToConsole("  VISUAL CHECK: Verify the DEFAULT tool does NOT have an X button");
-        msleep(VISUAL_DELAY);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify the DEFAULT tool does NOT have an X button")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -175,9 +182,8 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_REMOVAL_DISABLED_FOR_DEFAULT_TOOL",
 // UID: TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES
 // Description: Change the Y-Axis min and max value and check if the
 //   Y-Axis displays data with the new min and max value.
-// VISUAL: Verify Y-axis range updates in the plot
 // ===========================================================================
-printToConsole("\n=== Test 18: Set Y-Axis Min/Max Values (VISUAL) ===\n");
+printToConsole("\n=== Test 18: Set Y-Axis Min/Max Values (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES", function() {
     try {
@@ -200,16 +206,24 @@ TestFramework.runTest("TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES", function() {
         datalogger.setMinYAxis(0);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify Y-axis bottom value is now '0'");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-axis bottom value is now '0'")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Step 7: Set Y-axis max to 2
         printToConsole("  Setting Y-axis max to 2...");
         datalogger.setMaxYAxis(2);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify Y-axis top value is now '2'");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-axis top value is now '2'")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Test wider range
         printToConsole("  Setting Y-axis range to -10 to 10...");
@@ -217,8 +231,12 @@ TestFramework.runTest("TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES", function() {
         datalogger.setMaxYAxis(10);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify Y-axis displays range -10 to 10");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-axis displays range -10 to 10")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Cleanup
         datalogger.setRunning(false);
@@ -236,9 +254,8 @@ TestFramework.runTest("TST.DATALOGGER.SET_Y_AXIS_MIN_MAX_VALUES", function() {
 // Test 22: Verify Plot Display Method
 // UID: TST.DATALOGGER.VERIFY_PLOT_DISPLAY_METHOD
 // Description: Verify that the application displays data in "Plot" mode.
-// VISUAL: Verify data is displayed as a plot/graph
 // ===========================================================================
-printToConsole("\n=== Test 22: Verify Plot Display Method (VISUAL) ===\n");
+printToConsole("\n=== Test 22: Verify Plot Display Method (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.VERIFY_PLOT_DISPLAY_METHOD.VISUAL", function() {
     try {
@@ -261,8 +278,12 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_PLOT_DISPLAY_METHOD.VISUAL", functi
         datalogger.setDisplayMode(toolName, 0);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is displayed in Plot mode (graph with curves)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is displayed in Plot mode (graph with curves)")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         datalogger.setRunning(false);
         msleep(500);
@@ -279,9 +300,8 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_PLOT_DISPLAY_METHOD.VISUAL", functi
 // Test 23: Verify Plain Text Display Method
 // UID: TST.DATALOGGER.VERIFY_PLAIN_TEXT_DISPLAY_METHOD
 // Description: Verify that the application displays data in "Plain Text" mode.
-// VISUAL: Verify data is displayed as plain text values
 // ===========================================================================
-printToConsole("\n=== Test 23: Verify Plain Text Display Method (VISUAL) ===\n");
+printToConsole("\n=== Test 23: Verify Plain Text Display Method (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.VERIFY_PLAIN_TEXT_DISPLAY_METHOD.VISUAL", function() {
     try {
@@ -303,8 +323,13 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_PLAIN_TEXT_DISPLAY_METHOD.VISUAL", 
         datalogger.setDisplayMode(toolName, 1);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is displayed in Plain Text mode (text values)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is displayed in Plain Text mode (text values)")) {
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Restore to plot mode
         datalogger.setDisplayMode(toolName, 0);
@@ -323,9 +348,8 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_PLAIN_TEXT_DISPLAY_METHOD.VISUAL", 
 // Test 24: Verify 7 Segment Display Method
 // UID: TST.DATALOGGER.VERIFY_7_SEGMENT_DISPLAY_METHOD
 // Description: Verify that the application displays data in "7 Segment" mode.
-// VISUAL: Verify data is displayed in 7-segment style
 // ===========================================================================
-printToConsole("\n=== Test 24: Verify 7 Segment Display Method (VISUAL) ===\n");
+printToConsole("\n=== Test 24: Verify 7 Segment Display Method (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.VERIFY_7_SEGMENT_DISPLAY_METHOD.VISUAL", function() {
     try {
@@ -347,8 +371,13 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_7_SEGMENT_DISPLAY_METHOD.VISUAL", f
         datalogger.setDisplayMode(toolName, 2);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is displayed in 7 Segment mode (large digit display)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is displayed in 7 Segment mode (large digit display)")) {
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Restore to plot mode
         datalogger.setDisplayMode(toolName, 0);
@@ -367,9 +396,8 @@ TestFramework.runTest("TST.DATALOGGER.VERIFY_7_SEGMENT_DISPLAY_METHOD.VISUAL", f
 // Test 25: Toggle Between Display Methods
 // UID: TST.DATALOGGER.TOGGLE_BETWEEN_DISPLAY_METHODS
 // Description: Verify that the application toggles between display methods.
-// VISUAL: Verify each mode transition displays data correctly
 // ===========================================================================
-printToConsole("\n=== Test 25: Toggle Between Display Methods (VISUAL) ===\n");
+printToConsole("\n=== Test 25: Toggle Between Display Methods (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.TOGGLE_BETWEEN_DISPLAY_METHODS.VISUAL", function() {
     try {
@@ -391,24 +419,38 @@ TestFramework.runTest("TST.DATALOGGER.TOGGLE_BETWEEN_DISPLAY_METHODS.VISUAL", fu
         datalogger.setDisplayMode(toolName, 1);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is displayed in Plain Text mode");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is displayed in Plain Text mode")) {
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Step 5: Switch to 7 Segment
         printToConsole("  Switching to 7 Segment mode...");
         datalogger.setDisplayMode(toolName, 2);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is displayed in 7 Segment mode");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is displayed in 7 Segment mode")) {
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Step 6: Switch back to Plot
         printToConsole("  Switching back to Plot mode...");
         datalogger.setDisplayMode(toolName, 0);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is displayed in Plot mode");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is displayed in Plot mode")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         datalogger.setRunning(false);
         msleep(500);
@@ -425,9 +467,8 @@ TestFramework.runTest("TST.DATALOGGER.TOGGLE_BETWEEN_DISPLAY_METHODS.VISUAL", fu
 // Test 26: Set 7 Segment Display Precision
 // UID: TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION
 // Description: Change the 7 Segment precision and check if it updates.
-// VISUAL: Verify the number of decimal points changes in 7-segment display
 // ===========================================================================
-printToConsole("\n=== Test 26: Set 7 Segment Display Precision (VISUAL) ===\n");
+printToConsole("\n=== Test 26: Set 7 Segment Display Precision (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION.VISUAL", function() {
     try {
@@ -453,16 +494,28 @@ TestFramework.runTest("TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION.VISUAL", f
         datalogger.changePrecision(2);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify 7 Segment displays values with 2 decimal points");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify 7 Segment displays values with 2 decimal points")) {
+            datalogger.changePrecision(3);
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Set precision to 5 decimals
         printToConsole("  Setting precision to 5 decimals...");
         datalogger.changePrecision(5);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify 7 Segment displays values with 5 decimal points");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify 7 Segment displays values with 5 decimal points")) {
+            datalogger.changePrecision(3);
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Restore defaults
         datalogger.changePrecision(3);
@@ -482,9 +535,8 @@ TestFramework.runTest("TST.DATALOGGER.SET_7_SEGMENT_DISPLAY_PRECISION.VISUAL", f
 // Test 27: Toggle 7 Segment Min/Max Display
 // UID: TST.DATALOGGER.TOGGLE_7_SEGMENT_MIN_MAX_DISPLAY
 // Description: Toggle 7 Segment min/max and verify display changes.
-// VISUAL: Verify min/max values appear/disappear in 7-segment display
 // ===========================================================================
-printToConsole("\n=== Test 27: Toggle 7 Segment Min/Max Display (VISUAL) ===\n");
+printToConsole("\n=== Test 27: Toggle 7 Segment Min/Max Display (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.TOGGLE_7_SEGMENT_MIN_MAX_DISPLAY.VISUAL", function() {
     try {
@@ -510,16 +562,27 @@ TestFramework.runTest("TST.DATALOGGER.TOGGLE_7_SEGMENT_MIN_MAX_DISPLAY.VISUAL", 
         datalogger.setMinMax(false);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify 7 Segment displays data WITHOUT min/max values");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify 7 Segment displays data WITHOUT min/max values")) {
+            datalogger.setMinMax(true);
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Enable min/max
         printToConsole("  Enabling Min/Max display...");
         datalogger.setMinMax(true);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify 7 Segment displays data WITH min/max values");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify 7 Segment displays data WITH min/max values")) {
+            datalogger.setDisplayMode(toolName, 0);
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Restore
         datalogger.setDisplayMode(toolName, 0);
@@ -539,9 +602,8 @@ TestFramework.runTest("TST.DATALOGGER.TOGGLE_7_SEGMENT_MIN_MAX_DISPLAY.VISUAL", 
 // UID: TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE
 // Description: Verify that the user can set the maximum channel data storage
 //   via Preferences.
-// VISUAL: Verify the preference is applied in the DataLoggerPlugin tab
 // ===========================================================================
-printToConsole("\n=== Test 32: Set Maximum Channel Data Storage (VISUAL) ===\n");
+printToConsole("\n=== Test 32: Set Maximum Channel Data Storage (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE.VISUAL", function() {
     try {
@@ -550,9 +612,13 @@ TestFramework.runTest("TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE.VISUAL", 
         scopy.setPreference("dataloggerplugin_data_storage_size", "1 Mb");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Open Preferences > DataLoggerPlugin tab");
-        printToConsole("  VISUAL CHECK: Verify 'Maximum data stored for each monitor' is set to '1 Mb'");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Open Preferences > DataLoggerPlugin tab. " +
+            "Verify 'Maximum data stored for each monitor' is set to '1 Mb'")) {
+            scopy.setPreference("dataloggerplugin_data_storage_size", "10 Kb");
+            msleep(500);
+            return false;
+        }
 
         // Restore default
         scopy.setPreference("dataloggerplugin_data_storage_size", "10 Kb");
@@ -561,6 +627,7 @@ TestFramework.runTest("TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE.VISUAL", 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        scopy.setPreference("dataloggerplugin_data_storage_size", "10 Kb");
         return false;
     }
 });
@@ -570,9 +637,8 @@ TestFramework.runTest("TST.DATALOGGER.SET_MAXIMUM_CHANNEL_DATA_STORAGE.VISUAL", 
 // UID: TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL
 // Description: Verify that the user can set the read interval and that
 //   data collection rate changes accordingly.
-// VISUAL: Verify data is collected at the new interval rate
 // ===========================================================================
-printToConsole("\n=== Test 33: Set Data Logger Read Interval (VISUAL) ===\n");
+printToConsole("\n=== Test 33: Set Data Logger Read Interval (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL.VISUAL", function() {
     try {
@@ -590,16 +656,25 @@ TestFramework.runTest("TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL.VISUAL", fun
         datalogger.setRunning(true);
         msleep(2000);
 
-        printToConsole("  VISUAL CHECK: Note the current data collection rate (default: 1 second)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Note the current data collection rate (default: 1 second)")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Change read interval to 2 seconds
         printToConsole("  Setting read interval to 2 seconds...");
         scopy.setPreference("dataloggerplugin_read_interval", "2");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify data is now collected every 2 seconds (slower rate)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify data is now collected every 2 seconds (slower rate)")) {
+            scopy.setPreference("dataloggerplugin_read_interval", "1");
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Restore default
         scopy.setPreference("dataloggerplugin_read_interval", "1");
@@ -609,6 +684,7 @@ TestFramework.runTest("TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL.VISUAL", fun
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        scopy.setPreference("dataloggerplugin_read_interval", "1");
         datalogger.setRunning(false);
         return false;
     }
@@ -619,9 +695,8 @@ TestFramework.runTest("TST.DATALOGGER.SET_DATA_LOGGER_READ_INTERVAL.VISUAL", fun
 // UID: TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT
 // Description: Verify that the user can set the date time format for the
 //   X Axis via Preferences.
-// VISUAL: Verify X-axis labels change to the new format
 // ===========================================================================
-printToConsole("\n=== Test 34: Set X-Axis Date Time Format (VISUAL) ===\n");
+printToConsole("\n=== Test 34: Set X-Axis Date Time Format (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT.VISUAL", function() {
     try {
@@ -639,16 +714,25 @@ TestFramework.runTest("TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT.VISUAL", funct
         datalogger.setRunning(true);
         msleep(2000);
 
-        printToConsole("  VISUAL CHECK: Note the current X-axis date/time format (default: hh:mm:ss)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Note the current X-axis date/time format (default: hh:mm:ss)")) {
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Change format to mm:ss
         printToConsole("  Setting date time format to 'mm:ss'...");
         scopy.setPreference("dataloggerplugin_date_time_format", "mm:ss");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify X-axis now displays time in 'mm:ss' format");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify X-axis now displays time in 'mm:ss' format")) {
+            scopy.setPreference("dataloggerplugin_date_time_format", "hh:mm:ss");
+            datalogger.setRunning(false);
+            msleep(500);
+            return false;
+        }
 
         // Restore default
         scopy.setPreference("dataloggerplugin_date_time_format", "hh:mm:ss");
@@ -658,6 +742,7 @@ TestFramework.runTest("TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT.VISUAL", funct
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        scopy.setPreference("dataloggerplugin_date_time_format", "hh:mm:ss");
         datalogger.setRunning(false);
         return false;
     }
@@ -668,9 +753,8 @@ TestFramework.runTest("TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT.VISUAL", funct
 // UID: TST.DATALOGGER.USE_MULTIPLOT
 // Description: Verify that the user can enable multiplot in preferences,
 //   create multiple plots, and assign channels to different plots.
-// VISUAL: Verify multiple plots are displayed and can be managed
 // ===========================================================================
-printToConsole("\n=== Test 35: Use Multiplot Feature (VISUAL) ===\n");
+printToConsole("\n=== Test 35: Use Multiplot Feature (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.DATALOGGER.USE_MULTIPLOT", function() {
     try {
@@ -679,8 +763,12 @@ TestFramework.runTest("TST.DATALOGGER.USE_MULTIPLOT", function() {
         scopy.setPreference("dataloggerplugin_add_remove_plot", "true");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify multiplot is enabled in Preferences > DataLoggerPlugin");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify multiplot is enabled in Preferences > DataLoggerPlugin")) {
+            scopy.setPreference("dataloggerplugin_add_remove_plot", "false");
+            msleep(500);
+            return false;
+        }
 
         var monitorsStr = datalogger.showAvailableMonitors();
         var monitors = parseNewlineSeparatedString(monitorsStr);
@@ -700,12 +788,24 @@ TestFramework.runTest("TST.DATALOGGER.USE_MULTIPLOT", function() {
 
         printToConsole("  ACTION REQUIRED: Open Settings and press 'Add Plot' button");
         printToConsole("  ACTION REQUIRED: Assign a second channel to the new plot");
-        printToConsole("  VISUAL CHECK: Verify two plots are visible with data from assigned channels");
-        msleep(VISUAL_DELAY);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify two plots are visible with data from assigned channels")) {
+            datalogger.setRunning(false);
+            scopy.setPreference("dataloggerplugin_add_remove_plot", "false");
+            msleep(500);
+            return false;
+        }
 
         printToConsole("  ACTION REQUIRED: Remove the second plot");
-        printToConsole("  VISUAL CHECK: Verify only the first plot remains and its data is unaffected");
-        msleep(VISUAL_DELAY);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify only the first plot remains and its data is unaffected")) {
+            datalogger.setRunning(false);
+            scopy.setPreference("dataloggerplugin_add_remove_plot", "false");
+            msleep(500);
+            return false;
+        }
 
         // Restore
         datalogger.setRunning(false);
@@ -717,6 +817,128 @@ TestFramework.runTest("TST.DATALOGGER.USE_MULTIPLOT", function() {
         printToConsole("  Error: " + e);
         datalogger.setRunning(false);
         scopy.setPreference("dataloggerplugin_add_remove_plot", "false");
+        return false;
+    }
+});
+
+// ===========================================================================
+// Test 21: Adjust Plot Display Settings
+// UID: TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS
+// Description: Change the plot settings and check if the plot settings
+//   are changed (Buffer Preview, X-Axis labels, Y-Axis labels).
+// ===========================================================================
+printToConsole("\n=== Test 21: Adjust Plot Display Settings (SUPERVISED) ===\n");
+
+TestFramework.runTest("TST.DATALOGGER.ADJUST_PLOT_DISPLAY_SETTINGS", function() {
+    try {
+        var monitorsStr = datalogger.showAvailableMonitors();
+        var monitors = parseNewlineSeparatedString(monitorsStr);
+        if (monitors.length === 0) {
+            return "SKIP";
+        }
+
+        // Enable monitor and start
+        datalogger.enableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        // Switch to plot mode
+        datalogger.setDisplayMode(toolName, 0);
+        msleep(500);
+
+        printToConsole("  Starting data acquisition...");
+        datalogger.setRunning(true);
+        msleep(2000);
+
+        // Step 3: Toggle Buffer Preview (Navigator) off
+        printToConsole("  Toggling Buffer Preview off...");
+        datalogger.plot.setNavigatorEnabled(false);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Buffer Preview is NOT displayed below the plot")) {
+            datalogger.plot.setNavigatorEnabled(true);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 4: Toggle Buffer Preview on
+        printToConsole("  Toggling Buffer Preview on...");
+        datalogger.plot.setNavigatorEnabled(true);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Buffer Preview IS displayed below the plot")) {
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 5: Toggle X-Axis label off
+        printToConsole("  Toggling X-Axis labels off...");
+        datalogger.plot.setShowXAxisLabels(false);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify X-Axis labels are NOT displayed")) {
+            datalogger.plot.setShowXAxisLabels(true);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 6: Toggle X-Axis label on
+        printToConsole("  Toggling X-Axis labels on...");
+        datalogger.plot.setShowXAxisLabels(true);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify X-Axis labels ARE displayed")) {
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 7: Toggle Y-Axis label off
+        printToConsole("  Toggling Y-Axis labels off...");
+        datalogger.plot.setShowYAxisLabels(false);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-Axis labels are NOT displayed")) {
+            datalogger.plot.setShowYAxisLabels(true);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Step 8: Toggle Y-Axis label on
+        printToConsole("  Toggling Y-Axis labels on...");
+        datalogger.plot.setShowYAxisLabels(true);
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify Y-Axis labels ARE displayed")) {
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            msleep(500);
+            return false;
+        }
+
+        // Cleanup
+        datalogger.setRunning(false);
+        datalogger.disableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        return true;
+    } catch (e) {
+        printToConsole("  Error: " + e);
+        datalogger.setRunning(false);
         return false;
     }
 });

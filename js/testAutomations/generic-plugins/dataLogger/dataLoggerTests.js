@@ -38,9 +38,7 @@
 // Doc Test 15: TOGGLE_X_AXIS_UTC_TIME_DISPLAY - No UTC toggle API
 // Doc Test 16: TOGGLE_X_AXIS_LIVE_PLOTTING   - No live plotting toggle API
 // Doc Test 17: TOGGLE_Y_AXIS_AUTOSCALE       - No autoscale toggle API
-// Doc Test 19: ADJUST_CURVE_THICKNESS        - No curve thickness API
-// Doc Test 20: CHANGE_CURVE_STYLE            - No curve style API
-// Doc Test 21: ADJUST_PLOT_DISPLAY_SETTINGS  - No buffer preview/axis label API
+// Doc Test 21: ADJUST_PLOT_DISPLAY_SETTINGS  - No buffer preview/axis label API (partial — see VisualTests)
 // Doc Test 28: CHOOSE_FILE_FOR_DATA_LOGGING  - UI-only (file dialog)
 // Doc Test 35: USE_MULTIPLOT                 - No multiplot behavior API
 // Doc Test 36: USE_KDOCKS                    - UI-only (drag/drop docking)
@@ -907,6 +905,159 @@ TestFramework.runTest("TST.DATALOGGER.SET_X_AXIS_DATE_TIME_FORMAT", function () 
         printToConsole("  ✓ Preference set (cannot verify)");
 
         return "SKIP";
+    } catch (e) {
+        printToConsole("  Error: " + e);
+        return false;
+    }
+});
+
+// ============================================
+// Test 19: Adjust Curve Thickness
+// UID: TST.DATALOGGER.ADJUST_CURVE_THICKNESS
+// Description: Change the curve thickness and check if the curve thickness is changed
+// ============================================
+printToConsole("\n=== Test 19: Adjust Curve Thickness ===\n");
+
+TestFramework.runTest("TST.DATALOGGER.ADJUST_CURVE_THICKNESS", function () {
+    try {
+        let toolName = "Data Logger ";
+        let monitorsStr = datalogger.showAvailableMonitors();
+        let monitors = parseNewlineSeparatedString(monitorsStr);
+
+        if (monitors.length === 0) {
+            return "SKIP";
+        }
+
+        // Enable a monitor so we have a channel on the plot
+        datalogger.enableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        // Switch to plot mode
+        datalogger.setDisplayMode(toolName, 0);
+        msleep(500);
+
+        // Start running to populate the plot
+        datalogger.setRunning(true);
+        msleep(2000);
+
+        // Get channel names from the plot
+        let channels = datalogger.plot.getChannelNames();
+        if (!channels || channels.length === 0) {
+            printToConsole("  No channels available on plot");
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            return "SKIP";
+        }
+
+        let channelName = channels[0];
+        printToConsole("  Testing curve thickness for channel: " + channelName);
+
+        // Save original thickness
+        let original = datalogger.plot.getChannelThickness(channelName);
+        printToConsole("  Original thickness: " + original);
+
+        // Step 5: Set new thickness to 2
+        datalogger.plot.setChannelThickness(channelName, 2);
+        msleep(500);
+
+        // Verify expected result
+        let readBack = datalogger.plot.getChannelThickness(channelName);
+        printToConsole("  After change: " + readBack);
+
+        if (readBack !== 2) {
+            printToConsole("  FAIL: Expected thickness 2, got " + readBack);
+            datalogger.plot.setChannelThickness(channelName, original);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            return false;
+        }
+        printToConsole("  PASS: Curve thickness changed to 2");
+
+        // Restore original
+        datalogger.plot.setChannelThickness(channelName, original);
+        msleep(500);
+        datalogger.setRunning(false);
+        datalogger.disableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        return true;
+    } catch (e) {
+        printToConsole("  Error: " + e);
+        return false;
+    }
+});
+
+// ============================================
+// Test 20: Change Curve Style
+// UID: TST.DATALOGGER.CHANGE_CURVE_STYLE
+// Description: Change the curve style and check if the curve style is changed
+// ============================================
+printToConsole("\n=== Test 20: Change Curve Style ===\n");
+
+TestFramework.runTest("TST.DATALOGGER.CHANGE_CURVE_STYLE", function () {
+    try {
+        let toolName = "Data Logger ";
+        let monitorsStr = datalogger.showAvailableMonitors();
+        let monitors = parseNewlineSeparatedString(monitorsStr);
+
+        if (monitors.length === 0) {
+            return "SKIP";
+        }
+
+        // Enable a monitor so we have a channel on the plot
+        datalogger.enableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        // Switch to plot mode
+        datalogger.setDisplayMode(toolName, 0);
+        msleep(500);
+
+        // Start running to populate the plot
+        datalogger.setRunning(true);
+        msleep(2000);
+
+        // Get channel names from the plot
+        let channels = datalogger.plot.getChannelNames();
+        if (!channels || channels.length === 0) {
+            printToConsole("  No channels available on plot");
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            return "SKIP";
+        }
+
+        let channelName = channels[0];
+        printToConsole("  Testing curve style for channel: " + channelName);
+
+        // Save original style
+        let original = datalogger.plot.getChannelStyle(channelName);
+        printToConsole("  Original style: " + original);
+
+        // Step 5: Change to dots style (style index 4 = QwtPlotCurve::Dots)
+        let dotsStyle = 4;
+        datalogger.plot.setChannelStyle(channelName, dotsStyle);
+        msleep(500);
+
+        // Verify expected result
+        let readBack = datalogger.plot.getChannelStyle(channelName);
+        printToConsole("  After change: " + readBack);
+
+        if (readBack !== dotsStyle) {
+            printToConsole("  FAIL: Expected style " + dotsStyle + ", got " + readBack);
+            datalogger.plot.setChannelStyle(channelName, original);
+            datalogger.setRunning(false);
+            datalogger.disableMonitorOfTool(toolName, monitors[0]);
+            return false;
+        }
+        printToConsole("  PASS: Curve style changed to dots");
+
+        // Restore original
+        datalogger.plot.setChannelStyle(channelName, original);
+        msleep(500);
+        datalogger.setRunning(false);
+        datalogger.disableMonitorOfTool(toolName, monitors[0]);
+        msleep(500);
+
+        return true;
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;

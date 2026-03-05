@@ -19,7 +19,9 @@
  */
 
 #include "jesdstatusplugin.h"
+#include "jesdstatus_api.h"
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -113,11 +115,17 @@ bool JesdStatusPlugin::onConnect()
 		&JesdStatus::runToggled);
 	connect(dynamic_cast<JesdStatus *>(jesdStatus), &JesdStatus::running, m_toolList[0],
 		&ToolMenuEntry::setRunning);
+	initApi();
 	return true;
 }
 
 bool JesdStatusPlugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection
 	for(auto &tool : m_toolList) {
@@ -133,6 +141,13 @@ bool JesdStatusPlugin::onDisconnect()
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 	return true;
+}
+
+void JesdStatusPlugin::initApi()
+{
+	m_api = new JesdStatus_API(this);
+	m_api->setObjectName("jesdstatus");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void JesdStatusPlugin::initMetadata()

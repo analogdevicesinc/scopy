@@ -24,6 +24,7 @@
 
 #include "scopy-datalogger_export.h"
 #include <pluginbase/apiobject.h>
+#include <gui/plotwidget_api.h>
 
 namespace scopy::datamonitor {
 

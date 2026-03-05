@@ -33,6 +33,7 @@ namespace adc {
 
 class SCOPY_ADC_EXPORT TimePlotComponentSettings : public QWidget, public ToolComponent
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	TimePlotComponentSettings(TimePlotComponent *plt, QWidget *parent = nullptr);
@@ -62,6 +63,7 @@ private:
 	MenuPlotAxisRangeControl *m_yCtrl;
 	MenuOnOffSwitch *m_xAxisShow;
 	MenuOnOffSwitch *m_autoscaleBtn;
+	QAbstractButton *m_xySwitch;
 	QList<ChannelComponent *> m_channels;
 	QList<ScaleProvider *> m_scaleProviders;
 	QPushButton *m_deletePlot;

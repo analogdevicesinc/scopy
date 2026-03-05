@@ -87,7 +87,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->minSpinbox()->setScaleRange(1, 1);
 	m_yCtrl->maxSpinbox()->setScaleRange(1, 1);
 
-	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
+	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
 
 	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [=](double v) { m_yCtrl->setMin(v - 10); });

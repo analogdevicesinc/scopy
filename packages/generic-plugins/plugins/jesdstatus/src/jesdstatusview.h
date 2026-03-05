@@ -31,8 +31,12 @@
 
 namespace scopy {
 namespace jesdstatus {
+
+class JesdStatus_API;
+
 class SCOPY_JESDSTATUS_EXPORT JesdStatusView : public QWidget
 {
+	friend class JesdStatus_API;
 	Q_OBJECT
 public:
 	JesdStatusView(struct iio_device *dev, QWidget *parent = nullptr);

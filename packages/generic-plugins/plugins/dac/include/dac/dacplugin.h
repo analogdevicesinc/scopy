@@ -33,8 +33,12 @@
 
 namespace scopy {
 namespace dac {
+
+class DAC_API;
+
 class SCOPY_DAC_EXPORT DACPlugin : public QObject, public PluginBase
 {
+	friend class DAC_API;
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
@@ -55,8 +59,11 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
+
 	struct iio_context *m_ctx;
 	QWidget *dac;
+	DAC_API *m_api = nullptr;
 };
 } // namespace dac
 } // namespace scopy

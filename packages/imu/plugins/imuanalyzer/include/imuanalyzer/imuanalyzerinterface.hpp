@@ -52,8 +52,11 @@
 
 namespace scopy {
 
+class IMUAnalyzer_API;
+
 class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget
 {
+	friend class IMUAnalyzer_API;
 	Q_OBJECT
 public:
 	IMUAnalyzerInterface(QString uri, QWidget *parent = nullptr);

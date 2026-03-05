@@ -20,6 +20,7 @@
  */
 
 #include "dacplugin.h"
+#include "dac_api.h"
 #include "dac_logging_categories.h"
 #include "dacinstrument.h"
 #include "dacutils.h"
@@ -33,6 +34,7 @@
 #include <iioutil/connectionprovider.h>
 #include <gui/deviceinfopage.h>
 #include <pluginbase/preferences.h>
+#include <pluginbase/scopyjs.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -131,11 +133,23 @@ bool DACPlugin::onConnect()
 	connect(m_toolList.last(), &ToolMenuEntry::runToggled, dynamic_cast<DacInstrument *>(dac),
 		&DacInstrument::runToggled);
 	connect(dynamic_cast<DacInstrument *>(dac), &DacInstrument::running, m_toolList[0], &ToolMenuEntry::setRunning);
+	initApi();
 	return true;
+}
+
+void DACPlugin::initApi()
+{
+	m_api = new DAC_API(this);
+	m_api->setObjectName("dac");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 bool DACPlugin::onDisconnect()
 {
+	if(m_api) {
+		delete m_api;
+		m_api = nullptr;
+	}
 	qDebug(CAT_DAC) << "disconnect";
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);

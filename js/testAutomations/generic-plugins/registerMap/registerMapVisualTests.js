@@ -19,18 +19,11 @@
  */
 
 // ============================================================================
-// ALL THE FOLLOWING TESTS REQUIRE VISUAL VALIDATION
+// ALL THE FOLLOWING TESTS REQUIRE SUPERVISED VISUAL VALIDATION
 // These tests automate the steps from the manual test documentation but
-// require a human observer to verify UI changes. Each step includes a 3-second
-// pause to allow visual inspection of the application state.
+// require a human observer to verify UI changes. After each visual check,
+// the test will prompt the user to input 'y' (pass) or 'n' (fail).
 // Source: docs/tests/plugins/registermap/registermap_tests.rst
-//
-// Not automatable (Category C - skipped entirely):
-//   TST.REGMAP.PREFERENCES_SETTINGS_SAVE_ON_CLOSE - requires restarting Scopy
-//   TST.REGMAP.INFO_BUTTON_DOCUMENTATION - opens external browser
-//   TST.REGMAP.INFO_BUTTON_TUTORIAL - displays tutorial UI overlay
-//   TST.REGMAP.INFO_BUTTON_TUTORIAL_NO_XML - displays tutorial UI overlay
-//   TST.REGMAP.CUSTOM_XML_FILE - requires restarting Scopy and copying files
 // ============================================================================
 
 // Load test framework
@@ -38,8 +31,6 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("Register Map Visual Validation Tests");
-
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
 
 // Connect to device
 if (!TestFramework.connectToDevice()) {
@@ -49,18 +40,16 @@ if (!TestFramework.connectToDevice()) {
 
 // Switch to Register Map tool
 if (!switchToTool("Register map")) {
-    printToConsole("ERROR: Cannot access Register Map tool");
+    printToConsole("ERROR: Cannot switch to Register Map tool");
     scopy.exit();
 }
 
-// ===========================================================================
-// Test 5: Show register map table
+// ============================================
+// Test 5: Show Register Map Table
 // UID: TST.REGMAP.SHOW_TABLE
 // Description: Verify that the user can see the register map table.
-// Precondition: XML file of the device is present in the system
-// VISUAL: Verify the register map table is displayed in the plugin
-// ===========================================================================
-printToConsole("\n=== Test 5: Show Register Map Table (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 5: Show Register Map Table (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.SHOW_TABLE", function() {
     try {
@@ -71,8 +60,13 @@ TestFramework.runTest("TST.REGMAP.SHOW_TABLE", function() {
         }
 
         printToConsole("  Available devices: " + devices.join(", "));
-        printToConsole("  VISUAL CHECK: Verify the register map table is displayed in the plugin");
-        msleep(VISUAL_DELAY);
+
+        // Step 1: Open Register Map plugin (already open)
+        // Expected: The register map table is displayed in the plugin
+        if (!TestFramework.supervisedCheck(
+            "Verify the register map table is displayed in the plugin")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -81,14 +75,13 @@ TestFramework.runTest("TST.REGMAP.SHOW_TABLE", function() {
     }
 });
 
-// ===========================================================================
-// Test 7: Simple Register value updated on read
+// ============================================
+// Test 7: Simple Register Value Updated on Read
 // UID: TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_READ
 // Description: Verify that the user can see the register value in the
 //   table updated on read.
-// VISUAL: Verify the value in the table is updated to the new value
-// ===========================================================================
-printToConsole("\n=== Test 7: Simple Register Value Updated on Read (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 7: Simple Register Value Updated on Read (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_READ", function() {
     try {
@@ -97,12 +90,17 @@ TestFramework.runTest("TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_READ", functi
             return "SKIP";
         }
 
+        // Steps 2-3: Select register 0x02 and read
         printToConsole("  Reading register 0x02...");
         var value = regmap.readRegister("0x02");
+        msleep(500);
         printToConsole("  Read value: " + value);
 
-        printToConsole("  VISUAL CHECK: Verify the value in the register table is updated to: " + value);
-        msleep(VISUAL_DELAY);
+        // Expected: The value in the table is updated to the new value
+        if (!TestFramework.supervisedCheck(
+            "Verify the value in the register table is updated to: " + value)) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -111,14 +109,13 @@ TestFramework.runTest("TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_READ", functi
     }
 });
 
-// ===========================================================================
-// Test 8: Simple Register value updated on write
+// ============================================
+// Test 8: Simple Register Value Updated on Write
 // UID: TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_WRITE
 // Description: Verify that the user can see the register value in the
 //   table updated on write.
-// VISUAL: Verify the value in the table is updated to the new value
-// ===========================================================================
-printToConsole("\n=== Test 8: Simple Register Value Updated on Write (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 8: Simple Register Value Updated on Write (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_WRITE", function() {
     try {
@@ -131,13 +128,18 @@ TestFramework.runTest("TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_WRITE", funct
         var original = regmap.readRegister("0x02");
         printToConsole("  Original value of 0x02: " + original);
 
-        // Write new value
+        // Steps 3-5: Read, change to 0x4a, write
         printToConsole("  Writing 0x4a to register 0x02...");
         regmap.write("0x02", "0x4a");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify the value in the register table is updated to 0x4a");
-        msleep(VISUAL_DELAY);
+        // Expected: The value in the table is updated to the new value
+        if (!TestFramework.supervisedCheck(
+            "Verify the value in the register table for 0x02 is updated to 0x4a")) {
+            regmap.write("0x02", original);
+            msleep(500);
+            return false;
+        }
 
         // Restore original value
         regmap.write("0x02", original);
@@ -150,14 +152,13 @@ TestFramework.runTest("TST.REGMAP.SIMPLE_REGISTER_VALUE_UPDATED_ON_WRITE", funct
     }
 });
 
-// ===========================================================================
-// Test 9: Detailed Register value updated on read
+// ============================================
+// Test 9: Detailed Register Value Updated on Read
 // UID: TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_READ
 // Description: Verify that the detailed register bitfields value is
 //   updated on read.
-// VISUAL: Verify the detailed register bitfields are updated
-// ===========================================================================
-printToConsole("\n=== Test 9: Detailed Register Value Updated on Read (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 9: Detailed Register Value Updated on Read (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_READ", function() {
     try {
@@ -166,18 +167,22 @@ TestFramework.runTest("TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_READ", func
             return "SKIP";
         }
 
+        // Steps 2-3: Select register 0x02 and read
         printToConsole("  Reading register 0x02...");
         var value = regmap.readRegister("0x02");
+        msleep(500);
         printToConsole("  Read value: " + value);
 
-        // Show bitfield info if available
         var bitfields = regmap.getRegisterBitFieldsInfo("0x02");
         if (bitfields && bitfields.length > 0) {
             printToConsole("  Bitfields found: " + bitfields.length);
         }
 
-        printToConsole("  VISUAL CHECK: Verify the detailed register bitfields are updated to reflect value: " + value);
-        msleep(VISUAL_DELAY);
+        // Expected: The detailed register bitfields value is updated
+        if (!TestFramework.supervisedCheck(
+            "Verify the detailed register bitfields are updated to reflect value: " + value)) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -186,14 +191,13 @@ TestFramework.runTest("TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_READ", func
     }
 });
 
-// ===========================================================================
-// Test 10: Detailed Register value updated on write
+// ============================================
+// Test 10: Detailed Register Value Updated on Write
 // UID: TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_WRITE
 // Description: Verify that the detailed register bitfields value is
 //   updated on write.
-// VISUAL: Verify the detailed register bitfields are updated
-// ===========================================================================
-printToConsole("\n=== Test 10: Detailed Register Value Updated on Write (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 10: Detailed Register Value Updated on Write (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_WRITE", function() {
     try {
@@ -206,13 +210,18 @@ TestFramework.runTest("TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_WRITE", fun
         var original = regmap.readRegister("0x02");
         printToConsole("  Original value of 0x02: " + original);
 
-        // Write new value
+        // Steps 3-5: Read, change to 0x4a, write
         printToConsole("  Writing 0x4a to register 0x02...");
         regmap.write("0x02", "0x4a");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify the detailed register bitfields are updated to reflect value 0x4a");
-        msleep(VISUAL_DELAY);
+        // Expected: The detailed register bitfields value is updated
+        if (!TestFramework.supervisedCheck(
+            "Verify the detailed register bitfields are updated to reflect value 0x4a")) {
+            regmap.write("0x02", original);
+            msleep(500);
+            return false;
+        }
 
         // Restore original value
         regmap.write("0x02", original);
@@ -225,14 +234,13 @@ TestFramework.runTest("TST.REGMAP.DETAILED_REGISTER_VALUE_UPDATED_ON_WRITE", fun
     }
 });
 
-// ===========================================================================
-// Test 12: Change Value field updates detailed register bitfields
+// ============================================
+// Test 12: Change Value Field Updates Detailed Register Bitfields
 // UID: TST.REGMAP.CHANGE_VALUE_FIELD
-// Description: Verify that when the Value field is changed the detailed
-//   register bitfields are updated.
-// VISUAL: Verify bitfield "reg002_b3" changes from on to off
-// ===========================================================================
-printToConsole("\n=== Test 12: Change Value Field Updates Bitfields (VISUAL) ===\n");
+// Description: Verify that when value of the Value field is changed
+//   the detailed register bitfields are updated.
+// ============================================
+printToConsole("\n=== Test 12: Change Value Field Updates Bitfields (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.CHANGE_VALUE_FIELD", function() {
     try {
@@ -250,16 +258,25 @@ TestFramework.runTest("TST.REGMAP.CHANGE_VALUE_FIELD", function() {
         regmap.write("0x02", "0x4c");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify bitfield 'reg002_b3' is ON (bit 3 set in 0x4c)");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify bitfield 'reg002_b3' is ON (bit 3 is set in 0x4c)")) {
+            regmap.write("0x02", original);
+            msleep(500);
+            return false;
+        }
 
-        // Step 4: Change value to 0x44
-        printToConsole("  Changing value to 0x44 (bit 3 cleared)...");
+        // Step 4: Change value to 0x44 (bit 3 cleared)
+        printToConsole("  Changing value to 0x44 (clearing bit 3)...");
         regmap.write("0x02", "0x44");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify bitfield 'reg002_b3' changed from ON to OFF");
-        msleep(VISUAL_DELAY);
+        // Expected: The detailed bitfield "reg002_b3" value is changed from on to off
+        if (!TestFramework.supervisedCheck(
+            "Verify bitfield 'reg002_b3' changed from ON to OFF (bit 3 cleared in 0x44)")) {
+            regmap.write("0x02", original);
+            msleep(500);
+            return false;
+        }
 
         // Restore original value
         regmap.write("0x02", original);
@@ -272,16 +289,13 @@ TestFramework.runTest("TST.REGMAP.CHANGE_VALUE_FIELD", function() {
     }
 });
 
-// ===========================================================================
-// Test 13: Change selected register
+// ============================================
+// Test 13: Change Selected Register
 // UID: TST.REGMAP.CHANGE_SELECTED_REGISTER
 // Description: Verify that when the register is changed the detailed
 //   register bitfields are updated.
-// VISUAL: Verify register selection changes in the table and address picker
-// Note: +/- buttons and table click are UI-only interactions. This test
-//   reads different registers to trigger selection changes.
-// ===========================================================================
-printToConsole("\n=== Test 13: Change Selected Register (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 13: Change Selected Register (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.CHANGE_SELECTED_REGISTER", function() {
     try {
@@ -295,24 +309,44 @@ TestFramework.runTest("TST.REGMAP.CHANGE_SELECTED_REGISTER", function() {
         regmap.readRegister("0x20");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify register 0x20 is displayed and selected in the table");
-        msleep(VISUAL_DELAY);
+        // Expected: Register 0x20 is displayed and selected
+        if (!TestFramework.supervisedCheck(
+            "Verify register 0x20 is displayed and selected in the table")) {
+            return false;
+        }
 
-        // Step 3: Change to register 0x21 (simulates +button)
+        // Step 3: Change to register 0x21 (simulates + button)
         printToConsole("  Reading register 0x21...");
         regmap.readRegister("0x21");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify register 0x21 is now displayed and selected in the table");
-        msleep(VISUAL_DELAY);
+        // Expected: Register 0x21 is displayed and selected
+        if (!TestFramework.supervisedCheck(
+            "Verify register 0x21 is now displayed and selected in the table")) {
+            return false;
+        }
 
-        // Step 4: Change back to register 0x20 (simulates -button)
+        // Step 4: Change back to register 0x20 (simulates - button)
         printToConsole("  Reading register 0x20 again...");
         regmap.readRegister("0x20");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify register 0x20 is selected again and address picker shows 0x20");
-        msleep(VISUAL_DELAY);
+        // Expected: Register 0x20 is selected, address picker shows 0x20
+        if (!TestFramework.supervisedCheck(
+            "Verify register 0x20 is selected again and the address picker shows 0x20")) {
+            return false;
+        }
+
+        // Step 5: Click on register 0x21 in the table
+        // Note: Table click is UI-only, simulating via readRegister
+        printToConsole("  Reading register 0x21 (simulating table click)...");
+        regmap.readRegister("0x21");
+        msleep(500);
+
+        if (!TestFramework.supervisedCheck(
+            "Verify register 0x21 is selected and the address picker updated to 0x21")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -321,17 +355,16 @@ TestFramework.runTest("TST.REGMAP.CHANGE_SELECTED_REGISTER", function() {
     }
 });
 
-// ===========================================================================
-// Test 14: Toggle detailed register visible
+// ============================================
+// Test 14: Toggle Detailed Register Visible
 // UID: TST.REGMAP.TOGGLE_DETAILED_REGISTER_VISIBLE
 // Description: Verify that the user can toggle the detailed register
 //   visibility.
-// VISUAL: Verify the detailed register section hides and shows
-// Note: No API exists for toggling the detailed register panel. This test
-//   reads a register to ensure the detailed view has data, then requires
-//   manual interaction to toggle visibility.
-// ===========================================================================
-printToConsole("\n=== Test 14: Toggle Detailed Register Visible (VISUAL) ===\n");
+// Note: No API exists for toggling the detailed register panel.
+//   The test reads a register to populate the view, then asks the
+//   user to manually press the toggle button.
+// ============================================
+printToConsole("\n=== Test 14: Toggle Detailed Register Visible (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.TOGGLE_DETAILED_REGISTER_VISIBLE", function() {
     try {
@@ -345,16 +378,24 @@ TestFramework.runTest("TST.REGMAP.TOGGLE_DETAILED_REGISTER_VISIBLE", function() 
         regmap.readRegister("0x02");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify the detailed register view is visible with bitfield data");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Verify the detailed register view is visible with bitfield data. " +
+            "Then press the 'Toggle detailed register' button to HIDE it.")) {
+            return false;
+        }
 
-        printToConsole("  ACTION REQUIRED: Press the 'Toggle detailed register' button");
-        printToConsole("  VISUAL CHECK: Verify the detailed register section is now hidden");
-        msleep(VISUAL_DELAY);
+        // Expected: Detailed register is hidden
+        if (!TestFramework.supervisedCheck(
+            "Verify the detailed register section is now HIDDEN. " +
+            "Then press the 'Toggle detailed register' button again to SHOW it.")) {
+            return false;
+        }
 
-        printToConsole("  ACTION REQUIRED: Press the 'Toggle detailed register' button again");
-        printToConsole("  VISUAL CHECK: Verify the detailed register section is visible again");
-        msleep(VISUAL_DELAY);
+        // Expected: Detailed register is visible again
+        if (!TestFramework.supervisedCheck(
+            "Verify the detailed register section is VISIBLE again")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -363,14 +404,13 @@ TestFramework.runTest("TST.REGMAP.TOGGLE_DETAILED_REGISTER_VISIBLE", function() 
     }
 });
 
-// ===========================================================================
-// Test 20: Settings Dump register and write values buttons disabled
+// ============================================
+// Test 20: Settings Dump Register and Write Values Disabled
 // UID: TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED
 // Description: Verify that the Register dump and Write values buttons
 //   are disabled when the file path is not selected.
-// VISUAL: Verify buttons are disabled/enabled based on file path
-// ===========================================================================
-printToConsole("\n=== Test 20: Dump/Write Buttons Disabled Without Path (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 20: Dump/Write Buttons Disabled Without Path (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED", function() {
     try {
@@ -379,27 +419,33 @@ TestFramework.runTest("TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED"
             return "SKIP";
         }
 
-        // Clear file path to ensure buttons should be disabled
+        // Step 3-4: Verify buttons disabled when no path set
         printToConsole("  Clearing file path...");
         regmap.setPath("");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify 'Register dump' button is disabled (no file path set)");
-        msleep(VISUAL_DELAY);
+        // Expected: Register dump and Write values buttons are disabled
+        if (!TestFramework.supervisedCheck(
+            "Open Settings. Verify 'Register dump' and 'Write values' buttons are DISABLED " +
+            "(no file path is set)")) {
+            return false;
+        }
 
-        printToConsole("  VISUAL CHECK: Verify 'Write values' button is disabled (no file path set)");
-        msleep(VISUAL_DELAY);
-
-        // Set a file path to enable buttons
+        // Step 5: Select a file path to enable buttons
         var testPath = fileIO.getTempPath() + "/regmap_visual_test.csv";
         printToConsole("  Setting file path to: " + testPath);
         regmap.setPath(testPath);
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify 'Register dump' and 'Write values' buttons are now enabled");
-        msleep(VISUAL_DELAY);
+        // Expected: Both buttons are now enabled
+        if (!TestFramework.supervisedCheck(
+            "Verify 'Register dump' and 'Write values' buttons are now ENABLED")) {
+            regmap.setPath("");
+            msleep(500);
+            return false;
+        }
 
-        // Clear path again to restore
+        // Restore: clear path
         regmap.setPath("");
         msleep(500);
 
@@ -410,16 +456,13 @@ TestFramework.runTest("TST.REGMAP.SETTINGS_DUMP_REGIS_AND_WRITE_VALUES_DISABLED"
     }
 });
 
-// ===========================================================================
-// Test 21: Preferences color coding background color
+// ============================================
+// Test 21: Preferences Color Coding Background Color
 // UID: TST.REGMAP.PREFERENCES_COLOR_CODING_BACKGROUND_COLOR
 // Description: Verify that the background color of the register in the
 //   table is changing to reflect the value of the register.
-// VISUAL: Verify background colors change after reading a register
-// Note: Color coding preferences must be set manually via Preferences >
-//   RegmapPlugin > "Register background and bitfield background"
-// ===========================================================================
-printToConsole("\n=== Test 21: Color Coding Background Color (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 21: Color Coding Background Color (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_BACKGROUND_COLOR", function() {
     try {
@@ -428,17 +471,24 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_BACKGROUND_COLOR", fu
             return "SKIP";
         }
 
-        printToConsole("  ACTION REQUIRED: Open Preferences > RegmapPlugin tab");
-        printToConsole("  ACTION REQUIRED: Select 'Register background and bitfield background' from dropdown");
-        msleep(VISUAL_DELAY);
+        // Steps 1-3: User must set Preferences > RegmapPlugin > background color coding
+        if (!TestFramework.supervisedCheck(
+            "Open Preferences > RegmapPlugin tab. Select 'Register background and " +
+            "bitfield background' from the color coding dropdown. Then return to Register Map.")) {
+            return false;
+        }
 
+        // Steps 5-6: Select register 0x02 and read
         printToConsole("  Reading register 0x02...");
         regmap.readRegister("0x02");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify the background color of register 0x02 reflects its value");
-        printToConsole("  VISUAL CHECK: Verify the background color of bitfields reflects their values");
-        msleep(VISUAL_DELAY);
+        // Expected: Background colors reflect register/bitfield values
+        if (!TestFramework.supervisedCheck(
+            "Verify the background color of register 0x02 reflects its value AND " +
+            "the background color of bitfields reflects their values")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -447,16 +497,13 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_BACKGROUND_COLOR", fu
     }
 });
 
-// ===========================================================================
-// Test 22: Preferences color coding text color
+// ============================================
+// Test 22: Preferences Color Coding Text Color
 // UID: TST.REGMAP.PREFERENCES_COLOR_CODING_TEXT_COLOR
 // Description: Verify that the text color of the register in the table
 //   is changing to reflect the value of the register.
-// VISUAL: Verify text colors change after reading a register
-// Note: Color coding preferences must be set manually via Preferences >
-//   RegmapPlugin > "Register text and bitfield text"
-// ===========================================================================
-printToConsole("\n=== Test 22: Color Coding Text Color (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 22: Color Coding Text Color (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_TEXT_COLOR", function() {
     try {
@@ -465,17 +512,24 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_TEXT_COLOR", function
             return "SKIP";
         }
 
-        printToConsole("  ACTION REQUIRED: Open Preferences > RegmapPlugin tab");
-        printToConsole("  ACTION REQUIRED: Select 'Register text and bitfield text' from dropdown");
-        msleep(VISUAL_DELAY);
+        // Steps 1-3: User must set Preferences > RegmapPlugin > text color coding
+        if (!TestFramework.supervisedCheck(
+            "Open Preferences > RegmapPlugin tab. Select 'Register text and " +
+            "bitfield text' from the color coding dropdown. Then return to Register Map.")) {
+            return false;
+        }
 
+        // Steps 5-6: Select register 0x02 and read
         printToConsole("  Reading register 0x02...");
         regmap.readRegister("0x02");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify the text color of register 0x02 reflects its value");
-        printToConsole("  VISUAL CHECK: Verify the text color of bitfields reflects their values");
-        msleep(VISUAL_DELAY);
+        // Expected: Text colors reflect register/bitfield values
+        if (!TestFramework.supervisedCheck(
+            "Verify the text color of register 0x02 reflects its value AND " +
+            "the text color of bitfields reflects their values")) {
+            return false;
+        }
 
         return true;
     } catch (e) {
@@ -484,14 +538,12 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_TEXT_COLOR", function
     }
 });
 
-// ===========================================================================
-// Test 23: Preferences color for value range
+// ============================================
+// Test 23: Preferences Color for Value Range
 // UID: TST.REGMAP.PREFERENCES_COLORS_VALUE_RANGE
-// Description: Verify that registers with the same value have the same
-//   color coding applied.
-// VISUAL: Verify bitfields with same values have same colors
-// ===========================================================================
-printToConsole("\n=== Test 23: Color Coding Value Range (VISUAL) ===\n");
+// Description: Verify that the colors used for the values are correct.
+// ============================================
+printToConsole("\n=== Test 23: Color Coding Value Range (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.PREFERENCES_COLORS_VALUE_RANGE", function() {
     try {
@@ -500,31 +552,42 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLORS_VALUE_RANGE", function() {
             return "SKIP";
         }
 
-        printToConsole("  ACTION REQUIRED: Ensure Preferences > RegmapPlugin > 'Register text and bitfield text' is selected");
-        msleep(VISUAL_DELAY);
+        // Steps 1-3: Ensure text color coding is set
+        if (!TestFramework.supervisedCheck(
+            "Ensure Preferences > RegmapPlugin > 'Register text and bitfield text' " +
+            "is selected. Then return to Register Map.")) {
+            return false;
+        }
 
         // Save original values
         var orig02 = regmap.readRegister("0x02");
         var orig03 = regmap.readRegister("0x03");
-        printToConsole("  Original 0x02: " + orig02 + ", 0x03: " + orig03);
+        printToConsole("  Original values: 0x02=" + orig02 + ", 0x03=" + orig03);
 
-        // Write same value to both registers
+        // Steps 6-7: Write 0x6f to register 0x02 and read
         printToConsole("  Writing 0x6f to register 0x02...");
         regmap.write("0x02", "0x6f");
         msleep(500);
-
         regmap.readRegister("0x02");
         msleep(500);
 
+        // Steps 8-10: Write 0x6f to register 0x03 and read
         printToConsole("  Writing 0x6f to register 0x03...");
         regmap.write("0x03", "0x6f");
         msleep(500);
-
         regmap.readRegister("0x03");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Verify bitfields with the same value have the same text color");
-        msleep(VISUAL_DELAY);
+        // Expected: Bitfields with same value have same text color
+        if (!TestFramework.supervisedCheck(
+            "Verify that bitfields with the same value in registers 0x02 and 0x03 " +
+            "have the same text color")) {
+            regmap.write("0x02", orig02);
+            msleep(500);
+            regmap.write("0x03", orig03);
+            msleep(500);
+            return false;
+        }
 
         // Restore original values
         regmap.write("0x02", orig02);
@@ -539,14 +602,13 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLORS_VALUE_RANGE", function() {
     }
 });
 
-// ===========================================================================
-// Test 24: Preferences color coding dynamic change
+// ============================================
+// Test 24: Preferences Color Coding Dynamic Change
 // UID: TST.REGMAP.PREFERENCES_COLOR_CODING_DYNAMIC_CHANGE
 // Description: Verify that the color coding is changing dynamically
 //   when preferences are updated.
-// VISUAL: Verify colors update in real-time when preference changes
-// ===========================================================================
-printToConsole("\n=== Test 24: Color Coding Dynamic Change (VISUAL) ===\n");
+// ============================================
+printToConsole("\n=== Test 24: Color Coding Dynamic Change (SUPERVISED) ===\n");
 
 TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_DYNAMIC_CHANGE", function() {
     try {
@@ -555,22 +617,25 @@ TestFramework.runTest("TST.REGMAP.PREFERENCES_COLOR_CODING_DYNAMIC_CHANGE", func
             return "SKIP";
         }
 
-        // Step 2-3: Read a register to have a value displayed
+        // Steps 2-3: Read a register to have a value displayed
         printToConsole("  Reading register 0x02...");
         regmap.readRegister("0x02");
         msleep(500);
 
-        printToConsole("  VISUAL CHECK: Note the current appearance of register 0x02 (no color coding)");
-        msleep(VISUAL_DELAY);
-
-        // Step 4-6: User must change preferences
-        printToConsole("  ACTION REQUIRED: Open Preferences > RegmapPlugin tab");
-        printToConsole("  ACTION REQUIRED: Select 'Register background and bitfield background' from dropdown");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck(
+            "Note the current appearance of register 0x02 (no color coding or current coding). " +
+            "Then open Preferences > RegmapPlugin tab and select " +
+            "'Register background and bitfield background' from the dropdown.")) {
+            return false;
+        }
 
         // Step 7: Switch back to Register Map
-        printToConsole("  VISUAL CHECK: Verify the background color of register 0x02 dynamically updated to reflect its value");
-        msleep(VISUAL_DELAY);
+        // Expected: Background color dynamically updated
+        if (!TestFramework.supervisedCheck(
+            "Return to Register Map. Verify the background color of register 0x02 " +
+            "dynamically updated to reflect its value")) {
+            return false;
+        }
 
         return true;
     } catch (e) {

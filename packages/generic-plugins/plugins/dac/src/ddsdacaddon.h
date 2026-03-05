@@ -34,6 +34,7 @@ class TxNode;
 class TxChannel;
 class DdsDacAddon : public DacAddon
 {
+	friend class DAC_API;
 	Q_OBJECT
 public:
 	DdsDacAddon(DacDataModel *model, QWidget *parent = nullptr);
@@ -50,6 +51,7 @@ private:
 
 class TxMode : public QWidget
 {
+	friend class DAC_API;
 	Q_OBJECT
 public:
 	TxMode(TxNode *node, unsigned int mode, QWidget *parent = nullptr);

@@ -20,6 +20,7 @@
  */
 
 #include "imuanalyzer.h"
+#include "imuanalyzer_api.h"
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -31,6 +32,7 @@
 
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferences.h>
+#include <pluginbase/scopyjs.h>
 #include <qdebug.h>
 
 #include <deviceiconbuilder.h>
@@ -88,11 +90,17 @@ bool IMUAnalyzer::onConnect()
 	connect(imuTme, &ToolMenuEntry::runToggled, m_imuInterface, &IMUAnalyzerInterface::runToggled);
 	connect(m_imuInterface, &IMUAnalyzerInterface::runBtnPressed, imuTme, &ToolMenuEntry::setRunning);
 
+	initApi();
 	return true;
 }
 
 bool IMUAnalyzer::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -127,6 +135,13 @@ bool IMUAnalyzer::loadIcon()
 }
 
 QString IMUAnalyzer::description() { return "This plugin provides analysis and visualization for IMU sensor data"; }
+
+void IMUAnalyzer::initApi()
+{
+	m_api = new IMUAnalyzer_API(this);
+	m_api->setObjectName("imuanalyzer");
+	ScopyJS::GetInstance()->registerApi(m_api);
+}
 
 void IMUAnalyzer::initMetadata() // not actually needed - putting it here to set priority
 {
