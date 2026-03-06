@@ -157,21 +157,36 @@ void Adrv9009Plugin_API::switchAdvancedTab(const QString &tabName)
 	}
 
 	QPushButton *btn = nullptr;
-	if(tabName == "CLK Settings")          btn = tool->m_clkSettingsBtn;
-	else if(tabName == "Calibrations")     btn = tool->m_calibrationsBtn;
-	else if(tabName == "TX Settings")      btn = tool->m_txSettingsBtn;
-	else if(tabName == "RX Settings")      btn = tool->m_rxSettingsBtn;
-	else if(tabName == "ORX Settings")     btn = tool->m_orxSettingsBtn;
-	else if(tabName == "FHM Setup")        btn = tool->m_fhmSetupBtn;
-	else if(tabName == "PA Protection")    btn = tool->m_paProtectionBtn;
-	else if(tabName == "GAIN Setup")       btn = tool->m_gainSetupBtn;
-	else if(tabName == "AGC Setup")        btn = tool->m_agcSetupBtn;
-	else if(tabName == "ARM GPIO")         btn = tool->m_gpioConfigBtn;
-	else if(tabName == "AUX DAC")          btn = tool->m_auxDacBtn;
-	else if(tabName == "JESD204 Settings") btn = tool->m_jesd204SettingsBtn;
-	else if(tabName == "JESD Framer")      btn = tool->m_jesdFramerBtn;
-	else if(tabName == "JESD Deframer")    btn = tool->m_jesdDeframerBtn;
-	else if(tabName == "BIST")             btn = tool->m_bistBtn;
+	if(tabName == "CLK Settings")
+		btn = tool->m_clkSettingsBtn;
+	else if(tabName == "Calibrations")
+		btn = tool->m_calibrationsBtn;
+	else if(tabName == "TX Settings")
+		btn = tool->m_txSettingsBtn;
+	else if(tabName == "RX Settings")
+		btn = tool->m_rxSettingsBtn;
+	else if(tabName == "ORX Settings")
+		btn = tool->m_orxSettingsBtn;
+	else if(tabName == "FHM Setup")
+		btn = tool->m_fhmSetupBtn;
+	else if(tabName == "PA Protection")
+		btn = tool->m_paProtectionBtn;
+	else if(tabName == "GAIN Setup")
+		btn = tool->m_gainSetupBtn;
+	else if(tabName == "AGC Setup")
+		btn = tool->m_agcSetupBtn;
+	else if(tabName == "ARM GPIO")
+		btn = tool->m_gpioConfigBtn;
+	else if(tabName == "AUX DAC")
+		btn = tool->m_auxDacBtn;
+	else if(tabName == "JESD204 Settings")
+		btn = tool->m_jesd204SettingsBtn;
+	else if(tabName == "JESD Framer")
+		btn = tool->m_jesdFramerBtn;
+	else if(tabName == "JESD Deframer")
+		btn = tool->m_jesdDeframerBtn;
+	else if(tabName == "BIST")
+		btn = tool->m_bistBtn;
 
 	if(btn) {
 		btn->click();

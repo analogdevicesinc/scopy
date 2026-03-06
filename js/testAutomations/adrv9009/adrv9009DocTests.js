@@ -44,6 +44,10 @@
 // Not automated (requires OS file browser interaction):
 //   TST.ADRV9009.CONTROLS.PROFILE_LOAD  (#4)
 //
+// Not automated (cannot be automated — lane polarity changes disrupt the JESD link):
+//   TST.ADRV9009.ADVANCED.JESD_SETTINGS.SER_LANE_POLARITY  (#43)
+//   TST.ADRV9009.ADVANCED.JESD_SETTINGS.DES_LANE_POLARITY  (#44)
+//
 // ============================================================
 
 // Load test framework
@@ -1086,6 +1090,12 @@ TestFramework.runTest("TST.ADRV9009.CONTROLS.REFRESH_FUNCTION", function() {
     }
 });
 
+// Switch to the Advanced tool for all advanced tests
+if (!switchToTool("ADRV9009 Advanced")) {
+    printToConsole("ERROR: Cannot switch to ADRV9009 Advanced tool");
+    scopy.exit();
+}
+
 // ============================================
 // Advanced Test 2: Clock Settings Tab
 // UID: TST.ADRV9009.ADVANCED.CLK_SETTINGS
@@ -1098,6 +1108,8 @@ printToConsole("\n=== Advanced Test 2: Clock Settings ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.CLK_SETTINGS.DEVICE_CLOCK", function() {
     try {
+        adrv9009.switchAdvancedTab("CLK Settings");
+        msleep(500);
         var clkKey = findKey("dig-clocks-device-clock_khz");
         if (!clkKey) {
             printToConsole("  FAIL: device-clock_khz key not found");
@@ -1123,6 +1135,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.CLK_SETTINGS.DEVICE_CLOCK", functio
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.CLK_SETTINGS.VCO_FREQ", function() {
     try {
+        adrv9009.switchAdvancedTab("CLK Settings");
+        msleep(500);
         var vcoKey = findKey("dig-clocks-clk-pll-vco-freq_khz");
         if (!vcoKey) {
             printToConsole("  FAIL: clk-pll-vco-freq_khz key not found");
@@ -1147,6 +1161,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.CLK_SETTINGS.VCO_FREQ", function() 
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.CLK_SETTINGS.HS_DIVIDER", function() {
     try {
+        adrv9009.switchAdvancedTab("CLK Settings");
+        msleep(500);
         var hsDivKey = findKey("dig-clocks-clk-pll-hs-div");
         if (!hsDivKey) {
             printToConsole("  FAIL: clk-pll-hs-div key not found");
@@ -1180,6 +1196,8 @@ printToConsole("\n=== Advanced Test 3: RX Profile Settings ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.FIR_DECIMATION", function() {
     try {
+        adrv9009.switchAdvancedTab("RX Settings");
+        msleep(500);
         var firKey = findKey("rx-profile-rx-fir-decimation");
         if (!firKey) {
             printToConsole("  FAIL: rx-fir-decimation key not found");
@@ -1204,6 +1222,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.FIR_DECIMATION", functi
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.OUTPUT_RATE", function() {
     try {
+        adrv9009.switchAdvancedTab("RX Settings");
+        msleep(500);
         var rateKey = findKey("rx-profile-rx-output-rate_khz");
         if (!rateKey) {
             printToConsole("  FAIL: rx-output-rate_khz key not found");
@@ -1227,6 +1247,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.OUTPUT_RATE", function(
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.RF_BANDWIDTH", function() {
     try {
+        adrv9009.switchAdvancedTab("RX Settings");
+        msleep(500);
         var bwKey = findKey("rx-profile-rf-bandwidth_hz");
         if (!bwKey) {
             printToConsole("  FAIL: rx-profile-rf-bandwidth_hz key not found");
@@ -1250,6 +1272,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.RF_BANDWIDTH", function
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.RX_SETTINGS.CHANNELS_ENABLE", function() {
     try {
+        adrv9009.switchAdvancedTab("RX Settings");
+        msleep(500);
         var rxChKey = findKey("rx-settings-rx-channels");
         if (!rxChKey) {
             printToConsole("  FAIL: rx-settings-rx-channels key not found");
@@ -1280,6 +1304,8 @@ printToConsole("\n=== Advanced Test 4: TX Profile Settings ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.FIR_INTERPOLATION", function() {
     try {
+        adrv9009.switchAdvancedTab("TX Settings");
+        msleep(500);
         var firKey = findKey("tx-profile-tx-fir-interpolation");
         if (!firKey) {
             printToConsole("  FAIL: tx-fir-interpolation key not found");
@@ -1304,6 +1330,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.FIR_INTERPOLATION", fun
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.INPUT_RATE", function() {
     try {
+        adrv9009.switchAdvancedTab("TX Settings");
+        msleep(500);
         var rateKey = findKey("tx-profile-tx-input-rate_khz");
         if (!rateKey) {
             printToConsole("  FAIL: tx-input-rate_khz key not found");
@@ -1327,6 +1355,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.INPUT_RATE", function()
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.ATTEN_STEP_SIZE", function() {
     try {
+        adrv9009.switchAdvancedTab("TX Settings");
+        msleep(500);
         var stepKey = findKey("tx-settings-tx-atten-step-size");
         if (!stepKey) {
             printToConsole("  FAIL: tx-atten-step-size key not found");
@@ -1351,6 +1381,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.ATTEN_STEP_SIZE", funct
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.TX_SETTINGS.TX1_TX2_ATTEN", function() {
     try {
+        adrv9009.switchAdvancedTab("TX Settings");
+        msleep(500);
         var tx1Key = findKey("tx-settings-tx1-atten_md-b");
         var tx2Key = findKey("tx-settings-tx2-atten_md-b");
 
@@ -1388,6 +1420,8 @@ printToConsole("\n=== Advanced Test 5: ORX Profile Settings ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.ORX_SETTINGS.OUTPUT_RATE", function() {
     try {
+        adrv9009.switchAdvancedTab("ORX Settings");
+        msleep(500);
         var rateKey = findKey("orx-profile-orx-output-rate_khz");
         if (!rateKey) {
             printToConsole("  FAIL: orx-output-rate_khz key not found");
@@ -1412,6 +1446,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.ORX_SETTINGS.OUTPUT_RATE", function
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.ORX_SETTINGS.RF_BANDWIDTH", function() {
     try {
+        adrv9009.switchAdvancedTab("ORX Settings");
+        msleep(500);
         var bwKey = findKey("orx-profile-rf-bandwidth_hz");
         if (!bwKey) {
             printToConsole("  FAIL: orx-profile-rf-bandwidth_hz key not found");
@@ -1435,6 +1471,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.ORX_SETTINGS.RF_BANDWIDTH", functio
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.ORX_SETTINGS.CHANNELS_ENABLE", function() {
     try {
+        adrv9009.switchAdvancedTab("ORX Settings");
+        msleep(500);
         var orxChKey = findKey("obs-settings-obs-rx-channels-enable");
         if (!orxChKey) {
             orxChKey = findKey("obs-settings-obs-rx-channels");
@@ -1473,6 +1511,8 @@ printToConsole("\n=== Advanced Test 6: JESD204 Settings ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.SER_AMPLITUDE", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD204 Settings");
+        msleep(500);
         var serAmpKey = findKey("jesd204-ser-amplitude");
         if (!serAmpKey) {
             printToConsole("  FAIL: jesd204-ser-amplitude key not found");
@@ -1517,6 +1557,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.SER_AMPLITUDE", funct
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.SER_PRE_EMPHASIS", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD204 Settings");
+        msleep(500);
         var preEmpKey = findKey("jesd204-ser-pre-emphasis");
         if (!preEmpKey) {
             printToConsole("  FAIL: jesd204-ser-pre-emphasis key not found");
@@ -1554,95 +1596,10 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.SER_PRE_EMPHASIS", fu
     }
 });
 
-TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.SER_LANE_POLARITY", function() {
-    try {
-        // Step 4: Toggle serializer lane polarity bitmask (range 0–15 for 4 lanes)
-        var polKey = findKey("jesd204-ser-invert-lane-polarity");
-        if (!polKey) {
-            printToConsole("  FAIL: jesd204-ser-invert-lane-polarity key not found");
-            return false;
-        }
-        printToConsole("  Using SER lane polarity key: " + polKey);
-
-        var origVal = adrv9009.readWidget(polKey);
-        printToConsole("  Original SER lane polarity: " + origVal);
-        if (!origVal || origVal === "") {
-            printToConsole("  FAIL: ser-invert-lane-polarity returned empty");
-            return false;
-        }
-
-        // Write all lanes inverted (bitmask 15 = 0b1111), then clear (0)
-        var testVal = (origVal === "0") ? "15" : "0";
-        adrv9009.writeWidget(polKey, testVal);
-        msleep(500);
-        var readBack = adrv9009.readWidget(polKey);
-        printToConsole("  Set SER lane polarity to " + testVal + ", read back: " + readBack);
-
-        // Restore
-        adrv9009.writeWidget(polKey, origVal);
-        msleep(500);
-
-        if (!readBack || readBack === "") {
-            printToConsole("  FAIL: SER lane polarity read-back returned empty");
-            return false;
-        }
-        if (parseFloat(readBack) !== parseFloat(testVal)) {
-            printToConsole("  FAIL: SER lane polarity read-back " + readBack + " does not match " + testVal);
-            return false;
-        }
-        printToConsole("  PASS: JESD204 serializer lane polarity write-readback verified");
-        return true;
-    } catch (e) {
-        printToConsole("  Error: " + e);
-        return false;
-    }
-});
-
-TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.DES_LANE_POLARITY", function() {
-    try {
-        // Step 5: Toggle deserializer lane polarity bitmask (range 0–15 for 4 lanes)
-        var polKey = findKey("jesd204-des-invert-lane-polarity");
-        if (!polKey) {
-            printToConsole("  FAIL: jesd204-des-invert-lane-polarity key not found");
-            return false;
-        }
-        printToConsole("  Using DES lane polarity key: " + polKey);
-
-        var origVal = adrv9009.readWidget(polKey);
-        printToConsole("  Original DES lane polarity: " + origVal);
-        if (!origVal || origVal === "") {
-            printToConsole("  FAIL: des-invert-lane-polarity returned empty");
-            return false;
-        }
-
-        var testVal = (origVal === "0") ? "15" : "0";
-        adrv9009.writeWidget(polKey, testVal);
-        msleep(500);
-        var readBack = adrv9009.readWidget(polKey);
-        printToConsole("  Set DES lane polarity to " + testVal + ", read back: " + readBack);
-
-        // Restore
-        adrv9009.writeWidget(polKey, origVal);
-        msleep(500);
-
-        if (!readBack || readBack === "") {
-            printToConsole("  FAIL: DES lane polarity read-back returned empty");
-            return false;
-        }
-        if (parseFloat(readBack) !== parseFloat(testVal)) {
-            printToConsole("  FAIL: DES lane polarity read-back " + readBack + " does not match " + testVal);
-            return false;
-        }
-        printToConsole("  PASS: JESD204 deserializer lane polarity write-readback verified");
-        return true;
-    } catch (e) {
-        printToConsole("  Error: " + e);
-        return false;
-    }
-});
-
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.DES_EQ", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD204 Settings");
+        msleep(500);
         var desEqKey = findKey("jesd204-des-eq-setting");
         if (!desEqKey) {
             printToConsole("  FAIL: jesd204-des-eq-setting key not found");
@@ -1681,6 +1638,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.DES_EQ", function() {
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_SETTINGS.SYSREF_LVDS", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD204 Settings");
+        msleep(500);
         var sysrefKey = findKey("jesd204-sysref-lvds-mode");
         if (!sysrefKey) {
             printToConsole("  FAIL: jesd204-sysref-lvds-mode key not found");
@@ -1735,6 +1694,8 @@ printToConsole("\n=== Advanced Test 7: JESD Framer ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_FRAMER.BANK_DEVICE_ID", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD Framer");
+        msleep(500);
         // Step 3: Check Framer A and Framer B bank-id
         var bankAKey = findKey("framer-a-bank-id");
         var bankBKey = findKey("framer-b-bank-id");
@@ -1805,6 +1766,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_FRAMER.BANK_DEVICE_ID", functi
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_FRAMER.MK_PARAMS", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD Framer");
+        msleep(500);
         // Step 4: Verify M, K, F and NP parameter attributes are readable
         // These are JESD204 link parameters — read-only verification (writing could break the link)
         var params = [
@@ -1840,6 +1803,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_FRAMER.MK_PARAMS", function() 
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_FRAMER.SCRAMBLE", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD Framer");
+        msleep(500);
         // Step 6: Enable/disable scramble for Framer A (and Framer B)
         var scrambleKey = findKey("framer-a-scramble");
         if (!scrambleKey) {
@@ -1872,6 +1837,8 @@ printToConsole("\n=== Advanced Test 8: JESD Deframer ===\n");
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_DEFRAMER.BANK_DEVICE_ID", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD Deframer");
+        msleep(500);
         // Step 3: Check Deframer A and Deframer B bank-id
         var bankAKey = findKey("deframer-a-bank-id");
         var bankBKey = findKey("deframer-b-bank-id");
@@ -1942,6 +1909,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_DEFRAMER.BANK_DEVICE_ID", func
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_DEFRAMER.MK_PARAMS", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD Deframer");
+        msleep(500);
         // Step 4: Verify M and K parameter attributes are readable
         // Read-only verification — writing JESD link params on a live device could break the link
         var params = [
@@ -1975,6 +1944,8 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_DEFRAMER.MK_PARAMS", function(
 
 TestFramework.runTest("TST.ADRV9009.ADVANCED.JESD_DEFRAMER.SYNCB_OUT", function() {
     try {
+        adrv9009.switchAdvancedTab("JESD Deframer");
+        msleep(500);
         // Step 6: Change SYNCB out select for Deframer A (and Deframer B)
         var syncbKey = findKey("deframer-a-syncb-out-select");
         if (!syncbKey) {
