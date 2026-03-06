@@ -37,9 +37,13 @@
 
 namespace scopy::adrv9009 {
 
+class Adrv9009Plugin_API;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009 : public QWidget
 {
 	Q_OBJECT
+	friend class Adrv9009Plugin_API;
+
 public:
 	Adrv9009(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Adrv9009();
