@@ -52,6 +52,7 @@ public:
 
 	// Convenience: advanced tool
 	Q_INVOKABLE void triggerAdvancedRefresh();
+	Q_INVOKABLE void switchAdvancedTab(const QString &tabName);
 
 private:
 	QString readFromWidget(const QString &key);
