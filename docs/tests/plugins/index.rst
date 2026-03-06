@@ -23,6 +23,7 @@ Contents
    ad9084/index
    fmcomms5/index
    adrv9002/index
+   adrv9009/index
    imuanalyzer/index
    rfpowermeter/index
 
