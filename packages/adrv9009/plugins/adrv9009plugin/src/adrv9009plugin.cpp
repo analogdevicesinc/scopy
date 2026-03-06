@@ -19,6 +19,7 @@
  */
 
 #include "adrv9009plugin.h"
+#include "adrv9009plugin_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -27,6 +28,7 @@
 #include <adrv9009advanced.h>
 
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
 #include <iio-widgets/iiowidgetgroup.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9009PLUGIN, "Adrv9009Plugin")
@@ -194,11 +196,19 @@ bool Adrv9009Plugin::onConnect()
 
 	// Emit signal to notify system about tool list changes
 	Q_EMIT toolListChanged();
+
+	initApi();
 	return true;
 }
 
 bool Adrv9009Plugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	// Clean up tools and close connection
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
@@ -222,6 +232,13 @@ bool Adrv9009Plugin::onDisconnect()
 
 	qDebug(CAT_ADRV9009PLUGIN) << "ADRV9009 plugin disconnected successfully";
 	return true;
+}
+
+void Adrv9009Plugin::initApi()
+{
+	m_api = new Adrv9009Plugin_API(this);
+	m_api->setObjectName("adrv9009");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void Adrv9009Plugin::initMetadata()
