@@ -27,6 +27,7 @@
 #include <QDoubleSpinBox>
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio.h>
 #include <menuonoffswitch.h>
 #include <menuspinbox.h>
@@ -37,7 +38,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT BistWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	BistWidget(iio_device *device, QWidget *parent = nullptr);
+	BistWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~BistWidget();
 
 Q_SIGNALS:
@@ -49,6 +50,7 @@ private slots:
 
 private:
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 
 	// TX NCO custom controls (mimic iio-oscilloscope pattern)
 	MenuOnOffSwitch *m_txNcoEnable;

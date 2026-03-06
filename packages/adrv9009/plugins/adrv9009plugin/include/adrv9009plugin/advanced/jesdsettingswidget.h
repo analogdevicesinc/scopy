@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <menuonoffswitch.h>
 
 namespace scopy {
@@ -35,7 +36,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT JesdSettingsWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit JesdSettingsWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit JesdSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~JesdSettingsWidget();
 
 Q_SIGNALS:
@@ -46,6 +47,7 @@ private:
 	QWidget *createLaneCheckboxGroup(const QString &groupLabel, const QString &baseAttr, QWidget *parent);
 
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
 } // namespace adrv9009

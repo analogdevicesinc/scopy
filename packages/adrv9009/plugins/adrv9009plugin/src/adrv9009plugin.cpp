@@ -19,6 +19,7 @@
  */
 
 #include "adrv9009plugin.h"
+#include "adrv9009plugin_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -26,7 +27,11 @@
 #include <adrv9009.h>
 #include <adrv9009advanced.h>
 
+#include <style.h>
+#include <gui/deviceiconbuilder.h>
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
+#include <iio-widgets/iiowidgetgroup.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9009PLUGIN, "Adrv9009Plugin")
 using namespace scopy::adrv9009;
@@ -90,16 +95,28 @@ bool Adrv9009Plugin::loadPage()
 
 bool Adrv9009Plugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("ADRV9009");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
+
 	return true;
 }
 
 void Adrv9009Plugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("adrv9009tool", "ADRV9009", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adrv9009tool", "ADRV9009",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ADRV9009 Advanced", "ADRV9009 Advanced",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void Adrv9009Plugin::unload()
@@ -126,8 +143,9 @@ void Adrv9009Plugin::createAdditionalAdvancedTool(iio_device *device, const char
 	QString advancedToolName = generateAdvancedToolName(deviceName);
 
 	// Create advanced tool menu entry (using same string for ID and name)
-	ToolMenuEntry *advancedEntry = SCOPY_NEW_TOOLMENUENTRY(advancedToolName, advancedToolName,
-							       ":/gui/icons/scopy-default/icons/gear_wheel.svg");
+	ToolMenuEntry *advancedEntry = SCOPY_NEW_TOOLMENUENTRY(
+		advancedToolName, advancedToolName,
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg");
 
 	// Add to tool list first
 	m_toolList.append(advancedEntry);
@@ -138,7 +156,7 @@ void Adrv9009Plugin::createAdditionalAdvancedTool(iio_device *device, const char
 	Q_EMIT toolListChanged();
 
 	// Then create widget and set tool
-	Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device);
+	Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device, m_widgetGroup);
 	advancedEntry->setTool(adrv9009Advanced);
 
 	qDebug(CAT_ADRV9009PLUGIN) << "Created" << advancedToolName << "for device:" << deviceName;
@@ -154,8 +172,10 @@ bool Adrv9009Plugin::onConnect()
 		return false;
 	}
 
+	m_widgetGroup = new IIOWidgetGroup(this);
+
 	// Create basic ADRV9009 tool with IIO context
-	Adrv9009 *adrv9009 = new Adrv9009(conn->context());
+	Adrv9009 *adrv9009 = new Adrv9009(conn->context(), m_widgetGroup);
 	m_toolList[0]->setTool(adrv9009);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
@@ -172,7 +192,7 @@ bool Adrv9009Plugin::onConnect()
 		if(deviceName && QString(deviceName).startsWith("adrv9009-phy")) {
 			if(first) {
 				// Set up existing "ADRV9009 Advanced" tool (m_toolList[1])
-				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device);
+				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device, m_widgetGroup);
 				m_toolList[1]->setTool(adrv9009Advanced);
 				m_toolList[1]->setEnabled(true);
 				m_toolList[1]->setRunBtnVisible(true);
@@ -191,11 +211,19 @@ bool Adrv9009Plugin::onConnect()
 
 	// Emit signal to notify system about tool list changes
 	Q_EMIT toolListChanged();
+
+	initApi();
 	return true;
 }
 
 bool Adrv9009Plugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	// Clean up tools and close connection
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
@@ -208,12 +236,24 @@ bool Adrv9009Plugin::onDisconnect()
 		}
 	}
 
+	if(m_widgetGroup) {
+		delete m_widgetGroup;
+		m_widgetGroup = nullptr;
+	}
+
 	// Close connection
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
 	qDebug(CAT_ADRV9009PLUGIN) << "ADRV9009 plugin disconnected successfully";
 	return true;
+}
+
+void Adrv9009Plugin::initApi()
+{
+	m_api = new Adrv9009Plugin_API(this);
+	m_api->setObjectName("adrv9009");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void Adrv9009Plugin::initMetadata()

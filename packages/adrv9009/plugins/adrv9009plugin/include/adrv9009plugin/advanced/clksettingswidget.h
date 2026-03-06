@@ -24,6 +24,7 @@
 #include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <QVBoxLayout>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio.h>
 
 namespace scopy::adrv9009 {
@@ -33,7 +34,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT ClkSettingsWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ClkSettingsWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit ClkSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~ClkSettingsWidget();
 
 Q_SIGNALS:
@@ -44,6 +45,7 @@ private:
 	void createClockControls(QVBoxLayout *parentLayout);
 
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
 } // namespace scopy::adrv9009

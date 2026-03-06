@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <gui/widgets/menusectionwidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio.h>
 #include <menuonoffswitch.h>
 
@@ -34,7 +35,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT CalibrationWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	CalibrationWidget(iio_device *device, QWidget *parent = nullptr);
+	CalibrationWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~CalibrationWidget();
 
 Q_SIGNALS:
@@ -46,6 +47,7 @@ private slots:
 
 private:
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 
 	MenuOnOffSwitch *m_txLoLeakageCal;
 	MenuOnOffSwitch *m_txQecCal;

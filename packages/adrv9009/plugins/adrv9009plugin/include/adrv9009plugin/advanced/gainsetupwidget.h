@@ -24,6 +24,7 @@
 #include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
 #include <iio.h>
+#include <iio-widgets/iiowidgetgroup.h>
 
 class QVBoxLayout;
 
@@ -37,7 +38,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT GainSetupWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit GainSetupWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit GainSetupWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~GainSetupWidget();
 
 Q_SIGNALS:
@@ -49,6 +50,7 @@ private:
 	QWidget *createObservationGainSection(QWidget *parent);
 
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
 } // namespace adrv9009

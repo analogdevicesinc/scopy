@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <tooltemplate.h>
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <animatedrefreshbtn.h>
 #include <gui/widgets/menuspinbox.h>
 #include <gui/widgets/menusectionwidget.h>
@@ -36,11 +37,15 @@
 
 namespace scopy::adrv9009 {
 
+class Adrv9009Plugin_API;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009 : public QWidget
 {
 	Q_OBJECT
+	friend class Adrv9009Plugin_API;
+
 public:
-	Adrv9009(iio_context *ctx, QWidget *parent = nullptr);
+	Adrv9009(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Adrv9009();
 
 Q_SIGNALS:
@@ -48,6 +53,7 @@ Q_SIGNALS:
 
 private:
 	iio_context *m_ctx = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	QWidget *m_centralWidget;

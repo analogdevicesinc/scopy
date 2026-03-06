@@ -29,6 +29,7 @@
 #include <QVBoxLayout>
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio.h>
 
 // Forward declarations for section widgets
@@ -49,11 +50,15 @@ class JesdSettingsWidget;
 class JesdFramerWidget;
 class JesdDeframerWidget;
 
+class Adrv9009Plugin_API;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 {
 	Q_OBJECT
+	friend class Adrv9009Plugin_API;
+
 public:
-	Adrv9009Advanced(iio_device *device, QWidget *parent = nullptr);
+	Adrv9009Advanced(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Adrv9009Advanced();
 
 Q_SIGNALS:
@@ -61,6 +66,7 @@ Q_SIGNALS:
 
 private:
 	iio_device *m_device = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
 	AnimatedRefreshBtn *m_refreshButton;

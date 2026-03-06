@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <menuonoffswitch.h>
 
 namespace scopy {
@@ -35,7 +36,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT JesdFramerWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit JesdFramerWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit JesdFramerWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~JesdFramerWidget();
 
 Q_SIGNALS:
@@ -46,6 +47,7 @@ private:
 	QWidget *createFramerColumn(const QString &columnType, const QString &attrPrefix, QWidget *parent);
 
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
 } // namespace adrv9009

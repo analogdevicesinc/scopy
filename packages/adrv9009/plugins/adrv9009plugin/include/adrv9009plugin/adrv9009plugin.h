@@ -31,11 +31,20 @@
 // Forward declaration for IIO types
 struct iio_device;
 
+namespace scopy {
+class IIOWidgetGroup;
+}
+
 namespace scopy::adrv9009 {
+
+class Adrv9009Plugin_API;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	friend class Adrv9009Plugin_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -51,8 +60,12 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
 	QString generateAdvancedToolName(const char *deviceName);
 	void createAdditionalAdvancedTool(iio_device *device, const char *deviceName);
+
+	Adrv9009Plugin_API *m_api = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 } // namespace scopy::adrv9009
 #endif // ADRV9009PLUGIN_H
