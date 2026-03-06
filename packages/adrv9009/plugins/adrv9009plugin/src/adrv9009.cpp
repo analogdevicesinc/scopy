@@ -42,9 +42,10 @@ Q_LOGGING_CATEGORY(CAT_ADRV9009, "ADRV9009");
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-Adrv9009::Adrv9009(iio_context *ctx, QWidget *parent)
+Adrv9009::Adrv9009(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
+	, m_widgetGroup(group)
 	, m_tool(nullptr)
 	, m_refreshButton(nullptr)
 	, m_centralWidget(nullptr)
@@ -271,6 +272,8 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 					.title("ENSM mode")
 					.uiStrategy(IIOWidgetBuilder::ComboUi)
 					.buildSingle();
+	if(m_widgetGroup && ensmWidget)
+		m_widgetGroup->add(ensmWidget);
 	layout->addWidget(ensmWidget, 1, 0);
 	connect(this, &Adrv9009::readRequested, ensmWidget, &IIOWidget::readAsync);
 
@@ -300,8 +303,8 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 	iio_channel *trxLo = iio_device_find_channel(dev, "altvoltage0", true); // TRX_LO
 	if(trxLo) {
 		// Frequency(MHz)
-		IIOWidget *trxLoFreq =
-			Adrv9009WidgetFactory::createRangeWidget(trxLo, "frequency", "[70 1 6000]", "Frequency(MHz)");
+		IIOWidget *trxLoFreq = Adrv9009WidgetFactory::createRangeWidget(trxLo, "frequency", "[70 1 6000]",
+										"Frequency(MHz)", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, trxLoFreq, &IIOWidget::readAsync);
 		trxLoFreq->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -312,7 +315,7 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 
 		// Frequency Hopping Mode
 		IIOWidget *fhm = Adrv9009WidgetFactory::createCheckboxWidget(trxLo, "frequency_hopping_mode_enable",
-									     "Frequency Hopping Mode");
+									     "Frequency Hopping Mode", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, fhm, &IIOWidget::readAsync);
 		trxLoLayout->addWidget(fhm);
 	}
@@ -370,14 +373,17 @@ QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent
 	QGridLayout *calGridLayout = new QGridLayout();
 
 	// Row 1 checkboxes
-	IIOWidget *calRxQec = Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_rx_qec_en", "CAL RX QEC");
+	IIOWidget *calRxQec =
+		Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_rx_qec_en", "CAL RX QEC", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, calRxQec, &IIOWidget::readAsync);
-	IIOWidget *calTxQec = Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_tx_qec_en", "CAL TX QEC");
+	IIOWidget *calTxQec =
+		Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_tx_qec_en", "CAL TX QEC", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, calTxQec, &IIOWidget::readAsync);
-	IIOWidget *calTxLol = Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_tx_lol_en", "CAL TX LOL");
+	IIOWidget *calTxLol =
+		Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_tx_lol_en", "CAL TX LOL", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, calTxLol, &IIOWidget::readAsync);
-	IIOWidget *calTxLolExt =
-		Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_tx_lol_ext_en", "CAL TX LOL Ext.");
+	IIOWidget *calTxLolExt = Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_tx_lol_ext_en",
+									     "CAL TX LOL Ext.", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, calTxLolExt, &IIOWidget::readAsync);
 
 	calGridLayout->addWidget(calRxQec, 0, 0);
@@ -387,9 +393,10 @@ QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent
 
 	// Row 2 checkboxes
 	IIOWidget *calRxPhaseCorr = Adrv9009WidgetFactory::createCheckboxWidget(
-		device, "calibrate_rx_phase_correction_en", "CAL RX PHASE CORR");
+		device, "calibrate_rx_phase_correction_en", "CAL RX PHASE CORR", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, calRxPhaseCorr, &IIOWidget::readAsync);
-	IIOWidget *calFhm = Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_fhm_en", "CAL FHM");
+	IIOWidget *calFhm =
+		Adrv9009WidgetFactory::createCheckboxWidget(device, "calibrate_fhm_en", "CAL FHM", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, calFhm, &IIOWidget::readAsync);
 
 	calGridLayout->addWidget(calRxPhaseCorr, 1, 0);
@@ -466,8 +473,8 @@ QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *paren
 
 	if(rxChannel0) {
 		// RF Bandwidth (read-only, shared for RX section)
-		IIOWidget *rfBandwidthWidget = Adrv9009WidgetFactory::createReadOnlyWidget(rxChannel0, "rf_bandwidth",
-											   "RF Bandwidth(MHz)", false);
+		IIOWidget *rfBandwidthWidget = Adrv9009WidgetFactory::createReadOnlyWidget(
+			rxChannel0, "rf_bandwidth", "RF Bandwidth(MHz)", false, m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, rfBandwidthWidget, &IIOWidget::readAsync);
 		rfBandwidthWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -475,7 +482,7 @@ QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *paren
 
 		// Sampling Rate (read-only, shared for RX section)
 		IIOWidget *samplingRateWidget = Adrv9009WidgetFactory::createReadOnlyWidget(
-			rxChannel0, "sampling_frequency", "Sampling Rate(MSPS)", false);
+			rxChannel0, "sampling_frequency", "Sampling Rate(MSPS)", false, m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, samplingRateWidget, &IIOWidget::readAsync);
 		samplingRateWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -483,7 +490,8 @@ QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *paren
 
 		// Gain Control Modes (shared dropdown for RX section)
 		IIOWidget *gainControlModes = Adrv9009WidgetFactory::createComboWidget(
-			rxChannel0, "gain_control_mode", "gain_control_mode_available", "Gain Control Modes");
+			rxChannel0, "gain_control_mode", "gain_control_mode_available", "Gain Control Modes",
+			m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, gainControlModes, &IIOWidget::readAsync);
 		sectionControlsLayout->addWidget(gainControlModes);
 	}
@@ -557,22 +565,22 @@ QWidget *Adrv9009::createTxChainContentForDevice(iio_device *dev, QWidget *paren
 
 	if(txChannel0) {
 		// RF Bandwidth (read-only, shared for TX section)
-		IIOWidget *rfBandwidthWidget = Adrv9009WidgetFactory::createReadOnlyWidget(txChannel0, "rf_bandwidth",
-											   "RF Bandwidth(MHz)", false);
+		IIOWidget *rfBandwidthWidget = Adrv9009WidgetFactory::createReadOnlyWidget(
+			txChannel0, "rf_bandwidth", "RF Bandwidth(MHz)", false, m_widgetGroup);
 		rfBandwidthWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 		sectionControlsLayout->addWidget(rfBandwidthWidget);
 
 		// Sampling Rate (read-only, shared for TX section)
 		IIOWidget *samplingRateWidget = Adrv9009WidgetFactory::createReadOnlyWidget(
-			txChannel0, "sampling_frequency", "Sampling Rate(MSPS)", false);
+			txChannel0, "sampling_frequency", "Sampling Rate(MSPS)", false, m_widgetGroup);
 		samplingRateWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 		sectionControlsLayout->addWidget(samplingRateWidget);
 
 		// PA Protection (shared checkbox for TX section)
-		IIOWidget *paProtection =
-			Adrv9009WidgetFactory::createCheckboxWidget(txChannel0, "pa_protection_en", "PA Protection");
+		IIOWidget *paProtection = Adrv9009WidgetFactory::createCheckboxWidget(txChannel0, "pa_protection_en",
+										      "PA Protection", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, paProtection, &IIOWidget::readAsync);
 		sectionControlsLayout->addWidget(paProtection);
 	}
@@ -646,30 +654,30 @@ QWidget *Adrv9009::createObsRxChainContentForDevice(iio_device *dev, QWidget *pa
 
 	if(obsChannel0) {
 		// RF Bandwidth (read-only, shared for OBS section)
-		IIOWidget *rfBandwidthWidget = Adrv9009WidgetFactory::createReadOnlyWidget(obsChannel0, "rf_bandwidth",
-											   "RF Bandwidth(MHz)", false);
+		IIOWidget *rfBandwidthWidget = Adrv9009WidgetFactory::createReadOnlyWidget(
+			obsChannel0, "rf_bandwidth", "RF Bandwidth(MHz)", false, m_widgetGroup);
 		rfBandwidthWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 		sectionControlsLayout->addWidget(rfBandwidthWidget);
 
 		// Sampling Rate (read-only, shared for OBS section)
 		IIOWidget *samplingRateWidget = Adrv9009WidgetFactory::createReadOnlyWidget(
-			obsChannel0, "sampling_frequency", "Sampling Rate(MSPS)", false);
+			obsChannel0, "sampling_frequency", "Sampling Rate(MSPS)", false, m_widgetGroup);
 		samplingRateWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
 		sectionControlsLayout->addWidget(samplingRateWidget);
 
 		// LO Source Select (shared dropdown for OBS section)
 		IIOWidget *loSourceSelect = Adrv9009WidgetFactory::createComboWidget(
-			obsChannel0, "rf_port_select", "rf_port_select_available", "LO Source Select");
+			obsChannel0, "rf_port_select", "rf_port_select_available", "LO Source Select", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, loSourceSelect, &IIOWidget::readAsync);
 		sectionControlsLayout->addWidget(loSourceSelect);
 	}
 
 	if(auxLo) {
 		// AUX PLL LO Frequency (shared control for OBS section)
-		IIOWidget *auxLoFreq = Adrv9009WidgetFactory::createRangeWidget(auxLo, "frequency", "[0 1 6000]",
-										"AUX PLL LO Frequency(MHz)");
+		IIOWidget *auxLoFreq = Adrv9009WidgetFactory::createRangeWidget(
+			auxLo, "frequency", "[0 1 6000]", "AUX PLL LO Frequency(MHz)", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, auxLoFreq, &IIOWidget::readAsync);
 		auxLoFreq->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
@@ -784,43 +792,46 @@ QWidget *Adrv9009::createRxChannelWidget(iio_device *dev, QString title, int cha
 	}
 
 	// Hardware Gain(dB)
-	IIOWidget *gainWidget =
-		Adrv9009WidgetFactory::createRangeWidget(rxChannel, "hardwaregain", "[0 0.5 30]", "Hardware Gain(dB)");
+	IIOWidget *gainWidget = Adrv9009WidgetFactory::createRangeWidget(rxChannel, "hardwaregain", "[0 0.5 30]",
+									 "Hardware Gain(dB)", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, gainWidget, &IIOWidget::readAsync);
 	mainLayout->addWidget(gainWidget);
 
 	// RSSI (dB) - read-only
-	IIOWidget *rssi = Adrv9009WidgetFactory::createReadOnlyWidget(rxChannel, "rssi", "RSSI (dB):");
+	IIOWidget *rssi =
+		Adrv9009WidgetFactory::createReadOnlyWidget(rxChannel, "rssi", "RSSI (dB):", true, m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, rssi, &IIOWidget::readAsync);
 	mainLayout->addWidget(rssi);
 
 	// Gain Control - read-only
-	IIOWidget *gainControl =
-		Adrv9009WidgetFactory::createReadOnlyWidget(rxChannel, "gain_control_mode", "Gain Control:");
+	IIOWidget *gainControl = Adrv9009WidgetFactory::createReadOnlyWidget(rxChannel, "gain_control_mode",
+									     "Gain Control:", true, m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, gainControl, &IIOWidget::readAsync);
 	mainLayout->addWidget(gainControl);
 
 	// Pin Control checkbox
-	IIOWidget *pinMode =
-		Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "gain_control_pin_mode_en", "Pin Control:");
+	IIOWidget *pinMode = Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "gain_control_pin_mode_en",
+									 "Pin Control:", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, pinMode, &IIOWidget::readAsync);
 	mainLayout->addWidget(pinMode);
 
 	// Powerdown checkbox
-	IIOWidget *powerDown = Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "powerdown", "Powerdown");
+	IIOWidget *powerDown =
+		Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "powerdown", "Powerdown", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, powerDown, &IIOWidget::readAsync);
 	mainLayout->addWidget(powerDown);
 
 	mainLayout->addWidget(new QLabel("Tracking:"));
 
 	// Quadrature checkbox
-	IIOWidget *quadTracking =
-		Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "quadrature_tracking_en", "Quadrature");
+	IIOWidget *quadTracking = Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "quadrature_tracking_en",
+									      "Quadrature", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, quadTracking, &IIOWidget::readAsync);
 	mainLayout->addWidget(quadTracking);
 
 	// HD2 checkbox
-	IIOWidget *hd2Tracking = Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "hd2_tracking_en", "HD2");
+	IIOWidget *hd2Tracking =
+		Adrv9009WidgetFactory::createCheckboxWidget(rxChannel, "hd2_tracking_en", "HD2", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, hd2Tracking, &IIOWidget::readAsync);
 	mainLayout->addWidget(hd2Tracking);
 
@@ -853,33 +864,34 @@ QWidget *Adrv9009::createTxChannelWidget(iio_device *dev, QString title, int cha
 
 	// Attenuation(dB)
 	IIOWidget *gainWidget = Adrv9009WidgetFactory::createRangeWidget(txChannel, "hardwaregain", "[0 0.05 41.95]",
-									 "Attenuation(dB)");
+									 "Attenuation(dB)", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, gainWidget, &IIOWidget::readAsync);
 	gainWidget->setDataToUIConversion([](QString data) { return QString::number(-data.toDouble(), 'f', 2); });
 	gainWidget->setUItoDataConversion([](QString data) { return QString::number(-data.toDouble(), 'f', 2); });
 	mainLayout->addWidget(gainWidget);
 
 	// Pin Control checkbox
-	IIOWidget *pinMode =
-		Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "atten_control_pin_mode_en", "Pin Control");
+	IIOWidget *pinMode = Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "atten_control_pin_mode_en",
+									 "Pin Control", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, pinMode, &IIOWidget::readAsync);
 	mainLayout->addWidget(pinMode);
 
 	// Powerdown checkbox
-	IIOWidget *powerDown = Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "powerdown", "Powerdown");
+	IIOWidget *powerDown =
+		Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "powerdown", "Powerdown", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, powerDown, &IIOWidget::readAsync);
 	mainLayout->addWidget(powerDown);
 
 	mainLayout->addWidget(new QLabel("Tracking:"));
 	// Quadrature checkbox
-	IIOWidget *quadTracking =
-		Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "quadrature_tracking_en", "Quadrature");
+	IIOWidget *quadTracking = Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "quadrature_tracking_en",
+									      "Quadrature", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, quadTracking, &IIOWidget::readAsync);
 	mainLayout->addWidget(quadTracking);
 
 	// LO Leakage checkbox
-	IIOWidget *loLeakageTracking =
-		Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "lo_leakage_tracking_en", "LO Leakage");
+	IIOWidget *loLeakageTracking = Adrv9009WidgetFactory::createCheckboxWidget(txChannel, "lo_leakage_tracking_en",
+										   "LO Leakage", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, loLeakageTracking, &IIOWidget::readAsync);
 	mainLayout->addWidget(loLeakageTracking);
 
@@ -916,19 +928,20 @@ QWidget *Adrv9009::createObsChannelWidget(iio_device *dev, QString title, int ch
 	QFormLayout *formLayout = new QFormLayout();
 
 	// Hardware Gain(dB)
-	IIOWidget *gainWidget =
-		Adrv9009WidgetFactory::createRangeWidget(obsChannel, "hardwaregain", "[0 1 30]", "Hardware Gain(dB)");
+	IIOWidget *gainWidget = Adrv9009WidgetFactory::createRangeWidget(obsChannel, "hardwaregain", "[0 1 30]",
+									 "Hardware Gain(dB)", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, gainWidget, &IIOWidget::readAsync);
 	formLayout->addRow("Hardware Gain(dB):", gainWidget);
 
 	// Tracking: Quadrature checkbox only
-	IIOWidget *quadTracking =
-		Adrv9009WidgetFactory::createCheckboxWidget(obsChannel, "quadrature_tracking_en", "Quadrature");
+	IIOWidget *quadTracking = Adrv9009WidgetFactory::createCheckboxWidget(obsChannel, "quadrature_tracking_en",
+									      "Quadrature", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, quadTracking, &IIOWidget::readAsync);
 	formLayout->addRow("Tracking:", quadTracking);
 
 	// Powerdown checkbox
-	IIOWidget *powerDown = Adrv9009WidgetFactory::createCheckboxWidget(obsChannel, "powerdown", "Powerdown");
+	IIOWidget *powerDown =
+		Adrv9009WidgetFactory::createCheckboxWidget(obsChannel, "powerdown", "Powerdown", m_widgetGroup);
 	connect(this, &Adrv9009::readRequested, powerDown, &IIOWidget::readAsync);
 	formLayout->addRow("Powerdown:", powerDown);
 

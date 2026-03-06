@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio.h>
 
 namespace scopy::adrv9009 {
@@ -33,7 +34,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT FhmSetupWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	FhmSetupWidget(iio_device *device, QWidget *parent = nullptr);
+	FhmSetupWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~FhmSetupWidget();
 
 	MenuSectionCollapseWidget *section() const;
@@ -43,6 +44,7 @@ Q_SIGNALS:
 
 private:
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 	MenuSectionCollapseWidget *m_section;
 
 	void setupUi();

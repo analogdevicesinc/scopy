@@ -47,9 +47,10 @@ Q_LOGGING_CATEGORY(CAT_ADRV9009_ADVANCED, "ADRV9009_ADVANCED")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-Adrv9009Advanced::Adrv9009Advanced(iio_device *device, QWidget *parent)
+Adrv9009Advanced::Adrv9009Advanced(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_ADRV9009_ADVANCED) << "No device provided to ADRV9009 Advanced";
@@ -267,21 +268,21 @@ void Adrv9009Advanced::createNavigationButtons()
 void Adrv9009Advanced::createContentWidgets()
 {
 	// Create clock settings widget
-	m_clkSettings = new ClkSettingsWidget(m_device, this);
-	m_calibrations = new CalibrationWidget(m_device, this);
-	m_agcSetup = new AgcSetupWidget(m_device, this);
-	m_fhmSetup = new FhmSetupWidget(m_device, this);
-	m_paProtection = new PaProtectionWidget(m_device, this);
-	m_gainSetup = new GainSetupWidget(m_device, this);
-	m_gpioConfig = new ArmGpioWidget(m_device, this);
-	m_txSettings = new TxSettingsWidget(m_device, this);
-	m_rxSettings = new RxSettingsWidget(m_device, this);
-	m_orxSettings = new OrxSettingsWidget(m_device, this);
-	m_auxDac = new AuxDacWidget(m_device, this);
-	m_bist = new BistWidget(m_device, this);
-	m_jesd204Settings = new JesdSettingsWidget(m_device, this);
-	m_jesdFramer = new JesdFramerWidget(m_device, this);
-	m_jesdDeframer = new JesdDeframerWidget(m_device, this);
+	m_clkSettings = new ClkSettingsWidget(m_device, m_widgetGroup, this);
+	m_calibrations = new CalibrationWidget(m_device, m_widgetGroup, this);
+	m_agcSetup = new AgcSetupWidget(m_device, m_widgetGroup, this);
+	m_fhmSetup = new FhmSetupWidget(m_device, m_widgetGroup, this);
+	m_paProtection = new PaProtectionWidget(m_device, m_widgetGroup, this);
+	m_gainSetup = new GainSetupWidget(m_device, m_widgetGroup, this);
+	m_gpioConfig = new ArmGpioWidget(m_device, m_widgetGroup, this);
+	m_txSettings = new TxSettingsWidget(m_device, m_widgetGroup, this);
+	m_rxSettings = new RxSettingsWidget(m_device, m_widgetGroup, this);
+	m_orxSettings = new OrxSettingsWidget(m_device, m_widgetGroup, this);
+	m_auxDac = new AuxDacWidget(m_device, m_widgetGroup, this);
+	m_bist = new BistWidget(m_device, m_widgetGroup, this);
+	m_jesd204Settings = new JesdSettingsWidget(m_device, m_widgetGroup, this);
+	m_jesdFramer = new JesdFramerWidget(m_device, m_widgetGroup, this);
+	m_jesdDeframer = new JesdDeframerWidget(m_device, m_widgetGroup, this);
 
 	if(m_clkSettings) {
 		connect(this, &Adrv9009Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);

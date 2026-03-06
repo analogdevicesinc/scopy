@@ -19,6 +19,7 @@
  */
 
 #include "advanced/orxsettingswidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -33,9 +34,10 @@ Q_LOGGING_CATEGORY(CAT_ORXSETTINGS, "ORXSettings")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-OrxSettingsWidget::OrxSettingsWidget(iio_device *device, QWidget *parent)
+OrxSettingsWidget::OrxSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_ORXSETTINGS) << "No device provided to ORX Settings widget";
@@ -106,7 +108,8 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	firDecimationOptions.insert("2", "2");
 	firDecimationOptions.insert("4", "4");
 	auto firDecimation = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,orx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation");
+		m_device, "adi,orx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation",
+		m_widgetGroup);
 	if(firDecimation) {
 		layout->addWidget(firDecimation);
 		connect(this, &OrxSettingsWidget::readRequested, firDecimation, &IIOWidget::readAsync);
@@ -117,7 +120,8 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	dec5DecimationOptions.insert("4", "4");
 	dec5DecimationOptions.insert("5", "5");
 	auto dec5Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,orx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation");
+		m_device, "adi,orx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation",
+		m_widgetGroup);
 	if(dec5Decimation) {
 		layout->addWidget(dec5Decimation);
 		connect(this, &OrxSettingsWidget::readRequested, dec5Decimation, &IIOWidget::readAsync);
@@ -128,31 +132,34 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	rhb1DecimationOptions.insert("1", "1");
 	rhb1DecimationOptions.insert("2", "2");
 	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,orx-profile-rhb1-decimation", rhb1DecimationOptions, "RHB1 Decimation");
+		m_device, "adi,orx-profile-rhb1-decimation", rhb1DecimationOptions, "RHB1 Decimation", m_widgetGroup);
 	if(rhb1Decimation) {
 		layout->addWidget(rhb1Decimation);
 		connect(this, &OrxSettingsWidget::readRequested, rhb1Decimation, &IIOWidget::readAsync);
 	}
 
 	// ORX Output Rate (kHz) - Range Widget
-	auto outputRate = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-orx-output-rate_khz",
-								   "[30625 1 500000]", "ORX Output Rate (kHz)");
+	auto outputRate =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-orx-output-rate_khz",
+							 "[30625 1 500000]", "ORX Output Rate (kHz)", m_widgetGroup);
 	if(outputRate) {
 		layout->addWidget(outputRate);
 		connect(this, &OrxSettingsWidget::readRequested, outputRate, &IIOWidget::readAsync);
 	}
 
 	// RF Bandwidth (Hz) - Range Widget
-	auto rfBandwidth = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-rf-bandwidth_hz",
-								    "[5000000 1 450000000]", "RF Bandwidth (Hz)");
+	auto rfBandwidth =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-rf-bandwidth_hz",
+							 "[5000000 1 450000000]", "RF Bandwidth (Hz)", m_widgetGroup);
 	if(rfBandwidth) {
 		layout->addWidget(rfBandwidth);
 		connect(this, &OrxSettingsWidget::readRequested, rfBandwidth, &IIOWidget::readAsync);
 	}
 
 	// RX BBF3D BCorner (kHz) - Range Widget
-	auto bbf3dCorner = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-rx-bbf3d-bcorner_khz",
-								    "[10000 1 400000]", "RX BBF3D BCorner (kHz)");
+	auto bbf3dCorner =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-profile-rx-bbf3d-bcorner_khz",
+							 "[10000 1 400000]", "RX BBF3D BCorner (kHz)", m_widgetGroup);
 	if(bbf3dCorner) {
 		layout->addWidget(bbf3dCorner);
 		connect(this, &OrxSettingsWidget::readRequested, bbf3dCorner, &IIOWidget::readAsync);
@@ -162,7 +169,7 @@ QWidget *OrxSettingsWidget::createOrxProfileSection(QWidget *parent)
 	QMap<QString, QString> ddcModeOptions;
 	ddcModeOptions.insert("7", "0");
 	auto ddcMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,orx-profile-orx-ddc-mode",
-								      ddcModeOptions, "ORX DDC Mode");
+								      ddcModeOptions, "ORX DDC Mode", m_widgetGroup);
 	if(ddcMode) {
 		layout->addWidget(ddcMode);
 		connect(this, &OrxSettingsWidget::readRequested, ddcMode, &IIOWidget::readAsync);
@@ -193,7 +200,8 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	orxChannelsOptions.insert("2", "ORX2");
 	orxChannelsOptions.insert("3", "ORX1_and_ORX2");
 	auto orxChannels = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,obs-settings-obs-rx-channels-enable", orxChannelsOptions, "ORX Channels Enable");
+		m_device, "adi,obs-settings-obs-rx-channels-enable", orxChannelsOptions, "ORX Channels Enable",
+		m_widgetGroup);
 	if(orxChannels) {
 		layout->addWidget(orxChannels);
 		connect(this, &OrxSettingsWidget::readRequested, orxChannels, &IIOWidget::readAsync);
@@ -204,8 +212,8 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	framerSelOptions.insert("0", "A");
 	framerSelOptions.insert("1", "B");
 	framerSelOptions.insert("2", "A_and_B");
-	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,obs-settings-framer-sel",
-									framerSelOptions, "JESD204 Framer Selection");
+	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(
+		m_device, "adi,obs-settings-framer-sel", framerSelOptions, "JESD204 Framer Selection", m_widgetGroup);
 	if(framerSel) {
 		layout->addWidget(framerSel);
 		connect(this, &OrxSettingsWidget::readRequested, framerSel, &IIOWidget::readAsync);
@@ -216,7 +224,7 @@ QWidget *OrxSettingsWidget::createOrxConfigSection(QWidget *parent)
 	loSourceOptions.insert("0", "RFPLL");
 	loSourceOptions.insert("1", "AUXPLL");
 	auto loSource = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,obs-settings-obs-rx-lo-source",
-								       loSourceOptions, "ORX LO Source");
+								       loSourceOptions, "ORX LO Source", m_widgetGroup);
 	if(loSource) {
 		layout->addWidget(loSource);
 		connect(this, &OrxSettingsWidget::readRequested, loSource, &IIOWidget::readAsync);
@@ -242,7 +250,7 @@ QWidget *OrxSettingsWidget::createAuxPllSection(QWidget *parent)
 
 	// GPIO Select - Range Widget
 	auto gpioSelect = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,orx-lo-cfg-gpio-select", "[0 1 19]",
-								   "GPIO Select");
+								   "GPIO Select", m_widgetGroup);
 	if(gpioSelect) {
 		layout->addWidget(gpioSelect);
 		connect(this, &OrxSettingsWidget::readRequested, gpioSelect, &IIOWidget::readAsync);
@@ -250,7 +258,7 @@ QWidget *OrxSettingsWidget::createAuxPllSection(QWidget *parent)
 
 	// Disable AUX PLL Relocking - Checkbox
 	auto disableAuxPllRelock = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,orx-lo-cfg-disable-aux-pll-relocking", "Disable AUX PLL Relocking");
+		m_device, "adi,orx-lo-cfg-disable-aux-pll-relocking", "Disable AUX PLL Relocking", m_widgetGroup);
 	if(disableAuxPllRelock) {
 		layout->addWidget(disableAuxPllRelock);
 		disableAuxPllRelock->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);

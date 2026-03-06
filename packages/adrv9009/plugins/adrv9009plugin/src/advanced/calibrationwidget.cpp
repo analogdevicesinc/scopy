@@ -19,6 +19,7 @@
  */
 
 #include "advanced/calibrationwidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -37,9 +38,10 @@ Q_LOGGING_CATEGORY(CAT_CALIBRATION, "CALIBRATION")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-CalibrationWidget::CalibrationWidget(iio_device *device, QWidget *parent)
+CalibrationWidget::CalibrationWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 	, m_txLoLeakageCal(nullptr)
 	, m_txQecCal(nullptr)
 	, m_txLolExternalCal(nullptr)

@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 
 namespace scopy::adrv9009 {
 
@@ -33,7 +34,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT AgcSetupWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit AgcSetupWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit AgcSetupWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~AgcSetupWidget();
 
 Q_SIGNALS:
@@ -48,6 +49,7 @@ private:
 					 QWidget *parent);
 
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
 } // namespace scopy::adrv9009

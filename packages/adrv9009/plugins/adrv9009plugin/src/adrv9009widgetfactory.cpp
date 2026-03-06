@@ -26,7 +26,8 @@ using namespace scopy;
 using namespace scopy::adrv9009;
 
 // Device attribute widgets
-IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_device *device, QString attr, QString title, QWidget *parent)
+IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_device *device, QString attr, QString title,
+						      IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -34,10 +35,13 @@ IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_device *device, QStrin
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::EditableUi)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_device *device, QString attr, QString title, QWidget *parent)
+IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_device *device, QString attr, QString title,
+						       IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -48,11 +52,13 @@ IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_device *device, QStri
 	if(widget) {
 		widget->showProgressBar(false);
 	}
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_device *device, QString attr, QString availableAttr,
-						    QString title, QWidget *parent)
+						    QString title, IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -61,12 +67,14 @@ IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_device *device, QString 
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QString attr,
 							  const QMap<QString, QString> &optionsMap, QString title,
-							  QWidget *parent)
+							  IIOWidgetGroup *group, QWidget *parent)
 {
 	// Build space-separated display string from optionsMap values
 	auto values = optionsMap.values();
@@ -94,12 +102,13 @@ IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QS
 			return IIOWidgetUtils::comboDataToUiConversionFunction(data, &map);
 		});
 	}
-
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_device *device, QString attr, QString range, QString title,
-						    QWidget *parent)
+						    IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -108,11 +117,13 @@ IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_device *device, QString 
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_device *device, QString attr, QString title,
-						       bool compactMode, QWidget *parent)
+						       bool compactMode, IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -124,12 +135,14 @@ IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_device *device, QStri
 		widget->setEnabled(false);
 		widget->showProgressBar(false);
 	}
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 // Channel attribute widgets
 IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_channel *channel, QString attr, QString title,
-						      QWidget *parent)
+						      IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .channel(channel)
@@ -137,11 +150,13 @@ IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_channel *channel, QStr
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::EditableUi)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_channel *channel, QString attr, QString title,
-						       QWidget *parent)
+						       IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .channel(channel)
@@ -152,11 +167,13 @@ IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_channel *channel, QSt
 	if(widget) {
 		widget->showProgressBar(false);
 	}
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_channel *channel, QString attr, QString availableAttr,
-						    QString title, QWidget *parent)
+						    QString title, IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .channel(channel)
@@ -165,11 +182,13 @@ IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_channel *channel, QStrin
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_channel *channel, QString attr, QString range, QString title,
-						    QWidget *parent)
+						    IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .channel(channel)
@@ -178,11 +197,13 @@ IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_channel *channel, QStrin
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
-						       bool compactMode, QWidget *parent)
+						       bool compactMode, IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .channel(channel)
@@ -194,12 +215,14 @@ IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_channel *channel, QSt
 		widget->setEnabled(false);
 		widget->showProgressBar(false);
 	}
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 // Debug attribute widgets (following proper porting rules)
 IIOWidget *Adrv9009WidgetFactory::createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
-							 QWidget *parent)
+							 IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -209,12 +232,14 @@ IIOWidget *Adrv9009WidgetFactory::createDebugRangeWidget(iio_device *device, QSt
 				    .uiStrategy(IIOWidgetBuilder::RangeUi) // UI strategy auto-sets data strategy
 				    .includeDebugAttributes(true)
 				    .buildSingle();
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *device, QString attr,
 							       const QMap<QString, QString> &optionsMap, QString title,
-							       QWidget *parent)
+							       IIOWidgetGroup *group, QWidget *parent)
 {
 	// Build space-separated display string from optionsMap values (following Template 2B)
 	auto values = optionsMap.values();
@@ -247,12 +272,13 @@ IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *devic
 			return IIOWidgetUtils::comboDataToUiConversionFunction(data, &map);
 		});
 	}
-
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
 
 IIOWidget *Adrv9009WidgetFactory::createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
-							    QWidget *parent)
+							    IIOWidgetGroup *group, QWidget *parent)
 {
 	IIOWidget *widget = IIOWidgetBuilder(parent)
 				    .device(device)
@@ -264,5 +290,7 @@ IIOWidget *Adrv9009WidgetFactory::createDebugCheckboxWidget(iio_device *device, 
 	if(widget) {
 		widget->showProgressBar(false);
 	}
+	if(group && widget)
+		group->add(widget);
 	return widget;
 }
