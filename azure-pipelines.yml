@@ -119,7 +119,8 @@ stages:
                     succeeded(),
                     or(
                       eq(variables['Build.SourceBranch'], 'refs/heads/main'),
-                      eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main')
+                      eq(variables['System.PullRequest.TargetBranch'], 'main'),
+                      startsWith(variables['Build.SourceBranch'],'ci-')
                       )
                     ) # push artifacts only if pipeline completed successfully and either the build is for the main branch or there is a PR into main branch
       inputs:
