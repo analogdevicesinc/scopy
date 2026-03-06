@@ -25,6 +25,8 @@
 #include <iio.h>
 #include <adrv9009.h>
 #include <adrv9009advanced.h>
+#include <style.h>
+#include <gui/deviceiconbuilder.h>
 
 #include <iioutil/connectionprovider.h>
 
@@ -90,16 +92,27 @@ bool Adrv9009Plugin::loadPage()
 
 bool Adrv9009Plugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	QLabel *logo = new QLabel();
+	QPixmap pixmap(":/gui/icons/scopy-default/icons/logo_analog.svg");
+	int pixmapHeight = 14;
+	pixmap = pixmap.scaledToHeight(pixmapHeight, Qt::SmoothTransformation);
+	logo->setPixmap(pixmap);
+
+	QLabel *footer = new QLabel("ADRV9009");
+	Style::setStyle(footer, style::properties::label::deviceIcon, true);
+
+	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
 	return true;
 }
 
 void Adrv9009Plugin::loadToolList()
 {
-	m_toolList.append(
-		SCOPY_NEW_TOOLMENUENTRY("adrv9009tool", "ADRV9009", ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adrv9009tool", "ADRV9009",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ADRV9009 Advanced", "ADRV9009 Advanced",
-						  ":/gui/icons/scopy-default/icons/gear_wheel.svg"));
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void Adrv9009Plugin::unload()
@@ -126,8 +139,9 @@ void Adrv9009Plugin::createAdditionalAdvancedTool(iio_device *device, const char
 	QString advancedToolName = generateAdvancedToolName(deviceName);
 
 	// Create advanced tool menu entry (using same string for ID and name)
-	ToolMenuEntry *advancedEntry = SCOPY_NEW_TOOLMENUENTRY(advancedToolName, advancedToolName,
-							       ":/gui/icons/scopy-default/icons/gear_wheel.svg");
+	ToolMenuEntry *advancedEntry = SCOPY_NEW_TOOLMENUENTRY(
+		advancedToolName, advancedToolName,
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg");
 
 	// Add to tool list first
 	m_toolList.append(advancedEntry);
