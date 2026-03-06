@@ -50,9 +50,13 @@ class JesdSettingsWidget;
 class JesdFramerWidget;
 class JesdDeframerWidget;
 
+class Adrv9009Plugin_API;
+
 class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 {
 	Q_OBJECT
+	friend class Adrv9009Plugin_API;
+
 public:
 	Adrv9009Advanced(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Adrv9009Advanced();
