@@ -19,6 +19,7 @@
  */
 
 #include "advanced/armgpiowidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -34,9 +35,10 @@ Q_LOGGING_CATEGORY(CAT_ARMGPIO, "ArmGpio")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-ArmGpioWidget::ArmGpioWidget(iio_device *device, QWidget *parent)
+ArmGpioWidget::ArmGpioWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_ARMGPIO) << "No device provided to ARM GPIO widget";
@@ -86,7 +88,7 @@ void ArmGpioWidget::setupUi()
 
 	// Enable widget
 	auto orx1Sel0EnableWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-enable", "Enable", contentWidget);
+		m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-enable", "Enable", m_widgetGroup, contentWidget);
 	if(orx1Sel0EnableWidget) {
 		contentLayout->addWidget(orx1Sel0EnableWidget, 0, 1);
 		orx1Sel0EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -96,7 +98,7 @@ void ArmGpioWidget::setupUi()
 	// GPIO Pin Sel widget
 	auto orx1Sel0PinWidget =
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-gpio-pin-sel",
-							 "[0 1 15]", "GPIO Pin Sel", contentWidget);
+							 "[0 1 15]", "GPIO Pin Sel", m_widgetGroup, contentWidget);
 	if(orx1Sel0PinWidget) {
 		contentLayout->addWidget(orx1Sel0PinWidget, 0, 2);
 		connect(this, &ArmGpioWidget::readRequested, orx1Sel0PinWidget, &IIOWidget::readAsync);
@@ -104,7 +106,7 @@ void ArmGpioWidget::setupUi()
 
 	// Polarity widget
 	auto orx1Sel0PolarityWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-polarity", "Polarity", contentWidget);
+		m_device, "adi,arm-gpio-config-orx1-tx-sel0-pin-polarity", "Polarity", m_widgetGroup, contentWidget);
 	if(orx1Sel0PolarityWidget) {
 		contentLayout->addWidget(orx1Sel0PolarityWidget, 0, 3);
 		orx1Sel0PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -119,7 +121,7 @@ void ArmGpioWidget::setupUi()
 
 	// Enable widget
 	auto orx1Sel1EnableWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-enable", "Enable", contentWidget);
+		m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-enable", "Enable", m_widgetGroup, contentWidget);
 	if(orx1Sel1EnableWidget) {
 		contentLayout->addWidget(orx1Sel1EnableWidget, 1, 1);
 		orx1Sel1EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -129,7 +131,7 @@ void ArmGpioWidget::setupUi()
 	// GPIO Pin Sel widget
 	auto orx1Sel1PinWidget =
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-gpio-pin-sel",
-							 "[0 1 15]", "GPIO Pin Sel", contentWidget);
+							 "[0 1 15]", "GPIO Pin Sel", m_widgetGroup, contentWidget);
 	if(orx1Sel1PinWidget) {
 		contentLayout->addWidget(orx1Sel1PinWidget, 1, 2);
 		connect(this, &ArmGpioWidget::readRequested, orx1Sel1PinWidget, &IIOWidget::readAsync);
@@ -137,7 +139,7 @@ void ArmGpioWidget::setupUi()
 
 	// Polarity widget
 	auto orx1Sel1PolarityWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-polarity", "Polarity", contentWidget);
+		m_device, "adi,arm-gpio-config-orx1-tx-sel1-pin-polarity", "Polarity", m_widgetGroup, contentWidget);
 	if(orx1Sel1PolarityWidget) {
 		contentLayout->addWidget(orx1Sel1PolarityWidget, 1, 3);
 		orx1Sel1PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -152,7 +154,7 @@ void ArmGpioWidget::setupUi()
 
 	// Enable widget
 	auto orx2Sel0EnableWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-enable", "Enable", contentWidget);
+		m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-enable", "Enable", m_widgetGroup, contentWidget);
 	if(orx2Sel0EnableWidget) {
 		contentLayout->addWidget(orx2Sel0EnableWidget, 2, 1);
 		orx2Sel0EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -162,7 +164,7 @@ void ArmGpioWidget::setupUi()
 	// GPIO Pin Sel widget
 	auto orx2Sel0PinWidget =
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-gpio-pin-sel",
-							 "[0 1 15]", "GPIO Pin Sel", contentWidget);
+							 "[0 1 15]", "GPIO Pin Sel", m_widgetGroup, contentWidget);
 	if(orx2Sel0PinWidget) {
 		contentLayout->addWidget(orx2Sel0PinWidget, 2, 2);
 		connect(this, &ArmGpioWidget::readRequested, orx2Sel0PinWidget, &IIOWidget::readAsync);
@@ -170,7 +172,7 @@ void ArmGpioWidget::setupUi()
 
 	// Polarity widget
 	auto orx2Sel0PolarityWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-polarity", "Polarity", contentWidget);
+		m_device, "adi,arm-gpio-config-orx2-tx-sel0-pin-polarity", "Polarity", m_widgetGroup, contentWidget);
 	if(orx2Sel0PolarityWidget) {
 		contentLayout->addWidget(orx2Sel0PolarityWidget, 2, 3);
 		orx2Sel0PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -185,7 +187,7 @@ void ArmGpioWidget::setupUi()
 
 	// Enable widget
 	auto orx2Sel1EnableWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-enable", "Enable", contentWidget);
+		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-enable", "Enable", m_widgetGroup, contentWidget);
 	if(orx2Sel1EnableWidget) {
 		contentLayout->addWidget(orx2Sel1EnableWidget, 3, 1);
 		orx2Sel1EnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -195,7 +197,7 @@ void ArmGpioWidget::setupUi()
 	// GPIO Pin Sel widget
 	auto orx2Sel1PinWidget =
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-gpio-pin-sel",
-							 "[0 1 15]", "GPIO Pin Sel", contentWidget);
+							 "[0 1 15]", "GPIO Pin Sel", m_widgetGroup, contentWidget);
 	if(orx2Sel1PinWidget) {
 		contentLayout->addWidget(orx2Sel1PinWidget, 3, 2);
 		connect(this, &ArmGpioWidget::readRequested, orx2Sel1PinWidget, &IIOWidget::readAsync);
@@ -203,7 +205,7 @@ void ArmGpioWidget::setupUi()
 
 	// Polarity widget
 	auto orx2Sel1PolarityWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-polarity", "Polarity", contentWidget);
+		m_device, "adi,arm-gpio-config-orx2-tx-sel1-pin-polarity", "Polarity", m_widgetGroup, contentWidget);
 	if(orx2Sel1PolarityWidget) {
 		contentLayout->addWidget(orx2Sel1PolarityWidget, 3, 3);
 		orx2Sel1PolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -218,7 +220,7 @@ void ArmGpioWidget::setupUi()
 
 	// Enable widget
 	auto trackingEnableWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-enable", "Enable", contentWidget);
+		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-enable", "Enable", m_widgetGroup, contentWidget);
 	if(trackingEnableWidget) {
 		contentLayout->addWidget(trackingEnableWidget, 4, 1);
 		trackingEnableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -228,7 +230,7 @@ void ArmGpioWidget::setupUi()
 	// GPIO Pin Sel widget
 	auto trackingPinWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-gpio-pin-sel", "[0 1 15]", "GPIO Pin Sel",
-		contentWidget);
+		m_widgetGroup, contentWidget);
 	if(trackingPinWidget) {
 		contentLayout->addWidget(trackingPinWidget, 4, 2);
 		connect(this, &ArmGpioWidget::readRequested, trackingPinWidget, &IIOWidget::readAsync);
@@ -236,7 +238,7 @@ void ArmGpioWidget::setupUi()
 
 	// Polarity widget
 	auto trackingPolarityWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-polarity", "Polarity", contentWidget);
+		m_device, "adi,arm-gpio-config-en-tx-tracking-cals-polarity", "Polarity", m_widgetGroup, contentWidget);
 	if(trackingPolarityWidget) {
 		contentLayout->addWidget(trackingPolarityWidget, 4, 3);
 		trackingPolarityWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);

@@ -19,6 +19,7 @@
  */
 
 #include "advanced/bistwidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -37,9 +38,10 @@ Q_LOGGING_CATEGORY(CAT_BIST, "BIST")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-BistWidget::BistWidget(iio_device *device, QWidget *parent)
+BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_BIST) << "No device provided to BIST widget";
@@ -160,7 +162,7 @@ QWidget *BistWidget::createFramerPrbsSection(QWidget *parent)
 
 	// Framer A PRBS - Custom Combo Widget
 	auto framerAWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_a_prbs", prbOptions,
-									    "Framer A PRBS");
+									    "Framer A PRBS", m_widgetGroup);
 	if(framerAWidget) {
 		layout->addWidget(framerAWidget);
 		connect(this, &BistWidget::readRequested, framerAWidget, &IIOWidget::readAsync);
@@ -168,7 +170,7 @@ QWidget *BistWidget::createFramerPrbsSection(QWidget *parent)
 
 	// Framer B PRBS - Custom Combo Widget
 	auto framerBWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "bist_framer_b_prbs", prbOptions,
-									    "Framer B PRBS");
+									    "Framer B PRBS", m_widgetGroup);
 	if(framerBWidget) {
 		layout->addWidget(framerBWidget);
 		connect(this, &BistWidget::readRequested, framerBWidget, &IIOWidget::readAsync);

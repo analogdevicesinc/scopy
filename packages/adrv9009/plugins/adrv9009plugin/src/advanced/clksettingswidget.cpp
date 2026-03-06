@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QSpacerItem>
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <QLoggingCategory>
 #include <style.h>
 
@@ -33,9 +34,10 @@ Q_LOGGING_CATEGORY(CAT_ADRV9009_CLK_SETTINGS, "ADRV9009_CLK_SETTINGS")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-ClkSettingsWidget::ClkSettingsWidget(iio_device *device, QWidget *parent)
+ClkSettingsWidget::ClkSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_ADRV9009_CLK_SETTINGS) << "No device provided to Clock Settings";
@@ -94,8 +96,9 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	// 5. RF PLL Use External LO
 
 	// 1. Device Clock (kHz) - RangeWidget
-	IIOWidget *deviceClockWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,dig-clocks-device-clock_khz", "[10000 1000 500000]", "Device Clock (kHz)");
+	IIOWidget *deviceClockWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,dig-clocks-device-clock_khz",
+							 "[10000 1000 500000]", "Device Clock (kHz)", m_widgetGroup);
 	if(deviceClockWidget) {
 		Style::setStyle(deviceClockWidget, style::properties::widget::basicBackground, true, true);
 		parentLayout->addWidget(deviceClockWidget);
@@ -103,7 +106,8 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 
 	// 2. CLK PLL VCO Freq (kHz) - RangeWidget
 	IIOWidget *pllVcoFreqWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,dig-clocks-clk-pll-vco-freq_khz", "[5000000 1000 12000000]", "CLK PLL VCO Freq (kHz)");
+		m_device, "adi,dig-clocks-clk-pll-vco-freq_khz", "[5000000 1000 12000000]", "CLK PLL VCO Freq (kHz)",
+		m_widgetGroup);
 	if(pllVcoFreqWidget) {
 		Style::setStyle(pllVcoFreqWidget, style::properties::widget::basicBackground, true, true);
 		parentLayout->addWidget(pllVcoFreqWidget);
@@ -118,7 +122,7 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	hsDivOptions.insert("4", "5");
 
 	IIOWidget *hsDividerWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,dig-clocks-clk-pll-hs-div", hsDivOptions, "CLK PLL HS Divider");
+		m_device, "adi,dig-clocks-clk-pll-hs-div", hsDivOptions, "CLK PLL HS Divider", m_widgetGroup);
 	if(hsDividerWidget) {
 		Style::setStyle(hsDividerWidget, style::properties::widget::basicBackground, true, true);
 		parentLayout->addWidget(hsDividerWidget);

@@ -27,6 +27,7 @@
 #include <adrv9009advanced.h>
 
 #include <iioutil/connectionprovider.h>
+#include <iio-widgets/iiowidgetgroup.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9009PLUGIN, "Adrv9009Plugin")
 using namespace scopy::adrv9009;
@@ -138,7 +139,7 @@ void Adrv9009Plugin::createAdditionalAdvancedTool(iio_device *device, const char
 	Q_EMIT toolListChanged();
 
 	// Then create widget and set tool
-	Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device);
+	Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device, m_widgetGroup);
 	advancedEntry->setTool(adrv9009Advanced);
 
 	qDebug(CAT_ADRV9009PLUGIN) << "Created" << advancedToolName << "for device:" << deviceName;
@@ -154,8 +155,10 @@ bool Adrv9009Plugin::onConnect()
 		return false;
 	}
 
+	m_widgetGroup = new IIOWidgetGroup(this);
+
 	// Create basic ADRV9009 tool with IIO context
-	Adrv9009 *adrv9009 = new Adrv9009(conn->context());
+	Adrv9009 *adrv9009 = new Adrv9009(conn->context(), m_widgetGroup);
 	m_toolList[0]->setTool(adrv9009);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
@@ -172,7 +175,7 @@ bool Adrv9009Plugin::onConnect()
 		if(deviceName && QString(deviceName).startsWith("adrv9009-phy")) {
 			if(first) {
 				// Set up existing "ADRV9009 Advanced" tool (m_toolList[1])
-				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device);
+				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device, m_widgetGroup);
 				m_toolList[1]->setTool(adrv9009Advanced);
 				m_toolList[1]->setEnabled(true);
 				m_toolList[1]->setRunBtnVisible(true);
@@ -206,6 +209,11 @@ bool Adrv9009Plugin::onDisconnect()
 			tool->setTool(nullptr);
 			delete(w);
 		}
+	}
+
+	if(m_widgetGroup) {
+		delete m_widgetGroup;
+		m_widgetGroup = nullptr;
 	}
 
 	// Close connection

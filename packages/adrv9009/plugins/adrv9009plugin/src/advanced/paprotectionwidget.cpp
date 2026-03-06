@@ -19,6 +19,7 @@
  */
 
 #include "advanced/paprotectionwidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -32,9 +33,10 @@ Q_LOGGING_CATEGORY(CAT_PAPROTECTION, "PAProtection")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-PaProtectionWidget::PaProtectionWidget(iio_device *device, QWidget *parent)
+PaProtectionWidget::PaProtectionWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_PAPROTECTION) << "No device provided to PA Protection widget";
@@ -73,7 +75,7 @@ void PaProtectionWidget::setupUi()
 
 	// 1. Average Duration - Range Widget [0 1 14]
 	auto avgDuration = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-avg-duration",
-								    "[0 1 14]", "Average Duration");
+								    "[0 1 14]", "Average Duration", m_widgetGroup);
 	if(avgDuration) {
 		layout->addWidget(avgDuration);
 		connect(this, &PaProtectionWidget::readRequested, avgDuration, &IIOWidget::readAsync);
@@ -81,23 +83,25 @@ void PaProtectionWidget::setupUi()
 
 	// 2. TX Attenuation Step - Range Widget [0 1 127]
 	auto txAttenStep = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-tx-atten-step",
-								    "[0 1 127]", "TX Attenuation Step");
+								    "[0 1 127]", "TX Attenuation Step", m_widgetGroup);
 	if(txAttenStep) {
 		layout->addWidget(txAttenStep);
 		connect(this, &PaProtectionWidget::readRequested, txAttenStep, &IIOWidget::readAsync);
 	}
 
 	// 3. TX1 Power Threshold - Range Widget [1 1 8191]
-	auto tx1PowerThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,tx-pa-protection-tx1-power-threshold", "[1 1 8191]", "TX1 Power Threshold");
+	auto tx1PowerThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-tx1-power-threshold",
+							 "[1 1 8191]", "TX1 Power Threshold", m_widgetGroup);
 	if(tx1PowerThresh) {
 		layout->addWidget(tx1PowerThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx1PowerThresh, &IIOWidget::readAsync);
 	}
 
 	// 4. TX2 Power Threshold - Range Widget [1 1 8191]
-	auto tx2PowerThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,tx-pa-protection-tx2-power-threshold", "[1 1 8191]", "TX2 Power Threshold");
+	auto tx2PowerThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-tx2-power-threshold",
+							 "[1 1 8191]", "TX2 Power Threshold", m_widgetGroup);
 	if(tx2PowerThresh) {
 		layout->addWidget(tx2PowerThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx2PowerThresh, &IIOWidget::readAsync);
@@ -105,7 +109,7 @@ void PaProtectionWidget::setupUi()
 
 	// 5. Peak Count - Range Widget [0 1 31] - Critical: After power thresholds!
 	auto peakCount = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,tx-pa-protection-peak-count",
-								  "[0 1 31]", "Peak Count");
+								  "[0 1 31]", "Peak Count", m_widgetGroup);
 	if(peakCount) {
 		layout->addWidget(peakCount);
 		connect(this, &PaProtectionWidget::readRequested, peakCount, &IIOWidget::readAsync);
@@ -113,7 +117,7 @@ void PaProtectionWidget::setupUi()
 
 	// 6. TX1 Peak Threshold - Range Widget [1 1 255]
 	auto tx1PeakThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,tx-pa-protection-tx1-peak-threshold", "[1 1 255]", "TX1 Peak Threshold");
+		m_device, "adi,tx-pa-protection-tx1-peak-threshold", "[1 1 255]", "TX1 Peak Threshold", m_widgetGroup);
 	if(tx1PeakThresh) {
 		layout->addWidget(tx1PeakThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx1PeakThresh, &IIOWidget::readAsync);
@@ -121,7 +125,7 @@ void PaProtectionWidget::setupUi()
 
 	// 7. TX2 Peak Threshold - Range Widget [1 1 255]
 	auto tx2PeakThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,tx-pa-protection-tx2-peak-threshold", "[1 1 255]", "TX2 Peak Threshold");
+		m_device, "adi,tx-pa-protection-tx2-peak-threshold", "[1 1 255]", "TX2 Peak Threshold", m_widgetGroup);
 	if(tx2PeakThresh) {
 		layout->addWidget(tx2PeakThresh);
 		connect(this, &PaProtectionWidget::readRequested, tx2PeakThresh, &IIOWidget::readAsync);

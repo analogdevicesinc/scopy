@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <iio.h>
 
 namespace scopy::adrv9009 {
@@ -33,7 +34,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT TxSettingsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TxSettingsWidget(iio_device *device, QWidget *parent = nullptr);
+	TxSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~TxSettingsWidget();
 
 Q_SIGNALS:
@@ -41,6 +42,7 @@ Q_SIGNALS:
 
 private:
 	iio_device *m_device;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 
 	void setupUi();
 	QWidget *createTxProfileSection(QWidget *parent);

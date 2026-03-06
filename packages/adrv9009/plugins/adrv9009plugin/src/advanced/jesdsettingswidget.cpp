@@ -19,6 +19,7 @@
  */
 
 #include "advanced/jesdsettingswidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -34,9 +35,10 @@ Q_LOGGING_CATEGORY(CAT_JESDSETTINGS, "JesdSettings")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-JesdSettingsWidget::JesdSettingsWidget(iio_device *device, QWidget *parent)
+JesdSettingsWidget::JesdSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_JESDSETTINGS) << "No device provided to JESD Settings widget";
@@ -80,7 +82,7 @@ void JesdSettingsWidget::setupUi()
 
 	// SER AMPLITUDE - Range Widget [0 1 15]
 	auto serAmplitude = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,jesd204-ser-amplitude", "[0 1 15]",
-								     "SER AMPLITUDE");
+								     "SER AMPLITUDE", m_widgetGroup);
 	if(serAmplitude) {
 		settingsSection->contentLayout()->addWidget(serAmplitude);
 		connect(this, &JesdSettingsWidget::readRequested, serAmplitude, &IIOWidget::readAsync);
@@ -88,7 +90,7 @@ void JesdSettingsWidget::setupUi()
 
 	// SER PRE EMPHASIS - Range Widget [0 1 4]
 	auto serPreEmphasis = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,jesd204-ser-pre-emphasis",
-								       "[0 1 4]", "SER PRE EMPHASIS");
+								       "[0 1 4]", "SER PRE EMPHASIS", m_widgetGroup);
 	if(serPreEmphasis) {
 		settingsSection->contentLayout()->addWidget(serPreEmphasis);
 		connect(this, &JesdSettingsWidget::readRequested, serPreEmphasis, &IIOWidget::readAsync);
@@ -106,7 +108,7 @@ void JesdSettingsWidget::setupUi()
 
 	// DES EQ SETTING - Range Widget [0 1 4]
 	auto desEqSetting = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,jesd204-des-eq-setting", "[0 1 4]",
-								     "DES EQ SETTING");
+								     "DES EQ SETTING", m_widgetGroup);
 	if(desEqSetting) {
 		settingsSection->contentLayout()->addWidget(desEqSetting);
 		connect(this, &JesdSettingsWidget::readRequested, desEqSetting, &IIOWidget::readAsync);
@@ -114,7 +116,7 @@ void JesdSettingsWidget::setupUi()
 
 	// SYSREF LVDS MODE - Checkbox
 	auto sysrefLvdsMode = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,jesd204-sysref-lvds-mode",
-									  "SYSREF LVDS MODE");
+									  "SYSREF LVDS MODE", m_widgetGroup);
 	if(sysrefLvdsMode) {
 		settingsSection->contentLayout()->addWidget(sysrefLvdsMode);
 		sysrefLvdsMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -123,7 +125,7 @@ void JesdSettingsWidget::setupUi()
 
 	// SYSREF LVDS PN INVERT - Checkbox
 	auto sysrefLvdsPnInvert = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,jesd204-sysref-lvds-pn-invert", "SYSREF LVDS PN INVERT");
+		m_device, "adi,jesd204-sysref-lvds-pn-invert", "SYSREF LVDS PN INVERT", m_widgetGroup);
 	if(sysrefLvdsPnInvert) {
 		settingsSection->contentLayout()->addWidget(sysrefLvdsPnInvert);
 		sysrefLvdsPnInvert->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);

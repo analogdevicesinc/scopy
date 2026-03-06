@@ -27,15 +27,17 @@
 #include <QCheckBox>
 
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <gui/style.h>
 #include <gui/widgets/menucollapsesection.h>
 
 using namespace scopy::adrv9009;
 using namespace scopy;
 
-AuxDacWidget::AuxDacWidget(iio_device *device, QWidget *parent)
+AuxDacWidget::AuxDacWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(m_device != nullptr) {
 		setupUi();
@@ -115,7 +117,7 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 		// Value widget - use CORRECT attribute name following iio-oscilloscope reference
 		QString valueAttr = QString("adi,aux-dac-values%1").arg(i);
 		IIOWidget *valueWidget = Adrv9009WidgetFactory::createDebugRangeWidget(
-			m_device, valueAttr, "[0 1023 1]", QString("DAC %1 Value").arg(i), this);
+			m_device, valueAttr, "[0 1023 1]", QString("DAC %1 Value").arg(i), m_widgetGroup, this);
 		configGrid->addWidget(valueWidget, row, 1);
 		if(valueWidget) {
 			m_iioWidgets.append(valueWidget);
@@ -129,7 +131,8 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 		resolutionMap["1"] = "10_bit";
 		resolutionMap["2"] = "12_bit";
 		IIOWidget *resolutionWidget = Adrv9009WidgetFactory::createDebugCustomComboWidget(
-			m_device, resolutionAttr, resolutionMap, QString("DAC %1 Resolution").arg(i), this);
+			m_device, resolutionAttr, resolutionMap, QString("DAC %1 Resolution").arg(i), m_widgetGroup,
+			this);
 		configGrid->addWidget(resolutionWidget, row, 2);
 		if(resolutionWidget) {
 			m_iioWidgets.append(resolutionWidget);
@@ -144,7 +147,7 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 		vrefMap["2"] = "Internal_2.5V";
 		vrefMap["3"] = "Reserved";
 		IIOWidget *vrefWidget = Adrv9009WidgetFactory::createDebugCustomComboWidget(
-			m_device, vrefAttr, vrefMap, QString("DAC %1 Vref").arg(i), this);
+			m_device, vrefAttr, vrefMap, QString("DAC %1 Vref").arg(i), m_widgetGroup, this);
 		configGrid->addWidget(vrefWidget, row, 3);
 		if(vrefWidget) {
 			m_iioWidgets.append(vrefWidget);
@@ -162,7 +165,7 @@ QWidget *AuxDacWidget::createAuxDacControls(QWidget *parent)
 		// Value widget only for DAC 10-11
 		QString valueAttr = QString("adi,aux-dac-values%1").arg(i);
 		IIOWidget *valueWidget = Adrv9009WidgetFactory::createDebugRangeWidget(
-			m_device, valueAttr, "[0 1023 1]", QString("DAC %1 Value").arg(i), this);
+			m_device, valueAttr, "[0 1023 1]", QString("DAC %1 Value").arg(i), m_widgetGroup, this);
 		configGrid->addWidget(valueWidget, row, 1);
 		if(valueWidget) {
 			m_iioWidgets.append(valueWidget);

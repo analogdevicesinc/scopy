@@ -19,6 +19,7 @@
  */
 
 #include "advanced/fhmsetupwidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -33,9 +34,10 @@ Q_LOGGING_CATEGORY(CAT_FHMSETUP, "FHMSetup")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-FhmSetupWidget::FhmSetupWidget(iio_device *device, QWidget *parent)
+FhmSetupWidget::FhmSetupWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_FHMSETUP) << "No device provided to FHM Setup widget";
@@ -101,7 +103,8 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// FHM Enable - Checkbox
-	auto fhmEnable = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-enable", "FHM ENABLE");
+	auto fhmEnable = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-enable", "FHM ENABLE",
+								     m_widgetGroup);
 	if(fhmEnable) {
 		layout->addWidget(fhmEnable);
 		fhmEnable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -110,7 +113,7 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 
 	// Enable MCS Sync - Checkbox
 	auto mcsSyncEnable = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-enable-mcs-sync",
-									 "ENABLE MCS SYNC");
+									 "ENABLE MCS SYNC", m_widgetGroup);
 	if(mcsSyncEnable) {
 		layout->addWidget(mcsSyncEnable);
 		mcsSyncEnable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -119,7 +122,7 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 
 	// FHM Trigger Mode - Checkbox
 	auto triggerMode = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-trigger-mode",
-								       "FHM TRIGGER MODE");
+								       "FHM TRIGGER MODE", m_widgetGroup);
 	if(triggerMode) {
 		layout->addWidget(triggerMode);
 		triggerMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -127,8 +130,8 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 	}
 
 	// FHM Exit Mode - Checkbox
-	auto exitMode =
-		Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-exit-mode", "FHM EXIT MODE");
+	auto exitMode = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,fhm-mode-fhm-exit-mode",
+								    "FHM EXIT MODE", m_widgetGroup);
 	if(exitMode) {
 		layout->addWidget(exitMode);
 		exitMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -137,7 +140,8 @@ QWidget *FhmSetupWidget::createSettingsSection(QWidget *parent)
 
 	// FHM Init Frequency (Hz) - Range Widget
 	auto initFreq = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-mode-fhm-init-frequency_hz",
-								 "[100000000 1 6000000000]", "FHM INIT FREQUENCY (Hz)");
+								 "[100000000 1 6000000000]", "FHM INIT FREQUENCY (Hz)",
+								 m_widgetGroup);
 	if(initFreq) {
 		layout->addWidget(initFreq);
 		connect(this, &FhmSetupWidget::readRequested, initFreq, &IIOWidget::readAsync);
@@ -163,7 +167,7 @@ QWidget *FhmSetupWidget::createConfigSection(QWidget *parent)
 
 	// FHM GPIO Pin - Range Widget [0 1 15]
 	auto gpioPin = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-config-fhm-gpio-pin", "[0 1 15]",
-								"FHM GPIO PIN");
+								"FHM GPIO PIN", m_widgetGroup);
 	if(gpioPin) {
 		layout->addWidget(gpioPin);
 		connect(this, &FhmSetupWidget::readRequested, gpioPin, &IIOWidget::readAsync);
@@ -171,7 +175,7 @@ QWidget *FhmSetupWidget::createConfigSection(QWidget *parent)
 
 	// FHM Min Frequency (MHz) - Range Widget [100 1 6000]
 	auto minFreq = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-config-fhm-min-freq_mhz",
-								"[100 1 6000]", "FHM MIN FREQ (MHz)");
+								"[100 1 6000]", "FHM MIN FREQ (MHz)", m_widgetGroup);
 	if(minFreq) {
 		layout->addWidget(minFreq);
 		connect(this, &FhmSetupWidget::readRequested, minFreq, &IIOWidget::readAsync);
@@ -179,7 +183,7 @@ QWidget *FhmSetupWidget::createConfigSection(QWidget *parent)
 
 	// FHM Max Frequency (MHz) - Range Widget [100 1 6000]
 	auto maxFreq = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,fhm-config-fhm-max-freq_mhz",
-								"[100 1 6000]", "FHM MAX FREQ (MHz)");
+								"[100 1 6000]", "FHM MAX FREQ (MHz)", m_widgetGroup);
 	if(maxFreq) {
 		layout->addWidget(maxFreq);
 		connect(this, &FhmSetupWidget::readRequested, maxFreq, &IIOWidget::readAsync);

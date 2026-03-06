@@ -23,6 +23,7 @@
 
 #include "scopy-adrv9009plugin_export.h"
 #include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <QString>
 #include <QWidget>
 #include <iio.h>
@@ -34,39 +35,40 @@ class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009WidgetFactory
 public:
 	// Device attribute widgets
 	static IIOWidget *createSpinboxWidget(iio_device *device, QString attr, QString title,
-					      QWidget *parent = nullptr);
+					      IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createCheckboxWidget(iio_device *device, QString attr, QString title,
-					       QWidget *parent = nullptr);
+					       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createComboWidget(iio_device *device, QString attr, QString availableAttr, QString title,
-					    QWidget *parent = nullptr);
+					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createCustomComboWidget(iio_device *device, QString attr,
 						  const QMap<QString, QString> &optionsMap, QString title,
-						  QWidget *parent = nullptr);
+						  IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createRangeWidget(iio_device *device, QString attr, QString range, QString title,
-					    QWidget *parent = nullptr);
+					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createReadOnlyWidget(iio_device *device, QString attr, QString title, bool compactMode = true,
-					       QWidget *parent = nullptr);
+					       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 
 	// Channel attribute widgets
 	static IIOWidget *createSpinboxWidget(iio_channel *channel, QString attr, QString title,
-					      QWidget *parent = nullptr);
+					      IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createCheckboxWidget(iio_channel *channel, QString attr, QString title,
-					       QWidget *parent = nullptr);
+					       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createComboWidget(iio_channel *channel, QString attr, QString availableAttr, QString title,
-					    QWidget *parent = nullptr);
+					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createRangeWidget(iio_channel *channel, QString attr, QString range, QString title,
-					    QWidget *parent = nullptr);
+					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
-					       bool compactMode = true, QWidget *parent = nullptr);
+					       bool compactMode = true, IIOWidgetGroup *group = nullptr,
+					       QWidget *parent = nullptr);
 
 	// Debug attribute widgets (for advanced plugin features like aux DAC)
 	static IIOWidget *createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
-						 QWidget *parent = nullptr);
+						 IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createDebugCustomComboWidget(iio_device *device, QString attr,
 						       const QMap<QString, QString> &optionsMap, QString title,
-						       QWidget *parent = nullptr);
+						       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	static IIOWidget *createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
-						    QWidget *parent = nullptr);
+						    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 
 private:
 	Adrv9009WidgetFactory() = delete; // Static class, no instances

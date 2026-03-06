@@ -19,6 +19,7 @@
  */
 
 #include "advanced/jesddeframerwidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -35,9 +36,10 @@ Q_LOGGING_CATEGORY(CAT_JESDDEFRAMER, "JesdDeframer")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-JesdDeframerWidget::JesdDeframerWidget(iio_device *device, QWidget *parent)
+JesdDeframerWidget::JesdDeframerWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_JESDDEFRAMER) << "No device provided to JESD Deframer widget";
@@ -103,7 +105,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 1. BANK ID - Range Widget [0 1 15]
 	auto bankIdWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, QString("adi,jesd204-%1-bank-id").arg(attrPrefix), "[0 1 15]", "Bank ID");
+		m_device, QString("adi,jesd204-%1-bank-id").arg(attrPrefix), "[0 1 15]", "Bank ID", m_widgetGroup);
 	if(bankIdWidget) {
 		column->contentLayout()->addWidget(bankIdWidget);
 		connect(this, &JesdDeframerWidget::readRequested, bankIdWidget, &IIOWidget::readAsync);
@@ -111,7 +113,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 2. DEVICE ID - Range Widget [0 1 255]
 	auto deviceIdWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, QString("adi,jesd204-%1-device-id").arg(attrPrefix), "[0 1 255]", "Device ID");
+		m_device, QString("adi,jesd204-%1-device-id").arg(attrPrefix), "[0 1 255]", "Device ID", m_widgetGroup);
 	if(deviceIdWidget) {
 		column->contentLayout()->addWidget(deviceIdWidget);
 		connect(this, &JesdDeframerWidget::readRequested, deviceIdWidget, &IIOWidget::readAsync);
@@ -119,7 +121,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 3. LANE0 ID - Range Widget [0 1 31]
 	auto lane0IdWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, QString("adi,jesd204-%1-lane0-id").arg(attrPrefix), "[0 1 31]", "Lane0 ID");
+		m_device, QString("adi,jesd204-%1-lane0-id").arg(attrPrefix), "[0 1 31]", "Lane0 ID", m_widgetGroup);
 	if(lane0IdWidget) {
 		column->contentLayout()->addWidget(lane0IdWidget);
 		connect(this, &JesdDeframerWidget::readRequested, lane0IdWidget, &IIOWidget::readAsync);
@@ -131,7 +133,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	mOptions.insert("2", "2");
 	mOptions.insert("4", "4");
 	IIOWidget *mWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), mOptions, "M");
+		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), mOptions, "M", m_widgetGroup);
 	if(mWidget) {
 		column->contentLayout()->addWidget(mWidget);
 		connect(this, &JesdDeframerWidget::readRequested, mWidget, &IIOWidget::readAsync);
@@ -141,7 +143,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 5. K - Range Widget [1 1 32]
 	auto kWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, QString("adi,jesd204-%1-k").arg(attrPrefix),
-								"[1 1 32]", "K");
+								"[1 1 32]", "K", m_widgetGroup);
 	if(kWidget) {
 		column->contentLayout()->addWidget(kWidget);
 		connect(this, &JesdDeframerWidget::readRequested, kWidget, &IIOWidget::readAsync);
@@ -149,7 +151,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 6. SCRAMBLE - Checkbox
 	auto scrambleWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, QString("adi,jesd204-%1-scramble").arg(attrPrefix), "Scramble");
+		m_device, QString("adi,jesd204-%1-scramble").arg(attrPrefix), "Scramble", m_widgetGroup);
 	if(scrambleWidget) {
 		column->contentLayout()->addWidget(scrambleWidget);
 		scrambleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -158,7 +160,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 7. EXTERNAL SYSREF - Checkbox
 	auto extSysrefWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, QString("adi,jesd204-%1-external-sysref").arg(attrPrefix), "External SYSREF");
+		m_device, QString("adi,jesd204-%1-external-sysref").arg(attrPrefix), "External SYSREF", m_widgetGroup);
 	if(extSysrefWidget) {
 		column->contentLayout()->addWidget(extSysrefWidget);
 		extSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -224,7 +226,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	// 9. DESERIALIZER LANE CROSSBAR - Range Widget [0 1 255]
 	auto crossbarWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, QString("adi,jesd204-%1-deserializer-lane-crossbar").arg(attrPrefix), "[0 1 255]",
-		"Deserializer Lane Crossbar");
+		"Deserializer Lane Crossbar", m_widgetGroup);
 	if(crossbarWidget) {
 		column->contentLayout()->addWidget(crossbarWidget);
 		connect(this, &JesdDeframerWidget::readRequested, crossbarWidget, &IIOWidget::readAsync);
@@ -232,7 +234,8 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 10. LMFC OFFSET - Range Widget [0 1 31]
 	auto lmfcWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, QString("adi,jesd204-%1-lmfc-offset").arg(attrPrefix), "[0 1 31]", "LMFC Offset");
+		m_device, QString("adi,jesd204-%1-lmfc-offset").arg(attrPrefix), "[0 1 31]", "LMFC Offset",
+		m_widgetGroup);
 	if(lmfcWidget) {
 		column->contentLayout()->addWidget(lmfcWidget);
 		connect(this, &JesdDeframerWidget::readRequested, lmfcWidget, &IIOWidget::readAsync);
@@ -240,7 +243,8 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 11. NEW SYSREF ON RELINK - Checkbox
 	auto newSysrefWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, QString("adi,jesd204-%1-new-sysref-on-relink").arg(attrPrefix), "New SYSREF on Relink");
+		m_device, QString("adi,jesd204-%1-new-sysref-on-relink").arg(attrPrefix), "New SYSREF on Relink",
+		m_widgetGroup);
 	if(newSysrefWidget) {
 		column->contentLayout()->addWidget(newSysrefWidget);
 		newSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -249,7 +253,8 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 12. SYNCB OUT SELECT - Checkbox
 	auto syncbSelectWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, QString("adi,jesd204-%1-syncb-out-select").arg(attrPrefix), "SYNCB Out Select");
+		m_device, QString("adi,jesd204-%1-syncb-out-select").arg(attrPrefix), "SYNCB Out Select",
+		m_widgetGroup);
 	if(syncbSelectWidget) {
 		column->contentLayout()->addWidget(syncbSelectWidget);
 		syncbSelectWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -263,7 +268,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	npOptions.insert("12", "12");
 	npOptions.insert("16", "16");
 	IIOWidget *npWidget = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), npOptions, "NP");
+		m_device, QString("adi,jesd204-%1-np").arg(attrPrefix), npOptions, "NP", m_widgetGroup);
 	if(npWidget) {
 		column->contentLayout()->addWidget(npWidget);
 		connect(this, &JesdDeframerWidget::readRequested, npWidget, &IIOWidget::readAsync);
@@ -271,7 +276,8 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// 14. SYNCB OUT LVDS MODE - Checkbox
 	auto lvdsModeWidget = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, QString("adi,jesd204-%1-syncb-out-lvds-mode").arg(attrPrefix), "SYNCB Out LVDS Mode");
+		m_device, QString("adi,jesd204-%1-syncb-out-lvds-mode").arg(attrPrefix), "SYNCB Out LVDS Mode",
+		m_widgetGroup);
 	if(lvdsModeWidget) {
 		column->contentLayout()->addWidget(lvdsModeWidget);
 		lvdsModeWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -281,7 +287,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	// 15. SYNCB OUT LVDS PN INVERT - Checkbox
 	auto lvdsPnInvertWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-syncb-out-lvds-pn-invert").arg(attrPrefix),
-		"SYNCB Out LVDS PN Invert");
+		"SYNCB Out LVDS PN Invert", m_widgetGroup);
 	if(lvdsPnInvertWidget) {
 		column->contentLayout()->addWidget(lvdsPnInvertWidget);
 		lvdsPnInvertWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -291,7 +297,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	// 16. SYNCB OUT CMOS SLEW RATE - Range Widget [0 1 3]
 	auto cmosSlewWidget = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, QString("adi,jesd204-%1-syncb-out-cmos-slew-rate").arg(attrPrefix), "[0 1 3]",
-		"SYNCB Out CMOS Slew Rate");
+		"SYNCB Out CMOS Slew Rate", m_widgetGroup);
 	if(cmosSlewWidget) {
 		column->contentLayout()->addWidget(cmosSlewWidget);
 		connect(this, &JesdDeframerWidget::readRequested, cmosSlewWidget, &IIOWidget::readAsync);
@@ -300,7 +306,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	// 17. SYNCB OUT CMOS DRIVE LEVEL - Checkbox
 	auto cmosDriveWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-syncb-out-cmos-drive-level").arg(attrPrefix),
-		"SYNCB Out CMOS Drive Level");
+		"SYNCB Out CMOS Drive Level", m_widgetGroup);
 	if(cmosDriveWidget) {
 		column->contentLayout()->addWidget(cmosDriveWidget);
 		cmosDriveWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -310,7 +316,7 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 	// 18. ENABLE MANUAL LANE CROSSBAR - Checkbox
 	auto manualXbarWidget = Adrv9009WidgetFactory::createCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-enable-manual-lane-xbar").arg(attrPrefix),
-		"Enable Manual Lane Crossbar");
+		"Enable Manual Lane Crossbar", m_widgetGroup);
 	if(manualXbarWidget) {
 		column->contentLayout()->addWidget(manualXbarWidget);
 		manualXbarWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);

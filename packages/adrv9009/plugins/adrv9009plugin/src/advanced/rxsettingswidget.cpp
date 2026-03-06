@@ -19,6 +19,7 @@
  */
 
 #include "advanced/rxsettingswidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -34,9 +35,10 @@ Q_LOGGING_CATEGORY(CAT_RXSETTINGS, "RXSettings")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-RxSettingsWidget::RxSettingsWidget(iio_device *device, QWidget *parent)
+RxSettingsWidget::RxSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_RXSETTINGS) << "No device provided to RX Settings widget";
@@ -110,7 +112,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	firDecimationOptions.insert("2", "2");
 	firDecimationOptions.insert("4", "4");
 	auto firDecimation = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,rx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation");
+		m_device, "adi,rx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR Decimation", m_widgetGroup);
 	if(firDecimation) {
 		layout->addWidget(firDecimation);
 		connect(this, &RxSettingsWidget::readRequested, firDecimation, &IIOWidget::readAsync);
@@ -121,7 +123,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	dec5DecimationOptions.insert("4", "4");
 	dec5DecimationOptions.insert("5", "5");
 	auto dec5Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
-		m_device, "adi,rx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation");
+		m_device, "adi,rx-profile-rx-dec5-decimation", dec5DecimationOptions, "RX DEC5 Decimation",
+		m_widgetGroup);
 	if(dec5Decimation) {
 		layout->addWidget(dec5Decimation);
 		connect(this, &RxSettingsWidget::readRequested, dec5Decimation, &IIOWidget::readAsync);
@@ -131,32 +134,35 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	QMap<QString, QString> rhb1DecimationOptions;
 	rhb1DecimationOptions.insert("1", "1");
 	rhb1DecimationOptions.insert("2", "2");
-	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-profile-rhb1-decimation",
-									     rhb1DecimationOptions, "RHB1 Decimation");
+	auto rhb1Decimation = Adrv9009WidgetFactory::createCustomComboWidget(
+		m_device, "adi,rx-profile-rhb1-decimation", rhb1DecimationOptions, "RHB1 Decimation", m_widgetGroup);
 	if(rhb1Decimation) {
 		layout->addWidget(rhb1Decimation);
 		connect(this, &RxSettingsWidget::readRequested, rhb1Decimation, &IIOWidget::readAsync);
 	}
 
 	// RX Output Rate (kHz) - Range Widget
-	auto outputRate = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rx-output-rate_khz",
-								   "[25000 1 370000]", "RX Output Rate (kHz)");
+	auto outputRate =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rx-output-rate_khz",
+							 "[25000 1 370000]", "RX Output Rate (kHz)", m_widgetGroup);
 	if(outputRate) {
 		layout->addWidget(outputRate);
 		connect(this, &RxSettingsWidget::readRequested, outputRate, &IIOWidget::readAsync);
 	}
 
 	// RF Bandwidth (Hz) - Range Widget
-	auto rfBandwidth = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rf-bandwidth_hz",
-								    "[5000000 1 200000000]", "RF Bandwidth (Hz)");
+	auto rfBandwidth =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rf-bandwidth_hz",
+							 "[5000000 1 200000000]", "RF Bandwidth (Hz)", m_widgetGroup);
 	if(rfBandwidth) {
 		layout->addWidget(rfBandwidth);
 		connect(this, &RxSettingsWidget::readRequested, rfBandwidth, &IIOWidget::readAsync);
 	}
 
 	// RX BBF3D BCorner (kHz) - Range Widget
-	auto bbf3dCorner = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rx-bbf3d-bcorner_khz",
-								    "[5000 1 200000]", "RX BBF3D BCorner (kHz)");
+	auto bbf3dCorner =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-profile-rx-bbf3d-bcorner_khz",
+							 "[5000 1 200000]", "RX BBF3D BCorner (kHz)", m_widgetGroup);
 	if(bbf3dCorner) {
 		layout->addWidget(bbf3dCorner);
 		connect(this, &RxSettingsWidget::readRequested, bbf3dCorner, &IIOWidget::readAsync);
@@ -173,7 +179,7 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	ddcModeOptions.insert("6", "INT2_REALIF");
 	ddcModeOptions.insert("7", "DEC2_REALIF");
 	auto ddcMode = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-profile-rx-ddc-mode",
-								      ddcModeOptions, "RX DDC Mode");
+								      ddcModeOptions, "RX DDC Mode", m_widgetGroup);
 	if(ddcMode) {
 		layout->addWidget(ddcMode);
 		connect(this, &RxSettingsWidget::readRequested, ddcMode, &IIOWidget::readAsync);
@@ -198,9 +204,9 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// Band A - Input Band Width (kHz) - Range Widget
-	auto bandAInputBW =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-input-band-width_khz",
-							 "[0 1 4294967295]", "Band A Input Band Width (kHz)");
+	auto bandAInputBW = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rx-nco-shifter-band-a-input-band-width_khz", "[0 1 4294967295]",
+		"Band A Input Band Width (kHz)", m_widgetGroup);
 	if(bandAInputBW) {
 		layout->addWidget(bandAInputBW);
 		connect(this, &RxSettingsWidget::readRequested, bandAInputBW, &IIOWidget::readAsync);
@@ -209,34 +215,34 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 	// Band A - Input Center Freq (kHz) - Range Widget
 	auto bandAInputCenter = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,rx-nco-shifter-band-a-input-center-freq_khz", "[-2147483647 1 2147483647]",
-		"Band A Input Center Freq (kHz)");
+		"Band A Input Center Freq (kHz)", m_widgetGroup);
 	if(bandAInputCenter) {
 		layout->addWidget(bandAInputCenter);
 		connect(this, &RxSettingsWidget::readRequested, bandAInputCenter, &IIOWidget::readAsync);
 	}
 
 	// Band A - NCO1 Freq (kHz) - Range Widget
-	auto bandANCO1 =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-nco1-freq_khz",
-							 "[-2147483647 1 2147483647]", "Band A NCO1 Freq (kHz)");
+	auto bandANCO1 = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-nco1-freq_khz",
+								  "[-2147483647 1 2147483647]",
+								  "Band A NCO1 Freq (kHz)", m_widgetGroup);
 	if(bandANCO1) {
 		layout->addWidget(bandANCO1);
 		connect(this, &RxSettingsWidget::readRequested, bandANCO1, &IIOWidget::readAsync);
 	}
 
 	// Band A - NCO2 Freq (kHz) - Range Widget
-	auto bandANCO2 =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-nco2-freq_khz",
-							 "[-2147483647 1 2147483647]", "Band A NCO2 Freq (kHz)");
+	auto bandANCO2 = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-a-nco2-freq_khz",
+								  "[-2147483647 1 2147483647]",
+								  "Band A NCO2 Freq (kHz)", m_widgetGroup);
 	if(bandANCO2) {
 		layout->addWidget(bandANCO2);
 		connect(this, &RxSettingsWidget::readRequested, bandANCO2, &IIOWidget::readAsync);
 	}
 
 	// Band B - Input Band Width (kHz) - Range Widget
-	auto bandBInputBW =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-binput-band-width_khz",
-							 "[0 1 4294967295]", "Band B Input Band Width (kHz)");
+	auto bandBInputBW = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rx-nco-shifter-band-binput-band-width_khz", "[0 1 4294967295]",
+		"Band B Input Band Width (kHz)", m_widgetGroup);
 	if(bandBInputBW) {
 		layout->addWidget(bandBInputBW);
 		connect(this, &RxSettingsWidget::readRequested, bandBInputBW, &IIOWidget::readAsync);
@@ -245,25 +251,25 @@ QWidget *RxSettingsWidget::createNcoShifterConfigSection(QWidget *parent)
 	// Band B - Input Center Freq (kHz) - Range Widget
 	auto bandBInputCenter = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,rx-nco-shifter-band-binput-center-freq_khz", "[-2147483647 1 2147483647]",
-		"Band B Input Center Freq (kHz)");
+		"Band B Input Center Freq (kHz)", m_widgetGroup);
 	if(bandBInputCenter) {
 		layout->addWidget(bandBInputCenter);
 		connect(this, &RxSettingsWidget::readRequested, bandBInputCenter, &IIOWidget::readAsync);
 	}
 
 	// Band B - NCO1 Freq (kHz) - Range Widget
-	auto bandBNCO1 =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-bnco1-freq_khz",
-							 "[-2147483647 1 2147483647]", "Band B NCO1 Freq (kHz)");
+	auto bandBNCO1 = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-bnco1-freq_khz",
+								  "[-2147483647 1 2147483647]",
+								  "Band B NCO1 Freq (kHz)", m_widgetGroup);
 	if(bandBNCO1) {
 		layout->addWidget(bandBNCO1);
 		connect(this, &RxSettingsWidget::readRequested, bandBNCO1, &IIOWidget::readAsync);
 	}
 
 	// Band B - NCO2 Freq (kHz) - Range Widget
-	auto bandBNCO2 =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-bnco2-freq_khz",
-							 "[-2147483647 1 2147483647]", "Band B NCO2 Freq (kHz)");
+	auto bandBNCO2 = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rx-nco-shifter-band-bnco2-freq_khz",
+								  "[-2147483647 1 2147483647]",
+								  "Band B NCO2 Freq (kHz)", m_widgetGroup);
 	if(bandBNCO2) {
 		layout->addWidget(bandBNCO2);
 		connect(this, &RxSettingsWidget::readRequested, bandBNCO2, &IIOWidget::readAsync);
@@ -336,7 +342,7 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 	QString decPinAttr = QString("adi,rx%1-gain-ctrl-pin-rx-gain-dec-pin").arg(channel);
 
 	// Enable checkbox
-	auto enableWidget = Adrv9009WidgetFactory::createCheckboxWidget(m_device, enableAttr, "ENABLE");
+	auto enableWidget = Adrv9009WidgetFactory::createCheckboxWidget(m_device, enableAttr, "ENABLE", m_widgetGroup);
 	if(enableWidget) {
 		channelLayout->addWidget(enableWidget);
 		enableWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -344,14 +350,16 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 	}
 
 	// Inc step range widget
-	auto incStepWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, incStepAttr, "[0 1 7]", "INC STEP");
+	auto incStepWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, incStepAttr, "[0 1 7]", "INC STEP", m_widgetGroup);
 	if(incStepWidget) {
 		channelLayout->addWidget(incStepWidget);
 		connect(this, &RxSettingsWidget::readRequested, incStepWidget, &IIOWidget::readAsync);
 	}
 
 	// Dec step range widget
-	auto decStepWidget = Adrv9009WidgetFactory::createRangeWidget(m_device, decStepAttr, "[0 1 7]", "DEC STEP");
+	auto decStepWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, decStepAttr, "[0 1 7]", "DEC STEP", m_widgetGroup);
 	if(decStepWidget) {
 		channelLayout->addWidget(decStepWidget);
 		connect(this, &RxSettingsWidget::readRequested, decStepWidget, &IIOWidget::readAsync);
@@ -366,8 +374,8 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 		incOptions.insert("3", "3");
 		incOptions.insert("13", "13");
 	}
-	auto incPinWidget =
-		Adrv9009WidgetFactory::createCustomComboWidget(m_device, incPinAttr, incOptions, "RX GAIN INC PIN");
+	auto incPinWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, incPinAttr, incOptions,
+									   "RX GAIN INC PIN", m_widgetGroup);
 	if(incPinWidget) {
 		channelLayout->addWidget(incPinWidget);
 		connect(this, &RxSettingsWidget::readRequested, incPinWidget, &IIOWidget::readAsync);
@@ -382,8 +390,8 @@ QWidget *RxSettingsWidget::createRxChannelGpioGroup(int channel, QWidget *parent
 		decOptions.insert("4", "4");
 		decOptions.insert("14", "14");
 	}
-	auto decPinWidget =
-		Adrv9009WidgetFactory::createCustomComboWidget(m_device, decPinAttr, decOptions, "RX GAIN DEC PIN");
+	auto decPinWidget = Adrv9009WidgetFactory::createCustomComboWidget(m_device, decPinAttr, decOptions,
+									   "RX GAIN DEC PIN", m_widgetGroup);
 	if(decPinWidget) {
 		channelLayout->addWidget(decPinWidget);
 		connect(this, &RxSettingsWidget::readRequested, decPinWidget, &IIOWidget::readAsync);
@@ -413,8 +421,8 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	rxChannelsOptions.insert("1", "RX1");
 	rxChannelsOptions.insert("2", "RX2");
 	rxChannelsOptions.insert("3", "RX1_and_RX2");
-	auto rxChannels = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-settings-rx-channels",
-									 rxChannelsOptions, "RX Channel Enable");
+	auto rxChannels = Adrv9009WidgetFactory::createCustomComboWidget(
+		m_device, "adi,rx-settings-rx-channels", rxChannelsOptions, "RX Channel Enable", m_widgetGroup);
 	if(rxChannels) {
 		layout->addWidget(rxChannels);
 		connect(this, &RxSettingsWidget::readRequested, rxChannels, &IIOWidget::readAsync);
@@ -425,8 +433,8 @@ QWidget *RxSettingsWidget::createRxConfigurationSection(QWidget *parent)
 	framerSelOptions.insert("0", "A");
 	framerSelOptions.insert("1", "B");
 	framerSelOptions.insert("2", "A_and_B");
-	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(m_device, "adi,rx-settings-framer-sel",
-									framerSelOptions, "JESD204 Framer Selection");
+	auto framerSel = Adrv9009WidgetFactory::createCustomComboWidget(
+		m_device, "adi,rx-settings-framer-sel", framerSelOptions, "JESD204 Framer Selection", m_widgetGroup);
 	if(framerSel) {
 		layout->addWidget(framerSel);
 		connect(this, &RxSettingsWidget::readRequested, framerSel, &IIOWidget::readAsync);
