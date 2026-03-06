@@ -29,6 +29,8 @@
 #include <style.h>
 #include <gui/deviceiconbuilder.h>
 
+#include <style.h>
+#include <gui/deviceiconbuilder.h>
 #include <iioutil/connectionprovider.h>
 #include <pluginbase/scopyjs.h>
 #include <iio-widgets/iiowidgetgroup.h>
@@ -105,6 +107,7 @@ bool Adrv9009Plugin::loadIcon()
 	Style::setStyle(footer, style::properties::label::deviceIcon, true);
 
 	m_icon = DeviceIconBuilder().shape(DeviceIconBuilder::SQUARE).headerWidget(logo).footerWidget(footer).build();
+
 	return true;
 }
 
