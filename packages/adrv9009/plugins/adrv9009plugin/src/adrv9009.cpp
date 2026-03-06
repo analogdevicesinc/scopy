@@ -332,30 +332,44 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 
 void Adrv9009::loadProfileFromFile(QString filePath)
 {
-	if(!filePath.isEmpty()) {
-		QFile file(filePath);
-		if(!file.open(QIODevice::ReadOnly)) {
-			qWarning(CAT_ADRV9009) << "Failed to open profile:" << file.errorString();
-			return;
-		}
-
-		QByteArray buffer = file.readAll();
-		file.close();
-
-		// Write profile to device (use first device)
-		iio_device *device = m_adrv9009DeviceMap.first();
-		int ret = iio_device_attr_write_raw(device, "profile_config", buffer.constData(), buffer.size());
-
-		if(ret < 0) {
-			qWarning(CAT_ADRV9009) << "Profile loading failed, error:" << ret;
-		} else {
-			qDebug(CAT_ADRV9009) << "Profile loaded successfully";
-			Q_EMIT readRequested(); // Refresh all widgets
-		}
-
-	} else {
+	if(filePath.isEmpty()) {
 		qWarning(CAT_ADRV9009) << "Profile loading failed, no file path provided";
+		return;
 	}
+
+	QFile file(filePath);
+	if(!file.open(QIODevice::ReadOnly)) {
+		qWarning(CAT_ADRV9009) << "Failed to open profile:" << file.errorString();
+		return;
+	}
+
+	QByteArray buffer = file.readAll();
+	file.close();
+
+	// Show loading animation
+	m_refreshButton->startAnimation();
+
+	QFutureWatcher<ssize_t> *watcher = new QFutureWatcher<ssize_t>(this);
+	connect(
+		watcher, &QFutureWatcher<ssize_t>::finished, this,
+		[this, watcher]() {
+			m_refreshButton->stopAnimation();
+			ssize_t ret = watcher->result();
+			if(ret < 0) {
+				qWarning(CAT_ADRV9009) << "Profile loading failed, error:" << ret;
+			} else {
+				qDebug(CAT_ADRV9009) << "Profile loaded successfully";
+				Q_EMIT readRequested();
+			}
+			watcher->deleteLater();
+		},
+		Qt::QueuedConnection);
+
+	iio_device *device = m_adrv9009DeviceMap.first();
+	QFuture<ssize_t> future = QtConcurrent::run([device, buffer]() {
+		return iio_device_attr_write_raw(device, "profile_config", buffer.constData(), buffer.size());
+	});
+	watcher->setFuture(future);
 }
 
 QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent)
