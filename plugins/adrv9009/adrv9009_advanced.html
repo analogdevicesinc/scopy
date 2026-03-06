@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="The ADRV9002 (Jupiter) plugin provides a comprehensive interface for controlling and configuring the ADRV9002 dual-channel RF transceiver. This plugin enables users to manage both receive and transmit signal paths, configure device settings, and control FPGA-based signal generation features. The ADRV9002 is a dual-channel RF transceiver designed for software-defined radio applications with wide bandwidth and high performance." name="description" />
+<meta content="The ADRV9009 Advanced plugin provides direct access to low-level device attributes and specialized configuration options that are not available in the basic ADRV9009 plugin. This tool exposes the underlying ADRV9009 device attributes through organized collapsible sections, allowing expert users to configure advanced device parameters directly." name="description" />
 
-    <title>ADRV9002 (Jupiter) Plugin &#8212; Scopy  documentation</title>
+    <title>ADRV9009 Advanced &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=a525f648" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="ADRV9009 Plugin" href="../adrv9009/index.html" />
-    <link rel="prev" title="AD9084" href="../ad9084/ad9084.html" />
+    <link rel="next" title="JESD Status" href="../jesdstatus/index.html" />
+    <link rel="prev" title="ADRV9009" href="adrv9009.html" />
    
   
   
@@ -95,13 +95,25 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">ADRV9002 (Jupiter) Plugin</a><ul>
+<li><a class="reference internal" href="#">ADRV9009 Advanced</a><ul>
 <li><a class="reference internal" href="#description">Description</a></li>
-<li><a class="reference internal" href="#compatible-devices">Compatible Devices</a></li>
-<li><a class="reference internal" href="#device-global-settings">Device Global Settings</a></li>
-<li><a class="reference internal" href="#receive-chain-configuration">Receive Chain Configuration</a></li>
-<li><a class="reference internal" href="#transmit-chain-configuration">Transmit Chain Configuration</a></li>
-<li><a class="reference internal" href="#profile-generator">Profile Generator</a></li>
+<li><a class="reference internal" href="#clk-settings">CLK Settings</a></li>
+<li><a class="reference internal" href="#calibrations">Calibrations</a></li>
+<li><a class="reference internal" href="#tx-settings">TX Settings</a></li>
+<li><a class="reference internal" href="#rx-settings">RX Settings</a></li>
+<li><a class="reference internal" href="#orx-settings">ORX Settings</a></li>
+<li><a class="reference internal" href="#fhm-setup">FHM Setup</a></li>
+<li><a class="reference internal" href="#pa-protection">PA Protection</a></li>
+<li><a class="reference internal" href="#gain-setup">GAIN Setup</a></li>
+<li><a class="reference internal" href="#agc-setup">AGC Setup</a></li>
+<li><a class="reference internal" href="#gpio-config">GPIO Config</a></li>
+<li><a class="reference internal" href="#aux-dac">AUX DAC</a></li>
+<li><a class="reference internal" href="#jesd204-settings">JESD204 Settings</a></li>
+<li><a class="reference internal" href="#jesd-framer">JESD Framer</a></li>
+<li><a class="reference internal" href="#jesd-deframer">JESD Deframer</a></li>
+<li><a class="reference internal" href="#bist-built-in-self-test">BIST (Built-In Self Test)</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
 </ul>
 </li>
 </ul>
@@ -184,10 +196,10 @@ Content on this topic
 <li class="toctree-l3"><a class="reference internal" href="../ad9084/ad9084.html">AD9084</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">ADRV9002 (Jupiter) Plugin</a></li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7"/><div class="collapse"><a class="reference internal" href="../adrv9009/index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9009/adrv9009.html">ADRV9009</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9009/adrv9009_advanced.html">ADRV9009 Advanced</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../adrv9002/adrv9002.html">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="adrv9009.html">ADRV9009</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ADRV9009 Advanced</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
@@ -309,290 +321,318 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li></ol></nav>
+  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li><li><a href="index.html">ADRV9009 Plugin</a></li></ol></nav>
 </div>
           <div class="body" role="main">
             
-  <section id="adrv9002-jupiter-plugin">
-<span id="adrv9002"></span><h1>ADRV9002 (Jupiter) Plugin<a class="headerlink" href="#adrv9002-jupiter-plugin" title="Link to this heading"></a></h1>
+  <section id="adrv9009-advanced">
+<span id="id1"></span><h1>ADRV9009 Advanced<a class="headerlink" href="#adrv9009-advanced" title="Link to this heading"></a></h1>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
-<p>The ADRV9002 (Jupiter) plugin provides a comprehensive interface for controlling and
-configuring the ADRV9002 dual-channel RF transceiver. This plugin enables users to
-manage both receive and transmit signal paths, configure device settings, and control
-FPGA-based signal generation features. The ADRV9002 is a dual-channel RF transceiver
-designed for software-defined radio applications with wide bandwidth and high performance.</p>
-<p>The plugin is organized into four main sections providing complete control over the device
-functionality:</p>
-<ul class="simple">
-<li><p><strong>Device Global Settings</strong> - System-wide configuration and status monitoring</p></li>
-<li><p><strong>Receive Chain</strong> - RX channel configuration and signal path control</p></li>
-<li><p><strong>Transmit Chain</strong> - TX channel configuration and signal path control</p></li>
-<li><p><strong>Profile Generator</strong> - Integrated tools for creating and managing device profiles</p></li>
+<p>The ADRV9009 Advanced plugin provides direct access to low-level device attributes and specialized configuration options
+that are not available in the basic ADRV9009 plugin. This tool exposes the underlying ADRV9009 device attributes through
+organized collapsible sections, allowing expert users to configure advanced device parameters directly.</p>
+<p>The advanced plugin is organized into <strong>up to 15 navigation tabs</strong> (depending on implementation branch) with expandable/collapsible interface that adapts to window width:</p>
+<dl class="simple">
+<dt><strong>Implemented Sections:</strong></dt><dd><ul class="simple">
+<li><p><strong>CLK Settings</strong> - Device clock and PLL configuration</p></li>
+<li><p><strong>Calibrations</strong> - Calibration mask configuration and controls</p></li>
+<li><p><strong>TX Settings</strong> - Advanced transmitter configuration</p></li>
+<li><p><strong>RX Settings</strong> - Advanced receiver configuration</p></li>
+<li><p><strong>ORX Settings</strong> - Observation receiver configuration</p></li>
+<li><p><strong>FHM Setup</strong> - Frequency hopping mode configuration</p></li>
+<li><p><strong>PA Protection</strong> - Power amplifier protection settings</p></li>
+<li><p><strong>GAIN Setup</strong> - Gain control and AGC configuration</p></li>
+<li><p><strong>AGC Setup</strong> - Automatic gain control algorithm settings</p></li>
+<li><p><strong>GPIO Config</strong> - General purpose I/O configuration</p></li>
+<li><p><strong>AUX DAC</strong> - Auxiliary DAC controls for 12 independent channels</p></li>
+<li><p><strong>JESD204 Settings</strong> - JESD204 interface configuration</p></li>
+<li><p><strong>JESD Framer</strong> - JESD204 framer configuration (JESD branch only)</p></li>
+<li><p><strong>JESD Deframer</strong> - JESD204 deframer configuration (JESD branch only)</p></li>
+<li><p><strong>BIST</strong> - Built-in self-test features</p></li>
 </ul>
-</section>
-<section id="compatible-devices">
-<h2>Compatible Devices<a class="headerlink" href="#compatible-devices" title="Link to this heading"></a></h2>
-<p>The ADRV9002 plugin is compatible with:</p>
-<ul class="simple">
-<li><p>ADRV9002 dual-channel RF transceiver platforms</p></li>
-<li><p>Systems implementing the ADRV9002 IIO driver interface</p></li>
-<li><p>Hardware platforms with ADRV9002 integrated designs</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This plugin requires a compatible IIO context with ADRV9002 device support. Ensure that
-the appropriate device drivers are installed and the hardware is properly connected.</p>
-</div>
-</section>
-<section id="device-global-settings">
-<h2>Device Global Settings<a class="headerlink" href="#device-global-settings" title="Link to this heading"></a></h2>
-<p>The Device Global Settings section provides system-wide controls and monitoring capabilities:</p>
-<dl>
-<dt><strong>Profile Configuration</strong></dt><dd><p>Allows loading of profile configurations from external files. Profiles define the operational
-parameters including sampling rates, bandwidths, and signal path configurations.</p>
-<ul class="simple">
-<li><p><strong>Load Profile</strong>: Browse and select profile configuration files</p></li>
-<li><p><strong>Profile Status</strong>: Displays current profile information</p></li>
-</ul>
-<p>For detailed information about profiles, see the <a class="icon link reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/adrv9002#profiles" target="_blank">ADRV9002 Driver Documentation</a>.</p>
 </dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The plugin includes an integrated <strong>Profile Generator</strong> tab for creating profiles. This feature
-requires the external libadrv9002-iio library to be installed.</p>
-</div>
+<p><strong>Warning:</strong> The advanced plugin exposes low-level device attributes. Improper configuration may result in device malfunction or
+sub-optimal performance. Ensure you have adequate knowledge of ADRV9009 operation before using these features.</p>
+</section>
+<section id="clk-settings">
+<h2>CLK Settings<a class="headerlink" href="#clk-settings" title="Link to this heading"></a></h2>
+<p>The CLK Settings section provides direct control over ADRV9009 clock and PLL configuration through 5 specific device attributes:</p>
+<img alt="ADRV9009 CLK Settings" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_clk.png" />
 <dl class="simple">
-<dt><strong>Temperature Monitoring</strong></dt><dd><p>Reports the current device temperature for thermal monitoring and protection.</p>
-<ul class="simple">
-<li><p><strong>Temperature Display</strong>: Real-time device temperature in degrees Celsius</p></li>
-<li><p><strong>Temperature Status</strong>: Indicates normal operation or thermal warnings</p></li>
+<dt><strong>Device Clock (kHz):</strong></dt><dd><ul class="simple">
+<li><p><strong>Range:</strong> [10000 - 1000000] kHz in 1 kHz steps</p></li>
+<li><p><strong>Description:</strong> Main device clock frequency configuration</p></li>
 </ul>
 </dd>
-<dt><strong>Device Information</strong></dt><dd><p>Displays device identification and version information:</p>
-<ul class="simple">
-<li><p><strong>Device Driver Version</strong>: Current driver version information</p></li>
-<li><p><strong>Hardware Revision</strong>: Device hardware revision details</p></li>
-<li><p><strong>Firmware Version</strong>: Loaded firmware version</p></li>
+<dt><strong>CLK PLL VCO Frequency (kHz):</strong></dt><dd><ul class="simple">
+<li><p><strong>Range:</strong> [6000000 - 12000000] kHz in 1 kHz steps</p></li>
+<li><p><strong>Description:</strong> Clock PLL VCO frequency setting</p></li>
+</ul>
+</dd>
+<dt><strong>CLK PLL HS DIV:</strong></dt><dd><ul class="simple">
+<li><p><strong>Options:</strong> 2, 2.5, 3, 4, 5 (mapped from device values 0,1,2,3,4)</p></li>
+<li><p><strong>Description:</strong> Clock PLL high-speed divider selection</p></li>
+</ul>
+</dd>
+<dt><strong>RF PLL Phase Sync Mode:</strong></dt><dd><ul class="simple">
+<li><p><strong>Options:</strong> NOSYNC, INIT_TRACK, INIT_1TRACK, INIT_CONTTRACK (mapped from device values 0,1,2,3)</p></li>
+<li><p><strong>Description:</strong> RF PLL phase synchronization mode selection</p></li>
+</ul>
+</dd>
+<dt><strong>RF PLL Use External LO:</strong></dt><dd><ul class="simple">
+<li><p><strong>Description:</strong> Enable external local oscillator for RF PLL</p></li>
 </ul>
 </dd>
 </dl>
 </section>
-<section id="receive-chain-configuration">
-<h2>Receive Chain Configuration<a class="headerlink" href="#receive-chain-configuration" title="Link to this heading"></a></h2>
-<p>The Receive Chain section provides comprehensive control over the RX signal path for both channels:</p>
-<p><strong>Signal Path Parameters</strong></p>
+<section id="calibrations">
+<h2>Calibrations<a class="headerlink" href="#calibrations" title="Link to this heading"></a></h2>
+<p>The Calibrations section provides control over the ADRV9009 calibration mask through 6 calibration type checkboxes.
+Changes to any calibration checkbox immediately write the calibration mask to the device.</p>
+</section>
+<section id="tx-settings">
+<h2>TX Settings<a class="headerlink" href="#tx-settings" title="Link to this heading"></a></h2>
+<p>The TX Settings section provides advanced transmitter configuration through <strong>16 attributes organized in 3 collapsible sections</strong>:</p>
+<p><strong>TX Configuration Section:</strong>
+Low-level transmitter profile and sampling configuration controls.</p>
 <dl class="simple">
-<dt><strong>RF Bandwidth (MHz)</strong></dt><dd><p>Displays the Primary Signal Bandwidth of the currently loaded profile. This parameter defines
-the usable signal bandwidth for the receive path.</p>
-</dd>
-<dt><strong>Sampling Rate (MSPS)</strong></dt><dd><p>Shows the RX Sample Rate configured in the current profile. This determines the digital sampling
-frequency for received signals.</p>
-</dd>
-</dl>
-<p><strong>Gain Control Settings</strong></p>
-<dl class="simple">
-<dt><strong>Gain Control Mode</strong></dt><dd><p>Selects the gain control mechanism:</p>
-<ul class="simple">
-<li><p><strong>SPI</strong>: Manual gain control via software interface</p></li>
-<li><p><strong>PIN</strong>: Hardware pin-controlled gain adjustment</p></li>
-<li><p><strong>Automatic</strong>: Automatic gain control (AGC) mode</p></li>
-</ul>
-</dd>
-<dt><strong>Hardware Gain (dB)</strong></dt><dd><p>Controls the RX gain when in SPI or PIN mode. This setting adjusts the analog gain in the receive signal path.</p>
-</dd>
-</dl>
-<p><strong>Signal Monitoring</strong></p>
-<dl class="simple">
-<dt><strong>RSSI (dB)</strong></dt><dd><p>Displays the Received Signal Strength Indicator, providing real-time measurement of input signal level.</p>
-</dd>
-<dt><strong>Decimated Power (dB)</strong></dt><dd><p>Shows the decimated power measurement, useful for signal analysis and monitoring.</p>
-</dd>
-</dl>
-<p><strong>Frequency Control</strong></p>
-<dl class="simple">
-<dt><strong>NCO (Hz)</strong></dt><dd><p>Controls the Numerically Controlled Oscillator for frequency offset correction. This setting is only
-available if the loaded profile supports NCO correction.</p>
-</dd>
-<dt><strong>Local Oscillator (MHz)</strong></dt><dd><p>Controls the carrier frequency for the receive chain. This sets the center frequency for signal reception.</p>
-</dd>
-</dl>
-<p><strong>Channel Control</strong></p>
-<dl class="simple">
-<dt><strong>Enable</strong></dt><dd><p>While off disables the transmit channel, stopping signal transmission and reducing power consumption.</p>
-</dd>
-<dt><strong>Dynamic ADC Switch</strong></dt><dd><p>Enables dynamic ADC switching functionality for optimized power management and performance.</p>
-</dd>
-<dt><strong>ENSM (Enable State Machine)</strong></dt><dd><p>Selects the operational mode for the Enable State Machine:</p>
-<ul class="simple">
-<li><p><strong>Calibrated</strong>: Normal operation with calibrations enabled</p></li>
-<li><p><strong>Primed</strong>: Standby mode ready for quick activation</p></li>
-<li><p><strong>RF Enabled</strong>: Full RF operation mode</p></li>
-</ul>
-</dd>
-<dt><strong>Port Enable</strong></dt><dd><p>Configures how the port can be enabled:</p>
-<ul class="simple">
-<li><p><strong>SPI</strong>: Software-controlled port enable</p></li>
-<li><p><strong>PIN</strong>: Hardware pin-controlled port enable</p></li>
+<dt><strong>TX Profile Section (9 attributes):</strong></dt><dd><ul class="simple">
+<li><p><strong>DAC Div:</strong> DAC divider selection</p></li>
+<li><p><strong>TX FIR Interpolation:</strong> FIR filter interpolation factor</p></li>
+<li><p><strong>RHBD Decimation:</strong> RHBD decimation factor</p></li>
+<li><p><strong>THB1 Interpolation:</strong> THB1 interpolation factor</p></li>
+<li><p><strong>THB2 Interpolation:</strong> THB2 interpolation factor</p></li>
+<li><p><strong>THB3 Interpolation:</strong> THB3 interpolation factor</p></li>
+<li><p><strong>TX BBF 3dB Corner (kHz):</strong> Range [20000-250000] kHz - baseband filter corner frequency</p></li>
+<li><p><strong>TX DAC 3dB Corner (kHz):</strong> Range [50000-750000] kHz - DAC filter corner frequency</p></li>
+<li><p><strong>TX BBF 3dB Corner Table:</strong> Range [0-15] - filter corner frequency table index</p></li>
 </ul>
 </dd>
 </dl>
-<p><strong>Digital Signal Processing</strong></p>
+<p><strong>TX GPIO PIN Control Section:</strong>
+GPIO pin configuration for transmitter-related control signals and interfaces.</p>
+<img alt="ADRV9009 TX Settings Interface 1" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_tx_1.png" />
+<img alt="ADRV9009 TX Settings Interface 2" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_tx_2.png" />
+</section>
+<section id="rx-settings">
+<h2>RX Settings<a class="headerlink" href="#rx-settings" title="Link to this heading"></a></h2>
+<p>The RX Settings section provides advanced receiver configuration through <strong>25 attributes organized in 4 collapsible sections</strong>:</p>
+<p><strong>RX Configuration Section:</strong>
+Low-level receiver profile and sampling configuration controls.</p>
 <dl class="simple">
-<dt><strong>Digital Gain Control</strong></dt><dd><p>Selects the digital gain control mode for fine-tuning signal levels in the digital domain.</p>
+<dt><strong>RX Profile Section (7 attributes):</strong></dt><dd><ul class="simple">
+<li><p><strong>RX FIR Decimation:</strong> FIR filter decimation factor</p></li>
+<li><p><strong>RX Dec5 Decimation:</strong> Dec5 decimation factor</p></li>
+<li><p><strong>RHBD Decimation:</strong> RHBD decimation factor</p></li>
+<li><p><strong>RX ADC Profile:</strong> ADC profile selection</p></li>
+<li><p><strong>RX DDC Mode:</strong> DDC mode configuration</p></li>
+<li><p><strong>RX BBF 3dB Corner (kHz):</strong> Range [20000-250000] kHz - baseband filter corner frequency</p></li>
+<li><p><strong>RX ADC 3dB Corner (kHz):</strong> Range [50000-750000] kHz - ADC filter corner frequency</p></li>
+</ul>
 </dd>
-<dt><strong>Interface Gain (dB)</strong></dt><dd><p>Controls the Slicer block gain for digital signal processing optimization.</p>
+</dl>
+<p><strong>NCO Shifter Config Section:</strong>
+Numerically controlled oscillator configuration for frequency shifting applications.</p>
+<p><strong>RX GPIO PIN Control Section:</strong>
+GPIO pin configuration for receiver-related control signals and interfaces.</p>
+<img alt="ADRV9009 RX Settings Interface 1" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_rx_1.png" />
+<img alt="ADRV9009 RX Settings Interface 2" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_rx_2.png" />
+</section>
+<section id="orx-settings">
+<h2>ORX Settings<a class="headerlink" href="#orx-settings" title="Link to this heading"></a></h2>
+<p>The ORX (Observation RX) Settings section provides advanced observation receiver configuration through multiple collapsible sections:</p>
+<img alt="ADRV9009 ORX Settings" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_orx.png" />
+<p><strong>ORX Configuration Section:</strong>
+Low-level observation receiver profile and sampling configuration controls.</p>
+<p><strong>ORX Profile Section:</strong>
+Observation receiver filter and sampling rate configuration parameters.</p>
+<p><strong>ORX GPIO PIN Control Section:</strong>
+GPIO pin configuration for observation receiver control signals and interfaces.</p>
+</section>
+<section id="fhm-setup">
+<h2>FHM Setup<a class="headerlink" href="#fhm-setup" title="Link to this heading"></a></h2>
+<p>The FHM (Frequency Hopping Mode) Setup section provides frequency hopping configuration controls.</p>
+<img alt="ADRV9009 FHM Setup" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_fhm.png" />
+</section>
+<section id="pa-protection">
+<h2>PA Protection<a class="headerlink" href="#pa-protection" title="Link to this heading"></a></h2>
+<p>The PA (Power Amplifier) Protection section provides power amplifier protection configuration controls.</p>
+<img alt="ADRV9009 PA Protection" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_pa.png" />
+</section>
+<section id="gain-setup">
+<h2>GAIN Setup<a class="headerlink" href="#gain-setup" title="Link to this heading"></a></h2>
+<p>The GAIN Setup section provides gain control configuration through <strong>14 attributes organized in 2 collapsible sections</strong>:</p>
+<img alt="ADRV9009 GAIN Setup" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_gain.png" />
+<dl class="simple">
+<dt><strong>RX Section (7 attributes):</strong></dt><dd><ul class="simple">
+<li><p><strong>Gain Mode:</strong> gain control mode selection</p></li>
+<li><p><strong>Peak AGC Upper Threshold:</strong> Range [0-31] - upper AGC threshold setting</p></li>
+<li><p><strong>Peak AGC Lower Threshold:</strong> Range [0-31] - lower AGC threshold setting</p></li>
+<li><p><strong>Peak AGC Gain Step:</strong> Range [0-31] - AGC gain step size</p></li>
+<li><p><strong>Peak AGC Attack Delay:</strong> Range [0-63] - AGC attack delay setting</p></li>
+<li><p><strong>Peak AGC Recovery Delay:</strong> Range [0-2047] - AGC recovery delay setting</p></li>
+<li><p><strong>Low Power Threshold:</strong> Range [0-15] - low power detection threshold</p></li>
+</ul>
 </dd>
-<dt><strong>Tracking Calibrations</strong></dt><dd><p>Enable/disable various tracking calibration algorithms:</p>
-<ul class="simple">
-<li><p><strong>Quadrature FIC</strong>: Quadrature frequency image correction</p></li>
-<li><p><strong>BBDC Rejection</strong>: Baseband DC offset rejection</p></li>
-<li><p><strong>HD2</strong>: Second harmonic distortion correction</p></li>
-<li><p><strong>AGC</strong>: Automatic gain control calibration</p></li>
-<li><p><strong>Quadrature Poly</strong>: Quadrature polynomial correction</p></li>
-<li><p><strong>RSSI</strong>: RSSI calibration</p></li>
-<li><p><strong>RDFC</strong>: Receive data formatting correction</p></li>
+</dl>
+<p><strong>Observation Gain Section (7 attributes):</strong>
+Similar gain control parameters specifically for the observation receiver path.</p>
+</section>
+<section id="agc-setup">
+<h2>AGC Setup<a class="headerlink" href="#agc-setup" title="Link to this heading"></a></h2>
+<p>The AGC Setup section provides automatic gain control algorithm configuration:</p>
+<p><strong>AGC Configuration:</strong>
+Primary AGC algorithm configuration parameters and mode selection.</p>
+<p><strong>Analog Peak Detector:</strong>
+Peak detection based AGC configuration and threshold settings.</p>
+<p><strong>Power Measurement Detector:</strong>
+Power measurement based AGC configuration and performance parameters.</p>
+<img alt="ADRV9009 AGC Setup Interface 1" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_agc_1.png" />
+<img alt="ADRV9009 AGC Setup Interface 2" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_agc_2.png" />
+<img alt="ADRV9009 AGC Setup Interface 3" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_agc_3.png" />
+</section>
+<section id="gpio-config">
+<h2>GPIO Config<a class="headerlink" href="#gpio-config" title="Link to this heading"></a></h2>
+<p>The GPIO Config section provides ARM GPIO configuration implemented as part of the gain_fhm_pa_gpio branch.</p>
+<img alt="ADRV9009 GPIO Config" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_arm.png" />
+</section>
+<section id="aux-dac">
+<h2>AUX DAC<a class="headerlink" href="#aux-dac" title="Link to this heading"></a></h2>
+<p>The AUX DAC section provides auxiliary digital-to-analog converter configuration for <strong>12 independent DAC channels</strong> through a tabular interface:</p>
+<img alt="ADRV9009 AUX DAC Interface" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_aux.png" />
+<p><strong>DAC Channel Configuration:</strong></p>
+<dl class="simple">
+<dt><strong>Standard Channels (DAC 0-9):</strong></dt><dd><ul class="simple">
+<li><p><strong>DAC Value:</strong> Numeric output value setting for the DAC channel</p></li>
+<li><p><strong>Resolution:</strong> Configurable DAC resolution</p></li>
+<li><p><strong>Voltage Reference:</strong> Selectable voltage reference for the DAC output</p></li>
+</ul>
+</dd>
+<dt><strong>Limited Channels (DAC 10-11):</strong></dt><dd><ul class="simple">
+<li><p><strong>DAC Value:</strong> Numeric output value setting</p></li>
+<li><p><strong>Resolution:</strong> N/A (not configurable)</p></li>
+<li><p><strong>Voltage Reference:</strong> N/A (not configurable)</p></li>
+</ul>
+</dd>
+</dl>
+<p>The interface provides direct control over ADRV9009’s auxiliary DAC outputs for applications requiring analog control signals or reference voltages.</p>
+</section>
+<section id="jesd204-settings">
+<h2>JESD204 Settings<a class="headerlink" href="#jesd204-settings" title="Link to this heading"></a></h2>
+<p>The JESD204 Settings section provides JESD204 interface configuration through <strong>13 attributes in a single collapsible section</strong>:</p>
+<img alt="ADRV9009 JESD204 Settings" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_jesd_settings.png" />
+<dl class="simple">
+<dt><strong>JESD Settings Section:</strong></dt><dd><ul class="simple">
+<li><p><strong>Device JESD204 Link0 Converter Select:</strong> Combobox for converter selection</p></li>
+<li><p><strong>Device JESD204 Link0 JESD Mode:</strong> Combobox for JESD mode configuration</p></li>
+<li><p><strong>Device JESD204 Link0 Subclass:</strong> Combobox for subclass selection</p></li>
+<li><p><strong>Device JESD204 Link0 DualLink:</strong> Combobox for dual link configuration</p></li>
+<li><p><strong>Device JESD204 Link0 Version:</strong> Combobox for JESD204 version selection</p></li>
+<li><p>Additional link configuration parameters and settings (8 more attributes)</p></li>
 </ul>
 </dd>
 </dl>
 </section>
-<section id="transmit-chain-configuration">
-<h2>Transmit Chain Configuration<a class="headerlink" href="#transmit-chain-configuration" title="Link to this heading"></a></h2>
-<p>The Transmit Chain section provides control over the TX signal path for both channels:</p>
-<p><strong>Signal Path Parameters</strong></p>
+<section id="jesd-framer">
+<h2>JESD Framer<a class="headerlink" href="#jesd-framer" title="Link to this heading"></a></h2>
+<p><strong>Available in JESD branch only</strong></p>
+<p>The JESD Framer section provides dedicated JESD204 framer configuration through <strong>39 attributes organized in A|B column layout</strong>:</p>
+<img alt="ADRV9009 JESD Framer" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_jesd_framer.png" />
 <dl class="simple">
-<dt><strong>RF Bandwidth (MHz)</strong></dt><dd><p>Displays the Primary Signal Bandwidth for the transmit path as defined in the current profile.</p>
-</dd>
-<dt><strong>Sampling Rate (MSPS)</strong></dt><dd><p>Shows the TX Sample Rate configured in the current profile, determining the digital sampling
-frequency for transmitted signals.</p>
-</dd>
-</dl>
-<p><strong>Power Control</strong></p>
-<dl class="simple">
-<dt><strong>Attenuation (dB)</strong></dt><dd><p>Controls the TX output power attenuation. Higher values reduce output power.</p>
-</dd>
-<dt><strong>Attenuation Control Mode</strong></dt><dd><p>Selects the attenuation control mechanism:</p>
-<ul class="simple">
-<li><p><strong>SPI</strong>: Software-controlled attenuation</p></li>
-<li><p><strong>PIN</strong>: Hardware pin-controlled attenuation</p></li>
-<li><p><strong>Bypass</strong>: Bypass attenuation control</p></li>
+<dt><strong>JESD Framer A (22 attributes):</strong></dt><dd><ul class="simple">
+<li><p><strong>Bank ID:</strong> Range [0-15]</p></li>
+<li><p><strong>Device ID:</strong> Range [0-255]</p></li>
+<li><p><strong>Lane0 ID:</strong> Range [0-31]</p></li>
+<li><p><strong>M:</strong> Number of ADCs [0,2,4]</p></li>
+<li><p><strong>K:</strong> Frames per multiframe [1-32]</p></li>
+<li><p><strong>F:</strong> Bytes per frame [1,2,3,4,6,8]</p></li>
+<li><p><strong>NP:</strong> Sample resolution [12,16,24]</p></li>
+<li><p><strong>Scramble:</strong> Enable/disable scrambling</p></li>
+<li><p><strong>External SYSREF:</strong> System reference control</p></li>
+<li><p><strong>Serializer Lane 0-3:</strong> Individual lane controls</p></li>
+<li><p><strong>Serializer Lane Crossbar:</strong> Range [0-65535]</p></li>
+<li><p><strong>LMFC Offset:</strong> Range [0-31]</p></li>
+<li><p><strong>New SYSREF on Relink:</strong> Relink control</p></li>
+<li><p><strong>SYNCB In Select:</strong> SYNCB input selection</p></li>
+<li><p><strong>Over Sample:</strong> Over sampling control</p></li>
+<li><p>Additional SYNCB and configuration controls</p></li>
 </ul>
 </dd>
-</dl>
-<p><strong>Channel Control</strong></p>
-<dl class="simple">
-<dt><strong>ENSM (Enable State Machine)</strong></dt><dd><p>Configures the transmit channel operational mode similar to the receive chain.</p>
-</dd>
-<dt><strong>Port Enable</strong></dt><dd><p>Selects port enable control method (SPI or PIN) for the transmit channel.</p>
-</dd>
-<dt><strong>Enable</strong></dt><dd><p>While off disables the transmit channel, stopping signal transmission and reducing power consumption.</p>
-</dd>
-</dl>
-<p><strong>Frequency Control</strong></p>
-<dl class="simple">
-<dt><strong>NCO (Hz)</strong></dt><dd><p>Controls frequency offset correction for the transmit path when supported by the loaded profile.</p>
-</dd>
-<dt><strong>Local Oscillator (MHz)</strong></dt><dd><p>Sets the carrier frequency for signal transmission.</p>
-</dd>
-<dt><strong>Tracking Calibrations</strong></dt><dd><p>Enable/disable transmit-specific calibration algorithms:</p>
-<ul class="simple">
-<li><p><strong>Quadrature</strong>: Quadrature correction for TX path</p></li>
-<li><p><strong>PA Correction</strong>: Power amplifier linearity correction</p></li>
-<li><p><strong>LO Leakage</strong>: Local oscillator leakage correction</p></li>
-<li><p><strong>Close Loop Gain</strong>: Closed-loop gain calibration</p></li>
-<li><p><strong>Loopback Delay</strong>: Loopback delay calibration</p></li>
+<dt><strong>JESD Framer B (17 attributes):</strong></dt><dd><ul class="simple">
+<li><p>Similar framer configuration for second framer path</p></li>
 </ul>
 </dd>
 </dl>
 </section>
-<section id="profile-generator">
-<h2>Profile Generator<a class="headerlink" href="#profile-generator" title="Link to this heading"></a></h2>
-<p>The ADRV9002 plugin includes an integrated <strong>Profile Generator</strong> tab that provides
-a graphical interface for creating and managing ADRV9002 device profiles. This
-functionality requires an external dependency to be installed.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The Profile Generator functionality requires the <strong>libadrv9002-iio</strong> library to be
-installed. If this external tool is missing, the Profile Generator functionality will
-be disabled. The library can be obtained from: <a class="icon link reference external" href="https://analogdevicesinc.github.io/libadrv9002-iio" target="_blank">https://analogdevicesinc.github.io/libadrv9002-iio</a></p>
-</div>
-<p><strong>Profile Generator Interface</strong></p>
-<p>The Profile Generator tab is accessible through the main plugin interface and provides
-the following sections:</p>
+<section id="jesd-deframer">
+<h2>JESD Deframer<a class="headerlink" href="#jesd-deframer" title="Link to this heading"></a></h2>
+<p><strong>Available in JESD branch only</strong></p>
+<p>The JESD Deframer section provides dedicated JESD204 deframer configuration through <strong>42 attributes organized in A|B column layout</strong>:</p>
+<img alt="ADRV9009 JESD Deframer" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_jesd_deframer.png" />
 <dl class="simple">
-<dt><strong>Profile Generator CLI Detection</strong></dt><dd><p>Displays the status of the external profile generator tool:</p>
+<dt><strong>JESD Deframer A (21 attributes):</strong></dt><dd><ul class="simple">
+<li><p><strong>Bank ID:</strong> Range [0-15]</p></li>
+<li><p><strong>Device ID:</strong> Range [0-255]</p></li>
+<li><p><strong>Lane0 ID:</strong> Range [0-31]</p></li>
+<li><p><strong>M:</strong> Number of converters [0,2,4]</p></li>
+<li><p><strong>K:</strong> Frames per multiframe [1-32]</p></li>
+<li><p><strong>F:</strong> Bytes per frame [1,2,3,4,6,8]</p></li>
+<li><p><strong>NP:</strong> Sample resolution [12,16,24]</p></li>
+<li><p><strong>Scramble:</strong> Enable/disable scrambling</p></li>
+<li><p><strong>External SYSREF:</strong> System reference control</p></li>
+<li><p><strong>Deserializer Lane 0-3:</strong> Individual lane controls</p></li>
+<li><p><strong>Deserializer Lane Crossbar:</strong> Crossbar configuration</p></li>
+<li><p><strong>LMFC Offset:</strong> Local multiframe clock offset</p></li>
+<li><p><strong>New SYSREF on Relink:</strong> Relink control</p></li>
+<li><p><strong>SYNCB Out Select:</strong> SYNCB output selection</p></li>
+<li><p><strong>Enable Auto Channel Selection:</strong> Auto channel control</p></li>
+<li><p>Additional deserializer and configuration controls</p></li>
+</ul>
 </dd>
-<dt><strong>Profile Actions</strong></dt><dd><ul class="simple">
-<li><p><strong>Preset Dropdown</strong>: Select from predefined profile templates (“LTE” or “Live Device”)</p></li>
-<li><p><strong>Refresh Button</strong>: Reload available presets and update the interface</p></li>
-<li><p><strong>Save Stream to file</strong>: Export the generated stream configuration to a file</p></li>
-<li><p><strong>Save Profile to file</strong>: Export the profile configuration to a file</p></li>
-<li><p><strong>Load to device</strong>: Apply the current profile configuration to the connected ADRV9002 device</p></li>
+<dt><strong>JESD Deframer B (21 attributes):</strong></dt><dd><ul class="simple">
+<li><p>Similar deframer configuration for second deframer path</p></li>
 </ul>
 </dd>
 </dl>
-<p><strong>Radio Configuration</strong></p>
-<blockquote>
-<div><ul class="simple">
-<li><p><strong>SSI Interface</strong>: Show the Serial Synchronous Interface type (LVDS/CMOS)</p></li>
-<li><p><strong>Duplex mode</strong>: Choose between TDD (Time Division Duplex) and FDD (Frequency Division Duplex)</p></li>
-</ul>
-</div></blockquote>
+</section>
+<section id="bist-built-in-self-test">
+<h2>BIST (Built-In Self Test)<a class="headerlink" href="#bist-built-in-self-test" title="Link to this heading"></a></h2>
+<p>The BIST section provides built-in self-test capabilities implemented as part of the calibration_bist branch:</p>
+<p><strong>BIST Configuration:</strong>
+Built-in self-test pattern selection and configuration controls for device validation and diagnostics.</p>
+<img alt="ADRV9009 GPIO Config" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_adv_bist.png" />
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
 <dl class="simple">
-<dt><strong>Channel Configuration</strong></dt><dd><p>The interface provides separate configuration sections for each channel:</p>
-</dd>
-<dt><strong>RX Channels (RX 1 / RX 2)</strong></dt><dd><p>For each receive channel, the following options are available:</p>
-<ul class="simple">
-<li><p><strong>Enabled</strong>: Checkbox to enable/disable the RX channel</p></li>
-<li><p><strong>Frequency Offset Correction</strong>: Enable frequency offset correction capability</p></li>
-<li><p><strong>Bandwidth (Hz)</strong>: Set the channel bandwidth (e.g., 38000000)</p></li>
-<li><p><strong>Interface Sample Rate (Hz)</strong>: Configure the sample rate (e.g., 61440000)</p></li>
-<li><p><strong>RX RF Input</strong>: Select the RF input path (RxA/RxB)</p></li>
+<dt><strong>Configuration Issues:</strong></dt><dd><ul class="simple">
+<li><p>Verify device profile compatibility before loading configurations</p></li>
+<li><p>Check for conflicting settings between basic and advanced plugins</p></li>
+<li><p>Ensure proper calibration completion before advanced configuration</p></li>
 </ul>
 </dd>
-<dt><strong>TX Channels (TX 1 / TX 2)</strong></dt><dd><p>For each transmit channel, the following options are available:</p>
-<ul class="simple">
-<li><p><strong>Enabled</strong>: Checkbox to enable/disable the TX channel</p></li>
-<li><p><strong>Frequency Offset Correction</strong>: Enable frequency offset correction capability</p></li>
-<li><p><strong>Bandwidth (Hz)</strong>: Set the channel bandwidth (e.g., 38000000)</p></li>
-<li><p><strong>Interface Sample Rate (Hz)</strong>: Configure the sample rate (e.g., 61440000)</p></li>
+<dt><strong>Performance Issues:</strong></dt><dd><ul class="simple">
+<li><p>Monitor device temperature during advanced operations</p></li>
+<li><p>Verify power supply stability for optimal performance</p></li>
+<li><p>Check JESD204 link status for data path issues</p></li>
 </ul>
 </dd>
-<dt><strong>ORX Configuration</strong></dt><dd><p>Observation Receiver channels for monitoring and calibration</p>
-</dd>
-<dt><strong>Debug Information</strong></dt><dd><p>Displays the JSON configuration being generated:</p>
-<ul class="simple">
-<li><p><strong>Configuration Preview</strong>: Shows the profile configuration in JSON format</p></li>
-<li><p><strong>Real-time Updates</strong>: Updates automatically as parameters are changed</p></li>
-<li><p><strong>Technical Details</strong>: Displays low-level configuration parameters</p></li>
+<dt><strong>Calibration Problems:</strong></dt><dd><ul class="simple">
+<li><p>Allow adequate warm-up time before running calibrations</p></li>
+<li><p>Ensure proper RF signal conditions during calibration</p></li>
+<li><p>Monitor calibration convergence and completion status</p></li>
 </ul>
 </dd>
 </dl>
-<p><strong>External Tool Dependency</strong></p>
-<p>The Profile Generator relies on the <strong>libadrv9002-iio</strong> library:</p>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>Installation Required</strong>: Must be installed separately from Scopy</p></li>
-<li><p><strong>Version Compatibility</strong>: Different versions support different ADRV9002 API versions</p></li>
-<li><p><strong>CLI Integration</strong>: Scopy interfaces with the command-line tool provided by the library</p></li>
-<li><p><strong>Automatic Detection</strong>: Scopy automatically detects if the tool is available</p></li>
+<li><p><a class="icon link reference external" href="https://www.analog.com/en/design-center/landing-pages/001/adrv9009-resources.html" target="_blank">ADRV9009 System Development User Guide</a></p></li>
+<li><p><a class="icon link reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/adrv9009" target="_blank">ADRV9009 Register Map and Programming Guide</a></p></li>
 </ul>
-<p><strong>Supported API Versions</strong></p>
-<p>The external tool supports multiple ADRV9002 API versions:</p>
-<ul class="simple">
-<li><p><strong>v68.8.1 (v0.24)</strong>: Supported in libadrv9002-iio v0.1.0 and v0.2.0</p></li>
-<li><p><strong>v68.10.1 (v0.25)</strong>: Supported in libadrv9002-iio v0.2.0 and later</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If the Profile Generator tab appears grayed out or disabled, check that the libadrv9002-iio
-library is properly installed and accessible in the system PATH.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Profile configurations are device-specific and must match the connected ADRV9002 hardware
-capabilities. Invalid configurations will be rejected when loaded to the device.</p>
-</div>
 </section>
 </section>
 
@@ -600,8 +640,8 @@ capabilities. Invalid configurations will be rejected when loaded to the device.
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../ad9084/ad9084.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD9084</a>
-    <a href="../adrv9009/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADRV9009 Plugin</a>
+    <a href="adrv9009.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADRV9009</a>
+    <a href="../jesdstatus/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">JESD Status</a>
               </div>
           
         </div>

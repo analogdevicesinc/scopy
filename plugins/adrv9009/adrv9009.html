@@ -4,9 +4,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta content="The DAC plugin is used to interface with IIO DACs that implement the IIO buffer mechanism or a DDS mechanism. The plugin consists of an instrument with two data generation modes." name="description" />
+<meta content="The ADRV9009 plugin integrates with Scopy to provide comprehensive control and configuration for ADRV9009 transceiver devices. You should always use the latest version if possible. Changing any field will immediately write changes to the ADRV9009 settings to the hardware, and then read it back to make sure the setting is valid. If you want to set something that the GUI changes to a different number, that means the hardware (either the ADRV9009 transceiver or the FPGA fabric) does not support that mode/precision." name="description" />
 
-    <title>DAC plugin &#8212; Scopy  documentation</title>
+    <title>ADRV9009 &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=a525f648" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
@@ -14,8 +14,8 @@
     <link rel="icon" href="../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Datalogger" href="../datalogger/datalogger.html" />
-    <link rel="prev" title="ADC plugin" href="../adc/adc.html" />
+    <link rel="next" title="ADRV9009 Advanced" href="adrv9009_advanced.html" />
+    <link rel="prev" title="ADRV9009 Plugin" href="index.html" />
    
   
   
@@ -95,9 +95,18 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">DAC plugin</a><ul>
-<li><a class="reference internal" href="#buffer-mode">Buffer mode</a></li>
-<li><a class="reference internal" href="#dds-mode">DDS mode</a></li>
+<li><a class="reference internal" href="#">ADRV9009</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#multi-device-support">Multi-Device Support</a></li>
+<li><a class="reference internal" href="#adrv9009-global-settings">ADRV9009 Global Settings</a></li>
+<li><a class="reference internal" href="#receive-chain">Receive Chain</a></li>
+<li><a class="reference internal" href="#transmit-chain">Transmit Chain</a></li>
+<li><a class="reference internal" href="#observation-rx">Observation RX</a></li>
+<li><a class="reference internal" href="#fpga-settings">FPGA Settings</a></li>
+<li><a class="reference internal" href="#multi-chip-synchronization-mcs">Multi-Chip Synchronization (MCS)</a></li>
+<li><a class="reference internal" href="#configuration-and-profiles">Configuration and Profiles</a></li>
+<li><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
 </ul>
 </li>
 </ul>
@@ -134,7 +143,7 @@ Content on this topic
 </li>
 <li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
 <li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
@@ -181,9 +190,9 @@ Content on this topic
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../adrv9002/adrv9002.html">ADRV9002 (Jupiter) Plugin</a></li>
-<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7"/><div class="collapse"><a class="reference internal" href="../adrv9009/index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9009/adrv9009.html">ADRV9009</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../adrv9009/adrv9009_advanced.html">ADRV9009 Advanced</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7" checked=""/><div class="collapse"><a class="reference internal" href="index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_advanced.html">ADRV9009 Advanced</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
@@ -305,177 +314,189 @@ Content on this topic
       <div class="documentwrapper">
         <div class="bodywrapper" id="top-anchor">
           <div class="body-header">
-  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li></ol></nav>
+  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li><li><a href="index.html">ADRV9009 Plugin</a></li></ol></nav>
 </div>
           <div class="body" role="main">
             
-  <section id="dac-plugin">
-<span id="dac"></span><h1>DAC plugin<a class="headerlink" href="#dac-plugin" title="Link to this heading"></a></h1>
-<p>The DAC plugin is used to interface with IIO DACs that implement the IIO buffer
-mechanism or a DDS mechanism. The plugin consists of an instrument with two
-data generation modes.</p>
-<p>The plugin is compatible with contexts that have at least one IIO device that
-implements an output IIO buffer or at least one DDS (ALTVOLTAGE) output channel.</p>
-<p>Both generation modes feature a few common items in their layout.</p>
-<ol class="arabic simple">
-<li><p>Info button</p></li>
-</ol>
-<blockquote>
-<div><p>The top left side information button will open a pop-up window containing
-two buttons: <strong>Tutorial</strong> and <strong>Documentation</strong>.</p>
-<p>The Documentation button will open this page in a browser and close the
-pop-up window.</p>
-<p>The Tutorial button will start a tutorial that will guide the user through
-the main features of the plugin.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>Right side menu</p></li>
-</ol>
-<blockquote>
-<div><p>The right side menu is controlled by device or channel buttons. If only one
-DAC device is detected in the current context, its button will be available
-at the bottom of the instrument. If more DACs are detected, a left side
-device list will appear allowing the user to control which is the active
-and visible one at the moment. All device buttons can control the right
-side menu and all their IIO attributes are displayed in there.</p>
-<p>All the buffer capable channels of an IIO device are also capable to control
-the right side menu. More on these channel buttons can be found below in
-the buffer mode section.</p>
-</div></blockquote>
-<section id="buffer-mode">
-<h2>Buffer mode<a class="headerlink" href="#buffer-mode" title="Link to this heading"></a></h2>
-<img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/dac/dac-buffer.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/dac/dac-buffer.png?raw=true" />
-<p>If the IIO device implements a IIO buffer mechanism, this mode will be active
-and visible by default.
-Find all the sections of the instrument described below.</p>
-<ol class="arabic simple">
-<li><p>Dac Buffer Settings</p></li>
-</ol>
-<blockquote>
-<div><p>Browse and choose a .CSV file containing the channel data you want the
-DAC to output.
-Use the “Load” button to check and parse the provided file.
-The file is interpreted as one column per channel so make sure to structure
-your file accordingly. The file should not contain any comments or header
-data as loading will fail.</p>
-<p>If loading is successful the “File Size” will be populated with the parsed
-file size and a new section will appear below.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Only CSV (Comma separated values) accepted for now.</p>
-</div>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>Channels</p></li>
-</ol>
-<blockquote>
-<div><p>List of detected IIO channels that are buffer capable. These can be
-enabled or disabled using their left side check.</p>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p>Repeat data</p></li>
-</ol>
-<blockquote>
-<div><p>Choose whether to repeat the data columns loaded from file or not.
-If enabled, the data columns will be repeated on all enabled channels,
-without requiring the user to duplicate the data sets in the file to
-match the number of enabled channels.</p>
-<p>By default it is set to true.</p>
-</div></blockquote>
-<ol class="arabic simple" start="4">
-<li><p>Cyclic</p></li>
-</ol>
-<blockquote>
-<div><p>Choose whether to push a cyclic IIO buffer or stream non-cyclic buffers.
-If disabled, a new section containing “Buffer size” and “Kernel buffers”
-will appear.</p>
-<p>By default it is set to true.</p>
-</div></blockquote>
-<ol class="arabic simple" start="5">
-<li><p>File Size</p></li>
-</ol>
-<blockquote>
-<div><p>The size of the loaded file. It is populated once loading is successful
-and can be changed to a lower value, truncating the data loaded from file.</p>
-</div></blockquote>
-<ol class="arabic simple" start="6">
-<li><p>Run Button</p></li>
-</ol>
-<blockquote>
-<div><p>Start output generation on the currently enabled channels. If anything
-is invalid in the setup it will appear in the bottom “Console Log” once
-the Run Button is pressed.</p>
+  <section id="adrv9009">
+<span id="id1"></span><h1>ADRV9009<a class="headerlink" href="#adrv9009" title="Link to this heading"></a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<p>The ADRV9009 plugin integrates with Scopy to provide comprehensive control and configuration for ADRV9009 transceiver devices.
+You should always use the latest version if possible. Changing any field will immediately write changes to the ADRV9009 settings
+to the hardware, and then read it back to make sure the setting is valid. If you want to set something that the GUI changes to a
+different number, that means the hardware (either the ADRV9009 transceiver or the FPGA fabric) does not support that mode/precision.</p>
+<p>If you want to manipulate the devices behind the back of the GUI (e.g., via <code class="docutils literal notranslate"><span class="pre">/sys/bus/iio/devices/...</span></code>), you can still see the
+settings by clicking the “Refresh” button at the top.</p>
+<p>If you think the device has a setting that isn’t managed by this tab, check out the ADRV9009 Advanced Plugin for Scopy.</p>
 <dl class="simple">
-<dt>Some scenarios might be:</dt><dd><ul class="simple">
-<li><p>no channels are enabled</p></li>
-<li><p>there are more enabled channels than data available in the file</p></li>
-<li><p>errors appeared while trying to configure the IIO Buffer</p></li>
-<li><p>the combined enabled channels are not compatible (for I/Q channels)</p></li>
+<dt>The ADRV9009 view is divided into five main sections:</dt><dd><ul class="simple">
+<li><p><strong>ADRV9009 Global Settings</strong></p></li>
+<li><p><strong>ADRV9009 Receive Chain</strong></p></li>
+<li><p><strong>ADRV9009 Transmit Chain</strong></p></li>
+<li><p><strong>ADRV9009 Observation RX</strong></p></li>
+<li><p><strong>FPGA Settings</strong></p></li>
 </ul>
 </dd>
 </dl>
-</div></blockquote>
-<ol class="arabic simple" start="7">
-<li><p>Data Configuration</p></li>
-</ol>
+</section>
+<section id="multi-device-support">
+<h2>Multi-Device Support<a class="headerlink" href="#multi-device-support" title="Link to this heading"></a></h2>
+<p>The ADRV9009 plugin supports multi-device configurations for applications requiring synchronized operation across multiple transceivers.
+When multiple ADRV9009 devices are detected, the plugin automatically enables multi-device mode and provides:</p>
 <blockquote>
-<div><p>This section allows the user to scale the data before output.</p>
+<div><ul class="simple">
+<li><p><strong>Automatic Device Detection:</strong> Detection and enumeration of all connected ADRV9009-phy devices</p></li>
+<li><p><strong>Multi-Chip Sync (MCS):</strong> Synchronized operation across multiple devices with automatic or manual synchronization</p></li>
+</ul>
 </div></blockquote>
-<ol class="arabic simple" start="8">
-<li><p>Console Log</p></li>
-</ol>
+<img alt="ADRV9009 Multi-Device Interface" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_controls.png" />
+</section>
+<section id="adrv9009-global-settings">
+<h2>ADRV9009 Global Settings<a class="headerlink" href="#adrv9009-global-settings" title="Link to this heading"></a></h2>
+<p>The global settings section provides device-wide configuration options that affect the overall operation of the ADRV9009 transceiver:</p>
 <blockquote>
-<div><p>All errors or status messages are displayed here.</p>
-</div></blockquote>
-<ol class="arabic simple" start="9">
-<li><p>File Configuration</p></li>
-</ol>
-<blockquote>
-<div><p>This section is visible only when the buffer is non-cyclic. It contains a
-control for buffer size and one for kernel buffers. Both are automatically
-computed and populated when the file size changes.
-The buffer size can be in range [16, file size] while the kernel buffers
-can be in range [1, 64].</p>
+<div><ul class="simple">
+<li><p><strong>Profile Configuration:</strong> Allows loading of device profiles from configuration files</p></li>
+<li><p><strong>Clock Configuration:</strong> Configuration of device clock settings and reference sources</p></li>
+<li><p><strong>Calibration Control:</strong> Access to device calibration functions and status</p></li>
+</ul>
 </div></blockquote>
 </section>
-<section id="dds-mode">
-<h2>DDS mode<a class="headerlink" href="#dds-mode" title="Link to this heading"></a></h2>
-<img alt="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/dac/dac-dds.png?raw=true" class="align-center" src="https://github.com/analogdevicesinc/scopy/blob/doc_resources/resources/dac/dac-dds.png?raw=true" />
-<p>If the IIO Context contains an IIO Device with DDS capable channels, this
-mode will become available and will provide an automatically scanned structure
-for available TX channels with I/Q corresponding channels.</p>
-<ol class="arabic simple">
-<li><p>TX header section</p></li>
-</ol>
-<blockquote>
-<div><p>This section contains the name of the TX. It can be TX1..TXn or it can be just
-the index. This is determined based on the detected channels, whether
-I/Q channels or just simple tx channels are found.</p>
+<section id="receive-chain">
+<h2>Receive Chain<a class="headerlink" href="#receive-chain" title="Link to this heading"></a></h2>
+<p>The receive chain section controls the ADRV9009 receiver path configuration:</p>
 <dl class="simple">
-<dt>The next area in this section is the DDS MODE selector. The options available are:</dt><dd><ul class="simple">
-<li><p>disabled</p></li>
-<li><p>one tone</p></li>
-<li><p>two tones</p></li>
-<li><p>independent I/Q control</p></li>
+<dt><strong>Section-Level Controls (Shared):</strong></dt><dd><ul class="simple">
+<li><p><strong>RF Bandwidth(MHz):</strong> Display of current analog filter bandwidth</p></li>
+<li><p><strong>Sampling Rate(MSPS):</strong> Display of current ADC sampling rate</p></li>
+<li><p><strong>Gain Control Modes:</strong> Dropdown selection for section-wide gain control mode</p></li>
+</ul>
+</dd>
+<dt><strong>RX Channel Configuration (Per RX1/RX2):</strong></dt><dd><ul class="simple">
+<li><p><strong>Hardware Gain(dB):</strong> Manual gain control range [0-30] dB in 0.5 dB steps</p></li>
+<li><p><strong>RSSI (dB):</strong> Display of received signal strength indication</p></li>
+<li><p><strong>Gain Control:</strong> Display of current gain control mode for this channel</p></li>
+<li><p><strong>Pin Control:</strong> Enable/disable checkbox for gain control pin mode</p></li>
+<li><p><strong>Powerdown:</strong> Enable/disable checkbox to power down the channel</p></li>
+</ul>
+</dd>
+<dt><strong>Tracking Controls (Per Channel):</strong></dt><dd><ul class="simple">
+<li><p><strong>Quadrature:</strong> Enable/disable checkbox for quadrature tracking calibration</p></li>
+<li><p><strong>HD2:</strong> Enable/disable checkbox for second harmonic distortion tracking</p></li>
 </ul>
 </dd>
 </dl>
-<p>The last item of this section is the Read button which will refresh the values
-of all attributes below.</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>Tone area</p></li>
-</ol>
-<blockquote>
-<div><p>Based on the selected DDS MODE the layout of this area will change, having
-visible only the number of tones selected in the previously mentioned
-selector.</p>
-<p>Each tone has three modifiable attributes for “frequency”, “phase” and “scale”.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For scale, “-Inf dB” is equivalent with scale=0 or a disabled channel.</p>
-</div>
-</div></blockquote>
+</section>
+<section id="transmit-chain">
+<h2>Transmit Chain<a class="headerlink" href="#transmit-chain" title="Link to this heading"></a></h2>
+<p>The transmit chain section controls the ADRV9009 transmitter path configuration:</p>
+<dl class="simple">
+<dt><strong>Section-Level Controls (Shared):</strong></dt><dd><ul class="simple">
+<li><p><strong>RF Bandwidth(MHz):</strong> Display of current analog filter bandwidth (determined by profile)</p></li>
+<li><p><strong>Sampling Rate(MSPS):</strong> Display of current DAC sampling rate (determined by profile)</p></li>
+<li><p><strong>PA Protection:</strong> Enable/disable checkbox for power amplifier protection</p></li>
+</ul>
+</dd>
+<dt><strong>TX Channel Configuration (Per TX1/TX2):</strong></dt><dd><ul class="simple">
+<li><p><strong>Attenuation(dB):</strong> Manual attenuation control range [0 to -41.95] dB in 0.05 dB steps</p></li>
+<li><p><strong>Pin Control:</strong> Enable/disable checkbox for attenuation control pin mode</p></li>
+<li><p><strong>Powerdown:</strong> Enable/disable checkbox to power down the channel</p></li>
+</ul>
+</dd>
+<dt><strong>Tracking Controls (Per Channel):</strong></dt><dd><ul class="simple">
+<li><p><strong>Quadrature:</strong> Enable/disable checkbox for quadrature tracking calibration</p></li>
+<li><p><strong>LO Leakage:</strong> Enable/disable checkbox for local oscillator leakage tracking</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="observation-rx">
+<h2>Observation RX<a class="headerlink" href="#observation-rx" title="Link to this heading"></a></h2>
+<p>The Observation RX section provides configuration for the ADRV9009’s observation receiver path:</p>
+<dl class="simple">
+<dt><strong>Section-Level Controls (Shared):</strong></dt><dd><ul class="simple">
+<li><p><strong>RF Bandwidth(MHz):</strong> Display of current observation filter bandwidth (determined by profile)</p></li>
+<li><p><strong>Sampling Rate(MSPS):</strong> Display of current observation ADC sampling rate (determined by profile)</p></li>
+<li><p><strong>LO Source Select:</strong> Dropdown for RF port selection from available observation sources</p></li>
+<li><p><strong>Aux PLL LO Frequency(MHz):</strong> Auxiliary PLL LO frequency</p></li>
+</ul>
+</dd>
+<dt><strong>ORX Channel Configuration (Per OBS1/OBS2):</strong></dt><dd><ul class="simple">
+<li><p><strong>Hardware Gain(dB):</strong> Manual gain control range [0-30] dB in 1 dB steps</p></li>
+<li><p><strong>Quadrature:</strong> Enable/disable checkbox for quadrature tracking calibration</p></li>
+<li><p><strong>Powerdown:</strong> Enable/disable checkbox to power down the observation channel</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="fpga-settings">
+<h2>FPGA Settings<a class="headerlink" href="#fpga-settings" title="Link to this heading"></a></h2>
+<p>The FPGA settings section provides control over FPGA-based signal processing functions:</p>
+<dl class="simple">
+<dt><strong>Phase Rotation (RX Only):</strong></dt><dd><ul class="simple">
+<li><p><strong>RX1 Phase Rotation:</strong> Individual phase adjustment [-180 to +180] degrees</p></li>
+<li><p><strong>RX2 Phase Rotation:</strong> Individual phase adjustment [-180 to +180] degrees</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="multi-chip-synchronization-mcs">
+<h2>Multi-Chip Synchronization (MCS)<a class="headerlink" href="#multi-chip-synchronization-mcs" title="Link to this heading"></a></h2>
+<p>When multiple ADRV9009 devices are present, the MCS Sync functionality ensures synchronized operation.</p>
+</section>
+<section id="configuration-and-profiles">
+<h2>Configuration and Profiles<a class="headerlink" href="#configuration-and-profiles" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Profile Management:</strong></dt><dd><ul class="simple">
+<li><p><strong>Load Profile:</strong> Import device configuration from file</p></li>
+<li><p><strong>Profile Validation:</strong> Automatic validation of loaded configurations</p></li>
+<li><p><strong>Profile Application:</strong> Apply profiles to hardware with verification</p></li>
+</ul>
+</dd>
+<dt><strong>Refresh and Synchronization:</strong></dt><dd><ul class="simple">
+<li><p><strong>Refresh Button:</strong> Re-read all device settings from hardware</p></li>
+<li><p><strong>Real-time Updates:</strong> Automatic hardware synchronization</p></li>
+</ul>
+</dd>
+</dl>
+<img alt="ADRV9009 Main Interface" class="align-center" src="https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/adrv9009/9009_controls_2.png" />
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Device Detection Issues:</strong></dt><dd><ul class="simple">
+<li><p>Verify ADRV9009 device is properly connected</p></li>
+<li><p>Check device drivers and libiio installation</p></li>
+<li><p>Ensure device enumeration in IIO context</p></li>
+</ul>
+</dd>
+<dt><strong>Synchronization Problems:</strong></dt><dd><ul class="simple">
+<li><p>Verify HMC7044 clock distributor configuration</p></li>
+<li><p>Check JESD204 link status</p></li>
+<li><p>Use manual MCS sync if automatic sync fails</p></li>
+</ul>
+</dd>
+<dt><strong>Calibration Issues:</strong></dt><dd><ul class="simple">
+<li><p>Allow device warm-up time before calibration</p></li>
+<li><p>Check RF signal levels and connections</p></li>
+<li><p>Verify profile compatibility with hardware</p></li>
+</ul>
+</dd>
+<dt><strong>Performance Issues:</strong></dt><dd><ul class="simple">
+<li><p>Verify sampling rates are within device specifications</p></li>
+<li><p>Check RF bandwidth settings</p></li>
+<li><p>Monitor temperature and power supply stability</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="icon link reference external" href="https://www.analog.com/en/products/adrv9009.html" target="_blank">ADRV9009 Product Page</a></p></li>
+<li><p><a class="icon link reference external" href="https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/adrv9009" target="_blank">ADRV9009 Linux Driver Documentation</a></p></li>
+</ul>
 </section>
 </section>
 
@@ -483,8 +504,8 @@ selector.</p>
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../adc/adc.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADC plugin</a>
-    <a href="../datalogger/datalogger.html" title="Next document (Alt+Shift+RightArrow)" class="next">Datalogger</a>
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADRV9009 Plugin</a>
+    <a href="adrv9009_advanced.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADRV9009 Advanced</a>
               </div>
           
         </div>
