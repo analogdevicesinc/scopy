@@ -19,6 +19,7 @@
  */
 
 #include "advanced/agcsetupwidget.h"
+#include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
@@ -34,9 +35,10 @@ Q_LOGGING_CATEGORY(CAT_AGCSETUP, "AgcSetup")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-AgcSetupWidget::AgcSetupWidget(iio_device *device, QWidget *parent)
+AgcSetupWidget::AgcSetupWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
+	, m_widgetGroup(group)
 {
 	if(!m_device) {
 		qWarning(CAT_AGCSETUP) << "No device provided to AGC Setup widget";
@@ -113,23 +115,25 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 
 	// Peak Wait Time - Range Widget [0 1 31]
 	auto peakWaitTime = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-agc-peak-wait-time",
-								     "[0 1 31]", "Peak Wait Time");
+								     "[0 1 31]", "Peak Wait Time", m_widgetGroup);
 	if(peakWaitTime) {
 		layout->addWidget(peakWaitTime);
 		connect(this, &AgcSetupWidget::readRequested, peakWaitTime, &IIOWidget::readAsync);
 	}
 
 	// Gain Update Counter (us) - Range Widget [0 1 16000000]
-	auto gainUpdateCounter = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-agc-gain-update-counter_us", "[0 1 16000000]", "Gain Update Counter (us)");
+	auto gainUpdateCounter =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-agc-gain-update-counter_us",
+							 "[0 1 16000000]", "Gain Update Counter (us)", m_widgetGroup);
 	if(gainUpdateCounter) {
 		layout->addWidget(gainUpdateCounter);
 		connect(this, &AgcSetupWidget::readRequested, gainUpdateCounter, &IIOWidget::readAsync);
 	}
 
 	// Slow Loop Settling Delay - Range Widget [0 1 127]
-	auto slowLoopSettlingDelay = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-agc-slow-loop-settling-delay", "[0 1 127]", "Slow Loop Settling Delay");
+	auto slowLoopSettlingDelay =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-agc-slow-loop-settling-delay",
+							 "[0 1 127]", "Slow Loop Settling Delay", m_widgetGroup);
 	if(slowLoopSettlingDelay) {
 		layout->addWidget(slowLoopSettlingDelay);
 		connect(this, &AgcSetupWidget::readRequested, slowLoopSettlingDelay, &IIOWidget::readAsync);
@@ -137,7 +141,7 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 
 	// Low Thresh Prevent Gain - Checkbox
 	auto lowThreshPreventGain = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-agc-low-thresh-prevent-gain", "AGC Low Thresh Prevent Gain");
+		m_device, "adi,rxagc-agc-low-thresh-prevent-gain", "AGC Low Thresh Prevent Gain", m_widgetGroup);
 	if(lowThreshPreventGain) {
 		layout->addWidget(lowThreshPreventGain);
 		lowThreshPreventGain->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -146,7 +150,7 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 
 	// Change Gain If Thresh High - Checkbox
 	auto changeGainIfThreshHigh = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-agc-change-gain-if-thresh-high", "AGC Change Gain If Thresh High");
+		m_device, "adi,rxagc-agc-change-gain-if-thresh-high", "AGC Change Gain If Thresh High", m_widgetGroup);
 	if(changeGainIfThreshHigh) {
 		layout->addWidget(changeGainIfThreshHigh);
 		changeGainIfThreshHigh->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -154,8 +158,9 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 	}
 
 	// Peak Thresh Gain Control Mode - Checkbox
-	auto peakThreshGainControlMode = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-agc-peak-thresh-gain-control-mode", "AGC Peak Thresh Gain Control Mode");
+	auto peakThreshGainControlMode =
+		Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-agc-peak-thresh-gain-control-mode",
+							    "AGC Peak Thresh Gain Control Mode", m_widgetGroup);
 	if(peakThreshGainControlMode) {
 		layout->addWidget(peakThreshGainControlMode);
 		peakThreshGainControlMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -164,7 +169,7 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 
 	// Reset On RXON - Checkbox
 	auto resetOnRxon = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-agc-reset-on-rxon",
-								       "AGC Reset On RXON");
+								       "AGC Reset On RXON", m_widgetGroup);
 	if(resetOnRxon) {
 		layout->addWidget(resetOnRxon);
 		resetOnRxon->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -173,7 +178,8 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 
 	// Enable Sync Pulse For Gain Counter - Checkbox
 	auto enableSyncPulseForGainCounter = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-agc-enable-sync-pulse-for-gain-counter", "AGC Enable Sync Pulse For Gain Counter");
+		m_device, "adi,rxagc-agc-enable-sync-pulse-for-gain-counter", "AGC Enable Sync Pulse For Gain Counter",
+		m_widgetGroup);
 	if(enableSyncPulseForGainCounter) {
 		layout->addWidget(enableSyncPulseForGainCounter);
 		enableSyncPulseForGainCounter->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -181,8 +187,9 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 	}
 
 	// Enable IP3 Optimization Thresh - Checkbox
-	auto enableIp3OptimizationThresh = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-agc-enable-ip3-optimization-thresh", "AGC Enable IP3 Optimization Thresh");
+	auto enableIp3OptimizationThresh =
+		Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-agc-enable-ip3-optimization-thresh",
+							    "AGC Enable IP3 Optimization Thresh", m_widgetGroup);
 	if(enableIp3OptimizationThresh) {
 		layout->addWidget(enableIp3OptimizationThresh);
 		enableIp3OptimizationThresh->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -190,24 +197,25 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 	}
 
 	// IP3 Over Range Thresh - Range Widget [0 1 63]
-	auto ip3OverRangeThresh = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-ip3-over-range-thresh",
-									   "[0 1 63]", "IP3 Over Range Thresh");
+	auto ip3OverRangeThresh = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-ip3-over-range-thresh", "[0 1 63]", "IP3 Over Range Thresh", m_widgetGroup);
 	if(ip3OverRangeThresh) {
 		layout->addWidget(ip3OverRangeThresh);
 		connect(this, &AgcSetupWidget::readRequested, ip3OverRangeThresh, &IIOWidget::readAsync);
 	}
 
 	// IP3 Over Range Thresh Index - Range Widget [0 1 255]
-	auto ip3OverRangeThreshIndex = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-ip3-over-range-thresh-index", "[0 1 255]", "IP3 Over Range Thresh Index");
+	auto ip3OverRangeThreshIndex =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-ip3-over-range-thresh-index", "[0 1 255]",
+							 "IP3 Over Range Thresh Index", m_widgetGroup);
 	if(ip3OverRangeThreshIndex) {
 		layout->addWidget(ip3OverRangeThreshIndex);
 		connect(this, &AgcSetupWidget::readRequested, ip3OverRangeThreshIndex, &IIOWidget::readAsync);
 	}
 
 	// IP3 Peak Exceeded Count - Range Widget [0 1 255]
-	auto ip3PeakExceededCnt = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-ip3-peak-exceeded-cnt",
-									   "[0 1 255]", "IP3 Peak Exceeded Count");
+	auto ip3PeakExceededCnt = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-ip3-peak-exceeded-cnt", "[0 1 255]", "IP3 Peak Exceeded Count", m_widgetGroup);
 	if(ip3PeakExceededCnt) {
 		layout->addWidget(ip3PeakExceededCnt);
 		connect(this, &AgcSetupWidget::readRequested, ip3PeakExceededCnt, &IIOWidget::readAsync);
@@ -215,7 +223,7 @@ QWidget *AgcSetupWidget::createAgcConfigurationWidget(QWidget *parent)
 
 	// Enable Fast Recovery Loop - Checkbox
 	auto enableFastRecoveryLoop = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-agc-enable-fast-recovery-loop", "AGC Enable Fast Recovery Loop");
+		m_device, "adi,rxagc-agc-enable-fast-recovery-loop", "AGC Enable Fast Recovery Loop", m_widgetGroup);
 	if(enableFastRecoveryLoop) {
 		layout->addWidget(enableFastRecoveryLoop);
 		connect(this, &AgcSetupWidget::readRequested, enableFastRecoveryLoop, &IIOWidget::readAsync);
@@ -240,25 +248,27 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// Under Range Low Interval (ns) - Range Widget [0 1 4294967295]
-	auto underRangeLowInterval =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-agc-under-range-low-interval_ns",
-							 "[0 1 4294967295]", "Under Range Low Interval (ns)");
+	auto underRangeLowInterval = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-peak-agc-under-range-low-interval_ns", "[0 1 4294967295]",
+		"Under Range Low Interval (ns)", m_widgetGroup);
 	if(underRangeLowInterval) {
 		layout->addWidget(underRangeLowInterval);
 		connect(this, &AgcSetupWidget::readRequested, underRangeLowInterval, &IIOWidget::readAsync);
 	}
 
 	// Under Range Mid Interval - Range Widget [0 1 63]
-	auto underRangeMidInterval = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-agc-under-range-mid-interval", "[0 1 63]", "AGC Under Range Mid Interval");
+	auto underRangeMidInterval =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-agc-under-range-mid-interval",
+							 "[0 1 63]", "AGC Under Range Mid Interval", m_widgetGroup);
 	if(underRangeMidInterval) {
 		layout->addWidget(underRangeMidInterval);
 		connect(this, &AgcSetupWidget::readRequested, underRangeMidInterval, &IIOWidget::readAsync);
 	}
 
 	// Under Range High Interval - Range Widget [0 1 63]
-	auto underRangeHighInterval = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-agc-under-range-high-interval", "[0 1 63]", "AGC Under Range High Interval");
+	auto underRangeHighInterval =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-agc-under-range-high-interval",
+							 "[0 1 63]", "AGC Under Range High Interval", m_widgetGroup);
 	if(underRangeHighInterval) {
 		layout->addWidget(underRangeHighInterval);
 		connect(this, &AgcSetupWidget::readRequested, underRangeHighInterval, &IIOWidget::readAsync);
@@ -266,15 +276,16 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// APD High Thresh - Range Widget [7 1 49]
 	auto apdHighThresh = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-apd-high-thresh",
-								      "[7 1 49]", "APD High Thresh");
+								      "[7 1 49]", "APD High Thresh", m_widgetGroup);
 	if(apdHighThresh) {
 		layout->addWidget(apdHighThresh);
 		connect(this, &AgcSetupWidget::readRequested, apdHighThresh, &IIOWidget::readAsync);
 	}
 
 	// APD Low Gain Mode High Thresh - Range Widget [7 1 49]
-	auto apdLowGainModeHighThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-apd-low-gain-mode-high-thresh", "[7 1 49]", "APD Low Gain Mode High Thresh");
+	auto apdLowGainModeHighThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-apd-low-gain-mode-high-thresh",
+							 "[7 1 49]", "APD Low Gain Mode High Thresh", m_widgetGroup);
 	if(apdLowGainModeHighThresh) {
 		layout->addWidget(apdLowGainModeHighThresh);
 		connect(this, &AgcSetupWidget::readRequested, apdLowGainModeHighThresh, &IIOWidget::readAsync);
@@ -282,33 +293,34 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// APD Low Thresh - Range Widget [7 1 49]
 	auto apdLowThresh = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-apd-low-thresh",
-								     "[7 1 49]", "APD Low Thresh");
+								     "[7 1 49]", "APD Low Thresh", m_widgetGroup);
 	if(apdLowThresh) {
 		layout->addWidget(apdLowThresh);
 		connect(this, &AgcSetupWidget::readRequested, apdLowThresh, &IIOWidget::readAsync);
 	}
 
 	// APD Low Gain Mode Low Thresh - Range Widget [7 1 49]
-	auto apdLowGainModeLowThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-apd-low-gain-mode-low-thresh", "[7 1 49]", "APD Low Gain Mode Low Thresh");
+	auto apdLowGainModeLowThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-apd-low-gain-mode-low-thresh",
+							 "[7 1 49]", "APD Low Gain Mode Low Thresh", m_widgetGroup);
 	if(apdLowGainModeLowThresh) {
 		layout->addWidget(apdLowGainModeLowThresh);
 		connect(this, &AgcSetupWidget::readRequested, apdLowGainModeLowThresh, &IIOWidget::readAsync);
 	}
 
 	// APD Upper Thresh Peak Exceeded Count - Range Widget [0 1 255]
-	auto apdUpperThreshPeakExceededCnt =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-apd-upper-thresh-peak-exceeded-cnt",
-							 "[0 1 255]", "APD Upper Thresh Peak Exceeded Count");
+	auto apdUpperThreshPeakExceededCnt = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-peak-apd-upper-thresh-peak-exceeded-cnt", "[0 1 255]",
+		"APD Upper Thresh Peak Exceeded Count", m_widgetGroup);
 	if(apdUpperThreshPeakExceededCnt) {
 		layout->addWidget(apdUpperThreshPeakExceededCnt);
 		connect(this, &AgcSetupWidget::readRequested, apdUpperThreshPeakExceededCnt, &IIOWidget::readAsync);
 	}
 
 	// APD Lower Thresh Peak Exceeded Count - Range Widget [0 1 255]
-	auto apdLowerThreshPeakExceededCnt =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-apd-lower-thresh-peak-exceeded-cnt",
-							 "[0 1 255]", "APD Lower Thresh Peak Exceeded Count");
+	auto apdLowerThreshPeakExceededCnt = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-peak-apd-lower-thresh-peak-exceeded-cnt", "[0 1 255]",
+		"APD Lower Thresh Peak Exceeded Count", m_widgetGroup);
 	if(apdLowerThreshPeakExceededCnt) {
 		layout->addWidget(apdLowerThreshPeakExceededCnt);
 		connect(this, &AgcSetupWidget::readRequested, apdLowerThreshPeakExceededCnt, &IIOWidget::readAsync);
@@ -316,7 +328,7 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// APD Gain Step Attack - Range Widget [0 1 31]
 	auto apdGainStepAttack = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-apd-gain-step-attack", "[0 1 31]", "APD Gain Step Attack");
+		m_device, "adi,rxagc-peak-apd-gain-step-attack", "[0 1 31]", "APD Gain Step Attack", m_widgetGroup);
 	if(apdGainStepAttack) {
 		layout->addWidget(apdGainStepAttack);
 		connect(this, &AgcSetupWidget::readRequested, apdGainStepAttack, &IIOWidget::readAsync);
@@ -324,7 +336,7 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// APD Gain Step Recovery - Range Widget [0 1 31]
 	auto apdGainStepRecovery = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-apd-gain-step-recovery", "[0 1 31]", "APD Gain Step Recovery");
+		m_device, "adi,rxagc-peak-apd-gain-step-recovery", "[0 1 31]", "APD Gain Step Recovery", m_widgetGroup);
 	if(apdGainStepRecovery) {
 		layout->addWidget(apdGainStepRecovery);
 		connect(this, &AgcSetupWidget::readRequested, apdGainStepRecovery, &IIOWidget::readAsync);
@@ -332,7 +344,7 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// Enable HB2 Overload - Checkbox
 	auto enableHb2Overload = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-peak-enable-hb2-overload", "Enable HB2 Overload");
+		m_device, "adi,rxagc-peak-enable-hb2-overload", "Enable HB2 Overload", m_widgetGroup);
 	if(enableHb2Overload) {
 		layout->addWidget(enableHb2Overload);
 		enableHb2Overload->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -340,16 +352,18 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 	}
 
 	// HB2 Overload Duration Count - Range Widget [0 1 6]
-	auto hb2OverloadDurationCnt = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-overload-duration-cnt", "[0 1 6]", "HB2 Overload Duration Count");
+	auto hb2OverloadDurationCnt =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-overload-duration-cnt",
+							 "[0 1 6]", "HB2 Overload Duration Count", m_widgetGroup);
 	if(hb2OverloadDurationCnt) {
 		layout->addWidget(hb2OverloadDurationCnt);
 		connect(this, &AgcSetupWidget::readRequested, hb2OverloadDurationCnt, &IIOWidget::readAsync);
 	}
 
 	// HB2 Overload Thresh Count - Range Widget [1 1 15]
-	auto hb2OverloadThreshCnt = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-overload-thresh-cnt", "[1 1 15]", "HB2 Overload Thresh Count");
+	auto hb2OverloadThreshCnt =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-overload-thresh-cnt", "[1 1 15]",
+							 "HB2 Overload Thresh Count", m_widgetGroup);
 	if(hb2OverloadThreshCnt) {
 		layout->addWidget(hb2OverloadThreshCnt);
 		connect(this, &AgcSetupWidget::readRequested, hb2OverloadThreshCnt, &IIOWidget::readAsync);
@@ -357,73 +371,79 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// HB2 High Thresh - Range Widget [0 1 255]
 	auto hb2HighThresh = Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-high-thresh",
-								      "[0 1 255]", "HB2 High Thresh");
+								      "[0 1 255]", "HB2 High Thresh", m_widgetGroup);
 	if(hb2HighThresh) {
 		layout->addWidget(hb2HighThresh);
 		connect(this, &AgcSetupWidget::readRequested, hb2HighThresh, &IIOWidget::readAsync);
 	}
 
 	// HB2 Under Range Low Thresh - Range Widget [0 1 255]
-	auto hb2UnderRangeLowThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-under-range-low-thresh", "[0 1 255]", "HB2 Under Range Low Thresh");
+	auto hb2UnderRangeLowThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-under-range-low-thresh",
+							 "[0 1 255]", "HB2 Under Range Low Thresh", m_widgetGroup);
 	if(hb2UnderRangeLowThresh) {
 		layout->addWidget(hb2UnderRangeLowThresh);
 		connect(this, &AgcSetupWidget::readRequested, hb2UnderRangeLowThresh, &IIOWidget::readAsync);
 	}
 
 	// HB2 Under Range Mid Thresh - Range Widget [0 1 255]
-	auto hb2UnderRangeMidThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-under-range-mid-thresh", "[0 1 255]", "HB2 Under Range Mid Thresh");
+	auto hb2UnderRangeMidThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-under-range-mid-thresh",
+							 "[0 1 255]", "HB2 Under Range Mid Thresh", m_widgetGroup);
 	if(hb2UnderRangeMidThresh) {
 		layout->addWidget(hb2UnderRangeMidThresh);
 		connect(this, &AgcSetupWidget::readRequested, hb2UnderRangeMidThresh, &IIOWidget::readAsync);
 	}
 
 	// HB2 Under Range High Thresh - Range Widget [0 1 255]
-	auto hb2UnderRangeHighThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-under-range-high-thresh", "[0 1 255]", "HB2 Under Range High Thresh");
+	auto hb2UnderRangeHighThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-under-range-high-thresh",
+							 "[0 1 255]", "HB2 Under Range High Thresh", m_widgetGroup);
 	if(hb2UnderRangeHighThresh) {
 		layout->addWidget(hb2UnderRangeHighThresh);
 		connect(this, &AgcSetupWidget::readRequested, hb2UnderRangeHighThresh, &IIOWidget::readAsync);
 	}
 
 	// HB2 Upper Thresh Peak Exceeded Count - Range Widget [0 1 255]
-	auto hb2UpperThreshPeakExceededCnt =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-upper-thresh-peak-exceeded-cnt",
-							 "[0 1 255]", "HB2 Upper Thresh Peak Exceeded Count");
+	auto hb2UpperThreshPeakExceededCnt = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-peak-hb2-upper-thresh-peak-exceeded-cnt", "[0 1 255]",
+		"HB2 Upper Thresh Peak Exceeded Count", m_widgetGroup);
 	if(hb2UpperThreshPeakExceededCnt) {
 		layout->addWidget(hb2UpperThreshPeakExceededCnt);
 		connect(this, &AgcSetupWidget::readRequested, hb2UpperThreshPeakExceededCnt, &IIOWidget::readAsync);
 	}
 
 	// HB2 Lower Thresh Peak Exceeded Count - Range Widget [0 1 255]
-	auto hb2LowerThreshPeakExceededCnt =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-lower-thresh-peak-exceeded-cnt",
-							 "[0 1 255]", "HB2 Lower Thresh Peak Exceeded Count");
+	auto hb2LowerThreshPeakExceededCnt = Adrv9009WidgetFactory::createRangeWidget(
+		m_device, "adi,rxagc-peak-hb2-lower-thresh-peak-exceeded-cnt", "[0 1 255]",
+		"HB2 Lower Thresh Peak Exceeded Count", m_widgetGroup);
 	if(hb2LowerThreshPeakExceededCnt) {
 		layout->addWidget(hb2LowerThreshPeakExceededCnt);
 		connect(this, &AgcSetupWidget::readRequested, hb2LowerThreshPeakExceededCnt, &IIOWidget::readAsync);
 	}
 
 	// HB2 Gain Step High Recovery - Range Widget [0 1 31]
-	auto hb2GainStepHighRecovery = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-gain-step-high-recovery", "[0 1 31]", "HB2 Gain Step High Recovery");
+	auto hb2GainStepHighRecovery =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-gain-step-high-recovery",
+							 "[0 1 31]", "HB2 Gain Step High Recovery", m_widgetGroup);
 	if(hb2GainStepHighRecovery) {
 		layout->addWidget(hb2GainStepHighRecovery);
 		connect(this, &AgcSetupWidget::readRequested, hb2GainStepHighRecovery, &IIOWidget::readAsync);
 	}
 
 	// HB2 Gain Step Low Recovery - Range Widget [0 1 31]
-	auto hb2GainStepLowRecovery = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-gain-step-low-recovery", "[0 1 31]", "HB2 Gain Step Low Recovery");
+	auto hb2GainStepLowRecovery =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-gain-step-low-recovery",
+							 "[0 1 31]", "HB2 Gain Step Low Recovery", m_widgetGroup);
 	if(hb2GainStepLowRecovery) {
 		layout->addWidget(hb2GainStepLowRecovery);
 		connect(this, &AgcSetupWidget::readRequested, hb2GainStepLowRecovery, &IIOWidget::readAsync);
 	}
 
 	// HB2 Gain Step Mid Recovery - Range Widget [0 1 31]
-	auto hb2GainStepMidRecovery = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-gain-step-mid-recovery", "[0 1 31]", "HB2 Gain Step Mid Recovery");
+	auto hb2GainStepMidRecovery =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-peak-hb2-gain-step-mid-recovery",
+							 "[0 1 31]", "HB2 Gain Step Mid Recovery", m_widgetGroup);
 	if(hb2GainStepMidRecovery) {
 		layout->addWidget(hb2GainStepMidRecovery);
 		connect(this, &AgcSetupWidget::readRequested, hb2GainStepMidRecovery, &IIOWidget::readAsync);
@@ -431,7 +451,7 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// HB2 Gain Step Attack - Range Widget [0 1 31]
 	auto hb2GainStepAttack = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-peak-hb2-gain-step-attack", "[0 1 31]", "HB2 Gain Step Attack");
+		m_device, "adi,rxagc-peak-hb2-gain-step-attack", "[0 1 31]", "HB2 Gain Step Attack", m_widgetGroup);
 	if(hb2GainStepAttack) {
 		layout->addWidget(hb2GainStepAttack);
 		connect(this, &AgcSetupWidget::readRequested, hb2GainStepAttack, &IIOWidget::readAsync);
@@ -439,7 +459,7 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// HB2 Overload Power Mode - Checkbox
 	auto hb2OverloadPowerMode = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-peak-hb2-overload-power-mode", "HB2 Overload Power Mode");
+		m_device, "adi,rxagc-peak-hb2-overload-power-mode", "HB2 Overload Power Mode", m_widgetGroup);
 	if(hb2OverloadPowerMode) {
 		layout->addWidget(hb2OverloadPowerMode);
 		hb2OverloadPowerMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -447,8 +467,8 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 	}
 
 	// HB2 OVRG Sel - Checkbox
-	auto hb2OvrgSel =
-		Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-peak-hb2-ovrg-sel", "HB2 OVRG Sel");
+	auto hb2OvrgSel = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-peak-hb2-ovrg-sel",
+								      "HB2 OVRG Sel", m_widgetGroup);
 	if(hb2OvrgSel) {
 		layout->addWidget(hb2OvrgSel);
 		hb2OvrgSel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -457,7 +477,7 @@ QWidget *AgcSetupWidget::createAnalogPeakDetector(QWidget *parent)
 
 	// HB2 Thresh Config - Checkbox
 	auto hb2ThreshConfig = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-peak-hb2-thresh-config",
-									   "HB2 Thresh Config");
+									   "HB2 Thresh Config", m_widgetGroup);
 	if(hb2ThreshConfig) {
 		layout->addWidget(hb2ThreshConfig);
 		hb2ThreshConfig->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -485,7 +505,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 
 	// Power Enable Measurement - Checkbox
 	auto powerEnableMeasurement = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-power-power-enable-measurement", "Power Enable Measurement");
+		m_device, "adi,rxagc-power-power-enable-measurement", "Power Enable Measurement", m_widgetGroup);
 	if(powerEnableMeasurement) {
 		layout->addWidget(powerEnableMeasurement);
 		powerEnableMeasurement->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -494,7 +514,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 
 	// Power Use RFIR Out - Checkbox
 	auto powerUseRfirOut = Adrv9009WidgetFactory::createCheckboxWidget(
-		m_device, "adi,rxagc-power-power-use-rfir-out", "Power Use RFIR Out");
+		m_device, "adi,rxagc-power-power-use-rfir-out", "Power Use RFIR Out", m_widgetGroup);
 	if(powerUseRfirOut) {
 		layout->addWidget(powerUseRfirOut);
 		powerUseRfirOut->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -503,7 +523,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 
 	// Power Use BBDC2 - Checkbox
 	auto powerUseBbdc2 = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-power-power-use-bbdc2",
-									 "Power Use BBDC2");
+									 "Power Use BBDC2", m_widgetGroup);
 	if(powerUseBbdc2) {
 		layout->addWidget(powerUseBbdc2);
 		powerUseBbdc2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -513,15 +533,16 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 	// Under Range High Power Thresh - Range Widget [0 1 127]
 	auto underRangeHighPowerThresh =
 		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-under-range-high-power-thresh",
-							 "[0 1 127]", "Under Range High Power Thresh");
+							 "[0 1 127]", "Under Range High Power Thresh", m_widgetGroup);
 	if(underRangeHighPowerThresh) {
 		layout->addWidget(underRangeHighPowerThresh);
 		connect(this, &AgcSetupWidget::readRequested, underRangeHighPowerThresh, &IIOWidget::readAsync);
 	}
 
 	// Under Range Low Power Thresh - Range Widget [0 1 31]
-	auto underRangeLowPowerThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-under-range-low-power-thresh", "[0 1 31]", "Under Range Low Power Thresh");
+	auto underRangeLowPowerThresh =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-under-range-low-power-thresh",
+							 "[0 1 31]", "Under Range Low Power Thresh", m_widgetGroup);
 	if(underRangeLowPowerThresh) {
 		layout->addWidget(underRangeLowPowerThresh);
 		connect(this, &AgcSetupWidget::readRequested, underRangeLowPowerThresh, &IIOWidget::readAsync);
@@ -530,7 +551,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 	// Under Range High Power Gain Step Recovery - Range Widget [0 1 31]
 	auto underRangeHighPowerGainStepRecovery = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,rxagc-power-under-range-high-power-gain-step-recovery", "[0 1 31]",
-		"Under Range High Power Gain Step Recovery");
+		"Under Range High Power Gain Step Recovery", m_widgetGroup);
 	if(underRangeHighPowerGainStepRecovery) {
 		layout->addWidget(underRangeHighPowerGainStepRecovery);
 		connect(this, &AgcSetupWidget::readRequested, underRangeHighPowerGainStepRecovery,
@@ -540,7 +561,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 	// Under Range Low Power Gain Step Recovery - Range Widget [0 1 31]
 	auto underRangeLowPowerGainStepRecovery = Adrv9009WidgetFactory::createRangeWidget(
 		m_device, "adi,rxagc-power-under-range-low-power-gain-step-recovery", "[0 1 31]",
-		"Under Range Low Power Gain Step Recovery");
+		"Under Range Low Power Gain Step Recovery", m_widgetGroup);
 	if(underRangeLowPowerGainStepRecovery) {
 		layout->addWidget(underRangeLowPowerGainStepRecovery);
 		connect(this, &AgcSetupWidget::readRequested, underRangeLowPowerGainStepRecovery,
@@ -548,38 +569,43 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 	}
 
 	// Power Measurement Duration - Range Widget [0 1 31]
-	auto powerMeasurementDuration = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-power-measurement-duration", "[0 1 31]", "Power Measurement Duration");
+	auto powerMeasurementDuration =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-power-measurement-duration",
+							 "[0 1 31]", "Power Measurement Duration", m_widgetGroup);
 	if(powerMeasurementDuration) {
 		layout->addWidget(powerMeasurementDuration);
 		connect(this, &AgcSetupWidget::readRequested, powerMeasurementDuration, &IIOWidget::readAsync);
 	}
 
 	// TDD Power Meas Duration - Range Widget [0 1 65535]
-	auto durationWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-rx1-tdd-power-meas-duration", "[0 1 65535]", "RX1 TDD POWER MEAS DURATION");
+	auto durationWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-rx1-tdd-power-meas-duration",
+							 "[0 1 65535]", "RX1 TDD POWER MEAS DURATION", m_widgetGroup);
 	if(durationWidget) {
 		layout->addWidget(durationWidget);
 		connect(this, &AgcSetupWidget::readRequested, durationWidget, &IIOWidget::readAsync);
 	}
 
-	auto rx2DurationWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-rx2-tdd-power-meas-duration", "[0 1 65535]", "RX2 TDD POWER MEAS DURATION");
+	auto rx2DurationWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-rx2-tdd-power-meas-duration",
+							 "[0 1 65535]", "RX2 TDD POWER MEAS DURATION", m_widgetGroup);
 	if(rx2DurationWidget) {
 		layout->addWidget(rx2DurationWidget);
 		connect(this, &AgcSetupWidget::readRequested, rx2DurationWidget, &IIOWidget::readAsync);
 	}
 
 	// TDD Power Meas Delay - Range Widget [0 1 65535]
-	auto delayWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-rx1-tdd-power-meas-delay", "[0 1 65535]", "RX1 TDD POWER MEAS DELAY");
+	auto delayWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-rx1-tdd-power-meas-delay",
+							 "[0 1 65535]", "RX1 TDD POWER MEAS DELAY", m_widgetGroup);
 	if(delayWidget) {
 		layout->addWidget(delayWidget);
 		connect(this, &AgcSetupWidget::readRequested, delayWidget, &IIOWidget::readAsync);
 	}
 
-	auto rx2DelayWidget = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-rx2-tdd-power-meas-delay", "[0 1 65535]", "RX2 TDD POWER MEAS DELAY");
+	auto rx2DelayWidget =
+		Adrv9009WidgetFactory::createRangeWidget(m_device, "adi,rxagc-power-rx2-tdd-power-meas-delay",
+							 "[0 1 65535]", "RX2 TDD POWER MEAS DELAY", m_widgetGroup);
 	if(rx2DelayWidget) {
 		layout->addWidget(rx2DelayWidget);
 		connect(this, &AgcSetupWidget::readRequested, rx2DelayWidget, &IIOWidget::readAsync);
@@ -587,7 +613,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 
 	// Upper0 Power Thresh - Range Widget [0 1 127]
 	auto upper0PowerThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-upper0-power-thresh", "[0 1 127]", "Upper0 Power Thresh");
+		m_device, "adi,rxagc-power-upper0-power-thresh", "[0 1 127]", "Upper0 Power Thresh", m_widgetGroup);
 	if(upper0PowerThresh) {
 		layout->addWidget(upper0PowerThresh);
 		connect(this, &AgcSetupWidget::readRequested, upper0PowerThresh, &IIOWidget::readAsync);
@@ -595,7 +621,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 
 	// Upper1 Power Thresh - Range Widget [0 1 15]
 	auto upper1PowerThresh = Adrv9009WidgetFactory::createRangeWidget(
-		m_device, "adi,rxagc-power-upper1-power-thresh", "[0 1 15]", "Upper1 Power Thresh");
+		m_device, "adi,rxagc-power-upper1-power-thresh", "[0 1 15]", "Upper1 Power Thresh", m_widgetGroup);
 	if(upper1PowerThresh) {
 		layout->addWidget(upper1PowerThresh);
 		connect(this, &AgcSetupWidget::readRequested, upper1PowerThresh, &IIOWidget::readAsync);
@@ -603,7 +629,7 @@ QWidget *AgcSetupWidget::createPowerMeasurementDetector(QWidget *parent)
 
 	// Power Log Shift - Checkbox
 	auto powerLogShift = Adrv9009WidgetFactory::createCheckboxWidget(m_device, "adi,rxagc-power-power-log-shift",
-									 "Power Log Shift");
+									 "Power Log Shift", m_widgetGroup);
 	if(powerLogShift) {
 		layout->addWidget(powerLogShift);
 		powerLogShift->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -633,8 +659,8 @@ QWidget *AgcSetupWidget::createAgcRxChannelGroup(const QString &baseAttr, const 
 
 	// Create RX1 widget
 	QString rx1Attr = QString(baseAttr).arg(1);
-	auto rx1Widget =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, rx1Attr, range, QString("RX1 %1").arg(displayName));
+	auto rx1Widget = Adrv9009WidgetFactory::createRangeWidget(m_device, rx1Attr, range,
+								  QString("RX1 %1").arg(displayName), m_widgetGroup);
 	if(rx1Widget) {
 		channelLayout->addWidget(rx1Widget);
 		connect(this, &AgcSetupWidget::readRequested, rx1Widget, &IIOWidget::readAsync);
@@ -642,8 +668,8 @@ QWidget *AgcSetupWidget::createAgcRxChannelGroup(const QString &baseAttr, const 
 
 	// Create RX2 widget
 	QString rx2Attr = QString(baseAttr).arg(2);
-	auto rx2Widget =
-		Adrv9009WidgetFactory::createRangeWidget(m_device, rx2Attr, range, QString("RX2 %1").arg(displayName));
+	auto rx2Widget = Adrv9009WidgetFactory::createRangeWidget(m_device, rx2Attr, range,
+								  QString("RX2 %1").arg(displayName), m_widgetGroup);
 	if(rx2Widget) {
 		channelLayout->addWidget(rx2Widget);
 		connect(this, &AgcSetupWidget::readRequested, rx2Widget, &IIOWidget::readAsync);
