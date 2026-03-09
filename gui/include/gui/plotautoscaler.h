@@ -58,6 +58,8 @@ public Q_SLOTS:
 	void removeChannels(PlotChannel *);
 	void onNewData(const float *xData, const float *yData, size_t size, bool copy);
 	void setTimeout(int);
+	void setVisibleOnly(bool visibleOnly);
+	void setVisibleXRange(double xMin, double xMax);
 
 private:
 	QTimer *m_autoScaleTimer;
@@ -68,6 +70,10 @@ private:
 	double m_max;
 	double m_min;
 	int m_timeout;
+
+	bool m_visibleOnly;
+	double m_visibleXMin;
+	double m_visibleXMax;
 };
 } // namespace scopy::gui
 #endif // PLOTAUTOSCALER_H

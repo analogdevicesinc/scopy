@@ -42,6 +42,10 @@ PlotAutoscaler::PlotAutoscaler(QObject *parent)
 
 	m_max = -1000000.0;
 	m_min = 1000000.0;
+
+	m_visibleOnly = false;
+	m_visibleXMin = 0;
+	m_visibleXMax = 0;
 }
 
 PlotAutoscaler::~PlotAutoscaler() {}
@@ -56,6 +60,9 @@ void PlotAutoscaler::onNewData(const float *xData, const float *yData, size_t si
 {
 	// this is a little wonky but should work
 	if(!m_autoScaleTimer->isActive())
+		return;
+
+	if(m_visibleOnly)
 		return;
 
 	for(int i = 0; i < size; i++) {
@@ -84,6 +91,12 @@ void PlotAutoscaler::autoscale()
 		auto data = plotCh->curve()->data();
 		for(int i = 0; i < data->size(); i++) {
 
+			if(m_visibleOnly) {
+				double x = data->sample(i).x();
+				if(x < m_visibleXMin || x > m_visibleXMax)
+					continue;
+			}
+
 			qreal sample;
 			if(m_xAxisMode) {
 				sample = data->sample(i).x();
@@ -97,6 +110,12 @@ void PlotAutoscaler::autoscale()
 		}
 		qDebug(CAT_TIMEYAUTOSCALE)
 			<< "Autoscaling channel " << plotCh->name() << "to (" << m_min << ", " << m_max << ")";
+	}
+
+	if(m_min > m_max) {
+		m_max = -1000000.0;
+		m_min = 1000000.0;
+		return;
 	}
 
 	double minTolerance = m_tolerance * m_min;
@@ -134,5 +153,13 @@ void PlotAutoscaler::setTolerance(double newTolerance)
 bool PlotAutoscaler::xAxisMode() const { return m_xAxisMode; }
 
 void PlotAutoscaler::setXAxisMode(bool newXAxis) { m_xAxisMode = newXAxis; }
+
+void PlotAutoscaler::setVisibleOnly(bool visibleOnly) { m_visibleOnly = visibleOnly; }
+
+void PlotAutoscaler::setVisibleXRange(double xMin, double xMax)
+{
+	m_visibleXMin = xMin;
+	m_visibleXMax = xMax;
+}
 
 #include "moc_plotautoscaler.cpp"
