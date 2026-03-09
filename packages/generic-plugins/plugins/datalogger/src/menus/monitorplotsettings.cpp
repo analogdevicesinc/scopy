@@ -24,6 +24,7 @@
 #include <datamonitorutils.hpp>
 #include <menuplotaxisrangecontrol.h>
 #include <menuplotchannelcurvestylecontrol.h>
+#include <plotaxis.h>
 #include <style.h>
 #include <timemanager.hpp>
 #include <QLineEdit>
@@ -110,13 +111,38 @@ QWidget *MonitorPlotSettings::generateYAxisSettings(QWidget *parent)
 	plotAutoscaler->setTolerance(10);
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yAxisSection, false);
+	MenuOnOffSwitch *autoscaleVisible = new MenuOnOffSwitch(tr("AUTOSCALE VISIBLE"), yAxisSection, false);
 
 	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
-		plotYAxisController->setEnabled(!toggled);
 		if(toggled) {
+			autoscaleVisible->onOffswitch()->setChecked(false);
+			plotAutoscaler->setVisibleOnly(false);
 			plotAutoscaler->start();
-		} else {
+			plotYAxisController->setEnabled(false);
+		} else if(!autoscaleVisible->onOffswitch()->isChecked()) {
 			plotAutoscaler->stop();
+			plotYAxisController->setEnabled(true);
+		}
+	});
+
+	connect(autoscaleVisible->onOffswitch(), &QAbstractButton::toggled, this, [=, this](bool toggled) {
+		if(toggled) {
+			autoscale->onOffswitch()->setChecked(false);
+			plotAutoscaler->setVisibleOnly(true);
+			plotAutoscaler->setVisibleXRange(m_plot->plot()->xAxis()->visibleMin(),
+							 m_plot->plot()->xAxis()->visibleMax());
+			plotAutoscaler->start();
+			plotYAxisController->setEnabled(false);
+		} else if(!autoscale->onOffswitch()->isChecked()) {
+			plotAutoscaler->stop();
+			plotYAxisController->setEnabled(true);
+		}
+	});
+
+	connect(m_plot->plot()->xAxis(), &PlotAxis::axisScaleUpdated, this, [=, this]() {
+		if(autoscaleVisible->onOffswitch()->isChecked()) {
+			plotAutoscaler->setVisibleXRange(m_plot->plot()->xAxis()->visibleMin(),
+							 m_plot->plot()->xAxis()->visibleMax());
 		}
 	});
 
@@ -126,7 +152,7 @@ QWidget *MonitorPlotSettings::generateYAxisSettings(QWidget *parent)
 
 	connect(timeTracker, &TimeManager::toggleRunning, this, [=, this](bool toggled) {
 		if(toggled) {
-			if(autoscale->onOffswitch()->isChecked()) {
+			if(autoscale->onOffswitch()->isChecked() || autoscaleVisible->onOffswitch()->isChecked()) {
 				plotAutoscaler->start();
 			}
 		} else {
@@ -138,6 +164,7 @@ QWidget *MonitorPlotSettings::generateYAxisSettings(QWidget *parent)
 	connect(plotAutoscaler, &gui::PlotAutoscaler::newMax, m_plot, &MonitorPlot::updateYAxisIntervalMax);
 
 	yAxisSection->contentLayout()->addWidget(autoscale);
+	yAxisSection->contentLayout()->addWidget(autoscaleVisible);
 	yAxisSection->contentLayout()->addWidget(plotYAxisController);
 
 	return yaxisContainer;
