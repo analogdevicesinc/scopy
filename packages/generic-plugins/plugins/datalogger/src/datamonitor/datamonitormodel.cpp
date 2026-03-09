@@ -233,13 +233,13 @@ void DataMonitorModel::addValue(double time, double value)
 		ydata.pop_front();
 	}
 
-	if(ydata.isEmpty()) {
-		setMinValue(value);
-		setMaxValue(value);
-	}
-
 	// Apply scaling, offset, and unit of measurement scale
 	double adjustedValue = (value + m_offset) * m_scale;
+
+	if(ydata.isEmpty()) {
+		setMinValue(adjustedValue);
+		setMaxValue(adjustedValue);
+	}
 
 	xdata.push_back(time);
 	ydata.push_back(adjustedValue);
