@@ -44,6 +44,7 @@
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <verticaltabwidget.h>
+#include <mousewheelwidgetguard.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 
@@ -82,6 +83,8 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	QScrollArea *scrollArea = new QScrollArea();
 	scrollArea->setWidget(w);
 	scrollArea->setWidgetResizable(true);
+	MouseWheelWidgetGuard *wheelGuard = new MouseWheelWidgetGuard(w);
+	wheelGuard->installEventRecursively(w);
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	lay->addWidget(scrollArea);
 	Style::setBackgroundColor(scrollArea->viewport(), json::theme::background_subtle);
