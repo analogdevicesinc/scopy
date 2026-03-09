@@ -149,6 +149,7 @@ deploy_app(){
 
 	cp -r $PYTHON_FILES $DEST_FOLDER
 	cp $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss $DEST_FOLDER
+	cp $SRC_FOLDER/LICENSE $DEST_FOLDER/LICENSE.txt
 
 	bundle_drivers
 }
