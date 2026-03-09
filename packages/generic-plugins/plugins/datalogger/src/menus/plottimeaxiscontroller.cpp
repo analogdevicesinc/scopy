@@ -59,8 +59,8 @@ PlotTimeAxisController::PlotTimeAxisController(QWidget *parent)
 	timeEdit->setDisplayFormat("hh:mm:ss");
 	timeEdit->setVisible(false);
 
-	m_xdelta = new gui::MenuSpinbox("Delta", DataMonitorUtils::getAxisDefaultMaxValue(), "", 0, DBL_MAX, false,
-					false, xAxisContainer);
+	m_xdelta = new gui::MenuSpinbox("Time interval", DataMonitorUtils::getAxisDefaultMaxValue(), "", 0, DBL_MAX,
+					false, false, xAxisContainer);
 
 	QList<gui::UnitPrefix> scales;
 	scales.append({QString("s"), 1});
