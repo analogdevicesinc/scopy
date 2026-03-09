@@ -97,8 +97,8 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 
 bool DMM::isDMMCompatible(iio_channel *chn)
 {
-	// DMM channels have raw and scale and be input
-	if(!iio_channel_is_output(chn) && iioChannelHasAttribute(chn, "raw") && iioChannelHasAttribute(chn, "scale")) {
+	// DMM channels have raw and be input (scale is optional, defaults to 1)
+	if(!iio_channel_is_output(chn) && iioChannelHasAttribute(chn, "raw")) {
 		return true;
 	}
 	return false;
