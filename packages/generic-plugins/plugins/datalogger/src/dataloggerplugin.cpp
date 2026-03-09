@@ -116,13 +116,13 @@ bool DataLoggerPlugin::onConnect()
 	Preferences *p = Preferences::GetInstance();
 
 	auto &&timeTracker = TimeManager::GetInstance();
-	timeTracker->setTimerInterval(p->get("dataloggerplugin_read_interval").toDouble());
+	timeTracker->setTimerInterval(p->get("dataloggerplugin_read_interval").toDouble() / 1000.0);
 
 	connect(timeTracker, &TimeManager::timeout, m_dataAcquisitionManager, &DataAcquisitionManager::readData);
 
 	QObject::connect(p, &Preferences::preferenceChanged, this, [=, this](QString id, QVariant var) {
 		if(id.contains("dataloggerplugin_read_interval")) {
-			timeTracker->setTimerInterval(p->get("dataloggerplugin_read_interval").toDouble());
+			timeTracker->setTimerInterval(p->get("dataloggerplugin_read_interval").toDouble() / 1000.0);
 		}
 	});
 
@@ -281,7 +281,7 @@ void DataLoggerPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("dataloggerplugin_data_storage_size", "10 Kb");
-	p->init("dataloggerplugin_read_interval", "1");
+	p->init("dataloggerplugin_read_interval", "1000");
 	p->init("dataloggerplugin_date_time_format", "hh:mm:ss");
 	p->init("dataloggerplugin_add_remove_plot", false);
 	p->init("dataloggerplugin_add_remove_instrument", false);
@@ -311,13 +311,12 @@ bool DataLoggerPlugin::loadPreferencesPage()
 				 storage_options, generalSection));
 
 	generalSection->contentLayout()->addWidget(PREFERENCE_EDIT_VALIDATION(
-		p, "dataloggerplugin_read_interval", "Read interval (seconds) ",
-		"Select the time interval, in seconds, for data polling in the instrument.",
+		p, "dataloggerplugin_read_interval", "Read interval (ms)",
+		"Select the time interval, in milliseconds, for data polling in the instrument.",
 		[](const QString &text) {
-			// check if input is an positive integer
 			bool ok;
-			auto value = text.toInt(&ok);
-			return ok && value >= 0;
+			auto value = text.toDouble(&ok);
+			return ok && value > 0;
 		},
 		generalSection));
 
