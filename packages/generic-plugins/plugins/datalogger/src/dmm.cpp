@@ -75,7 +75,7 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				}
 
 				DmmDataMonitorModel *channelModel =
-					new DmmDataMonitorModel(name, StyleHelper::getChannelColor(j),
+					new DmmDataMonitorModel(name, StyleHelper::getChannelColor(result.size()),
 								unitOfMeasurement, scale, offset, dmmReadStrategy);
 				channelModel->setIioChannel(chn);
 				channelModel->setIioDevice(dev);
