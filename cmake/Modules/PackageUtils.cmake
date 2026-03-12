@@ -108,7 +108,7 @@ function(include_resources base_dir output_dir)
 		endif()
 		# Check if it's a directory
 		if(IS_DIRECTORY ${base_dir}/${child})
-			message(STATUS "Copying: ${child}")
+			message(STATUS "Copying: ${child} -> ${output_dir}")
 			file(COPY ${base_dir}/${child} DESTINATION ${output_dir})
 		endif()
 	endforeach()

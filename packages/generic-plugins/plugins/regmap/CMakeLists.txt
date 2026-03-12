@@ -76,7 +76,13 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 find_package(libm2k REQUIRED)
 
-set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/regmap-xml)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(REGMAP_XML_BUILD_PATH
+	    ${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}/plugins/${SCOPY_MODULE}/resources/regmap-xml
+	)
+else()
+	set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/regmap-xml)
+endif()
 
 file(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/resources/regmap-xml/*.xml)
 

@@ -56,7 +56,13 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-set(APOLLO_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad9084-filters)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(APOLLO_FILTERS_BUILD_PATH
+	    ${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}/plugins/${SCOPY_MODULE}/resources/ad9084-filters
+	)
+else()
+	set(APOLLO_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad9084-filters)
+endif()
 
 file(GLOB FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/resources/ad9084-filters/*)
 foreach(_filter ${FILTERS})
