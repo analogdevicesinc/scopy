@@ -8,6 +8,7 @@ BINARY=$1
 LOCATION=$2
 LIBS_ARRAY=()
 BLACKLISTED=($(wget --quiet https://raw.githubusercontent.com/probonopd/AppImages/master/excludelist -O - | sort | uniq | cut -d '#' -f 1 | grep -v "^#.*" | grep "[^-\s]"))
+BLACKLISTED+=(libglib-2.0.so.0)
 
 export LD_LIBRARY_PATH="${APP_DIR}/usr/lib:${SRC_DIR}/build:$LD_LIBRARY_PATH"
 run_ldd(){
