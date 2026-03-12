@@ -45,6 +45,7 @@ else
     BLACKLISTED+=(ld-linux-aarch64.so)
     BLACKLISTED+=(ld-linux-armhf.so.3)
     BLACKLISTED+=(ld-linux-aarch64.so.1)
+    BLACKLISTED+=(libglib-2.0.so.0)
 fi
 
 findlib()
