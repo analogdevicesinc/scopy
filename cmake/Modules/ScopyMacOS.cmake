@@ -49,13 +49,8 @@ foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
 	set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
 endforeach()
 
-# needs revising
-install(
-	CODE "
-	set(BU_CHMOD_BUNDLE_ITEMS ON)
-	include(BundleUtilities)
-	fixup_bundle(\"${CMAKE_BINARY_DIR}/Scopy.app\" \"${BUNDLED_QT_PLUGINS}\" \"${CMAKE_SOURCE_DIR}\")"
-)
+# needs revising install( CODE " set(BU_CHMOD_BUNDLE_ITEMS ON) include(BundleUtilities)
+# fixup_bundle(\"${CMAKE_BINARY_DIR}/Scopy.app\" \"${BUNDLED_QT_PLUGINS}\" \"${CMAKE_SOURCE_DIR}\")" )
 
 set(OSX_BUNDLE MACOSX_BUNDLE)
 

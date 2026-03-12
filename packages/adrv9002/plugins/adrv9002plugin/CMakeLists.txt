@@ -59,7 +59,13 @@ endif()
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
-set(ADRV9002_PROFILES_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/adrv9002-profiles)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(ADRV9002_PROFILES_BUILD_PATH
+	    ${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}/plugins/${SCOPY_MODULE}/resources/adrv9002-profiles
+	)
+else()
+	set(ADRV9002_PROFILES_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/adrv9002-profiles)
+endif()
 
 file(GLOB PROFILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/adrv9002-profiles/*)
 foreach(_profile ${PROFILES})

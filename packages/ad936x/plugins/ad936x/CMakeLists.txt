@@ -78,7 +78,13 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
 find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
 
-set(AD936X_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad936x-filters)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(AD936X_FILTERS_BUILD_PATH
+	    ${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}/plugins/${SCOPY_MODULE}/resources/ad936x-filters
+	)
+else()
+	set(AD936X_FILTERS_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/resources/ad936x-filters)
+endif()
 
 file(GLOB FIR_FILTERS ${CMAKE_CURRENT_SOURCE_DIR}/resources/ad936x-filters/*)
 foreach(_fir ${FIR_FILTERS})
