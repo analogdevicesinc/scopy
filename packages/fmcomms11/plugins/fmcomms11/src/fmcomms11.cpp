@@ -272,7 +272,7 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 			}
 		}
 
-		       // FIR85 Enable
+		// FIR85 Enable
 		iio_channel *voltage0Out = iio_device_find_channel(m_dac, "voltage0", true);
 
 		IIOWidget *fir85Enable = IIOWidgetBuilder(widget)
