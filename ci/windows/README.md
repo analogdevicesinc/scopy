@@ -1,69 +1,185 @@
-# Scopy MinGW Recipe
+# Windows CI Directory
 
-Build Scopy for Windows using MinGW64
+## Folder overview
 
-Scopy is a software oscilloscope and signal analysis toolset. [The official repository](https://github.com/analogdevicesinc/scopy) provides releases for Windows, Linux, macOS and Android.
+This directory contains scripts and resources for building Scopy on Windows using the MinGW toolchain.
+The build process uses MSYS2/MinGW environment to build and install the dependencies and creates Windows installers using Inno Setup.
 
+More detailed information can be found here: [Windows Build Instructions](https://analogdevicesinc.github.io/scopy/user_guide/build_instructions/windowsBuild.html#windows-build-instructions).
 
-## Building the Docker image
-To build the Docker image just execute the command
+### Scripts
 
-``` docker build --tag <image_name> --isolation=hyperv --memory=16GB --file docker/Dockerfile .```
+#### `mingw_toolchain.sh` - Sets up MinGW toolchain environment variables
 
-The Dockerfile is available in the docker folder.
+#### `windows_build_process.sh` - Main Windows build orchestration script
 
-[MSYS2](https://www.msys2.org/) will be installed inside the image along with all dependencies that are required in order to build and package the Scopy app.
+#### `build_and_create_installer.sh` - Builds Scopy and creates Windows installer
 
+### Supporting Files
 
-## Setting up the environment
+#### `scopy-64.iss.cmakein` - Inno Setup installer template  (will be processed by CMake to generate final .iss file)
 
-### Build prerequisites
-- An IDE:
-    - [QTCreator](https://doc.qt.io/qtcreator/)
-    - [Visual Studio Code](https://code.visualstudio.com/download)
+#### `mingw_dll_deps` -  Lists all DLLs needed for the installer
 
- - For development the [MSYS2](https://www.msys2.org/) shell is needed.
+#### `sigrokdecode-windows-fix.patch` - Windows-specific patch for libsigrokdecode
 
-### Setup dependencies
+### Docker Support
 
-1. Launch the mingw64 by executing the binary file from the location where the MSYS2 was installed
+#### `docker/Dockerfile` - Creates Windows build environment
 
-2. Execute the following script in the mingw64 terminal
+### Drivers Directory
 
-    ```bash
-        windows_build_process.sh
-    ```
+#### `drivers/` - Contains Windows driver files for hardware support
 
-- Optionally install GDB for build debugging
-    ```bash
-        pacman --noconfirm -S mingw-w64-x86_64-gdb
-    ```
+## Build Process
 
-### Building inside MinGW64 shell
+### Building Scopy using the Docker Image
 
-1. Enter the root directory of the repository
-2. Create a build directory ```mkdir build```
-3. Enter the build directory ```cd build```
-4. Execute ```cmake ../```
-5. Execute ``` make```
+`Prerequisites:` [Docker](https://docs.docker.com/desktop/setup/install/windows-install/)
 
-Inside the build folder a binary file named Scopy.exe will be generated. This is the starting file of the application.
+1. **Pull the Docker image**
 
-### Building in Visual Studio Code
+   ```bash
+   docker pull cristianbindea/scopy2-mingw64:latest
+   ```
 
-1. In VS Code, install [**C/C++ Extension Pack**](vscode:extension/ms-vscode.cpptools-extension-pack)
+2. **Start the Docker Image**
 
+   ```bash
+   docker run -it cristianbindea/scopy2-mingw64:latest
+   ```
+
+3. **Enter the MSYS env**
+
+   ```bash
+      C:\msys64\usr\bin\bash.exe
+   ```
+
+4. **Clone and build the application**
+
+   ```bash
+      git clone https://github.com/analogdevicesinc/scopy
+      cd scopy
+      mkdir build && cd build
+      cmake ../
+      make -j$(nproc)
+   ```
+
+This will compile the entire project. The process may take 15 minutes or more, depending on your CPU. More information about how to create a shared folder between the Docker container and the local machine can be found here [Building Scopy using the Docker Image](https://analogdevicesinc.github.io/scopy/user_guide/build_instructions/windowsBuild.html#building-scopy-using-the-docker-image).
+
+### Building the Docker Image
+
+`Prerequisites:` [Docker](https://docs.docker.com/desktop/setup/install/windows-install/)
+
+To build the Docker image just execute the command:
+
+   ```bash
+      docker build --tag scopy-windows --isolation=hyperv --memory=16GB --file docker/Dockerfile .
+   ```
+
+This will create the Docker Image and will install on it every dependency needed to build Scopy and to create an installer.
+
+### Building locally from sources
+
+`Prerequisites:`
+
+- [MSYS2](https://www.msys2.org/) with MinGW64
+- [Inno Setup](https://jrsoftware.org/isdl.php) (only if you want to create and installer)
+- ~20GB free disk space
+
+In order to emulate a UNIX-like environment for building Scopy on Windows, we use MSYS2.
+
+To install MSYS2, follow these instructions: MSYS2 Installation. We suggest installing the MSYS2 in root of the C:\ partition. In this tutorial the MSYS2 install path is C:\msys64, if you choose a different install directory, make sure to also update the paths.
+
+1. **Launch MinGW64 shell** from MSYS2 installation
+
+2. **Install Git and clone Scopy**
+
+   ```bash
+      pacman -S git
+      git clone https://github.com/analogdevicesinc/scopy
+   ```
+
+3. **Setup dependencies**
+
+   ```bash
+      ./windows_build_process.sh
+   ```
+
+This will configure the system for building Scopy.
+
+4. **Build Scopy**
+
+You can manually build the application using:
+
+   ```bash
+      mkdir build && cd build
+      cmake ../
+      make -j$(nproc)
+   ```
+
+Or you can run the build script. This will do a clean build each time is called.
+
+   ```bash
+      ./build_and_create_installer.sh build_scopy
+   ```
+
+Inside the build folder two executable binary files named Scopy.exe and Scopy-console.exe will be generated. This is the starting file of the application. More information about how to add the app to the PATH and open it from the file explorer, not just from the MINGW64 command line, can be found here [Running Scopy](https://analogdevicesinc.github.io/scopy/user_guide/build_instructions/windowsBuild.html#running-scopy).
+
+### Create installer
+
+In order to create an installer make sure you have Inno Setup installed at the default location. Or you can change the PATH variable from *build_and_create_installer.sh / create_installer()*.
+
+   ```bash
+      ./build_and_create_installer.sh build_scopy build_iio-emu deploy_app extract_debug_symbols create_installer
+   ```
+
+## Development Setup
+
+In order to have a complete Development setup you should follow the first 3 steps from [Build from source](###Building-locally-from-sources).
+
+A shortcut in the setup can be taken by first building the app from the command line using the step 4 from [Build from source](###Building-locally-from-sources). This will configure the build and will compile the application for the first time, later you can just import this configuration intro VS Code or Qt Creator.
+
+### Visual Studio Code
+
+1. Install C/C++ Extension Pack
 2. Open Scopy folder in VS Code
+3. Configure CMake project (CMake tool → Configure All Projects)
+4. Build project (CMake tool → Build)
 
-    > When opening the Scopy folder for the first time, a popup may appear to ask you to trust the authors of the files in this folder. Simply click on **`Yes, I trust the authors`**
+### Qt Creator
 
-3. In VS Code, go to the toolbar on your left and locate the CMake tool. On the **`PROJECT OUTLINE`** dropdown, click on the icon for *Configure All Projects*. This will instruct CMake to generate the files necessary for building the source code.
+1. Open project CMakeLists.txt
+2. Configure with MinGW64 kit
+3. Build and run
 
-4. Under the **`PROJECT STATUS`** dropdown in the CMake tool, click on the icon for *Build* to build the project.
+Here you can find a more detailed tutorial on [Qt Setup](https://analogdevicesinc.github.io/scopy/user_guide/build_instructions/windowsBuild.html#windows-qt-setup-instructions).
 
-## Generating the Scopy installer
-The installer is created using [Inno Setup](https://jrsoftware.org/isinfo.php). This tool is already installed in the Docker Image, but to install Inno Setup locally use this [installer](https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe).
+### Debugging
 
-First follow the **Setup dependencies** part.
+Install GDB for debugging:
 
-In order to build Scopy and create an installer locally use the **build_and_create_installer.sh** bash script executed from the mingw shell.
+```bash
+   pacman --noconfirm -S mingw-w64-x86_64-gdb
+```
+
+## Output
+
+- **Scopy.exe**: Main executable in build directory
+- **Scopy-console.exe**: Main executable in build directory, but with console logs
+- **Scopy-setup.exe**: Inno Setup installer
+- All required DLLs and runtime files
+
+## CI Integration
+
+- **GitHub Actions**: `.github/workflows/mingwbuild.yml`
+
+## Troubleshooting
+
+Common issues:
+
+1. **"command not found"**: Ensure running in MinGW64 shell, not CMD
+2. **Missing DLLs**: Check `mingw_dll_deps` list
+3. **CMake errors**: Verify all dependencies built successfully
+4. **Installer fails**: Ensure Inno Setup is installed
+5. **Out of memory**: Docker builds need 16GB RAM
