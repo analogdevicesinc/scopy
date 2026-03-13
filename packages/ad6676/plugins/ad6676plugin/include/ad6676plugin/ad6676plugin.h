@@ -34,10 +34,14 @@ class IIOWidgetGroup;
 
 namespace scopy::ad6676 {
 
+class AD6676_API;
+
 class SCOPY_AD6676PLUGIN_EXPORT Ad6676Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	friend class AD6676_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -54,6 +58,9 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
+
+	AD6676_API *m_api = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
