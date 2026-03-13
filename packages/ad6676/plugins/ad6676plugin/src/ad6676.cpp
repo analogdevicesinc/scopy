@@ -53,8 +53,7 @@ Ad6676::~Ad6676() {}
 // Widget helper methods
 // ---------------------------------------------------------------------------
 
-IIOWidget *Ad6676::createRangeWidget(iio_channel *ch, const QString &attr, const QString &range,
-				     const QString &title)
+IIOWidget *Ad6676::createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
 				    .device(m_dev)
@@ -161,12 +160,27 @@ void Ad6676::setupUi()
 	centralLayout->setContentsMargins(0, 0, 0, 0);
 	centralLayout->setSpacing(10);
 
-	centralLayout->addWidget(createAdcSettingsSection(m_centralWidget));
-	centralLayout->addWidget(createBandwidthSettingsSection(m_centralWidget));
-	centralLayout->addWidget(createReceiveSettingsSection(m_centralWidget));
-	centralLayout->addWidget(createShufflerSettingsSection(m_centralWidget));
-	centralLayout->addWidget(createTestSettingsSection(m_centralWidget));
+	QWidget *contentWidget = new QWidget(m_centralWidget);
 
+	Style::setBackgroundColor(contentWidget, json::theme::background_primary);
+	Style::setStyle(contentWidget, style::properties::widget::border_interactive);
+
+	QVBoxLayout *contentWidgetLayout = new QVBoxLayout(contentWidget);
+	contentWidgetLayout->setMargin(0);
+	contentWidgetLayout->setContentsMargins(0, 0, 0, 0);
+	contentWidgetLayout->setSpacing(10);
+
+	MenuCollapseSection *collapseSection = new MenuCollapseSection("AD6676", MenuCollapseSection::MHCW_NONE,
+							MenuCollapseSection::MHW_BASEWIDGET, m_centralWidget);
+
+	collapseSection->contentLayout()->addWidget(createAdcSettingsSection(collapseSection));
+	collapseSection->contentLayout()->addWidget(createBandwidthSettingsSection(collapseSection));
+	collapseSection->contentLayout()->addWidget(createReceiveSettingsSection(collapseSection));
+	collapseSection->contentLayout()->addWidget(createShufflerSettingsSection(collapseSection));
+	collapseSection->contentLayout()->addWidget(createTestSettingsSection(collapseSection));
+	contentWidgetLayout->addWidget(collapseSection);
+
+	centralLayout->addWidget(contentWidget);
 	centralLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	m_tool->addWidgetToCentralContainerHelper(m_scrollArea);
@@ -213,24 +227,28 @@ void Ad6676::updateBandwidthRange(QString adcFreqMhz)
 	auto *bwSpinbox = m_bwWidget->findChild<gui::MenuSpinbox *>();
 	if(bwSpinbox) {
 		bwSpinbox->setMinValue(0.005 * freqMhz); // 0.5% of ADC freq
-		bwSpinbox->setMaxValue(0.05 * freqMhz);  // 5% of ADC freq
+		bwSpinbox->setMaxValue(0.05 * freqMhz);	 // 5% of ADC freq
 	}
 }
 
-void Ad6676::onAdcFreqDisplayed(QString data, QString)
-{
-	updateBandwidthRange(data);
-}
+void Ad6676::onAdcFreqDisplayed(QString data, QString) { updateBandwidthRange(data); }
 
 // ---------------------------------------------------------------------------
 // Section creation — attributes ported from iio-oscilloscope ad6676.c
 // Device: axi-ad6676-hpc / Channel: voltage0 (input, false)
 // ---------------------------------------------------------------------------
 
-MenuSectionCollapseWidget *Ad6676::createAdcSettingsSection(QWidget *parent)
+QWidget *Ad6676::createAdcSettingsSection(QWidget *parent)
 {
-	auto *section = new MenuSectionCollapseWidget("ADC Settings", MenuCollapseSection::MHCW_NONE,
-						      MenuCollapseSection::MHW_BASEWIDGET, parent);
+	QWidget *section = new QWidget(parent);
+
+	QVBoxLayout *layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setContentsMargins(5, 5, 5, 5);
+	section->setLayout(layout);
+
+	QLabel *label = new QLabel("ADC Settings");
+	layout->addWidget(label);
 
 	// adc_frequency: IIO in Hz, UI in MHz. Range 2925–3200 MHz.
 	m_adcFreqWidget = createRangeWidget(m_chn, "adc_frequency", "[2925 1 3200]", "ADC Frequency (MHz)");
@@ -239,16 +257,23 @@ MenuSectionCollapseWidget *Ad6676::createAdcSettingsSection(QWidget *parent)
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 3); });
 		m_adcFreqWidget->setUItoDataConversion(
 			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
-		section->add(m_adcFreqWidget);
+		layout->addWidget(m_adcFreqWidget);
 	}
 
 	return section;
 }
 
-MenuSectionCollapseWidget *Ad6676::createBandwidthSettingsSection(QWidget *parent)
+QWidget *Ad6676::createBandwidthSettingsSection(QWidget *parent)
 {
-	auto *section = new MenuSectionCollapseWidget("Bandwidth Settings", MenuCollapseSection::MHCW_NONE,
-						      MenuCollapseSection::MHW_BASEWIDGET, parent);
+	QWidget *section = new QWidget(parent);
+
+	QVBoxLayout *layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setContentsMargins(5, 5, 5, 5);
+	section->setLayout(layout);
+
+	QLabel *label = new QLabel("Bandwidth Settings");
+	layout->addWidget(label);
 
 	// bandwidth: IIO in Hz, UI in MHz. Initial range 14.625–160 MHz (= 0.5%–5% of 2925 MHz).
 	// Range is dynamically updated when adc_frequency changes (see updateBandwidthRange).
@@ -271,19 +296,30 @@ MenuSectionCollapseWidget *Ad6676::createBandwidthSettingsSection(QWidget *paren
 
 	QHBoxLayout *bwLayout = new QHBoxLayout();
 	bwLayout->setContentsMargins(0, 0, 0, 0);
-	if(m_bwWidget)   bwLayout->addWidget(m_bwWidget);
-	if(bwMarginLow)  bwLayout->addWidget(bwMarginLow);
-	if(bwMarginHigh) bwLayout->addWidget(bwMarginHigh);
-	if(bwMarginIf)   bwLayout->addWidget(bwMarginIf);
-	section->contentLayout()->addLayout(bwLayout);
+	if(m_bwWidget)
+		bwLayout->addWidget(m_bwWidget);
+	if(bwMarginLow)
+		bwLayout->addWidget(bwMarginLow);
+	if(bwMarginHigh)
+		bwLayout->addWidget(bwMarginHigh);
+	if(bwMarginIf)
+		bwLayout->addWidget(bwMarginIf);
+	layout->addLayout(bwLayout);
 
 	return section;
 }
 
-MenuSectionCollapseWidget *Ad6676::createReceiveSettingsSection(QWidget *parent)
+QWidget *Ad6676::createReceiveSettingsSection(QWidget *parent)
 {
-	auto *section = new MenuSectionCollapseWidget("Receive Settings", MenuCollapseSection::MHCW_NONE,
-						      MenuCollapseSection::MHW_BASEWIDGET, parent);
+	QWidget *section = new QWidget(parent);
+
+	QVBoxLayout *layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setContentsMargins(5, 5, 5, 5);
+	section->setLayout(layout);
+
+	QLabel *label = new QLabel("Receive Settings");
+	layout->addWidget(label);
 
 	// intermediate_frequency: IIO in Hz, UI in MHz. Range 70–450 MHz.
 	IIOWidget *ifWidget =
@@ -296,8 +332,7 @@ MenuSectionCollapseWidget *Ad6676::createReceiveSettingsSection(QWidget *parent)
 	}
 
 	// sampling_frequency: IIO in Hz, UI in MHz. Display-only (editable=False in glade).
-	IIOWidget *sampFreqWidget =
-		createReadOnlyWidget(m_chn, "sampling_frequency", "Data Rate (MSPS)");
+	IIOWidget *sampFreqWidget = createReadOnlyWidget(m_chn, "sampling_frequency", "Data Rate (MSPS)");
 	if(sampFreqWidget) {
 		sampFreqWidget->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 3); });
@@ -319,23 +354,38 @@ MenuSectionCollapseWidget *Ad6676::createReceiveSettingsSection(QWidget *parent)
 				return QString("0");
 			return QString::number((int)(20.0 * log10(1.0 / linear) + 0.5));
 		});
+		scaleWidget->setUItoDataConversion([](QString data) {
+			double dbfs = data.toDouble();
+			return QString::number(pow(10.0, -dbfs / 20.0), 'g', 10);
+		});
 	}
 
 	QHBoxLayout *rxLayout = new QHBoxLayout();
 	rxLayout->setContentsMargins(0, 0, 0, 0);
-	if(ifWidget)       rxLayout->addWidget(ifWidget);
-	if(sampFreqWidget) rxLayout->addWidget(sampFreqWidget);
-	if(gainWidget)     rxLayout->addWidget(gainWidget);
-	if(scaleWidget)    rxLayout->addWidget(scaleWidget);
-	section->contentLayout()->addLayout(rxLayout);
+	if(ifWidget)
+		rxLayout->addWidget(ifWidget);
+	if(sampFreqWidget)
+		rxLayout->addWidget(sampFreqWidget);
+	if(gainWidget)
+		rxLayout->addWidget(gainWidget);
+	if(scaleWidget)
+		rxLayout->addWidget(scaleWidget);
+	layout->addLayout(rxLayout);
 
 	return section;
 }
 
-MenuSectionCollapseWidget *Ad6676::createShufflerSettingsSection(QWidget *parent)
+QWidget *Ad6676::createShufflerSettingsSection(QWidget *parent)
 {
-	auto *section = new MenuSectionCollapseWidget("Shuffler Settings", MenuCollapseSection::MHCW_NONE,
-						      MenuCollapseSection::MHW_BASEWIDGET, parent);
+	QWidget *section = new QWidget(parent);
+
+	QVBoxLayout *layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setContentsMargins(5, 5, 5, 5);
+	section->setLayout(layout);
+
+	QLabel *label = new QLabel("Shuffler Settings");
+	layout->addWidget(label);
 
 	// shuffler_control: options from shuffler_control_available
 	IIOWidget *shufflerCtrl =
@@ -347,24 +397,32 @@ MenuSectionCollapseWidget *Ad6676::createShufflerSettingsSection(QWidget *parent
 
 	QHBoxLayout *shufflerLayout = new QHBoxLayout();
 	shufflerLayout->setContentsMargins(0, 0, 0, 0);
-	if(shufflerCtrl)   shufflerLayout->addWidget(shufflerCtrl);
-	if(shufflerThresh) shufflerLayout->addWidget(shufflerThresh);
-	section->contentLayout()->addLayout(shufflerLayout);
+	if(shufflerCtrl)
+		shufflerLayout->addWidget(shufflerCtrl);
+	if(shufflerThresh)
+		shufflerLayout->addWidget(shufflerThresh);
+	layout->addLayout(shufflerLayout);
 
 	return section;
 }
 
-MenuSectionCollapseWidget *Ad6676::createTestSettingsSection(QWidget *parent)
+QWidget *Ad6676::createTestSettingsSection(QWidget *parent)
 {
-	auto *section = new MenuSectionCollapseWidget("Test Settings", MenuCollapseSection::MHCW_NONE,
-						      MenuCollapseSection::MHW_BASEWIDGET, parent);
+	QWidget *section = new QWidget(parent);
+
+	QVBoxLayout *layout = new QVBoxLayout();
+	layout->setSpacing(10);
+	layout->setContentsMargins(5, 5, 5, 5);
+	section->setLayout(layout);
+
+	QLabel *label = new QLabel("Test Settings");
+	layout->addWidget(label);
 
 	// test_mode: options from test_mode_available
 	// Note: sr_attribs in original uses "stest_mode" — may be a legacy alias; "test_mode" used here.
-	IIOWidget *testMode =
-		createComboWidget(m_chn, "test_mode", "test_mode_available", "Test Mode");
+	IIOWidget *testMode = createComboWidget(m_chn, "test_mode", "test_mode_available", "Test Mode");
 	if(testMode)
-		section->add(testMode);
+		layout->addWidget(testMode);
 
 	return section;
 }
