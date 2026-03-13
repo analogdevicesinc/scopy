@@ -21,6 +21,8 @@
 
 #include "fmcomms11plugin.h"
 #include "fmcomms11.h"
+#include "fmcomms11_api.h"
+#include <pluginbase/scopyjs.h>
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -102,11 +104,18 @@ bool Fmcomms11Plugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
 
+	initApi();
 	return true;
 }
 
 bool Fmcomms11Plugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -139,6 +148,13 @@ void Fmcomms11Plugin::initMetadata()
 	   "exclude":["m2kplugin"]
 	}
 )plugin");
+}
+
+void Fmcomms11Plugin::initApi()
+{
+	m_api = new Fmcomms11_API(this);
+	m_api->setObjectName("fmcomms11");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 #include "moc_fmcomms11plugin.cpp"
