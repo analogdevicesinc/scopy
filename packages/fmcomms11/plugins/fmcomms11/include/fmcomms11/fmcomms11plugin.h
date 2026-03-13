@@ -35,10 +35,13 @@ class IIOWidgetGroup;
 
 namespace scopy::fmcomms11 {
 
+class Fmcomms11_API;
+
 class SCOPY_FMCOMMS11_EXPORT Fmcomms11Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+	friend class Fmcomms11_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -55,7 +58,10 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
+
 	IIOWidgetGroup *m_widgetGroup = nullptr;
+	Fmcomms11_API *m_api = nullptr;
 };
 } // namespace scopy::fmcomms11
 #endif // FMCOMMS11PLUGIN_H
