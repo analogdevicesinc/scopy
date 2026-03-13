@@ -67,11 +67,11 @@ private:
 	IIOWidget *createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
 
 	// Section creation methods — one per glade frame
-	MenuSectionCollapseWidget *createAdcSettingsSection(QWidget *parent);
-	MenuSectionCollapseWidget *createBandwidthSettingsSection(QWidget *parent);
-	MenuSectionCollapseWidget *createReceiveSettingsSection(QWidget *parent);
-	MenuSectionCollapseWidget *createShufflerSettingsSection(QWidget *parent);
-	MenuSectionCollapseWidget *createTestSettingsSection(QWidget *parent);
+	QWidget *createAdcSettingsSection(QWidget *parent);
+	QWidget *createBandwidthSettingsSection(QWidget *parent);
+	QWidget *createReceiveSettingsSection(QWidget *parent);
+	QWidget *createShufflerSettingsSection(QWidget *parent);
+	QWidget *createTestSettingsSection(QWidget *parent);
 
 	iio_context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
