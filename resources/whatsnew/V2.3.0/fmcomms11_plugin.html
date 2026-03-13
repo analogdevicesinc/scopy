@@ -1,0 +1,23 @@
+<h1>FMCOMMS11 Plugin</h1>
+
+<p>Scopy now offers dedicated support for the AD-FMCOMMS11-EBZ evaluation board.</p>
+
+<p>The new <b>FMCOMMS11 Tool</b> enables you to integrate and control AD-FMCOMMS11-EBZ-based devices within Scopy. It provides a unified interface for configuring the high-speed RF DAC (AD9162), high-speed ADC (AD9625), input step attenuator (HMC1119), and output variable gain amplifier (ADL5240) through the IIO framework.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>ADC Control:</b> Configure test mode and input scale for the AD9625 high-speed ADC, with live sampling frequency readback.</li>
+  <li><b>Input Attenuation:</b> Adjust the HMC1119 step attenuator gain from 0 to &minus;31.75 dB in 0.25 dB steps.</li>
+  <li><b>DAC Control:</b> Set the NCO frequency and enable the FIR85 digital filter for the AD9162 RF DAC, with live sampling frequency readback.</li>
+  <li><b>Output VGA:</b> Adjust the ADL5240 variable gain amplifier from &minus;11.5 to +20 dB in 0.5 dB steps.</li>
+  <li><b>DDS Support:</b> Direct digital synthesis for the DAC is handled by the generic DAC plugin working alongside this plugin.</li>
+</ul>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Connect your AD-FMCOMMS11-EBZ device to your computer.</li>
+  <li>Ensure the IIO drivers for the AD9625, AD9162, HMC1119, and ADL5240 are properly installed.</li>
+  <li>Open Scopy and select the <b>FMCOMMS11</b> tool from the available instruments.</li>
+</ol>
+
+<p>For more detailed information, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/fmcomms11/fmcomms11.html" target="_blank">official documentation</a>.</p>
