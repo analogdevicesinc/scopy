@@ -103,10 +103,7 @@ QString Fmcomms11_API::getAdcSamplingFrequency()
 
 QString Fmcomms11_API::getAdcScale() { return readFromWidget("axi-ad9625-hpc/voltage0_in/scale"); }
 
-void Fmcomms11_API::setAdcScale(const QString &value)
-{
-	writeToWidget("axi-ad9625-hpc/voltage0_in/scale", value);
-}
+void Fmcomms11_API::setAdcScale(const QString &value) { writeToWidget("axi-ad9625-hpc/voltage0_in/scale", value); }
 
 QString Fmcomms11_API::getAdcTestMode() { return readFromWidget("axi-ad9625-hpc/voltage0_in/test_mode"); }
 
@@ -137,19 +134,13 @@ void Fmcomms11_API::setNcoFrequency(const QString &value) { writeToWidget(ncoKey
 
 QString Fmcomms11_API::isFir85Enabled() { return readFromWidget("axi-ad9162-hpc/fir85_enable"); }
 
-void Fmcomms11_API::setFir85Enabled(const QString &value)
-{
-	writeToWidget("axi-ad9162-hpc/fir85_enable", value);
-}
+void Fmcomms11_API::setFir85Enabled(const QString &value) { writeToWidget("axi-ad9162-hpc/fir85_enable", value); }
 
 // --- Output amplifier (ADL5240) ---
 
 QString Fmcomms11_API::getOutputGain() { return readFromWidget("adl5240/voltage0_out/hardwaregain"); }
 
-void Fmcomms11_API::setOutputGain(const QString &value)
-{
-	writeToWidget("adl5240/voltage0_out/hardwaregain", value);
-}
+void Fmcomms11_API::setOutputGain(const QString &value) { writeToWidget("adl5240/voltage0_out/hardwaregain", value); }
 
 // --- Generic widget access ---
 
