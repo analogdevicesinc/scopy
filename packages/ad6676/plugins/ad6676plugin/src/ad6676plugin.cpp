@@ -20,6 +20,7 @@
 
 #include "ad6676plugin.h"
 #include "ad6676.h"
+#include "ad6676_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -27,6 +28,7 @@
 #include "scopy-ad6676plugin_config.h"
 #include <iioutil/connectionprovider.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <pluginbase/scopyjs.h>
 #include <iio.h>
 
 Q_LOGGING_CATEGORY(CAT_AD6676PLUGIN, "Ad6676Plugin")
@@ -60,9 +62,9 @@ bool Ad6676Plugin::loadIcon()
 
 void Ad6676Plugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
-		"ad6676tool", "AD6676",
-		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad6676tool", "AD6676",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void Ad6676Plugin::unload() {}
@@ -86,11 +88,18 @@ bool Ad6676Plugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
 
+	initApi();
 	return true;
 }
 
 bool Ad6676Plugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -109,6 +118,13 @@ bool Ad6676Plugin::onDisconnect()
 
 	ConnectionProvider::close(m_param);
 	return true;
+}
+
+void Ad6676Plugin::initApi()
+{
+	m_api = new AD6676_API(this);
+	m_api->setObjectName("ad6676");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void Ad6676Plugin::initMetadata()
