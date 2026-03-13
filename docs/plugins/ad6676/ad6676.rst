@@ -1,0 +1,64 @@
+.. _ad6676:
+
+AD6676
+================================================================================
+
+The AD6676 plugin provides a direct interface for configuring the AD6676 wideband IF
+receiver subsystem. All settings are written to hardware immediately when a value is
+changed. If the hardware adjusts a value to the nearest supported setting, the updated
+value is read back and displayed automatically. Use the **Refresh** button to re-read
+all current hardware values at any time.
+
+.. AN_IMAGE_WILL_BE_HERE
+
+ADC Settings
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+
+  - **adc_frequency:** ADC sampling frequency in MHz. Valid range is 2925–3200 MHz.
+    Changing this value dynamically updates the valid range for the IF bandwidth setting.
+
+Bandwidth Settings
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+
+  - **bandwidth:** IF bandwidth in MHz. The valid range is automatically bounded to
+    0.5%–5% of the current ADC frequency; values outside this range are clamped by
+    the hardware.
+  - **bw_margin_low:** Lower bandwidth margin. Range 0–30.
+  - **bw_margin_high:** Upper bandwidth margin. Range 0–30.
+  - **bw_margin_if:** IF bandwidth margin. Range -30–30.
+
+Receive Settings
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+
+  - **intermediate_frequency:** IF center frequency in MHz. Valid range is 70–450 MHz.
+  - **sampling_frequency:** Read-only. Displays the resulting output data rate in MSPS
+    as determined by the current ADC frequency and bandwidth configuration.
+  - **hardwaregain:** Receiver attenuation in dB. Range -27–0 dB; more negative values
+    apply greater attenuation.
+  - **scale:** Input signal power in dBFS. Range 0–12.04 dBFS. Internally the driver
+    stores this as a linear voltage ratio; the plugin displays the dBFS representation.
+
+Shuffler Settings
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+
+  - **shuffler_control:** Selects the shuffler operating mode from the list of options
+    supported by the hardware.
+  - **shuffler_thresh:** Selects the shuffler threshold level from the list of options
+    supported by the hardware.
+
+Test Settings
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+
+  - **test_mode:** Selects the test pattern injected into the ADC data path. Choose from
+    the available options (e.g., off, midscale short, positive full scale, negative full
+    scale, alternating checkerboard, PN sequence, etc.) to verify data path integrity.
