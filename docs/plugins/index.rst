@@ -79,6 +79,8 @@ Application Specific plugins
 
 * DAQ2
     * :ref:`DAQ2 <daq2>`
+* AD6676
+    * :ref:`AD6676 <ad6676>`
 
 Contents
 ---------------------------------------------------------------------
@@ -102,6 +104,7 @@ Contents
    fmcomms11/fmcomms11
    cn0357/cn0357
    daq2/daq2
+   ad6676/index
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
