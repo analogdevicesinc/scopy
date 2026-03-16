@@ -69,6 +69,35 @@ PlotNavigator::PlotNavigator(PlotWidget *plotWidget, QSet<PlotChannel *> *channe
 	init();
 }
 
+PlotNavigator::PlotNavigator(QwtPlot *plot, QSet<QwtAxisId> *axes, QObject *parent)
+	: QObject(parent ? parent : plot)
+	, m_plotWidget(nullptr)
+	, m_plot(plot)
+	, m_axes(axes)
+	, m_channels(new QSet<PlotChannel *>())
+	, m_navigators(new QSet<Navigator *>())
+	, m_en(true)
+	, m_historyEn(true)
+	, m_autoBase(true)
+	, m_zoomerEn(true)
+	, m_magnifierEn(true)
+	, m_resetOnNewBase(true)
+	, m_zoomerXModifier(Qt::ShiftModifier)
+	, m_zoomerYModifier(Qt::ControlModifier)
+	, m_zoomerXYModifier(Qt::NoModifier)
+	, m_magnifierPanModifier(Qt::ShiftModifier)
+	, m_magnifierZoomModifier(Qt::NoModifier)
+	, m_resetButton(nullptr)
+{
+	initResetButton();
+	setResetButtonEn(true);
+	initNavigators();
+	connect(this, &PlotNavigator::undo, this, &PlotNavigator::onUndo);
+	connect(this, &PlotNavigator::reset, this, &PlotNavigator::onReset);
+	setEnabled(m_en);
+	setHistoryEn(m_historyEn);
+}
+
 void PlotNavigator::init()
 {
 	for(PlotChannel *ch : *m_channels) {
@@ -207,13 +236,15 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	connect(zoomer, &PlotZoomer::reset, this,
 		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 
-	connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
-		if(m_autoBase) {
-			setBaseRect(axisId);
-			if(m_resetOnNewBase)
-				Q_EMIT reset();
-		}
-	});
+	if(m_plotWidget) {
+		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
+			if(m_autoBase) {
+				setBaseRect(axisId);
+				if(m_resetOnNewBase)
+					Q_EMIT reset();
+			}
+		});
+	}
 
 	Q_EMIT addedNavigator(nav);
 }
@@ -339,6 +370,25 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 	}
 
 	m_channels->insert(channel);
+	m_visibleZoomer->setEnabled(isZoomerEn());
+}
+
+void PlotNavigator::addAxis(PlotAxis *axis)
+{
+	QwtAxisId axisId = axis->axisId();
+	if(!m_axes->contains(axisId)) {
+		m_axes->insert(axisId);
+		addNavigators(axisId);
+		setBaseRect(axisId);
+	}
+	// Connect axis scale updates for auto-base rect
+	connect(axis, &PlotAxis::axisScaleUpdated, this, [=]() {
+		if(m_autoBase) {
+			setBaseRect(axisId);
+			if(m_resetOnNewBase)
+				Q_EMIT reset();
+		}
+	});
 	m_visibleZoomer->setEnabled(isZoomerEn());
 }
 

@@ -62,11 +62,13 @@ class SCOPY_GUI_EXPORT PlotNavigator : public QObject
 
 public:
 	explicit PlotNavigator(PlotWidget *plotWidget, QSet<PlotChannel *> *channels = new QSet<PlotChannel *>());
+	explicit PlotNavigator(QwtPlot *plot, QSet<QwtAxisId> *axes, QObject *parent = nullptr);
 	~PlotNavigator();
 
 	QSet<PlotChannel *> *channels();
 	void addChannel(PlotChannel *channel);
 	void removeChannel(PlotChannel *channel);
+	void addAxis(PlotAxis *axis);
 
 	bool isZoomed();
 	void forcePan(QwtAxisId axisId, double factor);
