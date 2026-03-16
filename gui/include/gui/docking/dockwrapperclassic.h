@@ -37,6 +37,7 @@ public:
 	QWidget *innerWidget() const override;
 
 	void setActivated(bool isActivated) override;
+	void setTitle(const QString &title) override;
 
 private:
 	void init();

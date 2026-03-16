@@ -69,6 +69,35 @@ PlotNavigator::PlotNavigator(PlotWidget *plotWidget, QSet<PlotChannel *> *channe
 	init();
 }
 
+PlotNavigator::PlotNavigator(QwtPlot *plot, QSet<QwtAxisId> *axes, QObject *parent)
+	: QObject(parent ? parent : plot)
+	, m_plotWidget(nullptr)
+	, m_plot(plot)
+	, m_axes(axes)
+	, m_channels(new QSet<PlotChannel *>())
+	, m_navigators(new QSet<Navigator *>())
+	, m_en(true)
+	, m_historyEn(true)
+	, m_autoBase(true)
+	, m_zoomerEn(true)
+	, m_magnifierEn(true)
+	, m_resetOnNewBase(true)
+	, m_zoomerXModifier(Qt::ShiftModifier)
+	, m_zoomerYModifier(Qt::ControlModifier)
+	, m_zoomerXYModifier(Qt::NoModifier)
+	, m_magnifierPanModifier(Qt::ShiftModifier)
+	, m_magnifierZoomModifier(Qt::NoModifier)
+	, m_resetButton(nullptr)
+{
+	initResetButton();
+	setResetButtonEn(true);
+	initNavigators();
+	connect(this, &PlotNavigator::undo, this, &PlotNavigator::onUndo);
+	connect(this, &PlotNavigator::reset, this, &PlotNavigator::onReset);
+	setEnabled(m_en);
+	setHistoryEn(m_historyEn);
+}
+
 void PlotNavigator::init()
 {
 	for(PlotChannel *ch : *m_channels) {
@@ -207,13 +236,15 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	connect(zoomer, &PlotZoomer::reset, this,
 		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 
-	connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
-		if(m_autoBase) {
-			setBaseRect(axisId);
-			if(m_resetOnNewBase)
-				Q_EMIT reset();
-		}
-	});
+	if(m_plotWidget) {
+		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
+			if(m_autoBase) {
+				setBaseRect(axisId);
+				if(m_resetOnNewBase)
+					Q_EMIT reset();
+			}
+		});
+	}
 
 	Q_EMIT addedNavigator(nav);
 }
@@ -339,6 +370,25 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 	}
 
 	m_channels->insert(channel);
+	m_visibleZoomer->setEnabled(isZoomerEn());
+}
+
+void PlotNavigator::addAxis(PlotAxis *axis)
+{
+	QwtAxisId axisId = axis->axisId();
+	if(!m_axes->contains(axisId)) {
+		m_axes->insert(axisId);
+		addNavigators(axisId);
+		setBaseRect(axisId);
+	}
+	// Connect axis scale updates for auto-base rect
+	connect(axis, &PlotAxis::axisScaleUpdated, this, [=]() {
+		if(m_autoBase) {
+			setBaseRect(axisId);
+			if(m_resetOnNewBase)
+				Q_EMIT reset();
+		}
+	});
 	m_visibleZoomer->setEnabled(isZoomerEn());
 }
 
@@ -666,6 +716,46 @@ void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav
 			    nav2->magnifier->getYAxis() == nav1->magnifier->getYAxis())) {
 				syncNavigators(pNav2, nav2, pNav1, nav1);
 			}
+		}
+	});
+}
+
+// Sync only the X-axis navigators between two navigators that may belong to
+// different QwtPlot instances (and thus have different QwtAxisIds).
+// Handles navigators added both now and in the future (e.g. when channels
+// are added to a PlotWidget after construction).
+void PlotNavigator::syncXNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2)
+{
+	syncPlotNavigatorSignals(pNav1, pNav2);
+
+	// Sync navigators that already exist on both sides.
+	for(Navigator *nav1 : *pNav1->navigators()) {
+		if(!nav1->magnifier->isXAxisEn())
+			continue;
+		for(Navigator *nav2 : *pNav2->navigators()) {
+			if(!nav2->magnifier->isXAxisEn())
+				continue;
+			syncNavigators(pNav1, nav1, pNav2, nav2);
+		}
+	}
+
+	// Sync navigators added to pNav1 in the future against all current and
+	// future X-axis navigators on pNav2.
+	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [=](Navigator *nav1) {
+		if(!nav1->magnifier->isXAxisEn())
+			return;
+		for(Navigator *nav2 : *pNav2->navigators()) {
+			if(nav2->magnifier->isXAxisEn())
+				syncNavigators(pNav1, nav1, pNav2, nav2);
+		}
+	});
+
+	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [=](Navigator *nav2) {
+		if(!nav2->magnifier->isXAxisEn())
+			return;
+		for(Navigator *nav1 : *pNav1->navigators()) {
+			if(nav1->magnifier->isXAxisEn())
+				syncNavigators(pNav2, nav2, pNav1, nav1);
 		}
 	});
 }
