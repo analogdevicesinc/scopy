@@ -43,7 +43,7 @@
 //   TST.PREF.DEFAULT_YMODE - Requires app restart
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("ADC Documentation Tests");
