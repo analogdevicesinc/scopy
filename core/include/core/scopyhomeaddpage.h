@@ -67,6 +67,10 @@ private:
 	void loadDeviceInfoPage();
 	void initializeDevice();
 	void removePluginsCheckBoxes();
+#ifdef __linux__
+	void createSudoDialog();
+#endif
+
 	QTabWidget *createTabWidget(QWidget *parent);
 	QWidget *createInfoSection(QWidget *parent);
 	QWidget *createBtnsWidget(QWidget *parent);
