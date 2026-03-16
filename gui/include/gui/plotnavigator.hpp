@@ -25,6 +25,7 @@
 #include <QSet>
 #include <QStack>
 #include <QwtPlot>
+#include <plotaxis.h>
 #include "scopy-gui_export.h"
 
 class QPushButton;

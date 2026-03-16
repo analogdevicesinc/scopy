@@ -173,7 +173,13 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() {
+		m_plotComponentManager->selectChannel(c);
+		for(auto *plt : m_plotComponentManager->plots()) {
+			if(auto *fftPlt = dynamic_cast<FFTPlotComponent *>(plt))
+				fftPlt->setActiveChannel(c);
+		}
+	});
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
 	dc->addChannel(c);			   // used for sample rate computation
@@ -187,6 +193,10 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 	if(m_defaultRealCh == nullptr) {
 		m_defaultRealCh = c;
 		m_plotComponentManager->selectChannel(c);
+		for(auto *plt : m_plotComponentManager->plots()) {
+			if(auto *fftPlt = dynamic_cast<FFTPlotComponent *>(plt))
+				fftPlt->setActiveChannel(c);
+		}
 	}
 	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
@@ -237,7 +247,13 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() {
+		m_plotComponentManager->selectChannel(c);
+		for(auto *plt : m_plotComponentManager->plots()) {
+			if(auto *fftPlt = dynamic_cast<FFTPlotComponent *>(plt))
+				fftPlt->setActiveChannel(c);
+		}
+	});
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
 	dc->addChannel(c);			   // used for sample rate computation
@@ -329,6 +345,10 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 		if(isComplex) {
 			m_plotComponentManager->selectChannel(m_defaultComplexCh);
 			Q_EMIT m_defaultComplexCh->requestChannelMenu(false);
+			for(auto *plt : m_plotComponentManager->plots()) {
+				if(auto *fftPlt = dynamic_cast<FFTPlotComponent *>(plt))
+					fftPlt->setActiveChannel(m_defaultComplexCh);
+			}
 
 			// Show all enabled complex channels in genalyzer panel
 			for(auto component : components()) {
@@ -344,6 +364,10 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 			m_ui->m_analyze->setChecked(false);
 			m_plotComponentManager->selectChannel(m_defaultRealCh);
 			Q_EMIT m_defaultRealCh->requestChannelMenu(false);
+			for(auto *plt : m_plotComponentManager->plots()) {
+				if(auto *fftPlt = dynamic_cast<FFTPlotComponent *>(plt))
+					fftPlt->setActiveChannel(m_defaultRealCh);
+			}
 
 			m_plotComponentManager->genalyzerPanel()->clear();
 			m_plotComponentManager->enableGenalyzerPanel(false);

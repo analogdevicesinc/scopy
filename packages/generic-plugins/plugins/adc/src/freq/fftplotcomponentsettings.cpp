@@ -29,6 +29,7 @@
 #include <style.h>
 #include <pluginbase/preferences.h>
 #include <filemanager.h>
+#include <gui/waterfallplotwidget.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -103,6 +104,11 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
+	// Sync waterfall intensity (color axis) to the FFT Y-axis range
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double minVal, double maxVal) {
+		m_plotComponent->waterfallPlot()->setIntensityRange(minVal, maxVal);
+	});
+
 	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dBFS", -300, 300, true, false, yaxis);
 	InfoIconWidget::addHoveringInfoToWidget(m_yPwrOffset->label(),
 						"Offsets all channels' Y axis by set a amout units", m_yPwrOffset);
@@ -163,6 +169,9 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->setMin(-140);
 	m_yCtrl->setMax(20);
 	labelsSwitch->onOffswitch()->setChecked(Preferences::get("adc_plot_labels").toBool());
+
+	// Set initial waterfall intensity to match FFT Y-axis defaults
+	m_plotComponent->waterfallPlot()->setIntensityRange(-140.0, 20.0);
 
 	m_deletePlotHover = new QPushButton("", nullptr);
 	m_deletePlotHover->setMaximumSize(16, 16);

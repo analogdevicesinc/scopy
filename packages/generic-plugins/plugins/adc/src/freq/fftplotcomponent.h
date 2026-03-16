@@ -41,6 +41,10 @@
 #include <widgets/plotlegend.h>
 #include <gui/docking/dockableareainterface.h>
 #include <gui/docking/dockwrapperinterface.h>
+#include <gui/waterfallplotwidget.h>
+
+#include <QSplitter>
+#include <QPushButton>
 
 namespace scopy {
 namespace adc {
@@ -53,6 +57,11 @@ public:
 	~FFTPlotComponent();
 
 	virtual PlotWidget *fftPlot();
+	WaterfallPlotWidget *waterfallPlot();
+
+	ChannelComponent *activeChannel() const;
+	void setActiveChannel(ChannelComponent *ch);
+	void updateWaterfallTimeAxis(double sampleRate, uint32_t bufferSize);
 
 public:
 	void addChannel(ChannelComponent *) override;
@@ -66,6 +75,11 @@ public:
 
 private:
 	PlotWidget *m_fftPlot;
+	WaterfallPlotWidget *m_waterfallPlot;
+	QSplitter *m_fftSplitter;
+	QPushButton *m_waterfallToggle;
+	ChannelComponent *m_activeChannel;
+
 	FFTSamplingInfo *m_fftInfo;
 
 	DockableAreaInterface *m_dockableArea;

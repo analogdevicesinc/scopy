@@ -41,6 +41,7 @@ using namespace adc;
 
 FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	: PlotComponent(name, uuid, parent)
+	, m_activeChannel(nullptr)
 {
 	m_dockableArea = createDockableArea(this);
 	QWidget *dockableAreaWidget = m_dockableArea->asWidget();
@@ -53,7 +54,24 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	m_fftPlot->xAxis()->setInterval(0, 1);
 	m_fftPlot->xAxis()->setVisible(true);
 	m_fftPlot->yAxis()->setUnits("dBFS");
-	m_fftDockWrapper->setInnerWidget(m_fftPlot);
+
+	// Waterfall plot below the FFT plot
+	m_waterfallPlot = new WaterfallPlotWidget(this);
+	m_waterfallPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_waterfallPlot->setIntensityRange(-140.0, 20.0);
+	m_waterfallPlot->setFrequencyRange(0.0, 1.0);
+	m_waterfallPlot->setNumRows(200);
+	m_waterfallPlot->xAxis()->setUnits("Hz");
+	m_waterfallPlot->yAxis()->setUnits("s");
+	m_waterfallPlot->setColorBarTitle("dBFS");
+
+	// Vertical splitter: FFT on top, waterfall on bottom
+	m_fftSplitter = new QSplitter(Qt::Vertical, this);
+	m_fftSplitter->addWidget(m_fftPlot);
+	m_fftSplitter->addWidget(m_waterfallPlot);
+	m_fftSplitter->setStretchFactor(0, 1);
+	m_fftSplitter->setStretchFactor(1, 1);
+	m_fftDockWrapper->setInnerWidget(m_fftSplitter);
 
 	m_plots.append(m_fftPlot);
 
@@ -80,11 +98,39 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	int yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt();
 	m_cursor->getPlotCursors()->setXHandlePos((HandlePos)xCursorPos);
 	m_cursor->getPlotCursors()->setYHandlePos((HandlePos)yCursorPos);
+
+	// Toggle button to show/hide waterfall
+	m_waterfallToggle = new QPushButton("W", nullptr);
+	m_waterfallToggle->setCheckable(true);
+	m_waterfallToggle->setChecked(true);
+	m_waterfallToggle->setMaximumSize(16, 16);
+	m_waterfallToggle->setToolTip("Show/Hide Waterfall");
+	m_fftPlot->plotButtonManager()->add(m_waterfallToggle);
+	connect(m_waterfallToggle, &QPushButton::toggled, m_waterfallPlot, &QWidget::setVisible);
 }
 
 FFTPlotComponent::~FFTPlotComponent() {}
 
 PlotWidget *FFTPlotComponent::fftPlot() { return m_plots[0]; }
+
+WaterfallPlotWidget *FFTPlotComponent::waterfallPlot() { return m_waterfallPlot; }
+
+ChannelComponent *FFTPlotComponent::activeChannel() const { return m_activeChannel; }
+
+void FFTPlotComponent::setActiveChannel(ChannelComponent *ch)
+{
+	m_activeChannel = ch;
+	m_waterfallPlot->clearData();
+}
+
+void FFTPlotComponent::updateWaterfallTimeAxis(double sampleRate, uint32_t bufferSize)
+{
+	int rows = m_waterfallPlot->numRows();
+	double secsPerRow = (sampleRate > 0 && bufferSize > 0) ? static_cast<double>(bufferSize) / sampleRate : 1.0;
+	double totalSecs = rows * secsPerRow;
+	m_waterfallPlot->setYRange(0.0, totalSecs);
+	m_waterfallPlot->yAxis()->setUnits("s");
+}
 
 void FFTPlotComponent::addChannel(ChannelComponent *c)
 {

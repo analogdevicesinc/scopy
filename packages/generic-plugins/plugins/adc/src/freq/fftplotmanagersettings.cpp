@@ -24,6 +24,7 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menuheader.h>
 #include <gui/stylehelper.h>
+#include <gui/waterfallplotwidget.h>
 #include <grtimechannelcomponent.h>
 #include <style.h>
 
@@ -276,6 +277,16 @@ void FFTPlotManagerSettings::updateXAxis()
 
 	m_xmin->setValue(min);
 	m_xmax->setValue(max);
+
+	// Update waterfall frequency range and time axis for all FFT plots
+	for(PlotComponent *plt : m_plotManager->plots()) {
+		auto *fftPlt = dynamic_cast<FFTPlotComponent *>(plt);
+		if(fftPlt) {
+			fftPlt->waterfallPlot()->setFrequencyRange(min, max);
+			fftPlt->waterfallPlot()->clearData();
+			fftPlt->updateWaterfallTimeAxis(m_samplingInfo.sampleRate, m_samplingInfo.bufferSize);
+		}
+	}
 }
 
 MenuWidget *FFTPlotManagerSettings::menu() { return m_menu; }
@@ -321,6 +332,12 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 	p->plotMenu()->setComplexMode(m_samplingInfo.complexMode);
 
 	updateXMode(m_xModeCb->combo()->currentIndex(), p->fftPlot()->xAxis());
+
+	// Initialise waterfall freq range and time axis for the new plot
+	double curMin = m_xmin->value();
+	double curMax = m_xmax->value();
+	p->waterfallPlot()->setFrequencyRange(curMin, curMax);
+	p->updateWaterfallTimeAxis(m_samplingInfo.sampleRate, m_samplingInfo.bufferSize);
 }
 
 void FFTPlotManagerSettings::setPlotComboVisible()
