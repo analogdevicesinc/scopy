@@ -30,7 +30,7 @@
 //   LO frequencies are per-device (device 0 and device 1)
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("FMCOMMS5 Documentation Tests");

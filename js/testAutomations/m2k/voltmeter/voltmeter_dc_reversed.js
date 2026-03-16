@@ -29,7 +29,7 @@
 //
 // Reversed loopback. Ch1 measures V- (negative), Ch2 measures V+ (positive).
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 TestFramework.init("Voltmeter DC Reversed Polarity Tests");
 

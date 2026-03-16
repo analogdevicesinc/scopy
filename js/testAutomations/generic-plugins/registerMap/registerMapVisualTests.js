@@ -34,7 +34,7 @@
 // ============================================================================
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("Register Map Visual Validation Tests");

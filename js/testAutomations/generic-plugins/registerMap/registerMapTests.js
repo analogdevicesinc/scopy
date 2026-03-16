@@ -23,7 +23,7 @@
 // Based on TST.REGMAP.* test specifications
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Global wait time configuration
 // Set to 1000 for normal testing, can be increased for external observation

@@ -26,7 +26,7 @@
 // Prerequisite: iio-emu must be running externally for most tests
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: Emulator Tests
 TestFramework.init("Emulator Connection Tests");

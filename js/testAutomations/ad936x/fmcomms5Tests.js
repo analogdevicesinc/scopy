@@ -22,7 +22,7 @@
 // Runs all API tests: Global Settings, RX Chain, TX Chain, Per-Channel, LO, Widget Access, Utility
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: FMCOMMS5 Plugin Tests
 TestFramework.init("FMCOMMS5 Plugin Tests");

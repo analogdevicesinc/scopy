@@ -29,7 +29,7 @@
 // ============================================================================
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("FMCOMMS5 Visual Validation Tests");

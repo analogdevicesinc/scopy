@@ -31,7 +31,7 @@
 //   - Scope CH2+ → W2 (Signal Generator Output 2)
 //   - Scope CH2- → GND
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 TestFramework.init("Spectrum Analyzer Loopback Tests");
 

@@ -2,37 +2,41 @@
 
 ## Running Scripts — Path Requirements
 
-All test scripts use `evaluateFile()` with paths **relative to the Scopy build directory**. The `evaluateFile()` function resolves paths against the current working directory (CWD), not the script file's location. This means **you must always run Scopy from the `build/` directory**:
+All test scripts use `evaluateFile()` with paths **relative to the Scopy build directory**. The `evaluateFile()` function resolves paths against the current working directory (CWD), not the script file's location.
+
+Enable the `JS_TESTS_ENABLED` CMake option to copy the `js/` directory into the build directory, then run tests directly from the build directory:
 
 ```bash
 cd scopy/build/
-./scopy --script ../js/testAutomations/<path-to-test>.js
+cmake .. -DENABLE_SCOPYJS=ON -DJS_TESTS_ENABLED=ON
+make -j$(nproc)
+./scopy --script js/testAutomations/<path-to-test>.js
 ```
 
 For example:
 ```bash
 cd scopy/build/
-./scopy --script ../js/testAutomations/core/pluginLoadTests.js
-./scopy --script ../js/testAutomations/m2k/voltmeter/voltmeter_dc_loopback.js
+./scopy --script js/testAutomations/core/pluginLoadTests.js
+./scopy --script js/testAutomations/m2k/voltmeter/voltmeter_dc_loopback.js
 ```
 
-Running from any other directory will cause `evaluateFile()` calls inside the scripts to fail, since they all load the shared test framework via:
+All test scripts load the shared test framework via:
 ```javascript
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 ```
-This path only resolves correctly when CWD is `build/` (i.e., `build/../js/testAutomations/...`).
+This path resolves correctly from any build directory when `JS_TESTS_ENABLED=ON` is set.
 
 ---
 
 ## Requirements
 
-- **Scopy** built with `-DENABLE_SCOPYJS=ON`
+- **Scopy** built with `-DENABLE_SCOPYJS=ON -DJS_TESTS_ENABLED=ON`
 - **iio-emu** for emulator-based tests (`iio-emu adalm2000`, `iio-emu generic`, etc.)
 - **ADALM2000 hardware** for M2K loopback tests requiring real signal paths
 
 ```bash
 cd scopy/build/
-cmake .. -DENABLE_SCOPYJS=ON
+cmake .. -DENABLE_SCOPYJS=ON -DJS_TESTS_ENABLED=ON
 make -j$(nproc)
 ```
 

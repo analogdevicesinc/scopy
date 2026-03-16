@@ -23,7 +23,7 @@
 // Based on test documentation from docs/tests/plugins/swiot1l/swiot1l_tests.rst
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: SWIOT Supervised Tests
 TestFramework.init("SWIOT Plugin Supervised Tests");
