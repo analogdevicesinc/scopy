@@ -177,6 +177,12 @@ if(ENABLE_TESTING)
 	add_subdirectory(tests)
 endif()
 
+option(JS_TESTS_ENABLED "Copy JS test files to build directory" OFF)
+if(JS_TESTS_ENABLED)
+	message(STATUS "JS tests enabled - copying js/ to build directory")
+	file(COPY ${CMAKE_SOURCE_DIR}/js/ DESTINATION ${CMAKE_BINARY_DIR}/js)
+endif()
+
 option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" OFF)
 if(APPLE)
 	set(ENABLE_APPLICATION_BUNDLE ON)

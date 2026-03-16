@@ -22,7 +22,7 @@
 // Runs all API tests for the FMCOMMS5 Advanced debug attributes
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: FMCOMMS5 Advanced Plugin Tests
 TestFramework.init("FMCOMMS5 Advanced Plugin Tests");

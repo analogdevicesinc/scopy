@@ -22,7 +22,7 @@
 // Runs all API tests: Connection, Global, RX Chain, RX Tracking, TX Chain, TX Tracking, ORX, Widget Access, Utility
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: ADRV9002 Plugin Tests
 TestFramework.init("ADRV9002 Plugin Tests");

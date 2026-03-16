@@ -22,7 +22,7 @@
 // Runs all instrument tests: RMS, Harmonics, Waveform, Settings
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: PQM Plugin Complete Tests
 TestFramework.init("PQM Plugin Complete Tests");

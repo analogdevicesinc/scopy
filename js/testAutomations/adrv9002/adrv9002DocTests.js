@@ -26,7 +26,7 @@
 // Skipped: TST.ADRV9002.CONTROLS.DEVICE_DRIVER_API (no API for version string)
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("ADRV9002 Documentation Tests");

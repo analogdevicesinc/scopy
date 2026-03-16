@@ -23,7 +23,7 @@
 // Based on TST.M2K.SG.* test specifications
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: Signal Generator + Oscilloscope Integration Tests
 TestFramework.init("Signal Generator + Oscilloscope Tests");

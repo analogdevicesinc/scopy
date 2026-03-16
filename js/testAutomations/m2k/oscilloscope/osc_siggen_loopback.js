@@ -61,7 +61,7 @@
 //   - Known C++ bug: setCursorH2 uses getHBar1() instead of getHBar2()
 //   - Known C++ bug: setTriggerSource has guard idx > 0, cannot set to index 0
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 TestFramework.init("Oscilloscope + Signal Generator Loopback Tests");
 

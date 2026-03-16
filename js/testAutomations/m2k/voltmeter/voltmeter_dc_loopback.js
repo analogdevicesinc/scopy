@@ -29,7 +29,7 @@
 //
 // Ch1 measures V+ (positive), Ch2 measures V- (negative)
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 TestFramework.init("Voltmeter DC Loopback Tests");
 

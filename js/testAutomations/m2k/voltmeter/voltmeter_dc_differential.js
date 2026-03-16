@@ -28,7 +28,7 @@
 //
 // Differential measurement: Ch1 measures V+ minus V-
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 TestFramework.init("Voltmeter DC Differential Tests");
 

@@ -37,7 +37,7 @@
 //   - power.sync = false --> independent mode, power.sync = true --> tracking mode
 //   - power.dac2_value can only be set when sync = false (independent mode)
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 TestFramework.init("Power Supply + Voltmeter Loopback Tests");
 

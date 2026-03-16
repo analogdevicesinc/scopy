@@ -30,7 +30,7 @@
 // NOTE: No DIO loopback wires. DIO 8 and DIO 1 are each connected
 // to separate instruments (voltmeter and power supply).
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 var waitTime = 1000;
 

@@ -22,7 +22,7 @@
 // Runs all API tests for the AD936X Advanced debug attributes
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: AD936x Advanced Plugin Tests
 TestFramework.init("AD936x Advanced Plugin Tests");
