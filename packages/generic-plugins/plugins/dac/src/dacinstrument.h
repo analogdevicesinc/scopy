@@ -40,6 +40,7 @@ namespace dac {
 class DacDataManager;
 class SCOPY_DAC_EXPORT DacInstrument : public QWidget
 {
+	friend class DAC_API;
 	Q_OBJECT
 public:
 	DacInstrument(const Connection *conn, QWidget *parent = nullptr);

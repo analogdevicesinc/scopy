@@ -40,6 +40,7 @@ class DataBuffer;
 class TxNode;
 class BufferDacAddon : public DacAddon
 {
+	friend class DAC_API;
 	Q_OBJECT
 public:
 	BufferDacAddon(DacDataModel *model, QWidget *parent = nullptr);
