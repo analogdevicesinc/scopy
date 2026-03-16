@@ -218,6 +218,21 @@ var TestFramework = {
         return this.failedTests === 0 ? 0 : 1;
     },
 
+    // Supervised visual check - prompts user for pass/fail input
+    // Use this in VisualTests when validation requires human observation.
+    // Blocks until the user types 'y' (pass) or 'n' (fail).
+    supervisedCheck: function(description) {
+        printToConsole("  SUPERVISED CHECK: " + description);
+        var response = readFromConsole("  >> Pass? (y/n): ");
+        var passed = (response.trim().toLowerCase() === "y");
+        if (passed) {
+            printToConsole("  PASS: Confirmed by user");
+        } else {
+            printToConsole("  FAIL: Rejected by user");
+        }
+        return passed;
+    },
+
     // Save test results to file
     saveResults: function(filePath) {
         try {
