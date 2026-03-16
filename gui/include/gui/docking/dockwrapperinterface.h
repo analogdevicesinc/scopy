@@ -32,6 +32,7 @@ public:
 	virtual QWidget *innerWidget() const = 0;
 
 	virtual void setActivated(bool) = 0;
+	virtual void setTitle(const QString &title) = 0;
 
 protected:
 	DockWrapperInterface() = default;

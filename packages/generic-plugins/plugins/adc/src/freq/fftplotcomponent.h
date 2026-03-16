@@ -41,6 +41,8 @@
 #include <widgets/plotlegend.h>
 #include <gui/docking/dockableareainterface.h>
 #include <gui/docking/dockwrapperinterface.h>
+#include <gui/waterfallplotwidget.h>
+
 
 namespace scopy {
 namespace adc {
@@ -53,6 +55,12 @@ public:
 	~FFTPlotComponent();
 
 	virtual PlotWidget *fftPlot();
+	WaterfallPlotWidget *waterfallPlot();
+	DockWrapperInterface *waterfallDockWrapper();
+
+	ChannelComponent *activeChannel() const;
+
+	void selectChannel(ChannelComponent *ch) override;
 
 public:
 	void addChannel(ChannelComponent *) override;
@@ -66,10 +74,14 @@ public:
 
 private:
 	PlotWidget *m_fftPlot;
+	WaterfallPlotWidget *m_waterfallPlot;
+	ChannelComponent *m_activeChannel;
+
 	FFTSamplingInfo *m_fftInfo;
 
 	DockableAreaInterface *m_dockableArea;
 	DockWrapperInterface *m_fftDockWrapper;
+	DockWrapperInterface *m_waterfallDockWrapper;
 	PlotLegend *m_legend;
 
 	FFTPlotComponentSettings *m_plotMenu;

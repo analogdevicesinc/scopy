@@ -107,7 +107,7 @@ public:
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel *);
-	void showAxisLabels();
+	virtual void showAxisLabels();
 	void hideAxisLabels();
 	void setAlignCanvasToScales(bool alignCanvasToScales);
 
