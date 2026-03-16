@@ -44,8 +44,13 @@
 
 #include <adcinstrumentcontroller.h>
 namespace scopy {
+
+class PlotAPI;
+
 namespace adc {
 using namespace grutil;
+
+class ADC_API;
 
 typedef enum
 {
@@ -55,6 +60,7 @@ typedef enum
 
 class SCOPY_ADC_EXPORT ADCPlugin : public QObject, public PluginBase
 {
+	friend class ADC_API;
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
@@ -81,7 +87,6 @@ public:
 
 public Q_SLOTS:
 	void preferenceChanged(QString, QVariant t1);
-	void handlePreferences(QString, QVariant);
 
 private:
 	iio_context *m_ctx;
@@ -89,6 +94,11 @@ private:
 	QList<ADCInstrumentController *> m_ctrls;
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
+	void initApi();
+
+	ADC_API *m_api = nullptr;
+	PlotAPI *m_timePlotApi = nullptr;
+	PlotAPI *m_freqPlotApi = nullptr;
 };
 } // namespace adc
 } // namespace scopy

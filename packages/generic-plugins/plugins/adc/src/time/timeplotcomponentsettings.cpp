@@ -102,7 +102,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	MenuSectionCollapseWidget *xySection = new MenuSectionCollapseWidget(
 		"XY PLOT", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
-	QAbstractButton *xySwitch = xySection->collapseSection()->header();
+	m_xySwitch = xySection->collapseSection()->header();
 
 	m_xAxisSrc = new MenuCombo("XY - X Axis source");
 	InfoIconWidget::addHoveringInfoToWidget(
@@ -116,7 +116,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
 	InfoIconWidget::addHoveringInfoToWidget(
 		m_xAxisShow->label(), "Plots selected channel by itself over the current XY plot", m_xAxisShow);
-	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
 		m_plotComponent->xyDockWidget()->setActivated(b);
 		m_xAxisSrc->setVisible(b);
 		m_xAxisShow->setVisible(b);
@@ -179,7 +179,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisShow->setVisible(false);
 
 	// init
-	xySwitch->setChecked(false);
+	m_xySwitch->setChecked(false);
 	m_yCtrl->setMin(-2048);
 	m_yCtrl->setMax(2048);
 	labelsSwitch->onOffswitch()->setChecked(Preferences::get("adc_plot_labels").toBool());

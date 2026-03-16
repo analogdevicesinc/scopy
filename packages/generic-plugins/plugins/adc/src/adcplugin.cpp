@@ -20,7 +20,7 @@
  */
 
 #include "adcplugin.h"
-
+#include "adc_api.h"
 #include "adcinstrument.h"
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -42,6 +42,11 @@
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
 #include "scopy-adc_config.h"
+#include "time/timeplotcomponent.h"
+#include "freq/fftplotcomponent.h"
+
+#include <pluginbase/scopyjs.h>
+#include <gui/plot_api.h>
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -96,8 +101,6 @@ bool ADCPlugin::loadPreferencesPage()
 	Preferences *p = Preferences::GetInstance();
 
 	m_preferencesPage = new QWidget();
-	connect(p, &Preferences::preferenceChanged, m_preferencesPage,
-		[this](QString s, QVariant v) { handlePreferences(s, v); });
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
 	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
@@ -322,6 +325,7 @@ bool ADCPlugin::onConnect()
 	newInstrument(TIME, root, top);
 	newInstrument(FREQUENCY, root, top);
 	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
+	initApi();
 	return true;
 }
 
@@ -479,17 +483,38 @@ void ADCPlugin::preferenceChanged(QString s, QVariant t1)
 	}
 }
 
-void ADCPlugin::handlePreferences(QString s, QVariant v)
+void ADCPlugin::initApi()
 {
-	Preferences *p = Preferences::GetInstance();
-	if(s == "adc_plot_xcursor_position") {
-		Q_EMIT p->restartRequired();
-	} else if(s == "adc_plot_ycursor_position") {
-		Q_EMIT p->restartRequired();
-	} else if(s == "adc_plot_xaxis_label_position") {
-		Q_EMIT p->restartRequired();
-	} else if(s == "adc_plot_yaxis_label_position") {
-		Q_EMIT p->restartRequired();
+	m_api = new ADC_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	m_api->setObjectName("adc");
+	js->registerApi(m_api);
+
+	QJSValue adcJsObj = js->engine()->globalObject().property("adc");
+
+	m_timePlotApi = nullptr;
+	m_freqPlotApi = nullptr;
+
+	for(auto *ctrl : qAsConst(m_ctrls)) {
+		auto *timeCtrl = dynamic_cast<ADCTimeInstrumentController *>(ctrl);
+		if(timeCtrl && timeCtrl->m_plotComponentManager) {
+			auto *plotComp = dynamic_cast<TimePlotComponent *>(timeCtrl->m_plotComponentManager->plot(0));
+			if(plotComp) {
+				m_timePlotApi = new PlotAPI(plotComp, plotComp->timePlot(), plotComp->cursor());
+				m_timePlotApi->setObjectName("timePlot");
+				js->registerApi(m_timePlotApi, adcJsObj);
+			}
+		}
+
+		auto *freqCtrl = dynamic_cast<ADCFFTInstrumentController *>(ctrl);
+		if(freqCtrl && freqCtrl->m_plotComponentManager) {
+			auto *plotComp = dynamic_cast<FFTPlotComponent *>(freqCtrl->m_plotComponentManager->plot(0));
+			if(plotComp) {
+				m_freqPlotApi = new PlotAPI(plotComp, plotComp->fftPlot(), plotComp->cursor());
+				m_freqPlotApi->setObjectName("freqPlot");
+				js->registerApi(m_freqPlotApi, adcJsObj);
+			}
+		}
 	}
 }
 
@@ -498,6 +523,24 @@ bool ADCPlugin::onDisconnect()
 	Preferences *p = Preferences::GetInstance();
 	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
+
+	ScopyJS *js = ScopyJS::GetInstance();
+	if(m_api) {
+		js->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+	if(m_timePlotApi) {
+		js->unregisterApi(m_timePlotApi);
+		delete m_timePlotApi;
+		m_timePlotApi = nullptr;
+	}
+	if(m_freqPlotApi) {
+		js->unregisterApi(m_freqPlotApi);
+		delete m_freqPlotApi;
+		m_freqPlotApi = nullptr;
+	}
+
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 

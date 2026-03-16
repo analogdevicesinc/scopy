@@ -76,10 +76,6 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 
 	connect(m_plotMenu, &FFTPlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
 	m_cursor = new CursorController(m_fftPlot, this);
-	int xCursorPos = Preferences::get("adc_plot_xcursor_position").toInt();
-	int yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt();
-	m_cursor->getPlotCursors()->setXHandlePos((HandlePos)xCursorPos);
-	m_cursor->getPlotCursors()->setYHandlePos((HandlePos)yCursorPos);
 }
 
 FFTPlotComponent::~FFTPlotComponent() {}
