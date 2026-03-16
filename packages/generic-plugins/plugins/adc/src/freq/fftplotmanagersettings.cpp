@@ -81,6 +81,7 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 				tpc->fftPlotInfo()->setShowSPS(m_xModeCb->combo()->currentData().toInt() !=
 							       XMODE_SAMPLES);
 				tpc->fftPlotInfo()->update(s);
+				tpc->waterfallPlot()->updateYAxis();
 			}
 		}
 	});
@@ -276,6 +277,11 @@ void FFTPlotManagerSettings::updateXAxis()
 
 	m_xmin->setValue(min);
 	m_xmax->setValue(max);
+
+	for(auto p : m_plotManager->plots()) {
+		if(auto tpc = dynamic_cast<FFTPlotComponent *>(p))
+			tpc->waterfallPlot()->setFrequencyRange(min, max);
+	}
 }
 
 MenuWidget *FFTPlotManagerSettings::menu() { return m_menu; }

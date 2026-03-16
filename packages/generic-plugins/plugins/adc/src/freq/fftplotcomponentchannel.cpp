@@ -20,12 +20,15 @@
  */
 
 #include "fftplotcomponentchannel.h"
+#include <gui/waterfallplotwidget.h>
 #include <minmaxholdcontroller.hpp>
 #include <pluginbase/preferences.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menuplotaxisrangecontrol.h>
 #include <widgets/menuplotchannelcurvestylecontrol.h>
 #include <widgets/menusectionwidget.h>
+
+#include <vector>
 
 using namespace scopy;
 using namespace adc;
@@ -136,6 +139,17 @@ void FFTPlotComponentChannel::onNewData(const float *xData_, const float *yData_
 
 	m_minMaxHoldController->update(xData_, yData_, size);
 	m_markerController->computeMarkers();
+
+	// Feed waterfall if this channel is the active one
+	if(m_plotComponent && m_plotComponent->activeChannel() == m_ch) {
+		WaterfallPlotWidget *wf = m_plotComponent->waterfallPlot();
+		std::vector<double> buf(size);
+		for(size_t i = 0; i < size; ++i) {
+			buf[i] = static_cast<double>(yData_[i]);
+		}
+		wf->addFFTData(buf.data(), size);
+		wf->replot();
+	}
 }
 
 void FFTPlotComponentChannel::lockYAxis(bool b)

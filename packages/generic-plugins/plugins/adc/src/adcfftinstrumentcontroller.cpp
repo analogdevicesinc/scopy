@@ -173,7 +173,8 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this,
+		[=]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
 	dc->addChannel(c);			   // used for sample rate computation
@@ -237,7 +238,8 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this,
+		[=]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
 	dc->addChannel(c);			   // used for sample rate computation
