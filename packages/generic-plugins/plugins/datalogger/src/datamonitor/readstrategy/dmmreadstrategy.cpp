@@ -36,11 +36,15 @@ DMMReadStrategy::DMMReadStrategy(iio_device *dev, iio_channel *chn)
 void DMMReadStrategy::read()
 {
 	double raw = 0;
-	int readRaw = iio_channel_attr_read_double(chn, "raw", &raw);
+	int ret = iio_channel_attr_read_double(chn, "raw", &raw);
 
-	if(readRaw < 0) {
+	if(ret < 0) {
+		ret = iio_channel_attr_read_double(chn, "input", &raw);
+	}
+
+	if(ret < 0) {
 		char err[1024];
-		iio_strerror(-(int)readRaw, err, sizeof(err));
+		iio_strerror(-ret, err, sizeof(err));
 		qDebug() << "device read error " << err;
 
 	} else {
