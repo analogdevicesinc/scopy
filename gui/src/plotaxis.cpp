@@ -27,6 +27,46 @@
 #include <edgelessplot.h>
 
 using namespace scopy;
+
+PlotAxis::PlotAxis(int position, QwtPlot *plot, int axisIndex, QPen pen, QObject *parent)
+	: QObject(parent)
+	, m_plotWidget(nullptr)
+	, m_plot(plot)
+	, m_position(position)
+	, m_axisId(QwtAxisId(position, axisIndex))
+	, m_units("")
+{
+	m_min = -1;
+	m_max = 1;
+	m_divs = 11.0;
+	m_id = axisIndex;
+
+	m_plot->setAxesCount(position, m_id + 1);
+
+	updateAxisScale();
+
+	m_formatter = new MetricPrefixFormatter();
+	m_formatter->setTrimZeroes(true);
+	m_formatter->setTwoDecimalMode(false);
+	m_scaleDraw = new BasicScaleDraw(m_formatter, m_units);
+
+	m_scaleDraw->setColor(pen.color());
+	m_plot->setAxisScaleDraw(m_axisId, m_scaleDraw);
+
+	m_scaleEngine = new OscScaleEngine();
+	m_scaleEngine->setMajorTicksCount(m_divs);
+	m_plot->setAxisScaleEngine(m_axisId, (QwtScaleEngine *)m_scaleEngine);
+
+	// no addPlotAxis call — caller (WaterfallPlotWidget) tracks axes itself
+
+	setupAxisScale();
+	setVisible(false);
+
+	connect(this, &PlotAxis::minChanged, this, &PlotAxis::updateAxisScale);
+	connect(this, &PlotAxis::maxChanged, this, &PlotAxis::updateAxisScale);
+	setUnitsVisible(false);
+}
+
 PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	: QObject(parent)
 	, m_plotWidget(p)

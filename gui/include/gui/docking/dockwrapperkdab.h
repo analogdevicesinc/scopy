@@ -38,6 +38,7 @@ public:
 	void setInnerWidget(QWidget *innerWidget) override;
 	QWidget *innerWidget() const override;
 	void setActivated(bool isActive) override;
+	void setTitle(const QString &title) override;
 
 private:
 	static int s_dockWrapperId;
