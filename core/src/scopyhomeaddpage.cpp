@@ -29,6 +29,13 @@
 #include <menusectionwidget.h>
 #include <style.h>
 
+#include <popupwidget.h>
+#include <QApplication>
+
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
 Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE, "ScopyHomeAddPage")
 
 using namespace scopy;
@@ -100,6 +107,11 @@ void ScopyHomeAddPage::onVerifyFinished()
 		}
 		Q_EMIT verifyFinished(result);
 	}
+#ifdef __linux__
+	if(m_deviceImpl && m_deviceImpl->param().contains("local:") && getuid() != 0) {
+		createSudoDialog();
+	}
+#endif
 }
 
 void ScopyHomeAddPage::loadDeviceInfoPage()
@@ -270,5 +282,30 @@ QWidget *ScopyHomeAddPage::createAddPage(QWidget *parent)
 	addPageLay->addWidget(buttons);
 	return addPage;
 }
+
+#ifdef __linux__
+void ScopyHomeAddPage::createSudoDialog()
+{
+	PopupWidget *popupWidget = new PopupWidget(QApplication::activeWindow());
+	popupWidget->setDescription("<p>Local IIO devices were found, but certain operations (e.g. write, buffer "
+				    "access) may require elevated "
+				    "privileges. To ensure full access, you can run Scopy from the terminal with "
+				    "administrator privileges.</p>"
+				    "<p><span style='color:orange;'><b>Warning:</b> Running GUI applications as "
+				    "root can introduce security risks!</span></p>");
+	popupWidget->setFocusOnContinueButton();
+	popupWidget->setEnableExternalLinks(true);
+	popupWidget->enableTitleBar(false);
+	popupWidget->enableTintedOverlay(true);
+	popupWidget->enableCenterOnParent(true);
+	popupWidget->getContinueBtn()->setVisible(false);
+	popupWidget->getExitBtn()->setText("Continue as user");
+
+	connect(popupWidget->getExitBtn(), &QPushButton::clicked, this,
+		[popupWidget]() { popupWidget->deleteLater(); });
+
+	Style::setBackgroundColor(popupWidget, json::theme::background_primary);
+}
+#endif
 
 #include "moc_scopyhomeaddpage.cpp"
