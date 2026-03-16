@@ -32,7 +32,7 @@
 // Step 10 (reversed: DIO 8→1+, DIO 1→V+) requires different wiring
 // and is in dio_voltmeter_reversed.js.
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 var waitTime = 1000;
 

@@ -22,7 +22,7 @@
 // Tests: TST.DBG.EXPLR.LOAD, TST.DBG.EXPLR.NAV, TST.DBG.EXPLR.FILTER, TST.DBG.EXPLR.WATCH, TST.DBG.EXPLR.READ_ALL, TST.DBG.EXPLR.LOG, TST.DBG.CODEGEN
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: Debugger Tests
 TestFramework.init("Debugger Plugin Tests");

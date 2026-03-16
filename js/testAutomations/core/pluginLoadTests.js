@@ -30,7 +30,7 @@
 // 6. Disconnects and cleans up
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: Plugin Load Tests
 TestFramework.init("Plugin Load Detection Tests");

@@ -23,7 +23,7 @@
 // Tests: TST.AD9084.CHANNEL_CONFIGURATION, TST.AD9084.DISABLE_ENABLE_RX_TX_TABS
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("AD9084 Documentation Tests");

@@ -25,7 +25,7 @@
 //        TST.DEV.SELECT_TOOL, TST.DEV.ADD_ORDER, TST.DEV.MULTI_CONN, TST.DEV.RM_MULTI
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: Connection Tests
 TestFramework.init("Connection Lifecycle Tests");

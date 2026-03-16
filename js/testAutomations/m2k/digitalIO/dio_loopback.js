@@ -35,7 +35,7 @@
 // mode cannot be set from JS. Group test simulates group behavior using
 // individual pin operations.
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 var waitTime = 1000;
 

@@ -25,7 +25,7 @@
 //        TST.AD936X_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("AD936x Documentation Tests");

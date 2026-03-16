@@ -44,7 +44,7 @@
 // ============================================================================
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Helper function to parse newline-separated string into array
 function parseNewlineSeparatedString(str) {

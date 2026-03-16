@@ -22,7 +22,7 @@
 // Runs all API tests: Connection, Global Settings, RX Chain, TX Chain, Widget Access, Utility
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite: AD936x Plugin Tests
 TestFramework.init("AD936x Plugin Tests");
