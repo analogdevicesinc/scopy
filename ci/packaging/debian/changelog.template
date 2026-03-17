@@ -1,0 +1,5 @@
+${PACKAGE} (${VERSION}-1) stable; urgency=medium
+
+${RELEASE_NOTES}
+
+ -- ${MAINTAINER}  ${DATE}

@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+case "$1" in
+    remove|purge)
+        # Update desktop database
+        if command -v update-desktop-database >/dev/null 2>&1; then
+            update-desktop-database /usr/share/applications/
+        fi
+        ;;
+    *)
+        ;;
+esac
+
+exit 0

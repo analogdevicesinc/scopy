@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+
+# Package variables - will be set by environment from build script
+SCOPY ?= Scopy.AppImage
+PACKAGE ?= scopy
+VERSION ?= 1.0.0
+RELEASE ?= v1.0.0
+ARCHITECTURE ?= arm64
+
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	rm -f $(SCOPY)
+
+override_dh_auto_configure:
+	# No configuration needed for AppImage repackaging
+
+override_dh_auto_build:
+	# Copy the already-built AppImage from the provided path
+	cp $(APPIMAGE_PATH) $(SCOPY)
+	chmod +x $(SCOPY)
+
+override_dh_auto_install:
+	# Install AppImage to /usr/bin
+	install -D -m 0755 $(SCOPY) debian/$(PACKAGE)/usr/bin/$(SCOPY)
+
+	# Install desktop file
+	install -D -m 0644 debian/scopy.desktop debian/$(PACKAGE)/usr/share/applications/scopy.desktop
+
+	# Install icon from source tree
+	install -D -m 0644 gui/res/scopy.png debian/$(PACKAGE)/usr/share/scopy/icons/scopy.png
+
+	# Install copyright
+	install -D -m 0644 debian/copyright debian/$(PACKAGE)/usr/share/doc/$(PACKAGE)/copyright
+
+override_dh_auto_test:
+	# No tests for AppImage repackaging
+	:
+
+override_dh_shlibdeps:
+	# Skip dependency analysis - AppImage is self-contained
+	:
+
+override_dh_strip:
+	# Skip stripping - AppImage is already compiled
+	:
