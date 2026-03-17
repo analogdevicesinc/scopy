@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout Package Repository (this repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: package
 
@@ -27,7 +27,7 @@ jobs:
         run: echo "REPO_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
 
       - name: Clone Scopy Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: analogdevicesinc/scopy
           path: scopy
@@ -59,7 +59,7 @@ jobs:
           python3 ./package_generator.py -a --src=$GITHUB_WORKSPACE/$REPO_NAME --dest=$GITHUB_WORKSPACE
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${"${{ env.REPO_NAME }}"}-ubuntu22
           path: ${"${{ github.workspace }}"}/${"${{ env.REPO_NAME }}"}.zip

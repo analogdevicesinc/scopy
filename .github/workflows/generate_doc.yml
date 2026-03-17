@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: actions/setup-python@v5
       with:
         python-version: "3.x"
@@ -64,7 +64,7 @@ jobs:
         ./export-structurizr.sh
 
     - name: Store the generated doc
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: html
         path: docs/_build/html
@@ -75,7 +75,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - run: |
         git config --global user.name "${{ github.event.head_commit.committer.name }}"
         git config --global user.email "${{ github.event.head_commit.committer.email }}"
@@ -107,18 +107,18 @@ jobs:
           git commit -m "initial commit" --allow-empty
         )
 
-    # - uses: actions/download-artifact@v4
+    # - uses: actions/download-artifact@v8
     #   if: ${{ env.new_tag == '0' }} && ${{ env.test_report_folder == '' }}
     #   with:
     #     name: html
     #     path: scopy_testing_results/${{ env.test_report_folder }}
 
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       if: ${{ env.new_tag == '0' }} # && !${{ env.test_report_folder == '' }}
       with:
         name: html
 
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       if: ${{ env.new_tag == '1' }}
       with:
         name: html

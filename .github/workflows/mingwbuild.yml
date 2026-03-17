@@ -11,7 +11,7 @@ jobs:
   make_windows_installer:
     runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: '0'
 
@@ -56,19 +56,19 @@ jobs:
       shell: bash
       run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: scopy-windows-portable-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-x86_64.zip
         compression-level: 0
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: debug-windows-x86_64-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\debug-x86_64.zip
         compression-level: 0
 
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       with:
         name: scopy-windows-setup-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.zip

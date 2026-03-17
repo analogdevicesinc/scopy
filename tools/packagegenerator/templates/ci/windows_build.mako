@@ -14,13 +14,13 @@ jobs:
 
     steps:
       - name: Checkout Package Repository (this repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           path: package
 
       - name: Clone Scopy Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: analogdevicesinc/scopy
           path: scopy
@@ -69,7 +69,7 @@ jobs:
         run: echo "REPO_NAME=$(basename $GITHUB_REPOSITORY)" >> "$GITHUB_ENV"
         
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${"${{ env.REPO_NAME }}"}-windows
           path: artifacts/*

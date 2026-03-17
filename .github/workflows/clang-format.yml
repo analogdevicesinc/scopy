@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: DoozyX/clang-format-lint-action@v0.16
       with:
         source: '.'
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - uses: PuneetMatharu/cmake-format-lint-action@v1.0.4
       with:
         args: --config-files .cmake-format --check

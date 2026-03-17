@@ -36,7 +36,7 @@ jobs:
             sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
         - run: df -h
 
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v6
           with:
                 set-safe-directory: 'true'
                 fetch-depth: '0'
@@ -54,7 +54,7 @@ jobs:
                 git config --global --add safe.directory $GITHUB_WORKSPACE
                 echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
 
-        - uses: actions/upload-artifact@v4
+        - uses: actions/upload-artifact@v7
           with:
             name: ${{ env.app_image_folder }}-${{ env.commit_sha }} # app_image_folder and app_image_name are set in the x86-64_appimage_process.sh
             path: ${{ github.workspace }}/${{ env.app_image_name }}
