@@ -23,8 +23,11 @@
 #include <pluginbase/toolmenuentry.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <QLoggingCategory>
+#include <cstdint>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9002_API, "ADRV9002_API")
+
+static constexpr uint32_t BBDC_LOOP_GAIN_RES = 2147483648U; // 2^31, mirrors adrv9002.cpp
 
 using namespace scopy::adrv9002;
 
@@ -77,6 +80,12 @@ QString ADRV9002_API::readFromWidget(const QString &key)
 		return QString();
 	}
 
+	if(!widget->isEnabled()) {
+		// Attribute not available on this device; return the info message so
+		// JS callers can detect unavailability (instead of an empty string).
+		return QString("This attribute is not available for your current device!");
+	}
+
 	QPair<QString, QString> result = widget->read();
 	return result.first;
 }
@@ -101,6 +110,8 @@ void ADRV9002_API::writeToWidget(const QString &key, const QString &value)
 
 QStringList ADRV9002_API::getTools()
 {
+	if(!m_plugin)
+		return {};
 	QStringList tools;
 	for(ToolMenuEntry *tool : m_plugin->m_toolList) {
 		tools.append(tool->name());
@@ -140,7 +151,13 @@ void ADRV9002_API::setRxNcoFrequency(int ch, const QString &val) { writeToWidget
 
 QString ADRV9002_API::getRxDecimatedPower(int ch) { return readFromWidget(rxKey(ch, "decimated_power")); }
 
-QString ADRV9002_API::getRxRfBandwidth(int ch) { return readFromWidget(rxKey(ch, "rf_bandwidth")); }
+QString ADRV9002_API::getRxRfBandwidth(int ch)
+{
+	QString raw = readFromWidget(rxKey(ch, "rf_bandwidth"));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 
 QString ADRV9002_API::getRxDigitalGainControlMode(int ch)
 {
@@ -163,18 +180,36 @@ void ADRV9002_API::setRxDynamicAdcSwitchEnabled(int ch, const QString &val)
 	writeToWidget(rxKey(ch, "dynamic_adc_switch_en"), val);
 }
 
-QString ADRV9002_API::getRxBbdcLoopGain(int ch) { return readFromWidget(rxKey(ch, "bbdc_loop_gain_raw")); }
+QString ADRV9002_API::getRxBbdcLoopGain(int ch)
+{
+	QString raw = readFromWidget(rxKey(ch, "bbdc_loop_gain_raw"));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / BBDC_LOOP_GAIN_RES, 'f', 15);
+}
 void ADRV9002_API::setRxBbdcLoopGain(int ch, const QString &val)
 {
 	writeToWidget(rxKey(ch, "bbdc_loop_gain_raw"), val);
 }
 
-QString ADRV9002_API::getRxLoFrequency(int ch) { return readFromWidget(rxLoKey(ch)); }
+QString ADRV9002_API::getRxLoFrequency(int ch)
+{
+	QString raw = readFromWidget(rxLoKey(ch));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 void ADRV9002_API::setRxLoFrequency(int ch, const QString &val) { writeToWidget(rxLoKey(ch), val); }
 
 QString ADRV9002_API::getRxRssi(int ch) { return readFromWidget(rxKey(ch, "rssi")); }
 
-QString ADRV9002_API::getRxSamplingFrequency(int ch) { return readFromWidget(rxKey(ch, "sampling_frequency")); }
+QString ADRV9002_API::getRxSamplingFrequency(int ch)
+{
+	QString raw = readFromWidget(rxKey(ch, "sampling_frequency"));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 
 // --- RX Tracking ---
 
@@ -234,13 +269,25 @@ void ADRV9002_API::setTxAttenControlMode(int ch, const QString &val)
 	writeToWidget(txKey(ch, "atten_control_mode"), val);
 }
 
-QString ADRV9002_API::getTxLoFrequency(int ch) { return readFromWidget(txLoKey(ch)); }
+QString ADRV9002_API::getTxLoFrequency(int ch)
+{
+	QString raw = readFromWidget(txLoKey(ch));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 void ADRV9002_API::setTxLoFrequency(int ch, const QString &val) { writeToWidget(txLoKey(ch), val); }
 
 QString ADRV9002_API::getTxNcoFrequency(int ch) { return readFromWidget(txKey(ch, "nco_frequency")); }
 void ADRV9002_API::setTxNcoFrequency(int ch, const QString &val) { writeToWidget(txKey(ch, "nco_frequency"), val); }
 
-QString ADRV9002_API::getTxRfBandwidth(int ch) { return readFromWidget(txKey(ch, "rf_bandwidth")); }
+QString ADRV9002_API::getTxRfBandwidth(int ch)
+{
+	QString raw = readFromWidget(txKey(ch, "rf_bandwidth"));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 
 QString ADRV9002_API::getTxPortEnMode(int ch) { return readFromWidget(txKey(ch, "port_en_mode")); }
 void ADRV9002_API::setTxPortEnMode(int ch, const QString &val) { writeToWidget(txKey(ch, "port_en_mode"), val); }
@@ -251,7 +298,13 @@ void ADRV9002_API::setTxEnsmMode(int ch, const QString &val) { writeToWidget(txK
 QString ADRV9002_API::isTxEnabled(int ch) { return readFromWidget(txKey(ch, "en")); }
 void ADRV9002_API::setTxEnabled(int ch, const QString &val) { writeToWidget(txKey(ch, "en"), val); }
 
-QString ADRV9002_API::getTxSamplingFrequency(int ch) { return readFromWidget(txKey(ch, "sampling_frequency")); }
+QString ADRV9002_API::getTxSamplingFrequency(int ch)
+{
+	QString raw = readFromWidget(txKey(ch, "sampling_frequency"));
+	if(raw.isEmpty())
+		return raw;
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 
 // --- TX Tracking ---
 

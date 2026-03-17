@@ -64,7 +64,7 @@ TestFramework.runTest("TST.ADRV9002.TOOLS", function() {
 // ============================================
 printToConsole("\n=== Global ===\n");
 
-TestFramework.runTest("TST.ADRV9002.TEMPERATURE", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.GLOBAL_SETTINGS", function() {
     try {
         var value = adrv9002.getTemperature();
         printToConsole("  Temperature: " + value);
@@ -84,7 +84,7 @@ TestFramework.runTest("TST.ADRV9002.TEMPERATURE", function() {
 // ============================================
 printToConsole("\n=== RX Chain Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.RX_GAIN_MODE", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getRxGainControlMode(0);
         printToConsole("  Original RX gain control mode (ch0): " + original);
@@ -100,11 +100,12 @@ TestFramework.runTest("TST.ADRV9002.RX_GAIN_MODE", function() {
         return readBack === "manual";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxGainControlMode(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_HW_GAIN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         // Save original gain mode and gain
         var originalMode = adrv9002.getRxGainControlMode(0);
@@ -134,11 +135,13 @@ TestFramework.runTest("TST.ADRV9002.RX_HW_GAIN", function() {
         return readBack.indexOf("10") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxHardwareGain(0, originalGain); msleep(500); } catch(_) {}
+        try { adrv9002.setRxGainControlMode(0, originalMode); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_ENSM", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var value = adrv9002.getRxEnsmMode(0);
         printToConsole("  RX ENSM mode (ch0): " + value);
@@ -153,7 +156,7 @@ TestFramework.runTest("TST.ADRV9002.RX_ENSM", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_ENABLED", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxEnabled(0);
         printToConsole("  Original RX enabled (ch0): " + original);
@@ -169,11 +172,12 @@ TestFramework.runTest("TST.ADRV9002.RX_ENABLED", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_BBDC_REJECTION", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxBbdcRejectionEnabled(0);
         printToConsole("  Original RX BBDC rejection (ch0): " + original);
@@ -189,11 +193,12 @@ TestFramework.runTest("TST.ADRV9002.RX_BBDC_REJECTION", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxBbdcRejectionEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_PORT_EN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var value = adrv9002.getRxPortEnMode(0);
         printToConsole("  RX port en mode (ch0): " + value);
@@ -208,7 +213,7 @@ TestFramework.runTest("TST.ADRV9002.RX_PORT_EN", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_DYN_ADC_SWITCH", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxDynamicAdcSwitchEnabled(0);
         printToConsole("  Original RX dynamic ADC switch (ch0): " + original);
@@ -224,15 +229,16 @@ TestFramework.runTest("TST.ADRV9002.RX_DYN_ADC_SWITCH", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxDynamicAdcSwitchEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_LO_FREQ", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getRxLoFrequency(0);
         printToConsole("  Original RX LO frequency (ch0): " + original);
-        adrv9002.setRxLoFrequency(0, "2400000000");
+        adrv9002.setRxLoFrequency(0, "2400");
         msleep(500);
         var readBack = adrv9002.getRxLoFrequency(0);
         printToConsole("  Read back RX LO frequency (ch0): " + readBack);
@@ -241,14 +247,15 @@ TestFramework.runTest("TST.ADRV9002.RX_LO_FREQ", function() {
             adrv9002.setRxLoFrequency(0, original);
             msleep(500);
         }
-        return readBack === "2400000000";
+        return readBack === "2400.000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxLoFrequency(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_NCO_FREQ", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getRxNcoFrequency(0);
         printToConsole("  Original RX NCO frequency (ch0): " + original);
@@ -264,11 +271,12 @@ TestFramework.runTest("TST.ADRV9002.RX_NCO_FREQ", function() {
         return readBack === "1000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxNcoFrequency(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_DIG_GAIN_MODE", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getRxDigitalGainControlMode(0);
         printToConsole("  Original RX digital gain control mode (ch0): " + original);
@@ -284,11 +292,12 @@ TestFramework.runTest("TST.ADRV9002.RX_DIG_GAIN_MODE", function() {
         return readBack === "automatic";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxDigitalGainControlMode(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_INTF_GAIN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getRxInterfaceGain(0);
         printToConsole("  Original RX interface gain (ch0): " + original);
@@ -304,15 +313,16 @@ TestFramework.runTest("TST.ADRV9002.RX_INTF_GAIN", function() {
         return readBack === "0dB";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxInterfaceGain(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_BBDC_LOOP_GAIN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getRxBbdcLoopGain(0);
         printToConsole("  Original RX BBDC loop gain (ch0): " + original);
-        adrv9002.setRxBbdcLoopGain(0, "100");
+        adrv9002.setRxBbdcLoopGain(0, "0.5");
         msleep(500);
         var readBack = adrv9002.getRxBbdcLoopGain(0);
         printToConsole("  Read back RX BBDC loop gain (ch0): " + readBack);
@@ -321,14 +331,15 @@ TestFramework.runTest("TST.ADRV9002.RX_BBDC_LOOP_GAIN", function() {
             adrv9002.setRxBbdcLoopGain(0, original);
             msleep(500);
         }
-        return readBack === "100";
+        return readBack.indexOf("0.5") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxBbdcLoopGain(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_RF_BW", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var bw0 = adrv9002.getRxRfBandwidth(0);
         var bw1 = adrv9002.getRxRfBandwidth(1);
@@ -349,7 +360,7 @@ TestFramework.runTest("TST.ADRV9002.RX_RF_BW", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_RSSI", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var rssi0 = adrv9002.getRxRssi(0);
         var rssi1 = adrv9002.getRxRssi(1);
@@ -375,7 +386,7 @@ TestFramework.runTest("TST.ADRV9002.RX_RSSI", function() {
 // ============================================
 printToConsole("\n=== RX Read-Only Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.RX_DEC_POWER", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var val0 = adrv9002.getRxDecimatedPower(0);
         var val1 = adrv9002.getRxDecimatedPower(1);
@@ -396,7 +407,7 @@ TestFramework.runTest("TST.ADRV9002.RX_DEC_POWER", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_SAMPLING_FREQ", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var val0 = adrv9002.getRxSamplingFrequency(0);
         var val1 = adrv9002.getRxSamplingFrequency(1);
@@ -422,7 +433,7 @@ TestFramework.runTest("TST.ADRV9002.RX_SAMPLING_FREQ", function() {
 // ============================================
 printToConsole("\n=== RX Tracking Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.RX_QUAD_FIC_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxQuadratureFicTrackingEnabled(0);
         printToConsole("  Original RX quadrature FIC tracking (ch0): " + original);
@@ -438,11 +449,12 @@ TestFramework.runTest("TST.ADRV9002.RX_QUAD_FIC_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxQuadratureFicTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_AGC_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxAgcTrackingEnabled(0);
         printToConsole("  Original RX AGC tracking (ch0): " + original);
@@ -458,11 +470,12 @@ TestFramework.runTest("TST.ADRV9002.RX_AGC_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxAgcTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_BBDC_REJ_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxBbdcRejectionTrackingEnabled(0);
         printToConsole("  Original RX BBDC rejection tracking (ch0): " + original);
@@ -478,11 +491,12 @@ TestFramework.runTest("TST.ADRV9002.RX_BBDC_REJ_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxBbdcRejectionTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_QUAD_POLY_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxQuadraturePolyTrackingEnabled(0);
         printToConsole("  Original RX quadrature poly tracking (ch0): " + original);
@@ -498,11 +512,12 @@ TestFramework.runTest("TST.ADRV9002.RX_QUAD_POLY_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxQuadraturePolyTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_HD_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxHdTrackingEnabled(0);
         printToConsole("  Original RX HD tracking (ch0): " + original);
@@ -518,11 +533,12 @@ TestFramework.runTest("TST.ADRV9002.RX_HD_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxHdTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.RX_RSSI_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isRxRssiTrackingEnabled(0);
         printToConsole("  Original RX RSSI tracking (ch0): " + original);
@@ -538,6 +554,7 @@ TestFramework.runTest("TST.ADRV9002.RX_RSSI_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxRssiTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
@@ -547,7 +564,7 @@ TestFramework.runTest("TST.ADRV9002.RX_RSSI_TRACK", function() {
 // ============================================
 printToConsole("\n=== TX Chain Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.TX_ATTEN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getTxAttenuation(0);
         printToConsole("  Original TX attenuation (ch0): " + original);
@@ -563,11 +580,12 @@ TestFramework.runTest("TST.ADRV9002.TX_ATTEN", function() {
         return readBack.indexOf("-10") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxAttenuation(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_ATTEN_CTRL", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var value = adrv9002.getTxAttenControlMode(0);
         printToConsole("  TX atten control mode (ch0): " + value);
@@ -582,7 +600,7 @@ TestFramework.runTest("TST.ADRV9002.TX_ATTEN_CTRL", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_NCO_FREQ", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getTxNcoFrequency(0);
         printToConsole("  Original TX NCO frequency (ch0): " + original);
@@ -598,15 +616,16 @@ TestFramework.runTest("TST.ADRV9002.TX_NCO_FREQ", function() {
         return readBack === "1000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxNcoFrequency(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_LO_FREQ", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.getTxLoFrequency(0);
         printToConsole("  Original TX LO frequency (ch0): " + original);
-        adrv9002.setTxLoFrequency(0, "2400000000");
+        adrv9002.setTxLoFrequency(0, "2400");
         msleep(500);
         var readBack = adrv9002.getTxLoFrequency(0);
         printToConsole("  Read back TX LO frequency (ch0): " + readBack);
@@ -615,14 +634,15 @@ TestFramework.runTest("TST.ADRV9002.TX_LO_FREQ", function() {
             adrv9002.setTxLoFrequency(0, original);
             msleep(500);
         }
-        return readBack === "2400000000";
+        return readBack === "2400.000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxLoFrequency(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_ENSM", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var value = adrv9002.getTxEnsmMode(0);
         printToConsole("  TX ENSM mode (ch0): " + value);
@@ -637,7 +657,7 @@ TestFramework.runTest("TST.ADRV9002.TX_ENSM", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_ENABLED", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isTxEnabled(0);
         printToConsole("  Original TX enabled (ch0): " + original);
@@ -653,11 +673,12 @@ TestFramework.runTest("TST.ADRV9002.TX_ENABLED", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_PORT_EN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var value = adrv9002.getTxPortEnMode(0);
         printToConsole("  TX port en mode (ch0): " + value);
@@ -672,7 +693,7 @@ TestFramework.runTest("TST.ADRV9002.TX_PORT_EN", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_RF_BW", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var bw0 = adrv9002.getTxRfBandwidth(0);
         var bw1 = adrv9002.getTxRfBandwidth(1);
@@ -693,7 +714,7 @@ TestFramework.runTest("TST.ADRV9002.TX_RF_BW", function() {
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_SAMPLING_FREQ", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var val0 = adrv9002.getTxSamplingFrequency(0);
         var val1 = adrv9002.getTxSamplingFrequency(1);
@@ -719,7 +740,7 @@ TestFramework.runTest("TST.ADRV9002.TX_SAMPLING_FREQ", function() {
 // ============================================
 printToConsole("\n=== TX Tracking Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.TX_QUAD_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isTxQuadratureTrackingEnabled(0);
         printToConsole("  Original TX quadrature tracking (ch0): " + original);
@@ -735,11 +756,12 @@ TestFramework.runTest("TST.ADRV9002.TX_QUAD_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxQuadratureTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_CL_GAIN_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isTxCloseLoopGainTrackingEnabled(0);
         printToConsole("  Original TX close loop gain tracking (ch0): " + original);
@@ -755,11 +777,12 @@ TestFramework.runTest("TST.ADRV9002.TX_CL_GAIN_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxCloseLoopGainTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_PA_CORR_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isTxPaCorrectionTrackingEnabled(0);
         printToConsole("  Original TX PA correction tracking (ch0): " + original);
@@ -775,11 +798,12 @@ TestFramework.runTest("TST.ADRV9002.TX_PA_CORR_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxPaCorrectionTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_LB_DELAY_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isTxLoopbackDelayTrackingEnabled(0);
         printToConsole("  Original TX loopback delay tracking (ch0): " + original);
@@ -795,11 +819,12 @@ TestFramework.runTest("TST.ADRV9002.TX_LB_DELAY_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxLoopbackDelayTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.TX_LO_LEAK_TRACK", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         var original = adrv9002.isTxLoLeakageTrackingEnabled(0);
         printToConsole("  Original TX LO leakage tracking (ch0): " + original);
@@ -815,6 +840,7 @@ TestFramework.runTest("TST.ADRV9002.TX_LO_LEAK_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxLoLeakageTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
@@ -824,8 +850,13 @@ TestFramework.runTest("TST.ADRV9002.TX_LO_LEAK_TRACK", function() {
 // ============================================
 printToConsole("\n=== ORX Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.ORX_HW_GAIN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         var original = adrv9002.getOrxHardwareGain(0);
         printToConsole("  Original ORX HW gain (ch0): " + original);
         adrv9002.setOrxHardwareGain(0, "10");
@@ -840,12 +871,18 @@ TestFramework.runTest("TST.ADRV9002.ORX_HW_GAIN", function() {
         return readBack.indexOf("10") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setOrxHardwareGain(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.ORX_BBDC", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         var original = adrv9002.isOrxBbdcRejectionEnabled(0);
         printToConsole("  Original ORX BBDC rejection (ch0): " + original);
         adrv9002.setOrxBbdcRejectionEnabled(0, "1");
@@ -860,12 +897,18 @@ TestFramework.runTest("TST.ADRV9002.ORX_BBDC", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setOrxBbdcRejectionEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.ORX_QUAD_POLY", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         var original = adrv9002.isOrxQuadraturePolyTrackingEnabled(0);
         printToConsole("  Original ORX quadrature poly tracking (ch0): " + original);
         adrv9002.setOrxQuadraturePolyTrackingEnabled(0, "1");
@@ -880,12 +923,18 @@ TestFramework.runTest("TST.ADRV9002.ORX_QUAD_POLY", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setOrxQuadraturePolyTrackingEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.ORX_ENABLED", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         var original = adrv9002.isOrxEnabled(0);
         printToConsole("  Original ORX enabled (ch0): " + original);
         adrv9002.setOrxEnabled(0, "1");
@@ -900,6 +949,7 @@ TestFramework.runTest("TST.ADRV9002.ORX_ENABLED", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setOrxEnabled(0, original); msleep(500); } catch(_) {}
         return false;
     }
 });
@@ -948,6 +998,7 @@ TestFramework.runTest("TST.ADRV9002.WIDGET_RW", function() {
         return readBack === original;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.writeWidget(key, original); msleep(500); } catch(_) {}
         return false;
     }
 });
@@ -957,7 +1008,7 @@ TestFramework.runTest("TST.ADRV9002.WIDGET_RW", function() {
 // ============================================
 printToConsole("\n=== Utility Tests ===\n");
 
-TestFramework.runTest("TST.ADRV9002.REFRESH", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.REFRESH_FUNCTION", function() {
     try {
         adrv9002.refresh();
         msleep(500);

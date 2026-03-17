@@ -86,7 +86,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.GLOBAL_SETTINGS", function() {
 // ============================================
 printToConsole("\n=== Test 4: RX Channel Controls ===\n");
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.HW_GAIN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         // Step 2: Change RX1 Hardware Gain (0-36 dB)
         // Must be in manual mode to set gain
@@ -106,7 +106,9 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.HW_GAIN", functio
         if (readBack.indexOf("18") === -1) {
             printToConsole("  FAIL: Gain control did not respond correctly");
             adrv9002.setRxHardwareGain(0, origGain);
+            msleep(500);
             adrv9002.setRxGainControlMode(0, origMode);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 2 PASS: RX1 gain control responds and updates device");
@@ -127,18 +129,23 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.HW_GAIN", functio
 
         // Restore
         adrv9002.setRxHardwareGain(0, origGain);
+        msleep(500);
         adrv9002.setRxGainControlMode(0, origMode);
+        msleep(500);
         adrv9002.setRxHardwareGain(1, origGain2);
         msleep(500);
 
         return readBack.indexOf("18") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxHardwareGain(0, origGain); msleep(500); } catch(_) {}
+        try { adrv9002.setRxGainControlMode(0, origMode); msleep(500); } catch(_) {}
+        try { adrv9002.setRxHardwareGain(1, origGain2); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.GAIN_MODE", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         // Step 3: Change Gain Control Mode (manual/automatic)
         var origMode = adrv9002.getRxGainControlMode(0);
@@ -151,6 +158,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.GAIN_MODE", funct
         if (readBack !== "manual") {
             printToConsole("  FAIL: Gain control mode did not change to manual");
             adrv9002.setRxGainControlMode(0, origMode);
+            msleep(500);
             return false;
         }
 
@@ -167,11 +175,12 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.GAIN_MODE", funct
         return readBack === "automatic";
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxGainControlMode(0, origMode); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.ENSM_MODE", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         // Step 4: Change ENSM Mode (radio enable state machine)
         var ensmMode = adrv9002.getRxEnsmMode(0);
@@ -196,7 +205,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.ENSM_MODE", funct
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.POWERDOWN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         // Step 5: Toggle Powerdown enable/disable
         var origEnabled = adrv9002.isRxEnabled(0);
@@ -210,6 +219,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.POWERDOWN", funct
         if (disabled !== "0") {
             printToConsole("  FAIL: Powerdown did not disable RX1");
             adrv9002.setRxEnabled(0, origEnabled);
+            msleep(500);
             return false;
         }
 
@@ -221,6 +231,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.POWERDOWN", funct
         if (enabled !== "1") {
             printToConsole("  FAIL: Power up did not enable RX1");
             adrv9002.setRxEnabled(0, origEnabled);
+            msleep(500);
             return false;
         }
 
@@ -232,11 +243,12 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.POWERDOWN", funct
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxEnabled(0, origEnabled); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.READ_ONLY", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG", function() {
     try {
         // Step 6: Verify read-only values update: Decimated Power, Bandwidth, Sampling Rate
         var decPower0 = adrv9002.getRxDecimatedPower(0);
@@ -283,7 +295,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.READ_ONLY", funct
 // ============================================
 printToConsole("\n=== Test 5: TX Channel Controls ===\n");
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.ATTENUATION", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         // Step 2: Change TX1 Attenuation (-41.95 to 0 dB)
         var origAtten = adrv9002.getTxAttenuation(0);
@@ -296,6 +308,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.ATTENUATION", fun
         if (readBack.indexOf("-20") === -1) {
             printToConsole("  FAIL: Attenuation control did not respond");
             adrv9002.setTxAttenuation(0, origAtten);
+            msleep(500);
             return false;
         }
 
@@ -308,6 +321,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.ATTENUATION", fun
 
         // Restore
         adrv9002.setTxAttenuation(0, origAtten);
+        msleep(500);
         adrv9002.setTxAttenuation(1, origAtten2);
         msleep(500);
 
@@ -315,11 +329,13 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.ATTENUATION", fun
         return readBack.indexOf("-20") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxAttenuation(0, origAtten); msleep(500); } catch(_) {}
+        try { adrv9002.setTxAttenuation(1, origAtten2); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.ATTEN_CTRL_MODE", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         // Step 3: Change Attenuation Control Mode
         var mode = adrv9002.getTxAttenControlMode(0);
@@ -340,7 +356,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.ATTEN_CTRL_MODE",
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.POWERDOWN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         // Step 4: Toggle TX Powerdown enable/disable
         var origEnabled = adrv9002.isTxEnabled(0);
@@ -354,6 +370,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.POWERDOWN", funct
         if (disabled !== "0") {
             printToConsole("  FAIL: Powerdown did not disable TX1");
             adrv9002.setTxEnabled(0, origEnabled);
+            msleep(500);
             return false;
         }
 
@@ -365,6 +382,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.POWERDOWN", funct
         if (enabled !== "1") {
             printToConsole("  FAIL: Power up did not enable TX1");
             adrv9002.setTxEnabled(0, origEnabled);
+            msleep(500);
             return false;
         }
 
@@ -376,11 +394,12 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.POWERDOWN", funct
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setTxEnabled(0, origEnabled); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.READ_ONLY", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG", function() {
     try {
         // Step 5: Verify read-only values: Bandwidth, Sampling Rate
         var bw0 = adrv9002.getTxRfBandwidth(0);
@@ -426,7 +445,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.READ_ONLY", funct
 // ============================================
 printToConsole("\n=== Test 6: ORX Controls ===\n");
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.VISIBILITY", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
         // Step 1: Check if ORX controls are visible
         var orxGain = adrv9002.getOrxHardwareGain(0);
@@ -447,8 +466,13 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.VISIBILITY", function() 
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.HW_GAIN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         // Step 2: Change ORX Hardware Gain (4-36 dB)
         var origGain = adrv9002.getOrxHardwareGain(0);
         printToConsole("  Original ORX1 HW gain: " + origGain);
@@ -470,12 +494,18 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.HW_GAIN", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setOrxHardwareGain(0, origGain); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.BBDC_REJECTION", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         // Step 3: Enable/disable BBDC Rejection
         var origBbdc = adrv9002.isOrxBbdcRejectionEnabled(0);
         printToConsole("  Original ORX1 BBDC rejection: " + origBbdc);
@@ -502,12 +532,18 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.BBDC_REJECTION", functio
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setOrxBbdcRejectionEnabled(0, origBbdc); msleep(500); } catch(_) {}
         return false;
     }
 });
 
-TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.POWERDOWN", function() {
+TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG", function() {
     try {
+        var orxCheck = adrv9002.getOrxHardwareGain(0);
+        if (!orxCheck || orxCheck === "" || orxCheck.indexOf("not available") !== -1) {
+            printToConsole("  ORX controls not available on this device - SKIP");
+            return "SKIP";
+        }
         // Step 4: Toggle ORX Powerdown
         var origEnabled = adrv9002.isOrxEnabled(0);
         printToConsole("  Original ORX1 enabled: " + origEnabled);
@@ -573,12 +609,15 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.REFRESH_FUNCTION", function() {
         if (!afterRefreshGain || afterRefreshGain === "") {
             printToConsole("  FAIL: Values not updated after refresh");
             adrv9002.setRxHardwareGain(0, origGain);
+            msleep(500);
             adrv9002.setRxGainControlMode(0, origMode);
+            msleep(500);
             return false;
         }
 
         // Restore original values
         adrv9002.setRxHardwareGain(0, origGain);
+        msleep(500);
         adrv9002.setRxGainControlMode(0, origMode);
         msleep(500);
 
@@ -586,6 +625,8 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.REFRESH_FUNCTION", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        try { adrv9002.setRxHardwareGain(0, origGain); msleep(500); } catch(_) {}
+        try { adrv9002.setRxGainControlMode(0, origMode); msleep(500); } catch(_) {}
         return false;
     }
 });

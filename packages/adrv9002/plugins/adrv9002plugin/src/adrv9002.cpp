@@ -647,10 +647,10 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 
 	double dummy;
 	int ret = iio_channel_attr_read_double(rxCh, "orx_hardwaregain", &dummy);
-	if(ret == -ENODEV) {
+	bool orxAvailable = (ret >= 0);
+	if(!orxAvailable) {
 		qDebug(CAT_ADRV9002) << "ORX hardware not available on channel" << channel
-				     << "- orx_hardwaregain returned -ENODEV";
-		return nullptr; // Don't create widget if ORX hardware doesn't exist
+				     << "- orx_hardwaregain returned error:" << ret;
 	}
 
 	QWidget *widget = new QWidget();
@@ -667,15 +667,32 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 	Style::setStyle(titleLabel, style::properties::label::menuBig);
 	layout->addWidget(titleLabel, 0, 0, 1, 2); // Span 2 columns
 
+	static const QString unavailableMsg = "This attribute is not available for your current device!";
+
+	IIOWidget *hwGainWidget = createRangeWidget(rxCh, "orx_hardwaregain", "[4 1 36]", "Hardware Gain (dB)");
+	IIOWidget *bbdcWidget = createCheckboxWidget(rxCh, "orx_bbdc_rejection_en", "BBDC Rejection");
+	IIOWidget *quadPolyWidget = createCheckboxWidget(rxCh, "orx_quadrature_w_poly_tracking_en", "Quadrature Poly");
+	IIOWidget *enabledWidget = createCheckboxWidget(rxCh, "orx_en", "Enabled");
+
+	if(!orxAvailable) {
+		for(IIOWidget *w : QList<IIOWidget *>{hwGainWidget, bbdcWidget, quadPolyWidget, enabledWidget}) {
+			if(w) {
+				disconnect(this, &Adrv9002::readRequested, w, &IIOWidget::readAsync);
+				w->setEnabled(false);
+				w->getUiStrategy()->setInfoMessage(unavailableMsg);
+			}
+		}
+	}
+
 	// Row 1: Hardware Gain (Left) and BBDC Rejection (Right)
-	layout->addWidget(createRangeWidget(rxCh, "orx_hardwaregain", "[4 1 36]", "Hardware Gain (dB)"), 1, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_bbdc_rejection_en", "BBDC Rejection"), 1, 1);
+	layout->addWidget(hwGainWidget, 1, 0);
+	layout->addWidget(bbdcWidget, 1, 1);
 
 	// Row 2: Tracking (Left) and Enabled (Right)
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_quadrature_w_poly_tracking_en", "Quadrature Poly"), 2, 0);
-	layout->addWidget(createCheckboxWidget(rxCh, "orx_en", "Enabled"), 2, 1);
+	layout->addWidget(quadPolyWidget, 2, 0);
+	layout->addWidget(enabledWidget, 2, 1);
 
-	return widget;
+	return widget; // always return — section visible but grayed out when unavailable
 }
 
 // Widget Creation Helper Functions
