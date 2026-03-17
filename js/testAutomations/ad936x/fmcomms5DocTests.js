@@ -55,10 +55,11 @@ if (!switchToTool("FMCOMMS5")) {
 // ============================================
 printToConsole("\n=== Test 3: Change and Validate Global Settings ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.ENSM", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
+    var origMode;
     try {
         // Step 1: Change ENSM mode (FDD/TDD) - applies to both devices
-        var origMode = fmcomms5.getEnsmMode();
+        origMode = fmcomms5.getEnsmMode();
         printToConsole("  Original ENSM mode: " + origMode);
 
         fmcomms5.setEnsmMode("fdd");
@@ -68,6 +69,7 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.ENSM", funct
         if (readBack !== "fdd") {
             printToConsole("  FAIL: ENSM mode did not change to fdd");
             fmcomms5.setEnsmMode(origMode);
+            msleep(500);
             return false;
         }
 
@@ -79,11 +81,13 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.ENSM", funct
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origMode) { fmcomms5.setEnsmMode(origMode); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERNOR", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
+    var origGovernor;
     try {
         // Step 2: Change calibration mode and rate governor
         var calibMode = fmcomms5.getCalibMode();
@@ -93,7 +97,7 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERN
             return false;
         }
 
-        var origGovernor = fmcomms5.getTrxRateGovernor();
+        origGovernor = fmcomms5.getTrxRateGovernor();
         printToConsole("  Original TRX rate governor: " + origGovernor);
 
         fmcomms5.setTrxRateGovernor("nominal");
@@ -103,6 +107,7 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERN
         if (readBack !== "nominal") {
             printToConsole("  FAIL: Rate governor did not change to nominal");
             fmcomms5.setTrxRateGovernor(origGovernor);
+            msleep(500);
             return false;
         }
 
@@ -120,6 +125,7 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERN
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origGovernor) { fmcomms5.setTrxRateGovernor(origGovernor); msleep(500); }
         return false;
     }
 });
@@ -134,11 +140,12 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERN
 // ============================================
 printToConsole("\n=== Test 4: RX and TX Chain Configuration ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_GLOBAL", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origBw, origSr;
     try {
         // Step 1: Change RX bandwidth and sampling rate for all RX channels
-        var origBw = fmcomms5.getRxRfBandwidth();
-        var origSr = fmcomms5.getRxSamplingFrequency();
+        origBw = fmcomms5.getRxRfBandwidth();
+        origSr = fmcomms5.getRxSamplingFrequency();
         printToConsole("  Original RX RF BW: " + origBw);
         printToConsole("  Original RX sampling freq: " + origSr);
 
@@ -150,6 +157,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_GLOBAL", function() {
         if (bwReadBack !== "18000000") {
             printToConsole("  FAIL: RX bandwidth was not applied");
             fmcomms5.setRxRfBandwidth(origBw);
+            msleep(500);
             return false;
         }
 
@@ -161,12 +169,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_GLOBAL", function() {
         if (srReadBack !== "25000000") {
             printToConsole("  FAIL: RX sampling frequency was not applied");
             fmcomms5.setRxRfBandwidth(origBw);
+            msleep(500);
             fmcomms5.setRxSamplingFrequency(origSr);
+            msleep(500);
             return false;
         }
 
         // Restore
         fmcomms5.setRxRfBandwidth(origBw);
+        msleep(500);
         fmcomms5.setRxSamplingFrequency(origSr);
         msleep(500);
 
@@ -174,15 +185,18 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_GLOBAL", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origBw) { fmcomms5.setRxRfBandwidth(origBw); msleep(500); }
+        if (origSr) { fmcomms5.setRxSamplingFrequency(origSr); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_LO", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origLo0, origLo1;
     try {
         // RX LO frequency per-device (device 0 = ad9361-phy, device 1 = ad9361-phy-B)
-        var origLo0 = fmcomms5.getRxLoFrequency(0);
-        var origLo1 = fmcomms5.getRxLoFrequency(1);
+        origLo0 = fmcomms5.getRxLoFrequency(0);
+        origLo1 = fmcomms5.getRxLoFrequency(1);
         printToConsole("  Original RX LO device 0: " + origLo0);
         printToConsole("  Original RX LO device 1: " + origLo1);
 
@@ -194,6 +208,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_LO", function() {
         if (loReadBack0 !== "2400000000") {
             printToConsole("  FAIL: RX LO device 0 was not applied");
             fmcomms5.setRxLoFrequency(0, origLo0);
+            msleep(500);
             return false;
         }
 
@@ -205,12 +220,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_LO", function() {
         if (loReadBack1 !== "2400000000") {
             printToConsole("  FAIL: RX LO device 1 was not applied");
             fmcomms5.setRxLoFrequency(0, origLo0);
+            msleep(500);
             fmcomms5.setRxLoFrequency(1, origLo1);
+            msleep(500);
             return false;
         }
 
         // Restore
         fmcomms5.setRxLoFrequency(0, origLo0);
+        msleep(500);
         fmcomms5.setRxLoFrequency(1, origLo1);
         msleep(500);
 
@@ -218,15 +236,16 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_LO", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origLo0) { fmcomms5.setRxLoFrequency(0, origLo0); msleep(500); }
+        if (origLo1) { fmcomms5.setRxLoFrequency(1, origLo1); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_PER_CHANNEL", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origGains = [], origModes = [];
     try {
         // Verify per-channel RX gain across all 4 channels
-        var origGains = [];
-        var origModes = [];
         for (var ch = 0; ch < 4; ch++) {
             origModes.push(fmcomms5.getRxGainControlMode(ch));
             origGains.push(fmcomms5.getRxHardwareGain(ch));
@@ -237,10 +256,10 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_PER_CHANNEL", function
         var allPass = true;
         for (var ch = 0; ch < 4; ch++) {
             fmcomms5.setRxGainControlMode(ch, "manual");
-            msleep(300);
+            msleep(500);
             var testGain = String(10 + ch * 5); // 10, 15, 20, 25
             fmcomms5.setRxHardwareGain(ch, testGain);
-            msleep(300);
+            msleep(500);
             var readBack = fmcomms5.getRxHardwareGain(ch);
             printToConsole("  RX ch" + ch + " set to " + testGain + " dB, read back: " + readBack);
             if (readBack.indexOf(testGain) === -1) {
@@ -252,24 +271,30 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_PER_CHANNEL", function
         // Restore
         for (var ch = 0; ch < 4; ch++) {
             fmcomms5.setRxHardwareGain(ch, origGains[ch]);
+            msleep(500);
             fmcomms5.setRxGainControlMode(ch, origModes[ch]);
+            msleep(500);
         }
-        msleep(500);
 
         if (!allPass) return false;
         printToConsole("  PASS: RX per-channel gain applied for all 4 channels (RX1-4)");
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        for (var ch = 0; ch < origGains.length; ch++) {
+            if (origGains[ch]) { fmcomms5.setRxHardwareGain(ch, origGains[ch]); msleep(500); }
+            if (origModes[ch]) { fmcomms5.setRxGainControlMode(ch, origModes[ch]); msleep(500); }
+        }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_GLOBAL", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origBw, origSr;
     try {
         // Step 2: Change TX bandwidth and LO frequency for all TX channels
-        var origBw = fmcomms5.getTxRfBandwidth();
-        var origSr = fmcomms5.getTxSamplingFrequency();
+        origBw = fmcomms5.getTxRfBandwidth();
+        origSr = fmcomms5.getTxSamplingFrequency();
         printToConsole("  Original TX RF BW: " + origBw);
         printToConsole("  Original TX sampling freq: " + origSr);
 
@@ -281,11 +306,13 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_GLOBAL", function() {
         if (bwReadBack !== "18000000") {
             printToConsole("  FAIL: TX bandwidth was not applied");
             fmcomms5.setTxRfBandwidth(origBw);
+            msleep(500);
             return false;
         }
 
         // Restore
         fmcomms5.setTxRfBandwidth(origBw);
+        msleep(500);
         fmcomms5.setTxSamplingFrequency(origSr);
         msleep(500);
 
@@ -293,15 +320,18 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_GLOBAL", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origBw) { fmcomms5.setTxRfBandwidth(origBw); msleep(500); }
+        if (origSr) { fmcomms5.setTxSamplingFrequency(origSr); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_LO", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origLo0, origLo1;
     try {
         // TX LO frequency per-device
-        var origLo0 = fmcomms5.getTxLoFrequency(0);
-        var origLo1 = fmcomms5.getTxLoFrequency(1);
+        origLo0 = fmcomms5.getTxLoFrequency(0);
+        origLo1 = fmcomms5.getTxLoFrequency(1);
         printToConsole("  Original TX LO device 0: " + origLo0);
         printToConsole("  Original TX LO device 1: " + origLo1);
 
@@ -313,6 +343,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_LO", function() {
         if (loReadBack0 !== "2400000000") {
             printToConsole("  FAIL: TX LO device 0 was not applied");
             fmcomms5.setTxLoFrequency(0, origLo0);
+            msleep(500);
             return false;
         }
 
@@ -324,12 +355,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_LO", function() {
         if (loReadBack1 !== "2400000000") {
             printToConsole("  FAIL: TX LO device 1 was not applied");
             fmcomms5.setTxLoFrequency(0, origLo0);
+            msleep(500);
             fmcomms5.setTxLoFrequency(1, origLo1);
+            msleep(500);
             return false;
         }
 
         // Restore
         fmcomms5.setTxLoFrequency(0, origLo0);
+        msleep(500);
         fmcomms5.setTxLoFrequency(1, origLo1);
         msleep(500);
 
@@ -337,14 +371,16 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_LO", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origLo0) { fmcomms5.setTxLoFrequency(0, origLo0); msleep(500); }
+        if (origLo1) { fmcomms5.setTxLoFrequency(1, origLo1); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_PER_CHANNEL", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origGains = [];
     try {
         // Verify per-channel TX gain across all 4 channels
-        var origGains = [];
         for (var ch = 0; ch < 4; ch++) {
             origGains.push(fmcomms5.getTxHardwareGain(ch));
             printToConsole("  TX ch" + ch + " gain: " + origGains[ch]);
@@ -355,7 +391,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_PER_CHANNEL", function
         for (var ch = 0; ch < 4; ch++) {
             var testGain = String(-10 - ch * 5); // -10, -15, -20, -25
             fmcomms5.setTxHardwareGain(ch, testGain);
-            msleep(300);
+            msleep(500);
             var readBack = fmcomms5.getTxHardwareGain(ch);
             printToConsole("  TX ch" + ch + " set to " + testGain + " dB, read back: " + readBack);
             if (readBack.indexOf(testGain) === -1) {
@@ -367,14 +403,17 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_PER_CHANNEL", function
         // Restore
         for (var ch = 0; ch < 4; ch++) {
             fmcomms5.setTxHardwareGain(ch, origGains[ch]);
+            msleep(500);
         }
-        msleep(500);
 
         if (!allPass) return false;
         printToConsole("  PASS: TX per-channel gain applied for all 4 channels (TX1-4)");
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        for (var ch = 0; ch < origGains.length; ch++) {
+            if (origGains[ch]) { fmcomms5.setTxHardwareGain(ch, origGains[ch]); msleep(500); }
+        }
         return false;
     }
 });

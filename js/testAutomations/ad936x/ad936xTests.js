@@ -90,8 +90,9 @@ TestFramework.runTest("TST.AD936X.IS_FMCOMMS5", function() {
 printToConsole("\n=== Global Device Settings ===\n");
 
 TestFramework.runTest("TST.AD936X.ENSM_MODE", function() {
+    var original;
     try {
-        var original = ad936x.getEnsmMode();
+        original = ad936x.getEnsmMode();
         printToConsole("  Original ENSM mode: " + original);
         ad936x.setEnsmMode("fdd");
         msleep(500);
@@ -105,6 +106,7 @@ TestFramework.runTest("TST.AD936X.ENSM_MODE", function() {
         return readBack === "fdd";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setEnsmMode(original); msleep(500); }
         return false;
     }
 });
@@ -125,8 +127,9 @@ TestFramework.runTest("TST.AD936X.CALIB_MODE", function() {
 });
 
 TestFramework.runTest("TST.AD936X.TRX_RATE_GOVERNOR", function() {
+    var original;
     try {
-        var original = ad936x.getTrxRateGovernor();
+        original = ad936x.getTrxRateGovernor();
         printToConsole("  Original TRX rate governor: " + original);
         ad936x.setTrxRateGovernor("nominal");
         msleep(500);
@@ -140,6 +143,7 @@ TestFramework.runTest("TST.AD936X.TRX_RATE_GOVERNOR", function() {
         return readBack === "nominal";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setTrxRateGovernor(original); msleep(500); }
         return false;
     }
 });
@@ -175,8 +179,9 @@ TestFramework.runTest("TST.AD936X.TX_PATH_RATES", function() {
 });
 
 TestFramework.runTest("TST.AD936X.XO_CORRECTION", function() {
+    var original;
     try {
-        var original = ad936x.getXoCorrection();
+        original = ad936x.getXoCorrection();
         printToConsole("  Original XO correction: " + original);
         var testValue = "40000000";
         ad936x.setXoCorrection(testValue);
@@ -191,6 +196,7 @@ TestFramework.runTest("TST.AD936X.XO_CORRECTION", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setXoCorrection(original); msleep(500); }
         return false;
     }
 });
@@ -201,8 +207,9 @@ TestFramework.runTest("TST.AD936X.XO_CORRECTION", function() {
 printToConsole("\n=== RX Chain Tests ===\n");
 
 TestFramework.runTest("TST.AD936X.RX_RF_BW", function() {
+    var original;
     try {
-        var original = ad936x.getRxRfBandwidth();
+        original = ad936x.getRxRfBandwidth();
         printToConsole("  Original RX RF bandwidth: " + original);
         ad936x.setRxRfBandwidth("18000000");
         msleep(500);
@@ -216,13 +223,15 @@ TestFramework.runTest("TST.AD936X.RX_RF_BW", function() {
         return readBack === "18000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setRxRfBandwidth(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.RX_SAMPLING_FREQ", function() {
+    var original;
     try {
-        var original = ad936x.getRxSamplingFrequency();
+        original = ad936x.getRxSamplingFrequency();
         printToConsole("  Original RX sampling frequency: " + original);
         ad936x.setRxSamplingFrequency("25000000");
         msleep(500);
@@ -236,6 +245,7 @@ TestFramework.runTest("TST.AD936X.RX_SAMPLING_FREQ", function() {
         return readBack === "25000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setRxSamplingFrequency(original); msleep(500); }
         return false;
     }
 });
@@ -256,8 +266,9 @@ TestFramework.runTest("TST.AD936X.RX_RF_PORT", function() {
 });
 
 TestFramework.runTest("TST.AD936X.RX_LO_FREQ", function() {
+    var original;
     try {
-        var original = ad936x.getRxLoFrequency();
+        original = ad936x.getRxLoFrequency();
         printToConsole("  Original RX LO frequency: " + original);
         ad936x.setRxLoFrequency("2400000000");
         msleep(500);
@@ -271,13 +282,15 @@ TestFramework.runTest("TST.AD936X.RX_LO_FREQ", function() {
         return readBack === "2400000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setRxLoFrequency(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.RX_GAIN_MODE", function() {
+    var original;
     try {
-        var original = ad936x.getRxGainControlMode(0);
+        original = ad936x.getRxGainControlMode(0);
         printToConsole("  Original RX gain control mode (ch0): " + original);
         ad936x.setRxGainControlMode(0, "manual");
         msleep(500);
@@ -291,15 +304,17 @@ TestFramework.runTest("TST.AD936X.RX_GAIN_MODE", function() {
         return readBack === "manual";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setRxGainControlMode(0, original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.RX_HW_GAIN", function() {
+    var originalMode, originalGain;
     try {
         // Save original gain mode and gain
-        var originalMode = ad936x.getRxGainControlMode(0);
-        var originalGain = ad936x.getRxHardwareGain(0);
+        originalMode = ad936x.getRxGainControlMode(0);
+        originalGain = ad936x.getRxHardwareGain(0);
         printToConsole("  Original gain mode: " + originalMode);
         printToConsole("  Original HW gain: " + originalGain);
 
@@ -325,6 +340,8 @@ TestFramework.runTest("TST.AD936X.RX_HW_GAIN", function() {
         return readBack.indexOf("30") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalGain) { ad936x.setRxHardwareGain(0, originalGain); msleep(500); }
+        if (originalMode && originalMode !== "manual") { ad936x.setRxGainControlMode(0, originalMode); msleep(500); }
         return false;
     }
 });
@@ -351,8 +368,9 @@ TestFramework.runTest("TST.AD936X.RX_RSSI", function() {
 });
 
 TestFramework.runTest("TST.AD936X.RX_QUAD_TRACK", function() {
+    var original;
     try {
-        var original = ad936x.isQuadratureTrackingEnabled();
+        original = ad936x.isQuadratureTrackingEnabled();
         printToConsole("  Original quadrature tracking: " + original);
         ad936x.setQuadratureTrackingEnabled("1");
         msleep(500);
@@ -366,13 +384,15 @@ TestFramework.runTest("TST.AD936X.RX_QUAD_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setQuadratureTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.RX_RF_DC_TRACK", function() {
+    var original;
     try {
-        var original = ad936x.isRfDcOffsetTrackingEnabled();
+        original = ad936x.isRfDcOffsetTrackingEnabled();
         printToConsole("  Original RF DC offset tracking: " + original);
         ad936x.setRfDcOffsetTrackingEnabled("1");
         msleep(500);
@@ -386,13 +406,15 @@ TestFramework.runTest("TST.AD936X.RX_RF_DC_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setRfDcOffsetTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.RX_BB_DC_TRACK", function() {
+    var original;
     try {
-        var original = ad936x.isBbDcOffsetTrackingEnabled();
+        original = ad936x.isBbDcOffsetTrackingEnabled();
         printToConsole("  Original BB DC offset tracking: " + original);
         ad936x.setBbDcOffsetTrackingEnabled("1");
         msleep(500);
@@ -406,6 +428,7 @@ TestFramework.runTest("TST.AD936X.RX_BB_DC_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setBbDcOffsetTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -416,8 +439,9 @@ TestFramework.runTest("TST.AD936X.RX_BB_DC_TRACK", function() {
 printToConsole("\n=== TX Chain Tests ===\n");
 
 TestFramework.runTest("TST.AD936X.TX_RF_BW", function() {
+    var original;
     try {
-        var original = ad936x.getTxRfBandwidth();
+        original = ad936x.getTxRfBandwidth();
         printToConsole("  Original TX RF bandwidth: " + original);
         ad936x.setTxRfBandwidth("18000000");
         msleep(500);
@@ -431,13 +455,15 @@ TestFramework.runTest("TST.AD936X.TX_RF_BW", function() {
         return readBack === "18000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setTxRfBandwidth(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.TX_SAMPLING_FREQ", function() {
+    var original;
     try {
-        var original = ad936x.getTxSamplingFrequency();
+        original = ad936x.getTxSamplingFrequency();
         printToConsole("  Original TX sampling frequency: " + original);
         ad936x.setTxSamplingFrequency("25000000");
         msleep(500);
@@ -451,6 +477,7 @@ TestFramework.runTest("TST.AD936X.TX_SAMPLING_FREQ", function() {
         return readBack === "25000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setTxSamplingFrequency(original); msleep(500); }
         return false;
     }
 });
@@ -471,8 +498,9 @@ TestFramework.runTest("TST.AD936X.TX_RF_PORT", function() {
 });
 
 TestFramework.runTest("TST.AD936X.TX_LO_FREQ", function() {
+    var original;
     try {
-        var original = ad936x.getTxLoFrequency();
+        original = ad936x.getTxLoFrequency();
         printToConsole("  Original TX LO frequency: " + original);
         ad936x.setTxLoFrequency("2400000000");
         msleep(500);
@@ -486,13 +514,15 @@ TestFramework.runTest("TST.AD936X.TX_LO_FREQ", function() {
         return readBack === "2400000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.setTxLoFrequency(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.TX_HW_GAIN", function() {
+    var originalGain;
     try {
-        var originalGain = ad936x.getTxHardwareGain(0);
+        originalGain = ad936x.getTxHardwareGain(0);
         printToConsole("  Original TX HW gain: " + originalGain);
         ad936x.setTxHardwareGain(0, "-10");
         msleep(500);
@@ -506,6 +536,7 @@ TestFramework.runTest("TST.AD936X.TX_HW_GAIN", function() {
         return readBack.indexOf("-10") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalGain) { ad936x.setTxHardwareGain(0, originalGain); msleep(500); }
         return false;
     }
 });
@@ -558,9 +589,10 @@ TestFramework.runTest("TST.AD936X.WIDGET_KEYS", function() {
 });
 
 TestFramework.runTest("TST.AD936X.WIDGET_RW", function() {
+    var key = "ad9361-phy//ensm_mode";
+    var original;
     try {
-        var key = "ad9361-phy//ensm_mode";
-        var original = ad936x.readWidget(key);
+        original = ad936x.readWidget(key);
         printToConsole("  Original value for '" + key + "': " + original);
         ad936x.writeWidget(key, "fdd");
         msleep(500);
@@ -574,6 +606,7 @@ TestFramework.runTest("TST.AD936X.WIDGET_RW", function() {
         return readBack === "fdd";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x.writeWidget(key, original); msleep(500); }
         return false;
     }
 });

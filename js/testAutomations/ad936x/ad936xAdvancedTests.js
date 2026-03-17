@@ -47,8 +47,9 @@ msleep(500);
 printToConsole("\n=== ENSM Mode ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.FDD_MODE", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isFddModeEnabled();
+        original = ad936x_advanced.isFddModeEnabled();
         printToConsole("  Original FDD mode: " + original);
         ad936x_advanced.setFddModeEnabled("1");
         msleep(500);
@@ -61,13 +62,15 @@ TestFramework.runTest("TST.AD936X_ADV.FDD_MODE", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setFddModeEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.PIN_PULSE_MODE", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isEnsmPinPulseModeEnabled();
+        original = ad936x_advanced.isEnsmPinPulseModeEnabled();
         printToConsole("  Original pin pulse mode: " + original);
         ad936x_advanced.setEnsmPinPulseModeEnabled("0");
         msleep(500);
@@ -80,13 +83,15 @@ TestFramework.runTest("TST.AD936X_ADV.PIN_PULSE_MODE", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setEnsmPinPulseModeEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TXNRX_CONTROL", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isEnsmTxnrxControlEnabled();
+        original = ad936x_advanced.isEnsmTxnrxControlEnabled();
         printToConsole("  Original TXNRX control: " + original);
         ad936x_advanced.setEnsmTxnrxControlEnabled("0");
         msleep(500);
@@ -99,13 +104,15 @@ TestFramework.runTest("TST.AD936X_ADV.TXNRX_CONTROL", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setEnsmTxnrxControlEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TDD_DUAL_SYNTH", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTddDualSynthModeEnabled();
+        original = ad936x_advanced.isTddDualSynthModeEnabled();
         printToConsole("  Original TDD dual synth: " + original);
         ad936x_advanced.setTddDualSynthModeEnabled("0");
         msleep(500);
@@ -118,13 +125,15 @@ TestFramework.runTest("TST.AD936X_ADV.TDD_DUAL_SYNTH", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTddDualSynthModeEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TDD_FDD_VCO_TABLES", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTddFddVcoTablesEnabled();
+        original = ad936x_advanced.isTddFddVcoTablesEnabled();
         printToConsole("  Original TDD FDD VCO tables: " + original);
         ad936x_advanced.setTddFddVcoTablesEnabled("0");
         msleep(500);
@@ -137,13 +146,15 @@ TestFramework.runTest("TST.AD936X_ADV.TDD_FDD_VCO_TABLES", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTddFddVcoTablesEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TDD_SKIP_VCO_CAL", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTddSkipVcoCalEnabled();
+        original = ad936x_advanced.isTddSkipVcoCalEnabled();
         printToConsole("  Original TDD skip VCO cal: " + original);
         ad936x_advanced.setTddSkipVcoCalEnabled("0");
         msleep(500);
@@ -156,13 +167,15 @@ TestFramework.runTest("TST.AD936X_ADV.TDD_SKIP_VCO_CAL", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTddSkipVcoCalEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.UPDATE_TX_GAIN_ALERT", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isUpdateTxGainInAlertEnabled();
+        original = ad936x_advanced.isUpdateTxGainInAlertEnabled();
         printToConsole("  Original update TX gain in alert: " + original);
         ad936x_advanced.setUpdateTxGainInAlertEnabled("0");
         msleep(500);
@@ -175,6 +188,7 @@ TestFramework.runTest("TST.AD936X_ADV.UPDATE_TX_GAIN_ALERT", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setUpdateTxGainInAlertEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -217,8 +231,9 @@ TestFramework.runTest("TST.AD936X_ADV.TX_RF_PORT_INPUT", function() {
 });
 
 TestFramework.runTest("TST.AD936X_ADV.RX1_RX2_PHASE_INV", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isRx1Rx2PhaseInversionEnabled();
+        original = ad936x_advanced.isRx1Rx2PhaseInversionEnabled();
         printToConsole("  Original RX1-RX2 phase inversion: " + original);
         ad936x_advanced.setRx1Rx2PhaseInversionEnabled("0");
         msleep(500);
@@ -231,6 +246,7 @@ TestFramework.runTest("TST.AD936X_ADV.RX1_RX2_PHASE_INV", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setRx1Rx2PhaseInversionEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -243,8 +259,9 @@ msleep(500);
 printToConsole("\n=== Clocks ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.EXT_REFCLK", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isXoDisableUseExtRefclkEnabled();
+        original = ad936x_advanced.isXoDisableUseExtRefclkEnabled();
         printToConsole("  Original ext refclk: " + original);
         ad936x_advanced.setXoDisableUseExtRefclkEnabled("0");
         msleep(500);
@@ -257,13 +274,15 @@ TestFramework.runTest("TST.AD936X_ADV.EXT_REFCLK", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setXoDisableUseExtRefclkEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.EXT_RX_LO", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isExternalRxLoEnabled();
+        original = ad936x_advanced.isExternalRxLoEnabled();
         printToConsole("  Original external RX LO: " + original);
         ad936x_advanced.setExternalRxLoEnabled("0");
         msleep(500);
@@ -276,13 +295,15 @@ TestFramework.runTest("TST.AD936X_ADV.EXT_RX_LO", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setExternalRxLoEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.EXT_TX_LO", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isExternalTxLoEnabled();
+        original = ad936x_advanced.isExternalTxLoEnabled();
         printToConsole("  Original external TX LO: " + original);
         ad936x_advanced.setExternalTxLoEnabled("0");
         msleep(500);
@@ -295,6 +316,7 @@ TestFramework.runTest("TST.AD936X_ADV.EXT_TX_LO", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setExternalTxLoEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -315,8 +337,9 @@ TestFramework.runTest("TST.AD936X_ADV.CLK_OUTPUT_MODE", function() {
 });
 
 TestFramework.runTest("TST.AD936X_ADV.RX_FASTLOCK_PINCTRL", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isRxFastlockPincontrolEnabled();
+        original = ad936x_advanced.isRxFastlockPincontrolEnabled();
         printToConsole("  Original RX fastlock pincontrol: " + original);
         ad936x_advanced.setRxFastlockPincontrolEnabled("0");
         msleep(500);
@@ -329,13 +352,15 @@ TestFramework.runTest("TST.AD936X_ADV.RX_FASTLOCK_PINCTRL", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setRxFastlockPincontrolEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.RX_FASTLOCK_DELAY", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getRxFastlockDelay();
+        original = ad936x_advanced.getRxFastlockDelay();
         printToConsole("  Original RX fastlock delay: " + original);
         var testValue = "0";
         ad936x_advanced.setRxFastlockDelay(testValue);
@@ -349,13 +374,15 @@ TestFramework.runTest("TST.AD936X_ADV.RX_FASTLOCK_DELAY", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setRxFastlockDelay(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TX_FASTLOCK_PINCTRL", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTxFastlockPincontrolEnabled();
+        original = ad936x_advanced.isTxFastlockPincontrolEnabled();
         printToConsole("  Original TX fastlock pincontrol: " + original);
         ad936x_advanced.setTxFastlockPincontrolEnabled("0");
         msleep(500);
@@ -368,13 +395,15 @@ TestFramework.runTest("TST.AD936X_ADV.TX_FASTLOCK_PINCTRL", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxFastlockPincontrolEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TX_FASTLOCK_DELAY", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getTxFastlockDelay();
+        original = ad936x_advanced.getTxFastlockDelay();
         printToConsole("  Original TX fastlock delay: " + original);
         var testValue = "0";
         ad936x_advanced.setTxFastlockDelay(testValue);
@@ -388,6 +417,7 @@ TestFramework.runTest("TST.AD936X_ADV.TX_FASTLOCK_DELAY", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxFastlockDelay(original); msleep(500); }
         return false;
     }
 });
@@ -400,8 +430,9 @@ msleep(500);
 printToConsole("\n=== eLNA ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.ELNA_GAIN", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getElnaGain();
+        original = ad936x_advanced.getElnaGain();
         printToConsole("  Original eLNA gain: " + original);
         var testValue = "0";
         ad936x_advanced.setElnaGain(testValue);
@@ -415,13 +446,15 @@ TestFramework.runTest("TST.AD936X_ADV.ELNA_GAIN", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setElnaGain(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.ELNA_BYPASS_LOSS", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getElnaBypassLoss();
+        original = ad936x_advanced.getElnaBypassLoss();
         printToConsole("  Original eLNA bypass loss: " + original);
         var testValue = "0";
         ad936x_advanced.setElnaBypassLoss(testValue);
@@ -435,13 +468,15 @@ TestFramework.runTest("TST.AD936X_ADV.ELNA_BYPASS_LOSS", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setElnaBypassLoss(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.ELNA_SETTLING_DELAY", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getElnaSettlingDelay();
+        original = ad936x_advanced.getElnaSettlingDelay();
         printToConsole("  Original eLNA settling delay: " + original);
         var testValue = "0";
         ad936x_advanced.setElnaSettlingDelay(testValue);
@@ -455,13 +490,15 @@ TestFramework.runTest("TST.AD936X_ADV.ELNA_SETTLING_DELAY", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setElnaSettlingDelay(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.ELNA_RX1_GPO0", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isElnaRx1Gpo0ControlEnabled();
+        original = ad936x_advanced.isElnaRx1Gpo0ControlEnabled();
         printToConsole("  Original eLNA RX1 GPO0 control: " + original);
         ad936x_advanced.setElnaRx1Gpo0ControlEnabled("0");
         msleep(500);
@@ -474,13 +511,15 @@ TestFramework.runTest("TST.AD936X_ADV.ELNA_RX1_GPO0", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setElnaRx1Gpo0ControlEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.ELNA_RX2_GPO1", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isElnaRx2Gpo1ControlEnabled();
+        original = ad936x_advanced.isElnaRx2Gpo1ControlEnabled();
         printToConsole("  Original eLNA RX2 GPO1 control: " + original);
         ad936x_advanced.setElnaRx2Gpo1ControlEnabled("0");
         msleep(500);
@@ -493,13 +532,15 @@ TestFramework.runTest("TST.AD936X_ADV.ELNA_RX2_GPO1", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setElnaRx2Gpo1ControlEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.ELNA_GAINTABLE_ALL_IDX", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isElnaGaintableAllIndexEnabled();
+        original = ad936x_advanced.isElnaGaintableAllIndexEnabled();
         printToConsole("  Original eLNA gaintable all index: " + original);
         ad936x_advanced.setElnaGaintableAllIndexEnabled("0");
         msleep(500);
@@ -512,6 +553,7 @@ TestFramework.runTest("TST.AD936X_ADV.ELNA_GAINTABLE_ALL_IDX", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setElnaGaintableAllIndexEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -524,8 +566,9 @@ msleep(500);
 printToConsole("\n=== RSSI ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.RSSI_DURATION", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getRssiDuration();
+        original = ad936x_advanced.getRssiDuration();
         printToConsole("  Original RSSI duration: " + original);
         var testValue = "1";
         ad936x_advanced.setRssiDuration(testValue);
@@ -539,13 +582,15 @@ TestFramework.runTest("TST.AD936X_ADV.RSSI_DURATION", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setRssiDuration(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.RSSI_DELAY", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getRssiDelay();
+        original = ad936x_advanced.getRssiDelay();
         printToConsole("  Original RSSI delay: " + original);
         var testValue = "1";
         ad936x_advanced.setRssiDelay(testValue);
@@ -559,13 +604,15 @@ TestFramework.runTest("TST.AD936X_ADV.RSSI_DELAY", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setRssiDelay(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.RSSI_WAIT", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getRssiWait();
+        original = ad936x_advanced.getRssiWait();
         printToConsole("  Original RSSI wait: " + original);
         var testValue = "1";
         ad936x_advanced.setRssiWait(testValue);
@@ -579,6 +626,7 @@ TestFramework.runTest("TST.AD936X_ADV.RSSI_WAIT", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setRssiWait(original); msleep(500); }
         return false;
     }
 });
@@ -636,8 +684,9 @@ TestFramework.runTest("TST.AD936X_ADV.GC_RX2_MODE", function() {
 });
 
 TestFramework.runTest("TST.AD936X_ADV.SPLIT_GAIN_TABLE", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isSplitGainTableModeEnabled();
+        original = ad936x_advanced.isSplitGainTableModeEnabled();
         printToConsole("  Original split gain table: " + original);
         ad936x_advanced.setSplitGainTableModeEnabled("0");
         msleep(500);
@@ -650,13 +699,15 @@ TestFramework.runTest("TST.AD936X_ADV.SPLIT_GAIN_TABLE", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setSplitGainTableModeEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.GC_DEC_POW_DURATION", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getGcDecPowMeasurementDuration();
+        original = ad936x_advanced.getGcDecPowMeasurementDuration();
         printToConsole("  Original measurement duration: " + original);
         var testValue = "1";
         ad936x_advanced.setGcDecPowMeasurementDuration(testValue);
@@ -670,13 +721,15 @@ TestFramework.runTest("TST.AD936X_ADV.GC_DEC_POW_DURATION", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setGcDecPowMeasurementDuration(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.AGC_DELAY_MARGIN", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getAgcAttackDelayExtraMargin();
+        original = ad936x_advanced.getAgcAttackDelayExtraMargin();
         printToConsole("  Original AGC delay margin: " + original);
         var testValue = "1";
         ad936x_advanced.setAgcAttackDelayExtraMargin(testValue);
@@ -690,6 +743,7 @@ TestFramework.runTest("TST.AD936X_ADV.AGC_DELAY_MARGIN", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setAgcAttackDelayExtraMargin(original); msleep(500); }
         return false;
     }
 });
@@ -702,8 +756,9 @@ msleep(500);
 printToConsole("\n=== AGC Thresholds ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.AGC_OUTER_THRESH_HIGH", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getAgcOuterThreshHigh();
+        original = ad936x_advanced.getAgcOuterThreshHigh();
         printToConsole("  Original AGC outer thresh high: " + original);
         var testValue = "5";
         ad936x_advanced.setAgcOuterThreshHigh(testValue);
@@ -717,13 +772,15 @@ TestFramework.runTest("TST.AD936X_ADV.AGC_OUTER_THRESH_HIGH", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setAgcOuterThreshHigh(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.AGC_INNER_THRESH_HIGH", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getAgcInnerThreshHigh();
+        original = ad936x_advanced.getAgcInnerThreshHigh();
         printToConsole("  Original AGC inner thresh high: " + original);
         var testValue = "5";
         ad936x_advanced.setAgcInnerThreshHigh(testValue);
@@ -737,13 +794,15 @@ TestFramework.runTest("TST.AD936X_ADV.AGC_INNER_THRESH_HIGH", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setAgcInnerThreshHigh(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.AGC_INNER_THRESH_LOW", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getAgcInnerThreshLow();
+        original = ad936x_advanced.getAgcInnerThreshLow();
         printToConsole("  Original AGC inner thresh low: " + original);
         var testValue = "5";
         ad936x_advanced.setAgcInnerThreshLow(testValue);
@@ -757,13 +816,15 @@ TestFramework.runTest("TST.AD936X_ADV.AGC_INNER_THRESH_LOW", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setAgcInnerThreshLow(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.AGC_OUTER_THRESH_LOW", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getAgcOuterThreshLow();
+        original = ad936x_advanced.getAgcOuterThreshLow();
         printToConsole("  Original AGC outer thresh low: " + original);
         var testValue = "5";
         ad936x_advanced.setAgcOuterThreshLow(testValue);
@@ -777,13 +838,15 @@ TestFramework.runTest("TST.AD936X_ADV.AGC_OUTER_THRESH_LOW", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setAgcOuterThreshLow(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.AGC_GAIN_UPDATE_INTERVAL", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getAgcGainUpdateInterval();
+        original = ad936x_advanced.getAgcGainUpdateInterval();
         printToConsole("  Original AGC gain update interval: " + original);
         var testValue = "1";
         ad936x_advanced.setAgcGainUpdateInterval(testValue);
@@ -797,6 +860,7 @@ TestFramework.runTest("TST.AD936X_ADV.AGC_GAIN_UPDATE_INTERVAL", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setAgcGainUpdateInterval(original); msleep(500); }
         return false;
     }
 });
@@ -839,8 +903,9 @@ TestFramework.runTest("TST.AD936X_ADV.TXMON2_FE_GAIN", function() {
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TXMON_LOW_HIGH_THRESH", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getTxmonLowHighThresh();
+        original = ad936x_advanced.getTxmonLowHighThresh();
         printToConsole("  Original TXMON low/high thresh: " + original);
         var testValue = "1";
         ad936x_advanced.setTxmonLowHighThresh(testValue);
@@ -854,13 +919,15 @@ TestFramework.runTest("TST.AD936X_ADV.TXMON_LOW_HIGH_THRESH", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxmonLowHighThresh(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TXMON_LOW_GAIN", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getTxmonLowGain();
+        original = ad936x_advanced.getTxmonLowGain();
         printToConsole("  Original TXMON low gain: " + original);
         var testValue = "1";
         ad936x_advanced.setTxmonLowGain(testValue);
@@ -874,13 +941,15 @@ TestFramework.runTest("TST.AD936X_ADV.TXMON_LOW_GAIN", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxmonLowGain(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TXMON_HIGH_GAIN", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getTxmonHighGain();
+        original = ad936x_advanced.getTxmonHighGain();
         printToConsole("  Original TXMON high gain: " + original);
         var testValue = "1";
         ad936x_advanced.setTxmonHighGain(testValue);
@@ -894,13 +963,15 @@ TestFramework.runTest("TST.AD936X_ADV.TXMON_HIGH_GAIN", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxmonHighGain(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TXMON_DC_TRACKING", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTxmonDcTrackingEnabled();
+        original = ad936x_advanced.isTxmonDcTrackingEnabled();
         printToConsole("  Original TXMON DC tracking: " + original);
         ad936x_advanced.setTxmonDcTrackingEnabled("0");
         msleep(500);
@@ -913,13 +984,15 @@ TestFramework.runTest("TST.AD936X_ADV.TXMON_DC_TRACKING", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxmonDcTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TXMON_ONE_SHOT", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTxmonOneShotModeEnabled();
+        original = ad936x_advanced.isTxmonOneShotModeEnabled();
         printToConsole("  Original TXMON one-shot mode: " + original);
         ad936x_advanced.setTxmonOneShotModeEnabled("0");
         msleep(500);
@@ -932,6 +1005,7 @@ TestFramework.runTest("TST.AD936X_ADV.TXMON_ONE_SHOT", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTxmonOneShotModeEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -944,8 +1018,9 @@ msleep(500);
 printToConsole("\n=== Temp Sensor ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.TEMP_MEAS_INTERVAL", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getTempSenseMeasurementInterval();
+        original = ad936x_advanced.getTempSenseMeasurementInterval();
         printToConsole("  Original temp measurement interval: " + original);
         var testValue = "1000";
         ad936x_advanced.setTempSenseMeasurementInterval(testValue);
@@ -959,13 +1034,15 @@ TestFramework.runTest("TST.AD936X_ADV.TEMP_MEAS_INTERVAL", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTempSenseMeasurementInterval(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.TEMP_PERIODIC_MEAS", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isTempSensePeriodicMeasurementEnabled();
+        original = ad936x_advanced.isTempSensePeriodicMeasurementEnabled();
         printToConsole("  Original temp periodic measurement: " + original);
         ad936x_advanced.setTempSensePeriodicMeasurementEnabled("0");
         msleep(500);
@@ -978,6 +1055,7 @@ TestFramework.runTest("TST.AD936X_ADV.TEMP_PERIODIC_MEAS", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setTempSensePeriodicMeasurementEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -990,8 +1068,9 @@ msleep(500);
 printToConsole("\n=== MISC ===\n");
 
 TestFramework.runTest("TST.AD936X_ADV.DC_OFFSET_ATTEN_HIGH", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getDcOffsetAttenuationHighRange();
+        original = ad936x_advanced.getDcOffsetAttenuationHighRange();
         printToConsole("  Original DC offset attenuation high range: " + original);
         var testValue = "5";
         ad936x_advanced.setDcOffsetAttenuationHighRange(testValue);
@@ -1005,13 +1084,15 @@ TestFramework.runTest("TST.AD936X_ADV.DC_OFFSET_ATTEN_HIGH", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setDcOffsetAttenuationHighRange(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.DC_OFFSET_ATTEN_LOW", function() {
+    var original;
     try {
-        var original = ad936x_advanced.getDcOffsetAttenuationLowRange();
+        original = ad936x_advanced.getDcOffsetAttenuationLowRange();
         printToConsole("  Original DC offset attenuation low range: " + original);
         var testValue = "5";
         ad936x_advanced.setDcOffsetAttenuationLowRange(testValue);
@@ -1025,13 +1106,15 @@ TestFramework.runTest("TST.AD936X_ADV.DC_OFFSET_ATTEN_LOW", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setDcOffsetAttenuationLowRange(original); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X_ADV.QEC_TRACKING_SLOW", function() {
+    var original;
     try {
-        var original = ad936x_advanced.isQecTrackingSlowModeEnabled();
+        original = ad936x_advanced.isQecTrackingSlowModeEnabled();
         printToConsole("  Original QEC tracking slow mode: " + original);
         ad936x_advanced.setQecTrackingSlowModeEnabled("0");
         msleep(500);
@@ -1044,6 +1127,7 @@ TestFramework.runTest("TST.AD936X_ADV.QEC_TRACKING_SLOW", function() {
         return readBack === "0";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { ad936x_advanced.setQecTrackingSlowModeEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -1112,14 +1196,15 @@ TestFramework.runTest("TST.AD936X_ADV.WIDGET_KEYS", function() {
 });
 
 TestFramework.runTest("TST.AD936X_ADV.WIDGET_RW", function() {
+    var key, original;
     try {
         var keys = ad936x_advanced.getWidgetKeys();
         if (!keys || keys.length === 0) {
             printToConsole("  Error: No widget keys available");
             return false;
         }
-        var key = keys[0];
-        var original = ad936x_advanced.readWidget(key);
+        key = keys[0];
+        original = ad936x_advanced.readWidget(key);
         printToConsole("  Original value for '" + key + "': " + original);
         ad936x_advanced.writeWidget(key, original);
         msleep(500);
@@ -1128,6 +1213,7 @@ TestFramework.runTest("TST.AD936X_ADV.WIDGET_RW", function() {
         return readBack === original;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (key && original) { ad936x_advanced.writeWidget(key, original); msleep(500); }
         return false;
     }
 });

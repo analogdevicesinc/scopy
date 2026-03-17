@@ -51,9 +51,10 @@ if (!switchToTool("AD936X")) {
 printToConsole("\n=== Test 3: Change and Validate Device Global Settings ===\n");
 
 TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.ENSM", function() {
+    var origMode;
     try {
         // Step 1: Change ENSM mode (FDD/TDD)
-        var origMode = ad936x.getEnsmMode();
+        origMode = ad936x.getEnsmMode();
         printToConsole("  Original ENSM mode: " + origMode);
 
         ad936x.setEnsmMode("fdd");
@@ -63,6 +64,7 @@ TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.ENSM", functio
         if (readBack !== "fdd") {
             printToConsole("  FAIL: ENSM mode did not change to fdd");
             ad936x.setEnsmMode(origMode);
+            msleep(500);
             return false;
         }
         printToConsole("  ENSM mode FDD PASS");
@@ -81,11 +83,13 @@ TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.ENSM", functio
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origMode) { ad936x.setEnsmMode(origMode); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERNOR", function() {
+    var origGovernor;
     try {
         // Step 2: Change calibration mode and rate governor
         var calibMode = ad936x.getCalibMode();
@@ -96,7 +100,7 @@ TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERNOR
         }
         printToConsole("  Calibration mode reads correctly");
 
-        var origGovernor = ad936x.getTrxRateGovernor();
+        origGovernor = ad936x.getTrxRateGovernor();
         printToConsole("  Original TRX rate governor: " + origGovernor);
 
         ad936x.setTrxRateGovernor("nominal");
@@ -106,6 +110,7 @@ TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERNOR
         if (readBack !== "nominal") {
             printToConsole("  FAIL: Rate governor did not change to nominal");
             ad936x.setTrxRateGovernor(origGovernor);
+            msleep(500);
             return false;
         }
 
@@ -123,6 +128,7 @@ TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERNOR
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origGovernor) { ad936x.setTrxRateGovernor(origGovernor); msleep(500); }
         return false;
     }
 });
@@ -136,11 +142,12 @@ TestFramework.runTest("TST.AD936X.CHANGE_VALIDATE_GLOBAL_SETTINGS.CALIB_GOVERNOR
 printToConsole("\n=== Test 4: RX and TX Chain Configuration ===\n");
 
 TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
+    var origBw, origSr, origLo;
     try {
         // Step 1: Change RX bandwidth and sampling rate
-        var origBw = ad936x.getRxRfBandwidth();
-        var origSr = ad936x.getRxSamplingFrequency();
-        var origLo = ad936x.getRxLoFrequency();
+        origBw = ad936x.getRxRfBandwidth();
+        origSr = ad936x.getRxSamplingFrequency();
+        origLo = ad936x.getRxLoFrequency();
         printToConsole("  Original RX RF BW: " + origBw);
         printToConsole("  Original RX sampling freq: " + origSr);
         printToConsole("  Original RX LO freq: " + origLo);
@@ -153,6 +160,7 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
         if (bwReadBack !== "18000000") {
             printToConsole("  FAIL: RX bandwidth was not applied");
             ad936x.setRxRfBandwidth(origBw);
+            msleep(500);
             return false;
         }
 
@@ -164,7 +172,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
         if (srReadBack !== "25000000") {
             printToConsole("  FAIL: RX sampling frequency was not applied");
             ad936x.setRxRfBandwidth(origBw);
+            msleep(500);
             ad936x.setRxSamplingFrequency(origSr);
+            msleep(500);
             return false;
         }
 
@@ -176,8 +186,11 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
         if (loReadBack !== "2400000000") {
             printToConsole("  FAIL: RX LO frequency was not applied");
             ad936x.setRxRfBandwidth(origBw);
+            msleep(500);
             ad936x.setRxSamplingFrequency(origSr);
+            msleep(500);
             ad936x.setRxLoFrequency(origLo);
+            msleep(500);
             return false;
         }
 
@@ -189,7 +202,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
 
         // Restore
         ad936x.setRxRfBandwidth(origBw);
+        msleep(500);
         ad936x.setRxSamplingFrequency(origSr);
+        msleep(500);
         ad936x.setRxLoFrequency(origLo);
         msleep(500);
 
@@ -197,16 +212,20 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origBw) { ad936x.setRxRfBandwidth(origBw); msleep(500); }
+        if (origSr) { ad936x.setRxSamplingFrequency(origSr); msleep(500); }
+        if (origLo) { ad936x.setRxLoFrequency(origLo); msleep(500); }
         return false;
     }
 });
 
 TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.TX", function() {
+    var origBw, origSr, origLo;
     try {
         // Step 2: Change TX bandwidth and LO frequency
-        var origBw = ad936x.getTxRfBandwidth();
-        var origSr = ad936x.getTxSamplingFrequency();
-        var origLo = ad936x.getTxLoFrequency();
+        origBw = ad936x.getTxRfBandwidth();
+        origSr = ad936x.getTxSamplingFrequency();
+        origLo = ad936x.getTxLoFrequency();
         printToConsole("  Original TX RF BW: " + origBw);
         printToConsole("  Original TX sampling freq: " + origSr);
         printToConsole("  Original TX LO freq: " + origLo);
@@ -219,6 +238,7 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.TX", function() {
         if (bwReadBack !== "18000000") {
             printToConsole("  FAIL: TX bandwidth was not applied");
             ad936x.setTxRfBandwidth(origBw);
+            msleep(500);
             return false;
         }
 
@@ -230,7 +250,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.TX", function() {
         if (loReadBack !== "2400000000") {
             printToConsole("  FAIL: TX LO frequency was not applied");
             ad936x.setTxRfBandwidth(origBw);
+            msleep(500);
             ad936x.setTxLoFrequency(origLo);
+            msleep(500);
             return false;
         }
 
@@ -242,7 +264,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.TX", function() {
 
         // Restore
         ad936x.setTxRfBandwidth(origBw);
+        msleep(500);
         ad936x.setTxSamplingFrequency(origSr);
+        msleep(500);
         ad936x.setTxLoFrequency(origLo);
         msleep(500);
 
@@ -250,6 +274,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.TX", function() {
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origBw) { ad936x.setTxRfBandwidth(origBw); msleep(500); }
+        if (origSr) { ad936x.setTxSamplingFrequency(origSr); msleep(500); }
+        if (origLo) { ad936x.setTxLoFrequency(origLo); msleep(500); }
         return false;
     }
 });

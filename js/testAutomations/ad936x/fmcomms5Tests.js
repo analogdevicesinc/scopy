@@ -44,9 +44,10 @@ if (!switchToTool("FMCOMMS5")) {
 // ============================================
 printToConsole("\n=== Global Device Settings ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.ENSM_MODE", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
+    var original;
     try {
-        var original = fmcomms5.getEnsmMode();
+        original = fmcomms5.getEnsmMode();
         printToConsole("  Original ENSM mode: " + original);
         fmcomms5.setEnsmMode("fdd");
         msleep(500);
@@ -59,11 +60,12 @@ TestFramework.runTest("TST.FMCOMMS5.ENSM_MODE", function() {
         return readBack === "fdd";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setEnsmMode(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.CALIB_MODE", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
     try {
         var value = fmcomms5.getCalibMode();
         printToConsole("  Calib mode: " + value);
@@ -78,9 +80,10 @@ TestFramework.runTest("TST.FMCOMMS5.CALIB_MODE", function() {
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TRX_RATE_GOVERNOR", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
+    var original;
     try {
-        var original = fmcomms5.getTrxRateGovernor();
+        original = fmcomms5.getTrxRateGovernor();
         printToConsole("  Original TRX rate governor: " + original);
         fmcomms5.setTrxRateGovernor("nominal");
         msleep(500);
@@ -93,11 +96,12 @@ TestFramework.runTest("TST.FMCOMMS5.TRX_RATE_GOVERNOR", function() {
         return readBack === "nominal";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setTrxRateGovernor(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_PATH_RATES", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
     try {
         var value = fmcomms5.getRxPathRates();
         printToConsole("  RX path rates: " + value);
@@ -112,7 +116,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_PATH_RATES", function() {
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_PATH_RATES", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
     try {
         var value = fmcomms5.getTxPathRates();
         printToConsole("  TX path rates: " + value);
@@ -127,9 +131,10 @@ TestFramework.runTest("TST.FMCOMMS5.TX_PATH_RATES", function() {
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.XO_CORRECTION", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
+    var original;
     try {
-        var original = fmcomms5.getXoCorrection();
+        original = fmcomms5.getXoCorrection();
         printToConsole("  Original XO correction: " + original);
         var testValue = "40000000";
         fmcomms5.setXoCorrection(testValue);
@@ -143,6 +148,7 @@ TestFramework.runTest("TST.FMCOMMS5.XO_CORRECTION", function() {
         return readBack === testValue;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setXoCorrection(original); msleep(500); }
         return false;
     }
 });
@@ -152,9 +158,10 @@ TestFramework.runTest("TST.FMCOMMS5.XO_CORRECTION", function() {
 // ============================================
 printToConsole("\n=== RX Chain Tests ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.RX_RF_BW", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getRxRfBandwidth();
+        original = fmcomms5.getRxRfBandwidth();
         printToConsole("  Original RX RF bandwidth: " + original);
         fmcomms5.setRxRfBandwidth("18000000");
         msleep(500);
@@ -167,13 +174,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_RF_BW", function() {
         return readBack === "18000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRxRfBandwidth(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_SAMPLING_FREQ", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getRxSamplingFrequency();
+        original = fmcomms5.getRxSamplingFrequency();
         printToConsole("  Original RX sampling frequency: " + original);
         fmcomms5.setRxSamplingFrequency("25000000");
         msleep(500);
@@ -186,11 +195,12 @@ TestFramework.runTest("TST.FMCOMMS5.RX_SAMPLING_FREQ", function() {
         return readBack === "25000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRxSamplingFrequency(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_RF_PORT", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
     try {
         var value = fmcomms5.getRxRfPortSelect();
         printToConsole("  RX RF port: " + value);
@@ -205,9 +215,10 @@ TestFramework.runTest("TST.FMCOMMS5.RX_RF_PORT", function() {
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_QUAD_TRACK", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.isQuadratureTrackingEnabled();
+        original = fmcomms5.isQuadratureTrackingEnabled();
         printToConsole("  Original quadrature tracking: " + original);
         fmcomms5.setQuadratureTrackingEnabled("1");
         msleep(500);
@@ -220,13 +231,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_QUAD_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setQuadratureTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_RF_DC_TRACK", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.isRfDcOffsetTrackingEnabled();
+        original = fmcomms5.isRfDcOffsetTrackingEnabled();
         printToConsole("  Original RF DC offset tracking: " + original);
         fmcomms5.setRfDcOffsetTrackingEnabled("1");
         msleep(500);
@@ -239,13 +252,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_RF_DC_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRfDcOffsetTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_BB_DC_TRACK", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.isBbDcOffsetTrackingEnabled();
+        original = fmcomms5.isBbDcOffsetTrackingEnabled();
         printToConsole("  Original BB DC offset tracking: " + original);
         fmcomms5.setBbDcOffsetTrackingEnabled("1");
         msleep(500);
@@ -258,6 +273,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_BB_DC_TRACK", function() {
         return readBack === "1";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setBbDcOffsetTrackingEnabled(original); msleep(500); }
         return false;
     }
 });
@@ -267,9 +283,10 @@ TestFramework.runTest("TST.FMCOMMS5.RX_BB_DC_TRACK", function() {
 // ============================================
 printToConsole("\n=== TX Chain Tests ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.TX_RF_BW", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getTxRfBandwidth();
+        original = fmcomms5.getTxRfBandwidth();
         printToConsole("  Original TX RF bandwidth: " + original);
         fmcomms5.setTxRfBandwidth("18000000");
         msleep(500);
@@ -282,13 +299,15 @@ TestFramework.runTest("TST.FMCOMMS5.TX_RF_BW", function() {
         return readBack === "18000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setTxRfBandwidth(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_SAMPLING_FREQ", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getTxSamplingFrequency();
+        original = fmcomms5.getTxSamplingFrequency();
         printToConsole("  Original TX sampling frequency: " + original);
         fmcomms5.setTxSamplingFrequency("25000000");
         msleep(500);
@@ -301,11 +320,12 @@ TestFramework.runTest("TST.FMCOMMS5.TX_SAMPLING_FREQ", function() {
         return readBack === "25000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setTxSamplingFrequency(original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_RF_PORT", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
     try {
         var value = fmcomms5.getTxRfPortSelect();
         printToConsole("  TX RF port: " + value);
@@ -325,10 +345,11 @@ TestFramework.runTest("TST.FMCOMMS5.TX_RF_PORT", function() {
 // ============================================
 printToConsole("\n=== Per-Channel RX Tests ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.RX_HW_GAIN_CH0", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var originalMode, originalGain;
     try {
-        var originalMode = fmcomms5.getRxGainControlMode(0);
-        var originalGain = fmcomms5.getRxHardwareGain(0);
+        originalMode = fmcomms5.getRxGainControlMode(0);
+        originalGain = fmcomms5.getRxHardwareGain(0);
         printToConsole("  Original gain mode (ch0): " + originalMode);
         printToConsole("  Original HW gain (ch0): " + originalGain);
         fmcomms5.setRxGainControlMode(0, "manual");
@@ -348,14 +369,17 @@ TestFramework.runTest("TST.FMCOMMS5.RX_HW_GAIN_CH0", function() {
         return readBack.indexOf("30") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalGain) { fmcomms5.setRxHardwareGain(0, originalGain); msleep(500); }
+        if (originalMode && originalMode !== "manual") { fmcomms5.setRxGainControlMode(0, originalMode); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_HW_GAIN_CH2", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var originalMode, originalGain;
     try {
-        var originalMode = fmcomms5.getRxGainControlMode(2);
-        var originalGain = fmcomms5.getRxHardwareGain(2);
+        originalMode = fmcomms5.getRxGainControlMode(2);
+        originalGain = fmcomms5.getRxHardwareGain(2);
         printToConsole("  Original gain mode (ch2): " + originalMode);
         printToConsole("  Original HW gain (ch2): " + originalGain);
         fmcomms5.setRxGainControlMode(2, "manual");
@@ -375,13 +399,16 @@ TestFramework.runTest("TST.FMCOMMS5.RX_HW_GAIN_CH2", function() {
         return readBack.indexOf("30") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalGain) { fmcomms5.setRxHardwareGain(2, originalGain); msleep(500); }
+        if (originalMode && originalMode !== "manual") { fmcomms5.setRxGainControlMode(2, originalMode); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_GAIN_MODE_CH0", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getRxGainControlMode(0);
+        original = fmcomms5.getRxGainControlMode(0);
         printToConsole("  Original RX gain control mode (ch0): " + original);
         fmcomms5.setRxGainControlMode(0, "manual");
         msleep(500);
@@ -394,13 +421,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_GAIN_MODE_CH0", function() {
         return readBack === "manual";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRxGainControlMode(0, original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_GAIN_MODE_CH2", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getRxGainControlMode(2);
+        original = fmcomms5.getRxGainControlMode(2);
         printToConsole("  Original RX gain control mode (ch2): " + original);
         fmcomms5.setRxGainControlMode(2, "manual");
         msleep(500);
@@ -413,11 +442,12 @@ TestFramework.runTest("TST.FMCOMMS5.RX_GAIN_MODE_CH2", function() {
         return readBack === "manual";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRxGainControlMode(2, original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_RSSI", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
     try {
         var rssi0 = fmcomms5.getRxRssi(0);
         var rssi1 = fmcomms5.getRxRssi(1);
@@ -455,9 +485,10 @@ TestFramework.runTest("TST.FMCOMMS5.RX_RSSI", function() {
 // ============================================
 printToConsole("\n=== Per-Channel TX Tests ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.TX_HW_GAIN_CH0", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var originalGain;
     try {
-        var originalGain = fmcomms5.getTxHardwareGain(0);
+        originalGain = fmcomms5.getTxHardwareGain(0);
         printToConsole("  Original TX HW gain (ch0): " + originalGain);
         fmcomms5.setTxHardwareGain(0, "-10");
         msleep(500);
@@ -470,13 +501,15 @@ TestFramework.runTest("TST.FMCOMMS5.TX_HW_GAIN_CH0", function() {
         return readBack.indexOf("-10") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalGain) { fmcomms5.setTxHardwareGain(0, originalGain); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_HW_GAIN_CH2", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var originalGain;
     try {
-        var originalGain = fmcomms5.getTxHardwareGain(2);
+        originalGain = fmcomms5.getTxHardwareGain(2);
         printToConsole("  Original TX HW gain (ch2): " + originalGain);
         fmcomms5.setTxHardwareGain(2, "-10");
         msleep(500);
@@ -489,11 +522,12 @@ TestFramework.runTest("TST.FMCOMMS5.TX_HW_GAIN_CH2", function() {
         return readBack.indexOf("-10") !== -1;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalGain) { fmcomms5.setTxHardwareGain(2, originalGain); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_RSSI", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
     try {
         var rssi0 = fmcomms5.getTxRssi(0);
         var rssi1 = fmcomms5.getTxRssi(1);
@@ -531,9 +565,10 @@ TestFramework.runTest("TST.FMCOMMS5.TX_RSSI", function() {
 // ============================================
 printToConsole("\n=== LO Frequencies ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.RX_LO_DEV0", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getRxLoFrequency(0);
+        original = fmcomms5.getRxLoFrequency(0);
         printToConsole("  Original RX LO frequency (dev0): " + original);
         fmcomms5.setRxLoFrequency(0, "2400000000");
         msleep(500);
@@ -546,13 +581,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_LO_DEV0", function() {
         return readBack === "2400000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRxLoFrequency(0, original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.RX_LO_DEV1", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getRxLoFrequency(1);
+        original = fmcomms5.getRxLoFrequency(1);
         printToConsole("  Original RX LO frequency (dev1): " + original);
         fmcomms5.setRxLoFrequency(1, "2400000000");
         msleep(500);
@@ -565,13 +602,15 @@ TestFramework.runTest("TST.FMCOMMS5.RX_LO_DEV1", function() {
         return readBack === "2400000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setRxLoFrequency(1, original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_LO_DEV0", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getTxLoFrequency(0);
+        original = fmcomms5.getTxLoFrequency(0);
         printToConsole("  Original TX LO frequency (dev0): " + original);
         fmcomms5.setTxLoFrequency(0, "2400000000");
         msleep(500);
@@ -584,13 +623,15 @@ TestFramework.runTest("TST.FMCOMMS5.TX_LO_DEV0", function() {
         return readBack === "2400000000";
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setTxLoFrequency(0, original); msleep(500); }
         return false;
     }
 });
 
-TestFramework.runTest("TST.FMCOMMS5.TX_LO_DEV1", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var original;
     try {
-        var original = fmcomms5.getTxLoFrequency(1);
+        original = fmcomms5.getTxLoFrequency(1);
         printToConsole("  Original TX LO frequency (dev1): " + original);
         fmcomms5.setTxLoFrequency(1, "2400000000");
         msleep(500);
@@ -603,69 +644,7 @@ TestFramework.runTest("TST.FMCOMMS5.TX_LO_DEV1", function() {
         return readBack === "2400000000";
     } catch (e) {
         printToConsole("  Error: " + e);
-        return false;
-    }
-});
-
-// ============================================
-// Generic Widget Access Tests
-// ============================================
-printToConsole("\n=== Generic Widget Access Tests ===\n");
-
-TestFramework.runTest("TST.FMCOMMS5.WIDGET_KEYS", function() {
-    try {
-        var keys = fmcomms5.getWidgetKeys();
-        printToConsole("  Widget keys count: " + keys.length);
-        if (!keys || keys.length === 0) {
-            printToConsole("  Error: getWidgetKeys() returned empty list");
-            return false;
-        }
-        for (var i = 0; i < Math.min(keys.length, 5); i++) {
-            printToConsole("  Key[" + i + "]: " + keys[i]);
-        }
-        if (keys.length > 5) {
-            printToConsole("  ... and " + (keys.length - 5) + " more");
-        }
-        return true;
-    } catch (e) {
-        printToConsole("  Error: " + e);
-        return false;
-    }
-});
-
-TestFramework.runTest("TST.FMCOMMS5.WIDGET_RW", function() {
-    try {
-        var key = "ad9361-phy//ensm_mode";
-        var original = fmcomms5.readWidget(key);
-        printToConsole("  Original value for '" + key + "': " + original);
-        fmcomms5.writeWidget(key, "fdd");
-        msleep(500);
-        var readBack = fmcomms5.readWidget(key);
-        printToConsole("  Read back value: " + readBack);
-        if (original && original !== readBack) {
-            fmcomms5.writeWidget(key, original);
-            msleep(500);
-        }
-        return readBack === "fdd";
-    } catch (e) {
-        printToConsole("  Error: " + e);
-        return false;
-    }
-});
-
-// ============================================
-// Utility Tests
-// ============================================
-printToConsole("\n=== Utility Tests ===\n");
-
-TestFramework.runTest("TST.FMCOMMS5.REFRESH", function() {
-    try {
-        fmcomms5.refresh();
-        msleep(500);
-        printToConsole("  refresh() completed without exception");
-        return true;
-    } catch (e) {
-        printToConsole("  Error: " + e);
+        if (original) { fmcomms5.setTxLoFrequency(1, original); msleep(500); }
         return false;
     }
 });

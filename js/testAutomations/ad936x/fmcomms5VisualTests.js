@@ -21,8 +21,8 @@
 // ============================================================================
 // ALL THE FOLLOWING TESTS REQUIRE VISUAL VALIDATION
 // These tests automate the steps from the manual test documentation but
-// require a human observer to verify UI changes. Each step includes a 3-second
-// pause to allow visual inspection of the application state.
+// require a human observer to verify UI changes. Each step pauses for
+// supervised human validation before continuing.
 // Source: docs/tests/plugins/fmcomms5/fmcomms5_tests.rst
 // Note: FMCOMMS5 has two physical AD9361 devices (ad9361-phy and ad9361-phy-B)
 //   Channels 0-1 map to ad9361-phy, channels 2-3 map to ad9361-phy-B
@@ -33,8 +33,6 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("FMCOMMS5 Visual Validation Tests");
-
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
 
 // Connect to device
 if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
@@ -54,8 +52,7 @@ TestFramework.runTest("TST.FMCOMMS5.PLUGIN_LOADS", function() {
     try {
         // Step 1: Open Scopy application (already running)
         printToConsole("  Scopy application is running");
-        printToConsole("  VISUAL CHECK: Verify Scopy launched without errors");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify Scopy launched without errors");
 
         // Step 2: Open FMCOMMS5 plugin
         if (!switchToTool("FMCOMMS5")) {
@@ -70,8 +67,7 @@ TestFramework.runTest("TST.FMCOMMS5.PLUGIN_LOADS", function() {
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify FMCOMMS5 plugin loads and is accessible in the UI");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify FMCOMMS5 plugin loads and is accessible in the UI");
 
         return true;
     } catch (e) {
@@ -128,8 +124,7 @@ TestFramework.runTest("TST.FMCOMMS5.DEVICE_DETECTION_AND_DISPLAY", function() {
                 " (" + (ch < 2 ? "ad9361-phy" : "ad9361-phy-B") + ")");
         }
 
-        printToConsole("  VISUAL CHECK: Verify both AD9361-phy and AD9361-phy-B status panels are displayed");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify both AD9361-phy and AD9361-phy-B status panels are displayed");
 
         return true;
     } catch (e) {
@@ -145,31 +140,35 @@ TestFramework.runTest("TST.FMCOMMS5.DEVICE_DETECTION_AND_DISPLAY", function() {
 // ============================================
 printToConsole("\n=== Test 3: Global Settings (VISUAL) ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.VISUAL", function() {
+TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS", function() {
+    var origEnsm, origGov;
     try {
-        var origEnsm = fmcomms5.getEnsmMode();
-        var origGov = fmcomms5.getTrxRateGovernor();
+        origEnsm = fmcomms5.getEnsmMode();
+        origGov = fmcomms5.getTrxRateGovernor();
 
         // Step 1: Change ENSM mode
         printToConsole("  Setting ENSM mode to fdd...");
         fmcomms5.setEnsmMode("fdd");
-        printToConsole("  VISUAL CHECK: Verify ENSM mode changes to FDD for both devices");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify ENSM mode changes to FDD for both devices");
 
         // Step 2: Change rate governor
         printToConsole("  Setting TRX rate governor to nominal...");
         fmcomms5.setTrxRateGovernor("nominal");
-        printToConsole("  VISUAL CHECK: Verify rate governor changes for both devices");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify rate governor changes for both devices");
 
         // Restore
         fmcomms5.setEnsmMode(origEnsm);
+        msleep(500);
         fmcomms5.setTrxRateGovernor(origGov);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origEnsm) { fmcomms5.setEnsmMode(origEnsm); msleep(500); }
+        if (origGov) { fmcomms5.setTrxRateGovernor(origGov); msleep(500); }
         return false;
     }
 });
@@ -181,46 +180,54 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.VISUAL", fun
 // ============================================
 printToConsole("\n=== Test 4: RX and TX Chain Configuration (VISUAL) ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.VISUAL", function() {
+TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG", function() {
+    var origRxBw, origTxBw, origRxLo0, origRxLo1;
     try {
-        var origRxBw = fmcomms5.getRxRfBandwidth();
-        var origTxBw = fmcomms5.getTxRfBandwidth();
-        var origRxLo0 = fmcomms5.getRxLoFrequency(0);
-        var origRxLo1 = fmcomms5.getRxLoFrequency(1);
+        origRxBw = fmcomms5.getRxRfBandwidth();
+        origTxBw = fmcomms5.getTxRfBandwidth();
+        origRxLo0 = fmcomms5.getRxLoFrequency(0);
+        origRxLo1 = fmcomms5.getRxLoFrequency(1);
 
         // Step 1: Change RX bandwidth
         printToConsole("  Setting RX RF bandwidth to 18 MHz...");
         fmcomms5.setRxRfBandwidth("18000000");
-        printToConsole("  VISUAL CHECK: Verify RX bandwidth updated for all RX channels");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify RX bandwidth updated for all RX channels");
 
         // Change RX LO for both devices
         printToConsole("  Setting RX LO to 2.4 GHz for device 0 (channels 0-1)...");
         fmcomms5.setRxLoFrequency(0, "2400000000");
-        printToConsole("  VISUAL CHECK: Verify RX LO updated for device 0");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify RX LO updated for device 0");
 
         printToConsole("  Setting RX LO to 2.4 GHz for device 1 (channels 2-3)...");
         fmcomms5.setRxLoFrequency(1, "2400000000");
-        printToConsole("  VISUAL CHECK: Verify RX LO updated for device 1");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify RX LO updated for device 1");
 
         // Step 2: Change TX bandwidth
         printToConsole("  Setting TX RF bandwidth to 18 MHz...");
         fmcomms5.setTxRfBandwidth("18000000");
-        printToConsole("  VISUAL CHECK: Verify TX bandwidth updated for all TX channels");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify TX bandwidth updated for all TX channels");
 
         // Restore
         fmcomms5.setRxRfBandwidth(origRxBw);
+        msleep(500);
         fmcomms5.setTxRfBandwidth(origTxBw);
+        msleep(500);
         fmcomms5.setRxLoFrequency(0, origRxLo0);
+        msleep(500);
         fmcomms5.setRxLoFrequency(1, origRxLo1);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origRxBw) { fmcomms5.setRxRfBandwidth(origRxBw); msleep(500); }
+        if (origTxBw) { fmcomms5.setTxRfBandwidth(origTxBw); msleep(500); }
+        if (origRxLo0) { fmcomms5.setRxLoFrequency(0, origRxLo0); msleep(500); }
+        if (origRxLo1) { fmcomms5.setRxLoFrequency(1, origRxLo1); msleep(500); }
         return false;
     }
 });
@@ -232,28 +239,27 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.VISUAL", function() {
 // ============================================
 printToConsole("\n=== Test 5: Advanced Plugin Detection and Display (VISUAL) ===\n");
 
-TestFramework.runTest("TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY.VISUAL", function() {
+TestFramework.runTest("TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY", function() {
     try {
         if (!switchToTool("FMCOMMS5 Advanced")) {
             printToConsole("  FAIL: Cannot switch to FMCOMMS5 Advanced tool");
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify FMCOMMS5 Advanced plugin is loaded");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify FMCOMMS5 Advanced plugin is loaded");
 
         // Navigate through subtabs
         fmcomms5_advanced.switchSubtab("ENSM/Mode/Clocks");
-        printToConsole("  VISUAL CHECK: Verify ENSM/Mode/Clocks panel displays correctly");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify ENSM/Mode/Clocks panel displays correctly");
 
         fmcomms5_advanced.switchSubtab("Gain");
-        printToConsole("  VISUAL CHECK: Verify Gain panel displays correctly");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify Gain panel displays correctly");
 
         fmcomms5_advanced.switchSubtab("FMCOMMS5");
-        printToConsole("  VISUAL CHECK: Verify FMCOMMS5 calibration panel displays correctly");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify FMCOMMS5 calibration panel displays correctly");
 
         return true;
     } catch (e) {
