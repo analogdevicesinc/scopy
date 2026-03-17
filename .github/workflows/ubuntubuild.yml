@@ -32,7 +32,7 @@ jobs:
     steps:
         - name: check storage space
           run: df -h
-        - uses: actions/checkout@v4
+        - uses: actions/checkout@v6
         - name: Build Scopy
           run: |
             git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -45,7 +45,7 @@ jobs:
             QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu.xml
 
         - name: Report
-          uses: mikepenz/action-junit-report@v4
+          uses: mikepenz/action-junit-report@v6
           if: always()
           with:
              job_name: Verify Results

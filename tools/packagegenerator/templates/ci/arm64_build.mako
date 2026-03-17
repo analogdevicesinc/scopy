@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Package Repository (this repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           set-safe-directory: 'true'
           fetch-depth: 0
           path: package
 
       - name: Clone Scopy Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           set-safe-directory: 'true'
           repository: analogdevicesinc/scopy
@@ -70,7 +70,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/scopy/tools/packagegenerator
           python3 ./package_generator.py -a --src=$GITHUB_WORKSPACE/scopy/build/packages/$REPO_NAME --dest=$GITHUB_WORKSPACE/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: linux-arm64-${"${{ env.REPO_NAME }}"}
           path: ${"${{ github.workspace }}"}/${"${{ env.REPO_NAME }}"}.zip
