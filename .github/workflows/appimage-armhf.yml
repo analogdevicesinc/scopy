@@ -60,5 +60,16 @@ jobs:
             name: scopy-armhf-appimage-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy-armhf.AppImage
 
+        - name: Build Debian package
+          shell: bash
+          run: |
+            sudo apt-get install -y dpkg-dev debhelper devscripts rsync
+            ./ci/packaging/scopy-deb-build.sh scopy32 $GITHUB_WORKSPACE/Scopy-armhf.AppImage
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: scopy-armhf-deb-${{ env.commit_sha }}
+            path: ${{ github.workspace }}/scopy_*_armhf.deb
+
         - name: check storage space
           run: df -h

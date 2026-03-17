@@ -1,0 +1,13 @@
+Source: ${PACKAGE}
+Section: science
+Priority: optional
+Maintainer: ${MAINTAINER}
+Build-Depends: debhelper-compat (= 13), wget, unzip
+Standards-Version: 4.6.2
+Homepage: ${HOMEPAGE}
+
+Package: ${PACKAGE}
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${DEPENDS}
+Description: ${DESCRIPTION}
+ ${LONG_DESCRIPTION}
