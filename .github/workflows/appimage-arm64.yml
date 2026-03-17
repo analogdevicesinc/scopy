@@ -6,6 +6,9 @@ on:
         docker_tag:
           required: true
           type: string
+      secrets: 
+        CLOUDSMITH_SERVICE_SLUG:
+          required: true
 
 env:
   BUILD_HOST: ubuntu-22.04
@@ -15,6 +18,8 @@ env:
 jobs:
   make_arm64_appimage:
     runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
     steps:
 
         - name: check storage space
@@ -59,6 +64,39 @@ jobs:
           with:
             name: scopy-arm64-appimage-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy-arm64.AppImage
+
+        - name: Build Debian package
+          shell: bash
+          run: |
+            sudo apt-get install -y dpkg-dev debhelper devscripts rsync crossbuild-essential-arm64
+            ./ci/packaging/scopy-deb-build.sh scopy64 $GITHUB_WORKSPACE/Scopy-arm64.AppImage
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: scopy-arm64-deb-${{ env.commit_sha }}
+            path: |
+              ${{ github.workspace }}/scopy_*_arm64.deb
+              ${{ github.workspace }}/scopy_*.dsc
+              ${{ github.workspace }}/scopy_*.orig.tar.gz
+              ${{ github.workspace }}/scopy_*.debian.tar.xz
+            if-no-files-found: error
+        
+        - name: Authenticate with Cloudsmith via OIDC
+          if: success() && github.ref == 'refs/heads/main'
+          uses: cloudsmith-io/cloudsmith-cli-action@v2.0.2
+          with:
+            oidc-namespace: adi
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+      
+        - name: Upload debian package to Cloudsmith
+          if: success() && env.CLOUDSMITH_API_KEY != ''
+          run: |
+            pip install cloudsmith-cli
+            for f in scopy_*.dsc scopy_*.orig.tar.gz scopy_*.debian.tar.xz; do
+              [ -f "$f" ] || continue
+              cloudsmith push raw -SW --republish adi/kuiper-internal "$f" 
+            done
+            cloudsmith push deb -SW --republish "adi/kuiper-internal/debian/trixie" scopy_*.deb
 
         - name: check storage space
           run: df -h

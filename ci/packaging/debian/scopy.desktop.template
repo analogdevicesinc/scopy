@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Scopy
+GenericName=Oscilloscope
+Comment=A software oscilloscope and signal analysis toolset
+Exec=/usr/bin/${SCOPY}
+Icon=/usr/share/scopy/icons/scopy.png
+Terminal=false
+Type=Application
+Categories=Science;

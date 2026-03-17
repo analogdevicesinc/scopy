@@ -50,6 +50,7 @@ permissions:
   artifact-metadata: write
   checks: write
   actions: write
+  id-token: write # Needed for OIDC authentication to Cloudsmith in appimage-arm64 and appimage-armhf jobs.
 
 jobs:
     docker_tag:
@@ -70,6 +71,8 @@ jobs:
       uses: ./.github/workflows/appimage-arm64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     appimage-armhf:
       needs: docker_tag
@@ -77,6 +80,8 @@ jobs:
       uses: ./.github/workflows/appimage-armhf.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     mingw:
       needs: docker_tag
