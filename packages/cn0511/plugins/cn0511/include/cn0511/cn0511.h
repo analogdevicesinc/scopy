@@ -25,9 +25,8 @@
 #include "scopy-cn0511_export.h"
 #include <QBoxLayout>
 #include <QWidget>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
-#include <QPushButton>
+#include <animatedloadingbutton.h>
+#include <menuspinbox.h>
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio-widgets/iiowidgetbuilder.h>
@@ -54,6 +53,7 @@ private Q_SLOTS:
 	void applyCalibration();
 
 private:
+	friend class Cn0511_API;
 	iio_context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool = nullptr;
@@ -62,14 +62,16 @@ private:
 	iio_device *m_dac = nullptr;
 	iio_channel *m_dacCh = nullptr;
 
-	QDoubleSpinBox *m_freqSpinBox = nullptr;
-	QSpinBox *m_ampSpinBox = nullptr;
+	gui::MenuSpinbox *m_freqSpinBox = nullptr;
+	gui::MenuSpinbox *m_ampSpinBox = nullptr;
+	AnimatedLoadingButton *m_enterBtn = nullptr;
 
 	double m_calibFreq = 4500000000.0;
 	int m_amplitude = 0;
 
 	QWidget *generateSingleToneSection(QWidget *parent);
 	QWidget *generateDacAmpSection(QWidget *parent);
+	void readFrequencyFromDevice();
 };
 } // namespace cn0511
 } // namespace scopy
