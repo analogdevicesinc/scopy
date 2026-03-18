@@ -147,22 +147,22 @@ void DeviceManager::connectDeviceToManager(DeviceImpl *d)
 	connect(d, &DeviceImpl::disconnected, this, [=]() { disconnectDevice(d->id()); });
 	connect(d, &DeviceImpl::forget, this, [=]() { removeDeviceById(d->id()); });
 	connect(d, &DeviceImpl::requestReload, this, &DeviceManager::reloadDevice);
-	connect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
-	connect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
-	connect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
+	connect(d, &DeviceImpl::requestedRestart, this, QOverload<>::of(&DeviceManager::restartDevice));
+	connect(d, &DeviceImpl::toolListChanged, this, &DeviceManager::changeToolListDevice);
+	connect(d, &DeviceImpl::requestTool, this, &DeviceManager::requestTool);
 }
 
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d)
 {
-	disconnect(d, SIGNAL(connecting()));
-	disconnect(d, SIGNAL(connected()));
-	disconnect(d, SIGNAL(disconnecting()));
-	disconnect(d, SIGNAL(disconnected()));
-	disconnect(d, SIGNAL(forget()));
-	disconnect(d, SIGNAL(requestReload(QString, QStringList)));
-	disconnect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
-	disconnect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
-	disconnect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
+	disconnect(d, &DeviceImpl::connecting, nullptr, nullptr);
+	disconnect(d, &DeviceImpl::connected, nullptr, nullptr);
+	disconnect(d, &DeviceImpl::disconnecting, nullptr, nullptr);
+	disconnect(d, &DeviceImpl::disconnected, nullptr, nullptr);
+	disconnect(d, &DeviceImpl::forget, nullptr, nullptr);
+	disconnect(d, &DeviceImpl::requestReload, nullptr, nullptr);
+	disconnect(d, &DeviceImpl::requestedRestart, this, QOverload<>::of(&DeviceManager::restartDevice));
+	disconnect(d, &DeviceImpl::toolListChanged, this, &DeviceManager::changeToolListDevice);
+	disconnect(d, &DeviceImpl::requestTool, this, &DeviceManager::requestTool);
 }
 
 QString DeviceManager::restartDevice(QString id)

@@ -29,7 +29,7 @@ ScanButtonController::ScanButtonController(CyclicalTask *cs, QCheckBox *btn, QOb
 	this->cs = cs;
 	this->btn = btn;
 	m_scanTimeout = 2000;
-	conn = connect(this->btn, SIGNAL(toggled(bool)), this, SLOT(enableScan(bool)));
+	conn = connect(this->btn, &QCheckBox::toggled, this, &ScanButtonController::enableScan);
 }
 ScanButtonController::~ScanButtonController() { disconnect(conn); }
 

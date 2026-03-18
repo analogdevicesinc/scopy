@@ -196,7 +196,7 @@ CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent)
 	m_contLayout->setContentsMargins(0, 0, 0, 0);
 	m_contLayout->setSpacing(0);
 
-	connect(m_ctrl->checkBox(), SIGNAL(toggled(bool)), container, SLOT(setVisible(bool)));
+	connect(m_ctrl->checkBox(), &QCheckBox::toggled, container, &QWidget::setVisible);
 }
 
 CollapsableMenuControlButton::~CollapsableMenuControlButton() {}
