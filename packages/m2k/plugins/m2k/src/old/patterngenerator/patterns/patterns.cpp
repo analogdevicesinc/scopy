@@ -1333,9 +1333,9 @@ void UARTPatternUI::build_ui(QWidget *parent, uint16_t number_of_channels)
 	ui->CB_Parity->setCurrentIndex(pattern->get_parity());
 	ui->CB_Stop->setCurrentText(QString::number(pattern->get_stop_bits()));
 	ui->LE_Data->setText(QString::fromStdString(pattern->get_string()));
-	connect(ui->CB_baud, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
-	connect(ui->CB_Parity, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
-	connect(ui->CB_Stop, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
+	connect(ui->CB_baud, SIGNAL(activated(int)), this, SLOT(parse_ui()));
+	connect(ui->CB_Parity, SIGNAL(activated(int)), this, SLOT(parse_ui()));
+	connect(ui->CB_Stop, SIGNAL(activated(int)), this, SLOT(parse_ui()));
 	connect(ui->LE_Data, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	parse_ui();
 }
@@ -3618,7 +3618,7 @@ void PulsePatternUI::build_ui(QWidget *parent, uint16_t number_of_channels)
 	connect(ui->noPulses_LE, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	connect(ui->high_LE, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
 	connect(ui->low_LE, SIGNAL(textChanged(QString)), this, SLOT(parse_ui()));
-	connect(ui->start_CB, SIGNAL(activated(QString)), this, SLOT(parse_ui()));
+	connect(ui->start_CB, SIGNAL(activated(int)), this, SLOT(parse_ui()));
 	connect(frequencySpinButton, SIGNAL(valueChanged(double)), this, SLOT(parse_ui()));
 	parse_ui();
 }

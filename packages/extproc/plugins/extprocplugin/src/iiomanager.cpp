@@ -63,7 +63,7 @@ void IIOManager::startAcq(bool en)
 	if(m_readFw->isRunning()) {
 		m_readFw->waitForFinished();
 	}
-	m_readFw->setPaused(!en);
+	m_readFw->setSuspended(!en);
 	if(!en) {
 		destroyBuffer();
 	} else if(!m_buffer) {
@@ -74,7 +74,7 @@ void IIOManager::startAcq(bool en)
 
 void IIOManager::onDataRequest()
 {
-	if(!m_readFw->isRunning() && !m_readFw->isPaused()) {
+	if(!m_readFw->isRunning() && !m_readFw->isSuspending()) {
 		QFuture<void> f = QtConcurrent::run(&IIOManager::readBuffer, this);
 		m_readFw->setFuture(f);
 	}

@@ -116,8 +116,6 @@ int main(int argc, char *argv[])
 
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
 	QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
-	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
 	QApplication a(argc, argv);
 	ScopySplashscreen::init();
 	ScopySplashscreen::showMessage("Initializing scopy");

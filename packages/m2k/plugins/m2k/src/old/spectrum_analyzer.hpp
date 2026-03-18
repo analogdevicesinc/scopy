@@ -171,8 +171,8 @@ private Q_SLOTS:
 	void onCursorReadoutsChanged(struct cursorReadoutsText);
 	void toggleCursorsMode(bool toggled);
 
-	void on_comboBox_type_currentIndexChanged(const QString &);
-	void on_comboBox_window_currentIndexChanged(const QString &);
+	void on_comboBox_type_currentIndexChanged(int idx);
+	void on_comboBox_window_currentIndexChanged(int idx);
 	void on_comboBox_line_thickness_currentIndexChanged(int index);
 	void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
@@ -187,7 +187,7 @@ private Q_SLOTS:
 	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
-	void on_cmb_units_currentIndexChanged(const QString &);
+	void on_cmb_units_currentIndexChanged(int idx);
 	void onPlotNewMarkerData();
 	void onPlotMarkerSelected(uint chIdx, uint mkIdx);
 	void onMarkerFreqPosChanged(double);

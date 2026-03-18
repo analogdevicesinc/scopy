@@ -1812,7 +1812,7 @@ void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> y
 	nb_ref_channels++;
 
 	if(!ui->btnMarkers->isEnabled()) {
-		QSignalBlocker(ui->btnMarkers);
+		const QSignalBlocker blocker(ui->btnMarkers);
 		ui->btnMarkers->setEnabled(true);
 	}
 
@@ -2148,8 +2148,9 @@ void SpectrumAnalyzer::stop_blockchain_flow()
 	}
 }
 
-void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString &s)
+void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(int idx)
 {
+	QString s = ui->comboBox_type->itemText(idx);
 	auto it = std::find_if(avg_types.begin(), avg_types.end(),
 			       [&](const std::pair<QString, FftDisplayPlot::AverageType> &p) { return p.first == s; });
 
@@ -2194,8 +2195,9 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString &s)
 	}
 }
 
-void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString &s)
+void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(int idx)
 {
+	QString s = ui->comboBox_window->itemText(idx);
 	auto it = std::find_if(win_types.begin(), win_types.end(),
 			       [&](const std::pair<QString, FftWinType> &p) { return p.first == s; });
 
@@ -2506,9 +2508,9 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 #endif
 
 		if(allDisabled) {
-			QSignalBlocker(ui->btnMarkers);
+			const QSignalBlocker blocker1(ui->btnMarkers);
 			if(!ui->btnSweep->isChecked()) {
-				QSignalBlocker(ui->btnSettings);
+				const QSignalBlocker blocker2(ui->btnSettings);
 				ui->btnSettings->setChecked(false);
 			}
 			ui->btnMarkers->setChecked(false);
@@ -3021,8 +3023,9 @@ void SpectrumAnalyzer::singleCaptureDone()
 	}
 }
 
-void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString &unit)
+void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(int idx)
 {
+	QString unit = ui->cmb_units->itemText(idx);
 	auto it = std::find_if(
 		mag_types.begin(), mag_types.end(),
 		[&](const std::pair<QString, FftDisplayPlot::MagnitudeType> &p) { return p.first == unit; });
