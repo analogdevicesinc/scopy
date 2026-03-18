@@ -129,9 +129,9 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &HarmonicsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
-	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
+	connect(m_runBtn, &QAbstractButton::toggled, this, &HarmonicsInstrument::toggleHarmonics);
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
-	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
+	connect(m_singleBtn, &QAbstractButton::toggled, this, &HarmonicsInstrument::toggleHarmonics);
 }
 
 HarmonicsInstrument::~HarmonicsInstrument()

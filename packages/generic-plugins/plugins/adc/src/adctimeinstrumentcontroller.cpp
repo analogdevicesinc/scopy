@@ -147,12 +147,12 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 
 	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
-	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
-	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+	connect(c, &GRTimeSinkComponent::arm, this, &ADCInstrumentController::onStart);
+	connect(c, &GRTimeSinkComponent::disarm, this, &ADCInstrumentController::onStop);
 
 	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
-	connect(c, SIGNAL(requestForceStop()), this, SLOT(stop()));
+	connect(c, &GRTimeSinkComponent::requestForceStop, this, &ADCInstrumentController::stop);
 }
 
 void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)

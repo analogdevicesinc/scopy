@@ -143,11 +143,11 @@ void GRFFTSinkComponent::setSingleShot(bool b)
 void GRFFTSinkComponent::onArm()
 {
 	connect(this, &GRFFTSinkComponent::requestRebuild, m_top, &GRTopBlock::rebuild, Qt::QueuedConnection);
-	connect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
-	connect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
-	connect(m_top, SIGNAL(started()), this, SIGNAL(ready()));
-	connect(m_top, SIGNAL(aboutToStop()), this, SIGNAL(finish()));
-	connect(m_top, SIGNAL(forceStop()), this, SIGNAL(requestForceStop()));
+	connect(m_top, &GRTopBlock::builtSignalPaths, this, &GRFFTSinkComponent::connectSignalPaths);
+	connect(m_top, &GRTopBlock::teardownSignalPaths, this, &GRFFTSinkComponent::tearDownSignalPaths);
+	connect(m_top, &GRTopBlock::started, this, &GRFFTSinkComponent::ready);
+	connect(m_top, &GRTopBlock::aboutToStop, this, &GRFFTSinkComponent::finish);
+	connect(m_top, &GRTopBlock::forceStop, this, &GRFFTSinkComponent::requestForceStop);
 	Q_EMIT arm();
 	m_armed = true;
 }
@@ -157,11 +157,11 @@ void GRFFTSinkComponent::onDisarm()
 	m_armed = false;
 	Q_EMIT disarm();
 	disconnect(this, &GRFFTSinkComponent::requestRebuild, m_top, &GRTopBlock::rebuild);
-	disconnect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
-	disconnect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
-	disconnect(m_top, SIGNAL(started()), this, SIGNAL(ready()));
-	disconnect(m_top, SIGNAL(aboutToStop()), this, SIGNAL(finish()));
-	disconnect(m_top, SIGNAL(forceStop()), this, SIGNAL(requestForceStop()));
+	disconnect(m_top, &GRTopBlock::builtSignalPaths, this, &GRFFTSinkComponent::connectSignalPaths);
+	disconnect(m_top, &GRTopBlock::teardownSignalPaths, this, &GRFFTSinkComponent::tearDownSignalPaths);
+	disconnect(m_top, &GRTopBlock::started, this, &GRFFTSinkComponent::ready);
+	disconnect(m_top, &GRTopBlock::aboutToStop, this, &GRFFTSinkComponent::finish);
+	disconnect(m_top, &GRTopBlock::forceStop, this, &GRFFTSinkComponent::requestForceStop);
 }
 
 void GRFFTSinkComponent::init()

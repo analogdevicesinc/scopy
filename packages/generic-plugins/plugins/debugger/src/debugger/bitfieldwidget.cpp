@@ -67,8 +67,8 @@ BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber)
 
 	ui->valueSpinBox->setEnabled(false);
 	ui->valueSpinBox->setMaximum(1);
-	connect(ui->valueSpinBox, SIGNAL(valueChanged(int)), this,
-		SLOT(setValue(int))); // connect spinBox singnal to the value changed signal
+	connect(ui->valueSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+		&BitfieldWidget::setValue); // connect spinBox singnal to the value changed signal
 }
 
 BitfieldWidget::~BitfieldWidget() { delete ui; }
@@ -92,8 +92,8 @@ void BitfieldWidget::createWidget()
 		ui->stackedWidget->setCurrentIndex(1);
 		int temp = (int)pow(2, width) - 1;
 		ui->valueSpinBox->setMaximum(temp);
-		connect(ui->valueSpinBox, SIGNAL(valueChanged(int)), this,
-			SLOT(setValue(int))); // connect spinBox singnal to the value changed signal
+		connect(ui->valueSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+			&BitfieldWidget::setValue); // connect spinBox singnal to the value changed signal
 	} else {
 		/*set comboBox*/
 		ui->stackedWidget->setCurrentIndex(0);
@@ -107,8 +107,8 @@ void BitfieldWidget::createWidget()
 
 		ui->valueComboBox->addItem(temp.firstChildElement("Description").text());
 
-		connect(ui->valueComboBox, SIGNAL(currentIndexChanged(int)), this,
-			SLOT(setValue(int))); // connect comboBox signal to the value changed signal
+		connect(ui->valueComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+			&BitfieldWidget::setValue); // connect comboBox signal to the value changed signal
 	}
 }
 

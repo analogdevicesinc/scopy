@@ -134,9 +134,9 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &RmsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
-	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleRms(bool)));
+	connect(m_runBtn, &QAbstractButton::toggled, this, &RmsInstrument::toggleRms);
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
-	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleRms(bool)));
+	connect(m_singleBtn, &QAbstractButton::toggled, this, &RmsInstrument::toggleRms);
 }
 
 RmsInstrument::~RmsInstrument()

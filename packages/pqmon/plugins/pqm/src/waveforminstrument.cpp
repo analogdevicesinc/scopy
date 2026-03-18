@@ -110,9 +110,9 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &WaveformInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
-	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
+	connect(m_runBtn, &QAbstractButton::toggled, this, &WaveformInstrument::toggleWaveform);
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
-	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
+	connect(m_singleBtn, &QAbstractButton::toggled, this, &WaveformInstrument::toggleWaveform);
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
 		&WaveformInstrument::concurrentEnable);
 }

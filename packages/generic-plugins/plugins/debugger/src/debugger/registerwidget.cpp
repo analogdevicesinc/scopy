@@ -112,8 +112,8 @@ void RegisterWidget::createRegMap(const QString *device, int *address, const QSt
 		for(auto iterator = bitfieldsVector.rbegin(); iterator != bitfieldsVector.rend(); ++iterator) {
 
 			defaultValue += (*iterator)->getDefaultValue() << (*iterator)->getRegOffset();
-			connect(*iterator, SIGNAL(valueChanged(uint32_t, uint32_t)), this,
-				SLOT(setValue(uint32_t, uint32_t)));
+			connect(*iterator, &BitfieldWidget::valueChanged, this,
+				QOverload<uint32_t, uint32_t>::of(&RegisterWidget::setValue));
 			ui->horizontalLayout->addWidget(*iterator);
 		}
 	}

@@ -126,7 +126,7 @@ bool SWIOTPlugin::loadExtraButtons()
 	m_btnIdentify = new QPushButton("Identify");
 	Style::setStyle(m_btnIdentify, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnIdentify);
-	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
+	connect(m_btnIdentify, &QPushButton::clicked, m_swiotController, &SwiotController::identify);
 
 	return true;
 }
