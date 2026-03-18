@@ -327,14 +327,14 @@ void LogicAnalyzer_API::setDecoderSettings(const QList<QStringList> &decoderSett
 					obj = doc.object();
 				} else {
 					//					qDebug(CAT_LOGIC_ANALYZER) << "Document
-					// is not an object" << endl;
+					// is not an object" << Qt::endl;
 				}
 			} else {
 				//				qDebug(CAT_LOGIC_ANALYZER) << "Invalid JSON...\n";
 			}
 
 			QJsonArray propArray = obj["properties"].toArray();
-			for(const auto &propRef : qAsConst(propArray)) {
+			for(const auto &propRef : std::as_const(propArray)) {
 				auto prop = propRef.toObject();
 				for(auto p : binding->properties()) {
 					qDebug() << p->name();

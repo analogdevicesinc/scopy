@@ -31,7 +31,7 @@ SceneRenderer::SceneRenderer(QWidget *parent)
 
 	QVBoxLayout *layout = new QVBoxLayout();
 	layout->addWidget(container);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	this->setLayout(layout);
 
 	// Root entity

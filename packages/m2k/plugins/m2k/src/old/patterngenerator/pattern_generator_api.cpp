@@ -133,7 +133,7 @@ void PatternGenerator_API::setCurrentGroups(const QVector<QVector<int>> &groups)
 QVector<QPair<QVector<int>, QString>> PatternGenerator_API::getEnabledPatterns() const
 {
 	QVector<QPair<QVector<int>, QString>> enabledPatterns;
-	for(const QPair<QVector<int>, PatternUI *> &pattern : qAsConst(m_pattern->m_enabledPatterns)) {
+	for(const QPair<QVector<int>, PatternUI *> &pattern : std::as_const(m_pattern->m_enabledPatterns)) {
 		enabledPatterns.push_back({pattern.first, Pattern_API::toString(pattern.second->get_pattern())});
 	}
 

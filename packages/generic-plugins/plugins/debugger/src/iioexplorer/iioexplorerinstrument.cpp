@@ -170,7 +170,7 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 	QObject::connect(m_searchBar->getLineEdit(), &QLineEdit::textChanged, this, [this](QString text) {
 		if(text.isEmpty()) {
 			auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
-			m_proxyModel->setFilterRegExp(QRegExp("", Qt::CaseInsensitive, QRegExp::FixedString));
+			m_proxyModel->setFilterFixedString("");
 			m_proxyModel->invalidate(); // Trigger re-filtering
 			collapseAllItems(sourceModel->invisibleRootItem());
 			m_treeView->expand(m_proxyModel->index(0, 0));
@@ -437,7 +437,7 @@ void IIOExplorerInstrument::applySelection(const QItemSelection &selected, const
 
 void IIOExplorerInstrument::filterAndExpand(const QString &text)
 {
-	m_proxyModel->setFilterRegExp(QRegExp(text, Qt::CaseInsensitive, QRegExp::FixedString));
+	m_proxyModel->setFilterFixedString(text);
 	m_proxyModel->invalidate(); // Trigger re-filtering
 
 	if(text.isEmpty()) {

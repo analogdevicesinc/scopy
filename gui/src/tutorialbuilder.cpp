@@ -119,7 +119,7 @@ uint16_t TutorialBuilder::collectChapters()
 				    << "entry.";
 
 	// add the now sorted chapters into the tutorial overlay
-	for(const ChapterInstructions *chapter : qAsConst(m_chapters)) {
+	for(const ChapterInstructions *chapter : std::as_const(m_chapters)) {
 		// if there is no mainWidget specified, the first widget from the list will be set to be the mainWidget
 		this->addChapter(chapter->widgets.values(), chapter->description,
 				 (chapter->mainWidget.isNull()) ? chapter->widgets.first()
@@ -191,7 +191,7 @@ void TutorialBuilder::readTutorialRequirements()
 		HoverPosition content = convertStringToHoverPosition(contentString);
 
 		auto *chapterInstructions = new ChapterInstructions;
-		for(const auto &name : qAsConst(names)) {
+		for(const auto &name : std::as_const(names)) {
 			chapterInstructions->widgets.insert(name, nullptr); // the widgets will be set later
 		}
 		chapterInstructions->mainWidget = mainWidget;

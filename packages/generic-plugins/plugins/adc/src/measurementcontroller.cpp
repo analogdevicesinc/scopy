@@ -44,10 +44,10 @@ MeasurementController::MeasurementController(QPen pen, MeasureModel *msr, QObjec
 	, m_pen(pen)
 {
 	connect(m_measure, &MeasureModel::newMeasurementsAvailable, this, [=]() {
-		for(auto lbl : qAsConst(m_measureLabels)) {
+		for(auto lbl : std::as_const(m_measureLabels)) {
 			lbl->setValue(m_measure->measurement(lbl->name())->value());
 		}
-		for(auto lbl : qAsConst(m_statsLabels)) {
+		for(auto lbl : std::as_const(m_statsLabels)) {
 			auto stat = m_measure->measurement(lbl->name())->stat();
 			lbl->setValue(stat.average(), stat.min(), stat.max());
 		}
@@ -233,7 +233,7 @@ QWidget *TimeMeasureManager::createMeasurementMenu(QWidget *parent)
 	QVBoxLayout *lay = new QVBoxLayout(w);
 	w->setLayout(lay);
 	lay->setSpacing(6);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *hMeasure = createMeasurementMenuSection("HORIZONTAL", w);
 	QWidget *vMeasure = createMeasurementMenuSection("VERTICAL", w);
@@ -255,7 +255,7 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 					      MenuCollapseSection::MHW_BASEWIDGET, parent);
 	QWidget *headerWidget = new QWidget(measureSection);
 	QHBoxLayout *headerLay = new QHBoxLayout(headerWidget);
-	headerLay->setMargin(0);
+	headerLay->setContentsMargins(0, 0, 0, 0);
 
 	headerWidget->setLayout(headerLay);
 	QLabel *lblName = new QLabel("NAME");

@@ -206,7 +206,7 @@ bool SWIOTPlugin::onDisconnect()
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setRunning(false);
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -342,7 +342,7 @@ void SWIOTPlugin::setupToolList()
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setEnabled(true);
 		tme->setVisible(true);
 		if(!m_isRuntime) {

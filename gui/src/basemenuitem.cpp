@@ -192,7 +192,7 @@ void BaseMenuItem::dropEvent(QDropEvent *event)
 	}
 }
 
-void BaseMenuItem::enterEvent(QEvent *event) { event->accept(); }
+void BaseMenuItem::enterEvent(QEnterEvent *event) { event->accept(); }
 
 void BaseMenuItem::leaveEvent(QEvent *event) { event->accept(); }
 

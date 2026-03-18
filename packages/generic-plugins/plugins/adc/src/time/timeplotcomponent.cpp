@@ -115,7 +115,7 @@ PlotWidget *TimePlotComponent::xyPlot() { return m_plots[1]; }
 void TimePlotComponent::setSingleYModeAll(bool b)
 {
 	m_singleYMode = b;
-	for(auto ch : qAsConst(m_channels)) {
+	for(auto ch : std::as_const(m_channels)) {
 		auto pcc = dynamic_cast<TimePlotComponentChannel *>(ch);
 		pcc->lockYAxis(b);
 	}
@@ -178,7 +178,7 @@ void TimePlotComponent::refreshXYXAxis()
 void TimePlotComponent::onXyXNewData(const float *xData_, const float *yData_, size_t size, bool copy)
 {
 	xyXData = yData_;
-	for(PlotComponentChannel *ch : qAsConst(m_channels)) {
+	for(PlotComponentChannel *ch : std::as_const(m_channels)) {
 		auto pcc = dynamic_cast<TimePlotComponentChannel *>(ch);
 		pcc->setXyXData(xyXData);
 		pcc->refreshData(copy);
@@ -191,7 +191,7 @@ PlotLegend *TimePlotComponent::legend() const { return m_legend; }
 
 void TimePlotComponent::refreshXYXData()
 {
-	for(PlotComponentChannel *ch : qAsConst(m_channels)) {
+	for(PlotComponentChannel *ch : std::as_const(m_channels)) {
 		auto pcc = dynamic_cast<TimePlotComponentChannel *>(ch);
 		pcc->setXyXData(xyXData);
 		pcc->refreshData(true);
@@ -236,7 +236,7 @@ void TimePlotComponent::setXInterval(QPair<double, double> p) { setXInterval(p.f
 
 void TimePlotComponent::setXInterval(double min, double max)
 {
-	for(auto plt : qAsConst(m_plots)) {
+	for(auto plt : std::as_const(m_plots)) {
 		timePlot()->xAxis()->setInterval(min, max);
 	}
 }

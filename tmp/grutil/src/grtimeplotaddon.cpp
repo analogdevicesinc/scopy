@@ -44,7 +44,7 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	this->name = name;
 	widget = new QTabWidget();
 	m_lay = new QVBoxLayout(widget);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 
 	m_plotWidget = new PlotWidget(widget);
@@ -180,14 +180,14 @@ void GRTimePlotAddon::startPlotRefresh()
 void GRTimePlotAddon::drawTags()
 {
 
-	for(GRTimeChannelAddon *gr : qAsConst(grChannels)) {
+	for(GRTimeChannelAddon *gr : std::as_const(grChannels)) {
 		gr->plotCh()->clearMarkers();
 	}
 
 	if(!m_showPlotTags)
 		return;
 
-	for(GRTimeChannelAddon *gr : qAsConst(grChannels)) {
+	for(GRTimeChannelAddon *gr : std::as_const(grChannels)) {
 		if(gr->signalPath()->enabled()) {
 
 			int index = time_channel_map.value(gr->signalPath()->name(), -1);
@@ -281,7 +281,7 @@ void GRTimePlotAddon::setRawSamplesPtr()
 	int fft_iindex = -1;
 	int fft_qindex = -1;
 
-	for(GRTimeChannelAddon *gr : qAsConst(grChannels)) {
+	for(GRTimeChannelAddon *gr : std::as_const(grChannels)) {
 		if(gr->signalPath()->enabled()) {
 
 			int index = time_channel_map.value(gr->signalPath()->name(), -1);
@@ -436,7 +436,7 @@ void GRTimePlotAddon::connectSignalPaths()
 
 	int i = 0;
 	time_channel_map.clear();
-	for(GRTimeChannelAddon *gr : qAsConst(grChannels)) {
+	for(GRTimeChannelAddon *gr : std::as_const(grChannels)) {
 		if(gr->signalPath()->enabled()) {
 			m_top->connect(gr->signalPath()->getGrEndPoint(), 0, time_sink, i);
 			time_channel_map.insert(gr->signalPath()->name(), i);

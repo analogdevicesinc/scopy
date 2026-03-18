@@ -40,7 +40,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network)
+set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network OpenGLWidgets)
 
 file(
 	GLOB

@@ -52,15 +52,10 @@ public:
 		, m_pattern(pattern)
 	{
 		qRegisterMetaType<QVector<int>>("vector(int)");
-		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
 		qRegisterMetaType<QVector<QVector<int>>>("vector(vector(int))");
-		qRegisterMetaTypeStreamOperators<QVector<QVector<int>>>("vector(vector(int))");
 
 		qRegisterMetaType<QPair<QVector<int>, QString>>("pair(vector(int), string)");
-		qRegisterMetaTypeStreamOperators<QPair<QVector<int>, QString>>("pair(vector(int), string)");
 		qRegisterMetaType<QVector<QPair<QVector<int>, QString>>>("vector(pair(vector(int), string))");
-		qRegisterMetaTypeStreamOperators<QVector<QPair<QVector<int>, QString>>>(
-			"vector(pair(vector(int), string))");
 	}
 	~PatternGenerator_API() {}
 

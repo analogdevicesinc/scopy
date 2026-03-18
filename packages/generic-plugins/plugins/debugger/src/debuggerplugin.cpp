@@ -152,7 +152,7 @@ bool DebuggerPlugin::onConnect()
 
 bool DebuggerPlugin::onDisconnect()
 {
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		tme->setRunning(false);

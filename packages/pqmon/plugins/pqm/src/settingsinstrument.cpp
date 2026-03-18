@@ -44,7 +44,7 @@ SettingsInstrument::SettingsInstrument(QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *instrumentLayout = new QVBoxLayout(this);
 	setLayout(instrumentLayout);
-	instrumentLayout->setMargin(0);
+	instrumentLayout->setContentsMargins(0, 0, 0, 0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(false);
@@ -146,7 +146,7 @@ void SettingsInstrument::initConfigSection(QWidget *parent)
 
 	MenuSectionCollapseWidget *configSection = new MenuSectionCollapseWidget(
 		"Config values", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, container);
-	configSection->menuSection()->contentLayout()->setMargin(0);
+	configSection->menuSection()->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *configWidget = new QWidget(configSection);
 	configWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -223,7 +223,7 @@ void SettingsInstrument::initSystemTimeSection(QWidget *parent)
 
 	MenuSectionCollapseWidget *systemTimeSection = new MenuSectionCollapseWidget(
 		"System time", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, container);
-	systemTimeSection->menuSection()->contentLayout()->setMargin(0);
+	systemTimeSection->menuSection()->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	systemTimeSection->contentLayout()->setSpacing(6);
 
 	QDateTimeEdit *systemTimeEdit = new QDateTimeEdit(systemTimeSection);
@@ -255,7 +255,7 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 
 	MenuSectionCollapseWidget *timestampSection = new MenuSectionCollapseWidget(
 		"Logging", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, container);
-	timestampSection->menuSection()->contentLayout()->setMargin(0);
+	timestampSection->menuSection()->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	timestampSection->contentLayout()->setSpacing(6);
 
 	QPushButton *startLogBtn = new QPushButton("Start", timestampSection);
@@ -274,7 +274,7 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 
 	QWidget *timestampWidget = new QWidget(timestampSection);
 	timestampWidget->setLayout(new QHBoxLayout());
-	timestampWidget->layout()->setMargin(0);
+	timestampWidget->layout()->setContentsMargins(0, 0, 0, 0);
 	timestampWidget->layout()->setSpacing(10);
 
 	QDateTimeEdit *timestampEdit1 = new QDateTimeEdit(timestampSection);

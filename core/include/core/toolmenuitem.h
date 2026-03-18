@@ -51,7 +51,7 @@ public Q_SLOTS:
 	void onCollapsed(bool collapsed);
 
 protected:
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void leaveEvent(QEvent *event);
 
 private:

@@ -50,7 +50,7 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget *parent)
 	header = new QWidget();
 	auto headerLayout = new QHBoxLayout(header);
 	header->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-	headerLayout->setMargin(10);
+	headerLayout->setContentsMargins(10, 10, 10, 10);
 	headerLayout->setSpacing(10);
 
 	toolStatus = new QLabel("");
@@ -77,7 +77,7 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget *parent)
 	m_channelsWidget->layout()->addWidget(header);
 
 	m_channelsWidget->layout()->setSpacing(0);
-	m_channelsWidget->layout()->setMargin(0);
+	m_channelsWidget->layout()->setContentsMargins(0, 0, 0, 0);
 	m_channelsWidget->layout()->setContentsMargins(QMargins(0, 0, 0, 0));
 	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	m_channelsWidget->setStyleSheet("border: 0px;");
@@ -136,7 +136,7 @@ ChannelWidget *ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 					       const QString &fullName, const QString &shortName)
 {
 	ChannelWidget *ch = new ChannelWidget(chId, deletable, simplefied, color);
-	m_channelsWidget->layout()->setMargin(0);
+	m_channelsWidget->layout()->setContentsMargins(0, 0, 0, 0);
 	m_channelsWidget->layout()->addWidget(ch);
 	if(m_channelIdVisible) {
 		ch->setFullName(fullName + QString(" %1").arg(chId + 1));
@@ -166,7 +166,7 @@ ChannelWidget *ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 			m_parent->setMaximumWidth(m_maxChannelWidth);
 		} else {
 			// RESIZE CHANNELS
-			for(auto c : qAsConst(m_channelsList)) {
+			for(auto c : std::as_const(m_channelsList)) {
 				c->setMinimumWidth(m_maxChannelWidth);
 			}
 		}
@@ -220,7 +220,7 @@ void ChannelManager::changeParent(QWidget *newParent)
 		ch_width = header->width();
 		ch_height = header->height();
 	} else {
-		for(auto ch : qAsConst(m_channelsList)) {
+		for(auto ch : std::as_const(m_channelsList)) {
 			ch_width = std::max(ch_width, ch->width());
 			ch_height = std::max(ch_height, ch->height());
 		}
@@ -241,12 +241,12 @@ void ChannelManager::changeParent(QWidget *newParent)
 	}
 
 	m_channelsWidget->layout()->setSpacing(0);
-	m_channelsWidget->layout()->setMargin(0);
+	m_channelsWidget->layout()->setContentsMargins(0, 0, 0, 0);
 	m_channelsWidget->layout()->setContentsMargins(QMargins(0, 0, 0, 0));
 	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	m_channelsWidget->setStyleSheet("border: 0px;");
 
-	for(ChannelWidget *channel : qAsConst(m_channelsList)) {
+	for(ChannelWidget *channel : std::as_const(m_channelsList)) {
 		m_channelsWidget->layout()->addWidget(channel);
 	}
 
@@ -334,7 +334,7 @@ void ChannelManager::toggleChannelManager(bool toggled)
 {
 	Q_EMIT channelManagerToggle(toggled);
 
-	for(auto ch : qAsConst(m_channelsList)) {
+	for(auto ch : std::as_const(m_channelsList)) {
 		ch->toggleChannel(!toggled);
 		if(ch->isMainChannel() || ch->isPhysicalChannel()) {
 			ch->setMenuButtonVisibility(toggled);
@@ -353,7 +353,7 @@ void ChannelManager::toggleChannelManager(bool toggled)
 	m_channelsWidget->setMaximumWidth(currentWidth);
 
 	// RESIZE CHANNELS
-	for(auto c : qAsConst(m_channelsList)) {
+	for(auto c : std::as_const(m_channelsList)) {
 		c->setMinimumWidth(currentWidth);
 	}
 }

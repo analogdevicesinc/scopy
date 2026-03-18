@@ -27,7 +27,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QHeaderView>
-#include <QRegExp>
+#include <QRegularExpression>
 
 namespace scopy::m2k {
 
@@ -177,7 +177,7 @@ void DecoderTableModel::reloadDecoders(bool logic)
 	m_curves.clear();
 
 	// Reconnect signals for all the annotation curves
-	for(const auto &curve : qAsConst(m_plotCurves)) {
+	for(const auto &curve : std::as_const(m_plotCurves)) {
 		if(const auto annCurve = dynamic_cast<AnnotationCurve *>(curve)) {
 			m_curves.emplace_back(annCurve);
 		}
@@ -366,7 +366,7 @@ void DecoderTableModel::searchBoxSlot(QString text)
 	m_decoderTable->blockSignals(true);
 
 	m_logic->setStatusLabel("Searching ...");
-	QFuture<void> future = QtConcurrent::run(this, &DecoderTableModel::searchTable, text);
+	QFuture<void> future = QtConcurrent::run(&DecoderTableModel::searchTable, this, text);
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
 	connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
@@ -388,7 +388,7 @@ void DecoderTableModel::searchTable(QString text)
 	searchMask.clear();
 
 	if(!searchString.isEmpty()) {
-		QRegExp rx = QRegExp(searchString, Qt::CaseInsensitive);
+		QRegularExpression rx(searchString, QRegularExpression::CaseInsensitiveOption);
 
 		auto temp_curve = dynamic_cast<AnnotationCurve *>(m_plotCurves.at(m_current_column));
 		std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
@@ -442,7 +442,7 @@ void DecoderTableModel::searchTable(QString text)
 					     (ann.start_sample() <= start_sample && ann.end_sample() >= end_sample))) ||
 					   (start_sample <= ann.start_sample() && ann.end_sample() <= end_sample)) {
 						for(const auto &value : ann.annotations()) {
-							if(rx.indexIn(value) != -1) {
+							if(value.contains(rx)) {
 								goto skip_loop;
 							}
 						}

@@ -71,7 +71,7 @@ void CSVFileStrategy::loadData()
 			continue;
 		}
 		QStringList list = line.split(m_separator, Qt::SkipEmptyParts);
-		for(const QString &list_item : qAsConst(list)) {
+		for(const QString &list_item : std::as_const(list)) {
 			line_data.push_back(list_item);
 		}
 		if(line_data.size() > 0) {

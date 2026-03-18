@@ -36,7 +36,7 @@ MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent)
 	QWidget *wScroll = new QWidget(scroll);
 
 	m_layScroll = new QVBoxLayout();
-	m_layScroll->setMargin(0);
+	m_layScroll->setContentsMargins(0, 0, 0, 0);
 	m_layScroll->setSpacing(10);
 
 	wScroll->setLayout(m_layScroll);
@@ -47,7 +47,7 @@ MenuWidget::MenuWidget(QString name, QPen p, QWidget *parent)
 
 	scroll->setWidget(wScroll);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	setLayout(lay);
 
@@ -84,7 +84,7 @@ void MenuWidget::add(QWidget *w, QString name, MenuAlignment position)
 
 void MenuWidget::add(QWidget *w)
 {
-	add(w, "widget" + QString(uuid), MA_TOPLAST);
+	add(w, "widget" + QString::number(uuid), MA_TOPLAST);
 	uuid++;
 }
 

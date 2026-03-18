@@ -105,7 +105,7 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->setSpacing(10);
 	lay->addWidget(generalSection);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	QList<QPair<QString, QVariant>> xaxis_lbl_pos_options = {{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}};
@@ -360,7 +360,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 
 		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;
-			for(auto tool : qAsConst(m_toolList)) {
+			for(auto tool : std::as_const(m_toolList)) {
 				if(tool->tool() == ui) {
 					t = tool;
 				}
@@ -401,7 +401,7 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 
 		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
 			ToolMenuEntry *t = nullptr;
-			for(auto tool : qAsConst(m_toolList)) {
+			for(auto tool : std::as_const(m_toolList)) {
 				if(tool->tool() == ui) {
 					t = tool;
 				}
@@ -441,7 +441,7 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 	QWidget *w = tool->tool();
 	if(w) {
 		ADCInstrumentController *found = nullptr;
-		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
+		for(ADCInstrumentController *ctrl : std::as_const(m_ctrls)) {
 			if(ctrl->ui() == tool->tool()) {
 				found = ctrl;
 				break;
@@ -461,12 +461,12 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 void ADCPlugin::preferenceChanged(QString s, QVariant t1)
 {
 	if(s == "adc_add_remove_plot") {
-		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
+		for(ADCInstrumentController *ctrl : std::as_const(m_ctrls)) {
 			ctrl->setEnableAddRemovePlot(t1.toBool());
 		}
 	}
 	if(s == "adc_add_remove_instrument") {
-		for(ADCInstrumentController *ctrl : qAsConst(m_ctrls)) {
+		for(ADCInstrumentController *ctrl : std::as_const(m_ctrls)) {
 			ctrl->setEnableAddRemoveInstrument(t1.toBool());
 		}
 	}

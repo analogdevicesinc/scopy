@@ -46,9 +46,9 @@ bool JsonFormatedElement::getUseBifieldNameAsDescription() const { return useBif
 
 QString JsonFormatedElement::toString()
 {
-	return QString("Filename : " + fileName + " Compatible Dev: " + compatibleDevices->length() +
-		       " isAxiCompatible :" + isAxiCompatible + " useRegisterDescriptionAsName: " +
-		       useRegisterDescriptionAsName + " useBifieldDescriptionAsName: " + useBifieldDescriptionAsName);
+	return QString("Filename : " + fileName + " Compatible Dev: " + QString::number(compatibleDevices->length()) +
+		       " isAxiCompatible :" + QString::number(isAxiCompatible) + " useRegisterDescriptionAsName: " +
+		       QString::number(useRegisterDescriptionAsName) + " useBifieldDescriptionAsName: " + QString::number(useBifieldDescriptionAsName));
 }
 
 int JsonFormatedElement::getBitsPerRow() const { return bitsPerRow; }

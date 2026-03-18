@@ -42,7 +42,7 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 	QVBoxLayout *lay = new QVBoxLayout(parent);
 	lay->addWidget(w);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 }
 
@@ -92,7 +92,7 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 	m_menu->add(m_plotStack);
 
 	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt())); });
+		[=](int idx) { m_plotStack->show(QString::number(m_plotCb->combo()->currentData().toInt())); });
 
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
 
@@ -106,7 +106,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *bufferPlotSize = new QWidget(section);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
-	bufferPlotSizeLayout->setMargin(0);
+	bufferPlotSizeLayout->setContentsMargins(0, 0, 0, 0);
 	bufferPlotSizeLayout->setSpacing(10);
 	bufferPlotSize->setLayout(bufferPlotSizeLayout);
 
@@ -155,7 +155,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
-	xMinMaxLayout->setMargin(0);
+	xMinMaxLayout->setContentsMargins(0, 0, 0, 0);
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 
@@ -391,7 +391,7 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 		m_plotCb->combo()->setItemText(idx, newName);
 	});
 	m_plotCb->combo()->addItem(p->name(), p->uuid());
-	m_plotStack->add(QString(p->uuid()), plotMenu);
+	m_plotStack->add(QString::number(p->uuid()), plotMenu);
 	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
 	connect(p->plotMenu(), &TimePlotComponentSettings::requestSettings, this, [=]() {
@@ -416,7 +416,7 @@ void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 	// m_menu->remove(plotMenu);
 	int idx = m_plotCb->combo()->findData(p->uuid());
 	m_plotCb->combo()->removeItem(idx);
-	m_plotStack->remove(QString(p->uuid()));
+	m_plotStack->remove(QString::number(p->uuid()));
 
 	setPlotComboVisible();
 }
@@ -452,7 +452,7 @@ void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { 
 double TimePlotManagerSettings::readSampleRate()
 {
 	double sr = 1;
-	for(SampleRateProvider *ch : qAsConst(m_sampleRateProviders)) {
+	for(SampleRateProvider *ch : std::as_const(m_sampleRateProviders)) {
 		if(ch->sampleRateAvailable()) {
 			sr = ch->sampleRate();
 			break;

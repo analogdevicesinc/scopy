@@ -50,7 +50,7 @@ ScopyAboutPage::ScopyAboutPage(QWidget *parent)
 
 void ScopyAboutPage::initUI()
 {
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 	this->setLayout(layout);
 	layout->addWidget(tabWidget);
@@ -65,7 +65,7 @@ QWidget *ScopyAboutPage::buildPage(QString src)
 	browser->setOpenExternalLinks(true);
 
 	lay->addWidget(browser);
-	lay->setMargin(10);
+	lay->setContentsMargins(10, 10, 10, 10);
 	initNavigationWidget(browser);
 	Style::setStyle(browser, style::properties::widget::basicComponent);
 	Style::setStyle(browser, style::properties::widget::noBorder);

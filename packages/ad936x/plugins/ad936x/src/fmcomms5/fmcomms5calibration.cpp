@@ -70,7 +70,7 @@ Fmcomms5Calibration::Fmcomms5Calibration(iio_context *ctx, QObject *parent)
 	}
 }
 
-void Fmcomms5Calibration::calibrate() { QtConcurrent::run(this, &Fmcomms5Calibration::doCalibbrationInThread); }
+void Fmcomms5Calibration::calibrate() { QtConcurrent::run([this]() { doCalibbrationInThread(); }); }
 
 void Fmcomms5Calibration::doCalibbrationInThread()
 {

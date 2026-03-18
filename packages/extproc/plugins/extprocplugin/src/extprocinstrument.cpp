@@ -36,7 +36,7 @@ ExtProcInstrument::ExtProcInstrument(ToolMenuEntry *tme, QWidget *parent)
 	, m_tme(tme)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
 

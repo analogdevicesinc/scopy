@@ -40,7 +40,7 @@ BufferMenu::~BufferMenu() {}
 void BufferMenu::setupUI()
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	// Buffer size
 	m_bufferSizeSpin = new MenuSpinbox("Buffer Size", 16, "samples", 16, 4000000, true, false);

@@ -94,7 +94,7 @@ void ADCTimeInstrumentController::init()
 		m_ui->printPlotManager->printPlots(plotList, "ADC");
 	});
 
-	for(auto c : qAsConst(m_components)) {
+	for(auto c : std::as_const(m_components)) {
 		c->onInit();
 	}
 

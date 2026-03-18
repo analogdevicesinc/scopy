@@ -40,7 +40,7 @@ DetachedToolWindow::DetachedToolWindow(QWidget *parent, ToolMenuEntry *tme)
 
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	w = tme->tool();
 	setWindowIcon(QApplication::windowIcon());
 	setWindowTitle("Scopy - " + tme->pluginName() + " - " + tme->name() + " - " + tme->param());

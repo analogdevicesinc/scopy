@@ -65,7 +65,7 @@ void DeviceManager::addDevice(Device *d)
 
 QString DeviceManager::createDevice(QString category, QString param, bool async, QList<QString> plugins)
 {
-	for(Device *val : qAsConst(map)) {
+	for(Device *val : std::as_const(map)) {
 		if(val->param() == param) {
 			return "";
 		}
@@ -79,7 +79,7 @@ QString DeviceManager::createDevice(QString category, QString param, bool async,
 	connect(dl, &DeviceLoader::initialized, this, [=]() {
 		QList<Plugin *> availablePlugins = d->plugins();
 		if(!plugins.isEmpty()) {
-			for(Plugin *p : qAsConst(availablePlugins)) {
+			for(Plugin *p : std::as_const(availablePlugins)) {
 				bool enablePlugin = plugins.contains(p->name());
 				p->setEnabled(enablePlugin);
 			}
@@ -98,7 +98,7 @@ QString DeviceManager::createDevice(QString category, QString param, bool async,
 void DeviceManager::removeDevice(QString category, QString param)
 {
 
-	for(Device *d : qAsConst(map)) {
+	for(Device *d : std::as_const(map)) {
 		if(d->category() == category && d->param() == param) {
 			removeDeviceById(d->id());
 			return;
@@ -176,21 +176,21 @@ QString DeviceManager::restartDevice(QString id)
 
 void DeviceManager::disconnectAll()
 {
-	for(const QString &d : qAsConst(connectedDev)) {
+	for(const QString &d : std::as_const(connectedDev)) {
 		map[d]->disconnectDev();
 	}
 }
 
 void DeviceManager::save(QSettings &s)
 {
-	for(const QString &d : qAsConst(connectedDev)) {
+	for(const QString &d : std::as_const(connectedDev)) {
 		map[d]->save(s);
 	}
 }
 
 void DeviceManager::load(QSettings &s)
 {
-	for(const QString &d : qAsConst(connectedDev)) {
+	for(const QString &d : std::as_const(connectedDev)) {
 		map[d]->load(s);
 	}
 }
@@ -198,10 +198,10 @@ void DeviceManager::load(QSettings &s)
 void DeviceManager::requestConnectedDev()
 {
 	QMap<QString, QStringList> devMap;
-	for(const QString &d : qAsConst(connectedDev)) {
+	for(const QString &d : std::as_const(connectedDev)) {
 		QList<Plugin *> availablePlugins = dynamic_cast<DeviceImpl *>(map[d])->plugins();
 		QStringList enabledPlugins;
-		for(Plugin *p : qAsConst(availablePlugins)) {
+		for(Plugin *p : std::as_const(availablePlugins)) {
 			if(p->enabled()) {
 				enabledPlugins.append(p->name());
 			}
@@ -298,7 +298,7 @@ bool DeviceManager::busy()
 {
 	bool ret = false;
 
-	for(auto dev : qAsConst(map)) {
+	for(auto dev : std::as_const(map)) {
 		if(dev->state() == Device::DEV_ERROR || dev->state() == Device::DEV_INIT ||
 		   dev->state() == Device::DEV_CONNECTING || dev->state() == Device::DEV_DISCONNECTING)
 			return true;
@@ -310,10 +310,10 @@ int DeviceManager::connectedDeviceCount() { return connectedDev.size(); }
 
 void DeviceManager::saveSessionDevices()
 {
-	for(const QString &d : qAsConst(connectedDev)) {
+	for(const QString &d : std::as_const(connectedDev)) {
 		QList<Plugin *> availablePlugins = dynamic_cast<DeviceImpl *>(map[d])->plugins();
 		QStringList enabledPlugins;
-		for(Plugin *p : qAsConst(availablePlugins)) {
+		for(Plugin *p : std::as_const(availablePlugins)) {
 			if(p->enabled())
 				enabledPlugins.append(p->name());
 		}

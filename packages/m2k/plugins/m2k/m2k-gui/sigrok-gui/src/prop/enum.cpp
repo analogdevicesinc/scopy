@@ -206,7 +206,7 @@ void Enum::update_widget()
 
 		for(unsigned int i = 0; i < values_.size(); i++) {
 			const pair<QVariant, QString> &v = values_[i];
-			if(v.first.type() == QVariant::Double) {
+			if(v.first.typeId() == QMetaType::Double) {
 				double a = variant.toDouble();
 				double b = v.first.toDouble();
 

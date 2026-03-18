@@ -29,7 +29,7 @@ void ComboBoxLineEdit::mouseReleaseEvent(QMouseEvent *event) { QWidget::mouseRel
 
 void ComboBoxLineEdit::mousePressEvent(QMouseEvent *event) { QWidget::mousePressEvent(event); }
 
-void ComboBoxLineEdit::enterEvent(QEvent *event) { QWidget::enterEvent(event); }
+void ComboBoxLineEdit::enterEvent(QEnterEvent *event) { QWidget::enterEvent(event); }
 
 void ComboBoxLineEdit::leaveEvent(QEvent *event) { QWidget::leaveEvent(event); }
 

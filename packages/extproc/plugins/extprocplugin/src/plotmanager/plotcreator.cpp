@@ -130,7 +130,7 @@ void StandardPlotCreator::createPlotSettings()
 {
 	m_plotSettings = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_plotSettings);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addWidget(createYAxisSection());
 	lay->addWidget(createDataManagerSection());
 	lay->addWidget(createGeneralSettingsSection());
@@ -217,7 +217,7 @@ void StandardPlotCreator::initPlotChnlsTab(QWidget *parent)
 	// Create container widget for corner to ensure proper positioning
 	QWidget *cornerContainer = new QWidget();
 	QHBoxLayout *cornerLayout = new QHBoxLayout(cornerContainer);
-	cornerLayout->setMargin(0);
+	cornerLayout->setContentsMargins(0, 0, 0, 0);
 	cornerLayout->addWidget(plusBtn);
 
 	m_chnlsTab->setCornerWidget(cornerContainer, Qt::TopRightCorner);
@@ -250,7 +250,7 @@ QWidget *StandardPlotCreator::createTabEntryW(QTabWidget *parent, int chnlIdx)
 {
 	QWidget *w = new QWidget(parent);
 	QVBoxLayout *lay = new QVBoxLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QList<ExtProcPlotInfo::PlotInfoCh> infoChnls = m_plotInfo.channels;
 	MenuCombo *xDataCb = new MenuCombo("X Values");

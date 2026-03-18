@@ -80,7 +80,7 @@ bool PkgGridWidget::isFieldMatch(const QVariantMap &pkgMetadata, const QString &
 	}
 
 	QVariant var = pkgMetadata[field];
-	QStringList pkgValues = (var.type() == QVariant::String) ? QStringList{var.toString()} : var.toStringList();
+	QStringList pkgValues = (var.typeId() == QMetaType::QString) ? QStringList{var.toString()} : var.toStringList();
 
 	for(const QString &pkgVal : pkgValues) {
 		if(isSearchMatch(pkgVal, options)) {

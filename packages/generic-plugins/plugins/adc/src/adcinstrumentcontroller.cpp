@@ -80,14 +80,14 @@ void ADCInstrumentController::init() {}
 
 void ADCInstrumentController::deinit()
 {
-	for(auto c : qAsConst(m_components)) {
+	for(auto c : std::as_const(m_components)) {
 		c->onDeinit();
 	}
 }
 
 void ADCInstrumentController::onStart()
 {
-	for(auto c : qAsConst(m_components)) {
+	for(auto c : std::as_const(m_components)) {
 		if(c->enabled()) {
 			c->onStart();
 		}

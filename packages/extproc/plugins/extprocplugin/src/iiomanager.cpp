@@ -75,7 +75,7 @@ void IIOManager::startAcq(bool en)
 void IIOManager::onDataRequest()
 {
 	if(!m_readFw->isRunning() && !m_readFw->isPaused()) {
-		QFuture<void> f = QtConcurrent::run(this, &IIOManager::readBuffer);
+		QFuture<void> f = QtConcurrent::run(&IIOManager::readBuffer, this);
 		m_readFw->setFuture(f);
 	}
 }
@@ -199,7 +199,7 @@ void IIOManager::readAllChannels(QString deviceName)
 {
 	QMap<QString, iio_channel *> channels = m_devMap[deviceName];
 	m_bufferData.clear();
-	for(iio_channel *ch : qAsConst(channels)) {
+	for(iio_channel *ch : std::as_const(channels)) {
 		if(!iio_channel_is_enabled(ch)) {
 			continue;
 		}

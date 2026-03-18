@@ -121,7 +121,7 @@ void ExportSettings::setExportConfig(QMap<int, bool> config)
 	QStandardItemModel *model = static_cast<QStandardItemModel *>(exportChannels->model());
 
 	auto keys = config.keys();
-	for(int key : qAsConst(keys)) {
+	for(int key : std::as_const(keys)) {
 		model->item(key, 1)->setData(QVariant((int)config[key]), Qt::EditRole);
 	}
 }
@@ -149,7 +149,7 @@ void ExportSettings::on_btnExportAll_clicked()
 
 void ExportSettings::enableExportButton(bool on) { ui->btnExport->setEnabled(on); }
 
-void ExportSettings::disableUIMargins() { ui->verticalLayout_3->setMargin(0); }
+void ExportSettings::disableUIMargins() { ui->verticalLayout_3->setContentsMargins(0, 0, 0, 0); }
 
 void ExportSettings::setTitleLabelVisible(bool enabled)
 {

@@ -39,7 +39,7 @@ PluginManager::PluginManager(QObject *parent)
 
 PluginManager::~PluginManager()
 {
-	for(const PluginInfo &p : qAsConst(m_plugins)) {
+	for(const PluginInfo &p : std::as_const(m_plugins)) {
 		if(p.pluginInstance()) {
 			p.pluginInstance()->deinit();
 		}
@@ -97,7 +97,7 @@ void PluginManager::sort(bool ascending)
 	});
 
 	qDebug(CAT_PLUGINMANAGER) << "New plugin order:";
-	for(const PluginInfo &plugin : qAsConst(m_plugins)) {
+	for(const PluginInfo &plugin : std::as_const(m_plugins)) {
 		qDebug(CAT_PLUGINMANAGER) << plugin.name();
 	}
 }
@@ -146,7 +146,7 @@ QList<PluginInfo> PluginManager::getPluginsInfo() const { return m_plugins; }
 QList<PluginInfo> PluginManager::getLoadedPlugins() const
 {
 	QList<PluginInfo> loaded;
-	for(const PluginInfo &pInfo : qAsConst(m_plugins)) {
+	for(const PluginInfo &pInfo : std::as_const(m_plugins)) {
 		if(pInfo.isLoaded()) {
 			loaded.append(pInfo);
 		}
@@ -157,7 +157,7 @@ QList<PluginInfo> PluginManager::getLoadedPlugins() const
 QList<PluginInfo> PluginManager::getUnloadedPlugins() const
 {
 	QList<PluginInfo> unloaded;
-	for(const PluginInfo &pInfo : qAsConst(m_plugins)) {
+	for(const PluginInfo &pInfo : std::as_const(m_plugins)) {
 		if(!pInfo.isLoaded()) {
 			unloaded.append(pInfo);
 		}

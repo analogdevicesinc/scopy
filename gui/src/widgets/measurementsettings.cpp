@@ -36,7 +36,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
 	//		setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	measureSection = new MenuSectionWidget(this);
 	Style::setStyle(measureSection, style::properties::widget::border);

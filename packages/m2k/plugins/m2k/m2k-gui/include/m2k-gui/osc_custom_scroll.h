@@ -35,7 +35,7 @@ public:
 	~OscCustomScrollArea();
 
 public Q_SLOTS:
-	void enterEvent(QEvent *);
+	void enterEvent(QEnterEvent *);
 	void leaveEvent(QEvent *);
 
 private:

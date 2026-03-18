@@ -95,7 +95,7 @@ void RegisterMapValues::registerDump(QString path)
 			for(mapIterator = registerReadValues->begin(); mapIterator != registerReadValues->end();
 			    mapIterator++) {
 				out << QString::number(mapIterator.key(), 16) << ","
-				    << QString::number(mapIterator.value(), 16) << endl;
+				    << QString::number(mapIterator.value(), 16) << Qt::endl;
 			}
 		}
 

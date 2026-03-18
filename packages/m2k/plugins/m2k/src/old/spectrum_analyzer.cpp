@@ -618,7 +618,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(libm2k::context::M2k *m2k, QString uri, Filte
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
 	ui->markerTable->hide();
 
-	for(auto ch : qAsConst(channels)) {
+	for(auto ch : std::as_const(channels)) {
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
 
@@ -1517,7 +1517,7 @@ void SpectrumAnalyzer::on_btnImport_clicked()
 	QMap<int, bool> import_map = ui->importSettings->getExportConfig();
 
 	auto keys = import_map.keys();
-	for(int key : qAsConst(keys)) {
+	for(int key : std::as_const(keys)) {
 		if(import_map[key]) {
 			add_ref_waveform(key);
 		}
@@ -1756,7 +1756,7 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 		bool isOk = true;
 		for(const auto &ref_channel : referenceChannels) {
 			QString shortName = ref_channel->shortName();
-			int channel_counter = shortName.midRef(shortName.size() - 1).toInt();
+			int channel_counter = shortName.mid(shortName.size() - 1).toInt();
 			if(current == channel_counter) {
 				isOk = false;
 				break;

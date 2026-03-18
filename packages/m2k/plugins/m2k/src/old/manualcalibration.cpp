@@ -506,7 +506,7 @@ void ManualCalibration::initParameters(void)
 
 	unsigned int i = 0;
 	auto ctxAttrs = m_m2k_context->getAvailableContextAttributes();
-	for(auto &&attr : qAsConst(ctxAttrs)) {
+	for(auto &&attr : std::as_const(ctxAttrs)) {
 		name = QString::fromStdString(attr);
 		if(name.startsWith("cal,")) {
 			value = QString::fromStdString(m_m2k_context->getContextAttributeValue(attr));

@@ -1945,7 +1945,7 @@ void Oscilloscope::btnExport_clicked()
 	bool atleastOneChannelEnabled = false;
 
 	auto keys = exportConfig.keys();
-	for(auto x : qAsConst(keys))
+	for(auto x : std::as_const(keys))
 		if(exportConfig[x]) {
 			atleastOneChannelEnabled = true;
 			break;
@@ -2203,7 +2203,7 @@ void Oscilloscope::create_add_channel_panel()
 			QMap<int, bool> import_map = importSettings->getExportConfig();
 
 			auto keys = import_map.keys();
-			for(int key : qAsConst(keys)) {
+			for(int key : std::as_const(keys)) {
 				if(import_map[key]) {
 					add_ref_waveform(key);
 				}
@@ -2987,7 +2987,7 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 					xy_channels.push_back(QPair<gr::basic_block_sptr, int>(adc_samp_conv_block, i));
 				}
 			}
-			for(const auto &p : qAsConst(math_sinks)) {
+			for(const auto &p : std::as_const(math_sinks)) {
 				auto math = p.first;
 				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(math, 0));
 			}
