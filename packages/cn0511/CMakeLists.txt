@@ -30,6 +30,7 @@ set(PACKAGE_DESCRIPTION "Plugin for CN0511")
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
+include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
 message(STATUS "Including plugins for ${SCOPY_MODULE}")
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
