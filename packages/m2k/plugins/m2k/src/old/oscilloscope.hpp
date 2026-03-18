@@ -501,7 +501,7 @@ private:
 	QMetaObject::Connection showLogicAnalyzerTriggerConnection;
 
 	QThreadPool hwSettingsThreadPool;
-#define runInHwThreadPool(x) QtConcurrent::run(&hwSettingsThreadPool, std::bind([=]() { x; }))
+#define runInHwThreadPool(x) (void)QtConcurrent::run(&hwSettingsThreadPool, std::bind([=]() { x; }))
 };
 } // namespace scopy::m2k
 #endif /* M2K_OSCILLOSCOPE_H */

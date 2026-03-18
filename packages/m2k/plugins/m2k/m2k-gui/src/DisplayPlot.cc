@@ -194,7 +194,7 @@ void OscScaleDraw::draw(QPainter *painter, const QPalette &palette) const
 		drawLabel(painter, delta);
 	}
 
-	for(const auto &tick : qAsConst(ticks)) {
+	for(const auto &tick : std::as_const(ticks)) {
 		if(tick != delta) {
 			drawLabel(painter, tick);
 		}
@@ -1885,12 +1885,12 @@ void DisplayPlot::setZoomerParams(bool bounded, int maxStackDepth)
 		return;
 	}
 
-	for(auto zoomer : qAsConst(d_zoomer)) {
+	for(auto zoomer : std::as_const(d_zoomer)) {
 		zoomer->setMaxStackDepth(maxStackDepth);
 		dynamic_cast<LimitedPlotZoomer *>(zoomer)->setBoundVertical(bounded);
 	}
 
-	for(auto magnifier : qAsConst(d_magnifier)) {
+	for(auto magnifier : std::as_const(d_magnifier)) {
 		magnifier->setBounded(bounded);
 	}
 }

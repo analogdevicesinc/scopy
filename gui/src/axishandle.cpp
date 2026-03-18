@@ -356,7 +356,7 @@ bool AxisHandle::eventFilter(QObject *object, QEvent *event)
 		onResize();
 
 	} else if(event->type() == QEvent::Enter) {
-		if(onEnter(dynamic_cast<QEnterEvent *>(event)->pos())) {
+		if(onEnter(dynamic_cast<QEnterEvent *>(event)->position().toPoint())) {
 			return true;
 		}
 	} else if(event->type() == QEvent::MouseButtonPress) {

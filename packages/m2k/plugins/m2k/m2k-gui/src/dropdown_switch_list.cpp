@@ -169,7 +169,7 @@ void DropdownSwitchList::mousePressEvent(QMouseEvent *event)
 
 void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event)
 {
-	if(!rect().contains(event->localPos().toPoint())) {
+	if(!rect().contains(event->position().toPoint())) {
 		return;
 	}
 
