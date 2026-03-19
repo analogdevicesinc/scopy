@@ -62,7 +62,7 @@ add_compile_definitions(QT_MESSAGELOGCONTEXT)
 
 include(GNUInstallDirs)
 
-find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
 find_package(KDDockWidgets QUIET)
 if(KDDockWidgets_FOUND)
@@ -72,12 +72,7 @@ else()
 	message(STATUS "Not using KDDockWidgets")
 endif()
 
-if(Qt5Widgets_VERSION VERSION_LESS 5.15.2)
-	message(FATAL_ERROR "Minimum supported Qt 5.15.2")
-	return()
-else()
-	message(STATUS "Using Qt version: " ${Qt5Widgets_VERSION})
-endif()
+message(STATUS "Using Qt version: " ${Qt${QT_VERSION_MAJOR}Widgets_VERSION})
 
 # message(QtVersion: ${QT_VERSION_MAJOR}:${QT_VERSION_MINOR})
 
@@ -238,11 +233,11 @@ endif()
 find_package(ECM REQUIRED NO_MODULE)
 message(STATUS "ECM found at: ${ECM_DIR}")
 
-find_package(KF5Archive REQUIRED)
-if(KF5Archive_FOUND)
-	message(STATUS "Using KF5Archive")
+find_package(KF6Archive REQUIRED)
+if(KF6Archive_FOUND)
+	message(STATUS "Using KF6Archive")
 else()
-	message(STATUS "Not using KF5Archive")
+	message(STATUS "Not using KF6Archive")
 endif()
 
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
@@ -253,8 +248,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-core)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopy-core scopy-gui)
 
-if(KF5Archive_FOUND)
-	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+if(KF6Archive_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KF6::Archive)
 endif()
 
 # Compiler options
