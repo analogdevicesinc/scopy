@@ -84,7 +84,7 @@ void MenuWidget::add(QWidget *w, QString name, MenuAlignment position)
 
 void MenuWidget::add(QWidget *w)
 {
-	add(w, "widget" + QString(uuid), MA_TOPLAST);
+	add(w, "widget" + QString::number(uuid), MA_TOPLAST);
 	uuid++;
 }
 

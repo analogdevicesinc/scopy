@@ -97,7 +97,7 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 	m_menu->add(m_plotStack);
 
 	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt())); });
+		[=](int idx) { m_plotStack->show(QString::number(m_plotCb->combo()->currentData().toInt())); });
 
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
 
@@ -302,7 +302,7 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 		m_plotCb->combo()->setItemText(idx, newName);
 	});
 	m_plotCb->combo()->addItem(p->name(), p->uuid());
-	m_plotStack->add(QString(p->uuid()), plotMenu);
+	m_plotStack->add(QString::number(p->uuid()), plotMenu);
 	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
 
@@ -335,7 +335,7 @@ void FFTPlotManagerSettings::removePlot(FFTPlotComponent *p)
 	// m_menu->remove(plotMenu);
 	int idx = m_plotCb->combo()->findData(p->uuid());
 	m_plotCb->combo()->removeItem(idx);
-	m_plotStack->remove(QString(p->uuid()));
+	m_plotStack->remove(QString::number(p->uuid()));
 
 	setPlotComboVisible();
 }

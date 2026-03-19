@@ -231,7 +231,7 @@ QFileInfoList PkgUtil::getFilesInfo(const QString &path, const QStringList &dirF
 	QDirIterator it(path, nameFilters, QDir::NoFilter, QDirIterator::Subdirectories);
 	while(it.hasNext()) {
 		if(dirFilter.isEmpty()) {
-			files.append(it.next());
+			files.append(QFileInfo(it.next()));
 		} else {
 			QDir dir(it.next());
 			files.append(dir.entryInfoList(fileFilter, QDir::Files));

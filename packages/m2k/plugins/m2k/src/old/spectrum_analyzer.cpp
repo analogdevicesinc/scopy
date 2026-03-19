@@ -1756,7 +1756,7 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 		bool isOk = true;
 		for(const auto &ref_channel : referenceChannels) {
 			QString shortName = ref_channel->shortName();
-			int channel_counter = shortName.midRef(shortName.size() - 1).toInt();
+			int channel_counter = shortName.mid(shortName.size() - 1).toInt();
 			if(current == channel_counter) {
 				isOk = false;
 				break;

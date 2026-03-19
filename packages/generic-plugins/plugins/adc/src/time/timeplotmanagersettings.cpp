@@ -92,7 +92,7 @@ QWidget *TimePlotManagerSettings::createMenu(QWidget *parent)
 	m_menu->add(m_plotStack);
 
 	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt())); });
+		[=](int idx) { m_plotStack->show(QString::number(m_plotCb->combo()->currentData().toInt())); });
 
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
 
@@ -391,8 +391,8 @@ void TimePlotManagerSettings::addPlot(TimePlotComponent *p)
 		m_plotCb->combo()->setItemText(idx, newName);
 	});
 	m_plotCb->combo()->addItem(p->name(), p->uuid());
-	m_plotStack->add(QString(p->uuid()), plotMenu);
-	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
+	m_plotStack->add(QString::number(p->uuid()), plotMenu);
+	// m_menu->add(plotMenu, p->name() + QString::number(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
 	connect(p->plotMenu(), &TimePlotComponentSettings::requestSettings, this, [=]() {
 		int idx = m_plotCb->combo()->findData(p->uuid());
@@ -416,7 +416,7 @@ void TimePlotManagerSettings::removePlot(TimePlotComponent *p)
 	// m_menu->remove(plotMenu);
 	int idx = m_plotCb->combo()->findData(p->uuid());
 	m_plotCb->combo()->removeItem(idx);
-	m_plotStack->remove(QString(p->uuid()));
+	m_plotStack->remove(QString::number(p->uuid()));
 
 	setPlotComboVisible();
 }
