@@ -1009,7 +1009,7 @@ void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 		}
 
 		ui->decoderTableView->blockSignals(true);
-		QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
+		QFuture<void> future = QtConcurrent::run([this]() { waitForDecoders(); });
 		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 		connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
 			if(ui->btnDecoderTable->isChecked()) {
@@ -1595,7 +1595,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 			if(ui->decoderTableView->isActive()) {
 				ui->decoderTableView->blockSignals(true);
 
-				QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
+				QFuture<void> future = QtConcurrent::run([this]() { waitForDecoders(); });
 				QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
 				connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {

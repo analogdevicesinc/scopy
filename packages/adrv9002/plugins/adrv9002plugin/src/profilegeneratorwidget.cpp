@@ -712,10 +712,10 @@ void ProfileGeneratorWidget::onSaveToFile(bool isStreamFile)
 		if(isStreamFile) {
 			// Start animation
 			m_saveStreamToFileBtn->startAnimation();
-			QtConcurrent::run(this, &ProfileGeneratorWidget::doSaveStreamWork, fileName, configCopy);
+			(void)QtConcurrent::run([this, fileName, configCopy]() { doSaveStreamWork(fileName, configCopy); });
 		} else {
 			m_saveProfileToFileBtn->startAnimation();
-			QtConcurrent::run(this, &ProfileGeneratorWidget::doSaveProfileWork, fileName, configCopy);
+			(void)QtConcurrent::run([this, fileName, configCopy]() { doSaveProfileWork(fileName, configCopy); });
 		}
 	}
 }
@@ -744,7 +744,7 @@ void ProfileGeneratorWidget::onLoadToDevice()
 	m_loadToDeviceBtn->startAnimation();
 
 	// Execute worker function - fire and forget
-	QtConcurrent::run(this, &ProfileGeneratorWidget::doLoadToDeviceWork, configCopy);
+	(void)QtConcurrent::run([this, configCopy]() { doLoadToDeviceWork(configCopy); });
 }
 
 void ProfileGeneratorWidget::onDownloadCLI()

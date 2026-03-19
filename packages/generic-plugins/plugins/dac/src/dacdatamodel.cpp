@@ -347,7 +347,7 @@ void DacDataModel::startPushOperation()
 		qDebug(CAT_DAC_DATA) << "Cancel thread and wait in startPushOperation";
 		m_pushThd.waitForFinished();
 	}
-	m_pushThd = QtConcurrent::run(this, &DacDataModel::push);
+	m_pushThd = QtConcurrent::run([this]() { push(); });
 	m_pushWatcher->setFuture(m_pushThd);
 }
 
@@ -621,7 +621,7 @@ QString DacDataModel::generateToneName(QString chnId)
 	QString name = "";
 	int idx = chnId.indexOf(toneId);
 	if(idx != -1) {
-		int chnIndex = chnId.midRef(idx + toneId.size()).toInt(&ok);
+		int chnIndex = chnId.mid(idx + toneId.size()).toInt(&ok);
 		if(!ok)
 			return name;
 		int txIndex = (chnIndex / MAX_NB_TONES) + 1; // TX indexing from 1

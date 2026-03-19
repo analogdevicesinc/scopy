@@ -234,7 +234,7 @@ NetworkAnalyzer::NetworkAnalyzer(libm2k::context::M2k *m2k, QString uri, Filter 
 
 	connect(this, &NetworkAnalyzer::sweepDone, [=]() {
 		if(ui->runSingleWidget->runButtonChecked()) {
-			thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
+			thd = QtConcurrent::run([this]() { goertzel(); });
 			return;
 		}
 
@@ -1640,7 +1640,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		bufferPreviewer->clear();
 		configHwForNetworkAnalyzing();
 		m_stop = false;
-		thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
+		thd = QtConcurrent::run([this]() { goertzel(); });
 		ui->statusLabel->setText(tr("Running"));
 	} else {
 		ui->statusLabel->setText(tr("Stopping..."));

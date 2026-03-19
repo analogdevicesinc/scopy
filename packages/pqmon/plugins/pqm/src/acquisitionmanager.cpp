@@ -133,7 +133,7 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 void AcquisitionManager::futureReadData()
 {
 	if(!m_readFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(this, &AcquisitionManager::readData);
+		QFuture<void> f = QtConcurrent::run([this]() { readData(); });
 		m_readFw->setFuture(f);
 	}
 }
@@ -281,7 +281,7 @@ double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
 void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr)
 {
 	if(!m_setFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(this, &AcquisitionManager::setData, attr);
+		QFuture<void> f = QtConcurrent::run([this, attr]() { setData(attr); });
 		m_setFw->setFuture(f);
 	}
 }
