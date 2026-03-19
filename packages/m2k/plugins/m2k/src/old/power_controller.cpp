@@ -54,6 +54,7 @@ PowerController::PowerController(libm2k::context::M2k *m2k, ToolMenuEntry *tme, 
 	, m_m2k_powersupply(m_m2k_context->getPowerSupply())
 {
 	ui->setupUi(this);
+	connect(ui->trackingRatio, &QSlider::valueChanged, ui->trackingRatioLbl, qOverload<int>(&QLabel::setNum));
 
 	try {
 		m_m2k_powersupply->enableChannel(0, false);
