@@ -88,12 +88,12 @@ void GRTopBlock::build()
 	top->disconnect_all();
 	Q_EMIT aboutToBuild();
 
-	for(GRSignalPath *sig : qAsConst(m_signalPaths)) {
+	for(GRSignalPath *sig : std::as_const(m_signalPaths)) {
 		if(sig->enabled()) {
 			sig->connect_blk(this, nullptr);
 		}
 	}
-	for(GRIIODeviceSource *dev : qAsConst(m_iioDeviceSources)) {
+	for(GRIIODeviceSource *dev : std::as_const(m_iioDeviceSources)) {
 		dev->build_blks(this);
 		dev->connect_blk(this, nullptr);
 	}
@@ -107,14 +107,14 @@ void GRTopBlock::teardown()
 	Q_EMIT aboutToTeardown();
 	built = false;
 
-	for(GRIIODeviceSource *dev : qAsConst(m_iioDeviceSources)) {
+	for(GRIIODeviceSource *dev : std::as_const(m_iioDeviceSources)) {
 		if(dev->built()) {
 			dev->disconnect_blk(this);
 			dev->destroy_blks(this);
 		}
 	}
 
-	for(GRSignalPath *sig : qAsConst(m_signalPaths)) {
+	for(GRSignalPath *sig : std::as_const(m_signalPaths)) {
 		sig->disconnect_blk(this);
 	}
 

@@ -166,7 +166,7 @@ ChannelWidget *ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 			m_parent->setMaximumWidth(m_maxChannelWidth);
 		} else {
 			// RESIZE CHANNELS
-			for(auto c : qAsConst(m_channelsList)) {
+			for(auto c : std::as_const(m_channelsList)) {
 				c->setMinimumWidth(m_maxChannelWidth);
 			}
 		}
@@ -220,7 +220,7 @@ void ChannelManager::changeParent(QWidget *newParent)
 		ch_width = header->width();
 		ch_height = header->height();
 	} else {
-		for(auto ch : qAsConst(m_channelsList)) {
+		for(auto ch : std::as_const(m_channelsList)) {
 			ch_width = std::max(ch_width, ch->width());
 			ch_height = std::max(ch_height, ch->height());
 		}
@@ -246,7 +246,7 @@ void ChannelManager::changeParent(QWidget *newParent)
 	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	m_channelsWidget->setStyleSheet("border: 0px;");
 
-	for(ChannelWidget *channel : qAsConst(m_channelsList)) {
+	for(ChannelWidget *channel : std::as_const(m_channelsList)) {
 		m_channelsWidget->layout()->addWidget(channel);
 	}
 
@@ -334,7 +334,7 @@ void ChannelManager::toggleChannelManager(bool toggled)
 {
 	Q_EMIT channelManagerToggle(toggled);
 
-	for(auto ch : qAsConst(m_channelsList)) {
+	for(auto ch : std::as_const(m_channelsList)) {
 		ch->toggleChannel(!toggled);
 		if(ch->isMainChannel() || ch->isPhysicalChannel()) {
 			ch->setMenuButtonVisibility(toggled);
@@ -353,7 +353,7 @@ void ChannelManager::toggleChannelManager(bool toggled)
 	m_channelsWidget->setMaximumWidth(currentWidth);
 
 	// RESIZE CHANNELS
-	for(auto c : qAsConst(m_channelsList)) {
+	for(auto c : std::as_const(m_channelsList)) {
 		c->setMinimumWidth(currentWidth);
 	}
 }

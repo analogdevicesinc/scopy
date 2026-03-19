@@ -304,7 +304,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		sp->setMsbFirst(params["MSB"].toBool());
 
 		auto paramsContainer = params["v"].toArray();
-		for(const auto &val : qAsConst(paramsContainer)) {
+		for(const auto &val : std::as_const(paramsContainer)) {
 			sp->v.push_back(val.toInt());
 		}
 	} else if(ip) {
@@ -316,7 +316,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		ip->setWrite(params["write"].toBool());
 
 		auto paramsContainer = params["v"].toArray();
-		for(const auto &val : qAsConst(paramsContainer)) {
+		for(const auto &val : std::as_const(paramsContainer)) {
 			ip->v.push_back(val.toInt());
 		}
 	} else if(imp) {
@@ -1682,7 +1682,7 @@ void I2CPatternUI::parse_ui()
 	std::vector<uint8_t> b;
 	std::reverse(strList.begin(), strList.end());
 
-	for(const QString &str : qAsConst(strList)) {
+	for(const QString &str : std::as_const(strList)) {
 		uint64_t val;
 		bool ok;
 		b.clear();
@@ -2007,7 +2007,7 @@ void SPIPatternUI::parse_ui()
 	std::vector<uint8_t> b;
 	std::reverse(strList.begin(), strList.end());
 
-	for(const QString &str : qAsConst(strList)) {
+	for(const QString &str : std::as_const(strList)) {
 		uint64_t val;
 		bool ok;
 		b.clear();
@@ -3189,7 +3189,7 @@ void ImportPatternUI::parse_ui()
 
 	unsigned short mask = 0;
 	auto keys = import_settings->getExportConfig().keys();
-	for(int key : qAsConst(keys)) {
+	for(int key : std::as_const(keys)) {
 		mask = mask | (import_settings->getExportConfig()[key] << key);
 	}
 
@@ -3299,7 +3299,7 @@ Pattern *PatternFactory::create(QString name)
 {
 	int i = 0;
 
-	for(const auto &str : qAsConst(ui_list)) {
+	for(const auto &str : std::as_const(ui_list)) {
 		if(name == str) {
 			return create(i);
 		}
@@ -3377,7 +3377,7 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, QWidget *parent)
 	int i = 0;
 	QString name = QString::fromStdString(pattern->get_name());
 
-	for(const auto &str : qAsConst(ui_list)) {
+	for(const auto &str : std::as_const(ui_list)) {
 		if(name == str) {
 			return create_ui(pattern, i, parent);
 		}

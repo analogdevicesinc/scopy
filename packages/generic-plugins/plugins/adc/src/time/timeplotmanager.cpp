@@ -105,7 +105,7 @@ void TimePlotManager::multiPlotUpdate()
 {
 	bool b = m_plots.count() > 1;
 
-	for(PlotComponent *p : qAsConst(m_plots)) {
+	for(PlotComponent *p : std::as_const(m_plots)) {
 		auto plt = dynamic_cast<TimePlotComponent *>(p);
 		plt->plotMenu()->showPlotButtons(b);
 
@@ -113,7 +113,7 @@ void TimePlotManager::multiPlotUpdate()
 		plt->plotMenu()->showDeleteButtons(b && plt != m_primary);
 	}
 
-	for(PlotManagerCombobox *cb : qAsConst(m_channelPlotcomboMap)) {
+	for(PlotManagerCombobox *cb : std::as_const(m_channelPlotcomboMap)) {
 		cb->setVisible(b);
 	}
 }
@@ -131,7 +131,7 @@ void TimePlotManager::syncAllPlotNavigatorsAndCursors()
 {
 	if(m_primary != m_plots[0]) {
 		m_primary = m_plots[0];
-		for(PlotComponent *p : qAsConst(m_plots)) {
+		for(PlotComponent *p : std::as_const(m_plots)) {
 			syncNavigatorAndCursors(p);
 		}
 	}

@@ -355,7 +355,7 @@ void BufferDacAddon::onLoadFinished()
 void BufferDacAddon::enableFirstChannels(int channelCount)
 {
 	int i = 0;
-	for(auto btn : qAsConst(m_channelBtns)) {
+	for(auto btn : std::as_const(m_channelBtns)) {
 		btn->checkBox()->setChecked(i < channelCount);
 		i++;
 	}
@@ -468,7 +468,7 @@ QWidget *BufferDacAddon::createAttrMenu(TxNode *node, QWidget *parent)
 	layout->setContentsMargins(0, 0, 0, 10);
 	layout->setContentsMargins(0, 0, 0, 0);
 
-	for(IIOWidget *w : qAsConst(attrWidgets)) {
+	for(IIOWidget *w : std::as_const(attrWidgets)) {
 		layout->addWidget(w);
 		detectSamplingFrequency(w);
 	}

@@ -254,7 +254,7 @@ void IioTabWidget::scanFinished()
 	if(!m_avlCtxCb->isEnabled()) {
 		m_avlCtxCb->setEnabled(true);
 	}
-	for(const auto &ctx : qAsConst(m_scanList)) {
+	for(const auto &ctx : std::as_const(m_scanList)) {
 		QString cbEntry = ctx.first + " [" + ctx.second + "]";
 		m_avlCtxCb->addItem(cbEntry);
 	}

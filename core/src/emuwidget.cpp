@@ -364,7 +364,7 @@ QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 	w->setLayout(layout);
 
 	m_demoOptCb = new QComboBox(w);
-	for(const QString &opt : qAsConst(m_availableOptions)) {
+	for(const QString &opt : std::as_const(m_availableOptions)) {
 		m_demoOptCb->addItem(opt);
 	}
 	layout->addWidget(m_demoOptCb);

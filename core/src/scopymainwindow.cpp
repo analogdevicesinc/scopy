@@ -396,7 +396,7 @@ void ScopyMainWindow::initAboutPage()
 		return;
 	}
 	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
-	for(Plugin *p : qAsConst(plugin)) {
+	for(Plugin *p : std::as_const(plugin)) {
 		QString content = p->about();
 		if(!content.isEmpty()) {
 			about->addHorizontalTab(about->buildPage(content), p->name());
@@ -415,7 +415,7 @@ void ScopyMainWindow::initPreferencesPage()
 	}
 
 	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
-	for(Plugin *p : qAsConst(plugin)) {
+	for(Plugin *p : std::as_const(plugin)) {
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
 			prefPage->addHorizontalTab(p->preferencesPage(), p->name());

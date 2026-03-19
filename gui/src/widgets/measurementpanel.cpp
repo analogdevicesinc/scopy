@@ -233,7 +233,7 @@ void MeasurementsPanel::setInhibitUpdates(bool newInhibitUpdates)
 
 void MeasurementsPanel::clear()
 {
-	for(VerticalWidgetStack *stack : qAsConst(m_stacks)) {
+	for(VerticalWidgetStack *stack : std::as_const(m_stacks)) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -243,7 +243,7 @@ void MeasurementsPanel::clear()
 
 void MeasurementsPanel::refreshUi()
 {
-	for(VerticalWidgetStack *stack : qAsConst(m_stacks)) {
+	for(VerticalWidgetStack *stack : std::as_const(m_stacks)) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -254,7 +254,7 @@ void MeasurementsPanel::refreshUi()
 	m_stacks.append(new VerticalWidgetStack(stackSize, this));
 	panelLayout->insertWidget(idx, m_stacks.last());
 
-	for(QWidget *label : qAsConst(m_labels)) {
+	for(QWidget *label : std::as_const(m_labels)) {
 		addWidget(label);
 	}
 }
@@ -352,11 +352,11 @@ void StatsPanel::removeStat(StatsLabel *stat)
 
 void StatsPanel::updateOrder()
 {
-	for(StatsLabel *label : qAsConst(m_labels)) {
+	for(StatsLabel *label : std::as_const(m_labels)) {
 		panelLayout->removeWidget(label);
 	}
 
-	for(StatsLabel *label : qAsConst(m_labels)) {
+	for(StatsLabel *label : std::as_const(m_labels)) {
 		panelLayout->addWidget(label);
 	}
 }

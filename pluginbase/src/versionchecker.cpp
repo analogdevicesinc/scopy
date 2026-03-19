@@ -168,7 +168,7 @@ void VersionChecker::updateSubscriptions()
 		qDebug(CAT_VERSION) << "VersionChecker is in progress";
 		break;
 	case DONE:
-		for(auto &function : qAsConst(m_subscriptions)) {
+		for(auto &function : std::as_const(m_subscriptions)) {
 			std::invoke(function, m_cache);
 		}
 

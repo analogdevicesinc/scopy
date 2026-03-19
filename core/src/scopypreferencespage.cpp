@@ -106,7 +106,7 @@ void ScopyPreferencesPage::updateSessionDevices(QMap<QString, QStringList> devic
 {
 	int btnIdx = m_autoConnectWidget->contentLayout()->indexOf(m_devRefresh);
 	QStringList keys = devices.keys();
-	for(const QString &uri : qAsConst(keys)) {
+	for(const QString &uri : std::as_const(keys)) {
 		if(!m_connDevices.contains(uri)) {
 			QString prefId = uri + "_sticky";
 			QCheckBox *devCb = new QCheckBox(uri, m_autoConnectWidget);

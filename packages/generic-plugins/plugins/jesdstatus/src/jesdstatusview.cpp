@@ -267,7 +267,7 @@ void JesdStatusView::updateUi()
 
 void JesdStatusView::updateStatus()
 {
-	for(auto &pair : qAsConst(m_statusLabels)) {
+	for(auto &pair : std::as_const(m_statusLabels)) {
 		QLabel *vLbl = pair.first;
 		auto callback = pair.second;
 		auto elem = callback();
@@ -279,7 +279,7 @@ void JesdStatusView::updateStatus()
 void JesdStatusView::updateLaneStatus()
 {
 	auto lanes = m_laneLabels.keys();
-	for(unsigned int i : qAsConst(lanes)) {
+	for(unsigned int i : std::as_const(lanes)) {
 		for(auto &pair : m_laneLabels.value(i)) {
 			QLabel *vLbl = pair.first;
 			auto callback = pair.second;

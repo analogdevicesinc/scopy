@@ -153,7 +153,7 @@ DdsDacAddon::~DdsDacAddon() {}
 
 void DdsDacAddon::enable(bool enable)
 {
-	for(auto tx : qAsConst(m_txWidgets)) {
+	for(auto tx : std::as_const(m_txWidgets)) {
 		dynamic_cast<TxMode *>(tx->currentWidget())->enable(enable);
 	}
 }
@@ -218,7 +218,7 @@ TxMode::~TxMode() {}
 
 void TxMode::read()
 {
-	for(TxChannel *chn : qAsConst(m_txChannels)) {
+	for(TxChannel *chn : std::as_const(m_txChannels)) {
 		chn->read();
 	}
 }

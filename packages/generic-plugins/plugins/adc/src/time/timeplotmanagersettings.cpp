@@ -452,7 +452,7 @@ void TimePlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { 
 double TimePlotManagerSettings::readSampleRate()
 {
 	double sr = 1;
-	for(SampleRateProvider *ch : qAsConst(m_sampleRateProviders)) {
+	for(SampleRateProvider *ch : std::as_const(m_sampleRateProviders)) {
 		if(ch->sampleRateAvailable()) {
 			sr = ch->sampleRate();
 			break;

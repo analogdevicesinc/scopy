@@ -134,7 +134,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		m_ymode = static_cast<YMode>(ycb->itemData(idx).toInt());
-		for(auto c : qAsConst(m_scaleProviders)) {
+		for(auto c : std::as_const(m_scaleProviders)) {
 			c->setYMode(m_ymode);
 		}
 		updateYAxis();
@@ -291,7 +291,7 @@ void TimePlotComponentSettings::toggleAutoScale()
 void TimePlotComponentSettings::updateYModeCombo()
 {
 	bool scaleItemCbtmp = true;
-	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
+	for(ScaleProvider *s : std::as_const(m_scaleProviders)) {
 		if(s->scaleAvailable() == false) {
 			scaleItemCbtmp = false;
 			break;
@@ -318,7 +318,7 @@ void TimePlotComponentSettings::updateYAxis()
 {
 	double max = -1000000.0;
 	double min = 1000000.0;
-	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
+	for(ScaleProvider *s : std::as_const(m_scaleProviders)) {
 		if(s->yMax() > max) {
 			max = s->yMax();
 		}

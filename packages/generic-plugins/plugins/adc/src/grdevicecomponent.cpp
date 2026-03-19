@@ -219,7 +219,7 @@ CollapsableMenuControlButton *GRDeviceComponent::ctrl() { return m_ctrl; }
 
 bool GRDeviceComponent::sampleRateAvailable()
 {
-	for(auto c : qAsConst(m_channels)) {
+	for(auto c : std::as_const(m_channels)) {
 		if(c->enabled())
 			return m_src->sampleRateAvailable();
 	}

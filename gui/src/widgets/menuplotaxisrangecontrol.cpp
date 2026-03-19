@@ -73,7 +73,7 @@ void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax)
 
 void MenuPlotAxisRangeControl::removeAxis(PlotAxis *ax)
 {
-	for(const QMetaObject::Connection &c : qAsConst(connections[ax])) {
+	for(const QMetaObject::Connection &c : std::as_const(connections[ax])) {
 		QObject::disconnect(c);
 	}
 	connections.remove(ax);

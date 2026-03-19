@@ -443,7 +443,7 @@ QVariantList Oscilloscope_API::getChannels()
 {
 	QVariantList list;
 
-	for(Channel_API *each : qAsConst(osc->channels_api)) {
+	for(Channel_API *each : std::as_const(osc->channels_api)) {
 		list.append(QVariant::fromValue(each));
 	}
 	return list;

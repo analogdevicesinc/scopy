@@ -866,12 +866,12 @@ void CapturePlot::setGraticuleEnabled(bool enabled)
 	displayGraticule = enabled;
 
 	if(!displayGraticule) {
-		for(QwtPlotScaleItem *scale : qAsConst(scaleItems)) {
+		for(QwtPlotScaleItem *scale : std::as_const(scaleItems)) {
 			scale->attach(this);
 		}
 		graticule->enableGraticule(displayGraticule);
 	} else {
-		for(QwtPlotScaleItem *scale : qAsConst(scaleItems)) {
+		for(QwtPlotScaleItem *scale : std::as_const(scaleItems)) {
 			scale->detach();
 		}
 		graticule->enableGraticule(displayGraticule);
@@ -1269,7 +1269,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 	// merge new group if selected channels already have a group
 	QList<RoundedHandleV *> group = d_groupHandles.takeLast();
 	QList<RoundedHandleV *> updatedGroup;
-	for(RoundedHandleV *hdl : qAsConst(group)) {
+	for(RoundedHandleV *hdl : std::as_const(group)) {
 		auto hdlGroup =
 			std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
 				     [&hdl](const QList<RoundedHandleV *> &group) { return group.contains(hdl); });
@@ -1282,7 +1282,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 		}
 
 		auto hdlGroupContainer = *hdlGroup;
-		for(const auto &grpHdl : qAsConst(hdlGroupContainer)) {
+		for(const auto &grpHdl : std::as_const(hdlGroupContainer)) {
 			if(!updatedGroup.contains(grpHdl)) {
 				updatedGroup.push_back(grpHdl);
 			}
@@ -1342,14 +1342,14 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 	group.first()->setSelected(true);
 	group.first()->selected(true);
 
-	for(QwtPlotZoneItem *groupMarker : qAsConst(d_groupMarkers)) {
+	for(QwtPlotZoneItem *groupMarker : std::as_const(d_groupMarkers)) {
 		groupMarker->detach();
 		delete groupMarker;
 	}
 
 	d_groupMarkers.clear();
 
-	for(const auto &group : qAsConst(d_groupHandles)) {
+	for(const auto &group : std::as_const(d_groupHandles)) {
 		// Add group marker
 		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, 0));
 		const QwtInterval y = axisInterval(QwtAxisId(QwtAxis::YLeft, 0));
@@ -1373,7 +1373,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 	}
 
 	if(!newGroup) {
-		for(const auto &group : qAsConst(d_groupHandles)) {
+		for(const auto &group : std::as_const(d_groupHandles)) {
 			group.first()->triggerMove();
 		}
 	}
@@ -1400,7 +1400,7 @@ QVector<int> CapturePlot::getGroupOfChannel(int chnIdx)
 	}
 
 	auto hdlGroupContainer = *hdlGroup;
-	for(const auto &hdl : qAsConst(hdlGroupContainer)) {
+	for(const auto &hdl : std::as_const(hdlGroupContainer)) {
 		groupIdxList.push_back(d_offsetHandles.indexOf(hdl));
 	}
 
@@ -1797,7 +1797,7 @@ void CapturePlot::setOffsetWidgetVisible(int chnIdx, bool visible)
 	int count = 0;
 
 	auto hdlGroupContainer = *hdlGroup;
-	for(const auto &handle : qAsConst(hdlGroupContainer)) {
+	for(const auto &handle : std::as_const(hdlGroupContainer)) {
 		if(handle->isVisible()) {
 			count++;
 		}

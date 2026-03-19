@@ -70,7 +70,7 @@ void GRTimeSinkComponent::connectSignalPaths()
 	int index = 0;
 	time_channel_map.clear();
 
-	for(GRChannel *gr : qAsConst(m_channels)) {
+	for(GRChannel *gr : std::as_const(m_channels)) {
 		GRSignalPath *sigPath = gr->sigpath();
 		if(sigPath->enabled()) {
 			// connect end of signal path to time_sink input
@@ -104,7 +104,7 @@ void GRTimeSinkComponent::setData(bool copy)
 {
 	int index = 0;
 
-	for(GRChannel *gr : qAsConst(m_channels)) {
+	for(GRChannel *gr : std::as_const(m_channels)) {
 		int index = time_channel_map.value(gr->sigpath()->name(), -1);
 		if(index == -1)
 			continue;

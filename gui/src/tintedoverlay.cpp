@@ -50,7 +50,7 @@ void TintedOverlay::paintEvent(QPaintEvent *ev)
 	if(!holes.isEmpty()) {
 		QPainterPath p1, p2;
 		p1.addRect(rect());
-		for(QWidget *holeWidget : qAsConst(holes)) {
+		for(QWidget *holeWidget : std::as_const(holes)) {
 			QPoint offset = holeWidget->mapTo(parent, QPoint(0, 0));
 			QRect hole = holeWidget->geometry();
 			hole.moveTo(offset);

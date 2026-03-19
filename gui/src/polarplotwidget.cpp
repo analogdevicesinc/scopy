@@ -123,7 +123,7 @@ void PolarPlotWidget::setData(QVector<QVector<QwtPointPolar>> data)
 {
 	if(data.size() == m_plotChannels.size()) {
 		int chnlIdx = 0;
-		for(PolarPlotChannel *chnl : qAsConst(m_plotChannels)) {
+		for(PolarPlotChannel *chnl : std::as_const(m_plotChannels)) {
 			chnl->setSamples(data[chnlIdx]);
 			chnlIdx++;
 		}

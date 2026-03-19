@@ -167,10 +167,10 @@ Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 	m_tool->rightStack()->add(settingsMenuId, rightSideMenu);
 
 	scanChannels();
-	for(auto w : qAsConst(m_channelsRx)) {
+	for(auto w : std::as_const(m_channelsRx)) {
 		globalRxSection->contentLayout()->addWidget(w);
 	}
-	for(auto w : qAsConst(m_channelsTx)) {
+	for(auto w : std::as_const(m_channelsTx)) {
 		globalTxSection->contentLayout()->addWidget(w);
 	}
 	Q_EMIT triggerRead();

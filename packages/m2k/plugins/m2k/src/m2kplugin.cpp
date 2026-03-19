@@ -417,7 +417,7 @@ void M2kPlugin::cleanup()
 
 	restoreToolState(calibrationToolNames);
 
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		QWidget *tool = tme->tool();
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -554,7 +554,7 @@ bool M2kPlugin::onConnect()
 		connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
 		connect(m_m2kController, SIGNAL(calibrationFailed()), this, SLOT(calibrationFinished()));
 
-		for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 			tme->setEnabled(true);
 			tme->setRunBtnVisible(true);
 			tme->setRunning(false);

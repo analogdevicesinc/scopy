@@ -47,7 +47,7 @@ Filter::Filter(const struct iio_context *ctx)
 	auto obj = doc.object();
 
 	auto obj_keys = obj.keys();
-	for(const auto &key : qAsConst(obj_keys)) {
+	for(const auto &key : std::as_const(obj_keys)) {
 		const auto child = obj[key].toObject();
 
 		if(!child.contains("compatible-devices"))
@@ -60,7 +60,7 @@ Filter::Filter(const struct iio_context *ctx)
 		bool compatible = true;
 
 		auto comp_dev = compatible_devices.toArray();
-		for(const auto &value : qAsConst(comp_dev)) {
+		for(const auto &value : std::as_const(comp_dev)) {
 			if(!value.isString()) {
 				compatible = false;
 				break;

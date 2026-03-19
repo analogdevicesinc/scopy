@@ -47,7 +47,7 @@ void ToolMenuManager::addMenuItem(DeviceInfo dInfo, int itemIndex)
 	QString id = dInfo.id;
 	MenuSectionCollapseWidget *devSection = createMenuSectionItem(dInfo);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
-	for(ToolMenuEntry *tme : qAsConst(dInfo.tools)) {
+	for(ToolMenuEntry *tme : std::as_const(dInfo.tools)) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
 		devSection->add(toolMenuItem);
 		menuBtnGroup->addButton(toolMenuItem);

@@ -176,7 +176,7 @@ void DacDataManager::setupDacMode(QString mode_name, unsigned int mode)
 	}
 	auto channelBtns = dac->getChannelBtns();
 	auto channelMenus = dac->getChannelMenus();
-	for(auto btn : qAsConst(channelBtns)) {
+	for(auto btn : std::as_const(channelBtns)) {
 		QString uuid = channelBtns.key(btn);
 		QWidget *menu = channelMenus.value(uuid);
 		if(menu) {

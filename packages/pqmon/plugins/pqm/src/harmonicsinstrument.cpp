@@ -431,7 +431,7 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 	for(const QString &ch : m_chnls) {
 		QStringList harmonics = attr[ch][h].split(" ");
 		m_yValues[ch].clear();
-		for(const QString &val : qAsConst(harmonics)) {
+		for(const QString &val : std::as_const(harmonics)) {
 			double hValue = val.toDouble(&ok);
 			if(!ok) {
 				continue;

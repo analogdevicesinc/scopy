@@ -108,7 +108,7 @@ void TutorialOverlay::next()
 
 		m_hoverWidget->raise();
 		m_hoverWidget->setVisible(true);
-		for(QWidget *subj : qAsConst(subjects)) {
+		for(QWidget *subj : std::as_const(subjects)) {
 			subj->raise();
 			m_popupWidget->setFocusOnContinueButton();
 			auto *highlight = new TintedOverlay(subj, QColor(255, 255, 255, 35));
@@ -173,7 +173,7 @@ void TutorialOverlay::cleanupChapter()
 {
 	if(!highlights.isEmpty()) {
 		// delete previous highlight
-		for(TintedOverlay *highlight : qAsConst(highlights)) {
+		for(TintedOverlay *highlight : std::as_const(highlights)) {
 			delete highlight;
 		}
 		highlights.clear();

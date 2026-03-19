@@ -61,7 +61,7 @@ JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
 	m_tool->addWidgetToCentralContainerHelper(deviceSelectorWidget);
 	m_tool->addWidgetToCentralContainerHelper(m_jesdDeviceStack);
 
-	for(auto dev : qAsConst(m_deviceList)) {
+	for(auto dev : std::as_const(m_deviceList)) {
 		setupDevice(dev);
 	}
 

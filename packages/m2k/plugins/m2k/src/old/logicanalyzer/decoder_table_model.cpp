@@ -177,7 +177,7 @@ void DecoderTableModel::reloadDecoders(bool logic)
 	m_curves.clear();
 
 	// Reconnect signals for all the annotation curves
-	for(const auto &curve : qAsConst(m_plotCurves)) {
+	for(const auto &curve : std::as_const(m_plotCurves)) {
 		if(const auto annCurve = dynamic_cast<AnnotationCurve *>(curve)) {
 			m_curves.emplace_back(annCurve);
 		}

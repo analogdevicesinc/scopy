@@ -96,7 +96,7 @@ int ToolMenu::indexOf(QWidget *w) { return m_layScroll->indexOf(w); }
 
 void ToolMenu::colapseAll()
 {
-	for(QWidget *w : qAsConst(m_widgetMap)) {
+	for(QWidget *w : std::as_const(m_widgetMap)) {
 		Collapsable *c = dynamic_cast<Collapsable *>(w);
 		if(c != nullptr) {
 			c->setCollapsed(true);

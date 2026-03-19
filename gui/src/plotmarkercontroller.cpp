@@ -111,7 +111,7 @@ void PlotMarkerController::setFixedHandleVisible(bool b)
 {
 	m_handlesVisible = b;
 	if(m_markerType == MC_FIXED) {
-		for(auto handle : qAsConst(m_fixedHandles)) {
+		for(auto handle : std::as_const(m_fixedHandles)) {
 			handle->handle()->setVisible(b);
 			handle->handle()->raise();
 		}
@@ -120,7 +120,7 @@ void PlotMarkerController::setFixedHandleVisible(bool b)
 
 void PlotMarkerController::deinitFixedMarker()
 {
-	for(auto handle : qAsConst(m_fixedHandles)) {
+	for(auto handle : std::as_const(m_fixedHandles)) {
 		delete handle;
 	}
 	m_fixedHandles.clear();
@@ -215,7 +215,7 @@ void PlotMarkerController::computePeakMarkers()
 void PlotMarkerController::cacheMarkerInfo()
 {
 	m_markerCache.clear();
-	for(const auto &mi : qAsConst(m_markerInfo)) {
+	for(const auto &mi : std::as_const(m_markerInfo)) {
 		m_markerCache.push_back(mi.peak.x);
 	}
 	m_markerInfo.clear();

@@ -121,7 +121,7 @@ QWidget *BufferMenuView::createAttrSection(QWidget *parent)
 								   MenuCollapseSection::MHW_BASEWIDGET, attrContainer);
 
 	QList<QWidget *> widgets = m_swiotAdvMenu->getWidgetsList();
-	for(QWidget *w : qAsConst(widgets)) {
+	for(QWidget *w : std::as_const(widgets)) {
 		layout->addWidget(w);
 	}
 

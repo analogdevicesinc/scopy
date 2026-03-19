@@ -119,7 +119,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_windowCb->combo()->setCurrentIndex(0);
 
 	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(auto c : qAsConst(m_channels)) {
+		for(auto c : std::as_const(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 				fc->setWindow(m_windowCb->combo()->itemData(idx).toInt());
@@ -221,7 +221,7 @@ void FFTPlotComponentSettings::removeChannel(ChannelComponent *c)
 	auto fftPlotComponentChannel = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt());
 	m_autoscaler->removeChannels(fftPlotComponentChannel->m_fftPlotCh);
 
-	for(const QMetaObject::Connection &c : qAsConst(connections[c])) {
+	for(const QMetaObject::Connection &c : std::as_const(connections[c])) {
 		QObject::disconnect(c);
 	}
 	connections.remove(c);

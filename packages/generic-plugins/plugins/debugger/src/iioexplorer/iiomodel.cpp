@@ -81,7 +81,7 @@ void IIOModel::setupCtx()
 void IIOModel::generateCtxAttributes()
 {
 	// add attrs from context
-	for(IIOWidget *ctxWidget : qAsConst(m_ctxList)) {
+	for(IIOWidget *ctxWidget : std::as_const(m_ctxList)) {
 		m_entries.insert(ctxWidget->getRecipe().data);
 		auto *attrItem = createIIOStandardItem({ctxWidget}, ctxWidget->getRecipe().data, "",
 						       m_rootString + SEPARATOR + ctxWidget->getRecipe().data,
@@ -198,7 +198,7 @@ IIOStandardItem *IIOModel::createIIOStandardItem(QList<IIOWidget *> widgets, QSt
 	}
 
 	/* Hide all widgets */
-	for(IIOWidget *widget : qAsConst(widgets)) {
+	for(IIOWidget *widget : std::as_const(widgets)) {
 		widget->hide();
 	}
 

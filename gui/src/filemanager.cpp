@@ -88,7 +88,7 @@ void FileManager::open(QString fileName, FileManager::FilePurpose filepurpose)
 			QVector<QString> line_data;
 			QString line = in.readLine();
 			QStringList list = line.split(separator, Qt::SkipEmptyParts);
-			for(const QString &list_item : qAsConst(list)) {
+			for(const QString &list_item : std::as_const(list)) {
 				line_data.push_back(list_item);
 			}
 			if(line_data.size() > 0) {
@@ -296,7 +296,7 @@ void FileManager::performWrite(bool withScopyHeader)
 	// column names row
 	exportStream << "Sample" << separator;
 	bool skipFirstSeparator = true;
-	for(const QString &columnName : qAsConst(columnNames)) {
+	for(const QString &columnName : std::as_const(columnNames)) {
 		if(!skipFirstSeparator)
 			exportStream << separator;
 		exportStream << columnName;
@@ -345,7 +345,7 @@ void FileManager::performDecoderWrite(bool skip_empty_lines)
 	// column names row
 	bool skipFirstSeparator = true;
 
-	for(const auto &column : qAsConst(columnNames)) {
+	for(const auto &column : std::as_const(columnNames)) {
 		if(!skipFirstSeparator) {
 			exportStream << separator;
 		}

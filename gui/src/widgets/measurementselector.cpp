@@ -126,7 +126,7 @@ QCheckBox *MeasurementSelectorItem::statsCheckbox() const { return m_statsCheckb
 void MeasurementSelector::updateToggleAllMeasure()
 {
 	bool allChecked = true;
-	for(auto *item : qAsConst(m_map)) {
+	for(auto *item : std::as_const(m_map)) {
 		if(!item->measureCheckbox()->isChecked()) {
 			allChecked = false;
 			break;
@@ -139,7 +139,7 @@ void MeasurementSelector::updateToggleAllMeasure()
 void MeasurementSelector::updateToggleAllStats()
 {
 	bool allChecked = true;
-	for(auto *item : qAsConst(m_map)) {
+	for(auto *item : std::as_const(m_map)) {
 		if(!item->statsCheckbox()->isChecked()) {
 			allChecked = false;
 			break;

@@ -2776,7 +2776,7 @@ void LogicAnalyzer::readPreferences()
 		p->get("m2k_logic_separate_annotations").toBool(); // prefPanel->getSeparateAnnotations();
 	m_plot.setVisibleFpsLabel(showFps);
 
-	for(GenericLogicPlotCurve *curve : qAsConst(m_plotCurves)) {
+	for(GenericLogicPlotCurve *curve : std::as_const(m_plotCurves)) {
 		if(curve->getType() == LogicPlotCurveType::Data) {
 			LogicDataCurve *ldc = dynamic_cast<LogicDataCurve *>(curve);
 			if(!ldc) {
@@ -2803,7 +2803,7 @@ void LogicAnalyzer::exportData()
 
 	m_exportConfig = m_exportSettings->getExportConfig();
 	auto keys = m_exportConfig.keys();
-	for(auto x : qAsConst(keys)) {
+	for(auto x : std::as_const(keys)) {
 		if(m_exportConfig[x]) {
 			noChannelEnabled = false;
 			break;

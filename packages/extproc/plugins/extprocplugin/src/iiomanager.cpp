@@ -199,7 +199,7 @@ void IIOManager::readAllChannels(QString deviceName)
 {
 	QMap<QString, iio_channel *> channels = m_devMap[deviceName];
 	m_bufferData.clear();
-	for(iio_channel *ch : qAsConst(channels)) {
+	for(iio_channel *ch : std::as_const(channels)) {
 		if(!iio_channel_is_enabled(ch)) {
 			continue;
 		}

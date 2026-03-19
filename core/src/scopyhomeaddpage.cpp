@@ -124,7 +124,7 @@ void ScopyHomeAddPage::initializeDevice()
 void ScopyHomeAddPage::deviceLoaderInitialized()
 {
 	QList<Plugin *> plugins = m_deviceImpl->plugins();
-	for(Plugin *p : qAsConst(plugins)) {
+	for(Plugin *p : std::as_const(plugins)) {
 		PluginEnableWidget *pluginDescription = new PluginEnableWidget(m_pluginBrowserSection);
 		pluginDescription->setDescription(p->description());
 		pluginDescription->checkBox()->setText(p->name());

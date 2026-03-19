@@ -123,7 +123,7 @@ TxTone *TxChannel::setupTxTone(TxNode *nodeTone, unsigned int index)
 
 void TxChannel::read()
 {
-	for(auto tone : qAsConst(m_tones)) {
+	for(auto tone : std::as_const(m_tones)) {
 		tone->read();
 	}
 }

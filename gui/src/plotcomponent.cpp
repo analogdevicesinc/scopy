@@ -53,7 +53,7 @@ QPair<double, double> PlotComponent::xInterval()
 
 void PlotComponent::replot()
 {
-	for(auto plot : qAsConst(m_plots)) {
+	for(auto plot : std::as_const(m_plots)) {
 		plot->replot();
 	}
 	m_cursor->updateTracking();
@@ -61,14 +61,14 @@ void PlotComponent::replot()
 
 void PlotComponent::refreshAxisLabels()
 {
-	for(auto plot : qAsConst(m_plots)) {
+	for(auto plot : std::as_const(m_plots)) {
 		plot->showAxisLabels();
 	}
 }
 
 void PlotComponent::showPlotLabels(bool b)
 {
-	for(auto plot : qAsConst(m_plots)) {
+	for(auto plot : std::as_const(m_plots)) {
 		plot->setShowXAxisLabels(b);
 		plot->setShowYAxisLabels(b);
 		plot->showAxisLabels();
@@ -93,7 +93,7 @@ void PlotComponent::addChannel(ChannelComponent *c) { m_channels.append(c->plotC
 
 void PlotComponent::selectChannel(ChannelComponent *c)
 {
-	for(auto plot : qAsConst(m_plots)) {
+	for(auto plot : std::as_const(m_plots)) {
 		plot->selectChannel(c->plotChannelCmpt()->plotChannel());
 	}
 }
@@ -104,7 +104,7 @@ void PlotComponent::setXUnit(QString s) { m_plots[0]->xAxis()->setUnits(s); }
 
 void PlotComponent::setXInterval(double min, double max)
 {
-	for(auto plot : qAsConst(m_plots)) {
+	for(auto plot : std::as_const(m_plots)) {
 		plot->xAxis()->setInterval(min, max);
 	}
 }
@@ -112,7 +112,7 @@ void PlotComponent::setXInterval(double min, double max)
 void PlotComponent::removeChannel(ChannelComponent *c)
 {
 	PlotComponentChannel *toRemove;
-	for(PlotComponentChannel *ch : qAsConst(m_channels)) {
+	for(PlotComponentChannel *ch : std::as_const(m_channels)) {
 		if(ch->channelComponent() == c) {
 			toRemove = ch;
 			break;

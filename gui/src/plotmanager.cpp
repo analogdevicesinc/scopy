@@ -81,14 +81,14 @@ void PlotManager::setXInterval(double xMin, double xMax)
 {
 	m_xInterval.first = xMin;
 	m_xInterval.second = xMax;
-	for(auto plt : qAsConst(m_plots)) {
+	for(auto plt : std::as_const(m_plots)) {
 		plt->setXInterval(xMin, xMax);
 	}
 }
 
 void PlotManager::setXUnit(QString s)
 {
-	for(PlotComponent *p : qAsConst(m_plots)) {
+	for(PlotComponent *p : std::as_const(m_plots)) {
 		p->setXUnit(s);
 	}
 }
@@ -96,7 +96,7 @@ void PlotManager::setXUnit(QString s)
 void PlotManager::selectChannel(ChannelComponent *c)
 {
 	c->ctrl()->setChecked(true);
-	for(PlotComponentChannel *pcc : qAsConst(m_channels)) {
+	for(PlotComponentChannel *pcc : std::as_const(m_channels)) {
 		if(pcc->channelComponent() == c) {
 			pcc->plotComponent()->selectChannel(c);
 		}
@@ -159,7 +159,7 @@ void PlotManager::moveChannel(ChannelComponent *c, uint32_t uuid)
 PlotComponent *PlotManager::plot(uint32_t uuid)
 {
 	PlotComponent *plt = nullptr;
-	for(PlotComponent *p : qAsConst(m_plots)) {
+	for(PlotComponent *p : std::as_const(m_plots)) {
 		if(p->uuid() == uuid) {
 			plt = p;
 		}
@@ -171,7 +171,7 @@ QList<PlotComponent *> PlotManager::plots() const { return m_plots; }
 
 void PlotManager::replot()
 {
-	for(PlotComponent *p : qAsConst(m_plots)) {
+	for(PlotComponent *p : std::as_const(m_plots)) {
 		p->replot();
 	}
 	Q_EMIT newData();
