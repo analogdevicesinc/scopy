@@ -78,7 +78,7 @@ OscCustomScrollArea::OscCustomScrollArea(QWidget *parent)
 
 OscCustomScrollArea::~OscCustomScrollArea() { QScroller::ungrabGesture(this->viewport()); }
 
-void OscCustomScrollArea::enterEvent(QEvent *event)
+void OscCustomScrollArea::enterEvent(QEnterEvent *event)
 {
 	if(!disableCursor)
 		setCursor(Qt::OpenHandCursor);

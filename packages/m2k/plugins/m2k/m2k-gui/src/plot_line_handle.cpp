@@ -54,7 +54,7 @@ void PlotLineHandle::setPen(const QPen &pen) { m_pen = pen; }
 
 const QPen &PlotLineHandle::pen() { return m_pen; }
 
-void PlotLineHandle::enterEvent(QEvent *event)
+void PlotLineHandle::enterEvent(QEnterEvent *event)
 {
 	setCursor(Qt::OpenHandCursor);
 	QWidget::enterEvent(event);

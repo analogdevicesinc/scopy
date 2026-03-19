@@ -24,6 +24,7 @@
 #include "scopy-m2k-gui_export.h"
 #include "ComboBoxLineEdit.h"
 
+#include <QEnterEvent>
 #include <QComboBox>
 
 class QStandardItemModel;
@@ -55,7 +56,7 @@ public:
 protected Q_SLOTS:
 	void mousePressEvent(QMouseEvent *event) override;
 	void mouseReleaseEvent(QMouseEvent *event) override;
-	void enterEvent(QEvent *event) override;
+	void enterEvent(QEnterEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 
 private Q_SLOTS:

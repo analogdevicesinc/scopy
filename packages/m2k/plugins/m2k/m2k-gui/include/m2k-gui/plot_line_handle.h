@@ -22,6 +22,7 @@
 #define PLOT_LINE_HANDLE_H
 
 #include "scopy-m2k-gui_export.h"
+#include <QEnterEvent>
 #include <QPen>
 #include <QWidget>
 
@@ -53,7 +54,7 @@ Q_SIGNALS:
 	void reset();
 
 protected:
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 

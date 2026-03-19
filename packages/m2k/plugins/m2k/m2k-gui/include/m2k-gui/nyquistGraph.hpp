@@ -25,6 +25,7 @@
 #include "dbgraph.hpp"
 #include "nyquistplotzoomer.h"
 
+#include <QEnterEvent>
 #include <QMouseEvent>
 #include <QPushButton>
 #include <qwt_polar_curve.h>
@@ -79,7 +80,7 @@ public Q_SLOTS:
 
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void leaveEvent(QEvent *event);
 
 private:

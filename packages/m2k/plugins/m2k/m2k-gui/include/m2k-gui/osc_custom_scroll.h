@@ -21,6 +21,7 @@
 #define OSCCUSTOMSCROLL_H
 
 #include "scopy-m2k-gui_export.h"
+#include <QEnterEvent>
 #include <QEvent>
 #include <QScrollArea>
 #include <QScroller>
@@ -35,7 +36,7 @@ public:
 	~OscCustomScrollArea();
 
 public Q_SLOTS:
-	void enterEvent(QEvent *);
+	void enterEvent(QEnterEvent *);
 	void leaveEvent(QEvent *);
 
 private:
