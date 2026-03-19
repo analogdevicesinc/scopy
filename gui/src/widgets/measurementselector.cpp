@@ -36,7 +36,7 @@ MeasurementSelector::MeasurementSelector(QWidget *parent)
 {
 	lay = new QVBoxLayout(this);
 	setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(6);
 
 	setupToggleAllRow();

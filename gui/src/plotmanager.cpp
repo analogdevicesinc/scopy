@@ -32,12 +32,12 @@ PlotManager::PlotManager(QString name, QWidget *parent)
 	, m_plotIdx(0)
 {
 	QHBoxLayout *mainLayout = new QHBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(6);
 
 	QWidget *leftWidget = new QWidget(this);
 	m_lay = new QVBoxLayout(leftWidget);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 
 	m_measurePanel = new MeasurementsPanel(leftWidget);

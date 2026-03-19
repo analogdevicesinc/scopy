@@ -43,7 +43,7 @@ DioSettingsTab::DioSettingsTab(QWidget *parent)
 									   MenuCollapseSection::MHW_BASEWIDGET, this);
 	plotTimespanSection->setLayout(new QVBoxLayout());
 	plotTimespanSection->contentLayout()->setSpacing(10);
-	plotTimespanSection->contentLayout()->setMargin(0);
+	plotTimespanSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	QLabel *label = new QLabel(this);
 	label->setText("Polling at 1 sample/second");

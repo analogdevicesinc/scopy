@@ -276,7 +276,7 @@ MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(const DeviceIn
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget(dInfo.name, MenuCollapseSection::MHCW_ARROW, type, m_toolMenu);
 	section->contentLayout()->setSpacing(0);
-	section->menuSection()->layout()->setMargin(0);
+	section->menuSection()->layout()->setContentsMargins(0, 0, 0, 0);
 	section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	MenuCollapseHeader *collapseHeader = getCollapseSectionHeader(section);

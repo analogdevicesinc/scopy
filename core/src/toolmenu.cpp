@@ -38,7 +38,7 @@ ToolMenu::ToolMenu(QWidget *parent)
 	QWidget *wScroll = new QWidget(m_scroll);
 
 	m_layScroll = new QVBoxLayout();
-	m_layScroll->setMargin(0);
+	m_layScroll->setContentsMargins(0, 0, 0, 0);
 	m_layScroll->setSpacing(20);
 
 	wScroll->setLayout(m_layScroll);
@@ -50,7 +50,7 @@ ToolMenu::ToolMenu(QWidget *parent)
 	m_scroll->setWidget(wScroll);
 	m_scroll->verticalScrollBar()->setVisible(false);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	setLayout(lay);
 

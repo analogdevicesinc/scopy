@@ -44,7 +44,7 @@ JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 	m_colorMap.insert(C_OPT, Style::getAttribute(json::theme::content_busy));
 
 	QVBoxLayout *lay = new QVBoxLayout();
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	this->setLayout(lay);
 
@@ -58,7 +58,7 @@ JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 	statusContainer->setLayout(statusScrollLayH);
 	statusScroll->setWidgetResizable(true);
 	statusScroll->setWidget(statusHeader);
-	statusScrollLayH->setMargin(0);
+	statusScrollLayH->setContentsMargins(0, 0, 0, 0);
 	statusScroll->setSizePolicy(statusScroll->sizePolicy().horizontalPolicy(), QSizePolicy::Maximum);
 
 	// Setup status label
@@ -86,7 +86,7 @@ JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 		laneContainer->setLayout(laneScrollLayH);
 		laneScroll->setWidgetResizable(true);
 		laneScroll->setWidget(laneHeader);
-		laneScrollLayH->setMargin(0);
+		laneScrollLayH->setContentsMargins(0, 0, 0, 0);
 		laneScroll->setSizePolicy(statusScroll->sizePolicy().horizontalPolicy(), QSizePolicy::Maximum);
 
 		// Setup lane status label
@@ -127,8 +127,8 @@ void JesdStatusView::initStatusValues(QWidget *statusContainer)
 	MenuSectionWidget *statusValues = new MenuSectionWidget(statusContainer);
 	statusScrollLay->addWidget(statusLabels);
 	statusScrollLay->addWidget(statusValues);
-	statusLabels->contentLayout()->setMargin(0);
-	statusValues->contentLayout()->setMargin(0);
+	statusLabels->contentLayout()->setContentsMargins(0, 0, 0, 0);
+	statusValues->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	appendToStatusLabels(
 		"Link is", [this]() { return m_parser->getLinkState(); }, statusLabels, statusValues);
@@ -181,11 +181,11 @@ void JesdStatusView::initLaneStatusValues(QWidget *laneContainer)
 
 	// INIT LANE status LABELS
 	MenuSectionWidget *laneLabels = new MenuSectionWidget(laneContainer);
-	laneLabels->contentLayout()->setMargin(0);
+	laneLabels->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *laneValues = new QWidget(laneContainer);
 	QHBoxLayout *laneValuesLay = new QHBoxLayout();
-	laneValuesLay->setMargin(0);
+	laneValuesLay->setContentsMargins(0, 0, 0, 0);
 	laneValues->setLayout(laneValuesLay);
 
 	laneScrollLay->addWidget(laneLabels);
@@ -204,7 +204,7 @@ void JesdStatusView::initLaneStatusValues(QWidget *laneContainer)
 
 	for(int i = 0; i < m_parser->getLaneCount(); i++) {
 		MenuSectionWidget *lane = new MenuSectionWidget(laneValues);
-		lane->contentLayout()->setMargin(0);
+		lane->contentLayout()->setContentsMargins(0, 0, 0, 0);
 		laneValuesLay->addWidget(lane);
 		m_laneLabels.insert(i, {});
 

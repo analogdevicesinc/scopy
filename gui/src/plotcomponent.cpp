@@ -34,7 +34,7 @@ PlotComponent::PlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	m_plotLayout = new QHBoxLayout(this);
-	m_plotLayout->setMargin(0);
+	m_plotLayout->setContentsMargins(0, 0, 0, 0);
 	m_plotLayout->setSpacing(0);
 	setLayout(m_plotLayout);
 	m_name = name;

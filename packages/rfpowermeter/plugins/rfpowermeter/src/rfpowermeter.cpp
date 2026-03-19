@@ -144,7 +144,7 @@ bool RFPowerMeterPlugin::onConnect()
 	if(tool != nullptr) {
 		QWidget *widget = new QWidget(tool);
 		QHBoxLayout *layout = new QHBoxLayout();
-		layout->setMargin(5);
+		layout->setContentsMargins(5, 5, 5, 5);
 		layout->setSpacing(0);
 		widget->setLayout(layout);
 

@@ -30,7 +30,7 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	qRegisterMetaType<data3P>("data3P");
 
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 
 	m_uri = uri;

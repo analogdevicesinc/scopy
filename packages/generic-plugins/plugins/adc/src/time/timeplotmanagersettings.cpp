@@ -42,7 +42,7 @@ TimePlotManagerSettings::TimePlotManagerSettings(TimePlotManager *mgr, QWidget *
 	QVBoxLayout *lay = new QVBoxLayout(parent);
 	lay->addWidget(w);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 }
 
@@ -106,7 +106,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *bufferPlotSize = new QWidget(section);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
-	bufferPlotSizeLayout->setMargin(0);
+	bufferPlotSizeLayout->setContentsMargins(0, 0, 0, 0);
 	bufferPlotSizeLayout->setSpacing(10);
 	bufferPlotSize->setLayout(bufferPlotSizeLayout);
 
@@ -155,7 +155,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
-	xMinMaxLayout->setMargin(0);
+	xMinMaxLayout->setContentsMargins(0, 0, 0, 0);
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 

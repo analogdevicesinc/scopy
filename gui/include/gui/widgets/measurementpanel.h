@@ -47,7 +47,7 @@ public:
 		lay = new QVBoxLayout(this);
 		setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
 		setLayout(lay);
-		lay->setMargin(0);
+		lay->setContentsMargins(0, 0, 0, 0);
 		lay->setSpacing(6);
 		spacer = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
 		lay->addSpacerItem(spacer);

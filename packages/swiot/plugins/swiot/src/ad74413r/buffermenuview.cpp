@@ -40,7 +40,7 @@ BufferMenuView::BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *c
 	, m_connection(conn)
 {
 	setLayout(new QVBoxLayout());
-	layout()->setMargin(0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 BufferMenuView::~BufferMenuView() {}
@@ -53,7 +53,7 @@ void BufferMenuView::init(QString title, QString function, QPen color, QString u
 	QWidget *scrollWidget = new QWidget(scrollArea);
 	QVBoxLayout *layScroll = new QVBoxLayout(scrollWidget);
 	layScroll->setSpacing(10);
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	scrollWidget->setLayout(layScroll);
 
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -115,7 +115,7 @@ QWidget *BufferMenuView::createAttrSection(QWidget *parent)
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
 	auto layout = new QVBoxLayout(attrContainer);
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	MenuCollapseSection *attrSection = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
 								   MenuCollapseSection::MHW_BASEWIDGET, attrContainer);
@@ -136,7 +136,7 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 	MenuSectionWidget *verticalContainer = new MenuSectionWidget(this);
 	auto layout = new QHBoxLayout(verticalContainer);
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	MenuCollapseSection *verticalSettings = new MenuCollapseSection(
 		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, verticalContainer);

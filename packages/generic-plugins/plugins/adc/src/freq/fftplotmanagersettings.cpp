@@ -40,7 +40,7 @@ FFTPlotManagerSettings::FFTPlotManagerSettings(FFTPlotManager *mgr, QWidget *par
 	QVBoxLayout *lay = new QVBoxLayout(parent);
 	lay->addWidget(w);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 	m_samplingInfo.bufferSize = 32;
 	m_samplingInfo.plotSize = 32;
@@ -115,7 +115,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
-	xMinMaxLayout->setMargin(0);
+	xMinMaxLayout->setContentsMargins(0, 0, 0, 0);
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 

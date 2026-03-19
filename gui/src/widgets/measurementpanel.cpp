@@ -38,7 +38,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	m_lay = new QVBoxLayout(this);
 	setLayout(m_lay);
 
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	m_lay->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
@@ -59,7 +59,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 
 	QWidget *panel = new QWidget(this);
 	panelLayout = new QHBoxLayout(panel);
-	panelLayout->setMargin(0);
+	panelLayout->setContentsMargins(0, 0, 0, 0);
 	panelLayout->setSpacing(12);
 	panelLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	panel->setLayout(panelLayout);
@@ -92,7 +92,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 void MeasurementsPanel::setupControlButtons()
 {
 	QHBoxLayout *btnLayout = new QHBoxLayout();
-	btnLayout->setMargin(0);
+	btnLayout->setContentsMargins(0, 0, 0, 0);
 	btnLayout->setSpacing(4);
 
 	m_sortByChannelBtn = new QPushButton("Sort by channel", this);
@@ -266,7 +266,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 	m_lay = new QVBoxLayout(this);
 	setLayout(m_lay);
 
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	m_lay->setAlignment(Qt::AlignTop);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -277,7 +277,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	QWidget *panel = new QWidget(this);
 	panelLayout = new QHBoxLayout(panel);
-	panelLayout->setMargin(0);
+	panelLayout->setContentsMargins(0, 0, 0, 0);
 	panelLayout->setSpacing(6);
 	panel->setLayout(panelLayout);
 	scrollArea->setWidget(panel);
@@ -291,7 +291,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 void StatsPanel::setupControlButtons()
 {
 	QHBoxLayout *btnLayout = new QHBoxLayout();
-	btnLayout->setMargin(0);
+	btnLayout->setContentsMargins(0, 0, 0, 0);
 	btnLayout->setSpacing(4);
 
 	m_sortByChannelBtn = new QPushButton("Sort by channel", this);

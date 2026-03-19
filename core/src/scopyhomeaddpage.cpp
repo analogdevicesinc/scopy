@@ -40,7 +40,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent)
 	setProperty("device_page", true);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_stackedWidget = new QStackedWidget(this);
 	m_tabWidget = createTabWidget(m_stackedWidget);
@@ -200,7 +200,7 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	infoSection->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *layInfoSection = new QVBoxLayout(infoSection);
 	layInfoSection->setSpacing(10);
-	layInfoSection->setMargin(0);
+	layInfoSection->setContentsMargins(0, 0, 0, 0);
 	infoSection->setLayout(layInfoSection);
 
 	infoScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -210,7 +210,7 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	MenuCollapseSection *deviceInfoSection = new MenuCollapseSection(
 		"Device info", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, infoSection);
 	deviceInfoSection->contentLayout()->setSpacing(10);
-	deviceInfoSection->contentLayout()->setMargin(0);
+	deviceInfoSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	m_deviceInfoPage = new InfoPage(deviceInfoSection);
 	m_deviceInfoPage->setAdvancedMode(false);
@@ -220,7 +220,7 @@ QWidget *ScopyHomeAddPage::createInfoSection(QWidget *parent)
 	m_pluginBrowserSection = new MenuCollapseSection("Compatible plugins", MenuCollapseSection::MHCW_ONOFF,
 							 MenuCollapseSection::MHW_BASEWIDGET, infoSection);
 	m_pluginBrowserSection->contentLayout()->setSpacing(10);
-	m_pluginBrowserSection->contentLayout()->setMargin(0);
+	m_pluginBrowserSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	layInfoSection->addWidget(deviceInfoSection);
 	layInfoSection->addWidget(m_pluginBrowserSection);
@@ -232,7 +232,7 @@ QWidget *ScopyHomeAddPage::createBtnsWidget(QWidget *parent)
 {
 	QWidget *btnsWidget = new QWidget(parent);
 	QHBoxLayout *btnsLay = new QHBoxLayout(btnsWidget);
-	btnsLay->setMargin(0);
+	btnsLay->setContentsMargins(0, 0, 0, 0);
 	btnsLay->setAlignment(Qt::AlignRight);
 
 	m_backBtn = new QPushButton(btnsWidget);

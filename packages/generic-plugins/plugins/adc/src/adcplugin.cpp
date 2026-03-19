@@ -105,7 +105,7 @@ bool ADCPlugin::loadPreferencesPage()
 	generalSection->contentLayout()->setSpacing(10);
 	lay->addWidget(generalSection);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	QList<QPair<QString, QVariant>> xaxis_lbl_pos_options = {{"Top", QwtAxis::XTop}, {"Bottom", QwtAxis::XBottom}};

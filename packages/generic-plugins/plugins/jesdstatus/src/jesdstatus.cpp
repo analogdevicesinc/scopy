@@ -32,7 +32,7 @@ JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
 {
 	QVBoxLayout *lay = new QVBoxLayout();
 	this->setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
 	m_tool->topContainer()->setVisible(false);

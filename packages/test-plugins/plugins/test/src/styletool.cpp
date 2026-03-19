@@ -231,7 +231,7 @@ QWidget *StyleTool::buildPageColors()
 		colorSquare->setStyleSheet("background-color: " + Style::getColor(colorProperty).name() + ";");
 
 		QLabel *label = new QLabel(colorName);
-		label->setMargin(0); // Remove default margins for the label
+		label->setContentsMargins(0, 0, 0, 0); // Remove default margins for the label
 		hLayout->addWidget(colorSquare);
 		hLayout->addWidget(label);
 		hLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));

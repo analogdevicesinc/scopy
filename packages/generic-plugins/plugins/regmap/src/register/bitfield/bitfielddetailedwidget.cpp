@@ -54,7 +54,7 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 	mainFrame = new QFrame();
 	layout = new QVBoxLayout(this);
 	layout->setSpacing(0);
-	layout->setMargin(4);
+	layout->setContentsMargins(4, 4, 4, 4);
 
 	QHBoxLayout *firstLayout = new QHBoxLayout();
 	nameLabel = new QLabel(name);
@@ -91,7 +91,7 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(mainFrame);
 	mainLayout->setSpacing(0);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(mainLayout);
 
 	if(description == "Reserved") {

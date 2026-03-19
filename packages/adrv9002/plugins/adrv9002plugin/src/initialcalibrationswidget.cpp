@@ -71,7 +71,7 @@ void InitialCalibrationsWidget::setupUI()
 
 	// Controls layout (horizontal)
 	QHBoxLayout *controlsLayout = new QHBoxLayout();
-	controlsLayout->setMargin(0);
+	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	controlsLayout->setSpacing(10);
 
 	// Calibrations Mode label

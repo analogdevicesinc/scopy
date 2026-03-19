@@ -36,7 +36,7 @@ EnsmModeClocksWidget::EnsmModeClocksWidget(iio_device *device, IIOWidgetGroup *g
 	, QWidget{parent}
 {
 	m_layout = new QVBoxLayout(this);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
@@ -45,7 +45,7 @@ EnsmModeClocksWidget::EnsmModeClocksWidget(iio_device *device, IIOWidgetGroup *g
 	QVBoxLayout *layout = new QVBoxLayout(mainWidget);
 	mainWidget->setLayout(layout);
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea *scrollArea = new QScrollArea(parent);
 	scrollArea->setWidgetResizable(true);

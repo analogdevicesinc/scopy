@@ -54,7 +54,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	setLayout(layout);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_dockableArea = createDockableArea(this);
 
@@ -172,7 +172,7 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(
@@ -207,7 +207,7 @@ QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
 	// plotting mode: software trigger or rolling mode
 	QWidget *plottingModeWidget = new QWidget(plotSection);
 	plottingModeWidget->setLayout(new QVBoxLayout(plottingModeWidget));
-	plottingModeWidget->layout()->setMargin(0);
+	plottingModeWidget->layout()->setContentsMargins(0, 0, 0, 0);
 
 	connect(m_runBtn, &QPushButton::toggled, plottingModeWidget, &QWidget::setDisabled);
 	connect(m_singleBtn, &QPushButton::toggled, plottingModeWidget, &QWidget::setDisabled);

@@ -56,7 +56,7 @@ RegisterController::RegisterController(QWidget *parent)
 	QHBoxLayout *readWidgetLayout = new QHBoxLayout(readWidget);
 	Utils::removeLayoutMargins(readWidgetLayout);
 	readWidget->setLayout(readWidgetLayout);
-	readWidgetLayout->setMargin(16);
+	readWidgetLayout->setContentsMargins(16, 16, 16, 16);
 
 	QVBoxLayout *readWidgetLeftLayout = new QVBoxLayout();
 	Utils::removeLayoutMargins(readWidgetLeftLayout);
@@ -90,7 +90,7 @@ RegisterController::RegisterController(QWidget *parent)
 	writeWidgetLayout = new QHBoxLayout(writeWidget);
 	Utils::removeLayoutMargins(writeWidgetLayout);
 	writeWidget->setLayout(writeWidgetLayout);
-	writeWidgetLayout->setMargin(16);
+	writeWidgetLayout->setContentsMargins(16, 16, 16, 16);
 
 	QVBoxLayout *writeWidgetLeftLayout = new QVBoxLayout();
 	Utils::removeLayoutMargins(writeWidgetLeftLayout);

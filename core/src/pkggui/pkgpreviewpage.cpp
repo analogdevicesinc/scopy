@@ -27,7 +27,7 @@ PkgPreviewPage::PkgPreviewPage(QWidget *parent)
 	: QFrame(parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	MenuSectionCollapseWidget *section =
 		createSection("Preview", "Details about the selected package are displayed here.", this);
@@ -37,7 +37,7 @@ PkgPreviewPage::PkgPreviewPage(QWidget *parent)
 
 	m_infoPage = new InfoPage(this);
 	m_infoPage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_infoPage->layout()->setMargin(0);
+	m_infoPage->layout()->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea *scrollArea = new QScrollArea(section);
 	scrollArea->setWidget(m_infoPage);

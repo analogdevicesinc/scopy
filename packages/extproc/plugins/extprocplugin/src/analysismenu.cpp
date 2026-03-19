@@ -42,12 +42,12 @@ void AnalysisMenu::setupUI()
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_w = new QWidget(this);
 	m_w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_w->setLayout(new QVBoxLayout);
-	m_w->layout()->setMargin(0);
+	m_w->layout()->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(m_w);
 
 	// Apply button

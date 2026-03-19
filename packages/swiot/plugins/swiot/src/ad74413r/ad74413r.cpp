@@ -693,7 +693,7 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(
@@ -703,7 +703,7 @@ QWidget *Ad74413r::createSettingsMenu(QWidget *parent)
 									   MenuCollapseSection::MHW_BASEWIDGET, widget);
 	plotTimespanSection->setLayout(new QVBoxLayout());
 	plotTimespanSection->contentLayout()->setSpacing(10);
-	plotTimespanSection->contentLayout()->setMargin(0);
+	plotTimespanSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	// timespan
 	m_timespanSpin = new MenuSpinbox(tr("Timespan"), 1, "s", 0.1, 10, true, false, plotTimespanSection);

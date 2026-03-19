@@ -33,7 +33,7 @@ PolarPlotWidget::PolarPlotWidget(QWidget *parent)
 {
 	m_layout = new QGridLayout(this);
 	m_layout->setSpacing(0);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
 	setAzimuthInterval(0.0, 360.0, 45.0);

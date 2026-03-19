@@ -35,7 +35,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	: QWidget{parent}
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
@@ -52,7 +52,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 
 	QWidget *settingsBody = new QWidget(this);
 	QVBoxLayout *layout = new QVBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
 
@@ -69,7 +69,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 
 	QVBoxLayout *attrLayout = new QVBoxLayout();
 	attrLayout->setSpacing(10);
-	attrLayout->setMargin(0);
+	attrLayout->setContentsMargins(0, 0, 0, 0);
 	attrLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	if(qobject_cast<DmmDataMonitorModel *>(model)) {
@@ -94,7 +94,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 
 	QVBoxLayout *scalingLayout = new QVBoxLayout();
 	scalingLayout->setSpacing(10);
-	scalingLayout->setMargin(0);
+	scalingLayout->setContentsMargins(0, 0, 0, 0);
 	scalingLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	MenuCombo *scaleModeCBb = new MenuCombo("Scale Mode", scaling);
@@ -240,7 +240,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 
 	QVBoxLayout *plotSelectorLayout = new QVBoxLayout();
 	plotSelectorLayout->setSpacing(10);
-	plotSelectorLayout->setMargin(0);
+	plotSelectorLayout->setContentsMargins(0, 0, 0, 0);
 	plotSelectorLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	// Use the new method from MonitorPlotManager to create the combobox
@@ -260,7 +260,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 
 	QVBoxLayout *umLayout = new QVBoxLayout();
 	umLayout->setSpacing(10);
-	umLayout->setMargin(0);
+	umLayout->setContentsMargins(0, 0, 0, 0);
 	umLayout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	QLineEdit *umName = new QLineEdit(model->getUnitOfMeasure()->getName(), um);

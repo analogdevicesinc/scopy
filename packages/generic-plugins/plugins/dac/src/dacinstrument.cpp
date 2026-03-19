@@ -40,7 +40,7 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 	tool = new ToolTemplate(this);
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -96,7 +96,7 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 
 	dacManagerStack = new MapStackedWidget(this);
 	tool->addWidgetToCentralContainerHelper(dacManagerStack);
-	tool->centralContainer()->layout()->setMargin(0);
+	tool->centralContainer()->layout()->setContentsMargins(0, 0, 0, 0);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);

@@ -827,7 +827,7 @@ void ScopyMainWindow::detachScriptingTool()
 
 	// Set up layout for detached window
 	QVBoxLayout *layout = new QVBoxLayout(m_detachedScriptingWindow);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(m_scriptingTool);
 
 	// Show detached window

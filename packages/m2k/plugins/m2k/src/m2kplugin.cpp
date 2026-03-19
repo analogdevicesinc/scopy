@@ -278,7 +278,7 @@ bool M2kPlugin::loadPreferencesPage()
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 	lay->setSpacing(10);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	// General preferences
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);

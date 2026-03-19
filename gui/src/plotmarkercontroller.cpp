@@ -257,7 +257,7 @@ MarkerPanel::MarkerPanel(QWidget *parent)
 	m_panelLayout = new QHBoxLayout(this);
 	m_panelLayout->setAlignment(Qt::AlignLeft);
 	m_panelLayout->setSpacing(0);
-	m_panelLayout->setMargin(0);
+	m_panelLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_panelLayout);
 }
 
@@ -295,7 +295,7 @@ MarkerLabel::MarkerLabel(QString name, QPen c, QWidget *parent)
 {
 	m_lay = new QVBoxLayout(this);
 	setLayout(m_lay);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_name = name;
 	m_txt = new QTextEdit();
 	m_txt->setTextColor(c.color());

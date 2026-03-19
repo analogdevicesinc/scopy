@@ -28,7 +28,7 @@ PlotButtonManager::PlotButtonManager(QWidget *parent)
 	m_collapsableContainer = new QWidget(this);
 	m_collapsablelay = new QHBoxLayout(m_collapsableContainer);
 	m_collapsablelay->setSpacing(0);
-	m_collapsablelay->setMargin(0);
+	m_collapsablelay->setContentsMargins(0, 0, 0, 0);
 	m_collapsableContainer->setLayout(m_collapsablelay);
 
 	m_lay = new QHBoxLayout(this);
@@ -41,7 +41,7 @@ PlotButtonManager::PlotButtonManager(QWidget *parent)
 	m_lay->addWidget(m_collapseBtn);
 	m_lay->addWidget(m_collapsableContainer);
 	m_lay->setSpacing(0);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 
 	connect(m_collapseBtn, &QAbstractButton::toggled, this, &PlotButtonManager::collapsePriv);
 

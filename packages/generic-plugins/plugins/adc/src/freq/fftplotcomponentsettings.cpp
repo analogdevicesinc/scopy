@@ -47,7 +47,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	// This could be refactored in it's own class
 	QVBoxLayout *v = new QVBoxLayout(this);
 	v->setSpacing(0);
-	v->setMargin(0);
+	v->setContentsMargins(0, 0, 0, 0);
 	setLayout(v);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 

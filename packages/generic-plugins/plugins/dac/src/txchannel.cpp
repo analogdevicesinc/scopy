@@ -35,7 +35,7 @@ TxChannel::TxChannel(TxNode *node, unsigned int nbTonesMode, QWidget *parent)
 	, m_nbTonesMode(nbTonesMode)
 {
 	QVBoxLayout *chnIqLay = new QVBoxLayout();
-	chnIqLay->setMargin(0);
+	chnIqLay->setContentsMargins(0, 0, 0, 0);
 	chnIqLay->setSpacing(10);
 	this->setLayout(chnIqLay);
 
@@ -49,7 +49,7 @@ TxChannel::TxChannel(TxNode *node, unsigned int nbTonesMode, QWidget *parent)
 		toneList->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 		QHBoxLayout *toneListLay = new QHBoxLayout();
 		toneList->setLayout(toneListLay);
-		toneListLay->setMargin(0);
+		toneListLay->setContentsMargins(0, 0, 0, 0);
 		toneListLay->setSpacing(5);
 
 		chnIqLay->addWidget(toneList);
