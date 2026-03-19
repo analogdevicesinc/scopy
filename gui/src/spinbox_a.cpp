@@ -33,7 +33,8 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QPushButton>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QVBoxLayout>
 #include <qmath.h>
 #include <iostream>
@@ -55,7 +56,7 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 	, m_min_value(0.0)
 	, m_max_value(0.0)
 	, m_decimal_count(3)
-	, m_validator(new QRegExpValidator(this))
+	, m_validator(new QRegularExpressionValidator(this))
 #ifdef SPINBOX_API
 	, m_sba_api(new SpinBoxA_API(this))
 #endif
@@ -186,19 +187,19 @@ void SpinBoxA::onLineEditTextEdited()
 {
 	QLineEdit *lineEdit = static_cast<QLineEdit *>(QObject::sender());
 	QString text = lineEdit->text();
-	QRegExp rx(m_validator->regExp());
+	QRegularExpression rx(m_validator->regularExpression());
 	double value;
 	QString unit;
 	bool ok;
 
-	rx.indexIn(text);
-	value = rx.cap(1).toDouble(&ok);
+	QRegularExpressionMatch match = rx.match(text);
+	value = match.captured(1).toDouble(&ok);
 
 	if(!ok) {
 		return;
 	}
 
-	unit = rx.cap(6);
+	unit = match.captured(6);
 
 	if(unit.isEmpty()) {
 		unit = m_units[ui->SBA_Combobox->currentIndex()].first;
@@ -523,7 +524,7 @@ void SpinBoxA::setUnits(const QStringList &list)
 		regex += "([" + sufixes + "]?)";
 	}
 
-	m_validator->setRegExp(QRegExp(regex));
+	m_validator->setRegularExpression(QRegularExpression(regex));
 
 	m_units_list = list;
 }

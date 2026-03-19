@@ -29,6 +29,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QHeaderView>
+#include <QRegularExpression>
 
 namespace scopy::m2k {
 
@@ -124,9 +125,9 @@ void DecoderTable::exportData()
 
 	QFuture<void> future;
 	if(fileType == "csv") {
-		future = QtConcurrent::run(this, &DecoderTable::exportCsv, fileName);
+		future = QtConcurrent::run([this, fileName]() { exportCsv(fileName); });
 	} else if(fileType == "txt") {
-		future = QtConcurrent::run(this, &DecoderTable::exportTxt, fileName);
+		future = QtConcurrent::run([this, fileName]() { exportTxt(fileName); });
 	}
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
@@ -214,7 +215,7 @@ bool DecoderTable::exportCsv(QString fileName)
 	QVector<QVector<QString>> decoder_data;
 	AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(getDecoderCruves().at(col));
 	std::map<Row, RowData> decoder(curve->getAnnotationRows());
-	QRegExp rx = QRegExp(tableModel->getsearchString(), Qt::CaseInsensitive);
+	QRegularExpression rx(tableModel->getsearchString(), QRegularExpression::CaseInsensitiveOption);
 	int row_count = 0;
 	int primaryCol = 0;
 
