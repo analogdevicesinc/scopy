@@ -194,8 +194,9 @@ void IioTabWidget::setupFilterWidget(QStringList backednsList)
 
 void IioTabWidget::verifyBtnClicked()
 {
-	QRegularExpression ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
-				   "4][0-9]|25[0-5])$");
+	QRegularExpression ipRegex(
+		"^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
+		"4][0-9]|25[0-5])$");
 	QString uri(m_uriEdit->text());
 	bool isIp = uri.contains(ipRegex);
 	if(isIp && !m_uriEdit->text().contains("ip:")) {

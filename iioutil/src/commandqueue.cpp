@@ -89,11 +89,11 @@ void CommandQueue::runCmd()
 	if(m_running) {
 		connect(m_commandQueue.at(0), &Command::finished, this, &CommandQueue::resolveNext);
 		(void)QtConcurrent::run(QThreadPool::globalInstance(), std::bind([=]() {
-					  std::unique_lock<std::mutex> lock(m_commandMutex);
-					  qDebug(CAT_COMMANDQUEUE) << "execute start " << m_commandQueue.at(0);
-					  m_commandQueue.at(0)->execute();
-					  qDebug(CAT_COMMANDQUEUE) << "execute stop " << m_commandQueue.at(0);
-				  }));
+						std::unique_lock<std::mutex> lock(m_commandMutex);
+						qDebug(CAT_COMMANDQUEUE) << "execute start " << m_commandQueue.at(0);
+						m_commandQueue.at(0)->execute();
+						qDebug(CAT_COMMANDQUEUE) << "execute stop " << m_commandQueue.at(0);
+					}));
 	}
 }
 

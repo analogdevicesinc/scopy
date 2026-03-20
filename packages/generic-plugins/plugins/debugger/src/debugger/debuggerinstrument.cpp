@@ -59,14 +59,17 @@ DebuggerInstrument::DebuggerInstrument(struct iio_context *ctx, QJSEngine *engin
 			 &DebuggerInstrument::updateChannelComboBox);
 	QObject::connect(ui->ChannelComboBox, &QComboBox::currentTextChanged, this,
 			 &DebuggerInstrument::updateAttributeComboBox);
-	QObject::connect(ui->AttributeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DebuggerInstrument::updateFilename);
+	QObject::connect(ui->AttributeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+			 &DebuggerInstrument::updateFilename);
 	QObject::connect(ui->AttributeComboBox, &QComboBox::currentTextChanged, this,
 			 &DebuggerInstrument::updateValueWidget);
 	QObject::connect(ui->DevicecomboBox, &QComboBox::currentTextChanged, this, &DebuggerInstrument::updateSources);
 
-	QObject::connect(ui->addressSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &DebuggerInstrument::updateRegMap);
+	QObject::connect(ui->addressSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+			 &DebuggerInstrument::updateRegMap);
 
-	QObject::connect(ui->valueRegisterSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this->reg, QOverload<int>::of(&RegisterWidget::setValue));
+	QObject::connect(ui->valueRegisterSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this->reg,
+			 QOverload<int>::of(&RegisterWidget::setValue));
 	QObject::connect(this->reg, &RegisterWidget::valueChanged, ui->valueRegisterSpinBox, &QSpinBox::setValue);
 
 	QObject::connect(ui->DevicecomboBox, &QComboBox::currentTextChanged, this, &DebuggerInstrument::updateRegMap);

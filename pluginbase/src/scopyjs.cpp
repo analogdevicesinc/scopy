@@ -70,8 +70,8 @@ void ScopyJS::init()
 		m_engine.globalObject().setProperty(name, js_obj.property(name));
 	}
 
-	m_engine.globalObject().setProperty("inspect()",
-					    m_engine.evaluate("(function(o) { for (var each in o) { print(each); } })"));
+	m_engine.globalObject().setProperty(
+		"inspect()", m_engine.evaluate("(function(o) { for (var each in o) { print(each); } })"));
 	m_engine.installExtensions(QJSEngine::ConsoleExtension);
 	m_engine.globalObject().setProperty("fileIO", m_engine.newQObject(new JsFileIo(this)));
 

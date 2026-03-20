@@ -253,8 +253,10 @@ VertDebugSymbol::VertDebugSymbol(QObject *parent, const QSize &size, bool oppose
 	setAnchor(QPoint(x, surface().height() / 2));
 
 	// Pass the base positionChanged(double, double) signal as positionChanged(double)
-	connect(this, qOverload<double, double>(&Symbol::positionChanged), this, &VertDebugSymbol::onBasePositionChanged);
-	connect(this, qOverload<int, int>(&Symbol::pixelPositionChanged), this, &VertDebugSymbol::onBasePixelPositionChanged);
+	connect(this, qOverload<double, double>(&Symbol::positionChanged), this,
+		&VertDebugSymbol::onBasePositionChanged);
+	connect(this, qOverload<int, int>(&Symbol::pixelPositionChanged), this,
+		&VertDebugSymbol::onBasePixelPositionChanged);
 }
 
 void VertDebugSymbol::draw(QPainter *painter) const
@@ -346,8 +348,10 @@ HorizDebugSymbol::HorizDebugSymbol(QObject *parent, const QSize &size, bool oppo
 	setAnchor(QPoint(surface().width() / 2, y));
 
 	// Pass the base positionChanged(double, double) signal as positionChanged(double)
-	connect(this, qOverload<double, double>(&Symbol::positionChanged), this, &HorizDebugSymbol::onBasePositionChanged);
-	connect(this, qOverload<int, int>(&Symbol::pixelPositionChanged), this, &HorizDebugSymbol::onBasePixelPositionChanged);
+	connect(this, qOverload<double, double>(&Symbol::positionChanged), this,
+		&HorizDebugSymbol::onBasePositionChanged);
+	connect(this, qOverload<int, int>(&Symbol::pixelPositionChanged), this,
+		&HorizDebugSymbol::onBasePixelPositionChanged);
 }
 
 void HorizDebugSymbol::draw(QPainter *painter) const

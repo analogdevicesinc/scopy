@@ -173,9 +173,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
-	connect(scc, &ScannedIIOContextCollector::foundDevice, dm, [this](QString cat, QString param) {
-		dm->createDevice(cat, param);
-	});
+	connect(scc, &ScannedIIOContextCollector::foundDevice, dm,
+		[this](QString cat, QString param) { dm->createDevice(cat, param); });
 	connect(scc, &ScannedIIOContextCollector::lostDevice, dm, &DeviceManager::removeDevice);
 
 	connect(hp, &ScopyHomePage::requestDevice, this, &ScopyMainWindow::requestTools);
@@ -594,7 +593,8 @@ void ScopyMainWindow::loadPluginsFromRepository()
 	connect(pm, &PluginManager::startLoadPlugin, ScopySplashscreen::GetInstance(), &ScopySplashscreen::setMessage);
 	pr->init();
 	ScopySplashscreen::setPrefix("");
-	disconnect(pm, &PluginManager::startLoadPlugin, ScopySplashscreen::GetInstance(), &ScopySplashscreen::setMessage);
+	disconnect(pm, &PluginManager::startLoadPlugin, ScopySplashscreen::GetInstance(),
+		   &ScopySplashscreen::setMessage);
 
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
