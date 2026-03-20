@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+  "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+  "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+
+<policyconfig>
+  <vendor>Analog Devices Inc.</vendor>
+  <vendor_url>https://analogdevicesinc.github.io/scopy/</vendor_url>
+
+  <action id="org.adi.scopy.run">
+    <description>Run Scopy as administrator</description>
+    <message>Authentication is required to run Scopy with elevated privileges. To interact with local IIO devices, certain operations (e.g. write, buffer access) require elevated privileges.</message>
+    <icon_name>scopy</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/Scopy.AppImage</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+  </action>
+</policyconfig>
