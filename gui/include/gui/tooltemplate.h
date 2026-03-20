@@ -50,6 +50,7 @@ enum ToolTemplateContainer
 
 class SCOPY_GUI_EXPORT ToolTemplate : public QWidget
 {
+	Q_OBJECT
 public:
 	ToolTemplate(QWidget *parent = nullptr);
 	~ToolTemplate();

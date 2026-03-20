@@ -132,7 +132,7 @@ void CompletionCircle::paintEvent(QPaintEvent *)
 void CompletionCircle::mousePressEvent(QMouseEvent *e)
 {
 	if(e->button() == Qt::LeftButton) {
-		if(pointInsideCircle(e->pos(), m_xc, m_yc, m_radius - 2)) {
+		if(pointInsideCircle(e->position().toPoint(), m_xc, m_yc, m_radius - 2)) {
 			if(m_toggleable) {
 				m_pressed = !m_pressed;
 				repaint();

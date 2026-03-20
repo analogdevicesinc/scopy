@@ -166,7 +166,7 @@ bool BasicTracker::eventFilter(QObject *object, QEvent *event)
 {
 	if(event->type() == QEvent::MouseMove) {
 		QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
-		m_mousePos = mouseEvent->pos();
+		m_mousePos = mouseEvent->position().toPoint();
 		updateOverlay();
 	}
 	if(event->type() == QEvent::Leave && isVisible()) {

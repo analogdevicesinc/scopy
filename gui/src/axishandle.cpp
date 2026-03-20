@@ -350,7 +350,7 @@ bool AxisHandle::eventFilter(QObject *object, QEvent *event)
 		onLeave();
 
 	} else if(event->type() == QEvent::MouseButtonDblClick) {
-		onDoubleClick(dynamic_cast<QMouseEvent *>(event)->pos());
+		onDoubleClick(dynamic_cast<QMouseEvent *>(event)->position().toPoint());
 
 	} else if(event->type() == QEvent::Resize) {
 		onResize();
@@ -360,12 +360,12 @@ bool AxisHandle::eventFilter(QObject *object, QEvent *event)
 			return true;
 		}
 	} else if(event->type() == QEvent::MouseButtonPress) {
-		if(onMouseButtonPress(dynamic_cast<QMouseEvent *>(event)->pos())) {
+		if(onMouseButtonPress(dynamic_cast<QMouseEvent *>(event)->position().toPoint())) {
 			return true;
 		}
 	}
 	if(event->type() == QEvent::MouseMove && m_pressed) {
-		onMouseMove(dynamic_cast<QMouseEvent *>(event)->pos());
+		onMouseMove(dynamic_cast<QMouseEvent *>(event)->position().toPoint());
 		return true;
 	}
 
