@@ -36,6 +36,12 @@ override_dh_auto_install:
 	# Install copyright
 	install -D -m 0644 debian/copyright debian/$(PACKAGE)/usr/share/doc/$(PACKAGE)/copyright
 
+	# Install wrapper script for pkexec
+	install -D -m 0755 debian/scopy-root debian/$(PACKAGE)/usr/bin/scopy-root
+
+	# Install polkit policy file
+	install -D -m 0644 debian/org.adi.scopy.policy debian/$(PACKAGE)/usr/share/polkit-1/actions/org.adi.scopy.policy
+
 override_dh_auto_test:
 	# No tests for AppImage repackaging
 	:

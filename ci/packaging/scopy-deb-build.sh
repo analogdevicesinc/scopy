@@ -38,6 +38,7 @@ source "${SCRIPT_DIR}/configs/${CONFIG}.conf"
 set +a
 
 export SCOPY=Scopy.AppImage
+export SCOPY_ROOT=scopy-root
 export APPIMAGE_PATH=$(readlink -f "$APPIMAGE_PATH")
 
 WORK_DIR="${PACKAGE}-${VERSION}"
@@ -76,12 +77,17 @@ export RELEASE_NOTES
 envsubst < debian/control.template > debian/control
 envsubst < debian/changelog.template > debian/changelog
 envsubst < debian/scopy.desktop.template > debian/scopy.desktop
+envsubst < debian/org.adi.scopy.policy.template > debian/org.adi.scopy.policy
+envsubst '${SCOPY}' < debian/scopy-root.template > debian/scopy-root
 
 # Remove template files
 rm debian/*.template
 
 # Make sure debian/rules is executable
 chmod +x debian/rules
+
+# Make sure debian/scopy-root is executable
+chmod +x debian/scopy-root
 
 # Build package using debhelper (builds both binary and source packages)
 echo "Building packages..."
