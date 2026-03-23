@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>FMCOMMS5 &#8212; Scopy  documentation</title>
+    <title>ADRV9009 &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=5c8d5ce8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=5b85fa78" />
@@ -13,8 +13,8 @@
     <link rel="icon" href="../../../_static/scopy.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="FMCOMMS5 Test Suite" href="fmcomms5_tests.html" />
-    <link rel="prev" title="AD9084 Test Suite" href="../ad9084/ad9084_tests.html" />
+    <link rel="next" title="ADRV9009 Plugin - Test Suite" href="adrv9009_tests.html" />
+    <link rel="prev" title="ADRV9002 Profile Generator - Test Suite" href="../adrv9002/profile_generator_tests.html" />
    
   
   
@@ -94,7 +94,7 @@
         </div>
         <nav>
           <ul>
-<li><a class="reference internal" href="#">FMCOMMS5</a><ul>
+<li><a class="reference internal" href="#">ADRV9009</a><ul>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
 </li>
@@ -253,8 +253,8 @@ Content on this topic
 <li class="toctree-l4"><a class="reference internal" href="../ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12" checked=""/><div class="collapse"><a class="current reference internal" href="#">FMCOMMS5</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
-<li class="toctree-l4"><a class="reference internal" href="fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12"/><div class="collapse"><a class="reference internal" href="../fmcomms5/index.html">FMCOMMS5</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fmcomms5/fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-13" id="toctree-collapse-4-1-13"/><div class="collapse"><a class="reference internal" href="../adrv9002/index.html">ADRV9002 (Jupiter)</a><label for="toctree-collapse-4-1-13"><div class="icon"></div></label></div><ul>
@@ -262,8 +262,8 @@ Content on this topic
 <li class="toctree-l4"><a class="reference internal" href="../adrv9002/profile_generator_tests.html">ADRV9002 Profile Generator - Test Suite</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-14" id="toctree-collapse-4-1-14"/><div class="collapse"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a><label for="toctree-collapse-4-1-14"><div class="icon"></div></label></div><ul>
-<li class="toctree-l4"><a class="reference internal" href="../adrv9009/adrv9009_tests.html">ADRV9009 Plugin - Test Suite</a></li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-14" id="toctree-collapse-4-1-14" checked=""/><div class="collapse"><a class="current reference internal" href="#">ADRV9009</a><label for="toctree-collapse-4-1-14"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="adrv9009_tests.html">ADRV9009 Plugin - Test Suite</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-15" id="toctree-collapse-4-1-15"/><div class="collapse"><a class="reference internal" href="../imuanalyzer/index.html">IMU Analyzer</a><label for="toctree-collapse-4-1-15"><div class="icon"></div></label></div><ul>
@@ -311,19 +311,41 @@ Content on this topic
 </div>
           <div class="body" role="main">
             
-  <section id="fmcomms5">
-<span id="tests-fmcomms5"></span><h1>FMCOMMS5<a class="headerlink" href="#fmcomms5" title="Link to this heading"></a></h1>
+  <section id="adrv9009">
+<span id="tests-adrv9009"></span><h1>ADRV9009<a class="headerlink" href="#adrv9009" title="Link to this heading"></a></h1>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="fmcomms5_tests.html">FMCOMMS5 Test Suite</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fmcomms5_tests.html#test-1-plugin-loads">Test 1: Plugin Loads</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fmcomms5_tests.html#test-2-device-detection-and-display">Test 2: Device Detection and Display</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fmcomms5_tests.html#test-3-change-and-validate-global-settings">Test 3: Change and Validate Global Settings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fmcomms5_tests.html#test-4-rx-and-tx-chain-configuration">Test 4: RX and TX Chain Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fmcomms5_tests.html#test-5-advanced-plugin-detection-and-display">Test 5: Advanced Plugin Detection and Display</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fmcomms5_tests.html#test-6-fmcomms5-calibration">Test 6: FMCOMMS5 Calibration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adrv9009_tests.html">ADRV9009 Plugin - Test Suite</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="adrv9009_tests.html#setup-environment">Setup Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="adrv9009_tests.html#adrv9009-controls-tests">ADRV9009 Controls Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-1-plugin-loads-and-displays-adrv9009-device">Test 1: Plugin Loads and Displays ADRV9009 Device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-2-device-detection-and-display">Test 2: Device Detection and Display</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-3-global-settings-ensm-mode">Test 3: Global Settings — ENSM Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-4-profile-configuration-load">Test 4: Profile Configuration Load</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-5-trx-lo-frequency-control">Test 5: TRX LO Frequency Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-6-calibration-controls">Test 6: Calibration Controls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-7-rx-channel-controls-rx1-rx2">Test 7: RX Channel Controls (RX1/RX2)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-8-tx-channel-controls-tx1-tx2">Test 8: TX Channel Controls (TX1/TX2)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-9-observation-rx-controls-obs1-obs2">Test 9: Observation RX Controls (OBS1/OBS2)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-10-fpga-phase-rotation">Test 10: FPGA Phase Rotation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-11-refresh-functionality">Test 11: Refresh Functionality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-12-multi-chip-sync-multi-device-only">Test 12: Multi-Chip Sync (multi-device only)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="adrv9009_tests.html#adrv9009-advanced-tests">ADRV9009 Advanced Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-1-advanced-tool-loads-and-displays-tabs">Test 1: Advanced Tool Loads and Displays Tabs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-2-clock-settings-tab">Test 2: Clock Settings Tab</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-3-rx-profile-and-channel-settings">Test 3: RX Profile and Channel Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-4-tx-profile-and-channel-settings">Test 4: TX Profile and Channel Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-5-observation-rx-profile-settings">Test 5: Observation RX Profile Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-6-jesd204-physical-layer-settings">Test 6: JESD204 Physical Layer Settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-7-jesd204-framer-a-b-configuration">Test 7: JESD204 Framer A/B Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-8-jesd204-deframer-a-b-configuration">Test 8: JESD204 Deframer A/B Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adrv9009_tests.html#test-9-advanced-tool-refresh-functionality">Test 9: Advanced Tool Refresh Functionality</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -335,8 +357,8 @@ Content on this topic
           </div>
               <div class="related">
                 &nbsp;
-    <a href="../ad9084/ad9084_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">AD9084 Test Suite</a>
-    <a href="fmcomms5_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">FMCOMMS5 Test Suite</a>
+    <a href="../adrv9002/profile_generator_tests.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">ADRV9002 Profile Generator - Test Suite</a>
+    <a href="adrv9009_tests.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADRV9009 Plugin - Test Suite</a>
               </div>
           
         </div>
