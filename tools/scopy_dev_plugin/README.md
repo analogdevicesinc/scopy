@@ -2,7 +2,7 @@
 
 Claude Code plugin for Scopy development. Provides slash commands, knowledge skills, and hooks for building IIO device plugins.
 
-The plugin lives inside the repository at `scopy_dev_plugin/`. It is distributed via the local marketplace manifest at `.claude-plugin/marketplace.json`.
+The plugin lives inside the repository at `tools/scopy_dev_plugin/`. It is distributed via the local marketplace manifest at `.claude-plugin/marketplace.json`.
 
 ## Setup (per developer)
 

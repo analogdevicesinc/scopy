@@ -42,9 +42,9 @@ if head -80 "$file_path" 2>/dev/null | grep -q "Copyright"; then
 fi
 
 # Derive scopy repo root from this script's location
-# Script is at scopy/scopy_dev_plugin/hooks/scopy-license.sh
-# So ../../ is scopy/
-SCOPY_REPO="$(cd "$(dirname "$0")/../.." && pwd)"
+# Script is at scopy/tools/scopy_dev_plugin/hooks/scopy-license.sh
+# So ../../../ is scopy/
+SCOPY_REPO="$(cd "$(dirname "$0")/../../.." && pwd)"
 LICENSE_UTILS="$SCOPY_REPO/tools/license-header"
 TEMPLATE="$LICENSE_UTILS/templates/Scopy/LICENSE"
 PARAMS="$LICENSE_UTILS/templates/Scopy/params.conf"
