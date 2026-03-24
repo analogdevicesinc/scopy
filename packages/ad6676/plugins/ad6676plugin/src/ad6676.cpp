@@ -170,8 +170,8 @@ void Ad6676::setupUi()
 	contentWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	contentWidgetLayout->setSpacing(10);
 
-	MenuCollapseSection *collapseSection = new MenuCollapseSection("AD6676", MenuCollapseSection::MHCW_NONE,
-							MenuCollapseSection::MHW_BASEWIDGET, m_centralWidget);
+	MenuCollapseSection *collapseSection = new MenuCollapseSection(
+		"AD6676", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, m_centralWidget);
 
 	collapseSection->contentLayout()->addWidget(createAdcSettingsSection(collapseSection));
 	collapseSection->contentLayout()->addWidget(createBandwidthSettingsSection(collapseSection));
