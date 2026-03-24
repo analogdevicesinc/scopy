@@ -191,9 +191,8 @@ void RegisterMapTool::startTutorial()
 	settingsTutorialFinish = connect(registerMapTutorial, &gui::TutorialBuilder::finished, settings,
 					 &RegisterMapSettingsMenu::startTutorial, Qt::UniqueConnection);
 
-	controllerTutorial = connect(
-		settings, &RegisterMapSettingsMenu::tutorialDone, this,
-		[this]() { deviceList->value(activeRegisterMap)->startTutorial(); }, Qt::UniqueConnection);
+	controllerTutorial = connect(settings, &RegisterMapSettingsMenu::tutorialDone, this,
+				    &RegisterMapTool::startActiveDeviceTutorial, Qt::UniqueConnection);
 
 	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::tutorialFinished, this,
 		&RegisterMapTool::tutorialAborted);
@@ -218,9 +217,8 @@ void RegisterMapTool::startSimpleTutorial()
 	settingsTutorialFinish = connect(registerMapTutorial, &gui::TutorialBuilder::finished, settings,
 					 &RegisterMapSettingsMenu::startTutorial, Qt::UniqueConnection);
 
-	controllerTutorial = connect(
-		settings, &RegisterMapSettingsMenu::tutorialDone, this,
-		[this]() { deviceList->value(activeRegisterMap)->startSimpleTutorial(); }, Qt::UniqueConnection);
+	controllerTutorial = connect(settings, &RegisterMapSettingsMenu::tutorialDone, this,
+				    &RegisterMapTool::startActiveDeviceSimpleTutorial, Qt::UniqueConnection);
 
 	connect(deviceList->value(activeRegisterMap), &DeviceRegisterMap::simpleTutorialFinished, this,
 		&RegisterMapTool::tutorialAborted);
@@ -231,6 +229,16 @@ void RegisterMapTool::startSimpleTutorial()
 
 	registerMapTutorial->setTitle("Tutorial");
 	registerMapTutorial->start();
+}
+
+void RegisterMapTool::startActiveDeviceTutorial()
+{
+	deviceList->value(activeRegisterMap)->startTutorial();
+}
+
+void RegisterMapTool::startActiveDeviceSimpleTutorial()
+{
+	deviceList->value(activeRegisterMap)->startSimpleTutorial();
 }
 
 void RegisterMapTool::tutorialAborted()

@@ -80,6 +80,8 @@ private:
 private Q_SLOTS:
 	void updateActiveRegisterMap(QString registerName);
 	void toggleSearchBarEnabled(bool enabled);
+	void startActiveDeviceTutorial();
+	void startActiveDeviceSimpleTutorial();
 };
 } // namespace regmap
 } // namespace scopy
