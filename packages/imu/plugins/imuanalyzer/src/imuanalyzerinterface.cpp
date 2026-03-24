@@ -20,12 +20,16 @@
 
 #include "imuanalyzerinterface.hpp"
 
+#include <pluginbase/preferences.h>
+
 using namespace scopy;
 
 Q_DECLARE_METATYPE(data3P)
 
 IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	: QWidget{parent}
+	, m_sceneRender(nullptr)
+	, m_rstView(nullptr)
 {
 	qRegisterMetaType<data3P>("data3P");
 
@@ -60,20 +64,27 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	m_runBtn = new RunBtn(this);
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 
+	bool useOpenGL = Preferences::get("general_use_opengl").toBool();
+
 	QTabWidget *tabWidget = new QTabWidget(this);
 	m_tool->addWidgetToCentralContainerHelper(tabWidget);
 
-	m_sceneRender = new SceneRenderer();
-	tabWidget->addTab(m_sceneRender, "3D View");
+	if(useOpenGL) {
+		m_sceneRender = new SceneRenderer();
+		tabWidget->addTab(m_sceneRender, "3D View");
 
-	m_rstView = new MenuControlButton(this);
-	m_rstView->setName("Reset View");
-	m_rstView->checkBox()->setVisible(false);
-	m_rstView->button()->setVisible(false);
-	m_rstView->setCheckable(false);
-	m_tool->addWidgetToBottomContainerHelper(m_rstView, TTA_LEFT);
+		m_rstView = new MenuControlButton(this);
+		m_rstView->setName("Reset View");
+		m_rstView->checkBox()->setVisible(false);
+		m_rstView->button()->setVisible(false);
+		m_rstView->setCheckable(false);
+		m_tool->addWidgetToBottomContainerHelper(m_rstView, TTA_LEFT);
 
-	connect(m_rstView, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetView);
+		connect(m_rstView, &QPushButton::clicked, m_sceneRender, &SceneRenderer::resetView);
+		connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
+		connect(tabWidget, &QTabWidget::currentChanged, this,
+			[=, this](int index) { m_rstView->setVisible(index == 0); });
+	}
 
 	m_measureBtn = new MenuControlButton(this);
 	m_measureBtn->setName("Measure");
@@ -89,8 +100,6 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 		else
 			m_dataV->hide();
 	});
-
-	connect(this, &IMUAnalyzerInterface::generateRot, m_sceneRender, &SceneRenderer::setRot);
 
 	connect(m_runBtn, &QPushButton::toggled, [=, this](bool toggled) {
 		m_runThread = !m_runThread;
@@ -126,13 +135,6 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 			m_tool->requestMenu(key);
 
 		m_tool->openRightContainerHelper(toggled);
-	});
-
-	connect(tabWidget, &QTabWidget::currentChanged, [=, this](int index) {
-		if(index == 0)
-			m_rstView->show();
-		else
-			m_rstView->hide();
 	});
 }
 
