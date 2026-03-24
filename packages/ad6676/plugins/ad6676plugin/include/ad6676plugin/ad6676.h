@@ -60,8 +60,7 @@ private:
 	void connectSignals();
 
 	// Widget helpers — inline, no separate factory class needed
-	IIOWidget *createRangeWidget(iio_channel *ch, const QString &attr, const QString &range,
-				     const QString &title);
+	IIOWidget *createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title);
 	IIOWidget *createComboWidget(iio_channel *ch, const QString &attr, const QString &availableAttr,
 				     const QString &title);
 	IIOWidget *createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
