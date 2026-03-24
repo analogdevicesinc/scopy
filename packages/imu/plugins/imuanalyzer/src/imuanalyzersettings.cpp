@@ -60,30 +60,35 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 
 	bubbleLevelSettingsWidget->contentLayout()->addWidget(displayPoints);
 
-	MenuSectionWidget *sceneRendererSettings = new MenuSectionWidget(this);
-	MenuCollapseSection *sceneRendererSettingsWidget =
-		new MenuCollapseSection("3D Settings", MenuCollapseSection::MHCW_ARROW,
-					MenuCollapseSection::MHW_BASEWIDGET, sceneRendererSettings);
+	MenuSectionWidget *sceneRendererSettings = nullptr;
+	if(scRend) {
+		sceneRendererSettings = new MenuSectionWidget(this);
+		MenuCollapseSection *sceneRendererSettingsWidget =
+			new MenuCollapseSection("3D Settings", MenuCollapseSection::MHCW_ARROW,
+						MenuCollapseSection::MHW_BASEWIDGET, sceneRendererSettings);
 
-	QPushButton *cubeColorButton = new QPushButton("Select New Cube Color");
-	sceneRendererSettingsWidget->contentLayout()->addWidget(cubeColorButton);
+		QPushButton *cubeColorButton = new QPushButton("Select New Cube Color");
+		sceneRendererSettingsWidget->contentLayout()->addWidget(cubeColorButton);
 
-	connect(this, &ImuAnalyzerSettings::updateCubeColor, scRend, &SceneRenderer::updateCubeColor);
-	connect(cubeColorButton, &QPushButton::clicked, [&]() {
-		QColor color = QColorDialog::getColor(Qt::white, this, "Choose a Color");
-		if(color.isValid())
-			emit updateCubeColor(color);
-	});
+		connect(this, &ImuAnalyzerSettings::updateCubeColor, scRend, &SceneRenderer::updateCubeColor);
+		connect(cubeColorButton, &QPushButton::clicked, [&]() {
+			QColor color = QColorDialog::getColor(Qt::white, this, "Choose a Color");
+			if(color.isValid())
+				emit updateCubeColor(color);
+		});
 
-	QPushButton *planeColorButton = new QPushButton("Select New Plane Color");
-	sceneRendererSettingsWidget->contentLayout()->addWidget(planeColorButton);
+		QPushButton *planeColorButton = new QPushButton("Select New Plane Color");
+		sceneRendererSettingsWidget->contentLayout()->addWidget(planeColorButton);
 
-	connect(this, &ImuAnalyzerSettings::updatePlaneColor, scRend, &SceneRenderer::updatePlaneColor);
-	connect(planeColorButton, &QPushButton::clicked, [&]() {
-		QColor color = QColorDialog::getColor(Qt::white, this, "Choose a Color");
-		if(color.isValid())
-			emit updatePlaneColor(color);
-	});
+		connect(this, &ImuAnalyzerSettings::updatePlaneColor, scRend, &SceneRenderer::updatePlaneColor);
+		connect(planeColorButton, &QPushButton::clicked, [&]() {
+			QColor color = QColorDialog::getColor(Qt::white, this, "Choose a Color");
+			if(color.isValid())
+				emit updatePlaneColor(color);
+		});
+
+		sceneRendererSettings->layout()->addWidget(sceneRendererSettingsWidget);
+	}
 
 	QList<IIOWidget *> attributeWidget = IIOWidgetBuilder(nullptr).device(m_device).buildAll();
 	for(auto widget : attributeWidget) {
@@ -92,12 +97,12 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 
 	generalSettings->layout()->addWidget(generalSettingsWidget);
 	bubbleLevelSettings->layout()->addWidget(bubbleLevelSettingsWidget);
-	sceneRendererSettings->layout()->addWidget(sceneRendererSettingsWidget);
 
 	lay->addWidget(header);
 	lay->addWidget(generalSettings);
 	lay->addWidget(bubbleLevelSettings);
-	lay->addWidget(sceneRendererSettings);
+	if(sceneRendererSettings)
+		lay->addWidget(sceneRendererSettings);
 
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 }
