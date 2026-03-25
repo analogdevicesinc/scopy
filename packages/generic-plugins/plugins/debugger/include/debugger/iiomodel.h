@@ -39,6 +39,9 @@ public:
 	QStandardItemModel *getModel();
 	QSet<QString> getEntries();
 
+	// Lazily builds IIOWidget children for a device, trigger, or channel item.
+	void populateChildren(IIOStandardItem *item);
+
 Q_SIGNALS:
 	void emitLog(QDateTime timestamp, bool isRead, QString path, QString oldValue, QString newValue,
 		     int returnCode);
@@ -48,9 +51,11 @@ private:
 	void setupCtx();
 	void generateCtxAttributes();
 	void setupCurrentDevice();
-	void generateDeviceAttributes();
 	void setupCurrentChannel();
-	void generateChannelAttributes();
+	void populateDeviceChildren(IIOStandardItem *item);
+	void populateChannelChildren(IIOStandardItem *item);
+	void buildEntries();
+	QStandardItem *createPlaceholderItem();
 
 	/**
 	 * @brief Creates a new IIOStandardItem and connects it to the emitLog signal.
@@ -86,8 +91,6 @@ private:
 	int m_currentChannelIndex;
 
 	QList<IIOWidget *> m_ctxList;
-	QList<IIOWidget *> m_devList;
-	QList<IIOWidget *> m_chnlList;
 };
 } // namespace scopy::debugger
 

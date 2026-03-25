@@ -240,6 +240,7 @@ int IIOExplorerInstrument_API::getChildCount(const QString &path)
 		return 0;
 	}
 
+	p->m_iioModel->populateChildren(item);
 	return item->rowCount();
 }
 
@@ -258,6 +259,7 @@ QStringList IIOExplorerInstrument_API::getChildNames(const QString &path)
 		return result;
 	}
 
+	p->m_iioModel->populateChildren(item);
 	for(int i = 0; i < item->rowCount(); ++i) {
 		IIOStandardItem *child = dynamic_cast<IIOStandardItem *>(item->child(i));
 		if(child) {
@@ -374,6 +376,14 @@ QString IIOExplorerInstrument_API::readAttributeValue(const QString &path)
 		return QString();
 	}
 
+	// Populate the parent so the attribute item exists in the tree before searching
+	if(pathList.size() > 1) {
+		IIOStandardItem *parent = p->findItemByPath(iioRoot, pathList.mid(0, pathList.size() - 1));
+		if(parent) {
+			p->m_iioModel->populateChildren(parent);
+		}
+	}
+
 	IIOStandardItem *item = p->findItemByPath(iioRoot, pathList);
 	if(!item) {
 		return QString();
@@ -397,6 +407,14 @@ bool IIOExplorerInstrument_API::writeAttributeValue(const QString &path, const Q
 	IIOStandardItem *iioRoot = dynamic_cast<IIOStandardItem *>(root);
 	if(!iioRoot) {
 		return false;
+	}
+
+	// Populate the parent so the attribute item exists in the tree before searching
+	if(pathList.size() > 1) {
+		IIOStandardItem *parent = p->findItemByPath(iioRoot, pathList.mid(0, pathList.size() - 1));
+		if(parent) {
+			p->m_iioModel->populateChildren(parent);
+		}
 	}
 
 	IIOStandardItem *item = p->findItemByPath(iioRoot, pathList);

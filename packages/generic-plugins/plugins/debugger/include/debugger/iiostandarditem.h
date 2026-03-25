@@ -102,6 +102,14 @@ public:
 	bool isWatched();
 	void setWatched(bool isWatched);
 
+	bool childrenLoaded() const;
+	void setChildrenLoaded(bool loaded);
+
+	struct iio_device *device() const;
+	struct iio_channel *channel() const;
+
+	void setIIOWidgets(QList<IIOWidget *> widgets);
+
 	QString typeString();
 
 Q_SIGNALS:
@@ -132,6 +140,7 @@ private:
 	QString m_triggerStatus;
 	IIOStandardItem::Type m_type;
 	bool m_isWatched;
+	bool m_childrenLoaded;
 	bool m_isScanElement;
 	bool m_isOutput;
 	bool m_isEnabled;
