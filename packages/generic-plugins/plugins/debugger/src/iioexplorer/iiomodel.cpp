@@ -46,21 +46,17 @@ void IIOModel::iioTreeSetup()
 	m_rootString = m_uri;
 	setupCtx();
 
-	// add all devices from context, dfs
+	// add all devices from context, dfs — structure only, no IIOWidget creation
 	uint ctx_devices_count = iio_context_get_devices_count(m_ctx);
 	for(m_currentDeviceIndex = 0; m_currentDeviceIndex < ctx_devices_count; ++m_currentDeviceIndex) {
 		setupCurrentDevice();
 
-		// add all channels to current device
+		// add all channels to current device (structure only)
 		uint device_channels_count = iio_device_get_channels_count(m_currentDevice);
 		for(m_currentChannelIndex = 0; m_currentChannelIndex < device_channels_count; ++m_currentChannelIndex) {
 			setupCurrentChannel();
-			generateChannelAttributes();
-
-			// add channel to device
 			m_currentDeviceItem->appendRow(m_currentChannelItem);
 		}
-		generateDeviceAttributes();
 
 		// add device to ctx
 		m_rootItem->appendRow(m_currentDeviceItem);
@@ -68,6 +64,9 @@ void IIOModel::iioTreeSetup()
 	generateCtxAttributes();
 
 	m_model->appendRow(m_rootItem);
+
+	// Pre-populate m_entries with attr names so SearchBar autocomplete works immediately
+	buildEntries();
 }
 
 void IIOModel::setupCtx()
@@ -94,7 +93,6 @@ void IIOModel::generateCtxAttributes()
 void IIOModel::setupCurrentDevice()
 {
 	m_currentDevice = iio_context_get_device(m_ctx, static_cast<uint>(m_currentDeviceIndex));
-	m_devList = IIOWidgetBuilder(m_parent).device(m_currentDevice).includeAvailableAttributes(true).buildAll();
 	m_currentDeviceName = iio_device_get_name(m_currentDevice);
 	QString lbl = iio_device_get_label(m_currentDevice);
 	if(!lbl.isEmpty()) {
@@ -105,58 +103,24 @@ void IIOModel::setupCurrentDevice()
 		m_currentDeviceName = currentDeviceId;
 	}
 	bool is_trigger = iio_device_is_trigger(m_currentDevice);
-	if(is_trigger) {
-		m_currentDeviceItem =
-			createIIOStandardItem({}, m_currentDeviceName, currentDeviceId,
-					      m_rootString + SEPARATOR + m_currentDeviceName, IIOStandardItem::Trigger);
-	} else {
-		m_currentDeviceItem =
-			createIIOStandardItem(m_devList, m_currentDeviceName, currentDeviceId,
-					      m_rootString + SEPARATOR + m_currentDeviceName, IIOStandardItem::Device);
-	}
+	// Create item with empty widget list — widgets are built lazily in populateChildren()
+	IIOStandardItem::Type devType = is_trigger ? IIOStandardItem::Trigger : IIOStandardItem::Device;
+	m_currentDeviceItem = createIIOStandardItem({}, m_currentDeviceName, currentDeviceId,
+						    m_rootString + SEPARATOR + m_currentDeviceName, devType);
 	m_currentDeviceItem->setDevice(m_currentDevice);
 	m_currentDeviceItem->setEditable(false);
 	m_entries.insert(m_currentDeviceName);
 }
 
-void IIOModel::generateDeviceAttributes()
-{
-	// Debug attr idx
-	uint debug_attr_idx = 0;
-
-	// add all attrs to current device
-	for(int j = 0; j < m_devList.size(); ++j) {
-		QString device_attr = iio_device_get_attr(m_currentDevice, static_cast<uint>(j));
-		if(device_attr.isEmpty()) {
-			// Probably a debug attribute
-			device_attr = iio_device_get_debug_attr(m_currentDevice, debug_attr_idx++);
-		}
-
-		if(device_attr.isEmpty()) {
-			// Skip empty attributes
-			continue;
-		}
-
-		m_entries.insert(device_attr);
-		auto *attrItem =
-			createIIOStandardItem({m_devList[j]}, m_devList[j]->getRecipe().data, "",
-					      m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR + device_attr,
-					      IIOStandardItem::DeviceAttribute);
-		attrItem->setDevice(m_currentDevice);
-		attrItem->setEditable(false);
-		m_currentDeviceItem->appendRow(attrItem);
-	}
-}
-
 void IIOModel::setupCurrentChannel()
 {
 	m_currentChannel = iio_device_get_channel(m_currentDevice, static_cast<uint>(m_currentChannelIndex));
-	m_chnlList = IIOWidgetBuilder(m_parent).channel(m_currentChannel).includeAvailableAttributes(true).buildAll();
 	m_currentChannelName = iio_channel_get_id(m_currentChannel);
 	QString currentChannelId = iio_channel_get_name(m_currentChannel);
 
+	// Create item with empty widget list — widgets built lazily in populateChildren()
 	m_currentChannelItem =
-		createIIOStandardItem(m_chnlList, currentChannelId, m_currentChannelName,
+		createIIOStandardItem({}, currentChannelId, m_currentChannelName,
 				      m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR + m_currentChannelName,
 				      IIOStandardItem::Channel);
 	m_currentChannelItem->setChannel(m_currentChannel);
@@ -167,24 +131,130 @@ void IIOModel::setupCurrentChannel()
 
 	m_currentChannelItem->setEditable(false);
 	m_entries.insert(m_currentChannelName);
+
+	// Add placeholder child so the expand arrow is visible in the tree view
+	ssize_t attrCount = iio_channel_get_attrs_count(m_currentChannel);
+	if(attrCount > 0) {
+		m_currentChannelItem->appendRow(createPlaceholderItem());
+	}
 }
 
-void IIOModel::generateChannelAttributes()
+void IIOModel::populateChildren(IIOStandardItem *item)
 {
-	// add all attrs from channel
-	for(int i = 0; i < m_chnlList.size(); ++i) {
-		QString attr_name = iio_channel_get_attr(m_currentChannel, i);
-
-		m_entries.insert(attr_name);
-		QString attrName = m_chnlList[i]->getRecipe().data;
-		auto *attr_item = createIIOStandardItem({m_chnlList[i]}, attrName, "",
-							m_rootString + SEPARATOR + m_currentDeviceName + SEPARATOR +
-								m_currentChannelName + SEPARATOR + attrName,
-							IIOStandardItem::ChannelAttribute);
-		attr_item->setChannel(m_currentChannel);
-		attr_item->setEditable(false);
-		m_currentChannelItem->appendRow(attr_item);
+	if(!item || item->childrenLoaded()) {
+		return;
 	}
+	item->setChildrenLoaded(true);
+
+	IIOStandardItem::Type type = item->type();
+	if(type == IIOStandardItem::Device || type == IIOStandardItem::Trigger) {
+		populateDeviceChildren(item);
+	} else if(type == IIOStandardItem::Channel) {
+		populateChannelChildren(item);
+	}
+}
+
+void IIOModel::populateDeviceChildren(IIOStandardItem *item)
+{
+	struct iio_device *dev = item->device();
+	if(!dev) {
+		return;
+	}
+
+	QList<IIOWidget *> devWidgets =
+		IIOWidgetBuilder(m_parent).device(dev).includeAvailableAttributes(true).buildAll();
+	item->setIIOWidgets(devWidgets);
+
+	uint debug_attr_idx = 0;
+	for(int j = 0; j < devWidgets.size(); ++j) {
+		QString device_attr = iio_device_get_attr(dev, j);
+		if(device_attr.isEmpty()) {
+			device_attr = iio_device_get_debug_attr(dev, debug_attr_idx++);
+		}
+		if(device_attr.isEmpty()) {
+			continue;
+		}
+
+		m_entries.insert(device_attr);
+		auto *attrItem =
+			createIIOStandardItem({devWidgets[j]}, devWidgets[j]->getRecipe().data, "",
+					      item->path() + SEPARATOR + device_attr, IIOStandardItem::DeviceAttribute);
+		attrItem->setDevice(dev);
+		attrItem->setEditable(false);
+		item->appendRow(attrItem);
+	}
+}
+
+void IIOModel::populateChannelChildren(IIOStandardItem *item)
+{
+	struct iio_channel *ch = item->channel();
+	if(!ch) {
+		return;
+	}
+
+	// Remove placeholder if present (it's a plain QStandardItem, not IIOStandardItem)
+	if(item->rowCount() > 0 && !dynamic_cast<IIOStandardItem *>(item->child(0))) {
+		item->removeRow(0);
+	}
+
+	QList<IIOWidget *> chnlWidgets =
+		IIOWidgetBuilder(m_parent).channel(ch).includeAvailableAttributes(true).buildAll();
+	item->setIIOWidgets(chnlWidgets);
+
+	for(int i = 0; i < chnlWidgets.size(); ++i) {
+		QString attr_name = iio_channel_get_attr(ch, i);
+		m_entries.insert(attr_name);
+		QString attrName = chnlWidgets[i]->getRecipe().data;
+		auto *attr_item =
+			createIIOStandardItem({chnlWidgets[i]}, attrName, "", item->path() + SEPARATOR + attrName,
+					      IIOStandardItem::ChannelAttribute);
+		attr_item->setChannel(ch);
+		attr_item->setEditable(false);
+		item->appendRow(attr_item);
+	}
+}
+
+void IIOModel::buildEntries()
+{
+	uint devCount = iio_context_get_devices_count(m_ctx);
+	for(uint i = 0; i < devCount; ++i) {
+		struct iio_device *dev = iio_context_get_device(m_ctx, i);
+		uint devAttrCount = iio_device_get_attrs_count(dev);
+		for(uint j = 0; j < devAttrCount; ++j) {
+			const char *attr = iio_device_get_attr(dev, j);
+			if(attr) {
+				m_entries.insert(attr);
+			}
+		}
+
+		uint dbgAttrCount = iio_device_get_debug_attrs_count(dev);
+		for(uint j = 0; j < dbgAttrCount; ++j) {
+			const char *attr = iio_device_get_debug_attr(dev, j);
+			if(attr) {
+				m_entries.insert(attr);
+			}
+		}
+
+		uint chCount = iio_device_get_channels_count(dev);
+		for(uint k = 0; k < chCount; ++k) {
+			struct iio_channel *ch = iio_device_get_channel(dev, k);
+			uint chAttrCount = iio_channel_get_attrs_count(ch);
+			for(uint l = 0; l < chAttrCount; ++l) {
+				const char *attr = iio_channel_get_attr(ch, l);
+				if(attr) {
+					m_entries.insert(attr);
+				}
+			}
+		}
+	}
+}
+
+QStandardItem *IIOModel::createPlaceholderItem()
+{
+	auto *placeholder = new QStandardItem();
+	placeholder->setEnabled(false);
+	placeholder->setEditable(false);
+	return placeholder;
 }
 
 IIOStandardItem *IIOModel::createIIOStandardItem(QList<IIOWidget *> widgets, QString name, QString id, QString path,

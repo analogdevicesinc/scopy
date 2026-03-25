@@ -39,6 +39,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 	, m_type(type)
 	, m_isWatched(false)
 	, m_isBufferCapable(false)
+	, m_childrenLoaded(false)
 	, m_index(-1)
 {
 	generateToolTip();
@@ -60,6 +61,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 	, m_type(type)
 	, m_isWatched(false)
 	, m_isBufferCapable(false)
+	, m_childrenLoaded(false)
 	, m_index(-1)
 {
 	generateToolTip();
@@ -271,6 +273,22 @@ void IIOStandardItem::extractDataFromChannel()
 		m_index = iio_channel_get_index(m_channel);
 		m_details.append("Format: " + m_format);
 		m_details.append("Format explained: " + m_formatExplanations);
+	}
+}
+
+bool IIOStandardItem::childrenLoaded() const { return m_childrenLoaded; }
+
+void IIOStandardItem::setChildrenLoaded(bool loaded) { m_childrenLoaded = loaded; }
+
+struct iio_device *IIOStandardItem::device() const { return m_device; }
+
+struct iio_channel *IIOStandardItem::channel() const { return m_channel; }
+
+void IIOStandardItem::setIIOWidgets(QList<IIOWidget *> widgets)
+{
+	m_iioWidgets = widgets;
+	for(IIOWidget *w : qAsConst(m_iioWidgets)) {
+		w->hide();
 	}
 }
 

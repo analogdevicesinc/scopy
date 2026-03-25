@@ -136,6 +136,11 @@ void CliDetailsView::setupChannel()
 		QStandardItem *channelChild = m_deviceIIOItem->child(i);
 		m_channelIIOItem = dynamic_cast<IIOStandardItem *>(channelChild);
 
+		// Skip placeholder items inserted by lazy loading (not yet populated)
+		if(!m_channelIIOItem) {
+			continue;
+		}
+
 		// the item is for sure a ChannelAttribute
 		if(m_noChnlAttributes == 0) {
 			m_currentText.append(tabs(3) + "%%CHANNEL_ATTRS_COUNT%% channel-specific attributes found:\n");
@@ -177,6 +182,10 @@ void CliDetailsView::setupDevice()
 		QStandardItem *deviceChild = m_contextIIOItem->child(i);
 		m_deviceIIOItem = dynamic_cast<IIOStandardItem *>(deviceChild);
 
+		if(!m_deviceIIOItem) {
+			continue;
+		}
+
 		if(m_deviceIIOItem->type() == IIOStandardItem::Channel) {
 			setupChannel();
 		} else if(m_deviceIIOItem->type() == IIOStandardItem::DeviceAttribute) {
@@ -216,6 +225,10 @@ void CliDetailsView::setupContext()
 	for(int i = 0; i < childrenCount; ++i) {
 		QStandardItem *child = m_currentItem->child(i);
 		m_contextIIOItem = dynamic_cast<IIOStandardItem *>(child);
+
+		if(!m_contextIIOItem) {
+			continue;
+		}
 
 		// we consider that the list of children is divided in 2 sections: the
 		// attributes and the devices/triggers and they cannot be interleaved

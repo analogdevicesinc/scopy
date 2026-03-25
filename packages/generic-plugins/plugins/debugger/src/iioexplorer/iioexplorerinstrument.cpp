@@ -182,6 +182,19 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 	QObject::connect(m_treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
 			 &IIOExplorerInstrument::applySelection);
 
+	// Lazy-load attribute children when the user expands a device or channel node
+	QObject::connect(m_treeView, &QTreeView::expanded, this, [this](const QModelIndex &proxyIndex) {
+		QModelIndex srcIdx = m_proxyModel->mapToSource(proxyIndex);
+		auto *sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
+		if(!sourceModel) {
+			return;
+		}
+		auto *iioItem = dynamic_cast<IIOStandardItem *>(sourceModel->itemFromIndex(srcIdx));
+		if(iioItem) {
+			m_iioModel->populateChildren(iioItem);
+		}
+	});
+
 	QObject::connect(m_watchListView, &WatchListView::selectedItem, this, &IIOExplorerInstrument::selectItem);
 
 	QObject::connect(m_watchListView, &WatchListView::removeItem, this, [this](IIOStandardItem *item) {
@@ -429,6 +442,8 @@ void IIOExplorerInstrument::applySelection(const QItemSelection &selected, const
 	m_currentlySelectedItem = iioItem;
 
 	if(iioItem) {
+		// Populate lazily if the user selected without expanding first
+		m_iioModel->populateChildren(iioItem);
 		m_detailsView->setAddToWatchlistState(!iioItem->isWatched());
 		m_detailsView->setIIOStandardItem(iioItem);
 		m_watchListView->currentTreeSelectionChanged(iioItem);
