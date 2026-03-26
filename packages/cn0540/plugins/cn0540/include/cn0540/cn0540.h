@@ -40,9 +40,14 @@
 
 namespace scopy::cn0540 {
 
+class CN0540_API;
+
 class SCOPY_CN0540_EXPORT CN0540 : public QWidget
 {
 	Q_OBJECT
+
+	friend class CN0540_API;
+
 public:
 	explicit CN0540(iio_context *ctx, QWidget *parent = nullptr);
 	~CN0540();

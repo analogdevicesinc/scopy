@@ -30,10 +30,14 @@
 
 namespace scopy::cn0540 {
 
+class CN0540_API;
+
 class SCOPY_CN0540_EXPORT CN0540Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	friend class CN0540_API;
 
 public:
 	bool compatible(QString m_param, QString category) override;
@@ -48,6 +52,10 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	void initApi();
+	CN0540_API *m_api = nullptr;
 };
 
 } // namespace scopy::cn0540
