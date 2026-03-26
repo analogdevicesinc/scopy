@@ -220,18 +220,22 @@ build_gnuradio() {
 		-DENABLE_POSTINSTALL=OFF \
 		"
 
-	if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
-		PYTHON_WRAPPER="$STAGING_AREA/python-wrapper.sh"
-		echo '#!/bin/bash' > $PYTHON_WRAPPER
-		echo "
-		LOADER="$SYSROOT/lib/ld-linux-armhf.so.3"
-		LIB_PATH="$SYSROOT/usr/lib/arm-linux-gnueabihf"
-		PYTHON_BIN="$SYSROOT/usr/bin/python3"
-		" >> $PYTHON_WRAPPER
-		echo 'exec $LOADER --library-path $LIB_PATH $PYTHON_BIN "$@"'>> $PYTHON_WRAPPER
-		chmod +x $PYTHON_WRAPPER
-		CURRENT_BUILD_CMAKE_OPTS="${CURRENT_BUILD_CMAKE_OPTS} -DPYTHON_EXECUTABLE=${PYTHON_WRAPPER} \ "
-	fi
+	# This is not needed anymore, (don't know why) but it was used as a workaround to execute the python binary, from the sysroot, in the host machine
+	# it was needed because, for some reason, the gnuradio build process needed to execute the binary at build time
+	# if [ $TOOLCHAIN_HOST == "arm-linux-gnueabihf" ]; then
+	# 	PYTHON_WRAPPER="$STAGING_AREA/python-wrapper.sh"
+	# 	echo '#!/bin/bash' > $PYTHON_WRAPPER
+	# 	echo "
+	# 	LOADER="$SYSROOT/lib/ld-linux-armhf.so.3"
+	# 	LIB_PATH="$SYSROOT/usr/lib/arm-linux-gnueabihf"
+	# 	PYTHON_BIN="$SYSROOT/usr/bin/python3"
+	# 	" >> $PYTHON_WRAPPER
+	# 	echo 'exec $LOADER --library-path $LIB_PATH $PYTHON_BIN "$@"'>> $PYTHON_WRAPPER
+	# 	chmod +x $PYTHON_WRAPPER
+	# 	CURRENT_BUILD_CMAKE_OPTS="${CURRENT_BUILD_CMAKE_OPTS} -DPYTHON_EXECUTABLE=${PYTHON_WRAPPER} \ "
+	# fi
+	# although a better approch is to install qemu and to use:
+	# exec qemu-arm -cpu cortex-a9 -L /home/runner/scopy/ci/arm/staging/sysroot $PYTHON_BIN "$@"
 
 	build_with_cmake
 	sudo make install
