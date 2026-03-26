@@ -19,50 +19,48 @@
  *
  */
 
-#ifndef CN0511PLUGIN_H
-#define CN0511PLUGIN_H
-
-#define SCOPY_PLUGIN_NAME Cn0511Plugin
+#ifndef CN0511_API_H
+#define CN0511_API_H
 
 #include "scopy-cn0511_export.h"
-#include <QObject>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
-
-namespace scopy {
-class IIOWidgetGroup;
-}
+#include <pluginbase/apiobject.h>
+#include <QString>
+#include <QStringList>
 
 namespace scopy::cn0511 {
 
-class Cn0511_API;
+class Cn0511Plugin;
+class CN0511;
 
-class SCOPY_CN0511_EXPORT Cn0511Plugin : public QObject, public PluginBase
+class SCOPY_CN0511_EXPORT Cn0511_API : public ApiObject
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
-	friend class Cn0511_API;
-
 public:
-	bool compatible(QString m_param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
-	QString displayName() override;
+	explicit Cn0511_API(Cn0511Plugin *plugin);
+	~Cn0511_API();
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+	Q_INVOKABLE QStringList getTools();
+
+	Q_INVOKABLE QString getFrequency();
+	Q_INVOKABLE void setFrequency(const QString &val);
+
+	Q_INVOKABLE QString getAmplitude();
+	Q_INVOKABLE void setAmplitude(const QString &val);
+
+	Q_INVOKABLE void applyCalibration();
+
+	Q_INVOKABLE QString isDacAmpEnabled();
+	Q_INVOKABLE void setDacAmpEnabled(const QString &val);
+
+	Q_INVOKABLE void refresh();
 
 private:
-	void initApi();
+	CN0511 *getTool();
+	QString readFromWidget(const QString &key);
+	void writeToWidget(const QString &key, const QString &value);
 
-	IIOWidgetGroup *m_widgetGroup = nullptr;
-	Cn0511_API *m_api = nullptr;
+	Cn0511Plugin *m_plugin;
 };
+
 } // namespace scopy::cn0511
-#endif // CN0511PLUGIN_H
+#endif // CN0511_API_H
