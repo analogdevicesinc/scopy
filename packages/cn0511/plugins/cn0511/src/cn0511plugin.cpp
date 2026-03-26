@@ -21,6 +21,7 @@
 
 #include "cn0511plugin.h"
 #include "cn0511.h"
+#include "cn0511_api.h"
 
 #include <QLoggingCategory>
 #include <QLabel>
@@ -29,6 +30,7 @@
 #include "scopy-cn0511_config.h"
 #include <iioutil/connectionprovider.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_CN0511PLUGIN, "Cn0511Plugin")
 using namespace scopy::cn0511;
@@ -116,11 +118,24 @@ bool Cn0511Plugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
 
+	initApi();
 	return true;
+}
+
+void Cn0511Plugin::initApi()
+{
+	m_api = new Cn0511_API(this);
+	m_api->setObjectName("cn0511");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 bool Cn0511Plugin::onDisconnect()
 {
+	if(m_api) {
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
