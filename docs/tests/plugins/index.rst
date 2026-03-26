@@ -30,6 +30,7 @@ Contents
    imuanalyzer/index
    rfpowermeter/index
    cn0357/index
+   cn0540/index
 
 ..
  add the path to each plugin test case here
