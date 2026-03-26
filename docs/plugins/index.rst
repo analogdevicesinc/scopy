@@ -93,6 +93,9 @@ Application Specific plugins
 * CN0540
     * :ref:`CN0540 <cn0540>`
 
+* CN0511
+    * :ref:`CN0511 <cn0511>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -122,4 +125,5 @@ Contents
    imuanalyzer/imuanalyzer
    rfpowermeter/rfpowermeter
    cn0540/cn0540
+   cn0511/index
 

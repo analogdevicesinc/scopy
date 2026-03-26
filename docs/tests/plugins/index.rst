@@ -32,6 +32,7 @@ Contents
    rfpowermeter/index
    cn0357/index
    cn0540/index
+   cn0511/index
 
 ..
  add the path to each plugin test case here
