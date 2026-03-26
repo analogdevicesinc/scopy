@@ -177,11 +177,6 @@ if(ENABLE_TESTING)
 	add_subdirectory(tests)
 endif()
 
-if(ENABLE_SCOPYJS)
-	message(STATUS "JS tests enabled - copying js/ to build directory")
-	file(COPY ${CMAKE_SOURCE_DIR}/js/ DESTINATION ${CMAKE_BINARY_DIR}/js)
-endif()
-
 option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" OFF)
 if(APPLE)
 	set(ENABLE_APPLICATION_BUNDLE ON)
@@ -206,6 +201,11 @@ add_subdirectory(packages)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS")
+endif()
+
+if(ENABLE_SCOPYJS)
+	message(STATUS "JS tests enabled - copying js/ to build directory")
+	file(COPY ${CMAKE_SOURCE_DIR}/js/ DESTINATION ${CMAKE_BINARY_DIR}/js)
 endif()
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
