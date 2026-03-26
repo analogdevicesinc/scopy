@@ -20,12 +20,14 @@
 
 #include "cn0540plugin.h"
 #include "cn0540.h"
+#include "cn0540_api.h"
 
 #include <QLabel>
 #include <QLoggingCategory>
 #include <iio.h>
 
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
 #include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_CN0540PLUGIN, "CN0540Plugin")
@@ -63,14 +65,17 @@ bool CN0540Plugin::loadIcon()
 
 void CN0540Plugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(
-		"cn0540tool", "CN0540",
-		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("cn0540tool", "CN0540",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/gear_wheel.svg"));
 }
 
 void CN0540Plugin::unload() {}
 
-QString CN0540Plugin::description() { return "CN0540 precision measurement system plugin ported from iio-oscilloscope"; }
+QString CN0540Plugin::description()
+{
+	return "CN0540 precision measurement system plugin ported from iio-oscilloscope";
+}
 
 QString CN0540Plugin::displayName() { return "CN0540"; }
 
@@ -89,11 +94,22 @@ bool CN0540Plugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
 
+	initApi();
 	return true;
+}
+
+void CN0540Plugin::initApi()
+{
+	m_api = new CN0540_API(this);
+	m_api->setObjectName("cn0540");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 bool CN0540Plugin::onDisconnect()
 {
+	delete m_api;
+	m_api = nullptr;
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
