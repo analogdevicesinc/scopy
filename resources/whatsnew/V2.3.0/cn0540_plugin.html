@@ -1,0 +1,34 @@
+<h1>CN0540 Plugin</h1>
+
+<p>Scopy now offers dedicated support for the CN0540 Precision Measurement System.</p>
+
+<p>The new <b>CN0540 Tool</b> enables you to control and monitor CN0540-based
+precision measurement hardware directly within Scopy. It provides GPIO power
+management, FDA driver configuration, sensor voltage calibration, and real-time
+analog voltage monitoring.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>Power Control:</b> Manage device power state via GPIO, including SW_FF
+  fault flag detection, shutdown control, and constant current output.</li>
+  <li><b>ADC Driver Settings:</b> Enable or disable the Fully-Differential
+  Amplifier (FDA) and select between FULL POWER and LOW POWER operating modes.</li>
+  <li><b>Sensor Calibration:</b> Read ADC input voltage, set the DAC shift voltage,
+  compute sensor voltage, and run an automated iterative calibration routine.</li>
+  <li><b>Voltage Monitor:</b> Display six analog pin voltages (Vin+, Vgpio2,
+  Vgpio3, Vcom, Vfda+, Vfda-) refreshed automatically every second.</li>
+</ul>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Connect your CN0540 board to your computer.</li>
+  <li>Ensure the IIO drivers for <b>ad7768-1</b>, <b>ltc2606</b>, and
+  <b>one-bit-adc-dac</b> are properly installed.</li>
+  <li>Open Scopy and select the <b>CN0540</b> tool from the available instruments.</li>
+  <li>Use the <b>Refresh</b> button to read all hardware values, or interact with
+  each collapsible section individually.</li>
+</ol>
+
+<p>For more detailed information, please visit the
+<a href="https://analogdevicesinc.github.io/scopy/plugins/cn0540/cn0540.html"
+target="_blank">official documentation</a>.</p>
