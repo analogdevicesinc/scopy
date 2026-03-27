@@ -342,8 +342,6 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setRunBtnVisible(true);
 
 		adc = new ADCTimeInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
-		adc->init();
-
 		ui = adc->ui();
 		idx++;
 
@@ -384,7 +382,6 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setRunBtnVisible(true);
 
 		adc = new ADCFFTInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
-		adc->init();
 		ui = adc->ui();
 		idx++;
 
@@ -422,8 +419,20 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 	if(m_toolList.size() > 2) {
 		tme->setDetachable(false);
 	}
+
+	// Emit toolListChanged first so the new TME gets wired to updateTool in
+	// ToolMenuManager before setTool() triggers it.
 	Q_EMIT toolListChanged();
+
+	// Add the skeleton ADCInstrument (no children yet) to the ToolStack now.
+	// This is cheap: only the bare ADCInstrument widget gets reparented/repolished.
+	// init() is called afterwards so all sub-widgets (plots, channels, QwtPlot, etc.)
+	// are constructed while m_ui already has a proper parent in the widget hierarchy,
+	// avoiding the expensive full-subtree style repolish that addWidget() would trigger
+	// on an already fully-built widget tree.
 	tme->setTool(ui);
+
+	adc->init();
 
 	adc->setEnableAddRemovePlot(Preferences::get("adc_add_remove_plot").toBool());
 	adc->setEnableAddRemoveInstrument(Preferences::get("adc_add_remove_instrument").toBool());
