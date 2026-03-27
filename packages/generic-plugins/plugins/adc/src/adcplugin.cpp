@@ -342,8 +342,6 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setRunBtnVisible(true);
 
 		adc = new ADCTimeInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
-		adc->init();
-
 		ui = adc->ui();
 		idx++;
 
@@ -384,7 +382,6 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setRunBtnVisible(true);
 
 		adc = new ADCFFTInstrumentController(tme, m_param, "adc" + QString::number(idx), root, this);
-		adc->init();
 		ui = adc->ui();
 		idx++;
 
@@ -424,6 +421,10 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 	}
 	Q_EMIT toolListChanged();
 	tme->setTool(ui);
+
+	// only construct sub-widgets (plots, ch, etc) after setting a parent
+	// this avoids widget repolishing
+	adc->init();
 
 	adc->setEnableAddRemovePlot(Preferences::get("adc_add_remove_plot").toBool());
 	adc->setEnableAddRemoveInstrument(Preferences::get("adc_add_remove_instrument").toBool());
