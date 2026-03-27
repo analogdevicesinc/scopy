@@ -191,7 +191,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm, &DeviceManager::deviceDisconnected, this, [=]() { handleScanner(); });
 	connect(dm, &DeviceManager::deviceConnecting, this, [this](const QString &deviceId) {
 		Device *d = dm->getDevice(deviceId);
-		if(d) {
+		if(d && d->param().contains("usb:")) {
 			scc->lock(deviceId, d);
 		}
 	});
