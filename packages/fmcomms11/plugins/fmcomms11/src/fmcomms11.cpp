@@ -200,6 +200,7 @@ QWidget *FMCOMMS11::generateInputAttenuatorWidget(QWidget *parent)
 							  .buildSingle();
 			if(hardwaregain) {
 				hardwaregain->showProgressBar(false);
+				hardwaregain->setDataToUIConversion([](QString data) { return data.split(" ").first(); });
 				connect(this, &FMCOMMS11::readRequested, hardwaregain, &IIOWidget::readAsync);
 				layout->addWidget(hardwaregain);
 			}
@@ -255,7 +256,7 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 						     .channel(ncoCh)
 						     .attribute("frequency_nco")
 						     .uiStrategy(IIOWidgetBuilder::RangeUi)
-						     .optionsValues("[0 1000000 6000000000]")
+						     .optionsValues("[1000000 1 5999000000]")
 						     .title("NCO Frequency (MHz)")
 						     .group(m_group)
 						     .buildSingle();
@@ -274,6 +275,7 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 
 		// FIR85 Enable
 		iio_channel *voltage0Out = iio_device_find_channel(m_dac, "voltage0", true);
+		const char *fir85Attr = iio_device_find_attr(m_dac, "fir85_enable");
 
 		IIOWidget *fir85Enable = IIOWidgetBuilder(widget)
 						 .device(m_dac)
@@ -285,12 +287,13 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 
 		if(fir85Enable) {
 			fir85Enable->showProgressBar(false);
-			connect(this, &FMCOMMS11::readRequested, fir85Enable, &IIOWidget::readAsync);
 			fir85Enable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-			if(!voltage0Out) {
+			if(!voltage0Out || !fir85Attr) {
 				fir85Enable->setEnabled(false);
 				fir85Enable->getUiStrategy()->setInfoMessage(
 					"The attribute for this option is missing");
+			} else {
+				connect(this, &FMCOMMS11::readRequested, fir85Enable, &IIOWidget::readAsync);
 			}
 			layout->addWidget(fir85Enable);
 		}
@@ -326,6 +329,7 @@ QWidget *FMCOMMS11::generateOutputVgaWidget(QWidget *parent)
 							  .buildSingle();
 			if(hardwaregain) {
 				hardwaregain->showProgressBar(false);
+				hardwaregain->setDataToUIConversion([](QString data) { return data.split(" ").first(); });
 				connect(this, &FMCOMMS11::readRequested, hardwaregain, &IIOWidget::readAsync);
 				layout->addWidget(hardwaregain);
 			}
