@@ -83,7 +83,7 @@ void IIOModel::setupCtx()
 {
 	m_ctxList = IIOWidgetBuilder(nullptr).context(m_ctx).buildAll();
 	m_rootItem = createIIOStandardItem(m_ctxList, m_rootString, "", m_rootString, IIOStandardItem::Context);
-	// m_rootItem = new IIOStandardItem(m_ctxList, m_rootString, m_rootString, IIOStandardItem::Context);
+	m_rootItem->setContext(m_ctx);
 	m_rootItem->setEditable(false);
 }
 
@@ -99,6 +99,7 @@ void IIOModel::generateCtxAttributes()
 		auto *attrItem = createIIOStandardItem({ctxWidget}, ctxWidget->getRecipe().data, "",
 						       m_rootString + SEPARATOR + ctxWidget->getRecipe().data,
 						       IIOStandardItem::ContextAttribute);
+		attrItem->setContext(m_ctx);
 		attrItem->setEditable(false);
 		m_rootItem->appendRow(attrItem);
 	}

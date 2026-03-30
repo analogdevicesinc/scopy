@@ -26,6 +26,7 @@ using namespace scopy::debugger;
 
 IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QString path, IIOStandardItem::Type type)
 	: QStandardItem(name)
+	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
 	, m_iioWidgets(widgets)
@@ -48,6 +49,7 @@ IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QStri
 
 IIOStandardItem::IIOStandardItem(QList<IIOWidget *> widgets, QString name, QString id, QString path, Type type)
 	: QStandardItem((!name.isEmpty()) ? id + ": " + name : id)
+	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
 	, m_iioWidgets(widgets)
@@ -279,6 +281,10 @@ void IIOStandardItem::extractDataFromChannel()
 bool IIOStandardItem::childrenLoaded() const { return m_childrenLoaded; }
 
 void IIOStandardItem::setChildrenLoaded(bool loaded) { m_childrenLoaded = loaded; }
+
+struct iio_context *IIOStandardItem::context() const { return m_context; }
+
+void IIOStandardItem::setContext(struct iio_context *ctx) { m_context = ctx; }
 
 struct iio_device *IIOStandardItem::device() const { return m_device; }
 
