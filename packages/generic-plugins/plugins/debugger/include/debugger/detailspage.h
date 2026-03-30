@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SCOPY_DETAILSVIEW_H
-#define SCOPY_DETAILSVIEW_H
+#ifndef SCOPY_DETAILSPAGE_H
+#define SCOPY_DETAILSPAGE_H
 
 #include <QWidget>
 #include <QTabWidget>
@@ -36,31 +36,29 @@ namespace scopy::debugger {
 
 class IIOExplorerInstrument_API;
 
-class DetailsView : public QWidget
+class DetailsPage : public QWidget
 {
 	Q_OBJECT
 	friend class IIOExplorerInstrument_API;
 
 public:
-	explicit DetailsView(QString uri, QWidget *parent = nullptr);
-	void setIIOStandardItem(IIOStandardItem *item);
-	void refreshIIOView();
+	explicit DetailsPage(IIOStandardItem *item, QString uri, QWidget *parent = nullptr);
 
+	void refreshIIOView();
 	AnimationPushButton *readBtn();
 	QPushButton *addToWatchlistBtn();
 
 	// add:true = +, add:false = X
 	void setAddToWatchlistState(bool add);
 
-	void resetGeneratedCodeView(QList<IIOStandardItem *> items);
+	QTabWidget *tabWidget();
 
 Q_SIGNALS:
 	void pathSelected(QString path);
 
 private:
-	void setupUi();
+	void setupUi(IIOStandardItem *item, const QString &uri);
 
-	IIOStandardItem *m_currentItem;
 	GuiDetailsView *m_guiDetailsView;
 	CliDetailsView *m_cliDetailsView;
 	QTabWidget *m_tabWidget;
@@ -72,8 +70,8 @@ private:
 	AnimationPushButton *m_readBtn;
 	QPushButton *m_addToWatchlistBtn;
 	QTextBrowser *m_generatedCodeBrowser;
-	QString m_uri;
 };
+
 } // namespace scopy::debugger
 
-#endif // SCOPY_DETAILSVIEW_H
+#endif // SCOPY_DETAILSPAGE_H

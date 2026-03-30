@@ -74,7 +74,6 @@ void GuiDetailsView::setIIOStandardItem(IIOStandardItem *item)
 	clearWidgets();
 	QList<IIOWidget *> iioWidgets = item->getIIOWidgets();
 	for(IIOWidget *widget : iioWidgets) {
-		widget->show();
 		m_currentWidgets.append(widget);
 		widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 		m_scrollAreaContents->layout()->addWidget(widget);
@@ -100,13 +99,11 @@ void GuiDetailsView::clearWidgets()
 {
 	QLayoutItem *child;
 	while((child = m_scrollAreaContents->layout()->takeAt(0)) != nullptr) {
-		child->widget()->hide();
 		m_scrollAreaContents->layout()->removeWidget(child->widget());
 	}
 	m_currentWidgets.clear();
 
 	while((child = m_detailsSeparator->contentLayout()->takeAt(0)) != nullptr) {
-		child->widget()->hide();
 		m_detailsSeparator->contentLayout()->removeWidget(child->widget());
 	}
 	m_detailsList.clear();

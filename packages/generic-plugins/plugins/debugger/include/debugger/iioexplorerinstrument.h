@@ -24,12 +24,13 @@
 
 #include "scopy-debugger_export.h"
 #include "iiomodel.h"
-#include "detailsview.h"
+#include "detailspage.h"
 #include <gui/widgets/searchbar.h>
 #include "iiosortfilterproxymodel.h"
 #include "watchlistview.h"
 #include "savecontextsetup.h"
 #include "iiodebuglogger.h"
+#include <gui/mapstackedwidget.h>
 
 #include <iio.h>
 #include <QWidget>
@@ -57,10 +58,13 @@ private Q_SLOTS:
 	void applySelection(const QItemSelection &selected, const QItemSelection &deselected);
 	void filterAndExpand(const QString &text);
 	void selectItem(IIOStandardItem *item);
+	void onReadAllClicked();
+	void onWatchlistToggleClicked();
 
 private:
 	void setupUi();
 	void connectSignalsAndSlots();
+	void showOrBuildPage(IIOStandardItem *item);
 
 	// Recursive function to find an item in the source model
 	IIOStandardItem *findItemRecursive(QStandardItem *currentItem, QStandardItem *targetItem);
@@ -92,7 +96,8 @@ private:
 	QString m_uri;
 	QTreeView *m_treeView;
 	IIOModel *m_iioModel;
-	DetailsView *m_detailsView;
+	MapStackedWidget *m_mapStack;
+	DetailsPage *m_currentDetailsPage;
 	SearchBar *m_searchBar;
 	IIOSortFilterProxyModel *m_proxyModel;
 	WatchListView *m_watchListView;

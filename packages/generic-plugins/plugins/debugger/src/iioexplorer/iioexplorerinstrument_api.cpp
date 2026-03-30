@@ -22,7 +22,7 @@
 #include "iioexplorerinstrument_api.h"
 #include "iioexplorerinstrument.h"
 #include "iiodebuglogger.h"
-#include "detailsview.h"
+#include "detailspage.h"
 #include "codegenerator.h"
 #include "debuggerloggingcategories.h"
 #include "iiomodel.h"
@@ -240,6 +240,9 @@ int IIOExplorerInstrument_API::getChildCount(const QString &path)
 		return 0;
 	}
 
+	// Ensure children are populated so the count includes attribute items
+	p->m_iioModel->populateChildren(item);
+
 	return item->rowCount();
 }
 
@@ -257,6 +260,9 @@ QStringList IIOExplorerInstrument_API::getChildNames(const QString &path)
 	if(!item) {
 		return result;
 	}
+
+	// Ensure children are populated so attribute items are visible
+	p->m_iioModel->populateChildren(item);
 
 	for(int i = 0; i < item->rowCount(); ++i) {
 		IIOStandardItem *child = dynamic_cast<IIOStandardItem *>(item->child(i));
@@ -283,7 +289,9 @@ bool IIOExplorerInstrument_API::addCurrentItemToWatchlist()
 
 	p->m_currentlySelectedItem->setWatched(true);
 	p->m_watchListView->addToWatchlist(p->m_currentlySelectedItem);
-	p->m_detailsView->setAddToWatchlistState(false);
+	if(p->m_currentDetailsPage) {
+		p->m_currentDetailsPage->setAddToWatchlistState(false);
+	}
 
 	// Update code generator
 	QList<CodeGenerator::CodeGeneratorRecipe> recipes;
@@ -485,11 +493,16 @@ int IIOExplorerInstrument_API::getVisibleItemCount()
 
 void IIOExplorerInstrument_API::setDetailsViewTab(int index)
 {
-	if(index >= 0 && index < p->m_detailsView->m_tabWidget->count()) {
-		p->m_detailsView->m_tabWidget->setCurrentIndex(index);
+	auto *page = qobject_cast<DetailsPage *>(p->m_mapStack->currentWidget());
+	if(page && index >= 0 && index < page->tabWidget()->count()) {
+		page->tabWidget()->setCurrentIndex(index);
 	}
 }
 
-int IIOExplorerInstrument_API::getDetailsViewTab() { return p->m_detailsView->m_tabWidget->currentIndex(); }
+int IIOExplorerInstrument_API::getDetailsViewTab()
+{
+	auto *page = qobject_cast<DetailsPage *>(p->m_mapStack->currentWidget());
+	return page ? page->tabWidget()->currentIndex() : 0;
+}
 
 #include "moc_iioexplorerinstrument_api.cpp"

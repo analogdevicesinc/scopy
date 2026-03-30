@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -19,12 +19,10 @@
  *
  */
 
-#include "detailsview.h"
-#include "iiostandarditem.h"
+#include "detailspage.h"
 #include "style_properties.h"
 #include <QVBoxLayout>
 #include <style.h>
-#include "codegenerator.h"
 
 #define ADD_ICON ":/gui/icons/green_add.svg"
 #define REMOVE_ICON ":/gui/icons/orange_close.svg"
@@ -32,7 +30,7 @@
 using namespace scopy;
 using namespace scopy::debugger;
 
-DetailsView::DetailsView(QString uri, QWidget *parent)
+DetailsPage::DetailsPage(IIOStandardItem *item, QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_guiDetailsView(new GuiDetailsView(this))
 	, m_cliDetailsView(new CliDetailsView(this))
@@ -43,14 +41,12 @@ DetailsView::DetailsView(QString uri, QWidget *parent)
 	, m_titlePath(new PathTitle("Select an IIO item.", this))
 	, m_readBtn(new AnimationPushButton(this))
 	, m_addToWatchlistBtn(new QPushButton(this))
-	, m_uri(uri)
 {
-	setupUi();
-	// Fw the signal
-	connect(m_titlePath, &PathTitle::pathSelected, this, &DetailsView::pathSelected);
+	setupUi(item, uri);
+	connect(m_titlePath, &PathTitle::pathSelected, this, &DetailsPage::pathSelected);
 }
 
-void DetailsView::setupUi()
+void DetailsPage::setupUi(IIOStandardItem *item, const QString &uri)
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
@@ -63,7 +59,6 @@ void DetailsView::setupUi()
 
 	m_guiView->setLayout(new QVBoxLayout(m_guiView));
 	m_iioView->setLayout(new QVBoxLayout(m_iioView));
-
 	m_guiView->layout()->setContentsMargins(0, 0, 0, 0);
 	m_iioView->layout()->setContentsMargins(0, 0, 0, 0);
 
@@ -112,23 +107,27 @@ void DetailsView::setupUi()
 	Style::setStyle(tabContainer, style::properties::debugger::detailsView, true, true);
 	Style::setStyle(m_tabWidget, style::properties::debugger::detailsView, true, true);
 	Style::setStyle(m_readBtn, style::properties::button::basicButton);
-}
 
-void DetailsView::setIIOStandardItem(IIOStandardItem *item)
-{
+	// Populate views from item
 	m_titlePath->setTitle(item->path());
 	m_guiDetailsView->setIIOStandardItem(item);
 	m_cliDetailsView->setIIOStandardItem(item);
-	this->resetGeneratedCodeView({item});
+
+	// Generate per-item libiio code
+	QList<CodeGenerator::CodeGeneratorRecipe> recipes;
+	recipes.append(CodeGenerator::convertToCodeGeneratorRecipe(item, uri));
+	m_generatedCodeBrowser->setPlainText(CodeGenerator::generateCode(recipes));
 }
 
-void DetailsView::refreshIIOView() { m_cliDetailsView->refreshView(); }
+void DetailsPage::refreshIIOView() { m_cliDetailsView->refreshView(); }
 
-AnimationPushButton *DetailsView::readBtn() { return m_readBtn; }
+AnimationPushButton *DetailsPage::readBtn() { return m_readBtn; }
 
-QPushButton *DetailsView::addToWatchlistBtn() { return m_addToWatchlistBtn; }
+QPushButton *DetailsPage::addToWatchlistBtn() { return m_addToWatchlistBtn; }
 
-void DetailsView::setAddToWatchlistState(bool add)
+QTabWidget *DetailsPage::tabWidget() { return m_tabWidget; }
+
+void DetailsPage::setAddToWatchlistState(bool add)
 {
 	m_addToWatchlistBtn->setEnabled(true);
 	if(add) {
@@ -141,14 +140,4 @@ void DetailsView::setAddToWatchlistState(bool add)
 	}
 }
 
-void DetailsView::resetGeneratedCodeView(QList<IIOStandardItem *> items)
-{
-	QList<CodeGenerator::CodeGeneratorRecipe> recipes;
-	for(auto item : qAsConst(items)) {
-		recipes.append(CodeGenerator::convertToCodeGeneratorRecipe(item, m_uri));
-	}
-
-	m_generatedCodeBrowser->setPlainText(CodeGenerator::generateCode(recipes));
-}
-
-#include "moc_detailsview.cpp"
+#include "moc_detailspage.cpp"

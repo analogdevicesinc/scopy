@@ -136,7 +136,11 @@ void CliDetailsView::setupChannel()
 		QStandardItem *channelChild = m_deviceIIOItem->child(i);
 		m_channelIIOItem = dynamic_cast<IIOStandardItem *>(channelChild);
 
-		// the item is for sure a ChannelAttribute
+		// skip placeholder children (present when attributes have not been lazy-loaded yet)
+		if(!m_channelIIOItem) {
+			continue;
+		}
+
 		if(m_noChnlAttributes == 0) {
 			m_currentText.append(tabs(3) + "%%CHANNEL_ATTRS_COUNT%% channel-specific attributes found:\n");
 		}
@@ -176,6 +180,11 @@ void CliDetailsView::setupDevice()
 	for(int i = 0; i < deviceChildrenCount; ++i) {
 		QStandardItem *deviceChild = m_contextIIOItem->child(i);
 		m_deviceIIOItem = dynamic_cast<IIOStandardItem *>(deviceChild);
+
+		// skip placeholder children (present when attributes have not been lazy-loaded yet)
+		if(!m_deviceIIOItem) {
+			continue;
+		}
 
 		if(m_deviceIIOItem->type() == IIOStandardItem::Channel) {
 			setupChannel();
