@@ -124,7 +124,7 @@ void IIOExplorerInstrument::setupUi()
 
 	m_iioModel = new IIOModel(m_context, "context0", m_treeView);
 	m_searchBar = new SearchBar(m_iioModel->getEntries(), this);
-	m_mapStack = new MapStackedWidget(details_container);
+	m_mapStack = new LazyStackedWidget(this, details_container);
 	m_watchListView = new WatchListView(watch_list);
 
 	watch_list->layout()->addWidget(m_watchListView);
@@ -143,7 +143,7 @@ void IIOExplorerInstrument::setupUi()
 	m_treeView->expand(m_proxyModel->index(0, 0));
 	m_currentlySelectedItem =
 		dynamic_cast<IIOStandardItem *>(m_iioModel->getModel()->invisibleRootItem()->child(0));
-	showOrBuildPage(m_currentlySelectedItem);
+	m_mapStack->show(m_currentlySelectedItem->path());
 
 	details_container->layout()->addWidget(m_mapStack);
 	tree_view_container->layout()->addWidget(m_searchBar);
@@ -219,45 +219,63 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 		});
 }
 
-void IIOExplorerInstrument::showOrBuildPage(IIOStandardItem *item)
+QWidget *IIOExplorerInstrument::createWidget(const QString &key)
 {
+	QStringList pathList = key.split('/', Qt::SkipEmptyParts);
+	QStandardItem *root = m_iioModel->getModel()->invisibleRootItem()->child(0);
+	IIOStandardItem *iioRoot = dynamic_cast<IIOStandardItem *>(root);
+	if(!iioRoot) {
+		qWarning(CAT_IIODEBUGGER) << "Cannot find the model root.";
+		return nullptr;
+	}
+
+	IIOStandardItem *item = findItemByPath(iioRoot, pathList);
 	if(!item) {
-		return;
+		qWarning(CAT_IIODEBUGGER) << "Could not find item for key:" << key;
+		return nullptr;
 	}
 
-	if(!m_mapStack->contains(item->path())) {
-		// Ensure the item's IIOWidgets and attribute children exist before building the page
-		m_iioModel->populateChildren(item);
+	m_iioModel->populateChildren(item);
 
-		auto *page = new DetailsPage(item, m_uri, m_mapStack);
-		m_mapStack->add(item->path(), page);
+	auto *page = new DetailsPage(item, m_uri, m_mapStack);
 
-		connect(page, &DetailsPage::pathSelected, this, [this](QString path) {
-			QStringList pathList = path.split('/', Qt::SkipEmptyParts);
-			QStandardItem *root = m_iioModel->getModel()->invisibleRootItem()->child(0);
-			IIOStandardItem *iioRoot = dynamic_cast<IIOStandardItem *>(root);
-			if(!iioRoot) {
-				qWarning(CAT_IIODEBUGGER) << "Cannot find the model root.";
-				return;
-			}
-			IIOStandardItem *foundItem = findItemByPath(iioRoot, pathList);
-			if(!foundItem) {
-				qWarning(CAT_IIODEBUGGER) << "Could not find the item with path:" << path;
-				return;
-			}
-			selectItem(foundItem);
-		});
+	connect(page, &DetailsPage::pathSelected, this, [this](QString path) {
+		QStringList pathList = path.split('/', Qt::SkipEmptyParts);
+		QStandardItem *root = m_iioModel->getModel()->invisibleRootItem()->child(0);
+		IIOStandardItem *iioRoot = dynamic_cast<IIOStandardItem *>(root);
+		if(!iioRoot) {
+			qWarning(CAT_IIODEBUGGER) << "Cannot find the model root.";
+			return;
+		}
+		IIOStandardItem *foundItem = findItemByPath(iioRoot, pathList);
+		if(!foundItem) {
+			qWarning(CAT_IIODEBUGGER) << "Could not find the item with path:" << path;
+			return;
+		}
+		selectItem(foundItem);
+	});
 
-		connect(page->readBtn(), &QPushButton::clicked, this, &IIOExplorerInstrument::onReadAllClicked);
-		connect(page->addToWatchlistBtn(), &QPushButton::clicked, this,
-			&IIOExplorerInstrument::onWatchlistToggleClicked);
+	connect(page->readBtn(), &QPushButton::clicked, this, &IIOExplorerInstrument::onReadAllClicked);
+	connect(page->addToWatchlistBtn(), &QPushButton::clicked, this,
+		&IIOExplorerInstrument::onWatchlistToggleClicked);
+
+	return page;
+}
+
+void IIOExplorerInstrument::onShow(const QString &key, QWidget *widget)
+{
+	Q_UNUSED(key)
+	m_currentDetailsPage = qobject_cast<DetailsPage *>(widget);
+	if(m_currentDetailsPage && m_currentlySelectedItem) {
+		m_currentDetailsPage->setAddToWatchlistState(!m_currentlySelectedItem->isWatched());
 	}
+}
 
-	m_mapStack->show(item->path());
-	m_currentDetailsPage = qobject_cast<DetailsPage *>(m_mapStack->get(item->path()));
-
-	if(m_currentDetailsPage) {
-		m_currentDetailsPage->setAddToWatchlistState(!item->isWatched());
+void IIOExplorerInstrument::onRemove(const QString &key, QWidget *widget)
+{
+	Q_UNUSED(key)
+	if(m_currentDetailsPage == widget) {
+		m_currentDetailsPage = nullptr;
 	}
 }
 
@@ -461,7 +479,7 @@ void IIOExplorerInstrument::applySelection(const QItemSelection &selected, const
 	m_currentlySelectedItem = iioItem;
 
 	if(iioItem) {
-		showOrBuildPage(iioItem);
+		m_mapStack->show(iioItem->path());
 		m_watchListView->currentTreeSelectionChanged(iioItem);
 	}
 }
@@ -491,7 +509,7 @@ void IIOExplorerInstrument::selectItem(IIOStandardItem *item)
 	m_currentlySelectedItem = item;
 	auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
 	recursiveExpandItem(sourceModel->invisibleRootItem(), item);
-	showOrBuildPage(item);
+	m_mapStack->show(item->path());
 }
 
 void IIOExplorerInstrument::setupCodeGeneratorWindow()

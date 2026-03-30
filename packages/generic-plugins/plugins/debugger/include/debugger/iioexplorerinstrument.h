@@ -30,7 +30,8 @@
 #include "watchlistview.h"
 #include "savecontextsetup.h"
 #include "iiodebuglogger.h"
-#include <gui/mapstackedwidget.h>
+#include <gui/lazystackedwidget.h>
+#include <gui/stackedwidgetprovider.h>
 
 #include <iio.h>
 #include <QWidget>
@@ -42,7 +43,7 @@ namespace scopy::debugger {
 
 class IIOExplorerInstrument_API;
 
-class SCOPY_DEBUGGER_EXPORT IIOExplorerInstrument : public QWidget
+class SCOPY_DEBUGGER_EXPORT IIOExplorerInstrument : public QWidget, public StackedWidgetProvider
 {
 	Q_OBJECT
 	friend class IIOExplorerInstrument_API;
@@ -64,7 +65,11 @@ private Q_SLOTS:
 private:
 	void setupUi();
 	void connectSignalsAndSlots();
-	void showOrBuildPage(IIOStandardItem *item);
+
+	// StackedWidgetProvider interface
+	QWidget *createWidget(const QString &key) override;
+	void onShow(const QString &key, QWidget *widget) override;
+	void onRemove(const QString &key, QWidget *widget) override;
 
 	// Recursive function to find an item in the source model
 	IIOStandardItem *findItemRecursive(QStandardItem *currentItem, QStandardItem *targetItem);
@@ -96,7 +101,7 @@ private:
 	QString m_uri;
 	QTreeView *m_treeView;
 	IIOModel *m_iioModel;
-	MapStackedWidget *m_mapStack;
+	LazyStackedWidget *m_mapStack;
 	DetailsPage *m_currentDetailsPage;
 	SearchBar *m_searchBar;
 	IIOSortFilterProxyModel *m_proxyModel;
