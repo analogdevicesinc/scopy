@@ -36,7 +36,7 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 TestFramework.init("FMCOMMS11 Documentation Tests");
 
 // Connect to device
-if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
+if (!TestFramework.connectToDevice("ip:10.48.69.131")) {
     printToConsole("ERROR: Cannot proceed without device connection");
     scopy.exit();
 }
@@ -265,7 +265,7 @@ TestFramework.runTest("TST.FMCOMMS11.HMC1119_GAIN", function() {
         msleep(500);
         var newAttn = fmcomms11.getInputAttenuation();
         printToConsole("  After set to -15.75 - input attenuation: " + newAttn);
-        if (newAttn !== "-15.75") {
+        if (Math.abs(parseFloat(newAttn) - (-15.75)) > 0.01) {
             printToConsole("  FAIL: Input attenuation was not applied correctly");
             fmcomms11.setInputAttenuation(originalAttn);
             msleep(500);
@@ -358,7 +358,7 @@ TestFramework.runTest("TST.FMCOMMS11.DAC_NCO_FREQUENCY", function() {
         msleep(500);
         var newNco = fmcomms11.getNcoFrequency();
         printToConsole("  After set to 100 - NCO frequency: " + newNco);
-        if (newNco !== "100") {
+        if (Math.abs(parseFloat(newNco) - 100) > 0.01) {
             printToConsole("  FAIL: NCO frequency was not applied correctly");
             fmcomms11.setNcoFrequency(originalNco);
             msleep(500);
@@ -366,15 +366,22 @@ TestFramework.runTest("TST.FMCOMMS11.DAC_NCO_FREQUENCY", function() {
         }
         printToConsole("  PASS: NCO frequency set to 100 MHz");
 
-        // Restore original
-        fmcomms11.setNcoFrequency(originalNco);
-        msleep(500);
-        var restored = fmcomms11.getNcoFrequency();
-        printToConsole("  Restored NCO frequency: " + restored);
+        // Restore original only if it was within the valid writeable range
+        // (device may boot with NCO=0 or NCO=Fs which IIO rejects as a write)
+        var originalNcoFloat = parseFloat(originalNco);
+        if (originalNcoFloat >= 1.0 && originalNcoFloat <= 5999.0) {
+            fmcomms11.setNcoFrequency(originalNco);
+            msleep(500);
+            var restored = fmcomms11.getNcoFrequency();
+            printToConsole("  Restored NCO frequency: " + restored);
+        } else {
+            printToConsole("  Skipped restore: original value " + originalNco + " MHz is outside writeable range");
+        }
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
-        if (originalNco !== "") {
+        var originalNcoFloat2 = parseFloat(originalNco);
+        if (originalNco !== "" && originalNcoFloat2 >= 1.0 && originalNcoFloat2 <= 5999.0) {
             fmcomms11.setNcoFrequency(originalNco);
             msleep(500);
         }
@@ -478,7 +485,7 @@ TestFramework.runTest("TST.FMCOMMS11.ADL5240_GAIN", function() {
         msleep(500);
         var newGain = fmcomms11.getOutputGain();
         printToConsole("  After set to 10 - output gain: " + newGain);
-        if (newGain !== "10") {
+        if (Math.abs(parseFloat(newGain) - 10) > 0.01) {
             printToConsole("  FAIL: Output gain was not applied correctly");
             fmcomms11.setOutputGain(originalGain);
             msleep(500);

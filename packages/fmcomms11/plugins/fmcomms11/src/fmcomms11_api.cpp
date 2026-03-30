@@ -114,7 +114,10 @@ void Fmcomms11_API::setAdcTestMode(const QString &value)
 
 // --- Input attenuator (HMC1119) ---
 
-QString Fmcomms11_API::getInputAttenuation() { return readFromWidget("hmc1119/voltage0_out/hardwaregain"); }
+QString Fmcomms11_API::getInputAttenuation()
+{
+	return readFromWidget("hmc1119/voltage0_out/hardwaregain").split(" ").first();
+}
 
 void Fmcomms11_API::setInputAttenuation(const QString &value)
 {
@@ -128,9 +131,16 @@ QString Fmcomms11_API::getDacSamplingFrequency()
 	return readFromWidget("axi-ad9162-hpc/altvoltage0_out/sampling_frequency");
 }
 
-QString Fmcomms11_API::getNcoFrequency() { return readFromWidget(ncoKey()); }
+QString Fmcomms11_API::getNcoFrequency()
+{
+	QString raw = readFromWidget(ncoKey());
+	return QString::number(raw.toDouble() / 1e6, 'f', 6);
+}
 
-void Fmcomms11_API::setNcoFrequency(const QString &value) { writeToWidget(ncoKey(), value); }
+void Fmcomms11_API::setNcoFrequency(const QString &value)
+{
+	writeToWidget(ncoKey(), QString::number(value.toDouble() * 1e6, 'f', 0));
+}
 
 QString Fmcomms11_API::isFir85Enabled() { return readFromWidget("axi-ad9162-hpc/fir85_enable"); }
 
@@ -138,7 +148,10 @@ void Fmcomms11_API::setFir85Enabled(const QString &value) { writeToWidget("axi-a
 
 // --- Output amplifier (ADL5240) ---
 
-QString Fmcomms11_API::getOutputGain() { return readFromWidget("adl5240/voltage0_out/hardwaregain"); }
+QString Fmcomms11_API::getOutputGain()
+{
+	return readFromWidget("adl5240/voltage0_out/hardwaregain").split(" ").first();
+}
 
 void Fmcomms11_API::setOutputGain(const QString &value) { writeToWidget("adl5240/voltage0_out/hardwaregain", value); }
 
