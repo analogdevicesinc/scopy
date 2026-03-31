@@ -88,10 +88,16 @@ QWidget *ClgcSettingsWidget::createClgcSettingsSection(QWidget *parent)
 	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
+	// Signed 16-bit conversion lambdas (matches original SPINBUTTON_S16: (short)val cast)
+	auto s16DataToUI = [](QString data) { return QString::number((qint16)data.toLongLong()); };
+	auto s16UItoData = [](QString data) { return QString::number((quint16)(qint16)data.toInt()); };
+
 	// CLGC TX1 Desired Gain - RangeUi [-32768,32767,1] (signed 16-bit)
 	auto clgcTx1DesiredGainWidget = Ad9371WidgetFactory::createDebugRangeWidget(
-		m_device, "adi,clgc-tx1-desired-gain", "[0 1 65535]", "CLGC TX1 Desired Gain", this);
+		m_device, "adi,clgc-tx1-desired-gain", "[-32768 1 32767]", "CLGC TX1 Desired Gain", this);
 	if(clgcTx1DesiredGainWidget) {
+		clgcTx1DesiredGainWidget->setDataToUIConversion(s16DataToUI);
+		clgcTx1DesiredGainWidget->setUItoDataConversion(s16UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(clgcTx1DesiredGainWidget);
 		layout->addWidget(clgcTx1DesiredGainWidget);
@@ -101,8 +107,10 @@ QWidget *ClgcSettingsWidget::createClgcSettingsSection(QWidget *parent)
 
 	// CLGC TX2 Desired Gain - RangeUi [-32768,32767,1] (signed 16-bit)
 	auto clgcTx2DesiredGainWidget = Ad9371WidgetFactory::createDebugRangeWidget(
-		m_device, "adi,clgc-tx2-desired-gain", "[0 1 65535]", "CLGC TX2 Desired Gain", this);
+		m_device, "adi,clgc-tx2-desired-gain", "[-32768 1 32767]", "CLGC TX2 Desired Gain", this);
 	if(clgcTx2DesiredGainWidget) {
+		clgcTx2DesiredGainWidget->setDataToUIConversion(s16DataToUI);
+		clgcTx2DesiredGainWidget->setUItoDataConversion(s16UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(clgcTx2DesiredGainWidget);
 		layout->addWidget(clgcTx2DesiredGainWidget);
@@ -178,8 +186,10 @@ QWidget *ClgcSettingsWidget::createClgcSettingsSection(QWidget *parent)
 
 	// CLGC Additional Delay Offset - RangeUi [-32768,32767,1] (signed 16-bit)
 	auto clgcDelayOffsetWidget = Ad9371WidgetFactory::createDebugRangeWidget(
-		m_device, "adi,clgc-additional-delay-offset", "[0 1 65535]", "CLGC Additional Delay Offset", this);
+		m_device, "adi,clgc-additional-delay-offset", "[-32768 1 32767]", "CLGC Additional Delay Offset", this);
 	if(clgcDelayOffsetWidget) {
+		clgcDelayOffsetWidget->setDataToUIConversion(s16DataToUI);
+		clgcDelayOffsetWidget->setUItoDataConversion(s16UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(clgcDelayOffsetWidget);
 		layout->addWidget(clgcDelayOffsetWidget);
