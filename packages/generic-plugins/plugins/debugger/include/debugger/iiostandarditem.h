@@ -105,6 +105,9 @@ public:
 	bool childrenLoaded() const;
 	void setChildrenLoaded(bool loaded);
 
+	struct iio_context *context() const;
+	void setContext(struct iio_context *ctx);
+
 	struct iio_device *device() const;
 	struct iio_channel *channel() const;
 
@@ -127,6 +130,7 @@ private:
 	void extractDataFromDevice();
 	void extractDataFromChannel();
 
+	struct iio_context *m_context;
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;
 	QList<IIOWidget *> m_iioWidgets;
