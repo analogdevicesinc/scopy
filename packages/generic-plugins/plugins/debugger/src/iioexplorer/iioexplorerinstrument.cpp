@@ -146,6 +146,7 @@ void IIOExplorerInstrument::setupUi()
 	m_treeView->expand(m_proxyModel->index(0, 0));
 	m_currentlySelectedItem =
 		dynamic_cast<IIOStandardItem *>(m_iioModel->getModel()->invisibleRootItem()->child(0));
+	m_iioModel->populateChildren(m_currentlySelectedItem);
 	m_detailsView->setIIOStandardItem(m_currentlySelectedItem);
 
 	details_container->layout()->addWidget(m_detailsView);
@@ -181,19 +182,6 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 
 	QObject::connect(m_treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
 			 &IIOExplorerInstrument::applySelection);
-
-	// Lazy-load attribute children when the user expands a device or channel node
-	QObject::connect(m_treeView, &QTreeView::expanded, this, [this](const QModelIndex &proxyIndex) {
-		QModelIndex srcIdx = m_proxyModel->mapToSource(proxyIndex);
-		auto *sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
-		if(!sourceModel) {
-			return;
-		}
-		auto *iioItem = dynamic_cast<IIOStandardItem *>(sourceModel->itemFromIndex(srcIdx));
-		if(iioItem) {
-			m_iioModel->populateChildren(iioItem);
-		}
-	});
 
 	QObject::connect(m_watchListView, &WatchListView::selectedItem, this, &IIOExplorerInstrument::selectItem);
 
@@ -264,7 +252,6 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 					     returnCode < 0 ? "FAILURE " + QString::number(returnCode) : "SUCCESS",
 					     path, oldValue.isEmpty() || isRead ? "" : oldValue + " -> ", newValue);
 			m_debugLogger->appendLog(logMessage);
-			m_detailsView->refreshIIOView();
 		});
 
 	QObject::connect(m_detailsView, &DetailsView::pathSelected, this, [&](QString path) {
@@ -403,6 +390,9 @@ IIOStandardItem *IIOExplorerInstrument::findItemByPath(IIOStandardItem *currentI
 			return currentItem;
 		}
 
+		// Populate this node if needed so attribute children exist for traversal
+		m_iioModel->populateChildren(currentItem);
+
 		// Check the children recursively for the next segment
 		for(int i = 0; i < currentItem->rowCount(); ++i) {
 			IIOStandardItem *child = dynamic_cast<IIOStandardItem *>(currentItem->child(i));
@@ -477,6 +467,7 @@ void IIOExplorerInstrument::selectItem(IIOStandardItem *item)
 	m_currentlySelectedItem = item;
 	auto sourceModel = qobject_cast<QStandardItemModel *>(m_proxyModel->sourceModel());
 	recursiveExpandItem(sourceModel->invisibleRootItem(), item);
+	m_iioModel->populateChildren(item);
 	m_detailsView->setIIOStandardItem(item);
 }
 

@@ -24,6 +24,8 @@
 
 #include <QWidget>
 #include <QTextBrowser>
+#include <QFutureWatcher>
+#include <iio.h>
 #include "iiostandarditem.h"
 
 namespace scopy::debugger {
@@ -35,38 +37,24 @@ public:
 	void setIIOStandardItem(IIOStandardItem *item);
 	void refreshView();
 
-Q_SIGNALS:
-	void addToWatchlist(IIOStandardItem *item);
-	void removeFromWatchlist(IIOStandardItem *item);
-
 private:
 	void setupUi();
-	void setupChannelAttr();
-	void setupChannel();
-	void setupDeviceAttr();
-	void setupDevice();
-	void setupContextAttr();
-	void setupContext();
+	QString buildText(IIOStandardItem *item);
 
-	QString tabs(int level);
+	void appendContextInfo(struct iio_context *ctx, QString &text, int globalLevel);
+	void appendDeviceInfo(struct iio_device *dev, QString &text, int globalLevel);
+	void appendChannelInfo(struct iio_channel *ch, QString &text, int globalLevel);
+
+	QString readDeviceAttr(struct iio_device *dev, const char *attr, bool isDebug);
+	QString readChannelAttr(struct iio_channel *ch, const char *attr);
+	QString channelFormatString(struct iio_channel *ch);
+	QString triggerStatusString(struct iio_device *dev);
+
+	static QString tabs(int level, int globalLevel);
 
 	IIOStandardItem *m_currentItem;
 	QTextBrowser *m_textBrowser;
-
-	// used for creating the iio info view
-	IIOStandardItem *m_channelIIOItem;
-	IIOStandardItem *m_deviceIIOItem;
-	IIOStandardItem *m_contextIIOItem;
-
-	QString m_currentText;
-	QString m_deviceAttrsString;
-
-	int m_noCtxAttributes;
-	int m_noDevices;
-	int m_noDevAttributes;
-	int m_noChannels;
-	int m_noChnlAttributes;
-	int m_globalLevel;
+	bool m_includeDebugAttrs;
 };
 } // namespace scopy::debugger
 
