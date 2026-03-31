@@ -22,6 +22,9 @@
 #include "advanced/clksettingswidget.h"
 #include "advanced/calibrationwidget.h"
 #include "advanced/txsettingswidget.h"
+#include "advanced/dpdsettingswidget.h"
+#include "advanced/clgcsettingswidget.h"
+#include "advanced/vswrsettingswidget.h"
 #include "advanced/rxsettingswidget.h"
 #include "advanced/obssettingswidget.h"
 #include "advanced/gainsetupwidget.h"
@@ -179,6 +182,26 @@ void Ad9371Advanced::createNavigationButtons()
 	m_bistBtn->setCheckable(true);
 	m_bistBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
+	// DPD/CLGC/VSWR are AD9375-only features
+	bool hasDpd = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+
+	if(hasDpd) {
+		m_dpdSettingsBtn = new QPushButton("DPD Settings", this);
+		Style::setStyle(m_dpdSettingsBtn, style::properties::button::blueGrayButton);
+		m_dpdSettingsBtn->setCheckable(true);
+		m_dpdSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
+		m_clgcSettingsBtn = new QPushButton("CLGC Settings", this);
+		Style::setStyle(m_clgcSettingsBtn, style::properties::button::blueGrayButton);
+		m_clgcSettingsBtn->setCheckable(true);
+		m_clgcSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
+		m_vswrSettingsBtn = new QPushButton("VSWR Settings", this);
+		Style::setStyle(m_vswrSettingsBtn, style::properties::button::blueGrayButton);
+		m_vswrSettingsBtn->setCheckable(true);
+		m_vswrSettingsBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+	}
+
 	// Add buttons to button group
 	navigationButtons->addButton(m_clkSettingsBtn);
 	navigationButtons->addButton(m_calibrationsBtn);
@@ -193,6 +216,12 @@ void Ad9371Advanced::createNavigationButtons()
 	navigationButtons->addButton(m_jesdFramerBtn);
 	navigationButtons->addButton(m_jesdDeframerBtn);
 	navigationButtons->addButton(m_bistBtn);
+	if(m_dpdSettingsBtn)
+		navigationButtons->addButton(m_dpdSettingsBtn);
+	if(m_clgcSettingsBtn)
+		navigationButtons->addButton(m_clgcSettingsBtn);
+	if(m_vswrSettingsBtn)
+		navigationButtons->addButton(m_vswrSettingsBtn);
 
 	// Create main navigation widget with vertical layout for rows
 	QWidget *navigationWidget = new QWidget(this);
@@ -242,8 +271,16 @@ void Ad9371Advanced::createNavigationButtons()
 	connect(m_jesdDeframerBtn, &QPushButton::clicked, this,
 		[this]() { m_centralWidget->setCurrentWidget(m_jesdDeframer); });
 	connect(m_bistBtn, &QPushButton::clicked, this, [this]() { m_centralWidget->setCurrentWidget(m_bist); });
+	if(m_dpdSettingsBtn)
+		connect(m_dpdSettingsBtn, &QPushButton::clicked, this,
+			[this]() { m_centralWidget->setCurrentWidget(m_dpdSettings); });
+	if(m_clgcSettingsBtn)
+		connect(m_clgcSettingsBtn, &QPushButton::clicked, this,
+			[this]() { m_centralWidget->setCurrentWidget(m_clgcSettings); });
+	if(m_vswrSettingsBtn)
+		connect(m_vswrSettingsBtn, &QPushButton::clicked, this,
+			[this]() { m_centralWidget->setCurrentWidget(m_vswrSettings); });
 }
-
 
 void Ad9371Advanced::createContentWidgets()
 {
@@ -260,6 +297,14 @@ void Ad9371Advanced::createContentWidgets()
 	m_jesdFramer = new JesdFramerWidget(m_device, m_widgetGroup, this);
 	m_jesdDeframer = new JesdDeframerWidget(m_device, m_widgetGroup, this);
 	m_bist = new BistWidget(m_device, m_widgetGroup, this);
+	// DPD/CLGC/VSWR are AD9375-only features
+	bool hasDpd = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+	if(hasDpd) {
+		m_dpdSettings = new DpdSettingsWidget(m_device, m_widgetGroup, this);
+		m_clgcSettings = new ClgcSettingsWidget(m_device, m_widgetGroup, this);
+		m_vswrSettings = new VswrSettingsWidget(m_device, m_widgetGroup, this);
+	}
+
 	// Connect refresh signals
 	if(m_clkSettings)
 		connect(this, &Ad9371Advanced::readRequested, m_clkSettings, &ClkSettingsWidget::readRequested);
@@ -287,6 +332,12 @@ void Ad9371Advanced::createContentWidgets()
 		connect(this, &Ad9371Advanced::readRequested, m_jesdDeframer, &JesdDeframerWidget::readRequested);
 	if(m_bist)
 		connect(this, &Ad9371Advanced::readRequested, m_bist, &BistWidget::readRequested);
+	if(m_dpdSettings)
+		connect(this, &Ad9371Advanced::readRequested, m_dpdSettings, &DpdSettingsWidget::readRequested);
+	if(m_clgcSettings)
+		connect(this, &Ad9371Advanced::readRequested, m_clgcSettings, &ClgcSettingsWidget::readRequested);
+	if(m_vswrSettings)
+		connect(this, &Ad9371Advanced::readRequested, m_vswrSettings, &VswrSettingsWidget::readRequested);
 
 	// Add all widgets to stacked widget
 	m_centralWidget->addWidget(m_clkSettings);
@@ -302,6 +353,12 @@ void Ad9371Advanced::createContentWidgets()
 	m_centralWidget->addWidget(m_jesdFramer);
 	m_centralWidget->addWidget(m_jesdDeframer);
 	m_centralWidget->addWidget(m_bist);
+	if(m_dpdSettings)
+		m_centralWidget->addWidget(m_dpdSettings);
+	if(m_clgcSettings)
+		m_centralWidget->addWidget(m_clgcSettings);
+	if(m_vswrSettings)
+		m_centralWidget->addWidget(m_vswrSettings);
 }
 
 void Ad9371Advanced::switchToSection(const QString &name)
@@ -309,7 +366,7 @@ void Ad9371Advanced::switchToSection(const QString &name)
 	QList<QPushButton *> buttons = {m_clkSettingsBtn, m_calibrationsBtn, m_txSettingsBtn,	m_rxSettingsBtn,
 					m_obsSettingsBtn, m_gainSetupBtn,    m_agcSetupBtn,	m_armGpioBtn,
 					m_gpioBtn,	  m_auxDacBtn,	     m_jesdFramerBtn,	m_jesdDeframerBtn,
-					m_bistBtn};
+					m_bistBtn,	  m_dpdSettingsBtn,  m_clgcSettingsBtn, m_vswrSettingsBtn};
 
 	for(QPushButton *btn : buttons) {
 		if(btn && btn->text() == name) {
@@ -326,7 +383,7 @@ QStringList Ad9371Advanced::getSections() const
 	QList<QPushButton *> buttons = {m_clkSettingsBtn, m_calibrationsBtn, m_txSettingsBtn,	m_rxSettingsBtn,
 					m_obsSettingsBtn, m_gainSetupBtn,    m_agcSetupBtn,	m_armGpioBtn,
 					m_gpioBtn,	  m_auxDacBtn,	     m_jesdFramerBtn,	m_jesdDeframerBtn,
-					m_bistBtn};
+					m_bistBtn,	  m_dpdSettingsBtn,  m_clgcSettingsBtn, m_vswrSettingsBtn};
 
 	for(QPushButton *btn : buttons) {
 		if(btn)
@@ -346,6 +403,12 @@ void Ad9371Advanced::updateNavigationButtonsLayout()
 					   m_obsSettingsBtn, m_gainSetupBtn,	m_agcSetupBtn,	 m_armGpioBtn,
 					   m_gpioBtn,	     m_auxDacBtn,	m_jesdFramerBtn, m_jesdDeframerBtn,
 					   m_bistBtn};
+	if(m_dpdSettingsBtn)
+		allButtons.append(m_dpdSettingsBtn);
+	if(m_clgcSettingsBtn)
+		allButtons.append(m_clgcSettingsBtn);
+	if(m_vswrSettingsBtn)
+		allButtons.append(m_vswrSettingsBtn);
 
 	QList<QPushButton *> firstRowButtons;
 	QList<QPushButton *> remainingButtons;

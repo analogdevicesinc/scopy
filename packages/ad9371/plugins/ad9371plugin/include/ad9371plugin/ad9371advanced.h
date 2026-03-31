@@ -89,6 +89,9 @@ private:
 	QPushButton *m_jesdFramerBtn = nullptr;
 	QPushButton *m_jesdDeframerBtn = nullptr;
 	QPushButton *m_bistBtn = nullptr;
+	QPushButton *m_dpdSettingsBtn = nullptr;
+	QPushButton *m_clgcSettingsBtn = nullptr;
+	QPushButton *m_vswrSettingsBtn = nullptr;
 
 	// Navigation layout widgets
 	QWidget *m_firstRow = nullptr;
@@ -111,6 +114,9 @@ private:
 	JesdFramerWidget *m_jesdFramer = nullptr;
 	JesdDeframerWidget *m_jesdDeframer = nullptr;
 	BistWidget *m_bist = nullptr;
+	DpdSettingsWidget *m_dpdSettings = nullptr;
+	ClgcSettingsWidget *m_clgcSettings = nullptr;
+	VswrSettingsWidget *m_vswrSettings = nullptr;
 
 	void setupUi();
 	void createNavigationButtons();
