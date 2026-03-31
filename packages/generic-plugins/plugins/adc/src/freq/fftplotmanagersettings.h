@@ -103,7 +103,7 @@ private Q_SLOTS:
 private:
 	FFTPlotManager *m_plotManager;
 
-	void updateXMode(int mode, PlotAxis *axis);
+	void updateXMode(int mode, PlotAxis *fftAxis, PlotAxis *waterfallAxis);
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);

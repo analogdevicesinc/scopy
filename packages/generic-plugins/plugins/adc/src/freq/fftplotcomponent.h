@@ -42,6 +42,7 @@
 #include <gui/docking/dockableareainterface.h>
 #include <gui/docking/dockwrapperinterface.h>
 #include <gui/waterfallplotwidget.h>
+#include <gui/cursorcontroller.h>
 
 
 namespace scopy {
@@ -72,6 +73,8 @@ public:
 	FFTSamplingInfo *fftPlotInfo() const;
 	PlotLegend *legend() const;
 
+	CursorController *waterfallCursor() const;
+
 private:
 	PlotWidget *m_fftPlot;
 	WaterfallPlotWidget *m_waterfallPlot;
@@ -83,6 +86,8 @@ private:
 	DockWrapperInterface *m_fftDockWrapper;
 	DockWrapperInterface *m_waterfallDockWrapper;
 	PlotLegend *m_legend;
+
+	CursorController *m_waterfallCursor;
 
 	FFTPlotComponentSettings *m_plotMenu;
 };
