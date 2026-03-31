@@ -20,78 +20,102 @@
  */
 
 #include "clidetailsview.h"
-#include "debuggerloggingcategories.h"
-#include <gui/style.h>
-#include "style_properties.h"
+#include <QVBoxLayout>
+#include <QtConcurrent/QtConcurrentRun>
+#include <pluginbase/preferences.h>
+
+#define ATTR_BUFFER_SIZE 16384
 
 using namespace scopy::debugger;
 
 CliDetailsView::CliDetailsView(QWidget *parent)
 	: QWidget(parent)
 	, m_textBrowser(new QTextBrowser(this))
-	, m_currentText(QString())
-	, m_noCtxAttributes(0)
-	, m_noDevices(0)
-	, m_noDevAttributes(0)
-	, m_noChannels(0)
-	, m_noChnlAttributes(0)
+	, m_currentItem(nullptr)
+	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
 {
 	setupUi();
 }
 
 void CliDetailsView::setIIOStandardItem(IIOStandardItem *item)
 {
-	// TODO: add validation (big time)
 	m_currentItem = item;
-	m_currentText.clear();
-	m_deviceAttrsString.clear();
-	m_noCtxAttributes = 0;
-	m_noDevices = 0;
-	m_noDevAttributes = 0;
-	m_noChannels = 0;
-	m_noChnlAttributes = 0;
+	m_textBrowser->setText("Loading...");
 
-	switch(m_currentItem->type()) {
+	QFutureWatcher<QString> *watcher = new QFutureWatcher<QString>(this);
+	connect(watcher, &QFutureWatcher<QString>::finished, this, [this, watcher, item]() {
+		if(m_currentItem == item) {
+			m_textBrowser->setText(watcher->result());
+		}
+		watcher->deleteLater();
+	});
+
+	QFuture<QString> future = QtConcurrent::run([this, item]() { return buildText(item); });
+	watcher->setFuture(future);
+}
+
+void CliDetailsView::refreshView() { setIIOStandardItem(m_currentItem); }
+
+QString CliDetailsView::buildText(IIOStandardItem *item)
+{
+	QString text;
+	int globalLevel = 0;
+
+	switch(item->type()) {
 	case IIOStandardItem::Context:
-		m_globalLevel = 0;
-		setupContext();
+		globalLevel = 0;
+		appendContextInfo(item->context(), text, globalLevel);
 		break;
-	case IIOStandardItem::ContextAttribute:
-		m_globalLevel = 1;
-		m_contextIIOItem = item;
-		setupContextAttr();
+	case IIOStandardItem::ContextAttribute: {
+		struct iio_context *ctx = item->context();
+		if(ctx) {
+			uint count = iio_context_get_attrs_count(ctx);
+			for(uint i = 0; i < count; ++i) {
+				const char *name;
+				const char *value;
+				if(iio_context_get_attr(ctx, i, &name, &value) == 0 && item->name() == QString(name)) {
+					text.append(QString("%1: %2\n").arg(name).arg(value));
+					break;
+				}
+			}
+		}
 		break;
+	}
 	case IIOStandardItem::Device:
 		/* fallthrough */
 	case IIOStandardItem::Trigger:
-		m_globalLevel = 1;
-		m_contextIIOItem = item;
-		setupDevice();
+		globalLevel = 1;
+		appendDeviceInfo(item->device(), text, globalLevel);
 		break;
-	case IIOStandardItem::DeviceAttribute:
-		m_globalLevel = 4;
-		m_deviceIIOItem = item;
-		setupDeviceAttr();
-		m_currentText = m_deviceAttrsString;
+	case IIOStandardItem::DeviceAttribute: {
+		struct iio_device *dev = item->device();
+		if(dev) {
+			QString val = readDeviceAttr(dev, item->name().toStdString().c_str(), false);
+			if(val.isEmpty()) {
+				val = readDeviceAttr(dev, item->name().toStdString().c_str(), true);
+			}
+			text.append(QString("attr 0: %1 value: %2\n").arg(item->name()).arg(val));
+		}
 		break;
+	}
 	case IIOStandardItem::Channel:
-		m_globalLevel = 3;
-		m_deviceIIOItem = item;
-		setupChannel();
+		globalLevel = 3;
+		appendChannelInfo(item->channel(), text, globalLevel);
 		break;
-	case IIOStandardItem::ChannelAttribute:
-		m_globalLevel = 4;
-		m_channelIIOItem = item;
-		setupChannelAttr();
+	case IIOStandardItem::ChannelAttribute: {
+		struct iio_channel *ch = item->channel();
+		if(ch) {
+			QString val = readChannelAttr(ch, item->name().toStdString().c_str());
+			text.append(QString("attr 0: %1 value: %2\n").arg(item->name()).arg(val));
+		}
 		break;
+	}
 	default:
 		break;
 	}
 
-	m_textBrowser->setText(m_currentText);
+	return text;
 }
-
-void CliDetailsView::refreshView() { setIIOStandardItem(m_currentItem); }
 
 void CliDetailsView::setupUi()
 {
@@ -105,163 +129,208 @@ void CliDetailsView::setupUi()
 	m_textBrowser->setFont(mono);
 }
 
-void CliDetailsView::setupChannelAttr()
+void CliDetailsView::appendContextInfo(struct iio_context *ctx, QString &text, int globalLevel)
 {
-	IIOWidget *w = m_channelIIOItem->getIIOWidgets().at(0);
-	DataStrategyInterface *ds = w->getDataStrategy();
+	if(!ctx) {
+		return;
+	}
 
-	m_currentText.append(tabs(4) + "attr " + QString::number(m_noChnlAttributes) + ": " + m_channelIIOItem->name() +
-			     " value: " + ds->data() + "\n");
-	++m_noChnlAttributes;
-	QString channelOptData = ds->optionalData();
-	if(!channelOptData.isEmpty()) {
-		m_currentText.append(tabs(4) + "attr " + QString::number(m_noChnlAttributes) + ": " +
-				     w->getRecipe().iioDataOptions + " value: " + channelOptData + "\n");
-		++m_noChnlAttributes;
+	uint ctxAttrCount = iio_context_get_attrs_count(ctx);
+	text.append(QString("IIO context has %1 attributes:\n").arg(ctxAttrCount));
+	for(uint i = 0; i < ctxAttrCount; ++i) {
+		const char *name;
+		const char *value;
+		if(iio_context_get_attr(ctx, i, &name, &value) == 0) {
+			text.append(tabs(1, globalLevel) + QString("%1: %2\n").arg(name).arg(value));
+		}
+	}
+
+	uint devCount = iio_context_get_devices_count(ctx);
+	text.append(QString("IIO context has %1 devices:\n").arg(devCount));
+	for(uint i = 0; i < devCount; ++i) {
+		struct iio_device *dev = iio_context_get_device(ctx, i);
+		appendDeviceInfo(dev, text, globalLevel);
 	}
 }
 
-void CliDetailsView::setupChannel()
+void CliDetailsView::appendDeviceInfo(struct iio_device *dev, QString &text, int globalLevel)
 {
-	++m_noChannels;
-	m_currentText.append(
-		tabs(3) + m_deviceIIOItem->text() + ": (" + (m_deviceIIOItem->isOutput() ? "output" : "input") +
-		(m_deviceIIOItem->isScanElement() ? ", index: " + QString::number(m_deviceIIOItem->index()) +
-				 ", format: " + m_deviceIIOItem->format()
-						  : "") +
-		")\n");
-
-	int channelChildrenCount = m_deviceIIOItem->rowCount();
-	for(int i = 0; i < channelChildrenCount; ++i) {
-		QStandardItem *channelChild = m_deviceIIOItem->child(i);
-		m_channelIIOItem = dynamic_cast<IIOStandardItem *>(channelChild);
-
-		// Skip placeholder items inserted by lazy loading (not yet populated)
-		if(!m_channelIIOItem) {
-			continue;
-		}
-
-		// the item is for sure a ChannelAttribute
-		if(m_noChnlAttributes == 0) {
-			m_currentText.append(tabs(3) + "%%CHANNEL_ATTRS_COUNT%% channel-specific attributes found:\n");
-		}
-		setupChannelAttr();
+	if(!dev) {
+		return;
 	}
-	m_currentText.replace("%%CHANNEL_ATTRS_COUNT%%", QString::number(m_noChnlAttributes));
-	m_noChnlAttributes = 0;
-}
 
-void CliDetailsView::setupDeviceAttr()
-{
-	IIOWidget *w = m_deviceIIOItem->getIIOWidgets().at(0);
-	DataStrategyInterface *ds = w->getDataStrategy();
-
-	m_deviceAttrsString.append(tabs(4) + "attr " + QString::number(m_noDevAttributes) + ": " +
-				   m_deviceIIOItem->name() + " value: " + ds->data() + "\n");
-	++m_noDevAttributes;
-
-	QString deviceOptData = ds->optionalData();
-	if(!deviceOptData.isEmpty()) {
-		m_deviceAttrsString.append(tabs(4) + "attr " + QString::number(m_noDevAttributes) + ": " +
-					   w->getRecipe().iioDataOptions + " value: " + deviceOptData + "\n");
-		++m_noDevAttributes;
+	QString devName = iio_device_get_name(dev);
+	QString devLabel = iio_device_get_label(dev);
+	QString devId = iio_device_get_id(dev);
+	if(!devLabel.isEmpty()) {
+		devName = devLabel;
 	}
-}
+	if(devName.isEmpty()) {
+		devName = devId;
+	}
+	QString displayName = devId + ": " + devName;
 
-void CliDetailsView::setupDevice()
-{
-	++m_noDevices;
-	m_currentText.append(tabs(1) + m_contextIIOItem->text() +
-			     ((m_contextIIOItem->isBufferCapable()) ? " (buffer capable)" : "") + "\n");
-
-	int deviceChildrenCount = m_contextIIOItem->rowCount();
-	m_currentText.append(tabs(2) + "%%CHANNELS_COUNT%% channels found:\n");
-
-	m_deviceAttrsString = "";
-	for(int i = 0; i < deviceChildrenCount; ++i) {
-		QStandardItem *deviceChild = m_contextIIOItem->child(i);
-		m_deviceIIOItem = dynamic_cast<IIOStandardItem *>(deviceChild);
-
-		if(!m_deviceIIOItem) {
-			continue;
+	bool bufferCapable = false;
+	uint chCount = iio_device_get_channels_count(dev);
+	for(uint i = 0; i < chCount; ++i) {
+		if(iio_channel_is_scan_element(iio_device_get_channel(dev, i))) {
+			bufferCapable = true;
+			break;
 		}
+	}
 
-		if(m_deviceIIOItem->type() == IIOStandardItem::Channel) {
-			setupChannel();
-		} else if(m_deviceIIOItem->type() == IIOStandardItem::DeviceAttribute) {
+	text.append(tabs(1, globalLevel) + displayName + (bufferCapable ? " (buffer capable)" : "") + "\n");
 
-			if(m_noDevAttributes == 0) {
-				m_deviceAttrsString.append(tabs(2) +
-							   "%%DEV_ATTRS_COUNT%% device-specific attributes found:\n");
+	// Channels
+	text.append(tabs(2, globalLevel) + QString("%1 channels found:\n").arg(chCount));
+	for(uint i = 0; i < chCount; ++i) {
+		struct iio_channel *ch = iio_device_get_channel(dev, i);
+		appendChannelInfo(ch, text, globalLevel);
+	}
+
+	// Device attributes
+	uint devAttrCount = iio_device_get_attrs_count(dev);
+	if(devAttrCount > 0) {
+		text.append(tabs(2, globalLevel) + QString("%1 device-specific attributes found:\n").arg(devAttrCount));
+		for(uint i = 0; i < devAttrCount; ++i) {
+			const char *attr = iio_device_get_attr(dev, i);
+			if(!attr) {
+				continue;
 			}
-
-			setupDeviceAttr();
-		} else {
-			qWarning(CAT_DETAILSVIEW)
-				<< "Error when setting up the device, the type is not Channel nor DeviceAttribute";
+			QString val = readDeviceAttr(dev, attr, false);
+			text.append(tabs(4, globalLevel) +
+				    QString("attr %1: %2 value: %3\n").arg(i).arg(attr).arg(val));
 		}
 	}
-	m_currentText.append(m_deviceAttrsString);
-	m_currentText.append(tabs(2) + m_contextIIOItem->triggerStatus() + "\n");
 
-	m_currentText.replace("%%CHANNELS_COUNT%%", QString::number(m_noChannels));
-	m_noChannels = 0;
-
-	m_currentText.replace("%%DEV_ATTRS_COUNT%%", QString::number(m_noDevAttributes));
-	m_noDevAttributes = 0;
-}
-
-void CliDetailsView::setupContextAttr()
-{
-	++m_noCtxAttributes;
-	m_currentText.append(tabs(1) + m_contextIIOItem->name() + ": " +
-			     m_contextIIOItem->getIIOWidgets().at(0)->getDataStrategy()->data() + "\n");
-}
-
-void CliDetailsView::setupContext()
-{
-	m_currentText.append("IIO context has %%CTX_ATTRS%% attributes:\n");
-	int childrenCount = m_currentItem->rowCount();
-	for(int i = 0; i < childrenCount; ++i) {
-		QStandardItem *child = m_currentItem->child(i);
-		m_contextIIOItem = dynamic_cast<IIOStandardItem *>(child);
-
-		if(!m_contextIIOItem) {
-			continue;
-		}
-
-		// we consider that the list of children is divided in 2 sections: the
-		// attributes and the devices/triggers and they cannot be interleaved
-		if(m_contextIIOItem->type() == IIOStandardItem::ContextAttribute) {
-			setupContextAttr();
-		} else if(m_contextIIOItem->type() == IIOStandardItem::Device ||
-			  m_contextIIOItem->type() == IIOStandardItem::Trigger) {
-			if(m_noDevices == 0) {
-				m_currentText.append("IIO context has %%DEVICES_COUNT%% devices:\n");
+	// Debug attributes
+	if(m_includeDebugAttrs) {
+		uint dbgAttrCount = iio_device_get_debug_attrs_count(dev);
+		if(dbgAttrCount > 0) {
+			text.append(tabs(2, globalLevel) + QString("%1 debug attributes found:\n").arg(dbgAttrCount));
+			for(uint i = 0; i < dbgAttrCount; ++i) {
+				const char *attr = iio_device_get_debug_attr(dev, i);
+				if(!attr) {
+					continue;
+				}
+				QString val = readDeviceAttr(dev, attr, true);
+				text.append(tabs(4, globalLevel) +
+					    QString("attr %1: %2 value: %3\n").arg(i).arg(attr).arg(val));
 			}
-			setupDevice();
 		}
 	}
-	m_currentText.replace("%%CTX_ATTRS%%", QString::number(m_noCtxAttributes));
-	m_currentText.replace("%%DEVICES_COUNT%%", QString::number(m_noDevices));
+
+	// Trigger status
+	text.append(tabs(2, globalLevel) + triggerStatusString(dev) + "\n");
 }
 
-QString CliDetailsView::tabs(int level)
+void CliDetailsView::appendChannelInfo(struct iio_channel *ch, QString &text, int globalLevel)
 {
-	switch(level - m_globalLevel) {
-	case 0:
-		return "";
-	case 1:
-		return "\t";
-	case 2:
-		return "\t\t";
-	case 3:
-		return "\t\t\t";
-	case 4:
-		return "\t\t\t\t";
-	default:
-		return "";
+	if(!ch) {
+		return;
 	}
+
+	QString chId = iio_channel_get_id(ch);
+	const char *chNameCStr = iio_channel_get_name(ch);
+	QString chName = chNameCStr ? chNameCStr : "";
+	QString display = !chName.isEmpty() ? (chId + ": " + chName) : chId;
+
+	bool isOutput = iio_channel_is_output(ch);
+	bool isScanElement = iio_channel_is_scan_element(ch);
+
+	text.append(tabs(3, globalLevel) + display + ": (" + (isOutput ? "output" : "input"));
+	if(isScanElement) {
+		text.append(
+			QString(", index: %1, format: %2").arg(iio_channel_get_index(ch)).arg(channelFormatString(ch)));
+	}
+	text.append(")\n");
+
+	// Channel attributes
+	uint chAttrCount = iio_channel_get_attrs_count(ch);
+	if(chAttrCount > 0) {
+		text.append(tabs(3, globalLevel) + QString("%1 channel-specific attributes found:\n").arg(chAttrCount));
+		for(uint i = 0; i < chAttrCount; ++i) {
+			const char *attr = iio_channel_get_attr(ch, i);
+			if(!attr) {
+				continue;
+			}
+			QString val = readChannelAttr(ch, attr);
+			text.append(tabs(4, globalLevel) +
+				    QString("attr %1: %2 value: %3\n").arg(i).arg(attr).arg(val));
+		}
+	}
+}
+
+QString CliDetailsView::readDeviceAttr(struct iio_device *dev, const char *attr, bool isDebug)
+{
+	char buf[ATTR_BUFFER_SIZE] = {0};
+	ssize_t ret;
+	if(isDebug) {
+		ret = iio_device_debug_attr_read(dev, attr, buf, sizeof(buf));
+	} else {
+		ret = iio_device_attr_read(dev, attr, buf, sizeof(buf));
+	}
+	return (ret >= 0) ? QString(buf) : QString("ERROR (%1)").arg(ret);
+}
+
+QString CliDetailsView::readChannelAttr(struct iio_channel *ch, const char *attr)
+{
+	char buf[ATTR_BUFFER_SIZE] = {0};
+	ssize_t ret = iio_channel_attr_read(ch, attr, buf, sizeof(buf));
+	return (ret >= 0) ? QString(buf) : QString("ERROR (%1)").arg(ret);
+}
+
+QString CliDetailsView::channelFormatString(struct iio_channel *ch)
+{
+	const struct iio_data_format *format = iio_channel_get_data_format(ch);
+	char sign = format->is_signed ? 's' : 'u';
+	char repeat[12];
+	repeat[0] = '\0';
+
+	if(format->is_fully_defined) {
+		sign += 'A' - 'a';
+	}
+
+	if(format->repeat > 1) {
+		snprintf(repeat, sizeof(repeat), "X%u", format->repeat);
+	}
+
+	return QString("%1e:%2%3/%4%5>>%6")
+		.arg(format->is_be ? 'b' : 'l')
+		.arg(sign)
+		.arg(format->bits)
+		.arg(format->length)
+		.arg(repeat)
+		.arg(format->shift);
+}
+
+QString CliDetailsView::triggerStatusString(struct iio_device *dev)
+{
+	const struct iio_device *trig;
+	int ret = iio_device_get_trigger(dev, &trig);
+	if(ret == 0) {
+		if(trig) {
+			QString trigName = iio_device_get_name(trig);
+			QString trigId = iio_device_get_id(trig);
+			return QString("Current trigger: %1(%2)").arg(trigId).arg(trigName);
+		}
+		return "No trigger on this device";
+	} else if(ret == -ENODEV) {
+		return "No trigger assigned on this device";
+	} else if(ret == -ENOENT) {
+		return "No trigger on this device";
+	}
+	return "Unable to get trigger";
+}
+
+QString CliDetailsView::tabs(int level, int globalLevel)
+{
+	int effective = level - globalLevel;
+	QString result;
+	for(int i = 0; i < effective; ++i) {
+		result.append("\t");
+	}
+	return result;
 }
 
 #include "moc_clidetailsview.cpp"

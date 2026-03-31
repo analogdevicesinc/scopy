@@ -51,11 +51,11 @@ private:
 	void setupCtx();
 	void generateCtxAttributes();
 	void setupCurrentDevice();
+	void generateDeviceAttributes();
 	void setupCurrentChannel();
+	void generateChannelAttributes();
 	void populateDeviceChildren(IIOStandardItem *item);
 	void populateChannelChildren(IIOStandardItem *item);
-	void buildEntries();
-	QStandardItem *createPlaceholderItem();
 
 	/**
 	 * @brief Creates a new IIOStandardItem and connects it to the emitLog signal.
