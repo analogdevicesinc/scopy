@@ -146,7 +146,9 @@ QWidget *ObsSettingsWidget::createObsSettingsSection(QWidget *parent)
 	}
 
 	// #7: adi,obs-settings-sniffer-pll-lo-frequency_hz
-	QString snifferLoRange = "[300000000 1 4000000000]";
+	// AD9375 sniffer supports 300 MHz - 6 GHz, AD9371 sniffer supports 300 MHz - 4 GHz
+	bool isAd9375 = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+	QString snifferLoRange = isAd9375 ? "[300000000 1 6000000000]" : "[300000000 1 4000000000]";
 	IIOWidget *snifferLoFreq =
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,obs-settings-sniffer-pll-lo-frequency_hz",
 							    snifferLoRange, "SNIFFER PLL LO FREQUENCY HZ");

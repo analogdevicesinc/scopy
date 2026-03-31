@@ -41,15 +41,22 @@ CalibrationWidget::CalibrationWidget(iio_device *device, IIOWidgetGroup *group, 
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
+	, m_hasDpd(false)
 	, m_txQecCal(nullptr)
 	, m_txLoLeakageCal(nullptr)
 	, m_txLoLeakageExtCal(nullptr)
 	, m_txBbFilterCal(nullptr)
+	, m_dpdCal(nullptr)
+	, m_clgcCal(nullptr)
+	, m_vswrCal(nullptr)
 {
 	if(!m_device) {
 		qWarning(CAT_AD9371_CALIBRATION) << "No device provided to Calibrations";
 		return;
 	}
+
+	// Detect AD9375 (has DPD support) by checking for adi,dpd-model-version debug attr
+	m_hasDpd = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
 
 	setupUi();
 	readCalibrationMaskFromDevice();
@@ -87,7 +94,8 @@ void CalibrationWidget::setupUi()
 	scrollArea->setWidget(contentWidget);
 	mainLayout->addWidget(scrollArea);
 
-	qDebug(CAT_AD9371_CALIBRATION) << "Calibration widget created with 7 calibration mask controls";
+	qDebug(CAT_AD9371_CALIBRATION) << "Calibration widget created with 7 calibration mask controls"
+				       << (m_hasDpd ? "(DPD/CLGC/VSWR visible)" : "(DPD/CLGC/VSWR hidden)");
 }
 
 QWidget *CalibrationWidget::createCalibrationMaskGroup(QWidget *parent)
@@ -129,6 +137,30 @@ QWidget *CalibrationWidget::createCalibrationMaskGroup(QWidget *parent)
 	connect(m_txBbFilterCal->onOffswitch(), &QAbstractButton::toggled, this,
 		&CalibrationWidget::onCalibrationMaskChanged);
 
+	if(m_hasDpd) {
+		// Bit 15: DPD Init Cal (AD9375 only)
+		m_dpdCal = new MenuOnOffSwitch("DPD Init Cal", widget);
+		m_dpdCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		layout->addWidget(m_dpdCal);
+
+		// Bit 16: CLGC Init Cal (AD9375 only)
+		m_clgcCal = new MenuOnOffSwitch("CLGC Init Cal", widget);
+		m_clgcCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		layout->addWidget(m_clgcCal);
+
+		// Bit 17: VSWR Init Cal (AD9375 only)
+		m_vswrCal = new MenuOnOffSwitch("VSWR Init Cal", widget);
+		m_vswrCal->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		layout->addWidget(m_vswrCal);
+
+		connect(m_dpdCal->onOffswitch(), &QAbstractButton::toggled, this,
+			&CalibrationWidget::onCalibrationMaskChanged);
+		connect(m_clgcCal->onOffswitch(), &QAbstractButton::toggled, this,
+			&CalibrationWidget::onCalibrationMaskChanged);
+		connect(m_vswrCal->onOffswitch(), &QAbstractButton::toggled, this,
+			&CalibrationWidget::onCalibrationMaskChanged);
+	}
+
 	layout->addStretch();
 
 	return widget;
@@ -138,7 +170,8 @@ void CalibrationWidget::onCalibrationMaskChanged() { writeCalibrationMaskToDevic
 
 void CalibrationWidget::readCalibrationMaskFromDevice()
 {
-	if(!m_device || !m_txQecCal || !m_txLoLeakageCal || !m_txLoLeakageExtCal || !m_txBbFilterCal) {
+	if(!m_device || !m_txQecCal || !m_txLoLeakageCal || !m_txLoLeakageExtCal || !m_txBbFilterCal || !m_dpdCal ||
+	   !m_clgcCal || !m_vswrCal) {
 		return;
 	}
 
@@ -156,21 +189,31 @@ void CalibrationWidget::readCalibrationMaskFromDevice()
 	m_txLoLeakageCal->blockSignals(true);
 	m_txLoLeakageExtCal->blockSignals(true);
 	m_txBbFilterCal->blockSignals(true);
+	m_dpdCal->blockSignals(true);
+	m_clgcCal->blockSignals(true);
+	m_vswrCal->blockSignals(true);
 
 	m_txQecCal->onOffswitch()->setChecked((mask & (1LL << 14)) != 0);	  // Bit 14
 	m_txLoLeakageCal->onOffswitch()->setChecked((mask & (1LL << 10)) != 0);	  // Bit 10
 	m_txLoLeakageExtCal->onOffswitch()->setChecked((mask & (1LL << 9)) != 0); // Bit 9
 	m_txBbFilterCal->onOffswitch()->setChecked((mask & (1LL << 8)) != 0);	  // Bit 8
+	m_dpdCal->onOffswitch()->setChecked((mask & (1LL << 15)) != 0);		  // Bit 15
+	m_clgcCal->onOffswitch()->setChecked((mask & (1LL << 16)) != 0);	  // Bit 16
+	m_vswrCal->onOffswitch()->setChecked((mask & (1LL << 17)) != 0);	  // Bit 17
 
 	m_txQecCal->blockSignals(false);
 	m_txLoLeakageCal->blockSignals(false);
 	m_txLoLeakageExtCal->blockSignals(false);
 	m_txBbFilterCal->blockSignals(false);
+	m_dpdCal->blockSignals(false);
+	m_clgcCal->blockSignals(false);
+	m_vswrCal->blockSignals(false);
 }
 
 void CalibrationWidget::writeCalibrationMaskToDevice()
 {
-	if(!m_device || !m_txQecCal || !m_txLoLeakageCal || !m_txLoLeakageExtCal || !m_txBbFilterCal) {
+	if(!m_device || !m_txQecCal || !m_txLoLeakageCal || !m_txLoLeakageExtCal || !m_txBbFilterCal || !m_dpdCal ||
+	   !m_clgcCal || !m_vswrCal) {
 		return;
 	}
 
@@ -182,8 +225,8 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 		return;
 	}
 
-	// Clear the 4 managed bits (8, 9, 10, 14)
-	mask &= ~((1LL << 8) | (1LL << 9) | (1LL << 10) | (1LL << 14));
+	// Clear the 7 managed bits (8, 9, 10, 14, 15, 16, 17)
+	mask &= ~((1LL << 8) | (1LL << 9) | (1LL << 10) | (1LL << 14) | (1LL << 15) | (1LL << 16) | (1LL << 17));
 
 	if(m_txBbFilterCal->onOffswitch()->isChecked())
 		mask |= (1LL << 8); // Bit 8: TX BB Filter
@@ -193,6 +236,12 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 		mask |= (1LL << 10); // Bit 10: TX LO Leakage
 	if(m_txQecCal->onOffswitch()->isChecked())
 		mask |= (1LL << 14); // Bit 14: TX QEC
+	if(m_dpdCal->onOffswitch()->isChecked())
+		mask |= (1LL << 15); // Bit 15: DPD
+	if(m_clgcCal->onOffswitch()->isChecked())
+		mask |= (1LL << 16); // Bit 16: CLGC
+	if(m_vswrCal->onOffswitch()->isChecked())
+		mask |= (1LL << 17); // Bit 17: VSWR
 
 	qDebug(CAT_AD9371_CALIBRATION) << "Writing calibration mask to device:" << QString("0x%1").arg(mask, 0, 16);
 
