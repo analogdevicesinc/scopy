@@ -18,14 +18,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CALIBRATIONWIDGET_H
-#define CALIBRATIONWIDGET_H
+#ifndef VSWRSETTINGSWIDGET_H
+#define VSWRSETTINGSWIDGET_H
 
 #include "scopy-ad9371plugin_export.h"
 #include <QWidget>
 #include <QVBoxLayout>
 #include <iio.h>
-#include <menuonoffswitch.h>
+#include <iio-widgets/iiowidget.h>
+#include <gui/widgets/menusectionwidget.h>
 
 namespace scopy {
 class IIOWidgetGroup;
@@ -33,39 +34,26 @@ class IIOWidgetGroup;
 
 namespace scopy::ad9371 {
 
-class SCOPY_AD9371PLUGIN_EXPORT CalibrationWidget : public QWidget
+class SCOPY_AD9371PLUGIN_EXPORT VswrSettingsWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit CalibrationWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	~CalibrationWidget();
+	explicit VswrSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	~VswrSettingsWidget();
 
 Q_SIGNALS:
 	void readRequested();
 
-private Q_SLOTS:
-	void onCalibrationMaskChanged();
-	void readCalibrationMaskFromDevice();
-
 private:
 	void setupUi();
-	QWidget *createCalibrationMaskGroup(QWidget *parent);
-	void writeCalibrationMaskToDevice();
+	QWidget *createVswrSettingsSection(QWidget *parent);
 
 	iio_device *m_device;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
-	bool m_hasDpd;
-
-	MenuOnOffSwitch *m_txQecCal;
-	MenuOnOffSwitch *m_txLoLeakageCal;
-	MenuOnOffSwitch *m_txLoLeakageExtCal;
-	MenuOnOffSwitch *m_txBbFilterCal;
-	MenuOnOffSwitch *m_dpdCal;
-	MenuOnOffSwitch *m_clgcCal;
-	MenuOnOffSwitch *m_vswrCal;
+	QList<IIOWidget *> m_widgets;
 };
 
 } // namespace scopy::ad9371
 
-#endif // CALIBRATIONWIDGET_H
+#endif // VSWRSETTINGSWIDGET_H
