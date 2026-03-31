@@ -1,0 +1,12 @@
+[
+    {
+        "device": "ad9371",
+        "xml_path": "ad9371.xml",
+        "uri": "ip:127.0.0.1"
+    },
+    {
+        "device": "ad9375",
+        "xml_path": "ad9371_ad9375.xml",
+        "uri": "ip:127.0.0.1"
+    }
+]
