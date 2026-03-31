@@ -29,7 +29,7 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 TestFramework.init("AD9371 Advanced Unit Tests");
 
 // Connect to device
-if (!TestFramework.connectToDevice("ip:10.48.69.100")) {
+if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
     printToConsole("ERROR: Cannot proceed without device connection");
     scopy.exit();
 }
@@ -246,6 +246,72 @@ function testConversion(getter, setter, widgetKey, apiVal, rawVal, tolerance) {
     }
 }
 
+function testBadValueRange(key, min, max) {
+    try {
+        var orig = ad9371.readWidget(key);
+        printToConsole("  testBadValueRange: key=" + key + " orig=" + orig + " validRange=[" + min + "," + max + "]");
+        var tolerance = 0.01;
+
+        // Write above max — expect clamped to max
+        var aboveMax = String(parseFloat(max) + 1);
+        ad9371.writeWidget(key, aboveMax);
+        msleep(500);
+        var readAbove = ad9371.readWidget(key);
+        printToConsole("  Wrote aboveMax=" + aboveMax + ", read=" + readAbove);
+        if (Math.abs(parseFloat(readAbove) - parseFloat(max)) > tolerance) {
+            printToConsole("  FAIL: above-max not clamped, expected=" + max + " got=" + readAbove);
+            ad9371.writeWidget(key, String(parseFloat(orig)));
+            msleep(500);
+            return false;
+        }
+
+        // Write below min — expect clamped to min
+        var belowMin = String(parseFloat(min) - 1);
+        ad9371.writeWidget(key, belowMin);
+        msleep(500);
+        var readBelow = ad9371.readWidget(key);
+        printToConsole("  Wrote belowMin=" + belowMin + ", read=" + readBelow);
+        if (Math.abs(parseFloat(readBelow) - parseFloat(min)) > tolerance) {
+            printToConsole("  FAIL: below-min not clamped, expected=" + min + " got=" + readBelow);
+            ad9371.writeWidget(key, String(parseFloat(orig)));
+            msleep(500);
+            return false;
+        }
+
+        // Restore
+        ad9371.writeWidget(key, String(parseFloat(orig)));
+        msleep(500);
+        return true;
+    } catch (e) {
+        printToConsole("  Error in testBadValueRange: " + e);
+        return false;
+    }
+}
+
+function testBadValueCombo(key, badKey) {
+    try {
+        var orig = ad9371.readWidget(key);
+        printToConsole("  testBadValueCombo: key=" + key + " orig=" + orig + " badKey=" + badKey);
+
+        // Write invalid key — expect value unchanged
+        ad9371.writeWidget(key, badKey);
+        msleep(500);
+        var readBack = ad9371.readWidget(key);
+        printToConsole("  Wrote badKey=" + badKey + ", read=" + readBack);
+        if (readBack !== orig) {
+            printToConsole("  FAIL: invalid combo key was accepted, orig=" + orig + " got=" + readBack);
+            ad9371.writeWidget(key, orig);
+            msleep(500);
+            return false;
+        }
+
+        return true;
+    } catch (e) {
+        printToConsole("  Error in testBadValueCombo: " + e);
+        return false;
+    }
+}
+
 // Known status strings from ad9371_api.cpp for validation
 var KNOWN_DPD_STATUS = [
     "No Error", "Error: ORx disabled", "Error: Tx disabled",
@@ -407,12 +473,12 @@ var dpdSettingsTests = [
     {uid: "UNIT.ADV_DPD.OUTLIER_THRESHOLD", attr: "adi,dpd-outlier-threshold", type: "range", min: "0", max: "65535", mid: "32768"},
     {uid: "UNIT.ADV_DPD.ADDITIONAL_DELAY_OFFSET", attr: "adi,dpd-additional-delay-offset", type: "range", min: "0", max: "63", mid: "31"},
     {uid: "UNIT.ADV_DPD.PATH_DELAY_PN_SEQ_LEVEL", attr: "adi,dpd-path-delay-pn-seq-level", type: "range", min: "0", max: "255", mid: "128"},
-    {uid: "UNIT.ADV_DPD.WEIGHTS0_REAL", attr: "adi,dpd-weights0-real", type: "range", min: "0", max: "255", mid: "128"},
-    {uid: "UNIT.ADV_DPD.WEIGHTS0_IMAG", attr: "adi,dpd-weights0-imag", type: "range", min: "0", max: "255", mid: "128"},
-    {uid: "UNIT.ADV_DPD.WEIGHTS1_REAL", attr: "adi,dpd-weights1-real", type: "range", min: "0", max: "255", mid: "128"},
-    {uid: "UNIT.ADV_DPD.WEIGHTS1_IMAG", attr: "adi,dpd-weights1-imag", type: "range", min: "0", max: "255", mid: "128"},
-    {uid: "UNIT.ADV_DPD.WEIGHTS2_REAL", attr: "adi,dpd-weights2-real", type: "range", min: "0", max: "255", mid: "128"},
-    {uid: "UNIT.ADV_DPD.WEIGHTS2_IMAG", attr: "adi,dpd-weights2-imag", type: "range", min: "0", max: "255", mid: "128"}
+    {uid: "UNIT.ADV_DPD.WEIGHTS0_REAL", attr: "adi,dpd-weights0-real", type: "range", min: "-128", max: "127", mid: "0"},
+    {uid: "UNIT.ADV_DPD.WEIGHTS0_IMAG", attr: "adi,dpd-weights0-imag", type: "range", min: "-128", max: "127", mid: "0"},
+    {uid: "UNIT.ADV_DPD.WEIGHTS1_REAL", attr: "adi,dpd-weights1-real", type: "range", min: "-128", max: "127", mid: "0"},
+    {uid: "UNIT.ADV_DPD.WEIGHTS1_IMAG", attr: "adi,dpd-weights1-imag", type: "range", min: "-128", max: "127", mid: "0"},
+    {uid: "UNIT.ADV_DPD.WEIGHTS2_REAL", attr: "adi,dpd-weights2-real", type: "range", min: "-128", max: "127", mid: "0"},
+    {uid: "UNIT.ADV_DPD.WEIGHTS2_IMAG", attr: "adi,dpd-weights2-imag", type: "range", min: "-128", max: "127", mid: "0"}
 ];
 
 for (var i = 0; i < dpdSettingsTests.length; i++) {
@@ -437,15 +503,15 @@ ad9371.switchAdvancedTab("CLGC Settings");
 msleep(500);
 
 var clgcSettingsTests = [
-    {uid: "UNIT.ADV_CLGC.TX1_DESIRED_GAIN", attr: "adi,clgc-tx1-desired-gain", type: "range", min: "0", max: "65535", mid: "32768"},
-    {uid: "UNIT.ADV_CLGC.TX2_DESIRED_GAIN", attr: "adi,clgc-tx2-desired-gain", type: "range", min: "0", max: "65535", mid: "32768"},
+    {uid: "UNIT.ADV_CLGC.TX1_DESIRED_GAIN", attr: "adi,clgc-tx1-desired-gain", type: "range", min: "-32768", max: "32767", mid: "0"},
+    {uid: "UNIT.ADV_CLGC.TX2_DESIRED_GAIN", attr: "adi,clgc-tx2-desired-gain", type: "range", min: "-32768", max: "32767", mid: "0"},
     {uid: "UNIT.ADV_CLGC.TX1_ATTEN_LIMIT", attr: "adi,clgc-tx1-atten-limit", type: "range", min: "0", max: "40000", mid: "20000"},
     {uid: "UNIT.ADV_CLGC.TX2_ATTEN_LIMIT", attr: "adi,clgc-tx2-atten-limit", type: "range", min: "0", max: "40000", mid: "20000"},
     {uid: "UNIT.ADV_CLGC.TX1_CONTROL_RATIO", attr: "adi,clgc-tx1-control-ratio", type: "range", min: "1", max: "6", mid: "3"},
     {uid: "UNIT.ADV_CLGC.TX2_CONTROL_RATIO", attr: "adi,clgc-tx2-control-ratio", type: "range", min: "1", max: "6", mid: "3"},
     {uid: "UNIT.ADV_CLGC.ALLOW_TX1_ATTEN_UPDATES", attr: "adi,clgc-allow-tx1-atten-updates", type: "checkbox"},
     {uid: "UNIT.ADV_CLGC.ALLOW_TX2_ATTEN_UPDATES", attr: "adi,clgc-allow-tx2-atten-updates", type: "checkbox"},
-    {uid: "UNIT.ADV_CLGC.ADDITIONAL_DELAY_OFFSET", attr: "adi,clgc-additional-delay-offset", type: "range", min: "0", max: "65535", mid: "32768"},
+    {uid: "UNIT.ADV_CLGC.ADDITIONAL_DELAY_OFFSET", attr: "adi,clgc-additional-delay-offset", type: "range", min: "-32768", max: "32767", mid: "0"},
     {uid: "UNIT.ADV_CLGC.PATH_DELAY_PN_SEQ_LEVEL", attr: "adi,clgc-path-delay-pn-seq-level", type: "range", min: "0", max: "255", mid: "128"},
     {uid: "UNIT.ADV_CLGC.TX1_REL_THRESHOLD", attr: "adi,clgc-tx1-rel-threshold", type: "range", min: "0", max: "255", mid: "128"},
     {uid: "UNIT.ADV_CLGC.TX2_REL_THRESHOLD", attr: "adi,clgc-tx2-rel-threshold", type: "range", min: "0", max: "255", mid: "128"},
@@ -475,7 +541,7 @@ ad9371.switchAdvancedTab("VSWR Settings");
 msleep(500);
 
 var vswrSettingsTests = [
-    {uid: "UNIT.ADV_VSWR.ADDITIONAL_DELAY_OFFSET", attr: "adi,vswr-additional-delay-offset", type: "range", min: "0", max: "65535", mid: "32768"},
+    {uid: "UNIT.ADV_VSWR.ADDITIONAL_DELAY_OFFSET", attr: "adi,vswr-additional-delay-offset", type: "range", min: "-32768", max: "32767", mid: "0"},
     {uid: "UNIT.ADV_VSWR.PATH_DELAY_PN_SEQ_LEVEL", attr: "adi,vswr-path-delay-pn-seq-level", type: "range", min: "0", max: "255", mid: "128"},
     {uid: "UNIT.ADV_VSWR.TX1_SWITCH_GPIO3P3_PIN", attr: "adi,vswr-tx1-vswr-switch-gpio3p3-pin", type: "range", min: "0", max: "11", mid: "5"},
     {uid: "UNIT.ADV_VSWR.TX2_SWITCH_GPIO3P3_PIN", attr: "adi,vswr-tx2-vswr-switch-gpio3p3-pin", type: "range", min: "0", max: "11", mid: "5"},
@@ -832,6 +898,85 @@ var bistTests = [
     {uid: "UNIT.BIST.BIST_PRBS_OBS", attr: "bist_prbs_obs", type: "combo", options: ["0","1","2","3"]}
 ];
 runDataDrivenTests(bistTests);
+
+// ============================================
+// SECTION 17: Bad Value Tests
+// ============================================
+
+// Test that out-of-range values are properly clamped by IIOWidget spinboxes
+// and invalid combo keys are rejected
+
+// CLK: device-clock_khz [30000, 320000]
+TestFramework.runTest("UNIT.BADVAL.CLK_DEVICE_CLOCK_KHZ", function() {
+    ad9371.switchAdvancedTab("CLK Settings");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,clocks-device-clock_khz", "30000", "320000");
+});
+
+// TX: tx1-atten_mdb [0, 41950]
+TestFramework.runTest("UNIT.BADVAL.ADV_TX_ATTEN_MDB", function() {
+    ad9371.switchAdvancedTab("TX Settings");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,tx-settings-tx1-atten_mdb", "0", "41950");
+});
+
+// RX: rx-dec5-decimation [4, 5]
+TestFramework.runTest("UNIT.BADVAL.ADV_RX_DEC5", function() {
+    ad9371.switchAdvancedTab("RX Settings");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,rx-profile-rx-dec5-decimation", "4", "5");
+});
+
+// Gain: rx1-gain-index [0, 255]
+TestFramework.runTest("UNIT.BADVAL.GAIN_RX1_INDEX", function() {
+    ad9371.switchAdvancedTab("Gain Setup");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,rx1-gain-index", "0", "255");
+});
+
+// AGC: peak-wait-time [2, 31]
+TestFramework.runTest("UNIT.BADVAL.AGC_PEAK_WAIT", function() {
+    ad9371.switchAdvancedTab("AGC Setup");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,rx-agc-conf-agc-peak-wait-time", "2", "31");
+});
+
+// AUX DAC: value0 [0, 1023]
+TestFramework.runTest("UNIT.BADVAL.AUX_DAC_VALUE0", function() {
+    ad9371.switchAdvancedTab("AUX DAC");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,aux-dac-value0", "0", "1023");
+});
+
+// JESD: rx-framer-bank-id [0, 15]
+TestFramework.runTest("UNIT.BADVAL.JESD_RX_BANK_ID", function() {
+    ad9371.switchAdvancedTab("JESD RX Framer");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,jesd204-rx-framer-bank-id", "0", "15");
+});
+
+// TX Settings combo: channels-enable (valid: 0,1,2,3) — try "5"
+TestFramework.runTest("UNIT.BADVAL.ADV_TX_CHANNELS", function() {
+    ad9371.switchAdvancedTab("TX Settings");
+    msleep(500);
+    return testBadValueCombo(PHY + "adi,tx-settings-tx-channels-enable", "5");
+});
+
+// DPD: weights0-real [-128, 127] (AD9375 only)
+TestFramework.runTest("UNIT.BADVAL.DPD_WEIGHTS0_REAL", function() {
+    if (!isAd9375) return "SKIP";
+    ad9371.switchAdvancedTab("DPD Settings");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,dpd-weights0-real", "-128", "127");
+});
+
+// CLGC: tx1-desired-gain [-32768, 32767] (AD9375 only)
+TestFramework.runTest("UNIT.BADVAL.CLGC_TX1_DESIRED_GAIN", function() {
+    if (!isAd9375) return "SKIP";
+    ad9371.switchAdvancedTab("CLGC Settings");
+    msleep(500);
+    return testBadValueRange(PHY + "adi,clgc-tx1-desired-gain", "-32768", "32767");
+});
 
 // ============================================
 // Cleanup

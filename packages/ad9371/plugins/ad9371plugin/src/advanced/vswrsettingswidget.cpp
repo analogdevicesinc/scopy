@@ -88,10 +88,16 @@ QWidget *VswrSettingsWidget::createVswrSettingsSection(QWidget *parent)
 	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
-	// VSWR Additional Delay Offset - RangeUi [0,65535,1] (unsigned 16-bit)
+	// Signed 16-bit conversion lambdas (matches original SPINBUTTON_S16: (short)val cast)
+	auto s16DataToUI = [](QString data) { return QString::number((qint16)data.toLongLong()); };
+	auto s16UItoData = [](QString data) { return QString::number((quint16)(qint16)data.toInt()); };
+
+	// VSWR Additional Delay Offset - RangeUi [-32768,32767,1] (signed 16-bit)
 	auto vswrDelayOffsetWidget = Ad9371WidgetFactory::createDebugRangeWidget(
-		m_device, "adi,vswr-additional-delay-offset", "[0 1 65535]", "VSWR Additional Delay Offset", this);
+		m_device, "adi,vswr-additional-delay-offset", "[-32768 1 32767]", "VSWR Additional Delay Offset", this);
 	if(vswrDelayOffsetWidget) {
+		vswrDelayOffsetWidget->setDataToUIConversion(s16DataToUI);
+		vswrDelayOffsetWidget->setUItoDataConversion(s16UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(vswrDelayOffsetWidget);
 		layout->addWidget(vswrDelayOffsetWidget);

@@ -106,7 +106,21 @@ QString Ad9371_API::readFromWidget(const QString &key)
 	}
 
 	QPair<QString, QString> result = widget->read();
-	return stripUnitSuffix(result.first);
+	QString raw = stripUnitSuffix(result.first);
+
+	// Signed 8-bit attributes (DPD weights): kernel returns unsigned repr, convert to signed
+	if(key.contains("dpd-weights")) {
+		if(!raw.isEmpty())
+			raw = QString::number((qint8)raw.toLongLong());
+	}
+	// Signed 16-bit attributes (CLGC desired gain, CLGC/VSWR delay offset)
+	else if(key.contains("clgc-tx1-desired-gain") || key.contains("clgc-tx2-desired-gain") ||
+		key.contains("clgc-additional-delay-offset") || key.contains("vswr-additional-delay-offset")) {
+		if(!raw.isEmpty())
+			raw = QString::number((qint16)raw.toLongLong());
+	}
+
+	return raw;
 }
 
 QString Ad9371_API::stripUnitSuffix(const QString &value)
@@ -158,7 +172,43 @@ void Ad9371_API::writeToWidget(const QString &key, const QString &value)
 		return;
 	}
 
-	widget->writeAsync(value);
+	QString data = value;
+
+	// Read the widget's optionalData to get range or valid options — same info the UI uses
+	QPair<QString, QString> current = widget->read();
+	QString optionalData = current.second;
+
+	if(optionalData.startsWith("[")) {
+		// Range widget: clamp to [min, max], mirroring RangeAttrUi::processValueChange()
+		QString clean = optionalData.mid(1, optionalData.size() - 2);
+		QStringList parts = clean.split(" ", Qt::SkipEmptyParts);
+		if(parts.size() == 3) {
+			double min = parts[0].toDouble();
+			double max = parts[2].toDouble();
+			double clamped = std::min(std::max(min, value.toDouble()), max);
+			data = QString::number(clamped, 'g');
+		}
+	} else if(!optionalData.isEmpty()) {
+		// Combo widget: reject values not in the valid options list
+		QStringList validOptions = optionalData.split(" ", Qt::SkipEmptyParts);
+		if(!validOptions.contains(data)) {
+			qWarning(CAT_AD9371_API) << "Value" << value << "is not valid for key" << key
+						 << "- valid options:" << optionalData;
+			return;
+		}
+	}
+
+	// Signed 8-bit attributes (DPD weights): convert signed UI value to unsigned for kernel
+	if(key.contains("dpd-weights")) {
+		data = QString::number((quint8)(qint8)data.toInt());
+	}
+	// Signed 16-bit attributes (CLGC desired gain, CLGC/VSWR delay offset)
+	else if(key.contains("clgc-tx1-desired-gain") || key.contains("clgc-tx2-desired-gain") ||
+		key.contains("clgc-additional-delay-offset") || key.contains("vswr-additional-delay-offset")) {
+		data = QString::number((quint16)(qint16)data.toInt());
+	}
+
+	widget->writeAsync(data);
 }
 
 QString Ad9371_API::txChannelKey(int channel, const QString &attr)

@@ -29,7 +29,7 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 TestFramework.init("AD9371 Basic Unit Tests");
 
 // Connect to device
-if (!TestFramework.connectToDevice("ip:10.48.69.100")) {
+if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
     printToConsole("ERROR: Cannot proceed without device connection");
     scopy.exit();
 }
@@ -242,6 +242,72 @@ function testConversion(getter, setter, widgetKey, apiVal, rawVal, tolerance) {
         return true;
     } catch (e) {
         printToConsole("  Error in testConversion: " + e);
+        return false;
+    }
+}
+
+function testBadValueRange(key, min, max) {
+    try {
+        var orig = ad9371.readWidget(key);
+        printToConsole("  testBadValueRange: key=" + key + " orig=" + orig + " validRange=[" + min + "," + max + "]");
+        var tolerance = 0.01;
+
+        // Write above max — expect clamped to max
+        var aboveMax = String(parseFloat(max) + 1);
+        ad9371.writeWidget(key, aboveMax);
+        msleep(500);
+        var readAbove = ad9371.readWidget(key);
+        printToConsole("  Wrote aboveMax=" + aboveMax + ", read=" + readAbove);
+        if (Math.abs(parseFloat(readAbove) - parseFloat(max)) > tolerance) {
+            printToConsole("  FAIL: above-max not clamped, expected=" + max + " got=" + readAbove);
+            ad9371.writeWidget(key, String(parseFloat(orig)));
+            msleep(500);
+            return false;
+        }
+
+        // Write below min — expect clamped to min
+        var belowMin = String(parseFloat(min) - 1);
+        ad9371.writeWidget(key, belowMin);
+        msleep(500);
+        var readBelow = ad9371.readWidget(key);
+        printToConsole("  Wrote belowMin=" + belowMin + ", read=" + readBelow);
+        if (Math.abs(parseFloat(readBelow) - parseFloat(min)) > tolerance) {
+            printToConsole("  FAIL: below-min not clamped, expected=" + min + " got=" + readBelow);
+            ad9371.writeWidget(key, String(parseFloat(orig)));
+            msleep(500);
+            return false;
+        }
+
+        // Restore
+        ad9371.writeWidget(key, String(parseFloat(orig)));
+        msleep(500);
+        return true;
+    } catch (e) {
+        printToConsole("  Error in testBadValueRange: " + e);
+        return false;
+    }
+}
+
+function testBadValueCombo(key, badKey) {
+    try {
+        var orig = ad9371.readWidget(key);
+        printToConsole("  testBadValueCombo: key=" + key + " orig=" + orig + " badKey=" + badKey);
+
+        // Write invalid key — expect value unchanged
+        ad9371.writeWidget(key, badKey);
+        msleep(500);
+        var readBack = ad9371.readWidget(key);
+        printToConsole("  Wrote badKey=" + badKey + ", read=" + readBack);
+        if (readBack !== orig) {
+            printToConsole("  FAIL: invalid combo key was accepted, orig=" + orig + " got=" + readBack);
+            ad9371.writeWidget(key, orig);
+            msleep(500);
+            return false;
+        }
+
+        return true;
+    } catch (e) {
+        printToConsole("  Error in testBadValueCombo: " + e);
         return false;
     }
 }
@@ -2746,6 +2812,57 @@ TestFramework.runTest("UNIT.UTIL.REFRESH_ALL", function() {
 
         printToConsole("  PASS: refresh completed, values consistent");
         return true;
+    } catch (e) {
+        printToConsole("  Error: " + e);
+        return false;
+    }
+});
+
+// ============================================
+// SECTION 11: Bad Value Tests
+// ============================================
+
+// Test that out-of-range values are properly clamped by IIOWidget spinboxes
+
+TestFramework.runTest("UNIT.BADVAL.RX_CH0_HARDWARE_GAIN", function() {
+    return testBadValueRange("voltage0_in/hardwaregain", "0", "30");
+});
+
+TestFramework.runTest("UNIT.BADVAL.RX_CH0_TEMP_COMP_GAIN", function() {
+    return testBadValueRange("voltage0_in/temp_comp_gain", "-3", "3");
+});
+
+TestFramework.runTest("UNIT.BADVAL.OBS_TEMP_COMP_GAIN", function() {
+    return testBadValueRange("voltage2_in/temp_comp_gain", "-3", "3");
+});
+
+// Test that invalid combo key is rejected (value stays unchanged)
+TestFramework.runTest("UNIT.BADVAL.RX_GAIN_CONTROL_MODE", function() {
+    return testBadValueCombo("voltage0_in/gain_control_mode", "99");
+});
+
+// Test TX LO frequency below minimum via API
+TestFramework.runTest("UNIT.BADVAL.TX_LO_FREQUENCY", function() {
+    try {
+        var orig = ad9371.getTxLoFrequency();
+        printToConsole("  orig TX LO freq=" + orig);
+
+        // Write 0 MHz (below 300 MHz min)
+        ad9371.setTxLoFrequency("0");
+        msleep(500);
+        var readBack = ad9371.getTxLoFrequency();
+        printToConsole("  Wrote 0 MHz, read=" + readBack);
+
+        // Should either clamp to min or reject — value should not be 0
+        var passed = (parseFloat(readBack) >= 300);
+        if (!passed) {
+            printToConsole("  FAIL: TX LO accepted invalid frequency 0 MHz");
+        }
+
+        // Restore
+        ad9371.setTxLoFrequency(orig);
+        msleep(500);
+        return passed;
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
