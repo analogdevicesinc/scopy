@@ -111,6 +111,12 @@ bool Ad9371Plugin::onConnect()
 	// Create AD9371 Advanced tool
 	iio_device *device = iio_context_find_device(conn->context(), "ad9371-phy");
 
+	// Detect AD9375 and rename tools accordingly
+	if(device && iio_device_find_debug_attr(device, "adi,dpd-model-version")) {
+		m_toolList[0]->setName("ADRV9375");
+		m_toolList[1]->setName("ADRV9375 Advanced");
+	}
+
 	if(device && iio_device_get_debug_attrs_count(device) > 0) {
 		Ad9371Advanced *ad9371Advanced = new Ad9371Advanced(device, m_widgetGroup);
 		m_toolList[1]->setTool(ad9371Advanced);
