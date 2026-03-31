@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/ad9371">
+        <file>AD9371.png</file>
+    </qresource>
+</RCC>
