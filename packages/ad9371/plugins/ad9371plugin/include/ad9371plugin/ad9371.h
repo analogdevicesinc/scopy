@@ -88,6 +88,7 @@ private:
 
 	// Feature flags
 	bool m_is2Rx2Tx = false;
+	bool m_hasDpd = false;
 
 	// Phase rotation spinboxes (computed from calibscale/calibphase, not IIOWidgets)
 	gui::MenuSpinbox *m_phaseSpinbox1 = nullptr;
@@ -98,6 +99,9 @@ private:
 	MenuOnOffSwitch *m_calTxQec = nullptr;
 	MenuOnOffSwitch *m_calTxLol = nullptr;
 	MenuOnOffSwitch *m_calTxLolExt = nullptr;
+	MenuOnOffSwitch *m_calDpd = nullptr;
+	MenuOnOffSwitch *m_calClgc = nullptr;
+	MenuOnOffSwitch *m_calVswr = nullptr;
 
 	void setupUi();
 	void detectDevices();
