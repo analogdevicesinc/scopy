@@ -46,6 +46,54 @@ Q_LOGGING_CATEGORY(CAT_AD9371, "AD9371");
 using namespace scopy;
 using namespace scopy::ad9371;
 
+// Status string arrays from iio-oscilloscope ad9371.c
+static const char *dpd_status_strings[] = {
+	"No Error",
+	"Error: ORx disabled",
+	"Error: Tx disabled",
+	"Error: DPD initialization not run",
+	"Error: Path delay not setup",
+	"Error: ORx signal too low",
+	"Error: ORx signal saturated",
+	"Error: Tx signal too low",
+	"Error: Tx signal saturated",
+	"Error: Model error high",
+	"Error: AM AM outliers",
+	"Error: Invalid Tx profile",
+	"Error: ORx QEC Disabled",
+};
+
+static const char *clgc_status_strings[] = {
+	"No Error",
+	"Error: TX is disabled",
+	"Error: ORx is disabled",
+	"Error: Loopback switch is closed",
+	"Error: Data measurement aborted during capture",
+	"Error: No initial calibration was done",
+	"Error: Path delay not setup",
+	"Error: No apply control is possible",
+	"Error: Control value is out of range",
+	"Error: CLGC feature is disabled",
+	"Error: TX attenuation is capped",
+	"Error: Gain measurement",
+	"Error: No GPIO configured in single ORx configuration",
+	"Error: Tx is not observable with any of the ORx Channels",
+};
+
+static const char *vswr_status_strings[] = {
+	"No Error",
+	"Error: TX disabled",
+	"Error: ORx disabled",
+	"Error: Loopback switch is closed",
+	"Error: No initial calibration was done",
+	"Error: Path delay not setup",
+	"Error: Data capture aborted",
+	"Error: VSWR is disabled",
+	"Error: Entering Cal",
+	"Error: No GPIO configured in single ORx configuration",
+	"Error: Tx is not observable with any of the ORx Channels",
+};
+
 Ad9371::Ad9371(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
@@ -79,10 +127,12 @@ void Ad9371::detectDevices()
 		m_is2Rx2Tx = ch1 && iio_channel_find_attr(ch1, "hardwaregain");
 
 		iio_channel *txCh0 = iio_device_find_channel(m_dev, "voltage0", true);
+		m_hasDpd = txCh0 && iio_channel_find_attr(txCh0, "dpd_tracking_en");
 	}
 
 	qDebug(CAT_AD9371) << "Devices - PHY:" << (m_dev != nullptr) << "DDS:" << (m_dds != nullptr)
-			   << "CAP:" << (m_cap != nullptr) << "UDC:" << m_hasUdc << "2Rx2Tx:" << m_is2Rx2Tx;
+			   << "CAP:" << (m_cap != nullptr) << "UDC:" << m_hasUdc << "2Rx2Tx:" << m_is2Rx2Tx
+			   << "DPD:" << m_hasDpd;
 }
 
 const char *Ad9371::resolveFreqAttrName(iio_channel *ch, const char *fallback)
@@ -324,11 +374,23 @@ QWidget *Ad9371::generateGlobalSettingsWidget(QString title, QWidget *parent)
 	m_calTxLolExt = new MenuOnOffSwitch("CAL TX LOL Ext.", calibrationsWidget);
 	calGrid->addWidget(m_calTxLolExt, 0, 3);
 
+	// #2-#4: DPD/CLGC/VSWR calibration switches (conditional on has_dpd)
+	if(m_hasDpd) {
+		m_calDpd = new MenuOnOffSwitch("CAL DPD", calibrationsWidget);
+		calGrid->addWidget(m_calDpd, 1, 0);
+
+		m_calClgc = new MenuOnOffSwitch("CAL CLGC", calibrationsWidget);
+		calGrid->addWidget(m_calClgc, 1, 1);
+
+		m_calVswr = new MenuOnOffSwitch("CAL VSWR", calibrationsWidget);
+		calGrid->addWidget(m_calVswr, 1, 2);
+	}
+
 	// #9: Calibrate button
 	QPushButton *calibrateButton = new QPushButton("CALIBRATE", calibrationsWidget);
 	Style::setStyle(calibrateButton, style::properties::button::basicButton);
 	connect(calibrateButton, &QPushButton::clicked, this, &Ad9371::writeCalibrationToHardware);
-	calGrid->addWidget(calibrateButton, 0, 3);
+	calGrid->addWidget(calibrateButton, m_hasDpd ? 1 : 0, 3);
 
 	calibrationsLayout->addLayout(calGrid);
 	mainLayout->addWidget(calibrationsWidget);
@@ -378,6 +440,9 @@ void Ad9371::readCalibrationFromHardware()
 	readSwitch(m_calTxQec, "calibrate_tx_qec_en");
 	readSwitch(m_calTxLol, "calibrate_tx_lol_en");
 	readSwitch(m_calTxLolExt, "calibrate_tx_lol_ext_en");
+	readSwitch(m_calDpd, "calibrate_dpd_en");
+	readSwitch(m_calClgc, "calibrate_clgc_en");
+	readSwitch(m_calVswr, "calibrate_vswr_en");
 }
 
 void Ad9371::writeCalibrationToHardware()
@@ -393,6 +458,9 @@ void Ad9371::writeCalibrationToHardware()
 	writeSwitch(m_calTxQec, "calibrate_tx_qec_en");
 	writeSwitch(m_calTxLol, "calibrate_tx_lol_en");
 	writeSwitch(m_calTxLolExt, "calibrate_tx_lol_ext_en");
+	writeSwitch(m_calDpd, "calibrate_dpd_en");
+	writeSwitch(m_calClgc, "calibrate_clgc_en");
+	writeSwitch(m_calVswr, "calibrate_vswr_en");
 	int ret = iio_device_attr_write_bool(m_dev, "calibrate", true);
 	if(ret < 0)
 		qWarning(CAT_AD9371) << "Calibration failed:" << ret;
@@ -785,6 +853,473 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 		channelLayout->addWidget(tx2Widget);
 	}
 	mainLayout->addLayout(channelLayout);
+
+		// DPD/CLGC/VSWR sub-sections (conditional on has_dpd, AD9375 only)
+	if(m_hasDpd && txCh0) {
+		// Helper lambdas to reduce repetition
+		auto addReadOnly = [this, content](iio_channel *ch, const char *attr, const QString &labelTitle,
+						   QVBoxLayout *layout) {
+			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, labelTitle);
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
+			connect(this, &Ad9371::readRequested, w, &IIOWidget::readAsync);
+			layout->addWidget(w);
+			return w;
+		};
+
+		auto addScaledReadOnly = [this, content](iio_channel *ch, const char *attr, const QString &labelTitle,
+							 double divisor, const QString &unit, QVBoxLayout *layout) {
+			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, labelTitle);
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
+			connect(this, &Ad9371::readRequested, w, &IIOWidget::readAsync);
+			w->setDataToUIConversion([divisor, unit](QString data) {
+				double val = data.toLongLong() / divisor;
+				if(divisor <= 1.0)
+					return QString::number((long long)val) + " " + unit;
+				else if(divisor <= 10.0)
+					return QString::number(val, 'f', 1) + " " + unit;
+				else
+					return QString::number(val, 'f', 2) + " " + unit;
+			});
+			layout->addWidget(w);
+		};
+
+		auto addPrmsReadOnly = [this, content](iio_channel *ch, const char *attr, const QString &labelTitle,
+						       double divisor, const QString &unit, QVBoxLayout *layout) {
+			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, labelTitle);
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
+			connect(this, &Ad9371::readRequested, w, &IIOWidget::readAsync);
+			w->setDataToUIConversion([divisor, unit](QString data) {
+				return QString::number(data.toLongLong() / divisor + 21.0, 'f', 2) + " " + unit;
+			});
+			layout->addWidget(w);
+		};
+
+		// --- DPD Sub-section (#44-#57) ---
+		QLabel *dpdTitle = new QLabel("DPD Settings", content);
+		Style::setStyle(dpdTitle, style::properties::label::menuMedium);
+		mainLayout->addWidget(dpdTitle);
+
+		QHBoxLayout *dpdLayout = new QHBoxLayout();
+
+		// DPD TX1
+		{
+			QWidget *dpdTx1 = new QWidget(content);
+			Style::setBackgroundColor(dpdTx1, json::theme::background_primary);
+			Style::setStyle(dpdTx1, style::properties::widget::border_interactive);
+			QVBoxLayout *dpdTx1Layout = new QVBoxLayout(dpdTx1);
+			dpdTx1->setLayout(dpdTx1Layout);
+			{
+				QLabel *tx1Label = new QLabel("TX1");
+				Style::setStyle(tx1Label, style::properties::label::menuBig);
+				dpdTx1Layout->addWidget(tx1Label);
+			}
+
+			// #51: dpd_model_error (RO, ÷10, %)
+			addScaledReadOnly(txCh0, "dpd_model_error", "Model Error", 10.0, "%", dpdTx1Layout);
+			// #50: dpd_track_count (RO)
+			addScaledReadOnly(txCh0, "dpd_track_count", "Track Count", 1.0, "", dpdTx1Layout);
+			// #52: dpd_external_path_delay (RO, ÷16)
+			addScaledReadOnly(txCh0, "dpd_external_path_delay", "Ext Path Delay", 16.0, "", dpdTx1Layout);
+
+			// #53: dpd_status (RO, string map)
+			IIOWidget *dpdStatus = Ad9371WidgetFactory::createReadOnlyWidget(txCh0, "dpd_status", "Status");
+			if(m_widgetGroup)
+				m_widgetGroup->add(dpdStatus);
+			connect(this, &Ad9371::readRequested, dpdStatus, &IIOWidget::readAsync);
+			dpdStatus->setDataToUIConversion([](QString data) {
+				int idx = data.toInt();
+				int count = (int)(sizeof(dpd_status_strings) / sizeof(dpd_status_strings[0]));
+				if(idx >= 0 && idx < count)
+					return QString(dpd_status_strings[idx]);
+				return data;
+			});
+			dpdTx1Layout->addWidget(dpdStatus);
+
+			// #44: dpd_tracking_en
+			IIOWidget *dpdTrack =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh0, "dpd_tracking_en", "Tracking");
+			if(m_widgetGroup)
+				m_widgetGroup->add(dpdTrack);
+			connect(this, &Ad9371::readRequested, dpdTrack, &IIOWidget::readAsync);
+			dpdTx1Layout->addWidget(dpdTrack);
+
+			// #46: dpd_actuator_en
+			IIOWidget *dpdAct =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh0, "dpd_actuator_en", "Actuator");
+			if(m_widgetGroup)
+				m_widgetGroup->add(dpdAct);
+			connect(this, &Ad9371::readRequested, dpdAct, &IIOWidget::readAsync);
+			dpdTx1Layout->addWidget(dpdAct);
+
+			// #48: dpd_reset_en (button)
+			QPushButton *dpdReset = new QPushButton("Reset", dpdTx1);
+			Style::setStyle(dpdReset, style::properties::button::basicButton);
+			connect(dpdReset, &QPushButton::clicked, this,
+				[this, txCh0]() { iio_channel_attr_write_bool(txCh0, "dpd_reset_en", true); });
+			dpdTx1Layout->addWidget(dpdReset);
+
+			dpdLayout->addWidget(dpdTx1);
+		}
+
+		// DPD TX2
+		if(txCh1) {
+			QWidget *dpdTx2 = new QWidget(content);
+			Style::setBackgroundColor(dpdTx2, json::theme::background_primary);
+			Style::setStyle(dpdTx2, style::properties::widget::border_interactive);
+			QVBoxLayout *dpdTx2Layout = new QVBoxLayout(dpdTx2);
+			dpdTx2->setLayout(dpdTx2Layout);
+			{
+				QLabel *tx2Label = new QLabel("TX2");
+				Style::setStyle(tx2Label, style::properties::label::menuBig);
+				dpdTx2Layout->addWidget(tx2Label);
+			}
+
+			// #54-#57: read-only labels
+			addScaledReadOnly(txCh1, "dpd_model_error", "Model Error", 10.0, "%", dpdTx2Layout);
+			addScaledReadOnly(txCh1, "dpd_track_count", "Track Count", 1.0, "", dpdTx2Layout);
+			addScaledReadOnly(txCh1, "dpd_external_path_delay", "Ext Path Delay", 16.0, "", dpdTx2Layout);
+
+			IIOWidget *dpdStatus = Ad9371WidgetFactory::createReadOnlyWidget(txCh1, "dpd_status", "Status");
+			if(m_widgetGroup)
+				m_widgetGroup->add(dpdStatus);
+			connect(this, &Ad9371::readRequested, dpdStatus, &IIOWidget::readAsync);
+			dpdStatus->setDataToUIConversion([](QString data) {
+				int idx = data.toInt();
+				int count = (int)(sizeof(dpd_status_strings) / sizeof(dpd_status_strings[0]));
+				if(idx >= 0 && idx < count)
+					return QString(dpd_status_strings[idx]);
+				return data;
+			});
+			dpdTx2Layout->addWidget(dpdStatus);
+
+			// #45: dpd_tracking_en
+			IIOWidget *dpdTrack =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh1, "dpd_tracking_en", "Tracking");
+			if(m_widgetGroup)
+				m_widgetGroup->add(dpdTrack);
+			connect(this, &Ad9371::readRequested, dpdTrack, &IIOWidget::readAsync);
+			dpdTx2Layout->addWidget(dpdTrack);
+
+			// #47: dpd_actuator_en
+			IIOWidget *dpdAct =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh1, "dpd_actuator_en", "Actuator");
+			if(m_widgetGroup)
+				m_widgetGroup->add(dpdAct);
+			connect(this, &Ad9371::readRequested, dpdAct, &IIOWidget::readAsync);
+			dpdTx2Layout->addWidget(dpdAct);
+
+			// #49: dpd_reset_en (button)
+			QPushButton *dpdReset = new QPushButton("Reset", dpdTx2);
+			Style::setStyle(dpdReset, style::properties::button::basicButton);
+			connect(dpdReset, &QPushButton::clicked, this,
+				[this, txCh1]() { iio_channel_attr_write_bool(txCh1, "dpd_reset_en", true); });
+			dpdTx2Layout->addWidget(dpdReset);
+
+			dpdLayout->addWidget(dpdTx2);
+		}
+		mainLayout->addLayout(dpdLayout);
+
+		// --- CLGC Sub-section (#58-#73) ---
+		QLabel *clgcTitle = new QLabel("CLGC Settings", content);
+		Style::setStyle(clgcTitle, style::properties::label::menuMedium);
+		mainLayout->addWidget(clgcTitle);
+
+		QHBoxLayout *clgcLayout = new QHBoxLayout();
+
+		// CLGC TX1
+		{
+			QWidget *clgcTx1 = new QWidget(content);
+			Style::setBackgroundColor(clgcTx1, json::theme::background_primary);
+			Style::setStyle(clgcTx1, style::properties::widget::border_interactive);
+			QVBoxLayout *clgcTx1Layout = new QVBoxLayout(clgcTx1);
+			clgcTx1->setLayout(clgcTx1Layout);
+			{
+				QLabel *tx1Label = new QLabel("TX1");
+				Style::setStyle(tx1Label, style::properties::label::menuBig);
+				clgcTx1Layout->addWidget(tx1Label);
+			}
+
+			// #60: clgc_desired_gain (read-only, scale ÷100)
+			IIOWidget *clgcGain =
+				Ad9371WidgetFactory::createReadOnlyWidget(txCh0, "clgc_desired_gain", "Desired Gain");
+			if(m_widgetGroup)
+				m_widgetGroup->add(clgcGain);
+			connect(this, &Ad9371::readRequested, clgcGain, &IIOWidget::readAsync);
+			clgcGain->setDataToUIConversion(
+				[](QString data) { return QString::number(data.toDouble() / 100.0, 'f', 2); });
+			clgcTx1Layout->addWidget(clgcGain);
+
+			// #64: clgc_current_gain (RO, ÷100, dB)
+			addScaledReadOnly(txCh0, "clgc_current_gain", "Current Gain", 100.0, "dB", clgcTx1Layout);
+			// #66: clgc_tx_gain (RO, ÷20, dB)
+			addScaledReadOnly(txCh0, "clgc_tx_gain", "TX Gain", 20.0, "dB", clgcTx1Layout);
+			// #67: clgc_tx_rms (RO, ÷100, dBFS)
+			addScaledReadOnly(txCh0, "clgc_tx_rms", "TX RMS", 100.0, "dBFS", clgcTx1Layout);
+			// #65: clgc_orx_rms (RO, ÷100, dBFS)
+			addScaledReadOnly(txCh0, "clgc_orx_rms", "ORx RMS", 100.0, "dBFS", clgcTx1Layout);
+
+			// #62: clgc_track_count (RO)
+			addScaledReadOnly(txCh0, "clgc_track_count", "Track Count", 1.0, "", clgcTx1Layout);
+			// #63: clgc_status (RO, string map)
+			IIOWidget *clgcStatus =
+				Ad9371WidgetFactory::createReadOnlyWidget(txCh0, "clgc_status", "Status");
+			if(m_widgetGroup)
+				m_widgetGroup->add(clgcStatus);
+			connect(this, &Ad9371::readRequested, clgcStatus, &IIOWidget::readAsync);
+			clgcStatus->setDataToUIConversion([](QString data) {
+				int idx = data.toInt();
+				int count = (int)(sizeof(clgc_status_strings) / sizeof(clgc_status_strings[0]));
+				if(idx >= 0 && idx < count)
+					return QString(clgc_status_strings[idx]);
+				return data;
+			});
+			clgcTx1Layout->addWidget(clgcStatus);
+
+			// #58: clgc_tracking_en
+			IIOWidget *clgcTrack =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh0, "clgc_tracking_en", "CLGC Tracking");
+			if(m_widgetGroup)
+				m_widgetGroup->add(clgcTrack);
+			connect(this, &Ad9371::readRequested, clgcTrack, &IIOWidget::readAsync);
+			clgcTx1Layout->addWidget(clgcTrack);
+
+			clgcLayout->addWidget(clgcTx1);
+		}
+
+		// CLGC TX2
+		if(txCh1) {
+			QWidget *clgcTx2 = new QWidget(content);
+			Style::setBackgroundColor(clgcTx2, json::theme::background_primary);
+			Style::setStyle(clgcTx2, style::properties::widget::border_interactive);
+			QVBoxLayout *clgcTx2Layout = new QVBoxLayout(clgcTx2);
+			clgcTx2->setLayout(clgcTx2Layout);
+			{
+				QLabel *tx2Label = new QLabel("TX2");
+				Style::setStyle(tx2Label, style::properties::label::menuBig);
+				clgcTx2Layout->addWidget(tx2Label);
+			}
+
+			// #61: clgc_desired_gain (read-only, scale ÷100)
+			IIOWidget *clgcGain =
+				Ad9371WidgetFactory::createReadOnlyWidget(txCh1, "clgc_desired_gain", "Desired Gain");
+			if(m_widgetGroup)
+				m_widgetGroup->add(clgcGain);
+			connect(this, &Ad9371::readRequested, clgcGain, &IIOWidget::readAsync);
+			clgcGain->setDataToUIConversion(
+				[](QString data) { return QString::number(data.toDouble() / 100.0, 'f', 2); });
+			clgcTx2Layout->addWidget(clgcGain);
+
+			addScaledReadOnly(txCh1, "clgc_current_gain", "Current Gain", 100.0, "dB", clgcTx2Layout);
+			addScaledReadOnly(txCh1, "clgc_tx_gain", "TX Gain", 20.0, "dB", clgcTx2Layout);
+			addScaledReadOnly(txCh1, "clgc_tx_rms", "TX RMS", 100.0, "dBFS", clgcTx2Layout);
+			addScaledReadOnly(txCh1, "clgc_orx_rms", "ORx RMS", 100.0, "dBFS", clgcTx2Layout);
+
+			// #68-#73: read-only labels
+			addScaledReadOnly(txCh1, "clgc_track_count", "Track Count", 1.0, "", clgcTx2Layout);
+
+			IIOWidget *clgcStatus =
+				Ad9371WidgetFactory::createReadOnlyWidget(txCh1, "clgc_status", "Status");
+			if(m_widgetGroup)
+				m_widgetGroup->add(clgcStatus);
+			connect(this, &Ad9371::readRequested, clgcStatus, &IIOWidget::readAsync);
+			clgcStatus->setDataToUIConversion([](QString data) {
+				int idx = data.toInt();
+				int count = (int)(sizeof(clgc_status_strings) / sizeof(clgc_status_strings[0]));
+				if(idx >= 0 && idx < count)
+					return QString(clgc_status_strings[idx]);
+				return data;
+			});
+			clgcTx2Layout->addWidget(clgcStatus);
+
+			// #59: clgc_tracking_en
+			IIOWidget *clgcTrack =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh1, "clgc_tracking_en", "CLGC Tracking");
+			if(m_widgetGroup)
+				m_widgetGroup->add(clgcTrack);
+			connect(this, &Ad9371::readRequested, clgcTrack, &IIOWidget::readAsync);
+			clgcTx2Layout->addWidget(clgcTrack);
+
+			clgcLayout->addWidget(clgcTx2);
+		}
+		mainLayout->addLayout(clgcLayout);
+
+		// --- VSWR Sub-section (#74-#99) ---
+		QLabel *vswrTitle = new QLabel("VSWR Settings", content);
+		Style::setStyle(vswrTitle, style::properties::label::menuMedium);
+		mainLayout->addWidget(vswrTitle);
+
+		QHBoxLayout *vswrLayout = new QHBoxLayout();
+
+		// Helper to create a scaled read-only widget and place it in a grid
+		auto addVswrScaled = [this](iio_channel *ch, const char *attr, double divisor, const QString &unit,
+					    QGridLayout *grid, int row, int col) {
+			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, "");
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
+			connect(this, &Ad9371::readRequested, w, &IIOWidget::readAsync);
+			w->setDataToUIConversion([divisor, unit](QString data) {
+				double val = data.toLongLong() / divisor;
+				if(divisor <= 1.0)
+					return QString::number((long long)val) + " " + unit;
+				else
+					return QString::number(val, 'f', 2) + " " + unit;
+			});
+			grid->addWidget(w, row, col);
+		};
+
+		auto addVswrPrms = [this](iio_channel *ch, const char *attr, double divisor, const QString &unit,
+					  QGridLayout *grid, int row, int col) {
+			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, "");
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
+			connect(this, &Ad9371::readRequested, w, &IIOWidget::readAsync);
+			w->setDataToUIConversion([divisor, unit](QString data) {
+				return QString::number(data.toLongLong() / divisor + 21.0, 'f', 2) + " " + unit;
+			});
+			grid->addWidget(w, row, col);
+		};
+
+		// VSWR TX1
+		{
+			QWidget *vswrTx1 = new QWidget(content);
+			Style::setBackgroundColor(vswrTx1, json::theme::background_primary);
+			Style::setStyle(vswrTx1, style::properties::widget::border_interactive);
+			QVBoxLayout *vswrTx1Layout = new QVBoxLayout(vswrTx1);
+			vswrTx1->setLayout(vswrTx1Layout);
+			{
+				QLabel *tx1Label = new QLabel("TX1");
+				Style::setStyle(tx1Label, style::properties::label::menuBig);
+				vswrTx1Layout->addWidget(tx1Label);
+			}
+
+			// Table: Forward/Reflected measurements
+			QGridLayout *grid1 = new QGridLayout();
+			// Headers
+			grid1->addWidget(new QLabel("RMS"), 0, 1);
+			grid1->addWidget(new QLabel("Real"), 0, 2);
+			grid1->addWidget(new QLabel("Imag"), 0, 3);
+			grid1->addWidget(new QLabel("RMS ORx"), 0, 4);
+			grid1->addWidget(new QLabel("RMS Tx"), 0, 5);
+			// Forward row
+			grid1->addWidget(new QLabel("Forward"), 1, 0);
+			addVswrScaled(txCh0, "vswr_forward_gain", 100.0, "dB", grid1, 1, 1);
+			addVswrScaled(txCh0, "vswr_forward_gain_real", 100.0, "dB", grid1, 1, 2);
+			addVswrScaled(txCh0, "vswr_forward_gain_imag", 100.0, "dB", grid1, 1, 3);
+			addVswrPrms(txCh0, "vswr_forward_orx", 100.0, "dBFS", grid1, 1, 4);
+			addVswrPrms(txCh0, "vswr_forward_tx", 100.0, "dBFS", grid1, 1, 5);
+			// Reflected row
+			grid1->addWidget(new QLabel("Reflected"), 2, 0);
+			addVswrScaled(txCh0, "vswr_reflected_gain", 100.0, "dB", grid1, 2, 1);
+			addVswrScaled(txCh0, "vswr_reflected_gain_real", 100.0, "dB", grid1, 2, 2);
+			addVswrScaled(txCh0, "vswr_reflected_gain_imag", 100.0, "dB", grid1, 2, 3);
+			addVswrPrms(txCh0, "vswr_reflected_orx", 100.0, "dBFS", grid1, 2, 4);
+			addVswrPrms(txCh0, "vswr_reflected_tx", 100.0, "dBFS", grid1, 2, 5);
+			// Track count row
+			grid1->addWidget(new QLabel("Track Count:"), 3, 0);
+			addVswrScaled(txCh0, "vswr_track_count", 1.0, "", grid1, 3, 1);
+
+			vswrTx1Layout->addLayout(grid1);
+
+			// Status
+			IIOWidget *vswrStatus =
+				Ad9371WidgetFactory::createReadOnlyWidget(txCh0, "vswr_status", "Status");
+			if(m_widgetGroup)
+				m_widgetGroup->add(vswrStatus);
+			connect(this, &Ad9371::readRequested, vswrStatus, &IIOWidget::readAsync);
+			vswrStatus->setDataToUIConversion([](QString data) {
+				int idx = data.toInt();
+				int count = (int)(sizeof(vswr_status_strings) / sizeof(vswr_status_strings[0]));
+				if(idx >= 0 && idx < count)
+					return QString(vswr_status_strings[idx]);
+				return data;
+			});
+			vswrTx1Layout->addWidget(vswrStatus);
+
+			// Tracking
+			IIOWidget *vswrTrack =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh0, "vswr_tracking_en", "VSWR Tracking");
+			if(m_widgetGroup)
+				m_widgetGroup->add(vswrTrack);
+			connect(this, &Ad9371::readRequested, vswrTrack, &IIOWidget::readAsync);
+			vswrTx1Layout->addWidget(vswrTrack);
+
+			vswrLayout->addWidget(vswrTx1);
+		}
+
+		// VSWR TX2
+		if(txCh1) {
+			QWidget *vswrTx2 = new QWidget(content);
+			Style::setBackgroundColor(vswrTx2, json::theme::background_primary);
+			Style::setStyle(vswrTx2, style::properties::widget::border_interactive);
+			QVBoxLayout *vswrTx2Layout = new QVBoxLayout(vswrTx2);
+			vswrTx2->setLayout(vswrTx2Layout);
+			{
+				QLabel *tx2Label = new QLabel("TX2");
+				Style::setStyle(tx2Label, style::properties::label::menuBig);
+				vswrTx2Layout->addWidget(tx2Label);
+			}
+
+			// Table: Forward/Reflected measurements
+			QGridLayout *grid2 = new QGridLayout();
+			// Headers
+			grid2->addWidget(new QLabel("RMS"), 0, 1);
+			grid2->addWidget(new QLabel("Real"), 0, 2);
+			grid2->addWidget(new QLabel("Imag"), 0, 3);
+			grid2->addWidget(new QLabel("RMS ORx"), 0, 4);
+			grid2->addWidget(new QLabel("RMS Tx"), 0, 5);
+			// Forward row
+			grid2->addWidget(new QLabel("Forward"), 1, 0);
+			addVswrScaled(txCh1, "vswr_forward_gain", 100.0, "dB", grid2, 1, 1);
+			addVswrScaled(txCh1, "vswr_forward_gain_real", 100.0, "dB", grid2, 1, 2);
+			addVswrScaled(txCh1, "vswr_forward_gain_imag", 100.0, "dB", grid2, 1, 3);
+			addVswrPrms(txCh1, "vswr_forward_orx", 100.0, "dBFS", grid2, 1, 4);
+			addVswrPrms(txCh1, "vswr_forward_tx", 100.0, "dBFS", grid2, 1, 5);
+			// Reflected row
+			grid2->addWidget(new QLabel("Reflected"), 2, 0);
+			addVswrScaled(txCh1, "vswr_reflected_gain", 100.0, "dB", grid2, 2, 1);
+			addVswrScaled(txCh1, "vswr_reflected_gain_real", 100.0, "dB", grid2, 2, 2);
+			addVswrScaled(txCh1, "vswr_reflected_gain_imag", 100.0, "dB", grid2, 2, 3);
+			addVswrPrms(txCh1, "vswr_reflected_orx", 100.0, "dBFS", grid2, 2, 4);
+			addVswrPrms(txCh1, "vswr_reflected_tx", 100.0, "dBFS", grid2, 2, 5);
+			// Track count row
+			grid2->addWidget(new QLabel("Track Count:"), 3, 0);
+			addVswrScaled(txCh1, "vswr_track_count", 1.0, "", grid2, 3, 1);
+
+			vswrTx2Layout->addLayout(grid2);
+
+			// Status
+			IIOWidget *vswrStatus =
+				Ad9371WidgetFactory::createReadOnlyWidget(txCh1, "vswr_status", "Status");
+			if(m_widgetGroup)
+				m_widgetGroup->add(vswrStatus);
+			connect(this, &Ad9371::readRequested, vswrStatus, &IIOWidget::readAsync);
+			vswrStatus->setDataToUIConversion([](QString data) {
+				int idx = data.toInt();
+				int count = (int)(sizeof(vswr_status_strings) / sizeof(vswr_status_strings[0]));
+				if(idx >= 0 && idx < count)
+					return QString(vswr_status_strings[idx]);
+				return data;
+			});
+			vswrTx2Layout->addWidget(vswrStatus);
+
+			// Tracking
+			IIOWidget *vswrTrack =
+				Ad9371WidgetFactory::createCheckboxWidget(txCh1, "vswr_tracking_en", "VSWR Tracking");
+			if(m_widgetGroup)
+				m_widgetGroup->add(vswrTrack);
+			connect(this, &Ad9371::readRequested, vswrTrack, &IIOWidget::readAsync);
+			vswrTx2Layout->addWidget(vswrTrack);
+
+			vswrLayout->addWidget(vswrTx2);
+		}
+		mainLayout->addLayout(vswrLayout);
+	}
+
+	section->contentLayout()->addWidget(content);
+	return section;
 
 	section->contentLayout()->addWidget(content);
 	return section;
