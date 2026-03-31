@@ -1,0 +1,12 @@
+{
+    "id": "ad9371",
+    "title": "AD9371 Package",
+    "version": "@PROJECT_VERSION@",
+    "description": "AD9371 RF Transceiver control package for Scopy",
+    "license": "GPL-3.0",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin", "base-pkg"]
+  }
