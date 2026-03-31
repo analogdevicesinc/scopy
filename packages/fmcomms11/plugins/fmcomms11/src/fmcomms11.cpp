@@ -200,7 +200,8 @@ QWidget *FMCOMMS11::generateInputAttenuatorWidget(QWidget *parent)
 							  .buildSingle();
 			if(hardwaregain) {
 				hardwaregain->showProgressBar(false);
-				hardwaregain->setDataToUIConversion([](QString data) { return data.split(" ").first(); });
+				hardwaregain->setDataToUIConversion(
+					[](QString data) { return data.split(" ").first(); });
 				connect(this, &FMCOMMS11::readRequested, hardwaregain, &IIOWidget::readAsync);
 				layout->addWidget(hardwaregain);
 			}
@@ -329,7 +330,8 @@ QWidget *FMCOMMS11::generateOutputVgaWidget(QWidget *parent)
 							  .buildSingle();
 			if(hardwaregain) {
 				hardwaregain->showProgressBar(false);
-				hardwaregain->setDataToUIConversion([](QString data) { return data.split(" ").first(); });
+				hardwaregain->setDataToUIConversion(
+					[](QString data) { return data.split(" ").first(); });
 				connect(this, &FMCOMMS11::readRequested, hardwaregain, &IIOWidget::readAsync);
 				layout->addWidget(hardwaregain);
 			}
