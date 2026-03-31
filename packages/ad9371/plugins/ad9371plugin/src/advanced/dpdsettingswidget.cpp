@@ -198,10 +198,16 @@ QWidget *DpdSettingsWidget::createDpdSettingsSection(QWidget *parent)
 		connect(this, &DpdSettingsWidget::readRequested, dpdPathDelayWidget, &IIOWidget::readAsync);
 	}
 
+	// Signed 8-bit conversion lambdas (matches original SPINBUTTON_S8: (char)val cast)
+	auto s8DataToUI = [](QString data) { return QString::number((qint8)data.toLongLong()); };
+	auto s8UItoData = [](QString data) { return QString::number((quint8)(qint8)data.toInt()); };
+
 	// DPD Weights0 Real - RangeUi [-128,127,1] (signed 8-bit)
 	auto dpdW0RealWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,dpd-weights0-real",
-									   "[0 1 255]", "DPD Weights0 Real", this);
+									   "[-128 1 127]", "DPD Weights0 Real", this);
 	if(dpdW0RealWidget) {
+		dpdW0RealWidget->setDataToUIConversion(s8DataToUI);
+		dpdW0RealWidget->setUItoDataConversion(s8UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(dpdW0RealWidget);
 		layout->addWidget(dpdW0RealWidget);
@@ -211,8 +217,10 @@ QWidget *DpdSettingsWidget::createDpdSettingsSection(QWidget *parent)
 
 	// DPD Weights0 Imag - RangeUi [-128,127,1] (signed 8-bit)
 	auto dpdW0ImagWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,dpd-weights0-imag",
-									   "[0 1 255]", "DPD Weights0 Imag", this);
+									   "[-128 1 127]", "DPD Weights0 Imag", this);
 	if(dpdW0ImagWidget) {
+		dpdW0ImagWidget->setDataToUIConversion(s8DataToUI);
+		dpdW0ImagWidget->setUItoDataConversion(s8UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(dpdW0ImagWidget);
 		layout->addWidget(dpdW0ImagWidget);
@@ -222,8 +230,10 @@ QWidget *DpdSettingsWidget::createDpdSettingsSection(QWidget *parent)
 
 	// DPD Weights1 Real - RangeUi [-128,127,1] (signed 8-bit)
 	auto dpdW1RealWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,dpd-weights1-real",
-									   "[0 1 255]", "DPD Weights1 Real", this);
+									   "[-128 1 127]", "DPD Weights1 Real", this);
 	if(dpdW1RealWidget) {
+		dpdW1RealWidget->setDataToUIConversion(s8DataToUI);
+		dpdW1RealWidget->setUItoDataConversion(s8UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(dpdW1RealWidget);
 		layout->addWidget(dpdW1RealWidget);
@@ -233,8 +243,10 @@ QWidget *DpdSettingsWidget::createDpdSettingsSection(QWidget *parent)
 
 	// DPD Weights1 Imag - RangeUi [-128,127,1] (signed 8-bit)
 	auto dpdW1ImagWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,dpd-weights1-imag",
-									   "[0 1 255]", "DPD Weights1 Imag", this);
+									   "[-128 1 127]", "DPD Weights1 Imag", this);
 	if(dpdW1ImagWidget) {
+		dpdW1ImagWidget->setDataToUIConversion(s8DataToUI);
+		dpdW1ImagWidget->setUItoDataConversion(s8UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(dpdW1ImagWidget);
 		layout->addWidget(dpdW1ImagWidget);
@@ -244,8 +256,10 @@ QWidget *DpdSettingsWidget::createDpdSettingsSection(QWidget *parent)
 
 	// DPD Weights2 Real - RangeUi [-128,127,1] (signed 8-bit)
 	auto dpdW2RealWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,dpd-weights2-real",
-									   "[0 1 255]", "DPD Weights2 Real", this);
+									   "[-128 1 127]", "DPD Weights2 Real", this);
 	if(dpdW2RealWidget) {
+		dpdW2RealWidget->setDataToUIConversion(s8DataToUI);
+		dpdW2RealWidget->setUItoDataConversion(s8UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(dpdW2RealWidget);
 		layout->addWidget(dpdW2RealWidget);
@@ -255,8 +269,10 @@ QWidget *DpdSettingsWidget::createDpdSettingsSection(QWidget *parent)
 
 	// DPD Weights2 Imag - RangeUi [-128,127,1] (signed 8-bit)
 	auto dpdW2ImagWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,dpd-weights2-imag",
-									   "[0 1 255]", "DPD Weights2 Imag", this);
+									   "[-128 1 127]", "DPD Weights2 Imag", this);
 	if(dpdW2ImagWidget) {
+		dpdW2ImagWidget->setDataToUIConversion(s8DataToUI);
+		dpdW2ImagWidget->setUItoDataConversion(s8UItoData);
 		if(m_widgetGroup)
 			m_widgetGroup->add(dpdW2ImagWidget);
 		layout->addWidget(dpdW2ImagWidget);
