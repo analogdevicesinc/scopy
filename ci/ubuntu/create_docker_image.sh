@@ -1,5 +1,9 @@
 #!/bin/bash -ex
 
+# Create Docker Image for Ubuntu Build
+# ===========================
+# Usage: ./create_docker_image.sh
+
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 ubuntu20(){

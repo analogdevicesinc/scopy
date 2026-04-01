@@ -1,5 +1,9 @@
 #!/bin/bash -xe
 
+# Build and Install Dependencies for Ubuntu
+# ===========================
+# Usage: ./ubuntu_build_process.sh configure_system
+
 ## Set STAGING
 USE_STAGING=OFF
 ##
@@ -137,6 +141,14 @@ clone() {
 	popd
 }
 
+# Generic CMake build function
+# Used by all dependency build functions to handle CMake-based projects
+#
+# Process:
+# 1. Creates clean build directory
+# 2. Runs CMake with cross-compilation options
+# 3. Builds with parallel jobs
+# 4. Records build info to status file
 build_with_cmake() {
 	download_cmake
 	INSTALL=$1
@@ -168,8 +180,8 @@ install_packages() {
 		libxkbcommon-x11-0 libqt5gui5 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev
 }
 
+# Installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
 install_qt() {
-	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
 	[ "$PYTHON_VERSION" == "python3.12" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
 	[ "$PYTHON_VERSION" == "python3.11" ] && sudo pip3 install --no-cache-dir aqtinstall
 	[ "$PYTHON_VERSION" == "python3.9" ]  && sudo pip3 install --no-cache-dir aqtinstall

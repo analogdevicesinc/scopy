@@ -1,11 +1,18 @@
 #!/usr/bin/bash.exe
 
+# MinGW Toolchain Configuration Script
+# ===================================
+# Configure build environment for Windows cross-compilation
+# Usage: source mingw_toolchain.sh [USE_STAGING]
+
 set -ex
-# get the full directory path of the script
+# Get directory containing this script
 export WORKFOLDER=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# File to track build status and versions
 BUILD_STATUS_FILE=$WORKFOLDER/build-status
 
+# Dependency versions/branches
 LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
@@ -24,10 +31,13 @@ ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
 GENALYZER_BRANCH=main
 
+
 STAGING_AREA=$WORKFOLDER/staging
 MINGW_VERSION=mingw64
 ARCH=x86_64
 
+# USE_STAGING=ON: Install to isolated directory
+# USE_STAGING=OFF: Install to system MinGW directory
 USE_STAGING=$1
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
@@ -44,22 +54,28 @@ if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 fi
 
 RC_COMPILER_OPT="-DCMAKE_RC_COMPILER=/mingw64/bin/windres.exe"
+
+# Build PATH with all required tools
 PATH="/bin:$STAGING_DIR/bin:$WORKFOLDER/cv2pdb:/c/Program Files (x86)/Inno Setup 6:/c/innosetup/:/bin:/usr/bin:${STAGING_DIR}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/Appveyor/BuildAgent:$PATH"
+
 QMAKE=${STAGING_DIR}/bin/qmake
 PKG_CONFIG_PATH=$STAGING_DIR/lib/pkgconfig
 CC=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-gcc.exe
 CXX=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-g++.exe
+
 JOBS="-j22"
 MAKE_BIN=/usr/bin/make.exe
 MAKE_CMD="$MAKE_BIN $JOBS"
+
 export CMAKE_GENERATOR="Unix Makefiles"
 
+# These options are passed to every CMake invocation
 export CMAKE_OPTS=( \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DCMAKE_VERBOSE_MAKEFILE=ON \
 	-DCMAKE_C_COMPILER:FILEPATH=${CC} \
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CXX} \
-	-DCMAKE_MAKE_PROGRAM:FILEPATH=${MAKE_BIN}\
+	-DCMAKE_MAKE_PROGRAM:FILEPATH=${MAKE_BIN} \
 	-DPKG_CONFIG_EXECUTABLE=${STAGING_DIR}/bin/pkg-config.exe \
 	-DCMAKE_MODULE_PATH=$STAGING_DIR \
 	-DCMAKE_PREFIX_PATH=$STAGING_DIR\;$STAGING_DIR/lib/cmake \
@@ -68,13 +84,17 @@ export CMAKE_OPTS=( \
 	-DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 )
 
+# Complete CMake command with all options
 export CMAKE="${STAGING_AREA}/cmake/bin/cmake ${CMAKE_OPTS[@]} "
 
+
+# Used by projects that use autotools instead of CMake
 AUTOCONF_OPTS="--prefix=$STAGING_DIR \
 	--host=${ARCH}-w64-mingw32 \
 	--enable-shared \
 	--disable-static"
 
+# Debug output - show configuration
 echo -- BUILD_STATUS_FILE:$BUILD_STATUS_FILE
 echo -- MAKE_BIN:$MAKE_BIN
 echo -- STAGING_DIR:$STAGING_DIR
@@ -86,14 +106,13 @@ echo -- USING CMAKE COMMAND
 echo $CMAKE
 echo
 
-# an older version of cmake was needed to fix some gnuradio and boost build errors
 download_cmake() {
 	echo "#######DOWNLOAD CMAKE#######"
 	mkdir -p ${STAGING_AREA}
 	pushd ${STAGING_AREA}
 	if [ ! -d cmake ];then
 		wget https://github.com/Kitware/CMake/releases/download/v4.1.1/cmake-4.1.1-windows-x86_64.zip
-		# unzip and rename
+		# Extract and rename to 'cmake' directory
 		unzip cmake*.zip && rm cmake*.zip && mv cmake* cmake
 	else
 		echo "Cmake already downloaded"

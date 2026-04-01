@@ -1,12 +1,17 @@
 #!/bin/bash
 
+# Docker Image Creation Script for ARM Cross-Compilation
+# =====================================================
+# Creates a Docker image with ARM cross-compilation environment
+# Usage: ./create_docker_image.sh [arm32|arm64]
+
+
 set -ex
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 ARCH=$1
 source $SRC_DIR/ci/arm/arm_build_config.sh "$ARCH"
 
-# install docker
 install_packages(){
 	sudo apt-get update
 	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
@@ -16,6 +21,7 @@ install_packages(){
 	sudo apt-get -y install containerd.io docker-ce docker-ce-cli docker-buildx-plugin
 }
 
+# Create ARM sysroot from Kuiper Linux image
 create_sysroot(){
 	$SRC_DIR/ci/arm/create_sysroot.sh "$ARCH" \
 		install_packages \
@@ -25,7 +31,7 @@ create_sysroot(){
 		configure_sysroot
 }
 
-# archive the sysroot and move it next to the Dockerfile in order to copy the tar in the docker image
+# Package sysroot for Docker image
 tar_and_move_sysroot(){
 	pushd $STAGING_AREA
 	sudo tar -czf "${SYSROOT_TAR##*/}" sysroot
@@ -33,6 +39,7 @@ tar_and_move_sysroot(){
 	popd
 }
 
+# Build Docker image
 create_image(){
 	pushd ${SRC_DIR}/ci/arm
 	if [ "${ARCH}" == "arm32" ]; then

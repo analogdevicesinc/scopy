@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# macOS Build Script
+# =====================================
+# Build and install all the dependencies needed for Scopy on macOS
+# Usage: ./install_macos_deps.sh
+
+# This script is designed for Azure Pipelines CI but can be run locally on macOS systems.
+# It installs all dependencies into a staging area defined by $STAGING_AREA_DEPS,
+# which is used by the build script to find the dependencies when building Scopy and IIO-Emulator
+
+# For Azure Pipelines it also implements caching of Homebrew packages and built dependencies.
+
 set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh
@@ -107,8 +118,6 @@ setup_dependencies_cache() {
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
-
-source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
 
@@ -526,6 +535,7 @@ setup_git_cache
 setup_dependencies_cache
 check_cache_sizes
 
+# Install dependencies, clone repositories, and build all dependencies
 install_packages
 export_paths
 clone
