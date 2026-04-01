@@ -1,4 +1,11 @@
 #!/bin/bash
+
+# macOS Build Script
+# =====================================
+# After the build is complete, this script packages the Scopy.app bundle by fixing library paths and bundling dependencies.
+# It also creates a DMG installer and a ZIP archive for distribution.
+# Usage: ./package_darwin.sh
+
 set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
 source $REPO_SRC/ci/macOS/macos_config.sh

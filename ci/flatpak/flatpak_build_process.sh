@@ -1,38 +1,55 @@
 #!/bin/bash -xe
 
+# Flatpak Build Process Script
+# ===========================
+# Purpose: Build Scopy as a Flatpak package
+# Usage: ./flatpak_build_process.sh
+#
+# This script:
+# 1. Generates the Flatpak manifest (JSON)
+# 2. Modifies it for CI builds
+# 3. Builds the Flatpak package
+
+# Get repository root directory
 SCOPY_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SCOPY_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 
+# Flatpak manifest file (generated from template)
 SCOPY_JSON=$SCOPY_DIR/ci/flatpak/org.adi.Scopy.json
 
 pushd $SCOPY_DIR/ci/flatpak
+
 git submodule update --init
 
-# Run the preprocess step to generate org.adi.Scopy.json
+# Generate Flatpak manifest from template
+# The template (.json.c) contains C preprocessor directives
 make preprocess
 
-# Disable the preprocess step; The Json file will now be modified and
-# we don't want to re-generate it at the build step
 export EN_PREPROCESS=false
 
 if [ "$CI_SCRIPT" == "ON" ];
 	then
 		SOURCE_DIR=$GITHUB_WORKSPACE
-		# this is needed in order to be used by flatpak caching system
-		# the docker image already contains the built dependencies so we just have to move them
+		# Use pre-built dependencies from Docker image
+		# .flatpak-builder: Flatpak's build cache
+		# build: Compiled dependencies
 		cp -r /home/runner/flatpak_tools/.flatpak-builder $SOURCE_DIR/ci/flatpak
 		cp -r /home/runner/flatpak_tools/build $SOURCE_DIR/ci/flatpak
 	else
 		SOURCE_DIR=$SCOPY_DIR
 fi
 
-# check the number of elements in the json file in order to get the last element, which is Scopy
+# The manifest normally fetches Scopy from git
+# For CI, we need to use the local source directory
+
+# Find Scopy module (it's the last one in the modules array)
 cnt=$( echo $(jq '.modules | length' $SCOPY_JSON) )
 cnt=$(($cnt-1))
 
-# We are building in Github Actions and we use the current directory folder on a CLEAN Docker image
+# Replace git source with local directory source
 cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].type = "dir"' > tmp.json
 cp tmp.json $SCOPY_JSON
+# Set path to current source directory
 cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].path = "'$SOURCE_DIR'"' > tmp.json
 cp tmp.json $SCOPY_JSON
 cat $SCOPY_JSON | jq --tab 'del(.modules['$cnt'].sources[0].url)' > tmp.json
@@ -41,7 +58,7 @@ cat $SCOPY_JSON | jq --tab 'del(.modules['$cnt'].sources[0].branch)' > tmp.json
 cp tmp.json $SCOPY_JSON
 rm tmp.json
 
-# Generate build status info for the about page
+# Extract version info from all git modules for the build status file
 jq '.modules[] | select(type == "object" and .sources[]?.type == "git") | "\(.name): \(.sources[] | select(.type == "git") | .branch // .tag // .commit // "no branch, tag, or commit")"' ./org.adi.Scopy.json >> build-status
 cp build-status $SOURCE_DIR/build-status
 
@@ -52,6 +69,8 @@ cp build-status $SOURCE_DIR/build-status
 # cat $SCOPY_JSON | jq --tab '."build-options".env += ('$CI_ENVS')' > tmp.json
 # cp tmp.json $SCOPY_JSON
 
+# Build the Flatpak
+# This uses flatpak-builder with the generated manifest
 make
 
 # Copy the Scopy.flatpak file in $SOURCE_DIR (which is the external location, mount when docker starts)

@@ -1,19 +1,37 @@
 #!/bin/bash
+
+# x86_64 AppImage Build Script
+# ===========================
+# Build portable AppImage for x86_64 Linux systems
+# Usage: ./x86-64_appimage_process.sh [function_name ...]
+#
+# This script creates a portable AppImage that includes:
+# - Scopy application
+# - All required libraries
+# - Qt framework
+# - Python runtime for decoders
+# - IIO emulator
+#
+# The AppImage can run on most x86_64 Linux distributions
+# without requiring installation
+
 set -ex
 
-## Set STAGING
+# Staging configuration
+# OFF: Use system libraries where possible
+# ON: Use isolated dependency tree
 USE_STAGING=OFF
-##
 
+# Determine source directories
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# CI-specific configuration
 if [ "$CI_SCRIPT" == "ON" ]; then
 	USE_STAGING=OFF
 	SRC_DIR=$GITHUB_WORKSPACE
 fi
-
 
 export APPIMAGE=1
 
@@ -35,6 +53,7 @@ ECM_BRANCH=kf5
 KARCHIVE_BRANCH=kf5
 GENALYZER_BRANCH=main
 
+# Python version detection
 if [ -f /etc/os-release ]; then
     . /etc/os-release
 
@@ -60,38 +79,46 @@ else
     echo "/etc/os-release not found. Cannot determine OS."
 fi
 
+# Qt is installed using aqtinstall
 QT_INSTALL_LOCATION=/opt/Qt
 QT=$QT_INSTALL_LOCATION/5.15.2/gcc_64
 
 STAGING_AREA=$SRC_SCRIPT/staging
 QMAKE_BIN=$QT/bin/qmake
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
-JOBS=-j14
+JOBS=-j14 # Parallel build jobs
 
+# AppImage structure
+# =================
 APP_DIR_NAME=scopy.AppDir
 APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
 
+# Different names for different Ubuntu versions
 APP_IMAGE_FOLDER=scopy-x86_64-appimage
 [ "$VERSION_ID" == "20.04" ] && APP_IMAGE_FOLDER=scopy-x86_64-appimage-ubuntu20
 
 APP_IMAGE_NAME=${APP_IMAGE_FOLDER}.AppImage
 APP_IMAGE=$SRC_SCRIPT/$APP_IMAGE_NAME
 
+# Export variables for GitHub Actions
 [ $CI_SCRIPT ] && echo "app_image_folder=$APP_IMAGE_FOLDER" >> "$GITHUB_ENV"
 [ $CI_SCRIPT ] && echo "app_image_name=$APP_IMAGE_NAME" >> "$GITHUB_ENV"
 
+# Build status tracking
 BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
 
 if [ "$USE_STAGING" == "ON" ]
 	then
 		echo -- USING STAGING FOLDER: $STAGING_AREA_DEPS
 		STAGING_AREA_DEPS=$STAGING_AREA/dependencies
+		# Add staging libraries to runtime path
 		export LD_LIBRARY_PATH=$STAGING_AREA_DEPS/lib:$QT/lib:$LD_LIBRARY_PATH
+
 		CMAKE_OPTS=(\
 			-DCMAKE_LIBRARY_PATH=$STAGING_AREA_DEPS \
 			-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
 			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
-			-DCMAKE_EXE_LINKER_FLAGS=-L$STAGING_AREA_DEPS\;-L$STAGING_AREA_DEPS/lib \
+			-DCMAKE_EXE_LINKER_FLAGS=-L$STAGING_AREA_DEPS\;-L$STAGING_AREA_DEPS/lib \ # Linker paths
 			-DCMAKE_SHARED_LINKER_FLAGS=-L$STAGING_AREA_DEPS\;-L$STAGING_AREA_DEPS/lib \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 			-DCMAKE_VERBOSE_MAKEFILE=ON \
@@ -101,6 +128,7 @@ if [ "$USE_STAGING" == "ON" ]
 		echo -- NO STAGING: INSTALLING IN SYSTEM
 		STAGING_AREA_DEPS=/usr/local
 		export LD_LIBRARY_PATH=$QT/lib:$LD_LIBRARY_PATH:
+		
 		CMAKE_OPTS=(\
 			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -108,6 +136,7 @@ if [ "$USE_STAGING" == "ON" ]
 		)
 fi
 
+# Complete CMake command
 CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 echo -- USING CMAKE COMMAND:
 echo $CMAKE
@@ -137,8 +166,8 @@ clone() {
 	popd
 }
 
+# Installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
 install_qt() {
-	# installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
 	[ "$PYTHON_VERSION" == "python3.12" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
 	[ "$PYTHON_VERSION" == "python3.11" ] && sudo pip3 install --no-cache-dir aqtinstall
 	[ "$PYTHON_VERSION" == "python3.9" ]  && sudo pip3 install --no-cache-dir aqtinstall
@@ -151,20 +180,22 @@ download_tools() {
 
 	if [ ! -d cmake ];then
 		wget https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
-		tar -xf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake # unzip and rename
+		tar -xf cmake*.tar.gz && rm cmake*.tar.gz && mv cmake* cmake
 	fi
 
-	# download tools for creating the AppDir and the AppImage
+	# linuxdeploy: tool for creating AppDirs
 	if [ ! -f linuxdeploy-x86_64.AppImage ];then
 		wget https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-x86_64.AppImage
 		chmod +x linuxdeploy-x86_64.AppImage
 	fi
 
+	# Handles Qt-specific deployment
 	if [ ! -f linuxdeploy-plugin-qt-x86_64.AppImage ];then
 		wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/1-alpha-20240109-1/linuxdeploy-plugin-qt-x86_64.AppImage
 		chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
 	fi
 
+	# Creates the AppImage from AppDir
 	if [ ! -f linuxdeploy-plugin-appimage-x86_64.AppImage ];then
 		wget https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/1-alpha-20230713-1/linuxdeploy-plugin-appimage-x86_64.AppImage
 		chmod +x linuxdeploy-plugin-appimage-x86_64.AppImage
@@ -445,6 +476,8 @@ build_scopy() {
 	popd
 }
 
+# Assembles all files needed for the AppImage following the AppDir specification
+# https://docs.appimage.org/reference/appdir.html
 create_appdir(){
 
 	rm -rf $APP_DIR
@@ -458,13 +491,17 @@ create_appdir(){
 	LIBS=$(find $APP_DIR/usr -type f -name "libscopy*.so")
 	COPY_DEPS=${SRC_DIR}/ci/x86_64/copy-deps.sh
 
-	export QMAKE=$QMAKE_BIN # this is needed for deploy-plugin-qt.AppImage
-	# inside a docker image you can't run an appimage executable without privileges
-	# so the solution is to extract the appimage first and only then to run it
+	export QMAKE=$QMAKE_BIN  # AppImage Qt plugin needs to find qmake
+
+	# Workaround for running AppImages in Docker
+	# AppImages require FUSE which isn't available in Docker
+	# This flag makes them extract and run instead
 	export PATH=$QT:$PATH
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT/lib:$APP_DIR/usr/lib
 	sudo ldconfig
 	export APPIMAGE_EXTRACT_AND_RUN=1
+
+	# Run linuxdeploy to create basic AppDir structure
 	${STAGING_AREA}/linuxdeploy-x86_64.AppImage \
 		--appdir  $APP_DIR \
 		--executable $APP_DIR/usr/bin/scopy \
@@ -478,11 +515,12 @@ create_appdir(){
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
 
-	# search for the python version linked by cmake and copy inside the appimage the same version
+	# Copy Python runtime
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
 	python_path=/usr/lib/$FOUND_PYTHON_VERSION
 	cp -r $python_path $APP_DIR/usr/lib
 
+	# Copy protocol decoders
 	if [ -d $STAGING_AREA_DEPS/share/libsigrokdecode/decoders ]; then
 		cp -r $STAGING_AREA_DEPS/share/libsigrokdecode/decoders $APP_DIR/usr/lib
 	elif [ -d $STAGING_AREA/libsigrokdecode/decoders ];then
@@ -494,11 +532,14 @@ create_appdir(){
 
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	cp -r $QT/plugins $APP_DIR/usr
+
 	cp $QT/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
 	cp $QT/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
 	cp $QT/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
 	cp $QT/lib/libQt5DBus.so* $APP_DIR/usr/lib
+
 	cp $STAGING_AREA_DEPS/lib/libgenalyzer.so* $APP_DIR/usr/lib
+
 	cp /usr/lib/x86_64-linux-gnu/libXdmcp.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libbsd.so* $APP_DIR/usr/lib
 	cp /usr/lib/x86_64-linux-gnu/libXau.so* $APP_DIR/usr/lib
@@ -506,6 +547,7 @@ create_appdir(){
 	popd
 }
 
+# Packages the AppDir into a single executable file
 create_appimage(){
 	rm -rf $APP_IMAGE
 
@@ -521,7 +563,6 @@ generate_ci_envs(){
 	$SRC_DIR/ci/general/gen_ci_envs.sh > $SRC_DIR/ci/x86_64/gh-actions.envs
 }
 
-# move the staging folder that contains the tools needed for the build to the known location
 move_tools(){
 	[ -d /home/runner/staging ] && mv /home/runner/staging $STAGING_AREA || echo "Staging folder not found or already moved"
 	if [ ! -d $STAGING_AREA ]; then
@@ -535,10 +576,9 @@ move_appimage(){
 }
 
 
-#
-# Helper functions
-#
+# Helper Functions
 
+# Build all dependencies from source
 build_deps(){
 	clone
 	download_tools
@@ -560,20 +600,23 @@ build_deps(){
 	build_genalyzer ON
 }
 
+# Complete build from source to AppImage
 run_workflow(){
 	[ "$CI_SCRIPT" == "ON" ] && move_tools || download_tools
-	build_iio-emu
-	build_scopy
-	create_appdir
-	create_appimage
-	move_appimage
+	build_iio-emu       # Build emulator
+	build_scopy         # Build application
+	create_appdir       # Assemble files
+	create_appimage     # Package AppImage
+	move_appimage       # Move to output location
 }
 
+# Download build tools only
 get_tools(){
 	install_packages
 	download_tools
 }
 
+# Build AppImage assuming dependencies exist
 generate_appimage(){
 	download_tools
 	build_iio-emu
@@ -582,11 +625,12 @@ generate_appimage(){
 	create_appimage
 }
 
+# Complete system setup including Qt
 configure_system(){
-	install_packages
-	install_qt
-	build_deps
-	download_tools
+	install_packages    # System packages
+	install_qt          # Qt framework
+	build_deps          # All dependencies
+	download_tools      # Build tools
 }
 
 for arg in $@; do

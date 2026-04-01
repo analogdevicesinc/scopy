@@ -1,11 +1,18 @@
 #!/usr/bin/bash.exe
+
+# Windows Build Process Script for Scopy
+# =====================================
+# Purpose: Build Scopy for Windows using MSYS2/MinGW-w64
+# Usage: ./windows_build_process.sh
+
 set -xe
-# get the full directory path of the script
+# Get the directory containing this script
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-## Set STAGING
+# Staging configuration
+# OFF: Install to system directories
+# ON: Install to isolated staging area
 USE_STAGING=OFF
-##
 
 source $SCRIPT_DIR/mingw_toolchain.sh $USE_STAGING
 
@@ -17,6 +24,7 @@ install_packages() {
 		unzip\
 		zip\
 	"
+
 	TOOLS_PKGS="\
 		mingw-w64-${ARCH}-wget2\
 		mingw-w64-${ARCH}-cmake\
@@ -33,6 +41,9 @@ install_packages() {
 		mingw-w64-${ARCH}-boost\
 		mingw-w64-${ARCH}-ccache
 	"
+
+	# Pre-built libraries from MSYS2
+	# Using these saves significant build time
 	PACMAN_SYNC_DEPS="\
 		mingw-w64-${ARCH}-fftw\
 		mingw-w64-${ARCH}-orc\
@@ -54,6 +65,7 @@ install_packages() {
 	if [ "$USE_STAGING" == "ON" ]; then
 		mkdir -p $STAGING_DIR/var/lib/pacman/local
 		mkdir -p $STAGING_DIR/var/lib/pacman/sync
+		# Update core packages first
 		$PACMAN -Syuu bash filesystem mintty pacman
 	fi
 
@@ -88,6 +100,7 @@ clone() {
 	popd
 }
 
+# Records information about the build environment
 create_build_status_file() {
 	touch $BUILD_STATUS_FILE
 	echo "Scopy2-MinGW" >> $BUILD_STATUS_FILE
@@ -96,6 +109,7 @@ create_build_status_file() {
 	echo "" >> $BUILD_STATUS_FILE
 	echo "All explicitly installed packages on build machine" >> $BUILD_STATUS_FILE
 	echo "" >> $BUILD_STATUS_FILE
+	# List all explicitly installed packages
 	pacman --noconfirm -Qe >> $BUILD_STATUS_FILE
 	echo "" >> $BUILD_STATUS_FILE
 	echo "Deps built from sources" >> $BUILD_STATUS_FILE
@@ -109,6 +123,8 @@ clean_build_dir() {
 	cd $BUILD_FOLDER
 }
 
+# Generic CMake build function for dependencies
+# Handles the common build pattern for CMake-based projects
 build_with_cmake() {
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
@@ -125,17 +141,19 @@ build_with_cmake() {
 		make install
 	fi
 	eval $CURRENT_BUILD_POST_MAKE
+
+	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 
-	#clean deps folder
+	# Clean source directory in CI to save space
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
 	popd
 
-	# clear vars
+	# Clear variables for next build
 	CURRENT_BUILD_CMAKE_OPTS=""
 	CURRENT_BUILD_POST_CLEAN=""
 	CURRENT_BUILD_PATCHES=""
@@ -157,11 +175,12 @@ build_libserialport(){
 	make $JOBS
 	[ "$INSTALL" == "ON" ] && make install
 
-	#clean deps folder
+	# Clean source in CI builds
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
+	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -170,14 +189,14 @@ build_libserialport(){
 build_libiio() {
 	CURRENT_BUILD=libiio
 	CURRENT_BUILD_CMAKE_OPTS="\
-		${RC_COMPILER_OPT}\
-		-DWITH_USB_BACKEND:BOOL=ON\
-		-DWITH_SERIAL_BACKEND:BOOL=ON\
-		-DCSHARP_BINDINGS:BOOL=OFF\
-		-DPYTHON_BINDINGS:BOOL=OFF\
-		-DHAVE_DNS_SD:BOOL=ON\
-		-DENABLE_IPV6:BOOL=OFF\
-		-DWITH_EXAMPLES:BOOL=ON\
+		${RC_COMPILER_OPT}\              # Windows resource compiler
+		-DWITH_USB_BACKEND:BOOL=ON\      # Enable USB support
+		-DWITH_SERIAL_BACKEND:BOOL=ON\   # Enable serial port support
+		-DCSHARP_BINDINGS:BOOL=OFF\      # No C# bindings needed
+		-DPYTHON_BINDINGS:BOOL=OFF\      # No Python bindings needed
+		-DHAVE_DNS_SD:BOOL=ON\           # Enable network discovery
+		-DENABLE_IPV6:BOOL=OFF\          # Disable IPv6 (simplifies)
+		-DWITH_EXAMPLES:BOOL=ON\         # Build example programs
 	"
 	build_with_cmake $1
 }
@@ -280,12 +299,14 @@ build_qwt() {
 	pushd $STAGING_AREA/$CURRENT_BUILD
 	git clean -xdf
 
+# Apply inline patch to fix install prefix
+# Changes empty prefix to /mingw64
 patch -p1 <<-EOF
 --- a/qwtconfig.pri
 +++ b/qwtconfig.pri
 @@ -24,7 +24,7 @@ unix {
  }
- 
+
  win32 {
 -    QWT_INSTALL_PREFIX    = ""
 +    QWT_INSTALL_PREFIX    = "/mingw64"
@@ -313,11 +334,12 @@ EOF
 
 	cp $STAGING_DIR/lib/qwt.dll $STAGING_DIR/bin/qwt.dll
 
-	#clean deps folder
+	# Clean source in CI
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
+	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -329,6 +351,7 @@ build_libsigrokdecode() {
 	pushd $STAGING_AREA/$CURRENT_BUILD
 	git reset --hard
 	git clean -xdf
+	# Apply Windows compatibility patch
 	patch -p1 < ${WORKFOLDER}/sigrokdecode-windows-fix.patch
 	./autogen.sh
 
@@ -337,7 +360,9 @@ build_libsigrokdecode() {
 
 	if [ "$USE_STAGING" == "ON" ]
 	then
+		# LIBSIGROKDECODE_EXPORT needed for Windows DLL
 		CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" ./configure --prefix $STAGING_AREA_DEPS ${AUTOCONF_OPTS}
+		# LD_RUN_PATH helps find libraries at runtime
 		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
 	else
 		CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" ./configure ${AUTOCONF_OPTS}
@@ -348,11 +373,12 @@ build_libsigrokdecode() {
 		make install
 	fi
 
-	#clean deps folder
+	# Clean source in CI
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
+	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -396,35 +422,34 @@ build_genalyzer() {
 	build_with_cmake $1
 }
 
-#
-# Helper functions
-#
-
+# Build all dependencies in correct order
 build_deps() {
-	install_packages
-	create_build_status_file
-	clone
-	build_libserialport ON
-	build_libiio ON
-	build_libad9361 ON
-	build_libm2k ON
-	build_spdlog ON
-	build_libsndfile ON
-	build_volk ON
-	build_gnuradio ON
-	build_grscopy ON
-	build_grm2k ON
-	build_qwt ON
-	build_libsigrokdecode ON
-	build_libtinyiiod ON
-	build_kddock ON
-	build_ecm ON
-	build_karchive ON
-	build_genalyzer ON
+	install_packages         # Install MSYS2 packages
+	create_build_status_file # Initialize build log
+	clone                    # Clone all source repositories
+
+	build_libserialport ON   # Serial port library
+	build_libiio ON          # Industrial I/O library
+	build_libad9361 ON       # AD9361 transceiver library
+	build_libm2k ON          # ADALM2000 library
+	build_spdlog ON          # Fast logging library
+	build_libsndfile ON      # Sound file I/O
+	build_volk ON            # Vector-Optimized Library of Kernels
+	build_gnuradio ON        # GNU Radio framework
+	build_grscopy ON         # GNU Radio Scopy blocks
+	build_grm2k ON           # GNU Radio M2K blocks
+	build_qwt ON             # Qt plotting widgets
+	build_libsigrokdecode ON # Protocol decoding
+	build_libtinyiiod ON     # Tiny IIO daemon library
+	build_kddock ON          # Docking framework
+	build_ecm ON             # Extra CMake modules
+	build_karchive ON        # KDE archive library
+	build_genalyzer ON       # Signal analysis library
 }
 
 for arg in $@; do
 	$arg
 done
 
+# Default action: build all dependencies
 build_deps

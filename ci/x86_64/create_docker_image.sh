@@ -1,5 +1,11 @@
 #!/bin/bash -ex
 
+# Create Docker Image for x86_64 AppImage Build
+# ===========================
+# Usage: ./create_docker_image.sh ubuntu20
+# or
+# Usage: ./create_docker_image.sh ubuntu24
+
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 ubuntu20(){

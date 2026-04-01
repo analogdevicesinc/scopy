@@ -1,5 +1,9 @@
 #!/bin/bash -xe
 
+# Create Docker Image for Flatpak Build
+# ===========================
+# Usage: ./create_docker_image.sh
+
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )
 
