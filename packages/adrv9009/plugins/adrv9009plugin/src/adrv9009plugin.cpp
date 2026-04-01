@@ -243,6 +243,12 @@ bool Adrv9009Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
+	while(m_toolList.size() > 2) {
+		ToolMenuEntry *entry = m_toolList.takeLast();
+		delete entry;
+	}
+	Q_EMIT toolListChanged();
+
 	// Close connection
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
