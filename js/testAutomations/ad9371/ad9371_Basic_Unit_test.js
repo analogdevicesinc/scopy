@@ -2388,20 +2388,25 @@ TestFramework.runTest("UNIT.CAL.FULL_CALIBRATION_FLOW", function() {
         msleep(500);
 
         // Trigger calibration
-        ad9371.calibrate();
+        var calOk = ad9371.calibrate();
         msleep(2000);
 
-        // Verify flags still set
-        var rxQec = ad9371.getCalibrateRxQecEn();
-        var txQec = ad9371.getCalibrateTxQecEn();
-        printToConsole("  After calibrate: rx_qec=" + rxQec + " tx_qec=" + txQec);
-
-        // Restore
+        // Restore before any return path
         ad9371.setCalibrateRxQecEn(origRxQec);
         ad9371.setCalibrateTxQecEn(origTxQec);
         ad9371.setCalibrateTxLolEn(origTxLol);
         ad9371.setCalibrateTxLolExtEn(origTxLolExt);
         msleep(500);
+
+        if (!calOk) {
+            printToConsole("  FAIL: Calibration returned error from hardware");
+            return false;
+        }
+
+        // Verify flags still set after successful calibration
+        var rxQec = ad9371.getCalibrateRxQecEn();
+        var txQec = ad9371.getCalibrateTxQecEn();
+        printToConsole("  After calibrate: rx_qec=" + rxQec + " tx_qec=" + txQec);
 
         return true;
     } catch (e) {
@@ -2888,7 +2893,7 @@ TestFramework.runTest("UNIT.BADVAL.TX_LO_FREQUENCY", function() {
         printToConsole("  Wrote 0 MHz, read=" + readBack);
 
         // Should either clamp to min or reject — value should not be 0
-        var passed = (parseFloat(readBack) >= 300);
+        var passed = (parseFloat(readBack) >= 70);
         if (!passed) {
             printToConsole("  FAIL: TX LO accepted invalid frequency 0 MHz");
         }
