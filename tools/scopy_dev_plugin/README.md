@@ -40,6 +40,8 @@ Both must be on your `PATH`. On Ubuntu: `sudo apt install clang-format` and `pip
 | `/scopy_dev_plugin:verify-package <package>` | CI pre-flight validation (format + license) |
 | `/scopy_dev_plugin:validate-api <plugin>` | Validate API class implementation (checks A1–A7) |
 | `/scopy_dev_plugin:validate-automated-tests <plugin>` | Validate JS automated test scripts (checks T1–T7) |
+| `/scopy_dev_plugin:create-unit-tests <plugin>` | Generate JS unit test scripts for IIOWidget coverage |
+| `/scopy_dev_plugin:validate-unit-tests <plugin>` | Validate JS unit test scripts (checks U1–U7) |
 
 ## Knowledge Skills (auto-load)
 
@@ -51,6 +53,8 @@ These skills are loaded automatically when relevant context is detected:
 - **scopy-doc-format** — RST documentation conventions
 - **scopy-test-format** — Test case UID and RBP conventions
 - **scopy-api-patterns** — API class structure and Q_INVOKABLE patterns
+- **unit-test-quality-checks** — Unit test validation rules (U1–U7) for IIOWidget coverage tests
+- **unit-test-patterns** — Code patterns for unit test helpers and complex test scenarios
 
 ## Hooks
 
