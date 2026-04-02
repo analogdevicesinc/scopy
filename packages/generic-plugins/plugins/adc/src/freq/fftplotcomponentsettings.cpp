@@ -145,6 +145,11 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	connect(m_waterfallRows, &MenuSpinbox::valueChanged, this,
 		[=](double val) { m_plotComponent->waterfallPlot()->setNumRows((int)val); });
 
+	MenuOnOffSwitch *waterfallInvertSwitch = new MenuOnOffSwitch("Invert direction", waterfallSection, false);
+	connect(waterfallInvertSwitch->onOffswitch(), &QAbstractButton::toggled, this, [=](bool inverted) {
+		m_plotComponent->waterfallPlot()->setInverted(inverted);
+	});
+
 	connect(waterfallSwitch, &QAbstractButton::toggled, this, [=](bool on) {
 		m_plotComponent->waterfallDockWrapper()->setActivated(on);
 		// if(!on)
@@ -152,6 +157,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	});
 
 	waterfallSection->add(m_waterfallRows);
+	waterfallSection->add(waterfallInvertSwitch);
 
 	m_deletePlot = new QPushButton("Delete Plot");
 	StyleHelper::BasicButton(m_deletePlot);
