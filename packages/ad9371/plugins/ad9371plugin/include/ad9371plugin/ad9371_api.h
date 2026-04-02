@@ -58,7 +58,7 @@ public:
 	Q_INVOKABLE void setCalibrateClgcEn(const QString &val);
 	Q_INVOKABLE QString getCalibrateVswrEn();
 	Q_INVOKABLE void setCalibrateVswrEn(const QString &val);
-	Q_INVOKABLE void calibrate();
+	Q_INVOKABLE bool calibrate();
 
 	// --- RX Chain ---
 	Q_INVOKABLE QString getRxRfBandwidth();

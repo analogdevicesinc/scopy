@@ -384,25 +384,27 @@ void Ad9371_API::setCalibrateVswrEn(const QString &v)
 	iio_device_attr_write_bool(tool->m_dev, "calibrate_vswr_en", v.toInt() != 0);
 }
 
-void Ad9371_API::calibrate()
+bool Ad9371_API::calibrate()
 {
 	// Direct IIO write — no widget for write-only trigger
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	Connection *conn = cp->open(m_plugin->m_param);
 	if(!conn) {
 		qWarning(CAT_AD9371_API) << "Failed to open connection for calibrate";
-		return;
+		return false;
 	}
 	iio_device *dev = iio_context_find_device(conn->context(), "ad9371-phy");
 	if(!dev) {
 		qWarning(CAT_AD9371_API) << "ad9371-phy device not found";
-		return;
+		return false;
 	}
 	int ret = iio_device_attr_write_bool(dev, "calibrate", true);
-	if(ret < 0)
+	if(ret < 0) {
 		qWarning(CAT_AD9371_API) << "Calibration failed:" << ret;
-	else
-		qDebug(CAT_AD9371_API) << "Calibration triggered";
+		return false;
+	}
+	qDebug(CAT_AD9371_API) << "Calibration triggered";
+	return true;
 }
 
 // --- RX Chain ---
