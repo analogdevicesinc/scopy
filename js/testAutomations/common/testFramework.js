@@ -52,8 +52,10 @@ var TestFramework = {
 
     // Connect to device with automatic fallback to emulator
     connectToDevice: function(uri) {
-        // If specific URI provided, use it
-        if (uri) {
+        // Global injected by run_tests.py takes priority over hardcoded per-test URI
+        if (typeof scopyDeviceUri !== 'undefined' && scopyDeviceUri) {
+            this.deviceUri = scopyDeviceUri;
+        } else if (uri) {
             this.deviceUri = uri;
         }
 
