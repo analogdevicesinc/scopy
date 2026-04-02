@@ -186,15 +186,25 @@ void Ad9371_API::writeToWidget(const QString &key, const QString &value)
 			double min = parts[0].toDouble();
 			double max = parts[2].toDouble();
 			double clamped = std::min(std::max(min, value.toDouble()), max);
-			data = QString::number(clamped, 'g');
+			// 'g' format produces "6e+06" for large integers; IIO kernel rejects scientific notation.
+			data = (std::floor(clamped) == clamped) ? QString::number(static_cast<qlonglong>(clamped))
+								: QString::number(clamped, 'f');
 		}
 	} else if(!optionalData.isEmpty()) {
-		// Combo widget: reject values not in the valid options list
+		// Combo widget: validate against display options; also accept raw numeric IIO values.
 		QStringList validOptions = optionalData.split(" ", Qt::SkipEmptyParts);
 		if(!validOptions.contains(data)) {
-			qWarning(CAT_AD9371_API) << "Value" << value << "is not valid for key" << key
-						 << "- valid options:" << optionalData;
-			return;
+			// optionalData holds display strings (e.g. "VCO_DIV_1 VCO_DIV_2"); the IIO driver
+			// stores numeric values ("0", "1", ...). Accept integers as raw IIO values and let
+			// the driver enforce its own validation.
+			bool ok;
+			data.toLongLong(&ok);
+			if(!ok) {
+				qWarning(CAT_AD9371_API) << "Value" << value << "is not valid for key" << key
+							 << "- valid options:" << optionalData;
+				return;
+			}
+			// Numeric value: fall through and write directly to IIO
 		}
 	}
 
@@ -209,6 +219,20 @@ void Ad9371_API::writeToWidget(const QString &key, const QString &value)
 	}
 
 	widget->writeAsync(data);
+}
+
+void Ad9371_API::writeRawToWidget(const QString &key, const QString &value)
+{
+	if(!m_plugin->m_widgetGroup) {
+		qWarning(CAT_AD9371_API) << "Widget manager not available";
+		return;
+	}
+	IIOWidget *widget = m_plugin->m_widgetGroup->get(key);
+	if(!widget) {
+		qWarning(CAT_AD9371_API) << "Widget not found for key:" << key;
+		return;
+	}
+	widget->writeAsync(value);
 }
 
 QString Ad9371_API::txChannelKey(int channel, const QString &attr)
@@ -474,7 +498,8 @@ QString Ad9371_API::getRxLoFrequency()
 
 void Ad9371_API::setRxLoFrequency(const QString &val)
 {
-	writeToWidget("ad9371-phy/altvoltage0_out/frequency", QString::number(val.toDouble() * 1e6, 'f', 0));
+	double mhz = std::min(std::max(70.0, val.toDouble()), 6000.0);
+	writeRawToWidget("ad9371-phy/altvoltage0_out/frequency", QString::number(mhz * 1e6, 'f', 0));
 }
 
 // --- TX Chain ---
@@ -505,7 +530,8 @@ QString Ad9371_API::getTxAttenuation(int channel)
 
 void Ad9371_API::setTxAttenuation(int channel, const QString &val)
 {
-	writeToWidget(txChannelKey(channel, "hardwaregain"), QString::number(-std::abs(val.toDouble()), 'f', 2));
+	double atten = std::min(std::max(0.0, std::abs(val.toDouble())), 41.95);
+	writeRawToWidget(txChannelKey(channel, "hardwaregain"), QString::number(-atten, 'f', 2));
 }
 
 QString Ad9371_API::getTxQuadratureTracking(int channel)
@@ -551,7 +577,8 @@ QString Ad9371_API::getTxLoFrequency()
 
 void Ad9371_API::setTxLoFrequency(const QString &val)
 {
-	writeToWidget("ad9371-phy/altvoltage1_out/frequency", QString::number(val.toDouble() * 1e6, 'f', 0));
+	double mhz = std::min(std::max(70.0, val.toDouble()), 6000.0);
+	writeRawToWidget("ad9371-phy/altvoltage1_out/frequency", QString::number(mhz * 1e6, 'f', 0));
 }
 
 // --- DPD Settings ---
@@ -858,7 +885,8 @@ QString Ad9371_API::getSnifferLoFrequency()
 
 void Ad9371_API::setSnifferLoFrequency(const QString &val)
 {
-	writeToWidget("ad9371-phy/altvoltage2_out/frequency", QString::number(val.toDouble() * 1e6, 'f', 0));
+	double mhz = std::min(std::max(70.0, val.toDouble()), 6000.0);
+	writeRawToWidget("ad9371-phy/altvoltage2_out/frequency", QString::number(mhz * 1e6, 'f', 0));
 }
 
 // --- Advanced Tool Navigation ---

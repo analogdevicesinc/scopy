@@ -39,6 +39,7 @@ import select
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 
@@ -89,6 +90,19 @@ def resolve_paths(plugin_name, scopy_bin, emu_xml, js_file):
             paths["emu_xml"] = os.path.join(emu_dir, plugin_name + ".xml")
 
     return paths
+
+
+def generate_wrapper(device_uri, js_script):
+    """Generate a temp JS file that sets scopyDeviceUri then evaluates the real script."""
+    abs_script = os.path.abspath(js_script).replace("\\", "/")
+    content = (
+        f'var scopyDeviceUri = "{device_uri}";\n'
+        f'evaluateFile("{abs_script}");\n'
+    )
+    fd, path = tempfile.mkstemp(suffix=".js", prefix="scopy_wrapper_")
+    with os.fdopen(fd, "w") as f:
+        f.write(content)
+    return path
 
 
 def wait_for_port(host, port, timeout):
@@ -391,7 +405,15 @@ def main():
             print(f"[runner] Skipping emulator (using hardware at {args.device_uri})")
 
         # Run tests
-        lines, scopy_rc = run_scopy_tests(paths["scopy_bin"], paths["js_script"], args.timeout)
+        effective_uri = args.device_uri if args.device_uri else "ip:127.0.0.1"
+        wrapper_path = generate_wrapper(effective_uri, paths["js_script"])
+        try:
+            lines, scopy_rc = run_scopy_tests(paths["scopy_bin"], wrapper_path, args.timeout)
+        finally:
+            try:
+                os.unlink(wrapper_path)
+            except OSError:
+                pass
 
         print("=" * 60)
 

@@ -489,10 +489,20 @@ TestFramework.runTest("UNIT.RX.GAIN_CONTROL_MODE", function() {
 
 TestFramework.runTest("UNIT.RX.CH0_HARDWARE_GAIN", function() {
     try {
+        var origEnsm = ad9371.getEnsmMode();
+        var origGainMode = ad9371.getRxGainControlMode();
+        ad9371.setEnsmMode("radio_on");
+        msleep(500);
+        ad9371.setRxGainControlMode("manual");
+        msleep(500);
         var rangeResult = testRange(PHY + "voltage0_in/hardwaregain", "0", "30", "15");
-        if (!rangeResult) return false;
+        if (!rangeResult) {
+            ad9371.setRxGainControlMode(origGainMode);
+            ad9371.setEnsmMode(origEnsm);
+            return false;
+        }
 
-        return testConversion(
+        var result = testConversion(
             function() { return ad9371.getRxHardwareGain(0); },
             function(v) { ad9371.setRxHardwareGain(0, v); },
             PHY + "voltage0_in/hardwaregain",
@@ -500,6 +510,9 @@ TestFramework.runTest("UNIT.RX.CH0_HARDWARE_GAIN", function() {
             "15.00",
             1.0
         );
+        ad9371.setRxGainControlMode(origGainMode);
+        ad9371.setEnsmMode(origEnsm);
+        return result;
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -541,10 +554,20 @@ TestFramework.runTest("UNIT.RX.CH0_QUADRATURE_TRACKING", function() {
 
 TestFramework.runTest("UNIT.RX.CH1_HARDWARE_GAIN", function() {
     try {
+        var origEnsm = ad9371.getEnsmMode();
+        var origGainMode = ad9371.getRxGainControlMode();
+        ad9371.setEnsmMode("radio_on");
+        msleep(500);
+        ad9371.setRxGainControlMode("manual");
+        msleep(500);
         var rangeResult = testRange(PHY + "voltage1_in/hardwaregain", "0", "30", "15");
-        if (!rangeResult) return false;
+        if (!rangeResult) {
+            ad9371.setRxGainControlMode(origGainMode);
+            ad9371.setEnsmMode(origEnsm);
+            return false;
+        }
 
-        return testConversion(
+        var result = testConversion(
             function() { return ad9371.getRxHardwareGain(1); },
             function(v) { ad9371.setRxHardwareGain(1, v); },
             PHY + "voltage1_in/hardwaregain",
@@ -552,6 +575,9 @@ TestFramework.runTest("UNIT.RX.CH1_HARDWARE_GAIN", function() {
             "15.00",
             1.0
         );
+        ad9371.setRxGainControlMode(origGainMode);
+        ad9371.setEnsmMode(origEnsm);
+        return result;
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -2198,6 +2224,7 @@ TestFramework.runTest("UNIT.OBS.GAIN_CONTROL_MODE", function() {
 
 TestFramework.runTest("UNIT.OBS.HARDWARE_GAIN", function() {
     try {
+        ad9371.setEnsmMode("radio_on");
         // ORx gain requires rf_port_select in an observation mode and manual gain control
         var origPort = ad9371.getObsRfPortSelect();
         var origMode = ad9371.getObsGainControlMode();
@@ -2514,10 +2541,13 @@ TestFramework.runTest("UNIT.FPGA.PHASE_ROTATION_CH1", function() {
 TestFramework.runTest("UNIT.RX.GAIN_MODE_INTERACTION", function() {
     try {
         var origMode = ad9371.getRxGainControlMode();
+        var origEnsm = ad9371.getEnsmMode();
         var origGain = ad9371.getRxHardwareGain(0);
         printToConsole("  Original mode: " + origMode + ", gain: " + origGain);
 
-        // Set to manual and set a specific gain
+        // Ensure ENSM is radio_on AND gain control is manual for gain writes to take effect
+        ad9371.setEnsmMode("radio_on");
+        msleep(500);
         ad9371.setRxGainControlMode("manual");
         msleep(1000);
         ad9371.setRxHardwareGain(0, "20");
@@ -2527,6 +2557,7 @@ TestFramework.runTest("UNIT.RX.GAIN_MODE_INTERACTION", function() {
         if (Math.abs(parseFloat(manualGain) - 20.0) > 1.0) {
             printToConsole("  FAIL: gain should be ~20 in manual mode");
             ad9371.setRxGainControlMode(origMode);
+            ad9371.setEnsmMode(origEnsm);
             msleep(500);
             return false;
         }
@@ -2539,12 +2570,14 @@ TestFramework.runTest("UNIT.RX.GAIN_MODE_INTERACTION", function() {
         if (agcGain === null || agcGain === "") {
             printToConsole("  FAIL: gain unreadable in AGC mode");
             ad9371.setRxGainControlMode(origMode);
+            ad9371.setEnsmMode(origEnsm);
             msleep(500);
             return false;
         }
 
         // Restore
         ad9371.setRxGainControlMode(origMode);
+        ad9371.setEnsmMode(origEnsm);
         msleep(500);
         return true;
     } catch (e) {
@@ -2844,6 +2877,7 @@ TestFramework.runTest("UNIT.BADVAL.RX_GAIN_CONTROL_MODE", function() {
 // Test TX LO frequency below minimum via API
 TestFramework.runTest("UNIT.BADVAL.TX_LO_FREQUENCY", function() {
     try {
+        ad9371.setEnsmMode("radio_on");
         var orig = ad9371.getTxLoFrequency();
         printToConsole("  orig TX LO freq=" + orig);
 

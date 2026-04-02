@@ -182,6 +182,7 @@ public:
 private:
 	QString readFromWidget(const QString &key);
 	void writeToWidget(const QString &key, const QString &value);
+	void writeRawToWidget(const QString &key, const QString &value);
 	QString txChannelKey(int channel, const QString &attr);
 	static QString stripUnitSuffix(const QString &value);
 
