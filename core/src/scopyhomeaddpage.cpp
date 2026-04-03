@@ -56,7 +56,11 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent)
 	m_stackedWidget->addWidget(m_addPage);
 	m_stackedWidget->setCurrentWidget(m_tabWidget);
 
-	layout->addWidget(m_stackedWidget);
+	QScrollArea *scrollArea = new QScrollArea(this);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setWidget(m_stackedWidget);
+
+	layout->addWidget(scrollArea);
 	m_pendingUri = "";
 
 	connect(m_addBtn, &QPushButton::clicked, this, &ScopyHomeAddPage::addBtnClicked);
