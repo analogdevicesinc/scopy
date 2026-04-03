@@ -33,10 +33,12 @@ Download
       **ARM64**
 
         * Download: `Scopy AppImage executable for ARM64 <https://github.com/analogdevicesinc/scopy/releases/latest>`_
+	* Download: `Scopy Debian package for ARM64 that installs the AppImage with all the necessary wrappers and policies <https://github.com/analogdevicesinc/scopy/releases/latest>`_
 
       **ARM32**
 
         * Download: `Scopy AppImage executable for ARM32 <https://github.com/analogdevicesinc/scopy/releases/latest>`_
+	* Download: `Scopy Debian package for ARM32 that installs the AppImage with all the necessary wrappers and policies <https://github.com/analogdevicesinc/scopy/releases/latest>`_
 
 .. warning::
 
@@ -188,6 +190,50 @@ OR
     flatpak run --env=QT_QPA_PLATFORM=xcb org.adi.Scopy
 
     QT_QPA_PLATFORM=xcb ./Scopy.AppImage
+
+
+Running with elevated privileges on Linux
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some operations on local IIO devices (e.g. write, buffer access) require elevated (root) privileges.
+When Scopy detects a local IIO context and is not running as root, a dialog will inform you that certain
+operations may not be available. You can dismiss it with **Continue as user**
+and proceed with limited access.
+
+To gain full access, launch Scopy with elevated privileges:
+
+.. code-block::
+
+    sudo ./Scopy.AppImage
+
+
+**ARM systems (.deb package)**
+
+When Scopy is installed, via the Debian package, a *PolicyKit policy* and a
+*wrapper script* ``scopy-root`` are installed automatically.
+
+Starting the application using the graphical interface or by running the wrapper
+script will trigger a privilege prompt, allowing Scopy to be run with elevated
+privileges without needing to use ``sudo`` in the terminal.
+
+The privilege prompt will appear on application launch without any extra steps.
+
+The wrapper script is located in ``/usr/bin/scopy-root``. To launch Scopy with elevated privileges using the terminal, run:
+
+.. code-block::
+
+    scopy-root
+
+Sudo can still be used to launch the application with elevated privileges:
+
+.. code-block::
+
+    sudo ./Scopy.AppImage
+
+.. warning::
+
+    Running GUI applications as root can introduce security risks.
+    Use elevated privileges only when required for local IIO device access.
 
 
 Application Overview
