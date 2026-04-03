@@ -9,20 +9,19 @@ changed. If the hardware adjusts a value to the nearest supported setting, the u
 value is read back and displayed automatically. Use the **Refresh** button to re-read
 all current hardware values at any time.
 
-.. AN_IMAGE_WILL_BE_HERE
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad6676/ad6676.png
+    :align: center
+
+
 
 ADC Settings
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
 
   - **adc_frequency:** ADC sampling frequency in MHz. Valid range is 2925–3200 MHz.
     Changing this value dynamically updates the valid range for the IF bandwidth setting.
 
 Bandwidth Settings
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
 
   - **bandwidth:** IF bandwidth in MHz. The valid range is automatically bounded to
     0.5%–5% of the current ADC frequency; values outside this range are clamped by
@@ -33,8 +32,6 @@ Bandwidth Settings
 
 Receive Settings
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
 
   - **intermediate_frequency:** IF center frequency in MHz. Valid range is 70–450 MHz.
   - **sampling_frequency:** Read-only. Displays the resulting output data rate in MSPS
@@ -47,8 +44,6 @@ Receive Settings
 Shuffler Settings
 ---------------------------------
 
-.. AN_IMAGE_WILL_BE_HERE
-
   - **shuffler_control:** Selects the shuffler operating mode from the list of options
     supported by the hardware.
   - **shuffler_thresh:** Selects the shuffler threshold level from the list of options
@@ -56,8 +51,6 @@ Shuffler Settings
 
 Test Settings
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
 
   - **test_mode:** Selects the test pattern injected into the ADC data path. Choose from
     the available options (e.g., off, midscale short, positive full scale, negative full
