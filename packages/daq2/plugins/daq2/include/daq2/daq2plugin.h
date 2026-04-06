@@ -29,6 +29,10 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+namespace scopy::daq2 {
+class Daq2_API;
+} // namespace scopy::daq2
+
 namespace scopy {
 class IIOWidgetGroup;
 }
@@ -55,7 +59,12 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
+
 	IIOWidgetGroup *m_widgetGroup = nullptr;
+	Daq2_API *m_api = nullptr;
+
+	friend class Daq2_API;
 };
 
 } // namespace scopy::daq2

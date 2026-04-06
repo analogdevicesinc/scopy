@@ -20,6 +20,7 @@
  */
 
 #include "daq2plugin.h"
+#include "daq2_api.h"
 #include "daq2tool.h"
 #include "scopy-daq2_config.h"
 
@@ -28,6 +29,7 @@
 #include <deviceiconbuilder.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <iioutil/connectionprovider.h>
+#include <pluginbase/scopyjs.h>
 #include <style.h>
 
 Q_LOGGING_CATEGORY(CAT_DAQ2PLUGIN, "Daq2Plugin")
@@ -99,11 +101,24 @@ bool Daq2Plugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
 
+	initApi();
 	return true;
+}
+
+void Daq2Plugin::initApi()
+{
+	m_api = new Daq2_API(this);
+	m_api->setObjectName("daq2");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 bool Daq2Plugin::onDisconnect()
 {
+	if(m_api) {
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);

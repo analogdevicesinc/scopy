@@ -25,6 +25,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLoggingCategory>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QtConcurrent>
@@ -53,6 +54,7 @@ DAQ2::DAQ2(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	mainLayout->addWidget(m_tool);
 
 	m_refreshButton = new AnimatedRefreshBtn(false, this);
+
 	m_tool->addWidgetToTopContainerHelper(m_refreshButton, TTA_RIGHT);
 
 	connect(m_refreshButton, &QPushButton::clicked, this, [this]() {
