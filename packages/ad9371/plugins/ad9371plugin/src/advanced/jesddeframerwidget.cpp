@@ -75,7 +75,8 @@ void JesdDeframerWidget::setupUi()
 	auto bankIdWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-bank-id",
 									"[0 1 15]", "BANK ID");
 	if(bankIdWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(bankIdWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(bankIdWidget);
 		section->contentLayout()->addWidget(bankIdWidget);
 		connect(this, &JesdDeframerWidget::readRequested, bankIdWidget, &IIOWidget::readAsync);
 	}
@@ -84,7 +85,8 @@ void JesdDeframerWidget::setupUi()
 	auto deviceIdWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-device-id",
 									  "[0 1 255]", "DEVICE ID");
 	if(deviceIdWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(deviceIdWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(deviceIdWidget);
 		section->contentLayout()->addWidget(deviceIdWidget);
 		connect(this, &JesdDeframerWidget::readRequested, deviceIdWidget, &IIOWidget::readAsync);
 	}
@@ -93,7 +95,8 @@ void JesdDeframerWidget::setupUi()
 	auto lane0IdWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-lane0-id",
 									 "[0 1 31]", "LANE0 ID");
 	if(lane0IdWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(lane0IdWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(lane0IdWidget);
 		section->contentLayout()->addWidget(lane0IdWidget);
 		connect(this, &JesdDeframerWidget::readRequested, lane0IdWidget, &IIOWidget::readAsync);
 	}
@@ -102,7 +105,8 @@ void JesdDeframerWidget::setupUi()
 	auto mWidget =
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-m", "[0 1 255]", "M");
 	if(mWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(mWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(mWidget);
 		section->contentLayout()->addWidget(mWidget);
 		connect(this, &JesdDeframerWidget::readRequested, mWidget, &IIOWidget::readAsync);
 	}
@@ -110,7 +114,8 @@ void JesdDeframerWidget::setupUi()
 	// 5. K (Frames/Multiframe) - Range Widget [0,32,1]
 	auto kWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-k", "[0 1 32]", "K");
 	if(kWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(kWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(kWidget);
 		section->contentLayout()->addWidget(kWidget);
 		connect(this, &JesdDeframerWidget::readRequested, kWidget, &IIOWidget::readAsync);
 	}
@@ -119,7 +124,8 @@ void JesdDeframerWidget::setupUi()
 	auto scrambleWidget =
 		Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, "adi,jesd204-deframer-scramble", "SCRAMBLE");
 	if(scrambleWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(scrambleWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(scrambleWidget);
 		section->contentLayout()->addWidget(scrambleWidget);
 		scrambleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, scrambleWidget, &IIOWidget::readAsync);
@@ -129,7 +135,8 @@ void JesdDeframerWidget::setupUi()
 	auto extSysrefWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, "adi,jesd204-deframer-external-sysref", "EXTERNAL SYSREF");
 	if(extSysrefWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(extSysrefWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(extSysrefWidget);
 		section->contentLayout()->addWidget(extSysrefWidget);
 		extSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, extSysrefWidget, &IIOWidget::readAsync);
@@ -190,7 +197,8 @@ void JesdDeframerWidget::setupUi()
 	auto crossbarWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,jesd204-deframer-deserializer-lane-crossbar", "[0 1 255]", "DESERIALIZER LANE CROSSBAR");
 	if(crossbarWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(crossbarWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(crossbarWidget);
 		section->contentLayout()->addWidget(crossbarWidget);
 		connect(this, &JesdDeframerWidget::readRequested, crossbarWidget, &IIOWidget::readAsync);
 	}
@@ -199,7 +207,8 @@ void JesdDeframerWidget::setupUi()
 	auto eqSettingWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-eq-setting",
 									   "[0 1 3]", "EQ SETTING");
 	if(eqSettingWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(eqSettingWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(eqSettingWidget);
 		section->contentLayout()->addWidget(eqSettingWidget);
 		connect(this, &JesdDeframerWidget::readRequested, eqSettingWidget, &IIOWidget::readAsync);
 	}
@@ -261,7 +270,8 @@ void JesdDeframerWidget::setupUi()
 	auto lmfcWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,jesd204-deframer-lmfc-offset",
 								      "[0 1 31]", "LMFC OFFSET");
 	if(lmfcWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(lmfcWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(lmfcWidget);
 		section->contentLayout()->addWidget(lmfcWidget);
 		connect(this, &JesdDeframerWidget::readRequested, lmfcWidget, &IIOWidget::readAsync);
 	}
@@ -270,7 +280,8 @@ void JesdDeframerWidget::setupUi()
 	auto newSysrefWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, "adi,jesd204-deframer-new-sysref-on-relink", "NEW SYSREF ON RELINK");
 	if(newSysrefWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(newSysrefWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(newSysrefWidget);
 		section->contentLayout()->addWidget(newSysrefWidget);
 		newSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, newSysrefWidget, &IIOWidget::readAsync);
@@ -280,7 +291,8 @@ void JesdDeframerWidget::setupUi()
 	auto enableAutoXbarWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, "adi,jesd204-deframer-enable-auto-chan-xbar", "ENABLE AUTO CHAN XBAR");
 	if(enableAutoXbarWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(enableAutoXbarWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(enableAutoXbarWidget);
 		section->contentLayout()->addWidget(enableAutoXbarWidget);
 		enableAutoXbarWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, enableAutoXbarWidget, &IIOWidget::readAsync);
@@ -290,7 +302,8 @@ void JesdDeframerWidget::setupUi()
 	auto txSyncbModeWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, "adi,jesd204-deframer-tx-syncb-mode", "TX SYNCB MODE");
 	if(txSyncbModeWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(txSyncbModeWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(txSyncbModeWidget);
 		section->contentLayout()->addWidget(txSyncbModeWidget);
 		txSyncbModeWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdDeframerWidget::readRequested, txSyncbModeWidget, &IIOWidget::readAsync);

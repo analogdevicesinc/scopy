@@ -94,7 +94,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto bankIdWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-bank-id").arg(attrPrefix), "[0 1 15]", "BANK ID");
 	if(bankIdWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(bankIdWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(bankIdWidget);
 		column->contentLayout()->addWidget(bankIdWidget);
 		connect(this, &JesdFramerWidget::readRequested, bankIdWidget, &IIOWidget::readAsync);
 	}
@@ -103,7 +104,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto deviceIdWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-device-id").arg(attrPrefix), "[0 1 255]", "DEVICE ID");
 	if(deviceIdWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(deviceIdWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(deviceIdWidget);
 		column->contentLayout()->addWidget(deviceIdWidget);
 		connect(this, &JesdFramerWidget::readRequested, deviceIdWidget, &IIOWidget::readAsync);
 	}
@@ -112,7 +114,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto lane0IdWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-lane0-id").arg(attrPrefix), "[0 1 31]", "LANE0 ID");
 	if(lane0IdWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(lane0IdWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(lane0IdWidget);
 		column->contentLayout()->addWidget(lane0IdWidget);
 		connect(this, &JesdFramerWidget::readRequested, lane0IdWidget, &IIOWidget::readAsync);
 	}
@@ -121,7 +124,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto mWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-m").arg(attrPrefix), "[0 1 255]", "M");
 	if(mWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(mWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(mWidget);
 		column->contentLayout()->addWidget(mWidget);
 		connect(this, &JesdFramerWidget::readRequested, mWidget, &IIOWidget::readAsync);
 	}
@@ -130,7 +134,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto kWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-k").arg(attrPrefix), "[0 1 32]", "K");
 	if(kWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(kWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(kWidget);
 		column->contentLayout()->addWidget(kWidget);
 		connect(this, &JesdFramerWidget::readRequested, kWidget, &IIOWidget::readAsync);
 	}
@@ -139,7 +144,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto scrambleWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-scramble").arg(attrPrefix), "SCRAMBLE");
 	if(scrambleWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(scrambleWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(scrambleWidget);
 		column->contentLayout()->addWidget(scrambleWidget);
 		scrambleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, scrambleWidget, &IIOWidget::readAsync);
@@ -149,7 +155,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto extSysrefWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-external-sysref").arg(attrPrefix), "EXTERNAL SYSREF");
 	if(extSysrefWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(extSysrefWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(extSysrefWidget);
 		column->contentLayout()->addWidget(extSysrefWidget);
 		extSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, extSysrefWidget, &IIOWidget::readAsync);
@@ -211,7 +218,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 		m_device, QString("adi,jesd204-%1-serializer-lane-crossbar").arg(attrPrefix), "[0 1 255]",
 		"SERIALIZER LANE CROSSBAR");
 	if(serCrossbarWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(serCrossbarWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(serCrossbarWidget);
 		column->contentLayout()->addWidget(serCrossbarWidget);
 		connect(this, &JesdFramerWidget::readRequested, serCrossbarWidget, &IIOWidget::readAsync);
 	}
@@ -221,7 +229,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 		m_device, QString("adi,jesd204-%1-serializer-amplitude").arg(attrPrefix), "[0 1 15]",
 		"SERIALIZER AMPLITUDE");
 	if(serAmplitudeWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(serAmplitudeWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(serAmplitudeWidget);
 		column->contentLayout()->addWidget(serAmplitudeWidget);
 		connect(this, &JesdFramerWidget::readRequested, serAmplitudeWidget, &IIOWidget::readAsync);
 	}
@@ -230,7 +239,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto preEmphasisWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-pre-emphasis").arg(attrPrefix), "[0 1 7]", "PRE EMPHASIS");
 	if(preEmphasisWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(preEmphasisWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(preEmphasisWidget);
 		column->contentLayout()->addWidget(preEmphasisWidget);
 		connect(this, &JesdFramerWidget::readRequested, preEmphasisWidget, &IIOWidget::readAsync);
 	}
@@ -292,7 +302,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto lmfcWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, QString("adi,jesd204-%1-lmfc-offset").arg(attrPrefix), "[0 1 31]", "LMFC OFFSET");
 	if(lmfcWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(lmfcWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(lmfcWidget);
 		column->contentLayout()->addWidget(lmfcWidget);
 		connect(this, &JesdFramerWidget::readRequested, lmfcWidget, &IIOWidget::readAsync);
 	}
@@ -301,7 +312,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto newSysrefWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-new-sysref-on-relink").arg(attrPrefix), "NEW SYSREF ON RELINK");
 	if(newSysrefWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(newSysrefWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(newSysrefWidget);
 		column->contentLayout()->addWidget(newSysrefWidget);
 		newSysrefWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, newSysrefWidget, &IIOWidget::readAsync);
@@ -311,7 +323,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto enableAutoXbarWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-enable-auto-chan-xbar").arg(attrPrefix), "ENABLE AUTO CHAN XBAR");
 	if(enableAutoXbarWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(enableAutoXbarWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(enableAutoXbarWidget);
 		column->contentLayout()->addWidget(enableAutoXbarWidget);
 		enableAutoXbarWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, enableAutoXbarWidget, &IIOWidget::readAsync);
@@ -321,7 +334,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto obsRxSyncbWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-obs-rx-syncb-select").arg(attrPrefix), "OBS RX SYNCB SELECT");
 	if(obsRxSyncbWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(obsRxSyncbWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(obsRxSyncbWidget);
 		column->contentLayout()->addWidget(obsRxSyncbWidget);
 		obsRxSyncbWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, obsRxSyncbWidget, &IIOWidget::readAsync);
@@ -331,7 +345,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto rxSyncbModeWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-rx-syncb-mode").arg(attrPrefix), "RX SYNCB MODE");
 	if(rxSyncbModeWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(rxSyncbModeWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rxSyncbModeWidget);
 		column->contentLayout()->addWidget(rxSyncbModeWidget);
 		rxSyncbModeWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, rxSyncbModeWidget, &IIOWidget::readAsync);
@@ -341,7 +356,8 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	auto overSampleWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, QString("adi,jesd204-%1-over-sample").arg(attrPrefix), "OVER SAMPLE");
 	if(overSampleWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(overSampleWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(overSampleWidget);
 		column->contentLayout()->addWidget(overSampleWidget);
 		overSampleWidget->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &JesdFramerWidget::readRequested, overSampleWidget, &IIOWidget::readAsync);

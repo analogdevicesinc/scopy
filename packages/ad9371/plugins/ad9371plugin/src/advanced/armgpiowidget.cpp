@@ -113,7 +113,8 @@ QWidget *ArmGpioWidget::createGpioConfigSection(QWidget *parent)
 	for(const auto &a : checkboxAttrs) {
 		auto w = Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, a.attr, a.title, group);
 		if(w) {
-			if(m_widgetGroup) m_widgetGroup->add(w);
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
 			layout->addWidget(w);
 			m_widgets.append(w);
 			connect(this, &ArmGpioWidget::readRequested, w, &IIOWidget::readAsync);
@@ -135,7 +136,8 @@ QWidget *ArmGpioWidget::createGpioConfigSection(QWidget *parent)
 	for(const auto &a : rangeAttrs) {
 		auto w = Ad9371WidgetFactory::createDebugRangeWidget(m_device, a.attr, "[0 1 15]", a.title, group);
 		if(w) {
-			if(m_widgetGroup) m_widgetGroup->add(w);
+			if(m_widgetGroup)
+				m_widgetGroup->add(w);
 			layout->addWidget(w);
 			m_widgets.append(w);
 			connect(this, &ArmGpioWidget::readRequested, w, &IIOWidget::readAsync);
@@ -185,7 +187,8 @@ QWidget *ArmGpioWidget::createEnableAckSection(QWidget *parent)
 		auto rangeWidget =
 			Ad9371WidgetFactory::createDebugRangeWidget(m_device, a.attr, "[0 1 15]", a.rangeTitle, row);
 		if(rangeWidget) {
-			if(m_widgetGroup) m_widgetGroup->add(rangeWidget);
+			if(m_widgetGroup)
+				m_widgetGroup->add(rangeWidget);
 			rowLayout->addWidget(rangeWidget);
 			m_widgets.append(rangeWidget);
 			connect(this, &ArmGpioWidget::readRequested, rangeWidget, &IIOWidget::readAsync);

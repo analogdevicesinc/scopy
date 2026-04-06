@@ -101,7 +101,8 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 	auto txChannelsWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,tx-settings-tx-channels-enable", txChannelsOptions, "CHANNEL ENABLE", this);
 	if(txChannelsWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(txChannelsWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(txChannelsWidget);
 		layout->addWidget(txChannelsWidget);
 		m_widgets.append(txChannelsWidget);
 		connect(this, &TxSettingsWidget::readRequested, txChannelsWidget, &IIOWidget::readAsync);
@@ -112,7 +113,8 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,tx-settings-tx-pll-lo-frequency_hz",
 							    "[300000000 1 6000000000]", "TX PLL LO FREQUENCY HZ", this);
 	if(txPllLoFreqWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(txPllLoFreqWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(txPllLoFreqWidget);
 		layout->addWidget(txPllLoFreqWidget);
 		m_widgets.append(txPllLoFreqWidget);
 		connect(this, &TxSettingsWidget::readRequested, txPllLoFreqWidget, &IIOWidget::readAsync);
@@ -122,7 +124,8 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 	auto txPllExtLoWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, "adi,tx-settings-tx-pll-use-external-lo", "TX PLL USE EXTERNAL LO", this);
 	if(txPllExtLoWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(txPllExtLoWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(txPllExtLoWidget);
 		layout->addWidget(txPllExtLoWidget);
 		m_widgets.append(txPllExtLoWidget);
 		connect(this, &TxSettingsWidget::readRequested, txPllExtLoWidget, &IIOWidget::readAsync);
@@ -137,7 +140,8 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 	auto attenStepWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,tx-settings-tx-atten-step-size", attenStepOptions, "STEP SIZE", this);
 	if(attenStepWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(attenStepWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(attenStepWidget);
 		layout->addWidget(attenStepWidget);
 		m_widgets.append(attenStepWidget);
 		connect(this, &TxSettingsWidget::readRequested, attenStepWidget, &IIOWidget::readAsync);
@@ -147,7 +151,8 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 	auto tx1AttenWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,tx-settings-tx1-atten_mdb",
 									  "[0 1 41950]", "TX1 ATTEN mdB", this);
 	if(tx1AttenWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(tx1AttenWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(tx1AttenWidget);
 		layout->addWidget(tx1AttenWidget);
 		m_widgets.append(tx1AttenWidget);
 		connect(this, &TxSettingsWidget::readRequested, tx1AttenWidget, &IIOWidget::readAsync);
@@ -157,7 +162,8 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 	auto tx2AttenWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,tx-settings-tx2-atten_mdb",
 									  "[0 1 41950]", "TX2 ATTEN mdB", this);
 	if(tx2AttenWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(tx2AttenWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(tx2AttenWidget);
 		layout->addWidget(tx2AttenWidget);
 		m_widgets.append(tx2AttenWidget);
 		connect(this, &TxSettingsWidget::readRequested, tx2AttenWidget, &IIOWidget::readAsync);
@@ -188,7 +194,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto dacDivWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, "adi,tx-profile-dac-div",
 									      dacDivOptions, "DAC DIV", this);
 	if(dacDivWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(dacDivWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(dacDivWidget);
 		layout->addWidget(dacDivWidget);
 		m_widgets.append(dacDivWidget);
 		connect(this, &TxSettingsWidget::readRequested, dacDivWidget, &IIOWidget::readAsync);
@@ -202,7 +209,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto txFirInterpWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,tx-profile-tx-fir-interpolation", txFirInterpOptions, "TX FIR", this);
 	if(txFirInterpWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(txFirInterpWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(txFirInterpWidget);
 		layout->addWidget(txFirInterpWidget);
 		m_widgets.append(txFirInterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, txFirInterpWidget, &IIOWidget::readAsync);
@@ -212,7 +220,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto thb1InterpWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,tx-profile-thb1-interpolation", "[1 1 2]", "THB1 INTERPOLATION", this);
 	if(thb1InterpWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(thb1InterpWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(thb1InterpWidget);
 		layout->addWidget(thb1InterpWidget);
 		m_widgets.append(thb1InterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, thb1InterpWidget, &IIOWidget::readAsync);
@@ -222,7 +231,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto thb2InterpWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,tx-profile-thb2-interpolation", "[1 1 2]", "THB2 INTERPOLATION", this);
 	if(thb2InterpWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(thb2InterpWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(thb2InterpWidget);
 		layout->addWidget(thb2InterpWidget);
 		m_widgets.append(thb2InterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, thb2InterpWidget, &IIOWidget::readAsync);
@@ -232,7 +242,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto txInputHbInterpWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,tx-profile-tx-input-hb-interpolation", "[1 1 2]", "TX INPUT HB INTERPOLATION", this);
 	if(txInputHbInterpWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(txInputHbInterpWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(txInputHbInterpWidget);
 		layout->addWidget(txInputHbInterpWidget);
 		m_widgets.append(txInputHbInterpWidget);
 		connect(this, &TxSettingsWidget::readRequested, txInputHbInterpWidget, &IIOWidget::readAsync);
@@ -242,7 +253,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto iqRateWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,tx-profile-iq-rate_khz",
 									"[30000 1 320000]", "IQ RATE KHZ", this);
 	if(iqRateWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(iqRateWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(iqRateWidget);
 		layout->addWidget(iqRateWidget);
 		m_widgets.append(iqRateWidget);
 		connect(this, &TxSettingsWidget::readRequested, iqRateWidget, &IIOWidget::readAsync);
@@ -253,7 +265,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,tx-profile-primary-sig-bandwidth_hz",
 							    "[0 1 250000000]", "PRIMARY SIG BANDWIDTH HZ", this);
 	if(primSigBwWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(primSigBwWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(primSigBwWidget);
 		layout->addWidget(primSigBwWidget);
 		m_widgets.append(primSigBwWidget);
 		connect(this, &TxSettingsWidget::readRequested, primSigBwWidget, &IIOWidget::readAsync);
@@ -263,7 +276,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto rfBwWidget = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,tx-profile-rf-bandwidth_hz",
 								      "[0 1 250000000]", "RF BANDWIDTH HZ", this);
 	if(rfBwWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(rfBwWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rfBwWidget);
 		layout->addWidget(rfBwWidget);
 		m_widgets.append(rfBwWidget);
 		connect(this, &TxSettingsWidget::readRequested, rfBwWidget, &IIOWidget::readAsync);
@@ -273,7 +287,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto dac3dbCornerWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,tx-profile-tx-dac-3db-corner_khz", "[0 1 250000]", "TX DAC 3DB CORNER KHZ", this);
 	if(dac3dbCornerWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(dac3dbCornerWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(dac3dbCornerWidget);
 		layout->addWidget(dac3dbCornerWidget);
 		m_widgets.append(dac3dbCornerWidget);
 		connect(this, &TxSettingsWidget::readRequested, dac3dbCornerWidget, &IIOWidget::readAsync);
@@ -283,7 +298,8 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 	auto bbf3dbCornerWidget = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,tx-profile-tx-bbf-3db-corner_khz", "[0 1 250000]", "TX BBF 3DB CORNER KHZ", this);
 	if(bbf3dbCornerWidget) {
-		if(m_widgetGroup) m_widgetGroup->add(bbf3dbCornerWidget);
+		if(m_widgetGroup)
+			m_widgetGroup->add(bbf3dbCornerWidget);
 		layout->addWidget(bbf3dbCornerWidget);
 		m_widgets.append(bbf3dbCornerWidget);
 		connect(this, &TxSettingsWidget::readRequested, bbf3dbCornerWidget, &IIOWidget::readAsync);
