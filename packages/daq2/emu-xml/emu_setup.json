@@ -1,0 +1,7 @@
+[
+	{
+		"device": "daq2",
+		"xml_path": "daq2.xml",
+		"uri": "ip:127.0.0.1"
+	}
+]
