@@ -854,7 +854,7 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 	}
 	mainLayout->addLayout(channelLayout);
 
-		// DPD/CLGC/VSWR sub-sections (conditional on has_dpd, AD9375 only)
+	// DPD/CLGC/VSWR sub-sections (conditional on has_dpd, AD9375 only)
 	if(m_hasDpd && txCh0) {
 		// Helper lambdas to reduce repetition
 		auto addReadOnly = [this, content](iio_channel *ch, const char *attr, const QString &labelTitle,

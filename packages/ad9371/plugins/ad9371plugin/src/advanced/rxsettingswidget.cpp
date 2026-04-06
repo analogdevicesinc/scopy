@@ -102,7 +102,8 @@ QWidget *RxSettingsWidget::createRxSettingsSection(QWidget *parent)
 	auto rxChannels = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,rx-settings-rx-channels-enable", rxChannelsOptions, "CHANNEL ENABLE");
 	if(rxChannels) {
-		if(m_widgetGroup) m_widgetGroup->add(rxChannels);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rxChannels);
 		layout->addWidget(rxChannels);
 		connect(this, &RxSettingsWidget::readRequested, rxChannels, &IIOWidget::readAsync);
 	}
@@ -112,7 +113,8 @@ QWidget *RxSettingsWidget::createRxSettingsSection(QWidget *parent)
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx-settings-rx-pll-lo-frequency_hz",
 							    "[300000000 1 6000000000]", "RX PLL LO FREQUENCY HZ");
 	if(rxPllLoFreq) {
-		if(m_widgetGroup) m_widgetGroup->add(rxPllLoFreq);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rxPllLoFreq);
 		layout->addWidget(rxPllLoFreq);
 		connect(this, &RxSettingsWidget::readRequested, rxPllLoFreq, &IIOWidget::readAsync);
 	}
@@ -121,7 +123,8 @@ QWidget *RxSettingsWidget::createRxSettingsSection(QWidget *parent)
 	auto rxPllExtLo = Ad9371WidgetFactory::createDebugCheckboxWidget(
 		m_device, "adi,rx-settings-rx-pll-use-external-lo", "RX PLL USE EXTERNAL LO");
 	if(rxPllExtLo) {
-		if(m_widgetGroup) m_widgetGroup->add(rxPllExtLo);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rxPllExtLo);
 		layout->addWidget(rxPllExtLo);
 		rxPllExtLo->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &RxSettingsWidget::readRequested, rxPllExtLo, &IIOWidget::readAsync);
@@ -131,7 +134,8 @@ QWidget *RxSettingsWidget::createRxSettingsSection(QWidget *parent)
 	auto realIfData = Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, "adi,rx-settings-real-if-data",
 									 "REAL IF DATA");
 	if(realIfData) {
-		if(m_widgetGroup) m_widgetGroup->add(realIfData);
+		if(m_widgetGroup)
+			m_widgetGroup->add(realIfData);
 		layout->addWidget(realIfData);
 		realIfData->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &RxSettingsWidget::readRequested, realIfData, &IIOWidget::readAsync);
@@ -158,7 +162,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto adcDiv =
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx-profile-adc-div", "[1 1 2]", "ADC DIV");
 	if(adcDiv) {
-		if(m_widgetGroup) m_widgetGroup->add(adcDiv);
+		if(m_widgetGroup)
+			m_widgetGroup->add(adcDiv);
 		layout->addWidget(adcDiv);
 		connect(this, &RxSettingsWidget::readRequested, adcDiv, &IIOWidget::readAsync);
 	}
@@ -171,7 +176,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto firDecimation = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,rx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR");
 	if(firDecimation) {
-		if(m_widgetGroup) m_widgetGroup->add(firDecimation);
+		if(m_widgetGroup)
+			m_widgetGroup->add(firDecimation);
 		layout->addWidget(firDecimation);
 		connect(this, &RxSettingsWidget::readRequested, firDecimation, &IIOWidget::readAsync);
 	}
@@ -180,7 +186,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto dec5Decimation = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx-profile-rx-dec5-decimation",
 									  "[4 1 5]", "RX DEC5 DECIMATION");
 	if(dec5Decimation) {
-		if(m_widgetGroup) m_widgetGroup->add(dec5Decimation);
+		if(m_widgetGroup)
+			m_widgetGroup->add(dec5Decimation);
 		layout->addWidget(dec5Decimation);
 		connect(this, &RxSettingsWidget::readRequested, dec5Decimation, &IIOWidget::readAsync);
 	}
@@ -189,7 +196,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto enHighRejDec5 = Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, "adi,rx-profile-en-high-rej-dec5",
 									    "EN HIGH REJ DEC5");
 	if(enHighRejDec5) {
-		if(m_widgetGroup) m_widgetGroup->add(enHighRejDec5);
+		if(m_widgetGroup)
+			m_widgetGroup->add(enHighRejDec5);
 		layout->addWidget(enHighRejDec5);
 		enHighRejDec5->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		connect(this, &RxSettingsWidget::readRequested, enHighRejDec5, &IIOWidget::readAsync);
@@ -199,7 +207,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto rhb1Decimation = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx-profile-rhb1-decimation",
 									  "[1 1 2]", "RHB1 DECIMATION");
 	if(rhb1Decimation) {
-		if(m_widgetGroup) m_widgetGroup->add(rhb1Decimation);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rhb1Decimation);
 		layout->addWidget(rhb1Decimation);
 		connect(this, &RxSettingsWidget::readRequested, rhb1Decimation, &IIOWidget::readAsync);
 	}
@@ -208,7 +217,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto iqRate = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx-profile-iq-rate_khz",
 								  "[20000 1 200000]", "IQ RATE KHZ");
 	if(iqRate) {
-		if(m_widgetGroup) m_widgetGroup->add(iqRate);
+		if(m_widgetGroup)
+			m_widgetGroup->add(iqRate);
 		layout->addWidget(iqRate);
 		connect(this, &RxSettingsWidget::readRequested, iqRate, &IIOWidget::readAsync);
 	}
@@ -217,7 +227,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto rfBandwidth = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx-profile-rf-bandwidth_hz",
 								       "[5000000 1 100000000]", "RF BANDWIDTH HZ");
 	if(rfBandwidth) {
-		if(m_widgetGroup) m_widgetGroup->add(rfBandwidth);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rfBandwidth);
 		layout->addWidget(rfBandwidth);
 		connect(this, &RxSettingsWidget::readRequested, rfBandwidth, &IIOWidget::readAsync);
 	}
@@ -226,7 +237,8 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 	auto bbf3dbCorner = Ad9371WidgetFactory::createDebugRangeWidget(
 		m_device, "adi,rx-profile-rx-bbf-3db-corner_khz", "[0 1 153600]", "RX BBF 3DB CORNER KHZ");
 	if(bbf3dbCorner) {
-		if(m_widgetGroup) m_widgetGroup->add(bbf3dbCorner);
+		if(m_widgetGroup)
+			m_widgetGroup->add(bbf3dbCorner);
 		layout->addWidget(bbf3dbCorner);
 		connect(this, &RxSettingsWidget::readRequested, bbf3dbCorner, &IIOWidget::readAsync);
 	}
