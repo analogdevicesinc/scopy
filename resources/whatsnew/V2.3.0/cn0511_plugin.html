@@ -1,0 +1,25 @@
+<h1>CN0511 Plugin</h1>
+
+<p>Scopy now offers dedicated support for the CN0511 wideband synthesizer board.</p>
+
+<p>The new <b>CN0511 Tool</b> enables you to integrate and control CN0511-based devices within Scopy. It communicates with the AD9166 DAC and the AD9166-AMP amplifier via the IIO subsystem, providing precise control over output frequency, amplitude, and amplifier enable state.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>Single Tone Mode:</b> Configure the output frequency (0–10000 MHz) and amplitude (-91 to 0 dBm) of the AD9166 DAC channel</li>
+  <li><b>DAC Amplifier Control:</b> Enable or disable the AD9166-AMP output amplifier stage with a single checkbox</li>
+  <li><b>Calibration Apply:</b> Write frequency, amplitude, and IOFS calibration coefficients to the device atomically with the Enter button</li>
+  <li><b>Device Readback:</b> Refresh button reads the current NCO frequency back from the hardware and updates the displayed value</li>
+  <li><b>Auto-Initialization:</b> On connection, the AD9166 is initialized with the FIR85 interpolation filter and a 6 GHz DAC sampling frequency</li>
+</ul>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Connect your CN0511 device to your computer.</li>
+  <li>Ensure the AD9166 IIO drivers are properly installed.</li>
+  <li>Open Scopy and select the <b>CN0511</b> tool from the available instruments.</li>
+  <li>Set the desired output frequency and amplitude, then click <b>Enter</b> to apply settings to the hardware.</li>
+  <li>Use the <b>Refresh</b> button in the top-right corner to read back the current frequency from the device.</li>
+</ol>
+
+<p>For more detailed information, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/cn0511/cn0511.html" target="_blank">official documentation</a>.</p>
