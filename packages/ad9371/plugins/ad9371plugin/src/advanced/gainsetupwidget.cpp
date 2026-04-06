@@ -103,7 +103,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rxGainMode = Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, "adi,rx-gain-mode",
 									    rxGainModeOptions, "GAIN CONTROL MODE");
 	if(rxGainMode) {
-		if(m_widgetGroup) m_widgetGroup->add(rxGainMode);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rxGainMode);
 		layout->addWidget(rxGainMode);
 		connect(this, &GainSetupWidget::readRequested, rxGainMode, &IIOWidget::readAsync);
 	}
@@ -112,7 +113,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx1GainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx1-gain-index", "[0 1 255]",
 									"RX1 GAIN INDEX");
 	if(rx1GainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(rx1GainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rx1GainIndex);
 		layout->addWidget(rx1GainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx1GainIndex, &IIOWidget::readAsync);
 	}
@@ -121,7 +123,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx2GainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx2-gain-index", "[0 1 255]",
 									"RX2 GAIN INDEX");
 	if(rx2GainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(rx2GainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rx2GainIndex);
 		layout->addWidget(rx2GainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx2GainIndex, &IIOWidget::readAsync);
 	}
@@ -130,7 +133,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx1MaxGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx1-max-gain-index",
 									   "[0 1 255]", "RX1 MAX GAIN INDEX");
 	if(rx1MaxGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(rx1MaxGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rx1MaxGainIndex);
 		layout->addWidget(rx1MaxGainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx1MaxGainIndex, &IIOWidget::readAsync);
 	}
@@ -139,7 +143,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx1MinGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx1-min-gain-index",
 									   "[0 1 255]", "RX1 MIN GAIN INDEX");
 	if(rx1MinGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(rx1MinGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rx1MinGainIndex);
 		layout->addWidget(rx1MinGainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx1MinGainIndex, &IIOWidget::readAsync);
 	}
@@ -148,7 +153,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx2MaxGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx2-max-gain-index",
 									   "[0 1 255]", "RX2 MAX GAIN INDEX");
 	if(rx2MaxGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(rx2MaxGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rx2MaxGainIndex);
 		layout->addWidget(rx2MaxGainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx2MaxGainIndex, &IIOWidget::readAsync);
 	}
@@ -157,7 +163,8 @@ QWidget *GainSetupWidget::createRxGainSection(QWidget *parent)
 	auto rx2MinGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,rx2-min-gain-index",
 									   "[0 1 255]", "RX2 MIN GAIN INDEX");
 	if(rx2MinGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(rx2MinGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(rx2MinGainIndex);
 		layout->addWidget(rx2MinGainIndex);
 		connect(this, &GainSetupWidget::readRequested, rx2MinGainIndex, &IIOWidget::readAsync);
 	}
@@ -187,7 +194,8 @@ QWidget *GainSetupWidget::createOrxGainSection(QWidget *parent)
 	auto orxGainMode = Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, "adi,orx-gain-mode",
 									     orxGainModeOptions, "GAIN CONTROL MODE");
 	if(orxGainMode) {
-		if(m_widgetGroup) m_widgetGroup->add(orxGainMode);
+		if(m_widgetGroup)
+			m_widgetGroup->add(orxGainMode);
 		layout->addWidget(orxGainMode);
 		connect(this, &GainSetupWidget::readRequested, orxGainMode, &IIOWidget::readAsync);
 	}
@@ -196,7 +204,8 @@ QWidget *GainSetupWidget::createOrxGainSection(QWidget *parent)
 	auto orx1GainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,orx1-gain-index", "[0 1 255]",
 									 "ORX1 GAIN INDEX");
 	if(orx1GainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(orx1GainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(orx1GainIndex);
 		layout->addWidget(orx1GainIndex);
 		connect(this, &GainSetupWidget::readRequested, orx1GainIndex, &IIOWidget::readAsync);
 	}
@@ -205,7 +214,8 @@ QWidget *GainSetupWidget::createOrxGainSection(QWidget *parent)
 	auto orx2GainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,orx2-gain-index", "[0 1 255]",
 									 "ORX2 GAIN INDEX");
 	if(orx2GainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(orx2GainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(orx2GainIndex);
 		layout->addWidget(orx2GainIndex);
 		connect(this, &GainSetupWidget::readRequested, orx2GainIndex, &IIOWidget::readAsync);
 	}
@@ -214,7 +224,8 @@ QWidget *GainSetupWidget::createOrxGainSection(QWidget *parent)
 	auto orxMaxGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,orx-max-gain-index",
 									   "[0 1 255]", "MAX GAIN INDEX");
 	if(orxMaxGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(orxMaxGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(orxMaxGainIndex);
 		layout->addWidget(orxMaxGainIndex);
 		connect(this, &GainSetupWidget::readRequested, orxMaxGainIndex, &IIOWidget::readAsync);
 	}
@@ -223,7 +234,8 @@ QWidget *GainSetupWidget::createOrxGainSection(QWidget *parent)
 	auto orxMinGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,orx-min-gain-index",
 									   "[0 1 255]", "MIN GAIN INDEX");
 	if(orxMinGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(orxMinGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(orxMinGainIndex);
 		layout->addWidget(orxMinGainIndex);
 		connect(this, &GainSetupWidget::readRequested, orxMinGainIndex, &IIOWidget::readAsync);
 	}
@@ -253,7 +265,8 @@ QWidget *GainSetupWidget::createSnifferGainSection(QWidget *parent)
 	auto snifferGainMode = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,sniffer-gain-mode", snifferGainModeOptions, "GAIN CONTROL MODE");
 	if(snifferGainMode) {
-		if(m_widgetGroup) m_widgetGroup->add(snifferGainMode);
+		if(m_widgetGroup)
+			m_widgetGroup->add(snifferGainMode);
 		layout->addWidget(snifferGainMode);
 		connect(this, &GainSetupWidget::readRequested, snifferGainMode, &IIOWidget::readAsync);
 	}
@@ -262,7 +275,8 @@ QWidget *GainSetupWidget::createSnifferGainSection(QWidget *parent)
 	auto snifferGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,sniffer-gain-index",
 									    "[0 1 255]", "GAIN INDEX");
 	if(snifferGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(snifferGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(snifferGainIndex);
 		layout->addWidget(snifferGainIndex);
 		connect(this, &GainSetupWidget::readRequested, snifferGainIndex, &IIOWidget::readAsync);
 	}
@@ -271,7 +285,8 @@ QWidget *GainSetupWidget::createSnifferGainSection(QWidget *parent)
 	auto snifferMaxGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,sniffer-max-gain-index",
 									       "[0 1 255]", "MAX GAIN INDEX");
 	if(snifferMaxGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(snifferMaxGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(snifferMaxGainIndex);
 		layout->addWidget(snifferMaxGainIndex);
 		connect(this, &GainSetupWidget::readRequested, snifferMaxGainIndex, &IIOWidget::readAsync);
 	}
@@ -280,7 +295,8 @@ QWidget *GainSetupWidget::createSnifferGainSection(QWidget *parent)
 	auto snifferMinGainIndex = Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,sniffer-min-gain-index",
 									       "[0 1 255]", "MIN GAIN INDEX");
 	if(snifferMinGainIndex) {
-		if(m_widgetGroup) m_widgetGroup->add(snifferMinGainIndex);
+		if(m_widgetGroup)
+			m_widgetGroup->add(snifferMinGainIndex);
 		layout->addWidget(snifferMinGainIndex);
 		connect(this, &GainSetupWidget::readRequested, snifferMinGainIndex, &IIOWidget::readAsync);
 	}

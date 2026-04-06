@@ -81,6 +81,7 @@ OMIT_FILES_LIST=(
     \*.user
     ad9084\*.txt
     adrv9009-filters\*.txt
+    ad9371-filters\*.txt
     \*/cjson/cJSON.\*
     \*.stream
 )

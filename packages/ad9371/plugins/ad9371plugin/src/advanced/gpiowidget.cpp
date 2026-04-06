@@ -135,7 +135,8 @@ QWidget *GpioWidget::createGpio3v3Section(QWidget *parent)
 		auto *srcCtrl =
 			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, g.attr, srcCtrl3v3Map, "", row);
 		if(srcCtrl) {
-			if(m_widgetGroup) m_widgetGroup->add(srcCtrl);
+			if(m_widgetGroup)
+				m_widgetGroup->add(srcCtrl);
 			rowLayout->addWidget(srcCtrl);
 			m_widgets.append(srcCtrl);
 			connect(this, &GpioWidget::readRequested, srcCtrl, &IIOWidget::readAsync);
@@ -196,7 +197,8 @@ QWidget *GpioWidget::createGpioSection(QWidget *parent)
 		auto *srcCtrl =
 			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, g.attr, srcCtrlMap, "", row);
 		if(srcCtrl) {
-			if(m_widgetGroup) m_widgetGroup->add(srcCtrl);
+			if(m_widgetGroup)
+				m_widgetGroup->add(srcCtrl);
 			rowLayout->addWidget(srcCtrl);
 			m_widgets.append(srcCtrl);
 			connect(this, &GpioWidget::readRequested, srcCtrl, &IIOWidget::readAsync);

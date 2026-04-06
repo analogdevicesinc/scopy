@@ -134,7 +134,8 @@ QWidget *AuxDacWidget::createAuxDacSection(QWidget *parent)
 			Ad9371WidgetFactory::createDebugRangeWidget(m_device, valueAttr, "[0 1 1023]", "VALUE", this);
 		configGrid->addWidget(valueWidget, row, 2);
 		if(valueWidget) {
-			if(m_widgetGroup) m_widgetGroup->add(valueWidget);
+			if(m_widgetGroup)
+				m_widgetGroup->add(valueWidget);
 			m_widgets.append(valueWidget);
 			connect(this, &AuxDacWidget::readRequested, valueWidget, &IIOWidget::readAsync);
 		}
@@ -148,7 +149,8 @@ QWidget *AuxDacWidget::createAuxDacSection(QWidget *parent)
 											   slopeMap, "DAC SLOPE", this);
 		configGrid->addWidget(slopeWidget, row, 3);
 		if(slopeWidget) {
-			if(m_widgetGroup) m_widgetGroup->add(slopeWidget);
+			if(m_widgetGroup)
+				m_widgetGroup->add(slopeWidget);
 			m_widgets.append(slopeWidget);
 			connect(this, &AuxDacWidget::readRequested, slopeWidget, &IIOWidget::readAsync);
 		}
@@ -164,7 +166,8 @@ QWidget *AuxDacWidget::createAuxDacSection(QWidget *parent)
 			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, vrefAttr, vrefMap, "VREF", this);
 		configGrid->addWidget(vrefWidget, row, 4);
 		if(vrefWidget) {
-			if(m_widgetGroup) m_widgetGroup->add(vrefWidget);
+			if(m_widgetGroup)
+				m_widgetGroup->add(vrefWidget);
 			m_widgets.append(vrefWidget);
 			connect(this, &AuxDacWidget::readRequested, vrefWidget, &IIOWidget::readAsync);
 		}
