@@ -22,10 +22,10 @@
 // Tests every IIOWidget attribute and API getter/setter method via readWidget/writeWidget.
 // Device: axi-ad9680-hpc (ADC, AD9680)
 // Emulator: iio-emu generic daq2.xml at ip:127.0.0.1
-// Run: ./scopy --script ../js/testAutomations/daq2/daq2_Unit_test.js
+// Run: ./scopy --script js/testAutomations/daq2/daq2_Unit_test.js
 
 // Load test framework
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 // ============================================
 // Standard helper functions
