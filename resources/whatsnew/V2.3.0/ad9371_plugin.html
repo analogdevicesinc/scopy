@@ -1,0 +1,26 @@
+<h1>AD9371 / AD9375 Plugin</h1>
+
+<p>Scopy now offers dedicated support for the AD9371 and AD9375 wideband RF transceivers.</p>
+
+<p>The new <b>AD9371 Tool</b> enables you to integrate and control AD9371 and AD9375-based devices within Scopy. It provides real-time configuration of the full signal chain — receive, transmit, and observation paths — with live read-back from hardware on every change.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>Device Global Settings:</b> Configure the Enable State Machine (ENSM) mode, enable or disable RX/TX calibrations, and load device profiles for specific sample rate and bandwidth combinations.</li>
+  <li><b>Receive Chain:</b> Tune the RX LO frequency from 300 MHz to 6 GHz, set hardware gain in Manual Gain Control (MGC) mode, monitor RSSI, and select from Manual, Hybrid, or Automatic gain control modes.</li>
+  <li><b>Transmit Chain:</b> Set TX LO frequency and per-channel attenuation (0 to −41.95 dB in 0.05 dB steps) for TX1 and TX2, with continuous QEC and LOL tracking options.</li>
+  <li><b>Observation / Sniffer Chain:</b> Control the observation receiver LO frequency, hardware gain, gain control mode, and RF port selection for TX calibration monitoring.</li>
+  <li><b>Automatic AD9375 Detection:</b> The plugin detects AD9375 hardware automatically and enables its exclusive Digital Pre-Distortion (DPD), Closed-Loop Gain Control (CLGC), and VSWR detection features on the transmit path.</li>
+  <li><b>Built-In Self-Test (BIST):</b> Verify the device data path using tone injection, PRBS pattern generation, and digital loopback — all applied immediately without requiring a device reinitialize.</li>
+  <li><b>Advanced Tool:</b> A 13-tab low-level configuration interface covering clock settings, TX/RX/ORx data path profiles, AGC tuning, JESD204B framer and deframer, GPIO, AUX DAC, and initialization calibrations.</li>
+</ul>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Connect your AD9371 or AD9375 evaluation board to your computer.</li>
+  <li>Ensure the AD9371 IIO drivers are properly installed.</li>
+  <li>Open Scopy and connect to the device URI (e.g., <b>ip:192.168.2.1</b>).</li>
+  <li>Select the <b>AD9371</b> or <b>ADRV9375</b> tool from the available instruments.</li>
+</ol>
+
+<p>For more detailed information, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/ad9371/ad9371.html" target="_blank">official documentation</a>.</p>
