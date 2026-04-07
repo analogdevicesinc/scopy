@@ -21,8 +21,8 @@
 // ============================================================================
 // ALL THE FOLLOWING TESTS REQUIRE VISUAL VALIDATION
 // These tests automate the steps from the manual test documentation but
-// require a human observer to verify UI changes. Each step includes a 3-second
-// pause to allow visual inspection of the application state.
+// require a human observer to verify UI changes. Each step uses
+// supervisedCheck() to prompt for pass/fail confirmation.
 // Source: docs/tests/plugins/ad9084/ad9084_tests.rst
 // ============================================================================
 
@@ -31,8 +31,6 @@ evaluateFile("js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("AD9084 Visual Validation Tests");
-
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
 
 // Connect to device
 if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
@@ -67,10 +65,7 @@ TestFramework.runTest("TST.AD9084.PLUGIN_LOADS", function() {
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify AD9084 plugin is visible and accessible in the UI");
-        msleep(VISUAL_DELAY);
-
-        return true;
+        return TestFramework.supervisedCheck("Verify AD9084 plugin is visible and accessible in the UI");
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -109,10 +104,7 @@ TestFramework.runTest("TST.AD9084.DEVICE_DETECTION_AND_DISPLAY", function() {
             printToConsole("  ... and " + (keys.length - 10) + " more widgets");
         }
 
-        printToConsole("  VISUAL CHECK: Verify device status panels are displayed correctly");
-        msleep(VISUAL_DELAY);
-
-        return true;
+        return TestFramework.supervisedCheck("Verify device status panels are displayed correctly");
     } catch (e) {
         printToConsole("  Error: " + e);
         return false;
@@ -129,43 +121,78 @@ TestFramework.runTest("TST.AD9084.DEVICE_DETECTION_AND_DISPLAY", function() {
 printToConsole("\n=== Test 3: Channel Configuration (VISUAL) ===\n");
 
 TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION.VISUAL", function() {
+    var ch = 0;
+    var originalRx = null;
+    var originalTx = null;
     try {
-        var ch = 0;
-        var originalRx = ad9084.isRxEnabled(ch);
-        var originalTx = ad9084.isTxEnabled(ch);
+        originalRx = ad9084.isRxEnabled(ch);
+        originalTx = ad9084.isTxEnabled(ch);
 
         // Step 1: Enable RX channel
         printToConsole("  Enabling RX channel " + ch + "...");
         ad9084.setRxEnabled(ch, "1");
-        printToConsole("  VISUAL CHECK: Verify RX channel " + ch + " is enabled in the UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX channel " + ch + " is enabled in the UI")) {
+            ad9084.setRxEnabled(ch, originalRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, originalTx);
+            msleep(500);
+            return false;
+        }
 
         // Step 2: Disable RX channel
         printToConsole("  Disabling RX channel " + ch + "...");
         ad9084.setRxEnabled(ch, "0");
-        printToConsole("  VISUAL CHECK: Verify RX channel " + ch + " is disabled in the UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX channel " + ch + " is disabled in the UI")) {
+            ad9084.setRxEnabled(ch, originalRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, originalTx);
+            msleep(500);
+            return false;
+        }
 
         // Step 3: Enable TX channel
         printToConsole("  Enabling TX channel " + ch + "...");
         ad9084.setTxEnabled(ch, "1");
-        printToConsole("  VISUAL CHECK: Verify TX channel " + ch + " is enabled in the UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify TX channel " + ch + " is enabled in the UI")) {
+            ad9084.setRxEnabled(ch, originalRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, originalTx);
+            msleep(500);
+            return false;
+        }
 
         // Step 4: Disable TX channel
         printToConsole("  Disabling TX channel " + ch + "...");
         ad9084.setTxEnabled(ch, "0");
-        printToConsole("  VISUAL CHECK: Verify TX channel " + ch + " is disabled in the UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify TX channel " + ch + " is disabled in the UI")) {
+            ad9084.setRxEnabled(ch, originalRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, originalTx);
+            msleep(500);
+            return false;
+        }
 
         // Restore original states
         ad9084.setRxEnabled(ch, originalRx);
+        msleep(500);
         ad9084.setTxEnabled(ch, originalTx);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalRx !== null) {
+            ad9084.setRxEnabled(ch, originalRx);
+            msleep(500);
+        }
+        if (originalTx !== null) {
+            ad9084.setTxEnabled(ch, originalTx);
+            msleep(500);
+        }
         return false;
     }
 });
@@ -180,43 +207,78 @@ TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION.VISUAL", function() {
 printToConsole("\n=== Test 4: Disable and Enable RX/TX Tabs (VISUAL) ===\n");
 
 TestFramework.runTest("TST.AD9084.DISABLE_ENABLE_RX_TX_TABS.VISUAL", function() {
+    var ch = 0;
+    var origRx = null;
+    var origTx = null;
     try {
-        var ch = 0;
-        var origRx = ad9084.isRxEnabled(ch);
-        var origTx = ad9084.isTxEnabled(ch);
+        origRx = ad9084.isRxEnabled(ch);
+        origTx = ad9084.isTxEnabled(ch);
 
         // Step 1: Disable RX tab
         printToConsole("  Disabling RX tab (channel " + ch + ")...");
         ad9084.setRxEnabled(ch, "0");
-        printToConsole("  VISUAL CHECK: Verify RX tab is disabled and controls are inaccessible");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX tab is disabled and controls are inaccessible")) {
+            ad9084.setRxEnabled(ch, origRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, origTx);
+            msleep(500);
+            return false;
+        }
 
         // Step 2: Disable TX tab
         printToConsole("  Disabling TX tab (channel " + ch + ")...");
         ad9084.setTxEnabled(ch, "0");
-        printToConsole("  VISUAL CHECK: Verify TX tab is disabled and controls are inaccessible");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify TX tab is disabled and controls are inaccessible")) {
+            ad9084.setRxEnabled(ch, origRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, origTx);
+            msleep(500);
+            return false;
+        }
 
         // Step 3: Enable RX tab
         printToConsole("  Enabling RX tab (channel " + ch + ")...");
         ad9084.setRxEnabled(ch, "1");
-        printToConsole("  VISUAL CHECK: Verify RX tab is enabled and controls are accessible");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX tab is enabled and controls are accessible")) {
+            ad9084.setRxEnabled(ch, origRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, origTx);
+            msleep(500);
+            return false;
+        }
 
         // Step 4: Enable TX tab
         printToConsole("  Enabling TX tab (channel " + ch + ")...");
         ad9084.setTxEnabled(ch, "1");
-        printToConsole("  VISUAL CHECK: Verify TX tab is enabled and controls are accessible");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify TX tab is enabled and controls are accessible")) {
+            ad9084.setRxEnabled(ch, origRx);
+            msleep(500);
+            ad9084.setTxEnabled(ch, origTx);
+            msleep(500);
+            return false;
+        }
 
         // Restore original states
         ad9084.setRxEnabled(ch, origRx);
+        msleep(500);
         ad9084.setTxEnabled(ch, origTx);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origRx !== null) {
+            ad9084.setRxEnabled(ch, origRx);
+            msleep(500);
+        }
+        if (origTx !== null) {
+            ad9084.setTxEnabled(ch, origTx);
+            msleep(500);
+        }
         return false;
     }
 });

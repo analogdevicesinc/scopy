@@ -52,10 +52,12 @@ var TX_CH = 0;
 printToConsole("\n=== Test 3: Channel Configuration ===\n");
 
 TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION", function() {
+    var originalRx = null;
+    var originalTx = null;
     try {
         // Save original states
-        var originalRx = ad9084.isRxEnabled(RX_CH);
-        var originalTx = ad9084.isTxEnabled(TX_CH);
+        originalRx = ad9084.isRxEnabled(RX_CH);
+        originalTx = ad9084.isTxEnabled(TX_CH);
         printToConsole("  Original RX ch" + RX_CH + " enabled: " + originalRx);
         printToConsole("  Original TX ch" + TX_CH + " enabled: " + originalTx);
 
@@ -67,6 +69,9 @@ TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION", function() {
         if (rxEnabled !== "1") {
             printToConsole("  FAIL: RX channel was not enabled");
             ad9084.setRxEnabled(RX_CH, originalRx);
+            msleep(500);
+            ad9084.setTxEnabled(TX_CH, originalTx);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 1 PASS: RX channel is enabled");
@@ -79,6 +84,9 @@ TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION", function() {
         if (rxDisabled !== "0") {
             printToConsole("  FAIL: RX channel was not disabled");
             ad9084.setRxEnabled(RX_CH, originalRx);
+            msleep(500);
+            ad9084.setTxEnabled(TX_CH, originalTx);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 2 PASS: RX channel is disabled");
@@ -89,7 +97,10 @@ TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION", function() {
         var txEnabled = ad9084.isTxEnabled(TX_CH);
         if (txEnabled !== "1") {
             printToConsole("  FAIL: TX channel was not enabled");
+            ad9084.setRxEnabled(RX_CH, originalRx);
+            msleep(500);
             ad9084.setTxEnabled(TX_CH, originalTx);
+            msleep(500);
             return false;
         }
         printToConsole("  TX channel enable PASS");
@@ -99,19 +110,31 @@ TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION", function() {
         var txDisabled = ad9084.isTxEnabled(TX_CH);
         if (txDisabled !== "0") {
             printToConsole("  FAIL: TX channel was not disabled");
+            ad9084.setRxEnabled(RX_CH, originalRx);
+            msleep(500);
             ad9084.setTxEnabled(TX_CH, originalTx);
+            msleep(500);
             return false;
         }
         printToConsole("  TX channel disable PASS");
 
         // Restore original state
         ad9084.setRxEnabled(RX_CH, originalRx);
+        msleep(500);
         ad9084.setTxEnabled(TX_CH, originalTx);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (originalRx !== null) {
+            ad9084.setRxEnabled(RX_CH, originalRx);
+            msleep(500);
+        }
+        if (originalTx !== null) {
+            ad9084.setTxEnabled(TX_CH, originalTx);
+            msleep(500);
+        }
         return false;
     }
 });
@@ -125,10 +148,12 @@ TestFramework.runTest("TST.AD9084.CHANNEL_CONFIGURATION", function() {
 printToConsole("\n=== Test 4: Disable and Enable RX/TX Tabs ===\n");
 
 TestFramework.runTest("TST.AD9084.DISABLE_ENABLE_RX_TX_TABS", function() {
+    var origRx = null;
+    var origTx = null;
     try {
         // Save original RX and TX states
-        var origRx = ad9084.isRxEnabled(RX_CH);
-        var origTx = ad9084.isTxEnabled(TX_CH);
+        origRx = ad9084.isRxEnabled(RX_CH);
+        origTx = ad9084.isTxEnabled(TX_CH);
 
         // Step 1: Disable RX tab
         ad9084.setRxEnabled(RX_CH, "0");
@@ -137,6 +162,9 @@ TestFramework.runTest("TST.AD9084.DISABLE_ENABLE_RX_TX_TABS", function() {
         if (rxState !== "0") {
             printToConsole("  FAIL: RX tab was not disabled");
             ad9084.setRxEnabled(RX_CH, origRx);
+            msleep(500);
+            ad9084.setTxEnabled(TX_CH, origTx);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 1 PASS: RX tab is disabled and controls are inaccessible");
@@ -148,7 +176,9 @@ TestFramework.runTest("TST.AD9084.DISABLE_ENABLE_RX_TX_TABS", function() {
         if (txState !== "0") {
             printToConsole("  FAIL: TX tab was not disabled");
             ad9084.setRxEnabled(RX_CH, origRx);
+            msleep(500);
             ad9084.setTxEnabled(TX_CH, origTx);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 2 PASS: TX tab is disabled and controls are inaccessible");
@@ -160,7 +190,9 @@ TestFramework.runTest("TST.AD9084.DISABLE_ENABLE_RX_TX_TABS", function() {
         if (rxState !== "1") {
             printToConsole("  FAIL: RX tab was not enabled");
             ad9084.setRxEnabled(RX_CH, origRx);
+            msleep(500);
             ad9084.setTxEnabled(TX_CH, origTx);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 3 PASS: RX tab is enabled and controls are accessible");
@@ -172,19 +204,30 @@ TestFramework.runTest("TST.AD9084.DISABLE_ENABLE_RX_TX_TABS", function() {
         if (txState !== "1") {
             printToConsole("  FAIL: TX tab was not enabled");
             ad9084.setRxEnabled(RX_CH, origRx);
+            msleep(500);
             ad9084.setTxEnabled(TX_CH, origTx);
+            msleep(500);
             return false;
         }
         printToConsole("  Step 4 PASS: TX tab is enabled and controls are accessible");
 
         // Restore original states
         ad9084.setRxEnabled(RX_CH, origRx);
+        msleep(500);
         ad9084.setTxEnabled(TX_CH, origTx);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        if (origRx !== null) {
+            ad9084.setRxEnabled(RX_CH, origRx);
+            msleep(500);
+        }
+        if (origTx !== null) {
+            ad9084.setTxEnabled(TX_CH, origTx);
+            msleep(500);
+        }
         return false;
     }
 });
