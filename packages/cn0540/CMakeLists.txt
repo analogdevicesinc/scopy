@@ -27,10 +27,17 @@ set(PACKAGE_NAME ${SCOPY_MODULE})
 set(PACKAGE_DISPLAY_NAME "CN0540")
 set(PACKAGE_DESCRIPTION "Plugin for CN0540 precision measurement system")
 
+
+message(STATUS "building package: " ${SCOPY_MODULE})
+
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
-message(STATUS "Including plugins for ${SCOPY_MODULE}")
+
+message("Generate pkg translations")
+include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
+
+message("Including plugins")
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 	add_plugins(${CMAKE_CURRENT_SOURCE_DIR}/plugins ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/plugins)
 	install_plugins(
