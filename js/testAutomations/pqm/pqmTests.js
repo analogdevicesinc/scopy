@@ -45,7 +45,7 @@ if (switchToTool("Rms")) {
             // Verify tool opened by checking API is accessible
             pqm.isRmsRunning();
             pqm.isRmsLoggingEnabled();
-            printToConsole("  ✓ RMS tool opened successfully");
+            printToConsole("  RMS tool opened successfully");
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
@@ -54,9 +54,6 @@ if (switchToTool("Rms")) {
     });
 
     TestFramework.runTest("TST.PQM.RMS_INFO", function() {
-        printToConsole("\n=== Test 2 - Info button check ===\n");
-        printToConsole("  NOTE: TST.PQM.RMS_INFO requires manual testing (UI interaction)");
-
         return "SKIP";
     });
 
@@ -76,14 +73,16 @@ if (switchToTool("Rms")) {
         try {
             pqm.setRmsRunning(true);
             msleep(1000);
-            var isRunning = pqm.isRmsRunning();
-            if (!isRunning) return false;
+            if (!pqm.isRmsRunning()) {
+                return false;
+            }
             msleep(4000);
             pqm.setRmsRunning(false);
             msleep(500);
             return !pqm.isRmsRunning();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setRmsRunning(false);
             return false;
         }
     });
@@ -96,26 +95,39 @@ if (switchToTool("Rms")) {
             if (!pqm.isRmsLoggingEnabled()) return false;
             pqm.setRmsLogPath(logPath);
             msleep(500);
-            if (pqm.getRmsLogPath() !== logPath) return false;
+            if (pqm.getRmsLogPath() !== logPath) {
+                pqm.setRmsLoggingEnabled(false);
+                return false;
+            }
             pqm.setRmsRunning(true);
             msleep(2000);
             // Verify log file exists and is not empty
             var actualLogFile = pqm.getLogFilePath();
             if (!actualLogFile || actualLogFile === "") {
-                printToConsole("  ⚠ Log file path is empty");
+                printToConsole("  Log file path is empty");
+                pqm.setRmsRunning(false);
+                msleep(500);
+                pqm.setRmsLoggingEnabled(false);
                 return false;
             }
             var logContent = fileIO.readAll(actualLogFile);
             if (!logContent || logContent.length === 0) {
-                printToConsole("  ⚠ Log file is empty");
+                printToConsole("  Log file is empty");
+                pqm.setRmsRunning(false);
+                msleep(500);
+                pqm.setRmsLoggingEnabled(false);
                 return false;
             }
             pqm.setRmsRunning(false);
             msleep(500);
             pqm.setRmsLoggingEnabled(false);
+            msleep(500);
             return !pqm.isRmsLoggingEnabled();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setRmsRunning(false);
+            msleep(500);
+            pqm.setRmsLoggingEnabled(false);
             return false;
         }
     });
@@ -124,6 +136,7 @@ if (switchToTool("Rms")) {
         try {
             var invalidPath = "/invalid/path/that/does/not/exist";
             pqm.setRmsLoggingEnabled(true);
+            msleep(500);
             pqm.setRmsLogPath(invalidPath);
             msleep(500);
             pqm.setRmsRunning(true);
@@ -132,22 +145,21 @@ if (switchToTool("Rms")) {
             msleep(500);
 
             if (pqm.isRmsLoggingEnabled()) {
-                printToConsole("  ⚠ Logging section remained open (expected to close)");
+                printToConsole("  Logging section remained open (expected to close)");
                 return false;
-            } else {
-                printToConsole("  ✓ Logging section closed as expected");
             }
 
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setRmsRunning(false);
+            msleep(500);
+            pqm.setRmsLoggingEnabled(false);
             return false;
         }
     });
 
     TestFramework.runTest("TST.PQM.RMS_SETTINGS", function() {
-        printToConsole("\n=== Test 5 - Settings button check ===\n");
-        printToConsole("  NOTE: TST.PQM.RMS_SETTINGS requires manual testing (UI interaction - settings button toggle)");
         return "SKIP";
     });
 
@@ -158,17 +170,21 @@ if (switchToTool("Rms")) {
             pqm.triggerPqEvent(true);
             msleep(2000);
             pqm.setRmsRunning(false);
+            msleep(500);
             if (!pqm.isRmsPqEvents()) {
-                printToConsole("  ⚠ No PQ events detected after trigger (expected some)");
+                printToConsole("  No PQ events detected after trigger (expected some)");
+                pqm.triggerPqEvent(false);
                 return false;
             }
             pqm.triggerPqEvent(false);
             pqm.resetRmsPqEvents();
             msleep(500);
-            printToConsole("  ✓ PQEvents reset successfully");
             return !pqm.isRmsPqEvents();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setRmsRunning(false);
+            pqm.triggerPqEvent(false);
+            pqm.resetRmsPqEvents();
             return false;
         }
     });
@@ -182,22 +198,31 @@ if (switchToTool("Rms")) {
             pqm.triggerPqEvent(true);
             msleep(2000);
             pqm.setRmsRunning(false);
+            msleep(500);
             pqm.setHarmonicsRunning(false);
+            msleep(500);
             if (!pqm.isRmsPqEvents()) {
-                printToConsole("  ⚠ No PQ events detected after trigger (expected some) - RMS");
+                printToConsole("  No PQ events detected after trigger (expected some) - RMS");
+                pqm.triggerPqEvent(false);
+                pqm.resetRmsPqEvents();
                 return false;
             }
             if (!pqm.isHarmonicsPqEvents()) {
-                printToConsole("  ⚠ No PQ events detected after trigger (expected some) - Harmonics");
+                printToConsole("  No PQ events detected after trigger (expected some) - Harmonics");
+                pqm.triggerPqEvent(false);
+                pqm.resetRmsPqEvents();
                 return false;
             }
             pqm.triggerPqEvent(false);
             pqm.resetRmsPqEvents();
             msleep(500);
-            printToConsole("  ✓ PQEvents should be reset successfully");
             return !pqm.isRmsPqEvents() && !pqm.isHarmonicsPqEvents();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setRmsRunning(false);
+            pqm.setHarmonicsRunning(false);
+            pqm.triggerPqEvent(false);
+            pqm.resetRmsPqEvents();
             return false;
         }
     });
@@ -216,7 +241,7 @@ if (switchToTool("Harmonics")) {
             var isRunning = pqm.isHarmonicsRunning();
             var loggingEnabled = pqm.isHarmonicsLoggingEnabled();
             var activeChannel = pqm.getHarmonicsActiveChannel();
-            printToConsole("  ✓ Harmonics tool opened successfully");
+            printToConsole("  Harmonics tool opened successfully");
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
@@ -225,8 +250,6 @@ if (switchToTool("Harmonics")) {
     });
 
     TestFramework.runTest("TST.PQM.HARMONICS_INFO", function() {
-        printToConsole("\n=== Test 2 - Info button check ===\n");
-        printToConsole("  NOTE: TST.PQM.HARMONICS_INFO requires manual testing (UI interaction - opens browser)");
         return "SKIP";
     });
 
@@ -252,19 +275,16 @@ if (switchToTool("Harmonics")) {
             return !pqm.isHarmonicsRunning();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setHarmonicsRunning(false);
             return false;
         }
     });
 
     TestFramework.runTest("TST.PQM.HARMONICS_OVERVIEW_PLOT", function() {
-        printToConsole("\n=== Test 5 - Overview plot features ===\n");
-        printToConsole("  NOTE: TST.PQM.HARMONICS_OVERVIEW_PLOT requires manual testing (UI interaction - table row/cell selection and plot verification)");
         return "SKIP";
     });
 
     TestFramework.runTest("TST.PQM.HARMONICS_SETTINGS", function() {
-        printToConsole("\n=== Test 6 - Settings button check ===\n");
-        printToConsole("  NOTE: TST.PQM.HARMONICS_SETTINGS requires manual testing (UI interaction - settings button and dropdown)");
         return "SKIP";
     });
 
@@ -276,26 +296,39 @@ if (switchToTool("Harmonics")) {
             if (!pqm.isHarmonicsLoggingEnabled()) return false;
             pqm.setHarmonicsLogPath(logPath);
             msleep(500);
-            if (pqm.getHarmonicsLogPath() !== logPath) return false;
+            if (pqm.getHarmonicsLogPath() !== logPath) {
+                pqm.setHarmonicsLoggingEnabled(false);
+                return false;
+            }
             pqm.setHarmonicsRunning(true);
             msleep(2000);
             // Verify log file exists and is not empty
             var actualLogFile = pqm.getLogFilePath();
             if (!actualLogFile || actualLogFile === "") {
-                printToConsole("  ⚠ Log file path is empty");
+                printToConsole("  Log file path is empty");
+                pqm.setHarmonicsRunning(false);
+                msleep(500);
+                pqm.setHarmonicsLoggingEnabled(false);
                 return false;
             }
             var logContent = fileIO.readAll(actualLogFile);
             if (!logContent || logContent.length === 0) {
-                printToConsole("  ⚠ Log file is empty");
+                printToConsole("  Log file is empty");
+                pqm.setHarmonicsRunning(false);
+                msleep(500);
+                pqm.setHarmonicsLoggingEnabled(false);
                 return false;
             }
             pqm.setHarmonicsRunning(false);
             msleep(500);
             pqm.setHarmonicsLoggingEnabled(false);
+            msleep(500);
             return !pqm.isHarmonicsLoggingEnabled();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setHarmonicsRunning(false);
+            msleep(500);
+            pqm.setHarmonicsLoggingEnabled(false);
             return false;
         }
     });
@@ -304,21 +337,25 @@ if (switchToTool("Harmonics")) {
         try {
             var invalidPath = "/invalid/path/that/does/not/exist";
             pqm.setHarmonicsLoggingEnabled(true);
+            msleep(500);
             pqm.setHarmonicsLogPath(invalidPath);
             msleep(500);
             pqm.setHarmonicsRunning(true);
             msleep(3000);
             pqm.setHarmonicsRunning(false);
             msleep(500);
-            
+
             if (pqm.isHarmonicsLoggingEnabled()) {
-                printToConsole("  ⚠ Logging section remained open (expected to close)");
+                printToConsole("  Logging section remained open (expected to close)");
                 return false;
             }
-            
+
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setHarmonicsRunning(false);
+            msleep(500);
+            pqm.setHarmonicsLoggingEnabled(false);
             return false;
         }
     });
@@ -330,24 +367,26 @@ if (switchToTool("Harmonics")) {
             pqm.triggerPqEvent(true);
             msleep(2000);
             pqm.setHarmonicsRunning(false);
-            if(!pqm.isHarmonicsPqEvents()) {
-                printToConsole("  ⚠ No Harmonics PQ events detected after trigger (expected some)");
+            msleep(500);
+            if (!pqm.isHarmonicsPqEvents()) {
+                printToConsole("  No Harmonics PQ events detected after trigger (expected some)");
+                pqm.triggerPqEvent(false);
                 return false;
             }
             pqm.triggerPqEvent(false);
             pqm.resetHarmonicsPqEvents();
-            printToConsole("  ✓ Harmonics PQEvents should be reset successfully");
             msleep(500);
             return !pqm.isHarmonicsPqEvents();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setHarmonicsRunning(false);
+            pqm.triggerPqEvent(false);
+            pqm.resetHarmonicsPqEvents();
             return false;
         }
     });
 
     TestFramework.runTest("TST.PQM.HARMONICS_CURRENT_PLOTS_DATA", function() {
-        printToConsole("\n=== Test 10 - Current harmonics plots data correspondence ===\n");
-        printToConsole("  NOTE: TST.PQM.HARMONICS_CURRENT_PLOTS_DATA requires manual testing (UI interaction - visual plot/table data comparison)");
         return "SKIP";
     });
 }
@@ -366,7 +405,7 @@ if (switchToTool("Waveform")) {
             var loggingEnabled = pqm.isWaveformLoggingEnabled();
             var timespan = pqm.getWaveformTimespan();
             var rollingMode = pqm.isWaveformRollingMode();
-            printToConsole("  ✓ Waveform tool opened successfully");
+            printToConsole("  Waveform tool opened successfully");
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
@@ -375,42 +414,59 @@ if (switchToTool("Waveform")) {
     });
 
     TestFramework.runTest("TST.PQM.WAVEFORM_INFO", function() {
-        printToConsole("\n=== Test 2 - Info button check ===\n");
-        printToConsole("  NOTE: TST.PQM.WAVEFORM_INFO requires manual testing (UI interaction - opens browser)");
         return "SKIP";
     });
 
     TestFramework.runTest("TST.PQM.WAVEFORM_SETTINGS", function() {
-        printToConsole("\n=== Test 3 - Settings button check ===\n");
-        printToConsole("  NOTE: TST.PQM.WAVEFORM_SETTINGS requires manual testing (UI interaction - settings button toggle)");
         return "SKIP";
     });
 
     TestFramework.runTest("TST.PQM.WAVEFORM_SETTINGS_TIMESPAN", function() {
+        var originalTimespan = pqm.getWaveformTimespan();
         try {
             var testValues = [0.02, 1.0, 10.0];
             for (var i = 0; i < testValues.length; i++) {
                 pqm.setWaveformTimespan(testValues[i]);
                 msleep(500);
-                if (Math.abs(pqm.getWaveformTimespan() - testValues[i]) > 0.001) return false;
+                if (Math.abs(pqm.getWaveformTimespan() - testValues[i]) > 0.001) {
+                    pqm.setWaveformTimespan(originalTimespan);
+                    msleep(500);
+                    return false;
+                }
             }
+            pqm.setWaveformTimespan(originalTimespan);
+            msleep(500);
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformTimespan(originalTimespan);
             return false;
         }
     });
 
     TestFramework.runTest("TST.PQM.WAVEFORM_SETTINGS_ROLLING", function() {
+        var originalRolling = pqm.isWaveformRollingMode();
         try {
             pqm.setWaveformRollingMode(true);
             msleep(500);
-            if (!pqm.isWaveformRollingMode()) return false;
+            if (!pqm.isWaveformRollingMode()) {
+                pqm.setWaveformRollingMode(originalRolling);
+                msleep(500);
+                return false;
+            }
             pqm.setWaveformRollingMode(false);
             msleep(500);
-            return !pqm.isWaveformRollingMode();
+            if (pqm.isWaveformRollingMode()) {
+                pqm.setWaveformRollingMode(originalRolling);
+                msleep(500);
+                return false;
+            }
+            pqm.setWaveformRollingMode(originalRolling);
+            msleep(500);
+            return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRollingMode(originalRolling);
             return false;
         }
     });
@@ -424,6 +480,7 @@ if (switchToTool("Waveform")) {
             return !pqm.isWaveformRunning();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRunning(false);
             return false;
         }
     });
@@ -437,6 +494,7 @@ if (switchToTool("Waveform")) {
             return !pqm.isWaveformRunning();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRunning(false);
             return false;
         }
     });
@@ -454,6 +512,7 @@ if (switchToTool("Waveform")) {
             return !pqm.isWaveformRunning();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRunning(false);
             return false;
         }
     });
@@ -471,13 +530,12 @@ if (switchToTool("Waveform")) {
             return !pqm.isWaveformRunning();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRunning(false);
             return false;
         }
     });
 
     TestFramework.runTest("TST.PQM.WAVEFORM_PLOT_ZOOM", function() {
-        printToConsole("\n=== Test 10 - Plot zoom ===\n");
-        printToConsole("  NOTE: TST.PQM.WAVEFORM_PLOT_ZOOM requires manual testing (UI interaction - plot zoom gesture)");
         return "SKIP";
     });
 
@@ -489,26 +547,39 @@ if (switchToTool("Waveform")) {
             if (!pqm.isWaveformLoggingEnabled()) return false;
             pqm.setWaveformLogPath(logPath);
             msleep(500);
-            if (pqm.getWaveformLogPath() !== logPath) return false;
+            if (pqm.getWaveformLogPath() !== logPath) {
+                pqm.setWaveformLoggingEnabled(false);
+                return false;
+            }
             pqm.setWaveformRunning(true);
             msleep(5000);
             // Verify log file exists and is not empty
             var actualLogFile = pqm.getLogFilePath();
             if (!actualLogFile || actualLogFile === "") {
-                printToConsole("  ⚠ Log file path is empty");
+                printToConsole("  Log file path is empty");
+                pqm.setWaveformRunning(false);
+                msleep(500);
+                pqm.setWaveformLoggingEnabled(false);
                 return false;
             }
             var logContent = fileIO.readAll(actualLogFile);
             if (!logContent || logContent.length === 0) {
-                printToConsole("  ⚠ Log file is empty");
+                printToConsole("  Log file is empty");
+                pqm.setWaveformRunning(false);
+                msleep(500);
+                pqm.setWaveformLoggingEnabled(false);
                 return false;
             }
             pqm.setWaveformRunning(false);
             msleep(500);
             pqm.setWaveformLoggingEnabled(false);
+            msleep(500);
             return !pqm.isWaveformLoggingEnabled();
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRunning(false);
+            msleep(500);
+            pqm.setWaveformLoggingEnabled(false);
             return false;
         }
     });
@@ -517,22 +588,23 @@ if (switchToTool("Waveform")) {
         try {
             var invalidPath = "/invalid/path/that/does/not/exist";
             pqm.setWaveformLoggingEnabled(true);
+            msleep(500);
             pqm.setWaveformLogPath(invalidPath);
             msleep(500);
             pqm.setWaveformRunning(true);
             msleep(3000);
             pqm.setWaveformRunning(false);
             msleep(500);
-            if (pqm.isRmsLoggingEnabled()) {
-                printToConsole("  ⚠ Logging section remained open (expected to close)");
+            if (pqm.isWaveformLoggingEnabled()) {
+                printToConsole("  Logging section remained open (expected to close)");
                 return false;
-            } else {
-                printToConsole("  ✓ Logging section closed as expected");
             }
-            pqm.setWaveformLoggingEnabled(false);
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
+            pqm.setWaveformRunning(false);
+            msleep(500);
+            pqm.setWaveformLoggingEnabled(false);
             return false;
         }
     });
@@ -544,7 +616,7 @@ if (switchToTool("Waveform")) {
             pqm.setRmsRunning(true);
             msleep(1000);
             if (!pqm.isRmsRunning()) {
-                printToConsole("  ✗ Failed to start RMS");
+                printToConsole("  Failed to start RMS");
                 return false;
             }
 
@@ -553,7 +625,7 @@ if (switchToTool("Waveform")) {
             pqm.setHarmonicsRunning(true);
             msleep(1000);
             if (!pqm.isHarmonicsRunning()) {
-                printToConsole("  ✗ Failed to start Harmonics");
+                printToConsole("  Failed to start Harmonics");
                 pqm.setRmsRunning(false);
                 return false;
             }
@@ -565,32 +637,32 @@ if (switchToTool("Waveform")) {
 
             // Verify RMS stopped
             if (pqm.isRmsRunning()) {
-                printToConsole("  ✗ RMS did not stop when Waveform started");
+                printToConsole("  RMS did not stop when Waveform started");
                 pqm.setWaveformRunning(false);
                 return false;
             }
-            printToConsole("  ✓ RMS stopped as expected");
+            printToConsole("  RMS stopped as expected");
 
             // Verify Harmonics stopped
             if (pqm.isHarmonicsRunning()) {
-                printToConsole("  ✗ Harmonics did not stop when Waveform started");
+                printToConsole("  Harmonics did not stop when Waveform started");
                 pqm.setWaveformRunning(false);
                 return false;
             }
-            printToConsole("  ✓ Harmonics stopped as expected");
+            printToConsole("  Harmonics stopped as expected");
 
             // Verify Waveform is running
             if (!pqm.isWaveformRunning()) {
-                printToConsole("  ✗ Waveform is not running");
+                printToConsole("  Waveform is not running");
                 return false;
             }
-            printToConsole("  ✓ Waveform is running");
+            printToConsole("  Waveform is running");
 
             // Stop Waveform
             pqm.setWaveformRunning(false);
             msleep(500);
 
-            printToConsole("  ✓ Concurrent acquisition test passed");
+            printToConsole("  Concurrent acquisition test passed");
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
@@ -612,7 +684,7 @@ if (switchToTool("Settings")) {
     TestFramework.runTest("TST.PQM.SETTINGS_OPEN", function() {
         try {
             // Verify tool opened - settings read will confirm accessibility
-            printToConsole("  ✓ Settings tool opened successfully");
+            printToConsole("  Settings tool opened successfully");
             return true;
         } catch (e) {
             printToConsole("  Error: " + e);
@@ -632,12 +704,13 @@ if (switchToTool("Settings")) {
     });
 
     TestFramework.runTest("TST.PQM.SETTINGS_WRITE", function() {
+        var attrName = "msv_carrier_frequency";
         try {
             pqm.settingsRead();
             msleep(2000);
-            var attrName = "msv_carrier_frequency";
             var originalValue = pqm.getSettingsAttributeValue(attrName);
             pqm.setSettingsAttributeValue(attrName, "0.40");
+            msleep(500);
             pqm.settingsWrite();
             msleep(2000);
             pqm.settingsRead();
@@ -645,7 +718,9 @@ if (switchToTool("Settings")) {
             // Restore original value
             if (originalValue) {
                 pqm.setSettingsAttributeValue(attrName, originalValue);
+                msleep(500);
                 pqm.settingsWrite();
+                msleep(2000);
             }
             return true;
         } catch (e) {
