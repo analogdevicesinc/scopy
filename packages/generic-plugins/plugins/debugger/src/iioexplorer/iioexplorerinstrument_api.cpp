@@ -92,18 +92,45 @@ void IIOExplorerInstrument_API::setHSplitter(const QList<int> &newSplitter)
 
 void IIOExplorerInstrument_API::setCurrentTab(int index)
 {
+	if(!p->m_tabWidget) {
+		return;
+	}
 	if(index >= 0 && index < p->m_tabWidget->count()) {
 		p->m_tabWidget->setCurrentIndex(index);
 	}
 }
 
-int IIOExplorerInstrument_API::getCurrentTab() { return p->m_tabWidget->currentIndex(); }
+int IIOExplorerInstrument_API::getCurrentTab()
+{
+	if(!p->m_tabWidget) {
+		return -1;
+	}
+	return p->m_tabWidget->currentIndex();
+}
 
-void IIOExplorerInstrument_API::showIIOAttributesTab() { setCurrentTab(0); }
+void IIOExplorerInstrument_API::showIIOAttributesTab()
+{
+	if(!p->m_tabWidget) {
+		return;
+	}
+	setCurrentTab(0);
+}
 
-void IIOExplorerInstrument_API::showLogTab() { setCurrentTab(1); }
+void IIOExplorerInstrument_API::showLogTab()
+{
+	if(!p->m_tabWidget) {
+		return;
+	}
+	setCurrentTab(1);
+}
 
-void IIOExplorerInstrument_API::showCodeGeneratorTab() { setCurrentTab(2); }
+void IIOExplorerInstrument_API::showCodeGeneratorTab()
+{
+	if(!p->m_tabWidget) {
+		return;
+	}
+	setCurrentTab(2);
+}
 
 // ============================================
 // TREE NAVIGATION
@@ -332,17 +359,32 @@ bool IIOExplorerInstrument_API::removeItemFromWatchlistByPath(const QString &pat
 	return true;
 }
 
-QStringList IIOExplorerInstrument_API::getWatchlistPaths() { return p->m_watchListView->watchListEntries()->keys(); }
+QStringList IIOExplorerInstrument_API::getWatchlistPaths()
+{
+	if(!p->m_watchListView) {
+		return QStringList();
+	}
+	return p->m_watchListView->watchListEntries()->keys();
+}
 
 void IIOExplorerInstrument_API::clearWatchlist()
 {
+	if(!p->m_watchListView) {
+		return;
+	}
 	QStringList paths = getWatchlistPaths();
 	for(const QString &path : paths) {
 		removeItemFromWatchlistByPath(path);
 	}
 }
 
-void IIOExplorerInstrument_API::refreshWatchlist() { p->m_watchListView->refreshWatchlist(); }
+void IIOExplorerInstrument_API::refreshWatchlist()
+{
+	if(!p->m_watchListView) {
+		return;
+	}
+	p->m_watchListView->refreshWatchlist();
+}
 
 bool IIOExplorerInstrument_API::writeWatchlistAttributeValue(const QString &path, const QString &value)
 {
@@ -446,7 +488,13 @@ void IIOExplorerInstrument_API::triggerRead()
 // CODE GENERATOR
 // ============================================
 
-QString IIOExplorerInstrument_API::getGeneratedCode() { return p->m_generatedCodeBrowser->toPlainText(); }
+QString IIOExplorerInstrument_API::getGeneratedCode()
+{
+	if(!p->m_generatedCodeBrowser) {
+		return QString();
+	}
+	return p->m_generatedCodeBrowser->toPlainText();
+}
 
 bool IIOExplorerInstrument_API::saveGeneratedCode(const QString &filePath)
 {
@@ -463,25 +511,55 @@ bool IIOExplorerInstrument_API::saveGeneratedCode(const QString &filePath)
 // LOG (using friend class access to m_textBrowser)
 // ============================================
 
-QString IIOExplorerInstrument_API::getLogContent() { return p->m_debugLogger->m_textBrowser->toPlainText(); }
+QString IIOExplorerInstrument_API::getLogContent()
+{
+	if(!p->m_debugLogger || !p->m_debugLogger->m_textBrowser) {
+		return QString();
+	}
+	return p->m_debugLogger->m_textBrowser->toPlainText();
+}
 
-void IIOExplorerInstrument_API::clearLog() { p->m_debugLogger->m_textBrowser->clear(); }
+void IIOExplorerInstrument_API::clearLog()
+{
+	if(!p->m_debugLogger || !p->m_debugLogger->m_textBrowser) {
+		return;
+	}
+	p->m_debugLogger->m_textBrowser->clear();
+}
 
 // ============================================
 // SEARCH/FILTER
 // ============================================
 
-void IIOExplorerInstrument_API::setSearchText(const QString &text) { p->m_searchBar->getLineEdit()->setText(text); }
+void IIOExplorerInstrument_API::setSearchText(const QString &text)
+{
+	if(!p->m_searchBar || !p->m_searchBar->getLineEdit()) {
+		return;
+	}
+	p->m_searchBar->getLineEdit()->setText(text);
+}
 
-QString IIOExplorerInstrument_API::getSearchText() { return p->m_searchBar->getLineEdit()->text(); }
+QString IIOExplorerInstrument_API::getSearchText()
+{
+	if(!p->m_searchBar || !p->m_searchBar->getLineEdit()) {
+		return QString();
+	}
+	return p->m_searchBar->getLineEdit()->text();
+}
 
 QString IIOExplorerInstrument_API::getSearchPlaceholderText()
 {
+	if(!p->m_searchBar || !p->m_searchBar->getLineEdit()) {
+		return QString();
+	}
 	return p->m_searchBar->getLineEdit()->placeholderText();
 }
 
 int IIOExplorerInstrument_API::getVisibleItemCount()
 {
+	if(!p->m_proxyModel) {
+		return 0;
+	}
 	// Count visible items in the proxy model recursively
 	std::function<int(const QModelIndex &)> countItems = [&](const QModelIndex &parent) -> int {
 		int count = 0;
@@ -503,11 +581,20 @@ int IIOExplorerInstrument_API::getVisibleItemCount()
 
 void IIOExplorerInstrument_API::setDetailsViewTab(int index)
 {
+	if(!p->m_detailsView || !p->m_detailsView->m_tabWidget) {
+		return;
+	}
 	if(index >= 0 && index < p->m_detailsView->m_tabWidget->count()) {
 		p->m_detailsView->m_tabWidget->setCurrentIndex(index);
 	}
 }
 
-int IIOExplorerInstrument_API::getDetailsViewTab() { return p->m_detailsView->m_tabWidget->currentIndex(); }
+int IIOExplorerInstrument_API::getDetailsViewTab()
+{
+	if(!p->m_detailsView || !p->m_detailsView->m_tabWidget) {
+		return -1;
+	}
+	return p->m_detailsView->m_tabWidget->currentIndex();
+}
 
 #include "moc_iioexplorerinstrument_api.cpp"
