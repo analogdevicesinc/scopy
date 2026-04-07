@@ -3,12 +3,61 @@
 CN0540 Test Suite
 ================================================================================
 
+.. note::
+
+   User guide: :ref:`CN0540 user guide<cn0540>`
+
+.. note::
+    .. list-table::
+       :widths: 50 30 30 50 50
+       :header-rows: 1
+
+       * - Tester
+         - Test Date
+         - Scopy version
+         - Plugin version (N/A if not applicable)
+         - Comments
+       * -
+         -
+         -
+         -
+         -
+
 **Prerequisites:**
     - Scopy v2.0 or later with CN0540 plugin installed
     - CN0540 hardware board connected
     - IIO kernel drivers loaded for ``ad7768-1``, ``ltc2606``, and ``one-bit-adc-dac``
     - Device drivers and firmware are up to date
     - Reset .ini files to default by pressing **Reset** button in Preferences
+
+
+Setup Environment
+-----------------
+
+.. _cn0540_device_setup:
+
+**CN0540.device:**
+   - Connect a CN0540 evaluation board to your PC
+   - Ensure IIO kernel drivers are loaded for ``ad7768-1``, ``ltc2606``, and ``one-bit-adc-dac``
+   - Connect to the device in Scopy with the CN0540 plugin enabled
+
+.. _cn0540_device_emu:
+
+**CN0540.emulator:**
+   - Press the add device button and go to emulator
+   - Select the CN0540 device from the emulator list
+   - Enable, verify and select all available plugins
+   - Connect to the device
+
+.. _cn0540_device_default:
+
+**CN0540.default:**
+   - Use default device settings after connection
+   - Ensure all sections are in their initial collapsed or expanded state
+
+
+CN0540 Tests
+------------
 
 Test 1: Plugin Loads
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -22,7 +71,7 @@ Test 1: Plugin Loads
 **OS:** ANY
 
 **Preconditions:**
-    - Scopy is installed
+    - Use :ref:`CN0540.emulator <cn0540_device_emu>` or :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Open Scopy application
@@ -70,7 +119,7 @@ Test 2: Device Detection and Sections Display
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected with ``ad7768-1``, ``ltc2606``, and ``one-bit-adc-dac`` devices present
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Connect the CN0540 board and open the CN0540 plugin in Scopy
@@ -118,7 +167,7 @@ Test 3: Refresh Button Re-reads Hardware
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Open the CN0540 plugin and note the displayed values in all sections
@@ -166,7 +215,7 @@ Test 4: Power Control: Read SW_FF Status
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Power Control** section and click **Check Status** next to SW_FF
@@ -207,7 +256,7 @@ Test 5: Power Control: Shutdown Toggle
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Power Control** section and note the current state of the **Shutdown** checkbox
@@ -262,7 +311,7 @@ Test 6: Power Control: Constant Current Toggle
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Power Control** section and note the current state of the **Constant Current** checkbox
@@ -317,7 +366,7 @@ Test 7: ADC Driver Settings: FDA Status Toggle
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **ADC Driver Settings** section and note the current state of the **FDA Status** checkbox
@@ -372,7 +421,7 @@ Test 8: ADC Driver Settings: FDA Mode Toggle
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **ADC Driver Settings** section and note the current state of the **FDA Mode** checkbox
@@ -427,7 +476,7 @@ Test 9: Sensor Calibration: Input Voltage Read
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Sensor Calibration** section and click **Refresh**
@@ -468,7 +517,7 @@ Test 10: Sensor Calibration: Shift Voltage Write/Readback
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Sensor Calibration** section and click **Read** next to **Shift Voltage [mV]**
@@ -523,7 +572,7 @@ Test 11: Sensor Calibration: Sensor Voltage Calculation
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Sensor Calibration** section and click **Read** next to **Sensor Voltage [mV]**
@@ -564,7 +613,7 @@ Test 12: Sensor Calibration: Calibration Routine
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
 
 **Steps:**
     1. Expand the **Sensor Calibration** section and click **Calibrate**
@@ -612,7 +661,7 @@ Test 13: Voltage Monitor: Pin Voltages Display
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
     - An ``xadc`` or ``ltc2308`` auxiliary ADC device is present
 
 **Steps:**
@@ -661,7 +710,7 @@ Test 14: Voltage Monitor: Automatic Refresh
 **OS:** ANY
 
 **Preconditions:**
-    - CN0540 hardware board is connected
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
     - An ``xadc`` or ``ltc2308`` auxiliary ADC device is present
 
 **Steps:**
@@ -674,6 +723,48 @@ Test 14: Voltage Monitor: Automatic Refresh
 ..
     2. Wait at least 2 seconds without clicking anything and observe the voltage labels
         - **Expected result:** The displayed voltage values refresh automatically (the labels update without requiring a manual Refresh button click)
+        - **Actual result:**
+
+..
+  Actual test result goes here.
+..
+
+**Tested OS:**
+
+..
+  Details about the tested OS goes here.
+..
+
+**Comments:**
+
+..
+  Any comments about the test goes here.
+..
+
+**Result:** PASS/FAIL
+
+..
+  The result of the test goes here (PASS/FAIL).
+..
+
+Test 15: Voltage Monitor: Section Hidden Without Auxiliary ADC
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**UID:** TST.CN0540.VOLT_MON_SECTION_HIDDEN
+
+**RBP:** P3
+
+**Description:** Verify that the Voltage Monitor section is not shown when no supported auxiliary ADC (xadc or ltc2308) is detected.
+
+**OS:** ANY
+
+**Preconditions:**
+    - Use :ref:`CN0540.device <cn0540_device_setup>` setup
+    - No ``xadc`` or ``ltc2308`` auxiliary ADC device is present on the connected hardware
+
+**Steps:**
+    1. Open the CN0540 plugin with no auxiliary ADC present in the IIO context
+        - **Expected result:** The **Voltage Monitor** section is not visible in the plugin UI
         - **Actual result:**
 
 ..
