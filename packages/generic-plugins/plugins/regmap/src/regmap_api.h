@@ -50,22 +50,22 @@ public:
 	explicit RegMap_API(RegmapPlugin *regMapPlugin);
 	~RegMap_API();
 
-	Q_INVOKABLE void write(QString addr, QString val);
-	Q_INVOKABLE void writeBitField(QString addr, QString val);
+	Q_INVOKABLE void write(const QString &addr, const QString &val);
+	Q_INVOKABLE void writeBitField(const QString &addr, const QString &val);
 	Q_INVOKABLE QStringList getAvailableDevicesName();
-	Q_INVOKABLE bool setDevice(QString device);
-	Q_INVOKABLE QList<QString> search(QString searchParam);
-	Q_INVOKABLE void readInterval(QString startAddr, QString stopAddr);
+	Q_INVOKABLE bool setDevice(const QString &device);
+	Q_INVOKABLE QList<QString> search(const QString &searchParam);
+	Q_INVOKABLE void readInterval(const QString &startAddr, const QString &stopAddr);
 	Q_INVOKABLE bool enableAutoread(bool enable);
 	Q_INVOKABLE bool isAutoreadEnabled();
-	Q_INVOKABLE void registerDump(QString filePath);
-	Q_INVOKABLE void setPath(QString filePath);
-	Q_INVOKABLE void writeFromFile(QString filePath);
-	Q_INVOKABLE QString readRegister(QString addr);
-	Q_INVOKABLE QString getValueOfRegister(QString addr);
-	Q_INVOKABLE QStringList getRegisterInfo(QString addr);
-	Q_INVOKABLE QStringList getRegisterBitFieldsInfo(QString addr);
-	Q_INVOKABLE QStringList getBitFieldInfo(QString addr, QString bitName);
+	Q_INVOKABLE void registerDump(const QString &filePath);
+	Q_INVOKABLE void setPath(const QString &filePath);
+	Q_INVOKABLE void writeFromFile(const QString &filePath);
+	Q_INVOKABLE QString readRegister(const QString &addr);
+	Q_INVOKABLE QString getValueOfRegister(const QString &addr);
+	Q_INVOKABLE QStringList getRegisterInfo(const QString &addr);
+	Q_INVOKABLE QStringList getRegisterBitFieldsInfo(const QString &addr);
+	Q_INVOKABLE QStringList getBitFieldInfo(const QString &addr, const QString &bitName);
 
 private:
 	RegmapPlugin *m_regMapPlugin;
