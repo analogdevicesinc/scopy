@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE context [<!ELEMENT context (device | context-attribute)*><!ELEMENT context-attribute EMPTY><!ELEMENT device (channel | attribute | debug-attribute | buffer-attribute)*><!ELEMENT channel (scan-element?, attribute*)><!ELEMENT attribute EMPTY><!ELEMENT scan-element EMPTY><!ELEMENT debug-attribute EMPTY><!ELEMENT buffer-attribute EMPTY><!ATTLIST context name CDATA #REQUIRED description CDATA #IMPLIED><!ATTLIST context-attribute name CDATA #REQUIRED value CDATA #REQUIRED><!ATTLIST device id CDATA #REQUIRED name CDATA #IMPLIED><!ATTLIST channel id CDATA #REQUIRED type (input|output) #REQUIRED name CDATA #IMPLIED><!ATTLIST scan-element index CDATA #REQUIRED format CDATA #REQUIRED scale CDATA #IMPLIED><!ATTLIST attribute name CDATA #REQUIRED filename CDATA #IMPLIED value CDATA #IMPLIED><!ATTLIST debug-attribute name CDATA #REQUIRED value CDATA #IMPLIED><!ATTLIST buffer-attribute name CDATA #REQUIRED value CDATA #IMPLIED>]>
+<context name="network" description="CN0540 Precision Sensor Measurement System" >
+	<context-attribute name="uri" value="ip:127.0.0.1" />
+	<context-attribute name="ip,ip-addr" value="127.0.0.1" />
+
+	<!-- AD7768-1: 24-bit precision ADC -->
+	<device id="iio:device0" name="ad7768-1" >
+		<channel id="voltage0" type="input" >
+			<attribute name="raw" filename="in_voltage0_raw" value="0" />
+			<attribute name="scale" filename="in_voltage0_scale" value="0.000596" />
+		</channel>
+	</device>
+
+	<!-- LTC2606: 16-bit DAC used for voltage shift -->
+	<device id="iio:device1" name="ltc2606" >
+		<channel id="voltage0" type="output" >
+			<attribute name="raw" filename="out_voltage0_raw" value="0" />
+			<attribute name="scale" filename="out_voltage0_scale" value="0.076294" />
+		</channel>
+	</device>
+
+	<!-- one-bit-adc-dac: GPIO controller
+	     Plugin scans all channels and matches by label attribute.
+	     cn0540_sw_ff_gpio   - input:  switch fault flag (active-high)
+	     cn0540_shutdown_gpio - output: power shutdown (active-low)
+	     cn0540_FDA_DIS       - output: FDA disable (active-low)
+	     cn0540_FDA_MODE      - output: FDA power mode (1=FULL, 0=LOW)
+	     cn0540_blue_led      - output: constant current indicator -->
+	<device id="iio:device2" name="one-bit-adc-dac" >
+		<channel id="voltage0" type="input" >
+			<attribute name="raw" filename="in_voltage0_raw" value="0" />
+			<attribute name="label" filename="in_voltage0_label" value="cn0540_sw_ff_gpio" />
+		</channel>
+		<channel id="voltage1" type="output" >
+			<attribute name="raw" filename="out_voltage1_raw" value="1" />
+			<attribute name="label" filename="out_voltage1_label" value="cn0540_shutdown_gpio" />
+		</channel>
+		<channel id="voltage2" type="output" >
+			<attribute name="raw" filename="out_voltage2_raw" value="0" />
+			<attribute name="label" filename="out_voltage2_label" value="cn0540_FDA_DIS" />
+		</channel>
+		<channel id="voltage3" type="output" >
+			<attribute name="raw" filename="out_voltage3_raw" value="1" />
+			<attribute name="label" filename="out_voltage3_label" value="cn0540_FDA_MODE" />
+		</channel>
+		<channel id="voltage4" type="output" >
+			<attribute name="raw" filename="out_voltage4_raw" value="0" />
+			<attribute name="label" filename="out_voltage4_label" value="cn0540_blue_led" />
+		</channel>
+	</device>
+
+	<!-- xadc: analog voltage monitor
+	     Plugin reads 6 channels starting at voltage9 (xadc-specific offset).
+	     Displayed value = raw * scale * XADC_VREF(3.3).
+	     Pin mapping: voltage9=Vin+, voltage10=Vgpio2, voltage11=Vgpio3,
+	                  voltage12=Vcom, voltage13=Vfda+, voltage14=Vfda- -->
+	<device id="iio:device3" name="xadc" >
+		<channel id="voltage9" type="input" >
+			<attribute name="raw" filename="in_voltage9_raw" value="0" />
+			<attribute name="scale" filename="in_voltage9_scale" value="1.0" />
+		</channel>
+		<channel id="voltage10" type="input" >
+			<attribute name="raw" filename="in_voltage10_raw" value="0" />
+			<attribute name="scale" filename="in_voltage10_scale" value="1.0" />
+		</channel>
+		<channel id="voltage11" type="input" >
+			<attribute name="raw" filename="in_voltage11_raw" value="0" />
+			<attribute name="scale" filename="in_voltage11_scale" value="1.0" />
+		</channel>
+		<channel id="voltage12" type="input" >
+			<attribute name="raw" filename="in_voltage12_raw" value="0" />
+			<attribute name="scale" filename="in_voltage12_scale" value="1.0" />
+		</channel>
+		<channel id="voltage13" type="input" >
+			<attribute name="raw" filename="in_voltage13_raw" value="0" />
+			<attribute name="scale" filename="in_voltage13_scale" value="1.0" />
+		</channel>
+		<channel id="voltage14" type="input" >
+			<attribute name="raw" filename="in_voltage14_raw" value="0" />
+			<attribute name="scale" filename="in_voltage14_scale" value="1.0" />
+		</channel>
+	</device>
+
+</context>
