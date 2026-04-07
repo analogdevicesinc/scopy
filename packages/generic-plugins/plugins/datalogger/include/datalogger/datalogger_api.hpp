@@ -39,12 +39,12 @@ public:
 	// PLUGIN RELATED
 	Q_INVOKABLE QString showAvailableMonitors();
 	Q_INVOKABLE QString showAvailableDevices();
-	Q_INVOKABLE QString showMonitorsOfDevice(QString device);
-	Q_INVOKABLE QString enableMonitor(QString monitor);
-	Q_INVOKABLE QString disableMonitor(QString monitor);
+	Q_INVOKABLE QString showMonitorsOfDevice(const QString &device);
+	Q_INVOKABLE QString enableMonitor(const QString &monitor);
+	Q_INVOKABLE QString disableMonitor(const QString &monitor);
 	Q_INVOKABLE void setRunning(bool running);
 	Q_INVOKABLE void clearData();
-	Q_INVOKABLE void changeTool(QString name);
+	Q_INVOKABLE void changeTool(const QString &name);
 	Q_INVOKABLE void setMinMax(bool enable);
 	Q_INVOKABLE void changePrecision(int decimals);
 	Q_INVOKABLE void setMinYAxis(double min);
@@ -53,18 +53,21 @@ public:
 	// TOOL RELATED
 	Q_INVOKABLE QString createTool();
 	Q_INVOKABLE QString getToolList();
-	Q_INVOKABLE QString enableMonitorOfTool(QString toolName, QString monitor);
-	Q_INVOKABLE QString disableMonitorOfTool(QString toolName, QString monitor);
-	Q_INVOKABLE void setLogPathOfTool(QString toolName, QString path);
-	Q_INVOKABLE void logAtPathForTool(QString toolName, QString path);
-	Q_INVOKABLE void continuousLogAtPathForTool(QString toolName, QString path);
-	Q_INVOKABLE void stopContinuousLogForTool(QString toolName);
-	Q_INVOKABLE void importDataFromPathForTool(QString toolName, QString path);
-	Q_INVOKABLE void setMonitorDisplayName(QString toolName, QString monitor, QString displayName);
-	Q_INVOKABLE void setMonitorUnitOfMeasurementName(QString toolName, QString monitor, QString name);
-	Q_INVOKABLE void setMonitorUnitOfMeasurementSymbol(QString toolName, QString monitor, QString symbol);
-	Q_INVOKABLE void setDisplayMode(QString toolName, int mode);
-	Q_INVOKABLE void setToolName(QString currentToolName, QString newToolName);
+	Q_INVOKABLE QString enableMonitorOfTool(const QString &toolName, const QString &monitor);
+	Q_INVOKABLE QString disableMonitorOfTool(const QString &toolName, const QString &monitor);
+	Q_INVOKABLE void setLogPathOfTool(const QString &toolName, const QString &path);
+	Q_INVOKABLE void logAtPathForTool(const QString &toolName, const QString &path);
+	Q_INVOKABLE void continuousLogAtPathForTool(const QString &toolName, const QString &path);
+	Q_INVOKABLE void stopContinuousLogForTool(const QString &toolName);
+	Q_INVOKABLE void importDataFromPathForTool(const QString &toolName, const QString &path);
+	Q_INVOKABLE void setMonitorDisplayName(const QString &toolName, const QString &monitor,
+					       const QString &displayName);
+	Q_INVOKABLE void setMonitorUnitOfMeasurementName(const QString &toolName, const QString &monitor,
+							 const QString &name);
+	Q_INVOKABLE void setMonitorUnitOfMeasurementSymbol(const QString &toolName, const QString &monitor,
+							   const QString &symbol);
+	Q_INVOKABLE void setDisplayMode(const QString &toolName, int mode);
+	Q_INVOKABLE void setToolName(const QString &currentToolName, const QString &newToolName);
 
 private:
 	DataLoggerPlugin *m_dataLoggerPlugin;
