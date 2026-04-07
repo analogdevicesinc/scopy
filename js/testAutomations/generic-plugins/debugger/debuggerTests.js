@@ -315,7 +315,7 @@ TestFramework.runTest("TST.DBG.EXPLR.NAV", function() {
             printToConsole("  FAIL: Could not expand channel");
             return false;
         }
-        msleep(300);
+        msleep(500);
 
         var attrCount = iioExplorer.getChildCount(channelPath);
         if (attrCount === 0) {
@@ -346,7 +346,7 @@ TestFramework.runTest("TST.DBG.EXPLR.NAV", function() {
         if (attrNames.length > 1) {
             var attr2Path = channelPath + "/" + attrNames[1];
             if (iioExplorer.selectItemByPath(attr2Path)) {
-                msleep(300);
+                msleep(500);
                 selectedName = iioExplorer.getSelectedItemName();
                 selectedType = iioExplorer.getSelectedItemType();
                 printToConsole("  Step 9: Selected another attribute - Name: " + selectedName + ", Type: " + selectedType);
@@ -372,7 +372,7 @@ TestFramework.runTest("TST.DBG.EXPLR.NAV", function() {
             printToConsole("  FAIL: Could not collapse device");
             return false;
         }
-        msleep(300);
+        msleep(500);
 
         var isDeviceExpanded = iioExplorer.isItemExpanded(devicePath);
         if (isDeviceExpanded) {
@@ -383,7 +383,7 @@ TestFramework.runTest("TST.DBG.EXPLR.NAV", function() {
 
         // Cleanup: expand context back to normal state
         iioExplorer.expandItem(contextPath);
-        msleep(200);
+        msleep(500);
 
         return true;
     } catch (e) {
@@ -551,7 +551,7 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
             printToConsole("  FAIL: Could not add current item to watchlist");
             return false;
         }
-        msleep(300);
+        msleep(500);
 
         paths = iioExplorer.getWatchlistPaths();
         if (paths.length !== 1) {
@@ -566,7 +566,7 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
             printToConsole("  FAIL: Could not add item by path: " + testPath2);
             return false;
         }
-        msleep(300);
+        msleep(500);
 
         paths = iioExplorer.getWatchlistPaths();
         if (paths.length !== 2) {
@@ -588,7 +588,7 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
 
         // Refresh to ensure UI updates
         iioExplorer.refreshWatchlist();
-        msleep(300);
+        msleep(500);
 
         // Read back to verify value was written
         var readValue = iioExplorer.readAttributeValue(testPath1);
@@ -597,7 +597,7 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
 
         // Restore original value
         iioExplorer.writeWatchlistAttributeValue(testPath1, originalValue);
-        msleep(300);
+        msleep(500);
         printToConsole("  Step 5: Restored original value: " + originalValue);
 
         // Step 6: Remove element from watchlist (simulates clicking red X)
@@ -605,7 +605,7 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
             printToConsole("  FAIL: Could not remove item: " + testPath1);
             return false;
         }
-        msleep(300);
+        msleep(500);
 
         paths = iioExplorer.getWatchlistPaths();
         if (paths.length !== 1) {
@@ -619,7 +619,7 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
             printToConsole("  FAIL: Could not remove item: " + testPath2);
             return false;
         }
-        msleep(300);
+        msleep(500);
 
         paths = iioExplorer.getWatchlistPaths();
         if (paths.length !== 0) {
@@ -630,13 +630,14 @@ TestFramework.runTest("TST.DBG.EXPLR.WATCH", function() {
 
         // Cleanup
         iioExplorer.clearWatchlist();
-        msleep(300);
+        msleep(500);
         printToConsole("  Cleanup: Watchlist cleared");
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
         iioExplorer.clearWatchlist();
+        msleep(500);
         return false;
     }
 });
@@ -661,7 +662,7 @@ TestFramework.runTest("TST.DBG.EXPLR.READ_ALL", function() {
     try {
         // Setup: Clear watchlist and prepare test paths
         iioExplorer.clearWatchlist();
-        msleep(300);
+        msleep(500);
 
         var deviceAttrPath = "context0/ad9361-phy/calib_mode";
         var channelAttrPath = "context0/ad9361-phy/voltage0/gain_control_mode";
@@ -773,16 +774,24 @@ TestFramework.runTest("TST.DBG.EXPLR.READ_ALL", function() {
 
         // Reset details view to GUI tab
         iioExplorer.setDetailsViewTab(0);
-        msleep(200);
+        msleep(500);
 
         // Cleanup
         iioExplorer.clearWatchlist();
+        msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
-        iioExplorer.setDetailsViewTab(0);
-        iioExplorer.clearWatchlist();
+        // Restore state: reset details tab, clear watchlist
+        try {
+            iioExplorer.setDetailsViewTab(0);
+            msleep(500);
+            iioExplorer.clearWatchlist();
+            msleep(500);
+        } catch (e2) {
+            printToConsole("  Error during cleanup: " + e2);
+        }
         return false;
     }
 });
@@ -796,7 +805,7 @@ TestFramework.runTest("TST.DBG.EXPLR.LOG", function() {
     try {
         // Step 1: Clear the log
         iioExplorer.clearLog();
-        msleep(300);
+        msleep(500);
         printToConsole("  Cleared log");
 
         // Step 2: Verify log is empty or minimal
@@ -868,13 +877,25 @@ TestFramework.runTest("TST.DBG.EXPLR.LOG", function() {
 
         // Step 10: Switch back to IIO Attributes tab
         iioExplorer.showIIOAttributesTab();
-        msleep(300);
+        msleep(500);
         printToConsole("  Switched back to IIO Attributes tab");
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
-        iioExplorer.showIIOAttributesTab();
+        // Restore state: switch back to IIO Attributes tab, restore gain mode if changed
+        try {
+            iioExplorer.showIIOAttributesTab();
+            msleep(500);
+            var gainModePath = "context0/ad9361-phy/voltage0/gain_control_mode";
+            var currentVal = iioExplorer.readAttributeValue(gainModePath);
+            if (currentVal !== originalGainMode && typeof originalGainMode !== "undefined") {
+                iioExplorer.writeAttributeValue(gainModePath, originalGainMode);
+                msleep(500);
+            }
+        } catch (e2) {
+            printToConsole("  Error during cleanup: " + e2);
+        }
         return false;
     }
 });
@@ -888,7 +909,7 @@ TestFramework.runTest("TST.DBG.CODEGEN", function() {
     try {
         // Step 1: Clear watchlist
         iioExplorer.clearWatchlist();
-        msleep(300);
+        msleep(500);
         printToConsole("  Cleared watchlist");
 
         // Step 2: Add items to watchlist (generates code)
@@ -912,7 +933,7 @@ TestFramework.runTest("TST.DBG.CODEGEN", function() {
             printToConsole("  FAIL: Could not add attribute to watchlist: " + attrPath);
             return false;
         }
-        msleep(300);
+        msleep(500);
         printToConsole("  Added attribute to watchlist: " + attrPath);
 
         // Step 4: Switch to Code Generator tab
@@ -990,17 +1011,24 @@ TestFramework.runTest("TST.DBG.CODEGEN", function() {
 
         // Step 10: Switch back to IIO Attributes tab
         iioExplorer.showIIOAttributesTab();
-        msleep(300);
+        msleep(500);
         printToConsole("  Switched back to IIO Attributes tab");
 
         // Cleanup
         iioExplorer.clearWatchlist();
+        msleep(500);
 
         return allFound;
     } catch (e) {
         printToConsole("  Error: " + e);
-        iioExplorer.showIIOAttributesTab();
-        iioExplorer.clearWatchlist();
+        try {
+            iioExplorer.showIIOAttributesTab();
+            msleep(500);
+            iioExplorer.clearWatchlist();
+            msleep(500);
+        } catch (e2) {
+            printToConsole("  Error during cleanup: " + e2);
+        }
         return false;
     }
 });
