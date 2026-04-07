@@ -66,7 +66,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager scopy-iio-widgets)
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -77,6 +77,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-pkg-manager
+	       scopy-iio-widgets
 )
 
 set(CN0540_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

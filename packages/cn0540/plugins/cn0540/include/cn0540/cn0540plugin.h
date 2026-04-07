@@ -25,6 +25,7 @@
 
 #include "scopy-cn0540_export.h"
 #include <QObject>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
@@ -56,6 +57,7 @@ public Q_SLOTS:
 private:
 	void initApi();
 	CN0540_API *m_api = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
 } // namespace scopy::cn0540
