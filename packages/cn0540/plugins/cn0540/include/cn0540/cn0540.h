@@ -23,7 +23,7 @@
 
 #include "scopy-cn0540_export.h"
 
-#include <QCheckBox>
+#include <QFuture>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -32,13 +32,15 @@
 #include <QWidget>
 #include <iio.h>
 
+#include <iio-widgets/iiowidget.h>
+#include <iio-widgets/iiowidgetgroup.h>
 #include <gui/tooltemplate.h>
 #include <gui/widgets/animatedrefreshbtn.h>
 #include <gui/widgets/menusectionwidget.h>
 
-#define NUM_ANALOG_PINS 6
-
 namespace scopy::cn0540 {
+
+static constexpr int NUM_ANALOG_PINS = 6;
 
 class CN0540_API;
 
@@ -49,7 +51,7 @@ class SCOPY_CN0540_EXPORT CN0540 : public QWidget
 	friend class CN0540_API;
 
 public:
-	explicit CN0540(iio_context *ctx, QWidget *parent = nullptr);
+	explicit CN0540(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~CN0540();
 
 Q_SIGNALS:
@@ -57,16 +59,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void onReadSwFF();
-	void onReadShutdown();
-	void onReadFda();
-	void onReadFdaMode();
-	void onReadCC();
-	void onShutdownToggled(bool checked);
-	void onFdaToggled(bool checked);
-	void onFdaModeToggled(bool checked);
-	void onCCToggled(bool checked);
 	void onReadVshift();
-	void onWriteVshift();
 	void onReadVsensor();
 	void onCalibrate();
 	void updateVoltages();
@@ -103,28 +96,31 @@ private:
 
 	iio_channel *m_analogIn[NUM_ANALOG_PINS];
 
+	IIOWidgetGroup *m_group;
+
+	QFuture<void> m_calibFuture;
 	QTimer *m_voltMonTimer;
 
 	QLabel *m_swffStatusLabel;
-	QLabel *m_shutdownStatusLabel;
-	QLabel *m_fdaStatusLabel;
-	QLabel *m_fdaModeStatusLabel;
-	QLabel *m_ccStatusLabel;
-	QLabel *m_inputVoltageLabel;
 	QLabel *m_sensorVoltageLabel;
 	QLabel *m_calibStatusLabel;
 	QLabel *m_voltMonLabels[NUM_ANALOG_PINS];
 
-	QLineEdit *m_vshiftEdit;
+	QLineEdit *m_vshiftLineEdit;
 
-	QCheckBox *m_shutdownChk;
-	QCheckBox *m_fdaChk;
-	QCheckBox *m_fdaModeChk;
-	QCheckBox *m_ccChk;
+	IIOWidget *m_shutdownWidget;
+	IIOWidget *m_ccWidget;
+	IIOWidget *m_fdaWidget;
+	IIOWidget *m_fdaModeWidget;
 
 	AnimatedRefreshBtn *m_refreshBtn;
 
 	ToolTemplate *m_tool;
+
+	bool m_isXadc = false;
+
+	// Physical constants — shared with CN0540_API via friend class
+	static constexpr double DAC_BUF_GAIN = 1.22;
 };
 
 } // namespace scopy::cn0540

@@ -23,12 +23,10 @@
 #include "cn0540plugin.h"
 
 #include <QLoggingCategory>
+#include <iio-widgets/iiowidget.h>
 #include <pluginbase/toolmenuentry.h>
 
 Q_LOGGING_CATEGORY(CAT_CN0540_API, "CN0540_API")
-
-// Matches the DAC_BUF_GAIN constant defined in cn0540.cpp
-static constexpr double CN0540_DAC_BUF_GAIN = 1.22;
 
 using namespace scopy::cn0540;
 
@@ -209,7 +207,7 @@ void CN0540_API::setShiftVoltage(const QString &mV)
 	}
 	// The UI displays DAC voltage * DAC_BUF_GAIN; to set that displayed value,
 	// write the raw DAC voltage = vshiftMv / DAC_BUF_GAIN
-	tool->setVoltage(tool->m_dacCh, vshiftMv / CN0540_DAC_BUF_GAIN);
+	tool->setVoltage(tool->m_dacCh, vshiftMv / CN0540::DAC_BUF_GAIN);
 }
 
 QString CN0540_API::getSensorVoltage()
@@ -245,6 +243,39 @@ QStringList CN0540_API::getVoltageMonitor()
 		result.append(tool->m_voltMonLabels[i] ? tool->m_voltMonLabels[i]->text() : QString());
 	}
 	return result;
+}
+
+// --- IIOWidget access ---
+
+QStringList CN0540_API::getWidgetKeys()
+{
+	if(!m_plugin || !m_plugin->m_widgetGroup)
+		return {};
+	return m_plugin->m_widgetGroup->keys();
+}
+
+QString CN0540_API::readWidget(const QString &key)
+{
+	if(!m_plugin || !m_plugin->m_widgetGroup)
+		return {};
+	IIOWidget *w = m_plugin->m_widgetGroup->get(key);
+	if(!w) {
+		qWarning(CAT_CN0540_API) << "readWidget: no widget for key:" << key;
+		return {};
+	}
+	return w->read().first;
+}
+
+void CN0540_API::writeWidget(const QString &key, const QString &value)
+{
+	if(!m_plugin || !m_plugin->m_widgetGroup)
+		return;
+	IIOWidget *w = m_plugin->m_widgetGroup->get(key);
+	if(!w) {
+		qWarning(CAT_CN0540_API) << "writeWidget: no widget for key:" << key;
+		return;
+	}
+	w->writeAsync(value);
 }
 
 #include "moc_cn0540_api.cpp"

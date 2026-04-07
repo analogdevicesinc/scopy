@@ -28,6 +28,7 @@
 
 namespace scopy::cn0540 {
 
+class CN0540;
 class CN0540Plugin;
 
 class SCOPY_CN0540_EXPORT CN0540_API : public ApiObject
@@ -62,6 +63,11 @@ public:
 
 	// Voltage Monitor
 	Q_INVOKABLE QStringList getVoltageMonitor();
+
+	// IIOWidget access
+	Q_INVOKABLE QStringList getWidgetKeys();
+	Q_INVOKABLE QString readWidget(const QString &key);
+	Q_INVOKABLE void writeWidget(const QString &key, const QString &value);
 
 private:
 	CN0540 *getTool() const;

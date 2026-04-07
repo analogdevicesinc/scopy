@@ -22,7 +22,6 @@
 #include "cn0540.h"
 #include "cn0540_api.h"
 
-#include <QLabel>
 #include <QLoggingCategory>
 #include <iio.h>
 
@@ -89,7 +88,8 @@ bool CN0540Plugin::onConnect()
 		return false;
 	}
 
-	CN0540 *tool = new CN0540(conn->context());
+	m_widgetGroup = new IIOWidgetGroup(this);
+	CN0540 *tool = new CN0540(conn->context(), m_widgetGroup);
 	m_toolList[0]->setTool(tool);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -107,6 +107,7 @@ void CN0540Plugin::initApi()
 
 bool CN0540Plugin::onDisconnect()
 {
+	ScopyJS::GetInstance()->unregisterApi(m_api);
 	delete m_api;
 	m_api = nullptr;
 
@@ -120,6 +121,9 @@ bool CN0540Plugin::onDisconnect()
 			delete(w);
 		}
 	}
+
+	delete m_widgetGroup;
+	m_widgetGroup = nullptr;
 
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
