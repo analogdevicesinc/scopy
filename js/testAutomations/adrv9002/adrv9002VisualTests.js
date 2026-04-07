@@ -32,8 +32,6 @@ evaluateFile("js/testAutomations/common/testFramework.js");
 // Test Suite
 TestFramework.init("ADRV9002 Visual Validation Tests");
 
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
-
 // Connect to device
 if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
     printToConsole("ERROR: Cannot proceed without device connection");
@@ -67,8 +65,7 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.PLUGIN_LOADS", function() {
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify plugin loads and Controls tab shows device controls");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify plugin loads and Controls tab shows device controls");
 
         return true;
     } catch (e) {
@@ -96,15 +93,11 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.GLOBAL_SETTINGS.VISUAL", function()
         var temperature = adrv9002.getTemperature();
         printToConsole("  Temperature reading: " + temperature);
 
-        printToConsole("  VISUAL CHECK: Verify Global Settings section is expanded");
-        printToConsole("  VISUAL CHECK: Verify Profile Manager shows profile_config and stream_config status");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify Global Settings section is expanded and Profile Manager shows profile_config and stream_config status");
 
-        printToConsole("  VISUAL CHECK: Verify Temperature displays in Celsius with warning thresholds");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify Temperature displays in Celsius with warning thresholds");
 
-        printToConsole("  VISUAL CHECK: Verify Initial Calibrations widget availability");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify Initial Calibrations widget availability");
 
         return true;
     } catch (e) {
@@ -129,46 +122,56 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.RX_CHANNEL_CONFIG.VISUAL", function
         // Step 2: Change RX1 Hardware Gain
         printToConsole("  Setting gain control to manual mode...");
         adrv9002.setRxGainControlMode(0, "manual");
-        msleep(VISUAL_DELAY);
+        msleep(500);
 
         printToConsole("  Setting RX1 hardware gain to 10 dB...");
         adrv9002.setRxHardwareGain(0, "10");
-        printToConsole("  VISUAL CHECK: Verify gain control responds in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify gain control responds in UI");
 
         printToConsole("  Setting RX1 hardware gain to 30 dB...");
         adrv9002.setRxHardwareGain(0, "30");
-        printToConsole("  VISUAL CHECK: Verify gain value updated in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify gain value updated in UI");
 
         // Step 3: Change Gain Control Mode
         printToConsole("  Setting gain control mode to automatic...");
         adrv9002.setRxGainControlMode(0, "automatic");
-        printToConsole("  VISUAL CHECK: Verify mode changes and affects gain behavior");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify mode changes and affects gain behavior");
 
         // Step 5: Toggle Powerdown
         printToConsole("  Disabling RX1 (powerdown)...");
         adrv9002.setRxEnabled(0, "0");
-        printToConsole("  VISUAL CHECK: Verify RX1 is powered down in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify RX1 is powered down in UI");
 
         printToConsole("  Enabling RX1 (power up)...");
         adrv9002.setRxEnabled(0, "1");
-        printToConsole("  VISUAL CHECK: Verify RX1 is powered up in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify RX1 is powered up in UI");
 
         // Restore
         adrv9002.setRxGainControlMode(0, "manual");
         msleep(500);
         adrv9002.setRxHardwareGain(0, origGain);
+        msleep(500);
         adrv9002.setRxGainControlMode(0, origMode);
+        msleep(500);
         adrv9002.setRxEnabled(0, origEnabled);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        adrv9002.setRxGainControlMode(0, "manual");
+        msleep(500);
+        adrv9002.setRxHardwareGain(0, origGain);
+        msleep(500);
+        adrv9002.setRxGainControlMode(0, origMode);
+        msleep(500);
+        adrv9002.setRxEnabled(0, origEnabled);
+        msleep(500);
         return false;
     }
 });
@@ -188,33 +191,38 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.TX_CHANNEL_CONFIG.VISUAL", function
         // Step 2: Change TX1 Attenuation
         printToConsole("  Setting TX1 attenuation to -10 dB...");
         adrv9002.setTxAttenuation(0, "-10");
-        printToConsole("  VISUAL CHECK: Verify attenuation control responds in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify attenuation control responds in UI");
 
         printToConsole("  Setting TX1 attenuation to -30 dB...");
         adrv9002.setTxAttenuation(0, "-30");
-        printToConsole("  VISUAL CHECK: Verify attenuation value updated in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify attenuation value updated in UI");
 
         // Step 4: Toggle TX Powerdown
         printToConsole("  Disabling TX1 (powerdown)...");
         adrv9002.setTxEnabled(0, "0");
-        printToConsole("  VISUAL CHECK: Verify TX1 is powered down in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify TX1 is powered down in UI");
 
         printToConsole("  Enabling TX1 (power up)...");
         adrv9002.setTxEnabled(0, "1");
-        printToConsole("  VISUAL CHECK: Verify TX1 is powered up in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify TX1 is powered up in UI");
 
         // Restore
         adrv9002.setTxAttenuation(0, origAtten);
+        msleep(500);
         adrv9002.setTxEnabled(0, origEnabled);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error: " + e);
+        adrv9002.setTxAttenuation(0, origAtten);
+        msleep(500);
+        adrv9002.setTxEnabled(0, origEnabled);
+        msleep(500);
         return false;
     }
 });
@@ -235,45 +243,53 @@ TestFramework.runTest("TST.ADRV9002.CONTROLS.ORX_CONFIG.VISUAL", function() {
         // Step 2: Change ORX Hardware Gain
         printToConsole("  Setting ORX1 hardware gain to 10 dB...");
         adrv9002.setOrxHardwareGain(0, "10");
-        printToConsole("  VISUAL CHECK: Verify ORX gain control responds in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify ORX gain control responds in UI");
 
         printToConsole("  Setting ORX1 hardware gain to 30 dB...");
         adrv9002.setOrxHardwareGain(0, "30");
-        printToConsole("  VISUAL CHECK: Verify ORX gain value updated in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify ORX gain value updated in UI");
 
         // Step 3: Enable/disable BBDC Rejection
         printToConsole("  Enabling ORX BBDC Rejection...");
         adrv9002.setOrxBbdcRejectionEnabled(0, "1");
-        printToConsole("  VISUAL CHECK: Verify BBDC Rejection enabled in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify BBDC Rejection enabled in UI");
 
         printToConsole("  Disabling ORX BBDC Rejection...");
         adrv9002.setOrxBbdcRejectionEnabled(0, "0");
-        printToConsole("  VISUAL CHECK: Verify BBDC Rejection disabled in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify BBDC Rejection disabled in UI");
 
         // Step 4: Toggle ORX Powerdown
         printToConsole("  Disabling ORX1 (powerdown)...");
         adrv9002.setOrxEnabled(0, "0");
-        printToConsole("  VISUAL CHECK: Verify ORX1 is powered down in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify ORX1 is powered down in UI");
 
         printToConsole("  Enabling ORX1 (power up)...");
         adrv9002.setOrxEnabled(0, "1");
-        printToConsole("  VISUAL CHECK: Verify ORX1 is powered up in UI");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        TestFramework.supervisedCheck("Verify ORX1 is powered up in UI");
 
         // Restore
         adrv9002.setOrxHardwareGain(0, origGain);
+        msleep(500);
         adrv9002.setOrxBbdcRejectionEnabled(0, origBbdc);
+        msleep(500);
         adrv9002.setOrxEnabled(0, origEnabled);
         msleep(500);
 
         return true;
     } catch (e) {
         printToConsole("  Error (ORX may not be supported): " + e);
+        adrv9002.setOrxHardwareGain(0, origGain);
+        msleep(500);
+        adrv9002.setOrxBbdcRejectionEnabled(0, origBbdc);
+        msleep(500);
+        adrv9002.setOrxEnabled(0, origEnabled);
+        msleep(500);
         return "SKIP";
     }
 });
