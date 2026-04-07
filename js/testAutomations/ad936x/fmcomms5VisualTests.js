@@ -34,8 +34,6 @@ evaluateFile("js/testAutomations/common/testFramework.js");
 // Test Suite
 TestFramework.init("FMCOMMS5 Visual Validation Tests");
 
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
-
 // Connect to device
 if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
     printToConsole("ERROR: Cannot proceed without device connection");
@@ -54,8 +52,7 @@ TestFramework.runTest("TST.FMCOMMS5.PLUGIN_LOADS", function() {
     try {
         // Step 1: Open Scopy application (already running)
         printToConsole("  Scopy application is running");
-        printToConsole("  VISUAL CHECK: Verify Scopy launched without errors");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck("Verify Scopy launched without errors")) return false;
 
         // Step 2: Open FMCOMMS5 plugin
         if (!switchToTool("FMCOMMS5")) {
@@ -70,8 +67,7 @@ TestFramework.runTest("TST.FMCOMMS5.PLUGIN_LOADS", function() {
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify FMCOMMS5 plugin loads and is accessible in the UI");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck("Verify FMCOMMS5 plugin loads and is accessible in the UI")) return false;
 
         return true;
     } catch (e) {
@@ -128,8 +124,7 @@ TestFramework.runTest("TST.FMCOMMS5.DEVICE_DETECTION_AND_DISPLAY", function() {
                 " (" + (ch < 2 ? "ad9361-phy" : "ad9361-phy-B") + ")");
         }
 
-        printToConsole("  VISUAL CHECK: Verify both AD9361-phy and AD9361-phy-B status panels are displayed");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck("Verify both AD9361-phy and AD9361-phy-B status panels are displayed")) return false;
 
         return true;
     } catch (e) {
@@ -153,17 +148,18 @@ TestFramework.runTest("TST.FMCOMMS5.CHANGE_VALIDATE_GLOBAL_SETTINGS.VISUAL", fun
         // Step 1: Change ENSM mode
         printToConsole("  Setting ENSM mode to fdd...");
         fmcomms5.setEnsmMode("fdd");
-        printToConsole("  VISUAL CHECK: Verify ENSM mode changes to FDD for both devices");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify ENSM mode changes to FDD for both devices")) return false;
 
         // Step 2: Change rate governor
         printToConsole("  Setting TRX rate governor to nominal...");
         fmcomms5.setTrxRateGovernor("nominal");
-        printToConsole("  VISUAL CHECK: Verify rate governor changes for both devices");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify rate governor changes for both devices")) return false;
 
         // Restore
         fmcomms5.setEnsmMode(origEnsm);
+        msleep(500);
         fmcomms5.setTrxRateGovernor(origGov);
         msleep(500);
 
@@ -191,30 +187,33 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.VISUAL", function() {
         // Step 1: Change RX bandwidth
         printToConsole("  Setting RX RF bandwidth to 18 MHz...");
         fmcomms5.setRxRfBandwidth("18000000");
-        printToConsole("  VISUAL CHECK: Verify RX bandwidth updated for all RX channels");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX bandwidth updated for all RX channels")) return false;
 
         // Change RX LO for both devices
         printToConsole("  Setting RX LO to 2.4 GHz for device 0 (channels 0-1)...");
         fmcomms5.setRxLoFrequency(0, "2400000000");
-        printToConsole("  VISUAL CHECK: Verify RX LO updated for device 0");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX LO updated for device 0")) return false;
 
         printToConsole("  Setting RX LO to 2.4 GHz for device 1 (channels 2-3)...");
         fmcomms5.setRxLoFrequency(1, "2400000000");
-        printToConsole("  VISUAL CHECK: Verify RX LO updated for device 1");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify RX LO updated for device 1")) return false;
 
         // Step 2: Change TX bandwidth
         printToConsole("  Setting TX RF bandwidth to 18 MHz...");
         fmcomms5.setTxRfBandwidth("18000000");
-        printToConsole("  VISUAL CHECK: Verify TX bandwidth updated for all TX channels");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify TX bandwidth updated for all TX channels")) return false;
 
         // Restore
         fmcomms5.setRxRfBandwidth(origRxBw);
+        msleep(500);
         fmcomms5.setTxRfBandwidth(origTxBw);
+        msleep(500);
         fmcomms5.setRxLoFrequency(0, origRxLo0);
+        msleep(500);
         fmcomms5.setRxLoFrequency(1, origRxLo1);
         msleep(500);
 
@@ -239,21 +238,20 @@ TestFramework.runTest("TST.FMCOMMS5_ADVANCED.PLUGIN_DETECTION_AND_DISPLAY.VISUAL
             return false;
         }
 
-        printToConsole("  VISUAL CHECK: Verify FMCOMMS5 Advanced plugin is loaded");
-        msleep(VISUAL_DELAY);
+        if (!TestFramework.supervisedCheck("Verify FMCOMMS5 Advanced plugin is loaded")) return false;
 
         // Navigate through subtabs
         fmcomms5_advanced.switchSubtab("ENSM/Mode/Clocks");
-        printToConsole("  VISUAL CHECK: Verify ENSM/Mode/Clocks panel displays correctly");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify ENSM/Mode/Clocks panel displays correctly")) return false;
 
         fmcomms5_advanced.switchSubtab("Gain");
-        printToConsole("  VISUAL CHECK: Verify Gain panel displays correctly");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify Gain panel displays correctly")) return false;
 
         fmcomms5_advanced.switchSubtab("FMCOMMS5");
-        printToConsole("  VISUAL CHECK: Verify FMCOMMS5 calibration panel displays correctly");
-        msleep(VISUAL_DELAY);
+        msleep(500);
+        if (!TestFramework.supervisedCheck("Verify FMCOMMS5 calibration panel displays correctly")) return false;
 
         return true;
     } catch (e) {

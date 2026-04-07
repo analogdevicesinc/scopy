@@ -30,13 +30,13 @@ TestFramework.init("FMCOMMS5 Advanced Plugin Tests");
 // Connect to device
 if (!TestFramework.connectToDevice("ip:192.168.2.1")) {
     printToConsole("ERROR: Cannot proceed without device connection");
-    exit(1);
+    scopy.exit();
 }
 
 // Switch to FMCOMMS5 Advanced tool
 if (!switchToTool("FMCOMMS5 Advanced")) {
     printToConsole("ERROR: Cannot switch to FMCOMMS5 Advanced tool");
-    exit(1);
+    scopy.exit();
 }
 
 // ============================================

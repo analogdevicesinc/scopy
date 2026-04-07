@@ -167,6 +167,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_GLOBAL", function() {
 
         // Restore
         fmcomms5.setRxRfBandwidth(origBw);
+        msleep(500);
         fmcomms5.setRxSamplingFrequency(origSr);
         msleep(500);
 
@@ -211,6 +212,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_LO", function() {
 
         // Restore
         fmcomms5.setRxLoFrequency(0, origLo0);
+        msleep(500);
         fmcomms5.setRxLoFrequency(1, origLo1);
         msleep(500);
 
@@ -252,9 +254,10 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.RX_PER_CHANNEL", function
         // Restore
         for (var ch = 0; ch < 4; ch++) {
             fmcomms5.setRxHardwareGain(ch, origGains[ch]);
+            msleep(500);
             fmcomms5.setRxGainControlMode(ch, origModes[ch]);
+            msleep(500);
         }
-        msleep(500);
 
         if (!allPass) return false;
         printToConsole("  PASS: RX per-channel gain applied for all 4 channels (RX1-4)");
@@ -286,6 +289,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_GLOBAL", function() {
 
         // Restore
         fmcomms5.setTxRfBandwidth(origBw);
+        msleep(500);
         fmcomms5.setTxSamplingFrequency(origSr);
         msleep(500);
 
@@ -330,6 +334,7 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_LO", function() {
 
         // Restore
         fmcomms5.setTxLoFrequency(0, origLo0);
+        msleep(500);
         fmcomms5.setTxLoFrequency(1, origLo1);
         msleep(500);
 
@@ -367,8 +372,8 @@ TestFramework.runTest("TST.FMCOMMS5.RX_TX_CHAIN_CONFIG.TX_PER_CHANNEL", function
         // Restore
         for (var ch = 0; ch < 4; ch++) {
             fmcomms5.setTxHardwareGain(ch, origGains[ch]);
+            msleep(500);
         }
-        msleep(500);
 
         if (!allPass) return false;
         printToConsole("  PASS: TX per-channel gain applied for all 4 channels (TX1-4)");
