@@ -93,7 +93,7 @@ private:
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
-	SWIOT_API *m_api;
+	SWIOT_API *m_api = nullptr;
 
 	bool m_isRuntime;
 	bool m_switchCmd = false;

@@ -74,9 +74,9 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 3: Enable voltage_out 1 and voltage_in 2 channels
             swiot.setAdPlotChannelEnabled(0, true);
-            msleep(300);
+            msleep(500);
             swiot.setAdPlotChannelEnabled(1, true);
-            msleep(300);
+            msleep(500);
             if (!swiot.isAdChannelEnabled(0) || !swiot.isAdChannelEnabled(1)) {
                 printToConsole("  FAIL: Could not enable channels 0 and 1");
                 cleanupAd74413r();
@@ -97,9 +97,9 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 5: Set YMin to -1A and YMax to 10A for voltage_out 1
             swiot.setAdChannelYMin(0, -1.0);
-            msleep(300);
+            msleep(500);
             swiot.setAdChannelYMax(0, 10.0);
-            msleep(300);
+            msleep(500);
             if (!TestFramework.assertApproxEqual(swiot.getAdChannelYMin(0), -1.0, 0.01, "Channel 0 YMin set to -1")) {
                 cleanupAd74413r();
                 return false;
@@ -111,9 +111,9 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 6: Set YMin to 0V and YMax to 20V for voltage_in 2
             swiot.setAdChannelYMin(1, 0.0);
-            msleep(300);
+            msleep(500);
             swiot.setAdChannelYMax(1, 20.0);
-            msleep(300);
+            msleep(500);
             if (!TestFramework.assertApproxEqual(swiot.getAdChannelYMin(1), 0.0, 0.01, "Channel 1 YMin set to 0")) {
                 cleanupAd74413r();
                 return false;
@@ -126,6 +126,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
             // Step 7: Set the RAW output value to 8192 on voltage_out 1
             // Key format: device/channelId_direction/attribute
             var rawKey = "ad74413r/voltage0_out/raw";
+            var initialRawValue = swiot.getAdWidgetValue(rawKey);
             swiot.setAdWidgetValue(rawKey, "8192");
             msleep(1000);
 
@@ -142,7 +143,10 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
             swiot.adSingleShot();
             msleep(5000);
             printToConsole("  Step 8: Single capture completed");
-            printToConsole("  SUPERVISE: Verify voltage_in 2 instant value shows ~10V");
+            if (!TestFramework.supervisedCheck("Verify voltage_in 2 instant value shows ~10V")) {
+                cleanupAd74413r();
+                return false;
+            }
 
             // Step 9: Run a Continuous capture
             // SUPERVISE: voltage_in 2 instant value should show ~10V
@@ -154,7 +158,10 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 return false;
             }
             printToConsole("  Step 9: Continuous capture running");
-            printToConsole("  SUPERVISE: Verify voltage_in 2 instant value shows ~10V");
+            if (!TestFramework.supervisedCheck("Verify voltage_in 2 instant value shows ~10V")) {
+                cleanupAd74413r();
+                return false;
+            }
 
             // Step 10: While running change the RAW value to 4096
             // SUPERVISE: signal drops to ~5.5V on plot, instant value matches
@@ -166,7 +173,10 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 return false;
             }
             printToConsole("  Step 10: RAW set to 4096 - below field shows ~5.5V");
-            printToConsole("  SUPERVISE: Verify voltage_in 2 signal drops to ~5.5V on plot");
+            if (!TestFramework.supervisedCheck("Verify voltage_in 2 signal drops to ~5.5V on plot")) {
+                cleanupAd74413r();
+                return false;
+            }
 
             msleep(5000);
             // Step 11: While running change the RAW value to -1
@@ -179,11 +189,18 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 return false;
             }
             printToConsole("  Step 11: RAW clamped to 0 - below field shows 0V");
-            printToConsole("  SUPERVISE: Verify voltage_in 2 signal drops to 0V on plot");
+            if (!TestFramework.supervisedCheck("Verify voltage_in 2 signal drops to 0V on plot")) {
+                cleanupAd74413r();
+                return false;
+            }
+
+            // Restore RAW value to initial state
+            swiot.setAdWidgetValue(rawKey, initialRawValue);
+            msleep(500);
 
             // Cleanup
             cleanupAd74413r();
-            printToConsole("  Cleanup: capture stopped, channels disabled");
+            printToConsole("  Cleanup: capture stopped, channels disabled, RAW restored");
 
             return true;
         } catch (e) {
@@ -220,9 +237,9 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 3: Enable voltage_out 1, voltage_in 2 and diagnostic 5 channels
             swiot.setAdPlotChannelEnabled(0, true);
-            msleep(300);
+            msleep(500);
             swiot.setAdPlotChannelEnabled(1, true);
-            msleep(300);
+            msleep(500);
             swiot.setAdPlotChannelEnabled(2, true);
             msleep(1000);
             if (!swiot.isAdChannelEnabled(0) || !swiot.isAdChannelEnabled(1) || !swiot.isAdChannelEnabled(4)) {
@@ -234,6 +251,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 4: Set diag_function to sensel_b on diagnostic 5
             var diagFuncKey = "ad74413r/voltage4_in/diag_function";
+            var initialDiagFunc = swiot.getAdWidgetValue(diagFuncKey);
             swiot.setAdWidgetValue(diagFuncKey, "sensel_b");
             msleep(1000);
             var diagFunc = swiot.getAdWidgetValue(diagFuncKey);
@@ -245,6 +263,7 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
 
             // Step 5: Set the RAW output value to 8192 on voltage_out 1
             var rawKey = "ad74413r/voltage0_out/raw";
+            var initialRawValue = swiot.getAdWidgetValue(rawKey);
             swiot.setAdWidgetValue(rawKey, "8192");
             msleep(1000);
             var rawValue = swiot.getAdWidgetValue(rawKey);
@@ -260,7 +279,10 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 return false;
             }
             printToConsole("  Step 6: Continuous capture running");
-            printToConsole("  SUPERVISE: Verify diagnostic 5 instant value shows ~10V, same as voltage_in 2");
+            if (!TestFramework.supervisedCheck("Verify diagnostic 5 instant value shows ~10V, same as voltage_in 2")) {
+                cleanupAd74413r();
+                return false;
+            }
 
             // Step 7: While running change the RAW value to 4096
             // SUPERVISE: Both diagnostic 5 and voltage_in 2 drop to ~5.5V
@@ -272,7 +294,10 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 return false;
             }
             printToConsole("  Step 7: RAW set to 4096");
-            printToConsole("  SUPERVISE: Verify both diagnostic 5 and voltage_in 2 drop to ~5.5V");
+            if (!TestFramework.supervisedCheck("Verify both diagnostic 5 and voltage_in 2 drop to ~5.5V")) {
+                cleanupAd74413r();
+                return false;
+            }
 
             // Step 8: While running change the RAW value to 2000
             // SUPERVISE: Both diagnostic 5 and voltage_in 2 drop to ~2.7V
@@ -284,11 +309,20 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
                 return false;
             }
             printToConsole("  Step 8: RAW set to 2000");
-            printToConsole("  SUPERVISE: Verify both diagnostic 5 and voltage_in 2 drop to ~2.7V");
+            if (!TestFramework.supervisedCheck("Verify both diagnostic 5 and voltage_in 2 drop to ~2.7V")) {
+                cleanupAd74413r();
+                return false;
+            }
+
+            // Restore RAW value and diag_function to initial state
+            swiot.setAdWidgetValue(rawKey, initialRawValue);
+            msleep(500);
+            swiot.setAdWidgetValue(diagFuncKey, initialDiagFunc);
+            msleep(500);
 
             // Cleanup
             cleanupAd74413r();
-            printToConsole("  Cleanup: capture stopped, channels disabled");
+            printToConsole("  Cleanup: capture stopped, channels disabled, state restored");
 
             return true;
         } catch (e) {

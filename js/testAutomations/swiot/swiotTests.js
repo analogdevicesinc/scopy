@@ -201,27 +201,27 @@ TestFramework.runTest("TST.SWIOT.CONFIG", function() {
         // Step 3: Configure SWIOT
         // Channel 1: device ad74413r and function voltage_out
         swiot.setChannelDevice(0, "ad74413r");
-        msleep(300);
+        msleep(500);
         swiot.setChannelFunction(0, "voltage_out");
-        msleep(300);
+        msleep(500);
 
         // Channel 2: device ad74413r and function voltage_in
         swiot.setChannelDevice(1, "ad74413r");
-        msleep(300);
+        msleep(500);
         swiot.setChannelFunction(1, "voltage_in");
-        msleep(300);
+        msleep(500);
 
         // Channel 3: device max14906 and function input
         swiot.setChannelDevice(2, "max14906");
-        msleep(300);
+        msleep(500);
         swiot.setChannelFunction(2, "input");
-        msleep(300);
+        msleep(500);
 
         // Channel 4: device max14906 and function output
         swiot.setChannelDevice(3, "max14906");
-        msleep(300);
+        msleep(500);
         swiot.setChannelFunction(3, "output");
-        msleep(300);
+        msleep(500);
 
         printToConsole("  Configuration set:");
         printToConsole("    CH0: " + swiot.getChannelDevice(0) + " / " + swiot.getChannelFunction(0));
@@ -405,14 +405,14 @@ if (swiot.isRuntimeMode() && switchToTool("AD74413R")) {
             // Enable all channels
             for (var i = 0; i < channelCount; i++) {
                 swiot.setAdPlotChannelEnabled(i, true);
-                msleep(300);
+                msleep(500);
             }
             printToConsole("  Step 2a: All " + channelCount + " channels enabled");
 
             // Set sampling frequency to 4800 for all channels
             for (var i = 0; i < channelCount; i++) {
                 swiot.setAdChannelSamplingFrequency(i, 4800);
-                msleep(300);
+                msleep(500);
             }
             printToConsole("  Step 2b: Sampling frequency set to 4800 for all channels");
 
@@ -635,7 +635,7 @@ if (swiot.isRuntimeMode()) {
                 var adChannelCount = swiot.getAdChannelCount();
                 for (var i = 0; i < adChannelCount; i++) {
                     swiot.setAdPlotChannelEnabled(i, true);
-                    msleep(200);
+                    msleep(500);
                 }
                 swiot.setAdRunning(true);
                 msleep(2000);
@@ -675,7 +675,7 @@ if (swiot.isRuntimeMode()) {
             printToConsole("  Step 4a: AD Faults explanation was " + (wasAdEnabled ? "enabled" : "disabled"));
 
             swiot.setAdFaultsExplanationEnabled(false);
-            msleep(300);
+            msleep(500);
             if (!swiot.isAdFaultsExplanationEnabled()) {
                 printToConsole("  Step 4b: AD Faults explanation turned off - section below leds is hidden");
             } else {
@@ -715,7 +715,7 @@ if (swiot.isRuntimeMode()) {
                 var adChannelCount = swiot.getAdChannelCount();
                 for (var i = 0; i < adChannelCount; i++) {
                     swiot.setAdPlotChannelEnabled(i, true);
-                    msleep(200);
+                    msleep(500);
                 }
                 swiot.setAdRunning(true);
                 msleep(2000);
@@ -799,7 +799,7 @@ if (swiot.isRuntimeMode()) {
                 var adChannelCount = swiot.getAdChannelCount();
                 for (var i = 0; i < adChannelCount; i++) {
                     swiot.setAdPlotChannelEnabled(i, true);
-                    msleep(200);
+                    msleep(500);
                 }
                 swiot.setAdRunning(true);
                 msleep(2000);
