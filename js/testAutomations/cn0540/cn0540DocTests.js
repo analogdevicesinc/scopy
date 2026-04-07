@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -26,10 +26,10 @@
  *   - IIO kernel drivers loaded
  *
  * Run from the build directory:
- *   ./scopy --script ../js/testAutomations/cn0540/cn0540DocTests.js [--param ip:<address>]
+ *   ./scopy --script js/testAutomations/cn0540/cn0540DocTests.js [--param ip:<address>]
  */
 
-evaluateFile("../js/testAutomations/common/testFramework.js");
+evaluateFile("js/testAutomations/common/testFramework.js");
 
 var uri = "ip:192.168.2.1";
 if(typeof scriptArgs !== "undefined" && scriptArgs.length > 0) {
@@ -109,17 +109,18 @@ TestFramework.runTest("TST.CN0540.SHUTDOWN_TOGGLE", function() {
 
 	var toggled = (original === "true") ? "false" : "true";
 	cn0540.setShutdown(toggled);
-	msleep(200);
+	msleep(500);
 
 	var readback = cn0540.getShutdown();
 	if(readback !== toggled) {
 		printToConsole("  FAIL: Expected " + toggled + " but got " + readback);
 		cn0540.setShutdown(original);
+		msleep(500);
 		return false;
 	}
 
 	cn0540.setShutdown(original);
-	msleep(200);
+	msleep(500);
 	printToConsole("  Shutdown toggle verified and restored");
 	return true;
 });
@@ -136,17 +137,18 @@ TestFramework.runTest("TST.CN0540.CONSTANT_CURRENT_TOGGLE", function() {
 
 	var toggled = (original === "true") ? "false" : "true";
 	cn0540.setConstantCurrent(toggled);
-	msleep(200);
+	msleep(500);
 
 	var readback = cn0540.getConstantCurrent();
 	if(readback !== toggled) {
 		printToConsole("  FAIL: Expected " + toggled + " but got " + readback);
 		cn0540.setConstantCurrent(original);
+		msleep(500);
 		return false;
 	}
 
 	cn0540.setConstantCurrent(original);
-	msleep(200);
+	msleep(500);
 	printToConsole("  Constant current toggle verified and restored");
 	return true;
 });
@@ -163,17 +165,18 @@ TestFramework.runTest("TST.CN0540.FDA_STATUS_TOGGLE", function() {
 
 	var toggled = (original === "true") ? "false" : "true";
 	cn0540.setFdaEnabled(toggled);
-	msleep(200);
+	msleep(500);
 
 	var readback = cn0540.getFdaEnabled();
 	if(readback !== toggled) {
 		printToConsole("  FAIL: Expected " + toggled + " but got " + readback);
 		cn0540.setFdaEnabled(original);
+		msleep(500);
 		return false;
 	}
 
 	cn0540.setFdaEnabled(original);
-	msleep(200);
+	msleep(500);
 	printToConsole("  FDA status toggle verified and restored");
 	return true;
 });
@@ -189,25 +192,27 @@ TestFramework.runTest("TST.CN0540.FDA_MODE_TOGGLE", function() {
 	printToConsole("  Original FDA mode: " + original);
 
 	cn0540.setFdaMode("FULL POWER");
-	msleep(200);
+	msleep(500);
 	var fullPower = cn0540.getFdaMode();
 	if(fullPower !== "FULL POWER") {
 		printToConsole("  FAIL: Expected 'FULL POWER' but got: " + fullPower);
 		cn0540.setFdaMode(original);
+		msleep(500);
 		return false;
 	}
 
 	cn0540.setFdaMode("LOW POWER");
-	msleep(200);
+	msleep(500);
 	var lowPower = cn0540.getFdaMode();
 	if(lowPower !== "LOW POWER") {
 		printToConsole("  FAIL: Expected 'LOW POWER' but got: " + lowPower);
 		cn0540.setFdaMode(original);
+		msleep(500);
 		return false;
 	}
 
 	cn0540.setFdaMode(original);
-	msleep(200);
+	msleep(500);
 	printToConsole("  FDA mode toggle verified and restored");
 	return true;
 });
@@ -242,19 +247,20 @@ TestFramework.runTest("TST.CN0540.SHIFT_VOLTAGE_WRITE", function() {
 	// Write a known test value (10 mV)
 	var testValue = 10.0;
 	cn0540.setShiftVoltage(String(testValue));
-	msleep(300);
+	msleep(500);
 
 	var readback = cn0540.getShiftVoltage();
 	var diff = Math.abs(parseFloat(readback) - testValue);
 	if(diff > 1.0) {
 		printToConsole("  FAIL: Wrote " + testValue + " mV but read back " + readback + " mV");
 		cn0540.setShiftVoltage(original);
+		msleep(500);
 		return false;
 	}
 	printToConsole("  Readback: " + readback + " mV (tolerance OK)");
 
 	cn0540.setShiftVoltage(original);
-	msleep(300);
+	msleep(500);
 	printToConsole("  Shift voltage write/readback verified and restored");
 	return true;
 });
@@ -306,6 +312,10 @@ TestFramework.runTest("TST.CN0540.VOLT_MON_DISPLAY", function() {
 	}
 	var pinNames = ["Vin+", "Vgpio2", "Vgpio3", "Vcom", "Vfda+", "Vfda-"];
 	for(var i = 0; i < voltages.length; i++) {
+		if(isNaN(parseFloat(voltages[i]))) {
+			printToConsole("  FAIL: Non-numeric value for " + pinNames[i] + ": " + voltages[i]);
+			return false;
+		}
 		printToConsole("  " + pinNames[i] + ": " + voltages[i] + " mV");
 	}
 	return true;
@@ -329,6 +339,23 @@ TestFramework.runTest("TST.CN0540.VOLT_MON_AUTO_REFRESH", function() {
 	}
 	printToConsole("  Voltage monitor auto-refresh verified (" + v2.length + " channels)");
 	return true;
+});
+
+// ─── Test 15: Voltage Monitor Section Hidden Without Auxiliary ADC ────────────
+//
+// This test passes only when getVoltageMonitor() returns an empty list,
+// which is the programmatic equivalent of the Voltage Monitor section being
+// hidden. If an aux ADC is present, the test is skipped — run on hardware
+// without xadc/ltc2308 to exercise this path.
+
+TestFramework.runTest("TST.CN0540.VOLT_MON_SECTION_HIDDEN", function() {
+	var voltages = cn0540.getVoltageMonitor();
+	if(!voltages || voltages.length === 0) {
+		printToConsole("  PASS: getVoltageMonitor() returned empty — Voltage Monitor section not shown");
+		return true;
+	}
+	printToConsole("  SKIP: Auxiliary ADC present (" + voltages.length + " channels) — run on hardware without xadc/ltc2308 to test this case");
+	return "SKIP";
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
