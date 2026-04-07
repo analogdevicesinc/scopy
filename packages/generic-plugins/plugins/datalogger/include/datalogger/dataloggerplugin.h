@@ -69,7 +69,7 @@ private:
 	QList<ReadableDataMonitorModel *> dmmList;
 	DataAcquisitionManager *m_dataAcquisitionManager = nullptr;
 	void initApi();
-	DataLogger_API *api;
+	DataLogger_API *m_api = nullptr;
 	bool isRunning = false;
 	int toolIndex = 0;
 	QString toolIcon =

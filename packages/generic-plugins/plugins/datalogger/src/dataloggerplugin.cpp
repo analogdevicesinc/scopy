@@ -134,10 +134,10 @@ bool DataLoggerPlugin::onConnect()
 
 bool DataLoggerPlugin::onDisconnect()
 {
-	if(api) {
-		ScopyJS::GetInstance()->unregisterApi(api);
-		delete api;
-		api = nullptr;
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
 	}
 
 	auto count = dmmList.count();
@@ -256,13 +256,13 @@ void DataLoggerPlugin::toggleRunState(bool toggled)
 
 void DataLoggerPlugin::initApi()
 {
-	api = new DataLogger_API(this);
+	m_api = new DataLogger_API(this);
 	ScopyJS *js = ScopyJS::GetInstance();
-	api->setObjectName("datalogger");
-	js->registerApi(api);
+	m_api->setObjectName("datalogger");
+	js->registerApi(m_api);
 }
 
-DataLogger_API *DataLoggerPlugin::getApi() const { return api; }
+DataLogger_API *DataLoggerPlugin::getApi() const { return m_api; }
 
 void DataLoggerPlugin::initMetadata()
 {
