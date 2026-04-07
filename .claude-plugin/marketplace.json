@@ -1,12 +1,16 @@
 {
+  "version": "1",
   "name": "scopy-plugins",
+  "displayName": "Scopy Development Plugins",
   "owner": { "name": "Analog Devices Inc." },
   "metadata": {
     "description": "Scopy internal Claude Code plugins"
   },
   "plugins": [
     {
+      "id": "scopy_dev_plugin",
       "name": "scopy_dev_plugin",
+      "version": "1.0.0",
       "source": "./tools/scopy_dev_plugin",
       "description": "Scopy development tools: code generation, documentation, testing, quality checks, and styling for IIO plugin development."
     }
