@@ -30,7 +30,28 @@ IIOWidget's conversion setup. For each widget, note:
 - IIO attribute suffix patterns (e.g. hardwaregain returns "-10.000000 dB" — suffix must be stripped in getter)
 - Combo widget available-attribute name → extract valid enum string list for setter validation
 
-Also check if an API already exists (use the Glob tool to search for `*_api.h` in the plugin's package dir). If found, report it to the user and stop.
+Also check if an API already exists (use the Glob tool to search for `*_api.h` in the plugin's package dir). If found, switch to **Update Mode** (see below).
+
+## Update Mode (existing API)
+
+When an API class already exists, do NOT stop. Instead:
+
+1. **Read all existing API files** (header + source) and the plugin header/source.
+2. **Run all A1–A7 checks** from the `api-quality-checks` skill against the existing code (same as `/validate-api`).
+3. **Check for missing coverage**: Compare every IIOWidget discovered in Step 1 against the existing API methods. Flag any widgets that lack getter/setter pairs.
+4. **Present a fix plan** listing:
+   - Critical issues found (A1–A7 failures)
+   - Missing getter/setter pairs for uncovered widgets
+   - Conversion mismatches between tool lambdas and API methods
+5. **AUTO-APPROVE and proceed** — apply all fixes to the existing API files:
+   - Fix A2 issues (naming, lifecycle ordering, nullptr init)
+   - Fix A3 issues (add null-checks to methods missing them)
+   - Fix A7 issues (const QString& params, naming conventions)
+   - Add missing getter/setter methods for uncovered widgets
+   - Fix conversion logic mismatches
+6. Continue to **Step 4: Validate** below to confirm all checks pass after fixes.
+
+Do NOT regenerate the API from scratch — fix the existing code in place.
 
 ## Step 2: Design — WAIT FOR APPROVAL
 

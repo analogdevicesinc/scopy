@@ -30,14 +30,36 @@ Read these specific files:
    - `scopy/docs/tests/plugins/$ARGUMENTS/$ARGUMENTS_tests.rst`
    - `scopy/docs/tests/plugins/$ARGUMENTS/$ARGUMENTS_advanced_tests.rst` (if exists)
 
-3. **Existing test files** (avoid duplication):
+3. **Existing test files** (check for update mode):
    - Use Glob: `scopy/js/testAutomations/$ARGUMENTS/`
+   - If test files already exist, switch to **Update Mode** (see below).
 
 4. **Test framework API**:
    - `scopy/js/testAutomations/common/testFramework.js`
 
 5. **Cross-plugin APIs** (if RST steps reference other plugins):
    - Read headers for any plugin mentioned in test steps
+
+## Update Mode (existing tests)
+
+When JS test files already exist in `scopy/js/testAutomations/$ARGUMENTS/`, do NOT create new files from scratch. Instead:
+
+1. **Read all existing test files** completely.
+2. **Run all T1–T7 checks** from the `test-automation-quality-checks` skill against the existing code (same as `/validate-automated-tests`).
+3. **Present a fix plan** listing:
+   - Critical issues found (T1–T7 failures) with file:line references
+   - Missing test coverage (RST UIDs without JS tests)
+4. **AUTO-APPROVE and proceed** — apply all fixes to the existing test files:
+   - [T3] Add `msleep(500)` after every setter call that's missing it
+   - [T4] Add state save/restore in catch blocks and early return paths
+   - [T5] Replace `VISUAL_DELAY` / `msleep(VISUAL_DELAY)` with `TestFramework.supervisedCheck("description")`
+   - [T6] Fix file termination sequence if incorrect
+   - Add missing tests for uncovered RST UIDs (Category A/B only)
+5. Continue to **Step 4: Validate** below to confirm all checks pass after fixes.
+
+Do NOT regenerate tests from scratch — fix the existing code in place, preserving existing test logic.
+
+---
 
 ## Step 2: Classify — WAIT FOR APPROVAL
 
