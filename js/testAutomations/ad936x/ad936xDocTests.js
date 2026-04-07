@@ -189,7 +189,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.RX", function() {
 
         // Restore
         ad936x.setRxRfBandwidth(origBw);
+        msleep(500);
         ad936x.setRxSamplingFrequency(origSr);
+        msleep(500);
         ad936x.setRxLoFrequency(origLo);
         msleep(500);
 
@@ -242,7 +244,9 @@ TestFramework.runTest("TST.AD936X.RX_TX_CHAIN_CONFIG.TX", function() {
 
         // Restore
         ad936x.setTxRfBandwidth(origBw);
+        msleep(500);
         ad936x.setTxSamplingFrequency(origSr);
+        msleep(500);
         ad936x.setTxLoFrequency(origLo);
         msleep(500);
 
