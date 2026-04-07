@@ -99,10 +99,10 @@ function toggleBoolAttr(key, label) {
     }
     var newVal = (orig === "1" || orig === "true") ? "0" : "1";
     adrv9009.writeWidget(key, newVal);
-    msleep(300);
+    msleep(500);
     var rb = adrv9009.readWidget(key);
     adrv9009.writeWidget(key, orig);
-    msleep(300);
+    msleep(500);
     var rbNum = parseFloat(rb);
     var expected = parseFloat(newVal);
     if (isNaN(rbNum) || Math.abs(rbNum - expected) > 0.5) {
