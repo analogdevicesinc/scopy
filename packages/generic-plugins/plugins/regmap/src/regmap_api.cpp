@@ -32,17 +32,25 @@ RegMap_API::RegMap_API(RegmapPlugin *regMapPlugin)
 
 RegMap_API::~RegMap_API() {}
 
-void RegMap_API::write(QString addr, QString val)
+void RegMap_API::write(const QString &addr, const QString &val)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
 	uint32_t value = Utils::convertQStringToUint32(val);
 	Q_EMIT devRegMap->registerMapValues->requestWrite(address, value);
 }
 
-void RegMap_API::writeBitField(QString addr, QString val)
+void RegMap_API::writeBitField(const QString &addr, const QString &val)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
 	devRegMap->registerController->registerChanged(address);
 	Q_EMIT devRegMap->registerDetailedWidget->bitFieldValueChanged(val);
@@ -51,12 +59,20 @@ void RegMap_API::writeBitField(QString addr, QString val)
 
 QStringList RegMap_API::getAvailableDevicesName()
 {
+	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool || !m_regMapPlugin->registerMapTool->deviceList) {
+		qWarning(CAT_REGMAP_API) << "Register map tool not initialized";
+		return {};
+	}
 	auto devices = m_regMapPlugin->registerMapTool->deviceList;
 	return devices->keys();
 }
 
-bool RegMap_API::setDevice(QString device)
+bool RegMap_API::setDevice(const QString &device)
 {
+	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool) {
+		qWarning(CAT_REGMAP_API) << "Register map tool not initialized";
+		return false;
+	}
 	m_regMapPlugin->registerMapTool->updateActiveRegisterMap(device);
 	QString currentRegMap = m_regMapPlugin->registerMapTool->activeRegisterMap;
 	if(currentRegMap == device) {
@@ -66,10 +82,14 @@ bool RegMap_API::setDevice(QString device)
 	return false;
 }
 
-QList<QString> RegMap_API::search(QString searchParam)
+QList<QString> RegMap_API::search(const QString &searchParam)
 {
 	QList<uint32_t> resultIndexes;
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerMapTemplate) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return {};
+	}
 	resultIndexes = Search::searchForRegisters(devRegMap->registerMapTemplate->getRegisterList(), searchParam);
 	QList<QString> resultList;
 
@@ -79,9 +99,13 @@ QList<QString> RegMap_API::search(QString searchParam)
 	return resultList;
 }
 
-void RegMap_API::readInterval(QString startAddr, QString stopAddr)
+void RegMap_API::readInterval(const QString &startAddr, const QString &stopAddr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
 	uint32_t start = Utils::convertQStringToUint32(startAddr);
 	uint32_t stop = Utils::convertQStringToUint32(stopAddr);
 	for(int i = start; i <= stop; i++) {
@@ -92,6 +116,10 @@ void RegMap_API::readInterval(QString startAddr, QString stopAddr)
 bool RegMap_API::enableAutoread(bool enable)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return false;
+	}
 	devRegMap->toggleAutoread(enable);
 	if(devRegMap->getAutoread() == enable) {
 		return true;
@@ -103,36 +131,62 @@ bool RegMap_API::enableAutoread(bool enable)
 bool RegMap_API::isAutoreadEnabled()
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return false;
+	}
 	return devRegMap->getAutoread();
 }
 
-void RegMap_API::registerDump(QString filePath)
+void RegMap_API::registerDump(const QString &filePath)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerMapValues) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return;
+	}
 	Q_EMIT devRegMap->registerMapValues->registerDump(filePath);
 }
 
-void RegMap_API::setPath(QString filePath)
+void RegMap_API::setPath(const QString &filePath)
 {
+	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool || !m_regMapPlugin->registerMapTool->settings ||
+	   !m_regMapPlugin->registerMapTool->settings->fileBrowser) {
+		qWarning(CAT_REGMAP_API) << "Register map settings not initialized";
+		return;
+	}
 	m_regMapPlugin->registerMapTool->settings->fileBrowser->lineEdit()->setText(filePath);
 }
 
-void RegMap_API::writeFromFile(QString filePath)
+void RegMap_API::writeFromFile(const QString &filePath)
 {
+	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool || !m_regMapPlugin->registerMapTool->settings ||
+	   !m_regMapPlugin->registerMapTool->settings->writeListOfValuesButton) {
+		qWarning(CAT_REGMAP_API) << "Register map settings not initialized";
+		return;
+	}
 	setPath(filePath);
 	Q_EMIT m_regMapPlugin->registerMapTool->settings->writeListOfValuesButton->clicked();
 }
 
-QString RegMap_API::readRegister(QString addr)
+QString RegMap_API::readRegister(const QString &addr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerController || !devRegMap->registerController->regValue) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return "";
+	}
 	Q_EMIT devRegMap->requestRead(Utils::convertQStringToUint32(addr));
 	return devRegMap->registerController->regValue->text();
 }
 
-QString RegMap_API::getValueOfRegister(QString addr)
+QString RegMap_API::getValueOfRegister(const QString &addr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerMapValues) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return "";
+	}
 	uint32_t address = Utils::convertQStringToUint32(addr);
 	QMap<uint32_t, uint32_t> *values = devRegMap->registerMapValues->getRegisterReadValues();
 	if(values->keys().contains(address)) {
@@ -144,12 +198,19 @@ QString RegMap_API::getValueOfRegister(QString addr)
 
 DeviceRegisterMap *RegMap_API::getActiveDevRegMap()
 {
+	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool || !m_regMapPlugin->registerMapTool->deviceList) {
+		return nullptr;
+	}
 	return m_regMapPlugin->registerMapTool->deviceList->value(m_regMapPlugin->registerMapTool->activeRegisterMap);
 }
 
-QStringList RegMap_API::getRegisterInfo(QString addr)
+QStringList RegMap_API::getRegisterInfo(const QString &addr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerMapTableWidget || !devRegMap->registerMapTableWidget->registerModels) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return {};
+	}
 	QStringList regInfo;
 	RegisterModel *regModel =
 		devRegMap->registerMapTableWidget->registerModels->value(Utils::convertQStringToUint32(addr));
@@ -162,13 +223,24 @@ QStringList RegMap_API::getRegisterInfo(QString addr)
 	return regInfo;
 }
 
-QStringList RegMap_API::getRegisterBitFieldsInfo(QString addr)
+QStringList RegMap_API::getRegisterBitFieldsInfo(const QString &addr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerMapTableWidget || !devRegMap->registerMapTableWidget->registerModels) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return {};
+	}
 	QStringList bitFieldsDetails;
 	RegisterModel *regModel =
 		devRegMap->registerMapTableWidget->registerModels->value(Utils::convertQStringToUint32(addr));
+	if(!regModel) {
+		qWarning(CAT_REGMAP_API) << "Register model not found for address " << addr;
+		return {};
+	}
 	QVector<BitFieldModel *> *bitField = regModel->getBitFields();
+	if(!bitField) {
+		return {};
+	}
 
 	for(BitFieldModel *bf : *bitField) {
 		bitFieldsDetails.append("Name:" + bf->getName());
@@ -180,13 +252,24 @@ QStringList RegMap_API::getRegisterBitFieldsInfo(QString addr)
 	return bitFieldsDetails;
 }
 
-QStringList RegMap_API::getBitFieldInfo(QString addr, QString bitName)
+QStringList RegMap_API::getBitFieldInfo(const QString &addr, const QString &bitName)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
+	if(!devRegMap || !devRegMap->registerMapTableWidget || !devRegMap->registerMapTableWidget->registerModels) {
+		qWarning(CAT_REGMAP_API) << "No active device register map";
+		return {};
+	}
 	QStringList bitDetails;
 	RegisterModel *regModel =
 		devRegMap->registerMapTableWidget->registerModels->value(Utils::convertQStringToUint32(addr));
+	if(!regModel) {
+		qWarning(CAT_REGMAP_API) << "Register model not found for address " << addr;
+		return {};
+	}
 	QVector<BitFieldModel *> *bitField = regModel->getBitFields();
+	if(!bitField) {
+		return {};
+	}
 
 	for(BitFieldModel *bf : *bitField) {
 		if(bf->getName() == bitName) {

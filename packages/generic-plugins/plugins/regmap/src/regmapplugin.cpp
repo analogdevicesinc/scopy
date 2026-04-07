@@ -243,7 +243,6 @@ bool RegmapPlugin::onConnect()
 
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setTool(m_registerMapWidget);
-		InitApi();
 
 		for(auto &tool : m_toolList) {
 			tool->setEnabled(true);
@@ -252,6 +251,7 @@ bool RegmapPlugin::onConnect()
 
 		Q_EMIT toolListChanged();
 
+		initApi();
 		return true;
 	}
 
@@ -260,10 +260,10 @@ bool RegmapPlugin::onConnect()
 
 bool RegmapPlugin::onDisconnect()
 {
-	if(api) {
-		ScopyJS::GetInstance()->unregisterApi(api);
-		delete api;
-		api = nullptr;
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
 	}
 
 	auto &&cp = ConnectionProvider::GetInstance();
@@ -353,11 +353,11 @@ bool RegmapPlugin::isBufferCapable(iio_device *dev)
 	return false;
 }
 
-void RegmapPlugin::InitApi()
+void RegmapPlugin::initApi()
 {
-	api = new RegMap_API(this);
+	m_api = new RegMap_API(this);
 	ScopyJS *js = ScopyJS::GetInstance();
-	api->setObjectName("regmap");
-	js->registerApi(api);
+	m_api->setObjectName("regmap");
+	js->registerApi(m_api);
 }
 #include "moc_regmapplugin.cpp"
