@@ -27,7 +27,6 @@ set(PACKAGE_NAME ${SCOPY_MODULE})
 set(PACKAGE_DISPLAY_NAME "CN0540")
 set(PACKAGE_DESCRIPTION "Plugin for CN0540 precision measurement system")
 
-
 message(STATUS "building package: " ${SCOPY_MODULE})
 
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
