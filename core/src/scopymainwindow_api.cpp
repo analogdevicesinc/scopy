@@ -25,6 +25,9 @@
 #include "qapplication.h"
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/scopyjs.h>
+#include <QPixmap>
+#include <QScrollArea>
+#include "toolstack.h"
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY_API, "Scopy_API")
@@ -563,6 +566,72 @@ QStringList ScopyMainWindow_API::listFiles(const QStringList &dirFilter, const Q
 QString ScopyMainWindow_API::findPkgName(const QString &filePath)
 {
 	return PkgManager::reverseSearch(filePath).baseName();
+}
+
+void ScopyMainWindow_API::screenshot(const QString &path)
+{
+	QPixmap px = m_w->grab();
+	if(!px.save(path)) {
+		qWarning(CAT_SCOPY_API) << "Failed to save screenshot to:" << path;
+	}
+}
+
+void ScopyMainWindow_API::screenshotFullContent(const QString &path)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+
+	QScrollArea *sa = nullptr;
+	if(currentTool) {
+		for(QScrollArea *candidate : currentTool->findChildren<QScrollArea *>()) {
+			if(candidate->isVisible() && candidate->widget()) {
+				sa = candidate;
+				break;
+			}
+		}
+	}
+
+	if(sa) {
+		QWidget *content = sa->widget();
+		content->adjustSize();
+		QApplication::processEvents();
+		QPixmap px = content->grab();
+		if(!px.save(path)) {
+			qWarning(CAT_SCOPY_API) << "Failed to save full-content screenshot to:" << path;
+		}
+	} else {
+		screenshot(path);
+	}
+}
+
+QObject *ScopyMainWindow_API::getCurrentToolApi()
+{
+	// Find the name of the currently shown tool
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	QString currentToolName;
+	if(currentTool && !m_w->dm->connectedDev.isEmpty()) {
+		Device *dev = m_w->dm->getDevice(m_w->dm->connectedDev.back());
+		if(dev) {
+			for(ToolMenuEntry *tme : dev->toolList()) {
+				if(tme->tool() == currentTool) {
+					currentToolName = tme->name();
+					break;
+				}
+			}
+		}
+	}
+
+	// Return only the API whose objectName matches the current tool and exposes switchTab
+	const QList<ApiObject *> apis = ScopyJS::GetInstance()->getRegisteredApis();
+	for(ApiObject *api : apis) {
+		if(api->objectName() != currentToolName)
+			continue;
+		if(api->metaObject()->indexOfMethod("switchTab(QString)") != -1) {
+			return api;
+		}
+	}
+	return nullptr;
 }
 
 #include "moc_scopymainwindow_api.cpp"
