@@ -25,7 +25,9 @@
 #include "qapplication.h"
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/scopyjs.h>
+#include <QButtonGroup>
 #include <QPixmap>
+#include <QPushButton>
 #include <QScrollArea>
 #include "toolstack.h"
 using namespace scopy;
@@ -604,6 +606,70 @@ void ScopyMainWindow_API::screenshotFullContent(const QString &path)
 	}
 }
 
+int ScopyMainWindow_API::screenshotAllScrollAreas(const QString &pathPrefix)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	int count = 0;
+
+	if(currentTool) {
+		for(QScrollArea *sa : currentTool->findChildren<QScrollArea *>()) {
+			if(!sa->isVisible() || !sa->widget())
+				continue;
+			QWidget *content = sa->widget();
+			content->adjustSize();
+			QApplication::processEvents();
+			QPixmap px = content->grab();
+			QString path = pathPrefix + "_menu_" + QString::number(count) + ".png";
+			if(!px.save(path)) {
+				qWarning(CAT_SCOPY_API) << "Failed to save scroll area screenshot to:" << path;
+			}
+			count++;
+		}
+	}
+	return count;
+}
+
+QStringList ScopyMainWindow_API::getTabs()
+{
+	QStringList result;
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	if(!currentTool)
+		return result;
+
+	QButtonGroup *bg = currentTool->findChild<QButtonGroup *>();
+	if(!bg)
+		return result;
+
+	for(QAbstractButton *btn : bg->buttons()) {
+		if(!btn->text().trimmed().isEmpty()) {
+			result.append(btn->text());
+		}
+	}
+	return result;
+}
+
+void ScopyMainWindow_API::switchTab(const QString &tabName)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	if(!currentTool)
+		return;
+
+	QButtonGroup *bg = currentTool->findChild<QButtonGroup *>();
+	if(!bg)
+		return;
+
+	for(QAbstractButton *btn : bg->buttons()) {
+		if(btn->text() == tabName) {
+			btn->click();
+			return;
+		}
+	}
+	qWarning(CAT_SCOPY_API) << "Tab not found:" << tabName;
+}
+
 QObject *ScopyMainWindow_API::getCurrentToolApi()
 {
 	// Find the name of the currently shown tool
@@ -622,10 +688,10 @@ QObject *ScopyMainWindow_API::getCurrentToolApi()
 		}
 	}
 
-	// Return only the API whose objectName matches the current tool and exposes switchTab
+	// Return only the API whose objectName matches the current tool (case-insensitive) and exposes switchTab
 	const QList<ApiObject *> apis = ScopyJS::GetInstance()->getRegisteredApis();
 	for(ApiObject *api : apis) {
-		if(api->objectName() != currentToolName)
+		if(api->objectName().compare(currentToolName, Qt::CaseInsensitive) != 0)
 			continue;
 		if(api->metaObject()->indexOfMethod("switchTab(QString)") != -1) {
 			return api;
