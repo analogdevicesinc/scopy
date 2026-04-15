@@ -137,8 +137,25 @@ def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None):
         f.write(content)
     return path
 
+# 3 minutes per device should be more than enough, but we don't want to wait indefinitely if something hangs
+SCOPY_TIMEOUT = 180
 
-SCOPY_TIMEOUT = 60  # 1 minute per device
+def disable_first_run_dialog():
+    """Set general_first_run=false in Scopy preferences to skip the license dialog."""
+    import configparser
+
+    prefs_dir = os.path.join(os.path.expanduser("~"), ".config", "ADI", "Scopy-v2")
+    os.makedirs(prefs_dir, exist_ok=True)
+    prefs_file = os.path.join(prefs_dir, "preferences.ini")
+
+    config = configparser.ConfigParser()
+    config.read(prefs_file)
+    if "General" not in config:
+        config["General"] = {}
+    config["General"]["general_first_run"] = "false"
+    with open(prefs_file, "w") as f:
+        config.write(f)
+    print(f"[doc] Disabled first-run license dialog in {prefs_file}")
 
 
 def run_scopy(scopy_bin, wrapper_path):
@@ -160,18 +177,20 @@ def run_scopy(scopy_bin, wrapper_path):
 
 
 def discover_generic_plugin_names():
-    """Read SCOPY_PLUGIN_NAME from generic-plugins header files."""
-    pattern = os.path.join(
-        PROJECT_ROOT, "packages", "generic-plugins", "plugins", "*", "include", "*", "*.h"
-    )
+    """Read SCOPY_PLUGIN_NAME from generic-plugins and extproc header files."""
+    patterns = [
+        os.path.join(PROJECT_ROOT, "packages", "generic-plugins", "plugins", "*", "include", "*", "*.h"),
+        os.path.join(PROJECT_ROOT, "packages", "extproc", "plugins", "*", "include", "*", "*.h"),
+    ]
     names = []
-    for header in glob.glob(pattern):
-        with open(header) as f:
-            for line in f:
-                m = re.search(r"#define\s+SCOPY_PLUGIN_NAME\s+(\w+)", line)
-                if m:
-                    names.append(m.group(1))
-                    break
+    for pattern in patterns:
+        for header in glob.glob(pattern):
+            with open(header) as f:
+                for line in f:
+                    m = re.search(r"#define\s+SCOPY_PLUGIN_NAME\s+(\w+)", line)
+                    if m:
+                        names.append(m.group(1))
+                        break
     print(f"[doc] Generic plugin names: {names}")
     return names
 
@@ -204,6 +223,7 @@ def discover_all_packages():
 
 def run_single(args):
     """Run screenshot capture for a single package/emu-file."""
+    disable_first_run_dialog()
     emu_dir, entry = find_emu_setup(args.package, args.emu_file)
     uri = entry["uri"]
 
@@ -251,6 +271,7 @@ def run_single(args):
 
 def run_all(args):
     """Discover all packages and run screenshot capture for each device entry."""
+    disable_first_run_dialog()
     js_script = os.path.join(SCRIPT_DIR, "screenshots.js")
     if not os.path.isfile(js_script):
         print(f"[doc] ERROR: JS script not found at {js_script}")
