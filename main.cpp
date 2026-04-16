@@ -146,11 +146,11 @@ int main(int argc, char *argv[])
 	w.show();
 
 	ScopyMainWindow_API scopyApi(&w);
+	ScopySplashscreen::finish(&w);
 	int retHandler = CmdLineHandler::handle(parser, scopyApi);
 	if(retHandler == EXIT_FAILURE) {
 		return retHandler;
 	}
-	ScopySplashscreen::finish(&w);
 	int ret = a.exec();
 	restarter.restart(ret);
 	printf("Scopy finished gracefully\n");
