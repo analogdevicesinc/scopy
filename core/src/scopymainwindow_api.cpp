@@ -317,6 +317,14 @@ bool ScopyMainWindow_API::sortByUUID(const QString &k1, const QString &k2)
 
 void ScopyMainWindow_API::exit() { qApp->exit(); }
 
+void ScopyMainWindow_API::showPage(QString pageId)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	if(ts) {
+		ts->show(pageId);
+	}
+}
+
 QStringList ScopyMainWindow_API::getTools()
 {
 	Q_ASSERT(m_w->dm != nullptr);

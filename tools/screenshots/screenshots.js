@@ -62,3 +62,24 @@ plugins.forEach(function(plugin) {
         }
     });
 });
+
+// Capture non-tool pages: home, about, preferences
+var pages = ["home", "about", "preferences"];
+pages.forEach(function(page) {
+    scopy.showPage(page);
+    msleep(500);
+
+    scopy.screenshot(scopyOutDir + page + ".png");
+    scopy.screenshotAllScrollAreas(scopyOutDir + page);
+
+    var tabs = scopy.getTabs();
+    if(tabs.length > 0) {
+        tabs.forEach(function(tab) {
+            if(!tab || tab.trim() === "") return;
+            scopy.switchTab(tab);
+            msleep(300);
+            scopy.screenshot(scopyOutDir + page + "_" + tab + ".png");
+            scopy.screenshotAllScrollAreas(scopyOutDir + page + "_" + tab);
+        });
+    }
+});

@@ -58,6 +58,7 @@ public:
 	Q_INVOKABLE QMap<QString, QVariant> getPreferences();
 	Q_INVOKABLE void setPreference(QString preName, QVariant value);
 	Q_INVOKABLE void aboutPage();
+	Q_INVOKABLE void showPage(QString pageId);
 	Q_INVOKABLE QStringList getPlugins(int idx);
 	Q_INVOKABLE QStringList getPlugins(QString param, QString cat = "iio");
 	Q_INVOKABLE bool getToolBtnState(QString tool);
