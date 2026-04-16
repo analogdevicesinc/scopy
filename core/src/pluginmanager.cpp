@@ -93,7 +93,9 @@ void PluginManager::sort(bool ascending)
 		}
 		int priority1 = p1.pluginInstance()->metadata()["priority"].toInt();
 		int priority2 = p2.pluginInstance()->metadata()["priority"].toInt();
-		return ascending ? priority1 < priority2 : priority1 > priority2;
+		if(priority1 != priority2)
+			return ascending ? priority1 < priority2 : priority1 > priority2;
+		return ascending ? p1.name() < p2.name() : p1.name() > p2.name();
 	});
 
 	qDebug(CAT_PLUGINMANAGER) << "New plugin order:";
