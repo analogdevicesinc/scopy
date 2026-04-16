@@ -6,7 +6,7 @@ Automated documentation screenshot tool for Scopy. It starts an IIO emulator, la
 
 ```
 tools/screenshots/
-├── README.md                   # This file
+├── README.md               # This file
 ├── screenshots.py          # Main orchestrator (Python)
 ├── screenshots.js          # Screenshot capture script (JS, runs inside Scopy)
 └── push_screenshots.sh     # Push screenshots to doc_resources branch
@@ -20,34 +20,50 @@ tools/screenshots/
 
 ## Usage
 
-### Capturing Screenshots
+### Single Package Mode
 
-Run from the repository root:
+Capture screenshots for one package/device:
 
 ```bash
 python3 tools/screenshots/screenshots.py --package <package> --emu-file <file.xml> [options]
 ```
 
-#### Arguments
-
 | Argument      | Required | Description |
 |---------------|----------|-------------|
 | `--package`   | yes      | Package directory name under `packages/` (e.g. `ad9371`) |
-| `--emu-file`  | yes      | EMU XML filename inside `packages/<package>/emu-xml/` (e.g. `ad9371.xml`) |
+| `--emu-file`  | yes      | EMU XML filename or device name (e.g. `ad9371.xml` or `adalm2000`) |
 | `--scopy`     | no       | Path to scopy binary (default: `./scopy`) |
 | `--output`    | no       | Output directory (default: `docs/screenshots/<package>`) |
 
-#### Example
-
 ```bash
-# From the build directory, capture ad9371 screenshots
+# Example: capture ad9371 screenshots from the build directory
 python3 ../tools/screenshots/screenshots.py \
     --package ad9371 \
     --emu-file ad9371.xml \
     --scopy ./scopy
 ```
 
-Screenshots are saved to `docs/screenshots/ad9371/` by default, one PNG per tool (e.g. `ad9371_plugin.png`), plus one per tab if the tool exposes `switchTab`/`getTabs` via its API.
+### Batch Mode
+
+Discover and capture screenshots for all packages that have an `emu_setup.json`:
+
+```bash
+python3 tools/screenshots/screenshots.py --all [options]
+```
+
+| Argument        | Required | Description |
+|-----------------|----------|-------------|
+| `--all`         | yes      | Enable batch discovery mode |
+| `--scopy`       | no       | Path to scopy binary (default: `./scopy`) |
+| `--output-root` | no       | Base output directory (default: `docs/screenshots`) |
+
+In batch mode the tool:
+1. Discovers all packages with `emu-xml/emu_setup.json`
+2. Runs `generic-plugins` entries first to capture generic tool screenshots
+3. Runs all other packages, skipping generic plugin tools (to avoid duplicates)
+4. Reports a summary of successes and failures at the end
+
+Output is organized as `<output-root>/<package>/<device>/`.
 
 ### Pushing Screenshots
 
@@ -61,15 +77,25 @@ This creates a git worktree, copies the screenshots from `docs/screenshots/<pack
 
 ## How It Works
 
-1. Reads `packages/<package>/emu-xml/emu_setup.json` to get the IIO URI for the given XML file.
-2. Starts `iio-emu generic <emu-xml>` in the background and waits for port `30431` to be ready.
-3. Creates a temporary JS wrapper that injects `scopyPackage`, `scopyUri`, and `scopyOutDir` globals, then evaluates `screenshots.js`.
-4. Launches `scopy --script <wrapper>` and waits for it to exit.
+1. Reads `packages/<package>/emu-xml/emu_setup.json` to find the emulator config for the given device.
+2. Starts `iio-emu` with the configured type and XML in the background, waits for port `30431`.
+3. Creates a temporary JS wrapper that injects globals (`scopyUri`, `scopyOutDir`, `scopySkipPlugins`), then evaluates `screenshots.js`.
+4. Launches `scopy --script <wrapper>` with a 60s timeout per device.
 5. Terminates `iio-emu` on completion.
+
+### What screenshots.js captures
+
+For each plugin/tool on the connected device:
+
+- **Full window screenshot** -- `<tool>.png`
+- **Scroll area screenshots** -- captures all visible scroll areas (menus/panels) with full scrolled content via `scopy.screenshotAllScrollAreas()`
+- **Tab screenshots** -- if the tool has tabs (`scopy.getTabs()`), switches to each tab and captures both a full screenshot and scroll areas per tab (`<tool>_<tab>.png`)
+
+Generic plugin tools (DataLoggerPlugin, ADCPlugin, etc.) are taken as part of ADALM-Pluto device then skipped for non-generic packages to avoid duplicate screenshots.
 
 ## emu_setup.json Format
 
-Each package's `emu-xml/emu_setup.json` must be a JSON array with entries that include an `xml_path` and `uri` field:
+Each package's `emu-xml/emu_setup.json` must be a JSON array:
 
 ```json
 [
@@ -80,3 +106,14 @@ Each package's `emu-xml/emu_setup.json` must be a JSON array with entries that i
     }
 ]
 ```
+
+| Field            | Required | Description |
+|------------------|----------|-------------|
+| `device`         | yes      | Device identifier used for output directory naming |
+| `xml_path`       | no*      | EMU XML filename (used with `iio-emu generic <xml_path>`) |
+| `emu-type`       | no*      | Emulator type (default: `generic`). Use for built-in types like `adalm2000` |
+| `uri`            | yes      | IIO device URI (e.g. `ip:127.0.0.1`) |
+| `rx_tx_device`   | no       | Device name for binary data injection (e.g. `iio:device0`) |
+| `rx_tx_bin_path` | no       | Path to binary data file, relative to `emu-xml/` directory |
+
+*At least one of `xml_path` or `emu-type` is required for the emulator to start.
