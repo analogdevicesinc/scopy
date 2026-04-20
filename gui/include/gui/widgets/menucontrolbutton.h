@@ -67,6 +67,7 @@ public:
 	void setDoubleClickToOpenMenu(bool b);
 	void setOpenMenuChecksThis(bool b);
 	void enableToolTip(bool en);
+	void setIconEnabled(bool en);
 
 	QCheckBox *checkBox();
 	QPushButton *button();
@@ -90,6 +91,7 @@ private:
 	QCheckBox *m_chk;
 	QLabel *m_label;
 	QPushButton *m_btn;
+	QLabel *m_icon;
 	CheckboxStyle m_cs;
 	QMetaObject::Connection dblClickToOpenMenu;
 	QMetaObject::Connection openMenuChecksThis;
