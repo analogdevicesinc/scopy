@@ -27,6 +27,7 @@ REPO_ROOT=$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)
 # Extract SCOPY_VERSION from CMakeLists.txt by resolving its components
 PROJECT_VERSION=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' "${REPO_ROOT}/CMakeLists.txt")
 RELEASE_PHASE=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' "${REPO_ROOT}/CMakeLists.txt" || true)
+[ "${RELEASE_PHASE}" == "\"\"" ] &&  unset RELEASE_PHASE # if RELEASE_PHASE contains an empty string (only quotes) set it to null
 VERSION="${PROJECT_VERSION}${RELEASE_PHASE}"
 RELEASE="v${VERSION}"
 
