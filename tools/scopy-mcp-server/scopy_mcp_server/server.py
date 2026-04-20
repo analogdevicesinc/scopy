@@ -18,11 +18,12 @@ import json
 import logging
 import os
 import pathlib
+import shutil
 import sys
 
 from mcp.server.fastmcp import FastMCP
 
-from scopy_bridge import ScopyBridge
+from scopy_mcp_server.bridge import ScopyBridge
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("scopy-mcp")
@@ -106,11 +107,14 @@ def start_scopy() -> str:
         return "Scopy is already running and connected."
 
     scopy_path = os.environ.get("SCOPY_PATH", "scopy")
-    if not os.path.isfile(scopy_path):
+    resolved = shutil.which(scopy_path)
+    if resolved is None:
         return (
             f"Scopy binary not found at '{scopy_path}'. "
-            "Set the SCOPY_PATH environment variable in .mcp.json to the correct path."
+            "Set the SCOPY_PATH environment variable in .mcp.json, "
+            "or ensure 'scopy' is on your PATH."
         )
+    scopy_path = resolved
 
     logger.info(f"Launching Scopy from {scopy_path}...")
     try:
