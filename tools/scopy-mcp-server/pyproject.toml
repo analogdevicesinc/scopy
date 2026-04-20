@@ -1,11 +1,23 @@
 [project]
 name = "scopy-mcp-server"
 version = "0.1.0"
-description = "MCP server for controlling Scopy via its JavaScript console"
+description = "MCP server for controlling Scopy instruments via Claude Code"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
 requires-python = ">=3.10"
-dependencies = [
-    "mcp>=1.0.0",
+authors = [{name = "Analog Devices Inc."}]
+keywords = ["scopy", "mcp", "claude", "instruments", "sdr"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
 ]
+dependencies = ["mcp[cli]>=1.2.0"]
+
+[project.urls]
+Homepage = "https://github.com/analogdevicesinc/scopy"
+Repository = "https://github.com/analogdevicesinc/scopy"
 
 [project.scripts]
 scopy-mcp-server = "scopy_mcp_server:main"
@@ -13,3 +25,6 @@ scopy-mcp-server = "scopy_mcp_server:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scopy_mcp_server"]
