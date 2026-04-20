@@ -45,6 +45,26 @@ def _ensure_connected() -> str | None:
     return _NO_SCOPY_MSG
 
 
+def _run_tool(js_code: str) -> str:
+    """Run a JS command, catching stale-pipe and timeout errors as user-friendly strings."""
+    try:
+        return bridge.execute(js_code)
+    except RuntimeError as e:
+        msg = str(e)
+        if "stale FIFO" in msg or "stale pipe" in msg.lower():
+            return (
+                "Stale Scopy pipe detected — Scopy exited without cleaning up. "
+                "Please start Scopy again, or call start_scopy()."
+            )
+        return f"Scopy error: {msg}"
+    except TimeoutError:
+        return (
+            "Scopy did not respond within the timeout. "
+            "Check that Scopy is running and the MCP pipe listener is active "
+            "(look for 'MCP pipe listener active' in Scopy's log)."
+        )
+
+
 @mcp.tool()
 def start_scopy() -> str:
     """Launch a new Scopy session.
@@ -88,7 +108,7 @@ def add_device(uri: str, category: str = "iio") -> str:
     if err := _ensure_connected():
         return err
     js = f'scopy.addDevice("{uri}", "{category}")'
-    result = bridge.execute(js)
+    result = _run_tool(js)
     logger.info(f"add_device({uri}): {result}")
     return result
 
@@ -110,7 +130,7 @@ def connect_device(device_id: str) -> str:
         js = f"scopy.connectDevice({idx})"
     except ValueError:
         js = f'scopy.connectDevice("{device_id}")'
-    result = bridge.execute(js)
+    result = _run_tool(js)
     logger.info(f"connect_device({device_id}): {result}")
     return result
 
@@ -132,7 +152,7 @@ def switch_tool(tool_name: str, device_id: str = "") -> str:
         js = f'scopy.switchTool("{device_id}", "{tool_name}")'
     else:
         js = f'scopy.switchTool("{tool_name}")'
-    result = bridge.execute(js)
+    result = _run_tool(js)
     logger.info(f"switch_tool({tool_name}): {result}")
     return result
 
