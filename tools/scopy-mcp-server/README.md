@@ -18,11 +18,31 @@ The MCP server translates tool calls into JavaScript commands (e.g. `scopy.addDe
 
 ## Available tools
 
+### Core tools (always available)
+
 | Tool | Description | Example |
 |------|-------------|---------|
+| `start_scopy()` | Launch a new Scopy session | `start_scopy()` |
 | `add_device(uri)` | Add a device by URI | `add_device("192.168.2.1")` |
 | `connect_device(device_id)` | Connect to an added device | `connect_device("0")` |
 | `switch_tool(tool_name)` | Switch to a named tool | `switch_tool("AD936X")` |
+
+### Per-plugin generic tools (auto-generated from `scopy_api.json`)
+
+For each Scopy API object (`ad936x`, `ad936x_advanced`, `adrv9002`, `fmcomms5`, `iioExplorer`, `pqm`, `regmap`, `swiot`, `ad9084`, `adrv9009`, `fmcomms5_advanced`), three tools are registered:
+
+| Tool pattern | Description |
+|-------------|-------------|
+| `{obj}_list()` | List all valid parameter keys for this object |
+| `{obj}_read(key, channel=-1)` | Read a parameter. Pass `channel` ≥ 0 for channel-indexed parameters |
+| `{obj}_write(key, value, channel=-1)` | Write a parameter. Pass `channel` ≥ 0 for channel-indexed parameters |
+
+**Example usage:**
+```
+"List all ad936x parameters"      → ad936x_list()
+"Read the rx_lo from ad936x"      → ad936x_read("rx_lo")
+"Set tx gain on adrv9002 ch0"     → adrv9002_write("tx_hardware_gain", "30", channel=0)
+```
 
 ## Prerequisites
 
@@ -102,7 +122,29 @@ A `.mcp.json` file is included in the project root. Edit the `SCOPY_PATH` enviro
 
 No manual `pip install` or `venv` management needed.
 
-### Step 4: Restart Claude Code
+### Step 4: Allow all Scopy MCP tool calls without prompting (optional)
+
+By default, Claude Code asks for permission on every MCP tool call. With many Scopy tools registered, this means a confirmation prompt for each `ad936x_read`, `adrv9002_write`, etc.
+
+To approve all Scopy MCP tools in advance, create (or edit) `.claude/settings.json` in the **project root** and add the `mcp__scopy__*` rule:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "mcp__scopy__*"
+    ]
+  }
+}
+```
+
+The pattern `mcp__scopy__*` matches every tool exposed by the `scopy` MCP server. If you already have other entries in `permissions.allow`, just add this line to the existing array.
+
+> **Note:** The MCP protocol has no mechanism for a server to request blanket trust — this must be configured in Claude Code's settings. It cannot be done from inside the MCP server itself.
+
+If you prefer to approve tools globally (across all projects), add the same rule to `~/.claude/settings.json` instead.
+
+### Step 5: Restart Claude Code
 
 Claude Code reads `.mcp.json` on startup. Restart it to pick up the new server:
 
@@ -161,17 +203,34 @@ You will see the Scopy UI respond in real time.
 | MCP server not showing in Claude Code | `.mcp.json` not found or malformed | Ensure `.mcp.json` is in the project root, restart Claude Code |
 | `Scopy JS error: ...` | The JavaScript command failed inside Scopy | Check the error message — usually a wrong tool name or invalid device URI |
 
+## Regenerating the API library
+
+The `scopy_api.json` file is generated from Scopy's `*_api.h` header files. Re-run the generator whenever the Scopy API changes (new methods added, removed, or renamed):
+
+```bash
+# From the Scopy repo root
+python3 tools/scopy-mcp-server/generate_api_tools.py \
+  --scopy-root . \
+  --out tools/scopy-mcp-server/scopy_api.json
+```
+
+The generator will print a summary of how many keys and special methods it found per object. Review the output, then commit both the generator and the updated JSON.
+
+Restart Claude Code after regenerating so it picks up the new tool list.
+
 ## File structure
 
 ```
 tools/scopy-mcp-server/
-├── scopy_mcp_server.py   # MCP server (FastMCP, 3 tools)
-├── scopy_bridge.py       # Communication bridge (FIFO + PTY modes)
-├── pyproject.toml        # Python package definition (used by uv)
-├── requirements.txt      # Python dependencies (fallback for pip users)
-├── plan.md               # Implementation plan
-├── design.md             # Design decisions and architecture
-└── README.md             # This file
+├── scopy_mcp_server.py      # MCP server — loads JSON, registers all tools
+├── scopy_bridge.py          # Communication bridge (FIFO + PTY modes)
+├── generate_api_tools.py    # Generator script — parses *_api.h → scopy_api.json
+├── scopy_api.json           # Generated API metadata (committed, re-run generator to update)
+├── pyproject.toml           # Python package definition (used by uv)
+├── requirements.txt         # Python dependencies (fallback for pip users)
+├── plan.md                  # Implementation plan
+├── design.md                # Design decisions and architecture
+└── README.md                # This file
 ```
 
 ## Architecture details
