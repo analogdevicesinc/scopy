@@ -6,6 +6,7 @@ Handles two modes of communication with a Scopy instance:
 - Launch mode: spawn a new Scopy process with a PTY for stdin REPL access
 """
 
+import errno
 import os
 import pty
 import select
@@ -88,14 +89,35 @@ class ScopyBridge:
 
     def _execute_via_fifo(self, js_code: str) -> str:
         """Send command via FIFO, read response from response FIFO."""
-        # Write command to the command pipe
-        with open(MCP_CMD_PIPE, "w") as cmd_pipe:
+        # Use O_NONBLOCK so we get ENXIO immediately if Scopy is not listening
+        # (i.e. stale FIFO on disk but no reader). A blocking open would hang forever.
+        try:
+            fd = os.open(MCP_CMD_PIPE, os.O_WRONLY | os.O_NONBLOCK)
+        except OSError as e:
+            if e.errno == errno.ENXIO:
+                self._mark_stale()
+                raise RuntimeError(
+                    "Scopy pipe found but no listener (stale FIFO). "
+                    "Scopy is not running or was not built with MCP support."
+                )
+            raise
+
+        with os.fdopen(fd, "w") as cmd_pipe:
             cmd_pipe.write(js_code + "\n")
-            cmd_pipe.flush()
 
         # Read response from the response pipe with timeout
         response = self._read_fifo_response()
         return self._parse_fifo_response(response)
+
+    def _mark_stale(self):
+        """Clean up state when a stale FIFO is detected."""
+        self._ready = False
+        self.mode = None
+        for path in (MCP_CMD_PIPE, MCP_RSP_PIPE):
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
 
     def _read_fifo_response(self) -> str:
         """Read a line from the response FIFO with timeout."""
@@ -202,9 +224,12 @@ class ScopyBridge:
         if self.process is not None:
             self.process.terminate()
             try:
-                self.process.wait(timeout=5)
+                # Give Scopy enough time to run its Qt destructor and unlink FIFOs.
+                # If it still hasn't exited after 15s, SIGKILL it.
+                self.process.wait(timeout=15)
             except subprocess.TimeoutExpired:
                 self.process.kill()
+                self.process.wait()
             self.process = None
 
         self._ready = False
