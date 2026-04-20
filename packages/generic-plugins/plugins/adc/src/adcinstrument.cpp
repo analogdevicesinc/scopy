@@ -91,9 +91,19 @@ void ADCInstrument::setupToolLayout()
 	m_splitter->setStretchFactor(0, 0);
 	m_splitter->setStretchFactor(1, 1);
 	m_splitter->setStretchFactor(2, 0);
-	m_splitter->setSizes(QList<int>() << 210 << 600 << 310);
+	const int right_splitter_size = 310;
+	m_splitter->setSizes(QList<int>() << 210 << 600 << right_splitter_size);
 
 	tool->addWidgetToCentralContainerHelper(m_splitter);
+
+	connect(rightStack, &QStackedWidget::currentChanged, this, [=](int) {
+		if(m_splitter->sizes().at(2) == 0) {
+			QList<int> sizes = m_splitter->sizes();
+			sizes[1] -= right_splitter_size;
+			sizes[2] = right_splitter_size;
+			m_splitter->setSizes(sizes);
+		}
+	});
 
 	rightMenuBtnGrp = new SemiExclusiveButtonGroup(this);
 	tool->topContainerMenuControl()->setVisible(false);
