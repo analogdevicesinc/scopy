@@ -176,9 +176,9 @@ bool DataLoggerPlugin::onDisconnect()
 
 void DataLoggerPlugin::addNewTool()
 {
-	QString tool_name = QString("Data Logger ");
+	QString tool_name = QString("Data Logger");
 	if(toolIndex != 0) {
-		tool_name += QString::number(toolIndex);
+		tool_name += " " + QString::number(toolIndex);
 	}
 
 	ToolMenuEntry *toolMenuEntry = SCOPY_NEW_TOOLMENUENTRY(tool_name, tool_name, toolIcon);
