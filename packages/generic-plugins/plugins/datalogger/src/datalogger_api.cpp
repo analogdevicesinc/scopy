@@ -118,13 +118,16 @@ QString DataLogger_API::disableMonitor(const QString &monitor)
 	return "Success";
 }
 
+bool DataLogger_API::getRunning()
+{
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
+	return tool ? tool->running() : false;
+}
+
 void DataLogger_API::setRunning(bool running)
 {
-	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
-		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
-		return;
-	}
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	Q_ASSERT(m_dataLoggerPlugin->m_dataAcquisitionManager != nullptr);
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		tool->setRunning(running);
 		tool->runToggled(running);
@@ -147,7 +150,7 @@ void DataLogger_API::changeTool(const QString &name)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(!monitorTool) {
@@ -173,7 +176,7 @@ void DataLogger_API::setMinMax(bool enable)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(!monitorTool) {
@@ -194,7 +197,7 @@ void DataLogger_API::changePrecision(int decimals)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(!monitorTool) {
@@ -215,7 +218,7 @@ void DataLogger_API::setMinYAxis(double min)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(monitorTool && monitorTool->m_plotManager) {
@@ -236,7 +239,7 @@ void DataLogger_API::setMaxYAxis(double max)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(monitorTool && monitorTool->m_plotManager) {
