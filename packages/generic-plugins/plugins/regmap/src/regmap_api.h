@@ -53,9 +53,10 @@ public:
 	Q_INVOKABLE void write(const QString &addr, const QString &val);
 	Q_INVOKABLE void writeBitField(const QString &addr, const QString &val);
 	Q_INVOKABLE QStringList getAvailableDevicesName();
-	Q_INVOKABLE bool setDevice(const QString &device);
-	Q_INVOKABLE QList<QString> search(const QString &searchParam);
-	Q_INVOKABLE void readInterval(const QString &startAddr, const QString &stopAddr);
+	Q_INVOKABLE QString getDevice();
+	Q_INVOKABLE bool setDevice(QString device);
+	Q_INVOKABLE QList<QString> search(QString searchParam);
+	Q_INVOKABLE void readInterval(QString startAddr, QString stopAddr);
 	Q_INVOKABLE bool enableAutoread(bool enable);
 	Q_INVOKABLE bool isAutoreadEnabled();
 	Q_INVOKABLE void registerDump(const QString &filePath);

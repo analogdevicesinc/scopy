@@ -67,7 +67,9 @@ QStringList RegMap_API::getAvailableDevicesName()
 	return devices->keys();
 }
 
-bool RegMap_API::setDevice(const QString &device)
+QString RegMap_API::getDevice() { return m_regMapPlugin->registerMapTool->activeRegisterMap; }
+
+bool RegMap_API::setDevice(QString device)
 {
 	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool) {
 		qWarning(CAT_REGMAP_API) << "Register map tool not initialized";
