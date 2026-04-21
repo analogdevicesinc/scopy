@@ -39,7 +39,8 @@
       "dio",
       "dmm",
       "power",
-      "calib"
+      "calib",
+      "osc_channel"
     ]
   },
   "objects": {
@@ -5021,6 +5022,24 @@
           ],
           "returns": "bool"
         }
+      ],
+      "properties": [
+        {
+          "name": "hSplitter",
+          "type": "QList<int>",
+          "read": "hSplitter",
+          "is_list": true,
+          "write": "setHSplitter",
+          "element_type": "int"
+        },
+        {
+          "name": "vSplitter",
+          "type": "QList<int>",
+          "read": "vSplitter",
+          "is_list": true,
+          "write": "setVSplitter",
+          "element_type": "int"
+        }
       ]
     },
     "regmap": {
@@ -5239,6 +5258,60 @@
           "args": [],
           "returns": "void"
         }
+      ],
+      "properties": [
+        {
+          "name": "dir",
+          "type": "QList<bool>",
+          "read": "direction",
+          "is_list": true,
+          "write": "setDirection",
+          "element_type": "bool"
+        },
+        {
+          "name": "gpi",
+          "type": "QList<bool>",
+          "read": "gpi",
+          "is_list": true,
+          "element_type": "bool"
+        },
+        {
+          "name": "group",
+          "type": "QList<bool>",
+          "read": "grouped",
+          "is_list": true,
+          "write": "setGrouped",
+          "element_type": "bool"
+        },
+        {
+          "name": "locked",
+          "type": "QList<bool>",
+          "read": "locked",
+          "is_list": true,
+          "element_type": "bool"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "out",
+          "type": "QList<bool>",
+          "read": "output",
+          "is_list": true,
+          "write": "setOutput",
+          "element_type": "bool"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        }
       ]
     },
     "dmm": {
@@ -5248,10 +5321,248 @@
           "args": [],
           "returns": "void"
         }
+      ],
+      "properties": [
+        {
+          "name": "data_logging_append",
+          "type": "bool",
+          "read": "getDataLoggingAppend",
+          "is_list": false,
+          "write": "setDataLoggingAppend"
+        },
+        {
+          "name": "data_logging_en",
+          "type": "bool",
+          "read": "getDataLoggingEn",
+          "is_list": false,
+          "write": "setDataLoggingEn"
+        },
+        {
+          "name": "data_logging_timer",
+          "type": "double",
+          "read": "getDataLoggingTimer",
+          "is_list": false,
+          "write": "setDataLoggingTimer"
+        },
+        {
+          "name": "gainModes",
+          "type": "QVector<int>",
+          "read": "getGainModes",
+          "is_list": false,
+          "write": "setGainModes"
+        },
+        {
+          "name": "histogram_ch1",
+          "type": "bool",
+          "read": "get_histogram_ch1",
+          "is_list": false,
+          "write": "set_histogram_ch1"
+        },
+        {
+          "name": "histogram_ch2",
+          "type": "bool",
+          "read": "get_histogram_ch2",
+          "is_list": false,
+          "write": "set_histogram_ch2"
+        },
+        {
+          "name": "history_ch1_size_idx",
+          "type": "int",
+          "read": "get_history_ch1_size_idx",
+          "is_list": false,
+          "write": "set_history_ch1_size_idx"
+        },
+        {
+          "name": "history_ch2_size_idx",
+          "type": "int",
+          "read": "get_history_ch2_size_idx",
+          "is_list": false,
+          "write": "set_history_ch2_size_idx"
+        },
+        {
+          "name": "line_thickness_ch1",
+          "type": "float",
+          "read": "get_line_thickness_ch1",
+          "is_list": false,
+          "write": "set_line_thickness_ch1"
+        },
+        {
+          "name": "line_thickness_ch2",
+          "type": "float",
+          "read": "get_line_thickness_ch2",
+          "is_list": false,
+          "write": "set_line_thickness_ch2"
+        },
+        {
+          "name": "mode_ac_ch1",
+          "type": "bool",
+          "read": "get_mode_ac_ch1",
+          "is_list": false,
+          "write": "set_mode_ac_ch1"
+        },
+        {
+          "name": "mode_ac_ch2",
+          "type": "bool",
+          "read": "get_mode_ac_ch2",
+          "is_list": false,
+          "write": "set_mode_ac_ch1"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "peak_hold_en",
+          "type": "bool",
+          "read": "getPeakHoldEn",
+          "is_list": false,
+          "write": "setPeakHoldEn"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        },
+        {
+          "name": "value_ch1",
+          "type": "double",
+          "read": "read_ch1",
+          "is_list": false
+        },
+        {
+          "name": "value_ch2",
+          "type": "double",
+          "read": "read_ch2",
+          "is_list": false
+        }
       ]
     },
     "logic": {
-      "methods": []
+      "methods": [],
+      "properties": [
+        {
+          "name": "bufferSize",
+          "type": "int",
+          "read": "getBufferSize",
+          "is_list": false,
+          "write": "setBufferSize"
+        },
+        {
+          "name": "channelHeights",
+          "type": "QList<double>",
+          "read": "getChannelHeights",
+          "is_list": true,
+          "write": "setChannelHeights",
+          "element_type": "double"
+        },
+        {
+          "name": "channelNames",
+          "type": "QStringList",
+          "read": "getChannelNames",
+          "is_list": false,
+          "write": "setChannelNames"
+        },
+        {
+          "name": "channelPosition",
+          "type": "QList<double>",
+          "read": "getChannelPosition",
+          "is_list": true,
+          "write": "setChannelPosition",
+          "element_type": "double"
+        },
+        {
+          "name": "currentGroups",
+          "type": "QVector<QVector<int>>",
+          "read": "getCurrentGroups",
+          "is_list": false,
+          "write": "setCurrentGroups"
+        },
+        {
+          "name": "cursors",
+          "type": "bool",
+          "read": "hasCursors",
+          "is_list": false,
+          "write": "setCursors"
+        },
+        {
+          "name": "cursors_position",
+          "type": "int",
+          "read": "getCursorsPosition",
+          "is_list": false,
+          "write": "setCursorsPosition"
+        },
+        {
+          "name": "cursors_transparency",
+          "type": "int",
+          "read": "getCursorsTransparency",
+          "is_list": false,
+          "write": "setCursorsTransparency"
+        },
+        {
+          "name": "decoderSettings",
+          "type": "QList<QStringList>",
+          "read": "getDecoderSettings",
+          "is_list": true,
+          "write": "setDecoderSettings",
+          "element_type": "QStringList"
+        },
+        {
+          "name": "decoderStack",
+          "type": "QList<QStringList>",
+          "read": "getDecoderStack",
+          "is_list": true,
+          "write": "setDecoderStack",
+          "element_type": "QStringList"
+        },
+        {
+          "name": "delay",
+          "type": "int",
+          "read": "getDelay",
+          "is_list": false,
+          "write": "setDelay"
+        },
+        {
+          "name": "enabledChannels",
+          "type": "QList<int>",
+          "read": "getEnabledChannels",
+          "is_list": true,
+          "write": "setEnabledChannels",
+          "element_type": "int"
+        },
+        {
+          "name": "enabledDecoders",
+          "type": "QStringList",
+          "read": "getEnabledDecoders",
+          "is_list": false,
+          "write": "setEnabledDecoders"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "sampleRate",
+          "type": "double",
+          "read": "getSampleRate",
+          "is_list": false,
+          "write": "setSampleRate"
+        },
+        {
+          "name": "streamOneShot",
+          "type": "bool",
+          "read": "getStreamOrOneShot",
+          "is_list": false,
+          "write": "setStreamOrOneShot"
+        }
+      ]
     },
     "network": {
       "methods": [
@@ -5260,9 +5571,560 @@
           "args": [],
           "returns": "void"
         }
+      ],
+      "properties": [
+        {
+          "name": "amplitude",
+          "type": "double",
+          "read": "getAmplitude",
+          "is_list": false,
+          "write": "setAmplitude"
+        },
+        {
+          "name": "averaging",
+          "type": "int",
+          "read": "getAveraging",
+          "is_list": false,
+          "write": "setAveraging"
+        },
+        {
+          "name": "cursors",
+          "type": "bool",
+          "read": "getCursors",
+          "is_list": false,
+          "write": "setCursors"
+        },
+        {
+          "name": "cursors_position",
+          "type": "int",
+          "read": "getCursorsPosition",
+          "is_list": false,
+          "write": "setCursorsPosition"
+        },
+        {
+          "name": "cursors_transparency",
+          "type": "int",
+          "read": "getCursorsTransparency",
+          "is_list": false,
+          "write": "setCursorsTransparency"
+        },
+        {
+          "name": "data",
+          "type": "QList<double>",
+          "read": "data",
+          "is_list": true,
+          "element_type": "double"
+        },
+        {
+          "name": "freq",
+          "type": "QList<double>",
+          "read": "freq",
+          "is_list": true,
+          "element_type": "double"
+        },
+        {
+          "name": "line_thickness",
+          "type": "int",
+          "read": "getLineThickness",
+          "is_list": false,
+          "write": "setLineThickness"
+        },
+        {
+          "name": "log_freq",
+          "type": "bool",
+          "read": "isLogFreq",
+          "is_list": false,
+          "write": "setLogFreq"
+        },
+        {
+          "name": "max_freq",
+          "type": "double",
+          "read": "getMaxFreq",
+          "is_list": false,
+          "write": "setMaxFreq"
+        },
+        {
+          "name": "max_mag",
+          "type": "double",
+          "read": "getMaxMag",
+          "is_list": false,
+          "write": "setMaxMag"
+        },
+        {
+          "name": "max_phase",
+          "type": "double",
+          "read": "getMaxPhase",
+          "is_list": false,
+          "write": "setMaxPhase"
+        },
+        {
+          "name": "min_freq",
+          "type": "double",
+          "read": "getMinFreq",
+          "is_list": false,
+          "write": "setMinFreq"
+        },
+        {
+          "name": "min_mag",
+          "type": "double",
+          "read": "getMinMag",
+          "is_list": false,
+          "write": "setMinMag"
+        },
+        {
+          "name": "min_phase",
+          "type": "double",
+          "read": "getMinPhase",
+          "is_list": false,
+          "write": "setMinPhase"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "offset",
+          "type": "double",
+          "read": "getOffset",
+          "is_list": false,
+          "write": "setOffset"
+        },
+        {
+          "name": "periods",
+          "type": "int",
+          "read": "getPeriods",
+          "is_list": false,
+          "write": "setPeriods"
+        },
+        {
+          "name": "phase",
+          "type": "QList<double>",
+          "read": "phase",
+          "is_list": true,
+          "element_type": "double"
+        },
+        {
+          "name": "plot_type",
+          "type": "int",
+          "read": "getPlotType",
+          "is_list": false,
+          "write": "setPlotType"
+        },
+        {
+          "name": "ref_channel",
+          "type": "int",
+          "read": "getRefChannel",
+          "is_list": false,
+          "write": "setRefChannel"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        },
+        {
+          "name": "samples_count",
+          "type": "double",
+          "read": "getSamplesCount",
+          "is_list": false,
+          "write": "setSamplesCount"
+        }
       ]
     },
     "osc": {
+      "methods": [
+        {
+          "name": "show",
+          "args": [],
+          "returns": "void"
+        }
+      ],
+      "properties": [
+        {
+          "name": "auto_trigger",
+          "type": "bool",
+          "read": "autoTrigger",
+          "is_list": false,
+          "write": "setAutoTrigger"
+        },
+        {
+          "name": "autoset_en",
+          "type": "bool",
+          "read": "autosetEnabled",
+          "is_list": false,
+          "write": "enableAutoset"
+        },
+        {
+          "name": "channels",
+          "type": "QVariantList",
+          "read": "getChannels",
+          "is_list": true,
+          "element_type": "QVariant",
+          "nested": "osc_channel"
+        },
+        {
+          "name": "counter",
+          "type": "bool",
+          "read": "hasCounter",
+          "is_list": false,
+          "write": "setCounter"
+        },
+        {
+          "name": "current_channel",
+          "type": "int",
+          "read": "getCurrentChannel",
+          "is_list": false,
+          "write": "setCurrentChannel"
+        },
+        {
+          "name": "cursor_gateLeft",
+          "type": "double",
+          "read": "cursorGateLeft",
+          "is_list": false,
+          "write": "setCursorGateLeft"
+        },
+        {
+          "name": "cursor_gateRight",
+          "type": "double",
+          "read": "cursorGateRight",
+          "is_list": false,
+          "write": "setCursorGateRight"
+        },
+        {
+          "name": "cursor_h1",
+          "type": "double",
+          "read": "cursorH1",
+          "is_list": false,
+          "write": "setCursorH1"
+        },
+        {
+          "name": "cursor_h2",
+          "type": "double",
+          "read": "cursorH2",
+          "is_list": false,
+          "write": "setCursorH2"
+        },
+        {
+          "name": "cursor_v1",
+          "type": "double",
+          "read": "cursorV1",
+          "is_list": false,
+          "write": "setCursorV1"
+        },
+        {
+          "name": "cursor_v2",
+          "type": "double",
+          "read": "cursorV2",
+          "is_list": false,
+          "write": "setCursorV2"
+        },
+        {
+          "name": "cursors",
+          "type": "bool",
+          "read": "hasCursors",
+          "is_list": false,
+          "write": "setCursors"
+        },
+        {
+          "name": "cursors_position",
+          "type": "int",
+          "read": "getCursorsPosition",
+          "is_list": false,
+          "write": "setCursorsPosition"
+        },
+        {
+          "name": "cursors_transparency",
+          "type": "int",
+          "read": "getCursorsTransparency",
+          "is_list": false,
+          "write": "setCursorsTransparency"
+        },
+        {
+          "name": "export_all",
+          "type": "bool",
+          "read": "getExportAll",
+          "is_list": false,
+          "write": "setExportAll"
+        },
+        {
+          "name": "external_condition",
+          "type": "bool",
+          "read": "externalCondition",
+          "is_list": false,
+          "write": "setExternalCondition"
+        },
+        {
+          "name": "external_trigger",
+          "type": "bool",
+          "read": "externalTrigger",
+          "is_list": false,
+          "write": "setExternalTrigger"
+        },
+        {
+          "name": "external_trigger_daisy_order",
+          "type": "int",
+          "read": "externalTriggerDaisyOrder",
+          "is_list": false,
+          "write": "setExternalTriggerDaisyOrder"
+        },
+        {
+          "name": "external_trigger_out",
+          "type": "bool",
+          "read": "externalTriggerOut",
+          "is_list": false,
+          "write": "setExternalTriggerOut"
+        },
+        {
+          "name": "external_trigger_out_source",
+          "type": "int",
+          "read": "externalTriggerOutSource",
+          "is_list": false,
+          "write": "setExternalTriggerOutSource"
+        },
+        {
+          "name": "external_trigger_source",
+          "type": "int",
+          "read": "externalTriggerSource",
+          "is_list": false,
+          "write": "setExternalTriggerSource"
+        },
+        {
+          "name": "fft_en",
+          "type": "bool",
+          "read": "getFftEn",
+          "is_list": false,
+          "write": "setFftEn"
+        },
+        {
+          "name": "gating_enabled",
+          "type": "bool",
+          "read": "gatingEnabled",
+          "is_list": false,
+          "write": "setGatingEnabled"
+        },
+        {
+          "name": "hist_en",
+          "type": "bool",
+          "read": "getHistEn",
+          "is_list": false,
+          "write": "setHistEn"
+        },
+        {
+          "name": "horizontal_cursors",
+          "type": "bool",
+          "read": "horizontalCursors",
+          "is_list": false,
+          "write": "setHorizontalCursors"
+        },
+        {
+          "name": "internal_condition",
+          "type": "bool",
+          "read": "internalCondition",
+          "is_list": false,
+          "write": "setInternalCondition"
+        },
+        {
+          "name": "internal_trigger",
+          "type": "bool",
+          "read": "internalTrigger",
+          "is_list": false,
+          "write": "setInternalTrigger"
+        },
+        {
+          "name": "math_channels",
+          "type": "QList<QString>",
+          "read": "getMathChannels",
+          "is_list": true,
+          "write": "setMathChannels",
+          "element_type": "QString"
+        },
+        {
+          "name": "measure",
+          "type": "bool",
+          "read": "hasMeasure",
+          "is_list": false,
+          "write": "setMeasure"
+        },
+        {
+          "name": "measure_all",
+          "type": "bool",
+          "read": "measureAll",
+          "is_list": false,
+          "write": "setMeasureAll"
+        },
+        {
+          "name": "measure_en",
+          "type": "QList<int>",
+          "read": "measureEn",
+          "is_list": true,
+          "write": "setMeasureEn",
+          "element_type": "int"
+        },
+        {
+          "name": "memory_depth",
+          "type": "int",
+          "read": "getMemoryDepth",
+          "is_list": false,
+          "write": "setMemoryDepth"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        },
+        {
+          "name": "single",
+          "type": "bool",
+          "read": "isSingle",
+          "is_list": false,
+          "write": "single"
+        },
+        {
+          "name": "statistic_en",
+          "type": "QList<int>",
+          "read": "statisticEn",
+          "is_list": true,
+          "write": "setStatisticEn",
+          "element_type": "int"
+        },
+        {
+          "name": "statistics",
+          "type": "bool",
+          "read": "hasStatistics",
+          "is_list": false,
+          "write": "setStatistics"
+        },
+        {
+          "name": "time_base",
+          "type": "double",
+          "read": "getTimeBase",
+          "is_list": false,
+          "write": "setTimeBase"
+        },
+        {
+          "name": "time_position",
+          "type": "double",
+          "read": "getTimePos",
+          "is_list": false,
+          "write": "setTimePos"
+        },
+        {
+          "name": "trigger_hysteresis",
+          "type": "double",
+          "read": "getTriggerHysteresis",
+          "is_list": false,
+          "write": "setTriggerHysteresis"
+        },
+        {
+          "name": "trigger_input",
+          "type": "bool",
+          "read": "getTriggerInput",
+          "is_list": false,
+          "write": "setTriggerInput"
+        },
+        {
+          "name": "trigger_level",
+          "type": "double",
+          "read": "getTriggerLevel",
+          "is_list": false,
+          "write": "setTriggerLevel"
+        },
+        {
+          "name": "trigger_source",
+          "type": "int",
+          "read": "triggerSource",
+          "is_list": false,
+          "write": "setTriggerSource"
+        },
+        {
+          "name": "vertical_cursors",
+          "type": "bool",
+          "read": "verticalCursors",
+          "is_list": false,
+          "write": "setVerticalCursors"
+        },
+        {
+          "name": "xy_en",
+          "type": "bool",
+          "read": "getXyEn",
+          "is_list": false,
+          "write": "setXyEn"
+        },
+        {
+          "name": "xy_thickness",
+          "type": "int",
+          "read": "getXyThickness",
+          "is_list": false,
+          "write": "setXyThickness"
+        }
+      ]
+    },
+    "osc_channel_filter": {
+      "methods": [],
+      "properties": [
+        {
+          "name": "enHigh",
+          "type": "bool",
+          "read": "isEnableHigh",
+          "is_list": false,
+          "write": "setEnableHigh"
+        },
+        {
+          "name": "enLow",
+          "type": "bool",
+          "read": "isEnableLow",
+          "is_list": false,
+          "write": "setEnableLow"
+        },
+        {
+          "name": "gainHigh",
+          "type": "float",
+          "read": "gainHigh",
+          "is_list": false,
+          "write": "setGainHigh"
+        },
+        {
+          "name": "gainLow",
+          "type": "float",
+          "read": "gainLow",
+          "is_list": false,
+          "write": "setGainLow"
+        },
+        {
+          "name": "tcHigh",
+          "type": "float",
+          "read": "TCHigh",
+          "is_list": false,
+          "write": "setTCHigh"
+        },
+        {
+          "name": "tcLow",
+          "type": "float",
+          "read": "TCLow",
+          "is_list": false,
+          "write": "setTCLow"
+        }
+      ],
+      "nested": {
+        "parent": "osc_channel",
+        "parent_property": "digFilter"
+      }
+    },
+    "osc_channel": {
       "methods": [
         {
           "name": "setColor",
@@ -5286,16 +6148,265 @@
             }
           ],
           "returns": "void"
+        }
+      ],
+      "properties": [
+        {
+          "name": "ac_coupling",
+          "type": "bool",
+          "read": "getAcCoupling",
+          "is_list": false,
+          "write": "setAcCoupling"
         },
         {
-          "name": "show",
-          "args": [],
-          "returns": "void"
+          "name": "ac_rms",
+          "type": "double",
+          "read": "measured_ac_rms",
+          "is_list": false
+        },
+        {
+          "name": "amplitude",
+          "type": "double",
+          "read": "measured_amplitude",
+          "is_list": false
+        },
+        {
+          "name": "area",
+          "type": "double",
+          "read": "measured_area",
+          "is_list": false
+        },
+        {
+          "name": "cycle_area",
+          "type": "double",
+          "read": "measured_cycle_area",
+          "is_list": false
+        },
+        {
+          "name": "cycle_mean",
+          "type": "double",
+          "read": "measured_cycle_mean",
+          "is_list": false
+        },
+        {
+          "name": "cycle_rms",
+          "type": "double",
+          "read": "measured_cycle_rms",
+          "is_list": false
+        },
+        {
+          "name": "data",
+          "type": "QList<double>",
+          "read": "data",
+          "is_list": true,
+          "element_type": "double"
+        },
+        {
+          "name": "digFilter",
+          "type": "QVariantList",
+          "read": "getDigFilters",
+          "is_list": true,
+          "element_type": "QVariant",
+          "nested": "osc_channel_filter"
+        },
+        {
+          "name": "enabled",
+          "type": "bool",
+          "read": "channelEn",
+          "is_list": false,
+          "write": "setChannelEn"
+        },
+        {
+          "name": "fall",
+          "type": "double",
+          "read": "measured_fall",
+          "is_list": false
+        },
+        {
+          "name": "frequency",
+          "type": "double",
+          "read": "measured_frequency",
+          "is_list": false
+        },
+        {
+          "name": "high",
+          "type": "double",
+          "read": "measured_high",
+          "is_list": false
+        },
+        {
+          "name": "line_thickness",
+          "type": "double",
+          "read": "getLineThickness",
+          "is_list": false,
+          "write": "setLineThickness"
+        },
+        {
+          "name": "low",
+          "type": "double",
+          "read": "measured_low",
+          "is_list": false
+        },
+        {
+          "name": "max",
+          "type": "double",
+          "read": "measured_max",
+          "is_list": false
+        },
+        {
+          "name": "mean",
+          "type": "double",
+          "read": "measured_mean",
+          "is_list": false
+        },
+        {
+          "name": "middle",
+          "type": "double",
+          "read": "measured_middle",
+          "is_list": false
+        },
+        {
+          "name": "min",
+          "type": "double",
+          "read": "measured_min",
+          "is_list": false
+        },
+        {
+          "name": "neg_duty",
+          "type": "double",
+          "read": "measured_neg_duty",
+          "is_list": false
+        },
+        {
+          "name": "neg_overshoot",
+          "type": "double",
+          "read": "measured_neg_overshoot",
+          "is_list": false
+        },
+        {
+          "name": "neg_width",
+          "type": "double",
+          "read": "measured_neg_width",
+          "is_list": false
+        },
+        {
+          "name": "peak_to_peak",
+          "type": "double",
+          "read": "measured_peak_to_peak",
+          "is_list": false
+        },
+        {
+          "name": "period",
+          "type": "double",
+          "read": "measured_period",
+          "is_list": false
+        },
+        {
+          "name": "pos_duty",
+          "type": "double",
+          "read": "measured_pos_duty",
+          "is_list": false
+        },
+        {
+          "name": "pos_overshoot",
+          "type": "double",
+          "read": "measured_pos_overshoot",
+          "is_list": false
+        },
+        {
+          "name": "pos_width",
+          "type": "double",
+          "read": "measured_pos_width",
+          "is_list": false
+        },
+        {
+          "name": "probe_attenuation",
+          "type": "double",
+          "read": "getProbeAttenuation",
+          "is_list": false,
+          "write": "setProbeAttenuation"
+        },
+        {
+          "name": "rise",
+          "type": "double",
+          "read": "measured_rise",
+          "is_list": false
+        },
+        {
+          "name": "rms",
+          "type": "double",
+          "read": "measured_rms",
+          "is_list": false
+        },
+        {
+          "name": "v_offset",
+          "type": "double",
+          "read": "getVOffset",
+          "is_list": false,
+          "write": "setVOffset"
+        },
+        {
+          "name": "volts_per_div",
+          "type": "double",
+          "read": "getVoltsPerDiv",
+          "is_list": false,
+          "write": "setVoltsPerDiv"
         }
-      ]
+      ],
+      "nested": {
+        "parent": "osc",
+        "parent_property": "channels"
+      }
     },
     "pattern": {
-      "methods": []
+      "methods": [],
+      "properties": [
+        {
+          "name": "channelHeights",
+          "type": "QList<double>",
+          "read": "getChannelHeights",
+          "is_list": true,
+          "write": "setChannelHeights",
+          "element_type": "double"
+        },
+        {
+          "name": "channelNames",
+          "type": "QStringList",
+          "read": "getChannelNames",
+          "is_list": false,
+          "write": "setChannelNames"
+        },
+        {
+          "name": "channelPosition",
+          "type": "QList<double>",
+          "read": "getChannelPosition",
+          "is_list": true,
+          "write": "setChannelPosition",
+          "element_type": "double"
+        },
+        {
+          "name": "currentGroups",
+          "type": "QVector<QVector<int>>",
+          "read": "getCurrentGroups",
+          "is_list": false,
+          "write": "setCurrentGroups"
+        },
+        {
+          "name": "enabledChannels",
+          "type": "QList<int>",
+          "read": "getEnabledChannels",
+          "is_list": true,
+          "write": "setEnabledChannels",
+          "element_type": "int"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        }
+      ]
     },
     "power": {
       "methods": [
@@ -5303,6 +6414,57 @@
           "name": "show",
           "args": [],
           "returns": "void"
+        }
+      ],
+      "properties": [
+        {
+          "name": "dac1_enabled",
+          "type": "bool",
+          "read": "Dac1Enabled",
+          "is_list": false,
+          "write": "setDac1Enabled"
+        },
+        {
+          "name": "dac1_value",
+          "type": "double",
+          "read": "valueDac1",
+          "is_list": false,
+          "write": "setValueDac1"
+        },
+        {
+          "name": "dac2_enabled",
+          "type": "bool",
+          "read": "Dac2Enabled",
+          "is_list": false,
+          "write": "setDac2Enabled"
+        },
+        {
+          "name": "dac2_value",
+          "type": "double",
+          "read": "valueDac2",
+          "is_list": false,
+          "write": "setValueDac2"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "sync",
+          "type": "bool",
+          "read": "syncEnabled",
+          "is_list": false,
+          "write": "enableSync"
+        },
+        {
+          "name": "tracking_percent",
+          "type": "int",
+          "read": "getTrackingPercent",
+          "is_list": false,
+          "write": "setTrackingPercent"
         }
       ]
     },
@@ -5313,6 +6475,253 @@
           "args": [],
           "returns": "void"
         }
+      ],
+      "properties": [
+        {
+          "name": "autoscale",
+          "type": "bool",
+          "read": "getAutoscale",
+          "is_list": false,
+          "write": "setAutoscale"
+        },
+        {
+          "name": "buffer_amplitude",
+          "type": "QList<double>",
+          "read": "getBufferAmplitude",
+          "is_list": true,
+          "write": "setBufferAmplitude",
+          "element_type": "double"
+        },
+        {
+          "name": "buffer_file_path",
+          "type": "QList<QString>",
+          "read": "getBufferFilePath",
+          "is_list": true,
+          "write": "setBufferFilePath",
+          "element_type": "QString"
+        },
+        {
+          "name": "buffer_offset",
+          "type": "QList<double>",
+          "read": "getBufferOffset",
+          "is_list": true,
+          "write": "setBufferOffset",
+          "element_type": "double"
+        },
+        {
+          "name": "buffer_phase",
+          "type": "QList<double>",
+          "read": "getBufferPhase",
+          "is_list": true,
+          "write": "setBufferPhase",
+          "element_type": "double"
+        },
+        {
+          "name": "buffer_sample_rate",
+          "type": "QList<double>",
+          "read": "getBufferSampleRate",
+          "is_list": true,
+          "write": "setBufferSampleRate",
+          "element_type": "double"
+        },
+        {
+          "name": "constant_volts",
+          "type": "QList<double>",
+          "read": "getConstantValue",
+          "is_list": true,
+          "write": "setConstantValue",
+          "element_type": "double"
+        },
+        {
+          "name": "enabled",
+          "type": "QList<bool>",
+          "read": "enabledChannels",
+          "is_list": true,
+          "write": "enableChannels",
+          "element_type": "bool"
+        },
+        {
+          "name": "line_thickness",
+          "type": "QList<int>",
+          "read": "getLineThickness",
+          "is_list": true,
+          "write": "setLineThickness",
+          "element_type": "int"
+        },
+        {
+          "name": "load",
+          "type": "QList<double>",
+          "read": "getLoad",
+          "is_list": true,
+          "write": "setLoad",
+          "element_type": "double"
+        },
+        {
+          "name": "math_function",
+          "type": "QList<QString>",
+          "read": "getMathFunction",
+          "is_list": true,
+          "write": "setMathFunction",
+          "element_type": "QString"
+        },
+        {
+          "name": "math_record_length",
+          "type": "QList<double>",
+          "read": "getMathRecordLength",
+          "is_list": true,
+          "write": "setMathRecordLength",
+          "element_type": "double"
+        },
+        {
+          "name": "math_sample_rate",
+          "type": "QList<double>",
+          "read": "getMathSampleRate",
+          "is_list": true,
+          "write": "setMathSampleRate",
+          "element_type": "double"
+        },
+        {
+          "name": "mode",
+          "type": "QList<int>",
+          "read": "getMode",
+          "is_list": true,
+          "write": "setMode",
+          "element_type": "int"
+        },
+        {
+          "name": "noise_amplitude",
+          "type": "QList<double>",
+          "read": "getNoiseAmpl",
+          "is_list": true,
+          "write": "setNoiseAmpl",
+          "element_type": "double"
+        },
+        {
+          "name": "noise_type",
+          "type": "QList<int>",
+          "read": "getNoiseType",
+          "is_list": true,
+          "write": "setNoiseType",
+          "element_type": "int"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        },
+        {
+          "name": "stairphase",
+          "type": "QList<int>",
+          "read": "getStairWaveformPhase",
+          "is_list": true,
+          "write": "setStairWaveformPhase",
+          "element_type": "int"
+        },
+        {
+          "name": "steps_down",
+          "type": "QList<int>",
+          "read": "getStairWaveformStepsDown",
+          "is_list": true,
+          "write": "setStairWaveformStepsDown",
+          "element_type": "int"
+        },
+        {
+          "name": "steps_up",
+          "type": "QList<int>",
+          "read": "getStairWaveformStepsUp",
+          "is_list": true,
+          "write": "setStairWaveformStepsUp",
+          "element_type": "int"
+        },
+        {
+          "name": "waveform_amplitude",
+          "type": "QList<double>",
+          "read": "getWaveformAmpl",
+          "is_list": true,
+          "write": "setWaveformAmpl",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_duty",
+          "type": "QList<double>",
+          "read": "getWaveformDuty",
+          "is_list": true,
+          "write": "setWaveformDuty",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_fall",
+          "type": "QList<double>",
+          "read": "getWaveformFall",
+          "is_list": true,
+          "write": "setWaveformFall",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_frequency",
+          "type": "QList<double>",
+          "read": "getWaveformFreq",
+          "is_list": true,
+          "write": "setWaveformFreq",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_holdhigh",
+          "type": "QList<double>",
+          "read": "getWaveformHoldHigh",
+          "is_list": true,
+          "write": "setWaveformHoldHigh",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_holdlow",
+          "type": "QList<double>",
+          "read": "getWaveformHoldLow",
+          "is_list": true,
+          "write": "setWaveformHoldLow",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_offset",
+          "type": "QList<double>",
+          "read": "getWaveformOfft",
+          "is_list": true,
+          "write": "setWaveformOfft",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_phase",
+          "type": "QList<double>",
+          "read": "getWaveformPhase",
+          "is_list": true,
+          "write": "setWaveformPhase",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_rise",
+          "type": "QList<double>",
+          "read": "getWaveformRise",
+          "is_list": true,
+          "write": "setWaveformRise",
+          "element_type": "double"
+        },
+        {
+          "name": "waveform_type",
+          "type": "QList<int>",
+          "read": "getWaveformType",
+          "is_list": true,
+          "write": "setWaveformType",
+          "element_type": "int"
+        }
       ]
     },
     "spectrum": {
@@ -5321,6 +6730,156 @@
           "name": "show",
           "args": [],
           "returns": "void"
+        }
+      ],
+      "properties": [
+        {
+          "name": "bottomScale",
+          "type": "double",
+          "read": "bottomScale",
+          "is_list": false,
+          "write": "setBottomScale"
+        },
+        {
+          "name": "channels",
+          "type": "QVariantList",
+          "read": "getChannels",
+          "is_list": true,
+          "element_type": "QVariant",
+          "nested": "osc_channel"
+        },
+        {
+          "name": "currentChannel",
+          "type": "int",
+          "read": "currentChannel",
+          "is_list": false,
+          "write": "setCurrentChannel"
+        },
+        {
+          "name": "cursors",
+          "type": "bool",
+          "read": "hasCursors",
+          "is_list": false,
+          "write": "setCursors"
+        },
+        {
+          "name": "cursors_position",
+          "type": "int",
+          "read": "getCursorsPosition",
+          "is_list": false,
+          "write": "setCursorsPosition"
+        },
+        {
+          "name": "cursors_transparency",
+          "type": "int",
+          "read": "getCursorsTransparency",
+          "is_list": false,
+          "write": "setCursorsTransparency"
+        },
+        {
+          "name": "horizontal_cursors",
+          "type": "bool",
+          "read": "horizontalCursors",
+          "is_list": false,
+          "write": "setHorizontalCursors"
+        },
+        {
+          "name": "logScale",
+          "type": "bool",
+          "read": "getLogScale",
+          "is_list": false,
+          "write": "setLogScale"
+        },
+        {
+          "name": "markerTableVisible",
+          "type": "bool",
+          "read": "markerTableVisible",
+          "is_list": false,
+          "write": "setMarkerTableVisible"
+        },
+        {
+          "name": "markers",
+          "type": "QVariantList",
+          "read": "getMarkers",
+          "is_list": true,
+          "element_type": "QVariant"
+        },
+        {
+          "name": "notes",
+          "type": "QString",
+          "read": "getNotes",
+          "is_list": false,
+          "write": "setNotes"
+        },
+        {
+          "name": "resBW",
+          "type": "QString",
+          "read": "resBW",
+          "is_list": false,
+          "write": "setResBW"
+        },
+        {
+          "name": "running",
+          "type": "bool",
+          "read": "running",
+          "is_list": false,
+          "write": "run"
+        },
+        {
+          "name": "single",
+          "type": "bool",
+          "read": "isSingle",
+          "is_list": false,
+          "write": "single"
+        },
+        {
+          "name": "startFreq",
+          "type": "double",
+          "read": "startFreq",
+          "is_list": false,
+          "write": "setStartFreq"
+        },
+        {
+          "name": "stopFreq",
+          "type": "double",
+          "read": "stopFreq",
+          "is_list": false,
+          "write": "setStopFreq"
+        },
+        {
+          "name": "topScale",
+          "type": "double",
+          "read": "topScale",
+          "is_list": false,
+          "write": "setTopScale"
+        },
+        {
+          "name": "unitPerDiv",
+          "type": "double",
+          "read": "unitPerDiv",
+          "is_list": false,
+          "write": "setunitPerDiv"
+        },
+        {
+          "name": "units",
+          "type": "QString",
+          "read": "units",
+          "is_list": false,
+          "write": "setUnits"
+        },
+        {
+          "name": "vertical_cursors",
+          "type": "bool",
+          "read": "verticalCursors",
+          "is_list": false,
+          "write": "setVerticalCursors"
+        },
+        {
+          "name": "waterfall_visible",
+          "type": "bool",
+          "read": "getWaterfallVisible",
+          "is_list": false,
+          "write": "setWaterfallVisible"
         }
       ]
     },
