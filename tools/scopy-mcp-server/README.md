@@ -18,15 +18,18 @@ Claude Code ──(MCP stdio)──> scopy-mcp-server ──(FIFO or PTY)──>
 
 ## Install
 
-```bash
-pip install scopy-mcp-server
-```
+**Prerequisites:** Python 3.10+, Scopy installed, Claude Code
 
-Or with [uv](https://docs.astral.sh/uv/):
+Clone the Scopy repo (or download the [source zip](https://github.com/analogdevicesinc/scopy/archive/refs/heads/main.zip)):
 
 ```bash
-uv pip install scopy-mcp-server
+git clone https://github.com/analogdevicesinc/scopy
+cd scopy/tools/scopy-mcp-server
+bash install.sh
 ```
+
+The script checks Python, detects your Scopy binary, installs the package, and prints the
+`.mcp.json` snippet to paste into Claude Code. That's it.
 
 ## Configure Claude Code
 
@@ -52,21 +55,6 @@ If Scopy is not on your `$PATH`, set `SCOPY_PATH`:
       "env": {
         "SCOPY_PATH": "/path/to/scopy"
       }
-    }
-  }
-}
-```
-
-### Zero-install option (uvx)
-
-No `pip install` needed — `uvx` fetches from PyPI on demand:
-
-```json
-{
-  "mcpServers": {
-    "scopy": {
-      "command": "uvx",
-      "args": ["scopy-mcp-server"]
     }
   }
 }

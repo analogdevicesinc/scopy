@@ -48,6 +48,12 @@ CLASS_TO_JSOBJ = {
     "Calibration_API": "calib",
 }
 
+# Nested API classes: C++ class → (js_name, parent_js_obj, parent_property_name)
+NESTED_CLASS_MAP = {
+    "Channel_API": ("osc_channel", "osc", "channels"),
+    "Channel_Digital_Filter_API": ("osc_channel_filter", "osc_channel", "digFilter"),
+}
+
 # Maps package directory name → list of JS object names it exposes
 PLUGIN_OBJECTS: dict[str, list[str]] = {
     "core": ["scopy"],
@@ -68,11 +74,22 @@ _INVOKABLE_RE = re.compile(
     r"\(([^)]*)\)"             # argument list (group 3)
 )
 
+_PROPERTY_RE = re.compile(
+    r"Q_PROPERTY\(\s*"
+    r"([\w:<>*& ]+?)\s+"      # type (group 1)
+    r"(\w+)\s+"                # property name (group 2)
+    r"READ\s+(\w+)"           # read method (group 3)
+    r"(?:\s+WRITE\s+(\w+))?"  # optional write method (group 4)
+)
+
+_CLASS_RE = re.compile(
+    r"class\s+(?:\w+_EXPORT\s+)?(\w+)\s*:\s*public\s+(?:scopy::)?(?:ApiObject|QObject)"
+)
+
 
 def _clean_type(raw: str) -> str:
     """Normalize a C++ type string: strip const, &, *, whitespace."""
     t = raw.replace("const ", "").replace("&", "").replace("*", "").strip()
-    # Collapse multiple spaces
     return " ".join(t.split())
 
 
@@ -85,7 +102,6 @@ def _parse_arg(raw: str) -> dict:
         default = default.strip().strip('"')
         raw = raw.strip()
 
-    # Strip const, &, *
     cleaned = _clean_type(raw)
     parts = cleaned.split()
 
@@ -113,37 +129,126 @@ def _parse_args_list(raw: str) -> list[dict]:
     return [_parse_arg(a) for a in raw.split(",") if a.strip()]
 
 
+def _is_list_type(type_str: str) -> bool:
+    return type_str.startswith("QList<") or type_str == "QVariantList"
+
+
+def _element_type(type_str: str) -> str:
+    """Extract element type from QList<T>."""
+    m = re.match(r"QList<\s*(.+?)\s*>", type_str)
+    if m:
+        return _clean_type(m.group(1))
+    if type_str == "QVariantList":
+        return "QVariant"
+    return type_str
+
+
+def _parse_property(m: re.Match) -> dict:
+    """Parse a Q_PROPERTY regex match into structured form."""
+    raw_type = _clean_type(m.group(1))
+    prop = {
+        "name": m.group(2),
+        "type": raw_type,
+        "read": m.group(3),
+        "is_list": _is_list_type(raw_type),
+    }
+    if m.group(4):
+        prop["write"] = m.group(4)
+    if prop["is_list"]:
+        prop["element_type"] = _element_type(raw_type)
+    return prop
+
+
 def extract_class_name(text: str) -> str | None:
     m = re.search(r"class\s+(?:\w+_EXPORT\s+)?(\w+)\s*:\s*public\s+(?:scopy::)?ApiObject", text)
     return m.group(1) if m else None
 
 
-def parse_api_header(path: Path) -> tuple[str | None, list[dict]]:
+def _find_all_classes(text: str) -> list[str]:
+    """Find all class names that inherit from ApiObject or QObject."""
+    return _CLASS_RE.findall(text)
+
+
+def _extract_class_block(text: str, class_name: str) -> str:
+    """Extract the text block for a specific class declaration."""
+    pattern = re.compile(
+        r"class\s+(?:\w+_EXPORT\s+)?" + re.escape(class_name) + r"\s*:\s*public"
+    )
+    m = pattern.search(text)
+    if not m:
+        return ""
+
+    start = m.start()
+    brace_count = 0
+    in_class = False
+
+    for i in range(start, len(text)):
+        if text[i] == "{":
+            brace_count += 1
+            in_class = True
+        elif text[i] == "}":
+            brace_count -= 1
+            if in_class and brace_count == 0:
+                return text[start:i + 1]
+
+    return text[start:]
+
+
+def parse_api_header(path: Path) -> tuple[dict[str, dict], list[str]]:
     """
-    Returns (js_obj_name, methods).
-    js_obj_name is None if the class is not in CLASS_TO_JSOBJ.
-    methods is a flat list of all Q_INVOKABLE methods with their signatures.
+    Returns (objects_dict, js_names_found).
+    objects_dict maps js_obj_name → {"methods": [...], "properties": [...]}.
+    Handles both main API classes and nested classes.
     """
     text = path.read_text(errors="replace")
-    class_name = extract_class_name(text)
-    if not class_name or class_name not in CLASS_TO_JSOBJ:
-        return None, []
+    all_classes = _find_all_classes(text)
+    result: dict[str, dict] = {}
+    js_names: list[str] = []
 
-    js_obj = CLASS_TO_JSOBJ[class_name]
-    methods: list[dict] = []
+    for class_name in all_classes:
+        js_obj = None
+        nested_info = None
 
-    for m in _INVOKABLE_RE.finditer(text):
-        return_type = _clean_type(m.group(1))
-        method_name = m.group(2)
-        args = _parse_args_list(m.group(3))
+        if class_name in CLASS_TO_JSOBJ:
+            js_obj = CLASS_TO_JSOBJ[class_name]
+        elif class_name in NESTED_CLASS_MAP:
+            js_obj, parent_obj, parent_prop = NESTED_CLASS_MAP[class_name]
+            nested_info = {"parent": parent_obj, "parent_property": parent_prop}
+        else:
+            continue
 
-        methods.append({
-            "name": method_name,
-            "args": args,
-            "returns": return_type,
-        })
+        block = _extract_class_block(text, class_name)
+        if not block:
+            continue
 
-    return js_obj, methods
+        methods = []
+        for m in _INVOKABLE_RE.finditer(block):
+            methods.append({
+                "name": m.group(2),
+                "args": _parse_args_list(m.group(3)),
+                "returns": _clean_type(m.group(1)),
+            })
+
+        properties = []
+        for m in _PROPERTY_RE.finditer(block):
+            prop = _parse_property(m)
+            if prop["type"] == "QVariantList" and prop["name"] in ("channels", "digFilter"):
+                for nc, (nc_js, nc_parent, nc_prop) in NESTED_CLASS_MAP.items():
+                    if nc_prop == prop["name"]:
+                        prop["nested"] = nc_js
+                        break
+            properties.append(prop)
+
+        obj_meta = {"methods": methods}
+        if properties:
+            obj_meta["properties"] = properties
+        if nested_info:
+            obj_meta["nested"] = nested_info
+
+        result[js_obj] = obj_meta
+        js_names.append(js_obj)
+
+    return result, js_names
 
 
 def main():
@@ -168,47 +273,72 @@ def main():
     objects: dict[str, dict] = {}
 
     for header in api_headers:
-        js_obj, methods = parse_api_header(header)
-        if js_obj is None:
-            print(f"  skip  {header.relative_to(root)} (class not in mapping)", file=sys.stderr)
+        header_objects, js_names = parse_api_header(header)
+
+        if not header_objects:
+            print(f"  skip  {header.relative_to(root)} (no mapped classes)", file=sys.stderr)
             continue
 
-        print(
-            f"  parse {header.relative_to(root)} → {js_obj} ({len(methods)} methods)",
-            file=sys.stderr,
-        )
+        for js_obj, obj_meta in header_objects.items():
+            n_methods = len(obj_meta.get("methods", []))
+            n_props = len(obj_meta.get("properties", []))
+            print(
+                f"  parse {header.relative_to(root)} → {js_obj} "
+                f"({n_methods} methods, {n_props} properties)",
+                file=sys.stderr,
+            )
 
-        if js_obj in objects:
-            existing_sigs = {(m["name"], tuple(a["type"] for a in m["args"]))
-                            for m in objects[js_obj]["methods"]}
-            for m in methods:
-                sig = (m["name"], tuple(a["type"] for a in m["args"]))
-                if sig not in existing_sigs:
-                    objects[js_obj]["methods"].append(m)
-                    existing_sigs.add(sig)
-        else:
-            objects[js_obj] = {"methods": methods}
+            if js_obj in objects:
+                existing = objects[js_obj]
+                existing_sigs = {(m["name"], tuple(a["type"] for a in m["args"]))
+                                for m in existing.get("methods", [])}
+                for m in obj_meta.get("methods", []):
+                    sig = (m["name"], tuple(a["type"] for a in m["args"]))
+                    if sig not in existing_sigs:
+                        existing.setdefault("methods", []).append(m)
+                        existing_sigs.add(sig)
 
-    # Sort methods by name within each object for stable output
+                existing_props = {p["name"] for p in existing.get("properties", [])}
+                for p in obj_meta.get("properties", []):
+                    if p["name"] not in existing_props:
+                        existing.setdefault("properties", []).append(p)
+                        existing_props.add(p["name"])
+
+                if "nested" in obj_meta and "nested" not in existing:
+                    existing["nested"] = obj_meta["nested"]
+            else:
+                objects[js_obj] = obj_meta
+
     for obj_meta in objects.values():
-        obj_meta["methods"].sort(key=lambda m: m["name"])
+        if "methods" in obj_meta:
+            obj_meta["methods"].sort(key=lambda m: m["name"])
+        if "properties" in obj_meta:
+            obj_meta["properties"].sort(key=lambda p: p["name"])
 
-    # Build plugin grouping
-    parsed_objects = set(objects.keys())
+    # Build plugin grouping — include nested objects under parent's plugin
+    all_js_names = set(objects.keys())
     plugins = {
-        plugin: [obj for obj in obj_list if obj in parsed_objects]
+        plugin: [obj for obj in obj_list if obj in all_js_names]
         for plugin, obj_list in PLUGIN_OBJECTS.items()
     }
+    # Add nested objects to their parent's plugin
+    for js_obj, meta in objects.items():
+        if "nested" in meta:
+            parent = meta["nested"]["parent"]
+            for plugin, obj_list in plugins.items():
+                if parent in obj_list and js_obj not in obj_list:
+                    obj_list.append(js_obj)
     plugins = {p: objs for p, objs in plugins.items() if objs}
 
     output = {"plugins": plugins, "objects": objects}
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(output, indent=2))
 
-    total_methods = sum(len(o["methods"]) for o in objects.values())
+    total_methods = sum(len(o.get("methods", [])) for o in objects.values())
+    total_props = sum(len(o.get("properties", [])) for o in objects.values())
     print(
-        f"\nWrote {out_path} ({len(objects)} objects, {total_methods} methods "
-        f"across {len(plugins)} plugins)",
+        f"\nWrote {out_path} ({len(objects)} objects, {total_methods} methods, "
+        f"{total_props} properties across {len(plugins)} plugins)",
         file=sys.stderr,
     )
 

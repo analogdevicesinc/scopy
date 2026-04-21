@@ -74,19 +74,25 @@ def _build_js_call(obj: str, method: str, args: list[str]) -> str:
     """Build a JS function call with type-aware argument quoting."""
     js_args = []
     for a in args:
-        if a in ("true", "false"):
-            js_args.append(a)
-        else:
-            try:
-                int(a)
-                js_args.append(a)
-            except ValueError:
-                try:
-                    float(a)
-                    js_args.append(a)
-                except ValueError:
-                    js_args.append(f'"{a}"')
+        js_args.append(_quote_js_value(a))
     return f"{obj}.{method}({', '.join(js_args)})"
+
+
+def _quote_js_value(value: str) -> str:
+    """Quote a value for JavaScript: booleans and numbers unquoted, strings quoted."""
+    if value in ("true", "false"):
+        return value
+    try:
+        int(value)
+        return value
+    except ValueError:
+        pass
+    try:
+        float(value)
+        return value
+    except ValueError:
+        pass
+    return f'"{value}"'
 
 
 # ---------------------------------------------------------------------------
@@ -293,37 +299,193 @@ def _make_object_call_tool(obj: str, methods: list[dict]):
     return call_method
 
 
-def _make_object_list_tool(obj: str, methods: list[dict]):
-    """Create a _list tool that returns the full method inventory as JSON."""
+def _make_object_list_tool(obj: str, methods: list[dict], properties: list[dict] | None = None):
+    """Create a _list tool that returns the full method and property inventory as JSON."""
 
     @mcp.tool(name=f"{obj}_list")
-    def list_methods() -> str:
-        f"""List all available methods on the '{obj}' Scopy API object.
+    def list_api() -> str:
+        f"""List all available methods and properties on the '{obj}' Scopy API object.
 
-        Returns a JSON array of method signatures with name, arguments, and return type.
+        Returns a JSON object with 'methods' and 'properties' arrays.
         """
-        return json.dumps([
-            {
-                "name": m["name"],
-                "args": [
-                    a["name"] + ("=" + a["default"] if "default" in a else "")
-                    for a in m["args"]
-                ],
-                "returns": m["returns"],
-            }
-            for m in methods
-        ], indent=2)
+        result = {}
+        if methods:
+            result["methods"] = [
+                {
+                    "name": m["name"],
+                    "args": [
+                        a["name"] + ("=" + a["default"] if "default" in a else "")
+                        for a in m["args"]
+                    ],
+                    "returns": m["returns"],
+                }
+                for m in methods
+            ]
+        if properties:
+            result["properties"] = [
+                {
+                    "name": p["name"],
+                    "type": p["type"],
+                    "writable": "write" in p,
+                    "is_list": p.get("is_list", False),
+                }
+                for p in properties
+            ]
+        return json.dumps(result, indent=2)
 
-    return list_methods
+    return list_api
 
 
 # Register per-object tools for all objects (including scopy)
 for _obj, _meta in _API.get("objects", {}).items():
     _methods = _meta.get("methods", [])
-    if not _methods:
+    if _methods:
+        _make_object_call_tool(_obj, _methods)
+    _props = _meta.get("properties", [])
+    if _methods or _props:
+        _make_object_list_tool(_obj, _methods, _props)
+
+
+# ---------------------------------------------------------------------------
+# Property read/write tools — for Q_PROPERTY-based APIs (M2K instruments)
+# ---------------------------------------------------------------------------
+
+def _format_prop_line(p: dict) -> str:
+    """Format a property for the tool description."""
+    rw = "read/write" if "write" in p else "read-only"
+    suffix = f" (list, per-channel)" if p.get("is_list") else ""
+    return f"  {p['name']} ({p['type']}) [{rw}]{suffix}"
+
+
+def _build_js_path(obj: str, meta: dict) -> str:
+    """Build the JS object path, handling nested objects like osc.channels[idx]."""
+    nested = meta.get("nested")
+    if nested:
+        return f"{nested['parent']}.{nested['parent_property']}"
+    return obj
+
+
+def _make_property_read_tool(obj: str, properties: list[dict], meta: dict):
+    """Create a _read tool for reading Q_PROPERTY values."""
+    valid_names = {p["name"] for p in properties}
+    nested = meta.get("nested")
+
+    desc_lines = [f"Read a property from the '{obj}' Scopy API object.", ""]
+    if nested:
+        desc_lines.append(
+            f"This is a nested object accessed via {nested['parent']}.{nested['parent_property']}[index]."
+        )
+        desc_lines.append("")
+    desc_lines.append("Available properties:")
+    for p in properties:
+        desc_lines.append(_format_prop_line(p))
+
+    docstring = "\n".join(desc_lines)
+
+    if nested:
+        @mcp.tool(name=f"{obj}_read")
+        def read_nested_property(property: str, index: int = 0, channel: int = -1) -> str:
+            """placeholder"""
+            if err := _ensure_connected():
+                return err
+            if property not in valid_names:
+                return f"Unknown property '{property}' on {obj}. Available: {sorted(valid_names)}"
+            base = f"{nested['parent']}.{nested['parent_property']}[{index}]"
+            if channel >= 0:
+                js = f"{base}.{property}[{channel}]"
+            else:
+                js = f"{base}.{property}"
+            result = _run_tool(js)
+            logger.info(f"{base}.{property}: {result}")
+            return result
+
+        read_nested_property.__doc__ = docstring
+    else:
+        @mcp.tool(name=f"{obj}_read")
+        def read_property(property: str, channel: int = -1) -> str:
+            """placeholder"""
+            if err := _ensure_connected():
+                return err
+            if property not in valid_names:
+                return f"Unknown property '{property}' on {obj}. Available: {sorted(valid_names)}"
+            if channel >= 0:
+                js = f"{obj}.{property}[{channel}]"
+            else:
+                js = f"{obj}.{property}"
+            result = _run_tool(js)
+            logger.info(f"{obj}.{property}: {result}")
+            return result
+
+        read_property.__doc__ = docstring
+
+
+def _make_property_write_tool(obj: str, properties: list[dict], meta: dict):
+    """Create a _write tool for writing Q_PROPERTY values."""
+    writable = [p for p in properties if "write" in p]
+    if not writable:
+        return
+
+    valid_names = {p["name"] for p in writable}
+    nested = meta.get("nested")
+
+    desc_lines = [f"Write a property on the '{obj}' Scopy API object.", ""]
+    if nested:
+        desc_lines.append(
+            f"This is a nested object accessed via {nested['parent']}.{nested['parent_property']}[index]."
+        )
+        desc_lines.append("")
+    desc_lines.append("Writable properties:")
+    for p in writable:
+        desc_lines.append(_format_prop_line(p))
+
+    docstring = "\n".join(desc_lines)
+
+    if nested:
+        @mcp.tool(name=f"{obj}_write")
+        def write_nested_property(property: str, value: str, index: int = 0, channel: int = -1) -> str:
+            """placeholder"""
+            if err := _ensure_connected():
+                return err
+            if property not in valid_names:
+                return f"Unknown or read-only property '{property}' on {obj}. Writable: {sorted(valid_names)}"
+            quoted = _quote_js_value(value)
+            base = f"{nested['parent']}.{nested['parent_property']}[{index}]"
+            if channel >= 0:
+                js = f"{base}.{property}[{channel}] = {quoted}"
+            else:
+                js = f"{base}.{property} = {quoted}"
+            result = _run_tool(js)
+            logger.info(f"{base}.{property} = {value}: {result}")
+            return result
+
+        write_nested_property.__doc__ = docstring
+    else:
+        @mcp.tool(name=f"{obj}_write")
+        def write_property(property: str, value: str, channel: int = -1) -> str:
+            """placeholder"""
+            if err := _ensure_connected():
+                return err
+            if property not in valid_names:
+                return f"Unknown or read-only property '{property}' on {obj}. Writable: {sorted(valid_names)}"
+            quoted = _quote_js_value(value)
+            if channel >= 0:
+                js = f"{obj}.{property}[{channel}] = {quoted}"
+            else:
+                js = f"{obj}.{property} = {quoted}"
+            result = _run_tool(js)
+            logger.info(f"{obj}.{property} = {value}: {result}")
+            return result
+
+        write_property.__doc__ = docstring
+
+
+# Register property tools for objects that have properties
+for _obj, _meta in _API.get("objects", {}).items():
+    _props = _meta.get("properties", [])
+    if not _props:
         continue
-    _make_object_call_tool(_obj, _methods)
-    _make_object_list_tool(_obj, _methods)
+    _make_property_read_tool(_obj, _props, _meta)
+    _make_property_write_tool(_obj, _props, _meta)
 
 
 # ---------------------------------------------------------------------------
