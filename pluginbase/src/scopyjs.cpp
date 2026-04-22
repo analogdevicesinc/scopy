@@ -105,17 +105,9 @@ void ScopyJS::suppressScopyMessages(bool b)
 
 QJSEngine *ScopyJS::engine() { return &m_engine; }
 
-void ScopyJS::registerApi(ApiObject *obj)
-{
-	m_registeredApis.append(obj);
-	registerApi(obj, m_engine.globalObject());
-}
+void ScopyJS::registerApi(ApiObject *obj) { registerApi(obj, m_engine.globalObject()); }
 
-void ScopyJS::unregisterApi(ApiObject *obj)
-{
-	m_registeredApis.removeAll(obj);
-	unregisterApi(obj, m_engine.globalObject());
-}
+void ScopyJS::unregisterApi(ApiObject *obj) { unregisterApi(obj, m_engine.globalObject()); }
 
 void ScopyJS::registerApi(ApiObject *obj, QJSValue parentObj)
 {
@@ -141,8 +133,6 @@ void ScopyJS::registerApi(ApiObject *obj, QJSValue parentObj)
 }
 
 void ScopyJS::unregisterApi(ApiObject *obj, QJSValue parentObj) { parentObj.deleteProperty(obj->objectName()); }
-
-QList<ApiObject *> ScopyJS::getRegisteredApis() const { return m_registeredApis; }
 
 void ScopyJS::sleep(unsigned long s) { msleep(s * 1000); }
 

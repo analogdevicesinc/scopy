@@ -64,11 +64,9 @@ public:
 	Q_INVOKABLE bool getToolBtnState(QString tool);
 	Q_INVOKABLE bool runTool(QString tool, bool flag);
 	Q_INVOKABLE void screenshot(const QString &path);
-	Q_INVOKABLE void screenshotFullContent(const QString &path);
 	Q_INVOKABLE int screenshotAllScrollAreas(const QString &pathPrefix);
 	Q_INVOKABLE QStringList getTabs();
 	Q_INVOKABLE void switchTab(const QString &tabName);
-	Q_INVOKABLE QObject *getCurrentToolApi();
 	Q_INVOKABLE bool loadSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 	Q_INVOKABLE bool saveSetup(QString fileName, QString path = QCoreApplication::applicationDirPath());
 

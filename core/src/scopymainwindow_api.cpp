@@ -586,34 +586,6 @@ void ScopyMainWindow_API::screenshot(const QString &path)
 	}
 }
 
-void ScopyMainWindow_API::screenshotFullContent(const QString &path)
-{
-	ToolStack *ts = m_w->findChild<ToolStack *>();
-	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
-
-	QScrollArea *sa = nullptr;
-	if(currentTool) {
-		for(QScrollArea *candidate : currentTool->findChildren<QScrollArea *>()) {
-			if(candidate->isVisible() && candidate->widget()) {
-				sa = candidate;
-				break;
-			}
-		}
-	}
-
-	if(sa) {
-		QWidget *content = sa->widget();
-		content->adjustSize();
-		QApplication::processEvents();
-		QPixmap px = content->grab();
-		if(!px.save(path)) {
-			qWarning(CAT_SCOPY_API) << "Failed to save full-content screenshot to:" << path;
-		}
-	} else {
-		screenshot(path);
-	}
-}
-
 int ScopyMainWindow_API::screenshotAllScrollAreas(const QString &pathPrefix)
 {
 	ToolStack *ts = m_w->findChild<ToolStack *>();
@@ -676,36 +648,6 @@ void ScopyMainWindow_API::switchTab(const QString &tabName)
 		}
 	}
 	qWarning(CAT_SCOPY_API) << "Tab not found:" << tabName;
-}
-
-QObject *ScopyMainWindow_API::getCurrentToolApi()
-{
-	// Find the name of the currently shown tool
-	ToolStack *ts = m_w->findChild<ToolStack *>();
-	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
-	QString currentToolName;
-	if(currentTool && !m_w->dm->connectedDev.isEmpty()) {
-		Device *dev = m_w->dm->getDevice(m_w->dm->connectedDev.back());
-		if(dev) {
-			for(ToolMenuEntry *tme : dev->toolList()) {
-				if(tme->tool() == currentTool) {
-					currentToolName = tme->name();
-					break;
-				}
-			}
-		}
-	}
-
-	// Return only the API whose objectName matches the current tool (case-insensitive) and exposes switchTab
-	const QList<ApiObject *> apis = ScopyJS::GetInstance()->getRegisteredApis();
-	for(ApiObject *api : apis) {
-		if(api->objectName().compare(currentToolName, Qt::CaseInsensitive) != 0)
-			continue;
-		if(api->metaObject()->indexOfMethod("switchTab(QString)") != -1) {
-			return api;
-		}
-	}
-	return nullptr;
 }
 
 #include "moc_scopymainwindow_api.cpp"

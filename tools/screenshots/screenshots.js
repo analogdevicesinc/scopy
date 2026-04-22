@@ -83,3 +83,5 @@ pages.forEach(function(page) {
         });
     }
 });
+
+scopy.disconnectDevice();
