@@ -67,8 +67,6 @@ public:
 	void unregisterApi(ApiObject *obj);
 	void registerApi(ApiObject *obj, QJSValue parentObj);
 	void unregisterApi(ApiObject *obj, QJSValue parentObj);
-	QList<ApiObject *> getRegisteredApis() const;
-
 public Q_SLOTS:
 	void hasText();
 
@@ -83,7 +81,6 @@ private:
 #endif
 	QSocketNotifier *notifier;
 	bool done;
-	QList<ApiObject *> m_registeredApis;
 	static ScopyJS *pinstance_;
 	static QLoggingCategory::CategoryFilter oldCategoryFilter;
 	static void jsCategoryFilter(QLoggingCategory *category);
