@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="11" height="36" viewBox="0 0 11 36" xmlns="http://www.w3.org/2000/svg">
+  <!-- left triangle -->
+  <polygon points="4,13 0,18 4,23" fill="#848B95"/>
+  <!-- right triangle -->
+  <polygon points="7,13 11,18 7,23" fill="#848B95"/>
+</svg>
