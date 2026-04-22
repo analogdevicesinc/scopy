@@ -6,10 +6,10 @@ Automated documentation screenshot tool for Scopy. It starts an IIO emulator, la
 
 ```
 tools/screenshots/
-├── README.md               # This file
-├── screenshots.py          # Main orchestrator (Python)
-├── screenshots.js          # Screenshot capture script (JS, runs inside Scopy)
-└── push_screenshots.sh     # Push screenshots to doc_resources branch
+├── README.md                  # This file
+├── screenshots.py             # Main orchestrator (Python)
+├── screenshots.js             # Screenshot capture script (JS, runs inside Scopy)
+└── compare_screenshots.py     # Compare screenshots between two CI runs
 ```
 
 ## Prerequisites
@@ -17,6 +17,7 @@ tools/screenshots/
 - `iio-emu` installed and on `PATH`
 - A built `scopy` binary
 - Python 3.6+
+- `Pillow` (only for `compare_screenshots.py`)
 
 ## Usage
 
@@ -65,22 +66,30 @@ In batch mode the tool:
 
 Output is organized as `<output-root>/<package>/<device>/`.
 
-### Pushing Screenshots
+### Comparing Screenshots
 
-After capturing, push them to the `doc_resources` branch:
+Compare screenshots from two CI runs to detect UI changes:
 
 ```bash
-bash tools/screenshots/push_screenshots.sh <package>
+python3 tools/screenshots/compare_screenshots.py \
+    --baseline ~/Downloads/screenshots-run1 \
+    --current ~/Downloads/screenshots-run2
 ```
 
-This creates a git worktree, copies the screenshots from `docs/screenshots/<package>/` to `resources/<package>/` on the `doc_resources` branch, commits, and pushes.
+| Argument      | Required | Description |
+|---------------|----------|-------------|
+| `--baseline`  | yes      | Path to baseline screenshots directory |
+| `--current`   | yes      | Path to current screenshots directory |
+| `--threshold` | no       | Max percentage of different pixels to consider images the same (default: 5.0) |
+
+The tool reports images that differ beyond the threshold, as well as images that exist in only one set.
 
 ## How It Works
 
 1. Reads `packages/<package>/emu-xml/emu_setup.json` to find the emulator config for the given device.
 2. Starts `iio-emu` with the configured type and XML in the background, waits for port `30431`.
 3. Creates a temporary JS wrapper that injects globals (`scopyUri`, `scopyOutDir`, `scopySkipPlugins`), then evaluates `screenshots.js`.
-4. Launches `scopy --script <wrapper>` with a 60s timeout per device.
+4. Launches `scopy --script <wrapper>` with a 3-minute timeout per device.
 5. Terminates `iio-emu` on completion.
 
 ### What screenshots.js captures
@@ -91,7 +100,7 @@ For each plugin/tool on the connected device:
 - **Scroll area screenshots** -- captures all visible scroll areas (menus/panels) with full scrolled content via `scopy.screenshotAllScrollAreas()`
 - **Tab screenshots** -- if the tool has tabs (`scopy.getTabs()`), switches to each tab and captures both a full screenshot and scroll areas per tab (`<tool>_<tab>.png`)
 
-Generic plugin tools (DataLoggerPlugin, ADCPlugin, etc.) are taken as part of ADALM-Pluto device then skipped for non-generic packages to avoid duplicate screenshots.
+Generic plugin tools (DataLoggerPlugin, ADCPlugin, etc.) are captured once via the first generic-plugins entry, then skipped for device-specific packages to avoid duplicates.
 
 ## emu_setup.json Format
 
