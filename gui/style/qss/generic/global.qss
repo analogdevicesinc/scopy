@@ -7,12 +7,31 @@ QWidget {
     font-weight: normal;
 }
 
-QSplitter { color: &content_default& }
-QSplitter::handle:horizontal { width: 6px; }
-QSplitter::handle:vertical { height: 6px; }
-QSplitter::handle:hover { background-color: &background_secondary&; }
-QSplitter::handle:pressed { background-color: &background_secondary&; }
-QSplitter::handle:disabled { background-color: transparent; }
+QSplitter {
+    background-color: &background_subtle&;
+}
+QSplitter::handle:horizontal {
+    width: 11px;
+    background-color: transparent;
+    image: url(:/gui/icons/splitter_grip_h.svg);
+}
+QSplitter::handle:vertical {
+    height: 11px;
+    background-color: transparent;
+    image: url(:/gui/icons/splitter_grip_v.svg);
+}
+QSplitter::handle:horizontal:hover,
+QSplitter::handle:vertical:hover {
+    background-color: &interactive_subtle_hover&;
+}
+QSplitter::handle:horizontal:pressed,
+QSplitter::handle:vertical:pressed {
+    background-color: &interactive_primary_idle&;
+}
+QSplitter::handle:disabled {
+    background-color: transparent;
+    image: none;
+}
 
 QTextBrowser {
     border: none;
@@ -94,16 +113,6 @@ QLineEdit {
     border-radius: &radius_interactive&;
     padding: 0 &padding_interactive& 0 &padding_interactive&;
     selection-background-color: &interactive_subtle_pressed&;
-}
-
-QSplitter {
-    background-color: &background_subtle&;
-}
-QSplitter::handle:horizontal {
-    width: &unit_0_5&;
-}
-QSplitter::handle:vertical {
-    height: &unit_0_5&;
 }
 
 QLabel {

@@ -16,6 +16,8 @@
         <file>icons/close_hovered.svg</file>
         <file>icons/gate_handle.svg</file>
         <file>icons/h_cursor_handle.svg</file>
+        <file>icons/splitter_grip_h.svg</file>
+        <file>icons/splitter_grip_v.svg</file>
         <file>icons/handle_down_arrow.svg</file>
         <file>icons/handle_right_arrow.svg</file>
         <file>icons/handle_left_arrow.svg</file>
