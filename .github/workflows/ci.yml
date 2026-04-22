@@ -104,13 +104,3 @@ jobs:
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
 
-    doc-screenshots:
-      needs: docker_tag
-      if: >-
-        always() &&
-        github.event_name == 'pull_request' &&
-        (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/doc-screenshots.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-
