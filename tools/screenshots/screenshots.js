@@ -29,11 +29,11 @@
  *   scopySkipPlugins  - JSON array of plugin names to skip (e.g. ["ADCPlugin", "DACPlugin"])
  */
 
-scopy.addDevice(scopyUri);
-scopy.connectDevice(0);
+var deviceId = scopy.addDevice(scopyUri);
+scopy.connectDevice(deviceId);
 
 var skipList = scopySkipPlugins || [];
-var plugins = scopy.getPlugins(0);
+var plugins = scopy.getPlugins(scopyUri);
 
 plugins.forEach(function(plugin) {
     if(skipList.indexOf(plugin) !== -1) return;
