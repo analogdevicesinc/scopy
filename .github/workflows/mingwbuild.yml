@@ -15,6 +15,14 @@ jobs:
       with:
         fetch-depth: '0'
 
+    - name: Docker issue workaround # This is the recommended workaround for the issue described here: https://github.com/actions/runner-images/issues/13729
+      id: docker-workaround
+      run: |
+          $dockerState = Get-Service -Name "docker"
+          if ($dockerState.Status -ne "Running") {
+          Start-Service -Name "docker"
+          }
+
     - name: Pull the Docker Image
       run: docker pull cristianbindea/scopy2-mingw64:${{ inputs.docker_tag }}
 
