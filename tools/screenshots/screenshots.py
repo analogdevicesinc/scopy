@@ -148,7 +148,7 @@ def configure_scopy_preferences(scopy_bin):
     os.makedirs(prefs_dir, exist_ok=True)
     prefs_file = os.path.join(prefs_dir, "preferences.ini")
 
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(strict=False)
     config.read(prefs_file)
     if "General" not in config:
         config["General"] = {}
