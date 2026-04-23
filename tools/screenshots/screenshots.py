@@ -140,8 +140,8 @@ def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None):
 # 3 minutes per device should be more than enough, but we don't want to wait indefinitely if something hangs
 SCOPY_TIMEOUT = 180
 
-def disable_first_run_dialog():
-    """Set general_first_run=false in Scopy preferences to skip the license dialog."""
+def configure_scopy_preferences(scopy_bin):
+    """Configure Scopy preferences for headless screenshot capture."""
     import configparser
 
     prefs_dir = os.path.join(os.path.expanduser("~"), ".config", "ADI", "Scopy-v2")
@@ -153,9 +153,15 @@ def disable_first_run_dialog():
     if "General" not in config:
         config["General"] = {}
     config["General"]["general_first_run"] = "false"
+    config["General"]["general_dont_show_whats_new"] = "true"
+
+    packages_dir = os.path.join(os.path.dirname(os.path.abspath(scopy_bin)), "packages")
+    config["General"]["packages_path"] = packages_dir
+
     with open(prefs_file, "w") as f:
         config.write(f)
-    print(f"[doc] Disabled first-run license dialog in {prefs_file}")
+    print(f"[doc] Configured Scopy preferences in {prefs_file}")
+    print(f"[doc]   packages_path = {packages_dir}")
 
 
 def run_scopy(scopy_bin, wrapper_path):
@@ -223,7 +229,7 @@ def discover_all_packages():
 
 def run_single(args):
     """Run screenshot capture for a single package/emu-file."""
-    disable_first_run_dialog()
+    configure_scopy_preferences(args.scopy)
     emu_dir, entry = find_emu_setup(args.package, args.emu_file)
     uri = entry["uri"]
 
@@ -271,7 +277,7 @@ def run_single(args):
 
 def run_all(args):
     """Discover all packages and run screenshot capture for each device entry."""
-    disable_first_run_dialog()
+    configure_scopy_preferences(args.scopy)
     js_script = os.path.join(SCRIPT_DIR, "screenshots.js")
     if not os.path.isfile(js_script):
         print(f"[doc] ERROR: JS script not found at {js_script}")
