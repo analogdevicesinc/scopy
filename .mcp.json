@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "scopy": {
+      "command": "uv",
+      "args": ["run", "--directory", "tools/scopy-mcp-server", "scopy-mcp-server"],
+      "env": {
+        "SCOPY_PATH": "/home/imuthi/scopy/build/Qt_5_15_2_gcc_64-Debug/scopy"
+      }
+    }
+  }
+}
