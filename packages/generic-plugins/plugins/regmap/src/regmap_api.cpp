@@ -55,6 +55,8 @@ QStringList RegMap_API::getAvailableDevicesName()
 	return devices->keys();
 }
 
+QString RegMap_API::getDevice() { return m_regMapPlugin->registerMapTool->activeRegisterMap; }
+
 bool RegMap_API::setDevice(QString device)
 {
 	m_regMapPlugin->registerMapTool->updateActiveRegisterMap(device);

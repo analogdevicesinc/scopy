@@ -53,6 +53,7 @@ public:
 	Q_INVOKABLE void write(QString addr, QString val);
 	Q_INVOKABLE void writeBitField(QString addr, QString val);
 	Q_INVOKABLE QStringList getAvailableDevicesName();
+	Q_INVOKABLE QString getDevice();
 	Q_INVOKABLE bool setDevice(QString device);
 	Q_INVOKABLE QList<QString> search(QString searchParam);
 	Q_INVOKABLE void readInterval(QString startAddr, QString stopAddr);
