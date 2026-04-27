@@ -395,6 +395,7 @@ build_iio-emu() {
 
 build_scopy() {
 	echo "### Building scopy"
+	git config --global --add safe.directory $SRC_DIR
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\

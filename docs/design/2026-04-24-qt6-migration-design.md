@@ -82,20 +82,106 @@ main ─────────────────────────
 ---
 
 ### PR 3: CMake Build System Migration
-**Scope:** Build system files only — `CMakeLists.txt` across all modules.
+**Scope:** Build system files only — `CMakeLists.txt` across all modules. No source code changes.
 
-| File | Change |
-|------|--------|
-| `CMakeLists.txt` (root) | `find_package(QT NAMES Qt6 ...)`, add `OpenGLWidgets`, `StateMachine` |
-| `pkg-manager/CMakeLists.txt` | `KF5Archive` → `KF6Archive` |
-| `gui/CMakeLists.txt` | Add `Qt6::OpenGLWidgets`, `Qt6::StateMachine`; `QWT_QT_VERSION qt6` |
-| `packages/*/CMakeLists.txt` | `Qt5::*` → `Qt${QT_VERSION_MAJOR}::*` |
-| `cmake/Modules/` | Any custom Find modules that reference Qt5 explicitly |
-| `common/include/common/common.h` | Remove Qt 5.14 compat shim |
+**Testing:** All cmake configuration and builds run inside the local Docker image `scopy2-ubuntu24-qt6:testing`.
 
-**Reference:** PoC commit `eb9d183db` (first build with Qt6).
+#### Step 3.1: Root `CMakeLists.txt`
 
-**Validation:** `cmake -B build-qt6 -DCMAKE_PREFIX_PATH=/opt/Qt/6.8.3/gcc_64` succeeds (configuration stage).
+| Line | Current | Change To | Why |
+|------|---------|-----------|-----|
+| 65 | `find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)` | `find_package(QT NAMES Qt6 REQUIRED COMPONENTS Widgets)` | Target Qt6 only (no dual-version support needed on this branch) |
+| 75-80 | `if(Qt5Widgets_VERSION VERSION_LESS 5.15.2)` version check + status message using `Qt5Widgets_VERSION` | Replace with: `message(STATUS "Using Qt version: ${QT_VERSION}")` | Qt5-specific variable; Qt6 uses `QT_VERSION` directly |
+| 246 | `find_package(KF5Archive REQUIRED)` | `find_package(KF6Archive REQUIRED)` | KDE Frameworks 6 with Qt6 |
+| 247 | `if(KF5Archive_FOUND)` | `if(KF6Archive_FOUND)` | Match package name |
+| 248 | `message(STATUS "Using KF5Archive")` | `message(STATUS "Using KF6Archive")` | Match package name |
+| 262 | `target_link_libraries(... PUBLIC KF5::Archive)` | `target_link_libraries(... PUBLIC KF6::Archive)` | KF6 namespace |
+| 261 | `if(KF5Archive_FOUND)` | `if(KF6Archive_FOUND)` | Match package name |
+
+#### Step 3.2: `pkg-manager/CMakeLists.txt`
+
+| Line | Current | Change To | Why |
+|------|---------|-----------|-----|
+| 67 | `find_package(KF5Archive QUIET)` | `find_package(KF6Archive QUIET)` | KDE Frameworks 6 |
+| 68 | `if(KF5Archive_FOUND)` | `if(KF6Archive_FOUND)` | Match package name |
+| 69 | `target_link_libraries(... PUBLIC KF5::Archive)` | `target_link_libraries(... PUBLIC KF6::Archive)` | KF6 namespace |
+
+#### Step 3.3: `gui/CMakeLists.txt`
+
+| Line | Current | Change To | Why |
+|------|---------|-----------|-----|
+| 69 | `set(QWT_QT_VERSION qt5)` | `set(QWT_QT_VERSION qt6)` | QWT Qt6 library naming |
+| 110 | `find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)` | `find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg StateMachine REQUIRED)` | `QSignalTransition` in `gui/src/menu_anim.cpp` moved to StateMachine module in Qt6 |
+
+Also add `Qt${QT_VERSION_MAJOR}::StateMachine` to `target_link_libraries` for scopy-gui.
+
+#### Step 3.4: `core/CMakeLists.txt`
+
+| Line | Current | Change To | Why |
+|------|---------|-----------|-----|
+| 43 | `set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network)` | `set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network OpenGLWidgets)` | `QOpenGLWidget` in `core/src/scopymainwindow.cpp` moved to separate module in Qt6 |
+
+#### Step 3.5: `packages/imu/plugins/imuanalyzer/CMakeLists.txt`
+
+| Lines | Current | Change To | Why |
+|-------|---------|-----------|-----|
+| 109-110 | `Qt::Widgets`, `Qt::Core` | Keep (unversioned aliases work in Qt6) | Already compatible |
+| 115-121 | Hardcoded `Qt5::Core`, `Qt5::Gui`, `Qt5::Widgets`, `Qt5::3DCore`, `Qt5::3DExtras`, `Qt5::3DRender`, `Qt5::3DInput` | Replace with `Qt${QT_VERSION_MAJOR}::Core`, `Qt${QT_VERSION_MAJOR}::Gui`, `Qt${QT_VERSION_MAJOR}::Widgets`, `Qt${QT_VERSION_MAJOR}::3DCore`, `Qt${QT_VERSION_MAJOR}::3DExtras`, `Qt${QT_VERSION_MAJOR}::3DRender`, `Qt${QT_VERSION_MAJOR}::3DInput` | Hardcoded Qt5 namespaces break Qt6 |
+
+#### Step 3.6: `packages/generic-plugins/plugins/regmap/CMakeLists.txt`
+
+| Line | Current | Change To | Why |
+|------|---------|-----------|-----|
+| 130 | `Qt5::Test` | `Qt${QT_VERSION_MAJOR}::Test` | Hardcoded Qt5 namespace |
+
+#### Step 3.7: `packages/m2k/plugins/m2k/m2k-gui/CMakeLists.txt`
+
+| Line | Current | Change To | Why |
+|------|---------|-----------|-----|
+| 52 | `set(QWT_QT_VERSION qt5)` | `set(QWT_QT_VERSION qt6)` | QWT Qt6 library naming |
+
+> **Note:** M2K plugin is out of scope for source code changes but QWT version must still be updated for the build to find the correct QWT library.
+
+#### Step 3.8: `common/include/common/common.h`
+
+| Lines | Current | Change To | Why |
+|-------|---------|-----------|-----|
+| 28-33 | Qt 5.14 compat shim (`namespace Qt { endl, SkipEmptyParts }`) | Remove entirely | Qt6 is always ≥ 6.0, so the `QT_VERSION < 5.14` guard is never true |
+
+#### Step 3.9: `cmake/Modules/FindQwt.cmake`
+
+No changes needed — already includes both qt5 and qt6 search paths and library names.
+
+#### Verification
+
+Run inside the Docker container:
+```bash
+docker run -it --rm \
+  -v /path/to/scopy:/home/runner/scopy \
+  scopy2-ubuntu24-qt6:testing bash
+
+# Inside container
+git config --global --add safe.directory /home/runner/scopy
+cd /home/runner/scopy
+cmake -B build-qt6 -DCMAKE_PREFIX_PATH=/opt/Qt/6.8.3/gcc_64 -DENABLE_ALL_PACKAGES=ON
+```
+
+**Expected result:** cmake configuration completes successfully (compilation will fail until PR 4-6 are merged — this is expected at this stage).
+
+**Verification checks:**
+- `grep "Using Qt version: 6.8.3" build-qt6/CMakeCache.txt` or cmake output confirms Qt6 detected
+- `grep "KF6Archive" build-qt6/CMakeCache.txt` confirms KF6 linkage
+- No `Qt5::` references remain: `grep -rn "Qt5::" --include="CMakeLists.txt" . | grep -v m2k` returns zero hits (excluding m2k source changes which are deferred)
+
+#### Debug Notes — Issues Found During First Build Test (2026-04-27)
+
+**Issue 1: `cmake/Modules/ScopyTest.cmake` — hardcoded `Qt5` references**
+We ran `build_scopy` inside Docker and cmake failed with `Could not find a package configuration file provided by "Qt5"` at `ScopyTest.cmake:30`. Root cause: `ScopyTest.cmake` had `find_package(Qt5 COMPONENTS Test REQUIRED)` and `target_link_libraries(... Qt5::Test ...)` hardcoded instead of using `Qt${QT_VERSION_MAJOR}`. This file was missed in the initial PR 3 plan because the search only covered `CMakeLists.txt` files, not cmake modules in `cmake/Modules/`. Fix: replaced both occurrences with `Qt${QT_VERSION_MAJOR}` variants.
+
+**Issue 2: Git safe directory — `ScopyAbout.cmake` fails on `string REPLACE`**
+Same build test showed `CMake Error at cmake/Modules/ScopyAbout.cmake:63 (string): string sub-command REPLACE requires at least four arguments`. Root cause: when running inside Docker with a bind-mounted volume, git refuses to operate on the repo due to "dubious ownership" (container user `root` ≠ host user). The `ScopyAbout.cmake` module runs `git` commands to extract commit info, gets empty strings, and the `string(REPLACE ...)` call fails with too few arguments. Fix: added `git config --global --add safe.directory $SRC_DIR` at the start of the `build_scopy()` function in `ubuntu_build_process_qt6.sh`.
+
+**Note:** `cmake/Modules/ScopyMacOS.cmake:41` also has a hardcoded `Qt5Gui_PLUGINS` reference, but this is macOS-only and not blocking the Linux build. Will be addressed when macOS support is ported.
 
 ---
 

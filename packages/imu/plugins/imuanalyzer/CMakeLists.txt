@@ -112,13 +112,13 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
-	       Qt5::Core
-	       Qt5::Gui
-	       Qt5::Widgets
-	       Qt5::3DCore
-	       Qt5::3DExtras
-	       Qt5::3DRender
-	       Qt5::3DInput
+	       Qt${QT_VERSION_MAJOR}::Core
+	       Qt${QT_VERSION_MAJOR}::Gui
+	       Qt${QT_VERSION_MAJOR}::Widgets
+	       Qt${QT_VERSION_MAJOR}::3DCore
+	       Qt${QT_VERSION_MAJOR}::3DExtras
+	       Qt${QT_VERSION_MAJOR}::3DRender
+	       Qt${QT_VERSION_MAJOR}::3DInput
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
