@@ -21,6 +21,7 @@
 
 #include "scopyhomepage.h"
 
+#include "infopagestack.h"
 #include "scopyhomeinfopage.h"
 
 #include "ui_scopyhomepage.h"
@@ -28,6 +29,7 @@
 #include <QPushButton>
 
 #include <deviceicon.h>
+#include <gui/homepage_controls.h>
 #include <style.h>
 
 using namespace scopy;
@@ -55,11 +57,11 @@ ScopyHomePage::ScopyHomePage(QWidget *parent)
 
 	Style::setStyle(scanBtn(), style::properties::button::basicButton);
 	scanBtn()->setFixedWidth(Style::getDimension(json::global::unit_5));
-	connect(hc, SIGNAL(goLeft()), db, SLOT(prevDevice()));
-	connect(hc, SIGNAL(goRight()), db, SLOT(nextDevice()));
-	connect(db, SIGNAL(requestDevice(QString, int)), is, SLOT(slideInKey(QString, int)));
-	connect(db, SIGNAL(requestDevice(QString, int)), this, SIGNAL(requestDevice(QString)));
-	connect(this, SIGNAL(deviceAddedToUi(QString)), add, SLOT(deviceAddedToUi(QString)));
+	connect(hc, &HomepageControls::goLeft, db, &DeviceBrowser::prevDevice);
+	connect(hc, &HomepageControls::goRight, db, &DeviceBrowser::nextDevice);
+	connect(db, &DeviceBrowser::requestDevice, is, &InfoPageStack::slideInKey);
+	connect(db, &DeviceBrowser::requestDevice, this, [this](QString id, int) { Q_EMIT requestDevice(id); });
+	connect(this, &ScopyHomePage::deviceAddedToUi, add, &ScopyHomeAddPage::deviceAddedToUi);
 
 	connect(add, &ScopyHomeAddPage::requestDevice, this, [=](QString id) { Q_EMIT db->requestDevice(id, -1); });
 	connect(add, &ScopyHomeAddPage::newDeviceAvailable, this, [=](DeviceImpl *d) { Q_EMIT newDeviceAvailable(d); });

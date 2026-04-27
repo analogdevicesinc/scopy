@@ -66,10 +66,10 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 	ui->SBA_LineEdit->installEventFilter(this);
 	ui->SBA_CompletionCircle->installEventFilter(this);
 
-	connect(ui->SBA_Combobox, SIGNAL(currentIndexChanged(int)), SLOT(onComboboxIndexChanged(int)));
-	connect(ui->SBA_LineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
-	connect(ui->SBA_UpButton, SIGNAL(clicked()), SLOT(onUpButtonPressed()));
-	connect(ui->SBA_DownButton, SIGNAL(clicked()), SLOT(onDownButtonPressed()));
+	connect(ui->SBA_Combobox, &QComboBox::currentIndexChanged, this, &SpinBoxA::onComboboxIndexChanged);
+	connect(ui->SBA_LineEdit, &QLineEdit::editingFinished, this, &SpinBoxA::onLineEditTextEdited);
+	connect(ui->SBA_UpButton, &QPushButton::clicked, this, &SpinBoxA::onUpButtonPressed);
+	connect(ui->SBA_DownButton, &QPushButton::clicked, this, &SpinBoxA::onDownButtonPressed);
 	int size = Style::getDimension(json::global::unit_3);
 
 	Style::setStyle(ui->SBA_Combobox, style::properties::widget::noBorder);
@@ -84,8 +84,8 @@ SpinBoxA::SpinBoxA(QWidget *parent)
 	Style::setStyle(ui->SBA_DownButton, style::properties::button::spinboxButton, true, true);
 	ui->SBA_DownButton->setFixedSize(size, size);
 
-	connect(this, SIGNAL(valueChanged(double)), ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
-	connect(ui->SBA_CompletionCircle, SIGNAL(toggled(bool)), SLOT(setFineMode(bool)));
+	connect(this, &SpinBoxA::valueChanged, ui->SBA_CompletionCircle, &CompletionCircle::setValueDouble);
+	connect(ui->SBA_CompletionCircle, &CompletionCircle::toggled, this, &SpinBoxA::setFineMode);
 
 	m_displayScale = 1;
 }

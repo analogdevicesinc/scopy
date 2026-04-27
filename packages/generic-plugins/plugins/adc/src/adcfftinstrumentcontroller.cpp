@@ -365,12 +365,12 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 
 	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
-	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
-	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+	connect(c, &GRFFTSinkComponent::arm, this, &ADCFFTInstrumentController::onStart);
+	connect(c, &GRFFTSinkComponent::disarm, this, &ADCFFTInstrumentController::onStop);
 
 	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
-	connect(c, SIGNAL(requestForceStop()), this, SLOT(stop()));
+	connect(c, &GRFFTSinkComponent::requestForceStop, this, &ADCFFTInstrumentController::stop);
 }
 
 void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)

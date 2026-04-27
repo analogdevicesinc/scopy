@@ -115,7 +115,7 @@ bool SymbolController::eventFilter(QObject *object, QEvent *event)
 			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 
 			if(mouseEvent->button() == Qt::LeftButton) {
-				const bool accepted = pressed(mouseEvent->pos());
+				const bool accepted = pressed(mouseEvent->position().toPoint());
 
 				if(accepted) {
 					d_overlay->updateOverlay();
@@ -127,7 +127,7 @@ bool SymbolController::eventFilter(QObject *object, QEvent *event)
 		}
 		case QEvent::MouseMove: {
 			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
-			const bool accepted = moved(mouseEvent->pos());
+			const bool accepted = moved(mouseEvent->position().toPoint());
 
 			if(accepted)
 				d_overlay->updateOverlay();
@@ -138,7 +138,7 @@ bool SymbolController::eventFilter(QObject *object, QEvent *event)
 			const QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
 
 			if(mouseEvent->button() == Qt::LeftButton) {
-				released(mouseEvent->pos());
+				released(mouseEvent->position().toPoint());
 			}
 
 			break;

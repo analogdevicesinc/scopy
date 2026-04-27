@@ -25,6 +25,7 @@
 #include <qwt_interval.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_map.h>
+#include <qwt_scale_widget.h>
 
 /*
  * Abstract Class Symbol
@@ -48,8 +49,8 @@ Symbol::Symbol(QObject *parent, const QSize &size, QwtAxisId fixedAxis, QwtAxisI
 	const QwtScaleWidget *fAxis = plot()->axisWidget(d_fixedAxis);
 	const QwtScaleWidget *mAxis = plot()->axisWidget(d_mobileAxis);
 
-	QObject::connect((const QObject *)fAxis, SIGNAL(scaleDivChanged()), this, SLOT(onFixedScaleChanged()));
-	QObject::connect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this, SLOT(onMobileScaleChanged()));
+	QObject::connect(fAxis, &QwtScaleWidget::scaleDivChanged, this, &Symbol::onFixedScaleChanged);
+	QObject::connect(mAxis, &QwtScaleWidget::scaleDivChanged, this, &Symbol::onMobileScaleChanged);
 
 	onFixedScaleChanged();
 	onMobileScaleChanged();
@@ -97,11 +98,11 @@ void Symbol::setMobileAxis(QwtAxisId newAxis)
 {
 	if(d_mobileAxis != newAxis) {
 		const QwtScaleWidget *mAxis = plot()->axisWidget(d_mobileAxis);
-		disconnect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this, SLOT(onMobileScaleChanged()));
+		disconnect(mAxis, &QwtScaleWidget::scaleDivChanged, this, &Symbol::onMobileScaleChanged);
 
 		d_mobileAxis = newAxis;
 		mAxis = plot()->axisWidget(newAxis);
-		connect((const QObject *)mAxis, SIGNAL(scaleDivChanged()), this, SLOT(onMobileScaleChanged()));
+		connect(mAxis, &QwtScaleWidget::scaleDivChanged, this, &Symbol::onMobileScaleChanged);
 		onMobileScaleChanged();
 	}
 }
@@ -110,11 +111,11 @@ void Symbol::setFixedAxis(QwtAxisId newAxis)
 {
 	if(d_fixedAxis != newAxis) {
 		const QwtScaleWidget *fAxis = plot()->axisWidget(d_fixedAxis);
-		disconnect((const QObject *)fAxis, SIGNAL(scaleDivChanged()), this, SLOT(onFixedScaleChanged()));
+		disconnect(fAxis, &QwtScaleWidget::scaleDivChanged, this, &Symbol::onFixedScaleChanged);
 
 		d_fixedAxis = newAxis;
 		fAxis = plot()->axisWidget(newAxis);
-		connect((const QObject *)fAxis, SIGNAL(scaleDivChanged()), this, SLOT(onFixedScaleChanged()));
+		connect(fAxis, &QwtScaleWidget::scaleDivChanged, this, &Symbol::onFixedScaleChanged);
 		onFixedScaleChanged();
 	}
 }
@@ -252,8 +253,10 @@ VertDebugSymbol::VertDebugSymbol(QObject *parent, const QSize &size, bool oppose
 	setAnchor(QPoint(x, surface().height() / 2));
 
 	// Pass the base positionChanged(double, double) signal as positionChanged(double)
-	connect(this, SIGNAL(positionChanged(double, double)), this, SLOT(onBasePositionChanged(double, double)));
-	connect(this, SIGNAL(pixelPositionChanged(int, int)), this, SLOT(onBasePixelPositionChanged(int, int)));
+	connect(this, qOverload<double, double>(&Symbol::positionChanged), this,
+		&VertDebugSymbol::onBasePositionChanged);
+	connect(this, qOverload<int, int>(&Symbol::pixelPositionChanged), this,
+		&VertDebugSymbol::onBasePixelPositionChanged);
 }
 
 void VertDebugSymbol::draw(QPainter *painter) const
@@ -345,8 +348,10 @@ HorizDebugSymbol::HorizDebugSymbol(QObject *parent, const QSize &size, bool oppo
 	setAnchor(QPoint(surface().width() / 2, y));
 
 	// Pass the base positionChanged(double, double) signal as positionChanged(double)
-	connect(this, SIGNAL(positionChanged(double, double)), this, SLOT(onBasePositionChanged(double, double)));
-	connect(this, SIGNAL(pixelPositionChanged(int, int)), this, SLOT(onBasePixelPositionChanged(int, int)));
+	connect(this, qOverload<double, double>(&Symbol::positionChanged), this,
+		&HorizDebugSymbol::onBasePositionChanged);
+	connect(this, qOverload<int, int>(&Symbol::pixelPositionChanged), this,
+		&HorizDebugSymbol::onBasePixelPositionChanged);
 }
 
 void HorizDebugSymbol::draw(QPainter *painter) const

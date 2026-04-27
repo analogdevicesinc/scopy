@@ -305,7 +305,7 @@ void BufferPreviewer::mousePressEvent(QMouseEvent *event)
 		m_rightBtnClick = true;
 	} else {
 		setCursor(Qt::ClosedHandCursor);
-		m_offset = event->pos();
+		m_offset = event->position().toPoint();
 		Q_EMIT bufferStartDrag();
 	}
 }
@@ -313,7 +313,7 @@ void BufferPreviewer::mousePressEvent(QMouseEvent *event)
 void BufferPreviewer::mouseMoveEvent(QMouseEvent *event)
 {
 	if(!m_rightBtnClick) {
-		int value = (event->pos() - m_offset).x();
+		int value = (event->position().toPoint() - m_offset).x();
 		Q_EMIT bufferMovedBy(value);
 	}
 }

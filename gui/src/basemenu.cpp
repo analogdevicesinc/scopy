@@ -123,7 +123,7 @@ void BaseMenu::dragEnterEvent(QDragEnterEvent *event)
 		return;
 	}
 
-	if(!d_ui->verticalSpacer->geometry().contains(event->pos()) ||
+	if(!d_ui->verticalSpacer->geometry().contains(event->position().toPoint()) ||
 	   !event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)) {
 		event->ignore();
 		return;

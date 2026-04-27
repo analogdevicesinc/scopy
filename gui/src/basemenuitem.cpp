@@ -76,7 +76,7 @@ void BaseMenuItem::setPosition(int position) { d_position = position; }
 void BaseMenuItem::mousePressEvent(QMouseEvent *event)
 {
 	if(event->button() == Qt::LeftButton) {
-		d_dragStartPosition = event->pos();
+		d_dragStartPosition = event->position().toPoint();
 	}
 }
 
@@ -88,7 +88,7 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 
-	if((event->pos() - d_dragStartPosition).manhattanLength() < QApplication::startDragDistance()) {
+	if((event->position().toPoint() - d_dragStartPosition).manhattanLength() < QApplication::startDragDistance()) {
 		return;
 	}
 
@@ -112,7 +112,7 @@ void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 
 	drag->setPixmap(pix);
 	drag->setMimeData(mimeData);
-	drag->setHotSpot(event->pos());
+	drag->setHotSpot(event->position().toPoint());
 
 	drag->exec(Qt::MoveAction);
 
@@ -181,7 +181,7 @@ void BaseMenuItem::dropEvent(QDropEvent *event)
 		return;
 	}
 
-	bool dropAfter = d_botDragbox.contains(event->pos());
+	bool dropAfter = d_botDragbox.contains(event->position().toPoint());
 
 	if(event->mimeData()->hasFormat(menuItemMimeDataType)) {
 		short from = (short)event->mimeData()->data(menuItemMimeDataType)[1];

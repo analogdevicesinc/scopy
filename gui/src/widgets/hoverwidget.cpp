@@ -74,9 +74,10 @@ void HoverWidget::setDraggable(bool draggable)
 void HoverWidget::mousePressEvent(QMouseEvent *event)
 {
 	raise();
-	if(event->button() == Qt::LeftButton && m_content->geometry().contains(event->pos()) && m_draggable) {
+	if(event->button() == Qt::LeftButton && m_content->geometry().contains(event->position().toPoint()) &&
+	   m_draggable) {
 		is_dragging = true;
-		mouse_pos = new QPoint(event->pos());
+		mouse_pos = new QPoint(event->position().toPoint());
 	}
 }
 
@@ -95,7 +96,7 @@ void HoverWidget::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 
-	QPoint new_pos = event->pos() - *mouse_pos;
+	QPoint new_pos = event->position().toPoint() - *mouse_pos;
 	QPoint topLeft = mapToParent(m_content->geometry().topLeft());
 	QPoint new_topLeft = mapToParent(m_content->geometry().topLeft() + new_pos);
 	QPoint bottomRight = mapToParent(m_content->geometry().bottomRight());
@@ -186,7 +187,7 @@ bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 	if(watched == m_content) {
 		if(event->type() == QEvent::HoverMove) {
 			QMouseEvent *e = static_cast<QMouseEvent *>(event);
-			if(m_content->geometry().contains(e->pos()) && m_draggable)
+			if(m_content->geometry().contains(e->position().toPoint()) && m_draggable)
 				m_content->setCursor(Qt::ClosedHandCursor);
 			else
 				m_content->setCursor(Qt::ArrowCursor);

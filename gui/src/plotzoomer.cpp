@@ -194,8 +194,8 @@ void PlotZoomer::rescale(const QRectF &rect)
 
 void PlotZoomer::onZoomResize(QMouseEvent *event)
 {
-	double x = m_xAxisEn ? event->pos().x() : m_canvas->rect().right();
-	double y = m_yAxisEn ? event->pos().y() : m_canvas->rect().bottom();
+	double x = m_xAxisEn ? event->position().toPoint().x() : m_canvas->rect().right();
+	double y = m_yAxisEn ? event->position().toPoint().y() : m_canvas->rect().bottom();
 
 	QPoint origin = m_origin;
 	origin.rx() = m_xAxisEn ? m_origin.x() : 0;
@@ -222,7 +222,7 @@ void PlotZoomer::onZoomResize(QMouseEvent *event)
 
 void PlotZoomer::onZoomStart(QMouseEvent *event)
 {
-	m_origin = QPoint(event->pos().x(), event->pos().y());
+	m_origin = event->position().toPoint();
 	m_rubberBand = new QRubberBand(QRubberBand::Rectangle, m_canvas);
 	m_rubberBand->setGeometry(QRect(m_origin, QSize()));
 

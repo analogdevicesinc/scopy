@@ -53,9 +53,9 @@ DeviceBrowser::DeviceBrowser(QWidget *parent)
 
 	initBtns();
 
-	connect(ui->btnHome, SIGNAL(clicked()), this, SLOT(forwardRequestDeviceWithDirection()));
-	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(forwardRequestDeviceWithDirection()));
-	connect(this, SIGNAL(requestDevice(QString, int)), this, SLOT(updateSelectedDeviceIdx(QString)));
+	connect(ui->btnHome, &QPushButton::clicked, this, &DeviceBrowser::forwardRequestDeviceWithDirection);
+	connect(ui->btnAdd, &QPushButton::clicked, this, &DeviceBrowser::forwardRequestDeviceWithDirection);
+	connect(this, &DeviceBrowser::requestDevice, this, &DeviceBrowser::updateSelectedDeviceIdx);
 
 	connect(scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, this,
 		&DeviceBrowser::onScrollRangeChanged);

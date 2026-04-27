@@ -122,7 +122,7 @@ void IioTabWidget::setupConnections()
 	connect(m_fwScan, &QFutureWatcher<int>::started, m_btnScan, &AnimationPushButton::startAnimation,
 		Qt::QueuedConnection);
 	connect(m_fwScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::scanFinished, Qt::QueuedConnection);
-	connect(m_btnScan, SIGNAL(clicked()), this, SLOT(futureScan()), Qt::QueuedConnection);
+	connect(m_btnScan, &QPushButton::clicked, this, &IioTabWidget::futureScan, Qt::QueuedConnection);
 
 	connect(m_avlCtxCb, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int idx) {
 		if(idx >= 0 && idx < m_scanList.size()) {
@@ -136,7 +136,7 @@ void IioTabWidget::setupConnections()
 		Qt::QueuedConnection);
 	connect(m_fwSerialScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::serialScanFinished,
 		Qt::QueuedConnection);
-	connect(m_btnSerialScan, SIGNAL(clicked()), this, SLOT(futureSerialScan()), Qt::QueuedConnection);
+	connect(m_btnSerialScan, &QPushButton::clicked, this, &IioTabWidget::futureSerialScan, Qt::QueuedConnection);
 	// serial widget connections
 	connect(m_serialPortCb->combo(), &QComboBox::textActivated, this, [this]() {
 		QString crtText = m_serialPortCb->combo()->currentText();

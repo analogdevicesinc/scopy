@@ -83,17 +83,17 @@ void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 {
 	PageNavigationWidget *navWidget = new PageNavigationWidget(true, false, this);
 	QPushButton *homeButton = navWidget->getHomeBtn();
-	connect(homeButton, SIGNAL(clicked()), browser, SLOT(home()));
+	connect(homeButton, &QPushButton::clicked, browser, &QTextBrowser::home);
 
 	QPushButton *backwardButton = navWidget->getBackwardBtn();
 	backwardButton->setEnabled(false);
-	connect(backwardButton, SIGNAL(clicked()), browser, SLOT(backward()));
+	connect(backwardButton, &QPushButton::clicked, browser, &QTextBrowser::backward);
 	connect(browser, &QTextBrowser::backwardAvailable, backwardButton,
 		[=](bool available) { backwardButton->setEnabled(available); });
 
 	QPushButton *forwardButton = navWidget->getForwardBtn();
 	forwardButton->setEnabled(false);
-	connect(forwardButton, SIGNAL(clicked()), browser, SLOT(forward()));
+	connect(forwardButton, &QPushButton::clicked, browser, &QTextBrowser::forward);
 	connect(browser, &QTextBrowser::forwardAvailable, forwardButton,
 		[=](bool available) { forwardButton->setEnabled(available); });
 

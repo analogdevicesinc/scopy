@@ -131,8 +131,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 			}
 		},
 		Qt::QueuedConnection);
-	connect(browseMenu, SIGNAL(requestLoad()), this, SLOT(load()));
-	connect(browseMenu, SIGNAL(requestSave()), this, SLOT(save()));
+	connect(browseMenu, &BrowseMenu::requestLoad, this, QOverload<>::of(&ScopyMainWindow::load));
+	connect(browseMenu, &BrowseMenu::requestSave, this, QOverload<>::of(&ScopyMainWindow::save));
 	connect(browseMenu, &BrowseMenu::collapsed, this, &ScopyMainWindow::collapseToolMenu);
 	connect(browseMenu, &BrowseMenu::scriptingToolDetach, this, &ScopyMainWindow::handleScriptingToolDetach);
 
@@ -173,17 +173,18 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
-	connect(scc, SIGNAL(foundDevice(QString, QString)), dm, SLOT(createDevice(QString, QString)));
-	connect(scc, SIGNAL(lostDevice(QString, QString)), dm, SLOT(removeDevice(QString, QString)));
+	connect(scc, &ScannedIIOContextCollector::foundDevice, dm,
+		[this](QString cat, QString param) { dm->createDevice(cat, param); });
+	connect(scc, &ScannedIIOContextCollector::lostDevice, dm, &DeviceManager::removeDevice);
 
-	connect(hp, SIGNAL(requestDevice(QString)), this, SLOT(requestTools(QString)));
+	connect(hp, &ScopyHomePage::requestDevice, this, &ScopyMainWindow::requestTools);
 
-	connect(dm, SIGNAL(deviceAdded(QString, Device *)), this, SLOT(addDeviceToUi(QString, Device *)));
+	connect(dm, &DeviceManager::deviceAdded, this, &ScopyMainWindow::addDeviceToUi);
 
-	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), scc, SLOT(removeDevice(QString, Device *)));
-	connect(dm, SIGNAL(deviceRemoveStarted(QString, Device *)), this, SLOT(removeDeviceFromUi(QString)));
+	connect(dm, &DeviceManager::deviceRemoveStarted, scc, &ScannedIIOContextCollector::removeDevice);
+	connect(dm, &DeviceManager::deviceRemoveStarted, this, &ScopyMainWindow::removeDeviceFromUi);
 
-	connect(dm, SIGNAL(deviceConnecting(QString)), hp, SLOT(connectingDevice(QString)));
+	connect(dm, &DeviceManager::deviceConnecting, hp, &ScopyHomePage::connectingDevice);
 
 	connect(dm, &DeviceManager::deviceConnecting, this, [=]() { handleScanner(); });
 	connect(dm, &DeviceManager::deviceConnected, this, [=]() { handleScanner(); });
@@ -196,17 +197,16 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 		}
 	});
 
-	connect(dm, SIGNAL(deviceConnected(QString, Device *)), scc, SLOT(lock(QString, Device *)));
-	connect(dm, SIGNAL(deviceConnected(QString, Device *)), hp, SLOT(connectDevice(QString)));
-	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), scc, SLOT(unlock(QString, Device *)));
-	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), hp, SLOT(disconnectDevice(QString)));
+	connect(dm, &DeviceManager::deviceConnected, scc, &ScannedIIOContextCollector::lock);
+	connect(dm, &DeviceManager::deviceConnected, hp, &ScopyHomePage::connectDevice);
+	connect(dm, &DeviceManager::deviceDisconnected, scc, &ScannedIIOContextCollector::unlock);
+	connect(dm, &DeviceManager::deviceDisconnected, hp, &ScopyHomePage::disconnectDevice);
 
-	connect(dm, SIGNAL(requestDevice(QString)), hp, SLOT(viewDevice(QString)));
+	connect(dm, &DeviceManager::requestDevice, hp, &ScopyHomePage::viewDevice);
 
 	connect(dm, &DeviceManager::deviceChangedToolList, m_toolMenuManager, &ToolMenuManager::changeToolListContents);
-	connect(dm, SIGNAL(deviceConnected(QString, Device *)), m_toolMenuManager, SLOT(deviceConnected(QString)));
-	connect(dm, SIGNAL(deviceDisconnected(QString, Device *)), m_toolMenuManager,
-		SLOT(deviceDisconnected(QString)));
+	connect(dm, &DeviceManager::deviceConnected, m_toolMenuManager, &ToolMenuManager::deviceConnected);
+	connect(dm, &DeviceManager::deviceDisconnected, m_toolMenuManager, &ToolMenuManager::deviceDisconnected);
 	connect(dm, &DeviceManager::requestTool, m_toolMenuManager, &ToolMenuManager::showMenuItem);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, ts, &ToolStack::show);
 	connect(m_toolMenuManager, &ToolMenuManager::requestToolSelect, dtm, &DetachedToolWindowManager::show);
@@ -512,7 +512,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_scripting_enabled", false);
 	p->init("scopy_git_version", "");
 
-	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
+	connect(p, &Preferences::preferenceChanged, this, &ScopyMainWindow::handlePreferences);
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
 }
 
@@ -590,10 +590,11 @@ void ScopyMainWindow::loadPluginsFromRepository()
 	PluginManager *pm = pr->getPluginManager();
 	ScopySplashscreen::setPrefix("Loading plugin: ");
 
-	connect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
+	connect(pm, &PluginManager::startLoadPlugin, ScopySplashscreen::GetInstance(), &ScopySplashscreen::setMessage);
 	pr->init();
 	ScopySplashscreen::setPrefix("");
-	disconnect(pm, SIGNAL(startLoadPlugin(QString)), ScopySplashscreen::GetInstance(), SLOT(setMessage(QString)));
+	disconnect(pm, &PluginManager::startLoadPlugin, ScopySplashscreen::GetInstance(),
+		   &ScopySplashscreen::setMessage);
 
 #ifndef Q_OS_ANDROID
 	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();

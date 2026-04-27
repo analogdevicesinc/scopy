@@ -28,6 +28,7 @@
 namespace scopy {
 class SCOPY_GUI_EXPORT CustomAnimation : public QPropertyAnimation
 {
+	Q_OBJECT
 public:
 	CustomAnimation(QObject *target = nullptr);
 	CustomAnimation(QObject *target, const QByteArray &propertyName, QObject *parent = nullptr);

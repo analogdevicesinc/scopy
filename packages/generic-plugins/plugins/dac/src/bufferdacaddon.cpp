@@ -327,9 +327,9 @@ void BufferDacAddon::load(QString path)
 		return;
 	}
 
-	connect(m_dataBuffer, SIGNAL(loadFinished()), this, SLOT(onLoadFinished()), Qt::QueuedConnection);
-	connect(m_dataBuffer, SIGNAL(loadFailed()), this, SLOT(onLoadFailed()), Qt::QueuedConnection);
-	connect(m_dataBuffer, SIGNAL(dataUpdated()), this, SLOT(dataReload()), Qt::QueuedConnection);
+	connect(m_dataBuffer, &DataBuffer::loadFinished, this, &BufferDacAddon::onLoadFinished, Qt::QueuedConnection);
+	connect(m_dataBuffer, &DataBuffer::loadFailed, this, &BufferDacAddon::onLoadFailed, Qt::QueuedConnection);
+	connect(m_dataBuffer, &DataBuffer::dataUpdated, this, &BufferDacAddon::dataReload, Qt::QueuedConnection);
 
 	QMetaObject::invokeMethod(m_dataBuffer, "loadData", Qt::QueuedConnection);
 }

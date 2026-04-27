@@ -102,7 +102,9 @@ void TranslationsRepository::loadTranslations(QString language)
 	for(const QFileInfo &lang : languages) {
 		if(lang.fileName().endsWith("_" + language + ".qm") || lang.fileName() == language + ".qm") {
 			translatorList.append(new QTranslator());
-			translatorList.last()->load(lang.filePath());
+			if(!translatorList.last()->load(lang.filePath())) {
+				qWarning(CAT_TRANSLATIONREPOSITORY) << "Failed to load translation:" << lang.filePath();
+			}
 			QApplication::installTranslator(translatorList.last());
 
 			qDebug(CAT_TRANSLATIONREPOSITORY) << "Loaded:" << lang.fileName();

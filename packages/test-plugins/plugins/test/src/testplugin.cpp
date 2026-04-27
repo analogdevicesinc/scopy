@@ -108,7 +108,7 @@ bool TestPlugin::loadPage()
 	lay->addWidget(new QLabel("TestPage", m_page));
 	QPushButton *restartBtn = new QPushButton("restartPlugin", m_page);
 	lay->addWidget(restartBtn);
-	connect(restartBtn, SIGNAL(clicked()), this, SIGNAL(restartDevice()));
+	connect(restartBtn, &QPushButton::clicked, this, &TestPlugin::restartDevice);
 	return true;
 }
 
