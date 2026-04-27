@@ -33,6 +33,15 @@ ubuntu24(){
 	popd
 }
 
+ubuntu24_qt6(){
+	pushd $SRC_SCRIPT
+	docker build \
+		-t cristianbindea/scopy2-ubuntu24-qt6:testing \
+		--build-arg BASE_IMAGE=ubuntu:24.04 \
+		-f docker_ubuntu/Dockerfile.qt6 .
+	popd
+}
+
 for arg in $@; do
 	$arg
 done
