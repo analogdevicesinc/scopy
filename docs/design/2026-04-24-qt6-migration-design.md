@@ -40,20 +40,23 @@ main ─────────────────────────
 | `.dockerignore` | MODIFY — whitelist `ubuntu_build_process_qt6.sh` |
 
 **Key changes:**
-- Set `QT=6.8.3`, `ECM_BRANCH=master`, `KARCHIVE_BRANCH=master`
+- Set `QT=6.8.3`, `ECM_BRANCH=v6.8.0`, `KARCHIVE_BRANCH=v6.8.0`
+  - Note: initially set to `master`, but during Docker build karchive `master` failed with `Could not find Qt6Core >= 6.9.0` — master had moved ahead and bumped its minimum Qt requirement above 6.8.3. KDE Frameworks uses its own versioning (no `v6.8.3` exists); `v6.8.0` is the correct pinned tag — requires Qt ≥ 6.5.0, fully compatible with Qt 6.8.3.
 - aqtinstall command: `python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 6.8.3 linux_gcc_64 -m qt3d qtscxml`
   - Note: arch is `linux_gcc_64` (changed from `gcc_64` used in PoC/Qt 6.5)
   - Both `qt3d` and `qtscxml` verified available for 6.8.3
 - Add missing runtime deps: `libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0`
 - Add missing compression libs for KArchive: `libzstd-dev libbz2-dev liblzma-dev`
 - Set `-DKDDockWidgets_QT6=ON` for KDDockWidgets
-- Qt path in build script: `/opt/Qt/6.8.3/linux_gcc_64`
+- Qt path in build script: `/opt/Qt/6.8.3/gcc_64`
+
+  > **Note (debugged during Docker build):** We initially set the Qt path to `/opt/Qt/6.8.3/linux_gcc_64` based on the aqtinstall arch argument name. During the first Docker build attempt, the script failed at `build_qwt` with `qmake6: No such file or directory` (exit code 127). Investigation of aqtinstall's source (`QtRepoProperty.get_arch_dir_name`) revealed that on Linux, aqtinstall always installs Qt to the `gcc_64/` directory regardless of whether the arch argument is `linux_gcc_64` or `gcc_64`. The aqt command argument `linux_gcc_64` is correct (it selects the right Qt variant), but the on-disk path is always `gcc_64/`. Fix: keep `linux_gcc_64` in the aqt install command, change the QT path variable to `/opt/Qt/6.8.3/gcc_64`.
 
 **Qt 6.8-specific notes:**
 - Qt3D is deprecated in Qt 6.8 (maintained by KDAB going forward) but still ships and compiles. Used only in `packages/imu/plugins/imuanalyzer/`. No action needed now.
 - `QSignalSpy` no longer inherits `QObject` in Qt 6.8. Scopy's `Q_DECLARE_METATYPE(QSignalSpy *)` in `iioutil/test/tst_iiocommandqueue.cpp` should still compile — verify during PR 7 testing.
 
-**Validation:** `docker build` succeeds, `/opt/Qt/6.8.3/linux_gcc_64/bin/qmake6 --version` returns `Qt version 6.8.3`.
+**Validation:** `docker build` succeeds, `/opt/Qt/6.8.3/gcc_64/bin/qmake6 --version` returns `Qt version 6.8.3`.
 
 ---
 
@@ -68,7 +71,7 @@ main ─────────────────────────
 
 **Workflow design:**
 - Trigger: push or PR to `qt6_clean` branch
-- Container: `cristianbindea/scopy2-ubuntu24-qt6:<tag>`
+- Container: `scopy2-ubuntu24-qt6:<tag>` (registry prefix to be added when image is published to Docker Hub)
 - Build step: `ubuntu_build_process_qt6.sh build_scopy`
 - Test step: `QT_QPA_PLATFORM=offscreen ctest --output-on-failure`
 
@@ -92,7 +95,7 @@ main ─────────────────────────
 
 **Reference:** PoC commit `eb9d183db` (first build with Qt6).
 
-**Validation:** `cmake -B build-qt6 -DCMAKE_PREFIX_PATH=/opt/Qt/6.8.3/linux_gcc_64` succeeds (configuration stage).
+**Validation:** `cmake -B build-qt6 -DCMAKE_PREFIX_PATH=/opt/Qt/6.8.3/gcc_64` succeeds (configuration stage).
 
 ---
 
@@ -297,11 +300,11 @@ All concrete values for use in the build script and Docker setup:
 | Qt version | `6.8.3` |
 | aqtinstall arch | `linux_gcc_64` |
 | aqtinstall modules | `qt3d qtscxml` |
-| Qt install path | `/opt/Qt/6.8.3/linux_gcc_64` |
-| `ECM_BRANCH` | `master` |
-| `KARCHIVE_BRANCH` | `master` |
+| Qt install path | `/opt/Qt/6.8.3/gcc_64` (aqtinstall always uses `gcc_64/` on Linux) |
+| `ECM_BRANCH` | `v6.8.0` (pinned from `master` — KDE Frameworks `master` bumped min Qt to 6.9.0, breaking our 6.8.3 build; `v6.8.0` requires Qt ≥ 6.5.0 and is the last release in the 6.8.x series) |
+| `KARCHIVE_BRANCH` | `v6.8.0` (same reason as ECM; KDE Frameworks has no `v6.8.3` — their versioning is independent of Qt's) |
 | `KDDOCK_BRANCH` | `2.2` (unchanged, supports Qt 6.2+) |
-| `cmake --prefix-path` | `/opt/Qt/6.8.3/linux_gcc_64` |
+| `cmake --prefix-path` | `/opt/Qt/6.8.3/gcc_64` |
 
 **Qt 6.8-specific considerations:**
 - Qt3D deprecated (KDAB maintains) — still ships, still compiles, no action needed

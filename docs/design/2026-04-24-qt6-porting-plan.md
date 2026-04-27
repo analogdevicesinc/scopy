@@ -28,8 +28,8 @@
 - `ubuntu_build_process_qt6.sh` line 37: `QT=$QT_INSTALL_LOCATION/6.8.3/gcc_64`
 - `ubuntu_build_process_qt6.sh` line 178: `aqt install-qt ... 6.8.3 -m qt3d qtscxml`
 - aqtinstall arch: `linux_gcc_64` (changed from `gcc_64` used in 6.5/6.7)
-- `ECM_BRANCH=master` (was `v6.7.0`)
-- `KARCHIVE_BRANCH=master` (was `v6.7.0`)
+- `ECM_BRANCH=v6.8.0` (was `master` — `master` bumped min Qt to 6.9.0, breaking the 6.8.3 build; KDE Frameworks has no `v6.8.3`, `v6.8.0` is the correct pinned tag requiring Qt ≥ 6.5.0)
+- `KARCHIVE_BRANCH=v6.8.0` (same reason as ECM)
 
 **Qt 6.8-specific changes that affect Scopy:**
 
@@ -64,8 +64,8 @@ Provide a self-contained Qt6 build environment that does not touch the host Qt5 
    - Both `qt3d` and `qtscxml` verified available for 6.8.3
 
 2. **Update KArchive/ECM branches**:
-   - `ECM_BRANCH=master`
-   - `KARCHIVE_BRANCH=master`
+   - `ECM_BRANCH=v6.8.0` (pinned — `master` requires Qt ≥ 6.9.0; `v6.8.0` is Qt 6.8.3 compatible)
+   - `KARCHIVE_BRANCH=v6.8.0` (same reason)
 
 3. **Build the Docker image:**
    ```bash
@@ -133,11 +133,11 @@ Automated Qt6 build on every push to `qt6_migration` branch. Uses the Docker ima
 
 **Trigger:** Push or PR to `qt6_migration` branch
 
-**Docker image:** `cristianbindea/scopy2-ubuntu24-qt6:<tag>` (or equivalent registry)
+**Docker image:** `scopy2-ubuntu24-qt6:<tag>` (registry prefix to be added when image is published to Docker Hub)
 
 **Key difference from Qt5 workflow:**
 ```yaml
-container: cristianbindea/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
+container: scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
 steps:
   - run: ubuntu_build_process_qt6.sh build_scopy
 ```

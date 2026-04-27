@@ -1,0 +1,68 @@
+name: Build & Test Qt6
+
+on:
+    push:
+      branches:
+        - qt6_clean
+      paths-ignore:
+        - 'docs/**'
+        - '**.md'
+        - '**.rst'
+        - 'testing_results/**'
+        - '.clang-format'
+        - '.cmake-format'
+        - '.gitignore'
+        - '**/.gitignore'
+        - '.github/workflows/license-header.yml'
+        - '.github/workflows/generate_doc.yml'
+        - '.github/workflows/clang-format.yml'
+
+    pull_request:
+      branches:
+        - qt6_clean
+      paths-ignore:
+        - 'docs/**'
+        - '**.md'
+        - '**.rst'
+        - 'testing_results/**'
+        - '.clang-format'
+        - '.cmake-format'
+        - '.gitignore'
+        - '**/.gitignore'
+        - '.github/workflows/license-header.yml'
+        - '.github/workflows/generate_doc.yml'
+        - '.github/workflows/clang-format.yml'
+
+    workflow_dispatch:
+      inputs:
+        docker_tag:
+          description: 'Docker image tag'
+          required: true
+          default: 'latest'
+          type: choice
+          options:
+            - latest
+            - testing
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+  artifact-metadata: write
+  checks: write
+  actions: write
+
+jobs:
+    docker_tag:
+      if: github.event_name != 'workflow_dispatch'
+      uses: ./.github/workflows/get_docker_tag.yml
+
+    ubuntu-qt6-build:
+      needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      uses: ./.github/workflows/ubuntubuild-qt6.yml
+      with:
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
