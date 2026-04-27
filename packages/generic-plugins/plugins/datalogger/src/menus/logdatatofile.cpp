@@ -58,7 +58,7 @@ void LogDataToFile::continuousLogData(QString path)
 		}
 
 		// if a channels is added or removed we need to recreate the file using logData()
-		if(currentFileHeader != fileHeader) {
+		if(*currentFileHeader != fileHeader) {
 			logData(path);
 
 			currentFileHeader = new QString(fileHeader);
@@ -236,7 +236,7 @@ void LogDataToFile::loadData(QString path)
 
 		// we don't override data we create dummy monitors for all channels from file
 		for(it = valueMap.begin(); it != valueMap.end(); ++it) {
-			QString fileTitle("Import: " + file.fileName().splitRef("/").last());
+			QString fileTitle("Import: " + file.fileName().split("/").last());
 			QString monitorName(fileTitle + ":" + it.key());
 			if(m_dataAcquisitionManager->getDataMonitorMap()->contains(monitorName)) {
 

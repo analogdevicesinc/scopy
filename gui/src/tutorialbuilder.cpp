@@ -120,6 +120,9 @@ uint16_t TutorialBuilder::collectChapters()
 
 	// add the now sorted chapters into the tutorial overlay
 	for(const ChapterInstructions *chapter : std::as_const(m_chapters)) {
+		if(chapter->widgets.values().contains(nullptr)) {
+			continue;
+		}
 		// if there is no mainWidget specified, the first widget from the list will be set to be the mainWidget
 		this->addChapter(chapter->widgets.values(), chapter->description,
 				 (chapter->mainWidget.isNull()) ? chapter->widgets.first()

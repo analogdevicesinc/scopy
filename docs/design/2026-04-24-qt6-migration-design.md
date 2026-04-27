@@ -384,17 +384,177 @@ Build in Docker — compilation should progress past the 15% failure point. Any 
 
 ---
 
-### PR 7: Runtime Fixes & Final Verification
-**Scope:** JS engine fixes, runtime validation, deprecation cleanup.
+### PR 7: Remaining Build Fixes & Final Verification
+**Scope:** Fix all remaining Qt6 compilation blockers discovered after PR 6 build attempt, plus runtime fixes and validation.
 
-| Fix | Detail |
-|-----|--------|
-| JS syntax: `for (each in o)` → `for (var each in o)` | `scopyjs.cpp` — Qt6 V4 engine rejects non-standard syntax |
-| Tutorial builder nullptr check | `core/src/tutorialbuilder.cpp` |
-| UI tool template fix | Core UI fixes from PoC |
-| Sed artifact cleanup | Remove duplicate `setContentsMargins` if any remain |
+**Note (2026-04-27):** After completing PR 6 and running `ubuntu_build_process_qt6.sh build_scopy`, the build stopped at 19% with a `QString(int)` ambiguity error in `menuwidget.cpp:87`. Since `make` stops at the first error, many more issues were hidden behind it. All remaining issues were identified by comparing the `qt6_clean` branch against the PoC `qt6_migration` branch and scanning for known Qt6 breaking change patterns.
 
-**Verification checklist:**
+#### Step 7.1: `QString(int)` ambiguity — 4 files, 8 locations
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6 removed the implicit `int → QChar → QString` conversion path, making `QString(intVar)` ambiguous |
+| Fix | `QString(intExpr)` → `QString::number(intExpr)` |
+
+| File | Line(s) |
+|------|---------|
+| `gui/src/widgets/menuwidget.cpp` | 87 |
+| `packages/generic-plugins/plugins/adc/src/time/timeplotmanagersettings.cpp` | 95, 394, 419 |
+| `packages/generic-plugins/plugins/adc/src/freq/fftplotmanagersettings.cpp` | 100, 305, 338 |
+| `packages/generic-plugins/plugins/regmap/src/jsonformatedelement.cpp` | 49-51 (4 int/bool values in string concatenation) |
+
+#### Step 7.2: Implicit `QString→QFileInfo` conversion removed — 2 files
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6 made the `QFileInfo(QString)` constructor `explicit`, so implicit conversion from `QString` no longer compiles |
+| Fix | Wrap `QString` returns/arguments in explicit `QFileInfo()` constructor |
+
+| File | Line | Change |
+|------|------|--------|
+| `pkg-manager/src/pkgmanager.cpp` | 151 | `return pkgPath` → `return QFileInfo(pkgPath)` |
+| `pkg-manager/src/pkgutil.cpp` | 234 | `files.append(it.next())` → `files.append(QFileInfo(it.next()))` |
+
+#### Step 7.3: Qt3D includes moved to Qt3DCore — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | In Qt6, `QGeometry` and `QAttribute` were moved from `Qt3DRender` to `Qt3DCore` |
+| Fix | Update `#include` directives |
+
+| File | Line | Change |
+|------|------|--------|
+| `packages/imu/plugins/imuanalyzer/include/imuanalyzer/scenerenderer.hpp` | 47 | `Qt3DRender/QGeometry` → `Qt3DCore/QGeometry` |
+| same | 49 | `Qt3DRender/QAttribute` → `Qt3DCore/QAttribute` |
+
+#### Step 7.4: Sed artifact from PR 4 — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | PR 4's sed command `s/\.midRef(/\.mid(/g` preserved the backslash in the replacement string, producing `chnId\.mid(` instead of `chnId.mid(` |
+| Fix | Remove the stray backslash |
+
+| File | Line | Change |
+|------|------|--------|
+| `packages/generic-plugins/plugins/dac/src/dacdatamodel.cpp` | 624 | `chnId\.mid(` → `chnId.mid(` |
+
+#### Step 7.5: Missed `splitRef` → `split` — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | PR 4's sed covered `midRef`/`leftRef`/`rightRef` but missed `splitRef`. `QString::splitRef()` was removed in Qt6. |
+| Fix | `splitRef("/")` → `split("/")` |
+
+| File | Line | Change |
+|------|------|--------|
+| `packages/generic-plugins/plugins/datalogger/src/menus/logdatatofile.cpp` | 239 | `.splitRef("/").last()` → `.split("/").last()` |
+
+#### Step 7.6: `QString != NULL` comparison — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6 removed the implicit comparison path between `QString` and `NULL` (ambiguous between pointer and integer literal) |
+| Fix | Use `QString::isNull()` instead |
+
+| File | Line | Change |
+|------|------|--------|
+| `core/src/scopymainwindow_api.cpp` | 367 | `prefName != NULL` → `!prefName.isNull()` |
+
+#### Step 7.7: Pointer vs value comparison — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | `currentFileHeader` is `QString*` and `fileHeader` is `QString`. Direct `!=` comparison between pointer and value type is invalid — must dereference the pointer first. |
+| Fix | Dereference the pointer before comparing |
+
+| File | Line | Change |
+|------|------|--------|
+| `packages/generic-plugins/plugins/datalogger/src/menus/logdatatofile.cpp` | 61 | `currentFileHeader != fileHeader` → `*currentFileHeader != fileHeader` |
+
+#### Step 7.8: QSslError explicit constructor — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6 may require explicit `QSslError` construction from the enum value |
+| Fix | Wrap enum in explicit constructor call |
+
+| File | Line | Change |
+|------|------|--------|
+| `pluginbase/src/versionchecker.cpp` | 119 | `QSslError::NoPeerCertificate` → `QSslError(QSslError::NoPeerCertificate)` |
+
+#### Step 7.9: Non-standard JS syntax — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6's V4 JavaScript engine strictly rejects the non-standard `for (each in o)` syntax that Qt5's V4 tolerated |
+| Fix | Use standard `for...in` with `var` declaration |
+
+| File | Line | Change |
+|------|------|--------|
+| `pluginbase/src/scopyjs.cpp` | 74 | `for (each in o)` → `for (var each in o)` |
+
+#### Step 7.10: Tutorial builder nullptr crash — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Chapters with unresolved widgets (set to `nullptr` at parse time) crash when passed to `addChapter`. This surfaces in Qt6 because some widgets may fail to resolve due to changed module availability. |
+| Fix | Skip chapters containing `nullptr` widgets |
+
+| File | Line | Change |
+|------|------|--------|
+| `gui/src/tutorialbuilder.cpp` | 122 | Add `if(chapter->widgets.values().contains(nullptr)) { continue; }` guard |
+
+#### Step 7.11: Pre-existing bug fix — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Wrong variable used: `id_b` was computed from string `a` instead of `b`, causing incorrect channel sorting |
+| Fix | Use the correct variable |
+
+| File | Line | Change |
+|------|------|--------|
+| `gr-util/src/griiodevicesource.cpp` | 125 | `QString::fromStdString(a)` → `QString::fromStdString(b)` |
+
+#### Step 7.12: Missing `QDirIterator` include (transitive include removed) — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6 removed transitive includes: `<QDir>` no longer pulls in `<QDirIterator>`. The file uses `QDirIterator` on line 71 but only includes `<QDir>`. This did not appear in the PoC branch (Qt 6.7.0), likely because the transitive include was still present there. |
+| Qt6 docs | https://doc.qt.io/qt-6/qdiriterator.html — `#include <QDirIterator>` is required. Note: `QDirIterator` is deprecated in Qt 6.11+ in favor of `QDirListing`, but fully available in Qt 6.8.3. |
+| Fix | Add `#include <QDirIterator>` to the file |
+| Alternatives considered | Migrate to `QDirListing` — rejected as unnecessary for Qt 6.8.3 target and introduces API changes |
+
+| File | Line | Change |
+|------|------|--------|
+| `pkg-manager/src/pkgmanager.cpp` | after line 27 | Add `#include <QDirIterator>` |
+
+#### Step 7.13: Disable M2K package from Qt6 build
+
+| Detail | Value |
+|--------|-------|
+| Why | M2K package is out of scope for this Qt6 migration (deferred to planned M2K refactor). Multiple M2K-only Qt6 errors (`enterEvent`, `setWeight`, `setMargin`, `qAsConst`) would require fixing code that will be rewritten. |
+| Fix | Add `-DENABLE_PACKAGE_M2K=OFF` to `build_scopy()` in `ci/ubuntu/ubuntu_build_process_qt6.sh`. Uses the existing `PackageUtils.cmake` enable/disable mechanism. |
+| Reverted | Steps 7.13 and 7.14 M2K code edits (enterEvent, setWeight) were reverted since M2K is no longer compiled. |
+
+| File | Line | Change |
+|------|------|--------|
+| `ci/ubuntu/ubuntu_build_process_qt6.sh` | 402-403 | Added `-DENABLE_PACKAGE_M2K=OFF` after `-DENABLE_ALL_PACKAGES=ON` |
+
+#### Step 7.14: `QString < int` ambiguous comparison — 1 file
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6.8 with C++20 adds `operator<=>` overloads to `QString` via `Q_DECLARE_STRONGLY_ORDERED`, making `QString < int` ambiguous (10+ candidate conversions). |
+| Fix | Convert `id` to `int` at the comparison site: `id.toInt() < 0`. |
+
+| File | Line | Change |
+|------|------|--------|
+| `packages/extproc/plugins/extprocplugin/include/extprocplugin/controller/extprocplotinfo.h` | 88 | `id < 0` → `id.toInt() < 0` |
+
+#### Verification
+
+Build with `ubuntu_build_process_qt6.sh build_scopy`. If build completes, run:
+
 - [ ] `QT_QPA_PLATFORM=offscreen ctest --output-on-failure` — all 27 tests pass
 - [ ] Launch Scopy with X11 — all plugins load
 - [ ] JS scripting tool — `print("hello")` works

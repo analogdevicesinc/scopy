@@ -2,7 +2,7 @@
 
 > **Date:** 2026-04-24 (updated 2026-04-27)
 > **Branch:** `qt6_clean` (new clean branch from `main`; PoC reference: `qt6_migration`)
-> **Status:** Planning (based on completed proof-of-concept)
+> **Status:** Build compiles 100% (2026-04-27) — runtime verification pending
 > **Scope:** All packages except M2K (deferred to planned M2K refactor)
 > **Qt Version:** Qt 6.8.3 (decided 2026-04-27)
 
@@ -226,39 +226,44 @@ These are safe to apply via sed across the entire codebase (excluding `build/` a
 
 Each fix is small and isolated. Apply in order of discovery during compilation:
 
-- [ ] **4.1** `QRegExp` -> `QRegularExpression` (8 files)
-- [ ] **4.2** `QStyleOption::init()` -> `initFrom()`
-- [ ] **4.3** `QString(int)` -> `QString::number(int)` (ambiguous constructor)
-- [ ] **4.4** `QVariant::type()` -> `typeId()`, `QVariant::Type` -> `QMetaType::Type`
-- [ ] **4.5** `QtConcurrent::run()` argument order swap (17 occurrences)
-- [ ] **4.6** Implicit `QString->QFileInfo` conversion — add explicit `QFileInfo()` constructor
-- [ ] **4.7** `QList` explicit constructor — `{...}` -> `QList<T>{...}`
-- [ ] **4.8** `qRegisterMetaTypeStreamOperators` calls — remove (auto-registered in Qt6)
-- [ ] **4.9** `filterRegExp()` -> `filterRegularExpression()`
-- [ ] **4.10** Qt3D includes: `Qt3DRender/QGeometry` -> `Qt3DCore/QGeometry`
-- [ ] **4.11** `QSignalTransition` — add `StateMachine` module to CMake
-- [ ] **4.12** `QOpenGLWidget` — add `OpenGLWidgets` module to CMake
-- [ ] **4.13** Add explicit `#include <QFile>` where Qt6 only forward-declares
-- [ ] **4.14** `powercontrol.ui` — move `setNum` connection to code with `qOverload`
-- [ ] **4.15** `QString != NULL` -> `!str.isNull()`
+- [x] **4.1** `QRegExp` -> `QRegularExpression` (8 files) — done in PR 5
+- [x] **4.2** `QStyleOption::init()` -> `initFrom()` — done in PR 5
+- [x] **4.3** `QString(int)` -> `QString::number(int)` (ambiguous constructor) — done in PR 7 (4 files, 8 locations)
+- [x] **4.4** `QVariant::type()` -> `typeId()`, `QVariant::Type` -> `QMetaType::Type` — done in PR 5
+- [x] **4.5** `QtConcurrent::run()` argument order swap (17 occurrences) — done in PR 5
+- [x] **4.6** Implicit `QString->QFileInfo` conversion — add explicit `QFileInfo()` constructor — done in PR 7 (2 files)
+- [x] **4.7** `QList` explicit constructor — `{...}` -> `QList<T>{...}` — done in PR 5
+- [ ] **4.8** `qRegisterMetaTypeStreamOperators` calls — remove (auto-registered in Qt6) — zero non-m2k occurrences found
+- [x] **4.9** `filterRegExp()` -> `filterRegularExpression()` — done in PR 5
+- [x] **4.10** Qt3D includes: `Qt3DRender/QGeometry` -> `Qt3DCore/QGeometry` — done in PR 7
+- [x] **4.11** `QSignalTransition` — add `StateMachine` module to CMake — done in PR 3
+- [x] **4.12** `QOpenGLWidget` — add `OpenGLWidgets` module to CMake — done in PR 3/5
+- [x] **4.13** Add explicit `#include <QFile>` where Qt6 only forward-declares — done in PR 5
+- [ ] **4.14** `powercontrol.ui` — move `setNum` connection to code with `qOverload` — zero non-m2k occurrences found
+- [x] **4.15** `QString != NULL` -> `!str.isNull()` — done in PR 7
+- [x] **4.16** `splitRef()` -> `split()` — missed by PR 4 sed (1 file) — done in PR 7
+- [x] **4.17** Sed artifact: `\.mid(` backslash in `dacdatamodel.cpp` — done in PR 7
+- [x] **4.18** Pointer vs value `QString*` comparison in `logdatatofile.cpp` — done in PR 7
+- [x] **4.19** `QSslError` explicit constructor from enum — done in PR 7
+- [x] **4.20** `QString + int/bool` concatenation in `jsonformatedelement.cpp` — done in PR 7
 
 ### Phase 5: Signal/Slot & Overload Fixes
 
-- [ ] **5.1** Fix removed signal overloads: `QComboBox::currentIndexChanged(QString)`, `QSpinBox::valueChanged(QString)` -> use `int` parameter + `itemText(idx)`
-- [ ] **5.2** Modernize SIGNAL()/SLOT() in core, gui, adc, dac packages (84 connections — done in PoC)
-- [ ] **5.3** Leave `symbol_controller.cpp` and `deviceimpl.cpp` in old-style (intentional — runtime polymorphic dispatch)
-- [ ] **5.4** Skip M2K plugin (deferred to M2K refactor)
+- [x] **5.1** Fix removed signal overloads: `QComboBox::currentIndexChanged(QString)`, `QSpinBox::valueChanged(QString)` -> use `int` parameter + `itemText(idx)` — done in PR 6
+- [x] **5.2** Modernize SIGNAL()/SLOT() in core, gui, adc, dac packages (~104 connections) — done in PR 6
+- [x] **5.3** Leave `symbol_controller.cpp` and `deviceimpl.cpp` in old-style (intentional — runtime polymorphic dispatch) — confirmed in PR 6
+- [x] **5.4** Skip M2K plugin (deferred to M2K refactor) — confirmed
 
 ### Phase 6: Threading & Concurrency
 
-- [ ] **6.1** `QtConcurrent::run()` — add `(void)` cast for fire-and-forget calls (`[[nodiscard]]`)
-- [ ] **6.2** `QFutureWatcher::setPaused/isPaused` -> `setSuspended/isSuspending`
-- [ ] **6.3** `QSignalBlocker` temporaries -> assign to named variables (silent bug fix)
-- [ ] **6.4** `QMouseEvent::localPos()` -> `position()`, `QEnterEvent::pos()` -> `position().toPoint()`
+- [x] **6.1** `QtConcurrent::run()` — add `(void)` cast for fire-and-forget calls (`[[nodiscard]]`) — done in PR 6
+- [x] **6.2** `QFutureWatcher::setPaused/isPaused` -> `setSuspended/isSuspending` — done in PR 6
+- [x] **6.3** `QSignalBlocker` temporaries -> assign to named variables (silent bug fix) — done in PR 6
+- [x] **6.4** `QMouseEvent::localPos()` -> `position()`, `QEnterEvent::pos()` -> `position().toPoint()` — done in PR 6
 
 ### Phase 7: JS Engine & Runtime Validation
 
-- [ ] **7.1** Fix non-standard JS syntax: `for (each in o)` -> `for (var each in o)` in `scopyjs.cpp`
+- [x] **7.1** Fix non-standard JS syntax: `for (each in o)` -> `for (var each in o)` in `scopyjs.cpp` — done in PR 7
 - [ ] **7.2** Run unit tests: `QT_QPA_PLATFORM=offscreen ctest --output-on-failure` (expect 27/27 pass)
 - [ ] **7.3** Launch Scopy with X11 display — verify all plugins load
 - [ ] **7.4** Test JS scripting tool — verify `print("hello")` and basic evaluation work
@@ -267,7 +272,7 @@ Each fix is small and isolated. Apply in order of discovery during compilation:
 
 - [ ] **8.1** `QMouseEvent::pos()` -> `position().toPoint()` in 8 gui files
 - [ ] **8.2** Clean up duplicate `setContentsMargins` from sed artifacts
-- [ ] **8.3** Remove `Qt::AA_UseHighDpiPixmaps` (no-op in Qt6)
+- [x] **8.3** Remove `Qt::AA_UseHighDpiPixmaps` (no-op in Qt6) — done in PR 5
 
 ### Phase 9: Verification
 
@@ -308,6 +313,18 @@ Each fix is small and isolated. Apply in order of discovery during compilation:
 | 15 | `Qt::UniqueConnection` + lambda crash | Qt6 enforces assert | Extract lambda to named slot | regmap (2 sites) |
 | 16 | `.QWidget` CSS selector breaks with `Q_OBJECT` | `className()` changes | Don't add `Q_OBJECT` if not needed, or fix `Style::setBackgroundColor()` | style.cpp |
 | 17 | SVG files missing `fill` attribute | Theme system can't apply colors | Add solid `fill` color to SVG files | Various SVG resources |
+| 18 | Implicit `QString→QFileInfo` conversion | Qt6 made constructor `explicit` | Add explicit `QFileInfo()` | pkgmanager.cpp, pkgutil.cpp |
+| 19 | Qt3D `QGeometry`/`QAttribute` moved | Moved from `Qt3DRender` to `Qt3DCore` | Update `#include` paths | scenerenderer.hpp |
+| 20 | Sed artifact: backslash in `.mid()` | PR 4 sed replacement preserved `\` | Remove stray backslash | dacdatamodel.cpp |
+| 21 | Missed `splitRef()` removal | PR 4 sed only covered `midRef`/`leftRef`/`rightRef` | `splitRef()` → `split()` | logdatatofile.cpp |
+| 22 | `QString != NULL` comparison | Ambiguous in Qt6 | `!str.isNull()` | scopymainwindow_api.cpp |
+| 23 | `QString*` vs `QString` comparison | Pointer/value comparison invalid | Dereference pointer first | logdatatofile.cpp |
+| 24 | `QSslError` constructor from enum | May need explicit construction in Qt6 | `QSslError(QSslError::NoPeerCertificate)` | versionchecker.cpp |
+| 25 | Tutorial builder nullptr crash | Unresolved widgets passed to `addChapter` | Add nullptr guard | tutorialbuilder.cpp |
+| 26 | `griiodevicesource.cpp` bug | Wrong variable `a` used for `id_b` | Use variable `b` | griiodevicesource.cpp |
+| 27 | `QDirIterator` incomplete type | Qt6 removed transitive include from `<QDir>` | Add `#include <QDirIterator>` | pkgmanager.cpp |
+| 28 | M2K package disabled from Qt6 build | M2K has many Qt5 issues (enterEvent, setWeight, setMargin, qAsConst) — deferred to M2K refactor | `-DENABLE_PACKAGE_M2K=OFF` in build script | `ci/ubuntu/ubuntu_build_process_qt6.sh` |
+| 29 | `QString < int` ambiguous comparison | Qt6 C++20 `operator<=>` overloads make `QString < int` ambiguous | `id.toInt() < 0` | extprocplotinfo.h |
 
 ### 6.2 Known Risks (Not Blocking)
 

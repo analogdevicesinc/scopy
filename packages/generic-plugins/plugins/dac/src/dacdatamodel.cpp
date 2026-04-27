@@ -621,7 +621,7 @@ QString DacDataModel::generateToneName(QString chnId)
 	QString name = "";
 	int idx = chnId.indexOf(toneId);
 	if(idx != -1) {
-		int chnIndex = chnId\.mid(idx + toneId.size()).toInt(&ok);
+		int chnIndex = chnId.mid(idx + toneId.size()).toInt(&ok);
 		if(!ok)
 			return name;
 		int txIndex = (chnIndex / MAX_NB_TONES) + 1; // TX indexing from 1

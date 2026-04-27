@@ -116,7 +116,7 @@ void VersionChecker::pullNewCache()
 	connect(m_nam, &QNetworkAccessManager::sslErrors, this,
 		[](QNetworkReply *reply, const QList<QSslError> &errors) {
 			qDebug(CAT_VERSION) << "Ignoring ssl errors:" << errors;
-			reply->ignoreSslErrors(QList<QSslError>{QSslError::NoPeerCertificate});
+			reply->ignoreSslErrors(QList<QSslError>{QSslError(QSslError::NoPeerCertificate)});
 		});
 
 	connect(m_nam, &QNetworkAccessManager::finished, this, [this](QNetworkReply *r) {

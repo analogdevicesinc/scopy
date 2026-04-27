@@ -400,6 +400,7 @@ build_scopy() {
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_ALL_PACKAGES=ON
+		-DENABLE_PACKAGE_M2K=OFF
 		"
 	build_with_cmake OFF
 	popd
