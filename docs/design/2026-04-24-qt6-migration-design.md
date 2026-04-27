@@ -266,29 +266,93 @@ grep -rn '.midRef(' ...
 ---
 
 ### PR 5: API Migration (Manual Fixes)
-**Scope:** 15 categories of manual C++ fixes, each small and isolated.
+**Scope:** Manual C++ fixes for Qt6 API changes. M2K excluded. Each step is small and isolated.
 
-| Category | Files | Change |
-|----------|-------|--------|
-| `QRegExp` → `QRegularExpression` | 8 | Replace class + include |
-| `QStyleOption::init()` → `initFrom()` | ~12 widgets | One macro update |
-| `QString(int)` → `QString::number(int)` | ~10 | Disambiguate constructor |
-| `QVariant::type()` → `typeId()` | varies | Type system update |
-| `QtConcurrent::run()` arg order | 17 | Swap first two arguments |
-| Implicit `QString→QFileInfo` | varies | Add explicit constructor |
-| `QList` explicit constructor | varies | Add `QList<T>{...}` |
-| Remove `qRegisterMetaTypeStreamOperators` | varies | Delete calls (auto-registered in Qt6) |
-| `filterRegExp()` → `filterRegularExpression()` | varies | Rename |
-| Qt3D includes path change | varies | `Qt3DRender/QGeometry` → `Qt3DCore/QGeometry` |
-| Add explicit `#include <QFile>` | varies | Qt6 only forward-declares |
-| `powercontrol.ui` signal fix | 1 | Move `setNum` to code with `qOverload` |
-| `QString != NULL` → `!str.isNull()` | varies | Null comparison |
-| `QMouseEvent::pos()` → `position().toPoint()` | 8 gui files | Deprecation fix |
-| Remove `Qt::AA_UseHighDpiPixmaps` | 1 | No-op in Qt6 |
+**Note (2026-04-27):** After codebase exploration, several categories from the original plan were found to have zero occurrences outside M2K: `qRegisterMetaTypeStreamOperators`, Qt3D include moves, `powercontrol.ui` signal fix, `QString != NULL`, `QString(int)` disambiguation, implicit `QString→QFileInfo`. These are removed from the plan. `QMouseEvent::pos()` is deprecated but still compiles — deferred to cleanup.
 
-**Reference:** PoC commits `bce251e46`, `2432fb2d2`, `220cfc694`.
+#### Step 5.1: QSslError explicit list — `pluginbase/src/versionchecker.cpp:119`
 
-**Validation:** Full compilation succeeds (may still have linker errors until PR 6).
+| Detail | Value |
+|--------|-------|
+| Why | `QList<T>` constructor from initializer list became `explicit` in Qt6 |
+| Fix | `{QSslError::NoPeerCertificate}` → `QList<QSslError>{QSslError::NoPeerCertificate}` |
+
+This was the first error encountered — blocked the build at 5%.
+
+#### Step 5.2: QRegExp → QRegularExpression (4 files)
+
+| File | Change |
+|------|--------|
+| `gr-util/src/griiodevicesource.cpp:122-123` | `QString::remove(QRegExp(...))` → `remove(QRegularExpression(...))` |
+| `gui/src/spinbox_a.cpp` (6 locations) | Full migration: `QRegExpValidator` → `QRegularExpressionValidator`, `indexIn()`+`cap()` → `match()`+`captured()` |
+| `core/src/iiotabwidget.cpp:195-199,406-407` | `QRegExp` + `QRegExpValidator` for IP/serial validation |
+| `packages/swiot/.../bufferlogic.cpp:56` | `QRegExp` for number extraction |
+
+#### Step 5.3: filterRegExp → filterRegularExpression (2 files)
+
+| File | Change |
+|------|--------|
+| `.../iiosortfilterproxymodel.cpp:35` | `filterRegExp().pattern()` → `filterRegularExpression().pattern()` |
+| `.../iioexplorerinstrument.cpp:174,445` | `setFilterRegExp(QRegExp(...))` → `setFilterRegularExpression(QRegularExpression(...))` |
+
+#### Step 5.4: QStyleOption::init() → initFrom()
+
+| File | Change |
+|------|--------|
+| `gui/include/gui/utils.h:81` | `opt.init(this)` → `opt.initFrom(this)` in `QWIDGET_PAINT_EVENT_HELPER` macro |
+
+#### Step 5.5: QVariant::type() → typeId()
+
+| File | Change |
+|------|--------|
+| `core/src/pkggui/pkgpreviewpage.cpp:59` | `variant.type() == QVariant::List` → `variant.typeId() == QMetaType::QVariantList` |
+| `core/src/pkggui/pkggridwidget.cpp:83` | `var.type() == QVariant::String` → `var.typeId() == QMetaType::QString` |
+
+#### Step 5.6: Remove `Qt::AA_UseHighDpiPixmaps`
+
+| File | Change |
+|------|--------|
+| `main.cpp:119` | Delete `QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps)` — always-on in Qt6 |
+
+#### Step 5.7: QtConcurrent::run() argument order (9 files)
+
+Qt6 removed `run(object, &method, args...)`. New syntax: `run(&method, object, args...)`.
+
+| File | Occurrences |
+|------|-------------|
+| `fmcomms5calibration.cpp:73` | 1 |
+| `profilegeneratorwidget.cpp:715,718,747` | 3 |
+| `iiomanager.cpp:78` | 1 |
+| `dacdatamodel.cpp:350` | 1 |
+| `pqmdatalogger.cpp:142` | 1 |
+| `acquisitionmanager.cpp:136,284` | 2 |
+
+#### Step 5.8: Missing `OpenGLWidgets` Qt module in CMakeLists (3 files)
+
+**Found during build test (2026-04-27):** Build failed at 13% on `plotwidget.cpp` — QWT's `qwt_plot_opengl_canvas.h` includes `<qopenglwidget.h>` which in Qt6 moved from `QtWidgets` to the separate `QtOpenGLWidgets` module. Without the module in `find_package` and `target_link_libraries`, the include path is missing.
+
+| File | Change |
+|------|--------|
+| `gui/CMakeLists.txt:110,155` | Added `OpenGLWidgets` to `find_package` and `target_link_libraries` — gui uses `QwtPlotOpenGLCanvas` which inherits `QOpenGLWidget` |
+| `packages/imu/plugins/imuanalyzer/CMakeLists.txt:69,122` | Added `OpenGLWidgets` to `find_package` and `target_link_libraries` — `scenerenderer.hpp` includes `QOpenGLWidget` and `QOpenGLFunctions` |
+
+**Why:** In Qt5, `QOpenGLWidget` lived in `QtWidgets`. In Qt6, it was extracted into `QtOpenGLWidgets` — a separate module that must be explicitly found and linked. `core/CMakeLists.txt` already had it (added in PR 3), but gui and imuanalyzer did not.
+
+#### Step 5.9: `leaveEvent` calling `enterEvent` type mismatch — `smallOnOffSwitch.cpp:177`
+
+**Found during build test (2026-04-27):** Build failed at 15% — `leaveEvent` was calling `QCheckBox::enterEvent(event)` passing a `QEvent*`, but Qt6's `enterEvent` takes `QEnterEvent*`. This was a pre-existing bug: `leaveEvent` should call the parent `leaveEvent`, not `enterEvent`. PR 4's sed correctly changed `enterEvent` signatures but this call site was inside `leaveEvent`, so it was not a signature — it was a call to the wrong function entirely.
+
+**Fix:** `QCheckBox::enterEvent(event)` → `QCheckBox::leaveEvent(event)` (bug fix, not just type change)
+
+#### Step 5.10: Incomplete `QFile` type — `tutorialbuilder.h:83`
+
+**Found during build test (2026-04-27):** `QFile m_jsonFile` member has incomplete type. In Qt5, `QFile` was transitively included through header chains. In Qt6, `qevent.h` only forward-declares `QFile`, so headers using `QFile` as a value type need an explicit `#include <QFile>`.
+
+**Fix:** Added `#include <QFile>` to `gui/include/gui/tutorialbuilder.h`
+
+#### Verification
+
+Build in Docker — compilation should progress past the 15% failure point. Any new errors found during the build will be documented and fixed iteratively.
 
 ---
 

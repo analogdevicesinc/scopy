@@ -27,6 +27,8 @@
 
 #include <iio.h>
 #include <QLoggingCategory>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <style.h>
 #include <stylehelper.h>
 #include <iioutil/iioscantask.h>
@@ -192,8 +194,9 @@ void IioTabWidget::setupFilterWidget(QStringList backednsList)
 
 void IioTabWidget::verifyBtnClicked()
 {
-	QRegExp ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
-			"4][0-9]|25[0-5])$");
+	QRegularExpression ipRegex(
+		"^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
+		"4][0-9]|25[0-5])$");
 	QString uri(m_uriEdit->text());
 	bool isIp = uri.contains(ipRegex);
 	if(isIp && !m_uriEdit->text().contains("ip:")) {
@@ -403,8 +406,8 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 	lineEditWidget->layout()->setSpacing(0);
 	QLabel *serialFrameLabel = new QLabel("Config", lineEditWidget);
 
-	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
-	QRegExpValidator *validator = new QRegExpValidator(re, this);
+	QRegularExpression re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
+	QRegularExpressionValidator *validator = new QRegularExpressionValidator(re, this);
 	m_serialFrameEdit = new QLineEdit(lineEditWidget);
 	m_serialFrameEdit->setValidator(validator);
 	m_serialFrameEdit->setText("8n1");

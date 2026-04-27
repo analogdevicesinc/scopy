@@ -139,7 +139,7 @@ void PqmDataLogger::log()
 		return;
 	}
 	if(!m_writeFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(this, &PqmDataLogger::writeToFile);
+		QFuture<void> f = QtConcurrent::run(&PqmDataLogger::writeToFile, this);
 		m_writeFw->setFuture(f);
 	}
 }

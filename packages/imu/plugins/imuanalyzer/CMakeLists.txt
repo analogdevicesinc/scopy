@@ -67,6 +67,7 @@ find_package(
 	3DExtras
 	3DRender
 	3DInput
+	OpenGLWidgets
 )
 
 add_library(
@@ -119,6 +120,7 @@ target_link_libraries(
 	       Qt${QT_VERSION_MAJOR}::3DExtras
 	       Qt${QT_VERSION_MAJOR}::3DRender
 	       Qt${QT_VERSION_MAJOR}::3DInput
+	       Qt${QT_VERSION_MAJOR}::OpenGLWidgets
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

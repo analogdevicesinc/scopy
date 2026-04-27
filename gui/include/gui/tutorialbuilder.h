@@ -24,6 +24,7 @@
 #include "scopy-gui_export.h"
 #include "tutorialoverlay.h"
 
+#include <QFile>
 #include <QMap>
 
 namespace scopy::gui {

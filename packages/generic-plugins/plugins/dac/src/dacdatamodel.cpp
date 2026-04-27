@@ -347,7 +347,7 @@ void DacDataModel::startPushOperation()
 		qDebug(CAT_DAC_DATA) << "Cancel thread and wait in startPushOperation";
 		m_pushThd.waitForFinished();
 	}
-	m_pushThd = QtConcurrent::run(this, &DacDataModel::push);
+	m_pushThd = QtConcurrent::run(&DacDataModel::push, this);
 	m_pushWatcher->setFuture(m_pushThd);
 }
 

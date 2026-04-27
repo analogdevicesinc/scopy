@@ -20,6 +20,8 @@
 
 #include "ad74413r/bufferlogic.h"
 
+#include <QRegularExpression>
+
 #include "ad74413r/chnlinfobuilder.h"
 #include "ad74413r/ad74413r.h"
 
@@ -53,7 +55,7 @@ void BufferLogic::createChannels()
 		int chnlsNumber = iio_device_get_channels_count(m_iioDevicesMap[AD_NAME]);
 		int plotChnlsNo = 0;
 		int chnlIdx = -1;
-		const QRegExp rx("[^0-9]+");
+		const QRegularExpression rx("[^0-9]+");
 		for(int i = 0; i < chnlsNumber; i++) {
 			struct iio_channel *iioChnl = iio_device_get_channel(m_iioDevicesMap[AD_NAME], i);
 			QString chnlId(iio_channel_get_id(iioChnl));

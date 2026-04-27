@@ -174,7 +174,7 @@ void SmallOnOffSwitch::enterEvent(QEnterEvent *event)
 void SmallOnOffSwitch::leaveEvent(QEvent *event)
 {
 	m_is_entered = false;
-	QCheckBox::enterEvent(event);
+	QCheckBox::leaveEvent(event);
 }
 
 void SmallOnOffSwitch::mousePressEvent(QMouseEvent *event)

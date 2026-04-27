@@ -56,7 +56,7 @@ void PkgPreviewPage::updatePreview(const QVariantMap &metadata)
 	for(auto it = metadata.begin(); it != metadata.end(); ++it) {
 		QVariant variant = it.value();
 		QString value = it.value().toString();
-		if(variant.type() == QVariant::List) {
+		if(variant.typeId() == QMetaType::QVariantList) {
 			value = variant.toStringList().join(", ");
 		} else {
 			value = variant.toString();

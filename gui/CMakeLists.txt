@@ -107,7 +107,15 @@ endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg StateMachine REQUIRED)
+find_package(
+	Qt${QT_VERSION_MAJOR}
+	COMPONENTS Widgets
+		   Xml
+		   Svg
+		   StateMachine
+		   OpenGLWidgets
+	REQUIRED
+)
 find_package(KDDockWidgets QUIET)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
@@ -153,6 +161,7 @@ target_link_libraries(
 	       Qt${QT_VERSION_MAJOR}::Xml
 	       Qt${QT_VERSION_MAJOR}::Svg
 	       Qt${QT_VERSION_MAJOR}::StateMachine
+	       Qt${QT_VERSION_MAJOR}::OpenGLWidgets
 	       ${QWT_LIBRARIES}
 	       ${Boost_LIBRARIES}
 	       scopy-common

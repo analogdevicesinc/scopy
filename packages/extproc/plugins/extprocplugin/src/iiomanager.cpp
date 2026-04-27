@@ -75,7 +75,7 @@ void IIOManager::startAcq(bool en)
 void IIOManager::onDataRequest()
 {
 	if(!m_readFw->isRunning() && !m_readFw->isPaused()) {
-		QFuture<void> f = QtConcurrent::run(this, &IIOManager::readBuffer);
+		QFuture<void> f = QtConcurrent::run(&IIOManager::readBuffer, this);
 		m_readFw->setFuture(f);
 	}
 }

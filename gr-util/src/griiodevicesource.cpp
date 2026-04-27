@@ -21,6 +21,8 @@
 
 #include "griiodevicesource.h"
 
+#include <QRegularExpression>
+
 #include "griiocomplexchannelsrc.h"
 #include "griiofloatchannelsrc.h"
 #include "grlog.h"
@@ -119,8 +121,8 @@ void GRIIODeviceSource::computeChannelNames()
 
 		// sort by numbers inside ch name
 		bool ok_a, ok_b;
-		int id_a = QString::fromStdString(a).remove(QRegExp("[^0-9]")).toInt(&ok_a);
-		int id_b = QString::fromStdString(a).remove(QRegExp("[^0-9]")).toInt(&ok_b);
+		int id_a = QString::fromStdString(a).remove(QRegularExpression("[^0-9]")).toInt(&ok_a);
+		int id_b = QString::fromStdString(a).remove(QRegularExpression("[^0-9]")).toInt(&ok_b);
 		if(ok_a && ok_b) {
 			return id_a < id_b;
 		}
