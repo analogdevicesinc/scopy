@@ -56,14 +56,14 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_layout = new QVBoxLayout();
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(0);
 	setLayout(m_layout);
 
 	QScrollArea *scroll = new QScrollArea();
 	QWidget *w = new QWidget(scroll);
 	auto scrollLayout = new QVBoxLayout(w);
-	scrollLayout->setMargin(0);
+	scrollLayout->setContentsMargins(0, 0, 0, 0);
 	scrollLayout->setSpacing(5);
 	w->setLayout(scrollLayout);
 	scroll->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
@@ -86,7 +86,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(m_bufferSizeSpin, &MenuSpinbox::valueChanged, this,
 		[&](double value) { m_model->setBuffersize(value); });
 	buffersizeContainer->contentLayout()->setSpacing(0);
-	buffersizeContainer->contentLayout()->setMargin(0);
+	buffersizeContainer->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	buffersizeContainer->contentLayout()->addWidget(m_bufferSizeSpin);
 
 	// Kernel buffers section
@@ -98,7 +98,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	connect(m_kernelCountSpin, &MenuSpinbox::valueChanged, this,
 		[&](double value) { m_model->setKernelBuffersCount(value); });
 	kernelContainer->contentLayout()->setSpacing(0);
-	kernelContainer->contentLayout()->setMargin(0);
+	kernelContainer->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	kernelContainer->contentLayout()->addWidget(m_kernelCountSpin);
 
 	// Decimation section - hidden for now
@@ -117,7 +117,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	QWidget *runConfigContainer = new QWidget(this);
 	auto runConfigLay = new QHBoxLayout(this);
 	runConfigLay->setSpacing(10);
-	runConfigLay->setMargin(0);
+	runConfigLay->setContentsMargins(0, 0, 0, 0);
 	runConfigContainer->setLayout(runConfigLay);
 
 	// Run button section
@@ -217,7 +217,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	QWidget *channelsContainer = new QWidget(scrollArea);
 	channelsContainer->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 	QVBoxLayout *channelsContainerLayout = new QVBoxLayout();
-	channelsContainerLayout->setMargin(0);
+	channelsContainerLayout->setContentsMargins(0, 0, 0, 0);
 	channelsContainerLayout->setSpacing(0);
 	channelsContainer->setLayout(channelsContainerLayout);
 
@@ -291,7 +291,7 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 	auto topLayout = new QHBoxLayout();
 	topSection->setLayout(topLayout);
 	topSection->setFixedHeight(190);
-	topLayout->setMargin(0);
+	topLayout->setContentsMargins(0, 0, 0, 0);
 	topLayout->setSpacing(5);
 	topLayout->addWidget(fileBrowserSection);
 	topLayout->addWidget(channelsSection);
@@ -355,7 +355,7 @@ void BufferDacAddon::onLoadFinished()
 void BufferDacAddon::enableFirstChannels(int channelCount)
 {
 	int i = 0;
-	for(auto btn : qAsConst(m_channelBtns)) {
+	for(auto btn : std::as_const(m_channelBtns)) {
 		btn->checkBox()->setChecked(i < channelCount);
 		i++;
 	}
@@ -367,7 +367,7 @@ void BufferDacAddon::updateGuiStrategyWidget()
 		delete m_optionalGuiStrategy->layout();
 	}
 	auto optGuiStrLay = new QHBoxLayout(m_optionalGuiStrategy);
-	optGuiStrLay->setMargin(0);
+	optGuiStrLay->setContentsMargins(0, 0, 0, 0);
 	optGuiStrLay->setSpacing(0);
 	m_optionalGuiStrategy->setLayout(optGuiStrLay);
 
@@ -466,9 +466,9 @@ QWidget *BufferDacAddon::createAttrMenu(TxNode *node, QWidget *parent)
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
-	for(IIOWidget *w : qAsConst(attrWidgets)) {
+	for(IIOWidget *w : std::as_const(attrWidgets)) {
 		layout->addWidget(w);
 		detectSamplingFrequency(w);
 	}
@@ -487,7 +487,7 @@ QWidget *BufferDacAddon::createMenu(TxNode *node)
 	QScrollArea *scroll = new QScrollArea();
 	QWidget *wScroll = new QWidget(scroll);
 	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	layScroll->setSpacing(10);
 
 	wScroll->setLayout(layScroll);
@@ -497,7 +497,7 @@ QWidget *BufferDacAddon::createMenu(TxNode *node)
 
 	scroll->setWidget(wScroll);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 

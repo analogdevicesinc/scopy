@@ -32,7 +32,7 @@ InfoHeaderWidget::InfoHeaderWidget(QString title, QWidget *parent)
 {
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_infoBtn = new InfoBtn(this);
 	m_infoBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

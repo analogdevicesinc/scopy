@@ -216,7 +216,7 @@ bool Style::setTheme(QString themePath, float fontScale)
 QString Style::getThemeFromPkgs(QString theme)
 {
 	QString path = "";
-	for(const QFileInfo &file : qAsConst(m_pkgThemes)) {
+	for(const QFileInfo &file : std::as_const(m_pkgThemes)) {
 		if(file.baseName().contains(theme)) {
 			path = file.filePath();
 			break;
@@ -381,7 +381,7 @@ void Style::generateStyle()
 {
 	QFileInfoList qssList = getQssList(m_qssFolderPath);
 	qssList.append(m_pkgQss);
-	for(const QFileInfo &fInfo : qAsConst(qssList)) {
+	for(const QFileInfo &fInfo : std::as_const(qssList)) {
 		QFile file(fInfo.filePath());
 		if(file.open(QIODevice::ReadOnly)) {
 			QString data = QString(file.readAll());
@@ -451,3 +451,5 @@ QString Style::adjustForScaling(QString key, QString value, float scale)
 
 	return value;
 }
+
+#include "moc_style.cpp"

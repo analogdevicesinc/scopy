@@ -24,6 +24,7 @@
 
 #include "scopy-gui_export.h"
 
+#include <QEnterEvent>
 #include <QFrame>
 
 namespace scopy {
@@ -74,7 +75,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event) override;
 	void mouseMoveEvent(QMouseEvent *event) override;
 	void mouseReleaseEvent(QMouseEvent *event) override;
-	void enterEvent(QEvent *event) override;
+	void enterEvent(QEnterEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 	void drawBufferWave(QPainter *p, int start, int width, int widget_width);
 

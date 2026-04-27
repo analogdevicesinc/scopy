@@ -154,7 +154,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	QScrollArea *scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);
 	QVBoxLayout *layScroll = new QVBoxLayout();
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	layScroll->setSpacing(10);
 
 	wScroll->setLayout(layScroll);
@@ -165,7 +165,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 
 	scroll->setWidget(wScroll);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 
@@ -197,7 +197,7 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	for(auto w : attrWidgets) {
@@ -411,7 +411,7 @@ QWidget *ImportChannelAddon::createMenu(QWidget *parent)
 	QScrollArea *scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);
 	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	layScroll->setSpacing(10);
 
 	wScroll->setLayout(layScroll);
@@ -422,7 +422,7 @@ QWidget *ImportChannelAddon::createMenu(QWidget *parent)
 
 	scroll->setWidget(wScroll);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 

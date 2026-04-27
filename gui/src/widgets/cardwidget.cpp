@@ -59,7 +59,7 @@ QFrame *CardWidget::createTitleW(QWidget *parent)
 	QFrame *w = new QFrame(parent);
 	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QGridLayout *lay = new QGridLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 
 	m_title = new QLineEdit(w);

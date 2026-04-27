@@ -329,7 +329,7 @@ void BufferPreviewer::mouseReleaseEvent(QMouseEvent *event)
 	}
 }
 
-void BufferPreviewer::enterEvent(QEvent *event) { setCursor(Qt::OpenHandCursor); }
+void BufferPreviewer::enterEvent(QEnterEvent *event) { setCursor(Qt::OpenHandCursor); }
 
 void BufferPreviewer::leaveEvent(QEvent *event) { setCursor(Qt::ArrowCursor); }
 

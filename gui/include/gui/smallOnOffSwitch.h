@@ -24,6 +24,7 @@
 #include "scopy-gui_export.h"
 
 #include <QCheckBox>
+#include <QEnterEvent>
 #include <QColor>
 #include <QMap>
 #include <QPainter>
@@ -52,7 +53,7 @@ public Q_SLOTS:
 protected:
 	void resizeEvent(QResizeEvent *event) override;
 	void paintEvent(QPaintEvent *event) override;
-	void enterEvent(QEvent *event) override;
+	void enterEvent(QEnterEvent *event) override;
 	void leaveEvent(QEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 	int offset() const;

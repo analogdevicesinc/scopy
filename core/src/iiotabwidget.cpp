@@ -45,18 +45,18 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	QWidget *contentWidget = new QWidget(this);
 	QVBoxLayout *contentLay = new QVBoxLayout(this);
 	contentLay->setSpacing(10);
-	contentLay->setMargin(0);
+	contentLay->setContentsMargins(0, 0, 0, 0);
 	contentWidget->setLayout(contentLay);
 
 	QStringList backendsList = computeBackendsList();
 
 	MenuSectionCollapseWidget *scanSection = new MenuSectionCollapseWidget(
 		"SCAN", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
-	scanSection->menuSection()->layout()->setMargin(0);
+	scanSection->menuSection()->layout()->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *scanWidget = new QWidget(scanSection);
 	QGridLayout *scanGrid = new QGridLayout(scanWidget);
-	scanGrid->setMargin(0);
+	scanGrid->setContentsMargins(0, 0, 0, 0);
 	scanWidget->setLayout(scanGrid);
 
 	m_filterWidget = createFilterWidget(scanWidget);
@@ -82,7 +82,7 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 
 	MenuSectionCollapseWidget *serialSection = new MenuSectionCollapseWidget(
 		"SERIAL PORT", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
-	serialSection->menuSection()->layout()->setMargin(0);
+	serialSection->menuSection()->layout()->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *serialSettWidget = createSerialSettWidget(serialSection);
 	bool serialCompatible = isSerialCompatible();
@@ -254,7 +254,7 @@ void IioTabWidget::scanFinished()
 	if(!m_avlCtxCb->isEnabled()) {
 		m_avlCtxCb->setEnabled(true);
 	}
-	for(const auto &ctx : qAsConst(m_scanList)) {
+	for(const auto &ctx : std::as_const(m_scanList)) {
 		QString cbEntry = ctx.first + " [" + ctx.second + "]";
 		m_avlCtxCb->addItem(cbEntry);
 	}
@@ -356,7 +356,7 @@ QWidget *IioTabWidget::createFilterWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
 	return w;
@@ -366,7 +366,7 @@ QWidget *IioTabWidget::createAvlCtxWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
@@ -386,7 +386,7 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QGridLayout *layout = new QGridLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
@@ -399,7 +399,7 @@ QWidget *IioTabWidget::createSerialSettWidget(QWidget *parent)
 
 	QWidget *lineEditWidget = new QWidget(w);
 	lineEditWidget->setLayout(new QVBoxLayout(lineEditWidget));
-	lineEditWidget->layout()->setMargin(0);
+	lineEditWidget->layout()->setContentsMargins(0, 0, 0, 0);
 	lineEditWidget->layout()->setSpacing(0);
 	QLabel *serialFrameLabel = new QLabel("Config", lineEditWidget);
 
@@ -461,7 +461,7 @@ QWidget *IioTabWidget::createVerifyBtnWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setAlignment(Qt::AlignRight);
 	w->setLayout(layout);
 

@@ -45,7 +45,7 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	m_model = new DacDataModel(dev, this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_layout = new QVBoxLayout();
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(5);
 	setLayout(m_layout);
 
@@ -111,7 +111,7 @@ QWidget *DacDataManager::createAttrMenu(QWidget *parent)
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
@@ -131,7 +131,7 @@ QWidget *DacDataManager::createMenu()
 	QScrollArea *scroll = new QScrollArea();
 	QWidget *wScroll = new QWidget(scroll);
 	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	layScroll->setSpacing(10);
 
 	wScroll->setLayout(layScroll);
@@ -141,7 +141,7 @@ QWidget *DacDataManager::createMenu()
 
 	scroll->setWidget(wScroll);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 
@@ -176,7 +176,7 @@ void DacDataManager::setupDacMode(QString mode_name, unsigned int mode)
 	}
 	auto channelBtns = dac->getChannelBtns();
 	auto channelMenus = dac->getChannelMenus();
-	for(auto btn : qAsConst(channelBtns)) {
+	for(auto btn : std::as_const(channelBtns)) {
 		QString uuid = channelBtns.key(btn);
 		QWidget *menu = channelMenus.value(uuid);
 		if(menu) {

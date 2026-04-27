@@ -127,7 +127,7 @@ void MonitorPlotManager::multiPlotUpdate()
 {
 	bool b = m_plots.count() > 1;
 
-	for(PlotManagerCombobox *cb : qAsConst(m_channelPlotcomboMap)) {
+	for(PlotManagerCombobox *cb : std::as_const(m_channelPlotcomboMap)) {
 		cb->setVisible(b);
 	}
 }

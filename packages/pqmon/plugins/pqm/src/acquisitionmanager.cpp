@@ -227,7 +227,7 @@ bool AcquisitionManager::readBufferedData()
 	QString chnl;
 	int16_t *startAdr = (int16_t *)iio_buffer_start(m_buffer);
 	int16_t *endAdr = (int16_t *)iio_buffer_end(m_buffer);
-	for(const QString &ch : qAsConst(m_buffChnls)) {
+	for(const QString &ch : std::as_const(m_buffChnls)) {
 		m_bufferData[ch].clear();
 		m_bufferData[ch] = {};
 	}
@@ -342,7 +342,7 @@ void AcquisitionManager::storeProcessData()
 void AcquisitionManager::handlePQEvents()
 {
 	QString logMsg = "";
-	for(const QString &ch : qAsConst(m_eventsChnls)) {
+	for(const QString &ch : std::as_const(m_eventsChnls)) {
 		if(m_pqmAttr[ch]["countEvent"].toInt() == 0) {
 			continue;
 		}

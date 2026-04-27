@@ -52,7 +52,7 @@ RmsInstrument::RmsInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
 	setLayout(instrumentLayout);
-	instrumentLayout->setMargin(0);
+	instrumentLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_dockableArea = createDockableArea(this);
 
@@ -283,7 +283,7 @@ QWidget *RmsInstrument::createSettingsMenu(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(

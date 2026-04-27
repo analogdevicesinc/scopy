@@ -41,7 +41,7 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetGroup *group, QWidget 
 	, QWidget{parent}
 {
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);

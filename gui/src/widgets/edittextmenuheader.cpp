@@ -34,7 +34,7 @@ scopy::EditTextMenuHeader::EditTextMenuHeader(QString title, QPen pen, QWidget *
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
 	lay->setSpacing(0);
-	lay->setMargin(3);
+	lay->setContentsMargins(3, 3, 3, 3);
 
 	m_lineEdit = new QLineEdit(title, this);
 	m_line = new QFrame(this);

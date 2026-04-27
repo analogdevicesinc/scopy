@@ -112,13 +112,13 @@ void DacDataModel::enableDds(bool enable)
 {
 	qDebug(CAT_DAC_DATA) << QString("Enable DDS %1").arg(enable);
 	if(m_isBufferCapable && m_activeBuffer && enable) {
-		for(auto node : qAsConst(m_bufferTxs)) {
+		for(auto node : std::as_const(m_bufferTxs)) {
 			enableBufferChannel(node->getUuid(), false);
 		}
 	}
 	if(m_isDds) {
 		m_activeDds = enable;
-		for(auto tx : qAsConst(m_ddsTxs)) {
+		for(auto tx : std::as_const(m_ddsTxs)) {
 			tx->enableDds(enable);
 		}
 	}
@@ -209,7 +209,7 @@ void DacDataModel::enableBufferChannel(QString uuid, bool enable)
 unsigned int DacDataModel::getEnabledChannelsCount()
 {
 	unsigned int enChannelsCount = 0;
-	for(auto node : qAsConst(m_bufferTxs)) {
+	for(auto node : std::as_const(m_bufferTxs)) {
 		enChannelsCount += iio_channel_is_enabled(node->getChannel()) ? 1 : 0;
 	}
 	return enChannelsCount;
@@ -412,7 +412,7 @@ void DacDataModel::push()
 	int totalNbBuffers = totalSize / (m_buffersize * enChannelsCount);
 	while(!m_interrupted && bufferIdx <= totalNbBuffers) {
 		int chnIdx = 0;
-		for(auto ch : qAsConst(m_bufferTxs)) {
+		for(auto ch : std::as_const(m_bufferTxs)) {
 			if(!iio_channel_is_enabled(ch->getChannel())) {
 				continue;
 			}
@@ -542,7 +542,7 @@ int DacDataModel::getTxChannelEnabledCount(unsigned *enabled_mask)
 	if(enabled_mask)
 		*enabled_mask = 0;
 
-	for(auto ch : qAsConst(m_bufferTxs)) {
+	for(auto ch : std::as_const(m_bufferTxs)) {
 		bool enabled = iio_channel_is_enabled(ch->getChannel());
 		if(enabled) {
 			num_enabled++;
@@ -621,7 +621,7 @@ QString DacDataModel::generateToneName(QString chnId)
 	QString name = "";
 	int idx = chnId.indexOf(toneId);
 	if(idx != -1) {
-		int chnIndex = chnId.midRef(idx + toneId.size()).toInt(&ok);
+		int chnIndex = chnId\.mid(idx + toneId.size()).toInt(&ok);
 		if(!ok)
 			return name;
 		int txIndex = (chnIndex / MAX_NB_TONES) + 1; // TX indexing from 1

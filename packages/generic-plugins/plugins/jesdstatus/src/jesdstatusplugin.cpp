@@ -98,7 +98,7 @@ bool JesdStatusPlugin::onConnect()
 	m_ctx = conn->context();
 	QList<struct iio_device *> devLst;
 	QList<QString> lst = scanCompatibleDevices(conn->context());
-	for(const QString &id : qAsConst(lst)) {
+	for(const QString &id : std::as_const(lst)) {
 		auto dev = iio_context_find_device(conn->context(), id.toUtf8());
 		if(dev) {
 			devLst.push_back(dev);

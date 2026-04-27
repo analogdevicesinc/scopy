@@ -88,7 +88,7 @@ void GRIIODeviceSource::addChannel(QString channelName)
 
 void GRIIODeviceSource::computeChannelNames()
 {
-	for(GRIIOChannel *ch : qAsConst(m_list)) {
+	for(GRIIOChannel *ch : std::as_const(m_list)) {
 		GRIIOFloatChannelSrc *floatCh = dynamic_cast<GRIIOFloatChannelSrc *>(ch);
 		if(floatCh) {
 			addChannel(floatCh->getChannelName());
@@ -173,7 +173,7 @@ double GRIIODeviceSource::readSampleRate()
 void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top)
 {
 	QMap<GRIIOChannel *, int> map;
-	for(GRIIOChannel *ch : qAsConst(m_list)) {
+	for(GRIIOChannel *ch : std::as_const(m_list)) {
 		GRIIOFloatChannelSrc *floatCh = dynamic_cast<GRIIOFloatChannelSrc *>(ch);
 		if(floatCh) {
 			auto start_sptr = floatCh->getGrStartPoint();

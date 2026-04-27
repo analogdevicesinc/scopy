@@ -67,7 +67,7 @@ void GRSignalPath::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 {
 	qDebug(SCOPY_GR_UTIL) << "Start connecting GRSignalPath" << name();
 	GRProxyBlock *prevBlk = src;
-	for(GRProxyBlock *blk : qAsConst(list)) {
+	for(GRProxyBlock *blk : std::as_const(list)) {
 		if(blk->enabled() && !blk->built() ||
 		   (blk == list[0] && list.count() > 1)) // - an enabled signal path always needs a source enabled -
 							 // unless it's the only one I guess */ )
@@ -82,7 +82,7 @@ void GRSignalPath::connect_blk(GRTopBlock *top, GRProxyBlock *src)
 
 void GRSignalPath::disconnect_blk(GRTopBlock *top)
 {
-	for(GRProxyBlock *blk : qAsConst(list)) {
+	for(GRProxyBlock *blk : std::as_const(list)) {
 		if(blk->built()) {
 			blk->disconnect_blk(top);
 			blk->destroy_blks(top);

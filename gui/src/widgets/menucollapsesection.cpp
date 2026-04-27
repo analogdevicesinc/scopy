@@ -37,7 +37,7 @@ MenuCollapseHeader::MenuCollapseHeader(QString title, MenuCollapseSection::MenuH
 	: QAbstractButton(parent)
 {
 	lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setContentsMargins(0, 2, 0, 6);
 	lay->setSpacing(0);
 
@@ -109,7 +109,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 {
 	Style::setBackgroundColor(this, QString("transparent"));
 	m_lay = new QVBoxLayout(this);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
 	m_header = new MenuCollapseHeader(m_title, style, headerType, this);
@@ -118,7 +118,7 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 	m_lay->addWidget(container);
 	m_contLayout = new QVBoxLayout(container);
 	container->setLayout(m_contLayout);
-	m_contLayout->setMargin(0);
+	m_contLayout->setContentsMargins(0, 0, 0, 0);
 	m_contLayout->setSpacing(5);
 
 	connect(m_header, &QAbstractButton::toggled, container, &QWidget::setVisible);

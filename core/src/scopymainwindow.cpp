@@ -396,7 +396,7 @@ void ScopyMainWindow::initAboutPage()
 		return;
 	}
 	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
-	for(Plugin *p : qAsConst(plugin)) {
+	for(Plugin *p : std::as_const(plugin)) {
 		QString content = p->about();
 		if(!content.isEmpty()) {
 			about->addHorizontalTab(about->buildPage(content), p->name());
@@ -415,7 +415,7 @@ void ScopyMainWindow::initPreferencesPage()
 	}
 
 	QList<Plugin *> plugin = PluginRepository::getOriginalPlugins();
-	for(Plugin *p : qAsConst(plugin)) {
+	for(Plugin *p : std::as_const(plugin)) {
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
 			prefPage->addHorizontalTab(p->preferencesPage(), p->name());
@@ -827,7 +827,7 @@ void ScopyMainWindow::detachScriptingTool()
 
 	// Set up layout for detached window
 	QVBoxLayout *layout = new QVBoxLayout(m_detachedScriptingWindow);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->addWidget(m_scriptingTool);
 
 	// Show detached window

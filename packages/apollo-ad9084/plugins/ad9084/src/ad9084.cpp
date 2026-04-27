@@ -46,7 +46,7 @@ Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 {
 	QHBoxLayout *lay = new QHBoxLayout();
 	this->setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
 	m_tool->topContainer()->setVisible(true);
@@ -167,10 +167,10 @@ Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 	m_tool->rightStack()->add(settingsMenuId, rightSideMenu);
 
 	scanChannels();
-	for(auto w : qAsConst(m_channelsRx)) {
+	for(auto w : std::as_const(m_channelsRx)) {
 		globalRxSection->contentLayout()->addWidget(w);
 	}
-	for(auto w : qAsConst(m_channelsTx)) {
+	for(auto w : std::as_const(m_channelsTx)) {
 		globalTxSection->contentLayout()->addWidget(w);
 	}
 	Q_EMIT triggerRead();
@@ -297,14 +297,14 @@ QWidget *Ad9084::createMenu()
 {
 	QWidget *menu = new QWidget(this);
 	QVBoxLayout *vLay = new QVBoxLayout();
-	vLay->setMargin(0);
+	vLay->setContentsMargins(0, 0, 0, 0);
 	menu->setLayout(vLay);
 
 	// PFIR load container
 	auto pfirContainer = new MenuSectionCollapseWidget("PFIR CONFIG", MenuCollapseSection::MHCW_NONE,
 							   MenuCollapseSection::MHW_BASEWIDGET, menu);
 	QHBoxLayout *pfirlay = new QHBoxLayout(this);
-	pfirlay->setMargin(0);
+	pfirlay->setContentsMargins(0, 0, 0, 0);
 	pfirlay->setSpacing(10);
 
 	QFileInfoList filters = PkgManager::listFilesInfo(QStringList() << "ad9084-filters");
@@ -324,7 +324,7 @@ QWidget *Ad9084::createMenu()
 	auto cfirContainer = new MenuSectionCollapseWidget("CFIR CONFIG", MenuCollapseSection::MHCW_NONE,
 							   MenuCollapseSection::MHW_BASEWIDGET, menu);
 	QHBoxLayout *cfirlay = new QHBoxLayout(this);
-	cfirlay->setMargin(0);
+	cfirlay->setContentsMargins(0, 0, 0, 0);
 	cfirlay->setSpacing(10);
 
 	m_cfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);

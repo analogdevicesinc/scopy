@@ -32,7 +32,7 @@ JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
 {
 	QVBoxLayout *lay = new QVBoxLayout();
 	this->setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
 	m_tool->topContainer()->setVisible(false);
@@ -61,7 +61,7 @@ JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
 	m_tool->addWidgetToCentralContainerHelper(deviceSelectorWidget);
 	m_tool->addWidgetToCentralContainerHelper(m_jesdDeviceStack);
 
-	for(auto dev : qAsConst(m_deviceList)) {
+	for(auto dev : std::as_const(m_deviceList)) {
 		setupDevice(dev);
 	}
 

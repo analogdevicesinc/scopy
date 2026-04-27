@@ -186,24 +186,82 @@ Same build test showed `CMake Error at cmake/Modules/ScopyAbout.cmake:63 (string
 ---
 
 ### PR 4: Mass Automated Replacements
-**Scope:** Source code only — safe, mechanical text replacements via sed.
+**Scope:** Source code only — safe, mechanical text replacements via sed. M2K package excluded (deferred to its own refactor).
 
-| Replacement | Estimated Files | sed Pattern |
-|-------------|----------------|-------------|
-| `setMargin(N)` → `setContentsMargins(N,N,N,N)` | ~165 | `s/setMargin\(([^)]+)\)/setContentsMargins(\1, \1, \1, \1)/g` |
-| `qAsConst(` → `std::as_const(` | ~111 | `s/qAsConst(/std::as_const(/g` |
-| `<< endl` → `<< Qt::endl` | ~2 | `s/<< endl/<< Qt::endl/g` |
-| `.midRef(` → `.mid(` (and `leftRef`, `rightRef`) | few | `s/\.midRef(/\.mid(/g` |
-| `setWeight(75)` → `setWeight(QFont::Bold)` | ~5 | manual review |
-| `enterEvent(QEvent *` → `enterEvent(QEnterEvent *` | varies | `s/enterEvent(QEvent \*/enterEvent(QEnterEvent */g` |
+**All sed commands exclude:** `build/`, `.git/`, `staging_ubuntu20/`, `staging_ubuntu/`, `packages/m2k/`
+**File extensions:** `*.cpp`, `*.h`, `*.hpp`, `*.cc`, `*.mako`
 
-**All sed commands exclude:** `build/`, `.git/`, `m2k/`, `staging_ubuntu20/`
+#### Step 4.1: `setMargin(N)` → `setContentsMargins(N, N, N, N)`
 
-**Post-sed review:**
-- Check for duplicate `setContentsMargins` in `channel_manager.cpp` (known artifact)
-- Run `tools/format.sh` to fix formatting issues introduced by sed
+| Detail | Value |
+|--------|-------|
+| Why | `QLayout::setMargin()` removed in Qt6, only `setContentsMargins()` exists |
+| Occurrences | ~340 (non-m2k) |
+| sed | `s/setMargin\(([^)]+)\)/setContentsMargins(\1, \1, \1, \1)/g` |
 
-**Validation:** `grep -r "setMargin\|qAsConst\|midRef\|leftRef\|rightRef"` returns zero hits outside excluded dirs.
+~57 files already use both `setMargin` and `setContentsMargins` on different objects. After sed, some files may have redundant consecutive calls on the same object — harmless (second overrides first).
+
+#### Step 4.2: `qAsConst(` → `std::as_const(`
+
+| Detail | Value |
+|--------|-------|
+| Why | `qAsConst` deprecated in Qt6, C++17 `std::as_const` is the replacement |
+| Occurrences | ~210 (non-m2k, across .cpp/.h/.hpp/.cc/.mako) |
+| sed | `s/qAsConst(/std::as_const(/g` |
+
+#### Step 4.3: `<< endl` → `<< Qt::endl`
+
+| Detail | Value |
+|--------|-------|
+| Why | Bare `endl` is ambiguous in Qt6 |
+| Occurrences | 1 (non-m2k): `registermapvalues.cpp:98` |
+| sed | `s/<< endl/<< Qt::endl/g` (single file) |
+
+#### Step 4.4: `.midRef(` → `.mid(`
+
+| Detail | Value |
+|--------|-------|
+| Why | `QString::midRef()` and `QStringRef` removed in Qt6 |
+| Occurrences | 1 (non-m2k): `dacdatamodel.cpp:624` |
+| sed | `s/\.midRef(/\.mid(/g` (single file) |
+
+No `leftRef` or `rightRef` occurrences found.
+
+#### Step 4.5: `enterEvent(QEvent *)` → `enterEvent(QEnterEvent *)`
+
+| Detail | Value |
+|--------|-------|
+| Why | Qt6 changed parameter type; old signature silently stops being called |
+| Occurrences | 8 (non-m2k): 4 headers + 4 cpp files |
+| sed | `s/enterEvent\(QEvent \*([a-z]*)\)/enterEvent(QEnterEvent *\1)/g` |
+
+Also add `#include <QEnterEvent>` to 4 header files:
+- `gui/include/gui/buffer_previewer.hpp`
+- `gui/include/gui/basemenuitem.h`
+- `gui/include/gui/smallOnOffSwitch.h`
+- `core/include/core/toolmenuitem.h`
+
+#### Step 4.6: `setWeight(75)` → `setWeight(QFont::Bold)` — SKIPPED
+
+All occurrences are in m2k files (1 in .cpp, 4 in .cc). No-op for this PR.
+
+#### Step 4.7: Run formatter
+
+`./tools/format.sh` — fixes line lengths broken by `setContentsMargins(N, N, N, N)` expansion.
+
+#### Step 4.8: Docker build test
+
+Build inside Docker to verify. Compilation will still fail (PR 5 API fixes needed), but fewer errors than before PR 4.
+
+#### Verification
+
+These greps should all return 0 hits (excluding m2k and build dirs):
+```
+grep -rn 'setMargin(' ... (excluding setContentsMargins matches)
+grep -rn 'qAsConst(' ...
+grep -rn 'enterEvent(QEvent' ...
+grep -rn '.midRef(' ...
+```
 
 ---
 

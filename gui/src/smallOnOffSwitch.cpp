@@ -164,7 +164,7 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	}
 }
 
-void SmallOnOffSwitch::enterEvent(QEvent *event)
+void SmallOnOffSwitch::enterEvent(QEnterEvent *event)
 {
 	setCursor(Qt::PointingHandCursor);
 	m_is_entered = true;

@@ -32,7 +32,7 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	, m_toolTip(false)
 {
 	lay = new QHBoxLayout(this);
-	lay->setMargin(16);
+	lay->setContentsMargins(16, 16, 16, 16);
 	lay->setSpacing(10);
 
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -174,7 +174,7 @@ CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent)
 	: QWidget(parent)
 {
 	m_lay = new QVBoxLayout(this);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
 	m_ctrl = new MenuControlButton(this);
@@ -193,7 +193,7 @@ CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent)
 	m_lay->addWidget(container);
 	m_contLayout = new QVBoxLayout(container);
 	container->setLayout(m_contLayout);
-	m_contLayout->setMargin(0);
+	m_contLayout->setContentsMargins(0, 0, 0, 0);
 	m_contLayout->setSpacing(0);
 
 	connect(m_ctrl->checkBox(), SIGNAL(toggled(bool)), container, SLOT(setVisible(bool)));
