@@ -45,10 +45,20 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	m_color = Style::getAttribute(json::theme::interactive_primary_idle);
 	m_cs = CS_SQUARE;
 
+	m_icon = new QLabel(this);
+	int iconSize = Style::getDimension(json::global::unit_1);
+	QString iconPath =
+		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg";
+	m_icon->setPixmap(Style::getPixmap(iconPath, Style::getAttribute(json::theme::content_default))
+				  .scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+	m_icon->setAttribute(Qt::WA_TransparentForMouseEvents);
+	m_icon->hide();
+
 	lay->addWidget(m_chk);
 	lay->addWidget(m_label);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 	lay->addWidget(m_btn);
+	lay->addWidget(m_icon);
 	applyStylesheet();
 
 	connect(this, &QAbstractButton::toggled, this, [=](bool b) {
@@ -57,6 +67,11 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 		if(m_cs == CS_CIRCLE) {
 			Style::setStyle(m_chk, style::properties::checkbox::circleCB, b ? "selected" : "idle", true);
 		}
+
+		int iconSize = Style::getDimension(json::global::unit_1);
+		QColor iconColor = Style::getAttribute(b ? json::theme::content_inverse : json::theme::content_default);
+		m_icon->setPixmap(Style::getPixmap(iconPath, iconColor)
+					  .scaled(iconSize, iconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 	}); // Hackish - QStyle should be implemented
 
 	dblClickToOpenMenu = QMetaObject::Connection();
@@ -116,6 +131,8 @@ void MenuControlButton::enableToolTip(bool en)
 	m_toolTip = en;
 	m_label->setToolTip(en ? m_label->text() : "");
 }
+
+void MenuControlButton::setIconEnabled(bool en) { m_icon->setVisible(en); }
 
 void MenuControlButton::mouseDoubleClickEvent(QMouseEvent *e)
 {
