@@ -201,18 +201,16 @@ bool SWIOTPlugin::onConnect()
 
 bool SWIOTPlugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
 	auto ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
-
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
-		tme->setRunning(false);
-		tme->setEnabled(false);
-		tme->setRunBtnVisible(false);
-		tme->tool()->deleteLater();
-		tme->setTool(nullptr);
-	}
 
 	disconnect(dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::writeModeAttribute, this,
 		   &SWIOTPlugin::setCtxMode);
@@ -222,6 +220,14 @@ bool SWIOTPlugin::onDisconnect()
 		   &SwiotRuntime::onBackBtnPressed);
 	disconnect(dynamic_cast<Faults *>(faultsTme->tool()), &Faults::backBtnPressed, m_runtime,
 		   &SwiotRuntime::onBackBtnPressed);
+
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setRunning(false);
+		tme->setEnabled(false);
+		tme->setRunBtnVisible(false);
+		tme->tool()->deleteLater();
+		tme->setTool(nullptr);
+	}
 
 	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, this, &SWIOTPlugin::powerSupplyStatus);
 
@@ -241,11 +247,6 @@ bool SWIOTPlugin::onDisconnect()
 	if(m_statusContainer) {
 		delete m_statusContainer;
 		m_statusContainer = nullptr;
-	}
-	if(m_api) {
-		ScopyJS::GetInstance()->unregisterApi(m_api);
-		delete m_api;
-		m_api = nullptr;
 	}
 	clearPingTask();
 	ConnectionProvider::close(m_param);

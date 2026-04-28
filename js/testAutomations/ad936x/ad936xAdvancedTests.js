@@ -30,13 +30,13 @@ TestFramework.init("AD936x Advanced Plugin Tests");
 // Connect to device
 if (!TestFramework.connectToDevice("ip:192.168.2.1")) {
     printToConsole("ERROR: Cannot proceed without device connection");
-    exit(1);
+    scopy.exit();
 }
 
 // Switch to AD936X Advanced tool
 if (!switchToTool("AD936X Advanced")) {
     printToConsole("ERROR: Cannot switch to AD936X Advanced tool");
-    exit(1);
+    scopy.exit();
 }
 
 // ============================================

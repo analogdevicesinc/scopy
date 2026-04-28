@@ -83,8 +83,8 @@ private:
 	struct iio_device *getIioDevice(iio_context *ctx, const char *dev_name);
 	bool isBufferCapable(iio_device *dev);
 	RegisterMapTool *registerMapTool;
-	void InitApi();
-	RegMap_API *api;
+	void initApi();
+	RegMap_API *m_api = nullptr;
 };
 } // namespace regmap
 } // namespace scopy

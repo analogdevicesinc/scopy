@@ -228,7 +228,7 @@ bool PQM_API::isHarmonicsLoggingEnabled()
 void PQM_API::setHarmonicsLoggingEnabled(bool enabled)
 {
 	HarmonicsInstrument *harmonics = getHarmonicsInstrument();
-	if(harmonics && harmonics->m_logSection) {
+	if(harmonics && !isHarmonicsRunning() && harmonics->m_logSection) {
 		harmonics->m_logSection->setCollapsed(!enabled);
 	}
 }
@@ -344,7 +344,7 @@ bool PQM_API::isWaveformLoggingEnabled()
 void PQM_API::setWaveformLoggingEnabled(bool enabled)
 {
 	WaveformInstrument *waveform = getWaveformInstrument();
-	if(waveform && waveform->m_logSection) {
+	if(waveform && !isWaveformRunning() && waveform->m_logSection) {
 		waveform->m_logSection->setCollapsed(!enabled);
 	}
 }
@@ -400,7 +400,8 @@ void PQM_API::setSettingsAttributeValue(const QString &attrName, const QString &
 
 bool PQM_API::triggerPqEvent(bool enable)
 {
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_pqmPlugin->m_param);
+	auto *cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_pqmPlugin->m_param);
 	if(!conn) {
 		qWarning(CAT_PQM_API) << "Failed to open connection for PQ event trigger";
 		return false;
@@ -409,17 +410,20 @@ bool PQM_API::triggerPqEvent(bool enable)
 	iio_device *pqmDevice = iio_context_find_device(conn->context(), "pqm");
 	if(!pqmDevice) {
 		qWarning(CAT_PQM_API) << "PQM device not found";
+		cp->close(m_pqmPlugin->m_param);
 		return false;
 	}
 
 	iio_channel *countChannel = iio_device_find_channel(pqmDevice, "count0", true);
 	if(!countChannel) {
 		qWarning(CAT_PQM_API) << "dips channel not found";
+		cp->close(m_pqmPlugin->m_param);
 		return false;
 	}
 
 	const char *value = enable ? "1" : "0";
 	int ret = iio_channel_attr_write(countChannel, "countEvent", value);
+	cp->close(m_pqmPlugin->m_param);
 	if(ret < 0) {
 		qWarning(CAT_PQM_API) << "Failed to write countEvent attribute:" << ret;
 		return false;

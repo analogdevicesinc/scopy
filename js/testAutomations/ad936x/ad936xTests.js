@@ -30,13 +30,13 @@ TestFramework.init("AD936x Plugin Tests");
 // Connect to device
 if (!TestFramework.connectToDevice("ip:192.168.2.1")) {
     printToConsole("ERROR: Cannot proceed without device connection");
-    exit(1);
+    scopy.exit();
 }
 
 // Switch to AD936x tool
 if (!switchToTool("AD936X")) {
     printToConsole("ERROR: Cannot switch to AD936X tool");
-    exit(1);
+    scopy.exit();
 }
 
 // ============================================
@@ -559,7 +559,7 @@ TestFramework.runTest("TST.AD936X.WIDGET_KEYS", function() {
 
 TestFramework.runTest("TST.AD936X.WIDGET_RW", function() {
     try {
-        var key = "ad9361-phy//ensm_mode";
+        var key = "ad9361-phy/ensm_mode";
         var original = ad936x.readWidget(key);
         printToConsole("  Original value for '" + key + "': " + original);
         ad936x.writeWidget(key, "fdd");

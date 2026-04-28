@@ -21,8 +21,8 @@
 // ============================================================================
 // ALL THE FOLLOWING TESTS REQUIRE VISUAL VALIDATION
 // These tests automate the setup steps from the manual test documentation but
-// require a human observer to verify UI state. Each step includes a 3-second
-// pause to allow visual inspection of the application state.
+// require a human observer to verify UI state. Each step uses
+// TestFramework.supervisedCheck() to pause for visual inspection.
 // Source: docs/tests/plugins/adrv9009/adrv9009_tests.rst
 //
 // Tests covered (Category B — supervised):
@@ -37,8 +37,6 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 
 // Test Suite
 TestFramework.init("ADRV9009 Visual Validation Tests");
-
-var VISUAL_DELAY = 3000; // 3 seconds for human observation
 
 // Connect to device
 if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
@@ -65,7 +63,7 @@ TestFramework.runTest("TST.ADRV9009.CONTROLS.MCS_SYNC", function() {
         // Step 2: Verify MCS Sync button is visible in UI
         printToConsole("  VISUAL CHECK: Verify MCS Sync button is visible in the ADRV9009 tool");
         printToConsole("    Expected: MCS Sync button is present (only visible with multiple devices)");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify MCS Sync button is visible in the ADRV9009 tool");
 
         // Step 3: Trigger MCS Sync
         printToConsole("  Triggering MCS Sync...");
@@ -74,7 +72,7 @@ TestFramework.runTest("TST.ADRV9009.CONTROLS.MCS_SYNC", function() {
 
         printToConsole("  VISUAL CHECK: Verify multi-chip synchronization sequence completes without error");
         printToConsole("    Expected: Sync completes — no error dialog appears");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify multi-chip synchronization sequence completes without error");
 
         return true;
     } catch (e) {
@@ -123,10 +121,10 @@ TestFramework.runTest("TST.ADRV9009.ADVANCED.PLUGIN_DETECTION", function() {
         printToConsole("    13. JESD Framer");
         printToConsole("    14. JESD Deframer");
         printToConsole("    15. BIST");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify all 15 tabs are visible in the Advanced tool");
 
         printToConsole("  VISUAL CHECK: Verify each tab opens without error when clicked");
-        msleep(VISUAL_DELAY);
+        TestFramework.supervisedCheck("Verify each tab opens without error when clicked");
 
         printToConsole("  PASS: ADRV9009 Advanced tool opened — visual inspection required");
         return true;

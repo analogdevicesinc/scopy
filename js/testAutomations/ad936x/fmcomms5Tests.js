@@ -635,7 +635,7 @@ TestFramework.runTest("TST.FMCOMMS5.WIDGET_KEYS", function() {
 
 TestFramework.runTest("TST.FMCOMMS5.WIDGET_RW", function() {
     try {
-        var key = "ad9361-phy//ensm_mode";
+        var key = "ad9361-phy/ensm_mode";
         var original = fmcomms5.readWidget(key);
         printToConsole("  Original value for '" + key + "': " + original);
         fmcomms5.writeWidget(key, "fdd");
