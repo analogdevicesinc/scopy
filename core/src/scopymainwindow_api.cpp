@@ -25,6 +25,11 @@
 #include "qapplication.h"
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/scopyjs.h>
+#include <QButtonGroup>
+#include <QPixmap>
+#include <QPushButton>
+#include <QScrollArea>
+#include "toolstack.h"
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY_API, "Scopy_API")
@@ -312,6 +317,14 @@ bool ScopyMainWindow_API::sortByUUID(const QString &k1, const QString &k2)
 
 void ScopyMainWindow_API::exit() { qApp->exit(); }
 
+void ScopyMainWindow_API::showPage(QString pageId)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	if(ts) {
+		ts->show(pageId);
+	}
+}
+
 QStringList ScopyMainWindow_API::getTools()
 {
 	Q_ASSERT(m_w->dm != nullptr);
@@ -563,6 +576,78 @@ QStringList ScopyMainWindow_API::listFiles(const QStringList &dirFilter, const Q
 QString ScopyMainWindow_API::findPkgName(const QString &filePath)
 {
 	return PkgManager::reverseSearch(filePath).baseName();
+}
+
+void ScopyMainWindow_API::screenshot(const QString &path)
+{
+	QPixmap px = m_w->grab();
+	if(!px.save(path)) {
+		qWarning(CAT_SCOPY_API) << "Failed to save screenshot to:" << path;
+	}
+}
+
+int ScopyMainWindow_API::screenshotAllScrollAreas(const QString &pathPrefix)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	int count = 0;
+
+	if(currentTool) {
+		for(QScrollArea *sa : currentTool->findChildren<QScrollArea *>()) {
+			if(!sa->isVisible() || !sa->widget())
+				continue;
+			QWidget *content = sa->widget();
+			content->adjustSize();
+			QApplication::processEvents();
+			QPixmap px = content->grab();
+			QString path = pathPrefix + "_menu_" + QString::number(count) + ".png";
+			if(!px.save(path)) {
+				qWarning(CAT_SCOPY_API) << "Failed to save scroll area screenshot to:" << path;
+			}
+			count++;
+		}
+	}
+	return count;
+}
+
+QStringList ScopyMainWindow_API::getTabs()
+{
+	QStringList result;
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	if(!currentTool)
+		return result;
+
+	QButtonGroup *bg = currentTool->findChild<QButtonGroup *>();
+	if(!bg)
+		return result;
+
+	for(QAbstractButton *btn : bg->buttons()) {
+		if(!btn->text().trimmed().isEmpty()) {
+			result.append(btn->text());
+		}
+	}
+	return result;
+}
+
+void ScopyMainWindow_API::switchTab(const QString &tabName)
+{
+	ToolStack *ts = m_w->findChild<ToolStack *>();
+	QWidget *currentTool = ts ? ts->currentWidget() : nullptr;
+	if(!currentTool)
+		return;
+
+	QButtonGroup *bg = currentTool->findChild<QButtonGroup *>();
+	if(!bg)
+		return;
+
+	for(QAbstractButton *btn : bg->buttons()) {
+		if(btn->text() == tabName) {
+			btn->click();
+			return;
+		}
+	}
+	qWarning(CAT_SCOPY_API) << "Tab not found:" << tabName;
 }
 
 #include "moc_scopymainwindow_api.cpp"

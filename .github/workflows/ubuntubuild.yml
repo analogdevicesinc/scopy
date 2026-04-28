@@ -59,3 +59,22 @@ jobs:
 
         - name: check storage space
           run: df -h
+
+        - name: Generate screenshots
+          if: matrix.os_name == 'Ubuntu 24'
+          run: |
+            sudo ldconfig
+            export QT_QPA_PLATFORM=offscreen
+            python3 $GITHUB_WORKSPACE/tools/screenshots/screenshots.py \
+              --all \
+              --scopy $GITHUB_WORKSPACE/build/scopy \
+              --output-root $GITHUB_WORKSPACE/screenshots_output
+
+        - name: Upload screenshots artifact
+          if: matrix.os_name == 'Ubuntu 24'
+          uses: actions/upload-artifact@v4
+          with:
+            name: documentation-screenshots
+            path: ${{ github.workspace }}/screenshots_output/
+            if-no-files-found: error
+            retention-days: 30

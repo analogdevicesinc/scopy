@@ -67,7 +67,6 @@ public:
 	void unregisterApi(ApiObject *obj);
 	void registerApi(ApiObject *obj, QJSValue parentObj);
 	void unregisterApi(ApiObject *obj, QJSValue parentObj);
-
 public Q_SLOTS:
 	void hasText();
 
