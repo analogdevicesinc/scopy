@@ -42,6 +42,7 @@ public:
 	Q_INVOKABLE QString showMonitorsOfDevice(QString device);
 	Q_INVOKABLE QString enableMonitor(QString monitor);
 	Q_INVOKABLE QString disableMonitor(QString monitor);
+	Q_INVOKABLE bool getRunning();
 	Q_INVOKABLE void setRunning(bool running);
 	Q_INVOKABLE void clearData();
 	Q_INVOKABLE void changeTool(QString name);

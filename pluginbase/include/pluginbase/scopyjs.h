@@ -33,6 +33,10 @@
 #include <QSocketNotifier>
 #include <QFile>
 
+#ifdef Q_OS_UNIX
+#include <sys/stat.h>
+#endif
+
 class QJSEngine;
 
 namespace scopy {
@@ -71,6 +75,11 @@ public:
 public Q_SLOTS:
 	void hasText();
 
+#ifdef Q_OS_UNIX
+private Q_SLOTS:
+	void onPipeData();
+#endif
+
 private:
 	QFutureWatcher<QString> watcher;
 	QFuture<QString> future;
@@ -85,6 +94,15 @@ private:
 	static ScopyJS *pinstance_;
 	static QLoggingCategory::CategoryFilter oldCategoryFilter;
 	static void jsCategoryFilter(QLoggingCategory *category);
+
+#ifdef Q_OS_UNIX
+	void initMcpPipe();
+	void cleanupMcpPipe();
+	QSocketNotifier *m_pipeNotifier = nullptr;
+	int m_pipeFd = -1;
+	static constexpr const char *MCP_CMD_PIPE = "/tmp/scopy_mcp_cmd";
+	static constexpr const char *MCP_RSP_PIPE = "/tmp/scopy_mcp_rsp";
+#endif
 
 private:
 	const QString getScriptContent(QFile *file);
