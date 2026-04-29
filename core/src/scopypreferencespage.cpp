@@ -310,7 +310,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 				     "dialogs and other system dialogs within the application.",
 				     generalSection));
 
-	QStringList font_scale_options = {"1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"};
+	QStringList font_scale_options = {"0.7", "0.85", "1", "1.15", "1.3", "1.45", "1.6", "1.75", "1.9"};
 	generalSection->contentLayout()->addWidget(
 		PREFERENCE_COMBO(p, "font_scale", "Font scale (EXPERIMENTAL)",
 				 "Scale factor for the font size used across the application, suitable for "
