@@ -29,6 +29,29 @@ Both must be on your `PATH`. On Ubuntu: `sudo apt install clang-format` and `pip
 
 ## Slash Commands
 
+### Task Refinement Pipeline
+
+Turn vague development ideas into concrete, actionable designs. These two commands form a pipeline — use `/clarify-task` to refine a vague idea, then `/design-task` to produce a full design document. Each command is independently usable.
+
+| Command | Description |
+|---------|-------------|
+| `/scopy_dev_plugin:clarify-task <vague idea>` | Ask clarifying questions, explore code, produce a structured task brief |
+| `/scopy_dev_plugin:design-task <refined task>` | Analyze architecture, propose approaches, produce a full design document |
+
+**Recommended model:** Opus — both commands perform deep codebase exploration and complex architectural reasoning.
+
+**Example workflow:**
+```
+/scopy_dev_plugin:clarify-task add spectrum analyzer to ADC plugin
+  → answers questions, explores code → task brief
+
+/scopy_dev_plugin:design-task <paste or reference the task brief>
+  → proposes 2-3 approaches → detailed design doc
+  → optionally saved to docs/design/
+```
+
+### Code Generation & Documentation
+
 | Command | Description |
 |---------|-------------|
 | `/scopy_dev_plugin:create-api <plugin>` | Generate JavaScript API class for test automation |
@@ -36,6 +59,11 @@ Both must be on your `PATH`. On Ubuntu: `sudo apt install clang-format` and `pip
 | `/scopy_dev_plugin:create-test-docs <plugin>` | Generate RST test case documentation |
 | `/scopy_dev_plugin:create-automated-tests <plugin>` | Create JS automated test scripts |
 | `/scopy_dev_plugin:create-whatsnew <plugin> <version>` | Generate What's New HTML page |
+
+### Quality & Validation
+
+| Command | Description |
+|---------|-------------|
 | `/scopy_dev_plugin:check-code-quality <package>` | Static code quality analysis |
 | `/scopy_dev_plugin:verify-package <package>` | CI pre-flight validation (format + license) |
 | `/scopy_dev_plugin:validate-api <plugin>` | Validate API class implementation (checks A1–A7) |
@@ -45,12 +73,22 @@ Both must be on your `PATH`. On Ubuntu: `sudo apt install clang-format` and `pip
 
 These skills are loaded automatically when relevant context is detected:
 
+### Plugin Development
 - **iiowidget-patterns** — How to create IIOWidgets using IIOWidgetBuilder
 - **scopy-style-rules** — Theme system, Style::setStyle, background colors
 - **scopy-plugin-patterns** — Plugin lifecycle, ToolTemplate, refresh buttons
+- **scopy-api-patterns** — API class structure and Q_INVOKABLE patterns
+
+### Documentation & Testing
 - **scopy-doc-format** — RST documentation conventions
 - **scopy-test-format** — Test case UID and RBP conventions
-- **scopy-api-patterns** — API class structure and Q_INVOKABLE patterns
+
+### Task Refinement (loaded by clarify-task and design-task commands)
+- **scopy-architecture-knowledge** — Plugin lifecycle, library dependencies, build system, key design patterns
+- **scopy-tools-inventory** — Catalog of all dev tools (package generator, CI, testing, format scripts)
+- **scopy-component-relationships** — Library dependency graph, plugin families, style system, build flags
+- **scopy-decision-frameworks** — Decision trees for plugin vs core, widget type, sync vs async, API exposure
+- **external-research** — Guidelines for researching external solutions (Context7, ADI docs, web search)
 
 ## Hooks
 
