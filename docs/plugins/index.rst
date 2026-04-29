@@ -71,6 +71,8 @@ Application Specific plugins
 * ADRV9009
     * :ref:`ADRV9009 <adrv9009>`
     * :ref:`ADRV9009 Advanced <adrv9009_advanced>`
+* CN0540
+    * :ref:`CN0540 <cn0540>`
 
 Contents
 ---------------------------------------------------------------------
@@ -95,4 +97,5 @@ Contents
    scripting/scripting
    imuanalyzer/imuanalyzer
    rfpowermeter/rfpowermeter
+   cn0540/index
 
