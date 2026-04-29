@@ -72,6 +72,9 @@ Application Specific plugins
     * :ref:`ADRV9009 <adrv9009>`
     * :ref:`ADRV9009 Advanced <adrv9009_advanced>`
 
+* DAQ2
+    * :ref:`DAQ2 <daq2>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -91,6 +94,7 @@ Contents
    ad9084/index
    adrv9002/adrv9002
    adrv9009/index
+   daq2/index
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
