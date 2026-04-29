@@ -24,6 +24,7 @@ Contents
    fmcomms5/index
    adrv9002/index
    adrv9009/index
+   cn0511/index
    imuanalyzer/index
    rfpowermeter/index
 

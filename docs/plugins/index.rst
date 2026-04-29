@@ -71,6 +71,8 @@ Application Specific plugins
 * ADRV9009
     * :ref:`ADRV9009 <adrv9009>`
     * :ref:`ADRV9009 Advanced <adrv9009_advanced>`
+* CN0511
+    * :ref:`CN0511 <cn0511>`
 
 Contents
 ---------------------------------------------------------------------
@@ -91,6 +93,7 @@ Contents
    ad9084/index
    adrv9002/adrv9002
    adrv9009/index
+   cn0511/index
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
