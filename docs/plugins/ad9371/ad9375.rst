@@ -1,0 +1,64 @@
+.. _ad9375:
+
+AD9375
+================================================================================
+
+.. AN_IMAGE_WILL_BE_HERE
+   Screenshot: The full AD9375 (ADRV9375) plugin tool view showing all sections including the DPD/CLGC/VSWR controls in the TX Chain
+
+General Description
+-------------------
+
+The AD9375 is a superset of the AD9371 RF transceiver. It includes all the features of the
+AD9371 and additionally supports Digital Pre-Distortion (DPD), Closed-Loop Gain Control (CLGC),
+and Voltage Standing Wave Ratio (VSWR) detection on the transmit path.
+
+When the plugin connects to an AD9375 device, it detects the hardware variant automatically by
+checking for the ``adi,dpd-model-version`` debug attribute. If found, the tool is displayed
+as **ADRV9375** instead of AD9371 in the Scopy device panel.
+
+All features described in :ref:`ad9371` apply to the AD9375. This page documents only the
+additional capabilities specific to the AD9375.
+
+Additional TX Chain Features
+-----------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+   Screenshot: The AD9375 TX Chain section highlighting the DPD, CLGC, and VSWR enable and tracking controls
+
+The AD9375 extends the transmit chain with three additional control groups visible below the
+standard TX attenuation and tracking controls.
+
+DPD — Digital Pre-Distortion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Digital Pre-Distortion compensates for nonlinearity in the power amplifier by applying an
+inverse distortion function to the transmit signal before it reaches the PA. This improves
+transmit signal quality and reduces spectral regrowth.
+
+- **DPD Enable:** Enables or disables the DPD actuator on the transmit path.
+- **DPD Tracking Enable:** Enables continuous adaptation of the DPD model to track changes in
+  PA behavior over time, temperature, and power level.
+
+CLGC — Closed-Loop Gain Control
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Closed-Loop Gain Control maintains a target transmit gain at the antenna port by continuously
+measuring the output power via the observation receiver and adjusting the TX attenuation.
+
+- **CLGC Enable:** Enables or disables the CLGC loop on the transmit path.
+- **CLGC Tracking Enable:** Enables continuous closed-loop tracking to maintain the desired
+  output gain.
+- **Desired TX1 Gain (mdB):** The target output gain for TX channel 1 in millidecibels
+  (signed 16-bit value).
+- **Desired TX2 Gain (mdB):** The target output gain for TX channel 2 in millidecibels
+  (signed 16-bit value).
+
+VSWR — Voltage Standing Wave Ratio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+VSWR detection monitors the antenna port for impedance mismatches by comparing the forward
+and reflected signal components captured via the observation receiver.
+
+- **VSWR Enable:** Enables or disables VSWR detection on the transmit path.
+- **VSWR Tracking Enable:** Enables continuous monitoring of the antenna VSWR.
