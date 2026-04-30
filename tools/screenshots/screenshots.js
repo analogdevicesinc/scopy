@@ -33,21 +33,30 @@ var deviceId = scopy.addDevice(scopyUri);
 scopy.connectDevice(deviceId);
 
 var skipList = scopySkipPlugins || [];
+var usePluginDirs = scopyUsePluginDirs || false;
 var plugins = scopy.getPlugins(scopyUri);
+
+function sanitize(name) {
+    return name.replace(/\//g, "_");
+}
 
 plugins.forEach(function(plugin) {
     if(skipList.indexOf(plugin) !== -1) return;
 
     var tools = scopy.getToolsForPlugin(plugin);
+    if(tools.length === 0) return;
+
+    var baseDir = usePluginDirs ? scopyOutDir + plugin + "/" : scopyOutDir;
     tools.forEach(function(tool) {
         scopy.switchTool(tool);
         msleep(500);
 
+        var safeTool = sanitize(tool);
         // Full window screenshot
-        scopy.screenshot(scopyOutDir + tool + ".png");
+        scopy.screenshot(baseDir + safeTool + ".png");
 
         // Capture all visible scroll areas (menus/panels with full content)
-        scopy.screenshotAllScrollAreas(scopyOutDir + tool);
+        scopy.screenshotAllScrollAreas(baseDir + safeTool);
 
         // Capture tabs if the tool has any
         var tabs = scopy.getTabs();
@@ -56,8 +65,9 @@ plugins.forEach(function(plugin) {
                 if(!tab || tab.trim() === "") return;
                 scopy.switchTab(tab);
                 msleep(300);
-                scopy.screenshot(scopyOutDir + tool + "_" + tab + ".png");
-                scopy.screenshotAllScrollAreas(scopyOutDir + tool + "_" + tab);
+                var safeTab = sanitize(tab);
+                scopy.screenshot(baseDir + safeTool + "_" + safeTab + ".png");
+                scopy.screenshotAllScrollAreas(baseDir + safeTool + "_" + safeTab);
             });
         }
     });

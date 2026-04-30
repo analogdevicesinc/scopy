@@ -121,7 +121,7 @@ def stop_emulator(proc):
     print("[doc] iio-emu stopped")
 
 
-def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None):
+def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None, use_plugin_dirs=False):
     """Create a temp JS file that injects globals then evaluates the real script."""
     abs_js = os.path.abspath(js_script_path).replace("\\", "/")
     abs_out = os.path.abspath(out_dir).replace("\\", "/") + "/"
@@ -130,6 +130,7 @@ def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None):
         f'var scopyUri = "{uri}";\n'
         f'var scopyOutDir = "{abs_out}";\n'
         f"var scopySkipPlugins = {skip_json};\n"
+        f"var scopyUsePluginDirs = {'true' if use_plugin_dirs else 'false'};\n"
         f'evaluateFile("{abs_js}");\n'
     )
     fd, path = tempfile.mkstemp(suffix=".js", prefix="scopy_doc_")
@@ -260,7 +261,8 @@ def run_single(args):
             sys.exit(1)
         print(f"[doc] Port {EMU_PORT} ready")
 
-        wrapper = make_wrapper(uri, out_dir, js_script)
+        use_plugin_dirs = args.package == "generic-plugins"
+        wrapper = make_wrapper(uri, out_dir, js_script, use_plugin_dirs=use_plugin_dirs)
         try:
             rc = run_scopy(args.scopy, wrapper)
         finally:
@@ -317,7 +319,8 @@ def run_all(args):
                 continue
 
             print(f"[doc] Port {EMU_PORT} ready")
-            wrapper = make_wrapper(uri, out_dir, js_script, skip_plugins)
+            use_plugin_dirs = package == "generic-plugins"
+            wrapper = make_wrapper(uri, out_dir, js_script, skip_plugins, use_plugin_dirs)
             try:
                 rc = run_scopy(args.scopy, wrapper)
             finally:
