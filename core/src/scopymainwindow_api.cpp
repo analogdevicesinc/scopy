@@ -28,6 +28,8 @@
 #include <QButtonGroup>
 #include <QPixmap>
 #include <QPushButton>
+#include <QDir>
+#include <QFileInfo>
 #include <QScrollArea>
 #include "toolstack.h"
 using namespace scopy;
@@ -363,7 +365,7 @@ QStringList ScopyMainWindow_API::getToolsForPlugin(QString plugin)
 	if(dev) {
 		QList<ToolMenuEntry *> toolList = dev->toolList();
 		for(int i = 0; i < toolList.size(); i++) {
-			if(toolList[i]->pluginName() == plugin) {
+			if(toolList[i]->pluginName() == plugin && toolList[i]->tool()) {
 				resultList.append(toolList[i]->name());
 			}
 		}
@@ -580,6 +582,7 @@ QString ScopyMainWindow_API::findPkgName(const QString &filePath)
 
 void ScopyMainWindow_API::screenshot(const QString &path)
 {
+	QDir().mkpath(QFileInfo(path).absolutePath());
 	QPixmap px = m_w->grab();
 	if(!px.save(path)) {
 		qWarning(CAT_SCOPY_API) << "Failed to save screenshot to:" << path;
@@ -602,7 +605,8 @@ int ScopyMainWindow_API::screenshotAllScrollAreas(const QString &pathPrefix)
 			if(content->sizeHint().height() <= sa->viewport()->height())
 				continue;
 			QPixmap px = content->grab();
-			QString path = pathPrefix + "_menu_" + QString::number(count) + ".png";
+			QString path = pathPrefix + "_" + QString::number(count) + ".png";
+			QDir().mkpath(QFileInfo(path).absolutePath());
 			if(!px.save(path)) {
 				qWarning(CAT_SCOPY_API) << "Failed to save scroll area screenshot to:" << path;
 			}
