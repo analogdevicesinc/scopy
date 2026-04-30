@@ -599,6 +599,8 @@ int ScopyMainWindow_API::screenshotAllScrollAreas(const QString &pathPrefix)
 			QWidget *content = sa->widget();
 			content->adjustSize();
 			QApplication::processEvents();
+			if(content->sizeHint().height() <= sa->viewport()->height())
+				continue;
 			QPixmap px = content->grab();
 			QString path = pathPrefix + "_menu_" + QString::number(count) + ".png";
 			if(!px.save(path)) {
