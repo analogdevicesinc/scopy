@@ -63,7 +63,7 @@ jobs:
         - uses: actions/upload-artifact@v7
           with:
             name: scopy-arm64-appimage-${{ env.commit_sha }}
-            path: ${{ github.workspace }}/Scopy-arm64.AppImage
+            path: ${{ github.workspace }}/${{ env.app_image_name }} # app_image_name is set in the arm_build_config.sh script
 
         - name: Build Debian package
           shell: bash

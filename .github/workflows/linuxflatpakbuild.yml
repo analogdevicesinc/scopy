@@ -50,7 +50,7 @@ jobs:
     - uses: actions/upload-artifact@v7
       with:
         name: scopy-x86_64-flatpak-${{ env.commit_sha }}
-        path: ${{ github.workspace }}/Scopy.flatpak
+        path: ${{ github.workspace }}/${{ env.flatpak_name }} # flatpak_name is set in the flatpak_build_process.sh script
 
     - name: check storage space
       run: df -h

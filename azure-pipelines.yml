@@ -93,21 +93,22 @@ stages:
     - script: ./ci/macOS/package_darwin.sh
       displayName: 'Create Scopy.dmg'
       workingDirectory: $(Build.Repository.LocalPath)
-    - script: cp -R staging ${BUILD_ARTIFACTSTAGINGDIRECTORY}
-      displayName: 'Copy Staging Dir'
-      workingDirectory: $(Build.Repository.LocalPath)
     - script: |
             set -e
+            CURRENT_COMMIT=$(Build.SourceVersion)
+            CURRENT_COMMIT=${CURRENT_COMMIT:0:7}
+            echo "##vso[task.setvariable variable=currentCommit;]${CURRENT_COMMIT}"
+            echo "CURRENT_COMMIT = ${CURRENT_COMMIT}"
             echo "TF_BUILD = ${TF_BUILD}"
-            echo "ACCOUNT_NAME = " ${ACCOUNT_NAME}
-            echo "PROJECT_NAME = " ${PROJECT_NAME}
+            echo "ACCOUNT_NAME = ${ACCOUNT_NAME}"
+            echo "PROJECT_NAME = ${PROJECT_NAME}"
             MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
-            DEPLOY_FILE=Scopy-macos${MACOS_VERSION}-${CURRENT_COMMIT:0:7}.dmg
+            PROJECT_VERSION=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' "CMakeLists.txt")
+            RELEASE_PHASE=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' "CMakeLists.txt" || true)
+            DEPLOY_FILE=Scopy-v${PROJECT_VERSION}${RELEASE_PHASE}-osx${MACOS_VERSION}-x86_64.dmg # Hardcoded for x86_64, should be changed if we start building for arm64 as well
             cp build/ScopyApp.zip ${BUILD_ARTIFACTSTAGINGDIRECTORY}
             if [ -e build/Scopy.dmg ]; then
               cp build/Scopy.dmg ${BUILD_ARTIFACTSTAGINGDIRECTORY}/${DEPLOY_FILE}
-              cd ${BUILD_ARTIFACTSTAGINGDIRECTORY}
-              tar czvf Scopy-macos${MACOS_VERSION}.tar.gz ${DEPLOY_FILE}
             else
               echo "Scopy.dmg does not exists"
             fi
@@ -125,4 +126,4 @@ stages:
                     ) # push artifacts only if pipeline completed successfully and either the build is for the main branch or there is a PR into main branch
       inputs:
         targetPath: '$(Build.ArtifactStagingDirectory)'
-        artifactName: '$(artifactName)'
+        artifactName: '$(artifactName)-$(currentCommit)'

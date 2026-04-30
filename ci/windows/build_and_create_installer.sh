@@ -41,6 +41,13 @@ DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH       # Unstripped binaries for debugg
 PYTHON_FILES=$STAGING_DIR/lib/python3.*         # Python runtime
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build         # IIO emulator build directory
 
+PROJECT_VERSION=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' "${SRC_FOLDER}/CMakeLists.txt")
+RELEASE_PHASE=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' "${SRC_FOLDER}/CMakeLists.txt" || true)
+
+SCOPY_SETUP_NAME=Scopy-v${PROJECT_VERSION}${RELEASE_PHASE}-Windows-x86_64-setup.exe
+SCOPY_PORTABLE_NAME=Scopy-portable-$ARCH_BIT.zip
+DEBUG_FILES_NAME=Scopy-debug-$ARCH_BIT.zip
+
 download_tools() {
 	mkdir -p $STAGING_AREA
 	pacman -Qs mingw-w64-x86_64-wget2 > /dev/null || pacman -S --noconfirm mingw-w64-x86_64-wget2

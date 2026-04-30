@@ -97,7 +97,10 @@ APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
 APP_IMAGE_FOLDER=scopy-x86_64-appimage
 [ "$VERSION_ID" == "20.04" ] && APP_IMAGE_FOLDER=scopy-x86_64-appimage-ubuntu20
 
-APP_IMAGE_NAME=${APP_IMAGE_FOLDER}.AppImage
+PROJECT_VERSION=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' "${SRC_DIR}/CMakeLists.txt")
+RELEASE_PHASE=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' "${SRC_DIR}/CMakeLists.txt" || true)
+
+APP_IMAGE_NAME=Scopy-v${PROJECT_VERSION}${RELEASE_PHASE}-Linux-x86_64.AppImage
 APP_IMAGE=$SRC_SCRIPT/$APP_IMAGE_NAME
 
 # Export variables for GitHub Actions

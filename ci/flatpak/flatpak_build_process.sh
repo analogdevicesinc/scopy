@@ -73,6 +73,15 @@ cp build-status $SOURCE_DIR/build-status
 # This uses flatpak-builder with the generated manifest
 make
 
+
+PROJECT_VERSION=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' "${SRC_DIR}/CMakeLists.txt")
+RELEASE_PHASE=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' "${SRC_DIR}/CMakeLists.txt" || true)
+FLATPAK_NAME="Scopy-v${PROJECT_VERSION}${RELEASE_PHASE}-Linux-x86_64.flatpak" # Final Flatpak executable file
+
 # Copy the Scopy.flatpak file in $SOURCE_DIR (which is the external location, mount when docker starts)
-[ -z $CI_SCRIPT ] || cp Scopy.flatpak $SOURCE_DIR/
+[ $CI_SCRIPT ] && cp Scopy.flatpak $SOURCE_DIR/$FLATPAK_NAME
+
+# Export variables for GitHub Actions
+[ $CI_SCRIPT ] && echo "flatpak_name=$FLATPAK_NAME" >> "$GITHUB_ENV"
+
 popd

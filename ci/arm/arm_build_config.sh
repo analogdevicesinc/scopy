@@ -16,12 +16,14 @@ if [ "$1" == "arm64" ];then
 	ARCHITECTURE=aarch64
 	CMAKE_SYSTEM_PROCESSOR=aarch64
 	CMAKE_LIBRARY_ARCHITECTURE=aarch64-linux-gnu
+	APPIMAGE_ARCH=arm64
 elif [ "$1" == "arm32" ]; then
 	echo "Building for armhf"
 	TOOLCHAIN_HOST="arm-linux-gnueabihf"
 	ARCHITECTURE=armhf
 	CMAKE_SYSTEM_PROCESSOR=arm
 	CMAKE_LIBRARY_ARCHITECTURE=arm-linux-gnueabihf
+	APPIMAGE_ARCH=armhf
 else
 	echo "$1 is invalid.  Enter first argument arm32 or arm64 to choose the toolchain"
 	exit
@@ -84,11 +86,17 @@ CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}" # Complete CMake command with all options
 
 CROSS_COMPILER=$TOOLCHAIN
 
+PROJECT_VERSION=$(grep -oP 'project\(scopy VERSION \K[0-9.]+' "${SRC_DIR}/CMakeLists.txt")
+RELEASE_PHASE=$(grep -oP 'set\(SCOPY_RELEASE_PHASE \K[^)]+' "${SRC_DIR}/CMakeLists.txt" || true)
+
 APP_DIR=$SRC_SCRIPT/scopy.AppDir # Temporary directory structure that becomes the AppImage
-APP_IMAGE=$SRC_SCRIPT/Scopy.AppImage # Final AppImage executable file
+APP_IMAGE=$SRC_SCRIPT/Scopy-v${PROJECT_VERSION}${RELEASE_PHASE}-Linux-${APPIMAGE_ARCH}.AppImage # Final AppImage executable file
 APP_RUN=$SRC_SCRIPT/../general/AppRun # Entry point script that launches the application
 APP_DESKTOP=$SRC_SCRIPT/../general/scopy.desktop # Desktop entry file for Linux desktop integration
 APP_SQUASHFS=$SRC_SCRIPT/scopy.squashfs
+
+# Export variables for GitHub Actions
+[ $CI_SCRIPT ] && echo "app_image_name=$APP_IMAGE" >> "$GITHUB_ENV"
 
 # AppImage runtime for ARM
 # Downloaded from https://github.com/AppImage/AppImageKit/releases/continuous
