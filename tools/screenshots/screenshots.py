@@ -183,6 +183,39 @@ def run_scopy(scopy_bin, wrapper_path):
     return proc.returncode
 
 
+def make_first_run_wrapper(out_dir):
+    """Create a temp JS file that screenshots the What's New overlay and exits."""
+    abs_out = os.path.abspath(out_dir).replace("\\", "/") + "/"
+    content = (
+        f'msleep(2000);\n'
+        f'scopy.screenshot("{abs_out}whats_new.png");\n'
+        f'scopy.exit();\n'
+    )
+    fd, path = tempfile.mkstemp(suffix=".js", prefix="scopy_first_run_")
+    with os.fdopen(fd, "w") as f:
+        f.write(content)
+    return path
+
+
+def run_first_run(scopy_bin, output_dir):
+    """Run Scopy once to capture the What's New screenshot and satisfy the version check."""
+    print("\n[doc] === First Run: Capturing What's New ===")
+    configure_scopy_preferences(scopy_bin)
+
+    os.makedirs(output_dir, exist_ok=True)
+    wrapper = make_first_run_wrapper(output_dir)
+    try:
+        rc = run_scopy(scopy_bin, wrapper)
+    finally:
+        os.unlink(wrapper)
+
+    screenshot_path = os.path.join(output_dir, "whats_new.png")
+    if rc == 0 and os.path.isfile(screenshot_path):
+        print(f"[doc] What's New screenshot saved to: {screenshot_path}")
+    else:
+        print(f"[doc] WARNING: First run exited with code {rc}")
+
+
 def discover_generic_plugin_names():
     """Read SCOPY_PLUGIN_NAME from generic-plugins and extproc header files."""
     patterns = [
@@ -230,7 +263,11 @@ def discover_all_packages():
 
 def run_single(args):
     """Run screenshot capture for a single package/emu-file."""
-    configure_scopy_preferences(args.scopy)
+    out_dir = args.output or os.path.join(
+        PROJECT_ROOT, "docs", "screenshots", args.package
+    )
+    run_first_run(args.scopy, out_dir)
+
     emu_dir, entry = find_emu_setup(args.package, args.emu_file)
     uri = entry["uri"]
 
@@ -238,9 +275,6 @@ def run_single(args):
         print(f"[doc] ERROR: entry has no xml_path or emu-type, cannot emulate")
         sys.exit(1)
 
-    out_dir = args.output or os.path.join(
-        PROJECT_ROOT, "docs", "screenshots", args.package
-    )
     os.makedirs(out_dir, exist_ok=True)
     print(f"[doc] Output directory: {out_dir}")
 
@@ -279,15 +313,15 @@ def run_single(args):
 
 def run_all(args):
     """Discover all packages and run screenshot capture for each device entry."""
-    configure_scopy_preferences(args.scopy)
+    output_root = args.output_root or os.path.join(
+        PROJECT_ROOT, "docs", "screenshots"
+    )
+    run_first_run(args.scopy, os.path.join(output_root, "general"))
+
     js_script = os.path.join(SCRIPT_DIR, "screenshots.js")
     if not os.path.isfile(js_script):
         print(f"[doc] ERROR: JS script not found at {js_script}")
         sys.exit(1)
-
-    output_root = args.output_root or os.path.join(
-        PROJECT_ROOT, "docs", "screenshots"
-    )
 
     generic_names = discover_generic_plugin_names()
     all_entries = discover_all_packages()
