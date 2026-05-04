@@ -184,11 +184,17 @@ def run_scopy(scopy_bin, wrapper_path):
 
 
 def make_first_run_wrapper(out_dir):
-    """Create a temp JS file that screenshots the What's New overlay and exits."""
+    """Create a temp JS file that screenshots all What's New pages and exits."""
     abs_out = os.path.abspath(out_dir).replace("\\", "/") + "/"
     content = (
         f'msleep(2000);\n'
-        f'scopy.screenshot("{abs_out}whats_new.png");\n'
+        f'var pageCount = scopy.getWhatsNewPageCount();\n'
+        f'for (var p = 0; p < pageCount; p++) {{\n'
+        f'    scopy.switchWhatsNewPage(p);\n'
+        f'    msleep(300);\n'
+        f'    scopy.screenshot("{abs_out}whats_new_" + p + ".png");\n'
+        f'}}\n'
+        f'scopy.dismissWhatsNew();\n'
         f'scopy.exit();\n'
     )
     fd, path = tempfile.mkstemp(suffix=".js", prefix="scopy_first_run_")
@@ -209,9 +215,8 @@ def run_first_run(scopy_bin, output_dir):
     finally:
         os.unlink(wrapper)
 
-    screenshot_path = os.path.join(output_dir, "whats_new.png")
-    if rc == 0 and os.path.isfile(screenshot_path):
-        print(f"[doc] What's New screenshot saved to: {screenshot_path}")
+    if rc == 0:
+        print(f"[doc] What's New screenshots saved to: {output_dir}")
     else:
         print(f"[doc] WARNING: First run exited with code {rc}")
 

@@ -32,6 +32,7 @@
 #include <QFileInfo>
 #include <QScrollArea>
 #include "toolstack.h"
+#include "whatsnewoverlay.h"
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY_API, "Scopy_API")
@@ -654,6 +655,44 @@ void ScopyMainWindow_API::switchTab(const QString &tabName)
 		}
 	}
 	qWarning(CAT_SCOPY_API) << "Tab not found:" << tabName;
+}
+
+int ScopyMainWindow_API::getWhatsNewPageCount()
+{
+	WhatsNewOverlay *wn = m_w->findChild<WhatsNewOverlay *>();
+	if(!wn)
+		return 0;
+
+	QStackedWidget *mainStack = wn->findChild<QStackedWidget *>();
+	if(!mainStack || !mainStack->currentWidget())
+		return 0;
+
+	QStackedWidget *pageStack = mainStack->currentWidget()->findChild<QStackedWidget *>();
+	return pageStack ? pageStack->count() : 0;
+}
+
+void ScopyMainWindow_API::switchWhatsNewPage(int idx)
+{
+	WhatsNewOverlay *wn = m_w->findChild<WhatsNewOverlay *>();
+	if(!wn)
+		return;
+
+	QStackedWidget *mainStack = wn->findChild<QStackedWidget *>();
+	if(!mainStack || !mainStack->currentWidget())
+		return;
+
+	QStackedWidget *pageStack = mainStack->currentWidget()->findChild<QStackedWidget *>();
+	if(pageStack && idx >= 0 && idx < pageStack->count()) {
+		pageStack->setCurrentIndex(idx);
+	}
+}
+
+void ScopyMainWindow_API::dismissWhatsNew()
+{
+	WhatsNewOverlay *wn = m_w->findChild<WhatsNewOverlay *>();
+	if(wn) {
+		wn->deleteLater();
+	}
 }
 
 #include "moc_scopymainwindow_api.cpp"
