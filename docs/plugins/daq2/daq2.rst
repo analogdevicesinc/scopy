@@ -9,13 +9,43 @@ sure the setting is valid. If you want to set something that the GUI changes
 to a different number, that means the hardware (either the AD9680, the AD9144,
 or the FPGA fabric) does not support that mode or precision.
 
-If you want to re-read all current values from hardware (e.g. after a settings
-change outside Scopy), click the **Refresh** button in the top-right corner of
-the tool.
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The full DAQ2 tool view showing the ADC section and DAC section
-   with the refresh button visible in the top-right corner
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/daq2/daq2.png
+   :align: center
+
+
+Features
+--------
+
+- **ADC Monitoring:** Displays the ADC sampling frequency read directly from the hardware.
+- **Test Mode Control:** Configures each ADC channel independently into one of several built-in
+  test modes (e.g. PN9, PN23, checkerboard) for digital interface validation.
+- **DAC Monitoring:** Displays the DAC data clock frequency read directly from the hardware.
+- **Live Refresh:** A refresh button re-reads all device attributes from hardware on demand.
+- **Scripting Support:** Full JS API (object name ``daq2``) for automated test control.
+
+Supported Devices
+-----------------
+
+- **AD-FMCDAQ2-EBZ** (AD9680 ADC + AD9144 DAC)
+
+Getting Started
+---------------
+
+**Prerequisites**
+
+- AD-FMCDAQ2-EBZ evaluation board connected to a supported FPGA carrier
+- IIO context accessible via network (IP) or USB
+- Scopy 2.x or later
+
+**Using the Plugin**
+
+Connect Scopy to the device URI. The DAQ2 plugin is detected automatically when both the
+``axi-ad9680-hpc`` and ``axi-ad9144-hpc`` IIO devices are present in the context. Once
+connected, the ADC and DAC sampling frequencies are read from hardware and displayed. Use the
+Test Mode drop-downs to configure the ADC channels, and press the refresh button to re-read all
+values from hardware.
+
 
 ADC
 ---------------------------------
@@ -24,9 +54,6 @@ The ADC section controls the **AD9680** analog-to-digital converter
 (IIO device ``axi-ad9680-hpc``). Both channels share the same sampling clock
 but can be placed into independent test modes.
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The ADC section showing the sampling frequency label and the
-   Ch0 Test Mode and Ch1 Test Mode combo boxes
 
 - **Sampling Frequency:** Displays the ADC sample rate in MHz. This value is
   read from the hardware once at connect time and is not configurable from
@@ -54,9 +81,6 @@ DAC
 The DAC section monitors the **AD9144** digital-to-analog converter
 (IIO device ``axi-ad9144-hpc``).
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The DAC section showing the sampling frequency label
-
 - **Sampling Frequency:** Displays the DAC data clock in MHz. This value is
   read from the hardware once at connect time and is not configurable from
   this plugin.
@@ -67,3 +91,5 @@ The DAC section monitors the **AD9144** digital-to-analog converter
    FMCDAQ2 feature set but are not yet available in this Scopy release. For
    complete device documentation, see the
    `FMCDAQ2 Plugin wiki page <https://wiki.analog.com/resources/tools-software/linux-software/fmcdaq2_plugin>`_.
+
+
