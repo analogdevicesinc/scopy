@@ -56,12 +56,12 @@ printToConsole("\n=== Test 1: Plugin Loads ===\n");
 
 TestFramework.runTest("TST.FMCOMMS11.PLUGIN_LOADS", function() {
     try {
-        var tools = fmcomms11.getTools();
-        printToConsole("  FMCOMMS11 tools found: " + tools);
+        var tools = fmcomms11.getTools();    
         if (!tools || tools.length === 0) {
             printToConsole("  FAIL: No tools found for FMCOMMS11 plugin");
             return false;
         }
+        printToConsole("  FMCOMMS11 tools found: " + tools);
         printToConsole("  PASS: FMCOMMS11 plugin loaded and tools are accessible");
         return true;
     } catch (e) {
@@ -80,11 +80,11 @@ printToConsole("\n=== Test 2: Device Detection ===\n");
 TestFramework.runTest("TST.FMCOMMS11.DEVICE_DETECTION", function() {
     try {
         var keys = fmcomms11.getWidgetKeys();
-        printToConsole("  Widget keys available: " + keys.length);
         if (!keys || keys.length === 0) {
             printToConsole("  FAIL: No widgets detected - device may not be connected");
             return false;
         }
+        printToConsole("  Widget keys available: " + keys.length);
         printToConsole("  PASS: Device detected, " + keys.length + " widgets built");
         return true;
     } catch (e) {

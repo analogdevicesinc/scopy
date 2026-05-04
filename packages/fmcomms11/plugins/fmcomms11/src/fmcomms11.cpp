@@ -275,11 +275,12 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 		}
 
 		// FIR85 Enable
-		iio_channel *voltage0Out = iio_device_find_channel(m_dac, "voltage0", true);
-		const char *fir85Attr = iio_device_find_attr(m_dac, "fir85_enable");
+		iio_channel *voltage0Out = iio_device_find_channel(m_dac, "voltage0_i", true);
+		const char *fir85Attr = voltage0Out ? iio_channel_find_attr(voltage0Out, "fir85_enable") : nullptr;
 
 		IIOWidget *fir85Enable = IIOWidgetBuilder(widget)
 						 .device(m_dac)
+						 .channel(voltage0Out)
 						 .attribute("fir85_enable")
 						 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						 .title("FIR85 Enable")
