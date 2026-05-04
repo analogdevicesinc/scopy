@@ -100,7 +100,10 @@
 <li><a class="reference internal" href="#download">Download</a></li>
 <li><a class="reference internal" href="#what-s-new">What’s new</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#launch">Launch</a></li>
+<li><a class="reference internal" href="#launch">Launch</a><ul>
+<li><a class="reference internal" href="#running-with-elevated-privileges-on-linux">Running with elevated privileges on Linux</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#application-overview">Application Overview</a><ul>
 <li><a class="reference internal" href="#homepage-layout">Homepage layout</a><ul>
 <li><a class="reference internal" href="#device-browser">Device browser</a></li>
@@ -384,12 +387,14 @@ signal analysis.</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Download: <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest" target="_blank">Scopy AppImage executable for ARM64</a></p></li>
+<li><p>Download: <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest" target="_blank">Scopy Debian package for ARM64 that installs the AppImage with all the necessary wrappers and policies</a></p></li>
 </ul>
 </div></blockquote>
 <p><strong>ARM32</strong></p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Download: <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest" target="_blank">Scopy AppImage executable for ARM32</a></p></li>
+<li><p>Download: <a class="icon link reference external" href="https://github.com/analogdevicesinc/scopy/releases/latest" target="_blank">Scopy Debian package for ARM32 that installs the AppImage with all the necessary wrappers and policies</a></p></li>
 </ul>
 </div></blockquote>
 </div>
@@ -512,6 +517,37 @@ to solve it.</p>
 <p>flatpak run –env=QT_QPA_PLATFORM=xcb org.adi.Scopy</p>
 <p>QT_QPA_PLATFORM=xcb ./Scopy.AppImage</p>
 </div>
+<section id="running-with-elevated-privileges-on-linux">
+<h3>Running with elevated privileges on Linux<a class="headerlink" href="#running-with-elevated-privileges-on-linux" title="Link to this heading"></a></h3>
+<p>Some operations on local IIO devices (e.g. write, buffer access) require elevated (root) privileges.
+When Scopy detects a local IIO context and is not running as root, a dialog will inform you that certain
+operations may not be available. You can dismiss it with <strong>Continue as user</strong>
+and proceed with limited access.</p>
+<p>To gain full access, launch Scopy with elevated privileges:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">./</span><span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+</pre></div>
+</div>
+<p><strong>ARM systems (.deb package)</strong></p>
+<p>When Scopy is installed, via the Debian package, a <em>PolicyKit policy</em> and a
+<em>wrapper script</em> <code class="docutils literal notranslate"><span class="pre">scopy-root</span></code> are installed automatically.</p>
+<p>Starting the application using the graphical interface or by running the wrapper
+script will trigger a privilege prompt, allowing Scopy to be run with elevated
+privileges without needing to use <code class="docutils literal notranslate"><span class="pre">sudo</span></code> in the terminal.</p>
+<p>The privilege prompt will appear on application launch without any extra steps.</p>
+<p>The wrapper script is located in <code class="docutils literal notranslate"><span class="pre">/usr/bin/scopy-root</span></code>. To launch Scopy with elevated privileges using the terminal, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scopy</span><span class="o">-</span><span class="n">root</span>
+</pre></div>
+</div>
+<p>Sudo can still be used to launch the application with elevated privileges:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="o">./</span><span class="n">Scopy</span><span class="o">.</span><span class="n">AppImage</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Running GUI applications as root can introduce security risks.
+Use elevated privileges only when required for local IIO device access.</p>
+</div>
+</section>
 </section>
 <section id="application-overview">
 <h2>Application Overview<a class="headerlink" href="#application-overview" title="Link to this heading"></a></h2>
