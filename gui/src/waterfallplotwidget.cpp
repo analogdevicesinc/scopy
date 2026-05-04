@@ -29,6 +29,7 @@
 
 #include <qwt_scale_widget.h>
 #include <cfloat>
+#include <vector>
 
 using namespace scopy;
 
@@ -46,7 +47,7 @@ WaterfallData::WaterfallData()
 
 WaterfallData::~WaterfallData() {}
 
-void WaterfallData::addFFTData(const double *data, size_t size)
+void WaterfallData::addFFTData(const float *data, size_t size)
 {
 	if(!data || size == 0)
 		return;
@@ -59,7 +60,7 @@ void WaterfallData::addFFTData(const double *data, size_t size)
 		m_fftSize = size;
 	}
 
-	m_data.push_back(std::vector<double>(data, data + size));
+	m_data.push_back(std::vector<float>(data, data + size));
 
 	while(static_cast<int>(m_data.size()) > m_maxRows)
 		m_data.pop_front();
@@ -120,7 +121,7 @@ double WaterfallData::value(double x, double y) const
 	if(bin < 0 || static_cast<size_t>(bin) >= m_fftSize)
 		return -DBL_MAX;
 
-	return m_data[static_cast<size_t>(dataRow)][static_cast<size_t>(bin)];
+	return static_cast<double>(m_data[static_cast<size_t>(dataRow)][static_cast<size_t>(bin)]);
 }
 
 // =============================================================================
@@ -189,7 +190,7 @@ WaterfallPlotWidget::~WaterfallPlotWidget() {}
 
 void WaterfallPlotWidget::setWaterfallEnabled(bool enabled) { m_waterfallEnabled = enabled; }
 
-void WaterfallPlotWidget::addFFTData(const double *data, size_t size)
+void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 {
 	if(!m_waterfallEnabled)
 		return;
@@ -253,6 +254,21 @@ void WaterfallPlotWidget::setNumRows(int rows)
 		return;
 	m_data->setMaxRows(rows);
 	yAxis()->setInterval(rows, 0);
+}
+
+void WaterfallPlotWidget::setChannel(ChannelData *ch)
+{
+	disconnect(m_channel, &ChannelData::newData, this, nullptr);
+	if(m_channel != ch)
+		clearData();
+
+	m_channel = ch;
+	if(ch)
+		connect(m_channel, &ChannelData::newData, this,
+			[this](const float *, const float *yData, size_t size, bool) {
+				addFFTData(yData, size);
+				replot();
+			});
 }
 
 #include "moc_waterfallplotwidget.cpp"
