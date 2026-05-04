@@ -79,7 +79,7 @@ void Fmcomms11Plugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("fmcomms11Tool", "FMCOMMS11",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 }
 
 void Fmcomms11Plugin::unload() {}
