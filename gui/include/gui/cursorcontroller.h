@@ -23,6 +23,7 @@
 #define CURSORCONTROLLER_H
 
 #include "scopy-gui_export.h"
+#include <plotaxis.h>
 #include <plotcursors.h>
 #include <widgets/cursorsettings.h>
 #include <widgets/plotcursorreadouts.h>
@@ -38,6 +39,7 @@ public:
 
 	PlotCursors *getPlotCursors();
 	void connectSignals(CursorSettings *cursorSettings);
+	void setAxes(PlotAxis *xAxis, PlotAxis *yAxis);
 
 	void static syncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2);
 	void static unsyncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2);
