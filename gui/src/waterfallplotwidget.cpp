@@ -43,6 +43,7 @@ WaterfallData::WaterfallData()
 	, m_fftSize(0)
 	, m_xInterval(0.0, 1.0)
 	, m_zInterval(-120.0, 0.0)
+	, m_inverted(false)
 {}
 
 WaterfallData::~WaterfallData() {}
@@ -83,6 +84,10 @@ int WaterfallData::maxRows() const { return m_maxRows; }
 
 int WaterfallData::rowCount() const { return static_cast<int>(m_data.size()); }
 
+void WaterfallData::setInverted(bool inverted) { m_inverted = inverted; }
+
+bool WaterfallData::inverted() const { return m_inverted; }
+
 QwtInterval WaterfallData::interval(Qt::Axis axis) const
 {
 	switch(axis) {
@@ -104,8 +109,10 @@ double WaterfallData::value(double x, double y) const
 
 	const int nRows = static_cast<int>(m_data.size());
 
-	// Y is a row index in [0, maxRows]. Newest rows are at the top (high y).
-	const int row = static_cast<int>(y);
+	// Y is a row index in [0, maxRows].
+	// Normal (not inverted): newest rows are at the top (high y).
+	// Inverted: newest rows are at the bottom (low y) — flip the row index.
+	const int row = m_inverted ? (m_maxRows - 1 - static_cast<int>(y)) : static_cast<int>(y);
 	const int dataRow = row - (m_maxRows - nRows);
 
 	if(dataRow < 0 || dataRow >= nRows)
@@ -230,7 +237,6 @@ void WaterfallPlotWidget::clearData()
 void WaterfallPlotWidget::setFrequencyRange(double startHz, double stopHz)
 {
 	m_data->setXInterval(startHz, stopHz);
-	m_data->reset();
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 }
@@ -254,6 +260,13 @@ void WaterfallPlotWidget::setNumRows(int rows)
 		return;
 	m_data->setMaxRows(rows);
 	yAxis()->setInterval(rows, 0);
+}
+
+void WaterfallPlotWidget::setInverted(bool inverted)
+{
+	m_data->setInverted(inverted);
+	m_spectrogram->invalidateCache();
+	m_spectrogram->itemChanged();
 }
 
 void WaterfallPlotWidget::setChannel(ChannelData *ch)

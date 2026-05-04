@@ -44,7 +44,6 @@
 #include <gui/waterfallplotwidget.h>
 #include <gui/cursorcontroller.h>
 
-
 namespace scopy {
 namespace adc {
 
