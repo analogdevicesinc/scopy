@@ -101,7 +101,7 @@ Contents
    adrv9009/index
    fmcomms11/fmcomms11
    cn0357/cn0357
-   daq2/index
+   daq2/daq2
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer

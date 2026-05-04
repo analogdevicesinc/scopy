@@ -186,9 +186,5 @@ QWidget *DAQ2::buildDacSection()
 	freqLayout->addStretch();
 	layout->addWidget(freqRow);
 
-	// TODO: DDS/waveform controls (dac_data_manager) have no direct Scopy equivalent.
-	// The original plugin delegated all DAC tone/buffer management to dac_data_manager.
-	// This can be extended in a future port phase.
-
 	return section;
 }
