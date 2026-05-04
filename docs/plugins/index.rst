@@ -93,7 +93,7 @@ Contents
    ad9084/index
    adrv9002/adrv9002
    adrv9009/index
-   fmcomms11/index
+   fmcomms11/fmcomms11
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
