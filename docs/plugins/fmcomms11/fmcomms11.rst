@@ -1,19 +1,48 @@
 .. _fmcomms11:
 
 FMCOMMS11
-================================================================================
+========================================
 
-Description
----------------------------------
+Overview
+--------
 
-The FMCOMMS11 plugin works with Scopy to provide control of the AD-FMCOMMS11-EBZ
-high-speed RF evaluation board. It exposes controls for the AD9625 ADC, AD9162
-DAC, HMC1119 input step attenuator, and ADL5240 output variable gain amplifier.
-Changing any field immediately writes the value to the hardware via the IIO
-framework and reads it back to confirm the applied setting.
+The **FMCOMMS11** plugin for Scopy enables control and configuration of the
+AD-FMCOMMS11-EBZ evaluation board. It provides a unified interface to configure
+the high-speed RF DAC (AD9162), high-speed ADC (AD9625), input attenuator
+(HMC1119), and output variable gain amplifier (ADL5240) through the IIO
+framework.
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: Full FMCOMMS11 view showing all four sections (ADC, Input Attenuator, DAC, Output VGA) with a connected device
+Supported Devices
+-------------------
+
+- **AD-FMCOMMS11-EBZ**
+
+  - AD9162 — 16-bit, 12 GSPS RF DAC
+  - AD9625 — 12-bit, 2.5 GSPS ADC
+  - HMC1119 — digital step attenuator (input)
+  - ADL5240 — variable gain amplifier (output)
+
+Getting Started
+---------------
+
+**Prerequisites**
+
+- AD-FMCOMMS11-EBZ evaluation board with a compatible carrier (e.g., ZC706)
+- Linux IIO drivers loaded for all four required devices
+- Scopy version 2.2.0 or later
+
+**Using the Plugin**
+
+Connect the AD-FMCOMMS11-EBZ to your system and open Scopy. The FMCOMMS11
+plugin will be detected automatically when all four IIO devices
+(``axi-ad9625-hpc``, ``axi-ad9162-hpc``, ``hmc1119``, ``adl5240``) are present
+on the IIO context. Select the FMCOMMS11 tool from the device tool list to
+open the control panel. Changes to any control are written to the hardware
+immediately.
+
+
+Plugin Description
+------------------------------
 
 The FMCOMMS11 view is divided into four sections:
 
@@ -22,11 +51,12 @@ The FMCOMMS11 view is divided into four sections:
   - **DAC**
   - **Output VGA**
 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/fmcomms11/fmcomms11.png
+   :alt: FMCOMMS11
+   :align: center
+
 ADC
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The ADC section showing the Sampling Frequency readout, Scale combo, and Test Mode combo with a connected AD-FMCOMMS11-EBZ
 
   - **Sampling Frequency (MHz):** Displays the current ADC sampling frequency
     of the AD9625 in MHz. This field is read-only; the value is read directly
@@ -43,9 +73,6 @@ ADC
 Input Attenuator
 ---------------------------------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The Input Attenuator section showing the Hardware Gain spin control for the HMC1119 step attenuator
-
   - **Hardware Gain (dB):** Sets the attenuation applied by the HMC1119 digital
     step attenuator on the signal input path. The range is −31.75 dB to 0 dB
     in steps of 0.25 dB. A value of 0 dB means no attenuation; more negative
@@ -54,9 +81,6 @@ Input Attenuator
 
 DAC
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The DAC section showing the Sampling Frequency readout, NCO Frequency spin, and FIR85 Enable checkbox with a connected AD-FMCOMMS11-EBZ
 
   - **Sampling Frequency (MHz):** Displays the current DAC sampling frequency
     of the AD9162 in MHz. This field is read-only; the value is read from the
@@ -72,9 +96,6 @@ DAC
 
 Output VGA
 ---------------------------------
-
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The Output VGA section showing the Hardware Gain spin control for the ADL5240 variable gain amplifier
 
   - **Hardware Gain (dB):** Sets the gain of the ADL5240 variable gain amplifier
     on the signal output path. The range is −11.5 dB to +20 dB in steps of
