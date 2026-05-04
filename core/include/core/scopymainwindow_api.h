@@ -78,6 +78,10 @@ public:
 	Q_INVOKABLE QStringList listFiles(const QStringList &dirFilter, const QStringList &fileFilter);
 	Q_INVOKABLE QString findPkgName(const QString &filePath);
 
+	Q_INVOKABLE int getWhatsNewPageCount();
+	Q_INVOKABLE void switchWhatsNewPage(int idx);
+	Q_INVOKABLE void dismissWhatsNew();
+
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);
 	const QString getScriptContent(QFile *file);
