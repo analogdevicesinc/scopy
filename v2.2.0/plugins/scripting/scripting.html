@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="The Scopy Scripting Tool allows users to automate and extend Scopy’s functionality using JavaScript. Scripts can interact with devices, automate measurements, and control Scopy’s UI and instruments." name="description" />
+
+    <title>Scripting Tool &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=ac863bf0" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
+    <script async="async" src="../../_static/app.umd.js?v=09b0c6bc"></script>
+    <link rel="icon" href="../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="IMU Analyzer" href="../imuanalyzer/imuanalyzer.html" />
+    <link rel="prev" title="JESD Status" href="../jesdstatus/index.html" />
+   
+  
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        
+        <a id="logo" href="../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">Scripting Tool</a><ul>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#how-script-execution-works">How Script Execution Works</a></li>
+<li><a class="reference internal" href="#scripting-examples">Scripting Examples</a></li>
+<li><a class="reference internal" href="#command-line-scripting">Command Line Scripting</a></li>
+<li><a class="reference internal" href="#supported-commands">Supported Commands</a><ul>
+<li><a class="reference internal" href="#general">General</a></li>
+<li><a class="reference internal" href="#adalm2000-digitalio">ADALM2000: DigitalIO</a></li>
+<li><a class="reference internal" href="#adalm2000-power-supply">ADALM2000: Power Supply</a></li>
+<li><a class="reference internal" href="#adalm2000-voltmeter">ADALM2000: Voltmeter</a></li>
+<li><a class="reference internal" href="#adalm2000-signal-generator">ADALM2000: Signal Generator</a></li>
+<li><a class="reference internal" href="#adalm2000-network-analyzer">ADALM2000: Network Analyzer</a></li>
+<li><a class="reference internal" href="#adalm2000-oscilloscope">ADALM2000: Oscilloscope</a></li>
+<li><a class="reference internal" href="#adalm2000-pattern-generator">ADALM2000: Pattern Generator</a></li>
+<li><a class="reference internal" href="#adalm2000-logic-analyzer">ADALM2000: Logic Analyzer</a></li>
+<li><a class="reference internal" href="#adalm2000-spectrum-analyzer">ADALM2000: Spectrum Analyzer</a></li>
+<li><a class="reference internal" href="#regmap-api">RegMap API</a></li>
+<li><a class="reference internal" href="#datalogger-api">DataLogger API</a></li>
+<li><a class="reference internal" href="#iio-explorer-debugger-api">IIO Explorer (Debugger) API</a></li>
+<li><a class="reference internal" href="#pqm-api">PQM API</a></li>
+<li><a class="reference internal" href="#swiot-api">SWIOT API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../index.html">
+      <img src="../../_static/logo.svg"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/fmcomms5.html">FMCOMMS5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ad936x/fmcomms5_advanced.html">FMCOMMS5 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../adrv9002/adrv9002.html">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7"/><div class="collapse"><a class="reference internal" href="../adrv9009/index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9009/adrv9009.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adrv9009/adrv9009_advanced.html">ADRV9009 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scripting Tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../imuanalyzer/imuanalyzer.html">IMU Analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rfpowermeter/rfpowermeter.html">RF Power Meter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/package_generator.html">Package Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer_guide/plugin_developer_guide.html">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4"/><div class="collapse"><a class="reference internal" href="../../tests/index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tests/testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-9" id="toctree-collapse-4-1-9"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/jesd/index.html">JESD STATUS</a><label for="toctree-collapse-4-1-9"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/jesd/jesd_status_tests.html">JESD STATUS Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-10" id="toctree-collapse-4-1-10"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/ad936x/index.html">AD936X</a><label for="toctree-collapse-4-1-10"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/ad936x/ad936x_tests.html">AD936x Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-11" id="toctree-collapse-4-1-11"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/ad9084/index.html">AD9084</a><label for="toctree-collapse-4-1-11"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/fmcomms5/index.html">FMCOMMS5</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/fmcomms5/fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-13" id="toctree-collapse-4-1-13"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adrv9002/index.html">ADRV9002 (Jupiter)</a><label for="toctree-collapse-4-1-13"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9002/adrv9002_tests.html">ADRV9002 (Jupiter) Plugin - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9002/profile_generator_tests.html">ADRV9002 Profile Generator - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-14" id="toctree-collapse-4-1-14"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/adrv9009/index.html">ADRV9009</a><label for="toctree-collapse-4-1-14"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/adrv9009/adrv9009_tests.html">ADRV9009 Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-15" id="toctree-collapse-4-1-15"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/imuanalyzer/index.html">IMU Analyzer</a><label for="toctree-collapse-4-1-15"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/imuanalyzer/imuanalyzer_tests.html">IMU Analyzer Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-16" id="toctree-collapse-4-1-16"/><div class="collapse"><a class="reference internal" href="../../tests/plugins/rfpowermeter/index.html">RF Power Meter</a><label for="toctree-collapse-4-1-16"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../tests/plugins/rfpowermeter/rfpowermeter_tests.html">RF Power Meter Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../tests/general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/package_manager_tests.html">Package Manager - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/general/scripting_tool.html">Scripting Tool - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture/index.html">Software Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../index.html">Plugins</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="scripting-tool">
+<span id="id1"></span><h1>Scripting Tool<a class="headerlink" href="#scripting-tool" title="Link to this heading"></a></h1>
+<p>The Scopy Scripting Tool allows users to automate and extend Scopy’s functionality using JavaScript. Scripts can interact with devices, automate measurements, and control Scopy’s UI and instruments.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Script Editor:</strong> Write and edit JavaScript scripts directly in Scopy.</p></li>
+<li><p><strong>Load/Save:</strong> Open and save scripts to files.</p></li>
+<li><p><strong>Run:</strong> Execute scripts (stopping a running script is not supported).</p></li>
+<li><p><strong>Console Output:</strong> View script output and errors in a dedicated console.</p></li>
+<li><p><strong>Command Line Input:</strong> Enter and execute single-line commands interactively.</p></li>
+</ul>
+</section>
+<section id="how-script-execution-works">
+<h2>How Script Execution Works<a class="headerlink" href="#how-script-execution-works" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Scripts are executed using Qt’s built-in <cite>QJSEngine</cite> (ECMAScript/JavaScript engine). See the official documentation: <a class="icon link reference external" href="https://doc.qt.io/qt-5/qjsengine.html" target="_blank">https://doc.qt.io/qt-5/qjsengine.html</a></p></li>
+<li><p>The scripting tool provides a code editor, console, and run control.</p></li>
+<li><p>Scripts can be run from the editor or loaded from file.</p></li>
+</ul>
+</section>
+<section id="scripting-examples">
+<h2>Scripting Examples<a class="headerlink" href="#scripting-examples" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Connect to a device and iterate through its tools</p></li>
+</ol>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Find and connect to the first available device</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">devices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">getDevicesName</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">devices</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">devID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">addDevice</span><span class="p">(</span><span class="nx">devices</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">connectDevice</span><span class="p">(</span><span class="nx">devID</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">connected</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nx">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">getTools</span><span class="p">();</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">tools</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Tool iteration</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">disconnectDevice</span><span class="p">(</span><span class="nx">devID</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Connect to a device, switch to regmap, and read register 0x00</p></li>
+</ol>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Find and connect to the first available device, switch to RegMap, and read register 0x00</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">devices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">getDevicesName</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">devices</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">devID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">addDevice</span><span class="p">(</span><span class="nx">devices</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">connected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">connectDevice</span><span class="p">(</span><span class="nx">devID</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">connected</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="nx">switched</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">switchTool</span><span class="p">(</span><span class="nx">devID</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;RegMap&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">switched</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regmap</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="mh">0x00</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// Register value read</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">disconnectDevice</span><span class="p">(</span><span class="nx">devID</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>With a connected device: in the register map, read the first register, change its value to 1, read again, then restore the original value (with msleep)</p></li>
+</ol>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Assumes device is already connected and RegMap tool is active</span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">originalValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regmap</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="mh">0x00</span><span class="p">);</span>
+
+<span class="nx">regmap</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="mh">0x00</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">);</span>
+<span class="nx">scopy</span><span class="p">.</span><span class="nx">msleep</span><span class="p">(</span><span class="mf">1000</span><span class="p">);</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="nx">newValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regmap</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="mh">0x00</span><span class="p">);</span>
+
+<span class="nx">regmap</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="mh">0x00</span><span class="p">,</span><span class="w"> </span><span class="nx">originalValue</span><span class="p">);</span>
+<span class="nx">scopy</span><span class="p">.</span><span class="nx">msleep</span><span class="p">(</span><span class="mf">1000</span><span class="p">);</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="nx">restoredValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regmap</span><span class="p">.</span><span class="nx">read</span><span class="p">(</span><span class="mh">0x00</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="command-line-scripting">
+<h2>Command Line Scripting<a class="headerlink" href="#command-line-scripting" title="Link to this heading"></a></h2>
+<p>You can also run scripts from the command line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scopy<span class="w"> </span>--script<span class="w"> </span>myscript.js
+</pre></div>
+</div>
+<p>Or run a list of scripts:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scopy<span class="w"> </span>--script-list<span class="w"> </span>script1.js<span class="w"> </span>script2.js
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Stopping a running script is not supported.</p>
+</div>
+</section>
+<section id="supported-commands">
+<h2>Supported Commands<a class="headerlink" href="#supported-commands" title="Link to this heading"></a></h2>
+<p>A list of supported commands by the Scopy tool.</p>
+<section id="general">
+<h3>General<a class="headerlink" href="#general" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>exit()</p></td>
+<td><p>Exit Scopy application.</p></td>
+</tr>
+<tr class="row-odd"><td><p>msleep(ms)</p></td>
+<td><p>Delay for a specific amount of time (specified in milliseconds).</p></td>
+</tr>
+<tr class="row-even"><td><p>printToConsole(value)</p></td>
+<td><p>Print value to the console.</p></td>
+</tr>
+<tr class="row-odd"><td><p>fileIO.writeToFile(value, path)</p></td>
+<td><p>Write value in a file at specified path.</p></td>
+</tr>
+<tr class="row-even"><td><p>fileIO.appendToFile(value, path)</p></td>
+<td><p>Append value in a file at specified path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>fileIO.readAll(path)</p></td>
+<td><p>Read content from a file at specified path.</p></td>
+</tr>
+<tr class="row-even"><td><p>fileIO.readLine(path, lineNr)</p></td>
+<td><p>Read entire line from a file at specified path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-digitalio">
+<h3>ADALM2000: DigitalIO<a class="headerlink" href="#adalm2000-digitalio" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 25.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dio.dir[idx]</p></td>
+<td><p>true(out); false(in)</p></td>
+<td><p>Set channel direction (idx=0-15)</p></td>
+</tr>
+<tr class="row-odd"><td><p>dio.out[idx]</p></td>
+<td><p>true(high); false(low)</p></td>
+<td><p>Set channel output (idx=0-15)</p></td>
+</tr>
+<tr class="row-even"><td><p>dio.gpi[idx]</p></td>
+<td><p>true(high); false(low)</p></td>
+<td><p>Check pin value (high/low)</p></td>
+</tr>
+<tr class="row-odd"><td><p>dio.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run DigitalIO instrument</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-power-supply">
+<h3>ADALM2000: Power Supply<a class="headerlink" href="#adalm2000-power-supply" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27.3%" />
+<col style="width: 22.7%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>power.sync</p></td>
+<td><p>true(track); false(independent)</p></td>
+<td><p>Set Power Supplies as Independent or Tracking control.</p></td>
+</tr>
+<tr class="row-odd"><td><p>power.tracking_percent</p></td>
+<td><p>0 - 100 (%)</p></td>
+<td><p>Set Power Supplies Tracking ratio.</p></td>
+</tr>
+<tr class="row-even"><td><p>power.dac1_enabled</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Positive Power Supply.</p></td>
+</tr>
+<tr class="row-odd"><td><p>power.dac2_enabled</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Negative Power Supply.</p></td>
+</tr>
+<tr class="row-even"><td><p>power.dac1_value</p></td>
+<td><p>0 - 5 (V)</p></td>
+<td><p>Set Positive Power Supply output value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>power.dac2_value</p></td>
+<td><p>(-5) - 0 (V)</p></td>
+<td><p>Set Negative Power Supply output value.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-voltmeter">
+<h3>ADALM2000: Voltmeter<a class="headerlink" href="#adalm2000-voltmeter" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27.3%" />
+<col style="width: 22.7%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>dmm.mode_ac_low_ch1</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Set Channel 1 to AC mode (20Hz-800Hz)</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.mode_ac_low_ch2</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Set Channel 2 to AC mode (20Hz-800Hz)</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.mode_ac_high_ch1</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Set Channel 1 to AC mode (800Hz-40kHz)</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.mode_ac_high_ch2</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Set Channel 2 to AC mode (800Hz-40kHz)</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.histogram_ch1</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Channel 1 History plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.histogram_ch2</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Channel 2 History plot.</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.history_ch1_size_idx</p></td>
+<td><p>0 - 2</p></td>
+<td><p>Channel 1 History plot size (1s, 10s, 60s).</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.history_ch2_size_idx</p></td>
+<td><p>0 - 2</p></td>
+<td><p>Channel 2 History plot size (1s, 10s, 60s).</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.value_ch1</p></td>
+<td><p>Volts</p></td>
+<td><p>Read Channel 1 value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.value_ch2</p></td>
+<td><p>Volts</p></td>
+<td><p>Read Channel 2 value.</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.peak_hold_en</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Peak Hold.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.data_logging_en</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Data Logging.</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.data_logging_timer</p></td>
+<td><p>0 - 3600 (s)</p></td>
+<td><p>Set Data Logging Time.</p></td>
+</tr>
+<tr class="row-odd"><td><p>dmm.data_logging_append</p></td>
+<td><p>true(append); false(overwrite)</p></td>
+<td><p>Overwrite/Append data logging to file.</p></td>
+</tr>
+<tr class="row-even"><td><p>dmm.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Voltmeter instrument</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-signal-generator">
+<h3>ADALM2000: Signal Generator<a class="headerlink" href="#adalm2000-signal-generator" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.9%" />
+<col style="width: 23.1%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>siggen.mode[idx]</p></td>
+<td><p>0 - 3</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Operation mode (Constant, Waveform, Buffer, Math).</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.constant_volts[idx]</p></td>
+<td><p>(-5) - 5 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) voltage in Constant Mode.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.waveform_type[idx]</p></td>
+<td><p>0 - 5</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform type in Waveform Mode (Sine, Square, Triangle, Trapezoidal, Rising Ramp Sawtooth, Falling Ramp Sawtooth).</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.waveform_amplitude[idx]</p></td>
+<td><p>0.000001 - 5 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform amplitude in Waveform Mode.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.waveform_frequency[idx]</p></td>
+<td><p>0.001 - 37500000 (Hz)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform frequency in Waveform Mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.waveform_offset[idx]</p></td>
+<td><p>(-5) - 5 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform offset in Waveform Mode.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.waveform_phase[idx]</p></td>
+<td><p>0 - 359 (deg)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform phase in Waveform Mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.waveform_duty[idx]</p></td>
+<td><p>0 - 100 (%)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform duty in Waveform Mode (Square).</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.waveform_rise[idx]</p></td>
+<td><p>0.00000001 - 10 (s)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform rise time in Waveform Mode (Trapezoidal).</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.waveform_fall[idx]</p></td>
+<td><p>0.00000001 - 10 (s)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform fall time in Waveform Mode (Trapezoidal).</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.waveform_holdhigh[idx]</p></td>
+<td><p>0.00000001 - 10 (s)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform high time in Waveform Mode (Trapezoidal).</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.waveform_holdlow[idx]</p></td>
+<td><p>0.00000001 - 10 (s)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) waveform low time in Waveform Mode (Trapezoidal).</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.noise_type[idx]</p></td>
+<td><p>0(None); 200 - 203</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Noise Type (None, Uniform, Gaussian, Laplacian, Impulse).</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.noise_amplitude[idx]</p></td>
+<td><p>0.000001 - 10 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Noise Amplitude.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.math_function[idx]</p></td>
+<td><p>String</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Math function.</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.math_frequency[idx]</p></td>
+<td><p>0.001 - 37500000 (Hz)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Math frequency.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.buffer_file_path[idx]</p></td>
+<td><p>String</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Buffer file Path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.buffer_amplitude[idx]</p></td>
+<td><p>0.000000001 - 10 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Buffer amplitude.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.buffer_offset[idx]</p></td>
+<td><p>(-5) - 5 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Buffer offset.</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.buffer_sample_rate[idx]</p></td>
+<td><p>0.1 - 37500000 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Buffer sample rate.</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.buffer_phase[idx]</p></td>
+<td><p>0 - 359 (deg)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Buffer phase.</p></td>
+</tr>
+<tr class="row-odd"><td><p>siggen.enabled[idx]</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Channel 1/2 (idx=0/1)</p></td>
+</tr>
+<tr class="row-even"><td><p>siggen.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Signal Generator instrument.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-network-analyzer">
+<h3>ADALM2000: Network Analyzer<a class="headerlink" href="#adalm2000-network-analyzer" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27.3%" />
+<col style="width: 22.7%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>network.min_freq</p></td>
+<td><p>1 - 30000000 (Hz)</p></td>
+<td><p>Set Sweep Minimum Frequency.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.max_freq</p></td>
+<td><p>1 - 30000000 (Hz)</p></td>
+<td><p>Set Sweep Maximum Frequency.</p></td>
+</tr>
+<tr class="row-even"><td><p>network.samples_count</p></td>
+<td><p>10 - 1000 (samples)</p></td>
+<td><p>Set Sweep Samples Count.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.amplitude</p></td>
+<td><p>0.000001 - 10 (V)</p></td>
+<td><p>Set Waveform Amplitude.</p></td>
+</tr>
+<tr class="row-even"><td><p>network.offset</p></td>
+<td><p>(-5) - 5 (V)</p></td>
+<td><p>Set Waveform Offset.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.min_mag</p></td>
+<td><p>(-120) - 120 (dB)</p></td>
+<td><p>Set Minimum Magnitude displayed.</p></td>
+</tr>
+<tr class="row-even"><td><p>network.max_mag</p></td>
+<td><p>(-120) - 120 (dB)</p></td>
+<td><p>Set Maximum Magnitude displayed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.min_phase</p></td>
+<td><p>(-180) - 180 (deg)</p></td>
+<td><p>Set Minimum Phase displayed.</p></td>
+</tr>
+<tr class="row-even"><td><p>network.max_phase</p></td>
+<td><p>(-180) - 180 (deg)</p></td>
+<td><p>Set Maximum Phase displayed.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.log_freq</p></td>
+<td><p>true(log)/false(lin)</p></td>
+<td><p>Set Logarithmic/Linear plot scale display.</p></td>
+</tr>
+<tr class="row-even"><td><p>network.ref_channel</p></td>
+<td><p>1; 2</p></td>
+<td><p>Set Channel 1/2 as reference channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.line_thickness</p></td>
+<td><p>0-9</p></td>
+<td><p>Set plot line thickness (0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)</p></td>
+</tr>
+<tr class="row-even"><td><p>network.cursors</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Plot Cursors.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.cursors_position</p></td>
+<td><p>0 - 3</p></td>
+<td><p>Change Cursors Table position on plot.</p></td>
+</tr>
+<tr class="row-even"><td><p>network.cursors_transparency</p></td>
+<td><p>0 - 100 (%)</p></td>
+<td><p>Change Cursors Table transparency on plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p>network.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Network Analyzer instrument.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-oscilloscope">
+<h3>ADALM2000: Oscilloscope<a class="headerlink" href="#adalm2000-oscilloscope" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26.9%" />
+<col style="width: 23.1%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>osc.channels[idx].enabled</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Channel 1/2 (idx=0/1)</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].volts_per_div</p></td>
+<td><p>0.001 - 10 (V)</p></td>
+<td><p>Set Channel 1/2 (idx=0/1) Volts/Div value for the plot.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].ac_coupling</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Channel 1/2 (idx=0/1) AC Coupling.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].period</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s period.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].mean</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s mean value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].cycle_mean</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s cycle mean value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].rms</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s RMS value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].cycle_rms</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s Cycle RMS value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].ac_rms</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s AC RMS value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].area</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s Area value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].cycle_area</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s Cycle Area value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].min</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s min value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].max</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s max value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].amplitude</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s amplitude value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].peak_to_peak</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s peak-to-peak value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].low</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s low value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].high</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s high value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].middle</p></td>
+<td><p>( V )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s middle value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].pos_overshoot</p></td>
+<td><p>(%)</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s positive overshoot value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].neg_overshoot</p></td>
+<td><p>(%)</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s negative overshoot value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].rise</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s rise time value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].fall</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s fall time value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].pos_width</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s positive width value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].neg_width</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s negative width value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.channels[idx].pos_duty</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s positive duty cycle value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.channels[idx].neg_duty</p></td>
+<td><p>( s )</p></td>
+<td><p>Read Channel 1/2 (idx=0/1) signal’s negative duty cycle value.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.time_base</p></td>
+<td><p>0.0000001 - 1 (s)</p></td>
+<td><p>Set Oscilloscope time base.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.time_position</p></td>
+<td><p>(-5) - 5 (s)</p></td>
+<td><p>Set Oscilloscope time position.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.measure_all</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Display All Measurements.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.measure</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Measure Feature.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.counter</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Counter feature for Measurements.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.statistics</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Statistics feature for Measurements.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.cursors</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Cursors on plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.horizontal_cursors</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Horizontal Cursors on plot.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.vertical_cursors</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Vertical Cursors on plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.cursors_position</p></td>
+<td><p>0-3</p></td>
+<td><p>Set Cursors Table position on plot.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.cursors_transparency</p></td>
+<td><p>0-100 (%)</p></td>
+<td><p>Set Cursors Table transparency on plot.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.auto_trigger</p></td>
+<td><p>true(auto); false(normal)</p></td>
+<td><p>Set Trigger mode to Auto/Normal.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.internal_trigger</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable Internal Trigger.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.external_trigger</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Enable/Disable External Trigger.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.trigger_source</p></td>
+<td><p>0; 1</p></td>
+<td><p>Select Channel 1/2 (0/1) as Trigger Source.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.trigger_level</p></td>
+<td><p>(-25) - 25 (V)</p></td>
+<td><p>Set Trigger Level.</p></td>
+</tr>
+<tr class="row-even"><td><p>osc.trigger_hysteresis</p></td>
+<td><p>0 - 2.5 (V)</p></td>
+<td><p>Set Trigger Hysteresis.</p></td>
+</tr>
+<tr class="row-odd"><td><p>osc.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Oscilloscope instrument.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-pattern-generator">
+<h3>ADALM2000: Pattern Generator<a class="headerlink" href="#adalm2000-pattern-generator" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pattern.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Pattern Generator instrument.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-logic-analyzer">
+<h3>ADALM2000: Logic Analyzer<a class="headerlink" href="#adalm2000-logic-analyzer" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>logic.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Logic Analyzer instrument.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="adalm2000-spectrum-analyzer">
+<h3>ADALM2000: Spectrum Analyzer<a class="headerlink" href="#adalm2000-spectrum-analyzer" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>spectrum.running</p></td>
+<td><p>true(on); false(off)</p></td>
+<td><p>Run Spectrum Analyzer instrument.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="regmap-api">
+<h3>RegMap API<a class="headerlink" href="#regmap-api" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>regmap.write(addr, val)</p></td>
+<td><p>Address, Value</p></td>
+<td><p>Write value to register address.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.writeBitField(addr, val)</p></td>
+<td><p>Address, Value</p></td>
+<td><p>Write value to register bitfield.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.getAvailableDevicesName()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of available device names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.setDevice(device)</p></td>
+<td><p>Device name</p></td>
+<td><p>Set the active device.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.search(searchParam)</p></td>
+<td><p>Search string</p></td>
+<td><p>Search for registers or bitfields.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.readInterval(startAddr, stopAddr)</p></td>
+<td><p>Start, Stop address</p></td>
+<td><p>Read registers in address interval.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.enableAutoread(enable)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable autoread.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.isAutoreadEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if autoread is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.registerDump(filePath)</p></td>
+<td><p>File path</p></td>
+<td><p>Dump all register values to file.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.setPath(filePath)</p></td>
+<td><p>File path</p></td>
+<td><p>Set file path for operations.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.writeFromFile(filePath)</p></td>
+<td><p>File path</p></td>
+<td><p>Write register values from file.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.readRegister(addr)</p></td>
+<td><p>Address</p></td>
+<td><p>Read value from register address.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.getValueOfRegister(addr)</p></td>
+<td><p>Address</p></td>
+<td><p>Get value of register.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.getRegisterInfo(addr)</p></td>
+<td><p>Address</p></td>
+<td><p>Get info about register.</p></td>
+</tr>
+<tr class="row-even"><td><p>regmap.getRegisterBitFieldsInfo(addr)</p></td>
+<td><p>Address</p></td>
+<td><p>Get info about register bitfields.</p></td>
+</tr>
+<tr class="row-odd"><td><p>regmap.getBitFieldInfo(addr, bitName)</p></td>
+<td><p>Address, Bit name</p></td>
+<td><p>Get info about a specific bitfield.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="datalogger-api">
+<h3>DataLogger API<a class="headerlink" href="#datalogger-api" title="Link to this heading"></a></h3>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>datalogger.showAvailableMonitors()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Show available monitors.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.showAvailableDevices()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Show available devices.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.showMonitorsOfDevice(device)</p></td>
+<td><p>Device name</p></td>
+<td><p>Show monitors for a device.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.enableMonitor(monitor)</p></td>
+<td><p>Monitor name</p></td>
+<td><p>Enable a monitor.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.disableMonitor(monitor)</p></td>
+<td><p>Monitor name</p></td>
+<td><p>Disable a monitor.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.setRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop logging.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.clearData()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear logged data.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.changeTool(name)</p></td>
+<td><p>Tool name</p></td>
+<td><p>Change active tool.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.setMinMax(enable)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable min/max display.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.changePrecision(decimals)</p></td>
+<td><p>Integer</p></td>
+<td><p>Change display precision.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.setMinYAxis(min)</p></td>
+<td><p>Value</p></td>
+<td><p>Set minimum Y axis value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.setMaxYAxis(max)</p></td>
+<td><p>Value</p></td>
+<td><p>Set maximum Y axis value.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.createTool()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Create a new tool.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.getToolList()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of tools.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.enableMonitorOfTool(toolName, monitor)</p></td>
+<td><p>Tool, Monitor</p></td>
+<td><p>Enable monitor for tool.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.disableMonitorOfTool(toolName, monitor)</p></td>
+<td><p>Tool, Monitor</p></td>
+<td><p>Disable monitor for tool.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.setLogPathOfTool(toolName, path)</p></td>
+<td><p>Tool, Path</p></td>
+<td><p>Set log file path for tool.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.logAtPathForTool(toolName, path)</p></td>
+<td><p>Tool, Path</p></td>
+<td><p>Log data at path for tool.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.continuousLogAtPathForTool(toolName, path)</p></td>
+<td><p>Tool, Path</p></td>
+<td><p>Start continuous logging for tool.</p></td>
+</tr>
+<tr class="row-odd"><td><p>datalogger.stopContinuousLogForTool(toolName)</p></td>
+<td><p>Tool</p></td>
+<td><p>Stop continuous logging for tool.</p></td>
+</tr>
+<tr class="row-even"><td><p>datalogger.importDataFromPathForTool(toolName, path)</p></td>
+<td><p>Tool, Path</p></td>
+<td><p>Import data from file for tool.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="iio-explorer-debugger-api">
+<h3>IIO Explorer (Debugger) API<a class="headerlink" href="#iio-explorer-debugger-api" title="Link to this heading"></a></h3>
+<p class="rubric">Tab Control</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.setCurrentTab(index)</p></td>
+<td><p>0-2</p></td>
+<td><p>Set the current main tab (0=IIO Attributes, 1=Log, 2=Code Generator).</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getCurrentTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current main tab index.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.showIIOAttributesTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch to the IIO Attributes tab.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.showLogTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch to the Log tab.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.showCodeGeneratorTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch to the Code Generator tab.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Tree Navigation</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.selectItemByPath(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Select a tree item by path (e.g., “context0/ad9361-phy/voltage0/hardwaregain”).</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getSelectedItemPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the path of the currently selected item.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.getSelectedItemName()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the name of the currently selected item.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getSelectedItemType()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the type of the currently selected item.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Tree Expand/Collapse</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.expandItem(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Expand a tree item by path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.collapseItem(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Collapse a tree item by path.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.isItemExpanded(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Check if a tree item is expanded.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getChildCount(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Get the number of children for a tree item.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.getChildNames(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Get list of child names for a tree item.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Watchlist</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.addCurrentItemToWatchlist()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Add the currently selected item to the watchlist.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.addItemToWatchlistByPath(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Add a tree item to the watchlist by path.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.removeItemFromWatchlistByPath(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Remove a tree item from the watchlist by path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getWatchlistPaths()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of all watchlist item paths.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.clearWatchlist()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Remove all items from the watchlist.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.refreshWatchlist()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Refresh all watchlist entries.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.writeWatchlistAttributeValue(path, value)</p></td>
+<td><p>Path, Value</p></td>
+<td><p>Write a value to a watchlist attribute.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attribute Values</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.readAttributeValue(path)</p></td>
+<td><p>Path string</p></td>
+<td><p>Read the value of an attribute by path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.writeAttributeValue(path, value)</p></td>
+<td><p>Path, Value</p></td>
+<td><p>Write a value to an attribute by path.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.triggerRead()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a read on all child items of the selected item.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Code Generator</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.getGeneratedCode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the generated code content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.saveGeneratedCode(filePath)</p></td>
+<td><p>File path</p></td>
+<td><p>Save the generated code to a file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Log</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.getLogContent()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the log content.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.clearLog()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear the log.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Search/Filter</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.setSearchText(text)</p></td>
+<td><p>Search string</p></td>
+<td><p>Set the search/filter text.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getSearchText()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current search text.</p></td>
+</tr>
+<tr class="row-even"><td><p>iioExplorer.getSearchPlaceholderText()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the search placeholder text.</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getVisibleItemCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the number of visible items after filtering.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Details View</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iioExplorer.setDetailsViewTab(index)</p></td>
+<td><p>0-2</p></td>
+<td><p>Set the details view tab (0=GUI View, 1=IIO View, 2=Generated Code).</p></td>
+</tr>
+<tr class="row-odd"><td><p>iioExplorer.getDetailsViewTab()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current details view tab index.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="pqm-api">
+<h3>PQM API<a class="headerlink" href="#pqm-api" title="Link to this heading"></a></h3>
+<p class="rubric">Tool Selection</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.getTools()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of available tool names.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">RMS Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.isRmsRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if RMS instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setRmsRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the RMS instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.rmsSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isRmsLoggingEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if RMS logging is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setRmsLoggingEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable RMS logging.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getRmsLogPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the RMS log file path.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setRmsLogPath(path)</p></td>
+<td><p>File path</p></td>
+<td><p>Set the RMS log file path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.resetRmsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset RMS PQ events.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.isRmsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if RMS PQ events are active.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Harmonics Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.isHarmonicsRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Harmonics instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setHarmonicsRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the Harmonics instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.harmonicsSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getHarmonicsActiveChannel()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the active harmonics channel name.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsActiveChannel(channel)</p></td>
+<td><p>Channel name</p></td>
+<td><p>Set the active harmonics channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getHarmonicsType()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current harmonics type.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsType(type)</p></td>
+<td><p>“harmonics”, “inter_harmonics”</p></td>
+<td><p>Set the harmonics type.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isHarmonicsLoggingEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Harmonics logging is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsLoggingEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable Harmonics logging.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getHarmonicsLogPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the Harmonics log file path.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setHarmonicsLogPath(path)</p></td>
+<td><p>File path</p></td>
+<td><p>Set the Harmonics log file path.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.resetHarmonicsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset Harmonics PQ events.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.isHarmonicsPqEvents()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Harmonics PQ events are active.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Waveform Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.isWaveformRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Waveform instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setWaveformRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the Waveform instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.waveformSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getWaveformTimespan()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current timespan value.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformTimespan(value)</p></td>
+<td><p>Seconds</p></td>
+<td><p>Set the timespan value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isWaveformRollingMode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if rolling mode is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformRollingMode(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable rolling mode.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getWaveformTriggeredBy()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the trigger channel name.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformTriggeredBy(channel)</p></td>
+<td><p>Channel name</p></td>
+<td><p>Set the trigger channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.isWaveformLoggingEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Waveform logging is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformLoggingEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable Waveform logging.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getWaveformLogPath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the Waveform log file path.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.setWaveformLogPath(path)</p></td>
+<td><p>File path</p></td>
+<td><p>Set the Waveform log file path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Settings Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.settingsRead()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Read settings from device.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.settingsWrite()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Write settings to device.</p></td>
+</tr>
+<tr class="row-even"><td><p>pqm.getSettingsAttributeValue(attrName)</p></td>
+<td><p>Attribute name</p></td>
+<td><p>Get the value of a settings attribute.</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.setSettingsAttributeValue(attrName, value)</p></td>
+<td><p>Attribute name, Value</p></td>
+<td><p>Set the value of a settings attribute.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Utility</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>pqm.triggerPqEvent(enable)</p></td>
+<td><p>true/false</p></td>
+<td><p>Trigger a PQ event (for testing).</p></td>
+</tr>
+<tr class="row-odd"><td><p>pqm.getLogFilePath()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the actual log file path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="swiot-api">
+<h3>SWIOT API<a class="headerlink" href="#swiot-api" title="Link to this heading"></a></h3>
+<p class="rubric">Tool Selection</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.getTools()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of available tool names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isRuntimeMode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if device is in runtime mode.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.switchToConfigMode()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Switch from runtime mode to config mode.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Config Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.getConfigChannelCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get number of config channels.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.applyConfig()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Apply the current configuration.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setChannelEnabled(channelId, enabled)</p></td>
+<td><p>Channel ID, true/false</p></td>
+<td><p>Enable or disable a config channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isChannelEnabled(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Check if a config channel is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setChannelDevice(channelId, device)</p></td>
+<td><p>Channel ID, Device name</p></td>
+<td><p>Set the device for a config channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getChannelDevice(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the device name of a config channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAvailableDevices(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get list of available devices for a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setChannelFunction(channelId, function)</p></td>
+<td><p>Channel ID, Function name</p></td>
+<td><p>Set the function for a config channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getChannelFunction(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the function name of a config channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAvailableFunctions(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get list of available functions for a channel.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">AD74413R Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.isAdRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if AD74413R instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the AD74413R instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.adSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot acquisition.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdTimespan()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current timespan value.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setAdTimespan(timespan)</p></td>
+<td><p>Seconds</p></td>
+<td><p>Set the timespan value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdPlotLabelsEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable plot labels.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.isAdPlotLabelsEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if plot labels are enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdMeasurementsEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable measurements.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.isAdMeasurementsEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if measurements are enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdChannelEnabled(channelId, enabled)</p></td>
+<td><p>Channel ID, true/false</p></td>
+<td><p>Enable or disable a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.isAdChannelEnabled(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Check if a channel is enabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdChannelSamplingFrequency(channelId, frequency)</p></td>
+<td><p>Channel ID, Frequency</p></td>
+<td><p>Set the sampling frequency for a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAdChannelSamplingFrequency(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the sampling frequency of a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setAdChannelYMin(channelId, value)</p></td>
+<td><p>Channel ID, Value</p></td>
+<td><p>Set the Y axis minimum for a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setAdChannelYMax(channelId, value)</p></td>
+<td><p>Channel ID, Value</p></td>
+<td><p>Set the Y axis maximum for a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdChannelYMin(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the Y axis minimum of a channel.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAdChannelYMax(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get the Y axis maximum of a channel.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdChannelCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the number of AD74413R channels.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getAdChannelNames()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of AD74413R channel names.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdSampleRate()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current sample rate.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">MAX14906 Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.isMaxRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if MAX14906 instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setMaxRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the MAX14906 instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxTimespan()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the current timespan value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setMaxTimespan(timespan)</p></td>
+<td><p>Seconds</p></td>
+<td><p>Set the timespan value.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setMaxChannelOutput(channelId, value)</p></td>
+<td><p>Channel ID, true/false</p></td>
+<td><p>Set a channel output value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getMaxChannelOutput(channelId)</p></td>
+<td><p>Channel ID</p></td>
+<td><p>Get a channel output value.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxChannelCount()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the number of MAX14906 channels.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getMaxChannelNames()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of MAX14906 channel names.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxXAxisMin()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the X axis minimum value.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getMaxXAxisMax()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get the X axis maximum value.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Faults Instrument</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28.6%" />
+<col style="width: 21.4%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Values</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>swiot.isFaultsRunning()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if Faults instrument is running.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.setFaultsRunning(running)</p></td>
+<td><p>true/false</p></td>
+<td><p>Start or stop the Faults instrument.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.faultsSingleShot()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Trigger a single shot fault read.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.resetAdFaultsStored()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset AD74413R stored faults.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.resetMaxFaultsStored()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Reset MAX14906 stored faults.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.clearAdFaultsSelection()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear AD74413R fault bit selection.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.clearMaxFaultsSelection()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Clear MAX14906 fault bit selection.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdActiveFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of active AD74413R fault bit indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxActiveFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of active MAX14906 fault bit indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdSelectedFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of selected AD74413R fault bit indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxSelectedFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of selected MAX14906 fault bit indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.getAdStoredFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of stored AD74413R fault bit indices.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.getMaxStoredFaultBits()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Get list of stored MAX14906 fault bit indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.selectAdFaultBit(bitIndex)</p></td>
+<td><p>Bit index</p></td>
+<td><p>Select an AD74413R fault bit.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.selectMaxFaultBit(bitIndex)</p></td>
+<td><p>Bit index</p></td>
+<td><p>Select a MAX14906 fault bit.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isAdFaultsExplanationEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if AD74413R faults explanation is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setAdFaultsExplanationEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable AD74413R faults explanation.</p></td>
+</tr>
+<tr class="row-odd"><td><p>swiot.isMaxFaultsExplanationEnabled()</p></td>
+<td><ul class="simple">
+<li></li>
+</ul>
+</td>
+<td><p>Check if MAX14906 faults explanation is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p>swiot.setMaxFaultsExplanationEnabled(enabled)</p></td>
+<td><p>true/false</p></td>
+<td><p>Enable or disable MAX14906 faults explanation.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="../jesdstatus/index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">JESD Status</a>
+    <a href="../imuanalyzer/imuanalyzer.html" title="Next document (Alt+Shift+RightArrow)" class="next">IMU Analyzer</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>

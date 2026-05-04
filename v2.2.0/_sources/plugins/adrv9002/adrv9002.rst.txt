@@ -1,0 +1,293 @@
+.. _adrv9002:
+
+ADRV9002 (Jupiter) Plugin
+================================================================================
+
+Description
+---------------------------------------------------------------------
+
+The ADRV9002 (Jupiter) plugin provides a comprehensive interface for controlling and 
+configuring the ADRV9002 dual-channel RF transceiver. This plugin enables users to 
+manage both receive and transmit signal paths, configure device settings, and control 
+FPGA-based signal generation features. The ADRV9002 is a dual-channel RF transceiver 
+designed for software-defined radio applications with wide bandwidth and high performance.
+
+The plugin is organized into four main sections providing complete control over the device 
+functionality:
+
+* **Device Global Settings** - System-wide configuration and status monitoring
+* **Receive Chain** - RX channel configuration and signal path control
+* **Transmit Chain** - TX channel configuration and signal path control
+* **Profile Generator** - Integrated tools for creating and managing device profiles
+
+Compatible Devices
+---------------------------------------------------------------------
+
+The ADRV9002 plugin is compatible with:
+
+* ADRV9002 dual-channel RF transceiver platforms
+* Systems implementing the ADRV9002 IIO driver interface
+* Hardware platforms with ADRV9002 integrated designs
+
+.. note::
+   This plugin requires a compatible IIO context with ADRV9002 device support. Ensure that 
+   the appropriate device drivers are installed and the hardware is properly connected.
+
+Device Global Settings
+---------------------------------------------------------------------
+
+The Device Global Settings section provides system-wide controls and monitoring capabilities:
+
+**Profile Configuration**
+  Allows loading of profile configurations from external files. Profiles define the operational 
+  parameters including sampling rates, bandwidths, and signal path configurations.
+  
+  * **Load Profile**: Browse and select profile configuration files
+  * **Profile Status**: Displays current profile information
+  
+  For detailed information about profiles, see the `ADRV9002 Driver Documentation <https://wiki.analog.com/resources/tools-software/linux-drivers/iio-transceiver/adrv9002#profiles>`_.
+
+.. note::
+   The plugin includes an integrated **Profile Generator** tab for creating profiles. This feature 
+   requires the external libadrv9002-iio library to be installed.
+
+**Temperature Monitoring**
+  Reports the current device temperature for thermal monitoring and protection.
+  
+  * **Temperature Display**: Real-time device temperature in degrees Celsius
+  * **Temperature Status**: Indicates normal operation or thermal warnings
+
+**Device Information**
+  Displays device identification and version information:
+  
+  * **Device Driver Version**: Current driver version information
+  * **Hardware Revision**: Device hardware revision details
+  * **Firmware Version**: Loaded firmware version
+
+Receive Chain Configuration
+---------------------------------------------------------------------
+
+The Receive Chain section provides comprehensive control over the RX signal path for both channels:
+
+**Signal Path Parameters**
+
+**RF Bandwidth (MHz)**
+  Displays the Primary Signal Bandwidth of the currently loaded profile. This parameter defines 
+  the usable signal bandwidth for the receive path.
+
+**Sampling Rate (MSPS)**
+  Shows the RX Sample Rate configured in the current profile. This determines the digital sampling 
+  frequency for received signals.
+
+**Gain Control Settings**
+
+**Gain Control Mode**
+  Selects the gain control mechanism:
+  
+  * **SPI**: Manual gain control via software interface
+  * **PIN**: Hardware pin-controlled gain adjustment  
+  * **Automatic**: Automatic gain control (AGC) mode
+
+**Hardware Gain (dB)**
+  Controls the RX gain when in SPI or PIN mode. This setting adjusts the analog gain in the receive signal path.
+
+**Signal Monitoring**
+
+**RSSI (dB)**
+  Displays the Received Signal Strength Indicator, providing real-time measurement of input signal level.
+
+**Decimated Power (dB)**
+  Shows the decimated power measurement, useful for signal analysis and monitoring.
+
+**Frequency Control**
+
+**NCO (Hz)**
+  Controls the Numerically Controlled Oscillator for frequency offset correction. This setting is only 
+  available if the loaded profile supports NCO correction.
+
+**Local Oscillator (MHz)**
+  Controls the carrier frequency for the receive chain. This sets the center frequency for signal reception.
+
+**Channel Control**
+
+**Enable**
+  While off disables the transmit channel, stopping signal transmission and reducing power consumption.
+
+**Dynamic ADC Switch**
+  Enables dynamic ADC switching functionality for optimized power management and performance.
+
+**ENSM (Enable State Machine)**
+  Selects the operational mode for the Enable State Machine:
+  
+  * **Calibrated**: Normal operation with calibrations enabled
+  * **Primed**: Standby mode ready for quick activation
+  * **RF Enabled**: Full RF operation mode
+
+**Port Enable**
+  Configures how the port can be enabled:
+  
+  * **SPI**: Software-controlled port enable
+  * **PIN**: Hardware pin-controlled port enable
+
+**Digital Signal Processing**
+
+**Digital Gain Control**
+  Selects the digital gain control mode for fine-tuning signal levels in the digital domain.
+
+**Interface Gain (dB)**
+  Controls the Slicer block gain for digital signal processing optimization.
+
+**Tracking Calibrations**
+  Enable/disable various tracking calibration algorithms:
+  
+  * **Quadrature FIC**: Quadrature frequency image correction
+  * **BBDC Rejection**: Baseband DC offset rejection
+  * **HD2**: Second harmonic distortion correction
+  * **AGC**: Automatic gain control calibration
+  * **Quadrature Poly**: Quadrature polynomial correction
+  * **RSSI**: RSSI calibration
+  * **RDFC**: Receive data formatting correction
+
+Transmit Chain Configuration
+---------------------------------------------------------------------
+
+The Transmit Chain section provides control over the TX signal path for both channels:
+
+**Signal Path Parameters**
+
+**RF Bandwidth (MHz)**
+  Displays the Primary Signal Bandwidth for the transmit path as defined in the current profile.
+
+**Sampling Rate (MSPS)**
+  Shows the TX Sample Rate configured in the current profile, determining the digital sampling 
+  frequency for transmitted signals.
+
+**Power Control**
+
+**Attenuation (dB)**
+  Controls the TX output power attenuation. Higher values reduce output power.
+
+**Attenuation Control Mode**
+  Selects the attenuation control mechanism:
+  
+  * **SPI**: Software-controlled attenuation
+  * **PIN**: Hardware pin-controlled attenuation
+  * **Bypass**: Bypass attenuation control
+
+**Channel Control**
+
+**ENSM (Enable State Machine)**
+  Configures the transmit channel operational mode similar to the receive chain.
+
+**Port Enable**
+  Selects port enable control method (SPI or PIN) for the transmit channel.
+
+**Enable**
+  While off disables the transmit channel, stopping signal transmission and reducing power consumption.
+
+**Frequency Control**
+
+**NCO (Hz)**
+  Controls frequency offset correction for the transmit path when supported by the loaded profile.
+
+**Local Oscillator (MHz)**
+  Sets the carrier frequency for signal transmission.
+
+**Tracking Calibrations**
+  Enable/disable transmit-specific calibration algorithms:
+  
+  * **Quadrature**: Quadrature correction for TX path
+  * **PA Correction**: Power amplifier linearity correction
+  * **LO Leakage**: Local oscillator leakage correction
+  * **Close Loop Gain**: Closed-loop gain calibration
+  * **Loopback Delay**: Loopback delay calibration
+
+Profile Generator
+---------------------------------------------------------------------
+
+The ADRV9002 plugin includes an integrated **Profile Generator** tab that provides 
+a graphical interface for creating and managing ADRV9002 device profiles. This 
+functionality requires an external dependency to be installed.
+
+.. warning::
+   The Profile Generator functionality requires the **libadrv9002-iio** library to be 
+   installed. If this external tool is missing, the Profile Generator functionality will 
+   be disabled. The library can be obtained from: https://analogdevicesinc.github.io/libadrv9002-iio
+
+**Profile Generator Interface**
+
+The Profile Generator tab is accessible through the main plugin interface and provides 
+the following sections:
+
+**Profile Generator CLI Detection**
+  Displays the status of the external profile generator tool:
+
+**Profile Actions**
+  * **Preset Dropdown**: Select from predefined profile templates ("LTE" or "Live Device")
+  * **Refresh Button**: Reload available presets and update the interface
+  * **Save Stream to file**: Export the generated stream configuration to a file
+  * **Save Profile to file**: Export the profile configuration to a file
+  * **Load to device**: Apply the current profile configuration to the connected ADRV9002 device
+
+**Radio Configuration**
+
+  * **SSI Interface**: Show the Serial Synchronous Interface type (LVDS/CMOS)
+  * **Duplex mode**: Choose between TDD (Time Division Duplex) and FDD (Frequency Division Duplex)
+
+**Channel Configuration**
+  The interface provides separate configuration sections for each channel:
+
+**RX Channels (RX 1 / RX 2)**
+  For each receive channel, the following options are available:
+  
+  * **Enabled**: Checkbox to enable/disable the RX channel
+  * **Frequency Offset Correction**: Enable frequency offset correction capability
+  * **Bandwidth (Hz)**: Set the channel bandwidth (e.g., 38000000)
+  * **Interface Sample Rate (Hz)**: Configure the sample rate (e.g., 61440000)
+  * **RX RF Input**: Select the RF input path (RxA/RxB)
+
+**TX Channels (TX 1 / TX 2)**
+  For each transmit channel, the following options are available:
+  
+  * **Enabled**: Checkbox to enable/disable the TX channel
+  * **Frequency Offset Correction**: Enable frequency offset correction capability
+  * **Bandwidth (Hz)**: Set the channel bandwidth (e.g., 38000000)
+  * **Interface Sample Rate (Hz)**: Configure the sample rate (e.g., 61440000)
+
+**ORX Configuration**
+  Observation Receiver channels for monitoring and calibration
+
+**Debug Information**
+  Displays the JSON configuration being generated:
+  
+  * **Configuration Preview**: Shows the profile configuration in JSON format
+  * **Real-time Updates**: Updates automatically as parameters are changed
+  * **Technical Details**: Displays low-level configuration parameters
+
+
+**External Tool Dependency**
+
+The Profile Generator relies on the **libadrv9002-iio** library:
+
+* **Installation Required**: Must be installed separately from Scopy
+* **Version Compatibility**: Different versions support different ADRV9002 API versions
+* **CLI Integration**: Scopy interfaces with the command-line tool provided by the library
+* **Automatic Detection**: Scopy automatically detects if the tool is available
+
+**Supported API Versions**
+
+The external tool supports multiple ADRV9002 API versions:
+
+* **v68.8.1 (v0.24)**: Supported in libadrv9002-iio v0.1.0 and v0.2.0
+* **v68.10.1 (v0.25)**: Supported in libadrv9002-iio v0.2.0 and later
+
+.. note::
+   If the Profile Generator tab appears grayed out or disabled, check that the libadrv9002-iio 
+   library is properly installed and accessible in the system PATH.
+
+.. note::
+   Profile configurations are device-specific and must match the connected ADRV9002 hardware 
+   capabilities. Invalid configurations will be rejected when loaded to the device.
+
+
+
