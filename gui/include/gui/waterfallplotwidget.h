@@ -54,6 +54,9 @@ public:
 	int maxRows() const;
 	int rowCount() const;
 
+	void setInverted(bool inverted);
+	bool inverted() const;
+
 	QwtInterval interval(Qt::Axis axis) const override;
 	double value(double x, double y) const override;
 
@@ -61,6 +64,7 @@ private:
 	std::deque<std::vector<float>> m_data;
 	int m_maxRows;
 	size_t m_fftSize;
+	bool m_inverted;
 
 	QwtInterval m_xInterval;
 	QwtInterval m_zInterval;
@@ -107,6 +111,7 @@ public:
 	void setFrequencyRange(double startHz, double stopHz);
 	void setIntensityRange(double minDb, double maxDb);
 	void setNumRows(int rows);
+	void setInverted(bool inverted);
 
 public Q_SLOTS:
 	void updateYAxis();
