@@ -91,8 +91,13 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	m_cursor->getPlotCursors()->setXHandlePos((HandlePos)xCursorPos);
 	m_cursor->getPlotCursors()->setYHandlePos((HandlePos)yCursorPos);
 
-	PlotNavigator::syncXNavigators(m_fftPlot->navigator(), m_waterfallPlot->navigator());
+	m_waterfallCursor = new CursorController(m_waterfallPlot, this);
+	m_waterfallCursor->getPlotCursors()->setXHandlePos((HandlePos)xCursorPos);
+	m_waterfallCursor->getPlotCursors()->setYHandlePos((HandlePos)yCursorPos);
+	m_waterfallCursor->setAxes(m_waterfallPlot->xAxis(), m_waterfallPlot->yAxis());
 
+	CursorController::syncXCursorControllers(m_cursor, m_waterfallCursor);
+	PlotNavigator::syncXNavigators(m_fftPlot->navigator(), m_waterfallPlot->navigator());
 }
 
 FFTPlotComponent::~FFTPlotComponent() {}
@@ -117,7 +122,7 @@ void FFTPlotComponent::selectChannel(ChannelComponent *ch)
 		disconnect(m_activeChannel, &ChannelComponent::nameChanged, nullptr, nullptr);
 
 	m_activeChannel = ch;
-	m_waterfallPlot->clearData();
+	m_waterfallPlot->setChannel(ch ? ch->chData() : nullptr);
 
 	if(ch) {
 		m_waterfallDockWrapper->setTitle("Waterfall Plot - " + ch->name());
@@ -134,6 +139,8 @@ void FFTPlotComponent::addChannel(ChannelComponent *c)
 
 void FFTPlotComponent::removeChannel(ChannelComponent *c)
 {
+	if(c == m_activeChannel)
+		selectChannel(nullptr);
 	PlotComponent::removeChannel(c);
 	m_plotMenu->removeChannel(c);
 }
@@ -141,6 +148,8 @@ void FFTPlotComponent::removeChannel(ChannelComponent *c)
 FFTPlotComponentSettings *FFTPlotComponent::createPlotMenu(QWidget *parent) { return m_plotMenu; }
 
 FFTPlotComponentSettings *FFTPlotComponent::plotMenu() { return m_plotMenu; }
+
+CursorController *FFTPlotComponent::waterfallCursor() const { return m_waterfallCursor; }
 
 FFTSamplingInfo *FFTPlotComponent::fftPlotInfo() const { return m_fftInfo; }
 

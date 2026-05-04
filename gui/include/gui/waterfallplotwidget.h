@@ -23,6 +23,7 @@
 #define WATERFALL_PLOT_WIDGET_H
 
 #include "plotwidget.h"
+#include "toolcomponent.h"
 #include "scopy-gui_export.h"
 
 #include <qwt_plot_spectrogram.h>
@@ -43,7 +44,7 @@ public:
 	explicit WaterfallData();
 	~WaterfallData() override;
 
-	void addFFTData(const double *data, size_t size);
+	void addFFTData(const float *data, size_t size);
 	void reset();
 
 	void setXInterval(double minFreq, double maxFreq);
@@ -57,7 +58,7 @@ public:
 	double value(double x, double y) const override;
 
 private:
-	std::deque<std::vector<double>> m_data;
+	std::deque<std::vector<float>> m_data;
 	int m_maxRows;
 	size_t m_fftSize;
 
@@ -98,15 +99,14 @@ public:
 	explicit WaterfallPlotWidget(QWidget *parent = nullptr);
 	~WaterfallPlotWidget() override;
 
-	void addFFTData(const double *data, size_t size);
+	void addFFTData(const float *data, size_t size);
 	void clearData();
+
+	void setChannel(ChannelData *ch);
 
 	void setFrequencyRange(double startHz, double stopHz);
 	void setIntensityRange(double minDb, double maxDb);
 	void setNumRows(int rows);
-
-Q_SIGNALS:
-	void newData();
 
 public Q_SLOTS:
 	void updateYAxis();
@@ -121,6 +121,7 @@ private:
 	double m_secsPerRow;
 	int m_rowCount;
 	bool m_waterfallEnabled;
+	ChannelData *m_channel = nullptr;
 };
 
 } // namespace scopy
