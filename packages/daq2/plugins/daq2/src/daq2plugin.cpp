@@ -76,7 +76,7 @@ void Daq2Plugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("daq2Tool", "DAQ2",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 }
 
 void Daq2Plugin::unload() {}
