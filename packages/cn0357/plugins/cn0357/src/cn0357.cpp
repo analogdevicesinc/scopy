@@ -56,7 +56,7 @@ void Cn0357Plugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("cn0357tool", "CN0357",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 }
 
 void Cn0357Plugin::unload() {}
