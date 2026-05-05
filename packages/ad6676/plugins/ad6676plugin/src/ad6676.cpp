@@ -209,7 +209,6 @@ void Ad6676::connectSignals()
 	if(m_adcFreqWidget && m_bwWidget) {
 		auto *adcUiStrategy = dynamic_cast<RangeAttrUi *>(m_adcFreqWidget->getUiStrategy());
 		if(adcUiStrategy) {
-			connect(adcUiStrategy, &RangeAttrUi::emitData, this, &Ad6676::updateBandwidthRange);
 			connect(adcUiStrategy, &RangeAttrUi::displayedNewData, this, &Ad6676::onAdcFreqDisplayed);
 		}
 	}
@@ -224,10 +223,18 @@ void Ad6676::updateBandwidthRange(QString adcFreqMhz)
 	if(qFuzzyIsNull(freqMhz))
 		return;
 
+	double minBw = 0.005 * freqMhz;
+	double maxBw = 0.05 * freqMhz;
+	QString newRange = QString("[%1 0.001 %2]").arg(minBw).arg(maxBw);
+
+	auto *ds = m_bwWidget->getDataStrategy();
+	ds->setConstDataOptions(newRange);
+
 	auto *bwSpinbox = m_bwWidget->findChild<gui::MenuSpinbox *>();
-	if(bwSpinbox) {
-		bwSpinbox->setMinValue(0.005 * freqMhz); // 0.5% of ADC freq
-		bwSpinbox->setMaxValue(0.05 * freqMhz);	 // 5% of ADC freq
+	if (bwSpinbox) {
+		bwSpinbox->setMinValue(minBw);
+		bwSpinbox->setMaxValue(maxBw);
+		bwSpinbox->setValueForce(bwSpinbox->value(), true);
 	}
 }
 
