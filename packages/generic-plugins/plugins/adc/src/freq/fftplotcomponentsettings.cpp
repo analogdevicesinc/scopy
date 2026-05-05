@@ -145,9 +145,10 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 		[=](double val) { m_plotComponent->waterfallPlot()->setNumRows((int)val); });
 	m_waterfallRows->setValue(200);
 
-	MenuOnOffSwitch *waterfallInvertSwitch = new MenuOnOffSwitch("Invert direction", waterfallSection, false);
-	connect(waterfallInvertSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool inverted) { m_plotComponent->waterfallPlot()->setInverted(inverted); });
+	MenuOnOffSwitch *antialiasingSwitch = new MenuOnOffSwitch("Antialiasing", waterfallSection, false);
+	antialiasingSwitch->onOffswitch()->setChecked(true);
+	connect(antialiasingSwitch->onOffswitch(), &QAbstractButton::toggled, this,
+		[=](bool on) { m_plotComponent->waterfallPlot()->setAntialiasing(on); });
 
 	connect(waterfallSwitch, &QAbstractButton::toggled, this, [=](bool on) {
 		m_plotComponent->waterfallPlot()->setWaterfallEnabled(on);
@@ -157,7 +158,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	});
 
 	waterfallSection->add(m_waterfallRows);
-	waterfallSection->add(waterfallInvertSwitch);
+	waterfallSection->add(antialiasingSwitch);
 
 	m_deletePlot = new QPushButton("Delete Plot");
 	StyleHelper::BasicButton(m_deletePlot);

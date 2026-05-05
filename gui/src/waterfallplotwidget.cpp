@@ -24,6 +24,7 @@
 #include "plotnavigator.hpp"
 #include "plotscales.h"
 
+#include <cmath>
 #include <pluginbase/preferences.h>
 #include <plot_utils.hpp>
 
@@ -41,9 +42,9 @@ WaterfallData::WaterfallData()
 	: QwtRasterData()
 	, m_maxRows(0)
 	, m_fftSize(0)
+	, m_antialiasing(true)
 	, m_xInterval(0.0, 1.0)
 	, m_zInterval(-120.0, 0.0)
-	, m_inverted(false)
 {}
 
 WaterfallData::~WaterfallData() {}
@@ -84,9 +85,7 @@ int WaterfallData::maxRows() const { return m_maxRows; }
 
 int WaterfallData::rowCount() const { return static_cast<int>(m_data.size()); }
 
-void WaterfallData::setInverted(bool inverted) { m_inverted = inverted; }
-
-bool WaterfallData::inverted() const { return m_inverted; }
+void WaterfallData::setAntialiasing(bool enabled) { m_antialiasing = enabled; }
 
 QwtInterval WaterfallData::interval(Qt::Axis axis) const
 {
@@ -94,7 +93,7 @@ QwtInterval WaterfallData::interval(Qt::Axis axis) const
 	case Qt::XAxis:
 		return m_xInterval;
 	case Qt::YAxis:
-		return QwtInterval(0.0, static_cast<double>(m_maxRows));
+		return QwtInterval(static_cast<double>(m_maxRows), 0.0);
 	case Qt::ZAxis:
 		return m_zInterval;
 	default:
@@ -104,31 +103,43 @@ QwtInterval WaterfallData::interval(Qt::Axis axis) const
 
 double WaterfallData::value(double x, double y) const
 {
+	// yes, this actually happens if plot width or height is 0
+	if(!std::isfinite(x) || !std::isfinite(y))
+		return -DBL_MAX;
+
 	if(m_data.empty() || m_fftSize == 0)
 		return -DBL_MAX;
 
 	const int nRows = static_cast<int>(m_data.size());
 
-	// Y is a row index in [0, maxRows].
-	// Normal (not inverted): newest rows are at the top (high y).
-	// Inverted: newest rows are at the bottom (low y) — flip the row index.
-	const int row = m_inverted ? (m_maxRows - 1 - static_cast<int>(y)) : static_cast<int>(y);
-	const int dataRow = row - (m_maxRows - nRows);
+	const double dataRowF = (m_maxRows - 1.0 - y) - (m_maxRows - nRows);
 
-	if(dataRow < 0 || dataRow >= nRows)
+	if(dataRowF < 0.0 || dataRowF >= static_cast<double>(nRows))
 		return -DBL_MAX;
 
 	const double xRange = m_xInterval.maxValue() - m_xInterval.minValue();
 	if(xRange <= 0.0)
 		return -DBL_MAX;
 
-	const int bin =
-		static_cast<int>((x - m_xInterval.minValue()) / xRange * static_cast<double>(m_fftSize - 1) + 0.5);
+	const double binF = (x - m_xInterval.minValue()) / xRange * static_cast<double>(m_fftSize - 1);
 
-	if(bin < 0 || static_cast<size_t>(bin) >= m_fftSize)
+	if(binF < 0.0 || binF >= static_cast<double>(m_fftSize))
 		return -DBL_MAX;
 
-	return static_cast<double>(m_data[static_cast<size_t>(dataRow)][static_cast<size_t>(bin)]);
+	const int b0 = static_cast<int>(binF);
+	const int r0 = static_cast<int>(dataRowF);
+
+	if(!m_antialiasing)
+		return m_data[r0][b0];
+
+	const int r1 = std::min(r0 + 1, nRows - 1);
+	const double ty = dataRowF - r0;
+
+	const int b1 = std::min(b0 + 1, static_cast<int>(m_fftSize) - 1);
+	const double tx = binF - b0;
+
+	return (1.0 - ty) * ((1.0 - tx) * m_data[r0][b0] + tx * m_data[r0][b1]) +
+		ty * ((1.0 - tx) * m_data[r1][b0] + tx * m_data[r1][b1]);
 }
 
 // =============================================================================
@@ -173,7 +184,6 @@ WaterfallPlotWidget::WaterfallPlotWidget(QWidget *parent)
 	m_spectrogram->setColorMap(new WaterfallColorMap());
 	m_spectrogram->attach(plot());
 
-	// Y axis: row indices [maxRows, 0] — inverted so newest (0) is at top.
 	yAxis()->setInterval(m_data->maxRows(), 0);
 
 	m_timeFormatter = new WaterfallTimeFormatter(this);
@@ -199,9 +209,6 @@ void WaterfallPlotWidget::setWaterfallEnabled(bool enabled) { m_waterfallEnabled
 
 void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 {
-	if(!m_waterfallEnabled)
-		return;
-
 	if(m_rowTimer.isValid()) {
 		const double elapsed = m_rowTimer.elapsed() / 1000.0;
 		m_rowTimer.restart();
@@ -262,9 +269,9 @@ void WaterfallPlotWidget::setNumRows(int rows)
 	yAxis()->setInterval(rows, 0);
 }
 
-void WaterfallPlotWidget::setInverted(bool inverted)
+void WaterfallPlotWidget::setAntialiasing(bool enabled)
 {
-	m_data->setInverted(inverted);
+	m_data->setAntialiasing(enabled);
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 }
@@ -279,8 +286,10 @@ void WaterfallPlotWidget::setChannel(ChannelData *ch)
 	if(ch)
 		connect(m_channel, &ChannelData::newData, this,
 			[this](const float *, const float *yData, size_t size, bool) {
-				addFFTData(yData, size);
-				replot();
+				if(m_waterfallEnabled) {
+					addFFTData(yData, size);
+					replot();
+				}
 			});
 }
 
