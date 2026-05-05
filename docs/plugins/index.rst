@@ -93,7 +93,7 @@ Contents
    ad9084/index
    adrv9002/adrv9002
    adrv9009/index
-   ad6676/index
+   ad6676/ad6676
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
