@@ -1,0 +1,103 @@
+.. _cn0357:
+
+CN0357
+================================================================================
+
+Overview
+---------------------------------
+
+The **CN0357** plugin for Scopy provides an interface for the CN0357
+Electrochemical Gas Concentration Sensor circuit. It enables real-time
+monitoring of gas concentration by reading the AD7790 16-bit ADC and computing
+parts-per-million (ppm) values based on configurable sensor parameters and
+feedback resistance.
+
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/refs/heads/doc_resources/resources/cn0357/cn0357.png
+   :alt: CN0357
+   :align: center
+
+Features
+---------------------------------
+
+- **Gas Concentration Measurement:** Real-time ppm calculation from ADC readings.
+- **Configurable ADC Sampling:** Adjustable update rate from 16 Hz to 120 Hz.
+- **Dual Feedback Modes:** Supports both a digital potentiometer (rheostat) and
+  a fixed resistor for transimpedance feedback.
+- **Sensor Calibration:** Adjustable sensor sensitivity and computed conversion
+  coefficients.
+
+Supported Devices
+---------------------------------
+
+- **CN0357** (Electrochemical Gas Concentration Sensor using AD7790 ADC and
+  AD5270 Digital Potentiometer)
+
+Getting Started
+---------------------------------
+
+**Prerequisites**
+
+- A CN0357 evaluation board connected to a supported FPGA carrier
+- Scopy version 2.3.0 or later
+
+**Using the Plugin**
+
+Connect the CN0357 board to the host system and add the device in Scopy. The
+plugin automatically discovers the AD7790 ADC and, if present, the AD5270
+digital potentiometer. Once connected, the System section begins polling the
+ADC and displaying live measurements.
+
+Description
+---------------------------------
+
+The CN0357 view is divided in three sections:
+  - **ADC Settings**
+  - **Feedback Settings**
+  - **System**
+
+ADC Settings
+---------------------------------
+
+  - **Update Rate (Hz):** Selects the ADC sampling frequency. Available
+    options are 120, 100, 60, 50, 25 and 16 Hz.
+
+Feedback Settings
+---------------------------------
+
+  - **Feedback Type:** Selects the feedback configuration for the
+    transimpedance amplifier. In Rheostat mode the AD5270 digital
+    potentiometer sets the feedback resistance. In Fixed Resistor mode a
+    user-specified constant value is used instead.
+  - **RDAC Value:** Sets the digital potentiometer code (0 to 1023). Only
+    active in Rheostat mode. The corresponding resistance is computed and
+    displayed in the System section.
+  - **Program Rheostat:** Writes the current RDAC value to the AD5270
+    digital potentiometer hardware.
+  - **Fixed Resistor:** Sets a constant feedback resistance value in ohms.
+    Only visible when Fixed Resistor mode is selected.
+
+System
+---------------------------------
+
+  The System section displays real-time measurements and derived calibration
+  data in a two-column layout.
+
+  **Measurements**
+
+  - **Concentration (ppm):** Computed gas concentration based on the sensor
+    voltage, feedback resistance and sensor sensitivity.
+  - **Conversion (mV):** ADC voltage reading from the electrochemical sensor,
+    converted from raw counts to millivolts.
+  - **Supply Voltage (V):** ADC supply voltage reading, converted from raw
+    counts to volts.
+
+  **Data**
+
+  - **Sensor Sensitivity (nA/ppm):** Calibration parameter for the
+    electrochemical sensor. Adjustable from 1 to 100, with a default of 65.
+  - **Feedback Resistance:** Computed feedback resistance in ohms, derived from
+    the selected feedback mode and its parameters.
+  - **ppm/mV:** Computed conversion coefficient representing parts-per-million
+    per millivolt.
+  - **mV/ppm:** Computed conversion coefficient representing millivolts per
+    part-per-million.

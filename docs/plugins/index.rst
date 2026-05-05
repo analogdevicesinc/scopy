@@ -74,6 +74,9 @@ Application Specific plugins
 * FMCOMMS11
     * :ref:`FMCOMMS11 <fmcomms11>`
 
+* CN0357
+    * :ref:`CN0357 <cn0357>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -94,6 +97,7 @@ Contents
    adrv9002/adrv9002
    adrv9009/index
    fmcomms11/fmcomms11
+   cn0357/cn0357
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
