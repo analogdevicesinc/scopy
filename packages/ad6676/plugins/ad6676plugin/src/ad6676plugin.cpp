@@ -64,7 +64,7 @@ void Ad6676Plugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad6676tool", "AD6676",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 }
 
 void Ad6676Plugin::unload() {}
