@@ -109,26 +109,32 @@ double WaterfallData::value(double x, double y) const
 
 	const int nRows = static_cast<int>(m_data.size());
 
-	// Y is a row index in [0, maxRows].
-	// Normal (not inverted): newest rows are at the top (high y).
-	// Inverted: newest rows are at the bottom (low y) — flip the row index.
-	const int row = m_inverted ? (m_maxRows - 1 - static_cast<int>(y)) : static_cast<int>(y);
-	const int dataRow = row - (m_maxRows - nRows);
+	// Continuous row index in data space, bilinear blending across both axes.
+	const double rowF = m_inverted ? (m_maxRows - 1.0 - y) : y;
+	const double dataRowF = rowF - (m_maxRows - nRows);
 
-	if(dataRow < 0 || dataRow >= nRows)
+	if(dataRowF < 0.0 || dataRowF >= static_cast<double>(nRows))
 		return -DBL_MAX;
 
 	const double xRange = m_xInterval.maxValue() - m_xInterval.minValue();
 	if(xRange <= 0.0)
 		return -DBL_MAX;
 
-	const int bin =
-		static_cast<int>((x - m_xInterval.minValue()) / xRange * static_cast<double>(m_fftSize - 1) + 0.5);
+	const double binF = (x - m_xInterval.minValue()) / xRange * static_cast<double>(m_fftSize - 1);
 
-	if(bin < 0 || static_cast<size_t>(bin) >= m_fftSize)
+	if(binF < 0.0 || binF >= static_cast<double>(m_fftSize))
 		return -DBL_MAX;
 
-	return static_cast<double>(m_data[static_cast<size_t>(dataRow)][static_cast<size_t>(bin)]);
+	const int r0 = static_cast<int>(dataRowF);
+	const int r1 = std::min(r0 + 1, nRows - 1);
+	const double ty = dataRowF - r0;
+
+	const int b0 = static_cast<int>(binF);
+	const int b1 = std::min(b0 + 1, static_cast<int>(m_fftSize) - 1);
+	const double tx = binF - b0;
+
+	return (1.0 - ty) * ((1.0 - tx) * m_data[r0][b0] + tx * m_data[r0][b1]) +
+		ty * ((1.0 - tx) * m_data[r1][b0] + tx * m_data[r1][b1]);
 }
 
 // =============================================================================
@@ -199,9 +205,6 @@ void WaterfallPlotWidget::setWaterfallEnabled(bool enabled) { m_waterfallEnabled
 
 void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 {
-	if(!m_waterfallEnabled)
-		return;
-
 	if(m_rowTimer.isValid()) {
 		const double elapsed = m_rowTimer.elapsed() / 1000.0;
 		m_rowTimer.restart();
@@ -279,8 +282,10 @@ void WaterfallPlotWidget::setChannel(ChannelData *ch)
 	if(ch)
 		connect(m_channel, &ChannelData::newData, this,
 			[this](const float *, const float *yData, size_t size, bool) {
-				addFFTData(yData, size);
-				replot();
+				if(m_waterfallEnabled) {
+					addFFTData(yData, size);
+					replot();
+				}
 			});
 }
 
