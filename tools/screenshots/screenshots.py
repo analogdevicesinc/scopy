@@ -175,6 +175,10 @@ def run_scopy(scopy_bin, wrapper_path):
     proc = subprocess.Popen(cmd, cwd=build_dir)
     try:
         proc.wait(timeout=SCOPY_TIMEOUT)
+    except KeyboardInterrupt:
+        proc.kill()
+        proc.wait()
+        raise
     except subprocess.TimeoutExpired:
         print(f"[doc] WARNING: Scopy timed out after {SCOPY_TIMEOUT}s, killing")
         proc.kill()
@@ -408,12 +412,16 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.all:
-        run_all(args)
-    elif args.package and args.emu_file:
-        run_single(args)
-    else:
-        parser.error("Either --all or both --package and --emu-file are required")
+    try:
+        if args.all:
+            run_all(args)
+        elif args.package and args.emu_file:
+            run_single(args)
+        else:
+            parser.error("Either --all or both --package and --emu-file are required")
+    except KeyboardInterrupt:
+        print("\n[doc] Interrupted, stopping.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
