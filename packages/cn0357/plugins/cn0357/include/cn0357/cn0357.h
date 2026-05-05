@@ -34,10 +34,14 @@ class IIOWidgetGroup;
 
 namespace scopy::cn0357 {
 
+class Cn0357_API;
+
 class SCOPY_CN0357_EXPORT Cn0357Plugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	friend class Cn0357_API;
 
 public:
 	bool compatible(QString param, QString category) override;
@@ -53,6 +57,9 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
+	void initApi();
+
+	Cn0357_API *m_api = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 
