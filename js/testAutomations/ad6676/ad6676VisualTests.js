@@ -32,7 +32,7 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 TestFramework.init("AD6676 Visual Validation Tests");
 
 // Connect to device
-if (!TestFramework.connectToDevice("ip:192.168.2.1")) {
+if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
     printToConsole("ERROR: Cannot proceed without device connection");
     scopy.exit();
 }

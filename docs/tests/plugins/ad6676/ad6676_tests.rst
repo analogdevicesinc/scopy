@@ -4,7 +4,7 @@ AD6676 Test Suite
 ================================================================================
 
 **Prerequisites:**
-    - Scopy v2.1.0 or later with AD6676 plugin installed
+    - Scopy v2.3.0 or later with AD6676 plugin installed
     - AD6676 device connected
     - Device drivers and firmware are up to date
     - Reset .ini files to default by pressing **Reset** button in Preferences
