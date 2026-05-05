@@ -19,14 +19,15 @@
  */
 
 #include "cn0357.h"
+#include "cn0357_api.h"
+#include "cn0357tool.h"
 
 #include <QLoggingCategory>
 #include <iio.h>
 #include <iioutil/connectionprovider.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <pluginbase/scopyjs.h>
 #include <style.h>
-
-#include "cn0357tool.h"
 
 Q_LOGGING_CATEGORY(CAT_CN0357PLUGIN, "Cn0357Plugin")
 using namespace scopy::cn0357;
@@ -79,11 +80,18 @@ bool Cn0357Plugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
 
+	initApi();
 	return true;
 }
 
 bool Cn0357Plugin::onDisconnect()
 {
+	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
@@ -103,6 +111,13 @@ bool Cn0357Plugin::onDisconnect()
 	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 	return true;
+}
+
+void Cn0357Plugin::initApi()
+{
+	m_api = new Cn0357_API(this);
+	m_api->setObjectName("cn0357");
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 void Cn0357Plugin::initMetadata()

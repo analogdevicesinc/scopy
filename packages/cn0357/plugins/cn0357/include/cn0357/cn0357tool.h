@@ -40,6 +40,9 @@ namespace scopy::cn0357 {
 class SCOPY_CN0357_EXPORT Cn0357Tool : public QWidget
 {
 	Q_OBJECT
+
+	friend class Cn0357_API;
+
 public:
 	explicit Cn0357Tool(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~Cn0357Tool() = default;
