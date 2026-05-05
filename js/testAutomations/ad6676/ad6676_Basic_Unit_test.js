@@ -27,7 +27,7 @@ evaluateFile("../js/testAutomations/common/testFramework.js");
 
 TestFramework.init("AD6676 Basic Unit Tests");
 
-if (!TestFramework.connectToDevice("ip:10.48.69.131")) {
+if (!TestFramework.connectToDevice("ip:127.0.0.0")) {
     printToConsole("ERROR: Cannot proceed without device connection");
     scopy.exit();
 }
