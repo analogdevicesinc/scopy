@@ -231,7 +231,7 @@ void Ad6676::updateBandwidthRange(QString adcFreqMhz)
 	ds->setConstDataOptions(newRange);
 
 	auto *bwSpinbox = m_bwWidget->findChild<gui::MenuSpinbox *>();
-	if (bwSpinbox) {
+	if(bwSpinbox) {
 		bwSpinbox->setMinValue(minBw);
 		bwSpinbox->setMaxValue(maxBw);
 		bwSpinbox->setValueForce(bwSpinbox->value(), true);
