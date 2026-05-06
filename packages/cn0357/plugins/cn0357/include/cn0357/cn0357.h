@@ -1,0 +1,67 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef CN0357PLUGIN_H
+#define CN0357PLUGIN_H
+
+#define SCOPY_PLUGIN_NAME Cn0357Plugin
+
+#include "scopy-cn0357_export.h"
+#include <QObject>
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
+
+namespace scopy {
+class IIOWidgetGroup;
+}
+
+namespace scopy::cn0357 {
+
+class Cn0357_API;
+
+class SCOPY_CN0357_EXPORT Cn0357Plugin : public QObject, public PluginBase
+{
+	Q_OBJECT
+	SCOPY_PLUGIN;
+
+	friend class Cn0357_API;
+
+public:
+	bool compatible(QString param, QString category) override;
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
+	void unload() override;
+	void initMetadata() override;
+	QString description() override;
+
+public Q_SLOTS:
+	bool onConnect() override;
+	bool onDisconnect() override;
+
+private:
+	void initApi();
+
+	Cn0357_API *m_api = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
+};
+
+} // namespace scopy::cn0357
+#endif // CN0357PLUGIN_H

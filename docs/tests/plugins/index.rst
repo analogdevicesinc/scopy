@@ -26,6 +26,7 @@ Contents
    adrv9009/index
    imuanalyzer/index
    rfpowermeter/index
+   cn0357/index
 
 ..
  add the path to each plugin test case here
