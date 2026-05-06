@@ -1,0 +1,40 @@
+name: Push Qt6 Docker Image to Cloudsmith
+
+on:
+    workflow_dispatch:
+      inputs:
+        platform:
+          description: 'Platform to build'
+          required: true
+          default: 'ubuntu24_qt6'
+          type: choice
+          options:
+            - ubuntu24_qt6
+        tag:
+          description: 'Docker image tag'
+          required: true
+          default: 'testing'
+          type: choice
+          options:
+            - testing
+            - latest
+
+jobs:
+  push-docker:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Build Docker image
+          run: |
+            cd ci/ubuntu
+            ./create_docker_image.sh ${{ inputs.platform }}
+
+        - name: Login to Cloudsmith Docker registry
+          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+
+        - name: Tag and push image
+          run: |
+            IMAGE="docker.cloudsmith.io/adi/scopy-docker/scopy2-${{ inputs.platform == 'ubuntu24_qt6' && 'ubuntu24-qt6' || inputs.platform }}"
+            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
+            docker push "${IMAGE}:${{ inputs.tag }}"

@@ -18,9 +18,7 @@ jobs:
     name: Ubuntu 24 Qt6
 
     container:
-        # TODO: Replace with actual Qt6 Docker image once published to registry
-        # e.g. <registry>/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
-        image: PLACEHOLDER_QT6_IMAGE:${{ inputs.docker_tag }}
+        image: docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
         options: --user root
 
     steps:
