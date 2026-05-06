@@ -36,7 +36,7 @@ ubuntu24(){
 ubuntu24_qt6(){
 	pushd $SRC_SCRIPT
 	docker build \
-		-t docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:testing \
+		-t docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing \
 		--build-arg BASE_IMAGE=ubuntu:24.04 \
 		-f docker_ubuntu/Dockerfile.qt6 .
 	popd

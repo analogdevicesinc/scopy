@@ -35,6 +35,6 @@ jobs:
 
         - name: Tag and push image
           run: |
-            IMAGE="docker.cloudsmith.io/adi/scopy-docker/scopy2-${{ inputs.platform == 'ubuntu24_qt6' && 'ubuntu24-qt6' || inputs.platform }}"
+            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-${{ inputs.platform == 'ubuntu24_qt6' && 'ubuntu24-qt6' || inputs.platform }}"
             docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
             docker push "${IMAGE}:${{ inputs.tag }}"

@@ -11,9 +11,9 @@
 
 Scopy's Qt6 migration (branch `qt6_clean`) compiles 100% locally inside a Docker image built from `ci/ubuntu/docker_ubuntu/Dockerfile.qt6`. The next step is to publish Docker images to a registry and wire them into CI so every push is automatically built and tested across all platforms.
 
-**Current state:** Qt5 Docker images live on Docker Hub (`cristianbindea/` account). Qt6 images will move to **Cloudsmith** (`docker.cloudsmith.io/adi/scopy-docker/`). Qt5 and Qt6 pipelines run in parallel — Qt5 on `main`, Qt6 on `qt6_clean`.
+**Current state:** Qt5 Docker images live on Docker Hub (`cristianbindea/` account). Qt6 images will move to **Cloudsmith** (`docker.cloudsmith.io/adi/scopy-dockers/`). Qt5 and Qt6 pipelines run in parallel — Qt5 on `main`, Qt6 on `qt6_clean`.
 
-**Registry:** `docker.cloudsmith.io/adi/scopy-docker/<image>:<tag>`
+**Registry:** `docker.cloudsmith.io/adi/scopy-dockers/<image>:<tag>`
 **Auth:** OIDC (same pattern as existing ARM Debian uploads)
 **Qt version:** 6.8.3 everywhere
 **M2K:** disabled on all Qt6 builds (`-DENABLE_PACKAGE_M2K=OFF`)
@@ -31,7 +31,7 @@ Scopy's Qt6 migration (branch `qt6_clean`) compiles 100% locally inside a Docker
 
 ### Steps
 
-**1.1** Update `ci/ubuntu/create_docker_image.sh` — change `ubuntu24_qt6()` tag from `scopy2-ubuntu24-qt6:testing` to `docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:testing`
+**1.1** Update `ci/ubuntu/create_docker_image.sh` — change `ubuntu24_qt6()` tag from `scopy2-ubuntu24-qt6:testing` to `docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing`
 
 **1.2** Create `.github/workflows/push-docker-qt6.yml` — manual workflow (`workflow_dispatch`) that:
 - Runs on `ubuntu-latest`
@@ -39,12 +39,12 @@ Scopy's Qt6 migration (branch `qt6_clean`) compiles 100% locally inside a Docker
 - Authenticates with Cloudsmith via OIDC (same as `appimage-arm64.yml` lines 84-89)
 - Runs `docker login docker.cloudsmith.io -u token -p $CLOUDSMITH_API_KEY`
 - Builds image via `create_docker_image.sh ubuntu24_qt6`
-- Pushes to `docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:<tag>`
+- Pushes to `docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:<tag>`
 - Requires `id-token: write` permission and `CLOUDSMITH_SERVICE_SLUG` secret
 
 **1.3** Replace PLACEHOLDER in `.github/workflows/ubuntubuild-qt6.yml` line 23:
 ```yaml
-image: docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
+image: docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
 ```
 
 **1.4** Update `.github/workflows/ci-qt6.yml`:
@@ -64,7 +64,7 @@ image: docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:${{ inputs.dock
 | `.github/workflows/push-docker-qt6.yml` | Manual Docker image push to Cloudsmith |
 
 ### Verification
-- `docker pull docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6:testing` succeeds
+- `docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing` succeeds
 - CI build on `qt6_clean` pulls image and compiles Scopy
 - `ctest` passes with `QT_QPA_PLATFORM=offscreen`
 
@@ -104,7 +104,7 @@ Replace pacman Qt5 with aqtinstall Qt 6.8.3 (`win64_mingw` arch). Everything els
 **2.5** Update `ci/windows/.dockerignore` — whitelist Qt6 scripts
 
 **2.6** Create `.github/workflows/mingwbuild-qt6.yml` — based on `mingwbuild.yml`:
-- Image: `docker.cloudsmith.io/adi/scopy-docker/scopy2-mingw64-qt6:<tag>`
+- Image: `docker.cloudsmith.io/adi/scopy-dockers/scopy2-mingw64-qt6:<tag>`
 - Runs `build_and_create_installer_qt6.sh run_workflow`
 
 **2.7** Wire into `ci-qt6.yml` — add `mingw-qt6` job
@@ -226,8 +226,8 @@ Qt6 cross-compilation is fundamentally different from Qt5:
 **4.6** Update `ci/arm/.dockerignore` — whitelist Qt6 scripts
 
 **4.7** Create `ci/arm/create_docker_image_qt6.sh` — tags for Cloudsmith:
-- `docker.cloudsmith.io/adi/scopy-docker/scopy2-arm64-appimage-qt6:testing`
-- `docker.cloudsmith.io/adi/scopy-docker/scopy2-armhf-appimage-qt6:testing`
+- `docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-appimage-qt6:testing`
+- `docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-appimage-qt6:testing`
 
 **4.8** Create workflows: `appimage-arm64-qt6.yml`, `appimage-armhf-qt6.yml`
 
@@ -321,9 +321,9 @@ This is the same pattern already working for ARM Debian uploads in `appimage-arm
 
 | Platform | Image Name |
 |----------|-----------|
-| Ubuntu 24 Qt6 | `docker.cloudsmith.io/adi/scopy-docker/scopy2-ubuntu24-qt6` |
-| Windows Qt6 | `docker.cloudsmith.io/adi/scopy-docker/scopy2-mingw64-qt6` |
-| ARM64 Qt6 | `docker.cloudsmith.io/adi/scopy-docker/scopy2-arm64-appimage-qt6` |
-| ARM32 Qt6 | `docker.cloudsmith.io/adi/scopy-docker/scopy2-armhf-appimage-qt6` |
+| Ubuntu 24 Qt6 | `docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6` |
+| Windows Qt6 | `docker.cloudsmith.io/adi/scopy-dockers/scopy2-mingw64-qt6` |
+| ARM64 Qt6 | `docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-appimage-qt6` |
+| ARM32 Qt6 | `docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-appimage-qt6` |
 
 Tags: `testing` (dev) and `latest` (promoted after validation)
