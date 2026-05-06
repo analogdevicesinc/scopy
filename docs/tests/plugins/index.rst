@@ -20,6 +20,7 @@ Contents
    debugger/index
    jesd/index
    ad936x/index
+   daq2/index
    ad9084/index
    fmcomms5/index
    adrv9002/index

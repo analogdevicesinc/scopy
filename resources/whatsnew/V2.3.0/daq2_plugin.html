@@ -1,0 +1,21 @@
+<h1>DAQ2 Plugin</h1>
+
+<p>Scopy now offers dedicated support for the AD-FMCDAQ2-EBZ evaluation board.</p>
+
+<p>The new <b>DAQ2 Tool</b> enables you to integrate and control DAQ2-based devices within Scopy. It provides ADC monitoring and test mode configuration for the AD9680, along with DAC data clock monitoring for the AD9144.</p>
+
+<h2>Key Features</h2>
+<ul>
+  <li><b>ADC Monitoring:</b> Displays the AD9680 sampling frequency read directly from the hardware.</li>
+  <li><b>Test Mode Control:</b> Configures each ADC channel (Ch0 and Ch1) independently into built-in test modes including PN9, PN23, checkerboard, and more for digital interface validation.</li>
+  <li><b>DAC Monitoring:</b> Displays the AD9144 data clock frequency read directly from the hardware.</li>
+</ul>
+
+<h2>How to Use</h2>
+<ol>
+  <li>Connect your AD-FMCDAQ2-EBZ device to a supported FPGA carrier board.</li>
+  <li>Ensure the IIO drivers for the AD9680 and AD9144 are properly installed and the IIO context is accessible via network (IP) or USB.</li>
+  <li>Open Scopy and select the <b>DAQ2</b> tool from the available instruments.</li>
+</ol>
+
+<p>For more detailed information, please visit the <a href="https://analogdevicesinc.github.io/scopy/plugins/daq2/daq2.html" target="_blank">official documentation</a>.</p>
