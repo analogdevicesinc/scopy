@@ -32,7 +32,7 @@ jobs:
           fi
 
           case "$BRANCH_NAME" in
-            *scopy-testing*)
+            *scopy-testing*|qt6_*)
                 TAG="testing"
                 ;;
             *)
