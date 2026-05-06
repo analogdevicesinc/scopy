@@ -2,6 +2,8 @@ name: Build & Test
 
 on:
     push:
+      branches-ignore:
+        - 'qt6_*'
       paths-ignore:
         - 'docs/**'
         - '**.md'
@@ -16,6 +18,8 @@ on:
         - '.github/workflows/clang-format.yml'
 
     pull_request:
+      branches-ignore:
+        - 'qt6_*'
       paths-ignore:
         - 'docs/**'
         - '**.md'
