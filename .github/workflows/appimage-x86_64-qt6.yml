@@ -1,0 +1,61 @@
+name: Scopy Qt6 x86_64 AppImage Build
+
+on:
+    workflow_call:
+      inputs:
+        docker_tag:
+          required: true
+          type: string
+      secrets:
+        CLOUDSMITH_API_KEY:
+          required: true
+
+env:
+  BUILD_HOST: ubuntu-latest
+  USERNAME: github-actions
+  CI_SCRIPT: "ON"
+
+jobs:
+  make_x86-64_appimage_qt6:
+    runs-on: ubuntu-latest
+    name: Ubuntu 24 Qt6 AppImage
+
+    container:
+        image: docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
+        credentials:
+          username: token
+          password: ${{ secrets.CLOUDSMITH_API_KEY }}
+        options: --user root
+    steps:
+        - name: check storage space
+          run: df -h
+        - name: "Runner cleanup"
+          run: |
+            sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        - run: df -h
+
+        - uses: actions/checkout@v6
+          with:
+                set-safe-directory: 'true'
+                fetch-depth: '0'
+
+        - name: Create Scopy Qt6 AppImage
+          shell: bash
+          run: |
+                cd $GITHUB_WORKSPACE
+                ./ci/x86_64/x86-64_appimage_process_qt6.sh run_workflow
+
+        - name: Set short git commit SHA
+          shell: bash
+          run: |
+                cd $GITHUB_WORKSPACE
+                git config --global --add safe.directory $GITHUB_WORKSPACE
+                echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+
+        - uses: actions/upload-artifact@v7
+          with:
+            name: ${{ env.app_image_folder }}-${{ env.commit_sha }}
+            path: ${{ github.workspace }}/${{ env.app_image_name }}
+
+        - name: check storage space
+          run: df -h

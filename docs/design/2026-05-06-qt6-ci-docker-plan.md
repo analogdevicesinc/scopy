@@ -2,7 +2,7 @@
 
 > **Date:** 2026-05-06
 > **Branch:** `qt6_clean`
-> **Status:** Planning
+> **Status:** Phase 1 in progress
 > **Scope:** CI Docker images for all platforms, published to Cloudsmith
 
 ---
@@ -14,7 +14,7 @@ Scopy's Qt6 migration (branch `qt6_clean`) compiles 100% locally inside a Docker
 **Current state:** Qt5 Docker images live on Docker Hub (`cristianbindea/` account). Qt6 images will move to **Cloudsmith** (`docker.cloudsmith.io/adi/scopy-dockers/`). Qt5 and Qt6 pipelines run in parallel — Qt5 on `main`, Qt6 on `qt6_clean`.
 
 **Registry:** `docker.cloudsmith.io/adi/scopy-dockers/<image>:<tag>`
-**Auth:** OIDC (same pattern as existing ARM Debian uploads)
+**Auth:** API key (see [Auth section](#cloudsmith-auth) for decision rationale)
 **Qt version:** 6.8.3 everywhere
 **M2K:** disabled on all Qt6 builds (`-DENABLE_PACKAGE_M2K=OFF`)
 
@@ -22,54 +22,58 @@ Scopy's Qt6 migration (branch `qt6_clean`) compiles 100% locally inside a Docker
 
 ## Phase 1: Ubuntu 24 Qt6 → Cloudsmith (Simplest — already works locally)
 
-### What already exists
-- `ci/ubuntu/docker_ubuntu/Dockerfile.qt6` — Ubuntu 24.04 + Qt 6.8.3 image
-- `ci/ubuntu/ubuntu_build_process_qt6.sh` — full build script
-- `.github/workflows/ubuntubuild-qt6.yml` — build job (has `PLACEHOLDER_QT6_IMAGE`)
-- `.github/workflows/ci-qt6.yml` — orchestrator (triggers on `qt6_clean`)
-- `ci/ubuntu/.dockerignore` — already whitelists `ubuntu_build_process_qt6.sh`
+### Status: In progress — image pushed, CI auth wired up, awaiting first green build
 
-### Steps
+### What was done
 
-**1.1** Update `ci/ubuntu/create_docker_image.sh` — change `ubuntu24_qt6()` tag from `scopy2-ubuntu24-qt6:testing` to `docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing`
+**1.1** ✅ Updated `ci/ubuntu/create_docker_image.sh` — `ubuntu24_qt6()` tag now points to `docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing`
 
-**1.2** Create `.github/workflows/push-docker-qt6.yml` — manual workflow (`workflow_dispatch`) that:
-- Runs on `ubuntu-latest`
-- Takes inputs: platform (`ubuntu24_qt6`), tag (`testing`/`latest`)
-- Authenticates with Cloudsmith via OIDC (same as `appimage-arm64.yml` lines 84-89)
-- Runs `docker login docker.cloudsmith.io -u token -p $CLOUDSMITH_API_KEY`
-- Builds image via `create_docker_image.sh ubuntu24_qt6`
-- Pushes to `docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:<tag>`
-- Requires `id-token: write` permission and `CLOUDSMITH_SERVICE_SLUG` secret
+**1.2** ✅ Created `.github/workflows/push-docker-qt6.yml` — manual `workflow_dispatch` workflow that builds and pushes Qt6 Docker images to Cloudsmith using API key auth
 
-**1.3** Replace PLACEHOLDER in `.github/workflows/ubuntubuild-qt6.yml` line 23:
-```yaml
-image: docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
-```
+**1.3** ✅ Replaced `PLACEHOLDER_QT6_IMAGE` in `.github/workflows/ubuntubuild-qt6.yml` with actual Cloudsmith image reference
 
-**1.4** Update `.github/workflows/ci-qt6.yml`:
-- Add `id-token: write` to permissions (needed for future phases)
-- Pass `CLOUDSMITH_SERVICE_SLUG` secret to child workflows
+**1.4** ✅ Updated `.github/workflows/ci-qt6.yml` — passes `CLOUDSMITH_API_KEY` secret to child workflow
+
+**1.5** ✅ Updated `.github/workflows/ubuntubuild-qt6.yml` — added `credentials:` block for private registry auth and declared `CLOUDSMITH_API_KEY` secret in `workflow_call`
+
+**1.6** ✅ Updated `.github/workflows/get_docker_tag.yml` — `qt6_*` branches now map to `testing` tag (previously defaulted to `latest`)
+
+**1.7** ✅ Updated `.github/workflows/ci.yml` — added `branches-ignore: ['qt6_*']` to push and pull_request triggers so Qt5 CI doesn't run on Qt6 branches
+
+**1.8** ✅ Docker image pushed to Cloudsmith manually via `docker push` from local machine
+
+### Decisions made
+
+| Decision | Choice | Reason |
+|----------|--------|--------|
+| Auth method | API key (`CLOUDSMITH_API_KEY` GitHub secret) | OIDC requires Cloudsmith org admin to configure an OIDC service. Using personal API key is simpler during initial development when only the CI setup team uses the images. Will migrate to OIDC when images go to production use across the org. |
+| Registry name | `scopy-dockers` (not `scopy-docker`) | Matches the actual Cloudsmith repository name created on the web UI |
+| Docker tag for qt6 branches | `testing` | `get_docker_tag.yml` defaults to `latest` for non-testing branches. Added `qt6_*` pattern to map to `testing` since Qt6 images are not yet production-ready |
+| Qt5 CI on qt6 branches | Disabled via `branches-ignore` | Qt5 `ci.yml` had no branch filter, causing it to trigger on `qt6_clean` pushes and always fail. Used `branches-ignore: ['qt6_*']` wildcard to cover all future Qt6 branches |
+| First image push method | Manual `docker push` from local machine | Faster than debugging GitHub Actions workflow visibility. The `push-docker-qt6.yml` workflow only appears in the Actions UI when it exists on the default branch (`main`). Can be triggered via CLI: `gh workflow run push-docker-qt6.yml --ref qt6_clean` |
 
 ### Files modified
 | File | Change |
 |------|--------|
-| `ci/ubuntu/create_docker_image.sh` | Update tag in `ubuntu24_qt6()` |
-| `.github/workflows/ubuntubuild-qt6.yml` | Replace `PLACEHOLDER_QT6_IMAGE` |
-| `.github/workflows/ci-qt6.yml` | Add OIDC permissions |
+| `ci/ubuntu/create_docker_image.sh` | Update tag in `ubuntu24_qt6()` to Cloudsmith registry |
+| `.github/workflows/ubuntubuild-qt6.yml` | Replace placeholder, add registry credentials, declare secret |
+| `.github/workflows/ci-qt6.yml` | Pass `CLOUDSMITH_API_KEY` secret to child workflow |
+| `.github/workflows/ci.yml` | Add `branches-ignore: ['qt6_*']` to prevent Qt5 CI on Qt6 branches |
+| `.github/workflows/get_docker_tag.yml` | Map `qt6_*` branches to `testing` tag |
 
 ### Files created
 | File | Purpose |
 |------|---------|
-| `.github/workflows/push-docker-qt6.yml` | Manual Docker image push to Cloudsmith |
+| `.github/workflows/push-docker-qt6.yml` | Manual Docker image push to Cloudsmith (API key auth) |
 
 ### Verification
-- `docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing` succeeds
-- CI build on `qt6_clean` pulls image and compiles Scopy
-- `ctest` passes with `QT_QPA_PLATFORM=offscreen`
+- [x] `docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing` succeeds
+- [ ] CI build on `qt6_clean` pulls image and compiles Scopy
+- [ ] `ctest` passes with `QT_QPA_PLATFORM=offscreen`
 
-### Prerequisite (admin, one-time)
-Create the `scopy-docker` repository on Cloudsmith web UI (Docker format, under `adi` org)
+### Setup completed
+- Cloudsmith `scopy-dockers` repository created (Docker format, under `adi` org)
+- `CLOUDSMITH_API_KEY` GitHub secret added to repository
 
 ---
 
