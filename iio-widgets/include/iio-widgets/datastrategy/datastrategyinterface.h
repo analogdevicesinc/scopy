@@ -47,6 +47,8 @@ public:
 	 * */
 	virtual QString optionalData() = 0;
 
+	void setConstDataOptions(const QString &options) { m_recipe.constDataOptions = options; }
+
 public Q_SLOTS:
 	/**
 	 * @brief Performs a synchronous write operation. The synchronous write operation

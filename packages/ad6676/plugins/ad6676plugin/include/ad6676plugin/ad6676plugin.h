@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef AD6676PLUGIN_H
+#define AD6676PLUGIN_H
+
+#define SCOPY_PLUGIN_NAME Ad6676Plugin
+
+#include "scopy-ad6676plugin_export.h"
+#include <QObject>
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
+
+namespace scopy {
+class IIOWidgetGroup;
+}
+
+namespace scopy::ad6676 {
+
+class AD6676_API;
+
+class SCOPY_AD6676PLUGIN_EXPORT Ad6676Plugin : public QObject, public PluginBase
+{
+	Q_OBJECT
+	SCOPY_PLUGIN;
+
+	friend class AD6676_API;
+
+public:
+	bool compatible(QString m_param, QString category) override;
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
+	void unload() override;
+	void initMetadata() override;
+	QString description() override;
+	QString displayName() override;
+
+public Q_SLOTS:
+	bool onConnect() override;
+	bool onDisconnect() override;
+
+private:
+	void initApi();
+
+	AD6676_API *m_api = nullptr;
+	IIOWidgetGroup *m_widgetGroup = nullptr;
+};
+
+} // namespace scopy::ad6676
+
+#endif // AD6676PLUGIN_H
