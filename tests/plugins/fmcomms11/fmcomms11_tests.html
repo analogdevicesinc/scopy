@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="Scopy v2.2.0 or later with FMCOMMS11 plugin installed" name="description" />
+
+    <title>FMCOMMS11 Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=ac863bf0" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=5b85fa78" />
+    <script async="async" src="../../../_static/app.umd.js?v=09b0c6bc"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="ADRV9002 (Jupiter)" href="../adrv9002/index.html" />
+    <link rel="prev" title="FMCOMMS11" href="index.html" />
+   
+  
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">FMCOMMS11 Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup Environment</a></li>
+<li><a class="reference internal" href="#fmcomms11-controls-tests">FMCOMMS11 Controls Tests</a><ul>
+<li><a class="reference internal" href="#test-1-plugin-loads">Test 1: Plugin Loads</a></li>
+<li><a class="reference internal" href="#test-2-device-detection">Test 2: Device Detection</a></li>
+<li><a class="reference internal" href="#test-3-adc-section-visible">Test 3: ADC Section Visible</a></li>
+<li><a class="reference internal" href="#test-4-adc-sampling-frequency-display">Test 4: ADC Sampling Frequency Display</a></li>
+<li><a class="reference internal" href="#test-5-adc-test-mode-selection">Test 5: ADC Test Mode Selection</a></li>
+<li><a class="reference internal" href="#test-6-adc-scale-selection">Test 6: ADC Scale Selection</a></li>
+<li><a class="reference internal" href="#test-7-input-attenuator-section-visible">Test 7: Input Attenuator Section Visible</a></li>
+<li><a class="reference internal" href="#test-8-hmc1119-attenuator-gain">Test 8: HMC1119 Attenuator Gain</a></li>
+<li><a class="reference internal" href="#test-9-dds-section-visible">Test 9: DDS Section Visible</a></li>
+<li><a class="reference internal" href="#test-10-dac-section-visible">Test 10: DAC Section Visible</a></li>
+<li><a class="reference internal" href="#test-11-dac-sampling-frequency-display">Test 11: DAC Sampling Frequency Display</a></li>
+<li><a class="reference internal" href="#test-12-dac-nco-frequency">Test 12: DAC NCO Frequency</a></li>
+<li><a class="reference internal" href="#test-13-dac-fir85-filter-enable">Test 13: DAC FIR85 Filter Enable</a></li>
+<li><a class="reference internal" href="#test-14-output-vga-section-visible">Test 14: Output VGA Section Visible</a></li>
+<li><a class="reference internal" href="#test-15-adl5240-vga-gain">Test 15: ADL5240 VGA Gain</a></li>
+<li><a class="reference internal" href="#test-16-refresh-functionality">Test 16: Refresh Functionality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img src="../../../_static/logo.svg"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../../../plugins/ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/fmcomms5.html">FMCOMMS5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/fmcomms5_advanced.html">FMCOMMS5 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../../../plugins/ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adrv9002/adrv9002.html">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7"/><div class="collapse"><a class="reference internal" href="../../../plugins/adrv9009/index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/adrv9009/adrv9009.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/adrv9009/adrv9009_advanced.html">ADRV9009 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/fmcomms11/fmcomms11.html">FMCOMMS11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/scripting/scripting.html">Scripting Tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/imuanalyzer/imuanalyzer.html">IMU Analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/rfpowermeter/rfpowermeter.html">RF Power Meter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/package_generator.html">Package Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/plugin_developer_guide.html">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-9" id="toctree-collapse-4-1-9"/><div class="collapse"><a class="reference internal" href="../jesd/index.html">JESD STATUS</a><label for="toctree-collapse-4-1-9"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../jesd/jesd_status_tests.html">JESD STATUS Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-10" id="toctree-collapse-4-1-10"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936X</a><label for="toctree-collapse-4-1-10"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ad936x/ad936x_tests.html">AD936x Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-11" id="toctree-collapse-4-1-11"/><div class="collapse"><a class="reference internal" href="../ad9084/index.html">AD9084</a><label for="toctree-collapse-4-1-11"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12"/><div class="collapse"><a class="reference internal" href="../fmcomms5/index.html">FMCOMMS5</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fmcomms5/fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-13" id="toctree-collapse-4-1-13" checked=""/><div class="collapse"><a class="reference internal" href="index.html">FMCOMMS11</a><label for="toctree-collapse-4-1-13"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">FMCOMMS11 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-14" id="toctree-collapse-4-1-14"/><div class="collapse"><a class="reference internal" href="../adrv9002/index.html">ADRV9002 (Jupiter)</a><label for="toctree-collapse-4-1-14"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adrv9002/adrv9002_tests.html">ADRV9002 (Jupiter) Plugin - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adrv9002/profile_generator_tests.html">ADRV9002 Profile Generator - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-15" id="toctree-collapse-4-1-15"/><div class="collapse"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a><label for="toctree-collapse-4-1-15"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adrv9009/adrv9009_tests.html">ADRV9009 Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-16" id="toctree-collapse-4-1-16"/><div class="collapse"><a class="reference internal" href="../imuanalyzer/index.html">IMU Analyzer</a><label for="toctree-collapse-4-1-16"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../imuanalyzer/imuanalyzer_tests.html">IMU Analyzer Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-17" id="toctree-collapse-4-1-17"/><div class="collapse"><a class="reference internal" href="../rfpowermeter/index.html">RF Power Meter</a><label for="toctree-collapse-4-1-17"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../rfpowermeter/rfpowermeter_tests.html">RF Power Meter Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/package_manager_tests.html">Package Manager - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/scripting_tool.html">Scripting Tool - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture/index.html">Software Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Test Cases</a></li><li><a href="../index.html">Plugins Test Cases</a></li><li><a href="index.html">FMCOMMS11</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="fmcomms11-test-suite">
+<span id="fmcomms11-tests"></span><h1>FMCOMMS11 Test Suite<a class="headerlink" href="#fmcomms11-test-suite" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Scopy v2.2.0 or later with FMCOMMS11 plugin installed</p></li>
+<li><p>FMCOMMS11 evaluation board connected</p></li>
+<li><p>Device drivers and firmware are up to date</p></li>
+<li><p>Reset .ini files to default by pressing <strong>Reset</strong> button in Preferences</p></li>
+</ul>
+</dd>
+</dl>
+<section id="setup-environment">
+<h2>Setup Environment<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="fmcomms11-device-setup">
+<dt><strong>FMCOMMS11.device:</strong></dt><dd><ul class="simple">
+<li><p>Connect an FMCOMMS11 evaluation board via Ethernet/USB to your PC</p></li>
+<li><p>Ensure all four IIO devices are present: <code class="docutils literal notranslate"><span class="pre">axi-ad9625-hpc</span></code>, <code class="docutils literal notranslate"><span class="pre">axi-ad9162-hpc</span></code>, <code class="docutils literal notranslate"><span class="pre">hmc1119</span></code>, <code class="docutils literal notranslate"><span class="pre">adl5240</span></code></p></li>
+<li><p>Verify device drivers and firmware are up to date</p></li>
+<li><p>Connect to the device in Scopy with the FMCOMMS11 plugin enabled</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="fmcomms11-controls-tests">
+<h2>FMCOMMS11 Controls Tests<a class="headerlink" href="#fmcomms11-controls-tests" title="Link to this heading"></a></h2>
+<section id="test-1-plugin-loads">
+<h3>Test 1: Plugin Loads<a class="headerlink" href="#test-1-plugin-loads" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.PLUGIN_LOADS</p>
+<p><strong>RBP:</strong> P0</p>
+<p><strong>Description:</strong> Verify that the FMCOMMS11 plugin loads in Scopy without errors.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Scopy is installed</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open Scopy application</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy launches without errors</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-device-detection">
+<h3>Test 2: Device Detection<a class="headerlink" href="#test-2-device-detection" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.DEVICE_DETECTION</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> Verify that the FMCOMMS11 plugin detects all required IIO devices and displays the plugin tool.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Connect to the FMCOMMS11 board in Scopy</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Plugin detects all four devices (axi-ad9625-hpc, axi-ad9162-hpc, hmc1119, adl5240) and the FMCOMMS11 tool entry appears in the device tool list</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-adc-section-visible">
+<h3>Test 3: ADC Section Visible<a class="headerlink" href="#test-3-adc-section-visible" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.ADC_SECTION_VISIBLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the ADC section is visible and contains the expected controls.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The ADC section is visible and contains the Sampling Frequency display, Test Mode combo box, and Scale combo box</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-adc-sampling-frequency-display">
+<h3>Test 4: ADC Sampling Frequency Display<a class="headerlink" href="#test-4-adc-sampling-frequency-display" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.ADC_SAMPLING_FREQ_DISPLAY</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the ADC sampling frequency is displayed as a read-only value in MHz.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and observe the ADC Sampling Frequency field</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The ADC Sampling Frequency field is read-only and displays a non-zero value in MHz (e.g., 2500.000000 MHz for AD9625 at 2.5 GSPS)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-adc-test-mode-selection">
+<h3>Test 5: ADC Test Mode Selection<a class="headerlink" href="#test-5-adc-test-mode-selection" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.ADC_TEST_MODE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the ADC test mode combo box populates from the device and applies the selected mode.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and inspect the ADC Test Mode combo box</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The combo box is populated with options from the <code class="docutils literal notranslate"><span class="pre">test_mode_available</span></code> IIO attribute (e.g., off, midscale_short, fs, etc.)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-adc-scale-selection">
+<h3>Test 6: ADC Scale Selection<a class="headerlink" href="#test-6-adc-scale-selection" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.ADC_SCALE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the ADC scale combo box populates from the device and applies the selected scale.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and inspect the ADC Scale combo box</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The combo box is populated with options from the <code class="docutils literal notranslate"><span class="pre">scale_available</span></code> IIO attribute</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-input-attenuator-section-visible">
+<h3>Test 7: Input Attenuator Section Visible<a class="headerlink" href="#test-7-input-attenuator-section-visible" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.INPUT_ATTN_SECTION_VISIBLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the Input Attenuator section is visible and contains the HMC1119 gain control.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the Input Attenuator section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The Input Attenuator section is visible and contains a spin box for the HMC1119 hardwaregain control</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-hmc1119-attenuator-gain">
+<h3>Test 8: HMC1119 Attenuator Gain<a class="headerlink" href="#test-8-hmc1119-attenuator-gain" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.HMC1119_GAIN</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the HMC1119 attenuator gain spin box applies the value to the device within its valid range.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the HMC1119 hardwaregain spin box in the Input Attenuator section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Spin box is present with range -31.75 to 0 dB in 0.25 dB steps</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-dds-section-visible">
+<h3>Test 9: DDS Section Visible<a class="headerlink" href="#test-9-dds-section-visible" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.DDS_SECTION_VISIBLE</p>
+<p><strong>RBP:</strong> P2</p>
+<p><strong>Description:</strong> Verify that the DDS section is visible and the DAC data manager widget is present.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the DDS section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The DDS section is visible and contains the DAC data manager widget with DDS tone controls or buffer mode selection</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-dac-section-visible">
+<h3>Test 10: DAC Section Visible<a class="headerlink" href="#test-10-dac-section-visible" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.DAC_SECTION_VISIBLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the DAC section is visible and contains the expected controls.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the DAC section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The DAC section is visible and contains the Sampling Frequency display, NCO Frequency spin box, and FIR85 enable checkbox</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-dac-sampling-frequency-display">
+<h3>Test 11: DAC Sampling Frequency Display<a class="headerlink" href="#test-11-dac-sampling-frequency-display" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.DAC_SAMPLING_FREQ_DISPLAY</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the DAC sampling frequency is displayed as a read-only value in MHz.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and observe the DAC Sampling Frequency field in the DAC section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The DAC Sampling Frequency field is read-only and displays a non-zero value in MHz</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-dac-nco-frequency">
+<h3>Test 12: DAC NCO Frequency<a class="headerlink" href="#test-12-dac-nco-frequency" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.DAC_NCO_FREQUENCY</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the DAC NCO frequency spin box applies the value to the device in MHz.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the NCO Frequency spin box in the DAC section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Spin box is present with range 0 to 6000 MHz</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-dac-fir85-filter-enable">
+<h3>Test 13: DAC FIR85 Filter Enable<a class="headerlink" href="#test-13-dac-fir85-filter-enable" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.DAC_FIR85_ENABLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the FIR85 filter enable checkbox toggles the FIR85 filter on the DAC device.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the FIR85 checkbox in the DAC section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The FIR85 checkbox is present and reflects the current device state</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-14-output-vga-section-visible">
+<h3>Test 14: Output VGA Section Visible<a class="headerlink" href="#test-14-output-vga-section-visible" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.OUTPUT_VGA_SECTION_VISIBLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the Output VGA section is visible and contains the ADL5240 gain control.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the Output VGA section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The Output VGA section is visible and contains a spin box for the ADL5240 hardwaregain control</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-15-adl5240-vga-gain">
+<h3>Test 15: ADL5240 VGA Gain<a class="headerlink" href="#test-15-adl5240-vga-gain" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.ADL5240_GAIN</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the ADL5240 VGA gain spin box applies the value to the device within its valid range.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the FMCOMMS11 tool and locate the ADL5240 hardwaregain spin box in the Output VGA section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Spin box is present with range -11.5 to 20 dB in 0.5 dB steps</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-16-refresh-functionality">
+<h3>Test 16: Refresh Functionality<a class="headerlink" href="#test-16-refresh-functionality" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.FMCOMMS11.REFRESH_FUNCTION</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the refresh button reads back current attribute values from all devices and updates the UI.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#fmcomms11-device-setup"><span class="std std-ref">FMCOMMS11.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><p>Open the FMCOMMS11 tool and note the current displayed values</p></li>
+<li><p>Change a device attribute externally (e.g., via command line using <code class="docutils literal notranslate"><span class="pre">iio_attr</span></code>)</p></li>
+<li><dl class="simple">
+<dt>Click the refresh button in the FMCOMMS11 plugin</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All displayed values are updated to reflect the current device state, including ADC/DAC sampling frequencies, test mode, scale, NCO frequency, FIR85 state, and gain values</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">FMCOMMS11</a>
+    <a href="../adrv9002/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">ADRV9002 (Jupiter)</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
