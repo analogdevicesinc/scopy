@@ -6,6 +6,9 @@ on:
         docker_tag:
           required: true
           type: string
+      secrets:
+        CLOUDSMITH_API_KEY:
+          required: true
 
 env:
   BUILD_HOST: ubuntu
@@ -19,6 +22,9 @@ jobs:
 
     container:
         image: docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
+        credentials:
+          username: token
+          password: ${{ secrets.CLOUDSMITH_API_KEY }}
         options: --user root
 
     steps:

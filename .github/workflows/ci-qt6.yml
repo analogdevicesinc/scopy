@@ -66,3 +66,5 @@ jobs:
       uses: ./.github/workflows/ubuntubuild-qt6.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
