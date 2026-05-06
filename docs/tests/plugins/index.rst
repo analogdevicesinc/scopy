@@ -21,6 +21,7 @@ Contents
    jesd/index
    ad936x/index
    ad9084/index
+   ad9371/index
    fmcomms5/index
    fmcomms11/index
    adrv9002/index

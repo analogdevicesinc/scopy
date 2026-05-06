@@ -1,0 +1,3587 @@
+{
+  "package": "ad9371",
+  "scan_timestamp": "2026-03-27T16:38:56.767295",
+  "repo_root": "/home/imuthi/claude/scopy",
+  "plugin_dir": "packages/ad9371/plugins/ad9371plugin",
+  "widgets": [
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-enable-sync-pulse-for-gain-counter",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "ad9371",
+      "title": "Gain Control SYNC Pulse",
+      "source_file": "src/ad9371.cpp",
+      "source_line": 532,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-enable-sync-pulse-for-gain-counter",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "ad9371",
+      "title": "Gain Control SYNC Pulse",
+      "source_file": "src/ad9371.cpp",
+      "source_line": 1385,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-high-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "63",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD HIGH THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 140,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-low-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "63",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD LOW THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 141,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-high-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 HIGH THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 142,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-low-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 LOW THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 143,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-very-low-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 VERY LOW THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 144,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-high-thresh-exceeded-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD HIGH THRESH EXCEEDED CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 145,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-low-thresh-exceeded-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD LOW THRESH EXCEEDED CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 146,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-high-thresh-exceeded-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 HIGH THRESH EXCEEDED CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 147,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-low-thresh-exceeded-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 LOW THRESH EXCEEDED CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 148,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-very-low-thresh-exceeded-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 VERY LOW THRESH EXCEEDED CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 149,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-high-gain-step-attack",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD HIGH GAIN STEP ATTACK",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 152,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-low-gain-step-recovery",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD LOW GAIN STEP RECOVERY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 153,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-high-gain-step-attack",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 HIGH GAIN STEP ATTACK",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 154,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-low-gain-step-recovery",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 LOW GAIN STEP RECOVERY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 155,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-very-low-gain-step-recovery",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 VERY LOW GAIN STEP RECOVERY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 156,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-overload-duration-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "6",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 OVERLOAD DURATION CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 164,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-overload-thresh-cnt",
+      "type": "range",
+      "min": "0",
+      "max": "15",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 OVERLOAD THRESH CNT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 165,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-upper-high-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "15",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD UPPER HIGH THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 187,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-upper-low-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD UPPER LOW THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 188,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-lower-high-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD LOWER HIGH THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 189,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-lower-low-thresh",
+      "type": "range",
+      "min": "0",
+      "max": "15",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD LOWER LOW THRESH",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 190,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-upper-high-gain-step-attack",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD UPPER HIGH GAIN STEP ATTACK",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 193,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-upper-low-gain-step-attack",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD UPPER LOW GAIN STEP ATTACK",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 194,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-lower-high-gain-step-recovery",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD LOWER HIGH GAIN STEP RECOVERY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 195,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-lower-low-gain-step-recovery",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD LOWER LOW GAIN STEP RECOVERY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 197,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-meas-duration",
+      "type": "range",
+      "min": "0",
+      "max": "15",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD MEAS DURATION",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 200,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-rx1-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC RX MAX GAIN INDEX",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 228,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-rx1-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC RX MIN GAIN INDEX",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 229,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-rx2-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC RX2 MAX GAIN INDEX",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 230,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-rx2-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC RX2 MIN GAIN INDEX",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 231,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-gain-update-counter",
+      "type": "range",
+      "min": "1",
+      "max": "4194303",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC GAIN UPDATE COUNTER",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 239,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-slow-loop-settling-delay",
+      "type": "range",
+      "min": "0",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC SLOW LOOP SETTLING DELAY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 240,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-peak-wait-time",
+      "type": "range",
+      "min": "2",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC PEAK WAIT TIME",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 242,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-obs-rx-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC OBS RX MAX GAIN INDEX",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 268,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-obs-rx-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC OBS RX MIN GAIN INDEX",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 269,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-gain-update-counter",
+      "type": "range",
+      "min": "1",
+      "max": "4194303",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC GAIN UPDATE COUNTER",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 278,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-slow-loop-settling-delay",
+      "type": "range",
+      "min": "0",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC SLOW LOOP SETTLING DELAY",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 279,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-peak-wait-time",
+      "type": "range",
+      "min": "2",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC PEAK WAIT TIME",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 281,
+      "condition": null
+    },
+    {
+      "key_suffix": "-apd-fast-attack",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "APD FAST ATTACK",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 159,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-fast-attack",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 FAST ATTACK",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 160,
+      "condition": null
+    },
+    {
+      "key_suffix": "-hb2-overload-detect-enable",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "HB2 OVERLOAD DETECT ENABLE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 161,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-peak-threshold-mode",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC PEAK THRESHOLD MODE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 234,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-low-ths-prevent-gain-increase",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC LOW THS PREVENT GAIN INCREASE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 235,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-agc-conf-agc-reset-on-rx-enable",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC RESET ON RX ENABLE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 245,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-obs-rx-select",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC OBS RX SELECT",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 272,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-peak-threshold-mode",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC PEAK THRESHOLD MODE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 273,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-low-ths-prevent-gain-increase",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC LOW THS PREVENT GAIN INCREASE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 274,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-agc-conf-agc-reset-on-rx-enable",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "AGC RESET ON RX ENABLE",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 284,
+      "condition": null
+    },
+    {
+      "key_suffix": "-pmd-meas-config",
+      "type": "combo",
+      "options": {
+        "0": "DISABLED",
+        "1": "HB2",
+        "2": "RFIR",
+        "3": "PMD"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "AGC Setup",
+      "title": "PMD MEAS CONFIG",
+      "source_file": "src/advanced/agcsetupwidget.cpp",
+      "source_line": 208,
+      "condition": null
+    },
+    {
+      "key_suffix": "loopback_tx_rx",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "BIST",
+      "title": "ENABLE",
+      "source_file": "src/advanced/bistwidget.cpp",
+      "source_line": 131,
+      "condition": null
+    },
+    {
+      "key_suffix": "loopback_tx_obs",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "BIST",
+      "title": "ENABLE",
+      "source_file": "src/advanced/bistwidget.cpp",
+      "source_line": 149,
+      "condition": null
+    },
+    {
+      "key_suffix": "bist_prbs_rx",
+      "type": "combo",
+      "options": {
+        "0": "Off",
+        "1": "PRBS7",
+        "2": "PRBS15",
+        "3": "PRBS31"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "BIST",
+      "title": "RX",
+      "source_file": "src/advanced/bistwidget.cpp",
+      "source_line": 173,
+      "condition": null
+    },
+    {
+      "key_suffix": "bist_prbs_obs",
+      "type": "combo",
+      "options": {
+        "0": "Off",
+        "1": "PRBS7",
+        "2": "PRBS15",
+        "3": "PRBS31"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "BIST",
+      "title": "OBS",
+      "source_file": "src/advanced/bistwidget.cpp",
+      "source_line": 183,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx1-desired-gain",
+      "type": "range",
+      "min": "-32768",
+      "max": "32767",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX1 Desired Gain",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 92,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx2-desired-gain",
+      "type": "range",
+      "min": "-32768",
+      "max": "32767",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX2 Desired Gain",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 102,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx1-atten-limit",
+      "type": "range",
+      "min": "0",
+      "max": "40000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX1 Atten Limit",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 112,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx2-atten-limit",
+      "type": "range",
+      "min": "0",
+      "max": "40000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX2 Atten Limit",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 122,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx1-control-ratio",
+      "type": "range",
+      "min": "1",
+      "max": "6",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX1 Control Ratio",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 132,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx2-control-ratio",
+      "type": "range",
+      "min": "1",
+      "max": "6",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX2 Control Ratio",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 142,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-additional-delay-offset",
+      "type": "range",
+      "min": "-32768",
+      "max": "32767",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC Additional Delay Offset",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 172,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-path-delay-pn-seq-level",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC Path Delay PN Seq Level",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 182,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx1-rel-threshold",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX1 Rel Threshold",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 192,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx2-rel-threshold",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX2 Rel Threshold",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 202,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-allow-tx1-atten-updates",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC Allow TX1 Atten Updates",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 152,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-allow-tx2-atten-updates",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC Allow TX2 Atten Updates",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 162,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx1-rel-threshold-en",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX1 Rel Threshold Enable",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 212,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clgc-tx2-rel-threshold-en",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "CLGC Settings",
+      "title": "CLGC TX2 Rel Threshold Enable",
+      "source_file": "src/advanced/clgcsettingswidget.cpp",
+      "source_line": 222,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clocks-device-clock_khz",
+      "type": "range",
+      "min": "30000",
+      "max": "320000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLK Settings",
+      "title": "DEVICE CLOCK KHZ",
+      "source_file": "src/advanced/clksettingswidget.cpp",
+      "source_line": 85,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clocks-clk-pll-vco-freq_khz",
+      "type": "range",
+      "min": "6000000",
+      "max": "12500000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLK Settings",
+      "title": "CLK PLL VCO FREQ KHZ",
+      "source_file": "src/advanced/clksettingswidget.cpp",
+      "source_line": 97,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clocks-clk-pll-hs-div",
+      "type": "range",
+      "min": "4",
+      "max": "5",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "CLK Settings",
+      "title": "CLK PLL HS DIV",
+      "source_file": "src/advanced/clksettingswidget.cpp",
+      "source_line": 127,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,clocks-clk-pll-vco-div",
+      "type": "combo",
+      "options": {
+        "0": "VCO DIV 1",
+        "1": "VCO DIV 1.5",
+        "2": "VCO DIV 2",
+        "3": "VCO DIV 3"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "CLK Settings",
+      "title": "PLL VCO DIV",
+      "source_file": "src/advanced/clksettingswidget.cpp",
+      "source_line": 115,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-damping",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Damping",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 92,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-num-weights",
+      "type": "range",
+      "min": "0",
+      "max": "3",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Num Weights",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 102,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-model-version",
+      "type": "range",
+      "min": "0",
+      "max": "3",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Model Version",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 112,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-model-prior-weight",
+      "type": "range",
+      "min": "0",
+      "max": "32",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Model Prior Weight",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 132,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-samples",
+      "type": "range",
+      "min": "0",
+      "max": "65535",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Samples",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 152,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-outlier-threshold",
+      "type": "range",
+      "min": "0",
+      "max": "65535",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Outlier Threshold",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 162,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-additional-delay-offset",
+      "type": "range",
+      "min": "0",
+      "max": "63",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Additional Delay Offset",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 172,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-path-delay-pn-seq-level",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Path Delay PN Seq Level",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 182,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-weights0-real",
+      "type": "range",
+      "min": "-128",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Weights0 Real",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 192,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-weights0-imag",
+      "type": "range",
+      "min": "-128",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Weights0 Imag",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 202,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-weights1-real",
+      "type": "range",
+      "min": "-128",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Weights1 Real",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 212,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-weights1-imag",
+      "type": "range",
+      "min": "-128",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Weights1 Imag",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 222,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-weights2-real",
+      "type": "range",
+      "min": "-128",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Weights2 Real",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 232,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-weights2-imag",
+      "type": "range",
+      "min": "-128",
+      "max": "127",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Weights2 Imag",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 242,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-high-power-model-update",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD High Power Model Update",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 122,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,dpd-robust-modeling",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "DPD Settings",
+      "title": "DPD Robust Modeling",
+      "source_file": "src/advanced/dpdsettingswidget.cpp",
+      "source_line": 142,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx1-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "RX1 GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 112,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx2-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "RX2 GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 121,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx1-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "RX1 MAX GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 130,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx1-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "RX1 MIN GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 139,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx2-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "RX2 MAX GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 148,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx2-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "RX2 MIN GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 157,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,orx1-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "ORX1 GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 196,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,orx2-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "ORX2 GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 205,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,orx-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "MAX GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 214,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,orx-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "MIN GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 223,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 262,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-max-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "MAX GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 271,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-min-gain-index",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "MIN GAIN INDEX",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 280,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-gain-mode",
+      "type": "combo",
+      "options": {
+        "0": "MGC",
+        "2": "AGC",
+        "3": "HYBRID"
+      },
+      "valid_raw_keys": [
+        "0",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "GAIN CONTROL MODE",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 103,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,orx-gain-mode",
+      "type": "combo",
+      "options": {
+        "0": "MGC",
+        "2": "AGC",
+        "3": "HYBRID"
+      },
+      "valid_raw_keys": [
+        "0",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "GAIN CONTROL MODE",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 187,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-gain-mode",
+      "type": "combo",
+      "options": {
+        "0": "MGC",
+        "2": "AGC",
+        "3": "HYBRID"
+      },
+      "valid_raw_keys": [
+        "0",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "GAIN Setup",
+      "title": "GAIN CONTROL MODE",
+      "source_file": "src/advanced/gainsetupwidget.cpp",
+      "source_line": 253,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-bank-id",
+      "type": "range",
+      "min": "0",
+      "max": "15",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "BANK ID",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 75,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-device-id",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "DEVICE ID",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 84,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-lane0-id",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "LANE0 ID",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 93,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-m",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "M",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 103,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-k",
+      "type": "range",
+      "min": "0",
+      "max": "32",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "K",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 111,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-deserializer-lane-crossbar",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "DESERIALIZER LANE CROSSBAR",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 190,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-eq-setting",
+      "type": "range",
+      "min": "0",
+      "max": "3",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "EQ SETTING",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 199,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-lmfc-offset",
+      "type": "range",
+      "min": "0",
+      "max": "31",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "LMFC OFFSET",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 261,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-scramble",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "SCRAMBLE",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 120,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-external-sysref",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "EXTERNAL SYSREF",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 129,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-new-sysref-on-relink",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "NEW SYSREF ON RELINK",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 270,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-enable-auto-chan-xbar",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "ENABLE AUTO CHAN XBAR",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 280,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,jesd204-deframer-tx-syncb-mode",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "JESD Deframer",
+      "title": "TX SYNCB MODE",
+      "source_file": "src/advanced/jesddeframerwidget.cpp",
+      "source_line": 290,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-settings-sniffer-pll-lo-frequency_hz",
+      "type": "range",
+      "min": "300000000",
+      "max": "6000000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "SNIFFER PLL LO FREQUENCY HZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 149,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-adc-div",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "ADC DIV",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 205,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-rx-dec5-decimation",
+      "type": "range",
+      "min": "4",
+      "max": "5",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RX DEC5 DECIMATION",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 226,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-rhb1-decimation",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RHB1 DECIMATION",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 244,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-iq-rate_khz",
+      "type": "range",
+      "min": "20000",
+      "max": "320000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "IQ RATE KHZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 253,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-rf-bandwidth_hz",
+      "type": "range",
+      "min": "5000000",
+      "max": "240000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RF BANDWIDTH HZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 262,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-rx-bbf-3db-corner_khz",
+      "type": "range",
+      "min": "0",
+      "max": "250000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RX BBF 3DB CORNER KHZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 271,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-adc-div",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "ADC DIV",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 297,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-rx-dec5-decimation",
+      "type": "range",
+      "min": "4",
+      "max": "5",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RX DEC5 DECIMATION",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 319,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-rhb1-decimation",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RHB1 DECIMATION",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 337,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-iq-rate_khz",
+      "type": "range",
+      "min": "0",
+      "max": "61440",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "IQ RATE KHZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 346,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-rf-bandwidth_hz",
+      "type": "range",
+      "min": "0",
+      "max": "20000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RF BANDWIDTH HZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 355,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-rx-bbf-3db-corner_khz",
+      "type": "range",
+      "min": "0",
+      "max": "20000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RX BBF 3DB CORNER KHZ",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 364,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-settings-real-if-data",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "REAL IF DATA",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 158,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-en-high-rej-dec5",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "EN HIGH REJ DEC5",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 235,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-en-high-rej-dec5",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "EN HIGH REJ DEC5",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 328,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-settings-obs-rx-lo-source",
+      "type": "combo",
+      "options": {
+        "0": "OBSLO_TX_PLL",
+        "1": "OBSLO_SNIFFER_PLL"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "LO SOURCE",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 139,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-settings-default-obs-rx-channel",
+      "type": "combo",
+      "options": {
+        "0": "RXOFF",
+        "1": "RX1_TXLO",
+        "2": "RX2_TXLO",
+        "3": "INTERNALCALS",
+        "4": "SNIFFER",
+        "5": "RX1_SNIFFERLO",
+        "6": "RX2_SNIFFERLO",
+        "20": "SNIFFER_A",
+        "36": "SNIFFER_B",
+        "52": "SNIFFER_C"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "20",
+        "36",
+        "52"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "DEFAULT CHANNEL",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 178,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,obs-profile-rx-fir-decimation",
+      "type": "combo",
+      "options": {
+        "1": "DECIMATE by 1",
+        "2": "DECIMATE by 2",
+        "4": "DECIMATE by 4"
+      },
+      "valid_raw_keys": [
+        "1",
+        "2",
+        "4"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RX FIR",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 217,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,sniffer-profile-rx-fir-decimation",
+      "type": "combo",
+      "options": {
+        "1": "DECIMATE by 1",
+        "2": "DECIMATE by 2",
+        "4": "DECIMATE by 4"
+      },
+      "valid_raw_keys": [
+        "1",
+        "2",
+        "4"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "OBS Settings",
+      "title": "RX FIR",
+      "source_file": "src/advanced/obssettingswidget.cpp",
+      "source_line": 310,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-settings-rx-pll-lo-frequency_hz",
+      "type": "range",
+      "min": "300000000",
+      "max": "6000000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RX PLL LO FREQUENCY HZ",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 112,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-adc-div",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "ADC DIV",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 159,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-rx-dec5-decimation",
+      "type": "range",
+      "min": "4",
+      "max": "5",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RX DEC5 DECIMATION",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 180,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-rhb1-decimation",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RHB1 DECIMATION",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 199,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-iq-rate_khz",
+      "type": "range",
+      "min": "20000",
+      "max": "200000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "IQ RATE KHZ",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 208,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-rf-bandwidth_hz",
+      "type": "range",
+      "min": "5000000",
+      "max": "100000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RF BANDWIDTH HZ",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 217,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-rx-bbf-3db-corner_khz",
+      "type": "range",
+      "min": "0",
+      "max": "153600",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RX BBF 3DB CORNER KHZ",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 226,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-settings-rx-pll-use-external-lo",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RX PLL USE EXTERNAL LO",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 121,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-settings-real-if-data",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "REAL IF DATA",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 131,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-en-high-rej-dec5",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "EN HIGH REJ DEC5",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 189,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-settings-rx-channels-enable",
+      "type": "combo",
+      "options": {
+        "0": "RX_OFF",
+        "1": "RX1",
+        "2": "RX2",
+        "3": "RX1_RX2"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "CHANNEL ENABLE",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 102,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,rx-profile-rx-fir-decimation",
+      "type": "combo",
+      "options": {
+        "1": "DECIMATE by 1",
+        "2": "DECIMATE by 2",
+        "4": "DECIMATE by 4"
+      },
+      "valid_raw_keys": [
+        "1",
+        "2",
+        "4"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "RX Settings",
+      "title": "RX FIR",
+      "source_file": "src/advanced/rxsettingswidget.cpp",
+      "source_line": 171,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-settings-tx-pll-lo-frequency_hz",
+      "type": "range",
+      "min": "300000000",
+      "max": "6000000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX PLL LO FREQUENCY HZ",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 112,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-settings-tx1-atten_mdb",
+      "type": "range",
+      "min": "0",
+      "max": "41950",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX1 ATTEN mdB",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 147,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-settings-tx2-atten_mdb",
+      "type": "range",
+      "min": "0",
+      "max": "41950",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX2 ATTEN mdB",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 157,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-thb1-interpolation",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "THB1 INTERPOLATION",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 212,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-thb2-interpolation",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "THB2 INTERPOLATION",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 222,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-tx-input-hb-interpolation",
+      "type": "range",
+      "min": "1",
+      "max": "2",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX INPUT HB INTERPOLATION",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 232,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-iq-rate_khz",
+      "type": "range",
+      "min": "30000",
+      "max": "320000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "IQ RATE KHZ",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 242,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-primary-sig-bandwidth_hz",
+      "type": "range",
+      "min": "0",
+      "max": "250000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "PRIMARY SIG BANDWIDTH HZ",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 253,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-rf-bandwidth_hz",
+      "type": "range",
+      "min": "0",
+      "max": "250000000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "RF BANDWIDTH HZ",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 263,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-tx-dac-3db-corner_khz",
+      "type": "range",
+      "min": "0",
+      "max": "250000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX DAC 3DB CORNER KHZ",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 273,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-tx-bbf-3db-corner_khz",
+      "type": "range",
+      "min": "0",
+      "max": "250000",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX BBF 3DB CORNER KHZ",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 283,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-settings-tx-pll-use-external-lo",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX PLL USE EXTERNAL LO",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 122,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-settings-tx-channels-enable",
+      "type": "combo",
+      "options": {
+        "0": "TX OFF",
+        "1": "TX1",
+        "2": "TX2",
+        "3": "TX1 and TX2"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "CHANNEL ENABLE",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 101,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-settings-tx-atten-step-size",
+      "type": "combo",
+      "options": {
+        "0": "ATTEN STEP 0.05 dB",
+        "1": "ATTEN STEP 0.10 dB",
+        "2": "ATTEN STEP 0.20 dB",
+        "3": "ATTEN STEP 0.40 dB"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "STEP SIZE",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 137,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-dac-div",
+      "type": "combo",
+      "options": {
+        "0": "DAC DIV 2",
+        "1": "DAC DIV 2.5",
+        "2": "DAC DIV 4"
+      },
+      "valid_raw_keys": [
+        "0",
+        "1",
+        "2"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "DAC DIV",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 188,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,tx-profile-tx-fir-interpolation",
+      "type": "combo",
+      "options": {
+        "1": "INTERPOLATE by 1",
+        "2": "INTERPOLATE by 2",
+        "4": "INTERPOLATE by 4"
+      },
+      "valid_raw_keys": [
+        "1",
+        "2",
+        "4"
+      ],
+      "debug": true,
+      "readonly": false,
+      "section": "TX Settings",
+      "title": "TX FIR",
+      "source_file": "src/advanced/txsettingswidget.cpp",
+      "source_line": 202,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-additional-delay-offset",
+      "type": "range",
+      "min": "-32768",
+      "max": "32767",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR Additional Delay Offset",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 92,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-path-delay-pn-seq-level",
+      "type": "range",
+      "min": "0",
+      "max": "255",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR Path Delay PN Seq Level",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 102,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-tx1-vswr-switch-gpio3p3-pin",
+      "type": "range",
+      "min": "0",
+      "max": "11",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR TX1 Switch GPIO3v3 Pin",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 112,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-tx2-vswr-switch-gpio3p3-pin",
+      "type": "range",
+      "min": "0",
+      "max": "11",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR TX2 Switch GPIO3v3 Pin",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 122,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-tx1-vswr-switch-delay_us",
+      "type": "range",
+      "min": "0",
+      "max": "65535",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR TX1 Switch Delay (us)",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 152,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-tx2-vswr-switch-delay_us",
+      "type": "range",
+      "min": "0",
+      "max": "65535",
+      "step": "1",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR TX2 Switch Delay (us)",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 162,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-tx1-vswr-switch-polarity",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR TX1 Switch Polarity",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 132,
+      "condition": null
+    },
+    {
+      "key_suffix": "adi,vswr-tx2-vswr-switch-polarity",
+      "type": "checkbox",
+      "debug": true,
+      "readonly": false,
+      "section": "VSWR Settings",
+      "title": "VSWR TX2 Switch Polarity",
+      "source_file": "src/advanced/vswrsettingswidget.cpp",
+      "source_line": 142,
+      "condition": null
+    }
+  ],
+  "api_methods": [
+    {
+      "name": "getTools",
+      "method_type": "getter",
+      "return_type": "QStringList",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 132
+    },
+    {
+      "name": "getEnsmMode",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 143,
+      "widget_key": "ad9371-phy/ensm_mode"
+    },
+    {
+      "name": "setEnsmMode",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &mode",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 145
+    },
+    {
+      "name": "getCalibrateRxQecEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 147,
+      "widget_key": "ad9371-phy/calibrate_rx_qec_en"
+    },
+    {
+      "name": "setCalibrateRxQecEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 149
+    },
+    {
+      "name": "getCalibrateTxQecEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 151,
+      "widget_key": "ad9371-phy/calibrate_tx_qec_en"
+    },
+    {
+      "name": "setCalibrateTxQecEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 153
+    },
+    {
+      "name": "getCalibrateTxLolEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 155,
+      "widget_key": "ad9371-phy/calibrate_tx_lol_en"
+    },
+    {
+      "name": "setCalibrateTxLolEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 157
+    },
+    {
+      "name": "getCalibrateTxLolExtEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 159,
+      "widget_key": "ad9371-phy/calibrate_tx_lol_ext_en"
+    },
+    {
+      "name": "setCalibrateTxLolExtEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 161
+    },
+    {
+      "name": "getCalibrateDpdEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 166,
+      "widget_key": "ad9371-phy/calibrate_dpd_en"
+    },
+    {
+      "name": "setCalibrateDpdEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 168
+    },
+    {
+      "name": "getCalibrateClgcEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 170,
+      "widget_key": "ad9371-phy/calibrate_clgc_en"
+    },
+    {
+      "name": "setCalibrateClgcEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 172
+    },
+    {
+      "name": "getCalibrateVswrEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 174,
+      "widget_key": "ad9371-phy/calibrate_vswr_en"
+    },
+    {
+      "name": "setCalibrateVswrEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 176
+    },
+    {
+      "name": "calibrate",
+      "method_type": "action",
+      "return_type": "void",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 178
+    },
+    {
+      "name": "getRxRfBandwidth",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 201,
+      "widget_key": "ad9371-phy/voltage0_in/rf_bandwidth",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "getRxSamplingRate",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 209,
+      "widget_key": "ad9371-phy/voltage0_in/sampling_frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "getRxGainControlMode",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 217,
+      "widget_key": "ad9371-phy/voltage0_in/gain_control_mode"
+    },
+    {
+      "name": "setRxGainControlMode",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &mode",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 219
+    },
+    {
+      "name": "getRxTempCompGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 224
+    },
+    {
+      "name": "setRxTempCompGain",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 230
+    },
+    {
+      "name": "getRxHardwareGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 236
+    },
+    {
+      "name": "setRxHardwareGain",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 245
+    },
+    {
+      "name": "getRxQuadratureTracking",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 251
+    },
+    {
+      "name": "setRxQuadratureTracking",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 257
+    },
+    {
+      "name": "getRxRssi",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 263
+    },
+    {
+      "name": "getRxSamplingFrequency",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 269,
+      "widget_key": "ad9371-phy/voltage0_in/sampling_frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "setRxSamplingFrequency",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 277,
+      "conversion": "mhz_to_hz"
+    },
+    {
+      "name": "getRxLoFrequency",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 282,
+      "widget_key": "ad9371-phy/altvoltage0_out/frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "setRxLoFrequency",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 290,
+      "conversion": "mhz_to_hz"
+    },
+    {
+      "name": "getTxRfBandwidth",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 297,
+      "widget_key": "ad9371-phy/voltage0_out/rf_bandwidth",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "getTxSamplingRate",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 305,
+      "widget_key": "ad9371-phy/voltage0_out/sampling_frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "getTxAttenuation",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 313,
+      "conversion": "negate"
+    },
+    {
+      "name": "setTxAttenuation",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 321,
+      "conversion": "negate"
+    },
+    {
+      "name": "getTxQuadratureTracking",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 326
+    },
+    {
+      "name": "setTxQuadratureTracking",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 331
+    },
+    {
+      "name": "getTxLoLeakageTracking",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 336
+    },
+    {
+      "name": "setTxLoLeakageTracking",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 341
+    },
+    {
+      "name": "getTxSamplingFrequency",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 346,
+      "widget_key": "ad9371-phy/voltage0_out/sampling_frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "setTxSamplingFrequency",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 354,
+      "conversion": "mhz_to_hz"
+    },
+    {
+      "name": "getTxLoFrequency",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 359,
+      "widget_key": "ad9371-phy/altvoltage1_out/frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "setTxLoFrequency",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 367,
+      "conversion": "mhz_to_hz"
+    },
+    {
+      "name": "getDpdTrackingEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 374
+    },
+    {
+      "name": "setDpdTrackingEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 376
+    },
+    {
+      "name": "getDpdActuatorEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 381
+    },
+    {
+      "name": "setDpdActuatorEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 383
+    },
+    {
+      "name": "dpdReset",
+      "method_type": "action",
+      "return_type": "void",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 388
+    },
+    {
+      "name": "getDpdTrackCount",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 409
+    },
+    {
+      "name": "getDpdModelError",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 411,
+      "conversion": [
+        "scale_div_10",
+        "suffix_percent"
+      ]
+    },
+    {
+      "name": "getDpdExternalPathDelay",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 419,
+      "conversion": "scale_div_16"
+    },
+    {
+      "name": "getDpdStatus",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 427,
+      "conversion": "status_string_map"
+    },
+    {
+      "name": "getClgcTrackingEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 441
+    },
+    {
+      "name": "setClgcTrackingEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 443
+    },
+    {
+      "name": "getClgcDesiredGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 448,
+      "conversion": "scale_div_100"
+    },
+    {
+      "name": "setClgcDesiredGain",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 456,
+      "conversion": "scale_mul_100"
+    },
+    {
+      "name": "getClgcTrackCount",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 461
+    },
+    {
+      "name": "getClgcStatus",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 463,
+      "conversion": "status_string_map"
+    },
+    {
+      "name": "getClgcCurrentGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 475,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getClgcOrxRms",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 483,
+      "conversion": [
+        "scale_div_100",
+        "suffix_dbfs"
+      ]
+    },
+    {
+      "name": "getClgcTxGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 491,
+      "conversion": [
+        "scale_div_20",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getClgcTxRms",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 499,
+      "conversion": [
+        "scale_div_100",
+        "suffix_dbfs"
+      ]
+    },
+    {
+      "name": "getVswrTrackingEn",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 509
+    },
+    {
+      "name": "setVswrTrackingEn",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "int channel, const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 511
+    },
+    {
+      "name": "getVswrTrackCount",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 516
+    },
+    {
+      "name": "getVswrStatus",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 518,
+      "conversion": "status_string_map"
+    },
+    {
+      "name": "getVswrForwardGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 530,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getVswrForwardGainImag",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 538,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getVswrForwardGainReal",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 546,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getVswrForwardOrx",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 554,
+      "conversion": [
+        "scale_div_100",
+        "suffix_dbfs"
+      ]
+    },
+    {
+      "name": "getVswrForwardTx",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 562,
+      "conversion": [
+        "scale_div_100",
+        "suffix_dbfs"
+      ]
+    },
+    {
+      "name": "getVswrReflectedGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 570,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getVswrReflectedGainImag",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 578,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getVswrReflectedGainReal",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 586,
+      "conversion": [
+        "scale_div_100",
+        "suffix_db"
+      ]
+    },
+    {
+      "name": "getVswrReflectedOrx",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 594,
+      "conversion": [
+        "scale_div_100",
+        "suffix_dbfs"
+      ]
+    },
+    {
+      "name": "getVswrReflectedTx",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "int channel",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 602,
+      "conversion": [
+        "scale_div_100",
+        "suffix_dbfs"
+      ]
+    },
+    {
+      "name": "getObsRfBandwidth",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 612,
+      "widget_key": "ad9371-phy/voltage2_in/rf_bandwidth",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "getObsSamplingRate",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 620,
+      "widget_key": "ad9371-phy/voltage2_in/sampling_frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "getObsGainControlMode",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 628,
+      "widget_key": "ad9371-phy/voltage2_in/gain_control_mode"
+    },
+    {
+      "name": "setObsGainControlMode",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &mode",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 630
+    },
+    {
+      "name": "getObsRfPortSelect",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 635,
+      "widget_key": "ad9371-phy/voltage2_in/rf_port_select"
+    },
+    {
+      "name": "setObsRfPortSelect",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &port",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 637
+    },
+    {
+      "name": "getObsTempCompGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 642,
+      "widget_key": "ad9371-phy/voltage2_in/temp_comp_gain"
+    },
+    {
+      "name": "setObsTempCompGain",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 644
+    },
+    {
+      "name": "getObsHardwareGain",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 646,
+      "widget_key": "ad9371-phy/voltage2_in/hardwaregain"
+    },
+    {
+      "name": "setObsHardwareGain",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 654
+    },
+    {
+      "name": "getObsQuadratureTracking",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 659,
+      "widget_key": "ad9371-phy/voltage2_in/quadrature_tracking_en"
+    },
+    {
+      "name": "setObsQuadratureTracking",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 664
+    },
+    {
+      "name": "getObsRssi",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 669,
+      "widget_key": "ad9371-phy/voltage2_in/rssi"
+    },
+    {
+      "name": "getSnifferLoFrequency",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 671,
+      "widget_key": "ad9371-phy/altvoltage2_out/frequency",
+      "conversion": "hz_to_mhz"
+    },
+    {
+      "name": "setSnifferLoFrequency",
+      "method_type": "setter",
+      "return_type": "void",
+      "params": "const QString &val",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 679,
+      "conversion": "mhz_to_hz"
+    },
+    {
+      "name": "getAdvancedTabs",
+      "method_type": "getter",
+      "return_type": "QStringList",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 686
+    },
+    {
+      "name": "switchAdvancedTab",
+      "method_type": "action",
+      "return_type": "void",
+      "params": "const QString &name",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 700
+    },
+    {
+      "name": "getWidgetKeys",
+      "method_type": "getter",
+      "return_type": "QStringList",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 716
+    },
+    {
+      "name": "readWidget",
+      "method_type": "getter",
+      "return_type": "QString",
+      "params": "const QString &key",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 724
+    },
+    {
+      "name": "writeWidget",
+      "method_type": "action",
+      "return_type": "void",
+      "params": "const QString &key, const QString &value",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 726
+    },
+    {
+      "name": "refresh",
+      "method_type": "action",
+      "return_type": "void",
+      "params": "",
+      "source_file": "include/ad9371plugin/ad9371_api.h",
+      "source_line": 730
+    }
+  ],
+  "conditional_features": [
+    {
+      "condition_type": "debug_attr_exists",
+      "condition_attr": "adi,dpd-model-version",
+      "condition_variable": "hasDpd",
+      "source_file": "src/ad9371advanced.cpp",
+      "source_line": 186
+    },
+    {
+      "condition_type": "debug_attr_exists",
+      "condition_attr": "adi,dpd-model-version",
+      "condition_variable": "hasDpd",
+      "source_file": "src/ad9371advanced.cpp",
+      "source_line": 301
+    },
+    {
+      "condition_type": "debug_attr_exists",
+      "condition_attr": "adi,dpd-model-version",
+      "condition_variable": "m_hasDpd",
+      "source_file": "src/advanced/calibrationwidget.cpp",
+      "source_line": 59
+    }
+  ],
+  "sections": [
+    {
+      "name": "Controls",
+      "tool": "advanced",
+      "source_file": "src/ad9371.cpp"
+    },
+    {
+      "name": "Block Diagram",
+      "tool": "advanced",
+      "source_file": "src/ad9371.cpp"
+    },
+    {
+      "name": "CALIBRATE",
+      "tool": "advanced",
+      "source_file": "src/ad9371.cpp"
+    },
+    {
+      "name": "Reset",
+      "tool": "advanced",
+      "source_file": "src/ad9371.cpp"
+    },
+    {
+      "name": "CLK Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "Calibrations",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "TX Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "RX Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "OBS Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "GAIN Setup",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "AGC Setup",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "ARM GPIO",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "GPIO",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "AUX DAC",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "JESD Framer",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "JESD Deframer",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "BIST",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "DPD Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "CLGC Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "VSWR Settings",
+      "tool": "advanced",
+      "source_file": "src/ad9371advanced.cpp"
+    },
+    {
+      "name": "AGC Config - RX",
+      "tool": "basic",
+      "source_file": "src/advanced/agcsetupwidget.cpp"
+    },
+    {
+      "name": "AGC Config - Observation",
+      "tool": "basic",
+      "source_file": "src/advanced/agcsetupwidget.cpp"
+    },
+    {
+      "name": "Initialize",
+      "tool": "advanced",
+      "source_file": "src/advanced/bistwidget.cpp"
+    },
+    {
+      "name": "Clock Settings",
+      "tool": "basic",
+      "source_file": "src/advanced/clksettingswidget.cpp"
+    },
+    {
+      "name": "RX",
+      "tool": "basic",
+      "source_file": "src/advanced/gainsetupwidget.cpp"
+    },
+    {
+      "name": "Observation",
+      "tool": "basic",
+      "source_file": "src/advanced/gainsetupwidget.cpp"
+    },
+    {
+      "name": "Sniffer",
+      "tool": "basic",
+      "source_file": "src/advanced/gainsetupwidget.cpp"
+    },
+    {
+      "name": "GPIO 3.3V",
+      "tool": "basic",
+      "source_file": "src/advanced/gpiowidget.cpp"
+    },
+    {
+      "name": "GPIO Low Voltage",
+      "tool": "basic",
+      "source_file": "src/advanced/gpiowidget.cpp"
+    },
+    {
+      "name": "Deframer",
+      "tool": "basic",
+      "source_file": "src/advanced/jesddeframerwidget.cpp"
+    },
+    {
+      "name": "Config",
+      "tool": "basic",
+      "source_file": "src/advanced/obssettingswidget.cpp"
+    },
+    {
+      "name": "Profile",
+      "tool": "basic",
+      "source_file": "src/advanced/rxsettingswidget.cpp"
+    }
+  ],
+  "stats": {
+    "total_widgets": 174,
+    "by_type": {
+      "checkbox": 34,
+      "range": 123,
+      "combo": 17
+    },
+    "conditional_widgets": 0,
+    "api_methods": 99,
+    "source_files_scanned": 22
+  }
+}

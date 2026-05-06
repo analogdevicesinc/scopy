@@ -62,6 +62,12 @@ Application Specific plugins
     * :ref:`AD936X <ad936x>`
     * :ref:`AD936X Advanced <ad936x_advanced>`
 
+* AD9371 / AD9375
+    * :ref:`AD9371 <ad9371>`
+    * :ref:`AD9371 Advanced <ad9371_advanced>`
+    * :ref:`AD9375 <ad9375>`
+    * :ref:`AD9375 Advanced <ad9375_advanced>`
+
 * AD9084
     * :ref:`AD9084 <ad9084>`
 
@@ -90,6 +96,7 @@ Contents
    pqm/index
    swiot1l/index
    ad936x/index
+   ad9371/index
    ad9084/index
    adrv9002/adrv9002
    adrv9009/index
