@@ -201,6 +201,21 @@ void CursorController::updateTracking()
 	}
 }
 
+void CursorController::setAxes(PlotAxis *xAxis, PlotAxis *yAxis)
+{
+	// Bootstrap the readouts with the current formatter and units of each axis.
+	plotCursorReadouts->setXFormatter(xAxis->getFormatter());
+	plotCursorReadouts->setYFormatter(yAxis->getFormatter());
+	plotCursorReadouts->setXUnits(xAxis->getUnits());
+	plotCursorReadouts->setYUnits(yAxis->getUnits());
+
+	// Stay in sync whenever the axes change.
+	connect(xAxis, &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setXFormatter);
+	connect(xAxis, &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setXUnits);
+	connect(yAxis, &PlotAxis::formatterChanged, plotCursorReadouts, &PlotCursorReadouts::setYFormatter);
+	connect(yAxis, &PlotAxis::unitsChanged, plotCursorReadouts, &PlotCursorReadouts::setYUnits);
+}
+
 void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorController *ctrl2)
 {
 	ctrl2->setVisible(ctrl1->isVisible());
@@ -212,12 +227,14 @@ void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorCon
 		ctrl1->x1Cursor->blockSignals(true);
 		ctrl2->x1Cursor->setPosition(pos);
 		ctrl1->x1Cursor->blockSignals(false);
+		ctrl2->x1Cursor->repaint();
 		ctrl2->m_plot->repaint();
 	});
 	connect(ctrl1->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x2Cursor, [=](double pos) {
 		ctrl1->x2Cursor->blockSignals(true);
 		ctrl2->x2Cursor->setPosition(pos);
 		ctrl1->x2Cursor->blockSignals(false);
+		ctrl2->x2Cursor->repaint();
 		ctrl2->m_plot->repaint();
 	});
 
@@ -226,12 +243,14 @@ void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorCon
 		ctrl2->x1Cursor->blockSignals(true);
 		ctrl1->x1Cursor->setPosition(pos);
 		ctrl2->x1Cursor->blockSignals(false);
+		ctrl1->x1Cursor->repaint();
 		ctrl1->m_plot->repaint();
 	});
 	connect(ctrl2->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x2Cursor, [=](double pos) {
 		ctrl2->x2Cursor->blockSignals(true);
 		ctrl1->x2Cursor->setPosition(pos);
 		ctrl2->x2Cursor->blockSignals(false);
+		ctrl1->x2Cursor->repaint();
 		ctrl1->m_plot->repaint();
 	});
 }

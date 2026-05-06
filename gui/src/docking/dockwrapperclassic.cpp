@@ -45,4 +45,6 @@ void DockWrapper::init()
 
 void DockWrapper::setActivated(bool isActivated) { setVisible(isActivated); }
 
+void DockWrapper::setTitle(const QString &title) { setWindowTitle(title); }
+
 #include "moc_dockwrapperclassic.cpp"

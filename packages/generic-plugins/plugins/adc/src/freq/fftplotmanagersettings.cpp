@@ -81,6 +81,7 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 				tpc->fftPlotInfo()->setShowSPS(m_xModeCb->combo()->currentData().toInt() !=
 							       XMODE_SAMPLES);
 				tpc->fftPlotInfo()->update(s);
+				tpc->waterfallPlot()->updateYAxis();
 			}
 		}
 	});
@@ -144,7 +145,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		for(PlotComponent *plt : m_plotManager->plots()) {
 			auto p = dynamic_cast<FFTPlotComponent *>(plt);
-			updateXMode(idx, p->fftPlot()->xAxis());
+			updateXMode(idx, p->fftPlot()->xAxis(), p->waterfallPlot()->xAxis());
 		}
 	});
 
@@ -185,7 +186,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	return section;
 }
 
-void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
+void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *fftAxis, PlotAxis *waterfallAxis)
 {
 	QComboBox *xcb = m_xModeCb->combo();
 	m_sampleRateSpin->setVisible(false);
@@ -197,10 +198,11 @@ void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
 		m_plotManager->setXUnit("samples");
 		m_sampleRateSpin->setValue(m_samplingInfo.bufferSize);
 
-		axis->scaleDraw()->setUnitType("");
-		axis->scaleDraw()->setFloatPrecision(3);
-		axis->scaleDraw()->setUnitsEnabled(false);
-		axis->getFormatter()->setTwoDecimalMode(false);
+		fftAxis->scaleDraw()->setUnitType("");
+		fftAxis->scaleDraw()->setFloatPrecision(3);
+		fftAxis->scaleDraw()->setUnitsEnabled(false);
+		fftAxis->getFormatter()->setTwoDecimalMode(false);
+		waterfallAxis->setUnits("samples");
 	}
 
 	if(xcb->itemData(mode) == XMODE_TIME) {
@@ -213,10 +215,11 @@ void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
 		m_freqOffsetSpin->setVisible(true);
 		m_freqOffsetSpin->setEnabled(true);
 
-		axis->scaleDraw()->setUnitType("Hz");
-		axis->scaleDraw()->setUnitsEnabled(true);
-		axis->scaleDraw()->setFloatPrecision(3);
-		axis->getFormatter()->setTwoDecimalMode(false);
+		fftAxis->scaleDraw()->setUnitType("Hz");
+		fftAxis->scaleDraw()->setUnitsEnabled(true);
+		fftAxis->scaleDraw()->setFloatPrecision(3);
+		fftAxis->getFormatter()->setTwoDecimalMode(false);
+		waterfallAxis->setUnits("Hz");
 	}
 	if(xcb->itemData(mode) == XMODE_OVERRIDE) {
 		m_xmin->setUnit("Hz");
@@ -228,10 +231,11 @@ void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
 		m_freqOffsetSpin->setVisible(true);
 		m_freqOffsetSpin->setEnabled(true);
 
-		axis->scaleDraw()->setUnitType("Hz");
-		axis->scaleDraw()->setUnitsEnabled(true);
-		axis->scaleDraw()->setFloatPrecision(3);
-		axis->getFormatter()->setTwoDecimalMode(false);
+		fftAxis->scaleDraw()->setUnitType("Hz");
+		fftAxis->scaleDraw()->setUnitsEnabled(true);
+		fftAxis->scaleDraw()->setFloatPrecision(3);
+		fftAxis->getFormatter()->setTwoDecimalMode(false);
+		waterfallAxis->setUnits("Hz");
 	}
 	updateXAxis();
 	m_plotManager->updateAxisScales();
@@ -276,6 +280,11 @@ void FFTPlotManagerSettings::updateXAxis()
 
 	m_xmin->setValue(min);
 	m_xmax->setValue(max);
+
+	for(auto p : m_plotManager->plots()) {
+		if(auto tpc = dynamic_cast<FFTPlotComponent *>(p))
+			tpc->waterfallPlot()->setFrequencyRange(min, max);
+	}
 }
 
 MenuWidget *FFTPlotManagerSettings::menu() { return m_menu; }
@@ -320,7 +329,7 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 	// Set initial complex mode state
 	p->plotMenu()->setComplexMode(m_samplingInfo.complexMode);
 
-	updateXMode(m_xModeCb->combo()->currentIndex(), p->fftPlot()->xAxis());
+	updateXMode(m_xModeCb->combo()->currentIndex(), p->fftPlot()->xAxis(), p->waterfallPlot()->xAxis());
 }
 
 void FFTPlotManagerSettings::setPlotComboVisible()

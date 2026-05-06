@@ -60,9 +60,15 @@ void ADCFFTInstrumentController::init()
 	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 
 	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [=](uint32_t uuid) {
-		auto cursorController = m_plotComponentManager->plot(uuid)->cursor();
+		auto fftPlt = dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(uuid));
+
+		auto cursorController = fftPlt->cursor();
 		cursorController->connectSignals(m_cursorSettings);
 		connect(m_ui->m_cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
+
+		auto wfCursorController = fftPlt->waterfallCursor();
+		wfCursorController->connectSignals(m_cursorSettings);
+		connect(m_ui->m_cursor, &QAbstractButton::toggled, wfCursorController, &CursorController::setVisible);
 	});
 
 	m_fftPlotSettingsComponent = new FFTPlotManagerSettings(dynamic_cast<FFTPlotManager *>(m_plotComponentManager));
