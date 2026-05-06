@@ -68,8 +68,9 @@ Scopy's Qt6 migration (branch `qt6_clean`) compiles 100% locally inside a Docker
 
 ### Verification
 - [x] `docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:testing` succeeds
-- [ ] CI build on `qt6_clean` pulls image and compiles Scopy
+- [x] CI build on `qt6_clean` pulls image and compiles Scopy
 - [ ] `ctest` passes with `QT_QPA_PLATFORM=offscreen`
+- [x] Qt6 x86_64 AppImage builds successfully in local Docker (2026-05-06)
 
 ### Setup completed
 - Cloudsmith `scopy-dockers` repository created (Docker format, under `adi` org)
