@@ -2,4 +2,7 @@
 !build_and_create_installer.sh
 !mingw_toolchain.sh
 !windows_build_process.sh
+!build_and_create_installer_qt6.sh
+!mingw_toolchain_qt6.sh
+!windows_build_process_qt6.sh
 !sigrokdecode-windows-fix.patch
