@@ -77,6 +77,9 @@ Application Specific plugins
 * CN0357
     * :ref:`CN0357 <cn0357>`
 
+* DAQ2
+    * :ref:`DAQ2 <daq2>`
+
 Contents
 ---------------------------------------------------------------------
 
@@ -98,6 +101,7 @@ Contents
    adrv9009/index
    fmcomms11/fmcomms11
    cn0357/cn0357
+   daq2/daq2
    jesdstatus/index
    scripting/scripting
    imuanalyzer/imuanalyzer
