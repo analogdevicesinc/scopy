@@ -4,7 +4,6 @@ DLL_DEPS=(
     libsigrokdecode-*.dll
     libgcc_s_*.dll
     libstdc++-*.dll
-    Qt6Core.dll
     libboost_thread-mt.dll
     libgnuradio-analog.dll
     libgnuradio-blocks.dll
@@ -18,7 +17,6 @@ DLL_DEPS=(
     libgnuradio-iio.dll
     libad9361.dll
     libiio.dll
-    Qt6Xml.dll
     qwt.dll
     libglib-*.dll
     libgmodule-*.dll
@@ -31,42 +29,30 @@ DLL_DEPS=(
     libgmp-*.dll
     libusb-*.dll
     libxml2-*.dll
-    Qt6Network.dll
-    Qt6OpenGL.dll
-    Qt6Svg.dll
-    Qt6PrintSupport.dll
     libintl-*.dll
     libiconv-*.dll
     zlib1.dll
-    Qt6Gui.dll
     tinyiiod.dll
     libm2k.dll
     libvolk.dll
     libfftw3*.dll
-    Qt6Widgets.dll
     libicudt*.dll
     libffi-*.dll
     liblzma-5.dll
-    libdouble-conversion.dll
     libicuin*.dll
     libicuuc*.dll
     libpcre2-*.dll
     libzstd.dll
-    libharfbuzz-*.dll
-    libpng16-*.dll
     liborc-*.dll
-    libfreetype-*.dll
-    libgraphite2.dll
     libbrotlidec.dll
     libbz2-*.dll
     libbrotlicommon.dll
     libcrypto*.dll
     libssl*.dll
-    libmd4c.dll
     libserialport-0.dll
     libmatio*.dll
     libKF6Archive.dll
-    libkddockwidgets2.dll
+    libkddockwidgets*.dll
     libhdf5-*.dll
     libcurl-*.dll
     libsz-*.dll
@@ -78,11 +64,5 @@ DLL_DEPS=(
     libngtcp2-*.dll
     libngtcp2_*.dll
     libunistring-*.dll
-    Qt63DCore.dll
-    Qt63DExtras.dll
-    Qt63DRender.dll
-    Qt63DLogic.dll
-    Qt63DInput.dll
-    Qt6Concurrent.dll
     libgomp-1.dll
 )

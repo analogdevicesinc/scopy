@@ -28,7 +28,8 @@ STAGING_AREA=$WORKFOLDER/staging
 MINGW_VERSION=mingw64
 ARCH=x86_64
 
-QT=/c/Qt/6.8.3/mingw_64
+# QT=/c/Qt/6.8.3/mingw_64
+QT=C:/Qt/6.8.3/mingw_64
 
 USE_STAGING=$1
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
@@ -54,7 +55,7 @@ PKG_CONFIG_PATH=$STAGING_DIR/lib/pkgconfig
 CC=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-gcc.exe
 CXX=${STAGING_DIR}/bin/${ARCH}-w64-mingw32-g++.exe
 
-JOBS="-j22"
+JOBS="-j4"
 MAKE_BIN=/usr/bin/make.exe
 MAKE_CMD="$MAKE_BIN $JOBS"
 

@@ -14,6 +14,7 @@ install_packages() {
 		vim\
 		unzip\
 		zip\
+		pkg-config\
 	"
 
 	TOOLS_PKGS="\
@@ -31,7 +32,8 @@ install_packages() {
 		mingw-w64-${ARCH}-autotools\
 		libtool\
 		mingw-w64-${ARCH}-boost\
-		mingw-w64-${ARCH}-ccache
+		mingw-w64-${ARCH}-ccache \
+		mingw-w64-${ARCH}-pkgconf
 	"
 
 	PACMAN_SYNC_DEPS="\
@@ -63,9 +65,38 @@ install_packages() {
 	download_cmake
 }
 
+# install_qt() {
+
+# 	pacman --noconfirm -S mingw-w64-x86_64-zstd wget
+	
+# 	echo "Downloading standalone aqt binary..."
+# 	wget -qO aqt.exe https://github.com/miurahr/aqtinstall/releases/latest/download/aqt_x64.exe
+# 	chmod +x aqt.exe
+	
+# 	echo "Installing Qt6..."
+# 	./aqt.exe install-qt --outputdir /c/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
+
+# 	# # Install the pre-compiled MSYS2 versions of the failing dependencies
+# 	# pacman --noconfirm -S mingw-w64-x86_64-zstd \
+# 	# 	mingw-w64-x86_64-python-psutil \
+# 	# 	mingw-w64-x86_64-python-zstandard
+		
+# 	# # Force pip to bypass the PEP 668 environment lock
+# 	# pip3 install aqtinstall --break-system-packages
+
+# 	# python3 -m aqt install-qt --outputdir /c/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
+# }
+
 install_qt() {
-	pip3 install aqtinstall
-	python3 -m aqt install-qt --outputdir /c/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
+	pacman --noconfirm -S mingw-w64-x86_64-zstd wget
+	
+	echo "Downloading standalone aqt binary..."
+	wget -qO aqt.exe https://github.com/miurahr/aqtinstall/releases/latest/download/aqt_x64.exe
+	chmod +x aqt.exe
+	
+	echo "Installing Qt6..."
+	# Changed /c/Qt to C:/Qt below
+	./aqt.exe install-qt --outputdir C:/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
 }
 
 clone() {
@@ -234,7 +265,14 @@ build_volk() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+	# Temporarily reduce parallel jobs just for volk to save memory
+	local PREV_JOBS=$JOBS
+	JOBS="-j2" 
+	
 	build_with_cmake $1
+	
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 
 }
 
@@ -254,7 +292,15 @@ build_gnuradio() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+	
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
+	
 }
 
 build_grscopy() {
@@ -263,7 +309,14 @@ build_grscopy() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+	
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_grm2k() {
@@ -272,7 +325,13 @@ build_grm2k() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_qwt() {
@@ -280,6 +339,10 @@ build_qwt() {
 	CURRENT_BUILD=qwt
 	pushd $STAGING_AREA/$CURRENT_BUILD
 	git clean -xdf
+
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 
 patch -p1 <<-EOF
 --- a/qwtconfig.pri
@@ -317,6 +380,9 @@ EOF
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
+
+		# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
@@ -361,28 +427,56 @@ build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	CURRENT_BUILD=libtinyiiod
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
+	
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	CURRENT_BUILD=KDDockWidgets
 	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=OFF -DKDDockWidgets_TESTS=OFF"
+	
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	CURRENT_BUILD=extra-cmake-modules
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+	
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
 	CURRENT_BUILD=karchive
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
+	
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_genalyzer() {
@@ -392,7 +486,14 @@ build_genalyzer() {
 		-DBUILD_TESTING=OFF \
 		-DBUILD_SHARED_LIBS=ON \
 		"
+	
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_deps() {

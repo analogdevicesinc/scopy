@@ -127,6 +127,11 @@ deploy_app(){
 		--printsupport \
 		$DEST_FOLDER/Scopy.exe
 
+	# Manually copy the missing dynamic Qt6 libraries
+	cp -v $QT/bin/Qt6OpenGLWidgets.dll $DEST_FOLDER/
+	cp -v $QT/bin/Qt6Qml.dll $DEST_FOLDER/
+	cp -v $QT/bin/Qt6Xml.dll $DEST_FOLDER/
+
 	cp -vr $INSTALL_FOLDER/lib/libscopy*.dll $DEST_FOLDER
 	cp -vr $INSTALL_FOLDER/lib/scopy/* $DEST_FOLDER
 	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
