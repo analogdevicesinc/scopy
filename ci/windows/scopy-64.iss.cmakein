@@ -275,11 +275,11 @@ Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; F
 Source: "{#DestFolder}\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\{#Python}\*"; DestDir: "{app}\{#Python}"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\resources\*"; DestDir: "{app}\resources"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\styles\*"; DestDir: "{app}\styles"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\style\*"; DestDir: "{app}\style"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 //DLLs
 Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
