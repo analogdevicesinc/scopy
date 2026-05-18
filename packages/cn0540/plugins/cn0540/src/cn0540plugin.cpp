@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -109,7 +109,7 @@ bool CN0540Plugin::onDisconnect()
 {
 	ScopyJS::GetInstance()->unregisterApi(m_api);
 
-	if (m_api != nullptr) {
+	if(m_api != nullptr) {
 		delete m_api;
 		m_api = nullptr;
 	}

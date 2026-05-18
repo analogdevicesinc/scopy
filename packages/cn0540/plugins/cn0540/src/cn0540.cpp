@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -138,17 +138,13 @@ void CN0540::findGpioChannels()
 
 		if(strstr(label, "cn0540_sw_ff_gpio")) {
 			m_gpioSwFF = ch;
-		}
-		else if(strstr(label, "cn0540_shutdown_gpio")) {
+		} else if(strstr(label, "cn0540_shutdown_gpio")) {
 			m_gpioShutdown = ch;
-		}
-		else if(strstr(label, "cn0540_FDA_DIS")) {
+		} else if(strstr(label, "cn0540_FDA_DIS")) {
 			m_gpioFdaDis = ch;
-		}
-		else if(strstr(label, "cn0540_FDA_MODE")) {
+		} else if(strstr(label, "cn0540_FDA_MODE")) {
 			m_gpioFdaMode = ch;
-		}
-		else if(strstr(label, "cn0540_blue_led")) {
+		} else if(strstr(label, "cn0540_blue_led")) {
 			m_gpioCC = ch;
 		}
 	}
