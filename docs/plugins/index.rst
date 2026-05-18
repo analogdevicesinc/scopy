@@ -114,5 +114,5 @@ Contents
    scripting/scripting
    imuanalyzer/imuanalyzer
    rfpowermeter/rfpowermeter
-   cn0540/index
+   cn0540/cn0540
 

@@ -24,7 +24,7 @@ CN0540 Test Suite
          -
 
 **Prerequisites:**
-    - Scopy v2.0 or later with CN0540 plugin installed
+    - Scopy v2.3.0 or later with CN0540 plugin installed
     - CN0540 hardware board connected
     - IIO kernel drivers loaded for ``ad7768-1``, ``ltc2606``, and ``one-bit-adc-dac``
     - Device drivers and firmware are up to date
