@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta content="User guide: CN0540 user guide" name="description" />
+
+    <title>CN0540 Test Suite &#8212; Scopy  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=ac863bf0" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=5b85fa78" />
+    <script async="async" src="../../../_static/app.umd.js?v=09b0c6bc"></script>
+    <link rel="icon" href="../../../_static/scopy.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="General Test Cases" href="../../general/index.html" />
+    <link rel="prev" title="CN0540" href="index.html" />
+   
+  
+  
+  <meta name="repository" content="scopy">
+  <meta name="version" content="main">
+  
+    <meta name="page_source_suffix" content=".rst">
+  
+  
+  
+
+
+<style>
+  body {
+    
+  }
+
+  body.dark {
+    
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light) {
+      
+    }
+  }
+</style>
+  </head>
+  
+    <body>
+  
+  <input type="checkbox" id="input-show-toc">
+  <input type="checkbox" id="input-show-localtoc">
+  <input type="checkbox" id="input-show-repotoc">
+
+  
+  <div class="search-area">
+    <form action="" method="get">
+      <input type="text" name="q" aria-labelledby="search-documentation" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="search" placeholder="Search"/>
+      <button class="icon"></button>
+    </form>
+  </div>
+  
+
+  <header>
+    <div id="left">
+      <label id="show-sidebar" class="icon" for="input-show-toc" title="Show/hide index"></label>
+    </div>
+    <div id="right">
+      <span>
+        <a id="logo-org" href="https://analog.com" aria-label="Analog Devices Inc. landing page"></a>
+        <div class="vertical-divider"></div>
+        
+        <label id="show-repotoc" for="input-show-repotoc" title="Show/hide docs">Docs</label>
+        
+        <a id="logo" href="../../../index.html">
+          <div>Scopy</div>
+        </a>
+      </span>
+      <span class="reverse">
+        <label id="show-localtoc" class="icon" for="input-show-localtoc" title="Show/hide contents"></label>
+      </span>
+    </div>
+  </header>
+
+
+  <div class="repotoc-tree overlay">
+    <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+  </div>
+    <div class="localtoc">
+      <div class="tocwrapper">
+        <div class="header localtoc-header">
+          <a id="scroll-up" href="#top-anchor" title="Back to top"></a>
+        </div>
+        <nav>
+          <ul>
+<li><a class="reference internal" href="#">CN0540 Test Suite</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup Environment</a></li>
+<li><a class="reference internal" href="#id1">CN0540 Tests</a><ul>
+<li><a class="reference internal" href="#test-1-plugin-loads">Test 1: Plugin Loads</a></li>
+<li><a class="reference internal" href="#test-2-device-detection-and-sections-display">Test 2: Device Detection and Sections Display</a></li>
+<li><a class="reference internal" href="#test-3-refresh-button-re-reads-hardware">Test 3: Refresh Button Re-reads Hardware</a></li>
+<li><a class="reference internal" href="#test-4-power-control-read-sw-ff-status">Test 4: Power Control: Read SW_FF Status</a></li>
+<li><a class="reference internal" href="#test-5-power-control-shutdown-toggle">Test 5: Power Control: Shutdown Toggle</a></li>
+<li><a class="reference internal" href="#test-6-power-control-constant-current-toggle">Test 6: Power Control: Constant Current Toggle</a></li>
+<li><a class="reference internal" href="#test-7-adc-driver-settings-fda-status-toggle">Test 7: ADC Driver Settings: FDA Status Toggle</a></li>
+<li><a class="reference internal" href="#test-8-adc-driver-settings-fda-mode-toggle">Test 8: ADC Driver Settings: FDA Mode Toggle</a></li>
+<li><a class="reference internal" href="#test-9-sensor-calibration-input-voltage-read">Test 9: Sensor Calibration: Input Voltage Read</a></li>
+<li><a class="reference internal" href="#test-10-sensor-calibration-shift-voltage-write-readback">Test 10: Sensor Calibration: Shift Voltage Write/Readback</a></li>
+<li><a class="reference internal" href="#test-11-sensor-calibration-sensor-voltage-calculation">Test 11: Sensor Calibration: Sensor Voltage Calculation</a></li>
+<li><a class="reference internal" href="#test-12-sensor-calibration-calibration-routine">Test 12: Sensor Calibration: Calibration Routine</a></li>
+<li><a class="reference internal" href="#test-13-voltage-monitor-pin-voltages-display">Test 13: Voltage Monitor: Pin Voltages Display</a></li>
+<li><a class="reference internal" href="#test-14-voltage-monitor-automatic-refresh">Test 14: Voltage Monitor: Automatic Refresh</a></li>
+<li><a class="reference internal" href="#test-15-voltage-monitor-section-hidden-without-auxiliary-adc">Test 15: Voltage Monitor: Section Hidden Without Auxiliary ADC</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+      </div>
+    </div>
+
+  
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+    <a id="logo" href="../../../index.html">
+      <img src="../../../_static/logo.svg"/>
+    </a><input id="input-switch-toc" type="checkbox">
+<label id="show-repotoc" for="input-switch-toc">
+All content
+</label>
+<label id="show-toc" for="input-switch-toc">
+Content on this topic
+</label>
+<div class="repotoc-tree">
+  <root>
+  <a href="../../../index.html" class="current">Scopy</a>
+</root>
+
+</div>
+<div class="toc-tree">
+  <ul class="current">
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-1" id="toctree-collapse-1"/><div class="collapse"><a class="reference internal" href="../../../user_guide/index.html">Scopy Overview</a><label for="toctree-collapse-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/windowsBuild.html">Windows Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/linuxBuild.html">Linux Build Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user_guide/build_instructions/macosBuild.html">MacOS Build Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2" id="toctree-collapse-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/index.html">Plugins</a><label for="toctree-collapse-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adc/adc.html">ADC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/dac/dac.html">DAC plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/datalogger/datalogger.html">Datalogger</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-1" id="toctree-collapse-2-1"/><div class="collapse"><a class="reference internal" href="../../../plugins/debugger/index.html">Debugger</a><label for="toctree-collapse-2-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/debugger.html">Debugger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/debugger/iioexplorer.html">IIO Explorer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-2" id="toctree-collapse-2-2"/><div class="collapse"><a class="reference internal" href="../../../plugins/m2k/index.html">ADALM2000</a><label for="toctree-collapse-2-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/oscilloscope.html">Oscilloscope</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/spectrum_analyzer.html">Spectrum Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/network_analyzer.html">Network Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/signal_generator.html">Signal Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/logic_analyzer.html">Logic Analyzer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/pattern_generator.html">Pattern Generator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/digitalio.html">Digital IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/voltmeter.html">Voltmeter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/m2k/power_supply.html">Power Supply</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-3" id="toctree-collapse-2-3"/><div class="collapse"><a class="reference internal" href="../../../plugins/pqm/index.html">PQM</a><label for="toctree-collapse-2-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/rms.html">RMS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/harmonics.html">Harmonics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/waveform.html">Waveform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/pqm/settings.html">System settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-4" id="toctree-collapse-2-4"/><div class="collapse"><a class="reference internal" href="../../../plugins/swiot1l/index.html">AD-SWIOT1L-SL plugin</a><label for="toctree-collapse-2-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/swiot_config.html">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/ad74413r.html">AD74413R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/max14906.html">MAX14906</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/swiot1l/faults.html">Faults</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/registermap/registermap.html">Register Map</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-5" id="toctree-collapse-2-5"/><div class="collapse"><a class="reference internal" href="../../../plugins/ad936x/index.html">AD936x</a><label for="toctree-collapse-2-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/ad936x.html">AD936X</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/ad936x_advanced.html">AD936X Advanced</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/fmcomms5.html">FMCOMMS5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad936x/fmcomms5_advanced.html">FMCOMMS5 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-6" id="toctree-collapse-2-6"/><div class="collapse"><a class="reference internal" href="../../../plugins/ad9084/index.html">APOLLO</a><label for="toctree-collapse-2-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/ad9084/ad9084.html">AD9084</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/adrv9002/adrv9002.html">ADRV9002 (Jupiter) Plugin</a></li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-2-7" id="toctree-collapse-2-7"/><div class="collapse"><a class="reference internal" href="../../../plugins/adrv9009/index.html">ADRV9009 Plugin</a><label for="toctree-collapse-2-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/adrv9009/adrv9009.html">ADRV9009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../plugins/adrv9009/adrv9009_advanced.html">ADRV9009 Advanced</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/fmcomms11/fmcomms11.html">FMCOMMS11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/cn0357/cn0357.html">CN0357</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/daq2/daq2.html">DAQ2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/ad6676/ad6676.html">AD6676</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/jesdstatus/index.html">JESD Status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/scripting/scripting.html">Scripting Tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/imuanalyzer/imuanalyzer.html">IMU Analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/rfpowermeter/rfpowermeter.html">RF Power Meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../plugins/cn0540/cn0540.html">CN0540</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-3" id="toctree-collapse-3"/><div class="collapse"><a class="reference internal" href="../../../developer_guide/index.html">Scopy developer guide</a><label for="toctree-collapse-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/style.html">Style Tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/package_generator.html">Package Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../developer_guide/plugin_developer_guide.html">Plugin Developer Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4" id="toctree-collapse-4" checked=""/><div class="collapse"><a class="reference internal" href="../../index.html">Test Cases</a><label for="toctree-collapse-4"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../testing_guide.html">Testing Guide</a></li>
+<li class="toctree-l2 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1" id="toctree-collapse-4-1" checked=""/><div class="collapse"><a class="reference internal" href="../index.html">Plugins Test Cases</a><label for="toctree-collapse-4-1"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-1" id="toctree-collapse-4-1-1"/><div class="collapse"><a class="reference internal" href="../pqm/index.html">PQM</a><label for="toctree-collapse-4-1-1"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../pqm/pqm_tests.html">PQM Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-2" id="toctree-collapse-4-1-2"/><div class="collapse"><a class="reference internal" href="../datalogger/index.html">Datalogger</a><label for="toctree-collapse-4-1-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../datalogger/datalogger_tests.html">Datalogger Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-3" id="toctree-collapse-4-1-3"/><div class="collapse"><a class="reference internal" href="../dac/index.html">DAC</a><label for="toctree-collapse-4-1-3"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dac/dac_tests.html">DAC Plugin - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-4" id="toctree-collapse-4-1-4"/><div class="collapse"><a class="reference internal" href="../swiot1l/index.html">SWIOT1L</a><label for="toctree-collapse-4-1-4"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../swiot1l/swiot1l_tests.html">SWIOT Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-5" id="toctree-collapse-4-1-5"/><div class="collapse"><a class="reference internal" href="../adc/index.html">ADC</a><label for="toctree-collapse-4-1-5"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adc/adc_tests.html">ADC Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-6" id="toctree-collapse-4-1-6"/><div class="collapse"><a class="reference internal" href="../m2k/index.html">ADALM2000</a><label for="toctree-collapse-4-1-6"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/digital_io_tests.html">Digital IO - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/general_settings_tests.html">General Settings - Test Case</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/logic_analyzer_tests.html">Logic Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/network_analyzer_tests.html">Network Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/oscilloscope_tests.html">Oscilloscope - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/pattern_generator_tests.html">Pattern Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/power_supply_tests.html">Power Supply - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/spectrum_analyzer_tests.html">Spectrum Analyzer - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/signal_generator_tests.html">Signal Generator - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../m2k/voltmeter_tests.html">Voltmeter - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-7" id="toctree-collapse-4-1-7"/><div class="collapse"><a class="reference internal" href="../registermap/index.html">Register Map</a><label for="toctree-collapse-4-1-7"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../registermap/registermap_tests.html">Register Map - Test suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-8" id="toctree-collapse-4-1-8"/><div class="collapse"><a class="reference internal" href="../debugger/index.html">Debugger</a><label for="toctree-collapse-4-1-8"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_tests.html">Debugger - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../debugger/debugger_preferences_tests.html">Debugger Preferences - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-9" id="toctree-collapse-4-1-9"/><div class="collapse"><a class="reference internal" href="../jesd/index.html">JESD STATUS</a><label for="toctree-collapse-4-1-9"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../jesd/jesd_status_tests.html">JESD STATUS Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-10" id="toctree-collapse-4-1-10"/><div class="collapse"><a class="reference internal" href="../ad936x/index.html">AD936X</a><label for="toctree-collapse-4-1-10"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ad936x/ad936x_tests.html">AD936x Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-11" id="toctree-collapse-4-1-11"/><div class="collapse"><a class="reference internal" href="../daq2/index.html">DAQ2</a><label for="toctree-collapse-4-1-11"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../daq2/daq2_tests.html">DAQ2 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-12" id="toctree-collapse-4-1-12"/><div class="collapse"><a class="reference internal" href="../ad9084/index.html">AD9084</a><label for="toctree-collapse-4-1-12"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ad9084/ad9084_tests.html">AD9084 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-13" id="toctree-collapse-4-1-13"/><div class="collapse"><a class="reference internal" href="../fmcomms5/index.html">FMCOMMS5</a><label for="toctree-collapse-4-1-13"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fmcomms5/fmcomms5_tests.html">FMCOMMS5 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-14" id="toctree-collapse-4-1-14"/><div class="collapse"><a class="reference internal" href="../fmcomms11/index.html">FMCOMMS11</a><label for="toctree-collapse-4-1-14"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fmcomms11/fmcomms11_tests.html">FMCOMMS11 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-15" id="toctree-collapse-4-1-15"/><div class="collapse"><a class="reference internal" href="../adrv9002/index.html">ADRV9002 (Jupiter)</a><label for="toctree-collapse-4-1-15"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adrv9002/adrv9002_tests.html">ADRV9002 (Jupiter) Plugin - Test Suite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adrv9002/profile_generator_tests.html">ADRV9002 Profile Generator - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-16" id="toctree-collapse-4-1-16"/><div class="collapse"><a class="reference internal" href="../adrv9009/index.html">ADRV9009</a><label for="toctree-collapse-4-1-16"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../adrv9009/adrv9009_tests.html">ADRV9009 Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-17" id="toctree-collapse-4-1-17"/><div class="collapse"><a class="reference internal" href="../ad6676/index.html">AD6676</a><label for="toctree-collapse-4-1-17"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ad6676/ad6676_tests.html">AD6676 Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-18" id="toctree-collapse-4-1-18"/><div class="collapse"><a class="reference internal" href="../imuanalyzer/index.html">IMU Analyzer</a><label for="toctree-collapse-4-1-18"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../imuanalyzer/imuanalyzer_tests.html">IMU Analyzer Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-19" id="toctree-collapse-4-1-19"/><div class="collapse"><a class="reference internal" href="../rfpowermeter/index.html">RF Power Meter</a><label for="toctree-collapse-4-1-19"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../rfpowermeter/rfpowermeter_tests.html">RF Power Meter Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-20" id="toctree-collapse-4-1-20"/><div class="collapse"><a class="reference internal" href="../cn0357/index.html">CN0357</a><label for="toctree-collapse-4-1-20"><div class="icon"></div></label></div><ul>
+<li class="toctree-l4"><a class="reference internal" href="../cn0357/cn0357_tests.html">CN0357 Plugin - Test Suite</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-1-21" id="toctree-collapse-4-1-21" checked=""/><div class="collapse"><a class="reference internal" href="index.html">CN0540</a><label for="toctree-collapse-4-1-21"><div class="icon"></div></label></div><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">CN0540 Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><input class="toctree-collapse" type="checkbox" name="toctree-collapse-4-2" id="toctree-collapse-4-2"/><div class="collapse"><a class="reference internal" href="../../general/index.html">General Test Cases</a><label for="toctree-collapse-4-2"><div class="icon"></div></label></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/hp_tests.html">Homepage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/license_about_page_tests.html">License and About Page</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/install_tests.html">Installers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/add_dev_tests.html">Add device</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/connection_tests.html">Connection flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/emu_tests.html">EMU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/core/dev_tests.html">Device interaction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/instrument_detaching_tests.html">Instrument Detaching - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/general_preferences_tests.html">General Preferences - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/package_manager_tests.html">Package Manager - Test Suite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../general/scripting_tool.html">Scripting Tool - Test Suite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture/index.html">Software Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/preferences.html">Scopy Preferences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/bugReport.html">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_guide/troubleshooting.html">Scopy troubleshooting guide</a></li>
+</ul>
+
+
+</div>
+        </div>
+      </div>
+
+  <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper" id="top-anchor">
+          <div class="body-header">
+  <nav class="breadcrumb"><ol><li><a href="../../index.html">Test Cases</a></li><li><a href="../index.html">Plugins Test Cases</a></li><li><a href="index.html">CN0540</a></li></ol></nav>
+</div>
+          <div class="body" role="main">
+            
+  <section id="cn0540-test-suite">
+<span id="cn0540-tests"></span><h1>CN0540 Test Suite<a class="headerlink" href="#cn0540-test-suite" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>User guide: <a class="reference internal" href="../../../plugins/cn0540/cn0540.html#cn0540"><span class="std std-ref">CN0540 user guide</span></a></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23.8%" />
+<col style="width: 14.3%" />
+<col style="width: 14.3%" />
+<col style="width: 23.8%" />
+<col style="width: 23.8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tester</p></th>
+<th class="head"><p>Test Date</p></th>
+<th class="head"><p>Scopy version</p></th>
+<th class="head"><p>Plugin version (N/A if not applicable)</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<dl class="simple">
+<dt><strong>Prerequisites:</strong></dt><dd><ul class="simple">
+<li><p>Scopy v2.3.0 or later with CN0540 plugin installed</p></li>
+<li><p>CN0540 hardware board connected</p></li>
+<li><p>IIO kernel drivers loaded for <code class="docutils literal notranslate"><span class="pre">ad7768-1</span></code>, <code class="docutils literal notranslate"><span class="pre">ltc2606</span></code>, and <code class="docutils literal notranslate"><span class="pre">one-bit-adc-dac</span></code></p></li>
+<li><p>Device drivers and firmware are up to date</p></li>
+<li><p>Reset .ini files to default by pressing <strong>Reset</strong> button in Preferences</p></li>
+</ul>
+</dd>
+</dl>
+<section id="setup-environment">
+<h2>Setup Environment<a class="headerlink" href="#setup-environment" title="Link to this heading"></a></h2>
+<dl class="simple" id="cn0540-device-setup">
+<dt><strong>CN0540.device:</strong></dt><dd><ul class="simple">
+<li><p>Connect a CN0540 evaluation board to your PC</p></li>
+<li><p>Ensure IIO kernel drivers are loaded for <code class="docutils literal notranslate"><span class="pre">ad7768-1</span></code>, <code class="docutils literal notranslate"><span class="pre">ltc2606</span></code>, and <code class="docutils literal notranslate"><span class="pre">one-bit-adc-dac</span></code></p></li>
+<li><p>Connect to the device in Scopy with the CN0540 plugin enabled</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="cn0540-device-emu">
+<dt><strong>CN0540.emulator:</strong></dt><dd><ul class="simple">
+<li><p>Press the add device button and go to emulator</p></li>
+<li><p>Select the CN0540 device from the emulator list</p></li>
+<li><p>Enable, verify and select all available plugins</p></li>
+<li><p>Connect to the device</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple" id="cn0540-device-default">
+<dt><strong>CN0540.default:</strong></dt><dd><ul class="simple">
+<li><p>Use default device settings after connection</p></li>
+<li><p>Ensure all sections are in their initial collapsed or expanded state</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="id1">
+<h2>CN0540 Tests<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<section id="test-1-plugin-loads">
+<h3>Test 1: Plugin Loads<a class="headerlink" href="#test-1-plugin-loads" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.PLUGIN_LOADS</p>
+<p><strong>RBP:</strong> P0</p>
+<p><strong>Description:</strong> Verify that the CN0540 plugin loads in Scopy.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-emu"><span class="std std-ref">CN0540.emulator</span></a> or <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open Scopy application</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Scopy launches without errors</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-2-device-detection-and-sections-display">
+<h3>Test 2: Device Detection and Sections Display<a class="headerlink" href="#test-2-device-detection-and-sections-display" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.DEVICE_DETECTION</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the CN0540 plugin detects the required IIO devices and displays all four collapsible sections.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Connect the CN0540 board and open the CN0540 plugin in Scopy</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The plugin loads and displays four collapsible sections: Power Control, ADC Driver Settings, Sensor Calibration, and Voltage Monitor</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-3-refresh-button-re-reads-hardware">
+<h3>Test 3: Refresh Button Re-reads Hardware<a class="headerlink" href="#test-3-refresh-button-re-reads-hardware" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.REFRESH_BUTTON</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that clicking the Refresh button re-reads all hardware values and updates the UI.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the CN0540 plugin and note the displayed values in all sections</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> All sections display current hardware values</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-4-power-control-read-sw-ff-status">
+<h3>Test 4: Power Control: Read SW_FF Status<a class="headerlink" href="#test-4-power-control-read-sw-ff-status" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.READ_SW_FF</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that clicking Check Status reads the SW_FF fault flag GPIO and displays the result.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Power Control</strong> section and click <strong>Check Status</strong> next to SW_FF</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The SW_FF status label is updated with the current fault flag value read from hardware</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-5-power-control-shutdown-toggle">
+<h3>Test 5: Power Control: Shutdown Toggle<a class="headerlink" href="#test-5-power-control-shutdown-toggle" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.SHUTDOWN_TOGGLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that toggling the Shutdown checkbox writes to the shutdown GPIO and reads back the new state.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Power Control</strong> section and note the current state of the <strong>Shutdown</strong> checkbox</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Checkbox reflects the current hardware shutdown state</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-6-power-control-constant-current-toggle">
+<h3>Test 6: Power Control: Constant Current Toggle<a class="headerlink" href="#test-6-power-control-constant-current-toggle" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.CONSTANT_CURRENT_TOGGLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that toggling the Constant Current checkbox writes to the blue LED GPIO and reads back the new state.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Power Control</strong> section and note the current state of the <strong>Constant Current</strong> checkbox</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Checkbox reflects the current hardware GPIO state</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-7-adc-driver-settings-fda-status-toggle">
+<h3>Test 7: ADC Driver Settings: FDA Status Toggle<a class="headerlink" href="#test-7-adc-driver-settings-fda-status-toggle" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.FDA_STATUS_TOGGLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that toggling the FDA Status checkbox enables or disables the FDA amplifier and the status label updates accordingly.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>ADC Driver Settings</strong> section and note the current state of the <strong>FDA Status</strong> checkbox</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Checkbox reflects the current FDA enable state</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-8-adc-driver-settings-fda-mode-toggle">
+<h3>Test 8: ADC Driver Settings: FDA Mode Toggle<a class="headerlink" href="#test-8-adc-driver-settings-fda-mode-toggle" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.FDA_MODE_TOGGLE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that toggling the FDA Mode checkbox switches the FDA between FULL POWER and LOW POWER modes.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>ADC Driver Settings</strong> section and note the current state of the <strong>FDA Mode</strong> checkbox</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Checkbox reflects the current power mode (checked = FULL POWER, unchecked = LOW POWER)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-9-sensor-calibration-input-voltage-read">
+<h3>Test 9: Sensor Calibration: Input Voltage Read<a class="headerlink" href="#test-9-sensor-calibration-input-voltage-read" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.INPUT_VOLTAGE_READ</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that the Input Voltage field displays a valid ADC voltage reading from the ad7768-1 device.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Sensor Calibration</strong> section and click <strong>Refresh</strong></dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The <strong>Input Voltage [mV]</strong> label displays a numeric voltage value read from the <code class="docutils literal notranslate"><span class="pre">ad7768-1</span></code> <code class="docutils literal notranslate"><span class="pre">voltage0</span></code> channel</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-10-sensor-calibration-shift-voltage-write-readback">
+<h3>Test 10: Sensor Calibration: Shift Voltage Write/Readback<a class="headerlink" href="#test-10-sensor-calibration-shift-voltage-write-readback" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.SHIFT_VOLTAGE_WRITE</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that entering a shift voltage value and clicking Write sends the value to the ltc2606 DAC, and clicking Read reflects the written value.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Sensor Calibration</strong> section and click <strong>Read</strong> next to <strong>Shift Voltage [mV]</strong></dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The shift voltage field displays the current DAC voltage read from hardware</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-11-sensor-calibration-sensor-voltage-calculation">
+<h3>Test 11: Sensor Calibration: Sensor Voltage Calculation<a class="headerlink" href="#test-11-sensor-calibration-sensor-voltage-calculation" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.SENSOR_VOLTAGE_READ</p>
+<p><strong>RBP:</strong> P1</p>
+<p><strong>Description:</strong> Verify that clicking Read in the Sensor Voltage row calculates and displays a valid sensor voltage from the ADC, DAC, and FDA parameters.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Sensor Calibration</strong> section and click <strong>Read</strong> next to <strong>Sensor Voltage [mV]</strong></dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The <strong>Sensor Voltage [mV]</strong> label updates with a calculated numeric voltage value derived from the ADC input, DAC shift voltage, FDA gain, and FDA output common mode</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-12-sensor-calibration-calibration-routine">
+<h3>Test 12: Sensor Calibration: Calibration Routine<a class="headerlink" href="#test-12-sensor-calibration-calibration-routine" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.CALIBRATE</p>
+<p><strong>RBP:</strong> P2</p>
+<p><strong>Description:</strong> Verify that clicking Calibrate runs the iterative calibration routine and reports a completion status.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Expand the <strong>Sensor Calibration</strong> section and click <strong>Calibrate</strong></dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The calibration routine starts; the status label updates while the routine runs (up to 20 iterations)</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-13-voltage-monitor-pin-voltages-display">
+<h3>Test 13: Voltage Monitor: Pin Voltages Display<a class="headerlink" href="#test-13-voltage-monitor-pin-voltages-display" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.VOLT_MON_DISPLAY</p>
+<p><strong>RBP:</strong> P2</p>
+<p><strong>Description:</strong> Verify that the Voltage Monitor section displays numeric voltage readings for all six analog pins when a supported auxiliary ADC is present.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">xadc</span></code> or <code class="docutils literal notranslate"><span class="pre">ltc2308</span></code> auxiliary ADC device is present</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the CN0540 plugin and expand the <strong>Voltage Monitor</strong> section</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The section is visible and displays six labeled voltage fields: Vin+, Vgpio2, Vgpio3, Vcom, Vfda+, Vfda-</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-14-voltage-monitor-automatic-refresh">
+<h3>Test 14: Voltage Monitor: Automatic Refresh<a class="headerlink" href="#test-14-voltage-monitor-automatic-refresh" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.VOLT_MON_AUTO_REFRESH</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> Verify that the Voltage Monitor section automatically updates all six pin voltages every second without user interaction.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">xadc</span></code> or <code class="docutils literal notranslate"><span class="pre">ltc2308</span></code> auxiliary ADC device is present</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the CN0540 plugin, expand the <strong>Voltage Monitor</strong> section, and note the displayed values</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> Six voltage labels are displayed with current readings</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+<section id="test-15-voltage-monitor-section-hidden-without-auxiliary-adc">
+<h3>Test 15: Voltage Monitor: Section Hidden Without Auxiliary ADC<a class="headerlink" href="#test-15-voltage-monitor-section-hidden-without-auxiliary-adc" title="Link to this heading"></a></h3>
+<p><strong>UID:</strong> TST.CN0540.VOLT_MON_SECTION_HIDDEN</p>
+<p><strong>RBP:</strong> P3</p>
+<p><strong>Description:</strong> Verify that the Voltage Monitor section is not shown when no supported auxiliary ADC (xadc or ltc2308) is detected.</p>
+<p><strong>OS:</strong> ANY</p>
+<dl class="simple">
+<dt><strong>Preconditions:</strong></dt><dd><ul class="simple">
+<li><p>Use <a class="reference internal" href="#cn0540-device-setup"><span class="std std-ref">CN0540.device</span></a> setup</p></li>
+<li><p>No <code class="docutils literal notranslate"><span class="pre">xadc</span></code> or <code class="docutils literal notranslate"><span class="pre">ltc2308</span></code> auxiliary ADC device is present on the connected hardware</p></li>
+</ul>
+</dd>
+<dt><strong>Steps:</strong></dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>Open the CN0540 plugin with no auxiliary ADC present in the IIO context</dt><dd><ul class="simple">
+<li><p><strong>Expected result:</strong> The <strong>Voltage Monitor</strong> section is not visible in the plugin UI</p></li>
+<li><p><strong>Actual result:</strong></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p><strong>Tested OS:</strong></p>
+<p><strong>Comments:</strong></p>
+<p><strong>Result:</strong> PASS/FAIL</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+              <div class="related">
+                &nbsp;
+    <a href="index.html" title="Previous document (Alt+Shift+LeftArrow)" class="prev">CN0540</a>
+    <a href="../../general/index.html" title="Next document (Alt+Shift+RightArrow)" class="next">General Test Cases</a>
+              </div>
+          
+        </div>
+      </div>
+  </div>
+
+  <label id="cancel-area-show-toc" for="input-show-toc"></label>
+  <label id="cancel-area-show-localtoc" for="input-show-localtoc"></label>
+    <footer>
+      &#169;2024, Analog Devices, Inc.
+      
+      |
+      Made with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+      &amp; <a href="https://github.com/analogdevicesinc/doctools">Doctools</a>
+      
+    </footer>
+  </body>
+</html>
