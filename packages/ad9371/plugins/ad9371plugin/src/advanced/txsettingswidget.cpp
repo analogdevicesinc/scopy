@@ -94,10 +94,10 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 
 	// TX Channels Enable - ComboUi {0:"TX_OFF", 1:"TX1", 2:"TX2", 3:"TX1_TX2"}
 	QMap<QString, QString> txChannelsOptions;
-	txChannelsOptions.insert("0", "TX OFF");
+	txChannelsOptions.insert("0", "TX_OFF");
 	txChannelsOptions.insert("1", "TX1");
 	txChannelsOptions.insert("2", "TX2");
-	txChannelsOptions.insert("3", "TX1 and TX2");
+	txChannelsOptions.insert("3", "TX1_and_TX2");
 	auto txChannelsWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,tx-settings-tx-channels-enable", txChannelsOptions, "CHANNEL ENABLE", this);
 	if(txChannelsWidget) {

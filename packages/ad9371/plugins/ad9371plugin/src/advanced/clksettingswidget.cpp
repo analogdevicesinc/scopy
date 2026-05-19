@@ -107,10 +107,10 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 
 	// 3. CLK PLL VCO Div
 	QMap<QString, QString> vcoDivOptions;
-	vcoDivOptions.insert("0", "VCO DIV 1");
-	vcoDivOptions.insert("1", "VCO DIV 1.5");
-	vcoDivOptions.insert("2", "VCO DIV 2");
-	vcoDivOptions.insert("3", "VCO DIV 3");
+	vcoDivOptions.insert("0", "VCO_DIV_1");
+	vcoDivOptions.insert("1", "VCO_DIV_1.5");
+	vcoDivOptions.insert("2", "VCO_DIV_2");
+	vcoDivOptions.insert("3", "VCO_DIV_3");
 
 	IIOWidget *vcoDivWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,clocks-clk-pll-vco-div", vcoDivOptions, "PLL VCO DIV");
