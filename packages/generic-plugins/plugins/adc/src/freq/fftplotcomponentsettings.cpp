@@ -29,6 +29,7 @@
 #include <style.h>
 #include <pluginbase/preferences.h>
 #include <filemanager.h>
+#include <gui/waterfallplotwidget.h>
 
 #include <gnuradio/fft/window.h>
 
@@ -103,6 +104,11 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_plotComponent->fftPlot()->yAxis()->setUnitsVisible(true);
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
+	// Sync waterfall intensity (color axis) to the FFT Y-axis range
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double minVal, double maxVal) {
+		m_plotComponent->waterfallPlot()->setIntensityRange(minVal, maxVal);
+	});
+
 	m_yPwrOffset = new MenuSpinbox("Power Offset", 0, "dBFS", -300, 300, true, false, yaxis);
 	InfoIconWidget::addHoveringInfoToWidget(m_yPwrOffset->label(),
 						"Offsets all channels' Y axis by set a amout units", m_yPwrOffset);
@@ -126,6 +132,32 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 			}
 		}
 	});
+
+	MenuSectionCollapseWidget *waterfallSection = new MenuSectionCollapseWidget(
+		"WATERFALL PLOT", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	QAbstractButton *waterfallSwitch = waterfallSection->collapseSection()->header();
+	waterfallSwitch->setChecked(false);
+
+	m_waterfallRows = new MenuSpinbox("History rows", 200, "rows", 50, 2000, true, false, true, waterfallSection);
+	m_waterfallRows->setScaleRange(1, 1);
+	m_waterfallRows->setIncrementMode(MenuSpinbox::IS_FIXED);
+	connect(m_waterfallRows, &MenuSpinbox::valueChanged, this,
+		[=](double val) { m_plotComponent->waterfallPlot()->setNumRows((int)val); });
+	m_waterfallRows->setValue(200);
+
+	MenuOnOffSwitch *waterfallInvertSwitch = new MenuOnOffSwitch("Invert direction", waterfallSection, false);
+	connect(waterfallInvertSwitch->onOffswitch(), &QAbstractButton::toggled, this,
+		[=](bool inverted) { m_plotComponent->waterfallPlot()->setInverted(inverted); });
+
+	connect(waterfallSwitch, &QAbstractButton::toggled, this, [=](bool on) {
+		m_plotComponent->waterfallPlot()->setWaterfallEnabled(on);
+		m_plotComponent->waterfallDockWrapper()->setActivated(on);
+		if(!on)
+			m_plotComponent->waterfallPlot()->clearData();
+	});
+
+	waterfallSection->add(m_waterfallRows);
+	waterfallSection->add(waterfallInvertSwitch);
 
 	m_deletePlot = new QPushButton("Delete Plot");
 	StyleHelper::BasicButton(m_deletePlot);
@@ -153,6 +185,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	v->setSpacing(10);
 	v->addWidget(yaxis);
+	v->addWidget(waterfallSection);
 	v->addWidget(plotMenu);
 	v->addWidget(m_deletePlot);
 	v->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -163,6 +196,9 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->setMin(-140);
 	m_yCtrl->setMax(20);
 	labelsSwitch->onOffswitch()->setChecked(Preferences::get("adc_plot_labels").toBool());
+
+	// Initialize waterfall plot state
+	m_plotComponent->waterfallDockWrapper()->setActivated(false);
 
 	m_deletePlotHover = new QPushButton("", nullptr);
 	m_deletePlotHover->setMaximumSize(16, 16);

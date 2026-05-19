@@ -61,6 +61,7 @@ private:
 	PlotAutoscaler *m_autoscaler;
 
 	MenuCombo *m_windowCb;
+	MenuSpinbox *m_waterfallRows;
 
 	QList<ChannelComponent *> m_channels;
 

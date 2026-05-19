@@ -39,6 +39,7 @@ class SCOPY_GUI_EXPORT PlotAxis : public QObject
 	Q_OBJECT
 public:
 	PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent = nullptr);
+	PlotAxis(int position, QwtPlot *plot, int axisIndex, QPen pen, QObject *parent = nullptr);
 	~PlotAxis();
 
 	int position();

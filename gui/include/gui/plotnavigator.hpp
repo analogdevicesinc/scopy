@@ -25,6 +25,7 @@
 #include <QSet>
 #include <QStack>
 #include <QwtPlot>
+#include <plotaxis.h>
 #include "scopy-gui_export.h"
 
 class QPushButton;
@@ -62,11 +63,13 @@ class SCOPY_GUI_EXPORT PlotNavigator : public QObject
 
 public:
 	explicit PlotNavigator(PlotWidget *plotWidget, QSet<PlotChannel *> *channels = new QSet<PlotChannel *>());
+	explicit PlotNavigator(QwtPlot *plot, QSet<QwtAxisId> *axes, QObject *parent = nullptr);
 	~PlotNavigator();
 
 	QSet<PlotChannel *> *channels();
 	void addChannel(PlotChannel *channel);
 	void removeChannel(PlotChannel *channel);
+	void addAxis(PlotAxis *axis);
 
 	bool isZoomed();
 	void forcePan(QwtAxisId axisId, double factor);
@@ -120,6 +123,7 @@ public:
 
 	static void syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2, QSet<QwtAxisId> *axes);
 	static void syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2);
+	static void syncXNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2);
 	void setResetButtonEn(bool en);
 
 Q_SIGNALS:

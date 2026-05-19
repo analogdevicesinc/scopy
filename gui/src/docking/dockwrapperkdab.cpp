@@ -56,6 +56,8 @@ void DockWrapper::setInnerWidget(QWidget *innerWidget)
 
 QWidget *DockWrapper::innerWidget() const { return m_innerWidget; }
 
+void DockWrapper::setTitle(const QString &title) { KDDockWidgets::QtWidgets::DockWidget::setTitle(" " + title); }
+
 void DockWrapper::setActivated(bool isActivated)
 {
 	m_isActive = isActivated;
