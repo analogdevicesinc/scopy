@@ -361,43 +361,43 @@ QWidget *Ad9371::generateGlobalSettingsWidget(QString title, QWidget *parent)
 	// #5: calibrate_rx_qec_en
 	m_calRxQec = new MenuOnOffSwitch("CAL RX QEC", calibrationsWidget);
 	m_calRxQec->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	calGrid->addWidget(m_calRxQec, 0, 0);
+	calGrid->addWidget(m_calRxQec, 0, 0, Qt::AlignLeft);
 
 	// #6: calibrate_tx_qec_en
 	m_calTxQec = new MenuOnOffSwitch("CAL TX QEC", calibrationsWidget);
 	m_calTxQec->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	calGrid->addWidget(m_calTxQec, 0, 1);
+	calGrid->addWidget(m_calTxQec, 0, 1, Qt::AlignLeft);
 
 	// #7: calibrate_tx_lol_en
 	m_calTxLol = new MenuOnOffSwitch("CAL TX LOL", calibrationsWidget);
 	m_calTxLol->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	calGrid->addWidget(m_calTxLol, 0, 2);
+	calGrid->addWidget(m_calTxLol, 0, 2, Qt::AlignLeft);
 
 	// #8: calibrate_tx_lol_ext_en
 	m_calTxLolExt = new MenuOnOffSwitch("CAL TX LOL Ext.", calibrationsWidget);
 	m_calTxLolExt->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	calGrid->addWidget(m_calTxLolExt, 0, 3);
+	calGrid->addWidget(m_calTxLolExt, 0, 3, Qt::AlignLeft);
 
 	// #2-#4: DPD/CLGC/VSWR calibration switches (conditional on has_dpd)
 	if(m_hasDpd) {
 		m_calDpd = new MenuOnOffSwitch("CAL DPD", calibrationsWidget);
 		m_calDpd->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-		calGrid->addWidget(m_calDpd, 1, 0);
+		calGrid->addWidget(m_calDpd, 1, 0, Qt::AlignLeft);
 
 		m_calClgc = new MenuOnOffSwitch("CAL CLGC", calibrationsWidget);
 		m_calClgc->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-		calGrid->addWidget(m_calClgc, 1, 1);
+		calGrid->addWidget(m_calClgc, 1, 1, Qt::AlignLeft);
 
 		m_calVswr = new MenuOnOffSwitch("CAL VSWR", calibrationsWidget);
 		m_calVswr->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-		calGrid->addWidget(m_calVswr, 1, 2);
+		calGrid->addWidget(m_calVswr, 1, 2, Qt::AlignLeft);
 	}
 
 	// #9: Calibrate button
 	QPushButton *calibrateButton = new QPushButton("CALIBRATE", calibrationsWidget);
 	Style::setStyle(calibrateButton, style::properties::button::basicButton);
 	connect(calibrateButton, &QPushButton::clicked, this, &Ad9371::writeCalibrationToHardware);
-	calGrid->addWidget(calibrateButton, m_hasDpd ? 1 : 0, 3);
+	calGrid->addWidget(calibrateButton, 0, 4);
 
 	calibrationsLayout->addLayout(calGrid);
 	mainLayout->addWidget(calibrationsWidget);

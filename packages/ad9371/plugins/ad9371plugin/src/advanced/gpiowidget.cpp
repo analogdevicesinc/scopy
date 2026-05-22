@@ -22,11 +22,10 @@
 #include "ad9371widgetfactory.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QScrollArea>
 #include <QLabel>
 #include <QSpacerItem>
-#include <QGroupBox>
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -98,12 +97,17 @@ void GpioWidget::setupUi()
 
 QWidget *GpioWidget::createGpio3v3Section(QWidget *parent)
 {
-	QGroupBox *widget = new QGroupBox("GPIO 3.3V", parent);
+	QWidget *widget = new QWidget(parent);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	layout->setContentsMargins(10, 15, 10, 10);
 	layout->setSpacing(5);
+
+	QLabel *title = new QLabel("GPIO 3.3V", widget);
+	Style::setStyle(title, style::properties::label::menuMedium);
+	layout->addWidget(title);
 
 	QMap<QString, QString> srcCtrl3v3Map;
 	srcCtrl3v3Map.insert("1", "LEVELTRANSLATE_MODE");
@@ -111,7 +115,9 @@ QWidget *GpioWidget::createGpio3v3Section(QWidget *parent)
 	srcCtrl3v3Map.insert("3", "BITBANG_MODE");
 	srcCtrl3v3Map.insert("4", "EXTATTEN_LUT_MODE");
 
-	// Pin group rows: [0..3], [4..7], [8..11]
+	QGridLayout *grid = new QGridLayout();
+	grid->setSpacing(5);
+
 	struct
 	{
 		int startPin;
@@ -124,48 +130,50 @@ QWidget *GpioWidget::createGpio3v3Section(QWidget *parent)
 		{8, 11, "[8 ... 11]", "adi,gpio-3v3-src-ctrl11_8"},
 	};
 
+	int row = 0;
 	for(const auto &g : groups) {
-		QWidget *row = new QWidget(widget);
-		QHBoxLayout *rowLayout = new QHBoxLayout(row);
-		rowLayout->setContentsMargins(0, 2, 0, 2);
-		rowLayout->setSpacing(5);
-
-		rowLayout->addWidget(new QLabel(g.label, row));
+		grid->addWidget(new QLabel(g.label, widget), row, 0);
 
 		auto *srcCtrl =
-			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, g.attr, srcCtrl3v3Map, "", row);
+			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, g.attr, srcCtrl3v3Map, "", widget);
 		if(srcCtrl) {
 			if(m_widgetGroup)
 				m_widgetGroup->add(srcCtrl);
-			rowLayout->addWidget(srcCtrl);
+			grid->addWidget(srcCtrl, row, 1);
 			m_widgets.append(srcCtrl);
 			connect(this, &GpioWidget::readRequested, srcCtrl, &IIOWidget::readAsync);
 		}
 
 		for(int pin = g.startPin; pin <= g.endPin; pin++) {
-			auto *sw = new MenuOnOffSwitch("ENABLE", row);
+			auto *sw = new MenuOnOffSwitch(QString("GPIO %1").arg(pin, -2), widget);
 			sw->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-			rowLayout->addWidget(sw);
+			grid->addWidget(sw, row, 2 + (pin - g.startPin), Qt::AlignLeft);
 			m_gpio3v3OeBits.append(sw);
 			connect(sw->onOffswitch(), &QAbstractButton::toggled, this,
 				&GpioWidget::onGpio3v3OeMaskChanged);
 		}
 
-		layout->addWidget(row);
+		row++;
 	}
 
+	layout->addLayout(grid);
 	layout->addStretch();
 	return widget;
 }
 
 QWidget *GpioWidget::createGpioSection(QWidget *parent)
 {
-	QGroupBox *widget = new QGroupBox("GPIO Low Voltage", parent);
+	QWidget *widget = new QWidget(parent);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	layout->setContentsMargins(10, 15, 10, 10);
 	layout->setSpacing(5);
+
+	QLabel *title = new QLabel("GPIO Low Voltage", widget);
+	Style::setStyle(title, style::properties::label::menuMedium);
+	layout->addWidget(title);
 
 	QMap<QString, QString> srcCtrlMap;
 	srcCtrlMap.insert("0", "MONITOR_MODE");
@@ -173,7 +181,9 @@ QWidget *GpioWidget::createGpioSection(QWidget *parent)
 	srcCtrlMap.insert("9", "ARM_OUT_MODE");
 	srcCtrlMap.insert("10", "SLICER_OUT_MODE");
 
-	// Pin group rows: [0..3], [4..7], [8..11], [12..15], [16..18]
+	QGridLayout *grid = new QGridLayout();
+	grid->setSpacing(5);
+
 	struct
 	{
 		int startPin;
@@ -186,35 +196,32 @@ QWidget *GpioWidget::createGpioSection(QWidget *parent)
 		{16, 18, "[16 ... 18]", "adi,gpio-src-ctrl18_16"},
 	};
 
+	int row = 0;
 	for(const auto &g : groups) {
-		QWidget *row = new QWidget(widget);
-		QHBoxLayout *rowLayout = new QHBoxLayout(row);
-		rowLayout->setContentsMargins(0, 2, 0, 2);
-		rowLayout->setSpacing(5);
-
-		rowLayout->addWidget(new QLabel(g.label, row));
+		grid->addWidget(new QLabel(g.label, widget), row, 0);
 
 		auto *srcCtrl =
-			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, g.attr, srcCtrlMap, "", row);
+			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, g.attr, srcCtrlMap, "", widget);
 		if(srcCtrl) {
 			if(m_widgetGroup)
 				m_widgetGroup->add(srcCtrl);
-			rowLayout->addWidget(srcCtrl);
+			grid->addWidget(srcCtrl, row, 1);
 			m_widgets.append(srcCtrl);
 			connect(this, &GpioWidget::readRequested, srcCtrl, &IIOWidget::readAsync);
 		}
 
 		for(int pin = g.startPin; pin <= g.endPin; pin++) {
-			auto *sw = new MenuOnOffSwitch("ENABLE", row);
+			auto *sw = new MenuOnOffSwitch(QString("GPIO %1").arg(pin, -2), widget);
 			sw->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-			rowLayout->addWidget(sw);
+			grid->addWidget(sw, row, 2 + (pin - g.startPin), Qt::AlignLeft);
 			m_gpioOeBits.append(sw);
 			connect(sw->onOffswitch(), &QAbstractButton::toggled, this, &GpioWidget::onGpioOeMaskChanged);
 		}
 
-		layout->addWidget(row);
+		row++;
 	}
 
+	layout->addLayout(grid);
 	layout->addStretch();
 	return widget;
 }

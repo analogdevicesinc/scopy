@@ -26,7 +26,6 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QSpacerItem>
-#include <QGroupBox>
 #include <QPushButton>
 #include <iio-widgets/iiowidget.h>
 #include <QLoggingCategory>
@@ -98,11 +97,15 @@ QWidget *BistWidget::createBistControlsSection(QWidget *parent)
 	containerLayout->setSpacing(10);
 
 	// TX NCO section
-	QGroupBox *ncoGroup = new QGroupBox("TX NCO", container);
+	QWidget *ncoGroup = new QWidget(container);
+	Style::setBackgroundColor(ncoGroup, json::theme::background_primary);
 	Style::setStyle(ncoGroup, style::properties::widget::border_interactive);
 	QVBoxLayout *ncoLayout = new QVBoxLayout(ncoGroup);
 	ncoLayout->setContentsMargins(10, 15, 10, 10);
 	ncoLayout->setSpacing(5);
+	QLabel *ncoTitle = new QLabel("TX NCO", ncoGroup);
+	Style::setStyle(ncoTitle, style::properties::label::menuMedium);
+	ncoLayout->addWidget(ncoTitle);
 
 	m_ncoEnableCheckbox = new QCheckBox("ENABLE", ncoGroup);
 	ncoLayout->addWidget(m_ncoEnableCheckbox);
@@ -122,11 +125,15 @@ QWidget *BistWidget::createBistControlsSection(QWidget *parent)
 	containerLayout->addWidget(ncoGroup);
 
 	// TX -> RX Loopback section
-	QGroupBox *txRxGroup = new QGroupBox("TX -> RX Loopback", container);
+	QWidget *txRxGroup = new QWidget(container);
+	Style::setBackgroundColor(txRxGroup, json::theme::background_primary);
 	Style::setStyle(txRxGroup, style::properties::widget::border_interactive);
 	QVBoxLayout *txRxLayout = new QVBoxLayout(txRxGroup);
 	txRxLayout->setContentsMargins(10, 15, 10, 10);
 	txRxLayout->setSpacing(5);
+	QLabel *txRxTitle = new QLabel("TX -> RX Loopback", txRxGroup);
+	Style::setStyle(txRxTitle, style::properties::label::menuMedium);
+	txRxLayout->addWidget(txRxTitle);
 
 	auto loopbackTxRxWidget = Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, "loopback_tx_rx", "ENABLE");
 	if(loopbackTxRxWidget) {
@@ -139,11 +146,15 @@ QWidget *BistWidget::createBistControlsSection(QWidget *parent)
 	containerLayout->addWidget(txRxGroup);
 
 	// TX -> OBS Loopback section
-	QGroupBox *txObsGroup = new QGroupBox("TX -> OBS Loopback", container);
+	QWidget *txObsGroup = new QWidget(container);
+	Style::setBackgroundColor(txObsGroup, json::theme::background_primary);
 	Style::setStyle(txObsGroup, style::properties::widget::border_interactive);
 	QVBoxLayout *txObsLayout = new QVBoxLayout(txObsGroup);
 	txObsLayout->setContentsMargins(10, 15, 10, 10);
 	txObsLayout->setSpacing(5);
+	QLabel *txObsTitle = new QLabel("TX -> OBS Loopback", txObsGroup);
+	Style::setStyle(txObsTitle, style::properties::label::menuMedium);
+	txObsLayout->addWidget(txObsTitle);
 
 	auto loopbackTxObsWidget =
 		Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, "loopback_tx_obs", "ENABLE");
@@ -157,11 +168,15 @@ QWidget *BistWidget::createBistControlsSection(QWidget *parent)
 	containerLayout->addWidget(txObsGroup);
 
 	// Framer PRBS section
-	QGroupBox *prbsGroup = new QGroupBox("Framer PRBS", container);
+	QWidget *prbsGroup = new QWidget(container);
+	Style::setBackgroundColor(prbsGroup, json::theme::background_primary);
 	Style::setStyle(prbsGroup, style::properties::widget::border_interactive);
 	QVBoxLayout *prbsLayout = new QVBoxLayout(prbsGroup);
 	prbsLayout->setContentsMargins(10, 15, 10, 10);
 	prbsLayout->setSpacing(5);
+	QLabel *prbsTitle = new QLabel("Framer PRBS", prbsGroup);
+	Style::setStyle(prbsTitle, style::properties::label::menuMedium);
+	prbsLayout->addWidget(prbsTitle);
 
 	QMap<QString, QString> prbsOptions;
 	prbsOptions.insert("0", "Off");

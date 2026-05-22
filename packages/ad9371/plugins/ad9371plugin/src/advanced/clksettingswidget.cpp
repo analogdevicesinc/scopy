@@ -68,7 +68,14 @@ void ClkSettingsWidget::setupUi()
 	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
 		"Clock Settings", MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, contentWidget);
 
-	createClockControls(section->contentLayout());
+	QWidget *contentContainer = new QWidget(section);
+	Style::setBackgroundColor(contentContainer, json::theme::background_primary);
+	Style::setStyle(contentContainer, style::properties::widget::border_interactive);
+	QVBoxLayout *containerLayout = new QVBoxLayout(contentContainer);
+	containerLayout->setContentsMargins(10, 10, 10, 10);
+	containerLayout->setSpacing(10);
+	createClockControls(containerLayout);
+	section->contentLayout()->addWidget(contentContainer);
 
 	contentLayout->addWidget(section);
 	contentLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
@@ -87,7 +94,7 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	if(deviceClockWidget) {
 		if(m_widgetGroup)
 			m_widgetGroup->add(deviceClockWidget);
-		Style::setStyle(deviceClockWidget, style::properties::widget::basicBackground, true, true);
+
 		parentLayout->addWidget(deviceClockWidget);
 		m_widgets.append(deviceClockWidget);
 		connect(this, &ClkSettingsWidget::readRequested, deviceClockWidget, &IIOWidget::readAsync);
@@ -99,7 +106,7 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	if(pllVcoFreqWidget) {
 		if(m_widgetGroup)
 			m_widgetGroup->add(pllVcoFreqWidget);
-		Style::setStyle(pllVcoFreqWidget, style::properties::widget::basicBackground, true, true);
+
 		parentLayout->addWidget(pllVcoFreqWidget);
 		m_widgets.append(pllVcoFreqWidget);
 		connect(this, &ClkSettingsWidget::readRequested, pllVcoFreqWidget, &IIOWidget::readAsync);
@@ -117,7 +124,7 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	if(vcoDivWidget) {
 		if(m_widgetGroup)
 			m_widgetGroup->add(vcoDivWidget);
-		Style::setStyle(vcoDivWidget, style::properties::widget::basicBackground, true, true);
+
 		parentLayout->addWidget(vcoDivWidget);
 		m_widgets.append(vcoDivWidget);
 		connect(this, &ClkSettingsWidget::readRequested, vcoDivWidget, &IIOWidget::readAsync);
@@ -129,7 +136,7 @@ void ClkSettingsWidget::createClockControls(QVBoxLayout *parentLayout)
 	if(hsDivWidget) {
 		if(m_widgetGroup)
 			m_widgetGroup->add(hsDivWidget);
-		Style::setStyle(hsDivWidget, style::properties::widget::basicBackground, true, true);
+
 		parentLayout->addWidget(hsDivWidget);
 		m_widgets.append(hsDivWidget);
 		connect(this, &ClkSettingsWidget::readRequested, hsDivWidget, &IIOWidget::readAsync);

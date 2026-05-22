@@ -26,7 +26,6 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QSpacerItem>
-#include <QGroupBox>
 #include <QCheckBox>
 #include <iio-widgets/iiowidget.h>
 #include <QLoggingCategory>
