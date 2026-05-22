@@ -84,7 +84,7 @@ bool RegMap_API::setDevice(QString device)
 	return false;
 }
 
-QList<QString> RegMap_API::search(const QString &searchParam)
+QList<QString> RegMap_API::search(QString searchParam)
 {
 	QList<uint32_t> resultIndexes;
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
@@ -101,7 +101,7 @@ QList<QString> RegMap_API::search(const QString &searchParam)
 	return resultList;
 }
 
-void RegMap_API::readInterval(const QString &startAddr, const QString &stopAddr)
+void RegMap_API::readInterval(QString startAddr, QString stopAddr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
 	if(!devRegMap) {

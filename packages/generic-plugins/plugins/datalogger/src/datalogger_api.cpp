@@ -51,7 +51,7 @@ QString DataLogger_API::showAvailableDevices()
 	return availableDevices;
 }
 
-QString DataLogger_API::showMonitorsOfDevice(const QString &device)
+QString DataLogger_API::showMonitorsOfDevice(QString device)
 {
 	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
 		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
@@ -86,7 +86,7 @@ QString DataLogger_API::showAvailableMonitors()
 	return availableDevices;
 }
 
-QString DataLogger_API::enableMonitor(const QString &monitor)
+QString DataLogger_API::enableMonitor(QString monitor)
 {
 	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
 		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
@@ -102,7 +102,7 @@ QString DataLogger_API::enableMonitor(const QString &monitor)
 	return "Success";
 }
 
-QString DataLogger_API::disableMonitor(const QString &monitor)
+QString DataLogger_API::disableMonitor(QString monitor)
 {
 	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
 		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
