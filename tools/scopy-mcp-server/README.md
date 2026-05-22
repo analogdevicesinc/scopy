@@ -13,6 +13,7 @@ Claude Code ──(MCP stdio)──> scopy-mcp-server ──(FIFO or PTY)──>
 
 - **Linux** (uses Unix named pipes)
 - **Python 3.10+**
+- **[uv](https://docs.astral.sh/uv/)** — Python package runner
 - **Scopy** installed — [download here](https://github.com/analogdevicesinc/scopy/releases)
 - **Claude Code** (CLI, desktop, or IDE extension)
 
