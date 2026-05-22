@@ -9,8 +9,10 @@ The bridge is initialized lazily — Scopy is never started automatically.
 If no Scopy is running when a tool is called, the user is notified and
 given the option to call start_scopy() explicitly.
 
-Environment variables:
-    SCOPY_PATH  Path to the Scopy binary (default: "scopy")
+Binary discovery order:
+    1. <project_root>/build/scopy  (relative build path)
+    2. SCOPY_PATH env var          (user override)
+    3. "scopy" on system PATH      (fallback)
 """
 
 import atexit
@@ -112,15 +114,28 @@ def start_scopy() -> str:
     if bridge.is_ready():
         return "Scopy is already running and connected."
 
-    scopy_path = os.environ.get("SCOPY_PATH", "scopy")
-    resolved = shutil.which(scopy_path)
-    if resolved is None:
-        return (
-            f"Scopy binary not found at '{scopy_path}'. "
-            "Set the SCOPY_PATH environment variable in .mcp.json, "
-            "or ensure 'scopy' is on your PATH."
-        )
-    scopy_path = resolved
+    project_root = pathlib.Path(__file__).resolve().parents[3]
+    relative_build = project_root / "build" / "scopy"
+
+    if relative_build.is_file():
+        scopy_path = str(relative_build)
+    elif os.environ.get("SCOPY_PATH"):
+        scopy_path = os.environ["SCOPY_PATH"]
+        resolved = shutil.which(scopy_path)
+        if resolved is None:
+            return f"Scopy binary not found at '{scopy_path}' (from SCOPY_PATH)."
+        scopy_path = resolved
+    else:
+        resolved = shutil.which("scopy")
+        if resolved is None:
+            return (
+                "Scopy binary not found. Looked in:\n"
+                f"  1. {relative_build}\n"
+                "  2. SCOPY_PATH env var (not set)\n"
+                "  3. System PATH\n"
+                "Set SCOPY_PATH in .mcp.json or ensure 'scopy' is on your PATH."
+            )
+        scopy_path = resolved
 
     logger.info(f"Launching Scopy from {scopy_path}...")
     try:
