@@ -24,7 +24,6 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLabel>
-#include <QGroupBox>
 #include <QSpacerItem>
 #include <iio-widgets/iiowidget.h>
 #include <QLoggingCategory>
@@ -96,28 +95,35 @@ QWidget *ObsSettingsWidget::createObsSettingsSection(QWidget *parent)
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	// #1-5: CHECKBOX_MASK bits 0-4 on adi,obs-settings-obs-rx-channels-enable
-	QGroupBox *chEnableGroup = new QGroupBox("CHANNEL ENABLE", widget);
-	QGridLayout *chEnableLayout = new QGridLayout(chEnableGroup);
+	QWidget *chEnableGroup = new QWidget(widget);
+	Style::setBackgroundColor(chEnableGroup, json::theme::background_primary);
+	Style::setStyle(chEnableGroup, style::properties::widget::border_interactive);
+	QVBoxLayout *chEnableOuter = new QVBoxLayout(chEnableGroup);
+	QLabel *chEnableTitle = new QLabel("CHANNEL ENABLE", chEnableGroup);
+	Style::setStyle(chEnableTitle, style::properties::label::menuMedium);
+	chEnableOuter->addWidget(chEnableTitle);
+	QGridLayout *chEnableLayout = new QGridLayout();
+	chEnableOuter->addLayout(chEnableLayout);
 
 	m_chEnable0 = new MenuOnOffSwitch("ORX1", chEnableGroup);
 	m_chEnable0->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	chEnableLayout->addWidget(m_chEnable0, 0, 0);
+	chEnableLayout->addWidget(m_chEnable0, 0, 0, Qt::AlignLeft);
 
 	m_chEnable1 = new MenuOnOffSwitch("ORX2", chEnableGroup);
 	m_chEnable1->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	chEnableLayout->addWidget(m_chEnable1, 0, 1);
+	chEnableLayout->addWidget(m_chEnable1, 0, 1, Qt::AlignLeft);
 
 	m_chEnable2 = new MenuOnOffSwitch("SNRXA", chEnableGroup);
 	m_chEnable2->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	chEnableLayout->addWidget(m_chEnable2, 1, 0);
+	chEnableLayout->addWidget(m_chEnable2, 1, 0, Qt::AlignLeft);
 
 	m_chEnable3 = new MenuOnOffSwitch("SNRXB", chEnableGroup);
 	m_chEnable3->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	chEnableLayout->addWidget(m_chEnable3, 1, 1);
+	chEnableLayout->addWidget(m_chEnable3, 1, 1, Qt::AlignLeft);
 
 	m_chEnable4 = new MenuOnOffSwitch("SNRXC", chEnableGroup);
 	m_chEnable4->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	chEnableLayout->addWidget(m_chEnable4, 1, 2);
+	chEnableLayout->addWidget(m_chEnable4, 1, 2, Qt::AlignLeft);
 
 	connect(m_chEnable0->onOffswitch(), &QAbstractButton::toggled, this,
 		&ObsSettingsWidget::writeChannelEnableToDevice);

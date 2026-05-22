@@ -25,7 +25,6 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QSpacerItem>
-#include <QGroupBox>
 #include <iio-widgets/iiowidget.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -100,12 +99,17 @@ void CalibrationWidget::setupUi()
 
 QWidget *CalibrationWidget::createCalibrationMaskGroup(QWidget *parent)
 {
-	QGroupBox *widget = new QGroupBox("INIT Calibrations", parent);
+	QWidget *widget = new QWidget(parent);
+	Style::setBackgroundColor(widget, json::theme::background_primary);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	layout->setContentsMargins(10, 15, 10, 10);
 	layout->setSpacing(10);
+
+	QLabel *title = new QLabel("INIT Calibrations", widget);
+	Style::setStyle(title, style::properties::label::menuMedium);
+	layout->addWidget(title);
 
 	// Bit 14: RX QEC
 	m_txQecCal = new MenuOnOffSwitch("RX QEC", widget);

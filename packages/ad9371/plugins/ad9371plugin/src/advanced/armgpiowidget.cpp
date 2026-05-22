@@ -26,7 +26,6 @@
 #include <QScrollArea>
 #include <QLabel>
 #include <QSpacerItem>
-#include <QGroupBox>
 #include <iio-widgets/iiowidget.h>
 #include <QLoggingCategory>
 #include <style.h>
@@ -91,12 +90,17 @@ void ArmGpioWidget::setupUi()
 
 QWidget *ArmGpioWidget::createGpioConfigSection(QWidget *parent)
 {
-	QGroupBox *group = new QGroupBox("Mode", parent);
+	QWidget *group = new QWidget(parent);
+	Style::setBackgroundColor(group, json::theme::background_primary);
 	Style::setStyle(group, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(group);
 	layout->setContentsMargins(10, 15, 10, 10);
 	layout->setSpacing(5);
+
+	QLabel *title = new QLabel("Mode", group);
+	Style::setStyle(title, style::properties::label::menuMedium);
+	layout->addWidget(title);
 
 	// 4 checkboxes
 	struct
@@ -113,6 +117,7 @@ QWidget *ArmGpioWidget::createGpioConfigSection(QWidget *parent)
 	for(const auto &a : checkboxAttrs) {
 		auto w = Ad9371WidgetFactory::createDebugCheckboxWidget(m_device, a.attr, a.title, group);
 		if(w) {
+			w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 			if(m_widgetGroup)
 				m_widgetGroup->add(w);
 			layout->addWidget(w);
@@ -149,12 +154,17 @@ QWidget *ArmGpioWidget::createGpioConfigSection(QWidget *parent)
 
 QWidget *ArmGpioWidget::createEnableAckSection(QWidget *parent)
 {
-	QGroupBox *group = new QGroupBox("ACK", parent);
+	QWidget *group = new QWidget(parent);
+	Style::setBackgroundColor(group, json::theme::background_primary);
 	Style::setStyle(group, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(group);
 	layout->setContentsMargins(10, 15, 10, 10);
 	layout->setSpacing(5);
+
+	QLabel *ackTitle = new QLabel("ACK", group);
+	Style::setStyle(ackTitle, style::properties::label::menuMedium);
+	layout->addWidget(ackTitle);
 
 	// Each enable-ack attr has a lower 4-bit range widget and a bit-4 checkbox.
 	// The range widget reads/writes the lower 4 bits via standard IIOWidget [0,15,1].
@@ -196,6 +206,7 @@ QWidget *ArmGpioWidget::createEnableAckSection(QWidget *parent)
 
 		// Bit 4 checkbox (CHECKBOX_MASK pattern)
 		MenuOnOffSwitch *bit4Switch = new MenuOnOffSwitch(a.bit4Title, row);
+		bit4Switch->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 		rowLayout->addWidget(bit4Switch);
 		m_enableAckBit4.append(bit4Switch);
 		m_enableAckAttrNames.append(a.attr);
