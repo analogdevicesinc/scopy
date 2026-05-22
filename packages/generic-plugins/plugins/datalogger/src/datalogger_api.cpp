@@ -94,7 +94,7 @@ QString DataLogger_API::enableMonitor(const QString &monitor)
 	}
 
 	if(!m_dataLoggerPlugin->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-		return "Selected monitor dosen't exists";
+		return "Selected monitor doesn't exist";
 	} else {
 		m_dataLoggerPlugin->m_dataAcquisitionManager->updateActiveMonitors(true, monitor);
 	}
@@ -110,7 +110,7 @@ QString DataLogger_API::disableMonitor(const QString &monitor)
 	}
 
 	if(!m_dataLoggerPlugin->m_dataAcquisitionManager->getActiveMonitors().contains(monitor)) {
-		return "Selected monitor dosen't exists or is already disabled";
+		return "Selected monitor doesn't exist or is already disabled";
 	} else {
 		m_dataLoggerPlugin->m_dataAcquisitionManager->updateActiveMonitors(false, monitor);
 	}
@@ -294,7 +294,7 @@ QString DataLogger_API::enableMonitorOfTool(const QString &toolName, const QStri
 			return "Error: MonitorTool is null";
 		}
 		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return "Selected monitor dosen't exists";
+			return "Selected monitor doesn't exist";
 		} else {
 			Q_EMIT monitorTool->m_monitorSelectionMenu->requestMonitorToggled(true, monitor);
 		}
@@ -317,7 +317,7 @@ QString DataLogger_API::disableMonitorOfTool(const QString &toolName, const QStr
 			return "Error: MonitorTool is null";
 		}
 		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return "Selected monitor dosen't exists";
+			return "Selected monitor doesn't exist";
 		} else {
 			Q_EMIT monitorTool->m_monitorSelectionMenu->requestMonitorToggled(false, monitor);
 		}
