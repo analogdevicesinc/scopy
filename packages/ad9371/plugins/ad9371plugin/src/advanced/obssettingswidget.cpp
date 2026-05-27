@@ -225,9 +225,9 @@ QWidget *ObsSettingsWidget::createObsProfileSection(QWidget *parent)
 
 	// #11: adi,obs-profile-rx-fir-decimation - Combo {1:"DECIMATE by 1", 2:"DECIMATE by 2", 4:"DECIMATE by 4"}
 	QMap<QString, QString> firDecOptions;
-	firDecOptions.insert("1", "DECIMATE by 1");
-	firDecOptions.insert("2", "DECIMATE by 2");
-	firDecOptions.insert("4", "DECIMATE by 4");
+	firDecOptions.insert("1", "DECIMATE_by_1");
+	firDecOptions.insert("2", "DECIMATE_by_2");
+	firDecOptions.insert("4", "DECIMATE_by_4");
 	IIOWidget *firDec = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,obs-profile-rx-fir-decimation", firDecOptions, "RX FIR");
 	if(firDec) {
@@ -326,9 +326,9 @@ QWidget *ObsSettingsWidget::createSnifferProfileSection(QWidget *parent)
 
 	// #19: adi,sniffer-profile-rx-fir-decimation - Combo {1:"DECIMATE by 1", 2:"DECIMATE by 2", 4:"DECIMATE by 4"}
 	QMap<QString, QString> firDecOptions;
-	firDecOptions.insert("1", "DECIMATE by 1");
-	firDecOptions.insert("2", "DECIMATE by 2");
-	firDecOptions.insert("4", "DECIMATE by 4");
+	firDecOptions.insert("1", "DECIMATE_by_1");
+	firDecOptions.insert("2", "DECIMATE_by_2");
+	firDecOptions.insert("4", "DECIMATE_by_4");
 	IIOWidget *firDec = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,sniffer-profile-rx-fir-decimation", firDecOptions, "RX FIR");
 	if(firDec) {

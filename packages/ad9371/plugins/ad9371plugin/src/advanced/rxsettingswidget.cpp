@@ -170,9 +170,9 @@ QWidget *RxSettingsWidget::createRxProfileSection(QWidget *parent)
 
 	// 2. RX FIR Decimation - Combo {1:"DECIMATE by 1", 2:"DECIMATE by 2", 4:"DECIMATE by 4"}
 	QMap<QString, QString> firDecimationOptions;
-	firDecimationOptions.insert("1", "DECIMATE by 1");
-	firDecimationOptions.insert("2", "DECIMATE by 2");
-	firDecimationOptions.insert("4", "DECIMATE by 4");
+	firDecimationOptions.insert("1", "DECIMATE_by_1");
+	firDecimationOptions.insert("2", "DECIMATE_by_2");
+	firDecimationOptions.insert("4", "DECIMATE_by_4");
 	auto firDecimation = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,rx-profile-rx-fir-decimation", firDecimationOptions, "RX FIR");
 	if(firDecimation) {

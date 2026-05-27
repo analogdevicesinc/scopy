@@ -27,6 +27,7 @@
 #include <iio-widgets/iiowidgetgroup.h>
 #include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
+#include <QMetaObject>
 #include <iio.h>
 #include <cmath>
 #include <QDir>
@@ -193,19 +194,20 @@ void Ad9371_API::writeToWidget(const QString &key, const QString &value)
 	} else if(!optionalData.isEmpty()) {
 		// Combo widget: validate against display options; also accept raw numeric IIO values.
 		QStringList validOptions = optionalData.split(" ", Qt::SkipEmptyParts);
-		if(!validOptions.contains(data)) {
-			// optionalData holds display strings (e.g. "VCO_DIV_1 VCO_DIV_2"); the IIO driver
-			// stores numeric values ("0", "1", ...). Accept integers as raw IIO values and let
-			// the driver enforce its own validation.
-			bool ok;
-			data.toLongLong(&ok);
-			if(!ok) {
-				qWarning(CAT_AD9371_API) << "Value" << value << "is not valid for key" << key
-							 << "- valid options:" << optionalData;
-				return;
-			}
-			// Numeric value: fall through and write directly to IIO
+		if(validOptions.contains(data)) {
+			// Display label: invoke the widget's UI→DS conversion slot.
+			// convertUItoDS applies m_UItoDS (label→key) then calls saveData→writeAsync.
+			QMetaObject::invokeMethod(widget, "convertUItoDS", Qt::DirectConnection, Q_ARG(QString, data));
+			return;
 		}
+		bool ok;
+		data.toLongLong(&ok);
+		if(!ok) {
+			qWarning(CAT_AD9371_API) << "Value" << value << "is not valid for key" << key
+						 << "- valid options:" << optionalData;
+			return;
+		}
+		// Raw numeric: fall through and write directly to IIO
 	}
 
 	// Signed 8-bit attributes (DPD weights): convert signed UI value to unsigned for kernel

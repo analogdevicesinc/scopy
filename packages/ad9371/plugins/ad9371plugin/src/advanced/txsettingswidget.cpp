@@ -133,10 +133,10 @@ QWidget *TxSettingsWidget::createTxSettingsSection(QWidget *parent)
 
 	// TX Atten Step Size - ComboUi
 	QMap<QString, QString> attenStepOptions;
-	attenStepOptions.insert("0", "ATTEN STEP 0.05 dB");
-	attenStepOptions.insert("1", "ATTEN STEP 0.10 dB");
-	attenStepOptions.insert("2", "ATTEN STEP 0.20 dB");
-	attenStepOptions.insert("3", "ATTEN STEP 0.40 dB");
+	attenStepOptions.insert("0", "ATTEN_STEP_0.05_dB");
+	attenStepOptions.insert("1", "ATTEN_STEP_0.10_dB");
+	attenStepOptions.insert("2", "ATTEN_STEP_0.20_dB");
+	attenStepOptions.insert("3", "ATTEN_STEP_0.40_dB");
 	auto attenStepWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,tx-settings-tx-atten-step-size", attenStepOptions, "STEP SIZE", this);
 	if(attenStepWidget) {
@@ -188,9 +188,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 
 	// DAC Div - ComboUi
 	QMap<QString, QString> dacDivOptions;
-	dacDivOptions.insert("0", "DAC DIV 2");
-	dacDivOptions.insert("1", "DAC DIV 2.5");
-	dacDivOptions.insert("2", "DAC DIV 4");
+	dacDivOptions.insert("0", "DAC_DIV_2");
+	dacDivOptions.insert("1", "DAC_DIV_2.5");
+	dacDivOptions.insert("2", "DAC_DIV_4");
 	auto dacDivWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, "adi,tx-profile-dac-div",
 									      dacDivOptions, "DAC DIV", this);
 	if(dacDivWidget) {
@@ -203,9 +203,9 @@ QWidget *TxSettingsWidget::createTxProfileSection(QWidget *parent)
 
 	// TX FIR Interpolation - ComboUi
 	QMap<QString, QString> txFirInterpOptions;
-	txFirInterpOptions.insert("1", "INTERPOLATE by 1");
-	txFirInterpOptions.insert("2", "INTERPOLATE by 2");
-	txFirInterpOptions.insert("4", "INTERPOLATE by 4");
+	txFirInterpOptions.insert("1", "INTERPOLATE_by_1");
+	txFirInterpOptions.insert("2", "INTERPOLATE_by_2");
+	txFirInterpOptions.insert("4", "INTERPOLATE_by_4");
 	auto txFirInterpWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(
 		m_device, "adi,tx-profile-tx-fir-interpolation", txFirInterpOptions, "TX FIR", this);
 	if(txFirInterpWidget) {
