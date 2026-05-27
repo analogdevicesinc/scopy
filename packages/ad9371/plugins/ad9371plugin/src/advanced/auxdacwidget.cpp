@@ -142,8 +142,8 @@ QWidget *AuxDacWidget::createAuxDacSection(QWidget *parent)
 		// Slope widget - DebugCustomComboWidget
 		QString slopeAttr = QString("adi,aux-dac-slope%1").arg(i);
 		QMap<QString, QString> slopeMap;
-		slopeMap["0"] = "DAC SLOPE 1.404mV";
-		slopeMap["1"] = "DAC SLOPE 0.705mV";
+		slopeMap["0"] = "DAC_SLOPE_1.404mV";
+		slopeMap["1"] = "DAC_SLOPE_0.705mV";
 		IIOWidget *slopeWidget = Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, slopeAttr,
 											   slopeMap, "DAC SLOPE", this);
 		configGrid->addWidget(slopeWidget, row, 3);
@@ -157,10 +157,10 @@ QWidget *AuxDacWidget::createAuxDacSection(QWidget *parent)
 		// VRef widget - DebugCustomComboWidget
 		QString vrefAttr = QString("adi,aux-dac-vref%1").arg(i);
 		QMap<QString, QString> vrefMap;
-		vrefMap["0"] = "VREF 1 V";
-		vrefMap["1"] = "VREF 1.5 V";
-		vrefMap["2"] = "VREF 2 V";
-		vrefMap["3"] = "VREF 2.5 V";
+		vrefMap["0"] = "VREF_1_V";
+		vrefMap["1"] = "VREF_1.5_V";
+		vrefMap["2"] = "VREF_2_V";
+		vrefMap["3"] = "VREF_2.5_V";
 		IIOWidget *vrefWidget =
 			Ad9371WidgetFactory::createDebugCustomComboWidget(m_device, vrefAttr, vrefMap, "VREF", this);
 		configGrid->addWidget(vrefWidget, row, 4);
