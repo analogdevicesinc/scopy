@@ -81,10 +81,10 @@ void Ad9371Plugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("ad9371tool", "AD9371",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("AD9371 Advanced", "AD9371 Advanced",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 }
 
 void Ad9371Plugin::unload() {}

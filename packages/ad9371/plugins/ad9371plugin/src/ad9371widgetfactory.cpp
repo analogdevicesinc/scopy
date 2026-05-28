@@ -110,15 +110,9 @@ IIOWidget *Ad9371WidgetFactory::createRangeWidget(iio_device *device, QString at
 IIOWidget *Ad9371WidgetFactory::createReadOnlyWidget(iio_device *device, QString attr, QString title, bool compactMode,
 						     QWidget *parent)
 {
-	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
-				    .title(title)
-				    .compactMode(compactMode)
-				    .buildSingle();
+	IIOWidget *widget = IIOWidgetBuilder(parent).device(device).attribute(attr).title(title).buildSingle();
 	if(widget) {
 		widget->setEnabled(false);
-		widget->showProgressBar(false);
 	}
 	return widget;
 }
@@ -178,15 +172,9 @@ IIOWidget *Ad9371WidgetFactory::createRangeWidget(iio_channel *channel, QString 
 IIOWidget *Ad9371WidgetFactory::createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
 						     bool compactMode, QWidget *parent)
 {
-	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .channel(channel)
-				    .attribute(attr)
-				    .title(title)
-				    .compactMode(compactMode)
-				    .buildSingle();
+	IIOWidget *widget = IIOWidgetBuilder(parent).channel(channel).attribute(attr).title(title).buildSingle();
 	if(widget) {
 		widget->setEnabled(false);
-		widget->showProgressBar(false);
 	}
 	return widget;
 }
