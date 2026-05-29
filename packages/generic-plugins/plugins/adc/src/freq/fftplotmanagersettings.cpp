@@ -40,7 +40,7 @@ FFTPlotManagerSettings::FFTPlotManagerSettings(FFTPlotManager *mgr, QWidget *par
 	QVBoxLayout *lay = new QVBoxLayout(parent);
 	lay->addWidget(w);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 	m_samplingInfo.bufferSize = 32;
 	m_samplingInfo.plotSize = 32;
@@ -98,7 +98,7 @@ QWidget *FFTPlotManagerSettings::createMenu(QWidget *parent)
 	m_menu->add(m_plotStack);
 
 	connect(m_plotCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_plotStack->show(QString(m_plotCb->combo()->currentData().toInt())); });
+		[=](int idx) { m_plotStack->show(QString::number(m_plotCb->combo()->currentData().toInt())); });
 
 	m_menu->add(m_addPlotBtn, "add", gui::MenuWidget::MA_BOTTOMLAST);
 
@@ -116,7 +116,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *xMinMax = new QWidget(section);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
-	xMinMaxLayout->setMargin(0);
+	xMinMaxLayout->setContentsMargins(0, 0, 0, 0);
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 
@@ -311,8 +311,8 @@ void FFTPlotManagerSettings::addPlot(FFTPlotComponent *p)
 		m_plotCb->combo()->setItemText(idx, newName);
 	});
 	m_plotCb->combo()->addItem(p->name(), p->uuid());
-	m_plotStack->add(QString(p->uuid()), plotMenu);
-	// m_menu->add(plotMenu, p->name() + QString(p->uuid()), gui::MenuWidget::MA_TOPLAST);
+	m_plotStack->add(QString::number(p->uuid()), plotMenu);
+	// m_menu->add(plotMenu, p->name() + QString::number(p->uuid()), gui::MenuWidget::MA_TOPLAST);
 	setPlotComboVisible();
 
 	connect(p->plotMenu(), &FFTPlotComponentSettings::requestSettings, this, [=]() {
@@ -344,7 +344,7 @@ void FFTPlotManagerSettings::removePlot(FFTPlotComponent *p)
 	// m_menu->remove(plotMenu);
 	int idx = m_plotCb->combo()->findData(p->uuid());
 	m_plotCb->combo()->removeItem(idx);
-	m_plotStack->remove(QString(p->uuid()));
+	m_plotStack->remove(QString::number(p->uuid()));
 
 	setPlotComboVisible();
 }
@@ -379,7 +379,7 @@ void FFTPlotManagerSettings::removeSampleRateProvider(SampleRateProvider *s) { m
 double FFTPlotManagerSettings::readSampleRate()
 {
 	double sr = 1;
-	for(SampleRateProvider *ch : qAsConst(m_sampleRateProviders)) {
+	for(SampleRateProvider *ch : std::as_const(m_sampleRateProviders)) {
 		if(ch->sampleRateAvailable()) {
 			sr = ch->sampleRate();
 			break;
