@@ -66,7 +66,7 @@ qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 if(ANDROID)
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
 else()
-	set(QWT_QT_VERSION qt5)
+	set(QWT_QT_VERSION qt6)
 	find_path(
 		QWT_INCLUDE_DIRS
 		NAMES qwt_global.h
@@ -107,8 +107,16 @@ endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)
-find_package(KDDockWidgets QUIET)
+find_package(
+	Qt${QT_VERSION_MAJOR}
+	COMPONENTS Widgets
+		   Xml
+		   Svg
+		   StateMachine
+		   OpenGLWidgets
+	REQUIRED
+)
+find_package(KDDockWidgets-qt6 QUIET)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
@@ -143,7 +151,7 @@ target_include_directories(
 			       ${Boost_INCLUDE_DIRS}
 )
 # Link optional libraries
-if(KDDockWidgets_FOUND)
+if(KDDockWidgets-qt6_FOUND)
 	target_link_libraries(${PROJECT_NAME} PUBLIC KDAB::kddockwidgets)
 endif()
 
@@ -152,6 +160,8 @@ target_link_libraries(
 	PUBLIC Qt${QT_VERSION_MAJOR}::Widgets
 	       Qt${QT_VERSION_MAJOR}::Xml
 	       Qt${QT_VERSION_MAJOR}::Svg
+	       Qt${QT_VERSION_MAJOR}::StateMachine
+	       Qt${QT_VERSION_MAJOR}::OpenGLWidgets
 	       ${QWT_LIBRARIES}
 	       ${Boost_LIBRARIES}
 	       scopy-common

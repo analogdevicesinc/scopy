@@ -127,7 +127,7 @@ target_link_libraries(
 	       scopy-pkg-manager
 	       Qt${QT_VERSION_MAJOR}::Xml
 	       libm2k::libm2k
-	       Qt5::Test
+	       Qt${QT_VERSION_MAJOR}::Test
 )
 
 set(REGNMAP_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

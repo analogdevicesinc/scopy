@@ -64,9 +64,9 @@ foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-find_package(KF5Archive QUIET)
-if(KF5Archive_FOUND)
-	target_link_libraries(${PROJECT_NAME} PUBLIC KF5::Archive)
+find_package(KF6Archive QUIET)
+if(KF6Archive_FOUND)
+	target_link_libraries(${PROJECT_NAME} PUBLIC KF6::Archive)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopy-common scopy-gui)
