@@ -69,8 +69,8 @@ void SymbolController::attachSymbol(Symbol *symbol)
 {
 	if(d_symbols.indexOf(symbol) == -1) {
 		d_symbols.push_back(symbol);
-		QObject::connect((const QObject *)symbol, SIGNAL(positionChanged(double)), this, SLOT(updateOverlay()));
-		QObject::connect((const QObject *)symbol, SIGNAL(visibilityChanged(bool)), this, SLOT(updateOverlay()));
+		connect(symbol, &Symbol::positionChanged, this, &SymbolController::updateOverlay);
+		connect(symbol, &Symbol::visibilityChanged, this, &SymbolController::updateOverlay);
 
 		d_overlay->updateOverlay();
 	}
@@ -79,8 +79,8 @@ void SymbolController::attachSymbol(Symbol *symbol)
 void SymbolController::detachSymbol(Symbol *symbol)
 {
 	d_symbols.removeOne(symbol);
-	QObject::disconnect((const QObject *)symbol, SIGNAL(positionChanged(double)), this, SLOT(updateOverlay()));
-	QObject::disconnect((const QObject *)symbol, SIGNAL(visibilityChanged(bool)), this, SLOT(updateOverlay()));
+	disconnect(symbol, &Symbol::positionChanged, this, &SymbolController::updateOverlay);
+	disconnect(symbol, &Symbol::visibilityChanged, this, &SymbolController::updateOverlay);
 	d_overlay->updateOverlay();
 }
 

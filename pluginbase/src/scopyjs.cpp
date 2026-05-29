@@ -71,8 +71,8 @@ void ScopyJS::init()
 		m_engine.globalObject().setProperty(name, js_obj.property(name));
 	}
 
-	m_engine.globalObject().setProperty("inspect()",
-					    m_engine.evaluate("(function(o) { for (each in o) { print(each); } })"));
+	m_engine.globalObject().setProperty(
+		"inspect()", m_engine.evaluate("(function(o) { for (var each in o) { print(each); } })"));
 	m_engine.installExtensions(QJSEngine::ConsoleExtension);
 	m_engine.globalObject().setProperty("fileIO", m_engine.newQObject(new JsFileIo(this)));
 
@@ -80,7 +80,7 @@ void ScopyJS::init()
 		// verify if stdin is a true TTY - prevents QtCreator Application output from flooding the application
 		// notifier->setEnabled(false);
 		notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
-		connect(notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
+		connect(notifier, &QSocketNotifier::activated, this, [this]() { hasText(); });
 	}
 
 	if(Preferences::get("general_mcp_server_enabled").toBool()) {
