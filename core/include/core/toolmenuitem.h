@@ -22,6 +22,7 @@
 #ifndef TOOLMENUITEM_H
 #define TOOLMENUITEM_H
 
+#include <QEnterEvent>
 #include <QPushButton>
 #include <QWidget>
 #include <customPushButton.h>
@@ -51,7 +52,7 @@ public Q_SLOTS:
 	void onCollapsed(bool collapsed);
 
 protected:
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void leaveEvent(QEvent *event);
 
 private:
