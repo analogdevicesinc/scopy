@@ -1,4 +1,4 @@
-name: Scopy arm64 AppImage Build
+name: Scopy arm64 Qt6 Build
 
 on:
     workflow_call:
@@ -6,8 +6,8 @@ on:
         docker_tag:
           required: true
           type: string
-      secrets: 
-        CLOUDSMITH_SERVICE_SLUG:
+      secrets:
+        CLOUDSMITH_API_KEY:
           required: true
 
 env:
@@ -16,10 +16,8 @@ env:
   CI_SCRIPT: "ON"
 
 jobs:
-  make_arm64_appimage:
-    runs-on: ubuntu-22.04
-    permissions:
-      id-token: write
+  make_arm64_qt6:
+    runs-on: ubuntu-24.04-arm
     steps:
 
         - name: check storage space
@@ -37,24 +35,21 @@ jobs:
                 fetch-depth: '0'
 
         - name: Pull the Docker Image
-          run: docker pull cristianbindea/scopy2-arm64-appimage:${{ inputs.docker_tag }}
+          run: |
+                echo ${{ secrets.CLOUDSMITH_API_KEY }} | docker login docker.cloudsmith.io -u ionut-muthi --password-stdin
+                docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:${{ inputs.docker_tag }}
 
-        - name: Create Scopy AppImage
+        - name: Build Scopy AppImage
           shell: bash
           run: |
-                cd $GITHUB_WORKSPACE
-                sudo apt update
-                ./ci/arm/create_sysroot.sh arm64  install_packages install_qemu
-                ./ci/arm/arm_build_process.sh arm64 generate_ci_envs
-
                 docker run \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
-                        --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
-                        cristianbindea/scopy2-arm64-appimage:${{ inputs.docker_tag }} \
+                        docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:${{ inputs.docker_tag }} \
                         /bin/bash -c    'cd $HOME && \
                                         sudo chown -R runner:runner scopy && \
                                         cd $HOME/scopy && \
-                                        ./ci/arm/arm_build_process.sh arm64 install_packages move_tools move_sysroot build_scopy build_iio-emu create_appdir create_appimage move_appimage
+                                        sudo apt-get update && sudo apt-get install -y squashfs-tools patchelf && \
+                                        ./ci/arm/arm_native_build_process.sh download_cmake generate_appimage
                                         '
         - name: Set short git commit SHA
           shell: bash
@@ -62,41 +57,8 @@ jobs:
 
         - uses: actions/upload-artifact@v7
           with:
-            name: scopy-arm64-appimage-${{ env.commit_sha }}
+            name: scopy-arm64-qt6-appimage-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy-arm64.AppImage
-
-        - name: Build Debian package
-          shell: bash
-          run: |
-            sudo apt-get install -y dpkg-dev debhelper devscripts rsync crossbuild-essential-arm64
-            ./ci/packaging/scopy-deb-build.sh scopy64 $GITHUB_WORKSPACE/Scopy-arm64.AppImage
-
-        - uses: actions/upload-artifact@v7
-          with:
-            name: scopy-arm64-deb-${{ env.commit_sha }}
-            path: |
-              ${{ github.workspace }}/scopy_*_arm64.deb
-              ${{ github.workspace }}/scopy_*.dsc
-              ${{ github.workspace }}/scopy_*.orig.tar.gz
-              ${{ github.workspace }}/scopy_*.debian.tar.xz
-            if-no-files-found: error
-        
-        - name: Authenticate with Cloudsmith via OIDC
-          if: success() && github.ref == 'refs/heads/main'
-          uses: cloudsmith-io/cloudsmith-cli-action@v2.0.2
-          with:
-            oidc-namespace: adi
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
-      
-        - name: Upload debian package to Cloudsmith
-          if: success() && env.CLOUDSMITH_API_KEY != ''
-          run: |
-            pip install cloudsmith-cli
-            for f in scopy_*.dsc scopy_*.orig.tar.gz scopy_*.debian.tar.xz; do
-              [ -f "$f" ] || continue
-              cloudsmith push raw -SW --republish adi/kuiper-internal "$f" 
-            done
-            cloudsmith push deb -SW --republish "adi/kuiper-internal/debian/trixie" scopy_*.deb
 
         - name: check storage space
           run: df -h

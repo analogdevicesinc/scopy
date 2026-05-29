@@ -5,7 +5,12 @@ STAGING_AREA_DEPS=$STAGING_AREA/dependencies
 REPO_SRC=$(git rev-parse --show-toplevel)
 BUILDDIR=$REPO_SRC/build
 JOBS=-j8
-QT_FORMULAE=qt@5
+
+# Qt6 via aqtinstall (clang_64 universal binary)
+QT_INSTALL_LOCATION=$HOME/Qt
+QT=$QT_INSTALL_LOCATION/6.8.3/macos
+QT_PATH=$QT/bin
+QMAKE_BIN=$QT_PATH/qmake6
 
 # In the Boost 1.89.0 release,
 # the Boost.System library, needed by GNU Radio, has been removed
@@ -13,11 +18,9 @@ QT_FORMULAE=qt@5
 # Workaround is to use Boost 1.85 for now
 BOOST_FORMULAE=boost@1.85
 
-QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
 BOOST_PATH="$(brew --prefix ${BOOST_FORMULAE})/bin"
 export PATH="${QT_PATH}:${BOOST_PATH}:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH;$STAGING_AREA_DEPS;$STAGING_AREA_DEPS/lib"
-
 
 LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
@@ -29,7 +32,7 @@ GRM2K_BRANCH=main
 QWT_BRANCH=qwt-multiaxes-updated
 LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
-KDDOCK_BRANCH=2.1
-ECM_BRANCH=kf5
-KARCHIVE_BRANCH=kf5
+KDDOCK_BRANCH=2.2
+ECM_BRANCH=v6.8.0
+KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main

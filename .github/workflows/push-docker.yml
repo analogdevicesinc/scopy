@@ -1,0 +1,105 @@
+name: Push Qt6 Docker Image to Cloudsmith
+
+on:
+    workflow_dispatch:
+      inputs:
+        platform:
+          description: 'Platform to build'
+          required: true
+          default: 'ubuntu24_qt6'
+          type: choice
+          options:
+            - ubuntu22_qt6
+            - ubuntu24_qt6
+            - ubuntu26_qt6
+            - arm64_qt6
+            - armhf_qt6
+        tag:
+          description: 'Docker image tag'
+          required: true
+          default: 'testing'
+          type: choice
+          options:
+            - testing
+            - latest
+
+jobs:
+  push-docker-ubuntu22:
+    if: inputs.platform == 'ubuntu22_qt6'
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Build Docker image
+          run: |
+            cd ci/ubuntu
+            ./create_docker_image.sh ubuntu22_qt6
+
+        - name: Login to Cloudsmith Docker registry
+          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+
+        - name: Tag and push image
+          run: |
+            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu22-qt6"
+            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
+            docker push "${IMAGE}:${{ inputs.tag }}"
+
+  push-docker-ubuntu24:
+    if: inputs.platform == 'ubuntu24_qt6'
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Build Docker image
+          run: |
+            cd ci/ubuntu
+            ./create_docker_image.sh ubuntu24_qt6
+
+        - name: Login to Cloudsmith Docker registry
+          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+
+        - name: Tag and push image
+          run: |
+            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6"
+            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
+            docker push "${IMAGE}:${{ inputs.tag }}"
+
+  push-docker-ubuntu26:
+    if: inputs.platform == 'ubuntu26_qt6'
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Build Docker image
+          run: |
+            cd ci/ubuntu
+            ./create_docker_image.sh ubuntu26_qt6
+
+        - name: Login to Cloudsmith Docker registry
+          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+
+        - name: Tag and push image
+          run: |
+            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu26-qt6"
+            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
+            docker push "${IMAGE}:${{ inputs.tag }}"
+
+  push-docker-arm64:
+    if: inputs.platform == 'arm64_qt6'
+    runs-on: ubuntu-22.04
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Build Docker image
+          run: |
+            cd ci/arm
+            ./create_docker_image_qt6.sh arm64
+
+        - name: Login to Cloudsmith Docker registry
+          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+
+        - name: Tag and push image
+          run: |
+            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-appimage-qt6"
+            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
+            docker push "${IMAGE}:${{ inputs.tag }}"

@@ -1,0 +1,54 @@
+name: macOS Qt6 Scopy Build
+
+on:
+    workflow_call:
+
+env:
+  USERNAME: github-actions
+  CACHING_ENABLED: 'false'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.name }}
+    timeout-minutes: 120
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            name: macOS 14 Qt6 (ARM64)
+            artifact: Scopy-macOS14-arm64-qt6
+          - runner: macos-15-large
+            name: macOS 15 Qt6 (Intel)
+            artifact: Scopy-macOS15-x86_64-qt6
+
+    steps:
+        - uses: actions/checkout@v6
+          with:
+            fetch-depth: 0
+
+        - name: Build and Install Dependencies
+          run: |
+            chmod +x ci/macOS/macos_config.sh ci/macOS/install_macos_deps.sh ci/macOS/build_macos.sh ci/macOS/package_darwin.sh
+            ./ci/macOS/install_macos_deps.sh
+
+        - name: Build Scopy
+          run: |
+            export MACOSX_DEPLOYMENT_TARGET=11.0
+            ./ci/macOS/build_macos.sh
+
+        - name: Create Scopy.dmg
+          run: ./ci/macOS/package_darwin.sh
+
+        - name: Set short git commit SHA
+          run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+
+        - uses: actions/upload-artifact@v7
+          if: always()
+          with:
+            name: ${{ matrix.artifact }}-${{ env.commit_sha }}
+            path: |
+              build/Scopy.dmg
+              build/ScopyApp.zip
