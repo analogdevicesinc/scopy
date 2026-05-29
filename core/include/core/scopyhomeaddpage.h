@@ -54,9 +54,11 @@ Q_SIGNALS:
 	void newDeviceAvailable(scopy::DeviceImpl *d);
 	void verifyFinished(bool valid);
 
+public Q_SLOTS:
+	void deviceAddedToUi(QString);
+
 private Q_SLOTS:
 	void futureVerify(QString uri, QString cat);
-	void deviceAddedToUi(QString);
 	void onVerifyFinished();
 	void deviceLoaderInitialized();
 	void addBtnClicked();

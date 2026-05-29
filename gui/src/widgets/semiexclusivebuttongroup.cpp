@@ -29,7 +29,7 @@ SemiExclusiveButtonGroup::SemiExclusiveButtonGroup(QObject *parent)
 	m_exclusive = true;
 	m_lastBtn = nullptr;
 	QButtonGroup::setExclusive(false);
-	connect(this, SIGNAL(buttonClicked(QAbstractButton *)), SLOT(buttonClicked(QAbstractButton *)));
+	connect(this, &QButtonGroup::buttonClicked, this, &SemiExclusiveButtonGroup::buttonClicked);
 }
 
 void SemiExclusiveButtonGroup::setExclusive(bool bExclusive) { m_exclusive = bExclusive; }

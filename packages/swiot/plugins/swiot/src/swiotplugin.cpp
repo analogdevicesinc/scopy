@@ -126,7 +126,7 @@ bool SWIOTPlugin::loadExtraButtons()
 	m_btnIdentify = new QPushButton("Identify");
 	Style::setStyle(m_btnIdentify, style::properties::button::basicButton);
 	m_extraButtons.append(m_btnIdentify);
-	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
+	connect(m_btnIdentify, &QPushButton::clicked, m_swiotController, &SwiotController::identify);
 
 	return true;
 }
@@ -221,7 +221,7 @@ bool SWIOTPlugin::onDisconnect()
 	disconnect(dynamic_cast<Faults *>(faultsTme->tool()), &Faults::backBtnPressed, m_runtime,
 		   &SwiotRuntime::onBackBtnPressed);
 
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setRunning(false);
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -343,7 +343,7 @@ void SWIOTPlugin::setupToolList()
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setEnabled(true);
 		tme->setVisible(true);
 		if(!m_isRuntime) {

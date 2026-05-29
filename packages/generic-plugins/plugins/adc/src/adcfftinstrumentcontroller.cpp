@@ -114,7 +114,7 @@ void ADCFFTInstrumentController::init()
 		m_ui->printPlotManager->printPlots(plotList, "ADC");
 	});
 
-	for(auto c : qAsConst(m_components)) {
+	for(auto c : std::as_const(m_components)) {
 		c->onInit();
 	}
 
@@ -371,12 +371,12 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 
 	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
 
-	connect(c, SIGNAL(arm()), this, SLOT(onStart()));
-	connect(c, SIGNAL(disarm()), this, SLOT(onStop()));
+	connect(c, &GRFFTSinkComponent::arm, this, &ADCInstrumentController::onStart);
+	connect(c, &GRFFTSinkComponent::disarm, this, &ADCInstrumentController::onStop);
 
 	connect(c, SIGNAL(ready()), this, SLOT(startUpdates()));
 	connect(c, SIGNAL(finish()), this, SLOT(stopUpdates()));
-	connect(c, SIGNAL(requestForceStop()), this, SLOT(stop()));
+	connect(c, &GRFFTSinkComponent::requestForceStop, this, &ADCInstrumentController::stop);
 }
 
 void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
