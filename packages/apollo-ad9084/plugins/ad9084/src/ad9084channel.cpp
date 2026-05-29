@@ -48,7 +48,7 @@ Ad9084Channel::Ad9084Channel(iio_channel *chn, unsigned int chnIdx, IIOWidgetGro
 	, m_channelLabel("")
 {
 	QVBoxLayout *lay = new QVBoxLayout();
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 	this->setLayout(lay);
 
@@ -305,7 +305,7 @@ void Ad9084Channel::init()
 	QHBoxLayout *mainNcoLay = new QHBoxLayout();
 	QHBoxLayout *headerLay = new QHBoxLayout();
 	QHBoxLayout *cfirLay = new QHBoxLayout();
-	cfirLay->setMargin(0);
+	cfirLay->setContentsMargins(0, 0, 0, 0);
 
 	m_iioWidgets.push_back(IIOWidgetBuilder(this)
 				       .channel(m_channel)

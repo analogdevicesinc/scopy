@@ -42,7 +42,7 @@ TxNode::TxNode(QString uuid, iio_channel *chn, QObject *parent)
 
 TxNode::~TxNode()
 {
-	for(auto node : qAsConst(m_childNodes)) {
+	for(auto node : std::as_const(m_childNodes)) {
 		delete node;
 	}
 	m_childNodes.clear();
@@ -90,7 +90,7 @@ bool TxNode::enableDds(bool enable)
 			return false;
 		}
 	} else if(m_childNodes.size() != 0) {
-		for(auto node : qAsConst(m_childNodes)) {
+		for(auto node : std::as_const(m_childNodes)) {
 			bool ret = node->enableDds(enable);
 			if(!ret) {
 				return ret;

@@ -28,7 +28,7 @@ InfoIconWidget::InfoIconWidget(QString infoMessage, QWidget *parent)
 	: QWidget{parent}
 {
 	m_layout = new QVBoxLayout(this);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(0);
 	this->setLayout(m_layout);
 
@@ -62,7 +62,7 @@ QWidget *InfoIconWidget::addInfoToWidget(QWidget *w, QString infoMessage)
 	QHBoxLayout *lay = new QHBoxLayout();
 	newWidget->setLayout(lay);
 	lay->setSpacing(Style::getDimension(json::global::unit_0_5));
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addWidget(w);
 	lay->addWidget(info);
 
@@ -72,7 +72,7 @@ QWidget *InfoIconWidget::addInfoToWidget(QWidget *w, QString infoMessage)
 QWidget *InfoIconWidget::addHoveringInfoToWidget(QWidget *w, QString infoMessage, QWidget *parent, HoverPosition pos)
 {
 	InfoIconWidget *info = new InfoIconWidget(infoMessage);
-	info->layout()->setMargin(5);
+	info->layout()->setContentsMargins(5, 5, 5, 5);
 	HoverWidget *hover = new HoverWidget(info, w, parent);
 	hover->setAnchorPos(pos);
 	hover->setContentPos(pos);

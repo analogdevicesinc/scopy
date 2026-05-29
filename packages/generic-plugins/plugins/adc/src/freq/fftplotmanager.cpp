@@ -102,7 +102,7 @@ void FFTPlotManager::enableMeasurementPanel(bool)
 void FFTPlotManager::multiPlotUpdate()
 {
 	bool b = m_plots.count() > 1;
-	for(PlotComponent *p : qAsConst(m_plots)) {
+	for(PlotComponent *p : std::as_const(m_plots)) {
 		auto plt = dynamic_cast<FFTPlotComponent *>(p);
 		plt->plotMenu()->showDeleteButtons(b);
 
@@ -110,7 +110,7 @@ void FFTPlotManager::multiPlotUpdate()
 		plt->plotMenu()->showDeleteButtons(b && plt != m_primary);
 	}
 
-	for(PlotManagerCombobox *cb : qAsConst(m_channelPlotcomboMap)) {
+	for(PlotManagerCombobox *cb : std::as_const(m_channelPlotcomboMap)) {
 		cb->setVisible(b);
 	}
 }
@@ -128,7 +128,7 @@ void FFTPlotManager::syncAllPlotNavigatorsAndCursors()
 {
 	if(m_primary != m_plots[0]) {
 		m_primary = m_plots[0];
-		for(PlotComponent *p : qAsConst(m_plots)) {
+		for(PlotComponent *p : std::as_const(m_plots)) {
 			syncNavigatorAndCursors(p);
 		}
 	}

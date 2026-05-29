@@ -28,11 +28,11 @@ GridWidget::GridWidget(QWidget *parent)
 	, m_maxCol(1)
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *gridContainer = new QWidget(this);
 	m_layout = new QGridLayout(gridContainer);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 
 	mainLayout->addWidget(gridContainer);
 	mainLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));

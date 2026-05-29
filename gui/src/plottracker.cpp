@@ -64,7 +64,7 @@ void PlotTracker::addChannel(PlotChannel *ch) { m_trackers->insert(createTracker
 void PlotTracker::removeChannel(PlotChannel *ch)
 {
 	ChannelTracker *toRemove;
-	for(ChannelTracker *chTracker : qAsConst(*m_trackers)) {
+	for(ChannelTracker *chTracker : std::as_const(*m_trackers)) {
 		if(chTracker->channel == ch) {
 			toRemove = chTracker;
 			break;
@@ -102,7 +102,7 @@ ChannelTracker *PlotTracker::createTracker(PlotChannel *ch)
 void PlotTracker::onChannelSelected(PlotChannel *ch)
 {
 	if(m_en) {
-		for(ChannelTracker *chTracker : qAsConst(*m_trackers)) {
+		for(ChannelTracker *chTracker : std::as_const(*m_trackers)) {
 			chTracker->tracker->setEnabled(chTracker->channel == ch);
 		}
 	}

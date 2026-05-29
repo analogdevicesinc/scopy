@@ -157,7 +157,7 @@ void ToolMenuItem::onCollapsed(bool collapsed)
 	}
 }
 
-void ToolMenuItem::enterEvent(QEvent *event)
+void ToolMenuItem::enterEvent(QEnterEvent *event)
 {
 #ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", true);

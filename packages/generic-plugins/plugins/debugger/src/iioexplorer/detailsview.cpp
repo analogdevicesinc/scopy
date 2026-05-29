@@ -144,7 +144,7 @@ void DetailsView::setAddToWatchlistState(bool add)
 void DetailsView::resetGeneratedCodeView(QList<IIOStandardItem *> items)
 {
 	QList<CodeGenerator::CodeGeneratorRecipe> recipes;
-	for(auto item : qAsConst(items)) {
+	for(auto item : std::as_const(items)) {
 		recipes.append(CodeGenerator::convertToCodeGeneratorRecipe(item, m_uri));
 	}
 

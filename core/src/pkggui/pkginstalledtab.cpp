@@ -34,11 +34,11 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 	: QWidget(parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *w = new QWidget(this);
 	QVBoxLayout *wLay = new QVBoxLayout(w);
-	wLay->setMargin(10);
+	wLay->setContentsMargins(10, 10, 10, 10);
 
 	MenuSectionCollapseWidget *pkgSection = new MenuSectionCollapseWidget(
 		"Installed packages", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, w);
@@ -53,7 +53,7 @@ PkgInstalledTab::PkgInstalledTab(QWidget *parent)
 
 	QWidget *searchW = new QWidget(pkgSection);
 	QGridLayout *searchLay = new QGridLayout(searchW);
-	searchLay->setMargin(0);
+	searchLay->setContentsMargins(0, 0, 0, 0);
 
 	m_searchBar = new SearchBar(QSet<QString>{searchOptions.begin(), searchOptions.end()}, searchW);
 	m_searchBar->getLineEdit()->setPlaceholderText("Filter by keyword");

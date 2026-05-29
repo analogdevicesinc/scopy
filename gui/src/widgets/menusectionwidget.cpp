@@ -32,7 +32,7 @@ MenuSectionWidget::MenuSectionWidget(QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	setLayout(m_layout);
 	m_layout->setSpacing(0);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	StyleHelper::MenuSectionWidget(this, "menuSection");
 }
 
@@ -49,7 +49,7 @@ MenuVScrollArea::MenuVScrollArea(QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	setLayout(m_layout);
 	m_layout->setSpacing(0);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 }
 
 MenuVScrollArea::~MenuVScrollArea() {}
@@ -63,7 +63,7 @@ MenuSectionCollapseWidget::MenuSectionCollapseWidget(QString title, MenuCollapse
 {
 	m_layout = new QVBoxLayout(this);
 	m_layout->setSpacing(0);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 	m_section = new MenuSectionWidget(parent);
 	m_collapse = new MenuCollapseSection(title, style, headerType, m_section);

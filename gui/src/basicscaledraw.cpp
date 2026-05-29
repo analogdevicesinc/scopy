@@ -157,7 +157,7 @@ void BasicScaleDraw::draw(QPainter *painter, const QPalette &palette) const
 		drawLabel(painter, delta);
 	}
 
-	for(const auto &tick : qAsConst(ticks)) {
+	for(const auto &tick : std::as_const(ticks)) {
 		if(tick != delta) {
 			drawLabel(painter, tick);
 		}

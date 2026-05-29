@@ -31,7 +31,7 @@ PlotManagerCombobox::PlotManagerCombobox(PlotManager *man, ChannelComponent *c, 
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	MenuSectionWidget *sec = new MenuSectionWidget(this);
 	m_mcombo = new MenuCombo("PLOT", sec);

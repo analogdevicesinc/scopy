@@ -115,7 +115,7 @@ void GRFFTChannelComponent::_init()
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	widget = createMenu(this);
 	m_lay->addWidget(widget);
@@ -259,7 +259,7 @@ QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
 									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QLabel *avgLabel = new QLabel("Size", this);
 	Style::setStyle(avgLabel, style::properties::label::subtle);
@@ -297,13 +297,13 @@ QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(5);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	int btnSize = Style::getDimension(json::global::unit_2);
 
 	// Min hold row
 	auto minLayout = new QHBoxLayout();
 	minLayout->setSpacing(10);
-	minLayout->setMargin(0);
+	minLayout->setContentsMargins(0, 0, 0, 0);
 	QLabel *minHoldLabel(new QLabel("Min curve"));
 	Style::setStyle(minHoldLabel, style::properties::label::subtle);
 	SmallOnOffSwitch *minHoldSwitch = new SmallOnOffSwitch(section);
@@ -321,7 +321,7 @@ QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
 	// Max hold row
 	auto maxLayout = new QHBoxLayout();
 	maxLayout->setSpacing(10);
-	maxLayout->setMargin(0);
+	maxLayout->setContentsMargins(0, 0, 0, 0);
 	QLabel *maxHoldLabel(new QLabel("Max curve"));
 	Style::setStyle(maxHoldLabel, style::properties::label::subtle);
 	SmallOnOffSwitch *maxHoldSwitch = new SmallOnOffSwitch(section);
@@ -359,7 +359,7 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	MenuCombo *markerCb = new MenuCombo("Marker Type", section);
 	markerCb->combo()->addItem("Peak", PlotMarkerController::MC_PEAK);
@@ -435,7 +435,7 @@ QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title,
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	for(auto w : attrWidgets) {

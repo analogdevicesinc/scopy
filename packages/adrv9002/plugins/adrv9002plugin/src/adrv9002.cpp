@@ -57,7 +57,7 @@ void Adrv9002::setupUi()
 {
 	// Standard Scopy tool layout pattern
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -176,7 +176,7 @@ void Adrv9002::createControls(QWidget *centralWidget)
 {
 	// Create main layout with ad936x pattern (no styling on central widget)
 	QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10); // Add spacing between sections
 
@@ -215,7 +215,7 @@ QWidget *Adrv9002::createProfileGeneratorWidget()
 	// Create container widget following prompt pattern
 	QWidget *container = new QWidget();
 	QVBoxLayout *layout = new QVBoxLayout(container);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 0);
 
 	// Create scrollable area following prompt #3 pattern
@@ -242,7 +242,7 @@ QWidget *Adrv9002::generateDeviceDriverAPIWidget(QWidget *parent)
 	Style::setStyle(driverAPIWidget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *layout = new QVBoxLayout(driverAPIWidget);
-	layout->setMargin(5);
+	layout->setContentsMargins(5, 5, 5, 5);
 	layout->setContentsMargins(5, 5, 5, 5);
 	layout->setSpacing(2);
 
@@ -281,12 +281,12 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 	auto section = new MenuSectionCollapseWidget("ADRV9002 Global Settings", MenuCollapseSection::MHCW_ARROW,
 						     MenuCollapseSection::MHW_BASEWIDGET, parent);
 
-	section->layout()->setMargin(0);
+	section->layout()->setContentsMargins(0, 0, 0, 0);
 	QWidget *widget = new QWidget(section);
 
 	QHBoxLayout *layout = new QHBoxLayout(widget);
 	layout->setSpacing(15);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(layout);
 
 	// Temperature (separate from profile management)
@@ -343,7 +343,7 @@ MenuSectionCollapseWidget *Adrv9002::createReceiveChainSection(QWidget *parent)
 	// Create container widget for RX channels layout
 	QWidget *rxContainer = new QWidget();
 	QVBoxLayout *containerLayout = new QVBoxLayout(rxContainer);
-	containerLayout->setMargin(0);
+	containerLayout->setContentsMargins(0, 0, 0, 0);
 	containerLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Main RX section with RX1 and RX2 side by side
@@ -360,7 +360,7 @@ MenuSectionCollapseWidget *Adrv9002::createReceiveChainSection(QWidget *parent)
 
 	// ORX Section below RX1/RX2
 	QHBoxLayout *orxLayout = new QHBoxLayout();
-	orxLayout->setMargin(0);
+	orxLayout->setContentsMargins(0, 0, 0, 0);
 	orxLayout->addWidget(createOrxControls());
 	containerLayout->addLayout(orxLayout);
 
@@ -377,7 +377,7 @@ MenuSectionCollapseWidget *Adrv9002::createTransmitChainSection(QWidget *parent)
 	// Create container widget for TX channels layout
 	QWidget *txContainer = new QWidget();
 	QHBoxLayout *txLayout = new QHBoxLayout(txContainer);
-	txLayout->setMargin(0);
+	txLayout->setContentsMargins(0, 0, 0, 0);
 	txLayout->setContentsMargins(0, 0, 0, 0);
 	txLayout->setSpacing(15);
 
@@ -608,7 +608,7 @@ QWidget *Adrv9002::createOrxControls()
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout(widget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(15);
 
 	// ORX 1 Column

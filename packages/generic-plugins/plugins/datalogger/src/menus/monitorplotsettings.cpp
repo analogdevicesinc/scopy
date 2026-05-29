@@ -37,7 +37,7 @@ MonitorPlotSettings::MonitorPlotSettings(MonitorPlot *m_plot, QWidget *parent)
 	, QWidget{parent}
 {
 	mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
@@ -96,7 +96,7 @@ QWidget *MonitorPlotSettings::generateYAxisSettings(QWidget *parent)
 		"Y-AXIS", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, yaxisContainer);
 
 	yaxisContainer->contentLayout()->addWidget(yAxisSection);
-	yaxisContainer->contentLayout()->setMargin(0);
+	yaxisContainer->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	gui::MenuPlotAxisRangeControl *plotYAxisController =
 		new gui::MenuPlotAxisRangeControl(m_plot->plot()->yAxis(), this);
@@ -176,7 +176,7 @@ QWidget *MonitorPlotSettings::generateCurveStyleSettings(QWidget *parent)
 	MenuCollapseSection *curveStyleSection = new MenuCollapseSection(
 		"CURVE", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, curveStylecontainer);
 
-	curveStylecontainer->contentLayout()->setMargin(0);
+	curveStylecontainer->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	gui::MenuPlotChannelCurveStyleControl *curveMenu = new gui::MenuPlotChannelCurveStyleControl(curveStyleSection);
 
 	connect(m_plot, &MonitorPlot::monitorCurveAdded, curveMenu,
@@ -197,7 +197,7 @@ QWidget *MonitorPlotSettings::generatePlotUiSettings(QWidget *parent)
 		new MenuCollapseSection("PLOT SETTINGS", MenuCollapseSection::MHCW_NONE,
 					MenuCollapseSection::MHW_BASEWIDGET, plotStylecontainer);
 
-	plotStyleSection->contentLayout()->setMargin(0);
+	plotStyleSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	plotStyleSection->contentLayout()->setSpacing(10);
 
 	MenuOnOffSwitch *showYAxisLabel = new MenuOnOffSwitch(tr("Y-AXIS label"), plotStyleSection, false);

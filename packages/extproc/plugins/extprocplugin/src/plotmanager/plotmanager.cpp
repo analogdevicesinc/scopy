@@ -52,7 +52,7 @@ void PlotManager::onAvailableInfo(const OutputInfo &outInfo, QList<ExtProcPlotIn
 void PlotManager::plotSettingsRequest(const QString &plot)
 {
 	QWidget *w = nullptr;
-	for(const PlotContainer &c : qAsConst(m_plotContainers)) {
+	for(const PlotContainer &c : std::as_const(m_plotContainers)) {
 		if(c.creator->plotInfo().title == plot) {
 			w = c.creator->settingsMenu();
 			break;
@@ -101,7 +101,7 @@ void PlotManager::createPlots(QList<ExtProcPlotInfo> &plotInfoList)
 
 void PlotManager::clearPlots()
 {
-	for(const PlotContainer &c : qAsConst(m_plotContainers)) {
+	for(const PlotContainer &c : std::as_const(m_plotContainers)) {
 		delete c.creator;
 		QWidget *w = dynamic_cast<QWidget *>(c.plotWrapper);
 		if(w) {

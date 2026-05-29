@@ -45,7 +45,7 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 {
 	// Create main layout with horizontal split like iio-oscilloscope
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Title
 	m_title = new QLabel("Profile & Stream Configuration", this);
@@ -54,14 +54,14 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 
 	// Create horizontal layout for Profile controls (left) and Device Info (right)
 	QHBoxLayout *contentLayout = new QHBoxLayout();
-	contentLayout->setMargin(0);
+	contentLayout->setContentsMargins(0, 0, 0, 0);
 	contentLayout->setSpacing(15);
 	mainLayout->addLayout(contentLayout);
 
 	// Left side: Profile and Stream controls
 	QWidget *profileControlsWidget = new QWidget();
 	QVBoxLayout *leftLayout = new QVBoxLayout(profileControlsWidget);
-	leftLayout->setMargin(0);
+	leftLayout->setContentsMargins(0, 0, 0, 0);
 
 	// Get embedded resources directory
 	QFileInfoList profiles = scopy::PkgManager::listFilesInfo(QStringList() << "adrv9002-profiles");
@@ -75,7 +75,7 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 	// Create profile container with progress bar (following data logger pattern)
 	QWidget *profileContainer = new QWidget();
 	QVBoxLayout *profileLayout = new QVBoxLayout(profileContainer);
-	profileLayout->setMargin(0);
+	profileLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_profileFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, profileContainer);
 	m_profileFileBrowser->setFilter("Profile files (*.json)");
@@ -96,7 +96,7 @@ ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
 	// Create stream container with progress bar (following data logger pattern)
 	QWidget *streamContainer = new QWidget();
 	QVBoxLayout *streamLayout = new QVBoxLayout(streamContainer);
-	streamLayout->setMargin(0);
+	streamLayout->setContentsMargins(0, 0, 0, 0);
 	streamLayout->setSpacing(1);
 
 	m_streamFileBrowser = new scopy::FileBrowserWidget(scopy::FileBrowserWidget::OPEN_FILE, streamContainer);

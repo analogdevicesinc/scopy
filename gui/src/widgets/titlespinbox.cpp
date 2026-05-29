@@ -100,7 +100,7 @@ TitleSpinBox::TitleSpinBox(QString title, bool isCompact, QWidget *parent)
 	buttonWidgetLayout->setContentsMargins(0, 0, 0, 1);
 
 	spinboxWidgetLayout->setSpacing(0);
-	spinboxWidgetLayout->setMargin(0);
+	spinboxWidgetLayout->setContentsMargins(0, 0, 0, 0);
 
 	connectSignalsAndSlots();
 }

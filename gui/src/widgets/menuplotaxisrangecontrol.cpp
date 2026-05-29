@@ -30,7 +30,7 @@ MenuPlotAxisRangeControl::MenuPlotAxisRangeControl(PlotAxis *m_plotAxis, QWidget
 	// Y-MIN-MAX
 	QHBoxLayout *minMaxLayout = new QHBoxLayout(this);
 	setLayout(minMaxLayout);
-	minMaxLayout->setMargin(0);
+	minMaxLayout->setContentsMargins(0, 0, 0, 0);
 	minMaxLayout->setSpacing(10);
 	QString unit = m_plotAxis->getUnits();
 
@@ -73,7 +73,7 @@ void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax)
 
 void MenuPlotAxisRangeControl::removeAxis(PlotAxis *ax)
 {
-	for(const QMetaObject::Connection &c : qAsConst(connections[ax])) {
+	for(const QMetaObject::Connection &c : std::as_const(connections[ax])) {
 		QObject::disconnect(c);
 	}
 	connections.remove(ax);

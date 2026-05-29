@@ -26,7 +26,7 @@ DataVisualizer::DataVisualizer(QWidget *parent)
 	: QWidget(parent)
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	setLayout(lay);
 

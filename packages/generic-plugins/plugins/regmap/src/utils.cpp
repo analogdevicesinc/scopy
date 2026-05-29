@@ -67,7 +67,7 @@ uint32_t Utils::getBitMask(int offset, int width)
 
 void Utils::removeLayoutMargins(QLayout *layout)
 {
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 0);
 }
 

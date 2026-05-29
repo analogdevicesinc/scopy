@@ -35,7 +35,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QVBoxLayout *lay = new QVBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 	lay->setAlignment(Qt::AlignTop);
 	setLayout(lay);
@@ -45,7 +45,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_content = new QWidget(this);
 	m_content->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 	m_contentLay = new QVBoxLayout(m_content);
-	m_contentLay->setMargin(0);
+	m_contentLay->setContentsMargins(0, 0, 0, 0);
 	m_contentLay->setSpacing(0);
 	m_content->setLayout(m_contentLay);
 
@@ -102,7 +102,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	saveLoadWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	saveLoadWidget->setLayout(new QHBoxLayout(saveLoadWidget));
 	saveLoadWidget->layout()->setSpacing(0);
-	saveLoadWidget->layout()->setMargin(0);
+	saveLoadWidget->layout()->setContentsMargins(0, 0, 0, 0);
 
 	QPushButton *saveBtn = createBtn(
 		"Save", ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/save.svg",
@@ -248,7 +248,7 @@ QWidget *BrowseMenu::createHeader(QWidget *parent)
 	menuHeader->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QHBoxLayout *headerLay = new QHBoxLayout(menuHeader);
 	headerLay->setSpacing(0);
-	headerLay->setMargin(0);
+	headerLay->setContentsMargins(0, 0, 0, 0);
 	QPushButton *btnCollapseMini = new QPushButton(menuHeader);
 	Style::setStyle(btnCollapseMini, style::properties::widget::toolMenu);
 	Style::setStyle(btnCollapseMini, style::properties::button::toolButton);

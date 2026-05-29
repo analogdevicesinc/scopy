@@ -296,7 +296,7 @@ struct iio_channel *IIOStandardItem::channel() const { return m_channel; }
 void IIOStandardItem::setIIOWidgets(QList<IIOWidget *> widgets)
 {
 	m_iioWidgets = widgets;
-	for(IIOWidget *w : qAsConst(m_iioWidgets)) {
+	for(IIOWidget *w : std::as_const(m_iioWidgets)) {
 		w->hide();
 	}
 	connectLog();
