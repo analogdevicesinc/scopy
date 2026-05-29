@@ -1,6 +1,5 @@
-ARG BASE_IMAGE=ubuntu:24.04
-
-FROM ${BASE_IMAGE}
+FROM scratch
+ADD kuiper-rootfs.tar.gz /
 SHELL ["/bin/bash", "-c"]
 
 ARG USER=runner
@@ -8,10 +7,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV CI_SCRIPT=ON
 
 ENV TZ=Europe/Bucharest
+RUN mkdir -p /tmp /var/tmp && chmod 1777 /tmp /var/tmp
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && \
 	apt-get -y upgrade && \
-	apt-get install -y apt-utils sudo tzdata keyboard-configuration software-properties-common
+	apt-get install -y apt-utils sudo tzdata keyboard-configuration
 
 RUN groupadd -g 1001 -r $USER && \
 	useradd -u 1001 -g 1001 --create-home -r $USER
@@ -24,15 +24,19 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 	usermod -aG sudo $USER && \
 	usermod -aG plugdev $USER
 
-USER $USER
 WORKDIR /home/${USER}/scripts
-COPY ubuntu_build_process.sh .
-RUN ./ubuntu_build_process.sh configure_system
-WORKDIR /home/${USER}
+COPY arm_native_build_process.sh .
+
+RUN ./arm_native_build_process.sh install_packages
+RUN ./arm_native_build_process.sh download_cmake
+COPY qt6-armhf-installed.tar.gz /tmp/
+RUN tar -xzf /tmp/qt6-armhf-installed.tar.gz -C / && rm /tmp/qt6-armhf-installed.tar.gz
+RUN ./arm_native_build_process.sh clone
+RUN ./arm_native_build_process.sh build_deps
 
 # Clean image
 RUN rm -rf /home/${USER}/scripts
-RUN sudo rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/lib/apt/lists/*
 
-FROM scratch
-COPY --from=0 / /
+USER $USER
+WORKDIR /home/${USER}

@@ -1,7 +1,9 @@
-name: Build & Test
+name: Build & Test Qt6
 
 on:
     push:
+      branches:
+        - scopy_qt6_dev
       paths-ignore:
         - 'docs/**'
         - '**.md'
@@ -16,6 +18,8 @@ on:
         - '.github/workflows/clang-format.yml'
 
     pull_request:
+      branches:
+        - scopy_qt6_dev
       paths-ignore:
         - 'docs/**'
         - '**.md'
@@ -46,61 +50,60 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write # Needed to upload artifacts.
+  packages: write
   artifact-metadata: write
   checks: write
   actions: write
-  id-token: write # Needed for OIDC authentication to Cloudsmith in appimage-arm64 and appimage-armhf jobs.
 
 jobs:
     docker_tag:
-      # Only run this job if not manually triggered
       if: github.event_name != 'workflow_dispatch'
       uses: ./.github/workflows/get_docker_tag.yml
 
-    appimage-x86_64:
+    ubuntu-qt6-build:
+      needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      uses: ./.github/workflows/ubuntubuild.yml
+      with:
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+
+    appimage-x86_64-qt6:
       needs: docker_tag
       if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/appimage-x86_64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    appimage-arm64:
+    mingw-qt6:
+      needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      uses: ./.github/workflows/mingwbuild.yml
+      with:
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+
+    arm64-qt6:
       needs: docker_tag
       if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/appimage-arm64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    appimage-armhf:
+    armhf-qt6:
       needs: docker_tag
       if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
       uses: ./.github/workflows/appimage-armhf.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    mingw:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/mingwbuild.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-
-    ubuntu-build:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/ubuntubuild.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-
-    flatpak:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/linuxflatpakbuild.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-
+    macos-qt6:
+      uses: ./.github/workflows/macosbuild.yml
