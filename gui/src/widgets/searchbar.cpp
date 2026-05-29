@@ -40,7 +40,7 @@ SearchBar::SearchBar(QSet<QString> options, QWidget *parent)
 
 	setLayout(new QHBoxLayout(this));
 	layout()->addWidget(m_lineEdit);
-	layout()->setMargin(0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 }
 
 QLineEdit *SearchBar::getLineEdit() { return m_lineEdit; }

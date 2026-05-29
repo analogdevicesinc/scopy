@@ -174,7 +174,7 @@ GenalyzerPanel::GenalyzerPanel(QWidget *parent)
 	Style::setBackgroundColor(this, json::theme::background_subtle);
 
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setSpacing(0);
 
 	m_embeddedMainWindow = new QMainWindow(this);

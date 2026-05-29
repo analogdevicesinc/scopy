@@ -39,13 +39,13 @@ FileBrowser::FileBrowser(QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_layout = new QVBoxLayout();
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setSpacing(0);
 	setLayout(m_layout);
 
 	MenuSectionWidget *fileBufferContainer = new MenuSectionWidget(this);
 	fileBufferContainer->contentLayout()->setSpacing(10);
-	fileBufferContainer->contentLayout()->setMargin(0);
+	fileBufferContainer->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	m_fileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, fileBufferContainer);
 	m_fileBrowser->setFilter(tr("All Files(*)"));

@@ -37,7 +37,7 @@ FileBrowserWidget::FileBrowserWidget(BrowserDialogType type, QWidget *parent)
 	, m_baseDirectory("")
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_lineEdit = new QLineEdit(this);
 

@@ -58,7 +58,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 				  Style::getAttribute(json::theme::interactive_secondary_disabled));
 	QHBoxLayout *nameDescriptionLayout = new QHBoxLayout(nameDescriptionWidget);
 	nameDescriptionWidget->setLayout(nameDescriptionLayout);
-	// nameDescriptionLayout->setMargin(10);
+	// nameDescriptionLayout->setContentsMargins(10, 10, 10, 10);
 
 	QLabel *nameLabel = new QLabel("Name: " + regModel->getName(), this);
 	QLabel *descriptionLabel = new QLabel("Description: " + regModel->getDescription(), this);
@@ -67,7 +67,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
 	QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
-	bitFieldsWidgetLayout->setMargin(0);
+	bitFieldsWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	bitFieldsWidgetLayout->setSpacing(4);
 
 	bitFieldList = new QVector<BitFieldDetailedWidget *>();

@@ -130,7 +130,7 @@ void PlotInfo::initLayouts()
 	// top left info
 	m_leftLayout = new QVBoxLayout(m_leftInfo);
 	m_leftLayout->setSpacing(m_spacing);
-	m_leftLayout->setMargin(m_margin);
+	m_leftLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_leftHover = new HoverWidget(m_leftInfo, m_parent, m_parent);
 	m_leftHover->setAnchorPos(HoverPosition::HP_TOPLEFT);
@@ -140,7 +140,7 @@ void PlotInfo::initLayouts()
 	// top right info
 	m_rightLayout = new QVBoxLayout(m_rightInfo);
 	m_rightLayout->setSpacing(m_spacing);
-	m_rightLayout->setMargin(m_margin);
+	m_rightLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_rightHover = new HoverWidget(m_rightInfo, m_parent, m_parent);
 	m_rightHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
@@ -150,7 +150,7 @@ void PlotInfo::initLayouts()
 	// bottom left info
 	m_bottomLeftLayout = new QVBoxLayout(m_bottomLeftInfo);
 	m_bottomLeftLayout->setSpacing(m_spacing);
-	m_bottomLeftLayout->setMargin(m_margin);
+	m_bottomLeftLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_bottomLeftHover = new HoverWidget(m_bottomLeftInfo, m_parent, m_parent);
 	m_bottomLeftHover->setAnchorPos(HoverPosition::HP_BOTTOMLEFT);
@@ -160,7 +160,7 @@ void PlotInfo::initLayouts()
 	// bottom right info
 	m_bottomRightLayout = new QVBoxLayout(m_bottomRightInfo);
 	m_bottomRightLayout->setSpacing(m_spacing);
-	m_bottomRightLayout->setMargin(m_margin);
+	m_bottomRightLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_bottomRightHover = new HoverWidget(m_bottomRightInfo, m_parent, m_parent);
 	m_bottomRightHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);

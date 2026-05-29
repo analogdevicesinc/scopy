@@ -45,7 +45,7 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 {
 
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	this->setLayout(layout);
 

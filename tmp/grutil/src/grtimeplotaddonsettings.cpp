@@ -37,7 +37,7 @@ QWidget *GRTimePlotAddonSettings::createMenu(QWidget *parent)
 	QWidget *w = new QWidget(scroll);
 	scroll->setWidget(w);
 	QVBoxLayout *lay = new QVBoxLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 
@@ -108,7 +108,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *bufferPlotSize = new QWidget(xaxis);
 	QHBoxLayout *bufferPlotSizeLayout = new QHBoxLayout(bufferPlotSize);
-	bufferPlotSizeLayout->setMargin(0);
+	bufferPlotSizeLayout->setContentsMargins(0, 0, 0, 0);
 	bufferPlotSizeLayout->setSpacing(10);
 	bufferPlotSize->setLayout(bufferPlotSizeLayout);
 
@@ -165,7 +165,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 
 	QWidget *xMinMax = new QWidget(xaxis);
 	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
-	xMinMaxLayout->setMargin(0);
+	xMinMaxLayout->setContentsMargins(0, 0, 0, 0);
 	xMinMaxLayout->setSpacing(10);
 	xMinMax->setLayout(xMinMaxLayout);
 
@@ -288,11 +288,11 @@ QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 	MenuCollapseSection *xy = new MenuCollapseSection("X-Y", MenuCollapseSection::MHCW_NONE,
 							  MenuCollapseSection::MHW_BASEWIDGET, xycontainer);
 	QVBoxLayout *xyMenuLayout = new QVBoxLayout();
-	xyMenuLayout->setMargin(0);
+	xyMenuLayout->setContentsMargins(0, 0, 0, 0);
 	xyMenuLayout->setSpacing(10);
 	QVBoxLayout *xyLayout = new QVBoxLayout();
 	xyLayout->setSpacing(10);
-	xyLayout->setMargin(0);
+	xyLayout->setContentsMargins(0, 0, 0, 0);
 
 	xy_xaxis = new MenuCombo("X-Axis", xy);
 	xy_xaxis->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
@@ -369,11 +369,11 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 							   MenuCollapseSection::MHW_BASEWIDGET, fftcontainer);
 
 	QVBoxLayout *fftLayout = new QVBoxLayout();
-	fftLayout->setMargin(0);
+	fftLayout->setContentsMargins(0, 0, 0, 0);
 	fftLayout->setSpacing(10);
 
 	QVBoxLayout *iqLayout = new QVBoxLayout();
-	iqLayout->setMargin(0);
+	iqLayout->setContentsMargins(0, 0, 0, 0);
 	iqLayout->setSpacing(10);
 
 	fft_i = new MenuCombo("FFT Real", fft);

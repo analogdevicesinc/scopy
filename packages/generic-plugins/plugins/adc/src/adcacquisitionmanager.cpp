@@ -115,7 +115,7 @@ QList<AcqTreeNode *> AcqTreeNode::bfs()
 	while(!list.empty()) {
 		AcqTreeNode *current = list.front();
 		list.pop_front();
-		for(AcqTreeNode *child : qAsConst(current->m_treeChildren)) {
+		for(AcqTreeNode *child : std::as_const(current->m_treeChildren)) {
 			if(!visited.contains(child)) {
 				visited.push_back(child);
 				list.push_back(child);

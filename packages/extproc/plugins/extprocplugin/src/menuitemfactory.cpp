@@ -71,7 +71,7 @@ QWidget *MenuItemFactory::createLineEdit(const QString &field, const QVariantMap
 {
 	QWidget *w = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QLabel *label = new QLabel(field, w);
 	Style::setStyle(label, style::properties::label::menuSmall);

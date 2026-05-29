@@ -185,7 +185,7 @@ void PlotChannel::setSamples(const float *xData, const float *yData, size_t size
 
 void PlotChannel::clearMarkers()
 {
-	for(auto *m : qAsConst(m_markers)) {
+	for(auto *m : std::as_const(m_markers)) {
 		m->detach();
 		delete m;
 	}

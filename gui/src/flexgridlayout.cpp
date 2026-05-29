@@ -41,7 +41,7 @@ FlexGridLayout::FlexGridLayout(int maxCols, QWidget *parent)
 	m_gridLayout->setVerticalSpacing(0);
 	m_gridLayout->setContentsMargins(0, 0, 0, 0);
 	m_gridLayout->setSpacing(0);
-	m_gridLayout->setMargin(0);
+	m_gridLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_gridLayout);
 
 	m_hspacer = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);

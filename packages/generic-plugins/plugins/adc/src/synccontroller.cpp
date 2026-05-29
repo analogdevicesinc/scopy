@@ -47,7 +47,7 @@ void SyncController::arm(SyncInstrument *si)
 	if(!si->syncMode()) {
 		si->onArm();
 	} else {
-		for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
+		for(SyncInstrument *s : std::as_const(m_syncInstruments)) {
 			if(s->syncMode()) {
 				s->onArm();
 			}
@@ -60,7 +60,7 @@ void SyncController::disarm(SyncInstrument *si)
 	if(!si->syncMode()) {
 		si->onDisarm();
 	} else {
-		for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
+		for(SyncInstrument *s : std::as_const(m_syncInstruments)) {
 			if(s->syncMode()) {
 				s->onDisarm();
 			}
@@ -88,7 +88,7 @@ void SyncController::setBufferSize(SyncInstrument *si, uint32_t newBufferSize)
 {
 	if(!si->syncMode())
 		return;
-	for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
+	for(SyncInstrument *s : std::as_const(m_syncInstruments)) {
 		if(s == si)
 			continue;
 		if(s->syncMode()) {
@@ -101,7 +101,7 @@ void SyncController::setSingleShot(SyncInstrument *si, bool newSingleShot)
 {
 	if(!si->syncMode())
 		return;
-	for(SyncInstrument *s : qAsConst(m_syncInstruments)) {
+	for(SyncInstrument *s : std::as_const(m_syncInstruments)) {
 		if(s == si)
 			continue;
 		if(s->syncMode()) {

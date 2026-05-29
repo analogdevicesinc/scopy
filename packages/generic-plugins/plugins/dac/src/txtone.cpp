@@ -40,13 +40,13 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	, m_idx(idx)
 {
 	QVBoxLayout *toneLay = new QVBoxLayout(this);
-	toneLay->setMargin(0);
+	toneLay->setContentsMargins(0, 0, 0, 0);
 	toneLay->setSpacing(10);
 	this->setLayout(toneLay);
 
 	QWidget *headerWidget = new QWidget(this);
 	QHBoxLayout *headerLay = new QHBoxLayout(headerWidget);
-	headerLay->setMargin(0);
+	headerLay->setContentsMargins(0, 0, 0, 0);
 	headerLay->setSpacing(0);
 	headerWidget->setLayout(headerLay);
 

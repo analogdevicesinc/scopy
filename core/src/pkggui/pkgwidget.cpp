@@ -41,7 +41,7 @@ PkgWidget::PkgWidget(QWidget *parent)
 	: QWidget(parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_tabWidget = new VerticalTabWidget(this);
 
@@ -85,7 +85,7 @@ QWidget *PkgWidget::pkgList(QWidget *parent)
 
 	QWidget *wScroll = new QWidget(scroll);
 	m_layScroll = new QVBoxLayout(wScroll);
-	m_layScroll->setMargin(0);
+	m_layScroll->setContentsMargins(0, 0, 0, 0);
 	m_layScroll->setSpacing(10);
 
 	m_scrollSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -121,7 +121,7 @@ QWidget *PkgWidget::createRestartWidget(QWidget *parent)
 	QWidget *restartWidget = new QWidget(parent);
 	QHBoxLayout *lay = new QHBoxLayout(restartWidget);
 	lay->setSpacing(0);
-	lay->setMargin(10);
+	lay->setContentsMargins(10, 10, 10, 10);
 	restartWidget->setVisible(false);
 	QLabel *lab = new QLabel("An application restart is required for these changes to take effect. ");
 	QSpacerItem *space1 = new QSpacerItem(6, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);

@@ -158,7 +158,7 @@ bool RegmapPlugin::loadPreferencesPage()
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
@@ -200,7 +200,7 @@ bool RegmapPlugin::onConnect()
 	}
 	m_registerMapWidget = new QWidget();
 	QVBoxLayout *layout = new QVBoxLayout(m_registerMapWidget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	m_registerMapWidget->setLayout(layout);
 	Utils::applyJsonConfig();
 
@@ -269,7 +269,7 @@ bool RegmapPlugin::onDisconnect()
 	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		tme->setRunning(false);

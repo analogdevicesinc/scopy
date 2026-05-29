@@ -92,14 +92,14 @@ void PlotCursorReadouts::initContent()
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QHBoxLayout *content_lay = new QHBoxLayout(this);
 	setLayout(content_lay);
-	content_lay->setMargin(10);
+	content_lay->setContentsMargins(10, 10, 10, 10);
 	content_lay->setSpacing(10);
 
 	// y readouts
 	y_contents = new QWidget(this);
 	y_contents->setFixedWidth(120);
 	QGridLayout *y_contents_lay = new QGridLayout(y_contents);
-	y_contents_lay->setMargin(0);
+	y_contents_lay->setContentsMargins(0, 0, 0, 0);
 	y_contents_lay->setSpacing(2);
 	y_contents->setLayout(y_contents_lay);
 	content_lay->addWidget(y_contents);
@@ -122,7 +122,7 @@ void PlotCursorReadouts::initContent()
 	x_contents = new QWidget(this);
 	x_contents->setFixedWidth(120);
 	QGridLayout *x_contents_lay = new QGridLayout(x_contents);
-	x_contents_lay->setMargin(0);
+	x_contents_lay->setContentsMargins(0, 0, 0, 0);
 	x_contents_lay->setSpacing(2);
 	x_contents->setLayout(x_contents_lay);
 	content_lay->addWidget(x_contents);

@@ -38,7 +38,7 @@ FileDataGuiStrategy::FileDataGuiStrategy(QWidget *parent)
 
 	m_ui->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto lay = new QHBoxLayout(m_ui);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 	m_ui->setLayout(lay);
 

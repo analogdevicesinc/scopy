@@ -51,7 +51,7 @@ DataMonitorSettings::DataMonitorSettings(MonitorPlotManager *m_plotManager, QWid
 	, QWidget{parent}
 {
 	mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 }
@@ -68,7 +68,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 
 	settingsBody = new QWidget(this);
 	layout = new QVBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
 
@@ -89,7 +89,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 	///// plot settings ////////////////////////
 	QWidget *plotSettingsWidget = new QWidget(this);
 	QVBoxLayout *plotSettingsLayout = new QVBoxLayout(plotSettingsWidget);
-	plotSettingsLayout->setMargin(0);
+	plotSettingsLayout->setContentsMargins(0, 0, 0, 0);
 	plotSettingsLayout->setSpacing(10);
 
 	m_activeSettings->addWidget(plotSettingsWidget);
@@ -245,7 +245,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 	////// 7 segment settings ///////////////////
 	QWidget *sevenSegmentSettingsWidget = new QWidget(this);
 	QVBoxLayout *sevenSegmentSettingsLayout = new QVBoxLayout(sevenSegmentSettingsWidget);
-	sevenSegmentSettingsLayout->setMargin(0);
+	sevenSegmentSettingsLayout->setContentsMargins(0, 0, 0, 0);
 	sevenSegmentSettingsLayout->setSpacing(10);
 	sevenSegmentMonitorSettings = new SevenSegmentMonitorSettings(this);
 

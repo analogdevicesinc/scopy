@@ -142,7 +142,7 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 {
 	QWidget *carouselContent = new QWidget(m_carouselWidget);
 	QVBoxLayout *carouselContentLayout = new QVBoxLayout(carouselContent);
-	carouselContentLayout->setMargin(2);
+	carouselContentLayout->setContentsMargins(2, 2, 2, 2);
 	carouselContentLayout->setSpacing(0);
 
 	QStackedWidget *versionCarouselWithControls = new QStackedWidget(m_carouselWidget);

@@ -139,7 +139,7 @@ void DioDigitalChannel::setConfigModes(QStringList &configModes)
 	m_configModes = configModes;
 
 	m_configModesCombo->combo()->clear();
-	for(const QString &item : qAsConst(m_configModes)) {
+	for(const QString &item : std::as_const(m_configModes)) {
 		m_configModesCombo->combo()->addItem(item);
 	}
 }

@@ -43,7 +43,7 @@ void ConnectionLostWidget::setupUi(const QString &message)
 	setFixedHeight(30);
 
 	QHBoxLayout *layout = new QHBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
 	m_warningLabel = new QLabel(message, this);

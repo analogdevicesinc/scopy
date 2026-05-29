@@ -32,12 +32,12 @@ ToolMenuHeaderWidget::ToolMenuHeaderWidget(QString title, QWidget *parent)
 	, m_ledState(IDLE)
 {
 	QHBoxLayout *hLay = new QHBoxLayout(this);
-	hLay->setMargin(0);
+	hLay->setContentsMargins(0, 0, 0, 0);
 	hLay->setSpacing(10);
 
 	QWidget *titleWidget = new QWidget(this);
 	QVBoxLayout *titleLay = new QVBoxLayout(titleWidget);
-	titleLay->setMargin(0);
+	titleLay->setContentsMargins(0, 0, 0, 0);
 	titleLay->setSpacing(0);
 
 	m_title = new QLineEdit(title, this);

@@ -33,7 +33,7 @@ GainWidget::GainWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	, QWidget{parent}
 {
 	m_layout = new QVBoxLayout(this);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
@@ -41,7 +41,7 @@ GainWidget::GainWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	QVBoxLayout *layout = new QVBoxLayout(gainWidget);
 	gainWidget->setLayout(layout);
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea *scrollArea = new QScrollArea(parent);
 	scrollArea->setWidgetResizable(true);

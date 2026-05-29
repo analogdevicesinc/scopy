@@ -79,7 +79,7 @@ void TST_PluginManager::loadLibs()
 	p->clear();
 	QVERIFY2(p->count() == 0, "Clear libs failed");
 
-	for(const auto &lib : qAsConst(libs)) {
+	for(const auto &lib : std::as_const(libs)) {
 		p->add(lib);
 	}
 	QVERIFY2(p->count() > 0, "Add 1-by-1 failed");
@@ -92,8 +92,8 @@ void TST_PluginManager::loadLibs()
 
 	p->sort();
 	sortedplugins = p->getPlugins("");
-	for(auto p : qAsConst(plugins)) {
-		for(auto q : qAsConst(sortedplugins)) {
+	for(auto p : std::as_const(plugins)) {
+		for(auto q : std::as_const(sortedplugins)) {
 			if(p == q)
 				QFAIL("duplicates found in sortedplugins vs plugins");
 		}

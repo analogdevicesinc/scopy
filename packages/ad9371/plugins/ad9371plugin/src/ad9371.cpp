@@ -145,7 +145,7 @@ const char *Ad9371::resolveFreqAttrName(iio_channel *ch, const char *fallback)
 void Ad9371::setupUi()
 {
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -188,13 +188,13 @@ void Ad9371::setupUi()
 	// Controls view
 	m_centralWidget = new QWidget(this);
 	QVBoxLayout *centralWidgetLayout = new QVBoxLayout(m_centralWidget);
-	centralWidgetLayout->setMargin(0);
+	centralWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	centralWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	m_centralWidget->setLayout(centralWidgetLayout);
 
 	QWidget *controlsScrollWidget = new QWidget(this);
 	QVBoxLayout *controlsScrollLayout = new QVBoxLayout(controlsScrollWidget);
-	controlsScrollLayout->setMargin(0);
+	controlsScrollLayout->setContentsMargins(0, 0, 0, 0);
 	controlsScrollLayout->setContentsMargins(0, 0, 0, 0);
 	controlsScrollWidget->setLayout(controlsScrollLayout);
 

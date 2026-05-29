@@ -35,7 +35,7 @@ MeasurementLabel::MeasurementLabel(QWidget *parent)
 	m_unit = "";
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 	m_nameLabel = new QLabel(this);
 	setName("None");
@@ -96,7 +96,7 @@ StatsLabel::StatsLabel(QWidget *parent)
 
 	m_unit = "";
 	setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	m_nameLabel = new QLabel(this);
 	setName("None");
 

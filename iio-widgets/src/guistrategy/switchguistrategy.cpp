@@ -32,7 +32,7 @@ SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QWidge
 {
 	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
-	m_ui->layout()->setMargin(0);
+	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 	m_menuBigSwitch = new CustomSwitch(m_ui);
 	m_ui->layout()->addWidget(m_menuBigSwitch);
 	Q_EMIT requestData();

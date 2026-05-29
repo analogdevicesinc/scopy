@@ -50,7 +50,7 @@ void GuiDetailsView::setupUi()
 	MenuCollapseSection *attrSection = new MenuCollapseSection("Attributes", MenuCollapseSection::MHCW_ARROW,
 								   MenuCollapseSection::MHW_BASEWIDGET, this);
 	attrSection->contentLayout()->setSpacing(10);
-	attrSection->contentLayout()->setMargin(0);
+	attrSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 	attrSection->contentLayout()->addWidget(m_scrollArea);
 	attrSection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 	connect(attrSection->header(), &QAbstractButton::clicked, this, [this, attrSection](bool checked) {

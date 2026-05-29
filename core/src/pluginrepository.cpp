@@ -71,7 +71,7 @@ void PluginRepository::_init(QString location)
 	}
 	QStringList pluginFiles;
 
-	for(const QFileInfo &p : qAsConst(plugins)) {
+	for(const QFileInfo &p : std::as_const(plugins)) {
 		if(p.fileName() == pluginMetaFileName) {
 			pluginMetaFilePath = p.absoluteFilePath();
 			continue;

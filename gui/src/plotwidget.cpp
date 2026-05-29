@@ -65,7 +65,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	m_layout = new QGridLayout(this);
 	m_layout->addWidget(m_plot, 1, 0);
 	m_layout->setSpacing(0);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
 	m_plot->plotLayout()->setAlignCanvasToScales(true);
