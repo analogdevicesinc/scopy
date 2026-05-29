@@ -49,7 +49,7 @@ endif()
 if(ANDROID)
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
 else()
-	set(QWT_QT_VERSION qt5)
+	set(QWT_QT_VERSION qt6)
 	find_path(
 		QWT_INCLUDE_DIRS
 		NAMES qwt_global.h
