@@ -1,15 +1,9 @@
 #!/bin/bash
 
-# macOS Build Script
+# macOS Qt6 Build Script
 # =====================================
-# Build and install all the dependencies needed for Scopy on macOS
+# Build and install all the dependencies needed for Scopy Qt6 on macOS
 # Usage: ./install_macos_deps.sh
-
-# This script is designed for Azure Pipelines CI but can be run locally on macOS systems.
-# It installs all dependencies into a staging area defined by $STAGING_AREA_DEPS,
-# which is used by the build script to find the dependencies when building Scopy and IIO-Emulator
-
-# For Azure Pipelines it also implements caching of Homebrew packages and built dependencies.
 
 set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
@@ -21,8 +15,6 @@ GIT_CACHE_DIR="${CACHE_BASE_DIR}/.git-cache"
 HOMEBREW_CACHE_DIR="${CACHE_BASE_DIR}/.homebrew-cache"
 CACHE_SIZE_WARNING_GB=8
 
-PACKAGES="${QT_FORMULAE} volk spdlog ${BOOST_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
-
 # Cache size monitoring
 check_cache_sizes() {
     if [ -d "$CACHE_BASE_DIR" ]; then
@@ -30,7 +22,7 @@ check_cache_sizes() {
         echo "Total cache size: ${total_size_gb}GB"
 
         if [ "$total_size_gb" -gt "$CACHE_SIZE_WARNING_GB" ]; then
-            echo "⚠️  WARNING: Cache size (${total_size_gb}GB) approaching Azure DevOps limits"
+            echo "WARNING: Cache size (${total_size_gb}GB) approaching Azure DevOps limits"
         fi
     fi
 }
@@ -113,11 +105,14 @@ setup_dependencies_cache() {
         echo "No dependencies cache - building fresh"
         export DEPENDENCIES_CACHED=false
     fi
-    
+
 }
 
 OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
+
+# Qt6 via aqtinstall -- no Homebrew Qt package needed
+PACKAGES="volk spdlog ${BOOST_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
 
 install_packages() {
 
@@ -136,7 +131,7 @@ install_packages() {
 	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
 	macos_version=$(sw_vers -productVersion)
 	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
-	
+
 	# Package installation based on cache status
 	if [ "${CACHING_ENABLED}" = "true" ] && [ "${HOMEBREW_CACHE_ENABLED}" = "true" ]; then
 		echo "Installing packages with cache optimization (skipping update/upgrade)..."
@@ -154,23 +149,31 @@ install_packages() {
 	fi
 
 
-	brew install --overwrite --display-times $PACKAGES
+	brew install --overwrite --display-times $PACKAGES 2>&1 | grep -v "already installed and up-to-date"
 
 	pip3 install --break-system-packages mako
 }
 
+install_qt() {
+	echo "### Installing Qt 6.8.3 via aqtinstall"
+	pip3 install --break-system-packages aqtinstall
+	# Use aqt directly (installed by pip3 in same bin dir) to avoid python3/pip3 interpreter mismatch
+	aqt install-qt --outputdir $QT_INSTALL_LOCATION mac desktop 6.8.3 clang_64 -m qt3d qtscxml
+}
+
 export_paths(){
-	QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
-	export PATH="/usr/local/bin:$PATH"
-	export PATH="/usr/local/opt/bison/bin:$PATH"
+	BREW_PREFIX="$(brew --prefix)"
+	export PATH="$BREW_PREFIX/bin:$PATH"
+	export PATH="$BREW_PREFIX/opt/bison/bin:$PATH"
 	export PATH="${QT_PATH}:$PATH"
-	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
-	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_PREFIX/opt/libzip/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$BREW_PREFIX/opt/libffi/lib/pkgconfig"
 	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGING_AREA_DEPS/lib/pkgconfig"
 
-	QMAKE="$(command -v qmake)"
+	QMAKE="$(command -v qmake6)"
 	CMAKE_BIN="$(command -v cmake)"
-	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+	ARCH="$(uname -m)"
+	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_OSX_ARCHITECTURES=$ARCH"
 	CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
 	echo -- USING CMAKE COMMAND:
@@ -305,6 +308,10 @@ build_libm2k() {
 	CURRENT_BUILD=libm2k
 	save_version_info
 
+	# libm2k hardcodes x86_64 in src/CMakeLists.txt -- patch to match runner architecture
+	ARCH="$(uname -m)"
+	sed -i '' "s/set(CMAKE_OSX_ARCHITECTURES \"x86_64\")/set(CMAKE_OSX_ARCHITECTURES \"$ARCH\")/" src/CMakeLists.txt
+
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
 		-DENABLE_CSHARP=OFF \
@@ -362,7 +369,8 @@ build_grm2k() {
 	save_version_info
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF
+		-DDIGITAL=OFF \
+		-Dlibm2k_DIR=$STAGING_AREA_DEPS/lib/cmake/libm2k
 		"
 	build_with_cmake
 	make install
@@ -446,7 +454,7 @@ build_qwt() {
 	git clean -xdf
 	git reset --hard
 	patch_qwt
-	$QMAKE INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
 	make $JOBS
 	make install
 	popd
@@ -466,7 +474,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$QT -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DKDDockWidgets_QT6=ON"
 	build_with_cmake
 	make install
 	popd
@@ -484,7 +492,7 @@ build_ecm() {
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
 	pushd $STAGING_AREA/karchive
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF"
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$QT -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF"
 	build_with_cmake
 	make install
 	popd
@@ -535,8 +543,9 @@ setup_git_cache
 setup_dependencies_cache
 check_cache_sizes
 
-# Install dependencies, clone repositories, and build all dependencies
+# Install Qt6 via aqtinstall, install dependencies, clone repositories, and build all dependencies
 install_packages
+install_qt
 export_paths
 clone
 generate_status_file

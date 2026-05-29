@@ -1,14 +1,8 @@
-# select as base image matching your host to get process isolation
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-# this creates an empty file named recycle.bin which essentialy disables the recycle bin
-# this hack is needed because msys seems to create some files with wierd names in recycle bin
-# that freeze the docker layer when commiting
-# dirty hack
 RUN echo . > 'C:\$RECYCLE.BIN';
 
-# install msys2 and innosetup
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -UseBasicParsing -uri "https://github.com/msys2/msys2-installer/releases/download/2025-08-30/msys2-base-x86_64-20250830.sfx.exe" -OutFile msys2.exe; \
     .\msys2.exe -y -oC:\\; \
@@ -19,7 +13,6 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 RUN 'mkdir C:/msys64/home/docker/ && cd C:/msys64/home/docker/'
 
 SHELL ["cmd", "/S", "/C"]
-# set envvars PATH HOME CHERE_INVOKING MSYS_SYSTEM - https://www.msys2.org/docs/ci/#other-systems
 RUN setx PATH C:\msys64\bin;C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH% & \
     setx HOME C:\msys64\home\docker & \
     setx CHERE_INVOKING yes & \

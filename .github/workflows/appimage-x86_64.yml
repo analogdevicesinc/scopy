@@ -1,4 +1,4 @@
-name: Scopy x86_64 AppImage Build
+name: Scopy Qt6 x86_64 AppImage Build
 
 on:
     workflow_call:
@@ -6,6 +6,9 @@ on:
         docker_tag:
           required: true
           type: string
+      secrets:
+        CLOUDSMITH_API_KEY:
+          required: true
 
 env:
   BUILD_HOST: ubuntu-latest
@@ -13,20 +16,25 @@ env:
   CI_SCRIPT: "ON"
 
 jobs:
-  make_x86-64_appimage:
+  make_x86-64_appimage_qt6:
     runs-on: ubuntu-latest
+    name: Ubuntu ${{ matrix.ubuntu_version }} Qt6 AppImage
     strategy:
+      fail-fast: false
       matrix:
-          include:
-            - ubuntu: cristianbindea/scopy2-x86_64-appimage:${{ inputs.docker_tag }}
-              os_name: Ubuntu 24
-            - ubuntu: cristianbindea/scopy2-x86_64-appimage-ubuntu20:${{ inputs.docker_tag }}
-              os_name: Ubuntu 20
-      fail-fast: false # Disable fail-fast to run all matrix jobs even if one fails.
-    name: ${{ matrix.os_name }}
+        include:
+          - ubuntu_version: "22"
+            docker_image: scopy2-ubuntu22-qt6
+          - ubuntu_version: "24"
+            docker_image: scopy2-ubuntu24-qt6
+          - ubuntu_version: "26"
+            docker_image: scopy2-ubuntu26-qt6
 
     container:
-        image: ${{ matrix.ubuntu }}
+        image: docker.cloudsmith.io/adi/scopy-dockers/${{ matrix.docker_image }}:${{ inputs.docker_tag }}
+        credentials:
+          username: token
+          password: ${{ secrets.CLOUDSMITH_API_KEY }}
         options: --user root
     steps:
         - name: check storage space
@@ -41,7 +49,7 @@ jobs:
                 set-safe-directory: 'true'
                 fetch-depth: '0'
 
-        - name: Create Scopy AppImage
+        - name: Create Scopy Qt6 AppImage
           shell: bash
           run: |
                 cd $GITHUB_WORKSPACE
@@ -56,7 +64,7 @@ jobs:
 
         - uses: actions/upload-artifact@v7
           with:
-            name: ${{ env.app_image_folder }}-${{ env.commit_sha }} # app_image_folder and app_image_name are set in the x86-64_appimage_process.sh
+            name: ${{ env.app_image_folder }}-${{ env.commit_sha }}
             path: ${{ github.workspace }}/${{ env.app_image_name }}
 
         - name: check storage space

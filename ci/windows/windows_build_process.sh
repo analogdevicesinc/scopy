@@ -1,17 +1,8 @@
 #!/usr/bin/bash.exe
 
-# Windows Build Process Script for Scopy
-# =====================================
-# Purpose: Build Scopy for Windows using MSYS2/MinGW-w64
-# Usage: ./windows_build_process.sh
-
 set -xe
-# Get the directory containing this script
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-# Staging configuration
-# OFF: Install to system directories
-# ON: Install to isolated staging area
 USE_STAGING=OFF
 
 source $SCRIPT_DIR/mingw_toolchain.sh $USE_STAGING
@@ -23,6 +14,7 @@ install_packages() {
 		vim\
 		unzip\
 		zip\
+		pkg-config\
 	"
 
 	TOOLS_PKGS="\
@@ -32,6 +24,7 @@ install_packages() {
 		mingw-w64-${ARCH}-python3\
 		mingw-w64-${ARCH}-python-mako\
 		mingw-w64-${ARCH}-python-six\
+		mingw-w64-${ARCH}-python-pip\
 		mingw-w64-${ARCH}-make\
 		mingw-w64-${ARCH}-doxygen\
 		mingw-w64-${ARCH}-pcre2\
@@ -39,11 +32,10 @@ install_packages() {
 		mingw-w64-${ARCH}-autotools\
 		libtool\
 		mingw-w64-${ARCH}-boost\
-		mingw-w64-${ARCH}-ccache
+		mingw-w64-${ARCH}-ccache \
+		mingw-w64-${ARCH}-pkgconf
 	"
 
-	# Pre-built libraries from MSYS2
-	# Using these saves significant build time
 	PACMAN_SYNC_DEPS="\
 		mingw-w64-${ARCH}-fftw\
 		mingw-w64-${ARCH}-orc\
@@ -54,8 +46,6 @@ install_packages() {
 		mingw-w64-${ARCH}-glib2\
 		mingw-w64-${ARCH}-glibmm\
 		mingw-w64-${ARCH}-doxygen\
-		mingw-w64-${ARCH}-qt5\
-		mingw-w64-${ARCH}-angleproject\
 		mingw-w64-${ARCH}-zlib\
 		mingw-w64-${ARCH}-breakpad\
 		mingw-w64-${ARCH}-libusb\
@@ -65,7 +55,6 @@ install_packages() {
 	if [ "$USE_STAGING" == "ON" ]; then
 		mkdir -p $STAGING_DIR/var/lib/pacman/local
 		mkdir -p $STAGING_DIR/var/lib/pacman/sync
-		# Update core packages first
 		$PACMAN -Syuu bash filesystem mintty pacman
 	fi
 
@@ -74,6 +63,40 @@ install_packages() {
 	$PACMAN -S $PACMAN_SYNC_DEPS
 
 	download_cmake
+}
+
+# install_qt() {
+
+# 	pacman --noconfirm -S mingw-w64-x86_64-zstd wget
+
+# 	echo "Downloading standalone aqt binary..."
+# 	wget -qO aqt.exe https://github.com/miurahr/aqtinstall/releases/latest/download/aqt_x64.exe
+# 	chmod +x aqt.exe
+
+# 	echo "Installing Qt6..."
+# 	./aqt.exe install-qt --outputdir /c/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
+
+# 	# # Install the pre-compiled MSYS2 versions of the failing dependencies
+# 	# pacman --noconfirm -S mingw-w64-x86_64-zstd \
+# 	# 	mingw-w64-x86_64-python-psutil \
+# 	# 	mingw-w64-x86_64-python-zstandard
+
+# 	# # Force pip to bypass the PEP 668 environment lock
+# 	# pip3 install aqtinstall --break-system-packages
+
+# 	# python3 -m aqt install-qt --outputdir /c/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
+# }
+
+install_qt() {
+	pacman --noconfirm -S mingw-w64-x86_64-zstd wget
+
+	echo "Downloading standalone aqt binary..."
+	wget -qO aqt.exe https://github.com/miurahr/aqtinstall/releases/latest/download/aqt_x64.exe
+	chmod +x aqt.exe
+
+	echo "Installing Qt6..."
+	# Changed /c/Qt to C:/Qt below
+	./aqt.exe install-qt --outputdir C:/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
 }
 
 clone() {
@@ -100,16 +123,15 @@ clone() {
 	popd
 }
 
-# Records information about the build environment
 create_build_status_file() {
 	touch $BUILD_STATUS_FILE
-	echo "Scopy2-MinGW" >> $BUILD_STATUS_FILE
+	echo "Scopy2-MinGW-Qt6" >> $BUILD_STATUS_FILE
 	echo "Docker image built on $(date)" >> $BUILD_STATUS_FILE
 	echo "Deps installed using pacman" >> $BUILD_STATUS_FILE
+	echo "Qt6 installed via aqtinstall at $QT" >> $BUILD_STATUS_FILE
 	echo "" >> $BUILD_STATUS_FILE
 	echo "All explicitly installed packages on build machine" >> $BUILD_STATUS_FILE
 	echo "" >> $BUILD_STATUS_FILE
-	# List all explicitly installed packages
 	pacman --noconfirm -Qe >> $BUILD_STATUS_FILE
 	echo "" >> $BUILD_STATUS_FILE
 	echo "Deps built from sources" >> $BUILD_STATUS_FILE
@@ -123,8 +145,6 @@ clean_build_dir() {
 	cd $BUILD_FOLDER
 }
 
-# Generic CMake build function for dependencies
-# Handles the common build pattern for CMake-based projects
 build_with_cmake() {
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
@@ -142,18 +162,15 @@ build_with_cmake() {
 	fi
 	eval $CURRENT_BUILD_POST_MAKE
 
-	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 
-	# Clean source directory in CI to save space
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
 	popd
 
-	# Clear variables for next build
 	CURRENT_BUILD_CMAKE_OPTS=""
 	CURRENT_BUILD_POST_CLEAN=""
 	CURRENT_BUILD_PATCHES=""
@@ -175,12 +192,10 @@ build_libserialport(){
 	make $JOBS
 	[ "$INSTALL" == "ON" ] && make install
 
-	# Clean source in CI builds
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
-	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -189,14 +204,14 @@ build_libserialport(){
 build_libiio() {
 	CURRENT_BUILD=libiio
 	CURRENT_BUILD_CMAKE_OPTS="\
-		${RC_COMPILER_OPT}\              # Windows resource compiler
-		-DWITH_USB_BACKEND:BOOL=ON\      # Enable USB support
-		-DWITH_SERIAL_BACKEND:BOOL=ON\   # Enable serial port support
-		-DCSHARP_BINDINGS:BOOL=OFF\      # No C# bindings needed
-		-DPYTHON_BINDINGS:BOOL=OFF\      # No Python bindings needed
-		-DHAVE_DNS_SD:BOOL=ON\           # Enable network discovery
-		-DENABLE_IPV6:BOOL=OFF\          # Disable IPv6 (simplifies)
-		-DWITH_EXAMPLES:BOOL=ON\         # Build example programs
+		${RC_COMPILER_OPT}\
+		-DWITH_USB_BACKEND:BOOL=ON\
+		-DWITH_SERIAL_BACKEND:BOOL=ON\
+		-DCSHARP_BINDINGS:BOOL=OFF\
+		-DPYTHON_BINDINGS:BOOL=OFF\
+		-DHAVE_DNS_SD:BOOL=ON\
+		-DENABLE_IPV6:BOOL=OFF\
+		-DWITH_EXAMPLES:BOOL=ON\
 	"
 	build_with_cmake $1
 }
@@ -208,8 +223,6 @@ build_libad9361() {
 }
 
 build_spdlog() {
-	# [ -f "/usr/bin/x86_64-w64-mingw32-windres.exe" ] && rm -v /usr/bin/x86_64-w64-mingw32-windres.exe
-	# ln -s /usr/bin/windres.exe /usr/bin/x86_64-w64-mingw32-windres.exe
 	CURRENT_BUILD=spdlog
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DSPDLOG_BUILD_SHARED=ON\
@@ -252,7 +265,14 @@ build_volk() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+	# Temporarily reduce parallel jobs just for volk to save memory
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 
 }
 
@@ -272,7 +292,15 @@ build_gnuradio() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
+
 }
 
 build_grscopy() {
@@ -281,7 +309,14 @@ build_grscopy() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_grm2k() {
@@ -290,7 +325,13 @@ build_grm2k() {
 		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
 		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
 		"
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_qwt() {
@@ -299,8 +340,10 @@ build_qwt() {
 	pushd $STAGING_AREA/$CURRENT_BUILD
 	git clean -xdf
 
-# Apply inline patch to fix install prefix
-# Changes empty prefix to /mingw64
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
+
 patch -p1 <<-EOF
 --- a/qwtconfig.pri
 +++ b/qwtconfig.pri
@@ -334,12 +377,13 @@ EOF
 
 	cp $STAGING_DIR/lib/qwt.dll $STAGING_DIR/bin/qwt.dll
 
-	# Clean source in CI
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
-	# Record build info
+		# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
+
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -351,7 +395,6 @@ build_libsigrokdecode() {
 	pushd $STAGING_AREA/$CURRENT_BUILD
 	git reset --hard
 	git clean -xdf
-	# Apply Windows compatibility patch
 	patch -p1 < ${WORKFOLDER}/sigrokdecode-windows-fix.patch
 	./autogen.sh
 
@@ -360,9 +403,7 @@ build_libsigrokdecode() {
 
 	if [ "$USE_STAGING" == "ON" ]
 	then
-		# LIBSIGROKDECODE_EXPORT needed for Windows DLL
 		CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" ./configure --prefix $STAGING_AREA_DEPS ${AUTOCONF_OPTS}
-		# LD_RUN_PATH helps find libraries at runtime
 		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
 	else
 		CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" ./configure ${AUTOCONF_OPTS}
@@ -373,12 +414,10 @@ build_libsigrokdecode() {
 		make install
 	fi
 
-	# Clean source in CI
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf
 	fi
 
-	# Record build info
 	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
 	>> $BUILD_STATUS_FILE
 	popd
@@ -388,28 +427,56 @@ build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	CURRENT_BUILD=libtinyiiod
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
+
+	local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	CURRENT_BUILD=KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=OFF -DKDDockWidgets_TESTS=OFF"
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=OFF -DKDDockWidgets_TESTS=OFF"
+
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_ecm() {
 	echo "### Building extra-cmake-modules (ECM) - branch $ECM_BRANCH"
 	CURRENT_BUILD=extra-cmake-modules
-	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF -DBUILD_HTML_DOCS=OFF -DBUILD_MAN_DOCS=OFF -DBUILD_QTHELP_DOCS=OFF"
+
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
 	CURRENT_BUILD=karchive
 	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_TESTING=OFF"
+
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
 build_genalyzer() {
@@ -419,37 +486,43 @@ build_genalyzer() {
 		-DBUILD_TESTING=OFF \
 		-DBUILD_SHARED_LIBS=ON \
 		"
+
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
 	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
 }
 
-# Build all dependencies in correct order
 build_deps() {
-	install_packages         # Install MSYS2 packages
-	create_build_status_file # Initialize build log
-	clone                    # Clone all source repositories
+	install_packages
+	install_qt
+	create_build_status_file
+	clone
 
-	build_libserialport ON   # Serial port library
-	build_libiio ON          # Industrial I/O library
-	build_libad9361 ON       # AD9361 transceiver library
-	build_libm2k ON          # ADALM2000 library
-	build_spdlog ON          # Fast logging library
-	build_libsndfile ON      # Sound file I/O
-	build_volk ON            # Vector-Optimized Library of Kernels
-	build_gnuradio ON        # GNU Radio framework
-	build_grscopy ON         # GNU Radio Scopy blocks
-	build_grm2k ON           # GNU Radio M2K blocks
-	build_qwt ON             # Qt plotting widgets
-	build_libsigrokdecode ON # Protocol decoding
-	build_libtinyiiod ON     # Tiny IIO daemon library
-	build_kddock ON          # Docking framework
-	build_ecm ON             # Extra CMake modules
-	build_karchive ON        # KDE archive library
-	build_genalyzer ON       # Signal analysis library
+	build_libserialport ON
+	build_libiio ON
+	build_libad9361 ON
+	build_libm2k ON
+	build_spdlog ON
+	build_libsndfile ON
+	build_volk ON
+	build_gnuradio ON
+	build_grscopy ON
+	build_grm2k ON
+	build_qwt ON
+	build_libsigrokdecode ON
+	build_libtinyiiod ON
+	build_kddock ON
+	build_ecm ON
+	build_karchive ON
+	build_genalyzer ON
 }
 
 for arg in $@; do
 	$arg
 done
 
-# Default action: build all dependencies
 build_deps
