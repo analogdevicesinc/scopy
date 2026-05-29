@@ -32,7 +32,7 @@ bool IIOSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex 
 	QVariant itemData = sourceModel()->data(sourceIndex, Qt::DisplayRole);
 
 	// Check if the item's data contains the filter string
-	QString filterString = filterRegExp().pattern(); // Get the filter string
+	QString filterString = filterRegularExpression().pattern(); // Get the filter string
 	if(itemData.toString().contains(filterString, Qt::CaseInsensitive)) {
 		return true;
 	}

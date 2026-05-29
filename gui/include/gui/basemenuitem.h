@@ -25,6 +25,7 @@
 
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QEnterEvent>
 #include <QFrame>
 #include <QMouseEvent>
 
@@ -73,7 +74,7 @@ protected:
 	void dragEnterEvent(QDragEnterEvent *event);
 	void dragMoveEvent(QDragMoveEvent *event);
 	void dropEvent(QDropEvent *event);
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void leaveEvent(QEvent *event);
 
 protected:
