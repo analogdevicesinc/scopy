@@ -79,7 +79,7 @@ bool TestPlugin::loadPreferencesPage()
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
@@ -108,7 +108,7 @@ bool TestPlugin::loadPage()
 	lay->addWidget(new QLabel("TestPage", m_page));
 	QPushButton *restartBtn = new QPushButton("restartPlugin", m_page);
 	lay->addWidget(restartBtn);
-	connect(restartBtn, SIGNAL(clicked()), this, SIGNAL(restartDevice()));
+	connect(restartBtn, &QPushButton::clicked, this, &TestPlugin::restartDevice);
 	return true;
 }
 

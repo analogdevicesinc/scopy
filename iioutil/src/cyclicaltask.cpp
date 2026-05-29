@@ -35,7 +35,7 @@ CyclicalTask::CyclicalTask(QThread *task, QObject *parent)
 	t = new QTimer(this);
 	this->task = task;
 	this->task->setParent(this);
-	connect(t, SIGNAL(timeout()), this, SLOT(startThread()));
+	connect(t, &QTimer::timeout, this, &CyclicalTask::startThread);
 }
 
 CyclicalTask::~CyclicalTask()

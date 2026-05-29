@@ -210,7 +210,7 @@ void RangeAttrUi::onValueChanged(double value)
 
 	// we use QTimer::singleShot to execute processValueChange() after the event loop finished,
 	// to make sure the data was updated
-	QTimer::singleShot(0, this, SLOT(processValueChange()));
+	QTimer::singleShot(0, this, &RangeAttrUi::processValueChange);
 }
 
 void RangeAttrUi::processValueChange()

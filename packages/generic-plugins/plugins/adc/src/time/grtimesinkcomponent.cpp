@@ -70,7 +70,7 @@ void GRTimeSinkComponent::connectSignalPaths()
 	int index = 0;
 	time_channel_map.clear();
 
-	for(GRChannel *gr : qAsConst(m_channels)) {
+	for(GRChannel *gr : std::as_const(m_channels)) {
 		GRSignalPath *sigPath = gr->sigpath();
 		if(sigPath->enabled()) {
 			// connect end of signal path to time_sink input
@@ -104,7 +104,7 @@ void GRTimeSinkComponent::setData(bool copy)
 {
 	int index = 0;
 
-	for(GRChannel *gr : qAsConst(m_channels)) {
+	for(GRChannel *gr : std::as_const(m_channels)) {
 		int index = time_channel_map.value(gr->sigpath()->name(), -1);
 		if(index == -1)
 			continue;
@@ -141,11 +141,11 @@ void GRTimeSinkComponent::setSamplingInfo(SamplingInfo p)
 void GRTimeSinkComponent::onArm()
 {
 	connect(this, &GRTimeSinkComponent::requestRebuild, m_top, &GRTopBlock::rebuild, Qt::QueuedConnection);
-	connect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
-	connect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
-	connect(m_top, SIGNAL(started()), this, SIGNAL(ready()));
-	connect(m_top, SIGNAL(aboutToStop()), this, SIGNAL(finish()));
-	connect(m_top, SIGNAL(forceStop()), this, SIGNAL(requestForceStop()));
+	connect(m_top, &GRTopBlock::builtSignalPaths, this, &GRTimeSinkComponent::connectSignalPaths);
+	connect(m_top, &GRTopBlock::teardownSignalPaths, this, &GRTimeSinkComponent::tearDownSignalPaths);
+	connect(m_top, &GRTopBlock::started, this, &GRTimeSinkComponent::ready);
+	connect(m_top, &GRTopBlock::aboutToStop, this, &GRTimeSinkComponent::finish);
+	connect(m_top, &GRTopBlock::forceStop, this, &GRTimeSinkComponent::requestForceStop);
 	Q_EMIT arm();
 	m_armed = true;
 }
@@ -155,11 +155,11 @@ void GRTimeSinkComponent::onDisarm()
 	m_armed = false;
 	Q_EMIT disarm();
 	disconnect(this, &GRTimeSinkComponent::requestRebuild, m_top, &GRTopBlock::rebuild);
-	disconnect(m_top, SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
-	disconnect(m_top, SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
-	disconnect(m_top, SIGNAL(started()), this, SIGNAL(ready()));
-	disconnect(m_top, SIGNAL(aboutToStop()), this, SIGNAL(finish()));
-	disconnect(m_top, SIGNAL(forceStop()), this, SIGNAL(requestForceStop()));
+	disconnect(m_top, &GRTopBlock::builtSignalPaths, this, &GRTimeSinkComponent::connectSignalPaths);
+	disconnect(m_top, &GRTopBlock::teardownSignalPaths, this, &GRTimeSinkComponent::tearDownSignalPaths);
+	disconnect(m_top, &GRTopBlock::started, this, &GRTimeSinkComponent::ready);
+	disconnect(m_top, &GRTopBlock::aboutToStop, this, &GRTimeSinkComponent::finish);
+	disconnect(m_top, &GRTopBlock::forceStop, this, &GRTimeSinkComponent::requestForceStop);
 }
 
 void GRTimeSinkComponent::init()

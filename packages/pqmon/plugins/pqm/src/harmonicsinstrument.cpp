@@ -51,7 +51,7 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
 	setLayout(instrumentLayout);
-	instrumentLayout->setMargin(0);
+	instrumentLayout->setContentsMargins(0, 0, 0, 0);
 
 	ToolTemplate *tool = new ToolTemplate(this);
 	tool->topContainer()->setVisible(true);
@@ -81,7 +81,7 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	QWidget *tableWrapper = new QWidget(dockableAreaWidget);
 	tableWrapper->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	QVBoxLayout *tableWrapLay = new QVBoxLayout(tableWrapper);
-	tableWrapLay->setMargin(0);
+	tableWrapLay->setContentsMargins(0, 0, 0, 0);
 	tableWrapLay->setSpacing(0);
 
 	m_thdWidget = createThdWidget(tableWrapper);
@@ -129,9 +129,9 @@ HarmonicsInstrument::HarmonicsInstrument(ToolMenuEntry *tme, QString uri, QWidge
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &HarmonicsInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
-	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
+	connect(m_runBtn, &QAbstractButton::toggled, this, &HarmonicsInstrument::toggleHarmonics);
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
-	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleHarmonics(bool)));
+	connect(m_singleBtn, &QAbstractButton::toggled, this, &HarmonicsInstrument::toggleHarmonics);
 }
 
 HarmonicsInstrument::~HarmonicsInstrument()
@@ -264,7 +264,7 @@ QWidget *HarmonicsInstrument::createSettingsMenu(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(
@@ -431,7 +431,7 @@ void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> 
 	for(const QString &ch : m_chnls) {
 		QStringList harmonics = attr[ch][h].split(" ");
 		m_yValues[ch].clear();
-		for(const QString &val : qAsConst(harmonics)) {
+		for(const QString &val : std::as_const(harmonics)) {
 			double hValue = val.toDouble(&ok);
 			if(!ok) {
 				continue;
