@@ -69,7 +69,7 @@ Adrv9009Advanced::~Adrv9009Advanced() {}
 void Adrv9009Advanced::setupUi()
 {
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -209,18 +209,18 @@ void Adrv9009Advanced::createNavigationButtons()
 	// Create main navigation widget with vertical layout for rows
 	QWidget *navigationWidget = new QWidget(this);
 	navLayout = new QVBoxLayout(navigationWidget);
-	navLayout->setMargin(0);
+	navLayout->setContentsMargins(0, 0, 0, 0);
 	navLayout->setSpacing(2);
 
 	// Create persistent row widgets that will be reused
 	m_firstRow = new QWidget();
 	m_firstRowLayout = new QHBoxLayout(m_firstRow);
-	m_firstRowLayout->setMargin(0);
+	m_firstRowLayout->setContentsMargins(0, 0, 0, 0);
 	m_firstRowLayout->setSpacing(5);
 
 	m_secondRow = new QWidget();
 	m_secondRowLayout = new QHBoxLayout(m_secondRow);
-	m_secondRowLayout->setMargin(0);
+	m_secondRowLayout->setContentsMargins(0, 0, 0, 0);
 	m_secondRowLayout->setSpacing(5);
 
 	m_navigationSpacerItem = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding);

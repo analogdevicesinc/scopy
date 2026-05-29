@@ -87,7 +87,7 @@ void PlotAutoscaler::setTimeout(int t)
 
 void PlotAutoscaler::autoscale()
 {
-	for(PlotChannel *plotCh : qAsConst(m_channels)) {
+	for(PlotChannel *plotCh : std::as_const(m_channels)) {
 		auto data = plotCh->curve()->data();
 		for(int i = 0; i < data->size(); i++) {
 

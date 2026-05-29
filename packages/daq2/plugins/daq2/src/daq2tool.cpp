@@ -43,7 +43,7 @@ DAQ2::DAQ2(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	, m_group(group)
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -75,7 +75,7 @@ DAQ2::DAQ2(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 
 	QWidget *controlsWidget = new QWidget(this);
 	QVBoxLayout *controlsLayout = new QVBoxLayout(controlsWidget);
-	controlsLayout->setMargin(0);
+	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	controlsWidget->setLayout(controlsLayout);
 

@@ -96,7 +96,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 		QWidget *registerMapTable = new QWidget();
 		QVBoxLayout *registerMapTableLayout = new QVBoxLayout(registerMapTable);
-		registerMapTableLayout->setMargin(0);
+		registerMapTableLayout->setContentsMargins(0, 0, 0, 0);
 		registerMapTableLayout->setSpacing(0);
 		Utils::removeLayoutMargins(registerMapTableLayout);
 		registerMapTable->setLayout(registerMapTableLayout);
@@ -105,7 +105,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		QWidget *tableHeadWidget = new QWidget(this);
 		QHBoxLayout *tableHeadWidgetLayout = new QHBoxLayout(tableHeadWidget);
 		tableHeadWidgetLayout->setSpacing(4);
-		tableHeadWidgetLayout->setMargin(2);
+		tableHeadWidgetLayout->setContentsMargins(2, 2, 2, 2);
 		tableHeadWidget->setLayout(tableHeadWidgetLayout);
 
 		QWidget *registerTableHead = new QWidget(tableHeadWidget);

@@ -34,7 +34,7 @@ MenuHeaderWidget::MenuHeaderWidget(QString title, QPen pen, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_title = new QLineEdit(title, this);
 	m_title->setEnabled(false);

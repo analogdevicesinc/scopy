@@ -34,7 +34,7 @@ MenuComboWidget::MenuComboWidget(QString title, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_combo = new MenuCombo(title, this);
 
@@ -60,7 +60,7 @@ MenuCombo::MenuCombo(QString title, QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_label = new QLabel(title, this);
 	Style::setStyle(m_label, style::properties::label::subtle);

@@ -259,7 +259,7 @@ QWidget *TestTool::createMenu(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QVBoxLayout *lay = new QVBoxLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 

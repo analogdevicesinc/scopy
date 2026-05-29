@@ -36,7 +36,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	Style::setBackgroundColor(this, json::theme::background_primary);
 
 	m_layout = new QVBoxLayout(this);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 

@@ -45,7 +45,7 @@ void ADCInstrument::setupToolLayout()
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 	tool = new ToolTemplate(this);
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -65,7 +65,7 @@ void ADCInstrument::setupToolLayout()
 	// Left panel
 	m_leftPanel = new QWidget(m_splitter);
 	QVBoxLayout *leftLayout = new QVBoxLayout(m_leftPanel);
-	leftLayout->setMargin(0);
+	leftLayout->setContentsMargins(0, 0, 0, 0);
 	leftLayout->setSpacing(0);
 	m_leftStack = new MapStackedWidget(m_leftPanel);
 	leftLayout->addWidget(m_leftStack);
@@ -74,13 +74,13 @@ void ADCInstrument::setupToolLayout()
 	m_centralWidget = new QWidget(m_splitter);
 	m_centralWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *centralLayout = new QVBoxLayout(m_centralWidget);
-	centralLayout->setMargin(0);
+	centralLayout->setContentsMargins(0, 0, 0, 0);
 	centralLayout->setSpacing(0);
 
 	// Right panel
 	m_rightPanel = new QWidget(m_splitter);
 	QVBoxLayout *rightLayout = new QVBoxLayout(m_rightPanel);
-	rightLayout->setMargin(0);
+	rightLayout->setContentsMargins(0, 0, 0, 0);
 	rightLayout->setSpacing(0);
 	rightStack = new MapStackedWidget(m_rightPanel);
 	rightLayout->addWidget(rightStack);

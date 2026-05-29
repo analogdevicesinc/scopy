@@ -47,7 +47,7 @@ void ToolMenuManager::addMenuItem(DeviceInfo dInfo, int itemIndex)
 	QString id = dInfo.id;
 	MenuSectionCollapseWidget *devSection = createMenuSectionItem(dInfo);
 	QButtonGroup *menuBtnGroup = m_toolMenu->btnGroup();
-	for(ToolMenuEntry *tme : qAsConst(dInfo.tools)) {
+	for(ToolMenuEntry *tme : std::as_const(dInfo.tools)) {
 		ToolMenuItem *toolMenuItem = createToolMenuItem(tme, devSection);
 		devSection->add(toolMenuItem);
 		menuBtnGroup->addButton(toolMenuItem);
@@ -276,7 +276,7 @@ MenuSectionCollapseWidget *ToolMenuManager::createMenuSectionItem(const DeviceIn
 	MenuSectionCollapseWidget *section =
 		new MenuSectionCollapseWidget(dInfo.name, MenuCollapseSection::MHCW_ARROW, type, m_toolMenu);
 	section->contentLayout()->setSpacing(0);
-	section->menuSection()->layout()->setMargin(0);
+	section->menuSection()->layout()->setContentsMargins(0, 0, 0, 0);
 	section->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	MenuCollapseHeader *collapseHeader = getCollapseSectionHeader(section);

@@ -116,7 +116,7 @@ IIOWidget *Ad6676::createReadOnlyWidget(iio_channel *ch, const QString &attr, co
 void Ad6676::setupUi()
 {
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -156,7 +156,7 @@ void Ad6676::setupUi()
 	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 	QVBoxLayout *centralLayout = new QVBoxLayout(m_centralWidget);
-	centralLayout->setMargin(0);
+	centralLayout->setContentsMargins(0, 0, 0, 0);
 	centralLayout->setContentsMargins(0, 0, 0, 0);
 	centralLayout->setSpacing(10);
 
@@ -166,7 +166,7 @@ void Ad6676::setupUi()
 	Style::setStyle(contentWidget, style::properties::widget::border_interactive);
 
 	QVBoxLayout *contentWidgetLayout = new QVBoxLayout(contentWidget);
-	contentWidgetLayout->setMargin(0);
+	contentWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	contentWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	contentWidgetLayout->setSpacing(10);
 

@@ -141,7 +141,7 @@ QString CodeGenerator::generateCode(QList<CodeGeneratorRecipe> recipes)
 
 	QMap<QString, DeviceItems> devices;
 
-	for(const auto &recipe : qAsConst(recipes)) {
+	for(const auto &recipe : std::as_const(recipes)) {
 		// Device
 		if(!recipe.deviceName.isEmpty()) {
 			DeviceItems &device = devices[recipe.deviceName];

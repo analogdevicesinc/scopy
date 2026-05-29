@@ -107,7 +107,7 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 	QHBoxLayout *lay = dynamic_cast<QHBoxLayout *>(w->layout());
 	Q_ASSERT(lay);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 
 	w->m_icon->setPixmap(iconPath);

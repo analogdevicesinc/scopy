@@ -54,7 +54,7 @@ FMCOMMS11::~FMCOMMS11() {}
 void FMCOMMS11::setupUi()
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -84,7 +84,7 @@ void FMCOMMS11::setupUi()
 
 	QWidget *controlsWidget = new QWidget(this);
 	QVBoxLayout *controlsLayout = new QVBoxLayout(controlsWidget);
-	controlsLayout->setMargin(0);
+	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	controlsLayout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea *scrollArea = new QScrollArea(this);

@@ -26,7 +26,7 @@ BubbleLevelRenderer::BubbleLevelRenderer(QWidget *parent)
 	: QWidget{parent}
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 
 	m_rot = {0.0f, 0.0f, 0.0f};

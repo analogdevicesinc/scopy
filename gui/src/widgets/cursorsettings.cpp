@@ -42,7 +42,7 @@ void CursorSettings::initUI()
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	setFixedWidth(200);
 	layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(layout);
 
 	// x controls

@@ -42,7 +42,7 @@ FaultsPage::FaultsPage(QString uri, QWidget *parent)
 	QScrollArea *scrollArea = new QScrollArea(this);
 	QWidget *scrollWidget = new QWidget(scrollArea);
 	QVBoxLayout *layScroll = new QVBoxLayout(scrollWidget);
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	layScroll->setContentsMargins(0, 0, 0, 0);
 	scrollWidget->setLayout(layScroll);
 

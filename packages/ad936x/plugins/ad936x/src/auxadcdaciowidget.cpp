@@ -33,7 +33,7 @@ AuxAdcDacIoWidget::AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *group, 
 {
 
 	m_layout = new QVBoxLayout(this);
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
 
@@ -41,7 +41,7 @@ AuxAdcDacIoWidget::AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *group, 
 	QVBoxLayout *layout = new QVBoxLayout(auxAdcDacIoWidget);
 	layout->setSpacing(10);
 	auxAdcDacIoWidget->setLayout(layout);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea *scrollArea = new QScrollArea(parent);
 	scrollArea->setWidgetResizable(true);
@@ -391,7 +391,7 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 	widgetLayout->addWidget(bitmaskLabel, 2, 0);
 
 	QHBoxLayout *hLayout2 = new QHBoxLayout();
-	hLayout2->setMargin(0);
+	hLayout2->setContentsMargins(0, 0, 0, 0);
 	hLayout2->setSpacing(10);
 
 	// GPO0
@@ -441,7 +441,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 								  MenuCollapseSection::MHW_BASEWIDGET, gpoContainer);
 
 	gpoContainer->contentLayout()->addWidget(gpoSection);
-	gpoContainer->contentLayout()->setMargin(0);
+	gpoContainer->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *gpoContent = new QWidget(gpoSection);
 	QGridLayout *layout = new QGridLayout(gpoContent);

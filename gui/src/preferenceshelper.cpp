@@ -60,9 +60,9 @@ QWidget *PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QS
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(layout);
 
 	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
@@ -89,9 +89,9 @@ QWidget *PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStrin
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(layout);
 
 	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
@@ -118,9 +118,9 @@ QWidget *PreferencesHelper::addPreferenceEditValidation(Preferences *p, QString 
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(layout);
 
 	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
@@ -159,9 +159,9 @@ QWidget *PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, Q
 {
 	QWidget *w = new QWidget();
 	QHBoxLayout *lay = new QHBoxLayout();
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	w->setLayout(lay);
 
 	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
@@ -197,9 +197,9 @@ QWidget *PreferencesHelper::addPreferenceFileBrowser(Preferences *p, QString id,
 {
 	QWidget *widget = new QWidget();
 	QHBoxLayout *layout = new QHBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	widget->setLayout(layout);
 
 	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
@@ -230,7 +230,7 @@ QWidget *PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QStri
 	QWidget *w = new QWidget();
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *infoBtn = setupDescriptionButton(id, description, parent);
 

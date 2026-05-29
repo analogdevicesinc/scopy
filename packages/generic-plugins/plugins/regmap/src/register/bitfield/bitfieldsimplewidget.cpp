@@ -80,7 +80,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 
 	mainFrame->setLayout(layout);
 	QVBoxLayout *mainFrameLayout = new QVBoxLayout();
-	mainFrameLayout->setMargin(0);
+	mainFrameLayout->setContentsMargins(0, 0, 0, 0);
 	mainFrameLayout->setSpacing(0);
 	mainFrameLayout->addWidget(mainFrame);
 	setLayout(mainFrameLayout);

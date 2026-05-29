@@ -326,7 +326,7 @@ QWidget *FaultsDevice::createExplanationSection(QWidget *parent)
 						       MenuCollapseSection::MHW_BASEWIDGET, this);
 	m_explanationSection->setLayout(new QVBoxLayout());
 	m_explanationSection->contentLayout()->setSpacing(10);
-	m_explanationSection->contentLayout()->setMargin(0);
+	m_explanationSection->contentLayout()->setContentsMargins(0, 0, 0, 0);
 
 	m_explanationSection->contentLayout()->addWidget(m_faultsExplanation);
 
