@@ -25,6 +25,7 @@
 
 #include <QApplication>
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QJsonObject>
 #include <common/loggingutil.h>
@@ -148,7 +149,7 @@ QFileInfo PkgManager::reverseSearch(const QString &filePath)
 	for(auto it = validPackages_.begin(); it != validPackages_.end(); ++it) {
 		const QString pkgPath = it.value()[PkgManifest::PKG_PATH].toString();
 		if(filePath.contains(pkgPath)) {
-			return pkgPath;
+			return QFileInfo(pkgPath);
 		}
 	}
 	qWarning(CAT_PKGMANAGER) << "Couldn't find the package of the file:" << filePath;
