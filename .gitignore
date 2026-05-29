@@ -37,6 +37,7 @@ build/*
 .vscode/*
 ci/general/gh-actions.envs
 ci/ubuntu/staging
+ci/ubuntu/staging_ubuntu
 ci/macOS/staging
 ci/arm/staging
 ci/arm/docker/sysroot*
@@ -64,9 +65,13 @@ iioutil/include/iioutil/scopy-iioutil_config.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
+packages/**/scopy-*_config.h
+packages/**/scopy-*_export.h
 bin/*
 lib/*
 docs/_build/*
+docs/design/*
+docs/superpowers/*
 share/*
 gui/include/gui/style_properties.h
 gui/include/gui/style_attributes.h
