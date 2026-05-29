@@ -164,7 +164,7 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *event)
 	}
 }
 
-void SmallOnOffSwitch::enterEvent(QEvent *event)
+void SmallOnOffSwitch::enterEvent(QEnterEvent *event)
 {
 	setCursor(Qt::PointingHandCursor);
 	m_is_entered = true;
@@ -174,7 +174,7 @@ void SmallOnOffSwitch::enterEvent(QEvent *event)
 void SmallOnOffSwitch::leaveEvent(QEvent *event)
 {
 	m_is_entered = false;
-	QCheckBox::enterEvent(event);
+	QCheckBox::leaveEvent(event);
 }
 
 void SmallOnOffSwitch::mousePressEvent(QMouseEvent *event)
