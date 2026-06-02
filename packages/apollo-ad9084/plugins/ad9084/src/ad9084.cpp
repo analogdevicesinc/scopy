@@ -206,6 +206,10 @@ void Ad9084::scanChannels()
 	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
 		QString chn = m_rx_coarse_ddc_channel_names.at(i);
 		struct iio_channel *rxchn = iio_device_find_channel(m_device, chn.toUtf8(), false);
+		if(rxchn == nullptr) {
+			qWarning(CAT_AD9084) << "RX channel not found:" << chn;
+			continue;
+		}
 		Ad9084Channel *rxchnWidget = new Ad9084Channel(rxchn, i, m_group, this);
 		connect(this, &Ad9084::triggerRead, rxchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsRx.push_back(rxchnWidget);
@@ -218,6 +222,10 @@ void Ad9084::scanChannels()
 	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
 		QString chn = m_tx_coarse_duc_channel_names.at(i);
 		struct iio_channel *txchn = iio_device_find_channel(m_device, chn.toUtf8(), true);
+		if(txchn == nullptr) {
+			qWarning(CAT_AD9084) << "TX channel not found:" << chn;
+			continue;
+		}
 		Ad9084Channel *txchnWidget = new Ad9084Channel(txchn, i, m_group, this);
 		connect(this, &Ad9084::triggerRead, txchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsTx.push_back(txchnWidget);
@@ -243,6 +251,10 @@ void Ad9084::mapPathsUnique()
 							channels.push_back(chn);
 						}
 					}
+				}
+				if(channels.isEmpty()) {
+					qWarning(CAT_AD9084) << "No _i channels found for" << converter << cdc;
+					continue;
 				}
 				if(converter.contains("ADC")) {
 					m_rx_coarse_ddc_channel_names.push_back(channels.at(0));

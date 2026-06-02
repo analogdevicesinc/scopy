@@ -254,7 +254,11 @@ def discover_all_packages():
     generic_entries = []
     other_entries = []
 
+    skip_packages = {"m2k"}
     for pkg in sorted(os.listdir(packages_dir)):
+        if pkg in skip_packages:
+            print(f"[doc] Skipping {pkg}: not included in Qt6 port")
+            continue
         setup_path = os.path.join(packages_dir, pkg, "emu-xml", "emu_setup.json")
         if not os.path.isfile(setup_path):
             continue
