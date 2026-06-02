@@ -49,6 +49,7 @@ void PlotMarkerController::init()
 	m_enabled = false;
 	m_complex = false;
 	m_handlesVisible = true;
+	m_markerType = MC_NONE;
 	setNrOfMarkers(5);
 	setMarkerType(MC_NONE);
 }
