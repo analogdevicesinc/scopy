@@ -51,11 +51,14 @@ FaultsPage::FaultsPage(QString uri, QWidget *parent)
 	scrollArea->setWidget(scrollWidget);
 
 	// needed for subsection separator resize
-	m_ad74413rFaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	m_max14906FaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-	layScroll->addWidget(m_ad74413rFaultsDevice);
-	layScroll->addWidget(m_max14906FaultsDevice);
+	if(m_ad74413rFaultsDevice != nullptr) {
+		m_ad74413rFaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		layScroll->addWidget(m_ad74413rFaultsDevice);
+	}
+	if(m_max14906FaultsDevice != nullptr) {
+		m_max14906FaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		layScroll->addWidget(m_max14906FaultsDevice);
+	}
 	layScroll->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	layout->addWidget(scrollArea);
@@ -65,8 +68,12 @@ FaultsPage::~FaultsPage() { ConnectionProvider::close(m_uri); }
 
 void FaultsPage::update()
 {
-	m_ad74413rFaultsDevice->update();
-	m_max14906FaultsDevice->update();
+	if(m_ad74413rFaultsDevice != nullptr) {
+		m_ad74413rFaultsDevice->update();
+	}
+	if(m_max14906FaultsDevice != nullptr) {
+		m_max14906FaultsDevice->update();
+	}
 }
 
 void FaultsPage::setupDevices()

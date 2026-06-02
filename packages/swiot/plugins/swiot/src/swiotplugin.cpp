@@ -225,7 +225,9 @@ bool SWIOTPlugin::onDisconnect()
 		tme->setRunning(false);
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
-		tme->tool()->deleteLater();
+		if(tme->tool() != nullptr) {
+			tme->tool()->deleteLater();
+		}
 		tme->setTool(nullptr);
 	}
 
