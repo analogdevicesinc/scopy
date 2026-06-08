@@ -1,4 +1,4 @@
-name: Scopy armhf Qt6 Build
+name: Scopy armhf Qt6 Build (cross-compile)
 
 on:
     workflow_call:
@@ -11,13 +11,13 @@ on:
           required: true
 
 env:
-  BUILD_HOST: ubuntu-24.04-arm
+  BUILD_HOST: ubuntu-latest
   USERNAME: github-actions
   CI_SCRIPT: "ON"
 
 jobs:
   make_armhf_qt6:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-latest
     steps:
 
         - name: check storage space
@@ -34,27 +34,21 @@ jobs:
                 set-safe-directory: 'true'
                 fetch-depth: '0'
 
-        - name: Set up QEMU
-          uses: docker/setup-qemu-action@v3
-          with:
-            platforms: arm
-
         - name: Pull the Docker Image
           run: |
                 echo ${{ secrets.CLOUDSMITH_API_KEY }} | docker login docker.cloudsmith.io -u ionut-muthi --password-stdin
-                docker pull --platform linux/arm/v7 docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-native-qt6:${{ inputs.docker_tag }}
+                docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-cross-qt6:${{ inputs.docker_tag }}
 
         - name: Build Scopy AppImage
           shell: bash
           run: |
-                docker run --platform linux/arm/v7 \
+                docker run \
                         --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
-                        docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-native-qt6:${{ inputs.docker_tag }} \
+                        docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-cross-qt6:${{ inputs.docker_tag }} \
                         /bin/bash -c    'cd $HOME && \
                                         sudo chown -R runner:runner scopy && \
                                         cd $HOME/scopy && \
-                                        sudo apt-get update && sudo apt-get install -y squashfs-tools patchelf && \
-                                        ./ci/arm/arm_native_build_process.sh download_cmake generate_appimage
+                                        ./ci/arm/arm_cross_build_process.sh download_cmake generate_appimage
                                         '
         - name: Set short git commit SHA
           shell: bash
