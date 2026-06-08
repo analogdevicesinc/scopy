@@ -50,8 +50,11 @@ using namespace grutil;
 typedef enum
 {
 	TIME,
-	FREQUENCY
+	FREQUENCY,
+	SIM
 } ADCInstrumentType;
+
+class SimInstrumentController;
 
 class SCOPY_ADC_EXPORT ADCPlugin : public QObject, public PluginBase
 {
@@ -87,6 +90,7 @@ private:
 	iio_context *m_ctx;
 	QLineEdit *edit;
 	QList<ADCInstrumentController *> m_ctrls;
+	QList<SimInstrumentController *> m_simCtrls;
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
 };
