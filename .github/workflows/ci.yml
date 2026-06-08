@@ -96,15 +96,14 @@ jobs:
       secrets:
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-#   this version takes to long will be replaced by a cross compilation version in the future ( like for qt5 )
-    # armhf-qt6:
-    #   needs: docker_tag
-    #   if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-    #   uses: ./.github/workflows/appimage-armhf.yml
-    #   with:
-    #     docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-    #   secrets:
-    #     CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    armhf-qt6:
+      needs: docker_tag
+      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      uses: ./.github/workflows/appimage-armhf.yml
+      with:
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
     macos-qt6:
       uses: ./.github/workflows/macosbuild.yml
