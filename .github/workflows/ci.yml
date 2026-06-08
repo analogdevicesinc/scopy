@@ -60,41 +60,41 @@ jobs:
       if: github.event_name != 'workflow_dispatch'
       uses: ./.github/workflows/get_docker_tag.yml
 
-    ubuntu-qt6-build:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/ubuntubuild.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    # ubuntu-qt6-build:
+    #   needs: docker_tag
+    #   if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+    #   uses: ./.github/workflows/ubuntubuild.yml
+    #   with:
+    #     docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+    #   secrets:
+    #     CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    appimage-x86_64-qt6:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/appimage-x86_64.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    # appimage-x86_64-qt6:
+    #   needs: docker_tag
+    #   if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+    #   uses: ./.github/workflows/appimage-x86_64.yml
+    #   with:
+    #     docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+    #   secrets:
+    #     CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    mingw-qt6:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/mingwbuild.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    # mingw-qt6:
+    #   needs: docker_tag
+    #   if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+    #   uses: ./.github/workflows/mingwbuild.yml
+    #   with:
+    #     docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+    #   secrets:
+    #     CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    arm64-qt6:
-      needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
-      uses: ./.github/workflows/appimage-arm64.yml
-      with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+    # arm64-qt6:
+    #   needs: docker_tag
+    #   if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+    #   uses: ./.github/workflows/appimage-arm64.yml
+    #   with:
+    #     docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+    #   secrets:
+    #     CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
     armhf-qt6:
       needs: docker_tag
@@ -105,5 +105,5 @@ jobs:
       secrets:
         CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
 
-    macos-qt6:
-      uses: ./.github/workflows/macosbuild.yml
+    # macos-qt6:
+    #   uses: ./.github/workflows/macosbuild.yml
