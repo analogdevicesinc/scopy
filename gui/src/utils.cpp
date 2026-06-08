@@ -172,10 +172,28 @@ void Util::SetAttrRecur(QDomElement &elem, SVGSpec s)
 {
 	// if it has the tagname then overwritte desired attribute
 	if(elem.tagName().compare(s.tag) == 0) {
-		if(s.id.isEmpty()) {
+		bool match = s.id.isEmpty() || elem.attribute("id").compare(s.id) == 0;
+		if(match) {
 			elem.setAttribute(s.attrName, s.attrVal);
-		} else if(elem.attribute("id").compare(s.id) == 0) {
-			elem.setAttribute(s.attrName, s.attrVal);
+
+			// Qt6 SVG renderer respects CSS specificity — inline style overrides XML attributes.
+			// Remove conflicting property from inline style so the XML attribute takes effect.
+			QString style = elem.attribute("style");
+			if(!style.isEmpty()) {
+				QStringList props = style.split(";", Qt::SkipEmptyParts);
+				QStringList filtered;
+				for(const QString &prop : props) {
+					QString key = prop.section(":", 0, 0).trimmed();
+					if(key != s.attrName) {
+						filtered.append(prop.trimmed());
+					}
+				}
+				if(filtered.isEmpty()) {
+					elem.removeAttribute("style");
+				} else {
+					elem.setAttribute("style", filtered.join(";"));
+				}
+			}
 		}
 	}
 
