@@ -41,6 +41,7 @@
 
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
+#include "sim/siminstrumentcontroller.h"
 #include "scopy-adc_config.h"
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
@@ -241,6 +242,9 @@ void ADCPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_spectrum_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("sim", "ADC - Simulated",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_oscilloscope.svg"));
 }
 
 bool iio_is_buffer_capable(struct iio_device *dev)
@@ -321,6 +325,7 @@ bool ADCPlugin::onConnect()
 
 	newInstrument(TIME, root, top);
 	newInstrument(FREQUENCY, root, top);
+	newInstrument(SIM, nullptr, nullptr);
 	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
 	return true;
 }
@@ -414,6 +419,22 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		connect(adc, &ADCInstrumentController::connectionLost, this, &ADCPlugin::connectionLost,
 			Qt::QueuedConnection);
 		m_ctrls.append(adc);
+	} else if(t == SIM) {
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("sim", "ADC - Simulated",
+							  ":/gui/icons/" +
+								  Style::getAttribute(json::theme::icon_theme_folder) +
+								  "/icons/tool_oscilloscope.svg"));
+		auto tme = m_toolList.last();
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(false);
+
+		auto *ctrl = new SimInstrumentController(tme, this);
+		ctrl->init(m_ctx);
+		m_simCtrls.append(ctrl);
+
+		Q_EMIT toolListChanged();
+		tme->setTool(ctrl->ui());
+		return;
 	} else {
 		return;
 	}
@@ -447,8 +468,22 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 				break;
 			}
 		}
-		found->stop();
-		m_ctrls.removeAll(found);
+		if(found) {
+			found->stop();
+			m_ctrls.removeAll(found);
+		} else {
+			SimInstrumentController *simFound = nullptr;
+			for(SimInstrumentController *ctrl : qAsConst(m_simCtrls)) {
+				if(ctrl->ui() == tool->tool()) {
+					simFound = ctrl;
+					break;
+				}
+			}
+			if(simFound) {
+				simFound->stop();
+				m_simCtrls.removeAll(simFound);
+			}
+		}
 		tool->setTool(nullptr);
 		delete(w);
 	}
