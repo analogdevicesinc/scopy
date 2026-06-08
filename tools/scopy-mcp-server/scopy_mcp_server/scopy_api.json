@@ -3,11 +3,17 @@
     "core": [
       "scopy"
     ],
+    "ad6676": [
+      "ad6676"
+    ],
     "ad936x": [
       "ad936x",
       "ad936x_advanced",
       "fmcomms5",
       "fmcomms5_advanced"
+    ],
+    "ad9371": [
+      "ad9371"
     ],
     "apollo-ad9084": [
       "ad9084"
@@ -17,6 +23,18 @@
     ],
     "adrv9009": [
       "adrv9009"
+    ],
+    "cn0357": [
+      "cn0357"
+    ],
+    "cn0540": [
+      "cn0540"
+    ],
+    "daq2": [
+      "daq2"
+    ],
+    "fmcomms11": [
+      "fmcomms11"
     ],
     "generic-plugins": [
       "regmap",
@@ -136,6 +154,11 @@
           "returns": "bool"
         },
         {
+          "name": "dismissWhatsNew",
+          "args": [],
+          "returns": "void"
+        },
+        {
           "name": "exit",
           "args": [],
           "returns": "void"
@@ -205,6 +228,11 @@
           "returns": "QStringList"
         },
         {
+          "name": "getTabs",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
           "name": "getToolBtnState",
           "args": [
             {
@@ -228,6 +256,11 @@
             }
           ],
           "returns": "QStringList"
+        },
+        {
+          "name": "getWhatsNewPageCount",
+          "args": [],
+          "returns": "int"
         },
         {
           "name": "install",
@@ -353,6 +386,26 @@
           "returns": "bool"
         },
         {
+          "name": "screenshot",
+          "args": [
+            {
+              "name": "path",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "screenshotAllScrollAreas",
+          "args": [
+            {
+              "name": "pathPrefix",
+              "type": "QString"
+            }
+          ],
+          "returns": "int"
+        },
+        {
           "name": "setPreference",
           "args": [
             {
@@ -367,6 +420,16 @@
           "returns": "void"
         },
         {
+          "name": "showPage",
+          "args": [
+            {
+              "name": "pageId",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
           "name": "startScan",
           "args": [
             {
@@ -375,6 +438,16 @@
             }
           ],
           "returns": "bool"
+        },
+        {
+          "name": "switchTab",
+          "args": [
+            {
+              "name": "tabName",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
         },
         {
           "name": "switchTool",
@@ -401,6 +474,16 @@
           "returns": "bool"
         },
         {
+          "name": "switchWhatsNewPage",
+          "args": [
+            {
+              "name": "idx",
+              "type": "int"
+            }
+          ],
+          "returns": "void"
+        },
+        {
           "name": "uninstall",
           "args": [
             {
@@ -409,6 +492,219 @@
             }
           ],
           "returns": "bool"
+        }
+      ]
+    },
+    "ad6676": {
+      "methods": [
+        {
+          "name": "getAdcFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getBandwidth",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getBwMarginHigh",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getBwMarginIf",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getBwMarginLow",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getHardwareGain",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getIntermediateFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getSamplingFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getScale",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getShufflerControl",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getShufflerThresh",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTestMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getWidgetKeys",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "readWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "refresh",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "setAdcFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setBandwidth",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setBwMarginHigh",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setBwMarginIf",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setBwMarginLow",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setHardwareGain",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setIntermediateFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setScale",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setShufflerControl",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setShufflerThresh",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setTestMode",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "writeWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
         }
       ]
     },
@@ -2856,6 +3152,968 @@
         }
       ]
     },
+    "ad9371": {
+      "methods": [
+        {
+          "name": "calibrate",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "dpdReset",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "getAdvancedTabs",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getCalibrateClgcEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getCalibrateDpdEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getCalibrateRxQecEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getCalibrateTxLolEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getCalibrateTxLolExtEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getCalibrateTxQecEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getCalibrateVswrEn",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcCurrentGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcDesiredGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcOrxRms",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcStatus",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcTrackCount",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcTrackingEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcTxGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getClgcTxRms",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getDefaultProfilePath",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getDpdActuatorEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getDpdExternalPathDelay",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getDpdModelError",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getDpdStatus",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getDpdTrackCount",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getDpdTrackingEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getEnsmMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFpgaRxFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFpgaTxFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsGainControlMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsHardwareGain",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsQuadratureTracking",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsRfBandwidth",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsRfPortSelect",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsRssi",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsSamplingRate",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getObsTempCompGain",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getPhaseRotation",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxGainControlMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxHardwareGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxLoFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxQuadratureTracking",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxRfBandwidth",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxRssi",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxSamplingFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxSamplingRate",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getRxTempCompGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getSnifferLoFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getTxAttenuation",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getTxLoFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTxLoLeakageTracking",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getTxQuadratureTracking",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getTxRfBandwidth",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTxSamplingFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTxSamplingRate",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getUdcEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "getVswrForwardGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrForwardGainImag",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrForwardGainReal",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrForwardOrx",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrForwardTx",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrReflectedGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrReflectedGainImag",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrReflectedGainReal",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrReflectedOrx",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrReflectedTx",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrStatus",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrTrackCount",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getVswrTrackingEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "getWidgetKeys",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "hasUdc",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "loadProfile",
+          "args": [
+            {
+              "name": "filePath",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "readWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "refresh",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateClgcEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateDpdEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateRxQecEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateTxLolEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateTxLolExtEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateTxQecEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setCalibrateVswrEn",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setClgcTrackingEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setDpdActuatorEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setDpdTrackingEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setEnsmMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setFpgaRxFrequency",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setFpgaTxFrequency",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setObsGainControlMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setObsHardwareGain",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setObsQuadratureTracking",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setObsRfPortSelect",
+          "args": [
+            {
+              "name": "port",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setObsTempCompGain",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setPhaseRotation",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "degrees",
+              "type": "double"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRxGainControlMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRxHardwareGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRxLoFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRxQuadratureTracking",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRxSamplingFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRxTempCompGain",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setSnifferLoFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setTxAttenuation",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setTxLoFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setTxLoLeakageTracking",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setTxQuadratureTracking",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setTxSamplingFrequency",
+          "args": [
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setUdcEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setVswrTrackingEn",
+          "args": [
+            {
+              "name": "channel",
+              "type": "int"
+            },
+            {
+              "name": "val",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "switchAdvancedTab",
+          "args": [
+            {
+              "name": "name",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "writeWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        }
+      ]
+    },
     "adrv9002": {
       "methods": [
         {
@@ -4444,6 +5702,518 @@
               "name": "channel",
               "type": "int"
             },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "writeWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        }
+      ]
+    },
+    "cn0357": {
+      "methods": [
+        {
+          "name": "getAdcMillivolts",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getConcentrationPpm",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFeedbackResistance",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFeedbackType",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFixedResistor",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getMvPerPpm",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getPpmPerMv",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getRdacValue",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getSamplingFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getSensorSensitivity",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getSupplyVoltage",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getWidgetKeys",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "programRheostat",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "readWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "refresh",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "setFeedbackType",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setFixedResistor",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setRdacValue",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setSamplingFrequency",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setSensorSensitivity",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "writeWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        }
+      ]
+    },
+    "cn0540": {
+      "methods": [
+        {
+          "name": "calibrate",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "getConstantCurrent",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFdaEnabled",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getFdaMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getInputVoltage",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getSensorVoltage",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getShiftVoltage",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getShutdown",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getSwFF",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getVoltageMonitor",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getWidgetKeys",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "readWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "refresh",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "setConstantCurrent",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setFdaEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setFdaMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setShiftVoltage",
+          "args": [
+            {
+              "name": "mV",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setShutdown",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "writeWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        }
+      ]
+    },
+    "daq2": {
+      "methods": [
+        {
+          "name": "getAdcCh0TestMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getAdcCh1TestMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getWidgetKeys",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "readWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "refresh",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "setAdcCh0TestMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setAdcCh1TestMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "writeWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            },
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        }
+      ]
+    },
+    "fmcomms11": {
+      "methods": [
+        {
+          "name": "getAdcSamplingFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getAdcScale",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getAdcTestMode",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getDacSamplingFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getInputAttenuation",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getNcoFrequency",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getOutputGain",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getWidgetKeys",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "isFir85Enabled",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "readWidget",
+          "args": [
+            {
+              "name": "key",
+              "type": "QString"
+            }
+          ],
+          "returns": "QString"
+        },
+        {
+          "name": "refresh",
+          "args": [],
+          "returns": "void"
+        },
+        {
+          "name": "setAdcScale",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setAdcTestMode",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setFir85Enabled",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setInputAttenuation",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setNcoFrequency",
+          "args": [
+            {
+              "name": "value",
+              "type": "QString"
+            }
+          ],
+          "returns": "void"
+        },
+        {
+          "name": "setOutputGain",
+          "args": [
             {
               "name": "value",
               "type": "QString"
