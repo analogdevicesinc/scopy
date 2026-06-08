@@ -107,15 +107,7 @@ endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
-find_package(
-	Qt${QT_VERSION_MAJOR}
-	COMPONENTS Widgets
-		   Xml
-		   Svg
-		   StateMachine
-		   OpenGLWidgets
-	REQUIRED
-)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg OpenGLWidgets REQUIRED)
 find_package(KDDockWidgets-qt6 QUIET)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
@@ -160,7 +152,6 @@ target_link_libraries(
 	PUBLIC Qt${QT_VERSION_MAJOR}::Widgets
 	       Qt${QT_VERSION_MAJOR}::Xml
 	       Qt${QT_VERSION_MAJOR}::Svg
-	       Qt${QT_VERSION_MAJOR}::StateMachine
 	       Qt${QT_VERSION_MAJOR}::OpenGLWidgets
 	       ${QWT_LIBRARIES}
 	       ${Boost_LIBRARIES}

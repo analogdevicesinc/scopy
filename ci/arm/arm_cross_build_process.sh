@@ -42,7 +42,8 @@ JOBS=-j$(nproc)
 PYTHON_VERSION=$(python3 -c 'import sys; print(f"python3.{sys.version_info.minor}")' 2>/dev/null || echo "python3")
 
 CMAKE_DOWNLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
-CMAKE_BIN=$STAGING_AREA/cmake/bin/cmake
+CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
+[ ! -f "$CMAKE_BIN" ] && CMAKE_BIN=$(which cmake)
 
 APP_DIR=$SRC_SCRIPT/scopy.AppDir
 APP_IMAGE=$SRC_SCRIPT/Scopy.AppImage
