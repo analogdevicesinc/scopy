@@ -23,11 +23,22 @@ CLASS_TO_JSOBJ = {
     "AD936X_ADVANCED_API": "ad936x_advanced",
     "FMCOMMS5_API": "fmcomms5",
     "FMCOMMS5_ADVANCED_API": "fmcomms5_advanced",
+    # AD6676
+    "AD6676_API": "ad6676",
     # AD9084
     "AD9084_API": "ad9084",
+    # AD9371
+    "Ad9371_API": "ad9371",
     # ADRV9002 / ADRV9009
     "ADRV9002_API": "adrv9002",
     "Adrv9009Plugin_API": "adrv9009",
+    # CN0357 / CN0540
+    "Cn0357_API": "cn0357",
+    "CN0540_API": "cn0540",
+    # DAQ2
+    "Daq2_API": "daq2",
+    # FMCOMMS11
+    "Fmcomms11_API": "fmcomms11",
     # Generic plugins
     "RegMap_API": "regmap",
     "IIOExplorerInstrument_API": "iioExplorer",
@@ -57,10 +68,16 @@ NESTED_CLASS_MAP = {
 # Maps package directory name → list of JS object names it exposes
 PLUGIN_OBJECTS: dict[str, list[str]] = {
     "core": ["scopy"],
+    "ad6676": ["ad6676"],
     "ad936x": ["ad936x", "ad936x_advanced", "fmcomms5", "fmcomms5_advanced"],
+    "ad9371": ["ad9371"],
     "apollo-ad9084": ["ad9084"],
     "adrv9002": ["adrv9002"],
     "adrv9009": ["adrv9009"],
+    "cn0357": ["cn0357"],
+    "cn0540": ["cn0540"],
+    "daq2": ["daq2"],
+    "fmcomms11": ["fmcomms11"],
     "generic-plugins": ["regmap", "iioExplorer", "datalogger"],
     "pqmon": ["pqm"],
     "swiot": ["swiot"],
