@@ -89,6 +89,11 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src src/sim)
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+find_library(GENALYZER_LIB NAMES genalyzer HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib lib64)
+if(NOT GENALYZER_LIB)
+	message(FATAL_ERROR "libgenalyzer not found — required for GenalyzerFFTProcessor")
+endif()
+
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt::Widgets
@@ -98,6 +103,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-gr-util
 	       scopy-iio-widgets
+	PRIVATE ${GENALYZER_LIB}
 )
 
 set(ADC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
