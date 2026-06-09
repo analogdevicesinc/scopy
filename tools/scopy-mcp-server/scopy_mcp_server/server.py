@@ -30,7 +30,17 @@ from scopy_mcp_server.bridge import ScopyBridge
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("scopy-mcp")
 
-mcp = FastMCP("Scopy MCP Server")
+mcp = FastMCP(
+    "Scopy MCP Server",
+    instructions=(
+        "You are controlling Scopy, a multi-domain instrument application. "
+        "Use ONLY the provided MCP tools to interact with Scopy and its instruments. "
+        "Do NOT inspect Scopy binary files, shared libraries, or AppImage contents using "
+        "shell commands (nm, file, strings, objdump, ldd, etc.) — all instrument control "
+        "is available through the MCP tools. "
+        "When a user asks you to do something with Scopy, call the relevant MCP tool directly."
+    ),
+)
 bridge = ScopyBridge()
 
 _API = json.loads((pathlib.Path(__file__).parent / "scopy_api.json").read_text())
