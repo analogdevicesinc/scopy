@@ -1,0 +1,37 @@
+name: Package MCP Server
+
+on:
+  push:
+    branches: [scopy_mcp]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build MCP Server ZIP
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Build ZIP
+      run: |
+        PKG="scopy-mcp-server"
+        mkdir -p "$PKG/scopy_mcp_server"
+
+        cp tools/scopy-mcp-server/scopy_mcp_server/__init__.py    "$PKG/scopy_mcp_server/"
+        cp tools/scopy-mcp-server/scopy_mcp_server/server.py      "$PKG/scopy_mcp_server/"
+        cp tools/scopy-mcp-server/scopy_mcp_server/bridge.py      "$PKG/scopy_mcp_server/"
+        cp tools/scopy-mcp-server/scopy_mcp_server/scopy_api.json "$PKG/scopy_mcp_server/"
+
+        cp tools/scopy-mcp-server/pyproject.toml "$PKG/"
+        cp tools/scopy-mcp-server/setup.py       "$PKG/"
+        cp tools/scopy-mcp-server/README.md      "$PKG/"
+
+        zip -r scopy-mcp-server.zip "$PKG/"
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: scopy-mcp-server
+        path: scopy-mcp-server.zip
