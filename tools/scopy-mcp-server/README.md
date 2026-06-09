@@ -11,17 +11,25 @@ Claude Code ──(MCP stdio)──> scopy-mcp-server ──(FIFO or PTY)──>
 
 ## Prerequisites
 
-- **Linux** (uses Unix named pipes)
 - **Python 3.10+**
-- **[uv](https://docs.astral.sh/uv/)** — Python package runner
 - **Scopy** installed — [download here](https://github.com/analogdevicesinc/scopy/releases)
 - **Claude Code** (CLI, desktop, or IDE extension)
 
 ## Install
 
-**Prerequisites:** Python 3.10+, Scopy installed, Claude Code
+### Option A: Download the standalone package (Scopy app users)
 
-Clone the Scopy repo (or download the [source zip](https://github.com/analogdevicesinc/scopy/archive/refs/heads/main.zip)):
+Download `scopy-mcp-server.zip` from the latest [CI build artifacts](https://github.com/analogdevicesinc/scopy/actions/workflows/mcp-server-package.yml), then:
+
+```bash
+unzip scopy-mcp-server.zip
+cd scopy-mcp-server
+python3 setup.py
+```
+
+The script installs dependencies (tries [uv](https://docs.astral.sh/uv/), falls back to pip) and prints the `.mcp.json` snippet to paste into Claude Code.
+
+### Option B: From source (developers)
 
 ```bash
 git clone https://github.com/analogdevicesinc/scopy
@@ -29,8 +37,7 @@ cd scopy/tools/scopy-mcp-server
 bash install.sh
 ```
 
-The script checks Python, detects your Scopy binary, installs the package, and prints the
-`.mcp.json` snippet to paste into Claude Code. That's it.
+This regenerates the API metadata from Scopy headers, installs dependencies, and updates the repo's `.mcp.json`.
 
 ## Configure Claude Code
 
