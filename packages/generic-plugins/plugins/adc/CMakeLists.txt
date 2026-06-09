@@ -70,7 +70,11 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}
-	src/sim/PlutoIIOSource.h)
+	src/sim/PlutoIIOSource.h
+	src/sim/ScaleOffsetProcessor.h
+	src/sim/ScaleOffsetProcessor.cpp
+	src/sim/ScaleOffsetProcessorWidget.h
+	src/sim/ScaleOffsetProcessorWidget.cpp)
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
