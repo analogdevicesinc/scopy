@@ -26,7 +26,7 @@ jobs:
         oidc-auth-only: 'true'
 
     - name: Login to Cloudsmith Docker registry
-      run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+      run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
     - name: Pull the Docker Image
       run: docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy-windows-qt6:${{ inputs.docker_tag }}
