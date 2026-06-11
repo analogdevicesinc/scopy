@@ -67,6 +67,7 @@ jobs:
             docker run --rm \
               --user root \
               -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -e BUILD_HOST=$BUILD_HOST \
               -e USERNAME=$USERNAME \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
