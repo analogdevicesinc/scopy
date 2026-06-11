@@ -99,9 +99,9 @@ APP_IMAGE_FOLDER=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}
 APP_IMAGE_NAME=${APP_IMAGE_FOLDER}.AppImage
 APP_IMAGE=$SRC_SCRIPT/$APP_IMAGE_NAME
 
-# Export variables for GitHub Actions
-[ $CI_SCRIPT ] && echo "app_image_folder=$APP_IMAGE_FOLDER" >> "$GITHUB_ENV"
-[ $CI_SCRIPT ] && echo "app_image_name=$APP_IMAGE_NAME" >> "$GITHUB_ENV"
+# Export variables for GitHub Actions (only when GITHUB_ENV file exists on the runner)
+[ -f "$GITHUB_ENV" ] && echo "app_image_folder=$APP_IMAGE_FOLDER" >> "$GITHUB_ENV"
+[ -f "$GITHUB_ENV" ] && echo "app_image_name=$APP_IMAGE_NAME" >> "$GITHUB_ENV"
 
 # Build status tracking
 BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
