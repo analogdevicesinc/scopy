@@ -1,3 +1,4 @@
+# once on main this would be a manual trigger workflow that generates dockers for our ci and pushes them on cloudsmith
 name: Push Qt6 Docker Image to Cloudsmith
 
 on:
@@ -13,6 +14,7 @@ on:
             - ubuntu24_qt6
             - ubuntu26_qt6
             - windows_qt6
+            - all
         tag:
           description: 'Docker image tag'
           required: true
@@ -28,7 +30,7 @@ permissions:
 
 jobs:
   push-docker-ubuntu22:
-    if: inputs.platform == 'ubuntu22_qt6'
+    if: inputs.platform == 'ubuntu22_qt6' || inputs.platform == 'all'
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v6
@@ -55,7 +57,7 @@ jobs:
             docker push "${IMAGE}:${{ inputs.tag }}"
 
   push-docker-ubuntu24:
-    if: inputs.platform == 'ubuntu24_qt6'
+    if: inputs.platform == 'ubuntu24_qt6' || inputs.platform == 'all'
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v6
@@ -82,7 +84,7 @@ jobs:
             docker push "${IMAGE}:${{ inputs.tag }}"
 
   push-docker-ubuntu26:
-    if: inputs.platform == 'ubuntu26_qt6'
+    if: inputs.platform == 'ubuntu26_qt6' || inputs.platform == 'all'
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v6
@@ -109,7 +111,7 @@ jobs:
             docker push "${IMAGE}:${{ inputs.tag }}"
 
   push-docker-windows:
-    if: inputs.platform == 'windows_qt6'
+    if: inputs.platform == 'windows_qt6' || inputs.platform == 'all'
     runs-on: windows-2022
     steps:
         - uses: actions/checkout@v6
