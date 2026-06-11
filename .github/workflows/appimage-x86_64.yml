@@ -57,7 +57,7 @@ jobs:
             oidc-auth-only: 'true'
 
         - name: Docker login to Cloudsmith
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Pull Docker image
           run: docker pull docker.cloudsmith.io/adi/scopy-dockers/${{ matrix.docker_image }}:${{ inputs.docker_tag }}
@@ -73,6 +73,12 @@ jobs:
               -w $GITHUB_WORKSPACE \
               docker.cloudsmith.io/adi/scopy-dockers/${{ matrix.docker_image }}:${{ inputs.docker_tag }} \
               bash -c "git config --global --add safe.directory $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/x86_64/x86-64_appimage_process.sh run_workflow"
+
+        - name: Set AppImage env vars
+          run: |
+            UBUNTU_VERSION_SHORT="${{ matrix.ubuntu_version }}04"
+            echo "app_image_folder=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}" >> "$GITHUB_ENV"
+            echo "app_image_name=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}.AppImage" >> "$GITHUB_ENV"
 
         - name: Set short git commit SHA
           shell: bash

@@ -47,7 +47,7 @@ jobs:
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Tag and push image
           run: |
@@ -74,7 +74,7 @@ jobs:
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Tag and push image
           run: |
@@ -101,7 +101,7 @@ jobs:
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Tag and push image
           run: |
@@ -140,7 +140,7 @@ jobs:
               .
 
         - name: Login to Cloudsmith Docker registry
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Tag and push image
           run: |
@@ -167,7 +167,7 @@ jobs:
             oidc-auth-only: 'true'
 
         - name: Login to Cloudsmith Docker registry
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Tag and push image
           run: |
