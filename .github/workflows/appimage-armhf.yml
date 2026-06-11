@@ -43,7 +43,7 @@ jobs:
 
         - name: Pull the Docker Image
           run: |
-                echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+                docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
                 docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-cross-qt6:${{ inputs.docker_tag }}
 
         - name: Build Scopy AppImage

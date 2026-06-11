@@ -41,7 +41,7 @@ jobs:
             oidc-auth-only: 'true'
 
         - name: Docker login to Cloudsmith
-          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
         - name: Pull Docker image
           run: docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
