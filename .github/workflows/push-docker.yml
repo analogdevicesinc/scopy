@@ -12,8 +12,6 @@ on:
             - ubuntu22_qt6
             - ubuntu24_qt6
             - ubuntu26_qt6
-            - arm64_qt6
-            - armhf_cross_qt6
         tag:
           description: 'Docker image tag'
           required: true
@@ -106,71 +104,5 @@ jobs:
         - name: Tag and push image
           run: |
             IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu26-qt6"
-            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
-            docker push "${IMAGE}:${{ inputs.tag }}"
-
-  push-docker-armhf-cross:
-    if: inputs.platform == 'armhf_cross_qt6'
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v6
-
-        - name: Generate Cloudsmith OIDC Token
-          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
-          with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
-            oidc-auth-only: 'true'
-
-        - name: Download tarballs from Cloudsmith
-          run: |
-            mkdir -p ci/arm/docker/tarballs
-            cd ci/arm/docker/tarballs
-            cloudsmith download adi/scopy-dockers/sysroot-armhf-1.0.0.tar.gz sysroot-armhf.tar.gz
-            cloudsmith download adi/scopy-dockers/qt6-armhf-host-6.8.3.tar.gz qt6-host-installed.tar.gz
-            cloudsmith download adi/scopy-dockers/qt6-armhf-cross-6.8.3.tar.gz qt6-armhf-cross-installed.tar.gz
-
-        - name: Build Docker image
-          run: |
-            cd ci/arm
-            docker build \
-              --progress plain \
-              --tag scopy2-armhf-cross-qt6:testing \
-              -f docker/Dockerfile.armhf-cross \
-              .
-
-        - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
-
-        - name: Tag and push image
-          run: |
-            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-armhf-cross-qt6"
-            docker tag "scopy2-armhf-cross-qt6:testing" "${IMAGE}:${{ inputs.tag }}"
-            docker push "${IMAGE}:${{ inputs.tag }}"
-
-  push-docker-arm64:
-    if: inputs.platform == 'arm64_qt6'
-    runs-on: ubuntu-22.04
-    steps:
-        - uses: actions/checkout@v6
-
-        - name: Build Docker image
-          run: |
-            cd ci/arm
-            ./create_docker_image_qt6.sh arm64
-
-        - name: Generate Cloudsmith OIDC Token
-          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
-          with:
-            oidc-namespace: 'adi'
-            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
-            oidc-auth-only: 'true'
-
-        - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
-
-        - name: Tag and push image
-          run: |
-            IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-appimage-qt6"
             docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
             docker push "${IMAGE}:${{ inputs.tag }}"
