@@ -13,7 +13,6 @@ on:
             - ubuntu24_qt6
             - ubuntu26_qt6
             - arm64_qt6
-            - armhf_qt6
             - armhf_cross_qt6
         tag:
           description: 'Docker image tag'
@@ -23,6 +22,10 @@ on:
           options:
             - testing
             - latest
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   push-docker-ubuntu22:
@@ -36,8 +39,15 @@ jobs:
             cd ci/ubuntu
             ./create_docker_image.sh ubuntu22_qt6
 
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
         - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
 
         - name: Tag and push image
           run: |
@@ -56,8 +66,15 @@ jobs:
             cd ci/ubuntu
             ./create_docker_image.sh ubuntu24_qt6
 
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
         - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
 
         - name: Tag and push image
           run: |
@@ -76,8 +93,15 @@ jobs:
             cd ci/ubuntu
             ./create_docker_image.sh ubuntu26_qt6
 
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
         - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
 
         - name: Tag and push image
           run: |
@@ -90,6 +114,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v6
+
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
 
         - name: Download tarballs from Cloudsmith
           run: |
@@ -109,7 +140,7 @@ jobs:
               .
 
         - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
 
         - name: Tag and push image
           run: |
@@ -128,8 +159,15 @@ jobs:
             cd ci/arm
             ./create_docker_image_qt6.sh arm64
 
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
         - name: Login to Cloudsmith Docker registry
-          run: docker login docker.cloudsmith.io -u token -p "${{ secrets.CLOUDSMITH_API_KEY }}"
+          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
 
         - name: Tag and push image
           run: |
