@@ -51,6 +51,7 @@ jobs:
             docker run --rm \
               --user root \
               -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -e BUILD_HOST=$BUILD_HOST \
               -e USERNAME=$USERNAME \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
@@ -63,6 +64,7 @@ jobs:
             docker run --rm \
               --user root \
               -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
               -w $GITHUB_WORKSPACE \
               docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
@@ -86,6 +88,7 @@ jobs:
             docker run --rm \
               --user root \
               -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
               -e QT_QPA_PLATFORM=offscreen \
               -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
               -w $GITHUB_WORKSPACE \
