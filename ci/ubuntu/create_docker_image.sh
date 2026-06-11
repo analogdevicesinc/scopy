@@ -33,6 +33,10 @@ ubuntu26(){
 	popd
 }
 
+ubuntu22_qt6(){ ubuntu22; }
+ubuntu24_qt6(){ ubuntu24; }
+ubuntu26_qt6(){ ubuntu26; }
+
 for arg in $@; do
 	$arg
 done
