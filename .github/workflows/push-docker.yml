@@ -12,6 +12,7 @@ on:
             - ubuntu22_qt6
             - ubuntu24_qt6
             - ubuntu26_qt6
+            - windows_qt6
         tag:
           description: 'Docker image tag'
           required: true
@@ -104,5 +105,33 @@ jobs:
         - name: Tag and push image
           run: |
             IMAGE="docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu26-qt6"
+            docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
+            docker push "${IMAGE}:${{ inputs.tag }}"
+
+  push-docker-windows:
+    if: inputs.platform == 'windows_qt6'
+    runs-on: windows-2022
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
+        - name: Login to Cloudsmith Docker registry
+          run: docker login docker.cloudsmith.io -u token -p "$env:CLOUDSMITH_API_KEY"
+
+        - name: Build Docker image
+          shell: bash
+          run: |
+            cd ci/windows
+            ./create_docker_image.sh windows_qt6
+
+        - name: Tag and push image
+          run: |
+            $IMAGE = "docker.cloudsmith.io/adi/scopy-dockers/scopy-windows-qt6"
             docker tag "${IMAGE}:testing" "${IMAGE}:${{ inputs.tag }}"
             docker push "${IMAGE}:${{ inputs.tag }}"
