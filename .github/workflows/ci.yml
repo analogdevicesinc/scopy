@@ -54,6 +54,7 @@ permissions:
   artifact-metadata: write
   checks: write
   actions: write
+  id-token: write
 
 jobs:
     docker_tag:
@@ -67,7 +68,7 @@ jobs:
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     appimage-x86_64-qt6:
       needs: docker_tag
@@ -76,7 +77,7 @@ jobs:
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     mingw-qt6:
       needs: docker_tag
@@ -85,7 +86,7 @@ jobs:
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     arm64-qt6:
       needs: docker_tag
@@ -94,7 +95,7 @@ jobs:
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     armhf-qt6:
       needs: docker_tag
@@ -103,7 +104,7 @@ jobs:
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
       secrets:
-        CLOUDSMITH_API_KEY: ${{ secrets.CLOUDSMITH_API_KEY }}
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     macos-qt6:
       uses: ./.github/workflows/macosbuild.yml

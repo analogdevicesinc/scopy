@@ -7,7 +7,7 @@ on:
           required: true
           type: string
       secrets:
-        CLOUDSMITH_API_KEY:
+        CLOUDSMITH_SERVICE_SLUG:
           required: true
 
 env:
@@ -15,32 +15,58 @@ env:
   USERNAME: github-actions
   CI_SCRIPT: "ON"
 
+permissions:
+  id-token: write
+  contents: read
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Ubuntu 24 Qt6
 
-    container:
-        image: docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
-        credentials:
-          username: token
-          password: ${{ secrets.CLOUDSMITH_API_KEY }}
-        options: --user root
-
     steps:
         - name: check storage space
           run: df -h
+
         - uses: actions/checkout@v6
+          with:
+            fetch-depth: '0'
+
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
+        - name: Docker login to Cloudsmith
+          run: echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
+
+        - name: Pull Docker image
+          run: docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
+
         - name: Build Scopy
           run: |
-            git config --global --add safe.directory $GITHUB_WORKSPACE
-            $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e BUILD_HOST=$BUILD_HOST \
+              -e USERNAME=$USERNAME \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "git config --global --add safe.directory $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy"
 
         - name: Run Tests
           run: |
-            sudo ldconfig
-            cd $GITHUB_WORKSPACE/build
-            QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu-qt6.xml
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "ldconfig && cd $GITHUB_WORKSPACE/build && QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu-qt6.xml"
 
         - name: Report
           uses: mikepenz/action-junit-report@v6
@@ -57,12 +83,17 @@ jobs:
 
         - name: Generate screenshots
           run: |
-            sudo ldconfig
-            export QT_QPA_PLATFORM=offscreen
-            python3 $GITHUB_WORKSPACE/tools/screenshots/screenshots.py \
-              --all \
-              --scopy $GITHUB_WORKSPACE/build/scopy \
-              --output-root $GITHUB_WORKSPACE/screenshots_output
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e QT_QPA_PLATFORM=offscreen \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "ldconfig && python3 $GITHUB_WORKSPACE/tools/screenshots/screenshots.py \
+                --all \
+                --scopy $GITHUB_WORKSPACE/build/scopy \
+                --output-root $GITHUB_WORKSPACE/screenshots_output"
 
         - name: Upload screenshots artifact
           uses: actions/upload-artifact@v7
