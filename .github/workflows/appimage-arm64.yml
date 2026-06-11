@@ -7,7 +7,7 @@ on:
           required: true
           type: string
       secrets:
-        CLOUDSMITH_API_KEY:
+        CLOUDSMITH_SERVICE_SLUG:
           required: true
 
 env:
@@ -34,9 +34,16 @@ jobs:
                 set-safe-directory: 'true'
                 fetch-depth: '0'
 
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
         - name: Pull the Docker Image
           run: |
-                echo ${{ secrets.CLOUDSMITH_API_KEY }} | docker login docker.cloudsmith.io -u ionut-muthi --password-stdin
+                echo "$CLOUDSMITH_API_KEY" | docker login docker.cloudsmith.io -u token --password-stdin
                 docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:${{ inputs.docker_tag }}
 
         - name: Build Scopy AppImage
