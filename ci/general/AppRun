@@ -54,4 +54,4 @@ export PYTHONHOME=$python_dir
 export PYTHONPATH=$python_dir:$python_dir/lib-dynload:$python_dir/site-packages:$python_dir/encodings
 echo "Starting Scopy"
 ldd "$HERE"/usr/bin/scopy
-exec "$HERE"/usr/bin/scopy
+exec "$HERE"/usr/bin/scopy "$@"
