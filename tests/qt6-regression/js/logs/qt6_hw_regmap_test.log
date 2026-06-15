@@ -1,0 +1,298 @@
+[ I ScopySplashscreen 11:54:54.736 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:35 - Created splashscreen
+[ I ScopySplashscreen 11:54:55.781 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Initializing scopy"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "ScopyConfig"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "DefaultPackageFolderPath: /usr/local/lib/scopy/packages"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "PreferencesPluginFolderPath: /home/imuthi/.config/ADI/Scopy-v2"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "SettingsFolderPath: /home/imuthi/.config/ADI/Scopy-v2"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "ExecutableFolderPath: /home/imuthi/claude/scopy/build"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "version: 2.3.0-dev"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "gitCommit: ccab77bbd"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "fullversion: v2.3.0-dev-gccab77bbd"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "os: Ubuntu 24.04.4 LTS"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "pcSpecs: "
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "build_abi: x86_64-little_endian-lp64"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "build_cpu: x86_64"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "host: imuthi-Precision-5550"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "arch: x86_64"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "kernel: linux"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - "kernel-ver: 6.8.0-124-generic"
+[ I RuntimeEnvironmentInfo 11:54:55.782 ] file:///home/imuthi/claude/scopy/main.cpp:95 - ""
+[ I ScopySplashscreen 11:54:55.783 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Initializing preferences"
+[ I Preferences 11:54:55.784 ] file:///home/imuthi/claude/scopy/pluginbase/src/preferences.cpp:86 - "/home/imuthi/.config/ADI/Scopy-v2/preferences.ini"
+[ I Benchmark 11:54:55.785 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow.cpp:519 - void scopy::ScopyMainWindow::initPreferences() "Init preferences took:" 1 ms
+[ I ScopySplashscreen 11:54:55.890 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Initializing ui"
+[ I ScopySplashscreen 11:54:55.903 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Loading sigrok decoders"
+[ I Benchmark 11:54:56.203 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow.cpp:731 - void scopy::ScopyMainWindow::loadDecoders() "Loading the decoders took:" 299 ms
+[ I VersionCache 11:54:56.203 ] file:///home/imuthi/claude/scopy/pluginbase/src/versionchecker.cpp:58 - update checks disabled
+[ W VersionCache 11:54:56.203 ] file:///home/imuthi/claude/scopy/pluginbase/src/versionchecker.cpp:165 - VersionChecker is not initialized.
+[ I PluginRepository 11:54:56.235 ] file:///home/imuthi/claude/scopy/core/src/pluginrepository.cpp:64 - initializing plugins from:  ""
+[ I ScopySplashscreen 11:54:56.268 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Ad6676Plugin"
+[ I PluginManager 11:54:56.268 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Ad6676Plugin" in  "/home/imuthi/claude/scopy/build/packages/ad6676/plugins/libscopy-ad6676plugin.so"
+[ I ScopySplashscreen 11:54:56.275 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Ad936xPlugin"
+[ I PluginManager 11:54:56.276 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Ad936xPlugin" in  "/home/imuthi/claude/scopy/build/packages/ad936x/plugins/libscopy-ad936x.so"
+[ I ScopySplashscreen 11:54:56.284 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Ad9371Plugin"
+[ I PluginManager 11:54:56.284 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Ad9371Plugin" in  "/home/imuthi/claude/scopy/build/packages/ad9371/plugins/libscopy-ad9371plugin.so"
+[ I ScopySplashscreen 11:54:56.292 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Adrv9002Plugin"
+[ I PluginManager 11:54:56.292 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Adrv9002Plugin" in  "/home/imuthi/claude/scopy/build/packages/adrv9002/plugins/libscopy-adrv9002plugin.so"
+[ I ScopySplashscreen 11:54:56.298 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Adrv9009Plugin"
+[ I PluginManager 11:54:56.298 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Adrv9009Plugin" in  "/home/imuthi/claude/scopy/build/packages/adrv9009/plugins/libscopy-adrv9009plugin.so"
+[ I ScopySplashscreen 11:54:56.308 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "AD9084Plugin"
+[ I PluginManager 11:54:56.308 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "AD9084Plugin" in  "/home/imuthi/claude/scopy/build/packages/apollo-ad9084/plugins/libscopy-ad9084.so"
+[ I ScopySplashscreen 11:54:56.317 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Cn0357Plugin"
+[ I PluginManager 11:54:56.317 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Cn0357Plugin" in  "/home/imuthi/claude/scopy/build/packages/cn0357/plugins/libscopy-cn0357.so"
+[ I ScopySplashscreen 11:54:56.330 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "CN0540Plugin"
+[ I PluginManager 11:54:56.330 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "CN0540Plugin" in  "/home/imuthi/claude/scopy/build/packages/cn0540/plugins/libscopy-cn0540.so"
+[ I ScopySplashscreen 11:54:56.338 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Daq2Plugin"
+[ I PluginManager 11:54:56.338 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Daq2Plugin" in  "/home/imuthi/claude/scopy/build/packages/daq2/plugins/libscopy-daq2.so"
+[ I ScopySplashscreen 11:54:56.348 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "ExtProcPlugin"
+[ I PluginManager 11:54:56.348 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "ExtProcPlugin" in  "/home/imuthi/claude/scopy/build/packages/extproc/plugins/libscopy-extprocplugin.so"
+[ I ScopySplashscreen 11:54:56.356 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Fmcomms11Plugin"
+[ I PluginManager 11:54:56.356 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "Fmcomms11Plugin" in  "/home/imuthi/claude/scopy/build/packages/fmcomms11/plugins/libscopy-fmcomms11.so"
+[ I ScopySplashscreen 11:54:56.396 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "ADCPlugin"
+[ I PluginManager 11:54:56.396 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "ADCPlugin" in  "/home/imuthi/claude/scopy/build/packages/generic-plugins/plugins/libscopy-adc.so"
+[ I ScopySplashscreen 11:54:56.403 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "DACPlugin"
+[ I PluginManager 11:54:56.403 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "DACPlugin" in  "/home/imuthi/claude/scopy/build/packages/generic-plugins/plugins/libscopy-dac.so"
+[ I ScopySplashscreen 11:54:56.411 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "DataLoggerPlugin"
+[ I PluginManager 11:54:56.412 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "DataLoggerPlugin" in  "/home/imuthi/claude/scopy/build/packages/generic-plugins/plugins/libscopy-datalogger.so"
+[ I ScopySplashscreen 11:54:56.420 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "DebuggerPlugin"
+[ I PluginManager 11:54:56.420 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "DebuggerPlugin" in  "/home/imuthi/claude/scopy/build/packages/generic-plugins/plugins/libscopy-debugger.so"
+[ I ScopySplashscreen 11:54:56.426 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "JesdStatusPlugin"
+[ I PluginManager 11:54:56.426 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "JesdStatusPlugin" in  "/home/imuthi/claude/scopy/build/packages/generic-plugins/plugins/libscopy-jesdstatus.so"
+[ I ScopySplashscreen 11:54:56.435 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "RegmapPlugin"
+[ I PluginManager 11:54:56.435 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "RegmapPlugin" in  "/home/imuthi/claude/scopy/build/packages/generic-plugins/plugins/libscopy-regmap.so"
+[ I ScopySplashscreen 11:54:56.453 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "IMUAnalyzer"
+[ I PluginManager 11:54:56.453 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "IMUAnalyzer" in  "/home/imuthi/claude/scopy/build/packages/imu/plugins/libscopy-imuanalyzer.so"
+[ I ScopySplashscreen 11:54:56.460 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "PQMPlugin"
+[ I PluginManager 11:54:56.460 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "PQMPlugin" in  "/home/imuthi/claude/scopy/build/packages/pqmon/plugins/libscopy-pqm.so"
+[ I ScopySplashscreen 11:54:56.469 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "RFPowerMeterPlugin"
+[ I PluginManager 11:54:56.469 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "RFPowerMeterPlugin" in  "/home/imuthi/claude/scopy/build/packages/rfpowermeter/plugins/libscopy-rfpowermeter.so"
+[ I ScopySplashscreen 11:54:56.478 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "SWIOTPlugin"
+[ I PluginManager 11:54:56.478 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "SWIOTPlugin" in  "/home/imuthi/claude/scopy/build/packages/swiot/plugins/libscopy-swiot.so"
+[ I ScopySplashscreen 11:54:56.484 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "BareMinimum"
+[ I PluginManager 11:54:56.484 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "BareMinimum" in  "/home/imuthi/claude/scopy/build/packages/test-plugins/plugins/libscopy-bareminimum.so"
+[ I ScopySplashscreen 11:54:56.494 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "TestPlugin"
+[ I PluginManager 11:54:56.494 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "TestPlugin" in  "/home/imuthi/claude/scopy/build/packages/test-plugins/plugins/libscopy-guitest.so"
+[ I ScopySplashscreen 11:54:56.502 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "TestPlugin"
+[ I PluginManager 11:54:56.502 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "TestPlugin" in  "/home/imuthi/claude/scopy/build/packages/test-plugins/plugins/libscopy-test.so"
+[ I ScopySplashscreen 11:54:56.511 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "TestPluginIp"
+[ I PluginManager 11:54:56.511 ] file:///home/imuthi/claude/scopy/core/src/pluginmanager.cpp:62 - Found plugin: "TestPluginIp" in  "/home/imuthi/claude/scopy/build/packages/test-plugins/plugins/libscopy-test2.so"
+[ I Benchmark 11:54:56.511 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow.cpp:609 - void scopy::ScopyMainWindow::loadPluginsFromRepository() "Loading the plugins from the repository took:" 275 ms
+[ I Benchmark 11:54:57.423 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow.cpp:410 - void scopy::ScopyMainWindow::initAboutPage() "Init about page took:" 912 ms
+[ D ScopyTranslations 11:54:58.755 ] file:///home/imuthi/claude/scopy/core/src/translationsrepository.cpp:108 - Loaded: "en.qm"
+[ I ScopySplashscreen 11:54:58.795 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:60 - Splashscreen message: "Loading homepage"
+[ W default 11:54:58.817 ] file://unknown:0 - QLayout: Attempting to add QLayout "" to scopy::IioTabWidget "", which already has a layout
+[ I EmuAddPage 11:54:58.995 ] file:///home/imuthi/claude/scopy/core/src/emuwidget.cpp:256 - iio-emu from system!
+[ W default 11:54:59.234 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.234 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.234 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.252 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.252 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.257 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.257 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.261 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.261 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.516 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.516 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.690 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.691 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.797 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.797 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.912 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:54:59.912 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:00.635 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:00.635 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:00.722 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:00.722 ] file://unknown:0 - Unknown property box-shadow
+[ I Benchmark 11:55:00.821 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow.cpp:247 - scopy::ScopyMainWindow::ScopyMainWindow(QWidget*) "ScopyMainWindow constructor took:" 5037 ms
+[ I ScopySplashscreen 11:55:00.833 ] file:///home/imuthi/claude/scopy/gui/src/widgets/scopysplashscreen.cpp:78 - Finished splashscreen
+[ I ScannedIIOContextCollector 11:55:00.860 ] file:///home/imuthi/claude/scopy/core/src/scannediiocontextcollector.cpp:54 - new device found:  "usb:1.12.5"
+[ I DeviceManager 11:55:00.860 ] file:///home/imuthi/claude/scopy/core/src/devicemanager.cpp:73 - "iio" device with params "usb:1.12.5" added
+[ D Device 11:55:00.860 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:61 - "usb:1.12.5" ctor
+=====================================
+Test Suite: Qt6 HW RegMap Tests
+Start Time: 2026-06-02T08:55:00.866Z
+=====================================
+
+Connecting to device: ip:192.168.2.1
+[ I DeviceManager 11:55:00.888 ] file:///home/imuthi/claude/scopy/core/src/devicemanager.cpp:73 - "iio" device with params "ip:192.168.2.1" added
+[ D Device 11:55:00.888 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:61 - "ip:192.168.2.1" ctor
+[ I Benchmark 11:55:00.891 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:76 - virtual void scopy::DeviceImpl::init() "Dev init took:" 13 ms
+[ I Benchmark 11:55:00.891 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:76 - virtual void scopy::DeviceImpl::init() "Dev init took:" 2 ms
+[ I Benchmark 11:55:00.920 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:112 - virtual void scopy::DeviceImpl::loadPlugins() "AD936X plugins load took:" 28 ms
+[ I DeviceBrowser 11:55:00.979 ] file:///home/imuthi/claude/scopy/core/src/devicebrowser.cpp:104 - adding device  "dev_iio_ip:192.168.2.1_1"
+[ D DeviceManager 11:55:01.014 ] file:///home/imuthi/claude/scopy/core/src/devicemanager.cpp:228 - connecting  "dev_iio_ip:192.168.2.1_1" ...
+[ W qt.svg 11:55:01.304 ] file://unknown:0 - <use> element lend13 in wrong context!
+[ W qt.svg 11:55:01.304 ] file://unknown:0 - <use> element lend13 in wrong context!
+[ I Benchmark 11:55:01.880 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "Ad936xPlugin connection took:" 748 ms
+[ I Benchmark 11:55:03.176 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:112 - virtual void scopy::DeviceImpl::loadPlugins() "AD936X plugins load took:" 1284 ms
+[ I DeviceBrowser 11:55:03.227 ] file:///home/imuthi/claude/scopy/core/src/devicebrowser.cpp:104 - adding device  "dev_iio_usb:1.12.5_0"
+[ I CMDController 11:55:03.612 ] file:///home/imuthi/claude/scopy/packages/extproc/plugins/extprocplugin/src/controller/cmdcontroller.cpp:234 - cli path: "/home/imuthi/claude/scopy/build/cli_analyzer"
+[ I Benchmark 11:55:03.613 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "ExtProcPlugin connection took:" 302 ms
+[ W default 11:55:04.600 ] file://unknown:0 - QLayout: Attempting to add QLayout "" to scopy::dac::BufferDacAddon "", which already has a layout
+[ W default 11:55:04.608 ] file://unknown:0 - QLayout: Attempting to add QLayout "" to scopy::gui::MenuSpinbox "", which already has a layout
+[ I Benchmark 11:55:08.629 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "DACPlugin connection took:" 4988 ms
+[ I GRManager 11:55:08.975 ] file:///home/imuthi/claude/scopy/gr-util/src/grlogforward.cpp:79 - GNU Radio log forwarding initialized
+[ I default 11:55:08.975 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:47 - building "ctx0"
+[ W MapStackedWidget 11:55:09.729 ] file:///home/imuthi/claude/scopy/gui/src/mapstackedwidget.cpp:105 - "0" not found in MapStackWidget. cannot show
+[ I default 11:55:10.122 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "root"
+[ I default 11:55:10.123 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "ctx"
+[ I default 11:55:10.123 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "cf-ad9361-lpc"
+[ I default 11:55:10.312 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "voltage0"
+[ I default 11:55:10.951 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "voltage1"
+[ I default 11:55:11.509 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "voltage2"
+[ I default 11:55:11.989 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adctimeinstrumentcontroller.cpp:248 - "voltage3"
+[ W MapStackedWidget 11:55:13.622 ] file:///home/imuthi/claude/scopy/gui/src/mapstackedwidget.cpp:105 - "0" not found in MapStackWidget. cannot show
+[ I default 11:55:14.002 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "root"
+[ I default 11:55:14.002 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "ctx"
+[ I default 11:55:14.003 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "cf-ad9361-lpc"
+[ I default 11:55:14.149 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "voltage0"
+[ W qt.core.qobject.connect 11:55:14.529 ] file://unknown:0 - QObject::disconnect: Unexpected nullptr parameter
+[ I default 11:55:14.530 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "voltage1"
+[ I default 11:55:15.288 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "voltage2"
+[ I default 11:55:15.670 ] file:///home/imuthi/claude/scopy/packages/generic-plugins/plugins/adc/src/adcfftinstrumentcontroller.cpp:438 - "voltage3"
+[ I Benchmark 11:55:16.042 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "ADCPlugin connection took:" 7229 ms
+[ I GRManager 11:55:16.290 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:16.290 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I Benchmark 11:55:16.620 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "RegmapPlugin connection took:" 321 ms
+[ W default 11:55:17.884 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:17.884 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:17.884 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:18.028 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:18.028 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:18.127 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:18.127 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:18.150 ] file://unknown:0 - Unknown property box-shadow
+[ W default 11:55:18.150 ] file://unknown:0 - Unknown property box-shadow
+[ I Benchmark 11:55:18.151 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "DebuggerPlugin connection took:" 623 ms
+[ I ApiObject 11:55:18.176 ] file:///home/imuthi/claude/scopy/pluginbase/src/apiobject.cpp:181 - Loading  "iioExplorer" from:  "/home/imuthi/.config/ADI/Scopy-v2/DebuggerPlugin.ini"
+[ I ApiObject 11:55:18.179 ] file:///home/imuthi/claude/scopy/pluginbase/src/apiobject.cpp:181 - Loading  "WatchListView" from:  "/home/imuthi/.config/ADI/Scopy-v2/DebuggerPlugin.ini"
+[ W default 11:55:18.275 ] file://unknown:0 - QWidget::setLayout: Attempting to set QLayout "" on scopy::datamonitor::MonitorPlot "", which already has a layout
+[ W default 11:55:18.344 ] file://unknown:0 - QLayout::addChildLayout: layout QVBoxLayout "" already has a parent
+[ W default 11:55:18.353 ] file://unknown:0 - QLayout: Attempting to add QLayout "" to scopy::gui::MenuSpinbox "", which already has a layout
+[ W default 11:55:19.823 ] file://unknown:0 - QLayout::addChildLayout: layout QVBoxLayout "" already has a parent
+[ I Benchmark 11:55:21.124 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:463 - virtual void scopy::DeviceImpl::connectDev() "DataLoggerPlugin connection took:" 2945 ms
+[ I Benchmark 11:55:21.236 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:501 - virtual void scopy::DeviceImpl::connectDev() "AD936X device connection took:" 20222 ms
+✓ Successfully connected to device
+
+[ W Scopy_API 11:55:23.238 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow_api.cpp:258 - Tool  "Register Map"  doesn't exist for  "AD936X"
+  ERROR: Failed to switch tool: Error: Failed to switch to Register Map
+ERROR: Cannot switch to Register Map tool
+
+=== Device Discovery ===
+
+Running Test UID: TST.HW.REGMAP.AVAILABLE_DEVICES
+Test #1 in suite
+----------------------------------------
+  Available devices: 3
+    [0] ad9361-phy
+    [1] cf-ad9361-dds-core-lpc
+    [2] cf-ad9361-lpc
+✓ PASS (0ms)
+
+Running Test UID: TST.HW.REGMAP.SET_DEVICE
+Test #2 in suite
+----------------------------------------
+  Setting device to: ad9361-phy
+  setDevice returned: true
+✓ PASS (1027ms)
+
+
+=== Register Read ===
+
+Running Test UID: TST.HW.REGMAP.READ_REGISTER
+Test #3 in suite
+----------------------------------------
+  Register 0x000 value: 0x00
+✓ PASS (2ms)
+
+Running Test UID: TST.HW.REGMAP.GET_VALUE_OF_REGISTER
+Test #4 in suite
+----------------------------------------
+  Register 0x000 value (getValueOfRegister): 0x0000
+✓ PASS (0ms)
+
+Running Test UID: TST.HW.REGMAP.GET_REGISTER_INFO
+Test #5 in suite
+----------------------------------------
+  Register 0x000 info: Name:SPI Configuration,Address:0x0000,Description:reg000,Notes:
+✓ PASS (0ms)
+
+
+=== Search ===
+
+Running Test UID: TST.HW.REGMAP.SEARCH
+Test #6 in suite
+----------------------------------------
+  Search '0x00' returned: 6 results
+    [0] 581
+    [1] 588
+    [2] 589
+✓ PASS (4ms)
+
+
+=== Autoread ===
+
+Running Test UID: TST.HW.REGMAP.AUTOREAD
+Test #7 in suite
+----------------------------------------
+  Initial autoread state: false
+  After enable: true
+  After disable: false
+✓ PASS (1003ms)
+
+[ I Benchmark 11:55:25.302 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "Ad936xPlugin disconnection took:" 15 ms
+[ W default 11:55:25.320 ] file://unknown:0 - QProcess: Destroyed while process ("/home/imuthi/claude/scopy/build/cli_analyzer") is still running.
+[ I Benchmark 11:55:25.324 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "ExtProcPlugin disconnection took:" 21 ms
+[ I Benchmark 11:55:25.375 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "DACPlugin disconnection took:" 51 ms
+[ I GRManager 11:55:25.376 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:151 - Stopping top block
+[ I GRManager 11:55:25.381 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.381 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.391 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.392 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.401 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.401 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.414 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.414 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.539 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:151 - Stopping top block
+[ I GRManager 11:55:25.547 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.547 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.554 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.554 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.562 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.562 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.569 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.569 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.577 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.577 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I GRManager 11:55:25.583 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:175 - QObject(0x0)
+[ I GRManager 11:55:25.584 ] file:///home/imuthi/claude/scopy/gr-util/src/grtopblock.cpp:176 - Request rebuild
+[ I Benchmark 11:55:25.796 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "ADCPlugin disconnection took:" 420 ms
+[ I Benchmark 11:55:25.898 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "RegmapPlugin disconnection took:" 101 ms
+[ I ApiObject 11:55:25.898 ] file:///home/imuthi/claude/scopy/pluginbase/src/apiobject.cpp:193 - Saving  "iioExplorer" to:  "/home/imuthi/.config/ADI/Scopy-v2/DebuggerPlugin.ini"
+[ I ApiObject 11:55:25.898 ] file:///home/imuthi/claude/scopy/pluginbase/src/apiobject.cpp:193 - Saving  "WatchListView" to:  "/home/imuthi/.config/ADI/Scopy-v2/DebuggerPlugin.ini"
+[ I Benchmark 11:55:25.907 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "DebuggerPlugin disconnection took:" 0 ms
+[ I Benchmark 11:55:26.173 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:529 - virtual void scopy::DeviceImpl::disconnectDev() "DataLoggerPlugin disconnection took:" 265 ms
+[ I Benchmark 11:55:26.173 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:534 - virtual void scopy::DeviceImpl::disconnectDev() "AD936X device disconnection took:" 887 ms
+[ D DeviceManager 11:55:26.173 ] file:///home/imuthi/claude/scopy/core/src/devicemanager.cpp:272 - disconnecting  "dev_iio_ip:192.168.2.1_1" ...
+[ I DeviceBrowser 11:55:26.179 ] file:///home/imuthi/claude/scopy/core/src/devicebrowser.cpp:122 - removing device  "dev_iio_ip:192.168.2.1_1"
+[ W MapStackedWidget 11:55:26.181 ] file:///home/imuthi/claude/scopy/gui/src/mapstackedwidget.cpp:59 - "dev_iio_ip:192.168.2.1_1" not found in MapStackWidget. cannot remove
+[ I Benchmark 11:55:26.183 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:132 - virtual void scopy::DeviceImpl::unloadPlugins() "AD936X plugins unload took:" 1 ms
+[ D Device 11:55:26.183 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:538 - "dev_iio_ip:192.168.2.1_1" dtor
+[ I DeviceManager 11:55:26.183 ] file:///home/imuthi/claude/scopy/core/src/devicemanager.cpp:128 - device "dev_iio_ip:192.168.2.1_1" removed
+✓ Disconnected from device
+
+
+=====================================
+Test Summary: Qt6 HW RegMap Tests
+=====================================
+Total Tests:   7
+Passed:        7 (100%)
+Failed:        0
+Skipped:       0
+End Time:      2026-06-02T08:55:26.183Z
+=====================================
+
+0
+[ I Scopy_API 11:55:26.183 ] file:///home/imuthi/claude/scopy/core/src/scopymainwindow_api.cpp:286 - Script finished with status 0
+[ D Device 11:55:26.341 ] file:///home/imuthi/claude/scopy/core/src/deviceimpl.cpp:538 - "dev_iio_usb:1.12.5_0" dtor
+Scopy finished gracefully
