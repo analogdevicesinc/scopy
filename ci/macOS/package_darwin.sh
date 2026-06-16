@@ -75,6 +75,12 @@ echo " - Found python$version at $pythonpath"
 pythonid=${pythonidrpath#"$(brew --prefix python3)/Frameworks/"}
 cp -R $(brew --prefix python3)/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
 
+echo "=== Copying libsigrokdecode protocol decoders"
+if [ -d $STAGING_AREA_DEPS/share/libsigrokdecode/decoders ]; then
+	mkdir -p Scopy.app/Contents/MacOS/decoders
+	cp -R $STAGING_AREA_DEPS/share/libsigrokdecode/decoders/* Scopy.app/Contents/MacOS/decoders/
+fi
+
 echo "### Fixing scopy libraries and plugins "
 for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
 do
