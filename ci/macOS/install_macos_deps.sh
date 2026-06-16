@@ -141,6 +141,7 @@ install_packages() {
 		brew update
 
 		if [ "$major_version" -gt 12 ]; then
+			brew pin xcodes 2>/dev/null || true
 			brew upgrade --display-times || true #ignore homebrew upgrade errors
 			# Workaround: Install or update libtool package only if macOS version is greater than 12
 			# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3

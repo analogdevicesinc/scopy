@@ -38,20 +38,6 @@ set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Reso
 
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,-headerpad_max_install_names -Wl,-search_paths_first ${CMAKE_EXE_LINKER_FLAGS}")
 
-foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
-	get_target_property(_loc ${plugin} LOCATION)
-	get_filename_component(_name ${_loc} NAME)
-	get_filename_component(_dir ${_loc} DIRECTORY)
-	get_filename_component(_dir ${_dir} NAME)
-
-	set_source_files_properties(${_loc} PROPERTIES MACOSX_PACKAGE_LOCATION plugins/${_dir})
-	set(QT_PLUGINS ${QT_PLUGINS} ${_loc})
-	set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
-endforeach()
-
-# needs revising install( CODE " set(BU_CHMOD_BUNDLE_ITEMS ON) include(BundleUtilities)
-# fixup_bundle(\"${CMAKE_BINARY_DIR}/Scopy.app\" \"${BUNDLED_QT_PLUGINS}\" \"${CMAKE_SOURCE_DIR}\")" )
-
 set(OSX_BUNDLE MACOSX_BUNDLE)
 
 find_package(PkgConfig)
@@ -72,13 +58,8 @@ macro(set_macosx_package_location source_dir location extension)
 	endforeach()
 endmacro()
 
-set_macosx_package_location(${LIBSIGROK_DECODERS_DIR} "MacOS/decoders" "py")
-set_macosx_package_location(${CMAKE_BINARY_DIR}/style "MacOS/style" "")
+set_macosx_package_location(${LIBSIGROK_DECODERS_DIR} "Resources/decoders" "py")
+set_macosx_package_location(${CMAKE_BINARY_DIR}/style "Resources/style" "")
+set_macosx_package_location(${CMAKE_BINARY_DIR}/translations "Resources/translations" "")
 
-set(EXTRA_BUNDLE_FILES
-    ${EXTRA_BUNDLE_FILES}
-    ${QT_PLUGINS}
-    ${ICON_FILE}
-    ${PKGINFO}
-    ${QT_CONF}
-)
+set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${ICON_FILE} ${PKGINFO} ${QT_CONF})
