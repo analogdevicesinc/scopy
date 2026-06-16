@@ -66,7 +66,7 @@ if(ENABLE_TESTING)
 endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core Qml)
 
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}
@@ -98,6 +98,7 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt::Widgets
 	       Qt::Core
+	       Qt::Qml
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
