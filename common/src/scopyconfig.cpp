@@ -34,7 +34,7 @@ QString scopy::config::tempLogFilePath() { return QDir::cleanPath(settingsFolder
 QString scopy::config::defaultTranslationFolderPath()
 {
 #if defined __APPLE__
-	return QCoreApplication::applicationDirPath() + "/translations";
+	return QCoreApplication::applicationDirPath() + "/../Resources/translations";
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/translations";
 #endif
@@ -46,7 +46,7 @@ QString scopy::config::localTranslationFolderPath() { return SCOPY_TRANSLATION_B
 QString scopy::config::defaultStyleFolderPath()
 {
 #if defined __APPLE__
-	return QCoreApplication::applicationDirPath() + "/style";
+	return QCoreApplication::applicationDirPath() + "/../Resources/style";
 #elif defined(__appimage__)
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/style";
 #endif
