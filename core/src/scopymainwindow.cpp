@@ -691,7 +691,7 @@ void ScopyMainWindow::loadDecoders()
 	DebugTimer benchmark;
 #if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 #if defined __APPLE__
-	QString path = QCoreApplication::applicationDirPath() + "/decoders";
+	QString path = QCoreApplication::applicationDirPath() + "/../Resources/decoders";
 #elif defined(__appimage__)
 	QString path = QCoreApplication::applicationDirPath() + "/../lib/decoders";
 #else
