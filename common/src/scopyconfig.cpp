@@ -156,8 +156,8 @@ QString scopy::config::defaultPkgFolderPath()
 	// Scopy_install_folder/packages
 	return QCoreApplication::applicationDirPath() + "/packages";
 #elif defined __APPLE__
-	// Scopy.app/Contents/MacOS/packages
-	return QCoreApplication::applicationDirPath() + "/packages";
+	// Scopy.app/Contents/Resources/packages
+	return QCoreApplication::applicationDirPath() + "/../Resources/packages";
 #elif defined(__appimage__)
 	// usr/lib/packages
 	return QCoreApplication::applicationDirPath() + "/../lib/scopy/packages";
