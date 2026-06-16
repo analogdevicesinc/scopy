@@ -46,20 +46,30 @@ pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 
-macro(set_macosx_package_location source_dir location extension)
-	file(GLOB_RECURSE files ${source_dir}/*${extension})
-	foreach(_file ${files})
-		file(RELATIVE_PATH _relative_path ${source_dir} ${_file})
-		get_filename_component(parent_directory ${_relative_path} DIRECTORY)
-		message(STATUS "parent_directory: " ${parent_directory})
-		set_property(SOURCE ${_file} PROPERTY MACOSX_PACKAGE_LOCATION ${location}/${parent_directory})
-		message(STATUS "location/parent_directory: " ${location}/${parent_directory})
-		set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${_file})
-	endforeach()
-endmacro()
+set(EXTRA_BUNDLE_FILES ${ICON_FILE} ${PKGINFO} ${QT_CONF})
 
-set_macosx_package_location(${LIBSIGROK_DECODERS_DIR} "Resources/decoders" "py")
-set_macosx_package_location(${CMAKE_BINARY_DIR}/style "Resources/style" "")
-set_macosx_package_location(${CMAKE_BINARY_DIR}/translations "Resources/translations" "")
+function(setup_macos_bundle_resources target)
+	add_custom_command(
+		TARGET ${target}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/style
+			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/style
+		COMMENT "Copying style files into app bundle"
+	)
 
-set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${ICON_FILE} ${PKGINFO} ${QT_CONF})
+	add_custom_command(
+		TARGET ${target}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${LIBSIGROK_DECODERS_DIR}
+			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/decoders
+		COMMENT "Copying sigrokdecode decoders into app bundle"
+	)
+
+	add_custom_command(
+		TARGET ${target}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/translations
+			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/translations
+		COMMENT "Copying translations into app bundle"
+	)
+endfunction()

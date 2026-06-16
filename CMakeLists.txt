@@ -235,6 +235,10 @@ else()
 	endif()
 endif()
 
+if(APPLE)
+	setup_macos_bundle_resources(${PROJECT_NAME})
+endif()
+
 find_package(ECM REQUIRED NO_MODULE)
 message(STATUS "ECM found at: ${ECM_DIR}")
 
