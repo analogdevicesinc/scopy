@@ -494,6 +494,11 @@ create_appdir() {
 	cp $SRC_DIR/gui/res/scopy.png $APP_DIR/usr/share/icons/hicolor/512x512
 	cp $APP_DESKTOP $APP_DIR/usr/share/applications
 
+	cp /usr/local/bin/scopy $APP_DIR/usr/bin/
+	cp /usr/local/lib/libscopy*.so $APP_DIR/usr/lib/
+	mkdir -p $APP_DIR/usr/lib/scopy
+	cp -r /usr/local/lib/scopy/* $APP_DIR/usr/lib/scopy/ 2>/dev/null || true
+
 	if [ -f $EMU_BUILD_FOLDER/iio-emu ]; then
 		cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	elif command -v iio-emu &>/dev/null; then
@@ -502,9 +507,10 @@ create_appdir() {
 		cp /usr/local/bin/iio-emu $APP_DIR/usr/bin
 	fi
 
-	$COPY_DEPS --lib-dir /usr/local/lib:/usr/lib/$TOOLCHAIN_HOST:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
-	[ -f $APP_DIR/usr/bin/iio-emu ] && $COPY_DEPS --lib-dir /usr/local/lib:/usr/lib/$TOOLCHAIN_HOST:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu || true
-	$COPY_DEPS --lib-dir /usr/local/lib:/usr/lib/$TOOLCHAIN_HOST:${BUILD_FOLDER} --output-dir $APP_DIR/usr/lib "$(find $APP_DIR/usr -type f -name 'libscopy*.so')"
+	LIB_DIRS=/usr/local/lib:/usr/lib/$TOOLCHAIN_HOST:${BUILD_FOLDER}:${QT}/lib
+	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
+	[ -f $APP_DIR/usr/bin/iio-emu ] && $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu || true
+	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib "$(find $APP_DIR/usr -type f -name 'libscopy*.so')"
 
 	cp -r $QT/plugins $APP_DIR/usr
 
