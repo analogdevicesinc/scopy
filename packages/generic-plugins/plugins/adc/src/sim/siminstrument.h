@@ -14,6 +14,7 @@
 
 #include <gui/tooltemplate.h>
 #include <gui/plotwidget.h>
+#include <gui/waterfallplotwidget.h>
 #include <gui/widgets/toolbuttons.h>
 
 namespace scopy {
@@ -37,6 +38,7 @@ public:
 	~SimInstrument();
 
 	PlotWidget *plot() const { return m_plot; }
+	WaterfallPlotWidget *waterfall() const { return m_waterfall; }
 
 	// Called once after init() — builds the settings panel from engine + curve descriptors.
 	// Must be called before the widget is shown.
@@ -64,6 +66,7 @@ Q_SIGNALS:
 	void sampleSizeChanged(int size);
 	void maxFpsChanged(int fps);
 	void acqModeChanged(int index); // 0 = Continuous, 1 = Triggered
+	void waterfallRowsChanged(int rows);
 
 private:
 	void setupUi();
@@ -78,9 +81,10 @@ private:
 		QComboBox *yKey{nullptr};
 	};
 
-	ToolTemplate  *m_tool;
-	PlotWidget    *m_plot;
-	RunBtn        *m_runBtn;
+	ToolTemplate        *m_tool;
+	PlotWidget          *m_plot;
+	WaterfallPlotWidget *m_waterfall;
+	RunBtn              *m_runBtn;
 	SingleShotBtn *m_singleBtn;
 	GearBtn       *m_settingsBtn;
 	QPushButton   *m_cursorBtn;
