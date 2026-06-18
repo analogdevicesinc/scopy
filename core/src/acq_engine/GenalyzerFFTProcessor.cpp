@@ -6,8 +6,7 @@
 #include <variant>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 std::mutex GenalyzerFFTProcessor::s_fftMutex;
 
@@ -120,6 +119,5 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	store->write(m_freqKey, m_freqAxis);
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

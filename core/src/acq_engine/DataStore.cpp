@@ -3,8 +3,7 @@
 #include <QMutexLocker>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 DataStore::DataStore(QObject *parent)
 	: QObject(parent)
@@ -79,6 +78,5 @@ QSet<DataKey> DataStore::cycleKeys() const
 	return m_cycleKeys;
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

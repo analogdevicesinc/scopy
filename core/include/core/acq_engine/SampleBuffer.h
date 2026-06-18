@@ -5,8 +5,7 @@
 #include <QVector>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 enum class SampleType { Float32, Float64, Int32, Int16, Int8, UInt8 };
 
@@ -73,6 +72,5 @@ private:
 
 inline const SampleVariant SampleBuffer::m_empty = QVector<float>{};
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
