@@ -138,10 +138,16 @@ install_packages() {
 		export HOMEBREW_NO_AUTO_UPDATE=1
 	else
 		echo "Installing packages fresh..."
+
+		# Remove pre-installed third-party taps that cause CI annotation warnings
+		brew untap aws/tap 2>/dev/null || true
+		brew untap azure/bicep 2>/dev/null || true
+		brew untap hashicorp/tap 2>/dev/null || true
+
 		brew update
 
 		if [ "$major_version" -gt 12 ]; then
-			brew pin xcodes 2>/dev/null || true
+			brew uninstall --force xcodes 2>/dev/null || true
 			brew upgrade --display-times || true #ignore homebrew upgrade errors
 			# Workaround: Install or update libtool package only if macOS version is greater than 12
 			# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
