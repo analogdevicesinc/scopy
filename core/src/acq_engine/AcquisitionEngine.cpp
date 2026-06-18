@@ -5,8 +5,7 @@
 #include <QStringList>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 AcquisitionEngine::AcquisitionEngine(DataStore *store, QObject *parent)
 	: QObject(parent)
@@ -262,6 +261,5 @@ void AcquisitionEngine::safeOnStop(SourceBlock *src)
 	}
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

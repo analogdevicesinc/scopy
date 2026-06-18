@@ -5,8 +5,7 @@
 #include <variant>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 MathProcessor::MathProcessor(const QString &name, QObject *parent)
 	: ProcessorBlock(name, parent)
@@ -49,6 +48,5 @@ void MathProcessor::setFormula(const QString &formula)
 	m_evaluator.setFormula(formula);
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
