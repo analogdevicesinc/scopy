@@ -294,6 +294,9 @@ void SimInstrumentController::onCycleComplete()
 		m_ui->updateCurveKeyCombos(currentKeys);
 	}
 
+	// Refresh the DataStore inspector panel every cycle
+	m_ui->refreshDatastoreView(m_store);
+
 	// Read axis selections from the auto-generated per-curve combos
 	const QString xKeyStr  = m_ui->curveXKey(0);
 	const QString yKeyStr  = m_ui->curveYKey(0);

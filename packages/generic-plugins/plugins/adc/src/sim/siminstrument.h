@@ -3,6 +3,7 @@
 #include <core/acq_engine/AcquisitionError.h>
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataKey.h>
+#include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/ProcessorBlock.h>
 
 #include <QColor>
@@ -10,6 +11,7 @@
 #include <QList>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QTreeWidget>
 #include <QWidget>
 
 #include <gui/tooltemplate.h>
@@ -53,6 +55,10 @@ public:
 	// Refresh all axis key combo-boxes from the current store key list.
 	void updateCurveKeyCombos(const QList<scopy::acq::DataKey> &keys);
 
+	// Refresh the DataStore inspector panel with a live snapshot of the store.
+	// Safe to call from the main thread at any time (e.g. on every cycleComplete).
+	void refreshDatastoreView(scopy::acq::DataStore *store);
+
 public Q_SLOTS:
 	void onStarted();
 	void onStopped();
@@ -89,7 +95,9 @@ private:
 	GearBtn       *m_settingsBtn;
 	QPushButton   *m_cursorBtn;
 	QPushButton   *m_logBtn;
+	QPushButton   *m_datastoreBtn;
 	QTextEdit     *m_logView;
+	QTreeWidget   *m_datastoreTable;
 
 	// Populated by buildControlPanel()
 	QList<CurveSelectors> m_curveSelectors;
