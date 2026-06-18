@@ -1,6 +1,6 @@
 #include "siminstrument.h"
 
-#include "SourceBlock.h"
+#include <core/acq_engine/SourceBlock.h>
 
 #include <QCheckBox>
 #include <QDateTime>
@@ -114,7 +114,7 @@ void SimInstrument::wirePanelButton(QPushButton *btn, const QString &menuId,
 	});
 }
 
-void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
+void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 				      const QList<CurveDescriptor> &curves)
 {
 	// Collect all panel buttons for mutual exclusion wiring
@@ -165,7 +165,7 @@ void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
 		this, &SimInstrument::acqModeChanged);
 
 	// -- Source groups --
-	for(sim::SourceBlock *src : engine->sources()) {
+	for(scopy::acq::SourceBlock *src : engine->sources()) {
 		const bool hasChannels = !src->channelIds().isEmpty();
 		QWidget   *srcWidget   = src->createSettingsWidget(nullptr);
 		if(!hasChannels && !srcWidget)
@@ -237,7 +237,7 @@ void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
 		}
 
 		// Processor settings — one sub-group per processor
-		for(sim::ProcessorBlock *proc : desc.processors) {
+		for(scopy::acq::ProcessorBlock *proc : desc.processors) {
 			QWidget *procWidget = proc->createSettingsWidget(curveGroup);
 			if(!procWidget)
 				continue;
@@ -289,7 +289,7 @@ QString SimInstrument::curveYKey(int i) const
 	return (t == SAMPLE_INDEX_ENTRY) ? QString{} : t;
 }
 
-void SimInstrument::updateCurveKeyCombos(const QList<sim::DataKey> &keys)
+void SimInstrument::updateCurveKeyCombos(const QList<scopy::acq::DataKey> &keys)
 {
 	for(int i = 0; i < m_curveSelectors.size(); ++i) {
 		CurveSelectors &cs = m_curveSelectors[i];
@@ -300,7 +300,7 @@ void SimInstrument::updateCurveKeyCombos(const QList<sim::DataKey> &keys)
 			QSignalBlocker b(cs.xKey);
 			cs.xKey->clear();
 			cs.xKey->addItem(SAMPLE_INDEX_ENTRY);
-			for(const sim::DataKey &k : keys)
+			for(const scopy::acq::DataKey &k : keys)
 				cs.xKey->addItem(k.key);
 			const int idx = cs.xKey->findText(prev);
 			cs.xKey->setCurrentIndex(idx >= 0 ? idx : 0);
@@ -312,7 +312,7 @@ void SimInstrument::updateCurveKeyCombos(const QList<sim::DataKey> &keys)
 			QSignalBlocker b(cs.yKey);
 			cs.yKey->clear();
 			cs.yKey->addItem(SAMPLE_INDEX_ENTRY);
-			for(const sim::DataKey &k : keys)
+			for(const scopy::acq::DataKey &k : keys)
 				cs.yKey->addItem(k.key);
 			const int idx      = cs.yKey->findText(prev);
 			const int fallback = (i < cs.yKey->count() - 1) ? (i + 1) : 0;
@@ -353,13 +353,13 @@ void SimInstrument::onStopped()
 void SimInstrument::appendLog(int severity, const QString &id, const QString &message)
 {
 	const QString ts  = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-	const auto    sev = static_cast<sim::AcquisitionError::Severity>(severity);
+	const auto    sev = static_cast<scopy::acq::AcquisitionError::Severity>(severity);
 
 	QString color, tag;
-	if(sev == sim::AcquisitionError::Severity::Critical) {
+	if(sev == scopy::acq::AcquisitionError::Severity::Critical) {
 		color = "#ff4444";
 		tag   = "CRIT";
-	} else if(sev == sim::AcquisitionError::Severity::Warning) {
+	} else if(sev == scopy::acq::AcquisitionError::Severity::Warning) {
 		color = "#ffaa00";
 		tag   = "WARN";
 	} else {

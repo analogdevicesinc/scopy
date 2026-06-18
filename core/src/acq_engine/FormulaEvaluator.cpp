@@ -3,8 +3,7 @@
 #include <cmath>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 const QString FormulaEvaluator::k_setupScript = QStringLiteral(
 	"var sin=Math.sin,cos=Math.cos,tan=Math.tan,"
@@ -128,6 +127,5 @@ bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &ou
 	return true;
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

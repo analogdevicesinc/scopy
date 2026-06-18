@@ -3,8 +3,7 @@
 #include "MathBlockWidget.h"
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 MathSource::MathSource(const QString &id, QObject *parent)
 	: SourceBlock(id, parent)
@@ -30,6 +29,5 @@ void MathSource::setFormula(const QString &formula)
 	m_evaluator.setFormula(formula);
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

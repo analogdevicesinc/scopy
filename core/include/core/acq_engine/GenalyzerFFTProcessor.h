@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataKey.h"
 #include "ProcessorBlock.h"
 
@@ -8,8 +10,7 @@
 #include <vector>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 // ProcessorBlock that computes a complex FFT of an I/Q pair using genalyzer's
 // gn_fft, centres DC via gn_ifftshift, and converts to dBFS via gn_db.
@@ -20,7 +21,7 @@ namespace sim {
 //
 // Thread safety : genalyzer's fftw3 back-end is not re-entrant; s_fftMutex
 //                 serialises all gn_fft calls across every instance of this class.
-class GenalyzerFFTProcessor : public ProcessorBlock
+class SCOPY_CORE_EXPORT GenalyzerFFTProcessor : public ProcessorBlock
 {
 	Q_OBJECT
 public:
@@ -69,6 +70,5 @@ private:
 	void rebuildFreqAxis();
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

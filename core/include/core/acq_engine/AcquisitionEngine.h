@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "AcquisitionError.h"
 #include "DataStore.h"
 #include "ProcessorBlock.h"
@@ -12,10 +14,9 @@
 #include <QThread>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
-class AcquisitionEngine : public QObject
+class SCOPY_CORE_EXPORT AcquisitionEngine : public QObject
 {
 	Q_OBJECT
 public:
@@ -69,6 +70,5 @@ private:
 	unsigned int            m_maxFPS{0};
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

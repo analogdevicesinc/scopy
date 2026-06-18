@@ -69,12 +69,7 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core Qml)
 
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES}
-	src/sim/PlutoIIOSource.h
-	src/sim/ScaleOffsetProcessor.h
-	src/sim/ScaleOffsetProcessor.cpp
-	src/sim/ScaleOffsetProcessorWidget.h
-	src/sim/ScaleOffsetProcessorWidget.cpp)
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
@@ -89,10 +84,6 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src src/sim)
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
-find_library(GENALYZER_LIB NAMES genalyzer HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib lib64)
-if(NOT GENALYZER_LIB)
-	message(FATAL_ERROR "libgenalyzer not found — required for GenalyzerFFTProcessor")
-endif()
 
 target_link_libraries(
 	${PROJECT_NAME}
@@ -104,7 +95,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-gr-util
 	       scopy-iio-widgets
-	PRIVATE ${GENALYZER_LIB}
+	       scopy-core
 )
 
 set(ADC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

@@ -4,8 +4,7 @@
 #include <QStringList>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 struct DataKey
 {
@@ -50,11 +49,10 @@ private:
 	QStringList parts() const { return key.split('_'); }
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
 
-inline uint qHash(const scopy::adc::sim::DataKey &k, uint seed = 0) noexcept
+inline uint qHash(const scopy::acq::DataKey &k, uint seed = 0) noexcept
 {
 	return qHash(k.key, seed);
 }

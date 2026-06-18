@@ -1,17 +1,18 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataKey.h"
 #include "FormulaEvaluator.h"
 #include "ProcessorBlock.h"
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 // ProcessorBlock that transforms an input channel by evaluating a user-supplied formula.
 // Variables: T = sample index (0 .. N-1), X = input sample value.
 // Output key is set via configure().
-class MathProcessor : public ProcessorBlock
+class SCOPY_CORE_EXPORT MathProcessor : public ProcessorBlock
 {
 	Q_OBJECT
 public:
@@ -32,6 +33,5 @@ private:
 	DataKey          m_outputKey;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
