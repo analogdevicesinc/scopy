@@ -68,6 +68,23 @@ void WaterfallData::addFFTData(const float *data, size_t size)
 		m_data.pop_front();
 }
 
+void WaterfallData::setSnapshot(std::vector<QVector<float>> rows)
+{
+	// rows[0]=newest, rows.back()=oldest (SampleBuffer convention).
+	// m_data stores oldest-first (push_back = newest), so we reverse.
+	m_data.clear();
+	if(rows.empty()) {
+		m_fftSize = 0;
+		return;
+	}
+	m_fftSize = static_cast<size_t>(rows[0].size());
+	for(int i = static_cast<int>(rows.size()) - 1; i >= 0; --i) {
+		m_data.push_back(std::vector<float>(rows[i].begin(), rows[i].end()));
+	}
+	while(static_cast<int>(m_data.size()) > m_maxRows)
+		m_data.pop_front();
+}
+
 void WaterfallData::reset() { m_data.clear(); }
 
 void WaterfallData::setXInterval(double minFreq, double maxFreq) { m_xInterval = QwtInterval(minFreq, maxFreq); }
@@ -231,6 +248,14 @@ void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 	Q_EMIT newData();
 }
 
+void WaterfallPlotWidget::setHistorySnapshot(std::vector<QVector<float>> rows)
+{
+	m_data->setSnapshot(std::move(rows));
+	m_spectrogram->invalidateCache();
+	m_spectrogram->itemChanged();
+	Q_EMIT newData();
+}
+
 void WaterfallPlotWidget::clearData()
 {
 	m_data->reset();
@@ -244,6 +269,7 @@ void WaterfallPlotWidget::clearData()
 void WaterfallPlotWidget::setFrequencyRange(double startHz, double stopHz)
 {
 	m_data->setXInterval(startHz, stopHz);
+	xAxis()->setInterval(startHz, stopHz);
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 }
