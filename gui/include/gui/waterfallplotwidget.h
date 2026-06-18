@@ -45,6 +45,9 @@ public:
 	~WaterfallData() override;
 
 	void addFFTData(const float *data, size_t size);
+	// Replace the entire history with an externally-managed snapshot.
+	// rows[0] = newest frame, rows.back() = oldest frame (SampleBuffer convention).
+	void setSnapshot(std::vector<QVector<float>> rows);
 	void reset();
 
 	void setXInterval(double minFreq, double maxFreq);
@@ -103,6 +106,9 @@ public:
 	~WaterfallPlotWidget() override;
 
 	void addFFTData(const float *data, size_t size);
+	// Replace the waterfall history from an external snapshot (e.g. DataStore history).
+	// rows[0] = newest frame, rows.back() = oldest (matches SampleBuffer::sample() order).
+	void setHistorySnapshot(std::vector<QVector<float>> rows);
 	void clearData();
 
 	void setChannel(ChannelData *ch);
