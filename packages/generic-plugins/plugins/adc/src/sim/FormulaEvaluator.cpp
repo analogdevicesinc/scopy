@@ -124,6 +124,7 @@ bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &ou
 		out[i] = std::isfinite(v) ? static_cast<float>(v) : 0.0f;
 	}
 
+	m_workerEngine->collectGarbage();
 	return true;
 }
 
