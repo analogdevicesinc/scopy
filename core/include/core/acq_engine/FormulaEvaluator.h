@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -10,10 +12,9 @@
 #include <QVector>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
-class FormulaEvaluator
+class SCOPY_CORE_EXPORT FormulaEvaluator
 {
 public:
 	FormulaEvaluator();
@@ -40,6 +41,5 @@ private:
 	static const QString k_setupScript;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "SourceBlock.h"
+#include <core/acq_engine/SourceBlock.h>
+#include <core/acq_engine/DataStore.h>
 
 #include <atomic>
 
@@ -28,7 +29,7 @@ namespace sim {
 //   src->enableChannel("voltage1", true);
 //   engine->addSource(src);
 //   engine->run();
-class PlutoIIOSource : public SourceBlock
+class PlutoIIOSource : public scopy::acq::SourceBlock
 {
 	Q_OBJECT
 public:
@@ -48,7 +49,7 @@ public:
 
 	// Called on the worker thread. Blocks until one full buffer is ready,
 	// then writes each enabled channel to DataStore.
-	void acquire(DataStore *store) override;
+	void acquire(scopy::acq::DataStore *store) override;
 
 private:
 	iio_context *m_ctx;

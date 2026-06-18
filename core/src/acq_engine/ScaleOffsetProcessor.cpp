@@ -6,8 +6,7 @@
 #include <variant>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 ScaleOffsetProcessor::ScaleOffsetProcessor(const QString &name, QObject *parent)
 	: ProcessorBlock(name, parent)
@@ -56,6 +55,5 @@ QWidget *ScaleOffsetProcessor::createSettingsWidget(QWidget *parent)
 	return new ScaleOffsetProcessorWidget(this, parent);
 }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

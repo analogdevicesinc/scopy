@@ -46,6 +46,7 @@ set(SCOPY_QT_COMPONENTS
     Concurrent
     Network
     OpenGLWidgets
+    Qml
 )
 
 file(
@@ -54,6 +55,7 @@ file(
 	src/*.cpp
 	src/*.cc
 	src/pkggui/*.cpp
+	src/acq_engine/*.cpp
 )
 file(
 	GLOB
@@ -61,6 +63,7 @@ file(
 	include/${SCOPY_MODULE}/*.h
 	include/${SCOPY_MODULE}/*.hpp
 	include/${SCOPY_MODULE}/pkggui/*.h
+	include/${SCOPY_MODULE}/acq_engine/*.h
 )
 file(GLOB UI_LIST ui/*.ui)
 
@@ -129,12 +132,15 @@ generate_export_header(
 
 target_include_directories(
 	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
+				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
 )
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
 		${GLIB_INCLUDE_DIRS}
 		${GLIBCONFIG_INCLUDE_DIRS}
 		${LIBSIGROK_DECODE_INCLUDE_DIRS}
@@ -154,6 +160,11 @@ foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
+find_library(GENALYZER_LIB NAMES genalyzer HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib lib64)
+if(NOT GENALYZER_LIB)
+	message(FATAL_ERROR "libgenalyzer not found — required for GenalyzerFFTProcessor (acq_engine)")
+endif()
+
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC ${SCOPY_QT_LIBRARIES}
@@ -164,6 +175,7 @@ target_link_libraries(
 	       scopy-pkg-manager
 	       ${LIBSIGROK_DECODE_LINK_LIBRARIES}
 	       ${Python3_LIBRARIES}
+	PRIVATE ${GENALYZER_LIB}
 )
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH}

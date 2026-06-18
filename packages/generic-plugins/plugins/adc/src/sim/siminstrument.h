@@ -1,9 +1,9 @@
 #pragma once
 
-#include "AcquisitionError.h"
-#include "AcquisitionEngine.h"
-#include "DataKey.h"
-#include "ProcessorBlock.h"
+#include <core/acq_engine/AcquisitionError.h>
+#include <core/acq_engine/AcquisitionEngine.h>
+#include <core/acq_engine/DataKey.h>
+#include <core/acq_engine/ProcessorBlock.h>
 
 #include <QColor>
 #include <QComboBox>
@@ -31,7 +31,7 @@ public:
 	{
 		QString                    name;       // e.g. "Curve 1"
 		QColor                     color;
-		QList<sim::ProcessorBlock *> processors; // may be empty
+		QList<scopy::acq::ProcessorBlock *> processors; // may be empty
 	};
 
 	explicit SimInstrument(QWidget *parent = nullptr);
@@ -42,7 +42,7 @@ public:
 
 	// Called once after init() — builds the settings panel from engine + curve descriptors.
 	// Must be called before the widget is shown.
-	void buildControlPanel(sim::AcquisitionEngine *engine,
+	void buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 			       const QList<CurveDescriptor> &curves);
 
 	// Returns the currently selected X/Y DataStore key for curve i (0-based).
@@ -51,7 +51,7 @@ public:
 	QString curveYKey(int i) const;
 
 	// Refresh all axis key combo-boxes from the current store key list.
-	void updateCurveKeyCombos(const QList<sim::DataKey> &keys);
+	void updateCurveKeyCombos(const QList<scopy::acq::DataKey> &keys);
 
 public Q_SLOTS:
 	void onStarted();

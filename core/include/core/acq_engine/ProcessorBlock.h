@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataKey.h"
 #include "DataStore.h"
 
@@ -12,10 +14,9 @@
 class QWidget;
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
-class ProcessorBlock : public QObject
+class SCOPY_CORE_EXPORT ProcessorBlock : public QObject
 {
 	Q_OBJECT
 public:
@@ -40,6 +41,5 @@ protected:
 	QList<DataKey>    m_watchedKeys;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

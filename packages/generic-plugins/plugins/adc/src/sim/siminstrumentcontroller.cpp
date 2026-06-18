@@ -34,28 +34,28 @@ SimInstrumentController::~SimInstrumentController()
 void SimInstrumentController::init(iio_context *ctx)
 {
 	// ---- Engine + store ----
-	m_store  = new sim::DataStore(this);
-	m_engine = new sim::AcquisitionEngine(m_store, this);
+	m_store  = new scopy::acq::DataStore(this);
+	m_engine = new scopy::acq::AcquisitionEngine(m_store, this);
 	m_engine->setBufferSize(1024);
 	m_engine->setMaxFPS(30);
 
 	// ---- Sources ----
-	m_src = new sim::SimulatedSource("sim-adc", m_engine);
+	m_src = new scopy::adc::sim::SimulatedSource("sim-adc", m_engine);
 	m_src->enableChannel("voltage0", true);
 	m_src->enableChannel("voltage1", true);
 	m_engine->addSource(m_src);
 
 	if(ctx) {
-		m_plutoSrc = new sim::PlutoIIOSource(ctx, "pluto", "cf-ad9361-lpc", m_engine);
+		m_plutoSrc = new scopy::adc::sim::PlutoIIOSource(ctx, "pluto", "cf-ad9361-lpc", m_engine);
 		m_plutoSrc->enableChannel("voltage0", true);
 		m_plutoSrc->enableChannel("voltage1", true);
 		m_engine->addSource(m_plutoSrc);
 
-		m_fftProc = new sim::GenalyzerFFTProcessor(
-			sim::DataKey::raw("pluto", "voltage0"),
-			sim::DataKey::raw("pluto", "voltage1"),
-			sim::DataKey::withStage("pluto", "iq", "fft"),
-			sim::DataKey::withStage("pluto", "iq", "freq"),
+		m_fftProc = new scopy::acq::GenalyzerFFTProcessor(
+			scopy::acq::DataKey::raw("pluto", "voltage0"),
+			scopy::acq::DataKey::raw("pluto", "voltage1"),
+			scopy::acq::DataKey::withStage("pluto", "iq", "fft"),
+			scopy::acq::DataKey::withStage("pluto", "iq", "freq"),
 			static_cast<int>(m_engine->bufferSize()),
 			/*sampleRate=*/2.4e6,
 			GnWindowHann,
@@ -64,22 +64,22 @@ void SimInstrumentController::init(iio_context *ctx)
 	}
 
 	// ---- Processor: scale + offset ----
-	m_scaleProc = new sim::ScaleOffsetProcessor("scale-offset", this);
-	m_scaleProc->addChannel(sim::DataKey::raw("sim-adc", "voltage0"),
-				sim::DataKey::withStage("sim-adc", "voltage0", "scaled"),
+	m_scaleProc = new scopy::acq::ScaleOffsetProcessor("scale-offset", this);
+	m_scaleProc->addChannel(scopy::acq::DataKey::raw("sim-adc", "voltage0"),
+				scopy::acq::DataKey::withStage("sim-adc", "voltage0", "scaled"),
 				"voltage0");
-	m_scaleProc->addChannel(sim::DataKey::raw("sim-adc", "voltage1"),
-				sim::DataKey::withStage("sim-adc", "voltage1", "scaled"),
+	m_scaleProc->addChannel(scopy::acq::DataKey::raw("sim-adc", "voltage1"),
+				scopy::acq::DataKey::withStage("sim-adc", "voltage1", "scaled"),
 				"voltage1");
 	m_engine->addProcessor(m_scaleProc);
 
 	// ---- Math source + processor ----
-	m_mathSrc = new sim::MathSource("math-src", m_engine);
+	m_mathSrc = new scopy::acq::MathSource("math-src", m_engine);
 	m_engine->addSource(m_mathSrc);
 
-	m_mathProc = new sim::MathProcessor("math", m_engine);
+	m_mathProc = new scopy::acq::MathProcessor("math", m_engine);
 	m_mathProc->configure(m_mathSrc->outputKey(),
-			      sim::DataKey::withStage("math-src", "out", "proc"));
+			      scopy::acq::DataKey::withStage("math-src", "out", "proc"));
 	m_engine->addProcessor(m_mathProc);
 
 	// ---- UI ----
@@ -106,11 +106,11 @@ void SimInstrumentController::init(iio_context *ctx)
 		m_ui->m_plot->yAxis(), &PlotAxis::setMin);
 	connect(m_autoscalerY, &scopy::gui::PlotAutoscaler::newMax,
 		m_ui->m_plot->yAxis(), &PlotAxis::setMax);
-	connect(m_engine, &sim::AcquisitionEngine::started,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started,
 		m_autoscalerY, &scopy::gui::PlotAutoscaler::start);
-	connect(m_engine, &sim::AcquisitionEngine::stopped,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped,
 		m_autoscalerY, &scopy::gui::PlotAutoscaler::stop);
-	connect(m_engine, &sim::AcquisitionEngine::forceStopped,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped,
 		m_autoscalerY, &scopy::gui::PlotAutoscaler::stop);
 
 	m_autoscalerX = new scopy::gui::PlotAutoscaler(this);
@@ -121,16 +121,16 @@ void SimInstrumentController::init(iio_context *ctx)
 		m_ui->m_plot->xAxis(), &PlotAxis::setMin);
 	connect(m_autoscalerX, &scopy::gui::PlotAutoscaler::newMax,
 		m_ui->m_plot->xAxis(), &PlotAxis::setMax);
-	connect(m_engine, &sim::AcquisitionEngine::started,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started,
 		m_autoscalerX, &scopy::gui::PlotAutoscaler::start);
-	connect(m_engine, &sim::AcquisitionEngine::stopped,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped,
 		m_autoscalerX, &scopy::gui::PlotAutoscaler::stop);
-	connect(m_engine, &sim::AcquisitionEngine::forceStopped,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped,
 		m_autoscalerX, &scopy::gui::PlotAutoscaler::stop);
 
 	// ---- Wire UI buttons → engine ----
-	connect(m_ui, &SimInstrument::requestRun,  m_engine, &sim::AcquisitionEngine::run);
-	connect(m_ui, &SimInstrument::requestStop, m_engine, &sim::AcquisitionEngine::stop);
+	connect(m_ui, &SimInstrument::requestRun,  m_engine, &scopy::acq::AcquisitionEngine::run);
+	connect(m_ui, &SimInstrument::requestStop, m_engine, &scopy::acq::AcquisitionEngine::stop);
 	connect(m_ui, &SimInstrument::requestSingle, this, [this]() { m_engine->single(1); });
 
 	connect(m_ui, &SimInstrument::sampleSizeChanged, this, [this](int n) {
@@ -141,26 +141,26 @@ void SimInstrumentController::init(iio_context *ctx)
 	});
 	connect(m_ui, &SimInstrument::acqModeChanged, this, [this](int idx) {
 		m_engine->setMode(idx == 0
-			? sim::AcquisitionEngine::Mode::Continuous
-			: sim::AcquisitionEngine::Mode::Triggered);
+			? scopy::acq::AcquisitionEngine::Mode::Continuous
+			: scopy::acq::AcquisitionEngine::Mode::Triggered);
 	});
 
 	// ---- Wire engine signals → UI state ----
-	connect(m_engine, &sim::AcquisitionEngine::started,      m_ui, &SimInstrument::onStarted);
-	connect(m_engine, &sim::AcquisitionEngine::stopped,      m_ui, &SimInstrument::onStopped);
-	connect(m_engine, &sim::AcquisitionEngine::forceStopped, m_ui, &SimInstrument::onForceStopped);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started,      m_ui, &SimInstrument::onStarted);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped,      m_ui, &SimInstrument::onStopped);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, m_ui, &SimInstrument::onForceStopped);
 
 	// ---- Wire engine cycleComplete → plot update ----
-	connect(m_engine, &sim::AcquisitionEngine::cycleComplete,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::cycleComplete,
 		this, &SimInstrumentController::onCycleComplete, Qt::QueuedConnection);
 
 	// ---- Log errors ----
-	connect(m_engine, &sim::AcquisitionEngine::error, this,
+	connect(m_engine, &scopy::acq::AcquisitionEngine::error, this,
 		[this](int severity, const QString &id, const QString &message) {
-			const auto sev = static_cast<sim::AcquisitionError::Severity>(severity);
+			const auto sev = static_cast<scopy::acq::AcquisitionError::Severity>(severity);
 			const char *sevStr =
-				sev == sim::AcquisitionError::Severity::Critical ? "CRITICAL" :
-				sev == sim::AcquisitionError::Severity::Warning  ? "WARNING"  :
+				sev == scopy::acq::AcquisitionError::Severity::Critical ? "CRITICAL" :
+				sev == scopy::acq::AcquisitionError::Severity::Warning  ? "WARNING"  :
 				                                                   "INFO";
 			qWarning(CAT_SIM_CTRL) << "[" << sevStr << "]" << id << ":" << message;
 			if(m_ui)
@@ -178,7 +178,7 @@ void SimInstrumentController::init(iio_context *ctx)
 	m_fpsLabel->setText("-- FPS");
 	m_cycleCount = 0;
 	m_fpsTimer.start();
-	connect(m_engine, &sim::AcquisitionEngine::started, this, [this]() {
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started, this, [this]() {
 		m_cycleCount = 0;
 		m_fpsTimer.restart();
 		m_fpsLabel->setText("-- FPS");
@@ -194,9 +194,9 @@ void SimInstrumentController::init(iio_context *ctx)
 		m_ui->m_plot->replot();
 		m_ui->m_waterfall->replot();
 	});
-	connect(m_engine, &sim::AcquisitionEngine::started,      m_displayTimer, QOverload<>::of(&QTimer::start));
-	connect(m_engine, &sim::AcquisitionEngine::stopped,      m_displayTimer, &QTimer::stop);
-	connect(m_engine, &sim::AcquisitionEngine::forceStopped, m_displayTimer, &QTimer::stop);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started,      m_displayTimer, QOverload<>::of(&QTimer::start));
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped,      m_displayTimer, &QTimer::stop);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, m_displayTimer, &QTimer::stop);
 	auto flushDirty = [this]() {
 		if(m_dataDirty) {
 			m_dataDirty = false;
@@ -204,8 +204,8 @@ void SimInstrumentController::init(iio_context *ctx)
 			m_ui->m_waterfall->replot();
 		}
 	};
-	connect(m_engine, &sim::AcquisitionEngine::stopped,      this, flushDirty);
-	connect(m_engine, &sim::AcquisitionEngine::forceStopped, this, flushDirty);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped,      this, flushDirty);
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, this, flushDirty);
 
 	// ---- Cursors ----
 	m_cursorCtrl = new scopy::CursorController(m_ui->m_plot, this);
@@ -221,7 +221,7 @@ void SimInstrumentController::init(iio_context *ctx)
 
 	// TODO: temporary — reset autoscale accumulators on each engine start so stale
 	// extremes from a previous run don't pin the color range (see onCycleComplete).
-	connect(m_engine, &sim::AcquisitionEngine::started, this, [this]() {
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started, this, [this]() {
 		m_wfAutoMin =  DBL_MAX;
 		m_wfAutoMax = -DBL_MAX;
 	});
@@ -260,7 +260,7 @@ void SimInstrumentController::stop()
 		return;
 	if(m_displayTimer)
 		m_displayTimer->stop();
-	disconnect(m_engine, &sim::AcquisitionEngine::cycleComplete,
+	disconnect(m_engine, &scopy::acq::AcquisitionEngine::cycleComplete,
 		   this, &SimInstrumentController::onCycleComplete);
 	QCoreApplication::removePostedEvents(this);
 	m_engine->stop();
@@ -288,7 +288,7 @@ void SimInstrumentController::onCycleComplete()
 	}
 
 	// Refresh combos if the key set changed
-	const QList<sim::DataKey> currentKeys = m_store->keys();
+	const QList<scopy::acq::DataKey> currentKeys = m_store->keys();
 	if(currentKeys != m_lastKeys) {
 		m_lastKeys = currentKeys;
 		m_ui->updateCurveKeyCombos(currentKeys);
@@ -308,7 +308,7 @@ void SimInstrumentController::onCycleComplete()
 	QVector<float> xVec, yVec, y2Vec, x2Vec;
 
 	if(!xIsIndex) {
-		const sim::SampleBuffer xBuf = m_store->read(sim::DataKey(xKeyStr));
+		const scopy::acq::SampleBuffer xBuf = m_store->read(scopy::acq::DataKey(xKeyStr));
 		if(xBuf.empty()) return;
 		const auto &v = xBuf.sample(0);
 		if(!std::holds_alternative<QVector<float>>(v)) return;
@@ -317,7 +317,7 @@ void SimInstrumentController::onCycleComplete()
 	}
 
 	if(!yIsIndex) {
-		const sim::SampleBuffer yBuf = m_store->read(sim::DataKey(yKeyStr));
+		const scopy::acq::SampleBuffer yBuf = m_store->read(scopy::acq::DataKey(yKeyStr));
 		if(yBuf.empty()) return;
 		const auto &v = yBuf.sample(0);
 		if(!std::holds_alternative<QVector<float>>(v)) return;
@@ -326,7 +326,7 @@ void SimInstrumentController::onCycleComplete()
 	}
 
 	if(!y2IsIndex) {
-		const sim::SampleBuffer y2Buf = m_store->read(sim::DataKey(y2KeyStr));
+		const scopy::acq::SampleBuffer y2Buf = m_store->read(scopy::acq::DataKey(y2KeyStr));
 		if(!y2Buf.empty()) {
 			const auto &v = y2Buf.sample(0);
 			if(std::holds_alternative<QVector<float>>(v))
@@ -335,7 +335,7 @@ void SimInstrumentController::onCycleComplete()
 	}
 
 	if(!x2IsIndex) {
-		const sim::SampleBuffer x2Buf = m_store->read(sim::DataKey(x2KeyStr));
+		const scopy::acq::SampleBuffer x2Buf = m_store->read(scopy::acq::DataKey(x2KeyStr));
 		if(!x2Buf.empty()) {
 			const auto &v = x2Buf.sample(0);
 			if(std::holds_alternative<QVector<float>>(v))
@@ -402,7 +402,7 @@ void SimInstrumentController::onCycleComplete()
 	// Feed waterfall from the key selected in the Waterfall Y combo (index 2).
 	const QString wfYKeyStr = m_ui->curveYKey(2);
 	if(!wfYKeyStr.isEmpty()) {
-		const sim::DataKey wfYKey(wfYKeyStr);
+		const scopy::acq::DataKey wfYKey(wfYKeyStr);
 
 		// Key changed: migrate history-size budget to the new key.
 		if(wfYKey != m_fftWaterfallKey) {
@@ -416,7 +416,7 @@ void SimInstrumentController::onCycleComplete()
 		// Update X frequency axis from the selected X key (if any).
 		const QString wfXKeyStr = m_ui->curveXKey(2);
 		if(!wfXKeyStr.isEmpty()) {
-			const sim::SampleBuffer xBuf = m_store->read(sim::DataKey(wfXKeyStr));
+			const scopy::acq::SampleBuffer xBuf = m_store->read(scopy::acq::DataKey(wfXKeyStr));
 			if(!xBuf.empty()) {
 				const auto &xv = xBuf.sample(0);
 				if(std::holds_alternative<QVector<float>>(xv)) {
@@ -428,12 +428,12 @@ void SimInstrumentController::onCycleComplete()
 		}
 
 		// Build and push history snapshot.
-		const sim::SampleBuffer yBuf = m_store->read(m_fftWaterfallKey);
+		const scopy::acq::SampleBuffer yBuf = m_store->read(m_fftWaterfallKey);
 		if(!yBuf.empty()) {
 			std::vector<QVector<float>> snap;
 			snap.reserve(yBuf.depth());
 			for(std::size_t i = 0; i < yBuf.depth(); ++i) {
-				const sim::SampleVariant &v = yBuf.sample(i);
+				const scopy::acq::SampleVariant &v = yBuf.sample(i);
 				if(std::holds_alternative<QVector<float>>(v))
 					snap.push_back(std::get<QVector<float>>(v));
 			}

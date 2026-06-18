@@ -1,17 +1,18 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataKey.h"
 #include "FormulaEvaluator.h"
 #include "SourceBlock.h"
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 // SourceBlock that generates one channel by evaluating a user-supplied formula.
 // Variable T = sample index (0 .. bufferSize-1).
 // Output key: <id>_out_math
-class MathSource : public SourceBlock
+class SCOPY_CORE_EXPORT MathSource : public SourceBlock
 {
 	Q_OBJECT
 public:
@@ -31,6 +32,5 @@ private:
 	DataKey          m_outputKey;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
