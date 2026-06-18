@@ -3,13 +3,13 @@
 #include <cfloat>
 
 #include "siminstrument.h"
-#include "AcquisitionEngine.h"
-#include "DataStore.h"
-#include "GenalyzerFFTProcessor.h"
-#include "MathProcessor.h"
-#include "MathSource.h"
+#include <core/acq_engine/AcquisitionEngine.h>
+#include <core/acq_engine/DataStore.h>
+#include <core/acq_engine/GenalyzerFFTProcessor.h>
+#include <core/acq_engine/MathProcessor.h>
+#include <core/acq_engine/MathSource.h>
 #include "PlutoIIOSource.h"
-#include "ScaleOffsetProcessor.h"
+#include <core/acq_engine/ScaleOffsetProcessor.h>
 #include "SimulatedSource.h"
 
 struct iio_context;
@@ -56,14 +56,14 @@ private Q_SLOTS:
 private:
 	ToolMenuEntry *m_tme;
 
-	sim::DataStore              *m_store{nullptr};
-	sim::AcquisitionEngine      *m_engine{nullptr};
-	sim::SimulatedSource        *m_src{nullptr};
-	sim::PlutoIIOSource         *m_plutoSrc{nullptr};
-	sim::ScaleOffsetProcessor   *m_scaleProc{nullptr};
-	sim::GenalyzerFFTProcessor  *m_fftProc{nullptr};
-	sim::MathSource             *m_mathSrc{nullptr};
-	sim::MathProcessor          *m_mathProc{nullptr};
+	scopy::acq::DataStore              *m_store{nullptr};
+	scopy::acq::AcquisitionEngine      *m_engine{nullptr};
+	scopy::adc::sim::SimulatedSource        *m_src{nullptr};
+	scopy::adc::sim::PlutoIIOSource         *m_plutoSrc{nullptr};
+	scopy::acq::ScaleOffsetProcessor   *m_scaleProc{nullptr};
+	scopy::acq::GenalyzerFFTProcessor  *m_fftProc{nullptr};
+	scopy::acq::MathSource             *m_mathSrc{nullptr};
+	scopy::acq::MathProcessor          *m_mathProc{nullptr};
 
 	QPointer<SimInstrument> m_ui;
 
@@ -76,7 +76,7 @@ private:
 	QVector<float> m_indexBuf;
 
 	// Tracks the last seen key set so onCycleComplete() can refresh combos only on change.
-	QList<sim::DataKey> m_lastKeys;
+	QList<scopy::acq::DataKey> m_lastKeys;
 
 	scopy::gui::PlotAutoscaler *m_autoscalerY{nullptr};
 	scopy::gui::PlotAutoscaler *m_autoscalerX{nullptr};
@@ -91,7 +91,7 @@ private:
 	bool    m_dataDirty{false};
 
 	// Waterfall: currently active data key (set dynamically from curveYKey(2)).
-	sim::DataKey m_fftWaterfallKey;
+	scopy::acq::DataKey m_fftWaterfallKey;
 	int          m_currentWaterfallRows{200};
 	static constexpr int WATERFALL_ROWS = 200;
 

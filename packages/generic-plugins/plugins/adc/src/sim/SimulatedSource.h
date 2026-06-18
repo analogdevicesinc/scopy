@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DataKey.h"
-#include "SampleBuffer.h"
-#include "SourceBlock.h"
+#include <core/acq_engine/DataKey.h>
+#include <core/acq_engine/SampleBuffer.h>
+#include <core/acq_engine/SourceBlock.h>
 
 #include <cmath>
 
@@ -11,7 +11,7 @@ namespace adc {
 namespace sim {
 
 // Generates continuous sine-wave Float32 data for each enabled channel.
-class SimulatedSource : public SourceBlock
+class SimulatedSource : public scopy::acq::SourceBlock
 {
 	Q_OBJECT
 	static constexpr float TWO_PI = 6.28318530f;
@@ -21,7 +21,7 @@ public:
 		: SourceBlock(id, parent)
 	{}
 
-	void acquire(DataStore *store) override
+	void acquire(scopy::acq::DataStore *store) override
 	{
 		if(m_stopRequested)
 			return;
@@ -39,7 +39,7 @@ public:
 				data[i] = std::sin(TWO_PI * t + chIndex * 0.5f);
 			}
 
-			store->write(DataKey::raw(m_id, it.key()), std::move(data));
+			store->write(scopy::acq::DataKey::raw(m_id, it.key()), std::move(data));
 		}
 
 		if (m_sampleIndex >= 10 * m_bufferSize) {

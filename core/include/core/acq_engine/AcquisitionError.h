@@ -3,8 +3,7 @@
 #include <QString>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 struct AcquisitionError
 {
@@ -15,6 +14,5 @@ struct AcquisitionError
 	QString  message;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
