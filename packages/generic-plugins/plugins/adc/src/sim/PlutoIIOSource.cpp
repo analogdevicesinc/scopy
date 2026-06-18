@@ -1,5 +1,5 @@
 #include "PlutoIIOSource.h"
-#include "DataKey.h"
+#include <core/acq_engine/DataKey.h>
 
 #include <iio.h>
 #include <stdexcept>
@@ -68,7 +68,7 @@ void PlutoIIOSource::onStop()
 	}
 }
 
-void PlutoIIOSource::acquire(DataStore *store)
+void PlutoIIOSource::acquire(scopy::acq::DataStore *store)
 {
 	iio_buffer *buf = m_buf.load();
 	if(!buf || m_stopRequested)
@@ -104,7 +104,7 @@ void PlutoIIOSource::acquire(DataStore *store)
 			samples.append(static_cast<float>(raw) / FULL_SCALE);
 		}
 
-		store->write(DataKey::raw(m_id, it.key()), std::move(samples));
+		store->write(scopy::acq::DataKey::raw(m_id, it.key()), std::move(samples));
 	}
 }
 

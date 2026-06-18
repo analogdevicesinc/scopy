@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataKey.h"
 #include "SampleBuffer.h"
 
@@ -10,10 +12,9 @@
 #include <QSet>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
-class DataStore : public QObject
+class SCOPY_CORE_EXPORT DataStore : public QObject
 {
 	Q_OBJECT
 public:
@@ -40,6 +41,5 @@ private:
 	mutable QMutex              m_mutex;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

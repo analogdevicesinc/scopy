@@ -1,6 +1,6 @@
 #include "siminstrument.h"
 
-#include "SourceBlock.h"
+#include <core/acq_engine/SourceBlock.h>
 
 #include <QCheckBox>
 #include <QDateTime>
@@ -14,6 +14,7 @@
 #include <QSpinBox>
 #include <QSplitter>
 #include <QVBoxLayout>
+#include <QHeaderView>
 
 namespace scopy {
 namespace adc {
@@ -60,6 +61,10 @@ void SimInstrument::setupUi()
 	m_logBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_logBtn, TTA_RIGHT);
 
+	m_datastoreBtn = new QPushButton("DataStore", this);
+	m_datastoreBtn->setCheckable(true);
+	m_tool->addWidgetToTopContainerHelper(m_datastoreBtn, TTA_RIGHT);
+
 	// ---- central: oscilloscope + waterfall in a vertical splitter ----
 	m_plot = new PlotWidget(this);
 	m_waterfall = new WaterfallPlotWidget(this);
@@ -82,6 +87,15 @@ void SimInstrument::setupUi()
 	m_logView->setLineWrapMode(QTextEdit::NoWrap);
 	m_logView->setPlaceholderText("No errors or warnings.");
 	m_tool->rightStack()->add("log-view", m_logView);
+
+	// ---- right panel: DataStore inspector ----
+	m_datastoreTable = new QTreeWidget(this);
+	m_datastoreTable->setColumnCount(4);
+	m_datastoreTable->setHeaderLabels({"Key", "Type", "Samples", "History (used/cap)"});
+	m_datastoreTable->setRootIsDecorated(false);
+	m_datastoreTable->setAlternatingRowColors(true);
+	m_datastoreTable->header()->setStretchLastSection(true);
+	m_tool->rightStack()->add("datastore-view", m_datastoreTable);
 
 	// ---- signal wiring: run / single ----
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool checked) {
@@ -114,11 +128,11 @@ void SimInstrument::wirePanelButton(QPushButton *btn, const QString &menuId,
 	});
 }
 
-void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
+void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 				      const QList<CurveDescriptor> &curves)
 {
 	// Collect all panel buttons for mutual exclusion wiring
-	QList<QPushButton *> panelBtns = {m_settingsBtn, m_cursorBtn, m_logBtn};
+	QList<QPushButton *> panelBtns = {m_settingsBtn, m_cursorBtn, m_logBtn, m_datastoreBtn};
 
 	// ---- Settings panel (scrollable, single right-side panel) ----
 	auto *settingsInner = new QWidget();
@@ -165,7 +179,7 @@ void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
 		this, &SimInstrument::acqModeChanged);
 
 	// -- Source groups --
-	for(sim::SourceBlock *src : engine->sources()) {
+	for(scopy::acq::SourceBlock *src : engine->sources()) {
 		const bool hasChannels = !src->channelIds().isEmpty();
 		QWidget   *srcWidget   = src->createSettingsWidget(nullptr);
 		if(!hasChannels && !srcWidget)
@@ -237,7 +251,7 @@ void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
 		}
 
 		// Processor settings — one sub-group per processor
-		for(sim::ProcessorBlock *proc : desc.processors) {
+		for(scopy::acq::ProcessorBlock *proc : desc.processors) {
 			QWidget *procWidget = proc->createSettingsWidget(curveGroup);
 			if(!procWidget)
 				continue;
@@ -268,9 +282,10 @@ void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
 	m_tool->rightStack()->add("settings-panel", settingsScroll);
 
 	// ---- Wire panel toggle buttons (mutual exclusion) ----
-	wirePanelButton(m_settingsBtn, "settings-panel", panelBtns);
-	wirePanelButton(m_cursorBtn,   "cursor-config",  panelBtns);
-	wirePanelButton(m_logBtn,      "log-view",       panelBtns);
+	wirePanelButton(m_settingsBtn,  "settings-panel", panelBtns);
+	wirePanelButton(m_cursorBtn,    "cursor-config",  panelBtns);
+	wirePanelButton(m_logBtn,       "log-view",       panelBtns);
+	wirePanelButton(m_datastoreBtn, "datastore-view", panelBtns);
 }
 
 QString SimInstrument::curveXKey(int i) const
@@ -289,7 +304,7 @@ QString SimInstrument::curveYKey(int i) const
 	return (t == SAMPLE_INDEX_ENTRY) ? QString{} : t;
 }
 
-void SimInstrument::updateCurveKeyCombos(const QList<sim::DataKey> &keys)
+void SimInstrument::updateCurveKeyCombos(const QList<scopy::acq::DataKey> &keys)
 {
 	for(int i = 0; i < m_curveSelectors.size(); ++i) {
 		CurveSelectors &cs = m_curveSelectors[i];
@@ -300,7 +315,7 @@ void SimInstrument::updateCurveKeyCombos(const QList<sim::DataKey> &keys)
 			QSignalBlocker b(cs.xKey);
 			cs.xKey->clear();
 			cs.xKey->addItem(SAMPLE_INDEX_ENTRY);
-			for(const sim::DataKey &k : keys)
+			for(const scopy::acq::DataKey &k : keys)
 				cs.xKey->addItem(k.key);
 			const int idx = cs.xKey->findText(prev);
 			cs.xKey->setCurrentIndex(idx >= 0 ? idx : 0);
@@ -312,7 +327,7 @@ void SimInstrument::updateCurveKeyCombos(const QList<sim::DataKey> &keys)
 			QSignalBlocker b(cs.yKey);
 			cs.yKey->clear();
 			cs.yKey->addItem(SAMPLE_INDEX_ENTRY);
-			for(const sim::DataKey &k : keys)
+			for(const scopy::acq::DataKey &k : keys)
 				cs.yKey->addItem(k.key);
 			const int idx      = cs.yKey->findText(prev);
 			const int fallback = (i < cs.yKey->count() - 1) ? (i + 1) : 0;
@@ -353,13 +368,13 @@ void SimInstrument::onStopped()
 void SimInstrument::appendLog(int severity, const QString &id, const QString &message)
 {
 	const QString ts  = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-	const auto    sev = static_cast<sim::AcquisitionError::Severity>(severity);
+	const auto    sev = static_cast<scopy::acq::AcquisitionError::Severity>(severity);
 
 	QString color, tag;
-	if(sev == sim::AcquisitionError::Severity::Critical) {
+	if(sev == scopy::acq::AcquisitionError::Severity::Critical) {
 		color = "#ff4444";
 		tag   = "CRIT";
-	} else if(sev == sim::AcquisitionError::Severity::Warning) {
+	} else if(sev == scopy::acq::AcquisitionError::Severity::Warning) {
 		color = "#ffaa00";
 		tag   = "WARN";
 	} else {
@@ -375,6 +390,60 @@ void SimInstrument::appendLog(int severity, const QString &id, const QString &me
 	m_logView->append(line);
 	m_logView->verticalScrollBar()->setValue(
 		m_logView->verticalScrollBar()->maximum());
+}
+
+void SimInstrument::refreshDatastoreView(scopy::acq::DataStore *store)
+{
+	if(!store || !m_datastoreTable)
+		return;
+
+	const QList<scopy::acq::DataKey> keys = store->keys();
+
+	// Remove rows whose key no longer exists in the store
+	for(int i = m_datastoreTable->topLevelItemCount() - 1; i >= 0; --i) {
+		const QString rowKey = m_datastoreTable->topLevelItem(i)->text(0);
+		bool found = false;
+		for(const scopy::acq::DataKey &k : keys) {
+			if(k.key == rowKey) { found = true; break; }
+		}
+		if(!found)
+			delete m_datastoreTable->takeTopLevelItem(i);
+	}
+
+	// Update or insert a row for each key
+	for(const scopy::acq::DataKey &k : keys) {
+		const scopy::acq::SampleBuffer buf = store->read(k);
+
+		QString typeStr;
+		switch(buf.type()) {
+		case scopy::acq::SampleType::Float32: typeStr = "f32"; break;
+		case scopy::acq::SampleType::Float64: typeStr = "f64"; break;
+		case scopy::acq::SampleType::Int32:   typeStr = "i32"; break;
+		case scopy::acq::SampleType::Int16:   typeStr = "i16"; break;
+		case scopy::acq::SampleType::Int8:    typeStr = "i8";  break;
+		case scopy::acq::SampleType::UInt8:   typeStr = "u8";  break;
+		}
+
+		const QString samplesStr = QString::number(buf.size());
+		const QString histStr    = QString("%1/%2").arg(buf.depth()).arg(buf.historySize());
+
+		// Find existing row or create a new one
+		QTreeWidgetItem *item = nullptr;
+		for(int i = 0; i < m_datastoreTable->topLevelItemCount(); ++i) {
+			if(m_datastoreTable->topLevelItem(i)->text(0) == k.key) {
+				item = m_datastoreTable->topLevelItem(i);
+				break;
+			}
+		}
+		if(!item) {
+			item = new QTreeWidgetItem(m_datastoreTable);
+			item->setText(0, k.key);
+		}
+
+		item->setText(1, typeStr);
+		item->setText(2, samplesStr);
+		item->setText(3, histStr);
+	}
 }
 
 } // namespace adc
