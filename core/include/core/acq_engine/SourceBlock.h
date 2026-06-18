@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataStore.h"
 
 #include <atomic>
@@ -12,10 +14,9 @@
 class QWidget;
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
-class SourceBlock : public QObject
+class SCOPY_CORE_EXPORT SourceBlock : public QObject
 {
 	Q_OBJECT
 public:
@@ -51,6 +52,5 @@ protected:
 	QString             m_id;
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

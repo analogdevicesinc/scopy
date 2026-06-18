@@ -7,9 +7,9 @@
 #include <QVBoxLayout>
 
 namespace scopy {
-namespace adc {
+namespace acq {
 
-ScaleOffsetProcessorWidget::ScaleOffsetProcessorWidget(sim::ScaleOffsetProcessor *proc,
+ScaleOffsetProcessorWidget::ScaleOffsetProcessorWidget(ScaleOffsetProcessor *proc,
 						       QWidget *parent)
 	: QWidget(parent)
 {
@@ -18,7 +18,7 @@ ScaleOffsetProcessorWidget::ScaleOffsetProcessorWidget(sim::ScaleOffsetProcessor
 	lay->setSpacing(4);
 
 	bool firstChannel = true;
-	for(sim::ScaleOffsetProcessor::ChannelConfig *cfg : proc->channels()) {
+	for(ScaleOffsetProcessor::ChannelConfig *cfg : proc->channels()) {
 		if(!firstChannel) {
 			auto *sep = new QFrame(this);
 			sep->setFrameShape(QFrame::HLine);
@@ -63,5 +63,5 @@ ScaleOffsetProcessorWidget::ScaleOffsetProcessorWidget(sim::ScaleOffsetProcessor
 	lay->addStretch();
 }
 
-} // namespace adc
+} // namespace acq
 } // namespace scopy

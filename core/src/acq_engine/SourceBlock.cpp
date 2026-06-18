@@ -3,8 +3,7 @@
 #include <QWidget>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 SourceBlock::SourceBlock(const QString &id, QObject *parent)
 	: QObject(parent)
@@ -60,6 +59,5 @@ QList<QString> SourceBlock::enabledChannels() const
 
 QWidget *SourceBlock::createSettingsWidget(QWidget *) { return nullptr; }
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy

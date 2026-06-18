@@ -6,9 +6,9 @@
 #include <QVBoxLayout>
 
 namespace scopy {
-namespace adc {
+namespace acq {
 
-MathBlockWidget::MathBlockWidget(sim::FormulaEvaluator *evaluator, QWidget *parent)
+MathBlockWidget::MathBlockWidget(FormulaEvaluator *evaluator, QWidget *parent)
 	: QWidget(parent)
 {
 	auto *lay    = new QVBoxLayout(this);
@@ -42,5 +42,5 @@ MathBlockWidget::MathBlockWidget(sim::FormulaEvaluator *evaluator, QWidget *pare
 	});
 }
 
-} // namespace adc
+} // namespace acq
 } // namespace scopy

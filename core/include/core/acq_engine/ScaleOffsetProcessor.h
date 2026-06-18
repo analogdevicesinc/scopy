@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scopy-core_export.h"
+
 #include "DataKey.h"
 #include "ProcessorBlock.h"
 
@@ -7,13 +9,12 @@
 #include <QList>
 
 namespace scopy {
-namespace adc {
-namespace sim {
+namespace acq {
 
 // Processor that applies per-channel linear transform: output[i] = scale * input[i] + offset.
 // Reads <inputKey> from the DataStore, writes the result to <outputKey>.
 // scale and offset are set from the GUI thread and read from the worker thread via atomics.
-class ScaleOffsetProcessor : public ProcessorBlock
+class SCOPY_CORE_EXPORT ScaleOffsetProcessor : public ProcessorBlock
 {
 	Q_OBJECT
 public:
@@ -51,6 +52,5 @@ private:
 	QList<ChannelConfig *> m_channels; // owned
 };
 
-} // namespace sim
-} // namespace adc
+} // namespace acq
 } // namespace scopy
