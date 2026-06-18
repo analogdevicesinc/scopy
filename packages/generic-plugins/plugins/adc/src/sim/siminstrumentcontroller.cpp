@@ -1,6 +1,8 @@
 #include "siminstrumentcontroller.h"
 
 #include <numeric>
+#include <variant>
+#include <vector>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QLoggingCategory>
@@ -190,6 +192,7 @@ void SimInstrumentController::init(iio_context *ctx)
 			return;
 		m_dataDirty = false;
 		m_ui->m_plot->replot();
+		m_ui->m_waterfall->replot();
 	});
 	connect(m_engine, &sim::AcquisitionEngine::started,      m_displayTimer, QOverload<>::of(&QTimer::start));
 	connect(m_engine, &sim::AcquisitionEngine::stopped,      m_displayTimer, &QTimer::stop);
@@ -198,6 +201,7 @@ void SimInstrumentController::init(iio_context *ctx)
 		if(m_dataDirty) {
 			m_dataDirty = false;
 			m_ui->m_plot->replot();
+			m_ui->m_waterfall->replot();
 		}
 	};
 	connect(m_engine, &sim::AcquisitionEngine::stopped,      this, flushDirty);
@@ -210,15 +214,24 @@ void SimInstrumentController::init(iio_context *ctx)
 	m_ui->m_tool->rightStack()->add("cursor-config", cursorSettings);
 	connect(m_ui->m_cursorBtn, &QPushButton::toggled, m_cursorCtrl, &scopy::CursorController::setVisible);
 
+	// ---- Waterfall configuration ----
+	m_ui->m_waterfall->setNumRows(WATERFALL_ROWS);
+	m_ui->m_waterfall->setIntensityRange(-120.0, 0.0);
+	m_ui->m_waterfall->setWaterfallEnabled(true);
+
+	// TODO: temporary — reset autoscale accumulators on each engine start so stale
+	// extremes from a previous run don't pin the color range (see onCycleComplete).
+	connect(m_engine, &sim::AcquisitionEngine::started, this, [this]() {
+		m_wfAutoMin =  DBL_MAX;
+		m_wfAutoMax = -DBL_MAX;
+	});
+
 	// ---- Build the auto-generated settings panel ----
-	// Curve 1: sim-adc channels, ScaleOffsetProcessor settings
 	SimInstrument::CurveDescriptor curve1;
 	curve1.name  = "Curve 1";
 	curve1.color = QColor(0x4a, 0xb8, 0xff);
 	curve1.processors << m_scaleProc;
 
-	// Curve 2: pluto / FFT channels (may have no processor if ctx==null)
-	// MathProcessor settings are also here so the formula editor is always accessible.
 	SimInstrument::CurveDescriptor curve2;
 	curve2.name  = "Curve 2";
 	curve2.color = QColor(0xff, 0x7e, 0x40);
@@ -226,7 +239,19 @@ void SimInstrumentController::init(iio_context *ctx)
 		curve2.processors << m_fftProc;
 	curve2.processors << m_mathProc;
 
-	m_ui->buildControlPanel(m_engine, {curve1, curve2});
+	SimInstrument::CurveDescriptor wfDesc;
+	wfDesc.name  = "Waterfall";
+	wfDesc.color = QColor(0x00, 0xc8, 0xff); // cyan-ish, just for the swatch
+
+	m_ui->buildControlPanel(m_engine, {curve1, curve2, wfDesc});
+
+	// Wire waterfall history spinbox → update widget + DataStore history depth.
+	connect(m_ui, &SimInstrument::waterfallRowsChanged, this, [this](int rows) {
+		m_currentWaterfallRows = rows;
+		m_ui->m_waterfall->setNumRows(rows);
+		if(!m_fftWaterfallKey.key.isEmpty())
+			m_store->setHistorySize(m_fftWaterfallKey, static_cast<std::size_t>(rows));
+	});
 }
 
 void SimInstrumentController::stop()
@@ -373,6 +398,61 @@ void SimInstrumentController::onCycleComplete()
 		}
 		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
 	}();
+
+	// Feed waterfall from the key selected in the Waterfall Y combo (index 2).
+	const QString wfYKeyStr = m_ui->curveYKey(2);
+	if(!wfYKeyStr.isEmpty()) {
+		const sim::DataKey wfYKey(wfYKeyStr);
+
+		// Key changed: migrate history-size budget to the new key.
+		if(wfYKey != m_fftWaterfallKey) {
+			if(!m_fftWaterfallKey.key.isEmpty())
+				m_store->setHistorySize(m_fftWaterfallKey, 1);
+			m_fftWaterfallKey = wfYKey;
+			m_store->setHistorySize(m_fftWaterfallKey,
+						static_cast<std::size_t>(m_currentWaterfallRows));
+		}
+
+		// Update X frequency axis from the selected X key (if any).
+		const QString wfXKeyStr = m_ui->curveXKey(2);
+		if(!wfXKeyStr.isEmpty()) {
+			const sim::SampleBuffer xBuf = m_store->read(sim::DataKey(wfXKeyStr));
+			if(!xBuf.empty()) {
+				const auto &xv = xBuf.sample(0);
+				if(std::holds_alternative<QVector<float>>(xv)) {
+					const QVector<float> &freq = std::get<QVector<float>>(xv);
+					if(freq.size() >= 2)
+						m_ui->m_waterfall->setFrequencyRange(freq.first(), freq.last());
+				}
+			}
+		}
+
+		// Build and push history snapshot.
+		const sim::SampleBuffer yBuf = m_store->read(m_fftWaterfallKey);
+		if(!yBuf.empty()) {
+			std::vector<QVector<float>> snap;
+			snap.reserve(yBuf.depth());
+			for(std::size_t i = 0; i < yBuf.depth(); ++i) {
+				const sim::SampleVariant &v = yBuf.sample(i);
+				if(std::holds_alternative<QVector<float>>(v))
+					snap.push_back(std::get<QVector<float>>(v));
+			}
+
+			// TODO: temporary waterfall intensity autoscaling — should be reworked
+			// (e.g. via PlotAutoscaler or a dedicated WaterfallAutoscaler) and removed.
+			if(!snap.empty()) {
+				const QVector<float> &newest = snap[0];
+				for(float v : newest) {
+					if(v < m_wfAutoMin) m_wfAutoMin = v;
+					if(v > m_wfAutoMax) m_wfAutoMax = v;
+				}
+				if(m_wfAutoMin < m_wfAutoMax)
+					m_ui->m_waterfall->setIntensityRange(m_wfAutoMin, m_wfAutoMax);
+			}
+
+			m_ui->m_waterfall->setHistorySnapshot(std::move(snap));
+		}
+	}
 
 	m_dataDirty = true;
 }

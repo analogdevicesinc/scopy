@@ -12,6 +12,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSpinBox>
+#include <QSplitter>
 #include <QVBoxLayout>
 
 namespace scopy {
@@ -51,17 +52,25 @@ void SimInstrument::setupUi()
 	m_settingsBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_settingsBtn, TTA_RIGHT);
 
-	m_cursorBtn = new QPushButton("Cur", this);
+	m_cursorBtn = new QPushButton("Cursors", this);
 	m_cursorBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_cursorBtn, TTA_RIGHT);
 
-	m_logBtn = new QPushButton("Log", this);
+	m_logBtn = new QPushButton("Logs", this);
 	m_logBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_logBtn, TTA_RIGHT);
 
-	// ---- central: plot ----
+	// ---- central: oscilloscope + waterfall in a vertical splitter ----
 	m_plot = new PlotWidget(this);
-	m_tool->addWidgetToCentralContainerHelper(m_plot);
+	m_waterfall = new WaterfallPlotWidget(this);
+
+	auto *splitter = new QSplitter(Qt::Vertical, this);
+	splitter->addWidget(m_plot);
+	splitter->addWidget(m_waterfall);
+	splitter->setStretchFactor(0, 2);
+	splitter->setStretchFactor(1, 1);
+	splitter->setSizes({400, 200});
+	m_tool->addWidgetToCentralContainerHelper(splitter);
 
 	// ---- right panel: acquisition log ----
 	m_tool->rightContainer()->setVisible(true);
@@ -214,6 +223,18 @@ void SimInstrument::buildControlPanel(sim::AcquisitionEngine *engine,
 		auto *yCombo = new QComboBox(curveGroup);
 		yCombo->addItem(SAMPLE_INDEX_ENTRY);
 		curveLay->addWidget(yCombo);
+
+		// Waterfall-specific: history rows spinbox
+		if(desc.name == "Waterfall") {
+			curveLay->addWidget(new QLabel("History rows:"));
+			auto *wfRowsSpin = new QSpinBox(curveGroup);
+			wfRowsSpin->setRange(10, 2000);
+			wfRowsSpin->setSingleStep(10);
+			wfRowsSpin->setValue(200);
+			curveLay->addWidget(wfRowsSpin);
+			connect(wfRowsSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+				this, &SimInstrument::waterfallRowsChanged);
+		}
 
 		// Processor settings — one sub-group per processor
 		for(sim::ProcessorBlock *proc : desc.processors) {

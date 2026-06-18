@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cfloat>
+
 #include "siminstrument.h"
 #include "AcquisitionEngine.h"
 #include "DataStore.h"
@@ -87,6 +89,15 @@ private:
 
 	QTimer *m_displayTimer{nullptr};
 	bool    m_dataDirty{false};
+
+	// Waterfall: currently active data key (set dynamically from curveYKey(2)).
+	sim::DataKey m_fftWaterfallKey;
+	int          m_currentWaterfallRows{200};
+	static constexpr int WATERFALL_ROWS = 200;
+
+	// TODO: temporary waterfall intensity autoscaling accumulators — should be reworked and removed.
+	double m_wfAutoMin{DBL_MAX};
+	double m_wfAutoMax{-DBL_MAX};
 };
 
 } // namespace adc
