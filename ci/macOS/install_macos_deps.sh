@@ -141,6 +141,12 @@ install_packages() {
 
 		brew update
 
+		# Remove pre-installed third-party taps that cause CI annotation warnings
+		# Must run AFTER brew update (which re-registers them) but BEFORE brew upgrade/install (which emit the warnings)
+		brew untap --force aws/tap 2>/dev/null || true
+		brew untap --force azure/bicep 2>/dev/null || true
+		brew untap --force hashicorp/tap 2>/dev/null || true
+
 		if [ "$major_version" -gt 12 ]; then
 			brew uninstall --force xcodes 2>/dev/null || true
 			brew upgrade --display-times || true #ignore homebrew upgrade errors
@@ -148,12 +154,6 @@ install_packages() {
 			# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
 			PACKAGES="$PACKAGES libtool"
 		fi
-
-		# Remove pre-installed third-party taps that cause CI annotation warnings
-		# Must run AFTER brew update/upgrade — those commands re-register taps with installed formulae
-		brew untap --force aws/tap 2>/dev/null || true
-		brew untap --force azure/bicep 2>/dev/null || true
-		brew untap --force hashicorp/tap 2>/dev/null || true
 	fi
 
 
