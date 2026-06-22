@@ -2,8 +2,6 @@ name: Build & Test Qt6
 
 on:
     push:
-      branches:
-        - scopy_qt6_dev
       paths-ignore:
         - 'docs/**'
         - '**.md'
@@ -18,8 +16,6 @@ on:
         - '.github/workflows/clang-format.yml'
 
     pull_request:
-      branches:
-        - scopy_qt6_dev
       paths-ignore:
         - 'docs/**'
         - '**.md'
