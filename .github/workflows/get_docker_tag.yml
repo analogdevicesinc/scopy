@@ -36,7 +36,8 @@ jobs:
                 TAG="testing"
                 ;;
             *)
-                TAG="latest"
+                # TODO: revert to "latest" after the docker dependencies cleanup and docker regeneration
+                TAG="testing"
                 ;;
            esac
 
