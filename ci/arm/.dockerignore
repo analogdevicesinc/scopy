@@ -1,14 +1,6 @@
 *
 !sysroot.tar.gz
-!arm_build_process.sh
-!arm_build_config.sh
-!cmake_toolchain.cmake
-!create_sysroot.sh
 !copy-deps.sh
-!inside_chroot.sh
-!build_qt.sh
-!qt_patch_arm32.patch
-!qt_patch_arm64.patch
 !arm_cross_build_process.sh
 !cmake_toolchain_armhf.cmake
 !docker/Dockerfile.armhf-cross
@@ -17,3 +9,6 @@
 !docker/tarballs/qt6-armhf-cross-installed.tar.gz
 !build_qt6_armhf_cross.sh
 !docker/Dockerfile.qt6-build
+!verify_host_packages.sh
+!verify_qt6_cross.sh
+!verify_sysroot.sh
