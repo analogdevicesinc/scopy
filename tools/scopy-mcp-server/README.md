@@ -5,8 +5,8 @@ An MCP (Model Context Protocol) server that lets Claude Code control [Scopy](htt
 Say *"add device 192.168.2.1, connect to it, and switch to the AD936X tool"* and Claude will do it.
 
 ```
-Claude Code ──(MCP stdio)──> scopy-mcp-server ──(FIFO or PTY)──> Scopy JS engine
-                                               <──(FIFO or PTY)──
+Claude Code ──(MCP stdio)──> scopy-mcp-server ──(Unix socket / named pipe)──> Scopy JS engine
+                                               <──(Unix socket / named pipe)──
 ```
 
 ## Prerequisites
@@ -21,20 +21,36 @@ Claude Code ──(MCP stdio)──> scopy-mcp-server ──(FIFO or PTY)──>
 
 Download `scopy-mcp-server.zip` from the latest [CI build artifacts](https://github.com/analogdevicesinc/scopy/actions/workflows/mcp-server-package.yml), then:
 
+**Linux / macOS:**
 ```bash
 unzip scopy-mcp-server.zip
 cd scopy-mcp-server
 python3 setup.py
 ```
 
-The script installs dependencies (tries [uv](https://docs.astral.sh/uv/), falls back to pip) and prints the `.mcp.json` snippet to paste into Claude Code.
+**Windows:**
+```cmd
+unzip scopy-mcp-server.zip
+cd scopy-mcp-server
+python setup.py
+```
+
+The script installs dependencies (tries [uv](https://docs.astral.sh/uv/), falls back to pip), including the Windows-only `pywin32` package on Windows, and prints the `.mcp.json` snippet to paste into Claude Code.
 
 ### Option B: From source (developers)
 
+**Linux / macOS:**
 ```bash
 git clone https://github.com/analogdevicesinc/scopy
 cd scopy/tools/scopy-mcp-server
 bash install.sh
+```
+
+**Windows:**
+```cmd
+git clone https://github.com/analogdevicesinc/scopy
+cd scopy\tools\scopy-mcp-server
+python setup.py
 ```
 
 This regenerates the API metadata from Scopy headers, installs dependencies, and updates the repo's `.mcp.json`.
@@ -88,8 +104,25 @@ Restart Claude Code after changing `.mcp.json`.
 
 The server communicates with Scopy in two modes:
 
-- **Attach mode** — connects to an already-running Scopy via named pipes (`/tmp/scopy_mcp_cmd`, `/tmp/scopy_mcp_rsp`). Scopy creates these automatically on startup.
-- **Launch mode** — spawns a new Scopy process with a PTY so the stdin REPL activates. Use the `start_scopy()` tool.
+- **Attach mode** — connects to an already-running Scopy via its `QLocalServer` socket (`/tmp/scopy_mcp` on Linux/macOS, `\\.\pipe\scopy_mcp` on Windows). Scopy creates this automatically on startup when built with MCP support.
+- **Launch mode** — spawns a new Scopy process and waits for its MCP server socket to appear. Use the `start_scopy()` tool.
+
+Each JS command is a fresh connection: connect → send one line → read `OK:<result>` or `ERROR:<msg>` → close.
+
+### Windows support
+
+On Windows, the bridge uses the Win32 named-pipe API instead of Unix domain sockets. The `pywin32` package provides this:
+
+```cmd
+pip install .[windows]
+```
+
+Or with uv:
+```cmd
+uv sync --extra windows
+```
+
+The `setup.py` installer handles this automatically on Windows.
 
 ## Available tools
 
@@ -127,11 +160,12 @@ For each Scopy API object (`ad936x`, `adrv9002`, `regmap`, `datalogger`, etc.), 
 
 | Problem | Fix |
 |---------|-----|
-| `No running Scopy instance found` | Start Scopy first, or call `start_scopy()` |
+| `No running Scopy instance found` | Start Scopy first (must be built with MCP support), or call `start_scopy()` |
 | `Scopy binary not found` | Set `SCOPY_PATH` in `.mcp.json` env, or add `scopy` to your PATH |
 | `Scopy did not respond within 10s` | Check Scopy is responsive, try a simpler command |
 | MCP server not showing in Claude Code | Check `.mcp.json` syntax, restart Claude Code |
-| `Stale Scopy pipe detected` | Scopy exited uncleanly — restart Scopy |
+| `Cannot connect to Scopy` | Scopy exited — restart it, or call `start_scopy()` |
+| `win32file not found` (Windows) | Run `pip install .[windows]` to install `pywin32` |
 
 ## For Scopy developers
 
@@ -176,7 +210,7 @@ tools/scopy-mcp-server/
   scopy_mcp_server/           # Python package (pip-installable)
     __init__.py
     server.py                 # MCP server — loads API JSON, registers tools
-    bridge.py                 # Communication bridge (FIFO + PTY modes)
+    bridge.py                 # Communication bridge (QLocalSocket, cross-platform)
     scopy_api.json            # Generated API metadata (bundled in wheel)
   generate_api_tools.py       # Dev tool — parses *_api.h → scopy_api.json
   pyproject.toml

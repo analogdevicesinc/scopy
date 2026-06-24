@@ -15,6 +15,9 @@ classifiers = [
 ]
 dependencies = ["mcp[cli]>=1.2.0"]
 
+[project.optional-dependencies]
+windows = ["pywin32>=306"]
+
 [project.urls]
 Homepage = "https://github.com/analogdevicesinc/scopy"
 Repository = "https://github.com/analogdevicesinc/scopy"
