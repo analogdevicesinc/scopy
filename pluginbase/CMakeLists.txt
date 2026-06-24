@@ -55,7 +55,7 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
-set(SCOPY_QT_COMPONENTS Core Widgets Concurrent)
+set(SCOPY_QT_COMPONENTS Core Widgets Concurrent Network)
 
 option(ENABLE_SCOPYJS "Enable plugin scripting via JSEngine - requires QML" ON)
 if(ENABLE_SCOPYJS)
