@@ -29,6 +29,9 @@
 
 #include <iio.h>
 
+// TEMPORARY: forward declarations for M2kLogicSource wiring
+namespace libm2k { namespace context { class M2k; } }
+
 #include <QLabel>
 #include <QLineEdit>
 #include <QObject>
@@ -91,6 +94,7 @@ private:
 	QLineEdit *edit;
 	QList<ADCInstrumentController *> m_ctrls;
 	QList<SimInstrumentController *> m_simCtrls;
+	libm2k::context::M2k *m_m2k{nullptr}; // TEMPORARY: for M2kLogicSource
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
 };

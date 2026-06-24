@@ -9,10 +9,12 @@
 #include <core/acq_engine/MathProcessor.h>
 #include <core/acq_engine/MathSource.h>
 #include "PlutoIIOSource.h"
+#include "M2kLogicSource.h"
 #include <core/acq_engine/ScaleOffsetProcessor.h>
 #include "SimulatedSource.h"
 
 struct iio_context;
+namespace libm2k { namespace digital { class M2kDigital; } }
 
 #include <QElapsedTimer>
 #include <QLabel>
@@ -41,7 +43,9 @@ public:
 	// Build the engine, sources, UI and connect all signals. Call once.
 	// Pass a live iio_context* to use PlutoIIOSource (real hardware);
 	// pass nullptr (default) to use SimulatedSource (offline/testing).
-	void init(iio_context *ctx = nullptr);
+	// Optionally pass an M2kDigital* to also acquire M2K logic channels.
+	void init(iio_context *ctx = nullptr,
+		  libm2k::digital::M2kDigital *digital = nullptr);
 
 	// Stop the engine if running.
 	void stop();
@@ -60,6 +64,7 @@ private:
 	scopy::acq::AcquisitionEngine      *m_engine{nullptr};
 	scopy::adc::sim::SimulatedSource        *m_src{nullptr};
 	scopy::adc::sim::PlutoIIOSource         *m_plutoSrc{nullptr};
+	scopy::adc::sim::M2kLogicSource         *m_logicSrc{nullptr};
 	scopy::acq::ScaleOffsetProcessor   *m_scaleProc{nullptr};
 	scopy::acq::GenalyzerFFTProcessor  *m_fftProc{nullptr};
 	scopy::acq::MathSource             *m_mathSrc{nullptr};
