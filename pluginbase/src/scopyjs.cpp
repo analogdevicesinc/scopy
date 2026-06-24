@@ -33,6 +33,11 @@
 #include <thread>
 #include <unistd.h>
 
+#ifdef Q_OS_UNIX
+#include <fcntl.h>
+#include <sys/stat.h>
+#endif
+
 Q_LOGGING_CATEGORY(CAT_JS, "Scopy_JS")
 
 using std::cout;
@@ -45,7 +50,12 @@ ScopyJS::ScopyJS(QObject *parent)
 	: QObject(parent)
 {}
 
-ScopyJS::~ScopyJS() {}
+ScopyJS::~ScopyJS()
+{
+#ifdef Q_OS_UNIX
+	cleanupMcpPipe();
+#endif
+}
 
 ScopyJS *ScopyJS::GetInstance()
 {
@@ -81,6 +91,10 @@ void ScopyJS::init()
 		notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
 		connect(notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 	}
+
+#ifdef Q_OS_UNIX
+	initMcpPipe();
+#endif
 }
 
 void ScopyJS::returnToApplication()
@@ -269,5 +283,95 @@ const QString ScopyJS::getScriptContent(QFile *file)
 	file->close();
 	return content;
 }
+
+#ifdef Q_OS_UNIX
+void ScopyJS::initMcpPipe()
+{
+	// Remove stale FIFOs from previous runs
+	unlink(MCP_CMD_PIPE);
+	unlink(MCP_RSP_PIPE);
+
+	// Create FIFOs with owner-only permissions
+	if(mkfifo(MCP_CMD_PIPE, 0600) != 0) {
+		qWarning(CAT_JS) << "MCP: Failed to create command pipe" << MCP_CMD_PIPE;
+		return;
+	}
+	if(mkfifo(MCP_RSP_PIPE, 0600) != 0) {
+		qWarning(CAT_JS) << "MCP: Failed to create response pipe" << MCP_RSP_PIPE;
+		unlink(MCP_CMD_PIPE);
+		return;
+	}
+
+	// Open command pipe for reading (non-blocking to avoid hanging init)
+	m_pipeFd = open(MCP_CMD_PIPE, O_RDONLY | O_NONBLOCK);
+	if(m_pipeFd < 0) {
+		qWarning(CAT_JS) << "MCP: Failed to open command pipe for reading";
+		unlink(MCP_CMD_PIPE);
+		unlink(MCP_RSP_PIPE);
+		return;
+	}
+
+	m_pipeNotifier = new QSocketNotifier(m_pipeFd, QSocketNotifier::Read, this);
+	QObject::connect(m_pipeNotifier, &QSocketNotifier::activated, this, &ScopyJS::onPipeData);
+	qInfo(CAT_JS) << "MCP pipe listener active on" << MCP_CMD_PIPE;
+}
+
+void ScopyJS::onPipeData()
+{
+	char buf[4096];
+	ssize_t n = read(m_pipeFd, buf, sizeof(buf) - 1);
+	if(n <= 0) {
+		// Writer closed the pipe; reopen to accept next connection
+		m_pipeNotifier->setEnabled(false);
+		close(m_pipeFd);
+		m_pipeFd = open(MCP_CMD_PIPE, O_RDONLY | O_NONBLOCK);
+		if(m_pipeFd >= 0) {
+			delete m_pipeNotifier;
+			m_pipeNotifier = new QSocketNotifier(m_pipeFd, QSocketNotifier::Read, this);
+			QObject::connect(m_pipeNotifier, &QSocketNotifier::activated, this, &ScopyJS::onPipeData);
+		}
+		return;
+	}
+
+	buf[n] = '\0';
+	QString cmd = QString::fromUtf8(buf).trimmed();
+	if(cmd.isEmpty()) {
+		return;
+	}
+
+	QJSValue val = m_engine.evaluate(cmd);
+	QString result;
+	if(val.isError()) {
+		result = "ERROR:" + val.toString();
+	} else if(val.isUndefined()) {
+		result = "OK:undefined";
+	} else {
+		result = "OK:" + val.toString();
+	}
+
+	// Write result to response pipe
+	int rspFd = open(MCP_RSP_PIPE, O_WRONLY);
+	if(rspFd >= 0) {
+		QByteArray rspBytes = (result + "\n").toUtf8();
+		write(rspFd, rspBytes.constData(), rspBytes.size());
+		close(rspFd);
+	}
+}
+
+void ScopyJS::cleanupMcpPipe()
+{
+	if(m_pipeNotifier) {
+		m_pipeNotifier->setEnabled(false);
+		delete m_pipeNotifier;
+		m_pipeNotifier = nullptr;
+	}
+	if(m_pipeFd >= 0) {
+		close(m_pipeFd);
+		m_pipeFd = -1;
+	}
+	unlink(MCP_CMD_PIPE);
+	unlink(MCP_RSP_PIPE);
+}
+#endif
 
 #include "moc_scopyjs.cpp"
