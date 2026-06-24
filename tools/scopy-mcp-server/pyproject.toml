@@ -1,0 +1,15 @@
+[project]
+name = "scopy-mcp-server"
+version = "0.1.0"
+description = "MCP server for controlling Scopy via its JavaScript console"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+scopy-mcp-server = "scopy_mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
