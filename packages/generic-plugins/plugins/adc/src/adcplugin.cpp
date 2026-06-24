@@ -44,6 +44,10 @@
 #include "sim/siminstrumentcontroller.h"
 #include "scopy-adc_config.h"
 
+// TEMPORARY: for M2kLogicSource wiring
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/digital/m2kdigital.hpp>
+
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
 using namespace scopy::grutil;
@@ -425,8 +429,18 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		tme->setEnabled(true);
 		tme->setRunBtnVisible(false);
 
+		// TEMPORARY: try to get M2kDigital for M2kLogicSource
+		libm2k::digital::M2kDigital *digital = nullptr;
+		try {
+			m_m2k = libm2k::context::m2kOpen(m_ctx, m_param.toStdString().c_str());
+			if(m_m2k)
+				digital = m_m2k->getDigital();
+		} catch(...) {
+			qWarning(CAT_ADCPLUGIN) << "m2kOpen failed — M2kLogicSource will not be available";
+		}
+
 		auto *ctrl = new SimInstrumentController(tme, this);
-		ctrl->init(m_ctx);
+		ctrl->init(m_ctx, digital);
 		m_simCtrls.append(ctrl);
 
 		Q_EMIT toolListChanged();
@@ -534,6 +548,12 @@ bool ADCPlugin::onDisconnect()
 	Preferences *p = Preferences::GetInstance();
 	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
+	// TEMPORARY: close the libm2k wrapper (deinit=false so the iio_context is not destroyed)
+	if(m_m2k) {
+		libm2k::context::contextClose(m_m2k, false);
+		m_m2k = nullptr;
+	}
+
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 
