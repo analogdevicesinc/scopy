@@ -1,5 +1,7 @@
 #include "siminstrumentcontroller.h"
 
+#include <libm2k/digital/m2kdigital.hpp>
+
 #include <numeric>
 #include <variant>
 #include <vector>
@@ -31,7 +33,7 @@ SimInstrumentController::~SimInstrumentController()
 	stop();
 }
 
-void SimInstrumentController::init(iio_context *ctx)
+void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital *digital)
 {
 	// ---- Engine + store ----
 	m_store  = new scopy::acq::DataStore(this);
@@ -61,6 +63,14 @@ void SimInstrumentController::init(iio_context *ctx)
 			GnWindowHann,
 			m_engine);
 		m_engine->addProcessor(m_fftProc);
+	}
+
+	if(digital) {
+		m_logicSrc = new scopy::adc::sim::M2kLogicSource(digital, "m2k_logic", m_engine);
+		// Enable all 16 digital channels by default
+		for(int ch = 0; ch < scopy::adc::sim::M2kLogicSource::NR_CHANNELS; ++ch)
+			m_logicSrc->enableChannel(QString("DIO%1").arg(ch), true);
+		m_engine->addSource(m_logicSrc);
 	}
 
 	// ---- Processor: scale + offset ----
@@ -272,6 +282,20 @@ SimInstrument *SimInstrumentController::ui() const
 	return m_ui;
 }
 
+// Convert any SampleVariant type to QVector<float> so that non-float sources
+// (e.g. M2kLogicSource which stores QVector<quint8>) can be plotted on the
+// same curves as float sources.
+static QVector<float> toFloatVec(const scopy::acq::SampleVariant &v)
+{
+	return std::visit([](const auto &vec) -> QVector<float> {
+		QVector<float> out;
+		out.reserve(static_cast<int>(vec.size()));
+		for(const auto &s : vec)
+			out.append(static_cast<float>(s));
+		return out;
+	}, v);
+}
+
 void SimInstrumentController::onCycleComplete()
 {
 	if(!m_ui)
@@ -313,37 +337,27 @@ void SimInstrumentController::onCycleComplete()
 	if(!xIsIndex) {
 		const scopy::acq::SampleBuffer xBuf = m_store->read(scopy::acq::DataKey(xKeyStr));
 		if(xBuf.empty()) return;
-		const auto &v = xBuf.sample(0);
-		if(!std::holds_alternative<QVector<float>>(v)) return;
-		xVec = std::get<QVector<float>>(v);
+		xVec = toFloatVec(xBuf.sample(0));
 		if(xVec.isEmpty()) return;
 	}
 
 	if(!yIsIndex) {
 		const scopy::acq::SampleBuffer yBuf = m_store->read(scopy::acq::DataKey(yKeyStr));
 		if(yBuf.empty()) return;
-		const auto &v = yBuf.sample(0);
-		if(!std::holds_alternative<QVector<float>>(v)) return;
-		yVec = std::get<QVector<float>>(v);
+		yVec = toFloatVec(yBuf.sample(0));
 		if(yVec.isEmpty()) return;
 	}
 
 	if(!y2IsIndex) {
 		const scopy::acq::SampleBuffer y2Buf = m_store->read(scopy::acq::DataKey(y2KeyStr));
-		if(!y2Buf.empty()) {
-			const auto &v = y2Buf.sample(0);
-			if(std::holds_alternative<QVector<float>>(v))
-				y2Vec = std::get<QVector<float>>(v);
-		}
+		if(!y2Buf.empty())
+			y2Vec = toFloatVec(y2Buf.sample(0));
 	}
 
 	if(!x2IsIndex) {
 		const scopy::acq::SampleBuffer x2Buf = m_store->read(scopy::acq::DataKey(x2KeyStr));
-		if(!x2Buf.empty()) {
-			const auto &v = x2Buf.sample(0);
-			if(std::holds_alternative<QVector<float>>(v))
-				x2Vec = std::get<QVector<float>>(v);
-		}
+		if(!x2Buf.empty())
+			x2Vec = toFloatVec(x2Buf.sample(0));
 	}
 
 	// Determine primary sample count
@@ -421,12 +435,9 @@ void SimInstrumentController::onCycleComplete()
 		if(!wfXKeyStr.isEmpty()) {
 			const scopy::acq::SampleBuffer xBuf = m_store->read(scopy::acq::DataKey(wfXKeyStr));
 			if(!xBuf.empty()) {
-				const auto &xv = xBuf.sample(0);
-				if(std::holds_alternative<QVector<float>>(xv)) {
-					const QVector<float> &freq = std::get<QVector<float>>(xv);
-					if(freq.size() >= 2)
-						m_ui->m_waterfall->setFrequencyRange(freq.first(), freq.last());
-				}
+				const QVector<float> freq = toFloatVec(xBuf.sample(0));
+				if(freq.size() >= 2)
+					m_ui->m_waterfall->setFrequencyRange(freq.first(), freq.last());
 			}
 		}
 
@@ -436,9 +447,7 @@ void SimInstrumentController::onCycleComplete()
 			std::vector<QVector<float>> snap;
 			snap.reserve(yBuf.depth());
 			for(std::size_t i = 0; i < yBuf.depth(); ++i) {
-				const scopy::acq::SampleVariant &v = yBuf.sample(i);
-				if(std::holds_alternative<QVector<float>>(v))
-					snap.push_back(std::get<QVector<float>>(v));
+				snap.push_back(toFloatVec(yBuf.sample(i)));
 			}
 
 			// TODO: temporary waterfall intensity autoscaling — should be reworked
