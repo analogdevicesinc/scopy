@@ -1,31 +1,115 @@
 """
-Scopy communication bridge.
+Scopy communication bridge — cross-platform.
 
-Handles two modes of communication with a Scopy instance:
-- Attach mode: connect to a running Scopy via named pipes (FIFOs)
-- Launch mode: spawn a new Scopy process with a PTY for stdin REPL access
+Connects to Scopy's QLocalServer named 'scopy_mcp':
+  - Linux/macOS: Unix domain socket at /tmp/scopy_mcp (or $TMPDIR/scopy_mcp)
+  - Windows:     Named pipe at \\\\.\\pipe\\scopy_mcp
+
+Two modes:
+- Attach mode: connect to an already-running Scopy instance
+- Launch mode: spawn a new Scopy process, then wait for its MCP server to appear
 """
 
-import errno
 import os
-import pty
-import select
-import signal
-import stat
+import socket
 import subprocess
 import sys
 import time
 
-MCP_CMD_PIPE = "/tmp/scopy_mcp_cmd"
-MCP_RSP_PIPE = "/tmp/scopy_mcp_rsp"
-
 RESPONSE_TIMEOUT = 10  # seconds
+SERVER_NAME = "scopy_mcp"
+
+
+def _socket_path() -> str:
+    """Return the platform-appropriate path for the QLocalServer socket."""
+    if sys.platform == "win32":
+        return rf"\\.\pipe\{SERVER_NAME}"
+    # Linux / macOS — Qt places the socket in the temp directory
+    tmp = os.environ.get("TMPDIR", "/tmp")
+    return os.path.join(tmp, SERVER_NAME)
+
+
+def _execute_unix(command: str, timeout: float) -> str:
+    """Unix/macOS: connect via AF_UNIX socket, send command, read response."""
+    path = _socket_path()
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.settimeout(timeout)
+    try:
+        sock.connect(path)
+        sock.sendall((command + "\n").encode("utf-8"))
+        # Read until newline or EOF
+        data = b""
+        while True:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            data += chunk
+            if b"\n" in data:
+                break
+        return data.decode("utf-8").strip()
+    finally:
+        sock.close()
+
+
+def _execute_win32(command: str, timeout: float) -> str:
+    """Windows: connect via named pipe, send command, read response."""
+    import win32file  # type: ignore[import-untyped]
+    import pywintypes  # type: ignore[import-untyped]
+
+    pipe_name = _socket_path()
+    # Wait for pipe to be available (handles transient busy state)
+    deadline = time.time() + timeout
+    handle = None
+    while time.time() < deadline:
+        try:
+            handle = win32file.CreateFile(
+                pipe_name,
+                win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                0,
+                None,
+                win32file.OPEN_EXISTING,
+                0,
+                None,
+            )
+            break
+        except pywintypes.error as e:
+            import winerror  # type: ignore[import-untyped]
+            if e.args[0] == winerror.ERROR_PIPE_BUSY:
+                time.sleep(0.05)
+                continue
+            raise
+    if handle is None:
+        raise TimeoutError(f"Could not connect to Scopy named pipe within {timeout}s")
+
+    try:
+        win32file.WriteFile(handle, (command + "\n").encode("utf-8"))
+        data = b""
+        while True:
+            try:
+                _, chunk = win32file.ReadFile(handle, 4096)
+                data += chunk
+                if b"\n" in data:
+                    break
+            except pywintypes.error as e:
+                import winerror  # type: ignore[import-untyped]
+                if e.args[0] == winerror.ERROR_MORE_DATA:
+                    continue  # more data available
+                break  # pipe closed or other error
+        return data.decode("utf-8").strip()
+    finally:
+        win32file.CloseHandle(handle)
+
+
+def _connect_and_execute(command: str, timeout: float = RESPONSE_TIMEOUT) -> str:
+    """Connect to Scopy's local server, send command, read response."""
+    if sys.platform == "win32":
+        return _execute_win32(command, timeout)
+    return _execute_unix(command, timeout)
 
 
 class ScopyBridge:
     def __init__(self):
         self.mode = None  # "attach" or "launch"
-        self.pty_master = None
         self.process = None
         self._ready = False
 
@@ -34,25 +118,48 @@ class ScopyBridge:
         return self._ready
 
     def detect_running_scopy(self) -> bool:
-        """Check if a running Scopy instance has created the MCP command pipe."""
-        try:
-            if os.path.exists(MCP_CMD_PIPE) and stat.S_ISFIFO(os.stat(MCP_CMD_PIPE).st_mode):
+        """Check if a running Scopy's QLocalServer socket/pipe exists."""
+        path = _socket_path()
+        if sys.platform == "win32":
+            # On Windows, named pipes have no filesystem presence — try connecting
+            try:
+                import win32file  # type: ignore[import-untyped]
+                import pywintypes  # type: ignore[import-untyped]
+                handle = win32file.CreateFile(
+                    path,
+                    win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                    0,
+                    None,
+                    win32file.OPEN_EXISTING,
+                    0,
+                    None,
+                )
+                win32file.CloseHandle(handle)
                 return True
-        except OSError:
-            pass
-        return False
+            except Exception:
+                return False
+        else:
+            if not os.path.exists(path):
+                return False
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            try:
+                sock.connect(path)
+                sock.close()
+                return True
+            except (ConnectionRefusedError, OSError):
+                return False
 
     def attach(self):
-        """Attach to a running Scopy instance via FIFOs."""
+        """Attach to a running Scopy instance via its QLocalServer socket."""
         if not self.detect_running_scopy():
-            raise RuntimeError("No running Scopy instance found (MCP pipe does not exist)")
+            raise RuntimeError(
+                "No running Scopy instance found (MCP socket is not accepting connections)"
+            )
         self.mode = "attach"
         self._ready = True
 
     def launch(self, scopy_path: str):
-        """Launch Scopy as a subprocess with a PTY so the stdin REPL activates."""
-        master, slave = pty.openpty()
-
+        """Launch Scopy as a subprocess and wait for its MCP server to appear."""
         env = os.environ.copy()
         env["QT_LOGGING_RULES"] = "*.debug=false\n*.info=false\n*.warning=false"
 
@@ -60,176 +167,66 @@ class ScopyBridge:
         # resources relative to the executable location.
         scopy_dir = os.path.dirname(os.path.abspath(scopy_path))
 
+        kwargs: dict = {
+            "stdin": subprocess.DEVNULL,
+            "stdout": subprocess.DEVNULL,
+            "stderr": subprocess.DEVNULL,
+            "env": env,
+            "cwd": scopy_dir,
+        }
+
+        if sys.platform == "win32":
+            kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+        else:
+            kwargs["preexec_fn"] = os.setsid
+
         self.process = subprocess.Popen(
             [os.path.abspath(scopy_path), "--accept-license"],
-            stdin=slave,
-            stdout=slave,
-            stderr=slave,
-            env=env,
-            cwd=scopy_dir,
-            preexec_fn=os.setsid,
+            **kwargs,
         )
-        os.close(slave)
-        self.pty_master = master
         self.mode = "launch"
 
-        # Wait for Scopy to finish initializing (look for the "scopy > " prompt)
-        self._wait_for_prompt(timeout=30)
+        # Wait for the QLocalServer socket/pipe to appear
+        self._wait_for_server(timeout=30)
         self._ready = True
+
+    def _wait_for_server(self, timeout: float = 30):
+        """Poll until Scopy's QLocalServer is accepting connections."""
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if self.detect_running_scopy():
+                return
+            time.sleep(0.5)
+        raise RuntimeError(
+            f"Scopy did not create MCP server within {timeout}s. "
+            "It may still be loading or may have failed to start."
+        )
 
     def execute(self, js_code: str) -> str:
         """Execute a JS command in Scopy and return the result."""
         if not self._ready:
             raise RuntimeError("ScopyBridge is not connected to any Scopy instance")
+        response = _connect_and_execute(js_code)
+        return self._parse_response(response)
 
-        if self.mode == "attach":
-            return self._execute_via_fifo(js_code)
-        else:
-            return self._execute_via_pty(js_code)
-
-    def _execute_via_fifo(self, js_code: str) -> str:
-        """Send command via FIFO, read response from response FIFO."""
-        # Use O_NONBLOCK so we get ENXIO immediately if Scopy is not listening
-        # (i.e. stale FIFO on disk but no reader). A blocking open would hang forever.
-        try:
-            fd = os.open(MCP_CMD_PIPE, os.O_WRONLY | os.O_NONBLOCK)
-        except OSError as e:
-            if e.errno == errno.ENXIO:
-                self._mark_stale()
-                raise RuntimeError(
-                    "Scopy pipe found but no listener (stale FIFO). "
-                    "Scopy is not running or was not built with MCP support."
-                )
-            raise
-
-        with os.fdopen(fd, "w") as cmd_pipe:
-            cmd_pipe.write(js_code + "\n")
-
-        # Read response from the response pipe with timeout
-        response = self._read_fifo_response()
-        return self._parse_fifo_response(response)
-
-    def _mark_stale(self):
-        """Clean up state when a stale FIFO is detected."""
-        self._ready = False
-        self.mode = None
-        for path in (MCP_CMD_PIPE, MCP_RSP_PIPE):
-            try:
-                os.unlink(path)
-            except OSError:
-                pass
-
-    def _read_fifo_response(self) -> str:
-        """Read a line from the response FIFO with timeout."""
-        # Use alarm for timeout
-        def timeout_handler(signum, frame):
-            raise TimeoutError(f"Scopy did not respond within {RESPONSE_TIMEOUT} seconds")
-
-        old_handler = signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(RESPONSE_TIMEOUT)
-
-        try:
-            with open(MCP_RSP_PIPE, "r") as rsp_pipe:
-                line = rsp_pipe.readline().strip()
-            return line
-        finally:
-            signal.alarm(0)
-            signal.signal(signal.SIGALRM, old_handler)
-
-    def _parse_fifo_response(self, response: str) -> str:
-        """Parse OK:/ERROR: prefix from FIFO response."""
+    def _parse_response(self, response: str) -> str:
+        """Parse OK:/ERROR: prefix from QLocalServer response."""
         if response.startswith("OK:"):
             return response[3:]
         elif response.startswith("ERROR:"):
             raise RuntimeError(f"Scopy JS error: {response[6:]}")
-        else:
-            return response
-
-    def _execute_via_pty(self, js_code: str) -> str:
-        """Send command via PTY master, read output until prompt."""
-        # Write the JS command
-        os.write(self.pty_master, (js_code + "\n").encode())
-
-        # Read output until we see the "scopy > " prompt
-        output = self._read_until_prompt()
-
-        # The output contains: echoed command, result, then "scopy > "
-        lines = output.strip().split("\n")
-
-        # Filter out the echoed command and the prompt
-        result_lines = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped == js_code.strip():
-                continue
-            if stripped == "scopy >":
-                continue
-            if stripped.startswith("scopy >"):
-                continue
-            result_lines.append(stripped)
-
-        result = "\n".join(result_lines).strip()
-
-        if result.startswith("Exception:"):
-            raise RuntimeError(f"Scopy JS error: {result}")
-
-        return result
-
-    def _read_until_prompt(self, timeout: float = RESPONSE_TIMEOUT) -> str:
-        """Read PTY output until 'scopy > ' prompt appears."""
-        output = ""
-        deadline = time.time() + timeout
-
-        while time.time() < deadline:
-            remaining = deadline - time.time()
-            if remaining <= 0:
-                break
-
-            ready, _, _ = select.select([self.pty_master], [], [], min(remaining, 0.5))
-            if ready:
-                try:
-                    data = os.read(self.pty_master, 4096).decode("utf-8", errors="replace")
-                    output += data
-                    if "scopy > " in output or "scopy >" in output:
-                        return output
-                except OSError:
-                    break
-
-        raise TimeoutError(f"Scopy did not respond within {timeout} seconds")
-
-    def _wait_for_prompt(self, timeout: float = 30):
-        """Wait for the initial 'scopy > ' prompt after launch."""
-        try:
-            self._read_until_prompt(timeout=timeout)
-        except TimeoutError:
-            # Scopy may not print a prompt if stdin is not interactive enough.
-            # In launch mode, we also check if the MCP pipe was created (since
-            # Scopy's init() creates it).
-            if self.detect_running_scopy():
-                return
-            raise RuntimeError(
-                f"Scopy did not produce a prompt within {timeout}s. "
-                "It may still be loading or may have failed to start."
-            )
+        # Unexpected format — return as-is rather than silently drop
+        return response
 
     def close(self):
         """Clean up resources."""
-        if self.pty_master is not None:
-            try:
-                os.close(self.pty_master)
-            except OSError:
-                pass
-            self.pty_master = None
-
         if self.process is not None:
             self.process.terminate()
             try:
-                # Give Scopy enough time to run its Qt destructor and unlink FIFOs.
-                # If it still hasn't exited after 15s, SIGKILL it.
                 self.process.wait(timeout=15)
             except subprocess.TimeoutExpired:
                 self.process.kill()
                 self.process.wait()
             self.process = None
-
         self._ready = False
+        self.mode = None

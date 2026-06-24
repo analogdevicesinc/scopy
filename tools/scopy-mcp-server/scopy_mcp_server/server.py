@@ -3,7 +3,7 @@ Scopy MCP Server
 
 An MCP server that lets Claude Code control Scopy by sending JavaScript
 commands through Scopy's console (QJSEngine). Communicates with Scopy
-via named pipes (attach mode) or PTY (launch mode).
+via a QLocalServer socket (attach mode) or spawns a new process (launch mode).
 
 The bridge is initialized lazily — Scopy is never started automatically.
 If no Scopy is running when a tool is called, the user is notified and
@@ -47,7 +47,8 @@ _API = json.loads((pathlib.Path(__file__).parent / "scopy_api.json").read_text()
 
 _NO_SCOPY_MSG = (
     "No running Scopy instance found. "
-    "Please start Scopy manually, or call start_scopy() to launch it."
+    "Please start Scopy manually (it must be built with MCP support), "
+    "or call start_scopy() to launch it."
 )
 
 
@@ -63,22 +64,21 @@ def _ensure_connected() -> str | None:
 
 
 def _run_tool(js_code: str) -> str:
-    """Run a JS command, catching stale-pipe and timeout errors as user-friendly strings."""
+    """Run a JS command, converting connection and timeout errors to user-friendly strings."""
     try:
         return bridge.execute(js_code)
+    except (ConnectionRefusedError, FileNotFoundError):
+        return (
+            "Cannot connect to Scopy — it may have exited. "
+            "Please start Scopy again, or call start_scopy()."
+        )
     except RuntimeError as e:
-        msg = str(e)
-        if "stale FIFO" in msg or "stale pipe" in msg.lower():
-            return (
-                "Stale Scopy pipe detected — Scopy exited without cleaning up. "
-                "Please start Scopy again, or call start_scopy()."
-            )
-        return f"Scopy error: {msg}"
+        return f"Scopy error: {e}"
     except TimeoutError:
         return (
             "Scopy did not respond within the timeout. "
-            "Check that Scopy is running and the MCP pipe listener is active "
-            "(look for 'MCP pipe listener active' in Scopy's log)."
+            "Check that Scopy is running and the MCP server is active "
+            "(look for 'MCP server listening' in Scopy's log)."
         )
 
 

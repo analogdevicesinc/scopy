@@ -75,7 +75,11 @@ def install_with_uv() -> str | None:
     ver = subprocess.run([uv, "--version"], capture_output=True, text=True)
     ok(f"uv found ({ver.stdout.strip()})")
     info("Installing with uv sync...")
-    result = subprocess.run([uv, "sync"], cwd=SCRIPT_DIR)
+    # On Windows, include the optional pywin32 dependency for named-pipe IPC
+    cmd = [uv, "sync"]
+    if platform.system() == "Windows":
+        cmd += ["--extra", "windows"]
+    result = subprocess.run(cmd, cwd=SCRIPT_DIR)
     if result.returncode != 0:
         info("uv sync failed, trying pip instead...")
         return None
@@ -107,7 +111,14 @@ def _resolve_entry_point() -> str:
 def install_with_pip() -> str:
     """Install with pip. Returns absolute path to the installed entry point."""
     info("Installing with pip...")
-    result = subprocess.run([sys.executable, "-m", "pip", "install", "."], cwd=SCRIPT_DIR)
+    # On Windows, include the optional pywin32 dependency for named-pipe IPC
+    if platform.system() == "Windows":
+        install_target = ".[windows]"
+    else:
+        install_target = "."
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", install_target], cwd=SCRIPT_DIR
+    )
     if result.returncode != 0:
         fail("pip install failed. Check the output above for errors.")
     ok("Dependencies installed (pip)")
