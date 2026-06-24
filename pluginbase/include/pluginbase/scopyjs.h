@@ -29,13 +29,11 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QJSEngine>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QObject>
 #include <QSocketNotifier>
 #include <QFile>
-
-#ifdef Q_OS_UNIX
-#include <sys/stat.h>
-#endif
 
 class QJSEngine;
 
@@ -74,10 +72,8 @@ public:
 public Q_SLOTS:
 	void hasText();
 
-#ifdef Q_OS_UNIX
 private Q_SLOTS:
-	void onPipeData();
-#endif
+	void onMcpConnection();
 
 private:
 	QFutureWatcher<QString> watcher;
@@ -94,14 +90,10 @@ private:
 	static QLoggingCategory::CategoryFilter oldCategoryFilter;
 	static void jsCategoryFilter(QLoggingCategory *category);
 
-#ifdef Q_OS_UNIX
-	void initMcpPipe();
-	void cleanupMcpPipe();
-	QSocketNotifier *m_pipeNotifier = nullptr;
-	int m_pipeFd = -1;
-	static constexpr const char *MCP_CMD_PIPE = "/tmp/scopy_mcp_cmd";
-	static constexpr const char *MCP_RSP_PIPE = "/tmp/scopy_mcp_rsp";
-#endif
+	void initMcpServer();
+	void cleanupMcpServer();
+	QLocalServer *m_mcpServer = nullptr;
+	static constexpr const char *MCP_SERVER_NAME = "scopy_mcp";
 
 private:
 	const QString getScriptContent(QFile *file);
