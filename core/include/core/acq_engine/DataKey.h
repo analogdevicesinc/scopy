@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QMetaType>
 #include <QString>
 #include <QStringList>
 
@@ -56,3 +57,5 @@ inline uint qHash(const scopy::acq::DataKey &k, uint seed = 0) noexcept
 {
 	return qHash(k.key, seed);
 }
+
+Q_DECLARE_METATYPE(scopy::acq::DataKey)

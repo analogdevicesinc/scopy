@@ -1,5 +1,8 @@
 #include "siminstrumentcontroller.h"
 
+#include "DecoderOverlay.h"
+#include <core/decoder/SigrokCliBackend.h>
+
 #include <libm2k/digital/m2kdigital.hpp>
 
 #include <numeric>
@@ -71,6 +74,27 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		for(int ch = 0; ch < scopy::adc::sim::M2kLogicSource::NR_CHANNELS; ++ch)
 			m_logicSrc->enableChannel(QString("DIO%1").arg(ch), true);
 		m_engine->addSource(m_logicSrc);
+
+		// ---- Hardcoded UART decoder demo on DIO0 ----
+		auto backend = std::make_unique<scopy::decoder::SigrokCliBackend>();
+		m_uartDecoder = new scopy::acq::ExternalDecoderProcessor(
+			"uart-decoder", std::move(backend), m_engine);
+
+		scopy::decoder::DecoderConfig cfg;
+		cfg.decoderId   = "uart";
+		cfg.sampleRate  = 1.0e6;
+		cfg.numChannels = 1;
+		cfg.channels    = {{"rx", 0}};
+		cfg.options     = {{"baudrate", "115200"}, {"parity", "none"}};
+
+		m_uartDecoder->setConfig(cfg);
+		m_uartDecoder->setOrderedRawKeys(
+			{scopy::acq::DataKey::raw("m2k_logic", "DIO0")});
+		m_uartDecoder->setOutputKey(
+			scopy::acq::DataKey::withStage("m2k_logic", "uart-decoder", "decoded"));
+		m_uartDecoder->setWatchedKeys(
+			{scopy::acq::DataKey::raw("m2k_logic", "DIO0")});
+		m_engine->addProcessor(m_uartDecoder);
 	}
 
 	// ---- Processor: scale + offset ----
@@ -94,6 +118,12 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	// ---- UI ----
 	m_ui = new SimInstrument(nullptr);
+
+	// ---- Decoder overlay (after UI is built) ----
+	if(m_uartDecoder) {
+		m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
+		m_decoderOverlay->registerDecoder(m_uartDecoder);
+	}
 
 	// ---- Plot channels ----
 	// Channel 1 — cyan
@@ -288,11 +318,18 @@ SimInstrument *SimInstrumentController::ui() const
 static QVector<float> toFloatVec(const scopy::acq::SampleVariant &v)
 {
 	return std::visit([](const auto &vec) -> QVector<float> {
-		QVector<float> out;
-		out.reserve(static_cast<int>(vec.size()));
-		for(const auto &s : vec)
-			out.append(static_cast<float>(s));
-		return out;
+		using VecT = std::decay_t<decltype(vec)>;
+		if constexpr(std::is_same_v<VecT, QVector<scopy::acq::Annotation>>) {
+			// Annotations are not numerical; return empty so plotting
+			// paths silently skip decoded keys.
+			return QVector<float>{};
+		} else {
+			QVector<float> out;
+			out.reserve(static_cast<int>(vec.size()));
+			for(const auto &s : vec)
+				out.append(static_cast<float>(s));
+			return out;
+		}
 	}, v);
 }
 
