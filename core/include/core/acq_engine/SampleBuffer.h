@@ -2,24 +2,36 @@
 
 #include <deque>
 #include <variant>
+#include <QString>
 #include <QVector>
 
 namespace scopy {
 namespace acq {
 
-enum class SampleType { Float32, Float64, Int32, Int16, Int8, UInt8 };
+struct Annotation
+{
+	quint64 startSample{0};
+	quint64 endSample{0};
+	QString decoder; // e.g. "uart-1"
+	QString klass;   // annotation class / row
+	QString text;
+	int     severity{0};
+};
+
+enum class SampleType { Float32, Float64, Int32, Int16, Int8, UInt8, Annotation };
 
 using SampleVariant = std::variant<
-	QVector<float>,   // index 0 → SampleType::Float32
-	QVector<double>,  // index 1 → SampleType::Float64
-	QVector<qint32>,  // index 2 → SampleType::Int32
-	QVector<qint16>,  // index 3 → SampleType::Int16
-	QVector<qint8>,   // index 4 → SampleType::Int8
-	QVector<quint8>>; // index 5 → SampleType::UInt8
+	QVector<float>,        // index 0 → SampleType::Float32
+	QVector<double>,       // index 1 → SampleType::Float64
+	QVector<qint32>,       // index 2 → SampleType::Int32
+	QVector<qint16>,       // index 3 → SampleType::Int16
+	QVector<qint8>,        // index 4 → SampleType::Int8
+	QVector<quint8>,       // index 5 → SampleType::UInt8
+	QVector<Annotation>>;  // index 6 → SampleType::Annotation
 
 // SampleBuffer::type() casts variant.index() to SampleType.
 // Both sequences must remain in sync.
-static_assert(std::variant_size_v<SampleVariant> == 6,
+static_assert(std::variant_size_v<SampleVariant> == 7,
 	      "SampleVariant and SampleType enum must have the same number of alternatives");
 
 struct SampleBuffer
