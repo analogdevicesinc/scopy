@@ -56,6 +56,7 @@ file(
 	src/*.cc
 	src/pkggui/*.cpp
 	src/acq_engine/*.cpp
+	src/decoder/*.cpp
 )
 file(
 	GLOB
@@ -64,6 +65,7 @@ file(
 	include/${SCOPY_MODULE}/*.hpp
 	include/${SCOPY_MODULE}/pkggui/*.h
 	include/${SCOPY_MODULE}/acq_engine/*.h
+	include/${SCOPY_MODULE}/decoder/*.h
 )
 file(GLOB UI_LIST ui/*.ui)
 
@@ -135,12 +137,14 @@ target_include_directories(
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
 				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
+				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/decoder
 )
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/decoder
 		${GLIB_INCLUDE_DIRS}
 		${GLIBCONFIG_INCLUDE_DIRS}
 		${LIBSIGROK_DECODE_INCLUDE_DIRS}

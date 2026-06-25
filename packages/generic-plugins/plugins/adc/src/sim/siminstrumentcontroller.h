@@ -5,6 +5,7 @@
 #include "siminstrument.h"
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
+#include <core/acq_engine/ExternalDecoderProcessor.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
 #include <core/acq_engine/MathProcessor.h>
 #include <core/acq_engine/MathSource.h>
@@ -30,6 +31,8 @@ namespace libm2k { namespace digital { class M2kDigital; } }
 
 namespace scopy {
 namespace adc {
+
+class DecoderOverlay;
 
 // Self-contained controller for the simulated ADC tool.
 // Does NOT depend on GRTopBlock, AcqTreeNode, or any GNU Radio component.
@@ -69,6 +72,8 @@ private:
 	scopy::acq::GenalyzerFFTProcessor  *m_fftProc{nullptr};
 	scopy::acq::MathSource             *m_mathSrc{nullptr};
 	scopy::acq::MathProcessor          *m_mathProc{nullptr};
+	scopy::acq::ExternalDecoderProcessor *m_uartDecoder{nullptr};
+	scopy::adc::DecoderOverlay           *m_decoderOverlay{nullptr};
 
 	QPointer<SimInstrument> m_ui;
 

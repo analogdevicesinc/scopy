@@ -10,7 +10,9 @@ namespace acq {
 AcquisitionEngine::AcquisitionEngine(DataStore *store, QObject *parent)
 	: QObject(parent)
 	, m_store(store)
-{}
+{
+	qRegisterMetaType<scopy::acq::DataKey>("scopy::acq::DataKey");
+}
 
 AcquisitionEngine::~AcquisitionEngine()
 {
