@@ -28,16 +28,9 @@ def warn(msg):  print(f"{YELLOW}[WARN]{RESET}  {msg}")
 def fail(msg):  print(f"{RED}[FAIL]{RESET}  {msg}"); sys.exit(1)
 
 
-def _claude_config_dir() -> str | None:
-    """Return the Claude Code config directory for this OS, or None if unknown."""
-    system = platform.system()
-    if system in ("Linux", "Darwin"):
-        return os.path.expanduser("~/.claude")
-    elif system == "Windows":
-        appdata = os.environ.get("APPDATA")
-        if appdata:
-            return os.path.join(appdata, "Claude")
-    return None
+def _claude_config_dir() -> str:
+    """Return the Claude Code config directory (~/.claude on all platforms)."""
+    return os.path.expanduser("~/.claude")
 
 
 def _mcp_entry(command: str, used_uv: bool) -> dict:
@@ -89,23 +82,24 @@ def install_with_uv() -> str | None:
 
 def _resolve_entry_point() -> str:
     """Return the absolute path to the scopy-mcp-server script after pip install."""
-    # Try PATH first (works when ~/.local/bin is in PATH)
-    found = shutil.which("scopy-mcp-server")
+    exe_name = "scopy-mcp-server.exe" if os.name == "nt" else "scopy-mcp-server"
+    # Try PATH first (works when ~/.local/bin or Scripts is in PATH)
+    found = shutil.which(exe_name)
     if found:
         return found
     # Fallback: derive from sysconfig scripts dir (covers user installs not yet in PATH)
     scripts_dir = sysconfig.get_path("scripts", f"{os.name}_user")
     if scripts_dir:
-        candidate = os.path.join(scripts_dir, "scopy-mcp-server")
+        candidate = os.path.join(scripts_dir, exe_name)
         if os.path.isfile(candidate):
             return candidate
     # Last resort: scripts dir for the current Python prefix
     scripts_dir = sysconfig.get_path("scripts")
     if scripts_dir:
-        candidate = os.path.join(scripts_dir, "scopy-mcp-server")
+        candidate = os.path.join(scripts_dir, exe_name)
         if os.path.isfile(candidate):
             return candidate
-    return "scopy-mcp-server"  # give up, use bare name
+    return exe_name
 
 
 def install_with_pip() -> str:
@@ -126,26 +120,50 @@ def install_with_pip() -> str:
 
 
 # ---------------------------------------------------------------------------
-# Step 3A — Write ~/.claude/.mcp.json
+# Step 3A — Register MCP server with Claude Code
 # ---------------------------------------------------------------------------
 
-def configure_mcp_json(command: str, used_uv: bool):
-    print()
-    info("Configuring Claude Code MCP entry...")
+def _configure_via_cli(command: str, used_uv: bool) -> bool:
+    """Try to register the MCP server using `claude mcp add`. Returns True on success."""
+    claude = shutil.which("claude")
+    if not claude:
+        return False
 
+    cmd = [claude, "mcp", "add", "scopy", "-s", "user", "--"]
+    if used_uv:
+        cmd += [command, "run", "--directory", SCRIPT_DIR, "scopy-mcp-server"]
+    else:
+        cmd += [command]
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode == 0:
+        return True
+
+    if "already exists" in result.stderr.lower():
+        print("  A 'scopy' MCP server is already registered in Claude Code.")
+        print("  Update it with the new configuration? [Y/n] ", end="", flush=True)
+        try:
+            answer = input().strip().lower()
+        except EOFError:
+            answer = "n"
+        if answer not in ("", "y", "yes"):
+            info("Kept existing MCP server entry.")
+            return True
+        subprocess.run([claude, "mcp", "remove", "scopy", "-s", "user"],
+                       capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        return result.returncode == 0
+
+    return False
+
+
+def _configure_via_json(command: str, used_uv: bool) -> bool:
+    """Fallback: write the MCP entry directly to ~/.claude.json. Returns True on success."""
     claude_dir = _claude_config_dir()
-    if not claude_dir:
-        warn("Unrecognised OS — could not locate Claude Code config directory.")
-        _print_mcp_snippet(command, used_uv)
-        return
+    if not os.path.isdir(claude_dir):
+        return False
 
     mcp_path = os.path.expanduser("~/.claude.json")
-
-    if not os.path.isdir(claude_dir):
-        warn(f"Claude Code config directory not found at {claude_dir}.")
-        warn("Is Claude Code installed? Skipping automatic .mcp.json setup.")
-        _print_mcp_snippet(command, used_uv)
-        return
 
     entry = _mcp_entry(command, used_uv)
 
@@ -154,9 +172,7 @@ def configure_mcp_json(command: str, used_uv: bool):
             with open(mcp_path) as f:
                 data = json.load(f)
         except json.JSONDecodeError:
-            warn(f"{mcp_path} exists but is not valid JSON — skipping automatic update.")
-            _print_mcp_snippet(command, used_uv)
-            return
+            return False
     else:
         data = {}
 
@@ -165,8 +181,23 @@ def configure_mcp_json(command: str, used_uv: bool):
     with open(mcp_path, "w") as f:
         json.dump(data, f, indent=2)
         f.write("\n")
+    return True
 
-    ok(f"Updated {mcp_path} with 'scopy' MCP server entry (global scope).")
+
+def configure_mcp_json(command: str, used_uv: bool):
+    print()
+    info("Configuring Claude Code MCP entry...")
+
+    if _configure_via_cli(command, used_uv):
+        ok("Registered 'scopy' MCP server with Claude Code (user scope).")
+        return
+
+    if _configure_via_json(command, used_uv):
+        ok(f"Updated ~/.claude.json with 'scopy' MCP server entry (global scope).")
+        return
+
+    warn("Could not auto-configure Claude Code.")
+    _print_mcp_snippet(command, used_uv)
 
 
 def _print_mcp_snippet(command: str, used_uv: bool):
@@ -190,11 +221,7 @@ SCOPY_PERMISSION = "mcp__scopy__*"
 
 def configure_permissions():
     print()
-    claude_dir = _claude_config_dir()
-    if not claude_dir:
-        return
-
-    settings_path = os.path.join(claude_dir, "settings.json")
+    settings_path = os.path.join(_claude_config_dir(), "settings.json")
 
     if not os.path.isfile(settings_path):
         info(f"Claude Code settings.json not found at {settings_path} — skipping permissions setup.")
