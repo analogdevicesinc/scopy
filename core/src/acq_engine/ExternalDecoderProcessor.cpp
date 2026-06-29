@@ -2,13 +2,10 @@
 
 #include "DataStore.h"
 
-#include <QLoggingCategory>
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <vector>
-
-Q_LOGGING_CATEGORY(CAT_EXT_DEC_PROC, "ExternalDecoderProcessor")
 
 namespace scopy {
 namespace acq {
@@ -53,11 +50,11 @@ void ExternalDecoderProcessor::reset()
 void ExternalDecoderProcessor::process(DataStore *store)
 {
 	if(!m_backend || !store) {
-		qCDebug(CAT_EXT_DEC_PROC) << name() << "process(): no backend/store";
 		return;
 	}
 	if(m_orderedRawKeys.isEmpty()) {
-		qCWarning(CAT_EXT_DEC_PROC) << name() << "process(): no rawKeys set";
+		report(AcquisitionError::Severity::Warning,
+		       QStringLiteral("process(): no rawKeys set"));
 		return;
 	}
 
@@ -73,9 +70,10 @@ void ExternalDecoderProcessor::process(DataStore *store)
 		if(buf.empty()) continue;
 		const SampleVariant &v = buf.sample(0);
 		if(!std::holds_alternative<QVector<quint8>>(v)) {
-			qCWarning(CAT_EXT_DEC_PROC)
-				<< name() << "process(): key" << m_orderedRawKeys[i].key
-				<< "wrong variant index=" << v.index();
+			report(AcquisitionError::Severity::Warning,
+			       QStringLiteral("process(): key %1 wrong variant index=%2")
+				       .arg(m_orderedRawKeys[i].key)
+				       .arg(v.index()));
 			continue;
 		}
 		bitVecs[i] = std::get<QVector<quint8>>(v);
@@ -88,8 +86,6 @@ void ExternalDecoderProcessor::process(DataStore *store)
 
 	if(!anyPopulated || minLen <= 0
 	   || minLen == std::numeric_limits<qsizetype>::max()) {
-		qCDebug(CAT_EXT_DEC_PROC)
-			<< name() << "process(): nothing to decode this cycle";
 		// Still publish (empty) so consumers see a defined state.
 		if(!m_outKey.key.isEmpty()) {
 			store->write(m_outKey, std::move(annVec));
@@ -101,17 +97,19 @@ void ExternalDecoderProcessor::process(DataStore *store)
 	const int unitsize = std::max(1, static_cast<int>(std::ceil(m_cfg.numChannels / 8.0)));
 	packBits(bitVecs, m_cfg.numChannels, minLen, unitsize, m_packed);
 
-	qCInfo(CAT_EXT_DEC_PROC)
-		<< name() << "process(): decode" << minLen << "samples,"
-		<< "unitsize=" << unitsize << "bytes, totalBytes=" << m_packed.size();
+	report(AcquisitionError::Severity::Info,
+	       QStringLiteral("process(): decode %1 samples, unitsize=%2 bytes, totalBytes=%3")
+		       .arg(minLen)
+		       .arg(unitsize)
+		       .arg(m_packed.size()));
 
 	std::vector<scopy::decoder::AnnotationC> outC;
 	const bool ok = m_backend->decode(m_cfg, m_packed.data(),
 					  static_cast<std::size_t>(minLen), outC);
 	if(!ok) {
-		qCWarning(CAT_EXT_DEC_PROC)
-			<< name() << "backend decode failed:"
-			<< QString::fromStdString(m_backend->lastError());
+		report(AcquisitionError::Severity::Warning,
+		       QStringLiteral("backend decode failed: %1")
+			       .arg(QString::fromStdString(m_backend->lastError())));
 	}
 
 	annVec.reserve(static_cast<qsizetype>(outC.size()));
@@ -126,9 +124,10 @@ void ExternalDecoderProcessor::process(DataStore *store)
 		annVec.append(out);
 	}
 
-	qCInfo(CAT_EXT_DEC_PROC)
-		<< name() << "process(): produced" << annVec.size()
-		<< "annotations, outKey=" << m_outKey.key;
+	report(AcquisitionError::Severity::Info,
+	       QStringLiteral("process(): produced %1 annotations, outKey=%2")
+		       .arg(annVec.size())
+		       .arg(m_outKey.key));
 
 	if(!m_outKey.key.isEmpty()) {
 		store->write(m_outKey, std::move(annVec));

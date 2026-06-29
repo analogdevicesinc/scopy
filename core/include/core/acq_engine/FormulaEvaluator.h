@@ -24,7 +24,10 @@ public:
 	bool    isValid() const;                    // GUI thread
 	QString formula() const;                    // GUI thread
 
-	bool evaluateBatch(int n, const float *xIn, QVector<float> &out); // worker thread
+	// Worker thread. On failure returns false, fills `out` with zeros and
+	// writes a human-readable reason into `errorOut` (if non-null).
+	bool evaluateBatch(int n, const float *xIn, QVector<float> &out,
+			   QString *errorOut = nullptr);
 
 private:
 	static QString wrapFormula(const QString &formula);

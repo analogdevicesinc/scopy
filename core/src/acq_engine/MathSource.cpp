@@ -13,9 +13,10 @@ MathSource::MathSource(const QString &id, QObject *parent)
 void MathSource::acquire(DataStore *store)
 {
 	QVector<float> out(static_cast<int>(m_bufferSize));
-	if(!m_evaluator.evaluateBatch(out.size(), nullptr, out))
-		qWarning("[MathSource] formula evaluation failed — writing zeros for '%s'",
-			 qPrintable(m_id));
+	QString        err;
+	if(!m_evaluator.evaluateBatch(out.size(), nullptr, out, &err))
+		report(AcquisitionError::Severity::Warning,
+		       QStringLiteral("formula evaluation failed (%1) — writing zeros").arg(err));
 	store->write(m_outputKey, std::move(out));
 }
 

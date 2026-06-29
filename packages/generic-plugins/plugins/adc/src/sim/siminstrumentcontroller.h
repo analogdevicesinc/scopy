@@ -16,6 +16,7 @@
 
 struct iio_context;
 namespace libm2k { namespace digital { class M2kDigital; } }
+namespace scopy { class GenalyzerPanel; }
 
 #include <QElapsedTimer>
 #include <QLabel>
@@ -74,6 +75,7 @@ private:
 	scopy::acq::MathProcessor          *m_mathProc{nullptr};
 	scopy::acq::ExternalDecoderProcessor *m_uartDecoder{nullptr};
 	scopy::adc::DecoderOverlay           *m_decoderOverlay{nullptr};
+	scopy::GenalyzerPanel                *m_genalyzerPanel{nullptr};
 
 	QPointer<SimInstrument> m_ui;
 
