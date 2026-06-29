@@ -285,7 +285,11 @@ void MarkerPanel::deleteChannel(QString name)
 
 void MarkerPanel::updateChannel(QString name, QList<PlotMarkerController::MarkerInfo> mi)
 {
-	dynamic_cast<MarkerLabel *>(m_map[name])->updateInfo(mi);
+	MarkerLabel *label = dynamic_cast<MarkerLabel *>(m_map[name]);
+	if(!label)
+		return;
+
+	label->updateInfo(mi);
 	setFixedHeight(25 + mi.count() * 20);
 }
 
