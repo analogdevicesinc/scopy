@@ -1,5 +1,7 @@
 #include "SourceBlock.h"
 
+#include "AcquisitionEngine.h"
+
 #include <QWidget>
 
 namespace scopy {
@@ -9,6 +11,14 @@ SourceBlock::SourceBlock(const QString &id, QObject *parent)
 	: QObject(parent)
 	, m_id(id)
 {}
+
+void SourceBlock::report(AcquisitionError::Severity sev, const QString &msg) const
+{
+	auto *engine = qobject_cast<AcquisitionEngine *>(parent());
+	if(!engine)
+		return;
+	Q_EMIT engine->error(static_cast<int>(sev), m_id, msg);
+}
 
 void SourceBlock::onStart()
 {

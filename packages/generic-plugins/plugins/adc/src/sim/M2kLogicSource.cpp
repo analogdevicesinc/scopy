@@ -50,7 +50,7 @@ void M2kLogicSource::onStop()
 	} catch(...) {}
 
 	try {
-		m_digital->stopAcquisition();
+		// m_digital->stopAcquisition();
 	} catch(...) {}
 }
 
