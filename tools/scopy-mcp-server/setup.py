@@ -114,7 +114,14 @@ def install_with_pip() -> str:
         [sys.executable, "-m", "pip", "install", install_target], cwd=SCRIPT_DIR
     )
     if result.returncode != 0:
-        fail("pip install failed. Check the output above for errors.")
+        fail(
+            "pip install failed. This is likely because your system Python is\n"
+            "        externally managed (common on Ubuntu 23.04+, Debian 12+).\n\n"
+            "        To fix this, install uv and re-run setup.py:\n"
+            "          Linux/macOS: curl -LsSf https://astral.sh/uv/install.sh | sh\n"
+            "          Windows:     winget install astral-sh.uv\n\n"
+            "        See the Troubleshooting section in README.md for more details."
+        )
     ok("Dependencies installed (pip)")
     return _resolve_entry_point()
 

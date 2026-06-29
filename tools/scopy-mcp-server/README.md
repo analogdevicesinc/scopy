@@ -165,7 +165,7 @@ For each Scopy API object (`ad936x`, `adrv9002`, `regmap`, `datalogger`, etc.), 
 | `Scopy did not respond within 10s` | Check Scopy is responsive, try a simpler command |
 | MCP server not showing in Claude Code | Check `.mcp.json` syntax, restart Claude Code |
 | `Cannot connect to Scopy` | Scopy exited — restart it, or call `start_scopy()` |
-| `win32file not found` (Windows) | Run `pip install .[windows]` to install `pywin32` |
+| `error: externally-managed-environment` | Your system Python blocks global pip installs. Install uv and re-run `setup.py`: `curl -LsSf https://astral.sh/uv/install.sh \| sh`. For more information about this check the [official documentation](https://packaging.python.org/en/latest/specifications/externally-managed-environments/#externally-managed-environments). |
 
 ## For Scopy developers
 
