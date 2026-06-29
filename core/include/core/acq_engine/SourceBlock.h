@@ -2,6 +2,7 @@
 
 #include "scopy-core_export.h"
 
+#include "AcquisitionError.h"
 #include "DataStore.h"
 
 #include <atomic>
@@ -15,6 +16,8 @@ class QWidget;
 
 namespace scopy {
 namespace acq {
+
+class AcquisitionEngine;
 
 class SCOPY_CORE_EXPORT SourceBlock : public QObject
 {
@@ -43,6 +46,14 @@ public:
 	void setEnabled(bool en) { m_sourceEnabled.store(en, std::memory_order_relaxed); }
 
 	virtual QWidget *createSettingsWidget(QWidget *parent = nullptr);
+
+	// All diagnostics produced by this block must go through report(). The
+	// engine multiplexes them into its error(severity, id, message) signal.
+	// Parent the block to the AcquisitionEngine so report() can find it;
+	// blocks without an engine parent silently drop messages. Throwing from
+	// onStart()/acquire() is equivalent to report(Critical, what()) plus
+	// aborting the cycle — the engine catches and re-emits.
+	void report(AcquisitionError::Severity sev, const QString &msg) const;
 
 protected:
 	std::size_t         m_bufferSize{1024};

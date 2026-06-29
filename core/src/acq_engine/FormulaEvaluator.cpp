@@ -77,7 +77,8 @@ void FormulaEvaluator::rebuildEngine(const QString &formula)
 	}
 }
 
-bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &out)
+bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &out,
+				     QString *errorOut)
 {
 	QString formulaCopy;
 	bool    dirty = false;
@@ -94,7 +95,8 @@ bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &ou
 	out.resize(n);
 
 	if(!m_batchFn.isCallable()) {
-		qWarning("[FormulaEvaluator] no valid batch function — writing zeros");
+		if(errorOut)
+			*errorOut = QStringLiteral("no valid batch function");
 		out.fill(0.0f);
 		return false;
 	}
@@ -110,8 +112,8 @@ bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &ou
 	const QJSValue result = m_batchFn.call({QJSValue(n), jsXs});
 
 	if(result.isError()) {
-		qWarning("[FormulaEvaluator] evaluation exception: %s",
-			 qPrintable(result.toString()));
+		if(errorOut)
+			*errorOut = QStringLiteral("evaluation exception: %1").arg(result.toString());
 		m_batchFn = QJSValue();
 		m_syntaxValid.store(false, std::memory_order_relaxed);
 		out.fill(0.0f);

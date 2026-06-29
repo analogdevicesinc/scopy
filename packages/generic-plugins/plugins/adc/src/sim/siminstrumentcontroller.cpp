@@ -18,8 +18,12 @@
 #include <gui/plotaxis.h>
 #include <gui/plotchannel.h>
 #include <gui/widgets/cursorsettings.h>
+#include <gui/widgets/genalyzerpanel.h>
 #include <gui/widgets/plotinfowidgets.h>
 #include <gui/widgets/plotinfo.h>
+
+#include <core/acq_engine/GenalyzerConfig.h>
+#include <core/acq_engine/GenalyzerSettings.h>
 
 Q_LOGGING_CATEGORY(CAT_SIM_CTRL, "SimInstrumentController")
 
@@ -123,6 +127,57 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	if(m_uartDecoder) {
 		m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
 		m_decoderOverlay->registerDecoder(m_uartDecoder);
+	}
+
+	// ---- Genalyzer analysis panel ----
+	// Parented to m_ui and embedded into the tool's right-stack so it docks
+	// alongside the other settings widgets (cursor-config, genalyzer-config).
+	m_genalyzerPanel = new scopy::GenalyzerPanel(m_ui);
+	m_ui->m_tool->rightStack()->add("genalyzer-results", m_genalyzerPanel);
+
+	// AcquisitionEngine runs the processor on its own QThread; cross-thread
+	// delivery of the analysis snapshot is handled via Qt::QueuedConnection.
+	// GenalyzerResultsSnapshot is Q_DECLARE_METATYPE-d and registered in the
+	// processor's translation unit so queued dispatch is safe.
+	connect(m_fftProc, &scopy::acq::GenalyzerFFTProcessor::analysisReady,
+		this, [this](const scopy::acq::GenalyzerResultsSnapshot &snap) {
+			if(!m_genalyzerPanel)
+				return;
+			// Build temporary char**/double* views for GenalyzerPanel::updateResults,
+			// which (by design) expects raw genalyzer-style arrays.
+			const int n = snap.keys.size();
+			std::vector<QByteArray> keyBytes;
+			keyBytes.reserve(n);
+			std::vector<char *>     keyPtrs;
+			keyPtrs.reserve(n);
+			for(const QString &k : snap.keys) {
+				keyBytes.emplace_back(k.toUtf8());
+				keyPtrs.push_back(keyBytes.back().data());
+			}
+			std::vector<double> values(snap.values.begin(), snap.values.end());
+			m_genalyzerPanel->updateResults(
+				QStringLiteral("sim-adc/voltage0"),
+				QColor(0xff, 0x7e, 0x40),
+				static_cast<size_t>(n),
+				keyPtrs.empty() ? nullptr : keyPtrs.data(),
+				values.empty()  ? nullptr : values.data());
+		}, Qt::QueuedConnection);
+
+	// Surface failures in the log view so the user can see why analysis isn't
+	// producing numbers.
+	connect(m_fftProc, &scopy::acq::GenalyzerFFTProcessor::analysisFailed,
+		this, [this](const QString &reason) {
+			if(m_ui)
+				m_ui->appendLog(
+					static_cast<int>(scopy::acq::AcquisitionError::Severity::Warning),
+					QStringLiteral("genalyzer"),
+					reason);
+		}, Qt::QueuedConnection);
+
+	// Surface the FFT processor's settings widget in the right-stack so the
+	// user can flip between Auto / FixedTone and tune SSB widths.
+	if(QWidget *gnSettings = m_fftProc->createSettingsWidget(m_ui)) {
+		m_ui->m_tool->rightStack()->add("genalyzer-config", gnSettings);
 	}
 
 	// ---- Plot channels ----

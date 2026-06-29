@@ -32,9 +32,10 @@ void MathProcessor::process(DataStore *store)
 
 	const QVector<float> &in = std::get<QVector<float>>(v);
 	QVector<float>        out(in.size());
-	if(!m_evaluator.evaluateBatch(in.size(), in.constData(), out))
-		qWarning("[MathProcessor] formula evaluation failed — writing zeros for '%s'",
-			 qPrintable(m_name));
+	QString               err;
+	if(!m_evaluator.evaluateBatch(in.size(), in.constData(), out, &err))
+		report(AcquisitionError::Severity::Warning,
+		       QStringLiteral("formula evaluation failed (%1) — writing zeros").arg(err));
 	store->write(m_outputKey, std::move(out));
 }
 
