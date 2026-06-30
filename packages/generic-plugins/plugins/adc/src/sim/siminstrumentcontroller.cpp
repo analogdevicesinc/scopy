@@ -116,8 +116,8 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	m_engine->addSource(m_mathSrc);
 
 	m_mathProc = new scopy::acq::MathProcessor("math", m_engine);
-	m_mathProc->configure(m_mathSrc->outputKey(),
-			      scopy::acq::DataKey::withStage("math-src", "out", "proc"));
+	m_mathProc->setOutputKey(scopy::acq::DataKey::withStage("math-src", "out", "proc"));
+	m_mathProc->setWatchedKeys({m_mathSrc->outputKey()});
 	m_engine->addProcessor(m_mathProc);
 
 	// ---- UI ----
@@ -130,10 +130,8 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	}
 
 	// ---- Genalyzer analysis panel ----
-	// Parented to m_ui and embedded into the tool's right-stack so it docks
-	// alongside the other settings widgets (cursor-config, genalyzer-config).
 	m_genalyzerPanel = new scopy::GenalyzerPanel(m_ui);
-	m_ui->m_tool->rightStack()->add("genalyzer-results", m_genalyzerPanel);
+	m_ui->m_tool->addWidgetToCentralContainerHelper(m_genalyzerPanel);
 
 	// AcquisitionEngine runs the processor on its own QThread; cross-thread
 	// delivery of the analysis snapshot is handled via Qt::QueuedConnection.
@@ -173,12 +171,6 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 					QStringLiteral("genalyzer"),
 					reason);
 		}, Qt::QueuedConnection);
-
-	// Surface the FFT processor's settings widget in the right-stack so the
-	// user can flip between Auto / FixedTone and tune SSB widths.
-	if(QWidget *gnSettings = m_fftProc->createSettingsWidget(m_ui)) {
-		m_ui->m_tool->rightStack()->add("genalyzer-config", gnSettings);
-	}
 
 	// ---- Plot channels ----
 	// Channel 1 — cyan

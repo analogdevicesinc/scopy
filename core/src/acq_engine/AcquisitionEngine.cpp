@@ -45,8 +45,11 @@ void AcquisitionEngine::stop()
 
 	m_running = false;
 
-	for(SourceBlock *src : m_sources)
+	for(SourceBlock *src : m_sources) {
+		if(!src->isEnabled())
+			continue;
 		safeOnStop(src);
+	}
 
 	if(m_thread) {
 		m_thread->wait();
@@ -63,6 +66,8 @@ void AcquisitionEngine::startLoop(int acqCount)
 	m_faultStop = false;
 
 	for(SourceBlock *src : m_sources) {
+		if(!src->isEnabled())
+			continue;
 		src->setBufferSize(m_bufferSize);
 		try {
 			src->onStart();
@@ -182,8 +187,11 @@ void AcquisitionEngine::loop()
 	if(m_mode.load() == Mode::Continuous)
 		Q_EMIT cycleComplete();
 
-	for(SourceBlock *src : m_sources)
+	for(SourceBlock *src : m_sources) {
+		if(!src->isEnabled())
+			continue;
 		safeOnStop(src);
+	}
 
 	if(m_faultStop)
 		Q_EMIT forceStopped();
