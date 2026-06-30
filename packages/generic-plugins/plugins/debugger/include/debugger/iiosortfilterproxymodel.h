@@ -32,8 +32,16 @@ class IIOSortFilterProxyModel : public QSortFilterProxyModel
 public:
 	IIOSortFilterProxyModel(QObject *parent = nullptr);
 
+	void setSortChannels(bool enabled);
+	void setSortAttributes(bool enabled);
+
 protected:
 	bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+	bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+
+private:
+	bool m_sortChannels = false;
+	bool m_sortAttributes = false;
 };
 } // namespace scopy::debugger
 
