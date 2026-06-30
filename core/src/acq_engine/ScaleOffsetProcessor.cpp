@@ -3,6 +3,8 @@
 
 #include "DataStore.h"
 
+#include <QVBoxLayout>
+#include <QWidget>
 #include <variant>
 
 namespace scopy {
@@ -52,7 +54,13 @@ void ScaleOffsetProcessor::process(DataStore *store)
 
 QWidget *ScaleOffsetProcessor::createSettingsWidget(QWidget *parent)
 {
-	return new ScaleOffsetProcessorWidget(this, parent);
+	auto *w   = new QWidget(parent);
+	auto *lay = new QVBoxLayout(w);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(4);
+	lay->addWidget(ProcessorBlock::createSettingsWidget(w));
+	lay->addWidget(new ScaleOffsetProcessorWidget(this, w));
+	return w;
 }
 
 } // namespace acq

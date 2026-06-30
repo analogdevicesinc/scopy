@@ -17,36 +17,47 @@ const QString FormulaEvaluator::k_setupScript = QStringLiteral(
 	"pi=Math.PI,e=Math.E;");
 
 FormulaEvaluator::FormulaEvaluator()
-	: m_formula(QStringLiteral("sin(2*pi*T/100)"))
+	: m_formula(QStringLiteral("sin(2*pi*S/100)"))
 	, m_dirty(true)
 {
 	QJSEngine tempEng;
 	tempEng.evaluate(k_setupScript);
-	const QJSValue r = tempEng.evaluate(wrapFormula(m_formula));
+	const QJSValue r = tempEng.evaluate(wrapFormula(m_formula, 0));
 	m_syntaxValid.store(!r.isError(), std::memory_order_relaxed);
 }
 
 FormulaEvaluator::~FormulaEvaluator() = default;
 
-QString FormulaEvaluator::wrapFormula(const QString &formula)
+QString FormulaEvaluator::wrapFormula(const QString &formula, int inputCount)
 {
+	QString xDecls;
+	for(int k = 0; k < inputCount; ++k) {
+		xDecls += QStringLiteral(",X%1=(xs&&xs[%2])?xs[%2][i]:0")
+				  .arg(k + 1)
+				  .arg(k);
+	}
 	return QString(
 		       "(function(n,xs){"
 		       "var o=new Array(n);"
 		       "for(var i=0;i<n;i++){"
-		       "var T=i,X=xs?xs[i]:0;"
-		       "o[i]=(%1);"
+		       "var S=i%1;"
+		       "o[i]=(%2);"
 		       "}"
 		       "return o;"
 		       "})")
-		.arg(formula);
+		.arg(xDecls, formula);
 }
 
 void FormulaEvaluator::setFormula(const QString &formula)
 {
+	int probeCount;
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		probeCount = m_lastInputCount;
+	}
 	QJSEngine tempEng;
 	tempEng.evaluate(k_setupScript);
-	const QJSValue r = tempEng.evaluate(wrapFormula(formula));
+	const QJSValue r = tempEng.evaluate(wrapFormula(formula, probeCount));
 	m_syntaxValid.store(!r.isError(), std::memory_order_relaxed);
 
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -65,32 +76,35 @@ QString FormulaEvaluator::formula() const
 	return m_formula;
 }
 
-void FormulaEvaluator::rebuildEngine(const QString &formula)
+void FormulaEvaluator::rebuildEngine(const QString &formula, int inputCount)
 {
 	m_batchFn = QJSValue(); // release ref before destroying old engine
 	m_workerEngine.reset(new QJSEngine());
 	m_workerEngine->evaluate(k_setupScript);
-	m_batchFn = m_workerEngine->evaluate(wrapFormula(formula));
+	m_batchFn = m_workerEngine->evaluate(wrapFormula(formula, inputCount));
 	if(m_batchFn.isError()) {
 		m_batchFn = QJSValue();
 		m_syntaxValid.store(false, std::memory_order_relaxed);
 	}
 }
 
-bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &out,
+bool FormulaEvaluator::evaluateBatch(int n,
+				     const QVector<const QVector<float> *> &inputs,
+				     QVector<float> &out,
 				     QString *errorOut)
 {
 	QString formulaCopy;
 	bool    dirty = false;
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		dirty       = m_dirty;
+		dirty       = m_dirty || (m_lastInputCount != inputs.size());
 		formulaCopy = m_formula;
 		m_dirty     = false;
+		m_lastInputCount = inputs.size();
 	}
 
 	if(dirty)
-		rebuildEngine(formulaCopy);
+		rebuildEngine(formulaCopy, inputs.size());
 
 	out.resize(n);
 
@@ -101,13 +115,22 @@ bool FormulaEvaluator::evaluateBatch(int n, const float *xIn, QVector<float> &ou
 		return false;
 	}
 
-	QJSValue jsXs;
-	if(xIn) {
-		jsXs = m_workerEngine->newArray(static_cast<uint>(n));
-		for(int i = 0; i < n; ++i)
-			jsXs.setProperty(static_cast<quint32>(i), static_cast<double>(xIn[i]));
+	QJSValue jsXs = m_workerEngine->newArray(static_cast<uint>(inputs.size()));
+	for(int k = 0; k < inputs.size(); ++k) {
+		const QVector<float> *in = inputs[k];
+		if(!in) {
+			// leave slot as undefined; wrapper treats falsy as 0
+			continue;
+		}
+		QJSValue jsArr = m_workerEngine->newArray(static_cast<uint>(n));
+		const int copyN = std::min((long long)n, in->size());
+		for(int i = 0; i < copyN; ++i)
+			jsArr.setProperty(static_cast<quint32>(i),
+					  static_cast<double>((*in)[i]));
+		for(int i = copyN; i < n; ++i)
+			jsArr.setProperty(static_cast<quint32>(i), 0.0);
+		jsXs.setProperty(static_cast<quint32>(k), jsArr);
 	}
-	// default-constructed QJSValue is undefined — falsy in JS, so X falls back to 0
 
 	const QJSValue result = m_batchFn.call({QJSValue(n), jsXs});
 

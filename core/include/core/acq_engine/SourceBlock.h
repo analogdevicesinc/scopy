@@ -35,6 +35,7 @@ public:
 	std::size_t bufferSize() const;
 
 	void           enableChannel(const QString &channelId, bool en);
+	void           removeChannel(const QString &channelId);
 	void           disableAllChannels();
 	bool           isChannelEnabled(const QString &channelId) const;
 	QList<QString> enabledChannels() const;
@@ -43,7 +44,7 @@ public:
 	const QString &id() const { return m_id; }
 
 	bool isEnabled() const { return m_sourceEnabled.load(std::memory_order_relaxed); }
-	void setEnabled(bool en) { m_sourceEnabled.store(en, std::memory_order_relaxed); }
+	void setEnabled(bool en);
 
 	virtual QWidget *createSettingsWidget(QWidget *parent = nullptr);
 
@@ -54,6 +55,10 @@ public:
 	// onStart()/acquire() is equivalent to report(Critical, what()) plus
 	// aborting the cycle — the engine catches and re-emits.
 	void report(AcquisitionError::Severity sev, const QString &msg) const;
+
+Q_SIGNALS:
+	void channelsChanged();
+	void enabledChanged(bool en);
 
 protected:
 	std::size_t         m_bufferSize{1024};
