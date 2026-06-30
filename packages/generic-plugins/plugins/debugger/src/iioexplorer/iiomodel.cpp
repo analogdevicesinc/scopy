@@ -130,6 +130,8 @@ void IIOModel::setupCurrentChannel()
 		m_currentDeviceItem->setBufferCapable(true);
 	}
 
+	QString dir = m_currentChannelItem->isOutput() ? "output" : "input";
+	m_currentChannelItem->setText(m_currentChannelItem->text() + " (" + dir + ")");
 	m_currentChannelItem->setEditable(false);
 	m_entries.insert(m_currentChannelName);
 }
