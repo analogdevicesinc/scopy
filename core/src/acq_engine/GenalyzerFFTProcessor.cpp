@@ -112,11 +112,13 @@ void GenalyzerFFTProcessor::setConfig(const GenalyzerConfig &cfg)
 
 QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
 {
-	// Container = [Enable Analysis toggle] + inner GenalyzerSettings widget.
+	// Container = [block Enabled checkbox] + [Enable Analysis toggle] + inner GenalyzerSettings widget.
 	auto *container = new QWidget(parent);
 	auto *layout    = new QVBoxLayout(container);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(6);
+
+	layout->addWidget(ProcessorBlock::createSettingsWidget(container));
 
 	auto *enableBtn = new QPushButton("Enable Analysis", container);
 	enableBtn->setCheckable(true);
