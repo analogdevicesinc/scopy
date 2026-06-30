@@ -27,13 +27,13 @@ public:
 	virtual ~ProcessorBlock() = default;
 
 	virtual const QList<DataKey> &watchedKeys() const { return m_watchedKeys; }
-	void setWatchedKeys(const QList<DataKey> &keys) { m_watchedKeys = keys; }
+	virtual void setWatchedKeys(const QList<DataKey> &keys) { m_watchedKeys = keys; }
 
 	virtual void process(DataStore *store) = 0;
 	virtual void reset() {}
 
 	bool           isEnabled() const { return m_enabled.load(std::memory_order_relaxed); }
-	void           setEnabled(bool en) { m_enabled.store(en, std::memory_order_relaxed); }
+	void           setEnabled(bool en);
 	const QString &name() const { return m_name; }
 
 	virtual QWidget *createSettingsWidget(QWidget *parent = nullptr);
@@ -45,6 +45,9 @@ public:
 	// process() is equivalent to report(Critical, what()) plus aborting the
 	// cycle — the engine catches and re-emits.
 	void report(AcquisitionError::Severity sev, const QString &msg) const;
+
+Q_SIGNALS:
+	void enabledChanged(bool en);
 
 protected:
 	QString           m_name;
