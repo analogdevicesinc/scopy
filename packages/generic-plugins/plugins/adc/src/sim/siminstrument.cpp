@@ -2,7 +2,6 @@
 
 #include <core/acq_engine/SourceBlock.h>
 
-#include <QCheckBox>
 #include <QDateTime>
 #include <QFontDatabase>
 #include <QFrame>
@@ -179,30 +178,13 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 		this, &SimInstrument::acqModeChanged);
 
 	// -- Source groups --
+	// Each SourceBlock provides its own enable + per-channel checkboxes via
+	// createSettingsWidget(); we just wrap it in a group box.
 	for(scopy::acq::SourceBlock *src : engine->sources()) {
-		const bool hasChannels = !src->channelIds().isEmpty();
-		QWidget   *srcWidget   = src->createSettingsWidget(nullptr);
-		if(!hasChannels && !srcWidget)
-			continue;
-
 		auto *srcGroup = new QGroupBox(QString("Source: %1").arg(src->id()), settingsInner);
 		auto *srcLay   = new QVBoxLayout(srcGroup);
 		srcLay->setSpacing(4);
-
-		for(const QString &chId : src->channelIds()) {
-			auto *cb = new QCheckBox(chId, srcGroup);
-			cb->setChecked(src->isChannelEnabled(chId));
-			connect(cb, &QCheckBox::toggled, this, [src, chId](bool en) {
-				src->enableChannel(chId, en);
-			});
-			srcLay->addWidget(cb);
-		}
-
-		if(srcWidget) {
-			srcWidget->setParent(srcGroup);
-			srcLay->addWidget(srcWidget);
-		}
-
+		srcLay->addWidget(src->createSettingsWidget(srcGroup));
 		settingsLay->addWidget(srcGroup);
 	}
 
