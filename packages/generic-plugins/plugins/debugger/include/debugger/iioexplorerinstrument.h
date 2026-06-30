@@ -33,6 +33,7 @@
 
 #include <iio.h>
 #include <QWidget>
+#include <QCheckBox>
 #include <QTreeView>
 #include <QSplitter>
 #include <QTabWidget>
@@ -94,6 +95,8 @@ private:
 	IIOModel *m_iioModel;
 	DetailsView *m_detailsView;
 	SearchBar *m_searchBar;
+	QCheckBox *m_sortChannelsBtn;
+	QCheckBox *m_sortAttributesBtn;
 	IIOSortFilterProxyModel *m_proxyModel;
 	WatchListView *m_watchListView;
 	ApiObject *m_apiObject;

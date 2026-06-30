@@ -20,6 +20,8 @@
  */
 
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QCheckBox>
 #include <QLabel>
 #include <QScrollBar>
 #include <QFutureWatcher>
@@ -134,6 +136,8 @@ void IIOExplorerInstrument::setupUi()
 
 	m_proxyModel->setSourceModel(m_iioModel->getModel());
 	m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+	m_proxyModel->setSortRole(Qt::DisplayRole);
+	m_proxyModel->sort(0); // sorting is gated by the proxy's channel flag, toggled from the UI
 
 	Style::setBackgroundColor(m_mainWidget, json::theme::background_subtle);
 	Style::setBackgroundColor(m_debugLogger, json::theme::background_subtle);
@@ -150,7 +154,20 @@ void IIOExplorerInstrument::setupUi()
 	m_detailsView->setIIOStandardItem(m_currentlySelectedItem);
 
 	details_container->layout()->addWidget(m_detailsView);
+
+	m_sortChannelsBtn = new QCheckBox("Sort channels", tree_view_container);
+	m_sortAttributesBtn = new QCheckBox("Sort attributes", tree_view_container);
+
+	QWidget *sortContainer = new QWidget(tree_view_container);
+	sortContainer->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+	QHBoxLayout *sortContainerLay = new QHBoxLayout(sortContainer);
+	sortContainerLay->setContentsMargins(0, 0, 0, 0);
+	sortContainerLay->addWidget(m_sortChannelsBtn);
+	sortContainerLay->addWidget(m_sortAttributesBtn);
+	sortContainerLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
 	tree_view_container->layout()->addWidget(m_searchBar);
+	tree_view_container->layout()->addWidget(sortContainer);
 	tree_view_container->layout()->addWidget(m_treeView);
 
 	m_mainWidget->layout()->addWidget(bottom_container);
@@ -178,6 +195,16 @@ void IIOExplorerInstrument::connectSignalsAndSlots()
 		} else {
 			filterAndExpand(text);
 		}
+	});
+
+	QObject::connect(m_sortChannelsBtn, &QCheckBox::toggled, this, [this](bool checked) {
+		m_proxyModel->setSortChannels(checked);
+		m_proxyModel->invalidate(); // Trigger re-filtering
+	});
+
+	QObject::connect(m_sortAttributesBtn, &QCheckBox::toggled, this, [this](bool checked) {
+		m_proxyModel->setSortAttributes(checked);
+		m_proxyModel->invalidate(); // Trigger re-filtering
 	});
 
 	QObject::connect(m_treeView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
