@@ -256,4 +256,26 @@ Genalyzer analysis works seamlessly with the existing Frequency instrument featu
   is developed by Analog Devices and is available at: https://github.com/analogdevicesinc/genalyzer
 
 
+.. _waterfall_plot:
 
+Waterfall Plot (Frequency Instrument)
+--------------------------------------
+
+**Waterfall Plot** visualizes how the FFT spectrum evolves over time. Each acquired FFT frame is
+rendered as a new row of the plot, with the X axis representing frequency, the Y axis
+representing time (older data scrolls downwards), and color encoding the magnitude in
+dBFS.
+
+**Controls:**
+
+- **Enable switch** (in the section header) - shows or hides the waterfall dock.
+  Disabling it also clears the accumulated history.
+- **History rows** - number of FFT frames retained in the waterfall.
+  Range: 50 to 2000 rows. Default: 200.
+
+**Intensity mapping:**
+
+The waterfall's color (Z) axis is automatically synchronized with the FFT plot
+Y-axis range. Adjusting **Y Min-Max** or **Autoscale** on the FFT plot updates
+the waterfall intensity range accordingly, so the two views always share the
+same dBFS scale.
