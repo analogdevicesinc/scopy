@@ -24,7 +24,7 @@ CN0357 Plugin - Test Suite
          -
 
 **Prerequisites:**
-    - Scopy v2.3.0 or later with CN0357 plugin installed
+    - Scopy v2.2.1 or later with CN0357 plugin installed
     - CN0357 evaluation board connected to a supported FPGA carrier
     - Device drivers and firmware are up to date
     - Reset .ini files to default by pressing **Reset** button in Preferences
