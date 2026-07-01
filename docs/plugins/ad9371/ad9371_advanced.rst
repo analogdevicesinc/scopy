@@ -3,9 +3,6 @@
 AD9371 Advanced
 ================================================================================
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The full AD9371 Advanced plugin view showing the navigation row buttons and the active settings panel
-
 General Description
 -------------------
 
@@ -22,8 +19,8 @@ The Advanced tool is organized into 13 tabs displayed in two navigation rows at 
 Clock Settings
 --------------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The Clock Settings tab showing PLL divider and frequency fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_CLK%20Settings.png
+    :align: center
 
 Configures the device PLL and clock generation parameters.
 
@@ -35,8 +32,8 @@ Configures the device PLL and clock generation parameters.
 Calibrations
 ------------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The Calibrations tab showing the initial calibration mask checkboxes
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_Calibrations.png
+    :align: center
 
 Selects which calibrations are run during device initialization. Each calibration can be
 enabled or disabled independently via a bitmask.
@@ -60,8 +57,8 @@ enabled or disabled independently via a bitmask.
 TX Settings
 -----------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The TX Settings tab showing transmit channel configuration fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_TX%20Settings.png
+    :align: center
 
 Configures the transmit channel data path and profile parameters.
 
@@ -81,8 +78,8 @@ Configures the transmit channel data path and profile parameters.
 RX Settings
 -----------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The RX Settings tab showing receive channel configuration fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_RX%20Settings.png
+    :align: center
 
 Configures the receive channel data path and profile parameters.
 
@@ -102,8 +99,8 @@ Configures the receive channel data path and profile parameters.
 Observation RX Settings
 -----------------------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The Observation RX Settings tab showing ORx configuration fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_OBS%20Settings.png
+    :align: center
 
 Configures the observation receiver (ORx) data path, which is used for TX calibration monitoring.
 
@@ -117,8 +114,8 @@ Configures the observation receiver (ORx) data path, which is used for TX calibr
 Gain Setup
 ----------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The Gain Setup tab showing manual gain control parameter fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_GAIN%20Setup.png
+    :align: center
 
 Configures manual gain control parameters for the receive path.
 
@@ -130,8 +127,8 @@ Configures manual gain control parameters for the receive path.
 AGC Setup
 ---------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The AGC Setup tab showing threshold and timing configuration fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_AGC%20Setup.png
+    :align: center
 
 Configures the Automatic Gain Control (AGC) for the receive path.
 
@@ -155,8 +152,8 @@ Configures the Automatic Gain Control (AGC) for the receive path.
 ARM GPIO
 --------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The ARM GPIO tab showing ARM GPIO control register fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_ARM%20GPIO.png
+    :align: center
 
 Configures the GPIO pins controlled by the device ARM processor.
 
@@ -168,8 +165,8 @@ Configures the GPIO pins controlled by the device ARM processor.
 GPIO
 ----
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The GPIO tab showing standard GPIO source control and 3.3V output mask fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_GPIO.png
+    :align: center
 
 Configures the general-purpose GPIO pins for monitoring and control functions.
 
@@ -181,8 +178,8 @@ Configures the general-purpose GPIO pins for monitoring and control functions.
 AUX DAC
 -------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The AUX DAC tab showing auxiliary DAC word and enable fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_AUX%20DAC.png
+    :align: center
 
 Configures the auxiliary DAC outputs for analog signal generation.
 
@@ -195,8 +192,8 @@ Configures the auxiliary DAC outputs for analog signal generation.
 JESD Framer
 -----------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The JESD Framer tab showing JESD204B framer configuration parameters
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_JESD%20Framer.png
+    :align: center
 
 Configures the JESD204B framer used for the RX and ORx data paths.
 
@@ -216,8 +213,8 @@ Configures the JESD204B framer used for the RX and ORx data paths.
 JESD Deframer
 -------------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The JESD Deframer tab showing JESD204B deframer configuration parameters
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_JESD%20Deframer.png
+    :align: center
 
 Configures the JESD204B deframer used for the TX data path.
 
@@ -234,8 +231,8 @@ Configures the JESD204B deframer used for the TX data path.
 BIST
 ----
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The BIST tab showing Tone Injection, PRBS, and Loopback controls
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/AD9371%20Advanced_BIST.png
+    :align: center
 
 Built-In Self-Test (BIST) provides diagnostic signal paths for verifying the device data path.
 All BIST controls take effect immediately without requiring the Save Settings button.
