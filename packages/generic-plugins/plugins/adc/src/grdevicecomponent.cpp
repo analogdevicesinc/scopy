@@ -43,7 +43,7 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 	// connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	widget = createMenu(this);
 	m_lay->addWidget(widget);
@@ -112,7 +112,7 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
@@ -141,7 +141,7 @@ QWidget *GRDeviceComponent::createAttrMenu(QWidget *parent)
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);
@@ -160,7 +160,7 @@ QWidget *GRDeviceComponent::createMenu(QWidget *parent)
 	QScrollArea *scroll = new QScrollArea(parent);
 	QWidget *wScroll = new QWidget(scroll);
 	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
-	layScroll->setMargin(0);
+	layScroll->setContentsMargins(0, 0, 0, 0);
 	layScroll->setSpacing(10);
 
 	wScroll->setLayout(layScroll);
@@ -170,7 +170,7 @@ QWidget *GRDeviceComponent::createMenu(QWidget *parent)
 
 	scroll->setWidget(wScroll);
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
 
@@ -219,7 +219,7 @@ CollapsableMenuControlButton *GRDeviceComponent::ctrl() { return m_ctrl; }
 
 bool GRDeviceComponent::sampleRateAvailable()
 {
-	for(auto c : qAsConst(m_channels)) {
+	for(auto c : std::as_const(m_channels)) {
 		if(c->enabled())
 			return m_src->sampleRateAvailable();
 	}

@@ -47,7 +47,7 @@ public:
 		lay = new QVBoxLayout(this);
 		setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
 		setLayout(lay);
-		lay->setMargin(0);
+		lay->setContentsMargins(0, 0, 0, 0);
 		lay->setSpacing(6);
 		spacer = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
 		lay->addSpacerItem(spacer);
@@ -68,11 +68,11 @@ public:
 		if(m_widgets.contains(w)) {
 			m_widgets.removeAll(w);
 
-			for(QWidget *w : qAsConst(m_widgets)) {
+			for(QWidget *w : std::as_const(m_widgets)) {
 				lay->removeWidget(w);
 				w->setParent(nullptr);
 			}
-			for(QWidget *w : qAsConst(m_widgets)) {
+			for(QWidget *w : std::as_const(m_widgets)) {
 				int idx = lay->indexOf(spacer);
 				lay->insertWidget(idx, w, Qt::AlignTop | Qt::AlignLeft);
 			}
@@ -83,7 +83,7 @@ public:
 
 	void reparentWidgets(QWidget *parent = nullptr)
 	{
-		for(QWidget *w : qAsConst(m_widgets)) {
+		for(QWidget *w : std::as_const(m_widgets)) {
 			lay->removeWidget(w);
 			w->setParent(parent);
 		}

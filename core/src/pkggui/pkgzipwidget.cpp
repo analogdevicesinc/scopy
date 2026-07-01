@@ -34,11 +34,11 @@ PkgZipWidget::PkgZipWidget(QWidget *parent)
 	: QWidget(parent)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *w = new QWidget(this);
 	QVBoxLayout *wLay = new QVBoxLayout(w);
-	wLay->setMargin(10);
+	wLay->setContentsMargins(10, 10, 10, 10);
 
 	MenuSectionCollapseWidget *browserSection = createBrowserSection(w);
 	QMargins browserMargins(0, 10, 10, 10);
@@ -115,7 +115,7 @@ MenuSectionCollapseWidget *PkgZipWidget::createBrowserSection(QWidget *parent)
 
 	QWidget *w = new QWidget(browserSection);
 	QGridLayout *wLay = new QGridLayout(w);
-	wLay->setMargin(0);
+	wLay->setContentsMargins(0, 0, 0, 0);
 
 	m_fileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE);
 	m_fileBrowser->setFilter("*.zip");

@@ -1,4 +1,4 @@
-name: Ubuntu Scopy Build
+name: Ubuntu Qt6 Scopy Build
 
 on:
     workflow_call:
@@ -6,75 +6,105 @@ on:
         docker_tag:
           required: true
           type: string
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG:
+          required: true
 
 env:
   BUILD_HOST: ubuntu
   USERNAME: github-actions
   CI_SCRIPT: "ON"
 
+permissions:
+  id-token: write
+  contents: read
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-          include:
-            - ubuntu: cristianbindea/scopy2-ubuntu24:${{ inputs.docker_tag }}
-              os_name: Ubuntu 24
-            - ubuntu: cristianbindea/scopy2-ubuntu22:${{ inputs.docker_tag }}
-              os_name: Ubuntu 22
-      fail-fast: false # Disable fail-fast to run all matrix jobs even if one fails.
-    name: ${{ matrix.os_name }}
-
-    container:
-        image: ${{ matrix.ubuntu }}
-        options: --user root
+    name: Ubuntu 24 Qt6
 
     steps:
         - name: check storage space
           run: df -h
+
         - uses: actions/checkout@v6
+          with:
+            fetch-depth: '0'
+
+        - name: Generate Cloudsmith OIDC Token
+          uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+          with:
+            oidc-namespace: 'adi'
+            oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+            oidc-auth-only: 'true'
+
+        - name: Docker login to Cloudsmith
+          run: docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
+
+        - name: Pull Docker image
+          run: docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }}
+
         - name: Build Scopy
           run: |
-            git config --global --add safe.directory $GITHUB_WORKSPACE
-            $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+              -e BUILD_HOST=$BUILD_HOST \
+              -e USERNAME=$USERNAME \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "git config --global --add safe.directory $GITHUB_WORKSPACE && $GITHUB_WORKSPACE/ci/ubuntu/ubuntu_build_process.sh build_scopy"
 
         - name: Run Tests
           run: |
-            sudo ldconfig
-            cd $GITHUB_WORKSPACE/build
-            QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu.xml
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "ldconfig && cd $GITHUB_WORKSPACE/build && QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu-qt6.xml"
 
         - name: Report
           uses: mikepenz/action-junit-report@v6
           if: always()
           with:
              job_name: Verify Results
-             check_name: 'Scopy Test'
+             check_name: 'Scopy Qt6 Test'
              check_title_template: '{{TEST_NAME}}'
-             report_paths: '${{github.workspace}}/test-result-ubuntu.xml'
+             report_paths: '${{github.workspace}}/test-result-ubuntu-qt6.xml'
              detailed_summary: 'true'
              fail_on_failure: 'true'
              require_tests: 'true'
              include_passed: 'true'
 
-        - name: check storage space
-          run: df -h
-
         - name: Generate screenshots
-          if: matrix.os_name == 'Ubuntu 24'
           run: |
-            sudo ldconfig
-            export QT_QPA_PLATFORM=offscreen
-            python3 $GITHUB_WORKSPACE/tools/screenshots/screenshots.py \
-              --all \
-              --scopy $GITHUB_WORKSPACE/build/scopy \
-              --output-root $GITHUB_WORKSPACE/screenshots_output
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+              -e QT_QPA_PLATFORM=offscreen \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "ldconfig && python3 $GITHUB_WORKSPACE/tools/screenshots/screenshots.py \
+                --all \
+                --scopy $GITHUB_WORKSPACE/build/scopy \
+                --output-root $GITHUB_WORKSPACE/screenshots_output"
 
         - name: Upload screenshots artifact
-          if: matrix.os_name == 'Ubuntu 24'
           uses: actions/upload-artifact@v7
           with:
             name: documentation-screenshots
             path: ${{ github.workspace }}/screenshots_output/
             if-no-files-found: error
             retention-days: 30
+
+        - name: check storage space
+          run: df -h

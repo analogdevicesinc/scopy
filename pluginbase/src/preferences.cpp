@@ -34,7 +34,7 @@ Preferences::Preferences(QObject *parent)
 	: QObject(parent)
 	, s(nullptr)
 {
-	connect(parent, SIGNAL(aboutToQuit()), this, SLOT(save()));
+	connect(qobject_cast<QCoreApplication *>(parent), &QCoreApplication::aboutToQuit, this, &Preferences::save);
 }
 
 Preferences::~Preferences() {}

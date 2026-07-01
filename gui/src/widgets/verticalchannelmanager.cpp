@@ -27,7 +27,7 @@ VerticalChannelManager::VerticalChannelManager(QWidget *parent)
 	: QWidget(parent)
 {
 	lay = new QVBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 
 	setLayout(lay);
@@ -38,7 +38,7 @@ VerticalChannelManager::VerticalChannelManager(QWidget *parent)
 	QWidget *m_container = new QWidget(this);
 	m_contLayout = new QVBoxLayout(m_container);
 	m_contLayout->addSpacerItem(spacer);
-	m_contLayout->setMargin(0);
+	m_contLayout->setContentsMargins(0, 0, 0, 0);
 	m_contLayout->setSpacing(6);
 	m_container->setLayout(m_contLayout);
 

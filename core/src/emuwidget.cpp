@@ -63,11 +63,11 @@ EmuWidget::EmuWidget(QWidget *parent)
 
 	MenuSectionCollapseWidget *configSection = new MenuSectionCollapseWidget(
 		"CONFIGURATION", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, container);
-	configSection->menuSection()->layout()->setMargin(0);
+	configSection->menuSection()->layout()->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *emuWidget = new QWidget(configSection);
 	QGridLayout *emuWidgetLay = new QGridLayout(emuWidget);
-	emuWidgetLay->setMargin(0);
+	emuWidgetLay->setContentsMargins(0, 0, 0, 0);
 	emuWidgetLay->setSpacing(10);
 
 	QLabel *demoLabel = new QLabel("Device", emuWidget);
@@ -359,12 +359,12 @@ QWidget *EmuWidget::createDemoOptWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
 	m_demoOptCb = new QComboBox(w);
-	for(const QString &opt : qAsConst(m_availableOptions)) {
+	for(const QString &opt : std::as_const(m_availableOptions)) {
 		m_demoOptCb->addItem(opt);
 	}
 	layout->addWidget(m_demoOptCb);
@@ -375,7 +375,7 @@ QWidget *EmuWidget::createPortWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
 
@@ -408,7 +408,7 @@ QWidget *EmuWidget::createUriWidget(QWidget *parent)
 {
 	QWidget *w = new QWidget(parent);
 	QHBoxLayout *layout = new QHBoxLayout(w);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	w->setLayout(layout);
 

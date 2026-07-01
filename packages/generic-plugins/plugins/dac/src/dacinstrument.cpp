@@ -40,7 +40,7 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 	tool = new ToolTemplate(this);
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -96,7 +96,7 @@ DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
 
 	dacManagerStack = new MapStackedWidget(this);
 	tool->addWidgetToCentralContainerHelper(dacManagerStack);
-	tool->centralContainer()->layout()->setMargin(0);
+	tool->centralContainer()->layout()->setContentsMargins(0, 0, 0, 0);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn, TTA_LEFT);
@@ -128,7 +128,7 @@ void DacInstrument::startTutorial()
 
 void DacInstrument::runToggled(bool toggled)
 {
-	for(auto dac : qAsConst(m_dacDataManagers)) {
+	for(auto dac : std::as_const(m_dacDataManagers)) {
 		dac->runToggled(toggled);
 	}
 }
@@ -136,7 +136,7 @@ void DacInstrument::runToggled(bool toggled)
 void DacInstrument::dacRunning(bool toggled)
 {
 	bool run = toggled;
-	for(auto dac : qAsConst(m_dacDataManagers)) {
+	for(auto dac : std::as_const(m_dacDataManagers)) {
 		run = run || dac->isRunning();
 	}
 	Q_EMIT running(run);
@@ -237,7 +237,7 @@ void DacInstrument::setupDacDataManagers()
 
 				// Add all the DacManager control btns to the group
 				auto menuBtns = dm->getMenuControlBtns();
-				for(MenuControlButton *btn : qAsConst(menuBtns)) {
+				for(MenuControlButton *btn : std::as_const(menuBtns)) {
 					devicesGroup->addButton(btn);
 				}
 				break;
@@ -260,7 +260,7 @@ void DacInstrument::setupDacDataDeviceButtons()
 	vcm = new VerticalChannelManager(this);
 	tool->leftContainer()->setVisible(true);
 	tool->leftStack()->add(verticalChannelManagerId, vcm);
-	for(DacDataManager *dac : qAsConst(m_dacDataManagers)) {
+	for(DacDataManager *dac : std::as_const(m_dacDataManagers)) {
 		MenuControlButton *devBtn = addDevice(dac, vcm);
 		vcm->add(devBtn);
 	}

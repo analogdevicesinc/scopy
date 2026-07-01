@@ -1,4 +1,4 @@
-name: Scopy Windows Build
+name: Scopy Windows Qt6 Build
 
 on:
     workflow_call:
@@ -6,6 +6,9 @@ on:
         docker_tag:
           required: true
           type: string
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG:
+          required: true
 
 jobs:
   make_windows_installer:
@@ -15,16 +18,18 @@ jobs:
       with:
         fetch-depth: '0'
 
-    - name: Docker issue workaround # This is the recommended workaround for the issue described here: https://github.com/actions/runner-images/issues/13729
-      id: docker-workaround
-      run: |
-          $dockerState = Get-Service -Name "docker"
-          if ($dockerState.Status -ne "Running") {
-          Start-Service -Name "docker"
-          }
+    - name: Generate Cloudsmith OIDC Token
+      uses: cloudsmith-io/cloudsmith-cli-action@18665afcce9f859312b61989671af9af7402e4fb # v2.0.2
+      with:
+        oidc-namespace: 'adi'
+        oidc-service-slug: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+        oidc-auth-only: 'true'
+
+    - name: Login to Cloudsmith Docker registry
+      run: docker login docker.cloudsmith.io -u token -p "$env:CLOUDSMITH_API_KEY"
 
     - name: Pull the Docker Image
-      run: docker pull cristianbindea/scopy2-mingw64:${{ inputs.docker_tag }}
+      run: docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy-windows-qt6:${{ inputs.docker_tag }}
 
     - name: Run Docker Image
       shell: cmd
@@ -58,7 +63,7 @@ jobs:
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
                 -e CI_SCRIPT=ON ^
-                cristianbindea/scopy2-mingw64:${{ inputs.docker_tag }} C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
+                docker.cloudsmith.io/adi/scopy-dockers/scopy-windows-qt6:${{ inputs.docker_tag }} C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh run_workflow'
 
     - name: Set short git commit SHA
       shell: bash
@@ -66,74 +71,18 @@ jobs:
 
     - uses: actions/upload-artifact@v7
       with:
-        name: scopy-windows-portable-${{ env.commit_sha }}
+        name: scopy-windows-qt6-portable-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-x86_64.zip
         compression-level: 0
 
     - uses: actions/upload-artifact@v7
       with:
-        name: debug-windows-x86_64-${{ env.commit_sha }}
+        name: debug-windows-qt6-x86_64-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\debug-x86_64.zip
         compression-level: 0
 
     - uses: actions/upload-artifact@v7
       with:
-        name: scopy-windows-setup-${{ env.commit_sha }}
+        name: scopy-windows-qt6-setup-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.zip
         compression-level: 0
-
-
-    # Debug session
-    # - name: Start SSH session
-    #   uses: luchihoratiu/debug-via-ssh@main
-    #   with:
-    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-    #     SSH_PASS: ${{ secrets.SSH_PASS }}
-    #     NGROK_REGION: 'eu'
-
-
-
-#     - name: Upload master executable to continous prerelease
-#       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-#       run: |
-#         export SHORT_SHA=${{ github.sha }}
-#         export DEPLOY_FILE=Scopy-64-setup-${SHORT_SHA::7}.exe
-#         export ARTIFACT_ARCHIVE=Scopy-64-setup.zip
-
-#         cp "${{ github.workspace }}\artifacts\scopy-64-setup.exe" $DEPLOY_FILE
-#         tar.exe -a -c -f $ARTIFACT_ARCHIVE $DEPLOY_FILE
-
-#         choco install wget
-#         wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_windows_amd64.zip
-#         unzip ghr_v0.14.0_windows_amd64.zip
-
-#         "ghr_v0.14.0_windows_amd64\ghr.exe" -u ${{ github.repository_owner }} -r scopy -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous $ARTIFACT_ARCHIVE
-#       shell: bash
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-#  make-exe-32:
-#    runs-on: windows-latest
-#
-#    steps:
-##    - uses: actions/checkout@v2
-#    - name: Pull the Docker Image
-#      run: docker pull analogdevices/scopy-build:mingw32
-#      
-#    - name: Run Docker Image
-#      shell: cmd
-#      run: |
-#            mkdir %GITHUB_WORKSPACE%\artifacts & echo %GITHUB_WORKSPACE% & #docker run -v %cd%:C:\msys64\home\docker\scopy:rw -v #%GITHUB_WORKSPACE%\artifacts:C:\msys64\home\docker\artifact_i686:rw #-e GITHUB_WORKSPACE=%GITHUB_WORKSPACE% analogdevices/#scopy-build:mingw32 C:\msys64\usr\bin\bash.exe -c '/home/docker/#scopy/CI/appveyor/inside_mingw_docker.sh'
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: scopy-i686.zip
-#        path: ${{ github.workspace }}\artifacts\scopy-i686.zip
-#
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: debug-i686.zip
-#        path: ${{ github.workspace }}\artifacts\debug-i686.zip
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: scopy-i686-setup.exe
-#        path: ${{ github.workspace }}\artifacts\scopy-32-setup.exe 

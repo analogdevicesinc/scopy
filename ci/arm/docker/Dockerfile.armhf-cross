@@ -1,0 +1,62 @@
+ARG BASE_IMAGE=ubuntu:24.04
+
+FROM ${BASE_IMAGE}
+SHELL ["/bin/bash", "-c"]
+
+ARG USER=runner
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CI_SCRIPT=ON
+
+ENV TZ=Europe/Bucharest
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get update && \
+	apt-get -y upgrade && \
+	apt-get install -y apt-utils sudo tzdata keyboard-configuration software-properties-common
+
+RUN groupadd -g 1001 -r $USER && \
+	useradd -u 1001 -g 1001 --create-home -r $USER
+
+#Change password
+RUN echo "$USER:$USER" | chpasswd
+
+#Make sudo passwordless
+RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
+	usermod -aG sudo $USER && \
+	usermod -aG plugdev $USER
+
+USER $USER
+WORKDIR /home/${USER}/scripts
+
+# Copy build scripts
+COPY arm_cross_build_process.sh .
+COPY cmake_toolchain_armhf.cmake .
+COPY copy-deps.sh .
+
+# Install x86_64 host build tools (cross-compiler, GL/XCB for Qt6 host, etc.)
+RUN ./arm_cross_build_process.sh install_packages
+RUN ./arm_cross_build_process.sh download_cmake
+
+# Extract pre-built sysroot (Kuiper rootfs with all armhf -dev packages)
+COPY docker/tarballs/sysroot-armhf.tar.gz /tmp/
+RUN sudo mkdir -p /opt/sysroot && sudo tar -xzf /tmp/sysroot-armhf.tar.gz -C /opt/sysroot/ --transform='s|^sysroot|armhf|' && sudo rm /tmp/sysroot-armhf.tar.gz
+
+# Extract pre-built Qt6 host tools (x86_64 — moc, rcc, uic, qmake6)
+COPY docker/tarballs/qt6-host-installed.tar.gz /tmp/
+RUN sudo tar -xzf /tmp/qt6-host-installed.tar.gz -C / && sudo rm /tmp/qt6-host-installed.tar.gz
+
+# Extract pre-built Qt6 cross-compiled for armhf
+COPY docker/tarballs/qt6-armhf-cross-installed.tar.gz /tmp/
+RUN sudo tar -xzf /tmp/qt6-armhf-cross-installed.tar.gz -C / && sudo rm /tmp/qt6-armhf-cross-installed.tar.gz
+
+# Clone and cross-compile all Scopy dependencies
+RUN ./arm_cross_build_process.sh clone
+RUN ./arm_cross_build_process.sh build_deps
+
+# Clean image
+RUN rm -rf /home/${USER}/scripts
+RUN sudo rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home/${USER}
+
+FROM scratch
+COPY --from=0 / /

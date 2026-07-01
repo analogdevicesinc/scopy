@@ -46,7 +46,7 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 
 	QHBoxLayout *titleLayout = new QHBoxLayout();
 	titleLayout->setContentsMargins(0, 0, 0, 0);
-	titleLayout->setMargin(0);
+	titleLayout->setContentsMargins(0, 0, 0, 0);
 	titleLayout->setSpacing(5);
 
 	titleLayout->addWidget(m_title);

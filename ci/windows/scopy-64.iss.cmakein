@@ -88,7 +88,7 @@ begin
   end;
   UninstallButton.Caption := 'Uninstall';
   UninstallButton.ModalResult := mrOK;
-end;  
+end;
 
 procedure UninstallButtonClick(Sender: TObject);
 begin
@@ -147,7 +147,7 @@ begin
     UninstallButton.OnClick := @UninstallButtonClick;
     UninstallProgressForm.CancelButton.TabOrder := UninstallButton.TabOrder + 1;
 
-    { Run the wizard } 
+    { Run the wizard }
     UpdateUninstallWizard;
     CancelButtonEnabled := UninstallProgressForm.CancelButton.Enabled
     UninstallProgressForm.CancelButton.Enabled := True;
@@ -156,7 +156,7 @@ begin
 
     { Display the First uninstaller page }
     if UninstallProgressForm.ShowModal = mrCancel then Abort;
-    
+
     if UninstallDriverCheckBox.Checked = True then
     begin
         if not Exec(ExpandConstant('{app}\drivers\dpinst.exe'), '/s /U pluto-cdc-acm.inf', ExpandConstant('{app}\drivers'), SW_SHOW, ewWaitUntilTerminated, ResultCode) then
@@ -275,11 +275,11 @@ Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; F
 Source: "{#DestFolder}\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\{#Python}\*"; DestDir: "{app}\{#Python}"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\resources\*"; DestDir: "{app}\resources"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\styles\*"; DestDir: "{app}\styles"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\style\*"; DestDir: "{app}\style"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 //DLLs
 Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist

@@ -36,6 +36,9 @@ DioController::~DioController() {}
 
 int DioController::getChannelCount()
 {
+	if(m_device == nullptr) {
+		return 0;
+	}
 	unsigned int dev_count = iio_device_get_channels_count(m_device);
 	return (int)(dev_count);
 }

@@ -29,12 +29,12 @@ SevenSegmentMonitor::SevenSegmentMonitor(DataMonitorModel *model, QWidget *paren
 	, QFrame{parent}
 {
 	layout = new QHBoxLayout(this);
-	layout->setMargin(10);
+	layout->setContentsMargins(10, 10, 10, 10);
 	layout->setSpacing(10);
 	setLayout(layout);
 
 	QVBoxLayout *header = new QVBoxLayout();
-	header->setMargin(10);
+	header->setContentsMargins(10, 10, 10, 10);
 	header->setSpacing(10);
 
 	name = new QLabel(model->getDisplayName(), this);
@@ -54,7 +54,7 @@ SevenSegmentMonitor::SevenSegmentMonitor(DataMonitorModel *model, QWidget *paren
 	lcdNumber = new LcdNumber(this);
 
 	minMaxLayout = new QVBoxLayout();
-	minMaxLayout->setMargin(0);
+	minMaxLayout->setContentsMargins(0, 0, 0, 0);
 	minMaxLayout->setSpacing(10);
 
 	QHBoxLayout *minLayout = new QHBoxLayout();

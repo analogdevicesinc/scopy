@@ -32,11 +32,12 @@ jobs:
           fi
 
           case "$BRANCH_NAME" in
-            *scopy-testing*)
+            *scopy-testing*|*scopy_qt6*|qt6_*)
                 TAG="testing"
                 ;;
             *)
-                TAG="latest"
+                # TODO: revert to "latest" after the docker dependencies cleanup and docker regeneration
+                TAG="testing"
                 ;;
            esac
 

@@ -554,7 +554,7 @@ void TST_GRBlocks::test4()
 		}
 	}
 
-	QSignalSpy spy(&top, SIGNAL(builtSignalPaths()));
+	QSignalSpy spy(&top, &GRTopBlock::builtSignalPaths);
 	ch2->setEnabled(false);
 	top.rebuild();
 	scale_offset_2->setEnabled(false);
@@ -592,7 +592,7 @@ void TST_GRBlocks::test4()
 	}
 	top.stop();
 	top.teardown();
-	QSignalSpy spy2(&top, SIGNAL(builtSignalPaths()));
+	QSignalSpy spy2(&top, &GRTopBlock::builtSignalPaths);
 	ch2->setEnabled(true);
 	scale_offset_2->setEnabled(true);
 	QCOMPARE(spy2.count(), 0); // flowgraph is not rebuilt because it was not built

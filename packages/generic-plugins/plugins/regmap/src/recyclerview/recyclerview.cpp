@@ -44,11 +44,11 @@ RecyclerView::RecyclerView(QList<int> *widgets, QWidget *parent)
 	this->installEventFilter(this);
 	layout = new QHBoxLayout();
 	this->setLayout(layout);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 
 	bitFieldsWidgetLayout = new QGridLayout();
-	bitFieldsWidgetLayout->setMargin(0);
+	bitFieldsWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	bitFieldsWidgetLayout->setSpacing(0);
 	QWidget *bitFieldsWidget = new QWidget(this);
 	bitFieldsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);

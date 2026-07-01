@@ -67,7 +67,7 @@ GRTimeChannelComponent::GRTimeChannelComponent(GRIIOFloatChannelNode *node, Time
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	widget = createMenu(this);
 	m_lay->addWidget(widget);
@@ -106,7 +106,7 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	auto layout = new QVBoxLayout();
 	m_scaleOverrideWidget->setLayout(layout);
 	layout->setSpacing(0);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	QLabel *scaleLabel = new QLabel("Scale", this);
 	Style::setStyle(scaleLabel, style::properties::label::subtle);
 	m_scaleSpin = new QDoubleSpinBox(m_scaleOverrideWidget);
@@ -232,7 +232,7 @@ QWidget *GRTimeChannelComponent::createAttrMenu(QWidget *parent)
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	for(auto w : attrWidgets) {

@@ -27,7 +27,7 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 	: QWidget{parent}
 {
 	QVBoxLayout *lay = new QVBoxLayout();
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	setLayout(lay);
 

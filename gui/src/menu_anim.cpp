@@ -20,7 +20,6 @@
 
 #include "menu_anim.hpp"
 
-#include <QSignalTransition>
 #include <QSizePolicy>
 
 using namespace scopy;
@@ -66,8 +65,8 @@ MenuAnim::MenuAnim(QByteArray minAnimationProperty, QByteArray maxAnimationPrope
 	close_anim_min.setDuration(animationDuration);
 	close_anim_min.setEasingCurve(QEasingCurve::InOutExpo);
 
-	connect(&open_anim_max, SIGNAL(finished()), this, SLOT(openAnimFinished()));
-	connect(&close_anim_max, SIGNAL(finished()), this, SLOT(closeAnimFinished()));
+	connect(&open_anim_max, &QAbstractAnimation::finished, this, &MenuAnim::openAnimFinished);
+	connect(&close_anim_max, &QAbstractAnimation::finished, this, &MenuAnim::closeAnimFinished);
 }
 
 void MenuAnim::toggleMenu(bool open)

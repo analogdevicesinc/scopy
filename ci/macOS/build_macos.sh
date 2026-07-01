@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# macOS Build Script
+# macOS Qt6 Build Script
 # =====================================
-# Build Scopy and IIO-Emulator on macOS
-# Usage: ./build_azure_macos.sh
+# Build Scopy and IIO-Emulator on macOS with Qt6
+# Usage: ./build_macos.sh
 #
-# This script is designed for Azure Pipelines CI but can be run locally on macOS systems.
+# This script can be run locally on macOS systems.
 # It assumes dependencies are already installed via install_macos_deps.sh
 
 set -ex
 REPO_SRC=$(git rev-parse --show-toplevel)
-# Load macOS-specific configuration
+# Load macOS Qt6-specific configuration
 source $REPO_SRC/ci/macOS/macos_config.sh
 
 # Build IIO Emulator
@@ -31,7 +31,7 @@ build_iio-emu(){
 	cmake \
 		-DCMAKE_LIBRARY_PATH="$STAGING_AREA_DEPS" \
 		-DCMAKE_INSTALL_PREFIX="$STAGING_AREA_DEPS" \
-		-DCMAKE_PREFIX_PATH="${STAGING_AREA_DEPS};${STAGING_AREA_DEPS}/lib/cmake;" \
+		-DCMAKE_PREFIX_PATH="${QT};${STAGING_AREA_DEPS};${STAGING_AREA_DEPS}/lib/cmake;" \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_STAGING_PREFIX="$STAGING_AREA_DEPS" \
@@ -55,12 +55,17 @@ build_scopy(){
 	cmake \
 		-DCMAKE_LIBRARY_PATH="$STAGING_AREA_DEPS" \
 		-DCMAKE_INSTALL_PREFIX="$STAGING_AREA/scopy-install" \
-		-DCMAKE_PREFIX_PATH="${STAGING_AREA_DEPS};${STAGING_AREA_DEPS}/lib/cmake;${STAGING_AREA_DEPS}/lib/pkgconfig;${STAGING_AREA_DEPS}/lib/cmake/gnuradio;${STAGING_AREA_DEPS}/lib/cmake/iio" \
+		-DCMAKE_PREFIX_PATH="${QT};${STAGING_AREA_DEPS};${STAGING_AREA_DEPS}/lib/cmake;${STAGING_AREA_DEPS}/lib/pkgconfig;${STAGING_AREA_DEPS}/lib/cmake/gnuradio;${STAGING_AREA_DEPS}/lib/cmake/iio" \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_STAGING_PREFIX="$STAGING_AREA_DEPS" \
 		-DCMAKE_EXE_LINKER_FLAGS="-L${STAGING_AREA_DEPS}/lib" \
+		-DCMAKE_MACOSX_RPATH=ON \
+		-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+		-DCMAKE_INSTALL_RPATH="${STAGING_AREA_DEPS}/lib;${QT}/lib;@executable_path/../Frameworks" \
 		-DENABLE_TESTING=OFF \
+		-DENABLE_ALL_PACKAGES=ON \
+		-DENABLE_PACKAGE_M2K=OFF \
 		../
 	CFLAGS=-I${STAGING_AREA_DEPS}/include LDFLAGS=-L${STAGING_AREA_DEPS}/lib make ${JOBS}
 	otool -l ./Scopy.app/Contents/MacOS/Scopy

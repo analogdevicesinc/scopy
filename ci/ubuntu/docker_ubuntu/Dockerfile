@@ -1,5 +1,4 @@
-ARG BASE_IMAGE=ubuntu:latest
-# The default image will be ubuntu:latest
+ARG BASE_IMAGE=ubuntu:24.04
 
 FROM ${BASE_IMAGE}
 SHELL ["/bin/bash", "-c"]

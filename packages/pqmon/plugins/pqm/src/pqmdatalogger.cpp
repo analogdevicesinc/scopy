@@ -66,7 +66,7 @@ void PqmDataLogger::acquireBufferData(double val, int chIdx)
 void PqmDataLogger::acquireHarmonics(QMap<QString, QMap<QString, QString>> pqmAttr)
 {
 	QMutexLocker locker(&m_mutex);
-	for(const QString &ch : qAsConst(m_chnlsName)) {
+	for(const QString &ch : std::as_const(m_chnlsName)) {
 		if(!pqmAttr[ch].contains(ATTR_HARMONICS)) {
 			continue;
 		}
@@ -80,7 +80,7 @@ void PqmDataLogger::acquireRmsChnlAttr(QMap<QString, QMap<QString, QString>> pqm
 {
 	QMutexLocker locker(&m_mutex);
 	m_logQue.enqueue("Time,Phase," + m_rmsHeader.join(",") + "\n");
-	for(const QString &ch : qAsConst(m_chnlsName)) {
+	for(const QString &ch : std::as_const(m_chnlsName)) {
 		m_logQue.enqueue(QTime::currentTime().toString("hh:mm:ss.zzz") + "," + ch + ",");
 		for(const QString &attr : m_rmsHeader) {
 			if(!pqmAttr[ch].contains(attr)) {
@@ -139,7 +139,7 @@ void PqmDataLogger::log()
 		return;
 	}
 	if(!m_writeFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(this, &PqmDataLogger::writeToFile);
+		QFuture<void> f = QtConcurrent::run(&PqmDataLogger::writeToFile, this);
 		m_writeFw->setFuture(f);
 	}
 }

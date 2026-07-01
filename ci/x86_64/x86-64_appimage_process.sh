@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# x86_64 AppImage Build Script
+# x86_64 Qt6 AppImage Build Script
 # ===========================
-# Build portable AppImage for x86_64 Linux systems
+# Build portable AppImage for x86_64 Linux systems (Qt6)
 # Usage: ./x86-64_appimage_process.sh [function_name ...]
 #
 # This script creates a portable AppImage that includes:
@@ -47,10 +47,10 @@ GRM2K_BRANCH=main
 LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
-IIOEMU_BRANCH=master
-KDDOCK_BRANCH=2.1
-ECM_BRANCH=kf5
-KARCHIVE_BRANCH=kf5
+IIOEMU_BRANCH=main
+KDDOCK_BRANCH=2.2
+ECM_BRANCH=v6.8.0
+KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
 
 # Python version detection
@@ -59,17 +59,17 @@ if [ -f /etc/os-release ]; then
 
     if [ "$ID" = "ubuntu" ]; then
         case "$VERSION_ID" in
-            "20.04")
-                PYTHON_VERSION=python3.9
-                ;;
             "22.04")
                PYTHON_VERSION=python3.11
                 ;;
             "24.04")
                 PYTHON_VERSION=python3.12
                 ;;
+            "26.04")
+                PYTHON_VERSION=python3.14
+                ;;
             *)
-                echo "Running on Ubuntu, but not 20.04/22.04/24.04 (detected: $VERSION_ID)"
+                echo "Running on Ubuntu, but not 22.04/24.04/26.04 (detected: $VERSION_ID)"
                 ;;
         esac
     else
@@ -81,10 +81,10 @@ fi
 
 # Qt is installed using aqtinstall
 QT_INSTALL_LOCATION=/opt/Qt
-QT=$QT_INSTALL_LOCATION/5.15.2/gcc_64
+QT=$QT_INSTALL_LOCATION/6.8.3/gcc_64
 
 STAGING_AREA=$SRC_SCRIPT/staging
-QMAKE_BIN=$QT/bin/qmake
+QMAKE_BIN=$QT/bin/qmake6
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
 JOBS=-j14 # Parallel build jobs
 
@@ -93,16 +93,15 @@ JOBS=-j14 # Parallel build jobs
 APP_DIR_NAME=scopy.AppDir
 APP_DIR=$SRC_SCRIPT/$APP_DIR_NAME
 
-# Different names for different Ubuntu versions
-APP_IMAGE_FOLDER=scopy-x86_64-appimage
-[ "$VERSION_ID" == "20.04" ] && APP_IMAGE_FOLDER=scopy-x86_64-appimage-ubuntu20
+UBUNTU_VERSION_SHORT=$(echo "$VERSION_ID" | tr -d '.')
+APP_IMAGE_FOLDER=scopy-qt6-x86_64-appimage-ubuntu${UBUNTU_VERSION_SHORT}
 
 APP_IMAGE_NAME=${APP_IMAGE_FOLDER}.AppImage
 APP_IMAGE=$SRC_SCRIPT/$APP_IMAGE_NAME
 
-# Export variables for GitHub Actions
-[ $CI_SCRIPT ] && echo "app_image_folder=$APP_IMAGE_FOLDER" >> "$GITHUB_ENV"
-[ $CI_SCRIPT ] && echo "app_image_name=$APP_IMAGE_NAME" >> "$GITHUB_ENV"
+# Export variables for GitHub Actions (only when GITHUB_ENV file exists on the runner)
+[ -f "$GITHUB_ENV" ] && echo "app_image_folder=$APP_IMAGE_FOLDER" >> "$GITHUB_ENV"
+[ -f "$GITHUB_ENV" ] && echo "app_image_name=$APP_IMAGE_NAME" >> "$GITHUB_ENV"
 
 # Build status tracking
 BUILD_STATUS_FILE=$SRC_SCRIPT/build-status
@@ -128,7 +127,7 @@ if [ "$USE_STAGING" == "ON" ]
 		echo -- NO STAGING: INSTALLING IN SYSTEM
 		STAGING_AREA_DEPS=/usr/local
 		export LD_LIBRARY_PATH=$QT/lib:$LD_LIBRARY_PATH:
-		
+
 		CMAKE_OPTS=(\
 			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -170,8 +169,7 @@ clone() {
 install_qt() {
 	[ "$PYTHON_VERSION" == "python3.12" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
 	[ "$PYTHON_VERSION" == "python3.11" ] && sudo pip3 install --no-cache-dir aqtinstall
-	[ "$PYTHON_VERSION" == "python3.9" ]  && sudo pip3 install --no-cache-dir aqtinstall
-	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 5.15.2
+	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 6.8.3 linux_gcc_64 -m qt3d qtscxml
 }
 
 download_tools() {
@@ -430,7 +428,7 @@ build_iio-emu() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS"
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DKDDockWidgets_QT6=ON"
 	build_with_cmake $1
 	popd
 }
@@ -445,6 +443,7 @@ build_ecm() {
 
 build_karchive () {
 	echo "### Building karchive - version $KARCHIVE_BRANCH"
+	export CMAKE_PREFIX_PATH=$STAGING_AREA_DEPS/share/ECM/cmake:$CMAKE_PREFIX_PATH
 	pushd $STAGING_AREA/karchive
 	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DBUILD_TESTING=OFF"
 	build_with_cmake $1
@@ -470,7 +469,9 @@ build_scopy() {
 	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION \
-		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr
+		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr \
+		-DENABLE_ALL_PACKAGES=ON \
+		-DENABLE_PACKAGE_M2K=OFF
 		"
 	build_with_cmake OFF
 	popd
@@ -533,10 +534,10 @@ create_appdir(){
 	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	cp -r $QT/plugins $APP_DIR/usr
 
-	cp $QT/lib/libQt5XcbQpa.so* $APP_DIR/usr/lib
-	cp $QT/lib/libQt5WaylandClient.so* $APP_DIR/usr/lib
-	cp $QT/lib/libQt5EglFSDeviceIntegration.so* $APP_DIR/usr/lib
-	cp $QT/lib/libQt5DBus.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt6XcbQpa.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt6WaylandClient.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt6EglFSDeviceIntegration.so* $APP_DIR/usr/lib
+	cp $QT/lib/libQt6DBus.so* $APP_DIR/usr/lib
 
 	cp $STAGING_AREA_DEPS/lib/libgenalyzer.so* $APP_DIR/usr/lib
 

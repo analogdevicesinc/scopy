@@ -60,7 +60,7 @@ void SettingsMenu::createAcqMenu()
 
 	QWidget *acqWidget = new QWidget();
 	QVBoxLayout *acqLay = new QVBoxLayout(acqWidget);
-	acqLay->setMargin(0);
+	acqLay->setContentsMargins(0, 0, 0, 0);
 
 	// Post-processing
 	MenuSectionCollapseWidget *postProcSection = new MenuSectionCollapseWidget(
@@ -116,7 +116,7 @@ void SettingsMenu::createPlotMenu()
 
 	m_plotSettings = new QWidget(plotWidget);
 	m_plotSettings->setLayout(new QVBoxLayout());
-	m_plotSettings->layout()->setMargin(0);
+	m_plotSettings->layout()->setContentsMargins(0, 0, 0, 0);
 
 	plotLay->addWidget(plotSettings);
 	plotLay->addWidget(m_plotSettings);
@@ -143,7 +143,7 @@ QWidget *SettingsMenu::createMenuW(const QString &title, QWidget *parent)
 	QWidget *menu = new QWidget(parent);
 	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *lay = new QVBoxLayout(menu);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	MenuHeaderWidget *header =
 		new MenuHeaderWidget(title, QPen(Style::getAttribute(json::theme::interactive_primary_idle)), menu);
 	lay->addWidget(header);

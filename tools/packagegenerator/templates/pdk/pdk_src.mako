@@ -40,7 +40,7 @@ PDKWindow::PDKWindow(QWidget *parent)
 	initPreferencesPage();
 	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 	setMinimumSize(1280, 720);
-	layout()->setMargin(9);
+	layout()->setContentsMargins(9, 9, 9, 9);
 	layout()->setSpacing(6);
 	m_mainWidget = new MainWidget(this);
 	m_aboutPage = new QLabel(this);
@@ -79,7 +79,7 @@ void PDKWindow::onConnect()
 		onUnload();
 	}
 	QList<scopy::ToolMenuEntry *> tools = m_mainWidget->getPluginTools();
-	for(const scopy::ToolMenuEntry *t : qAsConst(tools)) {
+	for(const scopy::ToolMenuEntry *t : std::as_const(tools)) {
 		if(!t->tool())
 			continue;
 		QLabel *lbl = createTabLabel(t->name());
@@ -96,10 +96,10 @@ void PDKWindow::onConnect()
 void PDKWindow::onDisconnect()
 {
 	QList<scopy::ToolMenuEntry *> tools = m_mainWidget->getPluginTools();
-	for(const scopy::ToolMenuEntry *t : qAsConst(tools)) {
+	for(const scopy::ToolMenuEntry *t : std::as_const(tools)) {
 		t->disconnect(this);
 	}
-	for(auto t : qAsConst(m_toolList)) {
+	for(auto t : std::as_const(m_toolList)) {
 		int idx = m_tabWidget->indexOf(t);
 		m_tabWidget->removeTab(idx);
 		m_toolList.removeOne(t);
@@ -123,7 +123,7 @@ void PDKWindow::onDeinit()
 void PDKWindow::onLoad()
 {
 	QList<scopy::ToolMenuEntry *> tools = m_mainWidget->getPluginTools();
-	for(const scopy::ToolMenuEntry *t : qAsConst(tools)) {
+	for(const scopy::ToolMenuEntry *t : std::as_const(tools)) {
 		if(t->name().isEmpty())
 			continue;
 		QLabel *lbl = createTabLabel(t->name());
@@ -136,7 +136,7 @@ void PDKWindow::onUnload()
 {
 	if(m_loadedTools.isEmpty())
 		return;
-	for(auto t : qAsConst(m_loadedTools)) {
+	for(auto t : std::as_const(m_loadedTools)) {
 		int idx = m_tabWidget->indexOf(t);
 		m_tabWidget->removeTab(idx);
 		m_loadedTools.removeOne(t);
@@ -148,7 +148,7 @@ QWidget *PDKWindow::buildSaveSessionPreference()
 	scopy::Preferences *p = scopy::Preferences::GetInstance();
 	QWidget *w = new QWidget(this);
 	QHBoxLayout *lay = new QHBoxLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	lay->addWidget(scopy::PreferencesHelper::addPreferenceCheckBox(p, "general_save_session",
 								       "Save/Load Scopy session", "", this));
@@ -169,7 +169,7 @@ QWidget *PDKWindow::generalPreferences()
 	QVBoxLayout *lay = new QVBoxLayout(page);
 	scopy::Preferences *p = scopy::Preferences::GetInstance();
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	page->setLayout(lay);
 
@@ -275,7 +275,7 @@ void PDKWindow::initMainWindow()
 	centralWidget->setMinimumSize(1280, 720);
 	setCentralWidget(centralWidget);
 	QHBoxLayout *lay = new QHBoxLayout(centralWidget);
-	lay->setMargin(9);
+	lay->setContentsMargins(9, 9, 9, 9);
 	lay->setSpacing(6);
 
 	m_tabWidget = new QTabWidget(centralWidget);
@@ -291,7 +291,7 @@ QWidget *PDKWindow::addHorizontalTab(QWidget *w, QLabel *lbl, bool tabEnabled)
 	QWidget *pane = new QWidget(m_tabWidget);
 	pane->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QHBoxLayout *lay = new QHBoxLayout(pane);
-	lay->setMargin(10);
+	lay->setContentsMargins(10, 10, 10, 10);
 	pane->setLayout(lay);
 
 	QScrollArea *scrollArea = new QScrollArea(pane);
@@ -316,7 +316,7 @@ void PDKWindow::initPreferencesPage()
 	m_prefPage = new QWidget(this);
 	QGridLayout *lay = new QGridLayout(m_prefPage);
 	lay->setSpacing(6);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	scopy::MenuSectionWidget *generalWidget = new scopy::MenuSectionWidget(m_prefPage);
 	scopy::MenuCollapseSection *generalSection =
@@ -380,7 +380,7 @@ MainWidget::MainWidget(QWidget *parent)
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	this->setMinimumWidth(1024);
 	QGridLayout *lay = new QGridLayout(this);
-	lay->setMargin(9);
+	lay->setContentsMargins(9, 9, 9, 9);
 	lay->setSpacing(6);
 
 	m_statusLbl = new QLabel(this);
@@ -408,7 +408,7 @@ MainWidget::MainWidget(QWidget *parent)
 	QWidget *loadBtns = new QWidget(this);
 	loadBtns->setLayout(new QVBoxLayout(loadBtns));
 	loadBtns->layout()->setSpacing(0);
-	loadBtns->layout()->setMargin(0);
+	loadBtns->layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_loadBtn = new QPushButton("Load", this);
 	scopy::Style::setStyle(m_loadBtn, style::properties::button::basicButton);
@@ -433,7 +433,7 @@ MainWidget::MainWidget(QWidget *parent)
 	QWidget *connBtns = new QWidget(this);
 	connBtns->setLayout(new QVBoxLayout(connBtns));
 	connBtns->layout()->setSpacing(0);
-	connBtns->layout()->setMargin(0);
+	connBtns->layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_connBtn = new QPushButton("Connect", this);
 	scopy::Style::setStyle(m_connBtn, style::properties::button::basicButton);
@@ -452,7 +452,7 @@ MainWidget::MainWidget(QWidget *parent)
 	QWidget *pluginPage = new QWidget(this);
 	pluginPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	pluginPage->setLayout(new QVBoxLayout(pluginPage));
-	pluginPage->layout()->setMargin(0);
+	pluginPage->layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_scrollArea = new QScrollArea(pluginPage);
 	m_scrollArea->setWidgetResizable(true);
@@ -461,7 +461,7 @@ MainWidget::MainWidget(QWidget *parent)
 
 	m_pluginIcon = new QWidget(this);
 	m_pluginIcon->setLayout(new QHBoxLayout(m_pluginIcon));
-	m_pluginIcon->layout()->setMargin(0);
+	m_pluginIcon->layout()->setContentsMargins(0, 0, 0, 0);
 	m_pluginIcon->setFixedSize(100, 100);
 
 	lay->addWidget(m_pluginPathEdit, 0, 0);

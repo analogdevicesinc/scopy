@@ -133,7 +133,7 @@ void AcquisitionManager::toolEnabled(bool en, QString toolName)
 void AcquisitionManager::futureReadData()
 {
 	if(!m_readFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(this, &AcquisitionManager::readData);
+		QFuture<void> f = QtConcurrent::run(&AcquisitionManager::readData, this);
 		m_readFw->setFuture(f);
 	}
 }
@@ -227,7 +227,7 @@ bool AcquisitionManager::readBufferedData()
 	QString chnl;
 	int16_t *startAdr = (int16_t *)iio_buffer_start(m_buffer);
 	int16_t *endAdr = (int16_t *)iio_buffer_end(m_buffer);
-	for(const QString &ch : qAsConst(m_buffChnls)) {
+	for(const QString &ch : std::as_const(m_buffChnls)) {
 		m_bufferData[ch].clear();
 		m_bufferData[ch] = {};
 	}
@@ -281,7 +281,7 @@ double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
 void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr)
 {
 	if(!m_setFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(this, &AcquisitionManager::setData, attr);
+		QFuture<void> f = QtConcurrent::run(&AcquisitionManager::setData, this, attr);
 		m_setFw->setFuture(f);
 	}
 }
@@ -342,7 +342,7 @@ void AcquisitionManager::storeProcessData()
 void AcquisitionManager::handlePQEvents()
 {
 	QString logMsg = "";
-	for(const QString &ch : qAsConst(m_eventsChnls)) {
+	for(const QString &ch : std::as_const(m_eventsChnls)) {
 		if(m_pqmAttr[ch]["countEvent"].toInt() == 0) {
 			continue;
 		}

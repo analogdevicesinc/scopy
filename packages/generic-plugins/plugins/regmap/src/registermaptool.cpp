@@ -63,7 +63,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tool->topContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
-	tool->layout()->setMargin(4);
+	tool->layout()->setContentsMargins(4, 4, 4, 4);
 	tool->layout()->setSpacing(2);
 	tool->centralContainer()->layout()->setSpacing(0);
 	lay->addWidget(tool);

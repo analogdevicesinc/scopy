@@ -85,7 +85,7 @@ public:
 
 	bool isValid() const
 	{
-		if(id < 0 || title.isEmpty() || xLabel.isEmpty() || yLabel.isEmpty() || type == INVALID_TYPE) {
+		if(id.toInt() < 0 || title.isEmpty() || xLabel.isEmpty() || yLabel.isEmpty() || type == INVALID_TYPE) {
 			return false;
 		}
 

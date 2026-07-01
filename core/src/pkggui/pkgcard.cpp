@@ -38,11 +38,11 @@ PkgCard::PkgCard(QWidget *parent)
 {
 	QWidget *btnsW = new QWidget(this);
 	QHBoxLayout *btnsLay = new QHBoxLayout(btnsW);
-	btnsLay->setMargin(0);
+	btnsLay->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *categoryW = new QWidget(btnsW);
 	m_categoryLay = new QHBoxLayout(categoryW);
-	m_categoryLay->setMargin(0);
+	m_categoryLay->setContentsMargins(0, 0, 0, 0);
 
 	m_installBtn = new InstallBtn(btnsW);
 	connect(m_installBtn, &QPushButton::clicked, this, &PkgCard::installClicked);

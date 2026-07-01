@@ -36,7 +36,7 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 	: QWidget{parent}
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
@@ -47,7 +47,7 @@ DataLoggingMenu::DataLoggingMenu(QWidget *parent)
 
 	QWidget *progressFileBrowser = new QWidget(logDataSection);
 	QVBoxLayout *progressFileBrowserLay = new QVBoxLayout(progressFileBrowser);
-	progressFileBrowserLay->setMargin(0);
+	progressFileBrowserLay->setContentsMargins(0, 0, 0, 0);
 	progressFileBrowserLay->setSpacing(1);
 
 	fileBrowser = new FileBrowserWidget(FileBrowserWidget::SAVE_FILE, progressFileBrowser);

@@ -62,7 +62,7 @@ ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent)
 
 void ScopyPreferencesPage::initUI()
 {
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
 	this->setLayout(layout);
 	layout->addWidget(tabWidget);
@@ -77,7 +77,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text)
 	QWidget *pane = new QWidget();
 	Style::setBackgroundColor(pane, json::theme::background_subtle);
 	QHBoxLayout *lay = new QHBoxLayout();
-	lay->setMargin(10);
+	lay->setContentsMargins(10, 10, 10, 10);
 	pane->setLayout(lay);
 
 	QScrollArea *scrollArea = new QScrollArea();
@@ -106,7 +106,7 @@ void ScopyPreferencesPage::updateSessionDevices(QMap<QString, QStringList> devic
 {
 	int btnIdx = m_autoConnectWidget->contentLayout()->indexOf(m_devRefresh);
 	QStringList keys = devices.keys();
-	for(const QString &uri : qAsConst(keys)) {
+	for(const QString &uri : std::as_const(keys)) {
 		if(!m_connDevices.contains(uri)) {
 			QString prefId = uri + "_sticky";
 			QCheckBox *devCb = new QCheckBox(uri, m_autoConnectWidget);
@@ -133,7 +133,7 @@ void ScopyPreferencesPage::initRestartWidget()
 	restartWidget = new QWidget();
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setSpacing(0);
-	lay->setMargin(10);
+	lay->setContentsMargins(10, 10, 10, 10);
 	restartWidget->setLayout(lay);
 	restartWidget->setVisible(false);
 	QLabel *lab = new QLabel("An application restart is required for these settings to take effect. ");
@@ -160,7 +160,7 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	Preferences *p = Preferences::GetInstance();
 	QWidget *w = new QWidget(this);
 	QHBoxLayout *lay = new QHBoxLayout(w);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	lay->addWidget(PREFERENCE_CHECK_BOX(p, "general_save_session", "Save/Load Scopy session",
 					    "Allow Scopy to automatically save/load the session "
@@ -219,7 +219,7 @@ QWidget *ScopyPreferencesPage::buildResetScopyDefaultButton()
 	resetBtn->setMaximumWidth(Style::getDimension(json::global::unit_5));
 	connect(resetBtn, &QPushButton::clicked, this, &ScopyPreferencesPage::resetScopyPreferences);
 	lay->addWidget(resetBtn);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addSpacerItem(new QSpacerItem(6, 40, QSizePolicy::Preferred, QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Reset to settings and plugins to default"));
 	lay->addSpacerItem(new QSpacerItem(40, 40, QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -234,7 +234,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	Preferences *p = Preferences::GetInstance();
 	TranslationsRepository *t = scopy::TranslationsRepository::GetInstance();
 
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(10);
 	page->setLayout(lay);
 
@@ -404,7 +404,7 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	Style::setStyle(m_devRefresh, style::properties::button::borderButton);
 	QWidget *refreshWidget = new QWidget(m_autoConnectWidget);
 	QHBoxLayout *refreshLayout = new QHBoxLayout(refreshWidget);
-	refreshLayout->setMargin(0);
+	refreshLayout->setContentsMargins(0, 0, 0, 0);
 	refreshLayout->addWidget(
 		new QLabel("At each auto-connect session, it will try to connect to the checked devices"));
 	refreshLayout->addWidget(m_devRefresh);

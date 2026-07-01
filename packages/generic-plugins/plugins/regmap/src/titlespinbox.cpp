@@ -37,20 +37,20 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 
 	QHBoxLayout *mainLayout = new QHBoxLayout(this);
 	mainLayout->setSpacing(4);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(mainLayout);
 
 	QWidget *spinboxWidget = new QWidget(this);
 	Style::setBackgroundColor(spinboxWidget, json::theme::interactive_secondary_disabled);
 	QVBoxLayout *spinboxWidgetLayout = new QVBoxLayout(spinboxWidget);
 	spinboxWidgetLayout->setSpacing(0);
-	spinboxWidgetLayout->setMargin(0);
+	spinboxWidgetLayout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *buttonWidget = new QWidget(this);
 	Style::setBackgroundColor(buttonWidget, json::theme::interactive_secondary_disabled);
 	QVBoxLayout *buttonWidgetLayout = new QVBoxLayout(buttonWidget);
 	buttonWidgetLayout->setSpacing(0);
-	buttonWidgetLayout->setMargin(0);
+	buttonWidgetLayout->setContentsMargins(0, 0, 0, 0);
 
 	spinBoxUpButton = new QPushButton("+", buttonWidget);
 	RegmapStyleHelper::smallBlueButton(spinBoxUpButton);

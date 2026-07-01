@@ -49,7 +49,7 @@ DatamonitorTool::DatamonitorTool(DataAcquisitionManager *dataAcquisitionManager,
 	, QWidget{parent}
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 
 	tool = new ToolTemplate(this);
