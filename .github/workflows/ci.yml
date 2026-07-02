@@ -59,7 +59,7 @@ jobs:
 
     ubuntu-qt6-build:
       needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/ubuntubuild.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
@@ -68,7 +68,7 @@ jobs:
 
     appimage-x86_64-qt6:
       needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-x86_64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
@@ -77,7 +77,7 @@ jobs:
 
     mingw-qt6:
       needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/mingwbuild.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
@@ -86,7 +86,7 @@ jobs:
 
     arm64-qt6:
       needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-arm64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
@@ -95,7 +95,7 @@ jobs:
 
     armhf-qt6:
       needs: docker_tag
-      if: always() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped')
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-armhf.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
