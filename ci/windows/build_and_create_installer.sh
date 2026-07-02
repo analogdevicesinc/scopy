@@ -131,6 +131,10 @@ deploy_app(){
 	cp -v $QT/bin/Qt6OpenGLWidgets.dll $DEST_FOLDER/
 	cp -v $QT/bin/Qt6Qml.dll $DEST_FOLDER/
 	cp -v $QT/bin/Qt6Xml.dll $DEST_FOLDER/
+	cp -v $QT/bin/Qt63DCore.dll $DEST_FOLDER/
+	cp -v $QT/bin/Qt63DExtras.dll $DEST_FOLDER/
+	cp -v $QT/bin/Qt63DRender.dll $DEST_FOLDER/
+	cp -v $QT/bin/Qt63DInput.dll $DEST_FOLDER/
 
 	cp -vr $INSTALL_FOLDER/lib/libscopy*.dll $DEST_FOLDER
 	cp -vr $INSTALL_FOLDER/lib/scopy/* $DEST_FOLDER
