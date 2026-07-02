@@ -8,7 +8,7 @@
 
     <title>ADC plugin &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=a8f9a170" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=d3f78147" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -104,6 +104,7 @@
 <li><a class="reference internal" href="#integration-with-fft-workflow"><strong>Integration with FFT Workflow:</strong></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#waterfall-plot-frequency-instrument">Waterfall Plot (Frequency Instrument)</a></li>
 </ul>
 </li>
 </ul>
@@ -561,6 +562,25 @@ provides additional configuration options and is ideal for characterized test si
 is developed by Analog Devices and is available at: <a class="icon link reference external" href="https://github.com/analogdevicesinc/genalyzer" target="_blank">https://github.com/analogdevicesinc/genalyzer</a></p>
 </div>
 </section>
+</section>
+<section id="waterfall-plot-frequency-instrument">
+<span id="waterfall-plot"></span><h2>Waterfall Plot (Frequency Instrument)<a class="headerlink" href="#waterfall-plot-frequency-instrument" title="Link to this heading"></a></h2>
+<p><strong>Waterfall Plot</strong> visualizes how the FFT spectrum evolves over time. Each acquired FFT frame is
+rendered as a new row of the plot, with the X axis representing frequency, the Y axis
+representing time (older data scrolls downwards), and color encoding the magnitude in
+dBFS.</p>
+<p><strong>Controls:</strong></p>
+<ul class="simple">
+<li><p><strong>Enable switch</strong> (in the section header) - shows or hides the waterfall dock.
+Disabling it also clears the accumulated history.</p></li>
+<li><p><strong>History rows</strong> - number of FFT frames retained in the waterfall.
+Range: 50 to 2000 rows. Default: 200.</p></li>
+</ul>
+<p><strong>Intensity mapping:</strong></p>
+<p>The waterfall’s color (Z) axis is automatically synchronized with the FFT plot
+Y-axis range. Adjusting <strong>Y Min-Max</strong> or <strong>Autoscale</strong> on the FFT plot updates
+the waterfall intensity range accordingly, so the two views always share the
+same dBFS scale.</p>
 </section>
 </section>
 

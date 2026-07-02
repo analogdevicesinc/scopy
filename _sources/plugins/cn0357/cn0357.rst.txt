@@ -38,7 +38,7 @@ Getting Started
 **Prerequisites**
 
 - A CN0357 evaluation board connected to a supported FPGA carrier
-- Scopy version 2.3.0 or later
+- Scopy version 2.2.1 or later
 
 **Using the Plugin**
 
