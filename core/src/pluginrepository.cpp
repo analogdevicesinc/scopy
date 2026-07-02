@@ -95,7 +95,7 @@ void PluginRepository::_init(QString location)
 	// QPluginLoader uses LoadLibraryExW with LOAD_WITH_ALTERED_SEARCH_PATH, which ignores
 	// SetDllDirectory. Prepend the exe directory to PATH so transitive dependencies of
 	// plugin DLLs (e.g. Qt63DCore.dll) are resolved from there.
-	QString exeDir = QApplication::applicationDirPath().toNativeSeparators();
+	QString exeDir = QDir::toNativeSeparators(QApplication::applicationDirPath());
 	qputenv("PATH", (exeDir + ";" + qEnvironmentVariable("PATH")).toLocal8Bit());
 #endif
 
