@@ -26,6 +26,7 @@
 #include "txtone.h"
 #include "dac_logging_categories.h"
 
+#include <pluginbase/preferences.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/menucombo.h>
 #include <gui/mapstackedwidget.h>
@@ -125,11 +126,18 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 		auto mode = cb->itemData(idx).toInt();
 		ddsModeStack->show(QString::number(mode));
 		TxMode *current = dynamic_cast<TxMode *>(ddsModeStack->get(QString::number(mode)));
-		if(current) {
-			setRunning(mode != TxMode::DISABLED);
-			current->read();
+		if(!current) {
+			return;
 		}
+		current->enable(mode != TxMode::DISABLED);
+		current->read();
 	});
+
+	bool reset = Preferences::GetInstance()->get("dac_reset_dds_on_connect").toBool();
+	if(reset) {
+		ddsModeCombo->combo()->setCurrentIndex(TxMode::DISABLED);
+		dynamic_cast<TxMode *>(ddsModeStack->get(QString::number(TxMode::DISABLED)))->enable(false);
+	}
 
 	ddsModeSection->contentLayout()->addWidget(ddsModeCombo);
 	txHeaderLay->addWidget(txLabelSection, 1);
@@ -138,7 +146,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 
 	txLay->addWidget(txHeader);
 	txLay->addWidget(ddsModeStack);
-	m_txWidgets.insert(tx, ddsModeStack);
+	m_txWidgets.insert(tx, {ddsModeStack, ddsModeCombo});
 
 	return tx;
 }
@@ -151,18 +159,20 @@ QWidget *DdsDacAddon::setupTxMode(TxNode *txNode, unsigned int mode)
 
 DdsDacAddon::~DdsDacAddon() {}
 
-void DdsDacAddon::enable(bool enable)
+void DdsDacAddon::enable()
 {
-	for(auto tx : qAsConst(m_txWidgets)) {
-		dynamic_cast<TxMode *>(tx->currentWidget())->enable(enable);
+	for(auto it = m_txWidgets.constBegin(); it != m_txWidgets.constEnd(); ++it) {
+		int activeTones = dynamic_cast<TxMode *>(it->stack->currentWidget())->load();
+		it->combo->combo()->setCurrentIndex(activeTones);
 	}
 }
 
 void DdsDacAddon::setRunning(bool toggled)
 {
-	m_isRunning = toggled;
-	enable(m_isRunning);
-	Q_EMIT running(m_isRunning);
+	bool reset = Preferences::GetInstance()->get("dac_reset_dds_on_connect").toBool();
+	if(reset) {
+		disable();
+	}
 }
 
 TxMode::TxMode(TxNode *node, unsigned int mode, QWidget *parent)
@@ -223,14 +233,59 @@ void TxMode::read()
 	}
 }
 
+int TxMode::load()
+{
+	int activeTones = 0;
+	bool anyDds = m_node->readDds();
+	if(!anyDds) {
+		return activeTones;
+	}
+
+	read();
+	auto emitterChannel = m_txChannels.at(0);
+	for(int toneIdx = 1; toneIdx <= emitterChannel->toneCount(); toneIdx++) {
+		TxTone *tone = emitterChannel->tone(toneIdx);
+		if(tone->scale().toDouble() != 0) {
+			activeTones = toneIdx;
+		}
+	}
+
+	bool independent = false;
+	for(int chIdx = 1; chIdx < m_txChannels.size(); chIdx++) {
+		for(int toneIdx = 1; toneIdx <= emitterChannel->toneCount(); toneIdx++) {
+			TxTone *emitterTone = emitterChannel->tone(toneIdx);
+			TxTone *otherTone = m_txChannels.at(chIdx)->tone(toneIdx);
+			if(!emitterTone || !otherTone)
+				continue;
+			if(emitterTone->frequency() != otherTone->frequency() ||
+			   emitterTone->scale() != otherTone->scale()) {
+				independent = true;
+				break;
+			}
+		}
+		if(independent) {
+			break;
+		}
+	}
+
+	if(independent) {
+		activeTones = TxMode::INDEPENDENT_IQ_CTRL;
+	}
+	return activeTones;
+}
+
 void TxMode::enable(bool enabled)
 {
-	if(m_mode == TxMode::DISABLED && enabled) {
+	if(m_mode == TxMode::DISABLED) {
+		// Set the "raw" attr to 0 or 1
+		m_node->enableDds(false);
+
+		// Write all the scale attrs to 0 to reset the scales
+		// for all tones in all channels
+		for(int chIdx = 0; chIdx < m_txChannels.size(); chIdx++) {
+			Q_EMIT m_txChannels[chIdx]->resetChannelScales();
+		}
 		return;
-	}
-	// Write all the scale attrs to IIO
-	for(int chIdx = 0; chIdx < m_txChannels.size(); chIdx++) {
-		Q_EMIT m_txChannels[chIdx]->resetChannelScales();
 	}
 
 	// Set the "raw" attr to 0 or 1

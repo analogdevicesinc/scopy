@@ -44,12 +44,15 @@ class BufferDacAddon : public DacAddon
 public:
 	BufferDacAddon(DacDataModel *model, QWidget *parent = nullptr);
 	virtual ~BufferDacAddon();
-	virtual void enable(bool enable);
+	virtual void enable();
+	virtual void disable();
 	virtual void setRunning(bool running);
+	virtual bool isRunnable() override;
 
 Q_SIGNALS:
 	void log(QString log);
 	void toggleCyclic(bool toggled);
+	void refreshChannelBtns();
 
 public Q_SLOTS:
 	void dataReload();

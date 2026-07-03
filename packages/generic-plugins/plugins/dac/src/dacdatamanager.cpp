@@ -58,21 +58,20 @@ DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
 	StyleHelper::BackgroundWidget(m_mode);
 	auto cb = m_mode->combo();
 	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=, this](int idx) {
+		auto mode = cb->itemData(idx).toInt();
 		auto current = dynamic_cast<DacAddon *>(dacAddonStack->currentWidget());
 		if(current) {
-			current->enable(false);
+			current->disable();
 		}
 
-		auto mode = cb->itemData(idx).toInt();
 		auto next = dynamic_cast<DacAddon *>(dacAddonStack->get(QString::number(mode)));
 		if(next) {
-			next->enable(true);
+			next->enable();
 			Q_EMIT running(next->isRunning());
 		}
 		dacAddonStack->show(QString::number(mode));
 	});
 
-	setupDacMode("Disabled", DAC_DISABLED);
 	setupDacMode("Buffer", DAC_BUFFER);
 	setupDacMode("DDS", DAC_DDS);
 	Q_EMIT m_mode->combo()->currentIndexChanged(0);

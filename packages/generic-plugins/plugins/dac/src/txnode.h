@@ -48,6 +48,7 @@ public:
 	bool getFormatSigned() const;
 
 	bool enableDds(bool enable);
+	bool readDds() const;
 
 	const QColor &getColor() const;
 	void setColor(const QColor &newColor);
