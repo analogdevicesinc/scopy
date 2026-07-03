@@ -98,18 +98,23 @@ void PluginRepository::_init(QString location)
 
 #ifdef Q_OS_WINDOWS
 	// Qt6 drops the exe dir from the DLL search path; re-add it so plugins find their deps there.
+	const QString appDir = QDir::toNativeSeparators(QApplication::applicationDirPath());
+	qInfo(CAT_PLUGINREPOSTIORY) << "Windows DLL search: adding application dir to search path:" << appDir;
 	if(!SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS)) {
 		DWORD error = ::GetLastError();
 		std::string message = std::system_category().message(error);
 		qWarning(CAT_PLUGINREPOSTIORY)
 			<< "SetDefaultDllDirectories failed - " << QString::fromStdString(message);
+	} else {
+		qInfo(CAT_PLUGINREPOSTIORY) << "SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS) ok";
 	}
-	const QString appDir = QDir::toNativeSeparators(QApplication::applicationDirPath());
 	if(!AddDllDirectory(reinterpret_cast<PCWSTR>(appDir.utf16()))) {
 		DWORD error = ::GetLastError();
 		std::string message = std::system_category().message(error);
 		qWarning(CAT_PLUGINREPOSTIORY)
 			<< "cannot add .exe folder to library search path - " << QString::fromStdString(message);
+	} else {
+		qInfo(CAT_PLUGINREPOSTIORY) << "AddDllDirectory ok for" << appDir;
 	}
 #endif
 
