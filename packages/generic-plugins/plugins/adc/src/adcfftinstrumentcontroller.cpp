@@ -22,6 +22,7 @@
 #include "adcfftinstrumentcontroller.h"
 #include "adcinstrument.h"
 #include "grdevicecomponent.h"
+#include "freq/grfftdevicecomponent.h"
 #include "importchannelcomponent.h"
 #include "freq/grfftsinkcomponent.h"
 #include "freq/grfftchannelcomponent.h"
@@ -136,7 +137,8 @@ void ADCFFTInstrumentController::init()
 void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 {
 	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
-	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
+	GRFFTDeviceComponent *d = new GRFFTDeviceComponent(griiodsn);
+	d->init();
 	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
 

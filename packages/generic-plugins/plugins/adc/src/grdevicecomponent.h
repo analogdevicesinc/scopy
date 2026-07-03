@@ -51,6 +51,10 @@ public:
 	virtual bool sampleRateAvailable() override;
 	virtual double sampleRate() override;
 
+	// Must be called by the concrete class at the end of its constructor
+	// (subclasses' vtable isn't ready inside the base ctor).
+	void init();
+
 public Q_SLOTS:
 	void onStart() override;
 	void onStop() override;
@@ -61,14 +65,28 @@ public Q_SLOTS:
 	void removeChannel(ChannelComponent *c);
 	void addChannel(ChannelComponent *c);
 
-private:
+protected:
+	// Optional instrument-specific section inserted before the ATTRIBUTES
+	// section. Default: no extra section (used by the time instrument).
+	virtual QWidget *buildExtraMenu(QWidget *parent) { return nullptr; }
+
+	template <typename T, typename Fn>
+	void forEachChannel(Fn fn) const
+	{
+		for(auto *ch : m_channels) {
+			if(auto *typed = qobject_cast<T *>(ch))
+				fn(typed);
+		}
+	}
+
 	QString name;
-	QWidget *widget;
 	GRIIODeviceSourceNode *m_node;
 	GRIIODeviceSource *m_src;
+
+private:
+	QWidget *widget;
 	CollapsableMenuControlButton *m_ctrl;
 	QPen m_pen;
-	// QList<GRTimeChannelAddon *> m_channels;
 	QWidget *createChCommonAttrMenu(QWidget *parent);
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createMenu(QWidget *parent = nullptr);
