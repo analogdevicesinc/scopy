@@ -20,6 +20,7 @@
  */
 
 #include "grfftchannelcomponent.h"
+#include "fftmenucontrols.h"
 #include <pluginbase/preferences.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menucollapsesection.h>
@@ -255,142 +256,66 @@ QWidget *GRFFTChannelComponent::createMenu(QWidget *parent)
 
 QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("AVERAGING", MenuCollapseSection::MHCW_ONOFF,
-									   MenuCollapseSection::MHW_BASEWIDGET, parent);
-	auto layout = new QVBoxLayout();
-	layout->setSpacing(0);
-	layout->setMargin(0);
+	AveragingMenuControls c = buildAveragingMenu(parent);
+	m_avgSection = c.section;
+	m_avgSpin = c.sizeSpin;
 
-	QLabel *avgLabel = new QLabel("Size", this);
-	Style::setStyle(avgLabel, style::properties::label::subtle);
-	QSpinBox *avgSpinBox = new QSpinBox(this);
-	avgSpinBox->setRange(2, 1000);
-	avgSpinBox->setValue(2);
-
-	layout->addWidget(avgLabel);
-	layout->addWidget(avgSpinBox);
-
-	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		auto ch = dynamic_cast<FFTChannel *>(m_grtch);
 		if(ch) {
-			int size = b ? avgSpinBox->value() : 1;
+			int size = b ? c.sizeSpin->value() : 1;
 			ch->setAveragingSize(size);
 		}
 	});
 
-	connect(avgSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value) {
+	connect(c.sizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value) {
 		auto ch = dynamic_cast<FFTChannel *>(m_grtch);
 		if(ch) {
 			ch->setAveragingSize(value);
 		}
 	});
 
-	section->contentLayout()->addLayout(layout);
-	section->setCollapsed(true);
-	return section;
+	return c.section;
 }
 
 QWidget *GRFFTChannelComponent::createMinMaxHoldMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
-		"MIN/MAX HOLD", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
-
-	auto layout = new QVBoxLayout();
-	layout->setSpacing(5);
-	layout->setMargin(0);
-	int btnSize = Style::getDimension(json::global::unit_2);
-
-	// Min hold row
-	auto minLayout = new QHBoxLayout();
-	minLayout->setSpacing(10);
-	minLayout->setMargin(0);
-	QLabel *minHoldLabel(new QLabel("Min curve"));
-	Style::setStyle(minHoldLabel, style::properties::label::subtle);
-	SmallOnOffSwitch *minHoldSwitch = new SmallOnOffSwitch(section);
-	QPushButton *minResetBtn = new QPushButton("Reset", section);
-	minResetBtn->setIcon(
-		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
-	minResetBtn->setFixedHeight(btnSize);
-	minResetBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	Style::setStyle(minResetBtn, style::properties::button::grayButton);
-	minLayout->addWidget(minHoldLabel);
-	minLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
-	minLayout->addWidget(minResetBtn);
-	minLayout->addWidget(minHoldSwitch);
-
-	// Max hold row
-	auto maxLayout = new QHBoxLayout();
-	maxLayout->setSpacing(10);
-	maxLayout->setMargin(0);
-	QLabel *maxHoldLabel(new QLabel("Max curve"));
-	Style::setStyle(maxHoldLabel, style::properties::label::subtle);
-	SmallOnOffSwitch *maxHoldSwitch = new SmallOnOffSwitch(section);
-	QPushButton *maxResetBtn = new QPushButton("Reset", section);
-	maxResetBtn->setIcon(
-		Style::getPixmap(":/gui/icons/refresh.svg", Style::getColor(json::theme::content_inverse)));
-	maxResetBtn->setFixedHeight(btnSize);
-	maxResetBtn->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	Style::setStyle(maxResetBtn, style::properties::button::grayButton);
-	maxLayout->addWidget(maxHoldLabel);
-	maxLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
-	maxLayout->addWidget(maxResetBtn);
-	maxLayout->addWidget(maxHoldSwitch);
+	MinMaxHoldMenuControls c = buildMinMaxHoldMenu(parent);
+	m_minMaxSection = c.section;
+	m_minHoldSwitch = c.minSwitch;
+	m_maxHoldSwitch = c.maxSwitch;
 
 	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
-	connect(section->collapseSection()->header(), &QAbstractButton::toggled, controller,
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, controller,
 		&MinMaxHoldController::setEnabled);
-	connect(minHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMinEnabled);
-	connect(maxHoldSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMaxEnabled);
-	connect(minResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMin);
-	connect(maxResetBtn, &QPushButton::clicked, controller, &MinMaxHoldController::resetMax);
+	connect(c.minSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMinEnabled);
+	connect(c.maxSwitch, &QCheckBox::toggled, controller, &MinMaxHoldController::setMaxEnabled);
+	connect(c.minReset, &QPushButton::clicked, controller, &MinMaxHoldController::resetMin);
+	connect(c.maxReset, &QPushButton::clicked, controller, &MinMaxHoldController::resetMax);
 
-	layout->addLayout(minLayout);
-	layout->addLayout(maxLayout);
-
-	section->contentLayout()->addLayout(layout);
-	section->setCollapsed(true);
-	return section;
+	return c.section;
 }
 
 QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget("MARKER", MenuCollapseSection::MHCW_ONOFF,
-									   MenuCollapseSection::MHW_BASEWIDGET, parent);
+	MarkerMenuControls c = buildMarkerMenu(parent, m_complex);
+	m_markerSection = c.section;
+	m_markerCombo = c.typeCombo;
+	m_markerCntSpin = c.countSpin;
 
-	auto layout = new QVBoxLayout();
-	layout->setSpacing(10);
-	layout->setMargin(0);
-
-	MenuCombo *markerCb = new MenuCombo("Marker Type", section);
-	markerCb->combo()->addItem("Peak", PlotMarkerController::MC_PEAK);
-	markerCb->combo()->addItem("Fixed", PlotMarkerController::MC_FIXED);
-	markerCb->combo()->addItem("Single Tone", PlotMarkerController::MC_SINGLETONE);
-	if(m_complex) {
-		markerCb->combo()->addItem("Image", PlotMarkerController::MC_IMAGE);
-	}
-
-	markerCb->combo()->setCurrentIndex(0);
-
-	MenuOnOffSwitch *fixedMarkerEditBtn = new MenuOnOffSwitch("Marker editable", section);
+	MenuOnOffSwitch *fixedMarkerEditBtn = c.fixedEditSwitch;
 	connect(fixedMarkerEditBtn->onOffswitch(), &QAbstractButton::toggled, this,
 		[=](bool b) { m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(b); });
-	fixedMarkerEditBtn->onOffswitch()->setChecked(true);
-	fixedMarkerEditBtn->setVisible(false);
 
-	MenuSpinbox *markerCnt = new MenuSpinbox("Marker count", 5, "markers", 0, 9, true, false, section);
-	markerCnt->setIncrementMode(MenuSpinbox::IS_FIXED);
-	markerCnt->setScaleRange(1, 10);
-	markerCnt->setValue(5);
-
-	connect(markerCnt, &MenuSpinbox::valueChanged, this, [=](double cnt) {
+	connect(c.countSpin, &MenuSpinbox::valueChanged, this, [=](double cnt) {
 		m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt);
 		m_fftPlotComponentChannel->markerController()->computeMarkers();
 	});
 
-	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
 		if(b) {
 			auto markerType = static_cast<PlotMarkerController::MarkerTypes>(
-				markerCb->combo()->currentData().toInt());
+				c.typeCombo->combo()->currentData().toInt());
 			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
 				markerType == PlotMarkerController::MC_FIXED &&
 				fixedMarkerEditBtn->onOffswitch()->isChecked());
@@ -401,30 +326,23 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 		}
 	});
 
-	connect(markerCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(c.typeCombo->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
 		auto markerType =
-			static_cast<PlotMarkerController::MarkerTypes>(markerCb->combo()->currentData().toInt());
+			static_cast<PlotMarkerController::MarkerTypes>(c.typeCombo->combo()->currentData().toInt());
 		if(markerType == PlotMarkerController::MC_SINGLETONE) {
-			markerCnt->setMinValue(2);
-			if(markerCnt->value() < 2)
-				markerCnt->setValue(2);
+			c.countSpin->setMinValue(2);
+			if(c.countSpin->value() < 2)
+				c.countSpin->setValue(2);
 		} else {
-			markerCnt->setMinValue(0);
+			c.countSpin->setMinValue(0);
 		}
 		m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
 			markerType == PlotMarkerController::MC_FIXED && fixedMarkerEditBtn->onOffswitch()->isChecked());
 		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
-		fixedMarkerEditBtn->setVisible(markerCb->combo()->currentData().toInt() ==
-					       PlotMarkerController::MC_FIXED);
+		fixedMarkerEditBtn->setVisible(markerType == PlotMarkerController::MC_FIXED);
 	});
 
-	layout->addWidget(markerCb);
-	layout->addWidget(markerCnt);
-	layout->addWidget(fixedMarkerEditBtn);
-
-	section->contentLayout()->addLayout(layout);
-	section->setCollapsed(true);
-	return section;
+	return c.section;
 }
 
 QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title, QWidget *parent)
@@ -627,3 +545,40 @@ void GRFFTChannelComponent::setGenalyzerConfig(const scopy::grutil::GenalyzerCon
 		static_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setGenalyzerConfig(config);
 	}
 }
+
+// Device-level broadcast slots: drive local widgets so existing per-channel
+// signal wiring performs the actual work and the UI stays in sync.
+void GRFFTChannelComponent::applyMarkerEnabled(bool en)
+{
+	m_markerSection->collapseSection()->header()->setChecked(en);
+}
+
+void GRFFTChannelComponent::applyMarkerType(int type)
+{
+	int idx = m_markerCombo->combo()->findData(type);
+	if(idx >= 0) {
+		m_markerCombo->combo()->setCurrentIndex(idx);
+	}
+}
+
+void GRFFTChannelComponent::applyMarkerCount(int cnt) { m_markerCntSpin->setValue(cnt); }
+
+void GRFFTChannelComponent::applyAveragingEnabled(bool en)
+{
+	m_avgSection->collapseSection()->header()->setChecked(en);
+}
+
+void GRFFTChannelComponent::applyAveragingSize(int size) { m_avgSpin->setValue(size); }
+
+void GRFFTChannelComponent::applyMinMaxHoldEnabled(bool en)
+{
+	m_minMaxSection->collapseSection()->header()->setChecked(en);
+}
+
+void GRFFTChannelComponent::applyMinHoldEnabled(bool en) { m_minHoldSwitch->setChecked(en); }
+
+void GRFFTChannelComponent::applyMaxHoldEnabled(bool en) { m_maxHoldSwitch->setChecked(en); }
+
+void GRFFTChannelComponent::resetMinHold() { m_fftPlotComponentChannel->minMaxHoldController()->resetMin(); }
+
+void GRFFTChannelComponent::resetMaxHold() { m_fftPlotComponentChannel->minMaxHoldController()->resetMax(); }
