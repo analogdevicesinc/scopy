@@ -46,7 +46,8 @@ public:
 	bool isDds() const;
 
 	void enableDds(bool enable);
-	void enableBuffer(bool enabled);
+	void disableBuffer();
+	void enableBuffer();
 
 	QMap<QString, TxNode *> getBufferTxs() const;
 	QMap<QString, TxNode *> getDdsTxs() const;
@@ -96,7 +97,6 @@ private:
 	bool m_repeatFileBuffer;
 	int m_decimation;
 
-	bool m_activeDds;
 	bool m_activeBuffer;
 
 	const QString toneId = "altvoltage";
