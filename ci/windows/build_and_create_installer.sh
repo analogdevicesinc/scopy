@@ -131,13 +131,12 @@ deploy_app(){
 	cp -v $QT/bin/Qt6OpenGLWidgets.dll $DEST_FOLDER/
 	cp -v $QT/bin/Qt6Qml.dll $DEST_FOLDER/
 	cp -v $QT/bin/Qt6Xml.dll $DEST_FOLDER/
-	cp -v $QT/bin/Qt63DCore.dll $DEST_FOLDER/
-	cp -v $QT/bin/Qt63DExtras.dll $DEST_FOLDER/
-	cp -v $QT/bin/Qt63DRender.dll $DEST_FOLDER/
-	cp -v $QT/bin/Qt63DInput.dll $DEST_FOLDER/
 
 	cp -vr $INSTALL_FOLDER/lib/libscopy*.dll $DEST_FOLDER
 	cp -vr $INSTALL_FOLDER/lib/scopy/* $DEST_FOLDER
+
+	# Run windeployqt on plugin DLLs to resolve transitive Qt deps not covered by Scopy.exe
+	find $DEST_FOLDER/packages -name "*.dll" -exec $QT/bin/windeployqt6.exe --dir $DEST_FOLDER --no-translations {} +
 	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
 	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
