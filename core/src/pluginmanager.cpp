@@ -190,6 +190,7 @@ Plugin *PluginManager::loadPlugin(QString file)
 	}
 
 	qp.setFileName(file);
+	qInfo(CAT_PLUGINMANAGER) << "Loading plugin library:" << file;
 	ret = qp.load();
 	if(!ret) {
 		errorMsg = "Cannot load library " + qp.fileName() + "- err: " + qp.errorString();

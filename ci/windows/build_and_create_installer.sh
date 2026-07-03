@@ -135,8 +135,12 @@ deploy_app(){
 	cp -vr $INSTALL_FOLDER/lib/libscopy*.dll $DEST_FOLDER
 	cp -vr $INSTALL_FOLDER/lib/scopy/* $DEST_FOLDER
 
-	# Run windeployqt on plugin DLLs to resolve transitive Qt deps not covered by Scopy.exe
-	find $DEST_FOLDER/packages -name "*.dll" -exec $QT/bin/windeployqt6.exe --dir $DEST_FOLDER --no-translations {} +
+	# Run windeployqt on plugin DLLs to resolve transitive Qt deps not covered by Scopy.exe.
+	# --no-compiler-runtime: do NOT let windeployqt deposit Qt's bundled compiler runtime
+	# (libwinpthread/libstdc++/libgcc). The correct /mingw64 runtime is copied later via
+	# mingw_dll_deps; a Qt-bundled libwinpthread here lacks nanosleep64 and breaks gnuradio
+	# plugins (e.g. adc) with "The specified procedure could not be found".
+	find $DEST_FOLDER/packages -name "*.dll" -exec $QT/bin/windeployqt6.exe --dir $DEST_FOLDER --no-translations --no-compiler-runtime {} +
 	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
 	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
