@@ -22,6 +22,11 @@
 #include "pluginrepository.h"
 #include <pkg-manager/pkgmanager.h>
 
+#ifdef Q_OS_WINDOWS
+#include <windows.h>
+#include <Winbase.h>
+#endif
+
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
@@ -92,11 +97,13 @@ void PluginRepository::_init(QString location)
 	}
 
 #ifdef Q_OS_WINDOWS
-	// QPluginLoader uses LoadLibraryExW with LOAD_WITH_ALTERED_SEARCH_PATH, which ignores
-	// SetDllDirectory. Prepend the exe directory to PATH so transitive dependencies of
-	// plugin DLLs (e.g. Qt63DCore.dll) are resolved from there.
-	QString exeDir = QDir::toNativeSeparators(QApplication::applicationDirPath());
-	qputenv("PATH", (exeDir + ";" + qEnvironmentVariable("PATH")).toLocal8Bit());
+	bool b = SetDllDirectoryA(QApplication::applicationDirPath().toStdString().c_str());
+	if(!b) {
+		DWORD error = ::GetLastError();
+		std::string message = std::system_category().message(error);
+		qWarning(CAT_PLUGINREPOSTIORY)
+			<< "cannot add .exe folder to library search path - " << QString::fromStdString(message);
+	}
 #endif
 
 	pm->clear();
