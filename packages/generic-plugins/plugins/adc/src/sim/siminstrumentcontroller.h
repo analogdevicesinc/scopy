@@ -62,6 +62,8 @@ private Q_SLOTS:
 	void onCycleComplete();
 
 private:
+	void refreshPlotAxis();
+
 	ToolMenuEntry *m_tme;
 
 	scopy::acq::DataStore              *m_store{nullptr};
@@ -83,9 +85,11 @@ private:
 	PlotChannel *m_curve{nullptr};
 	PlotChannel *m_curve2{nullptr};
 
-	// Shared index buffer (0..n-1) used when X, Y, or Y2 is set to "Sample Index".
-	// Rebuilt whenever the acquisition buffer size changes.
+	// Shared index buffer (0..plotSize-1) used when X, Y, or Y2 is set to "Sample Index".
+	// Rebuilt whenever plot size changes.
 	QVector<float> m_indexBuf;
+
+	int m_plotSize{1024};
 
 	// Tracks the last seen key set so onCycleComplete() can refresh combos only on change.
 	QList<scopy::acq::DataKey> m_lastKeys;
