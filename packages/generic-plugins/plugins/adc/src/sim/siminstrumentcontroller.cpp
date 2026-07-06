@@ -47,6 +47,7 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	m_engine = new scopy::acq::AcquisitionEngine(m_store, this);
 	m_engine->setBufferSize(1024);
 	m_engine->setMaxFPS(30);
+	m_plotSize = 1024;
 
 	// ---- Sources ----
 	m_src = new scopy::adc::sim::SimulatedSource("sim-adc", m_engine);
@@ -216,12 +217,26 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		m_autoscalerX, &scopy::gui::PlotAutoscaler::stop);
 
 	// ---- Wire UI buttons → engine ----
-	connect(m_ui, &SimInstrument::requestRun,  m_engine, &scopy::acq::AcquisitionEngine::run);
+	connect(m_ui, &SimInstrument::requestRun, this, [this]() {
+		if(m_store) m_store->clear();
+		refreshPlotAxis();
+		m_engine->run();
+	});
 	connect(m_ui, &SimInstrument::requestStop, m_engine, &scopy::acq::AcquisitionEngine::stop);
-	connect(m_ui, &SimInstrument::requestSingle, this, [this]() { m_engine->single(1); });
+	connect(m_ui, &SimInstrument::requestSingle, this, [this]() {
+		if(m_store) m_store->clear();
+		refreshPlotAxis();
+		const std::size_t n = scopy::acq::DataStore::requiredHistoryDepth(
+			static_cast<std::size_t>(m_plotSize), m_engine->bufferSize());
+		m_engine->single(static_cast<unsigned int>(n));
+	});
 
 	connect(m_ui, &SimInstrument::sampleSizeChanged, this, [this](int n) {
 		m_engine->setBufferSize(static_cast<std::size_t>(n));
+	});
+	connect(m_ui, &SimInstrument::plotSizeChanged, this, [this](int n) {
+		m_plotSize = std::max(1, n);
+		refreshPlotAxis();
 	});
 	connect(m_ui, &SimInstrument::maxFpsChanged, this, [this](int fps) {
 		m_engine->setMaxFPS(static_cast<unsigned int>(fps));
@@ -339,6 +354,8 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		if(!m_fftWaterfallKey.key.isEmpty())
 			m_store->setHistorySize(m_fftWaterfallKey, static_cast<std::size_t>(rows));
 	});
+
+	refreshPlotAxis();
 }
 
 void SimInstrumentController::stop()
@@ -357,6 +374,19 @@ void SimInstrumentController::stop()
 SimInstrument *SimInstrumentController::ui() const
 {
 	return m_ui;
+}
+
+void SimInstrumentController::refreshPlotAxis()
+{
+	if(!m_ui)
+		return;
+
+	if(m_indexBuf.size() != m_plotSize) {
+		m_indexBuf.resize(m_plotSize);
+		std::iota(m_indexBuf.begin(), m_indexBuf.end(), 0.0f);
+	}
+
+	m_ui->m_plot->xAxis()->setInterval(0.0, static_cast<double>(m_plotSize - 1));
 }
 
 // Convert any SampleVariant type to QVector<float> so that non-float sources
@@ -419,55 +449,37 @@ void SimInstrumentController::onCycleComplete()
 	QVector<float> xVec, yVec, y2Vec, x2Vec;
 
 	if(!xIsIndex) {
-		const scopy::acq::SampleBuffer xBuf = m_store->read(scopy::acq::DataKey(xKeyStr));
-		if(xBuf.empty()) return;
-		xVec = toFloatVec(xBuf.sample(0));
+		xVec = m_store->readWindow(scopy::acq::DataKey(xKeyStr), m_plotSize);
 		if(xVec.isEmpty()) return;
 	}
-
 	if(!yIsIndex) {
-		const scopy::acq::SampleBuffer yBuf = m_store->read(scopy::acq::DataKey(yKeyStr));
-		if(yBuf.empty()) return;
-		yVec = toFloatVec(yBuf.sample(0));
+		yVec = m_store->readWindow(scopy::acq::DataKey(yKeyStr), m_plotSize);
 		if(yVec.isEmpty()) return;
 	}
+	if(!y2IsIndex)
+		y2Vec = m_store->readWindow(scopy::acq::DataKey(y2KeyStr), m_plotSize);
+	if(!x2IsIndex)
+		x2Vec = m_store->readWindow(scopy::acq::DataKey(x2KeyStr), m_plotSize);
 
-	if(!y2IsIndex) {
-		const scopy::acq::SampleBuffer y2Buf = m_store->read(scopy::acq::DataKey(y2KeyStr));
-		if(!y2Buf.empty())
-			y2Vec = toFloatVec(y2Buf.sample(0));
-	}
-
-	if(!x2IsIndex) {
-		const scopy::acq::SampleBuffer x2Buf = m_store->read(scopy::acq::DataKey(x2KeyStr));
-		if(!x2Buf.empty())
-			x2Vec = toFloatVec(x2Buf.sample(0));
-	}
-
-	// Determine primary sample count
-	int n = static_cast<int>(m_engine->bufferSize());
+	// Determine primary sample count (assembled, right-anchored)
+	int n;
 	if(!xIsIndex && !yIsIndex)
 		n = qMin(xVec.size(), yVec.size());
 	else if(!xIsIndex)
 		n = xVec.size();
 	else if(!yIsIndex)
 		n = yVec.size();
+	else
+		n = m_plotSize; // both sample-index — draw full plot span
 
 	if(n <= 0)
 		return;
 
-	// Rebuild shared index buffer if size changed
-	if(xIsIndex || yIsIndex || y2IsIndex || x2IsIndex) {
-		if(m_indexBuf.size() != n) {
-			m_indexBuf.resize(n);
-			std::iota(m_indexBuf.begin(), m_indexBuf.end(), 0.0f);
-		}
-		if(xIsIndex)
-			m_ui->m_plot->xAxis()->setInterval(0.0, static_cast<double>(n - 1));
-	}
-
-	const float *xPtr = xIsIndex ? m_indexBuf.data() : xVec.data();
-	const float *yPtr = yIsIndex ? m_indexBuf.data() : yVec.data();
+	// Sample-Index X: point into the tail of the static [0..plotSize-1] buffer
+	// so that the newest chunk lines up at the right edge of the plot.
+	const int   idxOffset = qMax(0, m_indexBuf.size() - n);
+	const float *xPtr = xIsIndex ? (m_indexBuf.data() + idxOffset) : xVec.data();
+	const float *yPtr = yIsIndex ? (m_indexBuf.data() + idxOffset) : yVec.data();
 
 	m_curve->setSamples(xPtr, yPtr, static_cast<size_t>(n), true);
 
@@ -476,7 +488,7 @@ void SimInstrumentController::onCycleComplete()
 		const float *y2Ptr;
 		int n2;
 		if(y2IsIndex) {
-			y2Ptr = m_indexBuf.data();
+			y2Ptr = m_indexBuf.data() + idxOffset;
 			n2    = n;
 		} else if(!y2Vec.isEmpty()) {
 			n2    = y2Vec.size();
@@ -488,14 +500,16 @@ void SimInstrumentController::onCycleComplete()
 
 		const float *x2Ptr;
 		if(x2IsIndex) {
-			x2Ptr = m_indexBuf.data();
-			n2    = qMin(n2, static_cast<int>(m_indexBuf.size()));
+			const int off2 = qMax(0, m_indexBuf.size() - n2);
+			x2Ptr = m_indexBuf.data() + off2;
+			n2    = qMin(n2, m_indexBuf.size() - off2);
 		} else if(!x2Vec.isEmpty()) {
 			n2    = qMin(n2, x2Vec.size());
 			x2Ptr = x2Vec.data();
 		} else {
-			x2Ptr = m_indexBuf.data();
-			n2    = qMin(n2, static_cast<int>(m_indexBuf.size()));
+			const int off2 = qMax(0, m_indexBuf.size() - n2);
+			x2Ptr = m_indexBuf.data() + off2;
+			n2    = qMin(n2, m_indexBuf.size() - off2);
 		}
 		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
 	}();
