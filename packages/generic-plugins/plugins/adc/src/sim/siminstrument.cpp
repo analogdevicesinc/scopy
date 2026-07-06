@@ -167,6 +167,14 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 	m_sampleSizeWidget = bufSpinBox;
 	engineLay->addWidget(bufSpinBox);
 
+	// Plot size
+	engineLay->addWidget(new QLabel("Plot size:"));
+	auto *plotSpinBox = new QSpinBox(engineGroup);
+	plotSpinBox->setRange(1, 10000000);
+	plotSpinBox->setValue(static_cast<int>(engine->bufferSize()));
+	m_plotSizeWidget = plotSpinBox;
+	engineLay->addWidget(plotSpinBox);
+
 	settingsLay->addWidget(engineGroup);
 
 	// Wire engine spinboxes
@@ -174,6 +182,8 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 		this, &SimInstrument::maxFpsChanged);
 	connect(bufSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
 		this, &SimInstrument::sampleSizeChanged);
+	connect(plotSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+		this, &SimInstrument::plotSizeChanged);
 	connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
 		this, &SimInstrument::acqModeChanged);
 
@@ -326,6 +336,8 @@ void SimInstrument::onStarted()
 		m_modeCombo->setEnabled(false);
 	if(m_sampleSizeWidget)
 		m_sampleSizeWidget->setEnabled(false);
+	if(m_plotSizeWidget)
+		m_plotSizeWidget->setEnabled(false);
 	m_singleBtn->setEnabled(false);
 }
 
@@ -342,6 +354,8 @@ void SimInstrument::onStopped()
 		m_modeCombo->setEnabled(true);
 	if(m_sampleSizeWidget)
 		m_sampleSizeWidget->setEnabled(true);
+	if(m_plotSizeWidget)
+		m_plotSizeWidget->setEnabled(true);
 	QSignalBlocker singleBlocker(m_singleBtn);
 	m_singleBtn->setChecked(false);
 	m_singleBtn->setEnabled(true);
