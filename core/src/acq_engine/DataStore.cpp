@@ -29,6 +29,14 @@ void DataStore::setHistorySize(const DataKey &key, std::size_t n)
 	m_data[key].setHistorySize(n);
 }
 
+void DataStore::ensureHistoryDepth(const DataKey &key, std::size_t depth)
+{
+	QMutexLocker lk(&m_mutex);
+	SampleBuffer &buf = m_data[key];
+	if(buf.historySize() < depth)
+		buf.setHistorySize(depth);
+}
+
 SampleBuffer DataStore::read(const DataKey &key) const
 {
 	QMutexLocker lk(&m_mutex);
@@ -36,6 +44,29 @@ SampleBuffer DataStore::read(const DataKey &key) const
 	if(it == m_data.end())
 		return SampleBuffer{};
 	return *it;
+}
+
+QVector<float> DataStore::readWindow(const DataKey &key, int plotSize)
+{
+	if(plotSize <= 0)
+		return {};
+
+	SampleBuffer snapshot;
+	{
+		QMutexLocker lk(&m_mutex);
+		auto it = m_data.find(key);
+		if(it == m_data.end())
+			return {};
+		const std::size_t chunkSize = it->size();
+		if(chunkSize > 0) {
+			const std::size_t need = requiredHistoryDepth(
+				static_cast<std::size_t>(plotSize), chunkSize);
+			if(it->historySize() < need)
+				it->setHistorySize(need);
+		}
+		snapshot = *it;
+	}
+	return assembleWindow(snapshot, plotSize);
 }
 
 bool DataStore::contains(const DataKey &key) const
@@ -76,6 +107,40 @@ QSet<DataKey> DataStore::cycleKeys() const
 {
 	QMutexLocker lk(&m_mutex);
 	return m_cycleKeys;
+}
+
+std::size_t DataStore::requiredHistoryDepth(std::size_t plotSize, std::size_t bufferSize)
+{
+	if(bufferSize == 0)
+		return 1;
+	const std::size_t d = (plotSize + bufferSize - 1) / bufferSize;
+	return d < 1 ? 1 : d;
+}
+
+QVector<float> DataStore::assembleWindow(const SampleBuffer &buf, int plotSize)
+{
+	QVector<float> out;
+	if(buf.empty() || plotSize <= 0)
+		return out;
+
+	const std::size_t depth = buf.depth();
+	for(std::size_t i = depth; i-- > 0;) {
+		std::visit(
+			[&out](const auto &vec) {
+				using VecT = std::decay_t<decltype(vec)>;
+				if constexpr(std::is_same_v<VecT, QVector<Annotation>>) {
+				} else {
+					out.reserve(out.size() + static_cast<int>(vec.size()));
+					for(const auto &s : vec)
+						out.append(static_cast<float>(s));
+				}
+			},
+			buf.sample(i));
+	}
+
+	if(out.size() > plotSize)
+		out = out.mid(out.size() - plotSize);
+	return out;
 }
 
 } // namespace acq

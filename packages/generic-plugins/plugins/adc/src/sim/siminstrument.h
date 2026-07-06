@@ -70,6 +70,7 @@ Q_SIGNALS:
 	void requestStop();
 	void requestSingle();
 	void sampleSizeChanged(int size);
+	void plotSizeChanged(int size);
 	void maxFpsChanged(int fps);
 	void acqModeChanged(int index); // 0 = Continuous, 1 = Triggered
 	void waterfallRowsChanged(int rows);
@@ -105,6 +106,7 @@ private:
 	// Engine controls kept so onStarted/onStopped can enable/disable them
 	QComboBox *m_modeCombo{nullptr};
 	QWidget   *m_sampleSizeWidget{nullptr}; // the QSpinBox for buffer size
+	QWidget   *m_plotSizeWidget{nullptr};   // the QSpinBox for plot size
 };
 
 } // namespace adc
