@@ -59,6 +59,9 @@
    * - general_scripting_enabled
      - Enable the use of Scripting Tool
      - When disabled, the Scripting Tool will not be accessible.
+   * - general_mcp_server_enabled
+     - Enable the MCP server
+     - When enabled, Scopy exposes a local MCP control socket for AI agents.
    * - autoconnect_previous
      - Auto-connect to previous session
      - Automatically use the saved URI to connect to previous devices,       if available, when the application starts. This speeds up the       connection process and reduces the number of necessary steps.
