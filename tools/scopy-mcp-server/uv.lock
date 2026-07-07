@@ -745,7 +745,7 @@ windows = [
 
 [package.metadata]
 requires-dist = [
-    { name = "mcp", extras = ["cli"], specifier = ">=1.2.0" },
+    { name = "mcp", extras = ["cli"], specifier = ">=1.10.0" },
     { name = "pywin32", marker = "extra == 'windows'", specifier = ">=306" },
 ]
 provides-extras = ["windows"]
