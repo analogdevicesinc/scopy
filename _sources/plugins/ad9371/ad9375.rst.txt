@@ -3,9 +3,6 @@
 AD9375
 ================================================================================
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The full AD9375 (ADRV9375) plugin tool view showing all sections including the DPD/CLGC/VSWR controls in the TX Chain
-
 General Description
 -------------------
 
@@ -20,11 +17,12 @@ as **ADRV9375** instead of AD9371 in the Scopy device panel.
 All features described in :ref:`ad9371` apply to the AD9375. This page documents only the
 additional capabilities specific to the AD9375.
 
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/ADRV9375.png
+    :align: center
+
 Additional TX Chain Features
 -----------------------------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The AD9375 TX Chain section highlighting the DPD, CLGC, and VSWR enable and tracking controls
 
 The AD9375 extends the transmit chain with three additional control groups visible below the
 standard TX attenuation and tracking controls.

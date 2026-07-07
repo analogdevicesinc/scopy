@@ -3,9 +3,6 @@
 AD9375 Advanced
 ================================================================================
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The full AD9375 Advanced plugin view showing all navigation tabs including the three AD9375-exclusive tabs: DPD, CLGC, and VSWR
-
 General Description
 -------------------
 
@@ -18,8 +15,8 @@ This page documents only the three additional tabs.
 DPD Setup
 ---------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The DPD Setup tab showing per-channel DPD model parameters, path delay, and status fields
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/ADRV9375%20Advanced_DPD%20Settings.png
+    :align: center
 
 The DPD Setup tab configures the Digital Pre-Distortion model parameters for each transmit
 channel. DPD linearizes the power amplifier by applying a pre-computed inverse distortion
@@ -52,8 +49,8 @@ function to the transmit signal.
 CLGC Setup
 ----------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The CLGC Setup tab showing desired gain fields, RMS measurement readbacks, and current gain status
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/ADRV9375%20Advanced_CLGC%20Settings.png
+    :align: center
 
 The CLGC Setup tab configures the Closed-Loop Gain Control parameters. CLGC measures the TX
 output power using the observation receiver and adjusts attenuation to maintain a specified
@@ -87,8 +84,8 @@ target gain.
 VSWR Setup
 ----------
 
-.. AN_IMAGE_WILL_BE_HERE
-   Screenshot: The VSWR Setup tab showing delay offset, forward and reflected gain fields, and ORx/TX measurement readbacks
+.. image:: https://raw.githubusercontent.com/analogdevicesinc/scopy/doc_resources/resources/ad9371/ADRV9375%20Advanced_VSWR%20Settings.png
+    :align: center
 
 The VSWR Setup tab configures the Voltage Standing Wave Ratio detection engine. VSWR detection
 compares the forward and reflected signal components at the antenna port using the observation
