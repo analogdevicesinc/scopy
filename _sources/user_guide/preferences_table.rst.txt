@@ -83,6 +83,12 @@
    * - debugger_v2_include_debugfs
      - Include debug attributes in IIO Explorer
      - Enable/disable the use of advanced debug attributes in the instrument.
+   * - dac_reset_dds_on_connect
+     - Reset DDS on connect
+     - Reset all DDS settings when connecting to the device.    Disable if another application is actively using the DDS.
+   * - dac_reset_dds_on_disconnect
+     - Reset DDS on disconnect
+     - Reset all DDS settings when disconnecting from the device.       Disable if another application needs the DDS to keep running.
    * - adc_plot_labels
      - Default state for plot labels
      - Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting 
