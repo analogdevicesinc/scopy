@@ -29,6 +29,7 @@
 #include <QtConcurrent>
 
 #include <common/common.h>
+#include <preferences.h>
 #include <iostream>
 #include <thread>
 #include <unistd.h>
@@ -82,7 +83,20 @@ void ScopyJS::init()
 		connect(notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 	}
 
-	initMcpServer();
+	if(Preferences::get("general_mcp_server_enabled").toBool()) {
+		initMcpServer();
+	}
+
+	Preferences *prefs = Preferences::GetInstance();
+	connect(prefs, &Preferences::preferenceChanged, this, [this](QString key, QVariant val) {
+		if(key == "general_mcp_server_enabled") {
+			if(val.toBool()) {
+				initMcpServer();
+			} else {
+				cleanupMcpServer();
+			}
+		}
+	});
 }
 
 void ScopyJS::returnToApplication()
