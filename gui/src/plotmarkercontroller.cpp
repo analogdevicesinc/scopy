@@ -254,12 +254,29 @@ void PlotMarkerController::setEnabled(bool newEnabled)
 }
 
 MarkerPanel::MarkerPanel(QWidget *parent)
+	: QWidget(parent)
 {
-	m_panelLayout = new QHBoxLayout(this);
+	QVBoxLayout *outerLay = new QVBoxLayout(this);
+	outerLay->setContentsMargins(0, 0, 0, 0);
+	outerLay->setSpacing(0);
+	setLayout(outerLay);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+
+	m_scrollArea = new QScrollArea(this);
+	m_scrollArea->setWidgetResizable(true);
+	m_scrollArea->setFrameShape(QFrame::NoFrame);
+	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+	m_panel = new QWidget(m_scrollArea);
+	m_panelLayout = new QHBoxLayout(m_panel);
 	m_panelLayout->setAlignment(Qt::AlignLeft);
 	m_panelLayout->setSpacing(0);
 	m_panelLayout->setContentsMargins(0, 0, 0, 0);
-	setLayout(m_panelLayout);
+	m_panel->setLayout(m_panelLayout);
+
+	m_scrollArea->setWidget(m_panel);
+	outerLay->addWidget(m_scrollArea);
 }
 
 MarkerPanel::~MarkerPanel() {}
@@ -269,7 +286,7 @@ void MarkerPanel::newChannel(QString name, QPen c)
 	if(m_map.contains(name)) {
 		deleteChannel(name);
 	}
-	QWidget *w = new MarkerLabel(name, c, this);
+	QWidget *w = new MarkerLabel(name, c, m_panel);
 	m_panelLayout->addWidget(w);
 	m_map[name] = w;
 }
