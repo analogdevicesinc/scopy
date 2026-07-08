@@ -38,7 +38,10 @@ struct DataKey
 		return QStringList(p.mid(2)).join("_");
 	}
 	QString firstStage() const { return parts().value(2); }
-	bool    isRaw()      const { return firstStage() == "raw"; }
+	// A key is "raw" if its final stage segment is "raw". Checking the
+	// suffix (rather than parts().value(2)) keeps this correct when the
+	// sourceId itself contains underscores, e.g. "m2k_logic".
+	bool    isRaw()      const { return key.endsWith(QStringLiteral("_raw")); }
 
 	bool operator<(const DataKey &o)  const noexcept { return key < o.key; }
 	bool operator==(const DataKey &o) const noexcept { return key == o.key; }
@@ -50,12 +53,12 @@ private:
 	QStringList parts() const { return key.split('_'); }
 };
 
-} // namespace acq
-} // namespace scopy
-
-inline uint qHash(const scopy::acq::DataKey &k, uint seed = 0) noexcept
+inline size_t qHash(const DataKey &k, size_t seed = 0) noexcept
 {
 	return qHash(k.key, seed);
 }
+
+} // namespace acq
+} // namespace scopy
 
 Q_DECLARE_METATYPE(scopy::acq::DataKey)

@@ -1,7 +1,11 @@
 #include "siminstrumentcontroller.h"
 
 #include "DecoderOverlay.h"
-#include <core/decoder/SigrokCliBackend.h>
+#include "DecoderManager.h"
+#include "DecoderPanel.h"
+
+#include <core/decoder/SigrokCliBackendFactory.h>
+#include <core/decoder/SigrokCliCatalog.h>
 
 #include <libm2k/digital/m2kdigital.hpp>
 
@@ -17,6 +21,8 @@
 
 #include <gui/plotaxis.h>
 #include <gui/plotchannel.h>
+#include <gui/style.h>
+#include <gui/style_attributes.h>
 #include <gui/widgets/cursorsettings.h>
 #include <gui/widgets/genalyzerpanel.h>
 #include <gui/widgets/plotinfowidgets.h>
@@ -79,27 +85,6 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		for(int ch = 0; ch < scopy::adc::sim::M2kLogicSource::NR_CHANNELS; ++ch)
 			m_logicSrc->enableChannel(QString("DIO%1").arg(ch), true);
 		m_engine->addSource(m_logicSrc);
-
-		// ---- Hardcoded UART decoder demo on DIO0 ----
-		auto backend = std::make_unique<scopy::decoder::SigrokCliBackend>();
-		m_uartDecoder = new scopy::acq::ExternalDecoderProcessor(
-			"uart-decoder", std::move(backend), m_engine);
-
-		scopy::decoder::DecoderConfig cfg;
-		cfg.decoderId   = "uart";
-		cfg.sampleRate  = 1.0e6;
-		cfg.numChannels = 1;
-		cfg.channels    = {{"rx", 0}};
-		cfg.options     = {{"baudrate", "115200"}, {"parity", "none"}};
-
-		m_uartDecoder->setConfig(cfg);
-		m_uartDecoder->setOrderedRawKeys(
-			{scopy::acq::DataKey::raw("m2k_logic", "DIO0")});
-		m_uartDecoder->setOutputKey(
-			scopy::acq::DataKey::withStage("m2k_logic", "uart-decoder", "decoded"));
-		m_uartDecoder->setWatchedKeys(
-			{scopy::acq::DataKey::raw("m2k_logic", "DIO0")});
-		m_engine->addProcessor(m_uartDecoder);
 	}
 
 	// ---- Processor: scale + offset ----
@@ -124,11 +109,19 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// ---- UI ----
 	m_ui = new SimInstrument(nullptr);
 
-	// ---- Decoder overlay (after UI is built) ----
-	if(m_uartDecoder) {
-		m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
-		m_decoderOverlay->registerDecoder(m_uartDecoder);
-	}
+	// ---- Decoder plumbing (composition root) ----
+	// The controller picks the concrete catalog + backend factory here.
+	// DecoderManager and DecoderPanel are backend-agnostic — swap these
+	// two lines to plug in a different decoder backend (e.g. libsigrok,
+	// a bespoke CLI) and nothing else needs to change.
+	m_decoderCatalog        = std::make_unique<scopy::decoder::SigrokCliCatalog>();
+	m_decoderBackendFactory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>();
+
+	m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
+	m_decoderMgr = new DecoderManager(m_engine, m_store,
+	                                  m_decoderBackendFactory.get(), this);
+	m_decoderMgr->setPlot(m_ui->m_plot);
+	m_decoderMgr->setOverlay(m_decoderOverlay);
 
 	// ---- Genalyzer analysis panel ----
 	m_genalyzerPanel = new scopy::GenalyzerPanel(m_ui);
@@ -347,6 +340,28 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	m_ui->buildControlPanel(m_engine, {curve1, curve2, wfDesc});
 
+	// ---- Decoders panel (right stack) ----
+	m_decoderPanel = new DecoderPanel(m_decoderMgr, m_store,
+	                                  m_decoderCatalog.get(), m_ui);
+	m_ui->registerDecoderPanel(m_decoderPanel);
+
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started, m_decoderPanel,
+		[this]() { m_decoderPanel->setEngineRunning(true); });
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped, m_decoderPanel,
+		[this]() { m_decoderPanel->setEngineRunning(false); });
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, m_decoderPanel,
+		[this]() { m_decoderPanel->setEngineRunning(false); });
+
+	// Refresh the newly added editor's channel combos with the current
+	// DataStore key set — otherwise editors created before/between runs
+	// (i.e. before onCycleComplete has fired for the new key set) come up
+	// with empty channel dropdowns.
+	connect(m_decoderMgr, &scopy::adc::DecoderManager::decoderAdded, m_decoderPanel,
+		[this](const QString &) {
+			if(m_decoderPanel && m_store)
+				m_decoderPanel->refreshRawKeys(m_store->keys());
+		});
+
 	// Wire waterfall history spinbox → update widget + DataStore history depth.
 	connect(m_ui, &SimInstrument::waterfallRowsChanged, this, [this](int rows) {
 		m_currentWaterfallRows = rows;
@@ -387,6 +402,21 @@ void SimInstrumentController::refreshPlotAxis()
 	}
 
 	m_ui->m_plot->xAxis()->setInterval(0.0, static_cast<double>(m_plotSize - 1));
+}
+
+void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)
+{
+	if(!ch || ch->isEnabled() == driven)
+		return;
+	if(driven) {
+		ch->enable();
+		m_autoscalerX->addChannels(ch);
+		m_autoscalerY->addChannels(ch);
+	} else {
+		ch->disable();
+		m_autoscalerX->removeChannels(ch);
+		m_autoscalerY->removeChannels(ch);
+	}
 }
 
 // Convert any SampleVariant type to QVector<float> so that non-float sources
@@ -430,6 +460,8 @@ void SimInstrumentController::onCycleComplete()
 	if(currentKeys != m_lastKeys) {
 		m_lastKeys = currentKeys;
 		m_ui->updateCurveKeyCombos(currentKeys);
+		if(m_decoderPanel)
+			m_decoderPanel->refreshRawKeys(currentKeys);
 	}
 
 	// Refresh the DataStore inspector panel every cycle
@@ -441,6 +473,17 @@ void SimInstrumentController::onCycleComplete()
 	const QString x2KeyStr = m_ui->curveXKey(1);
 	const QString y2KeyStr = m_ui->curveYKey(1);
 
+	// Decoder overlays are shown only for the DataKeys currently selected
+	// as a curve's Y source. This lets the user "view" a decoder key just
+	// like a numeric one.
+	if(m_decoderOverlay) {
+		QList<scopy::acq::DataKey> selected;
+		for(const QString &s : {yKeyStr, y2KeyStr})
+			if(!s.isEmpty())
+				selected.append(scopy::acq::DataKey(s));
+		m_decoderOverlay->setVisibleKeys(selected);
+	}
+
 	const bool xIsIndex  = xKeyStr.isEmpty();
 	const bool yIsIndex  = yKeyStr.isEmpty();
 	const bool x2IsIndex = x2KeyStr.isEmpty();
@@ -448,18 +491,31 @@ void SimInstrumentController::onCycleComplete()
 
 	QVector<float> xVec, yVec, y2Vec, x2Vec;
 
-	if(!xIsIndex) {
+	if(!xIsIndex)
 		xVec = m_store->readWindow(scopy::acq::DataKey(xKeyStr), m_plotSize);
-		if(xVec.isEmpty()) return;
-	}
-	if(!yIsIndex) {
+	if(!yIsIndex)
 		yVec = m_store->readWindow(scopy::acq::DataKey(yKeyStr), m_plotSize);
-		if(yVec.isEmpty()) return;
-	}
 	if(!y2IsIndex)
 		y2Vec = m_store->readWindow(scopy::acq::DataKey(y2KeyStr), m_plotSize);
 	if(!x2IsIndex)
 		x2Vec = m_store->readWindow(scopy::acq::DataKey(x2KeyStr), m_plotSize);
+
+	if(m_decoderOverlay)
+		m_decoderOverlay->setSampleCount(static_cast<quint64>(m_plotSize));
+
+	// A curve is "driven" only if it has numeric samples this cycle. Keys
+	// that produce no numeric data (e.g. decoder annotation keys) return
+	// an empty QVector<float> from readWindow — for those we hide the
+	// curve and drop it from the autoscalers so it doesn't skew Y range.
+	const bool curve1Driven = (xIsIndex || !xVec.isEmpty()) &&
+				  (yIsIndex || !yVec.isEmpty());
+	const bool curve2Driven = (x2IsIndex || !x2Vec.isEmpty()) &&
+				  (y2IsIndex || !y2Vec.isEmpty());
+	setCurveDriven(m_curve,  curve1Driven);
+	setCurveDriven(m_curve2, curve2Driven);
+
+	if(!curve1Driven)
+		return;
 
 	// Determine primary sample count (assembled, right-anchored)
 	int n;
@@ -485,17 +541,17 @@ void SimInstrumentController::onCycleComplete()
 
 	// Curve 2
 	[&] {
+		if(!curve2Driven)
+			return;
+
 		const float *y2Ptr;
 		int n2;
 		if(y2IsIndex) {
 			y2Ptr = m_indexBuf.data() + idxOffset;
 			n2    = n;
-		} else if(!y2Vec.isEmpty()) {
+		} else {
 			n2    = y2Vec.size();
 			y2Ptr = y2Vec.data();
-		} else {
-			// Y2 key not yet in store — skip this cycle
-			return;
 		}
 
 		const float *x2Ptr;
@@ -503,13 +559,9 @@ void SimInstrumentController::onCycleComplete()
 			const int off2 = qMax(0, m_indexBuf.size() - n2);
 			x2Ptr = m_indexBuf.data() + off2;
 			n2    = qMin(n2, m_indexBuf.size() - off2);
-		} else if(!x2Vec.isEmpty()) {
+		} else {
 			n2    = qMin(n2, x2Vec.size());
 			x2Ptr = x2Vec.data();
-		} else {
-			const int off2 = qMax(0, m_indexBuf.size() - n2);
-			x2Ptr = m_indexBuf.data() + off2;
-			n2    = qMin(n2, m_indexBuf.size() - off2);
 		}
 		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
 	}();
