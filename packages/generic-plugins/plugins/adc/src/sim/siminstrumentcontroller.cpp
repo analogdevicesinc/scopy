@@ -17,6 +17,8 @@
 
 #include <gui/plotaxis.h>
 #include <gui/plotchannel.h>
+#include <gui/style.h>
+#include <gui/style_attributes.h>
 #include <gui/widgets/cursorsettings.h>
 #include <gui/widgets/genalyzerpanel.h>
 #include <gui/widgets/plotinfowidgets.h>
@@ -127,7 +129,14 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// ---- Decoder overlay (after UI is built) ----
 	if(m_uartDecoder) {
 		m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
-		m_decoderOverlay->registerDecoder(m_uartDecoder);
+
+		// Give the decoder its own PlotAxis (vertical band). The band sits
+		// just below the waveform range so annotations don't overlap traces.
+		QPen decoderPen(Style::getColor(json::theme::content_silent));
+		auto *decoderAxis = new PlotAxis(m_ui->m_plot->yAxis()->position(),
+						 m_ui->m_plot, decoderPen, this);
+		decoderAxis->setInterval(-1.2, -0.2);
+		m_decoderOverlay->registerDecoder(m_uartDecoder, decoderAxis);
 	}
 
 	// ---- Genalyzer analysis panel ----
@@ -389,6 +398,21 @@ void SimInstrumentController::refreshPlotAxis()
 	m_ui->m_plot->xAxis()->setInterval(0.0, static_cast<double>(m_plotSize - 1));
 }
 
+void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)
+{
+	if(!ch || ch->isEnabled() == driven)
+		return;
+	if(driven) {
+		ch->enable();
+		m_autoscalerX->addChannels(ch);
+		m_autoscalerY->addChannels(ch);
+	} else {
+		ch->disable();
+		m_autoscalerX->removeChannels(ch);
+		m_autoscalerY->removeChannels(ch);
+	}
+}
+
 // Convert any SampleVariant type to QVector<float> so that non-float sources
 // (e.g. M2kLogicSource which stores QVector<quint8>) can be plotted on the
 // same curves as float sources.
@@ -441,6 +465,17 @@ void SimInstrumentController::onCycleComplete()
 	const QString x2KeyStr = m_ui->curveXKey(1);
 	const QString y2KeyStr = m_ui->curveYKey(1);
 
+	// Decoder overlays are shown only for the DataKeys currently selected
+	// as a curve's Y source. This lets the user "view" a decoder key just
+	// like a numeric one.
+	if(m_decoderOverlay) {
+		QList<scopy::acq::DataKey> selected;
+		for(const QString &s : {yKeyStr, y2KeyStr})
+			if(!s.isEmpty())
+				selected.append(scopy::acq::DataKey(s));
+		m_decoderOverlay->setVisibleKeys(selected);
+	}
+
 	const bool xIsIndex  = xKeyStr.isEmpty();
 	const bool yIsIndex  = yKeyStr.isEmpty();
 	const bool x2IsIndex = x2KeyStr.isEmpty();
@@ -448,18 +483,28 @@ void SimInstrumentController::onCycleComplete()
 
 	QVector<float> xVec, yVec, y2Vec, x2Vec;
 
-	if(!xIsIndex) {
+	if(!xIsIndex)
 		xVec = m_store->readWindow(scopy::acq::DataKey(xKeyStr), m_plotSize);
-		if(xVec.isEmpty()) return;
-	}
-	if(!yIsIndex) {
+	if(!yIsIndex)
 		yVec = m_store->readWindow(scopy::acq::DataKey(yKeyStr), m_plotSize);
-		if(yVec.isEmpty()) return;
-	}
 	if(!y2IsIndex)
 		y2Vec = m_store->readWindow(scopy::acq::DataKey(y2KeyStr), m_plotSize);
 	if(!x2IsIndex)
 		x2Vec = m_store->readWindow(scopy::acq::DataKey(x2KeyStr), m_plotSize);
+
+	// A curve is "driven" only if it has numeric samples this cycle. Keys
+	// that produce no numeric data (e.g. decoder annotation keys) return
+	// an empty QVector<float> from readWindow — for those we hide the
+	// curve and drop it from the autoscalers so it doesn't skew Y range.
+	const bool curve1Driven = (xIsIndex || !xVec.isEmpty()) &&
+				  (yIsIndex || !yVec.isEmpty());
+	const bool curve2Driven = (x2IsIndex || !x2Vec.isEmpty()) &&
+				  (y2IsIndex || !y2Vec.isEmpty());
+	setCurveDriven(m_curve,  curve1Driven);
+	setCurveDriven(m_curve2, curve2Driven);
+
+	if(!curve1Driven)
+		return;
 
 	// Determine primary sample count (assembled, right-anchored)
 	int n;
@@ -485,17 +530,17 @@ void SimInstrumentController::onCycleComplete()
 
 	// Curve 2
 	[&] {
+		if(!curve2Driven)
+			return;
+
 		const float *y2Ptr;
 		int n2;
 		if(y2IsIndex) {
 			y2Ptr = m_indexBuf.data() + idxOffset;
 			n2    = n;
-		} else if(!y2Vec.isEmpty()) {
+		} else {
 			n2    = y2Vec.size();
 			y2Ptr = y2Vec.data();
-		} else {
-			// Y2 key not yet in store — skip this cycle
-			return;
 		}
 
 		const float *x2Ptr;
@@ -503,13 +548,9 @@ void SimInstrumentController::onCycleComplete()
 			const int off2 = qMax(0, m_indexBuf.size() - n2);
 			x2Ptr = m_indexBuf.data() + off2;
 			n2    = qMin(n2, m_indexBuf.size() - off2);
-		} else if(!x2Vec.isEmpty()) {
+		} else {
 			n2    = qMin(n2, x2Vec.size());
 			x2Ptr = x2Vec.data();
-		} else {
-			const int off2 = qMax(0, m_indexBuf.size() - n2);
-			x2Ptr = m_indexBuf.data() + off2;
-			n2    = qMin(n2, m_indexBuf.size() - off2);
 		}
 		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
 	}();
