@@ -1,6 +1,7 @@
 #ifndef SCOPY_ADC_DECODEROVERLAY_H
 #define SCOPY_ADC_DECODEROVERLAY_H
 
+#include <QHash>
 #include <QObject>
 #include <QPointer>
 
@@ -8,6 +9,8 @@
 
 namespace scopy {
 
+class AnnotationCurve;
+class PlotAxis;
 class PlotWidget;
 
 namespace acq {
@@ -17,9 +20,10 @@ class DataStore;
 
 namespace adc {
 
-// Subscribes to ExternalDecoderProcessor::cycleProduced, then reads the
-// produced annotations out of the DataStore and prints them. This is the
-// temporary debug-only consumer; plot drawing will be reintroduced later.
+// Subscribes to ExternalDecoderProcessor::cycleProduced, reads the produced
+// annotations from the DataStore and forwards them to an AnnotationCurve for
+// on-plot drawing. Each registered decoder gets its own PlotAxis (vertical
+// band) and its own AnnotationCurve instance.
 class DecoderOverlay : public QObject
 {
 	Q_OBJECT
@@ -28,9 +32,21 @@ public:
 		       QObject *parent = nullptr);
 	~DecoderOverlay() override;
 
-	void registerDecoder(scopy::acq::ExternalDecoderProcessor *proc);
+	// Register a decoder for drawing. The caller supplies the PlotAxis
+	// that defines the vertical band this decoder will occupy; a new
+	// AnnotationCurve is created, attached to the plot and stored here.
+	void registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
+			     PlotAxis *yAxis);
 
-	void clear() {}
+	// Show only the curves whose output DataKey is in `keys`; hide the rest.
+	// Pass an empty list to hide all.
+	void setVisibleKeys(const QList<scopy::acq::DataKey> &keys);
+
+	// Push a per-sample x-value lookup into every registered AnnotationCurve.
+	// Pass an empty vector to revert to sample-index mode (legacy behavior).
+	void setSampleXValues(const QVector<double> &xValues);
+
+	void clear();
 
 private Q_SLOTS:
 	void onCycleProduced(scopy::acq::DataKey outKey);
@@ -38,6 +54,9 @@ private Q_SLOTS:
 private:
 	QPointer<PlotWidget>            m_plot;
 	QPointer<scopy::acq::DataStore> m_store;
+
+	// Keyed by the decoder's output DataKey.
+	QHash<scopy::acq::DataKey, AnnotationCurve *> m_curves;
 };
 
 } // namespace adc

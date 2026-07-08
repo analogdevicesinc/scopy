@@ -64,6 +64,10 @@ private Q_SLOTS:
 private:
 	void refreshPlotAxis();
 
+	// Enable/disable a PlotChannel and add/remove it from the autoscalers
+	// atomically. Idempotent — no-op if the driven state hasn't changed.
+	void setCurveDriven(PlotChannel *ch, bool driven);
+
 	ToolMenuEntry *m_tme;
 
 	scopy::acq::DataStore              *m_store{nullptr};

@@ -50,12 +50,12 @@ private:
 	QStringList parts() const { return key.split('_'); }
 };
 
-} // namespace acq
-} // namespace scopy
-
-inline uint qHash(const scopy::acq::DataKey &k, uint seed = 0) noexcept
+inline size_t qHash(const DataKey &k, size_t seed = 0) noexcept
 {
 	return qHash(k.key, seed);
 }
+
+} // namespace acq
+} // namespace scopy
 
 Q_DECLARE_METATYPE(scopy::acq::DataKey)
