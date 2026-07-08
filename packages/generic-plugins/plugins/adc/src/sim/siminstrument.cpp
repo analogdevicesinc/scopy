@@ -64,6 +64,10 @@ void SimInstrument::setupUi()
 	m_datastoreBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_datastoreBtn, TTA_RIGHT);
 
+	m_decoderBtn = new QPushButton("Decoders", this);
+	m_decoderBtn->setCheckable(true);
+	m_tool->addWidgetToTopContainerHelper(m_decoderBtn, TTA_RIGHT);
+
 	// ---- central: oscilloscope + waterfall in a vertical splitter ----
 	m_plot = new PlotWidget(this);
 	m_waterfall = new WaterfallPlotWidget(this);
@@ -78,7 +82,7 @@ void SimInstrument::setupUi()
 
 	// ---- right panel: acquisition log ----
 	m_tool->rightContainer()->setVisible(true);
-	m_tool->setRightContainerWidth(240);
+	m_tool->setRightContainerWidth(500);
 
 	m_logView = new QTextEdit(this);
 	m_logView->setReadOnly(true);
@@ -110,14 +114,13 @@ void SimInstrument::setupUi()
 	});
 }
 
-void SimInstrument::wirePanelButton(QPushButton *btn, const QString &menuId,
-				    const QList<QPushButton *> &allBtns)
+void SimInstrument::wirePanelButton(QPushButton *btn, const QString &menuId)
 {
-	connect(btn, &QPushButton::toggled, this, [this, btn, menuId, allBtns](bool on) {
+	connect(btn, &QPushButton::toggled, this, [this, btn, menuId](bool on) {
 		m_tool->openRightContainerHelper(on);
 		if(on) {
-			for(QPushButton *other : allBtns) {
-				if(other != btn) {
+			for(QPushButton *other : std::as_const(m_panelBtns)) {
+				if(other != btn && other) {
 					QSignalBlocker b(other);
 					other->setChecked(false);
 				}
@@ -130,8 +133,10 @@ void SimInstrument::wirePanelButton(QPushButton *btn, const QString &menuId,
 void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 				      const QList<CurveDescriptor> &curves)
 {
-	// Collect all panel buttons for mutual exclusion wiring
-	QList<QPushButton *> panelBtns = {m_settingsBtn, m_cursorBtn, m_logBtn, m_datastoreBtn};
+	// Collect all panel buttons for mutual exclusion wiring. Stored as a
+	// member so registerDecoderPanel() can append the Decoders button
+	// after buildControlPanel() runs.
+	m_panelBtns = {m_settingsBtn, m_cursorBtn, m_logBtn, m_datastoreBtn};
 
 	// ---- Settings panel (scrollable, single right-side panel) ----
 	auto *settingsInner = new QWidget();
@@ -274,10 +279,18 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 	m_tool->rightStack()->add("settings-panel", settingsScroll);
 
 	// ---- Wire panel toggle buttons (mutual exclusion) ----
-	wirePanelButton(m_settingsBtn,  "settings-panel", panelBtns);
-	wirePanelButton(m_cursorBtn,    "cursor-config",  panelBtns);
-	wirePanelButton(m_logBtn,       "log-view",       panelBtns);
-	wirePanelButton(m_datastoreBtn, "datastore-view", panelBtns);
+	wirePanelButton(m_settingsBtn,  "settings-panel");
+	wirePanelButton(m_cursorBtn,    "cursor-config");
+	wirePanelButton(m_logBtn,       "log-view");
+	wirePanelButton(m_datastoreBtn, "datastore-view");
+}
+
+void SimInstrument::registerDecoderPanel(QWidget *panel)
+{
+	if(!panel) return;
+	m_tool->rightStack()->add("decoder-panel", panel);
+	m_panelBtns.append(m_decoderBtn);
+	wirePanelButton(m_decoderBtn, "decoder-panel");
 }
 
 QString SimInstrument::curveXKey(int i) const
@@ -418,6 +431,8 @@ void SimInstrument::refreshDatastoreView(scopy::acq::DataStore *store)
 		case scopy::acq::SampleType::Int16:   typeStr = "i16"; break;
 		case scopy::acq::SampleType::Int8:    typeStr = "i8";  break;
 		case scopy::acq::SampleType::UInt8:   typeStr = "u8";  break;
+		case acq::SampleType::Annotation:
+			break;
 		}
 
 		const QString samplesStr = QString::number(buf.size());
