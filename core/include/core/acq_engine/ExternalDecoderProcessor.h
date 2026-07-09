@@ -44,6 +44,12 @@ public:
 
 	double sampleRate() const { return m_cfg.sampleRate; }
 
+	// Window (in samples) the decoder should assemble from its ordered raw
+	// keys each cycle. Defaults to 0 which falls back to a single buffer
+	// chunk (legacy behavior).
+	void setWindowSize(int n) { m_windowSize = n; }
+	int  windowSize() const   { return m_windowSize; }
+
 	void process(DataStore *store) override;
 	void reset() override;
 
@@ -58,6 +64,7 @@ private:
 	QList<DataKey>                                   m_orderedRawKeys;
 	DataKey                                          m_outKey;
 	std::vector<uint8_t>                             m_packed; // reused across cycles
+	int                                              m_windowSize{0};
 };
 
 } // namespace acq

@@ -76,6 +76,9 @@ public:
 	                 const scopy::decoder::DecoderConfig &cfg,
 	                 const QList<scopy::acq::DataKey> &orderedRawKeys);
 
+	// Propagates to every existing and future ExternalDecoderProcessor.
+	void setDecoderWindowSize(int n);
+
 	const QList<DecoderInstance> &decoders() const { return m_decoders; }
 	DecoderInstance              *find(const QString &uid);
 	bool                          isEngineRunning() const;
@@ -84,6 +87,7 @@ Q_SIGNALS:
 	void decoderAdded(const QString &uid);
 	void decoderRemoved(const QString &uid);
 	void configApplied(const QString &uid);
+	void bandAllocated(scopy::PlotAxis *axis);
 
 private:
 	scopy::PlotAxis *allocateBand(); // stack downward under waveform axis
@@ -103,6 +107,10 @@ private:
 	// Vertical stacking cursor for annotation bands. Bands start at
 	// -0.2 and grow downward in ~1.0-tall steps.
 	double                          m_nextBandTop{-0.2};
+
+	// Window size (samples) applied to every ExternalDecoderProcessor.
+	// 0 = legacy single-chunk mode.
+	int                             m_windowSize{0};
 };
 
 } // namespace adc

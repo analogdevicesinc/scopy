@@ -68,6 +68,7 @@ scopy::PlotAxis *DecoderManager::allocateBand()
 	auto *axis = new scopy::PlotAxis(m_plot->yAxis()->position(),
 	                                 m_plot, pen, this);
 	axis->setInterval(bottom, top);
+	Q_EMIT bandAllocated(axis);
 	return axis;
 }
 
@@ -105,6 +106,7 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	cfg.sampleRate  = 1.0e6;
 	cfg.numChannels = 0;
 	proc->setConfig(cfg);
+	proc->setWindowSize(m_windowSize);
 
 	const scopy::acq::DataKey outKey =
 		scopy::acq::DataKey::withStage("decoder", uid, "annotations");
@@ -135,12 +137,8 @@ void DecoderManager::removeDecoder(const QString &uid)
 		if(m_decoders[i].uid != uid) continue;
 		DecoderInstance d = m_decoders.takeAt(i);
 		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
-		// NOTE: the axis and AnnotationCurve inside the overlay are
-		// intentionally leaked at removal time — DecoderOverlay does
-		// not expose an unregister API, and axes are children of the
-		// plot with no per-decoder tracking here. For the demo flow
-		// that's acceptable; a follow-up should add
-		// DecoderOverlay::unregisterDecoder(outKey).
+		if(m_overlay) m_overlay->unregisterDecoder(d.outKey);
+		if(m_store)   m_store->remove(d.outKey);
 		if(d.proc) d.proc->deleteLater();
 		Q_EMIT decoderRemoved(uid);
 		qCInfo(CAT_DECODER_MGR) << "removed decoder" << uid;
@@ -168,11 +166,29 @@ void DecoderManager::applyConfig(const QString &uid,
 	d->proc->setConfig(cfg);
 	d->proc->setOrderedRawKeys(orderedRawKeys);
 	d->proc->setWatchedKeys(orderedRawKeys);
+
+	if(m_store && m_windowSize > 0) {
+		// Ensure the decoder can stitch a full window regardless of
+		// what the display currently reads.
+		const std::size_t depth = scopy::acq::DataStore::requiredHistoryDepth(
+			static_cast<std::size_t>(m_windowSize),
+			m_engine ? m_engine->bufferSize() : 1);
+		for(const scopy::acq::DataKey &k : orderedRawKeys)
+			m_store->ensureHistoryDepth(k, depth);
+	}
+
 	qCInfo(CAT_DECODER_MGR)
 		<< "applied config to" << uid
 		<< "channels=" << orderedRawKeys.size()
 		<< "sampleRate=" << cfg.sampleRate;
 	Q_EMIT configApplied(uid);
+}
+
+void DecoderManager::setDecoderWindowSize(int n)
+{
+	m_windowSize = n;
+	for(const DecoderInstance &d : m_decoders)
+		if(d.proc) d.proc->setWindowSize(n);
 }
 
 } // namespace adc

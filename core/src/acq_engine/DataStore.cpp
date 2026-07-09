@@ -57,6 +57,12 @@ QVector<float> DataStore::readWindow(const DataKey &key, int plotSize)
 		auto it = m_data.find(key);
 		if(it == m_data.end())
 			return {};
+		// Annotation buffers carry no numeric samples; assembleWindow
+		// returns empty for them. Skip both the historySize mutation
+		// and the copy so decoder-output keys are never mutated by
+		// the display path.
+		if(it->type() == SampleType::Annotation)
+			return {};
 		const std::size_t chunkSize = it->size();
 		if(chunkSize > 0) {
 			const std::size_t need = requiredHistoryDepth(
@@ -67,6 +73,33 @@ QVector<float> DataStore::readWindow(const DataKey &key, int plotSize)
 		snapshot = *it;
 	}
 	return assembleWindow(snapshot, plotSize);
+}
+
+QVector<quint8> DataStore::readWindowU8(const DataKey &key, int windowSize) const
+{
+	if(windowSize <= 0)
+		return {};
+	SampleBuffer snapshot;
+	{
+		QMutexLocker lk(&m_mutex);
+		auto it = m_data.find(key);
+		if(it == m_data.end())
+			return {};
+		if(it->type() != SampleType::UInt8)
+			return {};
+		snapshot = *it;
+	}
+	QVector<quint8> out;
+	const std::size_t depth = snapshot.depth();
+	for(std::size_t i = depth; i-- > 0;) {
+		const auto &vec = std::get<QVector<quint8>>(snapshot.sample(i));
+		out.reserve(out.size() + static_cast<int>(vec.size()));
+		for(quint8 s : vec)
+			out.append(s);
+	}
+	if(out.size() > windowSize)
+		out = out.mid(out.size() - windowSize);
+	return out;
 }
 
 bool DataStore::contains(const DataKey &key) const
@@ -95,6 +128,18 @@ void DataStore::reset()
 {
 	QMutexLocker lk(&m_mutex);
 	m_data.clear();
+}
+
+void DataStore::remove(const DataKey &key)
+{
+	bool changed = false;
+	{
+		QMutexLocker lk(&m_mutex);
+		changed = (m_data.remove(key) > 0);
+		m_cycleKeys.remove(key);
+	}
+	if(changed)
+		emit keysChanged(keys());
 }
 
 void DataStore::beginCycle()

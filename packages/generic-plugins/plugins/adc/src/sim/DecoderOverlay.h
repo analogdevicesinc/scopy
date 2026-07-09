@@ -41,6 +41,11 @@ public:
 	void registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
 			     PlotAxis *yAxis);
 
+	// Remove the AnnotationCurve associated with the given decoder output
+	// key: detach from the plot, delete the curve and drop it from the
+	// internal map. Safe to call for unknown keys.
+	void unregisterDecoder(const scopy::acq::DataKey &outKey);
+
 	// Show only the curves whose output DataKey is in `keys`; hide the rest.
 	// Pass an empty list to hide all.
 	void setVisibleKeys(const QList<scopy::acq::DataKey> &keys);

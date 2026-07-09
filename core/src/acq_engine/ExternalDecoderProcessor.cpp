@@ -66,18 +66,24 @@ void ExternalDecoderProcessor::process(DataStore *store)
 	qsizetype minLen = std::numeric_limits<qsizetype>::max();
 	bool anyPopulated = false;
 	for(int i = 0; i < m_orderedRawKeys.size(); ++i) {
-		const SampleBuffer buf = store->read(m_orderedRawKeys[i]);
-		if(buf.empty()) continue;
-		const SampleVariant &v = buf.sample(0);
-		if(!std::holds_alternative<QVector<quint8>>(v)) {
-			report(AcquisitionError::Severity::Warning,
-			       QStringLiteral("process(): key %1 wrong variant index=%2")
-				       .arg(m_orderedRawKeys[i].key)
-				       .arg(v.index()));
-			continue;
+		QVector<quint8> vec;
+		if(m_windowSize > 0) {
+			vec = store->readWindowU8(m_orderedRawKeys[i], m_windowSize);
+		} else {
+			const SampleBuffer buf = store->read(m_orderedRawKeys[i]);
+			if(buf.empty()) continue;
+			const SampleVariant &v = buf.sample(0);
+			if(!std::holds_alternative<QVector<quint8>>(v)) {
+				report(AcquisitionError::Severity::Warning,
+				       QStringLiteral("process(): key %1 wrong variant index=%2")
+					       .arg(m_orderedRawKeys[i].key)
+					       .arg(v.index()));
+				continue;
+			}
+			vec = std::get<QVector<quint8>>(v);
 		}
-		bitVecs[i] = std::get<QVector<quint8>>(v);
-		if(bitVecs[i].isEmpty()) continue;
+		if(vec.isEmpty()) continue;
+		bitVecs[i] = std::move(vec);
 		minLen = std::min(minLen, bitVecs[i].size());
 		anyPopulated = true;
 	}
@@ -122,6 +128,25 @@ void ExternalDecoderProcessor::process(DataStore *store)
 		out.text        = QString::fromStdString(a.text);
 		out.severity    = a.severity;
 		annVec.append(out);
+	}
+
+	// Right-anchor annotation indices onto the plot window: the decoder's
+	// input was `minLen` samples aligned to the right edge of a
+	// `m_windowSize`-wide plot, so add the left-pad size to every index.
+	// The display expresses plot-x directly as sample index (xAxis is
+	// [0, plotSize-1], AnnotationCurve::sampleCount==0), so after this
+	// shift annotations align with the stitched digital samples.
+	if(m_windowSize > 0) {
+		const qint64 pad = static_cast<qint64>(m_windowSize)
+				 - static_cast<qint64>(minLen);
+		if(pad > 0) {
+			for(Annotation &a : annVec) {
+				a.startSample = static_cast<quint64>(
+					static_cast<qint64>(a.startSample) + pad);
+				a.endSample   = static_cast<quint64>(
+					static_cast<qint64>(a.endSample) + pad);
+			}
+		}
 	}
 
 	report(AcquisitionError::Severity::Info,

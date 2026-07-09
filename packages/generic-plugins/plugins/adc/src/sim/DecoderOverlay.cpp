@@ -63,6 +63,21 @@ void DecoderOverlay::registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
 		Qt::QueuedConnection);
 }
 
+void DecoderOverlay::unregisterDecoder(const scopy::acq::DataKey &outKey)
+{
+	auto it = m_curves.find(outKey);
+	if(it == m_curves.end())
+		return;
+	AnnotationCurve *curve = it.value();
+	m_curves.erase(it);
+	if(curve) {
+		curve->detach();
+		delete curve;
+	}
+	if(m_plot)
+		m_plot->replot();
+}
+
 void DecoderOverlay::setVisibleKeys(const QList<scopy::acq::DataKey> &keys)
 {
 	const QSet<scopy::acq::DataKey> selected(keys.begin(), keys.end());
