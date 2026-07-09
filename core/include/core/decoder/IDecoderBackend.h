@@ -70,11 +70,6 @@ public:
 	                    std::vector<AnnotationC> &out) = 0;
 
 	virtual std::string lastError() const = 0;
-
-	// Optional introspection (used by future settings panel).
-	virtual std::vector<std::string> supportedDecoders() const { return {}; }
-	virtual std::map<std::string, std::string>
-	decoderOptions(const std::string & /*decoderId*/) const { return {}; }
 };
 
 } // namespace decoder
