@@ -3,6 +3,7 @@
 #include "DecoderOverlay.h"
 #include "DecoderManager.h"
 #include "DecoderPanel.h"
+#include "plotnavigator.hpp"
 
 #include <core/decoder/SigrokCliBackendFactory.h>
 #include <core/decoder/SigrokCliCatalog.h>
@@ -122,6 +123,12 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	                                  m_decoderBackendFactory.get(), this);
 	m_decoderMgr->setPlot(m_ui->m_plot);
 	m_decoderMgr->setOverlay(m_decoderOverlay);
+	m_decoderMgr->setDecoderWindowSize(m_plotSize);
+	connect(m_decoderMgr, &DecoderManager::bandAllocated, this,
+		[this](scopy::PlotAxis *axis) {
+			if(auto *nav = m_ui->m_plot->navigator())
+				nav->addAxis(axis);
+		});
 
 	// ---- Genalyzer analysis panel ----
 	m_genalyzerPanel = new scopy::GenalyzerPanel(m_ui);
@@ -230,6 +237,8 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	connect(m_ui, &SimInstrument::plotSizeChanged, this, [this](int n) {
 		m_plotSize = std::max(1, n);
 		refreshPlotAxis();
+		if(m_decoderMgr)
+			m_decoderMgr->setDecoderWindowSize(m_plotSize);
 	});
 	connect(m_ui, &SimInstrument::maxFpsChanged, this, [this](int fps) {
 		m_engine->setMaxFPS(static_cast<unsigned int>(fps));
@@ -501,7 +510,7 @@ void SimInstrumentController::onCycleComplete()
 		x2Vec = m_store->readWindow(scopy::acq::DataKey(x2KeyStr), m_plotSize);
 
 	if(m_decoderOverlay)
-		m_decoderOverlay->setSampleCount(static_cast<quint64>(m_plotSize));
+		m_decoderOverlay->setSampleCount(0);
 
 	// A curve is "driven" only if it has numeric samples this cycle. Keys
 	// that produce no numeric data (e.g. decoder annotation keys) return

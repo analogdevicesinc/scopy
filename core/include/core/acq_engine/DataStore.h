@@ -25,10 +25,16 @@ public:
 	void           ensureHistoryDepth(const DataKey &key, std::size_t depth);
 	SampleBuffer   read(const DataKey &key) const;
 	QVector<float> readWindow(const DataKey &key, int plotSize);
+	// Same right-anchored, multi-chunk stitching as readWindow(), but
+	// preserves QVector<quint8> type (for digital / packed-bit sources).
+	// Does NOT mutate the target key's historySize — callers must ensure
+	// depth via ensureHistoryDepth().
+	QVector<quint8> readWindowU8(const DataKey &key, int windowSize) const;
 	bool           contains(const DataKey &key) const;
 	QList<DataKey> keys() const;
 	void clear();
 	void reset();
+	void remove(const DataKey &key);
 
 	void          beginCycle();
 	QSet<DataKey> cycleKeys() const;
