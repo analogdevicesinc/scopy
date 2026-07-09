@@ -59,6 +59,11 @@ public:
 	// Safe to call from the main thread at any time (e.g. on every cycleComplete).
 	void refreshDatastoreView(scopy::acq::DataStore *store);
 
+	// Install the decoder panel widget in the right stack and wire the
+	// "Decoders" toggle button into the mutual-exclusion group set up by
+	// buildControlPanel(). Must be called after buildControlPanel().
+	void registerDecoderPanel(QWidget *panel);
+
 public Q_SLOTS:
 	void onStarted();
 	void onStopped();
@@ -77,9 +82,10 @@ Q_SIGNALS:
 
 private:
 	void setupUi();
-	// Wire one panel toggle button so that activating it deactivates all others in the list.
-	void wirePanelButton(QPushButton *btn, const QString &menuId,
-			     const QList<QPushButton *> &allBtns);
+	// Wire one panel toggle button so that activating it deactivates all
+	// others currently in m_panelBtns. The set is consulted at click-time
+	// (not at wire-time), so panels registered later still participate.
+	void wirePanelButton(QPushButton *btn, const QString &menuId);
 
 	// Per-curve selectors created by buildControlPanel()
 	struct CurveSelectors
@@ -97,6 +103,7 @@ private:
 	QPushButton   *m_cursorBtn;
 	QPushButton   *m_logBtn;
 	QPushButton   *m_datastoreBtn;
+	QPushButton   *m_decoderBtn;
 	QTextEdit     *m_logView;
 	QTreeWidget   *m_datastoreTable;
 
@@ -107,6 +114,11 @@ private:
 	QComboBox *m_modeCombo{nullptr};
 	QWidget   *m_sampleSizeWidget{nullptr}; // the QSpinBox for buffer size
 	QWidget   *m_plotSizeWidget{nullptr};   // the QSpinBox for plot size
+
+	// Mutual-exclusion set for right-panel toggle buttons. Populated in
+	// buildControlPanel() and mutated by registerDecoderPanel() so panels
+	// added after the control panel is built still share the group.
+	QList<QPushButton *> m_panelBtns;
 };
 
 } // namespace adc

@@ -220,6 +220,68 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 	painter->restore();
 }
 
+const AnnotationSpan *AnnotationCurve::hitTest(const QPointF &canvasPos,
+					       const QwtScaleMap &xMap,
+					       const QwtScaleMap &yMap,
+					       const QRectF &canvasRect) const
+{
+	if(m_rows.isEmpty() || m_anns.isEmpty())
+		return nullptr;
+	if(!canvasRect.contains(canvasPos))
+		return nullptr;
+
+	const int nRows = m_rows.size();
+	const double yTopVal    = m_yAxis ? m_yAxis->max() : yMap.s2();
+	const double yBottomVal = m_yAxis ? m_yAxis->min() : yMap.s1();
+	const double bandTopPx    = yMap.transform(yTopVal);
+	const double bandBottomPx = yMap.transform(yBottomVal);
+	const double bandHeightPx = bandBottomPx - bandTopPx;
+	if(bandHeightPx <= 0)
+		return nullptr;
+
+	const double rowStrideHeightPx = bandHeightPx / nRows;
+	const double rowHeightPx       = std::min(
+		std::max(rowStrideHeightPx - kRowSpacingPx, 4.0), kMaxRowHeightPx);
+
+	// Find which row (if any) the y-coord falls into.
+	const double y = canvasPos.y();
+	if(y < bandTopPx || y > bandBottomPx)
+		return nullptr;
+
+	int rowIndex = -1;
+	for(int r = 0; r < nRows; ++r) {
+		const double rowCenterPx = bandTopPx + rowHeightPx * (r + 0.5);
+		const double topPx    = rowCenterPx - rowHeightPx / 2.0;
+		const double bottomPx = rowCenterPx + rowHeightPx / 2.0;
+		if(y >= topPx && y <= bottomPx) {
+			rowIndex = r;
+			break;
+		}
+	}
+	if(rowIndex < 0)
+		return nullptr;
+
+	const double x = canvasPos.x();
+	const Row &row = m_rows[rowIndex];
+
+	// Return the annotation whose pixel span contains x. For instant
+	// markers (start==end) accept a small radius around the point.
+	const double kInstantRadiusPx = std::max(3.0, rowHeightPx / 2.0);
+	for(int idx : row.indices) {
+		const AnnotationSpan &a = m_anns[idx];
+		const double aStartPx = xMap.transform(sampleToX(a.startSample, xMap));
+		const double aEndPx   = xMap.transform(sampleToX(a.endSample,   xMap));
+		if(a.startSample == a.endSample) {
+			if(std::abs(x - aStartPx) <= kInstantRadiusPx)
+				return &a;
+		} else {
+			if(x >= aStartPx && x <= aEndPx)
+				return &a;
+		}
+	}
+	return nullptr;
+}
+
 void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap,
 			      const QwtScaleMap & /*yMap*/,
 			      const QRectF &canvasRect, const Row &row,

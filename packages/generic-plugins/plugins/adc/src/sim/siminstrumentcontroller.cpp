@@ -1,7 +1,11 @@
 #include "siminstrumentcontroller.h"
 
 #include "DecoderOverlay.h"
-#include <core/decoder/SigrokCliBackend.h>
+#include "DecoderManager.h"
+#include "DecoderPanel.h"
+
+#include <core/decoder/SigrokCliBackendFactory.h>
+#include <core/decoder/SigrokCliCatalog.h>
 
 #include <libm2k/digital/m2kdigital.hpp>
 
@@ -81,27 +85,6 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		for(int ch = 0; ch < scopy::adc::sim::M2kLogicSource::NR_CHANNELS; ++ch)
 			m_logicSrc->enableChannel(QString("DIO%1").arg(ch), true);
 		m_engine->addSource(m_logicSrc);
-
-		// ---- Hardcoded UART decoder demo on DIO0 ----
-		auto backend = std::make_unique<scopy::decoder::SigrokCliBackend>();
-		m_uartDecoder = new scopy::acq::ExternalDecoderProcessor(
-			"uart-decoder", std::move(backend), m_engine);
-
-		scopy::decoder::DecoderConfig cfg;
-		cfg.decoderId   = "uart";
-		cfg.sampleRate  = 1.0e6;
-		cfg.numChannels = 1;
-		cfg.channels    = {{"rx", 0}};
-		cfg.options     = {{"baudrate", "115200"}, {"parity", "none"}};
-
-		m_uartDecoder->setConfig(cfg);
-		m_uartDecoder->setOrderedRawKeys(
-			{scopy::acq::DataKey::raw("m2k_logic", "DIO0")});
-		m_uartDecoder->setOutputKey(
-			scopy::acq::DataKey::withStage("m2k_logic", "uart-decoder", "decoded"));
-		m_uartDecoder->setWatchedKeys(
-			{scopy::acq::DataKey::raw("m2k_logic", "DIO0")});
-		m_engine->addProcessor(m_uartDecoder);
 	}
 
 	// ---- Processor: scale + offset ----
@@ -126,18 +109,19 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// ---- UI ----
 	m_ui = new SimInstrument(nullptr);
 
-	// ---- Decoder overlay (after UI is built) ----
-	if(m_uartDecoder) {
-		m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
+	// ---- Decoder plumbing (composition root) ----
+	// The controller picks the concrete catalog + backend factory here.
+	// DecoderManager and DecoderPanel are backend-agnostic — swap these
+	// two lines to plug in a different decoder backend (e.g. libsigrok,
+	// a bespoke CLI) and nothing else needs to change.
+	m_decoderCatalog        = std::make_unique<scopy::decoder::SigrokCliCatalog>();
+	m_decoderBackendFactory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>();
 
-		// Give the decoder its own PlotAxis (vertical band). The band sits
-		// just below the waveform range so annotations don't overlap traces.
-		QPen decoderPen(Style::getColor(json::theme::content_silent));
-		auto *decoderAxis = new PlotAxis(m_ui->m_plot->yAxis()->position(),
-						 m_ui->m_plot, decoderPen, this);
-		decoderAxis->setInterval(-1.2, -0.2);
-		m_decoderOverlay->registerDecoder(m_uartDecoder, decoderAxis);
-	}
+	m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
+	m_decoderMgr = new DecoderManager(m_engine, m_store,
+	                                  m_decoderBackendFactory.get(), this);
+	m_decoderMgr->setPlot(m_ui->m_plot);
+	m_decoderMgr->setOverlay(m_decoderOverlay);
 
 	// ---- Genalyzer analysis panel ----
 	m_genalyzerPanel = new scopy::GenalyzerPanel(m_ui);
@@ -356,6 +340,28 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	m_ui->buildControlPanel(m_engine, {curve1, curve2, wfDesc});
 
+	// ---- Decoders panel (right stack) ----
+	m_decoderPanel = new DecoderPanel(m_decoderMgr, m_store,
+	                                  m_decoderCatalog.get(), m_ui);
+	m_ui->registerDecoderPanel(m_decoderPanel);
+
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started, m_decoderPanel,
+		[this]() { m_decoderPanel->setEngineRunning(true); });
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped, m_decoderPanel,
+		[this]() { m_decoderPanel->setEngineRunning(false); });
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, m_decoderPanel,
+		[this]() { m_decoderPanel->setEngineRunning(false); });
+
+	// Refresh the newly added editor's channel combos with the current
+	// DataStore key set — otherwise editors created before/between runs
+	// (i.e. before onCycleComplete has fired for the new key set) come up
+	// with empty channel dropdowns.
+	connect(m_decoderMgr, &scopy::adc::DecoderManager::decoderAdded, m_decoderPanel,
+		[this](const QString &) {
+			if(m_decoderPanel && m_store)
+				m_decoderPanel->refreshRawKeys(m_store->keys());
+		});
+
 	// Wire waterfall history spinbox → update widget + DataStore history depth.
 	connect(m_ui, &SimInstrument::waterfallRowsChanged, this, [this](int rows) {
 		m_currentWaterfallRows = rows;
@@ -454,6 +460,8 @@ void SimInstrumentController::onCycleComplete()
 	if(currentKeys != m_lastKeys) {
 		m_lastKeys = currentKeys;
 		m_ui->updateCurveKeyCombos(currentKeys);
+		if(m_decoderPanel)
+			m_decoderPanel->refreshRawKeys(currentKeys);
 	}
 
 	// Refresh the DataStore inspector panel every cycle
