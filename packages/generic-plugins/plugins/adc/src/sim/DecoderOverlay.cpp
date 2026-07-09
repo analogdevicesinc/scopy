@@ -57,12 +57,12 @@ void DecoderOverlay::setVisibleKeys(const QList<scopy::acq::DataKey> &keys)
 		m_plot->replot();
 }
 
-void DecoderOverlay::setSampleXValues(const QVector<double> &xValues)
+void DecoderOverlay::setSampleCount(quint64 n)
 {
 	if(m_plot.isNull())
 		return;
 	for(AnnotationCurve *c : std::as_const(m_curves))
-		c->setSampleXValues(xValues);
+		c->setSampleCount(n);
 }
 
 void DecoderOverlay::clear()
