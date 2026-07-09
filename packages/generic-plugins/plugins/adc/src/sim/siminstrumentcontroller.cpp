@@ -115,8 +115,11 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// DecoderManager and DecoderPanel are backend-agnostic — swap these
 	// two lines to plug in a different decoder backend (e.g. libsigrok,
 	// a bespoke CLI) and nothing else needs to change.
-	m_decoderCatalog        = std::make_unique<scopy::decoder::SigrokCliCatalog>();
-	m_decoderBackendFactory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>();
+	auto catalog            = std::make_unique<scopy::decoder::SigrokCliCatalog>();
+	auto *catalogPtr        = catalog.get();
+	m_decoderCatalog        = std::move(catalog);
+	m_decoderBackendFactory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>(
+		catalogPtr);
 
 	m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
 	m_decoderMgr = new DecoderManager(m_engine, m_store,

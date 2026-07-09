@@ -4,31 +4,28 @@
 #include "IDecoderBackendFactory.h"
 #include "SigrokCliBackend.h"
 
-#include <QString>
-
 namespace scopy {
 namespace decoder {
 
+class SigrokCliCatalog;
+
 // IDecoderBackendFactory that hands out fresh SigrokCliBackend instances.
-// The optional executable override is forwarded to every created backend so
-// tests / demo wiring can pin a specific sigrok-cli path.
+// The catalog (non-owning) is threaded through to every created backend so
+// they all share the same executable resolution / cache / override.
 class SCOPY_CORE_EXPORT SigrokCliBackendFactory : public IDecoderBackendFactory
 {
 public:
-	SigrokCliBackendFactory() = default;
-
-	void setExecutableOverride(const QString &path) { m_exeOverride = path; }
+	explicit SigrokCliBackendFactory(SigrokCliCatalog *catalog)
+		: m_catalog(catalog)
+	{}
 
 	std::unique_ptr<IDecoderBackend> create() override
 	{
-		auto b = std::make_unique<SigrokCliBackend>();
-		if(!m_exeOverride.isEmpty())
-			b->setExecutableOverride(m_exeOverride);
-		return b;
+		return std::make_unique<SigrokCliBackend>(m_catalog);
 	}
 
 private:
-	QString m_exeOverride;
+	SigrokCliCatalog *m_catalog{nullptr};
 };
 
 } // namespace decoder

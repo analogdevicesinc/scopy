@@ -9,6 +9,8 @@
 namespace scopy {
 namespace decoder {
 
+class SigrokCliCatalog;
+
 // IDecoderBackend implementation that drives sigrok-cli as a one-shot
 // child process. Each decode() call:
 //   1. spawns sigrok-cli with the configured protocol decoder
@@ -21,12 +23,15 @@ namespace decoder {
 // No state is preserved across decode() calls. Annotation sample indices
 // are buffer-local (0 .. nSamples-1).
 //
+// The executable path is resolved by the catalog (non-owning), which
+// owns the override / cache. The catalog must outlive the backend.
+//
 // Threading: safe to call decode() from any single thread; no QObject
 // signals are emitted, so no event loop is required.
 class SCOPY_CORE_EXPORT SigrokCliBackend : public IDecoderBackend
 {
 public:
-	SigrokCliBackend();
+	explicit SigrokCliBackend(SigrokCliCatalog *catalog);
 	~SigrokCliBackend() override;
 
 	bool        decode(const DecoderConfig &cfg,
@@ -34,21 +39,16 @@ public:
 	                   std::vector<AnnotationC> &out) override;
 	std::string lastError() const override { return m_lastError; }
 
-	// Allows demo wiring / tests to override the CLI lookup.
-	void    setExecutableOverride(const QString &path);
 	QString lastCommandLine() const { return m_lastCmdLine; }
 
 private:
-	QString     findCli() const;
-	QString     resolveCli() const; // cached wrapper around findCli()
 	QStringList buildArgs(const DecoderConfig &cfg) const;
 	void        parseStdout(const QByteArray &buf,
 	                        std::vector<AnnotationC> &out) const;
 
-	std::string     m_lastError;
-	QString         m_exeOverride;
-	QString         m_lastCmdLine;
-	mutable QString m_cachedExe;
+	SigrokCliCatalog *m_catalog{nullptr};
+	std::string       m_lastError;
+	QString           m_lastCmdLine;
 };
 
 } // namespace decoder
