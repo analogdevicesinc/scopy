@@ -103,20 +103,23 @@ void AnnotationCurve::setClassColor(const QString &klass, const QColor &c)
 	itemChanged();
 }
 
-void AnnotationCurve::setSampleXValues(const QVector<double> &xValues)
+void AnnotationCurve::setSampleCount(quint64 n)
 {
-	m_sampleX = xValues;
+	if(m_sampleCount == n)
+		return;
+	m_sampleCount = n;
 	itemChanged();
 }
 
-double AnnotationCurve::sampleToX(quint64 sample) const
+double AnnotationCurve::sampleToX(quint64 sample, const QwtScaleMap &xMap) const
 {
-	if(m_sampleX.isEmpty())
+	if(m_sampleCount == 0)
 		return static_cast<double>(sample);
-	const qsizetype n = m_sampleX.size();
-	if(sample >= static_cast<quint64>(n))
-		return m_sampleX.last();
-	return m_sampleX[static_cast<qsizetype>(sample)];
+	const double s1 = xMap.s1();
+	const double s2 = xMap.s2();
+	const double frac = std::min(1.0,
+		static_cast<double>(sample) / static_cast<double>(m_sampleCount));
+	return s1 + frac * (s2 - s1);
 }
 
 QColor AnnotationCurve::colorFor(const QString &klass) const
@@ -263,8 +266,8 @@ void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap,
 	for(int idx : row.indices) {
 		const AnnotationSpan &a = m_anns[idx];
 
-		const double aStartPx = xMap.transform(sampleToX(a.startSample));
-		const double aEndPx   = xMap.transform(sampleToX(a.endSample));
+		const double aStartPx = xMap.transform(sampleToX(a.startSample, xMap));
+		const double aEndPx   = xMap.transform(sampleToX(a.endSample, xMap));
 		const double widthPx  = aEndPx - aStartPx;
 		const double deltaPx  = aEndPx - prevEndPx;
 
@@ -360,8 +363,8 @@ void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &an
 				     const QColor &color, const QwtScaleMap &xMap,
 				     double topPx, double bottomPx) const
 {
-	const double startPx = xMap.transform(sampleToX(ann.startSample));
-	const double endPx   = xMap.transform(sampleToX(ann.endSample));
+	const double startPx = xMap.transform(sampleToX(ann.startSample, xMap));
+	const double endPx   = xMap.transform(sampleToX(ann.endSample, xMap));
 	const double heightPx = bottomPx - topPx;
 	const double centerY  = (topPx + bottomPx) / 2.0;
 

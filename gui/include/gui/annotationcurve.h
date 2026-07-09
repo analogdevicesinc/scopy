@@ -70,13 +70,11 @@ public:
 	// HSL hash of the class string is used.
 	void setClassColor(const QString &klass, const QColor &c);
 
-	// Optional per-sample x-value lookup. If empty (default), annotation
-	// startSample/endSample are used directly as x-axis data values (i.e.
-	// the plot x-axis is assumed to be in sample-index units). If set,
-	// xValues[i] gives the x-axis data value at sample index i, and
-	// annotations are placed at xValues[startSample] .. xValues[endSample].
-	// Out-of-range indices are clamped to xValues.first()/xValues.last().
-	void setSampleXValues(const QVector<double> &xValues);
+	// Total number of samples the annotations index into. If > 0,
+	// annotations are laid out proportionally across the current plot
+	// x-axis interval (whatever it currently is). If 0, startSample/
+	// endSample are used verbatim as x-axis data values.
+	void setSampleCount(quint64 n);
 
 	// QwtPlotItem
 	int  rtti() const override { return QwtPlotItem::Rtti_PlotUserItem + 42; }
@@ -117,15 +115,13 @@ private:
 	PlotAxis *m_xAxis;
 	PlotAxis *m_yAxis;
 
-	// Map a sample index to an x-axis data value. If m_sampleX is empty,
-	// returns the sample index verbatim (legacy sample-index mode).
-	double sampleToX(quint64 sample) const;
+	double sampleToX(quint64 sample, const QwtScaleMap &xMap) const;
 
-	QVector<AnnotationSpan> m_anns;   // flat list, sorted by startSample
+	QVector<AnnotationSpan> m_anns;
 	QList<Row>              m_rows;
 	QHash<QString, int>     m_rowByClass;
 	QHash<QString, QColor>  m_classColor;
-	QVector<double>         m_sampleX; // optional per-sample x-value lookup
+	quint64                 m_sampleCount = 0;
 };
 
 } // namespace scopy

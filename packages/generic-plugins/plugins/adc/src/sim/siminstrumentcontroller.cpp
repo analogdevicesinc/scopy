@@ -492,6 +492,9 @@ void SimInstrumentController::onCycleComplete()
 	if(!x2IsIndex)
 		x2Vec = m_store->readWindow(scopy::acq::DataKey(x2KeyStr), m_plotSize);
 
+	if(m_decoderOverlay)
+		m_decoderOverlay->setSampleCount(static_cast<quint64>(m_plotSize));
+
 	// A curve is "driven" only if it has numeric samples this cycle. Keys
 	// that produce no numeric data (e.g. decoder annotation keys) return
 	// an empty QVector<float> from readWindow — for those we hide the

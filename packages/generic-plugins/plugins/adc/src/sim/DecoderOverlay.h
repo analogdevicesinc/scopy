@@ -42,9 +42,10 @@ public:
 	// Pass an empty list to hide all.
 	void setVisibleKeys(const QList<scopy::acq::DataKey> &keys);
 
-	// Push a per-sample x-value lookup into every registered AnnotationCurve.
-	// Pass an empty vector to revert to sample-index mode (legacy behavior).
-	void setSampleXValues(const QVector<double> &xValues);
+	// Push the total sample count into every registered AnnotationCurve so
+	// annotations are laid out proportionally across the current plot
+	// x-axis range. Pass 0 to revert to sample-index mode.
+	void setSampleCount(quint64 n);
 
 	void clear();
 
