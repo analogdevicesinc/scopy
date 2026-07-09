@@ -24,17 +24,23 @@ public:
 	void setHistorySize(const DataKey &key, std::size_t n);
 	void           ensureHistoryDepth(const DataKey &key, std::size_t depth);
 	SampleBuffer   read(const DataKey &key) const;
+	SampleVariant  readWindowNative(const DataKey &key, int plotSize);
 	QVector<float> readWindow(const DataKey &key, int plotSize);
+	// Does NOT mutate the target key's historySize — callers must ensure
+	// depth via ensureHistoryDepth().
+	QVector<quint8> readWindowU8(const DataKey &key, int windowSize) const;
 	bool           contains(const DataKey &key) const;
 	QList<DataKey> keys() const;
 	void clear();
 	void reset();
+	void remove(const DataKey &key);
 
 	void          beginCycle();
 	QSet<DataKey> cycleKeys() const;
 
 	static std::size_t requiredHistoryDepth(std::size_t plotSize, std::size_t bufferSize);
-	static QVector<float> assembleWindow(const SampleBuffer &buf, int plotSize);
+	static SampleVariant  assembleWindow(const SampleBuffer &buf, int plotSize);
+	static QVector<float> assembleWindowFloat(const SampleBuffer &buf, int plotSize);
 
 Q_SIGNALS:
 	void dataWritten(DataKey key);
