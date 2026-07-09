@@ -1,13 +1,9 @@
 #include "decoder/SigrokCliBackend.h"
 
-#include "common/scopyconfig.h"
-#include "pluginbase/preferences.h"
+#include "decoder/SigrokCliCatalog.h"
 
-#include <QDir>
-#include <QFile>
 #include <QLoggingCategory>
 #include <QProcess>
-#include <QStandardPaths>
 
 #include <algorithm>
 #include <cmath>
@@ -17,47 +13,11 @@ Q_LOGGING_CATEGORY(CAT_SIGROK_BACKEND, "SigrokCliBackend")
 namespace scopy {
 namespace decoder {
 
-SigrokCliBackend::SigrokCliBackend()  = default;
+SigrokCliBackend::SigrokCliBackend(SigrokCliCatalog *catalog)
+	: m_catalog(catalog)
+{}
+
 SigrokCliBackend::~SigrokCliBackend() = default;
-
-QString SigrokCliBackend::findCli() const
-{
-	if(!m_exeOverride.isEmpty() && QFile::exists(m_exeOverride))
-		return m_exeOverride;
-
-	const QString prefPath = Preferences::get("sigrok_cli_path").toString();
-	if(!prefPath.isEmpty() && QFile::exists(prefPath))
-		return prefPath;
-
-	const QString folder = scopy::config::executableFolderPath();
-	if(!folder.isEmpty()) {
-		const QString candidate = QDir(folder).absoluteFilePath(
-#ifdef Q_OS_WIN
-			"sigrok-cli.exe"
-#else
-			"sigrok-cli"
-#endif
-		);
-		if(QFile::exists(candidate))
-			return candidate;
-	}
-
-	return QStandardPaths::findExecutable("sigrok-cli");
-}
-
-QString SigrokCliBackend::resolveCli() const
-{
-	if(!m_cachedExe.isEmpty() && QFile::exists(m_cachedExe))
-		return m_cachedExe;
-	m_cachedExe = findCli();
-	return m_cachedExe;
-}
-
-void SigrokCliBackend::setExecutableOverride(const QString &path)
-{
-	m_exeOverride = path;
-	m_cachedExe.clear(); // force re-resolve on next decode()
-}
 
 QStringList SigrokCliBackend::buildArgs(const DecoderConfig &cfg) const
 {
@@ -145,7 +105,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 		return true;
 	}
 
-	const QString exe = resolveCli();
+	const QString exe = m_catalog ? m_catalog->resolveCli() : QString{};
 	if(exe.isEmpty()) {
 		m_lastError = "sigrok-cli executable not found";
 		qCWarning(CAT_SIGROK_BACKEND) << m_lastError.c_str();
