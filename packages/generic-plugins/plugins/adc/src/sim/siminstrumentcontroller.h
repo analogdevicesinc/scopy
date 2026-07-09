@@ -5,7 +5,6 @@
 #include "siminstrument.h"
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
-#include <core/acq_engine/ExternalDecoderProcessor.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
 #include <core/acq_engine/MathProcessor.h>
 #include <core/acq_engine/MathSource.h>
@@ -25,15 +24,25 @@ namespace scopy { class GenalyzerPanel; }
 #include <QTimer>
 #include <QVector>
 
+#include <memory>
+
 #include <gui/cursorcontroller.h>
 #include <gui/plotautoscaler.h>
 #include <gui/plotchannel.h>
 #include <pluginbase/toolmenuentry.h>
 
 namespace scopy {
+
+namespace decoder {
+class IDecoderCatalog;
+class IDecoderBackendFactory;
+} // namespace decoder
+
 namespace adc {
 
 class DecoderOverlay;
+class DecoderManager;
+class DecoderPanel;
 
 // Self-contained controller for the simulated ADC tool.
 // Does NOT depend on GRTopBlock, AcqTreeNode, or any GNU Radio component.
@@ -79,9 +88,17 @@ private:
 	scopy::acq::GenalyzerFFTProcessor  *m_fftProc{nullptr};
 	scopy::acq::MathSource             *m_mathSrc{nullptr};
 	scopy::acq::MathProcessor          *m_mathProc{nullptr};
-	scopy::acq::ExternalDecoderProcessor *m_uartDecoder{nullptr};
+	scopy::adc::DecoderManager           *m_decoderMgr{nullptr};
+	scopy::adc::DecoderPanel             *m_decoderPanel{nullptr};
 	scopy::adc::DecoderOverlay           *m_decoderOverlay{nullptr};
 	scopy::GenalyzerPanel                *m_genalyzerPanel{nullptr};
+
+	// Composition-root-owned decoder plumbing. Swap the concrete
+	// implementations here (e.g. sigrok-cli → libsigrok → …) without
+	// touching DecoderManager/DecoderPanel. Non-QObject types, hence
+	// unique_ptr rather than Qt parenting.
+	std::unique_ptr<scopy::decoder::IDecoderCatalog>        m_decoderCatalog;
+	std::unique_ptr<scopy::decoder::IDecoderBackendFactory> m_decoderBackendFactory;
 
 	QPointer<SimInstrument> m_ui;
 

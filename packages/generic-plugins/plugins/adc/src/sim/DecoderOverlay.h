@@ -3,9 +3,12 @@
 
 #include <QHash>
 #include <QObject>
+#include <QPointF>
 #include <QPointer>
 
 #include "acq_engine/DataKey.h"
+
+class QEvent;
 
 namespace scopy {
 
@@ -49,10 +52,18 @@ public:
 
 	void clear();
 
+	// QObject
+	bool eventFilter(QObject *watched, QEvent *ev) override;
+
 private Q_SLOTS:
 	void onCycleProduced(scopy::acq::DataKey outKey);
 
 private:
+	// Look up the annotation under the given canvas-pixel position,
+	// scanning only currently visible AnnotationCurves. Returns the
+	// pretty-formatted tooltip text (empty if nothing hit).
+	QString tooltipForCanvasPos(const QPointF &canvasPos) const;
+
 	QPointer<PlotWidget>            m_plot;
 	QPointer<scopy::acq::DataStore> m_store;
 

@@ -81,6 +81,16 @@ public:
 	void draw(QPainter *painter, const QwtScaleMap &xMap,
 		  const QwtScaleMap &yMap, const QRectF &canvasRect) const override;
 
+	// Hit-test a canvas-pixel point against the currently laid out
+	// annotations. Uses the exact same row geometry as draw(). Returns
+	// nullptr if the point is outside this curve's band or not on any
+	// visible annotation. The returned pointer is valid until the next
+	// setAnnotations()/clear() call.
+	const AnnotationSpan *hitTest(const QPointF &canvasPos,
+				      const QwtScaleMap &xMap,
+				      const QwtScaleMap &yMap,
+				      const QRectF &canvasRect) const;
+
 private:
 	struct Row
 	{
