@@ -1,4 +1,4 @@
-${PACKAGE} (${VERSION}) stable; urgency=medium
+${PACKAGE} (${VERSION}-1) stable; urgency=medium
 
 ${RELEASE_NOTES}
 
