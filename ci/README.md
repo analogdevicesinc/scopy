@@ -8,15 +8,15 @@ Github Actions workflow:
 https://github.com/analogdevicesinc/scopy/blob/master/.github/workflows/mingwbuild.yml
 
 **Linux (flatpak - x86_64)**
-https://github.com/analogdevicesinc/scopy-flatpak
-docker pull analogdevices/scopy-build:flatpak
+Built in-repo from `ci/flatpak` on the KDE Qt6 runtime (org.kde.Platform/Sdk 6.8).
+docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6
 
-    ARCH=x86_64 make
-   
+    cd ci/flatpak && ARCH=x86_64 make
+
 Github Actions workflow - https://github.com/analogdevicesinc/scopy/blob/master/.github/workflows/linuxflatpakbuild.yml
 
 **Linux (flatpak - arm)**
-https://github.com/analogdevicesinc/scopy-flatpak
+Built in-repo from `ci/flatpak` (ARCH=arm).
 Run locally on arm machine (raspberry pi)
 
     ARCH=arm make
@@ -66,7 +66,7 @@ How to install Qt from qt.io : https://github.com/analogdevicesinc/scopy-android
 
 | Dependency | Windows | Linux Flatpak | Linux Ubuntu(development) | Linux ARM | macOS | Android |
 | --- | --- | --- | --- | --- | --- | --- |
-| Qt | pacman  | org.kde.Sdk (v5.15)| Qt.io |org.kde.Sdk (v5.14) | brew | Qt.io |
+| Qt | pacman  | org.kde.Sdk (v6.8)| Qt.io |org.kde.Sdk (v6.8) | brew | Qt.io |
 | qwt | src | src | src | src | src | src |
 | libxml2 | pacman | src | apt | src | brew | src |
 | libusb | pacman | src | apt | src | brew | src -  android branch/commit |
