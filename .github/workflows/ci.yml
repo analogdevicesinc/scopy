@@ -102,5 +102,14 @@ jobs:
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
+    flatpak-qt6:
+      needs: docker_tag
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
+      uses: ./.github/workflows/linuxflatpakbuild.yml
+      with:
+        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+      secrets:
+        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+
     macos-qt6:
       uses: ./.github/workflows/macosbuild.yml
