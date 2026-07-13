@@ -1,19 +1,19 @@
 #include "decoder/SigrokCliCatalog.h"
 
 #include "common/scopyconfig.h"
+#include "decoder/DecoderLogger.h"
 #include "pluginbase/preferences.h"
 
 #include <QDir>
 #include <QFile>
-#include <QLoggingCategory>
 #include <QProcess>
 #include <QRegularExpression>
 #include <QStandardPaths>
 
-Q_LOGGING_CATEGORY(CAT_SIGROK_CATALOG, "SigrokCliCatalog")
-
 namespace scopy {
 namespace decoder {
+
+static constexpr const char *kCatalogId = "sigrok-cli-catalog";
 
 SigrokCliCatalog::SigrokCliCatalog()  = default;
 SigrokCliCatalog::~SigrokCliCatalog() = default;
@@ -66,7 +66,8 @@ QString SigrokCliCatalog::runCli(const QStringList &args, bool *ok) const
 	if(ok) *ok = false;
 	const QString exe = resolveCli();
 	if(exe.isEmpty()) {
-		qCWarning(CAT_SIGROK_CATALOG) << "sigrok-cli not found";
+		if(m_logger)
+			m_logger->warning(kCatalogId, QStringLiteral("sigrok-cli not found"));
 		return {};
 	}
 
@@ -74,20 +75,24 @@ QString SigrokCliCatalog::runCli(const QStringList &args, bool *ok) const
 	proc.setProcessChannelMode(QProcess::MergedChannels);
 	proc.start(exe, args);
 	if(!proc.waitForStarted(2000)) {
-		qCWarning(CAT_SIGROK_CATALOG) << "failed to start sigrok-cli:"
-					      << proc.errorString();
+		if(m_logger)
+			m_logger->warning(kCatalogId,
+				QStringLiteral("failed to start sigrok-cli: ") + proc.errorString());
 		return {};
 	}
 	if(!proc.waitForFinished(10000)) {
-		qCWarning(CAT_SIGROK_CATALOG) << "sigrok-cli timed out";
+		if(m_logger)
+			m_logger->warning(kCatalogId, QStringLiteral("sigrok-cli timed out"));
 		proc.kill();
 		proc.waitForFinished(500);
 		return {};
 	}
 	if(proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
-		qCWarning(CAT_SIGROK_CATALOG)
-			<< "sigrok-cli exit=" << proc.exitCode()
-			<< "args=" << args;
+		if(m_logger)
+			m_logger->warning(kCatalogId,
+				QStringLiteral("sigrok-cli exit=%1 args=%2")
+					.arg(proc.exitCode())
+					.arg(args.join(' ')));
 		return QString::fromUtf8(proc.readAll());
 	}
 
@@ -106,7 +111,9 @@ QList<QString> SigrokCliCatalog::decoders() const
 	if(!ok || out.isEmpty()) return {};
 
 	parseListing(out, m_order, m_shortDesc);
-	qCInfo(CAT_SIGROK_CATALOG) << "found" << m_order.size() << "decoders";
+	if(m_logger)
+		m_logger->info(kCatalogId,
+			QStringLiteral("found %1 decoders").arg(m_order.size()));
 	return m_order;
 }
 
@@ -206,8 +213,10 @@ DecoderInfo SigrokCliCatalog::parseShow(const QString &stdoutText,
 		Options,
 		AnnClasses,
 		AnnRows,
+		Documentation,
 	};
 	Section section = Section::None;
+	QStringList docLines;
 
 	static const QRegularExpression rxItem(
 		R"(^-\s+(\S+?)(?:\s+\(([^)]*)\))?\s*:\s*(.*)$)");
@@ -226,7 +235,15 @@ DecoderInfo SigrokCliCatalog::parseShow(const QString &stdoutText,
 			else if(head == "Options")           section = Section::Options;
 			else if(head == "Annotation classes")section = Section::AnnClasses;
 			else if(head == "Annotation rows")   section = Section::AnnRows;
+			else if(head == "Documentation")     section = Section::Documentation;
 			else                                 section = Section::None;
+			continue;
+		}
+
+		// Documentation is a free-form multi-line block; capture verbatim
+		// until EOF or the next unindented header (handled above).
+		if(section == Section::Documentation) {
+			docLines.append(line);
 			continue;
 		}
 
@@ -278,10 +295,17 @@ DecoderInfo SigrokCliCatalog::parseShow(const QString &stdoutText,
 			di.annotationRows.append(trimmed.mid(2).trimmed());
 			break;
 		}
+		case Section::Documentation:
 		case Section::None:
 			break;
 		}
 	}
+
+	while(!docLines.isEmpty() && docLines.last().trimmed().isEmpty())
+		docLines.removeLast();
+	while(!docLines.isEmpty() && docLines.first().trimmed().isEmpty())
+		docLines.removeFirst();
+	di.documentation = docLines.join('\n');
 
 	return di;
 }

@@ -8,6 +8,7 @@ namespace scopy {
 namespace decoder {
 
 class SigrokCliCatalog;
+class DecoderLogger;
 
 // IDecoderBackendFactory that hands out fresh SigrokCliBackend instances.
 // The catalog (non-owning) is threaded through to every created backend so
@@ -19,13 +20,18 @@ public:
 		: m_catalog(catalog)
 	{}
 
+	void setLogger(DecoderLogger *lg) { m_logger = lg; }
+
 	std::unique_ptr<IDecoderBackend> create() override
 	{
-		return std::make_unique<SigrokCliBackend>(m_catalog);
+		auto b = std::make_unique<SigrokCliBackend>(m_catalog);
+		b->setLogger(m_logger);
+		return b;
 	}
 
 private:
 	SigrokCliCatalog *m_catalog{nullptr};
+	DecoderLogger    *m_logger{nullptr};
 };
 
 } // namespace decoder

@@ -10,6 +10,7 @@ namespace scopy {
 namespace decoder {
 
 class SigrokCliCatalog;
+class DecoderLogger;
 
 // IDecoderBackend implementation that drives sigrok-cli as a one-shot
 // child process. Each decode() call:
@@ -41,12 +42,15 @@ public:
 
 	QString lastCommandLine() const { return m_lastCmdLine; }
 
+	void setLogger(DecoderLogger *lg) { m_logger = lg; }
+
 private:
 	QStringList buildArgs(const DecoderConfig &cfg) const;
 	void        parseStdout(const QByteArray &buf,
 	                        std::vector<AnnotationC> &out) const;
 
 	SigrokCliCatalog *m_catalog{nullptr};
+	DecoderLogger    *m_logger{nullptr};
 	std::string       m_lastError;
 	QString           m_lastCmdLine;
 };

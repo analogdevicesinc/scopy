@@ -11,6 +11,8 @@
 namespace scopy {
 namespace decoder {
 
+class DecoderLogger;
+
 // Enumerates all decoders exposed by the local `sigrok-cli` binary and
 // exposes their per-decoder metadata (channels, options, annotation
 // classes/rows).
@@ -32,6 +34,8 @@ public:
 	// folder, and finally $PATH.
 	void          setExecutableOverride(const QString &path);
 	QString       resolveCli() const;
+
+	void          setLogger(DecoderLogger *lg) { m_logger = lg; }
 
 	// IDecoderCatalog
 	bool           isAvailable() const override;
@@ -55,6 +59,8 @@ private:
 	mutable QList<QString>                m_order;              // decoder ids
 	mutable QHash<QString, QString>       m_shortDesc;          // id → short desc
 	mutable QHash<QString, DecoderInfo>   m_info;               // id → info (lazy)
+
+	DecoderLogger                        *m_logger{nullptr};
 };
 
 } // namespace decoder

@@ -11,6 +11,8 @@ class QLibrary;
 namespace scopy {
 namespace decoder {
 
+class DecoderLogger;
+
 // IDecoderBackend implementation that loads a closed-source vendor decoder
 // shared library exposing the C ABI defined in decoder_c_api.h.
 //
@@ -28,10 +30,13 @@ public:
 	                   std::vector<AnnotationC> &out) override;
 	std::string lastError() const override { return m_lastError; }
 
+	void setLogger(DecoderLogger *lg) { m_logger = lg; }
+
 private:
 	QString                   m_libraryPath;
 	std::unique_ptr<QLibrary> m_lib;
 	std::string               m_lastError;
+	DecoderLogger            *m_logger{nullptr};
 };
 
 } // namespace decoder

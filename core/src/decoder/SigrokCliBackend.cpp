@@ -1,17 +1,17 @@
 #include "decoder/SigrokCliBackend.h"
 
+#include "decoder/DecoderLogger.h"
 #include "decoder/SigrokCliCatalog.h"
 
-#include <QLoggingCategory>
 #include <QProcess>
 
 #include <algorithm>
 #include <cmath>
 
-Q_LOGGING_CATEGORY(CAT_SIGROK_BACKEND, "SigrokCliBackend")
-
 namespace scopy {
 namespace decoder {
+
+static constexpr const char *kBackendId = "sigrok-cli-backend";
 
 SigrokCliBackend::SigrokCliBackend(SigrokCliCatalog *catalog)
 	: m_catalog(catalog)
@@ -101,14 +101,16 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	m_lastError.clear();
 
 	if(!data || nSamples == 0) {
-		qCDebug(CAT_SIGROK_BACKEND) << "decode(): empty input, skipping";
+		if(m_logger)
+			m_logger->info(kBackendId, QStringLiteral("decode(): empty input, skipping"));
 		return true;
 	}
 
 	const QString exe = m_catalog ? m_catalog->resolveCli() : QString{};
 	if(exe.isEmpty()) {
 		m_lastError = "sigrok-cli executable not found";
-		qCWarning(CAT_SIGROK_BACKEND) << m_lastError.c_str();
+		if(m_logger)
+			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
@@ -117,11 +119,12 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 
 	const QStringList args = buildArgs(cfg);
 	m_lastCmdLine          = exe + " " + args.join(' ');
-	qCInfo(CAT_SIGROK_BACKEND) << "decode(): exe=" << exe;
-	qCInfo(CAT_SIGROK_BACKEND) << "decode(): argv=" << args;
-	qCInfo(CAT_SIGROK_BACKEND) << "decode(): nSamples=" << nSamples
-				   << "unitsize=" << unitsize
-				   << "bytes=" << bytes;
+	if(m_logger) {
+		m_logger->info(kBackendId,
+			QStringLiteral("decode(): exe=%1 argv=%2 nSamples=%3 unitsize=%4 bytes=%5")
+				.arg(exe, args.join(' '))
+				.arg(nSamples).arg(unitsize).arg(bytes));
+	}
 
 	QProcess proc;
 	proc.setProcessChannelMode(QProcess::SeparateChannels);
@@ -129,22 +132,24 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	if(!proc.waitForStarted(2000)) {
 		m_lastError = "failed to start sigrok-cli: "
 			      + proc.errorString().toStdString();
-		qCWarning(CAT_SIGROK_BACKEND) << QString::fromStdString(m_lastError);
+		if(m_logger)
+			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
 	const qint64 wrote = proc.write(reinterpret_cast<const char *>(data), bytes);
-	if(wrote != bytes) {
-		qCWarning(CAT_SIGROK_BACKEND)
-			<< "decode(): write short: wrote=" << wrote
-			<< "wanted=" << bytes;
+	if(wrote != bytes && m_logger) {
+		m_logger->warning(kBackendId,
+			QStringLiteral("decode(): write short: wrote=%1 wanted=%2")
+				.arg(wrote).arg(bytes));
 	}
 	proc.waitForBytesWritten(2000);
-	proc.closeWriteChannel(); // EOF — flushes the decoder
+	proc.closeWriteChannel();
 
 	if(!proc.waitForFinished(10000)) {
 		m_lastError = "sigrok-cli timed out";
-		qCWarning(CAT_SIGROK_BACKEND) << QString::fromStdString(m_lastError);
+		if(m_logger)
+			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
 		proc.kill();
 		proc.waitForFinished(500);
 		return false;
@@ -153,15 +158,17 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	const QByteArray stdoutBuf = proc.readAllStandardOutput();
 	const QByteArray stderrBuf = proc.readAllStandardError();
 
-	qCInfo(CAT_SIGROK_BACKEND)
-		<< "decode(): exit=" << proc.exitCode()
-		<< "status=" << proc.exitStatus()
-		<< "stdout=" << stdoutBuf.size() << "bytes"
-		<< "stderr=" << stderrBuf.size() << "bytes";
+	if(m_logger) {
+		m_logger->info(kBackendId,
+			QStringLiteral("decode(): exit=%1 status=%2 stdout=%3 bytes stderr=%4 bytes")
+				.arg(proc.exitCode())
+				.arg(int(proc.exitStatus()))
+				.arg(stdoutBuf.size()).arg(stderrBuf.size()));
+	}
 
-	if(!stderrBuf.isEmpty()) {
-		qCWarning(CAT_SIGROK_BACKEND)
-			<< "decode(): stderr:" << stderrBuf.trimmed();
+	if(!stderrBuf.isEmpty() && m_logger) {
+		m_logger->warning(kBackendId,
+			QStringLiteral("decode(): stderr: ") + QString::fromUtf8(stderrBuf.trimmed()));
 	}
 
 	if(proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
@@ -172,7 +179,9 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	}
 
 	parseStdout(stdoutBuf, out);
-	qCInfo(CAT_SIGROK_BACKEND) << "decode(): parsed" << out.size() << "annotations";
+	if(m_logger)
+		m_logger->info(kBackendId,
+			QStringLiteral("decode(): parsed %1 annotations").arg(out.size()));
 	return true;
 }
 

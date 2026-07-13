@@ -46,6 +46,7 @@ struct SCOPY_CORE_EXPORT DecoderInfo
 	QString              id;          // "uart"
 	QString              name;        // "Universal Asynchronous Receiver/Transmitter"
 	QString              description; // short description
+	QString              documentation; // multi-line free-form docs
 	QList<ChannelInfo>   channels;    // required first, then optional
 	QList<OptionInfo>    options;
 	QStringList          annotationRows;    // e.g. "rx-data-vals (RX data)"…
