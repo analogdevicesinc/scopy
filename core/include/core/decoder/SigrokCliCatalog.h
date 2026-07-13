@@ -11,6 +11,8 @@
 namespace scopy {
 namespace decoder {
 
+class DecoderLogger;
+
 // Enumerates all decoders exposed by the local `sigrok-cli` binary and
 // exposes their per-decoder metadata (channels, options, annotation
 // classes/rows).
@@ -33,11 +35,18 @@ public:
 	void          setExecutableOverride(const QString &path);
 	QString       resolveCli() const;
 
+	void          setLogger(DecoderLogger *lg) { m_logger = lg; }
+
 	// IDecoderCatalog
 	bool           isAvailable() const override;
 	QList<QString> decoders() const override;
 	QString        shortDescription(const QString &decoderId) const override;
 	DecoderInfo    info(const QString &decoderId) const override;
+
+	// Parallel eager cache prime: spawns one `sigrok-cli --show -P <id>`
+	// per un-cached decoder in a small QProcess pool. Blocks until all
+	// finish. Cache writes are serialized by the caller thread.
+	void           loadAll() const override;
 
 private:
 	QString              runCli(const QStringList &args, bool *ok = nullptr) const;
@@ -55,6 +64,8 @@ private:
 	mutable QList<QString>                m_order;              // decoder ids
 	mutable QHash<QString, QString>       m_shortDesc;          // id → short desc
 	mutable QHash<QString, DecoderInfo>   m_info;               // id → info (lazy)
+
+	DecoderLogger                        *m_logger{nullptr};
 };
 
 } // namespace decoder

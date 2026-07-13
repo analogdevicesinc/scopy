@@ -19,15 +19,24 @@ struct ChannelMap
 	int         bitIndex{0};
 };
 
-// Configuration passed to IDecoderBackend::decode(). Backends may stack
-// multiple decoders by interpreting decoderId as comma-separated.
-struct DecoderConfig
+// One stage in a decoder stack. stage[0] is the root (reads raw logic);
+// stage[i>0] consumes the output of stage[i-1] and typically has no
+// channel bindings of its own.
+struct DecoderStage
 {
 	std::string                        decoderId;
-	double                             sampleRate{1.0e6};
-	int                                numChannels{1};
 	std::vector<ChannelMap>            channels;
 	std::map<std::string, std::string> options;
+};
+
+// Configuration passed to IDecoderBackend::decode(). A config always
+// describes a linear stack of decoders; single-decoder use is just
+// stack.size() == 1.
+struct DecoderConfig
+{
+	double                             sampleRate{1.0e6};
+	int                                numChannels{1};
+	std::vector<DecoderStage>          stack;
 	std::map<std::string, std::string> meta;
 };
 
@@ -37,10 +46,11 @@ struct AnnotationC
 {
 	uint64_t    start{0};
 	uint64_t    end{0};
-	std::string decoder;
+	std::string decoder;   // canonical decoderId (no "-N" stack suffix)
 	std::string klass;
 	std::string text;
 	int         severity{0};
+	int         stageIndex{0}; // 0 = root, 1 = first stacked, ...
 };
 
 // One-shot pluggable decoder backend.
