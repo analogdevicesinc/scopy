@@ -15,6 +15,7 @@ class PlotWidget;
 
 namespace decoder {
 class IDecoderBackendFactory;
+class DecoderLogger;
 } // namespace decoder
 
 namespace acq {
@@ -27,17 +28,18 @@ namespace adc {
 
 class DecoderOverlay;
 
-// Runtime handle for one active decoder. Owned by DecoderManager; the
-// AcquisitionEngine owns the processor lifetime.
+// Runtime handle for one active decoder stack. Owned by DecoderManager;
+// the AcquisitionEngine owns the processor lifetime. A stack has one entry
+// per stage in cfg.stack (index 0 is the root that reads raw logic).
 struct DecoderInstance
 {
-	QString                                uid;             // unique per manager: "<id>#<n>"
-	QString                                decoderId;       // e.g. "uart"
+	QString                                uid;             // unique per manager: "<rootId>#<n>"
+	QStringList                            stageIds;        // e.g. {"uart","modbus"}
 	scopy::decoder::DecoderConfig          cfg;             // last applied
-	QList<scopy::acq::DataKey>             orderedRawKeys;  // bitIndex → DataKey
+	QList<scopy::acq::DataKey>             orderedRawKeys;  // bitIndex → DataKey (root only)
 	scopy::acq::ExternalDecoderProcessor  *proc{nullptr};
-	scopy::acq::DataKey                    outKey;          // annotation output
-	QPointer<scopy::PlotAxis>              axis;            // annotation band
+	QList<scopy::acq::DataKey>             outKeys;         // one per stage
+	QList<QPointer<scopy::PlotAxis>>       axes;            // one band per stage
 };
 
 // Owns the list of active decoders and creates/destroys their processors
@@ -61,6 +63,7 @@ public:
 
 	void setPlot(scopy::PlotWidget *plot);
 	void setOverlay(DecoderOverlay *overlay);
+	void setLogger(scopy::decoder::DecoderLogger *lg) { m_logger = lg; }
 
 	// Create a new decoder instance. Returns its uid or an empty string
 	// on failure (e.g. plot/overlay not set yet).
@@ -69,6 +72,19 @@ public:
 	// Detach + delete a decoder instance and its axis. Safe to call while
 	// engine is running (the engine::removeProcessor handles queueing).
 	void removeDecoder(const QString &uid);
+
+	// Append a stacked stage to an existing decoder instance. Allocates
+	// a new annotation band + output DataKey, extends proc->outputKeys,
+	// and registers the new (outKey, axis) pair with the overlay.
+	// Returns the new stage index (>=1) on success, -1 on failure. Only
+	// valid when the engine is stopped.
+	int pushStage(const QString &uid, const QString &decoderId);
+
+	// Remove stages at index >= fromIndex (must be >= 1 — the root is
+	// never dropped this way). Bands are hidden/detached and their output
+	// keys removed from the overlay & store. Only valid when the engine
+	// is stopped.
+	void popStagesFrom(const QString &uid, int fromIndex);
 
 	// Push a new config to an existing decoder. Only valid when the
 	// engine is stopped; caller must check isEngineRunning() first.
@@ -111,6 +127,8 @@ private:
 	// Window size (samples) applied to every ExternalDecoderProcessor.
 	// 0 = legacy single-chunk mode.
 	int                             m_windowSize{0};
+
+	scopy::decoder::DecoderLogger  *m_logger{nullptr};
 };
 
 } // namespace adc
