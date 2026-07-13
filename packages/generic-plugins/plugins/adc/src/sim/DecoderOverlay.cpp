@@ -43,24 +43,24 @@ DecoderOverlay::DecoderOverlay(PlotWidget *plot, scopy::acq::DataStore *store,
 DecoderOverlay::~DecoderOverlay() { m_curves.clear(); }
 
 void DecoderOverlay::registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
+				     const scopy::acq::DataKey &outKey,
 				     PlotAxis *yAxis)
 {
 	if(!proc || !m_plot || !yAxis)
 		return;
 
-	const scopy::acq::DataKey outKey = proc->outputKey();
 	if(m_curves.contains(outKey))
 		return;
 
 	auto *curve = new AnnotationCurve(outKey.toString(),
 					  m_plot->xAxis(), yAxis);
-	curve->setVisible(false); // hidden until setVisibleKeys() enables it
+	curve->setVisible(false);
 	curve->attach(m_plot->plot());
 	m_curves.insert(outKey, curve);
 
 	connect(proc, &scopy::acq::ExternalDecoderProcessor::cycleProduced,
 		this, &DecoderOverlay::onCycleProduced,
-		Qt::QueuedConnection);
+		Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection));
 }
 
 void DecoderOverlay::unregisterDecoder(const scopy::acq::DataKey &outKey)

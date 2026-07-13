@@ -5,6 +5,7 @@
 #include "DecoderPanel.h"
 #include "plotnavigator.hpp"
 
+#include <core/decoder/DecoderLogger.h>
 #include <core/decoder/SigrokCliBackendFactory.h>
 #include <core/decoder/SigrokCliCatalog.h>
 
@@ -111,19 +112,22 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	m_ui = new SimInstrument(nullptr);
 
 	// ---- Decoder plumbing (composition root) ----
-	// The controller picks the concrete catalog + backend factory here.
-	// DecoderManager and DecoderPanel are backend-agnostic — swap these
-	// two lines to plug in a different decoder backend (e.g. libsigrok,
-	// a bespoke CLI) and nothing else needs to change.
+	m_decoderLogger = new scopy::decoder::DecoderLogger(this);
+	m_decoderLogger->setEngine(m_engine);
+
 	auto catalog            = std::make_unique<scopy::decoder::SigrokCliCatalog>();
 	auto *catalogPtr        = catalog.get();
+	catalogPtr->setLogger(m_decoderLogger);
 	m_decoderCatalog        = std::move(catalog);
-	m_decoderBackendFactory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>(
+	auto backendFactory     = std::make_unique<scopy::decoder::SigrokCliBackendFactory>(
 		catalogPtr);
+	backendFactory->setLogger(m_decoderLogger);
+	m_decoderBackendFactory = std::move(backendFactory);
 
 	m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
 	m_decoderMgr = new DecoderManager(m_engine, m_store,
 	                                  m_decoderBackendFactory.get(), this);
+	m_decoderMgr->setLogger(m_decoderLogger);
 	m_decoderMgr->setPlot(m_ui->m_plot);
 	m_decoderMgr->setOverlay(m_decoderOverlay);
 	m_decoderMgr->setDecoderWindowSize(m_plotSize);
@@ -355,6 +359,7 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// ---- Decoders panel (right stack) ----
 	m_decoderPanel = new DecoderPanel(m_decoderMgr, m_store,
 	                                  m_decoderCatalog.get(), m_ui);
+	m_decoderPanel->setLogger(m_decoderLogger);
 	m_ui->registerDecoderPanel(m_decoderPanel);
 
 	connect(m_engine, &scopy::acq::AcquisitionEngine::started, m_decoderPanel,
