@@ -110,6 +110,9 @@ private:
 	// Rebuilt whenever plot size changes.
 	QVector<float> m_indexBuf;
 
+	scopy::acq::SampleVariant m_liveX,  m_liveY,  m_liveX2,  m_liveY2;
+	QVector<float>            m_scratchX, m_scratchY, m_scratchX2, m_scratchY2;
+
 	int m_plotSize{1024};
 
 	// Tracks the last seen key set so onCycleComplete() can refresh combos only on change.

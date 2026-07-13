@@ -46,23 +46,19 @@ SampleBuffer DataStore::read(const DataKey &key) const
 	return *it;
 }
 
-QVector<float> DataStore::readWindow(const DataKey &key, int plotSize)
+SampleVariant DataStore::readWindowNative(const DataKey &key, int plotSize)
 {
 	if(plotSize <= 0)
-		return {};
+		return QVector<float>{};
 
 	SampleBuffer snapshot;
 	{
 		QMutexLocker lk(&m_mutex);
 		auto it = m_data.find(key);
 		if(it == m_data.end())
-			return {};
-		// Annotation buffers carry no numeric samples; assembleWindow
-		// returns empty for them. Skip both the historySize mutation
-		// and the copy so decoder-output keys are never mutated by
-		// the display path.
+			return QVector<float>{};
 		if(it->type() == SampleType::Annotation)
-			return {};
+			return QVector<Annotation>{};
 		const std::size_t chunkSize = it->size();
 		if(chunkSize > 0) {
 			const std::size_t need = requiredHistoryDepth(
@@ -73,6 +69,26 @@ QVector<float> DataStore::readWindow(const DataKey &key, int plotSize)
 		snapshot = *it;
 	}
 	return assembleWindow(snapshot, plotSize);
+}
+
+QVector<float> DataStore::readWindow(const DataKey &key, int plotSize)
+{
+	SampleVariant v = readWindowNative(key, plotSize);
+	return std::visit([](auto &&vec) -> QVector<float> {
+		using VecT = std::decay_t<decltype(vec)>;
+		if constexpr(std::is_same_v<VecT, QVector<Annotation>>) {
+			return {};
+		} else if constexpr(std::is_same_v<VecT, QVector<float>>) {
+			return std::forward<decltype(vec)>(vec);
+		} else {
+			QVector<float> out;
+			out.resize(vec.size());
+			float *dst = out.data();
+			for(int i = 0; i < vec.size(); ++i)
+				dst[i] = static_cast<float>(vec[i]);
+			return out;
+		}
+	}, std::move(v));
 }
 
 QVector<quint8> DataStore::readWindowU8(const DataKey &key, int windowSize) const
@@ -89,17 +105,10 @@ QVector<quint8> DataStore::readWindowU8(const DataKey &key, int windowSize) cons
 			return {};
 		snapshot = *it;
 	}
-	QVector<quint8> out;
-	const std::size_t depth = snapshot.depth();
-	for(std::size_t i = depth; i-- > 0;) {
-		const auto &vec = std::get<QVector<quint8>>(snapshot.sample(i));
-		out.reserve(out.size() + static_cast<int>(vec.size()));
-		for(quint8 s : vec)
-			out.append(s);
-	}
-	if(out.size() > windowSize)
-		out = out.mid(out.size() - windowSize);
-	return out;
+	SampleVariant assembled = assembleWindow(snapshot, windowSize);
+	if(!std::holds_alternative<QVector<quint8>>(assembled))
+		return {};
+	return std::get<QVector<quint8>>(std::move(assembled));
 }
 
 bool DataStore::contains(const DataKey &key) const
@@ -162,30 +171,57 @@ std::size_t DataStore::requiredHistoryDepth(std::size_t plotSize, std::size_t bu
 	return d < 1 ? 1 : d;
 }
 
-QVector<float> DataStore::assembleWindow(const SampleBuffer &buf, int plotSize)
+SampleVariant DataStore::assembleWindow(const SampleBuffer &buf, int plotSize)
 {
-	QVector<float> out;
 	if(buf.empty() || plotSize <= 0)
-		return out;
+		return QVector<float>{};
 
-	const std::size_t depth = buf.depth();
-	for(std::size_t i = depth; i-- > 0;) {
-		std::visit(
-			[&out](const auto &vec) {
-				using VecT = std::decay_t<decltype(vec)>;
-				if constexpr(std::is_same_v<VecT, QVector<Annotation>>) {
-				} else {
-					out.reserve(out.size() + static_cast<int>(vec.size()));
-					for(const auto &s : vec)
-						out.append(static_cast<float>(s));
-				}
-			},
-			buf.sample(i));
-	}
+	return std::visit([&](const auto &firstVec) -> SampleVariant {
+		using VecT = std::decay_t<decltype(firstVec)>;
+		if constexpr(std::is_same_v<VecT, QVector<Annotation>>) {
+			return QVector<Annotation>{};
+		} else {
+			const std::size_t depth = buf.depth();
+			if(depth == 1) {
+				if(firstVec.size() <= plotSize)
+					return firstVec;
+				return firstVec.mid(firstVec.size() - plotSize);
+			}
+			std::size_t total = 0;
+			for(std::size_t i = 0; i < depth; ++i)
+				total += static_cast<std::size_t>(
+					std::get<VecT>(buf.sample(i)).size());
+			VecT out;
+			out.reserve(static_cast<int>(total));
+			for(std::size_t i = depth; i-- > 0;) {
+				const auto &v = std::get<VecT>(buf.sample(i));
+				out.append(v);
+			}
+			if(out.size() > plotSize)
+				out = out.mid(out.size() - plotSize);
+			return out;
+		}
+	}, buf.sample(0));
+}
 
-	if(out.size() > plotSize)
-		out = out.mid(out.size() - plotSize);
-	return out;
+QVector<float> DataStore::assembleWindowFloat(const SampleBuffer &buf, int plotSize)
+{
+	SampleVariant v = assembleWindow(buf, plotSize);
+	return std::visit([](auto &&vec) -> QVector<float> {
+		using VecT = std::decay_t<decltype(vec)>;
+		if constexpr(std::is_same_v<VecT, QVector<Annotation>>) {
+			return {};
+		} else if constexpr(std::is_same_v<VecT, QVector<float>>) {
+			return std::forward<decltype(vec)>(vec);
+		} else {
+			QVector<float> out;
+			out.resize(vec.size());
+			float *dst = out.data();
+			for(int i = 0; i < vec.size(); ++i)
+				dst[i] = static_cast<float>(vec[i]);
+			return out;
+		}
+	}, std::move(v));
 }
 
 } // namespace acq
