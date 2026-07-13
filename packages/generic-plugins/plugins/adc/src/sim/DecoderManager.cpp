@@ -102,31 +102,32 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	auto *proc   = new scopy::acq::ExternalDecoderProcessor(
 		uid, std::move(backend), m_engine);
 
-	// Minimal default config; user must Apply an updated one for anything
-	// meaningful to happen (channel bindings are empty until then).
 	scopy::decoder::DecoderConfig cfg;
-	cfg.decoderId   = decoderId.toStdString();
 	cfg.sampleRate  = 1.0e6;
 	cfg.numChannels = 0;
+	scopy::decoder::DecoderStage stage;
+	stage.decoderId = decoderId.toStdString();
+	cfg.stack.push_back(stage);
 	proc->setConfig(cfg);
 	proc->setWindowSize(m_windowSize);
 
 	const scopy::acq::DataKey outKey =
-		scopy::acq::DataKey::withStage("decoder", uid, "annotations");
-	proc->setOutputKey(outKey);
+		scopy::acq::DataKey::withStage("decoder", uid + QStringLiteral("/0"),
+		                                "annotations");
+	proc->setOutputKeys({outKey});
 
 	m_engine->addProcessor(proc);
 
 	scopy::PlotAxis *axis = allocateBand();
-	m_overlay->registerDecoder(proc, axis);
+	m_overlay->registerDecoder(proc, outKey, axis);
 
 	DecoderInstance d;
 	d.uid       = uid;
-	d.decoderId = decoderId;
+	d.stageIds  = {decoderId};
 	d.cfg       = cfg;
 	d.proc      = proc;
-	d.outKey    = outKey;
-	d.axis      = axis;
+	d.outKeys   = {outKey};
+	d.axes      = {QPointer<scopy::PlotAxis>(axis)};
 	m_decoders.append(d);
 
 	Q_EMIT decoderAdded(uid);
@@ -140,13 +141,87 @@ void DecoderManager::removeDecoder(const QString &uid)
 		if(m_decoders[i].uid != uid) continue;
 		DecoderInstance d = m_decoders.takeAt(i);
 		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
-		if(m_overlay) m_overlay->unregisterDecoder(d.outKey);
-		if(m_store)   m_store->remove(d.outKey);
+		for(const scopy::acq::DataKey &k : d.outKeys) {
+			if(m_overlay) m_overlay->unregisterDecoder(k);
+			if(m_store)   m_store->remove(k);
+		}
 		if(d.proc) d.proc->deleteLater();
 		Q_EMIT decoderRemoved(uid);
 		if(m_logger) m_logger->info(kMgrId, QStringLiteral("removed decoder ") + uid);
 		return;
 	}
+}
+
+int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
+{
+	DecoderInstance *d = find(uid);
+	if(!d || !d->proc) {
+		if(m_logger)
+			m_logger->warning(kMgrId, QStringLiteral("pushStage: unknown uid ") + uid);
+		return -1;
+	}
+	if(isEngineRunning()) {
+		if(m_logger)
+			m_logger->warning(kMgrId,
+				QStringLiteral("pushStage: refusing mid-run mutation for ") + uid);
+		return -1;
+	}
+	if(!m_overlay || !m_plot) return -1;
+	if(decoderId.isEmpty())   return -1;
+
+	const int stageIndex = d->stageIds.size();
+
+	d->stageIds.append(decoderId);
+	scopy::decoder::DecoderStage stage;
+	stage.decoderId = decoderId.toStdString();
+	d->cfg.stack.push_back(stage);
+
+	const scopy::acq::DataKey outKey =
+		scopy::acq::DataKey::withStage("decoder",
+			QStringLiteral("%1/%2").arg(uid).arg(stageIndex),
+			"annotations");
+	d->outKeys.append(outKey);
+
+	scopy::PlotAxis *axis = allocateBand();
+	d->axes.append(QPointer<scopy::PlotAxis>(axis));
+
+	d->proc->setConfig(d->cfg);
+	d->proc->setOutputKeys(d->outKeys);
+	m_overlay->registerDecoder(d->proc, outKey, axis);
+
+	if(m_logger)
+		m_logger->info(kMgrId, QStringLiteral("pushStage: %1 += %2 (index %3)")
+			.arg(uid, decoderId).arg(stageIndex));
+	return stageIndex;
+}
+
+void DecoderManager::popStagesFrom(const QString &uid, int fromIndex)
+{
+	DecoderInstance *d = find(uid);
+	if(!d || !d->proc) return;
+	if(isEngineRunning()) {
+		if(m_logger)
+			m_logger->warning(kMgrId,
+				QStringLiteral("popStagesFrom: refusing mid-run mutation for ") + uid);
+		return;
+	}
+	if(fromIndex < 1) fromIndex = 1; // never drop root
+	if(fromIndex >= d->stageIds.size()) return;
+
+	while(d->stageIds.size() > fromIndex) {
+		const int idx = d->stageIds.size() - 1;
+		const scopy::acq::DataKey k = d->outKeys[idx];
+		if(m_overlay) m_overlay->unregisterDecoder(k);
+		if(m_store)   m_store->remove(k);
+		if(!d->axes[idx].isNull()) d->axes[idx]->deleteLater();
+		d->axes.removeAt(idx);
+		d->outKeys.removeAt(idx);
+		d->stageIds.removeAt(idx);
+		d->cfg.stack.pop_back();
+	}
+
+	d->proc->setConfig(d->cfg);
+	d->proc->setOutputKeys(d->outKeys);
 }
 
 void DecoderManager::applyConfig(const QString &uid,
@@ -163,6 +238,13 @@ void DecoderManager::applyConfig(const QString &uid,
 		if(m_logger)
 			m_logger->warning(kMgrId,
 				QStringLiteral("applyConfig: refusing mid-run mutation for ") + uid);
+		return;
+	}
+	if(static_cast<int>(cfg.stack.size()) != d->stageIds.size()) {
+		if(m_logger)
+			m_logger->warning(kMgrId,
+				QStringLiteral("applyConfig: stack size mismatch: cfg=%1 instance=%2")
+					.arg(cfg.stack.size()).arg(d->stageIds.size()));
 		return;
 	}
 

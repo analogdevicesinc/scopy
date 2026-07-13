@@ -39,8 +39,12 @@ public:
 
 	// Bit i of each packed sample is taken from keys[i].
 	void setOrderedRawKeys(const QList<DataKey> &keys) { m_orderedRawKeys = keys; }
-	void setOutputKey(const DataKey &k)                { m_outKey = k; }
-	const DataKey &outputKey() const                   { return m_outKey; }
+
+	// One output DataKey per stack stage (index 0 = root). Annotations
+	// are demultiplexed by AnnotationC::stageIndex and written to the
+	// matching key each cycle; unknown indices are dropped.
+	void setOutputKeys(const QList<DataKey> &keys)     { m_outKeys = keys; }
+	const QList<DataKey> &outputKeys() const           { return m_outKeys; }
 
 	double sampleRate() const { return m_cfg.sampleRate; }
 
@@ -62,7 +66,7 @@ private:
 	std::unique_ptr<scopy::decoder::IDecoderBackend> m_backend;
 	scopy::decoder::DecoderConfig                    m_cfg;
 	QList<DataKey>                                   m_orderedRawKeys;
-	DataKey                                          m_outKey;
+	QList<DataKey>                                   m_outKeys;
 	std::vector<uint8_t>                             m_packed; // reused across cycles
 	int                                              m_windowSize{0};
 };

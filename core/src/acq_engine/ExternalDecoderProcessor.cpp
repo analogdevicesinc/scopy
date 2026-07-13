@@ -88,15 +88,22 @@ void ExternalDecoderProcessor::process(DataStore *store)
 		anyPopulated = true;
 	}
 
-	QVector<Annotation> annVec;
+	// One annotation bucket per stack stage; unknown stageIndex → dropped.
+	const int nStages = m_outKeys.size();
+	std::vector<QVector<Annotation>> perStage(static_cast<std::size_t>(nStages));
+
+	auto publish = [&]() {
+		for(int i = 0; i < nStages; ++i) {
+			if(m_outKeys[i].key.isEmpty()) continue;
+			store->write(m_outKeys[i], std::move(perStage[i]));
+			Q_EMIT cycleProduced(m_outKeys[i]);
+		}
+	};
 
 	if(!anyPopulated || minLen <= 0
 	   || minLen == std::numeric_limits<qsizetype>::max()) {
 		// Still publish (empty) so consumers see a defined state.
-		if(!m_outKey.key.isEmpty()) {
-			store->write(m_outKey, std::move(annVec));
-			Q_EMIT cycleProduced(m_outKey);
-		}
+		publish();
 		return;
 	}
 
@@ -118,46 +125,31 @@ void ExternalDecoderProcessor::process(DataStore *store)
 			       .arg(QString::fromStdString(m_backend->lastError())));
 	}
 
-	annVec.reserve(static_cast<qsizetype>(outC.size()));
+	// Right-anchor pad for the plot window (same as before).
+	const qint64 pad = (m_windowSize > 0)
+		? std::max<qint64>(0, static_cast<qint64>(m_windowSize)
+				      - static_cast<qint64>(minLen))
+		: 0;
+
 	for(const auto &a : outC) {
+		if(a.stageIndex < 0 || a.stageIndex >= nStages) continue;
 		Annotation out;
-		out.startSample = a.start;
-		out.endSample   = a.end;
+		out.startSample = static_cast<quint64>(
+			static_cast<qint64>(a.start) + pad);
+		out.endSample   = static_cast<quint64>(
+			static_cast<qint64>(a.end)   + pad);
 		out.decoder     = QString::fromStdString(a.decoder);
 		out.klass       = QString::fromStdString(a.klass);
 		out.text        = QString::fromStdString(a.text);
 		out.severity    = a.severity;
-		annVec.append(out);
-	}
-
-	// Right-anchor annotation indices onto the plot window: the decoder's
-	// input was `minLen` samples aligned to the right edge of a
-	// `m_windowSize`-wide plot, so add the left-pad size to every index.
-	// The display expresses plot-x directly as sample index (xAxis is
-	// [0, plotSize-1], AnnotationCurve::sampleCount==0), so after this
-	// shift annotations align with the stitched digital samples.
-	if(m_windowSize > 0) {
-		const qint64 pad = static_cast<qint64>(m_windowSize)
-				 - static_cast<qint64>(minLen);
-		if(pad > 0) {
-			for(Annotation &a : annVec) {
-				a.startSample = static_cast<quint64>(
-					static_cast<qint64>(a.startSample) + pad);
-				a.endSample   = static_cast<quint64>(
-					static_cast<qint64>(a.endSample) + pad);
-			}
-		}
+		perStage[static_cast<std::size_t>(a.stageIndex)].append(out);
 	}
 
 	report(AcquisitionError::Severity::Info,
-	       QStringLiteral("process(): produced %1 annotations, outKey=%2")
-		       .arg(annVec.size())
-		       .arg(m_outKey.key));
+	       QStringLiteral("process(): produced annotations across %1 stages")
+		       .arg(nStages));
 
-	if(!m_outKey.key.isEmpty()) {
-		store->write(m_outKey, std::move(annVec));
-		Q_EMIT cycleProduced(m_outKey);
-	}
+	publish();
 }
 
 } // namespace acq

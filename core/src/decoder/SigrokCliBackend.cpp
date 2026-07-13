@@ -28,16 +28,18 @@ QStringList SigrokCliBackend::buildArgs(const DecoderConfig &cfg) const
 			.arg(cfg.numChannels)
 			.arg(static_cast<qint64>(cfg.sampleRate));
 
-	QString pSpec = QString::fromStdString(cfg.decoderId);
-	for(const auto &ch : cfg.channels)
-		pSpec += QString(":%1=%2")
-				 .arg(QString::fromStdString(ch.role))
-				 .arg(ch.bitIndex);
-	for(const auto &kv : cfg.options)
-		pSpec += QString(":%1=%2")
-				 .arg(QString::fromStdString(kv.first))
-				 .arg(QString::fromStdString(kv.second));
-	args << "-P" << pSpec;
+	for(const auto &stage : cfg.stack) {
+		QString pSpec = QString::fromStdString(stage.decoderId);
+		for(const auto &ch : stage.channels)
+			pSpec += QString(":%1=%2")
+					 .arg(QString::fromStdString(ch.role))
+					 .arg(ch.bitIndex);
+		for(const auto &kv : stage.options)
+			pSpec += QString(":%1=%2")
+					 .arg(QString::fromStdString(kv.first))
+					 .arg(QString::fromStdString(kv.second));
+		args << "-P" << pSpec;
+	}
 
 	args << "--protocol-decoder-samplenum"
 	     << "--protocol-decoder-ann-class";
@@ -70,8 +72,24 @@ void SigrokCliBackend::parseStdout(const QByteArray &buf,
 
 		const int decColon = rest.indexOf(": ");
 		if(decColon < 0) continue;
-		const QString decoder = rest.left(decColon);
-		rest                  = rest.mid(decColon + 2);
+		QString decoder = rest.left(decColon);
+		rest            = rest.mid(decColon + 2);
+
+		// sigrok tags stacked decoders as "<id>-<n>" where <n> is the
+		// 1-based position in the -P argument list. Split it off so
+		// consumers see the canonical id, and record the stage index
+		// (0-based) separately.
+		int stageIndex = 0;
+		const int lastDash = decoder.lastIndexOf('-');
+		if(lastDash > 0) {
+			const QString tail = decoder.mid(lastDash + 1);
+			bool ok = false;
+			const int n = tail.toInt(&ok);
+			if(ok && n >= 1) {
+				stageIndex = n - 1;
+				decoder    = decoder.left(lastDash);
+			}
+		}
 
 		const int classColon = rest.indexOf(": ");
 		QString klass, text;
@@ -83,12 +101,13 @@ void SigrokCliBackend::parseStdout(const QByteArray &buf,
 		}
 
 		AnnotationC ann;
-		ann.start    = start;
-		ann.end      = end;
-		ann.decoder  = decoder.toStdString();
-		ann.klass    = klass.toStdString();
-		ann.text     = text.toStdString();
-		ann.severity = 0;
+		ann.start      = start;
+		ann.end        = end;
+		ann.decoder    = decoder.toStdString();
+		ann.klass      = klass.toStdString();
+		ann.text       = text.toStdString();
+		ann.severity   = 0;
+		ann.stageIndex = stageIndex;
 		out.push_back(std::move(ann));
 	}
 }
