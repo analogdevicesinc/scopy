@@ -39,6 +39,7 @@ public:
 	// that defines the vertical band this decoder will occupy; a new
 	// AnnotationCurve is created, attached to the plot and stored here.
 	void registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
+			     const scopy::acq::DataKey &outKey,
 			     PlotAxis *yAxis);
 
 	// Remove the AnnotationCurve associated with the given decoder output

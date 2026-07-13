@@ -10,6 +10,9 @@
 #include <QRegularExpression>
 #include <QStandardPaths>
 
+#include <memory>
+#include <vector>
+
 namespace scopy {
 namespace decoder {
 
@@ -141,6 +144,74 @@ DecoderInfo SigrokCliCatalog::info(const QString &decoderId) const
 	return di;
 }
 
+void SigrokCliCatalog::loadAll() const
+{
+	// Ensure -L has run; anything decoders() adds to m_shortDesc is used
+	// as a fallback below.
+	const QList<QString> ids = decoders();
+	if(ids.isEmpty()) return;
+
+	const QString exe = resolveCli();
+	if(exe.isEmpty()) return;
+
+	// Cap concurrency to avoid fork-stormy behavior on constrained hosts.
+	// The scan is I/O-bound (sigrok-cli spends most of its time reading
+	// its own decoder .py) so a small pool suffices.
+	constexpr int kMaxParallel = 8;
+
+	QList<QString> todo;
+	todo.reserve(ids.size());
+	for(const QString &id : ids)
+		if(!m_info.contains(id)) todo.append(id);
+	if(todo.isEmpty()) return;
+
+	if(m_logger)
+		m_logger->info(kCatalogId,
+			QStringLiteral("loadAll: priming %1 decoder(s)").arg(todo.size()));
+
+	int next = 0;
+	while(next < todo.size()) {
+		const int batchEnd = std::min<int>(todo.size(), next + kMaxParallel);
+		std::vector<std::unique_ptr<QProcess>> batch;
+		batch.reserve(batchEnd - next);
+		QStringList batchIds;
+		batchIds.reserve(batchEnd - next);
+
+		for(int i = next; i < batchEnd; ++i) {
+			auto proc = std::make_unique<QProcess>();
+			proc->setProcessChannelMode(QProcess::MergedChannels);
+			proc->start(exe, {"--show", "-P", todo[i]});
+			batch.push_back(std::move(proc));
+			batchIds.append(todo[i]);
+		}
+
+		for(int i = 0; i < batch.size(); ++i) {
+			QProcess &p = *batch[i];
+			if(!p.waitForFinished(10000)) {
+				p.kill();
+				p.waitForFinished(500);
+				continue;
+			}
+			if(p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0)
+				continue;
+
+			const QString out = QString::fromUtf8(p.readAll());
+			if(out.isEmpty()) continue;
+
+			DecoderInfo di = parseShow(out, batchIds[i]);
+			if(di.description.isEmpty()) di.description = m_shortDesc.value(batchIds[i]);
+			if(di.name.isEmpty())        di.name        = batchIds[i];
+			m_info.insert(batchIds[i], di);
+		}
+
+		next = batchEnd;
+	}
+
+	if(m_logger)
+		m_logger->info(kCatalogId,
+			QStringLiteral("loadAll: cached %1 / %2").arg(m_info.size()).arg(ids.size()));
+}
+
 // Parse `sigrok-cli -L` output.
 //
 // The listing prints two sections:
@@ -208,6 +279,8 @@ DecoderInfo SigrokCliCatalog::parseShow(const QString &stdoutText,
 
 	enum class Section {
 		None,
+		InputIds,
+		OutputIds,
 		RequiredChannels,
 		OptionalChannels,
 		Options,
@@ -236,6 +309,8 @@ DecoderInfo SigrokCliCatalog::parseShow(const QString &stdoutText,
 			else if(head == "Annotation classes")section = Section::AnnClasses;
 			else if(head == "Annotation rows")   section = Section::AnnRows;
 			else if(head == "Documentation")     section = Section::Documentation;
+			else if(head == "Possible decoder input IDs")  section = Section::InputIds;
+			else if(head == "Possible decoder output IDs") section = Section::OutputIds;
 			else                                 section = Section::None;
 			continue;
 		}
@@ -293,6 +368,18 @@ DecoderInfo SigrokCliCatalog::parseShow(const QString &stdoutText,
 		case Section::AnnRows: {
 			// "- rx-data-vals (RX data): rx-data, rx-start, ..."
 			di.annotationRows.append(trimmed.mid(2).trimmed());
+			break;
+		}
+		case Section::InputIds: {
+			// "- logic"
+			const QString tok = trimmed.mid(2).trimmed();
+			if(!tok.isEmpty()) di.inputIds.append(tok);
+			break;
+		}
+		case Section::OutputIds: {
+			// "- uart"
+			const QString tok = trimmed.mid(2).trimmed();
+			if(!tok.isEmpty()) di.outputIds.append(tok);
 			break;
 		}
 		case Section::Documentation:

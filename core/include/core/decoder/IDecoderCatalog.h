@@ -47,6 +47,8 @@ struct SCOPY_CORE_EXPORT DecoderInfo
 	QString              name;        // "Universal Asynchronous Receiver/Transmitter"
 	QString              description; // short description
 	QString              documentation; // multi-line free-form docs
+	QStringList          inputIds;    // decoder types this one consumes (e.g. "logic", "uart")
+	QStringList          outputIds;   // decoder types this one produces (e.g. "uart")
 	QList<ChannelInfo>   channels;    // required first, then optional
 	QList<OptionInfo>    options;
 	QStringList          annotationRows;    // e.g. "rx-data-vals (RX data)"…
@@ -84,6 +86,18 @@ public:
 	// Full metadata for a single decoder. Returns a default-constructed
 	// DecoderInfo (isValid() == false) on error / unknown id.
 	virtual DecoderInfo    info(const QString &decoderId) const = 0;
+
+	// Eagerly populate the metadata cache for every decoder returned by
+	// decoders(). Safe to call multiple times: already-cached entries
+	// are skipped. Default implementation is a serial fallback; concrete
+	// backends override to parallelize.
+	//
+	// Blocks until the whole set is loaded — callers are expected to
+	// invoke this on a worker thread if latency matters.
+	virtual void loadAll() const
+	{
+		for(const QString &id : decoders()) (void)info(id);
+	}
 
 	static bool isValid(const DecoderInfo &d) { return !d.id.isEmpty(); }
 };

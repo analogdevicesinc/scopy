@@ -43,6 +43,11 @@ public:
 	QString        shortDescription(const QString &decoderId) const override;
 	DecoderInfo    info(const QString &decoderId) const override;
 
+	// Parallel eager cache prime: spawns one `sigrok-cli --show -P <id>`
+	// per un-cached decoder in a small QProcess pool. Blocks until all
+	// finish. Cache writes are serialized by the caller thread.
+	void           loadAll() const override;
+
 private:
 	QString              runCli(const QStringList &args, bool *ok = nullptr) const;
 	static void          parseListing(const QString &stdoutText,

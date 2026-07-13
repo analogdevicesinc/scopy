@@ -6,9 +6,12 @@
 #include <QPointer>
 #include <QPushButton>
 #include <QString>
+#include <QStringList>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+
+#include <functional>
 
 #include <core/acq_engine/DataKey.h>
 #include <core/decoder/IDecoderBackend.h>
@@ -52,6 +55,18 @@ public:
 Q_SIGNALS:
 	void removeRequested(const QString &uid);
 
+Q_SIGNALS:
+	// Emitted when the "+ Stack…" button is clicked. The panel opens
+	// a filtered picker and, on success, calls appendStage(id) here.
+	void stackPickerRequested(DecoderEditor *editor,
+	                          const QStringList &acceptedInputIds);
+
+public:
+	// Append a stage to this editor after DecoderManager::pushStage has
+	// already grown the runtime side. Rebuilds the stack UI and does not
+	// re-apply the config (caller decides).
+	void appendStage(const scopy::decoder::DecoderInfo &info);
+
 private Q_SLOTS:
 	void onApplyClicked();
 	void markDirty();
@@ -64,9 +79,24 @@ public:
 	enum class EditorState { NotApplied, Running, Modified };
 
 private:
-	QWidget *buildChannelsGroup(QWidget *parent);
-	QWidget *buildOptionsGroup(QWidget *parent);
+	// One per-stage sub-group inside the editor. Only stage 0 has a
+	// populated channel-combos list (stacked stages consume the previous
+	// stage's product, so they don't bind raw channels).
+	struct Stage {
+		scopy::decoder::DecoderInfo info;
+		QWidget                    *box{nullptr};
+		QList<QComboBox *>          channelCombos;
+		QHash<QString, QWidget *>   optionWidgets;
+	};
+
+	QWidget *buildStageWidget(int stageIndex,
+	                          const scopy::decoder::DecoderInfo &info,
+	                          Stage &out);
+	QWidget *buildChannelsGroup(QWidget *parent, Stage &st);
+	QWidget *buildOptionsGroup(QWidget *parent, Stage &st);
 	QWidget *buildOptionEditor(const scopy::decoder::OptionInfo &o);
+
+	void rebuildStackButtonState();
 
 	// Read the current UI values into cfg + orderedRawKeys.
 	void collect(scopy::decoder::DecoderConfig &cfg,
@@ -76,17 +106,16 @@ private:
 	void setState(EditorState s);
 
 	QString                        m_uid;
-	scopy::decoder::DecoderInfo    m_info;
 	DecoderManager                *m_mgr;
 	QPointer<scopy::acq::DataStore> m_store;
 
 	QDoubleSpinBox                *m_sampleRateSpin{nullptr};
 
-	// One channel row per DecoderInfo::channels entry (same order).
-	QList<QComboBox *>             m_channelCombos;
-
-	// Option id → widget (heterogeneous). We introspect at collect() time.
-	QHash<QString, QWidget *>      m_optionWidgets;
+	// Container for the per-stage sub-groups; the "+ Stack…" button lives
+	// right below the last stage's widget.
+	QVBoxLayout                   *m_stagesLay{nullptr};
+	QPushButton                   *m_stackBtn{nullptr};
+	QList<Stage>                   m_stages;
 
 	QPushButton                   *m_applyBtn{nullptr};
 	QPushButton                   *m_removeBtn{nullptr};
@@ -122,9 +151,19 @@ public:
 private Q_SLOTS:
 	void onAddClicked();
 	void onEditorRemoveRequested(const QString &uid);
+	void onStackPickerRequested(DecoderEditor *editor,
+	                            const QStringList &acceptedInputIds);
 
 private:
 	void appendEditorFor(const QString &uid, const QString &decoderId);
+
+	// Shared filtered picker used by both "+ Add decoder…" and
+	// "+ Stack decoder…". The filter is applied to every decoder id
+	// returned by the catalog; false hides that row entirely. On accept,
+	// the callback receives the selected decoder id.
+	void openPicker(const QString &title,
+	                std::function<bool(const QString &)> filter,
+	                std::function<void(const QString &)> onAccept);
 
 	DecoderManager                     *m_mgr;
 	QPointer<scopy::acq::DataStore>     m_store;
