@@ -36,6 +36,7 @@ namespace scopy {
 namespace decoder {
 class IDecoderCatalog;
 class IDecoderBackendFactory;
+class DecoderLogger;
 } // namespace decoder
 
 namespace adc {
@@ -99,6 +100,7 @@ private:
 	// unique_ptr rather than Qt parenting.
 	std::unique_ptr<scopy::decoder::IDecoderCatalog>        m_decoderCatalog;
 	std::unique_ptr<scopy::decoder::IDecoderBackendFactory> m_decoderBackendFactory;
+	scopy::decoder::DecoderLogger                          *m_decoderLogger{nullptr};
 
 	QPointer<SimInstrument> m_ui;
 

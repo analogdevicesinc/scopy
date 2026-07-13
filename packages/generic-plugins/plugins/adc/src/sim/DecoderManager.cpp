@@ -5,6 +5,7 @@
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/ExternalDecoderProcessor.h>
+#include <core/decoder/DecoderLogger.h>
 #include <core/decoder/IDecoderBackendFactory.h>
 
 #include <gui/plotaxis.h>
@@ -12,13 +13,12 @@
 #include <gui/style.h>
 #include <gui/style_attributes.h>
 
-#include <QLoggingCategory>
 #include <QPen>
-
-Q_LOGGING_CATEGORY(CAT_DECODER_MGR, "DecoderManager")
 
 namespace scopy {
 namespace adc {
+
+static constexpr const char *kMgrId = "decoder-manager";
 
 DecoderManager::DecoderManager(scopy::acq::AcquisitionEngine *engine,
                                scopy::acq::DataStore *store,
@@ -75,16 +75,18 @@ scopy::PlotAxis *DecoderManager::allocateBand()
 QString DecoderManager::addDecoder(const QString &decoderId)
 {
 	if(!m_engine) {
-		qCWarning(CAT_DECODER_MGR) << "addDecoder: no engine";
+		if(m_logger) m_logger->critical(kMgrId, QStringLiteral("addDecoder: no engine"));
 		return {};
 	}
 	if(!m_overlay || !m_plot) {
-		qCWarning(CAT_DECODER_MGR)
-			<< "addDecoder: overlay/plot not set (call setPlot/setOverlay first)";
+		if(m_logger)
+			m_logger->warning(kMgrId,
+				QStringLiteral("addDecoder: overlay/plot not set (call setPlot/setOverlay first)"));
 		return {};
 	}
 	if(!m_backendFactory) {
-		qCWarning(CAT_DECODER_MGR) << "addDecoder: no backend factory injected";
+		if(m_logger)
+			m_logger->critical(kMgrId, QStringLiteral("addDecoder: no backend factory injected"));
 		return {};
 	}
 	if(decoderId.isEmpty()) return {};
@@ -93,7 +95,8 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 
 	auto backend = m_backendFactory->create();
 	if(!backend) {
-		qCWarning(CAT_DECODER_MGR) << "addDecoder: backend factory returned null";
+		if(m_logger)
+			m_logger->critical(kMgrId, QStringLiteral("addDecoder: backend factory returned null"));
 		return {};
 	}
 	auto *proc   = new scopy::acq::ExternalDecoderProcessor(
@@ -127,7 +130,7 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	m_decoders.append(d);
 
 	Q_EMIT decoderAdded(uid);
-	qCInfo(CAT_DECODER_MGR) << "added decoder" << uid;
+	if(m_logger) m_logger->info(kMgrId, QStringLiteral("added decoder ") + uid);
 	return uid;
 }
 
@@ -141,7 +144,7 @@ void DecoderManager::removeDecoder(const QString &uid)
 		if(m_store)   m_store->remove(d.outKey);
 		if(d.proc) d.proc->deleteLater();
 		Q_EMIT decoderRemoved(uid);
-		qCInfo(CAT_DECODER_MGR) << "removed decoder" << uid;
+		if(m_logger) m_logger->info(kMgrId, QStringLiteral("removed decoder ") + uid);
 		return;
 	}
 }
@@ -152,12 +155,14 @@ void DecoderManager::applyConfig(const QString &uid,
 {
 	DecoderInstance *d = find(uid);
 	if(!d || !d->proc) {
-		qCWarning(CAT_DECODER_MGR) << "applyConfig: unknown uid" << uid;
+		if(m_logger)
+			m_logger->warning(kMgrId, QStringLiteral("applyConfig: unknown uid ") + uid);
 		return;
 	}
 	if(isEngineRunning()) {
-		qCWarning(CAT_DECODER_MGR)
-			<< "applyConfig: refusing mid-run mutation for" << uid;
+		if(m_logger)
+			m_logger->warning(kMgrId,
+				QStringLiteral("applyConfig: refusing mid-run mutation for ") + uid);
 		return;
 	}
 
@@ -177,10 +182,10 @@ void DecoderManager::applyConfig(const QString &uid,
 			m_store->ensureHistoryDepth(k, depth);
 	}
 
-	qCInfo(CAT_DECODER_MGR)
-		<< "applied config to" << uid
-		<< "channels=" << orderedRawKeys.size()
-		<< "sampleRate=" << cfg.sampleRate;
+	if(m_logger)
+		m_logger->info(kMgrId,
+			QStringLiteral("applied config to %1 channels=%2 sampleRate=%3")
+				.arg(uid).arg(orderedRawKeys.size()).arg(cfg.sampleRate));
 	Q_EMIT configApplied(uid);
 }
 

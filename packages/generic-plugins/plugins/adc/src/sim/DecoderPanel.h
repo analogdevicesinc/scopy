@@ -15,11 +15,13 @@
 #include <core/decoder/IDecoderCatalog.h>
 
 class QDoubleSpinBox;
+class QLabel;
 class QLineEdit;
 class QSpinBox;
 
 namespace scopy {
 namespace acq { class DataStore; }
+namespace decoder { class DecoderLogger; }
 
 namespace adc {
 
@@ -52,6 +54,14 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void onApplyClicked();
+	void markDirty();
+
+public:
+	// Three-state indicator of the editor vs. running processor:
+	//   NotApplied — decoder added but Apply never clicked yet
+	//   Running    — last-applied config matches what the processor uses
+	//   Modified   — user edited a value since the last Apply
+	enum class EditorState { NotApplied, Running, Modified };
 
 private:
 	QWidget *buildChannelsGroup(QWidget *parent);
@@ -61,6 +71,9 @@ private:
 	// Read the current UI values into cfg + orderedRawKeys.
 	void collect(scopy::decoder::DecoderConfig &cfg,
 	             QList<scopy::acq::DataKey> &orderedRawKeys) const;
+
+	// Push a new visual state to the status dot + text.
+	void setState(EditorState s);
 
 	QString                        m_uid;
 	scopy::decoder::DecoderInfo    m_info;
@@ -77,6 +90,10 @@ private:
 
 	QPushButton                   *m_applyBtn{nullptr};
 	QPushButton                   *m_removeBtn{nullptr};
+
+	QLabel                        *m_statusDot{nullptr};
+	QLabel                        *m_statusText{nullptr};
+	EditorState                    m_state{EditorState::NotApplied};
 };
 
 // Right-stack panel that lists all active decoders and lets the user add
@@ -92,6 +109,8 @@ public:
 	             scopy::acq::DataStore *store,
 	             scopy::decoder::IDecoderCatalog *catalog,
 	             QWidget *parent = nullptr);
+
+	void setLogger(scopy::decoder::DecoderLogger *lg) { m_logger = lg; }
 
 	// Called by the controller each cycle so the channel combos reflect
 	// the current DataStore key set.
@@ -124,6 +143,8 @@ private:
 	// Inline picker section shown by "+ Add decoder…". Only one at a
 	// time; clicking Add again closes any existing picker first.
 	QPointer<QWidget>                   m_pickerWidget;
+
+	scopy::decoder::DecoderLogger      *m_logger{nullptr};
 };
 
 } // namespace adc

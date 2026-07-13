@@ -15,6 +15,7 @@ class PlotWidget;
 
 namespace decoder {
 class IDecoderBackendFactory;
+class DecoderLogger;
 } // namespace decoder
 
 namespace acq {
@@ -61,6 +62,7 @@ public:
 
 	void setPlot(scopy::PlotWidget *plot);
 	void setOverlay(DecoderOverlay *overlay);
+	void setLogger(scopy::decoder::DecoderLogger *lg) { m_logger = lg; }
 
 	// Create a new decoder instance. Returns its uid or an empty string
 	// on failure (e.g. plot/overlay not set yet).
@@ -111,6 +113,8 @@ private:
 	// Window size (samples) applied to every ExternalDecoderProcessor.
 	// 0 = legacy single-chunk mode.
 	int                             m_windowSize{0};
+
+	scopy::decoder::DecoderLogger  *m_logger{nullptr};
 };
 
 } // namespace adc

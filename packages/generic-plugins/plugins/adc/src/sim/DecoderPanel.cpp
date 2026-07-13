@@ -3,6 +3,10 @@
 #include "DecoderManager.h"
 
 #include <core/acq_engine/DataStore.h>
+#include <core/decoder/DecoderLogger.h>
+
+#include <gui/style.h>
+#include <gui/style_attributes.h>
 
 #include <QDoubleSpinBox>
 #include <QFormLayout>
@@ -12,16 +16,16 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QLoggingCategory>
 #include <QScrollArea>
 #include <QSpinBox>
+#include <QStyle>
 #include <QToolButton>
 #include <QVBoxLayout>
 
-Q_LOGGING_CATEGORY(CAT_DECODER_PANEL, "DecoderPanel")
-
 namespace scopy {
 namespace adc {
+
+static constexpr const char *kPanelId = "decoder-panel";
 
 static const QString CH_UNASSIGNED = QStringLiteral("<unassigned>");
 
@@ -48,11 +52,44 @@ DecoderEditor::DecoderEditor(const QString &uid,
 	auto *lay = new QVBoxLayout(box);
 	lay->setSpacing(6);
 
-	if(!info.description.isEmpty()) {
+	// Status row: right-aligned dot + text indicating whether the current
+	// widget values are running, not yet applied, or modified since Apply.
+	{
+		auto *row = new QHBoxLayout();
+		row->addStretch();
+		m_statusDot = new QLabel(box);
+		const int sz = scopy::Style::getDimension(json::global::unit_0_5);
+		m_statusDot->setFixedSize(sz, sz);
+		row->addWidget(m_statusDot, 0, Qt::AlignVCenter);
+		m_statusText = new QLabel(box);
+		row->addWidget(m_statusText, 0, Qt::AlignVCenter);
+		lay->addLayout(row);
+	}
+
+	if(!info.description.isEmpty() || !info.documentation.isEmpty()) {
+		auto *row = new QHBoxLayout();
+		row->setSpacing(4);
+
 		auto *desc = new QLabel(info.description, box);
 		desc->setWordWrap(true);
 		desc->setStyleSheet("color:#888");
-		lay->addWidget(desc);
+		row->addWidget(desc, 1);
+
+		if(!info.documentation.isEmpty()) {
+			auto *infoBtn = new QToolButton(box);
+			infoBtn->setIcon(style()->standardIcon(QStyle::SP_MessageBoxInformation));
+			infoBtn->setAutoRaise(true);
+			// QToolTip wraps at ~80 columns when the string contains no
+			// HTML tags; wrap the docs in <p> and pre-escape so newlines
+			// become paragraph breaks rather than a single blob.
+			QString html = info.documentation.toHtmlEscaped();
+			html.replace(QStringLiteral("\n\n"), QStringLiteral("</p><p>"));
+			html.replace(QChar('\n'), QChar(' '));
+			infoBtn->setToolTip(QStringLiteral("<p>%1</p>").arg(html));
+			row->addWidget(infoBtn, 0, Qt::AlignTop);
+		}
+
+		lay->addLayout(row);
 	}
 
 	// Sample rate
@@ -66,6 +103,9 @@ DecoderEditor::DecoderEditor(const QString &uid,
 		m_sampleRateSpin->setValue(1.0e6);
 		row->addWidget(m_sampleRateSpin, 1);
 		lay->addLayout(row);
+		connect(m_sampleRateSpin,
+		        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+		        this, &DecoderEditor::markDirty);
 	}
 
 	// Channels
@@ -91,6 +131,17 @@ DecoderEditor::DecoderEditor(const QString &uid,
 	connect(m_removeBtn, &QPushButton::clicked, this, [this]() {
 		Q_EMIT removeRequested(m_uid);
 	});
+
+	// Authoritative apply signal: also fires for programmatic applies.
+	if(m_mgr) {
+		connect(m_mgr, &DecoderManager::configApplied,
+		        this, [this](const QString &uid) {
+			if(uid == m_uid) setState(EditorState::Running);
+		});
+	}
+
+	// Initial visual state.
+	setState(EditorState::NotApplied);
 }
 
 QWidget *DecoderEditor::buildChannelsGroup(QWidget *parent)
@@ -108,6 +159,8 @@ QWidget *DecoderEditor::buildChannelsGroup(QWidget *parent)
 		if(!ch.desc.isEmpty()) combo->setToolTip(ch.desc);
 		form->addRow(label + ":", combo);
 		m_channelCombos.append(combo);
+		connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+		        this, &DecoderEditor::markDirty);
 	}
 	return box;
 }
@@ -137,6 +190,8 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 			const int idx = c->findText(o.defaultValue);
 			if(idx >= 0) c->setCurrentIndex(idx);
 		}
+		connect(c, QOverload<int>::of(&QComboBox::currentIndexChanged),
+		        this, &DecoderEditor::markDirty);
 		return c;
 	}
 	case scopy::decoder::OptionType::Int: {
@@ -151,11 +206,15 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 				const int idx = c->findText(o.defaultValue);
 				if(idx >= 0) c->setCurrentIndex(idx);
 			}
+			connect(c, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			        this, &DecoderEditor::markDirty);
 			return c;
 		}
 		auto *s = new QSpinBox(this);
 		s->setRange(-1000000000, 1000000000);
 		s->setValue(o.defaultValue.toInt());
+		connect(s, QOverload<int>::of(&QSpinBox::valueChanged),
+		        this, &DecoderEditor::markDirty);
 		return s;
 	}
 	case scopy::decoder::OptionType::Double: {
@@ -166,18 +225,23 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 				const int idx = c->findText(o.defaultValue);
 				if(idx >= 0) c->setCurrentIndex(idx);
 			}
+			connect(c, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			        this, &DecoderEditor::markDirty);
 			return c;
 		}
 		auto *s = new QDoubleSpinBox(this);
 		s->setRange(-1.0e12, 1.0e12);
 		s->setDecimals(3);
 		s->setValue(o.defaultValue.toDouble());
+		connect(s, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+		        this, &DecoderEditor::markDirty);
 		return s;
 	}
 	case scopy::decoder::OptionType::String:
 	default: {
 		auto *l = new QLineEdit(this);
 		l->setText(o.defaultValue);
+		connect(l, &QLineEdit::textChanged, this, &DecoderEditor::markDirty);
 		return l;
 	}
 	}
@@ -243,14 +307,60 @@ void DecoderEditor::onApplyClicked()
 {
 	if(!m_mgr) return;
 	if(m_mgr->isEngineRunning()) {
-		qCWarning(CAT_DECODER_PANEL)
-			<< "Apply ignored: engine running (stop the engine first)";
 		return;
 	}
 	scopy::decoder::DecoderConfig cfg;
 	QList<scopy::acq::DataKey> keys;
 	collect(cfg, keys);
+	// State transition to Running happens via the DecoderManager::configApplied
+	// signal wired in the constructor — that also covers programmatic applies.
 	m_mgr->applyConfig(m_uid, cfg, keys);
+}
+
+void DecoderEditor::markDirty()
+{
+	// Only transition from Running → Modified. Stay in NotApplied until the
+	// user actually clicks Apply once.
+	if(m_state == EditorState::Running) setState(EditorState::Modified);
+}
+
+void DecoderEditor::setState(EditorState s)
+{
+	m_state = s;
+
+	QString color;
+	QString text;
+	QString tip;
+	switch(s) {
+	case EditorState::NotApplied:
+		color = scopy::Style::getColor(json::theme::content_silent).name();
+		text  = QStringLiteral("Not applied");
+		tip   = QStringLiteral("Configure channels/options and click Apply to start decoding.");
+		break;
+	case EditorState::Running:
+		color = scopy::Style::getColor(json::global::led_success).name();
+		text  = QStringLiteral("Running");
+		tip   = QStringLiteral("Decoder is running with the currently displayed settings.");
+		break;
+	case EditorState::Modified:
+		color = scopy::Style::getColor(json::global::led_error).name();
+		text  = QStringLiteral("Modified");
+		tip   = QStringLiteral("Settings changed since last Apply. Click Apply to update the running decoder.");
+		break;
+	}
+
+	if(m_statusDot) {
+		const int sz = m_statusDot->width();
+		m_statusDot->setStyleSheet(QStringLiteral(
+			"background-color:%1; border-radius:%2px;")
+			.arg(color).arg(sz / 2));
+		m_statusDot->setToolTip(tip);
+	}
+	if(m_statusText) {
+		m_statusText->setText(text);
+		m_statusText->setStyleSheet(QStringLiteral("color:%1;").arg(color));
+		m_statusText->setToolTip(tip);
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -336,12 +446,14 @@ void DecoderPanel::setEngineRunning(bool running)
 void DecoderPanel::onAddClicked()
 {
 	if(!m_catalog) {
-		qCWarning(CAT_DECODER_PANEL) << "onAddClicked: no catalog injected";
+		if(m_logger)
+			m_logger->critical(kPanelId, QStringLiteral("onAddClicked: no catalog injected"));
 		return;
 	}
 	const QList<QString> ids = m_catalog->decoders();
 	if(ids.isEmpty()) {
-		qCWarning(CAT_DECODER_PANEL) << "no decoders returned by catalog";
+		if(m_logger)
+			m_logger->warning(kPanelId, QStringLiteral("no decoders returned by catalog"));
 		return;
 	}
 
@@ -398,7 +510,8 @@ void DecoderPanel::onAddClicked()
 		}
 		const QString uid = m_mgr->addDecoder(id);
 		if(uid.isEmpty()) {
-			qCWarning(CAT_DECODER_PANEL) << "DecoderManager::addDecoder failed";
+			if(m_logger)
+				m_logger->critical(kPanelId, QStringLiteral("DecoderManager::addDecoder failed"));
 			return;
 		}
 		appendEditorFor(uid, id);
