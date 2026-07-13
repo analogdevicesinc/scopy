@@ -1,12 +1,13 @@
 #include "decoder/DynamicLibBackend.h"
 
-#include <QLibrary>
-#include <QLoggingCategory>
+#include "decoder/DecoderLogger.h"
 
-Q_LOGGING_CATEGORY(CAT_DYNLIB_BACKEND, "DynamicLibBackend")
+#include <QLibrary>
 
 namespace scopy {
 namespace decoder {
+
+static constexpr const char *kDynLibId = "dynamic-lib-backend";
 
 DynamicLibBackend::DynamicLibBackend(const QString &libraryPath)
 	: m_libraryPath(libraryPath)
@@ -19,8 +20,9 @@ bool DynamicLibBackend::decode(const DecoderConfig & /*cfg*/,
                                std::vector<AnnotationC> & /*out*/)
 {
 	m_lastError = "DynamicLibBackend not implemented in this build";
-	qCWarning(CAT_DYNLIB_BACKEND)
-		<< "decode() called on stub backend; library:" << m_libraryPath;
+	if(m_logger)
+		m_logger->warning(kDynLibId,
+			QStringLiteral("decode() called on stub backend; library: ") + m_libraryPath);
 	return false;
 }
 
