@@ -501,55 +501,77 @@ void SimInstrumentController::onCycleComplete()
 	const bool x2IsIndex = x2KeyStr.isEmpty();
 	const bool y2IsIndex = y2KeyStr.isEmpty();
 
-	QVector<float> xVec, yVec, y2Vec, x2Vec;
+	if(!xIsIndex)  m_liveX  = m_store->readWindowNative(scopy::acq::DataKey(xKeyStr),  m_plotSize);
+	else           m_liveX  = QVector<float>{};
+	if(!yIsIndex)  m_liveY  = m_store->readWindowNative(scopy::acq::DataKey(yKeyStr),  m_plotSize);
+	else           m_liveY  = QVector<float>{};
+	if(!x2IsIndex) m_liveX2 = m_store->readWindowNative(scopy::acq::DataKey(x2KeyStr), m_plotSize);
+	else           m_liveX2 = QVector<float>{};
+	if(!y2IsIndex) m_liveY2 = m_store->readWindowNative(scopy::acq::DataKey(y2KeyStr), m_plotSize);
+	else           m_liveY2 = QVector<float>{};
 
-	if(!xIsIndex)
-		xVec = m_store->readWindow(scopy::acq::DataKey(xKeyStr), m_plotSize);
-	if(!yIsIndex)
-		yVec = m_store->readWindow(scopy::acq::DataKey(yKeyStr), m_plotSize);
-	if(!y2IsIndex)
-		y2Vec = m_store->readWindow(scopy::acq::DataKey(y2KeyStr), m_plotSize);
-	if(!x2IsIndex)
-		x2Vec = m_store->readWindow(scopy::acq::DataKey(x2KeyStr), m_plotSize);
+	auto toFloatView = [](const scopy::acq::SampleVariant &v,
+			      QVector<float> &scratch)
+		-> std::pair<const float *, int> {
+		return std::visit(
+			[&](const auto &vec) -> std::pair<const float *, int> {
+				using VecT = std::decay_t<decltype(vec)>;
+				if constexpr(std::is_same_v<VecT, QVector<scopy::acq::Annotation>>) {
+					return {nullptr, 0};
+				} else if constexpr(std::is_same_v<VecT, QVector<float>>) {
+					return {vec.constData(), vec.size()};
+				} else {
+					scratch.resize(vec.size());
+					const auto *src = vec.constData();
+					float *dst = scratch.data();
+					for(int i = 0; i < vec.size(); ++i)
+						dst[i] = static_cast<float>(src[i]);
+					return {scratch.constData(), scratch.size()};
+				}
+			},
+			v);
+	};
+
+	const auto xView  = xIsIndex  ? std::pair<const float *, int>{nullptr, 0}
+				      : toFloatView(m_liveX,  m_scratchX);
+	const auto yView  = yIsIndex  ? std::pair<const float *, int>{nullptr, 0}
+				      : toFloatView(m_liveY,  m_scratchY);
+	const auto x2View = x2IsIndex ? std::pair<const float *, int>{nullptr, 0}
+				      : toFloatView(m_liveX2, m_scratchX2);
+	const auto y2View = y2IsIndex ? std::pair<const float *, int>{nullptr, 0}
+				      : toFloatView(m_liveY2, m_scratchY2);
 
 	if(m_decoderOverlay)
 		m_decoderOverlay->setSampleCount(0);
 
-	// A curve is "driven" only if it has numeric samples this cycle. Keys
-	// that produce no numeric data (e.g. decoder annotation keys) return
-	// an empty QVector<float> from readWindow — for those we hide the
-	// curve and drop it from the autoscalers so it doesn't skew Y range.
-	const bool curve1Driven = (xIsIndex || !xVec.isEmpty()) &&
-				  (yIsIndex || !yVec.isEmpty());
-	const bool curve2Driven = (x2IsIndex || !x2Vec.isEmpty()) &&
-				  (y2IsIndex || !y2Vec.isEmpty());
+	const bool curve1Driven = (xIsIndex || xView.second  > 0) &&
+				  (yIsIndex || yView.second  > 0);
+	const bool curve2Driven = (x2IsIndex || x2View.second > 0) &&
+				  (y2IsIndex || y2View.second > 0);
 	setCurveDriven(m_curve,  curve1Driven);
 	setCurveDriven(m_curve2, curve2Driven);
 
 	if(!curve1Driven)
 		return;
 
-	// Determine primary sample count (assembled, right-anchored)
 	int n;
 	if(!xIsIndex && !yIsIndex)
-		n = qMin(xVec.size(), yVec.size());
+		n = qMin(xView.second, yView.second);
 	else if(!xIsIndex)
-		n = xVec.size();
+		n = xView.second;
 	else if(!yIsIndex)
-		n = yVec.size();
+		n = yView.second;
 	else
 		n = m_plotSize; // both sample-index — draw full plot span
 
 	if(n <= 0)
 		return;
 
-	// Sample-Index X: point into the tail of the static [0..plotSize-1] buffer
-	// so that the newest chunk lines up at the right edge of the plot.
 	const int   idxOffset = qMax(0, m_indexBuf.size() - n);
-	const float *xPtr = xIsIndex ? (m_indexBuf.data() + idxOffset) : xVec.data();
-	const float *yPtr = yIsIndex ? (m_indexBuf.data() + idxOffset) : yVec.data();
+	const float *xPtr = xIsIndex ? (m_indexBuf.data() + idxOffset) : xView.first;
+	const float *yPtr = yIsIndex ? (m_indexBuf.data() + idxOffset) : yView.first;
 
-	m_curve->setSamples(xPtr, yPtr, static_cast<size_t>(n), true);
+	m_curve->setSamples(xPtr, yPtr, static_cast<size_t>(n), false);
 
 	// Curve 2
 	[&] {
@@ -562,8 +584,8 @@ void SimInstrumentController::onCycleComplete()
 			y2Ptr = m_indexBuf.data() + idxOffset;
 			n2    = n;
 		} else {
-			n2    = y2Vec.size();
-			y2Ptr = y2Vec.data();
+			n2    = y2View.second;
+			y2Ptr = y2View.first;
 		}
 
 		const float *x2Ptr;
@@ -572,10 +594,10 @@ void SimInstrumentController::onCycleComplete()
 			x2Ptr = m_indexBuf.data() + off2;
 			n2    = qMin(n2, m_indexBuf.size() - off2);
 		} else {
-			n2    = qMin(n2, x2Vec.size());
-			x2Ptr = x2Vec.data();
+			n2    = qMin(n2, x2View.second);
+			x2Ptr = x2View.first;
 		}
-		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
+		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), false);
 	}();
 
 	// Feed waterfall from the key selected in the Waterfall Y combo (index 2).
