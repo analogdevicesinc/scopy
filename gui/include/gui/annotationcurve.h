@@ -35,6 +35,7 @@
 namespace scopy {
 
 class PlotAxis;
+class PlotAxisHandle;
 
 // Drawing-side annotation representation. Kept local to the gui module so
 // this class does not depend on scopy-core (which links scopy-gui). Callers
@@ -49,16 +50,17 @@ struct SCOPY_GUI_EXPORT AnnotationSpan
 };
 
 // Draws a set of decoder annotations on a QwtPlot as colored rounded-rect
-// blocks stacked into rows. One instance per decoder; each instance uses its
-// own PlotAxis (yAxis) that defines the vertical band it occupies. All rows
-// derived from AnnotationSpan::klass stack inside [yAxis->min(), yAxis->max()].
+// blocks stacked into rows. One instance per decoder; the vertical band is
+// supplied externally: its top edge is a Y-axis scale value (so it follows
+// zoom/pan of the main y-axis) and its height is a fixed pixel size.
 //
 // PulseView-style aggregation collapses annotations that would render into
 // fewer than ~1 pixel into a single hatched block.
 class SCOPY_GUI_EXPORT AnnotationCurve : public QwtPlotItem
 {
 public:
-	AnnotationCurve(const QString &title, PlotAxis *xAxis, PlotAxis *yAxis);
+	AnnotationCurve(const QString &title, PlotAxis *xAxis, PlotAxis *yAxis,
+			PlotAxisHandle *handle = nullptr);
 	~AnnotationCurve() override;
 
 	// Full-replace update. Rows are derived from AnnotationSpan::klass;
@@ -75,6 +77,13 @@ public:
 	// x-axis interval (whatever it currently is). If 0, startSample/
 	// endSample are used verbatim as x-axis data values.
 	void setSampleCount(quint64 n);
+
+	// Band placement. Top edge is expressed in the y-axis' scale
+	// coordinates so it moves with y-axis zoom/pan. Height is a fixed
+	// canvas-pixel value so annotation rows stay legible independent of
+	// the y-scale. The band grows downward from top.
+	void setBandTopScale(double yScaleValue);
+	void setBandHeightPx(double heightPx);
 
 	// QwtPlotItem
 	int  rtti() const override { return QwtPlotItem::Rtti_PlotUserItem + 42; }
@@ -124,14 +133,22 @@ private:
 
 	PlotAxis *m_xAxis;
 	PlotAxis *m_yAxis;
+	PlotAxisHandle *m_handle;
 
 	double sampleToX(quint64 sample, const QwtScaleMap &xMap) const;
 
+	QString                 m_title;
 	QVector<AnnotationSpan> m_anns;
 	QList<Row>              m_rows;
 	QHash<QString, int>     m_rowByClass;
 	QHash<QString, QColor>  m_classColor;
 	quint64                 m_sampleCount = 0;
+
+	// Band geometry supplied by the caller (typically DecoderOverlay).
+	// Default: place at y-scale 0 with a modest height so the item is
+	// non-empty even if the caller forgets to configure it.
+	double m_bandTopScale = 0.0;
+	double m_bandHeightPx = 24.0;
 };
 
 } // namespace scopy

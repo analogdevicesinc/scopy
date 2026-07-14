@@ -9,9 +9,15 @@
 #include <core/decoder/IDecoderBackendFactory.h>
 
 #include <gui/plotaxis.h>
+#include <gui/plotaxishandle.h>
+#include <gui/plotnavigator.hpp>
 #include <gui/plotwidget.h>
 #include <gui/style.h>
 #include <gui/style_attributes.h>
+
+#include <axishandle.h>
+#include <qwt_plot.h>
+#include <qwt_plot_canvas.h>
 
 #include <QPen>
 
@@ -36,12 +42,17 @@ DecoderManager::~DecoderManager()
 	// engine doesn't call process() on dangling pointers.
 	for(const DecoderInstance &d : m_decoders) {
 		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
+		for(const QPointer<scopy::PlotAxisHandle> &h : d.handles) {
+			if(h.isNull()) continue;
+			if(m_plot) m_plot->removePlotAxisHandle(h);
+			h->deleteLater();
+		}
 		if(d.proc) d.proc->deleteLater();
 	}
 	m_decoders.clear();
 }
 
-void DecoderManager::setPlot(scopy::PlotWidget *plot)    { m_plot = plot; }
+void DecoderManager::setPlot(scopy::PlotWidget *plot)   { m_plot = plot; }
 void DecoderManager::setOverlay(DecoderOverlay *overlay) { m_overlay = overlay; }
 
 bool DecoderManager::isEngineRunning() const
@@ -56,20 +67,51 @@ DecoderInstance *DecoderManager::find(const QString &uid)
 	return nullptr;
 }
 
-scopy::PlotAxis *DecoderManager::allocateBand()
+double DecoderManager::nextBandPos()
 {
-	if(!m_plot) return nullptr;
-	constexpr double kBandHeight = 1.0;
-	const double top    = m_nextBandTop;
-	const double bottom = top - kBandHeight;
-	m_nextBandTop       = bottom;
+	if(!m_plot || !m_plot->yAxis()) return 0.0;
 
-	QPen pen(scopy::Style::getColor(json::theme::content_silent));
-	auto *axis = new scopy::PlotAxis(m_plot->yAxis()->position(),
-	                                 m_plot, pen, this);
-	axis->setInterval(bottom, top);
-	Q_EMIT bandAllocated(axis);
-	return axis;
+	if(!m_bandCursorInit) {
+		const double ymin = m_plot->yAxis()->min();
+		const double ymax = m_plot->yAxis()->max();
+		const double gap  = (ymax - ymin) * 0.05;
+		m_nextBandPos     = ymin - gap;
+		m_bandCursorInit  = true;
+	}
+
+	constexpr double kBandStride = 1.0;
+	const double pos = m_nextBandPos;
+	m_nextBandPos    = pos - kBandStride;
+	return pos;
+}
+
+scopy::PlotAxisHandle *DecoderManager::attachHandle(double initialPos)
+{
+	if(!m_plot || !m_plot->yAxis()) return nullptr;
+
+	auto *h = new scopy::PlotAxisHandle(m_plot, m_plot->yAxis());
+	h->handle()->setBarVisibility(scopy::BarVisibility::ON_HOVER);
+	h->handle()->setColor(scopy::Style::getColor(json::theme::content_silent));
+	h->handle()->setHandlePos(scopy::HandlePos::SOUTH_OR_EAST);
+
+	m_plot->addPlotAxisHandle(h);
+
+	if(auto *ah = h->handle()) {
+		if(auto *canvas = m_plot->plot()->canvas()) {
+			ah->setParent(canvas);
+			ah->resize(canvas->size());
+		}
+		ah->show();
+		ah->raise();
+	}
+
+	h->setPosition(initialPos);
+
+	connect(h, &scopy::PlotAxisHandle::scalePosChanged, this, [this](double) {
+		if(m_plot) m_plot->plot()->replot();
+	});
+
+	return h;
 }
 
 QString DecoderManager::addDecoder(const QString &decoderId)
@@ -91,7 +133,7 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	}
 	if(decoderId.isEmpty()) return {};
 
-	const QString uid = QString("%1#%2").arg(decoderId).arg(m_uidCounter++);
+	const QString uid = QString("%1-%2").arg(decoderId).arg(m_uidCounter++);
 
 	auto backend = m_backendFactory->create();
 	if(!backend) {
@@ -118,8 +160,9 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 
 	m_engine->addProcessor(proc);
 
-	scopy::PlotAxis *axis = allocateBand();
-	m_overlay->registerDecoder(proc, outKey, axis);
+	const double bandPos          = nextBandPos();
+	scopy::PlotAxisHandle *handle = attachHandle(bandPos);
+	m_overlay->registerDecoder(proc, outKey, handle, decoderId);
 
 	DecoderInstance d;
 	d.uid       = uid;
@@ -127,7 +170,7 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	d.cfg       = cfg;
 	d.proc      = proc;
 	d.outKeys   = {outKey};
-	d.axes      = {QPointer<scopy::PlotAxis>(axis)};
+	d.handles   = {QPointer<scopy::PlotAxisHandle>(handle)};
 	m_decoders.append(d);
 
 	Q_EMIT decoderAdded(uid);
@@ -144,6 +187,11 @@ void DecoderManager::removeDecoder(const QString &uid)
 		for(const scopy::acq::DataKey &k : d.outKeys) {
 			if(m_overlay) m_overlay->unregisterDecoder(k);
 			if(m_store)   m_store->remove(k);
+		}
+		for(const QPointer<scopy::PlotAxisHandle> &h : d.handles) {
+			if(h.isNull()) continue;
+			if(m_plot) m_plot->removePlotAxisHandle(h);
+			h->deleteLater();
 		}
 		if(d.proc) d.proc->deleteLater();
 		Q_EMIT decoderRemoved(uid);
@@ -182,12 +230,19 @@ int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
 			"annotations");
 	d->outKeys.append(outKey);
 
-	scopy::PlotAxis *axis = allocateBand();
-	d->axes.append(QPointer<scopy::PlotAxis>(axis));
+	// Reuse a previously-popped handle if one is still alive at this
+	// index; otherwise allocate a fresh one at the next stacking pos.
+	scopy::PlotAxisHandle *handle = nullptr;
+	if(stageIndex < d->handles.size() && !d->handles[stageIndex].isNull()) {
+		handle = d->handles[stageIndex].data();
+	} else {
+		handle = attachHandle(nextBandPos());
+		d->handles.append(QPointer<scopy::PlotAxisHandle>(handle));
+	}
 
 	d->proc->setConfig(d->cfg);
 	d->proc->setOutputKeys(d->outKeys);
-	m_overlay->registerDecoder(d->proc, outKey, axis);
+	m_overlay->registerDecoder(d->proc, outKey, handle, decoderId);
 
 	if(m_logger)
 		m_logger->info(kMgrId, QStringLiteral("pushStage: %1 += %2 (index %3)")
@@ -208,13 +263,13 @@ void DecoderManager::popStagesFrom(const QString &uid, int fromIndex)
 	if(fromIndex < 1) fromIndex = 1; // never drop root
 	if(fromIndex >= d->stageIds.size()) return;
 
+	// Keep handles alive for later reuse by pushStage(). Only unregister
+	// the overlay curves and drop the backend stack entries.
 	while(d->stageIds.size() > fromIndex) {
 		const int idx = d->stageIds.size() - 1;
 		const scopy::acq::DataKey k = d->outKeys[idx];
 		if(m_overlay) m_overlay->unregisterDecoder(k);
 		if(m_store)   m_store->remove(k);
-		if(!d->axes[idx].isNull()) d->axes[idx]->deleteLater();
-		d->axes.removeAt(idx);
 		d->outKeys.removeAt(idx);
 		d->stageIds.removeAt(idx);
 		d->cfg.stack.pop_back();

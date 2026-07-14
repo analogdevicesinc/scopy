@@ -6,6 +6,7 @@
 #include "acq_engine/SampleBuffer.h"
 #include "gui/annotationcurve.h"
 #include "gui/plotaxis.h"
+#include "gui/plotaxishandle.h"
 #include "gui/plotwidget.h"
 
 #include <QwtPlot>
@@ -13,7 +14,6 @@
 #include <QEvent>
 #include <QHelpEvent>
 #include <QMouseEvent>
-#include <QSet>
 #include <QToolTip>
 #include <QWidget>
 #include <qwt_scale_map.h>
@@ -44,17 +44,21 @@ DecoderOverlay::~DecoderOverlay() { m_curves.clear(); }
 
 void DecoderOverlay::registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
 				     const scopy::acq::DataKey &outKey,
-				     PlotAxis *yAxis)
+				     PlotAxisHandle *handle,
+				     const QString &title)
 {
-	if(!proc || !m_plot || !yAxis)
+	if(!proc || !m_plot || !handle)
 		return;
 
 	if(m_curves.contains(outKey))
 		return;
 
-	auto *curve = new AnnotationCurve(outKey.toString(),
-					  m_plot->xAxis(), yAxis);
-	curve->setVisible(false);
+	auto *curve = new AnnotationCurve(title,
+					  m_plot->xAxis(), m_plot->yAxis(), handle);
+	// Decoder annotations are always shown once registered. Visibility is
+	// no longer gated by the curve Y-combo — the user manages per-decoder
+	// presence via the DecoderPanel (Add / Remove) instead.
+	curve->setVisible(true);
 	curve->attach(m_plot->plot());
 	m_curves.insert(outKey, curve);
 
@@ -73,17 +77,6 @@ void DecoderOverlay::unregisterDecoder(const scopy::acq::DataKey &outKey)
 	if(curve) {
 		curve->detach();
 		delete curve;
-	}
-	if(m_plot)
-		m_plot->replot();
-}
-
-void DecoderOverlay::setVisibleKeys(const QList<scopy::acq::DataKey> &keys)
-{
-	const QSet<scopy::acq::DataKey> selected(keys.begin(), keys.end());
-	for(auto it = m_curves.constBegin(); it != m_curves.constEnd(); ++it) {
-		const bool visible = selected.contains(it.key());
-		it.value()->setVisible(visible);
 	}
 	if(m_plot)
 		m_plot->replot();

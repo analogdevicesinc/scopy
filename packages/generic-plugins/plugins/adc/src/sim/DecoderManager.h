@@ -11,6 +11,7 @@
 namespace scopy {
 
 class PlotAxis;
+class PlotAxisHandle;
 class PlotWidget;
 
 namespace decoder {
@@ -39,7 +40,10 @@ struct DecoderInstance
 	QList<scopy::acq::DataKey>             orderedRawKeys;  // bitIndex → DataKey (root only)
 	scopy::acq::ExternalDecoderProcessor  *proc{nullptr};
 	QList<scopy::acq::DataKey>             outKeys;         // one per stage
-	QList<QPointer<scopy::PlotAxis>>       axes;            // one band per stage
+	// One draggable handle per stage. The handle lives on the plot's
+	// main y-axis and its scale-space position defines the top of the
+	// annotation band; the AnnotationCurve reads this on each redraw.
+	QList<QPointer<scopy::PlotAxisHandle>> handles;
 };
 
 // Owns the list of active decoders and creates/destroys their processors
@@ -103,10 +107,16 @@ Q_SIGNALS:
 	void decoderAdded(const QString &uid);
 	void decoderRemoved(const QString &uid);
 	void configApplied(const QString &uid);
-	void bandAllocated(scopy::PlotAxis *axis);
 
 private:
-	scopy::PlotAxis *allocateBand(); // stack downward under waveform axis
+	// Compute the initial scale-space position (on the plot's main
+	// y-axis) for the next band handle, stacking downward from the
+	// previous handle position.
+	double nextBandPos();
+
+	// Create a draggable PlotAxisHandle on the plot's main y-axis at the
+	// given initial scale-space position, and make it visible.
+	scopy::PlotAxisHandle *attachHandle(double initialPos);
 
 	scopy::acq::AcquisitionEngine          *m_engine{nullptr};
 	scopy::acq::DataStore                  *m_store{nullptr};
@@ -120,9 +130,11 @@ private:
 	// add/remove cycles.
 	int                             m_uidCounter{0};
 
-	// Vertical stacking cursor for annotation bands. Bands start at
-	// -0.2 and grow downward in ~1.0-tall steps.
-	double                          m_nextBandTop{-0.2};
+	// Vertical stacking cursor (in main y-axis scale coordinates) for
+	// annotation band handle positions. First handle sits just below the
+	// current waveform y-range; each subsequent handle stacks downward.
+	double                          m_nextBandPos{0.0};
+	bool                            m_bandCursorInit{false};
 
 	// Window size (samples) applied to every ExternalDecoderProcessor.
 	// 0 = legacy single-chunk mode.

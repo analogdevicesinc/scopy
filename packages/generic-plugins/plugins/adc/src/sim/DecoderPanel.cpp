@@ -83,7 +83,7 @@ DecoderEditor::DecoderEditor(const QString &uid,
 	// "+ Stack…" button: disabled if the top stage produces nothing that
 	// could feed another decoder.
 	m_stackBtn = new QPushButton("Add stacked decoder", box);
-	scopy::Style::setStyle(m_stackBtn, style::properties::button::grayButton);
+	scopy::Style::setStyle(m_stackBtn, style::properties::button::subtleButton);
 	lay->addWidget(m_stackBtn);
 	connect(m_stackBtn, &QPushButton::clicked, this, [this]() {
 		if(m_stages.isEmpty()) return;
@@ -175,7 +175,7 @@ QWidget *DecoderEditor::buildStageWidget(int stageIndex,
 	if(stageIndex > 0) {
 		auto *row = new QHBoxLayout();
 		auto *rm  = new QPushButton(QStringLiteral("Unstack decoder"), box);
-		scopy::Style::setStyle(rm, style::properties::button::grayButton);
+		scopy::Style::setStyle(rm, style::properties::button::subtleButton);
 		row->addStretch();
 		row->addWidget(rm);
 		lay->addLayout(row);
@@ -586,7 +586,7 @@ void DecoderPanel::openPicker(const QString &title,
 	auto *addBtn    = new QPushButton("Add", box);
 	auto *cancelBtn = new QPushButton("Cancel", box);
 	scopy::Style::setStyle(addBtn,    style::properties::button::basicButton);
-	scopy::Style::setStyle(cancelBtn, style::properties::button::subtleButton);
+	scopy::Style::setStyle(cancelBtn, style::properties::button::basicButton);
 	btnRow->addStretch();
 	btnRow->addWidget(addBtn);
 	btnRow->addWidget(cancelBtn);
