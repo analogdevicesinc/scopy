@@ -13,7 +13,7 @@ class QEvent;
 namespace scopy {
 
 class AnnotationCurve;
-class PlotAxis;
+class PlotAxisHandle;
 class PlotWidget;
 
 namespace acq {
@@ -25,8 +25,10 @@ namespace adc {
 
 // Subscribes to ExternalDecoderProcessor::cycleProduced, reads the produced
 // annotations from the DataStore and forwards them to an AnnotationCurve for
-// on-plot drawing. Each registered decoder gets its own PlotAxis (vertical
-// band) and its own AnnotationCurve instance.
+// on-plot drawing. Each registered decoder gets its own annotation band
+// rendered against a caller-supplied PlotAxis (its interval defines the
+// band extent). Drag repositioning of the band is a separate concern handled
+// outside the overlay by whoever owns the axis.
 class DecoderOverlay : public QObject
 {
 	Q_OBJECT
@@ -35,21 +37,19 @@ public:
 		       QObject *parent = nullptr);
 	~DecoderOverlay() override;
 
-	// Register a decoder for drawing. The caller supplies the PlotAxis
-	// that defines the vertical band this decoder will occupy; a new
-	// AnnotationCurve is created, attached to the plot and stored here.
+	// Register a decoder for drawing. The caller supplies the
+	// PlotAxisHandle whose scale-space position defines the top of this
+	// decoder's annotation band; the overlay attaches an AnnotationCurve
+	// that reads the handle's position on every redraw.
 	void registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
 			     const scopy::acq::DataKey &outKey,
-			     PlotAxis *yAxis);
+			     scopy::PlotAxisHandle *handle,
+			     const QString &title);
 
 	// Remove the AnnotationCurve associated with the given decoder output
 	// key: detach from the plot, delete the curve and drop it from the
 	// internal map. Safe to call for unknown keys.
 	void unregisterDecoder(const scopy::acq::DataKey &outKey);
-
-	// Show only the curves whose output DataKey is in `keys`; hide the rest.
-	// Pass an empty list to hide all.
-	void setVisibleKeys(const QList<scopy::acq::DataKey> &keys);
 
 	// Push the total sample count into every registered AnnotationCurve so
 	// annotations are laid out proportionally across the current plot

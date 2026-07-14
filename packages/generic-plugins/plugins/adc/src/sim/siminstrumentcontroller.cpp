@@ -3,7 +3,6 @@
 #include "DecoderOverlay.h"
 #include "DecoderManager.h"
 #include "DecoderPanel.h"
-#include "plotnavigator.hpp"
 
 #include <core/decoder/DecoderLogger.h>
 #include <core/decoder/SigrokCliBackendFactory.h>
@@ -131,11 +130,6 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	m_decoderMgr->setPlot(m_ui->m_plot);
 	m_decoderMgr->setOverlay(m_decoderOverlay);
 	m_decoderMgr->setDecoderWindowSize(m_plotSize);
-	connect(m_decoderMgr, &DecoderManager::bandAllocated, this,
-		[this](scopy::PlotAxis *axis) {
-			if(auto *nav = m_ui->m_plot->navigator())
-				nav->addAxis(axis);
-		});
 
 	// ---- Genalyzer analysis panel ----
 	m_genalyzerPanel = new scopy::GenalyzerPanel(m_ui);
@@ -490,17 +484,9 @@ void SimInstrumentController::onCycleComplete()
 	const QString x2KeyStr = m_ui->curveXKey(1);
 	const QString y2KeyStr = m_ui->curveYKey(1);
 
-	// Decoder overlays are shown only for the DataKeys currently selected
-	// as a curve's Y source. This lets the user "view" a decoder key just
-	// like a numeric one.
-	if(m_decoderOverlay) {
-		QList<scopy::acq::DataKey> selected;
-		for(const QString &s : {yKeyStr, y2KeyStr})
-			if(!s.isEmpty())
-				selected.append(scopy::acq::DataKey(s));
-		m_decoderOverlay->setVisibleKeys(selected);
-	}
-
+	// Decoder annotations are drawn for every registered decoder,
+	// independent of the curve Y-combo selection. The curve combos only
+	// control the numeric X/Y traces below.
 	const bool xIsIndex  = xKeyStr.isEmpty();
 	const bool yIsIndex  = yKeyStr.isEmpty();
 	const bool x2IsIndex = x2KeyStr.isEmpty();
@@ -546,8 +532,12 @@ void SimInstrumentController::onCycleComplete()
 	const auto y2View = y2IsIndex ? std::pair<const float *, int>{nullptr, 0}
 				      : toFloatView(m_liveY2, m_scratchY2);
 
+	// Map annotation sample indices [0..m_plotSize) proportionally across
+	// whatever x-scale the plot currently uses, so decoder annotations
+	// stay aligned with the waveform curves regardless of the selected
+	// x-key (index, time, frequency, …).
 	if(m_decoderOverlay)
-		m_decoderOverlay->setSampleCount(0);
+		m_decoderOverlay->setSampleCount(static_cast<quint64>(m_plotSize));
 
 	const bool curve1Driven = (xIsIndex || xView.second  > 0) &&
 				  (yIsIndex || yView.second  > 0);
