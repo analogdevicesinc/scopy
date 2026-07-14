@@ -45,9 +45,12 @@ std::size_t SourceBlock::bufferSize() const
 void SourceBlock::enableChannel(const QString &channelId, bool en)
 {
 	const bool added = !m_channels.contains(channelId);
+	const bool prev  = m_channels.value(channelId, false);
 	m_channels[channelId] = en;
 	if(added)
 		Q_EMIT channelsChanged();
+	if(prev != en)
+		Q_EMIT channelEnabledChanged(channelId, en);
 }
 
 void SourceBlock::removeChannel(const QString &channelId)
