@@ -44,6 +44,7 @@ namespace adc {
 class DecoderOverlay;
 class DecoderManager;
 class DecoderPanel;
+class DigitalTrackManager;
 
 // Self-contained controller for the simulated ADC tool.
 // Does NOT depend on GRTopBlock, AcqTreeNode, or any GNU Radio component.
@@ -92,6 +93,7 @@ private:
 	scopy::adc::DecoderManager           *m_decoderMgr{nullptr};
 	scopy::adc::DecoderPanel             *m_decoderPanel{nullptr};
 	scopy::adc::DecoderOverlay           *m_decoderOverlay{nullptr};
+	scopy::adc::DigitalTrackManager      *m_digitalMgr{nullptr};
 	scopy::GenalyzerPanel                *m_genalyzerPanel{nullptr};
 
 	// Composition-root-owned decoder plumbing. Swap the concrete
