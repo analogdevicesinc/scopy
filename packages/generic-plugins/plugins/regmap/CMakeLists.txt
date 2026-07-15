@@ -74,8 +74,6 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
-find_package(libm2k REQUIRED)
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(REGMAP_XML_BUILD_PATH
 	    ${SCOPY_PACKAGE_BUILD_PATH}/${PACKAGE_NAME}/plugins/${SCOPY_MODULE}/resources/regmap-xml
@@ -126,7 +124,6 @@ target_link_libraries(
 	       scopy-core
 	       scopy-pkg-manager
 	       Qt${QT_VERSION_MAJOR}::Xml
-	       libm2k::libm2k
 	       Qt${QT_VERSION_MAJOR}::Test
 )
 

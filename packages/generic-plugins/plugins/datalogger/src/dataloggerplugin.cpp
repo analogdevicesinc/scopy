@@ -32,8 +32,6 @@
 #include <style.h>
 #include <deviceiconbuilder.h>
 
-#include <libm2k/analog/dmm.hpp>
-
 #include <iioutil/connectionprovider.h>
 
 #include <pluginbase/preferences.h>
