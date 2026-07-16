@@ -28,6 +28,7 @@ class ExternalDecoderProcessor;
 namespace adc {
 
 class DecoderOverlay;
+class DigitalTrackManager;
 
 // Runtime handle for one active decoder stack. Owned by DecoderManager;
 // the AcquisitionEngine owns the processor lifetime. A stack has one entry
@@ -68,6 +69,12 @@ public:
 	void setPlot(scopy::PlotWidget *plot);
 	void setOverlay(DecoderOverlay *overlay);
 	void setLogger(scopy::decoder::DecoderLogger *lg) { m_logger = lg; }
+
+	// Optional: if set, annotation-band handles are allocated on this
+	// dedicated digital-track manager instead of being created directly
+	// on the plot's main y-axis. Enables the mixed-signal view where
+	// analog curves and decoder annotations are on different axes.
+	void setDigitalTrackManager(DigitalTrackManager *mgr);
 
 	// Create a new decoder instance. Returns its uid or an empty string
 	// on failure (e.g. plot/overlay not set yet).
@@ -123,6 +130,7 @@ private:
 	scopy::decoder::IDecoderBackendFactory *m_backendFactory{nullptr};
 	QPointer<scopy::PlotWidget>             m_plot;
 	QPointer<DecoderOverlay>                m_overlay;
+	QPointer<DigitalTrackManager>           m_digitalMgr;
 
 	QList<DecoderInstance>          m_decoders;
 

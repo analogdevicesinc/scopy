@@ -13,6 +13,7 @@ class QEvent;
 namespace scopy {
 
 class AnnotationCurve;
+class PlotAxis;
 class PlotAxisHandle;
 class PlotWidget;
 
@@ -36,6 +37,11 @@ public:
 	DecoderOverlay(PlotWidget *plot, scopy::acq::DataStore *store,
 		       QObject *parent = nullptr);
 	~DecoderOverlay() override;
+
+	// Optional dedicated y-axis for annotation bands. If set, newly
+	// registered AnnotationCurves are attached to this axis instead of
+	// the plot's main y-axis (used by the mixed-signal digital area).
+	void setAnnotationYAxis(scopy::PlotAxis *axis) { m_annYAxis = axis; }
 
 	// Register a decoder for drawing. The caller supplies the
 	// PlotAxisHandle whose scale-space position defines the top of this
@@ -72,6 +78,7 @@ private:
 
 	QPointer<PlotWidget>            m_plot;
 	QPointer<scopy::acq::DataStore> m_store;
+	QPointer<scopy::PlotAxis>       m_annYAxis;
 
 	// Keyed by the decoder's output DataKey.
 	QHash<scopy::acq::DataKey, AnnotationCurve *> m_curves;

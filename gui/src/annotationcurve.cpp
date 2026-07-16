@@ -241,7 +241,7 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 		const double rowCenterPx = bandTopPx + rowHeightPx * (r + 0.5);
 		const double topPx       = rowCenterPx - rowHeightPx / 2.0;
 		const double bottomPx    = rowCenterPx + rowHeightPx / 2.0;
-		drawRowLabel(painter, canvasRect.left(), topPx, bottomPx,
+		drawRowLabel(painter, canvasRect.right() - labelBoxW, topPx, bottomPx,
 			     labelBoxW, klass);
 	}
 
@@ -418,19 +418,21 @@ void AnnotationCurve::drawRowLabel(QPainter *painter, double leftPx,
 				   double topPx, double bottomPx,
 				   double labelBoxW, const QString &text) const
 {
-	// Sharp-edged box with a chevron ">" right edge. Uses default
+	// Sharp-edged box with a chevron "<" left edge (tip on the left).
+	// Positioned on the right of the canvas by the caller. Uses default
 	// application palette colors so the label is theme-agnostic.
 	const double heightPx = bottomPx - topPx;
-	const double bodyR    = leftPx + labelBoxW - kLabelChevronPx;
-	const double tipX     = leftPx + labelBoxW;
+	const double tipX     = leftPx;
+	const double bodyL    = leftPx + kLabelChevronPx;
+	const double rightPx  = leftPx + labelBoxW;
 	const double midY     = (topPx + bottomPx) / 2.0;
 
 	QPolygonF poly;
-	poly << QPointF(leftPx, topPx)
-	     << QPointF(bodyR,  topPx)
-	     << QPointF(tipX,   midY)
-	     << QPointF(bodyR,  bottomPx)
-	     << QPointF(leftPx, bottomPx);
+	poly << QPointF(tipX,    midY)
+	     << QPointF(bodyL,   topPx)
+	     << QPointF(rightPx, topPx)
+	     << QPointF(rightPx, bottomPx)
+	     << QPointF(bodyL,   bottomPx);
 
 	painter->save();
 	painter->setPen(QPen(Style::getColor(json::theme::content_silent), 1.0));
@@ -440,7 +442,7 @@ void AnnotationCurve::drawRowLabel(QPainter *painter, double leftPx,
 	painter->drawPolygon(poly);
 
 	painter->setPen(Style::getColor(json::theme::content_default));
-	const QRectF textRect(leftPx + kLabelHPadPx,
+	const QRectF textRect(bodyL + kLabelHPadPx,
 			      topPx,
 			      labelBoxW - kLabelHPadPx * 2 - kLabelChevronPx,
 			      heightPx);
