@@ -59,6 +59,11 @@ public:
 Q_SIGNALS:
 	void channelsChanged();
 	void enabledChanged(bool en);
+	// Fired when an individual channel's enable state toggles. Not fired
+	// on first-add (channelsChanged covers that). Fine-grained hook for
+	// UI consumers (e.g. show/hide a plot track) that don't want to
+	// re-read the full channel map on every change.
+	void channelEnabledChanged(const QString &channelId, bool en);
 
 protected:
 	std::size_t         m_bufferSize{1024};

@@ -2,6 +2,7 @@
 
 #include "DecoderOverlay.h"
 #include "DecoderManager.h"
+#include "DigitalTrackManager.h"
 #include "DecoderPanel.h"
 
 #include <core/decoder/DecoderLogger.h>
@@ -123,12 +124,41 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	backendFactory->setLogger(m_decoderLogger);
 	m_decoderBackendFactory = std::move(backendFactory);
 
+	// Mixed-signal digital area: dedicated y-axis + per-item drag handles,
+	// hosting both raw 0/1 curves and decoder annotation bands.
+	m_digitalMgr = new scopy::adc::DigitalTrackManager(m_store, this);
+	m_digitalMgr->setPlot(m_ui->m_plot);
+
+	// Auto-register every M2K DIOx channel as a raw digital track and
+	// keep its visibility in sync with the source-block's enable state.
+	// The manager doesn't know about the source block itself — we just
+	// forward (sourceId, channelName, bool) via a plain slot.
+	if(m_logicSrc) {
+		const QString sourceId = m_logicSrc->id();
+		for(int ch = 0; ch < scopy::adc::sim::M2kLogicSource::NR_CHANNELS; ++ch) {
+			const QString name = QStringLiteral("DIO%1").arg(ch);
+			m_digitalMgr->addRawChannel(
+				scopy::acq::DataKey::raw(sourceId, name), name);
+			// Apply initial enable state so already-disabled
+			// channels start hidden.
+			m_digitalMgr->setChannelVisible(sourceId, name,
+				m_logicSrc->isChannelEnabled(name));
+		}
+		connect(m_logicSrc, &scopy::acq::SourceBlock::channelEnabledChanged,
+			m_digitalMgr,
+			[this, sourceId](const QString &ch, bool en) {
+				m_digitalMgr->setChannelVisible(sourceId, ch, en);
+			});
+	}
+
 	m_decoderOverlay = new scopy::adc::DecoderOverlay(m_ui->m_plot, m_store, this);
+	m_decoderOverlay->setAnnotationYAxis(m_digitalMgr->yAxis());
 	m_decoderMgr = new DecoderManager(m_engine, m_store,
 	                                  m_decoderBackendFactory.get(), this);
 	m_decoderMgr->setLogger(m_decoderLogger);
 	m_decoderMgr->setPlot(m_ui->m_plot);
 	m_decoderMgr->setOverlay(m_decoderOverlay);
+	m_decoderMgr->setDigitalTrackManager(m_digitalMgr);
 	m_decoderMgr->setDecoderWindowSize(m_plotSize);
 
 	// ---- Genalyzer analysis panel ----
@@ -538,6 +568,12 @@ void SimInstrumentController::onCycleComplete()
 	// x-key (index, time, frequency, …).
 	if(m_decoderOverlay)
 		m_decoderOverlay->setSampleCount(static_cast<quint64>(m_plotSize));
+
+	// Refresh raw digital tracks (0/1 waveforms) from the DataStore.
+	// Decoder annotation bands are pushed separately by DecoderOverlay
+	// on cycleProduced.
+	if(m_digitalMgr)
+		m_digitalMgr->updateRawCurves(m_plotSize);
 
 	const bool curve1Driven = (xIsIndex || xView.second  > 0) &&
 				  (yIsIndex || yView.second  > 0);

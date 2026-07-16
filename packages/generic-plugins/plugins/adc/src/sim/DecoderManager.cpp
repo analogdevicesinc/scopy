@@ -1,6 +1,7 @@
 #include "DecoderManager.h"
 
 #include "DecoderOverlay.h"
+#include "DigitalTrackManager.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
@@ -44,8 +45,12 @@ DecoderManager::~DecoderManager()
 		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
 		for(const QPointer<scopy::PlotAxisHandle> &h : d.handles) {
 			if(h.isNull()) continue;
-			if(m_plot) m_plot->removePlotAxisHandle(h);
-			h->deleteLater();
+			if(!m_digitalMgr.isNull()) {
+				m_digitalMgr->unregisterAnnotationBand(h);
+			} else {
+				if(m_plot) m_plot->removePlotAxisHandle(h);
+				h->deleteLater();
+			}
 		}
 		if(d.proc) d.proc->deleteLater();
 	}
@@ -54,6 +59,7 @@ DecoderManager::~DecoderManager()
 
 void DecoderManager::setPlot(scopy::PlotWidget *plot)   { m_plot = plot; }
 void DecoderManager::setOverlay(DecoderOverlay *overlay) { m_overlay = overlay; }
+void DecoderManager::setDigitalTrackManager(DigitalTrackManager *mgr) { m_digitalMgr = mgr; }
 
 bool DecoderManager::isEngineRunning() const
 {
@@ -160,8 +166,12 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 
 	m_engine->addProcessor(proc);
 
-	const double bandPos          = nextBandPos();
-	scopy::PlotAxisHandle *handle = attachHandle(bandPos);
+	scopy::PlotAxisHandle *handle = nullptr;
+	if(!m_digitalMgr.isNull()) {
+		handle = m_digitalMgr->registerAnnotationBand(uid);
+	} else {
+		handle = attachHandle(nextBandPos());
+	}
 	m_overlay->registerDecoder(proc, outKey, handle, decoderId);
 
 	DecoderInstance d;
@@ -190,8 +200,12 @@ void DecoderManager::removeDecoder(const QString &uid)
 		}
 		for(const QPointer<scopy::PlotAxisHandle> &h : d.handles) {
 			if(h.isNull()) continue;
-			if(m_plot) m_plot->removePlotAxisHandle(h);
-			h->deleteLater();
+			if(!m_digitalMgr.isNull()) {
+				m_digitalMgr->unregisterAnnotationBand(h);
+			} else {
+				if(m_plot) m_plot->removePlotAxisHandle(h);
+				h->deleteLater();
+			}
 		}
 		if(d.proc) d.proc->deleteLater();
 		Q_EMIT decoderRemoved(uid);
@@ -236,7 +250,12 @@ int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
 	if(stageIndex < d->handles.size() && !d->handles[stageIndex].isNull()) {
 		handle = d->handles[stageIndex].data();
 	} else {
-		handle = attachHandle(nextBandPos());
+		if(!m_digitalMgr.isNull()) {
+			handle = m_digitalMgr->registerAnnotationBand(
+				QStringLiteral("%1/%2").arg(uid).arg(stageIndex));
+		} else {
+			handle = attachHandle(nextBandPos());
+		}
 		d->handles.append(QPointer<scopy::PlotAxisHandle>(handle));
 	}
 

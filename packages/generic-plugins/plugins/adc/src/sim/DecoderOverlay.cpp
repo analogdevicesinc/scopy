@@ -53,8 +53,9 @@ void DecoderOverlay::registerDecoder(scopy::acq::ExternalDecoderProcessor *proc,
 	if(m_curves.contains(outKey))
 		return;
 
-	auto *curve = new AnnotationCurve(title,
-					  m_plot->xAxis(), m_plot->yAxis(), handle);
+	scopy::PlotAxis *yAxis = m_annYAxis.isNull() ? m_plot->yAxis()
+	                                             : m_annYAxis.data();
+	auto *curve = new AnnotationCurve(title, m_plot->xAxis(), yAxis, handle);
 	// Decoder annotations are always shown once registered. Visibility is
 	// no longer gated by the curve Y-combo — the user manages per-decoder
 	// presence via the DecoderPanel (Add / Remove) instead.
