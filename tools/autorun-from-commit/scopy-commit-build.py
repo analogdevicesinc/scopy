@@ -17,6 +17,24 @@ def autodetect_platform():
     else:
         return None
 
+def detect_ubuntu_version():
+    """Return host Ubuntu version as '2204'|'2404'|'2604', or None if unknown."""
+    try:
+        with open("/etc/os-release", "r") as f:
+            for line in f:
+                if line.startswith("VERSION_ID="):
+                    # VERSION_ID="24.04" -> 2404
+                    version = line.split("=", 1)[1].strip().strip('"')
+                    return version.replace(".", "")
+    except Exception:
+        pass
+    return None
+
+def detect_mac_arch():
+    """Return 'arm64' or 'x86_64' for the host Mac, based on platform.machine()."""
+    machine = platform.machine().lower()
+    return "arm64" if machine == "arm64" else "x86_64"
+
 def validate_platform_compatibility(target_platform, current_platform):
     """
     Check if the target platform executable can run on the current platform.
@@ -33,10 +51,11 @@ def validate_platform_compatibility(target_platform, current_platform):
     # Cross-platform compatibility rules
     compatibility_matrix = {
         'windows': ['windows'],
-        'x86': ['x86'],
+        'x86': ['x86', 'flatpak'],
         'arm64': ['arm64'],
         'arm32': ['arm32'],
-        'macos': ['macos']
+        'macos': ['macos'],
+        'flatpak': ['flatpak']
     }
 
     compatible_platforms = compatibility_matrix.get(current_platform, [])
@@ -97,7 +116,7 @@ def parse_arguments():
     )
     parser.add_argument("commit_sha", type=str, help="Commit SHA to search for (required)")
     parser.add_argument("--token", type=str, required=False, help="GitHub personal access token (optional, fallback to github_token.txt or ~/.git-credentials)")
-    parser.add_argument("--platform", type=str, choices=["windows", "x86", "arm64", "arm32", "macos"], required=False, help="Target platform (windows, x86, arm64, arm32, macos)")
+    parser.add_argument("--platform", type=str, choices=["windows", "x86", "arm64", "arm32", "macos", "flatpak"], required=False, help="Target platform (windows, x86, arm64, arm32, macos, flatpak)")
     parser.add_argument("--script", type=str, required=False, help="Optional path to a script to use or run after extraction")
     return parser.parse_args()
 
@@ -219,15 +238,36 @@ def filter_artifacts(artifacts, workflow_name, platform_value=None):
     if platform_value == "windows":
         return [a for a in artifacts if "scopy-windows-qt6-portable" in a["name"]]
     elif platform_value == "x86":
-        newer = [a for a in artifacts if a["name"].startswith("scopy-qt6-x86_64-appimage-ubuntu") and "ubuntu2204" not in a["name"]]
-        older = [a for a in artifacts if a["name"].startswith("scopy-qt6-x86_64-appimage-ubuntu2204")]
-        return newer + older
+        appimages = [a for a in artifacts if a["name"].startswith("scopy-qt6-x86_64-appimage-ubuntu")]
+        host_version = detect_ubuntu_version()
+        if host_version:
+            matched = [a for a in appimages if host_version in a["name"]]
+            if matched:
+                return matched
+        # No host match: fall back to the newest available Ubuntu version.
+        if appimages:
+            newest = sorted(appimages, key=lambda a: a["name"], reverse=True)
+            host_desc = f"ubuntu{host_version}" if host_version else "unknown host"
+            print(f"No AppImage for {host_desc}, falling back to {newest[0]['name']}")
+            return newest
+        return []
     elif platform_value == "arm64":
         return [a for a in artifacts if a["name"].startswith("scopy-arm64-qt6-appimage")]
     elif platform_value == "arm32":
         return [a for a in artifacts if a["name"].startswith("scopy-armhf-qt6-appimage")]
     elif platform_value == "macos":
-        return [a for a in artifacts if a["name"].startswith("Scopy-macOS")]
+        arch = detect_mac_arch()
+        prefix = "Scopy-macOS14-arm64-qt6" if arch == "arm64" else "Scopy-macOS15-x86_64-qt6"
+        matched = [a for a in artifacts if a["name"].startswith(prefix)]
+        if matched:
+            return matched
+        # No arch match: fall back to the first available macOS artifact.
+        fallback = [a for a in artifacts if a["name"].startswith("Scopy-macOS")]
+        if fallback:
+            print(f"No macOS build for host arch {arch}, falling back to {fallback[0]['name']}")
+        return fallback
+    elif platform_value == "flatpak":
+        return [a for a in artifacts if a["name"].startswith("scopy-x86_64-flatpak")]
 
 def download_artifact(artifact, commit_sha, headers):
     import datetime
@@ -294,6 +334,8 @@ def find_executable_by_extension(folder, platform_value):
             if platform_value == "x86" and file.endswith(".AppImage"):
                 return os.path.join(root, file)
             elif platform_value == "macos" and file.endswith(".dmg"):
+                return os.path.join(root, file)
+            elif platform_value == "flatpak" and file.endswith(".flatpak"):
                 return os.path.join(root, file)
     return None
 
@@ -369,6 +411,8 @@ def main():
         exe_name = "Scopy-armhf.AppImage"
     elif platform_value == "macos":
         exe_name = None  # Search for .dmg or .app dynamically
+    elif platform_value == "flatpak":
+        exe_name = None  # Search for the .flatpak bundle dynamically
     else:
         exe_name = None
 
@@ -407,6 +451,15 @@ def main():
             else:
                 subprocess.run(["xattr", "-rd", "com.apple.quarantine", exe_path], check=False)
                 proc = subprocess.Popen(["open", exe_path], stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
+        elif platform_value == "flatpak":
+            import shutil
+            if not shutil.which("flatpak"):
+                print("Error: 'flatpak' CLI not found. Install flatpak to run this bundle.")
+                print(f"Downloaded bundle: {exe_path}")
+                return
+            print(f"Installing flatpak bundle: {exe_path}")
+            subprocess.run(["flatpak", "install", "--user", "-y", exe_path], check=False)
+            proc = subprocess.Popen(["flatpak", "run", "org.adi.Scopy"], stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
         elif platform_value in ("x86", "arm64", "arm32"):
             st = os.stat(exe_path)
             if not (st.st_mode & stat.S_IXUSR):
