@@ -54,11 +54,18 @@ jobs:
               build/ScopyApp.zip
 
         # Flagged-risk platform: offscreen viability on macOS is unverified.
-        # The .app is self-contained (@executable_path), so no library env needed;
-        # buildinfo.py forces QT_QPA_PLATFORM=offscreen itself.
+        # macdeployqt only bundles libqcocoa.dylib in the .app; the offscreen
+        # platform plugin (libqoffscreen.dylib) is not included, so
+        # QT_QPA_PLATFORM=offscreen aborts at startup. Point Qt at the Qt
+        # install's own platforms dir, which contains libqoffscreen.dylib.
+        # buildinfo.py passes this env through to Scopy and forces offscreen.
         - name: Capture build-info screenshot
           continue-on-error: true
           run: |
+            # Qt install is $HOME/Qt/6.8.3/macos per ci/macOS/macos_config.sh.
+            export QT_QPA_PLATFORM_PLUGIN_PATH="$HOME/Qt/6.8.3/macos/plugins/platforms"
+            echo "Using QT_QPA_PLATFORM_PLUGIN_PATH=$QT_QPA_PLATFORM_PLUGIN_PATH"
+            ls -l "$QT_QPA_PLATFORM_PLUGIN_PATH/libqoffscreen.dylib" || echo "WARN: libqoffscreen.dylib not found"
             python3 tools/screenshots/buildinfo.py \
               --scopy build/Scopy.app/Contents/MacOS/Scopy \
               --output-root build-info-output

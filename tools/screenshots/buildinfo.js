@@ -22,6 +22,12 @@
 // Build-info screenshot script.
 // Expects `scopyOutDir` (absolute, trailing slash) to be injected by the launcher wrapper.
 msleep(2000);
+// A "What's New" overlay pops on a fresh CI prefs file because the stored
+// scopy_git_version never matches the build (scopymainwindow.cpp:464-466), and
+// dont_show_whats_new does not suppress that branch. Tear the overlay down the
+// same way the documentation screenshots flow does (screenshots.py first-run).
+scopy.dismissWhatsNew();
+msleep(300);
 scopy.showPage("about");
 msleep(500);
 scopy.showAboutBuildInfo();

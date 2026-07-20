@@ -191,7 +191,12 @@ def run_scopy(scopy_bin, wrapper_path, env=None):
     build_dir = os.path.dirname(os.path.abspath(scopy_bin))
     scopy_name = os.path.basename(scopy_bin)
     wrapper_rel = os.path.relpath(os.path.abspath(wrapper_path), build_dir)
-    cmd = [os.path.join(".", scopy_name), "--script", wrapper_rel]
+    # Use the absolute executable path, not "./name": subprocess only resolves a
+    # relative executable against cwd on POSIX. On Windows, CreateProcess() does
+    # not search cwd, so "./Scopy.exe" fails with WinError 193. cwd stays set to
+    # build_dir so Scopy still finds its colocated libraries/resources.
+    scopy_path = os.path.join(build_dir, scopy_name)
+    cmd = [scopy_path, "--script", wrapper_rel]
     print(f"[doc] Launching: {' '.join(cmd)} (cwd: {build_dir})")
     proc = subprocess.Popen(cmd, cwd=build_dir, env=env)
     try:
