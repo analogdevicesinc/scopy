@@ -22,15 +22,22 @@
 // Build-info screenshot script.
 // Expects `scopyOutDir` (absolute, trailing slash) to be injected by the launcher wrapper.
 msleep(2000);
-// A "What's New" overlay pops on a fresh CI prefs file because the stored
-// scopy_git_version never matches the build (scopymainwindow.cpp:464-466), and
-// dont_show_whats_new does not suppress that branch. Tear the overlay down the
-// same way the documentation screenshots flow does (screenshots.py first-run).
-scopy.dismissWhatsNew();
-msleep(300);
 scopy.showPage("about");
 msleep(500);
 scopy.showAboutBuildInfo();
+// Startup pops modal overlays that would obscure the build-info page:
+//  - a GPL license dialog when general_first_run is still true (e.g. macOS,
+//    where the seeded preferences.ini may not be the file Scopy reads);
+//  - a "What's New" overlay because the stored scopy_git_version never matches
+//    the freshly built version (scopymainwindow.cpp:464-466), which
+//    dont_show_whats_new does not suppress.
+// These are shown via queued connections during startup, so they can appear
+// after an early dismiss. Dismiss them here, right before the screenshot, once
+// all queued startup work has settled.
 msleep(1000);
+scopy.acceptLicense();
+msleep(200);
+scopy.dismissWhatsNew();
+msleep(500);
 scopy.screenshot(scopyOutDir + "build-info.png");
 scopy.exit();
