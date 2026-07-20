@@ -1,4 +1,23 @@
 #!/usr/bin/env python3
+#
+# Copyright (c) 2026 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
 """
 buildinfo.py — Headless, emulator-free capture of Scopy's build-info page.
 
@@ -55,14 +74,37 @@ def main():
     print(f"[buildinfo] Capturing build-info to {out_dir}")
     rc = run_scopy(scopy_bin, wrapper, env=env)
 
+    # The screenshot PNG is the success signal, not Scopy's exit code: Scopy is
+    # known to crash on shutdown (exit 245) *after* the capture is written, and
+    # screenshots.py already treats a nonzero Scopy exit as a warning. So we key
+    # success off a valid, non-trivial PNG and only warn on a bad exit code.
+    #
+    # A blank/black offscreen frame or a truncated write compresses to a tiny
+    # PNG, so a minimum-size floor catches those mechanical failures. It does NOT
+    # verify the *right* page is shown (build-info vs. plain About) — that is
+    # confirmed by visually inspecting the uploaded artifact.
+    MIN_PNG_BYTES = 3072  # blank frames are ~1-2 KB; a text page is much larger
+
     out_png = os.path.join(out_dir, "build-info.png")
-    if os.path.exists(out_png):
-        print(f"[buildinfo] Wrote {out_png}")
-    else:
-        print(f"[buildinfo] WARNING: expected screenshot missing: {out_png}")
-        if rc == 0:
-            rc = 1
-    return rc
+    if not os.path.exists(out_png):
+        print(f"[buildinfo] ERROR: expected screenshot missing: {out_png}")
+        return rc if rc != 0 else 1
+
+    size = os.path.getsize(out_png)
+    print(f"[buildinfo] Wrote {out_png} ({size} bytes)")
+    if size < MIN_PNG_BYTES:
+        print(
+            f"[buildinfo] ERROR: screenshot is implausibly small ({size} < "
+            f"{MIN_PNG_BYTES} bytes) — likely blank/black or truncated"
+        )
+        return rc if rc != 0 else 1
+
+    if rc != 0:
+        print(
+            f"[buildinfo] WARNING: Scopy exited with code {rc} (crash-on-shutdown "
+            f"is expected); screenshot captured, treating as success"
+        )
+    return 0
 
 
 if __name__ == "__main__":

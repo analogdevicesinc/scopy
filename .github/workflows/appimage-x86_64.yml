@@ -105,9 +105,6 @@ jobs:
                 export QT_PLUGIN_PATH=$APPDIR/usr/plugins && \
                 export QT_QPA_PLATFORM_PLUGIN_PATH=$APPDIR/usr/plugins/platforms && \
                 export LD_LIBRARY_PATH=$APPDIR/usr/lib && \
-                PYDIR=$(find "$APPDIR/usr/lib/" -maxdepth 1 -type d -name "python3.*") && \
-                export PYTHONHOME=$PYDIR && \
-                export PYTHONPATH=$PYDIR:$PYDIR/lib-dynload:$PYDIR/site-packages:$PYDIR/encodings && \
                 python3 $GITHUB_WORKSPACE/tools/screenshots/buildinfo.py \
                   --scopy $APPDIR/usr/bin/scopy \
                   --output-root $GITHUB_WORKSPACE/build-info-output'
