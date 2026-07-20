@@ -86,3 +86,24 @@ jobs:
         name: scopy-windows-qt6-setup-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.zip
         compression-level: 0
+
+    # Flagged-risk platform: offscreen viability in the mingw image is unverified.
+    - name: Capture build-info screenshot
+      shell: cmd
+      continue-on-error: true
+      run: |
+            docker run ^
+                -v %GITHUB_WORKSPACE%:C:\msys64\home\docker\scopy:rw ^
+                -e GITHUB_WORKSPACE=%GITHUB_WORKSPACE% ^
+                -e QT_QPA_PLATFORM=offscreen ^
+                -e CI_SCRIPT=ON ^
+                docker.cloudsmith.io/adi/scopy-dockers/scopy-windows-qt6:${{ inputs.docker_tag }} C:\msys64\usr\bin\bash.exe -c 'python3 /home/docker/scopy/tools/screenshots/buildinfo.py --scopy /home/docker/scopy/artifacts/scopy-x86_64/Scopy.exe --output-root /home/docker/scopy/artifacts/build-info-output'
+
+    - name: Upload build-info screenshot
+      uses: actions/upload-artifact@v7
+      continue-on-error: true
+      with:
+        name: build-info-windows
+        path: ${{ github.workspace }}\artifacts\build-info-output\
+        if-no-files-found: warn
+        retention-days: 30

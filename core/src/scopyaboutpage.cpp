@@ -24,8 +24,10 @@
 #include "widgets/hoverwidget.h"
 #include "widgets/pagenavigationwidget.h"
 
+#include <QDebug>
 #include <QLabel>
 #include <QTabBar>
+#include <QUrl>
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <style.h>
@@ -119,6 +121,21 @@ void ScopyAboutPage::buildWhatsNewButton(QWidget *parent)
 		whatsNew->move(this->rect().center() - whatsNew->rect().center());
 		QMetaObject::invokeMethod(whatsNew, &WhatsNewOverlay::showOverlay, Qt::QueuedConnection);
 	});
+}
+
+void ScopyAboutPage::showBuildInfo()
+{
+	// The "Scopy" tab is index 0; its page hosts the QTextBrowser built from qrc:/about.html.
+	// Scope the lookup to that page: plugin about-pages add further QTextBrowsers to this widget,
+	// so a bare findChild<QTextBrowser*>() on `this` would only work by insertion-order luck.
+	tabWidget->setCurrentIndex(0);
+	QWidget *page = tabWidget->widget(0);
+	QTextBrowser *browser = page ? page->findChild<QTextBrowser *>() : nullptr;
+	if(browser) {
+		browser->setSource(QUrl("qrc:/buildinfo.html"));
+	} else {
+		qWarning() << "About build-info: QTextBrowser not found";
+	}
 }
 
 void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) { tabWidget->addTab(w, text); }

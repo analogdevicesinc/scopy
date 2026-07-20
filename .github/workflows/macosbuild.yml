@@ -52,3 +52,22 @@ jobs:
             path: |
               build/Scopy.dmg
               build/ScopyApp.zip
+
+        # Flagged-risk platform: offscreen viability on macOS is unverified.
+        # The .app is self-contained (@executable_path), so no library env needed;
+        # buildinfo.py forces QT_QPA_PLATFORM=offscreen itself.
+        - name: Capture build-info screenshot
+          continue-on-error: true
+          run: |
+            python3 tools/screenshots/buildinfo.py \
+              --scopy build/Scopy.app/Contents/MacOS/Scopy \
+              --output-root build-info-output
+
+        - name: Upload build-info screenshot
+          uses: actions/upload-artifact@v7
+          continue-on-error: true
+          with:
+            name: build-info-macos-${{ matrix.artifact }}
+            path: build-info-output/
+            if-no-files-found: warn
+            retention-days: 30

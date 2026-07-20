@@ -106,5 +106,27 @@ jobs:
             if-no-files-found: error
             retention-days: 30
 
+        - name: Capture build-info screenshot
+          run: |
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+              -e QT_QPA_PLATFORM=offscreen \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/scopy2-ubuntu24-qt6:${{ inputs.docker_tag }} \
+              bash -c "ldconfig && python3 $GITHUB_WORKSPACE/tools/screenshots/buildinfo.py \
+                --scopy $GITHUB_WORKSPACE/build/scopy \
+                --output-root $GITHUB_WORKSPACE/build-info-output"
+
+        - name: Upload build-info screenshot
+          uses: actions/upload-artifact@v7
+          with:
+            name: build-info-ubuntu
+            path: ${{ github.workspace }}/build-info-output/
+            if-no-files-found: warn
+            retention-days: 30
+
         - name: check storage space
           run: df -h

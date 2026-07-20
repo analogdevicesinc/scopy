@@ -67,5 +67,32 @@ jobs:
             name: scopy-arm64-qt6-appimage-${{ env.commit_sha }}
             path: ${{ github.workspace }}/Scopy-arm64.AppImage
 
+        - name: Capture build-info screenshot
+          shell: bash
+          run: |
+                docker run \
+                        --mount type=bind,source="$GITHUB_WORKSPACE",target=/home/runner/scopy \
+                        docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:${{ inputs.docker_tag }} \
+                        /bin/bash -c    'cd $HOME/scopy && \
+                                        APPDIR=$HOME/scopy/ci/arm/scopy.AppDir && \
+                                        export QT_PLUGIN_PATH=$APPDIR/usr/plugins && \
+                                        export QT_QPA_PLATFORM_PLUGIN_PATH=$APPDIR/usr/plugins/platforms && \
+                                        export LD_LIBRARY_PATH=$APPDIR/usr/lib && \
+                                        PYDIR=$(find "$APPDIR/usr/lib/" -maxdepth 1 -type d -name "python3.*") && \
+                                        export PYTHONHOME=$PYDIR && \
+                                        export PYTHONPATH=$PYDIR:$PYDIR/lib-dynload:$PYDIR/site-packages:$PYDIR/encodings && \
+                                        python3 $HOME/scopy/tools/screenshots/buildinfo.py \
+                                          --scopy $APPDIR/usr/bin/scopy \
+                                          --output-root $HOME/scopy/build-info-output
+                                        '
+
+        - name: Upload build-info screenshot
+          uses: actions/upload-artifact@v7
+          with:
+            name: build-info-arm64
+            path: ${{ github.workspace }}/build-info-output/
+            if-no-files-found: warn
+            retention-days: 30
+
         - name: check storage space
           run: df -h

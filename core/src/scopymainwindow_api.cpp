@@ -328,6 +328,15 @@ void ScopyMainWindow_API::showPage(QString pageId)
 	}
 }
 
+void ScopyMainWindow_API::showAboutBuildInfo()
+{
+	if(m_w->about) {
+		m_w->about->showBuildInfo();
+	} else {
+		qWarning(CAT_SCOPY_API) << "About page not available";
+	}
+}
+
 QStringList ScopyMainWindow_API::getTools()
 {
 	Q_ASSERT(m_w->dm != nullptr);

@@ -7,6 +7,9 @@ moc_*.cpp
 *_automoc.cpp
 ui_*.h
 build*
+# 'build*' above is for build dirs; keep the screenshot launcher scripts tracked.
+!tools/screenshots/buildinfo.js
+!tools/screenshots/buildinfo.py
 deps
 scopy
 iio-emu

@@ -38,6 +38,7 @@ public:
 	~ScopyAboutPage();
 	void addHorizontalTab(QWidget *w, QString text);
 	QWidget *buildPage(QString src);
+	void showBuildInfo();
 
 private:
 	void initUI();

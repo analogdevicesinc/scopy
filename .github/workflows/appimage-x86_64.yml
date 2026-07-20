@@ -92,5 +92,33 @@ jobs:
             name: ${{ env.app_image_folder }}-${{ env.commit_sha }}
             path: ${{ github.workspace }}/${{ env.app_image_name }}
 
+        - name: Capture build-info screenshot
+          run: |
+            docker run --rm \
+              --user root \
+              -e CI_SCRIPT=ON \
+              -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+              -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+              -w $GITHUB_WORKSPACE \
+              docker.cloudsmith.io/adi/scopy-dockers/${{ matrix.docker_image }}:${{ inputs.docker_tag }} \
+              bash -c 'APPDIR=$GITHUB_WORKSPACE/ci/x86_64/scopy.AppDir && \
+                export QT_PLUGIN_PATH=$APPDIR/usr/plugins && \
+                export QT_QPA_PLATFORM_PLUGIN_PATH=$APPDIR/usr/plugins/platforms && \
+                export LD_LIBRARY_PATH=$APPDIR/usr/lib && \
+                PYDIR=$(find "$APPDIR/usr/lib/" -maxdepth 1 -type d -name "python3.*") && \
+                export PYTHONHOME=$PYDIR && \
+                export PYTHONPATH=$PYDIR:$PYDIR/lib-dynload:$PYDIR/site-packages:$PYDIR/encodings && \
+                python3 $GITHUB_WORKSPACE/tools/screenshots/buildinfo.py \
+                  --scopy $APPDIR/usr/bin/scopy \
+                  --output-root $GITHUB_WORKSPACE/build-info-output'
+
+        - name: Upload build-info screenshot
+          uses: actions/upload-artifact@v7
+          with:
+            name: build-info-appimage-x86_64-ubuntu${{ matrix.ubuntu_version }}
+            path: ${{ github.workspace }}/build-info-output/
+            if-no-files-found: warn
+            retention-days: 30
+
         - name: check storage space
           run: df -h

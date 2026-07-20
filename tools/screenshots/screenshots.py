@@ -141,13 +141,30 @@ def make_wrapper(uri, out_dir, js_script_path, skip_plugins=None, use_plugin_dir
 # 3 minutes per device should be more than enough, but we don't want to wait indefinitely if something hangs
 SCOPY_TIMEOUT = 180
 
+def scopy_prefs_path():
+    """Cross-platform path to Scopy's QSettings IniFormat preferences file.
+
+    QSettings uses IniFormat for Scopy, so the location follows the IniFormat
+    convention (not the native macOS plist path):
+      - Windows: %APPDATA%\\ADI\\Scopy-v2\\preferences.ini
+      - Linux/macOS: ~/.config/ADI/Scopy-v2/preferences.ini
+    """
+    if sys.platform.startswith("win"):
+        base = os.environ.get(
+            "APPDATA", os.path.join(os.path.expanduser("~"), "AppData", "Roaming")
+        )
+    else:
+        base = os.path.join(os.path.expanduser("~"), ".config")
+    prefs_dir = os.path.join(base, "ADI", "Scopy-v2")
+    return prefs_dir, os.path.join(prefs_dir, "preferences.ini")
+
+
 def configure_scopy_preferences(scopy_bin):
     """Configure Scopy preferences for headless screenshot capture."""
     import configparser
 
-    prefs_dir = os.path.join(os.path.expanduser("~"), ".config", "ADI", "Scopy-v2")
+    prefs_dir, prefs_file = scopy_prefs_path()
     os.makedirs(prefs_dir, exist_ok=True)
-    prefs_file = os.path.join(prefs_dir, "preferences.ini")
 
     config = configparser.ConfigParser(strict=False)
     config.read(prefs_file)
@@ -165,14 +182,18 @@ def configure_scopy_preferences(scopy_bin):
     print(f"[doc]   packages_path = {packages_dir}")
 
 
-def run_scopy(scopy_bin, wrapper_path):
-    """Launch scopy with the wrapper script and wait for it to exit."""
+def run_scopy(scopy_bin, wrapper_path, env=None):
+    """Launch scopy with the wrapper script and wait for it to exit.
+
+    env: optional environment dict passed through to the child process. When
+    None, the child inherits the current environment (default behaviour).
+    """
     build_dir = os.path.dirname(os.path.abspath(scopy_bin))
     scopy_name = os.path.basename(scopy_bin)
     wrapper_rel = os.path.relpath(os.path.abspath(wrapper_path), build_dir)
     cmd = [os.path.join(".", scopy_name), "--script", wrapper_rel]
     print(f"[doc] Launching: {' '.join(cmd)} (cwd: {build_dir})")
-    proc = subprocess.Popen(cmd, cwd=build_dir)
+    proc = subprocess.Popen(cmd, cwd=build_dir, env=env)
     try:
         proc.wait(timeout=SCOPY_TIMEOUT)
     except KeyboardInterrupt:
