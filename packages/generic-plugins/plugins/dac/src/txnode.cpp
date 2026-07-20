@@ -71,6 +71,32 @@ unsigned int TxNode::getFormatBits() const { return m_fmtBits; }
 
 bool TxNode::getFormatSigned() const { return m_fmtSigned; }
 
+bool TxNode::readDds() const
+{
+	if(m_channel) {
+		if(iio_channel_get_type(m_channel) == IIO_ALTVOLTAGE) {
+			bool value = false;
+			int ret = iio_channel_attr_read_bool(m_channel, "raw", &value);
+			if(ret < 0) {
+				qDebug(CAT_DAC_DATA) << QString("Can't read DDS channel raw, error: %1").arg(ret);
+				return false;
+			}
+			return value;
+		}
+		return false;
+	}
+
+	if(m_childNodes.size() != 0) {
+		for(auto node : std::as_const(m_childNodes)) {
+			if(node->readDds()) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool TxNode::enableDds(bool enable)
 {
 	qDebug(CAT_DAC_DATA) << QString("Try enable:%1 DDS TXNode %2").arg(enable).arg(m_txUuid);

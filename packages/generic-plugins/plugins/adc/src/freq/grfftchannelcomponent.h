@@ -40,6 +40,9 @@
 #include <gr-util/grfftfloatproxy.h>
 #include <gr-util/griiocomplexchannelsrc.h>
 #include <gui/plotmarkercontroller.h>
+#include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/menuspinbox.h>
+#include <QSpinBox>
 
 namespace scopy {
 namespace adc {
@@ -192,6 +195,17 @@ public:
 	virtual bool enabled() const override;
 	bool isComplex();
 
+	void applyMarkerEnabled(bool en);
+	void applyMarkerType(int type);
+	void applyMarkerCount(int cnt);
+	void applyAveragingEnabled(bool en);
+	void applyAveragingSize(int size);
+	void applyMinMaxHoldEnabled(bool en);
+	void applyMinHoldEnabled(bool en);
+	void applyMaxHoldEnabled(bool en);
+	void resetMinHold();
+	void resetMaxHold();
+
 public Q_SLOTS:
 	void enable() override;
 	void disable() override;
@@ -249,6 +263,18 @@ private:
 	MenuPlotChannelCurveStyleControl *m_curvemenu;
 	MenuSectionCollapseWidget *m_yaxisMenu;
 	FFTPlotComponentChannel *m_fftPlotComponentChannel;
+
+	// Widgets exposed for device-level broadcast slots
+	MenuSectionCollapseWidget *m_markerSection;
+	MenuCombo *m_markerCombo;
+	MenuSpinbox *m_markerCntSpin;
+
+	MenuSectionCollapseWidget *m_avgSection;
+	QSpinBox *m_avgSpin;
+
+	MenuSectionCollapseWidget *m_minMaxSection;
+	SmallOnOffSwitch *m_minHoldSwitch;
+	SmallOnOffSwitch *m_maxHoldSwitch;
 
 	QPushButton *m_snapBtn;
 

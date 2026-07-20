@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "scopy": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "tools/scopy-mcp-server",
+        "scopy-mcp-server"
+      ]
+    }
+  }
+}

@@ -34,11 +34,13 @@ class DacAddon : public QWidget
 public:
 	DacAddon(QWidget *parent = nullptr);
 	virtual ~DacAddon();
-	virtual void enable(bool enable);
+	virtual void enable();
+	virtual void disable();
 	virtual QMap<QString, MenuControlButton *> getChannelBtns();
 	virtual QMap<QString, QWidget *> getChannelMenus();
 	virtual void setRunning(bool running);
 	virtual bool isRunning();
+	virtual bool isRunnable();
 Q_SIGNALS:
 	void running(bool enabled);
 	void requestChannelMenu(QString uuid);

@@ -271,6 +271,9 @@ BufferDacAddon::BufferDacAddon(DacDataModel *model, QWidget *parent)
 		chnBtn->button()->setVisible(false);
 		connect(chnBtn->checkBox(), &QCheckBox::toggled, this,
 			[=, this](bool toggled) { m_model->enableBufferChannel(node->getUuid(), toggled); });
+		connect(this, &BufferDacAddon::refreshChannelBtns, this, [=, this]() {
+			m_model->enableBufferChannel(node->getUuid(), chnBtn->checkBox()->isChecked());
+		});
 		channelsContainerLayout->addWidget(chnBtn);
 
 		QWidget *chnMenu = createMenu(node);
@@ -399,7 +402,13 @@ void BufferDacAddon::updateGuiStrategyWidget()
 	}
 }
 
-void BufferDacAddon::enable(bool enable) { m_model->enableBuffer(enable); }
+void BufferDacAddon::enable()
+{
+	m_model->enableBuffer();
+	refreshChannelBtns();
+}
+
+void BufferDacAddon::disable() { m_model->disableBuffer(); }
 
 void BufferDacAddon::setRunning(bool toggled)
 {
@@ -511,3 +520,5 @@ QWidget *BufferDacAddon::createMenu(TxNode *node)
 	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	return w;
 }
+
+bool BufferDacAddon::isRunnable() { return true; }

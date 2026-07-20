@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <deviceiconbuilder.h>
 #include <menusectionwidget.h>
+#include <preferenceshelper.h>
 #include <style.h>
 
 #include <iioutil/connectionprovider.h>
@@ -36,6 +37,43 @@
 
 using namespace scopy;
 using namespace scopy::dac;
+
+void DACPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("dac_reset_dds_on_connect", false);
+	p->init("dac_reset_dds_on_disconnect", true);
+}
+
+bool DACPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *layout = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionCollapseWidget *generalSection = new MenuSectionCollapseWidget(
+		"General", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET);
+	generalSection->contentLayout()->setSpacing(10);
+	layout->addWidget(generalSection);
+	layout->setSpacing(0);
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	auto resetOnConnect = PREFERENCE_CHECK_BOX(p, "dac_reset_dds_on_connect", "Reset DDS on connect",
+						   "Reset all DDS settings when connecting to the device. "
+						   "Disable if another application is actively using the DDS.",
+						   generalSection);
+
+	auto resetOnDisconnect = PREFERENCE_CHECK_BOX(p, "dac_reset_dds_on_disconnect", "Reset DDS on disconnect",
+						      "Reset all DDS settings when disconnecting from the device. "
+						      "Disable if another application needs the DDS to keep running.",
+						      generalSection);
+
+	generalSection->contentLayout()->addWidget(resetOnConnect);
+	generalSection->contentLayout()->addWidget(resetOnDisconnect);
+
+	return true;
+}
 
 bool DACPlugin::compatible(QString m_param, QString category)
 {

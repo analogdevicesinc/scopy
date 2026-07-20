@@ -32,18 +32,25 @@ namespace dac {
 class DacDataModel;
 class TxNode;
 class TxChannel;
+
+struct TxWidgets
+{
+	MapStackedWidget *stack;
+	MenuCombo *combo;
+};
+
 class DdsDacAddon : public DacAddon
 {
 	Q_OBJECT
 public:
 	DdsDacAddon(DacDataModel *model, QWidget *parent = nullptr);
 	virtual ~DdsDacAddon();
-	virtual void enable(bool enable);
+	virtual void enable();
 	virtual void setRunning(bool running);
 
 private:
 	DacDataModel *m_model;
-	QMap<QWidget *, MapStackedWidget *> m_txWidgets;
+	QMap<QWidget *, TxWidgets> m_txWidgets;
 	QWidget *setupDdsTx(TxNode *txNode);
 	QWidget *setupTxMode(TxNode *txNode, unsigned int mode);
 };
@@ -60,11 +67,12 @@ public:
 		DISABLED = 0,
 		ONE_TONE = 1,
 		TWO_TONES = 2,
-		INDEPENDENT_IQ_CTRL
+		INDEPENDENT_IQ_CTRL = 3
 	} DdsMode;
 
 	void read();
 	void enable(bool enable);
+	int load();
 
 private:
 	TxNode *m_node;

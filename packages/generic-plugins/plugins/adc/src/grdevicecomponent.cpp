@@ -27,6 +27,7 @@
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <style.h>
+#include <QLabel>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -40,15 +41,18 @@ GRDeviceComponent::GRDeviceComponent(GRIIODeviceSourceNode *node, QWidget *paren
 	name = node->name();
 	m_pen = QPen(Style::getAttribute(json::theme::interactive_primary_idle));
 	m_src = node->src();
-	// connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
 	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
-	widget = createMenu(this);
-	m_lay->addWidget(widget);
 	setLayout(m_lay);
 	createMenuControlButton();
+}
+
+void GRDeviceComponent::init()
+{
+	widget = createMenu(this);
+	layout()->addWidget(widget);
 }
 
 QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
@@ -96,11 +100,6 @@ QWidget *GRDeviceComponent::createChCommonAttrMenu(QWidget *parent)
 					       .attribute(attrName)
 					       .buildSingle();
 
-			//			iiowidgetbuilder.convertToMulti(w)
-			/*createMultiDataStrategy
-			Add rest of data strategies
-
-			*/
 			attrWidgets.append(w);
 		}
 	}
@@ -175,15 +174,20 @@ QWidget *GRDeviceComponent::createMenu(QWidget *parent)
 	w->setLayout(lay);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(name, m_pen, w);
+
+	QWidget *extraMenu = buildExtraMenu(w);
 	QWidget *attrMenu = createAttrMenu(w);
 	QWidget *chcommonattrMenu = nullptr; // createChCommonAttrMenu(w);
 
 	lay->addWidget(header);
 	lay->addWidget(scroll);
-	layScroll->addWidget(attrMenu);
+	if(extraMenu) {
+		layScroll->addWidget(extraMenu);
+	}
 	if(chcommonattrMenu) {
 		layScroll->addWidget(chcommonattrMenu);
 	}
+	layScroll->addWidget(attrMenu);
 
 	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	return w;

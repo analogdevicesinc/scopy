@@ -51,7 +51,7 @@ QString DataLogger_API::showAvailableDevices()
 	return availableDevices;
 }
 
-QString DataLogger_API::showMonitorsOfDevice(const QString &device)
+QString DataLogger_API::showMonitorsOfDevice(QString device)
 {
 	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
 		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
@@ -86,7 +86,7 @@ QString DataLogger_API::showAvailableMonitors()
 	return availableDevices;
 }
 
-QString DataLogger_API::enableMonitor(const QString &monitor)
+QString DataLogger_API::enableMonitor(QString monitor)
 {
 	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
 		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
@@ -94,7 +94,7 @@ QString DataLogger_API::enableMonitor(const QString &monitor)
 	}
 
 	if(!m_dataLoggerPlugin->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-		return "Selected monitor dosen't exists";
+		return "Selected monitor doesn't exist";
 	} else {
 		m_dataLoggerPlugin->m_dataAcquisitionManager->updateActiveMonitors(true, monitor);
 	}
@@ -102,7 +102,7 @@ QString DataLogger_API::enableMonitor(const QString &monitor)
 	return "Success";
 }
 
-QString DataLogger_API::disableMonitor(const QString &monitor)
+QString DataLogger_API::disableMonitor(QString monitor)
 {
 	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
 		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
@@ -110,7 +110,7 @@ QString DataLogger_API::disableMonitor(const QString &monitor)
 	}
 
 	if(!m_dataLoggerPlugin->m_dataAcquisitionManager->getActiveMonitors().contains(monitor)) {
-		return "Selected monitor dosen't exists or is already disabled";
+		return "Selected monitor doesn't exist or is already disabled";
 	} else {
 		m_dataLoggerPlugin->m_dataAcquisitionManager->updateActiveMonitors(false, monitor);
 	}
@@ -118,13 +118,16 @@ QString DataLogger_API::disableMonitor(const QString &monitor)
 	return "Success";
 }
 
+bool DataLogger_API::getRunning()
+{
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
+	return tool ? tool->running() : false;
+}
+
 void DataLogger_API::setRunning(bool running)
 {
-	if(!m_dataLoggerPlugin || !m_dataLoggerPlugin->m_dataAcquisitionManager) {
-		qWarning(CAT_DATAMONITOR_API) << "DataAcquisitionManager is null";
-		return;
-	}
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	Q_ASSERT(m_dataLoggerPlugin->m_dataAcquisitionManager != nullptr);
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		tool->setRunning(running);
 		tool->runToggled(running);
@@ -147,7 +150,7 @@ void DataLogger_API::changeTool(const QString &name)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(!monitorTool) {
@@ -173,7 +176,7 @@ void DataLogger_API::setMinMax(bool enable)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(!monitorTool) {
@@ -194,7 +197,7 @@ void DataLogger_API::changePrecision(int decimals)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(!monitorTool) {
@@ -215,7 +218,7 @@ void DataLogger_API::setMinYAxis(double min)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(monitorTool && monitorTool->m_plotManager) {
@@ -236,7 +239,7 @@ void DataLogger_API::setMaxYAxis(double max)
 		return;
 	}
 
-	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger ");
+	ToolMenuEntry *tool = ToolMenuEntry::findToolMenuEntryByName(m_dataLoggerPlugin->m_toolList, "Data Logger");
 	if(tool) {
 		DatamonitorTool *monitorTool = dynamic_cast<DatamonitorTool *>(tool->tool());
 		if(monitorTool && monitorTool->m_plotManager) {
@@ -291,7 +294,7 @@ QString DataLogger_API::enableMonitorOfTool(const QString &toolName, const QStri
 			return "Error: MonitorTool is null";
 		}
 		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return "Selected monitor dosen't exists";
+			return "Selected monitor doesn't exist";
 		} else {
 			Q_EMIT monitorTool->m_monitorSelectionMenu->requestMonitorToggled(true, monitor);
 		}
@@ -314,7 +317,7 @@ QString DataLogger_API::disableMonitorOfTool(const QString &toolName, const QStr
 			return "Error: MonitorTool is null";
 		}
 		if(!monitorTool->m_dataAcquisitionManager->getDataMonitorMap()->contains(monitor)) {
-			return "Selected monitor dosen't exists";
+			return "Selected monitor doesn't exist";
 		} else {
 			Q_EMIT monitorTool->m_monitorSelectionMenu->requestMonitorToggled(false, monitor);
 		}

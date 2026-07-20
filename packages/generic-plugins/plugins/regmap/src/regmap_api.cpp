@@ -67,7 +67,9 @@ QStringList RegMap_API::getAvailableDevicesName()
 	return devices->keys();
 }
 
-bool RegMap_API::setDevice(const QString &device)
+QString RegMap_API::getDevice() { return m_regMapPlugin->registerMapTool->activeRegisterMap; }
+
+bool RegMap_API::setDevice(QString device)
 {
 	if(!m_regMapPlugin || !m_regMapPlugin->registerMapTool) {
 		qWarning(CAT_REGMAP_API) << "Register map tool not initialized";
@@ -82,7 +84,7 @@ bool RegMap_API::setDevice(const QString &device)
 	return false;
 }
 
-QList<QString> RegMap_API::search(const QString &searchParam)
+QList<QString> RegMap_API::search(QString searchParam)
 {
 	QList<uint32_t> resultIndexes;
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
@@ -99,7 +101,7 @@ QList<QString> RegMap_API::search(const QString &searchParam)
 	return resultList;
 }
 
-void RegMap_API::readInterval(const QString &startAddr, const QString &stopAddr)
+void RegMap_API::readInterval(QString startAddr, QString stopAddr)
 {
 	DeviceRegisterMap *devRegMap = getActiveDevRegMap();
 	if(!devRegMap) {

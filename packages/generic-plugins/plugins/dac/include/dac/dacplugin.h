@@ -49,6 +49,8 @@ public:
 	QString version() override;
 	QString description() override;
 	QString pkgName() override;
+	void initPreferences() override;
+	bool loadPreferencesPage() override;
 
 public Q_SLOTS:
 	bool onConnect() override;

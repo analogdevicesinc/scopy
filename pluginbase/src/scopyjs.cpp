@@ -29,6 +29,7 @@
 #include <QtConcurrent>
 
 #include <common/common.h>
+#include <preferences.h>
 #include <iostream>
 #include <thread>
 #include <unistd.h>
@@ -45,7 +46,7 @@ ScopyJS::ScopyJS(QObject *parent)
 	: QObject(parent)
 {}
 
-ScopyJS::~ScopyJS() {}
+ScopyJS::~ScopyJS() { cleanupMcpServer(); }
 
 ScopyJS *ScopyJS::GetInstance()
 {
@@ -81,6 +82,21 @@ void ScopyJS::init()
 		notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
 		connect(notifier, &QSocketNotifier::activated, this, [this]() { hasText(); });
 	}
+
+	if(Preferences::get("general_mcp_server_enabled").toBool()) {
+		initMcpServer();
+	}
+
+	Preferences *prefs = Preferences::GetInstance();
+	connect(prefs, &Preferences::preferenceChanged, this, [this](QString key, QVariant val) {
+		if(key == "general_mcp_server_enabled") {
+			if(val.toBool()) {
+				initMcpServer();
+			} else {
+				cleanupMcpServer();
+			}
+		}
+	});
 }
 
 void ScopyJS::returnToApplication()
@@ -268,6 +284,69 @@ const QString ScopyJS::getScriptContent(QFile *file)
 	QString content = stream.readAll();
 	file->close();
 	return content;
+}
+
+void ScopyJS::initMcpServer()
+{
+	QLocalServer::removeServer(MCP_SERVER_NAME);
+
+	m_mcpServer = new QLocalServer(this);
+	if(!m_mcpServer->listen(MCP_SERVER_NAME)) {
+		qWarning(CAT_JS) << "MCP: Failed to start local server:" << m_mcpServer->errorString();
+		delete m_mcpServer;
+		m_mcpServer = nullptr;
+		return;
+	}
+
+	connect(m_mcpServer, &QLocalServer::newConnection, this, &ScopyJS::onMcpConnection);
+	qInfo(CAT_JS) << "MCP server listening on" << m_mcpServer->fullServerName();
+}
+
+void ScopyJS::onMcpConnection()
+{
+	while(m_mcpServer->hasPendingConnections()) {
+		QLocalSocket *client = m_mcpServer->nextPendingConnection();
+		if(!client)
+			continue;
+
+		// Wait for the command to arrive (short timeout — commands are tiny)
+		if(!client->waitForReadyRead(5000)) {
+			client->deleteLater();
+			continue;
+		}
+
+		QByteArray data = client->readAll();
+		QString cmd = QString::fromUtf8(data).trimmed();
+		if(cmd.isEmpty()) {
+			client->deleteLater();
+			continue;
+		}
+
+		QJSValue val = m_engine.evaluate(cmd);
+		QString result;
+		if(val.isError()) {
+			result = "ERROR:" + val.toString();
+		} else if(val.isUndefined()) {
+			result = "OK:undefined";
+		} else {
+			result = "OK:" + val.toString();
+		}
+
+		client->write((result + "\n").toUtf8());
+		client->flush();
+		client->waitForBytesWritten(3000);
+		client->disconnectFromServer();
+		client->deleteLater();
+	}
+}
+
+void ScopyJS::cleanupMcpServer()
+{
+	if(m_mcpServer) {
+		m_mcpServer->close();
+		delete m_mcpServer;
+		m_mcpServer = nullptr;
+	}
 }
 
 #include "moc_scopyjs.cpp"

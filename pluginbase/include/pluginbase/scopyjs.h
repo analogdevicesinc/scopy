@@ -29,6 +29,8 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QJSEngine>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QObject>
 #include <QSocketNotifier>
 #include <QFile>
@@ -70,6 +72,9 @@ public:
 public Q_SLOTS:
 	void hasText();
 
+private Q_SLOTS:
+	void onMcpConnection();
+
 private:
 	QFutureWatcher<QString> watcher;
 	QFuture<QString> future;
@@ -84,6 +89,11 @@ private:
 	static ScopyJS *pinstance_;
 	static QLoggingCategory::CategoryFilter oldCategoryFilter;
 	static void jsCategoryFilter(QLoggingCategory *category);
+
+	void initMcpServer();
+	void cleanupMcpServer();
+	QLocalServer *m_mcpServer = nullptr;
+	static constexpr const char *MCP_SERVER_NAME = "scopy_mcp";
 
 private:
 	const QString getScriptContent(QFile *file);

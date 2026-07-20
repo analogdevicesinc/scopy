@@ -61,7 +61,7 @@ void SmallOnOffSwitch::initDimensions()
 	m_offset = m_base_offset;
 
 	m_icon_color = Style::getColor(json::theme::background_primary);
-	m_track_color[true] = Style::getColor(json::theme::interactive_primary_idle);
+	m_track_color[true] = Style::getColor(json::theme::interactive_primary_hover);
 	m_track_color[false] = Style::getColor(json::theme::interactive_subtle_idle);
 	m_track_color_disabled[true] = Style::getColor(json::theme::interactive_primary_disabled);
 	m_track_color_disabled[false] = Style::getColor(json::theme::interactive_subtle_disabled);

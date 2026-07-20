@@ -20,6 +20,9 @@
  */
 
 #include "iiosortfilterproxymodel.h"
+#include "iiostandarditem.h"
+
+#include <QStandardItemModel>
 
 using namespace scopy::debugger;
 
@@ -46,6 +49,32 @@ bool IIOSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex 
 
 	return false;
 }
+
+bool IIOSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+	auto *src = qobject_cast<QStandardItemModel *>(sourceModel());
+	if(src) {
+		auto *l = dynamic_cast<IIOStandardItem *>(src->itemFromIndex(left));
+		auto *r = dynamic_cast<IIOStandardItem *>(src->itemFromIndex(right));
+		if(l && r && l->type() == r->type()) {
+			bool isChannel = (l->type() == IIOStandardItem::Channel);
+			bool isAttribute = (l->type() == IIOStandardItem::ContextAttribute ||
+					    l->type() == IIOStandardItem::DeviceAttribute ||
+					    l->type() == IIOStandardItem::ChannelAttribute);
+
+			// Sort channels and/or attributes alphabetically when their flag is enabled
+			if((isChannel && m_sortChannels) || (isAttribute && m_sortAttributes)) {
+				return l->text().compare(r->text(), Qt::CaseInsensitive) < 0;
+			}
+		}
+	}
+
+	return left.row() < right.row();
+}
+
+void IIOSortFilterProxyModel::setSortChannels(bool enabled) { m_sortChannels = enabled; }
+
+void IIOSortFilterProxyModel::setSortAttributes(bool enabled) { m_sortAttributes = enabled; }
 
 IIOSortFilterProxyModel::IIOSortFilterProxyModel(QObject *parent)
 	: QSortFilterProxyModel(parent)

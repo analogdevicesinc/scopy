@@ -35,7 +35,9 @@ DacAddon::DacAddon(QWidget *parent)
 
 DacAddon::~DacAddon() {}
 
-void DacAddon::enable(bool enable) {}
+void DacAddon::enable() {}
+
+void DacAddon::disable() {}
 
 QMap<QString, MenuControlButton *> DacAddon::getChannelBtns() { return m_channelBtns; }
 
@@ -44,3 +46,5 @@ QMap<QString, QWidget *> DacAddon::getChannelMenus() { return m_channelMenus; }
 void DacAddon::setRunning(bool running) { m_isRunning = running; }
 
 bool DacAddon::isRunning() { return m_isRunning; }
+
+bool DacAddon::isRunnable() { return false; }

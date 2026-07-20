@@ -45,7 +45,6 @@ class DacDataManager : public QWidget
 public:
 	typedef enum
 	{
-		DAC_DISABLED,
 		DAC_BUFFER,
 		DAC_DDS
 	} DacMode;

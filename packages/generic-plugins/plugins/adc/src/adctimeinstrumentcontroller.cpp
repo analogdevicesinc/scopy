@@ -159,6 +159,7 @@ void ADCTimeInstrumentController::createIIODevice(AcqTreeNode *node)
 {
 	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
 	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
+	d->init();
 	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
 

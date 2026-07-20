@@ -22,6 +22,7 @@
 #include "adcfftinstrumentcontroller.h"
 #include "adcinstrument.h"
 #include "grdevicecomponent.h"
+#include "freq/grfftdevicecomponent.h"
 #include "importchannelcomponent.h"
 #include "freq/grfftsinkcomponent.h"
 #include "freq/grfftchannelcomponent.h"
@@ -136,7 +137,8 @@ void ADCFFTInstrumentController::init()
 void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 {
 	GRIIODeviceSourceNode *griiodsn = dynamic_cast<GRIIODeviceSourceNode *>(node);
-	GRDeviceComponent *d = new GRDeviceComponent(griiodsn);
+	GRFFTDeviceComponent *d = new GRFFTDeviceComponent(griiodsn);
+	d->init();
 	addComponent(d);
 	m_ui->addDevice(d->ctrl(), d);
 
@@ -194,18 +196,23 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		m_defaultRealCh = c;
 		m_plotComponentManager->selectChannel(c);
 	}
+
+	QString markerName = c->name();
+	if(griiofcn && griiofcn->treeParent()) {
+		markerName = griiofcn->treeParent()->name() + ":" + c->name();
+	}
+
 	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
-		QString name = c->name();
-		m_plotComponentManager->markerPanel()->updateChannel(name, info);
+		m_plotComponentManager->markerPanel()->updateChannel(markerName, info);
 	});
 
 	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
 	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
 		if(b) {
-			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
+			m_plotComponentManager->markerPanel()->newChannel(markerName, c->pen());
 		} else {
-			m_plotComponentManager->markerPanel()->deleteChannel(c->name());
+			m_plotComponentManager->markerPanel()->deleteChannel(markerName);
 		}
 
 		int markerCount = m_plotComponentManager->markerPanel()->markerCount();
@@ -258,17 +265,22 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		m_defaultComplexCh = c;
 	}
 
+	QString markerName = c->name();
+	if(griiofcn_I && griiofcn_I->treeParent()) {
+		markerName = griiofcn_I->treeParent()->name() + ":" + c->name();
+	}
+
 	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
 		auto info = c->markerController()->markerInfo();
-		m_plotComponentManager->markerPanel()->updateChannel(c->name(), info);
+		m_plotComponentManager->markerPanel()->updateChannel(markerName, info);
 	});
 
 	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
 	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
 		if(b) {
-			m_plotComponentManager->markerPanel()->newChannel(c->name(), c->pen());
+			m_plotComponentManager->markerPanel()->newChannel(markerName, c->pen());
 		} else {
-			m_plotComponentManager->markerPanel()->deleteChannel(c->name());
+			m_plotComponentManager->markerPanel()->deleteChannel(markerName);
 		}
 
 		int markerCount = m_plotComponentManager->markerPanel()->markerCount();

@@ -381,6 +381,10 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		PREFERENCE_CHECK_BOX(p, "general_scripting_enabled", "Enable the use of Scripting Tool",
 				     "When disabled, the Scripting Tool will not be accessible.", generalSection));
 
+	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
+		p, "general_mcp_server_enabled", "Enable the MCP server",
+		"When enabled, Scopy exposes a local MCP control socket for AI agents.", generalSection));
+
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
 							    MenuCollapseSection::MHW_COMPOSITEWIDGET, page);

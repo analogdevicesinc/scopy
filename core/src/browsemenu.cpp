@@ -87,6 +87,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_scriptingBtn->installEventFilter(this);
 
 	auto scriptingMenuLine = createHLine(m_content);
+	scriptingMenuLine->setVisible(scriptingEnabled);
 
 	// Connect to preference changes for scripting button
 	Preferences *prefs = Preferences::GetInstance();

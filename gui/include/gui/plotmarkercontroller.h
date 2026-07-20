@@ -30,6 +30,7 @@
 #include "qwidget.h"
 #include "utils.h"
 #include <QObject>
+#include <QScrollArea>
 #include <QwtPlotMarker>
 #include <QwtSymbol>
 
@@ -142,6 +143,8 @@ public Q_SLOTS:
 	int markerCount();
 
 private:
+	QScrollArea *m_scrollArea;
+	QWidget *m_panel;
 	QHBoxLayout *m_panelLayout;
 	QMap<QString, QWidget *> m_map;
 };

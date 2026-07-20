@@ -23,6 +23,8 @@
 #include "txnode.h"
 #include "dac_logging_categories.h"
 
+#include <pluginbase/preferences.h>
+
 #include <algorithm>
 
 #include <QtConcurrentRun>
@@ -35,7 +37,6 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	: QObject(parent)
 	, m_ddsTxs({})
 	, m_bufferTxs({})
-	, m_activeDds(false)
 	, m_activeBuffer(false)
 	, m_buffer(nullptr)
 	, m_cyclicBuffer(true)
@@ -94,30 +95,28 @@ bool DacDataModel::isBufferCapable() const { return m_isBufferCapable; }
 
 bool DacDataModel::isDds() const { return m_isDds; }
 
-void DacDataModel::enableBuffer(bool enabled)
+void DacDataModel::disableBuffer()
 {
-	qDebug(CAT_DAC_DATA) << QString("Enable buffer %1").arg(enabled);
-	if(m_isDds && enabled) {
-		enableDds(false);
-	}
-	if(m_isBufferCapable) {
-		m_activeBuffer = enabled;
-		if(!enabled) {
-			stop();
+	qDebug(CAT_DAC_DATA) << QString("Disable buffer.");
+	if(m_isBufferCapable && m_activeBuffer) {
+		for(auto node : std::as_const(m_bufferTxs)) {
+			enableBufferChannel(node->getUuid(), false);
 		}
+	}
+}
+
+void DacDataModel::enableBuffer()
+{
+	qDebug(CAT_DAC_DATA) << QString("Enable buffer.");
+	if(m_isBufferCapable) {
+		m_activeBuffer = true;
 	}
 }
 
 void DacDataModel::enableDds(bool enable)
 {
 	qDebug(CAT_DAC_DATA) << QString("Enable DDS %1").arg(enable);
-	if(m_isBufferCapable && m_activeBuffer && enable) {
-		for(auto node : std::as_const(m_bufferTxs)) {
-			enableBufferChannel(node->getUuid(), false);
-		}
-	}
 	if(m_isDds) {
-		m_activeDds = enable;
 		for(auto tx : std::as_const(m_ddsTxs)) {
 			tx->enableDds(enable);
 		}
@@ -633,6 +632,13 @@ QString DacDataModel::generateToneName(QString chnId)
 	return name;
 }
 
-void DacDataModel::deinitBufferDac() { enableBuffer(false); }
+void DacDataModel::deinitBufferDac() { disableBuffer(); }
 
-void DacDataModel::deinitDdsDac() { enableDds(false); }
+void DacDataModel::deinitDdsDac()
+{
+	auto reset = Preferences::GetInstance()->get("dac_reset_dds_on_disconnect").toBool();
+	if(!reset) {
+		return;
+	}
+	enableDds(false);
+}
