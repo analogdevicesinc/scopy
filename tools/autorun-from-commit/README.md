@@ -5,20 +5,12 @@ Automated tools for downloading and launching Scopy builds from CI/CD artifacts 
 ## Scripts
 
 ### `scopy-commit-build.py`
-Downloads Scopy builds from **GitHub Actions** for Linux/Windows/ARM64/macOS platforms.
-
-### `scopy-commit-build-macos.sh` (Deprecated)
-Legacy script that downloaded macOS builds from **Azure DevOps**. macOS builds are now on GitHub Actions — use `scopy-commit-build.py --platform macos` instead.
+Downloads Scopy builds from **GitHub Actions** for Linux (AppImage & Flatpak)/Windows/ARM64/ARM32/macOS platforms.
 
 ## Requirements
 
-### Python Script Dependencies
 - Python 3.6+
 - `requests` library: `pip install requests`
-
-### Bash Script Dependencies (macOS)
-- `curl`, `jq`, `unzip`, `base64`
-- Install with: `brew install curl jq unzip`
 
 ## Authentication
 
@@ -51,7 +43,7 @@ https://username:token@github.com
 # Use partial SHA (minimum 7 characters)
 ./scopy-commit-build.py abc1234
 
-# Specify platform explicitly available options : x86, arm64, arm32, windows, macos
+# Specify platform explicitly available options : x86, arm64, arm32, windows, macos, flatpak
 ./scopy-commit-build.py abc1234 --platform x86
 
 
@@ -59,9 +51,30 @@ https://username:token@github.com
 ./scopy-commit-build.py --help
 ```
 
+### Platforms
+
+| `--platform` | Artifact selected | Host detection |
+|---|---|---|
+| `x86` | `scopy-qt6-x86_64-appimage-ubuntu{2204,2404,2604}` | Reads `/etc/os-release`; picks the AppImage matching the host Ubuntu version, else falls back to the newest available (logged) |
+| `macos` | `Scopy-macOS14-arm64-qt6` / `Scopy-macOS15-x86_64-qt6` | Uses `platform.machine()`; Apple Silicon → arm64, Intel → x86_64, else first available (logged) |
+| `flatpak` | `scopy-x86_64-flatpak` (contains `Scopy.flatpak`) | Linux only; installed and launched via the `flatpak` CLI |
+| `arm64` | `scopy-arm64-qt6-appimage` | — |
+| `arm32` | `scopy-armhf-qt6-appimage` | — |
+| `windows` | `scopy-windows-qt6-portable` | — |
+
+### Flatpak Usage
+```bash
+# Linux host with the flatpak CLI installed
+./scopy-commit-build.py abc1234 --platform flatpak
+```
+This downloads and extracts the Flatpak bundle, then runs
+`flatpak install --user -y Scopy.flatpak` and `flatpak run org.adi.Scopy`.
+If the `flatpak` CLI is not installed, the bundle is downloaded but not launched,
+and its path is printed. Flatpak is Linux-only and is never auto-detected — it
+must be requested explicitly with `--platform flatpak`.
+
 ### macOS Usage
 ```bash
-# macOS builds are now on GitHub Actions, use the Python script:
 ./scopy-commit-build.py abc1234 --platform macos
 ```
 
@@ -75,9 +88,12 @@ https://username:token@github.com
 
 ## Notes
 
-- Script automatically detects platform if not specified
+- Script automatically detects platform if not specified (flatpak excluded — opt-in only)
+- On Linux, the host Ubuntu version selects the matching x86_64 AppImage
+- On macOS, the host CPU arch selects the matching build
 - Downloads are cached locally with timestamps
 - Nested ZIP files are automatically extracted
 - Linux/ARM64 executables get proper execute permissions
 - Windows executables are launched via shell
 - macOS apps have quarantine attributes removed
+- Flatpak bundles are installed and launched via the `flatpak` CLI (`org.adi.Scopy`)
