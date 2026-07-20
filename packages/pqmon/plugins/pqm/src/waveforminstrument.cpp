@@ -54,7 +54,7 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *layout = new QHBoxLayout(this);
 	setLayout(layout);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	m_dockableArea = createDockableArea(this);
 
@@ -110,9 +110,9 @@ WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget 
 	connect(m_tme, &ToolMenuEntry::runClicked, m_runBtn, &QAbstractButton::setChecked);
 	connect(this, &WaveformInstrument::enableTool, m_tme, &ToolMenuEntry::setRunning);
 	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
-	connect(m_runBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
+	connect(m_runBtn, &QAbstractButton::toggled, this, &WaveformInstrument::toggleWaveform);
 	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
-	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SLOT(toggleWaveform(bool)));
+	connect(m_singleBtn, &QAbstractButton::toggled, this, &WaveformInstrument::toggleWaveform);
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
 		&WaveformInstrument::concurrentEnable);
 }
@@ -172,7 +172,7 @@ QWidget *WaveformInstrument::createSettMenu(QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	QVBoxLayout *layout = new QVBoxLayout(widget);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
 	MenuHeaderWidget *header = new MenuHeaderWidget(
@@ -207,7 +207,7 @@ QWidget *WaveformInstrument::createMenuPlotSection(QWidget *parent)
 	// plotting mode: software trigger or rolling mode
 	QWidget *plottingModeWidget = new QWidget(plotSection);
 	plottingModeWidget->setLayout(new QVBoxLayout(plottingModeWidget));
-	plottingModeWidget->layout()->setMargin(0);
+	plottingModeWidget->layout()->setContentsMargins(0, 0, 0, 0);
 
 	connect(m_runBtn, &QPushButton::toggled, plottingModeWidget, &QWidget::setDisabled);
 	connect(m_singleBtn, &QPushButton::toggled, plottingModeWidget, &QWidget::setDisabled);

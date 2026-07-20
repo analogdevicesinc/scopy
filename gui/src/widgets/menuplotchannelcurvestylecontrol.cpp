@@ -40,14 +40,14 @@ MenuPlotChannelCurveStyleControl::~MenuPlotChannelCurveStyleControl() {}
 void MenuPlotChannelCurveStyleControl::createCurveMenu(QWidget *parent)
 {
 	QVBoxLayout *mainLay = new QVBoxLayout(this);
-	mainLay->setMargin(0);
+	mainLay->setContentsMargins(0, 0, 0, 0);
 	mainLay->setSpacing(10);
 
 	m_cbChannel = new MenuCombo("Curve", this);
 	mainLay->addWidget(m_cbChannel);
 
 	QHBoxLayout *styleLay = new QHBoxLayout();
-	styleLay->setMargin(0);
+	styleLay->setContentsMargins(0, 0, 0, 0);
 	styleLay->setSpacing(10);
 
 	m_cbThickness = new MenuCombo("Thickness", this);
@@ -69,7 +69,7 @@ void MenuPlotChannelCurveStyleControl::createCurveMenu(QWidget *parent)
 	mainLay->addLayout(styleLay);
 
 	QHBoxLayout *alphaLay = new QHBoxLayout();
-	alphaLay->setMargin(0);
+	alphaLay->setContentsMargins(0, 0, 0, 0);
 	alphaLay->setSpacing(10);
 	QLabel *alphaLabel = new QLabel("Opacity", this);
 	m_alphaSlider = new QSlider(Qt::Horizontal, this);

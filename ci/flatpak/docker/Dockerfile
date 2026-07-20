@@ -33,6 +33,6 @@ RUN sudo apt install -y git wget vim build-essential subversion mm-common && \
 
 # Install remote
 RUN sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-RUN sudo flatpak install flathub org.kde.Platform//5.15-23.08 -y && sudo flatpak install flathub org.kde.Sdk//5.15-23.08 -y
+RUN sudo flatpak install flathub org.kde.Platform//6.8 -y && sudo flatpak install flathub org.kde.Sdk//6.8 -y
 
 WORKDIR /home/$USER

@@ -33,7 +33,7 @@ CheckBoxAttrUi::CheckBoxAttrUi(IIOWidgetFactoryRecipe recipe, bool isCompact, QW
 {
 	m_recipe = recipe;
 	m_ui->setLayout(new QHBoxLayout(m_ui));
-	m_ui->layout()->setMargin(0);
+	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 	m_menuOnOffSwitch = new MenuOnOffSwitch("", m_ui);
 
 	m_title = new QLabel(recipe.data, m_ui);

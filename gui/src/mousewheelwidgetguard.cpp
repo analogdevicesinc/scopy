@@ -49,25 +49,25 @@ void MouseWheelWidgetGuard::installEventRecursively(QWidget *parentWidget)
 		return;
 	}
 	QList<QComboBox *> comboBoxes = parentWidget->findChildren<QComboBox *>();
-	for(auto ch : qAsConst(comboBoxes)) {
+	for(auto ch : std::as_const(comboBoxes)) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
 	QList<QDoubleSpinBox *> doubleSpinBoxes = parentWidget->findChildren<QDoubleSpinBox *>();
-	for(auto ch : qAsConst(doubleSpinBoxes)) {
+	for(auto ch : std::as_const(doubleSpinBoxes)) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
 	QList<QSpinBox *> spinBoxes = parentWidget->findChildren<QSpinBox *>();
-	for(auto ch : qAsConst(spinBoxes)) {
+	for(auto ch : std::as_const(spinBoxes)) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}
 
 	QList<QLineEdit *> lineEdits = parentWidget->findChildren<QLineEdit *>();
-	for(auto ch : qAsConst(lineEdits)) {
+	for(auto ch : std::as_const(lineEdits)) {
 		ch->installEventFilter(new MouseWheelWidgetGuard(ch));
 		ch->setFocusPolicy(Qt::StrongFocus);
 	}

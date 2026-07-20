@@ -46,7 +46,7 @@ Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 {
 	QHBoxLayout *lay = new QHBoxLayout();
 	this->setLayout(lay);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
 	m_tool->topContainer()->setVisible(true);
@@ -167,10 +167,10 @@ Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 	m_tool->rightStack()->add(settingsMenuId, rightSideMenu);
 
 	scanChannels();
-	for(auto w : qAsConst(m_channelsRx)) {
+	for(auto w : std::as_const(m_channelsRx)) {
 		globalRxSection->contentLayout()->addWidget(w);
 	}
-	for(auto w : qAsConst(m_channelsTx)) {
+	for(auto w : std::as_const(m_channelsTx)) {
 		globalTxSection->contentLayout()->addWidget(w);
 	}
 	Q_EMIT triggerRead();
@@ -206,6 +206,10 @@ void Ad9084::scanChannels()
 	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
 		QString chn = m_rx_coarse_ddc_channel_names.at(i);
 		struct iio_channel *rxchn = iio_device_find_channel(m_device, chn.toUtf8(), false);
+		if(rxchn == nullptr) {
+			qWarning(CAT_AD9084) << "RX channel not found:" << chn;
+			continue;
+		}
 		Ad9084Channel *rxchnWidget = new Ad9084Channel(rxchn, i, m_group, this);
 		connect(this, &Ad9084::triggerRead, rxchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsRx.push_back(rxchnWidget);
@@ -218,6 +222,10 @@ void Ad9084::scanChannels()
 	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
 		QString chn = m_tx_coarse_duc_channel_names.at(i);
 		struct iio_channel *txchn = iio_device_find_channel(m_device, chn.toUtf8(), true);
+		if(txchn == nullptr) {
+			qWarning(CAT_AD9084) << "TX channel not found:" << chn;
+			continue;
+		}
 		Ad9084Channel *txchnWidget = new Ad9084Channel(txchn, i, m_group, this);
 		connect(this, &Ad9084::triggerRead, txchnWidget, &Ad9084Channel::readChannel, Qt::QueuedConnection);
 		m_channelsTx.push_back(txchnWidget);
@@ -243,6 +251,10 @@ void Ad9084::mapPathsUnique()
 							channels.push_back(chn);
 						}
 					}
+				}
+				if(channels.isEmpty()) {
+					qWarning(CAT_AD9084) << "No _i channels found for" << converter << cdc;
+					continue;
 				}
 				if(converter.contains("ADC")) {
 					m_rx_coarse_ddc_channel_names.push_back(channels.at(0));
@@ -297,14 +309,14 @@ QWidget *Ad9084::createMenu()
 {
 	QWidget *menu = new QWidget(this);
 	QVBoxLayout *vLay = new QVBoxLayout();
-	vLay->setMargin(0);
+	vLay->setContentsMargins(0, 0, 0, 0);
 	menu->setLayout(vLay);
 
 	// PFIR load container
 	auto pfirContainer = new MenuSectionCollapseWidget("PFIR CONFIG", MenuCollapseSection::MHCW_NONE,
 							   MenuCollapseSection::MHW_BASEWIDGET, menu);
 	QHBoxLayout *pfirlay = new QHBoxLayout(this);
-	pfirlay->setMargin(0);
+	pfirlay->setContentsMargins(0, 0, 0, 0);
 	pfirlay->setSpacing(10);
 
 	QFileInfoList filters = PkgManager::listFilesInfo(QStringList() << "ad9084-filters");
@@ -324,7 +336,7 @@ QWidget *Ad9084::createMenu()
 	auto cfirContainer = new MenuSectionCollapseWidget("CFIR CONFIG", MenuCollapseSection::MHCW_NONE,
 							   MenuCollapseSection::MHW_BASEWIDGET, menu);
 	QHBoxLayout *cfirlay = new QHBoxLayout(this);
-	cfirlay->setMargin(0);
+	cfirlay->setContentsMargins(0, 0, 0, 0);
 	cfirlay->setSpacing(10);
 
 	m_cfirFileBrowser = new FileBrowserWidget(FileBrowserWidget::OPEN_FILE, menu);

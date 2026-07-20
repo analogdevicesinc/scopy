@@ -5,10 +5,10 @@ Automated tools for downloading and launching Scopy builds from CI/CD artifacts 
 ## Scripts
 
 ### `scopy-commit-build.py`
-Downloads Scopy builds from **GitHub Actions** for Linux/Windows/ARM64 platforms.
+Downloads Scopy builds from **GitHub Actions** for Linux/Windows/ARM64/macOS platforms.
 
-### `scopy-commit-build-macos.sh`
-Downloads Scopy builds from **Azure DevOps** for macOS platform.
+### `scopy-commit-build-macos.sh` (Deprecated)
+Legacy script that downloaded macOS builds from **Azure DevOps**. macOS builds are now on GitHub Actions — use `scopy-commit-build.py --platform macos` instead.
 
 ## Requirements
 
@@ -51,7 +51,7 @@ https://username:token@github.com
 # Use partial SHA (minimum 7 characters)
 ./scopy-commit-build.py abc1234
 
-# Specify platform explicitly available options : x86, arm64, arm32, windows
+# Specify platform explicitly available options : x86, arm64, arm32, windows, macos
 ./scopy-commit-build.py abc1234 --platform x86
 
 
@@ -61,11 +61,8 @@ https://username:token@github.com
 
 ### macOS Usage
 ```bash
-# Basic usage
-./scopy-commit-build-macos.sh abc123467b84461f5704e351c80e38a02bdfebb54
-
-# With token parameter
-./scopy-commit-build-macos.sh f6d3466 github_token
+# macOS builds are now on GitHub Actions, use the Python script:
+./scopy-commit-build.py abc1234 --platform macos
 ```
 
 ## How It Works

@@ -117,7 +117,7 @@ CurrentInLoopMenu::CurrentInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	QWidget *cnvtWidget = new QWidget(this);
 	QHBoxLayout *cnvtLayout = new QHBoxLayout(cnvtWidget);
 	cnvtWidget->setLayout(cnvtLayout);
-	cnvtLayout->setMargin(0);
+	cnvtLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_cnvtLabel = new QLabel(cnvtWidget);
 	cnvtLayout->addItem(new QSpacerItem(20, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -187,7 +187,7 @@ DigitalInLoopMenu::DigitalInLoopMenu(QWidget *parent, QString chnlFunction, Conn
 	QWidget *cnvtWidget = new QWidget(this);
 	QHBoxLayout *cnvtLayout = new QHBoxLayout(cnvtWidget);
 	cnvtWidget->setLayout(cnvtLayout);
-	cnvtLayout->setMargin(0);
+	cnvtLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_cnvtLabel = new QLabel(cnvtWidget);
 	cnvtLayout->addItem(new QSpacerItem(20, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -267,7 +267,7 @@ VoltageOutMenu::VoltageOutMenu(QWidget *parent, QString chnlFunction, Connection
 	QWidget *cnvtWidget = new QWidget(this);
 	QHBoxLayout *cnvtLayout = new QHBoxLayout(cnvtWidget);
 	cnvtWidget->setLayout(cnvtLayout);
-	cnvtLayout->setMargin(0);
+	cnvtLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_cnvtLabel = new QLabel(cnvtWidget);
 	cnvtLayout->addItem(new QSpacerItem(20, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
@@ -354,7 +354,7 @@ CurrentOutMenu::CurrentOutMenu(QWidget *parent, QString chnlFunction, Connection
 	QWidget *cnvtWidget = new QWidget(this);
 	QHBoxLayout *cnvtLayout = new QHBoxLayout(cnvtWidget);
 	cnvtWidget->setLayout(cnvtLayout);
-	cnvtLayout->setMargin(0);
+	cnvtLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_cnvtLabel = new QLabel(cnvtWidget);
 	cnvtLayout->addItem(new QSpacerItem(20, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));

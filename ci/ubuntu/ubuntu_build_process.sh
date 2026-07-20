@@ -1,6 +1,6 @@
 #!/bin/bash -xe
 
-# Build and Install Dependencies for Ubuntu
+# Qt6 Build and Install Dependencies for Ubuntu
 # ===========================
 # Usage: ./ubuntu_build_process.sh configure_system
 
@@ -28,15 +28,15 @@ LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
-KDDOCK_BRANCH=2.1
-ECM_BRANCH=kf5
-KARCHIVE_BRANCH=kf5
+KDDOCK_BRANCH=2.2
+ECM_BRANCH=v6.8.0
+KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
 
 STAGING_AREA=$SRC_SCRIPT/staging_ubuntu
 QT_INSTALL_LOCATION=/opt/Qt
-QT=$QT_INSTALL_LOCATION/5.15.2/gcc_64
-QMAKE_BIN=$QT/bin/qmake
+QT=$QT_INSTALL_LOCATION/6.8.3/gcc_64
+QMAKE_BIN=$QT/bin/qmake6
 JOBS=-j14
 STAGING_AREA=$SRC_SCRIPT/staging_ubuntu
 
@@ -47,17 +47,19 @@ if [ -f /etc/os-release ]; then
 
     if [ "$ID" = "ubuntu" ]; then
         case "$VERSION_ID" in
-            "20.04")
-                PYTHON_VERSION=python3.9
-                ;;
             "22.04")
                PYTHON_VERSION=python3.11
                 ;;
             "24.04")
                 PYTHON_VERSION=python3.12
                 ;;
+            "26.04")
+                PYTHON_VERSION=python3.14
+                LIBCLANG_PKG=libclang1-21
+                BOOST_PKG=libboost1.88-all-dev
+                ;;
             *)
-                echo "Running on Ubuntu, but not 20.04/22.04/24.04 (detected: $VERSION_ID)"
+                echo "Running on Ubuntu, but not 22.04/24.04/26.04 (detected: $VERSION_ID)"
                 ;;
         esac
     else
@@ -141,14 +143,6 @@ clone() {
 	popd
 }
 
-# Generic CMake build function
-# Used by all dependency build functions to handle CMake-based projects
-#
-# Process:
-# 1. Creates clean build directory
-# 2. Runs CMake with cross-compilation options
-# 3. Builds with parallel jobs
-# 4. Records build info to status file
 build_with_cmake() {
 	download_cmake
 	INSTALL=$1
@@ -173,19 +167,22 @@ install_packages() {
 		keyboard-configuration vim git wget unzip\
 		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
 		subversion mesa-common-dev graphviz xserver-xorg gettext texinfo mm-common doxygen \
-		libboost-all-dev libfftw3-dev liblog4cpp5v5 liblog4cpp5-dev \
+		${BOOST_PKG:-libboost-all-dev} libfftw3-dev liblog4cpp5v5 liblog4cpp5-dev \
 		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
-		libclang1 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
+		${LIBCLANG_PKG:-libclang1} libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
-		libxkbcommon-x11-0 libqt5gui5 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev
+		libxkbcommon-x11-0 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev \
+		libglu1-mesa-dev libxkbcommon-dev libvulkan-dev \
+		libzstd-dev libbz2-dev liblzma-dev \
+		libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0
 }
 
-# Installing Qt using the aqt tool https://github.com/miurahr/aqtinstall
 install_qt() {
+	# installing Qt6 using the aqt tool https://github.com/miurahr/aqtinstall
+	[ "$PYTHON_VERSION" == "python3.14" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
 	[ "$PYTHON_VERSION" == "python3.12" ] && sudo pip3 install --no-cache-dir --break-system-packages aqtinstall
 	[ "$PYTHON_VERSION" == "python3.11" ] && sudo pip3 install --no-cache-dir aqtinstall
-	[ "$PYTHON_VERSION" == "python3.9" ]  && sudo pip3 install --no-cache-dir aqtinstall
-	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 5.15.2
+	sudo python3 -m aqt install-qt --outputdir $QT_INSTALL_LOCATION linux desktop 6.8.3 linux_gcc_64 -m qt3d qtscxml
 }
 
 build_libserialport(){
@@ -362,7 +359,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS=""
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON"
 	build_with_cmake $1
 	popd
 }
@@ -404,10 +401,12 @@ build_iio-emu() {
 
 build_scopy() {
 	echo "### Building scopy"
+	git config --global --add safe.directory $SRC_DIR
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_ALL_PACKAGES=ON
+		-DENABLE_PACKAGE_M2K=OFF
 		"
 	build_with_cmake OFF
 	popd

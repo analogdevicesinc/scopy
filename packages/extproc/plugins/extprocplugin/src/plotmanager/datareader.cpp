@@ -164,7 +164,7 @@ void DataReader::readData(int64_t startSample, int64_t sampleCount)
 	QMap<QString, QVector<float>> processedData;
 
 	// Initialize vectors for each channel
-	for(const QString &ch : qAsConst(m_channelsName)) {
+	for(const QString &ch : std::as_const(m_channelsName)) {
 		processedData[ch] = QVector<float>();
 		processedData[ch].reserve(sampleCount);
 	}

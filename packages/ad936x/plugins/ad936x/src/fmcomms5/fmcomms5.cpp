@@ -45,7 +45,7 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	, m_group(group)
 {
 	m_mainLayout = new QVBoxLayout(this);
-	m_mainLayout->setMargin(0);
+	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 	m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -79,13 +79,13 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 
 	m_controlsWidget = new QWidget(this);
 	QVBoxLayout *controlsLayout = new QVBoxLayout(m_controlsWidget);
-	controlsLayout->setMargin(0);
+	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	controlsLayout->setContentsMargins(0, 0, 0, 0);
 	m_controlsWidget->setLayout(controlsLayout);
 
 	QWidget *controlsWidget = new QWidget(this);
 	QVBoxLayout *controlWidgetLayout = new QVBoxLayout(controlsWidget);
-	controlWidgetLayout->setMargin(0);
+	controlWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	controlWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	controlsWidget->setLayout(controlWidgetLayout);
 
@@ -299,7 +299,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 	mainLayout->addLayout(layout);
 
 	QHBoxLayout *rxDeviceLayout = new QHBoxLayout();
-	rxDeviceLayout->setMargin(0);
+	rxDeviceLayout->setContentsMargins(0, 0, 0, 0);
 	rxDeviceLayout->setSpacing(10);
 
 	QWidget *rxDeviceWidget = m_helper->generateRxDeviceWidget(dev, "ad9361-phy", widget);
@@ -406,7 +406,7 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 	layout->addLayout(lay);
 
 	QHBoxLayout *txWidgetsLayout = new QHBoxLayout();
-	txWidgetsLayout->setMargin(0);
+	txWidgetsLayout->setContentsMargins(0, 0, 0, 0);
 	txWidgetsLayout->setSpacing(10);
 
 	QWidget *txDeviceWidget = m_helper->generateTxDeviceWidget(dev, "ad9361-phy", widget);

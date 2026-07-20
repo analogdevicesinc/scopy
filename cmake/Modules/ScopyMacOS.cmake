@@ -38,20 +38,6 @@ set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Reso
 
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,-headerpad_max_install_names -Wl,-search_paths_first ${CMAKE_EXE_LINKER_FLAGS}")
 
-foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
-	get_target_property(_loc ${plugin} LOCATION)
-	get_filename_component(_name ${_loc} NAME)
-	get_filename_component(_dir ${_loc} DIRECTORY)
-	get_filename_component(_dir ${_dir} NAME)
-
-	set_source_files_properties(${_loc} PROPERTIES MACOSX_PACKAGE_LOCATION plugins/${_dir})
-	set(QT_PLUGINS ${QT_PLUGINS} ${_loc})
-	set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
-endforeach()
-
-# needs revising install( CODE " set(BU_CHMOD_BUNDLE_ITEMS ON) include(BundleUtilities)
-# fixup_bundle(\"${CMAKE_BINARY_DIR}/Scopy.app\" \"${BUNDLED_QT_PLUGINS}\" \"${CMAKE_SOURCE_DIR}\")" )
-
 set(OSX_BUNDLE MACOSX_BUNDLE)
 
 find_package(PkgConfig)
@@ -60,25 +46,30 @@ pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 
-macro(set_macosx_package_location source_dir location extension)
-	file(GLOB_RECURSE files ${source_dir}/*${extension})
-	foreach(_file ${files})
-		file(RELATIVE_PATH _relative_path ${source_dir} ${_file})
-		get_filename_component(parent_directory ${_relative_path} DIRECTORY)
-		message(STATUS "parent_directory: " ${parent_directory})
-		set_property(SOURCE ${_file} PROPERTY MACOSX_PACKAGE_LOCATION ${location}/${parent_directory})
-		message(STATUS "location/parent_directory: " ${location}/${parent_directory})
-		set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${_file})
-	endforeach()
-endmacro()
+set(EXTRA_BUNDLE_FILES ${ICON_FILE} ${PKGINFO} ${QT_CONF})
 
-set_macosx_package_location(${LIBSIGROK_DECODERS_DIR} "MacOS/decoders" "py")
-set_macosx_package_location(${CMAKE_BINARY_DIR}/style "MacOS/style" "")
+function(setup_macos_bundle_resources target)
+	add_custom_command(
+		TARGET ${target}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/style
+			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/style
+		COMMENT "Copying style files into app bundle"
+	)
 
-set(EXTRA_BUNDLE_FILES
-    ${EXTRA_BUNDLE_FILES}
-    ${QT_PLUGINS}
-    ${ICON_FILE}
-    ${PKGINFO}
-    ${QT_CONF}
-)
+	add_custom_command(
+		TARGET ${target}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${LIBSIGROK_DECODERS_DIR}
+			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/decoders
+		COMMENT "Copying sigrokdecode decoders into app bundle"
+	)
+
+	add_custom_command(
+		TARGET ${target}
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/translations
+			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/translations
+		COMMENT "Copying translations into app bundle"
+	)
+endfunction()

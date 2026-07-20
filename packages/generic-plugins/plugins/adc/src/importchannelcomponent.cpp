@@ -40,7 +40,7 @@ ImportChannelComponent::ImportChannelComponent(ImportFloatChannelNode *node, QPe
 	m_channelName = node->name();
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	auto m_lay = new QVBoxLayout(this);
-	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_lay->setSpacing(0);
 	widget = createMenu(this);
 	m_lay->addWidget(widget);

@@ -36,13 +36,13 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 	: QWidget{parent}
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10);
 	setLayout(mainLayout);
 
 	QWidget *settingsBody = new QWidget(this);
 	layout = new QVBoxLayout();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 	settingsBody->setLayout(layout);
 
@@ -55,13 +55,13 @@ MonitorSelectionMenu::MonitorSelectionMenu(QMap<QString, DataMonitorModel *> *mo
 
 	deviceChannelsWidget = new QWidget(this);
 	QVBoxLayout *deviceChannelsWidgetLayout = new QVBoxLayout(deviceChannelsWidget);
-	deviceChannelsWidgetLayout->setMargin(0);
+	deviceChannelsWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	deviceChannelsWidgetLayout->setSpacing(10);
 	deviceChannelsWidget->setLayout(deviceChannelsWidgetLayout);
 
 	importedChannelsWidget = new QWidget(this);
 	QVBoxLayout *importedChannelsWidgetLayout = new QVBoxLayout(importedChannelsWidget);
-	importedChannelsWidgetLayout->setMargin(0);
+	importedChannelsWidgetLayout->setContentsMargins(0, 0, 0, 0);
 	importedChannelsWidgetLayout->setSpacing(10);
 	importedChannelsWidget->setLayout(importedChannelsWidgetLayout);
 

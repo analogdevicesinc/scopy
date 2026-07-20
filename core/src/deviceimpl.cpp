@@ -65,7 +65,7 @@ void DeviceImpl::init()
 {
 	DebugTimer benchmark;
 	m_plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
-	for(Plugin *p : qAsConst(m_plugins)) {
+	for(Plugin *p : std::as_const(m_plugins)) {
 		QObject *obj = dynamic_cast<QObject *>(p);
 		if(obj) {
 			obj->setParent(this);
@@ -334,7 +334,7 @@ void DeviceImpl::loadCompatiblePluginsTab(QWidget *pluginsTab)
 {
 	QList<Plugin *> plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
 	QStringList enabledPlugins = getPluginsName();
-	for(Plugin *p : qAsConst(plugins)) {
+	for(Plugin *p : std::as_const(plugins)) {
 		PluginEnableWidget *pluginDescription = new PluginEnableWidget(pluginsTab);
 		bool pluginEnabled = enabledPlugins.contains(p->name());
 		pluginDescription->setDescription(p->description());
@@ -359,7 +359,7 @@ void DeviceImpl::loadCompatiblePluginsTab(QWidget *pluginsTab)
 QStringList DeviceImpl::getPluginsName()
 {
 	QStringList pluginsName;
-	for(Plugin *p : qAsConst(m_plugins)) {
+	for(Plugin *p : std::as_const(m_plugins)) {
 		pluginsName.push_back(p->name());
 	}
 	return pluginsName;
@@ -390,7 +390,7 @@ void DeviceImpl::onConnectionLost()
 
 Plugin *DeviceImpl::getPluginByName(const QString &pluginName)
 {
-	for(Plugin *p : qAsConst(m_plugins)) {
+	for(Plugin *p : std::as_const(m_plugins)) {
 		if(p->name() == pluginName) {
 			return p;
 		}
@@ -419,7 +419,7 @@ void DeviceImpl::hidePage()
 
 void DeviceImpl::save(QSettings &s)
 {
-	for(Plugin *p : qAsConst(m_plugins)) {
+	for(Plugin *p : std::as_const(m_plugins)) {
 		s.beginGroup(p->name());
 		p->saveSettings(s);
 		s.endGroup();
@@ -428,7 +428,7 @@ void DeviceImpl::save(QSettings &s)
 
 void DeviceImpl::load(QSettings &s)
 {
-	for(Plugin *p : qAsConst(m_plugins)) {
+	for(Plugin *p : std::as_const(m_plugins)) {
 		s.beginGroup(p->name());
 		p->loadSettings(s);
 		s.endGroup();

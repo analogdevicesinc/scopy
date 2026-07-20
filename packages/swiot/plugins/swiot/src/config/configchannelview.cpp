@@ -129,7 +129,7 @@ void ConfigChannelView::setDeviceAvailable(const QStringList &mDeviceAvailable)
 {
 	m_deviceAvailable = mDeviceAvailable;
 	m_deviceOptions->clear();
-	for(const QString &device : qAsConst(m_deviceAvailable)) {
+	for(const QString &device : std::as_const(m_deviceAvailable)) {
 		m_deviceOptions->addItem(device);
 	}
 }
@@ -155,7 +155,7 @@ void ConfigChannelView::setFunctionAvailable(const QStringList &mFunctionAvailab
 {
 	m_functionAvailable = mFunctionAvailable;
 	m_functionOptions->clear();
-	for(const QString &device : qAsConst(m_functionAvailable)) {
+	for(const QString &device : std::as_const(m_functionAvailable)) {
 		m_functionOptions->addItem(device);
 	}
 }

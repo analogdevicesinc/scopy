@@ -44,9 +44,9 @@
 #include <Qt3DRender/QCamera>
 
 #include <Qt3DCore/QEntity>
-#include <Qt3DRender/QGeometry>
+#include <Qt3DCore/QGeometry>
 #include <Qt3DRender/QGeometryRenderer>
-#include <Qt3DRender/QAttribute>
+#include <Qt3DCore/QAttribute>
 #include <QColor>
 #include <QBuffer>
 

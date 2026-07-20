@@ -37,11 +37,11 @@ PluginsTab::PluginsTab(QWidget *parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QVBoxLayout *lay = new QVBoxLayout(this);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *w = new QWidget(this);
 	QVBoxLayout *wLay = new QVBoxLayout(w);
-	wLay->setMargin(10);
+	wLay->setContentsMargins(10, 10, 10, 10);
 
 	MenuSectionCollapseWidget *pluginsSection = new MenuSectionCollapseWidget(
 		"Plugins", MenuCollapseSection::MHCW_NONE, MenuCollapseSection::MHW_BASEWIDGET, w);

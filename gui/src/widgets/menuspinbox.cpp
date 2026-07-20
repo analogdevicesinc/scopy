@@ -99,7 +99,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	setLayout(lay);
 
 	lay->setSpacing(0);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QLayout *btnLay;
 	QLayout *editLay;
@@ -110,7 +110,7 @@ void MenuSpinbox::layoutVertically(bool left)
 	btnLay->setSpacing(2);
 	btnLay->setContentsMargins(5, 0, 0, 0);
 	editLay->setSpacing(2);
-	editLay->setMargin(0);
+	editLay->setContentsMargins(0, 0, 0, 0);
 
 	btnLay->addWidget(m_plus);
 	btnLay->addWidget(m_minus);
@@ -159,13 +159,13 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	// Layout for the underline
 	auto lineLay = new QVBoxLayout(this);
 	lineLay->setSpacing(5);
-	lineLay->setMargin(0);
+	lineLay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lineLay);
 
 	// Elements layout
 	auto lay = new QHBoxLayout(this);
 	lay->setSpacing(5);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 
 	QLayout *btnLay;
 	QLayout *editLay;
@@ -174,7 +174,7 @@ void MenuSpinbox::layoutHorizontally(bool left)
 	editLay = new QHBoxLayout();
 
 	btnLay->setSpacing(2);
-	btnLay->setMargin(0);
+	btnLay->setContentsMargins(0, 0, 0, 0);
 	editLay->setSpacing(8);
 	editLay->setContentsMargins(0, 0, 5, 0);
 

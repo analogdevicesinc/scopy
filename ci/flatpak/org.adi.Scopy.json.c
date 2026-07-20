@@ -115,8 +115,8 @@
 		    "sources": [
                 {
                     "type": "archive",
-                    "url": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.16.tar.gz",
-                    "sha256": "11238f1d86c995d8aed2e22f04a1e3779f0d70e587caffeab4857f3c662ed5a4"
+                    "url": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.3.2.tar.gz",
+                    "sha256": "ad67819308618b5069537be237f8e68ca1c7fcc95ee4a121fe6845b1418248f8"
                 }
 			]
 		},
@@ -134,6 +134,7 @@
 				"--disable-libdaemon",
 				"--disable-mono",
 				"--disable-pygtk",
+				"--disable-python",
 #ifdef __ARM__
                 "--disable-dbus",
 #endif
@@ -507,13 +508,17 @@
 			"builddir": true,
 			"buildsystem": "cmake",
 			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app"
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DKDDockWidgets_QT6=ON",
+				"-DKDDockWidgets_FRONTENDS=qtwidgets",
+				"-DKDDockWidgets_EXAMPLES=OFF",
+				"-DKDDockWidgets_TESTS=OFF"
 			],
 			"sources": [
 				{
 					"type": "git",
 					"url": "https://github.com/KDAB/KDDockWidgets.git",
-					"branch": "2.1"
+					"branch": "2.2"
 				}
 			]
 		},
@@ -522,13 +527,17 @@
 			"builddir": true,
 			"buildsystem": "cmake",
 			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app"
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DBUILD_TESTING=OFF",
+				"-DBUILD_HTML_DOCS=OFF",
+				"-DBUILD_MAN_DOCS=OFF",
+				"-DBUILD_QTHELP_DOCS=OFF"
 			],
 			"sources": [
 				{
 					"type": "git",
 					"url": "https://github.com/KDE/extra-cmake-modules.git",
-					"branch": "kf5"
+					"branch": "v6.8.0"
 				}
 			]
 		},
@@ -537,13 +546,14 @@
 			"builddir": true,
 			"buildsystem": "cmake",
 			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app"
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DBUILD_TESTING=OFF"
 			],
 			"sources": [
 				{
 					"type": "git",
 					"url": "https://github.com/KDE/karchive.git",
-					"branch": "kf5"
+					"branch": "v6.8.0"
 				}
 			]
 		},
@@ -577,24 +587,11 @@
 				}
 			]
 		},
-		{
-			"name": "qtadvanceddocking",
-			"builddir": true,
-			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app" ],
-			"buildsystem": "cmake",
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System",
-					"tag": "3.8.1"
-				}
-			]
-		},
 	{
 		"name": "scopy",
 		"builddir": true,
 		"buildsystem": "cmake",
-		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF"],
+		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF"],
 		"sources": [
 			{
 				"type": "git",

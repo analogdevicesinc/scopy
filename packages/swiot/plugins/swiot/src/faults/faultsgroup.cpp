@@ -102,7 +102,7 @@ void FaultsGroup::update(uint32_t faultsNumeric)
 QStringList FaultsGroup::getExplanations()
 {
 	QStringList res;
-	for(auto fault : qAsConst(m_faults)) {
+	for(auto fault : std::as_const(m_faults)) {
 		res += getExplanation(fault->getId());
 	}
 

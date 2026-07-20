@@ -45,14 +45,14 @@ DdsDacAddon::DdsDacAddon(DacDataModel *model, QWidget *parent)
 	, m_model(model)
 {
 	auto m_layout = new QHBoxLayout();
-	m_layout->setMargin(0);
+	m_layout->setContentsMargins(0, 0, 0, 0);
 	m_layout->setAlignment(Qt::AlignTop);
 	setLayout(m_layout);
 
 	QScrollArea *scrollArea = new QScrollArea(this);
 	QWidget *txsContainer = new QWidget(scrollArea);
 	QVBoxLayout *txsContainerLayout = new QVBoxLayout(txsContainer);
-	txsContainerLayout->setMargin(0);
+	txsContainerLayout->setContentsMargins(0, 0, 0, 0);
 	txsContainerLayout->setSpacing(10);
 	txsContainerLayout->setAlignment(Qt::AlignTop);
 	txsContainer->setLayout(txsContainerLayout);
@@ -73,7 +73,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 {
 	QWidget *tx = new QWidget(this);
 	QVBoxLayout *txLay = new QVBoxLayout();
-	txLay->setMargin(0);
+	txLay->setContentsMargins(0, 0, 0, 0);
 	txLay->setSpacing(5);
 	tx->setLayout(txLay);
 	tx->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
@@ -88,7 +88,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 
 	QWidget *txHeader = new QWidget(this);
 	QHBoxLayout *txHeaderLay = new QHBoxLayout();
-	txHeaderLay->setMargin(0);
+	txHeaderLay->setContentsMargins(0, 0, 0, 0);
 	txHeaderLay->setSpacing(5);
 	txHeader->setLayout(txHeaderLay);
 
@@ -110,7 +110,7 @@ QWidget *DdsDacAddon::setupDdsTx(TxNode *txNode)
 		dynamic_cast<TxMode *>(ddsModeStack->currentWidget())->read();
 	});
 	txReadSection->contentLayout()->addWidget(m_readBtn);
-	txReadSection->contentLayout()->setMargin(15);
+	txReadSection->contentLayout()->setContentsMargins(15, 15, 15, 15);
 	txReadSection->contentLayout()->setSpacing(0);
 
 	MenuSectionWidget *ddsModeSection = new MenuSectionWidget(this);
@@ -183,7 +183,7 @@ TxMode::TxMode(TxNode *node, unsigned int mode, QWidget *parent)
 	QVBoxLayout *txChnsLay = new QVBoxLayout();
 	this->setLayout(txChnsLay);
 	txChnsLay->setSpacing(5);
-	txChnsLay->setMargin(0);
+	txChnsLay->setContentsMargins(0, 0, 0, 0);
 
 	auto txNodeChildren = m_node->getTones();
 	for(TxNode *child : txNodeChildren) {
@@ -228,7 +228,7 @@ TxMode::~TxMode() {}
 
 void TxMode::read()
 {
-	for(TxChannel *chn : qAsConst(m_txChannels)) {
+	for(TxChannel *chn : std::as_const(m_txChannels)) {
 		chn->read();
 	}
 }

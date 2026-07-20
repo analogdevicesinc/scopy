@@ -32,8 +32,6 @@
 #include <style.h>
 #include <deviceiconbuilder.h>
 
-#include <libm2k/analog/dmm.hpp>
-
 #include <iioutil/connectionprovider.h>
 
 #include <pluginbase/preferences.h>
@@ -300,7 +298,7 @@ bool DataLoggerPlugin::loadPreferencesPage()
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
-	lay->setMargin(0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->addWidget(generalWidget);
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 

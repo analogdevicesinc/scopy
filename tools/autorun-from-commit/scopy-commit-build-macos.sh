@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# DEPRECATED: macOS builds are now on GitHub Actions.
+# Use: scopy-commit-build.py --platform macos
+# This script is kept for legacy Azure DevOps access only.
+
 # Azure Pipelines API Test Script for macOS
 # This script downloads and launches Scopy from Azure DevOps builds
 

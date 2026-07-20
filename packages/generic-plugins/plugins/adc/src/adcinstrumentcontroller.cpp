@@ -47,7 +47,7 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString uri
 	m_plotTimer = new QTimer(this);
 	m_plotTimer->setSingleShot(true);
 	connect(m_plotTimer, &QTimer::timeout, this, &ADCInstrumentController::updateData);
-	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
+	connect(p, &Preferences::preferenceChanged, this, &ADCInstrumentController::handlePreferences);
 
 	m_fw = new QFutureWatcher<void>(this);
 	connect(
@@ -80,14 +80,14 @@ void ADCInstrumentController::init() {}
 
 void ADCInstrumentController::deinit()
 {
-	for(auto c : qAsConst(m_components)) {
+	for(auto c : std::as_const(m_components)) {
 		c->onDeinit();
 	}
 }
 
 void ADCInstrumentController::onStart()
 {
-	for(auto c : qAsConst(m_components)) {
+	for(auto c : std::as_const(m_components)) {
 		if(c->enabled()) {
 			c->onStart();
 		}

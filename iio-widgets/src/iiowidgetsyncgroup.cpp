@@ -51,7 +51,7 @@ void IIOWidgetSyncGroup::add(IIOWidget *widget, bool triggerPoint)
 void IIOWidgetSyncGroup::handleStatusChanged(QDateTime date, QString old, QString newD, int ret, bool readop)
 {
 	if(old != newD) {
-		for(auto w : qAsConst(m_widgets)) {
+		for(auto w : std::as_const(m_widgets)) {
 			w->readAsync();
 		}
 	}

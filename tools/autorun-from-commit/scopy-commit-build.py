@@ -10,6 +10,8 @@ def autodetect_platform():
     sys_platform = platform.system().lower()
     if 'windows' in sys_platform:
         return 'windows'
+    elif 'darwin' in sys_platform:
+        return 'macos'
     elif 'linux' in sys_platform:
         return 'x86'
     else:
@@ -31,9 +33,10 @@ def validate_platform_compatibility(target_platform, current_platform):
     # Cross-platform compatibility rules
     compatibility_matrix = {
         'windows': ['windows'],
-        'x86': ['x86'],  # Linux x86 only runs x86 executables
+        'x86': ['x86'],
         'arm64': ['arm64'],
-        'arm32': ['arm32']
+        'arm32': ['arm32'],
+        'macos': ['macos']
     }
 
     compatible_platforms = compatibility_matrix.get(current_platform, [])
@@ -94,7 +97,7 @@ def parse_arguments():
     )
     parser.add_argument("commit_sha", type=str, help="Commit SHA to search for (required)")
     parser.add_argument("--token", type=str, required=False, help="GitHub personal access token (optional, fallback to github_token.txt or ~/.git-credentials)")
-    parser.add_argument("--platform", type=str, choices=["windows", "x86", "arm64", "arm32"], required=False, help="Target platform (windows, x86, arm64, arm32)")
+    parser.add_argument("--platform", type=str, choices=["windows", "x86", "arm64", "arm32", "macos"], required=False, help="Target platform (windows, x86, arm64, arm32, macos)")
     parser.add_argument("--script", type=str, required=False, help="Optional path to a script to use or run after extraction")
     return parser.parse_args()
 
@@ -120,7 +123,7 @@ def get_token(token_arg):
     return None
 
 def get_workflow_name(platform):
-    return "Build & Test"
+    return "Build & Test Qt6"
 
 def get_github_api_headers(token):
     return {
@@ -214,19 +217,17 @@ def get_artifacts(owner, repo, run_id, headers):
 
 def filter_artifacts(artifacts, workflow_name, platform_value=None):
     if platform_value == "windows":
-        # Windows: artifact name starts with 'scopy-windows-x86_64' and does not contain 'setup'
-        return [a for a in artifacts if "scopy-windows-portable" in a["name"]]
+        return [a for a in artifacts if "scopy-windows-qt6-portable" in a["name"]]
     elif platform_value == "x86":
-        # Linux: artifact name starts with 'scopy-linux-x86_64-'
-        ubuntu24 = [a for a in artifacts if a["name"].startswith("scopy-x86_64-appimage") and "ubuntu20" not in a["name"]]
-        ubuntu20 = [a for a in artifacts if a["name"].startswith("scopy-x86_64-appimage-ubuntu20")]
-        return ubuntu24 + ubuntu20  # Prefer Ubuntu 24, fallback to Ubuntu 20
+        newer = [a for a in artifacts if a["name"].startswith("scopy-qt6-x86_64-appimage-ubuntu") and "ubuntu2204" not in a["name"]]
+        older = [a for a in artifacts if a["name"].startswith("scopy-qt6-x86_64-appimage-ubuntu2204")]
+        return newer + older
     elif platform_value == "arm64":
-        # arm64: artifact name starts with 'scopy-arm64'
-        return [a for a in artifacts if a["name"].startswith("scopy-arm64")]
+        return [a for a in artifacts if a["name"].startswith("scopy-arm64-qt6-appimage")]
     elif platform_value == "arm32":
-        # arm32/armhf: artifact name starts with 'scopy-linux-armhf'
-        return [a for a in artifacts if a["name"].startswith("scopy-armhf")]
+        return [a for a in artifacts if a["name"].startswith("scopy-armhf-qt6-appimage")]
+    elif platform_value == "macos":
+        return [a for a in artifacts if a["name"].startswith("Scopy-macOS")]
 
 def download_artifact(artifact, commit_sha, headers):
     import datetime
@@ -284,6 +285,15 @@ def find_executable(folder, exe_name):
     for root, dirs, files in os.walk(folder):
         for file in files:
             if file == exe_name:
+                return os.path.join(root, file)
+    return None
+
+def find_executable_by_extension(folder, platform_value):
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if platform_value == "x86" and file.endswith(".AppImage"):
+                return os.path.join(root, file)
+            elif platform_value == "macos" and file.endswith(".dmg"):
                 return os.path.join(root, file)
     return None
 
@@ -352,17 +362,22 @@ def main():
     if platform_value == "windows":
         exe_name = "Scopy-console.exe"
     elif platform_value == "x86":
-        exe_name = "scopy-x86_64-appimage.AppImage"
+        exe_name = None  # AppImage name includes ubuntu version, search dynamically
     elif platform_value == "arm64":
         exe_name = "Scopy-arm64.AppImage"
     elif platform_value == "arm32":
         exe_name = "Scopy-armhf.AppImage"
+    elif platform_value == "macos":
+        exe_name = None  # Search for .dmg or .app dynamically
     else:
         exe_name = None
 
-    exe_path = find_executable(folder_name, exe_name)
+    if exe_name:
+        exe_path = find_executable(folder_name, exe_name)
+    else:
+        exe_path = find_executable_by_extension(folder_name, platform_value)
     if not exe_path:
-        print(f"Executable not found for platform '{platform_value}'. Searched for: {exe_name}")
+        print(f"Executable not found for platform '{platform_value}'. Searched for: {exe_name or 'platform-specific files'}")
         sys.exit(1)
     print(f"Found executable: {exe_path}")
 
@@ -384,7 +399,15 @@ def main():
         # Launch Scopy process
         if platform_value == "windows":
             proc = subprocess.Popen(launch_args, shell=True, stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
-        elif platform_value == "x86" or platform_value == "arm64" or platform_value == "arm32":
+        elif platform_value == "macos":
+            if exe_path.endswith(".dmg"):
+                subprocess.run(["hdiutil", "attach", exe_path])
+                print(f"DMG mounted: {exe_path}")
+                return
+            else:
+                subprocess.run(["xattr", "-rd", "com.apple.quarantine", exe_path], check=False)
+                proc = subprocess.Popen(["open", exe_path], stdin=subprocess.PIPE, stdout=None, stderr=None, text=True)
+        elif platform_value in ("x86", "arm64", "arm32"):
             st = os.stat(exe_path)
             if not (st.st_mode & stat.S_IXUSR):
                 os.chmod(exe_path, st.st_mode | stat.S_IXUSR)

@@ -36,7 +36,7 @@ QStringList EmuUtils::availableDevices()
 		emuOptions_ = new QJsonArray(load());
 	}
 	QStringList availableDevices;
-	for(const auto &object : qAsConst(*emuOptions_)) {
+	for(const auto &object : std::as_const(*emuOptions_)) {
 		QString device = object.toObject().value(QString("device")).toString();
 		availableDevices.append(device);
 	}

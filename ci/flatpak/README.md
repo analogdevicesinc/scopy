@@ -64,8 +64,8 @@ All of these can be installed using:
 ```bash
    sudo apt install flatpak jq flatpak-builder
    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-   sudo flatpak install flathub org.kde.Platform//5.15-23.08 -y
-   sudo flatpak install flathub org.kde.Sdk//5.15-23.08 -y
+   sudo flatpak install flathub org.kde.Platform//6.8 -y
+   sudo flatpak install flathub org.kde.Sdk//6.8 -y
 ```
 
 Running ```make``` inside the ***scopy/ci/flatpak*** folder will build the Scopy.flatpak artifact.
@@ -78,13 +78,13 @@ This command will build the whole dependency tree and create an installer.
 1. Pull Docker image
 
    ```bash
-      docker pull cristianbindea/scopy2-flatpak:latest
+      docker pull docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:latest
    ```
 
 2. Run container with privileged access and bind the local Scopy repo to a volume inside the container
 
    ```bash
-       docker run -it --privileged --mount type=bind,source=path/to/scopy/repository,target=/home/runner/scopy cristianbindea/scopy2-flatpak:latest
+       docker run -it --privileged --mount type=bind,source=path/to/scopy/repository,target=/home/runner/scopy docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:latest
    ```
 
 3. Execute the build script inside container
