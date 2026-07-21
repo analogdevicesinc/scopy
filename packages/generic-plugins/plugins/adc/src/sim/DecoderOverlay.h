@@ -3,8 +3,11 @@
 
 #include <QHash>
 #include <QObject>
+#include <QPoint>
 #include <QPointF>
 #include <QPointer>
+#include <QString>
+#include <QTimer>
 
 #include "acq_engine/DataKey.h"
 
@@ -82,6 +85,19 @@ private:
 
 	// Keyed by the decoder's output DataKey.
 	QHash<scopy::acq::DataKey, AnnotationCurve *> m_curves;
+
+	// Hover-timer driven tooltip. Tooltip is only shown after the mouse
+	// has been still for m_hoverTimer.interval() ms on the canvas. This
+	// prevents a synthetic-MouseMove ↔ QToolTip::showText feedback loop
+	// (the tooltip window generating Leave/Enter events which used to
+	// trigger a fresh showText → new QTipLabel → OOM). Also suppressed
+	// while the wheel is turning so magnify zoom stays smooth.
+	void   showPendingTooltip();
+	QTimer m_hoverTimer;
+	QPoint m_pendingCanvasPos;
+	QPoint m_pendingGlobalPos;
+	QString m_lastTip;
+	QPoint  m_lastTipGlobal;
 };
 
 } // namespace adc

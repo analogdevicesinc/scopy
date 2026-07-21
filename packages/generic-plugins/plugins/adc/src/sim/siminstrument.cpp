@@ -68,6 +68,10 @@ void SimInstrument::setupUi()
 	m_decoderBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_decoderBtn, TTA_RIGHT);
 
+	m_decoderLogBtn = new QPushButton("Decoder Logs", this);
+	m_decoderLogBtn->setCheckable(true);
+	m_tool->addWidgetToTopContainerHelper(m_decoderLogBtn, TTA_RIGHT);
+
 	// ---- central: oscilloscope + waterfall in a vertical splitter ----
 	m_plot = new PlotWidget(this);
 	m_waterfall = new WaterfallPlotWidget(this);
@@ -90,6 +94,14 @@ void SimInstrument::setupUi()
 	m_logView->setLineWrapMode(QTextEdit::NoWrap);
 	m_logView->setPlaceholderText("No errors or warnings.");
 	m_tool->rightStack()->add("log-view", m_logView);
+
+	// ---- right panel: decoder log ----
+	m_decoderLogView = new QTextEdit(this);
+	m_decoderLogView->setReadOnly(true);
+	m_decoderLogView->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+	m_decoderLogView->setLineWrapMode(QTextEdit::NoWrap);
+	m_decoderLogView->setPlaceholderText("No decoder messages.");
+	m_tool->rightStack()->add("decoder-log-view", m_decoderLogView);
 
 	// ---- right panel: DataStore inspector ----
 	m_datastoreTable = new QTreeWidget(this);
@@ -136,7 +148,7 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 	// Collect all panel buttons for mutual exclusion wiring. Stored as a
 	// member so registerDecoderPanel() can append the Decoders button
 	// after buildControlPanel() runs.
-	m_panelBtns = {m_settingsBtn, m_cursorBtn, m_logBtn, m_datastoreBtn};
+	m_panelBtns = {m_settingsBtn, m_cursorBtn, m_logBtn, m_decoderLogBtn, m_datastoreBtn};
 
 	// ---- Settings panel (scrollable, single right-side panel) ----
 	auto *settingsInner = new QWidget();
@@ -279,10 +291,11 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 	m_tool->rightStack()->add("settings-panel", settingsScroll);
 
 	// ---- Wire panel toggle buttons (mutual exclusion) ----
-	wirePanelButton(m_settingsBtn,  "settings-panel");
-	wirePanelButton(m_cursorBtn,    "cursor-config");
-	wirePanelButton(m_logBtn,       "log-view");
-	wirePanelButton(m_datastoreBtn, "datastore-view");
+	wirePanelButton(m_settingsBtn,    "settings-panel");
+	wirePanelButton(m_cursorBtn,      "cursor-config");
+	wirePanelButton(m_logBtn,         "log-view");
+	wirePanelButton(m_decoderLogBtn,  "decoder-log-view");
+	wirePanelButton(m_datastoreBtn,   "datastore-view");
 }
 
 void SimInstrument::registerDecoderPanel(QWidget *panel)
@@ -399,6 +412,33 @@ void SimInstrument::appendLog(int severity, const QString &id, const QString &me
 	m_logView->append(line);
 	m_logView->verticalScrollBar()->setValue(
 		m_logView->verticalScrollBar()->maximum());
+}
+
+void SimInstrument::appendDecoderLog(int level, const QString &id, const QString &message)
+{
+	const QString ts = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
+
+	// Mirrors scopy::decoder::LogLevel: Info=0, Warning=1, Critical=2.
+	QString color, tag;
+	if(level >= 2) {
+		color = "#ff4444";
+		tag   = "CRIT";
+	} else if(level == 1) {
+		color = "#ffaa00";
+		tag   = "WARN";
+	} else {
+		color = "#aaaaaa";
+		tag   = "INFO";
+	}
+
+	const QString line = QString("<span style=\"color:%1\">[%2] %3 | %4: %5</span>")
+				     .arg(color, tag, ts,
+					  id.toHtmlEscaped(),
+					  message.toHtmlEscaped());
+
+	m_decoderLogView->append(line);
+	m_decoderLogView->verticalScrollBar()->setValue(
+		m_decoderLogView->verticalScrollBar()->maximum());
 }
 
 void SimInstrument::refreshDatastoreView(scopy::acq::DataStore *store)

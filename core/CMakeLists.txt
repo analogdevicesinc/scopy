@@ -57,6 +57,7 @@ file(
 	src/pkggui/*.cpp
 	src/acq_engine/*.cpp
 	src/decoder/*.cpp
+	src/decoder/codecs/*.cpp
 )
 file(
 	GLOB
@@ -66,6 +67,7 @@ file(
 	include/${SCOPY_MODULE}/pkggui/*.h
 	include/${SCOPY_MODULE}/acq_engine/*.h
 	include/${SCOPY_MODULE}/decoder/*.h
+	include/${SCOPY_MODULE}/decoder/codecs/*.h
 )
 file(GLOB UI_LIST ui/*.ui)
 
