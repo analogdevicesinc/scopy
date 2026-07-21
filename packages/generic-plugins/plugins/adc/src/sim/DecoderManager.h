@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QList>
+#include <QMap>
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -30,36 +31,26 @@ namespace adc {
 class DecoderOverlay;
 class DigitalTrackManager;
 
-// Runtime handle for one active decoder stack. Owned by DecoderManager;
-// the AcquisitionEngine owns the processor lifetime. A stack has one entry
-// per stage in cfg.stack (index 0 is the root that reads raw logic).
+// Runtime handle for one active decoder stack. cfg.stack[0] is the root.
+// Processor is owned by the AcquisitionEngine.
 struct DecoderInstance
 {
-	QString                                uid;             // unique per manager: "<rootId>#<n>"
-	QStringList                            stageIds;        // e.g. {"uart","modbus"}
-	scopy::decoder::DecoderConfig          cfg;             // last applied
-	QList<scopy::acq::DataKey>             orderedRawKeys;  // bitIndex → DataKey (root only)
+	QString                                uid;             // "<rootId>#<n>"
+	QStringList                            stageIds;
+	scopy::decoder::DecoderConfig          cfg;
+	QList<scopy::acq::DataKey>             orderedRawKeys;  // root bitIndex -> key
 	scopy::acq::ExternalDecoderProcessor  *proc{nullptr};
 	QList<scopy::acq::DataKey>             outKeys;         // one per stage
-	// One draggable handle per stage. The handle lives on the plot's
-	// main y-axis and its scale-space position defines the top of the
-	// annotation band; the AnnotationCurve reads this on each redraw.
-	QList<QPointer<scopy::PlotAxisHandle>> handles;
+	QList<QPointer<scopy::PlotAxisHandle>> handles;         // one per stage; top of band
 };
 
-// Owns the list of active decoders and creates/destroys their processors
-// and annotation-band axes. The overlay and plot are set separately so the
-// manager can be constructed before the UI exists.
-//
-// Threading: all public methods are main-thread only. Config mutation is
-// gated to when the engine is not running.
+// Owns active decoder instances; wires processors and annotation-band axes.
+// Main-thread only; config mutation requires the engine to be stopped.
 class DecoderManager : public QObject
 {
 	Q_OBJECT
 public:
-	// The backend factory is injected (non-owning) so this manager stays
-	// decoupled from any specific decoder implementation (sigrok-cli,
-	// libsigrok, custom CLI, …). The factory must outlive the manager.
+	// backendFactory is non-owning and must outlive the manager.
 	DecoderManager(scopy::acq::AcquisitionEngine *engine,
 	               scopy::acq::DataStore *store,
 	               scopy::decoder::IDecoderBackendFactory *backendFactory,
@@ -70,35 +61,36 @@ public:
 	void setOverlay(DecoderOverlay *overlay);
 	void setLogger(scopy::decoder::DecoderLogger *lg) { m_logger = lg; }
 
-	// Optional: if set, annotation-band handles are allocated on this
-	// dedicated digital-track manager instead of being created directly
-	// on the plot's main y-axis. Enables the mixed-signal view where
-	// analog curves and decoder annotations are on different axes.
+	// Route handles onto a dedicated digital-track manager (mixed-signal view).
 	void setDigitalTrackManager(DigitalTrackManager *mgr);
 
-	// Create a new decoder instance. Returns its uid or an empty string
-	// on failure (e.g. plot/overlay not set yet).
+	// Returns the new uid or "" on failure.
 	QString addDecoder(const QString &decoderId);
 
-	// Detach + delete a decoder instance and its axis. Safe to call while
-	// engine is running (the engine::removeProcessor handles queueing).
+	// options are written into cfg.meta with the "annIn." prefix.
+	struct AnnotationChainSpec
+	{
+		QString                  sourceUid;
+		int                      sourceStageIndex{0};
+		QString                  upstreamId;
+		QMap<QString, QString>   options;
+	};
+
+	// Root reads annotations from another instance; backend must
+	// acceptsAnnotationInput(cfg). Returns new uid or "".
+	QString addDecoderFromAnnotations(const QString &decoderId,
+	                                  const AnnotationChainSpec &spec);
+
+	// Safe while engine is running.
 	void removeDecoder(const QString &uid);
 
-	// Append a stacked stage to an existing decoder instance. Allocates
-	// a new annotation band + output DataKey, extends proc->outputKeys,
-	// and registers the new (outKey, axis) pair with the overlay.
-	// Returns the new stage index (>=1) on success, -1 on failure. Only
-	// valid when the engine is stopped.
+	// Returns the new stage index (>=1) or -1. Engine must be stopped.
 	int pushStage(const QString &uid, const QString &decoderId);
 
-	// Remove stages at index >= fromIndex (must be >= 1 — the root is
-	// never dropped this way). Bands are hidden/detached and their output
-	// keys removed from the overlay & store. Only valid when the engine
-	// is stopped.
+	// Remove stages index >= fromIndex (fromIndex >= 1). Engine must be stopped.
 	void popStagesFrom(const QString &uid, int fromIndex);
 
-	// Push a new config to an existing decoder. Only valid when the
-	// engine is stopped; caller must check isEngineRunning() first.
+	// Engine must be stopped.
 	void applyConfig(const QString &uid,
 	                 const scopy::decoder::DecoderConfig &cfg,
 	                 const QList<scopy::acq::DataKey> &orderedRawKeys);
@@ -113,16 +105,9 @@ public:
 Q_SIGNALS:
 	void decoderAdded(const QString &uid);
 	void decoderRemoved(const QString &uid);
-	void configApplied(const QString &uid);
 
 private:
-	// Compute the initial scale-space position (on the plot's main
-	// y-axis) for the next band handle, stacking downward from the
-	// previous handle position.
 	double nextBandPos();
-
-	// Create a draggable PlotAxisHandle on the plot's main y-axis at the
-	// given initial scale-space position, and make it visible.
 	scopy::PlotAxisHandle *attachHandle(double initialPos);
 
 	scopy::acq::AcquisitionEngine          *m_engine{nullptr};
@@ -134,18 +119,13 @@ private:
 
 	QList<DecoderInstance>          m_decoders;
 
-	// Monotonically increasing suffix so uids remain unique across
-	// add/remove cycles.
 	int                             m_uidCounter{0};
 
-	// Vertical stacking cursor (in main y-axis scale coordinates) for
-	// annotation band handle positions. First handle sits just below the
-	// current waveform y-range; each subsequent handle stacks downward.
+	// Vertical stacking cursor (main y-axis scale coords) for band handles.
 	double                          m_nextBandPos{0.0};
 	bool                            m_bandCursorInit{false};
 
-	// Window size (samples) applied to every ExternalDecoderProcessor.
-	// 0 = legacy single-chunk mode.
+	// Samples/cycle for every ExternalDecoderProcessor; 0 = single-chunk.
 	int                             m_windowSize{0};
 
 	scopy::decoder::DecoderLogger  *m_logger{nullptr};

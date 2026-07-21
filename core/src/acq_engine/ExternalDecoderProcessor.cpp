@@ -11,9 +11,8 @@ namespace scopy {
 namespace acq {
 
 namespace {
-// Pack per-bit 0/1 vectors into LSB-first packed bytes:
-//   unitsize = ceil(numChannels/8), channel i = bit i.
-// `out` is reused across cycles; assign() keeps its capacity.
+// Pack per-bit 0/1 vectors LSB-first: unitsize = ceil(numChannels/8),
+// channel i -> bit i. `out` is reused across cycles.
 void packBits(const std::vector<QVector<quint8>> &bitVecs,
 	      int numChannels, qsizetype nSamples, int unitsize,
 	      std::vector<uint8_t> &out)
@@ -42,9 +41,25 @@ ExternalDecoderProcessor::ExternalDecoderProcessor(
 
 ExternalDecoderProcessor::~ExternalDecoderProcessor() = default;
 
-void ExternalDecoderProcessor::reset()
+void ExternalDecoderProcessor::reset() {}
+
+// DataStore Annotation -> backend AnnotationC (single-stream input).
+static void toAnnotationC(const QVector<Annotation> &in,
+                          std::vector<scopy::decoder::AnnotationC> &out)
 {
-	// One-shot model: nothing to reset between cycles.
+	out.clear();
+	out.reserve(static_cast<std::size_t>(in.size()));
+	for(const Annotation &a : in) {
+		scopy::decoder::AnnotationC c;
+		c.start      = a.startSample;
+		c.end        = a.endSample;
+		c.decoder    = a.decoder.toStdString();
+		c.klass      = a.klass.toStdString();
+		c.text       = a.text.toStdString();
+		c.severity   = a.severity;
+		c.stageIndex = 0;
+		out.push_back(std::move(c));
+	}
 }
 
 void ExternalDecoderProcessor::process(DataStore *store)
@@ -52,15 +67,81 @@ void ExternalDecoderProcessor::process(DataStore *store)
 	if(!m_backend || !store) {
 		return;
 	}
+	if(m_cfg.rootInput == scopy::decoder::RootInput::Annotations) {
+		if(m_annInKey.key.isEmpty()) {
+			report(AcquisitionError::Severity::Warning,
+			       QStringLiteral("process(): rootInput=Annotations but no annInKey set"));
+			return;
+		}
+
+		const int nStages = m_outKeys.size();
+		std::vector<QVector<Annotation>> perStage(static_cast<std::size_t>(nStages));
+
+		auto publish = [&]() {
+			for(int i = 0; i < nStages; ++i) {
+				if(m_outKeys[i].key.isEmpty()) continue;
+				store->write(m_outKeys[i], std::move(perStage[i]));
+				Q_EMIT cycleProduced(m_outKeys[i]);
+			}
+		};
+
+		const SampleBuffer buf = store->read(m_annInKey);
+		if(buf.empty()) {
+			publish();
+			return;
+		}
+		const SampleVariant &v = buf.sample(0);
+		if(!std::holds_alternative<QVector<Annotation>>(v)) {
+			report(AcquisitionError::Severity::Warning,
+			       QStringLiteral("process(): annInKey %1 wrong variant index=%2")
+				       .arg(m_annInKey.key)
+				       .arg(v.index()));
+			publish();
+			return;
+		}
+		const QVector<Annotation> &annIn = std::get<QVector<Annotation>>(v);
+		if(annIn.isEmpty()) {
+			publish();
+			return;
+		}
+
+		std::vector<scopy::decoder::AnnotationC> inC;
+		toAnnotationC(annIn, inC);
+
+		std::vector<scopy::decoder::AnnotationC> outC;
+		const bool ok = m_backend->decodeAnnotations(m_cfg, inC, outC);
+		if(!ok) {
+			report(AcquisitionError::Severity::Warning,
+			       QStringLiteral("backend decodeAnnotations failed: %1")
+				       .arg(QString::fromStdString(m_backend->lastError())));
+		}
+
+		for(const auto &a : outC) {
+			if(a.stageIndex < 0 || a.stageIndex >= nStages) continue;
+			Annotation out;
+			out.startSample = a.start;
+			out.endSample   = a.end;
+			out.decoder     = QString::fromStdString(a.decoder);
+			out.klass       = QString::fromStdString(a.klass);
+			out.text        = QString::fromStdString(a.text);
+			out.severity    = a.severity;
+			perStage[static_cast<std::size_t>(a.stageIndex)].append(out);
+		}
+
+		report(AcquisitionError::Severity::Info,
+		       QStringLiteral("process(): annIn=%1 -> %2 stages, %3 output anns")
+			       .arg(annIn.size()).arg(nStages).arg(outC.size()));
+		publish();
+		return;
+	}
+
 	if(m_orderedRawKeys.isEmpty()) {
 		report(AcquisitionError::Severity::Warning,
 		       QStringLiteral("process(): no rawKeys set"));
 		return;
 	}
 
-	// Pull current cycle's per-bit vectors. minLen tracks the shortest
-	// populated bit so we don't truncate to zero just because one channel
-	// is missing.
+	// Pull per-bit vectors; minLen = shortest populated channel.
 	std::vector<QVector<quint8>> bitVecs;
 	bitVecs.resize(m_orderedRawKeys.size());
 	qsizetype minLen = std::numeric_limits<qsizetype>::max();
@@ -88,7 +169,6 @@ void ExternalDecoderProcessor::process(DataStore *store)
 		anyPopulated = true;
 	}
 
-	// One annotation bucket per stack stage; unknown stageIndex → dropped.
 	const int nStages = m_outKeys.size();
 	std::vector<QVector<Annotation>> perStage(static_cast<std::size_t>(nStages));
 
@@ -102,8 +182,7 @@ void ExternalDecoderProcessor::process(DataStore *store)
 
 	if(!anyPopulated || minLen <= 0
 	   || minLen == std::numeric_limits<qsizetype>::max()) {
-		// Still publish (empty) so consumers see a defined state.
-		publish();
+		publish(); // publish empty so consumers see a defined state
 		return;
 	}
 
@@ -125,7 +204,7 @@ void ExternalDecoderProcessor::process(DataStore *store)
 			       .arg(QString::fromStdString(m_backend->lastError())));
 	}
 
-	// Right-anchor pad for the plot window (same as before).
+	// Right-anchor pad for the plot window.
 	const qint64 pad = (m_windowSize > 0)
 		? std::max<qint64>(0, static_cast<qint64>(m_windowSize)
 				      - static_cast<qint64>(minLen))

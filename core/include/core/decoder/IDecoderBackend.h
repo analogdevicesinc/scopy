@@ -11,17 +11,16 @@
 namespace scopy {
 namespace decoder {
 
-// ChannelMap: associates a logical decoder role (e.g. "tx", "scl") with
-// a bit position (LSB-first) inside the packed sample stream.
+// Maps a decoder role (e.g. "tx", "scl") to a bit position (LSB-first)
+// in the packed sample stream.
 struct ChannelMap
 {
 	std::string role;
 	int         bitIndex{0};
 };
 
-// One stage in a decoder stack. stage[0] is the root (reads raw logic);
-// stage[i>0] consumes the output of stage[i-1] and typically has no
-// channel bindings of its own.
+// One stage in a decoder stack. stage[0] reads raw logic; stage[i>0]
+// consumes the previous stage's output and usually has no channel bindings.
 struct DecoderStage
 {
 	std::string                        decoderId;
@@ -29,19 +28,34 @@ struct DecoderStage
 	std::map<std::string, std::string> options;
 };
 
-// Configuration passed to IDecoderBackend::decode(). A config always
-// describes a linear stack of decoders; single-decoder use is just
-// stack.size() == 1.
+// DigitalSamples → decode() with packed bits; Annotations → decodeAnnotations()
+// reads a producing DecoderInstance's annotation output DataKey.
+enum class RootInput { DigitalSamples, Annotations };
+
+// Reference to another DecoderInstance's stage output; resolved to a DataKey.
+struct AnnotationInputRef
+{
+	std::string sourceUid;
+	int         sourceStageIndex{0};
+};
+
+// Passed to IDecoderBackend::decode(). Always describes a linear stack
+// (single-decoder = stack.size() == 1). When rootInput == Annotations,
+// meta carries "annIn.*" codec params (upstreamId, samplerate, bitrate,
+// frameformat, textinput, ...).
 struct DecoderConfig
 {
 	double                             sampleRate{1.0e6};
 	int                                numChannels{1};
 	std::vector<DecoderStage>          stack;
 	std::map<std::string, std::string> meta;
+
+	RootInput          rootInput{RootInput::DigitalSamples};
+	AnnotationInputRef annotationInput;
 };
 
-// Annotation produced by a backend for a single buffer. Sample indices
-// are buffer-local (0 .. nSamples-1 of the buffer just passed to decode()).
+// Annotation produced by a backend for a single buffer. start/end are
+// buffer-local sample indices.
 struct AnnotationC
 {
 	uint64_t    start{0};
@@ -50,34 +64,43 @@ struct AnnotationC
 	std::string klass;
 	std::string text;
 	int         severity{0};
-	int         stageIndex{0}; // 0 = root, 1 = first stacked, ...
+	int         stageIndex{0}; // 0 = root
 };
 
-// One-shot pluggable decoder backend.
-//
-// Threading: an instance is owned and called exclusively from the engine
-// worker thread (the thread that calls ProcessorBlock::process()). Each
-// decode() call is fully self-contained — no state is preserved across
-// calls. Backends spawning child processes (e.g. sigrok-cli) create and
-// tear them down within a single decode() invocation.
+// One-shot pluggable decoder backend. Owned and called exclusively from
+// the engine worker thread; each decode() call is self-contained (no
+// state kept across calls). Backends that spawn children (e.g. sigrok-cli)
+// spin them up and tear them down within one call.
 class SCOPY_CORE_EXPORT IDecoderBackend
 {
 public:
 	virtual ~IDecoderBackend() = default;
 
-	// Decode one buffer of packed samples.
-	//
-	// data: packed samples, unitsize = ceil(numChannels / 8) bytes/sample,
-	//       channel i = bit i, LSB-first within each byte.
-	// nSamples: number of samples in 'data' (NOT bytes).
-	// out:  cleared by the backend; populated with all annotations the
-	//       decoder produces for exactly this buffer.
-	//
-	// Returns true on success (including the case where 'out' is empty),
-	// false on hard error (in which case lastError() is populated).
+	// data: packed samples, unitsize = ceil(numChannels/8) bytes/sample,
+	//       channel i in bit i, LSB-first per byte. nSamples is samples, not bytes.
+	// out:  cleared then filled. Returns false on hard error (lastError() populated).
 	virtual bool decode(const DecoderConfig &cfg,
 	                    const uint8_t *data, std::size_t nSamples,
 	                    std::vector<AnnotationC> &out) = 0;
+
+	// True iff this backend can consume annotations as input under cfg.
+	virtual bool acceptsAnnotationInput(const DecoderConfig &cfg) const
+	{
+		(void)cfg;
+		return false;
+	}
+
+	// Semantics mirror decode(). Sample indices in 'out' must be on the
+	// source (upstream) timeline.
+	virtual bool decodeAnnotations(const DecoderConfig &cfg,
+	                               const std::vector<AnnotationC> &in,
+	                               std::vector<AnnotationC> &out)
+	{
+		(void)cfg;
+		(void)in;
+		out.clear();
+		return false;
+	}
 
 	virtual std::string lastError() const = 0;
 };

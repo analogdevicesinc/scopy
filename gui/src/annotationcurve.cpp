@@ -248,15 +248,15 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 	painter->restore();
 }
 
-const AnnotationSpan *AnnotationCurve::hitTest(const QPointF &canvasPos,
-					       const QwtScaleMap &xMap,
-					       const QwtScaleMap &yMap,
-					       const QRectF &canvasRect) const
+std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos,
+						       const QwtScaleMap &xMap,
+						       const QwtScaleMap &yMap,
+						       const QRectF &canvasRect) const
 {
 	if(m_rows.isEmpty() || m_anns.isEmpty())
-		return nullptr;
+		return std::nullopt;
 	if(!canvasRect.contains(canvasPos))
-		return nullptr;
+		return std::nullopt;
 
 	const int nRows = m_rows.size();
 	const double bandTopScale = m_handle ? m_handle->getPosition() : yMap.s2();
@@ -264,7 +264,7 @@ const AnnotationSpan *AnnotationCurve::hitTest(const QPointF &canvasPos,
 	const double bandHeightPx = nRows * kMaxRowHeightPx;
 	const double bandBottomPx = bandTopPx + bandHeightPx;
 	if(bandHeightPx <= 0)
-		return nullptr;
+		return std::nullopt;
 
 	const double rowStrideHeightPx = bandHeightPx / nRows;
 	const double rowHeightPx       = std::min(
@@ -273,7 +273,7 @@ const AnnotationSpan *AnnotationCurve::hitTest(const QPointF &canvasPos,
 	// Find which row (if any) the y-coord falls into.
 	const double y = canvasPos.y();
 	if(y < bandTopPx || y > bandBottomPx)
-		return nullptr;
+		return std::nullopt;
 
 	int rowIndex = -1;
 	for(int r = 0; r < nRows; ++r) {
@@ -286,13 +286,15 @@ const AnnotationSpan *AnnotationCurve::hitTest(const QPointF &canvasPos,
 		}
 	}
 	if(rowIndex < 0)
-		return nullptr;
+		return std::nullopt;
 
 	const double x = canvasPos.x();
 	const Row &row = m_rows[rowIndex];
 
 	// Return the annotation whose pixel span contains x. For instant
 	// markers (start==end) accept a small radius around the point.
+	// A copy is returned by value so the caller is unaffected by later
+	// mutations of m_anns (setAnnotations/clear).
 	const double kInstantRadiusPx = std::max(3.0, rowHeightPx / 2.0);
 	for(int idx : row.indices) {
 		const AnnotationSpan &a = m_anns[idx];
@@ -300,117 +302,40 @@ const AnnotationSpan *AnnotationCurve::hitTest(const QPointF &canvasPos,
 		const double aEndPx   = xMap.transform(sampleToX(a.endSample,   xMap));
 		if(a.startSample == a.endSample) {
 			if(std::abs(x - aStartPx) <= kInstantRadiusPx)
-				return &a;
+				return a;
 		} else {
 			if(x >= aStartPx && x <= aEndPx)
-				return &a;
+				return a;
 		}
 	}
-	return nullptr;
+	return std::nullopt;
 }
 
 void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap,
 			      const QwtScaleMap & /*yMap*/,
 			      const QRectF &canvasRect, const Row &row,
 			      double topPx, double bottomPx,
-			      double annotLeft) const
+			      double /*annotLeft*/) const
 {
 	if(row.indices.isEmpty())
 		return;
 
-	// Reserve the label column at the canvas left; annotations must not
-	// render underneath the label box.
 	painter->save();
 	painter->setClipRect(canvasRect);
-
-	const QFontMetrics fm   = painter->fontMetrics();
-	const double minLabelPx = fm.horizontalAdvance(QStringLiteral("XX"));
-
-	// PulseView-style block aggregation
-	// (see pv/views/trace/decodetrace.cpp:717-800):
-	//   walk annotations in sample order; if consecutive labels would
-	//   render less than a pixel apart, coalesce them into one block.
-	double  blockStartPx = 0.0;
-	double  prevEndPx    = -std::numeric_limits<double>::infinity();
-	int     blockCount   = 0;
-	QString blockKlass;
-	bool    blockClassUniform = true;
-	int     prevIdx = -1;
-
-	auto flushBlock = [&]() {
-		if(blockCount == 1) {
-			// Single annotation → draw normally.
-			drawAnnotation(painter, m_anns[prevIdx], row.color, xMap,
-				       topPx, bottomPx);
-		} else if(blockCount > 1) {
-			const QColor c = blockClassUniform
-				? colorFor(blockKlass)
-				: Style::getColor(json::theme::content_silent);
-			drawBlock(painter, blockStartPx, prevEndPx, c,
-				  blockClassUniform, topPx, bottomPx);
-		}
-		blockCount = 0;
-	};
 
 	for(int idx : row.indices) {
 		const AnnotationSpan &a = m_anns[idx];
 
 		const double aStartPx = xMap.transform(sampleToX(a.startSample, xMap));
 		const double aEndPx   = xMap.transform(sampleToX(a.endSample, xMap));
-		const double widthPx  = aEndPx - aStartPx;
-		const double deltaPx  = aEndPx - prevEndPx;
 
 		// Off-screen quick reject.
-		if(aEndPx < canvasRect.left() - 4.0 || aStartPx > canvasRect.right() + 4.0) {
-			// Include in block so aggregation still spans it, but don't
-			// waste time on solo text-fit checks.
-			if(blockCount == 0) {
-				blockStartPx      = aStartPx;
-				blockKlass        = a.klass;
-				blockClassUniform = true;
-			} else if(a.klass != blockKlass) {
-				blockClassUniform = false;
-			}
-			prevEndPx = aEndPx;
-			prevIdx   = idx;
-			++blockCount;
+		if(aEndPx < canvasRect.left() - 4.0 || aStartPx > canvasRect.right() + 4.0)
 			continue;
-		}
 
-		// Does this annotation deserve to be drawn as a solo block?
-		bool aIsSeparate = false;
-		if(widthPx >= minLabelPx) {
-			const double textW = fm.horizontalAdvance(a.text);
-			if(textW + kTextPadding * 2 <= widthPx)
-				aIsSeparate = true;
-			else if(widthPx >= minLabelPx * 2) // wide enough for elided text
-				aIsSeparate = true;
-		}
-
-		// Flush accumulated block when there's a visible gap or a solo block starts.
-		if(std::abs(deltaPx) > 1.0 || aIsSeparate) {
-			flushBlock();
-		}
-
-		if(aIsSeparate) {
-			drawAnnotation(painter, a, row.color, xMap, topPx, bottomPx);
-			prevEndPx = -std::numeric_limits<double>::infinity();
-			blockCount = 0;
-		} else {
-			if(blockCount == 0) {
-				blockStartPx      = aStartPx;
-				blockKlass        = a.klass;
-				blockClassUniform = true;
-			} else if(a.klass != blockKlass) {
-				blockClassUniform = false;
-			}
-			prevEndPx = aEndPx;
-			prevIdx   = idx;
-			++blockCount;
-		}
+		drawAnnotation(painter, a, row.color, xMap, topPx, bottomPx);
 	}
 
-	flushBlock();
 	painter->restore();
 }
 
@@ -498,35 +423,6 @@ void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &an
 				painter->drawText(rect, Qt::AlignCenter, shown);
 			}
 		}
-	}
-
-	painter->restore();
-}
-
-void AnnotationCurve::drawBlock(QPainter *painter, double startPx, double endPx,
-				const QColor &color, bool classUniform,
-				double topPx, double bottomPx) const
-{
-	const double widthPx  = endPx - startPx;
-	const double heightPx = bottomPx - topPx;
-
-	painter->save();
-
-	if(classUniform) {
-		painter->setPen(QPen(color.darker(150), 1.0));
-		painter->setBrush(QBrush(color, Qt::Dense4Pattern));
-	} else {
-		const QColor gray = Style::getColor(json::theme::content_silent);
-		painter->setPen(QPen(gray.darker(150), 1.0));
-		painter->setBrush(QBrush(gray, Qt::Dense4Pattern));
-	}
-
-	if(widthPx < 1.0) {
-		painter->drawLine(QPointF(startPx, topPx), QPointF(startPx, bottomPx));
-	} else {
-		const QRectF rect(startPx, topPx, widthPx, heightPx);
-		const double radius = heightPx / kCornerRadiusDiv;
-		painter->drawRoundedRect(rect, radius, radius);
 	}
 
 	painter->restore();

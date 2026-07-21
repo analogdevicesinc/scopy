@@ -9,6 +9,7 @@
 #include <gui/style_attributes.h>
 #include <gui/style_properties.h>
 
+#include <QButtonGroup>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QFrame>
@@ -17,9 +18,11 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QRadioButton>
 #include <QScrollArea>
 #include <QSet>
 #include <QSpinBox>
+#include <QStandardItemModel>
 #include <QStyle>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -66,22 +69,30 @@ DecoderEditor::DecoderEditor(const QString &uid,
 		lay->addLayout(row);
 		connect(m_sampleRateSpin,
 		        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-		        this, &DecoderEditor::markDirty);
+		        this, &DecoderEditor::applyNow);
 	}
 
-	// Per-stage sub-groups go here; new stages append at the bottom.
+	// Input-mode selector must precede the stages layout.
+	m_inputModeBox = qobject_cast<QGroupBox *>(buildInputModeGroup(box));
+	lay->addWidget(m_inputModeBox);
+
 	m_stagesLay = new QVBoxLayout();
 	m_stagesLay->setSpacing(6);
 	lay->addLayout(m_stagesLay);
 
-	// Root stage (index 0) — the only one with channel bindings.
+	// Root stage (index 0): only stage with channel bindings.
 	Stage root;
 	QWidget *rootBox = buildStageWidget(0, info, root);
 	m_stagesLay->addWidget(rootBox);
 	m_stages.append(root);
 
-	// "+ Stack…" button: disabled if the top stage produces nothing that
-	// could feed another decoder.
+	// annIn.* codec sub-group; visibility driven by input-mode radio.
+	m_annInBox = buildAnnotationInputGroup(box);
+	lay->addWidget(m_annInBox);
+
+	applyInputModeVisibility();
+
+	// Disabled when top stage has no chainable output.
 	m_stackBtn = new QPushButton("Add stacked decoder", box);
 	scopy::Style::setStyle(m_stackBtn, style::properties::button::subtleButton);
 	lay->addWidget(m_stackBtn);
@@ -94,35 +105,16 @@ DecoderEditor::DecoderEditor(const QString &uid,
 
 	{
 		auto *row = new QHBoxLayout();
-		m_applyBtn  = new QPushButton("Apply", box);
 		m_removeBtn = new QPushButton("Remove", box);
-		scopy::Style::setStyle(m_applyBtn,  style::properties::button::borderButton);
 		scopy::Style::setStyle(m_removeBtn, style::properties::button::borderButton);
-		row->addWidget(m_applyBtn);
-		row->addWidget(m_removeBtn);
 		row->addStretch();
-		m_statusDot = new QLabel(box);
-		const int sz = scopy::Style::getDimension(json::global::unit_0_5);
-		m_statusDot->setFixedSize(sz, sz);
-		row->addWidget(m_statusDot, 0, Qt::AlignVCenter | Qt::AlignRight);
-		m_statusText = new QLabel(box);
-		row->addWidget(m_statusText, 0, Qt::AlignVCenter | Qt::AlignRight);
+		row->addWidget(m_removeBtn);
 		lay->addLayout(row);
 	}
 
-	connect(m_applyBtn, &QPushButton::clicked, this, &DecoderEditor::onApplyClicked);
 	connect(m_removeBtn, &QPushButton::clicked, this, [this]() {
 		Q_EMIT removeRequested(m_uid);
 	});
-
-	if(m_mgr) {
-		connect(m_mgr, &DecoderManager::configApplied,
-		        this, [this](const QString &uid) {
-			if(uid == m_uid) setState(EditorState::Running);
-		});
-	}
-
-	setState(EditorState::NotApplied);
 }
 
 QWidget *DecoderEditor::buildStageWidget(int stageIndex,
@@ -162,16 +154,14 @@ QWidget *DecoderEditor::buildStageWidget(int stageIndex,
 		lay->addLayout(row);
 	}
 
-	// Only the root stage binds raw channels; stacked stages consume the
-	// previous stage's product.
+	// Only root stage binds raw channels.
 	if(stageIndex == 0 && !info.channels.isEmpty())
 		lay->addWidget(buildChannelsGroup(box, out));
 
 	if(!info.options.isEmpty())
 		lay->addWidget(buildOptionsGroup(box, out));
 
-	// Stack removal button on stacked stages: drops this stage and any
-	// above it (they'd be orphaned).
+	// Stacked stages: drop this and everything above it.
 	if(stageIndex > 0) {
 		auto *row = new QHBoxLayout();
 		auto *rm  = new QPushButton(QStringLiteral("Unstack decoder"), box);
@@ -183,14 +173,13 @@ QWidget *DecoderEditor::buildStageWidget(int stageIndex,
 			if(!m_mgr) return;
 			if(m_mgr->isEngineRunning()) return;
 			m_mgr->popStagesFrom(m_uid, stageIndex);
-			// Rebuild UI: drop stage widgets from stageIndex onward.
 			while(m_stages.size() > stageIndex) {
 				Stage &s = m_stages.last();
 				if(s.box) s.box->deleteLater();
 				m_stages.removeLast();
 			}
 			rebuildStackButtonState();
-			markDirty();
+			applyNow();
 		});
 	}
 
@@ -202,6 +191,7 @@ QWidget *DecoderEditor::buildChannelsGroup(QWidget *parent, Stage &st)
 	auto *box  = new QGroupBox("Channels", parent);
 	auto *form = new QFormLayout(box);
 	form->setLabelAlignment(Qt::AlignLeft);
+	st.channelsBox = box;
 
 	for(const auto &ch : st.info.channels) {
 		auto *combo = new QComboBox(box);
@@ -212,7 +202,7 @@ QWidget *DecoderEditor::buildChannelsGroup(QWidget *parent, Stage &st)
 		form->addRow(label + ":", combo);
 		st.channelCombos.append(combo);
 		connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		        this, &DecoderEditor::markDirty);
+		        this, &DecoderEditor::applyNow);
 	}
 	return box;
 }
@@ -252,7 +242,7 @@ void DecoderEditor::appendStage(const scopy::decoder::DecoderInfo &info)
 	m_stagesLay->addWidget(w);
 	m_stages.append(s);
 	rebuildStackButtonState();
-	markDirty();
+	applyNow();
 }
 
 QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
@@ -266,14 +256,11 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 			if(idx >= 0) c->setCurrentIndex(idx);
 		}
 		connect(c, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		        this, &DecoderEditor::markDirty);
+		        this, &DecoderEditor::applyNow);
 		return c;
 	}
 	case scopy::decoder::OptionType::Int: {
-		// Numeric enums (e.g. cpol 0/1) are stored with choices; a combo
-		// is still the correct editor because the decoder rejects
-		// out-of-list values. Fall back to spinbox when we have no
-		// enumerated choices.
+		// Numeric enums (e.g. cpol 0/1): use combo; else spinbox.
 		if(!o.choices.isEmpty()) {
 			auto *c = new QComboBox(this);
 			for(const QString &v : o.choices) c->addItem(v);
@@ -282,14 +269,14 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 				if(idx >= 0) c->setCurrentIndex(idx);
 			}
 			connect(c, QOverload<int>::of(&QComboBox::currentIndexChanged),
-			        this, &DecoderEditor::markDirty);
+			        this, &DecoderEditor::applyNow);
 			return c;
 		}
 		auto *s = new QSpinBox(this);
 		s->setRange(-1000000000, 1000000000);
 		s->setValue(o.defaultValue.toInt());
 		connect(s, QOverload<int>::of(&QSpinBox::valueChanged),
-		        this, &DecoderEditor::markDirty);
+		        this, &DecoderEditor::applyNow);
 		return s;
 	}
 	case scopy::decoder::OptionType::Double: {
@@ -301,7 +288,7 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 				if(idx >= 0) c->setCurrentIndex(idx);
 			}
 			connect(c, QOverload<int>::of(&QComboBox::currentIndexChanged),
-			        this, &DecoderEditor::markDirty);
+			        this, &DecoderEditor::applyNow);
 			return c;
 		}
 		auto *s = new QDoubleSpinBox(this);
@@ -309,37 +296,192 @@ QWidget *DecoderEditor::buildOptionEditor(const scopy::decoder::OptionInfo &o)
 		s->setDecimals(3);
 		s->setValue(o.defaultValue.toDouble());
 		connect(s, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-		        this, &DecoderEditor::markDirty);
+		        this, &DecoderEditor::applyNow);
 		return s;
 	}
 	case scopy::decoder::OptionType::String:
 	default: {
 		auto *l = new QLineEdit(this);
 		l->setText(o.defaultValue);
-		connect(l, &QLineEdit::textChanged, this, &DecoderEditor::markDirty);
+		connect(l, &QLineEdit::textChanged, this, &DecoderEditor::applyNow);
 		return l;
 	}
 	}
 }
 
-void DecoderEditor::refreshRawKeys(const QList<scopy::acq::DataKey> &rawKeys)
+QWidget *DecoderEditor::buildInputModeGroup(QWidget *parent)
+{
+	auto *box  = new QGroupBox(QStringLiteral("Input"), parent);
+	auto *lay  = new QVBoxLayout(box);
+	lay->setSpacing(4);
+
+	m_radioRaw = new QRadioButton(QStringLiteral("Raw digital channels"), box);
+	m_radioAnn = new QRadioButton(QStringLiteral("Annotations from another decoder"), box);
+	m_radioRaw->setChecked(true);
+
+	m_inputModeGroup = new QButtonGroup(box);
+	m_inputModeGroup->setExclusive(true);
+	m_inputModeGroup->addButton(m_radioRaw, 0);
+	m_inputModeGroup->addButton(m_radioAnn, 1);
+
+	lay->addWidget(m_radioRaw);
+	lay->addWidget(m_radioAnn);
+
+	// Populated from the manager's topology, not DataStore keys.
+	auto *row = new QHBoxLayout();
+	m_annSourceLabel = new QLabel(QStringLiteral("Source annotation stream:"), box);
+	m_annSourceCombo = new QComboBox(box);
+	m_annSourceCombo->addItem(CH_UNASSIGNED, QString());
+	row->addWidget(m_annSourceLabel);
+	row->addWidget(m_annSourceCombo, 1);
+	lay->addLayout(row);
+
+	connect(m_radioRaw, &QRadioButton::toggled, this, [this](bool) {
+		applyInputModeVisibility();
+		applyNow();
+	});
+	connect(m_radioAnn, &QRadioButton::toggled, this, [this](bool) {
+		applyInputModeVisibility();
+		applyNow();
+	});
+	connect(m_annSourceCombo,
+	        QOverload<int>::of(&QComboBox::currentIndexChanged),
+	        this, &DecoderEditor::applyNow);
+
+	// No channel roles: lock to annotation-input mode.
+	if(!m_stages.isEmpty() && m_stages[0].info.channels.isEmpty()) {
+		m_radioAnn->setChecked(true);
+		m_radioRaw->setEnabled(false);
+	}
+
+	return box;
+}
+
+bool DecoderEditor::isAnnotationMode() const
+{
+	return m_radioAnn && m_radioAnn->isChecked();
+}
+
+void DecoderEditor::applyInputModeVisibility()
+{
+	const bool ann = isAnnotationMode();
+	if(!m_stages.isEmpty() && m_stages[0].channelsBox)
+		m_stages[0].channelsBox->setVisible(!ann);
+	if(m_annSourceLabel) m_annSourceLabel->setVisible(ann);
+	if(m_annSourceCombo) m_annSourceCombo->setVisible(ann);
+	if(m_annInBox)       m_annInBox->setVisible(ann);
+}
+
+QWidget *DecoderEditor::buildAnnotationInputGroup(QWidget *parent)
+{
+	auto *box = new QGroupBox(QStringLiteral("Annotation input"), parent);
+	auto *form = new QFormLayout(box);
+	form->setLabelAlignment(Qt::AlignLeft);
+
+	m_annInSampleRate = new QDoubleSpinBox(box);
+	m_annInSampleRate->setRange(1.0, 1.0e12);
+	m_annInSampleRate->setDecimals(0);
+	m_annInSampleRate->setSingleStep(1.0e5);
+	m_annInSampleRate->setValue(1.0e7);
+	m_annInSampleRate->setToolTip(QStringLiteral(
+		"Synthetic samplerate used to regenerate the upstream "
+		"waveform for sigrok-cli's -I protocoldata."));
+	form->addRow(QStringLiteral("Samplerate (Hz):"), m_annInSampleRate);
+
+	m_annInBitrate = new QDoubleSpinBox(box);
+	m_annInBitrate->setRange(1.0, 1.0e9);
+	m_annInBitrate->setDecimals(0);
+	m_annInBitrate->setSingleStep(1200);
+	m_annInBitrate->setValue(115200);
+	m_annInBitrate->setToolTip(QStringLiteral(
+		"UART baud / SPI clock rate for the regenerated waveform."));
+	form->addRow(QStringLiteral("Bitrate:"), m_annInBitrate);
+
+	m_annInFrameFormat = new QLineEdit(box);
+	m_annInFrameFormat->setText(QStringLiteral("8n1"));
+	m_annInFrameFormat->setToolTip(QStringLiteral(
+		"UART frame format (data bits + parity + stop bits), "
+		"e.g. \"8n1\", \"7e1\"."));
+	form->addRow(QStringLiteral("Frame format:"), m_annInFrameFormat);
+
+	m_annInRadix = new QComboBox(box);
+	m_annInRadix->addItem(QStringLiteral("hex"));
+	m_annInRadix->addItem(QStringLiteral("dec"));
+	m_annInRadix->addItem(QStringLiteral("bin"));
+	m_annInRadix->addItem(QStringLiteral("ascii"));
+	m_annInRadix->setToolTip(QStringLiteral(
+		"How to parse the upstream annotation text into bytes. "
+		"Match the upstream decoder's 'format' option."));
+	form->addRow(QStringLiteral("Radix:"), m_annInRadix);
+
+	connect(m_annInSampleRate,
+	        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+	        this, &DecoderEditor::applyNow);
+	connect(m_annInBitrate,
+	        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+	        this, &DecoderEditor::applyNow);
+	connect(m_annInFrameFormat, &QLineEdit::textChanged,
+	        this, &DecoderEditor::applyNow);
+	connect(m_annInRadix, QOverload<int>::of(&QComboBox::currentIndexChanged),
+	        this, &DecoderEditor::applyNow);
+
+	return box;
+}
+
+void DecoderEditor::refreshKeys(const QList<scopy::acq::DataKey> &keys)
 {
 	if(m_stages.isEmpty()) return;
-	// Only the root stage binds raw channels.
+
+	// Raw digital keys only; annotation sources come from a separate combo.
+	QList<scopy::acq::DataKey> raw;
+	raw.reserve(keys.size());
+	for(const auto &k : keys)
+		if(k.isRaw()) raw.append(k);
+
 	for(QComboBox *c : m_stages[0].channelCombos) {
-		const QString prev = c->currentText();
+		const QString prev = c->currentData().toString();
 		QSignalBlocker b(c);
 		c->clear();
 		c->addItem(CH_UNASSIGNED, QString());
-		for(const auto &k : rawKeys) c->addItem(k.key, k.key);
-		const int idx = c->findText(prev);
-		c->setCurrentIndex(idx >= 0 ? idx : 0);
+		for(const auto &k : raw) c->addItem(k.key, k.key);
+
+		int idx = 0;
+		if(!prev.isEmpty()) {
+			const int found = c->findData(prev);
+			if(found >= 0) idx = found;
+		}
+		c->setCurrentIndex(idx);
 	}
 }
 
-void DecoderEditor::setApplyEnabled(bool en)
+void DecoderEditor::refreshAnnotationSources()
 {
-	if(m_applyBtn) m_applyBtn->setEnabled(en);
+	if(!m_annSourceCombo || !m_mgr) return;
+
+	const QString prev = m_annSourceCombo->currentData().toString();
+	QSignalBlocker b(m_annSourceCombo);
+	m_annSourceCombo->clear();
+	m_annSourceCombo->addItem(CH_UNASSIGNED, QString());
+
+	// Every stage of every other decoder is a potential source.
+	for(const DecoderInstance &d : m_mgr->decoders()) {
+		if(d.uid == m_uid) continue;
+		for(int stage = 0; stage < d.outKeys.size(); ++stage) {
+			const scopy::acq::DataKey &k = d.outKeys[stage];
+			const QString upstreamId = (stage < d.stageIds.size())
+				? d.stageIds[stage] : QString();
+			const QString label = QStringLiteral("%1 · stage %2 (%3)")
+				.arg(d.uid).arg(stage).arg(upstreamId);
+			m_annSourceCombo->addItem(label, k.key);
+		}
+	}
+
+	int idx = 0;
+	if(!prev.isEmpty()) {
+		const int found = m_annSourceCombo->findData(prev);
+		if(found >= 0) idx = found;
+	}
+	m_annSourceCombo->setCurrentIndex(idx);
 }
 
 void DecoderEditor::collect(scopy::decoder::DecoderConfig &cfg,
@@ -349,13 +491,59 @@ void DecoderEditor::collect(scopy::decoder::DecoderConfig &cfg,
 	cfg.stack.clear();
 	cfg.meta.clear();
 	orderedRawKeys.clear();
+	cfg.rootInput = scopy::decoder::RootInput::DigitalSamples;
+	cfg.annotationInput = scopy::decoder::AnnotationInputRef{};
+
+	const bool annMode = isAnnotationMode();
+	QString annKey;
+	if(annMode && m_annSourceCombo)
+		annKey = m_annSourceCombo->currentData().toString();
+
+	if(annMode) {
+		cfg.rootInput = scopy::decoder::RootInput::Annotations;
+		// channelId() == "<uid>/<stage>"
+		scopy::acq::DataKey dk(annKey);
+		const QString cid = dk.channelId();
+		const int slash = cid.lastIndexOf(QChar('/'));
+		QString srcUid;
+		int srcStage = 0;
+		if(slash > 0) {
+			srcUid   = cid.left(slash);
+			srcStage = cid.mid(slash + 1).toInt();
+		} else {
+			srcUid = cid;
+		}
+		cfg.annotationInput.sourceUid        = srcUid.toStdString();
+		cfg.annotationInput.sourceStageIndex = srcStage;
+
+		// Fill annIn.* meta; upstreamId comes from the manager.
+		if(m_mgr) {
+			DecoderInstance *src = m_mgr->find(srcUid);
+			if(src && srcStage >= 0 && srcStage < src->stageIds.size()) {
+				cfg.meta["annIn.upstreamId"] =
+					src->stageIds[srcStage].toStdString();
+			}
+		}
+		if(m_annInSampleRate)
+			cfg.meta["annIn.samplerate"] =
+				QString::number(m_annInSampleRate->value(), 'f', 0).toStdString();
+		if(m_annInBitrate)
+			cfg.meta["annIn.bitrate"] =
+				QString::number(m_annInBitrate->value(), 'f', 0).toStdString();
+		if(m_annInFrameFormat && !m_annInFrameFormat->text().isEmpty())
+			cfg.meta["annIn.frameformat"] =
+				m_annInFrameFormat->text().toStdString();
+		if(m_annInRadix)
+			cfg.meta["annIn.radix"] =
+				m_annInRadix->currentText().toStdString();
+	}
 
 	for(int si = 0; si < m_stages.size(); ++si) {
 		const Stage &st = m_stages[si];
 		scopy::decoder::DecoderStage stage;
 		stage.decoderId = st.info.id.toStdString();
 
-		if(si == 0) {
+		if(si == 0 && !annMode) {
 			for(int i = 0; i < st.info.channels.size()
 			            && i < st.channelCombos.size(); ++i) {
 				QComboBox *c = st.channelCombos[i];
@@ -383,67 +571,19 @@ void DecoderEditor::collect(scopy::decoder::DecoderConfig &cfg,
 
 		cfg.stack.push_back(std::move(stage));
 	}
-	cfg.numChannels = orderedRawKeys.size();
+	cfg.numChannels = annMode ? 0 : orderedRawKeys.size();
 }
 
-void DecoderEditor::onApplyClicked()
+void DecoderEditor::applyNow()
 {
 	if(!m_mgr) return;
-	if(m_mgr->isEngineRunning()) {
-		return;
-	}
+	// applyConfig requires a stopped engine; edits while running are dropped.
+	if(m_mgr->isEngineRunning()) return;
+
 	scopy::decoder::DecoderConfig cfg;
 	QList<scopy::acq::DataKey> keys;
 	collect(cfg, keys);
-	// State transition to Running happens via the DecoderManager::configApplied
-	// signal wired in the constructor — that also covers programmatic applies.
 	m_mgr->applyConfig(m_uid, cfg, keys);
-}
-
-void DecoderEditor::markDirty()
-{
-	// Only transition from Running → Modified. Stay in NotApplied until the
-	// user actually clicks Apply once.
-	if(m_state == EditorState::Running) setState(EditorState::Modified);
-}
-
-void DecoderEditor::setState(EditorState s)
-{
-	m_state = s;
-
-	QString color;
-	QString text;
-	QString tip;
-	switch(s) {
-	case EditorState::NotApplied:
-		color = scopy::Style::getColor(json::theme::content_silent).name();
-		text  = QStringLiteral("Not applied");
-		tip   = QStringLiteral("Configure channels/options and click Apply to start decoding.");
-		break;
-	case EditorState::Running:
-		color = scopy::Style::getColor(json::global::led_success).name();
-		text  = QStringLiteral("Running");
-		tip   = QStringLiteral("Decoder is running with the currently displayed settings.");
-		break;
-	case EditorState::Modified:
-		color = scopy::Style::getColor(json::global::led_error).name();
-		text  = QStringLiteral("Modified");
-		tip   = QStringLiteral("Settings changed since last Apply. Click Apply to update the running decoder.");
-		break;
-	}
-
-	if(m_statusDot) {
-		const int sz = m_statusDot->width();
-		m_statusDot->setStyleSheet(QStringLiteral(
-			"background-color:%1; border-radius:%2px;")
-			.arg(color).arg(sz / 2));
-		m_statusDot->setToolTip(tip);
-	}
-	if(m_statusText) {
-		m_statusText->setText(text);
-		m_statusText->setStyleSheet(QStringLiteral("color:%1;").arg(color));
-		m_statusText->setToolTip(tip);
-	}
 }
 
 // -----------------------------------------------------------------------------
@@ -473,17 +613,15 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr,
 	contentLay->setContentsMargins(8, 8, 8, 8);
 	contentLay->setSpacing(8);
 
-	// Header with the Add button.
 	auto *headerRow = new QHBoxLayout();
 	auto *title     = new QLabel("<b>Protocol decoders</b>", content);
-	auto *addBtn    = new QPushButton("Add decoder", content);
+	auto *addBtn    = new QPushButton("New decoder", content);
 	scopy::Style::setStyle(addBtn, style::properties::button::basicButton);
 	headerRow->addWidget(title);
 	headerRow->addStretch();
 	headerRow->addWidget(addBtn);
 	contentLay->addLayout(headerRow);
 
-	// Editors go below.
 	m_editorsLay = new QVBoxLayout();
 	m_editorsLay->setSpacing(8);
 	contentLay->addLayout(m_editorsLay);
@@ -493,9 +631,13 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr,
 
 	connect(addBtn, &QPushButton::clicked, this, &DecoderPanel::onAddClicked);
 
-	// Show a hint if the injected catalog is missing or unavailable at
-	// construction time. Concrete "why" messaging (e.g. "sigrok-cli not
-	// found") belongs to the composition root — the panel stays neutral.
+	if(m_mgr) {
+		connect(m_mgr, &DecoderManager::decoderAdded,
+		        this, [this](const QString &) { refreshAnnotationSources(); });
+		connect(m_mgr, &DecoderManager::decoderRemoved,
+		        this, [this](const QString &) { refreshAnnotationSources(); });
+	}
+
 	if(!m_catalog || !m_catalog->isAvailable()) {
 		auto *hint = new QLabel(
 			"No decoder backend is available. Check that the "
@@ -506,31 +648,23 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr,
 		contentLay->insertWidget(1, hint);
 		addBtn->setEnabled(false);
 	} else {
-		// Prime the catalog cache off the main thread so opening the
-		// stack picker (which calls catalog->info() per candidate to
-		// filter by inputIds) doesn't stall on ~100 sigrok-cli spawns.
+		// Prime the catalog cache off the main thread.
 		auto *cat = m_catalog;
 		(void)QtConcurrent::run([cat]() { cat->loadAll(); });
 	}
 }
 
-void DecoderPanel::refreshRawKeys(const QList<scopy::acq::DataKey> &keys)
+void DecoderPanel::refreshKeys(const QList<scopy::acq::DataKey> &keys)
 {
-	// Filter to raw keys only — decoders can only consume raw digital data.
-	QList<scopy::acq::DataKey> raw;
-	raw.reserve(keys.size());
-	for(const auto &k : keys)
-		if(k.isRaw()) raw.append(k);
-	m_rawKeysCache = raw;
+	m_keysCache = keys;
 	for(DecoderEditor *e : m_editors)
-		e->refreshRawKeys(raw);
+		e->refreshKeys(keys);
 }
 
-void DecoderPanel::setEngineRunning(bool running)
+void DecoderPanel::refreshAnnotationSources()
 {
-	m_engineRunning = running;
 	for(DecoderEditor *e : m_editors)
-		e->setApplyEnabled(!running);
+		e->refreshAnnotationSources();
 }
 
 void DecoderPanel::openPicker(const QString &title,
@@ -629,7 +763,7 @@ void DecoderPanel::openPicker(const QString &title,
 
 void DecoderPanel::onAddClicked()
 {
-	// Toggle: clicking Add while a picker is open closes it.
+	// Toggle: clicking Add while picker is open closes it.
 	if(m_pickerWidget) {
 		m_pickerWidget->deleteLater();
 		m_pickerWidget = nullptr;
@@ -700,8 +834,8 @@ void DecoderPanel::appendEditorFor(const QString &uid, const QString &decoderId)
 	if(!m_catalog) return;
 	const auto info = m_catalog->info(decoderId);
 	auto *ed = new DecoderEditor(uid, info, m_mgr, m_store.data(), this);
-	ed->refreshRawKeys(m_rawKeysCache);
-	ed->setApplyEnabled(!m_engineRunning);
+	ed->refreshKeys(m_keysCache);
+	ed->refreshAnnotationSources();
 	m_editorsLay->addWidget(ed);
 	m_editors.append(ed);
 
