@@ -456,6 +456,8 @@
 					"type": "script",
 					"commands": [
 						"sed -i \"s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\\/app/g\" qwtconfig.pri",
+						"sed -i \"s/qwtLibraryTarget(qwt)/qwtLibraryTarget(qwt_scopy)/\" src/src.pro",
+						"sed -i \"s/QWT_SONAME=libqwt.so/QWT_SONAME=libqwt_scopy.so/\" src/src.pro",
 						"qmake"
 					],
 					"dest-filename": "configure"
