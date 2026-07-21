@@ -28,11 +28,18 @@ DecoderOverlay::DecoderOverlay(PlotWidget *plot, scopy::acq::DataStore *store,
 	, m_plot(plot)
 	, m_store(store)
 {
-	// Watch the plot canvas so we can drive per-annotation tooltips from
-	// mouse-move events. The canvas already handles Qt::ToolTip events
-	// (from the Qwt picker infrastructure) so we listen to MouseMove and
-	// drive QToolTip::showText explicitly — this lets the tooltip follow
-	// the cursor across the canvas without waiting for a hover timeout.
+	// Watch the plot canvas and drive per-annotation tooltips from a
+	// single-shot hover timer instead of directly from MouseMove. Firing
+	// QToolTip::showText from inside a MouseMove handler triggered a
+	// tooltip-window ↔ synthetic Leave/MouseMove feedback loop during
+	// zoom-magnify that leaked QTipLabel widgets until the process (and
+	// often the user session) was OOM-killed. The hover timer is the
+	// same pattern Qt itself uses for built-in tooltips.
+	m_hoverTimer.setSingleShot(true);
+	m_hoverTimer.setInterval(250);
+	connect(&m_hoverTimer, &QTimer::timeout, this,
+		&DecoderOverlay::showPendingTooltip);
+
 	if(m_plot && m_plot->plot() && m_plot->plot()->canvas()) {
 		QWidget *cv = m_plot->plot()->canvas();
 		cv->setMouseTracking(true);
@@ -144,21 +151,87 @@ bool DecoderOverlay::eventFilter(QObject *watched, QEvent *ev)
 	if(!m_plot || !m_plot->plot() || m_plot->plot()->canvas() != watched)
 		return QObject::eventFilter(watched, ev);
 
-	if(ev->type() == QEvent::MouseMove) {
+	switch(ev->type()) {
+	case QEvent::MouseMove: {
 		auto *me = static_cast<QMouseEvent *>(ev);
-		const QString tip = tooltipForCanvasPos(me->position());
-		QWidget *cv = m_plot->plot()->canvas();
-		if(tip.isEmpty()) {
+		m_pendingCanvasPos = me->position().toPoint();
+		m_pendingGlobalPos = me->globalPosition().toPoint();
+
+		// If the cursor moved meaningfully away from where the last
+		// tooltip was shown, hide it right away. If the cursor is
+		// essentially still (synthetic MouseMove from a tooltip
+		// window appearing/disappearing) leave the existing tooltip
+		// alone — no allocation happens here.
+		const int dx = m_pendingGlobalPos.x() - m_lastTipGlobal.x();
+		const int dy = m_pendingGlobalPos.y() - m_lastTipGlobal.y();
+		if(!m_lastTip.isEmpty() && (dx * dx + dy * dy) > 4) {
 			QToolTip::hideText();
-		} else {
-			QToolTip::showText(me->globalPosition().toPoint(),
-					   tip, cv);
+			m_lastTip.clear();
+			m_lastTipGlobal = QPoint();
 		}
-	} else if(ev->type() == QEvent::Leave) {
-		QToolTip::hideText();
+
+		// (Re)start the hover timer. showText is deferred until the
+		// cursor has been still for setInterval() ms.
+		m_hoverTimer.start();
+		break;
+	}
+	case QEvent::Leave: {
+		m_hoverTimer.stop();
+		if(!m_lastTip.isEmpty()) {
+			QToolTip::hideText();
+			m_lastTip.clear();
+			m_lastTipGlobal = QPoint();
+		}
+		break;
+	}
+	case QEvent::Wheel: {
+		// Wheel drives PlotMagnifier zoom/pan. Suppress any pending
+		// tooltip and drop the current one so the tooltip cannot
+		// churn while the x-scale is changing rapidly. The event is
+		// not consumed — PlotMagnifier still gets it.
+		m_hoverTimer.stop();
+		if(!m_lastTip.isEmpty()) {
+			QToolTip::hideText();
+			m_lastTip.clear();
+			m_lastTipGlobal = QPoint();
+		}
+		break;
+	}
+	default:
+		break;
 	}
 
 	return QObject::eventFilter(watched, ev);
+}
+
+void DecoderOverlay::showPendingTooltip()
+{
+	if(!m_plot || !m_plot->plot())
+		return;
+	QWidget *cv = m_plot->plot()->canvas();
+	if(!cv)
+		return;
+	// If the cursor left the canvas since the timer was armed, do
+	// nothing — the Leave handler will have hidden any active tooltip.
+	if(!cv->underMouse())
+		return;
+
+	const QString tip = tooltipForCanvasPos(m_pendingCanvasPos);
+	if(tip.isEmpty()) {
+		if(!m_lastTip.isEmpty()) {
+			QToolTip::hideText();
+			m_lastTip.clear();
+			m_lastTipGlobal = QPoint();
+		}
+		return;
+	}
+
+	if(tip == m_lastTip)
+		return; // already showing this exact tip
+
+	QToolTip::showText(m_pendingGlobalPos, tip, cv);
+	m_lastTip       = tip;
+	m_lastTipGlobal = m_pendingGlobalPos;
 }
 
 QString DecoderOverlay::tooltipForCanvasPos(const QPointF &canvasPos) const
@@ -181,7 +254,7 @@ QString DecoderOverlay::tooltipForCanvasPos(const QPointF &canvasPos) const
 		const QwtScaleMap xMap = plot->canvasMap(curve->xAxis());
 		const QwtScaleMap yMap = plot->canvasMap(curve->yAxis());
 
-		const AnnotationSpan *hit =
+		const auto hit =
 			curve->hitTest(canvasPos, xMap, yMap, canvasRect);
 		if(!hit)
 			continue;

@@ -32,6 +32,8 @@
 
 #include <QwtPlotItem>
 
+#include <optional>
+
 namespace scopy {
 
 class PlotAxis;
@@ -92,13 +94,14 @@ public:
 
 	// Hit-test a canvas-pixel point against the currently laid out
 	// annotations. Uses the exact same row geometry as draw(). Returns
-	// nullptr if the point is outside this curve's band or not on any
-	// visible annotation. The returned pointer is valid until the next
-	// setAnnotations()/clear() call.
-	const AnnotationSpan *hitTest(const QPointF &canvasPos,
-				      const QwtScaleMap &xMap,
-				      const QwtScaleMap &yMap,
-				      const QRectF &canvasRect) const;
+	// std::nullopt if the point is outside this curve's band or not on
+	// any visible annotation. Returns by value so the caller owns the
+	// result and is unaffected by subsequent setAnnotations()/clear()
+	// calls on this curve.
+	std::optional<AnnotationSpan> hitTest(const QPointF &canvasPos,
+					      const QwtScaleMap &xMap,
+					      const QwtScaleMap &yMap,
+					      const QRectF &canvasRect) const;
 
 private:
 	struct Row
@@ -123,10 +126,6 @@ private:
 	void drawAnnotation(QPainter *painter, const AnnotationSpan &ann,
 			    const QColor &color, const QwtScaleMap &xMap,
 			    double topPx, double bottomPx) const;
-
-	void drawBlock(QPainter *painter, double startPx, double endPx,
-		       const QColor &color, bool classUniform,
-		       double topPx, double bottomPx) const;
 
 	static QString elideText(const QString &text, double maxWidth,
 				 const QFontMetrics &fm);
