@@ -39,7 +39,11 @@ find_path(
 
 find_library(
 	QWT_LIBRARIES
-	NAMES qwt6 qwt6-qt5 qwt qwt-qt5
+	NAMES qwt_scopy
+	      qwt6
+	      qwt6-qt5
+	      qwt
+	      qwt-qt5
 	HINTS ${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_INSTALL_PREFIX}/lib64
 	PATHS /usr/local/lib
 	      /usr/lib

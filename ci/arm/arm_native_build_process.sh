@@ -381,6 +381,9 @@ build_qwt() {
 	pushd $STAGING_AREA/qwt
 	git clean -xdf
 	sed -i 's|/usr/local/qwt-$$QWT_VERSION-ma|/usr/local|g' qwtconfig.pri
+	# Rename the produced library base name to qwt_scopy (and its SONAME in lockstep)
+	sed -i 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
+	sed -i 's|QWT_SONAME=libqwt.so|QWT_SONAME=libqwt_scopy.so|' src/src.pro
 	$QMAKE_BIN qwt.pro
 	make $JOBS
 	[ "$1" == "ON" ] && sudo make install
