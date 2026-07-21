@@ -17,7 +17,7 @@ DLL_DEPS=(
     libgnuradio-iio.dll
     libad9361.dll
     libiio.dll
-    qwt.dll
+    qwt_scopy.dll
     libglib-*.dll
     libgmodule-*.dll
     libsigc-*.dll

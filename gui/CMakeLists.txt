@@ -64,7 +64,7 @@ file(GLOB UI_LIST ui/*.ui)
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
 if(ANDROID)
-	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
+	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_scopy_${ANDROID_ABI})
 else()
 	set(QWT_QT_VERSION qt6)
 	find_path(
@@ -87,7 +87,7 @@ else()
 
 	find_library(
 		QWT_LIBRARIES
-		NAMES qwt
+		NAMES qwt_scopy
 		HINTS ${CMAKE_INSTALL_PREFIX}/lib
 		      /usr/lib
 		      /usr/lib64

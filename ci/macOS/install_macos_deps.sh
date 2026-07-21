@@ -439,7 +439,7 @@ patch_qwt() {
              QMAKE_LFLAGS_SONAME=
          }
      }
-+    macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt.dylib
++    macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt_scopy.dylib
  }
  else {
      CONFIG += staticlib
@@ -455,6 +455,8 @@ build_qwt() {
 	git clean -xdf
 	git reset --hard
 	patch_qwt
+	# Rename the produced library base name to qwt_scopy (SONAME handled in patch_qwt)
+	sed -i '' 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
 	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
 	make $JOBS
 	make install
