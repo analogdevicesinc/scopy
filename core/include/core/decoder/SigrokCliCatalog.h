@@ -13,25 +13,15 @@ namespace decoder {
 
 class DecoderLogger;
 
-// Enumerates all decoders exposed by the local `sigrok-cli` binary and
-// exposes their per-decoder metadata (channels, options, annotation
-// classes/rows).
-//
-// Uses QProcess to invoke `sigrok-cli`. Results are cached in-memory.
-// The list of decoders is populated lazily on first call to decoders().
-// Per-decoder metadata is populated lazily on first call to info(id).
-//
-// Threading: methods block on QProcess::waitForFinished. Call from a
-// worker thread if latency matters (typical: `-L` ~ 100 ms, `--show` ~ 200 ms).
+// IDecoderCatalog backed by `sigrok-cli`. Lazy in-memory cache; blocking
+// QProcess calls (call from a worker thread if latency matters).
 class SCOPY_CORE_EXPORT SigrokCliCatalog : public IDecoderCatalog
 {
 public:
 	SigrokCliCatalog();
 	~SigrokCliCatalog() override;
 
-	// Executable resolution mirrors SigrokCliBackend: honors an explicit
-	// override, the "sigrok_cli_path" preference, the scopy executable
-	// folder, and finally $PATH.
+	// Resolution order: override, "sigrok_cli_path" pref, scopy exe dir, $PATH.
 	void          setExecutableOverride(const QString &path);
 	QString       resolveCli() const;
 
@@ -43,9 +33,7 @@ public:
 	QString        shortDescription(const QString &decoderId) const override;
 	DecoderInfo    info(const QString &decoderId) const override;
 
-	// Parallel eager cache prime: spawns one `sigrok-cli --show -P <id>`
-	// per un-cached decoder in a small QProcess pool. Blocks until all
-	// finish. Cache writes are serialized by the caller thread.
+	// Parallel eager cache prime via a small QProcess pool. Blocking.
 	void           loadAll() const override;
 
 private:

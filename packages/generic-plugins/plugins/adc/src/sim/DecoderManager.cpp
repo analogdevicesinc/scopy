@@ -27,6 +27,16 @@ namespace adc {
 
 static constexpr const char *kMgrId = "decoder-manager";
 
+// Root stage: uid; stacked stages: "<uid> → <decoderId>".
+static QString stageTitle(const QString &uid,
+                          const QString &decoderId,
+                          int stageIndex)
+{
+	if(stageIndex == 0) return uid;
+	return uid + QStringLiteral(" ") + QChar(0x2192)
+		+ QStringLiteral(" ") + decoderId;
+}
+
 DecoderManager::DecoderManager(scopy::acq::AcquisitionEngine *engine,
                                scopy::acq::DataStore *store,
                                scopy::decoder::IDecoderBackendFactory *backendFactory,
@@ -39,8 +49,7 @@ DecoderManager::DecoderManager(scopy::acq::AcquisitionEngine *engine,
 
 DecoderManager::~DecoderManager()
 {
-	// Detach every processor from the engine before destruction so the
-	// engine doesn't call process() on dangling pointers.
+	// Detach processors before destruction to avoid dangling calls.
 	for(const DecoderInstance &d : m_decoders) {
 		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
 		for(const QPointer<scopy::PlotAxisHandle> &h : d.handles) {
@@ -172,7 +181,8 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	} else {
 		handle = attachHandle(nextBandPos());
 	}
-	m_overlay->registerDecoder(proc, outKey, handle, decoderId);
+	m_overlay->registerDecoder(proc, outKey, handle,
+	                           stageTitle(uid, decoderId, 0));
 
 	DecoderInstance d;
 	d.uid       = uid;
@@ -185,6 +195,118 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 
 	Q_EMIT decoderAdded(uid);
 	if(m_logger) m_logger->info(kMgrId, QStringLiteral("added decoder ") + uid);
+	return uid;
+}
+
+QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId,
+                                                  const AnnotationChainSpec &spec)
+{
+	if(!m_engine) {
+		if(m_logger) m_logger->critical(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: no engine"));
+		return {};
+	}
+	if(!m_overlay || !m_plot) {
+		if(m_logger) m_logger->warning(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: overlay/plot not set"));
+		return {};
+	}
+	if(!m_backendFactory) {
+		if(m_logger) m_logger->critical(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: no backend factory"));
+		return {};
+	}
+	if(decoderId.isEmpty() || spec.upstreamId.isEmpty()) return {};
+
+	DecoderInstance *src = find(spec.sourceUid);
+	if(!src) {
+		if(m_logger) m_logger->warning(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: unknown sourceUid %1")
+				.arg(spec.sourceUid));
+		return {};
+	}
+	if(spec.sourceStageIndex < 0 || spec.sourceStageIndex >= src->outKeys.size()) {
+		if(m_logger) m_logger->warning(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: bad stage index %1 (source has %2 stages)")
+				.arg(spec.sourceStageIndex).arg(src->outKeys.size()));
+		return {};
+	}
+
+	scopy::decoder::DecoderConfig cfg;
+	cfg.sampleRate  = src->cfg.sampleRate;
+	cfg.numChannels = 0;
+	scopy::decoder::DecoderStage stage;
+	stage.decoderId = decoderId.toStdString();
+	cfg.stack.push_back(stage);
+	cfg.rootInput = scopy::decoder::RootInput::Annotations;
+	cfg.annotationInput.sourceUid        = spec.sourceUid.toStdString();
+	cfg.annotationInput.sourceStageIndex = spec.sourceStageIndex;
+
+	cfg.meta["annIn.upstreamId"] = spec.upstreamId.toStdString();
+	for(auto it = spec.options.constBegin(); it != spec.options.constEnd(); ++it) {
+		cfg.meta[std::string("annIn.") + it.key().toStdString()] =
+			it.value().toStdString();
+	}
+
+	// Pre-check backend support before allocating.
+	auto probeBackend = m_backendFactory->create();
+	if(!probeBackend) {
+		if(m_logger) m_logger->critical(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: probe backend null"));
+		return {};
+	}
+	if(!probeBackend->acceptsAnnotationInput(cfg)) {
+		if(m_logger) m_logger->warning(kMgrId,
+			QStringLiteral("addDecoderFromAnnotations: backend rejects (upstream=%1, downstream=%2)")
+				.arg(spec.upstreamId, decoderId));
+		return {};
+	}
+	probeBackend.reset();
+
+	const QString uid = QString("%1-%2").arg(decoderId).arg(m_uidCounter++);
+
+	auto backend = m_backendFactory->create();
+	if(!backend) return {};
+	auto *proc = new scopy::acq::ExternalDecoderProcessor(
+		uid, std::move(backend), m_engine);
+	proc->setConfig(cfg);
+	proc->setWindowSize(m_windowSize);
+
+	const scopy::acq::DataKey outKey =
+		scopy::acq::DataKey::withStage("decoder",
+			uid + QStringLiteral("/0"), "annotations");
+	proc->setOutputKeys({outKey});
+
+	// Watch the source outKey; engine schedules on writes to watched keys.
+	const scopy::acq::DataKey srcKey = src->outKeys[spec.sourceStageIndex];
+	proc->setAnnotationInputKey(srcKey);
+	proc->setWatchedKeys({srcKey});
+
+	m_engine->addProcessor(proc);
+
+	scopy::PlotAxisHandle *handle = nullptr;
+	if(!m_digitalMgr.isNull()) {
+		handle = m_digitalMgr->registerAnnotationBand(uid);
+	} else {
+		handle = attachHandle(nextBandPos());
+	}
+	m_overlay->registerDecoder(proc, outKey, handle,
+	                           stageTitle(uid, decoderId, 0));
+
+	DecoderInstance d;
+	d.uid       = uid;
+	d.stageIds  = {decoderId};
+	d.cfg       = cfg;
+	d.proc      = proc;
+	d.outKeys   = {outKey};
+	d.handles   = {QPointer<scopy::PlotAxisHandle>(handle)};
+	m_decoders.append(d);
+
+	Q_EMIT decoderAdded(uid);
+	if(m_logger)
+		m_logger->info(kMgrId,
+			QStringLiteral("added annotation-chained decoder %1 (source=%2 stage=%3 upstream=%4)")
+				.arg(uid, spec.sourceUid).arg(spec.sourceStageIndex).arg(spec.upstreamId));
 	return uid;
 }
 
@@ -244,24 +366,20 @@ int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
 			"annotations");
 	d->outKeys.append(outKey);
 
-	// Reuse a previously-popped handle if one is still alive at this
-	// index; otherwise allocate a fresh one at the next stacking pos.
+	// popStagesFrom() truncates d->handles; always allocate fresh here.
 	scopy::PlotAxisHandle *handle = nullptr;
-	if(stageIndex < d->handles.size() && !d->handles[stageIndex].isNull()) {
-		handle = d->handles[stageIndex].data();
+	if(!m_digitalMgr.isNull()) {
+		handle = m_digitalMgr->registerAnnotationBand(
+			QStringLiteral("%1/%2").arg(uid).arg(stageIndex));
 	} else {
-		if(!m_digitalMgr.isNull()) {
-			handle = m_digitalMgr->registerAnnotationBand(
-				QStringLiteral("%1/%2").arg(uid).arg(stageIndex));
-		} else {
-			handle = attachHandle(nextBandPos());
-		}
-		d->handles.append(QPointer<scopy::PlotAxisHandle>(handle));
+		handle = attachHandle(nextBandPos());
 	}
+	d->handles.append(QPointer<scopy::PlotAxisHandle>(handle));
 
 	d->proc->setConfig(d->cfg);
 	d->proc->setOutputKeys(d->outKeys);
-	m_overlay->registerDecoder(d->proc, outKey, handle, decoderId);
+	m_overlay->registerDecoder(d->proc, outKey, handle,
+	                           stageTitle(uid, decoderId, stageIndex));
 
 	if(m_logger)
 		m_logger->info(kMgrId, QStringLiteral("pushStage: %1 += %2 (index %3)")
@@ -282,13 +400,24 @@ void DecoderManager::popStagesFrom(const QString &uid, int fromIndex)
 	if(fromIndex < 1) fromIndex = 1; // never drop root
 	if(fromIndex >= d->stageIds.size()) return;
 
-	// Keep handles alive for later reuse by pushStage(). Only unregister
-	// the overlay curves and drop the backend stack entries.
+	// Tear down popped stages: overlay curve, store key, cfg entry, handle.
 	while(d->stageIds.size() > fromIndex) {
 		const int idx = d->stageIds.size() - 1;
 		const scopy::acq::DataKey k = d->outKeys[idx];
 		if(m_overlay) m_overlay->unregisterDecoder(k);
 		if(m_store)   m_store->remove(k);
+		if(idx < d->handles.size()) {
+			QPointer<scopy::PlotAxisHandle> h = d->handles[idx];
+			if(!h.isNull()) {
+				if(!m_digitalMgr.isNull()) {
+					m_digitalMgr->unregisterAnnotationBand(h);
+				} else {
+					if(m_plot) m_plot->removePlotAxisHandle(h);
+					h->deleteLater();
+				}
+			}
+			d->handles.removeAt(idx);
+		}
 		d->outKeys.removeAt(idx);
 		d->stageIds.removeAt(idx);
 		d->cfg.stack.pop_back();
@@ -322,27 +451,43 @@ void DecoderManager::applyConfig(const QString &uid,
 		return;
 	}
 
-	d->cfg            = cfg;
-	d->orderedRawKeys = orderedRawKeys;
+	d->cfg = cfg;
 	d->proc->setConfig(cfg);
-	d->proc->setOrderedRawKeys(orderedRawKeys);
-	d->proc->setWatchedKeys(orderedRawKeys);
 
-	if(m_store && m_windowSize > 0) {
-		// Ensure the decoder can stitch a full window regardless of
-		// what the display currently reads.
-		const std::size_t depth = scopy::acq::DataStore::requiredHistoryDepth(
-			static_cast<std::size_t>(m_windowSize),
-			m_engine ? m_engine->bufferSize() : 1);
-		for(const scopy::acq::DataKey &k : orderedRawKeys)
-			m_store->ensureHistoryDepth(k, depth);
+	if(cfg.rootInput == scopy::decoder::RootInput::Annotations) {
+		// Annotation-in: ignore orderedRawKeys; resolve source outKey.
+		const QString srcUid = QString::fromStdString(cfg.annotationInput.sourceUid);
+		DecoderInstance *src = find(srcUid);
+		if(!src || cfg.annotationInput.sourceStageIndex < 0
+		   || cfg.annotationInput.sourceStageIndex >= src->outKeys.size()) {
+			if(m_logger) m_logger->warning(kMgrId,
+				QStringLiteral("applyConfig: bad annotationInput (uid=%1 stage=%2)")
+					.arg(srcUid).arg(cfg.annotationInput.sourceStageIndex));
+			return;
+		}
+		const scopy::acq::DataKey srcKey = src->outKeys[cfg.annotationInput.sourceStageIndex];
+		d->orderedRawKeys.clear();
+		d->proc->setAnnotationInputKey(srcKey);
+		d->proc->setWatchedKeys({srcKey});
+	} else {
+		d->orderedRawKeys = orderedRawKeys;
+		d->proc->setOrderedRawKeys(orderedRawKeys);
+		d->proc->setWatchedKeys(orderedRawKeys);
+
+		if(m_store && m_windowSize > 0) {
+			// Ensure history depth covers a full decoder window.
+			const std::size_t depth = scopy::acq::DataStore::requiredHistoryDepth(
+				static_cast<std::size_t>(m_windowSize),
+				m_engine ? m_engine->bufferSize() : 1);
+			for(const scopy::acq::DataKey &k : orderedRawKeys)
+				m_store->ensureHistoryDepth(k, depth);
+		}
 	}
 
 	if(m_logger)
 		m_logger->info(kMgrId,
 			QStringLiteral("applied config to %1 channels=%2 sampleRate=%3")
 				.arg(uid).arg(orderedRawKeys.size()).arg(cfg.sampleRate));
-	Q_EMIT configApplied(uid);
 }
 
 void DecoderManager::setDecoderWindowSize(int n)

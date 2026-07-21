@@ -69,6 +69,9 @@ public Q_SLOTS:
 	void onStopped();
 	void onForceStopped();
 	void appendLog(int severity, const QString &id, const QString &message);
+	// Append a decoder-only log line (called from DecoderLogger::messageLogged).
+	// `level` matches scopy::decoder::LogLevel (Info=0, Warning=1, Critical=2).
+	void appendDecoderLog(int level, const QString &id, const QString &message);
 
 Q_SIGNALS:
 	void requestRun();
@@ -104,7 +107,9 @@ private:
 	QPushButton   *m_logBtn;
 	QPushButton   *m_datastoreBtn;
 	QPushButton   *m_decoderBtn;
+	QPushButton   *m_decoderLogBtn;
 	QTextEdit     *m_logView;
+	QTextEdit     *m_decoderLogView;
 	QTreeWidget   *m_datastoreTable;
 
 	// Populated by buildControlPanel()
