@@ -2,20 +2,12 @@
 #define SCOPY_DECODER_C_API_H
 
 /*
- * Pure-C ABI shim for closed-source vendor decoder libraries.
+ * Pure-C ABI for vendor decoder libraries loaded by DynamicLibBackend.
+ * Only raw pointers and lengths cross this boundary. Configuration is a
+ * JSON string; keys mirror scopy::decoder::DecoderConfig.
  *
- * No Qt, no STL, no C++ types cross this boundary — only raw pointers and
- * lengths. Configuration is passed as a JSON string for forward compatibility;
- * keys mirror scopy::decoder::DecoderConfig.
- *
- * A vendor library implementing this ABI is loaded via QLibrary by
- * scopy::decoder::DynamicLibBackend and adapted to IDecoderBackend.
- *
- * Threading / lifecycle: scopy_decoder_decode() is fully self-contained.
- * No handles, no state. Every call decodes exactly one buffer; vendor
- * implementations spin up and tear down any internal resources within
- * a single invocation. Sample indices in delivered annotations are
- * buffer-local (0 .. n_samples-1).
+ * decode() is stateless: one call decodes one buffer. Sample indices in
+ * delivered annotations are buffer-local (0 .. n_samples-1).
  */
 
 #include <stddef.h>
@@ -26,9 +18,8 @@ extern "C" {
 #endif
 
 /*
- * POD annotation record passed to user callbacks. All const char* pointers
- * are owned by the backend and remain valid only for the duration of the
- * callback invocation.
+ * Annotation record. Strings are backend-owned and only valid for the
+ * duration of the callback.
  */
 typedef struct {
 	uint64_t    start;
@@ -42,28 +33,40 @@ typedef struct {
 typedef void (*scopy_decoder_ann_cb)(const scopy_decoder_annotation_t *ann, void *user);
 
 /*
- * One-shot decode entry point.
+ * One-shot samples-in decode.
  *
- * cfg_json:  UTF-8 JSON configuration string. Keys mirror
- *            scopy::decoder::DecoderConfig (decoderId, sampleRate,
+ * cfg_json:  JSON config (mirrors DecoderConfig: decoderId, sampleRate,
  *            numChannels, channels[], options{}, meta{}).
- * data:      packed samples, unitsize = ceil(numChannels / 8) bytes/sample,
- *            channel i = bit i, LSB-first within each byte.
- * n_samples: number of samples in 'data' (NOT bytes).
- * cb:        callback invoked once per produced annotation. May be NULL,
- *            in which case the backend still runs and reports errors but
- *            no annotations are surfaced.
- * user:      opaque pointer forwarded to 'cb'.
- * err_buf:   optional buffer for a human-readable error message on failure.
- *            May be NULL. The backend writes a NUL-terminated string of at
- *            most (err_buf_size - 1) bytes when returning a non-zero value.
+ * data:      packed samples; unitsize = ceil(numChannels/8), channel i
+ *            in bit i, LSB-first within each byte.
+ * n_samples: sample count (not bytes).
+ * cb/user:   optional per-annotation callback (may be NULL).
+ * err_buf:   optional NUL-terminated error message on failure.
  *
- * Returns 0 on success (including empty result), non-zero on hard error.
+ * Returns 0 on success, non-zero on hard error.
  */
 int scopy_decoder_decode(const char *cfg_json,
                          const uint8_t *data, size_t n_samples,
                          scopy_decoder_ann_cb cb, void *user,
                          char *err_buf, size_t err_buf_size);
+
+/*
+ * Return non-zero if scopy_decoder_decode_ann() is implemented.
+ * A missing symbol is treated as 0 (samples-in only).
+ */
+int scopy_decoder_accepts_annotations(void);
+
+/*
+ * One-shot annotation-in decode (chained decoders). Same JSON schema as
+ * scopy_decoder_decode; "annIn." keys carry codec options
+ * (upstreamId, samplerate, ...). Delivered sample indices are on the
+ * upstream timeline. Input strings valid only for the duration of the call.
+ */
+int scopy_decoder_decode_ann(const char *cfg_json,
+                             const scopy_decoder_annotation_t *in,
+                             size_t n_in,
+                             scopy_decoder_ann_cb cb, void *user,
+                             char *err_buf, size_t err_buf_size);
 
 #ifdef __cplusplus
 } /* extern "C" */
