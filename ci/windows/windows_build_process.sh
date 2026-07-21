@@ -358,6 +358,9 @@ patch -p1 <<-EOF
 
 EOF
 
+	# Rename the produced library base name to qwt_scopy (no SONAME on Windows)
+	sed -i 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
+
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
 
@@ -375,7 +378,7 @@ EOF
 		make install
 	fi
 
-	cp $STAGING_DIR/lib/qwt.dll $STAGING_DIR/bin/qwt.dll
+	cp $STAGING_DIR/lib/qwt_scopy.dll $STAGING_DIR/bin/qwt_scopy.dll
 
 	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
 		git clean -xdf

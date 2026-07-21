@@ -28,15 +28,15 @@ cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
 cp -avR $STAGING_AREA_DEPS/lib/genalyzer.framework Scopy.app/Contents/Frameworks/
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/resources
 
-libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
+libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt_scopy.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
 echo "=== Fixing libqwt"
-[ -z "$(otool -L ${libqwtpath} | grep libqwt...dylib)" ] || install_name_tool -id ${libqwtid} ${libqwtpath}
+[ -z "$(otool -L ${libqwtpath} | grep libqwt_scopy.*dylib)" ] || install_name_tool -id ${libqwtid} ${libqwtpath}
 otool -L ${libqwtpath}
 install_name_tool -change ${libqwtid} ${libqwtpath} ./Scopy.app/Contents/MacOS/Scopy
 for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
 do
-	[ -z "$(otool -L ${dylib} | grep libqwt...dylib)" ] || install_name_tool -change ${libqwtid} ${libqwtpath} ${dylib}
+	[ -z "$(otool -L ${dylib} | grep libqwt_scopy.*dylib)" ] || install_name_tool -change ${libqwtid} ${libqwtpath} ${dylib}
 	otool -L $dylib
 done
 
