@@ -114,6 +114,11 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// ---- Decoder plumbing (composition root) ----
 	m_decoderLogger = new scopy::decoder::DecoderLogger(this);
 	m_decoderLogger->setEngine(m_engine);
+	// Decoder logs go to their own right-stack panel; don't interleave them
+	// with the generic acq-error "Logs" panel via the engine::error path.
+	m_decoderLogger->setForwardToEngine(false);
+	connect(m_decoderLogger, &scopy::decoder::DecoderLogger::messageLogged,
+		m_ui, &SimInstrument::appendDecoderLog, Qt::QueuedConnection);
 
 	auto catalog            = std::make_unique<scopy::decoder::SigrokCliCatalog>();
 	auto *catalogPtr        = catalog.get();
@@ -386,13 +391,6 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	m_decoderPanel->setLogger(m_decoderLogger);
 	m_ui->registerDecoderPanel(m_decoderPanel);
 
-	connect(m_engine, &scopy::acq::AcquisitionEngine::started, m_decoderPanel,
-		[this]() { m_decoderPanel->setEngineRunning(true); });
-	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped, m_decoderPanel,
-		[this]() { m_decoderPanel->setEngineRunning(false); });
-	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, m_decoderPanel,
-		[this]() { m_decoderPanel->setEngineRunning(false); });
-
 	// Refresh the newly added editor's channel combos with the current
 	// DataStore key set — otherwise editors created before/between runs
 	// (i.e. before onCycleComplete has fired for the new key set) come up
@@ -400,7 +398,7 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	connect(m_decoderMgr, &scopy::adc::DecoderManager::decoderAdded, m_decoderPanel,
 		[this](const QString &) {
 			if(m_decoderPanel && m_store)
-				m_decoderPanel->refreshRawKeys(m_store->keys());
+				m_decoderPanel->refreshKeys(m_store->keys());
 		});
 
 	// Wire waterfall history spinbox → update widget + DataStore history depth.
@@ -502,7 +500,7 @@ void SimInstrumentController::onCycleComplete()
 		m_lastKeys = currentKeys;
 		m_ui->updateCurveKeyCombos(currentKeys);
 		if(m_decoderPanel)
-			m_decoderPanel->refreshRawKeys(currentKeys);
+			m_decoderPanel->refreshKeys(currentKeys);
 	}
 
 	// Refresh the DataStore inspector panel every cycle
