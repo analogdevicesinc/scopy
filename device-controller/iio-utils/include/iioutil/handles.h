@@ -5,44 +5,63 @@
 
 namespace scopy::iio {
 
-struct ContextHandle {
+struct ContextHandle
+{
 	void *ptr = nullptr;
 };
-struct DeviceHandle {
+struct DeviceHandle
+{
 	void *ptr = nullptr;
 };
-struct ChannelHandle {
+struct ChannelHandle
+{
 	void *ptr = nullptr;
 };
-struct AttrHandle {
+struct AttrHandle
+{
 	void *ptr = nullptr;
 };
-struct BufferHandle {
+struct BufferHandle
+{
 	void *ptr = nullptr;
 };
-struct BlockHandle {
+struct BlockHandle
+{
 	void *ptr = nullptr;
 };
-struct EventStreamHandle {
+struct EventStreamHandle
+{
 	void *ptr = nullptr;
 };
-struct ScanHandle {
+struct ScanHandle
+{
 	void *ptr = nullptr;
 };
-struct ChannelsMaskHandle {
+struct ChannelsMaskHandle
+{
 	void *ptr = nullptr;
 };
 
-enum class LibiioVersion { V0, V1, Default };
+// I changed the plan, and I removed this enum class from here.
+// Instead, i added a new enum class in the controller header (named BackendKind)
+// This should be removed!
+enum class LibiioVersion
+{
+    V0,
+    V1,
+    Default
+};
 
-struct ContextParams {
+struct ContextParams
+{
     int timeoutMs = 0; // 0 = backend default; -1 = infinite; INT_MIN = non-blocking
-    // Additional params (out, err, logLevel, stderrLevel, timestampLevel, flags)
-    // can be added here when needed — map to iio_context_params fields in v1contextops.cpp;
-    // v0 ignores anything beyond timeoutMs.
+               // Additional params (out, err, logLevel, stderrLevel, timestampLevel, flags)
+               // can be added here when needed — map to iio_context_params fields in v1contextops.cpp;
+               // v0 ignores anything beyond timeoutMs.
 };
 
-struct ScanResult {
+struct ScanResult
+{
 	QString uri;
 	QString description;
 };

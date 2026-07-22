@@ -7,12 +7,12 @@
 
 namespace scopy::iio {
 
-class BufferOpenCommand : public Command {
+class BufferOpenCommand : public Command
+{
 	Q_OBJECT
 public:
 	BufferOpenCommand(IBufferOps *ops, DeviceHandle dev, unsigned int idx, ChannelsMaskHandle mask,
-			  size_t samplesCount, bool cyclic, unsigned int kernelBuffers = 4,
-			  QObject *parent = nullptr)
+              size_t samplesCount, bool cyclic, unsigned int kernelBuffers = 4, QObject *parent = nullptr)
 		: Command(BufferCreate, dev.ptr, parent)
 		, m_ops(ops)
 		, m_devHandle(dev)
@@ -21,17 +21,18 @@ public:
 		, m_samples(samplesCount)
 		, m_cyclic(cyclic)
 		, m_kernelBuffers(kernelBuffers)
-	{}
+    {
+    }
 
 	void execute() override
 	{
 		Q_EMIT started(this);
 		if(!m_cancelled) {
-			m_openedHandle = m_ops->openBuffer(m_devHandle, m_idx, m_mask, m_samples, m_cyclic,
-							   m_kernelBuffers);
+            m_openedHandle =
+                m_ops->openBuffer(m_devHandle, m_idx, m_mask, m_samples, m_cyclic, m_kernelBuffers);
 			m_result = m_openedHandle.ptr
-					 ? Result<void>()
-					 : Result<void>(Unexpected{Error{-EIO, QStringLiteral("buffer open failed")}});
+                ? Result<void>()
+                : Result<void>(Unexpected{Error{-EIO, QStringLiteral("buffer open failed")}});
 		}
 		Q_EMIT finished(this);
 	}
