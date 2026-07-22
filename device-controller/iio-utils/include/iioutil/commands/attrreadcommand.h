@@ -21,7 +21,7 @@ public:
 	void execute() override
 	{
 		Q_EMIT started(this);
-		if(!m_cancelled) {
+        if(!m_cancelled) {
 			m_result = m_ops->read(m_handle);
 		}
 		Q_EMIT finished(this);
