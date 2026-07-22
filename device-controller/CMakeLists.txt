@@ -5,6 +5,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
+# All libraries (incl. the dlopen'd backend plugins) and executables land in one
+# place, so the backend loader's dlopen("libiio-backend-vN.so") resolves via the
+# rpath we set on consumers below.
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(DC_PLUGIN_DIR ${CMAKE_BINARY_DIR}/lib)
+
 find_package(Qt6 REQUIRED COMPONENTS Core Concurrent Test)
 find_package(QCoro6 REQUIRED COMPONENTS Core Coro)
 
