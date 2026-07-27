@@ -27,6 +27,9 @@
 #include "imuanalyzersettings.hpp"
 #include "datavisualizer.hpp"
 
+#include <atomic>
+#include <thread>
+
 #include <QLineEdit>
 #include <QObject>
 

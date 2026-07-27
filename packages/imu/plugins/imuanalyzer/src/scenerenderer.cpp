@@ -25,6 +25,10 @@ using namespace scopy;
 SceneRenderer::SceneRenderer(QWidget *parent)
 	: QWidget{parent}
 {
+	// Force Qt3D OpenGL backend; RHI (Qt6 default) needs libQt6ShaderTools which is absent and aborts.
+	if(qEnvironmentVariableIsEmpty("QT3D_RENDERER")) {
+		qputenv("QT3D_RENDERER", "opengl");
+	}
 	view = new Qt3DExtras::Qt3DWindow();
 	container = QWidget::createWindowContainer(view, this);
 	container->setMinimumSize(400, 300);
