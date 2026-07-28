@@ -52,10 +52,14 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	buttonWidgetLayout->setSpacing(0);
 	buttonWidgetLayout->setContentsMargins(0, 0, 0, 0);
 
-	spinBoxUpButton = new QPushButton("+", buttonWidget);
+	spinBoxUpButton = new QPushButton(buttonWidget);
+	spinBoxUpButton->setIcon(
+		Style::getPixmap(":/gui/icons/plus.svg", Style::getColor(json::theme::content_inverse)));
 	RegmapStyleHelper::smallBlueButton(spinBoxUpButton);
 
-	spinBoxDownButton = new QPushButton("-", buttonWidget);
+	spinBoxDownButton = new QPushButton(buttonWidget);
+	spinBoxDownButton->setIcon(
+		Style::getPixmap(":/gui/icons/minus.svg", Style::getColor(json::theme::content_inverse)));
 	RegmapStyleHelper::smallBlueButton(spinBoxDownButton);
 
 	buttonWidgetLayout->addWidget(spinBoxUpButton);

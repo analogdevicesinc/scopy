@@ -32,6 +32,7 @@
 #include <registermapsettingsmenu.hpp>
 #include <stylehelper.h>
 #include <style_properties.h>
+#include "style_properties.h"
 
 using namespace scopy::regmap;
 
@@ -197,7 +198,7 @@ void RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectName)
 
 	button->setFixedSize(16, 16);
 	button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	Style::setStyle(button, style::properties::button::smallSquareIconButton, true, true);
+	Style::setStyle(button, style::properties::button::regmapSmallBlueButton, true, true);
 }
 
 QString RegmapStyleHelper::getColorBasedOnValue(QString value)
