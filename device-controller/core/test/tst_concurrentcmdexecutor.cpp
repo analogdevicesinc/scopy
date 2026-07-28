@@ -13,24 +13,19 @@ class SlowCommand : public Command
 	Q_OBJECT
 public:
 	SlowCommand(int sleepMs, void *resource = nullptr, QObject *parent = nullptr)
-		: Command(AttrRead, resource, parent)
+        : Command(resource, parent)
 		, m_sleepMs(sleepMs)
     {
     }
 
-	void execute() override
-	{
-		Q_EMIT started(this);
-		if(!m_cancelled) {
-			QThread::msleep(m_sleepMs);
-			m_result = Result<void>{};
-		}
-        Q_EMIT finished(this);
-	}
-
-	QString toString() const override { return QStringLiteral("SlowCommand(%1ms)").arg(m_sleepMs); }
-
 	Result<void> result() const { return m_result; }
+
+protected:
+    void run() override
+    {
+        QThread::msleep(m_sleepMs);
+        m_result = Result<void>{};
+    }
 
 private:
 	int m_sleepMs;

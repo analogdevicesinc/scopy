@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/command.h"
+#include "core/resultcommand.h"
 #include "iioutil/handles.h"
 
 #include <cerrno>
@@ -8,34 +8,25 @@
 
 namespace scopy::iio {
 
-class PingCommand : public Command {
+class PingCommand : public ResultCommand<void>
+{
 	Q_OBJECT
 public:
 	PingCommand(ContextHandle handle, std::function<bool()> fn, QObject *parent = nullptr)
-		: Command(Ping, handle.ptr, parent)
+		: ResultCommand(handle.ptr, parent)
 		, m_fn(std::move(fn))
-	{}
-
-	void execute() override
 	{
-		Q_EMIT started(this);
-		if(!m_cancelled) {
-			m_result = m_fn() ? Result<void>()
-					  : Result<void>(Unexpected{Error{-ENODEV, QStringLiteral("ping failed")}});
-		}
-		Q_EMIT finished(this);
 	}
 
-	Result<void> result() const { return m_result; }
-
-	QString toString() const override
+protected:
+	void run() override
 	{
-		return QStringLiteral("Ping(ctx=%1)").arg(quintptr(m_resource));
+        setResult(m_fn() ? Result<void>()
+                 : Result<void>(Unexpected{Error{-ENODEV, QStringLiteral("ping failed")}}));
 	}
 
 private:
 	std::function<bool()> m_fn;
-	Result<void> m_result{Unexpected{Error{-ENODATA, QStringLiteral("command not executed")}}};
 };
 
 } // namespace scopy::iio
