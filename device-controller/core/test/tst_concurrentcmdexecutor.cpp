@@ -1,4 +1,4 @@
-#include "core/concurrentcmdexecutor.h"
+#include "core/pooledcmdexecutor.h"
 #include "core/command.h"
 
 #include <QElapsedTimer>
@@ -32,18 +32,19 @@ private:
 	Result<void> m_result{Unexpected{Error{-ENODATA, QStringLiteral("command not executed")}}};
 };
 
-class TestConcurrentCmdExecutor : public QObject
+class TestPooledCmdExecutor : public QObject
 {
 	Q_OBJECT
 private slots:
 	void parallelExecution();
 	void cancelByResource();
+    void cancelById();
 	void pendingCount();
 };
 
-void TestConcurrentCmdExecutor::parallelExecution()
+void TestPooledCmdExecutor::parallelExecution()
 {
-	ConcurrentCmdExecutor exec(4);
+    PooledCmdExecutor exec(4);
 	SlowCommand c1(100);
 	SlowCommand c2(100);
 
@@ -61,10 +62,10 @@ void TestConcurrentCmdExecutor::parallelExecution()
 	QVERIFY(bool(c2.result()));
 }
 
-void TestConcurrentCmdExecutor::cancelByResource()
+void TestPooledCmdExecutor::cancelByResource()
 {
 	int resource = 0;
-	ConcurrentCmdExecutor exec(4);
+    PooledCmdExecutor exec(4);
 	SlowCommand c1(100, &resource);
 	SlowCommand c2(0, &resource);
 
@@ -72,15 +73,36 @@ void TestConcurrentCmdExecutor::cancelByResource()
 	auto f2 = exec.execute(&c2);
 	exec.cancelByResource(&resource);
 
-	f1.waitForFinished();
 	f2.waitForFinished();
 }
 
-void TestConcurrentCmdExecutor::pendingCount()
+void TestPooledCmdExecutor::cancelById()
 {
-	ConcurrentCmdExecutor exec(4);
+    int resource = 0;
+    PooledCmdExecutor exec(4);
+    SlowCommand c1(100, &resource);
+    SlowCommand c2(200, &resource);
+
+    auto f1 = exec.execute(&c1);
+    auto f2 = exec.execute(&c2);
+
+    exec.cancelById(c2.id());
+
+    QElapsedTimer timer;
+    timer.start();
+
+    f1.waitForFinished();
+
+    QVERIFY(c2.isCancelled());
+    f2.waitForFinished();
+    QVERIFY(c2.isCancelled() && timer.elapsed() < 150);
+}
+
+void TestPooledCmdExecutor::pendingCount()
+{
+    PooledCmdExecutor exec(4);
 	QCOMPARE(exec.pendingCount(), 0);
 }
 
-QTEST_MAIN(TestConcurrentCmdExecutor)
+QTEST_MAIN(TestPooledCmdExecutor)
 #include "tst_concurrentcmdexecutor.moc"

@@ -1,8 +1,9 @@
-#include "core/serialcmdexecutor.h"
+#include "core/pooledcmdexecutor.h"
 #include "core/command.h"
 
 #include <QSignalSpy>
 #include <QTest>
+#include <qelapsedtimer.h>
 
 #include <cerrno>
 
@@ -40,7 +41,7 @@ private:
 	static inline int s_counter = 0;
 };
 
-class TestSerialCmdExecutor : public QObject
+class TestPooledSerialCmdExecutor : public QObject
 {
 	Q_OBJECT
 private slots:
@@ -48,14 +49,15 @@ private slots:
 
 	void serialOrder();
 	void cancelByResource();
-	void cancelAll();
+    void cancelById();
+    void cancelAll();
 	void pendingCount();
 	void futureResolves();
 };
 
-void TestSerialCmdExecutor::serialOrder()
+void TestPooledSerialCmdExecutor::serialOrder()
 {
-	SerialCmdExecutor q;
+    PooledCmdExecutor q;
 	DummyCommand c1, c2, c3;
 	auto f1 = q.execute(&c1);
 	auto f2 = q.execute(&c2);
@@ -68,10 +70,10 @@ void TestSerialCmdExecutor::serialOrder()
 	QVERIFY(c2.order() < c3.order());
 }
 
-void TestSerialCmdExecutor::cancelByResource()
+void TestPooledSerialCmdExecutor::cancelByResource()
 {
 	int resource = 0;
-	SerialCmdExecutor q;
+    PooledCmdExecutor q;
 	DummyCommand c1(50, &resource);
 	DummyCommand c2(0, &resource);
 
@@ -85,9 +87,29 @@ void TestSerialCmdExecutor::cancelByResource()
 	QVERIFY(c2.isCancelled());
 }
 
-void TestSerialCmdExecutor::cancelAll()
+void TestPooledSerialCmdExecutor::cancelById()
 {
-	SerialCmdExecutor q;
+    int resource = 0;
+    PooledCmdExecutor q;
+    DummyCommand c1(100, &resource);
+    DummyCommand c2(200, &resource);
+
+    auto f1 = q.execute(&c1);
+    auto f2 = q.execute(&c2);
+
+    q.cancelById(c2.id());
+
+    f1.waitForFinished();
+    QVERIFY(c2.isCancelled());
+    QElapsedTimer timer;
+    timer.start();
+    f2.waitForFinished();
+    QVERIFY(c2.isCancelled() && timer.elapsed() < 100);
+}
+
+void TestPooledSerialCmdExecutor::cancelAll()
+{
+    PooledCmdExecutor q;
 	DummyCommand c1(50);
 	DummyCommand c2;
 	DummyCommand c3;
@@ -102,20 +124,20 @@ void TestSerialCmdExecutor::cancelAll()
 	f3.waitForFinished();
 }
 
-void TestSerialCmdExecutor::pendingCount()
+void TestPooledSerialCmdExecutor::pendingCount()
 {
-	SerialCmdExecutor q;
+    PooledCmdExecutor q;
 	QCOMPARE(q.pendingCount(), 0);
 }
 
-void TestSerialCmdExecutor::futureResolves()
+void TestPooledSerialCmdExecutor::futureResolves()
 {
-	SerialCmdExecutor q;
+    PooledCmdExecutor q;
 	DummyCommand c;
 	auto f = q.execute(&c);
 	f.waitForFinished();
 	QVERIFY(bool(c.result()));
 }
 
-QTEST_MAIN(TestSerialCmdExecutor)
+QTEST_MAIN(TestPooledSerialCmdExecutor)
 #include "tst_serialcmdexecutor.moc"
