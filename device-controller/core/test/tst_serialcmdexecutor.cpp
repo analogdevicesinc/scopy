@@ -13,30 +13,25 @@ class DummyCommand : public Command
 	Q_OBJECT
 public:
 	DummyCommand(int sleepMs = 0, void *resource = nullptr, QObject *parent = nullptr)
-		: Command(AttrRead, resource, parent)
+        : Command(resource, parent)
 		, m_sleepMs(sleepMs)
     {
     }
-
-	void execute() override
-	{
-		Q_EMIT started(this);
-		if(!m_cancelled) {
-			if(m_sleepMs > 0) {
-				QThread::msleep(m_sleepMs);
-			}
-			m_result = Result<void>{};
-			m_order = s_counter++;
-		}
-		Q_EMIT finished(this);
-    }
-
-	QString toString() const override { return QStringLiteral("DummyCommand"); }
 
 	Result<void> result() const { return m_result; }
 	int order() const { return m_order; }
 
 	static void resetCounter() { s_counter = 0; }
+
+protected:
+    void run() override
+    {
+        if(m_sleepMs > 0) {
+            QThread::msleep(m_sleepMs);
+        }
+        m_result = Result<void>{};
+        m_order = s_counter++;
+    }
 
 private:
 	int m_sleepMs;
