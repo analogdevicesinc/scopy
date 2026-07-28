@@ -5,30 +5,20 @@
 
 namespace scopy::iio {
 
-class ChnDisableCommand : public Command {
+class ChnDisableCommand : public Command
+{
 	Q_OBJECT
 public:
-	ChnDisableCommand(IChannelOps *ops, ChannelHandle handle, ChannelsMaskHandle mask,
-			  QObject *parent = nullptr)
-		: Command(ChnDisable, handle.ptr, parent)
+	ChnDisableCommand(IChannelOps *ops, ChannelHandle handle, ChannelsMaskHandle mask, QObject *parent = nullptr)
+		: Command(handle.ptr, parent)
 		, m_ops(ops)
 		, m_handle(handle)
 		, m_mask(mask)
-	{}
-
-	void execute() override
 	{
-		Q_EMIT started(this);
-		if(!m_cancelled) {
-			m_ops->disable(m_handle, m_mask);
-		}
-		Q_EMIT finished(this);
 	}
 
-	QString toString() const override
-	{
-		return QStringLiteral("ChnDisable(handle=%1)").arg(quintptr(m_handle.ptr));
-	}
+protected:
+	void run() override { m_ops->disable(m_handle, m_mask); }
 
 private:
 	IChannelOps *m_ops;
