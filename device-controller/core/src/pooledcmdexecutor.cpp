@@ -1,25 +1,26 @@
-#include "core/concurrentcmdexecutor.h"
+#include "core/pooledcmdexecutor.h"
 #include "core/command.h"
+#include <QtConcurrent>
 
 namespace scopy {
 
-ConcurrentCmdExecutor::ConcurrentCmdExecutor(int maxThreads, QObject *parent)
+PooledCmdExecutor::PooledCmdExecutor(int maxThreads, QObject *parent)
 	: QObject(parent)
 {
 	m_pool.setMaxThreadCount(maxThreads);
 }
 
-ConcurrentCmdExecutor::~ConcurrentCmdExecutor()
+PooledCmdExecutor::~PooledCmdExecutor()
 {
-	ConcurrentCmdExecutor::cancelAll();
+	PooledCmdExecutor::cancelAll();
 	m_pool.waitForDone();
 	QMutexLocker lock(&m_mutex);
 	qDeleteAll(m_pending);
 }
 
-QFuture<void> ConcurrentCmdExecutor::execute(Command *cmd)
+QFuture<void> PooledCmdExecutor::execute(Command *cmd)
 {
-    if(!cmd) {
+	if(!cmd) {
 		return {};
 	}
 	{
@@ -32,20 +33,30 @@ QFuture<void> ConcurrentCmdExecutor::execute(Command *cmd)
 	m_pool.start([this, cmd, promise]() {
 		{
 			QMutexLocker lock(&m_mutex);
-			if(cmd) {
-				m_pending.removeOne(cmd);
-			}
+            if(cmd) {
+                m_pending.removeOne(cmd);
+            }
 		}
 		if(!cmd->isCancelled()) {
 			cmd->execute();
 		}
 		promise->finish();
 	});
-
 	return promise->future();
 }
 
-void ConcurrentCmdExecutor::cancelByResource(void *resource)
+void PooledCmdExecutor::cancelById(const QUuid &id)
+{
+	QMutexLocker lock(&m_mutex);
+	for(Command *cmd : std::as_const(m_pending)) {
+		if(cmd->id() == id) {
+			cmd->cancel();
+			break;
+		}
+	}
+}
+
+void PooledCmdExecutor::cancelByResource(void *resource)
 {
 	QMutexLocker lock(&m_mutex);
 	for(Command *cmd : std::as_const(m_pending)) {
@@ -55,7 +66,7 @@ void ConcurrentCmdExecutor::cancelByResource(void *resource)
 	}
 }
 
-void ConcurrentCmdExecutor::cancelAll()
+void PooledCmdExecutor::cancelAll()
 {
 	QMutexLocker lock(&m_mutex);
 	for(Command *cmd : std::as_const(m_pending)) {
@@ -63,7 +74,7 @@ void ConcurrentCmdExecutor::cancelAll()
 	}
 }
 
-int ConcurrentCmdExecutor::pendingCount() const
+int PooledCmdExecutor::pendingCount() const
 {
 	QMutexLocker lock(&m_mutex);
 	return m_pending.size();
