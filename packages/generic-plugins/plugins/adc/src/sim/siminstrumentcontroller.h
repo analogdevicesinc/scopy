@@ -11,6 +11,9 @@
 #include "PlutoIIOSource.h"
 #include "M2kLogicSource.h"
 #include <core/acq_engine/ScaleOffsetProcessor.h>
+#include <core/acq_engine/TriggerBinder.h>
+#include <core/acq_engine/TriggerProcessor.h>
+#include <core/acq_engine/TriggerProcessorWidget.h>
 #include "SimulatedSource.h"
 
 struct iio_context;
@@ -19,6 +22,8 @@ namespace scopy { class GenalyzerPanel; }
 
 #include <QElapsedTimer>
 #include <QLabel>
+#include <QMap>
+#include <QMutex>
 #include <QObject>
 #include <QPointer>
 #include <QTimer>
@@ -28,6 +33,7 @@ namespace scopy { class GenalyzerPanel; }
 
 #include <gui/cursorcontroller.h>
 #include <gui/plotautoscaler.h>
+#include <gui/plotaxishandle.h>
 #include <gui/plotchannel.h>
 #include <pluginbase/toolmenuentry.h>
 
@@ -72,8 +78,22 @@ private Q_SLOTS:
 	// Reads selected axis keys from DataStore → updates the single PlotChannel → replots.
 	void onCycleComplete();
 
+	// Called (queued) when the TriggerProcessor fires. Reads the exact
+	// fire-cycle chunk out of the snapshot payload (captured on the worker
+	// thread before the next cycle) instead of the live store.
+	void onTriggerFired(quint32 sampleIndex,
+			    QMap<QString, scopy::acq::SampleVariant> snapshot);
+
 private:
 	void refreshPlotAxis();
+	// Swap which signal drives the plot update path. Idempotent.
+	void setTriggerReplotEnabled(bool en);
+
+	// Reset all GUI-side data caches so a new run doesn't inherit any
+	// pointer aliasing to the previous run's buffers. Also detaches Qwt
+	// from any stale raw-sample pointer that might still be held.
+	// Called from requestRun / requestSingle right after m_store->clear().
+	void resetLiveBuffers();
 
 	// Enable/disable a PlotChannel and add/remove it from the autoscalers
 	// atomically. Idempotent — no-op if the driven state hasn't changed.
@@ -90,6 +110,9 @@ private:
 	scopy::acq::GenalyzerFFTProcessor  *m_fftProc{nullptr};
 	scopy::acq::MathSource             *m_mathSrc{nullptr};
 	scopy::acq::MathProcessor          *m_mathProc{nullptr};
+	scopy::acq::TriggerProcessor       *m_trigProc{nullptr};
+	scopy::acq::TriggerProcessorWidget *m_trigWidget{nullptr};
+	scopy::acq::TriggerBinder          *m_trigBinder{nullptr};
 	scopy::adc::DecoderManager           *m_decoderMgr{nullptr};
 	scopy::adc::DecoderPanel             *m_decoderPanel{nullptr};
 	scopy::adc::DecoderOverlay           *m_decoderOverlay{nullptr};
@@ -117,10 +140,13 @@ private:
 	scopy::acq::SampleVariant m_liveX,  m_liveY,  m_liveX2,  m_liveY2;
 	QVector<float>            m_scratchX, m_scratchY, m_scratchX2, m_scratchY2;
 
-	int m_plotSize{1024};
+	// Fire-cycle snapshot delivered inside the trigger's fired() signal.
+	// While non-empty, onCycleComplete reads windows from this map instead
+	// of the live DataStore, so single-shot / trigger-replot modes plot
+	// exactly the cycle that fired. Cleared after each fire is rendered.
+	QMap<QString, scopy::acq::SampleVariant> m_firedSnapshot;
 
-	// Tracks the last seen key set so onCycleComplete() can refresh combos only on change.
-	QList<scopy::acq::DataKey> m_lastKeys;
+	int m_plotSize{1024};
 
 	scopy::gui::PlotAutoscaler *m_autoscalerY{nullptr};
 	scopy::gui::PlotAutoscaler *m_autoscalerX{nullptr};
@@ -133,6 +159,64 @@ private:
 
 	QTimer *m_displayTimer{nullptr};
 	bool    m_dataDirty{false};
+
+	// When trigger-driven replot is active we save the engine's original
+	// maxFPS + Mode so we can restore them on disable. During trigger-replot
+	// the engine's maxFPS is forced to 0 (loop free-runs) and Mode is forced
+	// to Continuous (no per-cycle sleep on the Triggered branch, no need to
+	// gate cycleComplete emission).
+	bool                                m_triggerReplotEnabled{false};
+	unsigned int                        m_savedMaxFPS{0};
+	scopy::acq::AcquisitionEngine::Mode m_savedMode{
+		scopy::acq::AcquisitionEngine::Mode::Continuous};
+	QMetaObject::Connection m_cycleConn;
+
+	// Trigger sample-position indicator. Draggable when the trigger is in
+	// sample-specific mode; read-only/hidden otherwise. Position is in the
+	// plot's current X-axis unit (index / time / freq); the controller
+	// maps it back to a chunk sample index for the processor via the
+	// latest X-array snapshot of the selected X key.
+	scopy::PlotAxisHandle *m_triggerHandle{nullptr};
+	// Latest X-axis snapshot used for coord mapping: matches the current
+	// X-key selection. When empty, sample-index semantics apply.
+	QVector<float> m_lastPlotX;
+
+	// Scan-mode X-axis anchoring. The handle's *fractional* position on the
+	// canvas (0 = left edge, 1 = right edge) is the single source of truth
+	// for where the fired sample must appear. On every fire and on every
+	// user drag we recompute the X-interval so that
+	//     axisPosForSample(m_lastFiredSample) == xMin + m_handleFraction * W
+	// where W = xMax - xMin (owned by the autoscaler / X-key). External
+	// axis changes (autoscaler, refreshPlotAxis) trigger axisScaleUpdated
+	// which we hook to re-assert the invariant.
+	double  m_handleFraction{0.5};
+	quint32 m_lastFiredSample{0};
+	bool    m_haveLastFired{false};
+
+	// Recursion guard: align() calls setInterval() which fires
+	// axisScaleUpdated → onAxisScaleUpdated() which would call align()
+	// again. Set while we're the ones changing the interval.
+	bool m_aligning{false};
+
+	// True when the trigger processor is enabled AND in scan mode
+	// (non-sample-specific). Used to gate axis-anchoring behaviour.
+	bool scanActive() const;
+
+	// Map a chunk sample index → current X-axis position, using the last
+	// captured X-key snapshot (m_lastPlotX). Falls back to identity when
+	// the snapshot is empty or the index is out of range.
+	double axisPosForSample(quint32 s) const;
+
+	// Single source of truth for scan-mode alignment. Shifts the X
+	// interval so the fired sample lands at m_handleFraction of the
+	// canvas, then reprojects the handle onto that axis-value. No-op
+	// unless scanActive() && m_haveLastFired.
+	void align();
+
+	// Handler for xAxis::axisScaleUpdated. When something *else* (the
+	// autoscaler, refreshPlotAxis, user pan/zoom) changed the interval,
+	// re-align so the fired sample stays under the handle.
+	void onAxisScaleUpdated();
 
 	// Waterfall: currently active data key (set dynamically from curveYKey(2)).
 	scopy::acq::DataKey m_fftWaterfallKey;

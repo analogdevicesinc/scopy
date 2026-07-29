@@ -155,6 +155,8 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 	auto *settingsLay   = new QVBoxLayout(settingsInner);
 	settingsLay->setContentsMargins(8, 8, 8, 8);
 	settingsLay->setSpacing(8);
+	m_settingsInner    = settingsInner;
+	m_settingsInnerLay = settingsLay;
 
 	// -- Engine group --
 	auto *engineGroup = new QGroupBox("Engine", settingsInner);
@@ -304,6 +306,45 @@ void SimInstrument::registerDecoderPanel(QWidget *panel)
 	m_tool->rightStack()->add("decoder-panel", panel);
 	m_panelBtns.append(m_decoderBtn);
 	wirePanelButton(m_decoderBtn, "decoder-panel");
+}
+
+void SimInstrument::addGlobalProcessorGroup(scopy::acq::ProcessorBlock *proc)
+{
+	if(!proc || !m_settingsInnerLay || !m_settingsInner)
+		return;
+
+	// Strip the trailing stretch (last item) so the new group appears above
+	// it. If for any reason the last item isn't a stretch we leave it alone.
+	QLayoutItem *last = m_settingsInnerLay->itemAt(m_settingsInnerLay->count() - 1);
+	if(last && last->spacerItem())
+		delete m_settingsInnerLay->takeAt(m_settingsInnerLay->count() - 1);
+
+	auto *group = new QGroupBox(proc->name(), m_settingsInner);
+	auto *gLay  = new QVBoxLayout(group);
+	gLay->setContentsMargins(4, 4, 4, 4);
+	QWidget *w = proc->createSettingsWidget(group);
+	if(w)
+		gLay->addWidget(w);
+	m_settingsInnerLay->addWidget(group);
+	m_settingsInnerLay->addStretch();
+}
+
+void SimInstrument::addGlobalWidgetGroup(const QString &title, QWidget *body)
+{
+	if(!body || !m_settingsInnerLay || !m_settingsInner)
+		return;
+
+	QLayoutItem *last = m_settingsInnerLay->itemAt(m_settingsInnerLay->count() - 1);
+	if(last && last->spacerItem())
+		delete m_settingsInnerLay->takeAt(m_settingsInnerLay->count() - 1);
+
+	auto *group = new QGroupBox(title, m_settingsInner);
+	auto *gLay  = new QVBoxLayout(group);
+	gLay->setContentsMargins(4, 4, 4, 4);
+	body->setParent(group);
+	gLay->addWidget(body);
+	m_settingsInnerLay->addWidget(group);
+	m_settingsInnerLay->addStretch();
 }
 
 QString SimInstrument::curveXKey(int i) const
