@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16)
 
 # Cross-compilation toolchain for armhf (ARM32 hard-float) from x86_64 Uses Ubuntu cross-compiler with Kuiper Linux
 # sysroot

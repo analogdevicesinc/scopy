@@ -18,7 +18,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16)
 
 set(SCOPY_MODULE rfpowermeter)
 set(CURRENT_PKG_PATH ${CMAKE_CURRENT_SOURCE_DIR})

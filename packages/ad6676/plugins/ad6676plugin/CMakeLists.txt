@@ -18,7 +18,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16)
 
 set(SCOPY_MODULE ad6676plugin)
 
@@ -32,7 +32,7 @@ set(PLUGIN_DESCRIPTION "AD6676 Wideband IF Receiver Plugin")
 
 include(GenerateExportHeader)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC ON)
