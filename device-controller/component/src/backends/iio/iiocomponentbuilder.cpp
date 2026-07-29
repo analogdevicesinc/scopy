@@ -6,10 +6,15 @@
 #include "component/backends/iio/iiochannel.h"
 #include "component/backends/iio/iiocontext.h"
 #include "component/backends/iio/iiodevice.h"
+#include "component/backends/iio/iioinputstream.h"
+#include "component/backends/iio/iiooutputstream.h"
 #include "component/backends/iio/iioping.h"
+#include "component/backends/iio/iiosamplecodec.h"
+#include "component/backends/iio/iioscanelement.h"
 
 #include "iioutil/iattrops.h"
 #include "iioutil/ibackend.h"
+#include "iioutil/ibufferops.h"
 #include "iioutil/ichannelops.h"
 #include "iioutil/icontextops.h"
 #include "iioutil/ideviceops.h"
@@ -79,6 +84,7 @@ void IIOComponentBuilder::buildOneDevice(IIOContext *iioCtx, scopy::iio::DeviceH
 	buildDeviceAttributes(dev, executor);
 	buildDebugAttributes(dev, executor);
 	buildChannels(dev, executor);
+	buildStreams(dev, executor);
 }
 
 void IIOComponentBuilder::buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor)
@@ -127,6 +133,64 @@ void IIOComponentBuilder::buildChannels(IIODevice *dev, ICmdExecutor *executor)
 		for(unsigned int i = 0; i < attrs; ++i) {
 			const QString name = chOps->attrName(ch, i);
 			makeAttribute(chan, name, m_attrOps->channelAttr(ch, name), executor);
+		}
+
+		if(chOps->isScanElement(ch)) {
+			new IIOSampleCodec(chOps, ch, chan);
+		}
+	}
+}
+
+void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
+{
+	auto *devOps = m_backend->deviceOps();
+	auto *chOps = m_backend->channelOps();
+	auto *bufOps = m_backend->bufferOps();
+	const auto dh = dev->handle();
+
+	const unsigned int count = devOps->channelsCount(dh);
+	QList<scopy::iio::ChannelHandle> inputs, outputs;
+	for(unsigned int c = 0; c < count; ++c) {
+		const scopy::iio::ChannelHandle ch = devOps->getChannel(dh, c);
+		if(!ch.ptr || !chOps->isScanElement(ch)) {
+			continue;
+		}
+		(chOps->isOutput(ch) ? outputs : inputs).append(ch);
+	}
+
+	const int nbChannels = static_cast<int>(count);
+
+	if(!inputs.isEmpty()) {
+		auto *stream = new IIOInputStream(bufOps, chOps, dh, nbChannels, executor, dev);
+		for(const scopy::iio::ChannelHandle ch : inputs) {
+			auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
+			el->setIndex(chOps->index(ch));
+			el->setName(chOps->name(ch));
+			el->setIsOutput(false);
+		}
+		buildBufferAttributes(stream, dh, executor);
+	}
+	if(!outputs.isEmpty()) {
+		auto *stream = new IIOOutputStream(bufOps, chOps, dh, nbChannels, executor, dev);
+		for(const scopy::iio::ChannelHandle ch : outputs) {
+			auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
+			el->setIndex(chOps->index(ch));
+			el->setName(chOps->name(ch));
+			el->setIsOutput(true);
+		}
+		buildBufferAttributes(stream, dh, executor);
+	}
+}
+
+void IIOComponentBuilder::buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, ICmdExecutor *executor)
+{
+	auto *devOps = m_backend->deviceOps();
+	const unsigned int buffers = devOps->buffersCount(dh);
+	for(unsigned int b = 0; b < buffers; ++b) {
+		const unsigned int attrs = devOps->bufferAttrsCount(dh, b);
+		for(unsigned int i = 0; i < attrs; ++i) {
+			const QString name = devOps->bufferAttrName(dh, b, i);
+			makeAttribute(stream, name, m_attrOps->bufferAttr(dh, b, name), executor);
 		}
 	}
 }
