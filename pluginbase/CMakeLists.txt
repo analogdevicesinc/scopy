@@ -18,7 +18,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16)
 
 set(SCOPY_MODULE pluginbase)
 project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
@@ -27,7 +27,7 @@ include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
