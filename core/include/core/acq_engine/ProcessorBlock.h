@@ -17,8 +17,6 @@ class QWidget;
 namespace scopy {
 namespace acq {
 
-class AcquisitionEngine;
-
 class SCOPY_CORE_EXPORT ProcessorBlock : public QObject
 {
 	Q_OBJECT
