@@ -11,12 +11,16 @@
 
 #include <libm2k/digital/m2kdigital.hpp>
 
+#include <algorithm>
+#include <cmath>
+#include <cstring>
 #include <numeric>
 #include <variant>
 #include <vector>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QLoggingCategory>
+#include <QMutexLocker>
 #include <QPen>
 #include <Qt>
 #include <plotlegend.h>
@@ -107,6 +111,24 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	m_mathProc->setOutputKey(scopy::acq::DataKey::withStage("math-src", "out", "proc"));
 	m_mathProc->setWatchedKeys({m_mathSrc->outputKey()});
 	m_engine->addProcessor(m_mathProc);
+
+	// ---- Trigger processor ----
+	// Disabled by default so behaviour is byte-identical to today; the user
+	// enables it from the "Trigger" settings group. When enabled the
+	// controller switches its replot path from cycleComplete to fired.
+	// Starts with no conditions — the user adds them from the widget.
+	m_trigProc = new scopy::acq::TriggerProcessor("trigger", m_engine);
+	m_trigProc->setEnabled(false);
+	m_engine->addProcessor(m_trigProc);
+
+	// Standardized trigger ↔ engine wiring. All fire deliveries reach the
+	// GUI through the binder's re-emitted signals so we never touch raw
+	// QMetaObject::Connection pointers in call-site lambdas.
+	m_trigBinder = new scopy::acq::TriggerBinder(m_trigProc, m_engine, this);
+	connect(m_trigBinder, &scopy::acq::TriggerBinder::singleShotFired,
+		this, &SimInstrumentController::onTriggerFired);
+	connect(m_trigBinder, &scopy::acq::TriggerBinder::replotFired,
+		this, &SimInstrumentController::onTriggerFired);
 
 	// ---- UI ----
 	m_ui = new SimInstrument(nullptr);
@@ -255,20 +277,40 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// ---- Wire UI buttons → engine ----
 	connect(m_ui, &SimInstrument::requestRun, this, [this]() {
 		if(m_store) m_store->clear();
+		resetLiveBuffers();
 		refreshPlotAxis();
 		m_engine->run();
 	});
 	connect(m_ui, &SimInstrument::requestStop, m_engine, &scopy::acq::AcquisitionEngine::stop);
 	connect(m_ui, &SimInstrument::requestSingle, this, [this]() {
 		if(m_store) m_store->clear();
+		resetLiveBuffers();
 		refreshPlotAxis();
-		const std::size_t n = scopy::acq::DataStore::requiredHistoryDepth(
-			static_cast<std::size_t>(m_plotSize), m_engine->bufferSize());
-		m_engine->single(static_cast<unsigned int>(n));
+		if(m_triggerReplotEnabled) {
+			// Trigger-armed single: arm the binder's one-shot. On fire
+			// it re-emits singleShotFired (→ onTriggerFired plots the
+			// snapshot) and calls engine->stop(). No manual connection
+			// bookkeeping in the call site.
+			{
+				QSignalBlocker b(m_ui->m_singleBtn);
+				m_ui->m_singleBtn->setChecked(false);
+			}
+			if(m_trigBinder)
+				m_trigBinder->armSingleShot();
+			m_engine->run();
+		} else {
+			const std::size_t n = scopy::acq::DataStore::requiredHistoryDepth(
+				static_cast<std::size_t>(m_plotSize), m_engine->bufferSize());
+			m_engine->single(static_cast<unsigned int>(n));
+		}
 	});
 
 	connect(m_ui, &SimInstrument::sampleSizeChanged, this, [this](int n) {
 		m_engine->setBufferSize(static_cast<std::size_t>(n));
+		// targetSample is chunk-local, so its upper bound follows
+		// the engine's buffer size, not the plot window size.
+		if(m_trigWidget)
+			m_trigWidget->setMaxTargetSample(std::max(0, n - 1));
 	});
 	connect(m_ui, &SimInstrument::plotSizeChanged, this, [this](int n) {
 		m_plotSize = std::max(1, n);
@@ -290,9 +332,32 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped,      m_ui, &SimInstrument::onStopped);
 	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, m_ui, &SimInstrument::onForceStopped);
 
+	// Trigger label follows acquisition run state. "triggered" is only
+	// ever shown post-stop when a fire arrived during the run; during
+	// the run the label stays at "waiting" (enabled) / "idle" (disabled).
+	auto reportAcqRunning = [this](bool running) {
+		if(m_trigWidget)
+			m_trigWidget->setAcquisitionRunning(running);
+	};
+	connect(m_engine, &scopy::acq::AcquisitionEngine::started, this,
+		[reportAcqRunning]() { reportAcqRunning(true); });
+	connect(m_engine, &scopy::acq::AcquisitionEngine::stopped, this,
+		[reportAcqRunning]() { reportAcqRunning(false); });
+	connect(m_engine, &scopy::acq::AcquisitionEngine::forceStopped, this,
+		[reportAcqRunning]() { reportAcqRunning(false); });
+
 	// ---- Wire engine cycleComplete → plot update ----
-	connect(m_engine, &scopy::acq::AcquisitionEngine::cycleComplete,
-		this, &SimInstrumentController::onCycleComplete, Qt::QueuedConnection);
+	// The exact source of "replot now" is swappable at runtime — when the
+	// trigger is enabled we switch to TriggerProcessor::fired instead. See
+	// setTriggerReplotEnabled().
+	m_cycleConn = connect(m_engine, &scopy::acq::AcquisitionEngine::cycleComplete,
+		this, &SimInstrumentController::onCycleComplete,
+		Qt::QueuedConnection);
+
+	// Follow the processor's enable state so the user can flip trigger mode
+	// on/off directly from the trigger's own settings widget.
+	connect(m_trigProc, &scopy::acq::ProcessorBlock::enabledChanged, this,
+		[this](bool en) { setTriggerReplotEnabled(en); });
 
 	// ---- Log errors ----
 	connect(m_engine, &scopy::acq::AcquisitionEngine::error, this,
@@ -385,6 +450,157 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	m_ui->buildControlPanel(m_engine, {curve1, curve2, wfDesc});
 
+	// Trigger settings live in a global (non-curve) group at the bottom of
+	// the Settings panel. Build the widget manually so we can wire it to
+	// the DataStore's keysChanged signal for live key-combo refresh.
+	if(m_trigProc) {
+		auto *body = new QWidget(m_ui);
+		auto *lay  = new QVBoxLayout(body);
+		lay->setContentsMargins(0, 0, 0, 0);
+		lay->setSpacing(4);
+		// Base ProcessorBlock widget (enable checkbox etc.) — call the
+		// base virtual explicitly to avoid TriggerProcessor's override
+		// creating a second TriggerProcessorWidget internally.
+		lay->addWidget(m_trigProc->ProcessorBlock::createSettingsWidget(body));
+		m_trigWidget = new scopy::acq::TriggerProcessorWidget(m_trigProc, body);
+		lay->addWidget(m_trigWidget);
+		m_ui->addGlobalWidgetGroup(m_trigProc->name(), body);
+		m_trigWidget->setMaxTargetSample(
+			std::max(0, static_cast<int>(m_engine->bufferSize()) - 1));
+	}
+
+	// ---- Trigger sample-position handle on plot X axis ----
+	// Visible only when the trigger processor is in sample-specific mode.
+	// Draggable in that mode → writes back to processor via setTargetSample.
+	// Otherwise repositioned by fired(atSample) as a read-only indicator.
+	if(m_trigProc && m_ui && m_ui->m_plot && m_ui->m_plot->xAxis()) {
+		m_triggerHandle = new scopy::PlotAxisHandle(m_ui->m_plot, m_ui->m_plot->xAxis());
+		m_triggerHandle->handle()->setBarVisibility(scopy::BarVisibility::ALWAYS);
+		// Sample-specific mode: handle sits below the plot canvas so it
+		// doesn't collide with the top toolbar / channel labels.
+		m_triggerHandle->handle()->setHandlePos(scopy::HandlePos::SOUTH_OR_EAST);
+		m_ui->m_plot->addPlotAxisHandle(m_triggerHandle);
+		if(auto *ah = m_triggerHandle->handle()) {
+			if(auto *canvas = m_ui->m_plot->plot()->canvas()) {
+				ah->setParent(canvas);
+				ah->resize(canvas->size());
+			}
+		}
+		// Handle is visible whenever the trigger processor is enabled,
+		// regardless of mode. Hidden otherwise.
+		const bool initVis = m_trigProc->isEnabled();
+		m_triggerHandle->setVisible(initVis);
+		if(auto *ah = m_triggerHandle->handle())
+			ah->setVisible(initVis);
+
+		// Drag semantics:
+		//   • sample-specific: handle is a sample-index picker.
+		//   • scan mode: user just picked a new canvas fraction — the
+		//     handle stays where the user put it, and the axis shifts
+		//     so the fired sample lands under it. If no fire has been
+		//     recorded yet we only remember the fraction; the next
+		//     fire will realign.
+		connect(m_triggerHandle, &scopy::PlotAxisHandle::scalePosChanged, this,
+			[this](double pos) {
+				if(!m_trigProc) return;
+				if(m_trigProc->sampleSpecific()) {
+					// Convert axis position to a plot-window index,
+					// then to a chunk-local index (targetSample lives
+					// in chunk coordinates, matching the fired()
+					// payload).
+					const int chunkSize = m_engine
+						? static_cast<int>(m_engine->bufferSize())
+						: m_plotSize;
+					const int rightEdge = m_lastPlotX.isEmpty()
+						? m_plotSize
+						: m_lastPlotX.size();
+					int plotIdx;
+					if(m_lastPlotX.isEmpty()) {
+						plotIdx = static_cast<int>(std::round(pos));
+					} else {
+						// Nearest-neighbor along X array.
+						const float t = static_cast<float>(pos);
+						int best = 0;
+						float bestDist = std::abs(m_lastPlotX[0] - t);
+						for(int i = 1; i < m_lastPlotX.size(); ++i) {
+							const float d = std::abs(m_lastPlotX[i] - t);
+							if(d < bestDist) { bestDist = d; best = i; }
+						}
+						plotIdx = best;
+					}
+					plotIdx = std::clamp(plotIdx, 0, std::max(0, rightEdge - 1));
+					const int chunkIdx = std::clamp(
+						plotIdx - (rightEdge - chunkSize),
+						0, std::max(0, chunkSize - 1));
+					m_trigProc->setTargetSample(static_cast<quint32>(chunkIdx));
+				} else {
+					// Convert axis-space drop position back to a
+					// canvas fraction using the current interval.
+					if(!m_ui || !m_ui->m_plot || !m_ui->m_plot->xAxis())
+						return;
+					auto *ax = m_ui->m_plot->xAxis();
+					const double W = ax->max() - ax->min();
+					if(W <= 0.0) return;
+					m_handleFraction = std::clamp((pos - ax->min()) / W, 0.0, 1.0);
+					align();
+					if(m_ui && m_ui->m_plot) m_ui->m_plot->replot();
+				}
+			});
+
+		// Fire:
+		//   • sample-specific: snap handle to fired sample (indicator).
+		//   • scan mode: cache fired sample and align axis so it lands
+		//     at the handle's current fraction.
+		connect(m_trigProc, &scopy::acq::TriggerProcessor::fired, this,
+			[this](quint32 atSample) {
+				if(!m_triggerHandle) return;
+				if(m_trigProc && m_trigProc->sampleSpecific()) {
+					m_triggerHandle->setPositionSilent(axisPosForSample(atSample));
+				} else {
+					m_lastFiredSample = atSample;
+					m_haveLastFired   = true;
+					align();
+				}
+			}, Qt::QueuedConnection);
+
+		// Mode toggle: update visibility. In sample-specific mode the
+		// handle snaps to the current target (picker/indicator). In
+		// scan mode the handle keeps its fraction; alignment happens
+		// on the next fire.
+		connect(m_trigProc, &scopy::acq::TriggerProcessor::sampleSpecificChanged, this,
+			[this](bool on) {
+				if(!m_triggerHandle) return;
+				const bool vis = m_trigProc->isEnabled();
+				m_triggerHandle->setVisible(vis);
+				if(auto *ah = m_triggerHandle->handle())
+					ah->setVisible(vis);
+				if(on) {
+					m_triggerHandle->setPositionSilent(
+						axisPosForSample(m_trigProc->targetSample()));
+				} else {
+					// Entering scan mode: drop stale fire anchor.
+					// Fraction is preserved — user's chosen handle
+					// position carries over.
+					m_haveLastFired = false;
+				}
+				if(m_ui && m_ui->m_plot) m_ui->m_plot->replot();
+			});
+
+		// Programmatic target change (spinbox / single-shot latch).
+		connect(m_trigProc, &scopy::acq::TriggerProcessor::targetSampleChanged, this,
+			[this](quint32 s) {
+				if(!m_triggerHandle) return;
+				m_triggerHandle->setPositionSilent(axisPosForSample(s));
+			});
+
+		// External axis-scale changes (autoscaler tick, refreshPlotAxis,
+		// user pan/zoom) would otherwise slide the fired sample out from
+		// under the handle. Re-align on every scale update; the m_aligning
+		// guard breaks recursion when the source is our own setInterval().
+		connect(m_ui->m_plot->xAxis(), &PlotAxis::axisScaleUpdated, this,
+			&SimInstrumentController::onAxisScaleUpdated);
+	}
+
 	// ---- Decoders panel (right stack) ----
 	m_decoderPanel = new DecoderPanel(m_decoderMgr, m_store,
 	                                  m_decoderCatalog.get(), m_ui);
@@ -409,6 +625,42 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 			m_store->setHistorySize(m_fftWaterfallKey, static_cast<std::size_t>(rows));
 	});
 
+	// ---- Central DataStore key-set → GUI wiring ----
+	// Every consumer that needs the current key list subscribes here rather
+	// than polling from onCycleComplete(). keysChanged is emitted from the
+	// engine worker thread on new-key insertion (see DataStore::write) and
+	// on removal/reset, so cross-thread delivery uses Qt::QueuedConnection.
+	connect(m_store, &scopy::acq::DataStore::keysChanged, this,
+		[this](const QList<scopy::acq::DataKey> &keys) {
+			if(m_ui)
+				m_ui->updateCurveKeyCombos(keys);
+			if(m_decoderPanel)
+				m_decoderPanel->refreshKeys(keys);
+			if(m_trigWidget) {
+				QStringList sl;
+				sl.reserve(keys.size());
+				for(const auto &k : keys)
+					sl << k.key;
+				m_trigWidget->setAvailableKeys(sl);
+			}
+		}, Qt::QueuedConnection);
+
+	// Prime the GUI with whatever keys already exist (usually none at init,
+	// but harmless if the store was pre-populated).
+	{
+		const QList<scopy::acq::DataKey> keys = m_store->keys();
+		m_ui->updateCurveKeyCombos(keys);
+		if(m_decoderPanel)
+			m_decoderPanel->refreshKeys(keys);
+		if(m_trigWidget) {
+			QStringList sl;
+			sl.reserve(keys.size());
+			for(const auto &k : keys)
+				sl << k.key;
+			m_trigWidget->setAvailableKeys(sl);
+		}
+	}
+
 	refreshPlotAxis();
 }
 
@@ -416,11 +668,19 @@ void SimInstrumentController::stop()
 {
 	if(!m_engine)
 		return;
+	// Restore the engine's saved maxFPS and reconnect cycleComplete if we
+	// were in trigger-replot mode. This keeps the engine in a well-known
+	// state across start/stop cycles.
+	if(m_triggerReplotEnabled)
+		setTriggerReplotEnabled(false);
+	if(m_trigBinder)
+		m_trigBinder->disarmSingleShot();
 	if(m_displayTimer)
 		m_displayTimer->stop();
-	disconnect(m_engine, &scopy::acq::AcquisitionEngine::cycleComplete,
-		   this, &SimInstrumentController::onCycleComplete);
-	QCoreApplication::removePostedEvents(this);
+	if(m_cycleConn) {
+		disconnect(m_cycleConn);
+		m_cycleConn = {};
+	}
 	m_engine->stop();
 	m_dataDirty = false;
 }
@@ -441,6 +701,193 @@ void SimInstrumentController::refreshPlotAxis()
 	}
 
 	m_ui->m_plot->xAxis()->setInterval(0.0, static_cast<double>(m_plotSize - 1));
+}
+
+bool SimInstrumentController::scanActive() const
+{
+	return m_trigProc && m_trigProc->isEnabled() && !m_trigProc->sampleSpecific();
+}
+
+double SimInstrumentController::axisPosForSample(quint32 s) const
+{
+	// `s` is a chunk-local index emitted by TriggerProcessor::fired
+	// (0..bufferSize-1). The plot window aggregates one or more chunks
+	// with the newest on the right, so the newest chunk occupies the
+	// rightmost `bufferSize` positions of m_lastPlotX (or of the
+	// [0..m_plotSize-1] index axis when no X-key is selected).
+	const int chunkSize = m_engine
+		? static_cast<int>(m_engine->bufferSize())
+		: m_plotSize;
+	// Right-edge of the plot window measured in whichever units we live in:
+	//   • X-key selected:  m_lastPlotX.size()
+	//   • sample-index:    m_plotSize
+	const int rightEdge = m_lastPlotX.isEmpty()
+		? m_plotSize
+		: m_lastPlotX.size();
+	const int chunkIdx  = std::clamp(static_cast<int>(s), 0, std::max(0, chunkSize - 1));
+	const int plotIdx   = rightEdge - chunkSize + chunkIdx;
+	if(plotIdx < 0)
+		return m_lastPlotX.isEmpty() ? 0.0 : static_cast<double>(m_lastPlotX.first());
+	const int clamped = std::clamp(plotIdx, 0, std::max(0, rightEdge - 1));
+	if(m_lastPlotX.isEmpty())
+		return static_cast<double>(clamped);
+	return static_cast<double>(m_lastPlotX[clamped]);
+}
+
+void SimInstrumentController::align()
+{
+	if(m_aligning) return;
+	if(!scanActive() || !m_haveLastFired || !m_triggerHandle)
+		return;
+	if(!m_ui || !m_ui->m_plot || !m_ui->m_plot->xAxis())
+		return;
+	auto *ax = m_ui->m_plot->xAxis();
+	const double W = ax->max() - ax->min();
+	if(W <= 0.0)
+		return;
+	const double firedX = axisPosForSample(m_lastFiredSample);
+	const double frac   = std::clamp(m_handleFraction, 0.0, 1.0);
+	const double newMin = firedX - frac * W;
+
+	m_aligning = true;
+	ax->setInterval(newMin, newMin + W);
+	// Glue the handle onto the fired sample's axis value. axisScaleUpdated
+	// from setInterval() will fire onAxisScaleUpdated(), but m_aligning
+	// short-circuits it.
+	m_triggerHandle->setPositionSilent(firedX);
+	m_aligning = false;
+}
+
+void SimInstrumentController::onAxisScaleUpdated()
+{
+	if(m_aligning) return;
+	if(!scanActive() || !m_haveLastFired) return;
+	// External change to the interval (autoscaler / refreshPlotAxis /
+	// pan / zoom). Re-assert the invariant: fired sample under handle
+	// at m_handleFraction.
+	align();
+}
+
+void SimInstrumentController::resetLiveBuffers()
+{
+	// Drop all cached read windows so no prior-run buffer is reachable
+	// through m_live[X|Y|X2|Y2] on the next cycle.
+	m_liveX  = QVector<float>{};
+	m_liveY  = QVector<float>{};
+	m_liveX2 = QVector<float>{};
+	m_liveY2 = QVector<float>{};
+	m_scratchX.clear();
+	m_scratchY.clear();
+	m_scratchX2.clear();
+	m_scratchY2.clear();
+	m_lastPlotX.clear();
+
+	// Also drop any pending fire snapshot: it's no longer relevant to
+	// the fresh run.
+	m_firedSnapshot.clear();
+
+	// Detach Qwt curves from whatever pointers they were holding. With
+	// copy=true this is defensive rather than strictly needed, but it
+	// also makes the plot visually blank until fresh data arrives —
+	// preferable to briefly showing the previous run's tail. We pass a
+	// single dummy sample rather than size=0 to sidestep any Qwt path
+	// that dereferences the data pointer even for empty ranges.
+	static const float kZero = 0.0f;
+	if(m_curve)
+		m_curve->setSamples(&kZero, &kZero, 0, true);
+	if(m_curve2)
+		m_curve2->setSamples(&kZero, &kZero, 0, true);
+}
+
+void SimInstrumentController::setTriggerReplotEnabled(bool en)
+{
+	if(en == m_triggerReplotEnabled)
+		return;
+	m_triggerReplotEnabled = en;
+
+	if(en) {
+		// Force engine to free-run: setMaxFPS(0) removes the per-cycle
+		// sleep on the Triggered branch of the loop; Continuous never
+		// sleeps. We also force Mode::Continuous — with the trigger
+		// gating replot, per-cycle emission is what we want.
+		m_savedMaxFPS = m_engine->maxFPS();
+		m_savedMode   = m_engine->mode();
+		m_engine->setMaxFPS(0);
+		m_engine->setMode(scopy::acq::AcquisitionEngine::Mode::Continuous);
+		if(m_ui && m_ui->m_modeCombo) {
+			QSignalBlocker b(m_ui->m_modeCombo);
+			m_ui->m_modeCombo->setCurrentIndex(0); // Continuous
+		}
+
+		// Disconnect cycleComplete — only trigger fires should mark data
+		// dirty. Otherwise every free-running cycle would replot.
+		if(m_cycleConn) {
+			disconnect(m_cycleConn);
+			m_cycleConn = {};
+		}
+
+		// Keep m_displayTimer running: it enforces the replot rate cap.
+		// Trigger fires only mark m_dataDirty; the timer coalesces them
+		// to at most 1 replot every 1000/savedMaxFPS ms.
+		if(m_displayTimer) {
+			const int intervalMs = (m_savedMaxFPS > 0)
+				? std::max(1, 1000 / static_cast<int>(m_savedMaxFPS))
+				: 16;
+			m_displayTimer->setInterval(intervalMs);
+		}
+
+		if(m_trigBinder)
+			m_trigBinder->bindReplotOnFire();
+
+		// Entering scan mode: drop stale anchor. The handle keeps its
+		// current position — the axis will move to align with it on
+		// the next fire.
+		if(scanActive())
+			m_haveLastFired = false;
+		if(m_triggerHandle) {
+			m_triggerHandle->setVisible(true);
+			if(auto *ah = m_triggerHandle->handle())
+				ah->setVisible(true);
+			if(m_ui && m_ui->m_plot) m_ui->m_plot->replot();
+		}
+	} else {
+		if(m_trigBinder)
+			m_trigBinder->unbindReplotOnFire();
+		if(m_triggerHandle) {
+			m_haveLastFired = false;
+			m_triggerHandle->setVisible(false);
+			if(auto *ah = m_triggerHandle->handle())
+				ah->setVisible(false);
+			if(m_ui && m_ui->m_plot) m_ui->m_plot->replot();
+		}
+		m_engine->setMaxFPS(m_savedMaxFPS);
+		m_engine->setMode(m_savedMode);
+		if(m_ui && m_ui->m_modeCombo) {
+			QSignalBlocker b(m_ui->m_modeCombo);
+			m_ui->m_modeCombo->setCurrentIndex(
+				m_savedMode == scopy::acq::AcquisitionEngine::Mode::Continuous ? 0 : 1);
+		}
+		if(!m_cycleConn)
+			m_cycleConn = connect(m_engine,
+				&scopy::acq::AcquisitionEngine::cycleComplete,
+				this, &SimInstrumentController::onCycleComplete,
+				Qt::QueuedConnection);
+		if(m_displayTimer)
+			m_displayTimer->setInterval(16);
+	}
+}
+
+void SimInstrumentController::onTriggerFired(quint32 /*sampleIndex*/,
+	QMap<QString, scopy::acq::SampleVariant> snapshot)
+{
+	if(!m_ui || !m_engine)
+		return;
+	// Route reads through the fire-time snapshot delivered inside the
+	// fired() signal so we plot the exact cycle that fired, not
+	// whatever the free-running worker has since replaced it with.
+	m_firedSnapshot = std::move(snapshot);
+	onCycleComplete();
+	m_firedSnapshot.clear();
 }
 
 void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)
@@ -494,14 +941,8 @@ void SimInstrumentController::onCycleComplete()
 		m_fpsTimer.restart();
 	}
 
-	// Refresh combos if the key set changed
-	const QList<scopy::acq::DataKey> currentKeys = m_store->keys();
-	if(currentKeys != m_lastKeys) {
-		m_lastKeys = currentKeys;
-		m_ui->updateCurveKeyCombos(currentKeys);
-		if(m_decoderPanel)
-			m_decoderPanel->refreshKeys(currentKeys);
-	}
+	// Key-set refresh is now driven by DataStore::keysChanged (see init()).
+	// No per-cycle polling here.
 
 	// Refresh the DataStore inspector panel every cycle
 	m_ui->refreshDatastoreView(m_store);
@@ -520,13 +961,28 @@ void SimInstrumentController::onCycleComplete()
 	const bool x2IsIndex = x2KeyStr.isEmpty();
 	const bool y2IsIndex = y2KeyStr.isEmpty();
 
-	if(!xIsIndex)  m_liveX  = m_store->readWindowNative(scopy::acq::DataKey(xKeyStr),  m_plotSize);
+	// When a trigger fire is being serviced, prefer the fire-time snapshot
+	// delivered inside the fired() signal over the live store. The store
+	// may already contain newer chunks that displaced the fire-cycle's
+	// data from history (armed-continuous is free-running).
+	auto readWindow = [this](const QString &keyStr) -> scopy::acq::SampleVariant {
+		if(!m_firedSnapshot.isEmpty()) {
+			auto it = m_firedSnapshot.constFind(keyStr);
+			if(it != m_firedSnapshot.constEnd())
+				return it.value();
+			// Fall through to live read for keys not present in the
+			// snapshot (e.g. GUI added a new curve after the fire).
+		}
+		return m_store->readWindowNative(scopy::acq::DataKey(keyStr), m_plotSize);
+	};
+
+	if(!xIsIndex)  m_liveX  = readWindow(xKeyStr);
 	else           m_liveX  = QVector<float>{};
-	if(!yIsIndex)  m_liveY  = m_store->readWindowNative(scopy::acq::DataKey(yKeyStr),  m_plotSize);
+	if(!yIsIndex)  m_liveY  = readWindow(yKeyStr);
 	else           m_liveY  = QVector<float>{};
-	if(!x2IsIndex) m_liveX2 = m_store->readWindowNative(scopy::acq::DataKey(x2KeyStr), m_plotSize);
+	if(!x2IsIndex) m_liveX2 = readWindow(x2KeyStr);
 	else           m_liveX2 = QVector<float>{};
-	if(!y2IsIndex) m_liveY2 = m_store->readWindowNative(scopy::acq::DataKey(y2KeyStr), m_plotSize);
+	if(!y2IsIndex) m_liveY2 = readWindow(y2KeyStr);
 	else           m_liveY2 = QVector<float>{};
 
 	auto toFloatView = [](const scopy::acq::SampleVariant &v,
@@ -559,6 +1015,17 @@ void SimInstrumentController::onCycleComplete()
 				      : toFloatView(m_liveX2, m_scratchX2);
 	const auto y2View = y2IsIndex ? std::pair<const float *, int>{nullptr, 0}
 				      : toFloatView(m_liveY2, m_scratchY2);
+
+	// Snapshot the current X-axis array so the trigger handle can map
+	// its scale-space position (axis units) to a chunk sample index and
+	// vice versa. Empty when the user selected "Sample Index" — mapping
+	// then falls back to identity.
+	if(xIsIndex) {
+		m_lastPlotX.clear();
+	} else if(xView.first && xView.second > 0) {
+		m_lastPlotX.resize(xView.second);
+		std::memcpy(m_lastPlotX.data(), xView.first, xView.second * sizeof(float));
+	}
 
 	// Map annotation sample indices [0..m_plotSize) proportionally across
 	// whatever x-scale the plot currently uses, so decoder annotations
@@ -600,7 +1067,11 @@ void SimInstrumentController::onCycleComplete()
 	const float *xPtr = xIsIndex ? (m_indexBuf.data() + idxOffset) : xView.first;
 	const float *yPtr = yIsIndex ? (m_indexBuf.data() + idxOffset) : yView.first;
 
-	m_curve->setSamples(xPtr, yPtr, static_cast<size_t>(n), false);
+	// copy=true: Qwt keeps its own buffer. Prevents stale-pointer aliasing
+	// on m_liveX/Y across Stop/Run boundaries and out-of-band replots
+	// (decoder overlay, digital tracks, trigger handle drags) that could
+	// otherwise paint the tail of a prior run.
+	m_curve->setSamples(xPtr, yPtr, static_cast<size_t>(n), true);
 
 	// Curve 2
 	[&] {
@@ -626,7 +1097,7 @@ void SimInstrumentController::onCycleComplete()
 			n2    = qMin(n2, x2View.second);
 			x2Ptr = x2View.first;
 		}
-		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), false);
+		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
 	}();
 
 	// Feed waterfall from the key selected in the Waterfall Y combo (index 2).
