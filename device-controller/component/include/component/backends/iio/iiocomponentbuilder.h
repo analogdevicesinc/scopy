@@ -39,6 +39,8 @@ private:
 	void buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor);
 	void buildDebugAttributes(IIODevice *dev, ICmdExecutor *executor);
 	void buildChannels(IIODevice *dev, ICmdExecutor *executor);
+	void buildStreams(IIODevice *dev, ICmdExecutor *executor);
+	void buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, ICmdExecutor *executor);
 
 	scopy::component::Attribute *makeAttribute(QObject *parent, const QString &attrName,
 						   scopy::iio::AttrHandle handle, ICmdExecutor *executor,
