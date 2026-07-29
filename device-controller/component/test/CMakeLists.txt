@@ -8,3 +8,4 @@ endmacro()
 
 add_component_test(tst_component_attribute)
 add_component_test(tst_component_controller)
+add_component_test(tst_component_stream)
