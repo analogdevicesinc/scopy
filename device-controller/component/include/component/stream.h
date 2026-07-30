@@ -22,6 +22,7 @@ class Stream : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(bool isOpen READ isOpen NOTIFY openedChanged)
+	Q_PROPERTY(unsigned bufferIndex READ bufferIndex CONSTANT)
 	Q_PROPERTY(QList<int> enabledChannels READ enabledChannels CONSTANT)
 	Q_PROPERTY(quint64 samplesCount READ samplesCount CONSTANT)
 public:
@@ -35,6 +36,9 @@ public:
 	virtual void close() = 0;
 
 	bool isOpen() const { return m_open; }
+	// Which device buffer this stream drives. Distinguishes sibling streams of the
+	// same direction on a multi-buffer device (libiio v1). 0 for single-buffer.
+	unsigned bufferIndex() const { return m_bufferIndex; }
 	const StreamConfig &config() const { return m_config; }
 	QList<int> enabledChannels() const { return m_config.enabledChannels; }
 	size_t samplesCount() const { return m_config.samplesCount; }
@@ -46,6 +50,26 @@ Q_SIGNALS:
 protected:
 	StreamConfig m_config;
 	bool m_open = false;
+	unsigned m_bufferIndex = 0;
 };
+
+// Discovery helpers. A device may hold several same-direction streams (one per
+// device buffer on libiio v1), so callers must not assume uniqueness: enumerate
+// with streamsOf<T>() and disambiguate by bufferIndex, or fetch one directly with
+// streamAt<T>(). T is InputStream / OutputStream (direction) or a concrete leaf.
+template <typename T> QList<T *> streamsOf(const QObject *device)
+{
+	return device ? device->findChildren<T *>(QString(), Qt::FindDirectChildrenOnly) : QList<T *>{};
+}
+
+template <typename T> T *streamAt(const QObject *device, unsigned bufferIndex = 0)
+{
+	for(T *s : streamsOf<T>(device)) {
+		if(s->bufferIndex() == bufferIndex) {
+			return s;
+		}
+	}
+	return nullptr;
+}
 
 } // namespace scopy::component

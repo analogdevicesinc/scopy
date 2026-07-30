@@ -22,7 +22,7 @@ class IIOInputStream : public InputStream
 	Q_PROPERTY(unsigned kernelBuffers READ kernelBuffers CONSTANT)
 public:
 	IIOInputStream(scopy::iio::IBufferOps *bufOps, scopy::iio::IChannelOps *chOps, scopy::iio::DeviceHandle dev,
-		       int nbChannels, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
+		       int nbChannels, unsigned bufferIndex, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
 	~IIOInputStream() override;
 
 	scopy::iio::ChannelsMaskHandle mask() const { return m_mask; }

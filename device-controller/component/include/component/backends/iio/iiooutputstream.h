@@ -23,7 +23,7 @@ class IIOOutputStream : public OutputStream
 	Q_PROPERTY(bool cyclic READ cyclic CONSTANT)
 public:
 	IIOOutputStream(scopy::iio::IBufferOps *bufOps, scopy::iio::IChannelOps *chOps, scopy::iio::DeviceHandle dev,
-			int nbChannels, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
+			int nbChannels, unsigned bufferIndex, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
 	~IIOOutputStream() override;
 
 	scopy::iio::ChannelsMaskHandle mask() const { return m_mask; }

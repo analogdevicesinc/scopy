@@ -23,6 +23,8 @@
 #include "iioutil/icontextops.h"
 #include "iioutil/ideviceops.h"
 
+#include <algorithm>
+
 using namespace scopy;
 using namespace scopy::component::iio;
 
@@ -105,8 +107,8 @@ void IIOComponentBuilder::buildTrigger(IIODevice *dev, ICmdExecutor *executor)
 	}
 
 	// A trigger gates acquisition, so only a device with an input stream can be
-	// assigned one. buildStreams ran above, so the stream child (if any) is present.
-	if(dev->findChild<IIOInputStream *>(QString(), Qt::FindDirectChildrenOnly)) {
+	// assigned one. buildStreams ran above, so the stream children (if any) are present.
+	if(!scopy::component::streamsOf<IIOInputStream>(dev).isEmpty()) {
 		new IIOTriggerable(devOps, dh, executor, dev);
 	}
 }
@@ -190,38 +192,42 @@ void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
 
 	const int nbChannels = static_cast<int>(count);
 
-	if(!inputs.isEmpty()) {
-		auto *stream = new IIOInputStream(bufOps, chOps, dh, nbChannels, executor, dev);
-		for(const scopy::iio::ChannelHandle ch : inputs) {
-			auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
-			el->setIndex(chOps->index(ch));
-            el->setId(chOps->id(ch));
-			el->setIsOutput(false);
+	// libiio v1 exposes multiple buffers per device; attach one stream per buffer
+	// index per present direction, each with its own mask and scan elements. A
+	// single-buffer device (buffersCount 0 or 1) collapses to one stream per direction.
+	const unsigned buffers = std::max(1u, devOps->buffersCount(dh));
+	for(unsigned b = 0; b < buffers; ++b) {
+		if(!inputs.isEmpty()) {
+			auto *stream = new IIOInputStream(bufOps, chOps, dh, nbChannels, b, executor, dev);
+			for(const scopy::iio::ChannelHandle ch : inputs) {
+				auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
+				el->setIndex(chOps->index(ch));
+                el->setId(chOps->id(ch));
+				el->setIsOutput(false);
+			}
+			buildBufferAttributes(stream, dh, b, executor);
 		}
-		buildBufferAttributes(stream, dh, executor);
-	}
-	if(!outputs.isEmpty()) {
-		auto *stream = new IIOOutputStream(bufOps, chOps, dh, nbChannels, executor, dev);
-		for(const scopy::iio::ChannelHandle ch : outputs) {
-			auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
-			el->setIndex(chOps->index(ch));
-            el->setId(chOps->id(ch));
-			el->setIsOutput(true);
+		if(!outputs.isEmpty()) {
+			auto *stream = new IIOOutputStream(bufOps, chOps, dh, nbChannels, b, executor, dev);
+			for(const scopy::iio::ChannelHandle ch : outputs) {
+				auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
+				el->setIndex(chOps->index(ch));
+                el->setId(chOps->id(ch));
+				el->setIsOutput(true);
+			}
+			buildBufferAttributes(stream, dh, b, executor);
 		}
-		buildBufferAttributes(stream, dh, executor);
 	}
 }
 
-void IIOComponentBuilder::buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, ICmdExecutor *executor)
+void IIOComponentBuilder::buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, unsigned int bufferIndex,
+						ICmdExecutor *executor)
 {
 	auto *devOps = m_backend->deviceOps();
-	const unsigned int buffers = devOps->buffersCount(dh);
-	for(unsigned int b = 0; b < buffers; ++b) {
-		const unsigned int attrs = devOps->bufferAttrsCount(dh, b);
-		for(unsigned int i = 0; i < attrs; ++i) {
-			const QString name = devOps->bufferAttrName(dh, b, i);
-			makeAttribute(stream, name, m_attrOps->bufferAttr(dh, b, name), executor);
-		}
+	const unsigned int attrs = devOps->bufferAttrsCount(dh, bufferIndex);
+	for(unsigned int i = 0; i < attrs; ++i) {
+		const QString name = devOps->bufferAttrName(dh, bufferIndex, i);
+		makeAttribute(stream, name, m_attrOps->bufferAttr(dh, bufferIndex, name), executor);
 	}
 }
 
