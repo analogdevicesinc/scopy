@@ -71,7 +71,7 @@ RegisterController::RegisterController(QWidget *parent)
 	addressPicker->setMaximum(INT_MAX);
 	addressPicker->setPrefix("0x");
 	addressPicker->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	QObject::connect(addressPicker, &QSpinBox::textChanged, this, [=](QString address) {
+	QObject::connect(addressPicker, &QSpinBox::textChanged, this, [this](QString address) {
 		Q_EMIT registerAddressChanged(Utils::convertQStringToUint32(address));
 	});
 	readWidgetLayout->addLayout(readWidgetLeftLayout, 3);
@@ -79,7 +79,7 @@ RegisterController::RegisterController(QWidget *parent)
 	readButton = new QPushButton("Read", readWidget);
 	// request read
 	QObject::connect(readButton, &QPushButton::clicked, this,
-			 [=]() { Q_EMIT requestRead(Utils::convertQStringToUint32(addressPicker->text())); });
+			 [this]() { Q_EMIT requestRead(Utils::convertQStringToUint32(addressPicker->text())); });
 
 	readWidgetLayout->addWidget(readButton, 1, Qt::AlignRight);
 
@@ -110,7 +110,7 @@ RegisterController::RegisterController(QWidget *parent)
 	Style::setStyle(writeWidget, style::properties::regmap::registercontroller);
 	writeButton = new QPushButton("Write", writeWidget);
 	// request write on register
-	QObject::connect(writeButton, &QPushButton::clicked, this, [=]() {
+	QObject::connect(writeButton, &QPushButton::clicked, this, [this]() {
 		uint32_t address = addressPicker->value();
 		uint32_t value = Utils::convertQStringToUint32(regValue->text());
 		Q_EMIT requestWrite(address, value);
@@ -189,7 +189,7 @@ void RegisterController::startTutorial()
 	registerMapTutorial =
 		new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "register_controller", parent);
 
-	connect(registerMapTutorial, &gui::TutorialBuilder::finished, this, [=]() { Q_EMIT tutorialFinished(); });
+	connect(registerMapTutorial, &gui::TutorialBuilder::finished, this, [this]() { Q_EMIT tutorialFinished(); });
 	connect(registerMapTutorial, &gui::TutorialBuilder::aborted, this, &RegisterController::tutorialAborted);
 
 	registerMapTutorial->setTitle("Tutorial");
@@ -203,7 +203,7 @@ void RegisterController::startSimpleTutorial()
 							     "simple_register_controller", parent);
 
 	connect(registerMapSimpleTutorial, &gui::TutorialBuilder::finished, this,
-		[=]() { Q_EMIT simpleTutorialFinished(); });
+		[this]() { Q_EMIT simpleTutorialFinished(); });
 
 	connect(registerMapSimpleTutorial, &gui::TutorialBuilder::aborted, this, &RegisterController::tutorialAborted);
 

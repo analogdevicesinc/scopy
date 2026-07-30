@@ -90,7 +90,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
 	readInterval->setEnabled(false);
 
-	QObject::connect(readInterval, &QPushButton::clicked, this, [=]() {
+	QObject::connect(readInterval, &QPushButton::clicked, this, [this]() {
 		int startInterval = Utils::convertQStringToUint32(startReadInterval->text());
 		int endInterval = Utils::convertQStringToUint32(endReadInterval->text());
 		for(int i = startInterval; i <= endInterval; i++) {
@@ -98,7 +98,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 		}
 	});
 
-	QObject::connect(startReadInterval, &QLineEdit::textChanged, this, [=]() {
+	QObject::connect(startReadInterval, &QLineEdit::textChanged, this, [this]() {
 		if(!startReadInterval->text().isEmpty() && !endReadInterval->text().isEmpty()) {
 			readInterval->setEnabled(true);
 		} else {
@@ -106,7 +106,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 		}
 	});
 
-	QObject::connect(endReadInterval, &QLineEdit::textChanged, this, [=]() {
+	QObject::connect(endReadInterval, &QLineEdit::textChanged, this, [this]() {
 		if(!startReadInterval->text().isEmpty() && !endReadInterval->text().isEmpty()) {
 			readInterval->setEnabled(true);
 		} else {

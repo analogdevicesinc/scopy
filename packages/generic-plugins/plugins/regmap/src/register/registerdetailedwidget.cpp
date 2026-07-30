@@ -99,7 +99,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 			col = 0;
 		}
 		QObject::connect(bitFieldDetailedWidget, &BitFieldDetailedWidget::valueUpdated, this,
-				 [=]() { Q_EMIT bitFieldValueChanged(getBitFieldsValue()); });
+				 [this]() { Q_EMIT bitFieldValueChanged(getBitFieldsValue()); });
 	}
 	// add spacers to keep the shape of the detailed bitfileds when the number of bitfields didn't fill a row
 	if(row == 1) {

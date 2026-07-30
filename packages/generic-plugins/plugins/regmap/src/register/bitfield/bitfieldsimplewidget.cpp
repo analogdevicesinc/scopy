@@ -86,7 +86,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 	setLayout(mainFrameLayout);
 
 	Preferences *p = Preferences::GetInstance();
-	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
+	QObject::connect(p, &Preferences::preferenceChanged, this, [this](QString id, QVariant var) {
 		if(id.contains("regmap")) {
 			applyStyle();
 		}

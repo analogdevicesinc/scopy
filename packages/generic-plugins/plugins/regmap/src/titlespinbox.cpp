@@ -71,8 +71,9 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 
 	spinBox = new QSpinBox(spinboxWidget);
 	spinBox->setButtonSymbols(spinBox->ButtonSymbols::NoButtons);
-	connect(spinBoxUpButton, &QPushButton::clicked, spinBox, [=]() { spinBox->setValue(spinBox->value() + 1); });
-	connect(spinBoxDownButton, &QPushButton::clicked, spinBox, [=]() { spinBox->setValue(spinBox->value() - 1); });
+	connect(spinBoxUpButton, &QPushButton::clicked, spinBox, [this]() { spinBox->setValue(spinBox->value() + 1); });
+	connect(spinBoxDownButton, &QPushButton::clicked, spinBox,
+		[this]() { spinBox->setValue(spinBox->value() - 1); });
 
 	spinboxWidgetLayout->addWidget(titleLabel);
 	spinboxWidgetLayout->addWidget(spinBox);

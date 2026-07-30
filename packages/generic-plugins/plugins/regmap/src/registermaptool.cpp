@@ -71,9 +71,9 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	InfoBtn *infoBtn = new InfoBtn(this, true);
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 
-	connect(infoBtn, &InfoBtn::clicked, this, [=]() {
+	connect(infoBtn, &InfoBtn::clicked, this, [this, infoBtn]() {
 		infoBtn->generateInfoPopup(this);
-		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [=]() {
+		connect(infoBtn->getTutorialButton(), &QPushButton::clicked, this, [this]() {
 			if(searchBarWidget->isVisible()) {
 				startTutorial();
 			} else {
@@ -81,7 +81,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 			}
 		});
 
-		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, [=]() {
+		connect(infoBtn->getDocumentationButton(), &QAbstractButton::clicked, this, []() {
 			QDesktopServices::openUrl(
 				QUrl("https://analogdevicesinc.github.io/scopy/plugins/registermap/registermap.html"));
 		});
@@ -99,7 +99,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	settingsMenu = new GearBtn(this);
 	Style::setStyle(settingsMenu, style::properties::button::squareIconButton, true, true);
 
-	connect(settingsMenu, &QAbstractButton::toggled, this, [=](bool toggled) {
+	connect(settingsMenu, &QAbstractButton::toggled, this, [this](bool toggled) {
 		tool->openRightContainerHelper(toggled);
 		tool->requestMenu("settings");
 	});
@@ -120,7 +120,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->getContainerSpacer(tool->topContainerMenuControl())
 		->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam) {
+	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [this](QString searchParam) {
 		deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
 	});
 

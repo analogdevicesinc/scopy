@@ -51,7 +51,7 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 	QString iconPath = ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/search.svg";
 	searchButton->setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
 
-	connect(searchButton, &QPushButton::toggled, this, [=](bool toggle) {
+	connect(searchButton, &QPushButton::toggled, this, [this, iconPath](bool toggle) {
 		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
 		searchButton->setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
@@ -61,7 +61,7 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 	QObject::connect(searchBar, &QLineEdit::returnPressed, searchButton, &QPushButton::pressed);
 
 	QObject::connect(searchButton, &QPushButton::pressed, this,
-			 [=]() { Q_EMIT requestSearch(searchBar->text().toLower()); });
+			 [this]() { Q_EMIT requestSearch(searchBar->text().toLower()); });
 	layout->addWidget(searchBar);
 	layout->addWidget(searchButton);
 
