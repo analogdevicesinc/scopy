@@ -78,12 +78,16 @@ QCoro::Task<void> IIOInputStream::closeInternal()
 	if(!m_open || !m_buffer.ptr) {
 		co_return;
 	}
-	m_bufOps->cancelBuffer(m_buffer);
-	auto *cmd = new scopy::iio::BufferCloseCommand(m_bufOps, m_buffer);
-	co_await m_executor->execute(cmd);
-	cmd->deleteLater();
+	// Invalidate state up-front: cancelBuffer unblocks any in-flight refill, and
+	// clearing m_open/m_buffer before the co_await (which pumps the event loop)
+	// fences the refill completion off the now-dead buffer.
+	const scopy::iio::BufferHandle buffer = m_buffer;
 	m_buffer = {};
 	m_open = false;
+	m_bufOps->cancelBuffer(buffer);
+	auto *cmd = new scopy::iio::BufferCloseCommand(m_bufOps, buffer);
+	co_await m_executor->execute(cmd);
+	cmd->deleteLater();
 	Q_EMIT openedChanged(false);
 }
 
@@ -94,6 +98,11 @@ QCoro::Task<Result<void>> IIOInputStream::refillInternal(scopy::iio::BufferRefil
 	co_return co_await runCommand(
 		m_executor, cmd,
 		[this](const Result<void> &) {
+			// close() may have run while this refill was in flight (waitFor
+			// pumps the event loop): the buffer is gone, so don't decode it.
+			if(!m_open || !m_buffer.ptr) {
+				return;
+			}
 			buildStreamFormat();
 			Q_EMIT refillSucceeded();
 		},
