@@ -25,26 +25,23 @@ class IIOScanElement : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(long index READ index CONSTANT)
+	Q_PROPERTY(QString id READ id CONSTANT)
 	Q_PROPERTY(bool isOutput READ isOutput CONSTANT)
 public:
-	IIOScanElement(scopy::iio::IChannelOps *ops, scopy::iio::ChannelHandle handle, scopy::iio::ChannelsMaskHandle mask,
-		       scopy::ICmdExecutor *executor, QObject *parent = nullptr);
+    IIOScanElement(scopy::iio::IChannelOps *ops, scopy::iio::ChannelHandle handle,
+               scopy::iio::ChannelsMaskHandle mask, scopy::ICmdExecutor *executor, QObject *parent = nullptr);
 
 	long index() const { return m_index; }
-	QString name() const { return m_name; }
+	QString id() const { return m_id; }
 	bool isOutput() const { return m_isOutput; }
 	scopy::iio::ChannelHandle channelHandle() const { return m_handle; }
 
-	void setIndex(long index)
-	{
-		m_index = index;
-		refreshObjectName();
-	}
-	void setName(const QString &name)
-	{
-		m_name = name;
-		refreshObjectName();
-	}
+    void setIndex(long index)
+    {
+        m_index = index;
+        setObjectName("Scan element " + QString::number(m_index));
+    }
+    void setId(const QString &id) { m_id = id; }
 	void setIsOutput(bool isOutput) { m_isOutput = isOutput; }
 
 	Result<void> enable(bool en);
@@ -56,7 +53,6 @@ Q_SIGNALS:
 	void enableFailed(const scopy::Error &error);
 
 private:
-	void refreshObjectName() { setObjectName(m_name + QString::number(m_index)); }
 	scopy::Command *makeCommand(bool en);
 	QCoro::Task<Result<void>> enableInternal(scopy::Command *cmd, bool en);
 
@@ -65,7 +61,7 @@ private:
 	scopy::iio::ChannelsMaskHandle m_mask;
 	scopy::ICmdExecutor *m_executor;
 	long m_index = -1;
-	QString m_name;
+	QString m_id;
 	bool m_isOutput = false;
 };
 
