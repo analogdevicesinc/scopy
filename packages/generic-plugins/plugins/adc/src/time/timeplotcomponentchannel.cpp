@@ -87,7 +87,7 @@ void adc::TimePlotComponentChannel ::initPlotComponent(PlotComponent *pc)
 	m_timePlotAxisHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
 	m_timePlotAxisHandle->handle()->setColor(m_ch->pen().color());
 
-	connect(m_timePlotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+	connect(m_timePlotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [this](double pos) {
 		double min = m_timePlotYAxis->min() - pos;
 		double max = m_timePlotYAxis->max() - pos;
 		m_timePlotYAxis->setInterval(min, max);
@@ -106,9 +106,9 @@ void adc::TimePlotComponentChannel ::initPlotComponent(PlotComponent *pc)
 
 	// Sync curve style from time plot channel to XY plot channel
 	connect(m_timePlotCh, &PlotChannel::thicknessChanged, this,
-		[=]() { m_xyPlotCh->setThickness(m_timePlotCh->thickness()); });
-	connect(m_timePlotCh, &PlotChannel::styleChanged, this, [=]() { m_xyPlotCh->setStyle(m_timePlotCh->style()); });
-	connect(m_timePlotCh, &PlotChannel::penChanged, this, [=]() {
+		[this]() { m_xyPlotCh->setThickness(m_timePlotCh->thickness()); });
+	connect(m_timePlotCh, &PlotChannel::styleChanged, this, [this]() { m_xyPlotCh->setStyle(m_timePlotCh->style()); });
+	connect(m_timePlotCh, &PlotChannel::penChanged, this, [this]() {
 		QColor color = m_timePlotCh->pen().color();
 		m_xyPlotCh->setColor(color);
 		m_timePlotAxisHandle->handle()->setColor(color);
@@ -116,7 +116,7 @@ void adc::TimePlotComponentChannel ::initPlotComponent(PlotComponent *pc)
 	});
 
 	// Sync name changes from ChannelComponent to PlotChannels
-	connect(m_ch, &ChannelComponent::nameChanged, this, [=](const QString &name) {
+	connect(m_ch, &ChannelComponent::nameChanged, this, [this](const QString &name) {
 		m_timePlotCh->setName(name);
 		m_xyPlotCh->setName(name);
 		m_ch->ctrl()->setName(name);

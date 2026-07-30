@@ -203,7 +203,7 @@ void GRDeviceComponent::createMenuControlButton(QWidget *parent)
 void GRDeviceComponent::setupDeviceOnOffSwitch()
 {
 	m_ctrl->enableOnOffSwitch(true);
-	connect(m_ctrl->onOffSwitch(), &SmallOnOffSwitch::toggled, this, [=](bool en) {
+	connect(m_ctrl->onOffSwitch(), &SmallOnOffSwitch::toggled, this, [this](bool en) {
 		for(auto ch : m_channels) {
 			ch->ctrl()->checkBox()->setChecked(en);
 		}

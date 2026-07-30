@@ -60,7 +60,7 @@ void ADCFFTInstrumentController::init()
 
 	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 
-	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [=](uint32_t uuid) {
+	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [this, m_cursorSettings](uint32_t uuid) {
 		auto fftPlt = dynamic_cast<FFTPlotComponent *>(m_plotComponentManager->plot(uuid));
 
 		auto cursorController = fftPlt->cursor();
@@ -89,7 +89,7 @@ void ADCFFTInstrumentController::init()
 	analyzeHoverSettings->setAnchorOffset(QPoint(0, -10));
 
 	connect(m_ui->m_analyze->button(), &QAbstractButton::toggled, analyzeHoverSettings, &HoverWidget::setVisible);
-	connect(m_ui->m_analyze, &QAbstractButton::toggled, this, [=](bool checked) {
+	connect(m_ui->m_analyze, &QAbstractButton::toggled, this, [this](bool checked) {
 		m_genalyzerSettings->enableAnalysis(checked);
 		m_plotComponentManager->enableGenalyzerPanel(checked);
 	});
@@ -99,12 +99,12 @@ void ADCFFTInstrumentController::init()
 
 	plotStack->add("fft", m_plotComponentManager);
 	m_ui->getRightStack()->add(m_ui->settingsMenuId, m_fftPlotSettingsComponent);
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::requestOpenMenu, [=]() {
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::requestOpenMenu, [this]() {
 		m_ui->getRightStack()->show(m_ui->settingsMenuId);
 		m_ui->m_settingsBtn->setChecked(true);
 	});
 
-	connect(m_ui->m_printBtn, &QPushButton::clicked, [=]() {
+	connect(m_ui->m_printBtn, &QPushButton::clicked, [this]() {
 		QList<PlotWidget *> plotList;
 
 		for(PlotComponent *pp : m_plotComponentManager->plots()) {
@@ -147,7 +147,7 @@ void ADCFFTInstrumentController::createIIODevice(AcqTreeNode *node)
 	addComponent(d);
 
 	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this,
-		[=](SamplingInfo p) { d->setBufferSize(p.bufferSize); });
+		[d](SamplingInfo p) { d->setBufferSize(p.bufferSize); });
 }
 
 void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
@@ -181,7 +181,7 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [this, c]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
 	dc->addChannel(c);			   // used for sample rate computation
@@ -202,13 +202,13 @@ void ADCFFTInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 		markerName = griiofcn->treeParent()->name() + ":" + c->name();
 	}
 
-	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
+	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [this, c, markerName]() {
 		auto info = c->markerController()->markerInfo();
 		m_plotComponentManager->markerPanel()->updateChannel(markerName, info);
 	});
 
 	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
+	connect(markerController, &PlotMarkerController::markerEnabled, this, [this, c, markerName](bool b) {
 		if(b) {
 			m_plotComponentManager->markerPanel()->newChannel(markerName, c->pen());
 		} else {
@@ -250,7 +250,7 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [this, c]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			   // For matching Sink To Channels
 	dc->addChannel(c);			   // used for sample rate computation
@@ -270,13 +270,13 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 		markerName = griiofcn_I->treeParent()->name() + ":" + c->name();
 	}
 
-	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [=]() {
+	connect(c->markerController(), &PlotMarkerController::markerInfoUpdated, this, [this, c, markerName]() {
 		auto info = c->markerController()->markerInfo();
 		m_plotComponentManager->markerPanel()->updateChannel(markerName, info);
 	});
 
 	auto markerController = dynamic_cast<FFTPlotComponentChannel *>(c->plotChannelCmpt())->markerController();
-	connect(markerController, &PlotMarkerController::markerEnabled, this, [=](bool b) {
+	connect(markerController, &PlotMarkerController::markerEnabled, this, [this, c, markerName](bool b) {
 		if(b) {
 			m_plotComponentManager->markerPanel()->newChannel(markerName, c->pen());
 		} else {
@@ -298,18 +298,18 @@ void ADCFFTInstrumentController::createIIOComplexChannel(AcqTreeNode *node_I, Ac
 
 	// Connect channel enable/disable signals to update genalyzer panel visibility
 	connect(c, &GRFFTChannelComponent::genalyzerChannelEnabled, m_plotComponentManager->genalyzerPanel(),
-		[=](const QString &channelName) {
+		[this](const QString &channelName) {
 			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, true);
 		});
 	connect(c, &GRFFTChannelComponent::genalyzerChannelDisabled, m_plotComponentManager->genalyzerPanel(),
-		[=](const QString &channelName) {
+		[this](const QString &channelName) {
 			m_plotComponentManager->genalyzerPanel()->setChannelVisible(channelName, false);
 		});
 	connect(c, &GRFFTChannelComponent::genalyzerChannelRenamed, m_plotComponentManager->genalyzerPanel(),
 		&GenalyzerPanel::renameChannel);
 
 	connect(c->chData(), &ChannelData::newData, this,
-		[=](const float *xData_, const float *yData_, size_t size, bool copy) {
+		[this, c](const float *xData_, const float *yData_, size_t size, bool copy) {
 			if(m_ui->m_complex->isChecked() && m_plotComponentManager->genalyzerPanel()->isVisible()) {
 				c->triggerGenalyzerAnalysis();
 			}
@@ -324,15 +324,16 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	m_dataProvider = c;
 	c->init();
 
-	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this, [=](SamplingInfo p) {
-		if(m_started) {
-			stop();
-			c->setSamplingInfo(p);
-			start();
-		} else {
-			c->setSamplingInfo(p);
-		}
-	});
+	connect(m_fftPlotSettingsComponent, &FFTPlotManagerSettings::samplingInfoChanged, this,
+		[this, c](SamplingInfo p) {
+			if(m_started) {
+				stop();
+				c->setSamplingInfo(p);
+				start();
+			} else {
+				c->setSamplingInfo(p);
+			}
+		});
 
 	connect(c, &GRFFTSinkComponent::requestSingleShot, this, &ADCFFTInstrumentController::setSingleShot);
 	connect(c, &GRFFTSinkComponent::requestBufferSize, m_fftPlotSettingsComponent,
@@ -341,7 +342,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 
 	connect(m_ui->m_complex, &QAbstractButton::toggled, m_fftPlotSettingsComponent,
 		&FFTPlotManagerSettings::setComplexMode);
-	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [=]() {
+	connect(m_ui->m_complex, &QAbstractButton::toggled, this, [this]() {
 		bool isComplex = m_ui->m_complex->isChecked();
 		m_ui->m_analyze->setVisible(isComplex);
 		if(isComplex) {
@@ -368,7 +369,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 		}
 	});
 
-	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [this](bool b) {
 		setSingleShot(b);
 		if(b && !m_started) {
 			Q_EMIT requestStart();
@@ -381,7 +382,7 @@ void ADCFFTInstrumentController::createFFTSink(AcqTreeNode *node)
 	connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
 	connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
 
-	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
+	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [c](bool b) { c->setSyncMode(b); });
 
 	connect(c, &GRFFTSinkComponent::arm, this, &ADCInstrumentController::onStart);
 	connect(c, &GRFFTSinkComponent::disarm, this, &ADCInstrumentController::onStop);
@@ -405,7 +406,7 @@ void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	m_acqNodeComponentMap[ifcn] = c;
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [this, c]() { m_plotComponentManager->selectChannel(c); });
 
 	c->ctrl()->animateClick();
 
@@ -415,7 +416,7 @@ void ADCFFTInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	setupChannelMeasurement(m_plotComponentManager, c);
 
 	connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
-		[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
+		[c](bool en) { c->ctrl()->checkBox()->setChecked(en); });
 }
 
 bool ADCFFTInstrumentController::getComplexChannelPair(AcqTreeNode *node, AcqTreeNode **node_i, AcqTreeNode **node_q)

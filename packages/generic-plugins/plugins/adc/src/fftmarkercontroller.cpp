@@ -154,7 +154,7 @@ void FFTMarkerController::initFixedMarker()
 		this->m_markerInfo.append(mi);
 		PlotAxisHandle *handle =
 			new PlotAxisHandle(m_ch->plotComponent()->plot(0), m_ch->m_plotComponent->plot(0)->xAxis());
-		connect(handle, &PlotAxisHandle::scalePosChanged, this, [=](double v) {
+		connect(handle, &PlotAxisHandle::scalePosChanged, this, [this, i](double v) {
 			m_markerInfo[i].peak.x = v;
 			computeMarkers();
 		});

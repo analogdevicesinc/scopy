@@ -60,7 +60,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
 	Style::setStyle(plotTitle, style::properties::lineedit::menuLineEdit);
-	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
+	connect(plotTitle, &QLineEdit::textChanged, this, [this](QString s) {
 		m_plotComponent->setName(s);
 		//	plotMenu->setTitle("PLOT - " + s);
 	});
@@ -91,10 +91,10 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
 
-	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [=](double v) { m_yCtrl->setMin(v - 10); });
+	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [this](double v) { m_yCtrl->setMin(v - 10); });
 	// connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [this](bool b) {
 		m_yCtrl->setEnabled(!b);
 		m_autoscaleEnabled = b;
 		toggleAutoScale();
@@ -105,7 +105,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_plotComponent->fftPlot()->yAxis()->getFormatter()->setTwoDecimalMode(false);
 
 	// Sync waterfall intensity (color axis) to the FFT Y-axis range
-	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double minVal, double maxVal) {
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [this](double minVal, double maxVal) {
 		m_plotComponent->waterfallPlot()->setIntensityRange(minVal, maxVal);
 	});
 
@@ -124,7 +124,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_windowCb->combo()->addItem("No Window", gr::fft::window::WIN_RECTANGULAR);
 	m_windowCb->combo()->setCurrentIndex(0);
 
-	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(m_windowCb->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int idx) {
 		for(auto c : std::as_const(m_channels)) {
 			if(dynamic_cast<FFTChannel *>(c)) {
 				FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
@@ -142,15 +142,15 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_waterfallRows->setScaleRange(1, 1);
 	m_waterfallRows->setIncrementMode(MenuSpinbox::IS_FIXED);
 	connect(m_waterfallRows, &MenuSpinbox::valueChanged, this,
-		[=](double val) { m_plotComponent->waterfallPlot()->setNumRows((int)val); });
+		[this](double val) { m_plotComponent->waterfallPlot()->setNumRows((int)val); });
 	m_waterfallRows->setValue(200);
 
 	MenuOnOffSwitch *antialiasingSwitch = new MenuOnOffSwitch("Antialiasing", waterfallSection, false);
 	antialiasingSwitch->onOffswitch()->setChecked(true);
 	connect(antialiasingSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool on) { m_plotComponent->waterfallPlot()->setAntialiasing(on); });
+		[this](bool on) { m_plotComponent->waterfallPlot()->setAntialiasing(on); });
 
-	connect(waterfallSwitch, &QAbstractButton::toggled, this, [=](bool on) {
+	connect(waterfallSwitch, &QAbstractButton::toggled, this, [this](bool on) {
 		m_plotComponent->waterfallPlot()->setWaterfallEnabled(on);
 		m_plotComponent->waterfallDockWrapper()->setActivated(on);
 		if(!on)
@@ -162,11 +162,11 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	m_deletePlot = new QPushButton("Delete Plot");
 	StyleHelper::BasicButton(m_deletePlot);
-	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
+	connect(m_deletePlot, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestDeletePlot(); });
 
 	QPushButton *exportBtn = new QPushButton("Export plot to CSV");
 	StyleHelper::BasicButton(exportBtn);
-	connect(exportBtn, &QPushButton::clicked, this, [=]() {
+	connect(exportBtn, &QPushButton::clicked, this, [this]() {
 		QString csvData = m_plotComponent->fftPlot()->generateCsvData();
 		FileManagerHelper::saveDataToFile(this, csvData, tr("Export Plot Data"));
 	});
@@ -205,14 +205,14 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_deletePlotHover->setMaximumSize(16, 16);
 	m_deletePlotHover->setIcon(QIcon(":/gui/icons/orange_close.svg"));
 
-	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
+	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestDeletePlot(); });
 
 	m_settingsPlotHover = new QPushButton("", nullptr);
 	m_settingsPlotHover->setMaximumSize(16, 16);
 	m_settingsPlotHover->setIcon(
 		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg"));
 
-	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
+	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestSettings(); });
 
 	m_plotComponent->fftPlot()->plotButtonManager()->add(m_deletePlotHover);
 	m_plotComponent->fftPlot()->plotButtonManager()->add(m_settingsPlotHover);
@@ -244,7 +244,7 @@ void FFTPlotComponentSettings::addChannel(ChannelComponent *c)
 	if(dynamic_cast<FFTChannel *>(c)) {
 		FFTChannel *fc = dynamic_cast<FFTChannel *>(c);
 		connections[c] << connect(m_yPwrOffset, &MenuSpinbox::valueChanged, c,
-					  [=](double val) { fc->setPowerOffset(val); });
+					  [fc](double val) { fc->setPowerOffset(val); });
 		fc->setPowerOffset(m_yPwrOffset->value());
 		fc->setWindow(m_windowCb->combo()->currentData().toInt());
 	}

@@ -350,13 +350,13 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCTimeInstrumentController *>(adc),
 			&ADCTimeInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [this, grtp, t, root]() {
 			QMetaObject::invokeMethod(grtp, &GRTopBlock::suspendBuild, Qt::DirectConnection);
 			newInstrument(t, root, grtp);
 			QMetaObject::invokeMethod(grtp, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
 		});
 
-		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [this, ui]() {
 			ToolMenuEntry *t = nullptr;
 			for(auto tool : std::as_const(m_toolList)) {
 				if(tool->tool() == ui) {
@@ -390,13 +390,13 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		connect(root, &AcqTreeNode::deletedChild, dynamic_cast<ADCFFTInstrumentController *>(adc),
 			&ADCFFTInstrumentController::removeChannel, Qt::QueuedConnection);
 
-		connect(ui, &ADCInstrument::requestNewInstrument, this, [=]() {
+		connect(ui, &ADCInstrument::requestNewInstrument, this, [this, grtp, t, root]() {
 			QMetaObject::invokeMethod(grtp, &GRTopBlock::suspendBuild, Qt::DirectConnection);
 			newInstrument(t, root, grtp);
 			QMetaObject::invokeMethod(grtp, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
 		});
 
-		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [=]() {
+		connect(ui, &ADCInstrument::requestDeleteInstrument, this, [this, ui]() {
 			ToolMenuEntry *t = nullptr;
 			for(auto tool : std::as_const(m_toolList)) {
 				if(tool->tool() == ui) {

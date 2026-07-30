@@ -123,16 +123,16 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [this](double min, double max) {
 		m_timePlotComponentChannel->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this, [this](bool b) {
 		m_yLock = b;
 		m_timePlotComponentChannel->lockYAxis(!b);
 	});
 
-	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [this](bool b) {
 		m_yCtrl->setEnabled(!b);
 		m_autoscaleEnabled = b;
 		toggleAutoScale();
@@ -146,14 +146,14 @@ QWidget *GRTimeChannelComponent::createYAxisMenu(QWidget *parent)
 		m_yaxisMenu->contentLayout()->addWidget(m_scaleWidget);
 
 	connect(m_scaleSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-		[=](double value) { setYModeHelper(YMODE_SCALE_OVERRIDE); });
+		[this](double value) { setYModeHelper(YMODE_SCALE_OVERRIDE); });
 
-	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(cb, qOverload<int>(&QComboBox::currentIndexChanged), this, [this, cb](int idx) {
 		auto mode = cb->itemData(idx).toInt();
 		setYMode(static_cast<YMode>(mode));
 	});
 
-	connect(this, &GRTimeChannelComponent::yModeChanged, this, [=]() {
+	connect(this, &GRTimeChannelComponent::yModeChanged, this, [this, cb]() {
 		int idx = cb->currentIndex();
 		int itemcount = cb->count();
 		for(int i = 0; i < itemcount; i++) {
@@ -184,7 +184,7 @@ QPushButton *GRTimeChannelComponent::createSnapshotButton(QWidget *parent)
 	QPushButton *snapBtn = new QPushButton("Snapshot", parent);
 	StyleHelper::BasicButton(snapBtn);
 
-	connect(snapBtn, &QPushButton::clicked, this, [=]() {
+	connect(snapBtn, &QPushButton::clicked, this, [this]() {
 		std::vector<float> x, y;
 		auto data = m_timePlotComponentChannel->m_timePlotCh->curve()->data();
 		for(int i = 0; i < data->size(); i++) {

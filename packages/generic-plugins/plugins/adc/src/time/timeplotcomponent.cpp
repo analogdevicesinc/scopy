@@ -99,7 +99,8 @@ TimePlotComponent::TimePlotComponent(QString name, uint32_t uuid, QWidget *paren
 	m_plotMenu = new TimePlotComponentSettings(this, parent);
 	addComponent(m_plotMenu);
 
-	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
+	connect(m_plotMenu, &TimePlotComponentSettings::requestDeletePlot, this,
+		[this]() { Q_EMIT requestDeletePlot(); });
 	m_cursor = new CursorController(m_timePlot, this);
 	int xCursorPos = Preferences::get("adc_plot_xcursor_position").toInt();
 	int yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt();
@@ -146,16 +147,18 @@ void TimePlotComponent::setXYXChannel(ChannelComponent *c)
 		onXyXNewData(c->chData()->xData(), c->chData()->yData(), c->chData()->size(), true);
 		xyDataConn = connect(c->chData(), &ChannelData::newData, this, &TimePlotComponent::onXyXNewData);
 		cPlotChCmpt->m_xyPlotCh->setEnabled(m_showXSourceOnXy);
-		xyAxisMinConn = connect(cPlotChCmpt->m_timePlotYAxis, &PlotAxis::minChanged, this, [=](double val) {
-			if(!cPlotChCmpt->m_singleYMode) {
-				m_xyPlot->xAxis()->setMin(val);
-			}
-		});
-		xyAxisMaxConn = connect(cPlotChCmpt->m_timePlotYAxis, &PlotAxis::maxChanged, this, [=](double val) {
-			if(!cPlotChCmpt->m_singleYMode) {
-				m_xyPlot->xAxis()->setMax(val);
-			}
-		});
+		xyAxisMinConn = connect(cPlotChCmpt->m_timePlotYAxis, &PlotAxis::minChanged, this,
+					[this, cPlotChCmpt](double val) {
+						if(!cPlotChCmpt->m_singleYMode) {
+							m_xyPlot->xAxis()->setMin(val);
+						}
+					});
+		xyAxisMaxConn = connect(cPlotChCmpt->m_timePlotYAxis, &PlotAxis::maxChanged, this,
+					[this, cPlotChCmpt](double val) {
+						if(!cPlotChCmpt->m_singleYMode) {
+							m_xyPlot->xAxis()->setMax(val);
+						}
+					});
 	}
 }
 

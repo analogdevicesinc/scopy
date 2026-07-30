@@ -79,21 +79,21 @@ QWidget *GRFFTDeviceComponent::createMarkerMenu(QWidget *parent)
 	c.fixedEditSwitch->hide();
 	attachOverrideWarning(c.section);
 
-	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->applyMarkerEnabled(b); });
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [this, c](bool b) {
+		forEachChannel<GRFFTChannelComponent>([b](GRFFTChannelComponent *ch) { ch->applyMarkerEnabled(b); });
 		if(b) {
 			int t = c.typeCombo->combo()->currentData().toInt();
 			forEachChannel<GRFFTChannelComponent>(
-				[=](GRFFTChannelComponent *ch) { ch->applyMarkerType(t); });
+				[t](GRFFTChannelComponent *ch) { ch->applyMarkerType(t); });
 		}
 	});
-	connect(c.typeCombo->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int) {
+	connect(c.typeCombo->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [this, c](int) {
 		int t = c.typeCombo->combo()->currentData().toInt();
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->applyMarkerType(t); });
+		forEachChannel<GRFFTChannelComponent>([t](GRFFTChannelComponent *ch) { ch->applyMarkerType(t); });
 	});
-	connect(c.countSpin, &MenuSpinbox::valueChanged, this, [=](double cnt) {
+	connect(c.countSpin, &MenuSpinbox::valueChanged, this, [this](double cnt) {
 		int n = static_cast<int>(cnt);
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->applyMarkerCount(n); });
+		forEachChannel<GRFFTChannelComponent>([n](GRFFTChannelComponent *ch) { ch->applyMarkerCount(n); });
 	});
 
 	return c.section;
@@ -104,17 +104,17 @@ QWidget *GRFFTDeviceComponent::createAveragingMenu(QWidget *parent)
 	AveragingMenuControls c = buildAveragingMenu(parent);
 	attachOverrideWarning(c.section);
 
-	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->applyAveragingEnabled(b); });
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [this, c](bool b) {
+		forEachChannel<GRFFTChannelComponent>([b](GRFFTChannelComponent *ch) { ch->applyAveragingEnabled(b); });
 		if(b) {
 			int sz = c.sizeSpin->value();
 			forEachChannel<GRFFTChannelComponent>(
-				[=](GRFFTChannelComponent *ch) { ch->applyAveragingSize(sz); });
+				[sz](GRFFTChannelComponent *ch) { ch->applyAveragingSize(sz); });
 		}
 	});
-	connect(c.sizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value) {
+	connect(c.sizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value) {
 		forEachChannel<GRFFTChannelComponent>(
-			[=](GRFFTChannelComponent *ch) { ch->applyAveragingSize(value); });
+			[value](GRFFTChannelComponent *ch) { ch->applyAveragingSize(value); });
 	});
 
 	return c.section;
@@ -125,21 +125,21 @@ QWidget *GRFFTDeviceComponent::createMinMaxHoldMenu(QWidget *parent)
 	MinMaxHoldMenuControls c = buildMinMaxHoldMenu(parent);
 	attachOverrideWarning(c.section);
 
-	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [this](bool b) {
 		forEachChannel<GRFFTChannelComponent>(
-			[=](GRFFTChannelComponent *ch) { ch->applyMinMaxHoldEnabled(b); });
+			[b](GRFFTChannelComponent *ch) { ch->applyMinMaxHoldEnabled(b); });
 	});
-	connect(c.minSwitch, &QCheckBox::toggled, this, [=](bool b) {
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->applyMinHoldEnabled(b); });
+	connect(c.minSwitch, &QCheckBox::toggled, this, [this](bool b) {
+		forEachChannel<GRFFTChannelComponent>([b](GRFFTChannelComponent *ch) { ch->applyMinHoldEnabled(b); });
 	});
-	connect(c.maxSwitch, &QCheckBox::toggled, this, [=](bool b) {
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->applyMaxHoldEnabled(b); });
+	connect(c.maxSwitch, &QCheckBox::toggled, this, [this](bool b) {
+		forEachChannel<GRFFTChannelComponent>([b](GRFFTChannelComponent *ch) { ch->applyMaxHoldEnabled(b); });
 	});
-	connect(c.minReset, &QPushButton::clicked, this, [=]() {
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->resetMinHold(); });
+	connect(c.minReset, &QPushButton::clicked, this, [this]() {
+		forEachChannel<GRFFTChannelComponent>([](GRFFTChannelComponent *ch) { ch->resetMinHold(); });
 	});
-	connect(c.maxReset, &QPushButton::clicked, this, [=]() {
-		forEachChannel<GRFFTChannelComponent>([=](GRFFTChannelComponent *ch) { ch->resetMaxHold(); });
+	connect(c.maxReset, &QPushButton::clicked, this, [this]() {
+		forEachChannel<GRFFTChannelComponent>([](GRFFTChannelComponent *ch) { ch->resetMaxHold(); });
 	});
 
 	return c.section;

@@ -59,7 +59,7 @@ void ADCTimeInstrumentController::init()
 
 	connect(m_ui->m_cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 
-	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [=](uint32_t uuid) {
+	connect(m_plotComponentManager, &PlotManager::plotAdded, this, [this, m_cursorSettings](uint32_t uuid) {
 		auto cursorController = m_plotComponentManager->plot(uuid)->cursor();
 		cursorController->connectSignals(m_cursorSettings);
 		connect(m_ui->m_cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
@@ -78,12 +78,12 @@ void ADCTimeInstrumentController::init()
 	plotStack->add("time", m_plotComponentManager);
 	m_ui->getRightStack()->add(m_ui->settingsMenuId, m_timePlotSettingsComponent);
 
-	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::requestOpenMenu, [=]() {
+	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::requestOpenMenu, [this]() {
 		m_ui->getRightStack()->show(m_ui->settingsMenuId);
 		m_ui->m_settingsBtn->setChecked(true);
 	});
 
-	connect(m_ui->m_printBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_ui->m_printBtn, &QPushButton::clicked, this, [this]() {
 		QList<PlotWidget *> plotList;
 
 		for(PlotComponent *pp : m_plotComponentManager->plots()) {
@@ -132,7 +132,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	connect(m_timePlotSettingsComponent, &TimePlotManagerSettings::samplingInfoChanged, c,
 		&GRTimeSinkComponent::setSamplingInfo);
 
-	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_ui->m_singleBtn, &QAbstractButton::toggled, this, [this](bool b) {
 		setSingleShot(b);
 		if(b && !m_started) {
 			Q_EMIT requestStart();
@@ -145,7 +145,7 @@ void ADCTimeInstrumentController::createTimeSink(AcqTreeNode *node)
 	connect(m_ui, &ADCInstrument::requestStop, this, &ADCInstrumentController::requestStop);
 	connect(this, &ADCInstrumentController::requestStop, this, &ADCInstrumentController::stop);
 
-	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [=](bool b) { c->setSyncMode(b); });
+	connect(m_ui->m_sync, &QAbstractButton::toggled, this, [c](bool b) { c->setSyncMode(b); });
 
 	connect(c, &GRTimeSinkComponent::arm, this, &ADCInstrumentController::onStart);
 	connect(c, &GRTimeSinkComponent::disarm, this, &ADCInstrumentController::onStop);
@@ -202,7 +202,7 @@ void ADCTimeInstrumentController::createIIOFloatChannel(AcqTreeNode *node)
 
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [this, c]() { m_plotComponentManager->selectChannel(c); });
 
 	grtsc->addChannel(c);			    // For matching Sink To Channels
 	dc->addChannel(c);			    // used for sample rate computation
@@ -231,7 +231,7 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	m_acqNodeComponentMap[ifcn] = c;
 	m_ui->addChannel(c->ctrl(), c, cw);
 
-	connect(c->ctrl(), &QAbstractButton::clicked, this, [=]() { m_plotComponentManager->selectChannel(c); });
+	connect(c->ctrl(), &QAbstractButton::clicked, this, [this, c]() { m_plotComponentManager->selectChannel(c); });
 
 	c->ctrl()->animateClick();
 
@@ -241,7 +241,7 @@ void ADCTimeInstrumentController::createImportFloatChannel(AcqTreeNode *node)
 	setupChannelMeasurement(m_plotComponentManager, c);
 
 	connect(m_otherCMCB->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
-		[=](bool en) { c->ctrl()->checkBox()->setChecked(en); });
+		[c](bool en) { c->ctrl()->checkBox()->setChecked(en); });
 }
 
 void ADCTimeInstrumentController::addChannel(AcqTreeNode *node)
