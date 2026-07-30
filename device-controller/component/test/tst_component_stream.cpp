@@ -1,6 +1,7 @@
 #include "component/backends/iio/iioinputstream.h"
 #include "component/backends/iio/iiooutputstream.h"
 #include "component/backends/iio/iioscanelement.h"
+#include "component/stream.h"
 #include "component/streamview.h"
 #include "core/pooledcmdexecutor.h"
 #include "fakebufferops.h"
@@ -37,6 +38,7 @@ private Q_SLOTS:
 	void setKernelBuffersRefusedWhenOpen();
 	void maskFreedOnDelete();
 	void outputPushEmits();
+	void multiBufferSelector();
 };
 
 void TstComponentStream::openEnablesRefillDecodes()
@@ -49,7 +51,7 @@ void TstComponentStream::openEnablesRefillDecodes()
 	dctest::FakeChannel c0{0, "voltage0", false, true, s16Format()};
 	dctest::FakeChannel c1{1, "voltage1", false, true, s16Format()};
 
-	auto *stream = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 2, &exec);
+	auto *stream = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 2, 0, &exec);
 	auto *e0 = new IIOScanElement(&chOps, {&c0}, stream->mask(), &exec, stream);
 	e0->setIndex(0);
 	auto *e1 = new IIOScanElement(&chOps, {&c1}, stream->mask(), &exec, stream);
@@ -94,7 +96,7 @@ void TstComponentStream::setKernelBuffersRefusedWhenOpen()
 	dctest::FakeBufferOps bufOps;
 	bufOps.step = 2;
 
-	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, &exec);
+	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
 	QVERIFY(stream.setKernelBuffers(8));
 	QVERIFY(stream.open({{}, 4}));
 	QVERIFY(!stream.setKernelBuffers(2));
@@ -106,8 +108,8 @@ void TstComponentStream::maskFreedOnDelete()
 	dctest::FakeChannelOps chOps;
 	dctest::FakeBufferOps bufOps;
 	{
-		IIOInputStream in(&bufOps, &chOps, {}, 2, &exec);
-		IIOOutputStream out(&bufOps, &chOps, {}, 2, &exec);
+		IIOInputStream in(&bufOps, &chOps, {}, 2, 0, &exec);
+		IIOOutputStream out(&bufOps, &chOps, {}, 2, 0, &exec);
 		QCOMPARE(bufOps.masksAlive, 2);
 	}
 	QCOMPARE(bufOps.masksAlive, 0);
@@ -121,7 +123,7 @@ void TstComponentStream::outputPushEmits()
 	bufOps.step = 4;
 
 	dctest::FakeChannel c0{0, "voltage0", true, true, s16Format()};
-	auto *stream = new IIOOutputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, &exec);
+	auto *stream = new IIOOutputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
 	auto *e0 = new IIOScanElement(&chOps, {&c0}, stream->mask(), &exec, stream);
 	e0->setIndex(0);
 	bufOps.chOffset.insert(&c0, 0);
@@ -136,6 +138,32 @@ void TstComponentStream::outputPushEmits()
 
 	delete stream;
 	QCOMPARE(bufOps.masksAlive, 0);
+}
+
+void TstComponentStream::multiBufferSelector()
+{
+	PooledCmdExecutor exec(1);
+	dctest::FakeChannelOps chOps;
+	dctest::FakeBufferOps bufOps;
+
+	QObject device;
+	// Two input buffers + one output buffer on the same device.
+	auto *in0 = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec, &device);
+	auto *in1 = new IIOInputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 1, &exec, &device);
+	auto *out0 = new IIOOutputStream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec, &device);
+
+	// Enumerate by direction: two inputs, one output.
+	QCOMPARE(streamsOf<InputStream>(&device).size(), 2);
+	QCOMPARE(streamsOf<OutputStream>(&device).size(), 1);
+
+	// Select by buffer index.
+	QCOMPARE(streamAt<InputStream>(&device, 0), static_cast<InputStream *>(in0));
+	QCOMPARE(streamAt<InputStream>(&device, 1), static_cast<InputStream *>(in1));
+	QVERIFY(streamAt<InputStream>(&device, 2) == nullptr);
+	QCOMPARE(streamAt<OutputStream>(&device, 0), static_cast<OutputStream *>(out0));
+
+	QCOMPARE(in0->bufferIndex(), 0u);
+	QCOMPARE(in1->bufferIndex(), 1u);
 }
 
 QTEST_MAIN(TstComponentStream)
