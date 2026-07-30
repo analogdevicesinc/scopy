@@ -92,7 +92,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	if(registerMapTemplate) {
 		registerController->setHasMap(true);
 		QObject::connect(registerController, &RegisterController::toggleDetailedMenu, this,
-				 [=](bool toggled) { tool->openBottomContainerHelper(toggled); });
+				 [this](bool toggled) { tool->openBottomContainerHelper(toggled); });
 
 		QWidget *registerMapTable = new QWidget();
 		QVBoxLayout *registerMapTableLayout = new QVBoxLayout(registerMapTable);
@@ -144,7 +144,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		}
 
 		QObject::connect(registerMapTableWidget, &RegisterMapTable::registerSelected, this,
-				 [=](uint32_t address) {
+				 [this, registerMapTemplate, registerMapValues](uint32_t address) {
 					 registerController->blockSignals(true);
 					 registerMapTableWidget->setRegisterSelected(address);
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
@@ -155,7 +155,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 				 });
 
 		QObject::connect(registerController, &RegisterController::registerAddressChanged, this,
-				 [=](uint32_t address) {
+				 [this, registerMapTemplate, registerMapValues](uint32_t address) {
 					 registerChanged(registerMapTemplate->getRegisterTemplate(address));
 					 registerMapTableWidget->scrollTo(address);
 					 if(autoread) {
@@ -165,12 +165,13 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	}
 
 	QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
-			 [=](uint32_t address) { Q_EMIT registerMapValues->requestRead(address); });
-	QObject::connect(
-		registerController, &RegisterController::requestWrite, registerMapValues,
-		[=](uint32_t address, uint32_t value) { Q_EMIT registerMapValues->requestWrite(address, value); });
+			 [registerMapValues](uint32_t address) { Q_EMIT registerMapValues->requestRead(address); });
+	QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
+			 [registerMapValues](uint32_t address, uint32_t value) {
+				 Q_EMIT registerMapValues->requestWrite(address, value);
+			 });
 	QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
-			 [=](uint32_t address, uint32_t value) {
+			 [this, registerMapTemplate](uint32_t address, uint32_t value) {
 				 int regSize = 8;
 				 if(registerMapTemplate) {
 					 regSize = registerMapTemplate->getRegisterTemplate(0)->getWidth();
@@ -228,7 +229,7 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 
 	QObject::connect(registerDetailedWidget, &RegisterDetailedWidget::bitFieldValueChanged, registerController,
 			 &RegisterController::registerValueChanged);
-	QObject::connect(registerController, &RegisterController::valueChanged, this, [=](QString val) {
+	QObject::connect(registerController, &RegisterController::valueChanged, this, [this](QString val) {
 		registerDetailedWidget->updateBitFieldsValue(Utils::convertQStringToUint32(val));
 	});
 
@@ -276,12 +277,12 @@ void DeviceRegisterMap::initSettings()
 void DeviceRegisterMap::initTutorial()
 {
 
-	controllerTutorialFinish = connect(registerController, &RegisterController::tutorialFinished, this, [=]() {
+	controllerTutorialFinish = connect(registerController, &RegisterController::tutorialFinished, this, [this]() {
 		QWidget *parent = Util::findContainingWindow(this);
 		tutorial = new gui::TutorialBuilder(this, ":/registermap/tutorial_chapters.json", "device_register_map",
 						    parent);
 
-		connect(tutorial, &gui::TutorialBuilder::finished, this, [=]() { Q_EMIT tutorialFinished(); });
+		connect(tutorial, &gui::TutorialBuilder::finished, this, [this]() { Q_EMIT tutorialFinished(); });
 		connect(tutorial, &gui::TutorialBuilder::aborted, this, &DeviceRegisterMap::tutorialAborted);
 		tutorial->setTitle("Tutorial");
 		tutorial->start();

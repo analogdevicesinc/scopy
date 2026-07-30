@@ -65,7 +65,7 @@ RecyclerView::RecyclerView(QList<int> *widgets, QWidget *parent)
 	slider->setFixedWidth(8);
 	Style::setStyle(slider, style::properties::regmap::regmapSlider);
 
-	QObject::connect(m_scrollArea->verticalScrollBar(), &QAbstractSlider::valueChanged, this, [=](int value) {
+	QObject::connect(m_scrollArea->verticalScrollBar(), &QAbstractSlider::valueChanged, this, [this](int value) {
 		if(value == m_scrollArea->verticalScrollBar()->minimum()) {
 			slider->setValue(m_scrollBarCurrentValue - 1);
 			m_scrollArea->verticalScrollBar()->setValue(value + 1);
@@ -96,7 +96,7 @@ void RecyclerView::init()
 
 	m_scrollBarCurrentValue = slider->value();
 
-	QObject::connect(slider, &QAbstractSlider::valueChanged, this, [=](int value) {
+	QObject::connect(slider, &QAbstractSlider::valueChanged, this, [this](int value) {
 		if(m_scrollBarCurrentValue < value) {
 			int diff = value - (activeWidgetTop - widgets->begin());
 

@@ -143,7 +143,7 @@ void BitFieldDetailedWidget::firstRead()
 			valueComboBox->insertItem(i, options->at(i)->getDescription());
 		}
 
-		QObject::connect(valueComboBox, &QComboBox::currentTextChanged, this, [=](QString val) {
+		QObject::connect(valueComboBox, &QComboBox::currentTextChanged, this, [this](QString val) {
 			for(int i = 0; i < options->length(); i++) {
 				if(options->at(i)->getDescription() == val) {
 					Q_EMIT valueUpdated(options->at(i)->getValue());
@@ -159,7 +159,7 @@ void BitFieldDetailedWidget::firstRead()
 		layout->addWidget(valueSwitch);
 		layout->setAlignment(valueSwitch, Qt::AlignRight);
 
-		QObject::connect(valueSwitch, &SmallOnOffSwitch::toggled, this, [=](bool toggled) {
+		QObject::connect(valueSwitch, &SmallOnOffSwitch::toggled, this, [this](bool toggled) {
 			if(toggled) {
 				Q_EMIT valueUpdated("0");
 			} else {
@@ -171,7 +171,7 @@ void BitFieldDetailedWidget::firstRead()
 		valueLineEdit = new QLineEdit(this);
 		layout->addWidget(valueLineEdit);
 		QObject::connect(valueLineEdit, &QLineEdit::textChanged, this,
-				 [=](QString val) { Q_EMIT valueUpdated(val); });
+				 [this](QString val) { Q_EMIT valueUpdated(val); });
 	}
 }
 
