@@ -54,8 +54,8 @@ void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax)
 
 	connections[ax] << connect(m_min, &MenuSpinbox::valueChanged, ax, &PlotAxis::setMin);
 	connections[ax] << connect(m_min, &MenuSpinbox::valueChanged, this,
-				   [=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
-	connections[ax] << connect(ax, &PlotAxis::minChanged, this, [=]() {
+				   [this](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
+	connections[ax] << connect(ax, &PlotAxis::minChanged, this, [this, ax]() {
 		QSignalBlocker b(m_min);
 		m_min->setValue(ax->min());
 		Q_EMIT intervalChanged(m_min->value(), m_max->value());
@@ -63,8 +63,8 @@ void MenuPlotAxisRangeControl::addAxis(PlotAxis *ax)
 
 	connections[ax] << connect(m_max, &MenuSpinbox::valueChanged, ax, &PlotAxis::setMax);
 	connections[ax] << connect(m_max, &MenuSpinbox::valueChanged, this,
-				   [=](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
-	connections[ax] << connect(ax, &PlotAxis::maxChanged, this, [=]() {
+				   [this](double) { Q_EMIT intervalChanged(m_min->value(), m_max->value()); });
+	connections[ax] << connect(ax, &PlotAxis::maxChanged, this, [this, ax]() {
 		QSignalBlocker b(m_max);
 		m_max->setValue(ax->max());
 		Q_EMIT intervalChanged(m_min->value(), m_max->value());

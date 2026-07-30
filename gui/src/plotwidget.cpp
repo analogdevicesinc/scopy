@@ -165,7 +165,7 @@ void PlotWidget::addPlotChannel(PlotChannel *ch)
 	}
 
 	connect(ch, &PlotChannel::doReplot, this, &PlotWidget::replot);
-	connect(ch, &PlotChannel::attachCurve, this, [=](QwtPlotCurve *curve) { curve->attach(m_plot); });
+	connect(ch, &PlotChannel::attachCurve, this, [this](QwtPlotCurve *curve) { curve->attach(m_plot); });
 	m_navigator->addChannel(ch);
 	m_tracker->addChannel(ch);
 	Q_EMIT addedChannel(ch);
@@ -269,7 +269,7 @@ void PlotWidget::setupPlotInfo()
 		hDivInfo->hide();
 	}
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
-		[=](QString preference, QVariant value) {
+		[hDivInfo](QString preference, QVariant value) {
 			if(preference == "show_grid") {
 				hDivInfo->setVisible(value.toBool());
 			}

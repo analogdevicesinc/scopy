@@ -130,9 +130,9 @@ FPSInfo::FPSInfo(PlotWidget *plot, QWidget *parent)
 {
 	setVisible(Preferences::GetInstance()->get("general_show_plot_fps").toBool());
 
-	connect(m_plot, &PlotWidget::newData, this, [=]() { update(QDateTime::currentMSecsSinceEpoch()); });
+	connect(m_plot, &PlotWidget::newData, this, [this]() { update(QDateTime::currentMSecsSinceEpoch()); });
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
-		[=](QString preference, QVariant value) {
+		[this](QString preference, QVariant value) {
 			if(preference == "general_show_plot_fps") {
 				setVisible(value.toBool());
 			}
@@ -166,7 +166,7 @@ void FPSInfo::update(qint64 timestamp)
 TimestampInfo::TimestampInfo(PlotWidget *plot, QWidget *parent)
 {
 	connect(plot, &PlotWidget::newData, this,
-		[=]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss")); });
+		[this]() { setText(QDateTime::currentDateTime().time().toString("hh:mm:ss")); });
 }
 
 TimestampInfo::~TimestampInfo() {}

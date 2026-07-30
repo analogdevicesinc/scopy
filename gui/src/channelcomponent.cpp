@@ -117,7 +117,7 @@ void ChannelComponent::createMenuControlButton(ChannelComponent *c, QWidget *par
 	c->m_ctrl->button()->setCheckable(false);
 	c->m_ctrl->setCheckable(true);
 
-	connect(c->m_ctrl->checkBox(), &QCheckBox::toggled, c, [=](bool b) {
+	connect(c->m_ctrl->checkBox(), &QCheckBox::toggled, c, [c](bool b) {
 		if(b) {
 			c->enable();
 		} else {

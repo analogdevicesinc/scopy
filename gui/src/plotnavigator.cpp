@@ -138,8 +138,8 @@ void PlotNavigator::initResetButton()
 	m_resetButton->setIcon(icon);
 	m_resetButton->hide();
 
-	connect(m_resetButton, &QPushButton::clicked, this, [=]() { Q_EMIT reset(); });
-	connect(this, &PlotNavigator::rectChanged, this, [=]() { m_resetButton->setVisible(isZoomed()); });
+	connect(m_resetButton, &QPushButton::clicked, this, [this]() { Q_EMIT reset(); });
+	connect(this, &PlotNavigator::rectChanged, this, [this]() { m_resetButton->setVisible(isZoomed()); });
 
 	m_resetHover = new HoverWidget(m_resetButton, m_plot->canvas(), m_plot->canvas());
 	m_resetHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
@@ -218,26 +218,26 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	nav->zoomer = zoomer;
 	m_navigators->insert(nav);
 
-	connect(magnifier, &PlotMagnifier::zoomedRect, this, [=](const QRectF &rect) {
+	connect(magnifier, &PlotMagnifier::zoomedRect, this, [this, nav](const QRectF &rect) {
 		addRectToHistory(nav, rect, navigationType::Magnify);
 		Q_EMIT rectChanged(rect, navigationType::Magnify);
 	});
-	connect(magnifier, &PlotMagnifier::pannedRect, this, [=](const QRectF &rect) {
+	connect(magnifier, &PlotMagnifier::pannedRect, this, [this, nav](const QRectF &rect) {
 		addRectToHistory(nav, rect, navigationType::Pan);
 		Q_EMIT rectChanged(rect, navigationType::Pan);
 	});
-	connect(zoomer, &PlotZoomer::zoomed, this, [=](const QRectF &rect) {
+	connect(zoomer, &PlotZoomer::zoomed, this, [this, nav](const QRectF &rect) {
 		addRectToHistory(nav, rect, navigationType::Zoom);
 		Q_EMIT rectChanged(rect, navigationType::Zoom);
 	});
 
 	connect(magnifier, &PlotMagnifier::reset, this,
-		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
+		[this, zoomer]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 	connect(zoomer, &PlotZoomer::reset, this,
-		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
+		[this, zoomer]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 
 	if(m_plotWidget) {
-		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
+		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
 			if(m_autoBase) {
 				setBaseRect(axisId);
 				if(m_resetOnNewBase)
@@ -382,7 +382,7 @@ void PlotNavigator::addAxis(PlotAxis *axis)
 		setBaseRect(axisId);
 	}
 	// Connect axis scale updates for auto-base rect
-	connect(axis, &PlotAxis::axisScaleUpdated, this, [=]() {
+	connect(axis, &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
 		if(m_autoBase) {
 			setBaseRect(axisId);
 			if(m_resetOnNewBase)
@@ -617,17 +617,17 @@ bool PlotNavigator::getResetOnNewBase() { return m_resetOnNewBase; }
 void PlotNavigator::syncNavigators(PlotNavigator *pNav1, Navigator *nav1, PlotNavigator *pNav2, Navigator *nav2)
 {
 	// connect nav1 to nav2
-	connect(nav1->zoomer, &PlotZoomer::zoomed, pNav2, [=](const QRectF &rect) {
+	connect(nav1->zoomer, &PlotZoomer::zoomed, pNav2, [nav2, pNav2](const QRectF &rect) {
 		nav2->zoomer->silentZoom(rect);
 		pNav2->addRectToHistory(nav2, rect, navigationType::Zoom);
 		Q_EMIT pNav2->rectChanged(rect, navigationType::Zoom);
 	});
-	connect(nav1->magnifier, &PlotMagnifier::zoomedRect, pNav2, [=](const QRectF &rect) {
+	connect(nav1->magnifier, &PlotMagnifier::zoomedRect, pNav2, [nav2, pNav2](const QRectF &rect) {
 		nav2->zoomer->silentZoom(rect);
 		pNav2->addRectToHistory(nav2, rect, navigationType::Magnify);
 		Q_EMIT pNav2->rectChanged(rect, navigationType::Magnify);
 	});
-	connect(nav1->magnifier, &PlotMagnifier::pannedRect, pNav2, [=](const QRectF &rect) {
+	connect(nav1->magnifier, &PlotMagnifier::pannedRect, pNav2, [nav2, pNav2](const QRectF &rect) {
 		nav2->zoomer->silentZoom(rect);
 		pNav2->addRectToHistory(nav2, rect, navigationType::Pan);
 		Q_EMIT pNav2->rectChanged(rect, navigationType::Pan);
@@ -636,17 +636,17 @@ void PlotNavigator::syncNavigators(PlotNavigator *pNav1, Navigator *nav1, PlotNa
 	connect(pNav1, &PlotNavigator::reset, nav2->zoomer, &PlotZoomer::reset);
 
 	// connect nav2 to nav1
-	connect(nav2->zoomer, &PlotZoomer::zoomed, pNav1, [=](const QRectF &rect) {
+	connect(nav2->zoomer, &PlotZoomer::zoomed, pNav1, [nav1, pNav1](const QRectF &rect) {
 		nav1->zoomer->silentZoom(rect);
 		pNav1->addRectToHistory(nav1, rect, navigationType::Zoom);
 		Q_EMIT pNav1->rectChanged(rect, navigationType::Zoom);
 	});
-	connect(nav2->magnifier, &PlotMagnifier::zoomedRect, pNav1, [=](const QRectF &rect) {
+	connect(nav2->magnifier, &PlotMagnifier::zoomedRect, pNav1, [nav1, pNav1](const QRectF &rect) {
 		nav1->zoomer->silentZoom(rect);
 		pNav1->addRectToHistory(nav1, rect, navigationType::Magnify);
 		Q_EMIT pNav1->rectChanged(rect, navigationType::Magnify);
 	});
-	connect(nav2->magnifier, &PlotMagnifier::pannedRect, pNav1, [=](const QRectF &rect) {
+	connect(nav2->magnifier, &PlotMagnifier::pannedRect, pNav1, [nav1, pNav1](const QRectF &rect) {
 		nav1->zoomer->silentZoom(rect);
 		pNav1->addRectToHistory(nav1, rect, navigationType::Pan);
 		Q_EMIT pNav1->rectChanged(rect, navigationType::Pan);
@@ -698,7 +698,7 @@ void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav
 	syncPlotNavigatorAxes(pNav1, pNav2, axes);
 
 	// sync future axes
-	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [=](Navigator *nav1) {
+	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [pNav1, pNav2](Navigator *nav1) {
 		for(Navigator *nav2 : *pNav2->navigators()) {
 			if((nav1->magnifier->isXAxisEn() && nav2->magnifier->isXAxisEn() &&
 			    nav1->magnifier->getXAxis() == nav2->magnifier->getXAxis()) ||
@@ -708,7 +708,7 @@ void PlotNavigator::syncPlotNavigators(PlotNavigator *pNav1, PlotNavigator *pNav
 			}
 		}
 	});
-	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [=](Navigator *nav2) {
+	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [pNav1, pNav2](Navigator *nav2) {
 		for(Navigator *nav1 : *pNav1->navigators()) {
 			if((nav2->magnifier->isXAxisEn() && nav1->magnifier->isXAxisEn() &&
 			    nav2->magnifier->getXAxis() == nav1->magnifier->getXAxis()) ||
@@ -741,7 +741,7 @@ void PlotNavigator::syncXNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2)
 
 	// Sync navigators added to pNav1 in the future against all current and
 	// future X-axis navigators on pNav2.
-	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [=](Navigator *nav1) {
+	connect(pNav1, &PlotNavigator::addedNavigator, pNav1, [pNav1, pNav2](Navigator *nav1) {
 		if(!nav1->magnifier->isXAxisEn())
 			return;
 		for(Navigator *nav2 : *pNav2->navigators()) {
@@ -750,7 +750,7 @@ void PlotNavigator::syncXNavigators(PlotNavigator *pNav1, PlotNavigator *pNav2)
 		}
 	});
 
-	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [=](Navigator *nav2) {
+	connect(pNav2, &PlotNavigator::addedNavigator, pNav2, [pNav1, pNav2](Navigator *nav2) {
 		if(!nav2->magnifier->isXAxisEn())
 			return;
 		for(Navigator *nav1 : *pNav1->navigators()) {

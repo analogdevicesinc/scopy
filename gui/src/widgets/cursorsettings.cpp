@@ -86,16 +86,16 @@ void CursorSettings::initUI()
 
 void CursorSettings::connectSignals()
 {
-	connect(xEn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
+	connect(xEn->onOffswitch(), &QAbstractButton::toggled, this, [this](bool toggled) {
 		xTrack->setEnabled(toggled);
 		xLock->setEnabled(toggled);
 	});
-	connect(yEn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
+	connect(yEn->onOffswitch(), &QAbstractButton::toggled, this, [this](bool toggled) {
 		yLock->setEnabled(toggled);
 		if(!toggled)
 			xTrack->onOffswitch()->setChecked(false);
 	});
-	connect(xTrack->onOffswitch(), &QAbstractButton::toggled, this, [=](bool toggled) {
+	connect(xTrack->onOffswitch(), &QAbstractButton::toggled, this, [this](bool toggled) {
 		if(toggled && !yEn->onOffswitch()->isChecked())
 			yEn->onOffswitch()->setChecked(true);
 

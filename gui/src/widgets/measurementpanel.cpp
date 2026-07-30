@@ -72,7 +72,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent)
 	m_lay->addWidget(scrollArea);
 
 	connect(scrollArea->horizontalScrollBar(), &QAbstractSlider::rangeChanged, scrollBar,
-		[=](double min, double max) {
+		[scrollArea, scrollBar](double min, double max) {
 			auto singleStep = scrollArea->horizontalScrollBar()->singleStep();
 			scrollBar->setVisible(singleStep < (max - min));
 		});
@@ -107,19 +107,19 @@ void MeasurementsPanel::setupControlButtons()
 	m_sortByTypeBtn->setVisible(false);
 	m_hideBtn->setVisible(false);
 
-	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [this]() {
 		sort(0);
 		m_sortByChannelBtn->setVisible(false);
 		m_sortByTypeBtn->setVisible(true);
 	});
 
-	connect(m_sortByTypeBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_sortByTypeBtn, &QPushButton::clicked, this, [this]() {
 		sort(1);
 		m_sortByTypeBtn->setVisible(false);
 		m_sortByChannelBtn->setVisible(true);
 	});
 
-	connect(m_hideBtn, &QPushButton::clicked, this, [=]() { Q_EMIT hideAll(); });
+	connect(m_hideBtn, &QPushButton::clicked, this, [this]() { Q_EMIT hideAll(); });
 
 	btnLayout->addWidget(m_sortByChannelBtn);
 	btnLayout->addWidget(m_sortByTypeBtn);
@@ -196,14 +196,14 @@ void MeasurementsPanel::sort(int sortType)
 {
 
 	if(sortType == 0) {
-		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel *first, MeasurementLabel *second) {
+		std::sort(m_labels.begin(), m_labels.end(), [](MeasurementLabel *first, MeasurementLabel *second) {
 			if(first->idx() == second->idx()) {
 				return first->color().name() > second->color().name();
 			}
 			return first->idx() < second->idx();
 		});
 	} else {
-		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel *first, MeasurementLabel *second) {
+		std::sort(m_labels.begin(), m_labels.end(), [](MeasurementLabel *first, MeasurementLabel *second) {
 			if(first->color().name() == second->color().name()) {
 				return first->idx() < second->idx();
 			}
@@ -306,19 +306,19 @@ void StatsPanel::setupControlButtons()
 	m_sortByTypeBtn->setVisible(false);
 	m_hideBtn->setVisible(false);
 
-	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_sortByChannelBtn, &QPushButton::clicked, this, [this]() {
 		sort(0);
 		m_sortByChannelBtn->setVisible(false);
 		m_sortByTypeBtn->setVisible(true);
 	});
 
-	connect(m_sortByTypeBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_sortByTypeBtn, &QPushButton::clicked, this, [this]() {
 		sort(1);
 		m_sortByTypeBtn->setVisible(false);
 		m_sortByChannelBtn->setVisible(true);
 	});
 
-	connect(m_hideBtn, &QPushButton::clicked, this, [=]() { Q_EMIT hideAll(); });
+	connect(m_hideBtn, &QPushButton::clicked, this, [this]() { Q_EMIT hideAll(); });
 
 	btnLayout->addWidget(m_sortByChannelBtn);
 	btnLayout->addWidget(m_sortByTypeBtn);
@@ -364,14 +364,14 @@ void StatsPanel::updateOrder()
 void StatsPanel::sort(int sortType)
 {
 	if(sortType == 0) {
-		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel *first, StatsLabel *second) {
+		std::sort(m_labels.begin(), m_labels.end(), [](StatsLabel *first, StatsLabel *second) {
 			if(first->idx() == second->idx()) {
 				return first->color().name() > second->color().name();
 			}
 			return first->idx() < second->idx();
 		});
 	} else {
-		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel *first, StatsLabel *second) {
+		std::sort(m_labels.begin(), m_labels.end(), [](StatsLabel *first, StatsLabel *second) {
 			if(first->color().name() == second->color().name()) {
 				return first->idx() < second->idx();
 			}
