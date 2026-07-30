@@ -16,8 +16,8 @@ using namespace scopy::component;
 using namespace scopy::component::iio;
 
 IIOInputStream::IIOInputStream(scopy::iio::IBufferOps *bufOps, scopy::iio::IChannelOps *chOps,
-			       scopy::iio::DeviceHandle dev, int nbChannels, scopy::ICmdExecutor *executor,
-			       QObject *parent)
+			       scopy::iio::DeviceHandle dev, int nbChannels, unsigned bufferIndex,
+			       scopy::ICmdExecutor *executor, QObject *parent)
 	: InputStream(parent)
 	, m_bufOps(bufOps)
 	, m_chOps(chOps)
@@ -25,6 +25,7 @@ IIOInputStream::IIOInputStream(scopy::iio::IBufferOps *bufOps, scopy::iio::IChan
 	, m_mask(bufOps->createChannelsMask(nbChannels))
 	, m_executor(executor)
 {
+	m_bufferIndex = bufferIndex;
 }
 
 IIOInputStream::~IIOInputStream()
@@ -57,7 +58,7 @@ QCoro::Task<Result<void>> IIOInputStream::openInternal(StreamConfig cfg)
 {
 	applyEnabledChannels(cfg.enabledChannels);
 
-	auto *cmd = new scopy::iio::BufferOpenCommand(m_bufOps, m_dev, 0, m_mask, cfg.samplesCount, false,
+	auto *cmd = new scopy::iio::BufferOpenCommand(m_bufOps, m_dev, m_bufferIndex, m_mask, cfg.samplesCount, false,
 						      m_kernelBuffers);
 	auto result = co_await runCommand(
 		m_executor, cmd, [this, cmd](const Result<void> &) { m_buffer = cmd->openedHandle(); },
