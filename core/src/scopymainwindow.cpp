@@ -152,7 +152,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopySplashscreen::showMessage("Loading homepage");
 	hp = new ScopyHomePage(this);
 	m_sbc = new ScanButtonController(scanCycle, hp->scanControlBtn(), this);
-	connect(hp->scanBtn(), &QPushButton::clicked, this, [=]() { scanTask->run(); });
+	connect(hp->scanBtn(), &QPushButton::clicked, this, [this]() { scanTask->run(); });
 
 	DeviceAutoConnect::initPreferences();
 	dm = new DeviceManager(this);
@@ -187,10 +187,10 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(dm, &DeviceManager::deviceConnecting, hp, &ScopyHomePage::connectingDevice);
 
-	connect(dm, &DeviceManager::deviceConnecting, this, [=]() { handleScanner(); });
-	connect(dm, &DeviceManager::deviceConnected, this, [=]() { handleScanner(); });
-	connect(dm, &DeviceManager::deviceDisconnecting, this, [=]() { handleScanner(); });
-	connect(dm, &DeviceManager::deviceDisconnected, this, [=]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceConnecting, this, [this]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceConnected, this, [this]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceDisconnecting, this, [this]() { handleScanner(); });
+	connect(dm, &DeviceManager::deviceDisconnected, this, [this]() { handleScanner(); });
 	connect(dm, &DeviceManager::deviceConnecting, this, [this](const QString &deviceId) {
 		Device *d = dm->getDevice(deviceId);
 		if(d && d->param().contains("usb:")) {
@@ -575,7 +575,7 @@ void ScopyMainWindow::loadOpenGL()
 			"Please visit the <a "
 			"href=https://wiki.analog.com/university/tools/m2k/scopy-troubleshooting> Wiki "
 			"Analog page</a> for troubleshooting.");
-		connect(restarter, &RestartDialog::restartButtonClicked, [=] {
+		connect(restarter, &RestartDialog::restartButtonClicked, [restarter] {
 			ApplicationRestarter::triggerRestart();
 			restarter->deleteLater();
 		});

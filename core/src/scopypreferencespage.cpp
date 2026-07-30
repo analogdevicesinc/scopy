@@ -114,7 +114,7 @@ void ScopyPreferencesPage::updateSessionDevices(QMap<QString, QStringList> devic
 			devCb->setChecked(Preferences::get(prefId).toBool());
 			m_connDevices[uri] = devCb;
 			m_autoConnectWidget->contentLayout()->insertWidget(btnIdx, devCb);
-			connect(devCb, &QCheckBox::toggled, this, [=](bool en) {
+			connect(devCb, &QCheckBox::toggled, this, [uri, prefId, devices](bool en) {
 				if(en) {
 					DeviceAutoConnect::addDevice(uri, devices[uri]);
 				} else {
@@ -152,7 +152,7 @@ void ScopyPreferencesPage::initRestartWidget()
 
 	connect(btn, &QPushButton::clicked, btn, []() { ApplicationRestarter::triggerRestart(); });
 	connect(Preferences::GetInstance(), &Preferences::restartRequired, this,
-		[=]() { restartWidget->setVisible(true); });
+		[this]() { restartWidget->setVisible(true); });
 }
 
 QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
@@ -172,7 +172,7 @@ QWidget *ScopyPreferencesPage::buildSaveSessionPreference()
 	Style::setStyle(navigateBtn, style::properties::button::borderButton);
 	navigateBtn->setMaximumWidth(Style::getDimension(json::global::unit_5));
 	connect(navigateBtn, &QPushButton::clicked, this,
-		[=]() { QDesktopServices::openUrl(QUrl("file:" + scopy::config::settingsFolderPath())); });
+		[]() { QDesktopServices::openUrl(QUrl("file:" + scopy::config::settingsFolderPath())); });
 	lay->addWidget(navigateBtn);
 	return w;
 }

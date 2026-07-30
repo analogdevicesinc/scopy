@@ -74,7 +74,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent)
 
 	connect(m_emuWidget, &EmuWidget::emuDeviceAvailable, this, &ScopyHomeAddPage::onEmuDeviceAvailable);
 
-	connect(m_stackedWidget, &QStackedWidget::currentChanged, this, [=]() {
+	connect(m_stackedWidget, &QStackedWidget::currentChanged, this, [this]() {
 		if(m_stackedWidget->currentWidget() == m_addPage) {
 			m_addBtn->setFocus();
 		}
@@ -147,7 +147,7 @@ void ScopyHomeAddPage::deviceLoaderInitialized()
 		pluginDescription->checkBox()->setChecked(p->enabled());
 		m_pluginBrowserSection->contentLayout()->addWidget(pluginDescription);
 		m_pluginDescriptionList.push_back(pluginDescription);
-		connect(pluginDescription->checkBox(), &QCheckBox::toggled, this, [=](bool en) { p->setEnabled(en); });
+		connect(pluginDescription->checkBox(), &QCheckBox::toggled, this, [p](bool en) { p->setEnabled(en); });
 	}
 	m_stackedWidget->setCurrentWidget(m_addPage);
 	Q_EMIT verifyFinished(true);

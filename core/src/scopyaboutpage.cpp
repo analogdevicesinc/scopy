@@ -89,13 +89,13 @@ void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 	backwardButton->setEnabled(false);
 	connect(backwardButton, &QPushButton::clicked, browser, &QTextBrowser::backward);
 	connect(browser, &QTextBrowser::backwardAvailable, backwardButton,
-		[=](bool available) { backwardButton->setEnabled(available); });
+		[backwardButton](bool available) { backwardButton->setEnabled(available); });
 
 	QPushButton *forwardButton = navWidget->getForwardBtn();
 	forwardButton->setEnabled(false);
 	connect(forwardButton, &QPushButton::clicked, browser, &QTextBrowser::forward);
 	connect(browser, &QTextBrowser::forwardAvailable, forwardButton,
-		[=](bool available) { forwardButton->setEnabled(available); });
+		[forwardButton](bool available) { forwardButton->setEnabled(available); });
 
 	HoverWidget *hover = new HoverWidget(navWidget, browser, browser);
 	hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
