@@ -195,7 +195,7 @@ void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
 		for(const scopy::iio::ChannelHandle ch : inputs) {
 			auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
 			el->setIndex(chOps->index(ch));
-			el->setName(chOps->name(ch));
+            el->setId(chOps->id(ch));
 			el->setIsOutput(false);
 		}
 		buildBufferAttributes(stream, dh, executor);
@@ -205,7 +205,7 @@ void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
 		for(const scopy::iio::ChannelHandle ch : outputs) {
 			auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
 			el->setIndex(chOps->index(ch));
-			el->setName(chOps->name(ch));
+            el->setId(chOps->id(ch));
 			el->setIsOutput(true);
 		}
 		buildBufferAttributes(stream, dh, executor);
