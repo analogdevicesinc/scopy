@@ -56,7 +56,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	QLineEdit *plotTitle = new QLineEdit(m_plotComponent->name());
 	Style::setStyle(plotTitle, style::properties::lineedit::menuLineEdit);
-	connect(plotTitle, &QLineEdit::textChanged, this, [=](QString s) {
+	connect(plotTitle, &QLineEdit::textChanged, this, [this](QString s) {
 		m_plotComponent->setName(s);
 		//	plotMenu->setTitle("PLOT - " + s);
 	});
@@ -77,7 +77,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [this](double min, double max) {
 		bool singleYMode = false;
 		if(m_plotComponent->XYXChannel()) {
 			singleYMode = dynamic_cast<TimePlotComponentChannel *>(
@@ -91,7 +91,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 		m_plotComponent->xyPlot()->yAxis()->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_autoscaleBtn->onOffswitch(), &QAbstractButton::toggled, this, [this](bool b) {
 		m_yCtrl->setEnabled(!b);
 		m_autoscaleEnabled = b;
 		toggleAutoScale();
@@ -107,7 +107,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisSrc = new MenuCombo("XY - X Axis source");
 	InfoIconWidget::addHoveringInfoToWidget(
 		m_xAxisSrc->label(), "Selects which channel provides the X-axis values for the XY plot", m_xAxisSrc);
-	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(m_xAxisSrc->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int idx) {
 		QComboBox *cb = m_xAxisSrc->combo();
 		ChannelComponent *c = static_cast<ChannelComponent *>(cb->itemData(idx).value<void *>());
 		m_plotComponent->setXYXChannel(c);
@@ -116,14 +116,14 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_xAxisShow = new MenuOnOffSwitch("XY - Plot X source", plotMenu, false);
 	InfoIconWidget::addHoveringInfoToWidget(
 		m_xAxisShow->label(), "Plots selected channel by itself over the current XY plot", m_xAxisShow);
-	connect(xySwitch, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(xySwitch, &QAbstractButton::toggled, this, [this](bool b) {
 		m_plotComponent->xyDockWidget()->setActivated(b);
 		m_xAxisSrc->setVisible(b);
 		m_xAxisShow->setVisible(b);
 	});
 
 	connect(m_xAxisShow->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { m_plotComponent->showXSourceOnXy(b); });
+		[this](bool b) { m_plotComponent->showXSourceOnXy(b); });
 
 	m_yModeCb = new MenuCombo("YMODE", plotMenu);
 	InfoIconWidget::addHoveringInfoToWidget(m_yModeCb->label(),
@@ -132,7 +132,7 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	ycb->addItem("ADC Counts", YMODE_COUNT);
 	ycb->addItem("% Full Scale", YMODE_FS);
 
-	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [this, ycb](int idx) {
 		m_ymode = static_cast<YMode>(ycb->itemData(idx).toInt());
 		for(auto c : std::as_const(m_scaleProviders)) {
 			c->setYMode(m_ymode);
@@ -142,11 +142,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 
 	m_deletePlot = new QPushButton("Delete Plot");
 	StyleHelper::BasicButton(m_deletePlot);
-	connect(m_deletePlot, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
+	connect(m_deletePlot, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestDeletePlot(); });
 
 	QPushButton *exportBtn = new QPushButton("Export plot to CSV");
 	StyleHelper::BasicButton(exportBtn);
-	connect(exportBtn, &QPushButton::clicked, this, [=]() {
+	connect(exportBtn, &QPushButton::clicked, this, [this]() {
 		QString csvData = m_plotComponent->timePlot()->generateCsvData();
 		FileManagerHelper::saveDataToFile(this, csvData, tr("Export Plot Data"));
 	});
@@ -188,14 +188,14 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_deletePlotHover->setMaximumSize(16, 16);
 	m_deletePlotHover->setIcon(QIcon(":/gui/icons/orange_close.svg"));
 
-	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestDeletePlot(); });
+	connect(m_deletePlotHover, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestDeletePlot(); });
 
 	m_settingsPlotHover = new QPushButton("", nullptr);
 	m_settingsPlotHover->setMaximumSize(16, 16);
 	m_settingsPlotHover->setIcon(
 		QIcon(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/preferences.svg"));
 
-	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestSettings(); });
+	connect(m_settingsPlotHover, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestSettings(); });
 
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_deletePlotHover);
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_settingsPlotHover);

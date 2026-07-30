@@ -65,13 +65,13 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRII
 	m_grtch = new GRFFTComplexChannelSigpath(grtsc->name(), this, m_node->top()->src(),
 						 static_cast<GRIIOComplexChannelSrc *>(m_src), this);
 	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
-		[=](double v) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setPowerOffset(v); });
+		[this](double v) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setPowerOffset(v); });
 
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
-		[=](int w) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindow(w); });
+		[this](int w) { dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setWindow(w); });
 
 	connect(m_fftPlotComponentChannel->channelComponent(), &ChannelComponent::updatedSamplingInfo, this,
-		[=](SamplingInfo p) {
+		[this](SamplingInfo p) {
 			dynamic_cast<GRFFTComplexChannelSigpath *>(m_grtch)->setSampleRate(p.sampleRate);
 		});
 
@@ -96,10 +96,10 @@ GRFFTChannelComponent::GRFFTChannelComponent(GRIIOFloatChannelNode *node, FFTPlo
 	m_complex = false;
 
 	connect(this, &GRFFTChannelComponent::powerOffsetChanged, this,
-		[=](double v) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setPowerOffset(v); });
+		[this](double v) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setPowerOffset(v); });
 
 	connect(this, &GRFFTChannelComponent::windowChanged, this,
-		[=](int w) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindow(w); });
+		[this](int w) { dynamic_cast<GRFFTChannelSigpath *>(m_grtch)->setWindow(w); });
 	_init();
 }
 
@@ -154,7 +154,7 @@ QWidget *GRFFTChannelComponent::createYAxisMenu(QWidget *parent)
 	m_yCtrl = new MenuPlotAxisRangeControl(m_fftPlotComponentChannel->m_fftPlotYAxis, m_yaxisMenu);
 
 	connect(m_yaxisMenu->collapseSection()->header(), &QAbstractButton::toggled, this,
-		[=](bool b) { m_fftPlotComponentChannel->lockYAxis(!b); });
+		[this](bool b) { m_fftPlotComponentChannel->lockYAxis(!b); });
 
 	m_yaxisMenu->contentLayout()->addWidget(m_yCtrl);
 
@@ -171,7 +171,7 @@ QWidget *GRFFTChannelComponent::createCurveMenu(QWidget *parent)
 	section->contentLayout()->addWidget(m_curvemenu);
 
 	auto *controller = m_fftPlotComponentChannel->minMaxHoldController();
-	connect(controller, &MinMaxHoldController::enabledChanged, this, [=](bool enabled) {
+	connect(controller, &MinMaxHoldController::enabledChanged, this, [this, controller](bool enabled) {
 		if(enabled) {
 			if(controller->minChannel()) {
 				m_curvemenu->addChannels(controller->minChannel());
@@ -260,7 +260,7 @@ QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
 	m_avgSection = c.section;
 	m_avgSpin = c.sizeSpin;
 
-	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [this, c](bool b) {
 		auto ch = dynamic_cast<FFTChannel *>(m_grtch);
 		if(ch) {
 			int size = b ? c.sizeSpin->value() : 1;
@@ -268,7 +268,7 @@ QWidget *GRFFTChannelComponent::createAveragingMenu(QWidget *parent)
 		}
 	});
 
-	connect(c.sizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [=](int value) {
+	connect(c.sizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, [this, c](int value) {
 		auto ch = dynamic_cast<FFTChannel *>(m_grtch);
 		if(ch) {
 			ch->setAveragingSize(value);
@@ -305,42 +305,46 @@ QWidget *GRFFTChannelComponent::createMarkerMenu(QWidget *parent)
 
 	MenuOnOffSwitch *fixedMarkerEditBtn = c.fixedEditSwitch;
 	connect(fixedMarkerEditBtn->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(b); });
+		[this](bool b) { m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(b); });
 
-	connect(c.countSpin, &MenuSpinbox::valueChanged, this, [=](double cnt) {
+	connect(c.countSpin, &MenuSpinbox::valueChanged, this, [this](double cnt) {
 		m_fftPlotComponentChannel->markerController()->setNrOfMarkers(cnt);
 		m_fftPlotComponentChannel->markerController()->computeMarkers();
 	});
 
-	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
-		if(b) {
+	connect(c.section->collapseSection()->header(), &QAbstractButton::toggled, this,
+		[this, c, fixedMarkerEditBtn](bool b) {
+			if(b) {
+				auto markerType = static_cast<PlotMarkerController::MarkerTypes>(
+					c.typeCombo->combo()->currentData().toInt());
+				m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
+					markerType == PlotMarkerController::MC_FIXED &&
+					fixedMarkerEditBtn->onOffswitch()->isChecked());
+				m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
+			} else {
+				m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(false);
+				m_fftPlotComponentChannel->markerController()->setMarkerType(
+					PlotMarkerController::MC_NONE);
+			}
+		});
+
+	connect(c.typeCombo->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[this, c, fixedMarkerEditBtn](int idx) {
 			auto markerType = static_cast<PlotMarkerController::MarkerTypes>(
 				c.typeCombo->combo()->currentData().toInt());
+			if(markerType == PlotMarkerController::MC_SINGLETONE) {
+				c.countSpin->setMinValue(2);
+				if(c.countSpin->value() < 2)
+					c.countSpin->setValue(2);
+			} else {
+				c.countSpin->setMinValue(0);
+			}
 			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
 				markerType == PlotMarkerController::MC_FIXED &&
 				fixedMarkerEditBtn->onOffswitch()->isChecked());
 			m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
-		} else {
-			m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(false);
-			m_fftPlotComponentChannel->markerController()->setMarkerType(PlotMarkerController::MC_NONE);
-		}
-	});
-
-	connect(c.typeCombo->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		auto markerType =
-			static_cast<PlotMarkerController::MarkerTypes>(c.typeCombo->combo()->currentData().toInt());
-		if(markerType == PlotMarkerController::MC_SINGLETONE) {
-			c.countSpin->setMinValue(2);
-			if(c.countSpin->value() < 2)
-				c.countSpin->setValue(2);
-		} else {
-			c.countSpin->setMinValue(0);
-		}
-		m_fftPlotComponentChannel->markerController()->setFixedHandleVisible(
-			markerType == PlotMarkerController::MC_FIXED && fixedMarkerEditBtn->onOffswitch()->isChecked());
-		m_fftPlotComponentChannel->markerController()->setMarkerType(markerType);
-		fixedMarkerEditBtn->setVisible(markerType == PlotMarkerController::MC_FIXED);
-	});
+			fixedMarkerEditBtn->setVisible(markerType == PlotMarkerController::MC_FIXED);
+		});
 
 	return c.section;
 }

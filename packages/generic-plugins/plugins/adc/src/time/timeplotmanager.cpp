@@ -59,7 +59,7 @@ uint32_t TimePlotManager::addPlot(QString name)
 
 	plt->setXInterval(m_xInterval);
 
-	connect(plt, &TimePlotComponent::requestDeletePlot, this, [=]() {
+	connect(plt, &TimePlotComponent::requestDeletePlot, this, [this, plt]() {
 		Q_EMIT plotRemoved(plt->uuid());
 		removePlot(plt->uuid());
 

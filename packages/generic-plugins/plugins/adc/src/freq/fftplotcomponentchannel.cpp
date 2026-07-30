@@ -90,7 +90,7 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	m_fftPlotAxisHandle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
 	m_fftPlotAxisHandle->handle()->setColor(m_ch->pen().color());
 
-	connect(m_fftPlotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+	connect(m_fftPlotAxisHandle, &PlotAxisHandle::scalePosChanged, this, [this](double pos) {
 		double min = m_fftPlotYAxis->min() - pos;
 		double max = m_fftPlotYAxis->max() - pos;
 		m_fftPlotYAxis->setInterval(min, max);
@@ -103,14 +103,14 @@ void FFTPlotComponentChannel::initPlotComponent(PlotComponent *pc)
 	m_fftPlotCh->setEnabled(true);
 
 	// Sync curve style changes
-	connect(m_fftPlotCh, &PlotChannel::penChanged, this, [=]() {
+	connect(m_fftPlotCh, &PlotChannel::penChanged, this, [this]() {
 		QColor color = m_fftPlotCh->pen().color();
 		m_fftPlotAxisHandle->handle()->setColor(color);
 		m_ch->ctrl()->setColor(color);
 	});
 
 	// Sync name changes from ChannelComponent to PlotChannel
-	connect(m_ch, &ChannelComponent::nameChanged, this, [=](const QString &name) {
+	connect(m_ch, &ChannelComponent::nameChanged, this, [this](const QString &name) {
 		m_fftPlotCh->setName(name);
 		m_ch->ctrl()->setName(name);
 	});

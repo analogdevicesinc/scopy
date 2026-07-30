@@ -69,7 +69,7 @@ QWidget *ImportChannelComponent::createMenu(QWidget *parent)
 	QWidget *curvemenu = createCurveMenu(m_menu);
 	// QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
 	m_menu->header()->title()->setEnabled(true);
-	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, [=](QString s) { m_ctrl->setName(s); });
+	connect(m_menu->header()->title(), &QLineEdit::textChanged, this, [this](QString s) { m_ctrl->setName(s); });
 
 	QPushButton *m_forget = new QPushButton("Remove reference channel");
 	StyleHelper::BasicButton(m_forget);
@@ -96,11 +96,11 @@ QWidget *ImportChannelComponent::createYAxisMenu(QWidget *parent)
 	connect(m_autoscaler, &PlotAutoscaler::newMin, m_yCtrl, &MenuPlotAxisRangeControl::setMin);
 	connect(m_autoscaler, &PlotAutoscaler::newMax, m_yCtrl, &MenuPlotAxisRangeControl::setMax);
 
-	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [=](double min, double max) {
+	connect(m_yCtrl, &MenuPlotAxisRangeControl::intervalChanged, this, [this](double min, double max) {
 		m_timePlotChannelComponent->m_xyPlotYAxis->setInterval(m_yCtrl->min(), m_yCtrl->max());
 	});
 
-	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(section->collapseSection()->header(), &QAbstractButton::toggled, this, [this](bool b) {
 		m_yLock = b;
 		m_timePlotChannelComponent->lockYAxis(!b);
 	});

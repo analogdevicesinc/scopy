@@ -84,7 +84,8 @@ FFTPlotComponent::FFTPlotComponent(QString name, uint32_t uuid, QWidget *parent)
 	m_dockableArea->addDockWrapper(m_fftDockWrapper, DockableAreaInterface::Direction_TOP);
 	m_dockableArea->addDockWrapper(m_waterfallDockWrapper, DockableAreaInterface::Direction_BOTTOM);
 
-	connect(m_plotMenu, &FFTPlotComponentSettings::requestDeletePlot, this, [=]() { Q_EMIT requestDeletePlot(); });
+	connect(m_plotMenu, &FFTPlotComponentSettings::requestDeletePlot, this,
+		[this]() { Q_EMIT requestDeletePlot(); });
 	m_cursor = new CursorController(m_fftPlot, this);
 	int xCursorPos = Preferences::get("adc_plot_xcursor_position").toInt();
 	int yCursorPos = Preferences::get("adc_plot_ycursor_position").toInt();
@@ -127,7 +128,7 @@ void FFTPlotComponent::selectChannel(ChannelComponent *ch)
 	if(ch) {
 		m_waterfallDockWrapper->setTitle("Waterfall Plot - " + ch->name());
 		connect(ch, &ChannelComponent::nameChanged, this,
-			[=](const QString &name) { m_waterfallDockWrapper->setTitle("Waterfall Plot - " + name); });
+			[this](const QString &name) { m_waterfallDockWrapper->setTitle("Waterfall Plot - " + name); });
 	}
 }
 

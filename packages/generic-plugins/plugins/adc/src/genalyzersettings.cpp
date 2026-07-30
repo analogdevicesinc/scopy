@@ -157,7 +157,7 @@ void GenalyzerSettings::setupUI()
 	mainLayout->addWidget(section);
 
 	// Connect mode change to show/hide appropriate controls
-	connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int index) {
+	connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
 		bool isFixedTone = (m_modeCombo->currentData().toInt() == static_cast<int>(GenalyzerMode::FIXED_TONE));
 		m_fixedToneContainer->setVisible(isFixedTone);
 		m_autoModeContainer->setVisible(!isFixedTone);

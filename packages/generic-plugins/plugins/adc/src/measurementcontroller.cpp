@@ -43,7 +43,7 @@ MeasurementController::MeasurementController(QPen pen, MeasureModel *msr, QObjec
 	, m_measure(msr)
 	, m_pen(pen)
 {
-	connect(m_measure, &MeasureModel::newMeasurementsAvailable, this, [=]() {
+	connect(m_measure, &MeasureModel::newMeasurementsAvailable, this, [this]() {
 		for(auto lbl : std::as_const(m_measureLabels)) {
 			lbl->setValue(m_measure->measurement(lbl->name())->value());
 		}
@@ -281,7 +281,7 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 		if(meas.type.toUpper() == category.toUpper()) {
 			measureSelector->addMeasurement(meas.name, meas.icon);
 			connect(measureSelector->measurement(meas.name)->measureCheckbox(), &QCheckBox::toggled,
-				[=](bool b) {
+				[m_measureController, meas](bool b) {
 					if(b)
 						m_measureController->enableMeasurement(meas.name);
 					else
@@ -289,7 +289,7 @@ QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWid
 				});
 
 			connect(measureSelector->measurement(meas.name)->statsCheckbox(), &QCheckBox::toggled,
-				[=](bool b) {
+				[m_measureController, meas](bool b) {
 					if(b)
 						m_measureController->enableStats(meas.name);
 					else

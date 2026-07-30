@@ -52,7 +52,7 @@ ADCInstrumentController::ADCInstrumentController(ToolMenuEntry *tme, QString uri
 	m_fw = new QFutureWatcher<void>(this);
 	connect(
 		m_fw, &QFutureWatcher<void>::finished, this,
-		[=]() {
+		[this]() {
 			update();
 			if(m_refreshTimerRunning)
 				m_plotTimer->start();
@@ -137,7 +137,7 @@ void ADCInstrumentController::setSingleShot(bool b) { m_dataProvider->setSingleS
 
 void ADCInstrumentController::updateData()
 {
-	m_refillFuture = QtConcurrent::run([=]() { m_dataProvider->updateData(); });
+	m_refillFuture = QtConcurrent::run([this]() { m_dataProvider->updateData(); });
 	m_fw->setFuture(m_refillFuture);
 }
 
@@ -195,17 +195,17 @@ void ADCInstrumentController::setupChannelMeasurement(PlotManager *c, ChannelCom
 	connect(chMeasureManager, &MeasureManagerInterface::disableMeasurement, measurePanel,
 		&MeasurementsPanel::removeMeasurement);
 	connect(chMeasureManager, &MeasureManagerInterface::enableMeasurement, this,
-		[=]() { c->enableMeasurementPanel(true); });
-	connect(measurePanel, &MeasurementsPanel::hideAll, this, [=]() {
+		[c]() { c->enableMeasurementPanel(true); });
+	connect(measurePanel, &MeasurementsPanel::hideAll, this, [measurePanel, chMeasureManager]() {
 		measurePanel->setInhibitUpdates(true);
 		Q_EMIT chMeasureManager->toggleAllMeasurement(false);
 		measurePanel->setInhibitUpdates(false);
 	});
 	connect(chMeasureManager, &MeasureManagerInterface::enableStat, statsPanel, &StatsPanel::addStat);
 	connect(chMeasureManager, &MeasureManagerInterface::disableStat, statsPanel, &StatsPanel::removeStat);
-	connect(chMeasureManager, &MeasureManagerInterface::enableStat, this, [=]() { c->enableStatsPanel(true); });
+	connect(chMeasureManager, &MeasureManagerInterface::enableStat, this, [c]() { c->enableStatsPanel(true); });
 	connect(statsPanel, &StatsPanel::hideAll, chMeasureManager,
-		[=]() { Q_EMIT chMeasureManager->toggleAllStats(false); });
+		[chMeasureManager]() { Q_EMIT chMeasureManager->toggleAllStats(false); });
 }
 
 bool ADCInstrumentController::isMainInstrument() const { return m_isMainInstrument; }

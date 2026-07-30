@@ -96,7 +96,7 @@ void ADCInstrument::setupToolLayout()
 
 	tool->addWidgetToCentralContainerHelper(m_splitter);
 
-	connect(rightStack, &QStackedWidget::currentChanged, this, [=](int) {
+	connect(rightStack, &QStackedWidget::currentChanged, this, [this](int) {
 		if(m_splitter->sizes().at(2) == 0) {
 			QList<int> sizes = m_splitter->sizes();
 			sizes[1] -= right_splitter_size;
@@ -126,7 +126,7 @@ void ADCInstrument::setupToolLayout()
 	addBtn = new AddBtn(this);
 	removeBtn = new RemoveBtn(this);
 
-	connect(infoBtn, &QAbstractButton::clicked, this, [=]() {
+	connect(infoBtn, &QAbstractButton::clicked, this, []() {
 		QDesktopServices::openUrl(QUrl("https://analogdevicesinc.github.io/scopy/plugins/adc/adc.html"));
 	});
 
@@ -175,16 +175,16 @@ void ADCInstrument::setupToolLayout()
 	channelGroup = new QButtonGroup(this);
 	channelGroup->addButton(m_settingsBtn);
 
-	connect(m_settingsBtn->button(), &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_settingsBtn->button(), &QAbstractButton::toggled, this, [this](bool b) {
 		if(b)
 			rightStack->show(settingsMenuId);
 	});
-	connect(m_settingsBtn, &QAbstractButton::clicked, this, [=](bool b) {
+	connect(m_settingsBtn, &QAbstractButton::clicked, this, [this](bool b) {
 		if(b)
 			rightStack->show(settingsMenuId);
 	});
 
-	connect(m_runBtn, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(m_runBtn, &QAbstractButton::toggled, this, [this](bool b) {
 		m_runBtn->setEnabled(false);
 		if(b) {
 			Q_EMIT requestStart();
@@ -195,7 +195,7 @@ void ADCInstrument::setupToolLayout()
 
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QAbstractButton::toggle);
 
-	connect(addBtn, &QAbstractButton::clicked, this, [=]() { Q_EMIT requestNewInstrument(TIME); });
+	connect(addBtn, &QAbstractButton::clicked, this, [this]() { Q_EMIT requestNewInstrument(TIME); });
 
 	connect(removeBtn, &QAbstractButton::clicked, this, &ADCInstrument::requestDeleteInstrument);
 }
@@ -221,7 +221,7 @@ void ADCInstrument::addDevice(CollapsableMenuControlButton *b, ToolComponent *de
 	QString id = dev->name() + QString::number(uuid++);
 	rightStack->add(id, dev_widget);
 
-	connect(b->getControlBtn(), &QPushButton::clicked /* Or ::toggled*/, this, [=](bool b) {
+	connect(b->getControlBtn(), &QPushButton::clicked /* Or ::toggled*/, this, [this, id](bool b) {
 		if(b) {
 			rightStack->show(id);
 		}
@@ -248,14 +248,14 @@ void ADCInstrument::addChannel(MenuControlButton *btn, ChannelComponent *ch, Com
 
 	rightStack->add(id, ch_widget);
 
-	connect(btn->button(), &QPushButton::pressed, this, [=]() { Q_EMIT btn->clicked(true); });
-	connect(btn, &QAbstractButton::clicked, this, [=](bool b) {
+	connect(btn->button(), &QPushButton::pressed, this, [btn]() { Q_EMIT btn->clicked(true); });
+	connect(btn, &QAbstractButton::clicked, this, [this, id](bool b) {
 		if(b) {
 			switchToChannelMenu(id, true);
 		}
 	});
 
-	connect(ch, &ChannelComponent::requestChannelMenu, this, [=](bool f) { switchToChannelMenu(id, f); });
+	connect(ch, &ChannelComponent::requestChannelMenu, this, [this, id](bool f) { switchToChannelMenu(id, f); });
 
 	/*setupChannelSnapshot(ch);
 	setupChannelMeasurement(ch);
