@@ -13,6 +13,8 @@
 #include "component/backends/iio/iioregisterwriter.h"
 #include "component/backends/iio/iiosamplecodec.h"
 #include "component/backends/iio/iioscanelement.h"
+#include "component/backends/iio/iiotrigger.h"
+#include "component/backends/iio/iiotriggerable.h"
 
 #include "iioutil/iattrops.h"
 #include "iioutil/ibackend.h"
@@ -87,6 +89,26 @@ void IIOComponentBuilder::buildOneDevice(IIOContext *iioCtx, scopy::iio::DeviceH
 	buildDebugAttributes(dev, executor);
 	buildChannels(dev, executor);
 	buildStreams(dev, executor);
+	buildTrigger(dev, executor);
+}
+
+void IIOComponentBuilder::buildTrigger(IIODevice *dev, ICmdExecutor *executor)
+{
+	auto *devOps = m_backend->deviceOps();
+	const auto dh = dev->handle();
+
+	// A device that IS a trigger carries a source marker and has no trigger of its
+	// own, so it gets no Triggerable.
+	if(devOps->isTrigger(dh)) {
+		new IIOTrigger(devOps, dh, dev);
+		return;
+	}
+
+	// A trigger gates acquisition, so only a device with an input stream can be
+	// assigned one. buildStreams ran above, so the stream child (if any) is present.
+	if(dev->findChild<IIOInputStream *>(QString(), Qt::FindDirectChildrenOnly)) {
+		new IIOTriggerable(devOps, dh, executor, dev);
+	}
 }
 
 void IIOComponentBuilder::buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor)
