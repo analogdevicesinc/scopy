@@ -92,7 +92,7 @@ TestTool::TestTool(QWidget *parent)
 
 	QTimer *dataRefreshTimer = new QTimer(this);
 	dataRefreshTimer->setInterval(10);
-	connect(runBtn, &QPushButton::toggled, this, [=](bool b) {
+	connect(runBtn, &QPushButton::toggled, this, [dataRefreshTimer](bool b) {
 		if(b) {
 			dataRefreshTimer->start();
 		} else {
@@ -130,8 +130,8 @@ TestTool::TestTool(QWidget *parent)
 	plot->addPlotAxisHandle(ch1_plotch->handle());
 
 	connect(ch1->checkBox(), &QCheckBox::toggled, ch1_plotch, &PlotChannel::setEnabled);
-	connect(ch1->checkBox(), &QCheckBox::toggled, this, [=]() { plot->replot(); });
-	connect(ch1, &QAbstractButton::toggled, this, [=]() { plot->selectChannel(ch1_plotch); });
+	connect(ch1->checkBox(), &QCheckBox::toggled, this, [plot]() { plot->replot(); });
+	connect(ch1, &QAbstractButton::toggled, this, [plot, ch1_plotch]() { plot->selectChannel(ch1_plotch); });
 	ch1_plotch->curve()->setRawSamples(xTime.data(), y1Volt.data(), xTime.size());
 
 	MenuControlButton *ch2 = new MenuControlButton(this);
@@ -149,8 +149,8 @@ TestTool::TestTool(QWidget *parent)
 	ch2_plotch->setHandle(handle2);
 	plot->addPlotAxisHandle(ch2_plotch->handle());
 	connect(ch2->checkBox(), &QCheckBox::toggled, ch2_plotch, &PlotChannel::setEnabled);
-	connect(ch2->checkBox(), &QCheckBox::toggled, this, [=]() { plot->replot(); });
-	connect(ch2, &QAbstractButton::toggled, this, [=]() { plot->selectChannel(ch2_plotch); });
+	connect(ch2->checkBox(), &QCheckBox::toggled, this, [plot]() { plot->replot(); });
+	connect(ch2, &QAbstractButton::toggled, this, [plot, ch2_plotch]() { plot->selectChannel(ch2_plotch); });
 	ch2_plotch->curve()->setRawSamples(xTime.data(), y2Volt.data(), xTime.size());
 
 	MenuControlButton *cursor = new MenuControlButton(this);
@@ -206,9 +206,9 @@ TestTool::TestTool(QWidget *parent)
 	tool->rightStack()->add("ch1", wch1);
 	tool->rightStack()->add("ch2", wch2);
 
-	connect(channels->button(), &QAbstractButton::pressed, this, [=]() { tool->requestMenu("ch0"); });
-	connect(ch1->button(), &QAbstractButton::pressed, this, [=]() { tool->requestMenu("ch1"); });
-	connect(ch2->button(), &QAbstractButton::pressed, this, [=]() { tool->requestMenu("ch2"); });
+	connect(channels->button(), &QAbstractButton::pressed, this, [this]() { tool->requestMenu("ch0"); });
+	connect(ch1->button(), &QAbstractButton::pressed, this, [this]() { tool->requestMenu("ch1"); });
+	connect(ch2->button(), &QAbstractButton::pressed, this, [this]() { tool->requestMenu("ch2"); });
 
 	auto grp = static_cast<OpenLastMenuBtn *>(btn3)->getButtonGroup();
 	grp->addButton(channels->button());
@@ -248,7 +248,7 @@ TestTool::TestTool(QWidget *parent)
 	hv->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hv->setContentPos(HoverPosition::HP_TOPRIGHT);
 
-	connect(channels, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(channels, &QAbstractButton::toggled, this, [hv](bool b) {
 		qInfo() << "setVisible: " << b;
 		hv->setVisible(b);
 		hv->raise();

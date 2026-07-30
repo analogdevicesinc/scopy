@@ -132,8 +132,8 @@ bool TestPlugin::loadExtraButtons()
 	Style::setStyle(btnRegister, style::properties::button::grayButton);
 	m_extraButtons.append(btnRegister);
 
-	connect(m_extraButtons[0], &QAbstractButton::clicked, this, [=]() { edit->setText("Calibrating"); });
-	connect(m_extraButtons[1], &QAbstractButton::clicked, this, [=]() { edit->setText("Registering"); });
+	connect(m_extraButtons[0], &QAbstractButton::clicked, this, [this]() { edit->setText("Calibrating"); });
+	connect(m_extraButtons[1], &QAbstractButton::clicked, this, [this]() { edit->setText("Registering"); });
 	return true;
 }
 
@@ -213,10 +213,10 @@ bool TestPlugin::onConnect()
 	gui::MenuSpinbox *m_spin = new gui::MenuSpinbox("Frequency", 1e6, "Hz", 400000, 6000000000, tool);
 	;
 
-	connect(btn, &QPushButton::clicked, this, [=]() { m_toolList[0]->setAttached(!m_toolList[0]->attached()); });
+	connect(btn, &QPushButton::clicked, this, [this]() { m_toolList[0]->setAttached(!m_toolList[0]->attached()); });
 	connect(btn2, &QPushButton::clicked, this,
-		[=]() { m_toolList[0]->setName("TestPlugin" + QString::number(renameCnt++)); });
-	connect(btn3, &QPushButton::clicked, this, [=]() { startTutorial(); });
+		[this]() { m_toolList[0]->setName("TestPlugin" + QString::number(renameCnt++)); });
+	connect(btn3, &QPushButton::clicked, this, [this]() { startTutorial(); });
 	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testplugin/testImage.png\") ");
 
@@ -256,7 +256,7 @@ void TestPlugin::initHoverWidgetTests()
 	HoverWidget *hover = new HoverWidget(cursorMenu, btn4, tool);
 	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hover->setContentPos(HoverPosition::HP_TOPRIGHT);
-	connect(btn4, &QPushButton::toggled, this, [=](bool b) {
+	connect(btn4, &QPushButton::toggled, this, [hover](bool b) {
 		hover->setVisible(b);
 		hover->raise();
 	});
@@ -269,37 +269,37 @@ void TestPlugin::initHoverWidgetTests()
 	hoverTestLayout->addWidget(testBtn);
 	QLabel *testLabel = new QLabel("--HOVER TEST--");
 	testLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setContent(testLabel); });
+	connect(testBtn, &QPushButton::clicked, this, [hover, testLabel]() { hover->setContent(testLabel); });
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset content");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setContent(cursorMenu); });
+	connect(testBtn, &QPushButton::clicked, this, [hover, cursorMenu]() { hover->setContent(cursorMenu); });
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("change anchor");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setAnchor(edit); });
+	connect(testBtn, &QPushButton::clicked, this, [this, hover]() { hover->setAnchor(edit); });
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset anchor");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setAnchor(btn4); });
+	connect(testBtn, &QPushButton::clicked, this, [this, hover]() { hover->setAnchor(btn4); });
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("change parent");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setParent(lbl2); });
+	connect(testBtn, &QPushButton::clicked, this, [this, hover]() { hover->setParent(lbl2); });
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset parent");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setParent(tool); });
+	connect(testBtn, &QPushButton::clicked, this, [this, hover]() { hover->setParent(tool); });
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("change position");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() {
+	connect(testBtn, &QPushButton::clicked, this, [hover]() {
 		hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 		hover->setContentPos(HoverPosition::HP_TOPLEFT);
 	});
@@ -307,7 +307,7 @@ void TestPlugin::initHoverWidgetTests()
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset position");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=]() {
+	connect(testBtn, &QPushButton::clicked, this, [hover]() {
 		hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 		hover->setContentPos(HoverPosition::HP_TOPRIGHT);
 	});
@@ -316,14 +316,14 @@ void TestPlugin::initHoverWidgetTests()
 	testBtn->setText("set draggable");
 	testBtn->setCheckable(true);
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled) { hover->setDraggable(toggled); });
+	connect(testBtn, &QPushButton::toggled, this, [hover](bool toggled) { hover->setDraggable(toggled); });
 	testBtn->setStyleSheet("QPushButton::checked{background-color: grey;}");
 
 	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("set relative");
 	testBtn->setCheckable(true);
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled) { hover->setRelative(toggled); });
+	connect(testBtn, &QPushButton::toggled, this, [hover](bool toggled) { hover->setRelative(toggled); });
 	testBtn->setStyleSheet("QPushButton::checked{background-color: grey;}");
 
 	tool->layout()->addWidget(hoverTest);

@@ -156,7 +156,7 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group, QWid
 
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
-		connect(m_syncBtn, &QPushButton::clicked, this, [=]() {
+		connect(m_syncBtn, &QPushButton::clicked, this, [this]() {
 			// call to lib ad9361
 			ad9361_multichip_sync(m_mainDevice, &m_secondDevice, 1,
 					      FIXUP_INTERFACE_TIMING | CHECK_SAMPLE_RATES);

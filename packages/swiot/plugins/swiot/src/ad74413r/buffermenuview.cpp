@@ -155,13 +155,13 @@ QWidget *BufferMenuView::createVerticalSettingsMenu(QString unit, double yMin, d
 
 	// Connects
 	connect(m_yMin, &MenuSpinbox::valueChanged, this, &BufferMenuView::setYMin);
-	connect(this, &BufferMenuView::minChanged, this, [=](double min) {
+	connect(this, &BufferMenuView::minChanged, this, [m_yMin](double min) {
 		QSignalBlocker b(m_yMin);
 		m_yMin->setValue(min);
 	});
 
 	connect(m_yMax, &MenuSpinbox::valueChanged, this, &BufferMenuView::setYMax);
-	connect(this, &BufferMenuView::maxChanged, this, [=](double max) {
+	connect(this, &BufferMenuView::maxChanged, this, [m_yMax](double max) {
 		QSignalBlocker b(m_yMax);
 		m_yMax->setValue(max);
 	});
