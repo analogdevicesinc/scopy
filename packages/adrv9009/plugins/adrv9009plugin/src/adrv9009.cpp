@@ -421,7 +421,7 @@ QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent
 	Style::setStyle(calibrateButton, style::properties::button::basicButton);
 	calGridLayout->addWidget(calibrateButton, 1, 3);
 
-	connect(calibrateButton, &QPushButton::clicked, this, [=] {
+	connect(calibrateButton, &QPushButton::clicked, this, [this, device] {
 		// Trigger calibration
 		int ret = iio_device_attr_write_bool(device, "calibrate", true);
 		if(ret < 0) {
@@ -988,10 +988,11 @@ QWidget *Adrv9009::createFpgaRxChannelWidget(iio_device *dev, QString title, int
 
 	// Connect to phase rotation functions
 	connect(phaseSpinBox, &gui::MenuSpinbox::valueChanged, this,
-		[=](double degrees) { writePhase(dev, channelIndex, (int)degrees); });
+		[this, dev, channelIndex](double degrees) { writePhase(dev, channelIndex, (int)degrees); });
 
 	// Add to refresh handling
-	connect(this, &Adrv9009::readRequested, this, [=]() { readPhase(dev, channelIndex, phaseSpinBox); });
+	connect(this, &Adrv9009::readRequested, this,
+		[this, dev, channelIndex, phaseSpinBox]() { readPhase(dev, channelIndex, phaseSpinBox); });
 
 	mainLayout->addWidget(phaseSpinBox);
 

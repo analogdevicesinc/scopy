@@ -73,7 +73,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group, QWidget *paren
 	layout->addWidget(calSwitchControl);
 
 	connect(calSwitchControl, QOverload<const int>::of(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { calibration->callSwitchPortsEnableCb(idx); });
+		[calibration](int idx) { calibration->callSwitchPortsEnableCb(idx); });
 
 	m_calibrateBtn = new QPushButton("Calibrate", this);
 	Style::setStyle(m_calibrateBtn, style::properties::button::basicButton);
@@ -116,7 +116,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group, QWidget *paren
 				     .buildSingle();
 	layout->addWidget(txPhase);
 
-	connect(m_calibrateBtn, &QPushButton::clicked, this, [=]() {
+	connect(m_calibrateBtn, &QPushButton::clicked, this, [this, calibration, txPhase]() {
 		m_calibrateBtn->setEnabled(false);
 		calibration->calibrate();
 		m_calibrateBtn->setEnabled(true);

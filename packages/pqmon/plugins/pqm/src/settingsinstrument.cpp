@@ -287,11 +287,12 @@ void SettingsInstrument::initTimestampSection(QWidget *parent)
 
 	qInfo() << "Date time: " << timestampEdit2->dateTime().toString("yyyyMMddhhmmsszzz");
 
-	connect(timestampEdit1, &QDateTimeEdit::dateTimeChanged, this, [=](QDateTime dateTime) {
-		if(dateTime > timestampEdit2->dateTime()) {
-			timestampEdit1->setDateTime(timestampEdit2->dateTime());
-		}
-	});
+	connect(timestampEdit1, &QDateTimeEdit::dateTimeChanged, this,
+		[timestampEdit1, timestampEdit2](QDateTime dateTime) {
+			if(dateTime > timestampEdit2->dateTime()) {
+				timestampEdit1->setDateTime(timestampEdit2->dateTime());
+			}
+		});
 
 	QPushButton *timestampBtn = new QPushButton("Set", timestampSection);
 	timestampBtn->setFixedWidth(88);

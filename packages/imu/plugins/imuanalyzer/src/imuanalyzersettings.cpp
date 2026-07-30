@@ -56,7 +56,7 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 
 	connect(this, &ImuAnalyzerSettings::updateDisplayPoints, blRend, &BubbleLevelRenderer::setDisplayPoints);
 	connect(displayPoints->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { emit updateDisplayPoints(displayPoints->combo()->itemText(idx)); });
+		[this, displayPoints](int idx) { emit updateDisplayPoints(displayPoints->combo()->itemText(idx)); });
 
 	bubbleLevelSettingsWidget->contentLayout()->addWidget(displayPoints);
 
