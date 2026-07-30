@@ -40,7 +40,8 @@ private:
 	void buildDebugAttributes(IIODevice *dev, ICmdExecutor *executor);
 	void buildChannels(IIODevice *dev, ICmdExecutor *executor);
 	void buildStreams(IIODevice *dev, ICmdExecutor *executor);
-	void buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, ICmdExecutor *executor);
+	void buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, unsigned int bufferIndex,
+				   ICmdExecutor *executor);
 	void buildTrigger(IIODevice *dev, ICmdExecutor *executor);
 
 	scopy::component::Attribute *makeAttribute(QObject *parent, const QString &attrName,
