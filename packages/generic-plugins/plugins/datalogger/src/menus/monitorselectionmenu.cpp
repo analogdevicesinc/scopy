@@ -138,7 +138,7 @@ void MonitorSelectionMenu::addMonitor(DataMonitorModel *monitor)
 	m_monitorsGroup->addButton(monitorChannel);
 
 	connect(deviceMap.value(monitor->getDeviceName())->onOffSwitch(), &SmallOnOffSwitch::toggled, this,
-		[=](bool en) { monitorChannel->checkBox()->setChecked(en); });
+		[monitorChannel](bool en) { monitorChannel->checkBox()->setChecked(en); });
 
 	connect(monitorChannel, &MenuControlButton::clicked, this, [=, this](bool toggled) {
 		if(!monitorChannel->checkBox()->isChecked()) {

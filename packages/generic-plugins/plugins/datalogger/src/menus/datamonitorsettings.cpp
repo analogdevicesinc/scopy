@@ -141,7 +141,7 @@ void DataMonitorSettings::init(QString title, QColor color)
 		monitorPlotsSettings->setCurrentIndex(0);
 
 	connect(plotSelectorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { monitorPlotsSettings->setCurrentIndex(idx); });
+		[monitorPlotsSettings](int idx) { monitorPlotsSettings->setCurrentIndex(idx); });
 
 	// Helper to connect controller signals to a plot
 	auto connectXAxisController = [this](MonitorPlot *plt) {
@@ -194,19 +194,21 @@ void DataMonitorSettings::init(QString title, QColor color)
 	});
 
 	// Remove menu when a plot is removed
-	connect(m_plotManager, &MonitorPlotManager::plotRemoved, this, [=](uint32_t uuid) {
-		for(int i = 0; i < plotSelectorCombo->count(); ++i) {
-			if(plotSelectorCombo->itemData(i).toUInt() == uuid) {
-				plotSelectorCombo->removeItem(i);
-				QWidget *w = monitorPlotsSettings->widget(i);
-				monitorPlotsSettings->removeWidget(w);
-				w->deleteLater();
-				break;
+	connect(m_plotManager, &MonitorPlotManager::plotRemoved, this,
+		[plotSelectorCombo, monitorPlotsSettings](uint32_t uuid) {
+			for(int i = 0; i < plotSelectorCombo->count(); ++i) {
+				if(plotSelectorCombo->itemData(i).toUInt() == uuid) {
+					plotSelectorCombo->removeItem(i);
+					QWidget *w = monitorPlotsSettings->widget(i);
+					monitorPlotsSettings->removeWidget(w);
+					w->deleteLater();
+					break;
+				}
 			}
-		}
-		if(plotSelectorCombo->count() > 0 && plotSelectorCombo->currentIndex() >= plotSelectorCombo->count())
-			plotSelectorCombo->setCurrentIndex(0);
-	});
+			if(plotSelectorCombo->count() > 0 &&
+			   plotSelectorCombo->currentIndex() >= plotSelectorCombo->count())
+				plotSelectorCombo->setCurrentIndex(0);
+		});
 
 	// Keep plotSelectorCombo text in sync with plot name changes
 	for(const auto &pair : plotList) {

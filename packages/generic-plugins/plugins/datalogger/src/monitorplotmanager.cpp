@@ -196,7 +196,7 @@ QComboBox *MonitorPlotManager::createPlotAssignmentComboBox(DataMonitorModel *mo
 		if(plt)
 			combo->addItem(plt->name(), QVariant::fromValue(uuid));
 	});
-	QObject::connect(this, &MonitorPlotManager::plotRemoved, combo, [=](uint32_t uuid) {
+	QObject::connect(this, &MonitorPlotManager::plotRemoved, combo, [combo](uint32_t uuid) {
 		for(int i = 0; i < combo->count(); ++i) {
 			if(combo->itemData(i).toUInt() == uuid) {
 				combo->removeItem(i);

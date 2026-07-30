@@ -42,7 +42,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	MenuHeaderWidget *header = new MenuHeaderWidget(model->getDisplayName(), model->getColor(), this);
 	header->title()->setEnabled(true);
 	connect(header->title(), &QLineEdit::textChanged, model, &DataMonitorModel::setDisplayName);
-	connect(model, &DataMonitorModel::displayNameChanged, header, [=](QString name) {
+	connect(model, &DataMonitorModel::displayNameChanged, header, [header](QString name) {
 		header->blockSignals(true);
 		header->title()->setText(name);
 		header->blockSignals(false);
@@ -115,32 +115,33 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	scaleOverride->setVisible(false);
 	scaleOverride->setScalingEnabled(false);
 
-	connect(scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		if(scaleCb->itemData(idx) == SCALE_RAW) {
+	connect(scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[scaleCb, scaleOverride, model](int idx) {
+			if(scaleCb->itemData(idx) == SCALE_RAW) {
 
-			scaleOverride->setVisible(false);
-			// non scaled value is 1
-			model->setScale(1);
+				scaleOverride->setVisible(false);
+				// non scaled value is 1
+				model->setScale(1);
 
-		} else if(scaleCb->itemData(idx) == SCALE_SCALED) {
+			} else if(scaleCb->itemData(idx) == SCALE_SCALED) {
 
-			scaleOverride->setVisible(true);
-			scaleOverride->setEnabled(false);
-			model->setScale(model->defaultScale());
-			scaleOverride->blockSignals(true);
-			scaleOverride->setValue(model->defaultScale());
-			scaleOverride->blockSignals(false);
+				scaleOverride->setVisible(true);
+				scaleOverride->setEnabled(false);
+				model->setScale(model->defaultScale());
+				scaleOverride->blockSignals(true);
+				scaleOverride->setValue(model->defaultScale());
+				scaleOverride->blockSignals(false);
 
-		} else if(scaleCb->itemData(idx) == SCALE_OVERRIDE) {
+			} else if(scaleCb->itemData(idx) == SCALE_OVERRIDE) {
 
-			scaleOverride->setVisible(true);
-			scaleOverride->setEnabled(true);
-			model->setScale(model->defaultScale());
-			scaleOverride->blockSignals(true);
-			scaleOverride->setValue(model->defaultScale());
-			scaleOverride->blockSignals(false);
-		}
-	});
+				scaleOverride->setVisible(true);
+				scaleOverride->setEnabled(true);
+				model->setScale(model->defaultScale());
+				scaleOverride->blockSignals(true);
+				scaleOverride->setValue(model->defaultScale());
+				scaleOverride->blockSignals(false);
+			}
+		});
 
 	if(model->hasScale()) {
 		scaleCb->setCurrentIndex(1);
@@ -149,7 +150,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	scalingLayout->addWidget(scaleModeCBb);
 	scalingLayout->addWidget(scaleOverride);
 
-	connect(scaleOverride, &MenuSpinbox::valueChanged, this, [=](double value) {
+	connect(scaleOverride, &MenuSpinbox::valueChanged, this, [model](double value) {
 		if(qobject_cast<DmmDataMonitorModel *>(model)) {
 			DmmDataMonitorModel *dmmModel = dynamic_cast<DmmDataMonitorModel *>(model);
 			if(dmmModel) {
@@ -178,32 +179,33 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	offsetOverride->setVisible(false);
 	offsetOverride->setScalingEnabled(false);
 
-	connect(offsetCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		if(offsetCb->itemData(idx) == OFFSET_RAW) {
+	connect(offsetCb, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[offsetCb, offsetOverride, model](int idx) {
+			if(offsetCb->itemData(idx) == OFFSET_RAW) {
 
-			offsetOverride->setVisible(false);
-			// non offset value is 0
-			model->setOffset(0);
+				offsetOverride->setVisible(false);
+				// non offset value is 0
+				model->setOffset(0);
 
-		} else if(offsetCb->itemData(idx) == OFFSET_OFFSETED) {
+			} else if(offsetCb->itemData(idx) == OFFSET_OFFSETED) {
 
-			offsetOverride->setVisible(true);
-			offsetOverride->setEnabled(false);
-			model->setOffset(model->defaultOffset());
-			offsetOverride->blockSignals(true);
-			offsetOverride->setValue(model->defaultOffset());
-			offsetOverride->blockSignals(false);
+				offsetOverride->setVisible(true);
+				offsetOverride->setEnabled(false);
+				model->setOffset(model->defaultOffset());
+				offsetOverride->blockSignals(true);
+				offsetOverride->setValue(model->defaultOffset());
+				offsetOverride->blockSignals(false);
 
-		} else if(offsetCb->itemData(idx) == OFFSET_OVERRIDE) {
+			} else if(offsetCb->itemData(idx) == OFFSET_OVERRIDE) {
 
-			offsetOverride->setVisible(true);
-			offsetOverride->setEnabled(true);
-			model->setOffset(model->defaultOffset());
-			offsetOverride->blockSignals(true);
-			offsetOverride->setValue(model->defaultOffset());
-			offsetOverride->blockSignals(false);
-		}
-	});
+				offsetOverride->setVisible(true);
+				offsetOverride->setEnabled(true);
+				model->setOffset(model->defaultOffset());
+				offsetOverride->blockSignals(true);
+				offsetOverride->setValue(model->defaultOffset());
+				offsetOverride->blockSignals(false);
+			}
+		});
 
 	if(model->hasOffset()) {
 		offsetCb->setCurrentIndex(1);
@@ -212,7 +214,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	scalingLayout->addWidget(offsetModeCBb);
 	scalingLayout->addWidget(offsetOverride);
 
-	connect(offsetOverride, &MenuSpinbox::valueChanged, this, [=](double value) {
+	connect(offsetOverride, &MenuSpinbox::valueChanged, this, [model](double value) {
 		if(qobject_cast<DmmDataMonitorModel *>(model)) {
 			DmmDataMonitorModel *dmmModel = dynamic_cast<DmmDataMonitorModel *>(model);
 			if(dmmModel) {
@@ -268,16 +270,17 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	QLineEdit *umSymbol = new QLineEdit(model->getUnitOfMeasure()->getSymbol(), um);
 	umSymbol->setPlaceholderText("Symbol");
 
-	connect(umName, &QLineEdit::textChanged, this, [=](QString text) { model->getUnitOfMeasure()->setName(text); });
-	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this, [=]() {
+	connect(umName, &QLineEdit::textChanged, this,
+		[model](QString text) { model->getUnitOfMeasure()->setName(text); });
+	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this, [umName, model]() {
 		umName->blockSignals(true);
 		umName->setText(model->getUnitOfMeasure()->getName());
 		umName->blockSignals(false);
 	});
 
 	connect(umSymbol, &QLineEdit::textChanged, this,
-		[=](QString text) { model->getUnitOfMeasure()->setSymbol(text); });
-	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this, [=]() {
+		[model](QString text) { model->getUnitOfMeasure()->setSymbol(text); });
+	connect(model->getUnitOfMeasure(), &UnitOfMeasurement::unitChanged, this, [umSymbol, model]() {
 		umSymbol->blockSignals(true);
 		umSymbol->setText(model->getUnitOfMeasure()->getSymbol());
 		umSymbol->blockSignals(false);
