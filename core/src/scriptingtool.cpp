@@ -75,10 +75,10 @@ ScriptingTool::ScriptingTool(QWidget *parent)
 	Style::setStyle(m_codeEditor, style::properties::widget::basicComponent);
 	Style::setStyle(m_codeEditor, style::properties::widget::border_interactive);
 
-	connect(loadBtn, &QPushButton::clicked, this, [=]() { loadFile(); });
-	connect(saveBtn, &QPushButton::clicked, this, [=]() { saveToFile(); });
-	connect(saveAsBtn, &QPushButton::clicked, this, [=]() { saveFileAs(); });
-	connect(m_runBtn, &QPushButton::clicked, this, [=]() { evaluateCode(m_codeEditor->toPlainText()); });
+	connect(loadBtn, &QPushButton::clicked, this, [this]() { loadFile(); });
+	connect(saveBtn, &QPushButton::clicked, this, [this]() { saveToFile(); });
+	connect(saveAsBtn, &QPushButton::clicked, this, [this]() { saveFileAs(); });
+	connect(m_runBtn, &QPushButton::clicked, this, [this]() { evaluateCode(m_codeEditor->toPlainText()); });
 
 	m_console = new QPlainTextEdit(m_tool);
 	m_console->setReadOnly(true);

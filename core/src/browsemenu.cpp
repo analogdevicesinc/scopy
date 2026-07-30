@@ -65,7 +65,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	homeBtn->setChecked(true);
 	homeBtn->setIconSize(QSize(32, 32));
 	homeBtn->setStyleSheet("text-align: left");
-	connect(homeBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(HOME_ID); });
+	connect(homeBtn, &QPushButton::clicked, this, [this]() { Q_EMIT requestTool(HOME_ID); });
 	connect(this, &BrowseMenu::collapsed, homeBtn,
 		[this, homeBtn](bool collapsed) { hideBtnText(homeBtn, tr("Home"), collapsed); });
 	m_btnsMap[HOME_ID] = homeBtn;
@@ -80,7 +80,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	m_scriptingBtn->setChecked(false);
 
 	m_btnsMap[SCRIPTING_ID] = m_scriptingBtn;
-	connect(m_scriptingBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(SCRIPTING_ID); });
+	connect(m_scriptingBtn, &QPushButton::clicked, this, [this]() { Q_EMIT requestTool(SCRIPTING_ID); });
 	bool scriptingEnabled = Preferences::get("general_scripting_enabled").toBool();
 	m_scriptingBtn->setVisible(scriptingEnabled);
 
@@ -91,7 +91,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 
 	// Connect to preference changes for scripting button
 	Preferences *prefs = Preferences::GetInstance();
-	connect(prefs, &Preferences::preferenceChanged, this, [=](QString key, QVariant val) {
+	connect(prefs, &Preferences::preferenceChanged, this, [this, scriptingMenuLine](QString key, QVariant val) {
 		if(key == "general_scripting_enabled") {
 			bool enabled = val.toBool();
 			m_scriptingBtn->setVisible(enabled);
@@ -122,7 +122,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 					":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 						"/icons/preferences.svg",
 					m_content);
-	connect(pkgBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(PACKAGE_ID); });
+	connect(pkgBtn, &QPushButton::clicked, this, [this]() { Q_EMIT requestTool(PACKAGE_ID); });
 	pkgBtn->setCheckable(true);
 	m_btnsMap[PACKAGE_ID] = pkgBtn;
 
@@ -130,7 +130,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 						":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							"/icons/preferences.svg",
 						m_content);
-	connect(preferencesBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(PREFERENCES_ID); });
+	connect(preferencesBtn, &QPushButton::clicked, this, [this]() { Q_EMIT requestTool(PREFERENCES_ID); });
 	preferencesBtn->setCheckable(true);
 	m_btnsMap[PREFERENCES_ID] = preferencesBtn;
 
@@ -141,7 +141,7 @@ BrowseMenu::BrowseMenu(QWidget *parent)
 	aboutBtn->setIconSize(
 		QSize(Style::getDimension(json::global::unit_2), Style::getDimension(json::global::unit_2)));
 	aboutBtn->setCheckable(true);
-	connect(aboutBtn, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool(ABOUT_ID); });
+	connect(aboutBtn, &QPushButton::clicked, this, [this]() { Q_EMIT requestTool(ABOUT_ID); });
 	m_btnsMap[ABOUT_ID] = aboutBtn;
 
 	QLabel *logo = createScopyLogo(m_content);

@@ -60,7 +60,7 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	optionsControlLayout->addWidget(showAgain);
 
 	Preferences *p = Preferences::GetInstance();
-	connect(showAgain, &QCheckBox::toggled, this, [=](bool en) {
+	connect(showAgain, &QCheckBox::toggled, this, [p](bool en) {
 		p->set("general_dont_show_whats_new", en);
 		if(en) {
 			p->set("scopy_git_version", QString(SCOPY_VERSION_GIT));
@@ -73,10 +73,10 @@ WhatsNewOverlay::WhatsNewOverlay(QWidget *parent)
 	m_versionCb = new QComboBox(optionsoverlayControlWidget);
 
 	connect(m_versionCb, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { m_carouselWidget->setCurrentIndex(idx); });
+		[this](int idx) { m_carouselWidget->setCurrentIndex(idx); });
 
 	QPushButton *okButton = new QPushButton("Ok", optionsoverlayControlWidget);
-	connect(okButton, &QPushButton::clicked, this, [=]() { this->deleteLater(); });
+	connect(okButton, &QPushButton::clicked, this, [this]() { this->deleteLater(); });
 	Style::setStyle(okButton, style::properties::button::basicButton, true, true);
 	optionsControlLayout->addWidget(okButton);
 
@@ -202,11 +202,12 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 				htmlPageButton->setChecked(true);
 			}
 
-			connect(htmlPageButton, &QPushButton::toggled, this, [=](bool toggled) {
-				if(toggled) {
-					versionCarouselWithControls->setCurrentIndex(i);
-				}
-			});
+			connect(htmlPageButton, &QPushButton::toggled, this,
+				[versionCarouselWithControls, i](bool toggled) {
+					if(toggled) {
+						versionCarouselWithControls->setCurrentIndex(i);
+					}
+				});
 
 			carouselControlayout->addWidget(htmlPageButton, 0, Qt::AlignBottom);
 			m_carouselButtons->addButton(htmlPageButton, i);
@@ -224,13 +225,13 @@ void WhatsNewOverlay::generateVersionPage(QString filePath)
 			new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
 		carouselControlayout->addWidget(next);
 
-		connect(previous, &QPushButton::clicked, this, [=]() {
+		connect(previous, &QPushButton::clicked, this, [m_carouselButtons, numberOfPages]() {
 			int currentIndex = m_carouselButtons->checkedId();
 			int previousIndex = (currentIndex - 1 + numberOfPages) % numberOfPages;
 			m_carouselButtons->button(previousIndex)->setChecked(true);
 		});
 
-		connect(next, &QPushButton::clicked, this, [=]() {
+		connect(next, &QPushButton::clicked, this, [m_carouselButtons, numberOfPages]() {
 			int currentIndex = m_carouselButtons->checkedId();
 			int nextIndex = (currentIndex + 1) % numberOfPages;
 			m_carouselButtons->button(nextIndex)->setChecked(true);

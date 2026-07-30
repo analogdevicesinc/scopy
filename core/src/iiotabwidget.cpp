@@ -144,12 +144,13 @@ void IioTabWidget::setupConnections()
 		m_serialDescriptionLabel->setText(m_serialPortsNames[crtText]);
 		Q_EMIT uriChanged(getSerialPath());
 	});
-	connect(m_baudRateCb->combo(), &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
-	connect(m_serialFrameEdit, &QLineEdit::returnPressed, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_baudRateCb->combo(), &QComboBox::textActivated, this,
+		[this]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_serialFrameEdit, &QLineEdit::returnPressed, this, [this]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(this, &IioTabWidget::uriChanged, this, &IioTabWidget::updateUri);
-	connect(m_uriEdit, &QLineEdit::returnPressed, this, [=]() { Q_EMIT m_btnVerify->clicked(); });
+	connect(m_uriEdit, &QLineEdit::returnPressed, this, [this]() { Q_EMIT m_btnVerify->clicked(); });
 	connect(m_uriEdit, &QLineEdit::textChanged, this,
-		[=](QString uri) { m_btnVerify->setEnabled(!uri.isEmpty()); });
+		[this](QString uri) { m_btnVerify->setEnabled(!uri.isEmpty()); });
 }
 
 QStringList IioTabWidget::computeBackendsList()
@@ -170,7 +171,7 @@ QCheckBox *IioTabWidget::createBackendCheckBox(QString backEnd, QWidget *parent)
 {
 	QCheckBox *cb = new QCheckBox(backEnd, m_filterWidget);
 	cb->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	connect(cb, &QCheckBox::toggled, this, [=](bool en) {
+	connect(cb, &QCheckBox::toggled, this, [this, backEnd](bool en) {
 		if(en) {
 			m_scanParamsList.push_back(backEnd + ":");
 		} else {

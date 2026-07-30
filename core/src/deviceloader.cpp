@@ -48,7 +48,7 @@ void DeviceLoader::asyncInit()
 	QThread *th = new QThread();
 	connect(
 		th, &QThread::started, d,
-		[=]() {
+		[this, th]() {
 			// initializer thread
 			d->init();
 			th->quit(); // this replicates QThread::create behaviour of exiting the event loop after
@@ -57,7 +57,7 @@ void DeviceLoader::asyncInit()
 		Qt::QueuedConnection);
 
 #else
-	QThread *th = QThread::create([=] {
+	QThread *th = QThread::create([this] {
 		// initializer thread
 		d->init();
 	});
@@ -69,7 +69,7 @@ void DeviceLoader::asyncInit()
 
 	connect(
 		th, &QThread::destroyed, this,
-		[=]() {
+		[this]() {
 			;
 			// back to main thread
 			d->moveToThread(QThread::currentThread());

@@ -320,7 +320,7 @@ void ToolMenuManager::initToolMenuHeaderWidget(MenuCollapseHeader *header, const
 	Style::setStyle(header, style::properties::widget::ledBorder, isConnected);
 	thw->deviceBtn()->setCheckable(dInfo.hasConfigPage);
 	menuBtnGroup->addButton(thw->deviceBtn());
-	connect(thw->deviceBtn(), &QPushButton::toggled, this, [=](bool en) {
+	connect(thw->deviceBtn(), &QPushButton::toggled, this, [this, header, dInfo](bool en) {
 		if(en) {
 			Style::setStyle(header, style::properties::widget::deviceHeaderWidget, "selected");
 			Q_EMIT requestToolSelect(dInfo.id);
@@ -349,7 +349,8 @@ ToolMenuItem *ToolMenuManager::createToolMenuItem(ToolMenuEntry *tme, QWidget *p
 	toolMenuItem->onCollapsed(m_collapsed);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::toggled, tme, &ToolMenuEntry::runToggled);
 	connect(toolMenuItem->getToolRunBtn(), &QPushButton::clicked, tme, &ToolMenuEntry::runClicked);
-	connect(toolMenuItem, &QPushButton::clicked, this, [=]() { Q_EMIT requestToolSelect(toolMenuItem->getId()); });
+	connect(toolMenuItem, &QPushButton::clicked, this,
+		[this, toolMenuItem]() { Q_EMIT requestToolSelect(toolMenuItem->getId()); });
 	connect(toolMenuItem, &ToolMenuItem::doubleclick, this, [this, tme]() { setTmeAttached(tme); });
 	connect(tme, &ToolMenuEntry::updateToolEntry, toolMenuItem, &ToolMenuItem::updateItem);
 	connect(this, &ToolMenuManager::toolStackChanged, toolMenuItem, &ToolMenuItem::selectCrtItem);

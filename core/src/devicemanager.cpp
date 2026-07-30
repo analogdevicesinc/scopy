@@ -76,7 +76,7 @@ QString DeviceManager::createDevice(QString category, QString param, bool async,
 	DeviceImpl *d = DeviceFactory::build(param, category);
 	DeviceLoader *dl = new DeviceLoader(d, this);
 
-	connect(dl, &DeviceLoader::initialized, this, [=]() {
+	connect(dl, &DeviceLoader::initialized, this, [this, d, plugins]() {
 		QList<Plugin *> availablePlugins = d->plugins();
 		if(!plugins.isEmpty()) {
 			for(Plugin *p : std::as_const(availablePlugins)) {
@@ -141,11 +141,11 @@ QString DeviceManager::reloadDevice(QString id, QStringList plugins)
 
 void DeviceManager::connectDeviceToManager(DeviceImpl *d)
 {
-	connect(d, &DeviceImpl::connecting, this, [=]() { connectingDevice(d->id()); });
-	connect(d, &DeviceImpl::connected, this, [=]() { connectDevice(d->id()); });
-	connect(d, &DeviceImpl::disconnecting, this, [=]() { disconnectingDevice(d->id()); });
-	connect(d, &DeviceImpl::disconnected, this, [=]() { disconnectDevice(d->id()); });
-	connect(d, &DeviceImpl::forget, this, [=]() { removeDeviceById(d->id()); });
+	connect(d, &DeviceImpl::connecting, this, [this, d]() { connectingDevice(d->id()); });
+	connect(d, &DeviceImpl::connected, this, [this, d]() { connectDevice(d->id()); });
+	connect(d, &DeviceImpl::disconnecting, this, [this, d]() { disconnectingDevice(d->id()); });
+	connect(d, &DeviceImpl::disconnected, this, [this, d]() { disconnectDevice(d->id()); });
+	connect(d, &DeviceImpl::forget, this, [this, d]() { removeDeviceById(d->id()); });
 	connect(d, &DeviceImpl::requestReload, this, &DeviceManager::reloadDevice);
 	connect(d, &DeviceImpl::requestedRestart, this, QOverload<>::of(&DeviceManager::restartDevice));
 	connect(d, &DeviceImpl::toolListChanged, this, &DeviceManager::changeToolListDevice);

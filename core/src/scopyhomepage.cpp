@@ -61,8 +61,9 @@ ScopyHomePage::ScopyHomePage(QWidget *parent)
 	connect(db, &DeviceBrowser::requestDevice, this, [this](QString dev, int) { Q_EMIT requestDevice(dev); });
 	connect(this, &ScopyHomePage::deviceAddedToUi, add, &ScopyHomeAddPage::deviceAddedToUi);
 
-	connect(add, &ScopyHomeAddPage::requestDevice, this, [=](QString id) { Q_EMIT db->requestDevice(id, -1); });
-	connect(add, &ScopyHomeAddPage::newDeviceAvailable, this, [=](DeviceImpl *d) { Q_EMIT newDeviceAvailable(d); });
+	connect(add, &ScopyHomeAddPage::requestDevice, this, [db](QString id) { Q_EMIT db->requestDevice(id, -1); });
+	connect(add, &ScopyHomeAddPage::newDeviceAvailable, this,
+		[this](DeviceImpl *d) { Q_EMIT newDeviceAvailable(d); });
 
 	connect(db, &DeviceBrowser::displayNameChanged, this, &ScopyHomePage::displayNameChanged);
 }
