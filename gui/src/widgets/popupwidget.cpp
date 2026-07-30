@@ -105,7 +105,7 @@ void PopupWidget::enableCloseButton(bool en)
 		m_closeHover->setVisible(true);
 		m_closeHover->raise();
 
-		connect(m_closeButton, &QPushButton::clicked, this, [=]() { deleteLater(); });
+		connect(m_closeButton, &QPushButton::clicked, this, [this]() { deleteLater(); });
 	} else {
 		if(m_closeButton != nullptr) {
 			delete m_closeButton;

@@ -47,7 +47,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	measureSection->contentLayout()->addWidget(measurePanelSwitch);
 
 	connect(measurePanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { Q_EMIT enableMeasurementPanel(b); });
+		[this](bool b) { Q_EMIT enableMeasurementPanel(b); });
 
 	statsSection = new MenuSectionWidget(this);
 	Style::setStyle(statsSection, style::properties::widget::border);
@@ -55,7 +55,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	Style::setStyle(statsPanelSwitch->label(), style::properties::label::subtle, false);
 	Style::setStyle(statsPanelSwitch->label(), style::properties::label::defaultLabel);
 	connect(statsPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { Q_EMIT enableStatsPanel(b); });
+		[this](bool b) { Q_EMIT enableStatsPanel(b); });
 	statsSection->contentLayout()->addWidget(statsPanelSwitch);
 
 	statsPanelSwitch->onOffswitch()->setChecked(false);
@@ -67,7 +67,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	Style::setStyle(markerPanelSwitch->label(), style::properties::label::defaultLabel, true, true);
 
 	connect(markerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { Q_EMIT enableMarkerPanel(b); });
+		[this](bool b) { Q_EMIT enableMarkerPanel(b); });
 	markerSection->contentLayout()->addWidget(markerPanelSwitch);
 
 	markerPanelSwitch->onOffswitch()->setChecked(false);
@@ -79,7 +79,7 @@ MeasurementSettings::MeasurementSettings(QWidget *parent)
 	Style::setStyle(genalyzerPanelSwitch->label(), style::properties::label::defaultLabel);
 
 	connect(genalyzerPanelSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		[=](bool b) { Q_EMIT enableGenalyzerPanel(b); });
+		[this](bool b) { Q_EMIT enableGenalyzerPanel(b); });
 	genalyzerSection->contentLayout()->addWidget(genalyzerPanelSwitch);
 
 	genalyzerPanelSwitch->onOffswitch()->setChecked(false);

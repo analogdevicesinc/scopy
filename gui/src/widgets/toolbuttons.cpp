@@ -43,7 +43,7 @@ OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent)
 		"/icons/setup3_unchecked_hover.svg";
 	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
 
-	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+	connect(this, &QPushButton::toggled, this, [this, iconPath](bool toggle) {
 		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
@@ -53,14 +53,14 @@ OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent)
 	setChecked(opened);
 	grp = new SemiExclusiveButtonGroup(this);
 	connect(this, &QPushButton::toggled, m_menu, &MenuHAnim::toggleMenu);
-	connect(grp, &SemiExclusiveButtonGroup::buttonSelected, this, [=](QAbstractButton *btn) {
+	connect(grp, &SemiExclusiveButtonGroup::buttonSelected, this, [this](QAbstractButton *btn) {
 		if(btn == nullptr) {
 			this->setChecked(false);
 		} else {
 			this->setChecked(true);
 		}
 	});
-	connect(this, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(this, &QAbstractButton::toggled, this, [this](bool b) {
 		if(b) {
 			grp->getLastButton()->setChecked(true);
 		} else {
@@ -78,7 +78,7 @@ GearBtn::GearBtn(QWidget *parent)
 		":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/gear_wheel.svg";
 	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
 
-	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+	connect(this, &QPushButton::toggled, this, [this, iconPath](bool toggle) {
 		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
@@ -133,9 +133,10 @@ void InfoBtn::generateInfoPopup(QWidget *parent)
 	m_popupWidget->getContinueBtn()->setText("Documentation");
 	m_popupWidget->enableCloseButton(true);
 
-	connect(m_popupWidget->getExitBtn(), &QPushButton::clicked, this, [=]() { m_popupWidget->deleteLater(); });
+	connect(m_popupWidget->getExitBtn(), &QPushButton::clicked, this, [this]() { m_popupWidget->deleteLater(); });
 
-	connect(m_popupWidget->getContinueBtn(), &QPushButton::clicked, this, [=]() { m_popupWidget->deleteLater(); });
+	connect(m_popupWidget->getContinueBtn(), &QPushButton::clicked, this,
+		[this]() { m_popupWidget->deleteLater(); });
 
 	m_popupWidget->enableTintedOverlay(true);
 	m_popupWidget->show();
@@ -167,7 +168,7 @@ RunBtn::RunBtn(QWidget *parent)
 	setChecked(false);
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setText("Run");
-	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Run"); });
+	connect(this, &QPushButton::toggled, this, [this](bool b) { setText(b ? "Stop" : "Run"); });
 	Style::setStyle(this, style::properties::button::runButton);
 
 	QIcon icon1;
@@ -187,7 +188,7 @@ SingleShotBtn::SingleShotBtn(QWidget *parent)
 	setCheckable(true);
 	setChecked(false);
 	setText("Single");
-	connect(this, &QPushButton::toggled, this, [=](bool b) { setText(b ? "Stop" : "Single"); });
+	connect(this, &QPushButton::toggled, this, [this](bool b) { setText(b ? "Stop" : "Single"); });
 	Style::setStyle(this, style::properties::button::singleButton);
 
 	QIcon icon1;
@@ -207,7 +208,7 @@ AddBtn::AddBtn(QWidget *parent)
 	QString iconPath = ":/gui/icons/add.svg";
 	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
 
-	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+	connect(this, &QPushButton::toggled, this, [this, iconPath](bool toggle) {
 		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
@@ -221,7 +222,7 @@ RemoveBtn::RemoveBtn(QWidget *parent)
 	QString iconPath = ":/gui/icons/red_x.svg";
 	setIcon(Style::getPixmap(iconPath, Style::getColor(json::theme::content_default)));
 
-	connect(this, &QPushButton::toggled, this, [=](bool toggle) {
+	connect(this, &QPushButton::toggled, this, [this, iconPath](bool toggle) {
 		const char *color = toggle ? json::theme::content_inverse : json::theme::content_default;
 		setIcon(Style::getPixmap(iconPath, Style::getColor(color)));
 	});
@@ -326,7 +327,7 @@ MenuCollapseBtn::MenuCollapseBtn(Direction dir, MenuHAnim *menu, QWidget *parent
 
 	setIcon(Style::getPixmap(openIcon, Style::getColor(json::theme::content_default)));
 
-	connect(this, &QPushButton::toggled, this, [=](bool open) {
+	connect(this, &QPushButton::toggled, this, [this, openIcon, closedIcon, menu](bool open) {
 		setIcon(Style::getPixmap(open ? openIcon : closedIcon, Style::getColor(json::theme::content_default)));
 		menu->toggleMenu(open);
 	});

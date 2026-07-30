@@ -64,9 +64,9 @@ MenuSpinbox::MenuSpinbox(QString name, double val, QString unit, double min, dou
 	connect(m_plus, &QAbstractButton::clicked, this, &MenuSpinbox::incrementValue);
 	connect(m_minus, &QAbstractButton::clicked, this, &MenuSpinbox::decrementValue);
 
-	connect(m_edit, &QLineEdit::editingFinished, this, [=]() { userInput(m_edit->text()); });
+	connect(m_edit, &QLineEdit::editingFinished, this, [this]() { userInput(m_edit->text()); });
 
-	connect(m_scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(m_scaleCb, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int idx) {
 		m_incrementStrategy->setScale(m_scaleCb->itemData(idx).toDouble());
 		userInput(m_edit->text());
 	});

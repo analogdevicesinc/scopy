@@ -44,20 +44,20 @@ PlotAxisHandle::~PlotAxisHandle()
 void PlotAxisHandle::init()
 {
 	m_handle = new AxisHandle(m_axis->axisId(), HandlePos::SOUTH_OR_EAST, m_plot);
-	connect(m_plot, &QObject::destroyed, this, [=]() { m_handle = nullptr; });
+	connect(m_plot, &QObject::destroyed, this, [this]() { m_handle = nullptr; });
 	m_pos = pixelToScale(m_handle->getPos());
 
 	connect(m_plotWidget, &PlotWidget::canvasSizeChanged, this, &PlotAxisHandle::updatePos);
 	connect(m_plotWidget, &PlotWidget::plotScaleChanged, this, &PlotAxisHandle::updatePos);
 	connect(m_axis, &PlotAxis::axisScaleUpdated, this, &PlotAxisHandle::updatePos);
 
-	connect(this, &PlotAxisHandle::updatePos, this, [=]() {
+	connect(this, &PlotAxisHandle::updatePos, this, [this]() {
 		if(scaleToPixel(m_pos) != m_handle->getPos()) {
 			setPositionSilent(m_pos);
 		}
 	});
 
-	connect(m_handle, &AxisHandle::pixelPosChanged, this, [=](int pos) {
+	connect(m_handle, &AxisHandle::pixelPosChanged, this, [this](int pos) {
 		if(pos != scaleToPixel(m_pos)) {
 			Q_EMIT scalePosChanged(pixelToScale(pos));
 			m_pos = pixelToScale(pos);

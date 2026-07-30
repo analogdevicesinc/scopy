@@ -83,32 +83,32 @@ void CursorController::connectSignals(CursorSettings *cursorSettings)
 		&CursorController::readoutsDragToggled);
 
 	//  update session in case the settings are conncted to multiple controllers
-	connect(cursorSettings, &CursorSettings::sessionUpdated, this, [=]() { setVisible(isVisible()); });
+	connect(cursorSettings, &CursorSettings::sessionUpdated, this, [this]() { setVisible(isVisible()); });
 	cursorSettings->updateSession();
 
 	// cursor movement
-	connect(y1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+	connect(y1Cursor, &PlotAxisHandle::scalePosChanged, this, [this](double pos) {
 		if(yLock) {
 			y2Cursor->setPositionSilent(pos - yLockGap);
 			plotCursorReadouts->setY2(y2Cursor->getPosition());
 		}
 		plotCursorReadouts->setY1(pos);
 	});
-	connect(y2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+	connect(y2Cursor, &PlotAxisHandle::scalePosChanged, this, [this](double pos) {
 		if(yLock) {
 			y1Cursor->setPositionSilent(pos + yLockGap);
 			plotCursorReadouts->setY1(y1Cursor->getPosition());
 		}
 		plotCursorReadouts->setY2(pos);
 	});
-	connect(x1Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+	connect(x1Cursor, &PlotAxisHandle::scalePosChanged, this, [this](double pos) {
 		if(xLock) {
 			x2Cursor->setPositionSilent(pos - LockGap);
 			plotCursorReadouts->setX2(x2Cursor->getPosition());
 		}
 		plotCursorReadouts->setX1(pos);
 	});
-	connect(x2Cursor, &PlotAxisHandle::scalePosChanged, this, [=](double pos) {
+	connect(x2Cursor, &PlotAxisHandle::scalePosChanged, this, [this](double pos) {
 		if(xLock) {
 			x1Cursor->setPositionSilent(pos + LockGap);
 			plotCursorReadouts->setX1(x1Cursor->getPosition());
@@ -223,14 +223,14 @@ void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorCon
 	ctrl2->x2Cursor->setPosition(ctrl1->x2Cursor->getPosition());
 
 	// connect ctrl1 to ctrl2
-	connect(ctrl1->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x1Cursor, [=](double pos) {
+	connect(ctrl1->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x1Cursor, [ctrl1, ctrl2](double pos) {
 		ctrl1->x1Cursor->blockSignals(true);
 		ctrl2->x1Cursor->setPosition(pos);
 		ctrl1->x1Cursor->blockSignals(false);
 		ctrl2->x1Cursor->repaint();
 		ctrl2->m_plot->repaint();
 	});
-	connect(ctrl1->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x2Cursor, [=](double pos) {
+	connect(ctrl1->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl2->x2Cursor, [ctrl1, ctrl2](double pos) {
 		ctrl1->x2Cursor->blockSignals(true);
 		ctrl2->x2Cursor->setPosition(pos);
 		ctrl1->x2Cursor->blockSignals(false);
@@ -239,14 +239,14 @@ void CursorController::syncXCursorControllers(CursorController *ctrl1, CursorCon
 	});
 
 	// connect ctrl2 to ctrl1
-	connect(ctrl2->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x1Cursor, [=](double pos) {
+	connect(ctrl2->x1Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x1Cursor, [ctrl1, ctrl2](double pos) {
 		ctrl2->x1Cursor->blockSignals(true);
 		ctrl1->x1Cursor->setPosition(pos);
 		ctrl2->x1Cursor->blockSignals(false);
 		ctrl1->x1Cursor->repaint();
 		ctrl1->m_plot->repaint();
 	});
-	connect(ctrl2->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x2Cursor, [=](double pos) {
+	connect(ctrl2->x2Cursor, &PlotAxisHandle::scalePosChanged, ctrl1->x2Cursor, [ctrl1, ctrl2](double pos) {
 		ctrl2->x2Cursor->blockSignals(true);
 		ctrl1->x2Cursor->setPosition(pos);
 		ctrl2->x2Cursor->blockSignals(false);

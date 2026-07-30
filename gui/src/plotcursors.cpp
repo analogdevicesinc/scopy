@@ -56,7 +56,7 @@ void PlotCursors::initUI()
 
 void PlotCursors::connectSignals()
 {
-	connect(this, &PlotCursors::update, this, [=]() {
+	connect(this, &PlotCursors::update, this, [this]() {
 		Q_EMIT m_yCursors.first->updatePos();
 		Q_EMIT m_yCursors.second->updatePos();
 		Q_EMIT m_xCursors.first->updatePos();
@@ -66,17 +66,17 @@ void PlotCursors::connectSignals()
 		}
 	});
 
-	connect(m_xCursors.first, &PlotAxisHandle::scalePosChanged, this, [=]() {
+	connect(m_xCursors.first, &PlotAxisHandle::scalePosChanged, this, [this]() {
 		if(m_tracking) {
 			displayIntersection();
 		}
 	});
-	connect(m_xCursors.second, &PlotAxisHandle::scalePosChanged, this, [=]() {
+	connect(m_xCursors.second, &PlotAxisHandle::scalePosChanged, this, [this]() {
 		if(m_tracking) {
 			displayIntersection();
 		}
 	});
-	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
+	connect(m_plot, &PlotWidget::channelSelected, this, [this](PlotChannel *ch) {
 		PlotAxis *xAxis = m_plot->xAxis();
 		PlotAxis *yAxis = m_plot->xAxis();
 

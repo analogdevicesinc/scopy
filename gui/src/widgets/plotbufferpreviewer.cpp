@@ -60,12 +60,12 @@ void PlotBufferPreviewer::setupBufferPreviewer()
 
 	updateDataLimits(m_plot->xAxis()->min(), m_plot->xAxis()->max());
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [=]() {
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [this]() {
 		// reset the buffer preview position to current visible section
 		m_lastMin = m_plot->xAxis()->visibleMin();
 	});
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int bufferPos) {
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [this](int bufferPos) {
 		double bufferWidth = m_bufferPreviewer->width();
 		double axisWidth = m_bufferDataLimitMax - m_bufferDataLimitMin;
 		double newAxisPos = bufferPos * axisWidth / bufferWidth;
@@ -83,12 +83,12 @@ void PlotBufferPreviewer::setupBufferPreviewer()
 		updateBufferPreviewer();
 	});
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [this]() {
 		Q_EMIT m_plot->navigator()->reset();
 		updateBufferPreviewer();
 	});
 
-	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, [=]() { updateBufferPreviewer(); });
+	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, [this]() { updateBufferPreviewer(); });
 }
 
 void PlotBufferPreviewer::updateDataLimits(double min, double max)

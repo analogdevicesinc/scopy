@@ -61,7 +61,7 @@ MenuControlButton::MenuControlButton(QWidget *parent)
 	lay->addWidget(m_icon);
 	applyStylesheet();
 
-	connect(this, &QAbstractButton::toggled, this, [=](bool b) {
+	connect(this, &QAbstractButton::toggled, this, [this, iconPath](bool b) {
 		setDynamicProperty(this, "selected", b);
 		Style::setStyle(m_label, style::properties::label::menuMedium, b ? "selected" : "idle");
 		if(m_cs == CS_CIRCLE) {
@@ -103,7 +103,7 @@ void MenuControlButton::setName(QString s)
 void MenuControlButton::setDoubleClickToOpenMenu(bool b)
 {
 	if(b) {
-		dblClickToOpenMenu = connect(this, &MenuControlButton::doubleClicked, this, [=]() {
+		dblClickToOpenMenu = connect(this, &MenuControlButton::doubleClicked, this, [this]() {
 			setChecked(true);
 			if(m_btn->isVisible()) {
 				m_btn->click();
@@ -117,7 +117,7 @@ void MenuControlButton::setDoubleClickToOpenMenu(bool b)
 void MenuControlButton::setOpenMenuChecksThis(bool b)
 {
 	if(b) {
-		openMenuChecksThis = connect(m_btn, &QAbstractButton::toggled, this, [=](bool b) {
+		openMenuChecksThis = connect(m_btn, &QAbstractButton::toggled, this, [this](bool b) {
 			if(b)
 				setChecked(true);
 		});

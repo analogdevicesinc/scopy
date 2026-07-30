@@ -48,7 +48,7 @@ PlotManagerCombobox::PlotManagerCombobox(PlotManager *man, ChannelComponent *c, 
 	uint32_t uuid = c->plotChannelCmpt()->plotComponent()->uuid();
 	m_combo->setCurrentIndex(findIndexFromUuid(uuid));
 
-	connect(m_combo, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+	connect(m_combo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this, man](int idx) {
 		uint32_t uuid = m_combo->itemData(idx).toULongLong();
 		man->moveChannel(m_ch, uuid);
 		man->replot();

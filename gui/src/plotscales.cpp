@@ -83,7 +83,7 @@ void PlotScales::initMarginScales()
 
 	setMarginScalesEn(!Preferences::GetInstance()->get("show_graticule").toBool());
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
-		[=](QString preference, QVariant value) {
+		[this](QString preference, QVariant value) {
 			if(preference == "show_graticule") {
 				setMarginScalesEn(!value.toBool());
 			}
@@ -134,7 +134,7 @@ void PlotScales::initGrid()
 
 	setGridEn(Preferences::GetInstance()->get("show_grid").toBool());
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
-		[=](QString preference, QVariant value) {
+		[this](QString preference, QVariant value) {
 			if(preference == "show_grid") {
 				setGridEn(value.toBool());
 			}
@@ -159,12 +159,12 @@ void PlotScales::initGraticule()
 
 	setGraticuleEn(Preferences::GetInstance()->get("show_graticule").toBool());
 	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
-		[=](QString preference, QVariant value) {
+		[this](QString preference, QVariant value) {
 			if(preference == "show_graticule") {
 				setGraticuleEn(value.toBool());
 			}
 		});
-	connect(m_plot, &PlotWidget::channelSelected, this, [=](PlotChannel *ch) {
+	connect(m_plot, &PlotWidget::channelSelected, this, [this](PlotChannel *ch) {
 		QwtAxisId xAxisId = m_plot->xAxis()->axisId();
 		QwtAxisId yAxisId = m_plot->yAxis()->axisId();
 

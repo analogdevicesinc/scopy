@@ -137,7 +137,7 @@ QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *wid
 
 void DockerUtils::configureTopBar(QDockWidget *docker)
 {
-	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel) {
+	connect(docker, &QDockWidget::topLevelChanged, [docker](bool topLevel) {
 		QString icon_path = "";
 
 		if(QIcon::themeName() == "scopy-default") {

@@ -42,9 +42,9 @@ HomepageControls::~HomepageControls() {}
 
 void HomepageControls::connectSignals()
 {
-	connect(controls->getBackwardBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT goLeft(); });
-	connect(controls->getForwardBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT goRight(); });
-	connect(controls->getOpenBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT openFile(); });
+	connect(controls->getBackwardBtn(), &QPushButton::clicked, this, [this]() { Q_EMIT goLeft(); });
+	connect(controls->getForwardBtn(), &QPushButton::clicked, this, [this]() { Q_EMIT goRight(); });
+	connect(controls->getOpenBtn(), &QPushButton::clicked, this, [this]() { Q_EMIT openFile(); });
 }
 
 void HomepageControls::enableLeft(bool en) { controls->getBackwardBtn()->setEnabled(en); }
