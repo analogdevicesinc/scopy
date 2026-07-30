@@ -9,6 +9,8 @@
 #include "component/backends/iio/iioinputstream.h"
 #include "component/backends/iio/iiooutputstream.h"
 #include "component/backends/iio/iioping.h"
+#include "component/backends/iio/iioregisterreader.h"
+#include "component/backends/iio/iioregisterwriter.h"
 #include "component/backends/iio/iiosamplecodec.h"
 #include "component/backends/iio/iioscanelement.h"
 
@@ -106,6 +108,12 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = devOps->debugAttrName(dh, i);
 		makeAttribute(dev, name, m_attrOps->debugAttr(dh, name), executor);
+	}
+
+	// Register access — only where the device exposes a debug/register plane.
+	if(count > 0) {
+		new IIORegisterReader(devOps, dh, executor, dev);
+		new IIORegisterWriter(devOps, dh, executor, dev);
 	}
 }
 
