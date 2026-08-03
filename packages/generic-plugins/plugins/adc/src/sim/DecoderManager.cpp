@@ -316,6 +316,7 @@ void DecoderManager::removeDecoder(const QString &uid)
 		if(m_decoders[i].uid != uid) continue;
 		DecoderInstance d = m_decoders.takeAt(i);
 		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
+		if(m_store) m_store->releaseClaimant(uid);
 		for(const scopy::acq::DataKey &k : d.outKeys) {
 			if(m_overlay) m_overlay->unregisterDecoder(k);
 			if(m_store)   m_store->remove(k);
@@ -469,19 +470,13 @@ void DecoderManager::applyConfig(const QString &uid,
 		d->orderedRawKeys.clear();
 		d->proc->setAnnotationInputKey(srcKey);
 		d->proc->setWatchedKeys({srcKey});
+		if(m_store)
+			m_store->releaseClaimant(uid);
 	} else {
 		d->orderedRawKeys = orderedRawKeys;
 		d->proc->setOrderedRawKeys(orderedRawKeys);
 		d->proc->setWatchedKeys(orderedRawKeys);
-
-		if(m_store && m_windowSize > 0) {
-			// Ensure history depth covers a full decoder window.
-			const std::size_t depth = scopy::acq::DataStore::requiredHistoryDepth(
-				static_cast<std::size_t>(m_windowSize),
-				m_engine ? m_engine->bufferSize() : 1);
-			for(const scopy::acq::DataKey &k : orderedRawKeys)
-				m_store->ensureHistoryDepth(k, depth);
-		}
+		claimWindowDepth(*d);
 	}
 
 	if(m_logger)
@@ -490,11 +485,31 @@ void DecoderManager::applyConfig(const QString &uid,
 				.arg(uid).arg(orderedRawKeys.size()).arg(cfg.sampleRate));
 }
 
+// Claim enough history on each raw input for one full decoder window. Claims
+// are keyed by decoder uid, so re-claiming replaces the previous request and
+// removeDecoder() releases it — the DataStore keeps the max across claimants.
+void DecoderManager::claimWindowDepth(const DecoderInstance &d)
+{
+	if(!m_store)
+		return;
+	if(m_windowSize <= 0) {
+		m_store->releaseClaimant(d.uid);
+		return;
+	}
+	const std::size_t depth = scopy::acq::DataStore::depthForWindow(
+		static_cast<std::size_t>(m_windowSize),
+		m_engine ? m_engine->bufferSize() : 1);
+	for(const scopy::acq::DataKey &k : d.orderedRawKeys)
+		m_store->claimDepth(k, d.uid, depth);
+}
+
 void DecoderManager::setDecoderWindowSize(int n)
 {
 	m_windowSize = n;
-	for(const DecoderInstance &d : m_decoders)
+	for(const DecoderInstance &d : m_decoders) {
 		if(d.proc) d.proc->setWindowSize(n);
+		claimWindowDepth(d);
+	}
 }
 
 } // namespace adc

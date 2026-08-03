@@ -259,29 +259,23 @@ void DigitalTrackManager::setChannelVisible(const QString &sourceId,
 		m_plot->plot()->replot();
 }
 
-void DigitalTrackManager::updateRawCurves(int plotSize)
+void DigitalTrackManager::updateRawCurves(
+	int plotSize, const QMap<QString, scopy::acq::SampleVariant> *override)
 {
 	if(!m_store) return;
 	for(Item &it : m_items) {
 		if(it.kind != Item::Kind::RawCurve || !it.curve) continue;
 
-		const scopy::acq::SampleVariant v =
-			m_store->readWindowNative(it.srcKey, plotSize);
-
-		QVector<quint8> bits;
-		std::visit([&](const auto &vec) {
-			using VecT = std::decay_t<decltype(vec)>;
-			if constexpr(std::is_same_v<VecT, QVector<scopy::acq::Annotation>>) {
-				// Not applicable; leave bits empty.
-			} else {
-				bits.resize(vec.size());
-				for(int i = 0; i < vec.size(); ++i)
-					bits[i] = (vec[i] != 0) ? quint8(1) : quint8(0);
-			}
-		}, v);
-
 		it.curve->setSampleCount(static_cast<quint64>(plotSize));
-		it.curve->setSamples(bits);
+		if(override) {
+			const auto ov = override->constFind(it.srcKey.key);
+			if(ov != override->constEnd()) {
+				it.curve->setSamples(scopy::acq::toBits(ov.value()));
+				continue;
+			}
+		}
+		it.curve->setSamples(
+			scopy::acq::toBits(m_store->window(it.srcKey, plotSize)));
 	}
 }
 

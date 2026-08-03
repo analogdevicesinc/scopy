@@ -98,6 +98,11 @@ private:
 	// Enable/disable a PlotChannel and add/remove it from the autoscalers
 	// atomically. Idempotent — no-op if the driven state hasn't changed.
 	void setCurveDriven(PlotChannel *ch, bool driven);
+	void claimWaterfallDepth();
+	void claimPlotDepth();
+
+	static constexpr const char *kWaterfallClaimant = "waterfall";
+	static constexpr const char *kPlotClaimant      = "plot";
 
 	ToolMenuEntry *m_tme;
 
@@ -202,10 +207,11 @@ private:
 	// (non-sample-specific). Used to gate axis-anchoring behaviour.
 	bool scanActive() const;
 
-	// Map a chunk sample index → current X-axis position, using the last
-	// captured X-key snapshot (m_lastPlotX). Falls back to identity when
-	// the snapshot is empty or the index is out of range.
+	// Map a plot-window sample index → current X-axis position, using the
+	// last captured X-key snapshot (m_lastPlotX). Falls back to identity
+	// when the snapshot is empty. sampleForAxisPos() is the inverse.
 	double axisPosForSample(quint32 s) const;
+	int    sampleForAxisPos(double pos) const;
 
 	// Single source of truth for scan-mode alignment. Shifts the X
 	// interval so the fired sample lands at m_handleFraction of the
