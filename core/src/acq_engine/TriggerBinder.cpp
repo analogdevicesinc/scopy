@@ -12,7 +12,6 @@ TriggerBinder::TriggerBinder(TriggerProcessor *trig, AcquisitionEngine *engine,
 
 TriggerBinder::~TriggerBinder()
 {
-	// QObject destruction disconnects all signals we own; explicit for clarity.
 	if(m_singleShotConn) QObject::disconnect(m_singleShotConn);
 	if(m_replotConn)     QObject::disconnect(m_replotConn);
 }
@@ -21,21 +20,18 @@ void TriggerBinder::armSingleShot()
 {
 	if(!m_trig || !m_engine)
 		return;
-	// Idempotent: re-arm = replace any prior single-shot wire.
 	if(m_singleShotConn)
-		QObject::disconnect(m_singleShotConn);
+		QObject::disconnect(m_singleShotConn); // re-arm replaces the prior wire
 
 	m_singleShotArmed = true;
 	m_singleShotConn = connect(m_trig, &TriggerProcessor::fired, this,
 		[this](quint32 sampleIndex,
 		       QMap<QString, scopy::acq::SampleVariant> snapshot) {
-			// Guard against re-fire races: if we've already
-			// disarmed (e.g. re-fire while engine->stop() was
-			// pending) drop the redundant delivery silently.
+			// The worker keeps running until stop() lands, so a second
+			// fire may already be queued behind this one. Drop it.
 			if(!m_singleShotArmed)
 				return;
 			m_singleShotArmed = false;
-			// Disconnect first so any queued re-fire is dropped.
 			if(m_singleShotConn) {
 				QObject::disconnect(m_singleShotConn);
 				m_singleShotConn = {};

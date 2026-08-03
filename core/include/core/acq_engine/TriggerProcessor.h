@@ -9,6 +9,7 @@
 #include <QList>
 #include <QMap>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QString>
 #include <QVector>
 
@@ -20,12 +21,8 @@ struct TriggerCondition
 {
 	enum class Edge { Rising, Falling, Either };
 
-	// Edge detection uses the predicate high(v) = v > 0. This works for
-	// both unsigned digital lines (quint8 0/1) and signed analog signals
-	// (float, bipolar zero-crossing).
-	//   Rising : first i in [1,n) with !high(s[i-1]) &&  high(s[i])
-	//   Falling: first i in [1,n) with  high(s[i-1]) && !high(s[i])
-	//   Either : union of the two
+	// A sample counts as high when v > 0, which works for both unsigned
+	// digital lines and bipolar analog zero-crossings.
 	DataKey key;
 	Edge    edge{Edge::Rising};
 	bool    enabled{true};
@@ -43,8 +40,14 @@ struct CombineRule
 // ProcessorBlock that evaluates trigger conditions on the newest chunk of each
 // watched key. Each acquisition buffer is evaluated in isolation — no history,
 // no cross-chunk edge carry. Every condition scan short-circuits at the first
-// hit. On fire, emits fired(sampleIndex). Never blocks downstream processors —
-// they still run every cycle.
+// hit. Never blocks downstream processors — they still run every cycle.
+//
+// With a window size set (setWindowSize), a fire is *latched* rather than emitted
+// immediately: the processor waits until enough post-trigger samples have
+// accumulated to fill triggerPosition() of the window, then emits one complete
+// window centred on the firing sample. Further edges are ignored while latched
+// (holdoff), so every emitted window is centred on the fire that produced it.
+// Both fired()'s index and targetSample are plot-window indices in this mode.
 class SCOPY_CORE_EXPORT TriggerProcessor : public ProcessorBlock
 {
 	Q_OBJECT
@@ -79,15 +82,28 @@ public:
 	void    setSampleTolerance(quint32 tol);
 	quint32 sampleTolerance() const;
 
+	// Samples to assemble per fire, spanning as many chunks as the stream's
+	// claimed depth allows. 0 = emit the newest chunk only (legacy behaviour,
+	// no latching).
+	void setWindowSize(int n);
+	int  windowSize() const;
+
+	// Where the firing sample sits in the emitted window, 0 = left edge,
+	// 1 = right edge. Determines the pre/post-trigger split. Default 0.5.
+	void   setTriggerPosition(double frac);
+	double triggerPosition() const;
+
 	// ProcessorBlock overrides.
 	void     process(DataStore *store) override;
+	void     reset() override;
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 Q_SIGNALS:
 	// Emitted from the engine worker thread; consumers must use QueuedConnection.
-	// snapshot contains the newest chunk of every key in the DataStore at
-	// the moment of fire, so the GUI can plot the exact fire cycle even if
-	// the free-running worker has already advanced past it.
+	// snapshot holds one assembled window per DataStore key, captured at emit
+	// time, so the GUI plots exactly the fire's window even if the free-running
+	// worker has already advanced past it. sampleIndex indexes into those
+	// windows (or into the newest chunk when windowSize() == 0).
 	void fired(quint32 sampleIndex, QMap<QString, scopy::acq::SampleVariant> snapshot);
 	void skipped();
 	void conditionsChanged();
@@ -99,12 +115,37 @@ Q_SIGNALS:
 private:
 	void rebuildWatchedKeysLocked();
 
+	// Assigns under m_mutex, returning true if the value actually changed, so
+	// setters emit only on a real edit.
+	template<class T>
+	bool assign(T &field, const T &value)
+	{
+		QMutexLocker lk(&m_mutex);
+		if(field == value)
+			return false;
+		field = value;
+		return true;
+	}
+
+	template<class T>
+	T get(const T &field) const
+	{
+		QMutexLocker lk(&m_mutex);
+		return field;
+	}
+
 	mutable QMutex          m_mutex;
 	QList<TriggerCondition> m_conditions;
 	CombineRule             m_rule;
 	bool                    m_sampleSpecific{false};
 	quint32                 m_targetSample{0};
 	quint32                 m_sampleTolerance{0};
+	int                     m_windowSize{0};
+	double                  m_triggerPosition{0.5};
+
+	// Latched fire, worker thread only. -1 = idle; otherwise the count of
+	// post-trigger samples still needed before the window can be emitted.
+	int m_postWanted{-1};
 };
 
 } // namespace acq

@@ -80,6 +80,8 @@ void annotationTrampoline(const scopy_decoder_annotation_t *ann, void *user)
 	a.text       = ann->text    ? std::string(ann->text)    : std::string();
 	a.severity   = ann->severity;
 	a.stageIndex = 0;
+	a.hasValue   = ann->has_value != 0;
+	a.value      = ann->value;
 	out->push_back(std::move(a));
 }
 
@@ -185,12 +187,14 @@ bool DynamicLibBackend::decodeAnnotations(const DecoderConfig &cfg,
 	pod.reserve(in.size());
 	for(const AnnotationC &a : in) {
 		scopy_decoder_annotation_t p;
-		p.start    = a.start;
-		p.end      = a.end;
-		p.decoder  = a.decoder.c_str();
-		p.klass    = a.klass.c_str();
-		p.text     = a.text.c_str();
-		p.severity = a.severity;
+		p.start     = a.start;
+		p.end       = a.end;
+		p.decoder   = a.decoder.c_str();
+		p.klass     = a.klass.c_str();
+		p.text      = a.text.c_str();
+		p.severity  = a.severity;
+		p.has_value = a.hasValue ? 1 : 0;
+		p.value     = a.value;
 		pod.push_back(p);
 	}
 

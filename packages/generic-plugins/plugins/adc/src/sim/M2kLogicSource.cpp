@@ -16,9 +16,9 @@ M2kLogicSource::M2kLogicSource(libm2k::digital::M2kDigital *digital,
 	: SourceBlock(id, parent)
 	, m_digital(digital)
 {
-	// Register all 16 digital channels (disabled by default)
+	// Register all 16 digital channels, disabled by default.
 	for(int ch = 0; ch < NR_CHANNELS; ++ch)
-		m_channels.insert(QString("DIO%1").arg(ch), false);
+		enableChannel(QString("DIO%1").arg(ch), false);
 }
 
 M2kLogicSource::~M2kLogicSource()
@@ -45,13 +45,8 @@ void M2kLogicSource::onStop()
 {
 	m_stopRequested = true;
 
-	try {
-		// m_digital->cancelAcquisition(); // THIS CAUSES SEG FAULT
-	} catch(...) {}
-
-	try {
-		// m_digital->stopAcquisition();
-	} catch(...) {}
+	// cancelAcquisition()/stopAcquisition() are deliberately not called here:
+	// both segfault inside libm2k when the worker is mid-getSamplesP().
 }
 
 void M2kLogicSource::acquire(scopy::acq::DataStore *store)
@@ -82,7 +77,7 @@ void M2kLogicSource::acquire(scopy::acq::DataStore *store)
 		for(std::size_t i = 0; i < m_bufferSize; ++i)
 			samples[static_cast<int>(i)] = (raw[i] >> ch) & 1u;
 
-		store->write(scopy::acq::DataKey::raw(m_id, chId), std::move(samples));
+		store->write(scopy::acq::DataKey::raw(id(), chId), std::move(samples));
 	}
 }
 

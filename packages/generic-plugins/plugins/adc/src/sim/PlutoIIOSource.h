@@ -8,6 +8,7 @@
 struct iio_context;
 struct iio_device;
 struct iio_buffer;
+struct iio_channel;
 
 namespace scopy {
 namespace adc {
@@ -39,19 +40,19 @@ public:
 				QObject       *parent  = nullptr);
 	~PlutoIIOSource() override;
 
-	// Called by the engine on the main thread before the worker starts.
 	// Finds the device, enables channels, creates the IIO buffer.
 	void onStart() override;
 
-	// Called by the engine on the main thread when stopping.
-	// Cancels and destroys the IIO buffer (unblocks any blocked acquire()).
+	// Cancels and destroys the IIO buffer, which unblocks a blocked acquire().
+	// Also reached from the destructor, so it must stay idempotent.
 	void onStop() override;
 
-	// Called on the worker thread. Blocks until one full buffer is ready,
-	// then writes each enabled channel to DataStore.
+	// Blocks until one full buffer is ready, then writes each enabled channel.
 	void acquire(scopy::acq::DataStore *store) override;
 
 private:
+	iio_channel *findChannel(const QString &channelId) const;
+
 	iio_context *m_ctx;
 	QString      m_devName;
 	iio_device  *m_dev{nullptr};

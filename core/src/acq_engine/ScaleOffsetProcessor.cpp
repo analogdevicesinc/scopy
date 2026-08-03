@@ -3,9 +3,7 @@
 
 #include "DataStore.h"
 
-#include <QVBoxLayout>
 #include <QWidget>
-#include <variant>
 
 namespace scopy {
 namespace acq {
@@ -32,21 +30,16 @@ ScaleOffsetProcessor::ChannelConfig *ScaleOffsetProcessor::addChannel(const Data
 void ScaleOffsetProcessor::process(DataStore *store)
 {
 	for(ChannelConfig *cfg : m_channels) {
-		const SampleBuffer buf = store->read(cfg->inputKey);
-		if(buf.empty())
+		const auto src = store->latestAs<QVector<float>>(cfg->inputKey);
+		if(!src)
 			continue;
 
-		const auto &v = buf.sample(0);
-		if(!std::holds_alternative<QVector<float>>(v))
-			continue;
+		const float scale  = cfg->scale.load(std::memory_order_relaxed);
+		const float offset = cfg->offset.load(std::memory_order_relaxed);
 
-		const QVector<float> &src    = std::get<QVector<float>>(v);
-		const float           scale  = cfg->scale.load(std::memory_order_relaxed);
-		const float           offset = cfg->offset.load(std::memory_order_relaxed);
-
-		QVector<float> out(src.size());
-		for(int i = 0; i < src.size(); ++i)
-			out[i] = scale * src[i] + offset;
+		QVector<float> out(src->size());
+		for(int i = 0; i < src->size(); ++i)
+			out[i] = scale * (*src)[i] + offset;
 
 		store->write(cfg->outputKey, std::move(out));
 	}
@@ -54,13 +47,7 @@ void ScaleOffsetProcessor::process(DataStore *store)
 
 QWidget *ScaleOffsetProcessor::createSettingsWidget(QWidget *parent)
 {
-	auto *w   = new QWidget(parent);
-	auto *lay = new QVBoxLayout(w);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->setSpacing(4);
-	lay->addWidget(ProcessorBlock::createSettingsWidget(w));
-	lay->addWidget(new ScaleOffsetProcessorWidget(this, w));
-	return w;
+	return withBaseSettings(new ScaleOffsetProcessorWidget(this), parent);
 }
 
 } // namespace acq

@@ -15,6 +15,9 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
+#include <type_traits>
+#include <variant>
+
 namespace scopy {
 namespace adc {
 
@@ -104,13 +107,47 @@ void SimInstrument::setupUi()
 	m_tool->rightStack()->add("decoder-log-view", m_decoderLogView);
 
 	// ---- right panel: DataStore inspector ----
-	m_datastoreTable = new QTreeWidget(this);
+	// One top-level row per key; expanding it lists that stream's newest
+	// samples. The tree's own expander is the "drop down" — no extra widget per
+	// row, and the collapsed state is what keeps the per-cycle refresh cheap
+	// (child rows are only built for rows the user actually opened).
+	auto *dsPage = new QWidget(this);
+	auto *dsLay  = new QVBoxLayout(dsPage);
+	dsLay->setContentsMargins(0, 0, 0, 0);
+	dsLay->setSpacing(4);
+
+	auto *dsCtl = new QHBoxLayout();
+	dsCtl->setContentsMargins(4, 4, 4, 0);
+	dsCtl->addWidget(new QLabel("Show samples:", dsPage));
+	m_datastoreSampleCount = new QSpinBox(dsPage);
+	m_datastoreSampleCount->setRange(0, 4096);
+	m_datastoreSampleCount->setValue(32);
+	m_datastoreSampleCount->setToolTip(
+		"Newest samples listed under an expanded key. 0 lists none.\n"
+		"Rows refresh every acquisition cycle, so keep this small.\n"
+		"Samples are indexed from 0, oldest-first within the shown window.\n"
+		"Annotation streams list their sample range instead.");
+	dsCtl->addWidget(m_datastoreSampleCount);
+	m_datastoreHex = new QCheckBox("hex", dsPage);
+	m_datastoreHex->setToolTip("Show integer samples in hex. Floats are unaffected.");
+	dsCtl->addWidget(m_datastoreHex);
+	dsCtl->addStretch();
+	dsLay->addLayout(dsCtl);
+
+	m_datastoreTable = new QTreeWidget(dsPage);
 	m_datastoreTable->setColumnCount(4);
-	m_datastoreTable->setHeaderLabels({"Key", "Type", "Samples", "History (used/cap)"});
-	m_datastoreTable->setRootIsDecorated(false);
+	// Child rows reuse the first two columns for index and value, hence the
+	// double labels.
+	m_datastoreTable->setHeaderLabels(
+		{"Key / Sample", "Type / Value", "Samples", "History (used/cap)"});
 	m_datastoreTable->setAlternatingRowColors(true);
 	m_datastoreTable->header()->setStretchLastSection(true);
-	m_tool->rightStack()->add("datastore-view", m_datastoreTable);
+	m_datastoreTable->setUniformRowHeights(true);
+	// Sample values are columns of numbers; a proportional font makes them
+	// impossible to scan.
+	m_datastoreTable->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+	dsLay->addWidget(m_datastoreTable);
+	m_tool->rightStack()->add("datastore-view", dsPage);
 
 	// ---- signal wiring: run / single ----
 	connect(m_runBtn, &QPushButton::toggled, this, [this](bool checked) {
@@ -124,6 +161,37 @@ void SimInstrument::setupUi()
 		if(checked)
 			Q_EMIT requestSingle();
 	});
+
+	// ---- signal wiring: DataStore inspector ----
+	// Fill on expand rather than waiting for the next cycle: while the engine
+	// is stopped there is no next cycle, and a row that opens empty reads as a
+	// bug in the store.
+	connect(m_datastoreTable, &QTreeWidget::itemExpanded, this,
+		[this](QTreeWidgetItem *item) {
+			if(!item || item->parent() || !m_datastoreRef)
+				return;
+			fillDatastoreSamples(item, m_datastoreRef,
+					     scopy::acq::DataKey(item->text(0)));
+		});
+	// Collapsing drops the child rows so they cost nothing until reopened.
+	connect(m_datastoreTable, &QTreeWidget::itemCollapsed, this,
+		[](QTreeWidgetItem *item) {
+			if(item && !item->parent())
+				qDeleteAll(item->takeChildren());
+		});
+
+	auto refillExpanded = [this]() {
+		if(!m_datastoreRef || !m_datastoreTable)
+			return;
+		for(int i = 0; i < m_datastoreTable->topLevelItemCount(); ++i) {
+			QTreeWidgetItem *item = m_datastoreTable->topLevelItem(i);
+			if(item->isExpanded())
+				fillDatastoreSamples(item, m_datastoreRef,
+						     scopy::acq::DataKey(item->text(0)));
+		}
+	};
+	connect(m_datastoreSampleCount, &QSpinBox::valueChanged, this, refillExpanded);
+	connect(m_datastoreHex, &QCheckBox::toggled, this, refillExpanded);
 }
 
 void SimInstrument::wirePanelButton(QPushButton *btn, const QString &menuId)
@@ -487,6 +555,10 @@ void SimInstrument::refreshDatastoreView(scopy::acq::DataStore *store)
 	if(!store || !m_datastoreTable)
 		return;
 
+	// Remembered so itemExpanded can fill a row on the spot; while the engine
+	// is stopped this function is not called again.
+	m_datastoreRef = store;
+
 	const QList<scopy::acq::DataKey> keys = store->keys();
 
 	// Remove rows whose key no longer exists in the store
@@ -502,24 +574,9 @@ void SimInstrument::refreshDatastoreView(scopy::acq::DataStore *store)
 
 	// Update or insert a row for each key
 	for(const scopy::acq::DataKey &k : keys) {
-		const scopy::acq::SampleBuffer buf = store->read(k);
+		const scopy::acq::SampleBuffer buf = store->snapshot(k);
+		const auto type = buf.type();
 
-		QString typeStr;
-		switch(buf.type()) {
-		case scopy::acq::SampleType::Float32: typeStr = "f32"; break;
-		case scopy::acq::SampleType::Float64: typeStr = "f64"; break;
-		case scopy::acq::SampleType::Int32:   typeStr = "i32"; break;
-		case scopy::acq::SampleType::Int16:   typeStr = "i16"; break;
-		case scopy::acq::SampleType::Int8:    typeStr = "i8";  break;
-		case scopy::acq::SampleType::UInt8:   typeStr = "u8";  break;
-		case acq::SampleType::Annotation:
-			break;
-		}
-
-		const QString samplesStr = QString::number(buf.size());
-		const QString histStr    = QString("%1/%2").arg(buf.depth()).arg(buf.historySize());
-
-		// Find existing row or create a new one
 		QTreeWidgetItem *item = nullptr;
 		for(int i = 0; i < m_datastoreTable->topLevelItemCount(); ++i) {
 			if(m_datastoreTable->topLevelItem(i)->text(0) == k.key) {
@@ -532,9 +589,100 @@ void SimInstrument::refreshDatastoreView(scopy::acq::DataStore *store)
 			item->setText(0, k.key);
 		}
 
-		item->setText(1, typeStr);
-		item->setText(2, samplesStr);
-		item->setText(3, histStr);
+		item->setText(1, type ? scopy::acq::sampleTypeName(*type) : QStringLiteral("-"));
+		item->setText(2, QString::number(buf.size()));
+		item->setText(3, QString("%1/%2").arg(buf.depth()).arg(buf.capacity()));
+
+		// Show the expander before the row has ever been opened, so an
+		// unexpanded stream still advertises that it can be drilled into.
+		// Hidden when there is nothing to show, so the arrow never opens onto
+		// an empty list.
+		const bool drillable = !buf.empty() && m_datastoreSampleCount &&
+				       m_datastoreSampleCount->value() > 0;
+		item->setChildIndicatorPolicy(drillable
+			? QTreeWidgetItem::ShowIndicator
+			: QTreeWidgetItem::DontShowIndicator);
+
+		if(item->isExpanded())
+			fillDatastoreSamples(item, store, k);
+	}
+}
+
+namespace {
+
+// One sample as text. Integers honour `hex`; floats never do (a hex float is
+// not what anyone reading a scope trace wants).
+template<class T>
+QString formatSample(T v, bool hex)
+{
+	if constexpr(std::is_floating_point_v<T>) {
+		return QString::number(static_cast<double>(v), 'g', 6);
+	} else {
+		// Cast through the unsigned width so a negative qint8 prints as its
+		// two's-complement byte instead of a sign-extended "0xffffff80".
+		if(hex)
+			return QStringLiteral("0x%1").arg(
+				static_cast<quint64>(static_cast<std::make_unsigned_t<T>>(v)),
+				sizeof(T) * 2, 16, QLatin1Char('0'));
+		return QString::number(v);
+	}
+}
+
+} // namespace
+
+// Rebuilds `item`'s children from the newest samples of `key`. Reuses existing
+// child rows: this runs every cycle for every expanded row, and recreating the
+// items instead of retexting them makes the tree flicker and lose selection.
+void SimInstrument::fillDatastoreSamples(QTreeWidgetItem *item,
+					 scopy::acq::DataStore *store,
+					 const scopy::acq::DataKey &key)
+{
+	if(!item || !store || !m_datastoreSampleCount)
+		return;
+
+	const int  want = m_datastoreSampleCount->value();
+	const bool hex  = m_datastoreHex && m_datastoreHex->isChecked();
+	if(want <= 0) {
+		qDeleteAll(item->takeChildren());
+		return;
+	}
+
+	// window() spans chunks and is right-anchored, so this is the newest `want`
+	// samples regardless of how the acquisition happened to be chunked.
+	const scopy::acq::SampleVariant v = store->window(key, want);
+
+	// Rows to display: (col0, col1). Numeric streams show an index and a value;
+	// annotation streams show a sample range and "klass: text" — the same
+	// records, but an index into them means nothing to a reader.
+	QList<QPair<QString, QString>> rows;
+
+	std::visit([&](const auto &vec) {
+		using Vec = std::decay_t<decltype(vec)>;
+		if constexpr(std::is_same_v<Vec, QVector<scopy::acq::Annotation>>) {
+			const int first = std::max<int>(0, vec.size() - want);
+			for(int i = first; i < vec.size(); ++i) {
+				const scopy::acq::Annotation &a = vec.at(i);
+				rows.append({QString("%1-%2").arg(a.startSample).arg(a.endSample),
+					     a.klass.isEmpty() ? a.text
+							       : a.klass + ": " + a.text});
+			}
+		} else {
+			// window() already trimmed to `want` and returns oldest-first,
+			// so this is a plain 0-based index into the displayed window.
+			for(int i = 0; i < vec.size(); ++i)
+				rows.append({QString::number(i), formatSample(vec.at(i), hex)});
+		}
+	}, v);
+
+	while(item->childCount() > rows.size())
+		delete item->takeChild(item->childCount() - 1);
+	while(item->childCount() < rows.size())
+		new QTreeWidgetItem(item);
+
+	for(int i = 0; i < rows.size(); ++i) {
+		QTreeWidgetItem *child = item->child(i);
+		child->setText(0, rows.at(i).first);
+		child->setText(1, rows.at(i).second);
 	}
 }
 

@@ -7,7 +7,9 @@
 #include "decoder/IDecoderBackend.h"
 
 #include <QList>
+#include <QVector>
 #include <memory>
+#include <vector>
 
 namespace scopy {
 namespace acq {
@@ -52,6 +54,15 @@ Q_SIGNALS:
 	void cycleProduced(scopy::acq::DataKey outKey);
 
 private:
+	// Both fill `perStage` (one bucket per output key) and leave publishing
+	// to process(), so a bail-out still writes a defined empty result.
+	void decodeAnnotationInput(DataStore *store, std::vector<QVector<Annotation>> &perStage);
+	void decodeLogicInput(DataStore *store, std::vector<QVector<Annotation>> &perStage);
+	void publish(DataStore *store, std::vector<QVector<Annotation>> &perStage);
+	// Declares each output stream's AnnotationStreamInfo, so a decoder reading
+	// these annotations as input can interpret them without being told how.
+	void publishStreamInfo(DataStore *store);
+
 	std::unique_ptr<scopy::decoder::IDecoderBackend> m_backend;
 	scopy::decoder::DecoderConfig                    m_cfg;
 	QList<DataKey>                                   m_orderedRawKeys;

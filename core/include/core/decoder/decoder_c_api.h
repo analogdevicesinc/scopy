@@ -20,6 +20,11 @@ extern "C" {
 /*
  * Annotation record. Strings are backend-owned and only valid for the
  * duration of the callback.
+ *
+ * `text` is a display string, so it does not identify its own radix. A
+ * library that knows the numeric payload must set has_value=1 and fill
+ * `value`; consumers prefer it and only fall back to parsing `text` using
+ * the radix declared in meta["annIn.stream.textRadix"].
  */
 typedef struct {
 	uint64_t    start;
@@ -28,6 +33,8 @@ typedef struct {
 	const char *klass;
 	const char *text;
 	int32_t     severity;
+	int32_t     has_value;
+	uint64_t    value;
 } scopy_decoder_annotation_t;
 
 typedef void (*scopy_decoder_ann_cb)(const scopy_decoder_annotation_t *ann, void *user);
@@ -58,9 +65,25 @@ int scopy_decoder_accepts_annotations(void);
 
 /*
  * One-shot annotation-in decode (chained decoders). Same JSON schema as
- * scopy_decoder_decode; "annIn." keys carry codec options
- * (upstreamId, samplerate, ...). Delivered sample indices are on the
- * upstream timeline. Input strings valid only for the duration of the call.
+ * scopy_decoder_decode. Delivered sample indices are on the upstream
+ * timeline. Input strings valid only for the duration of the call.
+ *
+ * meta carries the "annIn." section. The producer's own description of the
+ * incoming stream — trust these over any guess:
+ *   annIn.stream.producerId   canonical id of the upstream decoder ("spi")
+ *   annIn.stream.textRadix    radix of `text` when has_value is 0:
+ *                             "hex" | "dec" | "oct" | "bin" | "ascii"
+ *   annIn.stream.samplerate   timeline start/end are expressed on, Hz
+ *   annIn.stream.bitrate      upstream line rate, 0 if not applicable
+ * Consumer-side keys, all optional:
+ *   annIn.upstreamId          override the extractor selection
+ *   annIn.radix               override annIn.stream.textRadix
+ *   annIn.samplerate          for backends that regenerate a waveform: rate
+ *   annIn.bitrate             of the *fabricated* signal, not the captured one
+ *   annIn.frameformat         UART frame format, e.g. "8n1"
+ *   annIn.direction           SPI: "mosi" | "miso" | "both"
+ *   annIn.<name>Klass         comma-separated annotation-class whitelist
+ *                             override for the named extraction rule
  */
 int scopy_decoder_decode_ann(const char *cfg_json,
                              const scopy_decoder_annotation_t *in,

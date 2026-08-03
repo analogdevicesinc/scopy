@@ -1,8 +1,7 @@
 #include "SourceBlock.h"
 
-#include "AcquisitionEngine.h"
-
 #include <QCheckBox>
+#include <QMutexLocker>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -10,17 +9,8 @@ namespace scopy {
 namespace acq {
 
 SourceBlock::SourceBlock(const QString &id, QObject *parent)
-	: QObject(parent)
-	, m_id(id)
+	: Block(id, parent)
 {}
-
-void SourceBlock::report(AcquisitionError::Severity sev, const QString &msg) const
-{
-	auto *engine = qobject_cast<AcquisitionEngine *>(parent());
-	if(!engine)
-		return;
-	Q_EMIT engine->error(static_cast<int>(sev), m_id, msg);
-}
 
 void SourceBlock::onStart()
 {
@@ -44,89 +34,93 @@ std::size_t SourceBlock::bufferSize() const
 
 void SourceBlock::enableChannel(const QString &channelId, bool en)
 {
-	const bool added = !m_channels.contains(channelId);
-	const bool prev  = m_channels.value(channelId, false);
-	m_channels[channelId] = en;
+	bool added, flipped;
+	{
+		QMutexLocker lk(&m_channelMutex);
+		added   = !m_channels.contains(channelId);
+		flipped = m_channels.value(channelId, false) != en;
+		m_channels[channelId] = en;
+	}
 	if(added)
 		Q_EMIT channelsChanged();
-	if(prev != en)
+	if(flipped)
 		Q_EMIT channelEnabledChanged(channelId, en);
 }
 
 void SourceBlock::removeChannel(const QString &channelId)
 {
-	if(m_channels.remove(channelId) > 0)
+	bool removed;
+	{
+		QMutexLocker lk(&m_channelMutex);
+		removed = m_channels.remove(channelId) > 0;
+	}
+	if(removed)
 		Q_EMIT channelsChanged();
-}
-
-void SourceBlock::setEnabled(bool en)
-{
-	const bool prev = m_sourceEnabled.exchange(en, std::memory_order_relaxed);
-	if(prev != en)
-		Q_EMIT enabledChanged(en);
 }
 
 void SourceBlock::disableAllChannels()
 {
-	for(auto &enabled : m_channels)
-		enabled = false;
+	QList<QString> flipped;
+	{
+		QMutexLocker lk(&m_channelMutex);
+		for(auto it = m_channels.begin(); it != m_channels.end(); ++it) {
+			if(!it.value())
+				continue;
+			it.value() = false;
+			flipped.append(it.key());
+		}
+	}
+	for(const QString &id : flipped)
+		Q_EMIT channelEnabledChanged(id, false);
 }
 
 bool SourceBlock::isChannelEnabled(const QString &channelId) const
 {
-	auto it = m_channels.find(channelId);
-	return it != m_channels.end() && it.value();
+	QMutexLocker lk(&m_channelMutex);
+	return m_channels.value(channelId, false);
 }
 
 QList<QString> SourceBlock::enabledChannels() const
 {
+	QMutexLocker lk(&m_channelMutex);
 	QList<QString> result;
-	for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it) {
+	for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it)
 		if(it.value())
 			result.append(it.key());
-	}
 	return result;
+}
+
+QList<QString> SourceBlock::channelIds() const
+{
+	QMutexLocker lk(&m_channelMutex);
+	return m_channels.keys();
 }
 
 QWidget *SourceBlock::createSettingsWidget(QWidget *parent)
 {
-	auto *w   = new QWidget(parent);
-	auto *lay = new QVBoxLayout(w);
+	auto *channels = new QWidget;
+	auto *lay      = new QVBoxLayout(channels);
 	lay->setContentsMargins(0, 0, 0, 0);
-	lay->setSpacing(4);
+	lay->setSpacing(2);
 
-	auto *enableCb = new QCheckBox(QStringLiteral("Enabled"), w);
-	enableCb->setChecked(isEnabled());
-	connect(enableCb, &QCheckBox::toggled, this, [this](bool en) { setEnabled(en); });
-	connect(this, &SourceBlock::enabledChanged, enableCb, &QCheckBox::setChecked);
-	lay->addWidget(enableCb);
-
-	auto *channelsContainer = new QWidget(w);
-	auto *channelsLay       = new QVBoxLayout(channelsContainer);
-	channelsLay->setContentsMargins(0, 0, 0, 0);
-	channelsLay->setSpacing(2);
-	lay->addWidget(channelsContainer);
-
-	auto rebuildChannels = [this, channelsContainer, channelsLay]() {
-		QLayoutItem *item;
-		while((item = channelsLay->takeAt(0)) != nullptr) {
+	auto rebuild = [this, channels, lay]() {
+		while(QLayoutItem *item = lay->takeAt(0)) {
 			if(QWidget *cw = item->widget())
 				cw->deleteLater();
 			delete item;
 		}
 		for(const QString &chId : channelIds()) {
-			auto *cb = new QCheckBox(chId, channelsContainer);
+			auto *cb = new QCheckBox(chId, channels);
 			cb->setChecked(isChannelEnabled(chId));
 			connect(cb, &QCheckBox::toggled, this,
 				[this, chId](bool en) { enableChannel(chId, en); });
-			channelsLay->addWidget(cb);
+			lay->addWidget(cb);
 		}
 	};
+	connect(this, &SourceBlock::channelsChanged, channels, rebuild);
+	rebuild();
 
-	connect(this, &SourceBlock::channelsChanged, w, rebuildChannels);
-	rebuildChannels();
-
-	return w;
+	return withBaseSettings(channels, parent);
 }
 
 } // namespace acq
