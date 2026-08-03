@@ -1,10 +1,10 @@
 #include "decoder/SigrokCliBackend.h"
 
-#include "decoder/AnnotationCodecRegistry.h"
+#include "decoder/AnnotationSymbols.h"
 #include "decoder/DecoderLogger.h"
-#include "decoder/IAnnotationExtractor.h"
-#include "decoder/IProtocolDataEncoder.h"
 #include "decoder/SigrokCliCatalog.h"
+
+#include "sigrok/ProtocolDataEncoder.h"
 
 #include <QByteArray>
 #include <QProcess>
@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 namespace scopy {
 namespace decoder {
@@ -20,7 +21,10 @@ static constexpr const char *kBackendId = "sigrok-cli-backend";
 
 SigrokCliBackend::SigrokCliBackend(SigrokCliCatalog *catalog)
 	: m_catalog(catalog)
-{}
+	, m_encoders(std::make_unique<sigrok::ProtocolDataEncoderRegistry>())
+{
+	m_encoders->registerBuiltins();
+}
 
 SigrokCliBackend::~SigrokCliBackend() = default;
 
@@ -32,22 +36,9 @@ QStringList SigrokCliBackend::buildArgs(const DecoderConfig &cfg) const
 			.arg(static_cast<qint64>(cfg.sampleRate)));
 }
 
-std::map<std::string, std::string>
-SigrokCliBackend::downstreamOptionOverrides(const std::string &decoderId)
-{
-	// Remaps needed on the annotation-input regen path (`-I protocoldata`
-	// emits a single wire; PDs expecting split TX/RX must fold to one).
-	static const std::map<std::string, std::map<std::string, std::string>> table = {
-		{"modbus", {{"cschannel", "RX"}, {"scchannel", "RX"}}},
-	};
-	auto it = table.find(decoderId);
-	return (it == table.end()) ? std::map<std::string, std::string>{}
-	                           : it->second;
-}
-
 QStringList SigrokCliBackend::buildArgsWithInput(const DecoderConfig &cfg,
                                                  const QString &inputFormat,
-                                                 const ProtocolDataInput *pdIn) const
+                                                 const sigrok::ProtocolDataInput *pdIn) const
 {
 	QStringList args;
 	args << "-i" << "-";
@@ -88,16 +79,16 @@ QStringList SigrokCliBackend::buildArgsWithInput(const DecoderConfig &cfg,
 	if(pdIn) {
 		// Annotation-input path: one comma-joined -P arg (sigrok only wires
 		// OUTPUT_PYTHON between stacked PDs sharing a single -P). The
-		// synthetic root PD (from annIn.upstreamId) is prepended so sigrok
+		// synthetic root PD (from the upstream id) is prepended so sigrok
 		// sees a valid root+stacked chain (e.g. spi:sck=..,spiflash).
 		QStringList stageSpecs;
 		stageSpecs.reserve(static_cast<int>(cfg.stack.size()) + 1);
 
-		auto upstreamIt = cfg.meta.find(std::string("annIn.upstreamId"));
-		if(upstreamIt != cfg.meta.end() && !upstreamIt->second.empty()) {
+		const AnnInOptions opts = AnnInOptions::fromMeta(cfg.meta);
+		if(!opts.upstreamId.isEmpty()) {
 			// Root spec built from pdIn->rootChannelOverrides; no source
 			// stage exists (upstream PD is reconstructed on the fly).
-			QString rootSpec = QString::fromStdString(upstreamIt->second);
+			QString rootSpec = opts.upstreamId;
 			for(const auto &kv : pdIn->rootChannelOverrides) {
 				rootSpec += QString(":%1=%2")
 					.arg(QString::fromStdString(kv.first))
@@ -107,7 +98,8 @@ QStringList SigrokCliBackend::buildArgsWithInput(const DecoderConfig &cfg,
 		}
 
 		for(const auto &stage : cfg.stack) {
-			const auto extra = downstreamOptionOverrides(stage.decoderId);
+			const auto extra = sigrok::downstreamOptionOverrides(
+				QString::fromStdString(stage.decoderId));
 			stageSpecs << serializeStage(stage, nullptr, extra);
 		}
 		args << "-P" << stageSpecs.join(',');
@@ -131,6 +123,15 @@ void SigrokCliBackend::parseStdout(const QByteArray &buf,
                                    const std::vector<DecoderStage> &stack,
                                    std::vector<AnnotationC> &out) const
 {
+	// sigrok labels annotations "<id>-<n>", where n counts instances of that
+	// decoder id across the whole -P chain, in order. So the k-th stage using
+	// id X answers to "X-(k+1)". Matching on the bare id instead pinned every
+	// instance to the first stage that used it, silently merging the rows of a
+	// stack like uart,modbus,modbus.
+	std::map<std::string, std::vector<int>> stagesById;
+	for(std::size_t i = 0; i < stack.size(); ++i)
+		stagesById[stack[i].decoderId].push_back(static_cast<int>(i));
+
 	const QList<QByteArray> lines = buf.split('\n');
 	for(const QByteArray &raw : lines) {
 		const QString s = QString::fromUtf8(raw).trimmed();
@@ -157,23 +158,26 @@ void SigrokCliBackend::parseStdout(const QByteArray &buf,
 		QString decoder = rest.left(decColon);
 		rest            = rest.mid(decColon + 2);
 
-		// Strip sigrok's "<id>-<n>" -P instance suffix; resolve stage index
-		// by id match against the configured stack.
+		// Split "<id>-<n>"; instance numbers are 1-based.
+		int       instance = 1;
 		const int lastDash = decoder.lastIndexOf('-');
 		if(lastDash > 0) {
-			const QString tail = decoder.mid(lastDash + 1);
-			bool ok = false;
-			(void)tail.toInt(&ok);
-			if(ok) decoder = decoder.left(lastDash);
-		}
-		int stageIndex = -1;
-		for(std::size_t i = 0; i < stack.size(); ++i) {
-			if(QString::fromStdString(stack[i].decoderId) == decoder) {
-				stageIndex = static_cast<int>(i);
-				break;
+			bool      ok = false;
+			const int n  = decoder.mid(lastDash + 1).toInt(&ok);
+			if(ok) {
+				instance = n;
+				decoder  = decoder.left(lastDash);
 			}
 		}
-		if(stageIndex < 0) stageIndex = 0; // unknown id: pin to root
+
+		int  stageIndex = 0; // unresolvable id: pin to root
+		auto it         = stagesById.find(decoder.toStdString());
+		if(it != stagesById.end()) {
+			const int nth = instance - 1;
+			stageIndex = (nth >= 0 && nth < static_cast<int>(it->second.size()))
+				? it->second[static_cast<std::size_t>(nth)]
+				: it->second.front();
+		}
 
 		const int classColon = rest.indexOf(": ");
 		QString klass, text;
@@ -290,40 +294,17 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 
 // Annotation-in path (chained decoding via `-I protocoldata:...`).
 
-namespace {
-
-// Strip the "annIn." prefix from cfg.meta entries and return them as a flat map.
-std::map<std::string, std::string> extractAnnInOpts(const DecoderConfig &cfg)
-{
-	std::map<std::string, std::string> out;
-	static const std::string kPrefix = "annIn.";
-	for(const auto &kv : cfg.meta) {
-		if(kv.first.compare(0, kPrefix.size(), kPrefix) != 0) continue;
-		out.emplace(kv.first.substr(kPrefix.size()), kv.second);
-	}
-	return out;
-}
-
-QString annInMetaGet(const DecoderConfig &cfg, const std::string &key)
-{
-	auto it = cfg.meta.find(std::string("annIn.") + key);
-	return (it == cfg.meta.end()) ? QString{} : QString::fromStdString(it->second);
-}
-
-} // namespace
-
 bool SigrokCliBackend::acceptsAnnotationInput(const DecoderConfig &cfg) const
 {
-	if(!m_codecs) return false;
-	if(cfg.stack.empty()) return false;
+	if(!m_extractors || cfg.stack.empty()) return false;
 
-	const QString upstreamId = annInMetaGet(cfg, "upstreamId");
-	if(upstreamId.isEmpty()) return false;
+	const AnnInOptions opts = AnnInOptions::fromMeta(cfg.meta);
+	if(opts.upstreamId.isEmpty()) return false;
 
-	// Extractor and encoder are both keyed on upstreamId (we regenerate
-	// the same wire; downstream stages are stacked by sigrok on top).
-	return m_codecs->findExtractor(upstreamId) != nullptr &&
-	       m_codecs->findEncoder(upstreamId)   != nullptr;
+	// Extractor and encoder are both keyed on the upstream id: we regenerate
+	// the same wire, and downstream stages are stacked by sigrok on top.
+	return m_extractors->find(opts.upstreamId) != nullptr &&
+	       m_encoders->find(opts.upstreamId)   != nullptr;
 }
 
 bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
@@ -333,8 +314,8 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	out.clear();
 	m_lastError.clear();
 
-	if(!m_codecs) {
-		m_lastError = "no codec registry attached to backend";
+	if(!m_extractors) {
+		m_lastError = "no extractor registry attached to backend";
 		if(m_logger)
 			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
 		return false;
@@ -352,34 +333,67 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 		return true;
 	}
 
-	const QString upstreamId = annInMetaGet(cfg, "upstreamId");
+	QStringList         warnings;
+	const AnnInOptions  opts = AnnInOptions::fromMeta(cfg.meta, &warnings);
+	if(!opts.unknownKeys.isEmpty())
+		warnings.append(QStringLiteral("unrecognized annIn keys: %1")
+			.arg(opts.unknownKeys.join(QStringLiteral(", "))));
+	for(const QString &w : warnings) {
+		if(m_logger)
+			m_logger->warning(kBackendId,
+				QStringLiteral("decodeAnnotations(): ") + w);
+	}
 
-	IAnnotationExtractor *ext = m_codecs->findExtractor(upstreamId);
-	IProtocolDataEncoder *enc = m_codecs->findEncoder(upstreamId);
+	IAnnotationExtractor          *ext = m_extractors->find(opts.upstreamId);
+	sigrok::IProtocolDataEncoder  *enc = m_encoders->find(opts.upstreamId);
 	if(!ext || !enc) {
-		m_lastError = std::string("no codec registered for upstream=")
-			      + upstreamId.toStdString();
+		m_lastError = std::string("no annotation-input support for upstream=")
+			      + opts.upstreamId.toStdString();
 		if(m_logger)
 			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
-	const auto codecOpts = extractAnnInOpts(cfg);
-
 	// 1. Extract payload symbols from upstream annotations.
 	std::vector<ExtractedSymbol> symbols;
-	QString extErr;
-	if(!ext->extract(in, codecOpts, symbols, &extErr)) {
+	ExtractStats                 stats;
+	QString                      extErr;
+	if(!ext->extract(in, opts, symbols, &stats, &extErr)) {
 		m_lastError = "annotation extractor failed: " + extErr.toStdString();
 		if(m_logger)
 			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
+	// Unreadable records are skipped rather than fatal, so this counter is the
+	// only sign of a radix mismatch — a decimal "105" read as hex gives the
+	// wrong byte with no error at all. noPayload is deliberately *not* warned
+	// about: it fires on every i2c capture (the R/W-bit row reuses the address
+	// class), which would bury the case that actually indicates corruption.
+	if(stats.sawRadixMismatch() && m_logger) {
+		m_logger->warning(kBackendId,
+			QStringLiteral("decodeAnnotations(): %1 annotation(s) hold a numeral that "
+			               "is not valid in radix=%2 and carried no numeric value — "
+			               "the upstream decoder's output format is probably not what "
+			               "was declared, so accepted bytes may be wrong too (%3)")
+				.arg(stats.radixMismatch)
+				.arg(QLatin1String(acq::textRadixName(opts.stream.textRadix)),
+				     stats.toString()));
+	} else if(m_logger) {
+		m_logger->info(kBackendId,
+			QStringLiteral("decodeAnnotations(): extract %1").arg(stats.toString()));
+	}
+	if(symbols.empty()) {
+		if(m_logger)
+			m_logger->warning(kBackendId,
+				QStringLiteral("decodeAnnotations(): no symbols extracted from %1 "
+				               "annotation(s); nothing to decode").arg(in.size()));
+		return true;
+	}
 
 	// 2. Encode symbols into `-I protocoldata:...` input.
-	ProtocolDataInput pdIn;
-	QString encErr;
-	if(!enc->encode(symbols, codecOpts, pdIn, &encErr)) {
+	sigrok::ProtocolDataInput pdIn;
+	QString                   encErr;
+	if(!enc->encode(symbols, opts, pdIn, &encErr)) {
 		m_lastError = "protocoldata encoder failed: " + encErr.toStdString();
 		if(m_logger)
 			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
@@ -457,70 +471,171 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 		return false;
 	}
 
-	// 4. Parse stdout with an extended stack [synthetic-root, user...]
-	//    so parseStdout can resolve indices for both.
+	// 4. Parse stdout with an extended stack [synthetic-root, user...] so
+	//    parseStdout can resolve indices for both.
 	std::vector<DecoderStage> extendedStack;
 	extendedStack.reserve(cfg.stack.size() + 1);
 	DecoderStage syntheticRoot;
-	syntheticRoot.decoderId = upstreamId.toStdString();
+	syntheticRoot.decoderId = opts.upstreamId.toStdString();
 	extendedStack.push_back(syntheticRoot);
 	for(const auto &s : cfg.stack) extendedStack.push_back(s);
 
-	std::vector<AnnotationC> syntheticOut;
-	parseStdout(stdoutBuf, extendedStack, syntheticOut);
+	std::vector<AnnotationC> parsed;
+	parseStdout(stdoutBuf, extendedStack, parsed);
 
-	// Drop synthetic-root (stageIndex==0); shift the rest down by 1.
-	{
-		std::vector<AnnotationC> filtered;
-		filtered.reserve(syntheticOut.size());
-		for(auto &a : syntheticOut) {
-			if(a.stageIndex <= 0) continue;
-			a.stageIndex -= 1;
-			filtered.push_back(std::move(a));
+	// Split off the synthetic root stage (stageIndex==0). Its annotations are
+	// not user-visible output, but they are the child's own report of where the
+	// symbols we fed in landed on the fabricated wire — which is exactly what
+	// the remap needs. The user stages shift down by 1.
+	std::vector<AnnotationC> rootAnns, syntheticOut;
+	syntheticOut.reserve(parsed.size());
+	for(auto &a : parsed) {
+		if(a.stageIndex < 0) continue;
+		if(a.stageIndex == 0) {
+			rootAnns.push_back(std::move(a));
+			continue;
 		}
-		syntheticOut = std::move(filtered);
+		a.stageIndex -= 1;
+		syntheticOut.push_back(std::move(a));
 	}
 
-	// 5. Remap synthetic sample indices back to the upstream timeline via
-	//    pdIn.byteToUpstreamAnn (proportional mapping across [0..nBytes)).
-	const int nBytes = static_cast<int>(pdIn.byteToUpstreamAnn.size());
-	const int nIn    = static_cast<int>(in.size());
+	remapToUpstream(pdIn, ext, opts, rootAnns, in, syntheticOut, out);
 
-	quint64 syntheticMin = std::numeric_limits<quint64>::max();
-	quint64 syntheticMax = 0;
-	for(const auto &a : syntheticOut) {
-		if(a.start < syntheticMin) syntheticMin = a.start;
-		if(a.end   > syntheticMax) syntheticMax = a.end;
-	}
-	if(syntheticMax < syntheticMin) { syntheticMin = 0; syntheticMax = 1; }
-	const double span = static_cast<double>(syntheticMax - syntheticMin);
+	if(m_logger)
+		m_logger->info(kBackendId,
+			QStringLiteral("decodeAnnotations(): parsed %1 annotations (remapped)")
+				.arg(out.size()));
+	return true;
+}
 
-	auto mapByteIdx = [&](quint64 syntheticSample) -> int {
-		if(nBytes <= 0 || span <= 0.0) return -1;
-		const double t = (static_cast<double>(syntheticSample) - syntheticMin) / span;
-		int idx = static_cast<int>(t * nBytes);
-		if(idx < 0) idx = 0;
-		if(idx >= nBytes) idx = nBytes - 1;
-		return idx;
+void SigrokCliBackend::remapToUpstream(const sigrok::ProtocolDataInput &pdIn,
+                                       IAnnotationExtractor *ext,
+                                       const AnnInOptions &opts,
+                                       const std::vector<AnnotationC> &rootAnns,
+                                       const std::vector<AnnotationC> &in,
+                                       std::vector<AnnotationC> &syntheticOut,
+                                       std::vector<AnnotationC> &out) const
+{
+	// The child decoded a *fabricated* waveform, so its sample numbers mean
+	// nothing on the real timeline and every downstream range has to be mapped
+	// back. The mapping is a list of (synthetic range -> upstream range) pairs,
+	// one per symbol, built as follows:
+	//
+	//   pdIn.anchors[k]  = the k-th payload symbol we emitted, and which
+	//                      upstream annotation it came from.
+	//   rootAnns         = the synthetic root PD's own reading of that same
+	//                      wire, so re-extracting it yields the same symbol
+	//                      sequence with *real* synthetic sample numbers.
+	//
+	// Asking the child where the symbols landed is the only reliable answer.
+	// Computing it here means re-deriving protocoldata's bit timing, framing
+	// overhead and inter-frame gaps for every protocol — and the previous
+	// version's shortcut (assume the symbols divide the span into equal slots)
+	// is wrong the moment framing appears: an SPI CS release/assert pair or an
+	// I2C START inserts idle samples that belong to no symbol, so word k is not
+	// at base + k*step and every range after the first gap is off by one symbol
+	// or more.
+	const int nIn = static_cast<int>(in.size());
+	out.reserve(syntheticOut.size());
+
+	// (synthetic start, synthetic end, upstream annotation index), symbol order.
+	struct Span
+	{
+		quint64 synStart{0};
+		quint64 synEnd{0};
+		int     upstreamAnnIndex{-1};
 	};
+	std::vector<Span> spans;
 
-	auto upstreamRange = [&](int byteIdx, quint64 &start, quint64 &end) -> bool {
-		if(byteIdx < 0 || byteIdx >= nBytes) return false;
-		const int annIdx = pdIn.byteToUpstreamAnn[byteIdx];
-		if(annIdx < 0 || annIdx >= nIn) return false;
-		start = in[annIdx].start;
-		end   = in[annIdx].end;
+	if(ext) {
+		std::vector<ExtractedSymbol> rootSymbols;
+		QString                      ignoredErr;
+		if(ext->extract(rootAnns, opts, rootSymbols, nullptr, &ignoredErr)) {
+			// One anchor per emitted *wire slot*, not per symbol: SPI writes
+			// MOSI and MISO of one word on a single line, and the root PD
+			// annotates both halves over the identical sample range. So collapse
+			// payload annotations to their distinct ranges — that granularity
+			// matches the anchors for every protocol, without either side having
+			// to know how the other groups bytes.
+			std::vector<std::pair<quint64, quint64>> wireSlots;
+			for(const ExtractedSymbol &s : rootSymbols) {
+				if(!symbolTagCarriesByte(s.tag)) continue;
+				const int ri = s.upstreamAnnIndex;
+				if(ri < 0 || ri >= static_cast<int>(rootAnns.size())) continue;
+				const AnnotationC &ra = rootAnns[static_cast<std::size_t>(ri)];
+				wireSlots.emplace_back(ra.start, ra.end);
+			}
+			std::sort(wireSlots.begin(), wireSlots.end());
+			wireSlots.erase(std::unique(wireSlots.begin(), wireSlots.end()), wireSlots.end());
+
+			const std::size_t n = std::min(wireSlots.size(), pdIn.anchors.size());
+			// A length mismatch means the wire we generated did not read back as
+			// the symbol sequence we put on it, so the pairing is guesswork past
+			// that point. Map what lines up and say so rather than drifting
+			// silently, which is the failure the old proportional map had.
+			if(wireSlots.size() != pdIn.anchors.size() && m_logger) {
+				m_logger->warning(kBackendId,
+					QStringLiteral("decodeAnnotations(): regenerated wire read back "
+					               "as %1 payload slot(s) but %2 were emitted; "
+					               "annotation sample ranges past slot %3 may be "
+					               "approximate")
+						.arg(wireSlots.size()).arg(pdIn.anchors.size()).arg(n));
+			}
+			spans.reserve(n);
+			for(std::size_t k = 0; k < n; ++k)
+				spans.push_back(Span{wireSlots[k].first, wireSlots[k].second,
+				                     pdIn.anchors[k].upstreamAnnIndex});
+		}
+	}
+
+	if(spans.empty() || nIn <= 0) {
+		// No usable mapping (no root annotations, or the extractor disagreed
+		// with itself). Report the whole upstream extent rather than sample
+		// numbers from a timeline the caller knows nothing about.
+		if(m_logger && !syntheticOut.empty() && nIn > 0) {
+			m_logger->warning(kBackendId,
+				QStringLiteral("decodeAnnotations(): could not map the synthetic "
+				               "timeline back (rootAnns=%1 anchors=%2); reporting "
+				               "%3 annotation(s) over the full upstream range")
+					.arg(rootAnns.size()).arg(pdIn.anchors.size())
+					.arg(syntheticOut.size()));
+		}
+		for(auto &a : syntheticOut) {
+			if(nIn > 0) {
+				a.start = in.front().start;
+				a.end   = in.back().end;
+			}
+			out.push_back(std::move(a));
+		}
+		return;
+	}
+
+	// Upstream range of the symbol whose synthetic span covers `sample`, or the
+	// nearest one when the sample falls in framing/idle between symbols.
+	auto upstreamAt = [&](quint64 sample, quint64 &start, quint64 &end) -> bool {
+		const Span *best     = nullptr;
+		quint64     bestDist = 0;
+		for(const Span &sp : spans) {
+			if(sample >= sp.synStart && sample < sp.synEnd) { best = &sp; break; }
+			const quint64 d = (sample < sp.synStart) ? (sp.synStart - sample)
+			                                        : (sample - sp.synEnd);
+			if(!best || d < bestDist) { best = &sp; bestDist = d; }
+		}
+		if(!best) return false;
+		const int i = best->upstreamAnnIndex;
+		if(i < 0 || i >= nIn) return false;
+		start = in[static_cast<std::size_t>(i)].start;
+		end   = in[static_cast<std::size_t>(i)].end;
 		return true;
 	};
 
-	out.reserve(syntheticOut.size());
 	for(auto &a : syntheticOut) {
-		const int b0 = mapByteIdx(a.start);
-		const int b1 = mapByteIdx(a.end);
-
 		quint64 s0 = 0, e0 = 0, s1 = 0, e1 = 0;
-		const bool ok0 = upstreamRange(b0, s0, e0);
-		const bool ok1 = upstreamRange(b1, s1, e1);
+		const bool ok0 = upstreamAt(a.start, s0, e0);
+		// `end` is exclusive on the synthetic wire; step inside the last symbol
+		// so a range ending exactly on a boundary does not claim the next one.
+		const bool ok1 = upstreamAt(a.end > a.start ? a.end - 1 : a.end, s1, e1);
+
 		if(ok0 && ok1) {
 			a.start = std::min(s0, s1);
 			a.end   = std::max(e0, e1);
@@ -530,18 +645,12 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 		} else if(ok1) {
 			a.start = s1;
 			a.end   = e1;
-		} else if(!in.empty()) {
+		} else {
 			a.start = in.front().start;
 			a.end   = in.back().end;
 		}
 		out.push_back(std::move(a));
 	}
-
-	if(m_logger)
-		m_logger->info(kBackendId,
-			QStringLiteral("decodeAnnotations(): parsed %1 annotations (remapped)")
-				.arg(out.size()));
-	return true;
 }
 
 } // namespace decoder

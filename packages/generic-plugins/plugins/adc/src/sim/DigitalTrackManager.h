@@ -2,12 +2,14 @@
 
 #include <QColor>
 #include <QList>
+#include <QMap>
 #include <QObject>
 #include <QPointer>
 #include <QString>
 #include <QVector>
 
 #include <core/acq_engine/DataKey.h>
+#include <core/acq_engine/SampleBuffer.h>
 
 namespace scopy {
 
@@ -65,7 +67,10 @@ public:
 	// Called each acquisition cycle. Reads current windows for every raw
 	// item from the store and pushes them to the corresponding
 	// DigitalCurveItem. `plotSize` is the x-axis extent in samples.
-	void updateRawCurves(int plotSize);
+	// Keys present in `override` are taken from there instead of the store,
+	// so a trigger fire draws its centred window rather than the live tail.
+	void updateRawCurves(int plotSize,
+			     const QMap<QString, scopy::acq::SampleVariant> *override = nullptr);
 
 public Q_SLOTS:
 	// Show/hide the raw digital track registered for a given

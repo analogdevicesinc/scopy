@@ -112,13 +112,12 @@ void GenalyzerFFTProcessor::setConfig(const GenalyzerConfig &cfg)
 
 QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
 {
-	// Container = [block Enabled checkbox] + [Enable Analysis toggle] + inner GenalyzerSettings widget.
-	auto *container = new QWidget(parent);
+	// [Enable Analysis toggle] + inner GenalyzerSettings widget, under the
+	// base block controls.
+	auto *container = new QWidget;
 	auto *layout    = new QVBoxLayout(container);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(6);
-
-	layout->addWidget(ProcessorBlock::createSettingsWidget(container));
 
 	auto *enableBtn = new QPushButton("Enable Analysis", container);
 	enableBtn->setCheckable(true);
@@ -145,7 +144,7 @@ QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
 			setConfig(merged);
 		});
 
-	return container;
+	return withBaseSettings(container, parent);
 }
 
 // ---------------------------------------------------------------------------
@@ -520,32 +519,17 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 
 	const FFTMode currentMode = (nWatched == 1) ? FFTMode::Real : FFTMode::Complex;
 
-	// Resolve input variants outside the gn_* mutex (DataStore handles its own locking).
+	// Resolve inputs outside the gn_* mutex (DataStore handles its own locking).
 	QVector<float> iSamples, qSamples;
-	{
-		const SampleBuffer aBuf = store->read(m_watchedKeys[0]);
-		if(aBuf.empty())
-			return;
-		const auto &aVar = aBuf.sample(0);
-		if(!std::holds_alternative<QVector<float>>(aVar)) {
-			report(AcquisitionError::Severity::Warning,
-			       QStringLiteral("input 0 is not QVector<float>; skipping"));
-			return;
-		}
-		iSamples = std::get<QVector<float>>(aVar);
-
-		if(currentMode == FFTMode::Complex) {
-			const SampleBuffer bBuf = store->read(m_watchedKeys[1]);
-			if(bBuf.empty())
-				return;
-			const auto &bVar = bBuf.sample(0);
-			if(!std::holds_alternative<QVector<float>>(bVar)) {
+	for(int i = 0; i < nWatched; ++i) {
+		auto s = store->latestAs<QVector<float>>(m_watchedKeys[i]);
+		if(!s) {
+			if(store->contains(m_watchedKeys[i]))
 				report(AcquisitionError::Severity::Warning,
-				       QStringLiteral("input 1 is not QVector<float>; skipping"));
-				return;
-			}
-			qSamples = std::get<QVector<float>>(bVar);
+				       QStringLiteral("input %1 is not float; skipping").arg(i));
+			return;
 		}
+		(i == 0 ? iSamples : qSamples) = std::move(*s);
 	}
 
 	const int n = (currentMode == FFTMode::Complex)

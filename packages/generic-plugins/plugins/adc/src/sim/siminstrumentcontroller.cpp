@@ -119,7 +119,13 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// Starts with no conditions — the user adds them from the widget.
 	m_trigProc = new scopy::acq::TriggerProcessor("trigger", m_engine);
 	m_trigProc->setEnabled(false);
+	// Fires deliver one full plot window, centred where the handle sits.
+	m_trigProc->setWindowSize(m_plotSize);
+	m_trigProc->setTriggerPosition(m_handleFraction);
 	m_engine->addProcessor(m_trigProc);
+	// Its snapshot spans the whole store, so it must see this cycle's derived
+	// data (scale/math/FFT/decoder annotations), not the previous cycle's.
+	m_engine->setRunLast(m_trigProc);
 
 	// Standardized trigger ↔ engine wiring. All fire deliveries reach the
 	// GUI through the binder's re-emitted signals so we never touch raw
@@ -299,7 +305,7 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 				m_trigBinder->armSingleShot();
 			m_engine->run();
 		} else {
-			const std::size_t n = scopy::acq::DataStore::requiredHistoryDepth(
+			const std::size_t n = scopy::acq::DataStore::depthForWindow(
 				static_cast<std::size_t>(m_plotSize), m_engine->bufferSize());
 			m_engine->single(static_cast<unsigned int>(n));
 		}
@@ -307,16 +313,21 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	connect(m_ui, &SimInstrument::sampleSizeChanged, this, [this](int n) {
 		m_engine->setBufferSize(static_cast<std::size_t>(n));
-		// targetSample is chunk-local, so its upper bound follows
-		// the engine's buffer size, not the plot window size.
-		if(m_trigWidget)
-			m_trigWidget->setMaxTargetSample(std::max(0, n - 1));
+		// Chunk size changed, so the chunk count covering one plot window did too.
+		claimPlotDepth();
+		if(m_decoderMgr)
+			m_decoderMgr->setDecoderWindowSize(m_plotSize);
 	});
 	connect(m_ui, &SimInstrument::plotSizeChanged, this, [this](int n) {
 		m_plotSize = std::max(1, n);
 		refreshPlotAxis();
+		claimPlotDepth();
 		if(m_decoderMgr)
 			m_decoderMgr->setDecoderWindowSize(m_plotSize);
+		if(m_trigProc)
+			m_trigProc->setWindowSize(m_plotSize);
+		if(m_trigWidget)
+			m_trigWidget->setMaxTargetSample(std::max(0, m_plotSize - 1));
 	});
 	connect(m_ui, &SimInstrument::maxFpsChanged, this, [this](int fps) {
 		m_engine->setMaxFPS(static_cast<unsigned int>(fps));
@@ -465,8 +476,8 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		m_trigWidget = new scopy::acq::TriggerProcessorWidget(m_trigProc, body);
 		lay->addWidget(m_trigWidget);
 		m_ui->addGlobalWidgetGroup(m_trigProc->name(), body);
-		m_trigWidget->setMaxTargetSample(
-			std::max(0, static_cast<int>(m_engine->bufferSize()) - 1));
+		// targetSample is a plot-window index.
+		m_trigWidget->setMaxTargetSample(std::max(0, m_plotSize - 1));
 	}
 
 	// ---- Trigger sample-position handle on plot X axis ----
@@ -504,35 +515,10 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 			[this](double pos) {
 				if(!m_trigProc) return;
 				if(m_trigProc->sampleSpecific()) {
-					// Convert axis position to a plot-window index,
-					// then to a chunk-local index (targetSample lives
-					// in chunk coordinates, matching the fired()
-					// payload).
-					const int chunkSize = m_engine
-						? static_cast<int>(m_engine->bufferSize())
-						: m_plotSize;
-					const int rightEdge = m_lastPlotX.isEmpty()
-						? m_plotSize
-						: m_lastPlotX.size();
-					int plotIdx;
-					if(m_lastPlotX.isEmpty()) {
-						plotIdx = static_cast<int>(std::round(pos));
-					} else {
-						// Nearest-neighbor along X array.
-						const float t = static_cast<float>(pos);
-						int best = 0;
-						float bestDist = std::abs(m_lastPlotX[0] - t);
-						for(int i = 1; i < m_lastPlotX.size(); ++i) {
-							const float d = std::abs(m_lastPlotX[i] - t);
-							if(d < bestDist) { bestDist = d; best = i; }
-						}
-						plotIdx = best;
-					}
-					plotIdx = std::clamp(plotIdx, 0, std::max(0, rightEdge - 1));
-					const int chunkIdx = std::clamp(
-						plotIdx - (rightEdge - chunkSize),
-						0, std::max(0, chunkSize - 1));
-					m_trigProc->setTargetSample(static_cast<quint32>(chunkIdx));
+					// targetSample is a plot-window index, the same
+					// space the handle lives in.
+					m_trigProc->setTargetSample(
+						static_cast<quint32>(sampleForAxisPos(pos)));
 				} else {
 					// Convert axis-space drop position back to a
 					// canvas fraction using the current interval.
@@ -542,6 +528,9 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 					const double W = ax->max() - ax->min();
 					if(W <= 0.0) return;
 					m_handleFraction = std::clamp((pos - ax->min()) / W, 0.0, 1.0);
+					// The pre/post split follows the handle, so the
+					// next fire is centred where the user put it.
+					m_trigProc->setTriggerPosition(m_handleFraction);
 					align();
 					if(m_ui && m_ui->m_plot) m_ui->m_plot->replot();
 				}
@@ -617,12 +606,10 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 				m_decoderPanel->refreshKeys(m_store->keys());
 		});
 
-	// Wire waterfall history spinbox → update widget + DataStore history depth.
 	connect(m_ui, &SimInstrument::waterfallRowsChanged, this, [this](int rows) {
 		m_currentWaterfallRows = rows;
 		m_ui->m_waterfall->setNumRows(rows);
-		if(!m_fftWaterfallKey.key.isEmpty())
-			m_store->setHistorySize(m_fftWaterfallKey, static_cast<std::size_t>(rows));
+		claimWaterfallDepth();
 	});
 
 	// ---- Central DataStore key-set → GUI wiring ----
@@ -632,6 +619,9 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// on removal/reset, so cross-thread delivery uses Qt::QueuedConnection.
 	connect(m_store, &scopy::acq::DataStore::keysChanged, this,
 		[this](const QList<scopy::acq::DataKey> &keys) {
+			// A newly appeared key starts at depth 1; claim before the
+			// first read so the very first window isn't truncated.
+			claimPlotDepth();
 			if(m_ui)
 				m_ui->updateCurveKeyCombos(keys);
 			if(m_decoderPanel)
@@ -648,6 +638,7 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 	// Prime the GUI with whatever keys already exist (usually none at init,
 	// but harmless if the store was pre-populated).
 	{
+		claimPlotDepth();
 		const QList<scopy::acq::DataKey> keys = m_store->keys();
 		m_ui->updateCurveKeyCombos(keys);
 		if(m_decoderPanel)
@@ -710,28 +701,34 @@ bool SimInstrumentController::scanActive() const
 
 double SimInstrumentController::axisPosForSample(quint32 s) const
 {
-	// `s` is a chunk-local index emitted by TriggerProcessor::fired
-	// (0..bufferSize-1). The plot window aggregates one or more chunks
-	// with the newest on the right, so the newest chunk occupies the
-	// rightmost `bufferSize` positions of m_lastPlotX (or of the
-	// [0..m_plotSize-1] index axis when no X-key is selected).
-	const int chunkSize = m_engine
-		? static_cast<int>(m_engine->bufferSize())
-		: m_plotSize;
-	// Right-edge of the plot window measured in whichever units we live in:
-	//   • X-key selected:  m_lastPlotX.size()
-	//   • sample-index:    m_plotSize
-	const int rightEdge = m_lastPlotX.isEmpty()
-		? m_plotSize
-		: m_lastPlotX.size();
-	const int chunkIdx  = std::clamp(static_cast<int>(s), 0, std::max(0, chunkSize - 1));
-	const int plotIdx   = rightEdge - chunkSize + chunkIdx;
-	if(plotIdx < 0)
-		return m_lastPlotX.isEmpty() ? 0.0 : static_cast<double>(m_lastPlotX.first());
-	const int clamped = std::clamp(plotIdx, 0, std::max(0, rightEdge - 1));
-	if(m_lastPlotX.isEmpty())
-		return static_cast<double>(clamped);
-	return static_cast<double>(m_lastPlotX[clamped]);
+	// `s` is an index into the plot window: TriggerProcessor emits the window
+	// it assembled, so fire indices and targetSample share the plot's own
+	// coordinates. Map it through the current X-key snapshot, or use it
+	// directly under sample-index semantics.
+	const int rightEdge = m_lastPlotX.isEmpty() ? m_plotSize : m_lastPlotX.size();
+	const int idx = std::clamp(static_cast<int>(s), 0, std::max(0, rightEdge - 1));
+	return m_lastPlotX.isEmpty() ? static_cast<double>(idx)
+				     : static_cast<double>(m_lastPlotX[idx]);
+}
+
+int SimInstrumentController::sampleForAxisPos(double pos) const
+{
+	const int rightEdge = m_lastPlotX.isEmpty() ? m_plotSize : m_lastPlotX.size();
+	int idx;
+	if(m_lastPlotX.isEmpty()) {
+		idx = static_cast<int>(std::round(pos));
+	} else {
+		// Nearest neighbour along the X array — it need not be monotonic
+		// (e.g. an X-Y plot), so a binary search would be wrong.
+		const float t = static_cast<float>(pos);
+		idx = 0;
+		float best = std::abs(m_lastPlotX[0] - t);
+		for(int i = 1; i < m_lastPlotX.size(); ++i) {
+			const float d = std::abs(m_lastPlotX[i] - t);
+			if(d < best) { best = d; idx = i; }
+		}
+	}
+	return std::clamp(idx, 0, std::max(0, rightEdge - 1));
 }
 
 void SimInstrumentController::align()
@@ -887,7 +884,50 @@ void SimInstrumentController::onTriggerFired(quint32 /*sampleIndex*/,
 	// whatever the free-running worker has since replaced it with.
 	m_firedSnapshot = std::move(snapshot);
 	onCycleComplete();
+
+	// Annotation streams need pushing explicitly: the overlay is otherwise
+	// driven by cycleProduced straight from the store, which holds the
+	// annotations at their original offsets rather than the window's.
+	if(m_decoderOverlay) {
+		for(auto it = m_firedSnapshot.constBegin();
+		    it != m_firedSnapshot.constEnd(); ++it) {
+			if(const auto *anns =
+				   std::get_if<QVector<scopy::acq::Annotation>>(&it.value()))
+				m_decoderOverlay->setAnnotations(
+					scopy::acq::DataKey(it.key()), *anns);
+		}
+	}
+
 	m_firedSnapshot.clear();
+}
+
+// The waterfall needs one retained chunk per displayed row. Claiming under a
+// fixed claimant name means switching keys or shrinking the row count releases
+// the old request automatically, while other consumers keep their own depth.
+void SimInstrumentController::claimWaterfallDepth()
+{
+	if(!m_store)
+		return;
+	m_store->releaseClaimant(kWaterfallClaimant);
+	if(!m_fftWaterfallKey.key.isEmpty())
+		m_store->claimDepth(m_fftWaterfallKey, kWaterfallClaimant,
+				    static_cast<std::size_t>(std::max(1, m_currentWaterfallRows)));
+}
+
+// Every key the plot can read — curve X/Y axes and raw digital tracks — needs
+// enough retained chunks to assemble one full plot window. Reads are const and
+// no longer grow depth as a side effect, so claim for the whole key set rather
+// than tracking which combo currently points where.
+void SimInstrumentController::claimPlotDepth()
+{
+	if(!m_store || !m_engine)
+		return;
+	// One chunk more than the window needs: a centred trigger window is read
+	// over-long (plotSize + extra, extra < bufferSize) and then re-anchored.
+	const std::size_t depth = 1 + scopy::acq::DataStore::depthForWindow(
+		static_cast<std::size_t>(m_plotSize), m_engine->bufferSize());
+	for(const scopy::acq::DataKey &k : m_store->keys())
+		m_store->claimDepth(k, kPlotClaimant, depth);
 }
 
 void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)
@@ -903,27 +943,6 @@ void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)
 		m_autoscalerX->removeChannels(ch);
 		m_autoscalerY->removeChannels(ch);
 	}
-}
-
-// Convert any SampleVariant type to QVector<float> so that non-float sources
-// (e.g. M2kLogicSource which stores QVector<quint8>) can be plotted on the
-// same curves as float sources.
-static QVector<float> toFloatVec(const scopy::acq::SampleVariant &v)
-{
-	return std::visit([](const auto &vec) -> QVector<float> {
-		using VecT = std::decay_t<decltype(vec)>;
-		if constexpr(std::is_same_v<VecT, QVector<scopy::acq::Annotation>>) {
-			// Annotations are not numerical; return empty so plotting
-			// paths silently skip decoded keys.
-			return QVector<float>{};
-		} else {
-			QVector<float> out;
-			out.reserve(static_cast<int>(vec.size()));
-			for(const auto &s : vec)
-				out.append(static_cast<float>(s));
-			return out;
-		}
-	}, v);
 }
 
 void SimInstrumentController::onCycleComplete()
@@ -973,48 +992,21 @@ void SimInstrumentController::onCycleComplete()
 			// Fall through to live read for keys not present in the
 			// snapshot (e.g. GUI added a new curve after the fire).
 		}
-		return m_store->readWindowNative(scopy::acq::DataKey(keyStr), m_plotSize);
+		return m_store->window(scopy::acq::DataKey(keyStr), m_plotSize);
 	};
 
-	if(!xIsIndex)  m_liveX  = readWindow(xKeyStr);
-	else           m_liveX  = QVector<float>{};
-	if(!yIsIndex)  m_liveY  = readWindow(yKeyStr);
-	else           m_liveY  = QVector<float>{};
-	if(!x2IsIndex) m_liveX2 = readWindow(x2KeyStr);
-	else           m_liveX2 = QVector<float>{};
-	if(!y2IsIndex) m_liveY2 = readWindow(y2KeyStr);
-	else           m_liveY2 = QVector<float>{};
+	m_liveX  = xIsIndex  ? scopy::acq::SampleVariant{QVector<float>{}} : readWindow(xKeyStr);
+	m_liveY  = yIsIndex  ? scopy::acq::SampleVariant{QVector<float>{}} : readWindow(yKeyStr);
+	m_liveX2 = x2IsIndex ? scopy::acq::SampleVariant{QVector<float>{}} : readWindow(x2KeyStr);
+	m_liveY2 = y2IsIndex ? scopy::acq::SampleVariant{QVector<float>{}} : readWindow(y2KeyStr);
 
-	auto toFloatView = [](const scopy::acq::SampleVariant &v,
-			      QVector<float> &scratch)
-		-> std::pair<const float *, int> {
-		return std::visit(
-			[&](const auto &vec) -> std::pair<const float *, int> {
-				using VecT = std::decay_t<decltype(vec)>;
-				if constexpr(std::is_same_v<VecT, QVector<scopy::acq::Annotation>>) {
-					return {nullptr, 0};
-				} else if constexpr(std::is_same_v<VecT, QVector<float>>) {
-					return {vec.constData(), vec.size()};
-				} else {
-					scratch.resize(vec.size());
-					const auto *src = vec.constData();
-					float *dst = scratch.data();
-					for(int i = 0; i < vec.size(); ++i)
-						dst[i] = static_cast<float>(src[i]);
-					return {scratch.constData(), scratch.size()};
-				}
-			},
-			v);
-	};
-
-	const auto xView  = xIsIndex  ? std::pair<const float *, int>{nullptr, 0}
-				      : toFloatView(m_liveX,  m_scratchX);
-	const auto yView  = yIsIndex  ? std::pair<const float *, int>{nullptr, 0}
-				      : toFloatView(m_liveY,  m_scratchY);
-	const auto x2View = x2IsIndex ? std::pair<const float *, int>{nullptr, 0}
-				      : toFloatView(m_liveX2, m_scratchX2);
-	const auto y2View = y2IsIndex ? std::pair<const float *, int>{nullptr, 0}
-				      : toFloatView(m_liveY2, m_scratchY2);
+	// Views alias m_liveX/Y directly for float streams and the scratch
+	// buffers otherwise, so plotting a non-float source costs one convert.
+	const scopy::acq::FloatView noView;
+	const auto xView  = xIsIndex  ? noView : scopy::acq::toFloatView(m_liveX,  m_scratchX);
+	const auto yView  = yIsIndex  ? noView : scopy::acq::toFloatView(m_liveY,  m_scratchY);
+	const auto x2View = x2IsIndex ? noView : scopy::acq::toFloatView(m_liveX2, m_scratchX2);
+	const auto y2View = y2IsIndex ? noView : scopy::acq::toFloatView(m_liveY2, m_scratchY2);
 
 	// Snapshot the current X-axis array so the trigger handle can map
 	// its scale-space position (axis units) to a chunk sample index and
@@ -1022,9 +1014,9 @@ void SimInstrumentController::onCycleComplete()
 	// then falls back to identity.
 	if(xIsIndex) {
 		m_lastPlotX.clear();
-	} else if(xView.first && xView.second > 0) {
-		m_lastPlotX.resize(xView.second);
-		std::memcpy(m_lastPlotX.data(), xView.first, xView.second * sizeof(float));
+	} else if(xView.data && xView.size > 0) {
+		m_lastPlotX.resize(xView.size);
+		std::memcpy(m_lastPlotX.data(), xView.data, xView.size * sizeof(float));
 	}
 
 	// Map annotation sample indices [0..m_plotSize) proportionally across
@@ -1038,12 +1030,13 @@ void SimInstrumentController::onCycleComplete()
 	// Decoder annotation bands are pushed separately by DecoderOverlay
 	// on cycleProduced.
 	if(m_digitalMgr)
-		m_digitalMgr->updateRawCurves(m_plotSize);
+		m_digitalMgr->updateRawCurves(
+			m_plotSize, m_firedSnapshot.isEmpty() ? nullptr : &m_firedSnapshot);
 
-	const bool curve1Driven = (xIsIndex || xView.second  > 0) &&
-				  (yIsIndex || yView.second  > 0);
-	const bool curve2Driven = (x2IsIndex || x2View.second > 0) &&
-				  (y2IsIndex || y2View.second > 0);
+	const bool curve1Driven = (xIsIndex || xView.size  > 0) &&
+				  (yIsIndex || yView.size  > 0);
+	const bool curve2Driven = (x2IsIndex || x2View.size > 0) &&
+				  (y2IsIndex || y2View.size > 0);
 	setCurveDriven(m_curve,  curve1Driven);
 	setCurveDriven(m_curve2, curve2Driven);
 
@@ -1052,11 +1045,11 @@ void SimInstrumentController::onCycleComplete()
 
 	int n;
 	if(!xIsIndex && !yIsIndex)
-		n = qMin(xView.second, yView.second);
+		n = qMin(xView.size, yView.size);
 	else if(!xIsIndex)
-		n = xView.second;
+		n = xView.size;
 	else if(!yIsIndex)
-		n = yView.second;
+		n = yView.size;
 	else
 		n = m_plotSize; // both sample-index — draw full plot span
 
@@ -1064,8 +1057,8 @@ void SimInstrumentController::onCycleComplete()
 		return;
 
 	const int   idxOffset = qMax(0, m_indexBuf.size() - n);
-	const float *xPtr = xIsIndex ? (m_indexBuf.data() + idxOffset) : xView.first;
-	const float *yPtr = yIsIndex ? (m_indexBuf.data() + idxOffset) : yView.first;
+	const float *xPtr = xIsIndex ? (m_indexBuf.data() + idxOffset) : xView.data;
+	const float *yPtr = yIsIndex ? (m_indexBuf.data() + idxOffset) : yView.data;
 
 	// copy=true: Qwt keeps its own buffer. Prevents stale-pointer aliasing
 	// on m_liveX/Y across Stop/Run boundaries and out-of-band replots
@@ -1084,8 +1077,8 @@ void SimInstrumentController::onCycleComplete()
 			y2Ptr = m_indexBuf.data() + idxOffset;
 			n2    = n;
 		} else {
-			n2    = y2View.second;
-			y2Ptr = y2View.first;
+			n2    = y2View.size;
+			y2Ptr = y2View.data;
 		}
 
 		const float *x2Ptr;
@@ -1094,8 +1087,8 @@ void SimInstrumentController::onCycleComplete()
 			x2Ptr = m_indexBuf.data() + off2;
 			n2    = qMin(n2, m_indexBuf.size() - off2);
 		} else {
-			n2    = qMin(n2, x2View.second);
-			x2Ptr = x2View.first;
+			n2    = qMin(n2, x2View.size);
+			x2Ptr = x2View.data;
 		}
 		m_curve2->setSamples(x2Ptr, y2Ptr, static_cast<size_t>(n2), true);
 	}();
@@ -1104,47 +1097,36 @@ void SimInstrumentController::onCycleComplete()
 	const QString wfYKeyStr = m_ui->curveYKey(2);
 	if(!wfYKeyStr.isEmpty()) {
 		const scopy::acq::DataKey wfYKey(wfYKeyStr);
-
-		// Key changed: migrate history-size budget to the new key.
 		if(wfYKey != m_fftWaterfallKey) {
-			if(!m_fftWaterfallKey.key.isEmpty())
-				m_store->setHistorySize(m_fftWaterfallKey, 1);
 			m_fftWaterfallKey = wfYKey;
-			m_store->setHistorySize(m_fftWaterfallKey,
-						static_cast<std::size_t>(m_currentWaterfallRows));
+			claimWaterfallDepth();
 		}
 
 		// Update X frequency axis from the selected X key (if any).
 		const QString wfXKeyStr = m_ui->curveXKey(2);
 		if(!wfXKeyStr.isEmpty()) {
-			const scopy::acq::SampleBuffer xBuf = m_store->read(scopy::acq::DataKey(wfXKeyStr));
-			if(!xBuf.empty()) {
-				const QVector<float> freq = toFloatVec(xBuf.sample(0));
-				if(freq.size() >= 2)
-					m_ui->m_waterfall->setFrequencyRange(freq.first(), freq.last());
-			}
+			const QVector<float> freq =
+				m_store->windowFloat(scopy::acq::DataKey(wfXKeyStr), m_plotSize);
+			if(freq.size() >= 2)
+				m_ui->m_waterfall->setFrequencyRange(freq.first(), freq.last());
 		}
 
-		// Build and push history snapshot.
-		const scopy::acq::SampleBuffer yBuf = m_store->read(m_fftWaterfallKey);
+		// Build and push history snapshot — one row per retained chunk.
+		const scopy::acq::SampleBuffer yBuf = m_store->snapshot(m_fftWaterfallKey);
 		if(!yBuf.empty()) {
 			std::vector<QVector<float>> snap;
 			snap.reserve(yBuf.depth());
-			for(std::size_t i = 0; i < yBuf.depth(); ++i) {
-				snap.push_back(toFloatVec(yBuf.sample(i)));
-			}
+			for(std::size_t i = 0; i < yBuf.depth(); ++i)
+				snap.push_back(scopy::acq::toFloat(yBuf.sample(i)));
 
 			// TODO: temporary waterfall intensity autoscaling — should be reworked
 			// (e.g. via PlotAutoscaler or a dedicated WaterfallAutoscaler) and removed.
-			if(!snap.empty()) {
-				const QVector<float> &newest = snap[0];
-				for(float v : newest) {
-					if(v < m_wfAutoMin) m_wfAutoMin = v;
-					if(v > m_wfAutoMax) m_wfAutoMax = v;
-				}
-				if(m_wfAutoMin < m_wfAutoMax)
-					m_ui->m_waterfall->setIntensityRange(m_wfAutoMin, m_wfAutoMax);
+			for(float v : std::as_const(snap.front())) {
+				if(v < m_wfAutoMin) m_wfAutoMin = v;
+				if(v > m_wfAutoMax) m_wfAutoMax = v;
 			}
+			if(m_wfAutoMin < m_wfAutoMax)
+				m_ui->m_waterfall->setIntensityRange(m_wfAutoMin, m_wfAutoMax);
 
 			m_ui->m_waterfall->setHistorySnapshot(std::move(snap));
 		}

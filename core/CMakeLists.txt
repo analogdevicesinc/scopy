@@ -57,7 +57,8 @@ file(
 	src/pkggui/*.cpp
 	src/acq_engine/*.cpp
 	src/decoder/*.cpp
-	src/decoder/codecs/*.cpp
+	# sigrok-cli-specific annotation-input machinery; private to the backend.
+	src/decoder/sigrok/*.cpp
 )
 file(
 	GLOB
@@ -67,7 +68,6 @@ file(
 	include/${SCOPY_MODULE}/pkggui/*.h
 	include/${SCOPY_MODULE}/acq_engine/*.h
 	include/${SCOPY_MODULE}/decoder/*.h
-	include/${SCOPY_MODULE}/decoder/codecs/*.h
 )
 file(GLOB UI_LIST ui/*.ui)
 
@@ -143,7 +143,11 @@ target_include_directories(
 )
 target_include_directories(
 	${PROJECT_NAME}
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+	# include/ so sources can spell public headers <core/decoder/X.h> — the
+	# same path external consumers use.
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+		${CMAKE_CURRENT_SOURCE_DIR}/src
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/decoder
