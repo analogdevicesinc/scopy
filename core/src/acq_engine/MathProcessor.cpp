@@ -2,10 +2,9 @@
 #include "DataStore.h"
 #include "MathBlockWidget.h"
 
-#include <QVBoxLayout>
-#include <QWidget>
 #include <algorithm>
-#include <variant>
+#include <deque>
+#include <QWidget>
 
 namespace scopy {
 namespace acq {
@@ -24,35 +23,26 @@ void MathProcessor::setWatchedKeys(const QList<DataKey> &keys)
 
 void MathProcessor::process(DataStore *store)
 {
-	const int nKeys = m_watchedKeys.size();
-
-	// Reserve to keep addresses stable across appends.
-	QVector<QVector<float>>          heldInputs;
-	QVector<const QVector<float> *>  inputs;
-	heldInputs.reserve(nKeys);
-	inputs.reserve(nKeys);
+	// held owns the chunks; inputs points into it. std::deque never
+	// invalidates element addresses on push_back, so the pointers stay valid.
+	std::deque<QVector<float>>      held;
+	QVector<const QVector<float> *> inputs;
+	inputs.reserve(m_watchedKeys.size());
 
 	int n = 0;
 	for(const DataKey &k : m_watchedKeys) {
-		const SampleBuffer buf = store->read(k);
-		if(buf.empty()) {
-			heldInputs.append(QVector<float>());
-			inputs.append(nullptr);
+		auto src = store->latestAs<QVector<float>>(k);
+		if(!src) {
+			inputs.append(nullptr); // absent or non-float reads as 0
 			continue;
 		}
-		const auto &v = buf.sample(0);
-		if(!std::holds_alternative<QVector<float>>(v)) {
-			heldInputs.append(QVector<float>());
-			inputs.append(nullptr);
-			continue;
-		}
-		heldInputs.append(std::get<QVector<float>>(v));
-		inputs.append(&heldInputs.last());
-		n = std::max((long long)n, heldInputs.last().size());
+		held.push_back(std::move(*src));
+		inputs.append(&held.back());
+		n = std::max<int>(n, held.back().size());
 	}
 
 	if(n == 0)
-		return; // nothing to do
+		return;
 
 	QVector<float> out(n);
 	QString        err;
@@ -64,13 +54,7 @@ void MathProcessor::process(DataStore *store)
 
 QWidget *MathProcessor::createSettingsWidget(QWidget *parent)
 {
-	auto *w   = new QWidget(parent);
-	auto *lay = new QVBoxLayout(w);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->setSpacing(4);
-	lay->addWidget(ProcessorBlock::createSettingsWidget(w));
-	lay->addWidget(new MathBlockWidget(this, w));
-	return w;
+	return withBaseSettings(new MathBlockWidget(this), parent);
 }
 
 void MathProcessor::setFormula(const QString &formula)

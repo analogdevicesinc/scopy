@@ -15,31 +15,23 @@
 namespace scopy {
 namespace acq {
 
-// ProcessorBlock that computes an FFT using genalyzer, with optional
-// Fourier analysis (SFDR/SNR/THD/NSD/...) using either auto or fixed-tone
-// configuration. Mode is auto-detected from the watched-keys count:
+// FFT via genalyzer, with optional Fourier analysis (SFDR/SNR/THD/NSD/…) in
+// either auto or fixed-tone configuration. The number of watched keys picks the
+// transform: one key means real (gn_rfft, axis [0, fs/2), nfft/2+1 bins), two
+// means complex I/Q (gn_fft + gn_ifftshift, axis [-fs/2, fs/2), nfft bins).
 //
-//   watchedKeys.size() == 1  -> Real mode      (gn_rfft, axis [0, fs/2],
-//                                               output nfft/2+1 bins,
-//                                               GnFreqAxisTypeReal)
-//   watchedKeys.size() == 2  -> Complex mode   (gn_fft + gn_ifftshift,
-//                                               axis [-fs/2, fs/2),
-//                                               output nfft bins,
-//                                               GnFreqAxisTypeDcLeft)
+// Watched keys are re-read every process(), so setWatchedKeys() can switch mode
+// at runtime — do it while the block is disabled.
 //
-// Watched keys are read at every process() call so they can be reassigned
-// at runtime via setWatchedKeys() — do it while the block is disabled.
-//
-// Thread safety: every gn_* call (FFT, ifftshift, db, analysis) is
-// serialised with s_genalyzerMutex because fftw3 (genalyzer's back-end)
-// is not re-entrant across instances.
+// Every gn_* call is serialised on s_genalyzerMutex: fftw3, genalyzer's
+// back-end, is not re-entrant even across separate instances.
 class SCOPY_CORE_EXPORT GenalyzerFFTProcessor : public ProcessorBlock
 {
 	Q_OBJECT
 public:
 	enum class FFTMode { Complex, Real };
 
-	// Complex / I-Q constructor (back-compat).
+	// Complex / I-Q.
 	explicit GenalyzerFFTProcessor(const DataKey &iKey,
 				       const DataKey &qKey,
 				       const DataKey &outputKey,
@@ -49,7 +41,7 @@ public:
 				       GnWindow       window     = GnWindowHann,
 				       QObject       *parent     = nullptr);
 
-	// Real / single-channel constructor.
+	// Real / single-channel.
 	explicit GenalyzerFFTProcessor(const DataKey &inKey,
 				       const DataKey &outputKey,
 				       const DataKey &freqKey,

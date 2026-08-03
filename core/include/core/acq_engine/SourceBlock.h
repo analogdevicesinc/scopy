@@ -2,75 +2,72 @@
 
 #include "scopy-core_export.h"
 
-#include "AcquisitionError.h"
+#include "Block.h"
 #include "DataStore.h"
 
 #include <atomic>
-#include <stdexcept>
 #include <QList>
 #include <QMap>
-#include <QObject>
+#include <QMutex>
 #include <QString>
-
-class QWidget;
 
 namespace scopy {
 namespace acq {
 
-class AcquisitionEngine;
-
-class SCOPY_CORE_EXPORT SourceBlock : public QObject
+// Produces sample chunks into the DataStore, one per enabled channel per cycle.
+//
+// Lifecycle, all on the engine's worker thread: onStart() once, acquire() per
+// cycle, onStop() once. Throwing from any of them aborts the run and surfaces
+// as a Critical report.
+//
+// The channel map is shared with the GUI thread, so acquire() must go through
+// enabledChannels() rather than touch it directly; the returned list is a
+// snapshot valid for the rest of the cycle.
+class SCOPY_CORE_EXPORT SourceBlock : public Block
 {
 	Q_OBJECT
 public:
 	explicit SourceBlock(const QString &id, QObject *parent = nullptr);
-	virtual ~SourceBlock() = default;
 
 	virtual void acquire(DataStore *store) = 0;
 
+	// Acquire and release device resources. Overrides must call the base.
 	virtual void onStart();
 	virtual void onStop();
+
+	const QString &id() const { return name(); }
 
 	void        setBufferSize(std::size_t size);
 	std::size_t bufferSize() const;
 
-	void           enableChannel(const QString &channelId, bool en);
-	void           removeChannel(const QString &channelId);
-	void           disableAllChannels();
+	void enableChannel(const QString &channelId, bool en);
+	void removeChannel(const QString &channelId);
+	void disableAllChannels();
+
 	bool           isChannelEnabled(const QString &channelId) const;
 	QList<QString> enabledChannels() const;
-	QList<QString> channelIds() const { return m_channels.keys(); }
+	QList<QString> channelIds() const;
 
-	const QString &id() const { return m_id; }
+	// One raw key per registered channel — the convention every SourceBlock
+	// subclass writes under. Sources that produce a derived stream instead
+	// (e.g. MathSource) override this again.
+	QList<DataKey> outputKeys() const override;
 
-	bool isEnabled() const { return m_sourceEnabled.load(std::memory_order_relaxed); }
-	void setEnabled(bool en);
-
-	virtual QWidget *createSettingsWidget(QWidget *parent = nullptr);
-
-	// All diagnostics produced by this block must go through report(). The
-	// engine multiplexes them into its error(severity, id, message) signal.
-	// Parent the block to the AcquisitionEngine so report() can find it;
-	// blocks without an engine parent silently drop messages. Throwing from
-	// onStart()/acquire() is equivalent to report(Critical, what()) plus
-	// aborting the cycle — the engine catches and re-emits.
-	void report(AcquisitionError::Severity sev, const QString &msg) const;
+	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 Q_SIGNALS:
+	// A channel was added or removed.
 	void channelsChanged();
-	void enabledChanged(bool en);
-	// Fired when an individual channel's enable state toggles. Not fired
-	// on first-add (channelsChanged covers that). Fine-grained hook for
-	// UI consumers (e.g. show/hide a plot track) that don't want to
-	// re-read the full channel map on every change.
+	// An existing channel's enable state flipped. Not emitted on first add.
 	void channelEnabledChanged(const QString &channelId, bool en);
 
 protected:
-	std::size_t         m_bufferSize{1024};
+	std::size_t       m_bufferSize{1024};
+	std::atomic<bool> m_stopRequested{false};
+
+private:
+	mutable QMutex      m_channelMutex;
 	QMap<QString, bool> m_channels;
-	std::atomic<bool>   m_stopRequested{false};
-	std::atomic<bool>   m_sourceEnabled{true};
-	QString             m_id;
 };
 
 } // namespace acq

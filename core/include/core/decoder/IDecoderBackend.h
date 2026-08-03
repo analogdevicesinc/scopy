@@ -40,9 +40,9 @@ struct AnnotationInputRef
 };
 
 // Passed to IDecoderBackend::decode(). Always describes a linear stack
-// (single-decoder = stack.size() == 1). When rootInput == Annotations,
-// meta carries "annIn.*" codec params (upstreamId, samplerate, bitrate,
-// frameformat, textinput, ...).
+// (single-decoder = stack.size() == 1). When rootInput == Annotations, meta
+// carries the "annIn.*" section parsed by AnnInOptions::fromMeta() — the
+// producer's stream descriptor under "annIn.stream.*" plus consumer overrides.
 struct DecoderConfig
 {
 	double                             sampleRate{1.0e6};
@@ -65,6 +65,14 @@ struct AnnotationC
 	std::string text;
 	int         severity{0};
 	int         stageIndex{0}; // 0 = root
+
+	// Numeric payload when the producer has it. `text` is a display string,
+	// so recovering a byte from it means knowing which radix was printed;
+	// consumers must prefer `value` and parse `text` only as a fallback.
+	// Mirrors scopy::acq::Annotation::value (std::optional is not ABI-safe,
+	// hence the flag).
+	bool     hasValue{false};
+	uint64_t value{0};
 };
 
 // One-shot pluggable decoder backend. Owned and called exclusively from

@@ -2,10 +2,13 @@
 
 #include <exception>
 #include <QElapsedTimer>
+#include <QMutexLocker>
 #include <QStringList>
 
 namespace scopy {
 namespace acq {
+
+using Severity = AcquisitionError::Severity;
 
 AcquisitionEngine::AcquisitionEngine(DataStore *store, QObject *parent)
 	: QObject(parent)
@@ -19,48 +22,156 @@ AcquisitionEngine::~AcquisitionEngine()
 	stop();
 }
 
-void AcquisitionEngine::addSource(SourceBlock *src)    { m_sources.append(src); }
-void AcquisitionEngine::removeSource(SourceBlock *src) { m_sources.removeOne(src); }
-const QList<SourceBlock *> &AcquisitionEngine::sources() const { return m_sources; }
+// --- Block registration ------------------------------------------------------
+//
+// Requests are queued and applied by the worker between cycles (syncBlocks), so
+// a mid-run add/remove can never race the worker's iteration. While stopped,
+// syncBlocks() runs inline so the lists are immediately observable.
 
-void AcquisitionEngine::addProcessor(ProcessorBlock *proc)    { m_processors.append(proc); }
-void AcquisitionEngine::removeProcessor(ProcessorBlock *proc) { m_processors.removeOne(proc); }
-const QList<ProcessorBlock *> &AcquisitionEngine::processors() const { return m_processors; }
-
-bool        AcquisitionEngine::isRunning()  const { return m_running; }
-void        AcquisitionEngine::setBufferSize(std::size_t size) { m_bufferSize = size; }
-std::size_t AcquisitionEngine::bufferSize() const { return m_bufferSize; }
-void        AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS = fps; }
-unsigned int AcquisitionEngine::maxFPS()   const { return m_maxFPS; }
-void             AcquisitionEngine::setMode(Mode m) { m_mode.store(m); }
-AcquisitionEngine::Mode AcquisitionEngine::mode()  const { return m_mode.load(); }
-
-void AcquisitionEngine::single(unsigned int count) { startLoop(static_cast<int>(count)); }
-void AcquisitionEngine::run()                      { startLoop(0); }
-
-void AcquisitionEngine::stop()
+void AcquisitionEngine::addSource(SourceBlock *src)
 {
-	if(!m_running)
-		return;
-
-	m_running = false;
-
-	for(SourceBlock *src : m_sources) {
-		if(!src->isEnabled())
-			continue;
-		safeOnStop(src);
+	{
+		QMutexLocker lk(&m_blockMutex);
+		m_pendingRemoveSources.removeAll(src);
+		m_pendingAddSources.append(src);
 	}
-
-	if(m_thread) {
-		m_thread->wait();
-		m_thread = nullptr;
-	}
+	if(!m_threadAlive)
+		syncBlocks();
 }
+
+void AcquisitionEngine::removeSource(SourceBlock *src)
+{
+	{
+		QMutexLocker lk(&m_blockMutex);
+		m_pendingAddSources.removeAll(src);
+		m_pendingRemoveSources.append(src);
+	}
+	if(!m_threadAlive)
+		syncBlocks();
+}
+
+void AcquisitionEngine::addProcessor(ProcessorBlock *proc)
+{
+	{
+		QMutexLocker lk(&m_blockMutex);
+		m_pendingRemoveProcessors.removeAll(proc);
+		m_pendingAddProcessors.append(proc);
+	}
+	if(!m_threadAlive)
+		syncBlocks();
+}
+
+void AcquisitionEngine::removeProcessor(ProcessorBlock *proc)
+{
+	{
+		QMutexLocker lk(&m_blockMutex);
+		m_pendingAddProcessors.removeAll(proc);
+		m_pendingRemoveProcessors.append(proc);
+	}
+	if(!m_threadAlive)
+		syncBlocks();
+}
+
+void AcquisitionEngine::setRunLast(ProcessorBlock *proc)
+{
+	QMutexLocker lk(&m_blockMutex);
+	m_runLast.insert(proc);
+}
+
+void AcquisitionEngine::syncBlocks()
+{
+	QMutexLocker lk(&m_blockMutex);
+
+	for(SourceBlock *s : m_pendingRemoveSources)
+		m_sources.removeAll(s);
+	for(SourceBlock *s : m_pendingAddSources)
+		if(!m_sources.contains(s))
+			m_sources.append(s);
+
+	for(ProcessorBlock *p : m_pendingRemoveProcessors)
+		m_processors.removeAll(p);
+	for(ProcessorBlock *p : m_pendingAddProcessors)
+		if(!m_processors.contains(p))
+			m_processors.append(p);
+
+	m_pendingAddSources.clear();
+	m_pendingRemoveSources.clear();
+	m_pendingAddProcessors.clear();
+	m_pendingRemoveProcessors.clear();
+}
+
+QList<SourceBlock *> AcquisitionEngine::sources() const
+{
+	QMutexLocker lk(&m_blockMutex);
+	return m_sources;
+}
+
+QList<ProcessorBlock *> AcquisitionEngine::processors() const
+{
+	QMutexLocker lk(&m_blockMutex);
+	return m_processors;
+}
+
+// --- Configuration -----------------------------------------------------------
+
+bool         AcquisitionEngine::isRunning() const { return m_running; }
+void         AcquisitionEngine::setBufferSize(std::size_t size) { m_bufferSize = size; }
+std::size_t  AcquisitionEngine::bufferSize() const { return m_bufferSize; }
+void         AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS = fps; }
+unsigned int AcquisitionEngine::maxFPS() const { return m_maxFPS; }
+void         AcquisitionEngine::setMode(Mode m) { m_mode.store(m); }
+AcquisitionEngine::Mode AcquisitionEngine::mode() const { return m_mode.load(); }
+
+void AcquisitionEngine::setMinReportSeverity(Severity sev) { m_minSeverity.store(sev); }
+Severity AcquisitionEngine::minReportSeverity() const { return m_minSeverity.load(); }
+
+void AcquisitionEngine::reportInfo(const QString &id, const QString &msg)
+{
+	if(Severity::Info >= m_minSeverity.load())
+		Q_EMIT error(static_cast<int>(Severity::Info), id, msg);
+}
+
+void AcquisitionEngine::reportWarningOnce(const QString &id, const QString &msg)
+{
+	if(Severity::Warning < m_minSeverity.load())
+		return;
+	QString &last = m_lastWarning[id];
+	if(last == msg)
+		return;
+	last = msg;
+	Q_EMIT error(static_cast<int>(Severity::Warning), id, msg);
+}
+
+template<class Fn>
+bool AcquisitionEngine::guarded(const QString &id, const QString &what, Fn &&fn)
+{
+	try {
+		fn();
+		return true;
+	} catch(const std::exception &e) {
+		Q_EMIT error(static_cast<int>(Severity::Critical), id,
+			     QString::fromStdString(e.what()));
+	} catch(...) {
+		Q_EMIT error(static_cast<int>(Severity::Critical), id,
+			     QStringLiteral("unknown exception in ") + what);
+	}
+	return false;
+}
+
+// --- Run control -------------------------------------------------------------
+
+void AcquisitionEngine::run()                      { startLoop(0); }
+void AcquisitionEngine::single(unsigned int count) { startLoop(static_cast<int>(count)); }
 
 void AcquisitionEngine::startLoop(int acqCount)
 {
-	if(m_running)
+	if(m_threadAlive)
 		return;
+
+	// A previous self-terminated run may have left a finished thread behind.
+	joinThread();
+
+	syncBlocks();
 
 	m_acqCount  = acqCount;
 	m_faultStop = false;
@@ -69,20 +180,16 @@ void AcquisitionEngine::startLoop(int acqCount)
 		if(!src->isEnabled())
 			continue;
 		src->setBufferSize(m_bufferSize);
-		try {
-			src->onStart();
-		} catch(const std::exception &e) {
-			Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-				     src->id(), QString::fromStdString(e.what()));
+		if(!guarded(src->id(), QStringLiteral("onStart()"), [src] { src->onStart(); }))
 			m_faultStop = true;
-		} catch(...) {
-			Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-				     src->id(), QStringLiteral("unknown exception in onStart()"));
-			m_faultStop = true;
-		}
 	}
 
+	// Release whatever the partially-started sources already claimed.
 	if(m_faultStop) {
+		for(SourceBlock *src : m_sources)
+			if(src->isEnabled())
+				guarded(src->id(), QStringLiteral("onStop()"),
+					[src] { src->onStop(); });
 		Q_EMIT forceStopped();
 		return;
 	}
@@ -90,10 +197,29 @@ void AcquisitionEngine::startLoop(int acqCount)
 	for(ProcessorBlock *proc : m_processors)
 		proc->reset();
 
-	m_running = true;
-	m_thread  = QThread::create([this] { loop(); });
-	connect(m_thread, &QThread::finished, m_thread, &QThread::deleteLater);
+	m_running     = true;
+	m_threadAlive = true;
+	// Owned, not self-deleting: startLoop() and stop() both need to wait() on
+	// it after a self-terminated run, so it must outlive loop() returning.
+	m_thread      = QThread::create([this] { loop(); });
 	m_thread->start();
+}
+
+void AcquisitionEngine::stop()
+{
+	m_running = false;
+	joinThread();
+}
+
+// Waits for the worker to finish and destroys the QThread. Safe to call when no
+// thread exists or when the worker already self-terminated.
+void AcquisitionEngine::joinThread()
+{
+	if(!m_thread)
+		return;
+	m_thread->wait();
+	delete m_thread;
+	m_thread = nullptr;
 }
 
 void AcquisitionEngine::loop()
@@ -104,171 +230,166 @@ void AcquisitionEngine::loop()
 		QStringList srcNames, procNames;
 		for(SourceBlock *s : m_sources)       srcNames  << s->id();
 		for(ProcessorBlock *p : m_processors) procNames << p->name();
-		Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Info),
-			     QStringLiteral("engine"),
-			     QString("started | sources: [%1] | processors: [%2] | buffer: %3")
-				     .arg(srcNames.join(", "),
-					  procNames.isEmpty() ? "none" : procNames.join(", "))
-				     .arg(m_bufferSize));
+		reportInfo(QStringLiteral("engine"),
+			   QStringLiteral("started | sources: [%1] | processors: [%2] | buffer: %3")
+				   .arg(srcNames.join(", "),
+					procNames.isEmpty() ? QStringLiteral("none")
+							    : procNames.join(", "))
+				   .arg(m_bufferSize));
 	}
 
-	int cyclesDone = 0;
-	QElapsedTimer cycleTimer;
-	QElapsedTimer heartbeatTimer;
+	m_lastWarning.clear();
+
+	int           cyclesDone = 0;
+	QElapsedTimer cycleTimer, heartbeatTimer;
 	heartbeatTimer.start();
 
 	while(m_running) {
 		cycleTimer.start();
-
+		syncBlocks();
 		m_store->beginCycle();
 
 		bool aborted = false;
 		for(SourceBlock *src : m_sources) {
 			if(!src->isEnabled())
 				continue;
-			const QSet<DataKey> beforeAcq = m_store->cycleKeys();
-			try {
-				src->acquire(m_store);
-			} catch(const std::exception &e) {
-				Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-					     src->id(), QString::fromStdString(e.what()));
+
+			const quint64 before = m_store->writeCount();
+			if(!guarded(src->id(), QStringLiteral("acquire()"),
+				    [&] { src->acquire(m_store); })) {
 				m_faultStop = true;
-				aborted = true;
+				aborted     = true;
 				break;
-			} catch(...) {
-				Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-					     src->id(), QStringLiteral("unknown exception in acquire()"));
-				m_faultStop = true;
+			}
+			if(m_store->writeCount() == before)
+				reportWarningOnce(src->id(),
+						  QStringLiteral("acquire() wrote no data"));
+			else
+				m_lastWarning.remove(src->id());
+			if(!m_running) {
 				aborted = true;
 				break;
 			}
-			if(m_store->cycleKeys() == beforeAcq)
-				Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Warning),
-					     src->id(), QStringLiteral("acquire() wrote no data this cycle"));
-			if(!m_running) { aborted = true; break; }
 		}
+		if(aborted)
+			break;
 
-		if(aborted) { m_running = false; break; }
-
-		if(m_store->cycleKeys().isEmpty())
-			Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Warning),
-				     QStringLiteral("engine"),
-				     QStringLiteral("no source produced any data this cycle"));
-
-		if(runProcessors()) { m_running = false; break; }
+		if(!runProcessors())
+			break;
 
 		if(m_mode.load() == Mode::Triggered) {
 			Q_EMIT cycleComplete();
 			if(!m_running)
 				break;
+			// Throttle so every cycle gets a chance to be displayed.
 			if(m_maxFPS > 0) {
-				const qint64 minMs   = 1000LL / static_cast<qint64>(m_maxFPS);
-				const qint64 elapsed = cycleTimer.elapsed();
-				if(elapsed < minMs)
-					QThread::msleep(static_cast<unsigned long>(minMs - elapsed));
+				const qint64 minMs = 1000LL / m_maxFPS;
+				const qint64 spent = cycleTimer.elapsed();
+				if(spent < minMs)
+					QThread::msleep(static_cast<unsigned long>(minMs - spent));
 			}
 		} else {
-			const qint64 hbMs = (m_maxFPS > 0)
-				? 1000LL / static_cast<qint64>(m_maxFPS)
-				: 16;
+			// Free-run; only the notification is rate-limited.
+			const qint64 hbMs = m_maxFPS > 0 ? 1000LL / m_maxFPS : 16;
 			if(heartbeatTimer.elapsed() >= hbMs) {
 				Q_EMIT cycleComplete();
 				heartbeatTimer.restart();
 			}
-			if(!m_running)
-				break;
 		}
 
-		++cyclesDone;
-		if(m_acqCount > 0 && cyclesDone >= m_acqCount)
-			m_running = false;
+		if(m_acqCount > 0 && ++cyclesDone >= m_acqCount)
+			break;
 	}
 
+	m_running = false;
+
+	// Continuous mode gates cycleComplete on the heartbeat, so emit a final
+	// one to publish whatever the last cycle produced.
 	if(m_mode.load() == Mode::Continuous)
 		Q_EMIT cycleComplete();
 
-	for(SourceBlock *src : m_sources) {
-		if(!src->isEnabled())
-			continue;
-		safeOnStop(src);
-	}
+	// Sole owner of onStop(): stop() only clears the flag and waits, so device
+	// teardown always happens exactly once, on this thread.
+	for(SourceBlock *src : m_sources)
+		if(src->isEnabled())
+			guarded(src->id(), QStringLiteral("onStop()"), [src] { src->onStop(); });
 
+	reportInfo(QStringLiteral("engine"), QStringLiteral("stopped"));
 	if(m_faultStop)
 		Q_EMIT forceStopped();
 	else
 		Q_EMIT stopped();
-	Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Info),
-		     QStringLiteral("engine"), QStringLiteral("stopped"));
+
+	// Last statement: stop() may return as soon as this clears.
+	m_threadAlive = false;
 }
 
 bool AcquisitionEngine::runProcessors()
 {
 	if(m_processors.isEmpty())
-		return false;
+		return true;
 
 	QSet<ProcessorBlock *> executed;
-	bool progress;
+	QSet<DataKey>          dirty = m_store->cycleKeys();
+	QSet<ProcessorBlock *> runLast;
+	{
+		QMutexLocker lk(&m_blockMutex);
+		runLast = m_runLast;
+	}
 
-	do {
-		progress = false;
-		const QSet<DataKey> dirty = m_store->cycleKeys();
+	// A processor that runs writes new keys, which may make another processor
+	// runnable — so re-scan until a pass changes nothing. Deferred processors
+	// are held back to a final pass so they observe everything the others wrote.
+	for(bool deferred : {false, true}) {
+		bool progress = true;
+		while(progress) {
+			progress = false;
+			for(ProcessorBlock *proc : m_processors) {
+				if(executed.contains(proc) || !proc->isEnabled())
+					continue;
+				if(runLast.contains(proc) != deferred)
+					continue;
 
-		for(ProcessorBlock *proc : m_processors) {
-			if(executed.contains(proc) || !proc->isEnabled())
-				continue;
+				bool ready = true;
+				for(const DataKey &k : proc->watchedKeys())
+					if(!dirty.contains(k)) {
+						ready = false;
+						break;
+					}
+				if(!ready)
+					continue;
 
-			bool ready = true;
-			for(const DataKey &k : proc->watchedKeys()) {
-				if(!dirty.contains(k)) { ready = false; break; }
+				if(!guarded(proc->name(), QStringLiteral("process()"),
+					    [&] { proc->process(m_store); })) {
+					m_faultStop = true;
+					return false;
+				}
+				executed.insert(proc);
+				progress = true;
 			}
-			if(!ready)
-				continue;
-
-			try {
-				proc->process(m_store);
-			} catch(const std::exception &e) {
-				Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-					     proc->name(), QString::fromStdString(e.what()));
-				m_faultStop = true;
-				return true;
-			} catch(...) {
-				Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-					     proc->name(), QStringLiteral("unknown exception in process()"));
-				m_faultStop = true;
-				return true;
-			}
-
-			executed.insert(proc);
-			progress = true;
+			if(progress)
+				dirty = m_store->cycleKeys();
 		}
-	} while(progress);
+	}
 
-	const QSet<DataKey> finalDirty = m_store->cycleKeys();
+	// A processor can legitimately idle for many cycles (e.g. a stacked decoder
+	// whose upstream has produced nothing yet), so dedupe rather than warn at
+	// cycle rate.
 	for(ProcessorBlock *proc : m_processors) {
-		if(executed.contains(proc) || !proc->isEnabled())
+		if(!proc->isEnabled())
 			continue;
+		if(executed.contains(proc)) {
+			m_lastWarning.remove(proc->name());
+			continue;
+		}
 		QStringList missing;
 		for(const DataKey &k : proc->watchedKeys())
-			if(!finalDirty.contains(k))
+			if(!dirty.contains(k))
 				missing << k.key;
-		Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Warning),
-			     proc->name(),
-			     "skipped — missing input keys: " + missing.join(", "));
+		reportWarningOnce(proc->name(),
+				  QStringLiteral("skipped — missing input keys: ") + missing.join(", "));
 	}
-	return false;
-}
-
-void AcquisitionEngine::safeOnStop(SourceBlock *src)
-{
-	try {
-		src->onStop();
-	} catch(const std::exception &e) {
-		Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-			     src->id(), QString::fromStdString(e.what()));
-	} catch(...) {
-		Q_EMIT error(static_cast<int>(AcquisitionError::Severity::Critical),
-			     src->id(), QStringLiteral("unknown exception in onStop()"));
-	}
+	return true;
 }
 
 } // namespace acq

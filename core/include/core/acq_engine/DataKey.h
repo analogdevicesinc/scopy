@@ -7,6 +7,16 @@
 namespace scopy {
 namespace acq {
 
+// Identifies one data stream in the DataStore as "<sourceId>_<channelId>_<stage>".
+//
+// The string is the identity: DataKey round-trips through GUI combo boxes and
+// settings as plain text, so equality and hashing are string-based and the
+// components are parsed back out on demand.
+//
+// Parsing is right-anchored — stage is the last segment, channel the one before
+// it, and everything left over is the source. Source IDs therefore may contain
+// underscores ("m2k_logic_DIO3_raw" -> source "m2k_logic", channel "DIO3"),
+// while channel and stage may not.
 struct DataKey
 {
 	QString key;
@@ -16,7 +26,7 @@ struct DataKey
 
 	static DataKey raw(const QString &sourceId, const QString &channelId)
 	{
-		return DataKey(sourceId + "_" + channelId + "_raw");
+		return withStage(sourceId, channelId, QStringLiteral("raw"));
 	}
 
 	static DataKey withStage(const QString &sourceId, const QString &channelId, const QString &stage)
@@ -24,24 +34,11 @@ struct DataKey
 		return DataKey(sourceId + "_" + channelId + "_" + stage);
 	}
 
-	static DataKey withStages(const QString &sourceId, const QString &channelId, const QStringList &stages)
-	{
-		return DataKey(sourceId + "_" + channelId + "_" + stages.join("_"));
-	}
+	QString sourceId()  const { return head(2); }
+	QString channelId() const { return tail(1); }
+	QString stage()     const { return tail(0); }
 
-	QString sourceId()   const { return parts().value(0); }
-	QString channelId()  const { return parts().value(1); }
-	QString stages()     const
-	{
-		const QStringList p = parts();
-		if(p.size() < 3) return {};
-		return QStringList(p.mid(2)).join("_");
-	}
-	QString firstStage() const { return parts().value(2); }
-	// A key is "raw" if its final stage segment is "raw". Checking the
-	// suffix (rather than parts().value(2)) keeps this correct when the
-	// sourceId itself contains underscores, e.g. "m2k_logic".
-	bool    isRaw()      const { return key.endsWith(QStringLiteral("_raw")); }
+	bool isRaw() const { return key.endsWith(QStringLiteral("_raw")); }
 
 	bool operator<(const DataKey &o)  const noexcept { return key < o.key; }
 	bool operator==(const DataKey &o) const noexcept { return key == o.key; }
@@ -50,7 +47,22 @@ struct DataKey
 	QString toString() const { return key; }
 
 private:
-	QStringList parts() const { return key.split('_'); }
+	// n-th segment counting back from the end.
+	QString tail(int n) const
+	{
+		const QStringList p = key.split('_');
+		const int i = p.size() - 1 - n;
+		return i >= 0 ? p.at(i) : QString();
+	}
+
+	// Everything before the last `dropped` segments, rejoined.
+	QString head(int dropped) const
+	{
+		const QStringList p = key.split('_');
+		if(p.size() <= dropped)
+			return {};
+		return QStringList(p.mid(0, p.size() - dropped)).join('_');
+	}
 };
 
 inline size_t qHash(const DataKey &k, size_t seed = 0) noexcept
