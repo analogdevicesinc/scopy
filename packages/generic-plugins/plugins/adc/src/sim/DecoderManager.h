@@ -109,6 +109,7 @@ Q_SIGNALS:
 private:
 	double nextBandPos();
 	scopy::PlotAxisHandle *attachHandle(double initialPos);
+	void claimWindowDepth(const DecoderInstance &d);
 
 	scopy::acq::AcquisitionEngine          *m_engine{nullptr};
 	scopy::acq::DataStore                  *m_store{nullptr};

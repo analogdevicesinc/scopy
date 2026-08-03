@@ -6,10 +6,13 @@
 #include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/ProcessorBlock.h>
 
+#include <QCheckBox>
 #include <QColor>
 #include <QComboBox>
 #include <QList>
+#include <QPointer>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QTextEdit>
 #include <QTreeWidget>
 #include <QWidget>
@@ -57,6 +60,7 @@ public:
 
 	// Refresh the DataStore inspector panel with a live snapshot of the store.
 	// Safe to call from the main thread at any time (e.g. on every cycleComplete).
+	// Expanding a row shows that stream's newest samples, refreshed by this call.
 	void refreshDatastoreView(scopy::acq::DataStore *store);
 
 	// Install the decoder panel widget in the right stack and wire the
@@ -122,6 +126,20 @@ private:
 	QTextEdit     *m_logView;
 	QTextEdit     *m_decoderLogView;
 	QTreeWidget   *m_datastoreTable;
+	// How many newest samples an expanded DataStore row lists. Kept small by
+	// default: the rows are rebuilt every cycle, so a large count turns the
+	// inspector into the most expensive thing in the GUI thread.
+	QSpinBox      *m_datastoreSampleCount{nullptr};
+	QCheckBox     *m_datastoreHex{nullptr};
+	// Last store passed to refreshDatastoreView(), so expanding a row can fill
+	// it immediately instead of waiting for the next cycle (which never comes
+	// while the engine is stopped). Not owned.
+	QPointer<scopy::acq::DataStore> m_datastoreRef;
+
+	// Fill `item`'s child rows with the newest samples of `key`. Called only
+	// for expanded rows.
+	void fillDatastoreSamples(QTreeWidgetItem *item, scopy::acq::DataStore *store,
+				  const scopy::acq::DataKey &key);
 
 	// Populated by buildControlPanel()
 	QList<CurveSelectors> m_curveSelectors;

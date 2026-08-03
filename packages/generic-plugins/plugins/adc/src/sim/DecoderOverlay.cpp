@@ -108,27 +108,12 @@ void DecoderOverlay::clear()
 	m_curves.clear();
 }
 
-void DecoderOverlay::onCycleProduced(scopy::acq::DataKey outKey)
+void DecoderOverlay::setAnnotations(const scopy::acq::DataKey &outKey,
+				    const QVector<scopy::acq::Annotation> &anns)
 {
-	if(!m_store)
-		return;
 	AnnotationCurve *curve = m_curves.value(outKey, nullptr);
 	if(!curve)
 		return;
-
-	const scopy::acq::SampleBuffer buf = m_store->read(outKey);
-	if(buf.empty()) {
-		curve->clear();
-		return;
-	}
-
-	const scopy::acq::SampleVariant &v = buf.sample(0);
-	if(!std::holds_alternative<QVector<scopy::acq::Annotation>>(v)) {
-		curve->clear();
-		return;
-	}
-
-	const auto &anns = std::get<QVector<scopy::acq::Annotation>>(v);
 
 	QVector<AnnotationSpan> spans;
 	spans.reserve(anns.size());
@@ -144,6 +129,19 @@ void DecoderOverlay::onCycleProduced(scopy::acq::DataKey outKey)
 	curve->setAnnotations(spans);
 	if(m_plot)
 		m_plot->replot();
+}
+
+void DecoderOverlay::onCycleProduced(scopy::acq::DataKey outKey)
+{
+	if(!m_store)
+		return;
+	const auto anns = m_store->latestAs<QVector<scopy::acq::Annotation>>(outKey);
+	if(!anns) {
+		if(AnnotationCurve *curve = m_curves.value(outKey, nullptr))
+			curve->clear();
+		return;
+	}
+	setAnnotations(outKey, *anns);
 }
 
 bool DecoderOverlay::eventFilter(QObject *watched, QEvent *ev)

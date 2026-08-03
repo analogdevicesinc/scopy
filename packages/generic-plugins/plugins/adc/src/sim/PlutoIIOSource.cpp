@@ -22,6 +22,13 @@ PlutoIIOSource::~PlutoIIOSource()
 	onStop();
 }
 
+iio_channel *PlutoIIOSource::findChannel(const QString &channelId) const
+{
+	if(!m_dev)
+		return nullptr;
+	return iio_device_find_channel(m_dev, channelId.toLocal8Bit().constData(), false);
+}
+
 void PlutoIIOSource::onStart()
 {
 	SourceBlock::onStart();
@@ -31,14 +38,9 @@ void PlutoIIOSource::onStart()
 		throw std::runtime_error(
 			QString("Device '%1' not found").arg(m_devName).toStdString());
 
-	for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it) {
-		if(!it.value())
-			continue;
-		iio_channel *ch = iio_device_find_channel(
-			m_dev, it.key().toLocal8Bit().constData(), false);
-		if(ch)
+	for(const QString &chId : enabledChannels())
+		if(iio_channel *ch = findChannel(chId))
 			iio_channel_enable(ch);
-	}
 
 	iio_buffer *buf = iio_device_create_buffer(m_dev, m_bufferSize, false);
 	m_buf.store(buf);
@@ -58,12 +60,11 @@ void PlutoIIOSource::onStop()
 	}
 
 	if(m_dev) {
-		for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it) {
-			iio_channel *ch = iio_device_find_channel(
-				m_dev, it.key().toLocal8Bit().constData(), false);
-			if(ch)
+		// Disable every known channel, not just the enabled ones: the GUI may
+		// have flipped a channel off after onStart() enabled it on the device.
+		for(const QString &chId : channelIds())
+			if(iio_channel *ch = findChannel(chId))
 				iio_channel_disable(ch);
-		}
 		m_dev = nullptr;
 	}
 }
@@ -84,12 +85,8 @@ void PlutoIIOSource::acquire(scopy::acq::DataStore *store)
 
 	const ptrdiff_t step = iio_buffer_step(buf);
 
-	for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it) {
-		if(!it.value())
-			continue;
-
-		iio_channel *ch = iio_device_find_channel(
-			m_dev, it.key().toLocal8Bit().constData(), false);
+	for(const QString &chId : enabledChannels()) {
+		iio_channel *ch = findChannel(chId);
 		if(!ch)
 			continue;
 
@@ -104,7 +101,7 @@ void PlutoIIOSource::acquire(scopy::acq::DataStore *store)
 			samples.append(static_cast<float>(raw) / FULL_SCALE);
 		}
 
-		store->write(scopy::acq::DataKey::raw(m_id, it.key()), std::move(samples));
+		store->write(scopy::acq::DataKey::raw(id(), chId), std::move(samples));
 	}
 }
 

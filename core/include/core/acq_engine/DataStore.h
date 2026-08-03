@@ -5,6 +5,8 @@
 #include "DataKey.h"
 #include "SampleBuffer.h"
 
+#include <optional>
+#include <QHash>
 #include <QList>
 #include <QMap>
 #include <QMutex>
@@ -14,42 +16,115 @@
 namespace scopy {
 namespace acq {
 
+// Central key/value store for acquired and derived sample streams.
+//
+// Sources and processors write chunks; the engine and GUI read them. Every
+// method is safe to call from any thread.
+//
+// History depth is not set directly. Consumers register a named claim
+// (claimDepth) for how many chunks back they need to see, and the effective
+// capacity of a stream is the maximum over its live claims. This keeps
+// independent consumers of the same key — a plot window, a waterfall, a decoder
+// — from overwriting each other's requirements. Reads never mutate capacity.
 class SCOPY_CORE_EXPORT DataStore : public QObject
 {
 	Q_OBJECT
 public:
 	explicit DataStore(QObject *parent = nullptr);
 
+	// --- Writing ---------------------------------------------------------
+
 	void write(const DataKey &key, SampleVariant vec);
-	void setHistorySize(const DataKey &key, std::size_t n);
-	void           ensureHistoryDepth(const DataKey &key, std::size_t depth);
-	SampleBuffer   read(const DataKey &key) const;
-	SampleVariant  readWindowNative(const DataKey &key, int plotSize);
-	QVector<float> readWindow(const DataKey &key, int plotSize);
-	// Does NOT mutate the target key's historySize — callers must ensure
-	// depth via ensureHistoryDepth().
-	QVector<quint8> readWindowU8(const DataKey &key, int windowSize) const;
-	bool           contains(const DataKey &key) const;
-	QList<DataKey> keys() const;
-	void clear();
-	void reset();
+
+	// --- Reading ---------------------------------------------------------
+
+	// Newest chunk. nullopt if the key is absent or has no chunks yet.
+	// Cheaper than snapshot() — copies one chunk, not the whole history.
+	std::optional<SampleVariant> latest(const DataKey &key) const;
+
+	// Newest chunk narrowed to T. nullopt also when the stream holds a
+	// different type, so callers get one check instead of three.
+	template<class T>
+	std::optional<T> latestAs(const DataKey &key) const
+	{
+		std::optional<SampleVariant> v = latest(key);
+		if(!v || !std::holds_alternative<T>(*v))
+			return std::nullopt;
+		return std::get<T>(std::move(*v));
+	}
+
+	// The newest `plotSize` samples, oldest-first, spanning as many chunks as
+	// the stream's claimed depth allows. Preserves the stream's sample type;
+	// windowFloat() converts, windowAs<T>() narrows.
+	SampleVariant  window(const DataKey &key, int plotSize) const;
+	QVector<float> windowFloat(const DataKey &key, int plotSize) const;
+
+	template<class T>
+	T windowAs(const DataKey &key, int plotSize) const
+	{
+		SampleVariant v = window(key, plotSize);
+		return std::holds_alternative<T>(v) ? std::get<T>(std::move(v)) : T{};
+	}
+
+	// Full history, for consumers that need every chunk (e.g. a waterfall).
+	SampleBuffer snapshot(const DataKey &key) const;
+
+	// --- Metadata --------------------------------------------------------
+
+	bool                      contains(const DataKey &key) const;
+	std::optional<SampleType> typeOf(const DataKey &key) const;
+	std::size_t               depth(const DataKey &key) const;
+	QList<DataKey>            keys() const;
+
+	// Stream-level annotation descriptor. Set once by the producer (it is
+	// constant across chunks) and read by consumers that need to interpret
+	// the stream — notably a decoder taking these annotations as input.
+	// Survives clear(); dropped by reset() and remove().
+	void setAnnotationInfo(const DataKey &key, const AnnotationStreamInfo &info);
+	std::optional<AnnotationStreamInfo> annotationInfo(const DataKey &key) const;
+
+	// Monotonic count of write() calls. Sample it around an operation to tell
+	// whether anything was written without copying key sets.
+	quint64 writeCount() const;
+
+	// --- History depth ---------------------------------------------------
+
+	// Register `claimant`'s requirement for `key`; replaces that claimant's
+	// previous claim on that key. Effective capacity is the max over claims.
+	void claimDepth(const DataKey &key, const QString &claimant, std::size_t depth);
+	void releaseDepth(const DataKey &key, const QString &claimant);
+	// Drop every claim held by `claimant` across all keys.
+	void releaseClaimant(const QString &claimant);
+
+	// Chunks needed to cover `plotSize` samples arriving `bufferSize` at a time.
+	static std::size_t depthForWindow(std::size_t plotSize, std::size_t bufferSize);
+
+	// --- Lifecycle -------------------------------------------------------
+
+	void clear();  // drop chunks, keep keys and claims
+	void reset();  // drop everything
 	void remove(const DataKey &key);
 
+	// Per-cycle dirty set: which keys were written since the last beginCycle().
+	// Drives processor scheduling in AcquisitionEngine.
 	void          beginCycle();
 	QSet<DataKey> cycleKeys() const;
 
-	static std::size_t requiredHistoryDepth(std::size_t plotSize, std::size_t bufferSize);
-	static SampleVariant  assembleWindow(const SampleBuffer &buf, int plotSize);
-	static QVector<float> assembleWindowFloat(const SampleBuffer &buf, int plotSize);
-
 Q_SIGNALS:
-	void dataWritten(DataKey key);
+	// Emitted when a key is added or removed. Emitted from whichever thread
+	// wrote, so GUI consumers must use Qt::QueuedConnection.
 	void keysChanged(QList<DataKey> keys);
 
 private:
-	QMap<DataKey, SampleBuffer> m_data;
-	QSet<DataKey>               m_cycleKeys;
-	mutable QMutex              m_mutex;
+	// Recomputes and applies capacity for `key`. Caller holds m_mutex.
+	void applyDepthLocked(const DataKey &key);
+
+	QMap<DataKey, SampleBuffer>                m_data;
+	QHash<DataKey, AnnotationStreamInfo>       m_annInfo;
+	QHash<DataKey, QHash<QString, std::size_t>> m_claims;
+	QSet<DataKey>                              m_cycleKeys;
+	quint64                                    m_writeCount{0};
+	mutable QMutex                             m_mutex;
 };
 
 } // namespace acq
