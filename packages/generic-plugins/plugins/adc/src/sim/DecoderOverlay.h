@@ -10,6 +10,7 @@
 #include <QTimer>
 
 #include "acq_engine/DataKey.h"
+#include "acq_engine/SampleBuffer.h"
 
 class QEvent;
 
@@ -64,6 +65,13 @@ public:
 	// annotations are laid out proportionally across the current plot
 	// x-axis range. Pass 0 to revert to sample-index mode.
 	void setSampleCount(quint64 n);
+
+	// Draw the given annotations for one decoder. onCycleProduced() reads the
+	// store and calls this; the trigger path calls it directly with the
+	// re-anchored annotations from a fire snapshot, which the store no longer
+	// holds in that form.
+	void setAnnotations(const scopy::acq::DataKey &outKey,
+			    const QVector<scopy::acq::Annotation> &anns);
 
 	void clear();
 

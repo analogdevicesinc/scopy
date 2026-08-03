@@ -27,26 +27,27 @@ public:
 			return;
 
 		const int count = static_cast<int>(m_bufferSize);
+		// Phase offset comes from the channel's position in the full list,
+		// so enabling/disabling a channel doesn't reshuffle the others.
+		const QList<QString> all = channelIds();
 
-		int chIndex = 0;
-		for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it, ++chIndex) {
-			if(!it.value())
+		for(int chIndex = 0; chIndex < all.size(); ++chIndex) {
+			if(!isChannelEnabled(all[chIndex]))
 				continue;
 
 			QVector<float> data(count);
 			for(int i = 0; i < count; ++i) {
-				float t = static_cast<float>(m_sampleIndex + i) / 100.0f;
+				const float t = static_cast<float>(m_sampleIndex + i) / 100.0f;
 				data[i] = std::sin(TWO_PI * t + chIndex * 0.5f);
 			}
 
-			store->write(scopy::acq::DataKey::raw(m_id, it.key()), std::move(data));
+			store->write(scopy::acq::DataKey::raw(id(), all[chIndex]), std::move(data));
 		}
 
-		if (m_sampleIndex >= 10 * m_bufferSize) {
+		if(m_sampleIndex >= 10 * static_cast<int>(m_bufferSize))
 			m_sampleIndex = 0;
-		} else {
+		else
 			m_sampleIndex += count;
-		}
 	}
 
 private:
