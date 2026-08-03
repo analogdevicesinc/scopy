@@ -87,7 +87,7 @@ bool TxNode::readDds() const
 	}
 
 	if(m_childNodes.size() != 0) {
-		for(auto node : qAsConst(m_childNodes)) {
+		for(auto node : std::as_const(m_childNodes)) {
 			if(node->readDds()) {
 				return true;
 			}

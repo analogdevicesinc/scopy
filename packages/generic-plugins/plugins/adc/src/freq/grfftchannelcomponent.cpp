@@ -353,7 +353,6 @@ QWidget *GRFFTChannelComponent::createChAttrMenu(iio_channel *ch, QString title,
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);
-	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	for(auto w : attrWidgets) {
