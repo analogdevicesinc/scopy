@@ -404,14 +404,22 @@ QWidget *DecoderEditor::buildAnnotationInputGroup(QWidget *parent)
 		"e.g. \"8n1\", \"7e1\"."));
 	form->addRow(QStringLiteral("Frame format:"), m_annInFrameFormat);
 
+	// "auto" must be the default and must write no meta key: the upstream
+	// decoder publishes its own radix, and an explicit value here overrides it.
+	// A combo that always sent one would make that declaration dead code and
+	// silently corrupt every byte whenever the two disagreed.
 	m_annInRadix = new QComboBox(box);
+	m_annInRadix->addItem(QStringLiteral("auto"));
 	m_annInRadix->addItem(QStringLiteral("hex"));
 	m_annInRadix->addItem(QStringLiteral("dec"));
+	m_annInRadix->addItem(QStringLiteral("oct"));
 	m_annInRadix->addItem(QStringLiteral("bin"));
 	m_annInRadix->addItem(QStringLiteral("ascii"));
 	m_annInRadix->setToolTip(QStringLiteral(
-		"How to parse the upstream annotation text into bytes. "
-		"Match the upstream decoder's 'format' option."));
+		"How to parse the upstream annotation text into bytes.\n"
+		"\"auto\" uses the radix the upstream decoder declares, which is "
+		"normally correct. Set one explicitly only to override a decoder "
+		"that reports the wrong format."));
 	form->addRow(QStringLiteral("Radix:"), m_annInRadix);
 
 	connect(m_annInSampleRate,
@@ -533,7 +541,9 @@ void DecoderEditor::collect(scopy::decoder::DecoderConfig &cfg,
 		if(m_annInFrameFormat && !m_annInFrameFormat->text().isEmpty())
 			cfg.meta["annIn.frameformat"] =
 				m_annInFrameFormat->text().toStdString();
-		if(m_annInRadix)
+		// Omitted on "auto" so the producer's declared radix survives; see the
+		// combo's construction.
+		if(m_annInRadix && m_annInRadix->currentText() != QStringLiteral("auto"))
 			cfg.meta["annIn.radix"] =
 				m_annInRadix->currentText().toStdString();
 	}

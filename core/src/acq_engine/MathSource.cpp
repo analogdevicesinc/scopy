@@ -2,7 +2,6 @@
 #include "DataStore.h"
 #include "MathBlockWidget.h"
 
-#include <QVBoxLayout>
 #include <QWidget>
 
 namespace scopy {
@@ -26,13 +25,7 @@ void MathSource::acquire(DataStore *store)
 
 QWidget *MathSource::createSettingsWidget(QWidget *parent)
 {
-	auto *w   = new QWidget(parent);
-	auto *lay = new QVBoxLayout(w);
-	lay->setContentsMargins(0, 0, 0, 0);
-	lay->setSpacing(4);
-	lay->addWidget(SourceBlock::createSettingsWidget(w));
-	lay->addWidget(new MathBlockWidget(&m_evaluator, w));
-	return w;
+	return withBaseSettings(new MathBlockWidget(&m_evaluator), parent);
 }
 
 void MathSource::setFormula(const QString &formula)
