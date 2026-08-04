@@ -37,17 +37,15 @@ public:
 	bool hasTrigger() const;
 	QString assignedTriggerName() const;
 
-	Result<void> setTrigger(IIOTrigger *source);
-	Q_INVOKABLE QUuid setTriggerAsync(IIOTrigger *source);
-	Result<void> clearTrigger();
-	Q_INVOKABLE QUuid clearTriggerAsync();
+	Q_INVOKABLE QCoro::Task<CommandResponse<void>> setTriggerAsync(IIOTrigger *source);
+	Q_INVOKABLE QCoro::Task<CommandResponse<void>> clearTriggerAsync();
 
 Q_SIGNALS:
 	void triggerSucceeded();
 	void triggerFailed(const scopy::Error &error);
 
 private:
-	QCoro::Task<Result<void>> setInternal(scopy::iio::SetTriggerCommand *cmd);
+	QCoro::Task<CommandResponse<void>> setInternal(scopy::iio::SetTriggerCommand *cmd);
 
 	scopy::iio::IDeviceOps *m_ops;
 	scopy::iio::DeviceHandle m_dev;

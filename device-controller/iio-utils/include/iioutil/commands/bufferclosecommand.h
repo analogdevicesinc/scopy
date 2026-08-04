@@ -1,23 +1,27 @@
 #pragma once
 
-#include "core/command.h"
+#include "core/resultcommand.h"
 #include "iioutil/ibufferops.h"
 
 namespace scopy::iio {
 
-class BufferCloseCommand : public Command
+class BufferCloseCommand : public ResultCommand<void>
 {
 	Q_OBJECT
 public:
 	BufferCloseCommand(IBufferOps *ops, BufferHandle handle, QObject *parent = nullptr)
-		: Command(handle.ptr, parent)
+		: ResultCommand(handle.ptr, parent)
 		, m_ops(ops)
 		, m_handle(handle)
 	{
 	}
 
 protected:
-	void run() override { m_ops->closeBuffer(m_handle); }
+    void run() override
+	{
+		m_ops->closeBuffer(m_handle);
+		setResult(Result<void>());
+	}
 
 private:
 	IBufferOps *m_ops;

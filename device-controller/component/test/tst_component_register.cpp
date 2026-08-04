@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QSignalSpy>
 #include <QTest>
+#include <qcoro/qcorofuture.h>
 
 using namespace scopy;
 using namespace scopy::component::iio;
@@ -78,8 +79,8 @@ void TstComponentRegister::writeThenReadBack()
 	IIORegisterWriter writer(&ops, dh, &exec);
 	IIORegisterReader reader(&ops, dh, &exec);
 
-	QVERIFY(writer.write(0x10, 0xabcd));
-	const Result<uint32_t> r = reader.read(0x10);
+	QVERIFY(QCoro::waitFor(writer.writeAsync(0x10, 0xabcd)));
+	const auto r = QCoro::waitFor(reader.readAsync(0x10));
 	QVERIFY(r);
 	QCOMPARE(r.value(), 0xabcdu);
 }
@@ -93,7 +94,7 @@ void TstComponentRegister::readEmitsSucceeded()
 
 	IIORegisterReader reader(&ops, dh, &exec);
 	QSignalSpy ok(&reader, &IIORegisterReader::readSucceeded);
-	QVERIFY(reader.read(0x20));
+	QVERIFY(QCoro::waitFor(reader.readAsync(0x20)));
 	QCOMPARE(ok.count(), 1);
 	QCOMPARE(ok.at(0).at(0).toUInt(), 0x20u);
 	QCOMPARE(ok.at(0).at(1).toUInt(), 0x55u);
@@ -110,8 +111,8 @@ void TstComponentRegister::failurePaths()
 	QSignalSpy rfail(&reader, &IIORegisterReader::readFailed);
 	QSignalSpy wfail(&writer, &IIORegisterWriter::writeFailed);
 
-	QVERIFY(!reader.read(0xdead));
-	QVERIFY(!writer.write(0xdead, 1));
+	QVERIFY(!QCoro::waitFor(reader.readAsync(0xdead)));
+	QVERIFY(!QCoro::waitFor(writer.writeAsync(0xdead, 1)));
 	QCOMPARE(rfail.count(), 1);
 	QCOMPARE(wfail.count(), 1);
 }

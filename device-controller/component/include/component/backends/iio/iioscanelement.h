@@ -44,8 +44,7 @@ public:
     void setId(const QString &id) { m_id = id; }
 	void setIsOutput(bool isOutput) { m_isOutput = isOutput; }
 
-	Result<void> enable(bool en);
-	Q_INVOKABLE QUuid enableAsync(bool en);
+	Q_INVOKABLE QCoro::Task<CommandResponse<void>> enableAsync(bool en);
 	bool isEnabled() const;
 
 Q_SIGNALS:
@@ -54,7 +53,6 @@ Q_SIGNALS:
 
 private:
 	scopy::Command *makeCommand(bool en);
-	QCoro::Task<Result<void>> enableInternal(scopy::Command *cmd, bool en);
 
 	scopy::iio::IChannelOps *m_ops;
 	scopy::iio::ChannelHandle m_handle;

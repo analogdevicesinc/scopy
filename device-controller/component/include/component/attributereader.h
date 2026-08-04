@@ -4,6 +4,7 @@
 
 #include <QObject>
 #include <QUuid>
+#include <qcorotask.h>
 
 namespace scopy::component {
 
@@ -19,11 +20,10 @@ public:
 	}
 	~AttributeReader() override = default;
 
-	virtual Result<QByteArray> read() = 0;
-	Q_INVOKABLE virtual QUuid readAsync() = 0; // returns the dispatched command's id
+    Q_INVOKABLE virtual QCoro::Task<CommandResponse<QByteArray>> readAsync() = 0;
 
 Q_SIGNALS:
-	void readSucceeded(Result<QByteArray> &result);
+    void readSucceeded(scopy::Result<QByteArray> &result);
 	void readFailed(const scopy::Error &error);
 };
 

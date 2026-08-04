@@ -8,6 +8,7 @@
 
 #include <QSignalSpy>
 #include <QTest>
+#include <qcoro/qcorofuture.h>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -60,19 +61,22 @@ void TstComponentStream::openEnablesRefillDecodes()
 	bufOps.chOffset.insert(&c0, 0);
 	bufOps.chOffset.insert(&c1, 2);
 
-	QVERIFY(stream->open({{0, 1}, 3}));
+    QVERIFY(QCoro::waitFor(stream->openAsync({{0, 1}, 3})));
 	QVERIFY(stream->isOpen());
 	QVERIFY(e0->isEnabled());
 	QVERIFY(e1->isEnabled());
 
 	// Fill known bytes: ch0 = 1,2,3 ; ch1 = 10,20,30 (int16 LE, interleaved).
 	auto *p = reinterpret_cast<int16_t *>(bufOps.storage.data());
-	p[0] = 1; p[1] = 10;
-	p[2] = 2; p[3] = 20;
-	p[4] = 3; p[5] = 30;
+    p[0] = 1;
+    p[1] = 10;
+    p[2] = 2;
+    p[3] = 20;
+    p[4] = 3;
+    p[5] = 30;
 
 	QSignalSpy ok(stream, &InputStream::refillSucceeded);
-	QVERIFY(stream->refill());
+	QVERIFY(QCoro::waitFor(stream->refillAsync()));
 	QCOMPARE(ok.count(), 1);
 
 	StreamView view(stream->readFormat());
@@ -98,7 +102,7 @@ void TstComponentStream::setKernelBuffersRefusedWhenOpen()
 
 	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
 	QVERIFY(stream.setKernelBuffers(8));
-	QVERIFY(stream.open({{}, 4}));
+    QVERIFY(QCoro::waitFor(stream.openAsync({{}, 4})));
 	QVERIFY(!stream.setKernelBuffers(2));
 }
 
@@ -128,11 +132,11 @@ void TstComponentStream::outputPushEmits()
 	e0->setIndex(0);
 	bufOps.chOffset.insert(&c0, 0);
 
-	QVERIFY(stream->open({{0}, 2}));
+    QVERIFY(QCoro::waitFor(stream->openAsync({{0}, 2})));
 	QCOMPARE(stream->writeFormat().channels.size(), 1);
 
 	QSignalSpy ok(stream, &OutputStream::pushSucceeded);
-	QVERIFY(stream->push());
+	QVERIFY(QCoro::waitFor(stream->pushAsync()));
 	QCOMPARE(ok.count(), 1);
 	QCOMPARE(bufOps.pushes, 1);
 
