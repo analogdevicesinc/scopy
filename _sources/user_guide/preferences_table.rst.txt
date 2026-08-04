@@ -5,54 +5,6 @@
    * - ID
      - Title
      - Description
-   * - adc_plot_labels
-     - Default state for plot labels
-     - Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting 
-   * - adc_add_remove_plot
-     - Add/Remove plot feature
-     - Allows the user to create multiple time or frequency plots      within the ADC instrument. Any channel can be moved between plots to provide      visual clarity and separation.
-   * - adc_add_remove_instrument
-     - Add/Remove instrument feature
-     - Allows the user to create multiple time or frequency      instruments, providing an easy way to switch between different run scenarios      without affecting previous settings.
-   * - adc_enable_iio_context_ping
-     - Enable automatic IIO context ping
-     - When enabled, a ping may be called before some ADC operations to verify if the      context is working as expected.
-   * - adc_plot_xaxis_label_position
-     - Plot X-Axis scale position
-     - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
-   * - adc_plot_yaxis_label_position
-     - Plot Y-Axis scale position
-     - Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.
-   * - adc_plot_yaxis_handle_position
-     - Plot channel Y-handle position
-     - Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.
-   * - adc_plot_xcursor_position
-     - Plot X-Cursor position
-     - Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.
-   * - adc_plot_ycursor_position
-     - Plot Y-Cursor position
-     - Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.
-   * - adc_default_y_mode
-     - ADC Default Y-Mode
-     - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
-   * - dac_reset_dds_on_connect
-     - Reset DDS on connect
-     - Reset all DDS settings when connecting to the device.    Disable if another application is actively using the DDS.
-   * - dac_reset_dds_on_disconnect
-     - Reset DDS on disconnect
-     - Reset all DDS settings when disconnecting from the device.       Disable if another application needs the DDS to keep running.
-   * - plugins_use_debugger_v2
-     - Use Debugger V2 plugin
-     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
-   * - debugger_v2_include_debugfs
-     - Include debug attributes in IIO Explorer
-     - Enable/disable the use of advanced debug attributes in the instrument.
-   * - regmap_color_by_value
-     - Use color to reflect value
-     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
-   * - dataloggerplugin_data_storage_size
-     - Maximum data stored for each monitor
-     - Select the maximum data storage size for each monitor in the datalogger.
    * - m2k_instrument_notes_active
      - Instrument Notes
      - Enable or disable a text section at the bottom of each ADALM2000 instrument, allowing the user to take notes. Disabled by default.
@@ -89,6 +41,54 @@
    * - m2k_logic_display_sample_time
      - Show sample and time info in decoder table
      - Select whether the sample and time detailed information is shown in the      decoder table of the Logic Analyzer. Enabled by default.
+   * - plugins_use_debugger_v2
+     - Use Debugger V2 plugin
+     - Switch between the old style debugger instrument, having     just basic controls over attributes or the new instrument     type, IIO Explorer, having a tree-like structure.
+   * - debugger_v2_include_debugfs
+     - Include debug attributes in IIO Explorer
+     - Enable/disable the use of advanced debug attributes in the instrument.
+   * - dac_reset_dds_on_connect
+     - Reset DDS on connect
+     - Reset all DDS settings when connecting to the device.    Disable if another application is actively using the DDS.
+   * - dac_reset_dds_on_disconnect
+     - Reset DDS on disconnect
+     - Reset all DDS settings when disconnecting from the device.       Disable if another application needs the DDS to keep running.
+   * - dataloggerplugin_data_storage_size
+     - Maximum data stored for each monitor
+     - Select the maximum data storage size for each monitor in the datalogger.
+   * - regmap_color_by_value
+     - Use color to reflect value
+     - Select from various configurations available which elements in the Register Map  are color coded for better visual interpretation.
+   * - adc_plot_labels
+     - Default state for plot labels
+     - Sets plot labels to be visible/hidden by default. Plot labels may be      enabled/disabled within the ADC plot settings, overwriting this setting 
+   * - adc_add_remove_plot
+     - Add/Remove plot feature
+     - Allows the user to create multiple time or frequency plots      within the ADC instrument. Any channel can be moved between plots to provide      visual clarity and separation.
+   * - adc_add_remove_instrument
+     - Add/Remove instrument feature
+     - Allows the user to create multiple time or frequency      instruments, providing an easy way to switch between different run scenarios      without affecting previous settings.
+   * - adc_enable_iio_context_ping
+     - Enable automatic IIO context ping
+     - When enabled, a ping may be called before some ADC operations to verify if the      context is working as expected.
+   * - adc_plot_xaxis_label_position
+     - Plot X-Axis scale position
+     - Select whether the X-Axis labels are displayed on the top or bottom of the plot. Only applied after restart.
+   * - adc_plot_yaxis_label_position
+     - Plot Y-Axis scale position
+     - Select whether the Y-Axis labels are displayed on the left or right side of the       plot. Only applied after restart.
+   * - adc_plot_yaxis_handle_position
+     - Plot channel Y-handle position
+     - Select whether the Y-Axis handle is located on the left or right side of the plot. Only applied after restart.
+   * - adc_plot_xcursor_position
+     - Plot X-Cursor position
+     - Select whether the X-Axis cursor handles are located on the top or bottom of the plot. Only applied after restart.
+   * - adc_plot_ycursor_position
+     - Plot Y-Cursor position
+     - Select whether the Y-Axis cursor handles are located on the left or right side of the plot. Only applied after restart.
+   * - adc_default_y_mode
+     - ADC Default Y-Mode
+     - Select the Y-Axis default mode, can be either ADC Counts or %Full Scale. This is also controllable while running, from the instrument settings. Only applied after restart.
    * - general_save_session
      - Save/Load Scopy session
      - Allow Scopy to automatically save/load the session     using .ini files into a predefined location.
