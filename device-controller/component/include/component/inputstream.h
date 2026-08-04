@@ -16,8 +16,7 @@ public:
 	{
 	}
 
-	virtual Result<void> refill() = 0;
-	Q_INVOKABLE virtual QUuid refillAsync() = 0;
+	Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> refillAsync() = 0;
 
 	// Read-only view of the captured buffer; valid after a successful refill().
 	virtual const StreamFormat &readFormat() const = 0;

@@ -27,8 +27,10 @@ Command *IIOScanElement::makeCommand(bool en)
 		  : static_cast<Command *>(new scopy::iio::ChnDisableCommand(m_ops, m_handle, m_mask));
 }
 
-QCoro::Task<Result<void>> IIOScanElement::enableInternal(Command *cmd, bool en)
+QCoro::Task<CommandResponse<void>> IIOScanElement::enableAsync(bool en)
 {
+	auto *cmd = makeCommand(en);
+	const QUuid id = cmd->id();
 	const bool was = m_ops->isEnabled(m_handle, m_mask);
 	co_await m_executor->execute(cmd);
 	cmd->deleteLater();
@@ -38,21 +40,11 @@ QCoro::Task<Result<void>> IIOScanElement::enableInternal(Command *cmd, bool en)
 		Q_EMIT enabledChanged(now);
 	}
 	if(now == en) {
-		co_return Result<void>();
+		co_return CommandResponse<void>(id);
 	}
-	Result<void> err{Unexpected{Error{-EIO, QStringLiteral("channel mask did not reach requested state")}}};
-	Q_EMIT enableFailed(err.error());
-	co_return err;
+	Unexpected err{Error{-EIO, QStringLiteral("channel mask did not reach requested state")}};
+	Q_EMIT enableFailed(err.error);
+	co_return CommandResponse<void>(id, std::move(err));
 }
-
-QUuid IIOScanElement::enableAsync(bool en)
-{
-	auto *cmd = makeCommand(en);
-	const QUuid id = cmd->id();
-	enableInternal(cmd, en);
-	return id;
-}
-
-Result<void> IIOScanElement::enable(bool en) { return QCoro::waitFor(enableInternal(makeCommand(en), en)); }
 
 bool IIOScanElement::isEnabled() const { return m_ops->isEnabled(m_handle, m_mask); }

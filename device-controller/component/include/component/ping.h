@@ -1,15 +1,19 @@
 #pragma once
 
+#include "core/result.h"
+
 #include <QObject>
 #include <QTimer>
 
+#include <qcoro/qcorotask.h>
+
 namespace scopy::component {
 
-// Reachability capability (Pattern A base). Monitoring is async: the timer fires
-// checkReachableAsync() (leaf dispatches the ping through the executor) and the
-// leaf reports the outcome via reachabilityChecked(bool), so the GUI thread never
-// blocks in a nested event loop. connectionLost() is emitted once, on first
-// failure. checkReachable() stays for one-off explicit synchronous checks.
+// Reachability capability (Pattern A base). A single async method: the timer
+// fires checkReachableAsync() (leaf dispatches the ping through the executor) and
+// the leaf reports the outcome via reachabilityChecked(bool), so the GUI thread
+// never blocks in a nested event loop. connectionLost() is emitted once, on first
+// failure. Callers needing a synchronous one-off wrap it: QCoro::waitFor(p->checkReachableAsync()).
 class Ping : public QObject
 {
 	Q_OBJECT
@@ -23,8 +27,7 @@ public:
 	}
 	~Ping() override = default;
 
-	virtual bool checkReachable() = 0;
-	virtual void checkReachableAsync() = 0;
+	Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> checkReachableAsync() = 0;
 
 	void startMonitoring(int intervalMs)
 	{

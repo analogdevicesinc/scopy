@@ -9,7 +9,7 @@ namespace scopy::iio {
 
 class AttrWriteCommand : public ResultCommand<void>
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
 	AttrWriteCommand(IAttrOps *ops, AttrHandle handle, const QString &value, QObject *parent = nullptr)
 		: ResultCommand(handle.ptr, parent)
@@ -20,7 +20,7 @@ public:
 	}
 
 protected:
-	void run() override { setResult(m_ops->write(m_handle, m_value)); }
+    void run() override { setResult(m_ops->write(m_handle, m_value)); }
 
 private:
 	IAttrOps *m_ops;
