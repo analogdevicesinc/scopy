@@ -19,8 +19,7 @@ public:
 	// Writable view of the internal buffer; valid after open(), up to push().
 	virtual StreamFormat &writeFormat() = 0;
 
-	virtual Result<void> push() = 0;
-	Q_INVOKABLE virtual QUuid pushAsync() = 0;
+	Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> pushAsync() = 0;
 
 Q_SIGNALS:
 	void pushSucceeded();

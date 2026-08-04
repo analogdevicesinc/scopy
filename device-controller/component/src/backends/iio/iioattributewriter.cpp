@@ -18,22 +18,10 @@ IIOAttributeWriter::IIOAttributeWriter(scopy::iio::IAttrOps *ops, scopy::iio::At
 {
 }
 
-QCoro::Task<Result<void>> IIOAttributeWriter::writeInternal(scopy::iio::AttrWriteCommand *cmd)
+QCoro::Task<CommandResponse<void>> IIOAttributeWriter::writeAsync(const QString &value)
 {
-	return runCommand(
-		m_executor, cmd, [this](Result<void> &) { Q_EMIT writeSucceeded(); },
-		[this](const scopy::Error &error) { Q_EMIT writeFailed(error); });
-}
-
-QUuid IIOAttributeWriter::writeAsync(const QString &value)
-{
-	auto *cmd = new scopy::iio::AttrWriteCommand(m_ops, m_handle, value, this);
-	const QUuid id = cmd->id();
-	writeInternal(cmd);
-	return id;
-}
-
-Result<void> IIOAttributeWriter::write(const QString &value)
-{
-	return QCoro::waitFor(writeInternal(new scopy::iio::AttrWriteCommand(m_ops, m_handle, value)));
+    auto *cmd = new scopy::iio::AttrWriteCommand(m_ops, m_handle, value, this);
+    return runCommand(
+        m_executor, cmd, [this](const Result<void> &) { Q_EMIT writeSucceeded(); },
+        [this](const scopy::Error &error) { Q_EMIT writeFailed(error); });
 }

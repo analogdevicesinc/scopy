@@ -5,6 +5,7 @@
 #include <QList>
 #include <QObject>
 #include <cstddef>
+#include <qcorotask.h>
 
 namespace scopy::component {
 
@@ -32,8 +33,8 @@ public:
 	}
 	~Stream() override = default;
 
-	virtual Result<void> open(const StreamConfig &cfg) = 0;
-	virtual void close() = 0;
+	virtual QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) = 0;
+	virtual QCoro::Task<CommandResponse<void>> closeAsync() = 0;
 
 	bool isOpen() const { return m_open; }
 	// Which device buffer this stream drives. Distinguishes sibling streams of the

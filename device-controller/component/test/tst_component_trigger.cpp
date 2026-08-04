@@ -5,6 +5,7 @@
 
 #include <QSignalSpy>
 #include <QTest>
+#include <qcoro/qcorofuture.h>
 
 using namespace scopy;
 using namespace scopy::component::iio;
@@ -78,12 +79,12 @@ void TstComponentTrigger::setAndClear()
 	QVERIFY(!triggerable.hasTrigger());
 
 	QSignalSpy ok(&triggerable, &IIOTriggerable::triggerSucceeded);
-	QVERIFY(triggerable.setTrigger(&source));
+	QVERIFY(QCoro::waitFor(triggerable.setTriggerAsync(&source)));
 	QCOMPARE(ok.count(), 1);
 	QVERIFY(triggerable.hasTrigger());
 	QCOMPARE(triggerable.assignedTriggerName(), QStringLiteral("trigger0"));
 
-	QVERIFY(triggerable.clearTrigger());
+	QVERIFY(QCoro::waitFor(triggerable.clearTriggerAsync()));
 	QCOMPARE(ok.count(), 2);
 	QVERIFY(!triggerable.hasTrigger());
 }

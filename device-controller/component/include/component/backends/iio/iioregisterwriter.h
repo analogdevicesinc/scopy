@@ -29,16 +29,13 @@ public:
 	IIORegisterWriter(scopy::iio::IDeviceOps *ops, scopy::iio::DeviceHandle handle, scopy::ICmdExecutor *executor,
 			  QObject *parent = nullptr);
 
-	Result<void> write(uint32_t addr, uint32_t value);
-	Q_INVOKABLE QUuid writeAsync(uint32_t addr, uint32_t value);
+	Q_INVOKABLE QCoro::Task<CommandResponse<void>> writeAsync(uint32_t addr, uint32_t value);
 
 Q_SIGNALS:
 	void writeSucceeded(uint32_t addr);
 	void writeFailed(const scopy::Error &error);
 
 private:
-	QCoro::Task<Result<void>> writeInternal(scopy::iio::RegWriteCommand *cmd, uint32_t addr);
-
 	scopy::iio::IDeviceOps *m_ops;
 	scopy::iio::DeviceHandle m_handle;
 	scopy::ICmdExecutor *m_executor;

@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QString>
 #include <QUuid>
+#include <qcorotask.h>
 
 namespace scopy::component {
 
@@ -20,8 +21,7 @@ public:
 	}
 	~AttributeWriter() override = default;
 
-	virtual Result<void> write(const QString &value) = 0;
-	Q_INVOKABLE virtual QUuid writeAsync(const QString &value) = 0; // returns the dispatched command's id
+    Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> writeAsync(const QString &value) = 0;
 
 Q_SIGNALS:
 	void writeSucceeded();

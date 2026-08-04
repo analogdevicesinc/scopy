@@ -55,17 +55,17 @@ Result<void> IIOOutputStream::setCyclic(bool cyclic)
 	return Result<void>();
 }
 
-void IIOOutputStream::applyEnabledChannels(const QList<int> &channels)
+QCoro::Task<void> IIOOutputStream::applyEnabledChannels(const QList<int> &channels)
 {
 	const QList<IIOScanElement *> elems = findChildren<IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
 	for(IIOScanElement *el : elems) {
-		el->enable(channels.contains(static_cast<int>(el->index())));
+		co_await el->enableAsync(channels.contains(static_cast<int>(el->index())));
 	}
 }
 
-QCoro::Task<Result<void>> IIOOutputStream::openInternal(StreamConfig cfg)
+QCoro::Task<CommandResponse<void>> IIOOutputStream::openAsync(const StreamConfig &cfg)
 {
-	applyEnabledChannels(cfg.enabledChannels);
+	co_await applyEnabledChannels(cfg.enabledChannels);
 
 	auto *cmd = new scopy::iio::BufferOpenCommand(m_bufOps, m_dev, m_bufferIndex, m_mask, cfg.samplesCount,
 						      m_cyclic, m_kernelBuffers);
@@ -82,12 +82,10 @@ QCoro::Task<Result<void>> IIOOutputStream::openInternal(StreamConfig cfg)
 	co_return result;
 }
 
-Result<void> IIOOutputStream::open(const StreamConfig &cfg) { return QCoro::waitFor(openInternal(cfg)); }
-
-QCoro::Task<void> IIOOutputStream::closeInternal()
+QCoro::Task<CommandResponse<void>> IIOOutputStream::closeAsync()
 {
 	if(!m_open || !m_buffer.ptr) {
-		co_return;
+		co_return CommandResponse<void>(QUuid());
 	}
 	// Invalidate state up-front: cancelBuffer unblocks any in-flight push, and
 	// clearing m_open/m_buffer before the co_await (which pumps the event loop)
@@ -98,15 +96,19 @@ QCoro::Task<void> IIOOutputStream::closeInternal()
 	m_bufOps->cancelBuffer(buffer);
 	auto *cmd = new scopy::iio::BufferCloseCommand(m_bufOps, buffer);
 	co_await m_executor->execute(cmd);
+	auto response = cmd->result();
 	cmd->deleteLater();
 	Q_EMIT openedChanged(false);
+	co_return response;
 }
 
-void IIOOutputStream::close() { QCoro::waitFor(closeInternal()); }
-
-QCoro::Task<Result<void>> IIOOutputStream::pushInternal(scopy::iio::BufferPushCommand *cmd)
+QCoro::Task<CommandResponse<void>> IIOOutputStream::pushAsync()
 {
-	co_return co_await runCommand(
+    if(!m_open || !m_buffer.ptr) {
+        co_return CommandResponse<void>(QUuid(), Unexpected{Error{-EIO, QStringLiteral("buffer not open")}});
+    }
+	auto *cmd = new scopy::iio::BufferPushCommand(m_bufOps, m_buffer);
+    co_return co_await runCommand(
 		m_executor, cmd,
 		[this](const Result<void> &) {
 			// close() may have run while this push was in flight.
@@ -116,19 +118,6 @@ QCoro::Task<Result<void>> IIOOutputStream::pushInternal(scopy::iio::BufferPushCo
 			Q_EMIT pushSucceeded();
 		},
 		[this](const Error &e) { Q_EMIT pushFailed(e); });
-}
-
-Result<void> IIOOutputStream::push()
-{
-	return QCoro::waitFor(pushInternal(new scopy::iio::BufferPushCommand(m_bufOps, m_buffer)));
-}
-
-QUuid IIOOutputStream::pushAsync()
-{
-	auto *cmd = new scopy::iio::BufferPushCommand(m_bufOps, m_buffer);
-	const QUuid id = cmd->id();
-	pushInternal(cmd);
-	return id;
 }
 
 void IIOOutputStream::buildStreamFormat()
