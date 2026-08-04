@@ -65,21 +65,27 @@ public:
 	{
 		m_read = cap;
 		cap->setParent(this);
-		connect(cap, &AttributeReader::readSucceeded, this, [this](Result<QByteArray> &r) {
-			if(r) {
-				setCachedValue(QString::fromUtf8(r.value()));
-			}
-		});
+        connect(
+            cap, &AttributeReader::readSucceeded, this,
+            [this](Result<QByteArray> &r) {
+                if(r) {
+                    setCachedValue(QString::fromUtf8(r.value()));
+                }
+            },
+            Qt::DirectConnection);
 	}
 	void addWriteCapability(AttributeWriter *cap)
 	{
 		m_write = cap;
 		cap->setParent(this);
-		connect(cap, &AttributeWriter::writeSucceeded, this, [this]() {
-			if(m_read) {
-				m_read->readAsync();
-			}
-		});
+        connect(
+            cap, &AttributeWriter::writeSucceeded, this,
+            [this]() {
+                if(m_read) {
+                    m_read->readAsync();
+                }
+            },
+            Qt::DirectConnection);
 	}
 
 Q_SIGNALS:
