@@ -78,7 +78,13 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr)
 		return Unexpected{Error{static_cast<int>(ret),
 					QStringLiteral("attr read failed: %1").arg(QString::fromUtf8(ai->name))}};
 	}
-	return QByteArray(buf, ret);
+	// libiio returns the byte count including the trailing NUL terminator; strip it so
+	// the value is not polluted with an embedded '\0' (breaks QString::toDouble(), comparisons, etc.)
+	QByteArray result(buf, ret);
+	while(result.endsWith('\0')) {
+		result.chop(1);
+	}
+	return result;
 }
 
 Result<void> V0AttrOps::write(AttrHandle attr, const QString &value)
@@ -146,7 +152,11 @@ Result<QByteArray> V0AttrOps::readAvailableAttr(const V0AttrInfo *ai) const
 		return Unexpected{Error{static_cast<int>(ret),
 					QStringLiteral("_available read failed: %1").arg(QString::fromUtf8(ai->name))}};
 	}
-	return QByteArray(buf, ret);
+	QByteArray result(buf, ret);
+	while(result.endsWith('\0')) {
+		result.chop(1);
+	}
+	return result;
 }
 
 Result<void> V0AttrOps::getRange(AttrHandle attr, double &min, double &step, double &max) const

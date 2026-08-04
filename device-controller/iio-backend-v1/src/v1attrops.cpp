@@ -48,7 +48,13 @@ Result<QByteArray> V1AttrOps::read(AttrHandle h)
     if(ret < 0) {
         return Unexpected{Error{static_cast<int>(ret), QStringLiteral("iio_attr_read_raw failed")}};
     }
-    return QByteArray(buf, static_cast<int>(ret));
+    // libiio reports the byte count including the trailing NUL terminator; strip it so the
+    // value is not polluted with an embedded '\0' (breaks QString::toDouble(), comparisons, etc.)
+    QByteArray result(buf, static_cast<int>(ret));
+    while(result.endsWith('\0')) {
+        result.chop(1);
+    }
+    return result;
 }
 
 Result<void> V1AttrOps::write(AttrHandle h, const QString &value)
