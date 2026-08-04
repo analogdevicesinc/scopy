@@ -3,15 +3,13 @@
 #include "component/inputstream.h"
 #include "iioutil/handles.h"
 
-#include <qcoro/qcorotask.h>
-
 namespace scopy {
 class ICmdExecutor;
 namespace iio {
 class IBufferOps;
 class IChannelOps;
 class BufferRefillCommand;
-}
+} // namespace iio
 } // namespace scopy
 
 namespace scopy::component::iio {
@@ -29,17 +27,13 @@ public:
 	unsigned kernelBuffers() const { return m_kernelBuffers; }
 	Result<void> setKernelBuffers(unsigned n);
 
-	Result<void> open(const StreamConfig &cfg) override;
-	void close() override;
-	Result<void> refill() override;
-	QUuid refillAsync() override;
+	QCoro::Task<CommandResponse<void>> openAsync(const StreamConfig &cfg) override;
+	QCoro::Task<CommandResponse<void>> closeAsync() override;
+	QCoro::Task<CommandResponse<void>> refillAsync() override;
 	const StreamFormat &readFormat() const override { return m_format; }
 
 private:
-	QCoro::Task<Result<void>> openInternal(StreamConfig cfg);
-	QCoro::Task<Result<void>> refillInternal(scopy::iio::BufferRefillCommand *cmd);
-	QCoro::Task<void> closeInternal();
-	void applyEnabledChannels(const QList<int> &channels);
+	QCoro::Task<void> applyEnabledChannels(const QList<int> &channels);
 	void buildStreamFormat();
 
 	scopy::iio::IBufferOps *m_bufOps;

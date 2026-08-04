@@ -9,6 +9,7 @@
 
 #include <QSignalSpy>
 #include <QTest>
+#include <qcoro/qcorofuture.h>
 
 using namespace scopy;
 using namespace scopy::component;
@@ -21,7 +22,7 @@ private Q_SLOTS:
 	void writeThenReadBackSettles();
 	void readOnlyHasNoWriter();
 	void tagsRoundTrip();
-	void readAsyncReturnsValidId();
+	void readAsyncCarriesCommandId();
 };
 
 void TstComponentAttribute::readPopulatesCachedValue()
@@ -85,14 +86,15 @@ void TstComponentAttribute::tagsRoundTrip()
 	QCOMPARE(findByTag<Attribute>(&root, tags::SampleRate).size(), 1);
 }
 
-void TstComponentAttribute::readAsyncReturnsValidId()
+void TstComponentAttribute::readAsyncCarriesCommandId()
 {
 	dctest::FakeAttrOps ops;
 	auto handle = ops.make("frequency", "1");
 	PooledCmdExecutor exec(1);
 
 	component::iio::IIOAttributeReader reader(&ops, handle, &exec);
-	QVERIFY(!reader.readAsync().isNull());
+	const auto resp = QCoro::waitFor(reader.readAsync());
+	QVERIFY(!resp.commandId().isNull());
 }
 
 QTEST_MAIN(TstComponentAttribute)

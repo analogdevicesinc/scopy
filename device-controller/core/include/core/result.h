@@ -4,6 +4,7 @@
 #include <QString>
 
 #include <cstring>
+#include <quuid.h>
 #include <utility>
 #include <variant>
 
@@ -108,6 +109,80 @@ public:
 private:
 	E m_error{};
 	bool m_hasValue = true;
+};
+
+// Result variant that also carries the id of the command it answers.
+template <typename T, typename E = Error>
+class CommandResponse : public Result<T, E>
+{
+public:
+	CommandResponse(QUuid commandId, const T &value)
+		: Result<T, E>(value)
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, T &&value)
+		: Result<T, E>(std::move(value))
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, const Unexpected<E> &e)
+		: Result<T, E>(e)
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, Unexpected<E> &&e)
+		: Result<T, E>(std::move(e))
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, const Result<T, E> &r)
+		: Result<T, E>(r)
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, Result<T, E> &&r)
+		: Result<T, E>(std::move(r))
+		, m_commandId(commandId)
+	{
+	}
+
+	[[nodiscard]] QUuid commandId() const { return m_commandId; }
+
+private:
+	QUuid m_commandId;
+};
+
+// void payload specialization.
+template <typename E>
+class CommandResponse<void, E> : public Result<void, E>
+{
+public:
+	explicit CommandResponse(QUuid commandId)
+		: Result<void, E>()
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, const Unexpected<E> &e)
+		: Result<void, E>(e)
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, Unexpected<E> &&e)
+		: Result<void, E>(std::move(e))
+		, m_commandId(commandId)
+	{
+	}
+	CommandResponse(QUuid commandId, const Result<void, E> &r)
+		: Result<void, E>(r)
+		, m_commandId(commandId)
+	{
+	}
+
+	[[nodiscard]] QUuid commandId() const { return m_commandId; }
+
+private:
+	QUuid m_commandId;
 };
 
 } // namespace scopy

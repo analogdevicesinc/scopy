@@ -29,12 +29,9 @@ public:
 	{
 	}
 
-	bool checkReachable() override;
-	void checkReachableAsync() override;
+	QCoro::Task<CommandResponse<void>> checkReachableAsync() override;
 
 private:
-	QCoro::Task<bool> checkInternal();
-
 	scopy::iio::IContextOps *m_ops;
 	scopy::iio::ContextHandle m_handle;
 	scopy::ICmdExecutor *m_executor;
