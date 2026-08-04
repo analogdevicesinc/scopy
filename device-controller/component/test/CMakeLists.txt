@@ -2,7 +2,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 
 macro(add_component_test name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} PRIVATE component core iio-utils Qt6::Test)
+    target_link_libraries(${name} PRIVATE component controller-core controller-iioutils Qt6::Test)
     add_test(NAME ${name} COMMAND ${name})
 endmacro()
 

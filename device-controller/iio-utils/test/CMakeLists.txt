@@ -5,7 +5,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 # Set DC_TEST_URI to a reachable context to exercise the live paths.
 macro(add_backend_test name)
     add_executable(${name} ${name}.cpp backendfixture.h)
-    target_link_libraries(${name} PRIVATE iio-utils Qt6::Test)
+    target_link_libraries(${name} PRIVATE controller-iioutils Qt6::Test)
     # The backends are dlopen'd at runtime; ensure the plugins are built first and
     # that the plugin dir is on the executable's rpath so dlopen resolves them.
     set_target_properties(${name} PROPERTIES
