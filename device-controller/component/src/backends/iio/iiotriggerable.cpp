@@ -28,7 +28,7 @@ QString IIOTriggerable::assignedTriggerName() const
 	return t.ptr ? m_ops->name(t) : QString();
 }
 
-QCoro::Task<Result<void>> IIOTriggerable::setInternal(scopy::iio::SetTriggerCommand *cmd)
+QCoro::Task<CommandResponse<void>> IIOTriggerable::setInternal(scopy::iio::SetTriggerCommand *cmd)
 {
 	return runCommand(
 		m_executor, cmd, [this](Result<void> &) { Q_EMIT triggerSucceeded(); },
@@ -42,28 +42,12 @@ static scopy::iio::DeviceHandle handleOf(IIOTrigger *source)
 	return source ? source->handle() : scopy::iio::DeviceHandle{};
 }
 
-Result<void> IIOTriggerable::setTrigger(IIOTrigger *source)
+QCoro::Task<CommandResponse<void>> IIOTriggerable::setTriggerAsync(IIOTrigger *source)
 {
-	return QCoro::waitFor(setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, handleOf(source))));
+	return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, handleOf(source), this));
 }
 
-QUuid IIOTriggerable::setTriggerAsync(IIOTrigger *source)
+QCoro::Task<CommandResponse<void>> IIOTriggerable::clearTriggerAsync()
 {
-	auto *cmd = new scopy::iio::SetTriggerCommand(m_ops, m_dev, handleOf(source), this);
-	const QUuid id = cmd->id();
-	setInternal(cmd);
-	return id;
-}
-
-Result<void> IIOTriggerable::clearTrigger()
-{
-	return QCoro::waitFor(setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, {})));
-}
-
-QUuid IIOTriggerable::clearTriggerAsync()
-{
-	auto *cmd = new scopy::iio::SetTriggerCommand(m_ops, m_dev, {}, this);
-	const QUuid id = cmd->id();
-	setInternal(cmd);
-	return id;
+	return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, {}, this));
 }

@@ -18,22 +18,10 @@ IIOAttributeReader::IIOAttributeReader(scopy::iio::IAttrOps *ops, scopy::iio::At
 {
 }
 
-QCoro::Task<Result<QByteArray>> IIOAttributeReader::readInternal(scopy::iio::AttrReadCommand *cmd)
+QCoro::Task<CommandResponse<QByteArray>> IIOAttributeReader::readAsync()
 {
-	return runCommand(
-		m_executor, cmd, [this](Result<QByteArray> &r) { Q_EMIT readSucceeded(r); },
-		[this](const scopy::Error &error) { Q_EMIT readFailed(error); });
-}
-
-QUuid IIOAttributeReader::readAsync()
-{
-	auto *cmd = new scopy::iio::AttrReadCommand(m_ops, m_handle, this);
-	const QUuid id = cmd->id();
-	readInternal(cmd);
-	return id;
-}
-
-Result<QByteArray> IIOAttributeReader::read()
-{
-	return QCoro::waitFor(readInternal(new scopy::iio::AttrReadCommand(m_ops, m_handle)));
+    auto *cmd = new scopy::iio::AttrReadCommand(m_ops, m_handle, this);
+    return runCommand(
+        m_executor, cmd, [this](Result<QByteArray> &r) { Q_EMIT readSucceeded(r); },
+        [this](const scopy::Error &error) { Q_EMIT readFailed(error); });
 }
