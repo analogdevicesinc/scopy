@@ -20,7 +20,9 @@ target_include_directories(component
 )
 
 target_link_libraries(component
-    PUBLIC core iio-utils Qt6::Core QCoro6::Core QCoro6::Coro
+    PUBLIC controller-core controller-iioutils Qt6::Core QCoro6::Core QCoro6::Coro
 )
 
-add_subdirectory(test)
+if(DC_STANDALONE)
+    add_subdirectory(test)
+endif()

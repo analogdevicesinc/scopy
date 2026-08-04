@@ -25,5 +25,5 @@ target_include_directories(iio-backend-v1
 )
 
 target_link_libraries(iio-backend-v1
-    PRIVATE Qt6::Core Qt6::Concurrent ${IIO_V1_LIB} iio-utils
+    PRIVATE Qt6::Core Qt6::Concurrent ${IIO_V1_LIB} controller-iioutils
 )
