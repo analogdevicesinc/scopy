@@ -6,18 +6,20 @@ file(GLOB IIOUTIL_HEADERS
 )
 file(GLOB IIOUTIL_SOURCES src/*.cpp)
 
-add_library(iio-utils SHARED
+add_library(controller-iioutils SHARED
     ${IIOUTIL_HEADERS}
     ${IIOUTIL_SOURCES}
 )
 
-target_include_directories(iio-utils
+target_include_directories(controller-iioutils
     PUBLIC include
 )
 
-target_link_libraries(iio-utils
-    PUBLIC core Qt6::Core
+target_link_libraries(controller-iioutils
+    PUBLIC controller-core Qt6::Core
     PRIVATE ${CMAKE_DL_LIBS}
 )
 
-add_subdirectory(test)
+if(DC_STANDALONE)
+    add_subdirectory(test)
+endif()
