@@ -31,42 +31,73 @@ class TstComponentController : public QObject
 {
 	Q_OBJECT
 private Q_SLOTS:
-	void adoptAndFindAll();
+	void adoptEmitsAndBuildsTree();
+	void refCountKeepsContextAlive();
 	void disconnectCascades();
 	void unknownBackendReturnsNull();
 };
 
-void TstComponentController::adoptAndFindAll()
+void TstComponentController::adoptEmitsAndBuildsTree()
 {
-	Controller c;
-	QSignalSpy added(&c, &Controller::componentAdded);
-	c.adopt(makeFakeTree());
+	Controller *c = Controller::GetInstance();
+	QSignalSpy added(c, &Controller::componentAdded);
 
+	Context *tree = makeFakeTree();
+	ContextHandle h = c->adopt("fake://adopt", tree);
+
+	QVERIFY(h);
 	QCOMPARE(added.count(), 1);
-	QCOMPARE(c.contexts().size(), 1);
-	QCOMPARE(c.findAll<Attribute>().size(), 2);
-	QCOMPARE(c.findAll<Channel>().size(), 1);
+	QCOMPARE(tree->findChildren<Attribute *>().size(), 2);
+	QCOMPARE(tree->findChildren<Channel *>().size(), 1);
+
+	// Re-adopting the same uri is refused (returns an empty handle).
+	QVERIFY(!c->adopt("fake://adopt", makeFakeTree()));
+}
+
+void TstComponentController::refCountKeepsContextAlive()
+{
+	Controller *c = Controller::GetInstance();
+	ContextHandle h1 = c->adopt("fake://ref", makeFakeTree());
+	QVERIFY(h1);
+
+	// A second handle to the same uri shares the context and bumps the count.
+	ContextHandle h2 = Controller::context("fake://ref");
+	QVERIFY(h2);
+	QCOMPARE(h2.get(), h1.get());
+
+	QSignalSpy removed(c, &Controller::componentRemoved);
+
+	// Dropping one handle keeps the context alive (refCount 2 -> 1).
+	h2.reset();
+	QCOMPARE(removed.count(), 0);
+
+	// Dropping the last handle tears it down (refCount 1 -> 0).
+	h1.reset();
+	QCOMPARE(removed.count(), 1);
+
+	// No handles left: acquiring the uri now yields nothing.
+	QVERIFY(!Controller::context("fake://ref"));
 }
 
 void TstComponentController::disconnectCascades()
 {
-	Controller c;
+	Controller *c = Controller::GetInstance();
 	Context *ctx = makeFakeTree();
 	QPointer<Attribute> attr = ctx->findChildren<Attribute *>().first();
-	c.adopt(ctx);
+	ContextHandle h = c->adopt("fake://cascade", ctx);
+	QVERIFY(h);
 
-	QSignalSpy removed(&c, &Controller::componentRemoved);
-	c.disconnect(ctx);
+	QSignalSpy removed(c, &Controller::componentRemoved);
+	h.reset(); // RAII disconnect of the last handle
 
 	QCOMPARE(removed.count(), 1);
-	QCOMPARE(c.contexts().size(), 0);
 	QTRY_VERIFY(attr.isNull()); // deleteLater cascades to the subtree
 }
 
 void TstComponentController::unknownBackendReturnsNull()
 {
-	Controller c;
-	QCOMPARE(c.connect("uri", BackendKind::M2k), nullptr);
+	// M2k has no registered factory -> connectCtx yields an empty handle.
+	QVERIFY(!Controller::connectCtx("fake://m2k", BackendKind::M2k));
 }
 
 QTEST_MAIN(TstComponentController)
