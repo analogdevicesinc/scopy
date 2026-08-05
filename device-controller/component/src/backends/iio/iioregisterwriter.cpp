@@ -20,7 +20,7 @@ IIORegisterWriter::IIORegisterWriter(scopy::iio::IDeviceOps *ops, scopy::iio::De
 
 QCoro::Task<CommandResponse<void>> IIORegisterWriter::writeAsync(uint32_t addr, uint32_t value)
 {
-	auto *cmd = new scopy::iio::RegWriteCommand(m_ops, m_handle, addr, value, this);
+    auto *cmd = new scopy::iio::RegWriteCommand(m_ops, m_handle, addr, value);
 	return runCommand(
 		m_executor, cmd, [this, addr](Result<void> &) { Q_EMIT writeSucceeded(addr); },
 		[this](const scopy::Error &error) { Q_EMIT writeFailed(error); });
