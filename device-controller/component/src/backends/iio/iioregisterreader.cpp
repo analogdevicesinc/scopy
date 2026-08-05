@@ -20,7 +20,7 @@ IIORegisterReader::IIORegisterReader(scopy::iio::IDeviceOps *ops, scopy::iio::De
 
 QCoro::Task<CommandResponse<uint32_t>> IIORegisterReader::readAsync(uint32_t addr)
 {
-	auto *cmd = new scopy::iio::RegReadCommand(m_ops, m_handle, addr, this);
+    auto *cmd = new scopy::iio::RegReadCommand(m_ops, m_handle, addr);
 	return runCommand(
 		m_executor, cmd, [this, addr](Result<uint32_t> &r) { Q_EMIT readSucceeded(addr, r.value()); },
 		[this](const scopy::Error &error) { Q_EMIT readFailed(error); });

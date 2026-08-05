@@ -29,7 +29,7 @@ Context *IIOContextFactory::create(const QString &uri)
 	ctx->setUri(uri);
 	ctx->setHandle(handle);
 
-	auto *executor = new PooledCmdExecutor(1, ctx);
+    auto *executor = new PooledCmdExecutor(1, ctx);
 	ctx->setExecutor(executor);
 
 	IIOComponentBuilder builder(backend);

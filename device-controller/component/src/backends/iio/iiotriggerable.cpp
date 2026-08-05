@@ -44,10 +44,10 @@ static scopy::iio::DeviceHandle handleOf(IIOTrigger *source)
 
 QCoro::Task<CommandResponse<void>> IIOTriggerable::setTriggerAsync(IIOTrigger *source)
 {
-	return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, handleOf(source), this));
+    return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, handleOf(source)));
 }
 
 QCoro::Task<CommandResponse<void>> IIOTriggerable::clearTriggerAsync()
 {
-	return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, {}, this));
+    return setInternal(new scopy::iio::SetTriggerCommand(m_ops, m_dev, {}));
 }
