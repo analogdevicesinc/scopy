@@ -20,7 +20,7 @@ IIOAttributeWriter::IIOAttributeWriter(scopy::iio::IAttrOps *ops, scopy::iio::At
 
 QCoro::Task<CommandResponse<void>> IIOAttributeWriter::writeAsync(const QString &value)
 {
-    auto *cmd = new scopy::iio::AttrWriteCommand(m_ops, m_handle, value, this);
+    auto *cmd = new scopy::iio::AttrWriteCommand(m_ops, m_handle, value);
     return runCommand(
         m_executor, cmd, [this](const Result<void> &) { Q_EMIT writeSucceeded(); },
         [this](const scopy::Error &error) { Q_EMIT writeFailed(error); });
