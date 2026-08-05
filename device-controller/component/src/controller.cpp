@@ -5,7 +5,21 @@
 
 #include "iioutil/handles.h"
 
+#include <component/ping.h>
+
 using namespace scopy::component;
+
+Controller *Controller::pinstance_{nullptr};
+std::mutex Controller::mutex_;
+
+Controller *Controller::GetInstance()
+{
+	std::lock_guard<std::mutex> lock(mutex_);
+	if(pinstance_ == nullptr) {
+		pinstance_ = new Controller();
+	}
+	return pinstance_;
+}
 
 Controller::Controller(QObject *parent)
 	: QObject(parent)
@@ -23,35 +37,53 @@ void Controller::registerFactory(BackendKind kind, std::shared_ptr<ContextFactor
     m_factories.insert(kind, std::move(factory));
 }
 
-Context *Controller::connect(const QString &uri, BackendKind backend)
+Context *Controller::_connectCtx(const QString &uri, BackendKind backend)
 {
 	auto it = m_factories.constFind(backend);
 	if(it == m_factories.constEnd() || !it.value()) {
 		return nullptr;
 	}
 
+	std::lock_guard<std::mutex> lock(m_ctxMutex);
+	if(auto e = m_contexts.find(uri); e != m_contexts.end()) {
+		e->refCount++;
+		return e->ctx;
+	}
 	Context *ctx = it.value()->create(uri);
 	if(ctx) {
-		adopt(ctx);
+		ctx->setParent(this);
+		m_contexts.insert(uri, CtxEntry{ctx, 1});
+		Ping *ping = ctx->findChild<Ping *>();
+		connect(ping, &Ping::connectionLost, this, [this, ctx]() { Q_EMIT connectionLost(ctx); });
+		ping->startMonitoring(2000);
+		Q_EMIT componentAdded(ctx);
 	}
 	return ctx;
 }
 
-void Controller::adopt(Context *ctx)
+void Controller::adopt(const QString &uri, Context *ctx)
 {
-	if(!ctx || m_contexts.contains(ctx)) {
+	std::lock_guard<std::mutex> lock(m_ctxMutex);
+    if(!ctx || m_contexts.contains(uri)) {
 		return;
 	}
 	ctx->setParent(this);
-	m_contexts.append(ctx);
+    m_contexts.insert(uri, CtxEntry{ctx, 1});
 	Q_EMIT componentAdded(ctx);
 }
 
-void Controller::disconnect(Context *ctx)
+void Controller::_disconnectCtx(const QString &uri)
 {
-	if(!ctx || !m_contexts.removeOne(ctx)) {
+	std::lock_guard<std::mutex> lock(m_ctxMutex);
+	auto e = m_contexts.find(uri);
+	if(e == m_contexts.end()) {
 		return;
 	}
+	if(--e->refCount > 0) {
+		return;
+	}
+	Context *ctx = e->ctx;
+	m_contexts.erase(e);
 	Q_EMIT componentRemoved(ctx);
 	ctx->deleteLater();
 }
