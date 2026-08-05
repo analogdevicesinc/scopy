@@ -9,6 +9,14 @@
 
 using namespace scopy::component;
 
+void ContextHandle::reset()
+{
+	if(m_ctx) {
+        Controller::GetInstance()->_disconnectCtx(m_uri);
+		m_ctx = nullptr;
+	}
+}
+
 Controller *Controller::pinstance_{nullptr};
 std::mutex Controller::mutex_;
 
@@ -61,21 +69,33 @@ Context *Controller::_connectCtx(const QString &uri, BackendKind backend)
 	return ctx;
 }
 
-void Controller::adopt(const QString &uri, Context *ctx)
+ContextHandle Controller::adopt(const QString &uri, Context *ctx)
 {
 	std::lock_guard<std::mutex> lock(m_ctxMutex);
     if(!ctx || m_contexts.contains(uri)) {
-		return;
+		return ContextHandle();
 	}
 	ctx->setParent(this);
     m_contexts.insert(uri, CtxEntry{ctx, 1});
 	Q_EMIT componentAdded(ctx);
+	return ContextHandle(uri, ctx);
+}
+
+ContextHandle Controller::_acquireExisting(const QString &uri)
+{
+	std::lock_guard<std::mutex> lock(m_ctxMutex);
+	auto e = m_contexts.find(uri);
+	if(e == m_contexts.end()) {
+		return ContextHandle();
+	}
+	e->refCount++;
+	return ContextHandle(uri, e->ctx);
 }
 
 void Controller::_disconnectCtx(const QString &uri)
 {
 	std::lock_guard<std::mutex> lock(m_ctxMutex);
-	auto e = m_contexts.find(uri);
+    auto e = m_contexts.find(uri);
 	if(e == m_contexts.end()) {
 		return;
 	}
