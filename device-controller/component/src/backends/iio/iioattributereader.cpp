@@ -20,7 +20,7 @@ IIOAttributeReader::IIOAttributeReader(scopy::iio::IAttrOps *ops, scopy::iio::At
 
 QCoro::Task<CommandResponse<QByteArray>> IIOAttributeReader::readAsync()
 {
-    auto *cmd = new scopy::iio::AttrReadCommand(m_ops, m_handle, this);
+    auto *cmd = new scopy::iio::AttrReadCommand(m_ops, m_handle);
     return runCommand(
         m_executor, cmd, [this](Result<QByteArray> &r) { Q_EMIT readSucceeded(r); },
         [this](const scopy::Error &error) { Q_EMIT readFailed(error); });
