@@ -42,6 +42,8 @@
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
 #include "sim/siminstrumentcontroller.h"
+#include "acq/acqinstrument.h"
+#include "acq/acqinstrumentcontroller.h"
 #include "scopy-adc_config.h"
 
 // TEMPORARY: for M2kLogicSource wiring
@@ -330,6 +332,7 @@ bool ADCPlugin::onConnect()
 	newInstrument(TIME, root, top);
 	newInstrument(FREQUENCY, root, top);
 	newInstrument(SIM, nullptr, nullptr);
+	newInstrument(ACQ, nullptr, nullptr);
 	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
 	return true;
 }
@@ -446,6 +449,22 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		Q_EMIT toolListChanged();
 		tme->setTool(ctrl->ui());
 		return;
+	} else if(t == ACQ) {
+		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("acq", "ADC - Acquisition",
+							  ":/gui/icons/" +
+								  Style::getAttribute(json::theme::icon_theme_folder) +
+								  "/icons/tool_oscilloscope.svg"));
+		auto tme = m_toolList.last();
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(true);
+
+		auto *ctrl = new AcqInstrumentController(tme, this);
+		ctrl->init(m_ctx);
+		m_acqCtrls.append(ctrl);
+
+		Q_EMIT toolListChanged();
+		tme->setTool(ctrl->ui());
+		return;
 	} else {
 		return;
 	}
@@ -497,6 +516,18 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 			if(simFound) {
 				simFound->stop();
 				m_simCtrls.removeAll(simFound);
+			} else {
+				AcqInstrumentController *acqFound = nullptr;
+				for(AcqInstrumentController *ctrl : std::as_const(m_acqCtrls)) {
+					if(ctrl->ui() == tool->tool()) {
+						acqFound = ctrl;
+						break;
+					}
+				}
+				if(acqFound) {
+					acqFound->stop();
+					m_acqCtrls.removeAll(acqFound);
+				}
 			}
 		}
 		tool->setTool(nullptr);

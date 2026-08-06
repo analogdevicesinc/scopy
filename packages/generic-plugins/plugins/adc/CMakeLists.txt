@@ -56,6 +56,9 @@ file(
 	src/sim/*.c
 	src/sim/*.cpp
 	src/sim/*.h
+	src/acq/*.c
+	src/acq/*.cpp
+	src/acq/*.h
 )
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
@@ -84,7 +87,9 @@ configure_file(
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src src/sim)
+target_include_directories(
+	${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src src/sim src/acq
+)
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
 
