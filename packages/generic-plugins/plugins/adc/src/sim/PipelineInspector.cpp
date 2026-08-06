@@ -9,14 +9,9 @@
 #include <core/acq_engine/ProcessorBlock.h>
 #include <core/acq_engine/SourceBlock.h>
 
-#include <gui/mapstackedwidget.h>
 #include <gui/style.h>
 
-#include <QFrame>
 #include <QHeaderView>
-#include <QLabel>
-#include <QScrollArea>
-#include <QSplitter>
 #include <QVBoxLayout>
 
 namespace scopy {
@@ -53,20 +48,10 @@ void PipelineInspector::buildUi()
 	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setSpacing(0);
 
-	// Side by side: the panel is wide and short (it spans the bottom rail), so a
-	// vertical split would leave both halves too short to read.
-	auto *splitter = new QSplitter(Qt::Horizontal, this);
-	// global.qss paints every QSplitter background_subtle, which is near-black and reads
-	// as a gap cut through the debug panel; transparent lets the panel's own fill show in
-	// the gutter. Spelled as a type selector rather than via setBackgroundColor(), whose
-	// `.QWidget` selector matches exact QWidget instances only and so misses a QSplitter.
-	splitter->setStyleSheet(QStringLiteral("QSplitter { background-color: transparent; }"));
-
-	// ---- tree ----
-	m_tree = new QTreeWidget(splitter);
-	// The panes are the sections of this tab, so each carries its own fill and border:
-	// the global QWidget rule is transparent, so without this a tree is a black hole in
-	// the panel with nothing marking where it ends.
+	m_tree = new QTreeWidget(this);
+	// The tree is a section of this tab, so it carries its own fill and border: the
+	// global QWidget rule is transparent, so without this it is a black hole in the
+	// panel with nothing marking where it ends.
 	Style::setStyle(m_tree, style::properties::widget::basicComponent);
 	m_tree->setColumnCount(ColCount);
 	m_tree->setHeaderLabels({"Block", "Status", "In", "Out"});
@@ -91,39 +76,8 @@ void PipelineInspector::buildUi()
 	}
 
 	connect(m_tree, &QTreeWidget::itemChanged, this, &PipelineInspector::onItemChanged);
-	connect(m_tree, &QTreeWidget::itemSelectionChanged, this, [this]() {
-		const QList<QTreeWidgetItem *> sel = m_tree->selectedItems();
-		showMenuFor(sel.isEmpty() ? nullptr : blockOf(sel.first()));
-	});
 
-	// ---- menu host ----
-	m_host = new MapStackedWidget(nullptr);
-
-	auto *placeholder = new QLabel("Select a block to see its settings.");
-	placeholder->setAlignment(Qt::AlignCenter);
-	placeholder->setWordWrap(true);
-	Style::setStyle(placeholder, style::properties::label::subtle);
-	m_placeholder = placeholder;
-	m_host->add(QStringLiteral("__none__"), m_placeholder);
-	m_host->show(QStringLiteral("__none__"));
-
-	auto *hostScroll = new QScrollArea(splitter);
-	hostScroll->setWidget(m_host);
-	hostScroll->setWidgetResizable(true);
-	hostScroll->setFrameShape(QFrame::NoFrame);
-	// Same surface as the tree beside it. The fill goes on the scroll area rather than on
-	// m_host: m_host is only as tall as the current page, so filling it would leave the
-	// rest of the pane unpainted.
-	Style::setStyle(hostScroll, style::properties::widget::basicComponent);
-
-	splitter->addWidget(m_tree);
-	splitter->addWidget(hostScroll);
-	splitter->setStretchFactor(0, 3);
-	splitter->setStretchFactor(1, 2);
-	const int unit = Style::getDimension(json::global::unit_5);
-	splitter->setSizes({unit * 5, unit * 3});
-
-	lay->addWidget(splitter);
+	lay->addWidget(m_tree);
 }
 
 void PipelineInspector::connectEngine()
@@ -166,13 +120,7 @@ void PipelineInspector::setDecoderManager(DecoderManager *mgr)
 	if(!mgr)
 		return;
 
-	// blocksChanged already covers the tree; this drops the host entry so a
-	// later block reusing the name can't inherit the removed one's widget.
-	connect(mgr, &DecoderManager::decoderRemoved, this, [this](const QString &name) {
-		if(m_host)
-			m_host->remove(name);
-		rebuild();
-	});
+	connect(mgr, &DecoderManager::decoderRemoved, this, [this](const QString &) { rebuild(); });
 	connect(mgr, &DecoderManager::decoderAdded, this, [this](const QString &) { rebuild(); });
 }
 
@@ -250,19 +198,15 @@ void PipelineInspector::rebuild()
 
 	m_applying = false;
 
-	// Reselect by pointer; falls through to the placeholder if it's gone.
-	bool restored = false;
+	// Reselect by pointer; leaves nothing selected if the block is gone.
 	if(selected) {
 		for(const Row &row : m_rows) {
 			if(row.block == selected) {
 				m_tree->setCurrentItem(row.item);
-				restored = true;
 				break;
 			}
 		}
 	}
-	if(!restored && selected)
-		showMenuFor(nullptr);
 
 	refreshStatus();
 }
@@ -298,7 +242,7 @@ QTreeWidgetItem *PipelineInspector::syncBlockRow(QTreeWidgetItem *parent, int in
 		}
 	}
 
-	// Enable state can also be flipped from the block's own settings widget.
+	// Enable state can also be flipped from outside this panel.
 	connect(block, &scopy::acq::Block::enabledChanged,
 		this, &PipelineInspector::refreshStatus, Qt::UniqueConnection);
 
@@ -410,33 +354,6 @@ void PipelineInspector::onErrorReported(int severity, const QString &id, const Q
 
 	m_diags.insert(id, Diag{sev, message});
 	refreshStatus();
-}
-
-void PipelineInspector::showMenuFor(scopy::acq::Block *block)
-{
-	if(!m_host)
-		return;
-
-	if(!block) {
-		m_host->show(QStringLiteral("__none__"));
-		return;
-	}
-
-	const QString key = block->name();
-
-	if(!m_host->contains(key)) {
-		// The block owns the instance, so a widget a host built itself and
-		// handed over via setSettingsWidget() comes back from here too — this
-		// is the only place a settings widget gets parented.
-		QWidget *w = block->settingsWidget(m_host);
-		if(!w) {
-			m_host->show(QStringLiteral("__none__"));
-			return;
-		}
-		m_host->add(key, w);
-	}
-
-	m_host->show(key);
 }
 
 } // namespace adc
