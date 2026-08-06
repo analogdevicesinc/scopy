@@ -87,15 +87,21 @@ public:
 	void attach(AcqPlotRow *row);
 	void detach();
 
+	// The row this channel is attached to, or null once detached. The manager needs it
+	// to decide whether removing this channel also removes a row — an exclusive row
+	// exists only for the repr that brought its own plot.
+	AcqPlotRow *row() const { return m_row; }
+
 	// One cycle. A no-op while disabled: a disabled channel must not pay for a
 	// window copy, and its visual is already detached.
 	void pull(int plotSize);
 	void reset();
 
-	// (Re)register the depth claim. Idempotent — claimDepth() replaces rather than
-	// accumulates, so no release is needed first. Correct even when the key does not
-	// exist yet: DataStore::write() applies pending claims before the first push, so
-	// claiming early is what makes the *first* window full-depth instead of one chunk.
+	// (Re)register the depth claim on this channel's key. Idempotent — claimDepth()
+	// replaces rather than accumulates, so no release is needed first. Correct even when
+	// the key does not exist yet: DataStore::write() applies pending claims before the
+	// first push, so claiming early is what makes the *first* window full-depth instead
+	// of one chunk.
 	void reclaimDepth(int plotSize, std::size_t bufferSize);
 
 	// A generic CHANNEL section (name, colour, key readout) stacked over the repr's
