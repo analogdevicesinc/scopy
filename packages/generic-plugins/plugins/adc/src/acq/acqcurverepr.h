@@ -29,6 +29,8 @@
 #include <QPointer>
 #include <QVector>
 
+#include <memory>
+
 namespace scopy {
 class PlotChannel;
 
@@ -38,6 +40,8 @@ class PlotAutoscaler;
 } // namespace gui
 
 namespace adc {
+
+class TimeMeasureManager;
 
 // An ordinary Qwt curve on the row's shared X/Y axes.
 //
@@ -79,9 +83,16 @@ public:
 	void reset() override;
 	std::size_t claimDepth(int plotSize, std::size_t bufferSize) const override;
 	QWidget *createSettingsWidget(QWidget *parent) override;
+	MeasureManagerInterface *measureManager() const override;
 	void setEnabled(bool en) override;
 	void setColor(const QColor &c) override;
 	void setName(const QString &n) override;
+
+	// Timeline the measurements are expressed on. Period, frequency and the rise/fall
+	// times are all sample counts divided by this, so a wrong value scales every
+	// horizontal measurement — it does not merely mislabel an axis. Unset means 1.0,
+	// i.e. measurements come out in samples.
+	void setSampleRate(double sr);
 
 	// ---- CurveRepr-specific ------------------------------------------------
 
@@ -124,6 +135,12 @@ private:
 	QPointer<scopy::gui::PlotAutoscaler> m_autoscaler;
 	QPointer<scopy::gui::MenuPlotAxisRangeControl> m_yCtrl;
 	bool m_autoscaleEnabled{false};
+
+	// Created in attach(), because the panels bind to its signals once and the pen
+	// colour it stamps on every label is only known from there. Parented to nothing —
+	// held by unique_ptr, since a repr is not a QObject and has no children.
+	std::unique_ptr<TimeMeasureManager> m_measureMgr;
+	double m_sampleRate{1.0};
 };
 
 } // namespace adc
