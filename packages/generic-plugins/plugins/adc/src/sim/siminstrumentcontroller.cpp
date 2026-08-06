@@ -83,6 +83,9 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 			/*sampleRate=*/2.4e6,
 			GnWindowHann,
 			m_engine);
+		// Lets the block claim chunk history when averaging is turned on: navg
+		// frames of nfft samples span more than one acquisition buffer.
+		m_fftProc->setAveragingStore(m_store, m_engine->bufferSize());
 		m_engine->addProcessor(m_fftProc);
 	}
 
