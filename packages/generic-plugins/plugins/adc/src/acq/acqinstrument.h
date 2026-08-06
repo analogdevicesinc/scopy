@@ -95,6 +95,12 @@ Q_SIGNALS:
 	void stopped();
 	void cycleComplete();
 
+	// The reader changed the engine's buffer size. The engine has no signal for
+	// this and the control lives here, so consumers whose requirements depend on
+	// it — anything claiming DataStore depth, since that is
+	// ceil(window / bufferSize) — have no other way to know.
+	void bufferSizeChanged(int samples);
+
 private Q_SLOTS:
 	void onStarted();
 	void onStopped();

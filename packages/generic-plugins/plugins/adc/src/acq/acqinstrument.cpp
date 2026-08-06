@@ -124,8 +124,10 @@ void AcqInstrument::setupTopRail()
 		m_engine->setMode(i == 0 ? scopy::acq::AcquisitionEngine::Mode::Continuous
 					 : scopy::acq::AcquisitionEngine::Mode::Triggered);
 	});
-	connect(m_bufferSpin, &gui::MenuSpinbox::valueChanged, this,
-		[this](double v) { m_engine->setBufferSize(static_cast<std::size_t>(v)); });
+	connect(m_bufferSpin, &gui::MenuSpinbox::valueChanged, this, [this](double v) {
+		m_engine->setBufferSize(static_cast<std::size_t>(v));
+		Q_EMIT bufferSizeChanged(static_cast<int>(v));
+	});
 
 	// The shell's target-fps field drives the engine's own ceiling. Seeded from the
 	// engine so the field shows what is actually in force, and left enabled while

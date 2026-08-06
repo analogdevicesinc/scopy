@@ -22,7 +22,10 @@
 #include "acqinstrumentcontroller.h"
 
 #include "PlutoIIOSource.h"
+#include "acqchannel.h"
+#include "acqcurverepr.h"
 #include "acqinstrument.h"
+#include "acqplotmanager.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
@@ -77,6 +80,8 @@ void AcqInstrumentController::init(iio_context *ctx)
 	m_ui = new AcqInstrument(nullptr);
 
 	setupBlocks(ctx);
+	// After setupBlocks: the channels added here point at keys the blocks declare.
+	setupPlots();
 
 	// The tool menu's own run button and the instrument's stay in step. Guarded
 	// by ToolMenuEntry::setRunning() only changing state, so the echo back is a
@@ -127,6 +132,45 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 	MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
 	it->addChannelRow(procs, "FFT", Style::getChannelColor(1), "fft", 1);
 	it->addMenuPage("fft", blockPage(it, m_fftProc, "GENALYZER FFT"));
+}
+
+void AcqInstrumentController::setupPlots()
+{
+	InstrumentTemplate *it = m_ui->shell();
+
+	m_plots = new AcqPlotManager(m_ui->store(), m_ui->engine(), it, m_ui);
+	it->setCenterWidget(m_plots);
+
+	// Direct, not queued: AcqInstrument already mirrors the engine's worker-thread
+	// signals onto the GUI thread, and these are its GUI-thread re-emissions.
+	connect(m_ui, &AcqInstrument::cycleComplete, m_plots, &AcqPlotManager::onCycleComplete);
+	connect(m_ui, &AcqInstrument::started, m_plots, &AcqPlotManager::onStarted);
+	connect(m_ui, &AcqInstrument::stopped, m_plots, &AcqPlotManager::onStopped);
+	// Depth is ceil(plotSize / bufferSize), so every channel's claim depends on a
+	// number only the instrument's buffer control knows about.
+	connect(m_ui, &AcqInstrument::bufferSizeChanged, m_plots, &AcqPlotManager::onBufferSizeChanged);
+
+	if(!m_plutoSrc || !m_fftProc) {
+		// setupBlocks() bailed for want of a context. The manager still exists — an
+		// empty plot beats no center widget — but there are no keys to point at.
+		return;
+	}
+
+	// Explicit kinds throughout: nothing has been written yet, so DataStore::typeOf()
+	// is nullopt and ReprKind::Auto could only guess.
+	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I", Style::getChannelColor(0),
+			    AcqPlotManager::ReprKind::Curve);
+	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage1"), "Q", Style::getChannelColor(1),
+			    AcqPlotManager::ReprKind::Curve);
+
+	// The FFT is the one channel with a real X stream: the processor writes the bin
+	// frequencies to a second key, so the curve is drawn against Hz rather than the
+	// shared sample-index ramp.
+	AcqChannel *fft = m_plots->addChannel(m_fftProc->outputKey(), "FFT", Style::getChannelColor(2),
+					      AcqPlotManager::ReprKind::Curve);
+	if(fft) {
+		static_cast<CurveRepr *>(fft->repr())->setXKey(m_fftProc->freqKey());
+	}
 }
 
 void AcqInstrumentController::stop()
