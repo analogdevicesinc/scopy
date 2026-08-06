@@ -38,7 +38,7 @@ public:
 
 	// One DataKey per stack stage (index 0 = root); demuxed by stageIndex.
 	void setOutputKeys(const QList<DataKey> &keys)     { m_outKeys = keys; }
-	const QList<DataKey> &outputKeys() const           { return m_outKeys; }
+	QList<DataKey> outputKeys() const override         { return m_outKeys; }
 
 	double sampleRate() const { return m_cfg.sampleRate; }
 

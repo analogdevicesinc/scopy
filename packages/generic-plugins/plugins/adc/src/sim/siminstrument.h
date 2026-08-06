@@ -68,16 +68,9 @@ public:
 	// buildControlPanel(). Must be called after buildControlPanel().
 	void registerDecoderPanel(QWidget *panel);
 
-	// Add a processor block group at the bottom of the Settings panel (not
-	// tied to any curve). Used e.g. for the global trigger. Must be called
-	// after buildControlPanel().
-	void addGlobalProcessorGroup(scopy::acq::ProcessorBlock *proc);
-
-	// Same layout as addGlobalProcessorGroup(), but hosts a caller-owned
-	// widget under a titled group box. Used when the widget needs
-	// construction arguments that ProcessorBlock::createSettingsWidget()
-	// doesn't accept (e.g. a DataStore pointer for live key lookup).
-	void addGlobalWidgetGroup(const QString &title, QWidget *body);
+	// Same contract as registerDecoderPanel(), for the acquisition-engine
+	// block tree behind the "Pipeline" toggle.
+	void registerPipelinePanel(QWidget *panel);
 
 public Q_SLOTS:
 	void onStarted();
@@ -123,6 +116,7 @@ private:
 	QPushButton   *m_datastoreBtn;
 	QPushButton   *m_decoderBtn;
 	QPushButton   *m_decoderLogBtn;
+	QPushButton   *m_pipelineBtn;
 	QTextEdit     *m_logView;
 	QTextEdit     *m_decoderLogView;
 	QTreeWidget   *m_datastoreTable;
@@ -154,9 +148,8 @@ private:
 	// added after the control panel is built still share the group.
 	QList<QPushButton *> m_panelBtns;
 
-	// Held so addGlobalProcessorGroup() can append new groups after
-	// buildControlPanel() has run. The trailing stretch item is removed
-	// on each append and re-added, to keep the panel top-aligned.
+	// Settings-panel body and its layout. The trailing stretch keeps the
+	// panel top-aligned.
 	QWidget     *m_settingsInner{nullptr};
 	QVBoxLayout *m_settingsInnerLay{nullptr};
 };

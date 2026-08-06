@@ -27,6 +27,15 @@ ScaleOffsetProcessor::ChannelConfig *ScaleOffsetProcessor::addChannel(const Data
 	return cfg;
 }
 
+QList<DataKey> ScaleOffsetProcessor::outputKeys() const
+{
+	QList<DataKey> result;
+	result.reserve(m_channels.size());
+	for(const ChannelConfig *cfg : m_channels)
+		result.append(cfg->outputKey);
+	return result;
+}
+
 void ScaleOffsetProcessor::process(DataStore *store)
 {
 	for(ChannelConfig *cfg : m_channels) {
