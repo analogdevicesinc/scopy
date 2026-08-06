@@ -239,6 +239,12 @@ AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QSt
 
 	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
 
+	// Before the claim would be more natural for the X key — a curve with an X stream
+	// reads two keys — but the claim here is for this channel's own key only, so the
+	// order does not matter. Before registerRail so the settings page sees a
+	// fully-configured repr.
+	applyCurveDefaults(ch);
+
 	// Both after attach(): the settings page binds to the repr's PlotChannel and the
 	// row's axis, and the measure manager is created in attach() too (it needs the
 	// pen colour).
@@ -306,6 +312,52 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 	m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
 }
 
+void AcqPlotManager::setSampleRate(double sr)
+{
+	if(sr <= 0.0) {
+		return;
+	}
+	m_sampleRate = sr;
+	// Also to the channels that already exist, so the controller may call this before
+	// or after any of them is created without the result differing.
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		applyCurveDefaults(ch);
+	}
+}
+
+void AcqPlotManager::setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey)
+{
+	if(key.key.isEmpty() || xKey.key.isEmpty()) {
+		return;
+	}
+	m_xKeys.insert(key, xKey);
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		applyCurveDefaults(ch);
+	}
+}
+
+void AcqPlotManager::applyCurveDefaults(AcqChannel *ch)
+{
+	if(!ch || !ch->repr()) {
+		return;
+	}
+	// Only a curve has either. A dynamic_cast rather than reading kindName(): the two
+	// setters are CurveRepr's own, not part of the repr interface, so this is the one
+	// place in the manager that has to know a concrete repr type — and a failed cast
+	// is exactly the right answer for a digital track or a waterfall.
+	CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr());
+	if(!curve) {
+		return;
+	}
+	curve->setSampleRate(m_sampleRate);
+	// Only when one is registered: setXKey with an empty key would be a no-op anyway,
+	// but leaving an already-set key alone matters if a reader ever sets one by hand.
+	const auto it = m_xKeys.constFind(ch->key());
+	if(it != m_xKeys.constEnd()) {
+		curve->setXKey(it.value());
+	}
+}
+
 MeasurementsPanel *AcqPlotManager::measurePanel()
 {
 	if(m_measurePanel.isNull() && !m_shell.isNull()) {
@@ -325,7 +377,16 @@ StatsPanel *AcqPlotManager::statsPanel()
 	if(m_statsPanel.isNull() && !m_shell.isNull()) {
 		m_statsPanel = new StatsPanel(this);
 		m_statsPanel->setVisible(false);
-		m_shell->addToSlot(PS_RIGHT, m_statsPanel);
+		// StatsPanel asks for Expanding in both directions, which is right for the side
+		// slot it was written for and wrong above a plot: PS_TOP is an unstretched
+		// layout, so the panel would still claim height off its scroll area's size hint
+		// and push the plot down. Maximum vertically, the same policy MeasurementsPanel
+		// picks for itself (gui/src/widgets/measurementpanel.cpp:44).
+		m_statsPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+		// PS_TOP, above the plot, with the measurement readouts below it. Stats are the
+		// min/max/avg of the measurements — reading the two against each other means
+		// both laid out the same way, not one of them turned sideways in the right slot.
+		m_shell->addToSlot(PS_TOP, m_statsPanel);
 	}
 	return m_statsPanel.data();
 }

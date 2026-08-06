@@ -115,7 +115,7 @@ public:
 	// CursorSettings page is registered under the id this returns in `settingsId`.
 	CursorController *cursors(QString *settingsId = nullptr);
 
-	// The measurement and stats readouts, in PS_BOTTOM and PS_RIGHT. Created on first
+	// The measurement and stats readouts, in PS_BOTTOM and PS_TOP. Created on first
 	// call and hidden until a label lands in one: both panels hide themselves when
 	// their label list empties, so an empty panel must not be shown at all or it
 	// reserves plot height for nothing.
@@ -129,6 +129,24 @@ public:
 	// Registered under the returned id and given a rail header row, so it is reachable
 	// without a channel existing yet.
 	QString createKeyPickerPage();
+
+	// ---- defaults for channels the reader creates -----------------------------
+	//
+	// Every plot channel is now made from the key picker, so anything a composed
+	// channel used to be handed at construction has to be registered here instead and
+	// applied by addChannel(). Both are set once by the controller, which is the only
+	// place that knows the pipeline.
+
+	// The timeline horizontal measurements are divided by, applied to every CurveRepr.
+	// Unset means 1.0, i.e. measurements come out in samples. Applies to channels
+	// created after this call and, so the order of the two does not matter, to those
+	// that already exist.
+	void setSampleRate(double sr);
+
+	// Draw any curve on `key` against `xKey` rather than the sample-index ramp. This
+	// is how an FFT magnitude channel gets a frequency axis: the picker offers keys,
+	// not the relationships between them, so the pairing has to be declared.
+	void setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey);
 
 public Q_SLOTS:
 	// Resizes the index ramp, rescales X, and re-claims every channel: depth is
@@ -181,6 +199,10 @@ private:
 	// Repopulates the key picker's list from the store. Called on keysChanged.
 	void refreshKeyPicker();
 
+	// Applies the registered sample rate and X-key pairing to a freshly attached
+	// channel, if its repr is a curve. Called from addChannel.
+	void applyCurveDefaults(AcqChannel *ch);
+
 	QPointer<scopy::acq::DataStore> m_store;
 	QPointer<scopy::acq::AcquisitionEngine> m_engine;
 	QPointer<InstrumentTemplate> m_shell;
@@ -212,6 +234,10 @@ private:
 
 	QPointer<QListWidget> m_keyList;
 	QPointer<MenuCombo> m_keyKindCombo;
+
+	// Registered by the controller, applied to every curve the reader creates.
+	double m_sampleRate{1.0};
+	QMap<scopy::acq::DataKey, scopy::acq::DataKey> m_xKeys;
 };
 
 } // namespace adc
