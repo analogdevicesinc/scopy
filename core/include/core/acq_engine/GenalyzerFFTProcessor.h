@@ -9,6 +9,7 @@
 #include <cgenalyzer.h>
 #include <cgenalyzer_simplified_beta.h>
 
+#include <atomic>
 #include <mutex>
 #include <vector>
 
@@ -22,6 +23,12 @@ namespace acq {
 //
 // Watched keys are re-read every process(), so setWatchedKeys() can switch mode
 // at runtime — do it while the block is disabled.
+//
+// Averaging is genalyzer's own: gn_fft/gn_rfft take navg and nfft separately and
+// average navg power spectra, so the block asks the DataStore for navg*nfft
+// samples rather than accumulating dB frames itself. The extra chunks come from
+// the store's history — see setAveraging() — which is why the block stays
+// stateless between cycles.
 //
 // Every gn_* call is serialised on s_genalyzerMutex: fftw3, genalyzer's
 // back-end, is not re-entrant even across separate instances.
@@ -61,9 +68,33 @@ public:
 	DataKey freqKey()    const { return m_freqKey; }
 
 	QList<DataKey> outputKeys() const override { return {m_outputKey, m_freqKey}; }
+
+	// The magnitude stream as a curve in dBFS against the frequency stream; the
+	// frequency stream itself as Hidden. Both are outputs, but only one is a
+	// trace — a bin-frequency ramp is an axis, and drawing it would put a
+	// diagonal line across the spectrum.
+	QHash<DataKey, StreamInfo> declaredStreams() const override;
 	int     nfft()       const { return m_nfft; }
 	double  sampleRate() const { return m_sampleRate; }
 	void    setSampleRate(double fs);
+
+	// Window function applied by gn_fft/gn_rfft and by the analysis config.
+	GnWindow window() const;
+	void     setWindow(GnWindow w);
+
+	// Real-mode dBFS reference: what a full-scale sinusoid measures. Ignored in
+	// complex mode, where gn_fft has no scaling argument.
+	GnRfftScale rfftScale() const;
+	void        setRfftScale(GnRfftScale s);
+
+	// Number of power spectra genalyzer averages per output frame; 1 disables
+	// averaging. Needs navg*nfft input samples, which come from the DataStore's
+	// chunk history, so the block registers a depth claim — hence the store.
+	// Pass the store the block will run against (and the engine's buffer size)
+	// once, at wiring time; nullptr leaves averaging pinned at 1.
+	void setAveragingStore(DataStore *store, std::size_t bufferSize);
+	int  averaging() const { return m_navg.load(std::memory_order_relaxed); }
+	void setAveraging(int navg);
 
 	FFTMode mode() const;
 
@@ -78,12 +109,27 @@ Q_SIGNALS:
 	void analysisReady(const scopy::acq::GenalyzerResultsSnapshot &results);
 	void analysisFailed(const QString &reason);
 
+	// Emitted when the transform parameters change, so a settings widget shows
+	// what the block is actually running with. nfftChanged also fires when
+	// process() re-derives nfft from the input length.
+	void sampleRateChanged(double fs);
+	void nfftChanged(int nfft);
+	void averagingChanged(int navg);
+
 private:
 	DataKey  m_outputKey;
 	DataKey  m_freqKey;
 	int      m_nfft;
 	double   m_sampleRate;
 	GnWindow m_window;
+	GnRfftScale m_rfftScale{GnRfftScaleDbfsSin};
+
+	// Averaging. m_navg is atomic so process() can read it without taking the
+	// gn_* mutex first; the store pointer and buffer size are set once at wiring
+	// time and only read afterwards.
+	std::atomic<int> m_navg{1};
+	DataStore       *m_avgStore{nullptr};
+	std::size_t      m_bufferSize{1};
 
 	// Cached output sizing — depends on mode + nfft.
 	int m_outBins{0};       // nfft   (complex)  or  nfft/2 + 1 (real)
@@ -100,6 +146,8 @@ private:
 	// Cached frequency axis (rebuilt when nfft / sample rate / mode change).
 	QVector<float> m_freqAxis;
 	FFTMode        m_lastModeForAxis{FFTMode::Complex};
+	// navg the staging buffers were last sized for; a change means resize.
+	int            m_sizedForNavg{1};
 
 	// Analysis state
 	GenalyzerConfig          m_cfg;
@@ -110,11 +158,18 @@ private:
 	// fftw3 (used internally by genalyzer) must not be called concurrently.
 	static std::mutex s_genalyzerMutex;
 
-	void resizeForNfft(int nfft, FFTMode mode);
+	// `navg` is passed rather than read from m_navg so one cycle uses a single
+	// consistent value: sizing the staging buffers with one navg and indexing
+	// them with another that arrived from the GUI mid-cycle overruns them.
+	void resizeForNfft(int nfft, FFTMode mode, int navg);
 	void rebuildFreqAxis(FFTMode mode);
 
-	int  runComplexFFT(const QVector<float> &iSamples, const QVector<float> &qSamples);
-	int  runRealFFT(const QVector<float> &samples);
+	// Re-register the history claim for navg*nfft samples on every watched key.
+	// Cheap and idempotent: claims are keyed (key, claimant) and replace.
+	void reclaimAveragingDepth();
+
+	int  runComplexFFT(const QVector<float> &iSamples, const QVector<float> &qSamples, int navg);
+	int  runRealFFT(const QVector<float> &samples, int navg);
 
 	void cleanupAutoConfig();
 	void cleanupFaConfig();
