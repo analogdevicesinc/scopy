@@ -277,30 +277,16 @@ void AcqInstrumentController::setupPlots()
 		});
 	}
 
-	// Every plot channel is created by the reader from here, and none at composition
-	// time: the pipeline publishes several keys per run and which of them is worth
-	// looking at — and as what — is not something this function can know. The plot
-	// opens empty.
-	//
-	// Two things the picker cannot infer are supplied by the manager instead, so a
-	// hand-made channel is configured exactly like a composed one would have been:
-	// the measurement timeline, and the X stream an FFT curve is drawn against.
+	// No plot channels are created here. The mechanism that decides which of the
+	// pipeline's keys become channels is being reworked; until it exists the plot opens
+	// empty, and AcqPlotManager::addChannel is the API whatever replaces it will call.
 	if(m_fftProc) {
 		// The timeline every horizontal measurement is divided by. From the FFT
 		// processor because that is where the rate is configured — the source does not
 		// publish one. Without it period and frequency come out in samples, which is
 		// not wrong so much as unreadable.
 		m_plots->setSampleRate(m_fftProc->sampleRate());
-		// The FFT's bin frequencies. The processor writes them to a second key, which
-		// is what lets a magnitude curve be drawn against Hz rather than the shared
-		// sample-index ramp without the channel knowing anything about FFTs.
-		m_plots->setXKeyFor(m_fftProc->outputKey(), m_fftProc->freqKey());
 	}
-
-	// Last, so the list it builds is populated from a store that already has whatever
-	// setupBlocks() registered. Useful even when setupBlocks() bailed for want of a
-	// context: the page exists, it is simply empty until a run writes something.
-	m_plots->createKeyPickerPage();
 }
 
 void AcqInstrumentController::stop()

@@ -67,26 +67,16 @@ public:
 
 	// Set the row's shared X interval.
 	//
-	// The X axis is shared per row for the same Qwt reason Y is, so one interval has to
-	// cover every channel here. The manager passes the union of the X ranges of the
-	// channels reading a real X stream (AcqPlotManager::syncXRanges) — a union rather
-	// than last-writer-wins, so two FFT curves on different frequency keys both stay on
-	// canvas instead of the row flickering between their ranges once per frame.
+	// The X axis is shared per row for the same Qwt reason Y is, so one interval covers
+	// every channel here — which is sound because X is the manager's 0..plotSize-1
+	// sample-index ramp for all of them. Called from the manager's constructor and from
+	// setPlotSize(), never per frame.
 	//
-	// A no-op when the requested interval is the one already requested, which is what
-	// makes it safe to call from replot() at 60 Hz: re-asserting the range every frame
-	// would undo any pan or zoom the reader performed between two frames, and the axis
-	// would appear frozen. Compared against the last *request*, not against the axis's
-	// current interval, precisely so a reader-driven zoom is not mistaken for a change
-	// that needs correcting.
+	// A no-op when the requested interval is the one already requested, so a repeated
+	// call cannot undo a pan or zoom the reader performed since. Compared against the
+	// last *request*, not against the axis's current interval, precisely so a
+	// reader-driven zoom is not mistaken for a change that needs correcting.
 	void setXInterval(double min, double max);
-
-	// Whether X is currently driven by a stream rather than by the 0..plotSize-1 index
-	// ramp. The manager needs it to know when to re-pin the ramp range: the last
-	// real-X channel going away leaves the axis on a frequency span with nothing but
-	// index-drawn curves on it.
-	bool xFromData() const { return m_xFromData; }
-	void setXFromData(bool b) { m_xFromData = b; }
 
 	// Next free vertical slot for a fixed-height item, in digitalAxis scale coords.
 	// Walks down in 26 px steps (24 px band + 2 px gap) — the pitch DigitalCurveItem
@@ -103,7 +93,6 @@ private:
 	PlotAxis *m_digitalAxis{nullptr};
 	const bool m_exclusive;
 
-	bool m_xFromData{false};
 	// Last interval setXInterval() actually applied, for its idempotence check. NaN
 	// initially so the first call always applies.
 	double m_xReqMin{qQNaN()}, m_xReqMax{qQNaN()};

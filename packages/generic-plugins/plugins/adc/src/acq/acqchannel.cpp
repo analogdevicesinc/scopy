@@ -26,12 +26,10 @@
 #include <core/acq_engine/DataStore.h>
 
 #include <gui/instrumenttemplate.h>
-#include <gui/style.h>
 #include <gui/widgets/menulineedit.h>
 #include <gui/widgets/menusectionwidget.h>
 
 #include <QLabel>
-#include <QPushButton>
 #include <QVBoxLayout>
 
 using namespace scopy;
@@ -112,28 +110,6 @@ void AcqChannel::reclaimDepth(int plotSize, std::size_t bufferSize)
 	}
 	const std::size_t depth = m_repr->claimDepth(plotSize, bufferSize);
 	m_store->claimDepth(m_key, m_claimant, depth);
-
-	// The repr's secondary keys — a curve's X stream — get the same depth. Not
-	// cosmetic: CurveRepr::pull truncates to qMin(x.size, y.size), so an X key left at
-	// the default capacity of 1 would clip a multi-chunk Y window down to one buffer.
-	const QList<scopy::acq::DataKey> extra = m_repr->extraKeys();
-	for(const scopy::acq::DataKey &k : extra) {
-		if(k.key.isEmpty() || k == m_key) {
-			continue;
-		}
-		m_store->claimDepth(k, m_claimant, depth);
-	}
-
-	// Release the keys we claimed last time and no longer read. The X key is
-	// user-editable, so retargeting it would otherwise leave the old key pinned at this
-	// channel's depth for the life of the instrument, with nothing reading it.
-	for(const scopy::acq::DataKey &old : std::as_const(m_claimedExtra)) {
-		if(old == m_key || extra.contains(old)) {
-			continue;
-		}
-		m_store->releaseDepth(old, m_claimant);
-	}
-	m_claimedExtra = extra;
 }
 
 void AcqChannel::setEnabled(bool en)
@@ -209,18 +185,6 @@ QWidget *AcqChannel::createSettingsPage(InstrumentTemplate *it, QWidget *parent)
 			lay->addWidget(reprSection);
 		}
 	}
-
-	// Last, below the repr's own knobs and outside every section: it acts on the channel
-	// as a whole, not on one aspect of it, and putting it inside a collapsible section
-	// would let it hide.
-	QPushButton *delBtn = new QPushButton(tr("Delete channel"), page);
-	Style::setStyle(delBtn, style::properties::button::basicButton);
-	// Emitted directly; it is the *manager's* connection to removeRequested that is
-	// queued, so the channel and this button are both off the stack by the time either
-	// is destroyed. Deferring here instead would not help: the lambda's `this` would be
-	// the channel being deleted inside the emit.
-	connect(delBtn, &QPushButton::clicked, this, [this]() { Q_EMIT removeRequested(); });
-	lay->addWidget(delBtn);
 
 	lay->addStretch();
 	return page;

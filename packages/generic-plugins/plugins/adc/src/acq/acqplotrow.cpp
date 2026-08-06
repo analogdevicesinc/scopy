@@ -96,7 +96,7 @@ void AcqPlotRow::setXInterval(double min, double max)
 		return;
 	}
 	// Unchanged request — leave the axis alone. See the header: this is what keeps a
-	// per-frame call from fighting the reader's pan and zoom.
+	// repeated call from fighting the reader's pan and zoom.
 	if(qFuzzyCompare(min, m_xReqMin) && qFuzzyCompare(max, m_xReqMax)) {
 		return;
 	}
