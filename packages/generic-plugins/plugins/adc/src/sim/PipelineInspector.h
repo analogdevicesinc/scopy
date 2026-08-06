@@ -10,8 +10,6 @@
 
 namespace scopy {
 
-class MapStackedWidget;
-
 namespace acq {
 class AcquisitionEngine;
 class Block;
@@ -22,14 +20,11 @@ namespace adc {
 
 class DecoderManager;
 
-// Live tree of every block registered with an AcquisitionEngine, over a host
-// that shows the selected block's own settings widget.
+// Live tree of every block registered with an AcquisitionEngine: name, enable
+// checkbox, activity/diagnostic badge, and the inbound/outbound key sets.
 //
-// This is the single home for block settings widgets: it hosts whatever
-// Block::settingsWidget() hands back, so a block has exactly one widget no
-// matter how many panels want to show it. A host needing to build the widget
-// itself (extra constructor arguments) gives it to the block via
-// Block::setSettingsWidget() and it surfaces here.
+// Read-out and enable toggling only — the panel shows no block settings widget.
+// Whoever wants to surface Block::settingsWidget() hosts it themselves.
 //
 // The tree is derived, never stored: the engine has no graph object, so rows
 // come from sources()/processors() and the in/out columns from watchedKeys()
@@ -47,7 +42,8 @@ public:
 			  scopy::acq::DataStore *store,
 			  QWidget *parent = nullptr);
 
-	// Optional: lets removed decoders drop their cached menu entry.
+	// Optional: rebuilds the tree as decoders come and go, which the engine's
+	// own blocksChanged can only report once its loop applies the change.
 	void setDecoderManager(scopy::adc::DecoderManager *mgr);
 
 public Q_SLOTS:
@@ -94,7 +90,6 @@ private:
 				      scopy::acq::Block *block, bool isSource);
 
 	void updateRowStatus(const Row &row);
-	void showMenuFor(scopy::acq::Block *block);
 	void onItemChanged(QTreeWidgetItem *item, int column);
 	void onErrorReported(int severity, const QString &id, const QString &message);
 
@@ -106,8 +101,6 @@ private:
 	QPointer<DecoderManager>       m_decoderMgr;
 
 	QTreeWidget            *m_tree{nullptr};
-	MapStackedWidget       *m_host{nullptr};
-	QWidget                *m_placeholder{nullptr};
 	QTreeWidgetItem        *m_groups[GroupCount]{};
 
 	QList<Row> m_rows;
