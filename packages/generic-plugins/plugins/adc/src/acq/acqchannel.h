@@ -27,6 +27,7 @@
 #include <core/acq_engine/DataKey.h>
 
 #include <QColor>
+#include <QList>
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -87,15 +88,25 @@ public:
 	void attach(AcqPlotRow *row);
 	void detach();
 
+	// The row this channel is attached to, or null once detached. The manager needs it
+	// to decide whether removing this channel also removes a row — an exclusive row
+	// exists only for the repr that brought its own plot.
+	AcqPlotRow *row() const { return m_row; }
+
 	// One cycle. A no-op while disabled: a disabled channel must not pay for a
 	// window copy, and its visual is already detached.
 	void pull(int plotSize);
 	void reset();
 
-	// (Re)register the depth claim. Idempotent — claimDepth() replaces rather than
-	// accumulates, so no release is needed first. Correct even when the key does not
-	// exist yet: DataStore::write() applies pending claims before the first push, so
-	// claiming early is what makes the *first* window full-depth instead of one chunk.
+	// (Re)register the depth claim, on this channel's key and on every key the repr
+	// names in extraKeys() (a curve's X stream). Idempotent — claimDepth() replaces
+	// rather than accumulates, so no release is needed first. Correct even when the key
+	// does not exist yet: DataStore::write() applies pending claims before the first
+	// push, so claiming early is what makes the *first* window full-depth instead of one
+	// chunk.
+	//
+	// Also releases any extra key claimed by a previous call and no longer read, so
+	// retargeting the X key does not leave the old one pinned.
 	void reclaimDepth(int plotSize, std::size_t bufferSize);
 
 	// A generic CHANNEL section (name, colour, key readout) stacked over the repr's
@@ -114,6 +125,13 @@ Q_SIGNALS:
 	void nameChanged(QString);
 	void colorChanged(QColor);
 
+	// The Delete button on this channel's own settings page was pressed. A signal
+	// rather than a direct call because removal is the manager's: the rail row, the menu
+	// page and the channel list are all its state, and the page cannot outlive the
+	// channel that owns the button. The manager's handler is queued, so the button
+	// survives its own click handler.
+	void removeRequested();
+
 	// The repr's read requirement changed (e.g. a waterfall's row count), so the
 	// manager must re-claim for this channel.
 	void depthNeedsReclaim();
@@ -129,6 +147,11 @@ private:
 
 	std::unique_ptr<AcqChannelRepr> m_repr;
 	AcqPlotRow *m_row{nullptr}; // not owned
+
+	// What extraKeys() returned on the last reclaimDepth(), so the next one can release
+	// whatever dropped out of the list. The destructor needs no equivalent:
+	// releaseClaimant() sweeps every key at once.
+	QList<scopy::acq::DataKey> m_claimedExtra;
 
 	bool m_enabled{true};
 };

@@ -40,9 +40,12 @@
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/menusectionwidget.h>
 
+#include <QComboBox>
+#include <QHash>
 #include <QLabel>
 #include <QListWidget>
 #include <QLoggingCategory>
+#include <QPair>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QSplitter>
@@ -87,8 +90,10 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 	rebuildIndexRamp();
 	// setPlotSize() would early-return on the unchanged value, so the initial X range
 	// has to be set by hand — otherwise the first frame draws against Qwt's default.
-	if(PlotWidget *p = sharedPlot()) {
-		p->xAxis()->setInterval(0, m_plotSize - 1);
+	// No channel exists yet, so this is unconditionally the ramp range; syncXRanges()
+	// takes over from the first replot.
+	if(m_sharedRow) {
+		m_sharedRow->setXInterval(0, qMax(1, m_plotSize - 1));
 	}
 
 	m_frameTimer = new QTimer(this);
@@ -237,13 +242,31 @@ AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QSt
 	// first window full-depth instead of a single chunk.
 	reclaim(ch);
 
-	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
+	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() {
+		reclaim(ch);
+		// Retargeting the X source is one of the things that raises this, and it changes
+		// the row's axis range — which nothing would repaint while the engine is
+		// stopped. Harmless for the other cause (a waterfall's row count) since a frame
+		// is what that wants too.
+		requestFrame();
+	});
 
-	// Before the claim would be more natural for the X key — a curve with an X stream
-	// reads two keys — but the claim here is for this channel's own key only, so the
-	// order does not matter. Before registerRail so the settings page sees a
-	// fully-configured repr.
+	// A disabled channel is excluded from the row's X union, so switching one off can
+	// change the axis — and switching the row's only real-X curve back on has to bring
+	// its range back.
+	connect(ch, &AcqChannel::enabledChanged, this, [this](bool) { requestFrame(); });
+
+	// Queued: the signal comes from a button on the channel's own settings page, and
+	// removeChannel() destroys both. Deferring to the event loop lets the click finish
+	// unwinding first.
+	connect(ch, &AcqChannel::removeRequested, this, [this, ch]() { removeChannel(ch); }, Qt::QueuedConnection);
+
+	// Before registerRail, so the settings page's X-source combo is built against the
+	// repr's final X key rather than showing sample index until the first refresh.
+	// setXKey requests a reclaim of its own, which is why the order relative to the
+	// claim above does not matter.
 	applyCurveDefaults(ch);
+	applyXKeyDefault(ch);
 
 	// Both after attach(): the settings page binds to the repr's PlotChannel and the
 	// row's axis, and the measure manager is created in attach() too (it needs the
@@ -260,8 +283,46 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 		return;
 	}
 	unregisterRail(ch);
-	// The destructor detaches and releases the claim.
-	delete ch;
+
+	// An exclusive row exists only for this channel's repr — a waterfall brought its own
+	// PlotWidget through createOwnPlot(). WaterfallRepr::detach() deliberately does not
+	// delete it (destruction order between a plot and the channel is unspecified, so a
+	// repr never deletes its plot), which leaves the manager to drop the row here or the
+	// splitter keeps a dead empty pane forever.
+	AcqPlotRow *ownRow = ch->row();
+	if(ownRow && ownRow->isExclusive() && ownRow != m_sharedRow) {
+		m_rows.removeOne(ownRow);
+	} else {
+		ownRow = nullptr;
+	}
+
+	// Detach the visual now rather than leaving it to the destructor: a pull() between
+	// here and the delete would be harmless (the channel is off m_channels), but a
+	// pending replot() would still paint an item whose repr is about to go. Also, this
+	// nulls the repr's plot pointer before the plot below is deleted.
+	ch->detach();
+
+	if(ownRow) {
+		// The plot first, then the row: AcqPlotRow holds it in a QPointer and its own
+		// destructor touches nothing, but the order keeps replot() from being reachable
+		// through a row still in m_rows.
+		if(PlotWidget *p = ownRow->plot()) {
+			// Removing from the splitter is implicit in the delete; deleteLater so a
+			// pending paint event on the canvas finishes first.
+			p->deleteLater();
+		}
+		delete ownRow;
+	}
+
+	// deleteLater, not delete. Even though the connection that gets us here is queued,
+	// removeChannel is public and a direct caller may well be inside a signal from this
+	// channel. The destructor detaches (idempotently) and releases the depth claim.
+	ch->deleteLater();
+
+	// Repaint, not just mark dirty: the deleted channel may have been the row's only
+	// real-X curve, and while the engine is stopped nothing else would ever run
+	// syncXRanges() to release the axis from its frequency span.
+	requestFrame();
 }
 
 void AcqPlotManager::registerRail(AcqChannel *ch)
@@ -280,7 +341,13 @@ void AcqPlotManager::registerRail(AcqChannel *ch)
 
 	// Built once, here, and never rebuilt — which is only sound because the key and
 	// the repr are fixed for the channel's life.
-	m_shell->addMenuPage(id, ch->createSettingsPage(m_shell.data()));
+	QWidget *page = ch->createSettingsPage(m_shell.data());
+	m_shell->addMenuPage(id, page);
+	// Remembered because removeMenuPage() only takes the widget out of the stack
+	// (MapStackedWidget::remove -> QStackedWidget::removeWidget, which reparents to
+	// nullptr and deletes nothing). Without this the page — and the Delete button that
+	// asked for the removal — outlives the channel as an orphaned top-level widget.
+	m_railPages.insert(ch, page);
 
 	if(SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row)) {
 		connect(sw, &QAbstractButton::toggled, ch, &AcqChannel::setEnabled);
@@ -305,11 +372,26 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 		return;
 	}
 	MenuControlButton *row = m_railRows.take(ch);
-	if(!row || m_shell.isNull()) {
+	QWidget *page = m_railPages.take(ch);
+	if(m_shell.isNull()) {
 		return;
 	}
-	// Four steps, done by the shell: button group, layout, menu page, deleteLater.
-	m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
+	if(row) {
+		// Four steps, done by the shell: button group, layout, menu page, deleteLater.
+		m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
+	}
+	if(page) {
+		// deleteLater for the same reason the row uses it: this runs from the page's own
+		// Delete button, so the widget tree holding it must outlive the emission.
+		page->deleteLater();
+	}
+
+	// The rail's exclusive group now has no checked button, so the menu still shows the
+	// page of a channel that is going away. Fall back to the key picker if it exists —
+	// it is the one page that is never per-channel.
+	if(m_shell->hasMenuPage(QString::fromLatin1(kKeyPickerPageId))) {
+		m_shell->showMenuPage(QString::fromLatin1(kKeyPickerPageId));
+	}
 }
 
 void AcqPlotManager::setSampleRate(double sr)
@@ -320,6 +402,10 @@ void AcqPlotManager::setSampleRate(double sr)
 	m_sampleRate = sr;
 	// Also to the channels that already exist, so the controller may call this before
 	// or after any of them is created without the result differing.
+	//
+	// applyCurveDefaults and not applyXKeyDefault: a sample-rate change says nothing
+	// about anyone's X source, and re-applying the registered pairing here would silently
+	// undo a choice the reader made in the combo.
 	for(AcqChannel *ch : std::as_const(m_channels)) {
 		applyCurveDefaults(ch);
 	}
@@ -331,8 +417,13 @@ void AcqPlotManager::setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq
 		return;
 	}
 	m_xKeys.insert(key, xKey);
+	// Registering a pairing is the one call that does mean "point these curves at this X
+	// key", so it applies to the channels that already exist as well as to future ones.
+	// Only the channels on `key`; every other one is untouched.
 	for(AcqChannel *ch : std::as_const(m_channels)) {
-		applyCurveDefaults(ch);
+		if(ch->key() == key) {
+			applyXKeyDefault(ch);
+		}
 	}
 }
 
@@ -350,11 +441,43 @@ void AcqPlotManager::applyCurveDefaults(AcqChannel *ch)
 		return;
 	}
 	curve->setSampleRate(m_sampleRate);
-	// Only when one is registered: setXKey with an empty key would be a no-op anyway,
-	// but leaving an already-set key alone matters if a reader ever sets one by hand.
+
+	// What the X-source combo on this channel's page offers. A callback rather than a
+	// key list because the page is built once and the store's key set grows as the
+	// pipeline runs — the repr asks when it fills the combo. Capturing `this` is safe:
+	// the channel is a child of this widget, so the repr cannot outlive it.
+	curve->setKeySource([this]() -> QList<scopy::acq::DataKey> {
+		return m_store.isNull() ? QList<scopy::acq::DataKey>{} : m_store->keys();
+	});
+
+	// Deliberately not the X key. That is applyXKeyDefault's job, called from the two
+	// places that mean it — see there.
+}
+
+void AcqPlotManager::applyXKeyDefault(AcqChannel *ch)
+{
+	if(!ch) {
+		return;
+	}
+	CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr());
+	if(!curve) {
+		return;
+	}
+	// Only when a pairing is registered for this Y key. An unregistered key is left
+	// alone rather than reset to sample index: the reader may have picked an X source
+	// from the combo, and the registry knows nothing about that choice.
 	const auto it = m_xKeys.constFind(ch->key());
 	if(it != m_xKeys.constEnd()) {
 		curve->setXKey(it.value());
+	}
+}
+
+void AcqPlotManager::refreshCurveKeySources()
+{
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		if(CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr())) {
+			curve->refreshKeySources();
+		}
 	}
 }
 
@@ -446,11 +569,12 @@ CursorController *AcqPlotManager::cursors(CursorSettings **settings)
 	}
 
 	m_cursors = new CursorController(plot, this);
-	// Parented here only so it cannot leak when the caller ignores it, and hidden
-	// because this widget has no layout — an unhidden child would paint over the plot
-	// at 0,0. The caller reparents it into whatever shows it.
-	m_cursorSettings = new CursorSettings(this);
-	m_cursorSettings->hide();
+	// Parentless, and deliberately never hidden: the caller is expected to hand it
+	// straight to a HoverWidget, whose layout takes ownership and shows it. Parenting it
+	// here instead would make it a stray child of this widget — which lays its plots out
+	// in a splitter and has no slot for it — and calling hide() would set the explicit
+	// -hide flag that stops the hover's layout from ever showing it again.
+	m_cursorSettings = new CursorSettings();
 	m_cursors->connectSignals(m_cursorSettings.data());
 	// Cursors off until asked for: the handles are created either way, but a plot that
 	// opens with four cursors on it is not what anyone wants.
@@ -498,6 +622,23 @@ QString AcqPlotManager::createKeyPickerPage()
 	m_keyKindCombo->combo()->addItem(QStringLiteral("Annotations"), static_cast<int>(ReprKind::Annotations));
 	section->add(m_keyKindCombo);
 
+	// The second key, offered here as well as on the channel's own page: a channel reads
+	// two streams and picking both at once is one gesture instead of create-then-edit.
+	// Ignored for every kind but Curve — a digital track and an annotation band lay
+	// themselves out proportionally across the shared X axis and have no X stream.
+	m_keyXCombo = new MenuCombo(QObject::tr("X source"), section);
+	section->add(m_keyXCombo);
+	connect(m_keyKindCombo->combo(), &QComboBox::currentIndexChanged, m_keyXCombo.data(), [this]() {
+		if(m_keyXCombo.isNull() || m_keyKindCombo.isNull()) {
+			return;
+		}
+		const ReprKind kind = static_cast<ReprKind>(m_keyKindCombo->combo()->currentData().toInt());
+		// Auto stays enabled: it resolves to Curve for every numeric type, which is most
+		// of what lands here, and greying out a control that may well apply is worse than
+		// leaving a choice that is sometimes ignored.
+		m_keyXCombo->setEnabled(kind == ReprKind::Curve || kind == ReprKind::Auto);
+	});
+
 	m_keyAddBtn = new QPushButton(QObject::tr("Add"), section);
 	Style::setStyle(m_keyAddBtn, style::properties::button::basicButton);
 	// Disabled until a key is selected, so "nothing selected" is visible in the button
@@ -529,6 +670,17 @@ QString AcqPlotManager::createKeyPickerPage()
 			// key — a Curve or Digital on an annotation stream — since Auto resolves
 			// every type there is.
 			return;
+		}
+
+		// The chosen X source, after addChannel so applyXKeyDefault has already run:
+		// this is the reader's explicit choice and must win over any pairing the
+		// controller registered for the Y key. A dynamic_cast because the kind asked for
+		// may not be the kind resolved — Auto on a UInt8 stream gives a DigitalRepr,
+		// which has no X stream to set.
+		if(!m_keyXCombo.isNull()) {
+			if(CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr())) {
+				curve->setXKey(scopy::acq::DataKey(m_keyXCombo->combo()->currentData().toString()));
+			}
 		}
 		// Straight to the new channel's page: the guessed name and colour are the first
 		// things a reader will want to change.
@@ -586,6 +738,22 @@ void AcqPlotManager::refreshKeyPicker()
 		m_keyHint->setVisible(m_keyList->count() == 0);
 	}
 	m_keyList->setVisible(m_keyList->count() > 0);
+
+	// The X-source combo carries the same keys plus the index sentinel. Selection
+	// preserved by key for the same reason the list's is — positions shift as keys
+	// appear — and defaulting to sample index, which is always item 0.
+	if(!m_keyXCombo.isNull()) {
+		QComboBox *box = m_keyXCombo->combo();
+		const QString prevX = box->currentData().toString();
+		QSignalBlocker blocker(box);
+		box->clear();
+		box->addItem(QObject::tr("Sample index"), CurveRepr::sampleIndexKey().toString());
+		for(const scopy::acq::DataKey &k : keys) {
+			box->addItem(k.toString(), k.toString());
+		}
+		const int xIdx = prevX.isEmpty() ? 0 : box->findData(prevX);
+		box->setCurrentIndex(xIdx < 0 ? 0 : xIdx);
+	}
 }
 
 void AcqPlotManager::rebuildIndexRamp()
@@ -603,10 +771,19 @@ void AcqPlotManager::setPlotSize(int n)
 	m_plotSize = n;
 	rebuildIndexRamp();
 
-	if(PlotWidget *p = sharedPlot()) {
-		p->xAxis()->setInterval(0, m_plotSize - 1);
+	// Only the rows still drawing against the ramp. A row whose curves read a real X key
+	// has a range that owes nothing to plotSize — a wider window on an FFT means finer
+	// bins over the same frequency span, not a wider span — and pinning it to
+	// 0..plotSize-1 here would push those curves off canvas until the next frame put the
+	// range back.
+	for(AcqPlotRow *r : std::as_const(m_rows)) {
+		if(!r->xFromData()) {
+			r->setXInterval(0, qMax(1, m_plotSize - 1));
+		}
 	}
 	reclaimAll();
+	// So the new axis range is visible while stopped, rather than at the next Run.
+	requestFrame();
 }
 
 void AcqPlotManager::reclaim(AcqChannel *ch)
@@ -641,6 +818,9 @@ void AcqPlotManager::onKeysChanged(QList<scopy::acq::DataKey> keys)
 	// runs before the engine has ever produced anything, so without this the list is
 	// built empty once and stays that way for the life of the instrument.
 	refreshKeyPicker();
+	// Same reason as the picker: a curve's X-source combo is on a page built once, so it
+	// has to be told when the set of keys it offers changes.
+	refreshCurveKeySources();
 	Q_EMIT keysAvailable(keys);
 }
 
@@ -675,8 +855,66 @@ void AcqPlotManager::onStopped()
 	}
 }
 
+void AcqPlotManager::requestFrame()
+{
+	m_dirty = true;
+	if(m_frameTimer && !m_frameTimer->isActive()) {
+		m_dirty = false;
+		replot();
+	}
+}
+
+void AcqPlotManager::syncXRanges()
+{
+	// Collected per row rather than per channel: the axis is shared (T7), so the interval
+	// has to be one range covering everything drawn on it.
+	QHash<AcqPlotRow *, QPair<double, double>> spans;
+
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		AcqPlotRow *row = ch->row();
+		if(!row || !ch->isEnabled()) {
+			// A disabled channel is detached, so its span must not hold the axis at a
+			// range nothing on screen occupies.
+			continue;
+		}
+		CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr());
+		if(!curve) {
+			continue;
+		}
+		double lo = 0.0, hi = 0.0;
+		if(!curve->xDataRange(lo, hi)) {
+			continue; // draws against the index ramp, or has not read anything yet
+		}
+
+		auto it = spans.find(row);
+		if(it == spans.end()) {
+			spans.insert(row, {lo, hi});
+		} else {
+			it->first = qMin(it->first, lo);
+			it->second = qMax(it->second, hi);
+		}
+	}
+
+	for(AcqPlotRow *r : std::as_const(m_rows)) {
+		const auto it = spans.constFind(r);
+		if(it != spans.constEnd()) {
+			r->setXFromData(true);
+			r->setXInterval(it->first, it->second);
+		} else if(r->xFromData()) {
+			// The last real-X curve on this row is gone — deleted, disabled, or
+			// retargeted to sample index. Without this the axis keeps the frequency
+			// span it was left on and every index-drawn curve on the row is squeezed
+			// into its first pixel.
+			r->setXFromData(false);
+			r->setXInterval(0, qMax(1, m_plotSize - 1));
+		}
+	}
+}
+
 void AcqPlotManager::replot()
 {
+	// Before the repaint, so a frame is never painted with the axis of the previous one.
+	syncXRanges();
 	for(AcqPlotRow *r : std::as_const(m_rows)) {
 		r->replot();
 	}

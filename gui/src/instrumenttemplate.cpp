@@ -280,27 +280,17 @@ void InstrumentTemplate::setupTopRail()
 	m_fps->setFixedWidth(fpsFieldWidth());
 	Style::setStyle(m_fps, style::properties::label::subtle);
 
-	// A plain QLineEdit rather than a MenuSpinbox: the spinbox carries a label, two
-	// stepper buttons and a scale combo, which is taller than this whole rail. The
-	// validator is what makes it a number field, and the units are in the
-	// placeholder rather than in a label of their own.
 	m_targetFps = new QLineEdit(fpsBox);
 	m_targetFps->setFixedWidth(fpsFieldWidth());
-	// Capped height: the rail is 44px and a QLineEdit's natural height plus the
-	// readout above it overruns that, which clips the pair rather than shrinking it.
 	m_targetFps->setFixedHeight(Style::getDimension(json::global::unit_2));
 	m_targetFps->setPlaceholderText("target FPS");
 	m_targetFps->setToolTip("Target FPS — how often the instrument is notified of new data. Empty for unlimited.");
-	// Upper bound is a sanity limit, not a capability claim: above the display's own
-	// refresh rate the extra notifications are work nobody sees.
 	m_targetFps->setValidator(new QIntValidator(1, 1000, m_targetFps));
 	Style::setStyle(m_targetFps, style::properties::lineedit::menuLineEdit);
 
 	fpsLay->addWidget(m_fps);
 	fpsLay->addWidget(m_targetFps);
 
-	// editingFinished, not textChanged: mid-typing "3" on the way to "30" would
-	// otherwise be applied as a rate of its own.
 	connect(m_targetFps, &QLineEdit::editingFinished, this, [this]() {
 		bool ok = false;
 		const int v = m_targetFps->text().toInt(&ok);
@@ -465,29 +455,57 @@ MenuSectionCollapseWidget *InstrumentTemplate::addChannelGroup(const QString &ti
 	return group;
 }
 
-MenuControlButton *InstrumentTemplate::makeChannelRow(MenuSectionCollapseWidget *group, const QString &name,
-						     const QColor &color, const QString &menuId, int indent,
-						     bool asSwitch)
+void InstrumentTemplate::configureChannelRow(MenuControlButton *row, QWidget *insert, CompositeWidget *group,
+					     const QString &name, const QColor &color, const QString &menuId,
+					     int indent)
 {
-	MenuControlButton *btn = new MenuControlButton(group);
-	btn->setName(name);
-	btn->setColor(color);
-	btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-	btn->enableToolTip(true);
+	row->setName(name);
+	// Only when asked for. Colour on a rail row means "this is the curve you see in
+	// that colour", so a source, processor or plot group must keep the row's neutral
+	// default rather than claim a curve it does not have.
+	if(color.isValid()) {
+		row->setColor(color);
+		row->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
+	}
+	row->enableToolTip(true);
 	// The gear glyph replaces the real gear button: the whole row opens the page, which
 	// is a larger and more forgiving target.
-	btn->button()->setVisible(false);
-	btn->setIconEnabled(true);
-	btn->setOpenMenuChecksThis(true);
-	btn->setDoubleClickToOpenMenu(false);
+	row->button()->setVisible(false);
+	row->setIconEnabled(true);
+	row->setOpenMenuChecksThis(true);
+	row->setDoubleClickToOpenMenu(false);
+	// MenuControlButton defaults to Maximum, which sizes it to its label and leaves the
+	// rail's width unused — rows have to fill it so the name, gear and switch line up
+	// down the column instead of each row ending wherever its text does.
+	insert->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	if(indent > 0) {
 		// Stacking is shown by indentation — processors on top of processors. Only
 		// the left margin moves; the rest is the row's own padding.
-		QMargins m = btn->layout()->contentsMargins();
+		QMargins m = row->layout()->contentsMargins();
 		m.setLeft(m.left() + indent * Style::getDimension(json::global::unit_2));
-		btn->layout()->setContentsMargins(m);
+		row->layout()->setContentsMargins(m);
 	}
+
+	m_channelGroup->addButton(row);
+	if(group) {
+		group->add(insert);
+	}
+
+	if(!menuId.isEmpty()) {
+		connect(row, &QAbstractButton::clicked, this, [this, menuId](bool b) {
+			if(b) {
+				showMenuPage(menuId);
+			}
+		});
+	}
+}
+
+MenuControlButton *InstrumentTemplate::makeChannelRow(CompositeWidget *group, const QString &name,
+						     const QColor &color, const QString &menuId, int indent,
+						     bool asSwitch)
+{
+	MenuControlButton *btn = new MenuControlButton();
 
 	if(asSwitch) {
 		// Plots create and destroy rather than mute, so the switch replaces the
@@ -497,31 +515,49 @@ MenuControlButton *InstrumentTemplate::makeChannelRow(MenuSectionCollapseWidget 
 		sw->setChecked(true);
 		btn->layout()->addWidget(sw);
 	}
-	m_channelGroup->addButton(btn);
 
-	group->add(btn);
-
-	if(!menuId.isEmpty()) {
-		connect(btn, &QAbstractButton::clicked, this, [this, menuId](bool b) {
-			if(b) {
-				showMenuPage(menuId);
-			}
-		});
-	}
-
+	configureChannelRow(btn, btn, group, name, color, menuId, indent);
 	return btn;
 }
 
-MenuControlButton *InstrumentTemplate::addChannelRow(MenuSectionCollapseWidget *group, const QString &name,
+MenuControlButton *InstrumentTemplate::addChannelRow(CompositeWidget *group, const QString &name,
 						    const QColor &color, const QString &menuId, int indent)
 {
 	return makeChannelRow(group, name, color, menuId, indent, false);
 }
 
-MenuControlButton *InstrumentTemplate::addChannelSwitchRow(MenuSectionCollapseWidget *group, const QString &name,
+MenuControlButton *InstrumentTemplate::addChannelSwitchRow(CompositeWidget *group, const QString &name,
 							  const QColor &color, const QString &menuId, int indent)
 {
 	return makeChannelRow(group, name, color, menuId, indent, true);
+}
+
+CollapsableMenuControlButton *InstrumentTemplate::addExpandableChannelRow(CompositeWidget *group, const QString &name,
+									 const QColor &color, const QString &menuId)
+{
+	CollapsableMenuControlButton *row = new CollapsableMenuControlButton();
+	MenuControlButton *hdr = row->getControlBtn();
+
+	// Two things the constructor did that have to be undone: it made the header
+	// non-checkable, and it took the checkbox for the collapse arrow. Checkable again
+	// because the header is a rail row like any other — it joins the exclusive group
+	// and opens a page. The arrow keeps the checkbox, so a coloured circle is not
+	// available here and `color` is only carried for the label.
+	hdr->setCheckable(true);
+	configureChannelRow(hdr, row, group, name, QColor(), menuId, 0);
+	if(color.isValid()) {
+		hdr->setColor(color);
+	}
+
+	// The arrow is inside the header button, so a click on it would also select the row
+	// and switch the page. Transparent-for-mouse is not an option — it *is* the
+	// collapse control — so the row body's own click is what expands instead: one
+	// target, and selecting a source shows its children.
+	QCheckBox *arrow = hdr->checkBox();
+	arrow->setAttribute(Qt::WA_TransparentForMouseEvents);
+	connect(hdr, &QAbstractButton::clicked, arrow, [arrow]() { arrow->setChecked(true); });
+
+	return row;
 }
 
 SmallOnOffSwitch *InstrumentTemplate::rowSwitch(MenuControlButton *row)
@@ -534,8 +570,7 @@ SmallOnOffSwitch *InstrumentTemplate::rowSwitch(MenuControlButton *row)
 	return row->findChild<SmallOnOffSwitch *>();
 }
 
-void InstrumentTemplate::removeChannelRow(MenuSectionCollapseWidget *group, MenuControlButton *row,
-					  const QString &menuId)
+void InstrumentTemplate::removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId)
 {
 	if(!row) {
 		return;

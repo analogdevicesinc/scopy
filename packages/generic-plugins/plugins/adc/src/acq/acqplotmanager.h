@@ -189,6 +189,25 @@ private:
 	void reclaim(AcqChannel *ch);
 	void rebuildIndexRamp();
 
+	// Point every row's shared X axis at the right range, and the reason the X source is
+	// a per-channel choice at all: a curve on a frequency key spans 0..30 MHz while the
+	// index ramp spans 0..plotSize-1, and an axis pinned to the latter draws the former
+	// entirely off canvas.
+	//
+	// Per row, because the axis is per row (T7 — PlotAxis is unremovable, so channels
+	// share one). A row with any real-X curve gets the union of their spans; a row with
+	// none goes back to 0..plotSize-1. Called from replot() rather than from pull(),
+	// where the spans are produced: a row's range depends on every channel on it, so it
+	// can only be computed once they have all read, and replot() is already that point.
+	void syncXRanges();
+
+	// Mark the view stale, and repaint now if nothing else will. While the engine runs
+	// the frame timer picks the flag up within 16 ms, which is the whole point of the
+	// flag; while it is stopped the timer is off, so a change made between runs — a
+	// channel deleted, an X source repointed — would sit unpainted until the next Run.
+	// Not a hidden cost: a stopped instrument has no frames to compete with.
+	void requestFrame();
+
 	// A rail row under "Plots" plus the channel's settings page, both keyed on
 	// ch->menuId(). Called from addChannel, so a channel created at runtime from the
 	// key picker gets its row on the same path as one created at composition time.
@@ -203,9 +222,23 @@ private:
 	// Repopulates the key picker's list from the store. Called on keysChanged.
 	void refreshKeyPicker();
 
-	// Applies the registered sample rate and X-key pairing to a freshly attached
-	// channel, if its repr is a curve. Called from addChannel.
+	// Applies the registered sample rate and the key-list source to a freshly attached
+	// channel, if its repr is a curve. Called from addChannel and from setSampleRate,
+	// which re-runs it over every existing channel — so it must contain nothing the
+	// reader can override by hand.
 	void applyCurveDefaults(AcqChannel *ch);
+
+	// Points a curve at the X key registered for its Y key by setXKeyFor, if any.
+	// Separate from applyCurveDefaults for exactly the reason above: the X source is
+	// user-editable, so it may only be written when something actually asks for it —
+	// creating the channel, or registering the pairing — never as a side effect of an
+	// unrelated setting changing.
+	void applyXKeyDefault(AcqChannel *ch);
+
+	// Re-fills every curve's X-source combo from the store. Called on keysChanged, for
+	// the same reason refreshKeyPicker is: the settings pages are built once, and the
+	// keys they offer only exist after a run.
+	void refreshCurveKeySources();
 
 	QPointer<scopy::acq::DataStore> m_store;
 	QPointer<scopy::acq::AcquisitionEngine> m_engine;
@@ -220,6 +253,9 @@ private:
 	// instrument with no channels shows no empty group. Rows are owned by the shell.
 	MenuSectionCollapseWidget *m_railGroup{nullptr};
 	QMap<AcqChannel *, MenuControlButton *> m_railRows;
+	// The channel's settings page. Kept because removeMenuPage() only unstacks it —
+	// MapStackedWidget::remove deletes nothing — so unregisterRail has to.
+	QMap<AcqChannel *, QWidget *> m_railPages;
 
 	int m_plotSize{1024};
 	// 0..plotSize-1, borrowed by every CurveRepr with no X key. One ramp for all of
@@ -239,6 +275,9 @@ private:
 
 	QPointer<QListWidget> m_keyList;
 	QPointer<MenuCombo> m_keyKindCombo;
+	// The X source for the channel about to be created. Only meaningful for a Curve;
+	// disabled for the kinds that have no X stream.
+	QPointer<MenuCombo> m_keyXCombo;
 	QPointer<QPushButton> m_keyAddBtn;
 	// Stands in for the list while no key exists yet, which is the state the page is in
 	// until the engine's first cycle.
