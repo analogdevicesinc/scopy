@@ -181,6 +181,14 @@ void AcqInstrumentController::setupPlots()
 	if(fft) {
 		static_cast<CurveRepr *>(fft->repr())->setXKey(m_fftProc->freqKey());
 	}
+
+	// The same I stream as a digital track, which is the sign of I: toBits() maps any
+	// non-zero to 1, so it thresholds at zero rather than needing a UInt8 source. Not
+	// a measurement anyone wants — it is here because it exercises the fixed-height
+	// item path and its X alignment against the analog curves above it, which is the
+	// only thing a digital track can get wrong on its own.
+	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I sign", Style::getChannelColor(3),
+			    AcqPlotManager::ReprKind::Digital);
 }
 
 void AcqInstrumentController::stop()
