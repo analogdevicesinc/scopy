@@ -129,6 +129,9 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 							  scopy::acq::DataKey::withStage("pluto", "iq", "freq"),
 							  static_cast<int>(engine->bufferSize()), kPlutoSampleRate,
 							  GnWindowHann, engine);
+	// Lets the block claim chunk history when averaging is turned on: navg frames
+	// of nfft samples span more than one acquisition buffer.
+	m_fftProc->setAveragingStore(m_ui->store(), engine->bufferSize());
 	engine->addProcessor(m_fftProc);
 
 	// Rail rows, so both blocks are reachable and the pipeline tab has something to
@@ -277,15 +280,16 @@ void AcqInstrumentController::setupPlots()
 		});
 	}
 
-	// No plot channels are created here. The mechanism that decides which of the
-	// pipeline's keys become channels is being reworked; until it exists the plot opens
-	// empty, and AcqPlotManager::addChannel is the API whatever replaces it will call.
+	// No plot channels are created here, and none need to be: the manager materialises
+	// one per stream whose producer declared a ReprKind, so a block added to the
+	// pipeline appears on the plot without a line of code here. See
+	// AcqPlotManager::AutoPolicy.
 	if(m_fftProc) {
-		// The timeline every horizontal measurement is divided by. From the FFT
-		// processor because that is where the rate is configured — the source does not
-		// publish one. Without it period and frequency come out in samples, which is
-		// not wrong so much as unreadable.
-		m_plots->setSampleRate(m_fftProc->sampleRate());
+		// The timeline for channels whose producer declared no rate — the raw source
+		// channels, since SourceBlock cannot know the device rate. From the FFT
+		// processor because that is where the rate is configured. A stream that carries
+		// its own rate (the FFT magnitudes do) ignores this.
+		m_plots->setFallbackSampleRate(m_fftProc->sampleRate());
 	}
 }
 
