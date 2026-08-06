@@ -24,8 +24,10 @@
 
 #include <core/acq_engine/DataKey.h>
 // Not forward-declared: QPointer needs the complete type, and the shell is what
-// phase 2's rail rows and menu pages are built on.
+// phase 2's rail rows and menu pages are built on. Same for MenuCombo, held by the
+// key picker.
 #include <gui/instrumenttemplate.h>
+#include <gui/widgets/menucombo.h>
 
 #include <QList>
 #include <QMap>
@@ -35,11 +37,15 @@
 
 #include <memory>
 
+class QListWidget;
 class QSplitter;
 class QTimer;
 
 namespace scopy {
+class CursorController;
+class MeasurementsPanel;
 class PlotWidget;
+class StatsPanel;
 
 namespace acq {
 class AcquisitionEngine;
@@ -100,6 +106,28 @@ public:
 	// For CursorController, the panels, and anything else that binds to a PlotWidget.
 	PlotWidget *sharedPlot() const;
 
+	// Cursors over row 0. Created on first call, so an instrument that never asks for
+	// them pays nothing — CursorController installs four draggable handles and an
+	// event filter on the canvas whether or not they are visible. The caller wires the
+	// returned controller's setVisible() to whatever toggles it, and its
+	// CursorSettings page is registered under the id this returns in `settingsId`.
+	CursorController *cursors(QString *settingsId = nullptr);
+
+	// The measurement and stats readouts, in PS_BOTTOM and PS_RIGHT. Created on first
+	// call and hidden until a label lands in one: both panels hide themselves when
+	// their label list empties, so an empty panel must not be shown at all or it
+	// reserves plot height for nothing.
+	MeasurementsPanel *measurePanel();
+	StatsPanel *statsPanel();
+
+	// A page listing every key the store currently holds, with a repr picker and an
+	// Add button. This is the one place ReprKind::Auto is meaningful: a key offered
+	// here has been written at least once, so DataStore::typeOf() can answer.
+	//
+	// Registered under the returned id and given a rail header row, so it is reachable
+	// without a channel existing yet.
+	QString createKeyPickerPage();
+
 public Q_SLOTS:
 	// Resizes the index ramp, rescales X, and re-claims every channel: depth is
 	// ceil(plotSize/bufferSize), so a wider window needs more chunks.
@@ -143,6 +171,14 @@ private:
 	void registerRail(AcqChannel *ch);
 	void unregisterRail(AcqChannel *ch);
 
+	// Binds the channel's repr's measure manager to the two panels, if it has one.
+	// Called from addChannel; a repr with nothing to measure (digital, waterfall) is
+	// silently skipped.
+	void registerMeasurements(AcqChannel *ch);
+
+	// Repopulates the key picker's list from the store. Called on keysChanged.
+	void refreshKeyPicker();
+
 	QPointer<scopy::acq::DataStore> m_store;
 	QPointer<scopy::acq::AcquisitionEngine> m_engine;
 	QPointer<InstrumentTemplate> m_shell;
@@ -165,6 +201,15 @@ private:
 	QTimer *m_frameTimer{nullptr};
 	bool m_dirty{false};
 	int m_uidCounter{0};
+
+	// All created on demand. Parented into the shell's slots or stack, hence QPointer:
+	// the shell can outlive this widget on some teardown orders.
+	QPointer<CursorController> m_cursors;
+	QPointer<MeasurementsPanel> m_measurePanel;
+	QPointer<StatsPanel> m_statsPanel;
+
+	QPointer<QListWidget> m_keyList;
+	QPointer<MenuCombo> m_keyKindCombo;
 };
 
 } // namespace adc

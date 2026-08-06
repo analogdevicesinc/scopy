@@ -31,9 +31,11 @@
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
+#include <gui/cursorcontroller.h>
 #include <gui/instrumenttemplate.h>
 #include <gui/style.h>
 
+#include <QPushButton>
 #include <QVBoxLayout>
 
 using namespace scopy;
@@ -161,6 +163,31 @@ void AcqInstrumentController::setupPlots()
 	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots,
 		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
 
+	// Cursors over row 0. The controller and its settings page are created here rather
+	// than lazily on the first click because the page has to be in the stack before the
+	// button can show it.
+	QString cursorPageId;
+	if(CursorController *cursors = m_plots->cursors(&cursorPageId)) {
+		QPushButton *cursorBtn = new QPushButton(tr("Cursors"), it);
+		cursorBtn->setCheckable(true);
+		Style::setStyle(cursorBtn, style::properties::button::basicButton);
+		it->addToTopRail(cursorBtn, TTA_RIGHT);
+		connect(cursorBtn, &QPushButton::toggled, cursors, &CursorController::setVisible);
+		// Showing the page on toggle-on only: unchecking hides the cursors, and yanking
+		// the reader out of a page they may have navigated to on purpose would be worse
+		// than leaving it up.
+		connect(cursorBtn, &QPushButton::toggled, it, [it, cursorPageId](bool on) {
+			if(on) {
+				it->showMenuPage(cursorPageId);
+			}
+		});
+	}
+
+	// The key picker. Deliberately before the composed channels: it lists whatever the
+	// store holds, so it is useful even when setupBlocks() found no context and the four
+	// channels below are never created.
+	m_plots->createKeyPickerPage();
+
 	if(!m_plutoSrc || !m_fftProc) {
 		// setupBlocks() bailed for want of a context. The manager still exists — an
 		// empty plot beats no center widget — but there are no keys to point at.
@@ -169,10 +196,21 @@ void AcqInstrumentController::setupPlots()
 
 	// Explicit kinds throughout: nothing has been written yet, so DataStore::typeOf()
 	// is nullopt and ReprKind::Auto could only guess.
-	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I", Style::getChannelColor(0),
-			    AcqPlotManager::ReprKind::Curve);
-	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage1"), "Q", Style::getChannelColor(1),
-			    AcqPlotManager::ReprKind::Curve);
+	AcqChannel *iCh = m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I",
+					      Style::getChannelColor(0), AcqPlotManager::ReprKind::Curve);
+	AcqChannel *qCh = m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage1"), "Q",
+					      Style::getChannelColor(1), AcqPlotManager::ReprKind::Curve);
+
+	// The timeline every horizontal measurement is divided by. Taken from the FFT
+	// processor because that is where the rate is configured — the source does not
+	// publish one. Without it period and frequency come out in samples, which is not
+	// wrong so much as unreadable.
+	const double sr = m_fftProc->sampleRate();
+	for(AcqChannel *ch : {iCh, qCh}) {
+		if(ch) {
+			static_cast<CurveRepr *>(ch->repr())->setSampleRate(sr);
+		}
+	}
 
 	// The FFT is the one channel with a real X stream: the processor writes the bin
 	// frequencies to a second key, so the curve is drawn against Hz rather than the

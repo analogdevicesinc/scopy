@@ -26,14 +26,22 @@
 #include "acqdigitalrepr.h"
 #include "acqplotrow.h"
 #include "acqwaterfallrepr.h"
+#include "measurementcontroller.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
 
+#include <gui/cursorcontroller.h>
 #include <gui/plotaxis.h>
 #include <gui/plotwidget.h>
+#include <gui/style.h>
+#include <gui/widgets/cursorsettings.h>
+#include <gui/widgets/measurementpanel.h>
+#include <gui/widgets/menusectionwidget.h>
 
+#include <QListWidget>
 #include <QLoggingCategory>
+#include <QPushButton>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QTimer>
@@ -51,6 +59,10 @@ namespace {
 // ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
 // extra cycles into one repaint.
 constexpr int kFrameIntervalMs = 16;
+
+// Menu ids for the two pages the manager owns itself, as opposed to one per channel.
+constexpr const char *kCursorPageId = "acq-cursors";
+constexpr const char *kKeyPickerPageId = "acq-keys";
 
 } // namespace
 
@@ -209,8 +221,10 @@ AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QSt
 
 	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
 
-	// After attach(): the settings page binds to the repr's PlotChannel and to the
-	// row's axis, neither of which exists before it.
+	// Both after attach(): the settings page binds to the repr's PlotChannel and the
+	// row's axis, and the measure manager is created in attach() too (it needs the
+	// pen colour).
+	registerMeasurements(ch);
 	registerRail(ch);
 
 	return ch;
@@ -272,6 +286,184 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 	}
 	// Four steps, done by the shell: button group, layout, menu page, deleteLater.
 	m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
+}
+
+MeasurementsPanel *AcqPlotManager::measurePanel()
+{
+	if(m_measurePanel.isNull() && !m_shell.isNull()) {
+		m_measurePanel = new MeasurementsPanel(this);
+		// Both hide themselves when their label list empties
+		// (gui/src/widgets/measurementpanel.cpp:174-176), so starting hidden keeps the
+		// two states consistent — otherwise an untouched instrument reserves plot
+		// height for an empty strip that would never come back once hidden.
+		m_measurePanel->setVisible(false);
+		m_shell->addToSlot(PS_BOTTOM, m_measurePanel);
+	}
+	return m_measurePanel.data();
+}
+
+StatsPanel *AcqPlotManager::statsPanel()
+{
+	if(m_statsPanel.isNull() && !m_shell.isNull()) {
+		m_statsPanel = new StatsPanel(this);
+		m_statsPanel->setVisible(false);
+		m_shell->addToSlot(PS_RIGHT, m_statsPanel);
+	}
+	return m_statsPanel.data();
+}
+
+void AcqPlotManager::registerMeasurements(AcqChannel *ch)
+{
+	if(!ch || !ch->repr()) {
+		return;
+	}
+	MeasureManagerInterface *mgr = ch->repr()->measureManager();
+	if(!mgr) {
+		// A digital track or a waterfall. Nothing to measure, and no panel to create
+		// for it — which is why the panels are built lazily here rather than in the
+		// constructor.
+		return;
+	}
+
+	MeasurementsPanel *meas = measurePanel();
+	StatsPanel *stats = statsPanel();
+	if(!meas || !stats) {
+		return;
+	}
+
+	connect(mgr, &MeasureManagerInterface::enableMeasurement, meas, &MeasurementsPanel::addMeasurement);
+	connect(mgr, &MeasureManagerInterface::disableMeasurement, meas, &MeasurementsPanel::removeMeasurement);
+	// The panel is shown by the first label rather than up front, and never hidden
+	// here: it hides itself when the last label goes.
+	connect(mgr, &MeasureManagerInterface::enableMeasurement, meas, [meas]() { meas->setVisible(true); });
+
+	connect(mgr, &MeasureManagerInterface::enableStat, stats, &StatsPanel::addStat);
+	connect(mgr, &MeasureManagerInterface::disableStat, stats, &StatsPanel::removeStat);
+	connect(mgr, &MeasureManagerInterface::enableStat, stats, [stats]() { stats->setVisible(true); });
+
+	// The panels' own "hide all" button unchecks every selector box, which is what
+	// actually removes the labels — the button alone would leave the model measuring.
+	// inhibitUpdates around it because removeMeasurement relayouts the whole stack per
+	// label otherwise (measurementpanel.cpp:178-182).
+	connect(meas, &MeasurementsPanel::hideAll, mgr, [meas, mgr]() {
+		meas->setInhibitUpdates(true);
+		Q_EMIT mgr->toggleAllMeasurement(false);
+		meas->setInhibitUpdates(false);
+	});
+	connect(stats, &StatsPanel::hideAll, mgr, [mgr]() { Q_EMIT mgr->toggleAllStats(false); });
+}
+
+CursorController *AcqPlotManager::cursors(QString *settingsId)
+{
+	if(settingsId) {
+		*settingsId = QString::fromLatin1(kCursorPageId);
+	}
+	if(!m_cursors.isNull()) {
+		return m_cursors.data();
+	}
+	PlotWidget *plot = sharedPlot();
+	if(!plot || m_shell.isNull()) {
+		return nullptr;
+	}
+
+	m_cursors = new CursorController(plot, this);
+	CursorSettings *settings = new CursorSettings(this);
+	m_cursors->connectSignals(settings);
+	m_shell->addMenuPage(QString::fromLatin1(kCursorPageId), settings);
+	// Cursors off until asked for: the handles are created either way, but a plot that
+	// opens with four cursors on it is not what anyone wants.
+	m_cursors->setVisible(false);
+	return m_cursors.data();
+}
+
+QString AcqPlotManager::createKeyPickerPage()
+{
+	const QString id = QString::fromLatin1(kKeyPickerPageId);
+	if(m_shell.isNull() || m_shell->hasMenuPage(id)) {
+		return id;
+	}
+
+	QWidget *page = new QWidget(this);
+	QVBoxLayout *lay = new QVBoxLayout(page);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	// SO_VIEW: adding a plot channel reads a key, it does not configure a block.
+	MenuSectionCollapseWidget *section = m_shell->createMenuSection(QStringLiteral("ADD CHANNEL"), SO_VIEW, page);
+
+	m_keyList = new QListWidget(section);
+	m_keyList->setSelectionMode(QAbstractItemView::SingleSelection);
+	section->add(m_keyList);
+
+	m_keyKindCombo = new MenuCombo(QStringLiteral("Representation"), section);
+	// Auto first, and it is finally honest here: every key in this list has been
+	// written at least once, so DataStore::typeOf() can answer and makeRepr's
+	// type switch is a real decision rather than a fallback to Curve.
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Auto"), static_cast<int>(ReprKind::Auto));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Curve"), static_cast<int>(ReprKind::Curve));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Digital"), static_cast<int>(ReprKind::Digital));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Waterfall"), static_cast<int>(ReprKind::Waterfall));
+	section->add(m_keyKindCombo);
+
+	QPushButton *addBtn = new QPushButton(QObject::tr("Add"), section);
+	Style::setStyle(addBtn, style::properties::button::basicButton);
+	section->add(addBtn);
+	connect(addBtn, &QPushButton::clicked, this, [this]() {
+		if(m_keyList.isNull() || !m_keyList->currentItem() || m_keyKindCombo.isNull()) {
+			return;
+		}
+		const scopy::acq::DataKey key(m_keyList->currentItem()->text());
+		const ReprKind kind = static_cast<ReprKind>(m_keyKindCombo->combo()->currentData().toInt());
+		// Name guessed from the key's channel segment, colour cycled by channel count.
+		// Both are editable from the new channel's own page, so guessing is fine — and
+		// channelId() is empty for a key that does not follow the source_channel_stage
+		// convention, hence the fallback to the whole key.
+		const QString chId = key.channelId();
+		AcqChannel *ch = addChannel(key, chId.isEmpty() ? key.toString() : chId,
+					    Style::getChannelColor(m_channels.count()), kind);
+		if(!ch) {
+			// makeRepr refused — an annotation stream, which has no numeric repr.
+			return;
+		}
+		// Straight to the new channel's page: the guessed name and colour are the first
+		// things a reader will want to change.
+		if(!m_shell.isNull()) {
+			m_shell->showMenuPage(ch->menuId());
+		}
+	});
+
+	lay->addWidget(section);
+	lay->addStretch();
+
+	m_shell->addMenuPage(id, page);
+	// Pinned above the groups rather than inside one: it is not a channel, and it has
+	// to be reachable before any channel exists.
+	m_shell->addRailHeaderRow(QStringLiteral("Add channel"), id);
+
+	refreshKeyPicker();
+	return id;
+}
+
+void AcqPlotManager::refreshKeyPicker()
+{
+	if(m_keyList.isNull() || m_store.isNull()) {
+		return;
+	}
+	// Rebuilt wholesale rather than diffed: the list is short, and the selection is
+	// only meaningful at the moment Add is pressed. Preserve it anyway so a key
+	// arriving mid-choice does not move the target out from under the pointer.
+	const QString selected = m_keyList->currentItem() ? m_keyList->currentItem()->text() : QString();
+
+	m_keyList->clear();
+	const QList<scopy::acq::DataKey> keys = m_store->keys();
+	for(const scopy::acq::DataKey &k : keys) {
+		m_keyList->addItem(k.toString());
+	}
+	if(!selected.isEmpty()) {
+		const QList<QListWidgetItem *> found = m_keyList->findItems(selected, Qt::MatchExactly);
+		if(!found.isEmpty()) {
+			m_keyList->setCurrentItem(found.first());
+		}
+	}
 }
 
 void AcqPlotManager::rebuildIndexRamp()
