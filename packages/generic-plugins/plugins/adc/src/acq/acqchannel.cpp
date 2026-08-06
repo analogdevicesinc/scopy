@@ -48,6 +48,14 @@ AcqChannel::AcqChannel(scopy::acq::DataStore *store, const scopy::acq::DataKey &
 {
 	// No depth claim here: plotSize and bufferSize belong to the manager, which
 	// calls reclaimDepth() right after attaching us.
+	//
+	// But a repr can change its own requirement later (a waterfall's row count), and
+	// it knows neither plotSize nor bufferSize. Forward it as a signal so the manager
+	// can re-claim with the numbers it owns. Capturing `this` is safe: the repr is a
+	// member and cannot outlive us.
+	if(m_repr) {
+		m_repr->setReclaimNotifier([this]() { Q_EMIT depthNeedsReclaim(); });
+	}
 }
 
 AcqChannel::~AcqChannel()
