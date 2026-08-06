@@ -195,6 +195,17 @@ public:
 	MenuControlButton *addChannelSwitchRow(MenuSectionCollapseWidget *group, const QString &name,
 					       const QColor &color, const QString &menuId, int indent = 0);
 
+	// The switch inside a row built by addChannelSwitchRow, so an owner can bind it
+	// without knowing how the row is assembled. Null for a row built by
+	// addChannelRow — those have a checkbox instead.
+	static SmallOnOffSwitch *rowSwitch(MenuControlButton *row);
+
+	// Undoes addChannelRow/addChannelSwitchRow. Four steps rather than one because
+	// the row is registered in three places: the exclusive button group (which would
+	// otherwise keep a dangling pointer), the group's layout, and the menu stack.
+	// `menuId` may be empty for a row that registered no page.
+	void removeChannelRow(MenuSectionCollapseWidget *group, MenuControlButton *row, const QString &menuId);
+
 	// A row pinned above the scroll area, outside every group. Used for the
 	// device/general-settings entry.
 	MenuControlButton *addRailHeaderRow(const QString &name, const QString &menuId);

@@ -32,6 +32,7 @@
 #include <gui/plotwidget.h>
 
 #include <QLoggingCategory>
+#include <QSignalBlocker>
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -203,6 +204,10 @@ AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QSt
 
 	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
 
+	// After attach(): the settings page binds to the repr's PlotChannel and to the
+	// row's axis, neither of which exists before it.
+	registerRail(ch);
+
 	return ch;
 }
 
@@ -211,8 +216,57 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 	if(!ch || !m_channels.removeOne(ch)) {
 		return;
 	}
+	unregisterRail(ch);
 	// The destructor detaches and releases the claim.
 	delete ch;
+}
+
+void AcqPlotManager::registerRail(AcqChannel *ch)
+{
+	if(!ch || m_shell.isNull() || m_railRows.contains(ch)) {
+		return;
+	}
+
+	if(!m_railGroup) {
+		m_railGroup = m_shell->addChannelGroup(QStringLiteral("Plots"));
+	}
+
+	const QString id = ch->menuId();
+	MenuControlButton *row = m_shell->addChannelSwitchRow(m_railGroup, ch->name(), ch->color(), id);
+	m_railRows.insert(ch, row);
+
+	// Built once, here, and never rebuilt — which is only sound because the key and
+	// the repr are fixed for the channel's life.
+	m_shell->addMenuPage(id, ch->createSettingsPage(m_shell.data()));
+
+	if(SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row)) {
+		connect(sw, &QAbstractButton::toggled, ch, &AcqChannel::setEnabled);
+		// Both directions: a channel can be disabled from code (a vanished key), and
+		// the switch has to show it.
+		connect(ch, &AcqChannel::enabledChanged, sw, [sw](bool en) {
+			QSignalBlocker b(sw);
+			sw->setChecked(en);
+		});
+		sw->setChecked(ch->isEnabled());
+	}
+
+	// The rail row is the channel's name in the UI, so a rename from the settings page
+	// has to reach it.
+	connect(ch, &AcqChannel::nameChanged, row, [row](const QString &n) { row->setName(n); });
+	connect(ch, &AcqChannel::colorChanged, row, [row](const QColor &c) { row->setColor(c); });
+}
+
+void AcqPlotManager::unregisterRail(AcqChannel *ch)
+{
+	if(!ch) {
+		return;
+	}
+	MenuControlButton *row = m_railRows.take(ch);
+	if(!row || m_shell.isNull()) {
+		return;
+	}
+	// Four steps, done by the shell: button group, layout, menu page, deleteLater.
+	m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
 }
 
 void AcqPlotManager::rebuildIndexRamp()

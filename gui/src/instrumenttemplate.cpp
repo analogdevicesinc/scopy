@@ -524,6 +524,41 @@ MenuControlButton *InstrumentTemplate::addChannelSwitchRow(MenuSectionCollapseWi
 	return makeChannelRow(group, name, color, menuId, indent, true);
 }
 
+SmallOnOffSwitch *InstrumentTemplate::rowSwitch(MenuControlButton *row)
+{
+	if(!row) {
+		return nullptr;
+	}
+	// makeChannelRow appends the switch into the row's own layout rather than
+	// exposing it, so this is the only way back to it.
+	return row->findChild<SmallOnOffSwitch *>();
+}
+
+void InstrumentTemplate::removeChannelRow(MenuSectionCollapseWidget *group, MenuControlButton *row,
+					  const QString &menuId)
+{
+	if(!row) {
+		return;
+	}
+
+	// First, and not optional: QButtonGroup does not observe its buttons' deletion
+	// through this path, so a row left in the group is a dangling pointer the next
+	// exclusive-selection walk would follow.
+	m_channelGroup->removeButton(row);
+
+	if(group) {
+		// Layout only — CompositeWidget::remove neither deletes nor unregisters.
+		group->remove(row);
+	}
+	if(!menuId.isEmpty()) {
+		removeMenuPage(menuId);
+	}
+
+	// deleteLater, not delete: this is usually called from the row's own toggled
+	// handler, so the button must outlive the signal emission.
+	row->deleteLater();
+}
+
 MenuControlButton *InstrumentTemplate::addRailHeaderRow(const QString &name, const QString &menuId)
 {
 	MenuControlButton *btn = new MenuControlButton(m_vcm);
