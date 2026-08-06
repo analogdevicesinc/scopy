@@ -23,11 +23,9 @@
 #define ACQPLOTMANAGER_H
 
 #include <core/acq_engine/DataKey.h>
-// Not forward-declared: QPointer needs the complete type, and the shell is what
-// phase 2's rail rows and menu pages are built on. Same for MenuCombo, held by the
-// key picker.
+// Not forward-declared: QPointer needs the complete type, and the shell is what the
+// rail rows and menu pages are built on.
 #include <gui/instrumenttemplate.h>
-#include <gui/widgets/menucombo.h>
 
 #include <QList>
 #include <QMap>
@@ -37,9 +35,6 @@
 
 #include <memory>
 
-class QLabel;
-class QListWidget;
-class QPushButton;
 class QSplitter;
 class QTimer;
 
@@ -80,8 +75,8 @@ public:
 	// Which representation a new channel gets. Auto resolves via
 	// DataStore::typeOf(), which returns nullopt until the key has been written once
 	// (SampleBuffer::type()) — so channels created at composition time, before the
-	// engine has ever run, must name their kind. Auto is for channels created in
-	// response to keysChanged, where the key exists by definition.
+	// engine has ever run, must name their kind. Auto is only meaningful for a channel
+	// created after the key has been written at least once.
 	enum class ReprKind
 	{
 		Auto,
@@ -126,31 +121,12 @@ public:
 	MeasurementsPanel *measurePanel();
 	StatsPanel *statsPanel();
 
-	// A page listing every key the store currently holds, with a repr picker and an
-	// Add button. This is the one place ReprKind::Auto is meaningful: a key offered
-	// here has been written at least once, so DataStore::typeOf() can answer.
-	//
-	// Registered under the returned id and given a rail header row, so it is reachable
-	// without a channel existing yet.
-	QString createKeyPickerPage();
-
-	// ---- defaults for channels the reader creates -----------------------------
-	//
-	// Every plot channel is now made from the key picker, so anything a composed
-	// channel used to be handed at construction has to be registered here instead and
-	// applied by addChannel(). Both are set once by the controller, which is the only
-	// place that knows the pipeline.
-
 	// The timeline horizontal measurements are divided by, applied to every CurveRepr.
 	// Unset means 1.0, i.e. measurements come out in samples. Applies to channels
 	// created after this call and, so the order of the two does not matter, to those
-	// that already exist.
+	// that already exist. Set by the controller, which is the only place that knows the
+	// pipeline.
 	void setSampleRate(double sr);
-
-	// Draw any curve on `key` against `xKey` rather than the sample-index ramp. This
-	// is how an FFT magnitude channel gets a frequency axis: the picker offers keys,
-	// not the relationships between them, so the pairing has to be declared.
-	void setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey);
 
 public Q_SLOTS:
 	// Resizes the index ramp, rescales X, and re-claims every channel: depth is
@@ -174,9 +150,10 @@ Q_SIGNALS:
 	// PlotManager::newData() (gui/src/plotmanager.cpp:177).
 	void newData();
 
-	// The store's key set changed, on the GUI thread. For a key picker; the manager
-	// deliberately creates nothing by itself — a pluto + FFT pipeline publishes four
-	// keys, and four unasked-for curves is worse than an empty plot.
+	// The store's key set changed, on the GUI thread. The manager deliberately creates
+	// nothing in response — a pluto + FFT pipeline publishes four keys, and four
+	// unasked-for curves is worse than an empty plot. Whoever decides which keys become
+	// channels listens here.
 	void keysAvailable(QList<scopy::acq::DataKey> keys);
 
 private Q_SLOTS:
@@ -190,8 +167,7 @@ private:
 	void rebuildIndexRamp();
 
 	// A rail row under "Plots" plus the channel's settings page, both keyed on
-	// ch->menuId(). Called from addChannel, so a channel created at runtime from the
-	// key picker gets its row on the same path as one created at composition time.
+	// ch->menuId(). Called from addChannel, so every channel gets its row on one path.
 	void registerRail(AcqChannel *ch);
 	void unregisterRail(AcqChannel *ch);
 
@@ -200,11 +176,9 @@ private:
 	// silently skipped.
 	void registerMeasurements(AcqChannel *ch);
 
-	// Repopulates the key picker's list from the store. Called on keysChanged.
-	void refreshKeyPicker();
-
-	// Applies the registered sample rate and X-key pairing to a freshly attached
-	// channel, if its repr is a curve. Called from addChannel.
+	// Applies the registered sample rate to a freshly attached channel, if its repr is a
+	// curve. Called from addChannel and from setSampleRate, which re-runs it over every
+	// existing channel — so it must contain nothing that is per-channel state.
 	void applyCurveDefaults(AcqChannel *ch);
 
 	QPointer<scopy::acq::DataStore> m_store;
@@ -220,6 +194,9 @@ private:
 	// instrument with no channels shows no empty group. Rows are owned by the shell.
 	MenuSectionCollapseWidget *m_railGroup{nullptr};
 	QMap<AcqChannel *, MenuControlButton *> m_railRows;
+	// The channel's settings page. Kept because removeMenuPage() only unstacks it —
+	// MapStackedWidget::remove deletes nothing — so unregisterRail has to.
+	QMap<AcqChannel *, QWidget *> m_railPages;
 
 	int m_plotSize{1024};
 	// 0..plotSize-1, borrowed by every CurveRepr with no X key. One ramp for all of
@@ -237,16 +214,8 @@ private:
 	QPointer<MeasurementsPanel> m_measurePanel;
 	QPointer<StatsPanel> m_statsPanel;
 
-	QPointer<QListWidget> m_keyList;
-	QPointer<MenuCombo> m_keyKindCombo;
-	QPointer<QPushButton> m_keyAddBtn;
-	// Stands in for the list while no key exists yet, which is the state the page is in
-	// until the engine's first cycle.
-	QPointer<QLabel> m_keyHint;
-
-	// Registered by the controller, applied to every curve the reader creates.
+	// Registered by the controller, applied to every curve.
 	double m_sampleRate{1.0};
-	QMap<scopy::acq::DataKey, scopy::acq::DataKey> m_xKeys;
 };
 
 } // namespace adc
