@@ -21,6 +21,7 @@
 
 #include "acqplotmanager.h"
 
+#include "acqannotationrepr.h"
 #include "acqchannel.h"
 #include "acqcurverepr.h"
 #include "acqdigitalrepr.h"
@@ -152,12 +153,12 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 		} else {
 			switch(*t) {
 			case scopy::acq::SampleType::Annotation:
-				// Every numeric conversion returns empty for annotations, so a curve
-				// or a digital track here would silently draw nothing. Refuse
-				// visibly instead; an AnnotationRepr is the eventual answer.
-				qWarning(CAT_ACQ_PLOTMANAGER)
-					<< "no representation for annotation stream" << key.toString();
-				return nullptr;
+				// The one type Auto can resolve exactly rather than guess: an
+				// annotation stream has no numeric conversion at all (toFloat and
+				// toBits both return empty for it), so AnnotationRepr is not a
+				// heuristic, it is the only representation that can read it.
+				kind = ReprKind::Annotations;
+				break;
 			case scopy::acq::SampleType::UInt8:
 			case scopy::acq::SampleType::Int8:
 				// A heuristic, not a truth: an 8-bit ADC stream would land here too.
@@ -168,6 +169,21 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 				kind = ReprKind::Curve;
 				break;
 			}
+		}
+	}
+
+	// Auto cannot land here — it resolves annotations to AnnotationRepr — but an
+	// explicit kind can, and this is the one combination that fails silently rather
+	// than visibly: toFloat and toBits both return empty for an annotation stream, so
+	// a curve or a digital track pointed at one draws nothing and looks like a dead
+	// key. Refuse with a warning instead.
+	if(kind != ReprKind::Annotations && !m_store.isNull()) {
+		const std::optional<scopy::acq::SampleType> t = m_store->typeOf(key);
+		if(t.has_value() && *t == scopy::acq::SampleType::Annotation) {
+			qWarning(CAT_ACQ_PLOTMANAGER)
+				<< "key" << key.toString()
+				<< "is an annotation stream; only ReprKind::Annotations can read it";
+			return nullptr;
 		}
 	}
 
@@ -185,6 +201,8 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 		// Never picked by Auto: any Float32 stream converts, but a spectrogram of a
 		// time-domain stream is noise. It has to be asked for.
 		return std::make_unique<WaterfallRepr>();
+	case ReprKind::Annotations:
+		return std::make_unique<AnnotationRepr>();
 	case ReprKind::Auto:
 		break;
 	}
@@ -402,6 +420,7 @@ QString AcqPlotManager::createKeyPickerPage()
 	m_keyKindCombo->combo()->addItem(QStringLiteral("Curve"), static_cast<int>(ReprKind::Curve));
 	m_keyKindCombo->combo()->addItem(QStringLiteral("Digital"), static_cast<int>(ReprKind::Digital));
 	m_keyKindCombo->combo()->addItem(QStringLiteral("Waterfall"), static_cast<int>(ReprKind::Waterfall));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Annotations"), static_cast<int>(ReprKind::Annotations));
 	section->add(m_keyKindCombo);
 
 	QPushButton *addBtn = new QPushButton(QObject::tr("Add"), section);
@@ -421,7 +440,9 @@ QString AcqPlotManager::createKeyPickerPage()
 		AcqChannel *ch = addChannel(key, chId.isEmpty() ? key.toString() : chId,
 					    Style::getChannelColor(m_channels.count()), kind);
 		if(!ch) {
-			// makeRepr refused — an annotation stream, which has no numeric repr.
+			// makeRepr refused. Only reachable by naming a kind that cannot read the
+			// key — a Curve or Digital on an annotation stream — since Auto resolves
+			// every type there is.
 			return;
 		}
 		// Straight to the new channel's page: the guessed name and colour are the first

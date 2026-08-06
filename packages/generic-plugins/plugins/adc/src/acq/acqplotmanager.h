@@ -84,16 +84,18 @@ public:
 		Auto,
 		Curve,
 		Digital,
-		Waterfall
+		Waterfall,
+		Annotations
 	};
 
 	AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::AcquisitionEngine *engine, InstrumentTemplate *shell,
 		       QWidget *parent = nullptr);
 	~AcqPlotManager() override;
 
-	// Returns null when the kind cannot be represented (an annotation stream has no
-	// numeric repr — every conversion in SampleBuffer returns empty for it, so a
-	// curve pointed at one would silently draw nothing).
+	// Returns null when the named kind cannot read the key: a Curve or Digital on an
+	// annotation stream, where every numeric conversion returns empty and the channel
+	// would silently draw nothing. Auto never hits this — it resolves annotations to
+	// ReprKind::Annotations.
 	AcqChannel *addChannel(const scopy::acq::DataKey &key, const QString &name, const QColor &color,
 			       ReprKind kind = ReprKind::Auto);
 	void removeChannel(AcqChannel *ch);
