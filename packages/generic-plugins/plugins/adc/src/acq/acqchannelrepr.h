@@ -29,6 +29,7 @@
 #include <QWidget>
 
 #include <cstddef>
+#include <functional>
 
 namespace scopy {
 class PlotWidget;
@@ -109,6 +110,28 @@ public:
 	// DataStore::claimDepth() under its own claimant name.
 	virtual std::size_t claimDepth(int plotSize, std::size_t bufferSize) const = 0;
 
+	// A repr whose claimDepth() answer can change on its own — a waterfall's row
+	// count is a setting, not a function of plotSize — calls this to say so. The
+	// channel installs a callback that emits AcqChannel::depthNeedsReclaim, which
+	// the manager turns back into a claim with the plotSize and bufferSize only it
+	// knows.
+	//
+	// A std::function rather than a signal because AcqChannelRepr is deliberately
+	// not a QObject: reprs are held by value in a unique_ptr, and the one thing
+	// they need to push upwards is not worth a moc pass and a second QObject in
+	// every subclass.
+	void setReclaimNotifier(std::function<void()> fn) { m_reclaimNotifier = std::move(fn); }
+
+protected:
+	void requestReclaim() const
+	{
+		if(m_reclaimNotifier) {
+			m_reclaimNotifier();
+		}
+	}
+
+public:
+
 	// ---- settings ----------------------------------------------------------
 
 	// The repr's own knobs — axis range, curve style, autoscale, intensity range.
@@ -128,6 +151,9 @@ public:
 
 	virtual void setColor(const QColor &c) { Q_UNUSED(c) }
 	virtual void setName(const QString &n) { Q_UNUSED(n) }
+
+private:
+	std::function<void()> m_reclaimNotifier;
 };
 
 } // namespace adc
