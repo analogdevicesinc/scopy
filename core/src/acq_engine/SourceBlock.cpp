@@ -96,6 +96,16 @@ QList<QString> SourceBlock::channelIds() const
 	return m_channels.keys();
 }
 
+QList<DataKey> SourceBlock::outputKeys() const
+{
+	QMutexLocker lk(&m_channelMutex);
+	QList<DataKey> result;
+	result.reserve(m_channels.size());
+	for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it)
+		result.append(DataKey::raw(m_name, it.key()));
+	return result;
+}
+
 QWidget *SourceBlock::createSettingsWidget(QWidget *parent)
 {
 	auto *channels = new QWidget;

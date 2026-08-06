@@ -34,6 +34,20 @@ bool Block::wantsReport(AcquisitionError::Severity sev) const
 	return engine && sev >= engine->minReportSeverity();
 }
 
+QWidget *Block::settingsWidget(QWidget *parent)
+{
+	if(m_settingsWidget.isNull())
+		m_settingsWidget = createSettingsWidget(parent);
+	return m_settingsWidget;
+}
+
+void Block::setSettingsWidget(QWidget *w)
+{
+	if(!w || !m_settingsWidget.isNull())
+		return;
+	m_settingsWidget = w;
+}
+
 QWidget *Block::createSettingsWidget(QWidget *parent)
 {
 	auto *cb = new QCheckBox(QStringLiteral("Enabled"), parent);

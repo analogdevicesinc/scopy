@@ -59,8 +59,12 @@ public:
 	void setMode(Mode m);
 	Mode mode() const;
 
-	void         setBufferSize(std::size_t size);
-	std::size_t  bufferSize() const;
+	void        setBufferSize(std::size_t size);
+	std::size_t bufferSize() const;
+
+	// The cycleComplete() rate ceiling; 0 means "as fast as the pipeline runs".
+	// Safe to call while running — the worker re-reads it every cycle, so a change
+	// takes effect on the next one.
 	void         setMaxFPS(unsigned int fps);
 	unsigned int maxFPS() const;
 
@@ -84,6 +88,9 @@ Q_SIGNALS:
 	void forceStopped();
 	void cycleComplete();
 	void error(int severity, const QString &id, const QString &message);
+	// A queued add/remove was applied, so sources()/processors() changed. Fires
+	// on the worker thread while running, on the caller's thread when stopped.
+	void blocksChanged();
 
 private:
 	void startLoop(int acqCount);
@@ -134,9 +141,12 @@ private:
 	std::atomic<Mode> m_mode{Mode::Triggered};
 	std::atomic<AcquisitionError::Severity> m_minSeverity{AcquisitionError::Severity::Warning};
 
-	int          m_acqCount{0};
-	std::size_t  m_bufferSize{1024};
-	unsigned int m_maxFPS{0};
+	int         m_acqCount{0};
+	std::size_t m_bufferSize{1024};
+	// Atomic, unlike the two above: a target frame rate is something a reader
+	// adjusts while watching the plot, so the worker re-reads it each cycle rather
+	// than latching it at run().
+	std::atomic<unsigned int> m_maxFPS{0};
 
 	// Worker-only: last warning emitted per block id, for reportWarningOnce().
 	QHash<QString, QString> m_lastWarning;
