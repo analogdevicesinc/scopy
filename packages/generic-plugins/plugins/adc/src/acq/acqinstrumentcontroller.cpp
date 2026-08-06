@@ -28,12 +28,20 @@
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
+#include <core/acq_engine/SourceBlock.h>
 #include <gui/cursorcontroller.h>
 #include <gui/instrumenttemplate.h>
 #include <gui/style.h>
+#include <gui/widgets/cursorsettings.h>
+#include <gui/widgets/hoverwidget.h>
 
+#include <QMap>
+#include <QPointer>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
+
+#include <memory>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -124,14 +132,89 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 	engine->addProcessor(m_fftProc);
 
 	// Rail rows, so both blocks are reachable and the pipeline tab has something to
-	// draw. The FFT is indented: it stacks on top of the source it reads.
+	// draw. No colours: these are pipeline blocks, and a coloured swatch on the rail
+	// means "this is the curve you see in that colour" — only plot channels have one.
 	MenuSectionCollapseWidget *sources = it->addChannelGroup("Sources");
-	it->addChannelRow(sources, "pluto", Style::getChannelColor(0), "pluto");
+	// Expandable, so the source's channels hang under it as a tree rather than as a
+	// flat list that says nothing about which device they belong to.
+	CollapsableMenuControlButton *plutoRow =
+		it->addExpandableChannelRow(sources, "pluto", QColor(), QStringLiteral("pluto"));
 	it->addMenuPage("pluto", blockPage(it, m_plutoSrc, "PLUTO"));
+	addSourceChannelRows(plutoRow, m_plutoSrc);
 
 	MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
-	it->addChannelRow(procs, "FFT", Style::getChannelColor(1), "fft", 1);
+	it->addChannelRow(procs, "FFT", QColor(), "fft");
 	it->addMenuPage("fft", blockPage(it, m_fftProc, "GENALYZER FFT"));
+}
+
+void AcqInstrumentController::addSourceChannelRows(CollapsableMenuControlButton *parentRow,
+						  scopy::acq::SourceBlock *src)
+{
+	if(!parentRow || !src) {
+		return;
+	}
+	InstrumentTemplate *it = m_ui->shell();
+
+	// id -> its switch, so the source flipping a channel itself can find the row again.
+	// Shared rather than a member: it belongs to this one source's subtree, and both
+	// lambdas below outlive this call.
+	auto switches = std::make_shared<QMap<QString, QPointer<SmallOnOffSwitch>>>();
+
+	// Rebuilt wholesale rather than diffed: a source has a handful of channels, and the
+	// list is only rebuilt when it actually changes.
+	auto rebuild = [this, it, parentRow, src, switches]() {
+		const QList<MenuControlButton *> old = parentRow->findChildren<MenuControlButton *>();
+		for(MenuControlButton *row : old) {
+			// The header is a child too, and removing it would take the whole row's
+			// selection and page with it.
+			if(row == parentRow->getControlBtn()) {
+				continue;
+			}
+			it->removeChannelRow(parentRow, row, QString());
+		}
+		switches->clear();
+
+		const QList<QString> ids = src->channelIds();
+		for(const QString &id : ids) {
+			// A switch, not a checkbox: a channel is enabled or not on the device,
+			// which is the same on/off a plot row's switch expresses. No page — the
+			// source's own settings cover the whole device — and no colour, because a
+			// raw channel is not a curve until someone adds one from the key picker.
+			// Indented one step: the header's own text is already offset by the
+			// collapse arrow, so a child at margin 0 reads as the source's sibling
+			// rather than as something under it.
+			MenuControlButton *row = it->addChannelSwitchRow(parentRow, id, QColor(), QString(), 1);
+			SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row);
+			if(!sw) {
+				continue;
+			}
+			QSignalBlocker b(sw);
+			sw->setChecked(src->isChannelEnabled(id));
+			switches->insert(id, sw);
+			connect(sw, &QAbstractButton::toggled, src, [src, id](bool en) { src->enableChannel(id, en); });
+		}
+	};
+
+	rebuild();
+	// Queued, both of them: a source can add channels or flip one from the worker
+	// thread (onStart reading the device, disableAllChannels on a failed start), and
+	// these touch widgets.
+	connect(src, &scopy::acq::SourceBlock::channelsChanged, this, rebuild, Qt::QueuedConnection);
+	// Without this the switch would keep claiming a channel is on after the source
+	// turned it off by itself.
+	connect(
+		src, &scopy::acq::SourceBlock::channelEnabledChanged, this,
+		[switches](const QString &id, bool en) {
+			SmallOnOffSwitch *sw = switches->value(id).data();
+			if(!sw) {
+				return;
+			}
+			// Blocked: this reflects what the source already did, so echoing it
+			// back through enableChannel() would be a round trip for nothing.
+			QSignalBlocker b(sw);
+			sw->setChecked(en);
+		},
+		Qt::QueuedConnection);
 }
 
 void AcqInstrumentController::setupPlots()
@@ -160,11 +243,12 @@ void AcqInstrumentController::setupPlots()
 	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots,
 		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
 
-	// Cursors over row 0. The controller and its settings page are created here rather
-	// than lazily on the first click because the page has to be in the stack before the
-	// button can show it.
-	QString cursorPageId;
-	if(CursorController *cursors = m_plots->cursors(&cursorPageId)) {
+	// Cursors over row 0, with their settings in a hover panel off the button rather
+	// than a right-menu page: the settings are read while dragging the handles, so they
+	// have to sit next to the plot instead of stealing the menu the channel being
+	// measured is configured in.
+	CursorSettings *cursorSettings = nullptr;
+	if(CursorController *cursors = m_plots->cursors(&cursorSettings)) {
 		QPushButton *cursorBtn = new QPushButton(tr("Cursors"), it);
 		cursorBtn->setCheckable(true);
 		// The same styling the shell gives its own Debug button, which is the other
@@ -174,13 +258,22 @@ void AcqInstrumentController::setupPlots()
 		Style::setStyle(cursorBtn, style::properties::label::menuMedium);
 		it->addToBottomRail(cursorBtn, TTA_RIGHT);
 		connect(cursorBtn, &QPushButton::toggled, cursors, &CursorController::setVisible);
-		// Showing the page on toggle-on only: unchecking hides the cursors, and yanking
-		// the reader out of a page they may have navigated to on purpose would be worse
-		// than leaving it up.
-		connect(cursorBtn, &QPushButton::toggled, it, [it, cursorPageId](bool on) {
-			if(on) {
-				it->showMenuPage(cursorPageId);
-			}
+
+		// The same anchoring the ADC time and FFT instruments use for their cursor
+		// panels (adctimeinstrumentcontroller.cpp:55-58): the button's top-right corner
+		// to the panel's top-left, offset 10px up. Because HP_TOPLEFT places the content
+		// by its bottom-right, that grows the panel up and to the left of the button —
+		// which is what keeps it on screen from a bottom-rail anchor. Parented to the
+		// shell so it floats over the plot instead of being clipped to the rail.
+		HoverWidget *hover = new HoverWidget(cursorSettings, cursorBtn, it);
+		hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+		hover->setContentPos(HoverPosition::HP_TOPLEFT);
+		hover->setAnchorOffset(QPoint(0, -10));
+		connect(cursorBtn, &QPushButton::toggled, hover, [hover](bool on) {
+			hover->setVisible(on);
+			// Later-created siblings (the measure and stats panels) stack above it
+			// otherwise, and a settings panel behind the plot is unusable.
+			hover->raise();
 		});
 	}
 

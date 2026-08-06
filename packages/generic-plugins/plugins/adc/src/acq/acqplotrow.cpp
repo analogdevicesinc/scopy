@@ -85,6 +85,26 @@ PlotAxis *AcqPlotRow::digitalAxis()
 	return m_digitalAxis;
 }
 
+void AcqPlotRow::setXInterval(double min, double max)
+{
+	if(m_plot.isNull()) {
+		return;
+	}
+	// Degenerate ranges come out of an empty or single-bin X stream; Qwt would divide by
+	// the span and leave the axis unlabelled, so the previous range stays.
+	if(!(max > min)) {
+		return;
+	}
+	// Unchanged request — leave the axis alone. See the header: this is what keeps a
+	// per-frame call from fighting the reader's pan and zoom.
+	if(qFuzzyCompare(min, m_xReqMin) && qFuzzyCompare(max, m_xReqMax)) {
+		return;
+	}
+	m_xReqMin = min;
+	m_xReqMax = max;
+	m_plot->xAxis()->setInterval(min, max);
+}
+
 double AcqPlotRow::nextDigitalSlot()
 {
 	PlotAxis *ax = digitalAxis();

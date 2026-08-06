@@ -25,6 +25,7 @@
 #include <core/acq_engine/DataKey.h>
 
 #include <QColor>
+#include <QList>
 #include <QString>
 #include <QWidget>
 
@@ -110,6 +111,16 @@ public:
 	// Chunks of history this representation needs. The channel turns this into
 	// DataStore::claimDepth() under its own claimant name.
 	virtual std::size_t claimDepth(int plotSize, std::size_t bufferSize) const = 0;
+
+	// Keys this repr reads *besides* the channel's own — a curve's X stream is the
+	// only one today. The channel claims the same depth on each, which is not
+	// cosmetic: pull() truncates to qMin(x.size, y.size), so an X key left at the
+	// default depth of 1 would clip a multi-chunk window down to a single buffer and
+	// the curve would silently draw the last 1/Nth of its window.
+	//
+	// Returned rather than claimed here because a repr knows neither plotSize nor
+	// bufferSize, and the claimant name belongs to the channel.
+	virtual QList<scopy::acq::DataKey> extraKeys() const { return {}; }
 
 	// A repr whose claimDepth() answer can change on its own — a waterfall's row
 	// count is a setting, not a function of plotSize — calls this to say so. The

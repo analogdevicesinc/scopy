@@ -26,12 +26,15 @@
 
 #include <core/acq_engine/SampleBuffer.h>
 
+#include <QList>
 #include <QPointer>
 #include <QVector>
 
+#include <functional>
 #include <memory>
 
 namespace scopy {
+class MenuCombo;
 class PlotChannel;
 
 namespace gui {
@@ -82,6 +85,7 @@ public:
 	void pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &key, int plotSize) override;
 	void reset() override;
 	std::size_t claimDepth(int plotSize, std::size_t bufferSize) const override;
+	QList<scopy::acq::DataKey> extraKeys() const override;
 	QWidget *createSettingsWidget(QWidget *parent) override;
 	MeasureManagerInterface *measureManager() const override;
 	void setEnabled(bool en) override;
@@ -100,13 +104,51 @@ public:
 	// The manager only ever resizes it from setPlotSize(), never from inside a pull.
 	void setIndexSource(const QVector<float> *idx) { m_indexSrc = idx; }
 
-	// Optional X stream, e.g. pluto_iq_freq for an FFT magnitude channel. Empty
-	// means "use the index ramp".
-	void setXKey(const scopy::acq::DataKey &k) { m_xKey = k; }
+	// The X stream. Either a real DataKey (pluto_iq_freq for an FFT magnitude channel)
+	// or kSampleIndexKey, the sentinel meaning "the manager's 0..plotSize-1 ramp".
+	//
+	// Empty is treated as the sentinel too, so a channel constructed without an X key
+	// draws against sample index — which is what every channel wants by default.
+	void setXKey(const scopy::acq::DataKey &k);
 	const scopy::acq::DataKey &xKey() const { return m_xKey; }
+
+	// The sentinel X key: a synthetic stream, not something any block writes, so it
+	// never appears in DataStore::keys() and can never collide with a real key (no
+	// source publishes a key beginning with '$').
+	//
+	// It exists because the alternative — an empty DataKey meaning "index" — is
+	// unrepresentable in a combo box next to the real keys, and the X source is now a
+	// user-editable choice rather than something only the controller sets.
+	static const scopy::acq::DataKey &sampleIndexKey();
+
+	// Whether `k` names the index ramp rather than a stored stream. True for the
+	// sentinel and for an empty key.
+	static bool isSampleIndexKey(const scopy::acq::DataKey &k);
+
+	// The span of the X samples last drawn, when X comes from a real stream. False while
+	// this curve draws against the index ramp, and false before the first pull that
+	// produced data — a curve on a frequency key that has not been written yet must not
+	// drag the row's axis to a made-up range.
+	//
+	// The manager reads this rather than the axis: with X shared per row, the range on
+	// screen has to be the union across the row's channels, which no single repr can
+	// compute. Recorded during pull() because the window is already in hand there and
+	// re-reading the store to answer this would double the copy.
+	bool xDataRange(double &min, double &max) const;
 
 	// For PlotAutoscaler and the curve-style control. Null before attach().
 	PlotChannel *plotChannel() const { return m_ch; }
+
+	// Every key currently in the store, for the X-source combo the settings page
+	// builds. Set by the manager, which is the only thing here holding the store; the
+	// repr has no store pointer of its own (pull() is handed one per call).
+	void setKeySource(std::function<QList<scopy::acq::DataKey>()> fn) { m_keySource = std::move(fn); }
+
+	// Repopulate the X-source combo from setKeySource(). The manager calls this on
+	// keysChanged: keys appear as the pipeline runs, and the settings page is built once
+	// and never rebuilt, so a list filled only at construction would stay the empty
+	// pre-run set for the life of the channel. No-op before the page exists.
+	void refreshKeySources();
 
 private:
 	// Follows the enable state: an autoscaler must not keep scaling the row's Y axis
@@ -120,12 +162,26 @@ private:
 	QPointer<AcqPlotRow> m_row;
 
 	const QVector<float> *m_indexSrc{nullptr};
+	// Defaults to the sentinel in the constructor, not left empty, so xKey() answers
+	// the combo honestly before anyone calls setXKey().
 	scopy::acq::DataKey m_xKey;
+
+	std::function<QList<scopy::acq::DataKey>()> m_keySource;
+	// The X-source combo, rebuilt from m_keySource each time it is shown: keys appear as
+	// the pipeline runs, so a list built once at page-construction time would be the
+	// empty pre-run set forever.
+	QPointer<scopy::MenuCombo> m_xCombo;
 
 	// Read windows and their conversion scratch. Members, not locals — see the
 	// lifetime note above.
 	scopy::acq::SampleVariant m_live, m_liveX;
 	QVector<float> m_scratch, m_scratchX;
+
+	// Span of the X samples handed to setSamples() on the last pull, for xDataRange().
+	// Invalidated by setXKey() and reset(), so a stale frequency span cannot outlive the
+	// key it came from.
+	double m_xMin{0.0}, m_xMax{0.0};
+	bool m_xRangeValid{false};
 
 	bool m_enabled{true};
 

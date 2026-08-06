@@ -187,13 +187,29 @@ public:
 	// selection group; clicking it (or its gear) shows the menu page registered
 	// under `menuId`. Pass an empty menuId for a row with no page of its own.
 	// `indent` shifts the row right, which is how processor stacking is shown.
-	MenuControlButton *addChannelRow(MenuSectionCollapseWidget *group, const QString &name, const QColor &color,
+	//
+	// `group` is any rail container — a group from addChannelGroup() or an expandable
+	// row from addExpandableChannelRow(), which is how a source's channels are nested
+	// under it. An invalid `color` leaves the row's own default, which is what
+	// everything that is not a plot channel wants: colour on the rail means "this is
+	// the curve you see in that colour", and a source or processor has no curve.
+	MenuControlButton *addChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
 					 const QString &menuId, int indent = 0);
 
 	// Same row, but with an on/off switch instead of a radio — plots create and
 	// destroy rather than mute, so they get a switch.
-	MenuControlButton *addChannelSwitchRow(MenuSectionCollapseWidget *group, const QString &name,
-					       const QColor &color, const QString &menuId, int indent = 0);
+	MenuControlButton *addChannelSwitchRow(CompositeWidget *group, const QString &name, const QColor &color,
+					       const QString &menuId, int indent = 0);
+
+	// A row that is itself a container: the row on top, its children indented under
+	// it, and an arrow on the row that collapses them. This is how a source carries
+	// its channels — pass the returned widget back as the `group` of the child rows.
+	//
+	// The row behaves like addChannelRow's otherwise: it joins the exclusive selection
+	// group and opens `menuId`. Its arrow is a separate hit target from the row body,
+	// so expanding does not change which page is showing, and vice versa.
+	CollapsableMenuControlButton *addExpandableChannelRow(CompositeWidget *group, const QString &name,
+							      const QColor &color, const QString &menuId);
 
 	// The switch inside a row built by addChannelSwitchRow, so an owner can bind it
 	// without knowing how the row is assembled. Null for a row built by
@@ -204,7 +220,7 @@ public:
 	// the row is registered in three places: the exclusive button group (which would
 	// otherwise keep a dangling pointer), the group's layout, and the menu stack.
 	// `menuId` may be empty for a row that registered no page.
-	void removeChannelRow(MenuSectionCollapseWidget *group, MenuControlButton *row, const QString &menuId);
+	void removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId);
 
 	// A row pinned above the scroll area, outside every group. Used for the
 	// device/general-settings entry.
@@ -248,7 +264,12 @@ private:
 	void setupSlots();
 	void setupTopRail();
 	void setupBottomRail();
-	MenuControlButton *makeChannelRow(MenuSectionCollapseWidget *group, const QString &name, const QColor &color,
+	// Shared by all three add*Row overloads. `row` is the button that goes in the rail
+	// for a plain row, or the header of the expandable one — everything except which
+	// widget gets inserted into `group` is identical between them.
+	void configureChannelRow(MenuControlButton *row, QWidget *insert, CompositeWidget *group, const QString &name,
+				 const QColor &color, const QString &menuId, int indent);
+	MenuControlButton *makeChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
 					  const QString &menuId, int indent, bool asSwitch);
 
 	ToolTemplate *m_tool;
