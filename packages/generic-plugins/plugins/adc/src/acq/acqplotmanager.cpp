@@ -25,6 +25,7 @@
 #include "acqcurverepr.h"
 #include "acqdigitalrepr.h"
 #include "acqplotrow.h"
+#include "acqwaterfallrepr.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
@@ -169,9 +170,9 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 		// shared X axis from the sample count pull() gives it, so it needs no ramp.
 		return std::make_unique<DigitalRepr>();
 	case ReprKind::Waterfall:
-		// Phase 4.
-		qWarning(CAT_ACQ_PLOTMANAGER) << "representation not implemented yet for" << key.toString();
-		return nullptr;
+		// Never picked by Auto: any Float32 stream converts, but a spectrogram of a
+		// time-domain stream is noise. It has to be asked for.
+		return std::make_unique<WaterfallRepr>();
 	case ReprKind::Auto:
 		break;
 	}

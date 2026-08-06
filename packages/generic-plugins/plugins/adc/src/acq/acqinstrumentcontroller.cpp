@@ -26,6 +26,7 @@
 #include "acqcurverepr.h"
 #include "acqinstrument.h"
 #include "acqplotmanager.h"
+#include "acqwaterfallrepr.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
@@ -189,6 +190,16 @@ void AcqInstrumentController::setupPlots()
 	// only thing a digital track can get wrong on its own.
 	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I sign", Style::getChannelColor(3),
 			    AcqPlotManager::ReprKind::Digital);
+
+	// The same FFT key again, as a spectrogram. Two channels on one key with distinct
+	// claimants and *different* depth requirements — the curve wants
+	// ceil(plotSize / bufferSize), this wants its row count — which is exactly what
+	// the max-over-claims rule exists for.
+	AcqChannel *wf = m_plots->addChannel(m_fftProc->outputKey(), "FFT waterfall", Style::getChannelColor(2),
+					     AcqPlotManager::ReprKind::Waterfall);
+	if(wf) {
+		static_cast<WaterfallRepr *>(wf->repr())->setXKey(m_fftProc->freqKey());
+	}
 }
 
 void AcqInstrumentController::stop()
