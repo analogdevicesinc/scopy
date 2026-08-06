@@ -35,6 +35,17 @@ PrintBtn::PrintBtn(QWidget *parent)
 	setText("Print");
 }
 
+PrintIconBtn::PrintIconBtn(QWidget *parent)
+	: QPushButton(parent)
+{
+	setCheckable(false);
+	setIcon(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+					 "/icons/print.svg",
+				 Style::getColor(json::theme::content_default)));
+	setToolTip("Print");
+	Style::setStyle(this, style::properties::button::squareIconButton);
+}
+
 OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent)
 	: QPushButton(parent)
 	, m_menu(menu)
