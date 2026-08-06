@@ -32,6 +32,11 @@
 namespace scopy {
 class PlotChannel;
 
+namespace gui {
+class MenuPlotAxisRangeControl;
+class PlotAutoscaler;
+} // namespace gui
+
 namespace adc {
 
 // An ordinary Qwt curve on the row's shared X/Y axes.
@@ -73,6 +78,7 @@ public:
 	void pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &key, int plotSize) override;
 	void reset() override;
 	std::size_t claimDepth(int plotSize, std::size_t bufferSize) const override;
+	QWidget *createSettingsWidget(QWidget *parent) override;
 	void setEnabled(bool en) override;
 	void setColor(const QColor &c) override;
 	void setName(const QString &n) override;
@@ -92,8 +98,15 @@ public:
 	PlotChannel *plotChannel() const { return m_ch; }
 
 private:
+	// Follows the enable state: an autoscaler must not keep scaling the row's Y axis
+	// to a curve the reader switched off, and PlotAutoscaler::autoscale() walks its
+	// channel list without checking isEnabled(). Same pairing as
+	// SimInstrumentController::setCurveDriven (src/sim/siminstrumentcontroller.cpp:942).
+	void syncAutoscalerChannel();
+
 	QPointer<PlotWidget> m_plot;
 	PlotChannel *m_ch{nullptr};
+	QPointer<AcqPlotRow> m_row;
 
 	const QVector<float> *m_indexSrc{nullptr};
 	scopy::acq::DataKey m_xKey;
@@ -104,6 +117,13 @@ private:
 	QVector<float> m_scratch, m_scratchX;
 
 	bool m_enabled{true};
+
+	// Built by createSettingsWidget, parented into the returned widget. QPointer
+	// because the page belongs to InstrumentTemplate's stack, which outlives this repr
+	// on tool teardown in some orders.
+	QPointer<scopy::gui::PlotAutoscaler> m_autoscaler;
+	QPointer<scopy::gui::MenuPlotAxisRangeControl> m_yCtrl;
+	bool m_autoscaleEnabled{false};
 };
 
 } // namespace adc

@@ -150,6 +150,16 @@ void AcqInstrumentController::setupPlots()
 	// number only the instrument's buffer control knows about.
 	connect(m_ui, &AcqInstrument::bufferSizeChanged, m_plots, &AcqPlotManager::onBufferSizeChanged);
 
+	// How much history is drawn, independent of how much arrives per cycle: depth is
+	// ceil(plotSize / bufferSize), so a window wider than the buffer is stitched from
+	// several chunks. Live while running — it only changes claims and the X range.
+	gui::MenuSpinbox *plotSpin = new gui::MenuSpinbox("Plot window", m_plots->plotSize(), "samples", 16, 1 << 20,
+							  true, false, false, it);
+	plotSpin->setIncrementMode(gui::MenuSpinbox::IS_POW2);
+	it->addEngineControl(plotSpin);
+	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots,
+		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
+
 	if(!m_plutoSrc || !m_fftProc) {
 		// setupBlocks() bailed for want of a context. The manager still exists — an
 		// empty plot beats no center widget — but there are no keys to point at.

@@ -25,11 +25,16 @@
 
 #include <core/acq_engine/DataStore.h>
 
+#include <gui/plotautoscaler.h>
 #include <gui/plotaxis.h>
 #include <gui/plotchannel.h>
 #include <gui/plotwidget.h>
+#include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menuplotaxisrangecontrol.h>
+#include <gui/widgets/menuplotchannelcurvestylecontrol.h>
 
 #include <QPen>
+#include <QVBoxLayout>
 
 using namespace scopy;
 using namespace scopy::adc;
@@ -44,6 +49,7 @@ void CurveRepr::attach(AcqPlotRow *row, const QString &name, const QColor &color
 		return;
 	}
 	m_plot = row->plot();
+	m_row = row;
 
 	// The row's shared X and Y axes, never a per-channel one — see the axis
 	// lifetime note in acqplotrow.h.
@@ -64,14 +70,23 @@ void CurveRepr::detach()
 	// a use-after-free.
 	if(m_plot.isNull()) {
 		m_ch = nullptr;
+		m_row = nullptr;
 		return;
 	}
 	if(!m_ch) {
 		return;
 	}
 
+	// Before the delete: PlotAutoscaler::autoscale() dereferences every channel in
+	// its list on a timer, so a deleted channel left registered is a use-after-free
+	// within one timeout.
+	if(m_autoscaler) {
+		m_autoscaler->removeChannels(m_ch);
+	}
+
 	PlotChannel *ch = m_ch;
 	m_ch = nullptr; // before the call, so a re-entrant detach() is a no-op
+	m_row = nullptr;
 
 	// Idempotence matters beyond tidiness: PlotTracker::removeChannel leaves its
 	// `toRemove` pointer uninitialised when the channel is not in its list
@@ -157,6 +172,79 @@ void CurveRepr::reset()
 	m_ch->setSamples(&kZero, &kZero, 0, true);
 }
 
+QWidget *CurveRepr::createSettingsWidget(QWidget *parent)
+{
+	// attach() must have run: every control here binds to the PlotChannel or the
+	// row's axis. AcqChannel::createSettingsPage is called after attach, so this
+	// holds — but a null return is better than half a page.
+	if(!m_ch || m_row.isNull() || !m_row->plot()) {
+		return nullptr;
+	}
+
+	QWidget *w = new QWidget(parent);
+	QVBoxLayout *lay = new QVBoxLayout(w);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(10);
+
+	// The row's shared Y axis, not a per-channel one. So this control moves the range
+	// for every curve on the row — which is the documented consequence of Qwt having
+	// no axis-removal path (see acqplotrow.h). N channels each building their own
+	// control over the same axis is fine: MenuPlotAxisRangeControl is a view, and it
+	// follows PlotAxis::min/maxChanged, so they stay in step with each other.
+	PlotAxis *yAxis = m_row->plot()->yAxis();
+	m_yCtrl = new scopy::gui::MenuPlotAxisRangeControl(yAxis, w);
+
+	MenuOnOffSwitch *autoBtn = new MenuOnOffSwitch(QObject::tr("AUTOSCALE"), w, false);
+
+	m_autoscaler = new scopy::gui::PlotAutoscaler(w);
+	syncAutoscalerChannel();
+	QObject::connect(m_autoscaler.data(), &scopy::gui::PlotAutoscaler::newMin, m_yCtrl.data(),
+			 &scopy::gui::MenuPlotAxisRangeControl::setMin);
+	QObject::connect(m_autoscaler.data(), &scopy::gui::PlotAutoscaler::newMax, m_yCtrl.data(),
+			 &scopy::gui::MenuPlotAxisRangeControl::setMax);
+
+	QObject::connect(autoBtn->onOffswitch(), &QAbstractButton::toggled, m_autoscaler.data(), [this](bool on) {
+		m_autoscaleEnabled = on;
+		// The manual spinboxes and the autoscaler write the same axis; leaving both
+		// live means the reader's value is overwritten a timeout later.
+		if(m_yCtrl) {
+			m_yCtrl->setEnabled(!on);
+		}
+		if(!m_autoscaler) {
+			return;
+		}
+		// start() is not optional: PlotAutoscaler::onNewData and autoscale() both
+		// return immediately while its timer is stopped
+		// (gui/src/plotautoscaler.cpp:59-63), so an autoscaler that is never started
+		// silently does nothing.
+		if(on) {
+			m_autoscaler->start();
+		} else {
+			m_autoscaler->stop();
+		}
+	});
+
+	scopy::gui::MenuPlotChannelCurveStyleControl *style = new scopy::gui::MenuPlotChannelCurveStyleControl(w);
+	style->addChannels(m_ch);
+
+	lay->addWidget(autoBtn);
+	lay->addWidget(m_yCtrl);
+	lay->addWidget(style);
+	return w;
+}
+
+void CurveRepr::syncAutoscalerChannel()
+{
+	if(!m_autoscaler || !m_ch) {
+		return;
+	}
+	if(m_enabled) {
+		m_autoscaler->addChannels(m_ch);
+	} else {
+		m_autoscaler->removeChannels(m_ch);
+	}
+}
+
 void CurveRepr::setEnabled(bool en)
 {
 	m_enabled = en;
@@ -168,6 +256,7 @@ void CurveRepr::setEnabled(bool en)
 	} else {
 		m_ch->disable();
 	}
+	syncAutoscalerChannel();
 }
 
 void CurveRepr::setColor(const QColor &c)

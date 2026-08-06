@@ -28,6 +28,7 @@
 #include <gui/instrumenttemplate.h>
 
 #include <QList>
+#include <QMap>
 #include <QPointer>
 #include <QVector>
 #include <QWidget>
@@ -136,6 +137,12 @@ private:
 	void reclaim(AcqChannel *ch);
 	void rebuildIndexRamp();
 
+	// A rail row under "Plots" plus the channel's settings page, both keyed on
+	// ch->menuId(). Called from addChannel, so a channel created at runtime from the
+	// key picker gets its row on the same path as one created at composition time.
+	void registerRail(AcqChannel *ch);
+	void unregisterRail(AcqChannel *ch);
+
 	QPointer<scopy::acq::DataStore> m_store;
 	QPointer<scopy::acq::AcquisitionEngine> m_engine;
 	QPointer<InstrumentTemplate> m_shell;
@@ -144,6 +151,11 @@ private:
 	AcqPlotRow *m_sharedRow{nullptr}; // built in the ctor, always row 0
 	QList<AcqPlotRow *> m_rows;
 	QList<AcqChannel *> m_channels; // parented to this
+
+	// The rail group holding the channel rows, created on the first registerRail so an
+	// instrument with no channels shows no empty group. Rows are owned by the shell.
+	MenuSectionCollapseWidget *m_railGroup{nullptr};
+	QMap<AcqChannel *, MenuControlButton *> m_railRows;
 
 	int m_plotSize{1024};
 	// 0..plotSize-1, borrowed by every CurveRepr with no X key. One ramp for all of
