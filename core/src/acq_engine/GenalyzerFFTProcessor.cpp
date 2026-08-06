@@ -3,8 +3,11 @@
 #include "AcquisitionError.h"
 #include "DataStore.h"
 #include "GenalyzerSettings.h"
+#include "GenalyzerTransformSettings.h"
 
-#include <QPushButton>
+#include <gui/widgets/menuonoffswitch.h>
+
+#include <QAbstractButton>
 #include <QString>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -53,7 +56,7 @@ GenalyzerFFTProcessor::GenalyzerFFTProcessor(const DataKey &iKey,
 	, m_window(window)
 {
 	m_watchedKeys = {iKey, qKey};
-	resizeForNfft(m_nfft, FFTMode::Complex);
+	resizeForNfft(m_nfft, FFTMode::Complex, 1);
 }
 
 GenalyzerFFTProcessor::GenalyzerFFTProcessor(const DataKey &inKey,
@@ -71,7 +74,7 @@ GenalyzerFFTProcessor::GenalyzerFFTProcessor(const DataKey &inKey,
 	, m_window(window)
 {
 	m_watchedKeys = {inKey};
-	resizeForNfft(m_nfft, FFTMode::Real);
+	resizeForNfft(m_nfft, FFTMode::Real, 1);
 }
 
 GenalyzerFFTProcessor::~GenalyzerFFTProcessor()
@@ -92,14 +95,121 @@ GenalyzerFFTProcessor::FFTMode GenalyzerFFTProcessor::mode() const
 
 void GenalyzerFFTProcessor::setSampleRate(double fs)
 {
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+		if(m_sampleRate == fs)
+			return;
+		m_sampleRate = fs;
+		rebuildFreqAxis(mode());
+		// Sample rate is baked into both auto and fixed-tone configs; invalidate.
+		cleanupAutoConfig();
+		cleanupFaConfig();
+	}
+	Q_EMIT sampleRateChanged(fs);
+}
+
+GnWindow GenalyzerFFTProcessor::window() const
+{
 	std::lock_guard<std::mutex> lock(s_genalyzerMutex);
-	if(m_sampleRate == fs)
+	return m_window;
+}
+
+void GenalyzerFFTProcessor::setWindow(GnWindow w)
+{
+	std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+	if(m_window == w)
 		return;
-	m_sampleRate = fs;
-	rebuildFreqAxis(mode());
-	// Sample rate is baked into both auto and fixed-tone configs; invalidate.
+	m_window = w;
+	// The window is baked into gn_config_fftz, so the auto config is stale. The
+	// fixed-tone config carries no window, but drop it too rather than leave the
+	// two paths invalidated on different rules.
 	cleanupAutoConfig();
 	cleanupFaConfig();
+}
+
+GnRfftScale GenalyzerFFTProcessor::rfftScale() const
+{
+	std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+	return m_rfftScale;
+}
+
+void GenalyzerFFTProcessor::setRfftScale(GnRfftScale s)
+{
+	std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+	m_rfftScale = s;
+}
+
+void GenalyzerFFTProcessor::setAveragingStore(DataStore *store, std::size_t bufferSize)
+{
+	m_avgStore   = store;
+	m_bufferSize = qMax<std::size_t>(1, bufferSize);
+	reclaimAveragingDepth();
+}
+
+void GenalyzerFFTProcessor::setAveraging(int navg)
+{
+	const int n = qMax(1, navg);
+	if(m_navg.exchange(n, std::memory_order_relaxed) == n)
+		return;
+
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+		// navg*nfft samples now come in per cycle, so the float->double staging
+		// buffers grow; nfft itself is unchanged.
+		resizeForNfft(m_nfft, mode(), n);
+		// navg is an argument to gn_config_fftz.
+		cleanupAutoConfig();
+		cleanupFaConfig();
+	}
+	reclaimAveragingDepth();
+	Q_EMIT averagingChanged(n);
+}
+
+void GenalyzerFFTProcessor::reclaimAveragingDepth()
+{
+	if(!m_avgStore)
+		return;
+	// One claim per watched key under this block's name. claimDepth replaces a
+	// claimant's previous claim, so shrinking navg releases the depth too.
+	std::size_t want;
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+		want = static_cast<std::size_t>(m_navg.load(std::memory_order_relaxed)) *
+		       static_cast<std::size_t>(qMax(1, m_nfft));
+	}
+	for(const DataKey &k : m_watchedKeys)
+		m_avgStore->claimDepth(k, name(), DataStore::depthForWindow(want, m_bufferSize));
+}
+
+QHash<DataKey, StreamInfo> GenalyzerFFTProcessor::declaredStreams() const
+{
+	QHash<DataKey, StreamInfo> result;
+
+	StreamInfo mag;
+	mag.label = QStringLiteral("FFT");
+	mag.unit = QStringLiteral("dBFS");
+	// Read under the same mutex setSampleRate() writes it under; a view asking for
+	// descriptors from the GUI thread races the settings widget otherwise.
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+		mag.sampleRate = m_sampleRate;
+	}
+	// The bin frequencies this magnitude stream is indexed by. This is the
+	// producer stating a fact about its own output, not a UI control — which is
+	// the distinction that matters here: a user picking two keys out of combo
+	// boxes was the mechanism removed in d0feff018.
+	mag.xKey = m_freqKey;
+	mag.kind = ReprKind::Curve;
+	result.insert(m_outputKey, mag);
+
+	// Declared, so a view can see it exists and label it, but never drawn.
+	StreamInfo freq;
+	freq.label = QStringLiteral("FFT frequency");
+	freq.unit = QStringLiteral("Hz");
+	freq.kind = ReprKind::Hidden;
+	result.insert(m_freqKey, freq);
+
+	return result;
 }
 
 void GenalyzerFFTProcessor::setConfig(const GenalyzerConfig &cfg)
@@ -112,17 +222,20 @@ void GenalyzerFFTProcessor::setConfig(const GenalyzerConfig &cfg)
 
 QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
 {
-	// [Enable Analysis toggle] + inner GenalyzerSettings widget, under the
-	// base block controls.
+	// [transform settings] + [Enable Analysis switch] + inner GenalyzerSettings
+	// widget, under the base block controls.
 	auto *container = new QWidget;
 	auto *layout    = new QVBoxLayout(container);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(6);
 
-	auto *enableBtn = new QPushButton("Enable Analysis", container);
-	enableBtn->setCheckable(true);
-	enableBtn->setChecked(m_cfg.enabled);
-	layout->addWidget(enableBtn);
+	layout->addWidget(new GenalyzerTransformSettings(this, container));
+
+	// A switch, not a button: this is a boolean in a settings menu, so it reads
+	// the same as every other toggle on the page.
+	auto *enableSwitch = new MenuOnOffSwitch(QStringLiteral("Enable Analysis"), container, false);
+	enableSwitch->onOffswitch()->setChecked(m_cfg.enabled);
+	layout->addWidget(enableSwitch);
 
 	auto *settings = new GenalyzerSettings(container);
 	settings->setConfig(m_cfg);
@@ -130,14 +243,14 @@ QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
 
 	// Inner settings widget edits mode/SSB/etc. but never flips `enabled`.
 	connect(settings, &GenalyzerSettings::configChanged, this,
-		[this, enableBtn](const GenalyzerConfig &cfg) {
+		[this, enableSwitch](const GenalyzerConfig &cfg) {
 			GenalyzerConfig merged = cfg;
-			merged.enabled         = enableBtn->isChecked();
+			merged.enabled         = enableSwitch->onOffswitch()->isChecked();
 			setConfig(merged);
 		});
 
-	// Enable button drives `enabled` independently.
-	connect(enableBtn, &QPushButton::toggled, this,
+	// Enable switch drives `enabled` independently.
+	connect(enableSwitch->onOffswitch(), &QAbstractButton::toggled, this,
 		[this, settings](bool on) {
 			GenalyzerConfig merged = settings->getConfig();
 			merged.enabled         = on;
@@ -151,20 +264,24 @@ QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
 // Buffer / axis management
 // ---------------------------------------------------------------------------
 
-void GenalyzerFFTProcessor::resizeForNfft(int nfft, FFTMode mode)
+void GenalyzerFFTProcessor::resizeForNfft(int nfft, FFTMode mode, int navg)
 {
-	m_nfft = nfft;
+	m_nfft         = nfft;
+	m_sizedForNavg = qMax(1, navg);
+	// Input staging holds every frame genalyzer will average; the transform output
+	// is one averaged spectrum, so output sizing is nfft-only.
+	const int inLen = nfft * m_sizedForNavg;
 	if(mode == FFTMode::Complex) {
 		m_outBins    = nfft;
 		m_fftOutSize = 2 * nfft;
-		m_iBuf.assign(nfft, 0.0);
-		m_qBuf.assign(nfft, 0.0);
+		m_iBuf.assign(inLen, 0.0);
+		m_qBuf.assign(inLen, 0.0);
 		m_realIn.clear();
 		m_shifted.assign(m_fftOutSize, 0.0);
 	} else {
 		m_outBins    = nfft / 2 + 1;
 		m_fftOutSize = 2 * m_outBins;
-		m_realIn.assign(nfft, 0.0);
+		m_realIn.assign(inLen, 0.0);
 		m_iBuf.clear();
 		m_qBuf.clear();
 		m_shifted.clear();
@@ -207,17 +324,19 @@ void GenalyzerFFTProcessor::reset()
 // ---------------------------------------------------------------------------
 
 int GenalyzerFFTProcessor::runComplexFFT(const QVector<float> &iSamples,
-					 const QVector<float> &qSamples)
+					 const QVector<float> &qSamples,
+					 int                   navg)
 {
-	for(int i = 0; i < m_nfft; ++i) {
+	const int inLen = m_nfft * navg;
+	for(int i = 0; i < inLen; ++i) {
 		m_iBuf[i] = static_cast<double>(iSamples[i]);
 		m_qBuf[i] = static_cast<double>(qSamples[i]);
 	}
 
 	int err = gn_fft(m_fftOut.data(), m_fftOutSize,
-			 m_iBuf.data(), m_nfft,
-			 m_qBuf.data(), m_nfft,
-			 1, m_nfft, m_window);
+			 m_iBuf.data(), inLen,
+			 m_qBuf.data(), inLen,
+			 navg, m_nfft, m_window);
 	if(err != 0) {
 		report(AcquisitionError::Severity::Warning,
 		       QStringLiteral("gn_fft failed err=%1").arg(err));
@@ -242,14 +361,15 @@ int GenalyzerFFTProcessor::runComplexFFT(const QVector<float> &iSamples,
 	return 0;
 }
 
-int GenalyzerFFTProcessor::runRealFFT(const QVector<float> &samples)
+int GenalyzerFFTProcessor::runRealFFT(const QVector<float> &samples, int navg)
 {
-	for(int i = 0; i < m_nfft; ++i)
+	const int inLen = m_nfft * navg;
+	for(int i = 0; i < inLen; ++i)
 		m_realIn[i] = static_cast<double>(samples[i]);
 
 	int err = gn_rfft(m_fftOut.data(), m_fftOutSize,
-			  m_realIn.data(), m_nfft,
-			  1, m_nfft, m_window, GnRfftScaleDbfsSin);
+			  m_realIn.data(), inLen,
+			  navg, m_nfft, m_window, m_rfftScale);
 	if(err != 0) {
 		report(AcquisitionError::Severity::Warning,
 		       QStringLiteral("gn_rfft failed err=%1").arg(err));
@@ -291,7 +411,10 @@ int GenalyzerFFTProcessor::configureAutoAnalysis()
 {
 	cleanupAutoConfig();
 
-	int err = gn_config_fftz(static_cast<size_t>(m_nfft), /*qres=*/1, /*navg=*/1,
+	// navg must match what runComplexFFT/runRealFFT actually passed, or the
+	// analysis reads the spectrum with the wrong noise normalisation.
+	const size_t navg = static_cast<size_t>(qMax(1, m_navg.load(std::memory_order_relaxed)));
+	int err = gn_config_fftz(static_cast<size_t>(m_nfft) * navg, /*qres=*/1, navg,
 				 static_cast<size_t>(m_nfft), m_window, &m_gnConfig);
 	if(err != 0) {
 		report(AcquisitionError::Severity::Warning,
@@ -518,62 +641,104 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	}
 
 	const FFTMode currentMode = (nWatched == 1) ? FFTMode::Real : FFTMode::Complex;
+	const int     navg        = qMax(1, m_navg.load(std::memory_order_relaxed));
 
 	// Resolve inputs outside the gn_* mutex (DataStore handles its own locking).
+	// With navg > 1 the frames genalyzer averages come out of the store's chunk
+	// history, so ask for the whole window rather than the newest chunk. window()
+	// returns a short vector while history is still filling, which the n/navg
+	// derivation below absorbs — the first cycles just use a smaller nfft.
+	int want;
+	{
+		// m_nfft is written by resizeForNfft() from both this thread and
+		// setAveraging(); take the mutex for the read rather than tearing.
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+		want = m_nfft * navg;
+	}
 	QVector<float> iSamples, qSamples;
 	for(int i = 0; i < nWatched; ++i) {
-		auto s = store->latestAs<QVector<float>>(m_watchedKeys[i]);
-		if(!s) {
-			if(store->contains(m_watchedKeys[i]))
-				report(AcquisitionError::Severity::Warning,
-				       QStringLiteral("input %1 is not float; skipping").arg(i));
-			return;
+		QVector<float> s;
+		if(navg > 1) {
+			s = store->windowAs<QVector<float>>(m_watchedKeys[i], want);
+			if(s.isEmpty()) {
+				if(store->contains(m_watchedKeys[i]))
+					report(AcquisitionError::Severity::Warning,
+					       QStringLiteral("input %1 is not float; skipping").arg(i));
+				return;
+			}
+		} else {
+			auto v = store->latestAs<QVector<float>>(m_watchedKeys[i]);
+			if(!v) {
+				if(store->contains(m_watchedKeys[i]))
+					report(AcquisitionError::Severity::Warning,
+					       QStringLiteral("input %1 is not float; skipping").arg(i));
+				return;
+			}
+			s = std::move(*v);
 		}
-		(i == 0 ? iSamples : qSamples) = std::move(*s);
+		(i == 0 ? iSamples : qSamples) = std::move(s);
 	}
 
 	const int n = (currentMode == FFTMode::Complex)
 			      ? qMin(iSamples.size(), qSamples.size())
 			      : iSamples.size();
-	if(n <= 0)
+	// nfft is derived, not configured: the input carries navg frames of it. A
+	// partial window (history still filling) truncates rather than skips, so the
+	// spectrum appears from the first cycle at reduced resolution.
+	const int nfft = n / navg;
+	if(nfft <= 0)
 		return;
 
-	std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+	bool resized = false;
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
 
-	if(n != m_nfft || currentMode != m_lastModeForAxis) {
-		report(AcquisitionError::Severity::Info,
-		       QStringLiteral("resize: nfft %1 -> %2 mode=%3")
-			       .arg(m_nfft)
-			       .arg(n)
-			       .arg(currentMode == FFTMode::Real ? "Real" : "Complex"));
-		resizeForNfft(n, currentMode);
-		// nfft or mode changed -> previous gn configs are stale.
-		cleanupAutoConfig();
-		cleanupFaConfig();
+		if(nfft != m_nfft || currentMode != m_lastModeForAxis || navg != m_sizedForNavg) {
+			report(AcquisitionError::Severity::Info,
+			       QStringLiteral("resize: nfft %1 -> %2 navg=%3 mode=%4")
+				       .arg(m_nfft)
+				       .arg(nfft)
+				       .arg(navg)
+				       .arg(currentMode == FFTMode::Real ? "Real" : "Complex"));
+			resizeForNfft(nfft, currentMode, navg);
+			// nfft, mode or navg changed -> previous gn configs are stale.
+			cleanupAutoConfig();
+			cleanupFaConfig();
+			resized = true;
+		}
+
+		int err = 0;
+		if(currentMode == FFTMode::Complex)
+			err = runComplexFFT(iSamples, qSamples, navg);
+		else
+			err = runRealFFT(iSamples, navg);
+
+		if(err != 0) {
+			Q_EMIT analysisFailed(QStringLiteral("fft=%1").arg(err));
+			return;
+		}
+
+		// Publish dB output + frequency axis.
+		QVector<float> out(m_outBins);
+		for(int i = 0; i < m_outBins; ++i)
+			out[i] = static_cast<float>(m_dbBuf[i]);
+
+		store->write(m_outputKey, std::move(out));
+		store->write(m_freqKey, m_freqAxis);
+
+		// Analysis is optional.
+		if(m_cfg.enabled)
+			performAnalysis(currentMode);
 	}
 
-	int err = 0;
-	if(currentMode == FFTMode::Complex)
-		err = runComplexFFT(iSamples, qSamples);
-	else
-		err = runRealFFT(iSamples);
-
-	if(err != 0) {
-		Q_EMIT analysisFailed(QStringLiteral("fft=%1").arg(err));
-		return;
+	// Outside the gn_* mutex: a settings widget slot reading nfft() or window()
+	// takes that same non-recursive mutex, and a direct connection would deadlock.
+	if(resized) {
+		// The claim is sized navg*nfft, so a derived nfft has to re-register it —
+		// otherwise averaging keeps the old, possibly too-small, depth.
+		reclaimAveragingDepth();
+		Q_EMIT nfftChanged(nfft);
 	}
-
-	// Publish dB output + frequency axis.
-	QVector<float> out(m_outBins);
-	for(int i = 0; i < m_outBins; ++i)
-		out[i] = static_cast<float>(m_dbBuf[i]);
-
-	store->write(m_outputKey, std::move(out));
-	store->write(m_freqKey, m_freqAxis);
-
-	// Analysis is optional.
-	if(m_cfg.enabled)
-		performAnalysis(currentMode);
 }
 
 } // namespace acq
