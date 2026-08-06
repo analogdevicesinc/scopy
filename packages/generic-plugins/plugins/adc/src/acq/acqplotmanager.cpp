@@ -21,19 +21,29 @@
 
 #include "acqplotmanager.h"
 
+#include "acqannotationrepr.h"
 #include "acqchannel.h"
 #include "acqcurverepr.h"
 #include "acqdigitalrepr.h"
 #include "acqplotrow.h"
 #include "acqwaterfallrepr.h"
+#include "measurementcontroller.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
 
+#include <gui/cursorcontroller.h>
 #include <gui/plotaxis.h>
 #include <gui/plotwidget.h>
+#include <gui/style.h>
+#include <gui/widgets/cursorsettings.h>
+#include <gui/widgets/measurementpanel.h>
+#include <gui/widgets/menusectionwidget.h>
 
+#include <QLabel>
+#include <QListWidget>
 #include <QLoggingCategory>
+#include <QPushButton>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QTimer>
@@ -51,6 +61,9 @@ namespace {
 // ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
 // extra cycles into one repaint.
 constexpr int kFrameIntervalMs = 16;
+
+// The one page the manager owns itself, as opposed to one per channel.
+constexpr const char *kKeyPickerPageId = "acq-keys";
 
 } // namespace
 
@@ -140,12 +153,12 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 		} else {
 			switch(*t) {
 			case scopy::acq::SampleType::Annotation:
-				// Every numeric conversion returns empty for annotations, so a curve
-				// or a digital track here would silently draw nothing. Refuse
-				// visibly instead; an AnnotationRepr is the eventual answer.
-				qWarning(CAT_ACQ_PLOTMANAGER)
-					<< "no representation for annotation stream" << key.toString();
-				return nullptr;
+				// The one type Auto can resolve exactly rather than guess: an
+				// annotation stream has no numeric conversion at all (toFloat and
+				// toBits both return empty for it), so AnnotationRepr is not a
+				// heuristic, it is the only representation that can read it.
+				kind = ReprKind::Annotations;
+				break;
 			case scopy::acq::SampleType::UInt8:
 			case scopy::acq::SampleType::Int8:
 				// A heuristic, not a truth: an 8-bit ADC stream would land here too.
@@ -156,6 +169,21 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 				kind = ReprKind::Curve;
 				break;
 			}
+		}
+	}
+
+	// Auto cannot land here — it resolves annotations to AnnotationRepr — but an
+	// explicit kind can, and this is the one combination that fails silently rather
+	// than visibly: toFloat and toBits both return empty for an annotation stream, so
+	// a curve or a digital track pointed at one draws nothing and looks like a dead
+	// key. Refuse with a warning instead.
+	if(kind != ReprKind::Annotations && !m_store.isNull()) {
+		const std::optional<scopy::acq::SampleType> t = m_store->typeOf(key);
+		if(t.has_value() && *t == scopy::acq::SampleType::Annotation) {
+			qWarning(CAT_ACQ_PLOTMANAGER)
+				<< "key" << key.toString()
+				<< "is an annotation stream; only ReprKind::Annotations can read it";
+			return nullptr;
 		}
 	}
 
@@ -173,6 +201,8 @@ std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataK
 		// Never picked by Auto: any Float32 stream converts, but a spectrogram of a
 		// time-domain stream is noise. It has to be asked for.
 		return std::make_unique<WaterfallRepr>();
+	case ReprKind::Annotations:
+		return std::make_unique<AnnotationRepr>();
 	case ReprKind::Auto:
 		break;
 	}
@@ -209,8 +239,16 @@ AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QSt
 
 	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
 
-	// After attach(): the settings page binds to the repr's PlotChannel and to the
-	// row's axis, neither of which exists before it.
+	// Before the claim would be more natural for the X key — a curve with an X stream
+	// reads two keys — but the claim here is for this channel's own key only, so the
+	// order does not matter. Before registerRail so the settings page sees a
+	// fully-configured repr.
+	applyCurveDefaults(ch);
+
+	// Both after attach(): the settings page binds to the repr's PlotChannel and the
+	// row's axis, and the measure manager is created in attach() too (it needs the
+	// pen colour).
+	registerMeasurements(ch);
 	registerRail(ch);
 
 	return ch;
@@ -274,6 +312,282 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 	m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
 }
 
+void AcqPlotManager::setSampleRate(double sr)
+{
+	if(sr <= 0.0) {
+		return;
+	}
+	m_sampleRate = sr;
+	// Also to the channels that already exist, so the controller may call this before
+	// or after any of them is created without the result differing.
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		applyCurveDefaults(ch);
+	}
+}
+
+void AcqPlotManager::setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey)
+{
+	if(key.key.isEmpty() || xKey.key.isEmpty()) {
+		return;
+	}
+	m_xKeys.insert(key, xKey);
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		applyCurveDefaults(ch);
+	}
+}
+
+void AcqPlotManager::applyCurveDefaults(AcqChannel *ch)
+{
+	if(!ch || !ch->repr()) {
+		return;
+	}
+	// Only a curve has either. A dynamic_cast rather than reading kindName(): the two
+	// setters are CurveRepr's own, not part of the repr interface, so this is the one
+	// place in the manager that has to know a concrete repr type — and a failed cast
+	// is exactly the right answer for a digital track or a waterfall.
+	CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr());
+	if(!curve) {
+		return;
+	}
+	curve->setSampleRate(m_sampleRate);
+	// Only when one is registered: setXKey with an empty key would be a no-op anyway,
+	// but leaving an already-set key alone matters if a reader ever sets one by hand.
+	const auto it = m_xKeys.constFind(ch->key());
+	if(it != m_xKeys.constEnd()) {
+		curve->setXKey(it.value());
+	}
+}
+
+MeasurementsPanel *AcqPlotManager::measurePanel()
+{
+	if(m_measurePanel.isNull() && !m_shell.isNull()) {
+		m_measurePanel = new MeasurementsPanel(this);
+		// Both hide themselves when their label list empties
+		// (gui/src/widgets/measurementpanel.cpp:174-176), so starting hidden keeps the
+		// two states consistent — otherwise an untouched instrument reserves plot
+		// height for an empty strip that would never come back once hidden.
+		m_measurePanel->setVisible(false);
+		m_shell->addToSlot(PS_BOTTOM, m_measurePanel);
+	}
+	return m_measurePanel.data();
+}
+
+StatsPanel *AcqPlotManager::statsPanel()
+{
+	if(m_statsPanel.isNull() && !m_shell.isNull()) {
+		m_statsPanel = new StatsPanel(this);
+		m_statsPanel->setVisible(false);
+		// StatsPanel asks for Expanding in both directions, which is right for the side
+		// slot it was written for and wrong above a plot: PS_TOP is an unstretched
+		// layout, so the panel would still claim height off its scroll area's size hint
+		// and push the plot down. Maximum vertically, the same policy MeasurementsPanel
+		// picks for itself (gui/src/widgets/measurementpanel.cpp:44).
+		m_statsPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+		// PS_TOP, above the plot, with the measurement readouts below it. Stats are the
+		// min/max/avg of the measurements — reading the two against each other means
+		// both laid out the same way, not one of them turned sideways in the right slot.
+		m_shell->addToSlot(PS_TOP, m_statsPanel);
+	}
+	return m_statsPanel.data();
+}
+
+void AcqPlotManager::registerMeasurements(AcqChannel *ch)
+{
+	if(!ch || !ch->repr()) {
+		return;
+	}
+	MeasureManagerInterface *mgr = ch->repr()->measureManager();
+	if(!mgr) {
+		// A digital track or a waterfall. Nothing to measure, and no panel to create
+		// for it — which is why the panels are built lazily here rather than in the
+		// constructor.
+		return;
+	}
+
+	MeasurementsPanel *meas = measurePanel();
+	StatsPanel *stats = statsPanel();
+	if(!meas || !stats) {
+		return;
+	}
+
+	connect(mgr, &MeasureManagerInterface::enableMeasurement, meas, &MeasurementsPanel::addMeasurement);
+	connect(mgr, &MeasureManagerInterface::disableMeasurement, meas, &MeasurementsPanel::removeMeasurement);
+	// The panel is shown by the first label rather than up front, and never hidden
+	// here: it hides itself when the last label goes.
+	connect(mgr, &MeasureManagerInterface::enableMeasurement, meas, [meas]() { meas->setVisible(true); });
+
+	connect(mgr, &MeasureManagerInterface::enableStat, stats, &StatsPanel::addStat);
+	connect(mgr, &MeasureManagerInterface::disableStat, stats, &StatsPanel::removeStat);
+	connect(mgr, &MeasureManagerInterface::enableStat, stats, [stats]() { stats->setVisible(true); });
+
+	// The panels' own "hide all" button unchecks every selector box, which is what
+	// actually removes the labels — the button alone would leave the model measuring.
+	// inhibitUpdates around it because removeMeasurement relayouts the whole stack per
+	// label otherwise (measurementpanel.cpp:178-182).
+	connect(meas, &MeasurementsPanel::hideAll, mgr, [meas, mgr]() {
+		meas->setInhibitUpdates(true);
+		Q_EMIT mgr->toggleAllMeasurement(false);
+		meas->setInhibitUpdates(false);
+	});
+	connect(stats, &StatsPanel::hideAll, mgr, [mgr]() { Q_EMIT mgr->toggleAllStats(false); });
+}
+
+CursorController *AcqPlotManager::cursors(CursorSettings **settings)
+{
+	if(!m_cursors.isNull()) {
+		if(settings) {
+			*settings = m_cursorSettings.data();
+		}
+		return m_cursors.data();
+	}
+	PlotWidget *plot = sharedPlot();
+	if(!plot) {
+		return nullptr;
+	}
+
+	m_cursors = new CursorController(plot, this);
+	// Parented here only so it cannot leak when the caller ignores it, and hidden
+	// because this widget has no layout — an unhidden child would paint over the plot
+	// at 0,0. The caller reparents it into whatever shows it.
+	m_cursorSettings = new CursorSettings(this);
+	m_cursorSettings->hide();
+	m_cursors->connectSignals(m_cursorSettings.data());
+	// Cursors off until asked for: the handles are created either way, but a plot that
+	// opens with four cursors on it is not what anyone wants.
+	m_cursors->setVisible(false);
+	if(settings) {
+		*settings = m_cursorSettings.data();
+	}
+	return m_cursors.data();
+}
+
+QString AcqPlotManager::createKeyPickerPage()
+{
+	const QString id = QString::fromLatin1(kKeyPickerPageId);
+	if(m_shell.isNull() || m_shell->hasMenuPage(id)) {
+		return id;
+	}
+
+	QWidget *page = new QWidget(this);
+	QVBoxLayout *lay = new QVBoxLayout(page);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	// SO_VIEW: adding a plot channel reads a key, it does not configure a block.
+	MenuSectionCollapseWidget *section = m_shell->createMenuSection(QStringLiteral("ADD CHANNEL"), SO_VIEW, page);
+
+	// Shown while the list is empty. A key exists only once something has been written
+	// to it, so before the first run this page has nothing to offer and an empty list
+	// with a dead Add button reads as a broken page rather than an early one.
+	m_keyHint = new QLabel(QObject::tr("No data streams yet — run the acquisition once."), section);
+	m_keyHint->setWordWrap(true);
+	Style::setStyle(m_keyHint, style::properties::label::subtle);
+	section->add(m_keyHint);
+
+	m_keyList = new QListWidget(section);
+	m_keyList->setSelectionMode(QAbstractItemView::SingleSelection);
+	section->add(m_keyList);
+
+	m_keyKindCombo = new MenuCombo(QStringLiteral("Representation"), section);
+	// Auto first, and it is finally honest here: every key in this list has been
+	// written at least once, so DataStore::typeOf() can answer and makeRepr's
+	// type switch is a real decision rather than a fallback to Curve.
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Auto"), static_cast<int>(ReprKind::Auto));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Curve"), static_cast<int>(ReprKind::Curve));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Digital"), static_cast<int>(ReprKind::Digital));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Waterfall"), static_cast<int>(ReprKind::Waterfall));
+	m_keyKindCombo->combo()->addItem(QStringLiteral("Annotations"), static_cast<int>(ReprKind::Annotations));
+	section->add(m_keyKindCombo);
+
+	m_keyAddBtn = new QPushButton(QObject::tr("Add"), section);
+	Style::setStyle(m_keyAddBtn, style::properties::button::basicButton);
+	// Disabled until a key is selected, so "nothing selected" is visible in the button
+	// rather than only in the guard below. A QListWidget selects nothing by default and
+	// an enabled Add that silently does nothing is indistinguishable from a broken one.
+	m_keyAddBtn->setEnabled(false);
+	section->add(m_keyAddBtn);
+	connect(m_keyList.data(), &QListWidget::currentItemChanged, m_keyAddBtn,
+		[this](QListWidgetItem *cur, QListWidgetItem *) { m_keyAddBtn->setEnabled(cur != nullptr); });
+	// Double-click adds directly: selecting then reaching for the button is two gestures
+	// for what reads as one action.
+	connect(m_keyList.data(), &QListWidget::itemDoubleClicked, m_keyAddBtn, [this]() { m_keyAddBtn->click(); });
+
+	connect(m_keyAddBtn.data(), &QPushButton::clicked, this, [this]() {
+		if(m_keyList.isNull() || !m_keyList->currentItem() || m_keyKindCombo.isNull()) {
+			return;
+		}
+		const scopy::acq::DataKey key(m_keyList->currentItem()->text());
+		const ReprKind kind = static_cast<ReprKind>(m_keyKindCombo->combo()->currentData().toInt());
+		// Name guessed from the key's channel segment, colour cycled by channel count.
+		// Both are editable from the new channel's own page, so guessing is fine — and
+		// channelId() is empty for a key that does not follow the source_channel_stage
+		// convention, hence the fallback to the whole key.
+		const QString chId = key.channelId();
+		AcqChannel *ch = addChannel(key, chId.isEmpty() ? key.toString() : chId,
+					    Style::getChannelColor(m_channels.count()), kind);
+		if(!ch) {
+			// makeRepr refused. Only reachable by naming a kind that cannot read the
+			// key — a Curve or Digital on an annotation stream — since Auto resolves
+			// every type there is.
+			return;
+		}
+		// Straight to the new channel's page: the guessed name and colour are the first
+		// things a reader will want to change.
+		if(!m_shell.isNull()) {
+			m_shell->showMenuPage(ch->menuId());
+		}
+	});
+
+	lay->addWidget(section);
+	lay->addStretch();
+
+	m_shell->addMenuPage(id, page);
+	// Pinned above the groups rather than inside one: it is not a channel, and it has
+	// to be reachable before any channel exists.
+	m_shell->addRailHeaderRow(QStringLiteral("Add channel"), id);
+
+	refreshKeyPicker();
+	return id;
+}
+
+void AcqPlotManager::refreshKeyPicker()
+{
+	if(m_keyList.isNull() || m_store.isNull()) {
+		return;
+	}
+	// Rebuilt wholesale rather than diffed: the list is short, and the selection is
+	// only meaningful at the moment Add is pressed. Preserve it anyway so a key
+	// arriving mid-choice does not move the target out from under the pointer.
+	const QString selected = m_keyList->currentItem() ? m_keyList->currentItem()->text() : QString();
+
+	m_keyList->clear();
+	const QList<scopy::acq::DataKey> keys = m_store->keys();
+	for(const scopy::acq::DataKey &k : keys) {
+		m_keyList->addItem(k.toString());
+	}
+
+	bool restored = false;
+	if(!selected.isEmpty()) {
+		const QList<QListWidgetItem *> found = m_keyList->findItems(selected, Qt::MatchExactly);
+		if(!found.isEmpty()) {
+			m_keyList->setCurrentItem(found.first());
+			restored = true;
+		}
+	}
+	// Otherwise select the first key, so the list is never populated-but-unselected.
+	// clear() drops the selection, so without this Add stays disabled after every
+	// refresh until the reader clicks — and the first refresh, where the keys appear
+	// all at once, is exactly when they have not clicked anything yet.
+	if(!restored && m_keyList->count() > 0) {
+		m_keyList->setCurrentRow(0);
+	}
+
+	// The list and the hint are exclusive: one of the two always says what the state is.
+	if(!m_keyHint.isNull()) {
+		m_keyHint->setVisible(m_keyList->count() == 0);
+	}
+	m_keyList->setVisible(m_keyList->count() > 0);
+}
+
 void AcqPlotManager::rebuildIndexRamp()
 {
 	m_indexX.resize(m_plotSize);
@@ -322,6 +636,11 @@ void AcqPlotManager::onKeysChanged(QList<scopy::acq::DataKey> keys)
 	// wholesale, so after either every channel's claim is gone and must be
 	// re-registered.
 	reclaimAll();
+	// The picker's whole content comes from here. keysChanged fires on the first write
+	// to a key (DataStore.cpp:26) and on reset/remove (:172, :186), and createKeyPickerPage
+	// runs before the engine has ever produced anything, so without this the list is
+	// built empty once and stays that way for the life of the instrument.
+	refreshKeyPicker();
 	Q_EMIT keysAvailable(keys);
 }
 

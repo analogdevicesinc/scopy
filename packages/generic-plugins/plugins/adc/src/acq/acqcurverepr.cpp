@@ -22,6 +22,7 @@
 #include "acqcurverepr.h"
 
 #include "acqplotrow.h"
+#include "measurementcontroller.h"
 
 #include <core/acq_engine/DataStore.h>
 
@@ -60,6 +61,12 @@ void CurveRepr::attach(AcqPlotRow *row, const QString &name, const QColor &color
 	// setSamples() before this line.
 	m_plot->addPlotChannel(m_ch);
 	m_ch->setEnabled(m_enabled);
+
+	// Here rather than in the constructor: initMeasure() stamps the pen colour onto
+	// every label it later creates, and the colour arrives with the row.
+	m_measureMgr = std::make_unique<TimeMeasureManager>();
+	m_measureMgr->initMeasure(QPen(color));
+	m_measureMgr->getModel()->setSampleRate(m_sampleRate);
 }
 
 void CurveRepr::detach()
@@ -151,12 +158,31 @@ void CurveRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &ke
 	// nothing can paint a prior run's tail. Same choice and same reasoning as
 	// src/sim/siminstrumentcontroller.cpp:1077-1081.
 	m_ch->setSamples(xPtr, y.data, static_cast<size_t>(n), true);
+
+	// Measured on the same window that was just drawn, so a label can never disagree
+	// with the curve above it. MeasureModel::setDataSource keeps the bare pointer and
+	// measure() reads it synchronously, which is safe for the same reason the view is:
+	// it aliases m_live or m_scratch, both members, so it stays valid until the next
+	// pull replaces them. Same call pair as
+	// src/time/grtimechannelcomponent.cpp:439-441.
+	if(m_measureMgr) {
+		MeasureModel *model = m_measureMgr->getModel();
+		model->setDataSource(y.data, static_cast<size_t>(n));
+		model->measure();
+	}
 }
 
 void CurveRepr::reset()
 {
 	// Drop every cached window so no prior-run buffer is reachable on the next
 	// cycle.
+	// Before the buffers go: the measure model holds a bare pointer into m_live or
+	// m_scratch from the last pull, and clearing those without telling it leaves it
+	// pointing at freed memory for any measure() before the next pull.
+	if(m_measureMgr) {
+		m_measureMgr->getModel()->setDataSource(nullptr, 0);
+	}
+
 	m_live = scopy::acq::SampleVariant{};
 	m_liveX = scopy::acq::SampleVariant{};
 	m_scratch.clear();
@@ -230,7 +256,31 @@ QWidget *CurveRepr::createSettingsWidget(QWidget *parent)
 	lay->addWidget(autoBtn);
 	lay->addWidget(m_yCtrl);
 	lay->addWidget(style);
+
+	// The measurement selector — two collapsible sections of checkbox pairs
+	// (measure · stat) which drive the panels the manager wired up. Built here rather
+	// than by the manager because it is per-curve, and it is the same widget the
+	// existing time channel puts in its menu
+	// (src/time/grtimechannelcomponent.cpp:215).
+	if(m_measureMgr) {
+		lay->addWidget(m_measureMgr->createMeasurementMenu(w));
+	}
+
 	return w;
+}
+
+MeasureManagerInterface *CurveRepr::measureManager() const { return m_measureMgr.get(); }
+
+void CurveRepr::setSampleRate(double sr)
+{
+	if(sr <= 0.0) {
+		return;
+	}
+	m_sampleRate = sr;
+	// Tolerates being called before attach(): the value is replayed there.
+	if(m_measureMgr) {
+		m_measureMgr->getModel()->setSampleRate(sr);
+	}
 }
 
 void CurveRepr::syncAutoscalerChannel()

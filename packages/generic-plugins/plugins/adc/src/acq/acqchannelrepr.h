@@ -41,6 +41,7 @@ class DataStore;
 namespace adc {
 
 class AcqPlotRow;
+class MeasureManagerInterface;
 
 // How one channel is drawn. A channel is a DataKey plus one of these plus the GUI
 // to edit it; everything else — FFT, scale/offset, thresholds — is an engine block
@@ -146,6 +147,19 @@ public:
 		Q_UNUSED(parent)
 		return nullptr;
 	}
+
+	// ---- measurements ------------------------------------------------------
+
+	// The repr's measurement manager, or null for a repr with nothing to measure.
+	//
+	// It lives here rather than on the channel for the same reason the settings do:
+	// what a measurement *means* is a property of the representation. Period and rise
+	// time are questions about a time-domain curve; a spectrogram has no answer to
+	// them, and a digital track's answers would be a different set entirely.
+	//
+	// Non-null only after attach(). The manager's panels bind to its signals once,
+	// which is why it must be created in attach() and not per call.
+	virtual MeasureManagerInterface *measureManager() const { return nullptr; }
 
 	virtual void setEnabled(bool en) = 0;
 
