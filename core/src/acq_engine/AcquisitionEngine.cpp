@@ -80,24 +80,37 @@ void AcquisitionEngine::setRunLast(ProcessorBlock *proc)
 
 void AcquisitionEngine::syncBlocks()
 {
-	QMutexLocker lk(&m_blockMutex);
+	bool changed;
+	{
+		QMutexLocker lk(&m_blockMutex);
 
-	for(SourceBlock *s : m_pendingRemoveSources)
-		m_sources.removeAll(s);
-	for(SourceBlock *s : m_pendingAddSources)
-		if(!m_sources.contains(s))
-			m_sources.append(s);
+		// Called once per cycle from loop(), so most calls have nothing
+		// pending — only report a change when something was actually applied.
+		changed = !m_pendingAddSources.isEmpty() || !m_pendingRemoveSources.isEmpty() ||
+			  !m_pendingAddProcessors.isEmpty() || !m_pendingRemoveProcessors.isEmpty();
 
-	for(ProcessorBlock *p : m_pendingRemoveProcessors)
-		m_processors.removeAll(p);
-	for(ProcessorBlock *p : m_pendingAddProcessors)
-		if(!m_processors.contains(p))
-			m_processors.append(p);
+		for(SourceBlock *s : m_pendingRemoveSources)
+			m_sources.removeAll(s);
+		for(SourceBlock *s : m_pendingAddSources)
+			if(!m_sources.contains(s))
+				m_sources.append(s);
 
-	m_pendingAddSources.clear();
-	m_pendingRemoveSources.clear();
-	m_pendingAddProcessors.clear();
-	m_pendingRemoveProcessors.clear();
+		for(ProcessorBlock *p : m_pendingRemoveProcessors)
+			m_processors.removeAll(p);
+		for(ProcessorBlock *p : m_pendingAddProcessors)
+			if(!m_processors.contains(p))
+				m_processors.append(p);
+
+		m_pendingAddSources.clear();
+		m_pendingRemoveSources.clear();
+		m_pendingAddProcessors.clear();
+		m_pendingRemoveProcessors.clear();
+	}
+
+	// Emitted with m_blockMutex released: a directly-connected slot calling
+	// sources()/processors() would otherwise deadlock on it.
+	if(changed)
+		Q_EMIT blocksChanged();
 }
 
 QList<SourceBlock *> AcquisitionEngine::sources() const
@@ -117,8 +130,8 @@ QList<ProcessorBlock *> AcquisitionEngine::processors() const
 bool         AcquisitionEngine::isRunning() const { return m_running; }
 void         AcquisitionEngine::setBufferSize(std::size_t size) { m_bufferSize = size; }
 std::size_t  AcquisitionEngine::bufferSize() const { return m_bufferSize; }
-void         AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS = fps; }
-unsigned int AcquisitionEngine::maxFPS() const { return m_maxFPS; }
+void         AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS.store(fps); }
+unsigned int AcquisitionEngine::maxFPS() const { return m_maxFPS.load(); }
 void         AcquisitionEngine::setMode(Mode m) { m_mode.store(m); }
 AcquisitionEngine::Mode AcquisitionEngine::mode() const { return m_mode.load(); }
 
@@ -281,16 +294,20 @@ void AcquisitionEngine::loop()
 			Q_EMIT cycleComplete();
 			if(!m_running)
 				break;
-			// Throttle so every cycle gets a chance to be displayed.
-			if(m_maxFPS > 0) {
-				const qint64 minMs = 1000LL / m_maxFPS;
+			// Throttle so every cycle gets a chance to be displayed. Read
+			// once: a concurrent setMaxFPS() must not change the divisor
+			// between the guard and the division.
+			const unsigned int fps = m_maxFPS.load();
+			if(fps > 0) {
+				const qint64 minMs = 1000LL / fps;
 				const qint64 spent = cycleTimer.elapsed();
 				if(spent < minMs)
 					QThread::msleep(static_cast<unsigned long>(minMs - spent));
 			}
 		} else {
 			// Free-run; only the notification is rate-limited.
-			const qint64 hbMs = m_maxFPS > 0 ? 1000LL / m_maxFPS : 16;
+			const unsigned int fps = m_maxFPS.load();
+			const qint64       hbMs = fps > 0 ? 1000LL / fps : 16;
 			if(heartbeatTimer.elapsed() >= hbMs) {
 				Q_EMIT cycleComplete();
 				heartbeatTimer.restart();
