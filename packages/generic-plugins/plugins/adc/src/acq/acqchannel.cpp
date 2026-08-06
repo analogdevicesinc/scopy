@@ -108,7 +108,8 @@ void AcqChannel::reclaimDepth(int plotSize, std::size_t bufferSize)
 	if(m_store.isNull() || !m_repr) {
 		return;
 	}
-	m_store->claimDepth(m_key, m_claimant, m_repr->claimDepth(plotSize, bufferSize));
+	const std::size_t depth = m_repr->claimDepth(plotSize, bufferSize);
+	m_store->claimDepth(m_key, m_claimant, depth);
 }
 
 void AcqChannel::setEnabled(bool en)

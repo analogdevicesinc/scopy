@@ -30,9 +30,12 @@
 struct iio_context;
 
 namespace scopy {
+class CollapsableMenuControlButton;
+
 namespace acq {
 class GenalyzerFFTProcessor;
-}
+class SourceBlock;
+} // namespace acq
 namespace adc {
 
 namespace sim {
@@ -68,6 +71,12 @@ public:
 private:
 	// Registers the test pipeline on the instrument's engine.
 	void setupBlocks(iio_context *ctx);
+
+	// One nested row per channel the source declares, each with a switch bound to the
+	// source's own enable state. Rebuilt on channelsChanged(), which is why the rows
+	// are not written out by hand at composition time — a source can gain or lose
+	// channels after onStart() has read the device.
+	void addSourceChannelRows(CollapsableMenuControlButton *parentRow, scopy::acq::SourceBlock *src);
 
 	// Builds the plot manager, makes it the center widget, and adds one channel per
 	// key the pipeline publishes. Runs after setupBlocks() so the block keys exist to

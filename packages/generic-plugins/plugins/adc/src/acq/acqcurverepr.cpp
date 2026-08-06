@@ -128,27 +128,14 @@ void CurveRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &ke
 		return;
 	}
 
-	const float *xPtr = nullptr;
-	int n = 0;
-
-	if(!m_xKey.key.isEmpty()) {
-		m_liveX = store->window(m_xKey, plotSize);
-		const scopy::acq::FloatView x = scopy::acq::toFloatView(m_liveX, m_scratchX);
-		if(x.size <= 0) {
-			return;
-		}
-		n = qMin(x.size, y.size);
-		xPtr = x.data;
-	} else {
-		if(!m_indexSrc || m_indexSrc->isEmpty()) {
-			return;
-		}
-		// A partial window is shorter, not left-padded (SampleBuffer::window), so
-		// right-anchor the shared ramp against it rather than starting at 0.
-		const int off = qMax(0, m_indexSrc->size() - y.size);
-		xPtr = m_indexSrc->constData() + off;
-		n = qMin(y.size, m_indexSrc->size() - off);
+	if(!m_indexSrc || m_indexSrc->isEmpty()) {
+		return;
 	}
+	// A partial window is shorter, not left-padded (SampleBuffer::window), so
+	// right-anchor the shared ramp against it rather than starting at 0.
+	const int off = qMax(0, m_indexSrc->size() - y.size);
+	const float *xPtr = m_indexSrc->constData() + off;
+	const int n = qMin(y.size, m_indexSrc->size() - off);
 
 	if(n <= 0) {
 		return;
@@ -184,9 +171,7 @@ void CurveRepr::reset()
 	}
 
 	m_live = scopy::acq::SampleVariant{};
-	m_liveX = scopy::acq::SampleVariant{};
 	m_scratch.clear();
-	m_scratchX.clear();
 
 	if(!m_ch || m_plot.isNull()) {
 		return;
@@ -267,32 +252,6 @@ QWidget *CurveRepr::createSettingsWidget(QWidget *parent)
 	}
 
 	return w;
-}
-
-MeasureManagerInterface *CurveRepr::measureManager() const { return m_measureMgr.get(); }
-
-void CurveRepr::setSampleRate(double sr)
-{
-	if(sr <= 0.0) {
-		return;
-	}
-	m_sampleRate = sr;
-	// Tolerates being called before attach(): the value is replayed there.
-	if(m_measureMgr) {
-		m_measureMgr->getModel()->setSampleRate(sr);
-	}
-}
-
-void CurveRepr::syncAutoscalerChannel()
-{
-	if(!m_autoscaler || !m_ch) {
-		return;
-	}
-	if(m_enabled) {
-		m_autoscaler->addChannels(m_ch);
-	} else {
-		m_autoscaler->removeChannels(m_ch);
-	}
 }
 
 void CurveRepr::setEnabled(bool en)
