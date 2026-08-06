@@ -45,18 +45,15 @@ class TimeMeasureManager;
 
 // An ordinary Qwt curve on the row's shared X/Y axes.
 //
-// Y comes from the channel's key. X is either the manager's shared 0..plotSize-1
-// ramp (borrowed, never copied — N channels must not each hold an identical
-// ramp) or a second key, which is how an FFT channel gets a frequency axis
-// without the channel knowing anything about FFTs.
+// Y comes from the channel's key. X is the manager's shared 0..plotSize-1 ramp,
+// borrowed and never copied — N channels must not each hold an identical ramp.
 //
 // LIFETIME — the toFloatView aliasing contract. FloatView points into the chunk
 // itself when the stream is already Float32, and into the scratch vector
 // otherwise; it is valid only while both outlive it
-// (core/include/core/acq_engine/SampleBuffer.h:94-100). So m_live/m_liveX and
-// m_scratch/m_scratchX are all members here, mirroring
-// src/sim/siminstrumentcontroller.h. Three rules follow, and each is a real
-// footgun:
+// (core/include/core/acq_engine/SampleBuffer.h:94-100). So m_live and m_scratch
+// are both members here, mirroring src/sim/siminstrumentcontroller.h. Three
+// rules follow, and each is a real footgun:
 //
 //   1. Assign the member, then take the view, then consume it, then return. A
 //      view must not survive pull().
@@ -100,11 +97,6 @@ public:
 	// The manager only ever resizes it from setPlotSize(), never from inside a pull.
 	void setIndexSource(const QVector<float> *idx) { m_indexSrc = idx; }
 
-	// Optional X stream, e.g. pluto_iq_freq for an FFT magnitude channel. Empty
-	// means "use the index ramp".
-	void setXKey(const scopy::acq::DataKey &k) { m_xKey = k; }
-	const scopy::acq::DataKey &xKey() const { return m_xKey; }
-
 	// For PlotAutoscaler and the curve-style control. Null before attach().
 	PlotChannel *plotChannel() const { return m_ch; }
 
@@ -120,12 +112,11 @@ private:
 	QPointer<AcqPlotRow> m_row;
 
 	const QVector<float> *m_indexSrc{nullptr};
-	scopy::acq::DataKey m_xKey;
 
-	// Read windows and their conversion scratch. Members, not locals — see the
+	// The read window and its conversion scratch. Members, not locals — see the
 	// lifetime note above.
-	scopy::acq::SampleVariant m_live, m_liveX;
-	QVector<float> m_scratch, m_scratchX;
+	scopy::acq::SampleVariant m_live;
+	QVector<float> m_scratch;
 
 	bool m_enabled{true};
 

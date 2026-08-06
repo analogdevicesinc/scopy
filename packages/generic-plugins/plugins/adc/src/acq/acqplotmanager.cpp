@@ -33,17 +33,12 @@
 #include <core/acq_engine/DataStore.h>
 
 #include <gui/cursorcontroller.h>
-#include <gui/plotaxis.h>
 #include <gui/plotwidget.h>
-#include <gui/style.h>
 #include <gui/widgets/cursorsettings.h>
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/menusectionwidget.h>
 
-#include <QLabel>
-#include <QListWidget>
 #include <QLoggingCategory>
-#include <QPushButton>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QTimer>
@@ -61,9 +56,6 @@ namespace {
 // ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
 // extra cycles into one repaint.
 constexpr int kFrameIntervalMs = 16;
-
-// The one page the manager owns itself, as opposed to one per channel.
-constexpr const char *kKeyPickerPageId = "acq-keys";
 
 } // namespace
 
@@ -87,8 +79,8 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 	rebuildIndexRamp();
 	// setPlotSize() would early-return on the unchanged value, so the initial X range
 	// has to be set by hand — otherwise the first frame draws against Qwt's default.
-	if(PlotWidget *p = sharedPlot()) {
-		p->xAxis()->setInterval(0, m_plotSize - 1);
+	if(m_sharedRow) {
+		m_sharedRow->setXInterval(0, qMax(1, m_plotSize - 1));
 	}
 
 	m_frameTimer = new QTimer(this);
@@ -239,10 +231,7 @@ AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QSt
 
 	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
 
-	// Before the claim would be more natural for the X key — a curve with an X stream
-	// reads two keys — but the claim here is for this channel's own key only, so the
-	// order does not matter. Before registerRail so the settings page sees a
-	// fully-configured repr.
+	// Before registerRail so the settings page sees a fully-configured repr.
 	applyCurveDefaults(ch);
 
 	// Both after attach(): the settings page binds to the repr's PlotChannel and the
@@ -260,8 +249,43 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 		return;
 	}
 	unregisterRail(ch);
-	// The destructor detaches and releases the claim.
-	delete ch;
+
+	// An exclusive row exists only for this channel's repr — a waterfall brought its own
+	// PlotWidget through createOwnPlot(). WaterfallRepr::detach() deliberately does not
+	// delete it (destruction order between a plot and the channel is unspecified, so a
+	// repr never deletes its plot), which leaves the manager to drop the row here or the
+	// splitter keeps a dead empty pane forever.
+	AcqPlotRow *ownRow = ch->row();
+	if(ownRow && ownRow->isExclusive() && ownRow != m_sharedRow) {
+		m_rows.removeOne(ownRow);
+	} else {
+		ownRow = nullptr;
+	}
+
+	// Detach the visual now rather than leaving it to the destructor: a pull() between
+	// here and the delete would be harmless (the channel is off m_channels), but a
+	// pending replot() would still paint an item whose repr is about to go. Also, this
+	// nulls the repr's plot pointer before the plot below is deleted.
+	ch->detach();
+
+	if(ownRow) {
+		// The plot first, then the row: AcqPlotRow holds it in a QPointer and its own
+		// destructor touches nothing, but the order keeps replot() from being reachable
+		// through a row still in m_rows.
+		if(PlotWidget *p = ownRow->plot()) {
+			// Removing from the splitter is implicit in the delete; deleteLater so a
+			// pending paint event on the canvas finishes first.
+			p->deleteLater();
+		}
+		delete ownRow;
+	}
+
+	// deleteLater, not delete: this is public, and a caller may well be inside a signal
+	// emitted by the very channel it is removing. The destructor detaches (idempotently)
+	// and releases the depth claim.
+	ch->deleteLater();
+
+	m_dirty = true;
 }
 
 void AcqPlotManager::registerRail(AcqChannel *ch)
@@ -280,7 +304,13 @@ void AcqPlotManager::registerRail(AcqChannel *ch)
 
 	// Built once, here, and never rebuilt — which is only sound because the key and
 	// the repr are fixed for the channel's life.
-	m_shell->addMenuPage(id, ch->createSettingsPage(m_shell.data()));
+	QWidget *page = ch->createSettingsPage(m_shell.data());
+	m_shell->addMenuPage(id, page);
+	// Remembered because removeMenuPage() only takes the widget out of the stack
+	// (MapStackedWidget::remove -> QStackedWidget::removeWidget, which reparents to
+	// nullptr and deletes nothing). Without this the page outlives the channel as an
+	// orphaned top-level widget.
+	m_railPages.insert(ch, page);
 
 	if(SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row)) {
 		connect(sw, &QAbstractButton::toggled, ch, &AcqChannel::setEnabled);
@@ -305,11 +335,20 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 		return;
 	}
 	MenuControlButton *row = m_railRows.take(ch);
-	if(!row || m_shell.isNull()) {
+	QWidget *page = m_railPages.take(ch);
+	if(m_shell.isNull()) {
 		return;
 	}
-	// Four steps, done by the shell: button group, layout, menu page, deleteLater.
-	m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
+	if(row) {
+		// Four steps, done by the shell: button group, layout, menu page, deleteLater.
+		m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
+	}
+	if(page) {
+		// deleteLater rather than delete: a caller may be removing this channel from
+		// inside a signal raised by a widget on this very page, so the tree holding it
+		// has to outlive the emission.
+		page->deleteLater();
+	}
 }
 
 void AcqPlotManager::setSampleRate(double sr)
@@ -325,37 +364,20 @@ void AcqPlotManager::setSampleRate(double sr)
 	}
 }
 
-void AcqPlotManager::setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey)
-{
-	if(key.key.isEmpty() || xKey.key.isEmpty()) {
-		return;
-	}
-	m_xKeys.insert(key, xKey);
-	for(AcqChannel *ch : std::as_const(m_channels)) {
-		applyCurveDefaults(ch);
-	}
-}
-
 void AcqPlotManager::applyCurveDefaults(AcqChannel *ch)
 {
 	if(!ch || !ch->repr()) {
 		return;
 	}
-	// Only a curve has either. A dynamic_cast rather than reading kindName(): the two
-	// setters are CurveRepr's own, not part of the repr interface, so this is the one
-	// place in the manager that has to know a concrete repr type — and a failed cast
-	// is exactly the right answer for a digital track or a waterfall.
+	// A dynamic_cast rather than reading kindName(): setSampleRate is CurveRepr's own,
+	// not part of the repr interface, so this is the one place in the manager that has to
+	// know a concrete repr type — and a failed cast is exactly the right answer for a
+	// digital track or a waterfall.
 	CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr());
 	if(!curve) {
 		return;
 	}
 	curve->setSampleRate(m_sampleRate);
-	// Only when one is registered: setXKey with an empty key would be a no-op anyway,
-	// but leaving an already-set key alone matters if a reader ever sets one by hand.
-	const auto it = m_xKeys.constFind(ch->key());
-	if(it != m_xKeys.constEnd()) {
-		curve->setXKey(it.value());
-	}
 }
 
 MeasurementsPanel *AcqPlotManager::measurePanel()
@@ -446,11 +468,12 @@ CursorController *AcqPlotManager::cursors(CursorSettings **settings)
 	}
 
 	m_cursors = new CursorController(plot, this);
-	// Parented here only so it cannot leak when the caller ignores it, and hidden
-	// because this widget has no layout — an unhidden child would paint over the plot
-	// at 0,0. The caller reparents it into whatever shows it.
-	m_cursorSettings = new CursorSettings(this);
-	m_cursorSettings->hide();
+	// Parentless, and deliberately never hidden: the caller is expected to hand it
+	// straight to a HoverWidget, whose layout takes ownership and shows it. Parenting it
+	// here instead would make it a stray child of this widget — which lays its plots out
+	// in a splitter and has no slot for it — and calling hide() would set the explicit
+	// -hide flag that stops the hover's layout from ever showing it again.
+	m_cursorSettings = new CursorSettings();
 	m_cursors->connectSignals(m_cursorSettings.data());
 	// Cursors off until asked for: the handles are created either way, but a plot that
 	// opens with four cursors on it is not what anyone wants.
@@ -459,133 +482,6 @@ CursorController *AcqPlotManager::cursors(CursorSettings **settings)
 		*settings = m_cursorSettings.data();
 	}
 	return m_cursors.data();
-}
-
-QString AcqPlotManager::createKeyPickerPage()
-{
-	const QString id = QString::fromLatin1(kKeyPickerPageId);
-	if(m_shell.isNull() || m_shell->hasMenuPage(id)) {
-		return id;
-	}
-
-	QWidget *page = new QWidget(this);
-	QVBoxLayout *lay = new QVBoxLayout(page);
-	lay->setContentsMargins(0, 0, 0, 0);
-
-	// SO_VIEW: adding a plot channel reads a key, it does not configure a block.
-	MenuSectionCollapseWidget *section = m_shell->createMenuSection(QStringLiteral("ADD CHANNEL"), SO_VIEW, page);
-
-	// Shown while the list is empty. A key exists only once something has been written
-	// to it, so before the first run this page has nothing to offer and an empty list
-	// with a dead Add button reads as a broken page rather than an early one.
-	m_keyHint = new QLabel(QObject::tr("No data streams yet — run the acquisition once."), section);
-	m_keyHint->setWordWrap(true);
-	Style::setStyle(m_keyHint, style::properties::label::subtle);
-	section->add(m_keyHint);
-
-	m_keyList = new QListWidget(section);
-	m_keyList->setSelectionMode(QAbstractItemView::SingleSelection);
-	section->add(m_keyList);
-
-	m_keyKindCombo = new MenuCombo(QStringLiteral("Representation"), section);
-	// Auto first, and it is finally honest here: every key in this list has been
-	// written at least once, so DataStore::typeOf() can answer and makeRepr's
-	// type switch is a real decision rather than a fallback to Curve.
-	m_keyKindCombo->combo()->addItem(QStringLiteral("Auto"), static_cast<int>(ReprKind::Auto));
-	m_keyKindCombo->combo()->addItem(QStringLiteral("Curve"), static_cast<int>(ReprKind::Curve));
-	m_keyKindCombo->combo()->addItem(QStringLiteral("Digital"), static_cast<int>(ReprKind::Digital));
-	m_keyKindCombo->combo()->addItem(QStringLiteral("Waterfall"), static_cast<int>(ReprKind::Waterfall));
-	m_keyKindCombo->combo()->addItem(QStringLiteral("Annotations"), static_cast<int>(ReprKind::Annotations));
-	section->add(m_keyKindCombo);
-
-	m_keyAddBtn = new QPushButton(QObject::tr("Add"), section);
-	Style::setStyle(m_keyAddBtn, style::properties::button::basicButton);
-	// Disabled until a key is selected, so "nothing selected" is visible in the button
-	// rather than only in the guard below. A QListWidget selects nothing by default and
-	// an enabled Add that silently does nothing is indistinguishable from a broken one.
-	m_keyAddBtn->setEnabled(false);
-	section->add(m_keyAddBtn);
-	connect(m_keyList.data(), &QListWidget::currentItemChanged, m_keyAddBtn,
-		[this](QListWidgetItem *cur, QListWidgetItem *) { m_keyAddBtn->setEnabled(cur != nullptr); });
-	// Double-click adds directly: selecting then reaching for the button is two gestures
-	// for what reads as one action.
-	connect(m_keyList.data(), &QListWidget::itemDoubleClicked, m_keyAddBtn, [this]() { m_keyAddBtn->click(); });
-
-	connect(m_keyAddBtn.data(), &QPushButton::clicked, this, [this]() {
-		if(m_keyList.isNull() || !m_keyList->currentItem() || m_keyKindCombo.isNull()) {
-			return;
-		}
-		const scopy::acq::DataKey key(m_keyList->currentItem()->text());
-		const ReprKind kind = static_cast<ReprKind>(m_keyKindCombo->combo()->currentData().toInt());
-		// Name guessed from the key's channel segment, colour cycled by channel count.
-		// Both are editable from the new channel's own page, so guessing is fine — and
-		// channelId() is empty for a key that does not follow the source_channel_stage
-		// convention, hence the fallback to the whole key.
-		const QString chId = key.channelId();
-		AcqChannel *ch = addChannel(key, chId.isEmpty() ? key.toString() : chId,
-					    Style::getChannelColor(m_channels.count()), kind);
-		if(!ch) {
-			// makeRepr refused. Only reachable by naming a kind that cannot read the
-			// key — a Curve or Digital on an annotation stream — since Auto resolves
-			// every type there is.
-			return;
-		}
-		// Straight to the new channel's page: the guessed name and colour are the first
-		// things a reader will want to change.
-		if(!m_shell.isNull()) {
-			m_shell->showMenuPage(ch->menuId());
-		}
-	});
-
-	lay->addWidget(section);
-	lay->addStretch();
-
-	m_shell->addMenuPage(id, page);
-	// Pinned above the groups rather than inside one: it is not a channel, and it has
-	// to be reachable before any channel exists.
-	m_shell->addRailHeaderRow(QStringLiteral("Add channel"), id);
-
-	refreshKeyPicker();
-	return id;
-}
-
-void AcqPlotManager::refreshKeyPicker()
-{
-	if(m_keyList.isNull() || m_store.isNull()) {
-		return;
-	}
-	// Rebuilt wholesale rather than diffed: the list is short, and the selection is
-	// only meaningful at the moment Add is pressed. Preserve it anyway so a key
-	// arriving mid-choice does not move the target out from under the pointer.
-	const QString selected = m_keyList->currentItem() ? m_keyList->currentItem()->text() : QString();
-
-	m_keyList->clear();
-	const QList<scopy::acq::DataKey> keys = m_store->keys();
-	for(const scopy::acq::DataKey &k : keys) {
-		m_keyList->addItem(k.toString());
-	}
-
-	bool restored = false;
-	if(!selected.isEmpty()) {
-		const QList<QListWidgetItem *> found = m_keyList->findItems(selected, Qt::MatchExactly);
-		if(!found.isEmpty()) {
-			m_keyList->setCurrentItem(found.first());
-			restored = true;
-		}
-	}
-	// Otherwise select the first key, so the list is never populated-but-unselected.
-	// clear() drops the selection, so without this Add stays disabled after every
-	// refresh until the reader clicks — and the first refresh, where the keys appear
-	// all at once, is exactly when they have not clicked anything yet.
-	if(!restored && m_keyList->count() > 0) {
-		m_keyList->setCurrentRow(0);
-	}
-
-	// The list and the hint are exclusive: one of the two always says what the state is.
-	if(!m_keyHint.isNull()) {
-		m_keyHint->setVisible(m_keyList->count() == 0);
-	}
-	m_keyList->setVisible(m_keyList->count() > 0);
 }
 
 void AcqPlotManager::rebuildIndexRamp()
@@ -603,8 +499,9 @@ void AcqPlotManager::setPlotSize(int n)
 	m_plotSize = n;
 	rebuildIndexRamp();
 
-	if(PlotWidget *p = sharedPlot()) {
-		p->xAxis()->setInterval(0, m_plotSize - 1);
+	// Every row: X is the sample-index ramp everywhere, so plotSize is the range.
+	for(AcqPlotRow *r : std::as_const(m_rows)) {
+		r->setXInterval(0, qMax(1, m_plotSize - 1));
 	}
 	reclaimAll();
 }
@@ -636,11 +533,6 @@ void AcqPlotManager::onKeysChanged(QList<scopy::acq::DataKey> keys)
 	// wholesale, so after either every channel's claim is gone and must be
 	// re-registered.
 	reclaimAll();
-	// The picker's whole content comes from here. keysChanged fires on the first write
-	// to a key (DataStore.cpp:26) and on reset/remove (:172, :186), and createKeyPickerPage
-	// runs before the engine has ever produced anything, so without this the list is
-	// built empty once and stays that way for the life of the instrument.
-	refreshKeyPicker();
 	Q_EMIT keysAvailable(keys);
 }
 

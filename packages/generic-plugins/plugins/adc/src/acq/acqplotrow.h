@@ -24,6 +24,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QtGlobal>
 
 namespace scopy {
 class PlotAxis;
@@ -64,6 +65,19 @@ public:
 	// DigitalTrackManager::setPlot() (src/sim/DigitalTrackManager.cpp:71-80).
 	PlotAxis *digitalAxis();
 
+	// Set the row's shared X interval.
+	//
+	// The X axis is shared per row for the same Qwt reason Y is, so one interval covers
+	// every channel here — which is sound because X is the manager's 0..plotSize-1
+	// sample-index ramp for all of them. Called from the manager's constructor and from
+	// setPlotSize(), never per frame.
+	//
+	// A no-op when the requested interval is the one already requested, so a repeated
+	// call cannot undo a pan or zoom the reader performed since. Compared against the
+	// last *request*, not against the axis's current interval, precisely so a
+	// reader-driven zoom is not mistaken for a change that needs correcting.
+	void setXInterval(double min, double max);
+
 	// Next free vertical slot for a fixed-height item, in digitalAxis scale coords.
 	// Walks down in 26 px steps (24 px band + 2 px gap) — the pitch DigitalCurveItem
 	// and AnnotationCurve both render at. Lifted from
@@ -78,6 +92,10 @@ private:
 	QPointer<PlotWidget> m_plot;
 	PlotAxis *m_digitalAxis{nullptr};
 	const bool m_exclusive;
+
+	// Last interval setXInterval() actually applied, for its idempotence check. NaN
+	// initially so the first call always applies.
+	double m_xReqMin{qQNaN()}, m_xReqMax{qQNaN()};
 
 	double m_nextSlot{0.0};
 	bool m_slotInit{false};
