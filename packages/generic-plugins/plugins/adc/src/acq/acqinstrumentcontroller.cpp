@@ -22,11 +22,8 @@
 #include "acqinstrumentcontroller.h"
 
 #include "PlutoIIOSource.h"
-#include "acqchannel.h"
-#include "acqcurverepr.h"
 #include "acqinstrument.h"
 #include "acqplotmanager.h"
-#include "acqwaterfallrepr.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
@@ -170,8 +167,12 @@ void AcqInstrumentController::setupPlots()
 	if(CursorController *cursors = m_plots->cursors(&cursorPageId)) {
 		QPushButton *cursorBtn = new QPushButton(tr("Cursors"), it);
 		cursorBtn->setCheckable(true);
-		Style::setStyle(cursorBtn, style::properties::button::basicButton);
-		it->addToTopRail(cursorBtn, TTA_RIGHT);
+		// The same styling the shell gives its own Debug button, which is the other
+		// bottom-rail toggle — both are view state rather than engine controls, which is
+		// why they sit here and not in the top rail with Run.
+		Style::setStyle(cursorBtn, style::properties::button::blueGrayButton);
+		Style::setStyle(cursorBtn, style::properties::label::menuMedium);
+		it->addToBottomRail(cursorBtn, TTA_RIGHT);
 		connect(cursorBtn, &QPushButton::toggled, cursors, &CursorController::setVisible);
 		// Showing the page on toggle-on only: unchecking hides the cursors, and yanking
 		// the reader out of a page they may have navigated to on purpose would be worse
@@ -183,61 +184,30 @@ void AcqInstrumentController::setupPlots()
 		});
 	}
 
-	// The key picker. Deliberately before the composed channels: it lists whatever the
-	// store holds, so it is useful even when setupBlocks() found no context and the four
-	// channels below are never created.
+	// Every plot channel is created by the reader from here, and none at composition
+	// time: the pipeline publishes several keys per run and which of them is worth
+	// looking at — and as what — is not something this function can know. The plot
+	// opens empty.
+	//
+	// Two things the picker cannot infer are supplied by the manager instead, so a
+	// hand-made channel is configured exactly like a composed one would have been:
+	// the measurement timeline, and the X stream an FFT curve is drawn against.
+	if(m_fftProc) {
+		// The timeline every horizontal measurement is divided by. From the FFT
+		// processor because that is where the rate is configured — the source does not
+		// publish one. Without it period and frequency come out in samples, which is
+		// not wrong so much as unreadable.
+		m_plots->setSampleRate(m_fftProc->sampleRate());
+		// The FFT's bin frequencies. The processor writes them to a second key, which
+		// is what lets a magnitude curve be drawn against Hz rather than the shared
+		// sample-index ramp without the channel knowing anything about FFTs.
+		m_plots->setXKeyFor(m_fftProc->outputKey(), m_fftProc->freqKey());
+	}
+
+	// Last, so the list it builds is populated from a store that already has whatever
+	// setupBlocks() registered. Useful even when setupBlocks() bailed for want of a
+	// context: the page exists, it is simply empty until a run writes something.
 	m_plots->createKeyPickerPage();
-
-	if(!m_plutoSrc || !m_fftProc) {
-		// setupBlocks() bailed for want of a context. The manager still exists — an
-		// empty plot beats no center widget — but there are no keys to point at.
-		return;
-	}
-
-	// Explicit kinds throughout: nothing has been written yet, so DataStore::typeOf()
-	// is nullopt and ReprKind::Auto could only guess.
-	AcqChannel *iCh = m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I",
-					      Style::getChannelColor(0), AcqPlotManager::ReprKind::Curve);
-	AcqChannel *qCh = m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage1"), "Q",
-					      Style::getChannelColor(1), AcqPlotManager::ReprKind::Curve);
-
-	// The timeline every horizontal measurement is divided by. Taken from the FFT
-	// processor because that is where the rate is configured — the source does not
-	// publish one. Without it period and frequency come out in samples, which is not
-	// wrong so much as unreadable.
-	const double sr = m_fftProc->sampleRate();
-	for(AcqChannel *ch : {iCh, qCh}) {
-		if(ch) {
-			static_cast<CurveRepr *>(ch->repr())->setSampleRate(sr);
-		}
-	}
-
-	// The FFT is the one channel with a real X stream: the processor writes the bin
-	// frequencies to a second key, so the curve is drawn against Hz rather than the
-	// shared sample-index ramp.
-	AcqChannel *fft = m_plots->addChannel(m_fftProc->outputKey(), "FFT", Style::getChannelColor(2),
-					      AcqPlotManager::ReprKind::Curve);
-	if(fft) {
-		static_cast<CurveRepr *>(fft->repr())->setXKey(m_fftProc->freqKey());
-	}
-
-	// The same I stream as a digital track, which is the sign of I: toBits() maps any
-	// non-zero to 1, so it thresholds at zero rather than needing a UInt8 source. Not
-	// a measurement anyone wants — it is here because it exercises the fixed-height
-	// item path and its X alignment against the analog curves above it, which is the
-	// only thing a digital track can get wrong on its own.
-	m_plots->addChannel(scopy::acq::DataKey::raw("pluto", "voltage0"), "I sign", Style::getChannelColor(3),
-			    AcqPlotManager::ReprKind::Digital);
-
-	// The same FFT key again, as a spectrogram. Two channels on one key with distinct
-	// claimants and *different* depth requirements — the curve wants
-	// ceil(plotSize / bufferSize), this wants its row count — which is exactly what
-	// the max-over-claims rule exists for.
-	AcqChannel *wf = m_plots->addChannel(m_fftProc->outputKey(), "FFT waterfall", Style::getChannelColor(2),
-					     AcqPlotManager::ReprKind::Waterfall);
-	if(wf) {
-		static_cast<WaterfallRepr *>(wf->repr())->setXKey(m_fftProc->freqKey());
-	}
 }
 
 void AcqInstrumentController::stop()
