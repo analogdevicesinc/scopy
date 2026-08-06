@@ -37,12 +37,15 @@
 
 #include <memory>
 
+class QLabel;
 class QListWidget;
+class QPushButton;
 class QSplitter;
 class QTimer;
 
 namespace scopy {
 class CursorController;
+class CursorSettings;
 class MeasurementsPanel;
 class PlotWidget;
 class StatsPanel;
@@ -111,9 +114,10 @@ public:
 	// Cursors over row 0. Created on first call, so an instrument that never asks for
 	// them pays nothing — CursorController installs four draggable handles and an
 	// event filter on the canvas whether or not they are visible. The caller wires the
-	// returned controller's setVisible() to whatever toggles it, and its
-	// CursorSettings page is registered under the id this returns in `settingsId`.
-	CursorController *cursors(QString *settingsId = nullptr);
+	// returned controller's setVisible() to whatever toggles it, and parents the
+	// CursorSettings widget handed back in `settings` wherever it wants it shown — it
+	// is deliberately left unparented rather than pushed into the right menu.
+	CursorController *cursors(CursorSettings **settings = nullptr);
 
 	// The measurement and stats readouts, in PS_BOTTOM and PS_TOP. Created on first
 	// call and hidden until a label lands in one: both panels hide themselves when
@@ -229,11 +233,16 @@ private:
 	// All created on demand. Parented into the shell's slots or stack, hence QPointer:
 	// the shell can outlive this widget on some teardown orders.
 	QPointer<CursorController> m_cursors;
+	QPointer<CursorSettings> m_cursorSettings;
 	QPointer<MeasurementsPanel> m_measurePanel;
 	QPointer<StatsPanel> m_statsPanel;
 
 	QPointer<QListWidget> m_keyList;
 	QPointer<MenuCombo> m_keyKindCombo;
+	QPointer<QPushButton> m_keyAddBtn;
+	// Stands in for the list while no key exists yet, which is the state the page is in
+	// until the engine's first cycle.
+	QPointer<QLabel> m_keyHint;
 
 	// Registered by the controller, applied to every curve the reader creates.
 	double m_sampleRate{1.0};

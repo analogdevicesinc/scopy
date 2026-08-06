@@ -40,6 +40,7 @@
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/menusectionwidget.h>
 
+#include <QLabel>
 #include <QListWidget>
 #include <QLoggingCategory>
 #include <QPushButton>
@@ -61,8 +62,7 @@ namespace {
 // extra cycles into one repaint.
 constexpr int kFrameIntervalMs = 16;
 
-// Menu ids for the two pages the manager owns itself, as opposed to one per channel.
-constexpr const char *kCursorPageId = "acq-cursors";
+// The one page the manager owns itself, as opposed to one per channel.
 constexpr const char *kKeyPickerPageId = "acq-keys";
 
 } // namespace
@@ -432,26 +432,32 @@ void AcqPlotManager::registerMeasurements(AcqChannel *ch)
 	connect(stats, &StatsPanel::hideAll, mgr, [mgr]() { Q_EMIT mgr->toggleAllStats(false); });
 }
 
-CursorController *AcqPlotManager::cursors(QString *settingsId)
+CursorController *AcqPlotManager::cursors(CursorSettings **settings)
 {
-	if(settingsId) {
-		*settingsId = QString::fromLatin1(kCursorPageId);
-	}
 	if(!m_cursors.isNull()) {
+		if(settings) {
+			*settings = m_cursorSettings.data();
+		}
 		return m_cursors.data();
 	}
 	PlotWidget *plot = sharedPlot();
-	if(!plot || m_shell.isNull()) {
+	if(!plot) {
 		return nullptr;
 	}
 
 	m_cursors = new CursorController(plot, this);
-	CursorSettings *settings = new CursorSettings(this);
-	m_cursors->connectSignals(settings);
-	m_shell->addMenuPage(QString::fromLatin1(kCursorPageId), settings);
+	// Parented here only so it cannot leak when the caller ignores it, and hidden
+	// because this widget has no layout — an unhidden child would paint over the plot
+	// at 0,0. The caller reparents it into whatever shows it.
+	m_cursorSettings = new CursorSettings(this);
+	m_cursorSettings->hide();
+	m_cursors->connectSignals(m_cursorSettings.data());
 	// Cursors off until asked for: the handles are created either way, but a plot that
 	// opens with four cursors on it is not what anyone wants.
 	m_cursors->setVisible(false);
+	if(settings) {
+		*settings = m_cursorSettings.data();
+	}
 	return m_cursors.data();
 }
 
@@ -469,6 +475,14 @@ QString AcqPlotManager::createKeyPickerPage()
 	// SO_VIEW: adding a plot channel reads a key, it does not configure a block.
 	MenuSectionCollapseWidget *section = m_shell->createMenuSection(QStringLiteral("ADD CHANNEL"), SO_VIEW, page);
 
+	// Shown while the list is empty. A key exists only once something has been written
+	// to it, so before the first run this page has nothing to offer and an empty list
+	// with a dead Add button reads as a broken page rather than an early one.
+	m_keyHint = new QLabel(QObject::tr("No data streams yet — run the acquisition once."), section);
+	m_keyHint->setWordWrap(true);
+	Style::setStyle(m_keyHint, style::properties::label::subtle);
+	section->add(m_keyHint);
+
 	m_keyList = new QListWidget(section);
 	m_keyList->setSelectionMode(QAbstractItemView::SingleSelection);
 	section->add(m_keyList);
@@ -484,10 +498,20 @@ QString AcqPlotManager::createKeyPickerPage()
 	m_keyKindCombo->combo()->addItem(QStringLiteral("Annotations"), static_cast<int>(ReprKind::Annotations));
 	section->add(m_keyKindCombo);
 
-	QPushButton *addBtn = new QPushButton(QObject::tr("Add"), section);
-	Style::setStyle(addBtn, style::properties::button::basicButton);
-	section->add(addBtn);
-	connect(addBtn, &QPushButton::clicked, this, [this]() {
+	m_keyAddBtn = new QPushButton(QObject::tr("Add"), section);
+	Style::setStyle(m_keyAddBtn, style::properties::button::basicButton);
+	// Disabled until a key is selected, so "nothing selected" is visible in the button
+	// rather than only in the guard below. A QListWidget selects nothing by default and
+	// an enabled Add that silently does nothing is indistinguishable from a broken one.
+	m_keyAddBtn->setEnabled(false);
+	section->add(m_keyAddBtn);
+	connect(m_keyList.data(), &QListWidget::currentItemChanged, m_keyAddBtn,
+		[this](QListWidgetItem *cur, QListWidgetItem *) { m_keyAddBtn->setEnabled(cur != nullptr); });
+	// Double-click adds directly: selecting then reaching for the button is two gestures
+	// for what reads as one action.
+	connect(m_keyList.data(), &QListWidget::itemDoubleClicked, m_keyAddBtn, [this]() { m_keyAddBtn->click(); });
+
+	connect(m_keyAddBtn.data(), &QPushButton::clicked, this, [this]() {
 		if(m_keyList.isNull() || !m_keyList->currentItem() || m_keyKindCombo.isNull()) {
 			return;
 		}
@@ -540,12 +564,28 @@ void AcqPlotManager::refreshKeyPicker()
 	for(const scopy::acq::DataKey &k : keys) {
 		m_keyList->addItem(k.toString());
 	}
+
+	bool restored = false;
 	if(!selected.isEmpty()) {
 		const QList<QListWidgetItem *> found = m_keyList->findItems(selected, Qt::MatchExactly);
 		if(!found.isEmpty()) {
 			m_keyList->setCurrentItem(found.first());
+			restored = true;
 		}
 	}
+	// Otherwise select the first key, so the list is never populated-but-unselected.
+	// clear() drops the selection, so without this Add stays disabled after every
+	// refresh until the reader clicks — and the first refresh, where the keys appear
+	// all at once, is exactly when they have not clicked anything yet.
+	if(!restored && m_keyList->count() > 0) {
+		m_keyList->setCurrentRow(0);
+	}
+
+	// The list and the hint are exclusive: one of the two always says what the state is.
+	if(!m_keyHint.isNull()) {
+		m_keyHint->setVisible(m_keyList->count() == 0);
+	}
+	m_keyList->setVisible(m_keyList->count() > 0);
 }
 
 void AcqPlotManager::rebuildIndexRamp()
@@ -596,6 +636,11 @@ void AcqPlotManager::onKeysChanged(QList<scopy::acq::DataKey> keys)
 	// wholesale, so after either every channel's claim is gone and must be
 	// re-registered.
 	reclaimAll();
+	// The picker's whole content comes from here. keysChanged fires on the first write
+	// to a key (DataStore.cpp:26) and on reset/remove (:172, :186), and createKeyPickerPage
+	// runs before the engine has ever produced anything, so without this the list is
+	// built empty once and stays that way for the life of the instrument.
+	refreshKeyPicker();
 	Q_EMIT keysAvailable(keys);
 }
 
