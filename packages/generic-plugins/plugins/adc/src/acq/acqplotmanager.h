@@ -24,8 +24,10 @@
 
 #include <core/acq_engine/DataKey.h>
 // Not forward-declared: QPointer needs the complete type, and the shell is what
-// phase 2's rail rows and menu pages are built on.
+// phase 2's rail rows and menu pages are built on. Same for MenuCombo, held by the
+// key picker.
 #include <gui/instrumenttemplate.h>
+#include <gui/widgets/menucombo.h>
 
 #include <QList>
 #include <QMap>
@@ -35,11 +37,18 @@
 
 #include <memory>
 
+class QLabel;
+class QListWidget;
+class QPushButton;
 class QSplitter;
 class QTimer;
 
 namespace scopy {
+class CursorController;
+class CursorSettings;
+class MeasurementsPanel;
 class PlotWidget;
+class StatsPanel;
 
 namespace acq {
 class AcquisitionEngine;
@@ -78,16 +87,18 @@ public:
 		Auto,
 		Curve,
 		Digital,
-		Waterfall
+		Waterfall,
+		Annotations
 	};
 
 	AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::AcquisitionEngine *engine, InstrumentTemplate *shell,
 		       QWidget *parent = nullptr);
 	~AcqPlotManager() override;
 
-	// Returns null when the kind cannot be represented (an annotation stream has no
-	// numeric repr — every conversion in SampleBuffer returns empty for it, so a
-	// curve pointed at one would silently draw nothing).
+	// Returns null when the named kind cannot read the key: a Curve or Digital on an
+	// annotation stream, where every numeric conversion returns empty and the channel
+	// would silently draw nothing. Auto never hits this — it resolves annotations to
+	// ReprKind::Annotations.
 	AcqChannel *addChannel(const scopy::acq::DataKey &key, const QString &name, const QColor &color,
 			       ReprKind kind = ReprKind::Auto);
 	void removeChannel(AcqChannel *ch);
@@ -99,6 +110,47 @@ public:
 	AcqPlotRow *sharedRow() const { return m_sharedRow; }
 	// For CursorController, the panels, and anything else that binds to a PlotWidget.
 	PlotWidget *sharedPlot() const;
+
+	// Cursors over row 0. Created on first call, so an instrument that never asks for
+	// them pays nothing — CursorController installs four draggable handles and an
+	// event filter on the canvas whether or not they are visible. The caller wires the
+	// returned controller's setVisible() to whatever toggles it, and parents the
+	// CursorSettings widget handed back in `settings` wherever it wants it shown — it
+	// is deliberately left unparented rather than pushed into the right menu.
+	CursorController *cursors(CursorSettings **settings = nullptr);
+
+	// The measurement and stats readouts, in PS_BOTTOM and PS_TOP. Created on first
+	// call and hidden until a label lands in one: both panels hide themselves when
+	// their label list empties, so an empty panel must not be shown at all or it
+	// reserves plot height for nothing.
+	MeasurementsPanel *measurePanel();
+	StatsPanel *statsPanel();
+
+	// A page listing every key the store currently holds, with a repr picker and an
+	// Add button. This is the one place ReprKind::Auto is meaningful: a key offered
+	// here has been written at least once, so DataStore::typeOf() can answer.
+	//
+	// Registered under the returned id and given a rail header row, so it is reachable
+	// without a channel existing yet.
+	QString createKeyPickerPage();
+
+	// ---- defaults for channels the reader creates -----------------------------
+	//
+	// Every plot channel is now made from the key picker, so anything a composed
+	// channel used to be handed at construction has to be registered here instead and
+	// applied by addChannel(). Both are set once by the controller, which is the only
+	// place that knows the pipeline.
+
+	// The timeline horizontal measurements are divided by, applied to every CurveRepr.
+	// Unset means 1.0, i.e. measurements come out in samples. Applies to channels
+	// created after this call and, so the order of the two does not matter, to those
+	// that already exist.
+	void setSampleRate(double sr);
+
+	// Draw any curve on `key` against `xKey` rather than the sample-index ramp. This
+	// is how an FFT magnitude channel gets a frequency axis: the picker offers keys,
+	// not the relationships between them, so the pairing has to be declared.
+	void setXKeyFor(const scopy::acq::DataKey &key, const scopy::acq::DataKey &xKey);
 
 public Q_SLOTS:
 	// Resizes the index ramp, rescales X, and re-claims every channel: depth is
@@ -143,6 +195,18 @@ private:
 	void registerRail(AcqChannel *ch);
 	void unregisterRail(AcqChannel *ch);
 
+	// Binds the channel's repr's measure manager to the two panels, if it has one.
+	// Called from addChannel; a repr with nothing to measure (digital, waterfall) is
+	// silently skipped.
+	void registerMeasurements(AcqChannel *ch);
+
+	// Repopulates the key picker's list from the store. Called on keysChanged.
+	void refreshKeyPicker();
+
+	// Applies the registered sample rate and X-key pairing to a freshly attached
+	// channel, if its repr is a curve. Called from addChannel.
+	void applyCurveDefaults(AcqChannel *ch);
+
 	QPointer<scopy::acq::DataStore> m_store;
 	QPointer<scopy::acq::AcquisitionEngine> m_engine;
 	QPointer<InstrumentTemplate> m_shell;
@@ -165,6 +229,24 @@ private:
 	QTimer *m_frameTimer{nullptr};
 	bool m_dirty{false};
 	int m_uidCounter{0};
+
+	// All created on demand. Parented into the shell's slots or stack, hence QPointer:
+	// the shell can outlive this widget on some teardown orders.
+	QPointer<CursorController> m_cursors;
+	QPointer<CursorSettings> m_cursorSettings;
+	QPointer<MeasurementsPanel> m_measurePanel;
+	QPointer<StatsPanel> m_statsPanel;
+
+	QPointer<QListWidget> m_keyList;
+	QPointer<MenuCombo> m_keyKindCombo;
+	QPointer<QPushButton> m_keyAddBtn;
+	// Stands in for the list while no key exists yet, which is the state the page is in
+	// until the engine's first cycle.
+	QPointer<QLabel> m_keyHint;
+
+	// Registered by the controller, applied to every curve the reader creates.
+	double m_sampleRate{1.0};
+	QMap<scopy::acq::DataKey, scopy::acq::DataKey> m_xKeys;
 };
 
 } // namespace adc
