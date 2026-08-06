@@ -59,6 +59,8 @@ public:
 
 	DataKey outputKey()  const { return m_outputKey; }
 	DataKey freqKey()    const { return m_freqKey; }
+
+	QList<DataKey> outputKeys() const override { return {m_outputKey, m_freqKey}; }
 	int     nfft()       const { return m_nfft; }
 	double  sampleRate() const { return m_sampleRate; }
 	void    setSampleRate(double fs);

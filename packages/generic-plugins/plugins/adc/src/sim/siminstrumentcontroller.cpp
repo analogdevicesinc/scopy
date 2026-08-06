@@ -4,6 +4,7 @@
 #include "DecoderManager.h"
 #include "DigitalTrackManager.h"
 #include "DecoderPanel.h"
+#include "PipelineInspector.h"
 
 #include <core/decoder/DecoderLogger.h>
 #include <core/decoder/SigrokCliBackendFactory.h>
@@ -461,11 +462,12 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	m_ui->buildControlPanel(m_engine, {curve1, curve2, wfDesc});
 
-	// Trigger settings live in a global (non-curve) group at the bottom of
-	// the Settings panel. Build the widget manually so we can wire it to
-	// the DataStore's keysChanged signal for live key-combo refresh.
+	// The trigger's widget needs wiring the block can't do itself (a live key
+	// list from the DataStore, the run state), so build it here and hand it
+	// to the block — the Pipeline panel picks it up from there, and the
+	// block's own createSettingsWidget() never runs to make a second one.
 	if(m_trigProc) {
-		auto *body = new QWidget(m_ui);
+		auto *body = new QWidget;
 		auto *lay  = new QVBoxLayout(body);
 		lay->setContentsMargins(0, 0, 0, 0);
 		lay->setSpacing(4);
@@ -475,7 +477,7 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 		lay->addWidget(m_trigProc->ProcessorBlock::createSettingsWidget(body));
 		m_trigWidget = new scopy::acq::TriggerProcessorWidget(m_trigProc, body);
 		lay->addWidget(m_trigWidget);
-		m_ui->addGlobalWidgetGroup(m_trigProc->name(), body);
+		m_trigProc->setSettingsWidget(body);
 		// targetSample is a plot-window index.
 		m_trigWidget->setMaxTargetSample(std::max(0, m_plotSize - 1));
 	}
@@ -605,6 +607,13 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 			if(m_decoderPanel && m_store)
 				m_decoderPanel->refreshKeys(m_store->keys());
 		});
+
+	// ---- Pipeline inspector (right stack) ----
+	// Built last so every block is already registered with the engine and any
+	// host-built settings widget has already been handed to its block.
+	m_pipelineInspector = new PipelineInspector(m_engine, m_store, m_ui);
+	m_pipelineInspector->setDecoderManager(m_decoderMgr);
+	m_ui->registerPipelinePanel(m_pipelineInspector);
 
 	connect(m_ui, &SimInstrument::waterfallRowsChanged, this, [this](int rows) {
 		m_currentWaterfallRows = rows;
@@ -964,7 +973,11 @@ void SimInstrumentController::onCycleComplete()
 	// No per-cycle polling here.
 
 	// Refresh the DataStore inspector panel every cycle
-	m_ui->refreshDatastoreView(m_store);
+	// m_ui->refreshDatastoreView(m_store);
+
+	// Status columns only — no tree rebuild on this path.
+	// if(m_pipelineInspector)
+		// m_pipelineInspector->refreshStatus();
 
 	// Read axis selections from the auto-generated per-curve combos
 	const QString xKeyStr  = m_ui->curveXKey(0);

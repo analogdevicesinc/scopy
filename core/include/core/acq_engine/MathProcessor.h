@@ -25,6 +25,8 @@ public:
 	void           setOutputKey(const DataKey &k) { m_outputKey = k; }
 	const DataKey &outputKey() const { return m_outputKey; }
 
+	QList<DataKey> outputKeys() const override { return {m_outputKey}; }
+
 	void setWatchedKeys(const QList<DataKey> &keys) override;
 
 	void     process(DataStore *store) override;

@@ -2,6 +2,8 @@
 
 #include <core/acq_engine/SourceBlock.h>
 
+#include <gui/style.h>
+
 #include <QDateTime>
 #include <QFontDatabase>
 #include <QFrame>
@@ -74,6 +76,10 @@ void SimInstrument::setupUi()
 	m_decoderLogBtn = new QPushButton("Decoder Logs", this);
 	m_decoderLogBtn->setCheckable(true);
 	m_tool->addWidgetToTopContainerHelper(m_decoderLogBtn, TTA_RIGHT);
+
+	m_pipelineBtn = new QPushButton("Pipeline", this);
+	m_pipelineBtn->setCheckable(true);
+	m_tool->addWidgetToTopContainerHelper(m_pipelineBtn, TTA_RIGHT);
 
 	// ---- central: oscilloscope + waterfall in a vertical splitter ----
 	m_plot = new PlotWidget(this);
@@ -274,16 +280,10 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 	connect(m_modeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
 		this, &SimInstrument::acqModeChanged);
 
-	// -- Source groups --
-	// Each SourceBlock provides its own enable + per-channel checkboxes via
-	// createSettingsWidget(); we just wrap it in a group box.
-	for(scopy::acq::SourceBlock *src : engine->sources()) {
-		auto *srcGroup = new QGroupBox(QString("Source: %1").arg(src->id()), settingsInner);
-		auto *srcLay   = new QVBoxLayout(srcGroup);
-		srcLay->setSpacing(4);
-		srcLay->addWidget(src->createSettingsWidget(srcGroup));
-		settingsLay->addWidget(srcGroup);
-	}
+	// Per-block settings (sources, processors, trigger, decoders) are not
+	// duplicated here — the Pipeline panel hosts each block's single widget,
+	// reached by selecting its row. This panel keeps what isn't block-owned:
+	// engine parameters and the per-curve axis bindings.
 
 	// -- Per-curve groups --
 	m_curveSelectors.clear();
@@ -329,18 +329,18 @@ void SimInstrument::buildControlPanel(scopy::acq::AcquisitionEngine *engine,
 				this, &SimInstrument::waterfallRowsChanged);
 		}
 
-		// Processor settings — one sub-group per processor
-		for(scopy::acq::ProcessorBlock *proc : desc.processors) {
-			QWidget *procWidget = proc->createSettingsWidget(curveGroup);
-			if(!procWidget)
-				continue;
-
-			auto *procGroup = new QGroupBox(proc->name(), curveGroup);
-			auto *procLay   = new QVBoxLayout(procGroup);
-			procLay->setContentsMargins(4, 4, 4, 4);
-			procWidget->setParent(procGroup);
-			procLay->addWidget(procWidget);
-			curveLay->addWidget(procGroup);
+		// The processors feeding this curve are listed by name only; their
+		// controls live on their own row in the Pipeline panel.
+		if(!desc.processors.isEmpty()) {
+			QStringList names;
+			names.reserve(desc.processors.size());
+			for(scopy::acq::ProcessorBlock *proc : desc.processors)
+				names << proc->name();
+			auto *chain = new QLabel(QString("Processors: %1").arg(names.join(" → ")),
+						 curveGroup);
+			chain->setWordWrap(true);
+			Style::setStyle(chain, style::properties::label::subtle);
+			curveLay->addWidget(chain);
 		}
 
 		settingsLay->addWidget(curveGroup);
@@ -376,43 +376,12 @@ void SimInstrument::registerDecoderPanel(QWidget *panel)
 	wirePanelButton(m_decoderBtn, "decoder-panel");
 }
 
-void SimInstrument::addGlobalProcessorGroup(scopy::acq::ProcessorBlock *proc)
+void SimInstrument::registerPipelinePanel(QWidget *panel)
 {
-	if(!proc || !m_settingsInnerLay || !m_settingsInner)
-		return;
-
-	// Strip the trailing stretch (last item) so the new group appears above
-	// it. If for any reason the last item isn't a stretch we leave it alone.
-	QLayoutItem *last = m_settingsInnerLay->itemAt(m_settingsInnerLay->count() - 1);
-	if(last && last->spacerItem())
-		delete m_settingsInnerLay->takeAt(m_settingsInnerLay->count() - 1);
-
-	auto *group = new QGroupBox(proc->name(), m_settingsInner);
-	auto *gLay  = new QVBoxLayout(group);
-	gLay->setContentsMargins(4, 4, 4, 4);
-	QWidget *w = proc->createSettingsWidget(group);
-	if(w)
-		gLay->addWidget(w);
-	m_settingsInnerLay->addWidget(group);
-	m_settingsInnerLay->addStretch();
-}
-
-void SimInstrument::addGlobalWidgetGroup(const QString &title, QWidget *body)
-{
-	if(!body || !m_settingsInnerLay || !m_settingsInner)
-		return;
-
-	QLayoutItem *last = m_settingsInnerLay->itemAt(m_settingsInnerLay->count() - 1);
-	if(last && last->spacerItem())
-		delete m_settingsInnerLay->takeAt(m_settingsInnerLay->count() - 1);
-
-	auto *group = new QGroupBox(title, m_settingsInner);
-	auto *gLay  = new QVBoxLayout(group);
-	gLay->setContentsMargins(4, 4, 4, 4);
-	body->setParent(group);
-	gLay->addWidget(body);
-	m_settingsInnerLay->addWidget(group);
-	m_settingsInnerLay->addStretch();
+	if(!panel) return;
+	m_tool->rightStack()->add("pipeline-panel", panel);
+	m_panelBtns.append(m_pipelineBtn);
+	wirePanelButton(m_pipelineBtn, "pipeline-panel");
 }
 
 QString SimInstrument::curveXKey(int i) const

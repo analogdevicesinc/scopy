@@ -45,6 +45,8 @@ public:
 
 	QList<ChannelConfig *> channels() const { return m_channels; }
 
+	QList<DataKey> outputKeys() const override;
+
 	void     process(DataStore *store) override;
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 

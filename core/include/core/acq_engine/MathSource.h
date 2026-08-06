@@ -27,6 +27,9 @@ public:
 	FormulaEvaluator &evaluator() { return m_evaluator; }
 	const DataKey    &outputKey() const { return m_outputKey; }
 
+	// Writes one derived key, not the per-channel raw keys SourceBlock assumes.
+	QList<DataKey> outputKeys() const override { return {m_outputKey}; }
+
 private:
 	FormulaEvaluator m_evaluator;
 	DataKey          m_outputKey;
