@@ -40,11 +40,14 @@ class PlutoIIOSource;
 }
 
 class AcqInstrument;
+class AcqPlotManager;
 
 // Composition root for one AcqInstrument.
 //
 // Blocks are constructed and registered here — the instrument itself never names
 // one. Currently a PlutoSDR source and a genalyzer FFT over its I/Q, for testing.
+// Plots and channels are built here too, for the same reason: the instrument owns
+// the engine and the store, not a view of them.
 class AcqInstrumentController : public QObject
 {
 	Q_OBJECT
@@ -66,12 +69,20 @@ private:
 	// Registers the test pipeline on the instrument's engine.
 	void setupBlocks(iio_context *ctx);
 
+	// Builds the plot manager, makes it the center widget, and adds one channel per
+	// key the pipeline publishes. Runs after setupBlocks() so the block keys exist to
+	// point at.
+	void setupPlots();
+
 	ToolMenuEntry          *m_tme{nullptr};
 	QPointer<AcqInstrument> m_ui;
 
 	// Parented to the engine, so listed here only for the settings pages.
 	sim::PlutoIIOSource            *m_plutoSrc{nullptr};
 	scopy::acq::GenalyzerFFTProcessor *m_fftProc{nullptr};
+
+	// Parented to the instrument.
+	QPointer<AcqPlotManager> m_plots;
 };
 
 } // namespace adc
