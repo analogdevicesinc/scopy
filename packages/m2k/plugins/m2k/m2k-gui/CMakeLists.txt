@@ -106,7 +106,9 @@ if(SCOPY_ENABLE_SIGROK_GUI)
 endif()
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+# Boost.System is header-only since Boost 1.69 and its compiled library was removed in Boost 1.89, so it must not be
+# requested as a component.
+find_package(Boost 1.69 COMPONENTS filesystem thread chrono REQUIRED)
 
 message(STATUS "Building " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
