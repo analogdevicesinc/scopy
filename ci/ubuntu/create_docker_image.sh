@@ -37,6 +37,16 @@ ubuntu22_qt6(){ ubuntu22; }
 ubuntu24_qt6(){ ubuntu24; }
 ubuntu26_qt6(){ ubuntu26; }
 
+# Slim local image for the dependency-rework pass (no push).
+ubuntu24_slim(){
+	pushd $SRC_SCRIPT
+	docker build \
+		-t scopy2-ubuntu24-qt6:deps-rework-local \
+		--build-arg BASE_IMAGE=ubuntu:24.04 \
+		-f docker_ubuntu/Dockerfile.slim .
+	popd
+}
+
 for arg in $@; do
 	$arg
 done
