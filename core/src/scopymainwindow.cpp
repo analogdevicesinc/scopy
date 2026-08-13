@@ -61,7 +61,9 @@
 #include "scopytitlemanager.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
+#if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 #include <libsigrokdecode/libsigrokdecode.h>
+#endif
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
 #include <QVersionNumber>
