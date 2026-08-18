@@ -1,7 +1,7 @@
 % if "cmake_min_required" in config:
 cmake_minimum_required(VERSION ${config['cmake_min_required']})
 % else:
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16)
 %endif
 
 set(SCOPY_MODULE ${scopy_module})
@@ -18,7 +18,7 @@ include(GenerateExportHeader)
 % if "cxx_standard" in config:
 set(CMAKE_CXX_STANDARD ${config['cxx_standard']})
 % else:
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 % endif
 set(CMAKE_CXX_STANDARD_REQUIRED ON) 
 
