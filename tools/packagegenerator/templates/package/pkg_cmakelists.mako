@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.16)
 
 set(SCOPY_MODULE ${id})
 set(CURRENT_PKG_PATH ${"${CMAKE_CURRENT_SOURCE_DIR}"})

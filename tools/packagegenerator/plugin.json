@@ -23,7 +23,7 @@
         }
     ],
     "cmakelists": {
-        "cmake_min_required": 3.9,
+        "cmake_min_required": 3.16,
         "cxx_standard": 20,
         "enable_testing": "ON"
     },
@@ -33,7 +33,7 @@
     },
     "test": {
         "cmakelists": true,
-        "cmake_min_required": 3.5,
+        "cmake_min_required": 3.16,
         "tst_pluginloader": true
     },
     "resources": {
