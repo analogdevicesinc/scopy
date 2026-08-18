@@ -190,10 +190,12 @@ void Ad74413r::onActivateRunBtns(bool enable)
 		m_runBtn->setEnabled(false);
 		m_singleBtn->setEnabled(false);
 		m_tme->setRunEnabled(false);
+		m_tme->setRunBtnVisible(false);
 	} else {
 		m_runBtn->setEnabled(true);
 		m_singleBtn->setEnabled(true);
 		m_tme->setRunEnabled(true);
+		m_tme->setRunBtnVisible(true);
 	}
 }
 
@@ -614,6 +616,7 @@ void Ad74413r::setupToolTemplate()
 	m_singleBtn = new SingleShotBtn(m_tool->topContainer());
 	m_singleBtn->setEnabled(false);
 	m_singleBtn->setChecked(false);
+	m_tme->setRunBtnVisible(false);
 	m_configBtn = createConfigBtn();
 
 	connect(m_infoBtn, &InfoBtn::clicked, this, [this]() {
