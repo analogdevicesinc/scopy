@@ -8,7 +8,7 @@
 
     <title>Package Generator &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../_static/scopy.png"/>
@@ -556,55 +556,55 @@ Below are platform-specific details and instructions:</p>
 <p><strong>pkg.json</strong></p>
 <p>The <cite>pkg.json</cite> file contains the configuration details for generating packages. Example:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newpackage&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New package&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A new package&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Analog Devices Inc.&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;LGPL&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;iio&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;plugin&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"newpackage"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New package"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A new package"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Analog Devices Inc."</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LGPL"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"iio"</span><span class="p">,</span><span class="w"> </span><span class="s2">"plugin"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p><strong>plugin.json</strong></p>
 <p>The <cite>plugin.json</cite> file contains the configuration details for generating plugins. Example:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;baseplugin&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;plugin_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newplugin&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;plugin_display_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New Plugin&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;plugin_description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A new plugin&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;class_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NEWPlugin&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;scopy::newplugin&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;device_category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;iio&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;tools&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"baseplugin"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"plugin_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"newplugin"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"plugin_display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New Plugin"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"plugin_description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A new plugin"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"class_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NEWPlugin"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"scopy::newplugin"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"device_category"</span><span class="p">:</span><span class="w"> </span><span class="s2">"iio"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"tools"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newtool1&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;tool_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Tool1&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;file_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tool1&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;class_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Tool1&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;namespace&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;scopy::newplugin&quot;</span>
+<span class="w">            </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"newtool1"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"tool_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tool1"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"file_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tool1"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"class_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tool1"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"scopy::newplugin"</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;cmakelists&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cmake_min_required&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">3.9</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;cxx_standard&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;enable_testing&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ON&quot;</span>
+<span class="w">    </span><span class="nt">"cmakelists"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"cmake_min_required"</span><span class="p">:</span><span class="w"> </span><span class="mf">3.9</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"cxx_standard"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"enable_testing"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ON"</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;style&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;qss&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;json&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"style"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"qss"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"json"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;test&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cmakelists&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;cmake_min_required&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">3.5</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;tst_pluginloader&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="nt">"test"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"cmakelists"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"cmake_min_required"</span><span class="p">:</span><span class="w"> </span><span class="mf">3.5</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"tst_pluginloader"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;resources&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;resources_qrc&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="nt">"resources"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"resources_qrc"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;doc&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;pdk&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;deps_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;project_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="nt">"doc"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"pdk"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"deps_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"project_path"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -614,12 +614,12 @@ Below are platform-specific details and instructions:</p>
 <h2><a class="toc-backref" href="#id6" role="doc-backlink">Manifest File</a><a class="headerlink" href="#manifest-file" title="Link to this heading"></a></h2>
 <p>The <cite>manifest.json.cmakein</cite> file is generated as part of the package structure. It contains metadata about the package and is used during the build process. Example:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;newpackage&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New Package&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A new package for Scopy&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Analog Devices Inc.&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;LGPL&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;iio&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;plugin&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"newpackage"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New Package"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A new package for Scopy"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"author"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Analog Devices Inc."</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LGPL"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"iio"</span><span class="p">,</span><span class="w"> </span><span class="s2">"plugin"</span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>

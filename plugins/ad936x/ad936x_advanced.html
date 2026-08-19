@@ -8,7 +8,7 @@
 
     <title>AD936X Advanced &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -390,8 +390,8 @@ devicetree property.</p></li>
 After you customize the driver for your application needs, you can read
 back all values from the Linux debugfs:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>root@linaro-ubuntu-desktop:~#<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/sys/kernel/debug/iio/iio<span class="se">\:</span>device1/
-root@linaro-ubuntu-desktop:/sys/kernel/debug/iio/iio:device1#<span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span>*<span class="w"> </span><span class="p">|</span>
-sed<span class="w"> </span><span class="s2">&quot;s/:/ = &lt;/g&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $0&quot;&gt;;&quot;}&#39;</span>
+root@linaro-ubuntu-desktop:/sys/kernel/debug/iio/iio:device1#<span class="w"> </span>grep<span class="w"> </span><span class="s2">""</span><span class="w"> </span>*<span class="w"> </span><span class="p">|</span>
+sed<span class="w"> </span><span class="s2">"s/:/ = &lt;/g"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'{print $0"&gt;;"}'</span>
 adi,2rx-2tx-mode-enable<span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;<span class="m">1</span>&gt;<span class="p">;</span>
 adi,agc-adc-large-overload-exceed-counter<span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;<span class="m">10</span>&gt;<span class="p">;</span>
 <span class="o">[</span><span class="w"> </span>--<span class="w"> </span>snip<span class="w"> </span>--<span class="w"> </span><span class="o">]</span>

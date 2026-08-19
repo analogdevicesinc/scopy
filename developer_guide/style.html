@@ -8,7 +8,7 @@
 
     <title>Style Tutorial &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../_static/scopy.png"/>
@@ -402,7 +402,7 @@ Content on this topic
 <p><strong>Arguments:</strong> <code class="docutils literal notranslate"><span class="pre">option,</span> <span class="pre">style_folder,</span> <span class="pre">header_folder</span></code> (option should always be <code class="docutils literal notranslate"><span class="pre">--plugin</span></code>).</p>
 <p>Example:</p>
 <div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">include</span><span class="p">(</span><span class="s">ScopyStyle</span><span class="p">)</span>
-<span class="nb">generate_style</span><span class="p">(</span><span class="s2">&quot;--plugin&quot;</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="s">/style</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="s">/include/pluginName</span><span class="p">)</span>
+<span class="nb">generate_style</span><span class="p">(</span><span class="s2">"--plugin"</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="s">/style</span><span class="w"> </span><span class="o">${</span><span class="nv">CMAKE_CURRENT_SOURCE_DIR</span><span class="o">}</span><span class="s">/include/pluginName</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Run CMake, and you should see the new properties in <code class="docutils literal notranslate"><span class="pre">header_folder/style_properties.h</span></code>.</p>

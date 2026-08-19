@@ -8,7 +8,7 @@
 
     <title>Scopy troubleshooting guide &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../_static/scopy.png"/>
@@ -449,27 +449,27 @@ the issue!</p>
 <p>We can modify the debug output of Scopy even if the release has a
 preconfigured filter.</p>
 <p>The default Scopy configuration is the following:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;*.debug=false</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;ToolStack.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;ToolManager.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;DeviceManager.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;Device.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;TestPlugin.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;Plugin.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;swiotConfig.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;CyclicalTask.debug=false</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;SWIOTPlugin.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;AD74413R.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;ScopyTranslations.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;GRTimeSinkComponent.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="s">&quot;GRManager.debug=true</span><span class="se">\n</span><span class="s">&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="s">"*.debug=false</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"ToolStack.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"ToolManager.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"DeviceManager.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"Device.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"TestPlugin.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"Plugin.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"swiotConfig.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"CyclicalTask.debug=false</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"SWIOTPlugin.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"AD74413R.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"ScopyTranslations.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"GRTimeSinkComponent.debug=true</span><span class="se">\n</span><span class="s">"</span>
+<span class="s">"GRManager.debug=true</span><span class="se">\n</span><span class="s">"</span>
 </pre></div>
 </div>
 <p>Using <strong>*.debug=false</strong> will suppress all the debug output of Scopy.</p>
 <p>Now let’s take some examples and check them on different Operating Systems:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1">## This will disable all the output and only enable logs</span>
 <span class="c1">## for the ADC Plugin</span>
-<span class="s2">&quot;*.debug=false;ADCPlugin.debug=true&quot;</span>
+<span class="s2">"*.debug=false;ADCPlugin.debug=true"</span>
 </pre></div>
 </div>
 </section>
@@ -477,7 +477,7 @@ preconfigured filter.</p>
 <h3>Linux x86_64, arm64, arm32, MacOS<a class="headerlink" href="#linux-x86-64-arm64-arm32-macos" title="Link to this heading"></a></h3>
 <p>In order to modify the Scopy logging rules, open up a terminal
 and run the following:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">QT_LOGGING_RULES</span><span class="o">=</span><span class="s2">&quot;*.debug=false;ADCPlugin.debug=true&quot;</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">QT_LOGGING_RULES</span><span class="o">=</span><span class="s2">"*.debug=false;ADCPlugin.debug=true"</span>
 </pre></div>
 </div>
 <p>After that, run Scopy (specific to each OS type) and observe
@@ -492,7 +492,7 @@ This will not only open the Scopy window, it will also start a command
 prompt in which all the output will be visible.</p>
 <p>In order to modify the QT_LOGGING_RULES on Windows, firstly open a
 command prompt and run the following:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="w"> </span><span class="nv">QT_LOGGING_RULES</span><span class="o">=</span><span class="s2">&quot;*.debug=false;ADCPlugin.debug=true&quot;</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span><span class="w"> </span><span class="nv">QT_LOGGING_RULES</span><span class="o">=</span><span class="s2">"*.debug=false;ADCPlugin.debug=true"</span>
 </pre></div>
 </div>
 <p>After that, you can run <em>Scopy-console.exe</em> from the <strong>same</strong> command
@@ -810,7 +810,7 @@ prompt.</p>
 </div>
 <p>If you need to regenerate this list after updating parts of Scopy, you can
 use the following command:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>grep<span class="w"> </span>-InH<span class="w"> </span>-r<span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*.rst*&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*.mako&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*build*&quot;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">&quot;*html*&quot;</span><span class="w"> </span><span class="s2">&quot;Q_LOGGING_CATEGORY&quot;</span><span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">&#39;s/.*Q_LOGGING_CATEGORY([^,]*, *&quot;\([^&quot;]*\)&quot;).*/\1/&#39;</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>grep<span class="w"> </span>-InH<span class="w"> </span>-r<span class="w"> </span>--exclude<span class="o">=</span><span class="s2">"*.rst*"</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">"*.mako"</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">"*build*"</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s2">"*html*"</span><span class="w"> </span><span class="s2">"Q_LOGGING_CATEGORY"</span><span class="w"> </span>.<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">'s/.*Q_LOGGING_CATEGORY([^,]*, *"\([^"]*\)").*/\1/'</span>
 </pre></div>
 </div>
 </section>

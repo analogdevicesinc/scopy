@@ -8,7 +8,7 @@
 
     <title>Scripting Tool - Test Suite &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../../_static/scopy.png"/>
@@ -472,7 +472,7 @@ Content on this topic
 <li><p>Open the scripting tool.</p></li>
 <li><p>Enter the following script in the editor:</p>
 <blockquote>
-<div><div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">deviceID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">addDevice</span><span class="p">(</span><span class="s2">&quot;ip:127.0.0.1&quot;</span><span class="p">)</span>
+<div><div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">deviceID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">scopy</span><span class="p">.</span><span class="nx">addDevice</span><span class="p">(</span><span class="s2">"ip:127.0.0.1"</span><span class="p">)</span>
 <span class="nx">scopy</span><span class="p">.</span><span class="nx">connectDevice</span><span class="p">(</span><span class="nx">deviceID</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -596,12 +596,12 @@ Content on this topic
 <li><p>Open the scripting tool.</p></li>
 <li><p>Enter the following script in the editor:</p>
 <blockquote>
-<div><div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">scopy</span><span class="p">.</span><span class="nx">switchTool</span><span class="p">(</span><span class="s2">&quot;Data Logger &quot;</span><span class="p">)</span>
+<div><div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">scopy</span><span class="p">.</span><span class="nx">switchTool</span><span class="p">(</span><span class="s2">"Data Logger "</span><span class="p">)</span>
 <span class="nx">msleep</span><span class="p">(</span><span class="mf">1000</span><span class="p">)</span>
-<span class="nx">scopy</span><span class="p">.</span><span class="nx">switchTool</span><span class="p">(</span><span class="s2">&quot;Register map&quot;</span><span class="p">)</span>
-<span class="nx">regmap</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">&quot;0x00&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0x01&quot;</span><span class="p">)</span>
+<span class="nx">scopy</span><span class="p">.</span><span class="nx">switchTool</span><span class="p">(</span><span class="s2">"Register map"</span><span class="p">)</span>
+<span class="nx">regmap</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"0x00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0x01"</span><span class="p">)</span>
 <span class="nx">msleep</span><span class="p">(</span><span class="mf">1000</span><span class="p">)</span>
-<span class="nx">regmap</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">&quot;0x00&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0x00&quot;</span><span class="p">)</span>
+<span class="nx">regmap</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"0x00"</span><span class="p">,</span><span class="w"> </span><span class="s2">"0x00"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div></blockquote>

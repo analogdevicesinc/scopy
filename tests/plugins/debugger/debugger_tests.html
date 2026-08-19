@@ -8,7 +8,7 @@
 
     <title>Debugger - Test Suite &#8212; Scopy  documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8e8a900e" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=cae2157c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/app.min.css?v=fb8972a4" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=5b85fa78" />
     <script async="async" src="../../../_static/app.umd.js?v=26d0298f"></script>
     <link rel="icon" href="../../../_static/scopy.png"/>
@@ -1213,14 +1213,14 @@ The watch list is located at the bottom of the instrument.</p></li>
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">argv</span><span class="p">[])</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kt">char</span><span class="w"> </span><span class="n">buffer</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
 <span class="w">  </span><span class="kt">ssize_t</span><span class="w"> </span><span class="n">ret</span><span class="p">;</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">iio_context</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iio_create_context_from_uri</span><span class="p">(</span><span class="s">&quot;ip:192.168.2.1&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">iio_context</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iio_create_context_from_uri</span><span class="p">(</span><span class="s">"ip:192.168.2.1"</span><span class="p">);</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ctx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error %d: Failed to create context</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">errno</span><span class="p">);</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"Error %d: Failed to create context</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">errno</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
 <span class="w">  </span><span class="p">}</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">iio_device</span><span class="w"> </span><span class="o">*</span><span class="n">ad9361_phy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iio_context_find_device</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ad9361-phy&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">iio_device</span><span class="w"> </span><span class="o">*</span><span class="n">ad9361_phy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iio_context_find_device</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">"ad9361-phy"</span><span class="p">);</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ad9361_phy</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Error: Could not find device ad9361-phy</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"Error: Could not find device ad9361-phy</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="w">  </span><span class="n">iio_context_destroy</span><span class="p">(</span><span class="n">ctx</span><span class="p">);</span>
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
