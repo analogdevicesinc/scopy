@@ -40,6 +40,7 @@ private Q_SLOTS:
 	void maskFreedOnDelete();
 	void outputPushEmits();
 	void multiBufferSelector();
+	void flattenDoubles();
 };
 
 void TstComponentStream::openEnablesRefillDecodes()
@@ -168,6 +169,42 @@ void TstComponentStream::multiBufferSelector()
 
 	QCOMPARE(in0->bufferIndex(), 0u);
 	QCOMPARE(in1->bufferIndex(), 1u);
+}
+
+void TstComponentStream::flattenDoubles()
+{
+	// Two interleaved S16 channels, 3 samples, scale = 2.0.
+	// ch0 raw = 1,2,3 -> 2,4,6 ; ch1 raw = 10,20,30 -> 20,40,60.
+	int16_t storage[] = {1, 10, 2, 20, 3, 30};
+
+	auto s16 = [](ptrdiff_t offset) {
+		ChannelFormat cf;
+		cf.offset = offset;
+		cf.stride = 4; // 2 channels * 2 bytes
+		cf.type = DataType::S16;
+		cf.validBits = 16;
+		cf.shift = 0;
+		cf.scale = 2.0;
+		cf.offsetPhys = 0.0;
+		return cf;
+	};
+
+	StreamFormat format;
+	format.data = storage;
+	format.sampleCount = 3;
+	format.layout = SamplesLayout::Interleaved;
+	format.channels = {s16(0), s16(2)};
+
+	StreamView view(format);
+
+	// Sanity against per-channel decode.
+	QCOMPARE(view.toDoubles(), (QVector<QVector<double>>{{2.0, 4.0, 6.0}, {20.0, 40.0, 60.0}}));
+
+	// Sample-major: [c0s0, c1s0, c0s1, c1s1, c0s2, c1s2].
+	QCOMPARE(view.toInterleavedDoubles(), (QVector<double>{2.0, 20.0, 4.0, 40.0, 6.0, 60.0}));
+
+	// Channel-major: [c0s0, c0s1, c0s2, c1s0, c1s1, c1s2].
+	QCOMPARE(view.toConcatenatedDoubles(), (QVector<double>{2.0, 4.0, 6.0, 20.0, 40.0, 60.0}));
 }
 
 QTEST_MAIN(TstComponentStream)
