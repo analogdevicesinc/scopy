@@ -58,6 +58,34 @@ public:
 		return out;
 	}
 
+	// out = [c0s0, c1s0, ..., c0s1, c1s1, ...].
+	QVector<double> toInterleavedDoubles() const
+	{
+		const int channels = channelCount();
+		QVector<double> out;
+		out.reserve(int(m_format.sampleCount) * channels);
+		for(size_t s = 0; s < m_format.sampleCount; ++s) {
+			for(int c = 0; c < channels; ++c) {
+				out.append(sampleAsDouble(c, s));
+			}
+		}
+		return out;
+	}
+
+	// out = [c0s0, c0s1, ..., c1s0, c1s1, ...].
+	QVector<double> toConcatenatedDoubles() const
+	{
+		const int channels = channelCount();
+		QVector<double> out;
+		out.reserve(int(m_format.sampleCount) * channels);
+		for(int c = 0; c < channels; ++c) {
+			for(size_t s = 0; s < m_format.sampleCount; ++s) {
+				out.append(sampleAsDouble(c, s));
+			}
+		}
+		return out;
+	}
+
 private:
 	int64_t rawInteger(const ChannelFormat &cf, int ch, size_t sample) const
 	{
