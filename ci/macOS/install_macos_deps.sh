@@ -388,6 +388,9 @@ build_qwt() {
 	patch_qwt
 	# Rename the produced library base name to qwt_scopy (SONAME handled in patch_qwt)
 	sed -i '' 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
+	# Fix subproject link references so they find qwt_scopy, not the old qwt name
+	sed -i '' 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
+		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
 	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
 	make $JOBS
 	make install
