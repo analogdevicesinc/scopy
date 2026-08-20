@@ -31,7 +31,11 @@ class SCOPY_CORE_EXPORT IIODeviceImpl : public DeviceImpl
 public:
 	explicit IIODeviceImpl(QString param, QObject *parent = nullptr)
 		: DeviceImpl(param, "iio", parent)
-	{}
+	{
+		// For now, only libiio v0. Changes will be made
+		m_context = component::Controller::connectCtx(param, component::BackendKind::Libiiov0);
+		// we must handle the ping
+	}
 	~IIODeviceImpl() {}
 
 	virtual void init() override;
