@@ -530,7 +530,10 @@ create_appdir(){
 	# Copy Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
 	# (core/CMakeLists.txt sets it inside the if(WITH_PYTHON) block), so the grep comes back empty.
 	# Guard it: an empty version would make python_path "/usr/lib/" and copy all of /usr/lib.
-	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
+	# The trailing `|| true` is required: this script runs under `set -e`, and the final `grep -o`
+	# exits 1 when it matches nothing, which the assignment inherits and which would abort the
+	# whole script here - before the check below could run.
+	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+' || true)
 	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d /usr/lib/$FOUND_PYTHON_VERSION ]; then
 		python_path=/usr/lib/$FOUND_PYTHON_VERSION
 		cp -r $python_path $APP_DIR/usr/lib
