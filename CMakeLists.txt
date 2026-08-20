@@ -184,6 +184,9 @@ else()
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_DLL_BUILD_PATH})
 endif()
 
+find_package(QCoro6 REQUIRED COMPONENTS Core Coro)
+add_subdirectory(device-controller)
+
 add_subdirectory(common)
 add_subdirectory(iioutil)
 add_subdirectory(gui)
