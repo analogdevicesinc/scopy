@@ -125,8 +125,5 @@ jobs:
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    # DEPS REWORK: disabled - ci/macOS still installs the gnuradio/sigrok/boost Homebrew set
-    # and has not been updated. This job uses no docker image, hence no docker_tag.
     macos-qt6:
-      if: false
       uses: ./.github/workflows/macosbuild.yml

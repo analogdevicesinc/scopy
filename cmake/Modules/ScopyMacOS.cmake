@@ -42,9 +42,11 @@ set(OSX_BUNDLE MACOSX_BUNDLE)
 
 find_package(PkgConfig)
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
-pkg_check_modules(GLIB REQUIRED glib-2.0)
-pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
-pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
+if(WITH_SIGROK)
+	pkg_check_modules(GLIB REQUIRED glib-2.0)
+	pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+	pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
+endif()
 
 set(EXTRA_BUNDLE_FILES ${ICON_FILE} ${PKGINFO} ${QT_CONF})
 
@@ -57,13 +59,15 @@ function(setup_macos_bundle_resources target)
 		COMMENT "Copying style files into app bundle"
 	)
 
-	add_custom_command(
-		TARGET ${target}
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${LIBSIGROK_DECODERS_DIR}
-			$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/decoders
-		COMMENT "Copying sigrokdecode decoders into app bundle"
-	)
+	if(WITH_SIGROK AND LIBSIGROK_DECODERS_DIR)
+		add_custom_command(
+			TARGET ${target}
+			POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${LIBSIGROK_DECODERS_DIR}
+				$<TARGET_BUNDLE_DIR:${target}>/Contents/Resources/decoders
+			COMMENT "Copying sigrokdecode decoders into app bundle"
+		)
+	endif()
 
 	add_custom_command(
 		TARGET ${target}
