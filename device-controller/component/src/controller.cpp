@@ -61,9 +61,9 @@ Context *Controller::_connectCtx(const QString &uri, BackendKind backend)
 	if(ctx) {
 		ctx->setParent(this);
 		m_contexts.insert(uri, CtxEntry{ctx, 1});
-		Ping *ping = ctx->findChild<Ping *>();
-		connect(ping, &Ping::connectionLost, this, [this, ctx]() { Q_EMIT connectionLost(ctx); });
-		ping->startMonitoring(2000);
+        Ping *ping = ctx->findChild<Ping *>();
+        connect(ping, &Ping::connectionLost, this, [this, ctx]() { Q_EMIT connectionLost(ctx); });
+        ping->startMonitoring(2000);
 		Q_EMIT componentAdded(ctx);
 	}
 	return ctx;
