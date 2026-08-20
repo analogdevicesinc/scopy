@@ -8,6 +8,7 @@
 namespace scopy::iio {
 
 class IScanOps;
+class IBackend;
 
 class IIOScan : public QObject {
 	Q_OBJECT
@@ -22,7 +23,8 @@ Q_SIGNALS:
 	void scanCompleted(const QVector<scopy::iio::ScanResult> &results);
 
 private:
-	IScanOps *m_scanOps;
+	IBackend *m_backend = nullptr; // non-owning; loader keeps backends resident for the process
+	IScanOps *m_scanOps = nullptr;
 };
 
 } // namespace scopy::iio
