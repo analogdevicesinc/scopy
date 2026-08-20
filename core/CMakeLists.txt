@@ -162,6 +162,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-iioutil
 	       scopy-pkg-manager
+	       component
 	       ${LIBSIGROK_DECODE_LINK_LIBRARIES}
 	       ${Python3_LIBRARIES}
 )
