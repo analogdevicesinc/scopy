@@ -22,8 +22,6 @@
 #ifndef ACQUISITIONMANAGER_H
 #define ACQUISITIONMANAGER_H
 
-#include "qtimer.h"
-#include <iio.h>
 #include <QObject>
 #include <QMap>
 #include <QFutureWatcher>
@@ -33,6 +31,12 @@
 
 #include <pqmdatalogger.h>
 
+#include <component/context.h>
+#include <component/controller.h>
+#include <component/device.h>
+
+#include <component/backends/iio/iioinputstream.h>
+
 #define MAX_ATTR_SIZE 1024
 #define BUFFER_SIZE 256
 #define DEVICE_PQM "pqm"
@@ -41,7 +45,7 @@ class AcquisitionManager : public QObject
 {
 	Q_OBJECT
 public:
-	AcquisitionManager(iio_context *ctx, PingTask *pingTask, QObject *parent = nullptr);
+	AcquisitionManager(component::ContextHandle ctx, QObject *parent = nullptr);
 	~AcquisitionManager();
 
 	bool hasFwVers() const;
@@ -61,11 +65,10 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void futureReadData();
 	void onReadFinished();
-	void pingTimerTimeout();
 
 private:
 	double convertFromHwToHost(int value, QString chnlId);
-	void enableBufferChnls(iio_device *dev);
+	QList<int> enableBufferChnls(component::Device *dev);
 	void readData();
 	void readAttrData();
 	void readBuffData();
@@ -78,12 +81,10 @@ private:
 	void adjustMap(const QString &attr, std::function<void(QString &)> adjuster);
 	static void computeAdjustedAngle(QString &angle);
 
-	iio_context *m_ctx;
-	iio_buffer *m_buffer;
+	component::ContextHandle m_ctx;
+	component::iio::IIOInputStream *m_inputStream = nullptr;
 	PqmDataLogger *m_pqmLog;
 
-	QTimer *m_pingTimer = nullptr;
-	PingTask *m_pingTask = nullptr;
 	QFutureWatcher<void> *m_readFw;
 	QFutureWatcher<void> *m_setFw;
 
