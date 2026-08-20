@@ -233,7 +233,7 @@ install_packages() {
 		libxcb-xinerama0  libgmp3-dev libzip-dev libglib2.0-dev libglibmm-2.4-dev libsigc++-2.0-dev \
 		libclang1 libmatio-dev liborc-0.4-dev libgl1-mesa-dev libavahi-client* libavahi-common* \
 		libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
-		libxkbcommon-x11-0 libqt5gui5 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev
+		libxkbcommon-x11-0 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev
 }
 
 build_libserialport(){
@@ -470,11 +470,19 @@ build_scopy() {
 	pushd $SRC_DIR
 	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
+	# Match the slim dependency image: adc and pqm are the only gnuradio consumers, and
+	# sigrok/python are the libsigrokdecode core path. Without these the build fails at configure
+	# on a slim image (gr-util -> find_package(Gnuradio REQUIRED), pkg_check_modules(libsigrokdecode
+	# REQUIRED)). Keep in step with build_scopy in ci/ubuntu/ubuntu_build_process_slim.sh.
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION \
 		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr \
 		-DENABLE_ALL_PACKAGES=ON \
 		-DENABLE_PACKAGE_M2K=OFF
+		-DENABLE_PLUGIN_ADC=OFF
+		-DENABLE_PLUGIN_PQM=OFF
+		-DWITH_SIGROK=OFF
+		-DWITH_PYTHON=OFF
 		"
 	build_with_cmake OFF
 	popd
@@ -519,22 +527,33 @@ create_appdir(){
 	cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
 	cp ${STAGING_AREA_DEPS}/lib/tinyiiod.so* $APP_DIR/usr/lib
 
-	# Copy Python runtime
+	# Copy Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
+	# (core/CMakeLists.txt sets it inside the if(WITH_PYTHON) block), so the grep comes back empty.
+	# Guard it: an empty version would make python_path "/usr/lib/" and copy all of /usr/lib.
 	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
-	python_path=/usr/lib/$FOUND_PYTHON_VERSION
-	cp -r $python_path $APP_DIR/usr/lib
+	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d /usr/lib/$FOUND_PYTHON_VERSION ]; then
+		python_path=/usr/lib/$FOUND_PYTHON_VERSION
+		cp -r $python_path $APP_DIR/usr/lib
+	else
+		echo "Python runtime not bundled (built with WITH_PYTHON=OFF)"
+	fi
 
-	# Copy protocol decoders
+	# Copy protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case on the slim
+	# dependency images - not an error there, so warn instead of failing the packaging step.
 	if [ -d $STAGING_AREA_DEPS/share/libsigrokdecode/decoders ]; then
 		cp -r $STAGING_AREA_DEPS/share/libsigrokdecode/decoders $APP_DIR/usr/lib
 	elif [ -d $STAGING_AREA/libsigrokdecode/decoders ];then
 		cp -r $STAGING_AREA/libsigrokdecode/decoders $APP_DIR/usr/lib
 	else
-		echo  "No decoders for libsigrokdecode found"
-		exit 1
+		echo  "No decoders for libsigrokdecode found (built with WITH_SIGROK=OFF)"
 	fi
 
-	cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
+	# spdlog is a gnuradio transitive dep, absent from the slim images (gr-util is not built).
+	if ls $STAGING_AREA_DEPS/lib/libspdlog.so* >/dev/null 2>&1; then
+		cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
+	else
+		echo "libspdlog not bundled (gnuradio stack not present)"
+	fi
 	cp -r $QT/plugins $APP_DIR/usr
 
 	cp $QT/lib/libQt6XcbQpa.so* $APP_DIR/usr/lib
