@@ -81,6 +81,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
+	       scopy-core
 )
 
 set(PQM_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
