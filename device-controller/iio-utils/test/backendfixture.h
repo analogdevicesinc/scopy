@@ -29,22 +29,19 @@ inline void addBackendRows()
 {
 	QTest::addColumn<int>("version");
 	auto *loader = scopy::iio::IIOBackendLoader::instance();
-	if(loader->load(scopy::iio::LibiioVersion::V0)) {
+	if(loader->backend(scopy::iio::LibiioVersion::V0)) {
 		QTest::newRow("v0") << static_cast<int>(scopy::iio::LibiioVersion::V0);
 	}
-	if(loader->load(scopy::iio::LibiioVersion::V1)) {
+	if(loader->backend(scopy::iio::LibiioVersion::V1)) {
 		QTest::newRow("v1") << static_cast<int>(scopy::iio::LibiioVersion::V1);
 	}
 }
 
-// Loads the backend for the given version. Returns nullptr if the plugin is absent.
+// Returns the backend for the given version, or nullptr if the plugin is absent.
+// The loader keeps it resident for the whole test process.
 inline scopy::iio::IBackend *loadBackend(scopy::iio::LibiioVersion v)
 {
-	auto *loader = scopy::iio::IIOBackendLoader::instance();
-	if(!loader->load(v) || !loader->isLoaded()) {
-		return nullptr;
-	}
-	return loader->backend();
+	return scopy::iio::IIOBackendLoader::instance()->backend(v);
 }
 
 // Opens a live context at the test URI. Returns a null handle if unreachable.
