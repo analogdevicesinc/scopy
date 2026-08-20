@@ -112,7 +112,7 @@ OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
 
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
-PACKAGES="volk spdlog ${BOOST_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libzip glib libusb glog doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2 ghr"
 
 install_packages() {
 
@@ -212,19 +212,15 @@ clone() {
 		git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 		git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 		git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-		git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-		git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
-		git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
-		git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+		git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 		git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-		git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 		git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 		git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
 
-		DEPENDENCY_REPOS="libserialport libiio libad9361 libm2k gr-scopy gr-m2k gnuradio qwt libsigrokdecode libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer"
+		DEPENDENCY_REPOS="libserialport libiio libad9361 libad9166 qwt libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer"
 		# Save to cache for next time
 		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
 			mkdir -p "$GIT_CACHE_DIR"
@@ -303,28 +299,6 @@ build_libiio() {
 	popd
 }
 
-build_libm2k() {
-	echo "### Building libm2k - branch $LIBM2K_BRANCH"
-	pushd $STAGING_AREA/libm2k
-	CURRENT_BUILD=libm2k
-	save_version_info
-
-	# libm2k hardcodes x86_64 in src/CMakeLists.txt -- patch to match runner architecture
-	ARCH="$(uname -m)"
-	sed -i '' "s/set(CMAKE_OSX_ARCHITECTURES \"x86_64\")/set(CMAKE_OSX_ARCHITECTURES \"$ARCH\")/" src/CMakeLists.txt
-
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF \
-		-DENABLE_CSHARP=OFF \
-		-DBUILD_EXAMPLES=OFF \
-		-DENABLE_TOOLS=OFF \
-		-DINSTALL_UDEV_RULES=OFF \
-		-DENABLE_LOG=OFF\
-		"
-	build_with_cmake
-	make install
-	popd
-}
 
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
@@ -342,65 +316,22 @@ build_libad9361() {
 	popd
 }
 
-build_gnuradio() {
-	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
-	CURRENT_BUILD=gnuradio
-	pushd $STAGING_AREA/gnuradio
+build_libad9166() {
+	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
+	CURRENT_BUILD=libad9166-iio
+	pushd $STAGING_AREA/libad9166
 	save_version_info
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
-		-DENABLE_DEFAULT=OFF \
-		-DENABLE_GNURADIO_RUNTIME=ON \
-		-DENABLE_GR_ANALOG=ON \
-		-DENABLE_GR_BLOCKS=ON \
-		-DENABLE_GR_FFT=ON \
-		-DENABLE_GR_FILTER=ON \
-		-DENABLE_GR_IIO=ON \
-		-DENABLE_POSTINSTALL=OFF
-		"
 	build_with_cmake
-	make install
+
+	# manually install framework (OSX_FRAMEWORK installs to /Library/Frameworks, not CMAKE_INSTALL_PREFIX)
+	mkdir -p $STAGING_AREA_DEPS/include
+	mkdir -p $STAGING_AREA_DEPS/lib/pkgconfig
+	cp -v $STAGING_AREA/libad9166/ad9166.h $STAGING_AREA_DEPS/include
+	cp -avR $STAGING_AREA/libad9166/build/ad9166.framework $STAGING_AREA_DEPS/lib
+	cp -v $STAGING_AREA/libad9166/build/libad9166.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
 }
 
-build_grm2k() {
-	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
-	CURRENT_BUILD=gr-m2k
-	pushd $STAGING_AREA/gr-m2k
-	save_version_info
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF \
-		-Dlibm2k_DIR=$STAGING_AREA_DEPS/lib/cmake/libm2k
-		"
-	build_with_cmake
-	make install
-	popd
-}
-
-build_grscopy() {
-	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
-	CURRENT_BUILD=gr-scopy
-	pushd $STAGING_AREA/gr-scopy
-	save_version_info
-	CURRENT_BUILD_CMAKE_OPTS="-DWITH_PYTHON=OFF "
-	build_with_cmake
-	make install
-	popd
-}
-
-build_libsigrokdecode() {
-	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
-	CURRENT_BUILD=libsigrokdecode
-	pushd $STAGING_AREA/libsigrokdecode
-	save_version_info
-	git reset --hard
-	git clean -xdf
-	./autogen.sh
-	./configure --prefix $STAGING_AREA_DEPS
-	make $JOBS install
-	popd
-}
 
 patch_qwt() {
 	patch -p1 <<-EOF
@@ -477,7 +408,7 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$QT -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DKDDockWidgets_QT6=ON"
+	CURRENT_BUILD_CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$QT -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets"
 	build_with_cmake
 	make install
 	popd
@@ -526,12 +457,8 @@ build_deps(){
 	build_libserialport
 	build_libiio
 	build_libad9361
-	build_libm2k
-	build_gnuradio
-	build_grscopy
-	build_grm2k
+	build_libad9166
 	build_qwt
-	build_libsigrokdecode
 	build_libtinyiiod
 	build_kddock
 	build_ecm
