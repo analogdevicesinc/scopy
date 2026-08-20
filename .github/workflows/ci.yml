@@ -66,13 +66,13 @@ jobs:
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    # DEPS REWORK: disabled until this platform is updated for the slim images.
-    # The ci/x86_64 script changes are made but not yet validated in a slim image.
-    # Re-enable by restoring the original `if:` below.
+    # DEPS REWORK: re-enabled. This is the only job that produces Ubuntu artifacts, and its
+    # matrix covers scopy2-ubuntu{22,24,26}-qt6, so it is also the only CI coverage of 22.04
+    # and 26.04 (ubuntubuild.yml deliberately tests 24.04 only). A working AppImage is the
+    # real proof the slim dependency set is sufficient.
     appimage-x86_64-qt6:
       needs: docker_tag
-      if: false
-      # original: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-x86_64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
