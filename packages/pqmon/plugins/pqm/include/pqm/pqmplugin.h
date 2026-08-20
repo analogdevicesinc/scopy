@@ -64,7 +64,6 @@ public Q_SLOTS:
 	void onPausePingTask(bool pause) override;
 
 private:
-	void clearPingTask();
 	void initApi();
 
 	InfoPage *m_infoPage;

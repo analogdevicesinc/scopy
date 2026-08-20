@@ -20,6 +20,7 @@
  */
 
 #include "pqmplugin.h"
+#include "component/device.h"
 #include "pqm_api.h"
 #include "preferenceshelper.h"
 #include "scopy-pqm_config.h"
@@ -42,28 +43,26 @@
 #include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
 #include <iioutil/iiopingtask.h>
+#include <component/attribute.h>
+#include <component/controller.h>
 
 Q_LOGGING_CATEGORY(CAT_PQMPLUGIN, "PQMPlugin");
 using namespace scopy::pqm;
 
-void PQMPlugin::preload() {}
+void PQMPlugin::preload() { QString preload; }
 
 bool PQMPlugin::compatible(QString m_param, QString category)
 {
 	bool ret = false;
-	auto &&cp = ConnectionProvider::GetInstance();
-
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qInfo(CAT_PQMPLUGIN) << "The context is not compatible with the PQMPlugin!";
 		return ret;
 	}
-	iio_device *pqmDevice = iio_context_find_device(conn->context(), "pqm");
-	if(pqmDevice) {
+	component::Device *pqm = ctx->findChild<component::Device *>("pqm", Qt::FindDirectChildrenOnly);
+	if(pqm) {
 		ret = true;
 	}
-	cp->close(m_param);
-
 	return ret;
 }
 
@@ -105,26 +104,22 @@ bool PQMPlugin::loadPage()
 	m_page->layout()->addWidget(m_infoPage);
 	m_page->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	auto cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(conn == nullptr)
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		qInfo(CAT_PQMPLUGIN) << "The context couldnt be found!";
 		return false;
-	struct iio_context *context = conn->context();
-	ssize_t attributeCount = iio_context_get_attrs_count(context);
-	for(int i = 0; i < attributeCount; ++i) {
-		const char *name;
-		const char *value;
-		int ret = iio_context_get_attr(context, i, &name, &value);
-		if(ret < 0) {
-			qWarning(CAT_PQMPLUGIN) << "Could not read attribute with index:" << i;
+	}
+
+	const QList<component::Attribute *> attributes =
+		ctx->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : attributes) {
+		if(!attr->readCapability()) {
 			continue;
 		}
-
-		m_infoPage->update(name, value);
+		QCoro::waitFor(attr->readCapability()->readAsync());
+		m_infoPage->update(attr->name(), attr->cachedValue());
 	}
-	cp->close(m_param);
 	m_page->ensurePolished();
-
 	return true;
 }
 
@@ -167,15 +162,13 @@ QString PQMPlugin::pkgName() { return PQM_PKG_NAME; }
 
 bool PQMPlugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		qInfo(CAT_PQMPLUGIN) << "The context couldnt be found!";
 		return false;
 	}
-	struct iio_context *ctx = conn->context();
-	m_pingTask = new IIOPingTask(ctx, this);
 
-	m_acqManager = new AcquisitionManager(ctx, m_pingTask, this);
+	m_acqManager = new AcquisitionManager(std::move(ctx), this);
 	bool hasFwVers = m_acqManager->hasFwVers();
 
 	m_attrHandler = new AttrInstrumentHandler(m_param, this);
@@ -254,9 +247,6 @@ bool PQMPlugin::onDisconnect()
 	m_acqManager = nullptr;
 	delete(m_attrHandler);
 	m_attrHandler = nullptr;
-	clearPingTask();
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
 	return true;
 }
 
@@ -270,14 +260,6 @@ void PQMPlugin::onPausePingTask(bool pause)
 		m_acqManager->stopPing();
 	} else {
 		m_acqManager->startPing();
-	}
-}
-
-void PQMPlugin::clearPingTask()
-{
-	if(m_pingTask) {
-		m_pingTask->deleteLater();
-		m_pingTask = nullptr;
 	}
 }
 

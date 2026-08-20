@@ -23,36 +23,39 @@
 #include "qtconcurrentrun.h"
 #include <QLoggingCategory>
 #include <QTimer>
+#include <component/attribute.h>
+#include <component/backends/iio/iioscanelement.h>
+#include <component/channel.h>
+#include <component/device.h>
+#include <component/ping.h>
+#include <component/streamview.h>
 #include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_PQM_ACQ, "PqmAqcManager");
 using namespace scopy::pqm;
 
-AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QObject *parent)
+AcquisitionManager::AcquisitionManager(component::ContextHandle ctx, QObject *parent)
 	: QObject(parent)
-	, m_ctx(ctx)
-	, m_pingTask(pingTask)
-	, m_buffer(nullptr)
+	, m_ctx(std::move(ctx))
 	, m_pqmLog(nullptr)
 {
 	Preferences *p = Preferences::GetInstance();
 	m_concurrentAcq = p->get("pqm_concurrent").toBool();
 	m_readFw = new QFutureWatcher<void>(this);
 	m_setFw = new QFutureWatcher<void>(this);
-	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(dev) {
 		// might need to set a trigger for the pqm device
+		m_inputStream = dev->findChild<component::iio::IIOInputStream *>();
 		m_pqmLog = new PqmDataLogger(this);
-		m_hasFwVers = iio_device_find_attr(dev, "fw_version");
+		m_hasFwVers = dev->findChild<component::Attribute *>(
+			"fw_version", Qt::FindDirectChildrenOnly); // iio_device_find_attr(dev, "fw_version");
 		readPqmAttributes();
-		enableBufferChnls(dev);
-		m_buffer = iio_device_create_buffer(dev, BUFFER_SIZE, false);
-		if(!m_buffer) {
+		QList<int> enabledChnls = enableBufferChnls(dev);
+
+		if(!QCoro::waitFor(m_inputStream->openAsync({enabledChnls, BUFFER_SIZE}))) {
 			qWarning(CAT_PQM_ACQ) << "Cannot create the buffer!";
 		}
-		m_pingTimer = new QTimer(this);
-		m_pingTimer->setInterval(3000);
-		connect(m_pingTimer, &QTimer::timeout, this, &AcquisitionManager::pingTimerTimeout);
 		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
 			Qt::QueuedConnection);
 		connect(this, &AcquisitionManager::logData, m_pqmLog, &PqmDataLogger::logPressed);
@@ -69,11 +72,6 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, PingTask *pingTask, QOb
 
 AcquisitionManager::~AcquisitionManager()
 {
-	if(m_pingTimer) {
-		m_pingTimer->stop();
-		m_pingTimer->deleteLater();
-		m_pingTimer = nullptr;
-	}
 	if(m_readFw) {
 		m_readFw->waitForFinished();
 		m_readFw->deleteLater();
@@ -84,33 +82,33 @@ AcquisitionManager::~AcquisitionManager()
 		m_setFw->deleteLater();
 		m_setFw = nullptr;
 	}
-	if(m_ctx) {
-		m_ctx = nullptr;
+	if(m_inputStream && m_inputStream->isOpen()) {
+		QCoro::waitFor(m_inputStream->closeAsync());
+		m_inputStream = nullptr;
 	}
-	if(m_buffer) {
-		iio_buffer_destroy(m_buffer);
-		m_buffer = nullptr;
-	}
-	m_pingTask = nullptr;
 	m_buffChnls.clear();
 	m_bufferData.clear();
 	m_pqmAttr.clear();
 }
 
-void AcquisitionManager::enableBufferChnls(iio_device *dev)
+QList<int> AcquisitionManager::enableBufferChnls(component::Device *dev)
 {
-	int chnlsNo = iio_device_get_channels_count(dev);
-	for(int i = 0; i < chnlsNo; i++) {
-		iio_channel *chnl = iio_device_get_channel(dev, i);
-		QString chName(iio_channel_get_name(chnl));
-		if(iio_channel_is_output(chnl)) {
-			m_eventsChnls.push_back(chName);
+	QList<int> enabledChnls{};
+	const QList<component::Channel *> chnls = dev->findChildren<component::Channel *>(Qt::FindDirectChildrenOnly);
+	for(component::Channel *chnl : chnls) {
+		if(chnl->isOutput()) {
+			m_eventsChnls.push_back(chnl->name());
 			continue;
 		}
-		iio_channel_enable(chnl);
-		m_buffChnls.push_back(chName);
+		m_buffChnls.push_back(chnl->name());
+	}
+	const QList<component::iio::IIOScanElement *> elements =
+		m_inputStream->findChildren<component::iio::IIOScanElement *>(Qt::FindDirectChildrenOnly);
+	for(component::iio::IIOScanElement *el : elements) {
+		enabledChnls.push_back(el->index());
 	}
 	m_pqmLog->setChnlsName(m_buffChnls);
+	return enabledChnls;
 }
 
 void AcquisitionManager::toolEnabled(bool en, QString toolName)
@@ -180,29 +178,28 @@ void AcquisitionManager::readBuffData()
 
 bool AcquisitionManager::readPqmAttributes()
 {
-	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
 		qDebug(CAT_PQM_ACQ) << "Device is unavailable!";
 		return false;
 	}
-	int attrNo = iio_device_get_attrs_count(dev);
-	int chnlsNo = iio_device_get_channels_count(dev);
-	const char *attrName = nullptr;
-	const char *chnlId = nullptr;
-	char dest[MAX_ATTR_SIZE];
-	for(int i = 0; i < attrNo; i++) {
-		attrName = iio_device_get_attr(dev, i);
-		iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
-		m_pqmAttr[DEVICE_PQM][attrName] = QString(dest);
+	const QList<component::Attribute *> devAttributes =
+		dev->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : devAttributes) {
+		if(attr->readCapability()) {
+			QCoro::waitFor(attr->readCapability()->readAsync());
+		}
+		m_pqmAttr[DEVICE_PQM][attr->name()] = attr->cachedValue();
 	}
-	for(int i = 0; i < chnlsNo; i++) {
-		iio_channel *chnl = iio_device_get_channel(dev, i);
-		attrNo = iio_channel_get_attrs_count(chnl);
-		chnlId = iio_channel_get_name(chnl);
-		for(int j = 0; j < attrNo; j++) {
-			attrName = iio_channel_get_attr(chnl, j);
-			iio_channel_attr_read(chnl, attrName, dest, MAX_ATTR_SIZE);
-			m_pqmAttr[chnlId][attrName] = QString(dest);
+	const QList<component::Channel *> chnls = dev->findChildren<component::Channel *>(Qt::FindDirectChildrenOnly);
+	for(component::Channel *chnl : chnls) {
+		const QList<component::Attribute *> chAttributes =
+			chnl->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+		for(component::Attribute *attr : chAttributes) {
+			if(attr->readCapability()) {
+				QCoro::waitFor(attr->readCapability()->readAsync());
+			}
+			m_pqmAttr[chnl->name()][attr->name()] = attr->cachedValue();
 		}
 	}
 	m_pqmLog->acquireAttrData(m_pqmAttr);
@@ -213,31 +210,26 @@ bool AcquisitionManager::readPqmAttributes()
 
 bool AcquisitionManager::readBufferedData()
 {
-	if(!m_buffer) {
+	if(!m_inputStream || !m_inputStream->isOpen()) {
 		qWarning(CAT_PQM_ACQ) << "The buffer is NULL!";
 		return false;
 	}
-	ssize_t ret = iio_buffer_refill(m_buffer);
-	if(ret < 0) {
-		qWarning(CAT_PQM_ACQ) << "An error occurred while refilling! [" << ret << "]";
+	Result<void> r = QCoro::waitFor(m_inputStream->refillAsync());
+	if(!r) {
+		qWarning(CAT_PQM_ACQ) << "An error occurred while refilling! [" << r.error().errorCode() << "]";
 		return false;
 	}
-	int samplesCounter = 0;
-	int chnlIdx = 0;
-	QString chnl;
-	int16_t *startAdr = (int16_t *)iio_buffer_start(m_buffer);
-	int16_t *endAdr = (int16_t *)iio_buffer_end(m_buffer);
+
+	component::StreamView view(m_inputStream->readFormat());
 	for(const QString &ch : std::as_const(m_buffChnls)) {
 		m_bufferData[ch].clear();
 		m_bufferData[ch] = {};
 	}
-	for(int16_t *ptr = startAdr; ptr != endAdr; ptr++) {
-		chnlIdx = samplesCounter % m_buffChnls.size();
-		chnl = m_buffChnls[chnlIdx];
-		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
-		m_pqmLog->acquireBufferData(d_ptr, chnlIdx);
-		m_bufferData[chnl].push_back(d_ptr);
-		samplesCounter++;
+	int chnlIdx = 0;
+	for(const QVector<double> &chnlStream : view.toDoubles()) {
+		const QString &chnl = m_buffChnls[chnlIdx];
+		m_bufferData[chnl].append(chnlStream);
+		chnlIdx++;
 	}
 	m_pqmLog->log();
 	return true;
@@ -254,16 +246,9 @@ void AcquisitionManager::onReadFinished()
 		Q_EMIT bufferDataAvailable(m_bufferData);
 	}
 	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
-	if(it != m_tools.cend()) {
+	if(it != m_tools.cend() && m_readFw) {
 		futureReadData();
 	}
-}
-
-void AcquisitionManager::pingTimerTimeout()
-{
-	QMutexLocker locker(&m_mutex);
-	m_pingTask->start();
-	m_pingTask->wait(THREAD_FINISH_TIMEOUT);
 }
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
@@ -286,39 +271,53 @@ void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> att
 	}
 }
 
-void AcquisitionManager::startPing() { m_pingTimer->start(); }
+void AcquisitionManager::startPing()
+{
+	component::Ping *ping = m_ctx->findChild<component::Ping *>();
+	ping->startMonitoring(2000);
+}
 
-void AcquisitionManager::stopPing() { m_pingTimer->stop(); }
+void AcquisitionManager::stopPing()
+{
+	component::Ping *ping = m_ctx->findChild<component::Ping *>();
+	ping->stopMonitoring();
+}
 
 void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
 	QMutexLocker locker(&m_mutex);
-	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
-	if(!dev)
+	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
+	if(!dev) {
 		return;
+	}
 	const QStringList keys = attr[DEVICE_PQM].keys();
 	for(const QString &key : keys) {
 		if(m_pqmAttr[DEVICE_PQM].contains(key) &&
 		   attr[DEVICE_PQM][key].compare(m_pqmAttr[DEVICE_PQM][key]) != 0) {
 			QString newVal = attr[DEVICE_PQM][key];
 			m_pqmAttr[DEVICE_PQM][key] = newVal;
-			iio_device_attr_write(dev, key.toStdString().c_str(), newVal.toStdString().c_str());
+			component::Attribute *attr = dev->findChild<component::Attribute *>(key);
+			if(attr && attr->writeCapability()) {
+				QCoro::waitFor(attr->writeCapability()->writeAsync(newVal));
+			}
 		}
 	}
 }
 
 void AcquisitionManager::setProcessData(bool en)
 {
-	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
 		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
 		return;
 	}
-	int ret = iio_device_attr_write_bool(dev, "process_data", en);
-	if(ret < 0) {
+	component::Attribute *attr = dev->findChild<component::Attribute *>("process_data");
+	if(!attr || !attr->writeCapability() ||
+	   !QCoro::waitFor(attr->writeCapability()->writeAsync(QString::number(en)))) {
 		qWarning(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
 		return;
 	}
+
 	m_processData.store(en);
 	qInfo(CAT_PQM_ACQ) << "process_data was written successfully:" << en;
 }
@@ -326,17 +325,18 @@ void AcquisitionManager::setProcessData(bool en)
 void AcquisitionManager::storeProcessData()
 {
 	QMutexLocker locker(&m_mutex);
-	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
 		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
 		return;
 	}
-	bool val = false;
-	int ret = iio_device_attr_read_bool(dev, "process_data", &val);
-	if(ret < 0) {
+	component::Attribute *attr = dev->findChild<component::Attribute *>("process_data");
+	Result<QByteArray> r = QCoro::waitFor(attr->readCapability()->readAsync());
+	if(!r) {
 		qWarning(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
+	} else {
+		m_processData.store(r.value().toInt());
 	}
-	m_processData.store(val);
 }
 
 void AcquisitionManager::handlePQEvents()
