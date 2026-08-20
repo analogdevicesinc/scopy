@@ -9,10 +9,9 @@ namespace scopy::iio {
 IIOScan::IIOScan(LibiioVersion version, QObject *parent)
     : QObject(parent)
 {
-    auto *loader = IIOBackendLoader::instance();
-    loader->load(version);
-    // scanOps() lifetime is managed by the backend (owned by IIOBackendLoader)
-    m_scanOps = loader->isLoaded() ? loader->backend()->scanOps() : nullptr;
+    // The loader keeps the backend resident for the whole process; non-owning pointers.
+    m_backend = IIOBackendLoader::instance()->backend(version);
+    m_scanOps = m_backend ? m_backend->scanOps() : nullptr;
 }
 
 IIOScan::~IIOScan() {}

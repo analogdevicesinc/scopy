@@ -7,20 +7,55 @@ namespace scopy::iio {
 
 using CreateFn = IBackend *(*)();
 
+static const char *soName(LibiioVersion v)
+{
+    switch(v) {
+    case LibiioVersion::V1:
+        return "libiio-backend-v1.so";
+    case LibiioVersion::V0:
+        return "libiio-backend-v0.so";
+    default:
+        return nullptr;
+    }
+}
+
 IIOBackendLoader *IIOBackendLoader::instance()
 {
     static IIOBackendLoader s_instance;
     return &s_instance;
 }
 
-IIOBackendLoader::~IIOBackendLoader() { unload(); }
-
-bool IIOBackendLoader::loadPlugin(const char *soName)
+IIOBackendLoader::~IIOBackendLoader()
 {
-    void *handle = dlopen(soName, RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);
+    QMutexLocker locker(&m_mutex);
+    for(IBackend *b : m_backends) {
+        delete b;
+    }
+    for(void *h : m_dlHandles) {
+        if(h) {
+            dlclose(h);
+        }
+    }
+    m_backends.clear();
+    m_dlHandles.clear();
+}
+
+IBackend *IIOBackendLoader::ensureLoaded(LibiioVersion v)
+{
+    auto it = m_backends.constFind(v);
+    if(it != m_backends.constEnd()) {
+        return it.value();
+    }
+
+    const char *name = soName(v);
+    if(!name) {
+        return nullptr;
+    }
+
+    void *handle = dlopen(name, RTLD_NOW | RTLD_LOCAL | RTLD_DEEPBIND);
     if(!handle) {
-        qWarning() << "IIOBackendLoader: dlopen failed for" << soName << ":" << dlerror();
-        return false;
+        qWarning() << "IIOBackendLoader: dlopen failed for" << name << ":" << dlerror();
+        return nullptr;
     }
 
     dlerror(); // clear previous error
@@ -29,78 +64,54 @@ bool IIOBackendLoader::loadPlugin(const char *soName)
     if(err) {
         qWarning() << "IIOBackendLoader: dlsym(createIIOBackend) failed:" << err;
         dlclose(handle);
-        return false;
+        return nullptr;
     }
 
     IBackend *backend = createFn();
     if(!backend) {
         qWarning() << "IIOBackendLoader: createIIOBackend() returned nullptr";
         dlclose(handle);
-        return false;
+        return nullptr;
     }
 
-    m_dlHandle = handle;
-    m_backend = backend;
-    return true;
+    m_dlHandles.insert(v, handle);
+    m_backends.insert(v, backend);
+    return backend;
 }
 
-bool IIOBackendLoader::load(LibiioVersion v)
+IBackend *IIOBackendLoader::resolve(LibiioVersion requested)
 {
-    if(m_backend && m_version == v) {
-        return true;
+    if(requested == LibiioVersion::V0 || requested == LibiioVersion::V1) {
+        return ensureLoaded(requested);
     }
 
-    if(m_backend) {
-        unload();
+    // Default: prefer an already-loaded backend (V1 first), then try to load.
+    if(auto it = m_backends.constFind(LibiioVersion::V1); it != m_backends.constEnd()) {
+        return it.value();
     }
-
-    if(v == LibiioVersion::V1) {
-        if(loadPlugin("libiio-backend-v1.so")) {
-            m_version = LibiioVersion::V1;
-            return true;
-        }
-        return false;
+    if(auto it = m_backends.constFind(LibiioVersion::V0); it != m_backends.constEnd()) {
+        return it.value();
     }
-
-    if(v == LibiioVersion::V0) {
-        if(loadPlugin("libiio-backend-v0.so")) {
-            m_version = LibiioVersion::V0;
-            return true;
-        }
-        return false;
+    if(IBackend *b = ensureLoaded(LibiioVersion::V1)) {
+        return b;
     }
-
-    // LibiioVersion::Default: try V1, fall back to V0
-    if(loadPlugin("libiio-backend-v1.so")) {
-        m_version = LibiioVersion::V1;
-        return true;
+    if(IBackend *b = ensureLoaded(LibiioVersion::V0)) {
+        return b;
     }
-    if(loadPlugin("libiio-backend-v0.so")) {
-        m_version = LibiioVersion::V0;
-        return true;
-    }
-
     qWarning() << "IIOBackendLoader: no libiio backend plugin found";
-    return false;
+    return nullptr;
 }
 
-void IIOBackendLoader::unload()
+IBackend *IIOBackendLoader::backend(LibiioVersion requested)
 {
-    delete m_backend;
-    m_backend = nullptr;
-
-    if(m_dlHandle) {
-        dlclose(m_dlHandle);
-        m_dlHandle = nullptr;
-    }
-
-    m_version = LibiioVersion::Default;
+    QMutexLocker locker(&m_mutex);
+    return resolve(requested);
 }
 
-bool IIOBackendLoader::isLoaded() const { return m_backend != nullptr; }
-
-LibiioVersion IIOBackendLoader::loadedVersion() const { return m_version; }
-
-IBackend *IIOBackendLoader::backend() const { return m_backend; }
+bool IIOBackendLoader::isLoaded(LibiioVersion v) const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_backends.contains(v);
+}
 
 } // namespace scopy::iio

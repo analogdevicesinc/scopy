@@ -14,12 +14,11 @@ using namespace scopy::component::iio;
 
 Context *IIOContextFactory::create(const QString &uri)
 {
-	auto *loader = scopy::iio::IIOBackendLoader::instance();
-	if(!loader->load(m_version)) {
+	scopy::iio::IBackend *backend = scopy::iio::IIOBackendLoader::instance()->backend(m_version);
+	if(!backend) {
 		return nullptr;
 	}
 
-	scopy::iio::IBackend *backend = loader->backend();
 	const scopy::iio::ContextHandle handle = backend->contextOps()->createContext(uri);
 	if(!handle.ptr) {
 		return nullptr;
@@ -28,6 +27,7 @@ Context *IIOContextFactory::create(const QString &uri)
 	auto *ctx = new IIOContext;
 	ctx->setUri(uri);
 	ctx->setHandle(handle);
+	ctx->setBackend(backend);
 
     auto *executor = new PooledCmdExecutor(1, ctx);
 	ctx->setExecutor(executor);
