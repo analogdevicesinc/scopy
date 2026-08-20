@@ -14,6 +14,7 @@ public:
 	virtual QString name(ContextHandle ctx) const = 0;
 	virtual QString description(ContextHandle ctx) const = 0;
 	virtual void version(ContextHandle ctx, unsigned int &major, unsigned int &minor, QString &tag) const = 0;
+	virtual ContextVersion getVersion(ContextHandle ctx) const = 0;
 	virtual unsigned int devicesCount(ContextHandle ctx) const = 0;
 	virtual DeviceHandle getDevice(ContextHandle ctx, unsigned int index) const = 0;
 	virtual DeviceHandle findDevice(ContextHandle ctx, const QString &name) const = 0;
