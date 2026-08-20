@@ -12,6 +12,7 @@ public:
 	QString name(ContextHandle ctx) const override;
 	QString description(ContextHandle ctx) const override;
 	void version(ContextHandle ctx, unsigned int &major, unsigned int &minor, QString &tag) const override;
+	ContextVersion getVersion(ContextHandle ctx) const override;
 	unsigned int devicesCount(ContextHandle ctx) const override;
 	DeviceHandle getDevice(ContextHandle ctx, unsigned int index) const override;
 	DeviceHandle findDevice(ContextHandle ctx, const QString &name) const override;

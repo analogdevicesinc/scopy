@@ -66,4 +66,11 @@ struct ScanResult
 	QString description;
 };
 
+struct ContextVersion
+{
+	unsigned int major = 0;
+	unsigned int minor = 0;
+	QString gitTag;
+};
+
 } // namespace scopy::iio

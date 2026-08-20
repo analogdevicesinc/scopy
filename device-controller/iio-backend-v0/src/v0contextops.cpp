@@ -43,6 +43,15 @@ void V0ContextOps::version(ContextHandle h, unsigned int &major, unsigned int &m
 	tag = QString::fromUtf8(tagBuf);
 }
 
+ContextVersion V0ContextOps::getVersion(ContextHandle h) const
+{
+	ContextVersion v;
+	char tagBuf[64] = {};
+	iio_context_get_version(ctx(h), &v.major, &v.minor, tagBuf);
+	v.gitTag = QString::fromUtf8(tagBuf);
+	return v;
+}
+
 unsigned int V0ContextOps::devicesCount(ContextHandle h) const { return iio_context_get_devices_count(ctx(h)); }
 
 DeviceHandle V0ContextOps::getDevice(ContextHandle h, unsigned int index) const
