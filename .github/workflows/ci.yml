@@ -79,9 +79,10 @@ jobs:
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    # DEPS REWORK: disabled - scopy-windows-qt6 has no :slim tag, so this would fail at
-    # docker pull. Note WITH_PYTHON=OFF also will not compile on Windows until
-    # initPythonWIN32() is guarded (see docs/design/scopy_deps_cleanup/deps-ci-platform-plan.md).
+    # DEPS REWORK: disabled ONLY because scopy-windows-qt6 has no :slim tag yet, so this would
+    # fail at docker pull. The WITH_PYTHON=OFF compile blocker is fixed (initPythonWIN32() is now
+    # guarded), and the ci/windows scripts are slim. Flip this back to the original `if:` below in
+    # the same change that pushes scopy-windows-qt6:slim - see docs/design/windows-progress.md.
     mingw-qt6:
       needs: docker_tag
       if: false

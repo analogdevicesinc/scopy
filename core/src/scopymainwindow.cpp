@@ -658,7 +658,7 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 
 void ScopyMainWindow::initPythonWIN32()
 {
-#ifdef WIN32
+#if defined(WIN32) && defined(WITH_PYTHON)
 	ScopySplashscreen::showMessage("Initializing Python engine");
 
 	QString pythonhome;

@@ -38,7 +38,7 @@ namespace scopy {
 class MeasurementLabel;
 class StatsLabel;
 
-class VerticalWidgetStack : public QWidget
+class SCOPY_GUI_EXPORT VerticalWidgetStack : public QWidget
 {
 	Q_OBJECT
 public:

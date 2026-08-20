@@ -23,7 +23,6 @@ install_packages() {
 		mingw-w64-${ARCH}-gcc\
 		mingw-w64-${ARCH}-python3\
 		mingw-w64-${ARCH}-python-mako\
-		mingw-w64-${ARCH}-python-six\
 		mingw-w64-${ARCH}-python-pip\
 		mingw-w64-${ARCH}-make\
 		mingw-w64-${ARCH}-doxygen\
@@ -31,25 +30,19 @@ install_packages() {
 		base-devel\
 		mingw-w64-${ARCH}-autotools\
 		libtool\
-		mingw-w64-${ARCH}-boost\
 		mingw-w64-${ARCH}-ccache \
 		mingw-w64-${ARCH}-pkgconf
 	"
 
 	PACMAN_SYNC_DEPS="\
 		mingw-w64-${ARCH}-fftw\
-		mingw-w64-${ARCH}-orc\
 		mingw-w64-${ARCH}-libxml2\
 		mingw-w64-${ARCH}-libzip\
-		mingw-w64-${ARCH}-fftw\
 		mingw-w64-${ARCH}-libffi\
-		mingw-w64-${ARCH}-glib2\
-		mingw-w64-${ARCH}-glibmm\
 		mingw-w64-${ARCH}-doxygen\
 		mingw-w64-${ARCH}-zlib\
 		mingw-w64-${ARCH}-breakpad\
-		mingw-w64-${ARCH}-libusb\
-		mingw-w64-${ARCH}-matio
+		mingw-w64-${ARCH}-libusb
 	"
 
 	if [ "$USE_STAGING" == "ON" ]; then
@@ -90,13 +83,31 @@ install_packages() {
 install_qt() {
 	pacman --noconfirm -S mingw-w64-x86_64-zstd wget
 
+	# aqt.exe is a native Windows (PyInstaller) binary, so it resolves its cache directory with
+	# Python's Windows expanduser - which needs USERPROFILE, or HOMEDRIVE+HOMEPATH. A plain
+	# `bash -lc` MSYS2 login shell exports none of them and aqt dies with "Could not determine
+	# home directory". Derive USERPROFILE from $HOME only when it is missing, so environments
+	# that already set it (e.g. the docker image) are untouched.
+	if [ -z "$USERPROFILE" ]; then
+		export USERPROFILE=$(cygpath -w "$HOME")
+		echo "USERPROFILE was unset; using $USERPROFILE for aqt"
+	fi
+
+	# Download into the staging area rather than the current directory, which would otherwise
+	# leave a ~15MB aqt.exe sitting in the source tree.
+	mkdir -p $STAGING_AREA
+	pushd $STAGING_AREA
+
 	echo "Downloading standalone aqt binary..."
 	wget -qO aqt.exe https://github.com/miurahr/aqtinstall/releases/latest/download/aqt_x64.exe
 	chmod +x aqt.exe
 
 	echo "Installing Qt6..."
 	# Changed /c/Qt to C:/Qt below
-	./aqt.exe install-qt --outputdir C:/Qt windows desktop 6.8.3 win64_mingw -m qt3d qtscxml
+	# qt3d kept for the imuanalyzer plugin; qtscxml dropped (no Scopy code uses Scxml).
+	./aqt.exe install-qt --outputdir C:/Qt windows desktop 6.8.3 win64_mingw -m qt3d
+
+	popd
 }
 
 clone() {
@@ -106,15 +117,9 @@ clone() {
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
+	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'libsndfile' ]	|| git clone --recursive https://github.com/libsndfile/libsndfile -b $LIBSNDFILE_BRANCH libsndfile
-	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
-	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
-	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
@@ -222,24 +227,9 @@ build_libad9361() {
 	build_with_cmake $1
 }
 
-build_spdlog() {
-	CURRENT_BUILD=spdlog
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DSPDLOG_BUILD_SHARED=ON\
-		-DSPDLOG_BUILD_EXAMPLE=OFF\
-		"
-	build_with_cmake $1
-}
-
-build_libm2k() {
-	CURRENT_BUILD=libm2k
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF\
-		-DENABLE_CSHARP=OFF\
-		-DBUILD_EXAMPLES=OFF\
-		-DENABLE_TOOLS=ON\
-		-DINSTALL_UDEV_RULES=OFF\
-		"
+build_libad9166() {
+	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
+	CURRENT_BUILD=libad9166
 	build_with_cmake $1
 }
 
@@ -254,84 +244,6 @@ build_libsndfile() {
 	-DBUILD_SHARED_LIBS=OFF\
 	-DBUILD_TESTING=OFF"
 	build_with_cmake $1
-}
-
-build_volk() {
-	CURRENT_BUILD=volk
-	CURRENT_BUILD_POST_CLEAN="git submodule update --init ../cpu_features"
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_MODTOOL=OFF\
-		-DENABLE_TESTING=OFF\
-		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
-		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
-		"
-	# Temporarily reduce parallel jobs just for volk to save memory
-	local PREV_JOBS=$JOBS
-	JOBS="-j2"
-
-	build_with_cmake $1
-
-	# Restore original jobs variable for the rest of the script
-	JOBS=$PREV_JOBS
-
-}
-
-build_gnuradio() {
-	CURRENT_BUILD=gnuradio
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_DEFAULT=OFF\
-		-DENABLE_GNURADIO_RUNTIME=ON\
-		-DENABLE_GR_ANALOG=ON\
-		-DENABLE_GR_BLOCKS=ON\
-		-DENABLE_GR_FFT=ON\
-		-DENABLE_GR_FILTER=ON\
-		-DENABLE_VOLK=ON\
-		-DENABLE_GR_IIO=ON\
-		-DENABLE_POSTINSTALL=OFF\
-		-DCMAKE_C_FLAGS=-fno-asynchronous-unwind-tables\
-		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
-		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
-		"
-
-	local PREV_JOBS=$JOBS
-	JOBS="-j2"
-
-	build_with_cmake $1
-
-	# Restore original jobs variable for the rest of the script
-	JOBS=$PREV_JOBS
-
-}
-
-build_grscopy() {
-	CURRENT_BUILD=gr-scopy
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
-		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
-		"
-
-	local PREV_JOBS=$JOBS
-	JOBS="-j2"
-
-	build_with_cmake $1
-
-	# Restore original jobs variable for the rest of the script
-	JOBS=$PREV_JOBS
-}
-
-build_grm2k() {
-	CURRENT_BUILD=gr-m2k
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe\
-		-DGR_PYTHON_DIR==$STAGING_DIR/lib/python3.10/site-packages\
-		"
-	local PREV_JOBS=$JOBS
-	JOBS="-j2"
-
-	build_with_cmake $1
-
-	# Restore original jobs variable for the rest of the script
-	JOBS=$PREV_JOBS
 }
 
 build_qwt() {
@@ -360,6 +272,11 @@ EOF
 
 	# Rename the produced library base name to qwt_scopy (no SONAME on Windows)
 	sed -i 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
+	# The designer/examples/playground/tests subprojects link the library by its old name
+	# (qwtAddLibrary(..., qwt)); update those to match the rename above, otherwise they fail
+	# with `ld: cannot find -lqwt`. (Gap in PR #2291; already fixed for Ubuntu.)
+	sed -i 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
+		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
 
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
@@ -392,40 +309,6 @@ EOF
 	popd
 }
 
-build_libsigrokdecode() {
-	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
-	CURRENT_BUILD=libsigrokdecode
-	pushd $STAGING_AREA/$CURRENT_BUILD
-	git reset --hard
-	git clean -xdf
-	patch -p1 < ${WORKFOLDER}/sigrokdecode-windows-fix.patch
-	./autogen.sh
-
-	INSTALL=$1
-	[ -z $INSTALL ] && INSTALL=ON
-
-	if [ "$USE_STAGING" == "ON" ]
-	then
-		CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" ./configure --prefix $STAGING_AREA_DEPS ${AUTOCONF_OPTS}
-		LD_RUN_PATH=$STAGING_AREA_DEPS/lib make $JOBS
-	else
-		CPPFLAGS="-DLIBSIGROKDECODE_EXPORT=1" ./configure ${AUTOCONF_OPTS}
-		make $JOBS
-	fi
-
-	if [ "$INSTALL" == "ON" ];then
-		make install
-	fi
-
-	if [ "$INSTALL" == "ON" ] && [ "$CI_SCRIPT" == "ON" ];then
-		git clean -xdf
-	fi
-
-	echo "$(basename -a "$(git config --get remote.origin.url)") - $(git rev-parse --abbrev-ref HEAD) - $(git rev-parse --short HEAD)" \
-	>> $BUILD_STATUS_FILE
-	popd
-}
-
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 	CURRENT_BUILD=libtinyiiod
@@ -443,7 +326,13 @@ build_libtinyiiod() {
 build_kddock () {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	CURRENT_BUILD=KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=OFF -DKDDockWidgets_TESTS=OFF"
+	# KDDockWidgets_NO_SPDLOG=ON is REQUIRED, not cosmetic. KDDockWidgets does
+	# find_package(spdlog QUIET) and links spdlog::spdlog if it finds it. On Windows spdlog is
+	# always present because it is a dependency of the mingw doxygen package, so without this the
+	# library links libspdlog and the bundle needs libspdlog-*.dll at runtime - Scopy.exe then
+	# fails to start with STATUS_DLL_NOT_FOUND (0xC0000135). Ubuntu only avoids this by accident,
+	# spdlog simply not being installed there. Being explicit makes it deterministic.
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets -DKDDockWidgets_EXAMPLES=OFF -DKDDockWidgets_TESTS=OFF -DKDDockWidgets_NO_SPDLOG=ON"
 
 		local PREV_JOBS=$JOBS
 	JOBS="-j2"
@@ -508,15 +397,9 @@ build_deps() {
 	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
-	build_libm2k ON
-	build_spdlog ON
+	build_libad9166 ON
 	build_libsndfile ON
-	build_volk ON
-	build_gnuradio ON
-	build_grscopy ON
-	build_grm2k ON
 	build_qwt ON
-	build_libsigrokdecode ON
 	build_libtinyiiod ON
 	build_kddock ON
 	build_ecm ON
@@ -524,8 +407,13 @@ build_deps() {
 	build_genalyzer ON
 }
 
-for arg in $@; do
-	$arg
-done
-
-build_deps
+# Run named steps if any were given, otherwise do the full dependency build. The docker image
+# invokes this with no arguments, so its behaviour is unchanged; passing a step name now runs
+# only that step, which is what a local/incremental build needs.
+if [ $# -gt 0 ]; then
+	for arg in $@; do
+		$arg
+	done
+else
+	build_deps
+fi
