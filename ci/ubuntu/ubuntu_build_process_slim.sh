@@ -24,7 +24,6 @@ LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBAD9166_BRANCH=libad9166-iio-v0
-SPDLOG_BRANCH=v1.x
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
@@ -126,7 +125,6 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
-	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
@@ -225,14 +223,6 @@ build_libad9361() {
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	pushd $STAGING_AREA/libad9166
-	build_with_cmake $1
-	popd
-}
-
-build_spdlog() {
-	echo "### Building spdlog - branch $SPDLOG_BRANCH"
-	pushd $STAGING_AREA/spdlog
-	CURRENT_BUILD_CMAKE_OPTS="-DSPDLOG_BUILD_SHARED=ON"
 	build_with_cmake $1
 	popd
 }
@@ -351,7 +341,6 @@ build_deps(){
 	build_libiio ON
 	build_libad9361 ON
 	build_libad9166 ON
-	build_spdlog ON
 	build_qwt ON
 	build_libtinyiiod ON
 	build_kddock ON
