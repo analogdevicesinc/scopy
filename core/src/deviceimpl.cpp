@@ -365,6 +365,8 @@ QStringList DeviceImpl::getPluginsName()
 	return pluginsName;
 }
 
+component::Context *DeviceImpl::context() const { return m_context.get(); }
+
 void DeviceImpl::onConnectionFailed()
 {
 	m_state = DEV_ERROR;
