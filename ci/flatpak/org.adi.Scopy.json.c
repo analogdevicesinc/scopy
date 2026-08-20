@@ -72,35 +72,6 @@
 				}
 			]
 		},
-		{
-			"name": "boost",
-			"cleanup": [ "/bin", "/share" ],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://sourceforge.net/projects/boost/files/boost/1.73.0/boost_1_73_0.tar.gz",
-					"sha256": "9995e192e68528793755692917f9eb6422f3052a53c5e13ba278a228af6c7acf"
-				},
-				{
-					"type": "script",
-					"commands": [
-						"#!/bin/sh",
-						"exec ./bootstrap.sh --with-libraries=date_time,filesystem,program_options,regex,system,test,thread,atomic,chrono --prefix=/app"
-					],
-					"dest-filename": "configure"
-				},
-				{
-					"type": "script",
-					"commands": [
-						"all:",
-						"\t./b2",
-						"install:",
-						"\t./b2 install"
-					],
-					"dest-filename": "Makefile"
-				}
-			]
-		},
 		"shared-modules/dbus-glib/dbus-glib.json",
 		{
 			"name": "dbus-glib-submodule"
@@ -162,19 +133,6 @@
 			]
 		},
 		{
-			"name": "matio",
-			"cleanup": [ "/bin", "/share" ],
-			"config-opts": [ "" ],
-			"build-commands": [ "true"],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://github.com/tbeu/matio/releases/download/v1.5.29/matio-1.5.29.tar.gz",
-					"sha256": "d9e5f7a2f2c594eff15f550e34729b01991cdd5a028a558be8ce595b32233afb"
-				}
-			]
-		},
-		{
 			"name": "libfftw3",
 			"config-opts": [
 				"--enable-shared",
@@ -216,88 +174,6 @@
 			],
 			"cleanup": [ "*" ]
 		},
-		{
-			"name": "libgmp",
-			"config-opts": [ "--prefix=/app", "--enable-cxx",
-		    EXPAND(CFLAGS)
-#ifdef __ARM__
-            ,EXPAND(ASFLAGS)
-#endif
-            ],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://ftp.gnu.org/gnu/gmp/gmp-6.2.0.tar.bz2",
-					"sha256": "f51c99cb114deb21a60075ffb494c1a210eb9d7cb729ed042ddb7de9534451ea"
-				}
-			]
-		},
-		{
-			"name": "liborc",
-			"config-opts": [ "--prefix=/app"
-#ifdef __ARM__
-            ,EXPAND(CFLAGS) ,EXPAND(ASFLAGS) 
-#endif
-            ],
-			"sources": [
-				{
-					"type": "archive",
-					"url": "https://gstreamer.freedesktop.org/data/src/orc/orc-0.4.28.tar.xz",
-					"sha256": "bfcd7c6563b05672386c4eedfc4c0d4a0a12b4b4775b74ec6deb88fc2bcd83ce"
-				}
-			]
-		},
-		{
-			"name": "fmt",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DFMT_TEST=OFF"
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/fmtlib/fmt.git",
-					"tag": "10.2.1"
-				}
-			]
-		},
-		{
-			"name": "libvolk",
-			"cleanup": [ "/bin", "/share" ],
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-            "-DCMAKE_INSTALL_PREFIX:PATH=/app",
-            EXPAND(CMAKE_C_FLAGS), EXPAND(CMAKE_ASM_FLAGS)
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/gnuradio/volk",
-					"branch": "main"
-				}
-			]
-		},
-		{
-			"name": "spdlog",
-			"cleanup": [ "/bin", "/share" ],
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-            "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DSPDLOG_BUILD_SHARED=ON",
-            EXPAND(CMAKE_C_FLAGS), EXPAND(CMAKE_ASM_FLAGS)
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/gabime/spdlog",
-					"branch": "v1.x"
-				}
-			]
-		},
-
 		{
 
 			"name": "serialport",
@@ -353,93 +229,15 @@
 			]
 		},
 		{
-			"name": "gnuradio",
-			"cleanup": [ "/bin", "/share" ],
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DENABLE_DEFAULT=OFF",
-				"-DENABLE_GNURADIO_RUNTIME=ON",
-				"-DENABLE_GR_ANALOG=ON",
-				"-DENABLE_GR_BLOCKS=ON",
-				"-DENABLE_GR_FFT=ON",
-				"-DENABLE_GR_FILTER=ON",
-				"-DENABLE_GR_IIO=ON",
-                EXPAND(CMAKE_C_FLAGS)
-#ifdef __ARM__
-                , EXPAND(CMAKE_ASM_FLAGS)
-#endif
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/gnuradio",
-					"branch" : "scopy2-maint-3.10"
-				}
-			]
-		},
-		{
-			"name": "glog",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DWITH_GFLAGS=OFF"
-			],
-			"sources": [
-				{
-					"type": "git",
-					"commit": "17e7679fd9beb95277ccd0708056ba85363f892b" ,
-					"url": "https://github.com/google/glog"
-				}
-			]
-		},
-		{
-			"name": "libm2k",
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [
-				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
-				"-DENABLE_PYTHON=OFF",
-				"-DENABLE_CSHARP=OFF",
-				"-DENABLE_TOOLS=OFF",
-				"-DBUILD_EXAMPLES=OFF",
-				"-DINSTALL_UDEV_RULES=OFF"
-			],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/libm2k",
-					"branch": "main"
-				}
-			]
-		},
-		{
-			"name": "gr-m2k",
-			"cleanup": [ "/share" ],
+			"name": "libad9166",
 			"builddir": true,
 			"buildsystem": "cmake",
 			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app" ],
 			"sources": [
 				{
 					"type": "git",
-					"url": "https://github.com/analogdevicesinc/gr-m2k",
-					"branch" : "main"
-				}
-			]
-		},
-		{
-			"name": "gr-scopy",
-			"cleanup": [ "/share" ],
-			"builddir": true,
-			"buildsystem": "cmake",
-			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app" ],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/analogdevicesinc/gr-scopy",
-					"branch" : "3.10"
+					"url": "https://github.com/analogdevicesinc/libad9166-iio",
+					"branch" : "libad9166-iio-v0"
 				}
 			]
 		},
@@ -458,6 +256,7 @@
 						"sed -i \"s/^\\s*QWT_INSTALL_PREFIX.*$/QWT_INSTALL_PREFIX=\\/app/g\" qwtconfig.pri",
 						"sed -i \"s/qwtLibraryTarget(qwt)/qwtLibraryTarget(qwt_scopy)/\" src/src.pro",
 						"sed -i \"s/QWT_SONAME=libqwt.so/QWT_SONAME=libqwt_scopy.so/\" src/src.pro",
+						"sed -i 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri",
 						"qmake"
 					],
 					"dest-filename": "configure"
@@ -472,19 +271,6 @@
 					"type": "archive",
 					"url": "https://nih.at/libzip/libzip-1.1.3.tar.xz",
 					"sha256": "729a295a59a9fd6e5b9fe9fd291d36ae391a9d2be0b0824510a214cfaa05ceee"
-				}
-			]
-		},
-		{
-			"name": "sigrokdecode",
-			"builddir": false,
-			"buildsystem": "autotools",
-			"config-opts": [ "--prefix=/app" ],
-			"sources": [
-				{
-					"type": "git",
-					"url": "https://github.com/sigrokproject/libsigrokdecode",
-					"branch" : "master"
 				}
 			]
 		},
@@ -593,7 +379,7 @@
 		"name": "scopy",
 		"builddir": true,
 		"buildsystem": "cmake",
-		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF"],
+		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DENABLE_PLUGIN_PQM=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF"],
 		"sources": [
 			{
 				"type": "git",
