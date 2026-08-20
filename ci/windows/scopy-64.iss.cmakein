@@ -1,7 +1,6 @@
 #define AppExeName "Scopy.exe"
 #define AppName "Scopy"
 #define AppDev "Analog Devices"
-#define Python "@PYTHON_VERSION@"
 #define DriverVersion "0.8"
 #define DestFolder "@ENV_DEST_FOLDER@"
 #define Workdir "@ENV_WORKDIR@"
@@ -270,13 +269,11 @@ Name: "packages"; Description: "Packages"; Types: full packages compact custom; 
 Source: "{#DestFolder}\*.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion
 Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Folders
-Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: packages; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
-Source: "{#DestFolder}\{#Python}\*"; DestDir: "{app}\{#Python}"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\resources\*"; DestDir: "{app}\resources"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
 Source: "{#DestFolder}\styles\*"; DestDir: "{app}\styles"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist

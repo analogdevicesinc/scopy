@@ -7,8 +7,13 @@ if [ "$CI_SCRIPT" == "ON" ];
 		SRC_FOLDER=$WORKDIR/scopy
 	else
 		set -x
-		SRC_FOLDER=$(git rev-parse --show-toplevel)
-		export WORKDIR=$SRC_FOLDER
+		# Overridable: `git rev-parse --show-toplevel` resolves symlinks/junctions to the real
+		# path, which defeats a junction used to give the build a space-free source path. CI
+		# takes the branch above and never sets this, so CI behaviour is unchanged.
+		SRC_FOLDER=${SRC_FOLDER:-$(git rev-parse --show-toplevel)}
+		# Overridable so the iio-emu checkout and build tree can live outside the source tree
+		# (WORKDIR defaults to the repo root, which otherwise gets an iio-emu/ clone dropped in it).
+		export WORKDIR=${WORKDIR:-$SRC_FOLDER}
 fi
 
 BUILD_TARGET=x86_64
@@ -20,11 +25,11 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/mingw_toolchain.sh $USE_STAGING
 
 INSTALL_FOLDER=$STAGING_AREA/scopy-install
-BUILD_FOLDER=$WORKDIR/build_$ARCH
+# Overridable for the same reason as STAGING_AREA (see mingw_toolchain.sh). CI sets nothing.
+BUILD_FOLDER=${BUILD_FOLDER:-$WORKDIR/build_$ARCH}
 ARTIFACT_FOLDER=$SRC_FOLDER/artifacts
 export DEST_FOLDER=$ARTIFACT_FOLDER/scopy-$ARCH
 DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH
-PYTHON_FILES=$STAGING_DIR/lib/python3.*
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 
 download_tools() {
@@ -62,9 +67,16 @@ build_scopy(){
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
 
-	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe \
+	# ADC and PQM must BOTH be explicitly OFF: the gr-util skip in the top-level CMakeLists tests
+	# `DEFINED ENABLE_PLUGIN_ADC AND NOT ENABLE_PLUGIN_ADC` and the same for PQM. Miss either and
+	# gr-util still configures, and its find_package(Gnuradio 3.10 REQUIRED) fails.
+	$CMAKE $RC_COMPILER_OPT \
 				-DENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER \
+				-DENABLE_PLUGIN_ADC=OFF \
+				-DENABLE_PLUGIN_PQM=OFF \
 				-DENABLE_PACKAGE_M2K=OFF \
+				-DWITH_SIGROK=OFF \
+				-DWITH_PYTHON=OFF \
 				$SRC_FOLDER
 	$MAKE_BIN $JOBS
 	ls -la $BUILD_FOLDER
@@ -138,11 +150,11 @@ deploy_app(){
 	# Run windeployqt on plugin DLLs to resolve transitive Qt deps not covered by Scopy.exe.
 	# --no-compiler-runtime: do NOT let windeployqt deposit Qt's bundled compiler runtime
 	# (libwinpthread/libstdc++/libgcc). The correct /mingw64 runtime is copied later via
-	# mingw_dll_deps; a Qt-bundled libwinpthread here lacks nanosleep64 and breaks gnuradio
-	# plugins (e.g. adc) with "The specified procedure could not be found".
+	# mingw_dll_deps; a Qt-bundled libwinpthread can lag the /mingw64 one (it historically
+	# lacked nanosleep64) and shadowing it breaks plugin loads with "The specified procedure
+	# could not be found".
 	find $DEST_FOLDER/packages -name "*.dll" -exec $QT/bin/windeployqt6.exe --dir $DEST_FOLDER --no-translations --no-compiler-runtime {} +
 	cp -vr $INSTALL_FOLDER/resources $DEST_FOLDER
-	cp -vr $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 	rm -vfr $(find $DEST_FOLDER -name "*.dll.a" -type f)
 
 	cp -vr  $QT/plugins/renderers $DEST_FOLDER/
@@ -160,7 +172,6 @@ deploy_app(){
 		cp -v /$MINGW_VERSION/bin/libgenalyzer.dll $DEST_FOLDER/ || echo "Warning: genalyzer DLL not found in system"
 	fi
 
-	cp -r $PYTHON_FILES $DEST_FOLDER
 	cp $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss $DEST_FOLDER
 	cp $SRC_FOLDER/LICENSE $DEST_FOLDER/LICENSE.txt
 
