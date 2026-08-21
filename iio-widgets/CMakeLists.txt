@@ -103,13 +103,13 @@ target_include_directories(
 		${IIO_INCLUDE_DIRS}
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-common scopy-gui scopy-core scopy-iioutil)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-common scopy-gui scopy-core scopy-iioutil component)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} ${IIO_LIBRARIES} scopy-gui scopy-iioutil)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} ${IIO_LIBRARIES} scopy-gui scopy-iioutil component)
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}

@@ -26,12 +26,17 @@
 #include <iioutil/connection.h>
 #include "scopy-iio-widgets_export.h"
 
+namespace scopy::component {
+class Attribute;
+}
+
 struct SCOPY_IIO_WIDGETS_EXPORT IIOWidgetFactoryRecipe
 {
-	scopy::Connection *connection = nullptr; // the connection is needed for using an commandq
-	struct iio_context *context = nullptr;	 // the context in which to search for iio structures
-	struct iio_device *device = nullptr;	 // the device in which to search for iio structures
-	struct iio_channel *channel = nullptr;	 // the channel in which to search for iio structures
+	scopy::Connection *connection = nullptr;	  // the connection is needed for using an commandq
+	struct iio_context *context = nullptr;		  // the context in which to search for iio structures
+	struct iio_device *device = nullptr;		  // the device in which to search for iio structures
+	struct iio_channel *channel = nullptr;		  // the channel in which to search for iio structures
+	scopy::component::Attribute *attribute = nullptr; // generic device-controller attribute (backend-agnostic)
 	QString data = "";	       // the name of the 'main' attribute that will be changed in the iio channel
 	QString iioDataOptions = "";   // the IIO attribute that describes what values can the attribute take
 	QString constDataOptions = ""; // the set of constant data that will populate an entry (e.g. combo box, range)

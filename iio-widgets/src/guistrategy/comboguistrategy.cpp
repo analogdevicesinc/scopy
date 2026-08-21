@@ -77,6 +77,9 @@ bool ComboAttrUi::isValid()
 	if(m_recipe.channel != nullptr && m_recipe.data != "" && m_recipe.iioDataOptions != "") {
 		return true;
 	}
+	if(m_recipe.attribute != nullptr && m_recipe.data != "" && m_recipe.constDataOptions != "") {
+		return true;
+	}
 	return false;
 }
 

@@ -29,6 +29,8 @@
 #include "datastrategy/contextattrdatastrategy.h"
 #include "datastrategy/cmdqchannelattrdatastrategy.h"
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
+#include "datastrategy/componentattrdatastrategy.h"
+#include <component/attribute.h>
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
 #include "guistrategy/temperatureguistrategy.h"
@@ -40,6 +42,30 @@
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_ATTRBUILDER, "AttrBuilder")
 
+namespace {
+// Render a component::Attribute's metadata into the constDataOptions string that
+// createUIS() already understands: "[min step max]" -> RangeUi, space-joined -> ComboUi,
+// empty -> EditableUi.
+QString formatComponentOptions(scopy::component::Attribute *attr)
+{
+	if(attr->hasRange()) {
+		const QList<double> r = attr->range();
+		if(r.size() == 3) {
+			// 'g' with 15 significant digits round-trips a double faithfully (and
+			// RangeAttrUi parses it back with QString::toDouble), preserving the
+			// device's min/step/max precision instead of arg()'s 6-digit default.
+			return QString("[%1 %2 %3]")
+				.arg(QString::number(r[0], 'g', 15), QString::number(r[1], 'g', 15),
+				     QString::number(r[2], 'g', 15));
+		}
+	}
+	if(attr->hasOptions()) {
+		return attr->options().join(' ');
+	}
+	return "";
+}
+} // namespace
+
 IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	: QObject(parent)
 	, m_connection(nullptr)
@@ -49,6 +75,8 @@ IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	, m_context(nullptr)
 	, m_device(nullptr)
 	, m_channel(nullptr)
+	, m_componentAttribute(nullptr)
+	, m_componentContainer(nullptr)
 	, m_attribute("")
 	, m_optionsAttribute("")
 	, m_optionsValues("")
@@ -67,6 +95,26 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	DataStrategyInterface *ds = nullptr;
 	GuiStrategyInterface *ui = nullptr;
 	const char *availableAttr = nullptr;
+
+	// Generic device-controller path: bind to a component::Attribute, bypassing the
+	// libiio pointer/attribute discovery below.
+	if(m_componentAttribute) {
+		m_generatedRecipe = {
+			.attribute = m_componentAttribute,
+			.data = m_componentAttribute->name(),
+			.constDataOptions = formatComponentOptions(m_componentAttribute),
+		};
+
+		ds = createDS();
+		ui = createUIS();
+
+		IIOWidget *widget = new IIOWidget(ui, ds, m_widgetParent);
+		widget->setRecipe(m_generatedRecipe);
+		if(m_group) {
+			m_group->add(widget);
+		}
+		return widget;
+	}
 
 	if(!m_context && !m_device && !m_channel) {
 		qWarning(CAT_ATTRBUILDER) << "No channel/device/context set.";
@@ -123,6 +171,24 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 	ssize_t attrCount = 0;
 	const char *attrName = nullptr;
 	const char *availableAttr = nullptr;
+
+	// Generic device-controller path: iterate the container's direct child Attributes.
+	if(m_componentContainer) {
+		const QList<component::Attribute *> attrs =
+			m_componentContainer->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+		if(attrs.isEmpty()) {
+			qWarning(CAT_ATTRBUILDER) << "The given component container has no Attribute children.";
+		}
+		for(component::Attribute *attr : attrs) {
+			if(attr->name().endsWith("_available") && !m_includeAvailableAttrs) {
+				continue;
+			}
+			m_componentAttribute = attr;
+			result.append(buildSingle());
+			m_componentAttribute = nullptr;
+		}
+		return result;
+	}
 
 	if(m_channel) {
 		attrCount = iio_channel_get_attrs_count(m_channel);
@@ -238,6 +304,8 @@ void IIOWidgetBuilder::clear()
 	m_context = nullptr;
 	m_device = nullptr;
 	m_channel = nullptr;
+	m_componentAttribute = nullptr;
+	m_componentContainer = nullptr;
 	m_attribute = "";
 	m_optionsAttribute = "";
 	m_optionsValues = "";
@@ -294,6 +362,18 @@ IIOWidgetBuilder &IIOWidgetBuilder::channel(iio_channel *channel)
 IIOWidgetBuilder &IIOWidgetBuilder::attribute(QString attribute)
 {
 	m_attribute = attribute;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::attribute(scopy::component::Attribute *attribute)
+{
+	m_componentAttribute = attribute;
+	return *this;
+}
+
+IIOWidgetBuilder &IIOWidgetBuilder::componentContainer(QObject *container)
+{
+	m_componentContainer = container;
 	return *this;
 }
 
@@ -355,7 +435,9 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 
 	// determine the DS
 	if(strategy == DS::NoDataStrategy) {
-		if(m_channel) {
+		if(m_componentAttribute) {
+			strategy = DS::ComponentAttrData;
+		} else if(m_channel) {
 			strategy = DS::AttrData;
 		} else if(m_device) {
 			strategy = DS::DeviceAttrData;
@@ -383,6 +465,9 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 	case DS::ContextAttrData:
 		ds = new ContextAttrDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
+	case DS::ComponentAttrData:
+		ds = new ComponentAttrDataStrategy(m_generatedRecipe, m_widgetParent);
+		break;
 	case DS::TriggerData:
 		ds = new TriggerDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
@@ -404,7 +489,19 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 	// figure out what strategy fits here
 	if(strategy == UIS::NoUIStrategy) {
-		if(!m_optionsAttribute.isEmpty()) {
+		if(m_componentAttribute) {
+			// Derive the editor type from the attribute's own structured metadata,
+			// no libiio calls or option-string parsing required.
+			if(!m_componentAttribute->isWritable()) {
+				strategy = UIS::EditableUi; // read-only: display value
+			} else if(m_componentAttribute->hasRange()) {
+				strategy = UIS::RangeUi;
+			} else if(m_componentAttribute->hasOptions()) {
+				strategy = UIS::ComboUi;
+			} else {
+				strategy = UIS::EditableUi;
+			}
+		} else if(!m_optionsAttribute.isEmpty()) {
 			// read values from iio and interpret them
 			char buffer[ATTR_BUFFER_SIZE] = {0};
 			ssize_t res = -1;
