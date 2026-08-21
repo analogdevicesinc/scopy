@@ -56,7 +56,7 @@ QWidget *RangeAttrUi::ui() { return m_ui; }
 
 bool RangeAttrUi::isValid()
 {
-	if((m_recipe.channel || m_recipe.device) && m_recipe.data != "" &&
+	if((m_recipe.channel || m_recipe.device || m_recipe.attribute) && m_recipe.data != "" &&
 	   (m_recipe.iioDataOptions != "" || m_recipe.constDataOptions != "")) {
 		return true;
 	}
