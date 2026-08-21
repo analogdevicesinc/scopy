@@ -219,7 +219,7 @@
 			"name": "libad9361",
 			"builddir": true,
 			"buildsystem": "cmake",
-			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app" ],
+			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
 			"sources": [
 				{
 					"type": "git",
@@ -232,7 +232,7 @@
 			"name": "libad9166",
 			"builddir": true,
 			"buildsystem": "cmake",
-			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app" ],
+			"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib" ],
 			"sources": [
 				{
 					"type": "git",
@@ -280,6 +280,7 @@
 			"buildsystem": "cmake",
 			"config-opts": [
 				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
 				"-DBUILD_SHARED_LIBS=OFF",
 				"-DBUILD_EXAMPLES=OFF"
 			],
@@ -297,6 +298,7 @@
 			"buildsystem": "cmake",
 			"config-opts": [
 				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
 				"-DKDDockWidgets_QT6=ON",
 				"-DKDDockWidgets_FRONTENDS=qtwidgets",
 				"-DKDDockWidgets_EXAMPLES=OFF",
@@ -351,6 +353,7 @@
 			"buildsystem": "cmake",
 			"config-opts": [
 				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
 				"-DBUILD_TESTING=OFF",
 				"-DBUILD_SHARED_LIBS=ON"
 			],
@@ -379,7 +382,7 @@
 		"name": "scopy",
 		"builddir": true,
 		"buildsystem": "cmake",
-		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DENABLE_PLUGIN_PQM=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF"],
+		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DENABLE_PLUGIN_PQM=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF"],
 		"sources": [
 			{
 				"type": "git",
