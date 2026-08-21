@@ -32,6 +32,10 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
+namespace component {
+class Attribute;
+}
+
 class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetBuilder : public QObject
 {
 	Q_OBJECT
@@ -43,6 +47,7 @@ public:
 		TriggerData,
 		DeviceAttrData,
 		ContextAttrData,
+		ComponentAttrData,
 	};
 
 	enum UIS
@@ -138,6 +143,23 @@ public:
 	IIOWidgetBuilder &attribute(QString attribute);
 
 	/**
+	 * @brief Binds the widget to a generic device-controller component::Attribute
+	 * (IIO/m2k/any backend). When set, the iio_context/device/channel path is
+	 * ignored and a ComponentAttrDataStrategy is built. The editor type (combo /
+	 * range / lineedit) is derived from the attribute's options()/range() metadata.
+	 * @param attribute
+	 */
+	IIOWidgetBuilder &attribute(scopy::component::Attribute *attribute);
+
+	/**
+	 * @brief Sets the device-controller container (component::Device / Channel /
+	 * Context, or any QObject that parents component::Attribute nodes) whose direct
+	 * child Attributes buildAll() will iterate over to create one IIOWidget each.
+	 * @param container
+	 */
+	IIOWidgetBuilder &componentContainer(QObject *container);
+
+	/**
 	 * @brief Sets the attribute that needs to be read in order to populate the
 	 * options from which the user can select to change the main attribute.
 	 * @param optionsAttribute
@@ -203,6 +225,8 @@ private:
 	iio_context *m_context;
 	iio_device *m_device;
 	iio_channel *m_channel;
+	scopy::component::Attribute *m_componentAttribute;
+	QObject *m_componentContainer;
 	QString m_attribute;
 	QString m_optionsAttribute;
 	QString m_optionsValues;
