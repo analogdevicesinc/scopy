@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -19,28 +19,22 @@
  *
  */
 
-#include "devicefactory.h"
-
-#include "iiodeviceimpl.h"
 #include "swiotdeviceimpl.h"
-
-#include <component/context.h>
-#include <component/device.h>
 
 using namespace scopy;
 
-DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *parent)
+void SWIOTDeviceImpl::connectDev()
 {
-	if(category.compare("iio", Qt::CaseInsensitive) == 0) {
-		component::ContextHandle ctx =
-			component::Controller::connectCtx(param, component::BackendKind::Libiiov0);
-		if(ctx && ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly)) {
-			return new SWIOTDeviceImpl(param, parent);
-		}
-		return new IIODeviceImpl(param, parent);
-	} else {
-		return new DeviceImpl(param, category, parent);
+	if(!m_context) {
+		m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0);
 	}
+	IIODeviceImpl::connectDev();
 }
 
-#include "moc_devicefactory.cpp"
+void SWIOTDeviceImpl::disconnectDev()
+{
+	IIODeviceImpl::disconnectDev();
+	m_context = component::ContextHandle{};
+}
+
+#include "moc_swiotdeviceimpl.cpp"
