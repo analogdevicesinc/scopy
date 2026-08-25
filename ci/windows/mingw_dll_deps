@@ -21,9 +21,6 @@ DLL_DEPS=(
     libiconv-*.dll
     zlib1.dll
     libfftw3*.dll
-    libicudt*.dll
-    libicuin*.dll
-    libicuuc*.dll
     libffi-*.dll
     liblzma-5.dll
     libpcre2-*.dll
@@ -33,9 +30,6 @@ DLL_DEPS=(
     libbz2-*.dll
     libcrypto*.dll
     libssl*.dll
-    # genalyzer
-    libhdf5-*.dll
-    libsz-*.dll
     # curl and its retinue
     libcurl-*.dll
     libidn2-*.dll
