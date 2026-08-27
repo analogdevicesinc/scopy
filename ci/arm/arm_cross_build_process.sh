@@ -39,7 +39,16 @@ PYTHON_VERSION=$(python3 -c 'import sys; print(f"python3.{sys.version_info.minor
 
 CMAKE_DOWNLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
-[ ! -f "$CMAKE_BIN" ] && CMAKE_BIN=$(which cmake)
+# The `|| true` is required. `command -v` exits 1 when cmake is not installed, and this script runs
+# under `set -e`, so the bare assignment aborted the entire script on this line - in the script's
+# preamble, before any function could run. That is fatal to the image build:
+# Dockerfile.armhf-cross runs `install_packages` as its first script invocation, and install_packages
+# is itself what installs cmake, so cmake is guaranteed absent on that pass.
+# The fallback is still needed at CI time: the Dockerfile deletes /home/runner/scripts, so
+# $STAGING_AREA/cmake does not exist in the finished image and the system cmake is the only one left.
+# `command -v` rather than `which`: it is a shell builtin, needs no package, and matches
+# arm_native_build_process.sh, which keeps the same fallback inside download_cmake().
+[ ! -f "$CMAKE_BIN" ] && CMAKE_BIN=$(command -v cmake || true)
 
 APP_DIR=$SRC_SCRIPT/scopy.AppDir
 APP_IMAGE=$SRC_SCRIPT/Scopy.AppImage
