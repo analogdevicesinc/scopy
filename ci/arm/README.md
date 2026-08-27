@@ -14,7 +14,9 @@ This directory contains scripts and configuration for building Scopy for ARM pla
 
 #### `build_qt.sh` - Cross-compiles Qt 5.15.16 for ARM
 
-#### `create_docker_image.sh` - Creates Docker images for ARM builds
+#### `create_docker_image_qt6.sh` - Creates the Qt6 Docker images for ARM builds (`arm64` native, `armhf_cross`)
+
+#### `setup_pi_for_docker_build.sh` - Prepares a Kuiper arm64 Raspberry Pi and produces the two tarballs `docker/Dockerfile.arm64` needs
 
 #### `docker/Dockerfile` - Base image configuration for ARM build environment
 
@@ -85,12 +87,23 @@ Finally, after the development is done use this to clean the system
 
 ### Building the Docker Image
 
-To build the Docker image, just run the script and select the required architecture.
+The tag defaults to `testing`; the dependency-rework pass uses `slim`.
+
+The **armhf cross image** builds on any x86_64 host and downloads its prebuilt tarballs from
+Cloudsmith:
 
    ```bash
-      ci/arm/create_docker_image.sh arm32 run_workflow
-      # or
-      ci/arm/create_docker_image.sh arm64 run_workflow
+      TAG=slim ci/arm/create_docker_image_qt6.sh armhf_cross
+   ```
+
+The **arm64 native image** must be built on an arm64 host, because `docker/Dockerfile.arm64`
+compiles the whole dependency stack natively. Run `setup_pi_for_docker_build.sh` on a Kuiper
+arm64 Raspberry Pi first - it writes `kuiper-rootfs.tar.gz` and `qt6-arm64-installed.tar.gz`
+into `ci/arm/`, where the Dockerfile reads them from:
+
+   ```bash
+      sudo ci/arm/setup_pi_for_docker_build.sh
+      sudo TAG=slim ci/arm/create_docker_image_qt6.sh arm64
    ```
 
 ### Building locally from sources

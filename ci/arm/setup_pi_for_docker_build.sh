@@ -37,6 +37,13 @@ fix_apt_mirror() {
 
 upgrade_system() {
 	echo "=== Upgrading system packages ==="
+	# apt-get update is required, not optional: dist-upgrade compares against the cached package
+	# lists, so without a refresh it reports "0 upgraded" on a system that is months behind and
+	# silently does nothing. run_all gets this via fix_apt_mirror, but this step is also run
+	# standalone before create_rootfs_tarball - and a stale base rootfs makes the image's own
+	# `apt-get -y upgrade` (Dockerfile.arm64) re-download every outdated package into a new layer
+	# while the base layer keeps the superseded copies, which cost ~3 GB in the first slim build.
+	apt-get update
 	apt-get -y dist-upgrade || true
 	apt --fix-broken install -y || true
 }
@@ -79,11 +86,22 @@ create_qt6_tarball() {
 
 create_rootfs_tarball() {
 	echo "=== Creating rootfs tarball for Docker ==="
+	# /usr/local and /opt/Qt are excluded deliberately. Dockerfile.arm64 rebuilds the whole of
+	# /usr/local via `clone` + `build_deps`, and installs Qt from qt6-arm64-installed.tar.gz, so
+	# capturing them here would bake the *previous* dependency generation into the image's base
+	# layer - where copy-deps.sh, which searches /usr/local/lib first, could pull a stale library
+	# into the AppImage. run_all makes this a certainty rather than a risk: build_scopy_deps runs
+	# immediately before this function.
+	# ./home/* is excluded wholesale - the image creates its own `runner` user (Dockerfile.arm64)
+	# and never reads the builder's home directory.
+	# ./var/log/* is the builder machine's own logs - 328 MB of them, of no use to a CI image.
+	# The trailing /* on these three keeps the directory itself, which the image still needs.
 	tar -czf "$CI_ARM_DIR/kuiper-rootfs.tar.gz" \
 		--exclude='./proc' --exclude='./sys' --exclude='./dev' \
 		--exclude='./run' --exclude='./tmp' --exclude='./mnt' \
-		--exclude='./media' --exclude='./home/*/staging' \
-		--exclude='./home/*/scopy' --exclude='./boot' \
+		--exclude='./media' --exclude='./boot' \
+		--exclude='./home/*' --exclude='./var/log/*' \
+		--exclude='./usr/local/*' --exclude='./opt/Qt' \
 		--exclude='./var/cache/apt' --exclude='./var/lib/docker' \
 		--exclude='./var/lib/containerd' \
 		-C / .
@@ -110,10 +128,10 @@ run_all() {
 	cleanup_build_artifacts
 	echo ""
 	echo "=== Setup complete ==="
-	echo "Next steps:"
-	echo "  1. docker build --tag docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:testing -f ci/arm/docker/Dockerfile.arm64 ci/arm"
-	echo "  2. sudo docker login docker.cloudsmith.io -u token -p \$CLOUDSMITH_API_KEY"
-	echo "  3. sudo docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:testing"
+	echo "Next steps (TAG selects the image variant; the dependency-rework pass uses slim):"
+	echo "  1. sudo TAG=slim $CI_ARM_DIR/create_docker_image_qt6.sh arm64"
+	echo "  2. sudo docker login docker.cloudsmith.io -u token"
+	echo "  3. sudo docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:slim"
 }
 
 if [ $# -eq 0 ]; then
