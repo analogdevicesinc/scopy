@@ -63,22 +63,23 @@ apt-get -y install \
 	libdbus-1-dev libsqlite3-dev libexpat1-dev \
 	libicu-dev
 
-echo "=== Installing Boost libraries ==="
-apt-get -y install \
-	libboost-system-dev libboost-filesystem-dev libboost-thread-dev libboost-chrono-dev \
-	libboost-date-time-dev libboost-program-options-dev libboost-regex-dev libboost-test-dev
-
+# Dropped with the slim dependency set, each because its only consumer is gone:
+#   the whole Boost block  - a gnuradio link requirement
+#   libgmp-dev             - gnuradio (genalyzer needs fftw3 only)
+#   libmatio-dev           - gnuradio
+#   liborc-0.4-dev         - libvolk
+#   libzmq3-dev            - no consumer anywhere, even before the rework
+#   python3-dev, libreadline-dev, libgdbm-dev, libdb5.3-dev - libsigrokdecode's embedded Python
+# Kept deliberately: libgsl-dev (verdict undetermined, ARM-only, left installed rather than
+# guessed at) and libglib2.0-dev above (libinput-dev pulls it back transitively regardless).
 echo "=== Installing Scopy dependency libraries ==="
 apt-get -y install \
-	libfftw3-dev libgmp-dev libzip-dev \
-	libmatio-dev liborc-0.4-dev \
+	libfftw3-dev libzip-dev \
 	libavahi-client-dev libavahi-common-dev \
 	libusb-1.0-0-dev libaio-dev libsndfile1-dev \
-	libncurses-dev libzmq3-dev libxml2-dev \
+	libncurses-dev libxml2-dev \
 	libwayland-dev libwayland-egl-backend-dev \
-	libgsl-dev libfuse2t64 \
-	python3-dev libreadline-dev \
-	libgdbm-dev libdb5.3-dev
+	libgsl-dev libfuse2t64
 
 echo "=== Installing audio codec libraries (libsndfile deps) ==="
 apt-get -y install \
