@@ -40,14 +40,25 @@ arm64(){
 	popd
 }
 
+# Cross-compiled ARM32 image. Builds on any x86_64 host: Dockerfile.armhf-cross is FROM
+# ubuntu:24.04 with crossbuild-essential-armhf and three prebuilt tarballs, and the armhf qmake6 in
+# the Qt prefix is a shell wrapper that execs the host qmake6 - so no qemu and no binfmt.
+# The tarballs are produced locally by the four-stage flow in armhf_docker_build_process.md and are
+# read straight from docker/tarballs/, so there is nothing to download. The previous
+# `cloudsmith download` calls fetched three package slugs whose existence could not be verified,
+# and would have overwritten the local inputs. Note that .github/workflows/push-docker.yml keeps
+# its own downloads of the same slugs and must keep them: a CI runner has no local copies.
 armhf_cross(){
 	pushd $SRC_SCRIPT
-	mkdir -p docker/tarballs
-
-	# Download pre-built tarballs from Cloudsmith
-	cloudsmith download adi/scopy-dockers/sysroot-armhf-1.0.0.tar.gz docker/tarballs/sysroot-armhf.tar.gz
-	cloudsmith download adi/scopy-dockers/qt6-armhf-host-6.8.3.tar.gz docker/tarballs/qt6-host-installed.tar.gz
-	cloudsmith download adi/scopy-dockers/qt6-armhf-cross-6.8.3.tar.gz docker/tarballs/qt6-armhf-cross-installed.tar.gz
+	for tarball in sysroot-armhf.tar.gz qt6-host-installed.tar.gz qt6-armhf-cross-installed.tar.gz; do
+		if [ ! -f "docker/tarballs/$tarball" ]; then
+			echo "Missing $SRC_SCRIPT/docker/tarballs/$tarball"
+			echo "See ci/arm/armhf_docker_build_process.md - stage 1 produces sysroot-armhf.tar.gz,"
+			echo "stage 2 produces the two Qt6 tarballs. They take hours, so they are gitignored"
+			echo "rather than merely untracked, to survive a git clean."
+			exit 1
+		fi
+	done
 
 	docker build \
 		--progress plain \
