@@ -26,13 +26,7 @@ fi
 LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
-LIBM2K_BRANCH=main
-SPDLOG_BRANCH=v1.x
-VOLK_BRANCH=main
-GNURADIO_BRANCH=scopy2-maint-3.10
-GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=main
-LIBSIGROKDECODE_BRANCH=master
+LIBAD9166_BRANCH=libad9166-iio-v0
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
@@ -67,6 +61,11 @@ QT_DOWNLOAD_LINK=https://download.qt.io/archive/qt/6.8/6.8.3/single/qt-everywher
 
 STAGING_AREA_DEPS=/usr/local
 export LD_LIBRARY_PATH=$QT/lib:$LD_LIBRARY_PATH:
+# Defines __appimage__ (top-level CMakeLists.txt), which makes the style, translation and package
+# paths resolve relative to the executable instead of the build-time install prefix. Without it the
+# packaged app cannot find its own theme. Mirrors ci/arm/arm_cross_build_process.sh and
+# ci/x86_64/x86-64_appimage_process.sh.
+export APPIMAGE=1
 
 CMAKE_OPTS=(\
 	-DCMAKE_PREFIX_PATH=$QT \
@@ -115,19 +114,19 @@ install_packages() {
 	sudo apt-get -y --no-install-recommends install \
 		python3-pip python3-dev python3-numpy python3-packaging python3-mako \
 		vim git wget unzip \
-		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison swig \
+		g++ build-essential cmake curl autogen autoconf autoconf-archive pkg-config flex bison \
 		mesa-common-dev graphviz gettext texinfo doxygen ninja-build \
-		libboost-all-dev libfftw3-dev \
+		libfftw3-dev \
 		libxcb1-dev '^libxcb.*-dev' libxcb-xinerama0 libxcb-icccm4 libxcb-keysyms1 \
 		libxcb-shape0-dev libxcb-xkb1 libxcb-cursor-dev libxcb-keysyms1-dev \
 		libxcb-icccm4-dev libxcb-image0-dev libxcb-render-util0-dev libxcb-sync-dev \
 		libxcb-randr0-dev libxcb-shm0-dev libxcb-util-dev libxcb-xkb-dev libxcb-ewmh-dev \
 		libx11-xcb-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev libxrender-dev \
-		libgmp3-dev libzip-dev libglib2.0-dev \
-		libmatio-dev liborc-0.4-dev libgl1-mesa-dev libgl-dev libegl-dev libgles-dev \
+		libzip-dev \
+		libgl1-mesa-dev libgl-dev libegl-dev libgles-dev \
 		libavahi-client-dev libavahi-common-dev \
 		libusb-1.0-0 libusb-1.0-0-dev libsndfile1-dev \
-		libxkbcommon-x11-0 libncurses-dev libtool libaio-dev libzmq3-dev libxml2-dev \
+		libxkbcommon-x11-0 libncurses-dev libtool libaio-dev libxml2-dev \
 		libglu1-mesa-dev libvulkan-dev \
 		libzstd-dev libbz2-dev liblzma-dev \
 		libxcb-cursor0 libxcb-image0 \
@@ -220,14 +219,8 @@ clone() {
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
-	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
-	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
-	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
@@ -282,14 +275,6 @@ build_libiio() {
 	popd
 }
 
-build_glog() {
-	echo "### Building glog - branch $GLOG_BRANCH"
-	pushd $STAGING_AREA/glog
-	CURRENT_BUILD_CMAKE_OPTS="-DWITH_GFLAGS=OFF"
-	build_with_cmake $1
-	popd
-}
-
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA/libad9361
@@ -297,82 +282,10 @@ build_libad9361() {
 	popd
 }
 
-build_libm2k() {
-	echo "### Building libm2k - branch $LIBM2K_BRANCH"
-	pushd $STAGING_AREA/libm2k
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF \
-		-DENABLE_CSHARP=OFF \
-		-DBUILD_EXAMPLES=OFF \
-		-DENABLE_TOOLS=OFF \
-		-DINSTALL_UDEV_RULES=OFF \
-		"
+build_libad9166() {
+	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
+	pushd $STAGING_AREA/libad9166
 	build_with_cmake $1
-	popd
-}
-
-build_spdlog() {
-	echo "### Building spdlog - branch $SPDLOG_BRANCH"
-	pushd $STAGING_AREA/spdlog
-	CURRENT_BUILD_CMAKE_OPTS="-DSPDLOG_BUILD_SHARED=ON"
-	build_with_cmake $1
-	popd
-}
-
-build_volk() {
-	echo "### Building volk - branch $VOLK_BRANCH"
-	pushd $STAGING_AREA/volk
-	CURRENT_BUILD_CMAKE_OPTS="-DPYTHON_EXECUTABLE=/usr/bin/python3"
-	build_with_cmake $1
-	popd
-}
-
-build_gnuradio() {
-	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
-	pushd $STAGING_AREA/gnuradio
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
-		-DENABLE_DEFAULT=OFF \
-		-DENABLE_GNURADIO_RUNTIME=ON \
-		-DENABLE_GR_ANALOG=ON \
-		-DENABLE_GR_BLOCKS=ON \
-		-DENABLE_GR_FFT=ON \
-		-DENABLE_GR_FILTER=ON \
-		-DENABLE_GR_IIO=ON \
-		-DENABLE_POSTINSTALL=OFF
-		"
-	build_with_cmake $1
-	popd
-}
-
-build_grm2k() {
-	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
-	pushd $STAGING_AREA/gr-m2k
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF
-		"
-	build_with_cmake $1
-	popd
-}
-
-build_grscopy() {
-	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
-	pushd $STAGING_AREA/gr-scopy
-	build_with_cmake $1
-	popd
-}
-
-build_libsigrokdecode() {
-	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
-	pushd $STAGING_AREA/libsigrokdecode
-	git clean -xdf
-	./autogen.sh
-	INSTALL=$1
-	[ -z $INSTALL ] && INSTALL=ON
-	./configure
-	make $JOBS
-	[ "$INSTALL" == "ON" ] && sudo make install
 	popd
 }
 
@@ -384,6 +297,11 @@ build_qwt() {
 	# Rename the produced library base name to qwt_scopy (and its SONAME in lockstep)
 	sed -i 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
 	sed -i 's|QWT_SONAME=libqwt.so|QWT_SONAME=libqwt_scopy.so|' src/src.pro
+	# The designer/examples/playground/tests subprojects link the library by its
+	# old name (qwtAddLibrary(..., qwt)); update those to match the rename above,
+	# otherwise they fail with `ld: cannot find -lqwt`. (Gap in PR #2291.)
+	sed -i 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
+		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
 	$QMAKE_BIN qwt.pro
 	make $JOBS
 	[ "$1" == "ON" ] && sudo make install
@@ -401,7 +319,8 @@ build_libtinyiiod() {
 build_kddock() {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON"
+	# FRONTENDS=qtwidgets drops the Qt Quick/QML backend (Scopy is 100% QtWidgets).
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets"
 	build_with_cmake $1
 	popd
 }
@@ -446,9 +365,15 @@ build_scopy() {
 	git config --global --add safe.directory $SRC_DIR
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
+	# Dependency-rework pass: disable the only gnuradio consumers (adc, pqm) and
+	# the sigrok/python core path so the dropped deps are not required.
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_ALL_PACKAGES=ON
 		-DENABLE_PACKAGE_M2K=OFF
+		-DENABLE_PLUGIN_ADC=OFF
+		-DENABLE_PLUGIN_PQM=OFF
+		-DWITH_SIGROK=OFF
+		-DWITH_PYTHON=OFF
 		"
 	build_with_cmake OFF
 	popd
@@ -459,14 +384,8 @@ build_deps() {
 	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
-	build_spdlog ON
-	build_libm2k ON
-	build_volk ON
-	build_gnuradio ON
-	build_grscopy ON
-	build_grm2k ON
+	build_libad9166 ON
 	build_qwt ON
-	build_libsigrokdecode ON
 	build_libtinyiiod ON
 	build_kddock ON
 	build_ecm ON
@@ -499,8 +418,18 @@ create_appdir() {
 
 	cp /usr/local/bin/scopy $APP_DIR/usr/bin/
 	cp /usr/local/lib/libscopy*.so $APP_DIR/usr/lib/
+	# The plugin tree, the style and the translations all install under /usr/local/lib/scopy, and with
+	# __appimage__ defined the app looks for all three relative to the executable, at
+	# usr/lib/scopy/{packages,style,translations} (common/src/scopyconfig.cpp:38,50,161). Silencing a
+	# failure here produces an AppImage that launches with no plugins and no theme and says nothing
+	# about why, so fail loudly instead.
 	mkdir -p $APP_DIR/usr/lib/scopy
-	cp -r /usr/local/lib/scopy/* $APP_DIR/usr/lib/scopy/ 2>/dev/null || true
+	if [ ! -d /usr/local/lib/scopy ] || [ -z "$(ls -A /usr/local/lib/scopy 2>/dev/null)" ]; then
+		echo "ERROR: /usr/local/lib/scopy is missing or empty - 'make install' did not install the"
+		echo "       plugin tree, style or translations. Refusing to package an AppImage without them."
+		exit 1
+	fi
+	cp -r /usr/local/lib/scopy/* $APP_DIR/usr/lib/scopy/
 
 	if [ -f $EMU_BUILD_FOLDER/iio-emu ]; then
 		cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
@@ -517,18 +446,42 @@ create_appdir() {
 
 	cp -r $QT/plugins $APP_DIR/usr
 
-	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
-	python_path=/usr/lib/$FOUND_PYTHON_VERSION
-	[ -d $python_path ] && cp -r $python_path $APP_DIR/usr/lib || true
+	# Copy Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
+	# (core/CMakeLists.txt sets it inside the if(WITH_PYTHON) block), so the grep comes back empty.
+	# Guard it: an empty version would make python_path "/usr/lib/" and copy all of /usr/lib.
+	# The trailing `|| true` is required: this script runs under `set -e`, and the final `grep -o`
+	# exits 1 when it matches nothing, which the assignment inherits and which would abort the
+	# whole script here - before the check below could run.
+	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+' || true)
+	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d /usr/lib/$FOUND_PYTHON_VERSION ]; then
+		cp -r /usr/lib/$FOUND_PYTHON_VERSION $APP_DIR/usr/lib
+	else
+		echo "Python runtime not bundled (built with WITH_PYTHON=OFF)"
+	fi
 
-	cp -r /usr/local/share/libsigrokdecode/decoders $APP_DIR/usr/lib 2>/dev/null || true
+	# Copy protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case on the slim
+	# dependency images - not an error there, so say so instead of failing silently.
+	if [ -d /usr/local/share/libsigrokdecode/decoders ]; then
+		cp -r /usr/local/share/libsigrokdecode/decoders $APP_DIR/usr/lib
+	else
+		echo "No decoders for libsigrokdecode found (built with WITH_SIGROK=OFF)"
+	fi
+
 	cp /usr/local/lib/libgenalyzer.so* $APP_DIR/usr/lib 2>/dev/null || true
 
-	cp $QT/lib/libQt6XcbQpa.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6EglFSDeviceIntegration.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6DBus.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6OpenGL.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6WaylandClient.so* $APP_DIR/usr/lib 2>/dev/null || true
+	# These are the only Qt libraries nothing scans for: copy-deps.sh is run over scopy and
+	# libscopy*.so, never over $QT/plugins, so the platform plugins' own dependencies reach the
+	# AppDir only through these copies. A silent miss here surfaces at runtime as "could not load
+	# the Qt platform plugin", so warn by name. Not fatal: which of these exist depends on how
+	# Qt6 was configured on the build host - QtDBus needs libdbus-1-dev, which install_packages
+	# does not install, and QT_QPA_PLATFORM in ci/general/AppRun falls back from wayland to xcb.
+	for qtlib in libQt6XcbQpa libQt6EglFSDeviceIntegration libQt6DBus libQt6OpenGL libQt6WaylandClient; do
+		if ls $QT/lib/$qtlib.so* >/dev/null 2>&1; then
+			cp $QT/lib/$qtlib.so* $APP_DIR/usr/lib
+		else
+			echo "WARNING: $qtlib not found in $QT/lib - Qt plugins needing it will fail to load"
+		fi
+	done
 
 	cp /usr/lib/$TOOLCHAIN_HOST/libGLESv2.so* $APP_DIR/usr/lib 2>/dev/null || true
 	cp /usr/lib/$TOOLCHAIN_HOST/libbsd.so* $APP_DIR/usr/lib 2>/dev/null || true

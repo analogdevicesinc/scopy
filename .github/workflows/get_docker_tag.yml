@@ -33,11 +33,10 @@ jobs:
 
           case "$BRANCH_NAME" in
             *deps_rework*)
-                # Dependency rework: this branch builds against the slim images
-                # (scopy2-ubuntu{22,24,26}-qt6:slim). Only the Ubuntu images carry a
-                # :slim tag, which is why the other platform jobs are disabled in
-                # ci.yml - they would fail at docker pull. Remove this case once slim
-                # is promoted to :testing / :latest.
+                # Dependency rework: this branch builds against the slim images. A platform's
+                # job in ci.yml stays disabled until its own image carries a :slim tag, or it
+                # would fail at docker pull. Enabled so far: ubuntu{22,24,26}, windows, arm64.
+                # Remove this case once slim is promoted to :testing / :latest.
                 TAG="slim"
                 ;;
             *scopy-testing*|*scopy_qt6*|qt6_*)
