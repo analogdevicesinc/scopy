@@ -74,10 +74,13 @@ cp tmp.json $SCOPY_JSON
 # ("Error: module scopy: Can't copy special file"); and ci/flatpak/.flatpak-builder is
 # flatpak-builder's own cache, copied in above, so without this the source copy drags in
 # the whole prebuilt dependency tree. skip paths are relative to the source dir and prune
-# entire subtrees. Every entry is gitignored, so on a clean CI checkout only the
-# ci/flatpak ones exist - and CI does populate those.
+# entire subtrees, and are literal relative paths - g_file_resolve_relative_path(), so no globs,
+# which is why the Kuiper image is named in full. Every entry is gitignored, so on a clean CI
+# checkout only the ci/flatpak ones exist - and CI does populate those.
+# ci/arm/docker/tarballs (1.85 GB) and the Kuiper .img (4.8 GB) are armhf image-build inputs; a
+# local flatpak build was copying both on every run, since dir sources are never cached.
 # Not skipping .git: ScopyAbout.cmake runs git rev-parse/config/log at configure time.
-cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].skip = ["ci/arm/staging", "ci/flatpak/.flatpak-builder", "ci/flatpak/build", "ci/flatpak/repo", ".worktrees", "build"]' > tmp.json
+cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].skip = ["ci/arm/staging", "ci/arm/docker/tarballs", "ci/arm/image_ADI-Kuiper-Linux-armhf.img", "ci/flatpak/.flatpak-builder", "ci/flatpak/build", "ci/flatpak/repo", ".worktrees", "build"]' > tmp.json
 cp tmp.json $SCOPY_JSON
 rm tmp.json
 
