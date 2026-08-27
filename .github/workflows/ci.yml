@@ -88,11 +88,9 @@ jobs:
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    # DEPS REWORK: disabled - scopy2-arm64-native-qt6 has no :slim tag yet.
     arm64-qt6:
       needs: docker_tag
-      if: false
-      # original: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
+      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-arm64.yml
       with:
         docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
