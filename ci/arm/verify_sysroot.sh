@@ -2,6 +2,11 @@
 # Verify sysroot has all required libraries and headers for Scopy cross-compilation
 # Usage: ./verify_sysroot.sh [sysroot_path]
 #        ./verify_sysroot.sh --tarball path/to/sysroot-armhf.tar.gz
+#
+# These checks track the package list in inside_chroot_armhf_qt6.sh, not whatever a previously
+# shipped tarball happens to contain. The Boost and Python sections were removed together with
+# the packages that fed them (Boost served gnuradio; the Python set served libsigrokdecode's
+# embedded interpreter), so an old pre-slim tarball will now report extra libraries, not failures.
 
 set -e
 
@@ -134,44 +139,19 @@ check_lib libudev;           check_header libudev.h udev
 
 echo ""
 echo "============================================"
-echo "6. Boost"
+echo "6. Scopy dependencies"
 echo "============================================"
-check_lib libboost_system;           check_header boost/system/error_code.hpp boost-system
-check_lib libboost_filesystem;       check_header boost/filesystem.hpp boost-filesystem
-check_lib libboost_thread;           check_header boost/thread.hpp boost-thread
-check_lib libboost_program_options;  check_header boost/program_options.hpp boost-program-options
-
-echo ""
-echo "============================================"
-echo "7. Scopy dependencies"
-echo "============================================"
+# libgmp and libzmq are gone with gnuradio; libgsl stays because its verdict is undetermined.
 check_lib libfftw3;          check_header fftw3.h fftw3
-check_lib libgmp;            check_header gmp.h gmp
 check_lib libxml2;           check_header libxml2/libxml/parser.h libxml2
 check_lib libusb-1.0;        check_header libusb-1.0/libusb.h libusb
 check_lib libsndfile;        check_header sndfile.h sndfile
-check_lib libzmq;            check_header zmq.h zmq
 check_lib libgsl;            check_header gsl/gsl_math.h gsl
 check_lib libavahi-client;   check_header avahi-client/client.h avahi
 
 echo ""
 echo "============================================"
-echo "8. Python (for libsigrokdecode)"
-echo "============================================"
-check_lib libpython3.13
-if [ "$USE_TARBALL" -eq 1 ]; then
-	echo "$FILE_LIST" | grep -qm1 "usr/include/python3.*/Python.h" && ok "Python.h (header)" || fail "Python.h (header)"
-else
-	found=$(find "$SYSROOT/usr/include" -name "Python.h" -path "*/python3*" 2>/dev/null | head -1)
-	[ -n "$found" ] && ok "Python.h (header)" || fail "Python.h (header)"
-fi
-check_lib libreadline;       check_header readline/readline.h readline
-check_lib libgdbm;           check_header gdbm.h gdbm
-check_lib libdb-5.3;         check_header db.h db
-
-echo ""
-echo "============================================"
-echo "9. Audio codecs (libsndfile transitive deps)"
+echo "7. Audio codecs (libsndfile transitive deps)"
 echo "============================================"
 check_lib libFLAC;           check_header FLAC/all.h FLAC
 check_lib libvorbis;         check_header vorbis/codec.h vorbis
@@ -182,7 +162,7 @@ check_lib libmp3lame;        check_header lame/lame.h lame
 
 echo ""
 echo "============================================"
-echo "10. Cross-compilation symlinks"
+echo "8. Cross-compilation symlinks"
 echo "============================================"
 if [ "$USE_TARBALL" -eq 0 ]; then
 	for link in asm gnu bits sys; do

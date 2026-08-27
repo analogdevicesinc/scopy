@@ -6,8 +6,9 @@
 # Usage: ./create_sysroot_armhf.sh [function_name ...]
 #
 # Prerequisites:
-#   - Run on host: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-#   - Docker container must use --privileged (for loop mount)
+#   - On a non-armhf host: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+#     and a --privileged container (for loop mount + emulated chroot)
+#   - On a native armhf host: sudo only. The chroot is not emulated, so no qemu and no binfmt.
 #
 # Functions:
 #   install_packages    - Install host tools (qemu, mount utils)
@@ -30,7 +31,17 @@ SYSROOT_RELATIVE_LINKS=https://raw.githubusercontent.com/abhiTronix/rpi_rootfs/m
 
 install_packages() {
 	sudo apt-get update
-	sudo apt-get -y install qemu-user-static qemu-system wget unzip
+	sudo apt-get -y install wget unzip
+	# qemu is only needed when this host is not itself armhf: configure_sysroot chroots into the
+	# armhf rootfs, which requires binfmt emulation on x86_64 but is an ordinary same-architecture
+	# chroot on an armhf machine. Installing it unconditionally made the emulation cost look
+	# inherent to the sysroot step, which it is not.
+	if [ "$(dpkg --print-architecture)" != "armhf" ]; then
+		echo "Host is not armhf - installing qemu for the chroot"
+		sudo apt-get -y install qemu-user-static qemu-system
+	else
+		echo "Host is armhf - the chroot is native, skipping qemu"
+	fi
 }
 
 extract_sysroot() {

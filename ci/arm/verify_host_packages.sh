@@ -54,7 +54,6 @@ check_dpkg autogen "autogen"
 check_dpkg autoconf "autoconf"
 check_dpkg autoconf-archive "autoconf-archive"
 check_dpkg libtool "libtool"
-check_dpkg swig "SWIG"
 
 echo ""
 echo "============================================"
@@ -131,7 +130,9 @@ check_dpkg libssl-dev "OpenSSL"
 check_dpkg libjpeg-dev "JPEG"
 check_dpkg libpng-dev "PNG"
 check_dpkg libdouble-conversion-dev "double-conversion"
-check_dpkg libglib2.0-dev "GLib"
+# libglib2.0-dev is no longer listed explicitly in install_packages, but libinput-dev pulls it
+# back transitively, so it must still be present for the Qt6 host build.
+check_dpkg libglib2.0-dev "GLib (transitive, via libinput-dev)"
 check_dpkg libzstd-dev "zstd"
 check_dpkg libbz2-dev "bzip2"
 check_dpkg liblzma-dev "lzma"
