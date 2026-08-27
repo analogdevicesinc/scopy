@@ -34,9 +34,12 @@ jobs:
           case "$BRANCH_NAME" in
             *deps_rework*)
                 # Dependency rework: this branch builds against the slim images. A platform's
-                # job in ci.yml stays disabled until its own image carries a :slim tag, or it
-                # would fail at docker pull. Enabled so far: ubuntu{22,24,26}, windows, arm64.
-                # Remove this case once slim is promoted to :testing / :latest.
+                # job in ci.yml stayed disabled until its own image carried a :slim tag, or it
+                # would fail at docker pull. All of them are now enabled: ubuntu{22,24,26},
+                # windows, arm64, armhf, flatpak (macOS uses no image).
+                # Remove this case once slim is promoted to :testing / :latest - note that until
+                # then, merging to main makes BRANCH_NAME "main", which falls through to the
+                # default case and selects :testing, i.e. the OLD pre-slim images.
                 TAG="slim"
                 ;;
             *scopy-testing*|*scopy_qt6*|qt6_*)
