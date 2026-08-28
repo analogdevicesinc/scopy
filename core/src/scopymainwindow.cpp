@@ -61,7 +61,9 @@
 #include "scopytitlemanager.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
+#if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 #include <libsigrokdecode/libsigrokdecode.h>
+#endif
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
 #include <QVersionNumber>
@@ -656,7 +658,7 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 
 void ScopyMainWindow::initPythonWIN32()
 {
-#ifdef WIN32
+#if defined(WIN32) && defined(WITH_PYTHON)
 	ScopySplashscreen::showMessage("Initializing Python engine");
 
 	QString pythonhome;
@@ -688,9 +690,9 @@ void ScopyMainWindow::initPythonWIN32()
 
 void ScopyMainWindow::loadDecoders()
 {
+#if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 	ScopySplashscreen::showMessage("Loading sigrok decoders");
 	DebugTimer benchmark;
-#if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 #if defined __APPLE__
 	QString path = QCoreApplication::applicationDirPath() + "/../Resources/decoders";
 #elif defined(__appimage__)
@@ -726,10 +728,10 @@ void ScopyMainWindow::loadDecoders()
 			tr("ERROR: There was a problem initializing libsigrokdecode. Some features may be missing"));
 		error.exec();
 	}
+	DEBUGTIMER_LOG(benchmark, "Loading the decoders took:");
 #else
 	qInfo(CAT_SCOPY) << "Python or libsigrokdecode are disabled, can't load decoders";
 #endif
-	DEBUGTIMER_LOG(benchmark, "Loading the decoders took:");
 }
 
 void ScopyMainWindow::initApi()

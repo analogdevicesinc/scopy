@@ -1,61 +1,37 @@
 DLL_DEPS=(
-    libspdlog.dll*
-    libglibmm-*.dll
-    libsigrokdecode-*.dll
+    # compiler runtime
     libgcc_s_*.dll
     libstdc++-*.dll
-    libboost_thread-mt.dll
-    libgnuradio-analog.dll
-    libgnuradio-blocks.dll
-    libgnuradio-fft.dll
     libwinpthread-*.dll
-    libgnuradio-filter.dll
-    libgnuradio-m2k.dll
-    libgnuradio-pmt.dll
-    libgnuradio-runtime.dll
-    libgnuradio-scopy.dll
-    libgnuradio-iio.dll
+    libgomp-1.dll
+    # scopy deps built from source
     libad9361.dll
+    libad9166.dll
     libiio.dll
-    qwt.dll
-    libglib-*.dll
-    libgmodule-*.dll
-    libsigc-*.dll
-    libgobject-*.dll
-    libpython*.dll
-    libboost_filesystem-mt.dll
-    libboost_chrono-mt.dll
-    libboost_program_options-mt.dll
-    libgmp-*.dll
+    libserialport-0.dll
+    tinyiiod.dll
+    qwt_scopy.dll
+    libgenalyzer.dll
+    libKF6Archive.dll
+    libkddockwidgets*.dll
+    # transitive
     libusb-*.dll
     libxml2-*.dll
     libintl-*.dll
     libiconv-*.dll
     zlib1.dll
-    tinyiiod.dll
-    libm2k.dll
-    libvolk.dll
     libfftw3*.dll
-    libicudt*.dll
     libffi-*.dll
     liblzma-5.dll
-    libicuin*.dll
-    libicuuc*.dll
     libpcre2-*.dll
     libzstd.dll
-    liborc-*.dll
     libbrotlidec.dll
-    libbz2-*.dll
     libbrotlicommon.dll
+    libbz2-*.dll
     libcrypto*.dll
     libssl*.dll
-    libserialport-0.dll
-    libmatio*.dll
-    libKF6Archive.dll
-    libkddockwidgets*.dll
-    libhdf5-*.dll
+    # curl and its retinue
     libcurl-*.dll
-    libsz-*.dll
     libidn2-*.dll
     libnghttp2-*.dll
     libnghttp3-*.dll
@@ -64,5 +40,4 @@ DLL_DEPS=(
     libngtcp2-*.dll
     libngtcp2_*.dll
     libunistring-*.dll
-    libgomp-1.dll
 )

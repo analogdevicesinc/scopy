@@ -28,15 +28,15 @@ cp -avR $STAGING_AREA_DEPS/lib/ad9361.framework Scopy.app/Contents/Frameworks/
 cp -avR $STAGING_AREA_DEPS/lib/genalyzer.framework Scopy.app/Contents/Frameworks/
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/resources
 
-libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt.6.4.0.dylib #hardcoded
+libqwtpath=${STAGING_AREA_DEPS}/lib/libqwt_scopy.6.4.0.dylib #hardcoded
 libqwtid="$(otool -D ${libqwtpath} | tail -1)"
 echo "=== Fixing libqwt"
-[ -z "$(otool -L ${libqwtpath} | grep libqwt...dylib)" ] || install_name_tool -id ${libqwtid} ${libqwtpath}
+[ -z "$(otool -L ${libqwtpath} | grep libqwt_scopy.*dylib)" ] || install_name_tool -id ${libqwtid} ${libqwtpath}
 otool -L ${libqwtpath}
 install_name_tool -change ${libqwtid} ${libqwtpath} ./Scopy.app/Contents/MacOS/Scopy
 for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
 do
-	[ -z "$(otool -L ${dylib} | grep libqwt...dylib)" ] || install_name_tool -change ${libqwtid} ${libqwtpath} ${dylib}
+	[ -z "$(otool -L ${dylib} | grep libqwt_scopy.*dylib)" ] || install_name_tool -change ${libqwtid} ${libqwtpath} ${dylib}
 	otool -L $dylib
 done
 
@@ -61,19 +61,21 @@ if ls ${m2kpath} 1>/dev/null 2>&1; then
 	install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 fi
 
-echo "### Get python version"
-brewprefix=$(brew --prefix python3)
-pyversion=${brewprefix##*@} # extract the text after the last '@'
-pythonpath=$brewprefix/Frameworks/Python.framework/Versions/$pyversion/Python
-pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
+if ls "$STAGING_AREA_DEPS/lib/libsigrokdecode"* 1>/dev/null 2>&1; then
+	echo "### Get python version"
+	brewprefix=$(brew --prefix python3)
+	pyversion=${brewprefix##*@} # extract the text after the last '@'
+	pythonpath=$brewprefix/Frameworks/Python.framework/Versions/$pyversion/Python
+	pythonidrpath="$(otool -D $pythonpath | head -2 |  tail -1)"
 
-if [ -z $pyversion ] ; then
-	echo "No Python paths found"
-	exit 1
+	if [ -z $pyversion ] ; then
+		echo "No Python paths found"
+		exit 1
+	fi
+	echo " - Found python$version at $pythonpath"
+	pythonid=${pythonidrpath#"$(brew --prefix python3)/Frameworks/"}
+	cp -R $(brew --prefix python3)/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
 fi
-echo " - Found python$version at $pythonpath"
-pythonid=${pythonidrpath#"$(brew --prefix python3)/Frameworks/"}
-cp -R $(brew --prefix python3)/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
 
 echo "=== Copying libsigrokdecode protocol decoders"
 if [ -d $STAGING_AREA_DEPS/share/libsigrokdecode/decoders ]; then
@@ -124,24 +126,28 @@ echo "=== Fixing ad9361.framework"
 install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/ad9361.framework/ad9361
 install_name_tool -id @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/${ad9361id}
 install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/${ad9361id}
-install_name_tool -change ${ad9361rpath} @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/libgnuradio-iio*
+if ls ./Scopy.app/Contents/Frameworks/libgnuradio-iio* 1>/dev/null 2>&1; then
+	install_name_tool -change ${ad9361rpath} @executable_path/../Frameworks/${ad9361id} ./Scopy.app/Contents/Frameworks/libgnuradio-iio*
+fi
 
 echo "=== Fixing libusb"
 install_name_tool -id @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/${libusbid}
 install_name_tool -change ${libusbpath} @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 
-echo "=== Fixing python"
-install_name_tool -id @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/${pythonid}
-python_sigrokdecode=$(otool -L ./Scopy.app/Contents/Frameworks/libsigrokdecode* | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
-[ -n "${python_sigrokdecode}" ] && install_name_tool -change ${python_sigrokdecode} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/libsigrokdecode*
-python_scopy=$(otool -L ./Scopy.app/Contents/MacOS/Scopy | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
-[ -n "${python_scopy}" ] && install_name_tool -change ${python_scopy} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
-for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
-do
-	otool -L $dylib
-	python=$(otool -L ${dylib} | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1');
-	[ -z "${python}" ] && echo "SKIP ${dylib##*/}" || install_name_tool -change ${python} @executable_path/../Frameworks/${pythonid} ${dylib}
-done
+if ls ./Scopy.app/Contents/Frameworks/libsigrokdecode* 1>/dev/null 2>&1; then
+	echo "=== Fixing python"
+	install_name_tool -id @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/${pythonid}
+	python_sigrokdecode=$(otool -L ./Scopy.app/Contents/Frameworks/libsigrokdecode* | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
+	[ -n "${python_sigrokdecode}" ] && install_name_tool -change ${python_sigrokdecode} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/libsigrokdecode*
+	python_scopy=$(otool -L ./Scopy.app/Contents/MacOS/Scopy | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
+	[ -n "${python_scopy}" ] && install_name_tool -change ${python_scopy} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
+	for dylib in ${SCOPYLIBS} ${SCOPYPLUGINS}
+	do
+		otool -L $dylib
+		python=$(otool -L ${dylib} | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1');
+		[ -z "${python}" ] && echo "SKIP ${dylib##*/}" || install_name_tool -change ${python} @executable_path/../Frameworks/${pythonid} ${dylib}
+	done
+fi
 
 
 echo "=== Fixing libserialport"
@@ -154,14 +160,14 @@ if ls ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib 1>/dev/null 2>&1; then
 	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib
 fi
 
-if [ -f  "./Scopy.app/Contents/Frameworks/libgnuradio-m2k*" ]; then
+if ls ./Scopy.app/Contents/Frameworks/libgnuradio-m2k* 1>/dev/null 2>&1; then
 	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 	if [ -n "${m2kid:-}" ]; then
 		install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 	fi
 fi
 
-if [ -f  "./Scopy.app/Contents/Frameworks/libgnuradio-scopy*" ]; then
+if ls ./Scopy.app/Contents/Frameworks/libgnuradio-scopy* 1>/dev/null 2>&1; then
 	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
 	if [ -n "${m2kid:-}" ]; then
 		install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*

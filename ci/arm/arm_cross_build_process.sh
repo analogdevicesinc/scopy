@@ -18,13 +18,7 @@ TOOLCHAIN_HOST=arm-linux-gnueabihf
 LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
-LIBM2K_BRANCH=main
-SPDLOG_BRANCH=v1.x
-VOLK_BRANCH=main
-GNURADIO_BRANCH=scopy2-maint-3.10
-GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=main
-LIBSIGROKDECODE_BRANCH=master
+LIBAD9166_BRANCH=libad9166-iio-v0
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
@@ -45,7 +39,16 @@ PYTHON_VERSION=$(python3 -c 'import sys; print(f"python3.{sys.version_info.minor
 
 CMAKE_DOWNLOAD_LINK=https://github.com/Kitware/CMake/releases/download/v3.29.0-rc2/cmake-3.29.0-rc2-linux-x86_64.tar.gz
 CMAKE_BIN=${STAGING_AREA}/cmake/bin/cmake
-[ ! -f "$CMAKE_BIN" ] && CMAKE_BIN=$(which cmake)
+# The `|| true` is required. `command -v` exits 1 when cmake is not installed, and this script runs
+# under `set -e`, so the bare assignment aborted the entire script on this line - in the script's
+# preamble, before any function could run. That is fatal to the image build:
+# Dockerfile.armhf-cross runs `install_packages` as its first script invocation, and install_packages
+# is itself what installs cmake, so cmake is guaranteed absent on that pass.
+# The fallback is still needed at CI time: the Dockerfile deletes /home/runner/scripts, so
+# $STAGING_AREA/cmake does not exist in the finished image and the system cmake is the only one left.
+# `command -v` rather than `which`: it is a shell builtin, needs no package, and matches
+# arm_native_build_process.sh, which keeps the same fallback inside download_cmake().
+[ ! -f "$CMAKE_BIN" ] && CMAKE_BIN=$(command -v cmake || true)
 
 APP_DIR=$SRC_SCRIPT/scopy.AppDir
 APP_IMAGE=$SRC_SCRIPT/Scopy.AppImage
@@ -97,11 +100,15 @@ download_cmake() {
 }
 
 install_packages() {
+	# Dropped from the dependency set: swig (gnuradio's Python bindings) and libglib2.0-dev.
+	# Removing libglib2.0-dev from this list is cosmetic, not a reduction - libinput-dev (kept
+	# below, needed by Qt6) pulls it back transitively via libwacom-dev / libgudev-1.0-dev.
+	# Verified on Ubuntu 24.04 in this pass and on Debian 13 during the arm64 pass.
 	sudo apt-get update
 	sudo apt-get -y upgrade
 	sudo apt-get -y install \
 		build-essential cmake git wget ca-certificates unzip \
-		g++ pkg-config flex bison autogen autoconf autoconf-archive libtool swig \
+		g++ pkg-config flex bison autogen autoconf autoconf-archive libtool \
 		crossbuild-essential-armhf \
 		ninja-build patchelf squashfs-tools \
 		python3 python3-pip python3-dev python3-numpy python3-packaging python3-mako \
@@ -116,7 +123,7 @@ install_packages() {
 		libxrender-dev libxcomposite-dev \
 		libdrm-dev libgbm-dev libinput-dev libudev-dev \
 		libssl-dev libjpeg-dev libpng-dev \
-		libdouble-conversion-dev libglib2.0-dev \
+		libdouble-conversion-dev \
 		libzstd-dev libbz2-dev liblzma-dev \
 		libfontconfig1-dev libfreetype-dev libpcre2-dev libharfbuzz-dev
 }
@@ -150,14 +157,8 @@ clone() {
 	[ -d 'libserialport' ] || git clone --recursive https://github.com/sigrokproject/libserialport -b $LIBSERIALPORT_BRANCH libserialport
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
-	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
-	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
-	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
-	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/analogdevicesinc/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
 	[ -d 'KDDockWidgets' ] || git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
@@ -220,81 +221,10 @@ build_libad9361() {
 	popd
 }
 
-build_libm2k() {
-	echo "### Building libm2k - branch $LIBM2K_BRANCH"
-	pushd $STAGING_AREA/libm2k
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF \
-		-DENABLE_CSHARP=OFF \
-		-DBUILD_EXAMPLES=OFF \
-		-DENABLE_TOOLS=OFF \
-		-DINSTALL_UDEV_RULES=OFF \
-		"
+build_libad9166() {
+	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
+	pushd $STAGING_AREA/libad9166
 	build_with_cmake $1
-	popd
-}
-
-build_spdlog() {
-	echo "### Building spdlog - branch $SPDLOG_BRANCH"
-	pushd $STAGING_AREA/spdlog
-	CURRENT_BUILD_CMAKE_OPTS="-DSPDLOG_BUILD_SHARED=ON"
-	build_with_cmake $1
-	popd
-}
-
-build_volk() {
-	echo "### Building volk - branch $VOLK_BRANCH"
-	pushd $STAGING_AREA/volk
-	CURRENT_BUILD_CMAKE_OPTS="-DPYTHON_EXECUTABLE=/usr/bin/python3 -DENABLE_ORC=OFF"
-	build_with_cmake $1
-	popd
-}
-
-build_gnuradio() {
-	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
-	pushd $STAGING_AREA/gnuradio
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
-		-DENABLE_DEFAULT=OFF \
-		-DENABLE_GNURADIO_RUNTIME=ON \
-		-DENABLE_GR_ANALOG=ON \
-		-DENABLE_GR_BLOCKS=ON \
-		-DENABLE_GR_FFT=ON \
-		-DENABLE_GR_FILTER=ON \
-		-DENABLE_GR_IIO=ON \
-		-DENABLE_POSTINSTALL=OFF
-		"
-	build_with_cmake $1
-	popd
-}
-
-build_grm2k() {
-	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
-	pushd $STAGING_AREA/gr-m2k
-	CURRENT_BUILD_CMAKE_OPTS="\
-		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF
-		"
-	build_with_cmake $1
-	popd
-}
-
-build_grscopy() {
-	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
-	pushd $STAGING_AREA/gr-scopy
-	build_with_cmake $1
-	popd
-}
-
-build_libsigrokdecode() {
-	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
-	set_config_opts
-	pushd $STAGING_AREA/libsigrokdecode
-	git clean -xdf
-	./autogen.sh
-	./configure "${CONFIG_OPTS[@]}"
-	make $JOBS
-	[ "$1" == "ON" ] && sudo make install
 	popd
 }
 
@@ -303,6 +233,14 @@ build_qwt() {
 	pushd $STAGING_AREA/qwt
 	git clean -xdf
 	sed -i 's|/usr/local/qwt-$$QWT_VERSION-ma|/usr/local|g' qwtconfig.pri
+	# Rename the produced library base name to qwt_scopy (and its SONAME in lockstep)
+	sed -i 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
+	sed -i 's|QWT_SONAME=libqwt.so|QWT_SONAME=libqwt_scopy.so|' src/src.pro
+	# The designer/examples/playground/tests subprojects link the library by its
+	# old name (qwtAddLibrary(..., qwt)); update those to match the rename above,
+	# otherwise they fail with `ld: cannot find -lqwt`. (Gap in PR #2291.)
+	sed -i 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
+		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
 	$QT/bin/qmake6 INCLUDEPATH=$SYSROOT/include LIBS=-L$SYSROOT/lib LIBS+=-L$SYSROOT/lib/$TOOLCHAIN_HOST qwt.pro
 	make $JOBS
 	sudo make INSTALL_ROOT=$SYSROOT install
@@ -320,7 +258,7 @@ build_libtinyiiod() {
 build_kddock() {
 	echo "### Building KDDockWidgets - version $KDDOCK_BRANCH"
 	pushd $STAGING_AREA/KDDockWidgets
-	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON"
+	CURRENT_BUILD_CMAKE_OPTS="-DKDDockWidgets_QT6=ON -DKDDockWidgets_FRONTENDS=qtwidgets"
 	build_with_cmake $1
 	# D18: KDDock installs headers to $SYSROOT/include/ but cmake expects $SYSROOT/usr/include/
 	[ -d $SYSROOT/include/kddockwidgets-qt6 ] && [ ! -e $SYSROOT/usr/include/kddockwidgets-qt6 ] && \
@@ -369,6 +307,9 @@ build_scopy() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_ALL_PACKAGES=ON \
 		-DENABLE_PACKAGE_M2K=OFF \
+		-DENABLE_PLUGIN_ADC=OFF \
+		-DWITH_SIGROK=OFF \
+		-DWITH_PYTHON=OFF \
 		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr \
 		"
 	build_with_cmake OFF
@@ -380,14 +321,8 @@ build_deps() {
 	build_libserialport ON
 	build_libiio ON
 	build_libad9361 ON
-	build_spdlog ON
-	build_libm2k ON
-	build_volk ON
-	build_gnuradio ON
-	build_grscopy ON
-	build_grm2k ON
+	build_libad9166 ON
 	build_qwt ON
-	build_libsigrokdecode ON
 	build_libtinyiiod ON
 	build_kddock ON
 	build_ecm ON
@@ -418,8 +353,25 @@ create_appdir() {
 	cp $SRC_DIR/gui/res/scopy.png $APP_DIR/usr/share/icons/hicolor/512x512
 	cp $APP_DESKTOP $APP_DIR/usr/share/applications
 
+	# $EMU_BUILD_FOLDER is $STAGING_AREA/iio-emu/build, i.e. under /home/runner/scripts, which
+	# Dockerfile.armhf-cross deletes when it cleans the image - so at CI time this source is
+	# guaranteed absent and the old single-source `if` silently shipped no emulator at all.
+	# The cross-compiled binary survives at $SYSROOT/bin/iio-emu: build_iio-emu installs with
+	# CMAKE_INSTALL_PREFIX=$SYSROOT, which is outside the deleted tree. Scopy then finds it next
+	# to its own executable (EmuWidget::findEmuPath -> applicationDirPath, core/src/emuwidget.cpp).
+	# Deliberately NOT arm64's `command -v iio-emu` / /usr/local/bin/iio-emu fallbacks: this is a
+	# cross build on an x86_64 host, so both of those resolve to x86_64 binaries that would look
+	# like a fix and not be executable on the target.
 	if [ -f $EMU_BUILD_FOLDER/iio-emu ]; then
 		cp $EMU_BUILD_FOLDER/iio-emu $APP_DIR/usr/bin
+	elif [ -f $SYSROOT/bin/iio-emu ]; then
+		cp $SYSROOT/bin/iio-emu $APP_DIR/usr/bin
+	else
+		echo "ERROR: no armhf iio-emu in $EMU_BUILD_FOLDER or $SYSROOT/bin."
+		echo "       Nothing outside this container can produce an armhf iio-emu, and the AppImage"
+		echo "       is the only vehicle that carries it to the device, so refusing to package"
+		echo "       without it. Check that build_deps ran build_iio-emu."
+		exit 1
 	fi
 
 	# Remove system Qt libs that interfere with bundled ones
@@ -427,34 +379,80 @@ create_appdir() {
 
 	LIB_DIRS=${SYSROOT}:${BUILD_FOLDER}:${QT}/lib
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/scopy
-	[ -f $APP_DIR/usr/bin/iio-emu ] && $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu || true
+	# iio-emu is guaranteed present by the check in create_appdir above, so a "not found" from
+	# copy-deps here is a genuine resolution fault rather than a tolerable absence - do not guard it.
+	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
 	find $APP_DIR/usr -type f -name 'libscopy*.so' | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
+
+	# Qt loads the platform plugins with dlopen, so nothing scanned above reaches them: libqxcb
+	# alone needs libQt6XcbQpa, which in turn needs libxcb-cursor and ~14 more libxcb siblings.
+	# Scan every platform plugin the AppDir ships so this gap cannot recur for the others.
+	ls $QT/plugins/platforms/*.so | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
 
 	cp -r $QT/plugins $APP_DIR/usr
 
-	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+')
+	# Copy the Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
+	# (core/CMakeLists.txt sets it inside the if(WITH_PYTHON) block), so the grep matches nothing.
+	# The trailing `|| true` is required: this script runs under `set -e` and the final `grep -o`
+	# exits 1 on no match, which the assignment inherits and which aborted the whole script here -
+	# before the guard below could run, making it dead code. Guard on non-empty as well as -d: an
+	# empty version would make python_path "$SYSROOT/usr/lib/" and copy the entire sysroot libdir.
+	FOUND_PYTHON_VERSION=$(grep 'PYTHON_VERSION' $SRC_DIR/build/CMakeCache.txt | awk -F= '{print $2}' | grep -o 'python[0-9]\+\.[0-9]\+' || true)
 	python_path=${SYSROOT}/usr/lib/$FOUND_PYTHON_VERSION
-	[ -d $python_path ] && cp -r $python_path $APP_DIR/usr/lib || true
+	if [ -n "$FOUND_PYTHON_VERSION" ] && [ -d "$python_path" ]; then
+		cp -r $python_path $APP_DIR/usr/lib
+	else
+		echo "Python runtime not bundled (built with WITH_PYTHON=OFF)"
+	fi
 
+	# Copy the protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case in the
+	# CI dependency image - not an error there, so say so instead of finishing silently.
+	decoders_found=""
 	for search_dir in $SYSROOT/share $SYSROOT/usr/share $SYSROOT/usr/local/share; do
-		[ -d $search_dir/libsigrokdecode/decoders ] && cp -r $search_dir/libsigrokdecode/decoders $APP_DIR/usr/lib && break
+		if [ -d $search_dir/libsigrokdecode/decoders ]; then
+			cp -r $search_dir/libsigrokdecode/decoders $APP_DIR/usr/lib
+			decoders_found=$search_dir
+			break
+		fi
 	done
+	if [ -z "$decoders_found" ]; then
+		echo "No decoders for libsigrokdecode found (built with WITH_SIGROK=OFF)"
+	fi
 
 	for search_dir in $SYSROOT/lib $SYSROOT/usr/lib $SYSROOT/usr/local/lib; do
 		ls $search_dir/libgenalyzer.so* >/dev/null 2>&1 && cp $search_dir/libgenalyzer.so* $APP_DIR/usr/lib && break
 	done
 
-	cp $QT/lib/libQt6XcbQpa.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6EglFSDeviceIntegration.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6DBus.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6OpenGL.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $QT/lib/libQt6WaylandClient.so* $APP_DIR/usr/lib 2>/dev/null || true
+	# Copy the Qt libraries the platform plugins need by name. The plugin scan above now follows
+	# their dependencies too, so this loop is belt-and-braces - but it names each library, so a
+	# silent miss still surfaces here rather than at runtime as "could not load the Qt platform
+	# plugin". Four of the five are present in qt6-armhf-cross-installed.tar.gz;
+	# libQt6WaylandClient is absent because the armhf cross Qt6 was configured without QtWayland
+	# and ships no libqwayland* platform plugin, so nothing can load it. Exactly one WARNING is
+	# expected here and it is not a regression; a WARNING for any of the other four is.
+	for qtlib in libQt6XcbQpa libQt6EglFSDeviceIntegration libQt6DBus libQt6OpenGL libQt6WaylandClient; do
+		if ls $QT/lib/$qtlib.so* >/dev/null 2>&1; then
+			cp $QT/lib/$qtlib.so* $APP_DIR/usr/lib
+		else
+			echo "WARNING: $qtlib not found in $QT/lib - Qt plugins needing it will fail to load"
+		fi
+	done
 
-	cp $SYSROOT/lib/$TOOLCHAIN_HOST/libGLESv2.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $SYSROOT/lib/$TOOLCHAIN_HOST/libbsd.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $SYSROOT/usr/lib/$TOOLCHAIN_HOST/libXdmcp.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $SYSROOT/usr/lib/$TOOLCHAIN_HOST/libXau.so* $APP_DIR/usr/lib 2>/dev/null || true
-	cp $SYSROOT/usr/lib/$TOOLCHAIN_HOST/libffi.so* $APP_DIR/usr/lib 2>/dev/null || true
+	# Sysroot libraries the same scan misses, each named with the directory it actually ships in.
+	for entry in \
+		$SYSROOT/lib/$TOOLCHAIN_HOST:libGLESv2 \
+		$SYSROOT/lib/$TOOLCHAIN_HOST:libbsd \
+		$SYSROOT/usr/lib/$TOOLCHAIN_HOST:libXdmcp \
+		$SYSROOT/usr/lib/$TOOLCHAIN_HOST:libXau \
+		$SYSROOT/usr/lib/$TOOLCHAIN_HOST:libffi; do
+		libdir=${entry%:*}
+		libname=${entry##*:}
+		if ls $libdir/$libname.so* >/dev/null 2>&1; then
+			cp $libdir/$libname.so* $APP_DIR/usr/lib
+		else
+			echo "WARNING: $libname not found in $libdir"
+		fi
+	done
 }
 
 create_appimage() {

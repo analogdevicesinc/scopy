@@ -8,14 +8,9 @@ BUILD_STATUS_FILE=$WORKFOLDER/build-status
 LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
-LIBM2K_BRANCH=main
-SPDLOG_BRANCH=v1.x
+# libad9166-iio: the main branch targets libiio v1; we are on v0.26, so this pin is required.
+LIBAD9166_BRANCH=libad9166-iio-v0
 LIBSNDFILE_BRANCH=1.2.2
-VOLK_BRANCH=main
-GNURADIO_BRANCH=scopy2-maint-3.10
-GRSCOPY_BRANCH=3.10
-GRM2K_BRANCH=main
-LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=v0.1
 KDDOCK_BRANCH=2.2
@@ -24,7 +19,9 @@ KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
 
 
-STAGING_AREA=$WORKFOLDER/staging
+# Overridable so a local build can keep multi-GB dep checkouts out of a synced/space-containing
+# source tree. CI sets nothing, so the default is unchanged.
+STAGING_AREA=${STAGING_AREA:-$WORKFOLDER/staging}
 MINGW_VERSION=mingw64
 ARCH=x86_64
 

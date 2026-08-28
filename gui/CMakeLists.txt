@@ -64,7 +64,7 @@ file(GLOB UI_LIST ui/*.ui)
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
 if(ANDROID)
-	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
+	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_scopy_${ANDROID_ABI})
 else()
 	set(QWT_QT_VERSION qt6)
 	find_path(
@@ -87,7 +87,7 @@ else()
 
 	find_library(
 		QWT_LIBRARIES
-		NAMES qwt
+		NAMES qwt_scopy
 		HINTS ${CMAKE_INSTALL_PREFIX}/lib
 		      /usr/lib
 		      /usr/lib64
@@ -109,9 +109,6 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg OpenGLWidgets REQUIRED)
 find_package(KDDockWidgets-qt6 QUIET)
-
-add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
 message(STATUS "Building: " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
@@ -140,7 +137,6 @@ target_include_directories(
 
 target_include_directories(
 	${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS}
-			       ${Boost_INCLUDE_DIRS}
 )
 # Link optional libraries
 if(KDDockWidgets-qt6_FOUND)
@@ -154,7 +150,6 @@ target_link_libraries(
 	       Qt${QT_VERSION_MAJOR}::Svg
 	       Qt${QT_VERSION_MAJOR}::OpenGLWidgets
 	       ${QWT_LIBRARIES}
-	       ${Boost_LIBRARIES}
 	       scopy-common
 	       scopy-pluginbase
 )

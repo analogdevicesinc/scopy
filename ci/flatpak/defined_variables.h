@@ -1,8 +1,6 @@
 #define _EXPAND(A) #A
 #define EXPAND(A) _EXPAND(A)
 
-#define DENABLE_INTERNAL_VOLK -DENABLE_INTERNAL_VOLK:BOOL=_ENABLE_VOLK
-
 #ifdef __ARM__
     #define RUNTIME_VERSION 6.8
 
@@ -15,12 +13,9 @@
     #define CMAKE_ASM_FLAGS -DCMAKE_ASM_FLAGS= _ASFLAGS_VALUE
     #define CMAKE_C_FLAGS -DCMAKE_C_FLAGS= -fno-asynchronous-unwind-tables _CFLAGS_VALUE
 
-    #define _ENABLE_VOLK OFF
-
 #elif __X86__
     #define RUNTIME_VERSION 6.8
     #define CFLAGS --disable-assembly
     #define CMAKE_C_FLAGS -DCMAKE_C_FLAGS= -fno-asynchronous-unwind-tables -fPIC
     #define CMAKE_ASM_FLAGS -DCMAKE_ASM_FLAGS=
-    #define _ENABLE_VOLK OFF
 #endif

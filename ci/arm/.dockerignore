@@ -12,3 +12,9 @@
 !verify_host_packages.sh
 !verify_qt6_cross.sh
 !verify_sysroot.sh
+# arm64 native image: Dockerfile.arm64 reads both tarballs from the context root, which is
+# where ci/arm/setup_pi_for_docker_build.sh writes them.
+!arm_native_build_process.sh
+!docker/Dockerfile.arm64
+!kuiper-rootfs.tar.gz
+!qt6-arm64-installed.tar.gz

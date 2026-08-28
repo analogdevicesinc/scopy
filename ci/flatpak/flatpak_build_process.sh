@@ -33,7 +33,20 @@ if [ "$CI_SCRIPT" == "ON" ];
 		# Use pre-built dependencies from Docker image
 		# .flatpak-builder: Flatpak's build cache
 		# build: Compiled dependencies
-		cp -r /home/runner/flatpak_tools/.flatpak-builder $SOURCE_DIR/ci/flatpak
+		# Seed the cache only when the workspace does not already have one. A plain "cp -r"
+		# into a populated .flatpak-builder fails: git writes its pack files mode 444, so cp
+		# cannot overwrite them ("cannot create regular file ...: Permission denied"). CI is
+		# unaffected either way - actions/checkout gives a virgin workspace, so the copy always
+		# runs there - but a second local run in the same tree aborts here under -e. Reusing the
+		# existing cache is also the point of the cache: the rerun resumes at the first module
+		# whose definition changed. To force a refresh from the image, delete
+		# $SOURCE_DIR/ci/flatpak/.flatpak-builder first.
+		if [ -d $SOURCE_DIR/ci/flatpak/.flatpak-builder ]; then
+			echo "-- Reusing existing flatpak-builder cache in the workspace"
+		else
+			cp -r /home/runner/flatpak_tools/.flatpak-builder $SOURCE_DIR/ci/flatpak
+		fi
+		# "make preprocess" above removes build/ every run, so this copy is already idempotent.
 		cp -r /home/runner/flatpak_tools/build $SOURCE_DIR/ci/flatpak
 	else
 		SOURCE_DIR=$SCOPY_DIR
@@ -55,6 +68,19 @@ cp tmp.json $SCOPY_JSON
 cat $SCOPY_JSON | jq --tab 'del(.modules['$cnt'].sources[0].url)' > tmp.json
 cp tmp.json $SCOPY_JSON
 cat $SCOPY_JSON | jq --tab 'del(.modules['$cnt'].sources[0].branch)' > tmp.json
+cp tmp.json $SCOPY_JSON
+# Exclude build artefacts and other-platform staging dirs from the copy. Two reasons:
+# ci/arm/staging/sysroot/dev/ holds device nodes, which flatpak-builder cannot copy
+# ("Error: module scopy: Can't copy special file"); and ci/flatpak/.flatpak-builder is
+# flatpak-builder's own cache, copied in above, so without this the source copy drags in
+# the whole prebuilt dependency tree. skip paths are relative to the source dir and prune
+# entire subtrees, and are literal relative paths - g_file_resolve_relative_path(), so no globs,
+# which is why the Kuiper image is named in full. Every entry is gitignored, so on a clean CI
+# checkout only the ci/flatpak ones exist - and CI does populate those.
+# ci/arm/docker/tarballs (1.85 GB) and the Kuiper .img (4.8 GB) are armhf image-build inputs; a
+# local flatpak build was copying both on every run, since dir sources are never cached.
+# Not skipping .git: ScopyAbout.cmake runs git rev-parse/config/log at configure time.
+cat $SCOPY_JSON | jq --tab '.modules['$cnt'].sources[0].skip = ["ci/arm/staging", "ci/arm/docker/tarballs", "ci/arm/image_ADI-Kuiper-Linux-armhf.img", "ci/flatpak/.flatpak-builder", "ci/flatpak/build", "ci/flatpak/repo", ".worktrees", "build"]' > tmp.json
 cp tmp.json $SCOPY_JSON
 rm tmp.json
 
