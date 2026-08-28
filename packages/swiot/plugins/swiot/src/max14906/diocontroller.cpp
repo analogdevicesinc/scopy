@@ -22,53 +22,52 @@
 #include "max14906/max14906.h"
 #include "swiot_logging_categories.h"
 
-using namespace scopy::swiot;
+#include <component/device.h>
+#include <component/channel.h>
 
-DioController::DioController(struct iio_context *context_, QString deviceName)
+using namespace scopy::swiot;
+using namespace scopy;
+
+DioController::DioController(component::Device *device, QString deviceName)
 	: m_deviceName(deviceName)
-	, m_context(context_)
+	, m_device(device)
 {
-	struct iio_device *dev = iio_context_find_device(m_context, MAX_NAME);
-	m_device = dev;
+	if(m_device) {
+		m_channels = m_device->findChildren<component::Channel *>(Qt::FindDirectChildrenOnly);
+	}
 }
 
 DioController::~DioController() {}
 
-int DioController::getChannelCount()
+int DioController::getChannelCount() { return m_channels.size(); }
+
+component::Channel *DioController::getChannel(unsigned int index)
 {
-	if(m_device == nullptr) {
-		return 0;
+	if(index >= (unsigned int)m_channels.size()) {
+		qCritical(CAT_SWIOT_MAX14906) << "Error when selecting channel with index" << index;
+		return nullptr;
 	}
-	unsigned int dev_count = iio_device_get_channels_count(m_device);
-	return (int)(dev_count);
+	return m_channels[index];
 }
 
 QString DioController::getChannelName(unsigned int index)
 {
-	iio_channel *channel = iio_device_get_channel(m_device, index);
+	component::Channel *channel = getChannel(index);
 	if(channel == nullptr) {
-		qCritical(CAT_SWIOT_MAX14906)
-			<< "Error when selecting channel with index" << index << ", returning empty string.";
 		return "";
 	}
-	QString name = iio_channel_get_id(channel);
-
-	return name;
+	return channel->id();
 }
 
 QString DioController::getChannelType(unsigned int index)
 {
-	iio_channel *channel = iio_device_get_channel(m_device, index);
+	component::Channel *channel = getChannel(index);
 	if(channel == nullptr) {
-		qCritical(CAT_SWIOT_MAX14906)
-			<< "Error when selecting channel with index" << index << ", returning empty string.";
 		return "";
 	}
-	bool output = iio_channel_is_output(channel);
-
-	return output ? "OUTPUT" : "INPUT";
+	return channel->isOutput() ? "OUTPUT" : "INPUT";
 }
 
-iio_device *DioController::getDevice() const { return DioController::m_device; }
+component::Device *DioController::getDevice() const { return DioController::m_device; }
 
 #include "moc_diocontroller.cpp"

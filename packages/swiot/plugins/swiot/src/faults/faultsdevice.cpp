@@ -22,16 +22,17 @@
 #include "faults/faultsgroup.h"
 #include "swiot_logging_categories.h"
 
-#include <iioutil/connectionprovider.h>
-#include <iioutil/iiocommand/iiochannelattributeread.h>
-#include <iioutil/iiocommand/iiodeviceattributeread.h>
-#include <iioutil/iiocommand/iioregisterread.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/backends/iio/iioregisterreader.h>
+
+#include <qcorotask.h>
 
 #include <style.h>
 #include <gui/stylehelper.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/dynamicWidget.h>
-#include <utility>
 #include "style_properties.h"
 
 #define FAULT_CHANNEL_NAME "voltage"
@@ -44,6 +45,9 @@ FaultsDevice::FaultsDevice(const QString &name, QString path, QString uri, QVect
 	: QWidget(parent)
 	, m_uri(uri)
 	, m_name(name.toUpper())
+	, m_device(nullptr)
+	, m_swiot(nullptr)
+	, m_registerReader(nullptr)
 	, m_registers(registers)
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
@@ -76,9 +80,8 @@ FaultsDevice::FaultsDevice(const QString &name, QString path, QString uri, QVect
 
 	connect(this, &FaultsDevice::specialFaultsUpdated, m_faultsGroup, &FaultsGroup::specialFaultsUpdated);
 	connect(m_faultsGroup, &FaultsGroup::specialFaultExplanationChanged, this, &FaultsDevice::updateExplanation);
-	connect(this, &FaultsDevice::faultNumericUpdated, this, &FaultsDevice::onFaultNumericUpdated,
-		Qt::QueuedConnection);
-	connect(this, &FaultsDevice::faultRegisterRead, this, &FaultsDevice::onFaultRegisterRead, Qt::QueuedConnection);
+	connect(this, &FaultsDevice::faultNumericUpdated, this, &FaultsDevice::onFaultNumericUpdated);
+	connect(this, &FaultsDevice::faultRegisterRead, this, &FaultsDevice::onFaultRegisterRead);
 
 	connectSignalsAndSlots();
 
@@ -86,7 +89,14 @@ FaultsDevice::FaultsDevice(const QString &name, QString path, QString uri, QVect
 	onFaultNumericUpdated();
 }
 
-FaultsDevice::~FaultsDevice() { ConnectionProvider::close(m_uri); }
+FaultsDevice::~FaultsDevice()
+{
+	if(!m_readRegTask.isReady()) {
+		QCoro::waitFor(m_readRegTask);
+	}
+	m_readRegTask = {};
+	m_context = {};
+}
 
 void FaultsDevice::resetStored()
 {
@@ -97,6 +107,15 @@ void FaultsDevice::resetStored()
 }
 
 void FaultsDevice::update() { readRegister(); }
+
+void FaultsDevice::readRegister()
+{
+
+	if(!m_readRegTask.isReady()) {
+		return;
+	}
+	m_readRegTask = readRegisters();
+}
 
 void FaultsDevice::updateExplanation(int index)
 {
@@ -165,103 +184,65 @@ void FaultsDevice::onFaultRegisterRead(int iReg, uint32_t value)
 	}
 }
 
-void FaultsDevice::readRegister()
+QCoro::Task<void> FaultsDevice::readRegisters()
 {
+	if(!m_registerReader) {
+		qCritical(CAT_SWIOT_FAULTS) << m_name << "has no register-read capability.";
+		co_return;
+	}
 	for(int i = 0; i < m_registers.size(); i++) {
-		uint32_t reg_val;
 		uint32_t address = m_registers.at(i);
-		Command *readRegisterCommand = new IioRegisterRead(m_device, address, nullptr);
-		connect(
-			readRegisterCommand, &scopy::Command::finished, this,
-			[=, this](scopy::Command *cmd) {
-				IioRegisterRead *tcmd = dynamic_cast<IioRegisterRead *>(cmd);
-				if(!tcmd) {
-					qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
-					return;
-				}
-				uint32_t reg = tcmd->getResult();
-
-				if(tcmd->getReturnCode() < 0) {
-					qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
-				} else {
-					qDebug(CAT_SWIOT_FAULTS) << m_name << "faults register read val:" << reg;
-					try {
-						Q_EMIT faultRegisterRead(i, reg);
-					} catch(std::invalid_argument &exception) {
-						qCritical(CAT_SWIOT_FAULTS)
-							<< m_name << "faults register could not be read.";
-					}
-				}
-			},
-			Qt::QueuedConnection);
-		m_cmdQueue->enqueue(readRegisterCommand);
-	}
-}
-
-void FaultsDevice::functionConfigCmdFinished(scopy::Command *cmd)
-{
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-	if(!tcmd) {
-		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault property";
-		return;
-	}
-
-	if(tcmd->getReturnCode() < 0) {
-		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault property";
-	} else {
-		int cmdIndex = m_functionConfigCmds.indexOf(cmd);
-		char *readFunction = tcmd->getResult();
-		Q_EMIT specialFaultsUpdated(cmdIndex, QString(readFunction));
-		disconnect(cmd, &scopy::Command::finished, this, &FaultsDevice::deviceConfigCmdFinished);
-	}
-}
-
-void FaultsDevice::deviceConfigCmdFinished(scopy::Command *cmd)
-{
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-	if(!tcmd) {
-		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault config property";
-		return;
-	}
-
-	if(tcmd->getReturnCode() < 0) {
-		qCritical(CAT_SWIOT_FAULTS) << "Error: cannot read swiot special fault config property";
-	} else {
-		char *readDevice = tcmd->getResult();
-		int cmdIndex = m_deviceConfigCmds.indexOf(cmd);
-		if(std::string(readDevice) == "ad74413r") {
-			QString function = "ch" + QString::number(cmdIndex) + "_function";
-
-			m_functionConfigCmds[cmdIndex] =
-				new IioDeviceAttributeRead(m_swiot, function.toStdString().c_str(), m_cmdQueue);
-			connect(m_functionConfigCmds.at(cmdIndex), &scopy::Command::finished, this,
-				&FaultsDevice::functionConfigCmdFinished, Qt::QueuedConnection);
-			disconnect(cmd, &scopy::Command::finished, this, &FaultsDevice::deviceConfigCmdFinished);
-			m_cmdQueue->enqueue(m_functionConfigCmds.at(cmdIndex));
+		auto r = co_await m_registerReader->readAsync(address);
+		if(!r) {
+			qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
+			continue;
 		}
+		uint32_t reg = r.value();
+		qDebug(CAT_SWIOT_FAULTS) << m_name << "faults register read val:" << reg;
+		Q_EMIT faultRegisterRead(i, reg);
 	}
 }
 
 void FaultsDevice::establishConnection(QString name)
 {
-	Connection *conn = ConnectionProvider::open(m_uri);
-	m_context = conn->context();
-	m_cmdQueue = conn->commandQueue();
-	m_device = iio_context_find_device(m_context, name.toStdString().c_str());
-	m_swiot = iio_context_find_device(m_context, "swiot");
+	m_context = component::Controller::context(m_uri);
+	if(!m_context) {
+		return;
+	}
+	m_device = m_context->findChild<component::Device *>(name);
+	m_swiot = m_context->findChild<component::Device *>("swiot");
+	if(m_device) {
+		m_registerReader = m_device->findChild<component::iio::IIORegisterReader *>();
+	}
 }
 
-void FaultsDevice::initSpecialFaults()
+QCoro::Task<void> FaultsDevice::initSpecialFaults()
 {
-	if(!m_name.contains("MAX")) {
-		for(int i = 0; i < SWIOT_NB_CHANNELS; ++i) {
-			std::string device = "ch" + std::to_string(i) + "_device";
-			m_deviceConfigCmds.push_back(new IioDeviceAttributeRead(m_swiot, device.c_str(), m_cmdQueue));
-			connect(m_deviceConfigCmds.at(i), &scopy::Command::finished, this,
-				&FaultsDevice::deviceConfigCmdFinished, Qt::QueuedConnection);
-			m_functionConfigCmds.push_back(nullptr);
-			m_cmdQueue->enqueue(m_deviceConfigCmds.at(i));
+	if(m_name.contains("MAX") || !m_swiot) {
+		co_return;
+	}
+	for(int i = 0; i < SWIOT_NB_CHANNELS; ++i) {
+		QString deviceAttrName = "ch" + QString::number(i) + "_device";
+		component::Attribute *deviceAttr =
+			m_swiot->findChild<component::Attribute *>(deviceAttrName, Qt::FindDirectChildrenOnly);
+		if(!deviceAttr || !deviceAttr->readCapability()) {
+			continue;
 		}
+		auto rd = co_await deviceAttr->readCapability()->readAsync();
+		if(!rd || deviceAttr->cachedValue() != "ad74413r") {
+			continue;
+		}
+		QString functionAttrName = "ch" + QString::number(i) + "_function";
+		component::Attribute *functionAttr =
+			m_swiot->findChild<component::Attribute *>(functionAttrName, Qt::FindDirectChildrenOnly);
+		if(!functionAttr || !functionAttr->readCapability()) {
+			continue;
+		}
+		auto rf = co_await functionAttr->readCapability()->readAsync();
+		if(!rf) {
+			continue;
+		}
+		Q_EMIT specialFaultsUpdated(i, functionAttr->cachedValue());
 	}
 }
 

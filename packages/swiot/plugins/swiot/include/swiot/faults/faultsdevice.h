@@ -28,10 +28,19 @@
 #include <QWidget>
 #include <gui/widgets/menucollapsesection.h>
 
-#include <iio.h>
-#include <iioutil/commandqueue.h>
+#include <component/controller.h>
+#include <qcoro/qcorotask.h>
 
-namespace scopy::swiot {
+namespace scopy {
+namespace component {
+class Device;
+class Attribute;
+namespace iio {
+class IIORegisterReader;
+}
+} // namespace component
+
+namespace swiot {
 class FaultsGroup;
 class SWIOT_API;
 
@@ -46,7 +55,6 @@ public:
 	~FaultsDevice();
 
 	void update();
-
 	void readRegister();
 public Q_SLOTS:
 	void resetStored();
@@ -62,12 +70,11 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void updateMinimumHeight();
-	void deviceConfigCmdFinished(scopy::Command *cmd);
-	void functionConfigCmdFinished(scopy::Command *cmd);
 
 private:
 	void establishConnection(QString name);
-	void initSpecialFaults();
+	QCoro::Task<void> initSpecialFaults();
+	QCoro::Task<void> readRegisters();
 	void initTutorialProperties();
 	void connectSignalsAndSlots();
 	QWidget *createTopWidget(QWidget *parent);
@@ -80,24 +87,25 @@ private:
 	MenuCollapseSection *m_explanationSection;
 
 	QString m_uri;
-	CommandQueue *m_cmdQueue;
+	component::ContextHandle m_context;
 
 	FaultsGroup *m_faultsGroup;
 	QVector<QWidget *> m_faultExplanationWidgets;
 
 	QString m_name;
 
-	struct iio_device *m_device;
-	struct iio_device *m_swiot;
-	struct iio_context *m_context;
+	component::Device *m_device;
+	component::Device *m_swiot;
+	component::iio::IIORegisterReader *m_registerReader;
 
 	uint32_t m_faultNumeric = 0;
 	QVector<uint32_t> m_registers;
 	QMap<int, uint32_t> m_registerValues;
-	QVector<Command *> m_deviceConfigCmds;
-	QVector<Command *> m_functionConfigCmds;
+
+	QCoro::Task<void> m_readRegTask;
 };
 
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // FAULTSDEVICE_H

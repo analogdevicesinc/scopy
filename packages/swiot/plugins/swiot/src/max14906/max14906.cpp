@@ -22,7 +22,9 @@
 #include "max14906/max14906.h"
 
 #include "swiot_logging_categories.h"
-#include <iioutil/connectionprovider.h>
+
+#include <component/device.h>
+#include <component/channel.h>
 
 #include <QDesktopServices>
 #include <QHBoxLayout>
@@ -87,12 +89,13 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	m_tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
 	m_tool->addWidgetToTopContainerHelper(m_gearBtn, TTA_RIGHT);
 
-	m_conn = ConnectionProvider::open(m_uri);
-	connect(m_conn, &Connection::aboutToBeDestroyed, this, &Max14906::handleConnectionDestroyed);
-	m_ctx = m_conn->context();
-	m_cmdQueue = m_conn->commandQueue();
-	m_max14906ToolController = new DioController(m_ctx);
-	m_readerThread = new ReaderThread(false, m_cmdQueue);
+	m_context = component::Controller::context(m_uri);
+	component::Device *maxDevice = nullptr;
+	if(m_context) {
+		maxDevice = m_context->findChild<component::Device *>(MAX_NAME);
+	}
+	m_max14906ToolController = new DioController(maxDevice);
+	m_swiotReader = new SwiotReader(false, this);
 
 	m_nbDioChannels = m_max14906ToolController->getChannelCount();
 
@@ -100,7 +103,7 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	connectSignalsAndSlots();
 
 	m_qTimer->setInterval(MAX14906_POLLING_TIME); // poll once every second
-	m_qTimer->setSingleShot(true);
+	m_qTimer->setSingleShot(false);
 
 	initChannels();
 	initMonitorToolView();
@@ -108,29 +111,22 @@ Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 Max14906::~Max14906()
 {
-	if(m_conn) {
+	if(m_context) {
 		if(m_runBtn->isChecked()) {
 			m_runBtn->setChecked(false);
 		}
-		if(m_readerThread->isRunning()) {
-			m_readerThread->forcedStop();
-			m_readerThread->wait();
-		}
-		delete m_readerThread;
-
-		ConnectionProvider::close(m_uri);
+		delete m_swiotReader;
+		m_context = {};
 	}
 }
 
 void Max14906::connectSignalsAndSlots()
 {
-	connect(m_conn, &Connection::aboutToBeDestroyed, m_readerThread, &ReaderThread::handleConnectionDestroyed);
 	connect(m_runBtn, &QPushButton::toggled, this, &Max14906::runButtonToggled);
 	connect(m_configBtn, &QPushButton::clicked, this, &Max14906::onConfigBtnPressed);
 
 	connect(m_max14906SettingsTab, &DioSettingsTab::timeValueChanged, this, &Max14906::timerChanged);
-	connect(m_qTimer, &QTimer::timeout, this, [&]() { m_readerThread->start(); });
-	connect(m_readerThread, &ReaderThread::started, this, [&]() { m_qTimer->start(1000); });
+	connect(m_qTimer, &QTimer::timeout, this, [&]() { m_swiotReader->readDio(); });
 
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QPushButton::setChecked);
 }
@@ -143,14 +139,6 @@ void Max14906::onConfigBtnPressed()
 	}
 
 	Q_EMIT configBtnPressed();
-}
-
-void Max14906::handleConnectionDestroyed()
-{
-	qDebug(CAT_SWIOT_MAX14906) << "Max14906 connection destroyed slot";
-	m_ctx = nullptr;
-	m_cmdQueue = nullptr;
-	m_conn = nullptr;
 }
 
 void Max14906::startTutorial()
@@ -171,21 +159,18 @@ void Max14906::runButtonToggled()
 		for(auto &channel : m_channelControls) {
 			channel->getDigitalChannel()->resetPlot();
 		}
-		qDebug(CAT_SWIOT_MAX14906) << "Reader thread started";
-		m_readerThread->start();
+		qDebug(CAT_SWIOT_MAX14906) << "DIO polling started";
+		m_swiotReader->readDio();
+		m_qTimer->start();
 		if(!m_tme->running()) {
 			m_tme->setRunning(true);
 		}
 	} else {
-		if(m_readerThread->isRunning()) {
-			qDebug(CAT_SWIOT_MAX14906) << "Reader thread stopped";
-			m_readerThread->forcedStop();
-			m_readerThread->wait();
-		}
+		qDebug(CAT_SWIOT_MAX14906) << "DIO polling stopped";
+		m_qTimer->stop();
 		if(m_tme->running()) {
 			m_tme->setRunning(false);
 		}
-		m_qTimer->stop();
 	}
 }
 
@@ -262,14 +247,14 @@ QFrame *Max14906::createVLine(QWidget *parent)
 void Max14906::initChannels()
 {
 	for(int i = 0; i < m_nbDioChannels; ++i) {
-		struct iio_channel *channel = iio_device_get_channel(m_max14906ToolController->getDevice(), i);
+		component::Channel *channel = m_max14906ToolController->getChannel(i);
 		DioDigitalChannelController *channel_control =
 			new DioDigitalChannelController(channel, m_max14906ToolController->getChannelName(i),
-							m_max14906ToolController->getChannelType(i), m_cmdQueue, this);
+							m_max14906ToolController->getChannelType(i), this);
 
 		m_channelControls.insert(i, channel_control);
-		m_readerThread->addDioChannel(i, channel);
-		connect(m_readerThread, &ReaderThread::channelDataChanged, channel_control,
+		m_swiotReader->addDioChannel(i, channel);
+		connect(m_swiotReader, &SwiotReader::channelDataChanged, channel_control,
 			[this, i](int index, double value) {
 				if(i == index) {
 					m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);

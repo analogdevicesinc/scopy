@@ -27,14 +27,17 @@
 #include <QObject>
 #include <QWidget>
 
-#include <iio.h>
+namespace scopy {
+namespace component {
+class Channel;
+}
 
-namespace scopy::swiot {
+namespace swiot {
 class BufferMenuView : public QWidget
 {
 	Q_OBJECT
 public:
-	BufferMenuView(QMap<QString, iio_channel *> chnls, Connection *conn, IIOWidgetGroup *widgetGroup = nullptr,
+	BufferMenuView(QMap<QString, component::Channel *> chnls, IIOWidgetGroup *widgetGroup = nullptr,
 		       QWidget *parent = nullptr);
 	~BufferMenuView();
 
@@ -66,9 +69,9 @@ private:
 
 	BufferMenu *m_swiotAdvMenu;
 	IIOWidgetGroup *m_widgetGroup;
-	Connection *m_connection;
-	QMap<QString, iio_channel *> m_chnls;
+	QMap<QString, component::Channel *> m_chnls;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SWIOTGENERICMENU_H

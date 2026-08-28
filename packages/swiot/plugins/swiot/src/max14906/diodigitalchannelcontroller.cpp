@@ -22,51 +22,27 @@
 
 #include "swiot_logging_categories.h"
 
-#include <iioutil/iiocommand/iiochannelattributeread.h>
-#include <iioutil/iiocommand/iiochannelattributewrite.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/attributewriter.h>
+
+#include <qcorotask.h>
 
 using namespace scopy::swiot;
 
-DioDigitalChannelController::DioDigitalChannelController(struct iio_channel *channel, const QString &deviceName,
-							 const QString &deviceType, CommandQueue *cmdQueue,
-							 QWidget *parent)
+DioDigitalChannelController::DioDigitalChannelController(component::Channel *channel, const QString &deviceName,
+							 const QString &deviceType, QWidget *parent)
 	: QWidget(parent)
 	, m_digitalChannel(new DioDigitalChannel(deviceName, deviceType, this))
 	, m_channelName(deviceName)
 	, m_channelType(deviceType)
-	, m_cmdQueue(cmdQueue)
 	, m_channel(channel)
+	, m_typeAttr(nullptr)
+	, m_rawAttr(nullptr)
+	, m_currentLimitAttr(nullptr)
 {
-	m_iioAttrAvailableTypes = (m_channelType == "INPUT") ? "IEC_type_available" : "do_mode_available";
-	m_iioAttrType = (m_channelType == "INPUT") ? "IEC_type" : "do_mode";
-
-	Command *readAvailableTypeCmd =
-		new IioChannelAttributeRead(m_channel, m_iioAttrAvailableTypes.toStdString().c_str(), nullptr);
-	Command *readTypeCmd = new IioChannelAttributeRead(m_channel, m_iioAttrType.toStdString().c_str(), nullptr);
-
-	connect(readAvailableTypeCmd, &scopy::Command::finished, this,
-		&DioDigitalChannelController::readAvailableTypeCmdFinished, Qt::QueuedConnection);
-
-	connect(readTypeCmd, &scopy::Command::finished, this, &DioDigitalChannelController::readTypeCmdFinished,
-		Qt::QueuedConnection);
-
-	m_cmdQueue->enqueue(readAvailableTypeCmd);
-	m_cmdQueue->enqueue(readTypeCmd);
-
-	if(m_channelType == "OUTPUT") {
-		Command *readRawCmd = new IioChannelAttributeRead(m_channel, "raw", nullptr);
-		Command *readCurrentLimitAvailableCmd =
-			new IioChannelAttributeRead(m_channel, "current_limit_available", nullptr);
-
-		connect(readRawCmd, &scopy::Command::finished, this, &DioDigitalChannelController::readRawCmdFinished,
-			Qt::QueuedConnection);
-
-		connect(readCurrentLimitAvailableCmd, &scopy::Command::finished, this,
-			&DioDigitalChannelController::readCurrentLimitAvailableCmdFinished, Qt::QueuedConnection);
-
-		m_cmdQueue->enqueue(readRawCmd);
-		m_cmdQueue->enqueue(readCurrentLimitAvailableCmd);
-	}
+	initChannelAttributes();
 
 	connect(m_digitalChannel->m_configModesCombo->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged),
 		this, [=, this](int index) { createWriteTypeCommand(index); });
@@ -82,163 +58,84 @@ DioDigitalChannelController::~DioDigitalChannelController() {}
 
 DioDigitalChannel *DioDigitalChannelController::getDigitalChannel() const { return m_digitalChannel; }
 
+void DioDigitalChannelController::initChannelAttributes()
+{
+	if(!m_channel) {
+		return;
+	}
+
+	QString typeAttrName = (m_channelType == "INPUT") ? "IEC_type" : "do_mode";
+	m_typeAttr = m_channel->findChild<component::Attribute *>(typeAttrName, Qt::FindDirectChildrenOnly);
+
+	if(m_typeAttr) {
+		m_availableTypes = m_typeAttr->options();
+		m_digitalChannel->setConfigModes(m_availableTypes);
+		if(m_typeAttr->readCapability()) {
+			QCoro::waitFor(m_typeAttr->readCapability()->readAsync());
+			m_type = m_typeAttr->cachedValue();
+			m_digitalChannel->setSelectedConfigMode(m_type);
+		}
+	} else {
+		qCritical(CAT_SWIOT_MAX14906) << "Could not find the type attribute for channel" << m_channelName;
+	}
+
+	if(m_channelType == "OUTPUT") {
+		m_currentLimitAttr =
+			m_channel->findChild<component::Attribute *>("current_limit", Qt::FindDirectChildrenOnly);
+		if(m_currentLimitAttr) {
+			const QStringList limitAvailable = m_currentLimitAttr->options();
+			for(const auto &item : limitAvailable) {
+				m_digitalChannel->m_currentLimitsCombo->combo()->addItem(item);
+			}
+			if(m_currentLimitAttr->readCapability()) {
+				QCoro::waitFor(m_currentLimitAttr->readCapability()->readAsync());
+				QString limit = m_currentLimitAttr->cachedValue();
+				int idx = m_digitalChannel->m_currentLimitsCombo->combo()->findText(limit);
+				if(idx < 0) {
+					qCritical(CAT_SWIOT_MAX14906) << "Could not find the " << limit
+								      << " in current limit available values!";
+				}
+				m_digitalChannel->m_currentLimitsCombo->combo()->setCurrentIndex(idx);
+			}
+		}
+
+		m_rawAttr = m_channel->findChild<component::Attribute *>("raw", Qt::FindDirectChildrenOnly);
+		if(m_rawAttr && m_rawAttr->readCapability()) {
+			QCoro::waitFor(m_rawAttr->readCapability()->readAsync());
+			bool ok = false;
+			bool rawValue = m_rawAttr->cachedValue().toInt(&ok);
+			if(ok) {
+				m_digitalChannel->m_valueSwitch->setChecked(rawValue);
+			}
+		}
+	}
+}
+
 void DioDigitalChannelController::createWriteRawCommand(bool value)
 {
-	Command *writeRawCmd =
-		new IioChannelAttributeWrite(m_channel, "raw", QString::number(value).toStdString().c_str(), nullptr);
-	connect(
-		writeRawCmd, &scopy::Command::finished, this,
-		[=, this](scopy::Command *cmd) {
-			IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
-			if(!tcmd) {
-				return;
-			}
-			if(tcmd->getReturnCode() < 0) {
-				qCritical(CAT_SWIOT_MAX14906)
-					<< "Could not write value " << value << " to channel " << m_channelName
-					<< " error code" << tcmd->getReturnCode();
-			}
-		},
-		Qt::QueuedConnection);
-	m_cmdQueue->enqueue(writeRawCmd);
+	if(!m_rawAttr || !m_rawAttr->writeCapability()) {
+		return;
+	}
+	m_rawAttr->writeCapability()->writeAsync(QString::number(value));
 }
 
 void DioDigitalChannelController::createWriteCurrentLimitCommand(int index)
 {
+	if(!m_currentLimitAttr || !m_currentLimitAttr->writeCapability()) {
+		return;
+	}
 	QString text = m_digitalChannel->m_currentLimitsCombo->combo()->currentText();
-	Command *writeCurrentLimitCmd =
-		new IioChannelAttributeWrite(m_channel, "current_limit", text.toStdString().c_str(), nullptr);
-	connect(writeCurrentLimitCmd, &scopy::Command::finished, this,
-		&DioDigitalChannelController::writeCurrentLimitCmdFinished, Qt::QueuedConnection);
-	m_cmdQueue->enqueue(writeCurrentLimitCmd);
+	m_currentLimitAttr->writeCapability()->writeAsync(text);
 }
 
 void DioDigitalChannelController::createWriteTypeCommand(int index)
 {
+	if(!m_typeAttr || !m_typeAttr->writeCapability()) {
+		return;
+	}
 	QString text = m_digitalChannel->m_configModesCombo->combo()->currentText();
 	m_type = text;
-	Command *writeTypeCmd = new IioChannelAttributeWrite(m_channel, m_iioAttrType.toStdString().c_str(),
-							     text.toStdString().c_str(), nullptr);
-	connect(writeTypeCmd, &scopy::Command::finished, this, &DioDigitalChannelController::writeTypeCmdFinished,
-		Qt::QueuedConnection);
-	m_cmdQueue->enqueue(writeTypeCmd);
-}
-
-void DioDigitalChannelController::readAvailableTypeCmdFinished(Command *cmd)
-{
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		QString result(tcmd->getResult());
-		m_availableTypes = result.trimmed().split(" ");
-		m_digitalChannel->setConfigModes(m_availableTypes);
-	} else {
-		qCritical(CAT_SWIOT_MAX14906)
-			<< "Could not read the available types, error code: " << tcmd->getReturnCode();
-	}
-}
-
-void DioDigitalChannelController::readTypeCmdFinished(Command *cmd)
-{
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		m_type = result;
-		m_digitalChannel->setSelectedConfigMode(m_type);
-	} else {
-		qCritical(CAT_SWIOT_MAX14906) << "Could not read the type, error code: " << tcmd->getReturnCode();
-	}
-}
-
-void DioDigitalChannelController::readRawCmdFinished(Command *cmd)
-{
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		bool ok = false;
-		bool rawValue = QString(result).toInt(&ok);
-		if(ok) {
-			m_digitalChannel->m_valueSwitch->setChecked(rawValue);
-		}
-	} else {
-		qCritical(CAT_SWIOT_MAX14906)
-			<< "Could not read initial channel raw value, error code: " << tcmd->getReturnCode();
-	}
-}
-
-void DioDigitalChannelController::readCurrentLimitCmdFinished(Command *cmd)
-{
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		int idx = m_digitalChannel->m_currentLimitsCombo->combo()->findText(result);
-		if(idx < 0) {
-			qCritical(CAT_SWIOT_MAX14906)
-				<< "Could not find the " << result << " in current limit available values!";
-		}
-		m_digitalChannel->m_currentLimitsCombo->combo()->setCurrentIndex(idx);
-	} else {
-		qCritical(CAT_SWIOT_MAX14906) << "Could not read current_limit, error code: " << tcmd->getReturnCode();
-	}
-}
-
-void DioDigitalChannelController::readCurrentLimitAvailableCmdFinished(Command *cmd)
-{
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		QStringList limitAvailable = QString(result).trimmed().split(" ");
-		for(const auto &item : limitAvailable) {
-			m_digitalChannel->m_currentLimitsCombo->combo()->addItem(item);
-		}
-
-		IioChannelAttributeRead *readCurrentLimitCmd =
-			new IioChannelAttributeRead(m_channel, "current_limit", nullptr);
-		connect(readCurrentLimitCmd, &scopy::Command::finished, this,
-			&DioDigitalChannelController::readCurrentLimitCmdFinished, Qt::QueuedConnection);
-		m_cmdQueue->enqueue(readCurrentLimitCmd);
-	} else {
-		qCritical(CAT_SWIOT_MAX14906)
-			<< "Could not read current_limit_available, error code: " << tcmd->getReturnCode();
-	}
-}
-
-void DioDigitalChannelController::writeCurrentLimitCmdFinished(Command *cmd)
-{
-	IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() < 0) {
-		qCritical(CAT_SWIOT_MAX14906) << "Could not write current limit value to channel " << m_channelName
-					      << " error code " << tcmd->getReturnCode();
-	}
-}
-
-void DioDigitalChannelController::writeTypeCmdFinished(Command *cmd)
-{
-	IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() < 0) {
-		qCritical(CAT_SWIOT_MAX14906) << "Could not write attr to channel " << m_channelName << " error code "
-					      << tcmd->getReturnCode();
-	}
+	m_typeAttr->writeCapability()->writeAsync(text);
 }
 
 #include "moc_diodigitalchannelcontroller.cpp"

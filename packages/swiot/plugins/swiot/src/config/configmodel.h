@@ -24,33 +24,33 @@
 #include <QObject>
 
 #include <QMap>
-#include <iioutil/commandqueue.h>
+#include <qcoro/qcorotask.h>
 
-extern "C"
-{
-	struct iio_channel;
-	struct iio_device;
-}
+namespace scopy {
+namespace component {
+class Device;
+class Attribute;
+} // namespace component
 
-namespace scopy::swiot {
+namespace swiot {
 class ConfigModel : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ConfigModel(struct iio_device *device, int channelId, CommandQueue *m_commandQueue);
+	explicit ConfigModel(component::Device *device, int channelId);
 	~ConfigModel();
 
-	void readEnabled();
-	void writeEnabled(const QString &enabled);
+	QCoro::Task<void> readEnabled();
+	QCoro::Task<void> writeEnabled(const QString &enabled);
 
-	void readDevice();
-	void writeDevice(const QString &device);
+	QCoro::Task<void> readDevice();
+	QCoro::Task<void> writeDevice(const QString &device);
 
-	void readFunction();
-	void writeFunction(const QString &function);
+	QCoro::Task<void> readFunction();
+	QCoro::Task<void> writeFunction(const QString &function);
 
-	void readDeviceAvailable();
-	void readFunctionAvailable();
+	QCoro::Task<void> readDeviceAvailable();
+	QCoro::Task<void> readFunctionAvailable();
 Q_SIGNALS:
 	void readConfigChannelEnabled(bool);
 	void readConfigChannelDevice(QString);
@@ -63,7 +63,9 @@ Q_SIGNALS:
 	void configChannelFunction();
 
 private:
-	struct iio_device *m_device;
+	component::Attribute *getAttr(const QString &name);
+
+	component::Device *m_device;
 	int m_channelId;
 
 	QString m_enableAttribute;
@@ -75,7 +77,7 @@ private:
 	QString m_enabled;
 	QStringList m_availableDevices;
 	QStringList m_availableFunctions;
-	CommandQueue *m_commandQueue;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 #endif // CONFIGMODEL_H
