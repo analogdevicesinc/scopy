@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Analog Devices Inc.
+ * Copyright (c) 2023 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -16,49 +16,55 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
  */
 
-#include "swiotidentifytask.h"
+#include "externalpsreader.h"
 
 #include "swiot_logging_categories.h"
 
 #include <component/device.h>
 #include <component/attribute.h>
-#include <component/attributewriter.h>
+#include <component/attributereader.h>
 
 #include <qcorotask.h>
 
 using namespace scopy::swiot;
 
-SwiotIdentifyTask::SwiotIdentifyTask(QString uri, QObject *parent)
+ExternalPsReader::ExternalPsReader(QString uri, QString attr, QObject *parent)
 	: QObject(parent)
 	, m_uri(uri)
+	, m_attribute(attr)
 	, m_swiot(nullptr)
 {
 	m_context = component::Controller::context(m_uri);
 	m_swiot = m_context ? m_context->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly) : nullptr;
 	if(!m_swiot) {
-		qDebug(CAT_SWIOT) << "Error, no context available for the identify task.";
+		qDebug(CAT_SWIOT) << "Error, no context available for the external ps task.";
 	}
 }
 
-SwiotIdentifyTask::~SwiotIdentifyTask() { m_context = {}; }
+ExternalPsReader::~ExternalPsReader() { m_context = {}; }
 
-QCoro::Task<void> SwiotIdentifyTask::identify()
+QCoro::Task<void> ExternalPsReader::readPowerSupply()
 {
 	if(!m_swiot) {
 		co_return;
 	}
-	component::Attribute *attr = m_swiot->findChild<component::Attribute *>("identify", Qt::FindDirectChildrenOnly);
-	if(!attr || !attr->writeCapability()) {
-		qCritical(CAT_SWIOT) << "Error, could not identify swiot.";
+	component::Attribute *attr =
+		m_swiot->findChild<component::Attribute *>(m_attribute, Qt::FindDirectChildrenOnly);
+	if(!attr || !attr->readCapability()) {
 		co_return;
 	}
-	auto r = co_await attr->writeCapability()->writeAsync("1");
+	auto r = co_await attr->readCapability()->readAsync();
 	if(!r) {
-		qCritical(CAT_SWIOT) << "Error, could not identify swiot.";
+		qCritical(CAT_SWIOT) << "Error, could not read" << m_attribute << "attribute from swiot device";
+		co_return;
+	}
+	bool ok = false;
+	bool extPsuValue = attr->cachedValue().toInt(&ok);
+	if(ok) {
+		Q_EMIT hasConnectedPowerSupply(extPsuValue);
 	}
 }
 
-#include "moc_swiotidentifytask.cpp"
+#include "moc_externalpsreader.cpp"

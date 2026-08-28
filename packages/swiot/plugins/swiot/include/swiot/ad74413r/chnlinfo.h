@@ -22,13 +22,10 @@
 #ifndef CHNLINFO_H
 #define CHNLINFO_H
 
-#include <iio.h>
-
 #include <QMap>
 #include <qobject.h>
 
-#include <iioutil/command.h>
-#include <iioutil/commandqueue.h>
+#include <component/channel.h>
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x)&0x00FF0000) >> 8) | (((x)&0x0000FF00) << 8) | ((x) << 24))
 namespace scopy::swiot {
@@ -36,15 +33,20 @@ class ChnlInfo : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQueue *cmdQueue);
+	explicit ChnlInfo(QString plotUm, QString hwUm, component::Channel *chnl);
 	~ChnlInfo();
 
 	virtual double convertData(unsigned int data) = 0;
-	iio_channel *iioChnl() const;
+	component::Channel *chnl() const;
 
 	bool isOutput() const;
 
 	bool isScanElement() const;
+	long scanIndex() const;
+	// A channel is a scan element when the device's input stream exposes a scan
+	// element for it; the owning BufferLogic resolves this and passes the index
+	// (>= 0). Not called => not a scan element.
+	void setScanIndex(long index);
 
 	QString chnlId() const;
 
@@ -57,27 +59,26 @@ public:
 
 	QString unitOfMeasure() const;
 
-	void addReadScaleCommand();
-	void addReadOffsetCommand();
-private Q_SLOTS:
-	void readScaleCommandFinished(scopy::Command *cmd);
-	void readOffsetCommandFinished(scopy::Command *cmd);
+	// Synchronously (re)read the "scale" and "offset" channel attributes into
+	// m_offsetScalePair. Called at construction and before each capture, since
+	// the device range/function can change between captures.
+	void readScaleOffset();
 
 protected:
 	bool m_isOutput;
 	bool m_isEnabled;
 	bool m_isScanElement;
+	long m_scanIndex;
 	QString m_chnlId;
 	QString m_plotUm;
 	QString m_hwUm;
 	std::pair<int, int> m_rangeValues = {-5, 5};
 	std::pair<double, double> m_offsetScalePair;
 	QMap<QString, double> m_unitOfMeasureFactor;
-	CommandQueue *m_commandQueue;
 
 private:
 	void initUnitOfMeasureFactor();
-	struct iio_channel *m_iioChnl;
+	component::Channel *m_chnl;
 };
 } // namespace scopy::swiot
 
