@@ -65,8 +65,11 @@ bool FaultWidget::isStored() const { return m_stored; }
 
 void FaultWidget::setStored(bool stored)
 {
+	if(stored == m_stored) {
+		return;
+	}
 	FaultWidget::m_stored = stored;
-	Style::setStyle(m_storedLabel, style::properties::swiot::activeStoredLabel, stored ? "high" : "low", true);
+	Style::setStyle(m_storedLabel, style::properties::swiot::activeStoredLabel, stored ? "high" : "low");
 	m_storedLabel->setStyle(m_storedLabel->style());
 }
 
@@ -74,8 +77,11 @@ bool FaultWidget::isActive() const { return m_active; }
 
 void FaultWidget::setActive(bool active)
 {
+	if(active == m_active) {
+		return;
+	}
 	FaultWidget::m_active = active;
-	Style::setStyle(m_activeLabel, style::properties::swiot::activeStoredLabel, active ? "high" : "low", true);
+	Style::setStyle(m_activeLabel, style::properties::swiot::activeStoredLabel, active ? "high" : "low");
 	m_activeLabel->setStyle(m_activeLabel->style());
 }
 
