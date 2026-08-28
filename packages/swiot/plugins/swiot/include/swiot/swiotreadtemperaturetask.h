@@ -21,37 +21,37 @@
 #ifndef SCOPY_SWIOTREADTEMPERATURETASK_H
 #define SCOPY_SWIOTREADTEMPERATURETASK_H
 
-#include <iio.h>
+#include <QObject>
+#include <qcoro/qcorotask.h>
+#include <component/controller.h>
 
-#include <QThread>
-
-#include <iioutil/command.h>
-#include <iioutil/connection.h>
-
-namespace scopy::swiot {
-class SwiotReadTemperatureTask : public QThread
+namespace scopy {
+namespace component {
+class Channel;
+}
+namespace swiot {
+class SwiotReadTemperatureTask : public QObject
 {
 	Q_OBJECT
 public:
 	explicit SwiotReadTemperatureTask(QString uri, QObject *parent = nullptr);
 	~SwiotReadTemperatureTask();
-	void run() override;
+
+	QCoro::Task<void> readTemperature();
 
 Q_SIGNALS:
 	void newTemperature(double value);
 
-private Q_SLOTS:
-	void readRawCommandFinished(scopy::Command *cmd);
-	void readScaleCommandFinished(scopy::Command *cmd);
-	void readOffsetCommandFinished(scopy::Command *cmd);
-
 private:
+	QCoro::Task<void> initScaleOffset();
+
 	QString m_uri;
-	struct iio_channel *m_channel;
-	struct iio_device *m_device;
-	Connection *m_conn;
-	double m_raw, m_scale, m_offset;
+	component::ContextHandle m_context;
+	component::Channel *m_channel;
+	double m_scale, m_offset;
+	bool m_initialized;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SCOPY_SWIOTREADTEMPERATURETASK_H

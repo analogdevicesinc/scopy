@@ -22,64 +22,77 @@
 
 #include "swiot_logging_categories.h"
 
-#include <iioutil/connectionprovider.h>
-#include <iioutil/iiocommand/iiodeviceattributeread.h>
-#include <iioutil/iiocommand/iiodeviceattributewrite.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/attributewriter.h>
+
+#include <qcorotask.h>
 
 using namespace scopy;
 using namespace scopy::swiot;
 
 SwiotController::SwiotController(QString uri, QObject *parent)
 	: QObject(parent)
+	, m_swiotDevice(nullptr)
 	, uri(uri)
 	, m_isRuntimeCtx(false)
 	, m_temperatureReadEn(false)
 {
-	temperatureTask = nullptr;
+	m_temperatureTask = nullptr;
 	temperatureTimer = nullptr;
-	extPsTask = nullptr;
+	m_extPsTask = nullptr;
 	powerSupplyTimer = nullptr;
-	identifyTask = nullptr;
-	m_cmdQueue = nullptr;
+	m_identifyTask = nullptr;
 }
 
-SwiotController::~SwiotController() {}
+SwiotController::~SwiotController()
+{
+	if(m_identifyTask) {
+		delete m_identifyTask;
+		m_identifyTask = nullptr;
+	}
+	m_context = {};
+}
 
 void SwiotController::connectSwiot()
 {
-	m_conn = ConnectionProvider::open(uri);
-	m_iioCtx = m_conn->context();
-	m_cmdQueue = m_conn->commandQueue();
+	m_context = component::Controller::context(uri);
+	m_swiotDevice =
+		m_context ? m_context->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly) : nullptr;
 }
 
 void SwiotController::disconnectSwiot()
 {
-	if(!m_conn || !m_iioCtx || !m_cmdQueue) {
-		return;
-	}
-	ConnectionProvider::close(uri);
-	m_conn = nullptr;
-	m_iioCtx = nullptr;
-	m_cmdQueue = nullptr;
+	m_swiotDevice = nullptr;
+	m_context = {};
 }
 
 void SwiotController::startPowerSupplyTask(QString attribute)
 {
-	extPsTask = new ExternalPsReaderThread(uri, attribute, this);
-	powerSupplyTimer = new CyclicalTask(extPsTask);
-	connect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this,
+	m_extPsTask = new ExternalPsReader(uri, attribute, this);
+	powerSupplyTimer = new QTimer(this);
+	powerSupplyTimer->setInterval(5000);
+	connect(m_extPsTask, &ExternalPsReader::hasConnectedPowerSupply, this,
 		&SwiotController::hasConnectedPowerSupply);
-	powerSupplyTimer->start(5000);
+	connect(powerSupplyTimer, &QTimer::timeout, this, [this]() { m_extPsTask->readPowerSupply(); });
+	m_extPsTask->readPowerSupply();
+	powerSupplyTimer->start();
 }
 
 void SwiotController::stopPowerSupplyTask()
 {
-	powerSupplyTimer->stop();
-	extPsTask->requestInterruption();
-	disconnect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this,
-		   &SwiotController::hasConnectedPowerSupply);
-	powerSupplyTimer->deleteLater();
-	extPsTask->deleteLater();
+	if(powerSupplyTimer) {
+		powerSupplyTimer->stop();
+		powerSupplyTimer->deleteLater();
+		powerSupplyTimer = nullptr;
+	}
+	if(m_extPsTask) {
+		disconnect(m_extPsTask, &ExternalPsReader::hasConnectedPowerSupply, this,
+			   &SwiotController::hasConnectedPowerSupply);
+		m_extPsTask->deleteLater();
+		m_extPsTask = nullptr;
+	}
 }
 
 void SwiotController::startTemperatureTask()
@@ -87,10 +100,13 @@ void SwiotController::startTemperatureTask()
 	if(!m_isRuntimeCtx || m_temperatureReadEn) {
 		return;
 	}
-	temperatureTask = new SwiotReadTemperatureTask(uri, this);
-	temperatureTimer = new CyclicalTask(temperatureTask);
-	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
-	temperatureTimer->start(2000);
+	m_temperatureTask = new SwiotReadTemperatureTask(uri, this);
+	temperatureTimer = new QTimer(this);
+	temperatureTimer->setInterval(2000);
+	connect(m_temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+	connect(temperatureTimer, &QTimer::timeout, this, [this]() { m_temperatureTask->readTemperature(); });
+	m_temperatureTask->readTemperature();
+	temperatureTimer->start();
 	m_temperatureReadEn = true;
 }
 
@@ -99,90 +115,69 @@ void SwiotController::stopTemperatureTask()
 	if(!m_isRuntimeCtx || !m_temperatureReadEn) {
 		return;
 	}
-	temperatureTask->requestInterruption();
-	temperatureTimer->stop();
-	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
-	temperatureTimer->deleteLater();
-	temperatureTask->deleteLater();
+	if(temperatureTimer) {
+		temperatureTimer->stop();
+		temperatureTimer->deleteLater();
+		temperatureTimer = nullptr;
+	}
+	if(m_temperatureTask) {
+		disconnect(m_temperatureTask, &SwiotReadTemperatureTask::newTemperature, this,
+			   &SwiotController::readTemperature);
+		m_temperatureTask->deleteLater();
+		m_temperatureTask = nullptr;
+	}
 	m_temperatureReadEn = false;
 }
 
 void SwiotController::identify()
 {
-	if(!identifyTask) {
-		identifyTask = new SwiotIdentifyTask(uri);
-		identifyTask->start();
-		connect(identifyTask, &QThread::finished, this, [=, this]() {
-			delete identifyTask;
-			identifyTask = nullptr;
-		});
+	if(!m_identifyTask) {
+		m_identifyTask = new SwiotIdentifyTask(uri, this);
 	}
+	m_identifyTask->identify();
 }
 
-void SwiotController::writeModeAttribute(QString mode)
+QCoro::Task<void> SwiotController::writeModeAttribute(QString mode)
 {
-	if(!m_iioCtx || !m_cmdQueue) {
-		return;
-	}
-	struct iio_device *swiot = iio_context_find_device(m_iioCtx, "swiot");
-	if(swiot) {
-		Command *writeModeCommand =
-			new IioDeviceAttributeWrite(swiot, "mode", mode.toStdString().c_str(), nullptr);
-		connect(writeModeCommand, &scopy::Command::finished, this, &SwiotController::writeModeCommandFinished,
-			Qt::QueuedConnection);
-		m_cmdQueue->enqueue(writeModeCommand);
-	} else {
-		qDebug(CAT_SWIOT) << "Can't find swiot iio_device";
+	if(!m_swiotDevice) {
+		qDebug(CAT_SWIOT) << "Can't find swiot device";
 		Q_EMIT writeModeFailed();
+		co_return;
 	}
-}
-
-void SwiotController::writeModeCommandFinished(scopy::Command *cmd)
-{
-	IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
-	if(!tcmd) {
-		return;
+	component::Attribute *attr =
+		m_swiotDevice->findChild<component::Attribute *>("mode", Qt::FindDirectChildrenOnly);
+	if(!attr || !attr->writeCapability()) {
+		qDebug(CAT_SWIOT) << "Can't find swiot mode attribute";
+		Q_EMIT writeModeFailed();
+		co_return;
 	}
-	if(tcmd->getReturnCode() >= 0) {
-		ConnectionProvider::closeAll(m_conn->uri());
-		QString attrVal = QString::fromStdString(tcmd->getAttributeValue());
-		Q_EMIT modeAttributeChanged(attrVal);
+	auto r = co_await attr->writeCapability()->writeAsync(mode);
+	if(r) {
 		qInfo(CAT_SWIOT) << R"(Successfully written swiot mode)";
+		Q_EMIT modeAttributeChanged(mode);
 	} else {
-		qDebug(CAT_SWIOT) << R"(Error, could not change swiot mode)" << tcmd->getReturnCode();
+		qDebug(CAT_SWIOT) << R"(Error, could not change swiot mode)";
 		Q_EMIT writeModeFailed();
 	}
 }
 
-void SwiotController::readModeAttribute()
+QCoro::Task<void> SwiotController::readModeAttribute()
 {
-	if(!m_iioCtx || !m_cmdQueue) {
-		return;
+	if(!m_swiotDevice) {
+		qDebug(CAT_SWIOT) << "Can't find swiot device";
+		co_return;
 	}
-	struct iio_device *swiot = iio_context_find_device(m_iioCtx, "swiot");
-	if(swiot) {
-		Command *readModeCommand = new IioDeviceAttributeRead(swiot, "mode", nullptr);
-		connect(readModeCommand, &scopy::Command::finished, this, &SwiotController::readModeCommandFinished,
-			Qt::QueuedConnection);
-		m_cmdQueue->enqueue(readModeCommand);
-	} else {
-		qDebug(CAT_SWIOT) << "Can't find swiot iio_device";
+	component::Attribute *attr =
+		m_swiotDevice->findChild<component::Attribute *>("mode", Qt::FindDirectChildrenOnly);
+	if(!attr || !attr->readCapability()) {
+		co_return;
 	}
-}
-
-void SwiotController::readModeCommandFinished(scopy::Command *cmd)
-{
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *mode = tcmd->getResult();
-		bool runtime = (strcmp(mode, "runtime") == 0);
+	auto r = co_await attr->readCapability()->readAsync();
+	if(r) {
+		bool runtime = (attr->cachedValue() == "runtime");
 		setIsRuntimeCtx(runtime);
 	} else {
-		qDebug(CAT_SWIOT) << R"(Critical error: could not read mode attribute, error code:)"
-				  << tcmd->getReturnCode();
+		qDebug(CAT_SWIOT) << R"(Critical error: could not read mode attribute)";
 	}
 }
 

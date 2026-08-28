@@ -28,18 +28,18 @@
 
 using namespace scopy::swiot;
 
-ChnlInfo *ChnlInfoBuilder::build(iio_channel *iioChnl, QString id, CommandQueue *cmdQueue)
+ChnlInfo *ChnlInfoBuilder::build(component::Channel *chnl, QString id)
 {
 	int chnl_type = decodeId(id);
 	switch(chnl_type) {
 	case VOLTAGE:
-		return new VoltageChnlInfo("V", "mV", iioChnl, cmdQueue);
+		return new VoltageChnlInfo("V", "mV", chnl);
 	case CURRENT:
-		return new CurrentChnlInfo("A", "mA", iioChnl, cmdQueue);
+		return new CurrentChnlInfo("A", "mA", chnl);
 	case RESISTANCE:
-		return new ResistanceChnlInfo("Ω", "Ω", iioChnl, cmdQueue);
+		return new ResistanceChnlInfo("Ω", "Ω", chnl);
 	case DIGITAL:
-		return new DigitalChnlInfo("unit", "unit", iioChnl, cmdQueue);
+		return new DigitalChnlInfo("unit", "unit", chnl);
 	default:
 		return nullptr;
 	}

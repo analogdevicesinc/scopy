@@ -23,32 +23,30 @@
 
 #include "chnlinfo.h"
 
-#include <iio.h>
-
 #include <QMap>
 #include <QObject>
 
-#include <cerrno>
-#include <iioutil/command.h>
-#include <iioutil/commandqueue.h>
+namespace scopy {
+namespace component {
+class Device;
+}
 
-Q_DECLARE_OPAQUE_POINTER(struct iio_buffer *)
+namespace swiot {
 
 #define MAX_BUFFER_SIZE 160
 #define MIN_BUFFER_SIZE 5
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 #define MAX_INPUT_CHNLS_NO 8
 
-namespace scopy::swiot {
 class BufferLogic : public QObject
 {
 	Q_OBJECT
 public:
-	explicit BufferLogic(QMap<QString, iio_device *> devicesMap, CommandQueue *commandQueue);
+	explicit BufferLogic(component::Device *adDevice, component::Device *swiotDevice, QObject *parent = nullptr);
 
 	~BufferLogic();
 
-	QMap<QString, iio_channel *> getIioChnl(int chnlIdx);
+	QMap<QString, component::Channel *> getChnl(int chnlIdx);
 
 	bool verifyChannelsEnabledChanges(QVector<bool> enabledChnls);
 	void applyChannelsEnabledChanges(QVector<bool> enabledChnls);
@@ -71,11 +69,6 @@ Q_SIGNALS:
 	void channelFunctionDetermined(unsigned int i, QString function);
 	void instantValueChanged(int channel, double value);
 
-private Q_SLOTS:
-	void enabledChnCmdFinished(unsigned int i, scopy::Command *cmd);
-	void configuredDevCmdFinished(unsigned int i, scopy::Command *cmd);
-	void chnFunctionCmdFinished(unsigned int i, scopy::Command *cmd);
-
 private:
 	void createChannels();
 	void initChannelFunction(unsigned int i);
@@ -83,13 +76,14 @@ private:
 
 private:
 	int m_plotChnlsNo;
-	QMap<QString, iio_device *> m_iioDevicesMap;
+	component::Device *m_adDevice;
+	component::Device *m_swiotDevice;
 	QMap<int, int> m_samplingFrequencies;
 	double m_samplingFrequency;
 
 	QMap<int, ChnlInfo *> m_chnlsInfo;
-	CommandQueue *m_commandQueue;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // BUFFERLOGIC_H

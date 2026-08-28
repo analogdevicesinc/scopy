@@ -23,7 +23,6 @@
 #include "swiot_logging_categories.h"
 
 #include <QDesktopServices>
-#include <QThread>
 #include <QTimer>
 #include <tutorialbuilder.h>
 #include <gui/stylehelper.h>
@@ -36,8 +35,7 @@ using namespace scopy::swiot;
 
 Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
-	, m_timer(new QTimer())
-	, m_thread(new QThread(this))
+	, m_timer(new QTimer(this))
 	, m_tme(tme)
 {
 	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
@@ -53,6 +51,8 @@ Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	m_tool->topContainer()->setVisible(true);
 
 	layout->addWidget(m_tool);
+
+	m_timer->setInterval(POLLING_INTERVAL);
 
 	InfoBtn *infoBtn = new InfoBtn(this, true);
 	m_tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
@@ -82,10 +82,8 @@ Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 Faults::~Faults()
 {
-	if(m_thread) {
-		m_thread->quit();
-		m_thread->wait();
-		delete m_thread;
+	if(m_timer) {
+		m_timer->stop();
 	}
 }
 
@@ -96,19 +94,12 @@ void Faults::connectSignalsAndSlots()
 	QObject::connect(m_configBtn, &QPushButton::clicked, this, &Faults::onBackBtnPressed);
 
 	QObject::connect(m_timer, &QTimer::timeout, this, &Faults::pollFaults);
-	QObject::connect(m_thread, &QThread::started, this, [&]() {
-		qDebug(CAT_SWIOT_FAULTS) << "Faults reader thread started";
-		m_timer->start(POLLING_INTERVAL);
-	});
-
 	QObject::connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QPushButton::setChecked);
 }
 
 void Faults::onBackBtnPressed()
 {
-
-	m_thread->quit();
-	m_thread->wait();
+	m_timer->stop();
 	Q_EMIT backBtnPressed();
 }
 
@@ -116,18 +107,15 @@ void Faults::runButtonClicked(bool toggled)
 {
 	m_singleBtn->setChecked(false);
 	if(toggled) {
-		m_thread->start();
+		m_timer->start();
 		if(!m_tme->running()) {
 			m_tme->setRunning(true);
 		}
 	} else {
-		if(m_thread->isRunning()) {
-			m_thread->quit();
-		}
+		m_timer->stop();
 		if(m_tme->running()) {
 			m_tme->setRunning(false);
 		}
-		m_timer->stop();
 	}
 }
 
