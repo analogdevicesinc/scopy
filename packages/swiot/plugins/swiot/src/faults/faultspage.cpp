@@ -22,7 +22,7 @@
 #include "swiot_logging_categories.h"
 #include <QScrollArea>
 #include <gui/stylehelper.h>
-#include <iioutil/connectionprovider.h>
+#include <component/device.h>
 
 using namespace scopy::swiot;
 
@@ -30,8 +30,7 @@ FaultsPage::FaultsPage(QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_uri(uri)
 {
-	Connection *conn = ConnectionProvider::open(m_uri);
-	m_context = conn->context();
+	m_context = component::Controller::context(m_uri);
 	setupDevices();
 
 	StyleHelper::BackgroundWidget(this);
@@ -64,7 +63,7 @@ FaultsPage::FaultsPage(QString uri, QWidget *parent)
 	layout->addWidget(scrollArea);
 }
 
-FaultsPage::~FaultsPage() { ConnectionProvider::close(m_uri); }
+FaultsPage::~FaultsPage() { m_context = {}; }
 
 void FaultsPage::update()
 {
@@ -78,9 +77,13 @@ void FaultsPage::update()
 
 void FaultsPage::setupDevices()
 {
-	struct iio_device *ad74413r = iio_context_find_device(m_context, "ad74413r");
-	struct iio_device *max14906 = iio_context_find_device(m_context, "max14906");
-	struct iio_device *swiot = iio_context_find_device(m_context, "swiot");
+	if(!m_context) {
+		qCritical(CAT_SWIOT_FAULTS) << "Error: no context available.";
+		return;
+	}
+	component::Device *ad74413r = m_context->findChild<component::Device *>("ad74413r");
+	component::Device *max14906 = m_context->findChild<component::Device *>("max14906");
+	component::Device *swiot = m_context->findChild<component::Device *>("swiot");
 
 	if(swiot) {
 		if(ad74413r) {

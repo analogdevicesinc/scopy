@@ -25,14 +25,14 @@
 #include "diocontroller.h"
 #include "diodigitalchannelcontroller.h"
 #include "diosettingstab.h"
-#include <readerthread.h>
+#include <swiotreader.h>
 #include <QWidget>
 #include <QPushButton>
+#include <QTimer>
 #include <gui/tooltemplate.h>
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/toolmenuentry.h>
-#include <iioutil/commandqueue.h>
-#include <iioutil/connection.h>
+#include <component/controller.h>
 
 #define MAX_NAME "max14906"
 #define MAX14906_POLLING_TIME 1000
@@ -53,9 +53,6 @@ public:
 Q_SIGNALS:
 	void configBtnPressed();
 
-public Q_SLOTS:
-	void handleConnectionDestroyed();
-
 private Q_SLOTS:
 	void runButtonToggled();
 	void timerChanged(double value);
@@ -75,10 +72,8 @@ private:
 
 	QTimer *m_qTimer;
 
-	CommandQueue *m_cmdQueue;
-	ReaderThread *m_readerThread;
-	Connection *m_conn;
-	struct iio_context *m_ctx;
+	SwiotReader *m_swiotReader;
+	component::ContextHandle m_context;
 	QString m_uri;
 	QMap<int, DioDigitalChannelController *> m_channelControls;
 

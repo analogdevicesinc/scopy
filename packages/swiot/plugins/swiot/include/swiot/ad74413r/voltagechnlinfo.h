@@ -30,8 +30,7 @@ class VoltageChnlInfo : public ChnlInfo
 {
 	Q_OBJECT
 public:
-	explicit VoltageChnlInfo(QString plotUm = "V", QString hwUm = "mV", iio_channel *iioChnl = nullptr,
-				 CommandQueue *cmdQueue = nullptr);
+	explicit VoltageChnlInfo(QString plotUm = "V", QString hwUm = "mV", component::Channel *chnl = nullptr);
 	~VoltageChnlInfo();
 
 	double convertData(unsigned int data) override;
