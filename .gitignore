@@ -88,3 +88,19 @@ compile_commands.json
 .venv/*
 artifacts/*
 build-*
+
+# Local planning notes (see CLAUDE.md's tasks/todo.md convention) - never part of a release.
+tasks/
+
+# Python bytecode. The MCP server package copies sources by name
+# (.github/workflows/mcp-server-package.yml) and hatch excludes __pycache__, so bytecode is
+# never shipped - and a cpython-3xx .pyc is useless on any other interpreter anyway.
+__pycache__/
+*.pyc
+
+# Local build artefacts and logs in the repo root only - root-anchored so nothing under ci/ is
+# hidden by these patterns.
+/*.AppImage
+/*.flatpak
+/*.log
+.worktrees/
