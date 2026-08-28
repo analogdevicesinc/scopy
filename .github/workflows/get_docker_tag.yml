@@ -2,6 +2,12 @@ name: Get Docker Tag
 
 on:
   workflow_call:
+    inputs:
+      override:
+        description: 'Explicit tag. Empty or "auto" resolves from the branch name.'
+        required: false
+        type: string
+        default: ''
     outputs:
       docker_tag:
         value: ${{ jobs.get_docker_tag.outputs.docker_tag }}
@@ -18,8 +24,31 @@ jobs:
     steps:
       - name: Get branch name
         id: set_docker_tag
+        env:
+          OVERRIDE: ${{ inputs.override }}
         run: |
-          # if a branch contains "scopy-testing" in its name, use "testing" tag, otherwise use "latest"
+          # Tag policy - the single source of truth for every job in ci.yml.
+          #
+          #   :slim    - the reduced dependency set. What main and every ordinary branch build
+          #              against TODAY. This is an interim state agreed deliberately: :slim will
+          #              later be retagged to :latest and the default here flipped, at which point
+          #              :slim retires. Until that happens :slim IS the production tag.
+          #   :testing - staging. Where a freshly built image lands to be validated, and what ci_*
+          #              branches build against, so work ON the images cannot break main.
+          #   :latest  - NOT IN USE YET. Present on only 1 of the 7 images (scopy-windows-qt6, and
+          #              there it holds pre-slim content), so selecting it fails at docker pull for
+          #              the other six. Deliberately not offered until the retag happens.
+          #
+          # A branch opts into :testing with the ci_ prefix CLAUDE.md documents - the prefix for work
+          # on the images and workflows themselves. Everything else, main and ordinary dev_/exp_
+          # feature branches included, gets whatever main gets.
+          #
+          # The resolver always runs, so a workflow_dispatch cannot bypass this policy - it passes
+          # its choice in as `override` instead. It previously defaulted to "latest" while skipping
+          # this job entirely, which selected a tag six of the seven images do not have.
+          #
+          # Deliberately NOT implemented: falling back to another tag when the chosen one is missing.
+          # That would silently build against different content and mask a failed promotion.
 
           echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
           echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
@@ -31,25 +60,23 @@ jobs:
             BRANCH_NAME="$GITHUB_REF_NAME"
           fi
 
-          case "$BRANCH_NAME" in
-            *deps_rework*)
-                # Dependency rework: this branch builds against the slim images. A platform's
-                # job in ci.yml stayed disabled until its own image carried a :slim tag, or it
-                # would fail at docker pull. All of them are now enabled: ubuntu{22,24,26},
-                # windows, arm64, armhf, flatpak (macOS uses no image).
-                # Remove this case once slim is promoted to :testing / :latest - note that until
-                # then, merging to main makes BRANCH_NAME "main", which falls through to the
-                # default case and selects :testing, i.e. the OLD pre-slim images.
-                TAG="slim"
-                ;;
-            *scopy-testing*|*scopy_qt6*|qt6_*)
-                TAG="testing"
-                ;;
-            *)
-                # TODO: revert to "latest" after the docker dependencies cleanup and docker regeneration
-                TAG="testing"
-                ;;
-           esac
+          echo "override: ${OVERRIDE:-(none)}"
 
-           echo "Selected tag: $TAG"
-           echo "docker_tag=$TAG" >> $GITHUB_OUTPUT
+          if [[ -n "$OVERRIDE" && "$OVERRIDE" != "auto" ]]; then
+            TAG="$OVERRIDE"
+            echo "Tag overridden by workflow_dispatch input"
+          else
+            case "$BRANCH_NAME" in
+              ci_*|*scopy-testing*|*scopy_qt6*|qt6_*)
+                  TAG="testing"
+                  ;;
+              *)
+                  # Step 2 of the agreed migration flips this to "latest" once :slim has been
+                  # retagged for all seven images. One line, and :slim retires.
+                  TAG="slim"
+                  ;;
+            esac
+          fi
+
+          echo "Selected tag: $TAG"
+          echo "docker_tag=$TAG" >> $GITHUB_OUTPUT
