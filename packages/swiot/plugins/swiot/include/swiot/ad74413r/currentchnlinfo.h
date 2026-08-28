@@ -30,8 +30,7 @@ class CurrentChnlInfo : public ChnlInfo
 {
 	Q_OBJECT
 public:
-	explicit CurrentChnlInfo(QString plotUm = "A", QString hwUm = "mA", iio_channel *iioChnl = nullptr,
-				 CommandQueue *cmdQueue = nullptr);
+	explicit CurrentChnlInfo(QString plotUm = "A", QString hwUm = "mA", component::Channel *chnl = nullptr);
 	~CurrentChnlInfo();
 
 	double convertData(unsigned int data) override;

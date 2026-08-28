@@ -23,12 +23,16 @@
 
 #include "faultsdevice.h"
 
-#include <iio.h>
+#include <component/controller.h>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QWidget>
 
-namespace scopy::swiot {
+namespace scopy {
+namespace component {
+class Device;
+}
+namespace swiot {
 class FaultsDevice;
 class SWIOT_API;
 
@@ -45,12 +49,13 @@ public:
 
 private:
 	QString m_uri;
-	struct iio_context *m_context;
+	component::ContextHandle m_context;
 
 	FaultsDevice *m_ad74413rFaultsDevice = nullptr;
 	FaultsDevice *m_max14906FaultsDevice = nullptr;
 
 	void setupDevices();
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 #endif // FAULTSPAGE_H

@@ -32,8 +32,7 @@ class ResistanceChnlInfo : public ChnlInfo
 {
 	Q_OBJECT
 public:
-	explicit ResistanceChnlInfo(QString plotUm = "Ω", QString hwUm = "Ω", iio_channel *iioChnl = nullptr,
-				    CommandQueue *cmdQueue = nullptr);
+	explicit ResistanceChnlInfo(QString plotUm = "Ω", QString hwUm = "Ω", component::Channel *chnl = nullptr);
 	~ResistanceChnlInfo();
 
 	double convertData(unsigned int data) override;

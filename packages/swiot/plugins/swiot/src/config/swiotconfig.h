@@ -29,12 +29,15 @@
 #include <QScrollArea>
 #include <gui/tooltemplate.h>
 
-#include <iio.h>
-#include <iioutil/commandqueue.h>
+#include <component/controller.h>
 
 #define NUMBER_OF_CHANNELS 4
 
-namespace scopy::swiot {
+namespace scopy {
+namespace component {
+class Device;
+}
+namespace swiot {
 
 class SWIOT_API;
 
@@ -57,14 +60,12 @@ Q_SIGNALS:
 
 private:
 	QString m_uri;
-	QMap<QString, struct iio_device *> m_iioDevices;
-	iio_context *m_context;
-	iio_device *m_swiotDevice;
+	component::ContextHandle m_context;
+	component::Device *m_swiotDevice;
 
 	QVector<ConfigController *> m_controllers;
 	QVector<QStringList *> m_funcAvailable;
 	QPushButton *m_applyBtn;
-	CommandQueue *m_commandQueue;
 
 	ToolTemplate *m_tool;
 	DrawArea *m_drawArea;
@@ -81,6 +82,7 @@ private:
 
 	void showEvent(QShowEvent *event) override;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SWIOTCONFIG_H

@@ -22,8 +22,12 @@
 
 #include "swiot_logging_categories.h"
 
-#include <iioutil/connectionprovider.h>
-#include <iioutil/iiocommand/iiochannelattributeread.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+
+#include <qcorotask.h>
 #include <utility>
 
 #define DEVICE_NAME "adt75"
@@ -32,127 +36,80 @@
 using namespace scopy::swiot;
 
 SwiotReadTemperatureTask::SwiotReadTemperatureTask(QString uri, QObject *parent)
-	: QThread(parent)
+	: QObject(parent)
 	, m_uri(std::move(uri))
 	, m_channel(nullptr)
-	, m_device(nullptr)
-	, m_conn(nullptr)
-	, m_raw(0.0)
 	, m_scale(0.0)
 	, m_offset(0.0)
+	, m_initialized(false)
 {
-	m_conn = ConnectionProvider::open(m_uri);
-	if(!m_conn) {
-		qDebug(CAT_SWIOT) << "Error, no context available for the temperature task.";
+	m_context = component::Controller::context(m_uri);
+	component::Device *device = m_context
+		? m_context->findChild<component::Device *>(DEVICE_NAME, Qt::FindDirectChildrenOnly)
+		: nullptr;
+	if(!device) {
+		qDebug(CAT_SWIOT) << "Error, could not find" << DEVICE_NAME << ". Temperature not available.";
 		return;
 	}
-	connect(m_conn, &Connection::aboutToBeDestroyed, this, [=, this]() { m_conn = nullptr; });
-
-	m_device = iio_context_find_device(m_conn->context(), DEVICE_NAME);
-	if(!m_device) {
-		qDebug(CAT_SWIOT) << "Error, could not find" << DEVICE_NAME
-				  << "from the given context. Temperature not available.";
-		return;
-	}
-
-	m_channel = iio_device_find_channel(m_device, CHANNEL_NAME, false);
+	m_channel = device->findChild<component::Channel *>(CHANNEL_NAME, Qt::FindDirectChildrenOnly);
 	if(!m_channel) {
-		qDebug(CAT_SWIOT) << "Error, could not find channel " << CHANNEL_NAME << "from device" << DEVICE_NAME
+		qDebug(CAT_SWIOT) << "Error, could not find channel" << CHANNEL_NAME << "from device" << DEVICE_NAME
 				  << ". Temperature not available.";
-		return;
-	}
-	Command *attrReadScale = new IioChannelAttributeRead(m_channel, "scale", nullptr, true);
-	Command *attrReadOffset = new IioChannelAttributeRead(m_channel, "offset", nullptr, true);
-
-	connect(attrReadScale, &scopy::Command::finished, this, &SwiotReadTemperatureTask::readScaleCommandFinished,
-		Qt::QueuedConnection);
-	connect(attrReadOffset, &scopy::Command::finished, this, &SwiotReadTemperatureTask::readOffsetCommandFinished,
-		Qt::QueuedConnection);
-	m_conn->commandQueue()->enqueue(attrReadScale);
-	m_conn->commandQueue()->enqueue(attrReadOffset);
-}
-
-SwiotReadTemperatureTask::~SwiotReadTemperatureTask()
-{
-	if(m_conn) {
-		m_conn = nullptr;
-		ConnectionProvider::close(m_uri);
 	}
 }
 
-void SwiotReadTemperatureTask::run()
+SwiotReadTemperatureTask::~SwiotReadTemperatureTask() { m_context = {}; }
+
+QCoro::Task<void> SwiotReadTemperatureTask::initScaleOffset()
 {
-	if(isInterruptionRequested()) {
-		return;
-	}
+	component::Attribute *scaleAttr =
+		m_channel->findChild<component::Attribute *>("scale", Qt::FindDirectChildrenOnly);
+	component::Attribute *offsetAttr =
+		m_channel->findChild<component::Attribute *>("offset", Qt::FindDirectChildrenOnly);
 
-	Command *attrReadRaw = new IioChannelAttributeRead(m_channel, "raw", nullptr);
-	connect(attrReadRaw, &scopy::Command::finished, this, &SwiotReadTemperatureTask::readRawCommandFinished,
-		Qt::QueuedConnection);
-
-	m_conn->commandQueue()->enqueue(attrReadRaw);
-}
-
-void SwiotReadTemperatureTask::readRawCommandFinished(Command *cmd)
-{
-	if(isInterruptionRequested()) {
-		return;
-	}
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *res = tcmd->getResult();
+	if(scaleAttr && scaleAttr->readCapability()) {
+		auto r = co_await scaleAttr->readCapability()->readAsync();
 		bool ok = false;
-		double raw = QString(res).toDouble(&ok);
-		if(ok) {
-			m_raw = raw;
-			double temperature = (m_raw + m_offset) * m_scale / 1000;
-			qDebug(CAT_SWIOT) << "Read temperature value of" << temperature;
-			Q_EMIT newTemperature(temperature);
+		double v = scaleAttr->cachedValue().toDouble(&ok);
+		if(r && ok) {
+			m_scale = v;
 		}
-	} else {
-		qDebug(CAT_SWIOT) << "Error, could not read \"raw\" attribute from " << DEVICE_NAME
-				  << ". Temperature not available.";
 	}
+	if(offsetAttr && offsetAttr->readCapability()) {
+		auto r = co_await offsetAttr->readCapability()->readAsync();
+		bool ok = false;
+		double v = offsetAttr->cachedValue().toDouble(&ok);
+		if(r && ok) {
+			m_offset = v;
+		}
+	}
+	m_initialized = true;
 }
 
-void SwiotReadTemperatureTask::readScaleCommandFinished(Command *cmd)
+QCoro::Task<void> SwiotReadTemperatureTask::readTemperature()
 {
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
+	if(!m_channel) {
+		co_return;
 	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *res = tcmd->getResult();
-		bool ok = false;
-		double scale = QString(res).toDouble(&ok);
-		if(ok) {
-			m_scale = scale;
-		}
-	} else {
-		qDebug(CAT_SWIOT) << "Error, could not read \"scale\" attribute from " << DEVICE_NAME
+	if(!m_initialized) {
+		co_await initScaleOffset();
+	}
+	component::Attribute *rawAttr = m_channel->findChild<component::Attribute *>("raw", Qt::FindDirectChildrenOnly);
+	if(!rawAttr || !rawAttr->readCapability()) {
+		co_return;
+	}
+	auto r = co_await rawAttr->readCapability()->readAsync();
+	if(!r) {
+		qDebug(CAT_SWIOT) << "Error, could not read \"raw\" attribute from" << DEVICE_NAME
 				  << ". Temperature not available.";
+		co_return;
 	}
-}
-
-void SwiotReadTemperatureTask::readOffsetCommandFinished(Command *cmd)
-{
-	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-	if(tcmd->getReturnCode() >= 0) {
-		char *res = tcmd->getResult();
-		bool ok = false;
-		double offset = QString(res).toDouble(&ok);
-		if(ok) {
-			m_offset = offset;
-		}
-	} else {
-		qDebug(CAT_SWIOT) << "Error, could not read \"offset\" attribute from " << DEVICE_NAME
-				  << ". Temperature not available.";
+	bool ok = false;
+	double raw = rawAttr->cachedValue().toDouble(&ok);
+	if(ok) {
+		double temperature = (raw + m_offset) * m_scale / 1000;
+		qDebug(CAT_SWIOT) << "Read temperature value of" << temperature;
+		Q_EMIT newTemperature(temperature);
 	}
 }
 
