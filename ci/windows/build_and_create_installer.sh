@@ -72,6 +72,7 @@ build_scopy(){
 	# gr-util still configures, and its find_package(Gnuradio 3.10 REQUIRED) fails.
 	$CMAKE $RC_COMPILER_OPT \
 				-DENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER \
+				-DENABLE_ALL_PACKAGES=ON \
 				-DENABLE_PLUGIN_ADC=OFF \
 				-DENABLE_PLUGIN_PQM=OFF \
 				-DENABLE_PACKAGE_M2K=OFF \
