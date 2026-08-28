@@ -96,7 +96,7 @@ if(${WITH_PYTHON})
 	set(BUILD_PYTHON_LIBRARY_DIRS ${Python3_LIBRARY_DIRS}/${PYTHON_VERSION})
 endif()
 
-option(WITH_SIGROK "Search for libsigrokdecode" ON)
+option(WITH_SIGROK "Search for libsigrokdecode" OFF)
 if(WITH_SIGROK)
 	find_package(PkgConfig)
 	set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
