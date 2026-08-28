@@ -444,6 +444,11 @@ create_appdir() {
 	[ -f $APP_DIR/usr/bin/iio-emu ] && $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu || true
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib "$(find $APP_DIR/usr -type f -name 'libscopy*.so')"
 
+	# Qt loads the platform plugins with dlopen, so nothing scanned above reaches them: libqxcb
+	# alone needs libQt6XcbQpa, which in turn needs libxcb-cursor and ~14 more libxcb siblings.
+	# Scan every platform plugin the AppDir ships so this gap cannot recur for the others.
+	ls $QT/plugins/platforms/*.so | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
+
 	cp -r $QT/plugins $APP_DIR/usr
 
 	# Copy Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache

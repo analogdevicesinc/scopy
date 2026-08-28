@@ -385,6 +385,11 @@ create_appdir() {
 	$COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib $APP_DIR/usr/bin/iio-emu
 	find $APP_DIR/usr -type f -name 'libscopy*.so' | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
 
+	# Qt loads the platform plugins with dlopen, so nothing scanned above reaches them: libqxcb
+	# alone needs libQt6XcbQpa, which in turn needs libxcb-cursor and ~14 more libxcb siblings.
+	# Scan every platform plugin the AppDir ships so this gap cannot recur for the others.
+	ls $QT/plugins/platforms/*.so | xargs $COPY_DEPS --lib-dir ${LIB_DIRS} --output-dir $APP_DIR/usr/lib
+
 	cp -r $QT/plugins $APP_DIR/usr
 
 	# Copy the Python runtime. With WITH_PYTHON=OFF, PYTHON_VERSION is never written to the cache
@@ -419,12 +424,13 @@ create_appdir() {
 		ls $search_dir/libgenalyzer.so* >/dev/null 2>&1 && cp $search_dir/libgenalyzer.so* $APP_DIR/usr/lib && break
 	done
 
-	# These are the only Qt libraries nothing scans for: copy-deps.sh runs over scopy and
-	# libscopy*.so, never over $QT/plugins, so the platform plugins' own dependencies reach the
-	# AppDir only through these copies. A silent miss surfaces at runtime as "could not load the
-	# Qt platform plugin", so name each one. All five are present in
-	# qt6-armhf-cross-installed.tar.gz, so a WARNING here is a real regression - non-fatal for now,
-	# matching arm64, where the same loop printed no warnings and every library landed.
+	# Copy the Qt libraries the platform plugins need by name. The plugin scan above now follows
+	# their dependencies too, so this loop is belt-and-braces - but it names each library, so a
+	# silent miss still surfaces here rather than at runtime as "could not load the Qt platform
+	# plugin". Four of the five are present in qt6-armhf-cross-installed.tar.gz;
+	# libQt6WaylandClient is absent because the armhf cross Qt6 was configured without QtWayland
+	# and ships no libqwayland* platform plugin, so nothing can load it. Exactly one WARNING is
+	# expected here and it is not a regression; a WARNING for any of the other four is.
 	for qtlib in libQt6XcbQpa libQt6EglFSDeviceIntegration libQt6DBus libQt6OpenGL libQt6WaylandClient; do
 		if ls $QT/lib/$qtlib.so* >/dev/null 2>&1; then
 			cp $QT/lib/$qtlib.so* $APP_DIR/usr/lib
