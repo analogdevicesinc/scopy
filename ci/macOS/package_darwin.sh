@@ -160,14 +160,14 @@ if ls ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib 1>/dev/null 2>&1; then
 	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libm2k.?.?.?.dylib
 fi
 
-if [ -f  "./Scopy.app/Contents/Frameworks/libgnuradio-m2k*" ]; then
+if ls ./Scopy.app/Contents/Frameworks/libgnuradio-m2k* 1>/dev/null 2>&1; then
 	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 	if [ -n "${m2kid:-}" ]; then
 		install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 	fi
 fi
 
-if [ -f  "./Scopy.app/Contents/Frameworks/libgnuradio-scopy*" ]; then
+if ls ./Scopy.app/Contents/Frameworks/libgnuradio-scopy* 1>/dev/null 2>&1; then
 	install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
 	if [ -n "${m2kid:-}" ]; then
 		install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
