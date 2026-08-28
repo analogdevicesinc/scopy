@@ -30,7 +30,7 @@
 #include <pluginbase/preferences.h>
 #include <style.h>
 
-#include <iioutil/connectionprovider.h>
+#include <component/device.h>
 
 using namespace scopy::swiot;
 
@@ -59,14 +59,12 @@ SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
 	QObject::connect(m_applyBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
 }
 
-SwiotConfig::~SwiotConfig() { ConnectionProvider::close(m_uri); }
+SwiotConfig::~SwiotConfig() { m_context = {}; }
 
 void SwiotConfig::provideDeviceConnection()
 {
-	Connection *conn = ConnectionProvider::open(m_uri);
-	m_context = conn->context();
-	m_commandQueue = conn->commandQueue();
-	m_swiotDevice = iio_context_find_device(m_context, "swiot");
+	m_context = component::Controller::context(m_uri);
+	m_swiotDevice = m_context ? m_context->findChild<component::Device *>("swiot") : nullptr;
 	if(m_swiotDevice == nullptr) {
 		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
 	}
@@ -113,7 +111,7 @@ void SwiotConfig::buildGridLayout()
 
 	for(int i = 0; i < NUMBER_OF_CHANNELS; i++) { // there can only be 4 channels
 		auto *channelView = new ConfigChannelView(i);
-		auto *configModel = new ConfigModel(m_swiotDevice, i, m_commandQueue);
+		auto *configModel = new ConfigModel(m_swiotDevice, i);
 		auto *configController = new ConfigController(channelView, configModel, i);
 		m_controllers.push_back(configController);
 		m_chnlsGrid->layout()->addWidget(channelView);

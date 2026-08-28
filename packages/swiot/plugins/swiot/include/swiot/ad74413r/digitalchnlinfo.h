@@ -30,8 +30,7 @@ class DigitalChnlInfo : public ChnlInfo
 {
 	Q_OBJECT
 public:
-	explicit DigitalChnlInfo(QString plotUm = "", QString hwUm = "", iio_channel *iioChnl = nullptr,
-				 CommandQueue *cmdQueue = nullptr);
+	explicit DigitalChnlInfo(QString plotUm = "", QString hwUm = "", component::Channel *chnl = nullptr);
 	~DigitalChnlInfo();
 
 	double convertData(unsigned int data) override;

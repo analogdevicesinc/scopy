@@ -18,29 +18,37 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SCOPY_EXTERNALPSREADERTHREAD_H
-#define SCOPY_EXTERNALPSREADERTHREAD_H
+#ifndef SCOPY_EXTERNALPSREADER_H
+#define SCOPY_EXTERNALPSREADER_H
 
-#include <QThread>
-#include <iioutil/connection.h>
+#include <QObject>
+#include <qcoro/qcorotask.h>
+#include <component/controller.h>
 
-namespace scopy::swiot {
-class ExternalPsReaderThread : public QThread
+namespace scopy {
+namespace component {
+class Device;
+}
+namespace swiot {
+class ExternalPsReader : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ExternalPsReaderThread(QString uri, QString attr, QObject *parent = nullptr);
-	~ExternalPsReaderThread();
+	explicit ExternalPsReader(QString uri, QString attr, QObject *parent = nullptr);
+	~ExternalPsReader();
 
-	void run() override;
+	QCoro::Task<void> readPowerSupply();
+
 Q_SIGNALS:
 	void hasConnectedPowerSupply(bool ps);
 
 private:
 	QString m_uri;
 	QString m_attribute;
-	Connection *m_conn;
+	component::ContextHandle m_context;
+	component::Device *m_swiot;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
-#endif // SCOPY_EXTERNALPSREADERTHREAD_H
+#endif // SCOPY_EXTERNALPSREADER_H
