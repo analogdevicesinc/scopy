@@ -355,6 +355,11 @@ build_qwt() {
 	# Rename the produced library base name to qwt_scopy (and its SONAME in lockstep)
 	sed -i 's|qwtLibraryTarget(qwt)|qwtLibraryTarget(qwt_scopy)|' src/src.pro
 	sed -i 's|QWT_SONAME=libqwt.so|QWT_SONAME=libqwt_scopy.so|' src/src.pro
+	# The designer/examples/playground/tests subprojects link the library by its
+	# old name (qwtAddLibrary(..., qwt)); update those to match the rename above,
+	# otherwise they fail with `ld: cannot find -lqwt`. (Gap in PR #2291.)
+	sed -i 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
+		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
 
 	INSTALL=$1
 	[ -z $INSTALL ] && INSTALL=ON
