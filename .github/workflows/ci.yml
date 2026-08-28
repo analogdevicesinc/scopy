@@ -63,57 +63,61 @@ jobs:
       with:
         override: ${{ inputs.docker_tag }}
 
-    ubuntu-qt6-build:
-      needs: docker_tag
-      uses: ./.github/workflows/ubuntubuild.yml
-      with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+    # ===== TEMPORARY - exp_macos_intel_runner branch only, DO NOT MERGE =====
+    # Non-macOS jobs commented out so the macos-15-intel runner test gives a clean,
+    # fast signal. Uncomment this whole block (strip the leading "# ") to restore.
+#     ubuntu-qt6-build:
+#       needs: docker_tag
+#       uses: ./.github/workflows/ubuntubuild.yml
+#       with:
+#         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+#       secrets:
+#         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    # DEPS REWORK: re-enabled. This is the only job that produces Ubuntu artifacts, and its
-    # matrix covers scopy2-ubuntu{22,24,26}-qt6, so it is also the only CI coverage of 22.04
-    # and 26.04 (ubuntubuild.yml deliberately tests 24.04 only). A working AppImage is the
-    # real proof the slim dependency set is sufficient.
-    appimage-x86_64-qt6:
-      needs: docker_tag
-      uses: ./.github/workflows/appimage-x86_64.yml
-      with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+#     # DEPS REWORK: re-enabled. This is the only job that produces Ubuntu artifacts, and its
+#     # matrix covers scopy2-ubuntu{22,24,26}-qt6, so it is also the only CI coverage of 22.04
+#     # and 26.04 (ubuntubuild.yml deliberately tests 24.04 only). A working AppImage is the
+#     # real proof the slim dependency set is sufficient.
+#     appimage-x86_64-qt6:
+#       needs: docker_tag
+#       uses: ./.github/workflows/appimage-x86_64.yml
+#       with:
+#         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+#       secrets:
+#         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    mingw-qt6:
-      needs: docker_tag
-      uses: ./.github/workflows/mingwbuild.yml
-      with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+#     mingw-qt6:
+#       needs: docker_tag
+#       uses: ./.github/workflows/mingwbuild.yml
+#       with:
+#         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+#       secrets:
+#         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    arm64-qt6:
-      needs: docker_tag
-      uses: ./.github/workflows/appimage-arm64.yml
-      with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+#     arm64-qt6:
+#       needs: docker_tag
+#       uses: ./.github/workflows/appimage-arm64.yml
+#       with:
+#         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+#       secrets:
+#         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    armhf-qt6:
-      needs: docker_tag
-      uses: ./.github/workflows/appimage-armhf.yml
-      with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+#     armhf-qt6:
+#       needs: docker_tag
+#       uses: ./.github/workflows/appimage-armhf.yml
+#       with:
+#         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+#       secrets:
+#         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
-    flatpak-qt6:
-      needs: docker_tag
-      uses: ./.github/workflows/linuxflatpakbuild.yml
-      with:
-        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
-      secrets:
-        CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+#     flatpak-qt6:
+#       needs: docker_tag
+#       uses: ./.github/workflows/linuxflatpakbuild.yml
+#       with:
+#         docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
+#       secrets:
+#         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
+    # ===== END TEMPORARY =====
 
     macos-qt6:
       uses: ./.github/workflows/macosbuild.yml

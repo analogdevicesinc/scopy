@@ -20,7 +20,7 @@ jobs:
           - runner: macos-14
             name: macOS 14 Qt6 (ARM64)
             artifact: Scopy-macOS14-arm64-qt6
-          - runner: macos-15-large
+          - runner: macos-15-intel
             name: macOS 15 Qt6 (Intel)
             artifact: Scopy-macOS15-x86_64-qt6
 
