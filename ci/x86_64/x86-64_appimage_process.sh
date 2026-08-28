@@ -475,7 +475,7 @@ build_scopy() {
 	pushd $SRC_DIR
 	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
-	# Match the CI dependency image: adc and pqm are the only gnuradio consumers, and
+	# Match the CI dependency image: adc is the only gnuradio consumer, and
 	# sigrok/python are the libsigrokdecode core path. Without these the build fails at configure
 	# in the CI images (gr-util -> find_package(Gnuradio REQUIRED), pkg_check_modules(libsigrokdecode
 	# REQUIRED)). Keep in step with build_scopy in ci/ubuntu/ubuntu_build_process.sh.
@@ -485,7 +485,6 @@ build_scopy() {
 		-DENABLE_ALL_PACKAGES=ON \
 		-DENABLE_PACKAGE_M2K=OFF
 		-DENABLE_PLUGIN_ADC=OFF
-		-DENABLE_PLUGIN_PQM=OFF
 		-DWITH_SIGROK=OFF
 		-DWITH_PYTHON=OFF
 		"

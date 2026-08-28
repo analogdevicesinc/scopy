@@ -382,7 +382,7 @@
 		"name": "scopy",
 		"builddir": true,
 		"buildsystem": "cmake",
-		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DENABLE_PLUGIN_PQM=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF"],
+		"config-opts": [ "-DCMAKE_INSTALL_PREFIX:PATH=/app", "-DCMAKE_INSTALL_LIBDIR:STRING=lib", "-DCMAKE_PREFIX_PATH=/app/lib/pkgconfig;/app/lib/cmake", "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DENABLE_ALL_PACKAGES=ON", "-DENABLE_PACKAGE_M2K=OFF", "-DENABLE_PLUGIN_ADC=OFF", "-DWITH_SIGROK=OFF", "-DWITH_PYTHON=OFF"],
 		"sources": [
 			{
 				"type": "git",
