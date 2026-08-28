@@ -43,17 +43,37 @@ arm64(){
 # Cross-compiled ARM32 image. Builds on any x86_64 host: Dockerfile.armhf-cross is FROM
 # ubuntu:24.04 with crossbuild-essential-armhf and three prebuilt tarballs, and the armhf qmake6 in
 # the Qt prefix is a shell wrapper that execs the host qmake6 - so no qemu and no binfmt.
-# The tarballs are produced locally by the four-stage flow in armhf_docker_build_process.md and are
-# read straight from docker/tarballs/, so there is nothing to download. The previous
-# `cloudsmith download` calls fetched three package slugs whose existence could not be verified,
-# and would have overwritten the local inputs. Note that .github/workflows/push-docker.yml keeps
-# its own downloads of the same slugs and must keep them: a CI runner has no local copies.
+# The three tarballs come from Cloudsmith, and are only regenerated locally in the handful of cases
+# that need it (the four-stage flow in armhf_docker_build_process.md, which takes hours).
+# Hence: download only what is ABSENT. A local copy always wins, so a dev who has just regenerated
+# one keeps it; a fresh checkout gets the published copy instead of running the four-stage flow.
+# This is deliberately not the unconditional download removed in 314080749, which overwrote local
+# inputs on every run. .github/workflows/push-docker.yml keeps its own download step and must:
+# a CI runner never has local copies.
 armhf_cross(){
 	pushd $SRC_SCRIPT
-	for tarball in sysroot-armhf.tar.gz qt6-host-installed.tar.gz qt6-armhf-cross-installed.tar.gz; do
-		if [ ! -f "docker/tarballs/$tarball" ]; then
-			echo "Missing $SRC_SCRIPT/docker/tarballs/$tarball"
-			echo "See ci/arm/armhf_docker_build_process.md - stage 1 produces sysroot-armhf.tar.gz,"
+	mkdir -p docker/tarballs
+
+	# package-name:version:local-filename
+	for entry in "sysroot-armhf:1.0.0:sysroot-armhf.tar.gz" \
+		     "qt6-armhf-host:6.8.3:qt6-host-installed.tar.gz" \
+		     "qt6-armhf-cross:6.8.3:qt6-armhf-cross-installed.tar.gz"; do
+		name=${entry%%:*}
+		rest=${entry#*:}
+		version=${rest%%:*}
+		file=${rest#*:}
+
+		if [ -f "docker/tarballs/$file" ]; then
+			echo "Using local docker/tarballs/$file (not overwriting)"
+			continue
+		fi
+
+		echo "Fetching $name $version from Cloudsmith -> docker/tarballs/$file"
+		if ! cloudsmith download adi/scopy-dockers "$name" \
+			--version "$version" --outfile "docker/tarballs/$file"; then
+			echo "Failed to download $name $version."
+			echo "Either the package is not published, or it must be regenerated locally:"
+			echo "see ci/arm/armhf_docker_build_process.md - stage 1 produces sysroot-armhf.tar.gz,"
 			echo "stage 2 produces the two Qt6 tarballs. They take hours, so they are gitignored"
 			echo "rather than merely untracked, to survive a git clean."
 			exit 1
