@@ -5,13 +5,13 @@
 # Usage: ./create_docker_image_qt6.sh arm64
 #        ./create_docker_image_qt6.sh armhf_cross
 #
-# The image tag defaults to "testing". The dependency-rework pass uses "slim":
+# TAG defaults to "testing", the staging tag a freshly built image lands on. main and ordinary
+# branches currently build against ":slim" (the reduced dependency set), by agreement, until :slim
+# is retagged to ":latest" and get_docker_tag.yml's default is flipped. So :slim is live and must
+# stay buildable; ":latest" is not in use yet and exists on only one of the seven images.
 #   TAG=slim ./create_docker_image_qt6.sh arm64
-#   ./create_docker_image_qt6.sh arm64_slim
 # The tag is an environment variable rather than $1 because $1 is the target function name
-# consumed by the dispatch loop at the bottom. The variant lives in the tag, not the image
-# name - slim replaces the full image once validated, so a name suffix would have to be
-# renamed at promotion and would break every pull URL.
+# consumed by the dispatch loop at the bottom.
 
 SRC_SCRIPT=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -87,10 +87,6 @@ armhf_cross(){
 		.
 	popd
 }
-
-# Slim dependency images (dependency-rework pass), mirroring ci/ubuntu/create_docker_image.sh.
-arm64_slim(){ TAG=slim; arm64; }
-armhf_cross_slim(){ TAG=slim; armhf_cross; }
 
 for arg in $@; do
 	$arg

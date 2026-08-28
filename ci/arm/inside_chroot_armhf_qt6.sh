@@ -63,7 +63,7 @@ apt-get -y install \
 	libdbus-1-dev libsqlite3-dev libexpat1-dev \
 	libicu-dev
 
-# Dropped with the slim dependency set, each because its only consumer is gone:
+# Dropped from the dependency set, each because its only consumer is gone:
 #   the whole Boost block  - a gnuradio link requirement
 #   libgmp-dev             - gnuradio (genalyzer needs fftw3 only)
 #   libmatio-dev           - gnuradio

@@ -4,11 +4,10 @@
 # ===========================
 # Usage: ./create_docker_image.sh [tag]
 #
-# The tag defaults to "testing". The dependency-rework pass uses "slim":
+# The tag defaults to "testing", the staging tag a freshly built image lands on. main and
+# ordinary branches currently build against ":slim" (the reduced dependency set), by agreement,
+# until :slim is retagged to ":latest" and get_docker_tag.yml's default is flipped:
 #   ./create_docker_image.sh slim
-# The variant lives in the tag, not the image name - slim replaces the full image once
-# validated, so a name suffix would have to be renamed at promotion and would break
-# every pull URL.
 
 SRC_DIR=$(git rev-parse --show-toplevel 2>/dev/null ) || \
 SRC_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && cd ../../ && pwd )

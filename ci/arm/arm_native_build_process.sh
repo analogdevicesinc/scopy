@@ -468,7 +468,7 @@ create_appdir() {
 		echo "Python runtime not bundled (built with WITH_PYTHON=OFF)"
 	fi
 
-	# Copy protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case on the slim
+	# Copy protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case in the CI
 	# dependency images - not an error there, so say so instead of failing silently.
 	if [ -d /usr/local/share/libsigrokdecode/decoders ]; then
 		cp -r /usr/local/share/libsigrokdecode/decoders $APP_DIR/usr/lib
