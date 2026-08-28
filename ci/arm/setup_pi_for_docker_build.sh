@@ -42,7 +42,7 @@ upgrade_system() {
 	# silently does nothing. run_all gets this via fix_apt_mirror, but this step is also run
 	# standalone before create_rootfs_tarball - and a stale base rootfs makes the image's own
 	# `apt-get -y upgrade` (Dockerfile.arm64) re-download every outdated package into a new layer
-	# while the base layer keeps the superseded copies, which cost ~3 GB in the first slim build.
+	# while the base layer keeps the superseded copies, which cost ~3 GB in the first build of the reduced image.
 	apt-get update
 	apt-get -y dist-upgrade || true
 	apt --fix-broken install -y || true
@@ -128,10 +128,13 @@ run_all() {
 	cleanup_build_artifacts
 	echo ""
 	echo "=== Setup complete ==="
-	echo "Next steps (TAG selects the image variant; the dependency-rework pass uses slim):"
-	echo "  1. sudo TAG=slim $CI_ARM_DIR/create_docker_image_qt6.sh arm64"
+	echo "Next steps (TAG selects the image tag; it defaults to testing, the staging tag):"
+	echo "  1. sudo $CI_ARM_DIR/create_docker_image_qt6.sh arm64"
 	echo "  2. sudo docker login docker.cloudsmith.io -u token"
-	echo "  3. sudo docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:slim"
+	echo "  3. sudo docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-arm64-native-qt6:testing"
+	echo ""
+	echo "NOTE: main currently builds against :slim, not :latest. To replace the image main uses,"
+	echo "      run step 1 as 'sudo TAG=slim ...' and push :slim instead."
 }
 
 if [ $# -eq 0 ]; then

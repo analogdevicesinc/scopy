@@ -24,23 +24,24 @@ pip install --upgrade cloudsmith-cli
 
 `create_docker_image.sh` builds the image **and** bakes the full dependency cache
 into it (`build_flatpak_deps.sh` runs `flatpak-builder --stop-at=scopy` inside).
-This is the long step (~30–60 min — builds boost, gnuradio, etc.).
+This is the long step (~30–60 min).
 
 ```bash
 cd ci/flatpak
 ./create_docker_image.sh          # → ...scopy2-flatpak-qt6:testing
-./create_docker_image.sh slim     # → ...scopy2-flatpak-qt6:slim   (dependency-rework pass)
+./create_docker_image.sh slim     # → ...scopy2-flatpak-qt6:slim
 cd ../..
 
 docker images | grep scopy2-flatpak-qt6   # confirm it exists
 ```
 
-The tag argument defaults to `testing`. The variant lives in the **tag**, not the image name: slim
-replaces the full image once validated, so a name suffix would have to be renamed at promotion and
-would break every pull URL. `get_docker_tag.yml` resolves `*deps_rework*` branches to `slim`.
+The tag argument defaults to `testing`, the staging tag a freshly built image lands on. `main` and
+ordinary branches currently build against `:slim`, by agreement, until `:slim` is retagged to
+`:latest` and `get_docker_tag.yml`'s default is flipped — so rebuild to `:slim` if `main` depends on
+it. Retagging never changes the image name, so every pull URL keeps working.
 
-> On the slim manifest this step is **faster** — boost and gnuradio, the two longest modules, are
-> gone. Expect a full cache miss the first time regardless: removing modules changes the cache key
+> This step is now **faster** — boost and gnuradio, the two longest modules, are gone from the
+> manifest. Expect a full cache miss the first time regardless: removing modules changes the cache key
 > of every later module, so nothing from an older `:testing` image is reusable.
 
 > All dependency branches/tags in `ci/flatpak/org.adi.Scopy.json.c` are pinned to the
@@ -60,15 +61,14 @@ docker run --rm --privileged \
   -e CI_SCRIPT=ON \
   -e GITHUB_WORKSPACE="$PWD" \
   --mount type=bind,source="$PWD",target="$PWD" \
-  docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:slim \
+  docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:testing \
   /bin/bash -c "sudo chown -R runner:runner '$PWD' && '$PWD/ci/flatpak/flatpak_build_process.sh'"
 
 echo "exit=$?"          # check the real exit code, not just that the wrapper finished
 ls -lh Scopy.flatpak    # should now exist in the repo root
 ```
 
-Swap `:slim` for `:testing` when validating the full manifest. On the slim manifest, also confirm
-the bundle contains none of the dropped stacks:
+Also confirm the bundle contains none of the dropped stacks:
 
 ```bash
 ls ci/flatpak/build/files/lib | grep -E 'gnuradio|volk|spdlog|sigrokdecode|m2k|^libgr|boost|glog|fmt'
@@ -109,13 +109,10 @@ flatpak run org.adi.Scopy
 docker login docker.cloudsmith.io -u token -p "$CLOUDSMITH_API_KEY"
 
 docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:testing
-# dependency-rework pass:
-docker push docker.cloudsmith.io/adi/scopy-dockers/scopy2-flatpak-qt6:slim
 ```
 
-> The `flatpak-qt6` job in `ci.yml` is currently `if: false` because no `:slim` tag existed.
-> Re-enable it (the original condition is preserved in the comment below the `if:`) **only after
-> this push succeeds** — otherwise every run fails at `docker pull`.
+> The `flatpak-qt6` job in `ci.yml` pulls this image, so push **before** merging anything that
+> needs a newly built one — otherwise every run fails at `docker pull`.
 
 Alternatively, do steps 1 + 3 from the GitHub UI:
 **Actions → "Push Qt6 Docker Image to Cloudsmith" → Run workflow →
