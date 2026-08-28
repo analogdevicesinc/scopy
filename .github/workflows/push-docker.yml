@@ -127,9 +127,15 @@ jobs:
           run: |
             mkdir -p ci/arm/docker/tarballs
             cd ci/arm/docker/tarballs
-            cloudsmith download adi/scopy-dockers/sysroot-armhf-1.0.0.tar.gz sysroot-armhf.tar.gz
-            cloudsmith download adi/scopy-dockers/qt6-armhf-host-6.8.3.tar.gz qt6-host-installed.tar.gz
-            cloudsmith download adi/scopy-dockers/qt6-armhf-cross-6.8.3.tar.gz qt6-armhf-cross-installed.tar.gz
+            # cloudsmith-cli takes "OWNER/REPO NAME"; the old three-segment form was rejected at
+            # argument parsing ("Invalid value for 'OWNER/REPO'") on every run, so this step could
+            # never have worked. The action installs the CLI unpinned, so it is always a recent one.
+            cloudsmith download adi/scopy-dockers sysroot-armhf --version 1.0.0 \
+              --outfile sysroot-armhf.tar.gz
+            cloudsmith download adi/scopy-dockers qt6-armhf-host --version 6.8.3 \
+              --outfile qt6-host-installed.tar.gz
+            cloudsmith download adi/scopy-dockers qt6-armhf-cross --version 6.8.3 \
+              --outfile qt6-armhf-cross-installed.tar.gz
 
         - name: Build Docker image
           run: |
