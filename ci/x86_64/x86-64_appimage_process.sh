@@ -470,10 +470,10 @@ build_scopy() {
 	pushd $SRC_DIR
 	[ -f /home/runner/build-status ] && cp /home/runner/build-status $SRC_DIR/build-status
 	[ $CI_SCRIPT ] && git config --global --add safe.directory $SRC_DIR
-	# Match the slim dependency image: adc and pqm are the only gnuradio consumers, and
+	# Match the CI dependency image: adc and pqm are the only gnuradio consumers, and
 	# sigrok/python are the libsigrokdecode core path. Without these the build fails at configure
-	# on a slim image (gr-util -> find_package(Gnuradio REQUIRED), pkg_check_modules(libsigrokdecode
-	# REQUIRED)). Keep in step with build_scopy in ci/ubuntu/ubuntu_build_process_slim.sh.
+	# in the CI images (gr-util -> find_package(Gnuradio REQUIRED), pkg_check_modules(libsigrokdecode
+	# REQUIRED)). Keep in step with build_scopy in ci/ubuntu/ubuntu_build_process.sh.
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_VERSION \
 		-DCMAKE_INSTALL_PREFIX=$APP_DIR/usr \
@@ -541,7 +541,7 @@ create_appdir(){
 		echo "Python runtime not bundled (built with WITH_PYTHON=OFF)"
 	fi
 
-	# Copy protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case on the slim
+	# Copy protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case in the CI
 	# dependency images - not an error there, so warn instead of failing the packaging step.
 	if [ -d $STAGING_AREA_DEPS/share/libsigrokdecode/decoders ]; then
 		cp -r $STAGING_AREA_DEPS/share/libsigrokdecode/decoders $APP_DIR/usr/lib
@@ -551,7 +551,7 @@ create_appdir(){
 		echo  "No decoders for libsigrokdecode found (built with WITH_SIGROK=OFF)"
 	fi
 
-	# spdlog is a gnuradio transitive dep, absent from the slim images (gr-util is not built).
+	# spdlog is a gnuradio transitive dep, absent from the CI images (gr-util is not built).
 	if ls $STAGING_AREA_DEPS/lib/libspdlog.so* >/dev/null 2>&1; then
 		cp $STAGING_AREA_DEPS/lib/libspdlog.so* $APP_DIR/usr/lib
 	else
