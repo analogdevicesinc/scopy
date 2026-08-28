@@ -32,12 +32,15 @@ on:
     workflow_dispatch:
       inputs:
         docker_tag:
-          description: 'Docker image tag'
+          # "latest" is deliberately absent: it exists on only one of the seven images, so
+          # selecting it fails at docker pull. Add it back when the retag to :latest happens.
+          description: 'Docker image tag ("auto" resolves from the branch name)'
           required: true
-          default: 'latest'
+          default: 'auto'
           type: choice
           options:
-            - latest
+            - auto
+            - slim
             - testing
 
 concurrency:
@@ -53,16 +56,18 @@ permissions:
   id-token: write
 
 jobs:
+    # Always runs, for every trigger. A dispatch passes its choice through as an override rather
+    # than skipping this job, which is what previously let a dispatch select a nonexistent :latest.
     docker_tag:
-      if: github.event_name != 'workflow_dispatch'
       uses: ./.github/workflows/get_docker_tag.yml
+      with:
+        override: ${{ inputs.docker_tag }}
 
     ubuntu-qt6-build:
       needs: docker_tag
-      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/ubuntubuild.yml
       with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
@@ -72,46 +77,41 @@ jobs:
     # real proof the slim dependency set is sufficient.
     appimage-x86_64-qt6:
       needs: docker_tag
-      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-x86_64.yml
       with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     mingw-qt6:
       needs: docker_tag
-      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/mingwbuild.yml
       with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     arm64-qt6:
       needs: docker_tag
-      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-arm64.yml
       with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     armhf-qt6:
       needs: docker_tag
-      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/appimage-armhf.yml
       with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
     flatpak-qt6:
       needs: docker_tag
-      if: ${{ !cancelled() && (needs.docker_tag.result == 'success' || needs.docker_tag.result == 'skipped') }}
       uses: ./.github/workflows/linuxflatpakbuild.yml
       with:
-        docker_tag: ${{ inputs.docker_tag || needs.docker_tag.outputs.docker_tag }}
+        docker_tag: ${{ needs.docker_tag.outputs.docker_tag }}
       secrets:
         CLOUDSMITH_SERVICE_SLUG: ${{ secrets.CLOUDSMITH_SERVICE_SLUG }}
 
