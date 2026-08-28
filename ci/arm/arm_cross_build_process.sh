@@ -100,7 +100,7 @@ download_cmake() {
 }
 
 install_packages() {
-	# Dropped with the slim dependency set: swig (gnuradio's Python bindings) and libglib2.0-dev.
+	# Dropped from the dependency set: swig (gnuradio's Python bindings) and libglib2.0-dev.
 	# Removing libglib2.0-dev from this list is cosmetic, not a reduction - libinput-dev (kept
 	# below, needed by Qt6) pulls it back transitively via libwacom-dev / libgudev-1.0-dev.
 	# Verified on Ubuntu 24.04 in this pass and on Debian 13 during the arm64 pass.
@@ -406,8 +406,8 @@ create_appdir() {
 		echo "Python runtime not bundled (built with WITH_PYTHON=OFF)"
 	fi
 
-	# Copy the protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case on the
-	# slim dependency image - not an error there, so say so instead of finishing silently.
+	# Copy the protocol decoders. Absent when built with WITH_SIGROK=OFF, which is the case in the
+	# CI dependency image - not an error there, so say so instead of finishing silently.
 	decoders_found=""
 	for search_dir in $SYSROOT/share $SYSROOT/usr/share $SYSROOT/usr/local/share; do
 		if [ -d $search_dir/libsigrokdecode/decoders ]; then

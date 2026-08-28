@@ -6,7 +6,7 @@
 # These checks track the package list in inside_chroot_armhf_qt6.sh, not whatever a previously
 # shipped tarball happens to contain. The Boost and Python sections were removed together with
 # the packages that fed them (Boost served gnuradio; the Python set served libsigrokdecode's
-# embedded interpreter), so an old pre-slim tarball will now report extra libraries, not failures.
+# embedded interpreter), so an older sysroot tarball will now report extra libraries, not failures.
 
 set -e
 

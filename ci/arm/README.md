@@ -87,13 +87,16 @@ Finally, after the development is done use this to clean the system
 
 ### Building the Docker Image
 
-The tag defaults to `testing`; the dependency-rework pass uses `slim`.
+The tag defaults to `testing`, the staging tag a freshly built image lands on. `main` and ordinary
+branches currently build against `:slim` (the reduced dependency set), by agreement, until `:slim` is
+retagged to `:latest` and `get_docker_tag.yml`'s default is flipped — so pass `TAG=slim` when
+rebuilding an image `main` depends on. `:latest` is not in use yet.
 
 The **armhf cross image** builds on any x86_64 host and downloads its prebuilt tarballs from
 Cloudsmith:
 
    ```bash
-      TAG=slim ci/arm/create_docker_image_qt6.sh armhf_cross
+      ci/arm/create_docker_image_qt6.sh armhf_cross
    ```
 
 The **arm64 native image** must be built on an arm64 host, because `docker/Dockerfile.arm64`
@@ -103,7 +106,7 @@ into `ci/arm/`, where the Dockerfile reads them from:
 
    ```bash
       sudo ci/arm/setup_pi_for_docker_build.sh
-      sudo TAG=slim ci/arm/create_docker_image_qt6.sh arm64
+      sudo ci/arm/create_docker_image_qt6.sh arm64
    ```
 
 ### Building locally from sources
