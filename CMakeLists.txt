@@ -187,22 +187,18 @@ endif()
 add_subdirectory(common)
 add_subdirectory(iioutil)
 add_subdirectory(gui)
-# Default the gnuradio consumers OFF: gr-util below hard-requires the gnuradio stack, which the CI dependency images no
-# longer ship. Both must be DEFINED and false for the skip to trigger, so set them here rather than relying on the
-# caller. Same idiom as packages/CMakeLists.txt.
+# Default the gnuradio consumer OFF: gr-util below hard-requires the gnuradio stack, which the CI dependency images no
+# longer ship. It must be DEFINED and false for the skip to trigger, so set it here rather than relying on the caller.
+# Same idiom as packages/CMakeLists.txt.
 if(NOT DEFINED ENABLE_PLUGIN_ADC)
 	set(ENABLE_PLUGIN_ADC OFF CACHE BOOL "Enable adc plugin" FORCE)
 endif()
 
-if(NOT DEFINED ENABLE_PLUGIN_PQM)
-	set(ENABLE_PLUGIN_PQM OFF CACHE BOOL "Enable pqm plugin" FORCE)
-endif()
-
-# gr-util hard-requires the gnuradio stack and is consumed only by the adc and pqm plugins. Skip it when both are
-# explicitly disabled so gnuradio can be dropped. (add_subdirectory(packages) synthesizes these flags later, but the
-# defaults above - or a value passed on the command line - already put them in the cache by this point.)
-if((DEFINED ENABLE_PLUGIN_ADC AND NOT ENABLE_PLUGIN_ADC) AND (DEFINED ENABLE_PLUGIN_PQM AND NOT ENABLE_PLUGIN_PQM))
-	message(STATUS "Skipping gr-util (ADC and PQM plugins both disabled)")
+# gr-util hard-requires the gnuradio stack and is consumed only by the adc plugin. Skip it when that flag is explicitly
+# disabled so gnuradio can be dropped. (add_subdirectory(packages) synthesizes the flag later, but the default above -
+# or a value passed on the command line - already puts it in the cache by this point.)
+if(DEFINED ENABLE_PLUGIN_ADC AND NOT ENABLE_PLUGIN_ADC)
+	message(STATUS "Skipping gr-util (ADC plugin disabled)")
 else()
 	add_subdirectory(gr-util)
 endif()

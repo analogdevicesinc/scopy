@@ -67,14 +67,13 @@ build_scopy(){
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
 
-	# ADC and PQM must BOTH be explicitly OFF: the gr-util skip in the top-level CMakeLists tests
-	# `DEFINED ENABLE_PLUGIN_ADC AND NOT ENABLE_PLUGIN_ADC` and the same for PQM. Miss either and
-	# gr-util still configures, and its find_package(Gnuradio 3.10 REQUIRED) fails.
+	# ADC must be explicitly OFF: the gr-util skip in the top-level CMakeLists tests
+	# `DEFINED ENABLE_PLUGIN_ADC AND NOT ENABLE_PLUGIN_ADC`, so the value must come from the command
+	# line. Miss it and gr-util still configures, and its find_package(Gnuradio 3.10 REQUIRED) fails.
 	$CMAKE $RC_COMPILER_OPT \
 				-DENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$INSTALL_FOLDER \
 				-DENABLE_ALL_PACKAGES=ON \
 				-DENABLE_PLUGIN_ADC=OFF \
-				-DENABLE_PLUGIN_PQM=OFF \
 				-DENABLE_PACKAGE_M2K=OFF \
 				-DWITH_SIGROK=OFF \
 				-DWITH_PYTHON=OFF \
