@@ -369,13 +369,12 @@ build_scopy() {
 	git config --global --add safe.directory $SRC_DIR
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
-	# Dependency-rework pass: disable the only gnuradio consumers (adc, pqm) and
+	# Dependency-rework pass: disable the only gnuradio consumer (adc) and
 	# the sigrok/python core path so the dropped deps are not required.
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_ALL_PACKAGES=ON
 		-DENABLE_PACKAGE_M2K=OFF
 		-DENABLE_PLUGIN_ADC=OFF
-		-DENABLE_PLUGIN_PQM=OFF
 		-DWITH_SIGROK=OFF
 		-DWITH_PYTHON=OFF
 		"
