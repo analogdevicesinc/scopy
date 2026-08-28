@@ -99,10 +99,17 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	// Generic device-controller path: bind to a component::Attribute, bypassing the
 	// libiio pointer/attribute discovery below.
 	if(m_componentAttribute) {
+		// Prefer the attribute's own structured metadata; fall back to caller-supplied
+		// artificial options/range (optionsValues) for attributes that have none in the
+		// device (e.g. DAC "raw" spinbox range, threshold range, on/off combos).
+		QString componentOptions = formatComponentOptions(m_componentAttribute);
+		if(componentOptions.isEmpty()) {
+			componentOptions = m_optionsValues;
+		}
 		m_generatedRecipe = {
 			.attribute = m_componentAttribute,
 			.data = m_componentAttribute->name(),
-			.constDataOptions = formatComponentOptions(m_componentAttribute),
+			.constDataOptions = componentOptions,
 		};
 
 		ds = createDS();
@@ -498,6 +505,11 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 				strategy = UIS::RangeUi;
 			} else if(m_componentAttribute->hasOptions()) {
 				strategy = UIS::ComboUi;
+			} else if(!m_generatedRecipe.constDataOptions.isEmpty()) {
+				// Caller-supplied artificial options/range (optionsValues): no device
+				// metadata, interpret the string like the libiio const-values path.
+				strategy = m_generatedRecipe.constDataOptions.startsWith('[') ? UIS::RangeUi
+											      : UIS::ComboUi;
 			} else {
 				strategy = UIS::EditableUi;
 			}
