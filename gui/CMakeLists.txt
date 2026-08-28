@@ -111,7 +111,9 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg OpenGLWidgets REQU
 find_package(KDDockWidgets-qt6 QUIET)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+# Boost.System is header-only since Boost 1.69 and its compiled library was removed in Boost 1.89, so it must not be
+# requested as a component.
+find_package(Boost 1.69 COMPONENTS filesystem thread chrono REQUIRED)
 
 message(STATUS "Building: " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
