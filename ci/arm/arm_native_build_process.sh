@@ -111,6 +111,9 @@ install_packages() {
 	sudo rm -rfv $(find / -path /proc -prune -o -name '*libad9166*' -print) 2>/dev/null || true
 
 	# Build tools and libraries for Debian Trixie 13 (ARM64)
+	# libfontconfig1-dev/libfreetype-dev/libharfbuzz-dev make Qt6 configure with fontconfig, so
+	# arm64 matches armhf (inside_chroot_armhf_qt6.sh:59-60) instead of falling back to the FreeType
+	# font DB, which scans <libdir>/fonts and warns because no image ships that directory.
 	sudo apt-get -y --no-install-recommends install \
 		python3-pip python3-dev python3-numpy python3-packaging python3-mako \
 		vim git wget unzip \
@@ -133,6 +136,7 @@ install_packages() {
 		libdrm-dev libgbm-dev libgles2-mesa-dev \
 		libinput-dev libudev-dev \
 		libssl-dev libjpeg-dev libpng-dev libxcomposite-dev libdouble-conversion-dev \
+		libfontconfig1-dev libfreetype-dev libharfbuzz-dev \
 		libwayland-dev libwayland-egl-backend-dev \
 		libgsl-dev python-is-python3 \
 		libclang-dev libfuse2 squashfs-tools patchelf
