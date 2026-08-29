@@ -22,7 +22,7 @@ M2K with user configurable parameters. It consists of 3 parts:
 
 * Signal Plot - visual representation of the signals
 
-* Control Panel - change signal paramteres
+* Control Panel - change signal parameters
 
 The signal generator instrument can be used to generate analog output from the 
 M2K with user configurable parameters. It consists of 3 parts:
@@ -32,7 +32,7 @@ M2K with user configurable parameters. It consists of 3 parts:
 
 * Signal Plot - visual representation of the signals
 
-* Control Panel - change signal paramteres
+* Control Panel - change signal parameters
 
 
 Constant signal only has one parameter which inputs the amplitude of the signal 
