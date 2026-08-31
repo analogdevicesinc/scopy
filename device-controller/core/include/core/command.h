@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #pragma once
 
 #include "core/result.h"
@@ -14,24 +35,23 @@ public:
 		: QObject(parent)
 		, m_id(QUuid::createUuid())
 		, m_resource(resource)
-	{
-	}
+	{}
 	virtual ~Command() = default;
 
 	virtual void execute()
 	{
 		Q_EMIT started(this);
 		if(!m_cancelled) {
-            run();
+			run();
 		}
 		Q_EMIT finished(this);
 	}
 
-    virtual QString toString() const
-    {
-        return QString::fromLatin1(metaObject()->className()) + QStringLiteral("(id=") +
-            m_id.toString(QUuid::WithoutBraces) + QLatin1Char(')');
-    }
+	virtual QString toString() const
+	{
+		return QString::fromLatin1(metaObject()->className()) + QStringLiteral("(id=") +
+			m_id.toString(QUuid::WithoutBraces) + QLatin1Char(')');
+	}
 
 	QUuid id() const { return m_id; }
 	void *resource() const { return m_resource; }
@@ -39,11 +59,11 @@ public:
 	bool isCancelled() const { return m_cancelled; }
 
 Q_SIGNALS:
-    void started(scopy::Command *cmd);
-    void finished(scopy::Command *cmd);
+	void started(scopy::Command *cmd);
+	void finished(scopy::Command *cmd);
 
 protected:
-    virtual void run() = 0;
+	virtual void run() = 0;
 
 	QUuid m_id;
 	void *m_resource;

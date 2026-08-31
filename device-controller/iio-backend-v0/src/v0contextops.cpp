@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "v0contextops.h"
 #include <iio.h>
 
@@ -8,10 +29,10 @@ static iio_context *ctx(ContextHandle h) { return static_cast<iio_context *>(h.p
 ContextHandle V0ContextOps::createContext(const QString &uri, const ContextParams &params)
 {
 	iio_context *c = iio_create_context_from_uri(uri.toUtf8().constData());
-    if(!c) {
+	if(!c) {
 		return {};
 	}
-    if(params.timeoutMs != 0) {
+	if(params.timeoutMs != 0) {
 		iio_context_set_timeout(c, static_cast<unsigned int>(params.timeoutMs));
 	}
 	return {c};

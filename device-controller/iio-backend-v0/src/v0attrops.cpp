@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "v0attrops.h"
 #include <iio.h>
 #include <cerrno>
@@ -53,8 +74,8 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr)
 		if(val) {
 			return QByteArray(val);
 		}
-        return Unexpected{Error{
-            -ENOENT, QStringLiteral("context attr read failed: %1").arg(QString::fromUtf8(ai->name))}};
+		return Unexpected{Error{
+			-ENOENT, QStringLiteral("context attr read failed: %1").arg(QString::fromUtf8(ai->name))}};
 	}
 	case V0AttrInfo::Device:
 		ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(), buf,
@@ -65,8 +86,8 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr)
 					    sizeof(buf));
 		break;
 	case V0AttrInfo::Debug:
-        ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(), buf,
-                         sizeof(buf));
+		ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(), buf,
+						 sizeof(buf));
 		break;
 	case V0AttrInfo::Buffer:
 		ret = iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
@@ -175,8 +196,8 @@ Result<void> V0AttrOps::getRange(AttrHandle attr, double &min, double &step, dou
 
 	QStringList parts = str.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
 	if(parts.size() != 3) {
-        return Unexpected{
-            Error{-EINVAL, QStringLiteral("range: expected \"[min step max]\", got \"%1\"").arg(str)}};
+		return Unexpected{
+			Error{-EINVAL, QStringLiteral("range: expected \"[min step max]\", got \"%1\"").arg(str)}};
 	}
 
 	bool okMin, okStep, okMax;
