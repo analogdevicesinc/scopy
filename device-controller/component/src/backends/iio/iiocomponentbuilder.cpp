@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "component/backends/iio/iiocomponentbuilder.h"
 
 #include "component/backends/iio/iioattribute.h"
@@ -202,7 +223,7 @@ void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
 			for(const scopy::iio::ChannelHandle ch : inputs) {
 				auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
 				el->setIndex(chOps->index(ch));
-                el->setId(chOps->id(ch));
+				el->setId(chOps->id(ch));
 				el->setIsOutput(false);
 			}
 			buildBufferAttributes(stream, dh, b, executor);
@@ -212,7 +233,7 @@ void IIOComponentBuilder::buildStreams(IIODevice *dev, ICmdExecutor *executor)
 			for(const scopy::iio::ChannelHandle ch : outputs) {
 				auto *el = new IIOScanElement(chOps, ch, stream->mask(), executor, stream);
 				el->setIndex(chOps->index(ch));
-                el->setId(chOps->id(ch));
+				el->setId(chOps->id(ch));
 				el->setIsOutput(true);
 			}
 			buildBufferAttributes(stream, dh, b, executor);
