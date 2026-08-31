@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #pragma once
 
 #include "iioutil/ibufferops.h"
@@ -37,15 +58,27 @@ public:
 	QString attrName(scopy::iio::ChannelHandle, unsigned int) const override { return {}; }
 	scopy::iio::DataFormat dataFormat(scopy::iio::ChannelHandle h) const override { return ch(h)->format; }
 
-	void enable(scopy::iio::ChannelHandle h, scopy::iio::ChannelsMaskHandle m) override { set(m)->insert(ch(h)->index); }
-	void disable(scopy::iio::ChannelHandle h, scopy::iio::ChannelsMaskHandle m) override { set(m)->remove(ch(h)->index); }
+	void enable(scopy::iio::ChannelHandle h, scopy::iio::ChannelsMaskHandle m) override
+	{
+		set(m)->insert(ch(h)->index);
+	}
+	void disable(scopy::iio::ChannelHandle h, scopy::iio::ChannelsMaskHandle m) override
+	{
+		set(m)->remove(ch(h)->index);
+	}
 	bool isEnabled(scopy::iio::ChannelHandle h, scopy::iio::ChannelsMaskHandle m) const override
 	{
 		return set(m)->contains(ch(h)->index);
 	}
 
-	size_t read(scopy::iio::ChannelHandle, scopy::iio::BlockHandle, void *, size_t, bool) const override { return 0; }
-	size_t write(scopy::iio::ChannelHandle, scopy::iio::BlockHandle, const void *, size_t, bool) override { return 0; }
+	size_t read(scopy::iio::ChannelHandle, scopy::iio::BlockHandle, void *, size_t, bool) const override
+	{
+		return 0;
+	}
+	size_t write(scopy::iio::ChannelHandle, scopy::iio::BlockHandle, const void *, size_t, bool) override
+	{
+		return 0;
+	}
 	void convert(scopy::iio::ChannelHandle, void *, const void *) const override {}
 	void convertInverse(scopy::iio::ChannelHandle, void *, const void *) const override {}
 };
