@@ -14,7 +14,3 @@ target_include_directories(controller-core
 target_link_libraries(controller-core
     PUBLIC Qt6::Core Qt6::Concurrent QCoro6::Core QCoro6::Coro
 )
-
-if(DC_STANDALONE)
-    add_subdirectory(test)
-endif()

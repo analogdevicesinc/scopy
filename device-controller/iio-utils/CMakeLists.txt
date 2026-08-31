@@ -19,7 +19,3 @@ target_link_libraries(controller-iioutils
     PUBLIC controller-core Qt6::Core
     PRIVATE ${CMAKE_DL_LIBS}
 )
-
-if(DC_STANDALONE)
-    add_subdirectory(test)
-endif()
