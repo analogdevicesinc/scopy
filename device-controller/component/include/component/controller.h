@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #pragma once
 
 #include "component/context.h"
@@ -29,8 +50,7 @@ public:
 	ContextHandle(QString uri, Context *ctx)
 		: m_uri(std::move(uri))
 		, m_ctx(ctx)
-	{
-	}
+	{}
 	~ContextHandle() { reset(); }
 
 	ContextHandle(const ContextHandle &) = delete;
@@ -39,8 +59,7 @@ public:
 	ContextHandle(ContextHandle &&o) noexcept
 		: m_uri(std::move(o.m_uri))
 		, m_ctx(std::exchange(o.m_ctx, nullptr))
-	{
-	}
+	{}
 	ContextHandle &operator=(ContextHandle &&o) noexcept
 	{
 		if(this != &o) {
@@ -80,16 +99,16 @@ public:
 	// built-in kinds; extra kinds can be registered before connect().
 	void registerFactory(BackendKind kind, std::shared_ptr<ContextFactory> factory);
 
-    static ContextHandle connectCtx(const QString &uri, BackendKind backend)
-    {
-        Context *ctx = GetInstance()->_connectCtx(uri, backend);
-        return ctx ? ContextHandle(uri, ctx) : ContextHandle();
-    }
+	static ContextHandle connectCtx(const QString &uri, BackendKind backend)
+	{
+		Context *ctx = GetInstance()->_connectCtx(uri, backend);
+		return ctx ? ContextHandle(uri, ctx) : ContextHandle();
+	}
 
-    static ContextHandle context(const QString &uri) { return GetInstance()->_acquireExisting(uri); }
+	static ContextHandle context(const QString &uri) { return GetInstance()->_acquireExisting(uri); }
 
 	// Adopt an externally-built Context (used by tests with a fake tree).
-    ContextHandle adopt(const QString &uri, Context *ctx);
+	ContextHandle adopt(const QString &uri, Context *ctx);
 
 Q_SIGNALS:
 	void componentAdded(scopy::component::Context *ctx);
@@ -112,7 +131,7 @@ private:
 	static Controller *pinstance_;
 	static std::mutex mutex_;
 	std::mutex m_ctxMutex;
-    QMap<QString, CtxEntry> m_contexts;
+	QMap<QString, CtxEntry> m_contexts;
 	QMap<BackendKind, std::shared_ptr<ContextFactory>> m_factories;
 };
 

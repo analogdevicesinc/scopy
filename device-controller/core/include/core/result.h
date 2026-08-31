@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #pragma once
 
 #include <QMetaType>
@@ -48,20 +69,16 @@ class Result
 public:
 	Result(const T &value)
 		: m_data(std::in_place_index<0>, value)
-    {
-    }
+	{}
 	Result(T &&value)
 		: m_data(std::in_place_index<0>, std::move(value))
-    {
-    }
+	{}
 	Result(const Unexpected<E> &e)
 		: m_data(std::in_place_index<1>, e)
-    {
-    }
+	{}
 	Result(Unexpected<E> &&e)
 		: m_data(std::in_place_index<1>, std::move(e))
-    {
-    }
+	{}
 
 	[[nodiscard]] bool hasValue() const { return m_data.index() == 0; }
 	[[nodiscard]] explicit operator bool() const { return hasValue(); }
@@ -92,13 +109,11 @@ public:
 	Result(const Unexpected<E> &e)
 		: m_error(e.error)
 		, m_hasValue(false)
-    {
-    }
+	{}
 	Result(Unexpected<E> &&e)
 		: m_error(std::move(e.error))
 		, m_hasValue(false)
-    {
-    }
+	{}
 
 	[[nodiscard]] bool hasValue() const { return m_hasValue; }
 	[[nodiscard]] explicit operator bool() const { return m_hasValue; }
@@ -119,33 +134,27 @@ public:
 	CommandResponse(QUuid commandId, const T &value)
 		: Result<T, E>(value)
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, T &&value)
 		: Result<T, E>(std::move(value))
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, const Unexpected<E> &e)
 		: Result<T, E>(e)
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, Unexpected<E> &&e)
 		: Result<T, E>(std::move(e))
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, const Result<T, E> &r)
 		: Result<T, E>(r)
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, Result<T, E> &&r)
 		: Result<T, E>(std::move(r))
 		, m_commandId(commandId)
-	{
-	}
+	{}
 
 	[[nodiscard]] QUuid commandId() const { return m_commandId; }
 
@@ -161,23 +170,19 @@ public:
 	explicit CommandResponse(QUuid commandId)
 		: Result<void, E>()
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, const Unexpected<E> &e)
 		: Result<void, E>(e)
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, Unexpected<E> &&e)
 		: Result<void, E>(std::move(e))
 		, m_commandId(commandId)
-	{
-	}
+	{}
 	CommandResponse(QUuid commandId, const Result<void, E> &r)
 		: Result<void, E>(r)
 		, m_commandId(commandId)
-	{
-	}
+	{}
 
 	[[nodiscard]] QUuid commandId() const { return m_commandId; }
 

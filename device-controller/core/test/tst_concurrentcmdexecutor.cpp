@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "core/pooledcmdexecutor.h"
 #include "core/command.h"
 
@@ -13,19 +34,18 @@ class SlowCommand : public Command
 	Q_OBJECT
 public:
 	SlowCommand(int sleepMs, void *resource = nullptr, QObject *parent = nullptr)
-        : Command(resource, parent)
+		: Command(resource, parent)
 		, m_sleepMs(sleepMs)
-    {
-    }
+	{}
 
 	Result<void> result() const { return m_result; }
 
 protected:
-    void run() override
-    {
-        QThread::msleep(m_sleepMs);
-        m_result = Result<void>{};
-    }
+	void run() override
+	{
+		QThread::msleep(m_sleepMs);
+		m_result = Result<void>{};
+	}
 
 private:
 	int m_sleepMs;
@@ -38,13 +58,13 @@ class TestPooledCmdExecutor : public QObject
 private slots:
 	void parallelExecution();
 	void cancelByResource();
-    void cancelById();
+	void cancelById();
 	void pendingCount();
 };
 
 void TestPooledCmdExecutor::parallelExecution()
 {
-    PooledCmdExecutor exec(4);
+	PooledCmdExecutor exec(4);
 	SlowCommand c1(100);
 	SlowCommand c2(100);
 
@@ -65,7 +85,7 @@ void TestPooledCmdExecutor::parallelExecution()
 void TestPooledCmdExecutor::cancelByResource()
 {
 	int resource = 0;
-    PooledCmdExecutor exec(4);
+	PooledCmdExecutor exec(4);
 	SlowCommand c1(100, &resource);
 	SlowCommand c2(0, &resource);
 
@@ -78,29 +98,29 @@ void TestPooledCmdExecutor::cancelByResource()
 
 void TestPooledCmdExecutor::cancelById()
 {
-    int resource = 0;
-    PooledCmdExecutor exec(4);
-    SlowCommand c1(100, &resource);
-    SlowCommand c2(200, &resource);
+	int resource = 0;
+	PooledCmdExecutor exec(4);
+	SlowCommand c1(100, &resource);
+	SlowCommand c2(200, &resource);
 
-    auto f1 = exec.execute(&c1);
-    auto f2 = exec.execute(&c2);
+	auto f1 = exec.execute(&c1);
+	auto f2 = exec.execute(&c2);
 
-    exec.cancelById(c2.id());
+	exec.cancelById(c2.id());
 
-    QElapsedTimer timer;
-    timer.start();
+	QElapsedTimer timer;
+	timer.start();
 
-    f1.waitForFinished();
+	f1.waitForFinished();
 
-    QVERIFY(c2.isCancelled());
-    f2.waitForFinished();
-    QVERIFY(c2.isCancelled() && timer.elapsed() < 150);
+	QVERIFY(c2.isCancelled());
+	f2.waitForFinished();
+	QVERIFY(c2.isCancelled() && timer.elapsed() < 150);
 }
 
 void TestPooledCmdExecutor::pendingCount()
 {
-    PooledCmdExecutor exec(4);
+	PooledCmdExecutor exec(4);
 	QCOMPARE(exec.pendingCount(), 0);
 }
 

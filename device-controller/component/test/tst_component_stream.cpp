@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "component/backends/iio/iioinputstream.h"
 #include "component/backends/iio/iiooutputstream.h"
 #include "component/backends/iio/iioscanelement.h"
@@ -62,19 +83,19 @@ void TstComponentStream::openEnablesRefillDecodes()
 	bufOps.chOffset.insert(&c0, 0);
 	bufOps.chOffset.insert(&c1, 2);
 
-    QVERIFY(QCoro::waitFor(stream->openAsync({{0, 1}, 3})));
+	QVERIFY(QCoro::waitFor(stream->openAsync({{0, 1}, 3})));
 	QVERIFY(stream->isOpen());
 	QVERIFY(e0->isEnabled());
 	QVERIFY(e1->isEnabled());
 
 	// Fill known bytes: ch0 = 1,2,3 ; ch1 = 10,20,30 (int16 LE, interleaved).
 	auto *p = reinterpret_cast<int16_t *>(bufOps.storage.data());
-    p[0] = 1;
-    p[1] = 10;
-    p[2] = 2;
-    p[3] = 20;
-    p[4] = 3;
-    p[5] = 30;
+	p[0] = 1;
+	p[1] = 10;
+	p[2] = 2;
+	p[3] = 20;
+	p[4] = 3;
+	p[5] = 30;
 
 	QSignalSpy ok(stream, &InputStream::refillSucceeded);
 	QVERIFY(QCoro::waitFor(stream->refillAsync()));
@@ -103,7 +124,7 @@ void TstComponentStream::setKernelBuffersRefusedWhenOpen()
 
 	IIOInputStream stream(&bufOps, &chOps, {reinterpret_cast<void *>(0x1)}, 1, 0, &exec);
 	QVERIFY(stream.setKernelBuffers(8));
-    QVERIFY(QCoro::waitFor(stream.openAsync({{}, 4})));
+	QVERIFY(QCoro::waitFor(stream.openAsync({{}, 4})));
 	QVERIFY(!stream.setKernelBuffers(2));
 }
 
@@ -133,7 +154,7 @@ void TstComponentStream::outputPushEmits()
 	e0->setIndex(0);
 	bufOps.chOffset.insert(&c0, 0);
 
-    QVERIFY(QCoro::waitFor(stream->openAsync({{0}, 2})));
+	QVERIFY(QCoro::waitFor(stream->openAsync({{0}, 2})));
 	QCOMPARE(stream->writeFormat().channels.size(), 1);
 
 	QSignalSpy ok(stream, &OutputStream::pushSucceeded);
