@@ -1,3 +1,24 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "backendfixture.h"
 
 #include "iioutil/icontextops.h"
@@ -37,7 +58,7 @@ void TestDeviceOps::enumerationAndIds()
 {
 	DC_REQUIRE_BACKEND();
 	IContextOps *ctxOps = b->contextOps();
-    IDeviceOps *devOps = b->deviceOps();
+	IDeviceOps *devOps = b->deviceOps();
 	DC_REQUIRE_CONTEXT();
 
 	const unsigned int count = ctxOps->devicesCount(ctx);
@@ -113,7 +134,7 @@ void TestDeviceOps::metadataCallable()
 		(void)devOps->label(dev);
 		(void)devOps->isTrigger(dev);
 		(void)devOps->isHwmon(dev);
-        (void)devOps->buffersCount(dev);
+		(void)devOps->buffersCount(dev);
 	}
 
 	ctxOps->destroyContext(ctx);
@@ -161,7 +182,7 @@ void TestDeviceOps::sampleSizeAndTrigger()
 		const unsigned int cn = devOps->channelsCount(dev);
 		// sampleSize over an all-enabled mask must be non-negative and never crash.
 		ChannelsMaskHandle mask = bufOps->createChannelsMask(cn);
-        (void)devOps->sampleSize(dev, mask);
+		(void)devOps->sampleSize(dev, mask);
 		bufOps->destroyChannelsMask(mask);
 		// getTrigger is a read-only query; a device without a trigger returns null.
 		(void)devOps->getTrigger(dev);
