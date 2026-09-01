@@ -34,6 +34,7 @@ KDDOCK_BRANCH=2.2
 ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
+QCORO_BRANCH=v0.13.0
 
 STAGING_AREA=$SRC_SCRIPT/staging
 QT_INSTALL_PREFIX=/opt/Qt/6.8.3/gcc_${ARCH_SUFFIX}
@@ -231,6 +232,7 @@ clone() {
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
 	popd
 }
 
@@ -364,6 +366,22 @@ build_iio-emu() {
 	popd
 }
 
+build_qcoro() {
+	echo "### Building qcoro - version $QCORO_BRANCH"
+	pushd $STAGING_AREA/qcoro
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DQCORO_BUILD_EXAMPLES=OFF \
+		-DQCORO_BUILD_TESTING=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQCORO_WITH_QTWEBSOCKETS=OFF \
+		-DQCORO_WITH_QTQUICK=OFF \
+		-DQCORO_WITH_QML=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
 build_scopy() {
 	echo "### Building scopy"
 	git config --global --add safe.directory $SRC_DIR
@@ -395,6 +413,7 @@ build_deps() {
 	build_karchive ON
 	build_genalyzer ON
 	build_iio-emu ON
+	build_qcoro ON
 }
 
 create_appdir() {
