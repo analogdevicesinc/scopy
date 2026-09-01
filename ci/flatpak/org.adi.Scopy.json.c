@@ -366,6 +366,29 @@
 			]
 		},
 		{
+			"name": "qcoro",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
+				"-DQCORO_BUILD_EXAMPLES=OFF",
+				"-DQCORO_BUILD_TESTING=OFF",
+				"-DBUILD_TESTING=OFF",
+				"-DQCORO_WITH_QTWEBSOCKETS=OFF",
+				"-DQCORO_WITH_QTQUICK=OFF",
+				"-DQCORO_WITH_QML=OFF",
+				"-DBUILD_SHARED_LIBS=ON"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/qcoro/qcoro.git",
+					"tag": "v0.13.0"
+				}
+			]
+		},
+		{
 			"name": "iio-emu",
 			"builddir": true,
 			"buildsystem": "cmake",
