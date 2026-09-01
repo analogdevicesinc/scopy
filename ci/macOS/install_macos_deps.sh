@@ -219,8 +219,9 @@ clone() {
 		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+		git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
 
-		DEPENDENCY_REPOS="libserialport libiio libad9361 libad9166 qwt libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer"
+		DEPENDENCY_REPOS="libserialport libiio libad9361 libad9166 qwt libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer qcoro"
 		# Save to cache for next time
 		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
 			mkdir -p "$GIT_CACHE_DIR"
@@ -449,6 +450,27 @@ build_genalyzer() {
 	popd
 }
 
+build_qcoro() {
+	echo "### Building qcoro - version $QCORO_BRANCH"
+	CURRENT_BUILD=qcoro
+	pushd $STAGING_AREA/qcoro
+	# QtDBus auto-disabled on APPLE; Network via qtbase. Qt found via $QT (aqt install), like build_kddock.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DCMAKE_PREFIX_PATH=$QT \
+		-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
+		-DQCORO_BUILD_EXAMPLES=OFF \
+		-DQCORO_BUILD_TESTING=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQCORO_WITH_QTWEBSOCKETS=OFF \
+		-DQCORO_WITH_QTQUICK=OFF \
+		-DQCORO_WITH_QML=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
 build_deps(){
 	if [ "${CACHING_ENABLED}" == "true" ] && [ "$DEPENDENCIES_CACHED" == "true" ]; then
 		echo "Found cached dependencies in $STAGING_AREA_DEPS"
@@ -467,6 +489,7 @@ build_deps(){
 	build_ecm
 	build_karchive
 	build_genalyzer
+	build_qcoro
 }
 
 # Setup cache management
