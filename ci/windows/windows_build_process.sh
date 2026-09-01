@@ -125,6 +125,7 @@ clone() {
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
 	popd
 }
 
@@ -388,6 +389,30 @@ build_genalyzer() {
 	JOBS=$PREV_JOBS
 }
 
+build_qcoro() {
+	echo "### Building qcoro - version $QCORO_BRANCH"
+	CURRENT_BUILD=qcoro
+	# QtDBus is auto-disabled by qcoro on WIN32; Network stays ON (qtbase). WebSockets/Quick/QML off
+	# to avoid pulling qtwebsockets/qtdeclarative.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DQCORO_BUILD_EXAMPLES=OFF \
+		-DQCORO_BUILD_TESTING=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQCORO_WITH_QTWEBSOCKETS=OFF \
+		-DQCORO_WITH_QTQUICK=OFF \
+		-DQCORO_WITH_QML=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
+	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
+}
+
 build_deps() {
 	install_packages
 	install_qt
@@ -405,6 +430,7 @@ build_deps() {
 	build_ecm ON
 	build_karchive ON
 	build_genalyzer ON
+	build_qcoro ON
 }
 
 # Run named steps if any were given, otherwise do the full dependency build. The docker image
