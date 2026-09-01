@@ -17,6 +17,7 @@ KDDOCK_BRANCH=2.2
 ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
+QCORO_BRANCH=v0.13.0
 
 
 # Overridable so a local build can keep multi-GB dep checkouts out of a synced/space-containing
