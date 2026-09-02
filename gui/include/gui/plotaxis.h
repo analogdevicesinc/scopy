@@ -72,6 +72,12 @@ public:
 	void setUnitsVisible(bool visible);
 	void setScaleEn(bool en);
 
+	// Draws the labels on the canvas itself instead of in the margin strip QwtPlotLayout
+	// reserves beside it, which hands that strip back to the plot. Driven by the
+	// "plot_labels_inside" preference; live, so it can flip at any point in the axis' life.
+	void setLabelsInside(bool inside);
+	bool labelsInside() const;
+
 public Q_SLOTS:
 	void setMax(double newMax);
 	void setMin(double newMin);
@@ -97,12 +103,18 @@ private:
 	PrefixFormatter *m_formatter;
 	EdgelessPlotScaleItem *m_scaleItem;
 
+	bool m_labelsInside = false;
+	// setVisible() keeps no state of its own, but a live inside/outside switch has to
+	// re-apply the current visibility through whichever path just became the active one.
+	bool m_visible = false;
+
 	int m_id;
 	double m_divs;
 	double m_min;
 	double m_max;
 
 	void setupAxisScale();
+	BasicScaleDraw *insideScaleDraw() const;
 	Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
 	Q_PROPERTY(double min READ min WRITE setMin NOTIFY minChanged)
 };

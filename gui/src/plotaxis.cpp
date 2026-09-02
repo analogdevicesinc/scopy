@@ -21,12 +21,38 @@
 
 #include "plotaxis.h"
 
+#include "insidescaledraw.h"
+
 #include <QDebug>
 #include <QwtPlotLayout>
 #include <qwt_scale_widget.h>
 #include <edgelessplot.h>
+#include <pluginbase/preferences.h>
+#include <style.h>
 
 using namespace scopy;
+
+namespace {
+/*
+ * A QwtPlotScaleItem with a borderDistance >= 0 is pinned to a canvas edge using the
+ * *opposite* of its alignment — a BottomScale lands on canvasRect.top(), a RightScale on
+ * canvasRect.left(). So asking for the mirrored alignment is what draws the labels inward.
+ */
+QwtScaleDraw::Alignment insideAlignment(int position)
+{
+	switch(position) {
+	case QwtAxis::XBottom:
+		return QwtScaleDraw::TopScale;
+	case QwtAxis::XTop:
+		return QwtScaleDraw::BottomScale;
+	case QwtAxis::YLeft:
+		return QwtScaleDraw::RightScale;
+	case QwtAxis::YRight:
+	default:
+		return QwtScaleDraw::LeftScale;
+	}
+}
+} // namespace
 
 PlotAxis::PlotAxis(int position, QwtPlot *plot, int axisIndex, QPen pen, QObject *parent)
 	: QObject(parent)
@@ -109,7 +135,20 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 
 PlotAxis::~PlotAxis() {}
 
-void PlotAxis::setUnitsVisible(bool visible) { m_scaleDraw->setUnitsEnabled(visible); }
+// The inside labels are drawn off a second BasicScaleDraw, so every formatting setter has to
+// reach it as well or the two scales disagree about units and precision.
+BasicScaleDraw *PlotAxis::insideScaleDraw() const
+{
+	return m_labelsInside ? dynamic_cast<BasicScaleDraw *>(m_scaleItem->scaleDraw()) : nullptr;
+}
+
+void PlotAxis::setUnitsVisible(bool visible)
+{
+	m_scaleDraw->setUnitsEnabled(visible);
+	if(BasicScaleDraw *draw = insideScaleDraw()) {
+		draw->setUnitsEnabled(visible);
+	}
+}
 
 void PlotAxis::setScaleEn(bool en)
 {
@@ -136,6 +175,74 @@ void PlotAxis::setupAxisScale()
 	m_scaleItem->setPalette(palette);
 	m_scaleItem->setBorderDistance(0);
 	m_scaleItem->setZ(200);
+
+	setLabelsInside(Preferences::get("plot_labels_inside").toBool());
+	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
+		[this](QString preference, QVariant value) {
+			if(preference == "plot_labels_inside") {
+				setLabelsInside(value.toBool());
+			}
+		});
+}
+
+bool PlotAxis::labelsInside() const { return m_labelsInside; }
+
+void PlotAxis::setLabelsInside(bool inside)
+{
+	if(m_labelsInside == inside) {
+		return;
+	}
+
+	m_labelsInside = inside;
+
+	// The item's scale draw cannot be m_scaleDraw: that one belongs to the external
+	// QwtScaleWidget, and setScaleDraw() takes ownership and deletes whatever it held.
+	if(inside) {
+		auto *draw = new InsideScaleDraw(m_formatter, m_units);
+		draw->setUnitsEnabled(m_scaleDraw->unitsEnabled());
+		draw->setFloatPrecision(m_scaleDraw->getFloatPrecison());
+		m_scaleItem->setScaleDraw(draw);
+	} else {
+		// A plain QwtScaleDraw, not a BasicScaleDraw — the latter's ctor disables Ticks,
+		// which would silently kill the tick-marks decoration this item draws in outside
+		// mode. Detach too, so outside mode is byte-for-byte the pre-feature behaviour.
+		m_scaleItem->setScaleDraw(new QwtScaleDraw());
+		m_scaleItem->detach();
+	}
+
+	QwtScaleDraw *draw = m_scaleItem->scaleDraw();
+	draw->setAlignment(inside ? insideAlignment(m_position) : static_cast<QwtScaleDraw::Alignment>(m_position));
+	draw->enableComponent(QwtAbstractScaleDraw::Backbone, false);
+	draw->enableComponent(QwtAbstractScaleDraw::Labels, inside);
+
+	// The end major ticks carry the interval bounds, so inside mode needs them back —
+	// without this a 0..1 axis reads "0.2 0.4 0.6 0.8".
+	m_scaleItem->setEdgeless(!inside);
+
+	// Inside labels sit over the traces, so they get the high-contrast content colour
+	// rather than the muted one the external scales use. A few pixels of border keep the
+	// vertical labels off the canvas frame.
+	QColor labelColor = inside ? QColor(Style::getAttribute(json::theme::content_default)) : QColor(0x6E6E6F);
+	QPalette palette = m_scaleItem->palette();
+	palette.setBrush(QPalette::WindowText, labelColor);
+	palette.setBrush(QPalette::Text, labelColor);
+	m_scaleItem->setPalette(palette);
+	m_scaleItem->setBorderDistance(inside && isVertical() ? 4 : 0);
+
+	if(auto *basicDraw = dynamic_cast<BasicScaleDraw *>(draw)) {
+		basicDraw->setColor(labelColor);
+	}
+
+	// Bind the item to this axis; otherwise it tracks Qwt's default index 0 and shows
+	// numbers off the wrong scale as soon as a second axis shares this position — the
+	// normal case for AcqPlot's pooled axes.
+	if(isHorizontal()) {
+		m_scaleItem->setXAxis(m_axisId);
+	} else {
+		m_scaleItem->setYAxis(m_axisId);
+	}
+
+	setVisible(m_visible);
 }
 
 int PlotAxis::position() { return m_position; }
@@ -150,6 +257,9 @@ void PlotAxis::setFormatter(PrefixFormatter *formatter)
 {
 	m_formatter = formatter;
 	m_scaleDraw->setFormatter(m_formatter);
+	if(BasicScaleDraw *draw = insideScaleDraw()) {
+		draw->setFormatter(m_formatter);
+	}
 
 	Q_EMIT formatterChanged(formatter);
 }
@@ -160,6 +270,9 @@ void PlotAxis::setUnits(QString units)
 {
 	m_units = units;
 	m_scaleDraw->setUnitType(m_units);
+	if(BasicScaleDraw *draw = insideScaleDraw()) {
+		draw->setUnitType(m_units);
+	}
 
 	Q_EMIT unitsChanged(units);
 }
@@ -179,7 +292,26 @@ void PlotAxis::setInterval(double min, double max)
 	//	updateAxisScale();
 }
 
-void PlotAxis::setVisible(bool val) { m_plot->setAxisVisible(m_axisId, val); }
+void PlotAxis::setVisible(bool val)
+{
+	m_visible = val;
+
+	if(m_labelsInside) {
+		// Kept unconditionally hidden: that is what stops QwtPlotLayout reserving the
+		// strip beside the canvas, which is the whole point of the feature.
+		m_plot->setAxisVisible(m_axisId, false);
+		if(val) {
+			m_scaleItem->attach(m_plot);
+		} else {
+			m_scaleItem->detach();
+		}
+		// Attaching a plot item does not force a repaint the way setAxisVisible() does.
+		m_plot->replot();
+		return;
+	}
+
+	m_plot->setAxisVisible(m_axisId, val);
+}
 
 void PlotAxis::updateAxisScale()
 {
