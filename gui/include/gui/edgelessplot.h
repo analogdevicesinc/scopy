@@ -36,6 +36,15 @@ class SCOPY_GUI_EXPORT EdgelessPlotScaleItem : public QwtPlotScaleItem
 public:
 	explicit EdgelessPlotScaleItem(QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale, const double pos = 0.0);
 	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
+
+	// Trimming the end ticks is the point of this class, so it stays on by default. It can
+	// be turned off for the callers that draw labels off these ticks — the end labels are
+	// the interval bounds, and dropping them makes a 0..1 axis read "0.2 0.4 0.6 0.8".
+	void setEdgeless(bool edgeless);
+	bool isEdgeless() const;
+
+private:
+	bool m_edgeless = true;
 };
 
 /*

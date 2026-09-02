@@ -52,9 +52,14 @@ public:
 
 	void enableDeltaLabel(bool enable);
 	void setUnitsEnabled(bool enable);
+	bool unitsEnabled() const;
 
 protected:
 	virtual void draw(QPainter *, const QPalette &) const;
+
+	// label() derives the delta step from the tick count, so a subclass that overrides draw()
+	// has to keep this in sync itself.
+	void setNrTicks(unsigned int nrTicks) const;
 
 private:
 	int m_floatPrecision;
