@@ -36,7 +36,14 @@ public:
 	~MapStackedWidget();
 
 	virtual void add(QString key, QWidget *w);
+	// Unstacks the widget and forgets the key, but does not delete: the widget is
+	// reparented to nothing and becomes a hidden top-level. Callers that keep their
+	// own pointer rely on that; callers that do not want it should use
+	// removeAndDelete() instead of leaking an orphan.
 	virtual bool remove(QString key);
+	// remove(), then deleteLater() the widget. Deferred rather than immediate because
+	// this is usually reached from a handler belonging to something inside the page.
+	bool removeAndDelete(QString key);
 	virtual QString getKey(QWidget *w);
 	virtual bool contains(QString key);
 	virtual QWidget *get(QString key);

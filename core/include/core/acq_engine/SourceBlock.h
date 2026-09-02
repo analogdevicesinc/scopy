@@ -53,6 +53,11 @@ public:
 	// (e.g. MathSource) override this again.
 	QList<DataKey> outputKeys() const override;
 
+	// A Curve labelled with the channel id, for any of this source's raw keys.
+	// A source producing something that is not a trace — a logic capture, a
+	// spectrum — overrides this.
+	std::optional<StreamInfo> streamInfo(const DataKey &key) const override;
+
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 Q_SIGNALS:

@@ -2,6 +2,8 @@
 
 #include "scopy-core_export.h"
 
+#include "DataKey.h"
+
 #include <deque>
 #include <optional>
 #include <variant>
@@ -68,6 +70,62 @@ struct AnnotationStreamInfo
 	quint64 bitrate{0};
 };
 
+// How a stream is drawn *if* a view asks for it to be drawn. This is the
+// producer's recommendation, not a request: no view creates a channel off the
+// back of it — that is the instrument's explicit call — so a stream declared
+// Curve is not on any plot until someone says addChannel().
+//
+// Always an explicit choice by whoever declares the stream — there is
+// deliberately no "figure it out from the SampleType" value.
+// Such a value can only ever be a guess (UInt8 is as plausibly an 8-bit ADC as
+// it is a logic line), and a wrong guess draws something misleading rather than
+// failing, which is worse than asking the producer to state what it publishes.
+//
+// `Hidden` is the default because it is the only safe thing to assume about a
+// stream nobody described: that it exists to be read by something other than a
+// plot — an X axis, a processor's input — and is not a trace.
+enum class ReprKind { Hidden, Curve, Digital, Annotations, Waterfall };
+
+SCOPY_CORE_EXPORT const char *reprKindName(ReprKind k);
+
+// Stream-level presentation descriptor, held once per DataKey.
+//
+// Same contract as AnnotationStreamInfo above, and the same reason for
+// existing: the producer knows what its stream *means* — that a chunk of
+// floats is a voltage in volts, or an FFT magnitude indexed by a companion
+// frequency stream — and without somewhere to say so, every consumer has to
+// guess it back from the key string and the sample type. Purely descriptive:
+// nothing in the engine reads this, only views.
+//
+// AnnotationStreamInfo stays separate rather than merging into this. It
+// describes *protocol* semantics (radix, bitrate, producing decoder) that a
+// downstream decoder consumes, which is a different concern from how a plot
+// should present the stream.
+struct StreamInfo
+{
+	// Display name. Empty means the view derives one from the key.
+	QString label;
+
+	// Y unit, e.g. "V", "dBFS". Empty when dimensionless or unknown.
+	QString unit;
+
+	// The timeline startSample/endSample and horizontal measurements are
+	// expressed on. 0 = unknown, so a view measures in samples.
+	double sampleRate{0.0};
+
+	// A companion stream holding this one's X values — FFT bin frequencies
+	// against FFT magnitudes. Empty means X is the sample index.
+	DataKey xKey;
+
+	// How to draw it, and — since the default is Hidden — also whether to draw
+	// it at all. There is no separate opt-in flag: a stream a producer never
+	// described stays Hidden, and naming any other kind *is* the opt-in.
+	ReprKind kind{ReprKind::Hidden};
+
+	// Index into the view's channel palette. -1 = let the view assign.
+	int colorIndex{-1};
+};
+
 enum class SampleType { Float32, Float64, Int32, Int16, Int8, UInt8, Annotation };
 
 using SampleVariant = std::variant<
@@ -118,7 +176,8 @@ SCOPY_CORE_EXPORT SampleVariant truncateWindow(const SampleVariant &v, int n);
 SCOPY_CORE_EXPORT SampleVariant shiftAnnotations(const SampleVariant &v, int n, int delta);
 
 // Bounded chunk history for one stream, newest at index 0. Capacity is owned by
-// the DataStore (see DataStore::claimDepth); pushing past it drops the oldest.
+// the DataStore (see DataStore::claimSamples / claimChunks); pushing past it drops
+// the oldest.
 class SCOPY_CORE_EXPORT SampleBuffer
 {
 public:

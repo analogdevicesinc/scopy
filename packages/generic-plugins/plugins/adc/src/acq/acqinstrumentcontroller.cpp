@@ -23,34 +23,30 @@
 
 #include "PlutoIIOSource.h"
 #include "acqinstrument.h"
+#include "acqplot.h"
+#include "acqplotkind.h"
 #include "acqplotmanager.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
 #include <core/acq_engine/SourceBlock.h>
-#include <gui/cursorcontroller.h>
 #include <gui/instrumenttemplate.h>
 #include <gui/style.h>
-#include <gui/widgets/cursorsettings.h>
-#include <gui/widgets/hoverwidget.h>
+#include <gui/widgets/genalyzerpanel.h>
 
 #include <QMap>
 #include <QPointer>
-#include <QPushButton>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include <memory>
+#include <vector>
 
 using namespace scopy;
 using namespace scopy::adc;
 
 namespace {
-
-// Pluto's RX default. The source doesn't read the rate back, so the FFT has to be
-// told, and a wrong value only mislabels the frequency axis.
-constexpr double kPlutoSampleRate = 2.4e6;
 
 // Wraps a block's own settings widget in a menu page with an owner pill, which is
 // what every rail row's page is made of.
@@ -71,6 +67,7 @@ QWidget *blockPage(InstrumentTemplate *it, scopy::acq::Block *block, const QStri
 
 AcqInstrumentController::AcqInstrumentController(ToolMenuEntry *tme, QObject *parent)
 	: QObject(parent)
+	, m_kPlutoSampleRate(2.4e6)
 	, m_tme(tme)
 {
 }
@@ -90,6 +87,9 @@ void AcqInstrumentController::init(iio_context *ctx)
 	setupBlocks(ctx);
 	// After setupBlocks: the channels added here point at keys the blocks declare.
 	setupPlots();
+	// After both: it sits in a slot around the center widget setupPlots() installs,
+	// and it listens to the block setupBlocks() created.
+	setupAnalysisPanel();
 
 	// The tool menu's own run button and the instrument's stay in step. Guarded
 	// by ToolMenuEntry::setRunning() only changing state, so the echo back is a
@@ -127,11 +127,11 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 							  scopy::acq::DataKey::raw("pluto", "voltage1"),
 							  scopy::acq::DataKey::withStage("pluto", "iq", "fft"),
 							  scopy::acq::DataKey::withStage("pluto", "iq", "freq"),
-							  static_cast<int>(engine->bufferSize()), kPlutoSampleRate,
+							  static_cast<int>(engine->bufferSize()), m_kPlutoSampleRate,
 							  GnWindowHann, engine);
 	// Lets the block claim chunk history when averaging is turned on: navg frames
-	// of nfft samples span more than one acquisition buffer.
-	m_fftProc->setAveragingStore(m_ui->store(), engine->bufferSize());
+	// are navg past chunks.
+	m_fftProc->setAveragingStore(m_ui->store());
 	engine->addProcessor(m_fftProc);
 
 	// Rail rows, so both blocks are reachable and the pipeline tab has something to
@@ -232,13 +232,13 @@ void AcqInstrumentController::setupPlots()
 	connect(m_ui, &AcqInstrument::cycleComplete, m_plots, &AcqPlotManager::onCycleComplete);
 	connect(m_ui, &AcqInstrument::started, m_plots, &AcqPlotManager::onStarted);
 	connect(m_ui, &AcqInstrument::stopped, m_plots, &AcqPlotManager::onStopped);
-	// Depth is ceil(plotSize / bufferSize), so every channel's claim depends on a
-	// number only the instrument's buffer control knows about.
-	connect(m_ui, &AcqInstrument::bufferSizeChanged, m_plots, &AcqPlotManager::onBufferSizeChanged);
+	// Nothing wired to the buffer size: a channel claims its window in samples and the
+	// store converts, so the view never learns the chunk length. See AcqInstrument's
+	// signal list for why that signal no longer exists.
 
-	// How much history is drawn, independent of how much arrives per cycle: depth is
-	// ceil(plotSize / bufferSize), so a window wider than the buffer is stitched from
-	// several chunks. Live while running — it only changes claims and the X range.
+	// How much history is drawn, independent of how much arrives per cycle: a window
+	// wider than one buffer is stitched from several chunks, which is the store's
+	// business. Live while running — it only changes claims and the X range.
 	gui::MenuSpinbox *plotSpin = new gui::MenuSpinbox("Plot window", m_plots->plotSize(), "samples", 16, 1 << 20,
 							  true, false, false, it);
 	plotSpin->setIncrementMode(gui::MenuSpinbox::IS_POW2);
@@ -246,51 +246,163 @@ void AcqInstrumentController::setupPlots()
 	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots,
 		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
 
-	// Cursors over row 0, with their settings in a hover panel off the button rather
-	// than a right-menu page: the settings are read while dragging the handles, so they
-	// have to sit next to the plot instead of stealing the menu the channel being
-	// measured is configured in.
-	CursorSettings *cursorSettings = nullptr;
-	if(CursorController *cursors = m_plots->cursors(&cursorSettings)) {
-		QPushButton *cursorBtn = new QPushButton(tr("Cursors"), it);
-		cursorBtn->setCheckable(true);
-		// The same styling the shell gives its own Debug button, which is the other
-		// bottom-rail toggle — both are view state rather than engine controls, which is
-		// why they sit here and not in the top rail with Run.
-		Style::setStyle(cursorBtn, style::properties::button::blueGrayButton);
-		Style::setStyle(cursorBtn, style::properties::label::menuMedium);
-		it->addToBottomRail(cursorBtn, TTA_RIGHT);
-		connect(cursorBtn, &QPushButton::toggled, cursors, &CursorController::setVisible);
-
-		// The same anchoring the ADC time and FFT instruments use for their cursor
-		// panels (adctimeinstrumentcontroller.cpp:55-58): the button's top-right corner
-		// to the panel's top-left, offset 10px up. Because HP_TOPLEFT places the content
-		// by its bottom-right, that grows the panel up and to the left of the button —
-		// which is what keeps it on screen from a bottom-rail anchor. Parented to the
-		// shell so it floats over the plot instead of being clipped to the rail.
-		HoverWidget *hover = new HoverWidget(cursorSettings, cursorBtn, it);
-		hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-		hover->setContentPos(HoverPosition::HP_TOPLEFT);
-		hover->setAnchorOffset(QPoint(0, -10));
-		connect(cursorBtn, &QPushButton::toggled, hover, [hover](bool on) {
-			hover->setVisible(on);
-			// Later-created siblings (the measure and stats panels) stack above it
-			// otherwise, and a settings panel behind the plot is unusable.
-			hover->raise();
-		});
+	// The engine's sample-index ramp has to be at least as long as the widest plot, or a
+	// plot wider than it reads a short X window and draws a truncated curve. The manager
+	// states the requirement and this connection applies it — the manager holds no engine
+	// pointer on purpose.
+	//
+	// Only a length change reaches the engine's std::iota; the write itself is one chunk,
+	// so this costs nothing per cycle.
+	if(scopy::acq::AcquisitionEngine *engine = m_ui->engine()) {
+		connect(m_plots, &AcqPlotManager::maxWindowSizeChanged, engine,
+			[engine](int n) { engine->setIndexRampLength(static_cast<std::size_t>(n)); });
+		// Once now: the manager's plots and channels are created below, and a channel
+		// reads X on its very first pull.
+		engine->setIndexRampLength(static_cast<std::size_t>(m_plots->plotSize()));
 	}
 
-	// No plot channels are created here, and none need to be: the manager materialises
-	// one per stream whose producer declared a ReprKind, so a block added to the
-	// pipeline appears on the plot without a line of code here. See
-	// AcqPlotManager::AutoPolicy.
+	// No cursors wiring here any more. Cursors are per plot, on the plot's own VIEW
+	// section, because PlotCursors binds its handles to one canvas in its constructor —
+	// so one instrument-wide button and controller could only ever drive the first plot.
+
 	if(m_fftProc) {
 		// The timeline for channels whose producer declared no rate — the raw source
 		// channels, since SourceBlock cannot know the device rate. From the FFT
 		// processor because that is where the rate is configured. A stream that carries
-		// its own rate (the FFT magnitudes do) ignores this.
+		// its own rate (the FFT magnitudes do) ignores this. Before the channels below,
+		// though either order works.
 		m_plots->setFallbackSampleRate(m_fftProc->sampleRate());
 	}
+
+	// --- A starting view, and only a starting view -------------------------------
+	//
+	// Everything below is one worked example of the manager's API, not policy. The
+	// manager scans nothing and infers nothing: with these lines removed the instrument
+	// opens on an empty dock area and the reader builds whatever they want from the "Plots"
+	// rail group. They are here so the tool opens on something useful, and so the two
+	// cases the tree was designed around are exercised on every run.
+	//
+	// The reader can delete either plot, delete either channel, retarget any axis, or add
+	// more of both — nothing here is protected and nothing recreates itself.
+	//
+	// The pipeline still owns the *details* of each channel: label, unit, colour, sample
+	// rate and recommended X source all come from the producer's StreamInfo. What these
+	// lines decide is only that the channel exists at all.
+	setupExampleView();
+}
+
+void AcqInstrumentController::setupExampleView()
+{
+	if(!m_plots) {
+		return;
+	}
+
+	// --- 1. Time domain: both raw channels on one Basic plot ---------------------
+	//
+	// First, which is all order decides now that the plots are docks: this one sits above
+	// the waterfall, and the two share the height evenly until the reader drags the
+	// separator.
+	//
+	// Both against the sample index (the default empty xKey), which is what makes them
+	// share one X scale and stay aligned with each other. They are the case per-channel X
+	// costs nothing for: two channels, one X source, one visible X axis.
+	if(AcqPlot *timePlot = m_plots->addPlot(tr("Time"), AcqPlotKind::Basic)) {
+		m_plots->addChannel(timePlot, scopy::acq::ReprKind::Curve,
+				    scopy::acq::DataKey::raw("pluto", "voltage0"));
+		m_plots->addChannel(timePlot, scopy::acq::ReprKind::Curve,
+				    scopy::acq::DataKey::raw("pluto", "voltage1"));
+	}
+
+	if(!m_fftProc) {
+		// No FFT block in the pipeline, so there is no magnitude stream to draw and no
+		// frequency stream to draw it against. The time plot above still stands.
+		return;
+	}
+
+	// --- 2. Spectrogram: FFT magnitude over time, indexed by frequency -----------
+	//
+	// A Waterfall plot rather than a Basic one, because the vertical axis here is chunk
+	// history and not a value range — which is a different plot widget, not a different
+	// curve style. One channel is all a spectrogram raster can show; nothing enforces
+	// that, so a second one added by hand interleaves its rows with this one's.
+	//
+	// X is freqKey(), a real stream in Hz, not the sample index. This is the case the
+	// per-channel X axis exists for, and it is why the channel registers a depth claim on
+	// its X key as well as its Y key: an X stream left at the store's default capacity
+	// would clip the magnitudes to a single chunk and the spectrum would draw short.
+	// The Hz unit is read off the frequency stream's own descriptor, so it is not restated
+	// here.
+	//
+	// freqKey() is deliberately not a channel of its own — it *is* this channel's X axis,
+	// and a frequency ramp plotted against itself says nothing.
+	if(AcqPlot *wfPlot = m_plots->addPlot(tr("Spectrogram"), AcqPlotKind::Waterfall)) {
+		m_plots->addChannel(wfPlot, scopy::acq::ReprKind::Waterfall, m_fftProc->outputKey(),
+				    m_fftProc->freqKey());
+	}
+}
+
+void AcqInstrumentController::setupAnalysisPanel()
+{
+	if(!m_fftProc) {
+		// No processor means no context: the panel would have nothing to ever show.
+		return;
+	}
+
+	InstrumentTemplate *it = m_ui->shell();
+
+	// PS_RIGHT rather than the right menu: this is a read-out that annotates the
+	// spectrum, so it belongs beside the plot and stays visible while a channel's
+	// menu page is open. The slot collapses to zero width when the panel is hidden.
+	m_genalyzerPanel = new GenalyzerPanel(it);
+	it->addToSlot(PS_RIGHT, m_genalyzerPanel);
+	m_genalyzerPanel->setVisible(m_fftProc->config().enabled);
+
+	// The one row the panel gets: the FFT output key, coloured to match nothing in
+	// particular — the spectrum's own colour comes from the plot manager's palette.
+	const QString channelName = m_fftProc->outputKey().toString();
+
+	// Queued: the engine runs the processor on its own thread. The snapshot is a
+	// registered metatype, so it deep-copies across the connection.
+	connect(
+		m_fftProc, &scopy::acq::GenalyzerFFTProcessor::analysisReady, this,
+		[this, channelName](const scopy::acq::GenalyzerResultsSnapshot &snap) {
+			if(!m_genalyzerPanel) {
+				return;
+			}
+			// GenalyzerPanel::updateResults takes genalyzer's raw char**/double*
+			// arrays, so the snapshot is unpacked into views that outlive the call.
+			const int               n = snap.keys.size();
+			std::vector<QByteArray> keyBytes;
+			keyBytes.reserve(n);
+			std::vector<char *> keyPtrs;
+			keyPtrs.reserve(n);
+			for(const QString &k : snap.keys) {
+				keyBytes.emplace_back(k.toUtf8());
+				keyPtrs.push_back(keyBytes.back().data());
+			}
+			std::vector<double> values(snap.values.begin(), snap.values.end());
+			m_genalyzerPanel->updateResults(channelName, QColor(0x4a, 0xb8, 0xff), static_cast<size_t>(n),
+							keyPtrs.empty() ? nullptr : keyPtrs.data(),
+							values.empty() ? nullptr : values.data());
+		},
+		Qt::QueuedConnection);
+
+	// Disabling analysis leaves the last numbers frozen on screen, which reads as a
+	// live measurement that stopped updating — so the table goes away with it. It is
+	// cleared rather than just hidden: the next enable should not flash stale values
+	// before the first snapshot arrives.
+	connect(
+		m_fftProc, &scopy::acq::GenalyzerFFTProcessor::analysisEnabledChanged, this,
+		[this](bool en) {
+			if(!m_genalyzerPanel) {
+				return;
+			}
+			if(!en) {
+				m_genalyzerPanel->clear();
+			}
+			m_genalyzerPanel->setVisible(en);
+		},
+		Qt::QueuedConnection);
 }
 
 void AcqInstrumentController::stop()

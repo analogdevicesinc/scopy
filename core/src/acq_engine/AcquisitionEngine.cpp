@@ -1,6 +1,8 @@
 #include "AcquisitionEngine.h"
 
+#include <algorithm>
 #include <exception>
+#include <numeric>
 #include <QElapsedTimer>
 #include <QMutexLocker>
 #include <QStringList>
@@ -13,8 +15,15 @@ using Severity = AcquisitionError::Severity;
 AcquisitionEngine::AcquisitionEngine(DataStore *store, QObject *parent)
 	: QObject(parent)
 	, m_store(store)
+	, m_defaultIndexRampLength(1024)
 {
 	qRegisterMetaType<scopy::acq::DataKey>("scopy::acq::DataKey");
+
+	// Written in the ctor: a channel can be created and read before the first
+	// cycle, and an X source with no samples draws nothing at all. The matching
+	// descriptor needs no publishing — streamInfo() answers for this key itself.
+	if(m_store)
+		publishIndexRamp(m_defaultIndexRampLength);
 }
 
 AcquisitionEngine::~AcquisitionEngine()
@@ -107,10 +116,71 @@ void AcquisitionEngine::syncBlocks()
 		m_pendingRemoveProcessors.clear();
 	}
 
-	// Emitted with m_blockMutex released: a directly-connected slot calling
-	// sources()/processors() would otherwise deadlock on it.
+	// Emitted with m_blockMutex released: a directly-connected consumer that
+	// reached back into sources()/processors() would deadlock on it.
 	if(changed)
 		Q_EMIT blocksChanged();
+}
+
+// --- Stream descriptors ------------------------------------------------------
+//
+// Both take a snapshot of the block lists under m_blockMutex and then call into
+// the blocks with it released: a block takes its own lock in there (SourceBlock
+// its channel mutex, GenalyzerFFTProcessor the genalyzer one), and holding two at
+// once is how deadlocks are built.
+
+QList<Block *> AcquisitionEngine::blockSnapshot() const
+{
+	QMutexLocker lk(&m_blockMutex);
+	QList<Block *> blocks;
+	blocks.reserve(m_sources.size() + m_processors.size());
+	for(SourceBlock *s : m_sources)
+		blocks.append(s);
+	for(ProcessorBlock *p : m_processors)
+		blocks.append(p);
+	return blocks;
+}
+
+std::optional<StreamInfo> AcquisitionEngine::streamInfo(const DataKey &key) const
+{
+	// The ramp is the engine's own stream, not any block's, so it is answered here.
+	// First, not last: no block produces this key, so asking them all would be a
+	// walk that cannot succeed. Hidden, like every stream that exists to be read as
+	// an X axis and is not a trace.
+	if(key == indexRampKey()) {
+		StreamInfo info;
+		info.label = QStringLiteral("sample index");
+		info.unit  = QStringLiteral("samples");
+		info.kind  = ReprKind::Hidden;
+		return info;
+	}
+
+	// First answer wins, which is not a real contest: keys are namespaced by
+	// producer name, so at most one block recognises any given one.
+	const QList<Block *> blocks = blockSnapshot();
+	for(Block *b : blocks) {
+		if(const std::optional<StreamInfo> info = b->streamInfo(key))
+			return info;
+	}
+
+	return std::nullopt;
+}
+
+QList<DataKey> AcquisitionEngine::declaredKeys() const
+{
+	// outputKeys(), not a second per-block enumeration: a block's outputs *are* the
+	// keys it can describe, and the descriptor lookup above answers nullopt for
+	// anything else. One list, so there is nothing to drift.
+	QSet<DataKey> all;
+	const QList<Block *> blocks = blockSnapshot();
+	for(Block *b : blocks) {
+		const QList<DataKey> out = b->outputKeys();
+		for(const DataKey &k : out)
+			all.insert(k);
+	}
+	all.insert(indexRampKey());
+
+	return all.values();
 }
 
 QList<SourceBlock *> AcquisitionEngine::sources() const
@@ -130,6 +200,56 @@ QList<ProcessorBlock *> AcquisitionEngine::processors() const
 bool         AcquisitionEngine::isRunning() const { return m_running; }
 void         AcquisitionEngine::setBufferSize(std::size_t size) { m_bufferSize = size; }
 std::size_t  AcquisitionEngine::bufferSize() const { return m_bufferSize; }
+
+// --- The sample-index ramp ---------------------------------------------------
+
+DataKey AcquisitionEngine::indexRampKey()
+{
+	// Neither component may contain an underscore: DataKey parses right-anchored
+	// on '_', so "sample_index" as one component would reparse as channel
+	// "sample" / stage "index" and sourceId() would answer wrongly.
+	return DataKey::withStage(QStringLiteral("engine"), QStringLiteral("sample"),
+				  QStringLiteral("index"));
+}
+
+std::size_t AcquisitionEngine::indexRampLength() const
+{
+	QMutexLocker lk(&m_rampMutex);
+	return static_cast<std::size_t>(m_indexRamp.size());
+}
+
+void AcquisitionEngine::setIndexRampLength(std::size_t n)
+{
+	publishIndexRamp(n);
+}
+
+void AcquisitionEngine::publishIndexRamp(std::size_t n)
+{
+	if(!m_store)
+		return;
+
+	n = std::max<std::size_t>(1, n);
+
+	QVector<float> ramp;
+	{
+		QMutexLocker lk(&m_rampMutex);
+		if(static_cast<std::size_t>(m_indexRamp.size()) != n) {
+			m_indexRamp.resize(static_cast<int>(n));
+			std::iota(m_indexRamp.begin(), m_indexRamp.end(), 0.0f);
+		}
+		// Copied under the lock, written outside it: DataStore::write takes its
+		// own mutex, and holding two at once is how deadlocks are built. The copy
+		// is a refcount bump — the resize above is what detaches.
+		ramp = m_indexRamp;
+	}
+
+	// Unconditional, even when the length did not change: this is also the path
+	// that re-establishes the chunk after DataStore::clear() dropped it.
+	m_store->write(indexRampKey(), ramp);
+}
+
+// --- Configuration, continued ------------------------------------------------
+
 void         AcquisitionEngine::setMaxFPS(unsigned int fps) { m_maxFPS.store(fps); }
 unsigned int AcquisitionEngine::maxFPS() const { return m_maxFPS.load(); }
 void         AcquisitionEngine::setMode(Mode m) { m_mode.store(m); }
@@ -185,6 +305,10 @@ void AcquisitionEngine::startLoop(int acqCount)
 	joinThread();
 
 	syncBlocks();
+
+	// Unconditional: a previous run's clear()/reset() drops the ramp's chunk, so it
+	// is re-established here rather than only when its length changes.
+	publishIndexRamp(indexRampLength());
 
 	m_acqCount  = acqCount;
 	m_faultStop = false;

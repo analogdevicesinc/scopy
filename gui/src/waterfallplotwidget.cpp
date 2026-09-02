@@ -29,7 +29,9 @@
 #include <plot_utils.hpp>
 
 #include <qwt_scale_widget.h>
+#include <algorithm>
 #include <cfloat>
+#include <cstring>
 #include <vector>
 
 using namespace scopy;
@@ -40,6 +42,8 @@ using namespace scopy;
 
 WaterfallData::WaterfallData()
 	: QwtRasterData()
+	, m_head(0)
+	, m_count(0)
 	, m_maxRows(0)
 	, m_fftSize(0)
 	, m_antialiasing(true)
@@ -49,43 +53,118 @@ WaterfallData::WaterfallData()
 
 WaterfallData::~WaterfallData() {}
 
-void WaterfallData::addFFTData(const float *data, size_t size)
+void WaterfallData::rebuildRing()
 {
-	if(!data || size == 0)
+	if(m_maxRows <= 0 || m_fftSize == 0) {
+		m_ring.clear();
+		m_head = 0;
+		m_count = 0;
 		return;
-
-	if(m_fftSize == 0)
-		m_fftSize = size;
-
-	if(size != m_fftSize) {
-		m_data.clear();
-		m_fftSize = size;
 	}
 
-	m_data.push_back(std::vector<float>(data, data + size));
+	// The slot count the existing block was laid out with, which is not m_maxRows —
+	// this runs *after* m_maxRows changed, and row() would otherwise wrap the old
+	// data modulo the new size.
+	const int oldRows = m_fftSize > 0 ? static_cast<int>(m_ring.size() / m_fftSize) : 0;
+	const int keep = std::min(m_count, m_maxRows);
 
-	while(static_cast<int>(m_data.size()) > m_maxRows)
-		m_data.pop_front();
+	std::vector<float> next(static_cast<size_t>(m_maxRows) * m_fftSize, -FLT_MAX);
+	// The newest `keep` rows, oldest-first from slot 0, so the result starts unwrapped
+	// and the copy is a single pass.
+	for(int i = 0; oldRows > 0 && i < keep; ++i) {
+		int slot = (m_head - keep + i) % oldRows;
+		if(slot < 0)
+			slot += oldRows;
+		std::memcpy(next.data() + static_cast<size_t>(i) * m_fftSize,
+			    m_ring.data() + static_cast<size_t>(slot) * m_fftSize, m_fftSize * sizeof(float));
+	}
+	m_ring = std::move(next);
+	m_count = oldRows > 0 ? keep : 0;
+	m_head = m_count % m_maxRows;
 }
+
+void WaterfallData::pushRow(const float *data, size_t len)
+{
+	float *dst = m_ring.data() + static_cast<size_t>(m_head) * m_fftSize;
+	std::memcpy(dst, data, len * sizeof(float));
+	if(len < m_fftSize)
+		std::fill(dst + len, dst + m_fftSize, -FLT_MAX);
+	m_head = (m_head + 1) % m_maxRows;
+	if(m_count < m_maxRows)
+		++m_count;
+}
+
+void WaterfallData::appendRow(const float *data, size_t size)
+{
+	// m_maxRows == 0 means setMaxRows() has not run yet. Dropping the row is the old
+	// behaviour; the difference is that it no longer latches m_fftSize on the way out,
+	// which used to leave value() reading a ring that was never filled.
+	if(!data || size == 0 || m_maxRows <= 0)
+		return;
+
+	if(size != m_fftSize) {
+		// A bin-count change invalidates every stored row — they are spectra of a
+		// different width. Same semantics as the old addFFTData, which cleared.
+		m_fftSize = size;
+		m_ring.assign(static_cast<size_t>(m_maxRows) * m_fftSize, -FLT_MAX);
+		m_head = 0;
+		m_count = 0;
+	} else if(m_ring.size() != static_cast<size_t>(m_maxRows) * m_fftSize) {
+		// setMaxRows() ran before the geometry was known, or the allocation is
+		// otherwise stale. Sized here so a row count set ahead of the first frame
+		// costs nothing.
+		rebuildRing();
+		if(m_ring.empty())
+			return;
+	}
+
+	pushRow(data, size);
+}
+
+void WaterfallData::addFFTData(const float *data, size_t size) { appendRow(data, size); }
 
 void WaterfallData::setSnapshot(std::vector<QVector<float>> rows)
 {
-	// rows[0]=newest, rows.back()=oldest (SampleBuffer convention).
-	// m_data stores oldest-first (push_back = newest), so we reverse.
-	m_data.clear();
-	if(rows.empty()) {
-		m_fftSize = 0;
+	// rows[0]=newest, rows.back()=oldest (SampleBuffer convention). The ring stores
+	// oldest-first, so it is filled back-to-front.
+	if(rows.empty() || m_maxRows <= 0) {
+		reset();
 		return;
 	}
-	m_fftSize = static_cast<size_t>(rows[0].size());
-	for(int i = static_cast<int>(rows.size()) - 1; i >= 0; --i) {
-		m_data.push_back(std::vector<float>(rows[i].begin(), rows[i].end()));
+	const size_t bins = static_cast<size_t>(rows.front().size());
+	if(bins == 0) {
+		reset();
+		return;
 	}
-	while(static_cast<int>(m_data.size()) > m_maxRows)
-		m_data.pop_front();
+
+	// Resize once here rather than letting the first appendRow() do it, so a snapshot
+	// of the same geometry as the previous one reuses the existing allocation.
+	m_fftSize = bins;
+	if(m_ring.size() != static_cast<size_t>(m_maxRows) * m_fftSize)
+		m_ring.assign(static_cast<size_t>(m_maxRows) * m_fftSize, -FLT_MAX);
+	m_head = 0;
+	m_count = 0;
+
+	// Only the newest m_maxRows are drawable, so the rest are not copied at all —
+	// the old code built a vector for every row and then popped the excess.
+	const int n = std::min(static_cast<int>(rows.size()), m_maxRows);
+	for(int i = n - 1; i >= 0; --i) {
+		const QVector<float> &r = rows[static_cast<size_t>(i)];
+		// pushRow, not appendRow: a row shorter than rows[0] is padded, not taken
+		// for a width change. The old code latched m_fftSize from rows[0] and let
+		// value() index every row to it, reading past the end of any shorter one.
+		if(!r.isEmpty())
+			pushRow(r.constData(), std::min(static_cast<size_t>(r.size()), m_fftSize));
+	}
 }
 
-void WaterfallData::reset() { m_data.clear(); }
+void WaterfallData::reset()
+{
+	// m_ring and m_fftSize are kept: a stop/start keeps the same geometry, so the
+	// next append reuses the block instead of reallocating it.
+	m_head = 0;
+	m_count = 0;
+}
 
 void WaterfallData::setXInterval(double minFreq, double maxFreq) { m_xInterval = QwtInterval(minFreq, maxFreq); }
 
@@ -93,14 +172,18 @@ void WaterfallData::setZInterval(double minDb, double maxDb) { m_zInterval = Qwt
 
 void WaterfallData::setMaxRows(int rows)
 {
-	if(rows <= 0)
+	if(rows <= 0 || rows == m_maxRows)
 		return;
 	m_maxRows = rows;
+	// Resized here, keeping the newest rows. The old version left m_data untouched,
+	// so shrinking kept the excess rows live until the next write.
+	if(m_fftSize > 0)
+		rebuildRing();
 }
 
 int WaterfallData::maxRows() const { return m_maxRows; }
 
-int WaterfallData::rowCount() const { return static_cast<int>(m_data.size()); }
+int WaterfallData::rowCount() const { return m_count; }
 
 void WaterfallData::setAntialiasing(bool enabled) { m_antialiasing = enabled; }
 
@@ -124,10 +207,10 @@ double WaterfallData::value(double x, double y) const
 	if(!std::isfinite(x) || !std::isfinite(y))
 		return -DBL_MAX;
 
-	if(m_data.empty() || m_fftSize == 0)
+	if(m_count == 0 || m_fftSize == 0)
 		return -DBL_MAX;
 
-	const int nRows = static_cast<int>(m_data.size());
+	const int nRows = m_count;
 
 	const double dataRowF = (m_maxRows - 1.0 - y) - (m_maxRows - nRows);
 
@@ -146,8 +229,14 @@ double WaterfallData::value(double x, double y) const
 	const int b0 = static_cast<int>(binF);
 	const int r0 = static_cast<int>(dataRowF);
 
+	// Resolved once per pixel instead of once per tap: four deque double-indirections
+	// become two index computations into one contiguous block.
+	const float *p0 = row(r0);
+	if(!p0)
+		return -DBL_MAX;
+
 	if(!m_antialiasing)
-		return m_data[r0][b0];
+		return p0[b0];
 
 	const int r1 = std::min(r0 + 1, nRows - 1);
 	const double ty = dataRowF - r0;
@@ -155,8 +244,9 @@ double WaterfallData::value(double x, double y) const
 	const int b1 = std::min(b0 + 1, static_cast<int>(m_fftSize) - 1);
 	const double tx = binF - b0;
 
-	return (1.0 - ty) * ((1.0 - tx) * m_data[r0][b0] + tx * m_data[r0][b1]) +
-		ty * ((1.0 - tx) * m_data[r1][b0] + tx * m_data[r1][b1]);
+	const float *p1 = (r1 == r0) ? p0 : row(r1);
+
+	return (1.0 - ty) * ((1.0 - tx) * p0[b0] + tx * p0[b1]) + ty * ((1.0 - tx) * p1[b0] + tx * p1[b1]);
 }
 
 // =============================================================================
@@ -226,6 +316,12 @@ void WaterfallPlotWidget::setWaterfallEnabled(bool enabled) { m_waterfallEnabled
 
 void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 {
+	appendRowDeferred(data, size);
+	endAppend();
+}
+
+void WaterfallPlotWidget::appendRowDeferred(const float *data, size_t size)
+{
 	if(m_rowTimer.isValid()) {
 		const double elapsed = m_rowTimer.elapsed() / 1000.0;
 		m_rowTimer.restart();
@@ -242,7 +338,11 @@ void WaterfallPlotWidget::addFFTData(const float *data, size_t size)
 		}
 	}
 
-	m_data->addFFTData(data, size);
+	m_data->appendRow(data, size);
+}
+
+void WaterfallPlotWidget::endAppend()
+{
 	m_spectrogram->invalidateCache();
 	m_spectrogram->itemChanged();
 	Q_EMIT newData();
@@ -293,6 +393,11 @@ void WaterfallPlotWidget::setNumRows(int rows)
 		return;
 	m_data->setMaxRows(rows);
 	yAxis()->setInterval(rows, 0);
+	// The row count feeds interval(Qt::YAxis) and value()'s row mapping, so a stale
+	// raster cache here draws the old geometry until the next append happens to
+	// invalidate it.
+	m_spectrogram->invalidateCache();
+	m_spectrogram->itemChanged();
 }
 
 void WaterfallPlotWidget::setAntialiasing(bool enabled)
@@ -304,7 +409,8 @@ void WaterfallPlotWidget::setAntialiasing(bool enabled)
 
 void WaterfallPlotWidget::setChannel(ChannelData *ch)
 {
-	disconnect(m_channel, &ChannelData::newData, this, nullptr);
+	if(m_channel)
+		disconnect(m_channel, &ChannelData::newData, this, nullptr);
 	if(m_channel != ch)
 		clearData();
 

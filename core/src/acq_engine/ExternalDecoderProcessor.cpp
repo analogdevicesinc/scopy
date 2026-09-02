@@ -117,6 +117,30 @@ ExternalDecoderProcessor::~ExternalDecoderProcessor() = default;
 
 void ExternalDecoderProcessor::reset() {}
 
+std::optional<StreamInfo> ExternalDecoderProcessor::streamInfo(const DataKey &key) const
+{
+	// Empty slots are skipped rather than matched: an unconfigured stage has no key,
+	// and an empty query key must not collide with it.
+	if(key.key.isEmpty())
+		return std::nullopt;
+
+	const int i = m_outKeys.indexOf(key);
+	if(i < 0)
+		return std::nullopt;
+
+	StreamInfo info;
+	info.kind       = ReprKind::Annotations;
+	info.sampleRate = m_cfg.sampleRate;
+	// The stage's decoder id where there is one — "uart", "i2c" — since that is
+	// what a reader recognises. Falls back to the key, which the view does too.
+	if(static_cast<std::size_t>(i) < m_cfg.stack.size())
+		info.label = QString::fromStdString(m_cfg.stack[static_cast<std::size_t>(i)].decoderId);
+	// No xKey and no colorIndex: annotation offsets are relative to the window the
+	// decode ran on, so they index the shared ramp, and AnnotationCurve colours
+	// per annotation class rather than per stream.
+	return info;
+}
+
 // Declares, per output key, how to read that stage's annotations: which
 // decoder produced them, what radix `text` is in, and the timeline they sit
 // on. A downstream decoder taking this stream as input reads it from the store

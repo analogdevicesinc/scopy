@@ -46,7 +46,7 @@ private:
 	std::unique_ptr<QJSEngine> m_workerEngine;
 	QJSValue                   m_batchFn;
 
-	static const QString k_setupScript;
+	const QString m_setupScript;
 };
 
 } // namespace acq

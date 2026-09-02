@@ -17,10 +17,9 @@
 namespace scopy {
 namespace decoder {
 
-static constexpr const char *kBackendId = "sigrok-cli-backend";
-
 SigrokCliBackend::SigrokCliBackend(SigrokCliCatalog *catalog)
-	: m_catalog(catalog)
+	: m_kBackendId("sigrok-cli-backend")
+	, m_catalog(catalog)
 	, m_encoders(std::make_unique<sigrok::ProtocolDataEncoderRegistry>())
 {
 	m_encoders->registerBuiltins();
@@ -209,7 +208,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 
 	if(!data || nSamples == 0) {
 		if(m_logger)
-			m_logger->info(kBackendId, QStringLiteral("decode(): empty input, skipping"));
+			m_logger->info(m_kBackendId, QStringLiteral("decode(): empty input, skipping"));
 		return true;
 	}
 
@@ -217,7 +216,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	if(exe.isEmpty()) {
 		m_lastError = "sigrok-cli executable not found";
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
@@ -227,7 +226,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	const QStringList args = buildArgs(cfg);
 	m_lastCmdLine          = exe + " " + args.join(' ');
 	if(m_logger) {
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decode(): exe=%1 argv=%2 nSamples=%3 unitsize=%4 bytes=%5")
 				.arg(exe, args.join(' '))
 				.arg(nSamples).arg(unitsize).arg(bytes));
@@ -240,13 +239,13 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 		m_lastError = "failed to start sigrok-cli: "
 			      + proc.errorString().toStdString();
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
 	const qint64 wrote = proc.write(reinterpret_cast<const char *>(data), bytes);
 	if(wrote != bytes && m_logger) {
-		m_logger->warning(kBackendId,
+		m_logger->warning(m_kBackendId,
 			QStringLiteral("decode(): write short: wrote=%1 wanted=%2")
 				.arg(wrote).arg(bytes));
 	}
@@ -256,7 +255,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	if(!proc.waitForFinished(10000)) {
 		m_lastError = "sigrok-cli timed out";
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		proc.kill();
 		proc.waitForFinished(500);
 		return false;
@@ -266,7 +265,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	const QByteArray stderrBuf = proc.readAllStandardError();
 
 	if(m_logger) {
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decode(): exit=%1 status=%2 stdout=%3 bytes stderr=%4 bytes")
 				.arg(proc.exitCode())
 				.arg(int(proc.exitStatus()))
@@ -274,7 +273,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 	}
 
 	if(!stderrBuf.isEmpty() && m_logger) {
-		m_logger->warning(kBackendId,
+		m_logger->warning(m_kBackendId,
 			QStringLiteral("decode(): stderr: ") + QString::fromUtf8(stderrBuf.trimmed()));
 	}
 
@@ -287,7 +286,7 @@ bool SigrokCliBackend::decode(const DecoderConfig &cfg,
 
 	parseStdout(stdoutBuf, cfg.stack, out);
 	if(m_logger)
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decode(): parsed %1 annotations").arg(out.size()));
 	return true;
 }
@@ -317,18 +316,18 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(!m_extractors) {
 		m_lastError = "no extractor registry attached to backend";
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 	if(cfg.stack.empty()) {
 		m_lastError = "decodeAnnotations(): empty stack";
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 	if(in.empty()) {
 		if(m_logger)
-			m_logger->info(kBackendId,
+			m_logger->info(m_kBackendId,
 				QStringLiteral("decodeAnnotations(): empty input, skipping"));
 		return true;
 	}
@@ -340,7 +339,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 			.arg(opts.unknownKeys.join(QStringLiteral(", "))));
 	for(const QString &w : warnings) {
 		if(m_logger)
-			m_logger->warning(kBackendId,
+			m_logger->warning(m_kBackendId,
 				QStringLiteral("decodeAnnotations(): ") + w);
 	}
 
@@ -350,7 +349,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 		m_lastError = std::string("no annotation-input support for upstream=")
 			      + opts.upstreamId.toStdString();
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
@@ -361,7 +360,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(!ext->extract(in, opts, symbols, &stats, &extErr)) {
 		m_lastError = "annotation extractor failed: " + extErr.toStdString();
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 	// Unreadable records are skipped rather than fatal, so this counter is the
@@ -370,7 +369,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	// about: it fires on every i2c capture (the R/W-bit row reuses the address
 	// class), which would bury the case that actually indicates corruption.
 	if(stats.sawRadixMismatch() && m_logger) {
-		m_logger->warning(kBackendId,
+		m_logger->warning(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): %1 annotation(s) hold a numeral that "
 			               "is not valid in radix=%2 and carried no numeric value — "
 			               "the upstream decoder's output format is probably not what "
@@ -379,12 +378,12 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 				.arg(QLatin1String(acq::textRadixName(opts.stream.textRadix)),
 				     stats.toString()));
 	} else if(m_logger) {
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): extract %1").arg(stats.toString()));
 	}
 	if(symbols.empty()) {
 		if(m_logger)
-			m_logger->warning(kBackendId,
+			m_logger->warning(m_kBackendId,
 				QStringLiteral("decodeAnnotations(): no symbols extracted from %1 "
 				               "annotation(s); nothing to decode").arg(in.size()));
 		return true;
@@ -396,7 +395,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(!enc->encode(symbols, opts, pdIn, &encErr)) {
 		m_lastError = "protocoldata encoder failed: " + encErr.toStdString();
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
@@ -405,14 +404,14 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(exe.isEmpty()) {
 		m_lastError = "sigrok-cli executable not found";
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
 	const QStringList args = buildArgsWithInput(cfg, pdIn.inputOpts, &pdIn);
 	m_lastCmdLine          = exe + " " + args.join(' ');
 	if(m_logger) {
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): exe=%1 argv=%2 upstreamAnns=%3 "
 			               "symbols=%4 stdinBytes=%5")
 				.arg(exe, args.join(' '))
@@ -427,13 +426,13 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 		m_lastError = "failed to start sigrok-cli: "
 			      + proc.errorString().toStdString();
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		return false;
 	}
 
 	const qint64 wrote = proc.write(pdIn.stdinBytes);
 	if(wrote != pdIn.stdinBytes.size() && m_logger) {
-		m_logger->warning(kBackendId,
+		m_logger->warning(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): write short: wrote=%1 wanted=%2")
 				.arg(wrote).arg(pdIn.stdinBytes.size()));
 	}
@@ -443,7 +442,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(!proc.waitForFinished(10000)) {
 		m_lastError = "sigrok-cli timed out";
 		if(m_logger)
-			m_logger->critical(kBackendId, QString::fromStdString(m_lastError));
+			m_logger->critical(m_kBackendId, QString::fromStdString(m_lastError));
 		proc.kill();
 		proc.waitForFinished(500);
 		return false;
@@ -453,14 +452,14 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	const QByteArray stderrBuf = proc.readAllStandardError();
 
 	if(m_logger) {
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): exit=%1 status=%2 stdout=%3 "
 			               "bytes stderr=%4 bytes")
 				.arg(proc.exitCode()).arg(int(proc.exitStatus()))
 				.arg(stdoutBuf.size()).arg(stderrBuf.size()));
 	}
 	if(!stderrBuf.isEmpty() && m_logger) {
-		m_logger->warning(kBackendId,
+		m_logger->warning(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): stderr: ")
 				+ QString::fromUtf8(stderrBuf.trimmed()));
 	}
@@ -502,7 +501,7 @@ bool SigrokCliBackend::decodeAnnotations(const DecoderConfig &cfg,
 	remapToUpstream(pdIn, ext, opts, rootAnns, in, syntheticOut, out);
 
 	if(m_logger)
-		m_logger->info(kBackendId,
+		m_logger->info(m_kBackendId,
 			QStringLiteral("decodeAnnotations(): parsed %1 annotations (remapped)")
 				.arg(out.size()));
 	return true;
@@ -574,7 +573,7 @@ void SigrokCliBackend::remapToUpstream(const sigrok::ProtocolDataInput &pdIn,
 			// that point. Map what lines up and say so rather than drifting
 			// silently, which is the failure the old proportional map had.
 			if(wireSlots.size() != pdIn.anchors.size() && m_logger) {
-				m_logger->warning(kBackendId,
+				m_logger->warning(m_kBackendId,
 					QStringLiteral("decodeAnnotations(): regenerated wire read back "
 					               "as %1 payload slot(s) but %2 were emitted; "
 					               "annotation sample ranges past slot %3 may be "
@@ -593,7 +592,7 @@ void SigrokCliBackend::remapToUpstream(const sigrok::ProtocolDataInput &pdIn,
 		// with itself). Report the whole upstream extent rather than sample
 		// numbers from a timeline the caller knows nothing about.
 		if(m_logger && !syntheticOut.empty() && nIn > 0) {
-			m_logger->warning(kBackendId,
+			m_logger->warning(m_kBackendId,
 				QStringLiteral("decodeAnnotations(): could not map the synthetic "
 				               "timeline back (rootAnns=%1 anchors=%2); reporting "
 				               "%3 annotation(s) over the full upstream range")

@@ -21,30 +21,36 @@
 
 #include "acqplotmanager.h"
 
-#include "acqannotationrepr.h"
-#include "acqchannel.h"
-#include "acqcurverepr.h"
-#include "acqdigitalrepr.h"
-#include "acqplotrow.h"
-#include "acqwaterfallrepr.h"
-#include "measurementcontroller.h"
+#include "acqaxis.h"
+#include "acqchannelregistry.h"
+#include "acqplot.h"
 
-#include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
 
-#include <gui/cursorcontroller.h>
+// The factories, needed here and not in the header: they are static free functions, so
+// the translation unit that calls one must include it (see the ODR note in
+// gui/docking/docksettings.h).
+#include <gui/docking/dockablearea.h>
+#include <gui/docking/dockwrapper.h>
 #include <gui/plotwidget.h>
+#include <gui/style.h>
+#include <gui/style_attributes.h>
 #include <gui/widgets/cursorsettings.h>
-#include <gui/widgets/measurementpanel.h>
+#include <gui/widgets/menucombo.h>
+#include <gui/widgets/menucontrolbutton.h>
+#include <gui/widgets/menulineedit.h>
 #include <gui/widgets/menusectionwidget.h>
 
+#include <QComboBox>
+#include <QLabel>
+#include <QLineEdit>
 #include <QLoggingCategory>
+#include <QPushButton>
+#include <QSet>
 #include <QSignalBlocker>
-#include <QSplitter>
+#include <QStringList>
 #include <QTimer>
 #include <QVBoxLayout>
-
-#include <numeric>
 
 Q_LOGGING_CATEGORY(CAT_ACQ_PLOTMANAGER, "AcqPlotManager")
 
@@ -53,15 +59,23 @@ using namespace scopy::adc;
 
 namespace {
 
-// ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
-// extra cycles into one repaint.
-constexpr int kFrameIntervalMs = 16;
+// The representations the reader may pick in the ADD CHANNEL section, in the order
+// they are offered. ReprKind::Hidden is deliberately absent: it is the producer saying
+// it does not want the stream drawn at all, so it is not a choice a plot offers.
+const QList<scopy::acq::ReprKind> &pickableReprs()
+{
+	static const QList<scopy::acq::ReprKind> kinds{scopy::acq::ReprKind::Curve, scopy::acq::ReprKind::Digital,
+						       scopy::acq::ReprKind::Annotations,
+						       scopy::acq::ReprKind::Waterfall};
+	return kinds;
+}
 
 } // namespace
 
 AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::AcquisitionEngine *engine,
 			       InstrumentTemplate *shell, QWidget *parent)
 	: QWidget(parent)
+	, m_kFrameIntervalMs(16)
 	, m_store(store)
 	, m_engine(engine)
 	, m_shell(shell)
@@ -69,22 +83,20 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
 
-	m_splitter = new QSplitter(Qt::Vertical, this);
-	lay->addWidget(m_splitter);
+	// A dock area rather than a splitter, so each plot arrives with a title bar and can
+	// be dragged, tabbed, split and resized — the same container TimePlotComponent and
+	// FFTPlotComponent use (src/time/timeplotcomponent.cpp:52-55).
+	m_dockArea = createDockableArea(this);
+	QWidget *areaWidget = m_dockArea->asWidget();
+	Style::setBackgroundColor(areaWidget, json::theme::background_subtle, true);
+	lay->addWidget(areaWidget);
 
-	// Row 0 hosts every repr that draws an item. Reprs that own a whole plot
-	// (waterfall) get appended as their own rows.
-	m_sharedRow = addRow(new PlotWidget(this), /*exclusive=*/false);
-
-	rebuildIndexRamp();
-	// setPlotSize() would early-return on the unchanged value, so the initial X range
-	// has to be set by hand — otherwise the first frame draws against Qwt's default.
-	if(m_sharedRow) {
-		m_sharedRow->setXInterval(0, qMax(1, m_plotSize - 1));
-	}
+	// No plot is created here, and that is the point: an empty manager is a valid state
+	// and the reader adds the first plot from the rail. A plot created in this
+	// constructor would be the manager deciding what the instrument shows.
 
 	m_frameTimer = new QTimer(this);
-	m_frameTimer->setInterval(kFrameIntervalMs);
+	m_frameTimer->setInterval(m_kFrameIntervalMs);
 	connect(m_frameTimer, &QTimer::timeout, this, [this]() {
 		if(!m_dirty) {
 			return;
@@ -102,144 +114,210 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 
 AcqPlotManager::~AcqPlotManager()
 {
-	// Channels are parented to this, so each destructor detaches its repr and
-	// releases its own claimant. Detach them explicitly first anyway: child
-	// destruction order is unspecified and a repr must not touch a plot that has
-	// already gone.
+	// Channels are parented to this, so each destructor detaches itself and releases its
+	// own claimant. Detach them explicitly first anyway: child destruction order is
+	// unspecified and a channel must not touch a plot that has already gone.
 	for(AcqChannel *ch : std::as_const(m_channels)) {
 		ch->detach();
 	}
+	// The AcqPlots are parented to this too, so Qt frees them; their widgets are children
+	// of their docks, which are children of the dock area, which is a child of this.
 }
 
-PlotWidget *AcqPlotManager::sharedPlot() const { return m_sharedRow ? m_sharedRow->plot() : nullptr; }
+// --- plots -----------------------------------------------------------------
 
-AcqPlotRow *AcqPlotManager::addRow(PlotWidget *plot, bool exclusive)
+AcqPlot *AcqPlotManager::plot(quint32 uuid) const
 {
-	if(!plot) {
-		return nullptr;
-	}
-	m_splitter->addWidget(plot);
-
-	// Row 0 (the item plot) gets twice the height of anything stacked under it —
-	// the proportions src/sim/siminstrument.cpp:85-95 uses for plot-over-waterfall.
-	const int idx = m_splitter->indexOf(plot);
-	m_splitter->setStretchFactor(idx, idx == 0 ? 2 : 1);
-
-	AcqPlotRow *row = new AcqPlotRow(plot, exclusive, this);
-	m_rows.append(row);
-	return row;
-}
-
-std::unique_ptr<AcqChannelRepr> AcqPlotManager::makeRepr(const scopy::acq::DataKey &key, ReprKind kind)
-{
-	if(kind == ReprKind::Auto) {
-		if(m_store.isNull()) {
-			return nullptr;
+	for(AcqPlot *p : std::as_const(m_plots)) {
+		if(p->uuid() == uuid) {
+			return p;
 		}
-		const std::optional<scopy::acq::SampleType> t = m_store->typeOf(key);
-		if(!t.has_value()) {
-			// Nothing has ever been written to this key, so there is no type to read.
-			// Default to a curve rather than refuse: it is the only representation
-			// every numeric type can use.
-			kind = ReprKind::Curve;
-		} else {
-			switch(*t) {
-			case scopy::acq::SampleType::Annotation:
-				// The one type Auto can resolve exactly rather than guess: an
-				// annotation stream has no numeric conversion at all (toFloat and
-				// toBits both return empty for it), so AnnotationRepr is not a
-				// heuristic, it is the only representation that can read it.
-				kind = ReprKind::Annotations;
-				break;
-			case scopy::acq::SampleType::UInt8:
-			case scopy::acq::SampleType::Int8:
-				// A heuristic, not a truth: an 8-bit ADC stream would land here too.
-				// The explicit-kind argument is the escape hatch.
-				kind = ReprKind::Digital;
-				break;
-			default:
-				kind = ReprKind::Curve;
-				break;
-			}
-		}
-	}
-
-	// Auto cannot land here — it resolves annotations to AnnotationRepr — but an
-	// explicit kind can, and this is the one combination that fails silently rather
-	// than visibly: toFloat and toBits both return empty for an annotation stream, so
-	// a curve or a digital track pointed at one draws nothing and looks like a dead
-	// key. Refuse with a warning instead.
-	if(kind != ReprKind::Annotations && !m_store.isNull()) {
-		const std::optional<scopy::acq::SampleType> t = m_store->typeOf(key);
-		if(t.has_value() && *t == scopy::acq::SampleType::Annotation) {
-			qWarning(CAT_ACQ_PLOTMANAGER)
-				<< "key" << key.toString()
-				<< "is an annotation stream; only ReprKind::Annotations can read it";
-			return nullptr;
-		}
-	}
-
-	switch(kind) {
-	case ReprKind::Curve: {
-		auto repr = std::make_unique<CurveRepr>();
-		repr->setIndexSource(&m_indexX);
-		return repr;
-	}
-	case ReprKind::Digital:
-		// No index source: the item lays its samples out proportionally across the
-		// shared X axis from the sample count pull() gives it, so it needs no ramp.
-		return std::make_unique<DigitalRepr>();
-	case ReprKind::Waterfall:
-		// Never picked by Auto: any Float32 stream converts, but a spectrogram of a
-		// time-domain stream is noise. It has to be asked for.
-		return std::make_unique<WaterfallRepr>();
-	case ReprKind::Annotations:
-		return std::make_unique<AnnotationRepr>();
-	case ReprKind::Auto:
-		break;
 	}
 	return nullptr;
 }
 
-AcqChannel *AcqPlotManager::addChannel(const scopy::acq::DataKey &key, const QString &name, const QColor &color,
-				       ReprKind kind)
+PlotWidget *AcqPlotManager::sharedPlot() const { return m_plots.isEmpty() ? nullptr : m_plots.first()->plot(); }
+
+AcqPlot *AcqPlotManager::addPlot(const QString &name, AcqPlotKind kind)
 {
-	std::unique_ptr<AcqChannelRepr> repr = makeRepr(key, kind);
-	if(!repr) {
+	const quint32 uuid = m_plotUuidCounter++;
+	AcqPlot *p = new AcqPlot(name, kind, uuid, this);
+
+	// Direction_BOTTOM, not the interface's Direction_RIGHT default: plots stack
+	// vertically, and in the plain-layout backend the *first* direction is what picks
+	// the orientation for every dock after it
+	// (gui/src/docking/dockableareaclassic.cpp:66-74) — a right would give a row.
+	//
+	// No sizing is asked for. The dock area splits evenly and the reader drags the
+	// separators; the splitter's old fixed 2:1 could not be recomputed on removal
+	// anyway, so after deleting the first plot it lied.
+	DockWrapperInterface *dock = createDockWrapper(p->name());
+	// Again, explicitly: the KDDW wrapper's constructor sets the title through its own
+	// space-prepending override, so the name it was built with arrives indented twice.
+	dock->setTitle(p->name());
+	dock->setInnerWidget(p->plot());
+	m_dockArea->addDockWrapper(dock, DockableAreaInterface::Direction_BOTTOM);
+
+	// The instrument's current window width, so a plot added later starts where the
+	// spinbox already says rather than at AcqPlot's own default.
+	p->setPlotSize(m_plotSize);
+
+	m_plots.append(p);
+	registerPlotRail(p);
+	m_plotRails[p].dock = dock;
+
+	// The title bar is the only place the plot's name shows outside the rail, so it
+	// follows a rename the way the FFT waterfall's does
+	// (src/freq/fftplotcomponent.cpp:128-130).
+	connect(p, &AcqPlot::nameChanged, this, [dock](const QString &n) { dock->setTitle(n); });
+
+	announceMaxWindowSize();
+	Q_EMIT plotAdded(uuid);
+	return p;
+}
+
+void AcqPlotManager::removePlot(quint32 uuid)
+{
+	AcqPlot *p = plot(uuid);
+	if(!p) {
+		return;
+	}
+
+	// First, while everything below it is still readable.
+	Q_EMIT plotRemoved(uuid);
+
+	// Over a copy: removeChannel mutates the plot's list through removeChannelRef.
+	const QList<AcqChannel *> chans = p->channels();
+	for(AcqChannel *ch : chans) {
+		removeChannel(ch);
+	}
+
+	// Before unregisterPlotRail erases the record it is stored in.
+	DockWrapperInterface *dock = m_plotRails.value(p).dock;
+
+	// After the channels, so their rows are unregistered from a container that still
+	// exists.
+	unregisterPlotRail(p);
+	m_plots.removeOne(p);
+
+	// Nothing to do about the cursors here: they belong to the plot now, as children of
+	// the AcqPlot, and go when it does. The settings page goes with the plot's menu page,
+	// which unregisterPlotRail already took down.
+
+	// The dock and not the plot widget: setInnerWidget reparented the widget into the
+	// dock, so the dock is what has to go and the widget goes with it as its child.
+	// Detaching the widget first would leave the dock holding a guest it no longer
+	// contains, which is the backend's invariant and not ours to break.
+	//
+	// deleteLater rather than delete, for the reason the plot widget alone used to be
+	// deferred: a pending paint event on the canvas has to finish first. And through the
+	// QWidget side, because DockWrapperInterface has no virtual destructor — the same path
+	// extprocplugin's PlotManager::clearPlots takes
+	// (packages/extproc/plugins/extprocplugin/src/plotmanager/plotmanager.cpp:104-112).
+	if(QWidget *dw = dynamic_cast<QWidget *>(dock)) {
+		dw->deleteLater();
+	} else if(PlotWidget *w = p->plot()) {
+		// No dock to delete (a plot added before one existed): fall back to the widget.
+		w->deleteLater();
+	}
+	// After the dock's deleteLater and not before: the pool's axes are children of this
+	// object, and deleting it first would destroy axes the widget still lists.
+	delete p;
+
+	announceMaxWindowSize();
+	m_dirty = true;
+}
+
+// --- channels --------------------------------------------------------------
+
+AcqChannel *AcqPlotManager::addChannel(AcqPlot *p, scopy::acq::ReprKind kind, const scopy::acq::DataKey &yKey,
+				       const scopy::acq::DataKey &xKey,
+				       const std::optional<scopy::acq::StreamInfo> &info)
+{
+	if(m_store.isNull()) {
+		return nullptr;
+	}
+	if(!p || !m_plots.contains(p)) {
+		qWarning(CAT_ACQ_PLOTMANAGER) << "refusing" << yKey.toString() << ": no such plot";
+		return nullptr;
+	}
+	// No compatibility test past this point — not the representation against the plot
+	// kind, not a channel count, not a duplicate. See addChannel's declaration for why.
+
+	AcqChannel::Args args;
+	args.store = m_store.data();
+	args.engine = m_engine.data();
+	args.key = yKey;
+	args.xKey = xKey;
+	// The caller's override first, else the producing block's own declaration, else a
+	// default-built descriptor — an unlabelled, unitless curve, which is all that can
+	// honestly be said about a key no block describes.
+	args.info = info.value_or(m_engine.isNull() ? scopy::acq::StreamInfo{}
+						    : m_engine->streamInfo(yKey).value_or(scopy::acq::StreamInfo{}));
+	args.uid = m_uidCounter++;
+	args.parent = this;
+
+	// The producer's slot if it named one, otherwise the next from our palette. Done here
+	// rather than in the channel because it is the *view's* palette — a channel has no way
+	// to know which slots its siblings took.
+	if(args.info.colorIndex < 0) {
+		args.info.colorIndex = m_nextColorIndex++;
+	}
+	// Record what the reader picked: a descriptor still saying Curve for a channel drawn
+	// as a logic track would make the two indistinguishable in the rail and the log.
+	args.info.kind = kind;
+
+	AcqChannel *ch = AcqChannelRegistry::instance().create(kind, args);
+	if(!ch) {
+		// An unregistered kind. The registry has already warned naming it.
 		return nullptr;
 	}
 
-	// A repr that *is* a plot gets its own row; everything else joins row 0. This is
-	// the whole of the waterfall asymmetry — the manager never names a PlotWidget
-	// subclass.
-	AcqPlotRow *row = m_sharedRow;
-	if(PlotWidget *own = repr->createOwnPlot(this)) {
-		row = addRow(own, /*exclusive=*/true);
-	}
-	if(!row) {
-		return nullptr;
-	}
+	// Before attach(): a kind can bake the rate into whatever it builds there, and a
+	// channel whose producer declared a rate ignores it anyway.
+	ch->setFallbackSampleRate(m_fallbackSampleRate);
 
-	AcqChannel *ch = new AcqChannel(m_store.data(), key, name, color, std::move(repr), m_uidCounter++, this);
 	m_channels.append(ch);
-	ch->attach(row);
+	p->addChannelRef(ch);
+	ch->attach(p);
 
-	// Claim now, even though the key may not exist yet: DataStore::write() applies
-	// pending claims before the first push, so an early claim is what makes the very
-	// first window full-depth instead of a single chunk.
+	// No setInterval for a sample-index axis any more: the ramp is a stream, so the
+	// channel's own requestInterval(x[0], x[n-1]) sets that range on the same path as
+	// every other X source — including when the reader retargets *back* to sample index,
+	// which this hand-written call could never cover.
+
+	// Claim now, even though the key may not exist yet: DataStore::write() applies pending
+	// claims before the first push, so an early claim is what makes the very first window
+	// full-depth instead of a single chunk.
 	reclaim(ch);
 
-	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch]() { reclaim(ch); });
+	// A retarget leaves a stale claim on the key that dropped out. Releasing the whole
+	// claimant and re-claiming is exactly equivalent to releasing `dropped` alone — a
+	// channel only ever claims its own two keys — and stays correct if a kind ever starts
+	// reading a third.
+	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch](scopy::acq::DataKey dropped) {
+		Q_UNUSED(dropped)
+		if(!m_store.isNull()) {
+			m_store->releaseClaimant(ch->claimant());
+		}
+		reclaim(ch);
+		m_dirty = true;
+	});
 
-	// Before registerRail so the settings page sees a fully-configured repr.
-	applyCurveDefaults(ch);
+	// Queued: the handler destroys this channel, and with it the settings page the Delete
+	// button that emitted this lives on.
+	connect(ch, &AcqChannel::removeRequested, this, [this, ch]() { removeChannel(ch); }, Qt::QueuedConnection);
 
-	// Both after attach(): the settings page binds to the repr's PlotChannel and the
-	// row's axis, and the measure manager is created in attach() too (it needs the
-	// pen colour).
-	registerMeasurements(ch);
+	// After attach(): the settings page binds to the channel's plot item and its axis pair,
+	// both of which attach() creates.
 	registerRail(ch);
 
+	// Greyed from the start if the key is only declared, not written — otherwise a channel
+	// created before the first cycle would look live while reading nothing.
+	ch->setKeyPresent(m_store->contains(yKey));
+
+	Q_EMIT channelAdded(ch);
+	m_dirty = true;
 	return ch;
 }
 
@@ -248,37 +326,21 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 	if(!ch || !m_channels.removeOne(ch)) {
 		return;
 	}
+	Q_EMIT channelRemoved(ch);
+
+	// Before detach(), which nulls the channel's owner: the rail row was nested under the
+	// plot's row, and unregisterRail asks the channel which plot that was.
 	unregisterRail(ch);
 
-	// An exclusive row exists only for this channel's repr — a waterfall brought its own
-	// PlotWidget through createOwnPlot(). WaterfallRepr::detach() deliberately does not
-	// delete it (destruction order between a plot and the channel is unspecified, so a
-	// repr never deletes its plot), which leaves the manager to drop the row here or the
-	// splitter keeps a dead empty pane forever.
-	AcqPlotRow *ownRow = ch->row();
-	if(ownRow && ownRow->isExclusive() && ownRow != m_sharedRow) {
-		m_rows.removeOne(ownRow);
-	} else {
-		ownRow = nullptr;
+	if(AcqPlot *owner = ch->plotOwner()) {
+		owner->removeChannelRef(ch);
 	}
 
 	// Detach the visual now rather than leaving it to the destructor: a pull() between
-	// here and the delete would be harmless (the channel is off m_channels), but a
-	// pending replot() would still paint an item whose repr is about to go. Also, this
-	// nulls the repr's plot pointer before the plot below is deleted.
+	// here and the delete would be harmless (the channel is off m_channels), but a pending
+	// replot() would still paint an item that is about to go. This is also what returns
+	// its axis pair to the plot's pool.
 	ch->detach();
-
-	if(ownRow) {
-		// The plot first, then the row: AcqPlotRow holds it in a QPointer and its own
-		// destructor touches nothing, but the order keeps replot() from being reachable
-		// through a row still in m_rows.
-		if(PlotWidget *p = ownRow->plot()) {
-			// Removing from the splitter is implicit in the delete; deleteLater so a
-			// pending paint event on the canvas finishes first.
-			p->deleteLater();
-		}
-		delete ownRow;
-	}
 
 	// deleteLater, not delete: this is public, and a caller may well be inside a signal
 	// emitted by the very channel it is removing. The destructor detaches (idempotently)
@@ -288,43 +350,288 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 	m_dirty = true;
 }
 
+// --- rail: the "Plots" group ------------------------------------------------
+
+MenuSectionCollapseWidget *AcqPlotManager::railGroup()
+{
+	if(m_railGroup || m_shell.isNull()) {
+		return m_railGroup;
+	}
+	m_railGroup = m_shell->addChannelGroup(tr("Plots"));
+	// First, and permanently first: rows are appended, so an add-plot row created now
+	// stays above every plot added later. Pinning it to the bottom instead would mean
+	// re-adding it on every addPlot, which fights the rail API for nothing.
+	createAddPlotRow(m_railGroup);
+	return m_railGroup;
+}
+
+void AcqPlotManager::createAddPlotRow(MenuSectionCollapseWidget *group)
+{
+	if(m_shell.isNull() || !group) {
+		return;
+	}
+
+	const QString id = QStringLiteral("acqplot:add");
+	MenuControlButton *row = m_shell->addChannelRow(group, tr("+ Add plot"), QColor(), id);
+	// Its checkbox would read as "this plot is selected" on a row that is not a plot. The
+	// row still joins the exclusive group — that is what shows its page.
+	row->checkBox()->setVisible(false);
+
+	QWidget *page = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(page);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	// SO_VIEW, like everything else the manager builds: adding a plot changes what is
+	// drawn, never what the engine produces.
+	MenuSectionCollapseWidget *section = m_shell->createMenuSection(tr("NEW PLOT"), SO_VIEW, page);
+
+	MenuLineEdit *nameEdit = new MenuLineEdit(section);
+	nameEdit->edit()->setPlaceholderText(tr("plot name"));
+	section->add(nameEdit);
+
+	MenuCombo *kindCombo = new MenuCombo(tr("Kind"), section);
+	// From allPlotKinds(), so a third plot kind appears here with no edit to this file.
+	const QList<AcqPlotKind> kinds = allPlotKinds();
+	for(AcqPlotKind k : kinds) {
+		kindCombo->combo()->addItem(plotKindName(k), static_cast<int>(k));
+	}
+	section->add(kindCombo);
+
+	QPushButton *createBtn = new QPushButton(tr("Create"), section);
+	Style::setStyle(createBtn, style::properties::button::borderButton);
+	connect(createBtn, &QAbstractButton::clicked, this, [this, nameEdit, kindCombo]() {
+		if(kindCombo->combo()->count() == 0) {
+			return;
+		}
+		const AcqPlotKind kind = static_cast<AcqPlotKind>(kindCombo->combo()->currentData().toInt());
+		QString name = nameEdit->edit()->text().trimmed();
+		if(name.isEmpty()) {
+			// Named after the uuid it is about to get, so two unnamed plots are still
+			// distinguishable in the rail.
+			name = tr("Plot %1").arg(m_plotUuidCounter);
+		}
+		addPlot(name, kind);
+		nameEdit->edit()->clear();
+	});
+	section->add(createBtn);
+
+	lay->addWidget(section);
+	lay->addStretch();
+	m_shell->addMenuPage(id, page);
+}
+
+void AcqPlotManager::registerPlotRail(AcqPlot *p)
+{
+	MenuSectionCollapseWidget *group = railGroup();
+	if(!p || !group || m_plotRails.contains(p)) {
+		return;
+	}
+
+	PlotRail rail;
+	// Expandable, because this row is the container its channels' rows nest under — which
+	// is what makes the rail the same tree as the object graph.
+	rail.row = m_shell->addExpandableChannelRow(group, p->name(), QColor(), p->menuId());
+	m_shell->addMenuPage(p->menuId(), createPlotPage(p, rail));
+	// After createPlotPage, which is what fills in the two combo pointers.
+	m_plotRails.insert(p, rail);
+
+	if(MenuControlButton *hdr = rail.row->getControlBtn()) {
+		connect(p, &AcqPlot::nameChanged, hdr, [hdr](const QString &n) { hdr->setName(n); });
+	}
+}
+
+void AcqPlotManager::unregisterPlotRail(AcqPlot *p)
+{
+	if(!p) {
+		return;
+	}
+	const PlotRail rail = m_plotRails.take(p);
+	if(m_shell.isNull() || !rail.row) {
+		return;
+	}
+	// The group holds the expandable row, not the header button inside it — that is what
+	// addExpandableChannelRow inserted — so the layout removal is done here and
+	// removeChannelRow is passed no group. It still does the other steps, and the
+	// button-group one is the one that must not be skipped: QButtonGroup does not observe
+	// its buttons' deletion through this path.
+	if(m_railGroup) {
+		m_railGroup->remove(rail.row);
+	}
+	m_shell->removeChannelRow(nullptr, rail.row->getControlBtn(), p->menuId(), /*deletePage=*/true);
+	// deleteLater for the same reason removeChannelRow uses it for the button: this can be
+	// reached from a click on the row's own page.
+	rail.row->deleteLater();
+}
+
+QWidget *AcqPlotManager::createViewSection(AcqPlot *p, QWidget *parent)
+{
+	MenuSectionCollapseWidget *section = m_shell->createMenuSection(tr("VIEW"), SO_VIEW, parent);
+
+	// All three are per plot, so all three are on the plot's own page rather than on a
+	// bottom-rail button shared by every plot — which is what the cursors used to be.
+	MenuOnOffSwitch *labelsSw = new MenuOnOffSwitch(tr("Show plot labels"), section);
+	labelsSw->onOffswitch()->setChecked(p->showLabels());
+	connect(labelsSw->onOffswitch(), &QAbstractButton::toggled, p, [p](bool on) { p->setShowLabels(on); });
+	section->add(labelsSw);
+
+	MenuOnOffSwitch *legendSw = new MenuOnOffSwitch(tr("Show legend"), section);
+	legendSw->onOffswitch()->setChecked(p->showLegend());
+	connect(legendSw->onOffswitch(), &QAbstractButton::toggled, p, [p](bool on) { p->setShowLegend(on); });
+	section->add(legendSw);
+
+	MenuOnOffSwitch *cursorSw = new MenuOnOffSwitch(tr("Show cursors"), section);
+	cursorSw->onOffswitch()->setChecked(p->showCursors());
+	section->add(cursorSw);
+
+	// The cursor controls drop down under the switch rather than living in a hover off a
+	// bottom-rail button. Built on first toggle, not here: CursorSettings brings a
+	// CursorController with it, which installs four draggable handles and a readout
+	// overlay on the canvas, and a plot whose cursors are never asked for should not pay
+	// for that. Parented into the section, so it is freed with the page.
+	connect(cursorSw->onOffswitch(), &QAbstractButton::toggled, p, [this, p, section](bool on) {
+		p->setShowCursors(on);
+		if(CursorSettings *cs = p->cursorSettings(section)) {
+			// add() only on the first build — the section is a CompositeWidget and
+			// would otherwise hold the same widget twice.
+			if(cs->parentWidget() == section && !cs->property("acqAdded").toBool()) {
+				cs->setProperty("acqAdded", true);
+				// Its own setFixedWidth(200) would leave it narrower than the
+				// rail and off-centre against the switches above it.
+				cs->setFixedWidth(QWIDGETSIZE_MAX);
+				cs->setMinimumWidth(0);
+				section->add(cs);
+			}
+			cs->setVisible(on);
+		}
+	});
+
+	return section;
+}
+
+QWidget *AcqPlotManager::createPlotPage(AcqPlot *p, PlotRail &rail)
+{
+	QWidget *page = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(page);
+	lay->setContentsMargins(0, 0, 0, 0);
+
+	MenuSectionCollapseWidget *plotSection = m_shell->createMenuSection(tr("PLOT"), SO_VIEW, page);
+	MenuLineEdit *nameEdit = new MenuLineEdit(plotSection);
+	nameEdit->edit()->setText(p->name());
+	connect(nameEdit->edit(), &QLineEdit::editingFinished, p,
+		[p, nameEdit]() { p->setName(nameEdit->edit()->text()); });
+	plotSection->add(nameEdit);
+	QLabel *kindLabel = new QLabel(plotKindName(p->kind()), plotSection);
+	// A readout, not a picker: the kind decides which widget class was built, and Qwt gives
+	// no way to turn one plot widget into another. Changing it means a new plot.
+	kindLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	plotSection->add(kindLabel);
+	lay->addWidget(plotSection);
+
+	lay->addWidget(createViewSection(p, page));
+
+	MenuSectionCollapseWidget *addSection = m_shell->createMenuSection(tr("ADD CHANNEL"), SO_VIEW, page);
+
+	MenuCombo *yCombo = new MenuCombo(tr("Y source"), addSection);
+	populateKeyCombo(yCombo, /*withSampleIndex=*/false);
+	addSection->add(yCombo);
+
+	MenuCombo *xCombo = new MenuCombo(tr("X source"), addSection);
+	populateKeyCombo(xCombo, /*withSampleIndex=*/true);
+	addSection->add(xCombo);
+
+	MenuCombo *reprCombo = new MenuCombo(tr("Draw as"), addSection);
+	// Every representation, whatever kind of plot this is. A waterfall on a basic plot or
+	// a curve on a spectrogram draws nothing useful, and that is the reader's business to
+	// see rather than this combo's to prevent.
+	for(scopy::acq::ReprKind k : pickableReprs()) {
+		reprCombo->combo()->addItem(QString::fromLatin1(scopy::acq::reprKindName(k)), static_cast<int>(k));
+	}
+	addSection->add(reprCombo);
+
+	QPushButton *addBtn = new QPushButton(tr("Add channel"), addSection);
+	Style::setStyle(addBtn, style::properties::button::borderButton);
+	connect(addBtn, &QAbstractButton::clicked, this, [this, p, yCombo, xCombo, reprCombo]() {
+		const scopy::acq::DataKey yKey = keyFromCombo(yCombo);
+		if(yKey.key.isEmpty()) {
+			// Either nothing is selected or the store has no streams yet. The sample index is
+			// not offered on the Y picker, so an empty key here is always "no source".
+			qWarning(CAT_ACQ_PLOTMANAGER) << "no Y source selected";
+			return;
+		}
+		const scopy::acq::ReprKind kind =
+			static_cast<scopy::acq::ReprKind>(reprCombo->combo()->currentData().toInt());
+		addChannel(p, kind, yKey, keyFromCombo(xCombo));
+	});
+	addSection->add(addBtn);
+
+	lay->addWidget(addSection);
+
+	QPushButton *delBtn = new QPushButton(tr("Delete plot"), page);
+	Style::setStyle(delBtn, style::properties::button::borderButton);
+	// Queued: the handler destroys this plot, and with it this page and this button, so a
+	// direct connection would return into freed memory. The uuid rather than the pointer
+	// for the same reason.
+	connect(delBtn, &QAbstractButton::clicked, this, [this, uuid = p->uuid()]() { removePlot(uuid); },
+		Qt::QueuedConnection);
+	lay->addWidget(delBtn);
+
+	lay->addStretch();
+
+	// Kept so onKeysChanged can repopulate them in place: a stream that appears after this
+	// page was built must be addable without rebuilding the page.
+	rail.yCombo = yCombo;
+	rail.xCombo = xCombo;
+
+	return page;
+}
+
+// --- rail: channel rows ----------------------------------------------------
+
 void AcqPlotManager::registerRail(AcqChannel *ch)
 {
 	if(!ch || m_shell.isNull() || m_railRows.contains(ch)) {
 		return;
 	}
-
-	if(!m_railGroup) {
-		m_railGroup = m_shell->addChannelGroup(QStringLiteral("Plots"));
+	// Under its plot's row, not under the group: the rail is the same tree as the object
+	// graph. A channel whose plot has no rail entry gets no row rather than a row in the
+	// wrong place.
+	AcqPlot *owner = ch->plotOwner();
+	if(!owner || !m_plotRails.contains(owner)) {
+		return;
+	}
+	CollapsableMenuControlButton *container = m_plotRails[owner].row;
+	if(!container) {
+		return;
 	}
 
 	const QString id = ch->menuId();
-	MenuControlButton *row = m_shell->addChannelSwitchRow(m_railGroup, ch->name(), ch->color(), id);
+	MenuControlButton *row = m_shell->addChannelSwitchRow(container, ch->name(), ch->color(), id);
 	m_railRows.insert(ch, row);
 
-	// Built once, here, and never rebuilt — which is only sound because the key and
-	// the repr are fixed for the channel's life.
-	QWidget *page = ch->createSettingsPage(m_shell.data());
-	m_shell->addMenuPage(id, page);
-	// Remembered because removeMenuPage() only takes the widget out of the stack
-	// (MapStackedWidget::remove -> QStackedWidget::removeWidget, which reparents to
-	// nullptr and deletes nothing). Without this the page outlives the channel as an
-	// orphaned top-level widget.
-	m_railPages.insert(ch, page);
+	// Built once, here, and never rebuilt — which is only sound because the key and the
+	// kind are fixed for the channel's life. The stack owns it from here: unregisterRail
+	// asks removeChannelRow to delete it.
+	m_shell->addMenuPage(id, ch->createSettingsPage(m_shell.data()));
 
 	if(SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row)) {
 		connect(sw, &QAbstractButton::toggled, ch, &AcqChannel::setEnabled);
-		// Both directions: a channel can be disabled from code (a vanished key), and
-		// the switch has to show it.
+		// Both directions: a channel can be disabled from code (a vanished key), and the
+		// switch has to show it.
 		connect(ch, &AcqChannel::enabledChanged, sw, [sw](bool en) {
 			QSignalBlocker b(sw);
 			sw->setChecked(en);
 		});
 		sw->setChecked(ch->isEnabled());
+
+		// A vanished key greys the row rather than removing it. Disabling the switch is the
+		// whole of "greyed": the channel is already force-disabled underneath, and leaving
+		// the switch live would let the reader tick a channel that cannot read.
+		connect(ch, &AcqChannel::keyPresentChanged, sw, [sw](bool present) { sw->setEnabled(present); });
+		sw->setEnabled(ch->isKeyPresent());
 	}
 
-	// The rail row is the channel's name in the UI, so a rename from the settings page
-	// has to reach it.
+	// The rail row is the channel's name in the UI, so a rename from the settings page has
+	// to reach it.
 	connect(ch, &AcqChannel::nameChanged, row, [row](const QString &n) { row->setName(n); });
 	connect(ch, &AcqChannel::colorChanged, row, [row](const QColor &c) { row->setColor(c); });
 }
@@ -335,159 +642,120 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 		return;
 	}
 	MenuControlButton *row = m_railRows.take(ch);
-	QWidget *page = m_railPages.take(ch);
-	if(m_shell.isNull()) {
+	if(m_shell.isNull() || !row) {
 		return;
 	}
-	if(row) {
-		// Four steps, done by the shell: button group, layout, menu page, deleteLater.
-		m_shell->removeChannelRow(m_railGroup, row, ch->menuId());
+	// The container is the plot's row, which is where addChannelSwitchRow put it. Null when
+	// the plot's rail entry has already gone — removeChannelRow tolerates that and still
+	// unregisters the button and its page, which is the part that must not be skipped.
+	AcqPlot *owner = ch->plotOwner();
+	CompositeWidget *container = nullptr;
+	if(owner && m_plotRails.contains(owner)) {
+		container = m_plotRails[owner].row;
 	}
-	if(page) {
-		// deleteLater rather than delete: a caller may be removing this channel from
-		// inside a signal raised by a widget on this very page, so the tree holding it
-		// has to outlive the emission.
-		page->deleteLater();
-	}
+	// Four steps, done by the shell: button group, layout, menu page, deleteLater.
+	// deletePage=true because nothing here keeps the page — it was built once for this
+	// channel and dies with it.
+	m_shell->removeChannelRow(container, row, ch->menuId(), /*deletePage=*/true);
 }
 
-void AcqPlotManager::setSampleRate(double sr)
+// --- source pickers --------------------------------------------------------
+
+void AcqPlotManager::populateKeyCombo(MenuCombo *combo, bool withSampleIndex) const
 {
-	if(sr <= 0.0) {
+	if(!combo || !combo->combo()) {
 		return;
 	}
-	m_sampleRate = sr;
-	// Also to the channels that already exist, so the controller may call this before
-	// or after any of them is created without the result differing.
-	for(AcqChannel *ch : std::as_const(m_channels)) {
-		applyCurveDefaults(ch);
-	}
-}
+	QComboBox *box = combo->combo();
 
-void AcqPlotManager::applyCurveDefaults(AcqChannel *ch)
-{
-	if(!ch || !ch->repr()) {
-		return;
-	}
-	// A dynamic_cast rather than reading kindName(): setSampleRate is CurveRepr's own,
-	// not part of the repr interface, so this is the one place in the manager that has to
-	// know a concrete repr type — and a failed cast is exactly the right answer for a
-	// digital track or a waterfall.
-	CurveRepr *curve = dynamic_cast<CurveRepr *>(ch->repr());
-	if(!curve) {
-		return;
-	}
-	curve->setSampleRate(m_sampleRate);
-}
+	// Blocked and rebuilt wholesale: clear() emits currentIndexChanged, and a listener
+	// would read that as the reader picking whatever lands at index 0.
+	QSignalBlocker blocker(box);
+	const QString previous = box->currentData().toString();
+	box->clear();
 
-MeasurementsPanel *AcqPlotManager::measurePanel()
-{
-	if(m_measurePanel.isNull() && !m_shell.isNull()) {
-		m_measurePanel = new MeasurementsPanel(this);
-		// Both hide themselves when their label list empties
-		// (gui/src/widgets/measurementpanel.cpp:174-176), so starting hidden keeps the
-		// two states consistent — otherwise an untouched instrument reserves plot
-		// height for an empty strip that would never come back once hidden.
-		m_measurePanel->setVisible(false);
-		m_shell->addToSlot(PS_BOTTOM, m_measurePanel);
-	}
-	return m_measurePanel.data();
-}
-
-StatsPanel *AcqPlotManager::statsPanel()
-{
-	if(m_statsPanel.isNull() && !m_shell.isNull()) {
-		m_statsPanel = new StatsPanel(this);
-		m_statsPanel->setVisible(false);
-		// StatsPanel asks for Expanding in both directions, which is right for the side
-		// slot it was written for and wrong above a plot: PS_TOP is an unstretched
-		// layout, so the panel would still claim height off its scroll area's size hint
-		// and push the plot down. Maximum vertically, the same policy MeasurementsPanel
-		// picks for itself (gui/src/widgets/measurementpanel.cpp:44).
-		m_statsPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-		// PS_TOP, above the plot, with the measurement readouts below it. Stats are the
-		// min/max/avg of the measurements — reading the two against each other means
-		// both laid out the same way, not one of them turned sideways in the right slot.
-		m_shell->addToSlot(PS_TOP, m_statsPanel);
-	}
-	return m_statsPanel.data();
-}
-
-void AcqPlotManager::registerMeasurements(AcqChannel *ch)
-{
-	if(!ch || !ch->repr()) {
-		return;
-	}
-	MeasureManagerInterface *mgr = ch->repr()->measureManager();
-	if(!mgr) {
-		// A digital track or a waterfall. Nothing to measure, and no panel to create
-		// for it — which is why the panels are built lazily here rather than in the
-		// constructor.
-		return;
+	if(withSampleIndex) {
+		// First, and the default for an X picker: a channel added without a thought about X
+		// is a time-domain channel, and the sample index is what that means. Its payload is
+		// the engine ramp's real key — it is a stream now — so the entry is skipped when the
+		// streams are listed below rather than appearing twice.
+		box->addItem(tr("sample index"), AcqAxis::rampKeyString());
 	}
 
-	MeasurementsPanel *meas = measurePanel();
-	StatsPanel *stats = statsPanel();
-	if(!meas || !stats) {
-		return;
-	}
-
-	connect(mgr, &MeasureManagerInterface::enableMeasurement, meas, &MeasurementsPanel::addMeasurement);
-	connect(mgr, &MeasureManagerInterface::disableMeasurement, meas, &MeasurementsPanel::removeMeasurement);
-	// The panel is shown by the first label rather than up front, and never hidden
-	// here: it hides itself when the last label goes.
-	connect(mgr, &MeasureManagerInterface::enableMeasurement, meas, [meas]() { meas->setVisible(true); });
-
-	connect(mgr, &MeasureManagerInterface::enableStat, stats, &StatsPanel::addStat);
-	connect(mgr, &MeasureManagerInterface::disableStat, stats, &StatsPanel::removeStat);
-	connect(mgr, &MeasureManagerInterface::enableStat, stats, [stats]() { stats->setVisible(true); });
-
-	// The panels' own "hide all" button unchecks every selector box, which is what
-	// actually removes the labels — the button alone would leave the model measuring.
-	// inhibitUpdates around it because removeMeasurement relayouts the whole stack per
-	// label otherwise (measurementpanel.cpp:178-182).
-	connect(meas, &MeasurementsPanel::hideAll, mgr, [meas, mgr]() {
-		meas->setInhibitUpdates(true);
-		Q_EMIT mgr->toggleAllMeasurement(false);
-		meas->setInhibitUpdates(false);
-	});
-	connect(stats, &StatsPanel::hideAll, mgr, [mgr]() { Q_EMIT mgr->toggleAllStats(false); });
-}
-
-CursorController *AcqPlotManager::cursors(CursorSettings **settings)
-{
-	if(!m_cursors.isNull()) {
-		if(settings) {
-			*settings = m_cursorSettings.data();
+	if(!m_store.isNull()) {
+		// Declared ∪ written: the two overlap but neither contains the other. A
+		// declared-but-unwritten stream is offered on purpose — adding its channel before the
+		// first cycle is what makes the first window full-depth.
+		QSet<scopy::acq::DataKey> all;
+		if(!m_engine.isNull()) {
+			const QList<scopy::acq::DataKey> declared = m_engine->declaredKeys();
+			for(const scopy::acq::DataKey &k : declared) {
+				all.insert(k);
+			}
 		}
-		return m_cursors.data();
-	}
-	PlotWidget *plot = sharedPlot();
-	if(!plot) {
-		return nullptr;
+		const QList<scopy::acq::DataKey> written = m_store->keys();
+		for(const scopy::acq::DataKey &k : written) {
+			all.insert(k);
+		}
+
+		QStringList names;
+		names.reserve(all.size());
+		for(const scopy::acq::DataKey &k : all) {
+			names << k.toString();
+		}
+		// Sorted: a QSet iterates in hash order, which would reshuffle the list every time
+		// the key set changed and make the picker unusable.
+		names.sort();
+		for(const QString &n : names) {
+			box->addItem(n, n);
+		}
 	}
 
-	m_cursors = new CursorController(plot, this);
-	// Parentless, and deliberately never hidden: the caller is expected to hand it
-	// straight to a HoverWidget, whose layout takes ownership and shows it. Parenting it
-	// here instead would make it a stray child of this widget — which lays its plots out
-	// in a splitter and has no slot for it — and calling hide() would set the explicit
-	// -hide flag that stops the hover's layout from ever showing it again.
-	m_cursorSettings = new CursorSettings();
-	m_cursors->connectSignals(m_cursorSettings.data());
-	// Cursors off until asked for: the handles are created either way, but a plot that
-	// opens with four cursors on it is not what anyone wants.
-	m_cursors->setVisible(false);
-	if(settings) {
-		*settings = m_cursorSettings.data();
-	}
-	return m_cursors.data();
+	// Keep what was selected where it still exists — a refresh must not silently retarget
+	// a selection the reader made and has not pressed Add on yet.
+	const int idx = box->findData(previous);
+	box->setCurrentIndex(qMax(0, idx));
 }
 
-void AcqPlotManager::rebuildIndexRamp()
+scopy::acq::DataKey AcqPlotManager::keyFromCombo(const MenuCombo *combo)
 {
-	m_indexX.resize(m_plotSize);
-	std::iota(m_indexX.begin(), m_indexX.end(), 0.0f);
+	if(!combo) {
+		return scopy::acq::DataKey();
+	}
+	// const_cast because MenuCombo::combo() is non-const; nothing here mutates it.
+	QComboBox *box = const_cast<MenuCombo *>(combo)->combo();
+	if(!box) {
+		return scopy::acq::DataKey();
+	}
+	const QString data = box->currentData().toString();
+	if(data.isEmpty()) {
+		return scopy::acq::DataKey();
+	}
+	// The sample-index entry needs no special case: its payload *is* the ramp key, and
+	// AcqChannel resolves an empty key to the same thing.
+	return scopy::acq::DataKey(data);
+}
+
+// --- geometry --------------------------------------------------------------
+
+int AcqPlotManager::plotSizeFor(AcqChannel *ch) const
+{
+	AcqPlot *p = ch ? ch->plotOwner() : nullptr;
+	// The plot's own width: plots can be different widths, so a channel's width is its
+	// plot's. The manager's default covers a channel read while detached, which pull()
+	// should never be doing but must not crash on.
+	return p ? p->plotSize() : m_plotSize;
+}
+
+void AcqPlotManager::announceMaxWindowSize()
+{
+	// Max, not the manager's default: two plots can be different widths, and the one ramp
+	// has to satisfy the widest. A narrower plot reads its tail.
+	int n = m_plotSize;
+	for(AcqPlot *p : std::as_const(m_plots)) {
+		n = qMax(n, p->plotSize());
+	}
+	Q_EMIT maxWindowSizeChanged(n);
 }
 
 void AcqPlotManager::setPlotSize(int n)
@@ -497,25 +765,35 @@ void AcqPlotManager::setPlotSize(int n)
 		return;
 	}
 	m_plotSize = n;
-	rebuildIndexRamp();
 
-	// Every row: X is the sample-index ramp everywhere, so plotSize is the range.
-	for(AcqPlotRow *r : std::as_const(m_rows)) {
-		r->setXInterval(0, qMax(1, m_plotSize - 1));
+	for(AcqPlot *p : std::as_const(m_plots)) {
+		p->setPlotSize(n);
 	}
+	// Nothing to set on the sample-index axes here either — see addChannel().
 	reclaimAll();
+	announceMaxWindowSize();
+	m_dirty = true;
+}
+
+void AcqPlotManager::setFallbackSampleRate(double sr)
+{
+	if(sr <= 0.0) {
+		return;
+	}
+	m_fallbackSampleRate = sr;
+	// Also to the channels that already exist, so the controller may call this before or
+	// after any of them is created without the result differing. Each channel ignores it if
+	// its own producer declared a rate.
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		ch->setFallbackSampleRate(sr);
+	}
 }
 
 void AcqPlotManager::reclaim(AcqChannel *ch)
 {
-	if(!ch) {
-		return;
+	if(ch) {
+		ch->reclaimDepth(plotSizeFor(ch));
 	}
-	// Safe to read from the GUI thread: m_bufferSize is deliberately non-atomic
-	// because the UI locks the buffer control while running, so it only ever changes
-	// while the worker is stopped.
-	const std::size_t bufSize = m_engine.isNull() ? 1u : m_engine->bufferSize();
-	ch->reclaimDepth(m_plotSize, bufSize);
 }
 
 void AcqPlotManager::reclaimAll()
@@ -525,21 +803,39 @@ void AcqPlotManager::reclaimAll()
 	}
 }
 
-void AcqPlotManager::onBufferSizeChanged() { reclaimAll(); }
+// --- pull loop -------------------------------------------------------------
 
 void AcqPlotManager::onKeysChanged(QList<scopy::acq::DataKey> keys)
 {
 	// Unconditionally, not a diff: DataStore::reset() and remove() erase m_claims
-	// wholesale, so after either every channel's claim is gone and must be
-	// re-registered.
+	// wholesale, so after either every channel's claim is gone and must be re-registered.
 	reclaimAll();
+
+	// Grey the channels whose key has gone and un-grey the ones that came back. No channel
+	// is created or destroyed here — what is drawn was decided by explicit addChannel()
+	// calls, and a key vanishing between runs must not take a channel's settings, rail row
+	// and menu page with it.
+	const QSet<scopy::acq::DataKey> live(keys.begin(), keys.end());
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		ch->setKeyPresent(live.contains(ch->key()));
+		// A stream that appeared after a settings page was built must still be selectable on
+		// it, on both sides.
+		ch->refreshAxisSourceChoices();
+	}
+
+	// And on every plot's add-channel section, for the same reason.
+	for(auto it = m_plotRails.begin(); it != m_plotRails.end(); ++it) {
+		populateKeyCombo(it->yCombo.data(), /*withSampleIndex=*/false);
+		populateKeyCombo(it->xCombo.data(), /*withSampleIndex=*/true);
+	}
+
 	Q_EMIT keysAvailable(keys);
 }
 
 void AcqPlotManager::onCycleComplete()
 {
 	for(AcqChannel *ch : std::as_const(m_channels)) {
-		ch->pull(m_plotSize);
+		ch->pull(plotSizeFor(ch));
 	}
 	// Deliberately no replot here — the frame timer owns repainting.
 	m_dirty = true;
@@ -547,11 +843,12 @@ void AcqPlotManager::onCycleComplete()
 
 void AcqPlotManager::onStarted()
 {
-	// run()/single() clear the store's chunks but keep the claims, and clearing
-	// chunks does not blank a curve: it would keep drawing the previous run's tail
-	// until the first new cycle landed.
+	// run()/single() clear the store's chunks but keep the claims, and clearing chunks does
+	// not blank a curve: it would keep drawing the previous run's tail until the first new
+	// cycle landed.
 	for(AcqChannel *ch : std::as_const(m_channels)) {
 		ch->reset();
+		ch->onStarted();
 	}
 	m_dirty = true;
 	m_frameTimer->start();
@@ -560,6 +857,11 @@ void AcqPlotManager::onStarted()
 void AcqPlotManager::onStopped()
 {
 	m_frameTimer->stop();
+	// Before the final flush: this is where each channel's axes take their last autoscale
+	// pass, so the frame that lands is drawn against the scale the data actually ended on.
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		ch->onStopped();
+	}
 	// One final flush, so the last cycle before the stop is not left unpainted.
 	if(m_dirty) {
 		m_dirty = false;
@@ -569,8 +871,8 @@ void AcqPlotManager::onStopped()
 
 void AcqPlotManager::replot()
 {
-	for(AcqPlotRow *r : std::as_const(m_rows)) {
-		r->replot();
+	for(AcqPlot *p : std::as_const(m_plots)) {
+		p->replot();
 	}
 	Q_EMIT newData();
 }

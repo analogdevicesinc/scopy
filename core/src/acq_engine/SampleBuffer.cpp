@@ -62,6 +62,18 @@ const char *textRadixName(TextRadix r)
 	return "?";
 }
 
+const char *reprKindName(ReprKind k)
+{
+	switch(k) {
+	case ReprKind::Hidden:      return "hidden";
+	case ReprKind::Curve:       return "curve";
+	case ReprKind::Digital:     return "digital";
+	case ReprKind::Annotations: return "annotations";
+	case ReprKind::Waterfall:   return "waterfall";
+	}
+	return "?";
+}
+
 bool textRadixFromString(const QString &s, TextRadix &out)
 {
 	const QString r = s.trimmed().toLower();

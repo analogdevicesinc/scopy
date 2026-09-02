@@ -20,19 +20,10 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-function(SETUP_TESTS)
-	foreach(_testname ${ARGS})
-		add_executable(_testname ${ARGS})
-		add_test(NAME ${_testname} COMMAND ${_testname})
-		target_link_libraries(${_testname} Qt${QT_VERSION_MAJOR}::Test)
-	endforeach()
-endfunction()
+# The shared helper, as every other suite in the tree uses. The local SETUP_TESTS this
+# replaces looped over ${ARGS} — never set, since the parameter is ${ARGN} — so its body
+# never ran and nothing here was ever built or registered with ctest.
+include(ScopyTest)
 
-# Tell CMake to run moc when necessary:
-set(CMAKE_AUTOMOC ON)
-# As moc files are generated in the binary dir, tell CMake to always look for includes there:
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-find_package(Qt${QT_VERSION_MAJOR}Test REQUIRED)
-
-setup_tests(tst_test1)
+# tst_test1.cpp is deliberately not listed: it is a license header with no test in it.
+setup_scopy_tests(waterfalldata)

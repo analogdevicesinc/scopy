@@ -16,9 +16,17 @@ void DataStore::write(const DataKey &key, SampleVariant vec)
 	{
 		QMutexLocker lk(&m_mutex);
 		newKey = !m_data.contains(key);
-		if(newKey)
-			applyDepthLocked(key);
 		m_data[key].push(std::move(vec));
+		// After the push, not before: capacity is derived from the chunk length, so
+		// there has to be a chunk to measure. This is also what applies the claims
+		// registered before the key existed — a view creates its channel (and claim)
+		// ahead of the first cycle, and that is what makes the first window
+		// full-depth rather than a single chunk.
+		//
+		// Every push, not just the first: the chunk length can change between cycles
+		// (the acquisition buffer is resized), and a sample claim has to follow it
+		// down as well as up. Cheap — a handful of claims and no allocation.
+		applyDepthLocked(key);
 		m_cycleKeys.insert(key);
 		++m_writeCount;
 	}
@@ -103,11 +111,26 @@ std::optional<AnnotationStreamInfo> DataStore::annotationInfo(const DataKey &key
 	return *it;
 }
 
-void DataStore::claimDepth(const DataKey &key, const QString &claimant, std::size_t depth)
+void DataStore::claimLocked(const DataKey &key, const QString &claimant, Claim c)
+{
+	c.amount = std::max<std::size_t>(1, c.amount);
+	// One entry per claimant, so a claim in either unit replaces whatever that
+	// claimant asked for before — including a claim in the other unit.
+	m_claims[key][claimant] = c;
+	applyDepthLocked(key);
+}
+
+void DataStore::claimSamples(const DataKey &key, const QString &claimant, std::size_t samples,
+			     std::size_t extraChunks)
 {
 	QMutexLocker lk(&m_mutex);
-	m_claims[key][claimant] = std::max<std::size_t>(1, depth);
-	applyDepthLocked(key);
+	claimLocked(key, claimant, Claim{samples, /*inSamples=*/true, extraChunks});
+}
+
+void DataStore::claimChunks(const DataKey &key, const QString &claimant, std::size_t chunks)
+{
+	QMutexLocker lk(&m_mutex);
+	claimLocked(key, claimant, Claim{chunks, /*inSamples=*/false, /*extraChunks=*/0});
 }
 
 void DataStore::releaseDepth(const DataKey &key, const QString &claimant)
@@ -138,15 +161,27 @@ void DataStore::releaseClaimant(const QString &claimant)
 
 void DataStore::applyDepthLocked(const DataKey &key)
 {
+	auto buf = m_data.find(key);
+	if(buf == m_data.end())
+		return;
+
+	// The length chunks are actually arriving in. Zero until the first push, which
+	// is why a sample claim cannot be resolved before then — write() re-applies once
+	// there is a chunk to measure.
+	const std::size_t chunkLen = buf->size();
+
 	std::size_t want = 1;
 	auto claims = m_claims.constFind(key);
 	if(claims != m_claims.constEnd())
-		for(std::size_t d : *claims)
-			want = std::max(want, d);
+		for(const Claim &c : *claims) {
+			// extraChunks is part of the one claim rather than a claim of its own,
+			// because it is a sum with the converted count and capacity is a max.
+			const std::size_t n =
+				c.inSamples ? depthForWindow(c.amount, chunkLen) + c.extraChunks : c.amount;
+			want = std::max(want, n);
+		}
 
-	auto buf = m_data.find(key);
-	if(buf != m_data.end())
-		buf->setCapacity(want);
+	buf->setCapacity(want);
 }
 
 void DataStore::clear()

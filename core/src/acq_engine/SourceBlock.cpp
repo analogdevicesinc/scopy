@@ -106,6 +106,38 @@ QList<DataKey> SourceBlock::outputKeys() const
 	return result;
 }
 
+std::optional<StreamInfo> SourceBlock::streamInfo(const DataKey &key) const
+{
+	QMutexLocker lk(&m_channelMutex);
+
+	// Every channel is published as raw(m_name, id), so anything shaped otherwise
+	// belongs to some other block and is not ours to describe.
+	int idx = 0;
+	for(auto it = m_channels.cbegin(); it != m_channels.cend(); ++it, ++idx) {
+		if(DataKey::raw(m_name, it.key()) != key)
+			continue;
+
+		StreamInfo info;
+		// The channel id is the only name the source has for it. A view is free to
+		// let the user rename the channel afterwards.
+		info.label = it.key();
+		// A raw acquired channel is a trace. That is the convention outputKeys()
+		// already encodes, and the one case where a base-class default is a
+		// statement of fact rather than a guess — a source that produces something
+		// else (a logic capture, a spectrum) overrides this.
+		info.kind = ReprKind::Curve;
+		// Distinct palette slots so a multi-channel source does not come up as
+		// several curves in one colour. The position in the map rather than a
+		// counter over one pass: m_channels is a QMap, so iteration is by channel
+		// id and every key gets the same slot on every call — which a hash-order
+		// walk would not guarantee.
+		info.colorIndex = idx;
+		return info;
+	}
+
+	return std::nullopt;
+}
+
 QWidget *SourceBlock::createSettingsWidget(QWidget *parent)
 {
 	auto *channels = new QWidget;

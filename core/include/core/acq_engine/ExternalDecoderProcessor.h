@@ -49,6 +49,13 @@ public:
 	void process(DataStore *store) override;
 	void reset() override;
 
+	// An Annotations descriptor for any of this decoder's output keys, labelled with
+	// that stage's decoder id.
+	// The protocol-level facts (radix, bitrate, producerId) go out separately as an
+	// AnnotationStreamInfo from publishStreamInfo() — that is what a downstream
+	// decoder consumes; this is only how a view should draw the stream.
+	std::optional<StreamInfo> streamInfo(const DataKey &key) const override;
+
 Q_SIGNALS:
 	// Emitted once per cycle after outKey has been written.
 	void cycleProduced(scopy::acq::DataKey outKey);
