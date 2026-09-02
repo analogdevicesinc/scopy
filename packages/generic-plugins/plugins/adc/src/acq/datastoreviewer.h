@@ -22,18 +22,21 @@
 #ifndef DATASTOREVIEWER_H
 #define DATASTOREVIEWER_H
 
-#include <QCheckBox>
 #include <QLabel>
 #include <QPointer>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTreeWidget>
 #include <QWidget>
+#include <infoiconwidget.h>
 
 #include <core/acq_engine/DataKey.h>
 
 namespace scopy {
+class MetricPrefixFormatter;
+
 namespace acq {
+class AcquisitionEngine;
 class DataStore;
 }
 
@@ -41,7 +44,13 @@ namespace adc {
 
 // Live view of every stream in a DataStore, split side by side: the key list on
 // the left (key, sample type, chunk size, history use), the selected stream's
-// newest samples on the right.
+// descriptor and newest samples on the right.
+//
+// The descriptor is what makes a misdrawn plot diagnosable here: without it, a
+// trace with no unit or the wrong X source is equally explained by the producing
+// block declaring it wrong and by the view reading it wrong. StreamInfo comes
+// from the engine, which asks the producing block; AnnotationStreamInfo comes
+// from the store.
 //
 // Selection rather than per-row expansion is what makes a per-cycle refresh
 // affordable: exactly one stream's samples are ever listed, so the work the panel
@@ -54,7 +63,10 @@ class DataStoreViewer : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit DataStoreViewer(scopy::acq::DataStore *store, QWidget *parent = nullptr);
+	// `engine` may be null — the panel then simply has no descriptor to report,
+	// since a block is the only thing that knows one.
+	DataStoreViewer(scopy::acq::DataStore *store, scopy::acq::AcquisitionEngine *engine,
+			QWidget *parent = nullptr);
 
 public Q_SLOTS:
 	// Re-read the store. Adds and removes rows to match the current key set,
@@ -80,11 +92,25 @@ private:
 		SampleColCount,
 	};
 
+	// Columns of the descriptor readout.
+	enum InfoColumn
+	{
+		ColField = 0,
+		ColFieldValue,
+		InfoColCount,
+	};
+
 	void buildUi();
 
-	// Rebuild the samples pane from the newest samples of the selected key. Reuses
-	// rows rather than recreating them: this runs every cycle, and recreating makes
-	// the list flicker and lose the reader's place.
+	// Rebuild the descriptor readout for the selected key. Asks the engine every
+	// time rather than caching or listening: a block's declaration changes with its
+	// channel set and its settings widget, and the engine answers from the block
+	// precisely so no copy needs re-syncing at those points.
+	void fillInfo();
+
+	// Rebuild the samples pane from the newest samples of the selected key, and the
+	// descriptor readout with it. Rows are reused rather than recreated: this runs
+	// every cycle, and recreating makes the list flicker and lose the reader's place.
 	void fillSamples();
 
 	// The key of the selected row, or an invalid key when nothing is selected.
@@ -96,6 +122,10 @@ private:
 
 	QTreeWidget *m_tree{nullptr};
 	QTreeWidget *m_samples{nullptr};
+	// Field/value readout of the selected stream's descriptor. Sized to its content
+	// rather than sharing the pane's height: the panel spans the short bottom rail,
+	// and a readout of six rows that takes half of it leaves no samples visible.
+	QTreeWidget *m_info{nullptr};
 	QLabel      *m_samplesTitle{nullptr};
 	// Disabled with no selection or an unwritten key: there is nothing to copy, and a
 	// button that copies an empty clipboard is worse than one that is visibly unavailable.
@@ -103,10 +133,16 @@ private:
 	// How many newest samples the pane lists. Small by default — see the class
 	// comment on why this is the expensive knob.
 	QSpinBox    *m_sampleCount{nullptr};
-	QCheckBox   *m_hex{nullptr};
 
-	// Not owned. A QPointer so a torn-down store can't be read through.
-	QPointer<scopy::acq::DataStore> m_store;
+	InfoIconWidget *m_sampleCountInfo{nullptr};
+
+	// Owned (parented here). Held rather than constructed per fill: fillInfo() runs
+	// at cycle rate and this is a QObject.
+	scopy::MetricPrefixFormatter *m_fmt{nullptr};
+
+	// Not owned. QPointers so a torn-down store or engine can't be read through.
+	QPointer<scopy::acq::DataStore>         m_store;
+	QPointer<scopy::acq::AcquisitionEngine> m_engine;
 };
 
 } // namespace adc

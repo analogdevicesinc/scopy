@@ -45,6 +45,9 @@ private:
 	                               const QString &decoderId);
 	static OptionInfo    parseOptionLine(const QString &content);
 
+	const char                           *m_kCatalogId;
+	int                                   m_kMaxParallel;
+
 	mutable QString                       m_exeOverride;
 	mutable QString                       m_cachedExe;
 

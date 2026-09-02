@@ -73,3 +73,5 @@ QWidget *Block::withBaseSettings(QWidget *own, QWidget *parent)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_Block.cpp"

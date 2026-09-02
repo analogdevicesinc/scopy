@@ -35,3 +35,5 @@ void MathSource::setFormula(const QString &formula)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_MathSource.cpp"

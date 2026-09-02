@@ -135,16 +135,16 @@ generate_export_header(
 )
 
 target_include_directories(
-	${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
-				  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/decoder
+	${PROJECT_NAME}
+	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+		  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+		  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/pkggui
+		  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/acq_engine
+		  ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/decoder
 )
 target_include_directories(
 	${PROJECT_NAME}
-	# include/ so sources can spell public headers <core/decoder/X.h> — the
-	# same path external consumers use.
+	# include/ so sources can spell public headers <core/decoder/X.h> — the same path external consumers use.
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
@@ -170,7 +170,12 @@ foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-find_library(GENALYZER_LIB NAMES genalyzer HINTS ${CMAKE_PREFIX_PATH} PATH_SUFFIXES lib lib64)
+find_library(
+	GENALYZER_LIB
+	NAMES genalyzer
+	HINTS ${CMAKE_PREFIX_PATH}
+	PATH_SUFFIXES lib lib64
+)
 if(NOT GENALYZER_LIB)
 	message(FATAL_ERROR "libgenalyzer not found — required for GenalyzerFFTProcessor (acq_engine)")
 endif()

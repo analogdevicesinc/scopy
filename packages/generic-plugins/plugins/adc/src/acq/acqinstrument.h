@@ -95,11 +95,12 @@ Q_SIGNALS:
 	void stopped();
 	void cycleComplete();
 
-	// The reader changed the engine's buffer size. The engine has no signal for
-	// this and the control lives here, so consumers whose requirements depend on
-	// it — anything claiming DataStore depth, since that is
-	// ceil(window / bufferSize) — have no other way to know.
-	void bufferSizeChanged(int samples);
+	// Deliberately no bufferSizeChanged signal. There used to be one, for consumers
+	// whose depth requirement was ceil(window / bufferSize) and so had to be
+	// recomputed here. Depth claims are now registered in samples and the DataStore
+	// re-derives the chunk count on every push, so nothing outside the engine needs
+	// to hear about a resize — and a consumer that forgot to subscribe (or latched
+	// the size once) can no longer pin history at a stale count.
 
 private Q_SLOTS:
 	void onStarted();
@@ -114,6 +115,11 @@ private:
 	// True while the engine is mid-run. Only used to keep the run button and the
 	// engine controls consistent — the engine itself is the authority.
 	void setRunning(bool running);
+
+	// Defaults. Chosen to match what every existing instrument sets by hand, so an
+	// owner that never touches them still gets a usable engine.
+	const std::size_t  m_kDefaultBufferSize;
+	const unsigned int m_kDefaultMaxFPS;
 
 	InstrumentTemplate *m_it{nullptr};
 

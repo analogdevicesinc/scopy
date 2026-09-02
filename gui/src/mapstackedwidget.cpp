@@ -63,6 +63,19 @@ bool MapStackedWidget::remove(QString key)
 	return true;
 }
 
+bool MapStackedWidget::removeAndDelete(QString key)
+{
+	// Resolved before remove() drops the mapping.
+	QWidget *w = get(key);
+	if(!remove(key)) {
+		return false;
+	}
+	if(w) {
+		w->deleteLater();
+	}
+	return true;
+}
+
 bool MapStackedWidget::contains(QString key) { return map.contains(key); }
 
 QWidget *MapStackedWidget::get(QString key)

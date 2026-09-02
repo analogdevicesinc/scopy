@@ -96,3 +96,5 @@ MathBlockWidget::MathBlockWidget(MathProcessor *proc, QWidget *parent)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_MathBlockWidget.cpp"

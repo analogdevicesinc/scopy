@@ -73,3 +73,5 @@ void TriggerBinder::unbindReplotOnFire()
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_TriggerBinder.cpp"

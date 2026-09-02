@@ -216,3 +216,5 @@ void GenalyzerSettings::updateUIFromConfig()
 	m_ssbFundamentalSpinbox->blockSignals(false);
 	m_ssbDefaultSpinbox->blockSignals(false);
 }
+
+#include "moc_GenalyzerSettings.cpp"

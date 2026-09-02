@@ -219,8 +219,10 @@ public:
 	// Undoes addChannelRow/addChannelSwitchRow. Four steps rather than one because
 	// the row is registered in three places: the exclusive button group (which would
 	// otherwise keep a dangling pointer), the group's layout, and the menu stack.
-	// `menuId` may be empty for a row that registered no page.
-	void removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId);
+	// `menuId` may be empty for a row that registered no page. `deletePage` forwards
+	// to removeMenuPage(): pass true unless you keep the page yourself.
+	void removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId,
+			      bool deletePage = false);
 
 	// A row pinned above the scroll area, outside every group. Used for the
 	// device/general-settings entry.
@@ -232,7 +234,10 @@ public:
 
 	// Hosts a page. Built once, never rebuilt; showMenuPage() only switches.
 	void addMenuPage(const QString &id, QWidget *w);
-	void removeMenuPage(const QString &id);
+	// Unstacks the page. Defaults to leaving it alive — several existing callers keep
+	// their own pointer and re-add it later — so pass `deletePage` to be rid of it
+	// rather than leaving an orphaned hidden top-level behind.
+	void removeMenuPage(const QString &id, bool deletePage = false);
 	bool hasMenuPage(const QString &id) const;
 	void showMenuPage(const QString &id);
 

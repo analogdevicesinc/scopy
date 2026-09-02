@@ -84,8 +84,8 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 			GnWindowHann,
 			m_engine);
 		// Lets the block claim chunk history when averaging is turned on: navg
-		// frames of nfft samples span more than one acquisition buffer.
-		m_fftProc->setAveragingStore(m_store, m_engine->bufferSize());
+		// frames are navg past chunks.
+		m_fftProc->setAveragingStore(m_store);
 		m_engine->addProcessor(m_fftProc);
 	}
 
@@ -317,8 +317,9 @@ void SimInstrumentController::init(iio_context *ctx, libm2k::digital::M2kDigital
 
 	connect(m_ui, &SimInstrument::sampleSizeChanged, this, [this](int n) {
 		m_engine->setBufferSize(static_cast<std::size_t>(n));
-		// Chunk size changed, so the chunk count covering one plot window did too.
-		claimPlotDepth();
+		// No re-claim: the plot claim is in samples and the store re-derives the
+		// chunk count on every push, so it follows the new chunk size on its own —
+		// down as well as up, which a latched conversion did not.
 		if(m_decoderMgr)
 			m_decoderMgr->setDecoderWindowSize(m_plotSize);
 	});
@@ -922,8 +923,9 @@ void SimInstrumentController::claimWaterfallDepth()
 		return;
 	m_store->releaseClaimant(kWaterfallClaimant);
 	if(!m_fftWaterfallKey.key.isEmpty())
-		m_store->claimDepth(m_fftWaterfallKey, kWaterfallClaimant,
-				    static_cast<std::size_t>(std::max(1, m_currentWaterfallRows)));
+		// Chunks: one retained chunk is one row however wide a chunk is.
+		m_store->claimChunks(m_fftWaterfallKey, kWaterfallClaimant,
+				     static_cast<std::size_t>(std::max(1, m_currentWaterfallRows)));
 }
 
 // Every key the plot can read — curve X/Y axes and raw digital tracks — needs
@@ -932,14 +934,15 @@ void SimInstrumentController::claimWaterfallDepth()
 // than tracking which combo currently points where.
 void SimInstrumentController::claimPlotDepth()
 {
-	if(!m_store || !m_engine)
+	if(!m_store)
 		return;
-	// One chunk more than the window needs: a centred trigger window is read
-	// over-long (plotSize + extra, extra < bufferSize) and then re-anchored.
-	const std::size_t depth = 1 + scopy::acq::DataStore::depthForWindow(
-		static_cast<std::size_t>(m_plotSize), m_engine->bufferSize());
+	// In samples, plus one chunk: a centred trigger window is read over-long
+	// (plotSize + extra, extra < one chunk) and then re-anchored. The store converts
+	// the sample part against the current chunk length on every push, so this needs
+	// no engine read and no re-claim when the buffer is resized.
 	for(const scopy::acq::DataKey &k : m_store->keys())
-		m_store->claimDepth(k, kPlotClaimant, depth);
+		m_store->claimSamples(k, kPlotClaimant, static_cast<std::size_t>(m_plotSize),
+				      /*extraChunks=*/1);
 }
 
 void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)
