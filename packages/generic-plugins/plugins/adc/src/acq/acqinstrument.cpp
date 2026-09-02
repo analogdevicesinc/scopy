@@ -38,17 +38,10 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-namespace {
-
-// Defaults. Chosen to match what every existing instrument sets by hand, so an
-// owner that never touches them still gets a usable engine.
-constexpr std::size_t  kDefaultBufferSize = 1024;
-constexpr unsigned int kDefaultMaxFPS = 30;
-
-} // namespace
-
 AcqInstrument::AcqInstrument(QWidget *parent)
 	: QWidget(parent)
+	, m_kDefaultBufferSize(1024)
+	, m_kDefaultMaxFPS(30)
 {
 	QVBoxLayout *lay = new QVBoxLayout(this);
 	lay->setContentsMargins(0, 0, 0, 0);
@@ -78,8 +71,8 @@ void AcqInstrument::setupEngine()
 {
 	m_store = new scopy::acq::DataStore(this);
 	m_engine = new scopy::acq::AcquisitionEngine(m_store, this);
-	m_engine->setBufferSize(kDefaultBufferSize);
-	m_engine->setMaxFPS(kDefaultMaxFPS);
+	m_engine->setBufferSize(m_kDefaultBufferSize);
+	m_engine->setMaxFPS(m_kDefaultMaxFPS);
 	m_engine->setMode(scopy::acq::AcquisitionEngine::Mode::Continuous);
 
 	// The log tab is a report sink, so it wants everything the blocks say, not
@@ -115,7 +108,7 @@ void AcqInstrument::setupTopRail()
 		m_engine->mode() == scopy::acq::AcquisitionEngine::Mode::Continuous ? 0 : 1);
 	m_it->addEngineControl(m_modeCombo);
 
-	m_bufferSpin = new gui::MenuSpinbox("Buffer size", kDefaultBufferSize, "samples", 16, 1 << 20, true, false,
+	m_bufferSpin = new gui::MenuSpinbox("Buffer size", m_kDefaultBufferSize, "samples", 16, 1 << 20, true, false,
 					    false, m_it);
 	m_bufferSpin->setIncrementMode(gui::MenuSpinbox::IS_POW2);
 	m_it->addEngineControl(m_bufferSpin);
@@ -125,8 +118,9 @@ void AcqInstrument::setupTopRail()
 					 : scopy::acq::AcquisitionEngine::Mode::Triggered);
 	});
 	connect(m_bufferSpin, &gui::MenuSpinbox::valueChanged, this, [this](double v) {
+		// Tell the engine and nothing else: depth claims are in samples and the
+		// DataStore follows the new chunk length on the next push.
 		m_engine->setBufferSize(static_cast<std::size_t>(v));
-		Q_EMIT bufferSizeChanged(static_cast<int>(v));
 	});
 
 	// The shell's target-fps field drives the engine's own ceiling. Seeded from the
@@ -161,7 +155,9 @@ void AcqInstrument::setupDebugTabs()
 	m_pipeline = new PipelineInspector(m_engine, m_store, m_it);
 	m_it->addDebugTab(m_pipeline, "Pipeline");
 
-	m_storeViewer = new DataStoreViewer(m_store, m_it);
+	// The engine as well as the store: a stream's descriptor is owned by the block
+	// that produces it, so the store alone cannot say what a key means.
+	m_storeViewer = new DataStoreViewer(m_store, m_engine, m_it);
 	m_it->addDebugTab(m_storeViewer, "DataStore");
 
 	m_logView = new LogView("No messages.", m_it);

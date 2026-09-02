@@ -19,9 +19,11 @@
  *
  */
 
-#include "acqannotationrepr.h"
+#include "acqannotationchannel.h"
 
-#include "acqplotrow.h"
+#include "acqaxis.h"
+#include "acqchannelregistry.h"
+#include "acqplot.h"
 
 #include <core/acq_engine/DataStore.h>
 
@@ -38,57 +40,75 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-AnnotationRepr::AnnotationRepr() = default;
+// Any stream. Only an annotation one has anything to show here: readData's latestAs<>()
+// narrows to the annotation alternative, so a numeric key clears the bands rather than
+// being misread.
+REGISTER_ACQ_CHANNEL_KIND(AcqAnnotationChannel, scopy::acq::ReprKind::Annotations)
 
-AnnotationRepr::~AnnotationRepr() { detach(); }
-
-void AnnotationRepr::attach(AcqPlotRow *row, const QString &name, const QColor &color)
+AcqAnnotationChannel::AcqAnnotationChannel(const Args &args)
+	: AcqChannel(args)
 {
-	if(!row || !row->plot() || m_item) {
+}
+
+AcqAnnotationChannel::~AcqAnnotationChannel() { detach(); }
+
+PlotAxis *AcqAnnotationChannel::ownYAxis(AcqPlot *plot) { return plot ? plot->digitalAxis() : nullptr; }
+
+void AcqAnnotationChannel::attachTo(AcqPlot *plot)
+{
+	if(!plot->plot() || m_item) {
 		return;
 	}
-	PlotAxis *yAxis = row->digitalAxis();
-	if(!yAxis) {
+	// Wrapped by the base through ownYAxis, so this and every logic track on the plot
+	// share one scale — which is what lets a decode band sit under the line it decodes.
+	PlotAxis *digAxis = yAxis() ? yAxis()->plotAxis() : plot->digitalAxis();
+	if(!digAxis) {
 		return;
 	}
 
-	m_plot = row->plot();
-	m_row = row;
-	m_color = color;
+	m_plot = plot->plot();
 
-	m_handle = new PlotAxisHandle(m_plot.data(), yAxis);
+	// AnnotationCurve places its spans by sample offset and takes no X array, so the
+	// source picker would be a control with no effect. Disabled with the reason, not
+	// hidden.
+	if(xAxis()) {
+		xAxis()->setSourceFixed(true, tr("Decode bands are drawn against the sample index"));
+	}
+
+	m_handle = new PlotAxisHandle(m_plot.data(), digAxis);
 	m_handle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
-	m_handle->handle()->setColor(color.isValid() ? color : Style::getColor(json::theme::content_silent));
-	// SOUTH_OR_EAST, i.e. the right edge, where DigitalRepr uses the left. A decode
-	// band is usually stacked directly under the logic track it decodes, and two
-	// handles at the same height on the same side would overlap.
+	m_handle->handle()->setColor(color().isValid() ? color() : Style::getColor(json::theme::content_silent));
+	// SOUTH_OR_EAST, i.e. the right edge, where AcqDigitalChannel uses the left. A
+	// decode band is usually stacked directly under the logic track it decodes, and
+	// two handles at the same height on the same side would overlap.
 	m_handle->handle()->setHandlePos(HandlePos::SOUTH_OR_EAST);
 	m_plot->addPlotAxisHandle(m_handle);
 
-	// See DigitalRepr::attach — the handle parents itself to the canvas and filters
-	// its events, so nothing here may reparent, resize or raise it.
+	// See AcqDigitalChannel::attachTo — the handle parents itself to the canvas and
+	// filters its events, so nothing here may reparent, resize or raise it.
 	m_handle->handle()->setVisible(true);
-	m_handle->setPosition(row->nextDigitalSlot());
+	m_handle->setPosition(plot->nextDigitalSlot());
 
-	QObject::connect(m_handle.data(), &PlotAxisHandle::scalePosChanged, m_handle.data(), [this](double) {
+	connect(m_handle.data(), &PlotAxisHandle::scalePosChanged, this, [this](double) {
 		if(!m_plot.isNull() && m_plot->plot()) {
 			m_plot->plot()->replot();
 		}
 	});
 
-	m_item = new AnnotationCurve(name, m_plot->xAxis(), yAxis, m_handle.data());
-	m_item->setVisible(m_enabled);
+	// This channel's own pooled X axis rather than the widget's built-in one, so the
+	// spans are laid out across the same horizontal scale its rail neighbours use.
+	PlotAxis *x = xAxis() ? xAxis()->plotAxis() : m_plot->xAxis();
+	m_item = new AnnotationCurve(name(), x, digAxis, m_handle.data());
 	m_item->attach(m_plot->plot());
 }
 
-void AnnotationRepr::detach()
+void AcqAnnotationChannel::detachFrom()
 {
-	// Same discipline as DigitalRepr: the plot and the channel owning this repr are
-	// siblings, so the QwtPlot may already have gone and auto-detached its items.
+	// Same discipline as AcqDigitalChannel: the plot and this channel are siblings, so
+	// the QwtPlot may already have gone and auto-detached its items.
 	if(m_plot.isNull()) {
 		m_item = nullptr;
 		m_handle = nullptr;
-		m_row = nullptr;
 		return;
 	}
 
@@ -107,25 +127,25 @@ void AnnotationRepr::detach()
 		// a channel is removed from a UI callback.
 		h->deleteLater();
 	}
-
-	m_row = nullptr;
 }
 
-std::size_t AnnotationRepr::claimDepth(int plotSize, std::size_t bufferSize) const
+DepthNeed AcqAnnotationChannel::depthNeeded(int plotSize) const
 {
 	Q_UNUSED(plotSize)
-	Q_UNUSED(bufferSize)
 	// One chunk, whatever the window. An annotation read is latestAs<>() — and even
 	// SampleBuffer::window() returns an annotation stream from the newest chunk alone,
 	// because the offsets in each record are relative to the window the decoder ran
 	// on and stitching would need shiftAnnotations() to re-anchor them. Claiming more
 	// would retain history nothing can read.
-	return 1u;
+	//
+	// Chunks, not samples: "the newest one" is a chunk count and must stay 1 however
+	// many annotation records that chunk happens to hold.
+	return DepthNeed::chunks(1);
 }
 
-void AnnotationRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &key, int plotSize)
+void AcqAnnotationChannel::readData(scopy::acq::DataStore *store, int plotSize)
 {
-	if(!store || !m_item || m_plot.isNull()) {
+	if(!m_item || m_plot.isNull()) {
 		return;
 	}
 
@@ -133,7 +153,7 @@ void AnnotationRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKe
 	// "this key is not an annotation stream" as well as the read, so a channel pointed
 	// at a numeric key by mistake draws nothing rather than misreading it.
 	const std::optional<QVector<scopy::acq::Annotation>> anns =
-		store->latestAs<QVector<scopy::acq::Annotation>>(key);
+		store->latestAs<QVector<scopy::acq::Annotation>>(key());
 	if(!anns) {
 		// Absent, empty, or the wrong type. Clear rather than leave the last decode on
 		// screen — a decoder that stopped producing has no annotations, and stale ones
@@ -164,16 +184,15 @@ void AnnotationRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKe
 	m_item->setAnnotations(spans);
 }
 
-void AnnotationRepr::reset()
+void AcqAnnotationChannel::reset()
 {
 	if(m_item && !m_plot.isNull()) {
 		m_item->clear();
 	}
 }
 
-void AnnotationRepr::setEnabled(bool en)
+void AcqAnnotationChannel::onEnabledChanged(bool en)
 {
-	m_enabled = en;
 	if(m_plot.isNull()) {
 		return;
 	}
@@ -185,9 +204,8 @@ void AnnotationRepr::setEnabled(bool en)
 	}
 }
 
-void AnnotationRepr::setColor(const QColor &c)
+void AcqAnnotationChannel::onColorChanged(const QColor &c)
 {
-	m_color = c;
 	if(m_plot.isNull()) {
 		return;
 	}
@@ -198,3 +216,5 @@ void AnnotationRepr::setColor(const QColor &c)
 		m_handle->handle()->setColor(c);
 	}
 }
+
+#include "moc_acqannotationchannel.cpp"

@@ -178,8 +178,31 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 	m_navigator->removeChannel(ch);
 	m_tracker->removeChannel(ch);
 
-	// QwtAxisId cannot be removed from QwtPlot
-	ch->yAxis()->setVisible(false);
+	// Run after the removal above, so the departing channel does not count itself as a
+	// user of its own axes.
+	auto hideAxisIfUnused = [this](PlotAxis *axis, bool yAxis) {
+		if(!axis) {
+			return;
+		}
+		for(PlotChannel *other : std::as_const(m_plotChannels)) {
+			if((yAxis ? other->yAxis() : other->xAxis()) == axis) {
+				return;
+			}
+		}
+		axis->setVisible(false);
+	};
+
+	// QwtAxisId cannot be removed from QwtPlot, so the axis outlives the channel and
+	// the most we can do is hide it. Only hide it when nobody is left using it: axes
+	// are shared between channels (PlotAxis's ctor grows the QwtPlot's axis count and
+	// callers pass the same PlotAxis to several channels), so hiding unconditionally
+	// used to take the labels away from every surviving sibling.
+	//
+	// Both sides, not just Y: a caller can give every channel its own X axis as well —
+	// the acq plot manager's axis pool does exactly that — and an X scale nobody uses
+	// would otherwise stay drawn for the life of the plot.
+	hideAxisIfUnused(ch->yAxis(), /*yAxis=*/true);
+	hideAxisIfUnused(ch->xAxis(), /*yAxis=*/false);
 	if(m_selectedChannel == ch) {
 		if(m_plotChannels.size() > 0) {
 			selectChannel(m_plotChannels[0]);
@@ -348,7 +371,7 @@ void PlotWidget::showAxisLabels()
 		m_selectedChannel->yAxis()->setVisible(m_showYAxisLabels);
 	} else {
 		xAxis()->setVisible(m_showXAxisLabels);
-		yAxis()->setVisible(m_showXAxisLabels);
+		yAxis()->setVisible(m_showYAxisLabels);
 	}
 }
 

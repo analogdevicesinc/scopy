@@ -139,10 +139,9 @@ void GenalyzerFFTProcessor::setRfftScale(GnRfftScale s)
 	m_rfftScale = s;
 }
 
-void GenalyzerFFTProcessor::setAveragingStore(DataStore *store, std::size_t bufferSize)
+void GenalyzerFFTProcessor::setAveragingStore(DataStore *store)
 {
-	m_avgStore   = store;
-	m_bufferSize = qMax<std::size_t>(1, bufferSize);
+	m_avgStore = store;
 	reclaimAveragingDepth();
 }
 
@@ -169,55 +168,67 @@ void GenalyzerFFTProcessor::reclaimAveragingDepth()
 {
 	if(!m_avgStore)
 		return;
-	// One claim per watched key under this block's name. claimDepth replaces a
-	// claimant's previous claim, so shrinking navg releases the depth too.
-	std::size_t want;
-	{
-		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
-		want = static_cast<std::size_t>(m_navg.load(std::memory_order_relaxed)) *
-		       static_cast<std::size_t>(qMax(1, m_nfft));
-	}
+	// Chunks, not samples: nfft *is* the chunk length (process() derives it from the
+	// newest chunk's size), so one averaged frame is exactly one chunk whatever that
+	// length happens to be. Claiming navg*nfft samples instead would make the claim
+	// scale with a length it is already expressed in.
+	//
+	// One claim per watched key under this block's name. A claim replaces that
+	// claimant's previous one, so shrinking navg releases the depth too.
+	const std::size_t want = static_cast<std::size_t>(qMax(1, m_navg.load(std::memory_order_relaxed)));
 	for(const DataKey &k : m_watchedKeys)
-		m_avgStore->claimDepth(k, name(), DataStore::depthForWindow(want, m_bufferSize));
+		m_avgStore->claimChunks(k, name(), want);
 }
 
-QHash<DataKey, StreamInfo> GenalyzerFFTProcessor::declaredStreams() const
+std::optional<StreamInfo> GenalyzerFFTProcessor::streamInfo(const DataKey &key) const
 {
-	QHash<DataKey, StreamInfo> result;
-
-	StreamInfo mag;
-	mag.label = QStringLiteral("FFT");
-	mag.unit = QStringLiteral("dBFS");
-	// Read under the same mutex setSampleRate() writes it under; a view asking for
-	// descriptors from the GUI thread races the settings widget otherwise.
-	{
-		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
-		mag.sampleRate = m_sampleRate;
+	if(key == m_outputKey) {
+		StreamInfo mag;
+		mag.label = QStringLiteral("FFT");
+		mag.unit = QStringLiteral("dBFS");
+		// Read under the same mutex setSampleRate() writes it under; a view asking for
+		// a descriptor from the GUI thread races the settings widget otherwise. Taken
+		// only on this key — the frequency stream below needs nothing guarded, which is
+		// what asking per key rather than per block buys.
+		{
+			std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+			mag.sampleRate = m_sampleRate;
+		}
+		// The bin frequencies this magnitude stream is indexed by. This is the
+		// producer stating a fact about its own output, not a UI control — which is
+		// the distinction that matters here: a user picking two keys out of combo
+		// boxes was the mechanism removed in d0feff018.
+		mag.xKey = m_freqKey;
+		mag.kind = ReprKind::Curve;
+		return mag;
 	}
-	// The bin frequencies this magnitude stream is indexed by. This is the
-	// producer stating a fact about its own output, not a UI control — which is
-	// the distinction that matters here: a user picking two keys out of combo
-	// boxes was the mechanism removed in d0feff018.
-	mag.xKey = m_freqKey;
-	mag.kind = ReprKind::Curve;
-	result.insert(m_outputKey, mag);
 
-	// Declared, so a view can see it exists and label it, but never drawn.
-	StreamInfo freq;
-	freq.label = QStringLiteral("FFT frequency");
-	freq.unit = QStringLiteral("Hz");
-	freq.kind = ReprKind::Hidden;
-	result.insert(m_freqKey, freq);
+	if(key == m_freqKey) {
+		// Described, so a view can see it exists and label it, but never drawn.
+		StreamInfo freq;
+		freq.label = QStringLiteral("FFT frequency");
+		freq.unit = QStringLiteral("Hz");
+		freq.kind = ReprKind::Hidden;
+		return freq;
+	}
 
-	return result;
+	return std::nullopt;
 }
 
 void GenalyzerFFTProcessor::setConfig(const GenalyzerConfig &cfg)
 {
-	std::lock_guard<std::mutex> lock(s_genalyzerMutex);
-	m_cfg = cfg;
-	cleanupAutoConfig();
-	cleanupFaConfig();
+	bool enabledChanged = false;
+	{
+		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
+		enabledChanged = (m_cfg.enabled != cfg.enabled);
+		m_cfg          = cfg;
+		cleanupAutoConfig();
+		cleanupFaConfig();
+	}
+	// Outside the mutex: a slot on this signal may read back config() or nfft(),
+	// and s_genalyzerMutex is not recursive.
+	if(enabledChanged)
+		Q_EMIT analysisEnabledChanged(cfg.enabled);
 }
 
 QWidget *GenalyzerFFTProcessor::createSettingsWidget(QWidget *parent)
@@ -411,9 +422,10 @@ int GenalyzerFFTProcessor::configureAutoAnalysis()
 {
 	cleanupAutoConfig();
 
-	// navg must match what runComplexFFT/runRealFFT actually passed, or the
-	// analysis reads the spectrum with the wrong noise normalisation.
-	const size_t navg = static_cast<size_t>(qMax(1, m_navg.load(std::memory_order_relaxed)));
+	// navg must match what runComplexFFT/runRealFFT actually passed — the frames
+	// this cycle had, not the configured maximum — or the analysis reads the
+	// spectrum with the wrong noise normalisation.
+	const size_t navg = static_cast<size_t>(qMax(1, m_configuredFrames));
 	int err = gn_config_fftz(static_cast<size_t>(m_nfft) * navg, /*qres=*/1, navg,
 				 static_cast<size_t>(m_nfft), m_window, &m_gnConfig);
 	if(err != 0) {
@@ -641,77 +653,99 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	}
 
 	const FFTMode currentMode = (nWatched == 1) ? FFTMode::Real : FFTMode::Complex;
-	const int     navg        = qMax(1, m_navg.load(std::memory_order_relaxed));
+	const int     navgMax     = qMax(1, m_navg.load(std::memory_order_relaxed));
+
+	// nfft is the length of one chunk — one acquisition buffer is one FFT frame,
+	// the same thing one input vector is to genalyzer_impl.cpp's work(). It is
+	// deliberately *not* derived from the averaging window: averaging stacks more
+	// frames in front of the transform, it never shortens the transform itself.
+	// Dividing the window by navg instead would latch, because the window is
+	// requested as nfft*navg and nfft is then rewritten from it.
+	int nfft = 0;
+	{
+		auto v = store->latestAs<QVector<float>>(m_watchedKeys[0]);
+		if(!v) {
+			if(store->contains(m_watchedKeys[0]))
+				report(AcquisitionError::Severity::Warning,
+				       QStringLiteral("input 0 is not float; skipping"));
+			return;
+		}
+		nfft = v->size();
+	}
+	if(nfft <= 0)
+		return;
 
 	// Resolve inputs outside the gn_* mutex (DataStore handles its own locking).
 	// With navg > 1 the frames genalyzer averages come out of the store's chunk
-	// history, so ask for the whole window rather than the newest chunk. window()
-	// returns a short vector while history is still filling, which the n/navg
-	// derivation below absorbs — the first cycles just use a smaller nfft.
-	int want;
-	{
-		// m_nfft is written by resizeForNfft() from both this thread and
-		// setAveraging(); take the mutex for the read rather than tearing.
-		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
-		want = m_nfft * navg;
-	}
-	QVector<float> iSamples, qSamples;
+	// history, so ask for nfft*navg samples rather than the newest chunk alone.
+	QVector<float> chan[2];
+	int            frames = navgMax;
 	for(int i = 0; i < nWatched; ++i) {
 		QVector<float> s;
-		if(navg > 1) {
-			s = store->windowAs<QVector<float>>(m_watchedKeys[i], want);
-			if(s.isEmpty()) {
-				if(store->contains(m_watchedKeys[i]))
-					report(AcquisitionError::Severity::Warning,
-					       QStringLiteral("input %1 is not float; skipping").arg(i));
-				return;
-			}
+		if(navgMax > 1) {
+			s = store->windowAs<QVector<float>>(m_watchedKeys[i], nfft * navgMax);
 		} else {
 			auto v = store->latestAs<QVector<float>>(m_watchedKeys[i]);
-			if(!v) {
-				if(store->contains(m_watchedKeys[i]))
-					report(AcquisitionError::Severity::Warning,
-					       QStringLiteral("input %1 is not float; skipping").arg(i));
-				return;
-			}
-			s = std::move(*v);
+			if(v)
+				s = std::move(*v);
 		}
-		(i == 0 ? iSamples : qSamples) = std::move(s);
+		if(s.isEmpty()) {
+			if(store->contains(m_watchedKeys[i]))
+				report(AcquisitionError::Severity::Warning,
+				       QStringLiteral("input %1 is not float; skipping").arg(i));
+			return;
+		}
+		// Whole frames only, and no more than the two channels agree on.
+		frames  = qMin(frames, s.size() / nfft);
+		chan[i] = std::move(s);
 	}
-
-	const int n = (currentMode == FFTMode::Complex)
-			      ? qMin(iSamples.size(), qSamples.size())
-			      : iSamples.size();
-	// nfft is derived, not configured: the input carries navg frames of it. A
-	// partial window (history still filling) truncates rather than skips, so the
-	// spectrum appears from the first cycle at reduced resolution.
-	const int nfft = n / navg;
-	if(nfft <= 0)
+	if(frames < 1)
 		return;
+
+	// Trim to the newest `frames` frames. window() is right-anchored, so the
+	// surplus is at the front — the oldest samples, which is what to drop.
+	const int inLen = frames * nfft;
+	for(int i = 0; i < nWatched; ++i) {
+		if(chan[i].size() != inLen)
+			chan[i] = chan[i].mid(chan[i].size() - inLen);
+	}
+	const QVector<float> &iSamples = chan[0];
+	const QVector<float> &qSamples = chan[1];
 
 	bool resized = false;
 	{
 		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
 
-		if(nfft != m_nfft || currentMode != m_lastModeForAxis || navg != m_sizedForNavg) {
+		// Sized for navgMax, not for the frames this cycle happens to have: the
+		// staging buffers then hold a full window from the start and the warm-up
+		// does not resize once per cycle.
+		if(nfft != m_nfft || currentMode != m_lastModeForAxis || navgMax != m_sizedForNavg) {
 			report(AcquisitionError::Severity::Info,
 			       QStringLiteral("resize: nfft %1 -> %2 navg=%3 mode=%4")
 				       .arg(m_nfft)
 				       .arg(nfft)
-				       .arg(navg)
+				       .arg(navgMax)
 				       .arg(currentMode == FFTMode::Real ? "Real" : "Complex"));
-			resizeForNfft(nfft, currentMode, navg);
+			resizeForNfft(nfft, currentMode, navgMax);
 			// nfft, mode or navg changed -> previous gn configs are stale.
 			cleanupAutoConfig();
 			cleanupFaConfig();
 			resized = true;
 		}
 
+		// The analysis config carries the frame count the spectrum was built with,
+		// so it goes stale while the history fills and averages fewer than navg.
+		if(frames != m_configuredFrames) {
+			m_configuredFrames = frames;
+			cleanupAutoConfig();
+			cleanupFaConfig();
+		}
+
 		int err = 0;
 		if(currentMode == FFTMode::Complex)
-			err = runComplexFFT(iSamples, qSamples, navg);
+			err = runComplexFFT(iSamples, qSamples, frames);
 		else
-			err = runRealFFT(iSamples, navg);
+			err = runRealFFT(iSamples, frames);
 
 		if(err != 0) {
 			Q_EMIT analysisFailed(QStringLiteral("fft=%1").arg(err));
@@ -734,9 +768,8 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	// Outside the gn_* mutex: a settings widget slot reading nfft() or window()
 	// takes that same non-recursive mutex, and a direct connection would deadlock.
 	if(resized) {
-		// The claim is sized navg*nfft, so a derived nfft has to re-register it —
-		// otherwise averaging keeps the old, possibly too-small, depth.
-		reclaimAveragingDepth();
+		// No re-claim here: the claim is navg chunks and a derived nfft does not
+		// change how many chunks navg frames span.
 		Q_EMIT nfftChanged(nfft);
 	}
 }

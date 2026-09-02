@@ -30,17 +30,22 @@
 #include <QSplitter>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <infoiconwidget.h>
 
+#include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/SampleBuffer.h>
+#include <gui/plot_utils.hpp>
 #include <gui/style.h>
 
 using namespace scopy;
 using namespace scopy::adc;
 
-DataStoreViewer::DataStoreViewer(scopy::acq::DataStore *store, QWidget *parent)
+DataStoreViewer::DataStoreViewer(scopy::acq::DataStore *store, scopy::acq::AcquisitionEngine *engine, QWidget *parent)
 	: QWidget(parent)
+	, m_fmt(new MetricPrefixFormatter(this))
 	, m_store(store)
+	, m_engine(engine)
 {
 	buildUi();
 	refresh();
@@ -99,27 +104,40 @@ void DataStoreViewer::buildUi()
 	ctl->addWidget(m_samplesTitle);
 	ctl->addStretch();
 
+	m_sampleCountInfo = new InfoIconWidget("Newest samples listed for the selected key. 0 lists none.\n"
+					       "Rows refresh every acquisition cycle, so keep this small.\n"
+					       "Samples are indexed from 0, oldest-first within the shown window.\n"
+					       "Annotation streams list their sample range instead.", right);
+	ctl->addWidget(m_sampleCountInfo);
+
 	m_sampleCount = new QSpinBox(right);
-	m_sampleCount->setRange(0, 4096);
-	m_sampleCount->setValue(32);
-	m_sampleCount->setToolTip("Newest samples listed for the selected key. 0 lists none.\n"
-				  "Rows refresh every acquisition cycle, so keep this small.\n"
-				  "Samples are indexed from 0, oldest-first within the shown window.\n"
-				  "Annotation streams list their sample range instead.");
+	m_sampleCount->setValue(16);
 	ctl->addWidget(m_sampleCount);
 
-	m_hex = new QCheckBox("hex", right);
-	m_hex->setToolTip("Show integer samples in hex. Floats are unaffected.");
-	ctl->addWidget(m_hex);
-
 	m_copyBtn = new QPushButton("Copy to clipboard", right);
-	m_copyBtn->setToolTip("Copy every sample of the selected key, one per line.\n"
-			      "Not just the rows listed — the count above only limits the display.");
 	m_copyBtn->setEnabled(false);
 	Style::setStyle(m_copyBtn, style::properties::button::basicButton);
 	ctl->addWidget(m_copyBtn);
 
 	rl->addLayout(ctl);
+
+	// ---- the selected stream's descriptor ----
+	m_info = new QTreeWidget(right);
+	m_info->setColumnCount(InfoColCount);
+	m_info->setHeaderLabels({"Field", "Value"});
+	m_info->setAlternatingRowColors(true);
+	m_info->setRootIsDecorated(false);
+	m_info->setUniformRowHeights(true);
+	m_info->header()->setStretchLastSection(true);
+	m_info->setColumnWidth(ColField, Style::getDimension(json::global::unit_5) * 2);
+	// A readout, not a list to navigate: nothing acts on a selected field, and a
+	// scrollbar never appears because the widget is resized to its rows instead.
+	m_info->setSelectionMode(QAbstractItemView::NoSelection);
+	m_info->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	Style::setStyle(m_info, style::properties::widget::basicComponent);
+	// No stretch, so the samples list keeps the pane's spare height; fillInfo()
+	// sets the fixed height from the row count.
+	rl->addWidget(m_info);
 
 	m_samples = new QTreeWidget(right);
 	m_samples->setColumnCount(SampleColCount);
@@ -148,7 +166,6 @@ void DataStoreViewer::buildUi()
 	// a bug in the store.
 	connect(m_tree, &QTreeWidget::itemSelectionChanged, this, &DataStoreViewer::fillSamples);
 	connect(m_sampleCount, &QSpinBox::valueChanged, this, &DataStoreViewer::fillSamples);
-	connect(m_hex, &QCheckBox::toggled, this, &DataStoreViewer::fillSamples);
 	connect(m_copyBtn, &QAbstractButton::clicked, this, &DataStoreViewer::copySamples);
 }
 
@@ -215,26 +232,122 @@ void DataStoreViewer::refresh()
 
 namespace {
 
-// One sample as text. Integers honour `hex`; floats never do (a hex float is not
-// what anyone reading a scope trace wants).
+// One sample as text.
 template <class T>
-QString formatSample(T v, bool hex)
+QString formatSample(T v)
 {
 	if constexpr(std::is_floating_point_v<T>) {
 		return QString::number(static_cast<double>(v), 'g', 6);
 	} else {
-		// Cast through the unsigned width so a negative qint8 prints as its
-		// two's-complement byte instead of a sign-extended "0xffffff80".
-		if(hex) {
-			return QStringLiteral("0x%1").arg(
-				static_cast<quint64>(static_cast<std::make_unsigned_t<T>>(v)), sizeof(T) * 2, 16,
-				QLatin1Char('0'));
-		}
 		return QString::number(v);
 	}
 }
 
+// A descriptor field's value, or spelled-out text for the value that means "unset".
+// Every such field gets one rather than a blank cell: a reader cannot tell an unset
+// unit from a stream the panel failed to read, and the two mean different things.
+QString orElse(const QString &s, const char *placeholder)
+{
+	return s.isEmpty() ? QString::fromLatin1(placeholder) : s;
+}
+
+// A rate or a bitrate as text. 0 is "unknown" everywhere in the descriptors.
+QString formatRate(const scopy::MetricPrefixFormatter *fmt, double value, const char *unit)
+{
+	return value == 0.0 ? QStringLiteral("(unknown)") : fmt->format(value, QString::fromLatin1(unit), 2);
+}
+
+// Retext a two-column tree in place, growing or shrinking the row count to match.
+// Reuse rather than clear-and-recreate: both callers run every acquisition cycle,
+// and recreating items makes the list flicker and loses the reader's scroll place.
+void applyRows(QTreeWidget *tree, const QList<QPair<QString, QString>> &rows)
+{
+	while(tree->topLevelItemCount() > rows.size()) {
+		delete tree->takeTopLevelItem(tree->topLevelItemCount() - 1);
+	}
+	while(tree->topLevelItemCount() < rows.size()) {
+		new QTreeWidgetItem(tree);
+	}
+	for(int i = 0; i < rows.size(); ++i) {
+		QTreeWidgetItem *row = tree->topLevelItem(i);
+		row->setText(0, rows.at(i).first);
+		row->setText(1, rows.at(i).second);
+	}
+}
+
 } // namespace
+
+void DataStoreViewer::fillInfo()
+{
+	if(!m_info) {
+		return;
+	}
+
+	// Rows to display: (field, value).
+	QList<QPair<QString, QString>> rows;
+
+	const scopy::acq::DataKey key = selectedKey();
+
+	// A stream a block declares but has never written has no row in the left tree to
+	// select — refresh() walks the store's keys(), and AcquisitionEngine::declaredKeys()
+	// is neither a subset nor a superset of those. So this only ever reports on keys
+	// that have been written at least once.
+	const std::optional<scopy::acq::StreamInfo> info =
+		(key.key.isEmpty() || m_engine.isNull()) ? std::nullopt : m_engine->streamInfo(key);
+
+	if(!key.key.isEmpty() && !info) {
+		// Not an error, and common: an X ramp or a processor's scratch key is exactly
+		// the stream its producer has nothing to say about.
+		rows.append({QStringLiteral("Stream info"), QStringLiteral("(not declared)")});
+	} else if(info) {
+		// Declaration order, so the readout and StreamInfo can be diffed by eye.
+		rows.append({QStringLiteral("Label"), orElse(info->label, "(derived from key)")});
+		rows.append({QStringLiteral("Unit"), orElse(info->unit, "(dimensionless)")});
+		rows.append({QStringLiteral("Sample rate"), formatRate(m_fmt, info->sampleRate, "sps")});
+		rows.append({QStringLiteral("X key"), orElse(info->xKey.key, "(sample index)")});
+		rows.append({QStringLiteral("Kind"), QString::fromLatin1(scopy::acq::reprKindName(info->kind))});
+		rows.append({QStringLiteral("Color index"), info->colorIndex < 0
+								    ? QStringLiteral("(view assigns)")
+								    : QString::number(info->colorIndex)});
+	}
+
+	// The protocol half of the description, for the streams that have one. Held by the
+	// store rather than the block, so it is a separate lookup with its own absent case.
+	if(!key.key.isEmpty() && m_store) {
+		const std::optional<scopy::acq::SampleType> type = m_store->snapshot(key).type();
+		if(type == scopy::acq::SampleType::Annotation) {
+			if(const std::optional<scopy::acq::AnnotationStreamInfo> ann = m_store->annotationInfo(key)) {
+				rows.append({QStringLiteral("Producer"), orElse(ann->producerId, "(unnamed)")});
+				rows.append({QStringLiteral("Text radix"),
+					     QString::fromLatin1(scopy::acq::textRadixName(ann->textRadix))});
+				rows.append({QStringLiteral("Bitrate"),
+					     formatRate(m_fmt, static_cast<double>(ann->bitrate), "bps")});
+				// Only when the two descriptions disagree: the annotation timeline
+				// shadowing a different StreamInfo rate is a bug in one of the two
+				// producers, and listing both is the only way to see it.
+				if(info && ann->sampleRate != info->sampleRate) {
+					rows.append({QStringLiteral("Annotation sample rate"),
+						     formatRate(m_fmt, ann->sampleRate, "sps")});
+				}
+			} else {
+				rows.append({QStringLiteral("Annotation info"), QStringLiteral("(not declared)")});
+			}
+		}
+	}
+
+	applyRows(m_info, rows);
+
+	if(rows.isEmpty()) {
+		m_info->hide();
+		return;
+	}
+	// Sized to its rows so it never competes with the samples list for the panel's
+	// height. sizeHintForRow() needs a row to exist, which the applyRows() above
+	// guarantees.
+	m_info->setFixedHeight(m_info->header()->height() + rows.size() * m_info->sizeHintForRow(0) +
+			       2 * m_info->frameWidth());
+	m_info->show();
+}
 
 void DataStoreViewer::fillSamples()
 {
@@ -247,16 +360,17 @@ void DataStoreViewer::fillSamples()
 		m_samples->clear();
 		m_samplesTitle->setText("Select a key.");
 		m_copyBtn->setEnabled(false);
+		fillInfo();
 		return;
 	}
 	m_samplesTitle->setText(key.key);
+	fillInfo();
 
 	// Copy goes to the store, not to these rows, so it only needs a selected key with
 	// something written under it — a display window of 0 rows still has samples to copy.
 	m_copyBtn->setEnabled(!m_store->snapshot(key).empty());
 
 	const int want = m_sampleCount->value();
-	const bool hex = m_hex->isChecked();
 	if(want <= 0) {
 		m_samples->clear();
 		return;
@@ -285,24 +399,13 @@ void DataStoreViewer::fillSamples()
 				// window() already trimmed to `want` and returns oldest-first,
 				// so this is a plain 0-based index into the displayed window.
 				for(int i = 0; i < vec.size(); ++i) {
-					rows.append({QString::number(i), formatSample(vec.at(i), hex)});
+					rows.append({QString::number(i), formatSample(vec.at(i))});
 				}
 			}
 		},
 		v);
 
-	while(m_samples->topLevelItemCount() > rows.size()) {
-		delete m_samples->takeTopLevelItem(m_samples->topLevelItemCount() - 1);
-	}
-	while(m_samples->topLevelItemCount() < rows.size()) {
-		new QTreeWidgetItem(m_samples);
-	}
-
-	for(int i = 0; i < rows.size(); ++i) {
-		QTreeWidgetItem *row = m_samples->topLevelItem(i);
-		row->setText(ColIndex, rows.at(i).first);
-		row->setText(ColValue, rows.at(i).second);
-	}
+	applyRows(m_samples, rows);
 }
 
 void DataStoreViewer::copySamples()
@@ -320,7 +423,6 @@ void DataStoreViewer::copySamples()
 	// spinbox only bounds what the pane lists — a copy is a one-off, so there is no
 	// reason to make the reader widen the display to get the whole stream out.
 	const scopy::acq::SampleBuffer buf = m_store->snapshot(key);
-	const bool hex = m_hex->isChecked();
 
 	// Values only, one per line: the index column is just the row number, and leaving
 	// it out means the text pastes straight into a plot or a spreadsheet column.
@@ -333,7 +435,7 @@ void DataStoreViewer::copySamples()
 					if constexpr(std::is_same_v<Vec, QVector<scopy::acq::Annotation>>) {
 						lines << (s.klass.isEmpty() ? s.text : s.klass + ": " + s.text);
 					} else {
-						lines << formatSample(s, hex);
+						lines << formatSample(s);
 					}
 				}
 			},

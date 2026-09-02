@@ -73,7 +73,7 @@ public:
 	// frequency stream itself as Hidden. Both are outputs, but only one is a
 	// trace — a bin-frequency ramp is an axis, and drawing it would put a
 	// diagonal line across the spectrum.
-	QHash<DataKey, StreamInfo> declaredStreams() const override;
+	std::optional<StreamInfo> streamInfo(const DataKey &key) const override;
 	int     nfft()       const { return m_nfft; }
 	double  sampleRate() const { return m_sampleRate; }
 	void    setSampleRate(double fs);
@@ -88,11 +88,11 @@ public:
 	void        setRfftScale(GnRfftScale s);
 
 	// Number of power spectra genalyzer averages per output frame; 1 disables
-	// averaging. Needs navg*nfft input samples, which come from the DataStore's
-	// chunk history, so the block registers a depth claim — hence the store.
-	// Pass the store the block will run against (and the engine's buffer size)
-	// once, at wiring time; nullptr leaves averaging pinned at 1.
-	void setAveragingStore(DataStore *store, std::size_t bufferSize);
+	// averaging. Needs navg past chunks, which come from the DataStore's chunk
+	// history, so the block registers a depth claim — hence the store. Pass the
+	// store the block will run against once, at wiring time; nullptr leaves
+	// averaging pinned at 1.
+	void setAveragingStore(DataStore *store);
 	int  averaging() const { return m_navg.load(std::memory_order_relaxed); }
 	void setAveraging(int navg);
 
@@ -108,6 +108,11 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void analysisReady(const scopy::acq::GenalyzerResultsSnapshot &results);
 	void analysisFailed(const QString &reason);
+
+	// GenalyzerConfig::enabled, broken out because a results view has to appear and
+	// disappear with it and has no reason to care about the rest of the config.
+	// Emitted from whichever thread called setConfig().
+	void analysisEnabledChanged(bool en);
 
 	// Emitted when the transform parameters change, so a settings widget shows
 	// what the block is actually running with. nfftChanged also fires when
@@ -125,11 +130,10 @@ private:
 	GnRfftScale m_rfftScale{GnRfftScaleDbfsSin};
 
 	// Averaging. m_navg is atomic so process() can read it without taking the
-	// gn_* mutex first; the store pointer and buffer size are set once at wiring
-	// time and only read afterwards.
+	// gn_* mutex first; the store pointer is set once at wiring time and only
+	// read afterwards.
 	std::atomic<int> m_navg{1};
 	DataStore       *m_avgStore{nullptr};
-	std::size_t      m_bufferSize{1};
 
 	// Cached output sizing — depends on mode + nfft.
 	int m_outBins{0};       // nfft   (complex)  or  nfft/2 + 1 (real)
@@ -148,6 +152,10 @@ private:
 	FFTMode        m_lastModeForAxis{FFTMode::Complex};
 	// navg the staging buffers were last sized for; a change means resize.
 	int            m_sizedForNavg{1};
+	// Frames the last transform actually averaged, which is below navg while the
+	// chunk history fills. The analysis config is built from it, so a change
+	// invalidates that config.
+	int            m_configuredFrames{0};
 
 	// Analysis state
 	GenalyzerConfig          m_cfg;
