@@ -381,3 +381,5 @@ QWidget *TriggerProcessor::createSettingsWidget(QWidget *parent)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_TriggerProcessor.cpp"

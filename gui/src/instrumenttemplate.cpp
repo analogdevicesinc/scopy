@@ -29,6 +29,7 @@
 #include <QHBoxLayout>
 #include <QIntValidator>
 #include <QLineEdit>
+#include <QScrollArea>
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QVBoxLayout>
@@ -57,6 +58,22 @@ static int debugPanelHeight()
 static int fpsFieldWidth()
 {
 	return Style::getDimension(json::global::unit_5);
+}
+
+// A rail's content in a vertical-only scroll area, so a menu taller than the panel stays
+// reachable. Same recipe VerticalChannelManager uses for its rows.
+static QScrollArea *wrapInScrollArea(QWidget *content, QWidget *parent)
+{
+	QScrollArea *area = new QScrollArea(parent);
+	area->setWidget(content);
+	area->setWidgetResizable(true);
+	area->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	area->setFrameShape(QFrame::NoFrame);
+	// The panels are collapsible by dragging the splitter handle; a scroll area's default
+	// minimum comes from its content and would put that floor back.
+	area->setMinimumWidth(0);
+	return area;
 }
 
 DebugPopup::DebugPopup(QWidget *parent)
@@ -153,8 +170,10 @@ void InstrumentTemplate::setupRegions()
 		Style::setBackgroundColor(panel, json::theme::background_primary);
 	}
 
-	m_leftPanel->layout()->addWidget(m_tool->leftStack());
-	m_rightPanel->layout()->addWidget(m_tool->rightStack());
+	// The whole stack is wrapped rather than each page, so pages stay plain QWidgets and
+	// no caller of addMenuPage()/leftStack()->add() changes.
+	m_leftPanel->layout()->addWidget(wrapInScrollArea(m_tool->leftStack(), m_leftPanel));
+	m_rightPanel->layout()->addWidget(wrapInScrollArea(m_tool->rightStack(), m_rightPanel));
 
 	m_splitter->addWidget(m_leftPanel);
 	// index 1 is left free for the center frame, which setupSlots() inserts.
@@ -570,7 +589,8 @@ SmallOnOffSwitch *InstrumentTemplate::rowSwitch(MenuControlButton *row)
 	return row->findChild<SmallOnOffSwitch *>();
 }
 
-void InstrumentTemplate::removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId)
+void InstrumentTemplate::removeChannelRow(CompositeWidget *group, MenuControlButton *row, const QString &menuId,
+					  bool deletePage)
 {
 	if(!row) {
 		return;
@@ -586,7 +606,7 @@ void InstrumentTemplate::removeChannelRow(CompositeWidget *group, MenuControlBut
 		group->remove(row);
 	}
 	if(!menuId.isEmpty()) {
-		removeMenuPage(menuId);
+		removeMenuPage(menuId, deletePage);
 	}
 
 	// deleteLater, not delete: this is usually called from the row's own toggled
@@ -623,7 +643,14 @@ QButtonGroup *InstrumentTemplate::channelGroup() const { return m_channelGroup; 
 
 void InstrumentTemplate::addMenuPage(const QString &id, QWidget *w) { m_tool->rightStack()->add(id, w); }
 
-void InstrumentTemplate::removeMenuPage(const QString &id) { m_tool->rightStack()->remove(id); }
+void InstrumentTemplate::removeMenuPage(const QString &id, bool deletePage)
+{
+	if(deletePage) {
+		m_tool->rightStack()->removeAndDelete(id);
+	} else {
+		m_tool->rightStack()->remove(id);
+	}
+}
 
 bool InstrumentTemplate::hasMenuPage(const QString &id) const { return m_tool->rightStack()->contains(id); }
 

@@ -19,31 +19,34 @@
  *
  */
 
-#ifndef ACQDIGITALREPR_H
-#define ACQDIGITALREPR_H
+#ifndef ACQDIGITALCHANNEL_H
+#define ACQDIGITALCHANNEL_H
 
-#include "acqchannelrepr.h"
+#include "acqchannel.h"
 
 #include <QPointer>
 #include <QVector>
 
 namespace scopy {
+class PlotAxis;
 class PlotAxisHandle;
+class PlotWidget;
 
 namespace adc {
 
 class DigitalCurveItem;
 
-// A fixed-height 0/1 track on the row's shared digital axis.
+// A fixed-height 0/1 track on the plot's shared digital axis.
 //
-// Differs from CurveRepr in three ways that the interface exists to absorb:
+// Differs from AcqCurveChannel in three ways that the base exists to absorb:
 //
 //   - the visual is a QwtPlotItem, not a PlotChannel, so nothing here goes
 //     through PlotWidget::addPlotChannel and the autoscaler/curve-style controls
 //     do not apply;
 //   - the band is 24 canvas pixels tall regardless of Y zoom, positioned off a
 //     draggable PlotAxisHandle rather than by a Y value, so it needs a vertical
-//     slot from the row rather than an axis range;
+//     slot from the plot rather than an axis range — which is why it declines the
+//     pooled Y axis and wraps AcqPlot::digitalAxis() instead;
 //   - it reads bits, not floats. toBits() maps any non-zero to 1, which is what
 //     makes a UInt8 logic stream and an Int32 comparator output look the same
 //     here.
@@ -54,38 +57,43 @@ class DigitalCurveItem;
 // uses. Without setSampleCount() the sample indices would be read as X scale
 // values and a 1024-sample track would be crammed into the first 1024 units of
 // whatever the axis happens to span.
-class DigitalRepr : public AcqChannelRepr
+class AcqDigitalChannel : public AcqChannel
 {
+	Q_OBJECT
 public:
-	DigitalRepr();
-	~DigitalRepr() override;
+	explicit AcqDigitalChannel(const Args &args);
+	~AcqDigitalChannel() override;
 
 	QString kindName() const override { return QStringLiteral("DIGITAL"); }
 
-	void attach(AcqPlotRow *row, const QString &name, const QColor &color) override;
-	void detach() override;
-	void pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &key, int plotSize) override;
 	void reset() override;
-	std::size_t claimDepth(int plotSize, std::size_t bufferSize) const override;
-	QWidget *createSettingsWidget(QWidget *parent) override;
-	void setEnabled(bool en) override;
-	void setColor(const QColor &c) override;
+
+protected:
+	void attachTo(AcqPlot *plot) override;
+	void detachFrom() override;
+	void readData(scopy::acq::DataStore *store, int plotSize) override;
+	DepthNeed depthNeeded(int plotSize) const override;
+
+	void onEnabledChanged(bool en) override;
+	void onColorChanged(const QColor &c) override;
+
+	// Declines the pooled Y axis: the band hangs off a PlotAxisHandle on the plot's
+	// shared digital axis, so a private Y scale would be an axis nothing draws against.
+	bool wantsPooledYAxis() const override { return false; }
+	scopy::PlotAxis *ownYAxis(AcqPlot *plot) override;
 
 private:
+	// No plot pointer of our own: the base holds it and plotOwner() returns it.
 	QPointer<PlotWidget> m_plot;
-	QPointer<AcqPlotRow> m_row;
 
 	// Not a QPointer: DigitalCurveItem is a QwtPlotItem, not a QObject.
 	DigitalCurveItem *m_item{nullptr};
 	// Is a QPointer: AxisHandle parents itself to the canvas, so a canvas teardown
 	// takes it with no notice to us.
 	QPointer<PlotAxisHandle> m_handle;
-
-	QColor m_color;
-	bool m_enabled{true};
 };
 
 } // namespace adc
 } // namespace scopy
 
-#endif // ACQDIGITALREPR_H
+#endif // ACQDIGITALCHANNEL_H

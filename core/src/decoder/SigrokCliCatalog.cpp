@@ -16,9 +16,11 @@
 namespace scopy {
 namespace decoder {
 
-static constexpr const char *kCatalogId = "sigrok-cli-catalog";
+SigrokCliCatalog::SigrokCliCatalog()
+	: m_kCatalogId("sigrok-cli-catalog")
+	, m_kMaxParallel(8)
+{}
 
-SigrokCliCatalog::SigrokCliCatalog()  = default;
 SigrokCliCatalog::~SigrokCliCatalog() = default;
 
 void SigrokCliCatalog::setExecutableOverride(const QString &path)
@@ -70,7 +72,7 @@ QString SigrokCliCatalog::runCli(const QStringList &args, bool *ok) const
 	const QString exe = resolveCli();
 	if(exe.isEmpty()) {
 		if(m_logger)
-			m_logger->warning(kCatalogId, QStringLiteral("sigrok-cli not found"));
+			m_logger->warning(m_kCatalogId, QStringLiteral("sigrok-cli not found"));
 		return {};
 	}
 
@@ -79,20 +81,20 @@ QString SigrokCliCatalog::runCli(const QStringList &args, bool *ok) const
 	proc.start(exe, args);
 	if(!proc.waitForStarted(2000)) {
 		if(m_logger)
-			m_logger->warning(kCatalogId,
+			m_logger->warning(m_kCatalogId,
 				QStringLiteral("failed to start sigrok-cli: ") + proc.errorString());
 		return {};
 	}
 	if(!proc.waitForFinished(10000)) {
 		if(m_logger)
-			m_logger->warning(kCatalogId, QStringLiteral("sigrok-cli timed out"));
+			m_logger->warning(m_kCatalogId, QStringLiteral("sigrok-cli timed out"));
 		proc.kill();
 		proc.waitForFinished(500);
 		return {};
 	}
 	if(proc.exitStatus() != QProcess::NormalExit || proc.exitCode() != 0) {
 		if(m_logger)
-			m_logger->warning(kCatalogId,
+			m_logger->warning(m_kCatalogId,
 				QStringLiteral("sigrok-cli exit=%1 args=%2")
 					.arg(proc.exitCode())
 					.arg(args.join(' ')));
@@ -115,7 +117,7 @@ QList<QString> SigrokCliCatalog::decoders() const
 
 	parseListing(out, m_order, m_shortDesc);
 	if(m_logger)
-		m_logger->info(kCatalogId,
+		m_logger->info(m_kCatalogId,
 			QStringLiteral("found %1 decoders").arg(m_order.size()));
 	return m_order;
 }
@@ -152,8 +154,6 @@ void SigrokCliCatalog::loadAll() const
 	const QString exe = resolveCli();
 	if(exe.isEmpty()) return;
 
-	constexpr int kMaxParallel = 8;
-
 	QList<QString> todo;
 	todo.reserve(ids.size());
 	for(const QString &id : ids)
@@ -161,12 +161,12 @@ void SigrokCliCatalog::loadAll() const
 	if(todo.isEmpty()) return;
 
 	if(m_logger)
-		m_logger->info(kCatalogId,
+		m_logger->info(m_kCatalogId,
 			QStringLiteral("loadAll: priming %1 decoder(s)").arg(todo.size()));
 
 	int next = 0;
 	while(next < todo.size()) {
-		const int batchEnd = std::min<int>(todo.size(), next + kMaxParallel);
+		const int batchEnd = std::min<int>(todo.size(), next + m_kMaxParallel);
 		std::vector<std::unique_ptr<QProcess>> batch;
 		batch.reserve(batchEnd - next);
 		QStringList batchIds;
@@ -203,7 +203,7 @@ void SigrokCliCatalog::loadAll() const
 	}
 
 	if(m_logger)
-		m_logger->info(kCatalogId,
+		m_logger->info(m_kCatalogId,
 			QStringLiteral("loadAll: cached %1 / %2").arg(m_info.size()).arg(ids.size()));
 }
 
