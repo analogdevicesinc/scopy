@@ -242,3 +242,5 @@ std::size_t DataStore::depthForWindow(std::size_t plotSize, std::size_t bufferSi
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_DataStore.cpp"

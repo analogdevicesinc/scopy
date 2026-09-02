@@ -20,9 +20,9 @@
 
 cmake_minimum_required(VERSION 3.9)
 
-# The shared helper, as every other suite in the tree uses. The local SETUP_TESTS this
-# replaces looped over ${ARGS} — never set, since the parameter is ${ARGN} — so its body
-# never ran and nothing here was ever built or registered with ctest.
+# The shared helper, as every other suite in the tree uses. The local SETUP_TESTS this replaces looped over ${ARGS} —
+# never set, since the parameter is ${ARGN} — so its body never ran and nothing here was ever built or registered with
+# ctest.
 include(ScopyTest)
 
 # tst_test1.cpp is deliberately not listed: it is a license header with no test in it.

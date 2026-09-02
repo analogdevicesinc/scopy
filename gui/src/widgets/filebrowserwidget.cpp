@@ -88,3 +88,5 @@ void FileBrowserWidget::browseFile()
 void FileBrowserWidget::setFilter(const QString &newFilter) { m_filter = newFilter; }
 
 void FileBrowserWidget::setBaseDirectory(const QString &newBaseDirectory) { m_baseDirectory = newBaseDirectory; }
+
+#include "moc_filebrowserwidget.cpp"

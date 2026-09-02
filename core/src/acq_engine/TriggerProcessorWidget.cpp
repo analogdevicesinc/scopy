@@ -299,3 +299,5 @@ void TriggerProcessorWidget::setStatusTriggered()
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_TriggerProcessorWidget.cpp"

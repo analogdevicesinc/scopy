@@ -62,3 +62,5 @@ void VerticalTabBar::paintEvent(QPaintEvent *event)
 		painter.drawText(rect, Qt::AlignCenter, tabText(i));
 	}
 }
+
+#include "moc_verticaltabbar.cpp"

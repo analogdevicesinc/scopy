@@ -535,3 +535,5 @@ bool AcquisitionEngine::runProcessors()
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_AcquisitionEngine.cpp"
