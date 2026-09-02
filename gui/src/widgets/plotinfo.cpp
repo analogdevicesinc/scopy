@@ -21,7 +21,9 @@
 
 #include "plotinfo.h"
 
+#include <QFontMetrics>
 #include <QLabel>
+#include <pluginbase/preferences.h>
 #include <style.h>
 #include <stylehelper.h>
 
@@ -38,6 +40,13 @@ PlotInfo::PlotInfo(QWidget *parent)
 	, m_bottomRightInfo(new QWidget())
 {
 	initLayouts();
+
+	connect(Preferences::GetInstance(), &Preferences::preferenceChanged, this,
+		[this](QString preference, QVariant) {
+			if(preference == "plot_labels_inside") {
+				applyMargins();
+			}
+		});
 }
 
 PlotInfo::~PlotInfo() {}
@@ -69,12 +78,12 @@ void PlotInfo::addCustomInfo(QWidget *info, InfoPosition hpos, InfoPosition vpos
 	}
 
 	info->setParent(targetParent);
+	setMouseTransparent(info);
 
 	if(alignRight) {
 		QLabel *labelInfo = dynamic_cast<QLabel *>(info);
 		if(labelInfo) {
 			labelInfo->setAlignment(Qt::AlignRight);
-			labelInfo->setAttribute(Qt::WA_TransparentForMouseEvents);
 		}
 	}
 
@@ -130,42 +139,74 @@ void PlotInfo::initLayouts()
 	// top left info
 	m_leftLayout = new QVBoxLayout(m_leftInfo);
 	m_leftLayout->setSpacing(m_spacing);
-	m_leftLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_leftHover = new HoverWidget(m_leftInfo, m_parent, m_parent);
 	m_leftHover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	m_leftHover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
 	m_leftHover->show();
+	setMouseTransparent(m_leftHover);
 
 	// top right info
 	m_rightLayout = new QVBoxLayout(m_rightInfo);
 	m_rightLayout->setSpacing(m_spacing);
-	m_rightLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_rightHover = new HoverWidget(m_rightInfo, m_parent, m_parent);
 	m_rightHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	m_rightHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
 	m_rightHover->show();
+	setMouseTransparent(m_rightHover);
 
 	// bottom left info
 	m_bottomLeftLayout = new QVBoxLayout(m_bottomLeftInfo);
 	m_bottomLeftLayout->setSpacing(m_spacing);
-	m_bottomLeftLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_bottomLeftHover = new HoverWidget(m_bottomLeftInfo, m_parent, m_parent);
 	m_bottomLeftHover->setAnchorPos(HoverPosition::HP_BOTTOMLEFT);
 	m_bottomLeftHover->setContentPos(HoverPosition::HP_TOPRIGHT);
 	m_bottomLeftHover->show();
+	setMouseTransparent(m_bottomLeftHover);
 
 	// bottom right info
 	m_bottomRightLayout = new QVBoxLayout(m_bottomRightInfo);
 	m_bottomRightLayout->setSpacing(m_spacing);
-	m_bottomRightLayout->setContentsMargins(m_margin, m_margin, m_margin, m_margin);
 
 	m_bottomRightHover = new HoverWidget(m_bottomRightInfo, m_parent, m_parent);
 	m_bottomRightHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
 	m_bottomRightHover->setContentPos(HoverPosition::HP_TOPLEFT);
 	m_bottomRightHover->show();
+	setMouseTransparent(m_bottomRightHover);
+
+	applyMargins();
+}
+
+// Qt's hit test recurses into children before consulting the attribute, so the whole subtree has to
+// carry it — a transparent label inside an opaque container is still unreachable. HoverWidget also
+// overrides mousePressEvent without ignore(), so it consumes presses even when it is not draggable;
+// being unhittable is what keeps the events off it and on the canvas, where PlotNavigator listens.
+void PlotInfo::setMouseTransparent(QWidget *w)
+{
+	w->setAttribute(Qt::WA_TransparentForMouseEvents);
+	for(QObject *child : w->children()) {
+		if(QWidget *childWidget = qobject_cast<QWidget *>(child)) {
+			setMouseTransparent(childWidget);
+		}
+	}
+}
+
+void PlotInfo::applyMargins()
+{
+	// With the axis labels drawn inside the canvas the corner groups would sit on top of them, so
+	// back off by a label's worth of room. Doubled horizontally on purpose: the real labels carry a
+	// unit suffix and a sign, so a placeholder of digits alone under-measures them. Vertically one
+	// line is exact — the label row is one line tall.
+	const bool inside = Preferences::get("plot_labels_inside").toBool();
+	const QFontMetrics fm(font());
+	const int padX = inside ? fm.horizontalAdvance("-000.00") * 2 : 0;
+	const int padY = inside ? fm.height() : 0;
+
+	for(QVBoxLayout *layout : {m_leftLayout, m_rightLayout, m_bottomLeftLayout, m_bottomRightLayout}) {
+		layout->setContentsMargins(m_margin + padX, m_margin + padY, m_margin + padX, m_margin + padY);
+	}
 }
 
 #include "moc_plotinfo.cpp"

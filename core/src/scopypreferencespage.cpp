@@ -298,6 +298,11 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 				     "on all the plots in the application for better signal visualization.",
 				     generalSection));
 	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "plot_labels_inside", "Draw plot labels inside the canvas",
+				     "Draw the axis labels inside the plot canvas instead of in a margin beside "
+				     "it, which gives the plot itself the space the labels would otherwise occupy.",
+				     generalSection));
+	generalSection->contentLayout()->addWidget(
 		PREFERENCE_CHECK_BOX(p, "iiowidgets_use_lazy_loading", "Use Lazy Loading",
 				     "Indicates whether lazy loading should be used for IIO widgets. "
 				     "Enabling this option allows the application to load IIO widgets only "
