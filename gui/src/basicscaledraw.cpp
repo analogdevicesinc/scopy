@@ -40,6 +40,7 @@ BasicScaleDraw::BasicScaleDraw(const QString &unit)
 	, m_shouldDrawMiddleDelta(false)
 	, m_nrTicks(0)
 	, m_delta(false)
+	, m_unitsEn(false)
 {
 	enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	enableComponent(QwtAbstractScaleDraw::Ticks, false);
@@ -86,6 +87,8 @@ void BasicScaleDraw::enableDeltaLabel(bool enable)
 }
 
 void BasicScaleDraw::setUnitsEnabled(bool enable) { m_unitsEn = enable; }
+
+bool BasicScaleDraw::unitsEnabled() const { return m_unitsEn; }
 
 void BasicScaleDraw::draw(QPainter *painter, const QPalette &palette) const
 {

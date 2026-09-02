@@ -52,6 +52,7 @@ public:
 
 	void enableDeltaLabel(bool enable);
 	void setUnitsEnabled(bool enable);
+	bool unitsEnabled() const;
 
 protected:
 	virtual void draw(QPainter *, const QPalette &) const;

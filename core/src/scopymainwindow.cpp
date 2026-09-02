@@ -492,6 +492,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_language", "en");
 	p->init("show_grid", true);
 	p->init("show_graticule", false);
+	p->init("plot_labels_inside", false);
 	p->init("iiowidgets_use_lazy_loading", true);
 	p->init("general_plot_target_fps", "60");
 #ifdef WIN32
