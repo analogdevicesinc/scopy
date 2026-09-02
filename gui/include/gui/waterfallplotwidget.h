@@ -33,7 +33,6 @@
 #include <QElapsedTimer>
 #include <plot_utils.hpp>
 
-#include <deque>
 #include <vector>
 
 namespace scopy {
@@ -44,9 +43,16 @@ public:
 	explicit WaterfallData();
 	~WaterfallData() override;
 
+	// Append one row, becoming the newest. Nothing is retained by reference: the
+	// samples are memcpy'd straight into the ring slot, so the caller may hand over
+	// a view into a chunk or a scratch buffer and reuse it immediately afterwards.
+	void appendRow(const float *data, size_t size);
 	void addFFTData(const float *data, size_t size);
 	// Replace the entire history with an externally-managed snapshot.
 	// rows[0] = newest frame, rows.back() = oldest frame (SampleBuffer convention).
+	//
+	// A bulk fill, not the incremental path: every row is copied. Callers with a
+	// growing history want appendRow() instead — see AcqWaterfallChannel.
 	void setSnapshot(std::vector<QVector<float>> rows);
 	void reset();
 
@@ -63,7 +69,41 @@ public:
 	double value(double x, double y) const override;
 
 private:
-	std::deque<std::vector<float>> m_data;
+	// Reallocate m_ring for the current m_maxRows x m_fftSize, preserving the newest
+	// min(m_count, m_maxRows) rows. The only allocating path besides a bin-count
+	// change, and it runs on a settings change rather than per frame.
+	void rebuildRing();
+
+	// Copy one row into the next ring slot and advance. Assumes m_ring is already
+	// sized for the current geometry. `len` shorter than m_fftSize is padded rather
+	// than treated as a width change, which is what lets setSnapshot() accept a
+	// ragged snapshot without each short row wiping the rows before it.
+	void pushRow(const float *data, size_t len);
+
+	// Logical row index -> the row's samples. r = 0 is the oldest live row,
+	// r = m_count - 1 the newest. Null when the ring is unallocated, so value() can
+	// bail rather than dereference.
+	const float *row(int r) const
+	{
+		if(m_ring.empty())
+			return nullptr;
+		int slot = (m_head - m_count + r) % m_maxRows;
+		if(slot < 0)
+			slot += m_maxRows;
+		return m_ring.data() + static_cast<size_t>(slot) * m_fftSize;
+	}
+
+	// One contiguous block of m_maxRows * m_fftSize floats, used as a ring of rows.
+	// m_head is the slot the next row goes into; m_count is how many are live.
+	//
+	// Contiguous rather than a deque of per-row vectors because both hot paths care:
+	// appending becomes a memcpy into an existing slot with no allocation, and
+	// value() — called once per raster pixel per repaint — becomes index arithmetic
+	// over one cache-friendly block instead of a double indirection per tap.
+	std::vector<float> m_ring;
+	int m_head;
+	int m_count;
+
 	int m_maxRows;
 	size_t m_fftSize;
 	bool m_antialiasing;
@@ -106,6 +146,14 @@ public:
 	~WaterfallPlotWidget() override;
 
 	void addFFTData(const float *data, size_t size);
+
+	// The same append, split so a caller with several rows to add pays for one
+	// repaint instead of one per row. appendRowDeferred() still maintains the Y
+	// axis's row timing; only the cache invalidation is held back until endAppend().
+	// Every appendRowDeferred() run must be closed by exactly one endAppend().
+	void appendRowDeferred(const float *data, size_t size);
+	void endAppend();
+
 	// Replace the waterfall history from an external snapshot (e.g. DataStore history).
 	// rows[0] = newest frame, rows.back() = oldest (matches SampleBuffer::sample() order).
 	void setHistorySnapshot(std::vector<QVector<float>> rows);

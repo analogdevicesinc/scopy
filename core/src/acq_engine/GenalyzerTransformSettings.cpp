@@ -197,3 +197,5 @@ void GenalyzerTransformSettings::updateDerived()
 	// of what would enable it, and the answer is "watch one key instead of two".
 	m_scaleContainer->setVisible(m_proc->mode() == GenalyzerFFTProcessor::FFTMode::Real);
 }
+
+#include "moc_GenalyzerTransformSettings.cpp"

@@ -5,23 +5,22 @@
 namespace scopy {
 namespace acq {
 
-const QString FormulaEvaluator::k_setupScript = QStringLiteral(
-	"var sin=Math.sin,cos=Math.cos,tan=Math.tan,"
-	"asin=Math.asin,acos=Math.acos,atan=Math.atan,atan2=Math.atan2,"
-	"sqrt=Math.sqrt,abs=Math.abs,log=Math.log,"
-	"log2=function(x){return Math.log(x)/Math.LN2;},"
-	"log10=function(x){return Math.log(x)/Math.LN10;},"
-	"exp=Math.exp,pow=Math.pow,"
-	"floor=Math.floor,ceil=Math.ceil,"
-	"min=Math.min,max=Math.max,"
-	"pi=Math.PI,e=Math.E;");
-
 FormulaEvaluator::FormulaEvaluator()
 	: m_formula(QStringLiteral("sin(2*pi*S/100)"))
 	, m_dirty(true)
+	, m_setupScript(QStringLiteral(
+		  "var sin=Math.sin,cos=Math.cos,tan=Math.tan,"
+		  "asin=Math.asin,acos=Math.acos,atan=Math.atan,atan2=Math.atan2,"
+		  "sqrt=Math.sqrt,abs=Math.abs,log=Math.log,"
+		  "log2=function(x){return Math.log(x)/Math.LN2;},"
+		  "log10=function(x){return Math.log(x)/Math.LN10;},"
+		  "exp=Math.exp,pow=Math.pow,"
+		  "floor=Math.floor,ceil=Math.ceil,"
+		  "min=Math.min,max=Math.max,"
+		  "pi=Math.PI,e=Math.E;"))
 {
 	QJSEngine tempEng;
-	tempEng.evaluate(k_setupScript);
+	tempEng.evaluate(m_setupScript);
 	const QJSValue r = tempEng.evaluate(wrapFormula(m_formula, 0));
 	m_syntaxValid.store(!r.isError(), std::memory_order_relaxed);
 }
@@ -56,7 +55,7 @@ void FormulaEvaluator::setFormula(const QString &formula)
 		probeCount = m_lastInputCount;
 	}
 	QJSEngine tempEng;
-	tempEng.evaluate(k_setupScript);
+	tempEng.evaluate(m_setupScript);
 	const QJSValue r = tempEng.evaluate(wrapFormula(formula, probeCount));
 	m_syntaxValid.store(!r.isError(), std::memory_order_relaxed);
 
@@ -80,7 +79,7 @@ void FormulaEvaluator::rebuildEngine(const QString &formula, int inputCount)
 {
 	m_batchFn = QJSValue(); // release ref before destroying old engine
 	m_workerEngine.reset(new QJSEngine());
-	m_workerEngine->evaluate(k_setupScript);
+	m_workerEngine->evaluate(m_setupScript);
 	m_batchFn = m_workerEngine->evaluate(wrapFormula(formula, inputCount));
 	if(m_batchFn.isError()) {
 		m_batchFn = QJSValue();
