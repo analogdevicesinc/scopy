@@ -300,3 +300,5 @@ void ExternalDecoderProcessor::decodeLogicInput(
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_ExternalDecoderProcessor.cpp"

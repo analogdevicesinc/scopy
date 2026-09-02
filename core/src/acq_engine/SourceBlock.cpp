@@ -167,3 +167,5 @@ QWidget *SourceBlock::createSettingsWidget(QWidget *parent)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_SourceBlock.cpp"

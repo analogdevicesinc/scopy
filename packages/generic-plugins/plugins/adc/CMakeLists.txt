@@ -88,7 +88,12 @@ configure_file(
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(
-	${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src src/sim src/acq
+	${PROJECT_NAME}
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+		src/time
+		src
+		src/sim
+		src/acq
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)

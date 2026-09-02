@@ -9,3 +9,5 @@ ProcessorBlock::ProcessorBlock(const QString &name, QObject *parent)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_ProcessorBlock.cpp"

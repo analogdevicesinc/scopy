@@ -776,3 +776,5 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 
 } // namespace acq
 } // namespace scopy
+
+#include "moc_GenalyzerFFTProcessor.cpp"
