@@ -32,3 +32,5 @@ VerticalTabWidget::VerticalTabWidget(QWidget *parent)
 	setTabPosition(QTabWidget::TabPosition::East);
 	Style::setStyle(tabBar(), style::properties::tabwidget::eastTabMenu, true, true);
 }
+
+#include "moc_verticaltabwidget.cpp"

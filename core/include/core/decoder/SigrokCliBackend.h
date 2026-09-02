@@ -84,6 +84,7 @@ private:
 	                     std::vector<AnnotationC> &syntheticOut,
 	                     std::vector<AnnotationC> &out) const;
 
+	const char                        *m_kBackendId;
 	SigrokCliCatalog                  *m_catalog{nullptr};
 	DecoderLogger                     *m_logger{nullptr};
 	const AnnotationExtractorRegistry *m_extractors{nullptr};

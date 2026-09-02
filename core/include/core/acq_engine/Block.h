@@ -4,8 +4,11 @@
 
 #include "AcquisitionError.h"
 #include "DataKey.h"
+#include "SampleBuffer.h"
 
 #include <atomic>
+#include <optional>
+#include <QHash>
 #include <QList>
 #include <QObject>
 #include <QPointer>
@@ -40,6 +43,39 @@ public:
 	// ProcessorBlock::watchedKeys() this is the whole graph: an edge exists
 	// wherever one block's outputKeys() appears in another's watchedKeys().
 	virtual QList<DataKey> outputKeys() const { return {}; }
+
+	// What one of this block's output streams means and how it should be drawn.
+	// outputKeys() says *which* streams exist; this says what they are, and the
+	// two are deliberately not two lists: this answers nullopt for anything
+	// outside outputKeys(), so there is no second enumeration to drift out of
+	// step with the first.
+	//
+	// nullopt for a key this block does not produce, and equally for one it
+	// produces but has nothing to say about — a view treats both the same way,
+	// falling back to a default-built descriptor (an unlabelled, unitless curve).
+	//
+	// Asked for through AcquisitionEngine::streamInfo(), which calls this every
+	// time rather than caching. So a view drawing one of these keys has its
+	// label, unit, rate, colour and X source available before the first cycle —
+	// which is what lets it register a depth claim early enough for the first
+	// window to be full depth — and a block whose answer changes needs no
+	// notification: return the new value and the next reader sees it.
+	//
+	// Called from the GUI thread while the worker runs, so an implementation that
+	// reads mutable state must take the same lock its setter does. One key per
+	// call is what keeps that cheap: a lookup takes only the locks the key it
+	// asked about actually needs.
+	//
+	// Describing does not put anything on a plot. The instrument decides what is
+	// drawn, by name, in its own setup code; this only says what the stream is. A
+	// key answered with ReprKind::Hidden, or not answered at all, is a stream the
+	// block does not consider a trace — a frequency ramp feeding an X axis — and
+	// stating that is useful even though nothing acts on it automatically.
+	//
+	// The representation is the block's own choice. There is no inference from
+	// SampleType anywhere in the stack, deliberately — see ReprKind in
+	// SampleBuffer.h.
+	virtual std::optional<StreamInfo> streamInfo(const DataKey &key) const { return std::nullopt; }
 
 	// The block's one settings widget, built on first call and reused after.
 	// Prefer this over createSettingsWidget() everywhere in UI code: two

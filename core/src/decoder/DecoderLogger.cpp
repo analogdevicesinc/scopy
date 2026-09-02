@@ -35,3 +35,5 @@ void DecoderLogger::log(LogLevel lvl, const QString &id, const QString &msg)
 
 } // namespace decoder
 } // namespace scopy
+
+#include "moc_DecoderLogger.cpp"

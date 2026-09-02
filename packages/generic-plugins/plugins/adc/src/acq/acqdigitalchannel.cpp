@@ -19,10 +19,12 @@
  *
  */
 
-#include "acqdigitalrepr.h"
+#include "acqdigitalchannel.h"
 
 #include "DigitalCurveItem.h"
-#include "acqplotrow.h"
+#include "acqaxis.h"
+#include "acqchannelregistry.h"
+#include "acqplot.h"
 
 #include <core/acq_engine/DataStore.h>
 
@@ -38,30 +40,47 @@
 using namespace scopy;
 using namespace scopy::adc;
 
-DigitalRepr::DigitalRepr() = default;
+// Any stream, and deliberately not only the 8-bit types: toBits() maps any non-zero to
+// 1, so a comparator writing Int32 is as valid a logic source as a UInt8 line. Which of
+// them is a logic line is the producer's statement (StreamInfo::kind), never an
+// inference from the width.
+REGISTER_ACQ_CHANNEL_KIND(AcqDigitalChannel, scopy::acq::ReprKind::Digital)
 
-DigitalRepr::~DigitalRepr() { detach(); }
-
-void DigitalRepr::attach(AcqPlotRow *row, const QString &name, const QColor &color)
+AcqDigitalChannel::AcqDigitalChannel(const Args &args)
+	: AcqChannel(args)
 {
-	if(!row || !row->plot() || m_item) {
+}
+
+AcqDigitalChannel::~AcqDigitalChannel() { detach(); }
+
+PlotAxis *AcqDigitalChannel::ownYAxis(AcqPlot *plot) { return plot ? plot->digitalAxis() : nullptr; }
+
+void AcqDigitalChannel::attachTo(AcqPlot *plot)
+{
+	if(!plot->plot() || m_item) {
 		return;
 	}
-	PlotAxis *yAxis = row->digitalAxis();
-	if(!yAxis) {
+	// The base already wrapped digitalAxis() for us — through ownYAxis, not the pool, so
+	// every logic track on this plot shares one scale and their handles are comparable.
+	PlotAxis *digAxis = yAxis() ? yAxis()->plotAxis() : plot->digitalAxis();
+	if(!digAxis) {
 		return;
 	}
 
-	m_plot = row->plot();
-	m_row = row;
-	m_color = color;
+	m_plot = plot->plot();
+
+	// Index-only, so say so on the picker rather than leaving a control that would be
+	// silently ignored. The reason is DigitalCurveItem's: see readData below.
+	if(xAxis()) {
+		xAxis()->setSourceFixed(true, tr("Logic tracks are drawn against the sample index"));
+	}
 
 	// A draggable handle on the shared digital axis, one per track. The item reads
 	// its band position off the handle every draw, so dragging the handle is what
 	// reorders tracks — there is no stored ordering to keep in sync.
-	m_handle = new PlotAxisHandle(m_plot.data(), yAxis);
+	m_handle = new PlotAxisHandle(m_plot.data(), digAxis);
 	m_handle->handle()->setBarVisibility(BarVisibility::ON_HOVER);
-	m_handle->handle()->setColor(color.isValid() ? color : Style::getColor(json::theme::content_silent));
+	m_handle->handle()->setColor(color().isValid() ? color() : Style::getColor(json::theme::content_silent));
 	// NORTH_OR_WEST on a YLeft axis is the left edge, where the analog Y labels are.
 	// Annotation bands use the east side, so the two never collide.
 	m_handle->handle()->setHandlePos(HandlePos::NORTH_OR_WEST);
@@ -72,33 +91,35 @@ void DigitalRepr::attach(AcqPlotRow *row, const QString &name, const QColor &col
 	// the handle gets clipped on a horizontal resize. Only the explicit show is
 	// needed, the same call PlotCursors makes.
 	m_handle->handle()->setVisible(true);
-	m_handle->setPosition(row->nextDigitalSlot());
+	m_handle->setPosition(plot->nextDigitalSlot());
 
 	// A drag moves the band, but the item only repositions on a draw, so the plot has
 	// to be told. The manager's frame timer would eventually do it, but not while
 	// stopped — which is exactly when a reader reorders tracks.
-	QObject::connect(m_handle.data(), &PlotAxisHandle::scalePosChanged, m_handle.data(), [this](double) {
+	connect(m_handle.data(), &PlotAxisHandle::scalePosChanged, this, [this](double) {
 		if(!m_plot.isNull() && m_plot->plot()) {
 			m_plot->plot()->replot();
 		}
 	});
 
-	m_item = new DigitalCurveItem(name, m_plot->xAxis(), yAxis, m_handle.data());
-	m_item->setColor(color);
-	m_item->setVisible(m_enabled);
+	// The pooled X axis, not the widget's built-in one: the band is laid out across
+	// whichever horizontal scale this channel was given, so that a logic track selected
+	// alongside an analog curve shows a scale that means the same thing.
+	PlotAxis *x = xAxis() ? xAxis()->plotAxis() : m_plot->xAxis();
+	m_item = new DigitalCurveItem(name(), x, digAxis, m_handle.data());
+	m_item->setColor(color());
 	m_item->attach(m_plot->plot());
 }
 
-void DigitalRepr::detach()
+void AcqDigitalChannel::detachFrom()
 {
 	// The plot, and with it the canvas that owns the handle, may already be gone —
-	// the repr's channel and the plot are siblings under the manager. Once the QwtPlot
-	// is destroyed Qwt has auto-detached its items, so detaching again is a
+	// this channel and the plot are siblings under the manager. Once the QwtPlot is
+	// destroyed Qwt has auto-detached its items, so detaching again is a
 	// use-after-free. Same discipline as DigitalTrackManager's destructor.
 	if(m_plot.isNull()) {
 		m_item = nullptr;
 		m_handle = nullptr;
-		m_row = nullptr;
 		return;
 	}
 
@@ -117,27 +138,25 @@ void DigitalRepr::detach()
 		// on the canvas when a channel is removed from a UI callback.
 		h->deleteLater();
 	}
-
-	m_row = nullptr;
 }
 
-std::size_t DigitalRepr::claimDepth(int plotSize, std::size_t bufferSize) const
+DepthNeed AcqDigitalChannel::depthNeeded(int plotSize) const
 {
 	// Same window as a curve: a digital track is one bit per sample over the same
 	// visible span.
-	return scopy::acq::DataStore::depthForWindow(static_cast<std::size_t>(qMax(1, plotSize)), bufferSize);
+	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)));
 }
 
-void DigitalRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &key, int plotSize)
+void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 {
-	if(!store || !m_item || m_plot.isNull()) {
+	if(!m_item || m_plot.isNull()) {
 		return;
 	}
 
-	// toBits owns its result, so unlike CurveRepr's FloatView there is no aliasing to
-	// manage here — and setSamples copies into the item anyway. The cost is one
-	// allocation per cycle, against a quint8 per sample.
-	const QVector<quint8> bits = scopy::acq::toBits(store->window(key, plotSize));
+	// toBits owns its result, so unlike AcqCurveChannel's FloatView there is no
+	// aliasing to manage here — and setSamples copies into the item anyway. The cost
+	// is one allocation per cycle, against a quint8 per sample.
+	const QVector<quint8> bits = scopy::acq::toBits(store->window(key(), plotSize));
 	if(bits.isEmpty()) {
 		return;
 	}
@@ -146,29 +165,24 @@ void DigitalRepr::pull(scopy::acq::DataStore *store, const scopy::acq::DataKey &
 	// plotSize rather than bits.size() is what keeps a partial window (a fresh run,
 	// or plotSize > one buffer) aligned with the analog curves instead of stretched to
 	// fill the axis.
+	//
+	// Index-only by construction: DigitalCurveItem places bands by sample number and
+	// takes no X array, so a StreamInfo::xKey cannot be honoured here — which is why
+	// attachTo() pins the X axis's source rather than leaving a picker whose selection
+	// would be silently dropped.
 	m_item->setSampleCount(static_cast<quint64>(qMax(1, plotSize)));
 	m_item->setSamples(bits);
 }
 
-void DigitalRepr::reset()
+void AcqDigitalChannel::reset()
 {
 	if(m_item && !m_plot.isNull()) {
 		m_item->clear();
 	}
 }
 
-QWidget *DigitalRepr::createSettingsWidget(QWidget *parent)
+void AcqDigitalChannel::onEnabledChanged(bool en)
 {
-	// Nothing to offer yet. The band height is fixed in canvas pixels, the vertical
-	// position is the handle (dragged on the plot, not from a menu), and there is no
-	// Y range to set. Colour and name are on the generic CHANNEL section above.
-	Q_UNUSED(parent)
-	return nullptr;
-}
-
-void DigitalRepr::setEnabled(bool en)
-{
-	m_enabled = en;
 	if(m_plot.isNull()) {
 		return;
 	}
@@ -182,9 +196,8 @@ void DigitalRepr::setEnabled(bool en)
 	}
 }
 
-void DigitalRepr::setColor(const QColor &c)
+void AcqDigitalChannel::onColorChanged(const QColor &c)
 {
-	m_color = c;
 	if(m_plot.isNull()) {
 		return;
 	}
@@ -195,3 +208,5 @@ void DigitalRepr::setColor(const QColor &c)
 		m_handle->handle()->setColor(c);
 	}
 }
+
+#include "moc_acqdigitalchannel.cpp"

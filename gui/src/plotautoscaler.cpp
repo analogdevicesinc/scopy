@@ -130,14 +130,26 @@ void PlotAutoscaler::autoscale()
 
 void PlotAutoscaler::addChannels(PlotChannel *c)
 {
+	if(!c || m_channels.contains(c)) {
+		return;
+	}
 	m_channels.append(c);
 	connect(c, &PlotChannel::newData, this, &PlotAutoscaler::onNewData);
+	// A caller that destroys a channel without unregistering it first used to leave this
+	// list holding a freed pointer, which autoscale() then walked on its next timeout.
+	// Unregistering here is what makes a channel outliving its registration harmless
+	// rather than a use-after-free a second away.
+	connect(c, &QObject::destroyed, this, [this, c]() { m_channels.removeAll(c); });
 }
 
 void PlotAutoscaler::removeChannels(PlotChannel *c)
 {
+	if(!c) {
+		return;
+	}
 	m_channels.removeAll(c);
 	disconnect(c, &PlotChannel::newData, this, &PlotAutoscaler::onNewData);
+	disconnect(c, &QObject::destroyed, this, nullptr);
 }
 
 double PlotAutoscaler::tolerance() const { return m_tolerance; }
