@@ -42,6 +42,7 @@ on:
             - auto
             - slim
             - testing
+            - qcoro-test
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
