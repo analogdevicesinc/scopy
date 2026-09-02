@@ -31,6 +31,7 @@ struct iio_context;
 
 namespace scopy {
 class CollapsableMenuControlButton;
+class GenalyzerPanel;
 
 namespace acq {
 class GenalyzerFFTProcessor;
@@ -78,10 +79,27 @@ private:
 	// channels after onStart() has read the device.
 	void addSourceChannelRows(CollapsableMenuControlButton *parentRow, scopy::acq::SourceBlock *src);
 
-	// Builds the plot manager, makes it the center widget, and adds one channel per
-	// key the pipeline publishes. Runs after setupBlocks() so the block keys exist to
-	// point at.
+	// Builds the plot manager, makes it the center widget, and wires the instrument's
+	// cycle/start/stop signals, the plot-window spinbox and the cursors. Creates no plot
+	// and no channel of its own — that is setupExampleView()'s job, called from the end of
+	// this. Runs after setupBlocks() so the block keys exist to point at.
 	void setupPlots();
+
+	// One worked example of the manager's API: a Basic plot with both raw channels against
+	// the sample index, and a Waterfall plot with the FFT magnitudes against the FFT
+	// frequency stream. Purely a starting view — every plot and channel it creates is
+	// deletable from the rail, nothing recreates itself, and with this call removed the
+	// instrument opens empty and is built entirely from the UI. Runs last, so it draws
+	// against a manager that is already fully wired.
+	void setupExampleView();
+
+	// The genalyzer results table, in the slot right of the plot. Shown only while
+	// analysis is enabled — an empty table beside the spectrum is just lost width.
+	void setupAnalysisPanel();
+
+	// Pluto's RX default. The source doesn't read the rate back, so the FFT has to be
+	// told, and a wrong value only mislabels the frequency axis.
+	const double m_kPlutoSampleRate;
 
 	ToolMenuEntry          *m_tme{nullptr};
 	QPointer<AcqInstrument> m_ui;
@@ -92,6 +110,7 @@ private:
 
 	// Parented to the instrument.
 	QPointer<AcqPlotManager> m_plots;
+	QPointer<GenalyzerPanel> m_genalyzerPanel;
 };
 
 } // namespace adc

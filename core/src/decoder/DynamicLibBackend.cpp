@@ -14,8 +14,6 @@
 namespace scopy {
 namespace decoder {
 
-static constexpr const char *kDynLibId = "dynamic-lib-backend";
-
 namespace {
 
 // Serializes cfg per the JSON schema in decoder_c_api.h.
@@ -88,7 +86,8 @@ void annotationTrampoline(const scopy_decoder_annotation_t *ann, void *user)
 } // namespace
 
 DynamicLibBackend::DynamicLibBackend(const QString &libraryPath)
-	: m_libraryPath(libraryPath)
+	: m_kDynLibId("dynamic-lib-backend")
+	, m_libraryPath(libraryPath)
 {}
 
 DynamicLibBackend::~DynamicLibBackend() = default;
@@ -133,7 +132,7 @@ bool DynamicLibBackend::decode(const DecoderConfig &cfg,
 {
 	out.clear();
 	if(!ensureLoaded()) {
-		if(m_logger) m_logger->warning(kDynLibId,
+		if(m_logger) m_logger->warning(m_kDynLibId,
 			QString::fromStdString(m_lastError));
 		return false;
 	}
@@ -151,7 +150,7 @@ bool DynamicLibBackend::decode(const DecoderConfig &cfg,
 	if(rc != 0) {
 		m_lastError = errbuf[0] ? std::string(errbuf)
 		                        : std::string("decode() returned non-zero");
-		if(m_logger) m_logger->warning(kDynLibId,
+		if(m_logger) m_logger->warning(m_kDynLibId,
 			QString::fromStdString(m_lastError));
 		return false;
 	}
@@ -177,7 +176,7 @@ bool DynamicLibBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(!m_symDecodeAnn) {
 		m_lastError = "DynamicLibBackend: library does not export "
 		              "scopy_decoder_decode_ann";
-		if(m_logger) m_logger->warning(kDynLibId,
+		if(m_logger) m_logger->warning(m_kDynLibId,
 			QString::fromStdString(m_lastError));
 		return false;
 	}
@@ -212,7 +211,7 @@ bool DynamicLibBackend::decodeAnnotations(const DecoderConfig &cfg,
 	if(rc != 0) {
 		m_lastError = errbuf[0] ? std::string(errbuf)
 		                        : std::string("decode_ann() returned non-zero");
-		if(m_logger) m_logger->warning(kDynLibId,
+		if(m_logger) m_logger->warning(m_kDynLibId,
 			QString::fromStdString(m_lastError));
 		return false;
 	}

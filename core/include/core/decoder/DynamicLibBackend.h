@@ -40,6 +40,7 @@ private:
 	// Lazy-load m_lib and resolve symbols. True iff scopy_decoder_decode resolved.
 	bool ensureLoaded() const;
 
+	const char               *m_kDynLibId;
 	QString                   m_libraryPath;
 	mutable std::unique_ptr<QLibrary> m_lib;
 	mutable bool              m_loadAttempted{false};
