@@ -305,7 +305,9 @@ build_iio-emu() {
 build_qcoro() {
 	echo "### Building qcoro - version $QCORO_BRANCH"
 	pushd $STAGING_AREA/qcoro
+	# Install under $SYSROOT/usr (alongside Qt) so headers match QCoro6Config's expected include path.
 	CURRENT_BUILD_CMAKE_OPTS="\
+		-DCMAKE_INSTALL_PREFIX=$SYSROOT/usr \
 		-DQCORO_BUILD_EXAMPLES=OFF \
 		-DQCORO_BUILD_TESTING=OFF \
 		-DBUILD_TESTING=OFF \
