@@ -29,13 +29,12 @@
 namespace scopy::iio {
 
 class IScanOps;
-class IBackend;
 
 class IIOScan : public QObject
 {
 	Q_OBJECT
 public:
-	explicit IIOScan(LibiioVersion version = LibiioVersion::V0, QObject *parent = nullptr);
+	explicit IIOScan(IScanOps *scanOps, QObject *parent = nullptr);
 	~IIOScan();
 
 	QVector<ScanResult> scan(const QString &backends = QString());
@@ -45,7 +44,6 @@ Q_SIGNALS:
 	void scanCompleted(const QVector<scopy::iio::ScanResult> &results);
 
 private:
-	IBackend *m_backend = nullptr; // non-owning; loader keeps backends resident for the process
 	IScanOps *m_scanOps = nullptr;
 };
 
