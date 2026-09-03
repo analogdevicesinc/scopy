@@ -23,6 +23,9 @@
 file(GLOB IIOUTIL_HEADERS include/iioutil/*.h include/iioutil/commands/*.h)
 file(GLOB IIOUTIL_SOURCES src/*.cpp)
 
+# Test purpose only (it is not cross platform)
+list(REMOVE_ITEM IIOUTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/iiobackendloader.cpp)
+
 add_library(controller-iioutils SHARED ${IIOUTIL_HEADERS} ${IIOUTIL_SOURCES})
 
 set_target_properties(controller-iioutils PROPERTIES OUTPUT_NAME scopy-controller-iioutils)
