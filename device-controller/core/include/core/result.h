@@ -42,6 +42,12 @@ struct Unexpected
 template <typename E>
 Unexpected(E) -> Unexpected<E>; // CTAD
 
+#if !defined(_WIN32)
+// Overloads that normalize strerror_r's two return conventions to the filled buffer.
+inline const char *strerrorMessage(int /*xsiRet*/, char *buf) { return buf; }	    // XSI: int
+inline const char *strerrorMessage(char *gnuRet, char * /*buf*/) { return gnuRet; } // GNU: char*
+#endif
+
 struct Error
 {
 	int code = 0;
@@ -58,7 +64,15 @@ struct Error
 			return {};
 		}
 		char buf[128];
-		const char *msg = strerror_r(errorCode(), buf, sizeof(buf));
+		buf[0] = '\0';
+#if defined(_WIN32)
+		strerror_s(buf, sizeof(buf), errorCode());
+		const char *msg = buf;
+#else
+		// strerror_r has two incompatible signatures: XSI (returns int, fills buf — macOS/POSIX)
+		// and GNU (returns char*, may leave buf untouched). Pick the right one by return type.
+		const char *msg = strerrorMessage(strerror_r(errorCode(), buf, sizeof(buf)), buf);
+#endif
 		return QString::fromUtf8(msg) + QStringLiteral(" (%1)").arg(errorCode());
 	}
 };
