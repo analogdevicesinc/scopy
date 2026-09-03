@@ -25,6 +25,8 @@ file(GLOB COMPONENT_SOURCES src/*.cpp src/backends/iio/*.cpp)
 
 add_library(component SHARED ${COMPONENT_HEADERS} ${COMPONENT_SOURCES})
 
+set_target_properties(component PROPERTIES OUTPUT_NAME scopy-component)
+
 target_include_directories(component PUBLIC include)
 
 target_link_libraries(
@@ -40,3 +42,11 @@ target_link_libraries(
 # Direct-link libiio v0: IIOContextFactory instantiates the v0 backend via the statically-linked createIIOBackend()
 # instead of dlopen'ing a plugin through IIOBackendLoader (which stays compiled but dormant). See iiocontextfactory.cpp.
 target_compile_definitions(component PRIVATE SCOPY_DC_DIRECT_LIBIIO_V0)
+
+install(
+	TARGETS
+	component LIBRARY
+	DESTINATION ${SCOPY_DLL_INSTALL_PATH}
+	COMPONENT ${SCOPY_PDK}
+	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
+)

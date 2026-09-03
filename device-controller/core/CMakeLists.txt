@@ -24,6 +24,12 @@ file(GLOB CORE_SOURCES src/*.cpp)
 
 add_library(controller-core SHARED ${CORE_HEADERS} ${CORE_SOURCES})
 
+set_target_properties(controller-core PROPERTIES OUTPUT_NAME scopy-controller-core)
+
 target_include_directories(controller-core PUBLIC include)
 
 target_link_libraries(controller-core PUBLIC Qt6::Core Qt6::Concurrent QCoro6::Core QCoro6::Coro)
+
+install(TARGETS controller-core LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
+	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
+)
