@@ -32,7 +32,7 @@ set_target_properties(controller-iioutils PROPERTIES OUTPUT_NAME scopy-controlle
 
 target_include_directories(controller-iioutils PUBLIC include)
 
-target_link_libraries(controller-iioutils PUBLIC controller-core Qt6::Core PRIVATE ${CMAKE_DL_LIBS})
+target_link_libraries(controller-iioutils PUBLIC controller-core Qt6::Core)
 
 install(TARGETS controller-iioutils LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
