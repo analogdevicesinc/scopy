@@ -21,19 +21,14 @@
 
 #include "iioutil/iioscan.h"
 #include "iioutil/iscanops.h"
-#include "iioutil/ibackend.h"
-#include "iioutil/iiobackendloader.h"
 #include <QThreadPool>
 
 namespace scopy::iio {
 
-IIOScan::IIOScan(LibiioVersion version, QObject *parent)
+IIOScan::IIOScan(IScanOps *scanOps, QObject *parent)
 	: QObject(parent)
-{
-	// The loader keeps the backend resident for the whole process; non-owning pointers.
-	m_backend = IIOBackendLoader::instance()->backend(version);
-	m_scanOps = m_backend ? m_backend->scanOps() : nullptr;
-}
+	, m_scanOps(scanOps)
+{}
 
 IIOScan::~IIOScan() {}
 
