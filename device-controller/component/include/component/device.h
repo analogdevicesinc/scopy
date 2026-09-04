@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <QString>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
@@ -31,7 +32,7 @@ namespace scopy::component {
 // holds only shared identity (id/name/label). Concrete backends subclass this
 // (IIODevice, ...) to carry backend handles; the base holds no backend types.
 // Shared identity is exposed through Q_PROPERTY for uniform client binding.
-class Device : public QObject
+class COMPONENT_EXPORT Device : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString id READ id CONSTANT)
