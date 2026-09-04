@@ -27,12 +27,13 @@
 #include <QString>
 #include <QUuid>
 #include <qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
 // Write capability (abstract base). Child of an Attribute; writeSucceeded is
 // wired to the reader's readAsync() for the write-then-read-back settle.
-class AttributeWriter : public QObject
+class COMPONENT_EXPORT AttributeWriter : public QObject
 {
 	Q_OBJECT
 public:

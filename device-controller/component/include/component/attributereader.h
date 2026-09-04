@@ -26,12 +26,13 @@
 #include <QObject>
 #include <QUuid>
 #include <qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
 // Read capability (abstract base). Child of an Attribute; readSucceeded is wired
 // to Attribute::setCachedValue.
-class AttributeReader : public QObject
+class COMPONENT_EXPORT AttributeReader : public QObject
 {
 	Q_OBJECT
 public:
