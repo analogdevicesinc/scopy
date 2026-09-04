@@ -25,10 +25,11 @@
 #include "iioutil/ideviceops.h"
 
 #include <cerrno>
+#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class SetTriggerCommand : public ResultCommand<void>
+class CONTROLLER_IIOUTILS_EXPORT SetTriggerCommand : public ResultCommand<void>
 {
 	Q_OBJECT
 public:

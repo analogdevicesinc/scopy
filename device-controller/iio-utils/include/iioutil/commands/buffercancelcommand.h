@@ -23,10 +23,11 @@
 
 #include "core/command.h"
 #include "iioutil/ibufferops.h"
+#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class BufferCancelCommand : public Command
+class CONTROLLER_IIOUTILS_EXPORT BufferCancelCommand : public Command
 {
 	Q_OBJECT
 public:
