@@ -22,13 +22,12 @@
 #pragma once
 
 #include "core/result.h"
-#include "core/controller_core_export.h"
 #include <QObject>
 #include <QUuid>
 
 namespace scopy {
 
-class CONTROLLER_CORE_EXPORT Command : public QObject
+class Command : public QObject
 {
 	Q_OBJECT
 public:

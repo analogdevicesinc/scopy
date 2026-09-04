@@ -25,11 +25,10 @@
 #include "iioutil/iattrops.h"
 
 #include <cerrno>
-#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class CONTROLLER_IIOUTILS_EXPORT AttrReadCommand : public ResultCommand<QByteArray>
+class AttrReadCommand : public ResultCommand<QByteArray>
 {
 	Q_OBJECT
 public:

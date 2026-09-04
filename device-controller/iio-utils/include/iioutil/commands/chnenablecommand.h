@@ -23,11 +23,10 @@
 
 #include "core/command.h"
 #include "iioutil/ichannelops.h"
-#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class CONTROLLER_IIOUTILS_EXPORT ChnEnableCommand : public Command
+class ChnEnableCommand : public Command
 {
 	Q_OBJECT
 public:

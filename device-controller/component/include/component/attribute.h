@@ -28,14 +28,13 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include "component/component_export.h"
 
 namespace scopy::component {
 
 // Identity + metadata node for one parameter. Performs no I/O itself: reads and
 // writes are delegated to AttributeReader / AttributeWriter capability children.
 // Writability is "has an AttributeWriter child".
-class COMPONENT_EXPORT Attribute : public QObject
+class Attribute : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString cachedValue MEMBER m_cachedValue NOTIFY valueChanged)

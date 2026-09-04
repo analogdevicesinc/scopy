@@ -26,11 +26,10 @@
 
 #include <cerrno>
 #include <functional>
-#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class CONTROLLER_IIOUTILS_EXPORT PingCommand : public ResultCommand<void>
+class PingCommand : public ResultCommand<void>
 {
 	Q_OBJECT
 public:

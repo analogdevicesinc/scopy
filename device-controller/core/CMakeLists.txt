@@ -24,15 +24,12 @@ file(GLOB CORE_SOURCES src/*.cpp)
 
 add_library(controller-core SHARED ${CORE_HEADERS} ${CORE_SOURCES})
 
-set_target_properties(controller-core PROPERTIES OUTPUT_NAME scopy-controller-core)
-
-include(GenerateExportHeader)
-generate_export_header(
+set_target_properties(
 	controller-core
-	BASE_NAME
-	CONTROLLER_CORE
-	EXPORT_FILE_NAME
-	${CMAKE_CURRENT_SOURCE_DIR}/include/core/controller_core_export.h
+	PROPERTIES OUTPUT_NAME scopy-controller-core
+		   WINDOWS_EXPORT_ALL_SYMBOLS ON
+		   CXX_VISIBILITY_PRESET default
+		   VISIBILITY_INLINES_HIDDEN OFF
 )
 
 target_include_directories(controller-core PUBLIC include)

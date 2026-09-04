@@ -28,15 +28,12 @@ list(REMOVE_ITEM IIOUTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/iiobackendloade
 
 add_library(controller-iioutils SHARED ${IIOUTIL_HEADERS} ${IIOUTIL_SOURCES})
 
-set_target_properties(controller-iioutils PROPERTIES OUTPUT_NAME scopy-controller-iioutils)
-
-include(GenerateExportHeader)
-generate_export_header(
+set_target_properties(
 	controller-iioutils
-	BASE_NAME
-	CONTROLLER_IIOUTILS
-	EXPORT_FILE_NAME
-	${CMAKE_CURRENT_SOURCE_DIR}/include/iioutil/controller_iioutils_export.h
+	PROPERTIES OUTPUT_NAME scopy-controller-iioutils
+		   WINDOWS_EXPORT_ALL_SYMBOLS ON
+		   CXX_VISIBILITY_PRESET default
+		   VISIBILITY_INLINES_HIDDEN OFF
 )
 
 target_include_directories(controller-iioutils PUBLIC include)

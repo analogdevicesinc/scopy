@@ -23,11 +23,10 @@
 
 #include "core/resultcommand.h"
 #include "iioutil/ibufferops.h"
-#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class CONTROLLER_IIOUTILS_EXPORT BufferCloseCommand : public ResultCommand<void>
+class BufferCloseCommand : public ResultCommand<void>
 {
 	Q_OBJECT
 public:

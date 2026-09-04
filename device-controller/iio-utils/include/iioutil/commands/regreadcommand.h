@@ -26,11 +26,10 @@
 
 #include <cerrno>
 #include <cstdint>
-#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class CONTROLLER_IIOUTILS_EXPORT RegReadCommand : public ResultCommand<uint32_t>
+class RegReadCommand : public ResultCommand<uint32_t>
 {
 	Q_OBJECT
 public:
