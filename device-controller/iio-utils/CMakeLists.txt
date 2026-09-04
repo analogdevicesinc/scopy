@@ -30,6 +30,15 @@ add_library(controller-iioutils SHARED ${IIOUTIL_HEADERS} ${IIOUTIL_SOURCES})
 
 set_target_properties(controller-iioutils PROPERTIES OUTPUT_NAME scopy-controller-iioutils)
 
+include(GenerateExportHeader)
+generate_export_header(
+	controller-iioutils
+	BASE_NAME
+	CONTROLLER_IIOUTILS
+	EXPORT_FILE_NAME
+	${CMAKE_CURRENT_SOURCE_DIR}/include/iioutil/controller_iioutils_export.h
+)
+
 target_include_directories(controller-iioutils PUBLIC include)
 
 target_link_libraries(controller-iioutils PUBLIC controller-core Qt6::Core)
