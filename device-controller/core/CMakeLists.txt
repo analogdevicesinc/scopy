@@ -26,6 +26,15 @@ add_library(controller-core SHARED ${CORE_HEADERS} ${CORE_SOURCES})
 
 set_target_properties(controller-core PROPERTIES OUTPUT_NAME scopy-controller-core)
 
+include(GenerateExportHeader)
+generate_export_header(
+	controller-core
+	BASE_NAME
+	CONTROLLER_CORE
+	EXPORT_FILE_NAME
+	${CMAKE_CURRENT_SOURCE_DIR}/include/core/controller_core_export.h
+)
+
 target_include_directories(controller-core PUBLIC include)
 
 target_link_libraries(controller-core PUBLIC Qt6::Core Qt6::Concurrent QCoro6::Core QCoro6::Coro)
