@@ -56,3 +56,4 @@ compile_commands.json
 *_qmlcache.qrc
 demo/
 core/include/core/controller_core_export.h
+iio-utils/include/iioutil/controller_iioutils_export.h

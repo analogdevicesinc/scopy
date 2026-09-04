@@ -25,10 +25,11 @@
 #include "iioutil/ibufferops.h"
 
 #include <cerrno>
+#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
-class BufferRefillCommand : public ResultCommand<void>
+class CONTROLLER_IIOUTILS_EXPORT BufferRefillCommand : public ResultCommand<void>
 {
 	Q_OBJECT
 public:

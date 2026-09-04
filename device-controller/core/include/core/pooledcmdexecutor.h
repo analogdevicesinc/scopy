@@ -22,6 +22,7 @@
 #pragma once
 
 #include "core/icmdexecutor.h"
+#include "core/controller_core_export.h"
 #include <QList>
 #include <QMutex>
 #include <QObject>
@@ -34,7 +35,7 @@ class Command;
 // Pool-based command executor. maxThreads == 1 gives strict FIFO (the default,
 // serializing all hardware operations on one connection); maxThreads > 1 allows
 // parallel access for backends that tolerate it (no ordering guarantee).
-class PooledCmdExecutor : public QObject, public ICmdExecutor
+class CONTROLLER_CORE_EXPORT PooledCmdExecutor : public QObject, public ICmdExecutor
 {
 	Q_OBJECT
 public:
