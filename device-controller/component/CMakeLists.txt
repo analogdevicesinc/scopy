@@ -27,6 +27,15 @@ add_library(component SHARED ${COMPONENT_HEADERS} ${COMPONENT_SOURCES})
 
 set_target_properties(component PROPERTIES OUTPUT_NAME scopy-component)
 
+include(GenerateExportHeader)
+generate_export_header(
+	component
+	BASE_NAME
+	COMPONENT
+	EXPORT_FILE_NAME
+	${CMAKE_CURRENT_SOURCE_DIR}/include/component/component_export.h
+)
+
 target_include_directories(component PUBLIC include)
 
 target_link_libraries(
