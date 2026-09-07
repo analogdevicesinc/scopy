@@ -23,6 +23,7 @@
 
 #include "component/context.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy::iio {
 class IBackend;
@@ -32,7 +33,7 @@ namespace scopy::component::iio {
 
 // IIO identity root. Carries the libiio context handle on top of the shared
 // Context identity (uri/name/description/executor).
-class IIOContext : public Context
+class COMPONENT_EXPORT IIOContext : public Context
 {
 	Q_OBJECT
 public:

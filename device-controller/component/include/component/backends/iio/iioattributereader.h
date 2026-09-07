@@ -23,6 +23,7 @@
 
 #include "component/attributereader.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -34,7 +35,7 @@ class AttrReadCommand;
 
 namespace scopy::component::iio {
 
-class IIOAttributeReader : public AttributeReader
+class COMPONENT_EXPORT IIOAttributeReader : public AttributeReader
 {
 	Q_OBJECT
 public:
