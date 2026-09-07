@@ -89,6 +89,8 @@ void BasicScaleDraw::setUnitsEnabled(bool enable) { m_unitsEn = enable; }
 
 bool BasicScaleDraw::unitsEnabled() const { return m_unitsEn; }
 
+void BasicScaleDraw::setNrTicks(unsigned int nrTicks) const { m_nrTicks = nrTicks; }
+
 void BasicScaleDraw::draw(QPainter *painter, const QPalette &palette) const
 {
 	const QList<double> allTicks = scaleDiv().ticks(QwtScaleDiv::MajorTick);

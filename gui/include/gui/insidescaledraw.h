@@ -42,8 +42,20 @@ class SCOPY_GUI_EXPORT InsideScaleDraw : public BasicScaleDraw
 public:
 	InsideScaleDraw(PrefixFormatter *formatter, const QString &unit);
 
+	// Shrinks the window labels are kept inside, in pixels, measured from each end of the scale.
+	void setEndMargins(double start, double end);
+	double startMargin() const;
+	double endMargin() const;
+
 protected:
+	void draw(QPainter *painter, const QPalette &palette) const override;
 	void drawLabel(QPainter *painter, double value) const override;
+
+private:
+	bool labelShift(const QFont &font, double value, QRect &bounds, double &shift) const;
+
+	double m_startMargin;
+	double m_endMargin;
 };
 } // namespace scopy
 
