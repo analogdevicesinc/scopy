@@ -27,6 +27,7 @@
 #include <QObject>
 #include <cstddef>
 #include <qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
@@ -40,7 +41,7 @@ struct StreamConfig
 
 // Streaming session + lifecycle. Direction-specific I/O lives on InputStream /
 // OutputStream. open() takes the same neutral config in both directions.
-class Stream : public QObject
+class COMPONENT_EXPORT Stream : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(bool isOpen READ isOpen NOTIFY openedChanged)

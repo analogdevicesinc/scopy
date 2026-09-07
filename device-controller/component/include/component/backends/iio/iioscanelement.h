@@ -29,6 +29,7 @@
 #include <QUuid>
 
 #include <qcoro/qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy {
 class Command;
@@ -42,7 +43,7 @@ namespace scopy::component::iio {
 
 // Scan/enable aspect of one streamable channel. Single source of truth for a
 // channel's membership in its stream's mask. Concrete IIO-only (no base yet).
-class IIOScanElement : public QObject
+class COMPONENT_EXPORT IIOScanElement : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(long index READ index CONSTANT)

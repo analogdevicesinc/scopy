@@ -25,12 +25,13 @@
 
 #include <QObject>
 #include <QVector>
+#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
 class IScanOps;
 
-class IIOScan : public QObject
+class CONTROLLER_IIOUTILS_EXPORT IIOScan : public QObject
 {
 	Q_OBJECT
 public:
