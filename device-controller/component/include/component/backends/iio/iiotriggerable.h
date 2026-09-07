@@ -29,6 +29,7 @@
 #include <QUuid>
 
 #include <qcoro/qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -47,7 +48,7 @@ class IIOTrigger;
 // setTrigger/clearTrigger go through the executor via SetTriggerCommand. A null
 // source (or clearTrigger) assigns no trigger. Parented to its IIODevice;
 // discovered via findChild<IIOTriggerable*>().
-class IIOTriggerable : public QObject
+class COMPONENT_EXPORT IIOTriggerable : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(bool hasTrigger READ hasTrigger NOTIFY triggerSucceeded)

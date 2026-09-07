@@ -25,6 +25,7 @@
 #include "iioutil/handles.h"
 
 #include <qcoro/qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -37,7 +38,7 @@ namespace scopy::component::iio {
 
 // IIO reachability leaf: dispatches a PingCommand through the injected executor
 // (IContextOps::ping may block on network I/O).
-class IIOPing : public Ping
+class COMPONENT_EXPORT IIOPing : public Ping
 {
 	Q_OBJECT
 public:

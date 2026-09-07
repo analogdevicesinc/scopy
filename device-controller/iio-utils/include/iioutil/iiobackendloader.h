@@ -25,12 +25,13 @@
 
 #include <QMap>
 #include <QMutex>
+#include "iioutil/controller_iioutils_export.h"
 
 namespace scopy::iio {
 
 class IBackend;
 
-class IIOBackendLoader
+class CONTROLLER_IIOUTILS_EXPORT IIOBackendLoader
 {
 public:
 	static IIOBackendLoader *instance();

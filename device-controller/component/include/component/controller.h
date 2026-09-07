@@ -29,6 +29,7 @@
 #include <QString>
 #include <memory>
 #include <mutex>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
@@ -43,7 +44,7 @@ enum class BackendKind
 	Default
 };
 
-class ContextHandle
+class COMPONENT_EXPORT ContextHandle
 {
 public:
 	ContextHandle() = default;
@@ -82,7 +83,7 @@ private:
 	Context *m_ctx = nullptr;
 };
 
-class Controller : public QObject
+class COMPONENT_EXPORT Controller : public QObject
 {
 	Q_OBJECT
 protected:

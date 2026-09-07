@@ -23,13 +23,14 @@
 
 #include "component/contextfactory.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy::component::iio {
 
 // Builds a libiio-backed Context: loads the backend plugin for its fixed
 // LibiioVersion, opens the context handle, attaches a serial executor, and
 // runs the IIO component builder. One factory instance per version.
-class IIOContextFactory : public ContextFactory
+class COMPONENT_EXPORT IIOContextFactory : public ContextFactory
 {
 public:
 	explicit IIOContextFactory(scopy::iio::LibiioVersion version)

@@ -24,6 +24,7 @@
 #include "component/samplecodec.h"
 #include "iioutil/dataformat.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy::iio {
 class IChannelOps;
@@ -31,7 +32,7 @@ class IChannelOps;
 
 namespace scopy::component::iio {
 
-class IIOSampleCodec : public SampleCodec
+class COMPONENT_EXPORT IIOSampleCodec : public SampleCodec
 {
 	Q_OBJECT
 public:

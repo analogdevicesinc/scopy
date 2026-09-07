@@ -25,10 +25,11 @@
 #include "component/streamformat.h"
 
 #include <QUuid>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
-class InputStream : public Stream
+class COMPONENT_EXPORT InputStream : public Stream
 {
 	Q_OBJECT
 public:
