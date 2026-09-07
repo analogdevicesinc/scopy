@@ -27,6 +27,7 @@
 #include "plotwidget.h"
 #include "plot_utils.hpp"
 #include "basicscaledraw.h"
+#include "insidescaledraw.h"
 #include "scopy-gui_export.h"
 #include "edgelessplot.h"
 
@@ -72,9 +73,6 @@ public:
 	void setUnitsVisible(bool visible);
 	void setScaleEn(bool en);
 
-	// Draws the labels on the canvas itself instead of in the margin strip QwtPlotLayout
-	// reserves beside it, which hands that strip back to the plot. Driven by the
-	// "plot_labels_inside" preference; live, so it can flip at any point in the axis' life.
 	void setLabelsInside(bool inside);
 	bool labelsInside() const;
 
@@ -103,10 +101,8 @@ private:
 	PrefixFormatter *m_formatter;
 	EdgelessPlotScaleItem *m_scaleItem;
 
-	bool m_labelsInside = false;
-	// setVisible() keeps no state of its own, but a live inside/outside switch has to
-	// re-apply the current visibility through whichever path just became the active one.
-	bool m_visible = false;
+	bool m_labelsInside;
+	bool m_visible;
 
 	int m_id;
 	double m_divs;
