@@ -23,12 +23,13 @@
 
 #include "component/device.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy::component::iio {
 
 // IIO device identity. Carries the libiio device handle on top of the shared
 // Device identity (id/name/label).
-class IIODevice : public Device
+class COMPONENT_EXPORT IIODevice : public Device
 {
 	Q_OBJECT
 public:

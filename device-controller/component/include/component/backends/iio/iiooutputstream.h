@@ -23,6 +23,7 @@
 
 #include "component/outputstream.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -35,7 +36,7 @@ class BufferPushCommand;
 
 namespace scopy::component::iio {
 
-class IIOOutputStream : public OutputStream
+class COMPONENT_EXPORT IIOOutputStream : public OutputStream
 {
 	Q_OBJECT
 	Q_PROPERTY(unsigned kernelBuffers READ kernelBuffers CONSTANT)

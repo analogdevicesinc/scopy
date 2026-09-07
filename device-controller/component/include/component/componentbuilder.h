@@ -22,6 +22,7 @@
 #pragma once
 
 #include "core/icmdexecutor.h"
+#include "component/component_export.h"
 
 namespace scopy::component {
 
@@ -29,7 +30,7 @@ class Context;
 
 // The one place that knows a backend's topology. The Controller creates the root
 // Context + executor, then the builder fills in the subtree.
-class ComponentBuilder
+class COMPONENT_EXPORT ComponentBuilder
 {
 public:
 	virtual ~ComponentBuilder() = default;

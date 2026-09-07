@@ -29,6 +29,7 @@
 #include <cstdint>
 
 #include <qcoro/qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -43,7 +44,7 @@ namespace scopy::component::iio {
 // Register-read capability of a device (debug register access). IIO-only, no
 // generic base — a register is addressed by number, so it attaches straight to
 // the IIODevice (discovered via findChild<IIORegisterReader*>()).
-class IIORegisterReader : public QObject
+class COMPONENT_EXPORT IIORegisterReader : public QObject
 {
 	Q_OBJECT
 public:

@@ -25,6 +25,7 @@
 
 #include <QObject>
 #include <QString>
+#include "component/component_export.h"
 
 namespace scopy::iio {
 class IDeviceOps;
@@ -36,7 +37,7 @@ namespace scopy::component::iio {
 // IIO-only, no generic base — pure metadata (name()), no I/O. Carries the device
 // handle so an IIOTriggerable can pass it to iio_device_set_trigger. Parented to
 // its IIODevice; discovered via findChild<IIOTrigger*>().
-class IIOTrigger : public QObject
+class COMPONENT_EXPORT IIOTrigger : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString name READ name CONSTANT)

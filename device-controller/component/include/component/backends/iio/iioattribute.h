@@ -23,12 +23,13 @@
 
 #include "component/attribute.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy::component::iio {
 
 // IIO attribute identity — carries the AttrHandle, no I/O logic. I/O lives on the
 // IIOAttributeReader / IIOAttributeWriter capability children.
-class IIOAttribute : public Attribute
+class COMPONENT_EXPORT IIOAttribute : public Attribute
 {
 	Q_OBJECT
 public:

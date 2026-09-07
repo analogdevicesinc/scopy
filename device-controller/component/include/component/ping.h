@@ -27,6 +27,7 @@
 #include <QTimer>
 
 #include <qcoro/qcorotask.h>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
@@ -35,7 +36,7 @@ namespace scopy::component {
 // the leaf reports the outcome via reachabilityChecked(bool), so the GUI thread
 // never blocks in a nested event loop. connectionLost() is emitted once, on first
 // failure. Callers needing a synchronous one-off wrap it: QCoro::waitFor(p->checkReachableAsync()).
-class Ping : public QObject
+class COMPONENT_EXPORT Ping : public QObject
 {
 	Q_OBJECT
 public:

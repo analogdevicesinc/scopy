@@ -22,12 +22,13 @@
 #pragma once
 
 #include <QObject>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
 // Per-channel single-sample codec: pure computation, no executor. Converts one
 // sample between hardware and host representation.
-class SampleCodec : public QObject
+class COMPONENT_EXPORT SampleCodec : public QObject
 {
 	Q_OBJECT
 public:
