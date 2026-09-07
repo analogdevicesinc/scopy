@@ -23,6 +23,7 @@
 
 #include "component/componentbuilder.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 #include <QString>
 
@@ -42,7 +43,7 @@ class IIODevice;
 
 // Builds the IIO component tree from a Context whose IIOContext handle is already
 // created and whose executor is set. Written as many small single-purpose methods.
-class IIOComponentBuilder : public ComponentBuilder
+class COMPONENT_EXPORT IIOComponentBuilder : public ComponentBuilder
 {
 public:
 	explicit IIOComponentBuilder(scopy::iio::IBackend *backend)

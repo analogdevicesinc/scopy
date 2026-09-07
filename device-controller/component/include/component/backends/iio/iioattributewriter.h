@@ -23,6 +23,7 @@
 
 #include "component/attributewriter.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy {
 class ICmdExecutor;
@@ -34,7 +35,7 @@ class AttrWriteCommand;
 
 namespace scopy::component::iio {
 
-class IIOAttributeWriter : public AttributeWriter
+class COMPONENT_EXPORT IIOAttributeWriter : public AttributeWriter
 {
 	Q_OBJECT
 public:

@@ -25,12 +25,13 @@
 
 #include <QVector>
 #include <cstring>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
 // Read-only decoder over a StreamFormat: raw byte access and normalized-double
 // materialization, so callers never write switch(type) + pointer math.
-class StreamView
+class COMPONENT_EXPORT StreamView
 {
 public:
 	explicit StreamView(const StreamFormat &format)

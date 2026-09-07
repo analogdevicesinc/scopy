@@ -26,6 +26,7 @@
 #include <QObject>
 #include <QString>
 #include <QUuid>
+#include "component/component_export.h"
 
 namespace scopy::component {
 
@@ -40,7 +41,7 @@ namespace scopy::component {
 // Concrete backends subclass this (IIOContext, ...) to carry backend-specific
 // identity fields. The base carries only what every backend shares. Shared
 // identity is exposed through Q_PROPERTY so clients can bind to it uniformly.
-class Context : public QObject
+class COMPONENT_EXPORT Context : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(QString uri READ uri CONSTANT)

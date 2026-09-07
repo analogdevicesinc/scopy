@@ -23,12 +23,13 @@
 
 #include "component/channel.h"
 #include "iioutil/handles.h"
+#include "component/component_export.h"
 
 namespace scopy::component::iio {
 
 // IIO channel identity. Carries the libiio channel handle on top of the shared
 // Channel identity (id/name/label/direction).
-class IIOChannel : public Channel
+class COMPONENT_EXPORT IIOChannel : public Channel
 {
 	Q_OBJECT
 public:
