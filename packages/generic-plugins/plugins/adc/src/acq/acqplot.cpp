@@ -135,7 +135,12 @@ PlotAxis *AcqPlot::acquireAxis(int position)
 	// The PlotWidget * overload specifically: it self-registers through
 	// addPlotAxis(this) and grows the QwtPlot's axis count for this position, which is
 	// the only supported way to add an axis at all.
-	QPen pen(Style::getColor(json::theme::content_silent));
+	//
+	// content_subtle, matching the pen PlotWidget::setupAxes() gives its built-in pair:
+	// a pooled axis and a plot's own axis are the same kind of scale to the user, and a
+	// waterfall shows the built-in pair directly, so any other colour reads as two
+	// different label styles between plots in the same instrument.
+	QPen pen(Style::getColor(json::theme::content_subtle));
 	PlotAxis *ax = new PlotAxis(position, m_plot.data(), pen, this);
 	m_all.append(ax);
 	return ax;
