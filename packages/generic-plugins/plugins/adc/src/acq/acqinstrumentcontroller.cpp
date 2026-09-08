@@ -26,10 +26,16 @@
 #include "acqplot.h"
 #include "acqplotkind.h"
 #include "acqplotmanager.h"
+#include "adxl355source.h"
+
+#include <iio.h>
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
+#include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
+#include <core/acq_engine/SnapshotSource.h>
+#include <core/acq_engine/SnapshotSourceWidget.h>
 #include <core/acq_engine/SourceBlock.h>
 #include <gui/instrumenttemplate.h>
 #include <gui/style.h>
@@ -107,14 +113,42 @@ void AcqInstrumentController::init(iio_context *ctx)
 
 void AcqInstrumentController::setupBlocks(iio_context *ctx)
 {
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+	InstrumentTemplate            *it = m_ui->shell();
+
+	// The group both paths add to. Created up front because the snapshot source belongs
+	// in it whether or not a context was opened.
+	MenuSectionCollapseWidget *sources = it->addChannelGroup("Sources");
+	setupSnapshotBlock(sources);
+
 	if(!ctx) {
-		// PlutoIIOSource opens a real IIO buffer device; there is no simulated
-		// stand-in here, so the instrument stays empty rather than pretending.
+		// Every hardware source here opens a real IIO device; there is no simulated
+		// stand-in, so the hardware half of the pipeline is skipped rather than
+		// pretended. The snapshot source above still works — it needs no device.
 		return;
 	}
 
+	// Which sources appear is decided by what the context actually holds, not by
+	// which tool opened it: both calls no-op when their device is absent, so a Pluto
+	// context comes up with the Pluto source and an ADXL context with the ADXL one,
+	// through one code path.
+	setupPlutoBlocks(sources, ctx);
+	setupAdxlBlocks(sources, ctx);
+
+	if(m_fftProc) {
+		MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
+		addBlockRow(procs, m_fftProc, QStringLiteral("FFT"), QStringLiteral("GENALYZER FFT"),
+			    QStringLiteral("fft"));
+	}
+}
+
+bool AcqInstrumentController::setupPlutoBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx)
+{
+	if(!iio_context_find_device(ctx, "cf-ad9361-lpc")) {
+		return false;
+	}
+
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
-	InstrumentTemplate            *it = m_ui->shell();
 
 	m_plutoSrc = new sim::PlutoIIOSource(ctx, "pluto", "cf-ad9361-lpc", engine);
 	m_plutoSrc->enableChannel("voltage0", true);
@@ -134,20 +168,104 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 	m_fftProc->setAveragingStore(m_ui->store());
 	engine->addProcessor(m_fftProc);
 
-	// Rail rows, so both blocks are reachable and the pipeline tab has something to
-	// draw. No colours: these are pipeline blocks, and a coloured swatch on the rail
-	// means "this is the curve you see in that colour" — only plot channels have one.
-	MenuSectionCollapseWidget *sources = it->addChannelGroup("Sources");
-	// Expandable, so the source's channels hang under it as a tree rather than as a
-	// flat list that says nothing about which device they belong to.
-	CollapsableMenuControlButton *plutoRow =
-		it->addExpandableChannelRow(sources, "pluto", QColor(), QStringLiteral("pluto"));
-	it->addMenuPage("pluto", blockPage(it, m_plutoSrc, "PLUTO"));
-	addSourceChannelRows(plutoRow, m_plutoSrc);
+	addBlockRow(sourcesGroup, m_plutoSrc, QStringLiteral("pluto"), QStringLiteral("PLUTO"),
+		    QStringLiteral("pluto"));
+	return true;
+}
 
-	MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
-	it->addChannelRow(procs, "FFT", QColor(), "fft");
-	it->addMenuPage("fft", blockPage(it, m_fftProc, "GENALYZER FFT"));
+bool AcqInstrumentController::setupAdxlBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx)
+{
+	if(!iio_context_find_device(ctx, "adxl355")) {
+		return false;
+	}
+
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+
+	// No FFT alongside it, unlike the Pluto path. The accel triple is three real
+	// streams rather than one complex pair, so a spectrum here would be three
+	// separate real transforms — three more blocks, which is a decision for whoever
+	// wants them and not a default this instrument should make.
+	m_adxlSrc = new Adxl355Source(ctx, QStringLiteral("adxl355"), QStringLiteral("adxl355"), engine);
+	// The block registers its own four channels with accel on and temp off, so
+	// nothing is enabled here — doing it again would just restate its default.
+	engine->addSource(m_adxlSrc);
+
+	addBlockRow(sourcesGroup, m_adxlSrc, QStringLiteral("adxl355"), QStringLiteral("ADXL355"),
+		    QStringLiteral("adxl355"));
+	return true;
+}
+
+CollapsableMenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCollapseWidget *group,
+								   scopy::acq::Block *block, const QString &label,
+								   const QString &pageTitle, const QString &menuId)
+{
+	if(!group || !block) {
+		return nullptr;
+	}
+	InstrumentTemplate *it = m_ui->shell();
+
+	// Every block gets the same entry, source or processor: one expandable row plus its
+	// settings page. Uniform on purpose — the rail is a view of the pipeline, and a
+	// pipeline block is a pipeline block whichever group it sits in, so a reader should
+	// not have to learn two row shapes to read one graph.
+	//
+	// No colour: a coloured swatch on the rail means "this is the curve you see in that
+	// colour", and only plot channels have one.
+	CollapsableMenuControlButton *row = it->addExpandableChannelRow(group, label, QColor(), menuId);
+	it->addMenuPage(menuId, blockPage(it, block, pageTitle));
+
+	// The subtree is what the row is expandable *for*: a source's channels hang under it
+	// as a tree rather than as a flat list that says nothing about which device they
+	// belong to. A block that declares no channels — every processor here, and the
+	// snapshot source until a slot is captured — just has an empty one; the row itself
+	// stays the same shape either way.
+	if(auto *src = qobject_cast<scopy::acq::SourceBlock *>(block)) {
+		addSourceChannelRows(row, src);
+	}
+
+	return row;
+}
+
+void AcqInstrumentController::setupSnapshotBlock(MenuSectionCollapseWidget *sourcesGroup)
+{
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+	scopy::acq::DataStore         *store = m_ui->store();
+
+	m_snapSrc = new scopy::acq::SnapshotSource("snapshot", engine);
+	// The store it captures *from*, which is the same one the engine writes to. A block
+	// cannot reach it on its own.
+	m_snapSrc->setSourceStore(store);
+	// One empty slot, so the panel opens on something to configure rather than on a bare
+	// "add" button. It publishes nothing until captured.
+	m_snapSrc->addSlot();
+	engine->addSource(m_snapSrc);
+
+	// Host-built widget: its key pickers need the DataStore and the engine, which the
+	// constructor of a block has no way to supply. Same pattern the trigger uses.
+	auto *body = new QWidget;
+	auto *lay = new QVBoxLayout(body);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(4);
+	// The base virtual explicitly, or SnapshotSource's override builds a second panel
+	// inside the one we are assembling.
+	lay->addWidget(m_snapSrc->SourceBlock::createSettingsWidget(body));
+	m_snapWidget = new scopy::acq::SnapshotSourceWidget(m_snapSrc, store, engine, body);
+	lay->addWidget(m_snapWidget);
+	// Before any settingsWidget() call, which blockPage() below is.
+	m_snapSrc->setSettingsWidget(body);
+
+	// Same entry as every other block, through the one path that builds them.
+	addBlockRow(sourcesGroup, m_snapSrc, QStringLiteral("Snapshot"), QStringLiteral("SNAPSHOT"),
+		    QStringLiteral("snapshot"));
+
+	// Queued: keysChanged comes off the engine's worker thread.
+	connect(store, &scopy::acq::DataStore::keysChanged, m_snapWidget,
+		[this](const QList<scopy::acq::DataKey> &) {
+			if(m_snapWidget) {
+				m_snapWidget->refreshKeys();
+			}
+		},
+		Qt::QueuedConnection);
 }
 
 void AcqInstrumentController::addSourceChannelRows(CollapsableMenuControlButton *parentRow,
@@ -266,11 +384,12 @@ void AcqInstrumentController::setupPlots()
 	// so one instrument-wide button and controller could only ever drive the first plot.
 
 	if(m_fftProc) {
-		// The timeline for channels whose producer declared no rate — the raw source
-		// channels, since SourceBlock cannot know the device rate. From the FFT
-		// processor because that is where the rate is configured. A stream that carries
-		// its own rate (the FFT magnitudes do) ignores this. Before the channels below,
-		// though either order works.
+		// The timeline for channels whose producer declared no rate — Pluto's raw
+		// channels, since PlutoIIOSource does not read the device rate back. From the
+		// FFT processor because that is where the rate is configured. A stream that
+		// carries its own rate ignores this: the FFT magnitudes do, and so does every
+		// ADXL channel, which is why setupAdxlBlocks needs nothing here. Before the
+		// channels below, though either order works.
 		m_plots->setFallbackSampleRate(m_fftProc->sampleRate());
 	}
 
@@ -297,20 +416,35 @@ void AcqInstrumentController::setupExampleView()
 		return;
 	}
 
-	// --- 1. Time domain: both raw channels on one Basic plot ---------------------
+	// --- 1. Time domain: the registered source's raw channels on one Basic plot --
 	//
 	// First, which is all order decides now that the plots are docks: this one sits above
 	// the waterfall, and the two share the height evenly until the reader drags the
 	// separator.
 	//
-	// Both against the sample index (the default empty xKey), which is what makes them
+	// All against the sample index (the default empty xKey), which is what makes them
 	// share one X scale and stay aligned with each other. They are the case per-channel X
-	// costs nothing for: two channels, one X source, one visible X axis.
-	if(AcqPlot *timePlot = m_plots->addPlot(tr("Time"), AcqPlotKind::Basic)) {
-		m_plots->addChannel(timePlot, scopy::acq::ReprKind::Curve,
-				    scopy::acq::DataKey::raw("pluto", "voltage0"));
-		m_plots->addChannel(timePlot, scopy::acq::ReprKind::Curve,
-				    scopy::acq::DataKey::raw("pluto", "voltage1"));
+	// costs nothing for: several channels, one X source, one visible X axis.
+	if(m_plutoSrc) {
+		if(AcqPlot *timePlot = m_plots->addPlot(tr("Time"), AcqPlotKind::Basic)) {
+			m_plots->addChannel(timePlot, scopy::acq::ReprKind::Curve,
+					    scopy::acq::DataKey::raw("pluto", "voltage0"));
+			m_plots->addChannel(timePlot, scopy::acq::ReprKind::Curve,
+					    scopy::acq::DataKey::raw("pluto", "voltage1"));
+		}
+	}
+
+	if(m_adxlSrc) {
+		// The accel triple only. temp starts disabled on the block, and a channel on
+		// a stream nothing writes draws an empty curve — so the row exists in the rail
+		// for the reader to enable, and the plot channel is theirs to add once it does.
+		// Unit and colour come from the block's own StreamInfo, not from here.
+		if(AcqPlot *accelPlot = m_plots->addPlot(tr("Acceleration"), AcqPlotKind::Basic)) {
+			for(const QString &chId : Adxl355Source::kAccelChannels) {
+				m_plots->addChannel(accelPlot, scopy::acq::ReprKind::Curve,
+						    scopy::acq::DataKey::raw(QStringLiteral("adxl355"), chId));
+			}
+		}
 	}
 
 	if(!m_fftProc) {
