@@ -25,6 +25,7 @@
 #include "acqchannelregistry.h"
 #include "acqplot.h"
 
+#include <core/acq_engine/DataKeyCombo.h>
 #include <core/acq_engine/DataStore.h>
 
 // The factories, needed here and not in the header: they are static free functions, so
@@ -663,58 +664,12 @@ void AcqPlotManager::unregisterRail(AcqChannel *ch)
 
 void AcqPlotManager::populateKeyCombo(MenuCombo *combo, bool withSampleIndex) const
 {
-	if(!combo || !combo->combo()) {
+	if(!combo) {
 		return;
 	}
-	QComboBox *box = combo->combo();
-
-	// Blocked and rebuilt wholesale: clear() emits currentIndexChanged, and a listener
-	// would read that as the reader picking whatever lands at index 0.
-	QSignalBlocker blocker(box);
-	const QString previous = box->currentData().toString();
-	box->clear();
-
-	if(withSampleIndex) {
-		// First, and the default for an X picker: a channel added without a thought about X
-		// is a time-domain channel, and the sample index is what that means. Its payload is
-		// the engine ramp's real key — it is a stream now — so the entry is skipped when the
-		// streams are listed below rather than appearing twice.
-		box->addItem(tr("sample index"), AcqAxis::rampKeyString());
-	}
-
-	if(!m_store.isNull()) {
-		// Declared ∪ written: the two overlap but neither contains the other. A
-		// declared-but-unwritten stream is offered on purpose — adding its channel before the
-		// first cycle is what makes the first window full-depth.
-		QSet<scopy::acq::DataKey> all;
-		if(!m_engine.isNull()) {
-			const QList<scopy::acq::DataKey> declared = m_engine->declaredKeys();
-			for(const scopy::acq::DataKey &k : declared) {
-				all.insert(k);
-			}
-		}
-		const QList<scopy::acq::DataKey> written = m_store->keys();
-		for(const scopy::acq::DataKey &k : written) {
-			all.insert(k);
-		}
-
-		QStringList names;
-		names.reserve(all.size());
-		for(const scopy::acq::DataKey &k : all) {
-			names << k.toString();
-		}
-		// Sorted: a QSet iterates in hash order, which would reshuffle the list every time
-		// the key set changed and make the picker unusable.
-		names.sort();
-		for(const QString &n : names) {
-			box->addItem(n, n);
-		}
-	}
-
-	// Keep what was selected where it still exists — a refresh must not silently retarget
-	// a selection the reader made and has not pressed Add on yet.
-	const int idx = box->findData(previous);
-	box->setCurrentIndex(qMax(0, idx));
+	// The declared ∪ written / sort / preserve-selection logic lives in core, shared with
+	// every other key picker in the stack; see DataKeyCombo.h for why each step is as it is.
+	scopy::acq::populateKeyCombo(combo->combo(), m_store, m_engine, withSampleIndex);
 }
 
 scopy::acq::DataKey AcqPlotManager::keyFromCombo(const MenuCombo *combo)
@@ -723,17 +678,7 @@ scopy::acq::DataKey AcqPlotManager::keyFromCombo(const MenuCombo *combo)
 		return scopy::acq::DataKey();
 	}
 	// const_cast because MenuCombo::combo() is non-const; nothing here mutates it.
-	QComboBox *box = const_cast<MenuCombo *>(combo)->combo();
-	if(!box) {
-		return scopy::acq::DataKey();
-	}
-	const QString data = box->currentData().toString();
-	if(data.isEmpty()) {
-		return scopy::acq::DataKey();
-	}
-	// The sample-index entry needs no special case: its payload *is* the ramp key, and
-	// AcqChannel resolves an empty key to the same thing.
-	return scopy::acq::DataKey(data);
+	return scopy::acq::keyFromCombo(const_cast<MenuCombo *>(combo)->combo());
 }
 
 // --- geometry --------------------------------------------------------------

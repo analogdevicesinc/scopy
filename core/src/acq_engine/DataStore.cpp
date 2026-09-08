@@ -34,6 +34,23 @@ void DataStore::write(const DataKey &key, SampleVariant vec)
 		Q_EMIT keysChanged(keys());
 }
 
+void DataStore::copy(const DataKey &key, SampleBuffer buffer)
+{
+	bool newKey;
+	{
+		QMutexLocker lk(&m_mutex);
+		newKey = !m_data.contains(key);
+		// Assigned, not pushed: the buffer *is* the history. No applyDepthLocked()
+		// either — see the header.
+		m_data[key] = std::move(buffer);
+		m_cycleKeys.insert(key);
+		// Counted like a write: that is what the engine's "produced nothing" check reads.
+		++m_writeCount;
+	}
+	if(newKey)
+		Q_EMIT keysChanged(keys());
+}
+
 std::optional<SampleVariant> DataStore::latest(const DataKey &key) const
 {
 	QMutexLocker lk(&m_mutex);

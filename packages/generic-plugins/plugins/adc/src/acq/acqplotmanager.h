@@ -284,9 +284,12 @@ private:
 	// Fills `combo` with the available streams — declared ∪ written, sorted — keeping
 	// the current selection where it still exists. `withSampleIndex` prepends the
 	// sample-index entry, which is what an X picker wants and a Y picker does not.
-	// Mirrors AcqAxis::refreshSourceChoices(); see there for why each step is as it is.
+	//
+	// Both forward to scopy::acq::populateKeyCombo / keyFromCombo in core; these stay
+	// only to adapt MenuCombo to the QComboBox the shared version takes. See
+	// core/acq_engine/DataKeyCombo.h for why each step of the rebuild is as it is.
 	void populateKeyCombo(MenuCombo *combo, bool withSampleIndex) const;
-	// The key a source combo currently names, empty for its sample-index entry.
+	// The key a source combo currently names, empty when nothing is selected.
 	static scopy::acq::DataKey keyFromCombo(const MenuCombo *combo);
 
 	// ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
