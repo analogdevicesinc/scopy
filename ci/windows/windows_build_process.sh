@@ -118,6 +118,7 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'libsndfile' ]	|| git clone --recursive https://github.com/libsndfile/libsndfile -b $LIBSNDFILE_BRANCH libsndfile
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -231,6 +232,19 @@ build_libad9361() {
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	CURRENT_BUILD=libad9166
+	build_with_cmake $1
+}
+
+build_libm2k() {
+	echo "### Building libm2k - branch $LIBM2K_BRANCH"
+	CURRENT_BUILD=libm2k
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF\
+		-DENABLE_CSHARP=OFF\
+		-DBUILD_EXAMPLES=OFF\
+		-DENABLE_TOOLS=ON\
+		-DINSTALL_UDEV_RULES=OFF\
+		"
 	build_with_cmake $1
 }
 
@@ -423,6 +437,7 @@ build_deps() {
 	build_libiio ON
 	build_libad9361 ON
 	build_libad9166 ON
+	build_libm2k ON
 	build_libsndfile ON
 	build_qwt ON
 	build_libtinyiiod ON
