@@ -42,3 +42,8 @@ target_link_libraries(controller-core PUBLIC Qt6::Core Qt6::Concurrent QCoro6::C
 install(TARGETS controller-core LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 )
+
+# Pure-logic tests, no hardware.
+if(ENABLE_TESTING)
+	add_subdirectory(test)
+endif()
