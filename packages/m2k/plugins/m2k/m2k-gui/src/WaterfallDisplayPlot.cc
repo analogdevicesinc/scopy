@@ -843,7 +843,6 @@ void WaterfallDisplayPlot::_updateIntensityRangeDisplay()
 {
 	QwtScaleWidget *rightAxis = axisWidget(QwtAxis::YRight);
 	QwtText colorBarTitle("Intensity (dB)");
-	colorBarTitle.setFont(QFont("Arial", d_color_bar_title_font_size));
 	rightAxis->setTitle(colorBarTitle);
 	rightAxis->setColorBarEnabled(true);
 

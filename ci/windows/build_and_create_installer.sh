@@ -40,6 +40,7 @@ export DEST_FOLDER=$ARTIFACT_FOLDER/scopy-$ARCH # Bundle directory (exported for
 DEBUG_FOLDER=$ARTIFACT_FOLDER/debug-$ARCH       # Unstripped binaries for debugging
 PYTHON_FILES=$STAGING_DIR/lib/python3.*         # Python runtime
 EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build         # IIO emulator build directory
+DRIVER_FOLDER=$DEST_FOLDER/drivers
 
 download_tools() {
 	mkdir -p $STAGING_AREA
@@ -64,6 +65,11 @@ download_tools() {
 	if [ ! -f cv2pdb-dlls.zip ]; then
 		wget2 https://swdownloads.analog.com/cse/scopydeps/cv2pdb-dlls.zip
 		unzip "cv2pdb-dlls.zip"
+	fi
+
+	if [ ! -f wdf-coinstaller.zip ]; then
+		wget2 http://swdownloads.analog.com/cse/m1k/drivers/wdf-coinstaller.zip
+		unzip "wdf-coinstaller.zip"
 	fi
 	popd
 }
@@ -106,13 +112,20 @@ build_iio-emu(){
 # Bundle device drivers with installer
 bundle_drivers(){
 	echo "### Bundling drivers"
-	cp -R $SRC_FOLDER/ci/windows/drivers $DEST_FOLDER
+
+	if [ ! -d "$WORKDIR/plutosdr-m2k-drivers-win" ]; then
+		git clone https://github.com/analogdevicesinc/plutosdr-m2k-drivers-win $WORKDIR/plutosdr-m2k-drivers-win
+	fi
+
+	mkdir -p $DRIVER_FOLDER
+	cp -R $WORKDIR/plutosdr-m2k-drivers-win/* $DRIVER_FOLDER
+	cp -R $STAGING_AREA/wdf-coinstaller/* $DRIVER_FOLDER/
 	if [[ $ARCH_BIT == "64" ]]; then
-		cp -R $STAGING_AREA/dfu-util-static-amd64.exe $DEST_FOLDER/drivers/dfu-util.exe
-		cp -R $STAGING_AREA/dpinst_amd64.exe $DEST_FOLDER/drivers/dpinst.exe
+		cp -R $STAGING_AREA/dfu-util-static-amd64.exe $DRIVER_FOLDER/dfu-util.exe
+		cp -R $STAGING_AREA/dpinst_amd64.exe $DRIVER_FOLDER/dpinst.exe
 	else
-		cp -R $STAGING_AREA/dfu-util-static.exe $DEST_FOLDER/drivers/dfu-util.exe
-		cp -R $STAGING_AREA/dpinst.exe $DEST_FOLDER/drivers/dpinst.exe
+		cp -R $STAGING_AREA/dfu-util-static.exe $DRIVER_FOLDER/dfu-util.exe
+		cp -R $STAGING_AREA/dpinst.exe $DRIVER_FOLDER/dpinst.exe
 	fi
 }
 
