@@ -44,6 +44,12 @@ public:
 
 	void write(const DataKey &key, SampleVariant vec);
 
+	// Replaces everything under `key` with a complete history, for a producer whose output
+	// *is* a whole buffer rather than a chunk. Unlike write(), does not apply the key's
+	// depth claims: a claim says how much history to keep as chunks arrive, and nothing is
+	// arriving here.
+	void copy(const DataKey &key, SampleBuffer buffer);
+
 	// --- Reading ---------------------------------------------------------
 
 	// Newest chunk. nullopt if the key is absent or has no chunks yet.
