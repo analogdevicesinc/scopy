@@ -57,6 +57,9 @@ if(NOT (IIO_LIBRARIES AND IIO_INCLUDE_DIRS))
 	)
 endif()
 
+# Tests needing a live libiio context; OFF so CI runs only hardware-free tests.
+option(DC_ENABLE_HARDWARE_TESTS "Build device-controller tests that require a live libiio context" OFF)
+
 add_subdirectory(core)
 add_subdirectory(iio-utils)
 add_subdirectory(iio-backend-v0)
