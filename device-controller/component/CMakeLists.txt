@@ -59,3 +59,8 @@ install(
 	COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 )
+
+# Fake-backed tests, no hardware.
+if(ENABLE_TESTING)
+	add_subdirectory(test)
+endif()

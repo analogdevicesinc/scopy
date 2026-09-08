@@ -46,3 +46,8 @@ target_link_libraries(controller-iioutils PUBLIC controller-core Qt6::Core)
 install(TARGETS controller-iioutils LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}
 )
+
+# Backend tests need a live libiio context (DC_TEST_URI); opt in via -DDC_ENABLE_HARDWARE_TESTS=ON.
+if(ENABLE_TESTING AND DC_ENABLE_HARDWARE_TESTS)
+	add_subdirectory(test)
+endif()
