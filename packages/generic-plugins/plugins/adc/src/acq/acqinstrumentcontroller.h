@@ -32,9 +32,12 @@ struct iio_context;
 namespace scopy {
 class CollapsableMenuControlButton;
 class GenalyzerPanel;
+class MenuSectionCollapseWidget;
 
 namespace acq {
 class GenalyzerFFTProcessor;
+class SnapshotSource;
+class SnapshotSourceWidget;
 class SourceBlock;
 } // namespace acq
 namespace adc {
@@ -73,6 +76,12 @@ private:
 	// Registers the test pipeline on the instrument's engine.
 	void setupBlocks(iio_context *ctx);
 
+	// The snapshot source and its panel. Separate from setupBlocks' hardware path
+	// because this block needs no device — it freezes streams that already exist, so it
+	// is useful whether or not a context was opened. Its widget has to be built here
+	// rather than by the block: the key pickers need the DataStore and the engine.
+	void setupSnapshotBlock(MenuSectionCollapseWidget *sourcesGroup);
+
 	// One nested row per channel the source declares, each with a switch bound to the
 	// source's own enable state. Rebuilt on channelsChanged(), which is why the rows
 	// are not written out by hand at composition time — a source can gain or lose
@@ -107,6 +116,10 @@ private:
 	// Parented to the engine, so listed here only for the settings pages.
 	sim::PlutoIIOSource            *m_plutoSrc{nullptr};
 	scopy::acq::GenalyzerFFTProcessor *m_fftProc{nullptr};
+	scopy::acq::SnapshotSource        *m_snapSrc{nullptr};
+
+	// Handed to m_snapSrc via setSettingsWidget(), so owned by the menu page's layout.
+	QPointer<scopy::acq::SnapshotSourceWidget> m_snapWidget;
 
 	// Parented to the instrument.
 	QPointer<AcqPlotManager> m_plots;

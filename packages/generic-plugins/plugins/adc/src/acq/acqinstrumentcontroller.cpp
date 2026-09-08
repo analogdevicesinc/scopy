@@ -29,7 +29,10 @@
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
+#include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
+#include <core/acq_engine/SnapshotSource.h>
+#include <core/acq_engine/SnapshotSourceWidget.h>
 #include <core/acq_engine/SourceBlock.h>
 #include <gui/instrumenttemplate.h>
 #include <gui/style.h>
@@ -107,14 +110,20 @@ void AcqInstrumentController::init(iio_context *ctx)
 
 void AcqInstrumentController::setupBlocks(iio_context *ctx)
 {
-	if(!ctx) {
-		// PlutoIIOSource opens a real IIO buffer device; there is no simulated
-		// stand-in here, so the instrument stays empty rather than pretending.
-		return;
-	}
-
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
 	InstrumentTemplate            *it = m_ui->shell();
+
+	// The group both paths add to. Created up front because the snapshot source belongs
+	// in it whether or not a context was opened.
+	MenuSectionCollapseWidget *sources = it->addChannelGroup("Sources");
+	setupSnapshotBlock(sources);
+
+	if(!ctx) {
+		// PlutoIIOSource opens a real IIO buffer device; there is no simulated
+		// stand-in here, so the hardware half of the pipeline is skipped rather than
+		// pretended. The snapshot source above still works — it needs no device.
+		return;
+	}
 
 	m_plutoSrc = new sim::PlutoIIOSource(ctx, "pluto", "cf-ad9361-lpc", engine);
 	m_plutoSrc->enableChannel("voltage0", true);
@@ -137,7 +146,7 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 	// Rail rows, so both blocks are reachable and the pipeline tab has something to
 	// draw. No colours: these are pipeline blocks, and a coloured swatch on the rail
 	// means "this is the curve you see in that colour" — only plot channels have one.
-	MenuSectionCollapseWidget *sources = it->addChannelGroup("Sources");
+	//
 	// Expandable, so the source's channels hang under it as a tree rather than as a
 	// flat list that says nothing about which device they belong to.
 	CollapsableMenuControlButton *plutoRow =
@@ -148,6 +157,48 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 	MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
 	it->addChannelRow(procs, "FFT", QColor(), "fft");
 	it->addMenuPage("fft", blockPage(it, m_fftProc, "GENALYZER FFT"));
+}
+
+void AcqInstrumentController::setupSnapshotBlock(MenuSectionCollapseWidget *sourcesGroup)
+{
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+	scopy::acq::DataStore         *store = m_ui->store();
+	InstrumentTemplate            *it = m_ui->shell();
+
+	m_snapSrc = new scopy::acq::SnapshotSource("snapshot", engine);
+	// The store it captures *from*, which is the same one the engine writes to. A block
+	// cannot reach it on its own.
+	m_snapSrc->setSourceStore(store);
+	// One empty slot, so the panel opens on something to configure rather than on a bare
+	// "add" button. It publishes nothing until captured.
+	m_snapSrc->addSlot();
+	engine->addSource(m_snapSrc);
+
+	// Host-built widget: its key pickers need the DataStore and the engine, which the
+	// constructor of a block has no way to supply. Same pattern the trigger uses.
+	auto *body = new QWidget;
+	auto *lay = new QVBoxLayout(body);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(4);
+	// The base virtual explicitly, or SnapshotSource's override builds a second panel
+	// inside the one we are assembling.
+	lay->addWidget(m_snapSrc->SourceBlock::createSettingsWidget(body));
+	m_snapWidget = new scopy::acq::SnapshotSourceWidget(m_snapSrc, store, engine, body);
+	lay->addWidget(m_snapWidget);
+	// Before any settingsWidget() call, which blockPage() below is.
+	m_snapSrc->setSettingsWidget(body);
+
+	it->addChannelRow(sourcesGroup, "Snapshot", QColor(), "snapshot");
+	it->addMenuPage("snapshot", blockPage(it, m_snapSrc, "SNAPSHOT"));
+
+	// Queued: keysChanged comes off the engine's worker thread.
+	connect(store, &scopy::acq::DataStore::keysChanged, m_snapWidget,
+		[this](const QList<scopy::acq::DataKey> &) {
+			if(m_snapWidget) {
+				m_snapWidget->refreshKeys();
+			}
+		},
+		Qt::QueuedConnection);
 }
 
 void AcqInstrumentController::addSourceChannelRows(CollapsableMenuControlButton *parentRow,
