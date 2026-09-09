@@ -20,7 +20,6 @@
  */
 
 #include "acquisitionmanager.h"
-#include "qtconcurrentrun.h"
 #include <QLoggingCategory>
 #include <QTimer>
 #include <component/attribute.h>
@@ -41,23 +40,25 @@ AcquisitionManager::AcquisitionManager(component::ContextHandle ctx, QObject *pa
 {
 	Preferences *p = Preferences::GetInstance();
 	m_concurrentAcq = p->get("pqm_concurrent").toBool();
-	m_readFw = new QFutureWatcher<void>(this);
-	m_setFw = new QFutureWatcher<void>(this);
 	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(dev) {
 		// might need to set a trigger for the pqm device
 		m_inputStream = dev->findChild<component::iio::IIOInputStream *>();
 		m_pqmLog = new PqmDataLogger(this);
-		m_hasFwVers = dev->findChild<component::Attribute *>(
-			"fw_version", Qt::FindDirectChildrenOnly); // iio_device_find_attr(dev, "fw_version");
-		readPqmAttributes();
+		m_hasFwVers = dev->findChild<component::Attribute *>("fw_version", Qt::FindDirectChildrenOnly);
+		QCoro::waitFor(readPqmAttributes());
 		QList<int> enabledChnls = enableBufferChnls(dev);
 
 		if(!QCoro::waitFor(m_inputStream->openAsync({enabledChnls, BUFFER_SIZE}))) {
 			qWarning(CAT_PQM_ACQ) << "Cannot create the buffer!";
 		}
-		connect(m_readFw, &QFutureWatcher<void>::finished, this, &AcquisitionManager::onReadFinished,
-			Qt::QueuedConnection);
+		m_timer.setInterval(0);
+		connect(&m_timer, &QTimer::timeout, this, [this]() {
+			if(m_cycleInFlight) {
+				return;
+			}
+			m_acqTask = acquisitionTask();
+		});
 		connect(this, &AcquisitionManager::logData, m_pqmLog, &PqmDataLogger::logPressed);
 		connect(p, &Preferences::preferenceChanged, this, [this](QString pref, QVariant value) {
 			if(pref == "pqm_concurrent") {
@@ -72,15 +73,14 @@ AcquisitionManager::AcquisitionManager(component::ContextHandle ctx, QObject *pa
 
 AcquisitionManager::~AcquisitionManager()
 {
-	if(m_readFw) {
-		m_readFw->waitForFinished();
-		m_readFw->deleteLater();
-		m_readFw = nullptr;
+	m_timer.stop();
+	if(m_acqTask) {
+		QCoro::waitFor(m_acqTask.value());
+		m_acqTask.reset();
 	}
-	if(m_setFw) {
-		m_setFw->waitForFinished();
-		m_setFw->deleteLater();
-		m_setFw = nullptr;
+	if(m_setTask) {
+		QCoro::waitFor(m_setTask.value());
+		m_setTask.reset();
 	}
 	if(m_inputStream && m_inputStream->isOpen()) {
 		QCoro::waitFor(m_inputStream->closeAsync());
@@ -111,83 +111,107 @@ QList<int> AcquisitionManager::enableBufferChnls(component::Device *dev)
 	return enabledChnls;
 }
 
+bool AcquisitionManager::isAnyToolEnabled() const
+{
+	return std::find(m_tools.cbegin(), m_tools.cend(), true) != m_tools.cend();
+}
+
 void AcquisitionManager::toolEnabled(bool en, QString toolName)
 {
 	m_tools[toolName] = en;
-	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
-	if(it != m_tools.cend()) {
-		stopPing();
-		storeProcessData();
-		if(!m_readFw->isRunning()) {
-			futureReadData();
-		}
+	if(isAnyToolEnabled()) {
+		startAcquisition();
 	} else {
-		m_readFw->waitForFinished();
-		m_readFw->cancel();
-		startPing();
+		stopAcquisition();
 	}
 }
 
-void AcquisitionManager::futureReadData()
+void AcquisitionManager::startAcquisition()
 {
-	if(!m_readFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(&AcquisitionManager::readData, this);
-		m_readFw->setFuture(f);
+	if(m_timer.isActive()) {
+		return;
 	}
+	stopPing();
+	QCoro::waitFor(storeProcessData());
+	m_timer.start();
 }
 
-void AcquisitionManager::readData()
+void AcquisitionManager::stopAcquisition()
 {
-	QMutexLocker locker(&m_mutex);
+	if(!m_timer.isActive()) {
+		return;
+	}
+	m_timer.stop();
+	startPing();
+}
 
+QCoro::Task<void> AcquisitionManager::acquisitionTask()
+{
+	m_cycleInFlight = true;
+	co_await readData();
+	if(m_timer.isActive()) {
+		if(m_attrHaveBeenRead) {
+			m_attrHaveBeenRead = false;
+			Q_EMIT pqmAttrsAvailable(m_pqmAttr);
+		}
+		if(m_buffHaveBeenRead) {
+			m_buffHaveBeenRead = false;
+			Q_EMIT bufferDataAvailable(m_bufferData);
+		}
+	}
+	m_cycleInFlight = false;
+}
+
+QCoro::Task<void> AcquisitionManager::readData()
+{
 	bool needsAttrData = m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"];
 	bool needsBufferData = m_tools["waveform"];
 	if(m_concurrentAcq && needsAttrData && needsBufferData) {
 		if(m_alternateExecution) {
-			readBuffData();
+			co_await readBuffData();
 		} else {
-			readAttrData();
+			co_await readAttrData();
 		}
 		m_alternateExecution = !m_alternateExecution;
 	} else {
 		if(needsAttrData) {
-			readAttrData();
+			co_await readAttrData();
 		}
 		if(needsBufferData) {
-			readBuffData();
+			co_await readBuffData();
 		}
 	}
 }
 
-void AcquisitionManager::readAttrData()
+QCoro::Task<void> AcquisitionManager::readAttrData()
 {
 	if(!m_processData.load()) {
-		setProcessData(true);
+		co_await setProcessData(true);
 	}
-	m_attrHaveBeenRead = readPqmAttributes();
+	m_attrHaveBeenRead = co_await readPqmAttributes();
 	adjustMap("angle", &AcquisitionManager::computeAdjustedAngle);
 }
 
-void AcquisitionManager::readBuffData()
+QCoro::Task<void> AcquisitionManager::readBuffData()
 {
 	if(m_processData.load()) {
-		setProcessData(false);
+		co_await setProcessData(false);
 	}
-	m_buffHaveBeenRead = readBufferedData();
+	m_buffHaveBeenRead = co_await readBufferedData();
 }
 
-bool AcquisitionManager::readPqmAttributes()
+QCoro::Task<bool> AcquisitionManager::readPqmAttributes()
 {
 	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
 		qDebug(CAT_PQM_ACQ) << "Device is unavailable!";
-		return false;
+		co_return false;
 	}
 	const QList<component::Attribute *> devAttributes =
 		dev->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
 	for(component::Attribute *attr : devAttributes) {
 		if(attr->readCapability()) {
-			QCoro::waitFor(attr->readCapability()->readAsync());
+			co_await attr->readCapability()->readAsync();
 		}
 		m_pqmAttr[DEVICE_PQM][attr->name()] = attr->cachedValue();
 	}
@@ -197,7 +221,7 @@ bool AcquisitionManager::readPqmAttributes()
 			chnl->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
 		for(component::Attribute *attr : chAttributes) {
 			if(attr->readCapability()) {
-				QCoro::waitFor(attr->readCapability()->readAsync());
+				co_await attr->readCapability()->readAsync();
 			}
 			m_pqmAttr[chnl->name()][attr->name()] = attr->cachedValue();
 		}
@@ -205,19 +229,21 @@ bool AcquisitionManager::readPqmAttributes()
 	m_pqmLog->acquireAttrData(m_pqmAttr);
 	handlePQEvents();
 	m_pqmLog->log();
-	return true;
+	co_return true;
 }
 
-bool AcquisitionManager::readBufferedData()
+QCoro::Task<bool> AcquisitionManager::readBufferedData()
 {
 	if(!m_inputStream || !m_inputStream->isOpen()) {
 		qWarning(CAT_PQM_ACQ) << "The buffer is NULL!";
-		return false;
+		m_cycleInFlight = false;
+		stopAcquisition();
+		co_return false;
 	}
-	Result<void> r = QCoro::waitFor(m_inputStream->refillAsync());
+	Result<void> r = co_await m_inputStream->refillAsync();
 	if(!r) {
 		qWarning(CAT_PQM_ACQ) << "An error occurred while refilling! [" << r.error().errorCode() << "]";
-		return false;
+		co_return false;
 	}
 
 	component::StreamView view(m_inputStream->readFormat());
@@ -231,24 +257,9 @@ bool AcquisitionManager::readBufferedData()
 		m_bufferData[chnl].append(chnlStream);
 		chnlIdx++;
 	}
+	m_pqmLog->acquireBufferData(m_bufferData);
 	m_pqmLog->log();
-	return true;
-}
-
-void AcquisitionManager::onReadFinished()
-{
-	if(m_attrHaveBeenRead) {
-		m_attrHaveBeenRead = false;
-		Q_EMIT pqmAttrsAvailable(m_pqmAttr);
-	}
-	if(m_buffHaveBeenRead) {
-		m_buffHaveBeenRead = false;
-		Q_EMIT bufferDataAvailable(m_bufferData);
-	}
-	QMap<QString, bool>::const_iterator it = std::find(m_tools.cbegin(), m_tools.cend(), true);
-	if(it != m_tools.cend() && m_readFw) {
-		futureReadData();
-	}
+	co_return true;
 }
 
 double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
@@ -263,13 +274,7 @@ double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
 	return result;
 }
 
-void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr)
-{
-	if(!m_setFw->isRunning()) {
-		QFuture<void> f = QtConcurrent::run(&AcquisitionManager::setData, this, attr);
-		m_setFw->setFuture(f);
-	}
-}
+void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr) { m_setTask = setData(attr); }
 
 void AcquisitionManager::startPing()
 {
@@ -283,12 +288,11 @@ void AcquisitionManager::stopPing()
 	ping->stopMonitoring();
 }
 
-void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
+QCoro::Task<void> AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 {
-	QMutexLocker locker(&m_mutex);
 	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
-		return;
+		co_return;
 	}
 	const QStringList keys = attr[DEVICE_PQM].keys();
 	for(const QString &key : keys) {
@@ -296,42 +300,40 @@ void AcquisitionManager::setData(QMap<QString, QMap<QString, QString>> attr)
 		   attr[DEVICE_PQM][key].compare(m_pqmAttr[DEVICE_PQM][key]) != 0) {
 			QString newVal = attr[DEVICE_PQM][key];
 			m_pqmAttr[DEVICE_PQM][key] = newVal;
-			component::Attribute *attr = dev->findChild<component::Attribute *>(key);
-			if(attr && attr->writeCapability()) {
-				QCoro::waitFor(attr->writeCapability()->writeAsync(newVal));
+			component::Attribute *devAttr = dev->findChild<component::Attribute *>(key);
+			if(devAttr && devAttr->writeCapability()) {
+				co_await devAttr->writeCapability()->writeAsync(newVal);
 			}
 		}
 	}
 }
 
-void AcquisitionManager::setProcessData(bool en)
+QCoro::Task<void> AcquisitionManager::setProcessData(bool en)
 {
 	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
 		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
-		return;
+		co_return;
 	}
 	component::Attribute *attr = dev->findChild<component::Attribute *>("process_data");
-	if(!attr || !attr->writeCapability() ||
-	   !QCoro::waitFor(attr->writeCapability()->writeAsync(QString::number(en)))) {
+	if(!attr || !attr->writeCapability() || !co_await attr->writeCapability()->writeAsync(QString::number(en))) {
 		qWarning(CAT_PQM_ACQ) << "Cannot write process_data attribute!";
-		return;
+		co_return;
 	}
 
 	m_processData.store(en);
 	qInfo(CAT_PQM_ACQ) << "process_data was written successfully:" << en;
 }
 
-void AcquisitionManager::storeProcessData()
+QCoro::Task<void> AcquisitionManager::storeProcessData()
 {
-	QMutexLocker locker(&m_mutex);
 	component::Device *dev = m_ctx->findChild<component::Device *>(DEVICE_PQM);
 	if(!dev) {
 		qWarning(CAT_PQM_ACQ) << "Device is unavailable!";
-		return;
+		co_return;
 	}
 	component::Attribute *attr = dev->findChild<component::Attribute *>("process_data");
-	Result<QByteArray> r = QCoro::waitFor(attr->readCapability()->readAsync());
+	Result<QByteArray> r = co_await attr->readCapability()->readAsync();
 	if(!r) {
 		qWarning(CAT_PQM_ACQ) << "Cannot read process_data attribute!";
 	} else {

@@ -44,6 +44,7 @@ public:
 
 	void setChnlsName(QStringList chnlsName);
 	void acquireBufferData(double val, int chIdx);
+	void acquireBufferData(const QMap<QString, QVector<double>> &bufferData);
 	void acquireAttrData(QMap<QString, QMap<QString, QString>> pqmAttr);
 	void acquirePqEvents(QString event);
 	void log();
