@@ -50,7 +50,7 @@ void TestResult::successValue()
 
 void TestResult::errorValue()
 {
-	Result<QByteArray> r(Unexpected{Error{-ENOENT, QStringLiteral("missing")}});
+	Result<QByteArray> r(Unexpected<Error>{Error{-ENOENT, QStringLiteral("missing")}});
 	QVERIFY(!r.hasValue());
 	QVERIFY(!bool(r));
 	QCOMPARE(r.error().code, -ENOENT);
@@ -63,7 +63,7 @@ void TestResult::valueOr()
 	Result<int> ok(42);
 	QCOMPARE(ok.valueOr(-1), 42);
 
-	Result<int> bad(Unexpected{Error{-EIO}});
+	Result<int> bad(Unexpected<Error>{Error{-EIO}});
 	QCOMPARE(bad.valueOr(-1), -1);
 }
 
@@ -76,7 +76,7 @@ void TestResult::voidSuccess()
 
 void TestResult::voidError()
 {
-	Result<void> r(Unexpected{Error{-EIO, QStringLiteral("io")}});
+	Result<void> r(Unexpected<Error>{Error{-EIO, QStringLiteral("io")}});
 	QVERIFY(!r.hasValue());
 	QVERIFY(!bool(r));
 	QCOMPARE(r.error().code, -EIO);
@@ -89,7 +89,7 @@ void TestResult::sameTypeTag()
 	QVERIFY(value.hasValue());
 	QCOMPARE(value.value().code, 7);
 
-	Result<Error, Error> err(Unexpected{Error{-1, QStringLiteral("fail")}});
+	Result<Error, Error> err(Unexpected<Error>{Error{-1, QStringLiteral("fail")}});
 	QVERIFY(!err.hasValue());
 	QCOMPARE(err.error().code, -1);
 }
