@@ -24,7 +24,11 @@
 
 #include <QObject>
 #include <QMap>
-#include <QFutureWatcher>
+#include <QTimer>
+
+#include <atomic>
+#include <optional>
+#include <qcoro/qcorotask.h>
 
 #include <iioutil/commandqueue.h>
 #include <iioutil/pingtask.h>
@@ -62,33 +66,32 @@ Q_SIGNALS:
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 	void pqEvent();
 
-private Q_SLOTS:
-	void futureReadData();
-	void onReadFinished();
-
 private:
 	double convertFromHwToHost(int value, QString chnlId);
 	QList<int> enableBufferChnls(component::Device *dev);
-	void readData();
-	void readAttrData();
-	void readBuffData();
-	bool readPqmAttributes();
-	bool readBufferedData();
-	void setData(QMap<QString, QMap<QString, QString>>);
-	void setProcessData(bool val);
-	void storeProcessData();
+	bool isAnyToolEnabled() const;
+	QCoro::Task<void> acquisitionTask();
+	QCoro::Task<void> readData();
+	QCoro::Task<void> readAttrData();
+	QCoro::Task<void> readBuffData();
+	QCoro::Task<bool> readPqmAttributes();
+	QCoro::Task<bool> readBufferedData();
+	QCoro::Task<void> setData(QMap<QString, QMap<QString, QString>>);
+	QCoro::Task<void> setProcessData(bool val);
+	QCoro::Task<void> storeProcessData();
 	void handlePQEvents();
 	void adjustMap(const QString &attr, std::function<void(QString &)> adjuster);
 	static void computeAdjustedAngle(QString &angle);
+	void startAcquisition();
+	void stopAcquisition();
 
 	component::ContextHandle m_ctx;
 	component::iio::IIOInputStream *m_inputStream = nullptr;
 	PqmDataLogger *m_pqmLog;
 
-	QFutureWatcher<void> *m_readFw;
-	QFutureWatcher<void> *m_setFw;
+	std::optional<QCoro::Task<void>> m_setTask;
+	std::optional<QCoro::Task<void>> m_acqTask;
 
-	QMutex m_mutex;
 	QStringList m_buffChnls;
 	QStringList m_eventsChnls;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
@@ -96,12 +99,14 @@ private:
 	QMap<QString, bool> m_tools = {{"rms", false}, {"harmonics", false}, {"waveform", false}, {"settings", false}};
 
 	std::atomic<bool> m_processData = false;
+	bool m_cycleInFlight = false;
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
 	bool m_hasFwVers = false;
 	bool m_concurrentAcq = false;
 	bool m_alternateExecution = false;
-	const int THREAD_FINISH_TIMEOUT = 10000;
+
+	QTimer m_timer;
 };
 } // namespace scopy::pqm
 
