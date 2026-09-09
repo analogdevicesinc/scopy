@@ -71,9 +71,9 @@ jobs:
                   TAG="testing"
                   ;;
               *)
-                  # Step 2 of the agreed migration flips this to "latest" once :slim has been
-                  # retagged for all seven images. One line, and :slim retires.
-                  TAG="slim"
+                  # Step 2 of the agreed migration flips this to "latest" once :qcoro-test (or :slim) has been
+                  # retagged for all seven images. One line, and :qcoro-test (or :slim) retires.
+                  TAG="qcoro-test"
                   ;;
             esac
           fi
