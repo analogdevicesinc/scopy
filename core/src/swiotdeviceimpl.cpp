@@ -26,7 +26,8 @@ using namespace scopy;
 void SWIOTDeviceImpl::connectDev()
 {
 	if(!m_context) {
-		m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0);
+		m_context =
+			component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0, m_swiotMaxThreads);
 	}
 	IIODeviceImpl::connectDev();
 }

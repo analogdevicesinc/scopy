@@ -39,14 +39,18 @@ class SCOPY_CORE_EXPORT SWIOTDeviceImpl : public IIODeviceImpl
 {
 	Q_OBJECT
 public:
-	explicit SWIOTDeviceImpl(QString param, QObject *parent = nullptr)
-		: IIODeviceImpl(param, parent)
+	explicit SWIOTDeviceImpl(QString param, int maxThreads = 1, QObject *parent = nullptr)
+		: IIODeviceImpl(param, maxThreads, parent)
+		, m_swiotMaxThreads(maxThreads)
 	{}
 	~SWIOTDeviceImpl() {}
 
 public Q_SLOTS:
 	void connectDev() override;
 	void disconnectDev() override;
+
+private:
+	int m_swiotMaxThreads = 1;
 };
 
 } // namespace scopy

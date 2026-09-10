@@ -66,7 +66,7 @@ void Controller::registerFactory(BackendKind kind, std::shared_ptr<ContextFactor
 	m_factories.insert(kind, std::move(factory));
 }
 
-Context *Controller::_connectCtx(const QString &uri, BackendKind backend)
+Context *Controller::_connectCtx(const QString &uri, BackendKind backend, int maxThreads)
 {
 	auto it = m_factories.constFind(backend);
 	if(it == m_factories.constEnd() || !it.value()) {
@@ -78,7 +78,7 @@ Context *Controller::_connectCtx(const QString &uri, BackendKind backend)
 		e->refCount++;
 		return e->ctx;
 	}
-	Context *ctx = it.value()->create(uri);
+	Context *ctx = it.value()->create(uri, maxThreads);
 	if(ctx) {
 		ctx->setParent(this);
 		m_contexts.insert(uri, CtxEntry{ctx, 1});

@@ -384,6 +384,14 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(PREFERENCE_CHECK_BOX(
 		p, "general_mcp_server_enabled", "Enable the MCP server",
 		"When enabled, Scopy exposes a local MCP control socket for AI agents.", generalSection));
+	generalSection->contentLayout()->addWidget(
+		PREFERENCE_CHECK_BOX(p, "dc_cmd_execution_parallel", "Enable parallel command execution",
+				     "When enabled, Scopy's plugins execute backend commands in parallel using an "
+				     "optimal number of threads. Otherwise, a single thread is used."
+				     "If the device has already been added to the Device Browser, changing this "
+				     "preference will have no "
+				     "effect. The preference is applied when a new device is added.",
+				     generalSection));
 
 	// Auto-connect
 	m_autoConnectWidget = new MenuSectionCollapseWidget("Session ", MenuCollapseSection::MHCW_NONE,
