@@ -373,10 +373,11 @@ void AcqPlotManager::createAddPlotRow(MenuSectionCollapseWidget *group)
 	}
 
 	const QString id = QStringLiteral("acqplot:add");
-	MenuControlButton *row = m_shell->addChannelRow(group, tr("+ Add plot"), QColor(), id);
-	// Its checkbox would read as "this plot is selected" on a row that is not a plot. The
-	// row still joins the exclusive group — that is what shows its page.
-	row->checkBox()->setVisible(false);
+	// A button rather than a channel row: it names no plot, so a row's colour swatch,
+	// switch and gear would all be furniture for something that is not there. It still
+	// joins the rail's exclusive group, which is what shows its page and un-checks it
+	// again when a real plot is selected.
+	m_shell->addRailActionButton(group, tr("Add plot"), id);
 
 	QWidget *page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(page);
