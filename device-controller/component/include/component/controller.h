@@ -100,9 +100,9 @@ public:
 	// built-in kinds; extra kinds can be registered before connect().
 	void registerFactory(BackendKind kind, std::shared_ptr<ContextFactory> factory);
 
-	static ContextHandle connectCtx(const QString &uri, BackendKind backend)
+	static ContextHandle connectCtx(const QString &uri, BackendKind backend, int maxThreads)
 	{
-		Context *ctx = GetInstance()->_connectCtx(uri, backend);
+		Context *ctx = GetInstance()->_connectCtx(uri, backend, maxThreads);
 		return ctx ? ContextHandle(uri, ctx) : ContextHandle();
 	}
 
@@ -125,7 +125,7 @@ private:
 		int refCount = 0;
 	};
 
-	Context *_connectCtx(const QString &uri, BackendKind backend);
+	Context *_connectCtx(const QString &uri, BackendKind backend, int maxThreads);
 	ContextHandle _acquireExisting(const QString &uri);
 	void _disconnectCtx(const QString &uri);
 

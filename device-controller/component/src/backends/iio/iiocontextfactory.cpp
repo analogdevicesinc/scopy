@@ -47,7 +47,7 @@ scopy::iio::IBackend *directBackend()
 } // namespace
 #endif
 
-Context *IIOContextFactory::create(const QString &uri)
+Context *IIOContextFactory::create(const QString &uri, const int maxThreads)
 {
 #ifdef SCOPY_DC_DIRECT_LIBIIO_V0
 	Q_UNUSED(m_version) // version is fixed to v0 at build time in direct-link mode
@@ -69,7 +69,7 @@ Context *IIOContextFactory::create(const QString &uri)
 	ctx->setHandle(handle);
 	ctx->setBackend(backend);
 
-	auto *executor = new PooledCmdExecutor(1, ctx);
+	auto *executor = new PooledCmdExecutor(maxThreads, ctx);
 	ctx->setExecutor(executor);
 
 	IIOComponentBuilder builder(backend);
