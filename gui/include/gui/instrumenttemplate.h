@@ -211,6 +211,12 @@ public:
 	CollapsableMenuControlButton *addExpandableChannelRow(CompositeWidget *group, const QString &name,
 							      const QColor &color, const QString &menuId);
 
+	// A plain checkable button in a rail group, for an entry that is an *action* rather
+	// than a thing — "+ Add plot" names no plot and has no colour, switch or gear, so it
+	// gets none of a row's furniture. It still joins the exclusive selection group and
+	// opens `menuId`, so it un-checks when a real row is picked.
+	QPushButton *addRailActionButton(CompositeWidget *group, const QString &text, const QString &menuId);
+
 	// The switch inside a row built by addChannelSwitchRow, so an owner can bind it
 	// without knowing how the row is assembled. Null for a row built by
 	// addChannelRow — those have a checkbox instead.
