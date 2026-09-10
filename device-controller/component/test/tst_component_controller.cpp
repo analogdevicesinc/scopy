@@ -117,8 +117,9 @@ void TstComponentController::disconnectCascades()
 
 void TstComponentController::unknownBackendReturnsNull()
 {
+	int maxThreads = 1;
 	// M2k has no registered factory -> connectCtx yields an empty handle.
-	QVERIFY(!Controller::connectCtx("fake://m2k", BackendKind::M2k));
+	QVERIFY(!Controller::connectCtx("fake://m2k", BackendKind::M2k, maxThreads));
 }
 
 QTEST_MAIN(TstComponentController)

@@ -517,6 +517,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_scripting_enabled", false);
 	p->init("general_mcp_server_enabled", false);
 	p->init("scopy_git_version", "");
+	p->init("dc_cmd_execution_parallel", false);
 
 	connect(p, &Preferences::preferenceChanged, this, &ScopyMainWindow::handlePreferences);
 	DEBUGTIMER_LOG(benchmark, "Init preferences took:");
