@@ -164,11 +164,13 @@ void InstrumentTemplate::setupRegions()
 		// minimumSizeHint; a floor that high is a floor the handle cannot cross, so
 		// the panels are allowed all the way down to collapsed.
 		panel->setMinimumWidth(0);
-		// Only the two menus get a background. ToolTemplate already paints itself
-		// background_subtle, so the center inherits it by staying transparent — see
-		// docs/acq-engine/08-instrument-layout.md.
-		Style::setBackgroundColor(panel, json::theme::background_primary);
 	}
+	// The right menu is one surface: one page at a time, so one fill. The rail is not —
+	// each of its groups carries its own, with the panel showing through between them —
+	// so it stays transparent over ToolTemplate's background_subtle. See
+	// docs/acq-engine/08-instrument-layout.md.
+	Style::setBackgroundColor(m_rightPanel, json::theme::background_primary);
+	Style::setBackgroundColor(m_leftPanel, QString("transparent"));
 
 	// The whole stack is wrapped rather than each page, so pages stay plain QWidgets and
 	// no caller of addMenuPage()/leftStack()->add() changes.
@@ -465,9 +467,19 @@ MenuSectionCollapseWidget *InstrumentTemplate::addChannelGroup(const QString &ti
 	MenuSectionCollapseWidget *group = new MenuSectionCollapseWidget(
 		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, m_vcm);
 
-	// The rail is already a surface; a panel fill per group would be a second border
-	// saying the same thing.
-	Style::setBackgroundColor(group->menuSection(), QString("transparent"));
+	// Each group keeps MenuSectionWidget's own fill and border rather than being flattened
+	// to transparent: the rail panel *is* transparent now, so the gap the
+	// VerticalChannelManager leaves between groups reads as empty space between three
+	// separate sections instead of three headings sharing one surface.
+	//
+	// The gap is the group's own bottom margin rather than the rail's layout spacing:
+	// VerticalChannelManager is shared with the older instruments, which put bare rows in
+	// it and would come out loose if the spacing there grew.
+	if(QLayout *outer = group->layout()) {
+		QMargins m = outer->contentsMargins();
+		m.setBottom(m.bottom() + Style::getDimension(json::global::unit_1));
+		outer->setContentsMargins(m);
+	}
 
 	m_vcm->add(group);
 	m_groups.insert(title, group);
@@ -577,6 +589,34 @@ CollapsableMenuControlButton *InstrumentTemplate::addExpandableChannelRow(Compos
 	connect(hdr, &QAbstractButton::clicked, arrow, [arrow]() { arrow->setChecked(true); });
 
 	return row;
+}
+
+QPushButton *InstrumentTemplate::addRailActionButton(CompositeWidget *group, const QString &text,
+						     const QString &menuId)
+{
+	QPushButton *btn = new QPushButton(text);
+	// Checkable so the exclusive group can hold it, which is what makes it fall back out
+	// when a real row is selected. blueGrayButton is the same fill-and-radius pair the
+	// bottom rail's Debug toggle uses, and it has a :checked state to show that.
+	btn->setCheckable(true);
+	Style::setStyle(btn, style::properties::button::blueGrayButton);
+	Style::setStyle(btn, style::properties::label::menuMedium);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	m_channelGroup->addButton(btn);
+	if(group) {
+		group->add(btn);
+	}
+
+	if(!menuId.isEmpty()) {
+		connect(btn, &QAbstractButton::clicked, this, [this, menuId](bool b) {
+			if(b) {
+				showMenuPage(menuId);
+			}
+		});
+	}
+
+	return btn;
 }
 
 SmallOnOffSwitch *InstrumentTemplate::rowSwitch(MenuControlButton *row)
