@@ -35,6 +35,7 @@ class GenalyzerPanel;
 class MenuSectionCollapseWidget;
 
 namespace acq {
+class Block;
 class GenalyzerFFTProcessor;
 class SnapshotSource;
 class SnapshotSourceWidget;
@@ -46,15 +47,17 @@ namespace sim {
 class PlutoIIOSource;
 }
 
+class Adxl355Source;
 class AcqInstrument;
 class AcqPlotManager;
 
 // Composition root for one AcqInstrument.
 //
 // Blocks are constructed and registered here — the instrument itself never names
-// one. Currently a PlutoSDR source and a genalyzer FFT over its I/Q, for testing.
-// Plots and channels are built here too, for the same reason: the instrument owns
-// the engine and the store, not a view of them.
+// one. Which sources appear depends on what the opened context holds: a PlutoSDR
+// source with a genalyzer FFT over its I/Q, an ADXL355 accelerometer source, or
+// neither. Plots and channels are built here too, for the same reason: the
+// instrument owns the engine and the store, not a view of them.
 class AcqInstrumentController : public QObject
 {
 	Q_OBJECT
@@ -63,8 +66,8 @@ public:
 	~AcqInstrumentController() override;
 
 	// Build the instrument, register blocks and wire it to the tool menu entry.
-	// Call once. `ctx` may be null, in which case no blocks are registered — the
-	// only source here needs real hardware.
+	// Call once. `ctx` may be null, in which case only the snapshot source is
+	// registered — every other source here needs real hardware.
 	void init(iio_context *ctx = nullptr);
 
 	// Stop the engine if running. Safe before init() and more than once.
@@ -76,11 +79,31 @@ private:
 	// Registers the test pipeline on the instrument's engine.
 	void setupBlocks(iio_context *ctx);
 
+	// The PlutoSDR source and the genalyzer FFT over its I/Q. Skipped when the
+	// context holds no cf-ad9361-lpc, which is every non-Pluto device — the
+	// instrument is not Pluto-specific, so a missing device is a source that does
+	// not appear rather than a failed setup. Returns true if it registered.
+	bool setupPlutoBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
+
+	// The ADXL355 accelerometer source, same deal: registered only when the
+	// context actually has the device. Separate from the Pluto path rather than
+	// chained to it — a context could in principle carry both, and neither is the
+	// other's fallback.
+	bool setupAdxlBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
+
 	// The snapshot source and its panel. Separate from setupBlocks' hardware path
 	// because this block needs no device — it freezes streams that already exist, so it
 	// is useful whether or not a context was opened. Its widget has to be built here
 	// rather than by the block: the key pickers need the DataStore and the engine.
 	void setupSnapshotBlock(MenuSectionCollapseWidget *sourcesGroup);
+
+	// The one rail entry every block gets, source or processor: an expandable row opening
+	// the block's settings page, with the source's channel rows nested under it. Uniform
+	// by design — the rail is a view of the pipeline, so two blocks should not read as two
+	// different kinds of thing because they sit in different groups.
+	CollapsableMenuControlButton *addBlockRow(MenuSectionCollapseWidget *group, scopy::acq::Block *block,
+						  const QString &label, const QString &pageTitle,
+						  const QString &menuId);
 
 	// One nested row per channel the source declares, each with a switch bound to the
 	// source's own enable state. Rebuilt on channelsChanged(), which is why the rows
@@ -115,6 +138,7 @@ private:
 
 	// Parented to the engine, so listed here only for the settings pages.
 	sim::PlutoIIOSource            *m_plutoSrc{nullptr};
+	Adxl355Source                     *m_adxlSrc{nullptr};
 	scopy::acq::GenalyzerFFTProcessor *m_fftProc{nullptr};
 	scopy::acq::SnapshotSource        *m_snapSrc{nullptr};
 
