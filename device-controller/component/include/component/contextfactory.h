@@ -34,7 +34,7 @@ class ContextFactory
 {
 public:
 	virtual ~ContextFactory() = default;
-	virtual Context *create(const QString &uri) = 0;
+	virtual Context *create(const QString &uri, const int maxThreads) = 0;
 };
 
 } // namespace scopy::component

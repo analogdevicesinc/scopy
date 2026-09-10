@@ -29,11 +29,11 @@ namespace scopy {
 class SCOPY_CORE_EXPORT IIODeviceImpl : public DeviceImpl
 {
 public:
-	explicit IIODeviceImpl(QString param, QObject *parent = nullptr)
+	explicit IIODeviceImpl(QString param, int maxThreads = 1, QObject *parent = nullptr)
 		: DeviceImpl(param, "iio", parent)
 	{
 		// For now, only libiio v0. Changes will be made
-		m_context = component::Controller::connectCtx(param, component::BackendKind::Libiiov0);
+		m_context = component::Controller::connectCtx(param, component::BackendKind::Libiiov0, maxThreads);
 		// we must handle the ping
 	}
 	~IIODeviceImpl() {}

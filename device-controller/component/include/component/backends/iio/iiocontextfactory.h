@@ -37,7 +37,7 @@ public:
 		: m_version(version)
 	{}
 
-	Context *create(const QString &uri) override;
+	Context *create(const QString &uri, const int maxThreads) override;
 
 private:
 	scopy::iio::LibiioVersion m_version;
