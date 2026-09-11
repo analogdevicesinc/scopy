@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Analog Devices Inc.
+ * Copyright (c) 2026 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see https://www.github.com/analogdevicesinc/scopy).
@@ -16,31 +16,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
-#ifndef SCOPY_EXTERNALPSREADERTHREAD_H
-#define SCOPY_EXTERNALPSREADERTHREAD_H
+#pragma once
 
-#include <QThread>
-#include <iioutil/connection.h>
+namespace scopy::iio {
 
-namespace scopy::swiot {
-class ExternalPsReaderThread : public QThread
+struct DataFormat
 {
-	Q_OBJECT
-public:
-	explicit ExternalPsReaderThread(QString uri, QString attr, QObject *parent = nullptr);
-	~ExternalPsReaderThread();
-
-	void run() override;
-Q_SIGNALS:
-	void hasConnectedPowerSupply(bool ps);
-
-private:
-	QString m_uri;
-	QString m_attribute;
-	Connection *m_conn;
+	unsigned int length;
+	unsigned int bits;
+	unsigned int shift;
+	bool is_signed;
+	bool is_fully_defined;
+	bool is_be;
+	bool with_scale;
+	double scale;
+	unsigned int repeat;
+	double offset; // v1 only; v0 backend sets 0.0
 };
-} // namespace scopy::swiot
 
-#endif // SCOPY_EXTERNALPSREADERTHREAD_H
+} // namespace scopy::iio

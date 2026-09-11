@@ -10,6 +10,7 @@ LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 # libad9166-iio: the main branch targets libiio v1; we are on v0.26, so this pin is required.
 LIBAD9166_BRANCH=libad9166-iio-v0
+LIBM2K_BRANCH=main
 LIBSNDFILE_BRANCH=1.2.2
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=v0.1
@@ -17,6 +18,7 @@ KDDOCK_BRANCH=2.2
 ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
+QCORO_BRANCH=v0.13.0
 
 
 # Overridable so a local build can keep multi-GB dep checkouts out of a synced/space-containing

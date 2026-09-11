@@ -21,33 +21,38 @@
 #ifndef SCOPY_DIOCONTROLLER_H
 #define SCOPY_DIOCONTROLLER_H
 
-#include <iio.h>
 #include <QString>
-#include <QThread>
-#include <QTimer>
+#include <QList>
+#include <QObject>
 
-#include <utility>
+namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
 
-namespace scopy::swiot {
+namespace swiot {
 class DioController : public QObject
 {
 	Q_OBJECT
 public:
-	explicit DioController(struct iio_context *context_, QString deviceName = "max14906");
+	explicit DioController(component::Device *device, QString deviceName = "max14906");
 	~DioController() override;
 
 	int getChannelCount();
 
-	iio_device *getDevice() const;
+	component::Device *getDevice() const;
+	component::Channel *getChannel(unsigned int index);
 
 	QString getChannelName(unsigned int index);
 	QString getChannelType(unsigned int index);
 
 private:
 	QString m_deviceName;
-	struct iio_context *m_context;
-	struct iio_device *m_device;
+	component::Device *m_device;
+	QList<component::Channel *> m_channels;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SCOPY_DIOCONTROLLER_H

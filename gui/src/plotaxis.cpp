@@ -183,6 +183,11 @@ void PlotAxis::setVisible(bool val) { m_plot->setAxisVisible(m_axisId, val); }
 
 void PlotAxis::updateAxisScale()
 {
+	// DEBUG(x-axis): a zero-width or non-finite interval makes qwt draw no scale/data (blank axis).
+	if(!qIsFinite(m_min) || !qIsFinite(m_max) || qFuzzyCompare(m_min, m_max)) {
+		qWarning() << "DEBUG PlotAxis::updateAxisScale: DEGENERATE interval pos=" << m_position << "id=" << m_id
+			   << "min=" << m_min << "max=" << m_max << "divs=" << m_divs;
+	}
 	m_plot->setAxisScale(m_axisId, m_min, m_max, (m_max - m_min) / m_divs); // set Divs, limits
 	m_plot->replot();
 	Q_EMIT axisScaleUpdated();

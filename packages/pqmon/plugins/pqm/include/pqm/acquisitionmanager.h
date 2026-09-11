@@ -22,16 +22,24 @@
 #ifndef ACQUISITIONMANAGER_H
 #define ACQUISITIONMANAGER_H
 
-#include "qtimer.h"
-#include <iio.h>
 #include <QObject>
 #include <QMap>
-#include <QFutureWatcher>
+#include <QTimer>
+
+#include <atomic>
+#include <optional>
+#include <qcoro/qcorotask.h>
 
 #include <iioutil/commandqueue.h>
 #include <iioutil/pingtask.h>
 
 #include <pqmdatalogger.h>
+
+#include <component/context.h>
+#include <component/controller.h>
+#include <component/device.h>
+
+#include <component/backends/iio/iioinputstream.h>
 
 #define MAX_ATTR_SIZE 1024
 #define BUFFER_SIZE 256
@@ -41,7 +49,7 @@ class AcquisitionManager : public QObject
 {
 	Q_OBJECT
 public:
-	AcquisitionManager(iio_context *ctx, PingTask *pingTask, QObject *parent = nullptr);
+	AcquisitionManager(component::ContextHandle ctx, QObject *parent = nullptr);
 	~AcquisitionManager();
 
 	bool hasFwVers() const;
@@ -58,36 +66,32 @@ Q_SIGNALS:
 	void logData(PqmDataLogger::ActiveInstrument instr, const QString &filePath);
 	void pqEvent();
 
-private Q_SLOTS:
-	void futureReadData();
-	void onReadFinished();
-	void pingTimerTimeout();
-
 private:
 	double convertFromHwToHost(int value, QString chnlId);
-	void enableBufferChnls(iio_device *dev);
-	void readData();
-	void readAttrData();
-	void readBuffData();
-	bool readPqmAttributes();
-	bool readBufferedData();
-	void setData(QMap<QString, QMap<QString, QString>>);
-	void setProcessData(bool val);
-	void storeProcessData();
+	QList<int> enableBufferChnls(component::Device *dev);
+	bool isAnyToolEnabled() const;
+	QCoro::Task<void> acquisitionTask();
+	QCoro::Task<void> readData();
+	QCoro::Task<void> readAttrData();
+	QCoro::Task<void> readBuffData();
+	QCoro::Task<bool> readPqmAttributes();
+	QCoro::Task<bool> readBufferedData();
+	QCoro::Task<void> setData(QMap<QString, QMap<QString, QString>>);
+	QCoro::Task<void> setProcessData(bool val);
+	QCoro::Task<void> storeProcessData();
 	void handlePQEvents();
 	void adjustMap(const QString &attr, std::function<void(QString &)> adjuster);
 	static void computeAdjustedAngle(QString &angle);
+	void startAcquisition();
+	void stopAcquisition();
 
-	iio_context *m_ctx;
-	iio_buffer *m_buffer;
+	component::ContextHandle m_ctx;
+	component::iio::IIOInputStream *m_inputStream = nullptr;
 	PqmDataLogger *m_pqmLog;
 
-	QTimer *m_pingTimer = nullptr;
-	PingTask *m_pingTask = nullptr;
-	QFutureWatcher<void> *m_readFw;
-	QFutureWatcher<void> *m_setFw;
+	std::optional<QCoro::Task<void>> m_setTask;
+	std::optional<QCoro::Task<void>> m_acqTask;
 
-	QMutex m_mutex;
 	QStringList m_buffChnls;
 	QStringList m_eventsChnls;
 	QMap<QString, QMap<QString, QString>> m_pqmAttr;
@@ -95,12 +99,14 @@ private:
 	QMap<QString, bool> m_tools = {{"rms", false}, {"harmonics", false}, {"waveform", false}, {"settings", false}};
 
 	std::atomic<bool> m_processData = false;
+	bool m_cycleInFlight = false;
 	bool m_attrHaveBeenRead = false;
 	bool m_buffHaveBeenRead = false;
 	bool m_hasFwVers = false;
 	bool m_concurrentAcq = false;
 	bool m_alternateExecution = false;
-	const int THREAD_FINISH_TIMEOUT = 10000;
+
+	QTimer m_timer;
 };
 } // namespace scopy::pqm
 

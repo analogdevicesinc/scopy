@@ -242,6 +242,26 @@
 			]
 		},
 		{
+			"name": "libm2k",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DENABLE_PYTHON=OFF",
+				"-DENABLE_CSHARP=OFF",
+				"-DENABLE_TOOLS=OFF",
+				"-DBUILD_EXAMPLES=OFF",
+				"-DINSTALL_UDEV_RULES=OFF"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/analogdevicesinc/libm2k",
+					"branch": "main"
+				}
+			]
+		},
+		{
 			"name": "qwt",
 			"cleanup": [ "/features", "/plugins", "/share" ],
 			"sources": [
@@ -362,6 +382,29 @@
 					"type": "git",
 					"url": "https://github.com/analogdevicesinc/genalyzer.git",
 					"branch": "main"
+				}
+			]
+		},
+		{
+			"name": "qcoro",
+			"builddir": true,
+			"buildsystem": "cmake",
+			"config-opts": [
+				"-DCMAKE_INSTALL_PREFIX:PATH=/app",
+				"-DCMAKE_INSTALL_LIBDIR:STRING=lib",
+				"-DQCORO_BUILD_EXAMPLES=OFF",
+				"-DQCORO_BUILD_TESTING=OFF",
+				"-DBUILD_TESTING=OFF",
+				"-DQCORO_WITH_QTWEBSOCKETS=OFF",
+				"-DQCORO_WITH_QTQUICK=OFF",
+				"-DQCORO_WITH_QML=OFF",
+				"-DBUILD_SHARED_LIBS=ON"
+			],
+			"sources": [
+				{
+					"type": "git",
+					"url": "https://github.com/qcoro/qcoro.git",
+					"tag": "v0.13.0"
 				}
 			]
 		},

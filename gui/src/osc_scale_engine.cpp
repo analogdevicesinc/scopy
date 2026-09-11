@@ -88,6 +88,12 @@ QwtScaleDiv OscScaleEngine::divideScale(double x1, double x2, int maxMajorSteps,
 	if(x1 > x2)
 		scaleDiv.invert();
 
+	// DEBUG(x-axis): dump what OscScaleEngine actually produces for the "points between" min/max.
+	qWarning() << "DEBUG divideScale: x1=" << x1 << "x2=" << x2 << "intMin=" << interval.minValue()
+		   << "intMax=" << interval.maxValue() << "width=" << interval.width() << "stepSize=" << stepSize
+		   << "majorTicks=" << ticks[QwtScaleDiv::MajorTick] << "| scaleDiv.lower=" << scaleDiv.lowerBound()
+		   << "scaleDiv.upper=" << scaleDiv.upperBound();
+
 	return scaleDiv;
 }
 

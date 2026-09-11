@@ -18,94 +18,84 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef READERTHREAD_H
-#define READERTHREAD_H
+#ifndef SWIOTREADER_H
+#define SWIOTREADER_H
 
 #include "ad74413r/chnlinfo.h"
 
-#include <iio.h>
-
+#include <QCloseEvent>
 #include <QMap>
-#include <QMutex>
-#include <QThread>
+#include <QObject>
+#include <QVector>
 
 #include <atomic>
-#include <iioutil/commandqueue.h>
+#include <qcoro/qcorotask.h>
 
-namespace scopy::swiot {
-class ReaderThread : public QThread
+namespace scopy {
+namespace component {
+class Device;
+class Channel;
+namespace iio {
+class IIOInputStream;
+}
+} // namespace component
+
+namespace swiot {
+// Despite the historical name, this is no longer a QThread: the pooled command
+// executor already runs IIO commands on a worker pool, so acquisition is driven
+// by a non-blocking QCoro coroutine loop on the owning (GUI) thread.
+class SwiotReader : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *parent = nullptr);
-	~ReaderThread();
+	explicit SwiotReader(bool isBuffered, QObject *parent = nullptr);
+	~SwiotReader();
 
-	void addDioChannel(int index, struct iio_channel *channel);
+	void addDioChannel(int index, component::Channel *channel);
 
-	void createDioChannelCommand(int index);
+	void addBufferedDevice(component::Device *device);
 
-	void addBufferedDevice(iio_device *device);
-
-	void runDio();
+	// DIO: read the "raw" attribute of every registered channel once (async).
+	void readDio();
 	void singleDio();
-
-	void runBuffered(int requiredBuffersNumber = 0);
-
-	void createIioBuffer();
-
-	void destroyIioBuffer();
-
-	void cancelIioBuffer();
-
-	void enableIioChnls();
-	void initIioChannels();
-
-	int getEnabledChnls();
 
 	QVector<ChnlInfo *> getEnabledBufferedChnls();
 
 	void startCapture(int requiredBuffersNumber = 0);
 
 	void requestStop();
-	void forcedStop();
+	QCoro::Task<void> forcedStop();
+
+	bool isRunning() const { return m_running; }
+
 public Q_SLOTS:
-	void handleConnectionDestroyed();
 	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
 	void onSamplingFrequencyComputed(double samplingFreq);
 
 Q_SIGNALS:
-	void readerThreadFinished();
+	void swiotReaderFinished();
 	void bufferRefilled(QMap<int, QVector<double>> bufferData, int bufferCounter);
 	void channelDataChanged(int channelId, double value);
 
-private Q_SLOTS:
-	void bufferRefillCommandFinished(scopy::Command *cmd);
-	void bufferCreateCommandFinished(scopy::Command *cmd);
-	void bufferDestroyCommandFinished(scopy::Command *cmd);
-	void bufferDestroyCommandStarted(scopy::Command *cmd);
-	void bufferCancelCommandFinished(scopy::Command *cmd);
-
 private:
-	void run() override;
+	QCoro::Task<void> acquisitionLoop();
+	QCoro::Task<void> dioReadOnce();
 
 	bool isBuffered;
-	bool m_deinit;
-	QMap<int, struct iio_channel *> m_dioChannels;
+	QMap<int, component::Channel *> m_dioChannels;
 
 	double m_samplingFreq = 4800;
-	int m_enabledChnlsNo;
 	std::atomic<int> bufferCounter;
 	std::atomic<int> m_requiredBuffersNumber;
-	CommandQueue *m_cmdQueue;
 
-	struct iio_device *m_iioDev;
-	struct iio_buffer *m_iioBuff;
+	component::iio::IIOInputStream *m_inputStream;
 	QMap<int, ChnlInfo *> m_chnlsInfo;
 	QVector<ChnlInfo *> m_bufferedChnls;
 	QMap<int, QVector<double>> m_bufferData;
-	std::atomic<bool> m_running, m_bufferInvalid;
-	std::mutex m_mutex;
+	std::atomic<bool> m_running;
+	std::optional<QCoro::Task<void>> m_acqLoopTask;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
-#endif // READERTHREAD_H
+#endif // SWIOTREADER_H

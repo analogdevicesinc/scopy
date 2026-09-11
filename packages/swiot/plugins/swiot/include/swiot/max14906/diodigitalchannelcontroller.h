@@ -22,17 +22,20 @@
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
 #include "diodigitalchannel.h"
-#include <iio.h>
 
-#include <iioutil/commandqueue.h>
+namespace scopy {
+namespace component {
+class Channel;
+class Attribute;
+} // namespace component
 
-namespace scopy::swiot {
+namespace swiot {
 class DioDigitalChannelController : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit DioDigitalChannelController(struct iio_channel *channel, const QString &deviceName,
-					     const QString &deviceType, CommandQueue *cmdQueue, QWidget *parent);
+	explicit DioDigitalChannelController(component::Channel *channel, const QString &deviceName,
+					     const QString &deviceType, QWidget *parent);
 	~DioDigitalChannelController() override;
 
 	DioDigitalChannel *getDigitalChannel() const;
@@ -41,31 +44,24 @@ private Q_SLOTS:
 	void createWriteRawCommand(bool value);
 	void createWriteTypeCommand(int index);
 
-	void readAvailableTypeCmdFinished(scopy::Command *cmd);
-	void readTypeCmdFinished(scopy::Command *cmd);
-	void readRawCmdFinished(scopy::Command *cmd);
-	void readCurrentLimitCmdFinished(scopy::Command *cmd);
-	void readCurrentLimitAvailableCmdFinished(scopy::Command *cmd);
-	void writeCurrentLimitCmdFinished(scopy::Command *cmd);
-	void writeTypeCmdFinished(scopy::Command *cmd);
-
 private:
+	void initChannelAttributes();
+
 	DioDigitalChannel *m_digitalChannel;
 
 	QString m_channelName;
 	QString m_channelType; // output or input
 
-	QString m_iioAttrAvailableTypes; // iio attribute
 	QStringList m_availableTypes;
-
-	QString m_iioAttrType; // iio attribute
 	QString m_type;
 
-	CommandQueue *m_cmdQueue;
-
-	struct iio_channel *m_channel;
+	component::Channel *m_channel;
+	component::Attribute *m_typeAttr;
+	component::Attribute *m_rawAttr;
+	component::Attribute *m_currentLimitAttr;
 };
 
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SCOPY_DIODIGITALCHANNELCONTROLLER_H

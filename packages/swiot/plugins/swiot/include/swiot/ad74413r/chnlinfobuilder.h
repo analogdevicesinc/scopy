@@ -50,7 +50,7 @@ public:
 			return -1;
 		}
 	}
-	static ChnlInfo *build(iio_channel *iioChnl, QString id, CommandQueue *cmdQueue);
+	static ChnlInfo *build(component::Channel *chnl, QString id);
 };
 } // namespace scopy::swiot
 

@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+#pragma once
+
+#include "core/result.h"
+
+#include <QObject>
+#include <QTimer>
+
+#include <qcoro/qcorotask.h>
+#include "component/component_export.h"
+
+namespace scopy::component {
+
+// Reachability capability (Pattern A base). A single async method: the timer
+// fires checkReachableAsync() (leaf dispatches the ping through the executor) and
+// the leaf reports the outcome via reachabilityChecked(bool), so the GUI thread
+// never blocks in a nested event loop. connectionLost() is emitted once, on first
+// failure. Callers needing a synchronous one-off wrap it: QCoro::waitFor(p->checkReachableAsync()).
+class COMPONENT_EXPORT Ping : public QObject
+{
+	Q_OBJECT
+public:
+	explicit Ping(QObject *parent = nullptr)
+		: QObject(parent)
+	{
+		m_timer.setSingleShot(false);
+		connect(&m_timer, &QTimer::timeout, this, [this]() { checkReachableAsync(); });
+		connect(this, &Ping::reachabilityChecked, this, &Ping::onReachabilityChecked);
+	}
+	~Ping() override = default;
+
+	Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> checkReachableAsync() = 0;
+
+	void startMonitoring(int intervalMs)
+	{
+		m_lost = false;
+		m_timer.start(intervalMs);
+	}
+	void stopMonitoring() { m_timer.stop(); }
+	bool isMonitoring() const { return m_timer.isActive(); }
+
+Q_SIGNALS:
+	void reachabilityChecked(bool reachable);
+	void connectionLost();
+
+private Q_SLOTS:
+	void onReachabilityChecked(bool reachable)
+	{
+		if(m_lost || reachable) {
+			return;
+		}
+		m_lost = true;
+		m_timer.stop();
+		Q_EMIT connectionLost();
+	}
+
+private:
+	QTimer m_timer;
+	bool m_lost = false;
+};
+
+} // namespace scopy::component

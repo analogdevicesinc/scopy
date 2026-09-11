@@ -56,7 +56,7 @@
 		<attribute name="process_data" value="1" />
 		<attribute name="fw_version" value="2.2" />
 		<channel id="voltage0" name="ua" type="input" >
-			<scan-element index="0" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="0" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_voltage0_rms" value="200.6921" />
 			<attribute name="angle" filename="in_voltage0_angle" value="119.99" />
 			<attribute name="deviation_under" filename="in_voltage0_deviation_under" value="0.000" />
@@ -74,7 +74,7 @@
 			<attribute name="maxMagnitude" filename="in_voltage0_maxMagnitude" value="0" />
 		</channel>
 		<channel id="voltage1" name="ub" type="input" >
-			<scan-element index="1" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="1" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_voltage1_rms" value="220.694" />
 			<attribute name="angle" filename="in_voltage1_angle" value="219.99" />
 			<attribute name="deviation_under" filename="in_voltage1_deviation_under" value="0.000" />
@@ -92,7 +92,7 @@
 			<attribute name="maxMagnitude" filename="in_voltage1_maxMagnitude" value="0" />
 		</channel>
 		<channel id="voltage2" name="uc" type="input" >
-			<scan-element index="2" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="2" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_voltage2_rms" value="140.621" />
 			<attribute name="angle" filename="in_voltage2_angle" value="0.000" />
 			<attribute name="deviation_under" filename="in_voltage2_deviation_under" value="0.000" />
@@ -110,7 +110,7 @@
 			<attribute name="maxMagnitude" filename="in_voltage2_maxMagnitude" value="0" />
 		</channel>
 		<channel id="current0" name="ia" type="input" >
-			<scan-element index="3" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="3" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_current0_rms" value="0.001" />
 			<attribute name="angle" filename="in_current0_angle" value="102.36" />
 			<attribute name="thd" filename="in_current0_thd" value="2.000" />
@@ -121,7 +121,7 @@
 			<attribute name="offset" filename="in_current0_offset" value="0.000" />
 		</channel>
 		<channel id="current1" name="ib" type="input" >
-			<scan-element index="4" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="4" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_current1_rms" value="0.002" />
 			<attribute name="angle" filename="in_current1_angle" value="154.00" />
 			<attribute name="thd" filename="in_current1_thd" value="2.001" />
@@ -132,7 +132,7 @@
 			<attribute name="offset" filename="in_current3_offset" value="0.000" />
 		</channel>
 		<channel id="current2" name="ic" type="input" >
-			<scan-element index="5" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="5" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_current2_rms" value="0.003" />
 			<attribute name="angle" filename="in_current2_angle" value="0.000" />
 			<attribute name="thd" filename="in_current2_thd" value="2.002" />
@@ -143,7 +143,7 @@
 			<attribute name="offset" filename="in_current2_offset" value="0.000" />
 		</channel>
 		<channel id="current3" name="in" type="input" >
-			<scan-element index="6" format="be:u24/32&gt;&gt;0" />
+			<scan-element index="6" format="le:s16/16&gt;&gt;0" />
 			<attribute name="rms" filename="in_current3_rms" value="0.000" />
 			<attribute name="angle" filename="in_current3_angle" value="0.000" />
 			<attribute name="raw" filename="in_current3_raw" value="0.000" />

@@ -31,6 +31,8 @@
 #include <QPushButton>
 #include <QTabWidget>
 
+#include <component/controller.h>
+
 namespace scopy {
 class ConnectionLostWidget;
 
@@ -63,6 +65,8 @@ public:
 	QList<Plugin *> plugins() const;
 	DeviceImpl::DeviceState_t state() override;
 	Plugin *getPluginByName(const QString &pluginName);
+
+	component::Context *context() const;
 
 public Q_SLOTS:
 	virtual void connectDev() override;
@@ -116,6 +120,7 @@ protected:
 	QPushButton *connbtn, *discbtn;
 	Plugin *m_pingPlugin = nullptr;
 	ConnectionLostWidget *m_connectionLostWidget = nullptr;
+	component::ContextHandle m_context;
 };
 } // namespace scopy
 

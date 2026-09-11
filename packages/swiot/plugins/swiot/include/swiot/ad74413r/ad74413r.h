@@ -23,10 +23,9 @@
 
 #include "bufferlogic.h"
 #include "bufferacquisitionhandler.h"
+#include "component/controller.h"
 #include "pluginbase/toolmenuentry.h"
-#include "readerthread.h"
-
-#include <iio.h>
+#include "swiotreader.h"
 
 #include <gui/mapstackedwidget.h>
 #include <gui/widgets/toolbuttons.h>
@@ -40,7 +39,6 @@
 #include <plotinfo.h>
 #include <gui/widgets/menuspinbox.h>
 
-#include <iioutil/connection.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #define MAX_CURVES_NUMBER 8
 #define AD_NAME "ad74413r"
@@ -63,18 +61,17 @@ public:
 
 	~Ad74413r();
 
+	QCoro::Task<void> shutdown();
 public Q_SLOTS:
 	void onRunBtnPressed(bool toggled);
 	void onSingleBtnPressed(bool toggled);
 
-	void onReaderThreadFinished();
+	void onSwiotReaderFinished();
 	void onSingleCaptureFinished();
 
 	void onDiagnosticFunctionUpdated();
 
 	void onActivateRunBtns(bool activate);
-
-	void handleConnectionDestroyed();
 
 	void onSamplingFrequencyUpdated(int channelId, int sampFreq);
 
@@ -101,7 +98,6 @@ private:
 	bool eventFilter(QObject *watched, QEvent *event) override;
 	void updateXData(int dataSize);
 	void plotData(QVector<double> curveData, int chnlIdx);
-	void createDevicesMap(iio_context *ctx);
 	void setupConnections();
 	void verifyChnlsChanges();
 	void initTutorialProperties();
@@ -127,13 +123,9 @@ private:
 	QString m_uri;
 
 	BufferLogic *m_swiotAdLogic;
-	ReaderThread *m_readerThread;
+	SwiotReader *m_swiotReader;
 	BufferAcquisitionHandler *m_acqHandler;
-	CommandQueue *m_cmdQueue;
 	MeasurementsPanel *m_measurePanel;
-
-	struct iio_context *m_ctx;
-	Connection *m_conn;
 
 	ToolTemplate *m_tool;
 	RunBtn *m_runBtn;
@@ -148,7 +140,6 @@ private:
 	SamplingInfo m_currentSamplingInfo;
 	QMap<int, PlotChannel *> m_plotChnls;
 
-	QMap<QString, iio_device *> m_iioDevicesMap;
 	CollapsableMenuControlButton *m_devBtn;
 	MenuControlButton *m_chnlsMenuBtn;
 	QButtonGroup *m_rightMenuBtnGrp;
@@ -164,6 +155,8 @@ private:
 	IIOWidgetGroup *m_widgetGroup;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
+
+	component::ContextHandle m_context;
 };
 } // namespace swiot
 } // namespace scopy

@@ -118,6 +118,7 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'libsndfile' ]	|| git clone --recursive https://github.com/libsndfile/libsndfile -b $LIBSNDFILE_BRANCH libsndfile
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
@@ -125,6 +126,7 @@ clone() {
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
 	popd
 }
 
@@ -230,6 +232,19 @@ build_libad9361() {
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	CURRENT_BUILD=libad9166
+	build_with_cmake $1
+}
+
+build_libm2k() {
+	echo "### Building libm2k - branch $LIBM2K_BRANCH"
+	CURRENT_BUILD=libm2k
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF\
+		-DENABLE_CSHARP=OFF\
+		-DBUILD_EXAMPLES=OFF\
+		-DENABLE_TOOLS=OFF\
+		-DINSTALL_UDEV_RULES=OFF\
+		"
 	build_with_cmake $1
 }
 
@@ -388,6 +403,30 @@ build_genalyzer() {
 	JOBS=$PREV_JOBS
 }
 
+build_qcoro() {
+	echo "### Building qcoro - version $QCORO_BRANCH"
+	CURRENT_BUILD=qcoro
+	# QtDBus is auto-disabled by qcoro on WIN32; Network stays ON (qtbase). WebSockets/Quick/QML off
+	# to avoid pulling qtwebsockets/qtdeclarative.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DQCORO_BUILD_EXAMPLES=OFF \
+		-DQCORO_BUILD_TESTING=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQCORO_WITH_QTWEBSOCKETS=OFF \
+		-DQCORO_WITH_QTQUICK=OFF \
+		-DQCORO_WITH_QML=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+
+		local PREV_JOBS=$JOBS
+	JOBS="-j2"
+
+	build_with_cmake $1
+
+	# Restore original jobs variable for the rest of the script
+	JOBS=$PREV_JOBS
+}
+
 build_deps() {
 	install_packages
 	install_qt
@@ -398,6 +437,7 @@ build_deps() {
 	build_libiio ON
 	build_libad9361 ON
 	build_libad9166 ON
+	build_libm2k ON
 	build_libsndfile ON
 	build_qwt ON
 	build_libtinyiiod ON
@@ -405,6 +445,7 @@ build_deps() {
 	build_ecm ON
 	build_karchive ON
 	build_genalyzer ON
+	build_qcoro ON
 }
 
 # Run named steps if any were given, otherwise do the full dependency build. The docker image

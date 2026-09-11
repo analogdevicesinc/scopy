@@ -63,6 +63,26 @@ void PqmDataLogger::acquireBufferData(double val, int chIdx)
 	m_logQue.enqueue(QString::number(val) + ",");
 }
 
+void PqmDataLogger::acquireBufferData(const QMap<QString, QVector<double>> &bufferData)
+{
+	if(m_crtInstr != Waveform) {
+		return;
+	}
+	int sampleCount = 0;
+	for(const QString &ch : std::as_const(m_chnlsName)) {
+		sampleCount = std::max(sampleCount, (int)bufferData.value(ch).size());
+	}
+	QMutexLocker locker(&m_mutex);
+	const QString timestamp = QTime::currentTime().toString("hh:mm:ss.zzz");
+	for(int i = 0; i < sampleCount; ++i) {
+		m_logQue.enqueue("\n" + timestamp + ",");
+		for(const QString &ch : std::as_const(m_chnlsName)) {
+			const QVector<double> &chData = bufferData.value(ch);
+			m_logQue.enqueue((i < chData.size() ? QString::number(chData[i]) : QStringLiteral("-")) + ",");
+		}
+	}
+}
+
 void PqmDataLogger::acquireHarmonics(QMap<QString, QMap<QString, QString>> pqmAttr)
 {
 	QMutexLocker locker(&m_mutex);
