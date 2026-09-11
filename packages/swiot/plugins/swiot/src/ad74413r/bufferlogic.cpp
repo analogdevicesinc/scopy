@@ -23,6 +23,7 @@
 #include <QRegularExpression>
 
 #include "ad74413r/chnlinfobuilder.h"
+#include "swiot_logging_categories.h"
 
 #include <component/attribute.h>
 #include <component/channel.h>
@@ -137,14 +138,23 @@ void BufferLogic::applySamplingFrequencyChanges(int channelId, int value)
 void BufferLogic::computeSamplingFrequency()
 {
 	double newSamplingFrequency = 0.0;
+	int enabledCount = 0;
 	auto keys = m_samplingFrequencies.keys();
 	for(int channelId : keys) {
+		// DEBUG(x-axis): per-channel raw sampling_frequency and enabled state feed the effective rate.
+		qInfo(CAT_SWIOT_AD74413R) << "DEBUG computeSamplingFrequency: chnl=" << channelId
+					  << "rawFreq=" << m_samplingFrequencies[channelId]
+					  << "enabled=" << m_chnlsInfo[channelId]->isEnabled();
 		if(m_chnlsInfo[channelId]->isEnabled()) {
 			newSamplingFrequency += (1.0 / m_samplingFrequencies[channelId]);
+			enabledCount++;
 		}
 	}
 	newSamplingFrequency = (newSamplingFrequency != 0.0) ? (1.0 / newSamplingFrequency) : 1.0;
 	m_samplingFrequency = newSamplingFrequency;
+	// DEBUG(x-axis): effective rate = harmonic-sum over enabled channels (~= rawFreq / enabledCount).
+	qInfo(CAT_SWIOT_AD74413R) << "DEBUG computeSamplingFrequency: enabledCount=" << enabledCount
+				  << "=> effectiveSamplingFrequency=" << newSamplingFrequency;
 	Q_EMIT samplingFrequencyComputed(newSamplingFrequency);
 }
 

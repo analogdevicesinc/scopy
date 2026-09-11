@@ -310,12 +310,29 @@ void Ad74413r::updateXData(int dataSize)
 {
 	double timespanValue = m_timespanSpin->value();
 	double plotSamples = m_currentSamplingInfo.sampleRate * timespanValue;
+	// DEBUG(x-axis): inputs. sampleRate = 4800 / enabled_channels (computeSamplingFrequency).
+	qInfo(CAT_SWIOT_AD74413R) << "DEBUG updateXData: dataSize=" << dataSize
+				  << "sampleRate=" << m_currentSamplingInfo.sampleRate << "timespan=" << timespanValue
+				  << "plotSamples=" << plotSamples;
+	if(m_currentSamplingInfo.sampleRate <= 0 || !qIsFinite(plotSamples) || plotSamples <= 0) {
+		// DEBUG(x-axis): degenerate divisor => x-data becomes inf/nan => blank plot.
+		qWarning(CAT_SWIOT_AD74413R)
+			<< "DEBUG updateXData: BAD DIVISOR sampleRate/plotSamples => blank/invalid x-data";
+	}
 	if(m_xTime.size() == plotSamples && dataSize == plotSamples) {
+		qInfo(CAT_SWIOT_AD74413R) << "DEBUG updateXData: early-return";
 		return;
 	}
 	m_xTime.clear();
 	for(int i = dataSize - 1; i >= 0; i--) {
 		m_xTime.push_back(-(i / plotSamples) * timespanValue);
+	}
+	// DEBUG(x-axis): resulting span vs fixed axis window [-timespan, 0].
+	if(!m_xTime.isEmpty()) {
+		qInfo(CAT_SWIOT_AD74413R)
+			<< "DEBUG updateXData: xTime.size=" << m_xTime.size() << "first(oldest)=" << m_xTime.first()
+			<< "last(newest)=" << m_xTime.last() << "| axis xMin=" << m_plot->xAxis()->min()
+			<< "xMax=" << m_plot->xAxis()->max();
 	}
 }
 
@@ -323,6 +340,11 @@ void Ad74413r::plotData(QVector<double> chnlData, int chnlIdx)
 {
 	int dataSize = chnlData.size();
 	updateXData(dataSize);
+	if(m_xTime.size() != dataSize) {
+		// DEBUG(x-axis): x/y length mismatch => qwt plots min(x,y) => truncated trace.
+		qWarning(CAT_SWIOT_AD74413R) << "DEBUG plotData: LENGTH MISMATCH xTime=" << m_xTime.size()
+					     << "yData=" << dataSize << "chnlIdx=" << chnlIdx;
+	}
 	m_plotChnls[chnlIdx]->curve()->setSamples(m_xTime.data(), chnlData.data(), dataSize);
 	m_currentSamplingInfo.plotSize = dataSize;
 	Q_EMIT updateSamplingInfo();
@@ -333,10 +355,15 @@ void Ad74413r::onBufferRefilled(QMap<int, QVector<double>> bufferData)
 {
 	QList<int> chnls = m_plotChnls.keys();
 	int dataIdx = 0;
+	// DEBUG(x-axis): raw buffer geometry as received from the reader.
+	qInfo(CAT_SWIOT_AD74413R) << "DEBUG onBufferRefilled: bufferKeys=" << bufferData.keys() << "plotChnls=" << chnls
+				  << "enabled=" << m_enabledChannels;
 	for(int chnlIdx : chnls) {
 		if(!m_enabledChannels[chnlIdx]) {
 			continue;
 		}
+		qInfo(CAT_SWIOT_AD74413R) << "DEBUG onBufferRefilled: chnlIdx=" << chnlIdx << "dataIdx=" << dataIdx
+					  << "samples=" << bufferData[dataIdx].size();
 		if(!bufferData[dataIdx].isEmpty()) {
 			plotData(bufferData[dataIdx], chnlIdx);
 			m_labels[chnlIdx].last()->setValue(bufferData[dataIdx].last());
@@ -347,6 +374,9 @@ void Ad74413r::onBufferRefilled(QMap<int, QVector<double>> bufferData)
 
 void Ad74413r::onSamplingFreqComputed(double freq)
 {
+	// DEBUG(x-axis): the sampleRate that drives x-data spacing. Compare across x86/ARM.
+	qInfo(CAT_SWIOT_AD74413R) << "DEBUG onSamplingFreqComputed: freq=" << freq
+				  << "(prev sampleRate=" << m_currentSamplingInfo.sampleRate << ")";
 	m_currentSamplingInfo.sampleRate = freq;
 	Q_EMIT updateSamplingInfo();
 }

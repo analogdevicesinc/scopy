@@ -40,7 +40,9 @@
 #include <gui/docking/dockablearea.h>
 #include <gui/docking/dockwrapper.h>
 #include <pluginbase/preferences.h>
+#include <QLoggingCategory>
 
+Q_LOGGING_CATEGORY(CAT_PQM_WAVEFORM, "PqmWaveform");
 using namespace scopy::pqm;
 
 WaveformInstrument::WaveformInstrument(ToolMenuEntry *tme, QString uri, QWidget *parent)
@@ -299,21 +301,43 @@ void WaveformInstrument::updateXData(int dataSize)
 {
 	double timespanValue = m_timespanSpin->value();
 	double plotSamples = m_plotSampleRate * timespanValue;
+	// DEBUG(x-axis): inputs to x-data generation. m_plotSampleRate is a fixed double (5120).
+	qInfo(CAT_PQM_WAVEFORM) << "DEBUG updateXData: dataSize=" << dataSize << "m_plotSampleRate=" << m_plotSampleRate
+				<< "timespan=" << timespanValue << "plotSamples=" << plotSamples
+				<< "sizeof(int)=" << (int)sizeof(int) << "sizeof(double)=" << (int)sizeof(double);
 	if(m_xTime.size() == plotSamples && dataSize == plotSamples) {
+		qInfo(CAT_PQM_WAVEFORM) << "DEBUG updateXData: early-return (xTime.size==plotSamples==dataSize)";
 		return;
 	}
 	m_xTime.clear();
 	for(int i = dataSize - 1; i >= 0; i--) {
 		m_xTime.push_back(-(i / plotSamples) * timespanValue);
 	}
+	// DEBUG(x-axis): resulting x-data span vs the fixed axis window [-timespan, 0].
+	if(!m_xTime.isEmpty()) {
+		qInfo(CAT_PQM_WAVEFORM) << "DEBUG updateXData: xTime.size=" << m_xTime.size()
+					<< "first(oldest)=" << m_xTime.first() << "last(newest)=" << m_xTime.last()
+					<< "| axis xMin=" << m_voltagePlot->xAxis()->min()
+					<< "xMax=" << m_voltagePlot->xAxis()->max();
+	}
 }
 
 void WaveformInstrument::plotData(QMap<QString, QVector<double>> chnlsData)
 {
 	const QStringList keys = chnlsData.keys();
+	// DEBUG(x-axis): per-channel received sample counts (must be equal across channels).
+	for(const QString &chnlId : keys) {
+		qInfo(CAT_PQM_WAVEFORM) << "DEBUG plotData: chnl=" << chnlId << "dataSize=" << chnlsData[chnlId].size();
+	}
 	for(const QString &chnlId : keys) {
 		int dataSize = chnlsData[chnlId].size();
 		updateXData(dataSize);
+		if(m_xTime.size() != dataSize) {
+			// DEBUG(x-axis): x/y length mismatch => qwt plots min(x,y) points => truncated trace.
+			qWarning(CAT_PQM_WAVEFORM) << "DEBUG plotData: LENGTH MISMATCH xTime=" << m_xTime.size()
+						   << "yData=" << dataSize << "chnl=" << chnlId;
+			qWarning(CAT_PQM_WAVEFORM) << m_xTime;
+		}
 		m_plotChnls[chnlId]->curve()->setSamples(m_xTime.data(), chnlsData[chnlId].data(), dataSize);
 	}
 	m_voltagePlot->replot();
