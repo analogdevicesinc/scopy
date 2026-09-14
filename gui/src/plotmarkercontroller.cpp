@@ -240,6 +240,10 @@ void PlotMarkerController::setCh(PlotComponentChannel *newCh) { m_ch = newCh; }
 
 bool PlotMarkerController::enabled() const { return m_enabled; }
 
+int PlotMarkerController::nrOfMarkers() const { return m_nrOfMarkers; }
+
+PlotMarkerController::MarkerTypes PlotMarkerController::markerType() const { return m_markerType; }
+
 void PlotMarkerController::setEnabled(bool newEnabled)
 {
 	m_enabled = newEnabled;

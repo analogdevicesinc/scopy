@@ -33,6 +33,7 @@ namespace adc {
 
 class SCOPY_ADC_EXPORT TimePlotComponentSettings : public QWidget, public ToolComponent
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	TimePlotComponentSettings(TimePlotComponent *plt, QWidget *parent = nullptr);

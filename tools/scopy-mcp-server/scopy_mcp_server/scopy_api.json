@@ -39,7 +39,8 @@
     "generic-plugins": [
       "regmap",
       "iioExplorer",
-      "datalogger"
+      "datalogger",
+      "adc"
     ],
     "pqmon": [
       "pqm"
@@ -6234,6 +6235,859 @@
             }
           ],
           "returns": "void"
+        }
+      ]
+    },
+    "adc": {
+      "methods": [
+        {
+          "name": "disableTimeMeasurement",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "measurement",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "enableTimeMeasurement",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "measurement",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "freqSingleShot",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "getComplexChannels",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getFreqBufferSize",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getFreqChannelAveragingSize",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "getFreqChannelMarkerCount",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "getFreqChannelMarkerType",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "getFreqChannelYMax",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "double"
+        },
+        {
+          "name": "getFreqChannelYMin",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "double"
+        },
+        {
+          "name": "getFreqChannels",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getFreqOffset",
+          "args": [],
+          "returns": "double"
+        },
+        {
+          "name": "getFreqPowerOffset",
+          "args": [],
+          "returns": "double"
+        },
+        {
+          "name": "getFreqSampleRate",
+          "args": [],
+          "returns": "double"
+        },
+        {
+          "name": "getFreqWindow",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getFreqXMode",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getGenalyzerExpectedFreq",
+          "args": [],
+          "returns": "double"
+        },
+        {
+          "name": "getGenalyzerHarmonicOrder",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getGenalyzerMetric",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "metric",
+              "type": "QString"
+            }
+          ],
+          "returns": "double"
+        },
+        {
+          "name": "getGenalyzerMetrics",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getGenalyzerMode",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getGenalyzerSSBDefault",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getGenalyzerSSBFundamental",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getGenalyzerSSBWidth",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getTimeBufferSize",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getTimeChannelYMax",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "double"
+        },
+        {
+          "name": "getTimeChannelYMin",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "double"
+        },
+        {
+          "name": "getTimeChannelYMode",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "int"
+        },
+        {
+          "name": "getTimeChannels",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getTimeMeasurementValue",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "measurement",
+              "type": "QString"
+            }
+          ],
+          "returns": "double"
+        },
+        {
+          "name": "getTimeMeasurements",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getTimePlotSize",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getTimeSampleRate",
+          "args": [],
+          "returns": "double"
+        },
+        {
+          "name": "getTimeXMode",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "getTools",
+          "args": [],
+          "returns": "QStringList"
+        },
+        {
+          "name": "getWaterfallHistory",
+          "args": [],
+          "returns": "int"
+        },
+        {
+          "name": "isFreqAutoscaleEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isFreqChannelAveragingEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "isFreqChannelEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "isFreqChannelMarkerEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "isFreqComplexMode",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isFreqCursorsEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isFreqRunning",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isGenalyzerEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeAutoscaleEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeChannelEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeCursorsEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeRollingMode",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeRunning",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeSingleYMode",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isTimeSyncBufferPlot",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "isWaterfallEnabled",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "lastError",
+          "args": [],
+          "returns": "QString"
+        },
+        {
+          "name": "ok",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqAutoscaleEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqBufferSize",
+          "args": [
+            {
+              "name": "size",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelAveragingEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelAveragingSize",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "size",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelMarkerCount",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "count",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelMarkerEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelMarkerType",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "type",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelYMax",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "max",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqChannelYMin",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "min",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqComplexMode",
+          "args": [
+            {
+              "name": "complex",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqCursorsEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqOffset",
+          "args": [
+            {
+              "name": "offset",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqPowerOffset",
+          "args": [
+            {
+              "name": "offset",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqRunning",
+          "args": [
+            {
+              "name": "running",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqSampleRate",
+          "args": [
+            {
+              "name": "rate",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqWindow",
+          "args": [
+            {
+              "name": "window",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setFreqXMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerExpectedFreq",
+          "args": [
+            {
+              "name": "freq",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerHarmonicOrder",
+          "args": [
+            {
+              "name": "order",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerSSBDefault",
+          "args": [
+            {
+              "name": "ssb",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerSSBFundamental",
+          "args": [
+            {
+              "name": "ssb",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setGenalyzerSSBWidth",
+          "args": [
+            {
+              "name": "width",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeAutoscaleEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeBufferSize",
+          "args": [
+            {
+              "name": "size",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeChannelEnabled",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeChannelYMax",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "max",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeChannelYMin",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "min",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeChannelYMode",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            },
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeCursorsEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimePlotSize",
+          "args": [
+            {
+              "name": "size",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeRollingMode",
+          "args": [
+            {
+              "name": "rolling",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeRunning",
+          "args": [
+            {
+              "name": "running",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeSampleRate",
+          "args": [
+            {
+              "name": "rate",
+              "type": "double"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeSingleYMode",
+          "args": [
+            {
+              "name": "single",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeSyncBufferPlot",
+          "args": [
+            {
+              "name": "sync",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeXMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setWaterfallEnabled",
+          "args": [
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setWaterfallHistory",
+          "args": [
+            {
+              "name": "rows",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "timeSingleShot",
+          "args": [],
+          "returns": "bool"
+        },
+        {
+          "name": "triggerGenalyzerAnalysis",
+          "args": [
+            {
+              "name": "channel",
+              "type": "QString"
+            }
+          ],
+          "returns": "bool"
         }
       ]
     },

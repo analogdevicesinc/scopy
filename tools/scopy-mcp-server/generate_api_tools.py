@@ -40,6 +40,7 @@ CLASS_TO_JSOBJ = {
     # FMCOMMS11
     "Fmcomms11_API": "fmcomms11",
     # Generic plugins
+    "ADC_API": "adc",
     "RegMap_API": "regmap",
     "IIOExplorerInstrument_API": "iioExplorer",
     "DataLogger_API": "datalogger",
@@ -78,7 +79,7 @@ PLUGIN_OBJECTS: dict[str, list[str]] = {
     "cn0540": ["cn0540"],
     "daq2": ["daq2"],
     "fmcomms11": ["fmcomms11"],
-    "generic-plugins": ["regmap", "iioExplorer", "datalogger"],
+    "generic-plugins": ["regmap", "iioExplorer", "datalogger", "adc"],
     "pqmon": ["pqm"],
     "swiot": ["swiot"],
     "m2k": ["osc", "spectrum", "network", "siggen", "logic", "pattern", "dio", "dmm", "power", "calib"],
