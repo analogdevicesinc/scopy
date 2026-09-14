@@ -35,6 +35,7 @@ namespace adc {
 
 class SCOPY_ADC_EXPORT GenalyzerSettings : public QWidget
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	explicit GenalyzerSettings(QWidget *parent = nullptr);

@@ -42,6 +42,9 @@
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
 #include "scopy-adc_config.h"
+#include "adc_api.h"
+
+#include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -322,6 +325,7 @@ bool ADCPlugin::onConnect()
 	newInstrument(TIME, root, top);
 	newInstrument(FREQUENCY, root, top);
 	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
+	initApi();
 	return true;
 }
 
@@ -494,11 +498,28 @@ void ADCPlugin::handlePreferences(QString s, QVariant v)
 	}
 }
 
+void ADCPlugin::initApi()
+{
+	m_api = new ADC_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	m_api->setObjectName("adc");
+	js->registerApi(m_api);
+
+}
+
 bool ADCPlugin::onDisconnect()
 {
 	Preferences *p = Preferences::GetInstance();
 	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
+
+	ScopyJS *js = ScopyJS::GetInstance();
+	if(m_api) {
+		js->unregisterApi(m_api);
+		delete m_api;
+		m_api = nullptr;
+	}
+
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 

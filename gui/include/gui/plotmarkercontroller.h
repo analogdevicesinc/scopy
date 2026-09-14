@@ -71,6 +71,8 @@ public:
 	void init();
 	bool enabled() const;
 	void setEnabled(bool newEnabled);
+	int nrOfMarkers() const;
+	MarkerTypes markerType() const;
 	virtual void attachMarkersToPlot() = 0;
 	const QList<MarkerInfo> &markerInfo() const;
 

@@ -88,6 +88,7 @@ class SCOPY_ADC_EXPORT GRTimeChannelComponent : public ChannelComponent,
 						public ScaleProvider
 
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	GRTimeChannelComponent(GRIIOFloatChannelNode *node, TimePlotComponent *m_plot, GRTimeSinkComponent *grtsc,

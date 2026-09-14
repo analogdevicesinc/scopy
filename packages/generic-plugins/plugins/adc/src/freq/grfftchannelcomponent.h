@@ -88,7 +88,13 @@ public:
 		m_fft->setPowerOffset(val);
 	}
 
-	void setAveragingSize(int size) override { m_fft->setNavg(size); }
+	void setAveragingSize(int size) override
+	{
+		m_navg = size;
+		m_fft->setNavg(size);
+	}
+
+	int averagingSize() const { return m_navg; }
 
 	double powerOffset() { return m_powerOffset; }
 
@@ -106,6 +112,7 @@ public:
 	GRFFTComplexProc *m_fft;
 	GRIIOComplexChannelSrc *m_grch;
 	double m_powerOffset;
+	int m_navg = 1;
 };
 
 class GRFFTChannelSigpath : public QObject, public GRChannel, public FFTChannel
@@ -146,7 +153,13 @@ public:
 		m_fft->setPowerOffset(val);
 	}
 
-	void setAveragingSize(int size) override { m_fft->setNavg(size); }
+	void setAveragingSize(int size) override
+	{
+		m_navg = size;
+		m_fft->setNavg(size);
+	}
+
+	int averagingSize() const { return m_navg; }
 
 	double powerOffset() { return m_powerOffset; }
 
@@ -162,6 +175,7 @@ public:
 	ChannelComponent *m_ch;
 	GRSignalPath *m_signalPath;
 	GRFFTFloatProc *m_fft;
+	int m_navg = 1;
 	GRIIOFloatChannelSrc *m_grch;
 	double m_powerOffset;
 };
@@ -172,6 +186,7 @@ class SCOPY_ADC_EXPORT GRFFTChannelComponent : public ChannelComponent,
 					       public SampleRateProvider,
 					       public FFTChannel
 {
+	friend class ADC_API;
 	Q_OBJECT
 public:
 	GRFFTChannelComponent(GRIIOFloatChannelNode *node_I, GRIIOFloatChannelNode *node_Q, FFTPlotComponent *m_plot,

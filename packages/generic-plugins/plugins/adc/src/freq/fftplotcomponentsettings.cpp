@@ -88,7 +88,7 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 	m_yCtrl->minSpinbox()->setScaleRange(1, 1);
 	m_yCtrl->maxSpinbox()->setScaleRange(1, 1);
 
-	MenuOnOffSwitch *m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
+	m_autoscaleBtn = new MenuOnOffSwitch(tr("AUTOSCALE"), plotMenu, false);
 	m_autoscaler = new PlotAutoscaler(this);
 
 	connect(m_autoscaler, &PlotAutoscaler::newMin, this, [=](double v) { m_yCtrl->setMin(v - 10); });
@@ -135,7 +135,8 @@ FFTPlotComponentSettings::FFTPlotComponentSettings(FFTPlotComponent *plt, QWidge
 
 	MenuSectionCollapseWidget *waterfallSection = new MenuSectionCollapseWidget(
 		"WATERFALL PLOT", MenuCollapseSection::MHCW_ONOFF, MenuCollapseSection::MHW_BASEWIDGET, parent);
-	QAbstractButton *waterfallSwitch = waterfallSection->collapseSection()->header();
+	m_waterfallSwitch = waterfallSection->collapseSection()->header();
+	QAbstractButton *waterfallSwitch = m_waterfallSwitch;
 	waterfallSwitch->setChecked(false);
 
 	m_waterfallRows = new MenuSpinbox("History rows", 200, "rows", 50, 2000, true, false, true, waterfallSection);
