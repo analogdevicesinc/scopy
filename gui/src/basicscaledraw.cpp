@@ -20,7 +20,6 @@
  */
 
 #include "basicscaledraw.h"
-#include "qlocale.h"
 
 #include <QPainter>
 #include <QRect>
@@ -89,71 +88,66 @@ void BasicScaleDraw::setUnitsEnabled(bool enable) { m_unitsEn = enable; }
 
 void BasicScaleDraw::draw(QPainter *painter, const QPalette &palette) const
 {
-	int nrMajorTicks = scaleDiv().ticks(QwtScaleDiv::MajorTick).size();
+	const QList<double> allTicks = scaleDiv().ticks(QwtScaleDiv::MajorTick);
+	m_nrTicks = allTicks.size();
 
-	m_nrTicks = nrMajorTicks;
+	if(allTicks.isEmpty())
+		return;
 
-	QList<double> ticks = scaleDiv().ticks(QwtScaleDiv::MajorTick);
-	QList<QRect> labels;
+	// pointSize() is -1 for pixel-sized fonts (Qt6/ARM) -> /4 would give 0 padding
+	int half = painter->font().pointSize() / 4;
+	if(half <= 0)
+		half = painter->fontMetrics().height() / 4;
 
-	for(int i = 0; i < ticks.size(); ++i) {
-		QRect bounds = boundingLabelRect(painter->font(), ticks[i]);
-		int half = painter->font().pointSize() / 4;
-
+	QList<QRect> bounds;
+	bounds.reserve(allTicks.size());
+	for(int i = 0; i < allTicks.size(); ++i) {
+		QRect r = boundingLabelRect(painter->font(), allTicks[i]);
 		if(orientation() == Qt::Horizontal)
-			bounds.adjust(-half, 0, half, 0);
+			r.adjust(-half, 0, half, 0);
 		else
-			bounds.adjust(0, -half / 2, 0, half / 2);
-
-		labels.append(bounds);
+			r.adjust(0, -half / 2, 0, half / 2);
+		bounds.append(r);
 	}
 
-	bool overlap = false;
+	const int midLabelPos = allTicks.size() / 2;
 
-	int midLabelPos = nrMajorTicks / 2;
+	// Decimate by growing a stride until the kept labels no longer overlap.
+	QList<double> ticks;
+	for(int stride = 1;; ++stride) {
+		QList<int> keep;
+		if(m_delta) {
+			keep.append(midLabelPos);
+			for(int i = midLabelPos - stride; i >= 0; i -= stride)
+				keep.prepend(i);
+			for(int i = midLabelPos + stride; i < allTicks.size(); i += stride)
+				keep.append(i);
+		} else {
+			for(int i = 0; i < allTicks.size(); i += stride)
+				keep.append(i);
+			if(keep.last() != allTicks.size() - 1)
+				keep.append(allTicks.size() - 1);
+		}
 
-	do {
-		overlap = false;
-		for(int i = 1; i < labels.size(); ++i) {
-			QRect last_rectangle = labels.at(i - 1);
-			QRect current_rectangle = labels.at(i);
-
-			if(current_rectangle.intersects(last_rectangle)) {
+		bool overlap = false;
+		for(int k = 1; k < keep.size(); ++k) {
+			if(bounds.at(keep.at(k)).intersects(bounds.at(keep.at(k - 1)))) {
 				overlap = true;
 				break;
 			}
 		}
 
-		if(overlap) {
-			if(m_delta) {
-				// If the middle delta label is to be drawn we are sure that
-				// ticks.size() is an odd number
-				int center = midLabelPos;
-				for(int i = center - 1; i >= 0; i -= 2) {
-					// Remove the tick and make sure to update the center
-					// label position
-					ticks.removeAt(i);
-					labels.removeAt(i);
-					--center;
-				}
-				for(int j = center + 1; j < ticks.size(); j += 1) {
-					ticks.removeAt(j);
-					labels.removeAt(j);
-				}
-			} else {
-				for(int i = 1; i < ticks.size(); ++i) {
-					ticks.removeAt(i);
-					labels.removeAt(i);
-				}
-			}
+		if(!overlap || keep.size() <= 2) {
+			for(int idx : std::as_const(keep))
+				ticks.append(allTicks.at(idx));
+			break;
 		}
-
-	} while(overlap);
+	}
 
 	double delta = -INFINITY;
 
 	if(m_delta && m_nrTicks > midLabelPos) {
-		delta = scaleDiv().ticks(QwtScaleDiv::MajorTick)[midLabelPos];
+		delta = allTicks[midLabelPos];
 		drawLabel(painter, delta);
 	}
 
