@@ -210,7 +210,7 @@ void MonitorPlot::setupXAxis()
 
 void MonitorPlot::genereateScaleDraw(QString format, double offset)
 {
-	m_scaleDraw = new QwtDateScaleDraw(Qt::OffsetFromUTC);
+	m_scaleDraw = new TimeScaleDraw(Qt::OffsetFromUTC);
 	m_scaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 	m_scaleDraw->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 
@@ -247,10 +247,13 @@ void MonitorPlot::setStartTime()
 void MonitorPlot::updateAxisScaleDraw()
 {
 	if(m_isRealTime) {
+		// wall-clock labels: no value shift, small (valid) tz offset
+		m_scaleDraw->setTimeReference(0);
 		m_scaleDraw->setUtcOffset(QDateTime::currentDateTime().offsetFromUtc());
 	} else {
-		double offset = (-1) * m_startTime / 1000;
-		m_scaleDraw->setUtcOffset(offset);
+		// elapsed-since-start labels: shift the value, keep the offset valid for Qt6
+		m_scaleDraw->setUtcOffset(0);
+		m_scaleDraw->setTimeReference(m_startTime);
 	}
 
 	m_plot->replot();
@@ -275,14 +278,10 @@ void MonitorPlot::updatePlotStartingPoint(double time, double delta)
 		delta = delta * 1000;
 	}
 
-	if(m_isRealTime) {
-		m_plot->xAxis()->setInterval(time - delta, time);
-	} else {
-		double offset = (-1) * m_startTime / 1000;
-		m_scaleDraw->setUtcOffset(offset);
-
-		m_plot->xAxis()->setInterval(time - delta, time);
-	}
+	// keep the value-shift reference in sync; never abuse setUtcOffset with a huge
+	// (Qt6-invalid) offset here, that produced empty x-axis labels on acquisition
+	m_scaleDraw->setTimeReference(m_isRealTime ? 0 : m_startTime);
+	m_plot->xAxis()->setInterval(time - delta, time);
 
 	updateBufferPreviewer(time);
 	m_plot->replot();
