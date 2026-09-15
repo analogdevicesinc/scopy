@@ -75,7 +75,7 @@ ChannelAttributesMenu::ChannelAttributesMenu(DataMonitorModel *model, MonitorPlo
 	if(qobject_cast<DmmDataMonitorModel *>(model)) {
 		QList<IIOWidget *> attrWidgets =
 			IIOWidgetBuilder(attr)
-				.channel(dynamic_cast<DmmDataMonitorModel *>(model)->iioChannel())
+				.componentContainer(dynamic_cast<DmmDataMonitorModel *>(model)->channel())
 				.buildAll();
 
 		for(auto w : attrWidgets) {
