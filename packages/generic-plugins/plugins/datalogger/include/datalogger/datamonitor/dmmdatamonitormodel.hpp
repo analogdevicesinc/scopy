@@ -26,6 +26,7 @@
 #include "readabledatamonitormodel.hpp"
 #include "scopy-datalogger_export.h"
 #include <QObject>
+#include <component/channel.h>
 
 namespace scopy {
 namespace datamonitor {
@@ -38,18 +39,13 @@ public:
 				     double defaultScale = 1, double defaultOffset = 0,
 				     DMMReadStrategy *readStrategy = nullptr, QObject *parent = nullptr);
 
-	iio_channel *iioChannel() const;
-	void setIioChannel(iio_channel *newIioChannel);
-
-	QString getDeviceName();
-	iio_device *iioDevice() const;
-	void setIioDevice(iio_device *newIioDevice);
+	component::Channel *channel() const;
+	void setChannel(component::Channel *newChannel);
 
 	DMMReadStrategy *readStrategy();
 
 private:
-	iio_channel *m_iioChannel;
-	iio_device *m_iioDevice;
+	component::Channel *m_channel = nullptr;
 	DMMReadStrategy *m_readStrategy;
 };
 } // namespace datamonitor

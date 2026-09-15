@@ -28,32 +28,32 @@
 using namespace scopy;
 using namespace datamonitor;
 
-DMMReadStrategy::DMMReadStrategy(iio_device *dev, iio_channel *chn)
-	: dev(dev)
-	, chn(chn)
+DMMReadStrategy::DMMReadStrategy(component::Attribute *readAttr)
+	: m_readAttr(readAttr)
 {}
 
 void DMMReadStrategy::read()
 {
-	double raw = 0;
-	int ret = iio_channel_attr_read_double(chn, "raw", &raw);
+	if(!m_readAttr || !m_readAttr->readCapability()) {
+		return;
+	}
+	// Fire the coroutine read; the previous one (if any) is dropped when replaced.
+	m_task = readTask();
+}
 
-	if(ret < 0) {
-		ret = iio_channel_attr_read_double(chn, "input", &raw);
+QCoro::Task<void> DMMReadStrategy::readTask()
+{
+	auto response = co_await m_readAttr->readCapability()->readAsync();
+	if(!response) {
+		qDebug() << "device read error " << response.error().message;
+		co_return;
 	}
 
-	if(ret < 0) {
-		char err[1024];
-		iio_strerror(-ret, err, sizeof(err));
-		qDebug() << "device read error " << err;
+	double result = QString::fromUtf8(response.value()).toDouble();
+	qDebug() << "dmm read success  ";
 
-	} else {
-		double result = raw;
-		qDebug() << "dmm read success  ";
+	auto &&timeTracker = TimeManager::GetInstance();
+	double currentTime = QwtDate::toDouble(timeTracker->lastReadValue());
 
-		auto &&timeTracker = TimeManager::GetInstance();
-		double currentTime = QwtDate::toDouble(timeTracker->lastReadValue());
-
-		Q_EMIT readDone(currentTime, result);
-	}
+	Q_EMIT readDone(currentTime, result);
 }

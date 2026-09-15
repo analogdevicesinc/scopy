@@ -24,8 +24,27 @@
 #include <datamonitor/readstrategy/dmmreadstrategy.hpp>
 #include <stylehelper.h>
 
+#include <qcoro/qcorotask.h>
+#include <component/attributereader.h>
+#include <component/backends/iio/iiochannel.h>
+
 using namespace scopy;
 using namespace datamonitor;
+
+namespace {
+// Read a scalar attribute value once, synchronously (discovery-time only).
+double readAttrOnce(component::Attribute *attr, double fallback)
+{
+	if(!attr || !attr->readCapability()) {
+		return fallback;
+	}
+	auto response = QCoro::waitFor(attr->readCapability()->readAsync());
+	if(!response) {
+		return fallback;
+	}
+	return QString::fromUtf8(response.value()).toDouble();
+}
+} // namespace
 
 DMM::DMM(QObject *parent)
 	: QObject{parent}
@@ -33,37 +52,39 @@ DMM::DMM(QObject *parent)
 	generateDictionaries();
 }
 
-QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
+QList<DmmDataMonitorModel *> DMM::getDmmMonitors(component::Context *ctx)
 {
 	QList<DmmDataMonitorModel *> result;
 
-	auto deviceCount = iio_context_get_devices_count(ctx);
-	for(int i = 0; i < deviceCount; i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
-		auto chnCout = iio_device_get_channels_count(dev);
-		for(int j = 0; j < chnCout; j++) {
-			// check if dmm
-			iio_channel *chn = iio_device_get_channel(dev, j);
+	const QList<component::iio::IIODevice *> devices =
+		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
+	for(component::iio::IIODevice *dev : devices) {
+		const QList<component::Channel *> channels =
+			dev->findChildren<component::Channel *>(Qt::FindDirectChildrenOnly);
+		for(component::Channel *chn : channels) {
 			// if the channel is DMM or hwmon we create a monitor for it
 			if(isDMMCompatible(chn) || isHwmon(dev, chn)) {
-				QString name = QString::fromStdString(iio_device_get_name(dev)) + ":" +
-					QString::fromStdString(iio_channel_get_id(chn));
+				QString name = dev->name() + ":" + chn->id();
 
 				UnitOfMeasurement *unitOfMeasurement = new UnitOfMeasurement("", "");
-				DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
 
-				double offset = 0;
-				bool hasOffset = iioChannelHasAttribute(chn, "offset");
-				if(hasOffset) {
-					iio_channel_attr_read_double(chn, "offset", &offset);
+				// DMM reads "raw", hwmon reads "input".
+				component::Attribute *readAttr = channelAttribute(chn, "raw");
+				if(!readAttr) {
+					readAttr = channelAttribute(chn, "input");
 				}
+				DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(readAttr);
 
-				double scale = 1;
-				bool hasScale = iioChannelHasAttribute(chn, "scale");
-				if(hasScale) {
-					iio_channel_attr_read_double(chn, "scale", &scale);
-				}
-				int type = iio_channel_get_type(chn);
+				component::Attribute *offsetAttr = channelAttribute(chn, "offset");
+				bool hasOffset = offsetAttr != nullptr;
+				double offset = readAttrOnce(offsetAttr, 0);
+
+				component::Attribute *scaleAttr = channelAttribute(chn, "scale");
+				bool hasScale = scaleAttr != nullptr;
+				double scale = readAttrOnce(scaleAttr, 1);
+
+				component::iio::IIOChannel *iioChnl = dynamic_cast<component::iio::IIOChannel *>(chn);
+				int type = iioChnl ? iioChnl->chanType() : iio_chan_type::IIO_CHAN_TYPE_UNKNOWN;
 				if(type != iio_chan_type::IIO_CHAN_TYPE_UNKNOWN) {
 					IIOUnit dmmInfo = m_iioDevices.value(static_cast<iio_chan_type>(type));
 
@@ -77,14 +98,13 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 				DmmDataMonitorModel *channelModel =
 					new DmmDataMonitorModel(name, StyleHelper::getChannelColor(result.size()),
 								unitOfMeasurement, scale, offset, dmmReadStrategy);
-				channelModel->setIioChannel(chn);
-				channelModel->setIioDevice(dev);
+				channelModel->setChannel(chn);
+				channelModel->setDeviceName(dev->name());
 				channelModel->setHasOffset(hasOffset);
 				channelModel->setHasScale(hasScale);
 
-				const char *channelName = iio_channel_get_name(chn);
-				if(channelName && strlen(channelName) > 0) {
-					channelModel->setDisplayName(QString::fromStdString(channelName));
+				if(!chn->name().isEmpty()) {
+					channelModel->setDisplayName(chn->name());
 				}
 
 				result.push_back(channelModel);
@@ -95,21 +115,19 @@ QList<DmmDataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 	return result;
 }
 
-bool DMM::isDMMCompatible(iio_channel *chn)
+bool DMM::isDMMCompatible(component::Channel *chn)
 {
 	// DMM channels have raw and be input (scale is optional, defaults to 1)
-	if(!iio_channel_is_output(chn) && iioChannelHasAttribute(chn, "raw")) {
+	if(!chn->isOutput() && channelAttribute(chn, "raw")) {
 		return true;
 	}
 	return false;
 }
 
-bool DMM::isHwmon(iio_device *dev, iio_channel *chn)
+bool DMM::isHwmon(component::iio::IIODevice *dev, component::Channel *chn)
 {
-	if(iio_device_is_hwmon(dev) && iioChannelHasAttribute(chn, "input")) {
-		auto d_name = iio_device_get_name(dev);
-		auto c_name = std::string(iio_channel_get_id(chn));
-		if(!c_name.empty() && d_name) {
+	if(dev->isHwmon() && channelAttribute(chn, "input")) {
+		if(!chn->id().isEmpty() && !dev->name().isEmpty()) {
 			return true;
 		}
 	}
@@ -117,18 +135,16 @@ bool DMM::isHwmon(iio_device *dev, iio_channel *chn)
 	return false;
 }
 
-bool DMM::iioChannelHasAttribute(iio_channel *chn, const std::string &attr)
+component::Attribute *DMM::channelAttribute(component::Channel *chn, const QString &attr)
 {
-	unsigned int nb_attr = iio_channel_get_attrs_count(chn);
-	const char *attr_name;
-	for(unsigned int i = 0; i < nb_attr; i++) {
-		attr_name = iio_channel_get_attr(chn, i);
-		std::size_t found = std::string(attr_name).find(attr);
-		if(found != std::string::npos) {
-			return true;
+	const QList<component::Attribute *> attrs =
+		chn->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *a : attrs) {
+		if(a->name().contains(attr)) {
+			return a;
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 void DMM::generateDictionaries()

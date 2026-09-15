@@ -22,9 +22,13 @@
 #ifndef DMMREADSTRATEGY_HPP
 #define DMMREADSTRATEGY_HPP
 
-#include "iio.h"
 #include "ireadstrategy.hpp"
 #include "scopy-datalogger_export.h"
+
+#include <optional>
+#include <qcoro/qcorotask.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
 
 namespace scopy {
 namespace datamonitor {
@@ -32,7 +36,8 @@ namespace datamonitor {
 class SCOPY_DATALOGGER_EXPORT DMMReadStrategy : public IReadStrategy
 {
 public:
-	DMMReadStrategy(iio_device *dev, iio_channel *chn);
+	// readAttr is the "raw" (DMM) or "input" (hwmon) attribute the value is read from.
+	explicit DMMReadStrategy(component::Attribute *readAttr);
 
 	void setUmScale(double scale);
 
@@ -41,8 +46,10 @@ public:
 	void read();
 
 private:
-	iio_device *dev;
-	iio_channel *chn;
+	QCoro::Task<void> readTask();
+
+	component::Attribute *m_readAttr;
+	std::optional<QCoro::Task<void>> m_task;
 };
 } // namespace datamonitor
 } // namespace scopy
