@@ -19,6 +19,7 @@ LIBSERIALPORT_BRANCH=master
 LIBIIO_VERSION=v0.26
 LIBAD9361_BRANCH=main
 LIBAD9166_BRANCH=libad9166-iio-v0
+LIBM2K_BRANCH=main
 QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
 IIOEMU_BRANCH=main
@@ -26,6 +27,7 @@ KDDOCK_BRANCH=2.2
 ECM_BRANCH=v6.8.0
 KARCHIVE_BRANCH=v6.8.0
 GENALYZER_BRANCH=main
+QCORO_BRANCH=v0.13.0
 
 export APPIMAGE=1
 
@@ -158,6 +160,7 @@ clone() {
 	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 	[ -d 'libad9361' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 	[ -d 'libad9166' ]	|| git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
@@ -165,6 +168,7 @@ clone() {
 	[ -d 'extra-cmake-modules' ] || git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 	[ -d 'karchive' ] || git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 	[ -d 'genalyzer' ] || git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+	[ -d 'qcoro' ] || git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
 	popd
 }
 
@@ -224,6 +228,20 @@ build_libad9361() {
 build_libad9166() {
 	echo "### Building libad9166 - branch $LIBAD9166_BRANCH"
 	pushd $STAGING_AREA/libad9166
+	build_with_cmake $1
+	popd
+}
+
+build_libm2k() {
+	echo "### Building libm2k - branch $LIBM2K_BRANCH"
+	pushd $STAGING_AREA/libm2k
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF \
+		-DENABLE_CSHARP=OFF \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_TOOLS=OFF \
+		-DINSTALL_UDEV_RULES=OFF \
+		"
 	build_with_cmake $1
 	popd
 }
@@ -300,6 +318,24 @@ build_iio-emu() {
 	popd
 }
 
+build_qcoro() {
+	echo "### Building qcoro - version $QCORO_BRANCH"
+	pushd $STAGING_AREA/qcoro
+	# Install under $SYSROOT/usr (alongside Qt) so headers match QCoro6Config's expected include path.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DCMAKE_INSTALL_PREFIX=$SYSROOT/usr \
+		-DQCORO_BUILD_EXAMPLES=OFF \
+		-DQCORO_BUILD_TESTING=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQCORO_WITH_QTWEBSOCKETS=OFF \
+		-DQCORO_WITH_QTQUICK=OFF \
+		-DQCORO_WITH_QML=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake $1
+	popd
+}
+
 build_scopy() {
 	echo "### Building scopy (cross-compile armhf)"
 	git config --global --add safe.directory $SRC_DIR
@@ -322,6 +358,7 @@ build_deps() {
 	build_libiio ON
 	build_libad9361 ON
 	build_libad9166 ON
+	build_libm2k ON
 	build_qwt ON
 	build_libtinyiiod ON
 	build_kddock ON
@@ -329,6 +366,7 @@ build_deps() {
 	build_karchive ON
 	build_genalyzer ON
 	build_iio-emu ON
+	build_qcoro ON
 }
 
 create_appdir() {

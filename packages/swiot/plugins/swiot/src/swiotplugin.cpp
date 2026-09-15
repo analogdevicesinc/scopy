@@ -26,17 +26,20 @@
 #include <QLabel>
 #include <stylehelper.h>
 #include <menusectionwidget.h>
-#include <iioutil/cmdqpingtask.h>
 #include <deviceiconbuilder.h>
 #include <style.h>
+#include <component/controller.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+
+#include <qcorotask.h>
 
 #include "scopy-swiot_config.h"
 #include "swiot_logging_categories.h"
 #include "max14906/max14906.h"
 #include "faults/faults.h"
 #include "ad74413r/ad74413r.h"
-
-#include <iioutil/connectionprovider.h>
 
 #include <src/config/swiotconfig.h>
 
@@ -50,20 +53,17 @@ bool SWIOTPlugin::compatible(QString m_param, QString category)
 {
 	m_name = "SWIOT1L";
 	bool ret = false;
-	Connection *conn = ConnectionProvider::open(m_param);
 
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qWarning(CAT_SWIOT) << "No context available for swiot";
 		return false;
 	}
 
-	iio_device *swiotDevice = iio_context_find_device(conn->context(), "swiot");
-	if(swiotDevice) {
+	component::Device *swiot = ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly);
+	if(swiot) {
 		ret = true;
 	}
-
-	ConnectionProvider::close(m_param);
-
 	return ret;
 }
 
@@ -100,22 +100,20 @@ bool SWIOTPlugin::loadPage()
 		}
 	});
 
-	Connection *conn = ConnectionProvider::open(m_param);
-
-	ssize_t attributeCount = iio_context_get_attrs_count(conn->context());
-	for(int i = 0; i < attributeCount; ++i) {
-		const char *name;
-		const char *value;
-		int ret = iio_context_get_attr(conn->context(), i, &name, &value);
-		if(ret < 0) {
-			qWarning(CAT_SWIOT) << "Could not read attribute with index:" << i;
-			continue;
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(ctx) {
+		const QList<component::Attribute *> attrs =
+			ctx->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+		for(component::Attribute *attr : attrs) {
+			if(attr->cachedValue().isEmpty() && attr->readCapability()) {
+				QCoro::waitFor(attr->readCapability()->readAsync());
+			}
+			m_infoPage->update(attr->name(), attr->cachedValue());
 		}
-
-		m_infoPage->update(name, value);
+	} else {
+		qWarning(CAT_SWIOT) << "No context available to populate the info page.";
 	}
 
-	ConnectionProvider::close(m_param);
 	m_page->ensurePolished();
 
 	return true;
@@ -176,13 +174,10 @@ void SWIOTPlugin::unload()
 bool SWIOTPlugin::onConnect()
 {
 
-	Connection *conn = ConnectionProvider::open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		return false;
 	}
-
-	m_pingTask = new CmdQPingTask(conn, "sw_trig", this);
-	m_cyclicalTask = new CyclicalTask(m_pingTask);
 
 	m_runtime = new SwiotRuntime(m_param, this);
 	connect(m_runtime, &SwiotRuntime::writeModeAttribute, this, &SWIOTPlugin::setCtxMode);
@@ -226,7 +221,7 @@ bool SWIOTPlugin::onDisconnect()
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		if(tme->tool() != nullptr) {
-			tme->tool()->deleteLater();
+			delete tme->tool();
 		}
 		tme->setTool(nullptr);
 	}
@@ -250,8 +245,6 @@ bool SWIOTPlugin::onDisconnect()
 		delete m_statusContainer;
 		m_statusContainer = nullptr;
 	}
-	clearPingTask();
-	ConnectionProvider::close(m_param);
 
 	if(m_switchCmd) {
 		m_switchCmd = false;
@@ -259,19 +252,6 @@ bool SWIOTPlugin::onDisconnect()
 	}
 
 	return true;
-}
-
-void SWIOTPlugin::startPingTask() { m_cyclicalTask->start(PING_PERIOD); }
-
-void SWIOTPlugin::stopPingTask() { m_cyclicalTask->stop(); }
-
-void SWIOTPlugin::onPausePingTask(bool pause)
-{
-	if(pause) {
-		stopPingTask();
-	} else {
-		startPingTask();
-	}
 }
 
 void SWIOTPlugin::onIsRuntimeCtxChanged(bool isRuntimeCtx)
@@ -379,18 +359,6 @@ void SWIOTPlugin::setupToolList()
 		&SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Faults *>(faultsTme->tool()), &Faults::backBtnPressed, m_runtime,
 		&SwiotRuntime::onBackBtnPressed);
-}
-
-void SWIOTPlugin::clearPingTask()
-{
-	if(m_cyclicalTask) {
-		m_cyclicalTask->deleteLater();
-		m_cyclicalTask = nullptr;
-	}
-	if(m_pingTask) {
-		m_pingTask->deleteLater();
-		m_pingTask = nullptr;
-	}
 }
 
 void SWIOTPlugin::initApi()

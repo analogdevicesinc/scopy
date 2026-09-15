@@ -23,6 +23,7 @@ on:
           options:
             - testing
             - latest
+            - qcoro-test
 
 permissions:
   id-token: write

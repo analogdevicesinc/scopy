@@ -24,7 +24,6 @@
 #include "swiot_logging_categories.h"
 
 #include <QDesktopServices>
-#include <iio.h>
 #include <measurementlabel.h>
 #include <plotinfo.h>
 #include <plotinfowidgets.h>
@@ -38,8 +37,9 @@
 #include <gui/stylehelper.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <pluginbase/preferences.h>
-
-#include <iioutil/connectionprovider.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
 
 using namespace scopy::swiot;
 using namespace scopy::gui;
@@ -50,18 +50,14 @@ Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	, m_uri(uri)
 	, m_tme(tme)
 	, m_swiotAdLogic(nullptr)
-	, m_readerThread(nullptr)
+	, m_swiotReader(nullptr)
 	, m_currentChannelSelected(0)
 	, m_widgetGroup(new IIOWidgetGroup(this))
 {
 	initPlotData();
 	setupToolTemplate();
-	m_conn = ConnectionProvider::open(m_uri);
-	if(m_conn) {
-		connect(m_conn, &Connection::aboutToBeDestroyed, this, &Ad74413r::handleConnectionDestroyed);
-		m_ctx = m_conn->context();
-		m_cmdQueue = m_conn->commandQueue();
-		createDevicesMap(m_ctx);
+	m_context = component::Controller::context(m_uri);
+	if(m_context) {
 		init();
 	}
 	initTutorialProperties();
@@ -69,53 +65,57 @@ Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
 
 Ad74413r::~Ad74413r()
 {
-	if(m_readerThread) {
-		m_readerThread->forcedStop();
-		delete m_readerThread;
+	if(m_swiotReader) {
+		QCoro::waitFor(shutdown());
+		delete m_swiotReader;
+		m_swiotReader = nullptr;
 	}
-	if(m_conn) {
-		ConnectionProvider::close(m_uri);
-	}
+	m_context = {};
 }
 
-void Ad74413r::handleConnectionDestroyed()
+QCoro::Task<void> Ad74413r::shutdown()
 {
-	qDebug(CAT_SWIOT_AD74413R) << "Ad74413R connection destroyed slot";
-	m_ctx = nullptr;
-	m_cmdQueue = nullptr;
-	m_conn = nullptr;
+	m_context->cancelAllCommands();
+	co_await m_swiotReader->forcedStop();
 }
 
 void Ad74413r::init()
 {
-	if(m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
-		char mode[64];
-		ssize_t result = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], "mode", mode, 64);
-		if((result >= 0) && (strcmp(mode, "runtime") == 0)) {
-			m_enabledChannels = QVector<bool>(MAX_CURVES_NUMBER, false);
+	component::Device *adDevice = m_context->findChild<component::Device *>(AD_NAME);
+	component::Device *swiotDevice = m_context->findChild<component::Device *>(SWIOT_DEVICE_NAME);
+	if(!adDevice || !swiotDevice) {
+		return;
+	}
+	component::Attribute *modeAttr =
+		swiotDevice->findChild<component::Attribute *>("mode", Qt::FindDirectChildrenOnly);
+	if(!modeAttr || !modeAttr->readCapability()) {
+		return;
+	}
+	QCoro::waitFor(modeAttr->readCapability()->readAsync());
 
-			m_swiotAdLogic = new BufferLogic(m_iioDevicesMap, m_cmdQueue);
-			m_readerThread = new ReaderThread(true, m_cmdQueue, this);
-			m_readerThread->addBufferedDevice(m_iioDevicesMap[AD_NAME]);
-			m_acqHandler = new BufferAcquisitionHandler(this);
-			m_rstAcqTimer = new QTimer(this);
+	if(modeAttr->cachedValue().compare("runtime") == 0) {
+		m_enabledChannels = QVector<bool>(MAX_CURVES_NUMBER, false);
 
-			setupConnections();
-			m_swiotAdLogic->initAd74413rChnlsFunctions();
-		}
+		m_swiotAdLogic = new BufferLogic(adDevice, swiotDevice, this);
+		m_swiotReader = new SwiotReader(true, this);
+		m_swiotReader->addBufferedDevice(adDevice);
+		m_acqHandler = new BufferAcquisitionHandler(this);
+		m_rstAcqTimer = new QTimer(this);
+
+		setupConnections();
+		m_swiotAdLogic->initAd74413rChnlsFunctions();
 	}
 }
 
 void Ad74413r::setupConnections()
 {
-	connect(m_conn, &Connection::aboutToBeDestroyed, m_readerThread, &ReaderThread::handleConnectionDestroyed);
 	connect(m_configBtn, &QPushButton::pressed, this, &Ad74413r::onConfigBtnPressed);
 	connect(m_runBtn, &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_singleBtn, &QPushButton::toggled, this, &Ad74413r::onSingleBtnPressed);
 
-	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
-	connect(m_swiotAdLogic, &BufferLogic::samplingFrequencyComputed, m_readerThread,
-		&ReaderThread::onSamplingFrequencyComputed);
+	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_swiotReader, &SwiotReader::onChnlsChange);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFrequencyComputed, m_swiotReader,
+		&SwiotReader::onSamplingFrequencyComputed);
 	connect(m_swiotAdLogic, &BufferLogic::samplingFrequencyComputed, m_acqHandler,
 		&BufferAcquisitionHandler::onSamplingFrequencyComputed);
 
@@ -125,9 +125,9 @@ void Ad74413r::setupConnections()
 	connect(m_swiotAdLogic, &BufferLogic::channelFunctionDetermined, this, &Ad74413r::setupChannel);
 	connect(m_tme, &ToolMenuEntry::runToggled, m_runBtn, &QPushButton::setChecked);
 
-	connect(m_readerThread, &ReaderThread::bufferRefilled, m_acqHandler,
-		&BufferAcquisitionHandler::onBufferRefilled, Qt::QueuedConnection);
-	connect(m_readerThread, &ReaderThread::readerThreadFinished, this, &Ad74413r::onReaderThreadFinished,
+	connect(m_swiotReader, &SwiotReader::bufferRefilled, m_acqHandler, &BufferAcquisitionHandler::onBufferRefilled,
+		Qt::QueuedConnection);
+	connect(m_swiotReader, &SwiotReader::swiotReaderFinished, this, &Ad74413r::onSwiotReaderFinished,
 		Qt::QueuedConnection);
 	connect(m_acqHandler, &BufferAcquisitionHandler::bufferDataReady, this, &Ad74413r::onBufferRefilled);
 	connect(m_acqHandler, &BufferAcquisitionHandler::singleCaptureFinished, this,
@@ -205,17 +205,17 @@ void Ad74413r::onRunBtnPressed(bool toggled)
 		m_singleBtn->setChecked(false);
 		m_singleBtn->setEnabled(false);
 		verifyChnlsChanges();
-		if(!m_readerThread->isRunning()) {
+		if(!m_swiotReader->isRunning()) {
 			m_acqHandler->setSingleCapture(false);
 			m_acqHandler->resetPlotParameters();
-			m_readerThread->startCapture();
+			m_swiotReader->startCapture();
 		}
 		if(!m_tme->running()) {
 			m_tme->setRunning(toggled);
 		}
 	} else {
 		m_singleBtn->setEnabled(true);
-		m_readerThread->requestStop();
+		m_swiotReader->requestStop();
 		if(m_tme->running()) {
 			m_tme->setRunning(toggled);
 		}
@@ -231,10 +231,10 @@ void Ad74413r::onSingleBtnPressed(bool toggled)
 			m_runBtn->setChecked(false);
 		}
 		m_acqHandler->setSingleCapture(true);
-		if(!m_readerThread->isRunning()) {
+		if(!m_swiotReader->isRunning()) {
 			m_acqHandler->resetPlotParameters();
 			int bufNumber = m_acqHandler->getRequiredBuffersNumber();
-			m_readerThread->startCapture(bufNumber);
+			m_swiotReader->startCapture(bufNumber);
 		}
 		m_singleBtn->setEnabled(false);
 	}
@@ -244,35 +244,21 @@ void Ad74413r::verifyChnlsChanges()
 {
 	bool changes = m_swiotAdLogic->verifyChannelsEnabledChanges(m_enabledChannels);
 	if(changes) {
-		m_readerThread->requestStop();
+		m_swiotReader->requestStop();
 		m_runBtn->setChecked(false);
 		m_swiotAdLogic->applyChannelsEnabledChanges(m_enabledChannels);
 	}
 }
 
-void Ad74413r::createDevicesMap(iio_context *ctx)
-{
-	int devicesCount = iio_context_get_devices_count(ctx);
-	for(int i = 0; i < devicesCount; i++) {
-		struct iio_device *iioDev = iio_context_get_device(ctx, i);
-		if(iioDev) {
-			QString deviceName = QString(iio_device_get_name(iioDev));
-			if((deviceName.compare(AD_NAME) && deviceName.compare(SWIOT_DEVICE_NAME)) == 0) {
-				m_iioDevicesMap[deviceName] = iioDev;
-			}
-		}
-	}
-}
-
 void Ad74413r::onSamplingFrequencyUpdated(int channelId, int value)
 {
-	m_readerThread->requestStop();
+	m_swiotReader->requestStop();
 	m_swiotAdLogic->applySamplingFrequencyChanges(channelId, value);
 }
 
 void Ad74413r::onDiagnosticFunctionUpdated()
 {
-	m_readerThread->requestStop();
+	m_swiotReader->requestStop();
 	m_swiotAdLogic->applyChannelsEnabledChanges(m_enabledChannels);
 }
 
@@ -292,7 +278,7 @@ void Ad74413r::onConfigBtnPressed()
 
 // TBD - The value of 500 is set so that the device reaches a stable state before the new acquisition
 // It is possible that this problem can be solved in other way
-void Ad74413r::onReaderThreadFinished()
+void Ad74413r::onSwiotReaderFinished()
 {
 	bool singleCaptureOn = m_acqHandler->singleCapture();
 	if(singleCaptureOn) {
@@ -316,7 +302,7 @@ void Ad74413r::onSingleCaptureFinished()
 		}
 		m_singleBtn->setEnabled(true);
 	}
-	m_readerThread->requestStop();
+	m_swiotReader->requestStop();
 	m_singleBtn->setChecked(false);
 }
 
@@ -480,8 +466,8 @@ void Ad74413r::setupChannel(int chnlIdx, QString function)
 		createMeasurementsLabel(chnlIdx, chPen, {unitPerDivLabel, valueLabel});
 		updateMeasurements(chYAxis, chnlIdx);
 
-		QMap<QString, iio_channel *> chnlsMap = m_swiotAdLogic->getIioChnl(chnlIdx);
-		BufferMenuView *menu = new BufferMenuView(chnlsMap, m_conn, m_widgetGroup, this);
+		QMap<QString, component::Channel *> chnlsMap = m_swiotAdLogic->getChnl(chnlIdx);
+		BufferMenuView *menu = new BufferMenuView(chnlsMap, m_widgetGroup, this);
 		menu->init(chnlId, function, chPen, unit, yRange.first, yRange.second);
 		std::pair<double, double> offsetScale = {0, 1};
 		offsetScale = (chnlsMap.size() > 1) ? m_swiotAdLogic->getChnlOffsetScale(chnlIdx + MAX_INPUT_CHNLS_NO)
