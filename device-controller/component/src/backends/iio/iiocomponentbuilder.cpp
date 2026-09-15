@@ -107,6 +107,7 @@ void IIOComponentBuilder::buildOneDevice(IIOContext *iioCtx, scopy::iio::DeviceH
 	dev->setId(devOps->id(dh));
 	dev->setName(devOps->name(dh));
 	dev->setLabel(devOps->label(dh));
+	dev->setIsHwmon(devOps->isHwmon(dh));
 
 	buildDeviceAttributes(dev, executor);
 	buildDebugAttributes(dev, executor);
@@ -181,6 +182,7 @@ void IIOComponentBuilder::buildChannels(IIODevice *dev, ICmdExecutor *executor)
 		chan->setName(chOps->name(ch));
 		chan->setLabel(chOps->label(ch));
 		chan->setIsOutput(chOps->isOutput(ch));
+		chan->setChanType(chOps->channelType(ch));
 
 		const unsigned int attrs = chOps->attrsCount(ch);
 		for(unsigned int i = 0; i < attrs; ++i) {

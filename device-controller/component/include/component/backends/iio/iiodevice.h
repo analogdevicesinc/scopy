@@ -40,8 +40,12 @@ public:
 	scopy::iio::DeviceHandle handle() const { return m_handle; }
 	void setHandle(scopy::iio::DeviceHandle handle) { m_handle = handle; }
 
+	bool isHwmon() const { return m_isHwmon; }
+	void setIsHwmon(bool isHwmon) { m_isHwmon = isHwmon; }
+
 private:
 	scopy::iio::DeviceHandle m_handle;
+	bool m_isHwmon = false;
 };
 
 } // namespace scopy::component::iio

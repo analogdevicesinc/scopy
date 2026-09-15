@@ -40,8 +40,13 @@ public:
 	scopy::iio::ChannelHandle handle() const { return m_handle; }
 	void setHandle(scopy::iio::ChannelHandle handle) { m_handle = handle; }
 
+	// Raw libiio channel type (iio_chan_type / hwmon_chan_type as int); -1 if unset.
+	int chanType() const { return m_chanType; }
+	void setChanType(int chanType) { m_chanType = chanType; }
+
 private:
 	scopy::iio::ChannelHandle m_handle;
+	int m_chanType = -1;
 };
 
 } // namespace scopy::component::iio
