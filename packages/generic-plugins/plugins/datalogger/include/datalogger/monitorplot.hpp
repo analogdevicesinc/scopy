@@ -31,6 +31,7 @@
 #include <QwtDateScaleEngine>
 #include <QTimer>
 #include <QLabel>
+#include <qwt_text.h>
 #include <plotbufferpreviewer.h>
 #include <plotcomponent.h>
 #include "scopy-datalogger_export.h"
@@ -43,6 +44,28 @@ class TimePlotInfo;
 namespace datamonitor {
 
 class MonitorPlotCurve;
+
+// QwtDateScaleDraw that renders values relative to a time reference. Non-realtime mode needs
+// elapsed-since-start labels; shifting the value keeps the resulting QDateTime valid, unlike
+// abusing setUtcOffset() with a multi-billion-second offset (rejected by Qt6's +-14h offset limit).
+class TimeScaleDraw : public QwtDateScaleDraw
+{
+public:
+	explicit TimeScaleDraw(Qt::TimeSpec spec = Qt::UTC)
+		: QwtDateScaleDraw(spec)
+	{}
+	void setTimeReference(double referenceMs)
+	{
+		if(!qFuzzyCompare(m_reference + 1.0, referenceMs + 1.0)) {
+			m_reference = referenceMs;
+			invalidateCache();
+		}
+	}
+	QwtText label(double value) const override { return QwtDateScaleDraw::label(value - m_reference); }
+
+private:
+	double m_reference = 0.0;
+};
 
 class SCOPY_DATALOGGER_EXPORT MonitorPlot : public PlotComponent
 {
@@ -85,7 +108,7 @@ private:
 	QString dateTimeFormat;
 	PlotWidget *m_plot;
 	PlotBufferPreviewer *m_bufferPreviewer = nullptr;
-	QwtDateScaleDraw *m_scaleDraw;
+	TimeScaleDraw *m_scaleDraw;
 	QMap<QString, MonitorPlotCurve *> *m_monitorCurves;
 	bool m_firstMonitor = true;
 
