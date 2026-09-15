@@ -108,6 +108,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       component
 )
 
 set(DATALOGGER_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

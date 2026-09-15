@@ -26,9 +26,13 @@
 #include <QMap>
 #include <QObject>
 #include "datamonitor/dmmdatamonitormodel.hpp"
-#include "iio.h"
 #include "scopy-datalogger_export.h"
 #include "iioutil/iiounits.h"
+
+#include <component/context.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/backends/iio/iiodevice.h>
 
 namespace scopy {
 namespace datamonitor {
@@ -39,10 +43,11 @@ class SCOPY_DATALOGGER_EXPORT DMM : public QObject
 public:
 	explicit DMM(QObject *parent = nullptr);
 
-	QList<DmmDataMonitorModel *> getDmmMonitors(iio_context *ctx);
-	bool isDMMCompatible(iio_channel *chn);
-	bool isHwmon(iio_device *dev, iio_channel *chn);
-	bool iioChannelHasAttribute(iio_channel *chn, std::string const &attr);
+	QList<DmmDataMonitorModel *> getDmmMonitors(component::Context *ctx);
+	bool isDMMCompatible(component::Channel *chn);
+	bool isHwmon(component::iio::IIODevice *dev, component::Channel *chn);
+	// Returns the first channel attribute whose name contains `attr`, or nullptr.
+	component::Attribute *channelAttribute(component::Channel *chn, const QString &attr);
 	void generateDictionaries();
 
 	QMap<iio_chan_type, IIOUnit> iioDevices() const;
