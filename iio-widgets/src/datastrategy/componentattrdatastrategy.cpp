@@ -87,7 +87,7 @@ void ComponentAttrDataStrategy::readAsync()
 	connect(
 		reader, &component::AttributeReader::readFailed, this,
 		[this](const scopy::Error &error) {
-			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, m_data, error.errorCode(), true);
+			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, m_data, -error.errorCode(), true);
 		},
 		Qt::SingleShotConnection);
 
@@ -110,14 +110,15 @@ void ComponentAttrDataStrategy::writeAsync(QString data)
 	connect(
 		writer, &component::AttributeWriter::writeSucceeded, this,
 		[this, data]() {
-			// On success the Attribute triggers a read-back -> valueChanged -> sendData.
 			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, 0, false);
+			readAsync();
 		},
 		Qt::SingleShotConnection);
 	connect(
 		writer, &component::AttributeWriter::writeFailed, this,
 		[this, data](const scopy::Error &error) {
-			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, error.errorCode(), false);
+			Q_EMIT emitStatus(QDateTime::currentDateTime(), m_data, data, -error.errorCode(), false);
+			readAsync();
 		},
 		Qt::SingleShotConnection);
 
