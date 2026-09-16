@@ -181,12 +181,7 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xcb->addItem("Samples", XMODE_SAMPLES);
 	xcb->addItem("Time - override samplerate", XMODE_OVERRIDE);
 
-	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(PlotComponent *plt : m_plotManager->plots()) {
-			auto p = dynamic_cast<TimePlotComponent *>(plt);
-			updateXMode(idx, p->timePlot()->xAxis());
-		}
-	});
+	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) { applyXMode(idx); });
 
 	m_sampleRateSpin = new MenuSpinbox("Sample rate", 1, "Hz", 1, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
@@ -214,6 +209,37 @@ QWidget *TimePlotManagerSettings::createXAxisMenu(QWidget *parent)
 	return section;
 }
 
+TimePlotManagerSettings::XMode TimePlotManagerSettings::xMode() const
+{
+	QComboBox *cb = m_xModeCb->combo();
+	return static_cast<XMode>(cb->itemData(cb->currentIndex()).toInt());
+}
+
+bool TimePlotManagerSettings::setXMode(XMode mode)
+{
+	QComboBox *cb = m_xModeCb->combo();
+	int idx = cb->findData(mode);
+	if(idx < 0) {
+		return false;
+	}
+	// Keep the combo in sync without relying on its signal: when it is already on idx no
+	// signal is emitted, and the plots must still be updated.
+	QSignalBlocker blocker(cb);
+	cb->setCurrentIndex(idx);
+	blocker.unblock();
+	applyXMode(idx);
+	return true;
+}
+
+void TimePlotManagerSettings::applyXMode(int idx)
+{
+	for(PlotComponent *plt : m_plotManager->plots()) {
+		if(auto p = dynamic_cast<TimePlotComponent *>(plt)) {
+			updateXMode(idx, p->timePlot()->xAxis());
+		}
+	}
+}
+
 void TimePlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
 {
 	QComboBox *xcb = m_xModeCb->combo();
@@ -221,11 +247,13 @@ void TimePlotManagerSettings::updateXMode(int mode, PlotAxis *axis)
 
 	if(xcb->itemData(mode) == XMODE_SAMPLES) {
 		m_sampleRateSpin->setValue(1);
-		m_xmin->setUnit("s");
+		// The X axis counts samples here, not seconds -- a sample rate of 1 makes the two
+		// numerically equal, which is why labelling them "s" went unnoticed.
+		m_xmin->setUnit("samples");
 		m_xmin->setScaleRange(1, 1e6);
-		m_xmax->setUnit("s");
+		m_xmax->setUnit("samples");
 		m_xmax->setScaleRange(1, 1e6);
-		m_plotManager->setXUnit("s");
+		m_plotManager->setXUnit("samples");
 
 		axis->scaleDraw()->setFloatPrecision(3);
 		axis->getFormatter()->setTwoDecimalMode(false);
@@ -280,8 +308,7 @@ void TimePlotManagerSettings::onInit()
 	m_xmin->setValue(0);
 	m_xmax->setValue(1024);
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
-	m_xModeCb->combo()->setCurrentIndex(1);
-	m_xModeCb->combo()->setCurrentIndex(0);
+	setXMode(XMODE_SAMPLES);
 
 	m_plotManager->updateAxisScales();
 

@@ -211,7 +211,10 @@ private:
 	Q_PROPERTY(QString unit READ unit WRITE setUnit NOTIFY unitChanged)
 
 	QString m_name;
-	double m_value, m_min, m_max;
+	// m_value is read by populateWidgets(), which the constructor reaches via
+	// setScaleRange() before setValue() has run - so it must start defined.
+	double m_value = 0;
+	double m_min, m_max;
 	double m_scaleMin, m_scaleMax;
 	QString m_unit;
 	bool m_large_widget;

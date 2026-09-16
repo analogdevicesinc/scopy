@@ -75,6 +75,14 @@ public:
 	uint32_t bufferSize() const;
 	void setBufferSize(uint32_t newBufferSize);
 
+	XMode xMode() const;
+	/// Applies mode across every plot and rescales the X axis. Unlike driving the combo
+	/// directly, this also works when the combo already sits on mode - which is the case
+	/// on init, where it starts on XMODE_SAMPLES.
+	/// Returns false if mode is not one of the combo's current entries (XMODE_TIME only
+	/// appears once a channel reports a sample rate).
+	bool setXMode(XMode mode);
+
 	void updateXAxis();
 	MenuWidget *menu() override;
 
@@ -107,6 +115,8 @@ private:
 	TimePlotManager *m_plotManager;
 
 	void updateXMode(int mode, PlotAxis *axis);
+	/// Runs updateXMode() over every plot. `idx` is a combo index, not an XMode value.
+	void applyXMode(int idx);
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);

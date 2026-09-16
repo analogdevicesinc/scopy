@@ -26,6 +26,8 @@
 #include <pluginbase/apiobject.h>
 #include <QStringList>
 
+class QComboBox;
+
 namespace scopy {
 namespace adc {
 
@@ -35,6 +37,7 @@ class ADCTimeInstrumentController;
 class ADCFFTInstrumentController;
 class GRTimeChannelComponent;
 class GRFFTChannelComponent;
+class TimePlotComponentSettings;
 
 /**
  * Scripting/MCP facade over the ADC plugin.
@@ -98,7 +101,9 @@ public:
 	Q_INVOKABLE bool isTimeChannelEnabled(const QString &channel);
 	Q_INVOKABLE bool setTimeChannelEnabled(const QString &channel, bool enabled);
 
-	// Channel Y-mode (0=COUNT, 1=FS, 2=SCALE, 3=SCALE_OVERRIDE)
+	// Per-channel Y-mode (0=COUNT, 1=FS, 2=SCALE, 3=SCALE_OVERRIDE).
+	// This is the YMODE combo in an individual channel's own menu, NOT the one in the
+	// instrument's general settings -- for that use get/setTimeYMode below.
 	Q_INVOKABLE int getTimeChannelYMode(const QString &channel);
 	Q_INVOKABLE bool setTimeChannelYMode(const QString &channel, int mode);
 
@@ -182,6 +187,16 @@ public:
 	Q_INVOKABLE int getFreqXMode();
 	Q_INVOKABLE bool setFreqXMode(int mode);
 
+	// ==================== Y-MODE ====================
+
+	// The YMODE combo in the time instrument's general settings, alongside XMODE.
+	// Setting it cascades to every channel and rescales the plot's Y axis, which is
+	// what setTimeChannelYMode (a single channel's own menu) does not do.
+	// YMode: 0=COUNT, 1=FS, 2=SCALE. SCALE is only offered when every channel
+	// exposes a scale attribute.
+	Q_INVOKABLE int getTimeYMode();
+	Q_INVOKABLE bool setTimeYMode(int mode);
+
 	// ==================== CHANNEL AVERAGING (FFT) ====================
 
 	Q_INVOKABLE bool isFreqChannelAveragingEnabled(const QString &channel);
@@ -238,6 +253,9 @@ private:
 	// --- lookups; all report via fail() when they return nullptr ---
 	ADCTimeInstrumentController *getTimeController();
 	ADCFFTInstrumentController *getFreqController();
+	/// The time instrument's plot settings widget, which hosts the general-settings
+	/// Y-AXIS controls (autoscale, Y range, YMODE).
+	TimePlotComponentSettings *getTimePlotSettings();
 	GRTimeChannelComponent *findTimeChannel(const QString &name);
 	/// Finds any FFT channel -- real or complex -- so every name returned by
 	/// getFreqChannels()/getComplexChannels() is accepted by every setter.
@@ -247,6 +265,11 @@ private:
 
 	/// Lists channel names of the requested kind, for "no such channel" messages.
 	QStringList freqChannelNames();
+
+	/// Renders a combo's entries as "value=label, ..." for "invalid mode" messages. The
+	/// valid set is runtime dependent for both XMODE and YMODE, so it has to be read off
+	/// the widget rather than assumed from the enum range.
+	static QString comboValues(const QComboBox *cb);
 
 	ADCPlugin *m_adcPlugin;
 	mutable QString m_lastError;

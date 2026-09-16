@@ -138,6 +138,14 @@ bool ADC_API::verify(const QString &what, double actual, double expected) const
 	return fail(QString("%1: requested %2 but reads back %3").arg(what).arg(expected).arg(actual));
 }
 
+QString ADC_API::comboValues(const QComboBox *cb)
+{
+	QStringList values;
+	for(int i = 0; i < cb->count(); ++i)
+		values.append(QString("%1=%2").arg(cb->itemData(i).toInt()).arg(cb->itemText(i)));
+	return values.join(", ");
+}
+
 // ==================== LOOKUPS ====================
 
 ADCTimeInstrumentController *ADC_API::getTimeController()
@@ -149,6 +157,23 @@ ADCTimeInstrumentController *ADC_API::getTimeController()
 	}
 	fail("no ADC - Time instrument found; is the device connected?");
 	return nullptr;
+}
+
+TimePlotComponentSettings *ADC_API::getTimePlotSettings()
+{
+	auto *ctrl = getTimeController();
+	if(!ctrl)
+		return nullptr;
+	if(!ctrl->m_plotComponentManager) {
+		fail("time instrument has no plot manager");
+		return nullptr;
+	}
+	auto *plot = dynamic_cast<TimePlotComponent *>(ctrl->m_plotComponentManager->plot(0));
+	if(!plot || !plot->plotMenu()) {
+		fail("time instrument has no plot settings menu");
+		return nullptr;
+	}
+	return plot->plotMenu();
 }
 
 ADCFFTInstrumentController *ADC_API::getFreqController()
@@ -487,6 +512,10 @@ bool ADC_API::setTimeChannelYMode(const QString &channel, int mode)
 				    .arg(channel, available.join(", ")));
 	}
 	cb->setCurrentIndex(idx);
+	// Verify the combo, not just ch->ymode(): the latter is written by this same setter's
+	// signal handler, so checking it alone cannot distinguish "applied" from "stored".
+	if(cb->currentData().toInt() != mode)
+		return fail(QString("channel '%1' Y mode did not apply").arg(channel));
 	return verify(QString("channel '%1' Y mode").arg(channel), static_cast<int>(ch->ymode()), mode);
 }
 
@@ -730,7 +759,7 @@ int ADC_API::getTimeXMode()
 	auto *ctrl = getTimeController();
 	if(!ctrl)
 		return -1;
-	return ctrl->m_timePlotSettingsComponent->m_xModeCb->combo()->currentData().toInt();
+	return static_cast<int>(ctrl->m_timePlotSettingsComponent->xMode());
 }
 
 bool ADC_API::setTimeXMode(int mode)
@@ -739,18 +768,14 @@ bool ADC_API::setTimeXMode(int mode)
 	auto *ctrl = getTimeController();
 	if(!ctrl)
 		return false;
-	QComboBox *cb = ctrl->m_timePlotSettingsComponent->m_xModeCb->combo();
+	auto *settings = ctrl->m_timePlotSettingsComponent;
 	// XMODE_TIME is only inserted once a channel reports a sample rate, so the set of
-	// valid values is runtime dependent - take it from the combo itself.
-	int idx = cb->findData(mode);
-	if(idx < 0) {
-		QStringList available;
-		for(int i = 0; i < cb->count(); ++i)
-			available.append(QString::number(cb->itemData(i).toInt()));
-		return fail(QString("invalid X mode %1; available: %2").arg(mode).arg(available.join(", ")));
-	}
-	cb->setCurrentIndex(idx);
-	return verify("X mode", cb->currentData().toInt(), mode);
+	// valid values is runtime dependent - setXMode() rejects the absent ones for us.
+	if(!settings->setXMode(static_cast<TimePlotManagerSettings::XMode>(mode)))
+		return fail(QString("invalid X mode %1; available: %2")
+				    .arg(mode)
+				    .arg(comboValues(settings->m_xModeCb->combo())));
+	return verify("X mode", static_cast<int>(settings->xMode()), mode);
 }
 
 // ============================================================================
@@ -1416,10 +1441,9 @@ int ADC_API::getFreqXMode()
 	auto *ctrl = getFreqController();
 	if(!ctrl)
 		return -1;
-	auto *cb = ctrl->m_fftPlotSettingsComponent->m_xModeCb;
-	if(!cb)
+	if(!ctrl->m_fftPlotSettingsComponent->m_xModeCb)
 		return failInt("frequency instrument has no X-mode combo");
-	return cb->combo()->currentData().toInt();
+	return static_cast<int>(ctrl->m_fftPlotSettingsComponent->xMode());
 }
 
 bool ADC_API::setFreqXMode(int mode)
@@ -1428,21 +1452,50 @@ bool ADC_API::setFreqXMode(int mode)
 	auto *ctrl = getFreqController();
 	if(!ctrl)
 		return false;
-	auto *xModeCb = ctrl->m_fftPlotSettingsComponent->m_xModeCb;
-	if(!xModeCb)
+	auto *settings = ctrl->m_fftPlotSettingsComponent;
+	if(!settings->m_xModeCb)
 		return fail("frequency instrument has no X-mode combo");
 
-	QComboBox *cb = xModeCb->combo();
-	int idx = cb->findData(mode);
-	if(idx < 0) {
-		QStringList valid;
-		for(int i = 0; i < cb->count(); ++i)
-			valid.append(QString("%1=%2").arg(cb->itemData(i).toInt()).arg(cb->itemText(i)));
-		return fail(QString("invalid freq X-mode %1; valid values: %2").arg(mode).arg(valid.join(", ")));
-	}
+	// XMODE_TIME is only inserted once a channel reports a sample rate, so the set of
+	// valid values is runtime dependent - setXMode() rejects the absent ones for us.
+	if(!settings->setXMode(static_cast<FFTPlotManagerSettings::XMode>(mode)))
+		return fail(QString("invalid freq X-mode %1; valid values: %2")
+				    .arg(mode)
+				    .arg(comboValues(settings->m_xModeCb->combo())));
+	return verify("freq X-mode", static_cast<int>(settings->xMode()), mode);
+}
 
-	cb->setCurrentIndex(idx);
-	return verify("freq X-mode", cb->currentData().toInt(), mode);
+// ==================== Y-MODE ====================
+
+int ADC_API::getTimeYMode()
+{
+	clearError();
+	auto *menu = getTimePlotSettings();
+	if(!menu)
+		return -1;
+	if(!menu->m_yModeCb)
+		return failInt("time instrument has no Y-mode combo");
+	// yMode() is the mode actually in force on the axis; the combo is kept in sync with it.
+	return static_cast<int>(menu->yMode());
+}
+
+bool ADC_API::setTimeYMode(int mode)
+{
+	clearError();
+	auto *menu = getTimePlotSettings();
+	if(!menu)
+		return false;
+	if(!menu->m_yModeCb)
+		return fail("time instrument has no Y-mode combo");
+
+	// YMODE_SCALE is only appended once every channel reports a scale attribute, so the
+	// valid set is runtime dependent - setYMode() rejects the absent ones for us. It also
+	// applies when the combo already sits on mode, which driving the combo would not.
+	if(!menu->setYMode(static_cast<YMode>(mode)))
+		return fail(QString("invalid Y-mode %1; valid values: %2")
+				    .arg(mode)
+				    .arg(comboValues(menu->m_yModeCb->combo())));
+	return verify("Y-mode", static_cast<int>(menu->yMode()), mode);
 }
 
 // ==================== CHANNEL AVERAGING (FFT) ====================

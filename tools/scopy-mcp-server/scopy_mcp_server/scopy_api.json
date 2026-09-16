@@ -6497,6 +6497,11 @@
           "returns": "int"
         },
         {
+          "name": "getTimeYMode",
+          "args": [],
+          "returns": "int"
+        },
+        {
           "name": "getTools",
           "args": [],
           "returns": "QStringList"
@@ -7046,6 +7051,16 @@
         },
         {
           "name": "setTimeXMode",
+          "args": [
+            {
+              "name": "mode",
+              "type": "int"
+            }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "setTimeYMode",
           "args": [
             {
               "name": "mode",

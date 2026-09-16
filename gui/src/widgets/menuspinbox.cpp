@@ -372,13 +372,23 @@ void MenuSpinbox::populateWidgets()
 
 void MenuSpinbox::setScaleRange(double min, double max)
 {
-	m_scaleCb->clear();
-	for(int i = 0; i < m_scales.count(); i++) {
-		auto scale = m_scales[i].scale;
-		if(scale >= min && scale <= max) {
-			m_scaleCb->addItem(m_scales[i].prefix + m_unit, scale);
+	// Repopulating must not look like the user picking a scale: clear() emits
+	// currentIndexChanged(-1) and each addItem() emits it again, and the handler reparses
+	// the edit text against itemData(-1) - i.e. no scale at all - which corrupts the value
+	// and pushes it downstream. Block the combo and restore the value ourselves.
+	{
+		QSignalBlocker blocker(m_scaleCb);
+		m_scaleCb->clear();
+		for(int i = 0; i < m_scales.count(); i++) {
+			auto scale = m_scales[i].scale;
+			if(scale >= min && scale <= max) {
+				m_scaleCb->addItem(m_scales[i].prefix + m_unit, scale);
+			}
 		}
 	}
+	// Reselect the scale that suits the value we already hold, and resync the edit text
+	// with it, since the entries (and so the indices) just changed underneath.
+	populateWidgets();
 	m_incrementStrategy->setScale(m_scaleCb->currentData().toDouble());
 }
 

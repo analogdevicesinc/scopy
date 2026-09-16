@@ -37,6 +37,9 @@ HDivInfo::HDivInfo(PlotWidget *plot, QWidget *parent)
 	m_mpf->setTrimZeroes(true);
 	m_mpf->setTwoDecimalMode(false);
 	connect(m_plot->navigator(), &PlotNavigator::rectChanged, this, &HDivInfo::onRectChanged);
+	// The text embeds the axis units, so a unit change (e.g. switching XMODE between samples
+	// and time) has to redraw it too - rectChanged alone does not fire for that.
+	connect(m_plot->xAxis(), &PlotAxis::unitsChanged, this, [this]() { onRectChanged(); });
 
 	onRectChanged();
 }

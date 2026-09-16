@@ -42,6 +42,13 @@ public:
 	void showDeleteButtons(bool b);
 	void showPlotButtons(bool b);
 
+	YMode yMode() const;
+	/// Applies mode to every channel on this plot and rescales the Y axis. Unlike driving
+	/// the combo directly, this also works when the combo already sits on mode - which is
+	/// the case on init, where the combo starts on index 0 and so emits nothing.
+	/// Returns false if mode is not one of the combo's current entries.
+	bool setYMode(YMode mode);
+
 public Q_SLOTS:
 	void addChannel(ChannelComponent *c);
 	void removeChannel(ChannelComponent *c);
@@ -76,6 +83,9 @@ private:
 private:
 	void toggleAutoScale();
 	void updateYModeCombo();
+	/// Cascades mode to the channels and rescales the axis. Shared by the combo's
+	/// currentIndexChanged handler and by setYMode().
+	void applyYMode(YMode mode);
 };
 
 } // namespace adc

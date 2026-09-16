@@ -132,13 +132,8 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	ycb->addItem("ADC Counts", YMODE_COUNT);
 	ycb->addItem("% Full Scale", YMODE_FS);
 
-	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		m_ymode = static_cast<YMode>(ycb->itemData(idx).toInt());
-		for(auto c : qAsConst(m_scaleProviders)) {
-			c->setYMode(m_ymode);
-		}
-		updateYAxis();
-	});
+	connect(ycb, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[=](int idx) { applyYMode(static_cast<YMode>(ycb->itemData(idx).toInt())); });
 
 	m_deletePlot = new QPushButton("Delete Plot");
 	StyleHelper::BasicButton(m_deletePlot);
@@ -201,9 +196,11 @@ TimePlotComponentSettings::TimePlotComponentSettings(TimePlotComponent *plt, QWi
 	m_plotComponent->timePlot()->plotButtonManager()->add(m_settingsPlotHover);
 	m_autoscaleBtn->onOffswitch()->setChecked(true);
 
-	m_ymode = static_cast<YMode>(-1);
+	// setCurrentIndex() emits nothing when the combo is already there, and it starts on
+	// index 0 - so go through setYMode(), which applies regardless.
 	auto y = Preferences::get("adc_default_y_mode").toInt();
-	m_yModeCb->combo()->setCurrentIndex(y);
+	int idx = qBound(0, y, m_yModeCb->combo()->count() - 1);
+	setYMode(static_cast<YMode>(m_yModeCb->combo()->itemData(idx).toInt()));
 }
 
 void TimePlotComponentSettings::showDeleteButtons(bool b)
@@ -288,6 +285,33 @@ void TimePlotComponentSettings::toggleAutoScale()
 	}
 }
 
+YMode TimePlotComponentSettings::yMode() const { return m_ymode; }
+
+bool TimePlotComponentSettings::setYMode(YMode mode)
+{
+	QComboBox *cb = m_yModeCb->combo();
+	int idx = cb->findData(mode);
+	if(idx < 0) {
+		return false;
+	}
+	// Keep the combo in sync without relying on its signal to do the work: when it is
+	// already on idx there is no signal, and applyYMode() must still run.
+	QSignalBlocker blocker(cb);
+	cb->setCurrentIndex(idx);
+	blocker.unblock();
+	applyYMode(mode);
+	return true;
+}
+
+void TimePlotComponentSettings::applyYMode(YMode mode)
+{
+	m_ymode = mode;
+	for(ScaleProvider *c : qAsConst(m_scaleProviders)) {
+		c->setYMode(mode);
+	}
+	updateYAxis();
+}
+
 void TimePlotComponentSettings::updateYModeCombo()
 {
 	bool scaleItemCbtmp = true;
@@ -298,17 +322,16 @@ void TimePlotComponentSettings::updateYModeCombo()
 		}
 	}
 
+	int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
 	if(scaleItemCbtmp) {
 		// need scale item
-		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
 		if(idx == -1) {
 			m_yModeCb->combo()->addItem("Scale", YMODE_SCALE);
 		}
 
 	} else {
-		// no need
-		int idx = m_yModeCb->combo()->findData(YMODE_SCALE);
-		if(idx) {
+		// no need -- findData() returns -1 when absent, which removeItem() must not see
+		if(idx != -1) {
 			m_yModeCb->combo()->removeItem(idx);
 		}
 	}
@@ -316,18 +339,22 @@ void TimePlotComponentSettings::updateYModeCombo()
 
 void TimePlotComponentSettings::updateYAxis()
 {
-	double max = -1000000.0;
-	double min = 1000000.0;
-	for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
-		if(s->yMax() > max) {
-			max = s->yMax();
+	// The fold below starts from inverted sentinels, so with no channels yet it would
+	// push min > max into the range control. Leave the range alone in that case.
+	if(!m_scaleProviders.isEmpty()) {
+		double max = -1000000.0;
+		double min = 1000000.0;
+		for(ScaleProvider *s : qAsConst(m_scaleProviders)) {
+			if(s->yMax() > max) {
+				max = s->yMax();
+			}
+			if(s->yMin() < min) {
+				min = s->yMin();
+			}
 		}
-		if(s->yMin() < min) {
-			min = s->yMin();
-		}
+		m_yCtrl->setMin(min);
+		m_yCtrl->setMax(max);
 	}
-	m_yCtrl->setMin(min);
-	m_yCtrl->setMax(max);
 
 	auto timePlotYAxis = m_plotComponent->timePlot()->yAxis();
 	switch(m_ymode) {
@@ -343,7 +370,9 @@ void TimePlotComponentSettings::updateYAxis()
 		timePlotYAxis->getFormatter()->setTwoDecimalMode(false);
 		break;
 	case YMODE_SCALE:
-		timePlotYAxis->setUnits(m_scaleProviders[0]->unit().symbol);
+		if(!m_scaleProviders.isEmpty()) {
+			timePlotYAxis->setUnits(m_scaleProviders[0]->unit().symbol);
+		}
 		timePlotYAxis->scaleDraw()->setFloatPrecision(3);
 		timePlotYAxis->getFormatter()->setTwoDecimalMode(true);
 		break;

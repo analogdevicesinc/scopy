@@ -142,12 +142,7 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	xcb->addItem("Samples", XMODE_SAMPLES);
 	xcb->addItem("Frequency - override samplerate", XMODE_OVERRIDE);
 
-	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
-		for(PlotComponent *plt : m_plotManager->plots()) {
-			auto p = dynamic_cast<FFTPlotComponent *>(plt);
-			updateXMode(idx, p->fftPlot()->xAxis(), p->waterfallPlot()->xAxis());
-		}
-	});
+	connect(xcb, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) { applyXMode(idx); });
 
 	m_sampleRateSpin = new MenuSpinbox("Sample Rate", 1, "Hz", 1, DBL_MAX, true, false, section);
 	m_sampleRateSpin->setIncrementMode(MenuSpinbox::IS_125);
@@ -184,6 +179,37 @@ QWidget *FFTPlotManagerSettings::createXAxisMenu(QWidget *parent)
 	section->contentLayout()->setSpacing(10);
 
 	return section;
+}
+
+FFTPlotManagerSettings::XMode FFTPlotManagerSettings::xMode() const
+{
+	QComboBox *cb = m_xModeCb->combo();
+	return static_cast<XMode>(cb->itemData(cb->currentIndex()).toInt());
+}
+
+bool FFTPlotManagerSettings::setXMode(XMode mode)
+{
+	QComboBox *cb = m_xModeCb->combo();
+	int idx = cb->findData(mode);
+	if(idx < 0) {
+		return false;
+	}
+	// Keep the combo in sync without relying on its signal: when it is already on idx no
+	// signal is emitted, and the plots must still be updated.
+	QSignalBlocker blocker(cb);
+	cb->setCurrentIndex(idx);
+	blocker.unblock();
+	applyXMode(idx);
+	return true;
+}
+
+void FFTPlotManagerSettings::applyXMode(int idx)
+{
+	for(PlotComponent *plt : m_plotManager->plots()) {
+		if(auto p = dynamic_cast<FFTPlotComponent *>(plt)) {
+			updateXMode(idx, p->fftPlot()->xAxis(), p->waterfallPlot()->xAxis());
+		}
+	}
 }
 
 void FFTPlotManagerSettings::updateXMode(int mode, PlotAxis *fftAxis, PlotAxis *waterfallAxis)
@@ -247,7 +273,9 @@ void FFTPlotManagerSettings::onInit()
 	m_sampleRateSpin->setValue(1);
 	m_xmin->setValue(0);
 	m_xmax->setValue(400);
-	m_xModeCb->combo()->setCurrentIndex(0);
+	// The combo already starts on XMODE_SAMPLES, so setCurrentIndex(0) emitted nothing and
+	// the axis units were never applied. setXMode() applies regardless.
+	setXMode(XMODE_SAMPLES);
 
 	m_sampleRateSpin->setVisible(false);
 	m_freqOffsetSpin->setVisible(false);
