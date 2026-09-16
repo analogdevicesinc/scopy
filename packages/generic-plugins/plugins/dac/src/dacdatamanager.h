@@ -33,9 +33,10 @@
 #include <gui/mapstackedwidget.h>
 #include <gui/widgets/menucontrolbutton.h>
 
-#include <iio.h>
-
 namespace scopy {
+namespace component {
+class Device;
+}
 namespace dac {
 class DacDataModel;
 class DacAddon;
@@ -49,7 +50,7 @@ public:
 		DAC_DDS
 	} DacMode;
 
-	DacDataManager(struct iio_device *dev, QWidget *parent = nullptr);
+	DacDataManager(component::Device *dev, QWidget *parent = nullptr);
 	virtual ~DacDataManager();
 
 	QString getName() const;

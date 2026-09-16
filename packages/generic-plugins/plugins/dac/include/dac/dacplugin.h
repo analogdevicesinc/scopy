@@ -29,7 +29,7 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-#include <iio.h>
+#include <component/controller.h>
 
 namespace scopy {
 namespace dac {
@@ -57,7 +57,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
-	struct iio_context *m_ctx;
+	component::ContextHandle m_context;
 	QWidget *dac;
 };
 } // namespace dac

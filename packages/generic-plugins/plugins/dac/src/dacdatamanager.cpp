@@ -32,6 +32,8 @@
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/iiowidget.h>
 
+#include <component/device.h>
+
 #include <QRandomGenerator>
 #include <QLabel>
 #include <QScrollArea>
@@ -39,7 +41,7 @@
 
 using namespace scopy;
 using namespace scopy::dac;
-DacDataManager::DacDataManager(struct iio_device *dev, QWidget *parent)
+DacDataManager::DacDataManager(component::Device *dev, QWidget *parent)
 	: QWidget(parent)
 {
 	m_model = new DacDataModel(dev, this);
@@ -105,7 +107,7 @@ QWidget *DacDataManager::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
 							    MenuCollapseSection::MHW_BASEWIDGET, attrContainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).device(m_model->getDev()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).componentContainer(m_model->getDev()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);

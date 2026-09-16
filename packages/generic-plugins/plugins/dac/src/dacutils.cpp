@@ -21,8 +21,13 @@
 
 #include "dacutils.h"
 
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/backends/iio/iiochannel.h>
+
 #include <float.h>
 #include <qmath.h>
+#include <iio.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -42,22 +47,19 @@ double DacUtils::dbFullScaleConvert(double scale, bool inverse)
 	}
 }
 
-bool DacUtils::checkDdsChannel(iio_channel *chn)
+bool DacUtils::checkDdsChannel(component::Channel *chn)
 {
-	iio_chan_type chnType = iio_channel_get_type(chn);
-	if(chnType != IIO_ALTVOLTAGE) {
+	auto *iioChn = qobject_cast<component::iio::IIOChannel *>(chn);
+	if(!iioChn || iioChn->chanType() != IIO_ALTVOLTAGE) {
 		return false;
 	}
-	auto freq = iio_channel_find_attr(chn, "frequency");
-	if(!freq) {
+	if(!chn->findChild<component::Attribute *>("frequency")) {
 		return false;
 	}
-	auto scale = iio_channel_find_attr(chn, "scale");
-	if(!scale) {
+	if(!chn->findChild<component::Attribute *>("scale")) {
 		return false;
 	}
-	auto phase = iio_channel_find_attr(chn, "phase");
-	if(!phase) {
+	if(!chn->findChild<component::Attribute *>("phase")) {
 		return false;
 	}
 	return true;
