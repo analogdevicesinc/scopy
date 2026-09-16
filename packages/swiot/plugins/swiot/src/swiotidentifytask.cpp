@@ -23,61 +23,42 @@
 
 #include "swiot_logging_categories.h"
 
-#include <iio.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/attributewriter.h>
 
-#include <iioutil/connectionprovider.h>
-#include <iioutil/iiocommand/iiodeviceattributewrite.h>
+#include <qcorotask.h>
 
 using namespace scopy::swiot;
+
 SwiotIdentifyTask::SwiotIdentifyTask(QString uri, QObject *parent)
-	: QThread(parent)
+	: QObject(parent)
 	, m_uri(uri)
-	, m_conn(nullptr)
+	, m_swiot(nullptr)
 {
-	m_conn = ConnectionProvider::open(m_uri);
-	if(!m_conn) {
+	m_context = component::Controller::context(m_uri);
+	m_swiot = m_context ? m_context->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly) : nullptr;
+	if(!m_swiot) {
 		qDebug(CAT_SWIOT) << "Error, no context available for the identify task.";
 	}
-	connect(m_conn, &Connection::aboutToBeDestroyed, this, [=, this]() { m_conn = nullptr; });
 }
 
-SwiotIdentifyTask::~SwiotIdentifyTask()
+SwiotIdentifyTask::~SwiotIdentifyTask() { m_context = {}; }
+
+QCoro::Task<void> SwiotIdentifyTask::identify()
 {
-	if(m_conn) {
-		m_conn = nullptr;
-		ConnectionProvider::close(m_uri);
+	if(!m_swiot) {
+		co_return;
+	}
+	component::Attribute *attr = m_swiot->findChild<component::Attribute *>("identify", Qt::FindDirectChildrenOnly);
+	if(!attr || !attr->writeCapability()) {
+		qCritical(CAT_SWIOT) << "Error, could not identify swiot.";
+		co_return;
+	}
+	auto r = co_await attr->writeCapability()->writeAsync("1");
+	if(!r) {
+		qCritical(CAT_SWIOT) << "Error, could not identify swiot.";
 	}
 }
 
-void SwiotIdentifyTask::run()
-{
-	if(!m_conn) {
-		return;
-	}
-
-	if(isInterruptionRequested()) {
-		return;
-	}
-	iio_device *swiotDevice = iio_context_find_device(m_conn->context(), "swiot");
-
-	if(swiotDevice) {
-		IioDeviceAttributeWrite *iioAttrWrite =
-			new IioDeviceAttributeWrite(swiotDevice, "identify", "1", nullptr, true);
-
-		connect(
-			iioAttrWrite, &scopy::Command::finished, this,
-			[=, this](scopy::Command *cmd) {
-				IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
-				if(!tcmd) {
-					return;
-				}
-				if(tcmd->getReturnCode() < 0) {
-					qCritical(CAT_SWIOT) << "Error, could not identify swiot, error code"
-							     << tcmd->getReturnCode();
-				}
-			},
-			Qt::QueuedConnection);
-
-		m_conn->commandQueue()->enqueue(iioAttrWrite);
-	}
-}
+#include "moc_swiotidentifytask.cpp"

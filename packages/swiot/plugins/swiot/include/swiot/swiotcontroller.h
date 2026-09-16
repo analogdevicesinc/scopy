@@ -21,16 +21,20 @@
 #ifndef SWIOTCONTROLLER_H
 #define SWIOTCONTROLLER_H
 
-#include "iioutil/cyclicaltask.h"
-#include "externalpsreaderthread.h"
+#include "externalpsreader.h"
 #include "swiotidentifytask.h"
 #include "swiotreadtemperaturetask.h"
 
-#include <iio.h>
-
 #include <QObject>
+#include <QTimer>
+#include <qcoro/qcorotask.h>
+#include <component/controller.h>
 
-namespace scopy::swiot {
+namespace scopy {
+namespace component {
+class Device;
+}
+namespace swiot {
 class SwiotController : public QObject
 {
 	Q_OBJECT
@@ -47,10 +51,11 @@ public:
 	void connectSwiot();
 	void disconnectSwiot();
 
+	QCoro::Task<void> writeModeAttribute(QString mode);
+	QCoro::Task<void> readModeAttribute();
+
 public Q_SLOTS:
 	void identify();
-	void writeModeAttribute(QString mode);
-	void readModeAttribute();
 
 Q_SIGNALS:
 	void pingSuccess();
@@ -60,26 +65,25 @@ Q_SIGNALS:
 	void modeAttributeChanged(QString mode);
 	void isRuntimeCtxChanged(bool isRuntimeCtx);
 	void writeModeFailed();
-private Q_SLOTS:
-	void writeModeCommandFinished(scopy::Command *cmd);
-	void readModeCommandFinished(scopy::Command *cmd);
 
 private:
 	void setIsRuntimeCtx(bool runtimeCtx);
 
-	SwiotIdentifyTask *identifyTask;
-	ExternalPsReaderThread *extPsTask;
-	SwiotReadTemperatureTask *temperatureTask;
-	CommandQueue *m_cmdQueue;
-	iio_context *m_iioCtx;
-	Connection *m_conn;
+	SwiotIdentifyTask *m_identifyTask;
+	ExternalPsReader *m_extPsTask;
+	SwiotReadTemperatureTask *m_temperatureTask;
+
+	component::ContextHandle m_context;
+	component::Device *m_swiotDevice;
+
 	QString uri;
 	bool m_isRuntimeCtx;
 	bool m_temperatureReadEn;
 
-	CyclicalTask *powerSupplyTimer;
-	CyclicalTask *temperatureTimer;
+	QTimer *powerSupplyTimer;
+	QTimer *temperatureTimer;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SWIOTCONTROLLER_H

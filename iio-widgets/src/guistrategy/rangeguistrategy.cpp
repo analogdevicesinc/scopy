@@ -56,7 +56,7 @@ QWidget *RangeAttrUi::ui() { return m_ui; }
 
 bool RangeAttrUi::isValid()
 {
-	if((m_recipe.channel || m_recipe.device) && m_recipe.data != "" &&
+	if((m_recipe.channel || m_recipe.device || m_recipe.attribute) && m_recipe.data != "" &&
 	   (m_recipe.iioDataOptions != "" || m_recipe.constDataOptions != "")) {
 		return true;
 	}
@@ -206,19 +206,15 @@ double RangeAttrUi::tryParse(QString number, bool *success, QString *unit)
 void RangeAttrUi::onValueChanged(double value)
 {
 	m_currentValueToProcess = value;
-	Q_EMIT requestData();
-
-	// we use QTimer::singleShot to execute processValueChange() after the event loop finished,
-	// to make sure the data was updated
 	QTimer::singleShot(0, this, &RangeAttrUi::processValueChange);
 }
 
 void RangeAttrUi::processValueChange()
 {
-	// manually clamp value since clamping within meniSpinBox is disabled
+	// clamp against the spinbox's known range; a user edit must not trigger a read
+	// (an async read lands after the edit and overwrites the typed value).
 	double clampedValue = std::min(std::max(m_spinBox->min(), m_currentValueToProcess), m_spinBox->max());
 
-	// set the value in UI again after it was updated from requestData()
 	m_spinBox->setValueSilent(clampedValue);
 	Q_EMIT emitData(Util::doubleToQString(clampedValue));
 }

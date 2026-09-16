@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2026 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+#pragma once
+
+#include "component/attributereader.h"
+#include "component/attributewriter.h"
+
+#include <QList>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include "component/component_export.h"
+
+namespace scopy::component {
+
+// Identity + metadata node for one parameter. Performs no I/O itself: reads and
+// writes are delegated to AttributeReader / AttributeWriter capability children.
+// Writability is "has an AttributeWriter child".
+class COMPONENT_EXPORT Attribute : public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString cachedValue MEMBER m_cachedValue NOTIFY valueChanged)
+	Q_PROPERTY(QString name READ name CONSTANT)
+	Q_PROPERTY(QString unit READ unit CONSTANT)
+	Q_PROPERTY(QList<double> range READ range CONSTANT)
+	Q_PROPERTY(QStringList options READ options CONSTANT)
+	Q_PROPERTY(bool hasRange READ hasRange CONSTANT)
+	Q_PROPERTY(bool hasOptions READ hasOptions CONSTANT)
+	Q_PROPERTY(bool isWritable READ isWritable CONSTANT)
+public:
+	explicit Attribute(QObject *parent = nullptr)
+		: QObject(parent)
+	{}
+	~Attribute() override = default;
+
+	QString name() const { return m_name; }
+	QString unit() const { return m_unit; }
+	QString cachedValue() const { return m_cachedValue; }
+	QList<double> range() const { return m_range; }
+	QStringList options() const { return m_options; }
+	bool hasRange() const { return !m_range.isEmpty(); }
+	bool hasOptions() const { return !m_options.isEmpty(); }
+
+	void setName(const QString &name)
+	{
+		m_name = name;
+		setObjectName(name);
+	}
+	void setUnit(const QString &unit) { m_unit = unit; }
+	void setRange(const QList<double> &range) { m_range = range; }
+	void setOptions(const QStringList &options) { m_options = options; }
+	void setCachedValue(const QString &value)
+	{
+		if(m_cachedValue == value) {
+			return;
+		}
+		m_cachedValue = value;
+		Q_EMIT valueChanged(value);
+	}
+
+	AttributeReader *readCapability() const { return m_read; }
+	AttributeWriter *writeCapability() const { return m_write; }
+	bool isWritable() const { return m_write != nullptr; }
+
+	// Reparent + wire the capabilities. The Attribute owns the wiring.
+	void addReadCapability(AttributeReader *cap)
+	{
+		m_read = cap;
+		cap->setParent(this);
+		connect(
+			cap, &AttributeReader::readSucceeded, this,
+			[this](Result<QByteArray> &r) {
+				if(r) {
+					setCachedValue(QString::fromUtf8(r.value()));
+				}
+			},
+			Qt::DirectConnection);
+	}
+	void addWriteCapability(AttributeWriter *cap)
+	{
+		m_write = cap;
+		cap->setParent(this);
+		connect(
+			cap, &AttributeWriter::writeSucceeded, this,
+			[this]() {
+				if(m_read) {
+					m_read->readAsync();
+				}
+			},
+			Qt::DirectConnection);
+	}
+
+Q_SIGNALS:
+	void valueChanged(const QString &value);
+
+private:
+	AttributeReader *m_read = nullptr;
+	AttributeWriter *m_write = nullptr;
+	QString m_name;
+	QString m_unit;
+	QString m_cachedValue;
+	QList<double> m_range;
+	QStringList m_options;
+};
+
+} // namespace scopy::component

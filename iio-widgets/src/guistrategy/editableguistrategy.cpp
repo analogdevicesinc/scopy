@@ -20,6 +20,7 @@
 
 #include "guistrategy/editableguistrategy.h"
 #include <gui/style.h>
+#include <component/attribute.h>
 
 using namespace scopy;
 
@@ -66,6 +67,11 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, bool isC
 		}
 	});
 
+	// A component::Attribute with no write capability is display-only.
+	if(m_recipe.attribute && !m_recipe.attribute->isWritable()) {
+		m_lineEdit->edit()->setReadOnly(true);
+	}
+
 	Q_EMIT requestData();
 }
 
@@ -75,7 +81,7 @@ QWidget *EditableGuiStrategy::ui() { return m_ui; }
 
 bool EditableGuiStrategy::isValid()
 {
-	if(m_recipe.data != "" && m_recipe.channel != nullptr) {
+	if(m_recipe.data != "" && (m_recipe.channel != nullptr || m_recipe.attribute != nullptr)) {
 		return true;
 	}
 	return false;
