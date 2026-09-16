@@ -123,6 +123,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-core
 	       scopy-pkg-manager
+	       component
 	       Qt${QT_VERSION_MAJOR}::Xml
 	       Qt${QT_VERSION_MAJOR}::Test
 )
