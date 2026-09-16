@@ -36,9 +36,8 @@
 using namespace scopy;
 using namespace regmap;
 
-XmlFileManager::XmlFileManager(struct iio_device *dev, QString filePath)
-	: dev(dev)
-	, filePath(filePath)
+XmlFileManager::XmlFileManager(QString filePath)
+	: filePath(filePath)
 {}
 
 QList<QString> *XmlFileManager::getAllAddresses()
