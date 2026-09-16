@@ -27,28 +27,31 @@
 #include <QString>
 #include <QColor>
 
-#include <iio.h>
+#include <qcoro/qcorotask.h>
 
 namespace scopy {
+namespace component {
+class Channel;
+}
 namespace dac {
 class TxNode : public QObject
 {
 	Q_OBJECT
 public:
-	TxNode(QString uuid, struct iio_channel *chn = nullptr, QObject *parent = nullptr);
+	TxNode(QString uuid, component::Channel *chn = nullptr, QObject *parent = nullptr);
 	virtual ~TxNode();
 
-	TxNode *addChildNode(QString uuid, struct iio_channel *chn = nullptr);
+	TxNode *addChildNode(QString uuid, component::Channel *chn = nullptr);
 
 	QMap<QString, TxNode *> getTones() const;
 	QString getUuid() const;
-	struct iio_channel *getChannel();
+	component::Channel *getChannel();
 	unsigned int getFormatShift() const;
 	unsigned int getFormatBits() const;
 	bool getFormatSigned() const;
 
-	bool enableDds(bool enable);
-	bool readDds() const;
+	QCoro::Task<bool> enableDds(bool enable);
+	QCoro::Task<bool> readDds() const;
 
 	const QColor &getColor() const;
 	void setColor(const QColor &newColor);
@@ -56,7 +59,7 @@ public:
 private:
 	QString m_txUuid;
 	QMap<QString, TxNode *> m_childNodes = {};
-	struct iio_channel *m_channel;
+	component::Channel *m_channel;
 	unsigned int m_fmtShift;
 	unsigned int m_fmtBits;
 	bool m_fmtSigned;

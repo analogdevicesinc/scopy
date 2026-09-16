@@ -31,9 +31,18 @@
 #include <preferenceshelper.h>
 #include <style.h>
 
-#include <iioutil/connectionprovider.h>
-#include <gui/deviceinfopage.h>
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/backends/iio/iiosamplecodec.h>
+
+#include <gui/infopage.h>
 #include <pluginbase/preferences.h>
+
+#include <qcoro/qcorotask.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -79,26 +88,22 @@ bool DACPlugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_DAC) << "compatible";
 	bool ret = false;
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-	if(conn == nullptr)
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		return ret;
+	}
 
-	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
-		iio_device *dev = iio_context_get_device(conn->context(), i);
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			if(!iio_channel_is_output(chn)) {
-				continue;
-			}
-			if(iio_channel_is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
-				ret = true;
-				goto finish;
-			}
+	const QList<component::Channel *> channels = ctx->findChildren<component::Channel *>();
+	for(component::Channel *chn : channels) {
+		if(!chn->isOutput()) {
+			continue;
+		}
+		if(chn->findChild<component::iio::IIOSampleCodec *>() || DacUtils::checkDdsChannel(chn)) {
+			ret = true;
+			break;
 		}
 	}
-finish:
 
-	ConnectionProvider::GetInstance()->close(m_param);
 	return ret;
 }
 
@@ -107,12 +112,23 @@ bool DACPlugin::loadPage()
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
 
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	Connection *conn = c->open(m_param);
-	auto deviceInfoPage = new DeviceInfoPage(conn);
-	lay->addWidget(deviceInfoPage);
+	InfoPage *infoPage = new InfoPage(m_page);
+	lay->addWidget(infoPage);
 	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
-	c->close(m_param);
+
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return false;
+	}
+	const QList<component::Attribute *> attributes =
+		ctx->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : attributes) {
+		if(!attr->readCapability()) {
+			continue;
+		}
+		QCoro::waitFor(attr->readCapability()->readAsync());
+		infoPage->update(attr->name(), attr->cachedValue());
+	}
 
 	return true;
 }
@@ -158,11 +174,11 @@ QString DACPlugin::about()
 
 bool DACPlugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-	if(conn == nullptr)
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		return false;
-	m_ctx = conn->context();
-	dac = new DacInstrument(conn);
+	}
+	dac = new DacInstrument(m_context.get());
 	m_toolList[0]->setTool(dac);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
@@ -185,9 +201,7 @@ bool DACPlugin::onDisconnect()
 			delete(w);
 		}
 	}
-	if(m_ctx) {
-		ConnectionProvider::GetInstance()->close(m_param);
-	}
+	m_context = {};
 	return true;
 }
 

@@ -28,7 +28,10 @@
 #include <menuheader.h>
 
 #include <iio-widgets/iiowidgetbuilder.h>
-#include <iio-widgets/datastrategy/channelattrdatastrategy.h>
+#include <iio-widgets/datastrategy/componentattrdatastrategy.h>
+
+#include <component/channel.h>
+#include <component/attribute.h>
 
 using namespace scopy;
 using namespace scopy::dac;
@@ -55,8 +58,7 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	StyleHelper::BackgroundWidget(this);
 
 	m_frequency = IIOWidgetBuilder(this)
-			      .channel(m_node->getChannel())
-			      .attribute("frequency")
+			      .attribute(m_node->getChannel()->findChild<component::Attribute *>("frequency"))
 			      .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
 			      .parent(this)
 			      .buildSingle();
@@ -64,8 +66,7 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	m_frequency->setDataToUIConversion(std::bind(&TxTone::frequencyDStoUI, this, std::placeholders::_1));
 
 	m_scale = IIOWidgetBuilder(this)
-			  .channel(m_node->getChannel())
-			  .attribute("scale")
+			  .attribute(m_node->getChannel()->findChild<component::Attribute *>("scale"))
 			  .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
 			  .parent(this)
 			  .buildSingle();
@@ -73,8 +74,7 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	m_scale->setDataToUIConversion(std::bind(&TxTone::scaleDStoUI, std::placeholders::_1));
 
 	m_phase = IIOWidgetBuilder(this)
-			  .channel(m_node->getChannel())
-			  .attribute("phase")
+			  .attribute(m_node->getChannel()->findChild<component::Attribute *>("phase"))
 			  .uiStrategy(IIOWidgetBuilder::UIS::EditableUi)
 			  .parent(this)
 			  .buildSingle();
@@ -82,14 +82,14 @@ TxTone::TxTone(TxNode *node, unsigned int idx, QWidget *parent)
 	m_phase->setUItoDataConversion(std::bind(&TxTone::phaseUItoDS, this, std::placeholders::_1));
 	m_phase->setDataToUIConversion(std::bind(&TxTone::phaseDStoUI, this, std::placeholders::_1));
 
-	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_frequency->getDataStrategy()),
-		&ChannelAttrDataStrategy::emitStatus, this, &TxTone::forwardFreqChange);
+	connect(dynamic_cast<ComponentAttrDataStrategy *>(m_frequency->getDataStrategy()),
+		&ComponentAttrDataStrategy::emitStatus, this, &TxTone::forwardFreqChange);
 
-	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_scale->getDataStrategy()),
-		&ChannelAttrDataStrategy::emitStatus, this, &TxTone::forwardScaleChange);
+	connect(dynamic_cast<ComponentAttrDataStrategy *>(m_scale->getDataStrategy()),
+		&ComponentAttrDataStrategy::emitStatus, this, &TxTone::forwardScaleChange);
 
-	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_phase->getDataStrategy()),
-		&ChannelAttrDataStrategy::emitStatus, this, &TxTone::forwardPhaseChange);
+	connect(dynamic_cast<ComponentAttrDataStrategy *>(m_phase->getDataStrategy()),
+		&ComponentAttrDataStrategy::emitStatus, this, &TxTone::forwardPhaseChange);
 
 	headerLay->addWidget(name);
 	headerLay->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Preferred));
