@@ -33,6 +33,8 @@
 #include <iio-widgets/iiowidget.h>
 #include <stylehelper.h>
 
+#include <qcoro/qcorotask.h>
+
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QScrollArea>
@@ -236,7 +238,7 @@ void TxMode::read()
 int TxMode::load()
 {
 	int activeTones = 0;
-	bool anyDds = m_node->readDds();
+	bool anyDds = QCoro::waitFor(m_node->readDds());
 	if(!anyDds) {
 		return activeTones;
 	}
@@ -278,7 +280,7 @@ void TxMode::enable(bool enabled)
 {
 	if(m_mode == TxMode::DISABLED) {
 		// Set the "raw" attr to 0 or 1
-		m_node->enableDds(false);
+		QCoro::waitFor(m_node->enableDds(false));
 
 		// Write all the scale attrs to 0 to reset the scales
 		// for all tones in all channels
@@ -289,5 +291,5 @@ void TxMode::enable(bool enabled)
 	}
 
 	// Set the "raw" attr to 0 or 1
-	m_node->enableDds(enabled);
+	QCoro::waitFor(m_node->enableDds(enabled));
 }
