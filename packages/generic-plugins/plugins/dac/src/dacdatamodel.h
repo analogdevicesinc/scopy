@@ -25,20 +25,26 @@
 #include <QObject>
 #include <QString>
 #include <QMap>
-#include <QFuture>
-#include <QFutureWatcher>
 #include <QTimer>
 
-#include <iio.h>
+#include <optional>
+#include <qcoro/qcorotask.h>
 
 namespace scopy {
+namespace component {
+class Device;
+namespace iio {
+class IIOOutputStream;
+class IIOScanElement;
+} // namespace iio
+} // namespace component
 namespace dac {
 class TxNode;
 class DacDataModel : public QObject
 {
 	Q_OBJECT
 public:
-	DacDataModel(struct iio_device *dev, QObject *parent = nullptr);
+	DacDataModel(component::Device *dev, QObject *parent = nullptr);
 	virtual ~DacDataModel();
 
 	QString getName() const;
@@ -64,7 +70,7 @@ public:
 	void enableBufferChannel(QString uuid, bool enable);
 	void start();
 	void stop();
-	struct iio_device *getDev() const;
+	component::Device *getDev() const;
 Q_SIGNALS:
 	void reqInitBuffer();
 	void log(QString log);
@@ -80,10 +86,9 @@ private Q_SLOTS:
 	void initBuffer();
 
 private:
-	struct iio_device *m_dev;
+	component::Device *m_dev;
+	component::iio::IIOOutputStream *m_out;
 	QString m_name;
-	QList<struct iio_channel *> m_channels;
-	struct iio_buffer *m_buffer;
 
 	unsigned int m_buffersize;
 	unsigned int m_userBuffersize;
@@ -107,10 +112,11 @@ private:
 
 	QMap<QString, TxNode *> m_ddsTxs;
 	QMap<QString, TxNode *> m_bufferTxs;
+	QMap<QString, component::iio::IIOScanElement *> m_scanElements;
 
 	QVector<QVector<double>> m_data;
-	QFuture<void> m_pushThd;
-	QFutureWatcher<void> *m_pushWatcher;
+	std::optional<QCoro::Task<void>> m_pushTask;
+	bool m_cycleInFlight;
 	QTimer *m_debounceTimer;
 	bool m_interrupted;
 
@@ -120,7 +126,8 @@ private:
 	void deinitDdsDac();
 	QString generateToneName(QString chnId);
 	QStringList generateTxNodesForChannel(QString name);
-	void push();
+	QCoro::Task<void> pushTask();
+	component::iio::IIOScanElement *scanElement(TxNode *node) const;
 	unsigned int getEnabledChannelsCount();
 	bool validateBufferParams();
 	void requestInterruption();
@@ -130,7 +137,7 @@ private:
 	void autoBuffersizeAndKernelBuffers();
 	void tryInitBuffer();
 	void startPushOperation();
-	void onPushCompleted();
+	bool isRunning();
 };
 } // namespace dac
 } // namespace scopy
