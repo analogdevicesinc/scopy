@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QTimer>
 
+#include <cstdint>
 #include <optional>
 #include <qcoro/qcorotask.h>
 
@@ -36,6 +37,7 @@ class Device;
 namespace iio {
 class IIOOutputStream;
 class IIOScanElement;
+class IIOSampleCodec;
 } // namespace iio
 } // namespace component
 namespace dac {
@@ -127,6 +129,13 @@ private:
 	QString generateToneName(QString chnId);
 	QStringList generateTxNodesForChannel(QString name);
 	QCoro::Task<void> pushTask();
+	QList<component::iio::IIOScanElement *> collectEnabledScanElements(QList<int> &indices) const;
+	QVector<component::iio::IIOSampleCodec *>
+	resolveCodecs(const QList<component::iio::IIOScanElement *> &enabledEls) const;
+	QVector<QVector<int32_t>> buildSampleColumns(unsigned int channelCount) const;
+	void fillBuffer(int bufferIdx, const QList<component::iio::IIOScanElement *> &enabledEls,
+			const QVector<component::iio::IIOSampleCodec *> &codecs,
+			const QVector<QVector<int32_t>> &columns);
 	component::iio::IIOScanElement *scanElement(TxNode *node) const;
 	unsigned int getEnabledChannelsCount();
 	bool validateBufferParams();
