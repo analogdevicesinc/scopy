@@ -93,6 +93,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-iio-widgets
 	       scopy-pkg-manager
+	       component
 )
 
 set(DAC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)

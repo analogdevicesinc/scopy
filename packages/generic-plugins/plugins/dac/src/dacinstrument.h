@@ -33,16 +33,18 @@
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <tooltemplate.h>
-#include <iioutil/connectionprovider.h>
 
 namespace scopy {
+namespace component {
+class Context;
+}
 namespace dac {
 class DacDataManager;
 class SCOPY_DAC_EXPORT DacInstrument : public QWidget
 {
 	Q_OBJECT
 public:
-	DacInstrument(const Connection *conn, QWidget *parent = nullptr);
+	DacInstrument(component::Context *ctx, QWidget *parent = nullptr);
 	virtual ~DacInstrument();
 
 public Q_SLOTS:
@@ -65,7 +67,7 @@ private:
 	void startBufferNonCyclicTutorial();
 	void abortTutorial();
 
-	const Connection *m_conn;
+	component::Context *m_ctx;
 	ToolTemplate *tool;
 	InfoBtn *infoBtn;
 	GearBtn *settingsBtn;
