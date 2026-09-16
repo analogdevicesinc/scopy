@@ -373,6 +373,82 @@ bool DacDataModel::isRunning()
 	return (m_out && m_out->isOpen()) || m_cycleInFlight || (m_debounceTimer && m_debounceTimer->isActive());
 }
 
+QList<component::iio::IIOScanElement *> DacDataModel::collectEnabledScanElements(QList<int> &indices) const
+{
+	// Enabled scan elements, in stream (findChildren) order -> aligns 1:1 with
+	// writeFormat().channels after openAsync.
+	const QList<component::iio::IIOScanElement *> allEls =
+		m_out->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
+	QList<component::iio::IIOScanElement *> enabledEls;
+	indices.clear();
+	for(auto *el : allEls) {
+		if(el->isEnabled()) {
+			enabledEls.append(el);
+			indices.append(static_cast<int>(el->index()));
+		}
+	}
+	return enabledEls;
+}
+
+QVector<component::iio::IIOSampleCodec *>
+DacDataModel::resolveCodecs(const QList<component::iio::IIOScanElement *> &enabledEls) const
+{
+	// Per enabled channel, resolve the sample codec (device counts -> raw bytes),
+	// matched to the scan element by id.
+	QVector<component::iio::IIOSampleCodec *> codecs(enabledEls.size(), nullptr);
+	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
+		for(auto node : std::as_const(m_bufferTxs)) {
+			auto *chn = node->getChannel();
+			if(chn && chn->id() == enabledEls[chIdx]->id()) {
+				codecs[chIdx] = chn->findChild<component::iio::IIOSampleCodec *>();
+				break;
+			}
+		}
+	}
+	return codecs;
+}
+
+QVector<QVector<int32_t>> DacDataModel::buildSampleColumns(unsigned int channelCount) const
+{
+	// Build per-channel int32 sample columns (decimation + repeat over data columns).
+	unsigned int additionalSamples = m_cyclicBuffer ? 0 : (m_filesize % m_buffersize);
+	unsigned int available_data_columns = m_data[0].size();
+	QVector<QVector<int32_t>> columns(channelCount);
+	for(unsigned int ch = 0; ch < channelCount; ch++) {
+		for(unsigned int i = 0; i < m_filesize + additionalSamples; i += m_decimation) {
+			unsigned int sampleIdx = std::min(i, m_filesize - 1);
+			columns[ch].append(static_cast<int32_t>(m_data[sampleIdx][ch % available_data_columns]));
+		}
+	}
+	return columns;
+}
+
+void DacDataModel::fillBuffer(int bufferIdx, const QList<component::iio::IIOScanElement *> &enabledEls,
+			      const QVector<component::iio::IIOSampleCodec *> &codecs,
+			      const QVector<QVector<int32_t>> &columns)
+{
+	component::StreamFormat &fmt = m_out->writeFormat();
+	char *base = static_cast<char *>(fmt.data);
+	unsigned int samplesPerBuffer = fmt.sampleCount;
+	unsigned int srcBase = (bufferIdx - 1) * samplesPerBuffer;
+	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
+		auto *codec = codecs[chIdx];
+		if(!codec) {
+			continue;
+		}
+		const component::ChannelFormat &cf = fmt.channels.at(chIdx);
+		const QVector<int32_t> &col = columns[chIdx];
+		for(unsigned int s = 0; s < samplesPerBuffer; s++) {
+			unsigned int srcIdx = srcBase + s;
+			if(srcIdx >= static_cast<unsigned int>(col.size())) {
+				break;
+			}
+			char *dst = base + cf.offset + cf.stride * static_cast<ptrdiff_t>(s);
+			codec->convertInverse(dst, &col[srcIdx]);
+		}
+	}
+}
+
 QCoro::Task<void> DacDataModel::pushTask()
 {
 	qDebug(CAT_DAC_DATA) << "Start push cycle";
@@ -392,20 +468,9 @@ QCoro::Task<void> DacDataModel::pushTask()
 	m_out->setCyclic(m_cyclicBuffer);
 	m_out->setKernelBuffers(m_kernelBufferCount);
 
-	// Enabled scan elements, in stream (findChildren) order -> aligns 1:1 with
-	// writeFormat().channels after openAsync.
-	const QList<component::iio::IIOScanElement *> allEls =
-		m_out->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
-	QList<component::iio::IIOScanElement *> enabledEls;
 	QList<int> indices;
-	for(auto *el : allEls) {
-		if(el->isEnabled()) {
-			enabledEls.append(el);
-			indices.append(static_cast<int>(el->index()));
-		}
-	}
-	unsigned int enChannelsCount = enabledEls.size();
-	if(enChannelsCount == 0) {
+	const QList<component::iio::IIOScanElement *> enabledEls = collectEnabledScanElements(indices);
+	if(enabledEls.isEmpty()) {
 		m_cycleInFlight = false;
 		co_return;
 	}
@@ -419,55 +484,17 @@ QCoro::Task<void> DacDataModel::pushTask()
 		co_return;
 	}
 
-	// Per enabled channel, resolve the sample codec (device counts -> raw bytes),
-	// matched to the scan element by id.
-	QVector<component::iio::IIOSampleCodec *> codecs(enChannelsCount, nullptr);
-	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
-		for(auto node : std::as_const(m_bufferTxs)) {
-			auto *chn = node->getChannel();
-			if(chn && chn->id() == enabledEls[chIdx]->id()) {
-				codecs[chIdx] = chn->findChild<component::iio::IIOSampleCodec *>();
-				break;
-			}
-		}
-	}
+	const QVector<component::iio::IIOSampleCodec *> codecs = resolveCodecs(enabledEls);
+	const QVector<QVector<int32_t>> columns = buildSampleColumns(enabledEls.size());
 
-	// Build per-channel int32 sample columns (decimation + repeat over data columns).
-	unsigned int additionalSamples = m_cyclicBuffer ? 0 : (m_filesize % m_buffersize);
-	unsigned int available_data_columns = m_data[0].size();
-	QVector<QVector<int32_t>> allDataC(enChannelsCount);
-	for(unsigned int ch = 0; ch < enChannelsCount; ch++) {
-		for(unsigned int i = 0; i < m_filesize + additionalSamples; i += m_decimation) {
-			unsigned int sampleIdx = std::min(i, m_filesize - 1);
-			allDataC[ch].append(static_cast<int32_t>(m_data[sampleIdx][ch % available_data_columns]));
-		}
-	}
-
-	component::StreamFormat &fmt = m_out->writeFormat();
-	char *base = static_cast<char *>(fmt.data);
-	unsigned int samplesPerBuffer = fmt.sampleCount;
-	unsigned int totalSamples = allDataC[0].size();
+	unsigned int samplesPerBuffer = m_out->writeFormat().sampleCount;
+	unsigned int totalSamples = columns[0].size();
 	int totalNbBuffers = m_cyclicBuffer ? 1 : (samplesPerBuffer ? (totalSamples / samplesPerBuffer) : 0);
 
 	int bufferIdx = 1;
 	while(!m_interrupted && bufferIdx <= totalNbBuffers) {
-		unsigned int srcBase = (bufferIdx - 1) * samplesPerBuffer;
-		for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
-			auto *codec = codecs[chIdx];
-			if(!codec) {
-				continue;
-			}
-			const component::ChannelFormat &cf = fmt.channels.at(chIdx);
-			const QVector<int32_t> &col = allDataC[chIdx];
-			for(unsigned int s = 0; s < samplesPerBuffer; s++) {
-				unsigned int srcIdx = srcBase + s;
-				if(srcIdx >= static_cast<unsigned int>(col.size())) {
-					break;
-				}
-				char *dst = base + cf.offset + cf.stride * static_cast<ptrdiff_t>(s);
-				codec->convertInverse(dst, &col[srcIdx]);
-			}
-		}
+		fillBuffer(bufferIdx, enabledEls, codecs, columns);
+
 		auto pushRes = co_await m_out->pushAsync();
 		if(!pushRes) {
 			QString msg = "Failed to push buffer.";
