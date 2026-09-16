@@ -27,6 +27,8 @@
 #include <menucollapsesection.h>
 #include <menusectionwidget.h>
 
+#include <qcoro/qcorotask.h>
+
 using namespace scopy;
 using namespace scopy::dac;
 TxChannel::TxChannel(TxNode *node, unsigned int nbTonesMode, QWidget *parent)
@@ -128,7 +130,7 @@ void TxChannel::read()
 	}
 }
 
-void TxChannel::enable(bool enable) { m_node->enableDds(enable); }
+void TxChannel::enable(bool enable) { QCoro::waitFor(m_node->enableDds(enable)); }
 
 QString TxChannel::channelUuid() const { return m_node->getUuid(); }
 
