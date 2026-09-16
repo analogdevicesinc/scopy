@@ -81,6 +81,7 @@ target_link_libraries(
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-iio-widgets
+	       component
 )
 
 set(JESDSTATUS_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
