@@ -28,7 +28,6 @@
 #include "registermapvalues.hpp"
 #include "regmapplugin.h"
 #include "xmlfilemanager.hpp"
-#include <iio.h>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
@@ -41,8 +40,13 @@
 #include <registermaptool.hpp>
 #include <style.h>
 #include <stylehelper.h>
-#include <src/readwrite/iioregisterreadstrategy.hpp>
-#include <src/readwrite/iioregisterwritestrategy.hpp>
+#include <src/readwrite/componentregisterreadstrategy.hpp>
+#include <src/readwrite/componentregisterwritestrategy.hpp>
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/backends/iio/iiodevice.h>
+#include <component/backends/iio/iioregisterreader.h>
+#include <component/backends/iio/iioregisterwriter.h>
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
 #include <gui/deviceinfopage.h>
@@ -117,24 +121,18 @@ void RegmapPlugin::unload()
 
 bool RegmapPlugin::compatible(QString m_param, QString category)
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-
-	if(!conn) {
-		cp->close(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		return false;
-	} else {
-		struct iio_context *ctx = conn->context();
-		auto deviceCount = iio_context_get_devices_count(ctx);
-		for(int i = 0; i < deviceCount; i++) {
-			iio_device *dev = iio_context_get_device(ctx, i);
-			if(iio_device_find_debug_attr(dev, "direct_reg_access")) {
-				cp->close(m_param);
-				return true;
-			}
+	}
+
+	const QList<component::iio::IIODevice *> devices =
+		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
+	for(component::iio::IIODevice *dev : devices) {
+		if(dev->findChild<component::iio::IIORegisterReader *>()) {
+			return true;
 		}
 	}
-	cp->close(m_param);
 
 	return false;
 }
@@ -182,19 +180,17 @@ bool RegmapPlugin::loadPreferencesPage()
 
 bool RegmapPlugin::onConnect()
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(conn == nullptr)
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx)
 		return false;
 
-	iio_context *ctx = conn->context();
-	m_deviceList = new QList<iio_device *>();
-	auto deviceCount = iio_context_get_devices_count(ctx);
+	m_deviceList = new QList<component::iio::IIODevice *>();
+	const QList<component::iio::IIODevice *> devices =
+		ctx->findChildren<component::iio::IIODevice *>(Qt::FindDirectChildrenOnly);
 
-	for(int i = 0; i < deviceCount; i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
-		if(iio_device_find_debug_attr(dev, "direct_reg_access")) {
-			qDebug(CAT_REGMAP) << "DEVICE FOUND " << iio_device_get_name(dev);
+	for(component::iio::IIODevice *dev : devices) {
+		if(dev->findChild<component::iio::IIORegisterReader *>()) {
+			qDebug(CAT_REGMAP) << "DEVICE FOUND " << dev->name();
 			m_deviceList->push_back(dev);
 		}
 	}
@@ -210,11 +206,13 @@ bool RegmapPlugin::onConnect()
 		layout->addWidget(registerMapTool);
 
 		for(int i = 0; i < m_deviceList->size(); ++i) {
-			iio_device *dev = m_deviceList->at(i);
-			IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(dev);
-			IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(dev);
+			component::iio::IIODevice *dev = m_deviceList->at(i);
+			ComponentRegisterReadStrategy *readStrategy = new ComponentRegisterReadStrategy(
+				dev->findChild<component::iio::IIORegisterReader *>());
+			ComponentRegisterWriteStrategy *writeStrategy = new ComponentRegisterWriteStrategy(
+				dev->findChild<component::iio::IIORegisterWriter *>());
 
-			QString devName = QString::fromStdString(iio_device_get_name(dev));
+			QString devName = dev->name();
 			qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << devName;
 			JsonFormatedElement *templatePaths = Utils::getTemplate(devName);
 			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
@@ -231,13 +229,13 @@ bool RegmapPlugin::onConnect()
 				}
 				if(templatePaths->getIsAxiCompatible()) {
 					uint32_t axiAddressSpace = Utils::convertQStringToUint32("80000000");
-					iioReadStrategy->setAddressSpace(axiAddressSpace);
-					iioWriteStrategy->setAddressSpace(axiAddressSpace);
+					readStrategy->setAddressSpace(axiAddressSpace);
+					writeStrategy->setAddressSpace(axiAddressSpace);
 				}
-				generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy,
+				generateDevice(templatePath, devName, readStrategy, writeStrategy,
 					       templatePaths->getBitsPerRow());
 			} else {
-				generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy);
+				generateDevice(templatePath, devName, readStrategy, writeStrategy);
 			}
 		}
 
@@ -265,9 +263,6 @@ bool RegmapPlugin::onDisconnect()
 		delete m_api;
 		m_api = nullptr;
 	}
-
-	auto &&cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
 
 	for(ToolMenuEntry *tme : std::as_const(m_toolList)) {
 		tme->setEnabled(false);
@@ -302,16 +297,15 @@ QString RegmapPlugin::pkgName() { return REGMAP_PKG_NAME; }
 
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 
-void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
-				  IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy,
-				  int bitsPerRow)
+void RegmapPlugin::generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
+				  IRegisterWriteStrategy *writeStrategy, int bitsPerRow)
 {
 
 	RegisterMapTemplate *registerMapTemplate = nullptr;
 	if(!xmlPath.isEmpty()) {
 		registerMapTemplate = new RegisterMapTemplate(this);
 		registerMapTemplate->setBitsPerRow(bitsPerRow);
-		XmlFileManager xmlFileManager(dev, xmlPath);
+		XmlFileManager xmlFileManager(xmlPath);
 		auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
 		if(!aux->isEmpty()) {
 			registerMapTemplate->setRegisterList(aux);
@@ -323,34 +317,6 @@ void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QStri
 	registerMapValues->setWriteStrategy(writeStrategy);
 
 	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues);
-}
-
-struct iio_device *RegmapPlugin::getIioDevice(iio_context *ctx, const char *dev_name)
-{
-	auto deviceCount = iio_context_get_devices_count(ctx);
-
-	for(int i = 0; i < deviceCount; i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
-		if(strcasecmp(iio_device_get_name(dev), dev_name) == 0) {
-			return dev;
-		}
-	}
-	return nullptr;
-}
-
-bool RegmapPlugin::isBufferCapable(iio_device *dev)
-{
-	unsigned int i;
-
-	for(i = 0; i < iio_device_get_channels_count(dev); i++) {
-		struct iio_channel *chn = iio_device_get_channel(dev, i);
-
-		if(iio_channel_is_scan_element(chn)) {
-			return true;
-		}
-	}
-
-	return false;
 }
 
 void RegmapPlugin::initApi()
