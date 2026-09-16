@@ -19,49 +19,49 @@
  */
 
 #include "jesdstatusplugin.h"
-#include <iioutil/connectionprovider.h>
 
 #include <QLoggingCategory>
 #include <QLabel>
 
 #include <style.h>
 #include "jesdstatus.h"
+#include "component/controller.h"
+
+#include <component/attribute.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_JESDSTATUSPLUGIN, "JesdStatusPlugin")
+using namespace scopy;
 using namespace scopy::jesdstatus;
 
 bool JesdStatusPlugin::compatible(QString m_param, QString category)
 {
 	bool ret = false;
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qDebug(CAT_JESDSTATUSPLUGIN) << "The context is not compatible with the JesdStatus Plugin!";
 		return ret;
 	}
 
-	auto lst = scanCompatibleDevices(conn->context());
+	auto lst = scanCompatibleDevices(ctx.get());
 	ret = lst.size();
-
-	cp->close(m_param);
 	return ret;
 }
 
-QList<QString> JesdStatusPlugin::scanCompatibleDevices(struct iio_context *ctx)
+QList<component::Device *> JesdStatusPlugin::scanCompatibleDevices(component::Context *ctx)
 {
-	QList<QString> devList = {};
-	unsigned int devs = iio_context_get_devices_count(ctx);
-	for(unsigned int i = 0; i < devs; i++) {
-		struct iio_device *dev = iio_context_get_device(ctx, i);
-		auto status = iio_device_find_attr(dev, "status");
-		if(!status) {
+	QList<component::Device *> devList = {};
+	for(component::Device *dev : ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+		component::Attribute *statusAttr =
+			dev->findChild<component::Attribute *>("status", Qt::FindDirectChildrenOnly);
+		if(!statusAttr) {
 			continue;
 		}
-		QString name = iio_device_get_name(dev);
-		QString id = iio_device_get_id(dev);
-		QString label = iio_device_get_label(dev);
+		QString name = dev->name();
+		QString id = dev->id();
+		QString label = dev->label();
 		if(name.contains("jesd") || id.contains("jesd") || label.contains("jesd")) {
-			devList.push_back(id);
+			devList.push_back(dev);
 		}
 	}
 	return devList;
@@ -90,20 +90,11 @@ QString JesdStatusPlugin::description() { return "JESD status GUI tool for compa
 
 bool JesdStatusPlugin::onConnect()
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		return false;
 	}
-	m_ctx = conn->context();
-	QList<struct iio_device *> devLst;
-	QList<QString> lst = scanCompatibleDevices(conn->context());
-	for(const QString &id : std::as_const(lst)) {
-		auto dev = iio_context_find_device(conn->context(), id.toUtf8());
-		if(dev) {
-			devLst.push_back(dev);
-		}
-	}
+	QList<component::Device *> devLst = scanCompatibleDevices(ctx.get());
 
 	JesdStatus *jesdStatus = new JesdStatus(devLst);
 	m_toolList[0]->setTool(jesdStatus);
@@ -130,8 +121,6 @@ bool JesdStatusPlugin::onDisconnect()
 			delete(w);
 		}
 	}
-	if(m_ctx)
-		ConnectionProvider::GetInstance()->close(m_param);
 	return true;
 }
 

@@ -23,19 +23,17 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <QVBoxLayout>
 
+#include <qcoro/qcorotask.h>
+
 using namespace scopy;
 using namespace jesdstatus;
 
-JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
+JesdStatusView::JesdStatusView(component::Device *dev, QWidget *parent)
 	: QWidget(parent)
-	, m_parserThread(new QThread(this))
 {
-	m_parser = new JesdStatusParser(dev, nullptr);
-	m_parser->moveToThread(m_parserThread);
+	m_parser = new JesdStatusParser(dev, this);
 
-	connect(m_parserThread, &QThread::started, m_parser, &JesdStatusParser::update);
-	connect(m_parser, &JesdStatusParser::finished, this, &JesdStatusView::updateUi, Qt::QueuedConnection);
-	connect(m_parser, &JesdStatusParser::finished, m_parserThread, &QThread::quit);
+	connect(m_parser, &JesdStatusParser::finished, this, &JesdStatusView::updateUi);
 
 	m_colorMap.insert(C_NORM, Style::getAttribute(json::theme::content_default));
 	m_colorMap.insert(C_GOOD, Style::getAttribute(json::theme::content_success));
@@ -109,14 +107,12 @@ JesdStatusView::JesdStatusView(iio_device *dev, QWidget *parent)
 
 JesdStatusView::~JesdStatusView()
 {
+	if(!m_updateTask.isReady()) {
+		QCoro::waitFor(m_updateTask);
+	}
+	m_updateTask = {};
 	m_laneLabels.clear();
 	m_statusLabels.clear();
-	if(m_parserThread->isRunning()) {
-		m_parserThread->quit();
-		m_parserThread->wait(2000);
-	}
-	delete m_parser;
-	m_parserThread->deleteLater();
 }
 
 void JesdStatusView::initStatusValues(QWidget *statusContainer)
@@ -254,9 +250,11 @@ void JesdStatusView::appendToStatusLabels(QString lbl, std::function<QPair<QStri
 
 void JesdStatusView::update()
 {
-	if(!m_parserThread->isRunning()) {
-		m_parserThread->start();
+	// Guard against overlapping refreshes: skip if the previous one is still in flight.
+	if(!m_updateTask.isReady()) {
+		return;
 	}
+	m_updateTask = m_parser->update();
 }
 
 void JesdStatusView::updateUi()

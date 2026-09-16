@@ -24,10 +24,12 @@
 #include <QWidget>
 #include <QTextEdit>
 #include <QLabel>
-#include <QThread>
 #include <gui/widgets/menusectionwidget.h>
 #include "scopy-jesdstatus_export.h"
 #include "jesdstatusparser.h"
+
+#include <qcoro/qcorotask.h>
+#include <component/device.h>
 
 namespace scopy {
 namespace jesdstatus {
@@ -35,7 +37,7 @@ class SCOPY_JESDSTATUS_EXPORT JesdStatusView : public QWidget
 {
 	Q_OBJECT
 public:
-	JesdStatusView(struct iio_device *dev, QWidget *parent = nullptr);
+	JesdStatusView(component::Device *dev, QWidget *parent = nullptr);
 	virtual ~JesdStatusView();
 
 public Q_SLOTS:
@@ -55,7 +57,7 @@ private:
 	void initStatusValues(QWidget *statusContainer);
 
 	JesdStatusParser *m_parser;
-	QThread *m_parserThread;
+	QCoro::Task<void> m_updateTask;
 	QMap<VISUAL_STATUS, QString> m_colorMap;
 	typedef QPair<QLabel *, std::function<QPair<QString, VISUAL_STATUS>()>> statusCallback;
 	typedef QPair<QLabel *, std::function<QPair<QString, VISUAL_STATUS>(unsigned int)>> laneStatusCallback;
