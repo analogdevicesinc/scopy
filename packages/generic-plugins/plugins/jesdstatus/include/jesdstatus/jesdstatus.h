@@ -26,10 +26,11 @@
 #include <gui/widgets/menucombo.h>
 #include <gui/tooltemplate.h>
 #include <gui/widgets/toolbuttons.h>
-#include <iio.h>
 #include <QList>
 #include <QWidget>
 #include <QTimer>
+
+#include <component/device.h>
 
 namespace scopy {
 namespace jesdstatus {
@@ -37,7 +38,7 @@ class SCOPY_JESDSTATUS_EXPORT JesdStatus : public QWidget
 {
 	Q_OBJECT
 public:
-	JesdStatus(QList<struct iio_device *> devLst, QWidget *parent = nullptr);
+	JesdStatus(QList<component::Device *> devLst, QWidget *parent = nullptr);
 	~JesdStatus();
 
 Q_SIGNALS:
@@ -49,11 +50,11 @@ public Q_SLOTS:
 private:
 	ToolTemplate *m_tool;
 	QTimer *m_timer;
-	QList<struct iio_device *> m_deviceList;
+	QList<component::Device *> m_deviceList;
 	MenuComboWidget *m_deviceSelector;
 	MapStackedWidget *m_jesdDeviceStack;
 
-	void setupDevice(iio_device *dev);
+	void setupDevice(component::Device *dev);
 	void poll();
 };
 } // namespace jesdstatus
