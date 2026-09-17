@@ -27,6 +27,11 @@
 #include <menuonoffswitch.h>
 #include <style.h>
 
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 #include <guistrategy/comboguistrategy.h>
 
 Q_LOGGING_CATEGORY(CAT_AD936X_HELPER, "AD936X_HELPER");
@@ -39,7 +44,7 @@ AD936xHelper::AD936xHelper(IIOWidgetGroup *group, QWidget *parent)
 	, m_group(group)
 {}
 
-QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *AD936xHelper::generateGlobalSettingsWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *globalSettingsWidget = new QWidget(parent);
 	Style::setBackgroundColor(globalSettingsWidget, json::theme::background_primary);
@@ -56,9 +61,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 
 	//// ensm_mode
 	IIOWidget *ensmMode = IIOWidgetBuilder(globalSettingsWidget)
-				      .device(dev)
-				      .attribute("ensm_mode")
-				      .optionsAttribute("ensm_mode_available")
+				      .attribute(component::attributeByName(dev, "ensm_mode"))
 				      .title("ENSM Mode")
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .group(m_group)
@@ -70,9 +73,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 
 	////calib_mode
 	IIOWidget *calibMode = IIOWidgetBuilder(globalSettingsWidget)
-				       .device(dev)
-				       .attribute("calib_mode")
-				       .optionsAttribute("calib_mode_available")
+				       .attribute(component::attributeByName(dev, "calib_mode"))
 				       .title("Calibration Mode")
 				       .uiStrategy(IIOWidgetBuilder::ComboUi)
 				       .group(m_group)
@@ -84,9 +85,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 
 	// trx_rate_governor
 	IIOWidget *trxRateGovernor = IIOWidgetBuilder(globalSettingsWidget)
-					     .device(dev)
-					     .attribute("trx_rate_governor")
-					     .optionsAttribute("trx_rate_governor_available")
+					     .attribute(component::attributeByName(dev, "trx_rate_governor"))
 					     .title("TRX Rate Governor")
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .group(m_group)
@@ -101,8 +100,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 
 	// rx_path_rates
 	IIOWidget *rxPathRates = IIOWidgetBuilder(globalSettingsWidget)
-					 .device(dev)
-					 .attribute("rx_path_rates")
+					 .attribute(component::attributeByName(dev, "rx_path_rates"))
 					 .title("RX Path Rates")
 					 .group(m_group)
 					 .buildSingle();
@@ -112,8 +110,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 
 	// tx_path_rates
 	IIOWidget *txPathRates = IIOWidgetBuilder(globalSettingsWidget)
-					 .device(dev)
-					 .attribute("tx_path_rates")
+					 .attribute(component::attributeByName(dev, "tx_path_rates"))
 					 .title("Tx Path Rates")
 					 .group(m_group)
 					 .buildSingle();
@@ -128,9 +125,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 
 	// xo_correction
 	IIOWidget *xoCorrection = IIOWidgetBuilder(globalSettingsWidget)
-					  .device(dev)
-					  .attribute("xo_correction")
-					  .optionsAttribute("xo_correction_available")
+					  .attribute(component::attributeByName(dev, "xo_correction"))
 					  .title("XO Correction")
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .group(m_group)
@@ -143,7 +138,7 @@ QWidget *AD936xHelper::generateGlobalSettingsWidget(iio_device *dev, QString tit
 	return globalSettingsWidget;
 }
 
-QWidget *AD936xHelper::generateRxDeviceWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *AD936xHelper::generateRxDeviceWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
@@ -157,13 +152,11 @@ QWidget *AD936xHelper::generateRxDeviceWidget(iio_device *dev, QString title, QW
 	layout->addWidget(titleLabel, 0, 0);
 
 	// because this channel is marked as output by libiio we need to mark altvoltage0 as output
-	iio_channel *altVoltage0 = iio_device_find_channel(dev, "altvoltage0", true);
+	component::Channel *altVoltage0 = component::channelById(dev, "altvoltage0", true);
 
 	// altvoltage0: RX_LO // frequency
 	IIOWidget *altVoltage0Frequency = IIOWidgetBuilder(widget)
-						  .channel(altVoltage0)
-						  .attribute("frequency")
-						  .optionsAttribute("frequency_available")
+						  .attribute(component::attributeByName(altVoltage0, "frequency"))
 						  .title("RX LO Frequency(MHz)")
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .group(m_group)
@@ -197,7 +190,7 @@ QWidget *AD936xHelper::generateRxDeviceWidget(iio_device *dev, QString title, QW
 	return widget;
 }
 
-QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, QWidget *parent)
+QWidget *AD936xHelper::generateRxChannelWidget(component::Channel *chn, QString title, QWidget *parent)
 {
 	QWidget *rxWidget = new QWidget(parent);
 	Style::setStyle(rxWidget, style::properties::widget::border_interactive);
@@ -211,10 +204,8 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 
 	// voltage0: hardwaregain
 	IIOWidget *hardwaregain = IIOWidgetBuilder(rxWidget)
-					  .channel(chn)
-					  .attribute("hardwaregain")
+					  .attribute(component::attributeByName(chn, "hardwaregain"))
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
-					  .optionsAttribute("hardwaregain_available")
 					  .title("Hardware Gain(dB)")
 					  .group(m_group)
 					  .buildSingle();
@@ -231,8 +222,7 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 
 	// voltage: rssi
 	IIOWidget *rssi = IIOWidgetBuilder(rxWidget)
-				  .channel(chn)
-				  .attribute("rssi")
+				  .attribute(component::attributeByName(chn, "rssi"))
 				  .title("RSSI(dB)")
 				  .group(m_group)
 				  .buildSingle();
@@ -247,10 +237,8 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 
 	// voltage: gain_control_mode
 	IIOWidget *gainControlMode = IIOWidgetBuilder(rxWidget)
-					     .channel(chn)
-					     .attribute("gain_control_mode")
+					     .attribute(component::attributeByName(chn, "gain_control_mode"))
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
-					     .optionsAttribute("gain_control_mode_available")
 					     .title("Gain Control Mode")
 					     .group(m_group)
 					     .buildSingle();
@@ -271,7 +259,7 @@ QWidget *AD936xHelper::generateRxChannelWidget(iio_channel *chn, QString title, 
 	return rxWidget;
 }
 
-QWidget *AD936xHelper::generateTxDeviceWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *AD936xHelper::generateTxDeviceWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setStyle(widget, style::properties::widget::border_interactive);
@@ -285,13 +273,11 @@ QWidget *AD936xHelper::generateTxDeviceWidget(iio_device *dev, QString title, QW
 	layout->addWidget(titleLabel, 0, 0);
 
 	bool isOutput = true;
-	iio_channel *altVoltage1 = iio_device_find_channel(dev, "altvoltage1", isOutput);
+	component::Channel *altVoltage1 = component::channelById(dev, "altvoltage1", isOutput);
 
 	// altvoltage1: TX_LO // frequency
 	IIOWidget *altVoltage1Frequency = IIOWidgetBuilder(widget)
-						  .channel(altVoltage1)
-						  .attribute("frequency")
-						  .optionsAttribute("frequency_available")
+						  .attribute(component::attributeByName(altVoltage1, "frequency"))
 						  .uiStrategy(IIOWidgetBuilder::RangeUi)
 						  .title("TX LO Frequency(MHz)")
 						  .group(m_group)
@@ -325,7 +311,7 @@ QWidget *AD936xHelper::generateTxDeviceWidget(iio_device *dev, QString title, QW
 	return widget;
 }
 
-QWidget *AD936xHelper::generateTxChannelWidget(iio_channel *chn, QString title, QWidget *parent)
+QWidget *AD936xHelper::generateTxChannelWidget(component::Channel *chn, QString title, QWidget *parent)
 {
 	QWidget *txWidget = new QWidget(parent);
 	Style::setStyle(txWidget, style::properties::widget::border_interactive);
@@ -339,10 +325,8 @@ QWidget *AD936xHelper::generateTxChannelWidget(iio_channel *chn, QString title, 
 
 	// adi,tx-attenuation-mdB
 	IIOWidget *txAttenuation = IIOWidgetBuilder(txWidget)
-					   .channel(chn)
-					   .attribute("hardwaregain")
+					   .attribute(component::attributeByName(chn, "hardwaregain"))
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
-					   .optionsAttribute("hardwaregain_available")
 					   .title("Attenuation(dB)")
 					   .group(m_group)
 					   .buildSingle();
@@ -356,8 +340,7 @@ QWidget *AD936xHelper::generateTxChannelWidget(iio_channel *chn, QString title, 
 	});
 
 	IIOWidget *rssi = IIOWidgetBuilder(txWidget)
-				  .channel(chn)
-				  .attribute("rssi")
+				  .attribute(component::attributeByName(chn, "rssi"))
 				  .title("RSSI(dB)")
 				  .group(m_group)
 				  .buildSingle();

@@ -27,6 +27,10 @@
 #include <iio-widgets/iiowidgetbuilder.h>
 
 namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
 class IIOWidgetGroup;
 namespace ad936x {
 
@@ -36,13 +40,13 @@ class SCOPY_AD936X_EXPORT AD936xHelper : public QWidget
 public:
 	AD936xHelper(IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 
-	QWidget *generateGlobalSettingsWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateGlobalSettingsWidget(component::Device *dev, QString title, QWidget *parent);
 
-	QWidget *generateRxDeviceWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateRxChannelWidget(iio_channel *chn, QString title, QWidget *parent);
+	QWidget *generateRxDeviceWidget(component::Device *dev, QString title, QWidget *parent);
+	QWidget *generateRxChannelWidget(component::Channel *chn, QString title, QWidget *parent);
 
-	QWidget *generateTxDeviceWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateTxChannelWidget(iio_channel *chn, QString title, QWidget *parent);
+	QWidget *generateTxDeviceWidget(component::Device *dev, QString title, QWidget *parent);
+	QWidget *generateTxChannelWidget(component::Channel *chn, QString title, QWidget *parent);
 
 Q_SIGNALS:
 	void readRequested();

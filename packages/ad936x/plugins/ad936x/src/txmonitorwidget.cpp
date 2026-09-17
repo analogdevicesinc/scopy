@@ -24,11 +24,14 @@
 #include <style.h>
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+TxMonitorWidget::TxMonitorWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -73,14 +76,14 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	}
 
 	// adi,txmon-1-front-end-gain
-	IIOWidget *tx1FrontendGain = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,txmon-1-front-end-gain")
-					     .uiStrategy(IIOWidgetBuilder::ComboUi)
-					     .optionsValues(optionasData)
-					     .title("")
-					     .group(m_group)
-					     .buildSingle();
+	IIOWidget *tx1FrontendGain =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,txmon-1-front-end-gain"))
+			.uiStrategy(IIOWidgetBuilder::ComboUi)
+			.optionsValues(optionasData)
+			.title("")
+			.group(m_group)
+			.buildSingle();
 	gLayout1->addWidget(tx1FrontendGain, 1, 1);
 
 	tx1FrontendGain->setUItoDataConversion([this, txFrontendGainOptions](QString data) {
@@ -91,14 +94,14 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	});
 
 	// adi,txmon-2-front-end-gain
-	IIOWidget *tx2FrontendGain = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,txmon-2-front-end-gain")
-					     .uiStrategy(IIOWidgetBuilder::ComboUi)
-					     .optionsValues(optionasData)
-					     .title("")
-					     .group(m_group)
-					     .buildSingle();
+	IIOWidget *tx2FrontendGain =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,txmon-2-front-end-gain"))
+			.uiStrategy(IIOWidgetBuilder::ComboUi)
+			.optionsValues(optionasData)
+			.title("")
+			.group(m_group)
+			.buildSingle();
 	gLayout1->addWidget(tx2FrontendGain, 1, 2);
 
 	tx2FrontendGain->setUItoDataConversion([this, txFrontendGainOptions](QString data) {
@@ -111,8 +114,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-1-lo-cm
 
 	IIOWidget *tx1LoCommonMode = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,txmon-1-lo-cm")
+					     .attribute(component::attributeByName(m_device, "adi,txmon-1-lo-cm"))
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
 					     .optionsValues("[0 1 63]")
 					     .title("")
@@ -124,8 +126,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-2-lo-cm
 
 	IIOWidget *tx2LoCommonMode = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,txmon-2-lo-cm")
+					     .attribute(component::attributeByName(m_device, "adi,txmon-2-lo-cm"))
 					     .uiStrategy(IIOWidgetBuilder::RangeUi)
 					     .optionsValues("[0 1 63]")
 					     .title("")
@@ -139,8 +140,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-low-high-thresh
 
 	IIOWidget *lowHighThresh = IIOWidgetBuilder(widget)
-					   .device(m_device)
-					   .attribute("adi,txmon-low-high-thresh")
+					   .attribute(component::attributeByName(m_device, "adi,txmon-low-high-thresh"))
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
 					   .optionsValues("[0 250 63750]")
 					   .title("Low/High Gain Threshold (mdB)")
@@ -152,8 +152,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-low-gain
 
 	IIOWidget *lowGain = IIOWidgetBuilder(widget)
-				     .device(m_device)
-				     .attribute("adi,txmon-low-gain")
+				     .attribute(component::attributeByName(m_device, "adi,txmon-low-gain"))
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 31]")
 				     .title("Low Gain (dB)")
@@ -165,8 +164,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-high-gain
 
 	IIOWidget *highGain = IIOWidgetBuilder(widget)
-				      .device(m_device)
-				      .attribute("adi,txmon-high-gain")
+				      .attribute(component::attributeByName(m_device, "adi,txmon-high-gain"))
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
 				      .optionsValues("[0 1 31]")
 				      .title("High Gain (dB)")
@@ -178,8 +176,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-delay
 
 	IIOWidget *delay = IIOWidgetBuilder(widget)
-				   .device(m_device)
-				   .attribute("adi,txmon-delay")
+				   .attribute(component::attributeByName(m_device, "adi,txmon-delay"))
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
 				   .optionsValues("[0 1 255]")
 				   .title("Delay (RX samples)")
@@ -191,8 +188,7 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	// adi,txmon-duration
 
 	IIOWidget *duration = IIOWidgetBuilder(widget)
-				      .device(m_device)
-				      .attribute("adi,txmon-duration")
+				      .attribute(component::attributeByName(m_device, "adi,txmon-duration"))
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
 				      .optionsValues("[16 16 8192]")
 				      .title("Duration (RX Samples)")
@@ -202,27 +198,27 @@ TxMonitorWidget::TxMonitorWidget(iio_device *device, IIOWidgetGroup *group, QWid
 	layout->addWidget(duration);
 
 	// adi,txmon-dc-tracking-enable
-	IIOWidget *dcTrackingEnabled = IIOWidgetBuilder(widget)
-					       .device(m_device)
-					       .attribute("adi,txmon-dc-tracking-enable")
-					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					       .title("Enable DC Tracking")
-					       .infoMessage("Please see the manual")
-					       .group(m_group)
-					       .buildSingle();
+	IIOWidget *dcTrackingEnabled =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,txmon-dc-tracking-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Enable DC Tracking")
+			.infoMessage("Please see the manual")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(dcTrackingEnabled);
 	dcTrackingEnabled->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	dcTrackingEnabled->showProgressBar(false);
 
 	// adi,txmon-one-shot-mode-enable
-	IIOWidget *oneShotModeEnabled = IIOWidgetBuilder(widget)
-						.device(m_device)
-						.attribute("adi,txmon-one-shot-mode-enable")
-						.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						.title("Enable One Shot Mode")
-						.infoMessage("Please see the manual")
-						.group(m_group)
-						.buildSingle();
+	IIOWidget *oneShotModeEnabled =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,txmon-one-shot-mode-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Enable One Shot Mode")
+			.infoMessage("Please see the manual")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(oneShotModeEnabled);
 	oneShotModeEnabled->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	oneShotModeEnabled->showProgressBar(false);
