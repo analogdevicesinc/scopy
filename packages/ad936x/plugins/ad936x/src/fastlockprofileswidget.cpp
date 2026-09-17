@@ -24,12 +24,15 @@
 #include <QBoxLayout>
 #include <style.h>
 
-#include <iioutil/connectionprovider.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributewriter.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-FastlockProfilesWidget::FastlockProfilesWidget(iio_channel *chn, QWidget *parent)
+FastlockProfilesWidget::FastlockProfilesWidget(component::Channel *chn, QWidget *parent)
 	: QWidget{parent}
 {
 
@@ -51,12 +54,16 @@ FastlockProfilesWidget::FastlockProfilesWidget(iio_channel *chn, QWidget *parent
 
 	connect(m_storeBtn, &QPushButton::clicked, this, [=, this]() {
 		int currentProfileSetting = m_fastlockProfiles->currentData().toInt();
-		iio_channel_attr_write_longlong(chn, "fastlock_store", (long long)currentProfileSetting);
+		if(auto *a = component::attributeByName(chn, "fastlock_store"); a && a->writeCapability()) {
+			a->writeCapability()->writeAsync(QString::number(currentProfileSetting));
+		}
 	});
 
 	connect(m_recallBtn, &QPushButton::clicked, this, [=, this]() {
 		int currentProfileSetting = m_fastlockProfiles->currentData().toInt();
-		iio_channel_attr_write_longlong(chn, "fastlock_recall", (long long)currentProfileSetting);
+		if(auto *a = component::attributeByName(chn, "fastlock_recall"); a && a->writeCapability()) {
+			a->writeCapability()->writeAsync(QString::number(currentProfileSetting));
+		}
 		Q_EMIT recallCalled();
 	});
 

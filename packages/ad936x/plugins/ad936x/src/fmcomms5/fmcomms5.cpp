@@ -34,12 +34,18 @@
 #include <QLoggingCategory>
 #include <guistrategy/comboguistrategy.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 Q_LOGGING_CATEGORY(CAT_FMCOMMS5, "FMCOMMS5");
 
 using namespace scopy;
 using namespace ad936x;
 
-FMCOMMS5::FMCOMMS5(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+FMCOMMS5::FMCOMMS5(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -97,7 +103,8 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 
 	if(m_ctx != nullptr) {
 
-		iio_device *mainDevice = iio_context_find_device(m_ctx, "ad9361-phy");
+		component::Device *mainDevice =
+			m_ctx->findChild<component::Device *>("ad9361-phy", Qt::FindDirectChildrenOnly);
 
 		m_helper = new AD936xHelper(m_group);
 		connect(this, &FMCOMMS5::readRequested, m_helper, &AD936xHelper::readRequested);
@@ -189,7 +196,7 @@ FMCOMMS5::FMCOMMS5(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 
 FMCOMMS5::~FMCOMMS5() {}
 
-QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *FMCOMMS5::generateRxChainWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -210,13 +217,11 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	bool isOutput = false;
 
-	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
+	component::Channel *voltage0 = component::channelById(dev, "voltage0", isOutput);
 
 	// voltage0: rf_bandwidth
 	IIOWidget *rfBandwidth = IIOWidgetBuilder(widget)
-					 .channel(voltage0)
-					 .attribute("rf_bandwidth")
-					 .optionsAttribute("rf_bandwidth_available")
+					 .attribute(component::attributeByName(voltage0, "rf_bandwidth"))
 					 .title("RF Bandwidth(MHz)")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .group(m_group)
@@ -231,9 +236,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	// voltage0:  sampling_frequency
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(widget)
-					       .channel(voltage0)
-					       .attribute("sampling_frequency")
-					       .optionsAttribute("sampling_frequency_available")
+					       .attribute(component::attributeByName(voltage0, "sampling_frequency"))
 					       .title("Sampling Rate(MSPS)")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .group(m_group)
@@ -250,9 +253,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	// voltage 0 : rf_port_select
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(widget)
-					  .channel(voltage0)
-					  .attribute("rf_port_select")
-					  .optionsAttribute("rf_port_select_available")
+					  .attribute(component::attributeByName(voltage0, "rf_port_select"))
 					  .title("RF Port Select")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .group(m_group)
@@ -261,37 +262,37 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 	connect(this, &FMCOMMS5::readRequested, rfPortSelect, &IIOWidget::readAsync);
 
 	// quadrature_tracking_en
-	IIOWidget *quadratureTrackingEn = IIOWidgetBuilder(this)
-						  .channel(voltage0)
-						  .attribute("quadrature_tracking_en")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .title("Quadrature")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *quadratureTrackingEn =
+		IIOWidgetBuilder(this)
+			.attribute(component::attributeByName(voltage0, "quadrature_tracking_en"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Quadrature")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(quadratureTrackingEn, 0, 5);
 	quadratureTrackingEn->showProgressBar(false);
 	connect(this, &FMCOMMS5::readRequested, quadratureTrackingEn, &IIOWidget::readAsync);
 
 	// rf_dc_offset_tracking_en
-	IIOWidget *rcDcOffsetTrackingEn = IIOWidgetBuilder(widget)
-						  .channel(voltage0)
-						  .attribute("rf_dc_offset_tracking_en")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .title("RF DC")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *rcDcOffsetTrackingEn =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(voltage0, "rf_dc_offset_tracking_en"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("RF DC")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(rcDcOffsetTrackingEn, 1, 5);
 	rcDcOffsetTrackingEn->showProgressBar(false);
 	connect(this, &FMCOMMS5::readRequested, rcDcOffsetTrackingEn, &IIOWidget::readAsync);
 
 	// bb_dc_offset_tracking_en
-	IIOWidget *bbDcOffsetTrackingEn = IIOWidgetBuilder(widget)
-						  .channel(voltage0)
-						  .attribute("bb_dc_offset_tracking_en")
-						  .title("BB DC")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *bbDcOffsetTrackingEn =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(voltage0, "bb_dc_offset_tracking_en"))
+			.title("BB DC")
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(bbDcOffsetTrackingEn, 2, 5);
 	bbDcOffsetTrackingEn->showProgressBar(false);
 	connect(this, &FMCOMMS5::readRequested, bbDcOffsetTrackingEn, &IIOWidget::readAsync);
@@ -306,25 +307,25 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 
 	rxDeviceLayout->addWidget(rxDeviceWidget);
 	rxDeviceWidget->layout()->addWidget(m_helper->generateRxChannelWidget(voltage0, "RX 1", rxDeviceWidget));
-	iio_channel *voltage1 = iio_device_find_channel(dev, "voltage1", isOutput);
-	if(voltage1 && iio_channel_find_attr(voltage1, "hardwaregain")) {
+	component::Channel *voltage1 = component::channelById(dev, "voltage1", isOutput);
+	if(voltage1 && component::attributeByName(voltage1, "hardwaregain")) {
 		rxDeviceWidget->layout()->addWidget(
 			m_helper->generateRxChannelWidget(voltage1, "RX 2", rxDeviceWidget));
 	}
 
 	//////// second device for fmcomms5 RX
 
-	iio_device *dev2 = iio_context_find_device(m_ctx, "ad9361-phy-B");
+	component::Device *dev2 = m_ctx->findChild<component::Device *>("ad9361-phy-B", Qt::FindDirectChildrenOnly);
 
 	QWidget *rxDevice2Widget = m_helper->generateRxDeviceWidget(dev2, "ad9361-phy-B", widget);
 
 	rxDeviceLayout->addWidget(rxDevice2Widget);
 
-	iio_channel *voltage0B = iio_device_find_channel(dev2, "voltage0", isOutput);
+	component::Channel *voltage0B = component::channelById(dev2, "voltage0", isOutput);
 
 	rxDevice2Widget->layout()->addWidget(m_helper->generateRxChannelWidget(voltage0B, "RX 3", rxDevice2Widget));
-	iio_channel *voltage1B = iio_device_find_channel(dev2, "voltage1", isOutput);
-	if(voltage1B && iio_channel_find_attr(voltage1B, "hardwaregain")) {
+	component::Channel *voltage1B = component::channelById(dev2, "voltage1", isOutput);
+	if(voltage1B && component::attributeByName(voltage1B, "hardwaregain")) {
 		rxDevice2Widget->layout()->addWidget(
 			m_helper->generateRxChannelWidget(voltage1B, "RX 4", rxDevice2Widget));
 	}
@@ -337,7 +338,7 @@ QWidget *FMCOMMS5::generateRxChainWidget(iio_device *dev, QString title, QWidget
 	return widget;
 }
 
-QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *FMCOMMS5::generateTxChainWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -353,13 +354,11 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 	QGridLayout *lay = new QGridLayout();
 
 	bool isOutput = true;
-	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
+	component::Channel *voltage0 = component::channelById(dev, "voltage0", isOutput);
 
 	// voltage0: rf_bandwidth
 	IIOWidget *rfBandwidth = IIOWidgetBuilder(widget)
-					 .channel(voltage0)
-					 .attribute("rf_bandwidth")
-					 .optionsAttribute("rf_bandwidth_available")
+					 .attribute(component::attributeByName(voltage0, "rf_bandwidth"))
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .title("RF Bandwidth(MHz)")
 					 .group(m_group)
@@ -374,9 +373,7 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 
 	// voltage0:  sampling_frequency
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(widget)
-					       .channel(voltage0)
-					       .attribute("sampling_frequency")
-					       .optionsAttribute("sampling_frequency_available")
+					       .attribute(component::attributeByName(voltage0, "sampling_frequency"))
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .title("Sampling Rate(MSPS)")
 					       .group(m_group)
@@ -393,9 +390,7 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 
 	// voltage0:  rf_port_select
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(widget)
-					  .channel(voltage0)
-					  .attribute("rf_port_select")
-					  .optionsAttribute("rf_port_select_available")
+					  .attribute(component::attributeByName(voltage0, "rf_port_select"))
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .title("RF Port Select")
 					  .group(m_group)
@@ -414,25 +409,25 @@ QWidget *FMCOMMS5::generateTxChainWidget(iio_device *dev, QString title, QWidget
 	txWidgetsLayout->addWidget(txDeviceWidget);
 
 	txDeviceWidget->layout()->addWidget(m_helper->generateTxChannelWidget(voltage0, "TX 1", txDeviceWidget));
-	iio_channel *voltage1 = iio_device_find_channel(dev, "voltage1", isOutput);
-	if(voltage1 && iio_channel_find_attr(voltage1, "hardwaregain")) {
+	component::Channel *voltage1 = component::channelById(dev, "voltage1", isOutput);
+	if(voltage1 && component::attributeByName(voltage1, "hardwaregain")) {
 		txDeviceWidget->layout()->addWidget(
 			m_helper->generateTxChannelWidget(voltage1, "TX 2", txDeviceWidget));
 	}
 
 	//////// second device for fmcomms5 TX
 
-	iio_device *dev2 = iio_context_find_device(m_ctx, "ad9361-phy-B");
+	component::Device *dev2 = m_ctx->findChild<component::Device *>("ad9361-phy-B", Qt::FindDirectChildrenOnly);
 
 	QWidget *txDevice2Widget = m_helper->generateTxDeviceWidget(dev2, "ad9361-phy-B", widget);
 
 	txWidgetsLayout->addWidget(txDevice2Widget);
 
-	iio_channel *voltage0B = iio_device_find_channel(dev2, "voltage0", isOutput);
+	component::Channel *voltage0B = component::channelById(dev2, "voltage0", isOutput);
 
 	txDevice2Widget->layout()->addWidget(m_helper->generateTxChannelWidget(voltage0B, "TX 3", txDevice2Widget));
-	iio_channel *voltage1B = iio_device_find_channel(dev2, "voltage1", isOutput);
-	if(voltage1 && iio_channel_find_attr(voltage1B, "hardwaregain")) {
+	component::Channel *voltage1B = component::channelById(dev2, "voltage1", isOutput);
+	if(voltage1B && component::attributeByName(voltage1B, "hardwaregain")) {
 		txDevice2Widget->layout()->addWidget(
 			m_helper->generateTxChannelWidget(voltage1B, "TX 4", txDevice2Widget));
 	}

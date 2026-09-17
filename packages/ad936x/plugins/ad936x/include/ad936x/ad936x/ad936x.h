@@ -33,6 +33,10 @@
 #include <ad936xhelper.h>
 
 namespace scopy {
+namespace component {
+class Context;
+class Device;
+} // namespace component
 class IIOWidgetGroup;
 namespace ad936x {
 
@@ -40,14 +44,14 @@ class SCOPY_AD936X_EXPORT AD936X : public QWidget
 {
 	Q_OBJECT
 public:
-	AD936X(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	AD936X(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~AD936X();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
@@ -55,8 +59,8 @@ private:
 	QWidget *m_blockDiagramWidget;
 	AnimatedRefreshBtn *m_refreshButton;
 
-	QWidget *generateRxChainWidget(iio_device *dev, QString title, QWidget *parent);
-	QWidget *generateTxChainWidget(iio_device *dev, QString title, QWidget *parent);
+	QWidget *generateRxChainWidget(component::Device *dev, QString title, QWidget *parent);
+	QWidget *generateTxChainWidget(component::Device *dev, QString title, QWidget *parent);
 
 	AD936xHelper *m_helper;
 };

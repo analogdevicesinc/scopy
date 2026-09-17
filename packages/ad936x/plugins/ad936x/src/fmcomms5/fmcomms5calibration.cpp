@@ -25,6 +25,8 @@
 #include <QtConcurrent>
 #include <QThread>
 
+#include <component/backends/iio/iiocontext.h>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -34,10 +36,23 @@ Q_LOGGING_CATEGORY(CAT_FMCOMMS5_CALIBRATION, "CAT_FMCOMMS5_CALIBRATION")
 using namespace scopy;
 using namespace ad936x;
 
-Fmcomms5Calibration::Fmcomms5Calibration(iio_context *ctx, QObject *parent)
-	: m_ctx(ctx)
+// FMCOMMS5 calibration keeps a raw libiio path: the algorithm uses buffer
+// capture and register read/write that the component tree does not expose. We
+// recover the raw iio_context* from the DC context node's backend handle.
+Fmcomms5Calibration::Fmcomms5Calibration(component::Context *ctx, QObject *parent)
+	: m_ctx(nullptr)
 	, QObject{parent}
 {
+	auto *iioCtx = dynamic_cast<component::iio::IIOContext *>(ctx);
+	if(!iioCtx) {
+		qWarning(CAT_FMCOMMS5_CALIBRATION) << "Context is not an IIO context!";
+		return;
+	}
+	m_ctx = static_cast<iio_context *>(iioCtx->handle().ptr);
+	if(!m_ctx) {
+		qWarning(CAT_FMCOMMS5_CALIBRATION) << "No raw iio_context available!";
+		return;
+	}
 	m_mainDevice = iio_context_find_device(m_ctx, "ad9361-phy");
 	m_secondDevice = iio_context_find_device(m_ctx, "ad9361-phy-B");
 

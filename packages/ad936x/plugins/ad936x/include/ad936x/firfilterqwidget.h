@@ -26,18 +26,22 @@
 #include <QWidget>
 #include <filebrowserwidget.h>
 #include "scopy-ad936x_export.h"
-#include <iio.h>
 #include <QBoxLayout>
 #include <menuonoffswitch.h>
 
 namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
 namespace ad936x {
 class SCOPY_AD936X_EXPORT FirFilterQWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	// at least one device is required
-	explicit FirFilterQWidget(iio_device *dev1, iio_device *dev2 = nullptr, QWidget *parent = nullptr);
+	explicit FirFilterQWidget(component::Device *dev1, component::Device *dev2 = nullptr,
+				  QWidget *parent = nullptr);
 
 Q_SIGNALS:
 	void autofilterToggled(bool toogled);
@@ -47,15 +51,15 @@ private:
 	QVBoxLayout *m_layout;
 	QPushButton *m_chooseFileBtn;
 	void chooseFile();
-	iio_device *m_dev1;
-	iio_device *m_dev2;
+	component::Device *m_dev1;
+	component::Device *m_dev2;
 	bool m_isRxFilter;
 	bool m_isTxFilter;
 	void applyFirFilter(QString path);
 
 	void applyChannelFilterToggled(bool isTx, bool toggled);
-	void toggleDeviceFilter(iio_device *dev, bool toggled);
-	void toggleChannelFilter(iio_channel *chn, QString attr, bool toggled);
+	void toggleDeviceFilter(component::Device *dev, bool toggled);
+	void toggleChannelFilter(component::Channel *chn, QString attr, bool toggled);
 
 	MenuOnOffSwitch *m_applyRxTxFilter;
 };

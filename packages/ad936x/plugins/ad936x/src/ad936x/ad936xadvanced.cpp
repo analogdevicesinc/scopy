@@ -30,12 +30,15 @@
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
 
+#include <component/context.h>
+#include <component/device.h>
+
 Q_LOGGING_CATEGORY(CAT_AD936x_ADVANCED, "AD936x_ADVANCED")
 
 using namespace scopy;
 using namespace ad936x;
 
-AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+AD936XAdvanced::AD936XAdvanced(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: m_ctx(ctx)
 	, m_group(group)
 	, QWidget{parent}
@@ -83,12 +86,9 @@ AD936XAdvanced::AD936XAdvanced(iio_context *ctx, IIOWidgetGroup *group, QWidget 
 
 	if(m_ctx != nullptr) {
 		// this should work for any device from AD936x family
-		iio_device *plutoDevice = nullptr;
-		int device_count = iio_context_get_devices_count(ctx);
-		for(int i = 0; i < device_count; ++i) {
-			iio_device *dev = iio_context_get_device(ctx, i);
-			const char *dev_name = iio_device_get_name(dev);
-			if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+		component::Device *plutoDevice = nullptr;
+		for(component::Device *dev : m_ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+			if(dev->name().contains("ad936", Qt::CaseInsensitive)) {
 				plutoDevice = dev;
 				break;
 			}
