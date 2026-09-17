@@ -26,7 +26,6 @@
 #include <QWidget>
 #include <animatedrefreshbtn.h>
 #include <tooltemplate.h>
-#include <iio.h>
 
 #include "auxadcdaciowidget.h"
 #include "elnawidget.h"
@@ -39,13 +38,17 @@
 #include "fmcomms5/fmcomms5tab.h"
 
 namespace scopy {
+namespace component {
+class Context;
+class Device;
+} // namespace component
 class IIOWidgetGroup;
 namespace ad936x {
 class SCOPY_AD936X_EXPORT Fmcomms5Advanced : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit Fmcomms5Advanced(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Fmcomms5Advanced();
 
 	void switchSubtab(const QString &name);
@@ -69,7 +72,7 @@ private:
 	QPushButton *m_syncBtn = nullptr;
 	void ad9361MultichipSync();
 
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
@@ -85,8 +88,8 @@ private:
 	BistWidget *m_bist;
 	Fmcomms5Tab *m_fmcomms5;
 
-	iio_device *m_mainDevice = nullptr;
-	iio_device *m_secondDevice = nullptr;
+	component::Device *m_mainDevice = nullptr;
+	component::Device *m_secondDevice = nullptr;
 	QStackedWidget *m_centralWidget = nullptr;
 
 	bool m_isToolInitialized;

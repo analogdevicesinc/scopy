@@ -24,16 +24,18 @@
 
 #include <QWidget>
 #include <QBoxLayout>
-#include <iio.h>
 
 namespace scopy {
+namespace component {
+class Device;
+}
 class IIOWidgetGroup;
 namespace ad936x {
 class MiscWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	explicit MiscWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~MiscWidget();
 
 Q_SIGNALS:
@@ -41,7 +43,7 @@ Q_SIGNALS:
 
 private:
 	QVBoxLayout *m_layout;
-	iio_device *m_device = nullptr;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 };
 } // namespace ad936x

@@ -23,11 +23,14 @@
 #include <style.h>
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-GainWidget::GainWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+GainWidget::GainWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -90,8 +93,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 		rxModeOptionsData += " " + rxModeValues.at(i);
 	}
 	IIOWidget *rx1Mode = IIOWidgetBuilder(modeWidget)
-				     .device(m_device)
-				     .attribute("adi,gc-rx1-mode")
+				     .attribute(component::attributeByName(m_device, "adi,gc-rx1-mode"))
 				     .uiStrategy(IIOWidgetBuilder::ComboUi)
 				     .optionsValues(rxModeOptionsData)
 				     .title("RX1")
@@ -111,8 +113,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 
 	// adi,gc-rx2-mode
 	IIOWidget *rx2Mode = IIOWidgetBuilder(modeWidget)
-				     .device(m_device)
-				     .attribute("adi,gc-rx2-mode")
+				     .attribute(component::attributeByName(m_device, "adi,gc-rx2-mode"))
 				     .uiStrategy(IIOWidgetBuilder::ComboUi)
 				     .optionsValues(rxModeOptionsData)
 				     .title("RX2")
@@ -140,15 +141,15 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 	for(int i = 0; i < tableModeValues.size(); i++) {
 		tableModeOptionsData += " " + tableModeValues.at(i);
 	}
-	IIOWidget *tableMode = IIOWidgetBuilder(modeWidget)
-				       .device(m_device)
-				       .attribute("adi,split-gain-table-mode-enable")
-				       .uiStrategy(IIOWidgetBuilder::ComboUi)
-				       .optionsValues(tableModeOptionsData)
-				       .title("Table Mode")
-				       .infoMessage("Enable Split Gain Table Mode - default Full Table")
-				       .group(m_group)
-				       .buildSingle();
+	IIOWidget *tableMode =
+		IIOWidgetBuilder(modeWidget)
+			.attribute(component::attributeByName(m_device, "adi,split-gain-table-mode-enable"))
+			.uiStrategy(IIOWidgetBuilder::ComboUi)
+			.optionsValues(tableModeOptionsData)
+			.title("Table Mode")
+			.infoMessage("Enable Split Gain Table Mode - default Full Table")
+			.group(m_group)
+			.buildSingle();
 	modeWidgetLayout->addWidget(tableMode, 1, 2);
 
 	tableMode->setUItoDataConversion([this, tableModeOptions](QString data) {
@@ -161,8 +162,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 	// adi,gc-dec-pow-measurement-duration
 	IIOWidget *decpowMeasurement =
 		IIOWidgetBuilder(modeWidget)
-			.device(m_device)
-			.attribute("adi,gc-dec-pow-measurement-duration")
+			.attribute(component::attributeByName(m_device, "adi,gc-dec-pow-measurement-duration"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 524288]")
 			.title("Dec PWR mess. duration in MGC and Slow Attack AGC mode")
@@ -175,8 +175,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 	// adi,gc-low-power-thresh
 	IIOWidget *lowPowerThresh =
 		IIOWidgetBuilder(modeWidget)
-			.device(m_device)
-			.attribute("adi,gc-low-power-thresh")
+			.attribute(component::attributeByName(m_device, "adi,gc-low-power-thresh"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 64]")
 			.title("Low PWR Thresh (dbFS)")
@@ -190,8 +189,7 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 	// adi,agc-attack-delay-extra-margin-us
 	IIOWidget *attackDelay =
 		IIOWidgetBuilder(modeWidget)
-			.device(m_device)
-			.attribute("adi,agc-attack-delay-extra-margin-us")
+			.attribute(component::attributeByName(m_device, "adi,agc-attack-delay-extra-margin-us"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 20000]")
 			.title("Attack Delay extra margin (us)")
@@ -206,8 +204,8 @@ QWidget *GainWidget::modeWidget(QWidget *parent)
 	// adi,gc-use-rx-fir-out-for-dec-pwr-meas-enable
 	IIOWidget *rxFirOut =
 		IIOWidgetBuilder(modeWidget)
-			.device(m_device)
-			.attribute("adi,gc-use-rx-fir-out-for-dec-pwr-meas-enable")
+			.attribute(
+				component::attributeByName(m_device, "adi,gc-use-rx-fir-out-for-dec-pwr-meas-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Use Rx FIR output for Dec. PWR measurements")
 			.infoMessage(
@@ -248,8 +246,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 	// adi,mgc-rx1-ctrl-inp-enable
 	IIOWidget *mgcRx1Ctrl =
 		IIOWidgetBuilder(mgcWidget)
-			.device(m_device)
-			.attribute("adi,mgc-rx1-ctrl-inp-enable")
+			.attribute(component::attributeByName(m_device, "adi,mgc-rx1-ctrl-inp-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("RX1 Control Input")
 			.infoMessage(
@@ -264,8 +261,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 	// adi,mgc-rx2-ctrl-inp-enable
 	IIOWidget *mgcRx2Ctrl =
 		IIOWidgetBuilder(mgcWidget)
-			.device(m_device)
-			.attribute("adi,mgc-rx2-ctrl-inp-enable")
+			.attribute(component::attributeByName(m_device, "adi,mgc-rx2-ctrl-inp-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("RX2 Control Input")
 			.infoMessage(
@@ -280,8 +276,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 	// adi,mgc-inc-gain-step
 	IIOWidget *mgcIncGain =
 		IIOWidgetBuilder(mgcWidget)
-			.device(m_device)
-			.attribute("adi,mgc-inc-gain-step")
+			.attribute(component::attributeByName(m_device, "adi,mgc-inc-gain-step"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[1 1 8]")
 			.title("Increase Gain Step")
@@ -296,8 +291,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 	// adi,mgc-dec-gain-step
 	IIOWidget *mgcDecGain =
 		IIOWidgetBuilder(mgcWidget)
-			.device(m_device)
-			.attribute("adi,mgc-inc-gain-step")
+			.attribute(component::attributeByName(m_device, "adi,mgc-inc-gain-step"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[1 1 8]")
 			.title("Decrease Gain Step")
@@ -321,8 +315,7 @@ QWidget *GainWidget::mgcWidget(QWidget *parent)
 		mgcSplitTableCtrlOptionsData += " " + mgcSplitTableCtrlValues.at(i);
 	}
 	IIOWidget *mgcSplitTableCtrl = IIOWidgetBuilder(mgcWidget)
-					       .device(m_device)
-					       .attribute("adi,mgc-inc-gain-step")
+					       .attribute(component::attributeByName(m_device, "adi,mgc-inc-gain-step"))
 					       .uiStrategy(IIOWidgetBuilder::ComboUi)
 					       .optionsValues(mgcSplitTableCtrlOptionsData)
 					       .title("Split Table Control Input Mode")
@@ -367,8 +360,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-outer-thresh-high
 	IIOWidget *outerThreshHigh =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-outer-thresh-high")
+			.attribute(component::attributeByName(m_device, "adi,agc-outer-thresh-high"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 127]")
 			.title("Outer Threshold High (dBFS)")
@@ -381,8 +373,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-outer-thresh-high-dec-steps
 	IIOWidget *outerThreshHighDecSteps =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-outer-thresh-high-dec-steps")
+			.attribute(component::attributeByName(m_device, "adi,agc-outer-thresh-high-dec-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Decrease Steps")
@@ -395,8 +386,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-inner-thresh-high
 	IIOWidget *innerThreshHigh =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-inner-thresh-high")
+			.attribute(component::attributeByName(m_device, "adi,agc-inner-thresh-high"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 127]")
 			.title("Inner Threshold High (dBFS) Fast AGC Lock Level (dBFS)")
@@ -410,8 +400,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-inner-thresh-high-dec-steps
 	IIOWidget *innerThreshHighDecSteps =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-inner-thresh-high-dec-steps")
+			.attribute(component::attributeByName(m_device, "adi,agc-inner-thresh-high-dec-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 7]")
 			.title("Decrease Steps")
@@ -423,8 +412,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 
 	// adi,agc-inner-thresh-low
 	IIOWidget *innerThreshLow = IIOWidgetBuilder(agcTresholdGainChangesWidget)
-					    .device(m_device)
-					    .attribute("adi,agc-inner-thresh-low")
+					    .attribute(component::attributeByName(m_device, "adi,agc-inner-thresh-low"))
 					    .uiStrategy(IIOWidgetBuilder::RangeUi)
 					    .optionsValues("[0 1 127]")
 					    .title("Inner Threshold Low (dBFS)")
@@ -437,8 +425,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-inner-thresh-low-inc-steps
 	IIOWidget *innerThreshLowIncSteps =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-inner-thresh-low-inc-steps")
+			.attribute(component::attributeByName(m_device, "adi,agc-inner-thresh-low-inc-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 7]")
 			.title("Increase Steps")
@@ -451,8 +438,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-outer-thresh-low
 	IIOWidget *outerThreshLow =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-outer-thresh-low")
+			.attribute(component::attributeByName(m_device, "adi,agc-outer-thresh-low"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 127]")
 			.title("Outer Threshold Low (dBFS)")
@@ -465,8 +451,7 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	// adi,agc-outer-thresh-low-inc-steps
 	IIOWidget *outerThreshLowIncSteps =
 		IIOWidgetBuilder(agcTresholdGainChangesWidget)
-			.device(m_device)
-			.attribute("adi,agc-outer-thresh-low-inc-steps")
+			.attribute(component::attributeByName(m_device, "adi,agc-outer-thresh-low-inc-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Increase Steps")
@@ -477,28 +462,28 @@ QWidget *GainWidget::agcThresholdGainChangesWidget(QWidget *parent)
 	agcTresholdGainChangesWidgetLayout->addWidget(outerThreshLowIncSteps, 4, 1);
 
 	// adi,agc-sync-for-gain-counter-enable
-	IIOWidget *sync = IIOWidgetBuilder(agcTresholdGainChangesWidget)
-				  .device(m_device)
-				  .attribute("adi,agc-sync-for-gain-counter-enable")
-				  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-				  .title("AGC Sync for Gain Counter")
-				  .infoMessage("If this attribute is set, CTRL_IN2 transitioning high resets the "
-					       "counter.See register 0x128, bit D4.")
-				  .group(m_group)
-				  .buildSingle();
+	IIOWidget *sync =
+		IIOWidgetBuilder(agcTresholdGainChangesWidget)
+			.attribute(component::attributeByName(m_device, "adi,agc-sync-for-gain-counter-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("AGC Sync for Gain Counter")
+			.infoMessage("If this attribute is set, CTRL_IN2 transitioning high resets the "
+				     "counter.See register 0x128, bit D4.")
+			.group(m_group)
+			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(sync, 5, 0);
 	sync->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	sync->showProgressBar(false);
 
 	// adi,agc-gain-update-interval-us
-	IIOWidget *gainUpdateInterval = IIOWidgetBuilder(agcTresholdGainChangesWidget)
-						.device(m_device)
-						.attribute("adi,agc-gain-update-interval-us")
-						.uiStrategy(IIOWidgetBuilder::RangeUi)
-						.optionsValues("[0 10 100000]")
-						.title("Gain Update Interval (us)")
-						.group(m_group)
-						.buildSingle();
+	IIOWidget *gainUpdateInterval =
+		IIOWidgetBuilder(agcTresholdGainChangesWidget)
+			.attribute(component::attributeByName(m_device, "adi,agc-gain-update-interval-us"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 10 100000]")
+			.title("Gain Update Interval (us)")
+			.group(m_group)
+			.buildSingle();
 	agcTresholdGainChangesWidgetLayout->addWidget(gainUpdateInterval, 6, 0);
 
 	connect(this, &GainWidget::readRequested, this, [=, this]() {
@@ -534,8 +519,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	// adi,gc-adc-large-overload-thresh
 	IIOWidget *largeOverloadThresh =
 		IIOWidgetBuilder(adcOverloadWidget)
-			.device(m_device)
-			.attribute("adi,gc-adc-large-overload-thresh")
+			.attribute(component::attributeByName(m_device, "adi,gc-adc-large-overload-thresh"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 255]")
 			.title("Large Thresh")
@@ -547,8 +531,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	// adi,gc-adc-small-overload-thresh
 	IIOWidget *smallOverloadThresh =
 		IIOWidgetBuilder(adcOverloadWidget)
-			.device(m_device)
-			.attribute("adi,gc-adc-small-overload-thresh")
+			.attribute(component::attributeByName(m_device, "adi,gc-adc-small-overload-thresh"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 255]")
 			.title("Small Thresh")
@@ -560,8 +543,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	// adi,agc-adc-large-overload-exceed-counter
 	IIOWidget *largeOverloadExceed =
 		IIOWidgetBuilder(adcOverloadWidget)
-			.device(m_device)
-			.attribute("adi,agc-adc-large-overload-exceed-counter")
+			.attribute(component::attributeByName(m_device, "adi,agc-adc-large-overload-exceed-counter"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Large Exceed Cntr")
@@ -575,8 +557,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	// adi,agc-adc-small-overload-exceed-counter
 	IIOWidget *smallOverloadExceed =
 		IIOWidgetBuilder(adcOverloadWidget)
-			.device(m_device)
-			.attribute("adi,agc-adc-small-overload-exceed-counter")
+			.attribute(component::attributeByName(m_device, "adi,agc-adc-small-overload-exceed-counter"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Small Exceed Counter")
@@ -589,8 +570,7 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	// adi,agc-adc-large-overload-inc-steps
 	IIOWidget *largeDecSteps =
 		IIOWidgetBuilder(adcOverloadWidget)
-			.device(m_device)
-			.attribute("adi,agc-adc-large-overload-inc-steps")
+			.attribute(component::attributeByName(m_device, "adi,agc-adc-large-overload-inc-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Large Decr. Steps ")
@@ -603,15 +583,16 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	adcOverloadWidgetLayout->addWidget(largeDecSteps, 3, 0);
 
 	// adi,agc-adc-lmt-small-overload-prevent-gain-inc-enable
-	IIOWidget *preventGainIncrease = IIOWidgetBuilder(adcOverloadWidget)
-						 .device(m_device)
-						 .attribute("adi,agc-adc-lmt-small-overload-prevent-gain-inc-enable")
-						 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						 .title("Prevent Gain Increase")
-						 .infoMessage("This attribute set the slow AGC inner low window "
-							      "threshold. See register 0x120, bits [D6:D0].")
-						 .group(m_group)
-						 .buildSingle();
+	IIOWidget *preventGainIncrease =
+		IIOWidgetBuilder(adcOverloadWidget)
+			.attribute(component::attributeByName(m_device,
+							      "adi,agc-adc-lmt-small-overload-prevent-gain-inc-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Prevent Gain Increase")
+			.infoMessage("This attribute set the slow AGC inner low window "
+				     "threshold. See register 0x120, bits [D6:D0].")
+			.group(m_group)
+			.buildSingle();
 	adcOverloadWidgetLayout->addWidget(preventGainIncrease, 3, 1);
 	preventGainIncrease->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	preventGainIncrease->showProgressBar(false);
@@ -621,8 +602,8 @@ QWidget *GainWidget::adcOverloadWidget(QWidget *parent)
 	// adi,agc-immed-gain-change-if-large-adc-overload-enable
 	IIOWidget *immedGainChange =
 		IIOWidgetBuilder(adcOverloadWidget)
-			.device(m_device)
-			.attribute("adi,agc-immed-gain-change-if-large-adc-overload-enable")
+			.attribute(component::attributeByName(m_device,
+							      "adi,agc-immed-gain-change-if-large-adc-overload-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Immediate Gain Change if Large Overload")
 			.infoMessage("Set this attribute to allow large ADC overload to reduce gain immediately. See "
@@ -661,38 +642,37 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 	widgetLayout->addWidget(title, 0, 0);
 
 	// adi,gc-lmt-overload-high-thresh
-	IIOWidget *highThresh = IIOWidgetBuilder(widget)
-					.device(m_device)
-					.attribute("adi,gc-lmt-overload-high-thresh")
-					.uiStrategy(IIOWidgetBuilder::RangeUi)
-					.optionsValues("[16 16 800]")
-					.title("High Tresh (mV)")
-					.infoMessage("This attribute sets the large LMT overload threshold. See "
-						     "register 0x108. This data is "
-						     "processed by the driver.")
-					.group(m_group)
-					.buildSingle();
+	IIOWidget *highThresh =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,gc-lmt-overload-high-thresh"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[16 16 800]")
+			.title("High Tresh (mV)")
+			.infoMessage("This attribute sets the large LMT overload threshold. See "
+				     "register 0x108. This data is "
+				     "processed by the driver.")
+			.group(m_group)
+			.buildSingle();
 	widgetLayout->addWidget(highThresh, 1, 0);
 
 	// adi,gc-lmt-overload-low-thresh
-	IIOWidget *lowThresh = IIOWidgetBuilder(widget)
-				       .device(m_device)
-				       .attribute("adi,gc-lmt-overload-low-thresh")
-				       .uiStrategy(IIOWidgetBuilder::RangeUi)
-				       .optionsValues("[16 16 800]")
-				       .title("Small Thresh")
-				       .infoMessage("This attribute sets the small LMT overload threshold. See "
-						    "register 0x107. This data is "
-						    "processed by the driver.")
-				       .group(m_group)
-				       .buildSingle();
+	IIOWidget *lowThresh =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,gc-lmt-overload-low-thresh"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[16 16 800]")
+			.title("Small Thresh")
+			.infoMessage("This attribute sets the small LMT overload threshold. See "
+				     "register 0x107. This data is "
+				     "processed by the driver.")
+			.group(m_group)
+			.buildSingle();
 	widgetLayout->addWidget(lowThresh, 1, 1);
 
 	// adi,agc-lmt-overload-large-exceed-counter
 	IIOWidget *largeExced =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,agc-lmt-overload-large-exceed-counter")
+			.attribute(component::attributeByName(m_device, "adi,agc-lmt-overload-large-exceed-counter"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Large Exceed Counter")
@@ -706,8 +686,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 	// adi,agc-lmt-overload-small-exceed-counter
 	IIOWidget *smallExced =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,agc-lmt-overload-small-exceed-counter")
+			.attribute(component::attributeByName(m_device, "adi,agc-lmt-overload-small-exceed-counter"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Small Exceed Cntr")
@@ -721,8 +700,7 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 	// adi,agc-lmt-overload-large-inc-steps
 	IIOWidget *largeInc =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,agc-lmt-overload-large-inc-steps")
+			.attribute(component::attributeByName(m_device, "adi,agc-lmt-overload-large-inc-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 7]")
 			.title("Large Decr. Steps")
@@ -736,8 +714,8 @@ QWidget *GainWidget::lmtOverloadWidget(QWidget *parent)
 	// adi,agc-immed-gain-change-if-large-lmt-overload-enable
 	IIOWidget *immedGain =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,agc-immed-gain-change-if-large-lmt-overload-enable")
+			.attribute(component::attributeByName(m_device,
+							      "adi,agc-immed-gain-change-if-large-lmt-overload-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Immediate Gain Change if Large Overload")
 			.infoMessage("Set this attribute to allow large LMT overloads to reduce gain immediately. See "
@@ -777,8 +755,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 	// adi,gc-dig-gain-enable
 	IIOWidget *gainMode =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,gc-dig-gain-enable")
+			.attribute(component::attributeByName(m_device, "adi,gc-dig-gain-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Dig Gain Enable")
 			.infoMessage(
@@ -793,8 +770,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 	// adi,agc-dig-saturation-exceed-counter
 	IIOWidget *saturationExceedCounter =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,agc-dig-saturation-exceed-counter")
+			.attribute(component::attributeByName(m_device, "adi,agc-dig-saturation-exceed-counter"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Saturation Exceed Counter")
@@ -807,8 +783,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 	// adi,gc-max-dig-gain
 	IIOWidget *maxDigGain =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,gc-max-dig-gain")
+			.attribute(component::attributeByName(m_device, "adi,gc-max-dig-gain"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 7]")
 			.title("Max Digital Gain")
@@ -821,8 +796,7 @@ QWidget *GainWidget::digitalGainWidget(QWidget *parent)
 
 	// adi,agc-dig-gain-step-size
 	IIOWidget *gainStepSize = IIOWidgetBuilder(widget)
-					  .device(m_device)
-					  .attribute("adi,agc-dig-gain-step-size")
+					  .attribute(component::attributeByName(m_device, "adi,agc-dig-gain-step-size"))
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .optionsValues("[0 1 8]")
 					  .title("Decr Step Size")
@@ -881,8 +855,7 @@ QWidget *GainWidget::stateResponseToPeakOverload(QWidget *parent)
 	// adi,fagc-state-wait-time-ns
 	IIOWidget *stateWaitTime =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-state-wait-time-ns")
+			.attribute(component::attributeByName(m_device, "adi,fagc-state-wait-time-ns"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 10 200000]")
 			.title("State Wait Time")
@@ -912,17 +885,17 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 	layout->addWidget(title, 0, 0);
 
 	// adi,fagc-allow-agc-gain-increase-enable
-	IIOWidget *allowGainIncrease = IIOWidgetBuilder(widget)
-					       .device(m_device)
-					       .attribute("adi,fagc-allow-agc-gain-increase-enable")
-					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					       .title("Allow AGC to increase Gain if signal below Low PWR Thresh")
-					       .infoMessage("Setting this attribute allows the fast AGC to increase "
-							    "the gain while optimizing the gain index. "
-							    "Clearing it prevents the gain from increasing in any "
-							    "condition. See register 0x110, bit D0.")
-					       .group(m_group)
-					       .buildSingle();
+	IIOWidget *allowGainIncrease =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,fagc-allow-agc-gain-increase-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Allow AGC to increase Gain if signal below Low PWR Thresh")
+			.infoMessage("Setting this attribute allows the fast AGC to increase "
+				     "the gain while optimizing the gain index. "
+				     "Clearing it prevents the gain from increasing in any "
+				     "condition. See register 0x110, bit D0.")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(allowGainIncrease, 1, 0);
 	allowGainIncrease->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	allowGainIncrease->showProgressBar(false);
@@ -930,8 +903,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 	// adi,gc-low-power-thresh
 	IIOWidget *lowPowerThresh =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,gc-low-power-thresh")
+			.attribute(component::attributeByName(m_device, "adi,gc-low-power-thresh"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 64]")
 			.title("Low PWR Thresh (dbFS)")
@@ -945,8 +917,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 	// adi,fagc-lp-thresh-increment-time
 	IIOWidget *lowPowerThreshIncrementTime =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-lp-thresh-increment-time")
+			.attribute(component::attributeByName(m_device, "adi,fagc-lp-thresh-increment-time"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 255]")
 			.title("Low PWR THresh Increment Time")
@@ -961,8 +932,7 @@ QWidget *GainWidget::lowPowerCheck(QWidget *parent)
 	// adi,fagc-lp-thresh-increment-steps
 	IIOWidget *lowPowerThreshIncrementSteps =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-lp-thresh-increment-steps")
+			.attribute(component::attributeByName(m_device, "adi,fagc-lp-thresh-increment-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[1 1 8]")
 			.title("Increment Step")
@@ -1001,8 +971,7 @@ QWidget *GainWidget::agcLockLevelAdjustment(QWidget *parent)
 	// adi,agc-inner-thresh-high
 	IIOWidget *innerThreshHigh =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,agc-inner-thresh-high")
+			.attribute(component::attributeByName(m_device, "adi,agc-inner-thresh-high"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 127]")
 			.title("AGC Lock Level (dBFS) (Inner Threshold High)")
@@ -1016,8 +985,8 @@ QWidget *GainWidget::agcLockLevelAdjustment(QWidget *parent)
 	// adi,fagc-lock-level-gain-increase-upper-limit
 	IIOWidget *lockLevelGain =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-lock-level-gain-increase-upper-limit")
+			.attribute(
+				component::attributeByName(m_device, "adi,fagc-lock-level-gain-increase-upper-limit"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 63]")
 			.title("Lock Level Gain Increase Upper Limit")
@@ -1031,8 +1000,7 @@ QWidget *GainWidget::agcLockLevelAdjustment(QWidget *parent)
 	// adi,fagc-lock-level-lmt-gain-increase-enable
 	IIOWidget *lockLevelLmtGain =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-lock-level-lmt-gain-increase-enable")
+			.attribute(component::attributeByName(m_device, "adi,fagc-lock-level-lmt-gain-increase-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Allow LMT Gain Increase")
 			.infoMessage("Set this attribute to allow the AGC to use LMT gain if the gain index needs to "
@@ -1066,30 +1034,29 @@ QWidget *GainWidget::peakDetectors(QWidget *parent)
 	layout->addWidget(title, 0, 0);
 
 	// adi,fagc-lpf-final-settling-steps
-	IIOWidget *lpfFinalSettingsSteps = IIOWidgetBuilder(widget)
-						   .device(m_device)
-						   .attribute("adi,fagc-lpf-final-settling-steps")
-						   .uiStrategy(IIOWidgetBuilder::RangeUi)
-						   .optionsValues("[0 1 3]")
-						   .title("LPF / Full Table Final, Final Settling Steps")
-						   .infoMessage("This attribute sets the reduction to the gain index "
-								"if a large LMT or large ADC overload occurs after "
-								"Lock Level but before fast AGC state 5. If the number "
-								"of overloads exceeds the Final Overrange Count "
-								"(fagc_final_overrange_count), the AGC algorithm "
-								"restarts. Depending on various conditions if a split "
-								"table is used, the gain may reduce in in the LPF or "
-								"the LMT (fagc_lmt_final_settling_steps). See "
-								"register 0x112, bits [D7:D6].")
-						   .group(m_group)
-						   .buildSingle();
+	IIOWidget *lpfFinalSettingsSteps =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,fagc-lpf-final-settling-steps"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 3]")
+			.title("LPF / Full Table Final, Final Settling Steps")
+			.infoMessage("This attribute sets the reduction to the gain index "
+				     "if a large LMT or large ADC overload occurs after "
+				     "Lock Level but before fast AGC state 5. If the number "
+				     "of overloads exceeds the Final Overrange Count "
+				     "(fagc_final_overrange_count), the AGC algorithm "
+				     "restarts. Depending on various conditions if a split "
+				     "table is used, the gain may reduce in in the LPF or "
+				     "the LMT (fagc_lmt_final_settling_steps). See "
+				     "register 0x112, bits [D7:D6].")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(lpfFinalSettingsSteps, 1, 0);
 
 	// adi,fagc-lmt-final-settling-steps
 	IIOWidget *lmtFinalSettingsSteps =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-lmt-final-settling-steps")
+			.attribute(component::attributeByName(m_device, "adi,fagc-lmt-final-settling-steps"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 3]")
 			.title("LMT Final Settling Steps")
@@ -1099,21 +1066,21 @@ QWidget *GainWidget::peakDetectors(QWidget *parent)
 	layout->addWidget(lmtFinalSettingsSteps, 1, 1);
 
 	// adi,fagc-final-overrange-count
-	IIOWidget *finalOverrange = IIOWidgetBuilder(widget)
-					    .device(m_device)
-					    .attribute("adi,fagc-final-overrange-count")
-					    .uiStrategy(IIOWidgetBuilder::RangeUi)
-					    .optionsValues("[0 1 7]")
-					    .title("Final Overrange Count")
-					    .infoMessage("Final Overrange Count. See register 0x116, bits [D7:D5].")
-					    .group(m_group)
-					    .buildSingle();
+	IIOWidget *finalOverrange =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,fagc-final-overrange-count"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 7]")
+			.title("Final Overrange Count")
+			.infoMessage("Final Overrange Count. See register 0x116, bits [D7:D5].")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(finalOverrange, 2, 0);
 
 	// adi,fagc-gain-increase-after-gain-lock-enable
 	IIOWidget *increaseAfterGainLock = IIOWidgetBuilder(widget)
-						   .device(m_device)
-						   .attribute("adi,fagc-gain-increase-after-gain-lock-enable")
+						   .attribute(component::attributeByName(
+							   m_device, "adi,fagc-gain-increase-after-gain-lock-enable"))
 						   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 						   .title("Low Power Test Gain Increase after Gain Lock")
 						   .infoMessage("Set this attribute to allow gain increases after the "
@@ -1178,17 +1145,17 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 		gainIndexTypeOptionsData += " " + gainIndexTypeValues.at(i);
 	}
 
-	IIOWidget *gainIndexType = IIOWidgetBuilder(widget)
-					   .device(m_device)
-					   .attribute("adi,fagc-gain-index-type-after-exit-rx-mode")
-					   .uiStrategy(IIOWidgetBuilder::ComboUi)
-					   .optionsValues(gainIndexTypeOptionsData)
-					   .title("")
-					   .infoMessage("MAX Gain (0); Optimized Gain (1); Set Gain (2)."
-							"See register 0x110, bits D4,D2. "
-							"This data is processed by the driver.")
-					   .group(m_group)
-					   .buildSingle();
+	IIOWidget *gainIndexType =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,fagc-gain-index-type-after-exit-rx-mode"))
+			.uiStrategy(IIOWidgetBuilder::ComboUi)
+			.optionsValues(gainIndexTypeOptionsData)
+			.title("")
+			.infoMessage("MAX Gain (0); Optimized Gain (1); Set Gain (2)."
+				     "See register 0x110, bits D4,D2. "
+				     "This data is processed by the driver.")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(gainIndexType, 1, 1);
 
 	gainIndexType->setUItoDataConversion([this, gainIndexTypeOptions](QString data) {
@@ -1211,8 +1178,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 
 	IIOWidget *increaseAfterGainLock =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-use-last-lock-level-for-set-gain-enable")
+			.attribute(component::attributeByName(m_device,
+							      "adi,fagc-use-last-lock-level-for-set-gain-enable"))
 			.uiStrategy(IIOWidgetBuilder::ComboUi)
 			.optionsValues(increaseAfterGainLockOptionsData)
 			.title("")
@@ -1233,8 +1200,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	// adi,fagc-optimized-gain-offset
 	IIOWidget *optimiezedGainOffset =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-optimized-gain-offset")
+			.attribute(component::attributeByName(m_device, "adi,fagc-optimized-gain-offset"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 15]")
 			.title("Optimized Gain Offset")
@@ -1246,17 +1212,18 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	layout->addWidget(optimiezedGainOffset, 2, 2);
 
 	// adi,fagc-rst-gla-stronger-sig-thresh-exceeded-enable
-	IIOWidget *sigThreshExceedEn = IIOWidgetBuilder(widget)
-					       .device(m_device)
-					       .attribute("adi,fagc-rst-gla-stronger-sig-thresh-exceeded-enable")
-					       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					       .title("If Signal Power increases above Lock Level by (dBFS)")
-					       .infoMessage("If this attribute is set and the fast AGC is in State 5, "
-							    "the gain will not change even if the signal "
-							    "power increase by more than the Stronger Signal "
-							    "Threshold. See register 0x115, bit D7.")
-					       .group(m_group)
-					       .buildSingle();
+	IIOWidget *sigThreshExceedEn =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device,
+							      "adi,fagc-rst-gla-stronger-sig-thresh-exceeded-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("If Signal Power increases above Lock Level by (dBFS)")
+			.infoMessage("If this attribute is set and the fast AGC is in State 5, "
+				     "the gain will not change even if the signal "
+				     "power increase by more than the Stronger Signal "
+				     "Threshold. See register 0x115, bit D7.")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(sigThreshExceedEn, 3, 0);
 	sigThreshExceedEn->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	sigThreshExceedEn->showProgressBar(false);
@@ -1264,8 +1231,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	// adi,fagc-rst-gla-stronger-sig-thresh-above-ll
 	IIOWidget *fagcRstGlaStrongerSigThresh =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-rst-gla-stronger-sig-thresh-above-ll")
+			.attribute(
+				component::attributeByName(m_device, "adi,fagc-rst-gla-stronger-sig-thresh-above-ll"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 63]")
 			.title("")
@@ -1281,8 +1248,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	// adi,fagc-rst-gla-engergy-lost-sig-thresh-exceeded-enable
 	IIOWidget *rstGlaEngLostSigThreshExceedEn =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-rst-gla-engergy-lost-sig-thresh-exceeded-enable")
+			.attribute(component::attributeByName(
+				m_device, "adi,fagc-rst-gla-engergy-lost-sig-thresh-exceeded-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("If Signal Power decreases below Lock Level by (dBFS)")
 			.infoMessage("If this attribute is set and the fast AGC is in State 5, the gain will not "
@@ -1297,8 +1264,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 
 	// adi,fagc-rst-gla-engergy-lost-sig-thresh-below-ll
 	IIOWidget *rstGlaEnergyLost = IIOWidgetBuilder(widget)
-					      .device(m_device)
-					      .attribute("adi,fagc-rst-gla-engergy-lost-sig-thresh-below-ll")
+					      .attribute(component::attributeByName(
+						      m_device, "adi,fagc-rst-gla-engergy-lost-sig-thresh-below-ll"))
 					      .uiStrategy(IIOWidgetBuilder::RangeUi)
 					      .optionsValues("[0 1 63]")
 					      .title("")
@@ -1312,22 +1279,22 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	layout->addWidget(rstGlaEnergyLost, 4, 1);
 
 	// adi,fagc-energy-lost-stronger-sig-gain-lock-exit-cnt
-	IIOWidget *energyLostStronger = IIOWidgetBuilder(widget)
-						.device(m_device)
-						.attribute("adi,fagc-energy-lost-stronger-sig-gain-lock-exit-cnt")
-						.uiStrategy(IIOWidgetBuilder::RangeUi)
-						.optionsValues("[0 1 63]")
-						.title("for (RX Samples) restart GLA ...")
-						.infoMessage("Gain Lock Exit Count. See register 0x119, bits [D5:D0].")
-						.group(m_group)
-						.buildSingle();
+	IIOWidget *energyLostStronger =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device,
+							      "adi,fagc-energy-lost-stronger-sig-gain-lock-exit-cnt"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 63]")
+			.title("for (RX Samples) restart GLA ...")
+			.infoMessage("Gain Lock Exit Count. See register 0x119, bits [D5:D0].")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(energyLostStronger, 3, 2);
 
 	// adi,fagc-rst-gla-large-lmt-overload-enable
 	IIOWidget *rstGlaLargeLmtOverloadEn =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-rst-gla-large-lmt-overload-enable")
+			.attribute(component::attributeByName(m_device, "adi,fagc-rst-gla-large-lmt-overload-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("If Large LMT Overload, Do Not Change Gain but Restart GLA")
 			.infoMessage("Unlock Gain if Lg ADC or LMT Ovrg. See register 0x110, bit D1.")
@@ -1350,8 +1317,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 
 	IIOWidget *rstGlaEnergyLostGotoOptimGainEn =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-rst-gla-engergy-lost-goto-optim-gain-enable")
+			.attribute(component::attributeByName(m_device,
+							      "adi,fagc-rst-gla-engergy-lost-goto-optim-gain-enable"))
 			.uiStrategy(IIOWidgetBuilder::ComboUi)
 			.optionsValues(rstGlaEnergyLostGotoOptimGainEnOptionsData)
 			.title(".. and GTO")
@@ -1376,8 +1343,7 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	// adi,fagc-rst-gla-large-adc-overload-enable
 	IIOWidget *glaLargeAdcOverloadEn =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-rst-gla-large-adc-overload-enable")
+			.attribute(component::attributeByName(m_device, "adi,fagc-rst-gla-large-adc-overload-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("If Large ADC Overload do not change Gain but restart GLA")
 			.infoMessage("Unlock gain if ADC Ovrg, Lg ADC or LMT Ovrg. See register 0x110, bit D1 and "
@@ -1391,8 +1357,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	// adi,fagc-rst-gla-en-agc-pulled-high-enable
 	IIOWidget *rstGlaEnAgc =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-gain-increase-after-gain-lock-enable")
+			.attribute(
+				component::attributeByName(m_device, "adi,fagc-gain-increase-after-gain-lock-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("If EN_AGC is pulled high restart GLA and goto")
 			.infoMessage(
@@ -1414,16 +1380,16 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 		rstGlaIfEnAgcPulledOptionsData += " " + rstGlaIfEnAgcPulledValues.at(i);
 	}
 
-	IIOWidget *rstGlaIfEnAgcPulled = IIOWidgetBuilder(widget)
-						 .device(m_device)
-						 .attribute("adi,fagc-rst-gla-if-en-agc-pulled-high-mode")
-						 .uiStrategy(IIOWidgetBuilder::ComboUi)
-						 .optionsValues(rstGlaIfEnAgcPulledOptionsData)
-						 .title("")
-						 .infoMessage("MAX Gain (0); Optimized Gain (1); Set Gain (2), No gain "
-							      "change. See registers 0x110, 0x111")
-						 .group(m_group)
-						 .buildSingle();
+	IIOWidget *rstGlaIfEnAgcPulled =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,fagc-rst-gla-if-en-agc-pulled-high-mode"))
+			.uiStrategy(IIOWidgetBuilder::ComboUi)
+			.optionsValues(rstGlaIfEnAgcPulledOptionsData)
+			.title("")
+			.infoMessage("MAX Gain (0); Optimized Gain (1); Set Gain (2), No gain "
+				     "change. See registers 0x110, 0x111")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(rstGlaIfEnAgcPulled, 7, 1);
 
 	rstGlaIfEnAgcPulled->setUItoDataConversion([this, rstGlaIfEnAgcPulledOptions](QString data) {
@@ -1436,8 +1402,8 @@ QWidget *GainWidget::gainUnlock(QWidget *parent)
 	// adi,fagc-power-measurement-duration-in-state5
 	IIOWidget *powerMeasurementDuration =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-power-measurement-duration-in-state5")
+			.attribute(
+				component::attributeByName(m_device, "adi,fagc-power-measurement-duration-in-state5"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 16 524288]")
 			.title("")
@@ -1485,8 +1451,7 @@ QWidget *GainWidget::miscWidget(QWidget *parent)
 	// adi,fagc-dec-pow-measurement-duration
 	IIOWidget *stateWaitTime =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,fagc-dec-pow-measurement-duration")
+			.attribute(component::attributeByName(m_device, "adi,fagc-dec-pow-measurement-duration"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 100]")
 			.title("Dec PWR mess. duration in fast attack mode")

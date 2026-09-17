@@ -33,6 +33,12 @@
 #include <QtConcurrent>
 #include <QLoggingCategory>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 #include <guistrategy/comboguistrategy.h>
 
 Q_LOGGING_CATEGORY(CAT_AD936X, "AD936X");
@@ -40,7 +46,7 @@ Q_LOGGING_CATEGORY(CAT_AD936X, "AD936X");
 using namespace scopy;
 using namespace ad936x;
 
-AD936X::AD936X(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+AD936X::AD936X(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -99,12 +105,9 @@ AD936X::AD936X(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 
 	if(m_ctx != nullptr) {
 		// this should work for any device from AD936x family
-		iio_device *plutoDevice = nullptr;
-		int device_count = iio_context_get_devices_count(m_ctx);
-		for(int i = 0; i < device_count; ++i) {
-			iio_device *dev = iio_context_get_device(m_ctx, i);
-			const char *dev_name = iio_device_get_name(dev);
-			if(dev_name && QString(dev_name).contains("ad936", Qt::CaseInsensitive)) {
+		component::Device *plutoDevice = nullptr;
+		for(component::Device *dev : m_ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+			if(dev->name().contains("ad936", Qt::CaseInsensitive)) {
 				plutoDevice = dev;
 				break;
 			}
@@ -179,7 +182,7 @@ AD936X::AD936X(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 
 AD936X::~AD936X() {}
 
-QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *AD936X::generateRxChainWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -200,13 +203,11 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 
 	bool isOutput = false;
 
-	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
+	component::Channel *voltage0 = component::channelById(dev, "voltage0", isOutput);
 
 	// voltage0: rf_bandwidth
 	IIOWidget *rfBandwidth = IIOWidgetBuilder(widget)
-					 .channel(voltage0)
-					 .attribute("rf_bandwidth")
-					 .optionsAttribute("rf_bandwidth_available")
+					 .attribute(component::attributeByName(voltage0, "rf_bandwidth"))
 					 .title("RF Bandwidth(MHz)")
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .group(m_group)
@@ -222,9 +223,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 
 	// voltage0:  sampling_frequency
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(widget)
-					       .channel(voltage0)
-					       .attribute("sampling_frequency")
-					       .optionsAttribute("sampling_frequency_available")
+					       .attribute(component::attributeByName(voltage0, "sampling_frequency"))
 					       .title("Sampling Rate(MSPS)")
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .group(m_group)
@@ -242,9 +241,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 
 	// voltage 0 : rf_port_select
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(widget)
-					  .channel(voltage0)
-					  .attribute("rf_port_select")
-					  .optionsAttribute("rf_port_select_available")
+					  .attribute(component::attributeByName(voltage0, "rf_port_select"))
 					  .title("RF Port Select")
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .group(m_group)
@@ -253,37 +250,37 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 	connect(this, &AD936X::readRequested, rfPortSelect, &IIOWidget::readAsync);
 
 	// quadrature_tracking_en
-	IIOWidget *quadratureTrackingEn = IIOWidgetBuilder(this)
-						  .channel(voltage0)
-						  .attribute("quadrature_tracking_en")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .title("Quadrature")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *quadratureTrackingEn =
+		IIOWidgetBuilder(this)
+			.attribute(component::attributeByName(voltage0, "quadrature_tracking_en"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Quadrature")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(quadratureTrackingEn, 0, 5);
 	quadratureTrackingEn->showProgressBar(false);
 	connect(this, &AD936X::readRequested, quadratureTrackingEn, &IIOWidget::readAsync);
 
 	// rf_dc_offset_tracking_en
-	IIOWidget *rcDcOffsetTrackingEn = IIOWidgetBuilder(widget)
-						  .channel(voltage0)
-						  .attribute("rf_dc_offset_tracking_en")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .title("RF DC")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *rcDcOffsetTrackingEn =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(voltage0, "rf_dc_offset_tracking_en"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("RF DC")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(rcDcOffsetTrackingEn, 1, 5);
 	rcDcOffsetTrackingEn->showProgressBar(false);
 	connect(this, &AD936X::readRequested, rcDcOffsetTrackingEn, &IIOWidget::readAsync);
 
 	// bb_dc_offset_tracking_en
-	IIOWidget *bbDcOffsetTrackingEn = IIOWidgetBuilder(widget)
-						  .channel(voltage0)
-						  .attribute("bb_dc_offset_tracking_en")
-						  .title("BB DC")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *bbDcOffsetTrackingEn =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(voltage0, "bb_dc_offset_tracking_en"))
+			.title("BB DC")
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(bbDcOffsetTrackingEn, 2, 5);
 	bbDcOffsetTrackingEn->showProgressBar(false);
 	connect(this, &AD936X::readRequested, bbDcOffsetTrackingEn, &IIOWidget::readAsync);
@@ -298,8 +295,8 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 
 	rxDeviceLayout->addWidget(rxDeviceWidget);
 	rxDeviceWidget->layout()->addWidget(m_helper->generateRxChannelWidget(voltage0, "RX 1", rxDeviceWidget));
-	iio_channel *voltage1 = iio_device_find_channel(dev, "voltage1", isOutput);
-	if(voltage1 && iio_channel_find_attr(voltage1, "hardwaregain")) {
+	component::Channel *voltage1 = component::channelById(dev, "voltage1", isOutput);
+	if(voltage1 && component::attributeByName(voltage1, "hardwaregain")) {
 		rxDeviceWidget->layout()->addWidget(
 			m_helper->generateRxChannelWidget(voltage1, "RX 2", rxDeviceWidget));
 	}
@@ -311,7 +308,7 @@ QWidget *AD936X::generateRxChainWidget(iio_device *dev, QString title, QWidget *
 	return widget;
 }
 
-QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *parent)
+QWidget *AD936X::generateTxChainWidget(component::Device *dev, QString title, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -327,13 +324,11 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 	QGridLayout *lay = new QGridLayout();
 
 	bool isOutput = true;
-	iio_channel *voltage0 = iio_device_find_channel(dev, "voltage0", isOutput);
+	component::Channel *voltage0 = component::channelById(dev, "voltage0", isOutput);
 
 	// voltage0: rf_bandwidth
 	IIOWidget *rfBandwidth = IIOWidgetBuilder(widget)
-					 .channel(voltage0)
-					 .attribute("rf_bandwidth")
-					 .optionsAttribute("rf_bandwidth_available")
+					 .attribute(component::attributeByName(voltage0, "rf_bandwidth"))
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .title("RF Bandwidth(MHz)")
 					 .group(m_group)
@@ -349,9 +344,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 
 	// voltage0:  sampling_frequency
 	IIOWidget *samplingFrequency = IIOWidgetBuilder(widget)
-					       .channel(voltage0)
-					       .attribute("sampling_frequency")
-					       .optionsAttribute("sampling_frequency_available")
+					       .attribute(component::attributeByName(voltage0, "sampling_frequency"))
 					       .uiStrategy(IIOWidgetBuilder::RangeUi)
 					       .title("Sampling Rate(MSPS)")
 					       .group(m_group)
@@ -368,9 +361,7 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 
 	// voltage0:  rf_port_select
 	IIOWidget *rfPortSelect = IIOWidgetBuilder(widget)
-					  .channel(voltage0)
-					  .attribute("rf_port_select")
-					  .optionsAttribute("rf_port_select_available")
+					  .attribute(component::attributeByName(voltage0, "rf_port_select"))
 					  .uiStrategy(IIOWidgetBuilder::ComboUi)
 					  .title("RF Port Select")
 					  .group(m_group)
@@ -388,8 +379,8 @@ QWidget *AD936X::generateTxChainWidget(iio_device *dev, QString title, QWidget *
 
 	txWidgetsLayout->addWidget(txDeviceWidget);
 	txDeviceWidget->layout()->addWidget(m_helper->generateTxChannelWidget(voltage0, "TX 1", txDeviceWidget));
-	iio_channel *voltage1 = iio_device_find_channel(dev, "voltage1", isOutput);
-	if(voltage1 && iio_channel_find_attr(voltage1, "hardwaregain")) {
+	component::Channel *voltage1 = component::channelById(dev, "voltage1", isOutput);
+	if(voltage1 && component::attributeByName(voltage1, "hardwaregain")) {
 		txDeviceWidget->layout()->addWidget(
 			m_helper->generateTxChannelWidget(voltage1, "TX 2", txDeviceWidget));
 	}

@@ -30,6 +30,10 @@
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/backends/iio/iiodevice.h>
+
 #include <ad9361.h>
 
 Q_LOGGING_CATEGORY(CAT_FMCOMMS5_ADVANCED, "FMCOMMS5_ADVANCED")
@@ -37,7 +41,7 @@ Q_LOGGING_CATEGORY(CAT_FMCOMMS5_ADVANCED, "FMCOMMS5_ADVANCED")
 using namespace scopy;
 using namespace ad936x;
 
-Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Fmcomms5Advanced::Fmcomms5Advanced(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: m_ctx(ctx)
 	, m_group(group)
 	, QWidget{parent}
@@ -85,16 +89,15 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group, QWid
 	navigationButtons->setExclusive(true);
 
 	if(m_ctx != nullptr) {
-		iio_device *mainDevice = nullptr;
-		iio_device *secondDevice = nullptr;
-
-		mainDevice = iio_context_find_device(m_ctx, "ad9361-phy");
+		component::Device *mainDevice =
+			m_ctx->findChild<component::Device *>("ad9361-phy", Qt::FindDirectChildrenOnly);
 		if(mainDevice == nullptr) {
 			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy device found in context!";
 			return;
 		}
 
-		secondDevice = iio_context_find_device(m_ctx, "ad9361-phy-B");
+		component::Device *secondDevice =
+			m_ctx->findChild<component::Device *>("ad9361-phy-B", Qt::FindDirectChildrenOnly);
 		if(secondDevice == nullptr) {
 			qWarning(CAT_FMCOMMS5_ADVANCED) << "No ad9361-phy-B device found in context!";
 			return;
@@ -157,9 +160,22 @@ Fmcomms5Advanced::Fmcomms5Advanced(iio_context *ctx, IIOWidgetGroup *group, QWid
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
 		connect(m_syncBtn, &QPushButton::clicked, this, [this]() {
+			// libad9361 needs raw iio_device*; recover them from the DC
+			// device nodes' backend handles (pragmatic hybrid).
+			auto *mainIio = dynamic_cast<component::iio::IIODevice *>(m_mainDevice);
+			auto *secondIio = dynamic_cast<component::iio::IIODevice *>(m_secondDevice);
+			if(!mainIio || !secondIio) {
+				qWarning(CAT_FMCOMMS5_ADVANCED) << "Devices are not IIO devices!";
+				return;
+			}
+			iio_device *mainDev = static_cast<iio_device *>(mainIio->handle().ptr);
+			iio_device *secondDev = static_cast<iio_device *>(secondIio->handle().ptr);
+			if(!mainDev || !secondDev) {
+				qWarning(CAT_FMCOMMS5_ADVANCED) << "No raw iio_device available!";
+				return;
+			}
 			// call to lib ad9361
-			ad9361_multichip_sync(m_mainDevice, &m_secondDevice, 1,
-					      FIXUP_INTERFACE_TIMING | CHECK_SAMPLE_RATES);
+			ad9361_multichip_sync(mainDev, &secondDev, 1, FIXUP_INTERFACE_TIMING | CHECK_SAMPLE_RATES);
 		});
 
 		m_tool->addWidgetToBottomContainerHelper(m_syncBtn, TTA_LEFT);

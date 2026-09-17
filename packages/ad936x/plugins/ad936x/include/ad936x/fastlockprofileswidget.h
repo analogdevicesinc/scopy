@@ -28,15 +28,17 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
-#include <iio.h>
 
 namespace scopy {
+namespace component {
+class Channel;
+}
 namespace ad936x {
 class SCOPY_AD936X_EXPORT FastlockProfilesWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit FastlockProfilesWidget(iio_channel *chn, QWidget *parent = nullptr);
+	explicit FastlockProfilesWidget(component::Channel *chn, QWidget *parent = nullptr);
 
 	QComboBox *fastlockProfiles() const;
 

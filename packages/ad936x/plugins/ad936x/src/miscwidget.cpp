@@ -22,13 +22,15 @@
 #include "miscwidget.h"
 
 #include <style.h>
-#include <iioutil/connectionprovider.h>
 #include <iiowidgetbuilder.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+MiscWidget::MiscWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -55,33 +57,33 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	dcOffsetTrackingLayout->addWidget(new QLabel("Attenuation", dcOffsetTracking), 1, 0);
 
 	// adi,dc-offset-attenuation-high-range
-	IIOWidget *attenuationHighRange = IIOWidgetBuilder(dcOffsetTracking)
-						  .device(m_device)
-						  .attribute("adi,dc-offset-attenuation-high-range")
-						  .uiStrategy(IIOWidgetBuilder::RangeUi)
-						  .optionsValues("[-16 1 15]")
-						  .title("")
-						  .infoMessage("RX LO > 4 GHz: These bits control the attenuator for "
-							       "the initialization and tracking RF DC offset "
-							       "calibrations. The integrated data shifts by this twos "
-							       "complement value and ranges from -16 to +15.")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *attenuationHighRange =
+		IIOWidgetBuilder(dcOffsetTracking)
+			.attribute(component::attributeByName(m_device, "adi,dc-offset-attenuation-high-range"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[-16 1 15]")
+			.title("")
+			.infoMessage("RX LO > 4 GHz: These bits control the attenuator for "
+				     "the initialization and tracking RF DC offset "
+				     "calibrations. The integrated data shifts by this twos "
+				     "complement value and ranges from -16 to +15.")
+			.group(m_group)
+			.buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationHighRange, 1, 1);
 
 	// adi,dc-offset-attenuation-low-range
-	IIOWidget *attenuationLowRange = IIOWidgetBuilder(dcOffsetTracking)
-						 .device(m_device)
-						 .attribute("adi,dc-offset-attenuation-low-range")
-						 .uiStrategy(IIOWidgetBuilder::RangeUi)
-						 .optionsValues("[-16 1 15]")
-						 .title("")
-						 .infoMessage("RX LO < 4 GHz: These bits control the attenuator for "
-							      "the initialization and tracking RF DC offset "
-							      "calibrations. The integrated data shifts by this twos "
-							      "complement value and ranges from -16 to +15.")
-						 .group(m_group)
-						 .buildSingle();
+	IIOWidget *attenuationLowRange =
+		IIOWidgetBuilder(dcOffsetTracking)
+			.attribute(component::attributeByName(m_device, "adi,dc-offset-attenuation-low-range"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[-16 1 15]")
+			.title("")
+			.infoMessage("RX LO < 4 GHz: These bits control the attenuator for "
+				     "the initialization and tracking RF DC offset "
+				     "calibrations. The integrated data shifts by this twos "
+				     "complement value and ranges from -16 to +15.")
+			.group(m_group)
+			.buildSingle();
 	dcOffsetTrackingLayout->addWidget(attenuationLowRange, 1, 2);
 
 	// count
@@ -90,8 +92,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	// adi,dc-offset-count-high-range
 	IIOWidget *countHighRange =
 		IIOWidgetBuilder(dcOffsetTracking)
-			.device(m_device)
-			.attribute("adi,dc-offset-count-high-range")
+			.attribute(component::attributeByName(m_device, "adi,dc-offset-count-high-range"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 255]")
 			.title("")
@@ -107,8 +108,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	// adi,dc-offset-count-low-range
 	IIOWidget *countLowRange =
 		IIOWidgetBuilder(dcOffsetTracking)
-			.device(m_device)
-			.attribute("adi,dc-offset-count-low-range")
+			.attribute(component::attributeByName(m_device, "adi,dc-offset-count-low-range"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 255]")
 			.title("")
@@ -125,8 +125,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	dcOffsetTrackingLayout->addWidget(new QLabel("Update Event Mask", dcOffsetTracking), 3, 0);
 	IIOWidget *updateEventMask =
 		IIOWidgetBuilder(dcOffsetTracking)
-			.device(m_device)
-			.attribute("adi,dc-offset-tracking-update-event-mask")
+			.attribute(component::attributeByName(m_device, "adi,dc-offset-tracking-update-event-mask"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 7]")
 			.title("")
@@ -153,8 +152,7 @@ MiscWidget::MiscWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	// adi,qec-tracking-slow-mode-enable
 	IIOWidget *qecTrackingIio =
 		IIOWidgetBuilder(qecTracking)
-			.device(m_device)
-			.attribute("adi,qec-tracking-slow-mode-enable")
+			.attribute(component::attributeByName(m_device, "adi,qec-tracking-slow-mode-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Slow QEC")
 			.infoMessage("Improved RX QEC tracking in case signal of interest is close to DC/LO")

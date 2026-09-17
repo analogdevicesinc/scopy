@@ -26,6 +26,9 @@
 #include <iio.h>
 
 namespace scopy {
+namespace component {
+class Context;
+} // namespace component
 namespace ad936x {
 
 struct MarkerResult
@@ -52,7 +55,7 @@ class Fmcomms5Calibration : public QObject
 {
 	Q_OBJECT
 public:
-	explicit Fmcomms5Calibration(iio_context *ctx, QObject *parent = nullptr);
+	explicit Fmcomms5Calibration(component::Context *ctx, QObject *parent = nullptr);
 
 	void calibrate();
 	void resetCalibration();

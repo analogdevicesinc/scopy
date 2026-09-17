@@ -23,11 +23,14 @@
 
 #include <style.h>
 #include <iiowidgetbuilder.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+ElnaWidget::ElnaWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -55,8 +58,7 @@ ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 
 	// adi,elna-gain-mdB
 	IIOWidget *gain = IIOWidgetBuilder(widget)
-				  .device(m_device)
-				  .attribute("adi,elna-gain-mdB")
+				  .attribute(component::attributeByName(m_device, "adi,elna-gain-mdB"))
 				  .uiStrategy(IIOWidgetBuilder::RangeUi)
 				  .optionsValues("[0 500 31500]")
 				  .title("LNA Gain (mdB)")
@@ -81,8 +83,7 @@ ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 
 	// adi,elna-bypass-loss-mdB
 	IIOWidget *bypassLoss = IIOWidgetBuilder(widget)
-					.device(m_device)
-					.attribute("adi,elna-bypass-loss-mdB")
+					.attribute(component::attributeByName(m_device, "adi,elna-bypass-loss-mdB"))
 					.uiStrategy(IIOWidgetBuilder::RangeUi)
 					.optionsValues("[0 500 31500]")
 					.title("LNA Bypass Loss (mdB)")
@@ -106,22 +107,21 @@ ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	layout->addWidget(bypassLoss);
 
 	// adi,elna-settling-delay-ns
-	IIOWidget *settlingDelay = IIOWidgetBuilder(widget)
-					   .device(m_device)
-					   .attribute("adi,elna-settling-delay-ns")
-					   .uiStrategy(IIOWidgetBuilder::RangeUi)
-					   .optionsValues("[0 1 20000]")
-					   .title("Settling Delay (ns)")
-					   .infoMessage("Settling delay of external LNA in ns")
-					   .group(m_group)
-					   .buildSingle();
+	IIOWidget *settlingDelay =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,elna-settling-delay-ns"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 20000]")
+			.title("Settling Delay (ns)")
+			.infoMessage("Settling delay of external LNA in ns")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(settlingDelay);
 
 	// adi,elna-rx1-gpo0-control-enable
 	IIOWidget *rx1GPO0Control =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,elna-rx1-gpo0-control-enable")
+			.attribute(component::attributeByName(m_device, "adi,elna-rx1-gpo0-control-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("RX1 GPO0")
 			.infoMessage("When set, the “Ext LNA Ctrl” bit in the Rx1 gain table sets the GPO0 state")
@@ -134,8 +134,7 @@ ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	// adi,elna-rx2-gpo1-control-enable
 	IIOWidget *rx2GPO0Control =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,elna-rx2-gpo1-control-enable")
+			.attribute(component::attributeByName(m_device, "adi,elna-rx2-gpo1-control-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("RX2 GPO0")
 			.infoMessage("When set, the “Ext LNA Ctrl” bit in the Rx2 gain table sets the GPO1 state")
@@ -148,8 +147,7 @@ ElnaWidget::ElnaWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	// adi,elna-gaintable-all-index-enable
 	IIOWidget *gaintableAllIndex =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,elna-gaintable-all-index-enable")
+			.attribute(component::attributeByName(m_device, "adi,elna-gaintable-all-index-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("External LNA enabled for all gain indexes")
 			.infoMessage("The external LNA control bit in the gain tables is set for all indexes")
