@@ -24,22 +24,26 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QLoggingCategory>
+
+#include <qcoro/qcorotask.h>
+#include <component/attributereader.h>
+
+using namespace scopy;
 using namespace scopy::jesdstatus;
 
 Q_LOGGING_CATEGORY(CAT_JESDPARSER, "JesdParser");
-#define MAX_JESD_ATTR_SIZE 8192
 
-JesdStatusParser::JesdStatusParser(iio_device *dev, QObject *parent)
+JesdStatusParser::JesdStatusParser(component::Device *dev, QObject *parent)
 	: QObject(parent)
 	, m_dev(dev)
 	, m_laneCount(0)
 	, m_encoder(JESD204_UNKNOWN)
 {
 	readEncoder();
-	unsigned int attrCount = iio_device_get_attrs_count(m_dev);
-	for(unsigned i = 0; i < attrCount; i++) {
-		QString attr = iio_device_get_attr(m_dev, i);
-		if(!attr.isEmpty() && attr.contains("lane")) {
+	const QList<component::Attribute *> attrs =
+		m_dev->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : attrs) {
+		if(attr->name().contains("lane")) {
 			m_laneCount++;
 		}
 	}
@@ -47,10 +51,27 @@ JesdStatusParser::JesdStatusParser(iio_device *dev, QObject *parent)
 
 JesdStatusParser::~JesdStatusParser() {}
 
-void JesdStatusParser::update()
+component::Attribute *JesdStatusParser::findAttr(const QString &name)
 {
-	readAllLaneStatus();
-	readStatus();
+	return m_dev->findChild<component::Attribute *>(name, Qt::FindDirectChildrenOnly);
+}
+
+QCoro::Task<QString> JesdStatusParser::readAttr(component::Attribute *attr)
+{
+	if(!attr || !attr->readCapability()) {
+		co_return QString();
+	}
+	auto response = co_await attr->readCapability()->readAsync();
+	if(!response) {
+		co_return QString();
+	}
+	co_return QString::fromUtf8(response.value());
+}
+
+QCoro::Task<void> JesdStatusParser::update()
+{
+	co_await readAllLaneStatus();
+	co_await readStatus();
 	Q_EMIT finished();
 }
 
@@ -373,43 +394,32 @@ int JesdStatusParser::extractLaneNumber(const QString &text)
 
 void JesdStatusParser::readEncoder()
 {
-	char encoder[MAX_JESD_ATTR_SIZE];
-
 	// If the encoder is not found, default to 8b10b. It might be an
 	// older kernel that only supports jesd204b
-	const char *encoderAttr = iio_device_find_attr(m_dev, "encoder");
+	component::Attribute *encoderAttr = findAttr("encoder");
 	if(!encoderAttr) {
 		m_encoder = JESD204_8B10B;
 	}
 
-	int ret = iio_device_attr_read(m_dev, "encoder", encoder, MAX_JESD_ATTR_SIZE);
-	if(ret < 0) {
+	QString encoder = QCoro::waitFor(readAttr(encoderAttr));
+	if(encoder.isNull()) {
 		qDebug(CAT_JESDPARSER) << "There is an issue reading the JESD204 status encoder. Aborting...";
 		m_encoder = JESD204_UNKNOWN;
-	} else if(!QString(encoder).compare(m_encoderTypes.value(JESD204_8B10B), Qt::CaseInsensitive)) {
+	} else if(!encoder.compare(m_encoderTypes.value(JESD204_8B10B), Qt::CaseInsensitive)) {
 		m_encoder = JESD204_8B10B;
 	} else {
 		m_encoder = JESD204_64B66B;
 	}
 }
 
-void JesdStatusParser::readLaneStatus(QString laneAttr)
+void JesdStatusParser::readLaneStatus(QString laneAttr, QString laneStatus)
 {
 	JESD204B_LANEINFO m_jesd204_lanestatus;
-	QString laneStatus = "";
 	int laneId = regexMatchUInt(laneAttr, QRegularExpression("lane(\\d+)_info"));
 
 	if(m_encoder == JESD204_UNKNOWN) {
 		return;
 	}
-
-	char buf[MAX_JESD_ATTR_SIZE];
-	int ret = iio_device_attr_read(m_dev, laneAttr.toUtf8(), buf, MAX_JESD_ATTR_SIZE);
-	if(ret < 0) {
-		qDebug(CAT_JESDPARSER) << "There is an issue reading the JESD204 lane status. Aborting...";
-		return;
-	}
-	laneStatus = QString(buf);
 
 	m_jesd204_lanestatus.lane_errors = regexMatchUInt(laneStatus, QRegularExpression("Errors: (\\S+)[ \\n]?"));
 	if(m_encoder == JESD204_64B66B) {
@@ -492,18 +502,24 @@ void JesdStatusParser::readLaneStatus(QString laneAttr)
 	m_allLaneStatus.insert(laneId, m_jesd204_lanestatus);
 }
 
-void JesdStatusParser::readAllLaneStatus()
+QCoro::Task<void> JesdStatusParser::readAllLaneStatus()
 {
 	if(m_encoder == JESD204_UNKNOWN) {
-		return;
+		co_return;
 	}
 
-	unsigned int attrCount = iio_device_get_attrs_count(m_dev);
-	for(unsigned i = 0; i < attrCount; i++) {
-		QString attr = iio_device_get_attr(m_dev, i);
-		if(!attr.isEmpty() && attr.contains("lane")) {
-			readLaneStatus(attr);
+	const QList<component::Attribute *> attrs =
+		m_dev->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *attr : attrs) {
+		if(!attr->name().contains("lane")) {
+			continue;
 		}
+		QString laneStatus = co_await readAttr(attr);
+		if(laneStatus.isNull()) {
+			qDebug(CAT_JESDPARSER) << "There is an issue reading the JESD204 lane status. Aborting...";
+			continue;
+		}
+		readLaneStatus(attr->name(), laneStatus);
 	}
 
 	int minLatency = 0;
@@ -525,21 +541,18 @@ void JesdStatusParser::readAllLaneStatus()
 	m_minLatency = minLatency;
 }
 
-void JesdStatusParser::readStatus()
+QCoro::Task<void> JesdStatusParser::readStatus()
 {
-	QString status = "";
 	const QString notAvailable = "N/A";
 	if(m_encoder == JESD204_UNKNOWN) {
-		return;
+		co_return;
 	}
 
-	char buf[MAX_JESD_ATTR_SIZE];
-	int ret = iio_device_attr_read(m_dev, "status", buf, MAX_JESD_ATTR_SIZE);
-	if(ret < 0) {
+	QString status = co_await readAttr(findAttr("status"));
+	if(status.isNull()) {
 		qDebug(CAT_JESDPARSER) << "There is an issue reading the JESD204 status. Aborting...";
-		return;
+		co_return;
 	}
-	status = QString(buf);
 
 	m_jesd204_status.link_state = regexMatch(status, QRegularExpression("Link is (\\S+)"));
 	m_jesd204_status.measured_link_clock =

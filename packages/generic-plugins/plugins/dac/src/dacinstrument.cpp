@@ -30,13 +30,18 @@
 
 #include <pluginbase/preferences.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/backends/iio/iiosamplecodec.h>
+
 using namespace scopy;
 using namespace scopy::dac;
 using namespace scopy::gui;
 
-DacInstrument::DacInstrument(const Connection *conn, QWidget *parent)
+DacInstrument::DacInstrument(component::Context *ctx, QWidget *parent)
 	: QWidget(parent)
-	, m_conn(conn)
+	, m_ctx(ctx)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
@@ -197,29 +202,30 @@ void DacInstrument::abortTutorial()
 void DacInstrument::setupDacDataManagers()
 {
 	QStringList deviceList;
-	int devCount = iio_context_get_devices_count(m_conn->context());
-	qDebug(CAT_DAC_INSTRUMENT) << " Found " << devCount << "devices";
-	for(int i = 0; i < devCount; i++) {
-		iio_device *dev = iio_context_get_device(m_conn->context(), i);
-		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
+	const QList<component::Device *> devices =
+		m_ctx->findChildren<component::Device *>(QString(), Qt::FindDirectChildrenOnly);
+	qDebug(CAT_DAC_INSTRUMENT) << " Found " << devices.size() << "devices";
+	for(component::Device *dev : devices) {
+		QString dev_name = dev->name();
 
 		qDebug(CAT_DAC_INSTRUMENT) << "Looking for scan elements in " << dev_name;
 		QStringList channelList;
-		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
+		const QList<component::Channel *> channels =
+			dev->findChildren<component::Channel *>(QString(), Qt::FindDirectChildrenOnly);
+		for(component::Channel *chn : channels) {
 
-			struct iio_channel *chn = iio_device_get_channel(dev, j);
-			QString chn_name = QString::fromLocal8Bit(iio_channel_get_id(chn));
+			QString chn_name = chn->id();
 			qDebug(CAT_DAC_INSTRUMENT) << "Verify if " << chn_name << "is scan element";
 			if(chn_name == "timestamp" /*|| chn_name == "accel_z" || chn_name =="accel_y"*/)
 				continue;
-			if(!iio_channel_is_output(chn)) {
+			if(!chn->isOutput()) {
 				continue;
 			}
-			if(iio_channel_is_scan_element(chn) || DacUtils::checkDdsChannel(chn)) {
+			if(chn->findChild<component::iio::IIOSampleCodec *>() || DacUtils::checkDdsChannel(chn)) {
 				channelList.append(chn_name);
 				deviceList.append(dev_name);
 
-				// Create a DataManager for each detected dac iio_device
+				// Create a DataManager for each detected dac device
 				auto dm = new DacDataManager(dev, dacManagerStack);
 				m_dacDataManagers.append(dm);
 				connect(dm, &DacDataManager::running, this, &DacInstrument::dacRunning);

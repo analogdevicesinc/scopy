@@ -36,8 +36,10 @@
 #include <menuheader.h>
 
 #include <iio-widgets/iiowidgetbuilder.h>
-#include <iio-widgets/datastrategy/channelattrdatastrategy.h>
+#include <iio-widgets/datastrategy/componentattrdatastrategy.h>
 #include <pkg-manager/pkgmanager.h>
+
+#include <component/channel.h>
 
 #include <QDateTime>
 #include <QCoreApplication>
@@ -459,8 +461,8 @@ void BufferDacAddon::forwardSamplingFrequencyChange(QDateTime timestamp, QString
 void BufferDacAddon::detectSamplingFrequency(IIOWidget *w)
 {
 	if(w->getRecipe().data.contains("sampling_frequency")) {
-		connect(dynamic_cast<ChannelAttrDataStrategy *>(w->getDataStrategy()),
-			&ChannelAttrDataStrategy::emitStatus, this, &BufferDacAddon::forwardSamplingFrequencyChange);
+		connect(dynamic_cast<ComponentAttrDataStrategy *>(w->getDataStrategy()),
+			&ComponentAttrDataStrategy::emitStatus, this, &BufferDacAddon::forwardSamplingFrequencyChange);
 		w->readAsync();
 	}
 }
@@ -470,7 +472,7 @@ QWidget *BufferDacAddon::createAttrMenu(TxNode *node, QWidget *parent)
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE,
 							    MenuCollapseSection::MHW_BASEWIDGET, attrContainer);
-	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).channel(node->getChannel()).buildAll();
+	QList<IIOWidget *> attrWidgets = IIOWidgetBuilder(attr).componentContainer(node->getChannel()).buildAll();
 
 	auto layout = new QVBoxLayout();
 	layout->setSpacing(10);

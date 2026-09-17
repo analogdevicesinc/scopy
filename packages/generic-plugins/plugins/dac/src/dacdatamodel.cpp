@@ -25,38 +25,42 @@
 
 #include <pluginbase/preferences.h>
 
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/streamformat.h>
+#include <component/backends/iio/iiochannel.h>
+#include <component/backends/iio/iiosamplecodec.h>
+#include <component/backends/iio/iiooutputstream.h>
+#include <component/backends/iio/iioscanelement.h>
+
 #include <algorithm>
 
-#include <QtConcurrentRun>
 #include <QDebug>
-#include <QThread>
+#include <iio.h>
 
 using namespace scopy;
 using namespace scopy::dac;
-DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
+DacDataModel::DacDataModel(component::Device *dev, QObject *parent)
 	: QObject(parent)
 	, m_ddsTxs({})
 	, m_bufferTxs({})
 	, m_activeBuffer(false)
-	, m_buffer(nullptr)
+	, m_out(nullptr)
 	, m_cyclicBuffer(true)
 	, m_repeatFileBuffer(true)
 	, m_interrupted(false)
+	, m_cycleInFlight(false)
 	, m_userBuffersize(0)
 	, m_userKernelBufferCount(0)
 	, m_filesize(0)
 	, m_decimation(1)
-	, m_pushWatcher(nullptr)
 	, m_debounceTimer(nullptr)
 {
 	m_dev = dev;
-	m_name = iio_device_get_name(m_dev);
+	m_name = m_dev->name();
 
 	m_isBufferCapable = initBufferDac();
 	m_isDds = initDdsDac();
-
-	m_pushWatcher = new QFutureWatcher<void>(this);
-	connect(m_pushWatcher, &QFutureWatcher<void>::finished, this, &DacDataModel::onPushCompleted);
 
 	m_debounceTimer = new QTimer(this);
 	m_debounceTimer->setSingleShot(true);
@@ -66,7 +70,7 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 	connect(
 		this, &DacDataModel::reqInitBuffer, this,
 		[this]() {
-			if(m_buffer) {
+			if(isRunning()) {
 				initBuffer();
 			}
 		},
@@ -75,6 +79,17 @@ DacDataModel::DacDataModel(struct iio_device *dev, QObject *parent)
 
 DacDataModel::~DacDataModel()
 {
+	m_interrupted = true;
+	if(m_debounceTimer) {
+		m_debounceTimer->stop();
+	}
+	if(m_pushTask) {
+		QCoro::waitFor(m_pushTask.value());
+		m_pushTask.reset();
+	}
+	if(m_out && m_out->isOpen()) {
+		QCoro::waitFor(m_out->closeAsync());
+	}
 	deinitBufferDac();
 	deinitDdsDac();
 }
@@ -87,7 +102,7 @@ void DacDataModel::reset()
 	m_data.clear();
 }
 
-struct iio_device *DacDataModel::getDev() const { return m_dev; }
+component::Device *DacDataModel::getDev() const { return m_dev; }
 
 QString DacDataModel::getName() const { return m_name; }
 
@@ -118,7 +133,7 @@ void DacDataModel::enableDds(bool enable)
 	qDebug(CAT_DAC_DATA) << QString("Enable DDS %1").arg(enable);
 	if(m_isDds) {
 		for(auto tx : std::as_const(m_ddsTxs)) {
-			tx->enableDds(enable);
+			QCoro::waitFor(tx->enableDds(enable));
 		}
 	}
 }
@@ -138,10 +153,11 @@ void DacDataModel::setRepeatFileBuffer(bool repeat)
 void DacDataModel::requestInterruption()
 {
 	m_interrupted = true;
-	if(m_pushThd.isRunning()) {
-		m_pushThd.waitForFinished();
+	if(m_pushTask) {
+		QCoro::waitFor(m_pushTask.value());
+		m_pushTask.reset();
 	}
-	qDebug(CAT_DAC_DATA) << "Thread stopped.";
+	qDebug(CAT_DAC_DATA) << "Cycle stopped.";
 }
 
 void DacDataModel::setCyclic(bool cyclic)
@@ -189,18 +205,20 @@ bool DacDataModel::setFilesize(unsigned int filesize)
 	return needToUpdate;
 }
 
+component::iio::IIOScanElement *DacDataModel::scanElement(TxNode *node) const
+{
+	return node ? m_scanElements.value(node->getUuid(), nullptr) : nullptr;
+}
+
 void DacDataModel::enableBufferChannel(QString uuid, bool enable)
 {
 	requestInterruption();
-	auto chn = m_bufferTxs.value(uuid)->getChannel();
-	if(!chn) {
-		qDebug(CAT_DAC_DATA) << QString("No channel for uuid %1").arg(uuid);
+	auto *el = m_scanElements.value(uuid, nullptr);
+	if(!el) {
+		qDebug(CAT_DAC_DATA) << QString("No scan element for uuid %1").arg(uuid);
+		return;
 	}
-	if(enable) {
-		iio_channel_enable(chn);
-	} else {
-		iio_channel_disable(chn);
-	}
+	QCoro::waitFor(el->enableAsync(enable));
 
 	tryInitBuffer();
 }
@@ -209,7 +227,8 @@ unsigned int DacDataModel::getEnabledChannelsCount()
 {
 	unsigned int enChannelsCount = 0;
 	for(auto node : std::as_const(m_bufferTxs)) {
-		enChannelsCount += iio_channel_is_enabled(node->getChannel()) ? 1 : 0;
+		auto *el = scanElement(node);
+		enChannelsCount += (el && el->isEnabled()) ? 1 : 0;
 	}
 	return enChannelsCount;
 }
@@ -268,8 +287,8 @@ void DacDataModel::autoBuffersizeAndKernelBuffers()
 
 void DacDataModel::tryInitBuffer()
 {
-	// Only emit signal if buffer exists
-	if(m_buffer) {
+	// Only restart if a buffer run is currently active
+	if(isRunning()) {
 		Q_EMIT reqInitBuffer();
 	}
 }
@@ -284,8 +303,7 @@ bool DacDataModel::validateBufferParams()
 	}
 
 	auto enabledChannelsCount = getEnabledChannelsCount();
-	ssize_t s_size = iio_device_get_sample_size(m_dev);
-	if(!s_size || enabledChannelsCount == 0) {
+	if(enabledChannelsCount == 0) {
 		auto msg = "Unable to create buffer, no channel enabled.";
 		qDebug(CAT_DAC_DATA) << msg;
 		Q_EMIT log(msg);
@@ -341,112 +359,175 @@ void DacDataModel::initBuffer()
 
 void DacDataModel::startPushOperation()
 {
-	if(m_pushThd.isRunning()) {
-		m_pushThd.cancel();
-		qDebug(CAT_DAC_DATA) << "Cancel thread and wait in startPushOperation";
-		m_pushThd.waitForFinished();
+	if(m_pushTask) {
+		QCoro::waitFor(m_pushTask.value());
+		m_pushTask.reset();
 	}
-	m_pushThd = QtConcurrent::run(&DacDataModel::push, this);
-	m_pushWatcher->setFuture(m_pushThd);
+	m_pushTask = pushTask();
 }
 
-void DacDataModel::onPushCompleted()
+bool DacDataModel::isRunning()
 {
-	qDebug(CAT_DAC_DATA) << "Push operation completed";
-
-	// If non-cyclic mode and operation completed successfully, emit signal
-	if(!m_interrupted && !m_cyclicBuffer) {
-		Q_EMIT requestStop();
-		qDebug(CAT_DAC_DATA) << "Non-cyclic run completed, signaling UI";
-	}
+	// A run is live while the stream is open (cyclic keeps it open), a push
+	// cycle is in flight, or a debounced (re)start is pending.
+	return (m_out && m_out->isOpen()) || m_cycleInFlight || (m_debounceTimer && m_debounceTimer->isActive());
 }
 
-void DacDataModel::push()
+QList<component::iio::IIOScanElement *> DacDataModel::collectEnabledScanElements(QList<int> &indices) const
 {
-	qDebug(CAT_DAC_DATA) << "Start push thread";
-	unsigned int totalSize = 0;
-	m_interrupted = false;
-	QVector<QVector<int32_t>> allDataC = {};
-	unsigned int enChannelsCount = getEnabledChannelsCount();
-	bool valid = validateBufferParams();
-	if(!valid) {
-		Q_EMIT invalidRunParams();
-		return;
+	// Enabled scan elements, in stream (findChildren) order -> aligns 1:1 with
+	// writeFormat().channels after openAsync.
+	const QList<component::iio::IIOScanElement *> allEls =
+		m_out->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
+	QList<component::iio::IIOScanElement *> enabledEls;
+	indices.clear();
+	for(auto *el : allEls) {
+		if(el->isEnabled()) {
+			enabledEls.append(el);
+			indices.append(static_cast<int>(el->index()));
+		}
 	}
+	return enabledEls;
+}
 
-	if(m_buffer) {
-		iio_buffer_destroy(m_buffer);
-		m_buffer = nullptr;
+QVector<component::iio::IIOSampleCodec *>
+DacDataModel::resolveCodecs(const QList<component::iio::IIOScanElement *> &enabledEls) const
+{
+	// Per enabled channel, resolve the sample codec (device counts -> raw bytes),
+	// matched to the scan element by id.
+	QVector<component::iio::IIOSampleCodec *> codecs(enabledEls.size(), nullptr);
+	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
+		for(auto node : std::as_const(m_bufferTxs)) {
+			auto *chn = node->getChannel();
+			if(chn && chn->id() == enabledEls[chIdx]->id()) {
+				codecs[chIdx] = chn->findChild<component::iio::IIOSampleCodec *>();
+				break;
+			}
+		}
 	}
+	return codecs;
+}
 
-	iio_device_set_kernel_buffers_count(m_dev, m_kernelBufferCount);
-
-	m_buffer = iio_device_create_buffer(m_dev, m_buffersize, m_cyclicBuffer);
-	if(!m_buffer) {
-		QString logMsg = QString("Unable to create buffer: %1").arg(strerror(errno));
-		qDebug(CAT_DAC_DATA) << logMsg;
-		Q_EMIT log(logMsg);
-		return;
-	}
-
-	unsigned int additionalSamples = 0;
-	unsigned int sampleIdx = 0;
-	if(!m_cyclicBuffer) {
-		additionalSamples = m_filesize % m_buffersize;
-	}
-
+QVector<QVector<int32_t>> DacDataModel::buildSampleColumns(unsigned int channelCount) const
+{
+	// Build per-channel int32 sample columns (decimation + repeat over data columns).
+	unsigned int additionalSamples = m_cyclicBuffer ? 0 : (m_filesize % m_buffersize);
 	unsigned int available_data_columns = m_data[0].size();
-	for(int ch = 0; ch < enChannelsCount; ch++) {
-		allDataC.push_back({});
+	QVector<QVector<int32_t>> columns(channelCount);
+	for(unsigned int ch = 0; ch < channelCount; ch++) {
 		for(unsigned int i = 0; i < m_filesize + additionalSamples; i += m_decimation) {
-			sampleIdx = std::min(i, m_filesize - 1);
-			// Convert double to int32_t - this handles any device bit depth
-			allDataC[ch].append(static_cast<int32_t>(m_data[sampleIdx][ch % available_data_columns]));
+			unsigned int sampleIdx = std::min(i, m_filesize - 1);
+			columns[ch].append(static_cast<int32_t>(m_data[sampleIdx][ch % available_data_columns]));
 		}
-		totalSize += allDataC[ch].size();
+	}
+	return columns;
+}
+
+void DacDataModel::fillBuffer(int bufferIdx, const QList<component::iio::IIOScanElement *> &enabledEls,
+			      const QVector<component::iio::IIOSampleCodec *> &codecs,
+			      const QVector<QVector<int32_t>> &columns)
+{
+	component::StreamFormat &fmt = m_out->writeFormat();
+	char *base = static_cast<char *>(fmt.data);
+	unsigned int samplesPerBuffer = fmt.sampleCount;
+	unsigned int srcBase = (bufferIdx - 1) * samplesPerBuffer;
+	for(int chIdx = 0; chIdx < enabledEls.size(); ++chIdx) {
+		auto *codec = codecs[chIdx];
+		if(!codec) {
+			continue;
+		}
+		const component::ChannelFormat &cf = fmt.channels.at(chIdx);
+		const QVector<int32_t> &col = columns[chIdx];
+		for(unsigned int s = 0; s < samplesPerBuffer; s++) {
+			unsigned int srcIdx = srcBase + s;
+			if(srcIdx >= static_cast<unsigned int>(col.size())) {
+				break;
+			}
+			char *dst = base + cf.offset + cf.stride * static_cast<ptrdiff_t>(s);
+			codec->convertInverse(dst, &col[srcIdx]);
+		}
+	}
+}
+
+QCoro::Task<void> DacDataModel::pushTask()
+{
+	qDebug(CAT_DAC_DATA) << "Start push cycle";
+	m_cycleInFlight = true;
+	m_interrupted = false;
+
+	if(!validateBufferParams() || !m_out || m_data.isEmpty()) {
+		Q_EMIT invalidRunParams();
+		m_cycleInFlight = false;
+		co_return;
 	}
 
-	int dataIdx = 0;
-	int bufferIdx = 1;
-	int totalNbBuffers = totalSize / (m_buffersize * enChannelsCount);
-	while(!m_interrupted && bufferIdx <= totalNbBuffers) {
-		int chnIdx = 0;
-		for(auto ch : std::as_const(m_bufferTxs)) {
-			if(!iio_channel_is_enabled(ch->getChannel())) {
-				continue;
-			}
-			unsigned int ch_len = sizeof(int32_t);
-			uintptr_t dst_ptr, src_ptr = (uintptr_t)(allDataC[chnIdx].data()),
-					   end = src_ptr + allDataC[chnIdx].size() * ch_len;
-			uintptr_t buf_end = (uintptr_t)iio_buffer_end(m_buffer);
-			ptrdiff_t buf_step = iio_buffer_step(m_buffer);
+	if(m_out->isOpen()) {
+		co_await m_out->closeAsync();
+	}
 
-			for(dst_ptr = (uintptr_t)iio_buffer_first(m_buffer, ch->getChannel());
-			    dst_ptr < buf_end && src_ptr + ch_len <= end; dst_ptr += buf_step, src_ptr += ch_len) {
-				iio_channel_convert_inverse(ch->getChannel(), (void *)dst_ptr, (const void *)(src_ptr));
-			}
-			chnIdx++;
-		}
-		ssize_t bytes = iio_buffer_push(m_buffer);
-		if(bytes < 0) {
-			QString errorMsg =
-				QString("Failed to push buffer: %1 (error code: %2)").arg(strerror(-bytes)).arg(bytes);
-			qDebug(CAT_DAC_DATA) << errorMsg;
-			Q_EMIT log(errorMsg);
+	m_out->setCyclic(m_cyclicBuffer);
+	m_out->setKernelBuffers(m_kernelBufferCount);
+
+	QList<int> indices;
+	const QList<component::iio::IIOScanElement *> enabledEls = collectEnabledScanElements(indices);
+	if(enabledEls.isEmpty()) {
+		m_cycleInFlight = false;
+		co_return;
+	}
+
+	auto openRes = co_await m_out->openAsync({indices, m_buffersize});
+	if(!openRes) {
+		QString msg = "Unable to open output stream.";
+		qDebug(CAT_DAC_DATA) << msg;
+		Q_EMIT log(msg);
+		m_cycleInFlight = false;
+		co_return;
+	}
+
+	const QVector<component::iio::IIOSampleCodec *> codecs = resolveCodecs(enabledEls);
+	const QVector<QVector<int32_t>> columns = buildSampleColumns(enabledEls.size());
+
+	unsigned int samplesPerBuffer = m_out->writeFormat().sampleCount;
+	unsigned int totalSamples = columns[0].size();
+	int totalNbBuffers = m_cyclicBuffer ? 1 : (samplesPerBuffer ? (totalSamples / samplesPerBuffer) : 0);
+
+	int bufferIdx = 1;
+	while(!m_interrupted && bufferIdx <= totalNbBuffers) {
+		fillBuffer(bufferIdx, enabledEls, codecs, columns);
+
+		auto pushRes = co_await m_out->pushAsync();
+		if(!pushRes) {
+			QString msg = "Failed to push buffer.";
+			qDebug(CAT_DAC_DATA) << msg;
+			Q_EMIT log(msg);
 			Q_EMIT requestStop();
-			return;
+			break;
 		}
-		QString logMsg = QString("Pushed %1 samples, %2 bytes (%3/%4 buffers)")
-					 .arg(m_buffersize)
-					 .arg(bytes)
+		QString logMsg = QString("Pushed %1 samples (%2/%3 buffers)")
+					 .arg(samplesPerBuffer)
 					 .arg(bufferIdx)
 					 .arg(totalNbBuffers);
 		qDebug(CAT_DAC_DATA) << logMsg;
 		Q_EMIT log(logMsg);
 		bufferIdx++;
 	}
+
+	// Cyclic output keeps transmitting from the kernel buffer, so leave the stream
+	// open; non-cyclic (or interrupted) runs close it once drained.
+	if(!m_cyclicBuffer || m_interrupted) {
+		if(m_out->isOpen()) {
+			co_await m_out->closeAsync();
+		}
+	}
 	if(m_interrupted) {
-		Q_EMIT log(QString("Aborting thread..."));
+		Q_EMIT log(QString("Aborting cycle..."));
+	}
+
+	m_cycleInFlight = false;
+
+	if(!m_interrupted && !m_cyclicBuffer) {
+		Q_EMIT requestStop();
+		qDebug(CAT_DAC_DATA) << "Non-cyclic run completed, signaling UI";
 	}
 }
 
@@ -458,32 +539,43 @@ void DacDataModel::stop()
 	if(!m_isBufferCapable) {
 		return;
 	}
-	if(m_buffer) {
-		iio_buffer_cancel(m_buffer);
-		iio_buffer_destroy(m_buffer);
-		m_buffer = nullptr;
-		qDebug(CAT_DAC_DATA) << "Buffer destroyed.";
+	if(m_out && m_out->isOpen()) {
+		QCoro::waitFor(m_out->closeAsync());
+		qDebug(CAT_DAC_DATA) << "Stream closed.";
 	}
 }
 
 bool DacDataModel::initBufferDac()
 {
 	unsigned int txCount = 0;
-	unsigned int channelCount = iio_device_get_channels_count(m_dev);
-	for(unsigned int i = 0; i < channelCount; i++) {
-		struct iio_channel *chn = iio_device_get_channel(m_dev, i);
-		if(!iio_channel_is_output(chn))
+	m_out = m_dev->findChild<component::iio::IIOOutputStream *>();
+	const QList<component::Channel *> channels =
+		m_dev->findChildren<component::Channel *>(QString(), Qt::FindDirectChildrenOnly);
+	QList<component::iio::IIOScanElement *> els;
+	if(m_out) {
+		els = m_out->findChildren<component::iio::IIOScanElement *>(QString(), Qt::FindDirectChildrenOnly);
+	}
+	for(auto *chn : channels) {
+		if(!chn->isOutput()) {
 			continue;
-		if(iio_channel_is_scan_element(chn)) {
-			txCount++;
-			QString id = iio_channel_get_id(chn);
-			QString name = iio_channel_get_name(chn);
-			if(name != "") {
-				id += ":" + name;
+		}
+		// Scan-element (buffer TX) channels carry an IIOSampleCodec child.
+		if(!chn->findChild<component::iio::IIOSampleCodec *>()) {
+			continue;
+		}
+		txCount++;
+		QString id = chn->id();
+		QString name = chn->name();
+		if(name != "") {
+			id += ":" + name;
+		}
+		QString uuid = m_dev->name() + ":" + id;
+		m_bufferTxs.insert(uuid, new TxNode(uuid, chn, this));
+		for(auto *el : els) {
+			if(el->id() == chn->id()) {
+				m_scanElements.insert(uuid, el);
+				break;
 			}
-			QString uuid = iio_device_get_name(m_dev);
-			uuid += ":" + id;
-			m_bufferTxs.insert(uuid, new TxNode(uuid, chn, this));
 		}
 	}
 	return (txCount != 0);
@@ -496,19 +588,21 @@ bool DacDataModel::initBufferDac()
 bool DacDataModel::initDdsDac()
 {
 	unsigned int ddsTonesCount = 0;
-	unsigned int channelCount = iio_device_get_channels_count(m_dev);
-	for(unsigned int i = 0; i < channelCount; i++) {
-		struct iio_channel *chn = iio_device_get_channel(m_dev, i);
-		if(!iio_channel_is_output(chn))
+	const QList<component::Channel *> channels =
+		m_dev->findChildren<component::Channel *>(QString(), Qt::FindDirectChildrenOnly);
+	for(auto *chn : channels) {
+		if(!chn->isOutput()) {
 			continue;
-		iio_chan_type chnType = iio_channel_get_type(chn);
-		if(chnType != IIO_ALTVOLTAGE)
+		}
+		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(chn);
+		if(!iioChn || iioChn->chanType() != IIO_ALTVOLTAGE) {
 			continue;
+		}
 		ddsTonesCount++;
 
 		// Name should contain TX*_I/Q_F or *A/*B
-		QString name = iio_channel_get_name(chn);
-		QString id = iio_channel_get_id(chn);
+		QString name = chn->name();
+		QString id = chn->id();
 		if(name == "") {
 			name = generateToneName(id);
 		}
@@ -534,7 +628,6 @@ bool DacDataModel::initDdsDac()
 
 int DacDataModel::getTxChannelEnabledCount(unsigned *enabled_mask)
 {
-	bool enabled;
 	int num_enabled = 0;
 	int ch_pos = 0;
 
@@ -542,7 +635,8 @@ int DacDataModel::getTxChannelEnabledCount(unsigned *enabled_mask)
 		*enabled_mask = 0;
 
 	for(auto ch : std::as_const(m_bufferTxs)) {
-		bool enabled = iio_channel_is_enabled(ch->getChannel());
+		auto *el = scanElement(ch);
+		bool enabled = el && el->isEnabled();
 		if(enabled) {
 			num_enabled++;
 			if(enabled_mask)

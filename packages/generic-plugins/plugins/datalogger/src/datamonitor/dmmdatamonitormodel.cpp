@@ -56,15 +56,9 @@ DmmDataMonitorModel::DmmDataMonitorModel(QString name, QColor color, UnitOfMeasu
 	setReadStrategy(readStrategy);
 }
 
-iio_channel *DmmDataMonitorModel::iioChannel() const { return m_iioChannel; }
+component::Channel *DmmDataMonitorModel::channel() const { return m_channel; }
 
-void DmmDataMonitorModel::setIioChannel(iio_channel *newIioChannel) { m_iioChannel = newIioChannel; }
-
-QString DmmDataMonitorModel::getDeviceName() { return QString::fromStdString(iio_device_get_name(m_iioDevice)); }
-
-iio_device *DmmDataMonitorModel::iioDevice() const { return m_iioDevice; }
-
-void DmmDataMonitorModel::setIioDevice(iio_device *newIioDevice) { m_iioDevice = newIioDevice; }
+void DmmDataMonitorModel::setChannel(component::Channel *newChannel) { m_channel = newChannel; }
 
 DMMReadStrategy *DmmDataMonitorModel::readStrategy() { return m_readStrategy; }
 
