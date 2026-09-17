@@ -23,12 +23,16 @@
 
 #include <iiowidgetutils.h>
 #include <style.h>
-#include <iioutil/connectionprovider.h>
+
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <component/attributewriter.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+BistWidget::BistWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -74,8 +78,7 @@ BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	}
 
 	IIOWidget *bistPrbs = IIOWidgetBuilder(widget)
-				      .device(m_device)
-				      .attribute("bist_prbs")
+				      .attribute(component::attributeByName(m_device, "bist_prbs"))
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .optionsValues(bistOptionasData)
 				      .title("Bist PRBS")
@@ -102,8 +105,7 @@ BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 		loopbackOptionasData += " " + loopbackValues.at(i);
 	}
 	IIOWidget *loopback = IIOWidgetBuilder(widget)
-				      .device(m_device)
-				      .attribute("loopback")
+				      .attribute(component::attributeByName(m_device, "loopback"))
 				      .uiStrategy(IIOWidgetBuilder::ComboUi)
 				      .optionsValues(loopbackOptionasData)
 				      .title("Loopback")
@@ -201,9 +203,8 @@ void BistWidget::updateBistTone()
 	// Format the configuration string
 	QString config = QString("%1 %2 %3 %4").arg(tone).arg(freq).arg(level).arg(bitmask);
 
-	int ret = iio_device_debug_attr_write(m_device, "bist_tone", config.toStdString().c_str());
-	if(ret < 0) {
-		qWarning() << "BIST Tone configuration failed" << QString::fromLocal8Bit(strerror(ret * (-1)));
+	if(auto *a = component::attributeByName(m_device, "bist_tone"); a && a->writeCapability()) {
+		a->writeCapability()->writeAsync(config);
 	}
 
 	Q_EMIT bistToneUpdated();

@@ -22,11 +22,14 @@
 #include "auxadcdaciowidget.h"
 
 #include <style.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-AuxAdcDacIoWidget::AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+AuxAdcDacIoWidget::AuxAdcDacIoWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -75,8 +78,7 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 	// adi,temp-sense-measurement-interval-ms
 	IIOWidget *tempSenseMeasurementInterval =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,temp-sense-measurement-interval-ms")
+			.attribute(component::attributeByName(m_device, "adi,temp-sense-measurement-interval-ms"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 100 20000]")
 			.title("Measurement Interval (ms)")
@@ -86,39 +88,39 @@ QWidget *AuxAdcDacIoWidget::tempSensorWidget(QWidget *parent)
 	tempSensorLayout->addWidget(tempSenseMeasurementInterval);
 
 	// adi,temp-sense-offset-signed
-	IIOWidget *tempSenseOffset = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,temp-sense-offset-signed")
-					     .uiStrategy(IIOWidgetBuilder::RangeUi)
-					     .optionsValues("[-128 1 127]")
-					     .infoMessage("Offset in signed deg. C, range -128…127")
-					     .title("Offset")
-					     .group(m_group)
-					     .buildSingle();
+	IIOWidget *tempSenseOffset =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,temp-sense-offset-signed"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[-128 1 127]")
+			.infoMessage("Offset in signed deg. C, range -128…127")
+			.title("Offset")
+			.group(m_group)
+			.buildSingle();
 	tempSensorLayout->addWidget(tempSenseOffset);
 
 	// adi,temp-sense-decimation
-	IIOWidget *tempSenseDecimation = IIOWidgetBuilder(widget)
-						 .device(m_device)
-						 .attribute("adi,temp-sense-decimation")
-						 .uiStrategy(IIOWidgetBuilder::RangeUi)
-						 .optionsValues("[256 256 32768]")
-						 .title("Decimation")
-						 .infoMessage("Decimation of the AuxADC used to derive the "
-							      "temperature. This data is processed by the driver.")
-						 .group(m_group)
-						 .buildSingle();
+	IIOWidget *tempSenseDecimation =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,temp-sense-decimation"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[256 256 32768]")
+			.title("Decimation")
+			.infoMessage("Decimation of the AuxADC used to derive the "
+				     "temperature. This data is processed by the driver.")
+			.group(m_group)
+			.buildSingle();
 	tempSensorLayout->addWidget(tempSenseDecimation);
 
 	// adi,temp-sense-periodic-measurement-enable
-	IIOWidget *tempSensePeriodicMeasurement = IIOWidgetBuilder(widget)
-							  .device(m_device)
-							  .attribute("adi,temp-sense-periodic-measurement-enable")
-							  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-							  .title("Periodic Measurement")
-							  .infoMessage("Enables periodic measurement")
-							  .group(m_group)
-							  .buildSingle();
+	IIOWidget *tempSensePeriodicMeasurement =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,temp-sense-periodic-measurement-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Periodic Measurement")
+			.infoMessage("Enables periodic measurement")
+			.group(m_group)
+			.buildSingle();
 	tempSensorLayout->addWidget(tempSensePeriodicMeasurement);
 	tempSensePeriodicMeasurement->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	tempSensePeriodicMeasurement->showProgressBar(false);
@@ -149,8 +151,7 @@ QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 	// adi,aux-adc-rate
 	IIOWidget *auxAdcRate =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,aux-adc-rate")
+			.attribute(component::attributeByName(m_device, "adi,aux-adc-rate"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1000 100000000]")
 			.title("Rate")
@@ -164,8 +165,7 @@ QWidget *AuxAdcDacIoWidget::auxAdcWidget(QWidget *parent)
 	// adi,aux-adc-decimation
 	IIOWidget *auxAdcDecimation =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,aux-adc-decimation")
+			.attribute(component::attributeByName(m_device, "adi,aux-adc-decimation"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[256 256 32768]")
 			.title("Decimation")
@@ -194,14 +194,14 @@ QWidget *AuxAdcDacIoWidget::auxDacWidget(QWidget *parent)
 	Style::setBackgroundColor(auxDacWidget, json::theme::background_primary);
 
 	// adi,aux-dac-manual-mode-enable
-	IIOWidget *auxDacManualMode = IIOWidgetBuilder(auxDacWidget)
-					      .device(m_device)
-					      .attribute("adi,aux-dac-manual-mode-enable")
-					      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					      .title("Manual Mode Enabled")
-					      .infoMessage("If enabled the Aux DAC doesn't slave the ENSM")
-					      .group(m_group)
-					      .buildSingle();
+	IIOWidget *auxDacManualMode =
+		IIOWidgetBuilder(auxDacWidget)
+			.attribute(component::attributeByName(m_device, "adi,aux-dac-manual-mode-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Manual Mode Enabled")
+			.infoMessage("If enabled the Aux DAC doesn't slave the ENSM")
+			.group(m_group)
+			.buildSingle();
 	auxDacWidgetLayout->addWidget(auxDacManualMode);
 	auxDacManualMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	auxDacManualMode->showProgressBar(false);
@@ -234,20 +234,20 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 	layout->addWidget(dacLabel, 0, 0);
 
 	// adi,aux-dacx-default-value-m
-	IIOWidget *dacDefaultValue = IIOWidgetBuilder(auxDacWidget)
-					     .device(m_device)
-					     .attribute("adi,aux-dac" + dacx + "-default-value-mV")
-					     .uiStrategy(IIOWidgetBuilder::RangeUi)
-					     .optionsValues("[306 1 3300]")
-					     .title("Default Value (mV)")
-					     .group(m_group)
-					     .buildSingle();
+	IIOWidget *dacDefaultValue =
+		IIOWidgetBuilder(auxDacWidget)
+			.attribute(component::attributeByName(m_device, "adi,aux-dac" + dacx + "-default-value-mV"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[306 1 3300]")
+			.title("Default Value (mV)")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(dacDefaultValue, 1, 1);
 
 	// adi,aux-dacx-active-in-alert-enable
 	IIOWidget *dacActiveInAlert = IIOWidgetBuilder(auxDacWidget)
-					      .device(m_device)
-					      .attribute("adi,aux-dac" + dacx + "-active-in-alert-enable")
+					      .attribute(component::attributeByName(
+						      m_device, "adi,aux-dac" + dacx + "-active-in-alert-enable"))
 					      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					      .title("Enable ALERT")
 					      .group(m_group)
@@ -258,47 +258,47 @@ QWidget *AuxAdcDacIoWidget::getAuxDac(QString dacx, QWidget *parent)
 	layout->addWidget(new QLabel("RX/TX Delay (us)", auxDacWidget), 2, 1);
 
 	// adi,aux-dacx-active-in-rx-enable
-	IIOWidget *dacActiveInRx = IIOWidgetBuilder(auxDacWidget)
-					   .device(m_device)
-					   .attribute("adi,aux-dac" + dacx + "-active-in-rx-enable")
-					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					   .title("Enable in RX")
-					   .group(m_group)
-					   .buildSingle();
+	IIOWidget *dacActiveInRx =
+		IIOWidgetBuilder(auxDacWidget)
+			.attribute(component::attributeByName(m_device, "adi,aux-dac" + dacx + "-active-in-rx-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Enable in RX")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(dacActiveInRx, 3, 0);
 	dacActiveInRx->showProgressBar(false);
 
 	// adi,aux-dacx-active-in-tx-enable
-	IIOWidget *dacActiveInTx = IIOWidgetBuilder(auxDacWidget)
-					   .device(m_device)
-					   .attribute("adi,aux-dac" + dacx + "-active-in-tx-enable")
-					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					   .title("Enable in Tx")
-					   .group(m_group)
-					   .buildSingle();
+	IIOWidget *dacActiveInTx =
+		IIOWidgetBuilder(auxDacWidget)
+			.attribute(component::attributeByName(m_device, "adi,aux-dac" + dacx + "-active-in-tx-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Enable in Tx")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(dacActiveInTx, 4, 0);
 	dacActiveInTx->showProgressBar(false);
 
 	// adi,aux-dacx-rx-delay-us
-	IIOWidget *rxDelay = IIOWidgetBuilder(auxDacWidget)
-				     .device(m_device)
-				     .attribute("adi,aux-dac" + dacx + "-rx-delay-us")
-				     .uiStrategy(IIOWidgetBuilder::RangeUi)
-				     .optionsValues("[0 1 255]")
-				     .title(" ")
-				     .group(m_group)
-				     .buildSingle();
+	IIOWidget *rxDelay =
+		IIOWidgetBuilder(auxDacWidget)
+			.attribute(component::attributeByName(m_device, "adi,aux-dac" + dacx + "-rx-delay-us"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 255]")
+			.title(" ")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(rxDelay, 3, 1);
 
 	// adi,aux-dacx-tx-delay-us
-	IIOWidget *txDelay = IIOWidgetBuilder(auxDacWidget)
-				     .device(m_device)
-				     .attribute("adi,aux-dac" + dacx + "-tx-delay-us")
-				     .uiStrategy(IIOWidgetBuilder::RangeUi)
-				     .optionsValues("[0 1 255]")
-				     .title(" ")
-				     .group(m_group)
-				     .buildSingle();
+	IIOWidget *txDelay =
+		IIOWidgetBuilder(auxDacWidget)
+			.attribute(component::attributeByName(m_device, "adi,aux-dac" + dacx + "-tx-delay-us"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 255]")
+			.title(" ")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(txDelay, 4, 1);
 
 	connect(this, &AuxAdcDacIoWidget::readRequested, this, [=, this]() {
@@ -326,8 +326,7 @@ QWidget *AuxAdcDacIoWidget::controlsOutWidget(QWidget *parent)
 
 	// adi,ctrl-outs-index
 	IIOWidget *ctrlOutsIndex = IIOWidgetBuilder(controlsOutWidget)
-					   .device(m_device)
-					   .attribute("adi,ctrl-outs-index")
+					   .attribute(component::attributeByName(m_device, "adi,ctrl-outs-index"))
 					   .uiStrategy(IIOWidgetBuilder::RangeUi)
 					   .optionsValues("[0 1 31]")
 					   .title("Index")
@@ -337,8 +336,7 @@ QWidget *AuxAdcDacIoWidget::controlsOutWidget(QWidget *parent)
 
 	// adi,ctrl-outs-enable-mask
 	IIOWidget *ctrlOutsMask = IIOWidgetBuilder(controlsOutWidget)
-					  .device(m_device)
-					  .attribute("adi,ctrl-outs-enable-mask")
+					  .attribute(component::attributeByName(m_device, "adi,ctrl-outs-enable-mask"))
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .optionsValues("[0 1 255]")
 					  .title("Mask")
@@ -372,8 +370,7 @@ QWidget *AuxAdcDacIoWidget::gposWidget(QWidget *parent)
 	// adi,gpo-manual-mode-enable
 	IIOWidget *gpoManualMode =
 		IIOWidgetBuilder(parent)
-			.device(m_device)
-			.attribute("adi,gpo-manual-mode-enable")
+			.attribute(component::attributeByName(m_device, "adi,gpo-manual-mode-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Enable")
 			.infoMessage(
@@ -450,8 +447,8 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 
 	// adi,gpoX-inactive-state-high-enable
 	IIOWidget *inactiveState = IIOWidgetBuilder(gpoContent)
-					   .device(m_device)
-					   .attribute("adi,gpo" + gpox + "-inactive-state-high-enable")
+					   .attribute(component::attributeByName(
+						   m_device, "adi,gpo" + gpox + "-inactive-state-high-enable"))
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					   .title("Enable Inactive High State")
 					   .group(m_group)
@@ -460,24 +457,24 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 	inactiveState->showProgressBar(false);
 
 	// adi,gpoX-slave-rx-enable
-	IIOWidget *stateRx = IIOWidgetBuilder(gpoContent)
-				     .device(m_device)
-				     .attribute("adi,gpo" + gpox + "-slave-rx-enable")
-				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-				     .title("Enable RX State")
-				     .group(m_group)
-				     .buildSingle();
+	IIOWidget *stateRx =
+		IIOWidgetBuilder(gpoContent)
+			.attribute(component::attributeByName(m_device, "adi,gpo" + gpox + "-slave-rx-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Enable RX State")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(stateRx, 1, 0);
 	stateRx->showProgressBar(false);
 
 	// adi,gpoX-slave-tx-enable
-	IIOWidget *stateTx = IIOWidgetBuilder(gpoContent)
-				     .device(m_device)
-				     .attribute("adi,gpo" + gpox + "-slave-tx-enable")
-				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-				     .title("Enable TX State")
-				     .group(m_group)
-				     .buildSingle();
+	IIOWidget *stateTx =
+		IIOWidgetBuilder(gpoContent)
+			.attribute(component::attributeByName(m_device, "adi,gpo" + gpox + "-slave-tx-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("Enable TX State")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(stateTx, 2, 0);
 	stateTx->showProgressBar(false);
 
@@ -486,8 +483,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 
 	// adi,gpoX-rx-delay-us
 	IIOWidget *rxDelay = IIOWidgetBuilder(gpoContent)
-				     .device(m_device)
-				     .attribute("adi,gpo" + gpox + "-rx-delay-us")
+				     .attribute(component::attributeByName(m_device, "adi,gpo" + gpox + "-rx-delay-us"))
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 255]")
 				     .title("")
@@ -497,8 +493,7 @@ QWidget *AuxAdcDacIoWidget::gpoWidget(QString gpox, QWidget *parent)
 
 	// adi,gpoX-tx-delay-us
 	IIOWidget *txDelay = IIOWidgetBuilder(gpoContent)
-				     .device(m_device)
-				     .attribute("adi,gpo" + gpox + "-tx-delay-us")
+				     .attribute(component::attributeByName(m_device, "adi,gpo" + gpox + "-tx-delay-us"))
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 1 255]")
 				     .title("")
@@ -535,5 +530,8 @@ void AuxAdcDacIoWidget::applyGpoMask()
 	if(m_gpo3Mask->onOffswitch()->isChecked())
 		mask |= (1 << 3); // Set bit 3
 
-	iio_device_debug_attr_write_longlong(m_device, "adi,gpo-manual-mode-enable-mask", mask);
+	if(auto *a = component::attributeByName(m_device, "adi,gpo-manual-mode-enable-mask");
+	   a && a->writeCapability()) {
+		a->writeCapability()->writeAsync(QString::number(mask));
+	}
 }
