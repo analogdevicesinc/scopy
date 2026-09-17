@@ -24,8 +24,10 @@
 #include <QLoggingCategory>
 #include <QLabel>
 #include <iiowidgetbuilder.h>
-#include <iioutil/connectionprovider.h>
 #include <style.h>
+#include <component/device.h>
+#include <component/controller.h>
+#include <component/attribute.h>
 
 #include "core/deviceimpl.h"
 #include <datalogger/datalogger_api.hpp>
@@ -39,24 +41,16 @@ using namespace scopy::rfpowermeter;
 
 bool RFPowerMeterPlugin::compatible(QString m_param, QString category)
 {
-	// This function defines the characteristics according to which the
-	// plugin is compatible with a specific device
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-
-	if(conn == nullptr)
-		return false;
-
 	bool ret = false;
-	iio_context *ctx = conn->context();
-	iio_device *powrmsDevice = iio_context_find_device(ctx, "powrms");
-
-	if(powrmsDevice != nullptr) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		return false;
+	}
+	component::Device *dev = ctx->findChild<component::Device *>("powrms", Qt::FindDirectChildrenOnly);
+	if(dev) {
 		ret = true;
 		qDebug(CAT_RFPOWERMETER) << "Found rf powermeter device";
 	}
-
-	cp->close(m_param);
 
 	return ret;
 }
@@ -78,17 +72,12 @@ bool RFPowerMeterPlugin::onConnect()
 	// In case of success the function must return true and false otherwise
 
 	// Check for RF power meter device and apply configuration
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-
-	if(conn == nullptr)
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		return false;
-
-	iio_context *ctx = conn->context();
-	iio_device *powrmsDevice = iio_context_find_device(ctx, "powrms");
-
-	if(powrmsDevice == nullptr) {
-		cp->close(m_param);
+	}
+	component::Device *powrmsDev = ctx->findChild<component::Device *>("powrms", Qt::FindDirectChildrenOnly);
+	if(!powrmsDev) {
 		qDebug(CAT_RFPOWERMETER) << "RF Powermeter device not found";
 		return false;
 	}
@@ -100,14 +89,12 @@ bool RFPowerMeterPlugin::onConnect()
 	datamonitor::DataLoggerPlugin *dataLogger = nullptr;
 
 	if(m_device == nullptr) {
-		cp->close(m_param);
 		qDebug(CAT_RFPOWERMETER) << "Device not found";
 		return false;
 	}
 	dataLogger = dynamic_cast<datamonitor::DataLoggerPlugin *>(m_device->getPluginByName("DataLoggerPlugin"));
 
 	if(!dataLogger) {
-		cp->close(m_param);
 		qWarning(CAT_RFPOWERMETER) << "DataLogger plugin not found or not enabled";
 		StatusBarManager::pushMessage("RF Power Meter requires DataLogger plugin to be enabled. Please enable "
 					      "DataLogger plugin first.",
@@ -117,14 +104,12 @@ bool RFPowerMeterPlugin::onConnect()
 
 	dataloggerApi = dataLogger->getApi();
 	if(!dataloggerApi) {
-		cp->close(m_param);
 		qWarning(CAT_RFPOWERMETER) << "DataLogger API not available";
 		StatusBarManager::pushMessage("DataLogger API not available for RF Power Meter configuration.", 5000);
 		return false;
 	}
 
 	if(dataLogger->toolList().isEmpty()) {
-		cp->close(m_param);
 		qWarning(CAT_RFPOWERMETER) << "DataLogger has no tools available";
 		StatusBarManager::pushMessage("DataLogger has no tools available for RF Power Meter.", 5000);
 		return false;
@@ -133,7 +118,6 @@ bool RFPowerMeterPlugin::onConnect()
 	// Additional safety check
 	ToolMenuEntry *firstTool = dataLogger->toolList().first();
 	if(!firstTool || !firstTool->tool()) {
-		cp->close(m_param);
 		qWarning(CAT_RFPOWERMETER) << "DataLogger first tool is invalid";
 		StatusBarManager::pushMessage("DataLogger tool is invalid for RF Power Meter.", 5000);
 		return false;
@@ -141,43 +125,42 @@ bool RFPowerMeterPlugin::onConnect()
 
 	datamonitor::DatamonitorTool *tool = dynamic_cast<datamonitor::DatamonitorTool *>(firstTool->tool());
 
-	if(tool != nullptr) {
-		QWidget *widget = new QWidget(tool);
-		QHBoxLayout *layout = new QHBoxLayout();
-		layout->setContentsMargins(5, 5, 5, 5);
-		layout->setSpacing(0);
-		widget->setLayout(layout);
-
-		Style::setBackgroundColor(widget, json::theme::background_primary, true);
-
-		IIOWidget *frequency =
-			IIOWidgetBuilder(tool).device(powrmsDevice).attribute("frequency_MHz").buildSingle();
-
-		if(frequency != nullptr) {
-			layout->addWidget(frequency);
-		}
-
-		auto *sevenSegMonitors = tool->getSevenSegmetMonitors();
-		if(!sevenSegMonitors) {
-			cp->close(m_param);
-			qWarning(CAT_RFPOWERMETER) << "SevenSegment monitors not available";
-			StatusBarManager::pushMessage("SevenSegment monitors not available for RF Power Meter.", 5000);
-			return false;
-		}
-
-		auto *sevenSegLayout = sevenSegMonitors->getLayout();
-		if(!sevenSegLayout) {
-			cp->close(m_param);
-			qWarning(CAT_RFPOWERMETER) << "SevenSegment layout not available";
-			StatusBarManager::pushMessage("SevenSegment layout not available for RF Power Meter.", 5000);
-			return false;
-		}
-
-		sevenSegLayout->addWidget(widget);
-	} else {
-		cp->close(m_param);
+	if(!tool) {
 		return false;
 	}
+
+	QWidget *widget = new QWidget(tool);
+	QHBoxLayout *layout = new QHBoxLayout();
+	layout->setContentsMargins(5, 5, 5, 5);
+	layout->setSpacing(0);
+	widget->setLayout(layout);
+
+	Style::setBackgroundColor(widget, json::theme::background_primary, true);
+
+	IIOWidget *frequency = IIOWidgetBuilder(tool)
+				       .attribute(powrmsDev->findChild<component::Attribute *>(
+					       "frequency_MHz", Qt::FindDirectChildrenOnly))
+				       .buildSingle();
+
+	if(frequency != nullptr) {
+		layout->addWidget(frequency);
+	}
+
+	auto *sevenSegMonitors = tool->getSevenSegmetMonitors();
+	if(!sevenSegMonitors) {
+		qWarning(CAT_RFPOWERMETER) << "SevenSegment monitors not available";
+		StatusBarManager::pushMessage("SevenSegment monitors not available for RF Power Meter.", 5000);
+		return false;
+	}
+
+	auto *sevenSegLayout = sevenSegMonitors->getLayout();
+	if(!sevenSegLayout) {
+		qWarning(CAT_RFPOWERMETER) << "SevenSegment layout not available";
+		StatusBarManager::pushMessage("SevenSegment layout not available for RF Power Meter.", 5000);
+		return false;
+	}
+
+	sevenSegLayout->addWidget(widget);
 
 	// Configure DataLogger for RF Power Meter (matching original JavaScript)
 	dataloggerApi->setToolName("Data Logger ", "RF Power Meter");
@@ -222,19 +205,10 @@ bool RFPowerMeterPlugin::onConnect()
 
 	qInfo(CAT_RFPOWERMETER) << "RF power meter configuration completed successfully";
 
-	cp->close(m_param);
 	return true;
 }
 
-bool RFPowerMeterPlugin::onDisconnect()
-{
-	// This method is called when the disconnect button is pressed
-	// It must remove all connections that were established on the connection
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
-
-	return true;
-}
+bool RFPowerMeterPlugin::onDisconnect() { return true; }
 
 void RFPowerMeterPlugin::initMetadata()
 {
