@@ -24,11 +24,14 @@
 #include <style.h>
 #include <iiowidgetbuilder.h>
 #include <iiowidgetutils.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-RssiWidget::RssiWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+RssiWidget::RssiWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -56,8 +59,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 
 	// adi,rssi-duration
 	IIOWidget *rssiDuration = IIOWidgetBuilder(widget)
-					  .device(m_device)
-					  .attribute("adi,rssi-duration")
+					  .attribute(component::attributeByName(m_device, "adi,rssi-duration"))
 					  .uiStrategy(IIOWidgetBuilder::RangeUi)
 					  .optionsValues("[0 1 100000]")
 					  .title("Duration (us)")
@@ -69,8 +71,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	// adi,rssi-delay
 	IIOWidget *rssiDelay =
 		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute("adi,rssi-delay")
+			.attribute(component::attributeByName(m_device, "adi,rssi-delay"))
 			.uiStrategy(IIOWidgetBuilder::RangeUi)
 			.optionsValues("[0 1 100000]")
 			.title("Delay (us)")
@@ -83,8 +84,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 
 	// wait  adi,rssi-wait
 	IIOWidget *rssiWait = IIOWidgetBuilder(widget)
-				      .device(m_device)
-				      .attribute("adi,rssi-wait")
+				      .attribute(component::attributeByName(m_device, "adi,rssi-wait"))
 				      .uiStrategy(IIOWidgetBuilder::RangeUi)
 				      .optionsValues("[0 1 100000]")
 				      .title("Wait (us)")
@@ -111,8 +111,7 @@ RssiWidget::RssiWidget(iio_device *device, IIOWidgetGroup *group, QWidget *paren
 	}
 
 	IIOWidget *rssiRestartMode = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,rssi-restart-mode")
+					     .attribute(component::attributeByName(m_device, "adi,rssi-restart-mode"))
 					     .uiStrategy(IIOWidgetBuilder::ComboUi)
 					     .optionsValues(optionasData)
 					     .title("Restart Mode")

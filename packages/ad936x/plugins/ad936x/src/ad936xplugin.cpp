@@ -30,9 +30,11 @@
 #include <deviceiconbuilder.h>
 #include <style.h>
 #include "scopy-ad936x_config.h"
-#include <iioutil/connectionprovider.h>
 #include <pluginbase/scopyjs.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 #include "ad936x/ad936x.h"
 #include "ad936x/ad963xadvanced.h"
@@ -48,26 +50,20 @@ bool Ad936xPlugin::compatible(QString m_param, QString category)
 
 	qDebug(CAT_AD936XPLUGIN) << "Check Pluto compatibility";
 	bool ret = false;
-	Connection *conn = ConnectionProvider::open(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!ctx) {
 		qWarning(CAT_AD936XPLUGIN) << "No context available for Pluto";
 		return false;
 	}
 
-	ret = false;
-	int device_count = iio_context_get_devices_count(conn->context());
 	// this should work for any device from AD936x family
-	for(int i = 0; i < device_count; ++i) {
-		iio_device *dev = iio_context_get_device(conn->context(), i);
-		const char *dev_name = iio_device_get_name(dev);
-		if(dev_name && QString(dev_name).startsWith("ad936", Qt::CaseInsensitive)) {
+	for(component::Device *dev : ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+		if(dev->name().startsWith("ad936", Qt::CaseInsensitive)) {
 			ret = true;
 			break;
 		}
 	}
-
-	ConnectionProvider::close(m_param);
 
 	return ret;
 }
@@ -108,38 +104,40 @@ QString Ad936xPlugin::displayName() { return PLUTO_PLUGIN_DISPLAY_NAME; }
 
 bool Ad936xPlugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::open(m_param);
+	m_context = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!m_context) {
 		qWarning(CAT_AD936XPLUGIN) << "No context available for Pluto";
 		return false;
 	}
 
+	component::Context *ctx = m_context.get();
+
 	m_widgetGroup = new IIOWidgetGroup(this);
 
 	// Check if FMCOMMS5 device is present (indicated by ad9361-phy-B device)
-	m_isFmcomms5 = iio_context_find_device(conn->context(), "ad9361-phy-B") != nullptr;
+	m_isFmcomms5 = ctx->findChild<component::Device *>("ad9361-phy-B", Qt::FindDirectChildrenOnly) != nullptr;
 
 	if(m_isFmcomms5) {
-		FMCOMMS5 *fmcomms5 = new FMCOMMS5(conn->context(), m_widgetGroup);
+		FMCOMMS5 *fmcomms5 = new FMCOMMS5(ctx, m_widgetGroup);
 		m_toolList[0]->setTool(fmcomms5);
 		m_toolList[0]->setName("FMCOMMS5");
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(false);
 
-		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(conn->context(), m_widgetGroup);
+		Fmcomms5Advanced *fmcomms5Advanced = new Fmcomms5Advanced(ctx, m_widgetGroup);
 		m_toolList[1]->setTool(fmcomms5Advanced);
 		m_toolList[1]->setName("FMCOMMS5 Advanced");
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(false);
 
 	} else {
-		AD936X *ad936X = new AD936X(conn->context(), m_widgetGroup);
+		AD936X *ad936X = new AD936X(ctx, m_widgetGroup);
 		m_toolList[0]->setTool(ad936X);
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setRunBtnVisible(true);
 
-		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(conn->context(), m_widgetGroup);
+		AD936XAdvanced *ad936XAdvanced = new AD936XAdvanced(ctx, m_widgetGroup);
 		m_toolList[1]->setTool(ad936XAdvanced);
 		m_toolList[1]->setEnabled(true);
 		m_toolList[1]->setRunBtnVisible(true);
@@ -188,7 +186,7 @@ bool Ad936xPlugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider::close(m_param);
+	m_context = {};
 	return true;
 }
 

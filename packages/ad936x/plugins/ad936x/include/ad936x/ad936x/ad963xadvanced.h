@@ -27,7 +27,6 @@
 #include <QWidget>
 #include <animatedrefreshbtn.h>
 #include <tooltemplate.h>
-#include <iio.h>
 
 #include "auxadcdaciowidget.h"
 #include "elnawidget.h"
@@ -39,13 +38,17 @@
 #include "bistwidget.h"
 
 namespace scopy {
+namespace component {
+class Context;
+class Device;
+} // namespace component
 class IIOWidgetGroup;
 namespace ad936x {
 class AD936XAdvanced : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit AD936XAdvanced(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit AD936XAdvanced(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~AD936XAdvanced();
 
 	void switchSubtab(const QString &name);
@@ -65,7 +68,7 @@ private:
 	QPushButton *m_miscBtn = nullptr;
 	QPushButton *m_bistBtn = nullptr;
 
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
@@ -79,7 +82,7 @@ private:
 	MiscWidget *m_misc;
 	BistWidget *m_bist;
 
-	iio_device *m_plutoDevice = nullptr;
+	component::Device *m_plutoDevice = nullptr;
 	QStackedWidget *m_centralWidget = nullptr;
 
 	bool m_isToolInitialized;
