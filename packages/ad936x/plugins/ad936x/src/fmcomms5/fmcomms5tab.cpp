@@ -28,12 +28,17 @@
 
 #include <fmcomms5/fmcomms5calibration.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 Q_LOGGING_CATEGORY(CAT_FMCOMMS5_TAB, "FMCOMMS5_TAB")
 
 using namespace scopy;
 using namespace ad936x;
 
-Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Fmcomms5Tab::Fmcomms5Tab(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: m_ctx(ctx)
 	, m_group(group)
 	, QWidget{parent}
@@ -98,7 +103,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group, QWidget *paren
 
 	layout->addWidget(m_calibProgressBar);
 
-	iio_device *mainDevice = iio_context_find_device(m_ctx, "ad9361-phy");
+	component::Device *mainDevice = m_ctx->findChild<component::Device *>("ad9361-phy", Qt::FindDirectChildrenOnly);
 
 	if(!mainDevice) {
 		qWarning(CAT_FMCOMMS5_TAB) << "No ad9361-phy device found in context!";
@@ -107,8 +112,7 @@ Fmcomms5Tab::Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group, QWidget *paren
 
 	// TX Phase
 	IIOWidget *txPhase = IIOWidgetBuilder(widget)
-				     .device(mainDevice)
-				     .attribute("calibration_switch_control")
+				     .attribute(component::attributeByName(mainDevice, "calibration_switch_control"))
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues("[0 0.1 360]")
 				     .title("TX Phase")

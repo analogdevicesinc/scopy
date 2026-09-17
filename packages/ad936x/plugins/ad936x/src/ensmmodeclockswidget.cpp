@@ -26,11 +26,14 @@
 #include <iiowidgetutils.h>
 #include <style.h>
 #include <guistrategy/comboguistrategy.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace ad936x;
 
-EnsmModeClocksWidget::EnsmModeClocksWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+EnsmModeClocksWidget::EnsmModeClocksWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: m_device(device)
 	, m_group(group)
 	, QWidget{parent}
@@ -77,14 +80,14 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	ensmModeWidgetLayout->addWidget(title);
 
 	// ensm_mode  ensm_mode_available
-	IIOWidget *fddMode = IIOWidgetBuilder(ensmModeWidget)
-				     .device(m_device)
-				     .attribute("adi,frequency-division-duplex-mode-enable")
-				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-				     .title("FDD/TDD")
-				     .infoMessage("Use FDD mode - default TDD")
-				     .group(m_group)
-				     .buildSingle();
+	IIOWidget *fddMode =
+		IIOWidgetBuilder(ensmModeWidget)
+			.attribute(component::attributeByName(m_device, "adi,frequency-division-duplex-mode-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("FDD/TDD")
+			.infoMessage("Use FDD mode - default TDD")
+			.group(m_group)
+			.buildSingle();
 	ensmModeWidgetLayout->addWidget(fddMode);
 	fddMode->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	fddMode->showProgressBar(false);
@@ -92,8 +95,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	// adi,ensm-enable-pin-pulse-mode-enable
 	IIOWidget *ensmEnablePinPulseMode =
 		IIOWidgetBuilder(ensmModeWidget)
-			.device(m_device)
-			.attribute("adi,ensm-enable-pin-pulse-mode-enable")
+			.attribute(component::attributeByName(m_device, "adi,ensm-enable-pin-pulse-mode-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Pin Pulse Mode")
 			.infoMessage("ENSM control Pins (ENABLE/TXNRX) use Pulse mode - default Level Mode")
@@ -106,8 +108,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	// adi,ensm-enable-txnrx-control-enable
 	IIOWidget *ensmEnableTxnrx =
 		IIOWidgetBuilder(ensmModeWidget)
-			.device(m_device)
-			.attribute("adi,ensm-enable-txnrx-control-enable")
+			.attribute(component::attributeByName(m_device, "adi,ensm-enable-txnrx-control-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("TXNRX Pin Control")
 			.infoMessage("ENSM control Pins (ENABLE/TXNRX) control ENSM state - default SPI writes")
@@ -128,8 +129,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	// adi,tdd-use-dual-synth-mode-enable
 	IIOWidget *useDualSynth =
 		IIOWidgetBuilder(ensmModeWidget)
-			.device(m_device)
-			.attribute("adi,tdd-use-dual-synth-mode-enable")
+			.attribute(component::attributeByName(m_device, "adi,tdd-use-dual-synth-mode-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Use Dual Synth")
 			.infoMessage("In TDD mode use Dual Synth mode - default only one Synth is enabled")
@@ -143,30 +143,34 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	QString useFddVcoTableAttr = "adi,tdd-use-fdd-vco-tables-enable";
 
 	// adi,tdd-use-fdd-vco-tables-enable
-	IIOWidget *useFddVcoTable = IIOWidgetBuilder(ensmModeWidget)
-					    .device(m_device)
-					    .attribute(useFddVcoTableAttr)
-					    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					    .title("Use FDD VCO tables")
-					    .group(m_group)
-					    .buildSingle();
-	ensmHBoxLayout->addWidget(useFddVcoTable);
-	useFddVcoTable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-	useFddVcoTable->showProgressBar(false);
-
-	bool isuseFddVcoTableEnabled = true;
-	if(iio_device_find_debug_attr(m_device, useFddVcoTableAttr.toStdString().c_str()) == nullptr) {
-		useFddVcoTable->setEnabled(false);
-		isuseFddVcoTableEnabled = false;
-		useFddVcoTable->getUiStrategy()->setInfoMessage(
-			"This attribute is not available for your current device!");
+	// The component tree only exposes attributes the device actually has, so a missing
+	// optional attribute is a null Attribute*. Build the widget only when present.
+	IIOWidget *useFddVcoTable = nullptr;
+	bool isuseFddVcoTableEnabled = false;
+	if(component::Attribute *attr = component::attributeByName(m_device, useFddVcoTableAttr)) {
+		useFddVcoTable = IIOWidgetBuilder(ensmModeWidget)
+					 .attribute(attr)
+					 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+					 .title("Use FDD VCO tables")
+					 .group(m_group)
+					 .buildSingle();
+		ensmHBoxLayout->addWidget(useFddVcoTable);
+		useFddVcoTable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		useFddVcoTable->showProgressBar(false);
+		isuseFddVcoTableEnabled = true;
+	} else {
+		QLabel *unavailable = new QLabel("Use FDD VCO tables (not available)", ensmModeWidget);
+		Style::setStyle(unavailable, style::properties::label::subtle);
+		unavailable->setEnabled(false);
+		unavailable->setToolTip("This attribute is not available for your current device!");
+		unavailable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		ensmHBoxLayout->addWidget(unavailable);
 	}
 
 	// adi,tdd-skip-vco-cal-enable
 	IIOWidget *skipVcoCal =
 		IIOWidgetBuilder(ensmModeWidget)
-			.device(m_device)
-			.attribute("adi,tdd-skip-vco-cal-enable")
+			.attribute(component::attributeByName(m_device, "adi,tdd-skip-vco-cal-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Skip VCO cal")
 			.infoMessage("Option to skip VCO cal in TDD mode when moving from TX/RX to Alert")
@@ -179,8 +183,7 @@ QWidget *EnsmModeClocksWidget::generateEnsmModeWidget(QWidget *parent)
 	// adi,update-tx-gain-in-alert-enable
 	IIOWidget *updateTxGainInAlert =
 		IIOWidgetBuilder(ensmModeWidget)
-			.device(m_device)
-			.attribute("adi,update-tx-gain-in-alert-enable")
+			.attribute(component::attributeByName(m_device, "adi,update-tx-gain-in-alert-enable"))
 			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 			.title("Update Tx Gain in ALERT")
 			.infoMessage("in TDD mode disable immediate TX Gain update and wait until ENSM moves to Alert")
@@ -240,8 +243,7 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 		rxOptionasData += " " + rxValues.at(i);
 	}
 	IIOWidget *rxPortInput = IIOWidgetBuilder(modeWidget)
-					 .device(m_device)
-					 .attribute("adi,rx-rf-port-input-select")
+					 .attribute(component::attributeByName(m_device, "adi,rx-rf-port-input-select"))
 					 .uiStrategy(IIOWidgetBuilder::ComboUi)
 					 .optionsValues(rxOptionasData)
 					 .title("RX port input")
@@ -267,8 +269,7 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 		txOptionasData += " " + txValues.at(i);
 	}
 	IIOWidget *txPortInput = IIOWidgetBuilder(modeWidget)
-					 .device(m_device)
-					 .attribute("adi,tx-rf-port-input-select")
+					 .attribute(component::attributeByName(m_device, "adi,tx-rf-port-input-select"))
 					 .uiStrategy(IIOWidgetBuilder::ComboUi)
 					 .optionsValues(txOptionasData)
 					 .title("TX port input")
@@ -284,14 +285,14 @@ QWidget *EnsmModeClocksWidget::generateModeWidget(QWidget *parent)
 	});
 
 	// adi,rx1-rx2-phase-inversion-enable
-	IIOWidget *rx1Rx2Phase = IIOWidgetBuilder(modeWidget)
-					 .device(m_device)
-					 .attribute("adi,rx1-rx2-phase-inversion-enable")
-					 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-					 .title("RX2 Phase Inversion")
-					 .infoMessage("If enabled RX1 and RX2 are phase aligned")
-					 .group(m_group)
-					 .buildSingle();
+	IIOWidget *rx1Rx2Phase =
+		IIOWidgetBuilder(modeWidget)
+			.attribute(component::attributeByName(m_device, "adi,rx1-rx2-phase-inversion-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("RX2 Phase Inversion")
+			.infoMessage("If enabled RX1 and RX2 are phase aligned")
+			.group(m_group)
+			.buildSingle();
 	modeWidgetLayout->addWidget(rx1Rx2Phase);
 	rx1Rx2Phase->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	rx1Rx2Phase->showProgressBar(false);
@@ -324,31 +325,33 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	QString xoDisableUseExtRefclkAttr = "adi,xo-disable-use-ext-refclk-enable";
 
 	// adi,xo-disable-use-ext-refclk-enable
-	IIOWidget *xoDisableUseExtRefclk =
-		IIOWidgetBuilder(widget)
-			.device(m_device)
-			.attribute(xoDisableUseExtRefclkAttr)
-			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-			.title("XO Disable Use EXT RefCLK")
-			.infoMessage("Disable XO use Ext CLK into XTAL_N - default XO into XTAL")
-			.group(m_group)
-			.buildSingle();
-	layout->addWidget(xoDisableUseExtRefclk, 1, 0);
-	xoDisableUseExtRefclk->showProgressBar(false);
-
-	bool isxoDisableUseExtRefclkEnabled = true;
-	if(iio_device_find_debug_attr(m_device, xoDisableUseExtRefclkAttr.toStdString().c_str()) == nullptr) {
-		xoDisableUseExtRefclk->setEnabled(false);
-		isxoDisableUseExtRefclkEnabled = false;
-		xoDisableUseExtRefclk->getUiStrategy()->setInfoMessage(
-			"This attribute is not available for your current device!");
+	// Optional attribute: build the widget only when present.
+	IIOWidget *xoDisableUseExtRefclk = nullptr;
+	bool isxoDisableUseExtRefclkEnabled = false;
+	if(component::Attribute *attr = component::attributeByName(m_device, xoDisableUseExtRefclkAttr)) {
+		xoDisableUseExtRefclk =
+			IIOWidgetBuilder(widget)
+				.attribute(attr)
+				.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+				.title("XO Disable Use EXT RefCLK")
+				.infoMessage("Disable XO use Ext CLK into XTAL_N - default XO into XTAL")
+				.group(m_group)
+				.buildSingle();
+		layout->addWidget(xoDisableUseExtRefclk, 1, 0);
+		xoDisableUseExtRefclk->showProgressBar(false);
+		isxoDisableUseExtRefclkEnabled = true;
+	} else {
+		QLabel *unavailable = new QLabel("XO Disable Use EXT RefCLK (not available)", widget);
+		Style::setStyle(unavailable, style::properties::label::subtle);
+		unavailable->setEnabled(false);
+		unavailable->setToolTip("This attribute is not available for your current device!");
+		layout->addWidget(unavailable, 1, 0);
 	}
 
 	// adi,external-rx-lo-enable
-	iio_channel *altVoltage0 = iio_device_find_channel(m_device, "altvoltage0", true);
 	IIOWidget *externalRxLo = IIOWidgetBuilder(widget)
-					  .channel(altVoltage0)
-					  .attribute("external")
+					  .attribute(component::attributeByName(
+						  component::channelById(m_device, "altvoltage0", true), "external"))
 					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					  .title("Ext RX LO")
 					  .infoMessage("Enables external LO for RX")
@@ -374,14 +377,14 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	for(int i = 0; i < values.size(); i++) {
 		optionasData += " " + values.at(i);
 	}
-	IIOWidget *clkOutputMode = IIOWidgetBuilder(widget)
-					   .device(m_device)
-					   .attribute("adi,clk-output-mode-select")
-					   .uiStrategy(IIOWidgetBuilder::ComboUi)
-					   .optionsValues(optionasData)
-					   .title("CLOCKOUT")
-					   .group(m_group)
-					   .buildSingle();
+	IIOWidget *clkOutputMode =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,clk-output-mode-select"))
+			.uiStrategy(IIOWidgetBuilder::ComboUi)
+			.optionsValues(optionasData)
+			.title("CLOCKOUT")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(clkOutputMode, 1, 1);
 
 	clkOutputMode->setUItoDataConversion([this, clkOutputModeOptions](QString data) {
@@ -392,10 +395,9 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	});
 
 	// adi,external-tx-lo-enable
-	iio_channel *altVoltage1 = iio_device_find_channel(m_device, "altvoltage1", true);
 	IIOWidget *externalTxLo = IIOWidgetBuilder(widget)
-					  .channel(altVoltage1)
-					  .attribute("external")
+					  .attribute(component::attributeByName(
+						  component::channelById(m_device, "altvoltage1", true), "external"))
 					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					  .title("Ext TX LO")
 					  .infoMessage("Enables external LO for TX")
@@ -405,51 +407,51 @@ QWidget *EnsmModeClocksWidget::generateClocksWidget(QWidget *parent)
 	externalTxLo->showProgressBar(false);
 
 	// adi,rx-fastlock-pincontrol-enable
-	IIOWidget *rxFastlockPincontrol = IIOWidgetBuilder(widget)
-						  .device(m_device)
-						  .attribute("adi,rx-fastlock-pincontrol-enable")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .title("RX Fastlock Pin Control")
-						  .infoMessage("RX fastlock pin control enable")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *rxFastlockPincontrol =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,rx-fastlock-pincontrol-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("RX Fastlock Pin Control")
+			.infoMessage("RX fastlock pin control enable")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(rxFastlockPincontrol, 4, 0);
 	rxFastlockPincontrol->showProgressBar(false);
 
 	// adi,rx-fastlock-delay-ns
-	IIOWidget *rxFastLockDelay = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,rx-fastlock-delay-ns")
-					     .uiStrategy(IIOWidgetBuilder::RangeUi)
-					     .optionsValues("[0 1 63750]")
-					     .title("RX Fastlock Delay (ns)")
-					     .infoMessage("RX fastlock delay in ns")
-					     .group(m_group)
-					     .buildSingle();
+	IIOWidget *rxFastLockDelay =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,rx-fastlock-delay-ns"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 63750]")
+			.title("RX Fastlock Delay (ns)")
+			.infoMessage("RX fastlock delay in ns")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(rxFastLockDelay, 4, 1);
 
 	// adi,tx-fastlock-pincontrol-enable
-	IIOWidget *txFastlockPincontrol = IIOWidgetBuilder(widget)
-						  .device(m_device)
-						  .attribute("adi,tx-fastlock-pincontrol-enable")
-						  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						  .title("TX Fastlock Pin Control")
-						  .infoMessage("TX fastlock pin control enable")
-						  .group(m_group)
-						  .buildSingle();
+	IIOWidget *txFastlockPincontrol =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,tx-fastlock-pincontrol-enable"))
+			.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+			.title("TX Fastlock Pin Control")
+			.infoMessage("TX fastlock pin control enable")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(txFastlockPincontrol, 5, 0);
 	txFastlockPincontrol->showProgressBar(false);
 
 	// adi,tx-fastlock-delay-ns
-	IIOWidget *txFastLockDelay = IIOWidgetBuilder(widget)
-					     .device(m_device)
-					     .attribute("adi,tx-fastlock-delay-ns")
-					     .uiStrategy(IIOWidgetBuilder::RangeUi)
-					     .optionsValues("[0 1 63750]")
-					     .title("TX Fastlock Delay (ns)")
-					     .infoMessage("TX fastlock delay in ns")
-					     .group(m_group)
-					     .buildSingle();
+	IIOWidget *txFastLockDelay =
+		IIOWidgetBuilder(widget)
+			.attribute(component::attributeByName(m_device, "adi,tx-fastlock-delay-ns"))
+			.uiStrategy(IIOWidgetBuilder::RangeUi)
+			.optionsValues("[0 1 63750]")
+			.title("TX Fastlock Delay (ns)")
+			.infoMessage("TX fastlock delay in ns")
+			.group(m_group)
+			.buildSingle();
 	layout->addWidget(txFastLockDelay, 5, 1);
 
 	connect(this, &EnsmModeClocksWidget::readRequested, this, [=, this]() {

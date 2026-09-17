@@ -22,6 +22,12 @@
 #include "firfilterqwidget.h"
 #include "pkg-manager/pkgmanager.h"
 
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributewriter.h>
+#include <component/navigation.h>
+
 #include <QFileDialog>
 #include <QLabel>
 #include <QDebug>
@@ -35,7 +41,7 @@ using namespace scopy;
 using namespace ad936x;
 Q_LOGGING_CATEGORY(CAT_FIR_FILTER, "FirFilter")
 
-FirFilterQWidget::FirFilterQWidget(iio_device *dev1, iio_device *dev2, QWidget *parent)
+FirFilterQWidget::FirFilterQWidget(component::Device *dev1, component::Device *dev2, QWidget *parent)
 	: m_dev1(dev1)
 	, m_dev2(dev2)
 	, QWidget{parent}
@@ -123,8 +129,6 @@ void FirFilterQWidget::applyFirFilter(QString path)
 		QTextStream textStream(&file);
 		auto line = textStream.readLine();
 
-		int ret = -ENOMEM;
-
 		// Skip comment lines
 		while(!textStream.atEnd()) {
 			line = textStream.readLine();
@@ -147,17 +151,15 @@ void FirFilterQWidget::applyFirFilter(QString path)
 		file.close();
 
 		// Write configuration to the device(s)
-		ret = iio_device_attr_write_raw(m_dev1, "filter_fir_config", buffer.toStdString().c_str(),
-						buffer.length());
-
-		if(m_dev2 != nullptr) {
-			int ret2 = iio_device_attr_write_raw(m_dev2, "filter_fir_config", buffer.data(), buffer.size());
-			ret = std::min(ret, ret2);
+		if(auto *a = component::attributeByName(m_dev1, "filter_fir_config"); a && a->writeCapability()) {
+			a->writeCapability()->writeAsync(buffer);
 		}
 
-		if(ret < 0) {
-			qWarning(CAT_FIR_FILTER)
-				<< "FIR Filter Configuration Failed" << QString::fromLocal8Bit(strerror(ret * (-1)));
+		if(m_dev2 != nullptr) {
+			if(auto *a = component::attributeByName(m_dev2, "filter_fir_config");
+			   a && a->writeCapability()) {
+				a->writeCapability()->writeAsync(buffer);
+			}
 		}
 	} else {
 		qWarning(CAT_FIR_FILTER) << "Unable to open file: " << path;
@@ -173,38 +175,32 @@ void FirFilterQWidget::applyFirFilter(QString path)
 
 void FirFilterQWidget::applyChannelFilterToggled(bool isTx, bool toggled)
 {
-	iio_channel *chn = iio_device_find_channel(m_dev1, "voltage0", isTx);
+	component::Channel *chn = component::channelById(m_dev1, "voltage0", isTx);
 	toggleChannelFilter(chn, "filter_fir_en", toggled);
 	if(m_dev2 != nullptr) {
-		iio_channel *chn = iio_device_find_channel(m_dev2, "voltage0", isTx);
+		component::Channel *chn = component::channelById(m_dev2, "voltage0", isTx);
 		toggleChannelFilter(chn, "filter_fir_en", toggled);
 	}
 }
 
-void FirFilterQWidget::toggleDeviceFilter(iio_device *dev, bool toggled)
+void FirFilterQWidget::toggleDeviceFilter(component::Device *dev, bool toggled)
 {
-	int ret = -ENOMEM;
 	// for FMCOMMS2 devices the attribute might be a device attr or a channel attr
-	ret = iio_device_attr_write_bool(dev, "in_out_voltage_filter_fir_en", toggled);
-
-	// if you are not able to write it as a device attr then it should be a channel attr for channel out
-	if(ret < 0) {
-		iio_channel *chn = iio_device_find_channel(dev, "out", false);
-		toggleChannelFilter(chn, "voltage_filter_fir_en", toggled);
-	} else {
+	if(auto *a = component::attributeByName(dev, "in_out_voltage_filter_fir_en"); a && a->writeCapability()) {
+		a->writeCapability()->writeAsync(toggled ? "1" : "0");
 		Q_EMIT filterChanged();
+	} else {
+		// if it is not a device attr then it should be a channel attr for channel out
+		component::Channel *chn = component::channelById(dev, "out", false);
+		toggleChannelFilter(chn, "voltage_filter_fir_en", toggled);
 	}
 }
 
-void FirFilterQWidget::toggleChannelFilter(iio_channel *chn, QString attr, bool toggled)
+void FirFilterQWidget::toggleChannelFilter(component::Channel *chn, QString attr, bool toggled)
 {
 	if(chn) {
-		int ret = -ENOMEM;
-		ret = iio_channel_attr_write_bool(chn, attr.toStdString().c_str(), toggled);
-		if(ret < 0) {
-			qWarning(CAT_FIR_FILTER) << "Failed to enable FIR filter channel: "
-						 << QString::fromLocal8Bit(strerror(ret * (-1)));
-		} else {
+		if(auto *a = component::attributeByName(chn, attr); a && a->writeCapability()) {
+			a->writeCapability()->writeAsync(toggled ? "1" : "0");
 			Q_EMIT filterChanged();
 		}
 	}
