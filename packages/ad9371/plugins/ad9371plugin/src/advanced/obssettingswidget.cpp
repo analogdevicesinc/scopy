@@ -28,13 +28,17 @@
 #include <iio-widgets/iiowidget.h>
 #include <QLoggingCategory>
 #include <style.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_OBS_SETTINGS, "AD9371_OBS_SETTINGS")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-ObsSettingsWidget::ObsSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+ObsSettingsWidget::ObsSettingsWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -153,7 +157,7 @@ QWidget *ObsSettingsWidget::createObsSettingsSection(QWidget *parent)
 
 	// #7: adi,obs-settings-sniffer-pll-lo-frequency_hz
 	// AD9375 sniffer supports 300 MHz - 6 GHz, AD9371 sniffer supports 300 MHz - 4 GHz
-	bool isAd9375 = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+	bool isAd9375 = (component::attributeByName(m_device, "adi,dpd-model-version") != nullptr);
 	QString snifferLoRange = isAd9375 ? "[300000000 1 6000000000]" : "[300000000 1 4000000000]";
 	IIOWidget *snifferLoFreq =
 		Ad9371WidgetFactory::createDebugRangeWidget(m_device, "adi,obs-settings-sniffer-pll-lo-frequency_hz",
@@ -407,9 +411,18 @@ void ObsSettingsWidget::readChannelEnableFromDevice()
 		return;
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,obs-settings-obs-rx-channels-enable", &mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to read OBS RX channels enable mask, error:" << ret;
+	bool ok = false;
+	component::Attribute *maskAttr =
+		component::attributeByName(m_device, "adi,obs-settings-obs-rx-channels-enable");
+	if(maskAttr && maskAttr->readCapability()) {
+		auto res = QCoro::waitFor(maskAttr->readCapability()->readAsync());
+		if(res) {
+			mask = maskAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
+		qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to read OBS RX channels enable mask";
 		return;
 	}
 
@@ -442,9 +455,18 @@ void ObsSettingsWidget::writeChannelEnableToDevice()
 
 	// Read-modify-write: preserve bits not managed by this UI
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,obs-settings-obs-rx-channels-enable", &mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to read mask before write, error:" << ret;
+	bool ok = false;
+	component::Attribute *maskAttr =
+		component::attributeByName(m_device, "adi,obs-settings-obs-rx-channels-enable");
+	if(maskAttr && maskAttr->readCapability()) {
+		auto res = QCoro::waitFor(maskAttr->readCapability()->readAsync());
+		if(res) {
+			mask = maskAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
+		qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to read mask before write";
 		return;
 	}
 
@@ -462,9 +484,14 @@ void ObsSettingsWidget::writeChannelEnableToDevice()
 	if(m_chEnable4->onOffswitch()->isChecked())
 		mask |= (1LL << 4);
 
-	ret = iio_device_debug_attr_write_longlong(m_device, "adi,obs-settings-obs-rx-channels-enable", mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to write OBS RX channels enable mask, error:" << ret;
+	component::Attribute *wAttr = component::attributeByName(m_device, "adi,obs-settings-obs-rx-channels-enable");
+	if(wAttr && wAttr->writeCapability()) {
+		auto wRes = QCoro::waitFor(wAttr->writeCapability()->writeAsync(QString::number(mask)));
+		if(!wRes) {
+			qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to write OBS RX channels enable mask";
+		}
+	} else {
+		qWarning(CAT_AD9371_OBS_SETTINGS) << "Failed to write OBS RX channels enable mask";
 	}
 
 	qDebug(CAT_AD9371_OBS_SETTINGS) << "Wrote OBS RX channels enable mask:" << QString("0x%1").arg(mask, 0, 16);

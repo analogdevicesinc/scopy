@@ -31,13 +31,17 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <QLoggingCategory>
 #include <style.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_GPIO, "AD9371_GPIO")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-GpioWidget::GpioWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+GpioWidget::GpioWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -237,8 +241,16 @@ void GpioWidget::readGpio3v3OeMask()
 	}
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,gpio-3v3-oe-mask", &mask);
-	if(ret < 0) {
+	bool ok = false;
+	component::Attribute *rAttr = component::attributeByName(m_device, "adi,gpio-3v3-oe-mask");
+	if(rAttr && rAttr->readCapability()) {
+		auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+		if(rRes) {
+			mask = rAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
 		qDebug(CAT_AD9371_GPIO) << "Failed to read gpio-3v3-oe-mask, using defaults";
 		mask = 0;
 	}
@@ -257,9 +269,17 @@ void GpioWidget::writeGpio3v3OeMask()
 	}
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,gpio-3v3-oe-mask", &mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_GPIO) << "Failed to read gpio-3v3-oe-mask before write, error:" << ret;
+	bool ok = false;
+	component::Attribute *rAttr = component::attributeByName(m_device, "adi,gpio-3v3-oe-mask");
+	if(rAttr && rAttr->readCapability()) {
+		auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+		if(rRes) {
+			mask = rAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
+		qWarning(CAT_AD9371_GPIO) << "Failed to read gpio-3v3-oe-mask before write";
 		return;
 	}
 
@@ -272,9 +292,14 @@ void GpioWidget::writeGpio3v3OeMask()
 		}
 	}
 
-	ret = iio_device_debug_attr_write_longlong(m_device, "adi,gpio-3v3-oe-mask", mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_GPIO) << "Failed to write gpio-3v3-oe-mask, error:" << ret;
+	component::Attribute *wAttr = component::attributeByName(m_device, "adi,gpio-3v3-oe-mask");
+	if(wAttr && wAttr->writeCapability()) {
+		auto wRes = QCoro::waitFor(wAttr->writeCapability()->writeAsync(QString::number(mask)));
+		if(!wRes) {
+			qWarning(CAT_AD9371_GPIO) << "Failed to write gpio-3v3-oe-mask";
+		}
+	} else {
+		qWarning(CAT_AD9371_GPIO) << "Failed to write gpio-3v3-oe-mask";
 	}
 }
 
@@ -285,8 +310,16 @@ void GpioWidget::readGpioOeMask()
 	}
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,gpio-oe-mask", &mask);
-	if(ret < 0) {
+	bool ok = false;
+	component::Attribute *rAttr = component::attributeByName(m_device, "adi,gpio-oe-mask");
+	if(rAttr && rAttr->readCapability()) {
+		auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+		if(rRes) {
+			mask = rAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
 		qDebug(CAT_AD9371_GPIO) << "Failed to read gpio-oe-mask, using defaults";
 		mask = 0;
 	}
@@ -305,9 +338,17 @@ void GpioWidget::writeGpioOeMask()
 	}
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,gpio-oe-mask", &mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_GPIO) << "Failed to read gpio-oe-mask before write, error:" << ret;
+	bool ok = false;
+	component::Attribute *rAttr = component::attributeByName(m_device, "adi,gpio-oe-mask");
+	if(rAttr && rAttr->readCapability()) {
+		auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+		if(rRes) {
+			mask = rAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
+		qWarning(CAT_AD9371_GPIO) << "Failed to read gpio-oe-mask before write";
 		return;
 	}
 
@@ -320,8 +361,13 @@ void GpioWidget::writeGpioOeMask()
 		}
 	}
 
-	ret = iio_device_debug_attr_write_longlong(m_device, "adi,gpio-oe-mask", mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_GPIO) << "Failed to write gpio-oe-mask, error:" << ret;
+	component::Attribute *wAttr = component::attributeByName(m_device, "adi,gpio-oe-mask");
+	if(wAttr && wAttr->writeCapability()) {
+		auto wRes = QCoro::waitFor(wAttr->writeCapability()->writeAsync(QString::number(mask)));
+		if(!wRes) {
+			qWarning(CAT_AD9371_GPIO) << "Failed to write gpio-oe-mask";
+		}
+	} else {
+		qWarning(CAT_AD9371_GPIO) << "Failed to write gpio-oe-mask";
 	}
 }
