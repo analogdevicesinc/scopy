@@ -27,6 +27,7 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <component/controller.h>
 
 namespace scopy {
 class IIOWidgetGroup;
@@ -58,6 +59,7 @@ public Q_SLOTS:
 
 private:
 	void initApi();
+	component::ContextHandle m_context;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	Ad9371 *m_ad9371Tool = nullptr;
 	Ad9371_API *m_api = nullptr;

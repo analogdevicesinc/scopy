@@ -25,13 +25,15 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QList>
-#include <iio.h>
 #include <iio-widgets/iiowidget.h>
 #include <menuonoffswitch.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
 }
+} // namespace scopy
 
 namespace scopy::ad9371 {
 
@@ -40,7 +42,7 @@ class SCOPY_AD9371PLUGIN_EXPORT ArmGpioWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ArmGpioWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit ArmGpioWidget(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~ArmGpioWidget();
 
 Q_SIGNALS:
@@ -56,7 +58,7 @@ private:
 	void readEnableAckFromDevice();
 	void writeEnableAckToDevice();
 
-	iio_device *m_device;
+	component::Device *m_device;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	QList<IIOWidget *> m_widgets;
 

@@ -30,13 +30,17 @@
 #include <gui/widgets/menucollapsesection.h>
 #include <QLoggingCategory>
 #include <style.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_CALIBRATION, "AD9371_CALIBRATION")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-CalibrationWidget::CalibrationWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+CalibrationWidget::CalibrationWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -55,7 +59,7 @@ CalibrationWidget::CalibrationWidget(iio_device *device, IIOWidgetGroup *group, 
 	}
 
 	// Detect AD9375 (has DPD support) by checking for adi,dpd-model-version debug attr
-	m_hasDpd = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+	m_hasDpd = (component::attributeByName(m_device, "adi,dpd-model-version") != nullptr);
 
 	setupUi();
 	readCalibrationMaskFromDevice();
@@ -180,8 +184,16 @@ void CalibrationWidget::readCalibrationMaskFromDevice()
 	}
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,default-initial-calibrations-mask", &mask);
-	if(ret < 0) {
+	bool ok = false;
+	component::Attribute *maskAttr = component::attributeByName(m_device, "adi,default-initial-calibrations-mask");
+	if(maskAttr && maskAttr->readCapability()) {
+		auto res = QCoro::waitFor(maskAttr->readCapability()->readAsync());
+		if(res) {
+			mask = maskAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
 		qDebug(CAT_AD9371_CALIBRATION) << "Failed to read calibration mask, using defaults (all disabled)";
 		mask = 0;
 	}
@@ -223,9 +235,17 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 
 	// Read-modify-write: preserve bits not managed by this UI
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,default-initial-calibrations-mask", &mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_CALIBRATION) << "Failed to read calibration mask before write, error:" << ret;
+	bool ok = false;
+	component::Attribute *maskAttr = component::attributeByName(m_device, "adi,default-initial-calibrations-mask");
+	if(maskAttr && maskAttr->readCapability()) {
+		auto res = QCoro::waitFor(maskAttr->readCapability()->readAsync());
+		if(res) {
+			mask = maskAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
+		qWarning(CAT_AD9371_CALIBRATION) << "Failed to read calibration mask before write";
 		return;
 	}
 
@@ -249,8 +269,13 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 
 	qDebug(CAT_AD9371_CALIBRATION) << "Writing calibration mask to device:" << QString("0x%1").arg(mask, 0, 16);
 
-	ret = iio_device_debug_attr_write_longlong(m_device, "adi,default-initial-calibrations-mask", mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_CALIBRATION) << "Failed to write calibration mask, error:" << ret;
+	component::Attribute *wAttr = component::attributeByName(m_device, "adi,default-initial-calibrations-mask");
+	if(wAttr && wAttr->writeCapability()) {
+		auto wRes = QCoro::waitFor(wAttr->writeCapability()->writeAsync(QString::number(mask)));
+		if(!wRes) {
+			qWarning(CAT_AD9371_CALIBRATION) << "Failed to write calibration mask";
+		}
+	} else {
+		qWarning(CAT_AD9371_CALIBRATION) << "Failed to write calibration mask";
 	}
 }
