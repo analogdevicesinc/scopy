@@ -33,12 +33,18 @@
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <pkg-manager/pkgmanager.h>
 
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
+
 Q_LOGGING_CATEGORY(CAT_AD9084, "AD9084");
 
 using namespace scopy;
 using namespace scopy::ad9084;
 
-Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
+Ad9084::Ad9084(component::Device *dev, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_group(group)
 	, m_device(dev)
@@ -84,7 +90,7 @@ Ad9084::Ad9084(struct iio_device *dev, IIOWidgetGroup *group, QWidget *parent)
 	Style::setStyle(m_txChain, style::properties::button::blueGrayButton);
 
 	m_deviceName = new QPushButton(this);
-	m_deviceName->setText(iio_device_get_name(m_device));
+	m_deviceName->setText(m_device->name());
 	Style::setStyle(m_deviceName, style::properties::button::basicButtonBig);
 	m_deviceName->setCheckable(false);
 	m_deviceName->setChecked(true);
@@ -186,15 +192,13 @@ Ad9084::~Ad9084()
 
 void Ad9084::scanChannels()
 {
-	unsigned int nbChannels = iio_device_get_channels_count(m_device);
-	for(unsigned int i = 0; i < nbChannels; i++) {
-		struct iio_channel *chn = iio_device_get_channel(m_device, i);
+	const auto channels = m_device->findChildren<component::Channel *>(QString(), Qt::FindDirectChildrenOnly);
+	for(component::Channel *chn : channels) {
 		if(!chn) {
 			continue;
 		}
 
-		auto attr = iio_channel_find_attr(chn, "label");
-		if(!attr) {
+		if(!component::attributeByName(chn, "label")) {
 			continue;
 		}
 		extractChannelPaths(chn);
@@ -205,7 +209,7 @@ void Ad9084::scanChannels()
 	m_iioWidgetGroups.push_back(adcFrequencyGrp);
 	for(unsigned int i = 0; i < m_rx_coarse_ddc_channel_names.size(); i++) {
 		QString chn = m_rx_coarse_ddc_channel_names.at(i);
-		struct iio_channel *rxchn = iio_device_find_channel(m_device, chn.toUtf8(), false);
+		component::Channel *rxchn = component::channelById(m_device, chn, false);
 		if(rxchn == nullptr) {
 			qWarning(CAT_AD9084) << "RX channel not found:" << chn;
 			continue;
@@ -221,7 +225,7 @@ void Ad9084::scanChannels()
 	m_iioWidgetGroups.push_back(dacFrequencyGrp);
 	for(unsigned int i = 0; i < m_tx_coarse_duc_channel_names.size(); i++) {
 		QString chn = m_tx_coarse_duc_channel_names.at(i);
-		struct iio_channel *txchn = iio_device_find_channel(m_device, chn.toUtf8(), true);
+		component::Channel *txchn = component::channelById(m_device, chn, true);
 		if(txchn == nullptr) {
 			qWarning(CAT_AD9084) << "TX channel not found:" << chn;
 			continue;
@@ -268,13 +272,15 @@ void Ad9084::mapPathsUnique()
 	}
 }
 
-bool Ad9084::extractChannelPaths(struct iio_channel *chn)
+bool Ad9084::extractChannelPaths(component::Channel *chn)
 {
-	size_t labelSize = 1024;
-	char buf[labelSize];
-	iio_channel_attr_read(chn, "label", buf, labelSize);
-	QString label(buf);
-	QString chnId = iio_channel_get_id(chn);
+	QString label;
+	component::Attribute *labelAttr = component::attributeByName(chn, "label");
+	if(labelAttr && labelAttr->readCapability()) {
+		QCoro::waitFor(labelAttr->readCapability()->readAsync());
+		label = labelAttr->cachedValue();
+	}
+	QString chnId = chn->id();
 
 	if(!label.contains("->")) {
 		return false;
@@ -379,9 +385,12 @@ void Ad9084::loadCfir(QString path)
 		return;
 	}
 	QString content = readFile(path);
-	size_t ret = iio_device_attr_write_raw(m_device, "cfir_config", content.toStdString().c_str(), content.size());
-	if(ret < 0)
+	component::Attribute *attr = component::attributeByName(m_device, "cfir_config");
+	if(!attr || !attr->writeCapability()) {
 		qDebug(CAT_AD9084) << "Failed to load CFIR CONFIG file to CFIR_CONFIG attr";
+		return;
+	}
+	QCoro::waitFor(attr->writeCapability()->writeAsync(content));
 }
 
 void Ad9084::loadPfir(QString path)
@@ -391,7 +400,10 @@ void Ad9084::loadPfir(QString path)
 		return;
 	}
 	QString content = readFile(path);
-	size_t ret = iio_device_attr_write_raw(m_device, "pfilt_config", content.toStdString().c_str(), content.size());
-	if(ret < 0)
+	component::Attribute *attr = component::attributeByName(m_device, "pfilt_config");
+	if(!attr || !attr->writeCapability()) {
 		qDebug(CAT_AD9084) << "Failed to load PFIR CONFIG file to PFILT_CONFIG attr";
+		return;
+	}
+	QCoro::waitFor(attr->writeCapability()->writeAsync(content));
 }

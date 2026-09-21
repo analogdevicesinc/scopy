@@ -25,10 +25,15 @@
 #include <iiowidget.h>
 #include <iiowidgetsyncgroup.h>
 #include <QWidget>
-#include <iio.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+
+namespace component {
+class Channel;
+class Device;
+} // namespace component
+
 namespace ad9084 {
 
 enum SharedAttrCategory
@@ -41,7 +46,7 @@ class SCOPY_AD9084_EXPORT Ad9084Channel : public QWidget
 {
 	Q_OBJECT
 public:
-	Ad9084Channel(struct iio_channel *chn, unsigned int chnIdx, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
+	Ad9084Channel(component::Channel *chn, unsigned int chnIdx, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~Ad9084Channel();
 
 	bool isInput() const;
@@ -70,8 +75,8 @@ private:
 
 private:
 	IIOWidgetGroup *m_group;
-	struct iio_channel *m_channel;
-	struct iio_device *m_device;
+	component::Channel *m_channel;
+	component::Device *m_device;
 	QString m_channelLabel;
 	QLabel *m_titleLbl;
 	bool m_input;
