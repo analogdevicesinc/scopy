@@ -23,6 +23,7 @@
 #include "cn0540plugin.h"
 
 #include <QLoggingCategory>
+#include <qcorotask.h>
 #include <iio-widgets/iiowidget.h>
 #include <pluginbase/toolmenuentry.h>
 
@@ -72,7 +73,7 @@ QString CN0540_API::getSwFF()
 		qWarning(CAT_CN0540_API) << "SW_FF GPIO channel not available";
 		return QString();
 	}
-	return tool->getGpioState(tool->m_gpioSwFF) ? "HIGH" : "LOW";
+	return QCoro::waitFor(tool->getGpioState(tool->m_gpioSwFF)) ? "HIGH" : "LOW";
 }
 
 QString CN0540_API::getShutdown()
@@ -83,7 +84,7 @@ QString CN0540_API::getShutdown()
 		return QString();
 	}
 	// Active-low: GPIO LOW = operating (enabled), GPIO HIGH = shutdown
-	bool operating = !tool->getGpioState(tool->m_gpioShutdown);
+	bool operating = !QCoro::waitFor(tool->getGpioState(tool->m_gpioShutdown));
 	return operating ? "true" : "false";
 }
 
@@ -96,7 +97,7 @@ void CN0540_API::setShutdown(const QString &enabled)
 	}
 	bool operating = (enabled == "true" || enabled == "1");
 	// Active-low: to operate (enabled=true), write GPIO LOW (false)
-	tool->setGpioState(tool->m_gpioShutdown, !operating);
+	QCoro::waitFor(tool->setGpioState(tool->m_gpioShutdown, !operating));
 }
 
 QString CN0540_API::getConstantCurrent()
@@ -106,7 +107,7 @@ QString CN0540_API::getConstantCurrent()
 		qWarning(CAT_CN0540_API) << "Constant current GPIO channel not available";
 		return QString();
 	}
-	return tool->getGpioState(tool->m_gpioCC) ? "true" : "false";
+	return QCoro::waitFor(tool->getGpioState(tool->m_gpioCC)) ? "true" : "false";
 }
 
 void CN0540_API::setConstantCurrent(const QString &enabled)
@@ -116,7 +117,7 @@ void CN0540_API::setConstantCurrent(const QString &enabled)
 		qWarning(CAT_CN0540_API) << "Constant current GPIO channel not available";
 		return;
 	}
-	tool->setGpioState(tool->m_gpioCC, enabled == "true" || enabled == "1");
+	QCoro::waitFor(tool->setGpioState(tool->m_gpioCC, enabled == "true" || enabled == "1"));
 }
 
 // --- ADC Driver Settings ---
@@ -129,7 +130,7 @@ QString CN0540_API::getFdaEnabled()
 		return QString();
 	}
 	// Active-low: GPIO LOW = FDA enabled, GPIO HIGH = FDA disabled
-	bool enabled = !tool->getGpioState(tool->m_gpioFdaDis);
+	bool enabled = !QCoro::waitFor(tool->getGpioState(tool->m_gpioFdaDis));
 	return enabled ? "true" : "false";
 }
 
@@ -142,7 +143,7 @@ void CN0540_API::setFdaEnabled(const QString &enabled)
 	}
 	bool enable = (enabled == "true" || enabled == "1");
 	// Active-low: to enable FDA (true), write GPIO LOW (false)
-	tool->setGpioState(tool->m_gpioFdaDis, !enable);
+	QCoro::waitFor(tool->setGpioState(tool->m_gpioFdaDis, !enable));
 }
 
 QString CN0540_API::getFdaMode()
@@ -152,7 +153,7 @@ QString CN0540_API::getFdaMode()
 		qWarning(CAT_CN0540_API) << "FDA_MODE GPIO channel not available";
 		return QString();
 	}
-	return tool->getGpioState(tool->m_gpioFdaMode) ? "FULL POWER" : "LOW POWER";
+	return QCoro::waitFor(tool->getGpioState(tool->m_gpioFdaMode)) ? "FULL POWER" : "LOW POWER";
 }
 
 void CN0540_API::setFdaMode(const QString &mode)
@@ -167,7 +168,7 @@ void CN0540_API::setFdaMode(const QString &mode)
 		qWarning(CAT_CN0540_API) << "Invalid FDA mode:" << mode << "Valid options:" << options;
 		return;
 	}
-	tool->setGpioState(tool->m_gpioFdaMode, mode == "FULL POWER");
+	QCoro::waitFor(tool->setGpioState(tool->m_gpioFdaMode, mode == "FULL POWER"));
 }
 
 // --- Sensor Calibration ---
@@ -179,7 +180,7 @@ QString CN0540_API::getInputVoltage()
 		qWarning(CAT_CN0540_API) << "ADC channel not available";
 		return QString();
 	}
-	return QString::number(tool->getVoltage(tool->m_adcCh), 'f', 4);
+	return QString::number(QCoro::waitFor(tool->getVoltage(tool->m_adcCh)), 'f', 4);
 }
 
 QString CN0540_API::getShiftVoltage()
@@ -189,7 +190,7 @@ QString CN0540_API::getShiftVoltage()
 		qWarning(CAT_CN0540_API) << "DAC channel not available";
 		return QString();
 	}
-	return QString::number(tool->getVshiftMv(), 'f', 4);
+	return QString::number(QCoro::waitFor(tool->getVshiftMv()), 'f', 4);
 }
 
 void CN0540_API::setShiftVoltage(const QString &mV)
@@ -207,7 +208,7 @@ void CN0540_API::setShiftVoltage(const QString &mV)
 	}
 	// The UI displays DAC voltage * DAC_BUF_GAIN; to set that displayed value,
 	// write the raw DAC voltage = vshiftMv / DAC_BUF_GAIN
-	tool->setVoltage(tool->m_dacCh, vshiftMv / CN0540::DAC_BUF_GAIN);
+	QCoro::waitFor(tool->setVoltage(tool->m_dacCh, vshiftMv / CN0540::DAC_BUF_GAIN));
 }
 
 QString CN0540_API::getSensorVoltage()
@@ -217,7 +218,7 @@ QString CN0540_API::getSensorVoltage()
 		qWarning(CAT_CN0540_API) << "ADC or DAC channel not available";
 		return QString();
 	}
-	tool->onReadVsensor();
+	QCoro::waitFor(tool->onReadVsensor());
 	return tool->m_sensorVoltageLabel ? tool->m_sensorVoltageLabel->text() : QString();
 }
 
