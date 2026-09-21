@@ -22,10 +22,16 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iio-widgets/datastrategy/channelattrdatastrategy.h>
+#include <iio-widgets/datastrategy/componentattrdatastrategy.h>
 #include <style.h>
 #include <QLabel>
 #include <QVBoxLayout>
+
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9084CHANNEL, "AD9084Channel");
 
@@ -38,7 +44,7 @@ using namespace scopy::ad9084;
 #define PHASE_RANGE "[-180 1 180]"
 #define SCALE_RANGE "[0.0 0.01 1.0]"
 
-Ad9084Channel::Ad9084Channel(iio_channel *chn, unsigned int chnIdx, IIOWidgetGroup *group, QWidget *parent)
+Ad9084Channel::Ad9084Channel(component::Channel *chn, unsigned int chnIdx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_group(group)
 	, m_channel(chn)
@@ -52,11 +58,13 @@ Ad9084Channel::Ad9084Channel(iio_channel *chn, unsigned int chnIdx, IIOWidgetGro
 	lay->setSpacing(0);
 	this->setLayout(lay);
 
-	m_device = const_cast<iio_device *>(iio_channel_get_device(m_channel));
-	m_input = !iio_channel_is_output(m_channel);
-	char *label = new char[MAX_ATTR_SIZE];
-	iio_channel_attr_read(m_channel, "label", label, MAX_ATTR_SIZE);
-	m_channelLabel = QString(label);
+	m_device = qobject_cast<component::Device *>(m_channel->parent());
+	m_input = !m_channel->isOutput();
+	component::Attribute *labelAttr = component::attributeByName(m_channel, "label");
+	if(labelAttr && labelAttr->readCapability()) {
+		QCoro::waitFor(labelAttr->readCapability()->readAsync());
+		m_channelLabel = labelAttr->cachedValue();
+	}
 	Style::setBackgroundColor(this, json::theme::background_primary);
 
 	connect(this, &Ad9084Channel::requestEnableUi, this, [this](bool en) {
@@ -80,8 +88,7 @@ void Ad9084Channel::setupFrequency()
 {
 	if(m_input) {
 		m_frequencyWidget = IIOWidgetBuilder(this)
-					    .channel(m_channel)
-					    .attribute("adc_frequency")
+					    .attribute(component::attributeByName(m_channel, "adc_frequency"))
 					    .uiStrategy(IIOWidgetBuilder::EditableUi)
 					    .title("ADC Frequency (MHz)")
 					    .parent(this)
@@ -90,8 +97,7 @@ void Ad9084Channel::setupFrequency()
 		m_iioWidgetGroupList.value(ADC_FREQUENCY)->add(m_frequencyWidget);
 	} else {
 		m_frequencyWidget = IIOWidgetBuilder(this)
-					    .channel(m_channel)
-					    .attribute("dac_frequency")
+					    .attribute(component::attributeByName(m_channel, "dac_frequency"))
 					    .uiStrategy(IIOWidgetBuilder::EditableUi)
 					    .title("DAC Frequency (MHz)")
 					    .parent(this)
@@ -110,10 +116,8 @@ void Ad9084Channel::setupFrequency()
 void Ad9084Channel::setupChannelNco(QLayout *lay)
 {
 	auto chnNcoFreq = IIOWidgetBuilder(this)
-				  .channel(m_channel)
-				  .attribute("channel_nco_frequency")
+				  .attribute(component::attributeByName(m_channel, "channel_nco_frequency"))
 				  .uiStrategy(IIOWidgetBuilder::RangeUi)
-				  .optionsAttribute("channel_nco_frequency_available")
 				  .title("NCO Frequency (MHz)")
 				  .parent(this)
 				  .group(m_group)
@@ -122,8 +126,7 @@ void Ad9084Channel::setupChannelNco(QLayout *lay)
 	chnNcoFreq->setDataToUIConversion(std::bind(&Ad9084Channel::frequencyDStoUI, this, std::placeholders::_1));
 
 	auto chnNcoPhase = IIOWidgetBuilder(this)
-				   .channel(m_channel)
-				   .attribute("channel_nco_phase")
+				   .attribute(component::attributeByName(m_channel, "channel_nco_phase"))
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
 				   .optionsValues(PHASE_RANGE)
 				   .title("NCO Phase")
@@ -143,10 +146,8 @@ void Ad9084Channel::setupChannelNco(QLayout *lay)
 void Ad9084Channel::setupMainNco(QLayout *lay)
 {
 	auto mainNcoFreq = IIOWidgetBuilder(this)
-				   .channel(m_channel)
-				   .attribute("main_nco_frequency")
+				   .attribute(component::attributeByName(m_channel, "main_nco_frequency"))
 				   .uiStrategy(IIOWidgetBuilder::RangeUi)
-				   .optionsAttribute("main_nco_frequency_available")
 				   .title("Main NCO Frequency")
 				   .parent(this)
 				   .group(m_group)
@@ -155,8 +156,7 @@ void Ad9084Channel::setupMainNco(QLayout *lay)
 	mainNcoFreq->setDataToUIConversion(std::bind(&Ad9084Channel::frequencyDStoUI, this, std::placeholders::_1));
 
 	auto mainNcoPhase = IIOWidgetBuilder(this)
-				    .channel(m_channel)
-				    .attribute("main_nco_phase")
+				    .attribute(component::attributeByName(m_channel, "main_nco_phase"))
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
 				    .optionsValues(PHASE_RANGE)
 				    .title("Main NCO Phase")
@@ -176,30 +176,24 @@ void Ad9084Channel::setupMainNco(QLayout *lay)
 void Ad9084Channel::setupInChannelsAttrs(QLayout *lay)
 {
 	auto testMode = IIOWidgetBuilder(this)
-				.channel(m_channel)
-				.attribute("test_mode")
+				.attribute(component::attributeByName(m_channel, "test_mode"))
 				.uiStrategy(IIOWidgetBuilder::ComboUi)
-				.optionsAttribute("test_mode_available")
 				.title("Test Mode")
 				.parent(this)
 				.group(m_group)
 				.buildSingle();
 
 	auto nyquistZone = IIOWidgetBuilder(this)
-				   .channel(m_channel)
-				   .attribute("nyquist_zone")
+				   .attribute(component::attributeByName(m_channel, "nyquist_zone"))
 				   .uiStrategy(IIOWidgetBuilder::ComboUi)
-				   .optionsAttribute("nyquist_zone_available")
 				   .title("Nyquist Zone")
 				   .parent(this)
 				   .group(m_group)
 				   .buildSingle();
 
 	auto loopback = IIOWidgetBuilder(this)
-				.channel(m_channel)
-				.attribute("loopback")
+				.attribute(component::attributeByName(m_channel, "loopback"))
 				.uiStrategy(IIOWidgetBuilder::ComboUi)
-				.optionsAttribute("loopback_available")
 				.title("Loopback Mode")
 				.parent(this)
 				.group(m_group)
@@ -217,8 +211,7 @@ void Ad9084Channel::setupInChannelsAttrs(QLayout *lay)
 void Ad9084Channel::setupChannelTone(QLayout *lay)
 {
 	auto chnNcoGainScale = IIOWidgetBuilder(this)
-				       .channel(m_channel)
-				       .attribute("channel_nco_gain_scale")
+				       .attribute(component::attributeByName(m_channel, "channel_nco_gain_scale"))
 				       .uiStrategy(IIOWidgetBuilder::RangeUi)
 				       .optionsValues(SCALE_RANGE)
 				       .title("Gain Scale")
@@ -227,8 +220,7 @@ void Ad9084Channel::setupChannelTone(QLayout *lay)
 				       .buildSingle();
 
 	auto testToneScale = IIOWidgetBuilder(this)
-				     .channel(m_channel)
-				     .attribute("channel_nco_test_tone_scale")
+				     .attribute(component::attributeByName(m_channel, "channel_nco_test_tone_scale"))
 				     .uiStrategy(IIOWidgetBuilder::RangeUi)
 				     .optionsValues(SCALE_RANGE)
 				     .title("Test Tone Scale")
@@ -237,8 +229,7 @@ void Ad9084Channel::setupChannelTone(QLayout *lay)
 				     .buildSingle();
 
 	auto chnNcoTestToneEn = IIOWidgetBuilder(this)
-					.channel(m_channel)
-					.attribute("channel_nco_test_tone_en")
+					.attribute(component::attributeByName(m_channel, "channel_nco_test_tone_en"))
 					.uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					.title("Test Tone Enable")
 					.parent(this)
@@ -258,8 +249,7 @@ void Ad9084Channel::setupChannelTone(QLayout *lay)
 void Ad9084Channel::setupMainTone(QLayout *lay)
 {
 	auto mainTestToneScale = IIOWidgetBuilder(this)
-					 .channel(m_channel)
-					 .attribute("main_nco_test_tone_scale")
+					 .attribute(component::attributeByName(m_channel, "main_nco_test_tone_scale"))
 					 .uiStrategy(IIOWidgetBuilder::RangeUi)
 					 .optionsValues(SCALE_RANGE)
 					 .title("Main Test Tone Scale")
@@ -268,8 +258,7 @@ void Ad9084Channel::setupMainTone(QLayout *lay)
 					 .buildSingle();
 
 	auto mainTestToneEn = IIOWidgetBuilder(this)
-				      .channel(m_channel)
-				      .attribute("main_nco_test_tone_en")
+				      .attribute(component::attributeByName(m_channel, "main_nco_test_tone_en"))
 				      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				      .title("Test Tone Enable")
 				      .parent(this)
@@ -290,7 +279,7 @@ void Ad9084Channel::init()
 	Style::setStyle(m_chnSection, style::properties::widget::border_interactive);
 
 	// Setup channel name and label
-	QString chnId = QString(iio_channel_get_id(m_channel));
+	QString chnId = m_channel->id();
 	chnId = chnId.remove("voltage");
 	QString title = QString("Channel %1 [ %2 ]").arg(QString::number(m_chnIdx), m_channelLabel);
 	m_titleLbl = new QLabel(title);
@@ -308,8 +297,7 @@ void Ad9084Channel::init()
 	cfirLay->setContentsMargins(0, 0, 0, 0);
 
 	m_iioWidgets.push_back(IIOWidgetBuilder(this)
-				       .channel(m_channel)
-				       .attribute("cfir_en")
+				       .attribute(component::attributeByName(m_channel, "cfir_en"))
 				       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				       .title("CFIR Enable")
 				       .parent(this)
@@ -320,8 +308,7 @@ void Ad9084Channel::init()
 	cfirLay->addWidget(m_iioWidgets.last());
 
 	m_iioWidgets.push_back(IIOWidgetBuilder(this)
-				       .channel(m_channel)
-				       .attribute("cfir_profile_sel")
+				       .attribute(component::attributeByName(m_channel, "cfir_profile_sel"))
 				       .uiStrategy(IIOWidgetBuilder::ComboUi)
 				       .optionsValues("1 2")
 				       .title("CFIR Profile")
@@ -331,8 +318,7 @@ void Ad9084Channel::init()
 	cfirLay->addWidget(m_iioWidgets.last());
 
 	m_iioWidgets.push_back(IIOWidgetBuilder(this)
-				       .channel(m_channel)
-				       .attribute("en")
+				       .attribute(component::attributeByName(m_channel, "en"))
 				       .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				       .compactMode(true)
 				       .title("")
@@ -341,8 +327,8 @@ void Ad9084Channel::init()
 				       .buildSingle());
 	m_iioWidgets.last()->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	m_iioWidgets.last()->showProgressBar(false);
-	connect(dynamic_cast<ChannelAttrDataStrategy *>(m_iioWidgets.last()->getDataStrategy()),
-		&ChannelAttrDataStrategy::emitStatus, this,
+	connect(dynamic_cast<ComponentAttrDataStrategy *>(m_iioWidgets.last()->getDataStrategy()),
+		&ComponentAttrDataStrategy::emitStatus, this,
 		[this](QDateTime timestamp, QString oldData, QString newData, int retCode, bool readOp) {
 			if(retCode < 0) {
 				return;
