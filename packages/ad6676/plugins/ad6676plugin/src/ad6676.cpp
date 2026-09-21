@@ -33,12 +33,18 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/menuspinbox.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 Q_LOGGING_CATEGORY(CAT_AD6676, "AD6676")
 
 using namespace scopy::ad6676;
 using namespace scopy;
 
-Ad6676::Ad6676(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Ad6676::Ad6676(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -53,12 +59,11 @@ Ad6676::~Ad6676() {}
 // Widget helper methods
 // ---------------------------------------------------------------------------
 
-IIOWidget *Ad6676::createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title)
+IIOWidget *Ad6676::createRangeWidget(component::Channel *ch, const QString &attr, const QString &range,
+				     const QString &title)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_dev)
-				    .channel(ch)
-				    .attribute(attr)
+				    .attribute(component::attributeByName(ch, attr))
 				    .optionsValues(range)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
@@ -71,14 +76,14 @@ IIOWidget *Ad6676::createRangeWidget(iio_channel *ch, const QString &attr, const
 	return widget;
 }
 
-IIOWidget *Ad6676::createComboWidget(iio_channel *ch, const QString &attr, const QString &availableAttr,
+IIOWidget *Ad6676::createComboWidget(component::Channel *ch, const QString &attr, const QString &availableAttr,
 				     const QString &title)
 {
+	// options are derived from the component::Attribute metadata (populated from
+	// the "<attr>_available" companion); optionsAttribute is a no-op on this path.
+	Q_UNUSED(availableAttr)
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_dev)
-				    .channel(ch)
-				    .attribute(attr)
-				    .optionsAttribute(availableAttr)
+				    .attribute(component::attributeByName(ch, attr))
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .group(m_group)
@@ -90,12 +95,10 @@ IIOWidget *Ad6676::createComboWidget(iio_channel *ch, const QString &attr, const
 	return widget;
 }
 
-IIOWidget *Ad6676::createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title)
+IIOWidget *Ad6676::createReadOnlyWidget(component::Channel *ch, const QString &attr, const QString &title)
 {
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_dev)
-				    .channel(ch)
-				    .attribute(attr)
+				    .attribute(component::attributeByName(ch, attr))
 				    .title(title)
 				    .compactMode(true)
 				    .group(m_group)
@@ -134,14 +137,14 @@ void Ad6676::setupUi()
 	}
 
 	// Find the single IIO device: "axi-ad6676-hpc"
-	m_dev = iio_context_find_device(m_ctx, "axi-ad6676-hpc");
+	m_dev = m_ctx->findChild<component::Device *>("axi-ad6676-hpc", Qt::FindDirectChildrenOnly);
 	if(!m_dev) {
 		qWarning(CAT_AD6676) << "Device axi-ad6676-hpc not found";
 		return;
 	}
 
 	// All attributes use voltage0 (input, false)
-	m_chn = iio_device_find_channel(m_dev, "voltage0", false);
+	m_chn = component::channelById(m_dev, "voltage0", false);
 	if(!m_chn) {
 		qWarning(CAT_AD6676) << "Channel voltage0 not found";
 		return;
