@@ -21,17 +21,22 @@
 #include "cn0357widgetfactory.h"
 
 #include <iio-widgets/iiowidgetbuilder.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace scopy::cn0357;
 
-IIOWidget *Cn0357WidgetFactory::createComboWidget(iio_device *device, QString attr, QString availableAttr,
+IIOWidget *Cn0357WidgetFactory::createComboWidget(component::Device *device, QString attr, QString availableAttr,
 						  QString title, IIOWidgetGroup *group, QWidget *parent)
 {
+	// options are derived from the component::Attribute metadata (populated from
+	// the "<attr>_available" companion); availableAttr is kept for documentation.
+	Q_UNUSED(availableAttr)
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
-				    .optionsAttribute(availableAttr)
+				    .attribute(component::attributeByName(device, attr))
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .buildSingle();
@@ -40,41 +45,29 @@ IIOWidget *Cn0357WidgetFactory::createComboWidget(iio_device *device, QString at
 	return widget;
 }
 
-IIOWidget *Cn0357WidgetFactory::createAdcReadOnlyWidget(iio_device *device, iio_channel *channel, QString attr,
-							QString title, double factor, IIOWidgetGroup *group,
-							QWidget *parent)
+IIOWidget *Cn0357WidgetFactory::createAdcReadOnlyWidget(component::Channel *channel, QString attr, QString title,
+							double factor, IIOWidgetGroup *group, QWidget *parent)
 {
-	IIOWidget *widget = nullptr;
+	if(!channel)
+		return nullptr;
 
-	if(channel) {
-		// Formula: (raw / 32768.0 - 1) * factor
-		// factor = 1200.0 for gas sensor input → mV
-		// factor = 5.85  for power supply channel → V
-		widget = IIOWidgetBuilder(parent).channel(channel).attribute(attr).title(title).buildSingle();
-		if(widget) {
-			widget->setEnabled(false);
-			widget->showProgressBar(false);
-			widget->setDataToUIConversion([factor](QString data) -> QString {
-				bool ok;
-				double raw = data.toDouble(&ok);
-				if(!ok)
-					return data;
-				return QString::number((raw / 32768.0 - 1.0) * factor, 'f', 3);
-			});
-		}
-	} else {
-		// Channel not found — use device to satisfy builder guards, then disable
-		widget = IIOWidgetBuilder(parent)
-				 .device(device)
-				 .attribute(attr)
-				 .title(title)
-				 .uiStrategy(IIOWidgetBuilder::EditableUi)
-				 .infoMessage("the " + attr + " is not available")
-				 .buildSingle();
-		if(widget) {
-			widget->setEnabled(false);
-			widget->showProgressBar(false);
-		}
+	// Formula: (raw / 32768.0 - 1) * factor
+	// factor = 1200.0 for gas sensor input → mV
+	// factor = 5.85  for power supply channel → V
+	IIOWidget *widget = IIOWidgetBuilder(parent)
+				    .attribute(component::attributeByName(channel, attr))
+				    .title(title)
+				    .buildSingle();
+	if(widget) {
+		widget->setEnabled(false);
+		widget->showProgressBar(false);
+		widget->setDataToUIConversion([factor](QString data) -> QString {
+			bool ok;
+			double raw = data.toDouble(&ok);
+			if(!ok)
+				return data;
+			return QString::number((raw / 32768.0 - 1.0) * factor, 'f', 3);
+		});
 	}
 
 	if(group && widget)
