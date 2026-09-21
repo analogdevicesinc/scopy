@@ -32,12 +32,19 @@
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <style.h>
+#include <qcorotask.h>
+
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 Q_LOGGING_CATEGORY(CAT_DAQ2TOOL, "DAQ2Tool")
 using namespace scopy;
 using namespace scopy::daq2;
 
-DAQ2::DAQ2(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+DAQ2::DAQ2(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -94,9 +101,10 @@ DAQ2::~DAQ2() {}
 
 QWidget *DAQ2::buildAdcSection()
 {
-	iio_device *adc = iio_context_find_device(m_ctx, "axi-ad9680-hpc");
-	iio_channel *ch0 = adc ? iio_device_find_channel(adc, "voltage0", false) : nullptr;
-	iio_channel *ch1 = adc ? iio_device_find_channel(adc, "voltage1", false) : nullptr;
+	component::Device *adc =
+		m_ctx ? m_ctx->findChild<component::Device *>("axi-ad9680-hpc", Qt::FindDirectChildrenOnly) : nullptr;
+	component::Channel *ch0 = adc ? component::channelById(adc, "voltage0", false) : nullptr;
+	component::Channel *ch1 = adc ? component::channelById(adc, "voltage1", false) : nullptr;
 
 	QWidget *section = new QWidget(this);
 	Style::setBackgroundColor(section, json::theme::background_primary);
@@ -116,9 +124,12 @@ QWidget *DAQ2::buildAdcSection()
 	freqLayout->addWidget(new QLabel("Sampling frequency:", freqRow));
 	QLabel *adcFreqLabel = new QLabel("N/A", freqRow);
 	if(ch0) {
-		long long val = 0;
-		if(iio_channel_attr_read_longlong(ch0, "sampling_frequency", &val) == 0)
-			adcFreqLabel->setText(QString::number(val / 1e6, 'f', 3) + " MHz");
+		component::Attribute *freqAttr = component::attributeByName(ch0, "sampling_frequency");
+		if(freqAttr && freqAttr->readCapability()) {
+			QCoro::waitFor(freqAttr->readCapability()->readAsync());
+			adcFreqLabel->setText(QString::number(freqAttr->cachedValue().toLongLong() / 1e6, 'f', 3) +
+					      " MHz");
+		}
 	}
 	freqLayout->addWidget(adcFreqLabel);
 	freqLayout->addStretch();
@@ -127,9 +138,7 @@ QWidget *DAQ2::buildAdcSection()
 	// Ch0 test_mode combo
 	if(ch0) {
 		IIOWidget *ch0TestMode = IIOWidgetBuilder(section)
-						 .channel(ch0)
-						 .attribute("test_mode")
-						 .optionsAttribute("test_mode_available")
+						 .attribute(component::attributeByName(ch0, "test_mode"))
 						 .title("Ch0 Test Mode")
 						 .uiStrategy(IIOWidgetBuilder::ComboUi)
 						 .group(m_group)
@@ -141,9 +150,7 @@ QWidget *DAQ2::buildAdcSection()
 	// Ch1 test_mode combo
 	if(ch1) {
 		IIOWidget *ch1TestMode = IIOWidgetBuilder(section)
-						 .channel(ch1)
-						 .attribute("test_mode")
-						 .optionsAttribute("test_mode_available")
+						 .attribute(component::attributeByName(ch1, "test_mode"))
 						 .title("Ch1 Test Mode")
 						 .uiStrategy(IIOWidgetBuilder::ComboUi)
 						 .group(m_group)
@@ -157,8 +164,9 @@ QWidget *DAQ2::buildAdcSection()
 
 QWidget *DAQ2::buildDacSection()
 {
-	iio_device *dac = iio_context_find_device(m_ctx, "axi-ad9144-hpc");
-	iio_channel *alt0 = dac ? iio_device_find_channel(dac, "altvoltage0", true) : nullptr;
+	component::Device *dac =
+		m_ctx ? m_ctx->findChild<component::Device *>("axi-ad9144-hpc", Qt::FindDirectChildrenOnly) : nullptr;
+	component::Channel *alt0 = dac ? component::channelById(dac, "altvoltage0", true) : nullptr;
 
 	QWidget *section = new QWidget(this);
 	Style::setBackgroundColor(section, json::theme::background_primary);
@@ -178,9 +186,12 @@ QWidget *DAQ2::buildDacSection()
 	freqLayout->addWidget(new QLabel("Sampling frequency:", freqRow));
 	QLabel *dacFreqLabel = new QLabel("N/A", freqRow);
 	if(alt0) {
-		long long val = 0;
-		if(iio_channel_attr_read_longlong(alt0, "sampling_frequency", &val) == 0)
-			dacFreqLabel->setText(QString::number(val / 1e6, 'f', 3) + " MHz");
+		component::Attribute *freqAttr = component::attributeByName(alt0, "sampling_frequency");
+		if(freqAttr && freqAttr->readCapability()) {
+			QCoro::waitFor(freqAttr->readCapability()->readAsync());
+			dacFreqLabel->setText(QString::number(freqAttr->cachedValue().toLongLong() / 1e6, 'f', 3) +
+					      " MHz");
+		}
 	}
 	freqLayout->addWidget(dacFreqLabel);
 	freqLayout->addStretch();
