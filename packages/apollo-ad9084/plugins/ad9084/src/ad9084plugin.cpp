@@ -25,12 +25,15 @@
 
 #include <style.h>
 #include <gui/deviceiconbuilder.h>
-#include <iioutil/connectionprovider.h>
 
 #include "ad9084.h"
 #include "ad9084_api.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/scopyjs.h>
+
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9084PLUGIN, "AD9084Plugin")
 using namespace scopy::ad9084;
@@ -40,22 +43,21 @@ bool AD9084Plugin::compatible(QString m_param, QString category)
 	// This function defines the characteristics according to which the
 	// plugin is compatible with a specific device
 	bool ret = false;
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qDebug(CAT_AD9084PLUGIN) << "The context is not compatible with the AD9084 Plugin!";
 		return ret;
 	}
 
-	iio_device *apolloDevice = iio_context_find_device(conn->context(), "axi-ad9084-rx-hpc");
+	component::Device *apolloDevice =
+		ctx->findChild<component::Device *>("axi-ad9084-rx-hpc", Qt::FindDirectChildrenOnly);
 	if(!apolloDevice) {
-		apolloDevice = iio_context_find_device(conn->context(), "axi-ad9088-rx-hpc");
+		apolloDevice = ctx->findChild<component::Device *>("axi-ad9088-rx-hpc", Qt::FindDirectChildrenOnly);
 	}
 
 	if(apolloDevice) {
 		ret = true;
 	}
-	cp->close(m_param);
 	return ret;
 }
 
@@ -92,25 +94,23 @@ QString AD9084Plugin::description() { return "Tool for Apollo MxFE interaction."
 bool AD9084Plugin::onConnect()
 {
 	int deviceIdx = 1;
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		return false;
 	}
 
-	m_ctx = conn->context();
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	struct iio_device *dev = iio_context_find_device(conn->context(), "axi-ad9084-rx-hpc");
+	component::Device *dev =
+		m_context->findChild<component::Device *>("axi-ad9084-rx-hpc", Qt::FindDirectChildrenOnly);
 	m_toolList.last()->setTool(new Ad9084(dev, m_widgetGroup));
 	m_toolList.last()->setEnabled(true);
 	m_toolList.last()->setRunBtnVisible(true);
 
-	unsigned int devCount = iio_context_get_devices_count(conn->context());
-	for(unsigned int i = 0; i < devCount; i++) {
+	const auto devices = m_context->findChildren<component::Device *>(QString(), Qt::FindDirectChildrenOnly);
+	for(component::Device *rxDev : devices) {
 		bool newTool = false;
 		QString toolName = "";
-		struct iio_device *rxDev = iio_context_get_device(conn->context(), i);
 		if(!rxDev) {
 			continue;
 		}
@@ -118,7 +118,7 @@ bool AD9084Plugin::onConnect()
 			continue;
 		}
 
-		QString name = iio_device_get_name(rxDev);
+		QString name = rxDev->name();
 		if(name.contains("axi-ad9084-rx")) {
 			newTool = true;
 			toolName = "AD9084";
@@ -175,8 +175,7 @@ bool AD9084Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	if(m_ctx)
-		ConnectionProvider::GetInstance()->close(m_param);
+	m_context = {};
 	return true;
 }
 
