@@ -29,18 +29,21 @@
 
 #include <iio-widgets/iiowidgetbuilder.h>
 
-struct iio_context;
-struct iio_device;
-
 namespace scopy {
 class IIOWidgetGroup;
+
+namespace component {
+class Context;
+class Device;
+} // namespace component
+
 namespace fmcomms11 {
 
 class SCOPY_FMCOMMS11_EXPORT FMCOMMS11 : public QWidget
 {
 	Q_OBJECT
 public:
-	FMCOMMS11(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	FMCOMMS11(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~FMCOMMS11();
 
 Q_SIGNALS:
@@ -53,11 +56,11 @@ private:
 	QWidget *generateDacWidget(QWidget *parent);
 	QWidget *generateOutputVgaWidget(QWidget *parent);
 
-	iio_context *m_ctx = nullptr;
-	iio_device *m_adc = nullptr;
-	iio_device *m_dac = nullptr;
-	iio_device *m_attn = nullptr;
-	iio_device *m_vga = nullptr;
+	component::Context *m_ctx = nullptr;
+	component::Device *m_adc = nullptr;
+	component::Device *m_dac = nullptr;
+	component::Device *m_attn = nullptr;
+	component::Device *m_vga = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool = nullptr;
 	AnimatedRefreshBtn *m_refreshButton = nullptr;
