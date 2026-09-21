@@ -31,16 +31,21 @@
 #include <gui/widgets/filebrowserwidget.h>
 #include <iiowidget.h>
 #include <QWidget>
-#include <iio.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+
+namespace component {
+class Device;
+class Channel;
+} // namespace component
+
 namespace ad9084 {
 class SCOPY_AD9084_EXPORT Ad9084 : public QWidget
 {
 	Q_OBJECT
 public:
-	Ad9084(struct iio_device *dev, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
+	Ad9084(component::Device *dev, IIOWidgetGroup *mgr, QWidget *parent = nullptr);
 	~Ad9084();
 
 Q_SIGNALS:
@@ -48,7 +53,7 @@ Q_SIGNALS:
 
 private:
 	void scanChannels();
-	bool extractChannelPaths(iio_channel *chn);
+	bool extractChannelPaths(component::Channel *chn);
 	void mapPathsUnique();
 	QWidget *createMenu();
 	void loadCfir(QString path);
@@ -56,7 +61,7 @@ private:
 	QString readFile(QString file);
 
 	IIOWidgetGroup *m_group;
-	struct iio_device *m_device;
+	component::Device *m_device;
 	ToolTemplate *m_tool;
 	GearBtn *m_settingsBtn;
 	QPushButton *m_deviceName;
