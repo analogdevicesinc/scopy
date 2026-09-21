@@ -21,6 +21,8 @@
 #include "advanced/clksettingswidget.h"
 #include "ad9371widgetfactory.h"
 #include <iio-widgets/iiowidgetgroup.h>
+#include <component/device.h>
+#include <component/navigation.h>
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLabel>
@@ -34,7 +36,7 @@ Q_LOGGING_CATEGORY(CAT_AD9371_CLK_SETTINGS, "AD9371_CLK_SETTINGS")
 using namespace scopy;
 using namespace scopy::ad9371;
 
-ClkSettingsWidget::ClkSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+ClkSettingsWidget::ClkSettingsWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

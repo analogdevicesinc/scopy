@@ -21,6 +21,8 @@
 #include "advanced/rxsettingswidget.h"
 #include "ad9371widgetfactory.h"
 #include <iio-widgets/iiowidgetgroup.h>
+#include <component/device.h>
+#include <component/navigation.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QScrollArea>
@@ -34,7 +36,7 @@ Q_LOGGING_CATEGORY(CAT_AD9371_RX_SETTINGS, "AD9371_RX_SETTINGS")
 using namespace scopy;
 using namespace scopy::ad9371;
 
-RxSettingsWidget::RxSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+RxSettingsWidget::RxSettingsWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

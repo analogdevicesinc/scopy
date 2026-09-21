@@ -28,14 +28,17 @@
 #include <iio-widgets/iiowidget.h>
 #include <QLoggingCategory>
 #include <style.h>
-#include <iio.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_JESD_DEFRAMER, "AD9371_JESD_DEFRAMER")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-JesdDeframerWidget::JesdDeframerWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+JesdDeframerWidget::JesdDeframerWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -170,7 +173,10 @@ void JesdDeframerWidget::setupUi()
 		if(desLane3->onOffswitch()->isChecked())
 			bitmask |= (1 << 3);
 		QString value = QString::number(bitmask);
-		iio_device_debug_attr_write(m_device, desLanesAttr.toUtf8().constData(), value.toUtf8().constData());
+		component::Attribute *wAttr = component::attributeByName(m_device, desLanesAttr);
+		if(wAttr && wAttr->writeCapability()) {
+			QCoro::waitFor(wAttr->writeCapability()->writeAsync(value));
+		}
 	};
 
 	connect(desLane0->onOffswitch(), &QAbstractButton::toggled, this, updateDesLanes);
@@ -179,11 +185,19 @@ void JesdDeframerWidget::setupUi()
 	connect(desLane3->onOffswitch(), &QAbstractButton::toggled, this, updateDesLanes);
 
 	auto readDesLanes = [this, desLanesAttr, desLane0, desLane1, desLane2, desLane3]() {
-		char value[16];
-		int ret = iio_device_debug_attr_read(m_device, desLanesAttr.toUtf8().constData(), value, sizeof(value));
-		if(ret < 0)
+		component::Attribute *rAttr = component::attributeByName(m_device, desLanesAttr);
+		QString value;
+		bool ok = false;
+		if(rAttr && rAttr->readCapability()) {
+			auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+			if(rRes) {
+				value = rAttr->cachedValue().trimmed();
+				ok = true;
+			}
+		}
+		if(!ok)
 			return;
-		int bitmask = QString(value).toInt();
+		int bitmask = value.toInt();
 		desLane0->onOffswitch()->setChecked((bitmask & (1 << 0)) != 0);
 		desLane1->onOffswitch()->setChecked((bitmask & (1 << 1)) != 0);
 		desLane2->onOffswitch()->setChecked((bitmask & (1 << 2)) != 0);
@@ -241,8 +255,10 @@ void JesdDeframerWidget::setupUi()
 		if(invLane3->onOffswitch()->isChecked())
 			bitmask |= (1 << 3);
 		QString value = QString::number(bitmask);
-		iio_device_debug_attr_write(m_device, invertPolarityAttr.toUtf8().constData(),
-					    value.toUtf8().constData());
+		component::Attribute *wAttr = component::attributeByName(m_device, invertPolarityAttr);
+		if(wAttr && wAttr->writeCapability()) {
+			QCoro::waitFor(wAttr->writeCapability()->writeAsync(value));
+		}
 	};
 
 	connect(invLane0->onOffswitch(), &QAbstractButton::toggled, this, updateInvPolarity);
@@ -251,12 +267,19 @@ void JesdDeframerWidget::setupUi()
 	connect(invLane3->onOffswitch(), &QAbstractButton::toggled, this, updateInvPolarity);
 
 	auto readInvPolarity = [this, invertPolarityAttr, invLane0, invLane1, invLane2, invLane3]() {
-		char value[16];
-		int ret = iio_device_debug_attr_read(m_device, invertPolarityAttr.toUtf8().constData(), value,
-						     sizeof(value));
-		if(ret < 0)
+		component::Attribute *rAttr = component::attributeByName(m_device, invertPolarityAttr);
+		QString value;
+		bool ok = false;
+		if(rAttr && rAttr->readCapability()) {
+			auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+			if(rRes) {
+				value = rAttr->cachedValue().trimmed();
+				ok = true;
+			}
+		}
+		if(!ok)
 			return;
-		int bitmask = QString(value).toInt();
+		int bitmask = value.toInt();
 		invLane0->onOffswitch()->setChecked((bitmask & (1 << 0)) != 0);
 		invLane1->onOffswitch()->setChecked((bitmask & (1 << 1)) != 0);
 		invLane2->onOffswitch()->setChecked((bitmask & (1 << 2)) != 0);
