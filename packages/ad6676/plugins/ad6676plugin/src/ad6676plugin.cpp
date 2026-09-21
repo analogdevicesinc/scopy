@@ -26,10 +26,11 @@
 #include <QLabel>
 #include <style.h>
 #include "scopy-ad6676plugin_config.h"
-#include <iioutil/connectionprovider.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/scopyjs.h>
-#include <iio.h>
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_AD6676PLUGIN, "Ad6676Plugin")
 
@@ -39,17 +40,14 @@ bool Ad6676Plugin::compatible(QString param, QString category)
 {
 	qDebug(CAT_AD6676PLUGIN) << "Check AD6676 compatibility";
 
-	Connection *conn = ConnectionProvider::open(param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(param);
+	if(!ctx) {
 		qWarning(CAT_AD6676PLUGIN) << "No context available for AD6676";
 		return false;
 	}
 
 	// identify() logic from iio-oscilloscope: find "axi-ad6676-hpc"
-	bool ret = iio_context_find_device(conn->context(), "axi-ad6676-hpc") != nullptr;
-
-	ConnectionProvider::close(param);
-	return ret;
+	return ctx->findChild<component::Device *>("axi-ad6676-hpc", Qt::FindDirectChildrenOnly) != nullptr;
 }
 
 bool Ad6676Plugin::loadPage() { return false; }
@@ -75,15 +73,15 @@ QString Ad6676Plugin::displayName() { return AD6676PLUGIN_PLUGIN_DISPLAY_NAME; }
 
 bool Ad6676Plugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::open(m_param);
-	if(!conn) {
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		qWarning(CAT_AD6676PLUGIN) << "No context available for AD6676";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	Ad6676 *tool = new Ad6676(conn->context(), m_widgetGroup);
+	Ad6676 *tool = new Ad6676(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(tool);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -116,7 +114,7 @@ bool Ad6676Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider::close(m_param);
+	m_context = {};
 	return true;
 }
 
