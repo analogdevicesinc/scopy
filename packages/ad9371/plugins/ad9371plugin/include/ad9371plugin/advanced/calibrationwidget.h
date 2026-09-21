@@ -24,12 +24,14 @@
 #include "scopy-ad9371plugin_export.h"
 #include <QWidget>
 #include <QVBoxLayout>
-#include <iio.h>
 #include <menuonoffswitch.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
 }
+} // namespace scopy
 
 namespace scopy::ad9371 {
 
@@ -38,7 +40,8 @@ class SCOPY_AD9371PLUGIN_EXPORT CalibrationWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit CalibrationWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit CalibrationWidget(component::Device *device, IIOWidgetGroup *group = nullptr,
+				   QWidget *parent = nullptr);
 	~CalibrationWidget();
 
 Q_SIGNALS:
@@ -53,7 +56,7 @@ private:
 	QWidget *createCalibrationMaskGroup(QWidget *parent);
 	void writeCalibrationMaskToDevice();
 
-	iio_device *m_device;
+	component::Device *m_device;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	bool m_hasDpd;
 

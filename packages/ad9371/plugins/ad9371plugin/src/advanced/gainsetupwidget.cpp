@@ -21,6 +21,8 @@
 #include "advanced/gainsetupwidget.h"
 #include "ad9371widgetfactory.h"
 #include <iio-widgets/iiowidgetgroup.h>
+#include <component/device.h>
+#include <component/navigation.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QScrollArea>
@@ -33,7 +35,7 @@ Q_LOGGING_CATEGORY(CAT_AD9371_GAIN_SETUP, "AD9371_GAIN_SETUP")
 using namespace scopy;
 using namespace scopy::ad9371;
 
-GainSetupWidget::GainSetupWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+GainSetupWidget::GainSetupWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

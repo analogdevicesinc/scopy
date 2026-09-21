@@ -30,13 +30,17 @@
 #include <QLoggingCategory>
 #include <style.h>
 #include <gui/widgets/menucollapsesection.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_ARM_GPIO, "AD9371_ARM_GPIO")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-ArmGpioWidget::ArmGpioWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+ArmGpioWidget::ArmGpioWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -229,11 +233,17 @@ void ArmGpioWidget::readEnableAckFromDevice()
 
 	for(int i = 0; i < m_enableAckBit4.size() && i < m_enableAckAttrNames.size(); i++) {
 		long long val = 0;
-		int ret = iio_device_debug_attr_read_longlong(m_device, m_enableAckAttrNames[i].toStdString().c_str(),
-							      &val);
-		if(ret < 0) {
-			qDebug(CAT_AD9371_ARM_GPIO)
-				<< "Failed to read" << m_enableAckAttrNames[i] << "for bit 4, error:" << ret;
+		bool ok = false;
+		component::Attribute *rAttr = component::attributeByName(m_device, m_enableAckAttrNames[i]);
+		if(rAttr && rAttr->readCapability()) {
+			auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+			if(rRes) {
+				val = rAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+				ok = true;
+			}
+		}
+		if(!ok) {
+			qDebug(CAT_AD9371_ARM_GPIO) << "Failed to read" << m_enableAckAttrNames[i] << "for bit 4";
 			continue;
 		}
 
@@ -255,11 +265,17 @@ void ArmGpioWidget::writeEnableAckToDevice()
 	for(int i = 0; i < m_enableAckBit4.size() && i < m_enableAckAttrNames.size(); i++) {
 		// Read-modify-write: read current value, update bit 4, write back
 		long long val = 0;
-		int ret = iio_device_debug_attr_read_longlong(m_device, m_enableAckAttrNames[i].toStdString().c_str(),
-							      &val);
-		if(ret < 0) {
-			qWarning(CAT_AD9371_ARM_GPIO)
-				<< "Failed to read" << m_enableAckAttrNames[i] << "before write, error:" << ret;
+		bool ok = false;
+		component::Attribute *rAttr = component::attributeByName(m_device, m_enableAckAttrNames[i]);
+		if(rAttr && rAttr->readCapability()) {
+			auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+			if(rRes) {
+				val = rAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+				ok = true;
+			}
+		}
+		if(!ok) {
+			qWarning(CAT_AD9371_ARM_GPIO) << "Failed to read" << m_enableAckAttrNames[i] << "before write";
 			continue;
 		}
 
@@ -269,11 +285,14 @@ void ArmGpioWidget::writeEnableAckToDevice()
 			val |= (1 << 4);
 		}
 
-		ret = iio_device_debug_attr_write_longlong(m_device, m_enableAckAttrNames[i].toStdString().c_str(),
-							   val);
-		if(ret < 0) {
-			qWarning(CAT_AD9371_ARM_GPIO)
-				<< "Failed to write" << m_enableAckAttrNames[i] << "error:" << ret;
+		component::Attribute *wAttr = component::attributeByName(m_device, m_enableAckAttrNames[i]);
+		if(wAttr && wAttr->writeCapability()) {
+			auto wRes = QCoro::waitFor(wAttr->writeCapability()->writeAsync(QString::number(val)));
+			if(!wRes) {
+				qWarning(CAT_AD9371_ARM_GPIO) << "Failed to write" << m_enableAckAttrNames[i];
+			}
+		} else {
+			qWarning(CAT_AD9371_ARM_GPIO) << "Failed to write" << m_enableAckAttrNames[i];
 		}
 	}
 }

@@ -42,13 +42,16 @@
 #include <style.h>
 #include <QLoggingCategory>
 #include <QScrollArea>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_ADVANCED, "AD9371_ADVANCED")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-Ad9371Advanced::Ad9371Advanced(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+Ad9371Advanced::Ad9371Advanced(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -58,9 +61,7 @@ Ad9371Advanced::Ad9371Advanced(iio_device *device, IIOWidgetGroup *group, QWidge
 		return;
 	}
 
-	const char *device_name = iio_device_get_name(m_device);
-	qDebug(CAT_AD9371_ADVANCED) << "AD9371 Advanced initialized for device:"
-				    << (device_name ? device_name : "unknown");
+	qDebug(CAT_AD9371_ADVANCED) << "AD9371 Advanced initialized for device:" << m_device->name();
 
 	setupUi();
 }
@@ -183,7 +184,7 @@ void Ad9371Advanced::createNavigationButtons()
 	m_bistBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 	// DPD/CLGC/VSWR are AD9375-only features
-	bool hasDpd = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+	bool hasDpd = (component::attributeByName(m_device, "adi,dpd-model-version") != nullptr);
 
 	if(hasDpd) {
 		m_dpdSettingsBtn = new QPushButton("DPD Settings", this);
@@ -298,7 +299,7 @@ void Ad9371Advanced::createContentWidgets()
 	m_jesdDeframer = new JesdDeframerWidget(m_device, m_widgetGroup, this);
 	m_bist = new BistWidget(m_device, m_widgetGroup, this);
 	// DPD/CLGC/VSWR are AD9375-only features
-	bool hasDpd = (iio_device_find_debug_attr(m_device, "adi,dpd-model-version") != nullptr);
+	bool hasDpd = (component::attributeByName(m_device, "adi,dpd-model-version") != nullptr);
 	if(hasDpd) {
 		m_dpdSettings = new DpdSettingsWidget(m_device, m_widgetGroup, this);
 		m_clgcSettings = new ClgcSettingsWidget(m_device, m_widgetGroup, this);

@@ -38,9 +38,14 @@
 
 namespace scopy {
 class IIOWidgetGroup;
-}
 
-namespace scopy::ad9371 {
+namespace component {
+class Context;
+class Device;
+class Channel;
+} // namespace component
+
+namespace ad9371 {
 
 class SCOPY_AD9371PLUGIN_EXPORT Ad9371 : public QWidget
 {
@@ -48,14 +53,14 @@ class SCOPY_AD9371PLUGIN_EXPORT Ad9371 : public QWidget
 	friend class Ad9371_API;
 
 public:
-	Ad9371(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	Ad9371(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Ad9371();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
@@ -64,9 +69,9 @@ private:
 	AnimatedRefreshBtn *m_refreshButton;
 
 	// Device pointers
-	iio_device *m_dev = nullptr;
-	iio_device *m_dds = nullptr;
-	iio_device *m_cap = nullptr;
+	component::Device *m_dev = nullptr;
+	component::Device *m_dds = nullptr;
+	component::Device *m_cap = nullptr;
 
 	// Live-refresh timer and widgets (RSSI + hardware gain)
 	QTimer *m_liveTimer = nullptr;
@@ -79,8 +84,8 @@ private:
 	IIOWidget *m_txSampRateLabel = nullptr;
 
 	// Up/Down Converter (ADF4351)
-	iio_device *m_udcRx = nullptr;
-	iio_device *m_udcTx = nullptr;
+	component::Device *m_udcRx = nullptr;
+	component::Device *m_udcTx = nullptr;
 	bool m_hasUdc = false;
 	bool m_udcEnabled = false;
 	IIOWidget *m_rxLoWidget = nullptr;
@@ -114,7 +119,7 @@ private:
 	QWidget *generateFpgaSettingsWidget(QString title, QWidget *parent);
 
 	// Helper to resolve LO frequency attribute name
-	const char *resolveFreqAttrName(iio_channel *ch, const char *fallback);
+	const char *resolveFreqAttrName(component::Channel *ch, const char *fallback);
 
 	// Up/Down Converter helpers
 	void onUdcToggled(bool enabled);
@@ -128,9 +133,10 @@ private Q_SLOTS:
 	void loadProfileFromFile(QString filePath);
 
 	// FPGA Phase Rotation Helpers
-	void writePhase(iio_device *fpgaDev, int channelIndex, int degrees);
-	void readPhase(iio_device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox);
+	void writePhase(component::Device *fpgaDev, int channelIndex, int degrees);
+	void readPhase(component::Device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox);
 };
 
-} // namespace scopy::ad9371
+} // namespace ad9371
+} // namespace scopy
 #endif // AD9371_H

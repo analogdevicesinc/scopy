@@ -41,6 +41,13 @@
 #include <iio-widgets/iiowidgetgroup.h>
 #include <guistrategy/comboguistrategy.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
+
 Q_LOGGING_CATEGORY(CAT_AD9371, "AD9371");
 
 using namespace scopy;
@@ -94,7 +101,7 @@ static const char *vswr_status_strings[] = {
 	"Error: Tx is not observable with any of the ORx Channels",
 };
 
-Ad9371::Ad9371(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Ad9371::Ad9371(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_widgetGroup(group)
@@ -115,19 +122,19 @@ void Ad9371::detectDevices()
 	if(!m_ctx)
 		return;
 
-	m_dev = iio_context_find_device(m_ctx, "ad9371-phy");
-	m_dds = iio_context_find_device(m_ctx, "axi-ad9371-tx-hpc");
-	m_cap = iio_context_find_device(m_ctx, "axi-ad9371-rx-hpc");
-	m_udcRx = iio_context_find_device(m_ctx, "adf4351-udc-rx-pmod");
-	m_udcTx = iio_context_find_device(m_ctx, "adf4351-udc-tx-pmod");
+	m_dev = m_ctx->findChild<component::Device *>("ad9371-phy", Qt::FindDirectChildrenOnly);
+	m_dds = m_ctx->findChild<component::Device *>("axi-ad9371-tx-hpc", Qt::FindDirectChildrenOnly);
+	m_cap = m_ctx->findChild<component::Device *>("axi-ad9371-rx-hpc", Qt::FindDirectChildrenOnly);
+	m_udcRx = m_ctx->findChild<component::Device *>("adf4351-udc-rx-pmod", Qt::FindDirectChildrenOnly);
+	m_udcTx = m_ctx->findChild<component::Device *>("adf4351-udc-tx-pmod", Qt::FindDirectChildrenOnly);
 	m_hasUdc = (m_udcRx != nullptr && m_udcTx != nullptr);
 
 	if(m_dev) {
-		iio_channel *ch1 = iio_device_find_channel(m_dev, "voltage1", false);
-		m_is2Rx2Tx = ch1 && iio_channel_find_attr(ch1, "hardwaregain");
+		component::Channel *ch1 = component::channelById(m_dev, "voltage1", false);
+		m_is2Rx2Tx = ch1 && component::attributeByName(ch1, "hardwaregain");
 
-		iio_channel *txCh0 = iio_device_find_channel(m_dev, "voltage0", true);
-		m_hasDpd = txCh0 && iio_channel_find_attr(txCh0, "dpd_tracking_en");
+		component::Channel *txCh0 = component::channelById(m_dev, "voltage0", true);
+		m_hasDpd = txCh0 && component::attributeByName(txCh0, "dpd_tracking_en");
 	}
 
 	qDebug(CAT_AD9371) << "Devices - PHY:" << (m_dev != nullptr) << "DDS:" << (m_dds != nullptr)
@@ -135,9 +142,9 @@ void Ad9371::detectDevices()
 			   << "DPD:" << m_hasDpd;
 }
 
-const char *Ad9371::resolveFreqAttrName(iio_channel *ch, const char *fallback)
+const char *Ad9371::resolveFreqAttrName(component::Channel *ch, const char *fallback)
 {
-	if(iio_channel_find_attr(ch, "frequency"))
+	if(ch && component::attributeByName(ch, "frequency"))
 		return "frequency";
 	return fallback;
 }
@@ -420,12 +427,15 @@ void Ad9371::loadProfileFromFile(QString filePath)
 	QByteArray buffer = file.readAll();
 	file.close();
 
-	iio_context_set_timeout(m_ctx, 30000);
-	int ret = iio_device_attr_write_raw(m_dev, "profile_config", buffer.constData(), buffer.size());
-	iio_context_set_timeout(m_ctx, 3000);
-	if(ret < 0)
-		qWarning(CAT_AD9371) << "Profile loading failed, error:" << ret;
-	else {
+	component::Attribute *attr = m_dev ? component::attributeByName(m_dev, "profile_config") : nullptr;
+	if(!attr || !attr->writeCapability()) {
+		qWarning(CAT_AD9371) << "Profile loading failed, profile_config attribute not accessible";
+		return;
+	}
+	auto res = QCoro::waitFor(attr->writeCapability()->writeAsync(QString::fromUtf8(buffer)));
+	if(!res) {
+		qWarning(CAT_AD9371) << "Profile loading failed";
+	} else {
 		qDebug(CAT_AD9371) << "Profile loaded successfully";
 		Q_EMIT readRequested();
 	}
@@ -435,13 +445,15 @@ void Ad9371::readCalibrationFromHardware()
 {
 	if(!m_dev)
 		return;
-	bool val;
 	auto readSwitch = [&](MenuOnOffSwitch *sw, const char *attr) {
 		if(!sw)
 			return;
-		int ret = iio_device_attr_read_bool(m_dev, attr, &val);
-		if(ret >= 0)
-			sw->onOffswitch()->setChecked(val);
+		component::Attribute *a = component::attributeByName(m_dev, attr);
+		if(!a || !a->readCapability())
+			return;
+		auto res = QCoro::waitFor(a->readCapability()->readAsync());
+		if(res)
+			sw->onOffswitch()->setChecked(a->cachedValue().trimmed().toInt() != 0);
 	};
 	readSwitch(m_calRxQec, "calibrate_rx_qec_en");
 	readSwitch(m_calTxQec, "calibrate_tx_qec_en");
@@ -459,7 +471,10 @@ void Ad9371::writeCalibrationToHardware()
 	auto writeSwitch = [&](MenuOnOffSwitch *sw, const char *attr) {
 		if(!sw)
 			return;
-		iio_device_attr_write_bool(m_dev, attr, sw->onOffswitch()->isChecked());
+		component::Attribute *a = component::attributeByName(m_dev, attr);
+		if(!a || !a->writeCapability())
+			return;
+		QCoro::waitFor(a->writeCapability()->writeAsync(sw->onOffswitch()->isChecked() ? "1" : "0"));
 	};
 	writeSwitch(m_calRxQec, "calibrate_rx_qec_en");
 	writeSwitch(m_calTxQec, "calibrate_tx_qec_en");
@@ -468,9 +483,12 @@ void Ad9371::writeCalibrationToHardware()
 	writeSwitch(m_calDpd, "calibrate_dpd_en");
 	writeSwitch(m_calClgc, "calibrate_clgc_en");
 	writeSwitch(m_calVswr, "calibrate_vswr_en");
-	int ret = iio_device_attr_write_bool(m_dev, "calibrate", true);
-	if(ret < 0)
-		qWarning(CAT_AD9371) << "Calibration failed:" << ret;
+	component::Attribute *calAttr = component::attributeByName(m_dev, "calibrate");
+	if(!calAttr || !calAttr->writeCapability())
+		return;
+	auto res = QCoro::waitFor(calAttr->writeCapability()->writeAsync("1"));
+	if(!res)
+		qWarning(CAT_AD9371) << "Calibration failed";
 	else {
 		qDebug(CAT_AD9371) << "Calibration triggered";
 		Q_EMIT readRequested();
@@ -489,8 +507,8 @@ QWidget *Ad9371::generateRxChainWidget(QString title, QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout(content);
 	content->setLayout(mainLayout);
 
-	iio_channel *rxCh0 = iio_device_find_channel(m_dev, "voltage0", false);
-	iio_channel *rxCh1 = m_is2Rx2Tx ? iio_device_find_channel(m_dev, "voltage1", false) : nullptr;
+	component::Channel *rxCh0 = component::channelById(m_dev, "voltage0", false);
+	component::Channel *rxCh1 = m_is2Rx2Tx ? component::channelById(m_dev, "voltage1", false) : nullptr;
 
 	// Section-level controls
 	QHBoxLayout *sectionControls = new QHBoxLayout();
@@ -505,9 +523,7 @@ QWidget *Ad9371::generateRxChainWidget(QString title, QWidget *parent)
 		connect(this, &Ad9371::readRequested, rfBw, &IIOWidget::readAsync);
 		rfBw->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-		char rfBwBuf[256] = {0};
-		int rfBwRet = iio_channel_attr_read(rxCh0, "rf_bandwidth", rfBwBuf, sizeof(rfBwBuf));
-		if(rfBwRet < 0 || strcmp(rfBwBuf, "ERROR") == 0) {
+		if(component::attributeByName(rxCh0, "rf_bandwidth") == nullptr) {
 			rfBw->setEnabled(false);
 			rfBw->getUiStrategy()->setInfoMessage("Can't access attribute rf_bandwidth");
 		}
@@ -525,7 +541,7 @@ QWidget *Ad9371::generateRxChainWidget(QString title, QWidget *parent)
 		m_rxSampRateLabel = sampRate;
 
 		// #18: RX LO Frequency (altvoltage0, MHz scale)
-		iio_channel *rxLo = iio_device_find_channel(m_dev, "altvoltage0", true);
+		component::Channel *rxLo = component::channelById(m_dev, "altvoltage0", true);
 		if(rxLo) {
 			const char *freqAttr = resolveFreqAttrName(rxLo, "RX_LO_frequency");
 			IIOWidget *rxLoFreq = Ad9371WidgetFactory::createRangeWidget(rxLo, freqAttr, "[70 1 6000]",
@@ -555,8 +571,9 @@ QWidget *Ad9371::generateRxChainWidget(QString title, QWidget *parent)
 		if(m_widgetGroup)
 			m_widgetGroup->add(gcSyncPulse);
 		connect(this, &Ad9371::readRequested, gcSyncPulse, &IIOWidget::readAsync);
-		if(iio_device_find_debug_attr(m_dev, "adi,rx-agc-conf-agc-enable-sync-pulse-for-gain-counter") ==
-		   nullptr) {
+		if(gcSyncPulse &&
+		   component::attributeByName(m_dev, "adi,rx-agc-conf-agc-enable-sync-pulse-for-gain-counter") ==
+			   nullptr) {
 			gcSyncPulse->setEnabled(false);
 			gcSyncPulse->getUiStrategy()->setInfoMessage(
 				"Can't access attribute adi,rx-agc-conf-agc-enable-sync-pulse-for-gain-counter");
@@ -723,8 +740,8 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout(content);
 	content->setLayout(mainLayout);
 
-	iio_channel *txCh0 = iio_device_find_channel(m_dev, "voltage0", true);
-	iio_channel *txCh1 = m_is2Rx2Tx ? iio_device_find_channel(m_dev, "voltage1", true) : nullptr;
+	component::Channel *txCh0 = component::channelById(m_dev, "voltage0", true);
+	component::Channel *txCh1 = m_is2Rx2Tx ? component::channelById(m_dev, "voltage1", true) : nullptr;
 
 	// Section-level read-only labels
 	QHBoxLayout *sectionControls = new QHBoxLayout();
@@ -751,7 +768,7 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 		m_txSampRateLabel = sampRate;
 
 		// #41: TX LO Frequency (altvoltage1, MHz scale)
-		iio_channel *txLo = iio_device_find_channel(m_dev, "altvoltage1", true);
+		component::Channel *txLo = component::channelById(m_dev, "altvoltage1", true);
 		if(txLo) {
 			const char *freqAttr = resolveFreqAttrName(txLo, "TX_LO_frequency");
 			IIOWidget *txLoFreq = Ad9371WidgetFactory::createRangeWidget(txLo, freqAttr, "[70 1 6000]",
@@ -964,8 +981,11 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 			// #48: dpd_reset_en (button)
 			QPushButton *dpdReset = new QPushButton("Reset", dpdTx1);
 			Style::setStyle(dpdReset, style::properties::button::basicButton);
-			connect(dpdReset, &QPushButton::clicked, this,
-				[this, txCh0]() { iio_channel_attr_write_bool(txCh0, "dpd_reset_en", true); });
+			connect(dpdReset, &QPushButton::clicked, this, [this, txCh0]() {
+				component::Attribute *a = component::attributeByName(txCh0, "dpd_reset_en");
+				if(a && a->writeCapability())
+					QCoro::waitFor(a->writeCapability()->writeAsync("1"));
+			});
 			dpdTx1Layout->addWidget(dpdReset);
 
 			dpdLayout->addWidget(dpdTx1);
@@ -1059,8 +1079,11 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 			// #49: dpd_reset_en (button)
 			QPushButton *dpdReset = new QPushButton("Reset", dpdTx2);
 			Style::setStyle(dpdReset, style::properties::button::basicButton);
-			connect(dpdReset, &QPushButton::clicked, this,
-				[this, txCh1]() { iio_channel_attr_write_bool(txCh1, "dpd_reset_en", true); });
+			connect(dpdReset, &QPushButton::clicked, this, [this, txCh1]() {
+				component::Attribute *a = component::attributeByName(txCh1, "dpd_reset_en");
+				if(a && a->writeCapability())
+					QCoro::waitFor(a->writeCapability()->writeAsync("1"));
+			});
 			dpdTx2Layout->addWidget(dpdReset);
 
 			dpdLayout->addWidget(dpdTx2);
@@ -1315,8 +1338,8 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 
 		QHBoxLayout *vswrLayout = new QHBoxLayout();
 
-		auto createVswrScaled = [this](iio_channel *ch, const char *attr, double divisor, const QString &unit,
-					       QGridLayout *grid, int row, int col) {
+		auto createVswrScaled = [this](component::Channel *ch, const char *attr, double divisor,
+					       const QString &unit, QGridLayout *grid, int row, int col) {
 			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, "");
 			if(m_widgetGroup)
 				m_widgetGroup->add(w);
@@ -1332,8 +1355,8 @@ QWidget *Ad9371::generateTxChainWidget(QString title, QWidget *parent)
 			return w;
 		};
 
-		auto createVswrPrms = [this](iio_channel *ch, const char *attr, double divisor, const QString &unit,
-					     QGridLayout *grid, int row, int col) {
+		auto createVswrPrms = [this](component::Channel *ch, const char *attr, double divisor,
+					     const QString &unit, QGridLayout *grid, int row, int col) {
 			IIOWidget *w = Ad9371WidgetFactory::createReadOnlyWidget(ch, attr, "");
 			if(m_widgetGroup)
 				m_widgetGroup->add(w);
@@ -1556,7 +1579,7 @@ QWidget *Ad9371::generateObsRxChainWidget(QString title, QWidget *parent)
 	QVBoxLayout *mainLayout = new QVBoxLayout(content);
 	content->setLayout(mainLayout);
 
-	iio_channel *obsCh = iio_device_find_channel(m_dev, "voltage2", false);
+	component::Channel *obsCh = component::channelById(m_dev, "voltage2", false);
 
 	// Section-level controls
 	QHBoxLayout *sectionControls = new QHBoxLayout();
@@ -1570,9 +1593,7 @@ QWidget *Ad9371::generateObsRxChainWidget(QString title, QWidget *parent)
 		connect(this, &Ad9371::readRequested, rfBw, &IIOWidget::readAsync);
 		rfBw->setDataToUIConversion(
 			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-		char rfBwBuf[256] = {0};
-		int rfBwRet = iio_channel_attr_read(obsCh, "rf_bandwidth", rfBwBuf, sizeof(rfBwBuf));
-		if(rfBwRet < 0 || strcmp(rfBwBuf, "ERROR") == 0) {
+		if(component::attributeByName(obsCh, "rf_bandwidth") == nullptr) {
 			rfBw->setEnabled(false);
 			rfBw->getUiStrategy()->setInfoMessage("Can't access attribute rf_bandwidth");
 		}
@@ -1589,7 +1610,7 @@ QWidget *Ad9371::generateObsRxChainWidget(QString title, QWidget *parent)
 		sectionControls->addWidget(sampRate);
 
 		// #30: Sniffer LO Frequency (altvoltage2, MHz scale)
-		iio_channel *snLo = iio_device_find_channel(m_dev, "altvoltage2", true);
+		component::Channel *snLo = component::channelById(m_dev, "altvoltage2", true);
 		if(snLo) {
 			const char *freqAttr = resolveFreqAttrName(snLo, "RX_SN_LO_frequency");
 			IIOWidget *snLoFreq = Ad9371WidgetFactory::createRangeWidget(snLo, freqAttr, "[70 1 6000]",
@@ -1618,8 +1639,9 @@ QWidget *Ad9371::generateObsRxChainWidget(QString title, QWidget *parent)
 		if(m_widgetGroup)
 			m_widgetGroup->add(obsGcSyncPulse);
 		connect(this, &Ad9371::readRequested, obsGcSyncPulse, &IIOWidget::readAsync);
-		if(iio_device_find_debug_attr(m_dev, "adi,obs-agc-conf-agc-enable-sync-pulse-for-gain-counter") ==
-		   nullptr) {
+		if(obsGcSyncPulse &&
+		   component::attributeByName(m_dev, "adi,obs-agc-conf-agc-enable-sync-pulse-for-gain-counter") ==
+			   nullptr) {
 			obsGcSyncPulse->setEnabled(false);
 			obsGcSyncPulse->getUiStrategy()->setInfoMessage(
 				"Can't access attribute adi,obs-agc-conf-agc-enable-sync-pulse-for-gain-counter");
@@ -1703,8 +1725,8 @@ QWidget *Ad9371::generateFpgaSettingsWidget(QString title, QWidget *parent)
 
 	// #100: TX Sampling Frequency (dds device, voltage0 out)
 	if(m_dds) {
-		iio_channel *ddsCh = iio_device_find_channel(m_dds, "voltage0", true);
-		if(ddsCh && iio_channel_find_attr(ddsCh, "sampling_frequency_available")) {
+		component::Channel *ddsCh = component::channelById(m_dds, "voltage0", true);
+		if(ddsCh && component::attributeByName(ddsCh, "sampling_frequency_available")) {
 			IIOWidget *fpgaTxFreq = Ad9371WidgetFactory::createComboWidget(
 				ddsCh, "sampling_frequency", "sampling_frequency_available", "TX Sampling Rate");
 			if(m_widgetGroup)
@@ -1717,8 +1739,8 @@ QWidget *Ad9371::generateFpgaSettingsWidget(QString title, QWidget *parent)
 
 	// #101: RX Sampling Frequency (cap device, voltage0_i in)
 	if(m_cap) {
-		iio_channel *capCh = iio_device_find_channel(m_cap, "voltage0_i", false);
-		if(capCh && iio_channel_find_attr(capCh, "sampling_frequency_available")) {
+		component::Channel *capCh = component::channelById(m_cap, "voltage0_i", false);
+		if(capCh && component::attributeByName(capCh, "sampling_frequency_available")) {
 			IIOWidget *fpgaRxFreq = Ad9371WidgetFactory::createComboWidget(
 				capCh, "sampling_frequency", "sampling_frequency_available", "RX Sampling Rate");
 			if(m_widgetGroup)
@@ -1773,21 +1795,26 @@ QWidget *Ad9371::generateFpgaSettingsWidget(QString title, QWidget *parent)
 	return section;
 }
 
-void Ad9371::writePhase(iio_device *fpgaDev, int channelIndex, int degrees)
+void Ad9371::writePhase(component::Device *fpgaDev, int channelIndex, int degrees)
 {
 	double phase = degrees * 2.0 * M_PI / 360.0;
 
 	QString i_ch = QString("voltage%1_i").arg(channelIndex);
 	QString q_ch = QString("voltage%1_q").arg(channelIndex);
 
-	iio_channel *i_chn = iio_device_find_channel(fpgaDev, i_ch.toLatin1(), false);
-	iio_channel *q_chn = iio_device_find_channel(fpgaDev, q_ch.toLatin1(), false);
+	component::Channel *i_chn = component::channelById(fpgaDev, i_ch, false);
+	component::Channel *q_chn = component::channelById(fpgaDev, q_ch, false);
 
 	if(i_chn && q_chn) {
-		iio_channel_attr_write_double(i_chn, "calibscale", cos(phase));
-		iio_channel_attr_write_double(i_chn, "calibphase", -sin(phase));
-		iio_channel_attr_write_double(q_chn, "calibscale", cos(phase));
-		iio_channel_attr_write_double(q_chn, "calibphase", sin(phase));
+		auto writeDouble = [](component::Channel *ch, const char *attr, double value) {
+			component::Attribute *a = component::attributeByName(ch, attr);
+			if(a && a->writeCapability())
+				QCoro::waitFor(a->writeCapability()->writeAsync(QString::number(value, 'f', 6)));
+		};
+		writeDouble(i_chn, "calibscale", cos(phase));
+		writeDouble(i_chn, "calibphase", -sin(phase));
+		writeDouble(q_chn, "calibscale", cos(phase));
+		writeDouble(q_chn, "calibphase", sin(phase));
 
 		qDebug(CAT_AD9371) << "Phase rotation set to" << degrees << "degrees for channel" << channelIndex;
 	} else {
@@ -1795,20 +1822,35 @@ void Ad9371::writePhase(iio_device *fpgaDev, int channelIndex, int degrees)
 	}
 }
 
-void Ad9371::readPhase(iio_device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox)
+void Ad9371::readPhase(component::Device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox)
 {
 	QString i_ch = QString("voltage%1_i").arg(channelIndex);
 	QString q_ch = QString("voltage%1_q").arg(channelIndex);
 
-	iio_channel *i_chn = iio_device_find_channel(fpgaDev, i_ch.toLatin1(), false);
-	iio_channel *q_chn = iio_device_find_channel(fpgaDev, q_ch.toLatin1(), false);
+	component::Channel *i_chn = component::channelById(fpgaDev, i_ch, false);
+	component::Channel *q_chn = component::channelById(fpgaDev, q_ch, false);
 
 	if(i_chn && q_chn && spinBox) {
 		double val[4];
-		if(iio_channel_attr_read_double(i_chn, "calibscale", &val[0]) == 0 &&
-		   iio_channel_attr_read_double(i_chn, "calibphase", &val[1]) == 0 &&
-		   iio_channel_attr_read_double(q_chn, "calibscale", &val[2]) == 0 &&
-		   iio_channel_attr_read_double(q_chn, "calibphase", &val[3]) == 0) {
+		bool ok = true;
+		auto readDouble = [&ok](component::Channel *ch, const char *attr, double *out) {
+			component::Attribute *a = component::attributeByName(ch, attr);
+			if(!a || !a->readCapability()) {
+				ok = false;
+				return;
+			}
+			auto res = QCoro::waitFor(a->readCapability()->readAsync());
+			if(!res) {
+				ok = false;
+				return;
+			}
+			*out = a->cachedValue().trimmed().toDouble();
+		};
+		readDouble(i_chn, "calibscale", &val[0]);
+		readDouble(i_chn, "calibphase", &val[1]);
+		readDouble(q_chn, "calibscale", &val[2]);
+		readDouble(q_chn, "calibphase", &val[3]);
+		if(ok) {
 
 			val[0] = acos(val[0]) * 360.0 / (2.0 * M_PI);
 			val[1] = asin(-1.0 * val[1]) * 360.0 / (2.0 * M_PI);
@@ -1870,10 +1912,14 @@ void Ad9371::updateLoConversion(IIOWidget *loWidget, bool isRx)
 			double extPllHz = (centerFreq + largePart) * 1e6;
 
 			// Write to ADF4351 device
-			iio_device *udcDev = isRx ? m_udcRx : m_udcTx;
-			iio_channel *udcCh = iio_device_find_channel(udcDev, "altvoltage0", true);
-			if(udcCh) {
-				iio_channel_attr_write_longlong(udcCh, "frequency", (long long)extPllHz);
+			component::Device *udcDev = isRx ? m_udcRx : m_udcTx;
+			component::Channel *udcCh =
+				udcDev ? component::channelById(udcDev, "altvoltage0", true) : nullptr;
+			component::Attribute *freqAttr =
+				udcCh ? component::attributeByName(udcCh, "frequency") : nullptr;
+			if(freqAttr && freqAttr->writeCapability()) {
+				QCoro::waitFor(
+					freqAttr->writeCapability()->writeAsync(QString::number((long long)extPllHz)));
 			}
 
 			// Return ad9371-phy portion for the IIOWidget to write
