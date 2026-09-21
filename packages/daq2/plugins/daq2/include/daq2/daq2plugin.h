@@ -28,6 +28,7 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <component/controller.h>
 
 namespace scopy::daq2 {
 class Daq2_API;
@@ -61,6 +62,7 @@ public Q_SLOTS:
 private:
 	void initApi();
 
+	component::ContextHandle m_context;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	Daq2_API *m_api = nullptr;
 
