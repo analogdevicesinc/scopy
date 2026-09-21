@@ -23,14 +23,15 @@
 
 #include "scopy-cn0540_export.h"
 
-#include <QFuture>
+#include <optional>
+
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <iio.h>
+#include <qcorotask.h>
 
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
@@ -38,7 +39,14 @@
 #include <gui/widgets/animatedrefreshbtn.h>
 #include <gui/widgets/menusectionwidget.h>
 
-namespace scopy::cn0540 {
+namespace scopy {
+namespace component {
+class Context;
+class Device;
+class Channel;
+} // namespace component
+
+namespace cn0540 {
 
 static constexpr int NUM_ANALOG_PINS = 6;
 
@@ -51,54 +59,56 @@ class SCOPY_CN0540_EXPORT CN0540 : public QWidget
 	friend class CN0540_API;
 
 public:
-	explicit CN0540(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	explicit CN0540(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~CN0540();
 
 Q_SIGNALS:
 	void readAll();
 
 private Q_SLOTS:
-	void onReadSwFF();
-	void onReadVshift();
-	void onReadVsensor();
-	void onCalibrate();
-	void updateVoltages();
+	QCoro::Task<void> onReadSwFF();
+	QCoro::Task<void> onReadVshift();
+	QCoro::Task<void> onReadVsensor();
+	QCoro::Task<void> onCalibrate();
+	QCoro::Task<void> updateVoltages();
 
 private:
 	void setupUi();
 	void findGpioChannels();
 	void findVoltMonChannels();
-	bool getGpioState(iio_channel *ch);
-	void setGpioState(iio_channel *ch, bool state);
-	double getVoltage(iio_channel *ch);
-	void setVoltage(iio_channel *ch, double voltageMv);
-	double getVshiftMv();
+	QCoro::Task<bool> getGpioState(component::Channel *ch);
+	QCoro::Task<void> setGpioState(component::Channel *ch, bool state);
+	QCoro::Task<double> getVoltage(component::Channel *ch);
+	QCoro::Task<void> setVoltage(component::Channel *ch, double voltageMv);
+	QCoro::Task<double> getVshiftMv();
 
 	MenuSectionCollapseWidget *createPowerControlSection(QWidget *parent);
 	MenuSectionCollapseWidget *createAdcDriverSection(QWidget *parent);
 	MenuSectionCollapseWidget *createSensorCalibSection(QWidget *parent);
 	MenuSectionCollapseWidget *createVoltMonSection(QWidget *parent);
 
-	iio_context *m_ctx;
-	iio_device *m_adcDev;
-	iio_device *m_dacDev;
-	iio_device *m_gpioDev;
-	iio_device *m_voltMonDev;
+	component::Context *m_ctx;
+	component::Device *m_adcDev;
+	component::Device *m_dacDev;
+	component::Device *m_gpioDev;
+	component::Device *m_voltMonDev;
 
-	iio_channel *m_adcCh;
-	iio_channel *m_dacCh;
+	component::Channel *m_adcCh;
+	component::Channel *m_dacCh;
 
-	iio_channel *m_gpioSwFF;
-	iio_channel *m_gpioShutdown;
-	iio_channel *m_gpioFdaDis;
-	iio_channel *m_gpioFdaMode;
-	iio_channel *m_gpioCC;
+	component::Channel *m_gpioSwFF;
+	component::Channel *m_gpioShutdown;
+	component::Channel *m_gpioFdaDis;
+	component::Channel *m_gpioFdaMode;
+	component::Channel *m_gpioCC;
 
-	iio_channel *m_analogIn[NUM_ANALOG_PINS];
+	component::Channel *m_analogIn[NUM_ANALOG_PINS];
 
 	IIOWidgetGroup *m_group;
 
-	QFuture<void> m_calibFuture;
+	std::optional<QCoro::Task<void>> m_calibTask;
+	bool m_calibInFlight = false;
+	bool m_voltMonInFlight = false;
 	QTimer *m_voltMonTimer;
 
 	QLabel *m_swffStatusLabel;
@@ -123,5 +133,6 @@ private:
 	static constexpr double DAC_BUF_GAIN = 1.22;
 };
 
-} // namespace scopy::cn0540
+} // namespace cn0540
+} // namespace scopy
 #endif // CN0540_H
