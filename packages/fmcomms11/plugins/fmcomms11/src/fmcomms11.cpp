@@ -29,22 +29,28 @@
 #include <style.h>
 #include <iio-widgets/iiowidgetgroup.h>
 
-#include <iio.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 Q_LOGGING_CATEGORY(CAT_FMCOMMS11, "FMCOMMS11");
 
 using namespace scopy;
 using namespace fmcomms11;
 
-FMCOMMS11::FMCOMMS11(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+FMCOMMS11::FMCOMMS11(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
 {
-	m_adc = iio_context_find_device(m_ctx, "axi-ad9625-hpc");
-	m_dac = iio_context_find_device(m_ctx, "axi-ad9162-hpc");
-	m_attn = iio_context_find_device(m_ctx, "hmc1119");
-	m_vga = iio_context_find_device(m_ctx, "adl5240");
+	if(m_ctx) {
+		m_adc = m_ctx->findChild<component::Device *>("axi-ad9625-hpc", Qt::FindDirectChildrenOnly);
+		m_dac = m_ctx->findChild<component::Device *>("axi-ad9162-hpc", Qt::FindDirectChildrenOnly);
+		m_attn = m_ctx->findChild<component::Device *>("hmc1119", Qt::FindDirectChildrenOnly);
+		m_vga = m_ctx->findChild<component::Device *>("adl5240", Qt::FindDirectChildrenOnly);
+	}
 
 	setupUi();
 }
@@ -113,20 +119,19 @@ QWidget *FMCOMMS11::generateAdcWidget(QWidget *parent)
 	layout->addWidget(titleLabel);
 
 	if(m_adc) {
-		iio_channel *voltage0In = iio_device_find_channel(m_adc, "voltage0", false);
+		component::Channel *voltage0In = component::channelById(m_adc, "voltage0", false);
 
 		if(voltage0In) {
 			QGridLayout *gridLayout = new QGridLayout();
 			layout->addLayout(gridLayout);
 
 			// Sampling Frequency (read-only, MHz) — left column, row 0
-			IIOWidget *samplingFreq = IIOWidgetBuilder(widget)
-							  .device(m_adc)
-							  .channel(voltage0In)
-							  .attribute("sampling_frequency")
-							  .title("Sampling Frequency (MHz)")
-							  .group(m_group)
-							  .buildSingle();
+			IIOWidget *samplingFreq =
+				IIOWidgetBuilder(widget)
+					.attribute(component::attributeByName(voltage0In, "sampling_frequency"))
+					.title("Sampling Frequency (MHz)")
+					.group(m_group)
+					.buildSingle();
 			if(samplingFreq) {
 				samplingFreq->setEnabled(false);
 				samplingFreq->showProgressBar(false);
@@ -138,11 +143,8 @@ QWidget *FMCOMMS11::generateAdcWidget(QWidget *parent)
 
 			// Scale — left column, row 1
 			IIOWidget *scale = IIOWidgetBuilder(widget)
-						   .device(m_adc)
-						   .channel(voltage0In)
-						   .attribute("scale")
+						   .attribute(component::attributeByName(voltage0In, "scale"))
 						   .uiStrategy(IIOWidgetBuilder::ComboUi)
-						   .optionsAttribute("scale_available")
 						   .title("Scale")
 						   .group(m_group)
 						   .buildSingle();
@@ -154,11 +156,8 @@ QWidget *FMCOMMS11::generateAdcWidget(QWidget *parent)
 
 			// Test Mode — right column, row 0
 			IIOWidget *testMode = IIOWidgetBuilder(widget)
-						      .device(m_adc)
-						      .channel(voltage0In)
-						      .attribute("test_mode")
+						      .attribute(component::attributeByName(voltage0In, "test_mode"))
 						      .uiStrategy(IIOWidgetBuilder::ComboUi)
-						      .optionsAttribute("test_mode_available")
 						      .title("Test Mode")
 						      .group(m_group)
 						      .buildSingle();
@@ -186,18 +185,17 @@ QWidget *FMCOMMS11::generateInputAttenuatorWidget(QWidget *parent)
 	layout->addWidget(titleLabel);
 
 	if(m_attn) {
-		iio_channel *voltage0Out = iio_device_find_channel(m_attn, "voltage0", true);
+		component::Channel *voltage0Out = component::channelById(m_attn, "voltage0", true);
 
 		if(voltage0Out) {
-			IIOWidget *hardwaregain = IIOWidgetBuilder(widget)
-							  .device(m_attn)
-							  .channel(voltage0Out)
-							  .attribute("hardwaregain")
-							  .uiStrategy(IIOWidgetBuilder::RangeUi)
-							  .optionsValues("[-31.75 0.25 0]")
-							  .title("Hardwaregain (dB)")
-							  .group(m_group)
-							  .buildSingle();
+			IIOWidget *hardwaregain =
+				IIOWidgetBuilder(widget)
+					.attribute(component::attributeByName(voltage0Out, "hardwaregain"))
+					.uiStrategy(IIOWidgetBuilder::RangeUi)
+					.optionsValues("[-31.75 0.25 0]")
+					.title("Hardwaregain (dB)")
+					.group(m_group)
+					.buildSingle();
 			if(hardwaregain) {
 				hardwaregain->showProgressBar(false);
 				hardwaregain->setDataToUIConversion(
@@ -225,16 +223,15 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 
 	if(m_dac) {
 		// Sampling Frequency (read-only, MHz) - on altvoltage0 output channel
-		iio_channel *altvoltage0Out = iio_device_find_channel(m_dac, "altvoltage0", true);
+		component::Channel *altvoltage0Out = component::channelById(m_dac, "altvoltage0", true);
 
 		if(altvoltage0Out) {
-			IIOWidget *samplingFreq = IIOWidgetBuilder(widget)
-							  .device(m_dac)
-							  .channel(altvoltage0Out)
-							  .attribute("sampling_frequency")
-							  .title("Sampling Frequency (MHz)")
-							  .group(m_group)
-							  .buildSingle();
+			IIOWidget *samplingFreq =
+				IIOWidgetBuilder(widget)
+					.attribute(component::attributeByName(altvoltage0Out, "sampling_frequency"))
+					.title("Sampling Frequency (MHz)")
+					.group(m_group)
+					.buildSingle();
 			if(samplingFreq) {
 				samplingFreq->setEnabled(false);
 				samplingFreq->showProgressBar(false);
@@ -246,16 +243,14 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 		}
 
 		// NCO Frequency (MHz) - try altvoltage4 first, fallback to altvoltage2
-		iio_channel *ncoCh = iio_device_find_channel(m_dac, "altvoltage4", true);
+		component::Channel *ncoCh = component::channelById(m_dac, "altvoltage4", true);
 		if(!ncoCh) {
-			ncoCh = iio_device_find_channel(m_dac, "altvoltage2", true);
+			ncoCh = component::channelById(m_dac, "altvoltage2", true);
 		}
 
 		if(ncoCh) {
 			IIOWidget *ncoFreq = IIOWidgetBuilder(widget)
-						     .device(m_dac)
-						     .channel(ncoCh)
-						     .attribute("frequency_nco")
+						     .attribute(component::attributeByName(ncoCh, "frequency_nco"))
 						     .uiStrategy(IIOWidgetBuilder::RangeUi)
 						     .optionsValues("[1000000 1 5999000000]")
 						     .title("NCO Frequency (MHz)")
@@ -275,29 +270,23 @@ QWidget *FMCOMMS11::generateDacWidget(QWidget *parent)
 		}
 
 		// FIR85 Enable
-		iio_channel *voltage0Out = iio_device_find_channel(m_dac, "voltage0_i", true);
-		const char *fir85Attr = voltage0Out ? iio_channel_find_attr(voltage0Out, "fir85_enable") : nullptr;
+		component::Channel *voltage0Out = component::channelById(m_dac, "voltage0_i", true);
+		component::Attribute *fir85Attr =
+			voltage0Out ? component::attributeByName(voltage0Out, "fir85_enable") : nullptr;
 
-		IIOWidget *fir85Enable = IIOWidgetBuilder(widget)
-						 .device(m_dac)
-						 .channel(voltage0Out)
-						 .attribute("fir85_enable")
-						 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
-						 .title("FIR85 Enable")
-						 .group(m_group)
-						 .buildSingle();
-
-		if(fir85Enable) {
-			fir85Enable->showProgressBar(false);
-			fir85Enable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-			if(!voltage0Out || !fir85Attr) {
-				fir85Enable->setEnabled(false);
-				fir85Enable->getUiStrategy()->setInfoMessage(
-					"The attribute for this option is missing");
-			} else {
+		if(fir85Attr) {
+			IIOWidget *fir85Enable = IIOWidgetBuilder(widget)
+							 .attribute(fir85Attr)
+							 .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
+							 .title("FIR85 Enable")
+							 .group(m_group)
+							 .buildSingle();
+			if(fir85Enable) {
+				fir85Enable->showProgressBar(false);
+				fir85Enable->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 				connect(this, &FMCOMMS11::readRequested, fir85Enable, &IIOWidget::readAsync);
+				layout->addWidget(fir85Enable);
 			}
-			layout->addWidget(fir85Enable);
 		}
 	}
 
@@ -317,18 +306,17 @@ QWidget *FMCOMMS11::generateOutputVgaWidget(QWidget *parent)
 	layout->addWidget(titleLabel);
 
 	if(m_vga) {
-		iio_channel *voltage0Out = iio_device_find_channel(m_vga, "voltage0", true);
+		component::Channel *voltage0Out = component::channelById(m_vga, "voltage0", true);
 
 		if(voltage0Out) {
-			IIOWidget *hardwaregain = IIOWidgetBuilder(widget)
-							  .device(m_vga)
-							  .channel(voltage0Out)
-							  .attribute("hardwaregain")
-							  .uiStrategy(IIOWidgetBuilder::RangeUi)
-							  .optionsValues("[-11.5 0.5 20]")
-							  .title("Hardwaregain (dB)")
-							  .group(m_group)
-							  .buildSingle();
+			IIOWidget *hardwaregain =
+				IIOWidgetBuilder(widget)
+					.attribute(component::attributeByName(voltage0Out, "hardwaregain"))
+					.uiStrategy(IIOWidgetBuilder::RangeUi)
+					.optionsValues("[-11.5 0.5 20]")
+					.title("Hardwaregain (dB)")
+					.group(m_group)
+					.buildSingle();
 			if(hardwaregain) {
 				hardwaregain->showProgressBar(false);
 				hardwaregain->setDataToUIConversion(
