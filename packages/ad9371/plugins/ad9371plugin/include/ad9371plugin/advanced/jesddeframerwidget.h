@@ -24,13 +24,15 @@
 #include "scopy-ad9371plugin_export.h"
 #include <QWidget>
 #include <QVBoxLayout>
-#include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <menuonoffswitch.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
 }
+} // namespace scopy
 
 namespace scopy::ad9371 {
 
@@ -39,7 +41,8 @@ class SCOPY_AD9371PLUGIN_EXPORT JesdDeframerWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit JesdDeframerWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit JesdDeframerWidget(component::Device *device, IIOWidgetGroup *group = nullptr,
+				    QWidget *parent = nullptr);
 	~JesdDeframerWidget();
 
 Q_SIGNALS:
@@ -48,7 +51,7 @@ Q_SIGNALS:
 private:
 	void setupUi();
 
-	iio_device *m_device;
+	component::Device *m_device;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 

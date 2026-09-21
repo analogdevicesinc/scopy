@@ -31,13 +31,17 @@
 #include <QLoggingCategory>
 #include <style.h>
 #include <gui/widgets/menucollapsesection.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_BIST, "AD9371_BIST")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+BistWidget::BistWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -222,11 +226,14 @@ void BistWidget::onInitializeClicked()
 		return;
 	}
 
-	int ret = iio_device_debug_attr_write_longlong(m_device, "initialize", 1);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_BIST) << "Failed to write initialize, error:" << ret;
-	} else {
-		qDebug(CAT_AD9371_BIST) << "Initialize triggered successfully";
+	component::Attribute *wAttr = component::attributeByName(m_device, "initialize");
+	if(wAttr && wAttr->writeCapability()) {
+		auto res = QCoro::waitFor(wAttr->writeCapability()->writeAsync("1"));
+		if(!res) {
+			qWarning(CAT_AD9371_BIST) << "Failed to write initialize";
+		} else {
+			qDebug(CAT_AD9371_BIST) << "Initialize triggered successfully";
+		}
 	}
 
 	// Trigger a settings reload after initialize
@@ -246,8 +253,11 @@ void BistWidget::writeBistToneToDevice()
 	QString cmd = QString("%1 %2 %3").arg(enable).arg(tx1Freq).arg(tx2Freq);
 
 	// Reset first, then write new (iio-oscilloscope pattern)
-	iio_device_debug_attr_write(m_device, "bist_tone", "0 0 0");
-	iio_device_debug_attr_write(m_device, "bist_tone", cmd.toStdString().c_str());
+	component::Attribute *wAttr = component::attributeByName(m_device, "bist_tone");
+	if(wAttr && wAttr->writeCapability()) {
+		QCoro::waitFor(wAttr->writeCapability()->writeAsync("0 0 0"));
+		QCoro::waitFor(wAttr->writeCapability()->writeAsync(cmd));
+	}
 
 	qDebug(CAT_AD9371_BIST) << "Wrote bist_tone:" << cmd;
 }
@@ -258,9 +268,17 @@ void BistWidget::readBistToneFromDevice()
 		return;
 	}
 
-	char value[256];
-	int ret = iio_device_debug_attr_read(m_device, "bist_tone", value, sizeof(value));
-	if(ret < 0) {
+	component::Attribute *rAttr = component::attributeByName(m_device, "bist_tone");
+	QString value;
+	bool ok = false;
+	if(rAttr && rAttr->readCapability()) {
+		auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+		if(rRes) {
+			value = rAttr->cachedValue().trimmed();
+			ok = true;
+		}
+	}
+	if(!ok) {
 		m_ncoEnableCheckbox->setChecked(false);
 		m_tx1NcoFreqSpin->setValue(0);
 		m_tx2NcoFreqSpin->setValue(0);
@@ -269,7 +287,7 @@ void BistWidget::readBistToneFromDevice()
 	}
 
 	// Parse "enable tx1_freq_hz tx2_freq_hz"
-	QStringList parts = QString::fromUtf8(value).trimmed().split(' ');
+	QStringList parts = value.split(' ');
 	if(parts.size() >= 3) {
 		bool enableValue = (parts[0] == "1");
 		double tx1FreqMHz = parts[1].toDouble() / 1000000.0; // Hz to MHz
@@ -288,10 +306,9 @@ void BistWidget::readBistToneFromDevice()
 		m_tx1NcoFreqSpin->blockSignals(false);
 		m_tx2NcoFreqSpin->blockSignals(false);
 
-		qDebug(CAT_AD9371_BIST) << "Read bist_tone:" << QString::fromUtf8(value).trimmed()
-					<< "enable:" << enableValue << "tx1:" << tx1FreqMHz << "MHz tx2:" << tx2FreqMHz
-					<< "MHz";
+		qDebug(CAT_AD9371_BIST) << "Read bist_tone:" << value << "enable:" << enableValue
+					<< "tx1:" << tx1FreqMHz << "MHz tx2:" << tx2FreqMHz << "MHz";
 	} else {
-		qWarning(CAT_AD9371_BIST) << "Invalid bist_tone format:" << QString::fromUtf8(value).trimmed();
+		qWarning(CAT_AD9371_BIST) << "Invalid bist_tone format:" << value;
 	}
 }

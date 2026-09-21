@@ -31,13 +31,17 @@
 #include <QLoggingCategory>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/style.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_AUX_DAC, "AD9371_AUX_DAC")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-AuxDacWidget::AuxDacWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+AuxDacWidget::AuxDacWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -184,8 +188,16 @@ void AuxDacWidget::readEnableMaskFromDevice()
 	}
 
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,aux-dac-enable-mask", &mask);
-	if(ret < 0) {
+	bool ok = false;
+	component::Attribute *maskAttr = component::attributeByName(m_device, "adi,aux-dac-enable-mask");
+	if(maskAttr && maskAttr->readCapability()) {
+		auto res = QCoro::waitFor(maskAttr->readCapability()->readAsync());
+		if(res) {
+			mask = maskAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
 		qDebug(CAT_AD9371_AUX_DAC) << "Failed to read aux-dac-enable-mask, using defaults";
 		mask = 0;
 	}
@@ -206,9 +218,17 @@ void AuxDacWidget::writeEnableMaskToDevice()
 
 	// Read-modify-write: preserve bits not managed by this UI
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,aux-dac-enable-mask", &mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_AUX_DAC) << "Failed to read aux-dac-enable-mask before write, error:" << ret;
+	bool ok = false;
+	component::Attribute *maskAttr = component::attributeByName(m_device, "adi,aux-dac-enable-mask");
+	if(maskAttr && maskAttr->readCapability()) {
+		auto res = QCoro::waitFor(maskAttr->readCapability()->readAsync());
+		if(res) {
+			mask = maskAttr->cachedValue().trimmed().toLongLong(nullptr, 0);
+			ok = true;
+		}
+	}
+	if(!ok) {
+		qWarning(CAT_AD9371_AUX_DAC) << "Failed to read aux-dac-enable-mask before write";
 		return;
 	}
 
@@ -223,8 +243,13 @@ void AuxDacWidget::writeEnableMaskToDevice()
 		}
 	}
 
-	ret = iio_device_debug_attr_write_longlong(m_device, "adi,aux-dac-enable-mask", mask);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_AUX_DAC) << "Failed to write aux-dac-enable-mask, error:" << ret;
+	component::Attribute *wAttr = component::attributeByName(m_device, "adi,aux-dac-enable-mask");
+	if(wAttr && wAttr->writeCapability()) {
+		auto wRes = QCoro::waitFor(wAttr->writeCapability()->writeAsync(QString::number(mask)));
+		if(!wRes) {
+			qWarning(CAT_AD9371_AUX_DAC) << "Failed to write aux-dac-enable-mask";
+		}
+	} else {
+		qWarning(CAT_AD9371_AUX_DAC) << "Failed to write aux-dac-enable-mask";
 	}
 }
