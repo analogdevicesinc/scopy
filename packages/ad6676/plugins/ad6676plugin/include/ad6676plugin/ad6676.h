@@ -27,7 +27,6 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QPushButton>
-#include <iio.h>
 
 #include <gui/tooltemplate.h>
 #include <gui/widgets/animatedrefreshbtn.h>
@@ -36,8 +35,13 @@
 #include <iio-widgets/iiowidget.h>
 
 namespace scopy {
+namespace component {
+class Context;
+class Device;
+class Channel;
+} // namespace component
 class IIOWidgetGroup;
-}
+} // namespace scopy
 
 namespace scopy::ad6676 {
 
@@ -45,7 +49,7 @@ class SCOPY_AD6676PLUGIN_EXPORT Ad6676 : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Ad6676(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	explicit Ad6676(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~Ad6676();
 
 Q_SIGNALS:
@@ -60,10 +64,11 @@ private:
 	void connectSignals();
 
 	// Widget helpers — inline, no separate factory class needed
-	IIOWidget *createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title);
-	IIOWidget *createComboWidget(iio_channel *ch, const QString &attr, const QString &availableAttr,
+	IIOWidget *createRangeWidget(component::Channel *ch, const QString &attr, const QString &range,
 				     const QString &title);
-	IIOWidget *createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
+	IIOWidget *createComboWidget(component::Channel *ch, const QString &attr, const QString &availableAttr,
+				     const QString &title);
+	IIOWidget *createReadOnlyWidget(component::Channel *ch, const QString &attr, const QString &title);
 
 	// Section creation methods — one per glade frame
 	QWidget *createAdcSettingsSection(QWidget *parent);
@@ -72,10 +77,10 @@ private:
 	QWidget *createShufflerSettingsSection(QWidget *parent);
 	QWidget *createTestSettingsSection(QWidget *parent);
 
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
-	iio_device *m_dev = nullptr;
-	iio_channel *m_chn = nullptr;
+	component::Device *m_dev = nullptr;
+	component::Channel *m_chn = nullptr;
 
 	QVBoxLayout *m_mainLayout = nullptr;
 	ToolTemplate *m_tool = nullptr;
