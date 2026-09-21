@@ -32,10 +32,15 @@
 #include <gui/widgets/menuspinbox.h>
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iio.h>
 #include <tooltemplate.h>
 
-namespace scopy::cn0357 {
+namespace scopy {
+namespace component {
+class Context;
+class Device;
+class Channel;
+} // namespace component
+namespace cn0357 {
 
 class SCOPY_CN0357_EXPORT Cn0357Tool : public QWidget
 {
@@ -44,7 +49,7 @@ class SCOPY_CN0357_EXPORT Cn0357Tool : public QWidget
 	friend class Cn0357_API;
 
 public:
-	explicit Cn0357Tool(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	explicit Cn0357Tool(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~Cn0357Tool() = default;
 
 Q_SIGNALS:
@@ -65,13 +70,13 @@ private:
 	QWidget *createFeedbackSettingsSection(QWidget *parent);
 	QWidget *createSystemSection(QWidget *parent);
 
-	// IIO handles
-	iio_context *m_ctx;
+	// device-controller component handles
+	component::Context *m_ctx;
 	IIOWidgetGroup *m_group;
-	iio_device *m_adcDev = nullptr;
-	iio_channel *m_adcCh = nullptr;	 // voltage0 (in)
-	iio_channel *m_pwrCh = nullptr;	 // supply (in)
-	iio_channel *m_rdacCh = nullptr; // dpot voltage0 (out)
+	component::Device *m_adcDev = nullptr;
+	component::Channel *m_adcCh = nullptr;	// voltage0 (in)
+	component::Channel *m_pwrCh = nullptr;	// supply (in)
+	component::Channel *m_rdacCh = nullptr; // dpot voltage0 (out)
 
 	// UI structure
 	ToolTemplate *m_tool;
@@ -102,5 +107,6 @@ private:
 	double m_adcMv = 0.0;
 };
 
-} // namespace scopy::cn0357
+} // namespace cn0357
+} // namespace scopy
 #endif // CN0357TOOL_H

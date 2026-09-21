@@ -31,12 +31,18 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <style.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 #include "cn0357widgetfactory.h"
 
 Q_LOGGING_CATEGORY(CAT_CN0357TOOL, "Cn0357Tool")
 using namespace scopy::cn0357;
 
-Cn0357Tool::Cn0357Tool(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Cn0357Tool::Cn0357Tool(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -53,16 +59,16 @@ void Cn0357Tool::findDevicesAndChannels()
 	if(!m_ctx)
 		return;
 
-	m_adcDev = iio_context_find_device(m_ctx, "ad7790");
-	iio_device *dpotDev = iio_context_find_device(m_ctx, "ad5270_iio");
+	m_adcDev = m_ctx->findChild<component::Device *>("ad7790", Qt::FindDirectChildrenOnly);
+	component::Device *dpotDev = m_ctx->findChild<component::Device *>("ad5270_iio", Qt::FindDirectChildrenOnly);
 
 	if(m_adcDev) {
-		m_adcCh = iio_device_find_channel(m_adcDev, "voltage0", false);
-		m_pwrCh = iio_device_find_channel(m_adcDev, "supply", false);
+		m_adcCh = component::channelById(m_adcDev, "voltage0", false);
+		m_pwrCh = component::channelById(m_adcDev, "supply", false);
 	}
 
 	if(dpotDev) {
-		m_rdacCh = iio_device_find_channel(dpotDev, "voltage0", true);
+		m_rdacCh = component::channelById(dpotDev, "voltage0", true);
 	}
 
 	if(!m_adcDev)
@@ -179,7 +185,9 @@ QWidget *Cn0357Tool::createFeedbackSettingsSection(QWidget *parent)
 		if(!m_rdacCh)
 			return;
 		QString raw = QString::number((int)m_rdacSpinBox->value());
-		iio_channel_attr_write(m_rdacCh, "raw", raw.toStdString().c_str());
+		if(auto *a = component::attributeByName(m_rdacCh, "raw"); a && a->writeCapability()) {
+			a->writeCapability()->writeAsync(raw);
+		}
 	});
 
 	if(!m_rdacCh) {
@@ -243,8 +251,8 @@ QWidget *Cn0357Tool::createSystemSection(QWidget *parent)
 
 	// Conversion (mV) — IIOWidget ReadOnly, adc voltage0-voltage0, raw→mV
 	// Factory handles null channel: returns disabled IIOWidget with info message
-	m_adcMvWidget = Cn0357WidgetFactory::createAdcReadOnlyWidget(m_adcDev, m_adcCh, "raw", "Conversion (mV)",
-								     1200.0, m_group, measurementsWidget);
+	m_adcMvWidget = Cn0357WidgetFactory::createAdcReadOnlyWidget(m_adcCh, "raw", "Conversion (mV)", 1200.0, m_group,
+								     measurementsWidget);
 	if(m_adcMvWidget) {
 		measurementsLayout->addWidget(m_adcMvWidget);
 		connect(this, &Cn0357Tool::readRequested, m_adcMvWidget, &IIOWidget::readAsync);
@@ -258,8 +266,8 @@ QWidget *Cn0357Tool::createSystemSection(QWidget *parent)
 
 	// Supply Voltage (V) — IIOWidget ReadOnly, adc supply, raw→V
 	// Factory handles null channel: returns disabled IIOWidget with info message
-	m_supplyVWidget = Cn0357WidgetFactory::createAdcReadOnlyWidget(m_adcDev, m_pwrCh, "raw", "Supply Voltage (V)",
-								       5.85, m_group, measurementsWidget);
+	m_supplyVWidget = Cn0357WidgetFactory::createAdcReadOnlyWidget(m_pwrCh, "raw", "Supply Voltage (V)", 5.85,
+								       m_group, measurementsWidget);
 	if(m_supplyVWidget) {
 		measurementsLayout->addWidget(m_supplyVWidget);
 		connect(this, &Cn0357Tool::readRequested, m_supplyVWidget, &IIOWidget::readAsync);
