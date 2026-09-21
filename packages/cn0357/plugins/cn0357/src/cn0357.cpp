@@ -23,26 +23,23 @@
 #include "cn0357tool.h"
 
 #include <QLoggingCategory>
-#include <iio.h>
-#include <iioutil/connectionprovider.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/scopyjs.h>
 #include <style.h>
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_CN0357PLUGIN, "Cn0357Plugin")
 using namespace scopy::cn0357;
 
 bool Cn0357Plugin::compatible(QString param, QString category)
 {
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(param);
-	if(!conn)
+	component::ContextHandle ctx = component::Controller::context(param);
+	if(!ctx)
 		return false;
 
-	bool ret = (iio_context_find_device(conn->context(), "ad7790") != nullptr);
-
-	cp->close(param);
-	return ret;
+	return ctx->findChild<component::Device *>("ad7790", Qt::FindDirectChildrenOnly) != nullptr;
 }
 
 bool Cn0357Plugin::loadPage() { return false; }
@@ -66,16 +63,15 @@ QString Cn0357Plugin::description() { return "CN0357 Electrochemical Gas Concent
 
 bool Cn0357Plugin::onConnect()
 {
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		qWarning(CAT_CN0357PLUGIN) << "Failed to open connection";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	Cn0357Tool *tool = new Cn0357Tool(conn->context(), m_widgetGroup);
+	Cn0357Tool *tool = new Cn0357Tool(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(tool);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -108,8 +104,7 @@ bool Cn0357Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
+	m_context = {};
 	return true;
 }
 

@@ -26,21 +26,25 @@
 #include <QWidget>
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iio.h>
 
-namespace scopy::cn0357 {
+namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
+namespace cn0357 {
 
 class SCOPY_CN0357_EXPORT Cn0357WidgetFactory
 {
 public:
 	// Sampling frequency combo (device-level, uses _available attribute)
-	static IIOWidget *createComboWidget(iio_device *device, QString attr, QString availableAttr, QString title,
-					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	static IIOWidget *createComboWidget(component::Device *device, QString attr, QString availableAttr,
+					    QString title, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 
 	// ADC raw ReadOnly widget with linear conversion: (raw/32768.0 - 1) * factor
 	// Used for voltage0-voltage0 (factor=1200.0 → mV) and supply (factor=5.85 → V)
-	// When channel is null, creates a disabled widget with info message instead
-	static IIOWidget *createAdcReadOnlyWidget(iio_device *device, iio_channel *channel, QString attr, QString title,
+	// Returns nullptr when the channel is not available.
+	static IIOWidget *createAdcReadOnlyWidget(component::Channel *channel, QString attr, QString title,
 						  double factor, IIOWidgetGroup *group = nullptr,
 						  QWidget *parent = nullptr);
 
@@ -48,5 +52,6 @@ private:
 	Cn0357WidgetFactory() = delete;
 };
 
-} // namespace scopy::cn0357
+} // namespace cn0357
+} // namespace scopy
 #endif // CN0357WIDGETFACTORY_H
