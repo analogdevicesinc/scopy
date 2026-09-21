@@ -27,6 +27,7 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <component/controller.h>
 
 namespace scopy {
 class IIOWidgetGroup;
@@ -61,6 +62,7 @@ private:
 
 	Cn0357_API *m_api = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
+	component::ContextHandle m_context;
 };
 
 } // namespace scopy::cn0357
