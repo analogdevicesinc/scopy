@@ -22,6 +22,9 @@
 #include "iiowidgetgroup.h"
 #include <QLoggingCategory>
 #include <iio.h>
+#include <component/attribute.h>
+#include <component/channel.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_IIOWIDGETGROUP, "IIOWidgetGroup")
 
@@ -73,6 +76,23 @@ QString IIOWidgetGroup::generateKey(const IIOWidgetFactoryRecipe &recipe)
 	QString deviceName;
 	QString channelId;
 	QString attribute = recipe.data;
+
+	// Device-controller (component) path: derive the same device/channel_dir/attr
+	// key from the component tree parents so keys match the libiio path above.
+	if(recipe.attribute) {
+		QObject *parent = recipe.attribute->parent();
+		if(auto *chan = qobject_cast<component::Channel *>(parent)) {
+			channelId = chan->id() + (chan->isOutput() ? "_out" : "_in");
+			if(auto *dev = qobject_cast<component::Device *>(chan->parent())) {
+				deviceName = dev->name();
+			}
+			return deviceName + "/" + channelId + "/" + attribute;
+		}
+		if(auto *dev = qobject_cast<component::Device *>(parent)) {
+			return dev->name() + "/" + attribute;
+		}
+		return QStringLiteral("context/") + attribute;
+	}
 
 	if(recipe.channel) {
 		const char *name = iio_channel_get_id(recipe.channel);
