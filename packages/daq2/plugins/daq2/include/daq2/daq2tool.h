@@ -28,10 +28,12 @@
 #include <animatedrefreshbtn.h>
 #include <iio-widgets/iiowidgetbuilder.h>
 
-#include <iio.h>
-
 namespace scopy {
 class IIOWidgetGroup;
+
+namespace component {
+class Context;
+} // namespace component
 
 namespace daq2 {
 
@@ -39,7 +41,7 @@ class SCOPY_DAQ2_EXPORT DAQ2 : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit DAQ2(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit DAQ2(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~DAQ2();
 
 Q_SIGNALS:
@@ -49,7 +51,7 @@ private:
 	QWidget *buildAdcSection();
 	QWidget *buildDacSection();
 
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	ToolTemplate *m_tool;
 	AnimatedRefreshBtn *m_refreshButton;
