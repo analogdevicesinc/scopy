@@ -29,8 +29,11 @@
 #include <deviceiconbuilder.h>
 #include <style.h>
 #include "scopy-fmcomms11_config.h"
-#include <iioutil/connectionprovider.h>
 #include <iio-widgets/iiowidgetgroup.h>
+
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_FMCOMMS11PLUGIN, "Fmcomms11Plugin")
 using namespace scopy::fmcomms11;
@@ -38,23 +41,19 @@ using namespace scopy::fmcomms11;
 bool Fmcomms11Plugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_FMCOMMS11PLUGIN) << "Check FMCOMMS11 compatibility";
-	bool ret = false;
-	Connection *conn = ConnectionProvider::open(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!ctx) {
 		qWarning(CAT_FMCOMMS11PLUGIN) << "No context available for FMCOMMS11";
 		return false;
 	}
 
-	iio_device *adc = iio_context_find_device(conn->context(), "axi-ad9625-hpc");
-	iio_device *dac = iio_context_find_device(conn->context(), "axi-ad9162-hpc");
-	iio_device *attn = iio_context_find_device(conn->context(), "hmc1119");
-	iio_device *vga = iio_context_find_device(conn->context(), "adl5240");
-	ret = !!adc && !!dac && !!attn && !!vga;
+	bool adc = ctx->findChild<component::Device *>("axi-ad9625-hpc", Qt::FindDirectChildrenOnly) != nullptr;
+	bool dac = ctx->findChild<component::Device *>("axi-ad9162-hpc", Qt::FindDirectChildrenOnly) != nullptr;
+	bool attn = ctx->findChild<component::Device *>("hmc1119", Qt::FindDirectChildrenOnly) != nullptr;
+	bool vga = ctx->findChild<component::Device *>("adl5240", Qt::FindDirectChildrenOnly) != nullptr;
 
-	ConnectionProvider::close(m_param);
-
-	return ret;
+	return adc && dac && attn && vga;
 }
 
 bool Fmcomms11Plugin::loadPage() { return false; }
@@ -90,16 +89,16 @@ QString Fmcomms11Plugin::displayName() { return FMCOMMS11_PLUGIN_DISPLAY_NAME; }
 
 bool Fmcomms11Plugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::open(m_param);
+	m_context = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!m_context) {
 		qWarning(CAT_FMCOMMS11PLUGIN) << "No context available for FMCOMMS11";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	FMCOMMS11 *tool = new FMCOMMS11(conn->context(), m_widgetGroup);
+	FMCOMMS11 *tool = new FMCOMMS11(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(tool);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -132,7 +131,7 @@ bool Fmcomms11Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider::close(m_param);
+	m_context = {};
 	return true;
 }
 
