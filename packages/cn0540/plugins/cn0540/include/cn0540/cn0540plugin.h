@@ -28,6 +28,7 @@
 #include <iio-widgets/iiowidgetgroup.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <component/controller.h>
 
 namespace scopy::cn0540 {
 
@@ -58,6 +59,7 @@ private:
 	void initApi();
 	CN0540_API *m_api = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
+	component::ContextHandle m_context;
 };
 
 } // namespace scopy::cn0540
