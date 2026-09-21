@@ -20,7 +20,7 @@
 
 #include "cn0540.h"
 
-#include <cstring>
+#include <chrono>
 
 #include <QFormLayout>
 #include <QGridLayout>
@@ -29,12 +29,17 @@
 #include <QMetaObject>
 #include <QScrollArea>
 #include <QSpacerItem>
-#include <QThread>
-#include <QtConcurrent>
+#include <qcorotimer.h>
 
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <gui/style_properties.h>
 #include <style.h>
+
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 Q_LOGGING_CATEGORY(CAT_CN0540, "CN0540")
 
@@ -47,7 +52,7 @@ static constexpr double XADC_VREF = 3.3;
 using namespace scopy;
 using namespace scopy::cn0540;
 
-CN0540::CN0540(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+CN0540::CN0540(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_adcDev(nullptr)
@@ -84,18 +89,18 @@ CN0540::CN0540(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 		return;
 	}
 
-	m_adcDev = iio_context_find_device(m_ctx, "ad7768-1");
-	m_dacDev = iio_context_find_device(m_ctx, "ltc2606");
-	m_gpioDev = iio_context_find_device(m_ctx, "one-bit-adc-dac");
-	m_voltMonDev = iio_context_find_device(m_ctx, "xadc");
+	m_adcDev = m_ctx->findChild<component::Device *>("ad7768-1", Qt::FindDirectChildrenOnly);
+	m_dacDev = m_ctx->findChild<component::Device *>("ltc2606", Qt::FindDirectChildrenOnly);
+	m_gpioDev = m_ctx->findChild<component::Device *>("one-bit-adc-dac", Qt::FindDirectChildrenOnly);
+	m_voltMonDev = m_ctx->findChild<component::Device *>("xadc", Qt::FindDirectChildrenOnly);
 	if(!m_voltMonDev)
-		m_voltMonDev = iio_context_find_device(m_ctx, "ltc2308");
+		m_voltMonDev = m_ctx->findChild<component::Device *>("ltc2308", Qt::FindDirectChildrenOnly);
 
 	if(m_adcDev) {
-		m_adcCh = iio_device_find_channel(m_adcDev, "voltage0", false);
+		m_adcCh = component::channelById(m_adcDev, "voltage0", false);
 	}
 	if(m_dacDev) {
-		m_dacCh = iio_device_find_channel(m_dacDev, "voltage0", true);
+		m_dacCh = component::channelById(m_dacDev, "voltage0", true);
 	}
 	if(m_gpioDev) {
 		findGpioChannels();
@@ -113,38 +118,39 @@ CN0540::CN0540(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	}
 
 	Q_EMIT readAll();
-	QMetaObject::invokeMethod(this, &CN0540::onCalibrate, Qt::QueuedConnection);
+	QMetaObject::invokeMethod(
+		this, [this]() { m_calibTask = onCalibrate(); }, Qt::QueuedConnection);
 }
 
 CN0540::~CN0540()
 {
 	if(m_voltMonTimer)
 		m_voltMonTimer->stop();
-	m_calibFuture.waitForFinished();
+	if(m_calibTask) {
+		QCoro::waitFor(*m_calibTask);
+	}
 }
 
 void CN0540::findGpioChannels()
 {
-	unsigned int nch = iio_device_get_channels_count(m_gpioDev);
-	for(unsigned int i = 0; i < nch; i++) {
-		iio_channel *ch = iio_device_get_channel(m_gpioDev, i);
-		if(!ch)
+	for(component::Channel *ch :
+	    m_gpioDev->findChildren<component::Channel *>(QString(), Qt::FindDirectChildrenOnly)) {
+		component::Attribute *labelAttr = component::attributeByName(ch, "label");
+		if(!labelAttr || !labelAttr->readCapability())
 			continue;
 
-		char label[64] = {};
-		int ret = iio_channel_attr_read(ch, "label", label, sizeof(label));
-		if(ret < 0)
-			continue;
+		QCoro::waitFor(labelAttr->readCapability()->readAsync());
+		QString label = labelAttr->cachedValue();
 
-		if(strstr(label, "cn0540_sw_ff_gpio")) {
+		if(label.contains("cn0540_sw_ff_gpio")) {
 			m_gpioSwFF = ch;
-		} else if(strstr(label, "cn0540_shutdown_gpio")) {
+		} else if(label.contains("cn0540_shutdown_gpio")) {
 			m_gpioShutdown = ch;
-		} else if(strstr(label, "cn0540_FDA_DIS")) {
+		} else if(label.contains("cn0540_FDA_DIS")) {
 			m_gpioFdaDis = ch;
-		} else if(strstr(label, "cn0540_FDA_MODE")) {
+		} else if(label.contains("cn0540_FDA_MODE")) {
 			m_gpioFdaMode = ch;
-		} else if(strstr(label, "cn0540_blue_led")) {
+		} else if(label.contains("cn0540_blue_led")) {
 			m_gpioCC = ch;
 		}
 	}
@@ -153,64 +159,60 @@ void CN0540::findGpioChannels()
 void CN0540::findVoltMonChannels()
 {
 	// xadc analog pins start at voltage9; ltc2308 starts at voltage0
-	const char *devName = iio_device_get_name(m_voltMonDev);
-	m_isXadc = devName && (strcmp(devName, "xadc") == 0);
+	m_isXadc = (m_voltMonDev->objectName() == "xadc");
 	int startIdx = m_isXadc ? 9 : 0;
 
 	for(int i = 0; i < NUM_ANALOG_PINS; i++) {
-		char name[16];
-		snprintf(name, sizeof(name), "voltage%d", startIdx + i);
-		m_analogIn[i] = iio_device_find_channel(m_voltMonDev, name, false);
+		m_analogIn[i] = component::channelById(m_voltMonDev, QString("voltage%1").arg(startIdx + i), false);
 	}
 }
 
-bool CN0540::getGpioState(iio_channel *ch)
+QCoro::Task<bool> CN0540::getGpioState(component::Channel *ch)
 {
-	long long val = 0;
-	int ret = iio_channel_attr_read_longlong(ch, "raw", &val);
-	if(ret < 0) {
-		qWarning(CAT_CN0540) << "getGpioState: failed to read raw attr, ret=" << ret;
+	component::Attribute *raw = component::attributeByName(ch, "raw");
+	if(!raw || !raw->readCapability()) {
+		co_return false;
 	}
-	return (bool)val;
+	co_await raw->readCapability()->readAsync();
+	co_return raw->cachedValue().toLongLong() != 0;
 }
 
-void CN0540::setGpioState(iio_channel *ch, bool state)
+QCoro::Task<void> CN0540::setGpioState(component::Channel *ch, bool state)
 {
-	int ret = iio_channel_attr_write_longlong(ch, "raw", (long long)state);
-	if(ret < 0) {
-		qWarning(CAT_CN0540) << "setGpioState: failed to write raw attr, ret=" << ret;
+	component::Attribute *raw = component::attributeByName(ch, "raw");
+	if(!raw || !raw->writeCapability()) {
+		co_return;
 	}
+	co_await raw->writeCapability()->writeAsync(QString::number((int)state));
 }
 
-double CN0540::getVoltage(iio_channel *ch)
+QCoro::Task<double> CN0540::getVoltage(component::Channel *ch)
 {
-	long long raw = 0;
-	double scale = 0.0;
-	int ret = iio_channel_attr_read_longlong(ch, "raw", &raw);
-	if(ret < 0) {
-		qWarning(CAT_CN0540) << "getVoltage: failed to read raw attr, ret=" << ret;
+	component::Attribute *raw = component::attributeByName(ch, "raw");
+	component::Attribute *scaleAttr = component::attributeByName(ch, "scale");
+	if(!raw || !raw->readCapability() || !scaleAttr || !scaleAttr->readCapability()) {
+		co_return 0.0;
 	}
-	ret = iio_channel_attr_read_double(ch, "scale", &scale);
-	if(ret < 0) {
-		qWarning(CAT_CN0540) << "getVoltage: failed to read scale attr, ret=" << ret;
-	}
-	return (double)raw * scale;
+	co_await raw->readCapability()->readAsync();
+	co_await scaleAttr->readCapability()->readAsync();
+	co_return raw->cachedValue().toDouble() * scaleAttr->cachedValue().toDouble();
 }
 
-void CN0540::setVoltage(iio_channel *ch, double voltageMv)
+QCoro::Task<void> CN0540::setVoltage(component::Channel *ch, double voltageMv)
 {
-	double scale = 0.0;
-	int ret = iio_channel_attr_read_double(ch, "scale", &scale);
-	if(ret < 0) {
-		qWarning(CAT_CN0540) << "setVoltage: failed to read scale attr, ret=" << ret;
-		return;
+	component::Attribute *raw = component::attributeByName(ch, "raw");
+	component::Attribute *scaleAttr = component::attributeByName(ch, "scale");
+	if(!raw || !raw->writeCapability() || !scaleAttr || !scaleAttr->readCapability()) {
+		co_return;
 	}
+	co_await scaleAttr->readCapability()->readAsync();
+	double scale = scaleAttr->cachedValue().toDouble();
 	if(scale != 0.0) {
-		iio_channel_attr_write_longlong(ch, "raw", (long long)(voltageMv / scale));
+		co_await raw->writeCapability()->writeAsync(QString::number((long long)(voltageMv / scale)));
 	}
 }
 
-double CN0540::getVshiftMv() { return getVoltage(m_dacCh) * DAC_BUF_GAIN; }
+QCoro::Task<double> CN0540::getVshiftMv() { co_return(co_await getVoltage(m_dacCh)) * DAC_BUF_GAIN; }
 
 void CN0540::setupUi()
 {
@@ -294,8 +296,7 @@ MenuSectionCollapseWidget *CN0540::createPowerControlSection(QWidget *parent)
 	// SHUTDOWN row (active-low: GPIO low=operating, GPIO high=shutdown)
 	if(m_gpioShutdown) {
 		m_shutdownWidget = IIOWidgetBuilder(container)
-					   .channel(m_gpioShutdown)
-					   .attribute("raw")
+					   .attribute(component::attributeByName(m_gpioShutdown, "raw"))
 					   .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					   .title("Shutdown")
 					   .group(m_group)
@@ -309,8 +310,7 @@ MenuSectionCollapseWidget *CN0540::createPowerControlSection(QWidget *parent)
 	// CONSTANT CURRENT row (active-high: GPIO high=LED on=constant current)
 	if(m_gpioCC) {
 		m_ccWidget = IIOWidgetBuilder(container)
-				     .channel(m_gpioCC)
-				     .attribute("raw")
+				     .attribute(component::attributeByName(m_gpioCC, "raw"))
 				     .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				     .title("Constant Current")
 				     .group(m_group)
@@ -338,8 +338,7 @@ MenuSectionCollapseWidget *CN0540::createAdcDriverSection(QWidget *parent)
 	// FDA Status row (active-low: GPIO low=FDA enabled, GPIO high=FDA disabled)
 	if(m_gpioFdaDis) {
 		m_fdaWidget = IIOWidgetBuilder(container)
-				      .channel(m_gpioFdaDis)
-				      .attribute("raw")
+				      .attribute(component::attributeByName(m_gpioFdaDis, "raw"))
 				      .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				      .title("FDA Status")
 				      .group(m_group)
@@ -353,8 +352,7 @@ MenuSectionCollapseWidget *CN0540::createAdcDriverSection(QWidget *parent)
 	// FDA Mode row (raw=1 → FULL POWER, raw=0 → LOW POWER; maps directly to checkbox)
 	if(m_gpioFdaMode) {
 		m_fdaModeWidget = IIOWidgetBuilder(container)
-					  .channel(m_gpioFdaMode)
-					  .attribute("raw")
+					  .attribute(component::attributeByName(m_gpioFdaMode, "raw"))
 					  .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 					  .title("FDA Mode (checked = FULL POWER)")
 					  .group(m_group)
@@ -409,6 +407,7 @@ MenuSectionCollapseWidget *CN0540::createSensorCalibSection(QWidget *parent)
 		double mV = m_vshiftLineEdit->text().toDouble(&ok);
 		if(ok) {
 			setVoltage(m_dacCh, mV / DAC_BUF_GAIN);
+			m_vshiftLineEdit->setText(QString::number(mV, 'f', 4));
 		}
 	});
 	layout->addWidget(writeVshiftBtn, 1, 3);
@@ -449,48 +448,50 @@ MenuSectionCollapseWidget *CN0540::createVoltMonSection(QWidget *parent)
 	return section;
 }
 
-void CN0540::onReadVshift()
+QCoro::Task<void> CN0540::onReadVshift()
 {
 	if(!m_dacCh || !m_vshiftLineEdit) {
-		return;
+		co_return;
 	}
 
-	m_vshiftLineEdit->setText(QString::number(getVshiftMv(), 'f', 4));
+	double vshift = co_await getVshiftMv();
+	m_vshiftLineEdit->setText(QString::number(vshift, 'f', 4));
 }
 
-void CN0540::onReadSwFF()
+QCoro::Task<void> CN0540::onReadSwFF()
 {
 	if(!m_gpioSwFF) {
-		return;
+		co_return;
 	}
 
-	bool state = getGpioState(m_gpioSwFF);
+	bool state = co_await getGpioState(m_gpioSwFF);
 	m_swffStatusLabel->setText(state ? "HIGH" : "LOW");
 }
 
-void CN0540::onReadVsensor()
+QCoro::Task<void> CN0540::onReadVsensor()
 {
 	if(!m_adcCh || !m_dacCh) {
-		return;
+		co_return;
 	}
 
-	double vadcMv = getVoltage(m_adcCh);
-	double vshiftMv = getVshiftMv();
+	double vadcMv = co_await getVoltage(m_adcCh);
+	double vshiftMv = co_await getVshiftMv();
 	double v1St = FDA_VOCM_MV - vadcMv / FDA_GAIN;
 	double vsensorMv = ((G + 1.0) * vshiftMv - v1St) / G;
 	vsensorMv -= vadcMv;
 	m_sensorVoltageLabel->setText(QString::number(vsensorMv, 'f', 4));
 }
 
-void CN0540::onCalibrate()
+QCoro::Task<void> CN0540::onCalibrate()
 {
 	if(!m_adcCh || !m_dacCh) {
-		return;
+		co_return;
 	}
 
-	if(m_calibFuture.isRunning()) {
-		return;
+	if(m_calibInFlight) {
+		co_return;
 	}
+	m_calibInFlight = true;
 
 	if(m_calibStatusLabel) {
 		m_calibStatusLabel->setText("Calibrating...");
@@ -500,41 +501,37 @@ void CN0540::onCalibrate()
 		m_voltMonTimer->stop();
 	}
 
-	m_calibFuture = QtConcurrent::run([this]() {
-		double adcVoltageMv = 0.0;
-		for(int i = 0; i < CALIB_MAX_ITER; i++) {
-			adcVoltageMv = getVoltage(m_adcCh);
-			double dacVoltageMv = getVoltage(m_dacCh) - adcVoltageMv;
-			setVoltage(m_dacCh, dacVoltageMv);
-			QThread::msleep(10);
-		}
-		QString adcStr = QString::number(adcVoltageMv, 'f', 4);
-		QMetaObject::invokeMethod(
-			this,
-			[this, adcStr]() {
-				if(m_calibStatusLabel)
-					m_calibStatusLabel->setText(adcStr);
-				onReadVshift();
-				onReadVsensor();
-				if(m_voltMonTimer)
-					m_voltMonTimer->start(1000);
-			},
-			Qt::QueuedConnection);
-	});
+	double adcVoltageMv = 0.0;
+	for(int i = 0; i < CALIB_MAX_ITER; i++) {
+		adcVoltageMv = co_await getVoltage(m_adcCh);
+		double dacVoltageMv = (co_await getVoltage(m_dacCh)) - adcVoltageMv;
+		co_await setVoltage(m_dacCh, dacVoltageMv);
+		co_await QCoro::sleepFor(std::chrono::milliseconds(10));
+	}
+
+	if(m_calibStatusLabel)
+		m_calibStatusLabel->setText(QString::number(adcVoltageMv, 'f', 4));
+	co_await onReadVshift();
+	co_await onReadVsensor();
+	if(m_voltMonTimer)
+		m_voltMonTimer->start(1000);
+
+	m_calibInFlight = false;
 }
 
-void CN0540::updateVoltages()
+QCoro::Task<void> CN0540::updateVoltages()
 {
-	if(!m_voltMonDev) {
-		return;
+	if(!m_voltMonDev || m_voltMonInFlight) {
+		co_return;
 	}
+	m_voltMonInFlight = true;
 
 	for(int i = 0; i < NUM_ANALOG_PINS; i++) {
 		if(!m_analogIn[i] || !m_voltMonLabels[i]) {
 			continue;
 		}
 
-		double result = getVoltage(m_analogIn[i]);
+		double result = co_await getVoltage(m_analogIn[i]);
 
 		if(m_isXadc) {
 			result *= XADC_VREF;
@@ -542,4 +539,6 @@ void CN0540::updateVoltages()
 
 		m_voltMonLabels[i]->setText(QString::number(result, 'f', 2));
 	}
+
+	m_voltMonInFlight = false;
 }
