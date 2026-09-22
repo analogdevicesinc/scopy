@@ -26,8 +26,12 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QApplication>
-#include <QtConcurrent>
 #include <stylehelper.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_PROFILEGENERATORWIDGET, "ProfileGeneratorWidget")
 
@@ -70,7 +74,7 @@ QString DeviceConfigurationParser::mapRfPortFromDevice(const QString &devicePort
 }
 
 DeviceConfigurationParser::ParsedDeviceConfig
-DeviceConfigurationParser::parseProfileConfig(iio_device *dev, const QString &profileConfigText)
+DeviceConfigurationParser::parseProfileConfig(component::Device *dev, const QString &profileConfigText)
 {
 	ParsedDeviceConfig config;
 
@@ -106,20 +110,30 @@ DeviceConfigurationParser::parseProfileConfig(iio_device *dev, const QString &pr
 
 		QString chnannelName = QString("voltage%1").arg(ch);
 
-		iio_channel *rxChannel = iio_device_find_channel(dev, chnannelName.toUtf8(), false);
-		iio_channel *txChannel = iio_device_find_channel(dev, chnannelName.toUtf8(), true);
+		component::Channel *rxChannel = component::channelById(dev, chnannelName, false);
+		component::Channel *txChannel = component::channelById(dev, chnannelName, true);
 
-		int ret = 0;
+		// Reads a channel longlong attribute; returns true on success (mirrors iio ret==0 case).
+		auto readChannelLongLong = [](component::Channel *ch, const QString &attr, long long &out) -> bool {
+			component::Attribute *a = component::attributeByName(ch, attr);
+			if(a && a->readCapability()) {
+				auto res = QCoro::waitFor(a->readCapability()->readAsync());
+				if(res) {
+					out = a->cachedValue().trimmed().toLongLong();
+					return true;
+				}
+			}
+			return false;
+		};
+
 		// Channel data will be populated from individual IIO attributes
 		if(rxChannel != nullptr) {
 			long long sampling_freq;
-			ret = iio_channel_attr_read_longlong(rxChannel, "sampling_frequency", &sampling_freq);
-			if(ret == 0)
+			if(readChannelLongLong(rxChannel, "sampling_frequency", sampling_freq))
 				config.rxChannels[ch].sampleRateHz = static_cast<uint32_t>(sampling_freq);
 
 			long long rf_bandwidth;
-			ret = iio_channel_attr_read_longlong(rxChannel, "rf_bandwidth", &rf_bandwidth);
-			if(ret == 0)
+			if(readChannelLongLong(rxChannel, "rf_bandwidth", rf_bandwidth))
 				config.rxChannels[ch].channelBandwidthHz = static_cast<uint32_t>(rf_bandwidth);
 
 			config.rxChannels[ch].freqOffsetCorrectionEnable = false;
@@ -131,13 +145,11 @@ DeviceConfigurationParser::parseProfileConfig(iio_device *dev, const QString &pr
 		if(txChannel != nullptr) {
 
 			long long sampling_freq;
-			ret = iio_channel_attr_read_longlong(txChannel, "sampling_frequency", &sampling_freq);
-			if(ret == 0)
+			if(readChannelLongLong(txChannel, "sampling_frequency", sampling_freq))
 				config.txChannels[ch].sampleRateHz = sampling_freq;
 
 			long long rf_bandwidth;
-			ret = iio_channel_attr_read_longlong(txChannel, "rf_bandwidth", &rf_bandwidth);
-			if(ret == 0)
+			if(readChannelLongLong(txChannel, "rf_bandwidth", rf_bandwidth))
 				config.txChannels[ch].channelBandwidthHz = rf_bandwidth;
 
 			config.txChannels[ch].freqOffsetCorrectionEnable = false;
@@ -150,7 +162,7 @@ DeviceConfigurationParser::parseProfileConfig(iio_device *dev, const QString &pr
 	return config;
 }
 
-ProfileGeneratorWidget::ProfileGeneratorWidget(iio_device *device, QWidget *parent)
+ProfileGeneratorWidget::ProfileGeneratorWidget(component::Device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_cliManager(nullptr)
@@ -708,14 +720,14 @@ void ProfileGeneratorWidget::onSaveToFile(bool isStreamFile)
 		// Copy data for safe worker thread access
 		RadioConfig configCopy = m_radioConfig;
 
-		// Execute appropriate worker function - fire and forget
+		// Execute appropriate worker (main-thread coroutine) - fire and forget
 		if(isStreamFile) {
 			// Start animation
 			m_saveStreamToFileBtn->startAnimation();
-			QtConcurrent::run(&ProfileGeneratorWidget::doSaveStreamWork, this, fileName, configCopy);
+			doSaveStreamWork(fileName, configCopy);
 		} else {
 			m_saveProfileToFileBtn->startAnimation();
-			QtConcurrent::run(&ProfileGeneratorWidget::doSaveProfileWork, this, fileName, configCopy);
+			doSaveProfileWork(fileName, configCopy);
 		}
 	}
 }
@@ -743,8 +755,8 @@ void ProfileGeneratorWidget::onLoadToDevice()
 	// Start animation
 	m_loadToDeviceBtn->startAnimation();
 
-	// Execute worker function - fire and forget
-	QtConcurrent::run(&ProfileGeneratorWidget::doLoadToDeviceWork, this, configCopy);
+	// Execute worker (main-thread coroutine) - fire and forget
+	doLoadToDeviceWork(configCopy);
 }
 
 void ProfileGeneratorWidget::onDownloadCLI()
@@ -806,28 +818,29 @@ QString ProfileGeneratorWidget::readDeviceAttribute(const QString &attributeName
 		return QString();
 	}
 
-	char buffer[1024];
-	int ret = iio_device_attr_read(m_device, attributeName.toLocal8Bit().data(), buffer, sizeof(buffer));
-
-	if(ret > 0) {
-		return QString::fromLocal8Bit(buffer, ret).trimmed();
-	} else {
-		qDebug(CAT_PROFILEGENERATORWIDGET)
-			<< "Failed to read device attribute:" << attributeName << "ret:" << ret;
-		return QString();
+	component::Attribute *a = component::attributeByName(m_device, attributeName);
+	if(a && a->readCapability()) {
+		auto res = QCoro::waitFor(a->readCapability()->readAsync());
+		if(res) {
+			return a->cachedValue().trimmed();
+		}
 	}
+
+	qDebug(CAT_PROFILEGENERATORWIDGET) << "Failed to read device attribute:" << attributeName;
+	return QString();
 }
 
 QString ProfileGeneratorWidget::getDeviceDriverVersion()
 {
 	// Try to get version from context or device attributes
+	// (debug attrs are regular Device attribute children)
 	if(m_device != nullptr) {
-		char api_version[16];
-		auto ret = iio_device_debug_attr_read(m_device, "api_version", api_version, sizeof(api_version));
-		if(ret < 0) {
-			return "";
-		} else {
-			return QString(api_version);
+		component::Attribute *a = component::attributeByName(m_device, "api_version");
+		if(a && a->readCapability()) {
+			auto res = QCoro::waitFor(a->readCapability()->readAsync());
+			if(res) {
+				return a->cachedValue().trimmed();
+			}
 		}
 	}
 
@@ -1129,13 +1142,9 @@ bool ProfileGeneratorWidget::readDeviceConfiguration()
 	}
 }
 
-iio_channel *ProfileGeneratorWidget::findIIOChannel(const QString &channelName, bool isOutput)
+component::Channel *ProfileGeneratorWidget::findIIOChannel(const QString &channelName, bool isOutput)
 {
-	if(!m_device) {
-		return nullptr;
-	}
-
-	return iio_device_find_channel(m_device, channelName.toLocal8Bit().data(), isOutput);
+	return m_device ? component::channelById(m_device, channelName, isOutput) : nullptr;
 }
 
 void ProfileGeneratorWidget::populateUIFromDeviceConfig(const DeviceConfigurationParser::ParsedDeviceConfig &config)
