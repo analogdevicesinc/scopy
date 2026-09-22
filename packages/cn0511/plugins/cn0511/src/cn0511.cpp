@@ -46,7 +46,6 @@ CN0511::CN0511(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	, m_group(group)
 {
 	QVBoxLayout *mainLayout = new QVBoxLayout(this);
-	mainLayout->setMargin(0);
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 
 	m_tool = new ToolTemplate(this);
@@ -79,12 +78,10 @@ CN0511::CN0511(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	// Central scroll area
 	QWidget *controlsContainer = new QWidget(this);
 	QVBoxLayout *controlsLayout = new QVBoxLayout(controlsContainer);
-	controlsLayout->setMargin(0);
 	controlsLayout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget *controlsWidget = new QWidget(this);
 	QVBoxLayout *controlWidgetLayout = new QVBoxLayout(controlsWidget);
-	controlWidgetLayout->setMargin(0);
 	controlWidgetLayout->setContentsMargins(0, 0, 0, 0);
 
 	QScrollArea *scrollArea = new QScrollArea(this);
@@ -119,7 +116,6 @@ QWidget *CN0511::generateSingleToneSection(QWidget *parent)
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	widget->setLayout(layout);
-	layout->setMargin(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(10);
 
@@ -128,11 +124,9 @@ QWidget *CN0511::generateSingleToneSection(QWidget *parent)
 	layout->addWidget(titleLabel);
 
 	QHBoxLayout *controlsLayout = new QHBoxLayout();
-	controlsLayout->setMargin(0);
 	controlsLayout->setContentsMargins(0, 0, 0, 0);
 
 	QVBoxLayout *configLayout = new QVBoxLayout();
-	configLayout->setMargin(0);
 	configLayout->setContentsMargins(0, 0, 0, 0);
 	configLayout->setSpacing(10);
 
