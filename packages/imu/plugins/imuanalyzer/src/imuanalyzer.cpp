@@ -35,6 +35,8 @@
 
 #include <deviceiconbuilder.h>
 
+#include <component/context.h>
+#include <component/device.h>
 Q_LOGGING_CATEGORY(CAT_IMUANALYZER, "IMUAnalyzer");
 using namespace scopy;
 
@@ -42,22 +44,17 @@ bool IMUAnalyzer::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_IMUANALYZER) << "compatible";
 	bool ret = false;
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-	if(conn == nullptr)
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx)
 		return ret;
 
-	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
-		iio_device *dev = iio_context_get_device(conn->context(), i);
-		const char *rawName = iio_device_get_name(dev);
-		std::string name = rawName ? rawName : "";
-		if(name.find("adis") != std::string::npos) {
+	const QList<component::Device *> devices = ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly);
+	for(component::Device *d : devices) {
+		if(d->name().contains("adis")) {
 			ret = true;
-			goto finish;
+			break;
 		}
 	}
-finish:
-
-	ConnectionProvider::GetInstance()->close(m_param);
 	return ret;
 }
 
@@ -70,15 +67,27 @@ void IMUAnalyzer::loadToolList()
 
 bool IMUAnalyzer::onConnect()
 {
-
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-
-	if(conn == nullptr) {
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		return false;
 	}
+
+	component::Device *adisDev = nullptr;
+	const QList<component::Device *> devices =
+		m_context->findChildren<component::Device *>(Qt::FindDirectChildrenOnly);
+	for(component::Device *d : devices) {
+		if(d->name().contains("adis")) {
+			adisDev = d;
+			break;
+		}
+	}
+	if(!adisDev) {
+		return false;
+	}
+
 	ToolMenuEntry *imuTme = m_toolList[0];
 
-	m_imuInterface = new IMUAnalyzerInterface(m_param);
+	m_imuInterface = new IMUAnalyzerInterface(adisDev);
 
 	imuTme->setEnabled(true);
 	imuTme->setTool(m_imuInterface);
@@ -104,7 +113,7 @@ bool IMUAnalyzer::onDisconnect()
 		}
 	}
 	m_imuInterface = nullptr;
-	ConnectionProvider::GetInstance()->close(m_param);
+	m_context = {};
 
 	return true;
 }

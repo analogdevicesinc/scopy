@@ -22,11 +22,22 @@
 
 #include <pluginbase/preferences.h>
 
+#include <QTimer>
+#include <qcoro/qcorotask.h>
+
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+
 using namespace scopy;
+
+static constexpr int IMU_POLL_INTERVAL_MS = 30;
 
 Q_DECLARE_METATYPE(data3P)
 
-IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
+IMUAnalyzerInterface::IMUAnalyzerInterface(component::Device *device, QWidget *parent)
 	: QWidget{parent}
 	, m_sceneRender(nullptr)
 	, m_rstView(nullptr)
@@ -37,8 +48,15 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(lay);
 
-	m_uri = uri;
-	initIIODevice();
+	m_device = device;
+
+	m_timer = new QTimer(this);
+	connect(m_timer, &QTimer::timeout, this, [this]() {
+		if(m_cycleInFlight) {
+			return;
+		}
+		m_activeCycle = readCycle();
+	});
 
 	m_tool = new ToolTemplate(this);
 	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -102,11 +120,11 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 	});
 
 	connect(m_runBtn, &QPushButton::toggled, [=, this](bool toggled) {
-		m_runThread = !m_runThread;
 		if(toggled) {
-			t = std::thread(&IMUAnalyzerInterface::generateRotation, this);
+			QCoro::waitFor(initGains());
+			m_timer->start(IMU_POLL_INTERVAL_MS);
 		} else {
-			t.join();
+			m_timer->stop();
 		}
 		Q_EMIT runBtnPressed(toggled);
 	});
@@ -140,76 +158,117 @@ IMUAnalyzerInterface::IMUAnalyzerInterface(QString uri, QWidget *parent)
 
 IMUAnalyzerInterface::~IMUAnalyzerInterface()
 {
-	m_runThread = false;
-	if(t.joinable()) {
-		t.join();
+	if(m_timer) {
+		m_timer->stop();
+	}
+	if(m_activeCycle) {
+		QCoro::waitFor(m_activeCycle.value());
+		m_activeCycle.reset();
 	}
 }
 
 void IMUAnalyzerInterface::runToggled(bool toggled) { m_runBtn->setChecked(toggled); }
 
-void IMUAnalyzerInterface::generateRotation()
+QCoro::Task<void> IMUAnalyzerInterface::initGains()
 {
+	m_accelX = component::channelById(m_device, "accel_x", false);
+	m_accelY = component::channelById(m_device, "accel_y", false);
+	m_accelZ = component::channelById(m_device, "accel_z", false);
+	m_temp = component::channelById(m_device, "temp0", false);
+	m_hasTemp = (m_temp != nullptr);
 
-	iio_channel *linearAccChX = iio_device_find_channel(m_device, "accel_x", false);
-	iio_channel *linearAccChY = iio_device_find_channel(m_device, "accel_y", false);
-	iio_channel *linearAccChZ = iio_device_find_channel(m_device, "accel_z", false);
-
-	iio_channel *tempCh = iio_device_find_channel(m_device, "temp0", false);
-
-	double samplingFreq;
-	iio_device_attr_read_double(m_device, "sampling_frequency", &samplingFreq);
-
-	double linearAccGainX, linearAccGainY, linearAccGainZ;
-	iio_channel_attr_read_double(linearAccChX, "scale", &linearAccGainX);
-	iio_channel_attr_read_double(linearAccChY, "scale", &linearAccGainY);
-	iio_channel_attr_read_double(linearAccChZ, "scale", &linearAccGainZ);
-
-	double tempGain, tempOffset;
-	if(tempCh != nullptr) {
-		iio_channel_attr_read_double(tempCh, "scale", &tempGain);
-		iio_channel_attr_read_double(tempCh, "offset", &tempOffset);
+	component::Attribute *samplingAttr = component::attributeByName(m_device, "sampling_frequency");
+	if(samplingAttr && samplingAttr->readCapability()) {
+		co_await samplingAttr->readCapability()->readAsync();
+		m_samplingFreq = samplingAttr->cachedValue().toDouble();
 	}
 
-	double linearAccX, linearAccY, linearAccZ;
-	double temp;
-
-	while(m_runThread) {
-
-		iio_channel_attr_read_double(linearAccChX, "raw", &linearAccX);
-		iio_channel_attr_read_double(linearAccChY, "raw", &linearAccY);
-		iio_channel_attr_read_double(linearAccChZ, "raw", &linearAccZ);
-
-		m_dist.dataX = float(linearAccX * linearAccGainX);
-		m_dist.dataY = float(linearAccY * linearAccGainY);
-		m_dist.dataZ = float(linearAccZ * linearAccGainZ);
-
-		if(tempCh != nullptr) {
-			iio_channel_attr_read_double(tempCh, "raw", &temp);
-			temp = temp * tempGain - tempOffset;
+	if(m_accelX) {
+		component::Attribute *a = component::attributeByName(m_accelX, "scale");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			m_gainX = a->cachedValue().toDouble();
 		}
-
-		m_rot.dataX = atan2(-m_dist.dataX, sqrt(m_dist.dataY * m_dist.dataY + m_dist.dataZ * m_dist.dataZ)) *
-			180 / 3.14f;
-		m_rot.dataY = atan2(m_dist.dataY, m_dist.dataZ) * 180 / 3.14f;
-		m_rot.dataZ = 0;
-
-		QMetaObject::invokeMethod(this, "generateRot", Qt::QueuedConnection, Q_ARG(data3P, m_rot));
-		QMetaObject::invokeMethod(this, "updateValues", Qt::QueuedConnection, Q_ARG(data3P, m_rot),
-					  Q_ARG(data3P, m_dist), Q_ARG(float, float(temp)));
+	}
+	if(m_accelY) {
+		component::Attribute *a = component::attributeByName(m_accelY, "scale");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			m_gainY = a->cachedValue().toDouble();
+		}
+	}
+	if(m_accelZ) {
+		component::Attribute *a = component::attributeByName(m_accelZ, "scale");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			m_gainZ = a->cachedValue().toDouble();
+		}
+	}
+	if(m_hasTemp) {
+		component::Attribute *scaleAttr = component::attributeByName(m_temp, "scale");
+		if(scaleAttr && scaleAttr->readCapability()) {
+			co_await scaleAttr->readCapability()->readAsync();
+			m_tempGain = scaleAttr->cachedValue().toDouble();
+		}
+		component::Attribute *offsetAttr = component::attributeByName(m_temp, "offset");
+		if(offsetAttr && offsetAttr->readCapability()) {
+			co_await offsetAttr->readCapability()->readAsync();
+			m_tempOffset = offsetAttr->cachedValue().toDouble();
+		}
 	}
 }
 
-void IMUAnalyzerInterface::initIIODevice()
+QCoro::Task<void> IMUAnalyzerInterface::readCycle()
 {
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
-	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
-		m_device = iio_context_get_device(conn->context(), i);
-		std::string name = iio_device_get_name(m_device);
-		if(name.find("adis") != std::string::npos) {
-			return;
+	m_cycleInFlight = true;
+
+	double linearAccX = 0, linearAccY = 0, linearAccZ = 0;
+	double temp = 0;
+
+	if(m_accelX) {
+		component::Attribute *a = component::attributeByName(m_accelX, "raw");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			linearAccX = a->cachedValue().toDouble();
 		}
 	}
+	if(m_accelY) {
+		component::Attribute *a = component::attributeByName(m_accelY, "raw");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			linearAccY = a->cachedValue().toDouble();
+		}
+	}
+	if(m_accelZ) {
+		component::Attribute *a = component::attributeByName(m_accelZ, "raw");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			linearAccZ = a->cachedValue().toDouble();
+		}
+	}
+
+	m_dist.dataX = float(linearAccX * m_gainX);
+	m_dist.dataY = float(linearAccY * m_gainY);
+	m_dist.dataZ = float(linearAccZ * m_gainZ);
+
+	if(m_hasTemp) {
+		component::Attribute *a = component::attributeByName(m_temp, "raw");
+		if(a && a->readCapability()) {
+			co_await a->readCapability()->readAsync();
+			temp = a->cachedValue().toDouble();
+		}
+		temp = temp * m_tempGain - m_tempOffset;
+	}
+
+	m_rot.dataX =
+		atan2(-m_dist.dataX, sqrt(m_dist.dataY * m_dist.dataY + m_dist.dataZ * m_dist.dataZ)) * 180 / 3.14f;
+	m_rot.dataY = atan2(m_dist.dataY, m_dist.dataZ) * 180 / 3.14f;
+	m_rot.dataZ = 0;
+
+	Q_EMIT generateRot(m_rot);
+	Q_EMIT updateValues(m_rot, m_dist, float(temp));
+
+	m_cycleInFlight = false;
 }
 
 #include "moc_imuanalyzerinterface.cpp"
