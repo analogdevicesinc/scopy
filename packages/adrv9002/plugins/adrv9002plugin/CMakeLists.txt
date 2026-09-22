@@ -89,10 +89,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
 
+qcoro_enable_coroutines()
+
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt::Widgets
 	       Qt::Core
+	       QCoro6::Core
+	       QCoro6::Coro
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil

@@ -23,13 +23,17 @@
 #include <QLoggingCategory>
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <stylehelper.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_INITIALCALIBRATIONSWIDGET, "InitialCalibrationsWidget")
 
 using namespace scopy::adrv9002;
 using namespace scopy;
 
-InitialCalibrationsWidget::InitialCalibrationsWidget(iio_device *device, QWidget *parent)
+InitialCalibrationsWidget::InitialCalibrationsWidget(component::Device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_titleLabel(nullptr)
@@ -43,15 +47,13 @@ InitialCalibrationsWidget::InitialCalibrationsWidget(iio_device *device, QWidget
 
 InitialCalibrationsWidget::~InitialCalibrationsWidget() {}
 
-bool InitialCalibrationsWidget::isSupported(iio_device *device)
+bool InitialCalibrationsWidget::isSupported(component::Device *device)
 {
 	if(!device)
 		return false;
 
 	// Check if device has initial_calibrations_available attribute
-	char buffer[256];
-	int ret = iio_device_attr_read(device, "initial_calibrations_available", buffer, sizeof(buffer));
-	return (ret > 0);
+	return component::attributeByName(device, "initial_calibrations_available") != nullptr;
 }
 
 void InitialCalibrationsWidget::setupUI()
@@ -81,22 +83,25 @@ void InitialCalibrationsWidget::setupUI()
 
 	// Create calibration mode combo widget with custom options (off, auto only)
 	if(m_device) {
-		m_modeComboWidget =
-			IIOWidgetBuilder(this)
-				.device(m_device)
-				.attribute("initial_calibrations")
-				.optionsValues("off auto") // Custom options - space separated string
-				.title("")		   // No title as we have a separate label
-				.uiStrategy(IIOWidgetBuilder::ComboUi)
-				.compactMode(true)
-				.infoMessage("off: Initial calibrations won't run automatically.\n"
-					     "auto: Initial calibrations will run automatically for "
-					     "Carrier changes bigger or equal to 100MHz.\n\n"
-					     "To manually run the calibrations, press the \"Calibrate now\" button!")
-				.buildSingle();
+		component::Attribute *initCalAttr = component::attributeByName(m_device, "initial_calibrations");
+		if(initCalAttr) {
+			m_modeComboWidget =
+				IIOWidgetBuilder(this)
+					.attribute(initCalAttr)
+					.optionsValues("off auto") // Custom options - space separated string
+					.title("")		   // No title as we have a separate label
+					.uiStrategy(IIOWidgetBuilder::ComboUi)
+					.compactMode(true)
+					.infoMessage(
+						"off: Initial calibrations won't run automatically.\n"
+						"auto: Initial calibrations will run automatically for "
+						"Carrier changes bigger or equal to 100MHz.\n\n"
+						"To manually run the calibrations, press the \"Calibrate now\" button!")
+					.buildSingle();
 
-		if(m_modeComboWidget) {
-			controlsLayout->addWidget(m_modeComboWidget);
+			if(m_modeComboWidget) {
+				controlsLayout->addWidget(m_modeComboWidget);
+			}
 		}
 	}
 
@@ -157,15 +162,15 @@ QString InitialCalibrationsWidget::getAttributeValue(const QString &attributeNam
 	if(!m_device)
 		return "";
 
-	char buffer[256];
-	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(), buffer, sizeof(buffer));
-
-	if(ret < 0) {
-		qWarning(CAT_INITIALCALIBRATIONSWIDGET) << "Failed to read attribute" << attributeName << ":" << ret;
-		return "";
+	component::Attribute *a = component::attributeByName(m_device, attributeName);
+	if(a && a->readCapability()) {
+		auto res = QCoro::waitFor(a->readCapability()->readAsync());
+		if(res)
+			return a->cachedValue().trimmed();
 	}
 
-	return QString(buffer).trimmed();
+	qWarning(CAT_INITIALCALIBRATIONSWIDGET) << "Failed to read attribute" << attributeName;
+	return "";
 }
 
 bool InitialCalibrationsWidget::writeAttributeValue(const QString &attributeName, const QString &value)
@@ -173,12 +178,16 @@ bool InitialCalibrationsWidget::writeAttributeValue(const QString &attributeName
 	if(!m_device)
 		return false;
 
-	QByteArray valueBytes = value.toUtf8();
-	int ret = iio_device_attr_write(m_device, attributeName.toUtf8().constData(), valueBytes.constData());
+	component::Attribute *a = component::attributeByName(m_device, attributeName);
+	if(!a || !a->writeCapability()) {
+		qWarning(CAT_INITIALCALIBRATIONSWIDGET) << "Failed to write attribute" << attributeName;
+		return false;
+	}
 
-	if(ret < 0) {
+	auto res = QCoro::waitFor(a->writeCapability()->writeAsync(value));
+	if(!res) {
 		qWarning(CAT_INITIALCALIBRATIONSWIDGET)
-			<< "Failed to write attribute" << attributeName << "with value" << value << ":" << ret;
+			<< "Failed to write attribute" << attributeName << "with value" << value;
 		return false;
 	}
 

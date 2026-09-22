@@ -20,9 +20,15 @@
 
 #include <profileclimanager.h>
 #include <QStandardPaths>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
+#include <qcoroprocess.h>
 
 Q_LOGGING_CATEGORY(CAT_PROFILECLIMANAGER, "ProfileCliManager")
 
+using namespace scopy;
 using namespace scopy::adrv9002;
 
 // Static constants
@@ -32,7 +38,7 @@ const int ProfileCliManager::CLI_TIMEOUT_MS = 30000; // 30 seconds
 // Helper function for boolean to numeric conversion (matching iio-oscilloscope cJSON_AddNumberToObject)
 static int boolToInt(bool value) { return value ? 1 : 0; }
 
-ProfileCliManager::ProfileCliManager(iio_device *device, QObject *parent)
+ProfileCliManager::ProfileCliManager(component::Device *device, QObject *parent)
 	: QObject(parent)
 	, m_device(device)
 	, m_cliAvailable(false)
@@ -125,10 +131,11 @@ bool ProfileCliManager::validateCliVersion()
 }
 
 // Profile Operations
-void ProfileCliManager::saveProfileToFile(const QString &filename, const RadioConfig &config)
+QCoro::Task<void> ProfileCliManager::saveProfileToFile(QString filename, RadioConfig config)
 {
 	if(!m_cliAvailable) {
 		Q_EMIT operationError("Profile Generator CLI not available");
+		co_return;
 	}
 
 	// Create temporary config file
@@ -137,7 +144,7 @@ void ProfileCliManager::saveProfileToFile(const QString &filename, const RadioCo
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
-		return;
+		co_return;
 	}
 
 	// Execute CLI command (following iio-oscilloscope pattern)
@@ -145,23 +152,24 @@ void ProfileCliManager::saveProfileToFile(const QString &filename, const RadioCo
 	arguments << "--config" << configFile << "--profile" << filename;
 
 	QString output;
-	bool success = executeCli(arguments, output);
+	bool success = co_await executeCli(arguments, &output);
 
 	// Cleanup temp file
 	cleanupTempFiles(QStringList() << configFile);
 
 	if(!success) {
 		Q_EMIT operationError(QString("CLI execution failed: %1").arg(output));
-		return;
+		co_return;
 	}
 
 	Q_EMIT operationProgress("Profile saved successfully");
 }
 
-void ProfileCliManager::saveStreamToFile(const QString &filename, const RadioConfig &config)
+QCoro::Task<void> ProfileCliManager::saveStreamToFile(QString filename, RadioConfig config)
 {
 	if(!m_cliAvailable) {
 		Q_EMIT operationError("Profile Generator CLI not available");
+		co_return;
 	}
 
 	// Create temporary config file
@@ -170,7 +178,7 @@ void ProfileCliManager::saveStreamToFile(const QString &filename, const RadioCon
 
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
-		return;
+		co_return;
 	}
 
 	// Execute CLI command for stream image
@@ -178,24 +186,24 @@ void ProfileCliManager::saveStreamToFile(const QString &filename, const RadioCon
 	arguments << "--config" << configFile << "--stream" << filename;
 
 	QString output;
-	bool success = executeCli(arguments, output);
+	bool success = co_await executeCli(arguments, &output);
 
 	// Cleanup temp file
 	cleanupTempFiles(QStringList() << configFile);
 
 	if(!success) {
 		Q_EMIT operationError(QString("CLI execution failed: %1").arg(output));
-		return;
+		co_return;
 	}
 
 	Q_EMIT operationProgress("Stream image saved successfully");
 }
 
-void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
+QCoro::Task<void> ProfileCliManager::loadProfileToDevice(RadioConfig config)
 {
 	if(!m_cliAvailable) {
 		Q_EMIT operationError("Profile Generator CLI not available");
-		return;
+		co_return;
 	}
 
 	// Create temporary files (following iio-oscilloscope pattern exactly)
@@ -210,7 +218,7 @@ void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
 	if(!writeConfigToTempFile(configFile, config)) {
 		Q_EMIT operationError("Failed to write configuration file");
 		cleanupTempFiles(tempFiles);
-		return;
+		co_return;
 	}
 
 	Q_EMIT operationProgress("Generating profile and stream files...");
@@ -220,12 +228,12 @@ void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
 	arguments << "--config" << configFile << "--profile" << profileFile << "--stream" << streamFile;
 
 	QString output;
-	bool success = executeCli(arguments, output);
+	bool success = co_await executeCli(arguments, &output);
 
 	if(!success) {
 		Q_EMIT operationError(QString("CLI execution failed: %1").arg(output));
 		cleanupTempFiles(tempFiles);
-		return;
+		co_return;
 	}
 
 	Q_EMIT operationProgress("Loading profile to device...");
@@ -235,14 +243,14 @@ void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
 	if(profileData.isEmpty()) {
 		Q_EMIT operationError("Failed to read generated profile file");
 		cleanupTempFiles(tempFiles);
-		return;
+		co_return;
 	}
 
 	// Write profile to device
-	if(!writeDeviceAttribute("profile_config", profileData)) {
+	if(!co_await writeDeviceAttribute("profile_config", profileData)) {
 		Q_EMIT operationError("Failed to write profile to device");
 		cleanupTempFiles(tempFiles);
-		return;
+		co_return;
 	}
 
 	// Read generated stream file
@@ -250,13 +258,13 @@ void ProfileCliManager::loadProfileToDevice(const RadioConfig &config)
 	if(streamData.isEmpty()) {
 		Q_EMIT operationError("Failed to read generated stream image file");
 		cleanupTempFiles(tempFiles);
-		return;
+		co_return;
 	}
 
-	if(!writeDeviceAttribute("stream_config", streamData)) {
+	if(!co_await writeDeviceAttribute("stream_config", streamData)) {
 		Q_EMIT operationError("Failed to write stream image to device");
 		cleanupTempFiles(tempFiles);
-		return;
+		co_return;
 	}
 
 	Q_EMIT operationProgress("Stream_config write completed successfully");
@@ -350,40 +358,42 @@ bool ProfileCliManager::writeConfigToTempFile(const QString &filename, const Rad
 	return true;
 }
 
-// CLI Execution
-bool ProfileCliManager::executeCli(const QStringList &arguments, QString &output)
+// CLI Execution (non-blocking on the main thread via QCoroProcess)
+QCoro::Task<bool> ProfileCliManager::executeCli(QStringList arguments, QString *output)
 {
 	QString workingDir = QFileInfo(m_cliPath).absolutePath();
 
 	QProcess process;
-	process.setProgram(m_cliPath);
-	process.setArguments(arguments);
 	process.setWorkingDirectory(workingDir);
-	process.start();
 
-	if(!process.waitForStarted(5000)) {
-		output = QString("Failed to start CLI: %1").arg(process.errorString());
-		return false;
-	}
-
-	if(!process.waitForFinished(CLI_TIMEOUT_MS)) {
-		process.kill();
-		if(!process.waitForFinished(3000)) { // Give it time to cleanup
-			process.terminate();	     // Force terminate if kill didn't work
+	if(!co_await qCoro(process).start(m_cliPath, arguments)) {
+		if(output) {
+			*output = QString("Failed to start CLI: %1").arg(process.errorString());
 		}
-		output = "CLI execution timeout";
-		return false;
+		co_return false;
 	}
 
-	output = process.readAllStandardOutput();
+	if(!co_await qCoro(process).waitForFinished(CLI_TIMEOUT_MS)) {
+		process.kill();
+		co_await qCoro(process).waitForFinished(3000); // Give it time to cleanup
+		if(output) {
+			*output = "CLI execution timeout";
+		}
+		co_return false;
+	}
+
+	QString out = process.readAllStandardOutput();
+	if(output) {
+		*output = out;
+	}
 
 	if(process.exitCode() != 0) {
 		qWarning(CAT_PROFILECLIMANAGER)
-			<< "CLI command failed with exit code:" << process.exitCode() << "Error:" << output;
-		return false;
+			<< "CLI command failed with exit code:" << process.exitCode() << "Error:" << out;
+		co_return false;
 	}
 
-	return true;
+	co_return true;
 }
 
 // File Operations
@@ -401,22 +411,24 @@ QByteArray ProfileCliManager::readFileContents(const QString &filename)
 	return data;
 }
 
-bool ProfileCliManager::writeDeviceAttribute(const QString &attribute, const QByteArray &data)
+QCoro::Task<bool> ProfileCliManager::writeDeviceAttribute(QString attribute, QByteArray data)
 {
 	if(!m_device) {
 		qWarning(CAT_PROFILECLIMANAGER) << "No device available for writing attribute:" << attribute;
-		return false;
+		co_return false;
 	}
 
-	int ret = iio_device_attr_write_raw(m_device, attribute.toLocal8Bit().data(), data.constData(), data.size());
-
-	if(ret > 0) {
-		return true;
-	} else {
-		qWarning(CAT_PROFILECLIMANAGER)
-			<< "Failed to write attribute:" << attribute << "expected:" << data.size() << "written:" << ret;
-		return false;
+	component::Attribute *a = component::attributeByName(m_device, attribute);
+	if(!a || !a->writeCapability()) {
+		qWarning(CAT_PROFILECLIMANAGER) << "Failed to write attribute:" << attribute;
+		co_return false;
 	}
+
+	auto res = co_await a->writeCapability()->writeAsync(QString::fromUtf8(data));
+	if(!res) {
+		qWarning(CAT_PROFILECLIMANAGER) << "Failed to write attribute:" << attribute;
+	}
+	co_return(bool) res;
 }
 
 void ProfileCliManager::cleanupTempFiles(const QStringList &files)
