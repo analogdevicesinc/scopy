@@ -23,12 +23,16 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
-#include <iioutil/connectionprovider.h>
 #include <pluginbase/scopyjs.h>
-#include <iio.h>
 
 #include "adrv9002.h"
 #include <iio-widgets/iiowidgetgroup.h>
+
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9002PLUGIN, "Adrv9002Plugin")
 using namespace scopy::adrv9002;
@@ -38,9 +42,8 @@ bool Adrv9002Plugin::compatible(QString m_param, QString category)
 	// This function defines the characteristics according to which the
 	// plugin is compatible with a specific device
 	bool ret = false;
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qDebug(CAT_ADRV9002PLUGIN) << "The context is not compatible with the ADRV9002 Plugin!";
 		return ret;
 	}
@@ -50,10 +53,8 @@ bool Adrv9002Plugin::compatible(QString m_param, QString category)
 	const char *adrv9002_devices[] = {"adrv9002-phy", "adrv9003-phy", "adrv9004-phy", "adrv9005-phy",
 					  "adrv9006-phy"};
 
-	iio_device *adrv9002Device = nullptr;
 	for(const char *device_name : adrv9002_devices) {
-		adrv9002Device = iio_context_find_device(conn->context(), device_name);
-		if(adrv9002Device) {
+		if(ctx->findChild<component::Device *>(device_name, Qt::FindDirectChildrenOnly)) {
 			qDebug(CAT_ADRV9002PLUGIN) << "Found compatible device:" << device_name;
 			ret = true;
 			break; // Only one device needed for compatibility
@@ -64,7 +65,6 @@ bool Adrv9002Plugin::compatible(QString m_param, QString category)
 		qDebug(CAT_ADRV9002PLUGIN) << "No ADRV9002 family devices found in context";
 	}
 
-	cp->close(m_param);
 	return ret;
 }
 
@@ -80,21 +80,8 @@ bool Adrv9002Plugin::loadPage()
 	m_page->layout()->addWidget(m_infoPage);
 	m_page->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	auto cp = ContextProvider::GetInstance();
-	struct iio_context *context = cp->open(m_param);
-	ssize_t attributeCount = iio_context_get_attrs_count(context);
-	for(int i = 0; i < attributeCount; ++i) {
-		const char *name;
-		const char *value;
-		int ret = iio_context_get_attr(context, i, &name, &value);
-		if(ret < 0) {
-			qWarning(CAT_ADRV9002PLUGIN) << "Could not read attribute with index:" << i;
-			continue;
-		}
-
-		m_infoPage->update(name, value);
-	}
-	cp->close(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	// Iterate context attributes and populate the info page here.
 	m_page->ensurePolished();
 	return true;
 	*/
@@ -125,10 +112,9 @@ bool Adrv9002Plugin::onConnect()
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
+	m_context = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!m_context) {
 		qWarning(CAT_ADRV9002PLUGIN) << "No context available for ADRV9002";
 		return false;
 	}
@@ -137,14 +123,16 @@ bool Adrv9002Plugin::onConnect()
 	const char *adrv9002_devices[] = {"adrv9002-phy", "adrv9003-phy", "adrv9004-phy", "adrv9005-phy",
 					  "adrv9006-phy"};
 	for(const char *device_name : adrv9002_devices) {
-		if(iio_context_find_device(conn->context(), device_name)) {
-			m_devName = QString(device_name);
+		component::Device *device =
+			m_context->findChild<component::Device *>(device_name, Qt::FindDirectChildrenOnly);
+		if(device) {
+			m_devName = device->name();
 			break;
 		}
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
-	Adrv9002 *adrv9002 = new Adrv9002(conn->context(), m_widgetGroup);
+	Adrv9002 *adrv9002 = new Adrv9002(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(adrv9002);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -177,8 +165,7 @@ bool Adrv9002Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	auto &&cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
+	m_context = {};
 	return true;
 }
 
