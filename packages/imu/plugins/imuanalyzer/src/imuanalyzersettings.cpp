@@ -19,10 +19,11 @@
  */
 
 #include "imuanalyzersettings.hpp"
+#include "component/device.h"
 
 using namespace scopy;
 
-ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device,
+ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, component::Device *device,
 					 QWidget *parent)
 	: QWidget{parent}
 {
@@ -90,7 +91,7 @@ ImuAnalyzerSettings::ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRende
 		sceneRendererSettings->layout()->addWidget(sceneRendererSettingsWidget);
 	}
 
-	QList<IIOWidget *> attributeWidget = IIOWidgetBuilder(nullptr).device(m_device).buildAll();
+	QList<IIOWidget *> attributeWidget = IIOWidgetBuilder(nullptr).componentContainer(m_device).buildAll();
 	for(auto widget : attributeWidget) {
 		generalSettingsWidget->contentLayout()->addWidget(widget);
 	}
