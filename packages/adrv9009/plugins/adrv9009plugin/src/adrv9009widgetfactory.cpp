@@ -21,17 +21,24 @@
 #include "adrv9009widgetfactory.h"
 #include <iio-widgets/iiowidgetbuilder.h>
 #include <iio-widgets/iiowidgetutils.h>
+#include <component/attribute.h>
+#include <component/channel.h>
+#include <component/device.h>
+#include <component/navigation.h>
 
 using namespace scopy;
 using namespace scopy::adrv9009;
 
 // Device attribute widgets
-IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_device *device, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(component::Device *device, QString attr, QString title,
 						      IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::EditableUi)
 				    .buildSingle();
@@ -40,12 +47,15 @@ IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_device *device, QStrin
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_device *device, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(component::Device *device, QString attr, QString title,
 						       IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				    .buildSingle();
@@ -57,25 +67,28 @@ IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_device *device, QStri
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_device *device, QString attr, QString availableAttr,
-						    QString title, IIOWidgetGroup *group, QWidget *parent)
+IIOWidget *Adrv9009WidgetFactory::createComboWidget(component::Device *device, QString attr, QString title,
+						    IIOWidgetGroup *group, QWidget *parent)
 {
-	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
-				    .optionsAttribute(availableAttr)
-				    .title(title)
-				    .uiStrategy(IIOWidgetBuilder::ComboUi)
-				    .buildSingle();
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
+	IIOWidget *widget =
+		IIOWidgetBuilder(parent).attribute(a).title(title).uiStrategy(IIOWidgetBuilder::ComboUi).buildSingle();
 	if(group && widget)
 		group->add(widget);
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QString attr,
+IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(component::Device *device, QString attr,
 							  const QMap<QString, QString> &optionsMap, QString title,
 							  IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
 	// Build space-separated display string from optionsMap values
 	auto values = optionsMap.values();
 	QString optionsValues = "";
@@ -85,8 +98,7 @@ IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QS
 
 	// Create widget with ComboUi strategy
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .optionsValues(optionsValues)
@@ -107,12 +119,15 @@ IIOWidget *Adrv9009WidgetFactory::createCustomComboWidget(iio_device *device, QS
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_device *device, QString attr, QString range, QString title,
-						    IIOWidgetGroup *group, QWidget *parent)
+IIOWidget *Adrv9009WidgetFactory::createRangeWidget(component::Device *device, QString attr, QString range,
+						    QString title, IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .optionsValues(range)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
@@ -122,15 +137,14 @@ IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_device *device, QString 
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_device *device, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(component::Device *device, QString attr, QString title,
 						       bool compactMode, IIOWidgetGroup *group, QWidget *parent)
 {
-	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
-				    .title(title)
-				    .compactMode(compactMode)
-				    .buildSingle();
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
+	IIOWidget *widget = IIOWidgetBuilder(parent).attribute(a).title(title).compactMode(compactMode).buildSingle();
 	if(widget) {
 		widget->setEnabled(false);
 		widget->showProgressBar(false);
@@ -141,12 +155,15 @@ IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_device *device, QStri
 }
 
 // Channel attribute widgets
-IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_channel *channel, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(component::Channel *channel, QString attr, QString title,
 						      IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(channel, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .channel(channel)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::EditableUi)
 				    .buildSingle();
@@ -155,12 +172,15 @@ IIOWidget *Adrv9009WidgetFactory::createSpinboxWidget(iio_channel *channel, QStr
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_channel *channel, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(component::Channel *channel, QString attr, QString title,
 						       IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(channel, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .channel(channel)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				    .buildSingle();
@@ -172,27 +192,29 @@ IIOWidget *Adrv9009WidgetFactory::createCheckboxWidget(iio_channel *channel, QSt
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createComboWidget(iio_channel *channel, QString attr, QString availableAttr,
-						    QString title, IIOWidgetGroup *group, QWidget *parent)
+IIOWidget *Adrv9009WidgetFactory::createComboWidget(component::Channel *channel, QString attr, QString title,
+						    IIOWidgetGroup *group, QWidget *parent)
 {
-	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .channel(channel)
-				    .attribute(attr)
-				    .optionsAttribute(availableAttr)
-				    .title(title)
-				    .uiStrategy(IIOWidgetBuilder::ComboUi)
-				    .buildSingle();
+	component::Attribute *a = component::attributeByName(channel, attr);
+	if(!a) {
+		return nullptr;
+	}
+	IIOWidget *widget =
+		IIOWidgetBuilder(parent).attribute(a).title(title).uiStrategy(IIOWidgetBuilder::ComboUi).buildSingle();
 	if(group && widget)
 		group->add(widget);
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_channel *channel, QString attr, QString range, QString title,
-						    IIOWidgetGroup *group, QWidget *parent)
+IIOWidget *Adrv9009WidgetFactory::createRangeWidget(component::Channel *channel, QString attr, QString range,
+						    QString title, IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(channel, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .channel(channel)
-				    .attribute(attr)
+				    .attribute(a)
 				    .optionsValues(range)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
@@ -202,15 +224,14 @@ IIOWidget *Adrv9009WidgetFactory::createRangeWidget(iio_channel *channel, QStrin
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(component::Channel *channel, QString attr, QString title,
 						       bool compactMode, IIOWidgetGroup *group, QWidget *parent)
 {
-	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .channel(channel)
-				    .attribute(attr)
-				    .title(title)
-				    .compactMode(compactMode)
-				    .buildSingle();
+	component::Attribute *a = component::attributeByName(channel, attr);
+	if(!a) {
+		return nullptr;
+	}
+	IIOWidget *widget = IIOWidgetBuilder(parent).attribute(a).title(title).compactMode(compactMode).buildSingle();
 	if(widget) {
 		widget->setEnabled(false);
 		widget->showProgressBar(false);
@@ -220,28 +241,35 @@ IIOWidget *Adrv9009WidgetFactory::createReadOnlyWidget(iio_channel *channel, QSt
 	return widget;
 }
 
-// Debug attribute widgets (following proper porting rules)
-IIOWidget *Adrv9009WidgetFactory::createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
-							 IIOWidgetGroup *group, QWidget *parent)
+// Debug attribute widgets — debug attributes are plain Attribute children of the
+// device in the component tree, resolved by name like any other attribute.
+IIOWidget *Adrv9009WidgetFactory::createDebugRangeWidget(component::Device *device, QString attr, QString range,
+							 QString title, IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .optionsValues(range)
 				    .title(title)
-				    .uiStrategy(IIOWidgetBuilder::RangeUi) // UI strategy auto-sets data strategy
-				    .includeDebugAttributes(true)
+				    .uiStrategy(IIOWidgetBuilder::RangeUi)
 				    .buildSingle();
 	if(group && widget)
 		group->add(widget);
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *device, QString attr,
+IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(component::Device *device, QString attr,
 							       const QMap<QString, QString> &optionsMap, QString title,
 							       IIOWidgetGroup *group, QWidget *parent)
 {
-	// Build space-separated display string from optionsMap values (following Template 2B)
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
+	// Build space-separated display string from optionsMap values
 	auto values = optionsMap.values();
 	QString optionsValues = "";
 	for(int i = 0; i < values.size(); i++) {
@@ -252,14 +280,12 @@ IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *devic
 		optionsValues += value.replace(" ", "_");
 	}
 
-	// Create widget with ComboUi strategy (following porting rules)
+	// Create widget with ComboUi strategy
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
-				    .uiStrategy(IIOWidgetBuilder::ComboUi) // UI strategy auto-sets data strategy
+				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .optionsValues(optionsValues)
-				    .includeDebugAttributes(true)
 				    .buildSingle();
 
 	// Set bidirectional conversion functions; capture map by value so the widget
@@ -277,15 +303,17 @@ IIOWidget *Adrv9009WidgetFactory::createDebugCustomComboWidget(iio_device *devic
 	return widget;
 }
 
-IIOWidget *Adrv9009WidgetFactory::createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
+IIOWidget *Adrv9009WidgetFactory::createDebugCheckboxWidget(component::Device *device, QString attr, QString title,
 							    IIOWidgetGroup *group, QWidget *parent)
 {
+	component::Attribute *a = component::attributeByName(device, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(parent)
-				    .device(device)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
-				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi) // UI strategy auto-sets data strategy
-				    .includeDebugAttributes(true)
+				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				    .buildSingle();
 	if(widget) {
 		widget->showProgressBar(false);
