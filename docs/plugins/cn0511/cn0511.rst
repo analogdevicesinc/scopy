@@ -1,0 +1,55 @@
+.. _cn0511:
+
+CN0511
+================================================================================
+
+Description
+---------------------------------
+
+The CN0511 plugin works with Scopy to control the CN0511 wideband synthesizer board.
+It communicates with the AD9166 DAC and the AD9166-AMP amplifier via the IIO subsystem.
+
+On connection, the plugin initializes the AD9166 with the FIR85 interpolation filter
+enabled and a 6 GHz DAC sampling frequency. All output settings (frequency, amplitude,
+and IOFS calibration coefficients) are written to the device together when the **Enter**
+button is clicked.
+
+Use the **Refresh** button in the top-right corner to read the current NCO frequency
+back from the hardware and update the displayed value.
+
+The CN0511 view is divided into two sections:
+
+  - **Single Tone Mode**
+  - **DAC Amplifier**
+
+.. AN_IMAGE_WILL_BE_HERE
+   Screenshot: The CN0511 tool showing both the Single Tone Mode and DAC Amplifier sections with controls visible
+
+Single Tone Mode
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+   Screenshot: The Single Tone Mode section showing the Frequency (MHz) spinbox, Amplitude (dBm) spinbox, and Enter button
+
+  - **Frequency (MHz):** Sets the NCO output frequency of the AD9166 DAC channel.
+    Range is 0 to 10000 MHz. The default value is 4500 MHz. The value is applied
+    to the hardware when the **Enter** button is clicked.
+
+  - **Amplitude (dBm):** Sets the output power level of the synthesizer.
+    Range is -91 to 0 dBm. The value is applied to the hardware when the **Enter**
+    button is clicked.
+
+  - **Enter:** Applies the current frequency and amplitude settings to the hardware.
+    Clicking this button writes the NCO frequency, the amplitude, and the IOFS
+    calibration coefficients to the AD9166 device. A loading animation is shown
+    while the write operation is in progress.
+
+DAC Amplifier
+---------------------------------
+
+.. AN_IMAGE_WILL_BE_HERE
+   Screenshot: The DAC Amplifier section showing the Enable checkbox
+
+  - **Enable:** Enables or disables the AD9166-AMP output amplifier stage.
+    When checked, the amplifier is active and the synthesizer output is driven
+    through the amplifier. The state is read back from the hardware on refresh.
