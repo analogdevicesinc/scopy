@@ -20,6 +20,7 @@
 
 #include "advanced/auxdacwidget.h"
 #include "adrv9009widgetfactory.h"
+#include <component/device.h>
 
 #include <QLabel>
 #include <QGridLayout>
@@ -34,7 +35,7 @@
 using namespace scopy::adrv9009;
 using namespace scopy;
 
-AuxDacWidget::AuxDacWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+AuxDacWidget::AuxDacWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

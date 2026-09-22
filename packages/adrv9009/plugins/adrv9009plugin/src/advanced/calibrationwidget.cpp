@@ -21,6 +21,10 @@
 #include "advanced/calibrationwidget.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include <gui/widgets/menucollapsesection.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcoro/qcorotask.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QSpacerItem>
@@ -38,7 +42,7 @@ Q_LOGGING_CATEGORY(CAT_CALIBRATION, "CALIBRATION")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-CalibrationWidget::CalibrationWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+CalibrationWidget::CalibrationWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -161,10 +165,19 @@ void CalibrationWidget::readCalibrationMaskFromDevice()
 
 	// Read calibration mask from device
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,default-initial-calibrations-mask", &mask);
-	if(ret < 0) {
-		// Set default values (all calibrations disabled) on read error
-		qDebug(CAT_CALIBRATION) << "Failed to read calibration mask, using defaults (all disabled)";
+	component::Attribute *a = component::attributeByName(m_device, "adi,default-initial-calibrations-mask");
+	if(a && a->readCapability()) {
+		auto res = QCoro::waitFor(a->readCapability()->readAsync());
+		if(res) {
+			mask = a->cachedValue().toLongLong();
+		} else {
+			// Set default values (all calibrations disabled) on read error
+			qDebug(CAT_CALIBRATION) << "Failed to read calibration mask, using defaults (all disabled)";
+			mask = 0;
+		}
+	} else {
+		qDebug(CAT_CALIBRATION)
+			<< "Failed to resolve calibration mask attribute, using defaults (all disabled)";
 		mask = 0;
 	}
 
@@ -204,11 +217,17 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 
 	// Read-modify-write: preserve bits not managed by this UI (same as iio-oscilloscope CHECKBOX_MASK)
 	long long mask = 0;
-	int ret = iio_device_debug_attr_read_longlong(m_device, "adi,default-initial-calibrations-mask", &mask);
-	if(ret < 0) {
-		qWarning(CAT_CALIBRATION) << "Failed to read calibration mask before write, error:" << ret;
+	component::Attribute *a = component::attributeByName(m_device, "adi,default-initial-calibrations-mask");
+	if(!a || !a->readCapability() || !a->writeCapability()) {
+		qWarning(CAT_CALIBRATION) << "Failed to resolve calibration mask attribute for read-modify-write";
 		return;
 	}
+	auto rres = QCoro::waitFor(a->readCapability()->readAsync());
+	if(!rres) {
+		qWarning(CAT_CALIBRATION) << "Failed to read calibration mask before write";
+		return;
+	}
+	mask = a->cachedValue().toLongLong();
 
 	// Clear only the 6 managed bits, then apply UI state
 	mask &= ~((1LL << 8) | (1LL << 9) | (1LL << 10) | (1LL << 14) | (1LL << 15) | (1LL << 23));
@@ -228,8 +247,8 @@ void CalibrationWidget::writeCalibrationMaskToDevice()
 
 	qDebug(CAT_CALIBRATION) << "Writing calibration mask to device:" << QString("0x%1").arg(mask, 0, 16);
 
-	ret = iio_device_debug_attr_write_longlong(m_device, "adi,default-initial-calibrations-mask", mask);
-	if(ret < 0) {
-		qWarning(CAT_CALIBRATION) << "Failed to write calibration mask, error:" << ret;
+	auto wres = QCoro::waitFor(a->writeCapability()->writeAsync(QString::number(mask)));
+	if(!wres) {
+		qWarning(CAT_CALIBRATION) << "Failed to write calibration mask";
 	}
 }

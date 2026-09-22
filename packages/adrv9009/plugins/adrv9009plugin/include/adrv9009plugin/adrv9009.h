@@ -35,6 +35,14 @@
 #include <gui/widgets/menusectionwidget.h>
 #include "adrv9009widgetfactory.h"
 
+#include <qcoro/qcorotask.h>
+
+namespace scopy::component {
+class Context;
+class Device;
+class Channel;
+} // namespace scopy::component
+
 namespace scopy::adrv9009 {
 
 class Adrv9009Plugin_API;
@@ -45,14 +53,14 @@ class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009 : public QWidget
 	friend class Adrv9009Plugin_API;
 
 public:
-	Adrv9009(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	Adrv9009(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Adrv9009();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_context *m_ctx = nullptr;
+	component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
@@ -60,7 +68,7 @@ private:
 	AnimatedRefreshBtn *m_refreshButton;
 	QPushButton *m_mcsButton = nullptr;
 
-	QMap<QString, iio_device *> m_adrv9009DeviceMap;
+	QMap<QString, component::Device *> m_adrv9009DeviceMap;
 	bool m_multiDeviceMode = false;
 
 	// magic number from iio-osc
@@ -68,10 +76,10 @@ private:
 
 	void setupUi();
 	void detectAndStoreDevices();
-	void performMcsSync();
+	QCoro::Task<void> performMcsSync();
 
-	void loadProfileFromFile(QString filePath);
-	QWidget *generateCalibrationWidget(iio_device *device, QWidget *parent);
+	QCoro::Task<void> loadProfileFromFile(QString filePath);
+	QWidget *generateCalibrationWidget(component::Device *device, QWidget *parent);
 
 	// Simple section generators
 	QWidget *generateGlobalSettingsWidget(QString title, QWidget *parent);
@@ -81,31 +89,27 @@ private:
 	QWidget *generateFpgaSettingsWidget(QString title, QWidget *parent);
 
 	// Device-specific content creators
-	QWidget *createGlobalSettingsContentForDevice(iio_device *device, QWidget *parent);
-	QWidget *createRxChainContentForDevice(iio_device *device, QWidget *parent);
-	QWidget *createTxChainContentForDevice(iio_device *device, QWidget *parent);
-	QWidget *createObsRxChainContentForDevice(iio_device *device, QWidget *parent);
-	QWidget *createFpgaSettingsContentForDevice(iio_device *device, QWidget *parent);
+	QWidget *createGlobalSettingsContentForDevice(component::Device *device, QWidget *parent);
+	QWidget *createRxChainContentForDevice(component::Device *device, QWidget *parent);
+	QWidget *createTxChainContentForDevice(component::Device *device, QWidget *parent);
+	QWidget *createObsRxChainContentForDevice(component::Device *device, QWidget *parent);
+	QWidget *createFpgaSettingsContentForDevice(component::Device *device, QWidget *parent);
 
 	// RX channel helper
-	QWidget *createRxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent);
+	QWidget *createRxChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent);
 
 	// TX channel helper
-	QWidget *createTxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent);
+	QWidget *createTxChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent);
 
 	// OBS channel helper
-	QWidget *createObsChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent);
+	QWidget *createObsChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent);
 
 	// FPGA phase rotation channel helper
-	QWidget *createFpgaRxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent);
-
-	// FPGA Widget Creation Helpers (for different device)
-	IIOWidget *createFpgaRangeWidget(iio_device *dev, iio_channel *ch, const QString &attr, const QString &range,
-					 const QString &title);
+	QWidget *createFpgaRxChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent);
 
 	// FPGA Phase Rotation Helpers
-	void writePhase(iio_device *fpgaDev, int channelIndex, int degrees);
-	void readPhase(iio_device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox);
+	QCoro::Task<void> writePhase(component::Device *fpgaDev, int channelIndex, int degrees);
+	QCoro::Task<void> readPhase(component::Device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox);
 };
 
 } // namespace scopy::adrv9009
