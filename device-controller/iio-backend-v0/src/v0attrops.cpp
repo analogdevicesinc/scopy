@@ -61,10 +61,10 @@ AttrHandle V0AttrOps::channelAttr(ChannelHandle ch, const QString &name)
 
 void V0AttrOps::releaseAttr(AttrHandle attr) { delete info(attr); }
 
-Result<QByteArray> V0AttrOps::read(AttrHandle attr)
+Result<QByteArray> V0AttrOps::read(AttrHandle attr, size_t bytes)
 {
 	auto *ai = info(attr);
-	char buf[4096];
+	QByteArray buf(static_cast<int>(bytes), Qt::Uninitialized);
 	ssize_t ret = 0;
 
 	switch(ai->scope) {
@@ -78,20 +78,20 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr)
 			-ENOENT, QStringLiteral("context attr read failed: %1").arg(QString::fromUtf8(ai->name))}};
 	}
 	case V0AttrInfo::Device:
-		ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(), buf,
-					   sizeof(buf));
+		ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
+					   buf.data(), buf.size());
 		break;
 	case V0AttrInfo::Channel:
-		ret = iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent), ai->name.constData(), buf,
-					    sizeof(buf));
+		ret = iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent), ai->name.constData(),
+					    buf.data(), buf.size());
 		break;
 	case V0AttrInfo::Debug:
-		ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(), buf,
-						 sizeof(buf));
+		ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
+						 buf.data(), buf.size());
 		break;
 	case V0AttrInfo::Buffer:
 		ret = iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent), ai->name.constData(),
-						  buf, sizeof(buf));
+						  buf.data(), buf.size());
 		break;
 	}
 
@@ -101,7 +101,7 @@ Result<QByteArray> V0AttrOps::read(AttrHandle attr)
 	}
 	// libiio returns the byte count including the trailing NUL terminator; strip it so
 	// the value is not polluted with an embedded '\0' (breaks QString::toDouble(), comparisons, etc.)
-	QByteArray result(buf, ret);
+	QByteArray result(buf.constData(), ret);
 	while(result.endsWith('\0')) {
 		result.chop(1);
 	}

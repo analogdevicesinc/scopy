@@ -42,7 +42,7 @@ public:
 
 	// I/O — returns a typed Result; called from Command::execute() on worker thread.
 	// The read payload is the raw attr bytes; errors travel in the Unexpected<Error> channel.
-	virtual Result<QByteArray> read(AttrHandle attr) = 0;
+	virtual Result<QByteArray> read(AttrHandle attr, size_t bytes = 4096) = 0;
 	virtual Result<void> write(AttrHandle attr, const QString &value) = 0;
 
 	// Range / available — convenience parsers for _available attributes.

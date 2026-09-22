@@ -42,7 +42,7 @@ public:
 	IIOAttributeReader(scopy::iio::IAttrOps *ops, scopy::iio::AttrHandle handle, scopy::ICmdExecutor *executor,
 			   QObject *parent = nullptr);
 
-	QCoro::Task<CommandResponse<QByteArray>> readAsync();
+	QCoro::Task<CommandResponse<QByteArray>> readAsync(size_t bytes = 4096);
 
 private:
 	scopy::iio::IAttrOps *m_ops;
