@@ -23,10 +23,13 @@
 
 #include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
-#include <iio.h>
 #include <iio-widgets/iiowidgetgroup.h>
 
 class QVBoxLayout;
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy {
 class MenuSectionCollapseWidget;
@@ -38,7 +41,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT GainSetupWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit GainSetupWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit GainSetupWidget(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~GainSetupWidget();
 
 Q_SIGNALS:
@@ -49,7 +52,7 @@ private:
 	QWidget *createRxGainSection(QWidget *parent);
 	QWidget *createObservationGainSection(QWidget *parent);
 
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 

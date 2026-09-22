@@ -21,6 +21,7 @@
 #include "advanced/agcsetupwidget.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
+#include <component/device.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -35,7 +36,7 @@ Q_LOGGING_CATEGORY(CAT_AGCSETUP, "AgcSetup")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-AgcSetupWidget::AgcSetupWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+AgcSetupWidget::AgcSetupWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

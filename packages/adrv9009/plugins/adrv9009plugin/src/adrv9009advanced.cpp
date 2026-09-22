@@ -41,13 +41,14 @@
 #include <style.h>
 #include <QLoggingCategory>
 #include <QScrollArea>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9009_ADVANCED, "ADRV9009_ADVANCED")
 
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-Adrv9009Advanced::Adrv9009Advanced(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+Adrv9009Advanced::Adrv9009Advanced(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -57,9 +58,8 @@ Adrv9009Advanced::Adrv9009Advanced(iio_device *device, IIOWidgetGroup *group, QW
 		return;
 	}
 
-	const char *device_name = iio_device_get_name(m_device);
-	qDebug(CAT_ADRV9009_ADVANCED) << "ADRV9009 Advanced initialized for device:"
-				      << (device_name ? device_name : "unknown");
+	const QString device_name = m_device->name();
+	qDebug(CAT_ADRV9009_ADVANCED) << "ADRV9009 Advanced initialized for device:" << device_name;
 
 	setupUi();
 }
@@ -427,8 +427,8 @@ QWidget *Adrv9009Advanced::createPlaceholderWidget(const QString &sectionName)
 	Style::setStyle(placeholder, style::properties::label::menuSmall);
 	placeholder->setAlignment(Qt::AlignCenter);
 
-	const char *device_name = iio_device_get_name(m_device);
-	QLabel *deviceInfo = new QLabel(QString("Device: %1").arg(device_name ? device_name : "unknown"));
+	const QString device_name = m_device->name();
+	QLabel *deviceInfo = new QLabel(QString("Device: %1").arg(device_name));
 	Style::setStyle(deviceInfo, style::properties::label::menuSmall);
 	deviceInfo->setAlignment(Qt::AlignCenter);
 

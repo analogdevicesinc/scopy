@@ -21,6 +21,10 @@
 #include "advanced/bistwidget.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcoro/qcorotask.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -38,7 +42,7 @@ Q_LOGGING_CATEGORY(CAT_BIST, "BIST")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-BistWidget::BistWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+BistWidget::BistWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -202,12 +206,16 @@ void BistWidget::writeBistToneToDevice()
 	unsigned tx1_freq = (unsigned)(m_tx1FreqSpinBox->value() * 1000); // MHz to kHz
 	unsigned tx2_freq = (unsigned)(m_tx2FreqSpinBox->value() * 1000); // MHz to kHz
 
-	char composite[40];
-	std::sprintf(composite, "%u %u %u", enable, tx1_freq, tx2_freq);
+	QString composite = QString("%1 %2 %3").arg(enable).arg(tx1_freq).arg(tx2_freq);
 
-	// Use iio-oscilloscope pattern: reset then set (prevents issues)
-	iio_device_debug_attr_write(m_device, "bist_tone", "0 0 0");
-	iio_device_debug_attr_write(m_device, "bist_tone", composite);
+	component::Attribute *a = component::attributeByName(m_device, "bist_tone");
+	if(a && a->writeCapability()) {
+		// Use iio-oscilloscope pattern: reset then set (prevents issues)
+		QCoro::waitFor(a->writeCapability()->writeAsync(QStringLiteral("0 0 0")));
+		QCoro::waitFor(a->writeCapability()->writeAsync(composite));
+	} else {
+		qWarning(CAT_BIST) << "Failed to resolve bist_tone attribute for write";
+	}
 }
 
 void BistWidget::readBistToneFromDevice()
@@ -216,9 +224,13 @@ void BistWidget::readBistToneFromDevice()
 		return;
 	}
 
-	char value[256];
-	int ret = iio_device_debug_attr_read(m_device, "bist_tone", value, sizeof(value));
-	if(ret < 0) {
+	component::Attribute *a = component::attributeByName(m_device, "bist_tone");
+	bool readOk = false;
+	if(a && a->readCapability()) {
+		auto res = QCoro::waitFor(a->readCapability()->readAsync());
+		readOk = (bool)res;
+	}
+	if(!readOk) {
 		// Set default values on read error
 		m_txNcoEnable->onOffswitch()->setChecked(false);
 		m_tx1FreqSpinBox->setValue(0.0);
@@ -227,8 +239,10 @@ void BistWidget::readBistToneFromDevice()
 		return;
 	}
 
+	QString value = a->cachedValue();
+
 	// Parse "enable tx1_freq tx2_freq" exactly like iio-oscilloscope
-	QStringList parts = QString::fromUtf8(value).trimmed().split(' ');
+	QStringList parts = value.trimmed().split(' ');
 	if(parts.size() >= 3) {
 		bool enableValue = (parts[0] == "1");
 		double tx1FreqMHz = parts[1].toDouble() / 1000.0; // kHz to MHz
@@ -248,10 +262,10 @@ void BistWidget::readBistToneFromDevice()
 		m_tx1FreqSpinBox->blockSignals(false);
 		m_tx2FreqSpinBox->blockSignals(false);
 
-		qDebug(CAT_BIST) << "Read bist_tone from device:" << QString::fromUtf8(value).trimmed()
+		qDebug(CAT_BIST) << "Read bist_tone from device:" << value.trimmed()
 				 << "parsed as enable:" << enableValue << "tx1:" << tx1FreqMHz
 				 << "MHz tx2:" << tx2FreqMHz << "MHz";
 	} else {
-		qWarning(CAT_BIST) << "Invalid bist_tone format from device:" << QString::fromUtf8(value).trimmed();
+		qWarning(CAT_BIST) << "Invalid bist_tone format from device:" << value.trimmed();
 	}
 }

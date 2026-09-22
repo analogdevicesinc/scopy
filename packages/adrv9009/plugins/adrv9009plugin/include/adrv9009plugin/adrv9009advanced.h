@@ -30,7 +30,10 @@
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iio.h>
+
+namespace scopy::component {
+class Device;
+}
 
 // Forward declarations for section widgets
 namespace scopy::adrv9009 {
@@ -58,14 +61,14 @@ class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009Advanced : public QWidget
 	friend class Adrv9009Plugin_API;
 
 public:
-	Adrv9009Advanced(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	Adrv9009Advanced(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Adrv9009Advanced();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_device *m_device = nullptr;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;
