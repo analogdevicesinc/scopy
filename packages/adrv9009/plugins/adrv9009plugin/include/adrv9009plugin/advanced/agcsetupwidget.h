@@ -23,9 +23,12 @@
 
 #include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
-#include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy::adrv9009 {
 
@@ -34,7 +37,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT AgcSetupWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit AgcSetupWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit AgcSetupWidget(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~AgcSetupWidget();
 
 Q_SIGNALS:
@@ -48,7 +51,7 @@ private:
 	QWidget *createAgcRxChannelGroup(const QString &baseAttr, const QString &displayName, const QString &range,
 					 QWidget *parent);
 
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 

@@ -36,13 +36,21 @@
 #include <qtconcurrentrun.h>
 #include <filebrowserwidget.h>
 #include <pkg-manager/pkgmanager.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <component/backends/iio/iioregisterreader.h>
+#include <component/backends/iio/iioregisterwriter.h>
+#include <qcoro/qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9009, "ADRV9009");
 
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-Adrv9009::Adrv9009(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Adrv9009::Adrv9009(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_widgetGroup(group)
@@ -132,13 +140,14 @@ void Adrv9009::setupUi()
 
 			m_mcsButton = new QPushButton("MCS Sync", this);
 			Style::setStyle(m_mcsButton, style::properties::button::basicButton);
-			connect(m_mcsButton, &QPushButton::clicked, this, &Adrv9009::performMcsSync);
+			connect(m_mcsButton, &QPushButton::clicked, this,
+				[this]() { QCoro::waitFor(performMcsSync()); });
 			m_tool->addWidgetToBottomContainerHelper(m_mcsButton, TTA_LEFT);
 
 			qDebug(CAT_ADRV9009) << "MCS Sync button added for" << m_adrv9009DeviceMap.size() << "devices";
 
 			// Auto-sync after initialization (like iio-osc)
-			QTimer::singleShot(100, this, [this]() { performMcsSync(); });
+			QTimer::singleShot(100, this, [this]() { QCoro::waitFor(performMcsSync()); });
 		}
 	} else {
 		qWarning(CAT_ADRV9009) << "No ADRV9009 devices found in context";
@@ -157,14 +166,11 @@ void Adrv9009::detectAndStoreDevices()
 		return;
 	}
 
-	unsigned int deviceCount = iio_context_get_devices_count(m_ctx);
+	for(component::Device *dev : m_ctx->findChildren<component::Device *>(Qt::FindDirectChildrenOnly)) {
+		QString deviceName = dev->name();
 
-	for(unsigned int i = 0; i < deviceCount; i++) {
-		iio_device *dev = iio_context_get_device(m_ctx, i);
-		const char *deviceName = iio_device_get_name(dev);
-
-		if(deviceName && QString(deviceName).startsWith("adrv9009-phy")) {
-			m_adrv9009DeviceMap[QString(deviceName)] = dev;
+		if(deviceName.startsWith("adrv9009-phy")) {
+			m_adrv9009DeviceMap[deviceName] = dev;
 			qDebug(CAT_ADRV9009) << "Found ADRV9009 device:" << deviceName;
 		}
 	}
@@ -174,44 +180,53 @@ void Adrv9009::detectAndStoreDevices()
 	qDebug(CAT_ADRV9009) << "Multi-device mode:" << m_multiDeviceMode;
 }
 
-void Adrv9009::performMcsSync()
+QCoro::Task<void> Adrv9009::performMcsSync()
 {
 	// 1. Skip if single device (exact iio-osc check)
 	if(!m_multiDeviceMode) {
-		return;
+		co_return;
 	}
 
 	qDebug(CAT_ADRV9009) << "Starting MCS sync for" << m_adrv9009DeviceMap.size() << "devices";
 
 	// 2. Try JESD204-FSM automatic sync (exact magic number from iio-osc!)
 	QStringList deviceNames = m_adrv9009DeviceMap.keys();
-	iio_device *firstDevice = m_adrv9009DeviceMap[deviceNames.first()];
-	int ret = iio_device_attr_write_longlong(firstDevice, "multichip_sync", multichipSyncValue);
-	if(ret != -EINVAL) {
-		qDebug(CAT_ADRV9009) << "JESD204-FSM automatic sync successful";
-		Q_EMIT readRequested(); // Refresh all widgets
-		return;
+	component::Device *firstDevice = m_adrv9009DeviceMap[deviceNames.first()];
+	component::Attribute *mcsAttr = component::attributeByName(firstDevice, "multichip_sync");
+	if(mcsAttr && mcsAttr->writeCapability()) {
+		auto ret = co_await mcsAttr->writeCapability()->writeAsync(QString::number(multichipSyncValue));
+		if(ret) {
+			qDebug(CAT_ADRV9009) << "JESD204-FSM automatic sync successful";
+			Q_EMIT readRequested(); // Refresh all widgets
+			co_return;
+		}
 	}
 
 	qDebug(CAT_ADRV9009) << "JESD204-FSM not available, using manual sync";
 
 	// 3. Configure HMC7044 clock distributor (exact iio-osc logic)
-	iio_device *hmc7044_dev = iio_context_find_device(m_ctx, "hmc7044");
+	component::Device *hmc7044_dev = m_ctx->findChild<component::Device *>("hmc7044", Qt::FindDirectChildrenOnly);
 	if(hmc7044_dev) {
-		unsigned int val;
-		int ret = iio_device_reg_read(hmc7044_dev, 0x5a, &val);
-		// Is continuous mode?
-		if(!ret && val == 7) {
-			iio_device_reg_write(hmc7044_dev, 0x5a, 0);
-			qDebug(CAT_ADRV9009) << "HMC7044 REG 0x5A set to level sensitive GPI SYSREF request";
+		auto *rr = hmc7044_dev->findChild<component::iio::IIORegisterReader *>();
+		auto *rw = hmc7044_dev->findChild<component::iio::IIORegisterWriter *>();
+		if(rr && rw) {
+			auto r = co_await rr->readAsync(0x5a);
+			// Is continuous mode?
+			if(r && r.value() == 7) {
+				co_await rw->writeAsync(0x5a, 0);
+				qDebug(CAT_ADRV9009) << "HMC7044 REG 0x5A set to level sensitive GPI SYSREF request";
+			}
 		}
 	}
 
 	// 4. Manual sync sequence for all devices (exact iio-osc sequence)
 	for(int i = 0; i <= 11; i++) {
 		for(const QString &deviceName : deviceNames) {
-			iio_device *device = m_adrv9009DeviceMap[deviceName];
-			iio_device_attr_write_longlong(device, "multichip_sync", i);
+			component::Device *device = m_adrv9009DeviceMap[deviceName];
+			component::Attribute *attr = component::attributeByName(device, "multichip_sync");
+			if(attr && attr->writeCapability()) {
+				co_await attr->writeCapability()->writeAsync(QString::number(i));
+			}
 		}
 	}
 
@@ -226,7 +241,7 @@ QWidget *Adrv9009::generateGlobalSettingsWidget(QString title, QWidget *parent)
 
 	if(!m_multiDeviceMode) {
 		// Single device mode - use first (and only) device
-		iio_device *device = m_adrv9009DeviceMap.first();
+		component::Device *device = m_adrv9009DeviceMap.first();
 		QWidget *content = createGlobalSettingsContentForDevice(device, globalSection);
 		globalSection->contentLayout()->addWidget(content);
 	} else {
@@ -236,7 +251,7 @@ QWidget *Adrv9009::generateGlobalSettingsWidget(QString title, QWidget *parent)
 		QStringList deviceNames = m_adrv9009DeviceMap.keys();
 		for(int i = 0; i < deviceNames.size(); i++) {
 			QString deviceName = deviceNames[i];
-			iio_device *device = m_adrv9009DeviceMap[deviceName];
+			component::Device *device = m_adrv9009DeviceMap[deviceName];
 
 			QWidget *deviceContent = createGlobalSettingsContentForDevice(device, deviceTabs);
 			deviceTabs->addTab(deviceContent, deviceName);
@@ -248,7 +263,7 @@ QWidget *Adrv9009::generateGlobalSettingsWidget(QString title, QWidget *parent)
 	return globalSection;
 }
 
-QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget *parent)
+QWidget *Adrv9009::createGlobalSettingsContentForDevice(component::Device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -264,18 +279,13 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 
 	QGridLayout *layout = new QGridLayout();
 
-	// Active ENSM and ENSM Modes are one widget
-	IIOWidget *ensmWidget = IIOWidgetBuilder(widget)
-					.device(dev)
-					.attribute("ensm_mode")
-					.optionsAttribute("ensm_mode_available")
-					.title("ENSM mode")
-					.uiStrategy(IIOWidgetBuilder::ComboUi)
-					.buildSingle();
-	if(m_widgetGroup && ensmWidget)
-		m_widgetGroup->add(ensmWidget);
-	layout->addWidget(ensmWidget, 1, 0);
-	connect(this, &Adrv9009::readRequested, ensmWidget, &IIOWidget::readAsync);
+	// Active ENSM and ENSM Modes are one widget (combo options auto-derive from dc metadata)
+	IIOWidget *ensmWidget =
+		Adrv9009WidgetFactory::createComboWidget(dev, "ensm_mode", "ENSM mode", m_widgetGroup, widget);
+	if(ensmWidget) {
+		layout->addWidget(ensmWidget, 1, 0);
+		connect(this, &Adrv9009::readRequested, ensmWidget, &IIOWidget::readAsync);
+	}
 
 	// Load Profile section
 	QLabel *loadProflieLabel = new QLabel("Load Profile");
@@ -288,7 +298,8 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 	layout->addWidget(loadProflieLabel, 0, 1);
 	layout->addWidget(profileWidget, 1, 1);
 
-	connect(profileWidget->lineEdit(), &QLineEdit::textChanged, this, &Adrv9009::loadProfileFromFile);
+	connect(profileWidget->lineEdit(), &QLineEdit::textChanged, this,
+		[this](const QString &filePath) { QCoro::waitFor(loadProfileFromFile(filePath)); });
 
 	// TRX Local Oscillator framed widget
 	QWidget *trxLoWidget = new QWidget(widget);
@@ -300,7 +311,7 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 	Style::setStyle(trxLoTitle, style::properties::label::menuMedium);
 	trxLoLayout->addWidget(trxLoTitle);
 
-	iio_channel *trxLo = iio_device_find_channel(dev, "altvoltage0", true); // TRX_LO
+	component::Channel *trxLo = component::channelById(dev, "altvoltage0", true); // TRX_LO
 	if(trxLo) {
 		// Frequency(MHz)
 		IIOWidget *trxLoFreq = Adrv9009WidgetFactory::createRangeWidget(trxLo, "frequency", "[70 1 6000]",
@@ -330,17 +341,17 @@ QWidget *Adrv9009::createGlobalSettingsContentForDevice(iio_device *dev, QWidget
 	return widget;
 }
 
-void Adrv9009::loadProfileFromFile(QString filePath)
+QCoro::Task<void> Adrv9009::loadProfileFromFile(QString filePath)
 {
 	if(filePath.isEmpty()) {
 		qWarning(CAT_ADRV9009) << "Profile loading failed, no file path provided";
-		return;
+		co_return;
 	}
 
 	QFile file(filePath);
 	if(!file.open(QIODevice::ReadOnly)) {
 		qWarning(CAT_ADRV9009) << "Failed to open profile:" << file.errorString();
-		return;
+		co_return;
 	}
 
 	QByteArray buffer = file.readAll();
@@ -349,30 +360,22 @@ void Adrv9009::loadProfileFromFile(QString filePath)
 	// Show loading animation
 	m_refreshButton->startAnimation();
 
-	QFutureWatcher<ssize_t> *watcher = new QFutureWatcher<ssize_t>(this);
-	connect(
-		watcher, &QFutureWatcher<ssize_t>::finished, this,
-		[this, watcher]() {
-			m_refreshButton->stopAnimation();
-			ssize_t ret = watcher->result();
-			if(ret < 0) {
-				qWarning(CAT_ADRV9009) << "Profile loading failed, error:" << ret;
-			} else {
-				qDebug(CAT_ADRV9009) << "Profile loaded successfully";
-				Q_EMIT readRequested();
-			}
-			watcher->deleteLater();
-		},
-		Qt::QueuedConnection);
+	component::Device *device = m_adrv9009DeviceMap.first();
+	component::Attribute *profileAttr = component::attributeByName(device, "profile_config");
+	if(profileAttr && profileAttr->writeCapability()) {
+		auto ret = co_await profileAttr->writeCapability()->writeAsync(QString::fromUtf8(buffer));
+		if(!ret) {
+			qWarning(CAT_ADRV9009) << "Profile loading failed";
+		} else {
+			qDebug(CAT_ADRV9009) << "Profile loaded successfully";
+			Q_EMIT readRequested();
+		}
+	}
 
-	iio_device *device = m_adrv9009DeviceMap.first();
-	QFuture<ssize_t> future = QtConcurrent::run([device, buffer]() {
-		return iio_device_attr_write_raw(device, "profile_config", buffer.constData(), buffer.size());
-	});
-	watcher->setFuture(future);
+	m_refreshButton->stopAnimation();
 }
 
-QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent)
+QWidget *Adrv9009::generateCalibrationWidget(component::Device *device, QWidget *parent)
 {
 	QWidget *calibrationsWidget = new QWidget(parent);
 	Style::setBackgroundColor(calibrationsWidget, json::theme::background_primary);
@@ -423,12 +426,15 @@ QWidget *Adrv9009::generateCalibrationWidget(iio_device *device, QWidget *parent
 
 	connect(calibrateButton, &QPushButton::clicked, this, [this, device] {
 		// Trigger calibration
-		int ret = iio_device_attr_write_bool(device, "calibrate", true);
-		if(ret < 0) {
-			qWarning(CAT_ADRV9009) << "Calibration failed:" << ret;
-		} else {
-			qDebug(CAT_ADRV9009) << "Calibration triggered";
-			Q_EMIT readRequested(); // Refresh widgets
+		component::Attribute *calAttr = component::attributeByName(device, "calibrate");
+		if(calAttr && calAttr->writeCapability()) {
+			auto ret = QCoro::waitFor(calAttr->writeCapability()->writeAsync("1"));
+			if(!ret) {
+				qWarning(CAT_ADRV9009) << "Calibration failed";
+			} else {
+				qDebug(CAT_ADRV9009) << "Calibration triggered";
+				Q_EMIT readRequested(); // Refresh widgets
+			}
 		}
 	});
 
@@ -444,7 +450,7 @@ QWidget *Adrv9009::generateRxChainWidget(QString title, QWidget *parent)
 
 	if(!m_multiDeviceMode) {
 		// Single device mode - use first (and only) device
-		iio_device *device = m_adrv9009DeviceMap.first();
+		component::Device *device = m_adrv9009DeviceMap.first();
 		QWidget *content = createRxChainContentForDevice(device, rxSection);
 		rxSection->contentLayout()->addWidget(content);
 	} else {
@@ -454,7 +460,7 @@ QWidget *Adrv9009::generateRxChainWidget(QString title, QWidget *parent)
 		QStringList deviceNames = m_adrv9009DeviceMap.keys();
 		for(int i = 0; i < deviceNames.size(); i++) {
 			QString deviceName = deviceNames[i];
-			iio_device *device = m_adrv9009DeviceMap[deviceName];
+			component::Device *device = m_adrv9009DeviceMap[deviceName];
 
 			QWidget *deviceContent = createRxChainContentForDevice(device, deviceTabs);
 			deviceTabs->addTab(deviceContent, deviceName);
@@ -466,7 +472,7 @@ QWidget *Adrv9009::generateRxChainWidget(QString title, QWidget *parent)
 	return rxSection;
 }
 
-QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *parent)
+QWidget *Adrv9009::createRxChainContentForDevice(component::Device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -483,7 +489,7 @@ QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *paren
 	// Section-level controls
 	QHBoxLayout *sectionControlsLayout = new QHBoxLayout();
 
-	iio_channel *rxChannel0 = iio_device_find_channel(dev, "voltage0", false);
+	component::Channel *rxChannel0 = component::channelById(dev, "voltage0", false);
 
 	if(rxChannel0) {
 		// RF Bandwidth (read-only, shared for RX section)
@@ -504,8 +510,7 @@ QWidget *Adrv9009::createRxChainContentForDevice(iio_device *dev, QWidget *paren
 
 		// Gain Control Modes (shared dropdown for RX section)
 		IIOWidget *gainControlModes = Adrv9009WidgetFactory::createComboWidget(
-			rxChannel0, "gain_control_mode", "gain_control_mode_available", "Gain Control Modes",
-			m_widgetGroup);
+			rxChannel0, "gain_control_mode", "Gain Control Modes", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, gainControlModes, &IIOWidget::readAsync);
 		sectionControlsLayout->addWidget(gainControlModes);
 	}
@@ -535,7 +540,7 @@ QWidget *Adrv9009::generateTxChainWidget(QString title, QWidget *parent)
 
 	if(!m_multiDeviceMode) {
 		// Single device mode - use first (and only) device
-		iio_device *device = m_adrv9009DeviceMap.first();
+		component::Device *device = m_adrv9009DeviceMap.first();
 		QWidget *content = createTxChainContentForDevice(device, txSection);
 		txSection->contentLayout()->addWidget(content);
 	} else {
@@ -545,7 +550,7 @@ QWidget *Adrv9009::generateTxChainWidget(QString title, QWidget *parent)
 		QStringList deviceNames = m_adrv9009DeviceMap.keys();
 		for(int i = 0; i < deviceNames.size(); i++) {
 			QString deviceName = deviceNames[i];
-			iio_device *device = m_adrv9009DeviceMap[deviceName];
+			component::Device *device = m_adrv9009DeviceMap[deviceName];
 
 			QWidget *deviceContent = createTxChainContentForDevice(device, deviceTabs);
 			deviceTabs->addTab(deviceContent, deviceName);
@@ -557,7 +562,7 @@ QWidget *Adrv9009::generateTxChainWidget(QString title, QWidget *parent)
 	return txSection;
 }
 
-QWidget *Adrv9009::createTxChainContentForDevice(iio_device *dev, QWidget *parent)
+QWidget *Adrv9009::createTxChainContentForDevice(component::Device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -575,7 +580,7 @@ QWidget *Adrv9009::createTxChainContentForDevice(iio_device *dev, QWidget *paren
 	QHBoxLayout *sectionControlsLayout = new QHBoxLayout();
 
 	// Find TX output channel for chain-level controls
-	iio_channel *txChannel0 = iio_device_find_channel(dev, "voltage0", true);
+	component::Channel *txChannel0 = component::channelById(dev, "voltage0", true);
 
 	if(txChannel0) {
 		// RF Bandwidth (read-only, shared for TX section)
@@ -623,7 +628,7 @@ QWidget *Adrv9009::generateObsRxChainWidget(QString title, QWidget *parent)
 
 	if(!m_multiDeviceMode) {
 		// Single device mode - use first (and only) device
-		iio_device *device = m_adrv9009DeviceMap.first();
+		component::Device *device = m_adrv9009DeviceMap.first();
 		QWidget *content = createObsRxChainContentForDevice(device, obsSection);
 		obsSection->contentLayout()->addWidget(content);
 	} else {
@@ -633,7 +638,7 @@ QWidget *Adrv9009::generateObsRxChainWidget(QString title, QWidget *parent)
 		QStringList deviceNames = m_adrv9009DeviceMap.keys();
 		for(int i = 0; i < deviceNames.size(); i++) {
 			QString deviceName = deviceNames[i];
-			iio_device *device = m_adrv9009DeviceMap[deviceName];
+			component::Device *device = m_adrv9009DeviceMap[deviceName];
 
 			QWidget *deviceContent = createObsRxChainContentForDevice(device, deviceTabs);
 			deviceTabs->addTab(deviceContent, deviceName);
@@ -645,7 +650,7 @@ QWidget *Adrv9009::generateObsRxChainWidget(QString title, QWidget *parent)
 	return obsSection;
 }
 
-QWidget *Adrv9009::createObsRxChainContentForDevice(iio_device *dev, QWidget *parent)
+QWidget *Adrv9009::createObsRxChainContentForDevice(component::Device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -663,8 +668,8 @@ QWidget *Adrv9009::createObsRxChainContentForDevice(iio_device *dev, QWidget *pa
 	QHBoxLayout *sectionControlsLayout = new QHBoxLayout();
 
 	// Find channels for chain-level controls
-	iio_channel *obsChannel0 = iio_device_find_channel(dev, "voltage2", false); // For RF/sampling
-	iio_channel *auxLo = iio_device_find_channel(dev, "altvoltage1", true);	    // For AUX LO
+	component::Channel *obsChannel0 = component::channelById(dev, "voltage2", false); // For RF/sampling
+	component::Channel *auxLo = component::channelById(dev, "altvoltage1", true);	  // For AUX LO
 
 	if(obsChannel0) {
 		// RF Bandwidth (read-only, shared for OBS section)
@@ -682,8 +687,8 @@ QWidget *Adrv9009::createObsRxChainContentForDevice(iio_device *dev, QWidget *pa
 		sectionControlsLayout->addWidget(samplingRateWidget);
 
 		// LO Source Select (shared dropdown for OBS section)
-		IIOWidget *loSourceSelect = Adrv9009WidgetFactory::createComboWidget(
-			obsChannel0, "rf_port_select", "rf_port_select_available", "LO Source Select", m_widgetGroup);
+		IIOWidget *loSourceSelect = Adrv9009WidgetFactory::createComboWidget(obsChannel0, "rf_port_select",
+										     "LO Source Select", m_widgetGroup);
 		connect(this, &Adrv9009::readRequested, loSourceSelect, &IIOWidget::readAsync);
 		sectionControlsLayout->addWidget(loSourceSelect);
 	}
@@ -724,7 +729,7 @@ QWidget *Adrv9009::generateFpgaSettingsWidget(QString title, QWidget *parent)
 
 	if(!m_multiDeviceMode) {
 		// Single device mode - use first (and only) device
-		iio_device *device = m_adrv9009DeviceMap.first();
+		component::Device *device = m_adrv9009DeviceMap.first();
 		QWidget *content = createFpgaSettingsContentForDevice(device, fpgaSection);
 		fpgaSection->contentLayout()->addWidget(content);
 	} else {
@@ -734,7 +739,7 @@ QWidget *Adrv9009::generateFpgaSettingsWidget(QString title, QWidget *parent)
 		QStringList deviceNames = m_adrv9009DeviceMap.keys();
 		for(int i = 0; i < deviceNames.size(); i++) {
 			QString deviceName = deviceNames[i];
-			iio_device *device = m_adrv9009DeviceMap[deviceName];
+			component::Device *device = m_adrv9009DeviceMap[deviceName];
 
 			QWidget *deviceContent = createFpgaSettingsContentForDevice(device, deviceTabs);
 			deviceTabs->addTab(deviceContent, deviceName);
@@ -746,7 +751,7 @@ QWidget *Adrv9009::generateFpgaSettingsWidget(QString title, QWidget *parent)
 	return fpgaSection;
 }
 
-QWidget *Adrv9009::createFpgaSettingsContentForDevice(iio_device *dev, QWidget *parent)
+QWidget *Adrv9009::createFpgaSettingsContentForDevice(component::Device *dev, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -756,7 +761,8 @@ QWidget *Adrv9009::createFpgaSettingsContentForDevice(iio_device *dev, QWidget *
 	widget->setLayout(mainLayout);
 
 	// Find FPGA device corresponding to this ADRV9009 device
-	iio_device *fpga_dev = iio_context_find_device(m_ctx, "axi-adrv9009-rx-hpc");
+	component::Device *fpga_dev =
+		m_ctx->findChild<component::Device *>("axi-adrv9009-rx-hpc", Qt::FindDirectChildrenOnly);
 	if(fpga_dev == nullptr) {
 		qWarning(CAT_ADRV9009) << "FPGA device (axi-adrv9009-rx-hpc) not found in context";
 		return widget;
@@ -782,7 +788,7 @@ QWidget *Adrv9009::createFpgaSettingsContentForDevice(iio_device *dev, QWidget *
 	return widget;
 }
 
-QWidget *Adrv9009::createRxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent)
+QWidget *Adrv9009::createRxChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -798,7 +804,7 @@ QWidget *Adrv9009::createRxChannelWidget(iio_device *dev, QString title, int cha
 
 	// Find the RX channel (voltage0 for RX1, voltage1 for RX2)
 	QString channelId = QString("voltage%1").arg(channelIndex);
-	iio_channel *rxChannel = iio_device_find_channel(dev, channelId.toLocal8Bit().data(), false);
+	component::Channel *rxChannel = component::channelById(dev, channelId, false);
 
 	if(!rxChannel) {
 		qWarning(CAT_ADRV9009) << "RX channel" << channelId << "not found";
@@ -853,7 +859,7 @@ QWidget *Adrv9009::createRxChannelWidget(iio_device *dev, QString title, int cha
 	return widget;
 }
 
-QWidget *Adrv9009::createTxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent)
+QWidget *Adrv9009::createTxChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -869,7 +875,7 @@ QWidget *Adrv9009::createTxChannelWidget(iio_device *dev, QString title, int cha
 
 	// Find the TX channel (voltage0 for TX1, voltage1 for TX2)
 	QString channelId = QString("voltage%1").arg(channelIndex);
-	iio_channel *txChannel = iio_device_find_channel(dev, channelId.toLocal8Bit().data(), true);
+	component::Channel *txChannel = component::channelById(dev, channelId, true);
 
 	if(!txChannel) {
 		qWarning(CAT_ADRV9009) << "TX channel" << channelId << "not found";
@@ -913,7 +919,7 @@ QWidget *Adrv9009::createTxChannelWidget(iio_device *dev, QString title, int cha
 	return widget;
 }
 
-QWidget *Adrv9009::createObsChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent)
+QWidget *Adrv9009::createObsChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -929,7 +935,7 @@ QWidget *Adrv9009::createObsChannelWidget(iio_device *dev, QString title, int ch
 
 	// Find the OBS channel (voltage2 for OBS1, voltage3 for OBS2)
 	QString channelId = QString("voltage%1").arg(channelIndex);
-	iio_channel *obsChannel = iio_device_find_channel(dev, channelId.toLocal8Bit().data(), false);
+	component::Channel *obsChannel = component::channelById(dev, channelId, false);
 
 	if(!obsChannel) {
 		qWarning(CAT_ADRV9009) << "OBS channel" << channelId << "not found";
@@ -965,7 +971,7 @@ QWidget *Adrv9009::createObsChannelWidget(iio_device *dev, QString title, int ch
 	return widget;
 }
 
-QWidget *Adrv9009::createFpgaRxChannelWidget(iio_device *dev, QString title, int channelIndex, QWidget *parent)
+QWidget *Adrv9009::createFpgaRxChannelWidget(component::Device *dev, QString title, int channelIndex, QWidget *parent)
 {
 	QWidget *widget = new QWidget(parent);
 	Style::setBackgroundColor(widget, json::theme::background_primary);
@@ -987,22 +993,24 @@ QWidget *Adrv9009::createFpgaRxChannelWidget(iio_device *dev, QString title, int
 	phaseSpinBox->enableRangeLimits(false);
 
 	// Connect to phase rotation functions
-	connect(phaseSpinBox, &gui::MenuSpinbox::valueChanged, this,
-		[this, dev, channelIndex](double degrees) { writePhase(dev, channelIndex, (int)degrees); });
+	connect(phaseSpinBox, &gui::MenuSpinbox::valueChanged, this, [this, dev, channelIndex](double degrees) {
+		QCoro::waitFor(writePhase(dev, channelIndex, (int)degrees));
+	});
 
 	// Add to refresh handling
-	connect(this, &Adrv9009::readRequested, this,
-		[this, dev, channelIndex, phaseSpinBox]() { readPhase(dev, channelIndex, phaseSpinBox); });
+	connect(this, &Adrv9009::readRequested, this, [this, dev, channelIndex, phaseSpinBox]() {
+		QCoro::waitFor(readPhase(dev, channelIndex, phaseSpinBox));
+	});
 
 	mainLayout->addWidget(phaseSpinBox);
 
-	readPhase(dev, channelIndex, phaseSpinBox);
+	QCoro::waitFor(readPhase(dev, channelIndex, phaseSpinBox));
 
 	qDebug(CAT_ADRV9009) << "FPGA" << title << "channel widget created successfully";
 	return widget;
 }
 
-void Adrv9009::writePhase(iio_device *fpgaDev, int channelIndex, int degrees)
+QCoro::Task<void> Adrv9009::writePhase(component::Device *fpgaDev, int channelIndex, int degrees)
 {
 	// Convert degrees to radians
 	double phase = degrees * 2.0 * M_PI / 360.0;
@@ -1011,15 +1019,24 @@ void Adrv9009::writePhase(iio_device *fpgaDev, int channelIndex, int degrees)
 	QString i_ch = QString("voltage%1_i").arg(channelIndex);
 	QString q_ch = QString("voltage%1_q").arg(channelIndex);
 
-	iio_channel *i_chn = iio_device_find_channel(fpgaDev, i_ch.toLatin1(), false);
-	iio_channel *q_chn = iio_device_find_channel(fpgaDev, q_ch.toLatin1(), false);
+	component::Channel *i_chn = component::channelById(fpgaDev, i_ch, false);
+	component::Channel *q_chn = component::channelById(fpgaDev, q_ch, false);
 
 	if(i_chn && q_chn) {
 		// Write the 4 calculated values (exact iio-osc formula)
-		iio_channel_attr_write_double(i_chn, "calibscale", cos(phase));
-		iio_channel_attr_write_double(i_chn, "calibphase", -sin(phase));
-		iio_channel_attr_write_double(q_chn, "calibscale", cos(phase));
-		iio_channel_attr_write_double(q_chn, "calibphase", sin(phase));
+		component::Attribute *iScale = component::attributeByName(i_chn, "calibscale");
+		component::Attribute *iPhase = component::attributeByName(i_chn, "calibphase");
+		component::Attribute *qScale = component::attributeByName(q_chn, "calibscale");
+		component::Attribute *qPhase = component::attributeByName(q_chn, "calibphase");
+
+		if(iScale && iScale->writeCapability())
+			co_await iScale->writeCapability()->writeAsync(QString::number(cos(phase)));
+		if(iPhase && iPhase->writeCapability())
+			co_await iPhase->writeCapability()->writeAsync(QString::number(-sin(phase)));
+		if(qScale && qScale->writeCapability())
+			co_await qScale->writeCapability()->writeAsync(QString::number(cos(phase)));
+		if(qPhase && qPhase->writeCapability())
+			co_await qPhase->writeCapability()->writeAsync(QString::number(sin(phase)));
 
 		qDebug(CAT_ADRV9009) << "Phase rotation set to" << degrees << "degrees for channel" << channelIndex;
 	} else {
@@ -1027,41 +1044,55 @@ void Adrv9009::writePhase(iio_device *fpgaDev, int channelIndex, int degrees)
 	}
 }
 
-void Adrv9009::readPhase(iio_device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox)
+QCoro::Task<void> Adrv9009::readPhase(component::Device *fpgaDev, int channelIndex, gui::MenuSpinbox *spinBox)
 {
 	// Exact copy of iio-osc rx_phase_rotation_update algorithm
 	QString i_ch = QString("voltage%1_i").arg(channelIndex);
 	QString q_ch = QString("voltage%1_q").arg(channelIndex);
 
-	iio_channel *i_chn = iio_device_find_channel(fpgaDev, i_ch.toLatin1(), false);
-	iio_channel *q_chn = iio_device_find_channel(fpgaDev, q_ch.toLatin1(), false);
+	component::Channel *i_chn = component::channelById(fpgaDev, i_ch, false);
+	component::Channel *q_chn = component::channelById(fpgaDev, q_ch, false);
 
 	if(i_chn && q_chn && spinBox) {
-		double val[4];
-		if(iio_channel_attr_read_double(i_chn, "calibscale", &val[0]) == 0 &&
-		   iio_channel_attr_read_double(i_chn, "calibphase", &val[1]) == 0 &&
-		   iio_channel_attr_read_double(q_chn, "calibscale", &val[2]) == 0 &&
-		   iio_channel_attr_read_double(q_chn, "calibphase", &val[3]) == 0) {
+		component::Attribute *iScale = component::attributeByName(i_chn, "calibscale");
+		component::Attribute *iPhase = component::attributeByName(i_chn, "calibphase");
+		component::Attribute *qScale = component::attributeByName(q_chn, "calibscale");
+		component::Attribute *qPhase = component::attributeByName(q_chn, "calibphase");
 
-			// Exact iio-osc reverse calculations
-			val[0] = acos(val[0]) * 360.0 / (2.0 * M_PI);
-			val[1] = asin(-1.0 * val[1]) * 360.0 / (2.0 * M_PI);
-			val[2] = acos(val[2]) * 360.0 / (2.0 * M_PI);
-			val[3] = asin(val[3]) * 360.0 / (2.0 * M_PI);
+		if(iScale && iPhase && qScale && qPhase) {
+			double val[4];
+			auto r0 = co_await iScale->readCapability()->readAsync();
+			auto r1 = co_await iPhase->readCapability()->readAsync();
+			auto r2 = co_await qScale->readCapability()->readAsync();
+			auto r3 = co_await qPhase->readCapability()->readAsync();
 
-			// Exact iio-osc sign handling
-			if(val[1] < 0.0)
-				val[0] *= -1.0;
+			if(r0 && r1 && r2 && r3) {
+				val[0] = iScale->cachedValue().toDouble();
+				val[1] = iPhase->cachedValue().toDouble();
+				val[2] = qScale->cachedValue().toDouble();
+				val[3] = qPhase->cachedValue().toDouble();
 
-			// Average like iio-osc
-			double degrees = (val[0] + val[1] + val[2] + val[3]) / 4.0;
-			spinBox->setValue(degrees);
+				// Exact iio-osc reverse calculations
+				val[0] = acos(val[0]) * 360.0 / (2.0 * M_PI);
+				val[1] = asin(-1.0 * val[1]) * 360.0 / (2.0 * M_PI);
+				val[2] = acos(val[2]) * 360.0 / (2.0 * M_PI);
+				val[3] = asin(val[3]) * 360.0 / (2.0 * M_PI);
 
-			qDebug(CAT_ADRV9009) << "Read phase rotation:" << (int)round(degrees) << "degrees for channel"
-					     << channelIndex << "vals:" << val[0] << val[1] << val[2] << val[3];
-		} else {
-			qWarning(CAT_ADRV9009)
-				<< "Failed to read phase rotation attributes for channel" << channelIndex;
+				// Exact iio-osc sign handling
+				if(val[1] < 0.0)
+					val[0] *= -1.0;
+
+				// Average like iio-osc
+				double degrees = (val[0] + val[1] + val[2] + val[3]) / 4.0;
+				spinBox->setValue(degrees);
+
+				qDebug(CAT_ADRV9009)
+					<< "Read phase rotation:" << (int)round(degrees) << "degrees for channel"
+					<< channelIndex << "vals:" << val[0] << val[1] << val[2] << val[3];
+			} else {
+				qWarning(CAT_ADRV9009)
+					<< "Failed to read phase rotation attributes for channel" << channelIndex;
+			}
 		}
 	}
 }

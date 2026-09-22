@@ -25,7 +25,10 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iio.h>
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy::adrv9009 {
 
@@ -34,7 +37,8 @@ class SCOPY_ADRV9009PLUGIN_EXPORT ClkSettingsWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ClkSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit ClkSettingsWidget(component::Device *device, IIOWidgetGroup *group = nullptr,
+				   QWidget *parent = nullptr);
 	~ClkSettingsWidget();
 
 Q_SIGNALS:
@@ -44,7 +48,7 @@ private:
 	void setupUi();
 	void createClockControls(QVBoxLayout *parentLayout);
 
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 

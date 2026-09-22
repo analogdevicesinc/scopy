@@ -26,7 +26,10 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iio.h>
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy::adrv9009 {
 
@@ -34,7 +37,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT PaProtectionWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	PaProtectionWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	PaProtectionWidget(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~PaProtectionWidget();
 
 	MenuSectionCollapseWidget *section() const;
@@ -43,7 +46,7 @@ Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	MenuSectionCollapseWidget *m_section;
 

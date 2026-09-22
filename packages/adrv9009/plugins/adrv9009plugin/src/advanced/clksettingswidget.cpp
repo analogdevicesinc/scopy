@@ -20,6 +20,7 @@
 
 #include "advanced/clksettingswidget.h"
 #include "adrv9009widgetfactory.h"
+#include <component/device.h>
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLabel>
@@ -34,7 +35,7 @@ Q_LOGGING_CATEGORY(CAT_ADRV9009_CLK_SETTINGS, "ADRV9009_CLK_SETTINGS")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-ClkSettingsWidget::ClkSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+ClkSettingsWidget::ClkSettingsWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -44,9 +45,7 @@ ClkSettingsWidget::ClkSettingsWidget(iio_device *device, IIOWidgetGroup *group, 
 		return;
 	}
 
-	const char *device_name = iio_device_get_name(m_device);
-	qDebug(CAT_ADRV9009_CLK_SETTINGS)
-		<< "Clock Settings initialized for device:" << (device_name ? device_name : "unknown");
+	qDebug(CAT_ADRV9009_CLK_SETTINGS) << "Clock Settings initialized for device:" << m_device->name();
 
 	setupUi();
 }
