@@ -40,8 +40,12 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-#include <iio.h>
-#include <iioutil/connectionprovider.h>
+#include <component/controller.h>
+
+namespace scopy::component {
+class Context;
+class Device;
+} // namespace scopy::component
 
 namespace scopy {
 
@@ -62,6 +66,7 @@ public:
 
 private:
 	IMUAnalyzerInterface *m_imuInterface = nullptr;
+	component::ContextHandle m_context;
 };
 
 } // namespace scopy
