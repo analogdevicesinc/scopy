@@ -26,10 +26,13 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QCheckBox>
-#include <iio.h>
 #include <iio-widgets/iiowidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <gui/widgets/menusectionwidget.h>
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy::adrv9009 {
 
@@ -38,7 +41,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT AuxDacWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit AuxDacWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit AuxDacWidget(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~AuxDacWidget();
 
 Q_SIGNALS:
@@ -48,7 +51,7 @@ private:
 	void setupUi();
 	QWidget *createAuxDacControls(QWidget *parent);
 
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	QList<IIOWidget *> m_iioWidgets;
 	const int AUX_DAC_FULL_CONFIG_COUNT = 10; // DACs 0-9 have value+resolution+vref

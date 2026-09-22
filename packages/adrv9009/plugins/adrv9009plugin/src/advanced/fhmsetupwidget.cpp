@@ -21,6 +21,7 @@
 #include "advanced/fhmsetupwidget.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
+#include <component/device.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -34,7 +35,7 @@ Q_LOGGING_CATEGORY(CAT_FHMSETUP, "FHMSetup")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-FhmSetupWidget::FhmSetupWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+FhmSetupWidget::FhmSetupWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
