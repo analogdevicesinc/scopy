@@ -24,6 +24,13 @@
 #include <iio-widgets/iiowidgetgroup.h>
 #include <iio-widgets/guistrategy/temperatureguistrategy.h>
 
+#include <component/context.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
+
 #include <QLoggingCategory>
 #include <QFutureWatcher>
 #include <QtConcurrent>
@@ -35,7 +42,7 @@ Q_LOGGING_CATEGORY(CAT_ADRV9002, "ADRV9002")
 using namespace scopy::adrv9002;
 using namespace scopy;
 
-Adrv9002::Adrv9002(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
+Adrv9002::Adrv9002(component::Context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_ctx(ctx)
 	, m_group(group)
@@ -43,7 +50,7 @@ Adrv9002::Adrv9002(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 	, m_refreshButton(nullptr)
 	, m_scrollArea(nullptr)
 	, m_centralWidget(nullptr)
-	, m_iio_dev(nullptr)
+	, m_dev(nullptr)
 	, m_profileManager(nullptr)
 	, m_initialCalibrationsWidget(nullptr)
 {
@@ -80,24 +87,24 @@ void Adrv9002::setupUi()
 					  "adrv9006-phy"};
 
 	for(const char *device_name : adrv9002_devices) {
-		m_iio_dev = iio_context_find_device(m_ctx, device_name);
-		if(m_iio_dev) {
+		m_dev = m_ctx->findChild<component::Device *>(device_name, Qt::FindDirectChildrenOnly);
+		if(m_dev) {
 			qDebug(CAT_ADRV9002) << "Found ADRV9002 device:" << device_name;
 			break;
 		}
 	}
 
-	if(!m_iio_dev) {
+	if(!m_dev) {
 		qWarning(CAT_ADRV9002) << "No ADRV9002 device found in context";
 		return;
 	}
 
 	// Initialize profile manager
-	m_profileManager = new ProfileManager(m_iio_dev, this);
+	m_profileManager = new ProfileManager(m_dev, this);
 
 	// Initialize initial calibrations widget (only if supported)
-	m_initialCalibrationsWidget = new InitialCalibrationsWidget(m_iio_dev, this);
-	m_initialCalibrationsWidget->setEnabled(InitialCalibrationsWidget::isSupported(m_iio_dev));
+	m_initialCalibrationsWidget = new InitialCalibrationsWidget(m_dev, this);
+	m_initialCalibrationsWidget->setEnabled(InitialCalibrationsWidget::isSupported(m_dev));
 
 	// Create tab system
 	m_tabCentralWidget = new QStackedWidget(this);
@@ -180,7 +187,7 @@ void Adrv9002::createControls(QWidget *centralWidget)
 	mainLayout->setContentsMargins(0, 0, 0, 0);
 	mainLayout->setSpacing(10); // Add spacing between sections
 
-	if(m_ctx && m_iio_dev) {
+	if(m_ctx && m_dev) {
 		// Add Device Driver API section first (matching iio-oscilloscope layout)
 		mainLayout->addWidget(generateDeviceDriverAPIWidget(centralWidget));
 
@@ -220,7 +227,7 @@ QWidget *Adrv9002::createProfileGeneratorWidget()
 
 	// Create scrollable area following prompt #3 pattern
 	QScrollArea *scrollArea = new QScrollArea();
-	ProfileGeneratorWidget *profileGen = new ProfileGeneratorWidget(m_iio_dev, this);
+	ProfileGeneratorWidget *profileGen = new ProfileGeneratorWidget(m_dev, this);
 
 	scrollArea->setWidget(profileGen);
 	scrollArea->setWidgetResizable(true);
@@ -262,14 +269,15 @@ QWidget *Adrv9002::generateDeviceDriverAPIWidget(QWidget *parent)
 
 QString Adrv9002::getDeviceDriverVersion()
 {
-	// Try to get version from context or device attributes
-	if(m_ctx) {
-		char api_version[16];
-		auto ret = iio_device_debug_attr_read(m_iio_dev, "api_version", api_version, sizeof(api_version));
-		if(ret < 0) {
+	// Try to get version from device attributes
+	if(m_ctx && m_dev) {
+		component::Attribute *a = component::attributeByName(m_dev, "api_version");
+		if(a && a->readCapability()) {
+			auto res = QCoro::waitFor(a->readCapability()->readAsync());
+			if(res) {
+				return a->cachedValue().trimmed();
+			}
 			return "Unable to read version ";
-		} else {
-			return QString(api_version);
 		}
 	}
 
@@ -290,12 +298,11 @@ MenuSectionCollapseWidget *Adrv9002::createGlobalSettingsSection(QWidget *parent
 	widget->setLayout(layout);
 
 	// Temperature (separate from profile management)
-	iio_channel *tempCh = iio_device_find_channel(m_iio_dev, "temp0", false);
-	if(tempCh) {
+	component::Channel *tempCh = component::channelById(m_dev, "temp0", false);
+	component::Attribute *tempAttr = tempCh ? component::attributeByName(tempCh, "input") : nullptr;
+	if(tempAttr) {
 		IIOWidget *tempWidget = IIOWidgetBuilder(this)
-						.device(m_iio_dev)
-						.channel(tempCh)
-						.attribute("input")
+						.attribute(tempAttr)
 						.uiStrategy(IIOWidgetBuilder::TemperatureUi)
 						.title("Temperature")
 						.group(m_group)
@@ -412,9 +419,9 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 
 	// Find channels
 	QString channelName = QString("voltage%1").arg(channel);
-	iio_channel *rxCh = iio_device_find_channel(m_iio_dev, channelName.toLocal8Bit().data(), false);
+	component::Channel *rxCh = component::channelById(m_dev, channelName, false);
 	QString loChannelName = QString("altvoltage%1").arg(channel);
-	iio_channel *loCh = iio_device_find_channel(m_iio_dev, loChannelName.toLocal8Bit().data(), true);
+	component::Channel *loCh = component::channelById(m_dev, loChannelName, true);
 
 	if(!rxCh) {
 		QLabel *errorLabel = new QLabel("Channel not found");
@@ -432,19 +439,21 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 	layout->addWidget(createCheckboxWidget(rxCh, "bbdc_rejection_en", "BBDC Rejection"), 5, 0);
 
 	// Only create NCO widget if supported
-	double dummy;
-	int ret = iio_channel_attr_read_double(rxCh, "nco_frequency", &dummy);
-	if(ret == 0) {
+	if(component::attributeByName(rxCh, "nco_frequency") != nullptr) {
 		layout->addWidget(createRangeWidget(rxCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), 6, 0);
 	}
 
 	layout->addWidget(createReadOnlyWidget(rxCh, "decimated_power", "Decimated Power (dB)"), 7, 0);
 	IIOWidget *rfBandwidth = createReadOnlyWidget(rxCh, "rf_bandwidth", "Bandwidth (MHz)");
-	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	rfBandwidth->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
-	layout->addWidget(rfBandwidth, 8, 0);
+	if(rfBandwidth) {
+		rfBandwidth->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		rfBandwidth->setRangeToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		rfBandwidth->setUItoDataConversion(
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
+		layout->addWidget(rfBandwidth, 8, 0);
+	}
 
 	// Column 1 (Right) - from iio-oscilloscope column 4
 	layout->addWidget(createComboWidget(rxCh, "digital_gain_control_mode", "digital_gain_control_mode_available",
@@ -463,38 +472,45 @@ QWidget *Adrv9002::createRxChannelControls(const QString &title, int channel)
 
 	IIOWidget *bbdcWidget = createRangeWidget(rxCh, "bbdc_loop_gain_raw", bbdcRange, "BBDC Loop Gain (dB)");
 	// Add conversion functions similar to iio-oscilloscope
-	bbdcWidget->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / BBDC_LOOP_GAIN_RES, 'f', 15); });
-	bbdcWidget->setUItoDataConversion(
-		[](QString data) { return QString::number(round(data.toDouble() * BBDC_LOOP_GAIN_RES), 'f', 0); });
-	layout->addWidget(bbdcWidget, 5, 1);
+	if(bbdcWidget) {
+		bbdcWidget->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / BBDC_LOOP_GAIN_RES, 'f', 15); });
+		bbdcWidget->setUItoDataConversion([](QString data) {
+			return QString::number(round(data.toDouble() * BBDC_LOOP_GAIN_RES), 'f', 0);
+		});
+		layout->addWidget(bbdcWidget, 5, 1);
+	}
 
 	if(loCh) {
 		QString loAttr = QString("RX%1_LO_frequency").arg(channel + 1);
 		auto loWidget = createRangeWidget(loCh, loAttr, "[30000000 1 6000000000]", "Local Oscillator (MHz)");
 
 		// Add MHz ↔ Hz conversion
-		loWidget->setDataToUIConversion(
-			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-		loWidget->setRangeToUIConversion(
-			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-		loWidget->setUItoDataConversion(
-			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
+		if(loWidget) {
+			loWidget->setDataToUIConversion(
+				[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+			loWidget->setRangeToUIConversion(
+				[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+			loWidget->setUItoDataConversion(
+				[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
-		layout->addWidget(loWidget, 6, 1);
+			layout->addWidget(loWidget, 6, 1);
+		}
 	}
 
 	layout->addWidget(createContinuousReadOnlyWidget(rxCh, "rssi", "RSSI (dB)"), 7, 1);
 
 	IIOWidget *samplingFreq = createReadOnlyWidget(rxCh, "sampling_frequency", "Sampling Rate (MSPS)");
 	// Add MSPS ↔ SPS conversion
-	samplingFreq->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	samplingFreq->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	samplingFreq->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
-	layout->addWidget(samplingFreq, 8, 1);
+	if(samplingFreq) {
+		samplingFreq->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		samplingFreq->setRangeToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		samplingFreq->setUItoDataConversion(
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
+		layout->addWidget(samplingFreq, 8, 1);
+	}
 
 	// Tracking section at bottom spanning both columns
 	QLabel *trackingLabel = new QLabel("Tracking:");
@@ -530,9 +546,9 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 
 	// Find channels
 	QString channelName = QString("voltage%1").arg(channel);
-	iio_channel *txCh = iio_device_find_channel(m_iio_dev, channelName.toLocal8Bit().data(), true);
+	component::Channel *txCh = component::channelById(m_dev, channelName, true);
 	QString loChannelName = QString("altvoltage%1").arg(channel + 2); // TX LO channels are altvoltage2/3
-	iio_channel *loCh = iio_device_find_channel(m_iio_dev, loChannelName.toLocal8Bit().data(), true);
+	component::Channel *loCh = component::channelById(m_dev, loChannelName, true);
 
 	if(!txCh) {
 		QLabel *errorLabel = new QLabel("Channel not found");
@@ -551,31 +567,35 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 		auto loWidget = createRangeWidget(loCh, loAttr, "[30000000 1 6000000000]", "Local Oscillator (MHz)");
 
 		// Add MHz ↔ Hz conversion
-		loWidget->setDataToUIConversion(
-			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-		loWidget->setRangeToUIConversion(
-			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-		loWidget->setUItoDataConversion(
-			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
+		if(loWidget) {
+			loWidget->setDataToUIConversion(
+				[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+			loWidget->setRangeToUIConversion(
+				[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+			loWidget->setUItoDataConversion(
+				[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
 
-		layout->addWidget(loWidget, 3, 0);
+			layout->addWidget(loWidget, 3, 0);
+		}
 	}
 
 	// Only create NCO widget if supported
-	double dummy;
-	int ret = iio_channel_attr_read_double(txCh, "nco_frequency", &dummy);
-	if(ret == 0) {
+	if(component::attributeByName(txCh, "nco_frequency") != nullptr) {
 		layout->addWidget(createRangeWidget(txCh, "nco_frequency", "[-20000 1 20000]", "NCO (Hz)"), 4, 0);
 	}
 
 	IIOWidget *rfBandwidth = createReadOnlyWidget(txCh, "rf_bandwidth", "Bandwidth (MHz)");
 
 	// Add MHz ↔ Hz conversion
-	rfBandwidth->setDataToUIConversion([](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	rfBandwidth->setRangeToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	rfBandwidth->setUItoDataConversion([](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
-	layout->addWidget(rfBandwidth, 5, 0);
+	if(rfBandwidth) {
+		rfBandwidth->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		rfBandwidth->setRangeToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		rfBandwidth->setUItoDataConversion(
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
+		layout->addWidget(rfBandwidth, 5, 0);
+	}
 
 	// Column 1 (Right) - from iio-oscilloscope TX column 4
 	layout->addWidget(createComboWidget(txCh, "port_en_mode", "port_en_mode_available", "Port Enable"), 1, 1);
@@ -584,11 +604,13 @@ QWidget *Adrv9002::createTxChannelControls(const QString &title, int channel)
 	// Row+3 is empty in iio-oscilloscope
 	IIOWidget *samplingFreq = createReadOnlyWidget(txCh, "sampling_frequency", "Sampling Rate (MSPS)");
 	// Add MSPS ↔ SPS conversion
-	samplingFreq->setDataToUIConversion(
-		[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
-	samplingFreq->setUItoDataConversion(
-		[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
-	layout->addWidget(samplingFreq, 5, 1);
+	if(samplingFreq) {
+		samplingFreq->setDataToUIConversion(
+			[](QString data) { return QString::number(data.toDouble() / 1e6, 'f', 6); });
+		samplingFreq->setUItoDataConversion(
+			[](QString data) { return QString::number(data.toDouble() * 1e6, 'f', 0); });
+		layout->addWidget(samplingFreq, 5, 1);
+	}
 
 	QLabel *trackingLabel = new QLabel("Tracking:");
 	Style::setStyle(trackingLabel, style::properties::label::menuBig);
@@ -617,7 +639,7 @@ QWidget *Adrv9002::createOrxControls()
 	if(orx1Widget != nullptr)
 		layout->addWidget(orx1Widget);
 
-	QString deviceName = QString(iio_device_get_name(m_iio_dev));
+	QString deviceName = m_dev->name();
 	bool showOrx2 = !(deviceName == "adrv9003-phy" || deviceName == "adrv9005-phy");
 
 	if(showOrx2) {
@@ -638,18 +660,16 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 {
 	// Find the corresponding RX channel (ORX uses same channel as RX but different attributes)
 	QString channelName = QString("voltage%1").arg(channel);
-	iio_channel *rxCh = iio_device_find_channel(m_iio_dev, channelName.toLocal8Bit().data(), false);
+	component::Channel *rxCh = component::channelById(m_dev, channelName, false);
 
 	if(!rxCh) {
 		qDebug(CAT_ADRV9002) << "Channel not found:" << channelName;
 		return nullptr;
 	}
 
-	double dummy;
-	int ret = iio_channel_attr_read_double(rxCh, "orx_hardwaregain", &dummy);
-	if(ret == -ENODEV) {
+	if(component::attributeByName(rxCh, "orx_hardwaregain") == nullptr) {
 		qDebug(CAT_ADRV9002) << "ORX hardware not available on channel" << channel
-				     << "- orx_hardwaregain returned -ENODEV";
+				     << "- orx_hardwaregain attribute not present";
 		return nullptr; // Don't create widget if ORX hardware doesn't exist
 	}
 
@@ -680,14 +700,16 @@ QWidget *Adrv9002::createOrxChannelControls(const QString &title, int channel)
 
 // Widget Creation Helper Functions
 
-IIOWidget *Adrv9002::createComboWidget(iio_channel *ch, const QString &attr, const QString &availableAttr,
+IIOWidget *Adrv9002::createComboWidget(component::Channel *ch, const QString &attr, const QString &availableAttr,
 				       const QString &title)
 {
+	Q_UNUSED(availableAttr)
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
-				    .channel(ch)
-				    .attribute(attr)
-				    .optionsAttribute(availableAttr)
+				    .attribute(a)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::ComboUi)
 				    .group(m_group)
@@ -699,12 +721,15 @@ IIOWidget *Adrv9002::createComboWidget(iio_channel *ch, const QString &attr, con
 	return widget;
 }
 
-IIOWidget *Adrv9002::createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title)
+IIOWidget *Adrv9002::createRangeWidget(component::Channel *ch, const QString &attr, const QString &range,
+				       const QString &title)
 {
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
-				    .channel(ch)
-				    .attribute(attr)
+				    .attribute(a)
 				    .optionsValues(range)
 				    .title(title)
 				    .uiStrategy(IIOWidgetBuilder::RangeUi)
@@ -717,12 +742,14 @@ IIOWidget *Adrv9002::createRangeWidget(iio_channel *ch, const QString &attr, con
 	return widget;
 }
 
-IIOWidget *Adrv9002::createCheckboxWidget(iio_channel *ch, const QString &attr, const QString &label)
+IIOWidget *Adrv9002::createCheckboxWidget(component::Channel *ch, const QString &attr, const QString &label)
 {
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
-				    .channel(ch)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(label)
 				    .uiStrategy(IIOWidgetBuilder::CheckBoxUi)
 				    .group(m_group)
@@ -735,12 +762,14 @@ IIOWidget *Adrv9002::createCheckboxWidget(iio_channel *ch, const QString &attr, 
 	return widget;
 }
 
-IIOWidget *Adrv9002::createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title)
+IIOWidget *Adrv9002::createReadOnlyWidget(component::Channel *ch, const QString &attr, const QString &title)
 {
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
-				    .channel(ch)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .compactMode(true)
 				    .group(m_group)
@@ -755,12 +784,14 @@ IIOWidget *Adrv9002::createReadOnlyWidget(iio_channel *ch, const QString &attr, 
 	return widget;
 }
 
-IIOWidget *Adrv9002::createContinuousReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title)
+IIOWidget *Adrv9002::createContinuousReadOnlyWidget(component::Channel *ch, const QString &attr, const QString &title)
 {
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(!a) {
+		return nullptr;
+	}
 	IIOWidget *widget = IIOWidgetBuilder(m_centralWidget)
-				    .device(m_iio_dev)
-				    .channel(ch)
-				    .attribute(attr)
+				    .attribute(a)
 				    .title(title)
 				    .compactMode(true)
 				    .group(m_group)
