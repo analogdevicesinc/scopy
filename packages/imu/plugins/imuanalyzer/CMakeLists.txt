@@ -104,11 +104,15 @@ foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
+qcoro_enable_coroutines()
+
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt${QT_VERSION_MAJOR}::Widgets
 	       Qt${QT_VERSION_MAJOR}::Core
 	       Qt${QT_VERSION_MAJOR}::OpenGLWidgets
+	       QCoro6::Core
+	       QCoro6::Coro
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
