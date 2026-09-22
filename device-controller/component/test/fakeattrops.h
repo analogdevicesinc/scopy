@@ -50,7 +50,7 @@ public:
 	scopy::iio::AttrHandle channelAttr(scopy::iio::ChannelHandle, const QString &) override { return {}; }
 	void releaseAttr(scopy::iio::AttrHandle) override {}
 
-	scopy::Result<QByteArray> read(scopy::iio::AttrHandle attr) override
+	scopy::Result<QByteArray> read(scopy::iio::AttrHandle attr, size_t bytes = 4096) override
 	{
 		return m_values.value(static_cast<int *>(attr.ptr));
 	}

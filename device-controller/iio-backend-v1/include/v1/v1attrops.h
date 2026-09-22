@@ -36,7 +36,7 @@ public:
 	AttrHandle channelAttr(ChannelHandle ch, const QString &name) override;
 	void releaseAttr(AttrHandle attr) override; // no-op: iio_attr* lifetime is tied to context
 
-	Result<QByteArray> read(AttrHandle attr) override;
+	Result<QByteArray> read(AttrHandle attr, size_t bytes) override;
 	Result<void> write(AttrHandle attr, const QString &value) override;
 
 	Result<void> getRange(AttrHandle attr, double &min, double &step, double &max) const override;
