@@ -41,7 +41,7 @@ public:
 	{}
 	~AttributeReader() override = default;
 
-	Q_INVOKABLE virtual QCoro::Task<CommandResponse<QByteArray>> readAsync() = 0;
+	Q_INVOKABLE virtual QCoro::Task<CommandResponse<QByteArray>> readAsync(size_t bytes = 4096) = 0;
 
 Q_SIGNALS:
 	void readSucceeded(scopy::Result<QByteArray> &result);
