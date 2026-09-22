@@ -45,10 +45,8 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QTimer>
-#include <QFutureWatcher>
 #include <functional>
 #include <array>
-#include <iio.h>
 #include <pluginbase/statusbarmanager.h>
 #include <iiowidget.h>
 #include <style.h>
@@ -59,6 +57,13 @@
 #include <profilegeneratorconstants.h>
 #include <profilegeneratortypes.h>
 #include <profileclimanager.h>
+
+namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
+} // namespace scopy
 
 namespace scopy::adrv9002 {
 
@@ -104,7 +109,7 @@ public:
 		uint32_t clockDivider;
 	};
 
-	static ParsedDeviceConfig parseProfileConfig(iio_device *dev, const QString &profileConfigText);
+	static ParsedDeviceConfig parseProfileConfig(component::Device *dev, const QString &profileConfigText);
 	static QString extractValueBetween(const QString &text, const QString &begin, const QString &end);
 	static QString mapRfPortFromDevice(const QString &devicePort, int channel);
 };
@@ -114,7 +119,7 @@ class SCOPY_ADRV9002PLUGIN_EXPORT ProfileGeneratorWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ProfileGeneratorWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit ProfileGeneratorWidget(component::Device *device, QWidget *parent = nullptr);
 	~ProfileGeneratorWidget();
 
 Q_SIGNALS:
@@ -209,7 +214,7 @@ private:
 
 	// Phase 1: Device Configuration Reading
 	bool readDeviceConfiguration();
-	iio_channel *findIIOChannel(const QString &channelName, bool isOutput);
+	component::Channel *findIIOChannel(const QString &channelName, bool isOutput);
 	void populateUIFromDeviceConfig(const DeviceConfigurationParser::ParsedDeviceConfig &config);
 	void resetPresetTracking();
 	void forceUpdateAllUIControls();
@@ -218,7 +223,7 @@ private:
 	void updateChannelUIControls(int channelIndex, const ChannelConfigWidget::ChannelData &data);
 
 	// Device handle
-	iio_device *m_device;
+	component::Device *m_device;
 
 	// CLI management
 	ProfileCliManager *m_cliManager;
