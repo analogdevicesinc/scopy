@@ -112,7 +112,9 @@ OS_VERSION=${1:-$(sw_vers -productVersion)}
 echo "MacOS version $OS_VERSION"
 
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
-PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2 ghr"
+# ghr is deliberately absent: it was never invoked (releases use actions/upload-artifact)
+# and it has no x86_64 bottle, so on Intel it source-builds its `go` build dependency.
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2"
 
 install_packages() {
 
@@ -127,8 +129,7 @@ install_packages() {
 	# uninstall cmake before installing other dependencies https://github.com/actions/runner-images/issues/12912
 	brew uninstall --force cmake || true
 
-	# Workaround for brew taking a long time to upgrade existing packages
-	# Check if macOS version and upgrade packages only if the version is greater than macOS 12
+	# macOS version gate: libtool is only appended to PACKAGES above macOS 12 (see below)
 	macos_version=$(sw_vers -productVersion)
 	major_version=$(echo "$macos_version" | cut -d '.' -f 1)
 
@@ -142,7 +143,11 @@ install_packages() {
 
 		if [ "$major_version" -gt 12 ]; then
 			brew pin xcodes 2>/dev/null || true
-			brew upgrade --display-times || true #ignore homebrew upgrade errors
+			# No `brew upgrade` here on purpose: it upgraded every outdated package on the
+			# runner image (41 on Intel, 29 on ARM), not just Scopy's. Homebrew stopped
+			# building x86_64 bottles in Sept 2026, so 29 of those compiled from source on
+			# Intel -- node@22 took 46 min and llvm@22 was still building when the 120 min
+			# timeout killed the job. Scopy links none of them. See tasks/ci-macos-updates.md.
 			# Workaround: Install or update libtool package only if macOS version is greater than 12
 			# Note: libtool (v2.4.7) is pre-installed by default, but it can be updated to v2.5.3
 			PACKAGES="$PACKAGES libtool"
