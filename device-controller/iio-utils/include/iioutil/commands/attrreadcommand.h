@@ -33,18 +33,20 @@ class CONTROLLER_IIOUTILS_EXPORT AttrReadCommand : public ResultCommand<QByteArr
 {
 	Q_OBJECT
 public:
-	AttrReadCommand(IAttrOps *ops, AttrHandle handle, QObject *parent = nullptr)
+	AttrReadCommand(IAttrOps *ops, AttrHandle handle, size_t bytes = 4096, QObject *parent = nullptr)
 		: ResultCommand(handle.ptr, parent)
 		, m_ops(ops)
 		, m_handle(handle)
+		, m_bytes(bytes)
 	{}
 
 protected:
-	void run() override { setResult(m_ops->read(m_handle)); }
+	void run() override { setResult(m_ops->read(m_handle, m_bytes)); }
 
 private:
 	IAttrOps *m_ops;
 	AttrHandle m_handle;
+	size_t m_bytes;
 };
 
 } // namespace scopy::iio
