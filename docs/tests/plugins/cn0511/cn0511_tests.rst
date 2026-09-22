@@ -4,7 +4,7 @@ CN0511 Test Suite
 ================================================================================
 
 **Prerequisites:**
-    - Scopy v2.1.0 or later with CN0511 plugin installed
+    - Scopy v2.3.0 or later with CN0511 plugin installed
     - CN0511 board connected, or emulator running:
       ``iio-emu cn0511 <repo>/packages/cn0511/emu-xml/cn0511.xml`` (URI: ``ip:127.0.0.1``)
     - Device drivers and firmware are up to date
