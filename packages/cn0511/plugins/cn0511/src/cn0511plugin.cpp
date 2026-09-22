@@ -77,7 +77,7 @@ void Cn0511Plugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("cn0511Tool", "CN0511",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/gear_wheel.svg"));
+							  "/icons/tool_debugger.svg"));
 }
 
 void Cn0511Plugin::unload() {}
@@ -132,6 +132,7 @@ void Cn0511Plugin::initApi()
 bool Cn0511Plugin::onDisconnect()
 {
 	if(m_api) {
+		ScopyJS::GetInstance()->unregisterApi(m_api);
 		delete m_api;
 		m_api = nullptr;
 	}

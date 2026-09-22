@@ -100,7 +100,7 @@ CN0511::CN0511(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent)
 		controlWidgetLayout->addWidget(generateDacAmpSection(controlsWidget));
 		controlWidgetLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-		connect(this, &CN0511::readRequested, this, &CN0511::readFrequencyFromDevice);
+		connect(this, &CN0511::readRequested, this, &CN0511::readFrequencyFromDevice, Qt::QueuedConnection);
 	}
 
 	m_tool->addWidgetToCentralContainerHelper(controlsContainer);
@@ -116,7 +116,7 @@ QWidget *CN0511::generateSingleToneSection(QWidget *parent)
 
 	QVBoxLayout *layout = new QVBoxLayout(widget);
 	widget->setLayout(layout);
-	layout->setContentsMargins(0, 0, 0, 0);
+	layout->setContentsMargins(10, 10, 10, 10);
 	layout->setSpacing(10);
 
 	QLabel *titleLabel = new QLabel("Single Tone Mode", widget);
@@ -187,7 +187,7 @@ QWidget *CN0511::generateDacAmpSection(QWidget *parent)
 
 		enWidget->showProgressBar(false);
 		layout->addWidget(enWidget);
-		connect(this, &CN0511::readRequested, enWidget, &IIOWidget::readAsync);
+		connect(this, &CN0511::readRequested, enWidget, &IIOWidget::readAsync, Qt::QueuedConnection);
 	}
 
 	return widget;

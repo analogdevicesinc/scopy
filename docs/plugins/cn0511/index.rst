@@ -33,7 +33,7 @@ Getting Started
 **Prerequisites**
 
 - A CN0511 board connected and accessible via a supported IIO context (USB, network, or local)
-- Scopy version 2.1.0 or later
+- Scopy version 2.3.0 or later
 
 **Using the Plugin**
 
