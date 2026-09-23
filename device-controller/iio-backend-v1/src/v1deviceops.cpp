@@ -114,7 +114,7 @@ DeviceHandle V1DeviceOps::getTrigger(DeviceHandle h) const
 
 ssize_t V1DeviceOps::sampleSize(DeviceHandle h, ChannelsMaskHandle mask) const
 {
-	return iio_device_get_sample_size(dev(h), static_cast<iio_channels_mask *>(h.ptr));
+	return iio_device_get_sample_size(dev(h), static_cast<iio_channels_mask *>(mask.ptr));
 }
 
 Result<uint32_t> V1DeviceOps::regRead(DeviceHandle h, uint32_t addr)
