@@ -43,22 +43,10 @@ elseif(ENABLE_ALL_PACKAGES MATCHES ON)
 	message(STATUS "ENABLE_ALL_PACKAGES is set.")
 endif()
 
-# device-controller branch: only pqmon and swiot are migrated to the device-controller
 set(SCOPY_DC_DISABLED_PACKAGES
     TEST-PLUGINS
     EXTPROC
     M2K
-    AD6676
-    AD936X
-    AD9371
-    ADRV9002
-    ADRV9009
-    APOLLO-AD9084
-    CN0357
-    CN0540
-    DAQ2
-    FMCOMMS11
-    IMU
 )
 foreach(pkg ${SCOPY_DC_DISABLED_PACKAGES})
         set(ENABLE_PACKAGE_${pkg} OFF CACHE BOOL "Enable ${pkg} package" FORCE)
