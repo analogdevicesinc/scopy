@@ -58,9 +58,7 @@ set(SCOPY_DC_DISABLED_PACKAGES
     CN0540
     DAQ2
     FMCOMMS11
-    GENERIC-PLUGINS
     IMU
-    RFPOWERMETER
 )
 foreach(pkg ${SCOPY_DC_DISABLED_PACKAGES})
         set(ENABLE_PACKAGE_${pkg} OFF CACHE BOOL "Enable ${pkg} package" FORCE)
