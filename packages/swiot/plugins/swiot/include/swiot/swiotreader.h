@@ -52,12 +52,9 @@ public:
 	~SwiotReader();
 
 	void addDioChannel(int index, component::Channel *channel);
+	QCoro::Task<void> readDio();
 
 	void addBufferedDevice(component::Device *device);
-
-	// DIO: read the "raw" attribute of every registered channel once (async).
-	void readDio();
-	void singleDio();
 
 	QVector<ChnlInfo *> getEnabledBufferedChnls();
 
@@ -79,7 +76,6 @@ Q_SIGNALS:
 
 private:
 	QCoro::Task<void> acquisitionLoop();
-	QCoro::Task<void> dioReadOnce();
 
 	bool isBuffered;
 	QMap<int, component::Channel *> m_dioChannels;
