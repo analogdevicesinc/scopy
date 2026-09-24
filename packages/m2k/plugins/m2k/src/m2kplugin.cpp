@@ -194,19 +194,6 @@ void M2kPlugin::showPageCallback() { m_m2kController->startTemperatureTask(); }
 
 void M2kPlugin::hidePageCallback() { m_m2kController->stopTemperatureTask(); }
 
-void M2kPlugin::startPingTask() { m_cyclicalTask->start(PING_PERIOD); }
-
-void M2kPlugin::stopPingTask() { m_cyclicalTask->stop(); }
-
-void M2kPlugin::onPausePingTask(bool pause)
-{
-	if(pause) {
-		stopPingTask();
-	} else {
-		startPingTask();
-	}
-}
-
 void M2kPlugin::calibrationStarted()
 {
 	storeToolState(calibrationToolNames);

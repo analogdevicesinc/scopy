@@ -98,9 +98,6 @@ protected:
 	void loadConfigPage();
 	void loadToolList();
 	void loadBadges();
-	void setPingPlugin(Plugin *plugin);
-	void bindPing();
-	void unbindPing();
 	void loadCompatiblePluginsTab(QWidget *pluginsTab);
 	QStringList getPluginsName();
 	void setState(DeviceState_t state);
@@ -122,7 +119,6 @@ protected:
 	QWidget *m_page;
 	QTabWidget *m_configPage;
 	QPushButton *connbtn, *discbtn;
-	Plugin *m_pingPlugin = nullptr;
 	ConnectionLostWidget *m_connectionLostWidget = nullptr;
 	component::ContextHandle m_context;
 };
