@@ -165,6 +165,7 @@ install_qt() {
 	pip3 install --break-system-packages aqtinstall
 	# Use aqt directly (installed by pip3 in same bin dir) to avoid python3/pip3 interpreter mismatch
 	aqt install-qt --outputdir $QT_INSTALL_LOCATION mac desktop 6.8.3 clang_64 -m qt3d qtscxml
+	patch_qt_sdk26
 }
 
 export_paths(){
@@ -335,6 +336,78 @@ build_libad9166() {
 	cp -avR $STAGING_AREA/libad9166/build/ad9166.framework $STAGING_AREA_DEPS/lib
 	cp -v $STAGING_AREA/libad9166/build/libad9166.pc $STAGING_AREA_DEPS/lib/pkgconfig
 	popd
+}
+
+
+# Qt 6.8.3 is pinned deliberately but predates the macOS 26 SDK / clang 21. Backport two
+# upstream qtbase fixes, absent from the 6.8 LTS line (earliest release with both is
+# 6.11.1). Guarded, so each no-ops once Qt carries the fix.
+# Details: tasks/macos26-sdk-qt-patch.md
+patch_qt_sdk26() {
+	# Qt 6.8.3 declares QT_SUPPORTED_MAX_MACOS_SDK_VERSION 15 (lib/cmake/Qt6/
+	# Qt6ConfigExtras.cmake); at or below that the toolchain is in spec and none of these
+	# patches apply -- a macOS 26 fix must not touch macOS 15.
+	# Keep the `| cut`: cut exits 0 on empty input, so a missing xcrun cannot abort the
+	# script under `set -e` the way a bare $(xcrun ...) would.
+	SDK_MAJOR=$(xcrun --show-sdk-version 2>/dev/null | cut -d. -f1)
+	if [ -z "$SDK_MAJOR" ] || [ "$SDK_MAJOR" -le 15 ]; then
+		echo "### macOS SDK ${SDK_MAJOR:-unknown} needs no Qt 6.8.3 patches (supported max 15)"
+		return 0
+	fi
+
+	echo "### Backporting Qt macOS 26 SDK fixes into $QT"
+
+	# d90c9e25a4dd: __yield needs <arm_acle.h>, which Qt does not include, so try
+	# __builtin_arm_yield first. Via qglobal.h, so it breaks every arm64 TU.
+	# awk + write-through: patch and `sed -i ''` would break the Headers symlink.
+	QYIELDCPU_H="$QT/lib/QtCore.framework/Headers/qyieldcpu.h"
+	if grep -q '^#if __has_builtin(__yield)$' "$QYIELDCPU_H"; then
+		awk '
+			/^#if __has_builtin\(__yield\)$/ && !done {
+				print "#if __has_builtin(__builtin_arm_yield)"
+				print "    __builtin_arm_yield();"
+				print "#elif __has_builtin(__yield)"
+				done = 1
+				next
+			}
+			{ print }
+		' "$QYIELDCPU_H" > "$QYIELDCPU_H.sdk26" &&
+			cat "$QYIELDCPU_H.sdk26" > "$QYIELDCPU_H"
+		rm -f "$QYIELDCPU_H.sdk26"
+		echo "--- patched qyieldcpu.h"
+	fi
+
+	# cdb33c3d5621: AGL is gone from the macOS 26 SDK, and Apple's macOS 26 release notes
+	# state AGL symbols do nothing on 64-bit and it is safe to stop linking it. mac.conf is
+	# only a template; a binary install bakes the resolved flags into qt_lib_gui_private.pri
+	# and the .prl files. Text extensions only -- sed on a framework binary would corrupt it.
+	AGL_COUNT=0
+	while read -r AGL_FILE; do
+		sed -i '' -e 's/[[:space:];]*-framework[[:space:];]*AGL//g' "$AGL_FILE"
+		AGL_COUNT=$((AGL_COUNT + 1))
+	done < <(find "$QT/mkspecs" "$QT/lib" -type f \
+		\( -name '*.prl' -o -name '*.pri' -o -name '*.conf' -o -name '*.pc' \) -print0 |
+		xargs -0 grep -l -- '-framework AGL' 2>/dev/null)
+	echo "--- stripped AGL from $AGL_COUNT file(s)"
+
+	# The sweep cannot drop mac.conf's AGL include line; its continuation backslash
+	# has to go with it.
+	MAC_CONF="$QT/mkspecs/common/mac.conf"
+	if grep -q 'AGL\.framework' "$MAC_CONF"; then
+		sed -i '' \
+			-e '/AGL\.framework\/Headers/d' \
+			-e 's|\(OpenGL\.framework/Headers\) \\$|\1|' \
+			"$MAC_CONF"
+		echo "--- patched mac.conf include path"
+	fi
+
+	# Same commit, CMake side: reaches KDDockWidgets and Scopy via Qt6::Gui. Only the
+	# linking line goes -- deleting the block would orphan two bare endif().
+	FIND_WRAPGL="$QT/lib/cmake/Qt6/FindWrapOpenGL.cmake"
+	if grep -q 'target_link_libraries.*agl_fw_path' "$FIND_WRAPGL"; then
+		sed -i '' '/target_link_libraries.*agl_fw_path/d' "$FIND_WRAPGL"
+		echo "--- patched FindWrapOpenGL.cmake"
+	fi
 }
 
 
