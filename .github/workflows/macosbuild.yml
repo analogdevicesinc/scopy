@@ -6,6 +6,12 @@ on:
 env:
   USERNAME: github-actions
   CACHING_ENABLED: 'false'
+  # ccache. Scopy's own build already enables it in CMakeLists.txt whenever BUILD_HOST is
+  # unset -- which it deliberately is here, so do NOT add BUILD_HOST to this workflow or
+  # ccache turns off silently. install_macos_deps.sh passes it to the dependency builds
+  # and installs it via brew. Only persistence needed wiring, below.
+  CCACHE_DIR: ${{ github.workspace }}/.ccache
+  CCACHE_MAXSIZE: 500M
 
 jobs:
   build:
@@ -23,11 +29,29 @@ jobs:
           - runner: macos-15-large
             name: macOS 15 Qt6 (Intel)
             artifact: Scopy-macOS15-x86_64-qt6
+          - runner: macos-26
+            name: macOS 26 Qt6 (ARM64)
+            artifact: Scopy-macOS26-arm64-qt6
+          - runner: macos-26-intel
+            name: macOS 26 Qt6 (Intel)
+            artifact: Scopy-macOS26-x86_64-qt6
 
     steps:
         - uses: actions/checkout@v6
           with:
             fetch-depth: 0
+
+        # After checkout on purpose: checkout cleans the workspace, which would wipe
+        # CCACHE_DIR. Keyed per runner label rather than per arch, because macos-26 builds
+        # against a Qt tree that patch_qt_sdk26() has modified, so its hashes differ from
+        # macos-15's. The sha in the key never matches, so restore-keys always supplies the
+        # newest previous cache for that runner and every run saves a fresh one.
+        - name: Restore ccache
+          uses: actions/cache@v4
+          with:
+            path: ${{ env.CCACHE_DIR }}
+            key: ccache-${{ matrix.runner }}-${{ github.sha }}
+            restore-keys: ccache-${{ matrix.runner }}-
 
         - name: Build and Install Dependencies
           run: |
@@ -41,6 +65,11 @@ jobs:
 
         - name: Create Scopy.dmg
           run: ./ci/macOS/package_darwin.sh
+
+        # Diagnostic only -- tolerate a failure before install_packages() installed ccache.
+        - name: ccache stats
+          if: always()
+          run: ccache -s || true
 
         - name: Set short git commit SHA
           run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
