@@ -56,7 +56,7 @@ DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
 	, m_category(category)
 	, m_reloadPluginsSet({})
 {
-	m_state = DEV_INIT;
+	setState(DEV_INIT);
 	m_id = "dev_" + category + "_" + param + "_" + scopy::config::getUuid();
 	qDebug(CAT_DEVICEIMPL) << m_param << "ctor";
 }
@@ -108,7 +108,7 @@ void DeviceImpl::loadPlugins()
 		p->postload();
 		p->setDevice(this);
 	}
-	m_state = DEV_IDLE;
+	setState(DEV_IDLE);
 	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins load took:");
 }
 
@@ -365,11 +365,20 @@ QStringList DeviceImpl::getPluginsName()
 	return pluginsName;
 }
 
+void DeviceImpl::setState(DeviceState_t state)
+{
+	if(m_state == state) {
+		return;
+	}
+	m_state = state;
+	Q_EMIT stateChanged(m_state);
+}
+
 component::Context *DeviceImpl::context() const { return m_context.get(); }
 
 void DeviceImpl::onConnectionFailed()
 {
-	m_state = DEV_ERROR;
+	setState(DEV_ERROR);
 	disconnectDev();
 }
 
@@ -439,7 +448,7 @@ void DeviceImpl::load(QSettings &s)
 
 void DeviceImpl::connectDev()
 {
-	m_state = DEV_CONNECTING;
+	setState(DEV_CONNECTING);
 	DebugTimer pluginConnBm;
 	DebugTimer connectDevBm;
 	ConnectionLoadingBar *connectionLoadingBar = new ConnectionLoadingBar();
@@ -497,7 +506,7 @@ void DeviceImpl::connectDev()
 		bindPing();
 	}
 	// connected will be sent regardless of connection result indicating that the process finished
-	m_state = DEV_CONNECTED;
+	setState(DEV_CONNECTED);
 	Q_EMIT connected();
 	delete connectionLoadingBar;
 	DEBUGTIMER_LOG(connectDevBm, this->displayName() + " device connection took:");
@@ -507,7 +516,7 @@ void DeviceImpl::disconnectDev()
 {
 	DebugTimer pluginDisconnBm;
 	DebugTimer disconnectDevBm;
-	m_state = DEV_DISCONNECTING;
+	setState(DEV_DISCONNECTING);
 	Q_EMIT disconnecting();
 
 	if(m_connectionLostWidget) {
@@ -532,7 +541,7 @@ void DeviceImpl::disconnectDev()
 	}
 	m_connectedPlugins.clear();
 	connbtn->setFocus();
-	m_state = DEV_IDLE;
+	setState(DEV_IDLE);
 	DEBUGTIMER_LOG(disconnectDevBm, this->displayName() + " device disconnection took:");
 	Q_EMIT disconnected();
 }
