@@ -146,11 +146,7 @@ QCoro::Task<void> SwiotReader::acquisitionLoop()
 	Q_EMIT swiotReaderFinished();
 }
 
-void SwiotReader::readDio() { dioReadOnce(); }
-
-void SwiotReader::singleDio() { dioReadOnce(); }
-
-QCoro::Task<void> SwiotReader::dioReadOnce()
+QCoro::Task<void> SwiotReader::readDio()
 {
 	const auto keys = m_dioChannels.keys();
 	for(int index : keys) {
