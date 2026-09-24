@@ -94,6 +94,8 @@ private:
 	bool m_isRuntime;
 	bool m_switchCmd = false;
 	QString m_ctxMode;
+
+	static constexpr int PING_TIMEOUT_MS = 5000;
 };
 } // namespace scopy::swiot
 #endif // SWIOTPLUGIN_H

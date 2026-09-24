@@ -51,7 +51,7 @@ public:
 
 	Q_INVOKABLE virtual QCoro::Task<CommandResponse<void>> checkReachableAsync() = 0;
 
-	void startMonitoring(int intervalMs)
+	void startMonitoring(int intervalMs = 2000)
 	{
 		m_lost = false;
 		m_timer.start(intervalMs);

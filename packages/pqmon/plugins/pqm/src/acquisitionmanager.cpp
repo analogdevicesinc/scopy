@@ -279,12 +279,18 @@ void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> att
 void AcquisitionManager::startPing()
 {
 	component::Ping *ping = m_ctx->findChild<component::Ping *>();
-	ping->startMonitoring(2000);
+	if(!ping) {
+		return;
+	}
+	ping->startMonitoring();
 }
 
 void AcquisitionManager::stopPing()
 {
 	component::Ping *ping = m_ctx->findChild<component::Ping *>();
+	if(!ping) {
+		return;
+	}
 	ping->stopMonitoring();
 }
 

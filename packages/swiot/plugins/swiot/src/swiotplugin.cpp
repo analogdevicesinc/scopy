@@ -32,6 +32,7 @@
 #include <component/device.h>
 #include <component/attribute.h>
 #include <component/attributereader.h>
+#include <component/ping.h>
 
 #include <qcorotask.h>
 
@@ -177,6 +178,10 @@ bool SWIOTPlugin::onConnect()
 	component::ContextHandle ctx = component::Controller::context(m_param);
 	if(!ctx) {
 		return false;
+	}
+	component::Ping *ping = ctx->findChild<component::Ping *>();
+	if(ping) {
+		ping->startMonitoring(PING_TIMEOUT_MS);
 	}
 
 	m_runtime = new SwiotRuntime(m_param, this);

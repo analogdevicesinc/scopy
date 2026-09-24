@@ -42,7 +42,6 @@
 
 #include <pluginbase/preferences.h>
 #include <iioutil/connectionprovider.h>
-#include <iioutil/iiopingtask.h>
 #include <component/attribute.h>
 #include <component/controller.h>
 
@@ -248,19 +247,6 @@ bool PQMPlugin::onDisconnect()
 	delete(m_attrHandler);
 	m_attrHandler = nullptr;
 	return true;
-}
-
-void PQMPlugin::startPingTask() { m_acqManager->startPing(); }
-
-void PQMPlugin::stopPingTask() { m_acqManager->stopPing(); }
-
-void PQMPlugin::onPausePingTask(bool pause)
-{
-	if(pause) {
-		m_acqManager->stopPing();
-	} else {
-		m_acqManager->startPing();
-	}
 }
 
 void PQMPlugin::initApi()
