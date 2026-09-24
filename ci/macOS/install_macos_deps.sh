@@ -114,7 +114,7 @@ echo "MacOS version $OS_VERSION"
 # Qt6 via aqtinstall -- no Homebrew Qt package needed
 # ghr is deliberately absent: it was never invoked (releases use actions/upload-artifact)
 # and it has no x86_64 bottle, so on Intel it source-builds its `go` build dependency.
-PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2"
+PACKAGES="pkg-config cmake fftw bison gettext autoconf automake libzip libusb doxygen wget gnu-sed dylibbundler libxml2 ccache"
 
 install_packages() {
 
@@ -180,7 +180,10 @@ export_paths(){
 	QMAKE="$(command -v qmake6)"
 	CMAKE_BIN="$(command -v cmake)"
 	ARCH="$(uname -m)"
-	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_OSX_ARCHITECTURES=$ARCH"
+	# Scopy's own build picks ccache up from CMakeLists.txt (RULE_LAUNCH_COMPILE); the
+	# dependencies need it passed explicitly. Each dep build does `rm -rf build` + `git
+	# clean -xdf`, so they recompile unchanging sources every run -- near-total cache hits.
+	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS -DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_OSX_ARCHITECTURES=$ARCH -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 	CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
 	echo -- USING CMAKE COMMAND:
@@ -270,7 +273,7 @@ build_libserialport(){
 	save_version_info
 	git clean -xdf
 	./autogen.sh
-	./configure --prefix $STAGING_AREA_DEPS
+	CC="ccache cc" ./configure --prefix $STAGING_AREA_DEPS
 	make $JOBS
 	make install
 	popd
@@ -469,7 +472,9 @@ build_qwt() {
 	# Fix subproject link references so they find qwt_scopy, not the old qwt name
 	sed -i '' 's|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)|qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt_scopy)|' \
 		designer/designer.pro examples/examples.pri playground/playground.pri tests/tests.pri
-	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+	# QMAKE_CXX only: QMAKE_LINK is already expanded from the spec, so linking stays direct.
+	$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib \
+		QMAKE_CXX="ccache clang++" qwt.pro
 	make $JOBS
 	make install
 	popd
