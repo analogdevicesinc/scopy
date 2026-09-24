@@ -185,7 +185,7 @@ else()
 endif()
 
 find_package(QCoro6 REQUIRED COMPONENTS Core Coro)
-# Set necessary compiler flags to enable coroutine suppor
+# Set necessary compiler flags to enable coroutine support
 qcoro_enable_coroutines()
 
 add_subdirectory(device-controller)
