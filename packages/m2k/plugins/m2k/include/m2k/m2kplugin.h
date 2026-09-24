@@ -71,9 +71,6 @@ public:
 public Q_SLOTS:
 	void showPageCallback() override;
 	void hidePageCallback() override;
-	void startPingTask() override;
-	void stopPingTask() override;
-	void onPausePingTask(bool pause) override;
 
 	void calibrationStarted();
 	void calibrationSuccess();
