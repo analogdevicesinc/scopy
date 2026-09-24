@@ -103,12 +103,16 @@ protected:
 	void unbindPing();
 	void loadCompatiblePluginsTab(QWidget *pluginsTab);
 	QStringList getPluginsName();
+	void setState(DeviceState_t state);
+
+Q_SIGNALS:
+	void stateChanged(scopy::Device::DeviceState_t state);
 
 protected:
 	QList<Plugin *> m_plugins;
 	QList<Plugin *> m_connectedPlugins;
 	QSet<QString> m_reloadPluginsSet;
-	DeviceState_t m_state;
+	DeviceState_t m_state = DEV_INIT;
 	QString m_id;
 	QString m_category;
 	QString m_displayName;

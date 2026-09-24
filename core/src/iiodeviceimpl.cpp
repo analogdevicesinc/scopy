@@ -31,6 +31,40 @@ using namespace scopy;
 
 void IIODeviceImpl::init() { DeviceImpl::init(); }
 
+void IIODeviceImpl::onStateChanged(DeviceState_t state)
+{
+	switch(state) {
+	case DEV_CONNECTING:
+		// here or i must overwrite the connectDev method to be sure this happen
+		acquireContext();
+		break;
+	case DEV_IDLE:
+		releaseContext();
+		break;
+	default:
+		break;
+	}
+}
+
+void IIODeviceImpl::acquireContext()
+{
+	if(m_context) {
+		return;
+	}
+	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0, m_maxThreads);
+	if(!m_context) {
+		qWarning(CAT_IIO_DEVICEIMPL) << "Failed to acquire context for" << m_param;
+	}
+}
+
+void IIODeviceImpl::releaseContext()
+{
+	if(!m_context) {
+		return;
+	}
+	m_context = component::ContextHandle{};
+}
+
 bool IIODeviceImpl::verify() { return static_cast<bool>(m_context); }
 
 QMap<QString, QString> IIODeviceImpl::readDeviceInfo()
