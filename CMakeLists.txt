@@ -199,6 +199,12 @@ if(NOT DEFINED ENABLE_PLUGIN_ADC)
 	set(ENABLE_PLUGIN_ADC OFF CACHE BOOL "Enable adc plugin" FORCE)
 endif()
 
+# Debugger plugin is not migrated to the device-controller on this branch. Force it OFF unless the caller opts in, same
+# idiom as ENABLE_PLUGIN_ADC above.
+if(NOT DEFINED ENABLE_PLUGIN_DEBUGGER)
+	set(ENABLE_PLUGIN_DEBUGGER OFF CACHE BOOL "Enable debugger plugin" FORCE)
+endif()
+
 # gr-util hard-requires the gnuradio stack and is consumed only by the adc plugin. Skip it when that flag is explicitly
 # disabled so gnuradio can be dropped. (add_subdirectory(packages) synthesizes the flag later, but the default above -
 # or a value passed on the command line - already puts it in the cache by this point.)

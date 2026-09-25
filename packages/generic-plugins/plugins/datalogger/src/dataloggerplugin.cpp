@@ -32,7 +32,8 @@
 #include <style.h>
 #include <deviceiconbuilder.h>
 
-#include <iioutil/connectionprovider.h>
+#include <component/controller.h>
+#include <component/context.h>
 
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
@@ -47,15 +48,11 @@ bool DataLoggerPlugin::compatible(QString m_param, QString category)
 {
 	// This function defines the characteristics according to which the
 	// plugin is compatible with a specific device
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qWarning(CAT_DATALOGGERLUGIN) << "No context available for datalogger";
 		return false;
 	}
-
-	cp->close(m_param);
 
 	return true;
 }
@@ -92,14 +89,12 @@ bool DataLoggerPlugin::onConnect()
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(conn == nullptr)
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx)
 		return false;
-	iio_context *ctx = conn->context();
 
 	DMM dmm;
-	QList<DmmDataMonitorModel *> availableDmmList = dmm.getDmmMonitors(ctx);
+	QList<DmmDataMonitorModel *> availableDmmList = dmm.getDmmMonitors(ctx.get());
 
 	foreach(auto dmmModel, availableDmmList) {
 		dmmList.push_back(dmmModel);
@@ -147,9 +142,6 @@ bool DataLoggerPlugin::onDisconnect()
 		delete m_dataAcquisitionManager;
 		m_dataAcquisitionManager = nullptr;
 	}
-
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
 
 	// This method is called when the disconnect button is pressed
 	// It must remove all connections that were established on the connection

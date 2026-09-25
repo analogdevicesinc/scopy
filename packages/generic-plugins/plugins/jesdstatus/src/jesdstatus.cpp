@@ -25,7 +25,7 @@
 
 using namespace scopy::jesdstatus;
 
-JesdStatus::JesdStatus(QList<struct iio_device *> devLst, QWidget *parent)
+JesdStatus::JesdStatus(QList<component::Device *> devLst, QWidget *parent)
 	: QWidget(parent)
 	, m_deviceList(devLst)
 	, m_timer(new QTimer(this))
@@ -85,10 +85,10 @@ void JesdStatus::runToggled(bool toggled)
 	}
 }
 
-void JesdStatus::setupDevice(struct iio_device *dev)
+void JesdStatus::setupDevice(component::Device *dev)
 {
 	JesdStatusView *jesdLinkDevView = new JesdStatusView(dev, this);
-	QString devLbl = iio_device_get_label(dev);
+	QString devLbl = dev->label();
 	m_deviceSelector->combo()->addItem(devLbl);
 	m_jesdDeviceStack->add(devLbl, jesdLinkDevView);
 	jesdLinkDevView->update();

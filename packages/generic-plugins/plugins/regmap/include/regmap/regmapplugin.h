@@ -28,8 +28,6 @@
 #include "pluginbase/pluginbase.h"
 #include "scopy-regmap_export.h"
 
-#include <iio.h>
-
 #include <QObject>
 
 #include <pluginbase/plugin.h>
@@ -41,6 +39,9 @@
 namespace Ui {}
 
 namespace scopy {
+namespace component::iio {
+class IIODevice;
+}
 namespace regmap {
 
 class RegisterMapTool;
@@ -69,9 +70,8 @@ public:
 
 	QWidget *getTool();
 
-	void generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
-			    IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy,
-			    int bitsPerRow = 8);
+	void generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
+			    IRegisterWriteStrategy *writeStrategy, int bitsPerRow = 8);
 
 public Q_SLOTS:
 	bool onConnect() override;
@@ -79,9 +79,7 @@ public Q_SLOTS:
 
 private:
 	QWidget *m_registerMapWidget = nullptr;
-	QList<iio_device *> *m_deviceList = nullptr;
-	struct iio_device *getIioDevice(iio_context *ctx, const char *dev_name);
-	bool isBufferCapable(iio_device *dev);
+	QList<component::iio::IIODevice *> *m_deviceList = nullptr;
 	RegisterMapTool *registerMapTool;
 	void initApi();
 	RegMap_API *m_api = nullptr;

@@ -25,7 +25,10 @@
 #include <QString>
 #include <QMap>
 #include <QObject>
-#include <iio.h>
+
+#include <qcoro/qcorotask.h>
+#include <component/device.h>
+#include <component/attribute.h>
 
 namespace scopy::jesdstatus {
 
@@ -49,7 +52,7 @@ class SCOPY_JESDSTATUS_EXPORT JesdStatusParser : public QObject
 {
 	Q_OBJECT
 public:
-	JesdStatusParser(struct iio_device *dev, QObject *parent);
+	JesdStatusParser(component::Device *dev, QObject *parent);
 	virtual ~JesdStatusParser();
 
 	ENCODER_TYPE getEncoder() const;
@@ -78,14 +81,14 @@ public:
 	QPair<QString, VISUAL_STATUS> getSysrefAlignmentError();
 	QPair<QString, VISUAL_STATUS> getSyncState();
 
-public Q_SLOTS:
-	void update();
+	// Fully-coroutine refresh: reads lane status + status asynchronously, then emits finished().
+	QCoro::Task<void> update();
 
 Q_SIGNALS:
 	void finished();
 
 private:
-	struct iio_device *m_dev;
+	component::Device *m_dev;
 	unsigned int m_laneCount;
 	ENCODER_TYPE m_encoder;
 	int m_minLatency;
@@ -151,10 +154,13 @@ private:
 
 private:
 	int extractLaneNumber(const QString &text);
+	component::Attribute *findAttr(const QString &name);
+	// Async read of an attribute's value; empty/null QString on failure.
+	QCoro::Task<QString> readAttr(component::Attribute *attr);
 	void readEncoder();
-	void readLaneStatus(QString laneAttr);
-	void readAllLaneStatus();
-	void readStatus();
+	void readLaneStatus(QString laneAttr, QString laneStatus);
+	QCoro::Task<void> readAllLaneStatus();
+	QCoro::Task<void> readStatus();
 	QString regexMatch(QString container, QRegularExpression regex, QString init = "");
 	long regexMatchUInt(QString container, QRegularExpression regex);
 	QList<QString> regexMatchMultiple(QString container, QRegularExpression regex, int count);

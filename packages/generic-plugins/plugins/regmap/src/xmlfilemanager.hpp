@@ -25,8 +25,6 @@
 #include "registermaptemplate.hpp"
 #include "scopy-regmap_export.h"
 
-#include <iio.h>
-
 #include <QObject>
 
 class QDomElement;
@@ -41,7 +39,7 @@ class SCOPY_REGMAP_EXPORT XmlFileManager : public QObject
 	Q_OBJECT
 
 public:
-	XmlFileManager(struct iio_device *dev, QString filePath);
+	XmlFileManager(QString filePath);
 
 	QList<QString> *getAllAddresses();
 	QMap<uint32_t, RegisterModel *> *getAllRegisters(RegisterMapTemplate *parent);
@@ -54,7 +52,6 @@ public:
 
 private:
 	QString filePath;
-	struct iio_device *dev;
 };
 } // namespace scopy::regmap
 #endif // XMLFILEMANAGER_HPP

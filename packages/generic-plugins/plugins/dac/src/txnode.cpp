@@ -22,9 +22,18 @@
 #include "txnode.h"
 #include "dac_logging_categories.h"
 
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributereader.h>
+#include <component/attributewriter.h>
+#include <component/backends/iio/iiochannel.h>
+#include <component/backends/iio/iiosamplecodec.h>
+
+#include <iio.h>
+
 using namespace scopy;
 using namespace scopy::dac;
-TxNode::TxNode(QString uuid, iio_channel *chn, QObject *parent)
+TxNode::TxNode(QString uuid, component::Channel *chn, QObject *parent)
 	: QObject(parent)
 	, m_channel(chn)
 	, m_txUuid(uuid)
@@ -32,11 +41,12 @@ TxNode::TxNode(QString uuid, iio_channel *chn, QObject *parent)
 	, m_fmtShift(0)
 	, m_fmtSigned(true)
 {
-	if(m_channel) {
-		auto fmt = iio_channel_get_data_format(m_channel);
-		m_fmtShift = fmt->shift;
-		m_fmtBits = fmt->bits;
-		m_fmtSigned = fmt->is_signed;
+	auto *codec = m_channel ? m_channel->findChild<component::iio::IIOSampleCodec *>() : nullptr;
+	if(codec) {
+		auto fmt = codec->dataFormat();
+		m_fmtShift = fmt.shift;
+		m_fmtBits = fmt.bits;
+		m_fmtSigned = fmt.is_signed;
 	}
 }
 
@@ -49,7 +59,7 @@ TxNode::~TxNode()
 	qDebug(CAT_DAC_DATA) << QString("Delete TX Node %1").arg(m_txUuid);
 }
 
-TxNode *TxNode::addChildNode(QString uuid, iio_channel *chn)
+TxNode *TxNode::addChildNode(QString uuid, component::Channel *chn)
 {
 	TxNode *child = m_childNodes.value(uuid, nullptr);
 	if(!child) {
@@ -63,7 +73,7 @@ QMap<QString, TxNode *> TxNode::getTones() const { return m_childNodes; }
 
 QString TxNode::getUuid() const { return m_txUuid; }
 
-iio_channel *TxNode::getChannel() { return m_channel; }
+component::Channel *TxNode::getChannel() { return m_channel; }
 
 unsigned int TxNode::getFormatShift() const { return m_fmtShift; }
 
@@ -71,62 +81,62 @@ unsigned int TxNode::getFormatBits() const { return m_fmtBits; }
 
 bool TxNode::getFormatSigned() const { return m_fmtSigned; }
 
-bool TxNode::readDds() const
+QCoro::Task<bool> TxNode::readDds() const
 {
 	if(m_channel) {
-		if(iio_channel_get_type(m_channel) == IIO_ALTVOLTAGE) {
-			bool value = false;
-			int ret = iio_channel_attr_read_bool(m_channel, "raw", &value);
-			if(ret < 0) {
-				qDebug(CAT_DAC_DATA) << QString("Can't read DDS channel raw, error: %1").arg(ret);
-				return false;
+		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(m_channel);
+		if(iioChn && iioChn->chanType() == IIO_ALTVOLTAGE) {
+			auto *raw = m_channel->findChild<component::Attribute *>("raw");
+			if(!raw || !raw->readCapability()) {
+				co_return false;
 			}
-			return value;
+			co_await raw->readCapability()->readAsync();
+			co_return raw->cachedValue().toInt() != 0;
 		}
-		return false;
+		co_return false;
 	}
 
-	if(m_childNodes.size() != 0) {
-		for(auto node : std::as_const(m_childNodes)) {
-			if(node->readDds()) {
-				return true;
-			}
+	for(auto node : std::as_const(m_childNodes)) {
+		if(co_await node->readDds()) {
+			co_return true;
 		}
 	}
 
-	return false;
+	co_return false;
 }
 
-bool TxNode::enableDds(bool enable)
+QCoro::Task<bool> TxNode::enableDds(bool enable)
 {
 	qDebug(CAT_DAC_DATA) << QString("Try enable:%1 DDS TXNode %2").arg(enable).arg(m_txUuid);
 	if(m_channel) {
-		if(iio_channel_get_type(m_channel) == IIO_ALTVOLTAGE) {
-			int ret = iio_channel_attr_write_bool(m_channel, "raw", enable);
-			if(ret < 0) {
-				qDebug(CAT_DAC_DATA) << QString("Can't enable DDS channel, error: %1").arg(ret);
-				return false;
+		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(m_channel);
+		if(iioChn && iioChn->chanType() == IIO_ALTVOLTAGE) {
+			auto *raw = m_channel->findChild<component::Attribute *>("raw");
+			if(!raw || !raw->writeCapability()) {
+				co_return false;
 			}
-			qDebug(CAT_DAC_DATA) << QString("DDS channel %1 enabled: %2, ret code %3")
-							.arg(m_txUuid)
-							.arg(enable)
-							.arg(ret);
+			auto ret = co_await raw->writeCapability()->writeAsync(enable ? "1" : "0");
+			if(!ret) {
+				qDebug(CAT_DAC_DATA) << QString("Can't enable DDS channel %1").arg(m_txUuid);
+				co_return false;
+			}
+			qDebug(CAT_DAC_DATA) << QString("DDS channel %1 enabled: %2").arg(m_txUuid).arg(enable);
 		} else {
 			qDebug(CAT_DAC_DATA) << QString("%1 not a DDS channel").arg(m_txUuid);
-			return false;
+			co_return false;
 		}
 	} else if(m_childNodes.size() != 0) {
 		for(auto node : std::as_const(m_childNodes)) {
-			bool ret = node->enableDds(enable);
+			bool ret = co_await node->enableDds(enable);
 			if(!ret) {
-				return ret;
+				co_return ret;
 			}
 		}
 	} else {
 		qDebug(CAT_DAC_DATA) << "can't enable DDS channel, invalid selection";
-		return false;
+		co_return false;
 	}
-	return true;
+	co_return true;
 }
 
 const QColor &TxNode::getColor() const { return m_color; }

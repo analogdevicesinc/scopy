@@ -27,6 +27,8 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include "component/context.h"
+#include "component/device.h"
 
 namespace scopy::jesdstatus {
 class SCOPY_JESDSTATUS_EXPORT JesdStatusPlugin : public QObject, public PluginBase
@@ -48,8 +50,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
-	struct iio_context *m_ctx;
-	QList<QString> scanCompatibleDevices(iio_context *ctx);
+	QList<component::Device *> scanCompatibleDevices(component::Context *ctx);
 };
 } // namespace scopy::jesdstatus
 #endif // JESDSTATUSPLUGIN_H
