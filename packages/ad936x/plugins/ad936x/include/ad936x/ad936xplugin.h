@@ -28,6 +28,7 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include <component/controller.h>
 
 namespace scopy {
 class IIOWidgetGroup;
@@ -73,6 +74,7 @@ private:
 	FMCOMMS5_ADVANCED_API *m_fmcomms5AdvancedApi = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	bool m_isFmcomms5 = false;
+	component::ContextHandle m_context;
 };
 } // namespace scopy::ad936x
 #endif // AD936XPLUGIN_H

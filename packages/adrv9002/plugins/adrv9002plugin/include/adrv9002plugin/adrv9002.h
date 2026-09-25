@@ -32,7 +32,6 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include <QButtonGroup>
-#include <iio.h>
 #include <profilemanager.h>
 #include <profilegeneratorwidget.h>
 #include <initialcalibrationswidget.h>
@@ -43,14 +42,19 @@
 
 namespace scopy {
 class IIOWidgetGroup;
-}
+namespace component {
+class Context;
+class Device;
+class Channel;
+} // namespace component
+} // namespace scopy
 
 namespace scopy::adrv9002 {
 class SCOPY_ADRV9002PLUGIN_EXPORT Adrv9002 : public QWidget
 {
 	Q_OBJECT
 public:
-	Adrv9002(iio_context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	Adrv9002(scopy::component::Context *ctx, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~Adrv9002();
 
 Q_SIGNALS:
@@ -83,16 +87,18 @@ private:
 	QWidget *createOrxChannelControls(const QString &title, int channel);
 
 	// Widget Creation Helpers
-	IIOWidget *createComboWidget(iio_channel *ch, const QString &attr, const QString &availableAttr,
+	IIOWidget *createComboWidget(scopy::component::Channel *ch, const QString &attr, const QString &availableAttr,
 				     const QString &title);
-	IIOWidget *createRangeWidget(iio_channel *ch, const QString &attr, const QString &range, const QString &title);
-	IIOWidget *createCheckboxWidget(iio_channel *ch, const QString &attr, const QString &label);
+	IIOWidget *createRangeWidget(scopy::component::Channel *ch, const QString &attr, const QString &range,
+				     const QString &title);
+	IIOWidget *createCheckboxWidget(scopy::component::Channel *ch, const QString &attr, const QString &label);
 
-	IIOWidget *createReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
-	IIOWidget *createContinuousReadOnlyWidget(iio_channel *ch, const QString &attr, const QString &title);
+	IIOWidget *createReadOnlyWidget(scopy::component::Channel *ch, const QString &attr, const QString &title);
+	IIOWidget *createContinuousReadOnlyWidget(scopy::component::Channel *ch, const QString &attr,
+						  const QString &title);
 
 	// Standard Scopy tool components
-	iio_context *m_ctx = nullptr;
+	scopy::component::Context *m_ctx = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	QVBoxLayout *m_mainLayout;
 	ToolTemplate *m_tool;
@@ -115,7 +121,7 @@ private:
 	QWidget *m_centralWidget;
 
 	// Device handle
-	iio_device *m_iio_dev = nullptr;
+	scopy::component::Device *m_dev = nullptr;
 
 	// Profile manager
 	ProfileManager *m_profileManager;

@@ -32,9 +32,13 @@
 #include <gui/widgets/smallprogressbar.h>
 #include <pkg-manager/pkgmanager.h>
 #include <pluginbase/statusbarmanager.h>
-#include <QFutureWatcher>
-#include <functional>
-#include <iio.h>
+#include <qcorotask.h>
+
+namespace scopy {
+namespace component {
+class Device;
+}
+} // namespace scopy
 
 namespace scopy::adrv9002 {
 
@@ -50,7 +54,7 @@ class SCOPY_ADRV9002PLUGIN_EXPORT ProfileManager : public QWidget
 	Q_OBJECT
 
 public:
-	explicit ProfileManager(iio_device *device, QWidget *parent = nullptr);
+	explicit ProfileManager(component::Device *device, QWidget *parent = nullptr);
 	~ProfileManager();
 
 	QString title() const;
@@ -69,26 +73,27 @@ public Q_SLOTS:
 	void updateStreamStatus(ProgressBarState status);
 
 private Q_SLOTS:
-	void onProfileFileChanged();
-	void onStreamFileChanged();
+	QCoro::Task<void> onProfileFileChanged();
+	QCoro::Task<void> onStreamFileChanged();
 	void updateStatus();
 
 private:
-	// Core functionality
-	bool loadProfileFromFile(const QString &filename);
-	bool loadStreamFromFile(const QString &filename);
-	QString readDeviceAttribute(const QString &attributeName);
-	bool writeDeviceAttribute(const QString &attributeName, const QByteArray &data);
+	// Core functionality (main-thread coroutines)
+	QCoro::Task<bool> loadProfileFromFile(QString filename);
+	QCoro::Task<bool> loadStreamFromFile(QString filename);
+	QString readDeviceAttribute(const QString &attributeName, size_t bytes = ATTR_READ_BYTES);
+	QCoro::Task<bool> writeDeviceAttribute(QString attributeName, QByteArray data);
+
+	// Component I/O helpers (run on the object's main thread)
+	QString componentRead(const QString &attributeName, size_t bytes = ATTR_READ_BYTES);
+	QCoro::Task<bool> componentWrite(QString attributeName, QByteArray data);
 
 	// Device info panel
 	QWidget *createDeviceInfoPanel();
-	QString getAttributeValue(const QString &attributeName);
-
-	// Progress bar animation helper for threaded operations
-	void executeWithProgress(bool isProfile, std::function<bool()> work);
+	QString getAttributeValue(const QString &attributeName, size_t bytes = ATTR_READ_BYTES);
 
 	// Device communication
-	iio_device *m_device;
+	component::Device *m_device;
 
 	// UI components - following FastlockProfilesWidget pattern
 	QLabel *m_title;
@@ -109,6 +114,8 @@ private:
 	// Current file paths
 	QString m_currentProfilePath;
 	QString m_currentStreamPath;
+
+	static constexpr size_t ATTR_READ_BYTES = 1024 * 16;
 };
 
 } // namespace scopy::adrv9002

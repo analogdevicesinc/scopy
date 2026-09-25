@@ -27,8 +27,10 @@
 #include "imuanalyzersettings.hpp"
 #include "datavisualizer.hpp"
 
-#include <atomic>
-#include <thread>
+#include <optional>
+
+#include <qcoro/qcorotask.h>
+#include <QTimer>
 
 #include <QLineEdit>
 #include <QObject>
@@ -45,13 +47,15 @@
 #include <toolbuttons.h>
 #include <tooltemplate.h>
 
-#include <iio.h>
-#include <iioutil/connectionprovider.h>
-
 #include <hoverwidget.h>
 #include <QStackedLayout>
 #include <measurementpanel.h>
 #include <math.h>
+
+namespace scopy::component {
+class Device;
+class Channel;
+} // namespace scopy::component
 
 namespace scopy {
 
@@ -59,7 +63,7 @@ class SCOPY_IMUANALYZER_EXPORT IMUAnalyzerInterface : public QWidget
 {
 	Q_OBJECT
 public:
-	IMUAnalyzerInterface(QString uri, QWidget *parent = nullptr);
+	IMUAnalyzerInterface(component::Device *device, QWidget *parent = nullptr);
 	~IMUAnalyzerInterface();
 
 public Q_SLOTS:
@@ -70,11 +74,10 @@ Q_SIGNALS:
 	void generateRot(data3P rot);
 	void updateValues(data3P rot, data3P pos, float temp);
 
-public:
-	void generateRotation();
-	void initIIODevice();
-
 private:
+	QCoro::Task<void> initGains();
+	QCoro::Task<void> readCycle();
+
 	ToolTemplate *m_tool;
 
 	InfoBtn *m_infoBtn;
@@ -91,11 +94,14 @@ private:
 	data3P m_rot = {0.0f, 0.0f, 0.0f};
 	data3P m_dist = {0.0f, 0.0f, 0.0f};
 
-	std::atomic<bool> m_runThread{false};
-	std::thread t;
-	QString m_uri;
+	component::Device *m_device = nullptr;
+	component::Channel *m_accelX = nullptr, *m_accelY = nullptr, *m_accelZ = nullptr, *m_temp = nullptr;
+	double m_gainX = 0, m_gainY = 0, m_gainZ = 0, m_tempGain = 0, m_tempOffset = 0, m_samplingFreq = 0;
+	bool m_hasTemp = false;
 
-	iio_device *m_device;
+	QTimer *m_timer = nullptr;
+	bool m_cycleInFlight = false;
+	std::optional<QCoro::Task<void>> m_activeCycle;
 };
 } // namespace scopy
 

@@ -29,10 +29,15 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QMessageBox>
-#include <iio.h>
 #include <iio-widgets/iiowidget.h>
 #include <pluginbase/statusbarmanager.h>
 #include <style.h>
+
+namespace scopy {
+namespace component {
+class Device;
+}
+} // namespace scopy
 
 namespace scopy::adrv9002 {
 
@@ -41,10 +46,10 @@ class SCOPY_ADRV9002PLUGIN_EXPORT InitialCalibrationsWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit InitialCalibrationsWidget(iio_device *device, QWidget *parent = nullptr);
+	explicit InitialCalibrationsWidget(component::Device *device, QWidget *parent = nullptr);
 	~InitialCalibrationsWidget();
 
-	static bool isSupported(iio_device *device);
+	static bool isSupported(component::Device *device);
 
 Q_SIGNALS:
 	void calibrationStarted();
@@ -64,7 +69,7 @@ private:
 	bool writeAttributeValue(const QString &attributeName, const QString &value);
 
 	// Device communication
-	iio_device *m_device;
+	component::Device *m_device;
 
 	// UI components
 	QLabel *m_titleLabel;

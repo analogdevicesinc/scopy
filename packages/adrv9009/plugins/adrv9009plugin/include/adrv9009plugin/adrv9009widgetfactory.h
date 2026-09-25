@@ -26,7 +26,11 @@
 #include <iio-widgets/iiowidgetgroup.h>
 #include <QString>
 #include <QWidget>
-#include <iio.h>
+
+namespace scopy::component {
+class Device;
+class Channel;
+} // namespace scopy::component
 
 namespace scopy::adrv9009 {
 
@@ -34,40 +38,41 @@ class SCOPY_ADRV9009PLUGIN_EXPORT Adrv9009WidgetFactory
 {
 public:
 	// Device attribute widgets
-	static IIOWidget *createSpinboxWidget(iio_device *device, QString attr, QString title,
+	static IIOWidget *createSpinboxWidget(component::Device *device, QString attr, QString title,
 					      IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createCheckboxWidget(iio_device *device, QString attr, QString title,
+	static IIOWidget *createCheckboxWidget(component::Device *device, QString attr, QString title,
 					       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createComboWidget(iio_device *device, QString attr, QString availableAttr, QString title,
+	static IIOWidget *createComboWidget(component::Device *device, QString attr, QString title,
 					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createCustomComboWidget(iio_device *device, QString attr,
+	static IIOWidget *createCustomComboWidget(component::Device *device, QString attr,
 						  const QMap<QString, QString> &optionsMap, QString title,
 						  IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createRangeWidget(iio_device *device, QString attr, QString range, QString title,
+	static IIOWidget *createRangeWidget(component::Device *device, QString attr, QString range, QString title,
 					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createReadOnlyWidget(iio_device *device, QString attr, QString title, bool compactMode = true,
-					       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	static IIOWidget *createReadOnlyWidget(component::Device *device, QString attr, QString title,
+					       bool compactMode = true, IIOWidgetGroup *group = nullptr,
+					       QWidget *parent = nullptr);
 
 	// Channel attribute widgets
-	static IIOWidget *createSpinboxWidget(iio_channel *channel, QString attr, QString title,
+	static IIOWidget *createSpinboxWidget(component::Channel *channel, QString attr, QString title,
 					      IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createCheckboxWidget(iio_channel *channel, QString attr, QString title,
+	static IIOWidget *createCheckboxWidget(component::Channel *channel, QString attr, QString title,
 					       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createComboWidget(iio_channel *channel, QString attr, QString availableAttr, QString title,
+	static IIOWidget *createComboWidget(component::Channel *channel, QString attr, QString title,
 					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createRangeWidget(iio_channel *channel, QString attr, QString range, QString title,
+	static IIOWidget *createRangeWidget(component::Channel *channel, QString attr, QString range, QString title,
 					    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
+	static IIOWidget *createReadOnlyWidget(component::Channel *channel, QString attr, QString title,
 					       bool compactMode = true, IIOWidgetGroup *group = nullptr,
 					       QWidget *parent = nullptr);
 
 	// Debug attribute widgets (for advanced plugin features like aux DAC)
-	static IIOWidget *createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
+	static IIOWidget *createDebugRangeWidget(component::Device *device, QString attr, QString range, QString title,
 						 IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createDebugCustomComboWidget(iio_device *device, QString attr,
+	static IIOWidget *createDebugCustomComboWidget(component::Device *device, QString attr,
 						       const QMap<QString, QString> &optionsMap, QString title,
 						       IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
-	static IIOWidget *createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
+	static IIOWidget *createDebugCheckboxWidget(component::Device *device, QString attr, QString title,
 						    IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 
 private:

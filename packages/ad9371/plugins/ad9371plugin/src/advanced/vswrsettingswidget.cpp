@@ -21,6 +21,8 @@
 #include "advanced/vswrsettingswidget.h"
 #include "ad9371widgetfactory.h"
 #include <iio-widgets/iiowidgetgroup.h>
+#include <component/device.h>
+#include <component/navigation.h>
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLabel>
@@ -35,7 +37,7 @@ Q_LOGGING_CATEGORY(CAT_AD9371_VSWR_SETTINGS, "AD9371_VSWR_SETTINGS")
 using namespace scopy;
 using namespace scopy::ad9371;
 
-VswrSettingsWidget::VswrSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+VswrSettingsWidget::VswrSettingsWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

@@ -25,15 +25,17 @@
 #include <style.h>
 #include <stylehelper.h>
 #include <smallprogressbar.h>
-#include <QtConcurrent>
-#include <QThread>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_PROFILEMANAGER, "ProfileManager")
 
 using namespace scopy::adrv9002;
 using namespace scopy;
 
-ProfileManager::ProfileManager(iio_device *device, QWidget *parent)
+ProfileManager::ProfileManager(component::Device *device, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_title(nullptr)
@@ -166,19 +168,18 @@ QWidget *ProfileManager::createDeviceInfoPanel()
 	return panel;
 }
 
-QString ProfileManager::getAttributeValue(const QString &attributeName)
+QString ProfileManager::getAttributeValue(const QString &attributeName, size_t bytes)
 {
-	if(!m_device)
+	if(!m_device) {
 		return "Device not available";
-
-	char buffer[8192]; // Large buffer for profile_config
-	int ret = iio_device_attr_read(m_device, attributeName.toUtf8().constData(), buffer, sizeof(buffer));
-
-	if(ret < 0) {
-		return QString("Error reading %1: %2").arg(attributeName).arg(ret);
 	}
 
-	return QString(buffer);
+	component::Attribute *a = component::attributeByName(m_device, attributeName);
+	if(!a || !a->readCapability()) {
+		return QString("Error reading %1").arg(attributeName);
+	}
+
+	return componentRead(attributeName, bytes);
 }
 
 void ProfileManager::updateDeviceInfo()
@@ -196,104 +197,74 @@ void ProfileManager::updateDeviceInfo()
 
 void ProfileManager::refreshStatus() { updateStatus(); }
 
-void ProfileManager::onProfileFileChanged()
+QCoro::Task<void> ProfileManager::onProfileFileChanged()
 {
 	if(!m_profileFileBrowser || !m_profileFileBrowser->lineEdit()) {
-		return;
+		co_return;
 	}
 
 	QString filename = m_profileFileBrowser->lineEdit()->text();
 	if(filename.isEmpty() || filename == "(None)") {
-		return;
+		co_return;
 	}
 
-	// Execute heavy work with progress indication
-	executeWithProgress(true, [this, filename]() -> bool {
-		// Move existing load logic to worker thread
-		bool success = loadProfileFromFile(filename);
+	// Non-blocking load on the main thread with progress indication
+	updateProfileStatus(ProgressBarState::BUSY);
+	bool success = co_await loadProfileFromFile(filename);
+	updateProfileStatus(success ? ProgressBarState::SUCCESS : ProgressBarState::ERROR);
 
-		// UI feedback via main thread
-		QMetaObject::invokeMethod(
-			this,
-			[this, success, filename]() {
-				if(success) {
-					m_currentProfilePath = filename;
-					Q_EMIT profileLoaded(filename);
-					updateStatus();
+	QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
+	if(success) {
+		m_currentProfilePath = filename;
+		Q_EMIT profileLoaded(filename);
+		updateStatus();
 
-					// Additional feedback
-					QFileInfo fileInfo(filename);
-					QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
-					profileEdit->setToolTip(
-						QString("Profile loaded successfully: %1").arg(fileInfo.fileName()));
-					scopy::StatusBarManager::pushMessage(
-						QString("Profile loaded: %1").arg(fileInfo.fileName()), 3000);
-					qInfo(CAT_PROFILEMANAGER) << "Profile loaded successfully:" << filename;
-				} else {
-					QString errorMsg = QString("Failed to load profile from: %1").arg(filename);
-					Q_EMIT profileError(errorMsg);
-					qWarning(CAT_PROFILEMANAGER) << errorMsg;
-					scopy::StatusBarManager::pushMessage(errorMsg, 5000);
-
-					// Additional feedback
-					QLineEdit *profileEdit = m_profileFileBrowser->lineEdit();
-					profileEdit->setToolTip(errorMsg);
-				}
-			},
-			Qt::QueuedConnection);
-
-		return success;
-	});
+		QFileInfo fileInfo(filename);
+		profileEdit->setToolTip(QString("Profile loaded successfully: %1").arg(fileInfo.fileName()));
+		scopy::StatusBarManager::pushMessage(QString("Profile loaded: %1").arg(fileInfo.fileName()), 3000);
+		qInfo(CAT_PROFILEMANAGER) << "Profile loaded successfully:" << filename;
+	} else {
+		QString errorMsg = QString("Failed to load profile from: %1").arg(filename);
+		Q_EMIT profileError(errorMsg);
+		qWarning(CAT_PROFILEMANAGER) << errorMsg;
+		scopy::StatusBarManager::pushMessage(errorMsg, 5000);
+		profileEdit->setToolTip(errorMsg);
+	}
 }
 
-void ProfileManager::onStreamFileChanged()
+QCoro::Task<void> ProfileManager::onStreamFileChanged()
 {
 	if(!m_streamFileBrowser || !m_streamFileBrowser->lineEdit()) {
-		return;
+		co_return;
 	}
 
 	QString filename = m_streamFileBrowser->lineEdit()->text();
 	if(filename.isEmpty() || filename == "(None)") {
-		return;
+		co_return;
 	}
 
-	// Execute heavy work with progress indication
-	executeWithProgress(false, [this, filename]() -> bool {
-		// Move existing load logic to worker thread
-		bool success = loadStreamFromFile(filename);
+	// Non-blocking load on the main thread with progress indication
+	updateStreamStatus(ProgressBarState::BUSY);
+	bool success = co_await loadStreamFromFile(filename);
+	updateStreamStatus(success ? ProgressBarState::SUCCESS : ProgressBarState::ERROR);
 
-		// UI feedback via main thread
-		QMetaObject::invokeMethod(
-			this,
-			[this, success, filename]() {
-				if(success) {
-					m_currentStreamPath = filename;
-					Q_EMIT streamLoaded(filename);
-					updateStatus();
+	QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
+	if(success) {
+		m_currentStreamPath = filename;
+		Q_EMIT streamLoaded(filename);
+		updateStatus();
 
-					// Additional feedback
-					QFileInfo fileInfo(filename);
-					QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
-					streamEdit->setToolTip(
-						QString("Stream loaded successfully: %1").arg(fileInfo.fileName()));
-					scopy::StatusBarManager::pushMessage(
-						QString("Stream loaded: %1").arg(fileInfo.fileName()), 3000);
-					qInfo(CAT_PROFILEMANAGER) << "Stream loaded successfully:" << filename;
-				} else {
-					QString errorMsg = QString("Failed to load stream from: %1").arg(filename);
-					Q_EMIT streamError(errorMsg);
-					qWarning(CAT_PROFILEMANAGER) << errorMsg;
-					scopy::StatusBarManager::pushMessage(errorMsg, 5000);
-
-					// Additional feedback
-					QLineEdit *streamEdit = m_streamFileBrowser->lineEdit();
-					streamEdit->setToolTip(errorMsg);
-				}
-			},
-			Qt::QueuedConnection);
-
-		return success;
-	});
+		QFileInfo fileInfo(filename);
+		streamEdit->setToolTip(QString("Stream loaded successfully: %1").arg(fileInfo.fileName()));
+		scopy::StatusBarManager::pushMessage(QString("Stream loaded: %1").arg(fileInfo.fileName()), 3000);
+		qInfo(CAT_PROFILEMANAGER) << "Stream loaded successfully:" << filename;
+	} else {
+		QString errorMsg = QString("Failed to load stream from: %1").arg(filename);
+		Q_EMIT streamError(errorMsg);
+		qWarning(CAT_PROFILEMANAGER) << errorMsg;
+		scopy::StatusBarManager::pushMessage(errorMsg, 5000);
+		streamEdit->setToolTip(errorMsg);
+	}
 }
 
 void ProfileManager::updateStatus()
@@ -341,18 +312,18 @@ void ProfileManager::updateStatus()
 	}
 }
 
-bool ProfileManager::loadProfileFromFile(const QString &filename)
+QCoro::Task<bool> ProfileManager::loadProfileFromFile(QString filename)
 {
 	if(!m_device) {
 		qWarning(CAT_PROFILEMANAGER) << "No device available for profile loading";
-		return false;
+		co_return false;
 	}
 
 	// Read file content
 	QFile file(filename);
 	if(!file.open(QIODevice::ReadOnly)) {
 		qWarning(CAT_PROFILEMANAGER) << "Failed to open profile file:" << filename;
-		return false;
+		co_return false;
 	}
 
 	QByteArray profileData = file.readAll();
@@ -360,32 +331,32 @@ bool ProfileManager::loadProfileFromFile(const QString &filename)
 
 	if(profileData.isEmpty()) {
 		qWarning(CAT_PROFILEMANAGER) << "Profile file is empty:" << filename;
-		return false;
+		co_return false;
 	}
 
 	// Write to device attribute
-	bool success = writeDeviceAttribute("profile_config", profileData);
+	bool success = co_await writeDeviceAttribute("profile_config", profileData);
 	if(success) {
 		qDebug(CAT_PROFILEMANAGER) << "Profile data written to device successfully";
 	} else {
 		qWarning(CAT_PROFILEMANAGER) << "Failed to write profile data to device";
 	}
 
-	return success;
+	co_return success;
 }
 
-bool ProfileManager::loadStreamFromFile(const QString &filename)
+QCoro::Task<bool> ProfileManager::loadStreamFromFile(QString filename)
 {
 	if(!m_device) {
 		qWarning(CAT_PROFILEMANAGER) << "No device available for stream loading";
-		return false;
+		co_return false;
 	}
 
 	// Read file content - ensure binary mode for .stream files
 	QFile file(filename);
 	if(!file.open(QIODevice::ReadOnly)) {
 		qWarning(CAT_PROFILEMANAGER) << "Failed to open stream file:" << filename;
-		return false;
+		co_return false;
 	}
 
 	QByteArray streamData = file.readAll();
@@ -393,58 +364,68 @@ bool ProfileManager::loadStreamFromFile(const QString &filename)
 
 	if(streamData.isEmpty()) {
 		qWarning(CAT_PROFILEMANAGER) << "Stream file is empty:" << filename;
-		return false;
+		co_return false;
 	}
 
 	// Write to device attribute
-	bool success = writeDeviceAttribute("stream_config", streamData);
+	bool success = co_await writeDeviceAttribute("stream_config", streamData);
 	if(success) {
 		qDebug(CAT_PROFILEMANAGER) << "Stream data written to device successfully";
 	} else {
 		qWarning(CAT_PROFILEMANAGER) << "Failed to write stream data to device";
 	}
 
-	return success;
+	co_return success;
 }
 
-QString ProfileManager::readDeviceAttribute(const QString &attributeName)
+QString ProfileManager::readDeviceAttribute(const QString &attributeName, size_t bytes)
 {
 	if(!m_device) {
 		return QString();
 	}
 
-	char buffer[1024];
-	int ret = iio_device_attr_read(m_device, attributeName.toLocal8Bit().data(), buffer, sizeof(buffer));
-
-	if(ret > 0) {
-		return QString::fromLocal8Bit(buffer, ret).trimmed();
-	} else {
-		qDebug(CAT_PROFILEMANAGER) << "Failed to read device attribute:" << attributeName << "ret:" << ret;
-		return QString();
-	}
+	return componentRead(attributeName, bytes);
 }
 
-bool ProfileManager::writeDeviceAttribute(const QString &attributeName, const QByteArray &data)
+QCoro::Task<bool> ProfileManager::writeDeviceAttribute(QString attributeName, QByteArray data)
 {
 	if(!m_device) {
 		qWarning(CAT_PROFILEMANAGER) << "No device available for writing attribute:" << attributeName;
-		return false;
+		co_return false;
 	}
 
-	// Follow the original iio-oscilloscope pattern for error checking
-	int ret =
-		iio_device_attr_write_raw(m_device, attributeName.toLocal8Bit().data(), data.constData(), data.size());
-
-	if(ret < 0) {
-		// Negative return value indicates an error
-		qWarning(CAT_PROFILEMANAGER) << "Failed to write attribute:" << attributeName << "error code:" << ret;
-		return false;
+	bool success = co_await componentWrite(attributeName, data);
+	if(success) {
+		qDebug(CAT_PROFILEMANAGER)
+			<< "Successfully wrote" << data.size() << "bytes to attribute:" << attributeName;
 	} else {
-		// Positive return value indicates success (bytes written)
-		qDebug(CAT_PROFILEMANAGER) << "Successfully wrote" << ret << "bytes to attribute:" << attributeName
-					   << "(expected:" << data.size() << ")";
-		return true;
+		qWarning(CAT_PROFILEMANAGER) << "Failed to write attribute:" << attributeName;
 	}
+	co_return success;
+}
+
+QString ProfileManager::componentRead(const QString &attributeName, size_t bytes)
+{
+	component::Attribute *a = component::attributeByName(m_device, attributeName);
+	if(a && a->readCapability()) {
+		auto res = QCoro::waitFor(a->readCapability()->readAsync(bytes));
+		if(res) {
+			return a->cachedValue().trimmed();
+		}
+	}
+
+	qDebug(CAT_PROFILEMANAGER) << "Failed to read device attribute:" << attributeName;
+	return QString();
+}
+
+QCoro::Task<bool> ProfileManager::componentWrite(QString attributeName, QByteArray data)
+{
+	component::Attribute *a = component::attributeByName(m_device, attributeName);
+	if(!a || !a->writeCapability())
+		co_return false;
+
+	auto res = co_await a->writeCapability()->writeAsync(QString::fromUtf8(data));
+	co_return(bool) res;
 }
 
 void ProfileManager::updateProfileStatus(ProgressBarState status)
@@ -473,34 +454,4 @@ void ProfileManager::updateStreamStatus(ProgressBarState status)
 		m_streamProgressBar->startProgress();
 		m_streamProgressBar->setBarColor(Style::getAttribute(json::theme::content_busy));
 	}
-}
-
-void ProfileManager::executeWithProgress(bool isProfile, std::function<bool()> work)
-{
-	// Set progress bar to BUSY state (equivalent to startAnimation)
-	if(isProfile) {
-		updateProfileStatus(ProgressBarState::BUSY);
-	} else {
-		updateStreamStatus(ProgressBarState::BUSY);
-	}
-
-	QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
-	connect(
-		watcher, &QFutureWatcher<bool>::finished, this,
-		[this, watcher, isProfile]() {
-			bool success = watcher->result();
-
-			// Set progress bar to final state (equivalent to stopAnimation)
-			if(isProfile) {
-				updateProfileStatus(success ? ProgressBarState::SUCCESS : ProgressBarState::ERROR);
-			} else {
-				updateStreamStatus(success ? ProgressBarState::SUCCESS : ProgressBarState::ERROR);
-			}
-
-			watcher->deleteLater();
-		},
-		Qt::QueuedConnection);
-
-	QFuture<bool> future = QtConcurrent::run([work]() { return work(); });
-	watcher->setFuture(future);
 }

@@ -24,26 +24,28 @@
 
 #include <QWidget>
 #include <QBoxLayout>
-#include <iio.h>
 #include <QCheckBox>
 #include <QProgressBar>
 #include <QPushButton>
 
 namespace scopy {
+namespace component {
+class Context;
+} // namespace component
 class IIOWidgetGroup;
 namespace ad936x {
 class Fmcomms5Tab : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Fmcomms5Tab(iio_context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit Fmcomms5Tab(component::Context *ctx, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Fmcomms5Tab();
 
 Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_context *m_ctx;
+	component::Context *m_ctx;
 	IIOWidgetGroup *m_group = nullptr;
 	QVBoxLayout *m_layout;
 	QProgressBar *m_calibProgressBar;

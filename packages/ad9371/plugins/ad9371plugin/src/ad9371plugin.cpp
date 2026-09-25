@@ -23,14 +23,17 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
-#include <iio.h>
 #include <ad9371.h>
 #include <ad9371advanced.h>
 #include <style.h>
 #include <gui/deviceiconbuilder.h>
 #include <iio-widgets/iiowidgetgroup.h>
 
-#include <iioutil/connectionprovider.h>
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
 #include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371PLUGIN, "Ad9371Plugin")
@@ -38,16 +41,15 @@ using namespace scopy::ad9371;
 
 bool Ad9371Plugin::compatible(QString m_param, QString category)
 {
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qWarning(CAT_AD9371PLUGIN) << "Failed to open connection";
 		return false;
 	}
 
 	// AD9371 requires ad9371-phy AND excludes ad9371-phy-B (dual-chip variant)
-	iio_device *device = iio_context_find_device(conn->context(), "ad9371-phy");
-	iio_device *deviceB = iio_context_find_device(conn->context(), "ad9371-phy-B");
+	component::Device *device = ctx->findChild<component::Device *>("ad9371-phy", Qt::FindDirectChildrenOnly);
+	component::Device *deviceB = ctx->findChild<component::Device *>("ad9371-phy-B", Qt::FindDirectChildrenOnly);
 	bool compatible = (device != nullptr) && (deviceB == nullptr);
 
 	if(compatible) {
@@ -56,7 +58,6 @@ bool Ad9371Plugin::compatible(QString m_param, QString category)
 		qDebug(CAT_AD9371PLUGIN) << "AD9371 device not found or dual-chip detected, plugin not compatible";
 	}
 
-	cp->close(m_param);
 	return compatible;
 }
 
@@ -93,31 +94,30 @@ QString Ad9371Plugin::description() { return "AD9371 RF Transceiver control and 
 
 bool Ad9371Plugin::onConnect()
 {
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		qWarning(CAT_AD9371PLUGIN) << "Failed to open connection for tool initialization";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	// Create basic AD9371 tool with IIO context
-	m_ad9371Tool = new Ad9371(conn->context(), m_widgetGroup);
+	// Create basic AD9371 tool with component context
+	m_ad9371Tool = new Ad9371(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(m_ad9371Tool);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
 	// Create AD9371 Advanced tool
-	iio_device *device = iio_context_find_device(conn->context(), "ad9371-phy");
+	component::Device *device = m_context->findChild<component::Device *>("ad9371-phy", Qt::FindDirectChildrenOnly);
 
 	// Detect AD9375 and rename tools accordingly
-	if(device && iio_device_find_debug_attr(device, "adi,dpd-model-version")) {
+	if(device && component::attributeByName(device, "adi,dpd-model-version")) {
 		m_toolList[0]->setName("ADRV9375");
 		m_toolList[1]->setName("ADRV9375 Advanced");
 	}
 
-	if(device && iio_device_get_debug_attrs_count(device) > 0) {
+	if(device && component::attributeByName(device, "adi,default-initial-calibrations-mask")) {
 		Ad9371Advanced *ad9371Advanced = new Ad9371Advanced(device, m_widgetGroup);
 		m_toolList[1]->setTool(ad9371Advanced);
 		m_toolList[1]->setEnabled(true);
@@ -154,8 +154,7 @@ bool Ad9371Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
+	m_context = {};
 
 	qDebug(CAT_AD9371PLUGIN) << "AD9371 plugin disconnected successfully";
 	return true;

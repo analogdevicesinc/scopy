@@ -24,13 +24,15 @@
 #include "scopy-ad9371plugin_export.h"
 #include <QWidget>
 #include <QVBoxLayout>
-#include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidget.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
 }
+} // namespace scopy
 
 namespace scopy::ad9371 {
 
@@ -39,7 +41,8 @@ class SCOPY_AD9371PLUGIN_EXPORT RxSettingsWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit RxSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit RxSettingsWidget(component::Device *device, IIOWidgetGroup *group = nullptr,
+				  QWidget *parent = nullptr);
 	~RxSettingsWidget();
 
 Q_SIGNALS:
@@ -50,7 +53,7 @@ private:
 	QWidget *createRxSettingsSection(QWidget *parent);
 	QWidget *createRxProfileSection(QWidget *parent);
 
-	iio_device *m_device;
+	component::Device *m_device;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 

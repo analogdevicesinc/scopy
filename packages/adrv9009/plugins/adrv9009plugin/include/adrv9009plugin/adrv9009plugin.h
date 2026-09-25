@@ -27,13 +27,14 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-
-// Forward declaration for IIO types
-struct iio_device;
+#include <component/controller.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
 }
+} // namespace scopy
 
 namespace scopy::adrv9009 {
 
@@ -62,10 +63,11 @@ public Q_SLOTS:
 private:
 	void initApi();
 	QString generateAdvancedToolName(const char *deviceName);
-	void createAdditionalAdvancedTool(iio_device *device, const char *deviceName);
+	void createAdditionalAdvancedTool(component::Device *device, const char *deviceName);
 
 	Adrv9009Plugin_API *m_api = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
+	component::ContextHandle m_context;
 };
 } // namespace scopy::adrv9009
 #endif // ADRV9009PLUGIN_H

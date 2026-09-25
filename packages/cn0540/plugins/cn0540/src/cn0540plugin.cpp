@@ -23,11 +23,13 @@
 #include "cn0540_api.h"
 
 #include <QLoggingCategory>
-#include <iio.h>
 
-#include <iioutil/connectionprovider.h>
 #include <pluginbase/scopyjs.h>
 #include <style.h>
+
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_CN0540PLUGIN, "CN0540Plugin")
 
@@ -35,22 +37,19 @@ using namespace scopy::cn0540;
 
 bool CN0540Plugin::compatible(QString m_param, QString category)
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-
-	if(!conn) {
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
 		qDebug(CAT_CN0540PLUGIN) << "No context available for CN0540";
 		return false;
 	}
 
-	iio_context *ctx = conn->context();
-	bool ret = iio_context_find_device(ctx, "ad7768-1") && iio_context_find_device(ctx, "ltc2606") &&
-		iio_context_find_device(ctx, "one-bit-adc-dac");
+	bool ret = ctx->findChild<component::Device *>("ad7768-1", Qt::FindDirectChildrenOnly) &&
+		ctx->findChild<component::Device *>("ltc2606", Qt::FindDirectChildrenOnly) &&
+		ctx->findChild<component::Device *>("one-bit-adc-dac", Qt::FindDirectChildrenOnly);
 
 	if(ret)
 		qDebug(CAT_CN0540PLUGIN) << "Found CN0540 devices";
 
-	cp->close(m_param);
 	return ret;
 }
 
@@ -80,16 +79,14 @@ QString CN0540Plugin::displayName() { return "CN0540"; }
 
 bool CN0540Plugin::onConnect()
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-
-	if(!conn) {
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
 		qWarning(CAT_CN0540PLUGIN) << "No context available for CN0540";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
-	CN0540 *tool = new CN0540(conn->context(), m_widgetGroup);
+	CN0540 *tool = new CN0540(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(tool);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -128,8 +125,7 @@ bool CN0540Plugin::onDisconnect()
 	delete m_widgetGroup;
 	m_widgetGroup = nullptr;
 
-	auto &&cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
+	m_context = {};
 	return true;
 }
 

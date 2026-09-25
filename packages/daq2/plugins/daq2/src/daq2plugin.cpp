@@ -28,9 +28,12 @@
 #include <QLoggingCategory>
 #include <deviceiconbuilder.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iioutil/connectionprovider.h>
 #include <pluginbase/scopyjs.h>
 #include <style.h>
+
+#include <component/controller.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_DAQ2PLUGIN, "Daq2Plugin")
 using namespace scopy::daq2;
@@ -38,18 +41,15 @@ using namespace scopy::daq2;
 bool Daq2Plugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_DAQ2PLUGIN) << "Check DAQ2 compatibility";
-	Connection *conn = ConnectionProvider::open(m_param);
+	component::ContextHandle ctx = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!ctx) {
 		qWarning(CAT_DAQ2PLUGIN) << "No context available for DAQ2";
 		return false;
 	}
 
-	iio_context *ctx = conn->context();
-	bool adcFound = iio_context_find_device(ctx, "axi-ad9680-hpc") != nullptr;
-	bool dacFound = iio_context_find_device(ctx, "axi-ad9144-hpc") != nullptr;
-
-	ConnectionProvider::close(m_param);
+	bool adcFound = ctx->findChild<component::Device *>("axi-ad9680-hpc", Qt::FindDirectChildrenOnly) != nullptr;
+	bool dacFound = ctx->findChild<component::Device *>("axi-ad9144-hpc", Qt::FindDirectChildrenOnly) != nullptr;
 
 	return adcFound && dacFound;
 }
@@ -87,16 +87,16 @@ QString Daq2Plugin::displayName() { return DAQ2_PLUGIN_DISPLAY_NAME; }
 
 bool Daq2Plugin::onConnect()
 {
-	Connection *conn = ConnectionProvider::open(m_param);
+	m_context = component::Controller::context(m_param);
 
-	if(!conn) {
+	if(!m_context) {
 		qWarning(CAT_DAQ2PLUGIN) << "No context available for DAQ2";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	DAQ2 *daq2 = new DAQ2(conn->context(), m_widgetGroup);
+	DAQ2 *daq2 = new DAQ2(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(daq2);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(false);
@@ -135,7 +135,7 @@ bool Daq2Plugin::onDisconnect()
 		m_widgetGroup = nullptr;
 	}
 
-	ConnectionProvider::close(m_param);
+	m_context = {};
 	return true;
 }
 

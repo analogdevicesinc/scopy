@@ -25,53 +25,59 @@
 #include <iio-widgets/iiowidget.h>
 #include <QString>
 #include <QWidget>
-#include <iio.h>
 
-namespace scopy::ad9371 {
+namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
+
+namespace ad9371 {
 
 class SCOPY_AD9371PLUGIN_EXPORT Ad9371WidgetFactory
 {
 public:
 	// Device attribute widgets
-	static IIOWidget *createSpinboxWidget(iio_device *device, QString attr, QString title,
+	static IIOWidget *createSpinboxWidget(component::Device *device, QString attr, QString title,
 					      QWidget *parent = nullptr);
-	static IIOWidget *createCheckboxWidget(iio_device *device, QString attr, QString title,
+	static IIOWidget *createCheckboxWidget(component::Device *device, QString attr, QString title,
 					       QWidget *parent = nullptr);
-	static IIOWidget *createComboWidget(iio_device *device, QString attr, QString availableAttr, QString title,
-					    QWidget *parent = nullptr);
-	static IIOWidget *createCustomComboWidget(iio_device *device, QString attr,
+	static IIOWidget *createComboWidget(component::Device *device, QString attr, QString availableAttr,
+					    QString title, QWidget *parent = nullptr);
+	static IIOWidget *createCustomComboWidget(component::Device *device, QString attr,
 						  const QMap<QString, QString> &optionsMap, QString title,
 						  QWidget *parent = nullptr);
-	static IIOWidget *createRangeWidget(iio_device *device, QString attr, QString range, QString title,
+	static IIOWidget *createRangeWidget(component::Device *device, QString attr, QString range, QString title,
 					    QWidget *parent = nullptr);
-	static IIOWidget *createReadOnlyWidget(iio_device *device, QString attr, QString title, bool compactMode = true,
-					       QWidget *parent = nullptr);
+	static IIOWidget *createReadOnlyWidget(component::Device *device, QString attr, QString title,
+					       bool compactMode = true, QWidget *parent = nullptr);
 
 	// Channel attribute widgets
-	static IIOWidget *createSpinboxWidget(iio_channel *channel, QString attr, QString title,
+	static IIOWidget *createSpinboxWidget(component::Channel *channel, QString attr, QString title,
 					      QWidget *parent = nullptr);
-	static IIOWidget *createCheckboxWidget(iio_channel *channel, QString attr, QString title,
+	static IIOWidget *createCheckboxWidget(component::Channel *channel, QString attr, QString title,
 					       QWidget *parent = nullptr);
-	static IIOWidget *createComboWidget(iio_channel *channel, QString attr, QString availableAttr, QString title,
+	static IIOWidget *createComboWidget(component::Channel *channel, QString attr, QString availableAttr,
+					    QString title, QWidget *parent = nullptr);
+	static IIOWidget *createRangeWidget(component::Channel *channel, QString attr, QString range, QString title,
 					    QWidget *parent = nullptr);
-	static IIOWidget *createRangeWidget(iio_channel *channel, QString attr, QString range, QString title,
-					    QWidget *parent = nullptr);
-	static IIOWidget *createReadOnlyWidget(iio_channel *channel, QString attr, QString title,
+	static IIOWidget *createReadOnlyWidget(component::Channel *channel, QString attr, QString title,
 					       bool compactMode = true, QWidget *parent = nullptr);
 
 	// Debug attribute widgets (for advanced plugin features)
-	static IIOWidget *createDebugRangeWidget(iio_device *device, QString attr, QString range, QString title,
+	static IIOWidget *createDebugRangeWidget(component::Device *device, QString attr, QString range, QString title,
 						 QWidget *parent = nullptr);
-	static IIOWidget *createDebugCustomComboWidget(iio_device *device, QString attr,
+	static IIOWidget *createDebugCustomComboWidget(component::Device *device, QString attr,
 						       const QMap<QString, QString> &optionsMap, QString title,
 						       QWidget *parent = nullptr);
-	static IIOWidget *createDebugCheckboxWidget(iio_device *device, QString attr, QString title,
+	static IIOWidget *createDebugCheckboxWidget(component::Device *device, QString attr, QString title,
 						    QWidget *parent = nullptr);
 
 private:
 	Ad9371WidgetFactory() = delete; // Static class, no instances
 };
 
-} // namespace scopy::ad9371
+} // namespace ad9371
+} // namespace scopy
 
 #endif // AD9371WIDGETFACTORY_H

@@ -23,10 +23,13 @@
 
 #include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
-#include <iio.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <iio-widgets/iiowidgetgroup.h>
 #include <menuonoffswitch.h>
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy {
 namespace adrv9009 {
@@ -36,7 +39,8 @@ class SCOPY_ADRV9009PLUGIN_EXPORT JesdSettingsWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit JesdSettingsWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	explicit JesdSettingsWidget(component::Device *device, IIOWidgetGroup *group = nullptr,
+				    QWidget *parent = nullptr);
 	~JesdSettingsWidget();
 
 Q_SIGNALS:
@@ -46,7 +50,7 @@ private:
 	void setupUi();
 	QWidget *createLaneCheckboxGroup(const QString &groupLabel, const QString &baseAttr, QWidget *parent);
 
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 };
 

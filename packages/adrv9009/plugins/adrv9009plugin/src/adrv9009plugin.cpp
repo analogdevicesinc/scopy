@@ -23,7 +23,6 @@
 
 #include <QLoggingCategory>
 #include <QLabel>
-#include <iio.h>
 #include <adrv9009.h>
 #include <adrv9009advanced.h>
 #include <style.h>
@@ -31,9 +30,10 @@
 
 #include <style.h>
 #include <gui/deviceiconbuilder.h>
-#include <iioutil/connectionprovider.h>
 #include <pluginbase/scopyjs.h>
 #include <iio-widgets/iiowidgetgroup.h>
+#include <component/context.h>
+#include <component/device.h>
 
 Q_LOGGING_CATEGORY(CAT_ADRV9009PLUGIN, "Adrv9009Plugin")
 using namespace scopy::adrv9009;
@@ -41,15 +41,14 @@ using namespace scopy::adrv9009;
 bool Adrv9009Plugin::compatible(QString m_param, QString category)
 {
 	// Check for adrv9009-phy device family
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
-		qWarning(CAT_ADRV9009PLUGIN) << "Failed to open connection";
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	if(!ctx) {
+		qWarning(CAT_ADRV9009PLUGIN) << "The context is not compatible with the Adrv9009Plugin!";
 		return false;
 	}
 
 	// Look for ADRV9009 PHY device
-	iio_device *device = iio_context_find_device(conn->context(), "adrv9009-phy");
+	component::Device *device = ctx->findChild<component::Device *>("adrv9009-phy", Qt::FindDirectChildrenOnly);
 	bool compatible = (device != nullptr);
 
 	if(compatible) {
@@ -58,7 +57,6 @@ bool Adrv9009Plugin::compatible(QString m_param, QString category)
 		qDebug(CAT_ADRV9009PLUGIN) << "ADRV9009 device not found, plugin not compatible";
 	}
 
-	cp->close(m_param);
 	return compatible;
 }
 
@@ -139,7 +137,7 @@ QString Adrv9009Plugin::generateAdvancedToolName(const char *deviceName)
 	}
 }
 
-void Adrv9009Plugin::createAdditionalAdvancedTool(iio_device *device, const char *deviceName)
+void Adrv9009Plugin::createAdditionalAdvancedTool(component::Device *device, const char *deviceName)
 {
 	// Generate the tool name
 	QString advancedToolName = generateAdvancedToolName(deviceName);
@@ -166,32 +164,30 @@ void Adrv9009Plugin::createAdditionalAdvancedTool(iio_device *device, const char
 
 bool Adrv9009Plugin::onConnect()
 {
-	// Open connection and pass context to tool
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_param);
-	if(!conn) {
-		qWarning(CAT_ADRV9009PLUGIN) << "Failed to open connection for tool initialization";
+	// Acquire the already-connected device-controller context and pass it to the tools.
+	m_context = component::Controller::context(m_param);
+	if(!m_context) {
+		qWarning(CAT_ADRV9009PLUGIN) << "The context couldnt be found!";
 		return false;
 	}
 
 	m_widgetGroup = new IIOWidgetGroup(this);
 
-	// Create basic ADRV9009 tool with IIO context
-	Adrv9009 *adrv9009 = new Adrv9009(conn->context(), m_widgetGroup);
+	// Create basic ADRV9009 tool with the component-tree context
+	Adrv9009 *adrv9009 = new Adrv9009(m_context.get(), m_widgetGroup);
 	m_toolList[0]->setTool(adrv9009);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
 	// Iterate through devices to set up ADRV9009 Advanced tools
-	iio_context *ctx = conn->context();
-	unsigned int deviceCount = iio_context_get_devices_count(ctx);
+	const QList<component::Device *> devices =
+		m_context->findChildren<component::Device *>(Qt::FindDirectChildrenOnly);
 	bool first = true;
 
-	for(unsigned int i = 0; i < deviceCount; i++) {
-		iio_device *device = iio_context_get_device(ctx, i);
-		const char *deviceName = iio_device_get_name(device);
+	for(component::Device *device : devices) {
+		const QString deviceName = device->name();
 
-		if(deviceName && QString(deviceName).startsWith("adrv9009-phy")) {
+		if(deviceName.startsWith("adrv9009-phy")) {
 			if(first) {
 				// Set up existing "ADRV9009 Advanced" tool (m_toolList[1])
 				Adrv9009Advanced *adrv9009Advanced = new Adrv9009Advanced(device, m_widgetGroup);
@@ -203,7 +199,7 @@ bool Adrv9009Plugin::onConnect()
 					<< "Set up ADRV9009 Advanced for first device:" << deviceName;
 				first = false;
 			} else {
-				createAdditionalAdvancedTool(device, deviceName);
+				createAdditionalAdvancedTool(device, qUtf8Printable(deviceName));
 			}
 		}
 	}
@@ -249,9 +245,8 @@ bool Adrv9009Plugin::onDisconnect()
 	}
 	Q_EMIT toolListChanged();
 
-	// Close connection
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	cp->close(m_param);
+	// Release the context handle (decrements the shared refcount)
+	m_context = {};
 
 	qDebug(CAT_ADRV9009PLUGIN) << "ADRV9009 plugin disconnected successfully";
 	return true;

@@ -21,6 +21,7 @@
 #include "advanced/txsettingswidget.h"
 #include <iio-widgets/iiowidgetgroup.h>
 #include "adrv9009widgetfactory.h"
+#include <component/device.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -35,7 +36,7 @@ Q_LOGGING_CATEGORY(CAT_TXSETTINGS, "TXSettings")
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-TxSettingsWidget::TxSettingsWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+TxSettingsWidget::TxSettingsWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)

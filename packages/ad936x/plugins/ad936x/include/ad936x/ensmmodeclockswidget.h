@@ -24,9 +24,11 @@
 
 #include <QBoxLayout>
 #include <QWidget>
-#include <iio.h>
 
 namespace scopy {
+namespace component {
+class Device;
+}
 class IIOWidgetGroup;
 namespace ad936x {
 
@@ -34,7 +36,7 @@ class EnsmModeClocksWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit EnsmModeClocksWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	explicit EnsmModeClocksWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~EnsmModeClocksWidget();
 
 Q_SIGNALS:
@@ -42,7 +44,7 @@ Q_SIGNALS:
 
 private:
 	QVBoxLayout *m_layout;
-	iio_device *m_device = nullptr;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_group = nullptr;
 	QWidget *generateEnsmModeWidget(QWidget *parent);
 	QWidget *generateModeWidget(QWidget *parent);

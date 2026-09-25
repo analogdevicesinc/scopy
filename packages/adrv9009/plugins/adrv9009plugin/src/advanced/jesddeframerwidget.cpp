@@ -29,14 +29,17 @@
 #include <QLoggingCategory>
 #include <style.h>
 #include <gui/widgets/menusectionwidget.h>
-#include <iio.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcoro/qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_JESDDEFRAMER, "JesdDeframer")
 
 using namespace scopy;
 using namespace scopy::adrv9009;
 
-JesdDeframerWidget::JesdDeframerWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+JesdDeframerWidget::JesdDeframerWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -197,7 +200,12 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 		if(lane3->onOffswitch()->isChecked())
 			bitmask |= (1 << 3);
 		QString value = QString::number(bitmask);
-		iio_device_debug_attr_write(m_device, baseAttr.toUtf8().constData(), value.toUtf8().constData());
+		component::Attribute *a = component::attributeByName(m_device, baseAttr);
+		if(a && a->writeCapability()) {
+			QCoro::waitFor(a->writeCapability()->writeAsync(value));
+		} else {
+			qWarning(CAT_JESDDEFRAMER) << "Failed to resolve" << baseAttr << "for write";
+		}
 	};
 
 	// Connect each switch to update function
@@ -208,11 +216,13 @@ QWidget *JesdDeframerWidget::createDeframerColumn(const QString &columnType, con
 
 	// Function to read from hardware and set switches
 	auto readFromHardware = [this, baseAttr, lane0, lane1, lane2, lane3]() {
-		char value[16];
-		int ret = iio_device_debug_attr_read(m_device, baseAttr.toUtf8().constData(), value, sizeof(value));
-		if(ret < 0)
+		component::Attribute *a = component::attributeByName(m_device, baseAttr);
+		if(!a || !a->readCapability())
 			return;
-		int bitmask = QString(value).toInt();
+		auto res = QCoro::waitFor(a->readCapability()->readAsync());
+		if(!res)
+			return;
+		int bitmask = a->cachedValue().toInt();
 		lane0->onOffswitch()->setChecked((bitmask & (1 << 0)) != 0);
 		lane1->onOffswitch()->setChecked((bitmask & (1 << 1)) != 0);
 		lane2->onOffswitch()->setChecked((bitmask & (1 << 2)) != 0);

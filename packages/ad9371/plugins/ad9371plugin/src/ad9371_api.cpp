@@ -25,17 +25,63 @@
 #include "ad9371advanced.h"
 #include <pluginbase/toolmenuentry.h>
 #include <iio-widgets/iiowidgetgroup.h>
-#include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
 #include <QMetaObject>
-#include <iio.h>
 #include <cmath>
 #include <QDir>
 #include <pkg-manager/pkgmanager.h>
 
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
+
 Q_LOGGING_CATEGORY(CAT_AD9371_API, "AD9371_API")
 
+using namespace scopy;
 using namespace scopy::ad9371;
+
+namespace {
+// Read a boolean device attribute through the component tree; returns "1"/"0" or empty on failure.
+QString readDevBool(component::Device *dev, const char *attr)
+{
+	component::Attribute *a = component::attributeByName(dev, attr);
+	if(!a || !a->readCapability())
+		return QString();
+	auto res = QCoro::waitFor(a->readCapability()->readAsync());
+	if(!res)
+		return QString();
+	return QString::number(a->cachedValue().trimmed().toInt() != 0 ? 1 : 0);
+}
+
+void writeDevBool(component::Device *dev, const char *attr, bool value)
+{
+	component::Attribute *a = component::attributeByName(dev, attr);
+	if(a && a->writeCapability())
+		QCoro::waitFor(a->writeCapability()->writeAsync(value ? "1" : "0"));
+}
+
+// Read a double channel attribute; returns false on failure.
+bool readChanDouble(component::Channel *ch, const char *attr, double *out)
+{
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(!a || !a->readCapability())
+		return false;
+	auto res = QCoro::waitFor(a->readCapability()->readAsync());
+	if(!res)
+		return false;
+	*out = a->cachedValue().trimmed().toDouble();
+	return true;
+}
+
+void writeChanDouble(component::Channel *ch, const char *attr, double value)
+{
+	component::Attribute *a = component::attributeByName(ch, attr);
+	if(a && a->writeCapability())
+		QCoro::waitFor(a->writeCapability()->writeAsync(QString::number(value, 'f', 6)));
+}
+} // namespace
 
 static const char *dpd_status_strings[] = {
 	"No Error",
@@ -265,9 +311,7 @@ QString Ad9371_API::getCalibrateRxQecEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_rx_qec_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_rx_qec_en");
 }
 
 void Ad9371_API::setCalibrateRxQecEn(const QString &v)
@@ -275,7 +319,7 @@ void Ad9371_API::setCalibrateRxQecEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_rx_qec_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_rx_qec_en", v.toInt() != 0);
 }
 
 QString Ad9371_API::getCalibrateTxQecEn()
@@ -283,9 +327,7 @@ QString Ad9371_API::getCalibrateTxQecEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_tx_qec_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_tx_qec_en");
 }
 
 void Ad9371_API::setCalibrateTxQecEn(const QString &v)
@@ -293,7 +335,7 @@ void Ad9371_API::setCalibrateTxQecEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_tx_qec_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_tx_qec_en", v.toInt() != 0);
 }
 
 QString Ad9371_API::getCalibrateTxLolEn()
@@ -301,9 +343,7 @@ QString Ad9371_API::getCalibrateTxLolEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_tx_lol_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_tx_lol_en");
 }
 
 void Ad9371_API::setCalibrateTxLolEn(const QString &v)
@@ -311,7 +351,7 @@ void Ad9371_API::setCalibrateTxLolEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_tx_lol_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_tx_lol_en", v.toInt() != 0);
 }
 
 QString Ad9371_API::getCalibrateTxLolExtEn()
@@ -319,9 +359,7 @@ QString Ad9371_API::getCalibrateTxLolExtEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_tx_lol_ext_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_tx_lol_ext_en");
 }
 
 void Ad9371_API::setCalibrateTxLolExtEn(const QString &v)
@@ -329,7 +367,7 @@ void Ad9371_API::setCalibrateTxLolExtEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_tx_lol_ext_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_tx_lol_ext_en", v.toInt() != 0);
 }
 
 QString Ad9371_API::getCalibrateDpdEn()
@@ -337,9 +375,7 @@ QString Ad9371_API::getCalibrateDpdEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_dpd_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_dpd_en");
 }
 
 void Ad9371_API::setCalibrateDpdEn(const QString &v)
@@ -347,7 +383,7 @@ void Ad9371_API::setCalibrateDpdEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_dpd_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_dpd_en", v.toInt() != 0);
 }
 
 QString Ad9371_API::getCalibrateClgcEn()
@@ -355,9 +391,7 @@ QString Ad9371_API::getCalibrateClgcEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_clgc_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_clgc_en");
 }
 
 void Ad9371_API::setCalibrateClgcEn(const QString &v)
@@ -365,7 +399,7 @@ void Ad9371_API::setCalibrateClgcEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_clgc_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_clgc_en", v.toInt() != 0);
 }
 
 QString Ad9371_API::getCalibrateVswrEn()
@@ -373,9 +407,7 @@ QString Ad9371_API::getCalibrateVswrEn()
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return QString();
-	bool val;
-	int ret = iio_device_attr_read_bool(tool->m_dev, "calibrate_vswr_en", &val);
-	return (ret >= 0) ? QString::number(val ? 1 : 0) : QString();
+	return readDevBool(tool->m_dev, "calibrate_vswr_en");
 }
 
 void Ad9371_API::setCalibrateVswrEn(const QString &v)
@@ -383,26 +415,24 @@ void Ad9371_API::setCalibrateVswrEn(const QString &v)
 	Ad9371 *tool = m_plugin->m_ad9371Tool;
 	if(!tool || !tool->m_dev)
 		return;
-	iio_device_attr_write_bool(tool->m_dev, "calibrate_vswr_en", v.toInt() != 0);
+	writeDevBool(tool->m_dev, "calibrate_vswr_en", v.toInt() != 0);
 }
 
 bool Ad9371_API::calibrate()
 {
-	// Direct IIO write — no widget for write-only trigger
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_plugin->m_param);
-	if(!conn) {
-		qWarning(CAT_AD9371_API) << "Failed to open connection for calibrate";
-		return false;
-	}
-	iio_device *dev = iio_context_find_device(conn->context(), "ad9371-phy");
-	if(!dev) {
+	Ad9371 *tool = m_plugin->m_ad9371Tool;
+	if(!tool || !tool->m_dev) {
 		qWarning(CAT_AD9371_API) << "ad9371-phy device not found";
 		return false;
 	}
-	int ret = iio_device_attr_write_bool(dev, "calibrate", true);
-	if(ret < 0) {
-		qWarning(CAT_AD9371_API) << "Calibration failed:" << ret;
+	component::Attribute *a = component::attributeByName(tool->m_dev, "calibrate");
+	if(!a || !a->writeCapability()) {
+		qWarning(CAT_AD9371_API) << "calibrate attribute not found";
+		return false;
+	}
+	auto res = QCoro::waitFor(a->writeCapability()->writeAsync("1"));
+	if(!res) {
+		qWarning(CAT_AD9371_API) << "Calibration failed";
 		return false;
 	}
 	qDebug(CAT_AD9371_API) << "Calibration triggered";
@@ -603,23 +633,16 @@ void Ad9371_API::setDpdActuatorEn(int channel, const QString &val)
 
 void Ad9371_API::dpdReset(int channel)
 {
-	// Direct IIO write — dpd_reset_en is a write-only trigger
-	ConnectionProvider *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_plugin->m_param);
-	if(!conn) {
-		qWarning(CAT_AD9371_API) << "Failed to open connection for DPD reset";
-		return;
-	}
-	iio_device *dev = iio_context_find_device(conn->context(), "ad9371-phy");
-	if(!dev) {
+	Ad9371 *tool = m_plugin->m_ad9371Tool;
+	if(!tool || !tool->m_dev) {
 		qWarning(CAT_AD9371_API) << "ad9371-phy device not found";
 		return;
 	}
 	QString chn = (channel == 0) ? "voltage0" : "voltage1";
-	iio_channel *ch = iio_device_find_channel(dev, chn.toLatin1(), true);
-	if(ch) {
-		iio_channel_attr_write_bool(ch, "dpd_reset_en", true);
-	}
+	component::Channel *ch = component::channelById(tool->m_dev, chn, true);
+	component::Attribute *a = component::attributeByName(ch, "dpd_reset_en");
+	if(a && a->writeCapability())
+		QCoro::waitFor(a->writeCapability()->writeAsync("1"));
 }
 
 QString Ad9371_API::getDpdTrackCount(int channel) { return readFromWidget(txChannelKey(channel, "dpd_track_count")); }
@@ -974,17 +997,15 @@ QString Ad9371_API::getPhaseRotation(int channel)
 	QString i_ch = QString("voltage%1_i").arg(channel);
 	QString q_ch = QString("voltage%1_q").arg(channel);
 
-	iio_channel *i_chn = iio_device_find_channel(tool->m_cap, i_ch.toLatin1(), false);
-	iio_channel *q_chn = iio_device_find_channel(tool->m_cap, q_ch.toLatin1(), false);
+	component::Channel *i_chn = component::channelById(tool->m_cap, i_ch, false);
+	component::Channel *q_chn = component::channelById(tool->m_cap, q_ch, false);
 
 	if(!i_chn || !q_chn)
 		return QString();
 
 	double val[4];
-	if(iio_channel_attr_read_double(i_chn, "calibscale", &val[0]) != 0 ||
-	   iio_channel_attr_read_double(i_chn, "calibphase", &val[1]) != 0 ||
-	   iio_channel_attr_read_double(q_chn, "calibscale", &val[2]) != 0 ||
-	   iio_channel_attr_read_double(q_chn, "calibphase", &val[3]) != 0)
+	if(!readChanDouble(i_chn, "calibscale", &val[0]) || !readChanDouble(i_chn, "calibphase", &val[1]) ||
+	   !readChanDouble(q_chn, "calibscale", &val[2]) || !readChanDouble(q_chn, "calibphase", &val[3]))
 		return QString();
 
 	val[0] = acos(val[0]) * 360.0 / (2.0 * M_PI);
@@ -1035,14 +1056,14 @@ void Ad9371_API::setPhaseRotation(int channel, double degrees)
 	QString i_ch = QString("voltage%1_i").arg(channel);
 	QString q_ch = QString("voltage%1_q").arg(channel);
 
-	iio_channel *i_chn = iio_device_find_channel(tool->m_cap, i_ch.toLatin1(), false);
-	iio_channel *q_chn = iio_device_find_channel(tool->m_cap, q_ch.toLatin1(), false);
+	component::Channel *i_chn = component::channelById(tool->m_cap, i_ch, false);
+	component::Channel *q_chn = component::channelById(tool->m_cap, q_ch, false);
 
 	if(i_chn && q_chn) {
-		iio_channel_attr_write_double(i_chn, "calibscale", cos(phase));
-		iio_channel_attr_write_double(i_chn, "calibphase", -sin(phase));
-		iio_channel_attr_write_double(q_chn, "calibscale", cos(phase));
-		iio_channel_attr_write_double(q_chn, "calibphase", sin(phase));
+		writeChanDouble(i_chn, "calibscale", cos(phase));
+		writeChanDouble(i_chn, "calibphase", -sin(phase));
+		writeChanDouble(q_chn, "calibscale", cos(phase));
+		writeChanDouble(q_chn, "calibphase", sin(phase));
 	}
 }
 

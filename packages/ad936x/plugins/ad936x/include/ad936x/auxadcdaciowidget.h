@@ -24,19 +24,21 @@
 
 #include <QWidget>
 #include <QBoxLayout>
-#include <iio.h>
 #include <menuonoffswitch.h>
 #include <iiowidgetbuilder.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
+}
 namespace ad936x {
 
 class AuxAdcDacIoWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit AuxAdcDacIoWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
+	explicit AuxAdcDacIoWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent = nullptr);
 	~AuxAdcDacIoWidget();
 
 Q_SIGNALS:
@@ -44,7 +46,7 @@ Q_SIGNALS:
 
 private:
 	QVBoxLayout *m_layout;
-	iio_device *m_device = nullptr;
+	component::Device *m_device = nullptr;
 	QWidget *tempSensorWidget(QWidget *parent);
 	QWidget *auxAdcWidget(QWidget *parent);
 	QWidget *auxDacWidget(QWidget *parent);

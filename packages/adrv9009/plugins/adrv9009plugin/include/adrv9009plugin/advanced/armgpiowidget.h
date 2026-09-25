@@ -23,10 +23,13 @@
 
 #include "scopy-adrv9009plugin_export.h"
 #include <QWidget>
-#include <iio.h>
 #include <iio-widgets/iiowidgetgroup.h>
 
 class QVBoxLayout;
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy {
 class MenuSectionCollapseWidget;
@@ -38,7 +41,7 @@ class SCOPY_ADRV9009PLUGIN_EXPORT ArmGpioWidget : public QWidget
 	Q_OBJECT
 
 public:
-	ArmGpioWidget(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	ArmGpioWidget(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~ArmGpioWidget();
 
 	MenuSectionCollapseWidget *section() const;
@@ -49,7 +52,7 @@ Q_SIGNALS:
 private:
 	void setupUi();
 
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	MenuSectionCollapseWidget *m_section;
 };

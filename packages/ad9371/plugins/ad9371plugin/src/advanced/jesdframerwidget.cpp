@@ -29,14 +29,17 @@
 #include <QLoggingCategory>
 #include <style.h>
 #include <gui/widgets/menusectionwidget.h>
-#include <iio.h>
+#include <component/device.h>
+#include <component/attribute.h>
+#include <component/navigation.h>
+#include <qcorotask.h>
 
 Q_LOGGING_CATEGORY(CAT_AD9371_JESD_FRAMER, "AD9371_JESD_FRAMER")
 
 using namespace scopy;
 using namespace scopy::ad9371;
 
-JesdFramerWidget::JesdFramerWidget(iio_device *device, IIOWidgetGroup *group, QWidget *parent)
+JesdFramerWidget::JesdFramerWidget(component::Device *device, IIOWidgetGroup *group, QWidget *parent)
 	: QWidget(parent)
 	, m_device(device)
 	, m_widgetGroup(group)
@@ -190,7 +193,10 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 		if(serLane3->onOffswitch()->isChecked())
 			bitmask |= (1 << 3);
 		QString value = QString::number(bitmask);
-		iio_device_debug_attr_write(m_device, serLanesAttr.toUtf8().constData(), value.toUtf8().constData());
+		component::Attribute *wAttr = component::attributeByName(m_device, serLanesAttr);
+		if(wAttr && wAttr->writeCapability()) {
+			QCoro::waitFor(wAttr->writeCapability()->writeAsync(value));
+		}
 	};
 
 	connect(serLane0->onOffswitch(), &QAbstractButton::toggled, this, updateSerLanes);
@@ -199,11 +205,19 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	connect(serLane3->onOffswitch(), &QAbstractButton::toggled, this, updateSerLanes);
 
 	auto readSerLanes = [this, serLanesAttr, serLane0, serLane1, serLane2, serLane3]() {
-		char value[16];
-		int ret = iio_device_debug_attr_read(m_device, serLanesAttr.toUtf8().constData(), value, sizeof(value));
-		if(ret < 0)
+		component::Attribute *rAttr = component::attributeByName(m_device, serLanesAttr);
+		QString value;
+		bool ok = false;
+		if(rAttr && rAttr->readCapability()) {
+			auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+			if(rRes) {
+				value = rAttr->cachedValue().trimmed();
+				ok = true;
+			}
+		}
+		if(!ok)
 			return;
-		int bitmask = QString(value).toInt();
+		int bitmask = value.toInt();
 		serLane0->onOffswitch()->setChecked((bitmask & (1 << 0)) != 0);
 		serLane1->onOffswitch()->setChecked((bitmask & (1 << 1)) != 0);
 		serLane2->onOffswitch()->setChecked((bitmask & (1 << 2)) != 0);
@@ -273,8 +287,10 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 		if(invLane3->onOffswitch()->isChecked())
 			bitmask |= (1 << 3);
 		QString value = QString::number(bitmask);
-		iio_device_debug_attr_write(m_device, invertPolarityAttr.toUtf8().constData(),
-					    value.toUtf8().constData());
+		component::Attribute *wAttr = component::attributeByName(m_device, invertPolarityAttr);
+		if(wAttr && wAttr->writeCapability()) {
+			QCoro::waitFor(wAttr->writeCapability()->writeAsync(value));
+		}
 	};
 
 	connect(invLane0->onOffswitch(), &QAbstractButton::toggled, this, updateInvPolarity);
@@ -283,12 +299,19 @@ QWidget *JesdFramerWidget::createFramerColumn(const QString &columnTitle, const 
 	connect(invLane3->onOffswitch(), &QAbstractButton::toggled, this, updateInvPolarity);
 
 	auto readInvPolarity = [this, invertPolarityAttr, invLane0, invLane1, invLane2, invLane3]() {
-		char value[16];
-		int ret = iio_device_debug_attr_read(m_device, invertPolarityAttr.toUtf8().constData(), value,
-						     sizeof(value));
-		if(ret < 0)
+		component::Attribute *rAttr = component::attributeByName(m_device, invertPolarityAttr);
+		QString value;
+		bool ok = false;
+		if(rAttr && rAttr->readCapability()) {
+			auto rRes = QCoro::waitFor(rAttr->readCapability()->readAsync());
+			if(rRes) {
+				value = rAttr->cachedValue().trimmed();
+				ok = true;
+			}
+		}
+		if(!ok)
 			return;
-		int bitmask = QString(value).toInt();
+		int bitmask = value.toInt();
 		invLane0->onOffswitch()->setChecked((bitmask & (1 << 0)) != 0);
 		invLane1->onOffswitch()->setChecked((bitmask & (1 << 1)) != 0);
 		invLane2->onOffswitch()->setChecked((bitmask & (1 << 2)) != 0);

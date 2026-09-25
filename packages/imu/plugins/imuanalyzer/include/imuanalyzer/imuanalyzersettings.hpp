@@ -44,10 +44,13 @@
 #include <QPalette>
 
 #include "scopy-imuanalyzer_export.h"
-#include "iio.h"
 #include "iio-widgets/iiowidget.h"
 #include "iio-widgets/iiowidgetbuilder.h"
 #include "iio-widgets/iiowidgetdata.h"
+
+namespace scopy::component {
+class Device;
+}
 
 namespace scopy {
 
@@ -55,7 +58,7 @@ class SCOPY_IMUANALYZER_EXPORT ImuAnalyzerSettings : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, iio_device *device,
+	explicit ImuAnalyzerSettings(SceneRenderer *scRend, BubbleLevelRenderer *blRend, component::Device *device,
 				     QWidget *parent = nullptr);
 
 signals:
@@ -64,7 +67,7 @@ signals:
 	void updateDisplayPoints(QString displayP);
 
 private:
-	iio_device *m_device;
+	component::Device *m_device = nullptr;
 };
 } // namespace scopy
 #endif // IMUANALYZERSETTINGS_H

@@ -29,11 +29,13 @@
 #include <QVBoxLayout>
 #include <tooltemplate.h>
 #include <animatedrefreshbtn.h>
-#include <iio.h>
 
 namespace scopy {
 class IIOWidgetGroup;
+namespace component {
+class Device;
 }
+} // namespace scopy
 
 // Forward declarations for section widgets
 namespace scopy::ad9371 {
@@ -58,7 +60,7 @@ class SCOPY_AD9371PLUGIN_EXPORT Ad9371Advanced : public QWidget
 {
 	Q_OBJECT
 public:
-	Ad9371Advanced(iio_device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
+	Ad9371Advanced(component::Device *device, IIOWidgetGroup *group = nullptr, QWidget *parent = nullptr);
 	~Ad9371Advanced();
 
 	void switchToSection(const QString &name);
@@ -68,7 +70,7 @@ Q_SIGNALS:
 	void readRequested();
 
 private:
-	iio_device *m_device = nullptr;
+	component::Device *m_device = nullptr;
 	IIOWidgetGroup *m_widgetGroup = nullptr;
 	ToolTemplate *m_tool;
 	QVBoxLayout *m_mainLayout;

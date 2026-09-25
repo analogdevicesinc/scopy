@@ -36,10 +36,17 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QLoggingCategory>
-#include <iio.h>
+#include <qcorotask.h>
 #include <profilegeneratortypes.h>
 
 Q_DECLARE_LOGGING_CATEGORY(CAT_PROFILECLIMANAGER)
+
+namespace scopy {
+namespace component {
+class Device;
+class Channel;
+} // namespace component
+} // namespace scopy
 
 namespace scopy::adrv9002 {
 
@@ -48,7 +55,7 @@ class SCOPY_ADRV9002PLUGIN_EXPORT ProfileCliManager : public QObject
 	Q_OBJECT
 
 public:
-	explicit ProfileCliManager(iio_device *device, QObject *parent = nullptr);
+	explicit ProfileCliManager(component::Device *device, QObject *parent = nullptr);
 	~ProfileCliManager();
 
 	// CLI detection and validation
@@ -56,10 +63,10 @@ public:
 	QString getCliVersion() const;
 	QString getCliPath() const;
 
-	// Profile operations following iio-oscilloscope pattern
-	void saveProfileToFile(const QString &filename, const RadioConfig &config);
-	void saveStreamToFile(const QString &filename, const RadioConfig &config);
-	void loadProfileToDevice(const RadioConfig &config);
+	// Profile operations following iio-oscilloscope pattern (main-thread coroutines)
+	QCoro::Task<void> saveProfileToFile(QString filename, RadioConfig config);
+	QCoro::Task<void> saveStreamToFile(QString filename, RadioConfig config);
+	QCoro::Task<void> loadProfileToDevice(RadioConfig config);
 
 	// Configuration preview for debug display
 	QString generateConfigPreview(const RadioConfig &config);
@@ -77,18 +84,18 @@ private:
 	bool writeConfigToTempFile(const QString &filename, const RadioConfig &config);
 	QString createConfigJson(const RadioConfig &config);
 
-	// CLI execution (based on iio-oscilloscope pattern)
-	bool executeCli(const QStringList &arguments, QString &output);
+	// CLI execution (non-blocking coroutine over QProcess)
+	QCoro::Task<bool> executeCli(QStringList arguments, QString *output);
 
 	// File operations
 	QByteArray readFileContents(const QString &filename);
-	bool writeDeviceAttribute(const QString &attribute, const QByteArray &data);
+	QCoro::Task<bool> writeDeviceAttribute(QString attribute, QByteArray data);
 
 	// Cleanup helpers
 	void cleanupTempFiles(const QStringList &files);
 
 	// Member variables
-	iio_device *m_device;
+	component::Device *m_device;
 	bool m_cliAvailable;
 	QString m_cliPath;
 	QString m_cliVersion;
