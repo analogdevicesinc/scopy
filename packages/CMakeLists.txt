@@ -43,16 +43,26 @@ elseif(ENABLE_ALL_PACKAGES MATCHES ON)
 	message(STATUS "ENABLE_ALL_PACKAGES is set.")
 endif()
 
-# Default disabled packages
-if(NOT DEFINED ENABLE_PACKAGE_TEST-PLUGINS)
-	set(ENABLE_PACKAGE_TEST-PLUGINS OFF CACHE BOOL "Enable test plugins package" FORCE)
-endif()
-
-if(NOT DEFINED ENABLE_PACKAGE_EXTPROC)
-	set(ENABLE_PACKAGE_EXTPROC OFF CACHE BOOL "Enable extproc package" FORCE)
-endif()
-
-if(NOT DEFINED ENABLE_PACKAGE_M2K)
-	set(ENABLE_PACKAGE_M2K OFF CACHE BOOL "Enable m2k package" FORCE)
-endif()
+# device-controller branch: only pqmon and swiot are migrated to the device-controller
+set(SCOPY_DC_DISABLED_PACKAGES
+    TEST-PLUGINS
+    EXTPROC
+    M2K
+    AD6676
+    AD936X
+    AD9371
+    ADRV9002
+    ADRV9009
+    APOLLO-AD9084
+    CN0357
+    CN0540
+    DAQ2
+    FMCOMMS11
+    GENERIC-PLUGINS
+    IMU
+    RFPOWERMETER
+)
+foreach(pkg ${SCOPY_DC_DISABLED_PACKAGES})
+        set(ENABLE_PACKAGE_${pkg} OFF CACHE BOOL "Enable ${pkg} package" FORCE)
+endforeach()
 add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})

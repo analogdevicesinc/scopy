@@ -21,50 +21,67 @@
 
 #include "iiodeviceimpl.h"
 
-#include "iioutil/connectionprovider.h"
-
 #include <QLoggingCategory>
+
+#include <component/attribute.h>
 
 Q_LOGGING_CATEGORY(CAT_IIO_DEVICEIMPL, "IIODevice")
 
 using namespace scopy;
-void IIODeviceImpl::init()
+
+void IIODeviceImpl::init() { DeviceImpl::init(); }
+
+void IIODeviceImpl::onStateChanged(DeviceState_t state)
 {
-	auto cp = ConnectionProvider::GetInstance();
-
-	// Optimization for iio plugins - keep context open while running compatible
-
-	cp->open(m_param);
-	DeviceImpl::init();
-	cp->close(m_param);
-}
-
-bool IIODeviceImpl::verify()
-{
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-	if(!conn) {
-		return false;
+	switch(state) {
+	case DEV_CONNECTING:
+		// here or i must overwrite the connectDev method to be sure this happen
+		acquireContext();
+		break;
+	case DEV_IDLE:
+		releaseContext();
+		break;
+	default:
+		break;
 	}
-	ConnectionProvider::GetInstance()->close(m_param);
-	return true;
 }
+
+void IIODeviceImpl::acquireContext()
+{
+	if(m_context) {
+		return;
+	}
+	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0, m_maxThreads);
+	if(!m_context) {
+		qWarning(CAT_IIO_DEVICEIMPL) << "Failed to acquire context for" << m_param;
+	}
+}
+
+void IIODeviceImpl::releaseContext()
+{
+	if(!m_context) {
+		return;
+	}
+	m_context = component::ContextHandle{};
+}
+
+bool IIODeviceImpl::verify() { return static_cast<bool>(m_context); }
 
 QMap<QString, QString> IIODeviceImpl::readDeviceInfo()
 {
 	QMap<QString, QString> contextAttributes;
-	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
-	if(!conn) {
+	if(!m_context) {
 		qWarning(CAT_IIO_DEVICEIMPL) << "Cannot read the device info! (unavailable context)";
 	} else {
-		for(int i = 0; i < iio_context_get_attrs_count(conn->context()); i++) {
-			const char *name;
-			const char *value;
-			int ret = iio_context_get_attr(conn->context(), i, &name, &value);
-			if(ret != 0)
+		const QList<component::Attribute *> attributes =
+			m_context->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+		for(component::Attribute *attr : attributes) {
+			if(!attr->readCapability()) {
 				continue;
-			contextAttributes[name] = value;
+			}
+			QCoro::waitFor(attr->readCapability()->readAsync());
+			contextAttributes[attr->name()] = attr->cachedValue();
 		}
-		ConnectionProvider::GetInstance()->close(m_param);
 	}
 
 	return contextAttributes;

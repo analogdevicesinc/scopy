@@ -22,12 +22,14 @@
 #define SWIOTRUNTIME_H
 
 #include <QObject>
-#include <QMap>
-#include <iio.h>
+#include <qcoro/qcorotask.h>
+#include <component/controller.h>
 
-#include <iioutil/commandqueue.h>
-
-namespace scopy::swiot {
+namespace scopy {
+namespace component {
+class Device;
+}
+namespace swiot {
 #define AD_NAME "ad74413r"
 #define AD_TRIGGER_NAME "ad74413r-dev0"
 
@@ -40,22 +42,18 @@ public:
 
 public Q_SLOTS:
 	void onBackBtnPressed();
-	void writeTriggerDevice();
 	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
-private Q_SLOTS:
-	void setTriggerCommandFinished(scopy::Command *);
+
 Q_SIGNALS:
 	void writeModeAttribute(QString mode);
 
 private:
-	void createDevicesMap();
+	QCoro::Task<void> writeTriggerDevice();
 
-private:
 	QString m_uri;
-	iio_context *m_iioCtx;
-	QMap<QString, struct iio_device *> m_iioDevices;
-	CommandQueue *m_cmdQueue;
+	component::ContextHandle m_context;
 };
-} // namespace scopy::swiot
+} // namespace swiot
+} // namespace scopy
 
 #endif // SWIOTRUNTIME_H

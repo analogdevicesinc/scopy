@@ -29,14 +29,28 @@ namespace scopy {
 class SCOPY_CORE_EXPORT IIODeviceImpl : public DeviceImpl
 {
 public:
-	explicit IIODeviceImpl(QString param, QObject *parent = nullptr)
+	explicit IIODeviceImpl(QString param, int maxThreads = 1, QObject *parent = nullptr)
 		: DeviceImpl(param, "iio", parent)
-	{}
+		, m_maxThreads(maxThreads)
+	{
+		acquireContext();
+		connect(this, &IIODeviceImpl::stateChanged, this, &IIODeviceImpl::onStateChanged, Qt::DirectConnection);
+		// we must handle the ping
+	}
 	~IIODeviceImpl() {}
 
 	virtual void init() override;
 	bool verify() override;
 	QMap<QString, QString> readDeviceInfo() override;
+
+protected:
+	void acquireContext();
+	void releaseContext();
+
+private:
+	void onStateChanged(DeviceState_t state);
+
+	int m_maxThreads = 1;
 };
 
 } // namespace scopy

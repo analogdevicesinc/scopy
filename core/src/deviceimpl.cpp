@@ -44,7 +44,6 @@
 #include <gui/widgets/hoverwidget.h>
 #include <gui/widgets/connectionloadingbar.h>
 #include <gui/widgets/connectionlostwidget.h>
-#include <iioutil/pingtask.h>
 #include <pluginbase/statusbarmanager.h>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
@@ -56,9 +55,18 @@ DeviceImpl::DeviceImpl(QString param, QString category, QObject *parent)
 	, m_category(category)
 	, m_reloadPluginsSet({})
 {
-	m_state = DEV_INIT;
+	setState(DEV_INIT);
 	m_id = "dev_" + category + "_" + param + "_" + scopy::config::getUuid();
 	qDebug(CAT_DEVICEIMPL) << m_param << "ctor";
+
+	connect(
+		component::Controller::GetInstance(), &component::Controller::connectionLost, this,
+		[this](component::Context *ctx) {
+			if(m_state == DEV_CONNECTED && m_context && ctx == m_context.get()) {
+				onConnectionLost();
+			}
+		},
+		Qt::QueuedConnection);
 }
 
 void DeviceImpl::init()
@@ -108,7 +116,7 @@ void DeviceImpl::loadPlugins()
 		p->postload();
 		p->setDevice(this);
 	}
-	m_state = DEV_IDLE;
+	setState(DEV_IDLE);
 	DEBUGTIMER_LOG(benchmark, this->displayName() + " plugins load took:");
 }
 
@@ -289,47 +297,6 @@ void DeviceImpl::loadBadges()
 	connect(this, &DeviceImpl::connecting, warningHover, &HoverWidget::hide);
 }
 
-void DeviceImpl::setPingPlugin(Plugin *plugin)
-{
-	if(!m_pingPlugin && plugin->pingTask()) {
-		m_pingPlugin = plugin;
-	}
-}
-
-void DeviceImpl::bindPing()
-{
-	if(!m_pingPlugin) {
-		return;
-	}
-	for(auto &&p : m_connectedPlugins) {
-		connect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)), dynamic_cast<QObject *>(m_pingPlugin),
-			SLOT(onPausePingTask(bool)));
-	}
-
-	PingTask *pingTask = m_pingPlugin->pingTask();
-	connect(pingTask, &PingTask::forceDisconnect, this, &DeviceImpl::disconnectDev, Qt::QueuedConnection);
-	connect(pingTask, &PingTask::connectionLost, this, &DeviceImpl::onConnectionLost, Qt::QueuedConnection);
-	m_pingPlugin->startPingTask();
-}
-
-void DeviceImpl::unbindPing()
-{
-	if(!m_pingPlugin) {
-		return;
-	}
-	for(auto &&p : m_connectedPlugins) {
-		disconnect(dynamic_cast<QObject *>(p), SIGNAL(pausePingTask(bool)),
-			   dynamic_cast<QObject *>(m_pingPlugin), SLOT(onPausePingTask(bool)));
-	}
-	m_pingPlugin->stopPingTask();
-
-	PingTask *pingTask = m_pingPlugin->pingTask();
-	disconnect(pingTask, &PingTask::forceDisconnect, this, &DeviceImpl::disconnectDev);
-	disconnect(pingTask, &PingTask::connectionLost, this, &DeviceImpl::onConnectionLost);
-	pingTask->finish();
-	m_pingPlugin = nullptr;
-}
-
 void DeviceImpl::loadCompatiblePluginsTab(QWidget *pluginsTab)
 {
 	QList<Plugin *> plugins = PluginRepository::getCompatiblePlugins(m_param, m_category);
@@ -365,9 +332,20 @@ QStringList DeviceImpl::getPluginsName()
 	return pluginsName;
 }
 
+void DeviceImpl::setState(DeviceState_t state)
+{
+	if(m_state == state) {
+		return;
+	}
+	m_state = state;
+	Q_EMIT stateChanged(m_state);
+}
+
+component::Context *DeviceImpl::context() const { return m_context.get(); }
+
 void DeviceImpl::onConnectionFailed()
 {
-	m_state = DEV_ERROR;
+	setState(DEV_ERROR);
 	disconnectDev();
 }
 
@@ -437,7 +415,7 @@ void DeviceImpl::load(QSettings &s)
 
 void DeviceImpl::connectDev()
 {
-	m_state = DEV_CONNECTING;
+	setState(DEV_CONNECTING);
 	DebugTimer pluginConnBm;
 	DebugTimer connectDevBm;
 	ConnectionLoadingBar *connectionLoadingBar = new ConnectionLoadingBar();
@@ -471,7 +449,6 @@ void DeviceImpl::connectDev()
 				m_plugins[i]->loadSettings(s);
 			}
 			m_connectedPlugins.push_back(m_plugins[i]);
-			setPingPlugin(m_plugins[i]);
 		} else {
 			QJsonValue obj = m_plugins[i]->metadata().value("disconnectDevOnConnectFailure");
 			if(obj != QJsonValue::Undefined) {
@@ -492,10 +469,9 @@ void DeviceImpl::connectDev()
 	} else {
 		discbtn->setEnabled(true);
 		discbtn->setFocus();
-		bindPing();
 	}
 	// connected will be sent regardless of connection result indicating that the process finished
-	m_state = DEV_CONNECTED;
+	setState(DEV_CONNECTED);
 	Q_EMIT connected();
 	delete connectionLoadingBar;
 	DEBUGTIMER_LOG(connectDevBm, this->displayName() + " device connection took:");
@@ -505,7 +481,7 @@ void DeviceImpl::disconnectDev()
 {
 	DebugTimer pluginDisconnBm;
 	DebugTimer disconnectDevBm;
-	m_state = DEV_DISCONNECTING;
+	setState(DEV_DISCONNECTING);
 	Q_EMIT disconnecting();
 
 	if(m_connectionLostWidget) {
@@ -514,7 +490,6 @@ void DeviceImpl::disconnectDev()
 		m_connectionLostWidget = nullptr;
 	}
 
-	unbindPing();
 	connbtn->show();
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
@@ -530,7 +505,7 @@ void DeviceImpl::disconnectDev()
 	}
 	m_connectedPlugins.clear();
 	connbtn->setFocus();
-	m_state = DEV_IDLE;
+	setState(DEV_IDLE);
 	DEBUGTIMER_LOG(disconnectDevBm, this->displayName() + " device disconnection took:");
 	Q_EMIT disconnected();
 }

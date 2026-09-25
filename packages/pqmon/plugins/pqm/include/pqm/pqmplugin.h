@@ -59,12 +59,8 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
-	void startPingTask() override;
-	void stopPingTask() override;
-	void onPausePingTask(bool pause) override;
 
 private:
-	void clearPingTask();
 	void initApi();
 
 	InfoPage *m_infoPage;

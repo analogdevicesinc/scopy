@@ -213,14 +213,16 @@ clone() {
 		git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
 		git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
 		git clone --recursive https://github.com/analogdevicesinc/libad9166-iio.git -b $LIBAD9166_BRANCH libad9166
+		git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
 		git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
 		git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
 		git clone --recursive https://github.com/KDAB/KDDockWidgets.git -b $KDDOCK_BRANCH KDDockWidgets
 		git clone --recursive https://github.com/KDE/extra-cmake-modules.git -b $ECM_BRANCH extra-cmake-modules
 		git clone --recursive https://github.com/KDE/karchive.git -b $KARCHIVE_BRANCH karchive
 		git clone --recursive https://github.com/analogdevicesinc/genalyzer.git -b $GENALYZER_BRANCH genalyzer
+		git clone --recursive https://github.com/qcoro/qcoro.git -b $QCORO_BRANCH qcoro
 
-		DEPENDENCY_REPOS="libserialport libiio libad9361 libad9166 qwt libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer"
+		DEPENDENCY_REPOS="libserialport libiio libad9361 libad9166 libm2k qwt libtinyiiod KDDockWidgets extra-cmake-modules karchive genalyzer qcoro"
 		# Save to cache for next time
 		if [ "${CACHING_ENABLED}" == "true" ] && [ -n "$GIT_CACHE_DIR" ]; then
 			mkdir -p "$GIT_CACHE_DIR"
@@ -378,6 +380,29 @@ EOF
 }
 
 
+build_libm2k() {
+	echo "### Building libm2k - branch $LIBM2K_BRANCH"
+	pushd $STAGING_AREA/libm2k
+	CURRENT_BUILD=libm2k
+	save_version_info
+
+	# libm2k hardcodes x86_64 in src/CMakeLists.txt -- patch to match runner architecture
+	ARCH="$(uname -m)"
+	sed -i '' "s/set(CMAKE_OSX_ARCHITECTURES \"x86_64\")/set(CMAKE_OSX_ARCHITECTURES \"$ARCH\")/" src/CMakeLists.txt
+
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF \
+		-DENABLE_CSHARP=OFF \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_TOOLS=OFF \
+		-DINSTALL_UDEV_RULES=OFF \
+		-DENABLE_LOG=OFF\
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
 build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
 	CURRENT_BUILD=qwt
@@ -449,6 +474,27 @@ build_genalyzer() {
 	popd
 }
 
+build_qcoro() {
+	echo "### Building qcoro - version $QCORO_BRANCH"
+	CURRENT_BUILD=qcoro
+	pushd $STAGING_AREA/qcoro
+	# QtDBus auto-disabled on APPLE; Network via qtbase. Qt found via $QT (aqt install), like build_kddock.
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DCMAKE_PREFIX_PATH=$QT \
+		-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
+		-DQCORO_BUILD_EXAMPLES=OFF \
+		-DQCORO_BUILD_TESTING=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQCORO_WITH_QTWEBSOCKETS=OFF \
+		-DQCORO_WITH_QTQUICK=OFF \
+		-DQCORO_WITH_QML=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		"
+	build_with_cmake
+	make install
+	popd
+}
+
 build_deps(){
 	if [ "${CACHING_ENABLED}" == "true" ] && [ "$DEPENDENCIES_CACHED" == "true" ]; then
 		echo "Found cached dependencies in $STAGING_AREA_DEPS"
@@ -461,12 +507,14 @@ build_deps(){
 	build_libiio
 	build_libad9361
 	build_libad9166
+	build_libm2k
 	build_qwt
 	build_libtinyiiod
 	build_kddock
 	build_ecm
 	build_karchive
 	build_genalyzer
+	build_qcoro
 }
 
 # Setup cache management

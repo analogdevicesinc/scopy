@@ -23,8 +23,8 @@
 
 using namespace scopy::swiot;
 
-DigitalChnlInfo::DigitalChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQueue *cmdQueue)
-	: ChnlInfo(plotUm, hwUm, iioChnl, cmdQueue)
+DigitalChnlInfo::DigitalChnlInfo(QString plotUm, QString hwUm, component::Channel *chnl)
+	: ChnlInfo(plotUm, hwUm, chnl)
 {
 	m_rangeValues = {MIN_DIGITAL_VALUE, MAX_DIGITAL_VALUE};
 }

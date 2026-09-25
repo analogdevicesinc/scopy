@@ -24,7 +24,6 @@
 #include "faultspage.h"
 #include <pluginbase/toolmenuentry.h>
 
-#include <iio.h>
 #include <gui/widgets/toolbuttons.h>
 #include <gui/tooltemplate.h>
 
@@ -65,7 +64,6 @@ private:
 	QPushButton *m_configBtn;
 
 	QTimer *m_timer;
-	QThread *m_thread;
 
 	FaultsPage *m_faultsPage;
 

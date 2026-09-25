@@ -23,20 +23,23 @@
 #include <QRegularExpression>
 
 #include "ad74413r/chnlinfobuilder.h"
-#include "ad74413r/ad74413r.h"
 
-#include <iioutil/iiocommand/iiochannelattributeread.h>
-#include <iioutil/iiocommand/iiochannelattributewrite.h>
-#include <iioutil/iiocommand/iiodeviceattributeread.h>
+#include <component/attribute.h>
+#include <component/channel.h>
+#include <component/device.h>
+#include <component/backends/iio/iioinputstream.h>
+#include <component/backends/iio/iioscanelement.h>
 
+using namespace scopy;
 using namespace scopy::swiot;
 
-BufferLogic::BufferLogic(QMap<QString, iio_device *> devicesMap, CommandQueue *commandQueue)
-	: m_plotChnlsNo(0)
-	, m_iioDevicesMap(devicesMap)
-	, m_commandQueue(commandQueue)
+BufferLogic::BufferLogic(component::Device *adDevice, component::Device *swiotDevice, QObject *parent)
+	: QObject(parent)
+	, m_plotChnlsNo(0)
+	, m_adDevice(adDevice)
+	, m_swiotDevice(swiotDevice)
 {
-	if(m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
+	if(m_adDevice && m_swiotDevice) {
 		createChannels();
 	}
 }
@@ -51,34 +54,47 @@ BufferLogic::~BufferLogic()
 
 void BufferLogic::createChannels()
 {
-	if(m_iioDevicesMap[AD_NAME]) {
-		int chnlsNumber = iio_device_get_channels_count(m_iioDevicesMap[AD_NAME]);
-		int plotChnlsNo = 0;
-		int chnlIdx = -1;
-		const QRegularExpression rx("[^0-9]+");
-		for(int i = 0; i < chnlsNumber; i++) {
-			struct iio_channel *iioChnl = iio_device_get_channel(m_iioDevicesMap[AD_NAME], i);
-			QString chnlId(iio_channel_get_id(iioChnl));
-			QString chnlInfoId = chnlId[0].toLower();
-			if(iio_channel_find_attr(iioChnl, "threshold")) {
-				chnlInfoId = "d";
-			}
-			ChnlInfo *channelInfo = ChnlInfoBuilder::build(iioChnl, chnlInfoId, m_commandQueue);
-			const auto &&parts = chnlId.split(rx);
-			chnlIdx = -1;
-			plotChnlsNo = (!channelInfo->isOutput() && channelInfo->isScanElement()) ? (plotChnlsNo + 1)
-												 : plotChnlsNo;
-			if(parts.size() <= 1) {
-				continue;
-			}
-			if(parts[1].compare("")) {
-				chnlIdx = parts[1].toInt();
-				chnlIdx = (channelInfo->isOutput()) ? (chnlIdx + MAX_INPUT_CHNLS_NO) : chnlIdx;
-			}
-			m_chnlsInfo[chnlIdx] = channelInfo;
+	// Resolve which channels are scan elements (and at which index) from the
+	// device's input stream.
+	QMap<QString, long> scanElemIndex;
+	component::iio::IIOInputStream *stream = m_adDevice->findChild<component::iio::IIOInputStream *>();
+	if(stream) {
+		const QList<component::iio::IIOScanElement *> elems =
+			stream->findChildren<component::iio::IIOScanElement *>(Qt::FindDirectChildrenOnly);
+		for(component::iio::IIOScanElement *el : elems) {
+			scanElemIndex[el->id()] = el->index();
 		}
-		m_plotChnlsNo = plotChnlsNo;
 	}
+
+	int plotChnlsNo = 0;
+	int chnlIdx = -1;
+	const QRegularExpression rx("[^0-9]+");
+	const QList<component::Channel *> chnls =
+		m_adDevice->findChildren<component::Channel *>(Qt::FindDirectChildrenOnly);
+	for(component::Channel *chnl : chnls) {
+		QString chnlId = chnl->id();
+		QString chnlInfoId = chnlId[0].toLower();
+		if(chnl->findChild<component::Attribute *>("threshold", Qt::FindDirectChildrenOnly)) {
+			chnlInfoId = "d";
+		}
+		ChnlInfo *channelInfo = ChnlInfoBuilder::build(chnl, chnlInfoId);
+		if(scanElemIndex.contains(chnlId)) {
+			channelInfo->setScanIndex(scanElemIndex[chnlId]);
+		}
+		const auto &&parts = chnlId.split(rx);
+		chnlIdx = -1;
+		plotChnlsNo =
+			(!channelInfo->isOutput() && channelInfo->isScanElement()) ? (plotChnlsNo + 1) : plotChnlsNo;
+		if(parts.size() <= 1) {
+			continue;
+		}
+		if(parts[1].compare("")) {
+			chnlIdx = parts[1].toInt();
+			chnlIdx = (channelInfo->isOutput()) ? (chnlIdx + MAX_INPUT_CHNLS_NO) : chnlIdx;
+		}
+		m_chnlsInfo[chnlIdx] = channelInfo;
+	}
+	m_plotChnlsNo = plotChnlsNo;
 }
 
 bool BufferLogic::verifyChannelsEnabledChanges(QVector<bool> enabledChnls)
@@ -226,96 +242,42 @@ void BufferLogic::initDiagnosticChannels()
 
 void BufferLogic::initChannelFunction(unsigned int i)
 {
-	std::string chnlEnableAttribute = "ch" + std::to_string(i) + "_enable";
-	Command *enabledChnCmd =
-		new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME], chnlEnableAttribute.c_str(), nullptr);
-	connect(
-		enabledChnCmd, &scopy::Command::finished, this,
-		[=, this](scopy::Command *cmd) { enabledChnCmdFinished(i, cmd); }, Qt::QueuedConnection);
-	m_commandQueue->enqueue(enabledChnCmd);
-}
+	auto readAttr = [this](const QString &name) -> QString {
+		component::Attribute *attr =
+			m_swiotDevice->findChild<component::Attribute *>(name, Qt::FindDirectChildrenOnly);
+		if(!attr || !attr->readCapability()) {
+			return QString();
+		}
+		QCoro::waitFor(attr->readCapability()->readAsync());
+		return attr->cachedValue();
+	};
 
-void BufferLogic::enabledChnCmdFinished(unsigned int i, scopy::Command *cmd)
-{
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-	if(!tcmd) {
+	bool ok = false;
+	bool enabled = readAttr("ch" + QString::number(i) + "_enable").toInt(&ok);
+	if(!ok || !enabled) {
+		Q_EMIT channelFunctionDetermined(i, "no_config");
 		return;
 	}
-
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		bool ok = false;
-		bool enabled = QString(result).toInt(&ok);
-		if(!ok) {
-			return;
-		}
-		if(enabled) {
-			std::string deviceAttributeName = "ch" + std::to_string(i) + "_device";
-			Command *configuredDevCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
-									       deviceAttributeName.c_str(), nullptr);
-			connect(
-				configuredDevCmd, &scopy::Command::finished, this,
-				[=, this](scopy::Command *cmd) { configuredDevCmdFinished(i, cmd); },
-				Qt::QueuedConnection);
-			m_commandQueue->enqueue(configuredDevCmd);
-
-		} else {
-			Q_EMIT channelFunctionDetermined(i, "no_config");
-		}
-	}
-}
-
-void BufferLogic::configuredDevCmdFinished(unsigned int i, scopy::Command *cmd)
-{
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-	if(!tcmd) {
+	QString device = readAttr("ch" + QString::number(i) + "_device");
+	if(device != "ad74413r") {
+		Q_EMIT channelFunctionDetermined(i, "no_config");
 		return;
 	}
-
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		std::string device = std::string(result);
-		if(device == "ad74413r") {
-			std::string functionAttributeName = "ch" + std::to_string(i) + "_function";
-			Command *chnFunctionCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
-									     functionAttributeName.c_str(), nullptr);
-			connect(
-				chnFunctionCmd, &scopy::Command::finished, this,
-				[=, this](scopy::Command *cmd) { chnFunctionCmdFinished(i, cmd); },
-				Qt::QueuedConnection);
-			m_commandQueue->enqueue(chnFunctionCmd);
-
-		} else {
-			Q_EMIT channelFunctionDetermined(i, "no_config");
-		}
-	}
+	QString function = readAttr("ch" + QString::number(i) + "_function");
+	Q_EMIT channelFunctionDetermined(i, function);
 }
 
-void BufferLogic::chnFunctionCmdFinished(unsigned int i, scopy::Command *cmd)
+QMap<QString, component::Channel *> BufferLogic::getChnl(int chnlIdx)
 {
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-	if(!tcmd) {
-		return;
-	}
-
-	if(tcmd->getReturnCode() >= 0) {
-		char *result = tcmd->getResult();
-		QString function = QString(result);
-		Q_EMIT channelFunctionDetermined(i, function);
-	}
-}
-
-QMap<QString, iio_channel *> BufferLogic::getIioChnl(int chnlIdx)
-{
-	QMap<QString, iio_channel *> chnlsMap;
+	QMap<QString, component::Channel *> chnlsMap;
 	int outputChblIdx = chnlIdx + MAX_INPUT_CHNLS_NO;
 
 	if(m_chnlsInfo.contains(chnlIdx) && !m_chnlsInfo[chnlIdx]->isOutput()) {
-		chnlsMap["input"] = m_chnlsInfo[chnlIdx]->iioChnl();
+		chnlsMap["input"] = m_chnlsInfo[chnlIdx]->chnl();
 	}
 
 	if(m_chnlsInfo.contains(outputChblIdx) && m_chnlsInfo[outputChblIdx]->isOutput()) {
-		chnlsMap["output"] = m_chnlsInfo[outputChblIdx]->iioChnl();
+		chnlsMap["output"] = m_chnlsInfo[outputChblIdx]->chnl();
 	}
 
 	return chnlsMap;
