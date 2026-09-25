@@ -63,8 +63,6 @@ set(SCOPY_DC_DISABLED_PACKAGES
     RFPOWERMETER
 )
 foreach(pkg ${SCOPY_DC_DISABLED_PACKAGES})
-	if(NOT DEFINED ENABLE_PACKAGE_${pkg})
-		set(ENABLE_PACKAGE_${pkg} OFF CACHE BOOL "Enable ${pkg} package" FORCE)
-	endif()
+        set(ENABLE_PACKAGE_${pkg} OFF CACHE BOOL "Enable ${pkg} package" FORCE)
 endforeach()
 add_packages(${CMAKE_CURRENT_SOURCE_DIR} ${SCOPY_PACKAGE_BUILD_PATH})
