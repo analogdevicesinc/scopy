@@ -100,6 +100,11 @@ public:
 			       const QString &devName = "adxl355", QObject *parent = nullptr);
 	~Adxl355Source() override;
 
+	// The constructor's device lookup is the answer: it caches m_dev and leaves throwing
+	// to onStart(), so a block built against a context without this part is inert rather
+	// than broken.
+	bool isAvailable() const override { return m_dev != nullptr; }
+
 	// Finds the device, enables the buffered channels, creates the buffer. temp
 	// being enabled does not create one: it is not a scan element, so a run with
 	// only temp enabled reads attributes and never touches a buffer.

@@ -19,6 +19,8 @@ class QWidget;
 namespace scopy {
 namespace acq {
 
+class DataStore;
+
 // Shared base for SourceBlock and ProcessorBlock: identity, enable state,
 // diagnostics and the settings-widget scaffold.
 //
@@ -113,6 +115,12 @@ Q_SIGNALS:
 protected:
 	// Stacks the base enable checkbox above `own` in a fresh container.
 	QWidget *withBaseSettings(QWidget *own, QWidget *parent);
+
+	// The store this block's engine writes to, or null when the block has no
+	// engine parent. Borrowed, never owned. Lets a block reach the store from
+	// its own constructor rather than wait for a host to inject it — which is
+	// what makes a settings widget needing the store self-buildable.
+	DataStore *engineStore() const;
 
 	QString           m_name;
 	std::atomic<bool> m_enabled{true};

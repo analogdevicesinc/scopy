@@ -71,12 +71,10 @@ public:
 		std::optional<CsvFileReader::FirstColumnMode> firstColumnMode;
 	};
 
+	// `parent` should be the AcquisitionEngine: that is where the store this publishes into
+	// comes from. A parentless block parses files but reaches no store.
 	explicit FileSourceBlock(const QString &id = QStringLiteral("file"), QObject *parent = nullptr);
 	~FileSourceBlock() override;
-
-	// The store to publish into outside a cycle. Injected because a block cannot reach it on
-	// its own. Borrowed.
-	void setTargetStore(scopy::acq::DataStore *store);
 
 	int addSlot();
 	void removeSlot(int index);
@@ -95,6 +93,7 @@ public:
 	void onStart() override;
 
 	std::optional<scopy::acq::StreamInfo> streamInfo(const scopy::acq::DataKey &key) const override;
+
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 Q_SIGNALS:
@@ -151,7 +150,11 @@ private:
 
 	mutable QMutex                     m_mutex;
 	std::vector<std::unique_ptr<Slot>> m_slots;
-	scopy::acq::DataStore             *m_store{nullptr};
+
+	// The store to publish into outside a cycle — the engine's, taken from the parent at
+	// construction. Borrowed, and set once: acquire() uses the store the engine passes in, not
+	// this. Null without an engine parent, which every read here already guards.
+	scopy::acq::DataStore *const m_store{nullptr};
 };
 
 } // namespace adc
