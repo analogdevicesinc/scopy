@@ -57,6 +57,12 @@ QWidget *Block::createSettingsWidget(QWidget *parent)
 	return cb;
 }
 
+DataStore *Block::engineStore() const
+{
+	auto *engine = qobject_cast<AcquisitionEngine *>(parent());
+	return engine ? engine->store() : nullptr;
+}
+
 QWidget *Block::withBaseSettings(QWidget *own, QWidget *parent)
 {
 	auto *w   = new QWidget(parent);

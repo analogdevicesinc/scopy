@@ -97,6 +97,11 @@ SnapshotSourceWidget::SnapshotSourceWidget(SnapshotSource *src, DataStore *store
 	}
 	if(m_store) {
 		connect(m_store, &QObject::destroyed, this, [this]() { m_store = nullptr; });
+		// Queued: keysChanged comes off the engine's worker thread, and refreshKeys() repopulates
+		// combos. A key appearing or going is exactly when the pickers are stale.
+		connect(
+			m_store, &DataStore::keysChanged, this, [this](const QList<DataKey> &) { refreshKeys(); },
+			Qt::QueuedConnection);
 	}
 	if(m_engine) {
 		connect(m_engine, &QObject::destroyed, this, [this]() { m_engine = nullptr; });
