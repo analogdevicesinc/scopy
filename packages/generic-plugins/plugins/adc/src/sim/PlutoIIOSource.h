@@ -40,6 +40,10 @@ public:
 				QObject       *parent  = nullptr);
 	~PlutoIIOSource() override;
 
+	// Looks the device up in the context, since m_dev is only cached in onStart(). Out of line
+	// because this header forward-declares iio_context rather than including <iio.h>.
+	bool isAvailable() const override;
+
 	// Finds the device, enables channels, creates the IIO buffer.
 	void onStart() override;
 

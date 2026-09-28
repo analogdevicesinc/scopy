@@ -64,11 +64,9 @@ public:
 		}
 	};
 
+	// `parent` should be the AcquisitionEngine: that is where the store to capture from comes
+	// from. A parentless block captures nothing.
 	explicit SnapshotSource(const QString &id, QObject *parent = nullptr);
-
-	// The store to capture from, also the one the engine writes to. Injected because a block
-	// cannot reach it on its own. Borrowed, not owned.
-	void setSourceStore(DataStore *store);
 
 	int addSlot(); // returns the new slot's index
 	void removeSlot(int index);
@@ -111,10 +109,11 @@ private:
 
 	mutable QMutex m_mutex;
 	QList<Slot> m_slots;
-	// Raw and unguarded, unlike the widget's pointers: only ever read on the GUI thread by
-	// capture() and the setters, which the reader drives while the instrument is alive.
-	// acquire() uses the store the engine passes in, not this.
-	DataStore *m_srcStore{nullptr};
+	// Set once from the engine parent at construction. Raw and unguarded, unlike the widget's
+	// pointers: only ever read on the GUI thread by capture() and the setters, which the
+	// reader drives while the instrument is alive. acquire() uses the store the engine passes
+	// in, not this.
+	DataStore *const m_srcStore{nullptr};
 };
 
 } // namespace acq

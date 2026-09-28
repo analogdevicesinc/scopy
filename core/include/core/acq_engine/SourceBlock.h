@@ -31,6 +31,14 @@ public:
 
 	virtual void acquire(DataStore *store) = 0;
 
+	// False when this source's device is not present in the context it was
+	// built against: absent, not failed. A source needing no device never
+	// overrides this. Asked on the GUI thread right after construction, so a
+	// host can build every source it knows of and keep the ones that answer
+	// true — which means an implementation must be safe to call before
+	// onStart() has run.
+	virtual bool isAvailable() const { return true; }
+
 	// Acquire and release device resources. Overrides must call the base.
 	virtual void onStart();
 	virtual void onStop();

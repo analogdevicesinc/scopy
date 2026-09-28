@@ -44,6 +44,11 @@ public:
 	explicit AcquisitionEngine(DataStore *store, QObject *parent = nullptr);
 	~AcquisitionEngine() override;
 
+	// The store every block writes into. Borrowed, never owned — handed in at
+	// construction and outliving this. Blocks reach it through
+	// Block::engineStore() rather than through here.
+	DataStore *store() const { return m_store; }
+
 	void          addSource(SourceBlock *src);
 	void          removeSource(SourceBlock *src);
 	QList<SourceBlock *> sources() const;
