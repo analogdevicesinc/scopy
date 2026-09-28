@@ -33,8 +33,8 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
-#include <readwrite/iregisterreadstrategy.hpp>
-#include <readwrite/iregisterwritestrategy.hpp>
+#include "readwrite/iregisterreadstrategy.hpp"
+#include "readwrite/iregisterwritestrategy.hpp"
 
 namespace Ui {}
 
@@ -45,6 +45,7 @@ class IIODevice;
 namespace regmap {
 
 class RegisterMapTool;
+class RegisterMapTemplate;
 class JsonFormatedElement;
 class RegMap_API;
 
@@ -73,6 +74,16 @@ public:
 	void generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
 			    IRegisterWriteStrategy *writeStrategy, int bitsPerRow = 8);
 
+	// Extension API used by device specific packages to customize an already connected device.
+	// Must be called after RegmapPlugin::onConnect (use a lower plugin priority than regmap).
+	bool hasDevice(const QString &devName) const;
+	// Replaces the register read/write functions of devName. A nullptr strategy keeps the current one.
+	// Regmap takes ownership of the given strategies.
+	bool setDeviceAccess(const QString &devName, IRegisterReadStrategy *readStrategy,
+			     IRegisterWriteStrategy *writeStrategy);
+	// Replaces the register map XML of devName.
+	bool setDeviceXml(const QString &devName, const QString &xmlPath, int bitsPerRow = 8);
+
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
@@ -80,7 +91,8 @@ public Q_SLOTS:
 private:
 	QWidget *m_registerMapWidget = nullptr;
 	QList<component::iio::IIODevice *> *m_deviceList = nullptr;
-	RegisterMapTool *registerMapTool;
+	RegisterMapTool *registerMapTool = nullptr;
+	RegisterMapTemplate *buildTemplate(const QString &xmlPath, int bitsPerRow);
 	void initApi();
 	RegMap_API *m_api = nullptr;
 };

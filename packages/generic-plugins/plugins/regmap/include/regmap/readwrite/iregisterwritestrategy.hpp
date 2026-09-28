@@ -19,21 +19,23 @@
  *
  */
 
-#ifndef IREGISTERREADSTRATEGY_HPP
-#define IREGISTERREADSTRATEGY_HPP
+#ifndef IREGISTERWRITESTRATEGY_HPP
+#define IREGISTERWRITESTRATEGY_HPP
+
+#include "../scopy-regmap_export.h"
 
 #include <QObject>
 
 namespace scopy::regmap {
-class IRegisterReadStrategy : public QObject
+class SCOPY_REGMAP_EXPORT IRegisterWriteStrategy : public QObject
 {
 	Q_OBJECT
 public:
-	virtual void read(uint32_t address) = 0;
+	virtual void write(uint32_t address, uint32_t val) = 0;
 
 Q_SIGNALS:
-	void readDone(uint32_t address, uint32_t value);
-	void readError(const char *err);
+	void writeError(const char *err);
+	void writeSuccess(uint32_t address);
 };
 } // namespace scopy::regmap
-#endif // IREGISTERREADSTRATEGY_HPP
+#endif // IREGISTERWRITESTRATEGY_HPP

@@ -22,7 +22,7 @@
 #include "fileregisterreadstrategy.hpp"
 
 #include "../logging_categories.h"
-#include "iregisterreadstrategy.hpp"
+#include <readwrite/iregisterreadstrategy.hpp>
 #include "utils.hpp"
 
 #include <QFile>

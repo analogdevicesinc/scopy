@@ -150,6 +150,40 @@ void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMa
 	}
 }
 
+RegisterMapValues *RegisterMapTool::getRegisterMapValues(const QString &devName) const
+{
+	DeviceRegisterMap *regMap = deviceList->value(devName, nullptr);
+	return regMap ? regMap->getRegisterMapValues() : nullptr;
+}
+
+bool RegisterMapTool::setDeviceTemplate(const QString &devName, RegisterMapTemplate *registerMapTemplate)
+{
+	DeviceRegisterMap *oldRegMap = deviceList->value(devName, nullptr);
+	if(!oldRegMap) {
+		return false;
+	}
+
+	bool isActive = (devName == activeRegisterMap);
+	if(isActive) {
+		toggleSettingsMenu(devName, false);
+	}
+
+	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, oldRegMap->getRegisterMapValues(), this);
+	deviceList->insert(devName, regMap);
+	tool->addWidgetToCentralContainerHelper(regMap);
+	oldRegMap->hide();
+	oldRegMap->deleteLater();
+
+	if(isActive) {
+		regMap->show();
+		toggleSettingsMenu(devName, true);
+		toggleSearchBarEnabled(regMap->hasTemplate());
+	} else {
+		regMap->hide();
+	}
+	return true;
+}
+
 void RegisterMapTool::toggleSettingsMenu(QString registerName, bool toggle)
 {
 	if(toggle) {

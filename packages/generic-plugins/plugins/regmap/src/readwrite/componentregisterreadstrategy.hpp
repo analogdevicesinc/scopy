@@ -22,7 +22,7 @@
 #ifndef COMPONENTREGISTERREADSTRATEGY_HPP
 #define COMPONENTREGISTERREADSTRATEGY_HPP
 
-#include "iregisterreadstrategy.hpp"
+#include <readwrite/iregisterreadstrategy.hpp>
 
 namespace scopy::component::iio {
 class IIORegisterReader;

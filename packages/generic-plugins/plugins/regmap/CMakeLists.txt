@@ -61,7 +61,9 @@ file(
 	src/recyclerview/*.cpp
 	src/recyclerview/*.hpp
 )
-file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp
+     include/${SCOPY_MODULE}/readwrite/*.hpp
+)
 file(GLOB UI_LIST ui/*.ui)
 
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)

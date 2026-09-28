@@ -271,6 +271,7 @@ bool RegmapPlugin::onDisconnect()
 		tme->tool()->deleteLater();
 		tme->setTool(nullptr);
 	}
+	registerMapTool = nullptr;
 
 	Q_EMIT toolListChanged();
 
@@ -300,23 +301,87 @@ QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 void RegmapPlugin::generateDevice(QString xmlPath, QString devName, IRegisterReadStrategy *readStrategy,
 				  IRegisterWriteStrategy *writeStrategy, int bitsPerRow)
 {
-
-	RegisterMapTemplate *registerMapTemplate = nullptr;
-	if(!xmlPath.isEmpty()) {
-		registerMapTemplate = new RegisterMapTemplate(this);
-		registerMapTemplate->setBitsPerRow(bitsPerRow);
-		XmlFileManager xmlFileManager(xmlPath);
-		auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
-		if(!aux->isEmpty()) {
-			registerMapTemplate->setRegisterList(aux);
-		}
-	}
+	RegisterMapTemplate *registerMapTemplate = buildTemplate(xmlPath, bitsPerRow);
 
 	RegisterMapValues *registerMapValues = new RegisterMapValues();
+	readStrategy->setParent(registerMapValues);
+	writeStrategy->setParent(registerMapValues);
 	registerMapValues->setReadStrategy(readStrategy);
 	registerMapValues->setWriteStrategy(writeStrategy);
 
 	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues);
+}
+
+RegisterMapTemplate *RegmapPlugin::buildTemplate(const QString &xmlPath, int bitsPerRow)
+{
+	if(xmlPath.isEmpty()) {
+		return nullptr;
+	}
+
+	RegisterMapTemplate *registerMapTemplate = new RegisterMapTemplate(this);
+	registerMapTemplate->setBitsPerRow(bitsPerRow);
+	XmlFileManager xmlFileManager(xmlPath);
+	auto aux = xmlFileManager.getAllRegisters(registerMapTemplate);
+	if(!aux->isEmpty()) {
+		registerMapTemplate->setRegisterList(aux);
+	}
+	return registerMapTemplate;
+}
+
+bool RegmapPlugin::hasDevice(const QString &devName) const
+{
+	return registerMapTool && registerMapTool->getRegisterMapValues(devName);
+}
+
+bool RegmapPlugin::setDeviceAccess(const QString &devName, IRegisterReadStrategy *readStrategy,
+				   IRegisterWriteStrategy *writeStrategy)
+{
+	RegisterMapValues *values = registerMapTool ? registerMapTool->getRegisterMapValues(devName) : nullptr;
+	if(!values) {
+		qWarning(CAT_REGMAP) << "setDeviceAccess: device not found" << devName;
+		return false;
+	}
+
+	// values read with the previous strategy are no longer relevant
+	values->getRegisterReadValues()->clear();
+
+	if(readStrategy) {
+		IRegisterReadStrategy *old = values->getReadStrategy();
+		readStrategy->setParent(values);
+		values->setReadStrategy(readStrategy);
+		if(old) {
+			old->deleteLater();
+		}
+	}
+	if(writeStrategy) {
+		IRegisterWriteStrategy *old = values->getWriteStrategy();
+		writeStrategy->setParent(values);
+		values->setWriteStrategy(writeStrategy);
+		if(old) {
+			old->deleteLater();
+		}
+	}
+
+	qInfo(CAT_REGMAP) << "Custom register access installed for" << devName;
+	return true;
+}
+
+bool RegmapPlugin::setDeviceXml(const QString &devName, const QString &xmlPath, int bitsPerRow)
+{
+	if(!hasDevice(devName)) {
+		qWarning(CAT_REGMAP) << "setDeviceXml: device not found" << devName;
+		return false;
+	}
+
+	RegisterMapTemplate *registerMapTemplate = buildTemplate(xmlPath, bitsPerRow);
+	if(!registerMapTemplate || registerMapTemplate->getRegisterList()->isEmpty()) {
+		qWarning(CAT_REGMAP) << "setDeviceXml: no registers found in" << xmlPath;
+		delete registerMapTemplate;
+		return false;
+	}
+
+	qInfo(CAT_REGMAP) << "Custom register map" << xmlPath << "installed for" << devName;
+	return registerMapTool->setDeviceTemplate(devName, registerMapTemplate);
 }
 
 void RegmapPlugin::initApi()

@@ -22,7 +22,7 @@
 #ifndef IIOREGISTERREADSTRATEGY_HPP
 #define IIOREGISTERREADSTRATEGY_HPP
 
-#include "iregisterreadstrategy.hpp"
+#include <readwrite/iregisterreadstrategy.hpp>
 
 #include <iio.h>
 

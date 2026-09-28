@@ -58,6 +58,7 @@ public:
 	void applyFilters(QString filter);
 	bool hasTemplate();
 	bool getAutoread();
+	RegisterMapValues *getRegisterMapValues() const;
 	void startTutorial();
 	void startSimpleTutorial();
 

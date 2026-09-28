@@ -64,20 +64,38 @@ uint32_t RegisterMapValues::getValueOfRegister(uint32_t address) { return regist
 
 void RegisterMapValues::setReadStrategy(IRegisterReadStrategy *readStrategy)
 {
+	// strategies can be replaced at runtime, drop all connections of the previous one
+	if(this->readStrategy) {
+		QObject::disconnect(this, nullptr, this->readStrategy, nullptr);
+		QObject::disconnect(this->readStrategy, nullptr, this, nullptr);
+		if(writeStrategy) {
+			QObject::disconnect(writeStrategy, nullptr, this->readStrategy, nullptr);
+		}
+	}
+
 	this->readStrategy = readStrategy;
 	QObject::disconnect(m_readConnection);
 	QObject::connect(this, &RegisterMapValues::requestRead, readStrategy, &IRegisterReadStrategy::read);
 	QObject::connect(readStrategy, &IRegisterReadStrategy::readDone, this, &RegisterMapValues::readDone);
+	if(writeStrategy) {
+		QObject::connect(writeStrategy, &IRegisterWriteStrategy::writeSuccess, readStrategy,
+				 &IRegisterReadStrategy::read, Qt::UniqueConnection);
+	}
 }
 
 void RegisterMapValues::setWriteStrategy(IRegisterWriteStrategy *writeStrategy)
 {
+	if(this->writeStrategy) {
+		QObject::disconnect(this, nullptr, this->writeStrategy, nullptr);
+		QObject::disconnect(this->writeStrategy, nullptr, nullptr, nullptr);
+	}
+
 	this->writeStrategy = writeStrategy;
 	QObject::disconnect(writeConnection);
 	QObject::connect(this, &RegisterMapValues::requestWrite, writeStrategy, &IRegisterWriteStrategy::write);
 	if(readStrategy) {
 		QObject::connect(writeStrategy, &IRegisterWriteStrategy::writeSuccess, readStrategy,
-				 &IRegisterReadStrategy::read);
+				 &IRegisterReadStrategy::read, Qt::UniqueConnection);
 	}
 }
 

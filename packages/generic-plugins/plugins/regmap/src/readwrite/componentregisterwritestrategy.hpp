@@ -22,7 +22,7 @@
 #ifndef COMPONENTREGISTERWRITESTRATEGY_HPP
 #define COMPONENTREGISTERWRITESTRATEGY_HPP
 
-#include "iregisterwritestrategy.hpp"
+#include <readwrite/iregisterwritestrategy.hpp>
 
 namespace scopy::component::iio {
 class IIORegisterWriter;

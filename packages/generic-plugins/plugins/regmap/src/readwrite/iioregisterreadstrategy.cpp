@@ -22,7 +22,7 @@
 #include "iioregisterreadstrategy.hpp"
 
 #include "../logging_categories.h"
-#include "iregisterreadstrategy.hpp"
+#include <readwrite/iregisterreadstrategy.hpp>
 
 using namespace scopy;
 using namespace regmap;

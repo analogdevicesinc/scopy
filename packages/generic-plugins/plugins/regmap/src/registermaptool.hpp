@@ -56,6 +56,9 @@ public:
 
 	void addDevice(QString devName, RegisterMapTemplate *registerMapTemplate = nullptr,
 		       RegisterMapValues *registerMapValues = nullptr);
+	RegisterMapValues *getRegisterMapValues(const QString &devName) const;
+	// rebuilds the register map view of devName using a new template, keeping its values/strategies
+	bool setDeviceTemplate(const QString &devName, RegisterMapTemplate *registerMapTemplate);
 
 signals:
 

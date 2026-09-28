@@ -22,7 +22,7 @@
 #ifndef IIOREGISTERWRITESTRATEGY_HPP
 #define IIOREGISTERWRITESTRATEGY_HPP
 
-#include "iregisterwritestrategy.hpp"
+#include <readwrite/iregisterwritestrategy.hpp>
 
 #include <iio.h>
 

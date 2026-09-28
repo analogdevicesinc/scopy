@@ -22,7 +22,7 @@
 #ifndef FILEREGISTERREADSTRATEGY_HPP
 #define FILEREGISTERREADSTRATEGY_HPP
 
-#include "iregisterreadstrategy.hpp"
+#include <readwrite/iregisterreadstrategy.hpp>
 
 class QString;
 namespace scopy::regmap {

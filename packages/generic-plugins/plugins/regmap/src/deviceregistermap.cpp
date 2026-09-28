@@ -253,6 +253,8 @@ void DeviceRegisterMap::applyFilters(QString filter)
 	}
 }
 
+RegisterMapValues *DeviceRegisterMap::getRegisterMapValues() const { return registerMapValues; }
+
 bool DeviceRegisterMap::hasTemplate()
 {
 	if(registerMapTemplate) {
