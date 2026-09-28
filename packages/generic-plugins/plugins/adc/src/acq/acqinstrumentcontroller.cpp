@@ -26,7 +26,10 @@
 #include "acqplot.h"
 #include "acqplotkind.h"
 #include "acqplotmanager.h"
+#include "ad4130source.h"
 #include "adxl355source.h"
+#include "filesourceblock.h"
+#include "filesourcewidget.h"
 
 #include <iio.h>
 
@@ -43,6 +46,7 @@
 
 #include <QMap>
 #include <QPointer>
+#include <QPushButton>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
@@ -116,24 +120,27 @@ void AcqInstrumentController::setupBlocks(iio_context *ctx)
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
 	InstrumentTemplate            *it = m_ui->shell();
 
-	// The group both paths add to. Created up front because the snapshot source belongs
-	// in it whether or not a context was opened.
+	// The group both paths add to. Created up front because the snapshot and file sources
+	// belong in it whether or not a context was opened.
 	MenuSectionCollapseWidget *sources = it->addChannelGroup("Sources");
 	setupSnapshotBlock(sources);
+	setupFileBlock(sources);
 
 	if(!ctx) {
 		// Every hardware source here opens a real IIO device; there is no simulated
 		// stand-in, so the hardware half of the pipeline is skipped rather than
-		// pretended. The snapshot source above still works — it needs no device.
+		// pretended. The snapshot and file sources above still work — neither needs a
+		// device.
 		return;
 	}
 
 	// Which sources appear is decided by what the context actually holds, not by
-	// which tool opened it: both calls no-op when their device is absent, so a Pluto
-	// context comes up with the Pluto source and an ADXL context with the ADXL one,
-	// through one code path.
+	// which tool opened it: every call no-ops when its device is absent, so a Pluto
+	// context comes up with the Pluto source and an AD4130 context with the AD4130
+	// one, through one code path.
 	setupPlutoBlocks(sources, ctx);
 	setupAdxlBlocks(sources, ctx);
+	setupAd4130Blocks(sources, ctx);
 
 	if(m_fftProc) {
 		MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
@@ -192,6 +199,29 @@ bool AcqInstrumentController::setupAdxlBlocks(MenuSectionCollapseWidget *sources
 
 	addBlockRow(sourcesGroup, m_adxlSrc, QStringLiteral("adxl355"), QStringLiteral("ADXL355"),
 		    QStringLiteral("adxl355"));
+	return true;
+}
+
+bool AcqInstrumentController::setupAd4130Blocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx)
+{
+	// "ad4130" is both the device name the Linux driver registers and the block's
+	// id, which is what DataKeys carry and what shows on the rail.
+	if(!iio_context_find_device(ctx, "ad4130")) {
+		return false;
+	}
+
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+
+	// No FFT here either, and for the same reason as the ADXL path: this is a set of
+	// independent real channels, so a spectrum would be one transform block per
+	// channel — a decision for whoever wants them, not a default.
+	m_ad4130Src = new Ad4130Source(ctx, QStringLiteral("ad4130"), QStringLiteral("ad4130"), engine);
+	// The block enumerates the device's channels itself and enables them, so nothing
+	// is named here.
+	engine->addSource(m_ad4130Src);
+
+	addBlockRow(sourcesGroup, m_ad4130Src, QStringLiteral("ad4130"), QStringLiteral("AD4130"),
+		    QStringLiteral("ad4130"));
 	return true;
 }
 
@@ -266,6 +296,38 @@ void AcqInstrumentController::setupSnapshotBlock(MenuSectionCollapseWidget *sour
 			}
 		},
 		Qt::QueuedConnection);
+}
+
+void AcqInstrumentController::setupFileBlock(MenuSectionCollapseWidget *sourcesGroup)
+{
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+
+	m_fileSrc = new FileSourceBlock(QStringLiteral("file"), engine);
+	// The store it publishes into, which is the same one the engine writes to. A block cannot
+	// reach it on its own, and this one publishes outside a cycle.
+	m_fileSrc->setTargetStore(m_ui->store());
+	// One empty slot, so the panel opens on something to configure rather than on a bare "add"
+	// button. It publishes nothing until a file is picked.
+	m_fileSrc->addSlot();
+	engine->addSource(m_fileSrc);
+
+	// Host-built widget, for the reason the snapshot one is: the rows are a view of a slot list
+	// the reader edits while the instrument is alive.
+	auto *body = new QWidget;
+	auto *lay = new QVBoxLayout(body);
+	lay->setContentsMargins(0, 0, 0, 0);
+	lay->setSpacing(4);
+	// The base virtual explicitly, to match the snapshot path — createSettingsWidget() forwards
+	// to it, but naming it here says the channel switches are what is wanted.
+	lay->addWidget(m_fileSrc->scopy::acq::SourceBlock::createSettingsWidget(body));
+	m_fileWidget = new FileSourceWidget(m_fileSrc, body);
+	lay->addWidget(m_fileWidget);
+	// Before any settingsWidget() call, which blockPage() below is.
+	m_fileSrc->setSettingsWidget(body);
+
+	// Same entry as every other block, through the one path that builds them.
+	addBlockRow(sourcesGroup, m_fileSrc, QStringLiteral("File"), QStringLiteral("FILE"),
+		    QStringLiteral("file"));
 }
 
 void AcqInstrumentController::addSourceChannelRows(CollapsableMenuControlButton *parentRow,
@@ -350,6 +412,17 @@ void AcqInstrumentController::setupPlots()
 	connect(m_ui, &AcqInstrument::cycleComplete, m_plots, &AcqPlotManager::onCycleComplete);
 	connect(m_ui, &AcqInstrument::started, m_plots, &AcqPlotManager::onStarted);
 	connect(m_ui, &AcqInstrument::stopped, m_plots, &AcqPlotManager::onStopped);
+
+	// The file source publishes outside a cycle, so nothing else would tell the views to re-pull —
+	// and the frame timer only runs while acquiring, hence the explicit replot. This is what
+	// makes a file draw with the engine stopped.
+	if(m_fileSrc) {
+		connect(m_fileSrc, &FileSourceBlock::published, m_plots, [this]() {
+			m_plots->onCycleComplete();
+			m_plots->replot();
+		});
+	}
+
 	// Nothing wired to the buffer size: a channel claims its window in samples and the
 	// store converts, so the view never learns the chunk length. See AcqInstrument's
 	// signal list for why that signal no longer exists.
@@ -443,6 +516,19 @@ void AcqInstrumentController::setupExampleView()
 			for(const QString &chId : Adxl355Source::kAccelChannels) {
 				m_plots->addChannel(accelPlot, scopy::acq::ReprKind::Curve,
 						    scopy::acq::DataKey::raw(QStringLiteral("adxl355"), chId));
+			}
+		}
+	}
+
+	if(m_ad4130Src) {
+		// Every channel the device turned out to have, against the sample index and
+		// in volts on one Y scale — same part, same range, so a shared axis compares
+		// them rather than just stacking them. Labels, units and colours come from
+		// the block's own StreamInfo. Deletable like every other channel here.
+		if(AcqPlot *adcPlot = m_plots->addPlot(tr("AD4130"), AcqPlotKind::Basic)) {
+			for(const QString &chId : m_ad4130Src->channels()) {
+				m_plots->addChannel(adcPlot, scopy::acq::ReprKind::Curve,
+						    scopy::acq::DataKey::raw(QStringLiteral("ad4130"), chId));
 			}
 		}
 	}
