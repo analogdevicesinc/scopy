@@ -21,6 +21,8 @@
 
 #include "adxl355source.h"
 
+#include "sourceregistry.h"
+
 #include <core/acq_engine/DataKey.h>
 #include <core/acq_engine/DataStore.h>
 
@@ -694,5 +696,12 @@ std::optional<scopy::acq::StreamInfo> Adxl355Source::streamInfo(const scopy::acq
 	info.colorIndex = accelIndex;
 	return info;
 }
+
+// The block registers its own four channels with accel on and temp off, builds its own settings
+// widget and answers isAvailable() from its cached device, so this is the constructor alone.
+static const bool s_adxl355Registered = AcqSourceRegistry::instance().add(
+	[](iio_context *ctx, QObject *parent) -> scopy::acq::SourceBlock * {
+		return new Adxl355Source(ctx, QStringLiteral("adxl355"), QStringLiteral("adxl355"), parent);
+	});
 
 #include "moc_adxl355source.cpp"
