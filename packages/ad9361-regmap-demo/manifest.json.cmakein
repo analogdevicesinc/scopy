@@ -1,0 +1,12 @@
+{
+    "id": "ad9361-regmap-demo",
+    "title": "AD9361 Register Map Demo",
+    "version": "@PROJECT_VERSION@",
+    "description": "Demo package: ad9361-phy register map XML and file backed register read/write for the Register Map plugin",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin"]
+}
