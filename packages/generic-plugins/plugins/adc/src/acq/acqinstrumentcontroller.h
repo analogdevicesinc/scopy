@@ -22,8 +22,10 @@
 #ifndef ACQINSTRUMENTCONTROLLER_H
 #define ACQINSTRUMENTCONTROLLER_H
 
+#include <QList>
 #include <QObject>
 #include <QPointer>
+#include <QString>
 
 #include <pluginbase/toolmenuentry.h>
 
@@ -47,7 +49,10 @@ namespace sim {
 class PlutoIIOSource;
 }
 
+class Ad4130Source;
 class Adxl355Source;
+class FileSourceBlock;
+class FileSourceWidget;
 class AcqInstrument;
 class AcqPlotManager;
 
@@ -55,9 +60,10 @@ class AcqPlotManager;
 //
 // Blocks are constructed and registered here — the instrument itself never names
 // one. Which sources appear depends on what the opened context holds: a PlutoSDR
-// source with a genalyzer FFT over its I/Q, an ADXL355 accelerometer source, or
-// neither. Plots and channels are built here too, for the same reason: the
-// instrument owns the engine and the store, not a view of them.
+// source with a genalyzer FFT over its I/Q, an ADXL355 accelerometer source, an
+// AD4130 ADC source, any combination, or none. Plots and channels are built here
+// too, for the same reason: the instrument owns the engine and the store, not a
+// view of them.
 class AcqInstrumentController : public QObject
 {
 	Q_OBJECT
@@ -66,8 +72,8 @@ public:
 	~AcqInstrumentController() override;
 
 	// Build the instrument, register blocks and wire it to the tool menu entry.
-	// Call once. `ctx` may be null, in which case only the snapshot source is
-	// registered — every other source here needs real hardware.
+	// Call once. `ctx` may be null, in which case only the snapshot and file sources
+	// are registered — every other source here needs real hardware.
 	void init(iio_context *ctx = nullptr);
 
 	// Stop the engine if running. Safe before init() and more than once.
@@ -91,11 +97,22 @@ private:
 	// other's fallback.
 	bool setupAdxlBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
 
+	// The AD4130 ADC source, on the same terms as the two above: registered only
+	// when the context has the device, and not the fallback for either of them.
+	// Simpler than both — the block enumerates its own channels off the device tree
+	// and needs nothing configured here.
+	bool setupAd4130Blocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
+
 	// The snapshot source and its panel. Separate from setupBlocks' hardware path
 	// because this block needs no device — it freezes streams that already exist, so it
 	// is useful whether or not a context was opened. Its widget has to be built here
 	// rather than by the block: the key pickers need the DataStore and the engine.
 	void setupSnapshotBlock(MenuSectionCollapseWidget *sourcesGroup);
+
+	// The file source and its panel, registered on the same terms as the snapshot one: it needs
+	// no device, so it belongs outside setupBlocks' hardware path, and its widget is built here
+	// because the rows are a view of a slot list that changes while the instrument is alive.
+	void setupFileBlock(MenuSectionCollapseWidget *sourcesGroup);
 
 	// The one rail entry every block gets, source or processor: an expandable row opening
 	// the block's settings page, with the source's channel rows nested under it. Uniform
@@ -139,11 +156,14 @@ private:
 	// Parented to the engine, so listed here only for the settings pages.
 	sim::PlutoIIOSource            *m_plutoSrc{nullptr};
 	Adxl355Source                     *m_adxlSrc{nullptr};
+	Ad4130Source                      *m_ad4130Src{nullptr};
 	scopy::acq::GenalyzerFFTProcessor *m_fftProc{nullptr};
 	scopy::acq::SnapshotSource        *m_snapSrc{nullptr};
+	FileSourceBlock                   *m_fileSrc{nullptr};
 
-	// Handed to m_snapSrc via setSettingsWidget(), so owned by the menu page's layout.
+	// Handed to their blocks via setSettingsWidget(), so owned by the menu pages' layouts.
 	QPointer<scopy::acq::SnapshotSourceWidget> m_snapWidget;
+	QPointer<FileSourceWidget>                 m_fileWidget;
 
 	// Parented to the instrument.
 	QPointer<AcqPlotManager> m_plots;
