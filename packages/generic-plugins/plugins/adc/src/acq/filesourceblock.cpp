@@ -21,6 +21,9 @@
 
 #include "filesourceblock.h"
 
+#include "filesourcewidget.h"
+#include "sourceregistry.h"
+
 #include <core/acq_engine/DataKey.h>
 #include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/SnapshotSource.h>
@@ -40,6 +43,9 @@ int FileSourceBlock::Slot::sampleCount() const
 
 FileSourceBlock::FileSourceBlock(const QString &id, QObject *parent)
 	: SourceBlock(id, parent)
+	// The store to publish into outside a cycle. Taken from the engine parent rather than
+	// injected, so a file loaded while the engine is stopped reaches views immediately.
+	, m_store(engineStore())
 {
 	// The base settings widget's checkboxes toggle channels, and a toggle is exactly the kind
 	// of state change that has to reach the store.
@@ -47,8 +53,6 @@ FileSourceBlock::FileSourceBlock(const QString &id, QObject *parent)
 }
 
 FileSourceBlock::~FileSourceBlock() = default;
-
-void FileSourceBlock::setTargetStore(scopy::acq::DataStore *store) { m_store = store; }
 
 FileSourceBlock::Slot *FileSourceBlock::slotAt(int index)
 {
@@ -454,9 +458,20 @@ std::optional<scopy::acq::StreamInfo> FileSourceBlock::streamInfo(const scopy::a
 
 QWidget *FileSourceBlock::createSettingsWidget(QWidget *parent)
 {
-	// The panel is host-built, like the snapshot one: it is a list of rows over the slots, and
-	// the block has nothing of its own to draw beside the base channel switches.
-	return SourceBlock::createSettingsWidget(parent);
+	// The rows are a view of a slot list the reader edits while the instrument is alive, so the
+	// widget needs nothing but the block.
+	return withBaseSettings(new FileSourceWidget(this), parent);
 }
+
+// No isAvailable() override: this source reads files, so it is there whether or not a context was
+// opened, and it ignores the one it is handed.
+static const bool s_fileSourceRegistered =
+	AcqSourceRegistry::instance().add([](iio_context *, QObject *parent) -> scopy::acq::SourceBlock * {
+		auto *src = new FileSourceBlock(QStringLiteral("file"), parent);
+		// One empty slot, so the panel opens on something to configure rather than on a bare
+		// "add" button.
+		src->addSlot();
+		return src;
+	});
 
 #include "moc_filesourceblock.cpp"

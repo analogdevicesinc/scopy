@@ -22,7 +22,6 @@
 #ifndef ACQINSTRUMENTCONTROLLER_H
 #define ACQINSTRUMENTCONTROLLER_H
 
-#include <QList>
 #include <QObject>
 #include <QPointer>
 #include <QString>
@@ -39,31 +38,15 @@ class MenuSectionCollapseWidget;
 namespace acq {
 class Block;
 class GenalyzerFFTProcessor;
-class SnapshotSource;
-class SnapshotSourceWidget;
 class SourceBlock;
 } // namespace acq
 namespace adc {
 
-namespace sim {
-class PlutoIIOSource;
-}
-
-class Ad4130Source;
-class Adxl355Source;
-class FileSourceBlock;
-class FileSourceWidget;
 class AcqInstrument;
 class AcqPlotManager;
 
-// Composition root for one AcqInstrument.
-//
-// Blocks are constructed and registered here — the instrument itself never names
-// one. Which sources appear depends on what the opened context holds: a PlutoSDR
-// source with a genalyzer FFT over its I/Q, an ADXL355 accelerometer source, an
-// AD4130 ADC source, any combination, or none. Plots and channels are built here
-// too, for the same reason: the instrument owns the engine and the store, not a
-// view of them.
+// Composition root for one AcqInstrument. Sources come from AcqSourceRegistry, so which
+// ones appear is decided by what the opened context holds and not by anything named here.
 class AcqInstrumentController : public QObject
 {
 	Q_OBJECT
@@ -71,9 +54,9 @@ public:
 	explicit AcqInstrumentController(ToolMenuEntry *tme, QObject *parent = nullptr);
 	~AcqInstrumentController() override;
 
-	// Build the instrument, register blocks and wire it to the tool menu entry.
-	// Call once. `ctx` may be null, in which case only the snapshot and file sources
-	// are registered — every other source here needs real hardware.
+	// Build the instrument, register blocks and wire it to the tool menu entry. Call once.
+	// `ctx` may be null, in which case every device-backed source reports itself unavailable
+	// and is skipped.
 	void init(iio_context *ctx = nullptr);
 
 	// Stop the engine if running. Safe before init() and more than once.
@@ -82,88 +65,39 @@ public:
 	AcqInstrument *ui() const;
 
 private:
-	// Registers the test pipeline on the instrument's engine.
+	// One pass over the registry: build each source, keep the available ones, add the rail row.
 	void setupBlocks(iio_context *ctx);
 
-	// The PlutoSDR source and the genalyzer FFT over its I/Q. Skipped when the
-	// context holds no cf-ad9361-lpc, which is every non-Pluto device — the
-	// instrument is not Pluto-specific, so a missing device is a source that does
-	// not appear rather than a failed setup. Returns true if it registered.
-	bool setupPlutoBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
-
-	// The ADXL355 accelerometer source, same deal: registered only when the
-	// context actually has the device. Separate from the Pluto path rather than
-	// chained to it — a context could in principle carry both, and neither is the
-	// other's fallback.
-	bool setupAdxlBlocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
-
-	// The AD4130 ADC source, on the same terms as the two above: registered only
-	// when the context has the device, and not the fallback for either of them.
-	// Simpler than both — the block enumerates its own channels off the device tree
-	// and needs nothing configured here.
-	bool setupAd4130Blocks(MenuSectionCollapseWidget *sourcesGroup, iio_context *ctx);
-
-	// The snapshot source and its panel. Separate from setupBlocks' hardware path
-	// because this block needs no device — it freezes streams that already exist, so it
-	// is useful whether or not a context was opened. Its widget has to be built here
-	// rather than by the block: the key pickers need the DataStore and the engine.
-	void setupSnapshotBlock(MenuSectionCollapseWidget *sourcesGroup);
-
-	// The file source and its panel, registered on the same terms as the snapshot one: it needs
-	// no device, so it belongs outside setupBlocks' hardware path, and its widget is built here
-	// because the rows are a view of a slot list that changes while the instrument is alive.
-	void setupFileBlock(MenuSectionCollapseWidget *sourcesGroup);
+	// The genalyzer FFT over Pluto's I/Q. Not part of the source registry — a processor
+	// watches keys no single source owns. After setupBlocks().
+	void setupProcessors();
 
 	// The one rail entry every block gets, source or processor: an expandable row opening
-	// the block's settings page, with the source's channel rows nested under it. Uniform
-	// by design — the rail is a view of the pipeline, so two blocks should not read as two
-	// different kinds of thing because they sit in different groups.
+	// the block's settings page, with the source's channel rows nested under it.
 	CollapsableMenuControlButton *addBlockRow(MenuSectionCollapseWidget *group, scopy::acq::Block *block,
 						  const QString &label, const QString &pageTitle,
 						  const QString &menuId);
 
-	// One nested row per channel the source declares, each with a switch bound to the
-	// source's own enable state. Rebuilt on channelsChanged(), which is why the rows
-	// are not written out by hand at composition time — a source can gain or lose
-	// channels after onStart() has read the device.
+	// One nested row per channel the source declares, rebuilt on channelsChanged() — a
+	// source can gain or lose channels after onStart() has read the device.
 	void addSourceChannelRows(CollapsableMenuControlButton *parentRow, scopy::acq::SourceBlock *src);
 
-	// Builds the plot manager, makes it the center widget, and wires the instrument's
-	// cycle/start/stop signals, the plot-window spinbox and the cursors. Creates no plot
-	// and no channel of its own — that is setupExampleView()'s job, called from the end of
-	// this. Runs after setupBlocks() so the block keys exist to point at.
+	// The plot manager and its wiring. Creates no plot and no channel: every view is built
+	// from the rail. Runs after setupBlocks() so the block keys exist to point at.
 	void setupPlots();
 
-	// One worked example of the manager's API: a Basic plot with both raw channels against
-	// the sample index, and a Waterfall plot with the FFT magnitudes against the FFT
-	// frequency stream. Purely a starting view — every plot and channel it creates is
-	// deletable from the rail, nothing recreates itself, and with this call removed the
-	// instrument opens empty and is built entirely from the UI. Runs last, so it draws
-	// against a manager that is already fully wired.
-	void setupExampleView();
-
-	// The genalyzer results table, in the slot right of the plot. Shown only while
-	// analysis is enabled — an empty table beside the spectrum is just lost width.
+	// The genalyzer results table, in the slot right of the plot. Shown only while analysis
+	// is enabled.
 	void setupAnalysisPanel();
 
-	// Pluto's RX default. The source doesn't read the rate back, so the FFT has to be
-	// told, and a wrong value only mislabels the frequency axis.
+	// Pluto's RX default. The source doesn't read the rate back, so the FFT has to be told.
 	const double m_kPlutoSampleRate;
 
 	ToolMenuEntry          *m_tme{nullptr};
 	QPointer<AcqInstrument> m_ui;
 
-	// Parented to the engine, so listed here only for the settings pages.
-	sim::PlutoIIOSource            *m_plutoSrc{nullptr};
-	Adxl355Source                     *m_adxlSrc{nullptr};
-	Ad4130Source                      *m_ad4130Src{nullptr};
+	// Parented to the engine, kept for the analysis panel and the fallback rate.
 	scopy::acq::GenalyzerFFTProcessor *m_fftProc{nullptr};
-	scopy::acq::SnapshotSource        *m_snapSrc{nullptr};
-	FileSourceBlock                   *m_fileSrc{nullptr};
-
-	// Handed to their blocks via setSettingsWidget(), so owned by the menu pages' layouts.
-	QPointer<scopy::acq::SnapshotSourceWidget> m_snapWidget;
-	QPointer<FileSourceWidget>                 m_fileWidget;
 
 	// Parented to the instrument.
 	QPointer<AcqPlotManager> m_plots;
