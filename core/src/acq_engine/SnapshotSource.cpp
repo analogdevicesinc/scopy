@@ -13,13 +13,11 @@ namespace acq {
 
 SnapshotSource::SnapshotSource(const QString &id, QObject *parent)
 	: SourceBlock(id, parent)
+	// The store this captures *from*, which is the one the engine writes to. Taken from
+	// the engine parent rather than injected: a block built without one captures nothing,
+	// which is the same answer the old uninitialised member gave.
+	, m_srcStore(engineStore())
 {}
-
-void SnapshotSource::setSourceStore(DataStore *store)
-{
-	QMutexLocker lk(&m_mutex);
-	m_srcStore = store;
-}
 
 QString SnapshotSource::sanitizeTitle(const QString &title)
 {
@@ -335,9 +333,13 @@ std::optional<StreamInfo> SnapshotSource::streamInfo(const DataKey &key) const
 
 QWidget *SnapshotSource::createSettingsWidget(QWidget *parent)
 {
-	// Fallback with no store or engine, so the combos list nothing. A host that wants a usable
-	// panel builds SnapshotSourceWidget itself and injects it with setSettingsWidget().
-	return withBaseSettings(new SnapshotSourceWidget(this, nullptr, nullptr), parent);
+	// Both handles come from the engine parent, so this is the real panel rather than one
+	// with empty key pickers. Without a parent they are null and the combos list nothing,
+	// which is all a parentless block could offer anyway.
+	// QObject::parent() qualified: the `parent` parameter shadows it.
+	return withBaseSettings(
+		new SnapshotSourceWidget(this, m_srcStore, qobject_cast<AcquisitionEngine *>(QObject::parent())),
+		parent);
 }
 
 } // namespace acq

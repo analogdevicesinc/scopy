@@ -17,6 +17,11 @@ PlutoIIOSource::PlutoIIOSource(iio_context *ctx, const QString &id,
 	, m_devName(devName)
 {}
 
+bool PlutoIIOSource::isAvailable() const
+{
+	return m_ctx && iio_context_find_device(m_ctx, m_devName.toUtf8().constData()) != nullptr;
+}
+
 PlutoIIOSource::~PlutoIIOSource()
 {
 	onStop();
