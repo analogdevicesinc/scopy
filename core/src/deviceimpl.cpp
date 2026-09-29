@@ -486,7 +486,7 @@ void DeviceImpl::disconnectDev()
 
 	if(m_connectionLostWidget) {
 		m_connectionLostWidget->hide();
-		delete m_connectionLostWidget;
+		m_connectionLostWidget->deleteLater();
 		m_connectionLostWidget = nullptr;
 	}
 
