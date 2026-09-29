@@ -151,13 +151,17 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 	auto *devOps = m_backend->deviceOps();
 	const auto dh = dev->handle();
 	const unsigned int count = devOps->debugAttrsCount(dh);
+	bool hasRegAccess = false;
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = devOps->debugAttrName(dh, i);
 		makeAttribute(dev, name, m_attrOps->debugAttr(dh, name), executor);
+		if(name.contains("direct_reg_access")) {
+			hasRegAccess = true;
+		}
 	}
 
 	// Register access — only where the device exposes a debug/register plane.
-	if(count > 0) {
+	if(hasRegAccess) {
 		new IIORegisterReader(devOps, dh, executor, dev);
 		new IIORegisterWriter(devOps, dh, executor, dev);
 	}
