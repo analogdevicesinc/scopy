@@ -99,23 +99,26 @@ void TestPooledCmdExecutor::cancelByResource()
 void TestPooledCmdExecutor::cancelById()
 {
 	int resource = 0;
-	PooledCmdExecutor exec(4);
+	PooledCmdExecutor exec(2);
 	SlowCommand c1(100, &resource);
-	SlowCommand c2(200, &resource);
+	SlowCommand c2(100, &resource);
+	SlowCommand c3(200, &resource);
 
 	auto f1 = exec.execute(&c1);
 	auto f2 = exec.execute(&c2);
+	auto f3 = exec.execute(&c3);
 
-	exec.cancelById(c2.id());
+	exec.cancelById(c3.id());
 
 	QElapsedTimer timer;
 	timer.start();
 
 	f1.waitForFinished();
-
-	QVERIFY(c2.isCancelled());
 	f2.waitForFinished();
-	QVERIFY(c2.isCancelled() && timer.elapsed() < 150);
+
+	QVERIFY(c3.isCancelled());
+	f3.waitForFinished();
+	QVERIFY(c3.isCancelled() && timer.elapsed() < 150);
 }
 
 void TestPooledCmdExecutor::pendingCount()
