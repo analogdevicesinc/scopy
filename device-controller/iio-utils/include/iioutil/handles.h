@@ -63,9 +63,6 @@ struct ChannelsMaskHandle
 	void *ptr = nullptr;
 };
 
-// I changed the plan, and I removed this enum class from here.
-// Instead, i added a new enum class in the controller header (named BackendKind)
-// This should be removed!
 enum class LibiioVersion
 {
 	V0,
