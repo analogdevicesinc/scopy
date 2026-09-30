@@ -27,6 +27,7 @@
 
 #include <component/device.h>
 #include <component/channel.h>
+#include <component/attribute.h>
 #include <component/streamformat.h>
 #include <component/backends/iio/iiochannel.h>
 #include <component/backends/iio/iiosamplecodec.h>
@@ -596,6 +597,10 @@ bool DacDataModel::initDdsDac()
 		}
 		auto *iioChn = qobject_cast<component::iio::IIOChannel *>(chn);
 		if(!iioChn || iioChn->chanType() != IIO_ALTVOLTAGE) {
+			continue;
+		}
+		// Only DDS tone channels carry a "frequency" attribute
+		if(!chn->findChild<component::Attribute *>("frequency")) {
 			continue;
 		}
 		ddsTonesCount++;
