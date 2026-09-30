@@ -144,36 +144,52 @@ Result<void> V0AttrOps::write(AttrHandle attr, const QString &value)
 
 Result<QByteArray> V0AttrOps::readAvailableAttr(const V0AttrInfo *ai) const
 {
+	static constexpr qsizetype kInitial = 8192;
+	static constexpr qsizetype kMax = 1 << 20;
+
+	if(ai->scope == V0AttrInfo::Context) {
+		return Unexpected{Error{-ENOSYS, QStringLiteral("no _available for context attrs")}};
+	}
+
 	QByteArray availName = ai->name + "_available";
-	char buf[4096];
+	QByteArray buf;
 	ssize_t ret = 0;
 
-	switch(ai->scope) {
-	case V0AttrInfo::Context:
-		return Unexpected{Error{-ENOSYS, QStringLiteral("no _available for context attrs")}};
-	case V0AttrInfo::Device:
-		ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), availName.constData(), buf,
-					   sizeof(buf));
-		break;
-	case V0AttrInfo::Channel:
-		ret = iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent), availName.constData(), buf,
-					    sizeof(buf));
-		break;
-	case V0AttrInfo::Debug:
-		ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent), availName.constData(),
-						 buf, sizeof(buf));
-		break;
-	case V0AttrInfo::Buffer:
-		ret = iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent), availName.constData(),
-						  buf, sizeof(buf));
-		break;
+	for(qsizetype size = kInitial; size <= kMax; size *= 2) {
+		buf.resize(size);
+		switch(ai->scope) {
+		case V0AttrInfo::Device:
+			ret = iio_device_attr_read(static_cast<const iio_device *>(ai->parent), availName.constData(),
+						   buf.data(), buf.size());
+			break;
+		case V0AttrInfo::Channel:
+			ret = iio_channel_attr_read(static_cast<const iio_channel *>(ai->parent), availName.constData(),
+						    buf.data(), buf.size());
+			break;
+		case V0AttrInfo::Debug:
+			ret = iio_device_debug_attr_read(static_cast<const iio_device *>(ai->parent),
+							 availName.constData(), buf.data(), buf.size());
+			break;
+		case V0AttrInfo::Buffer:
+			ret = iio_device_buffer_attr_read(static_cast<const iio_device *>(ai->parent),
+							  availName.constData(), buf.data(), buf.size());
+			break;
+		default:
+			break;
+		}
+
+		// local backend truncates silently (ret == len); iiod returns -EIO when too small
+		bool maybeTruncated = (ret >= size) || (ret == -EIO);
+		if(!maybeTruncated) {
+			break;
+		}
 	}
 
 	if(ret < 0) {
 		return Unexpected{Error{static_cast<int>(ret),
 					QStringLiteral("_available read failed: %1").arg(QString::fromUtf8(ai->name))}};
 	}
-	QByteArray result(buf, ret);
+	QByteArray result(buf.constData(), ret);
 	while(result.endsWith('\0')) {
 		result.chop(1);
 	}
