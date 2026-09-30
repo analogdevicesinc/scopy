@@ -26,6 +26,8 @@
 #include <QCommandLineParser>
 #include <style.h>
 
+#include <csignal>
+
 #include <core/application_restarter.h>
 #include <core/cmdlinehandler.h>
 #include <core/scopymainwindow_api.h>
@@ -98,6 +100,10 @@ void printRuntimeEnvironmentInfo()
 
 int main(int argc, char *argv[])
 {
+#ifndef _WIN32
+	::signal(SIGPIPE, SIG_IGN);
+#endif
+
 #ifdef __APPLE__
 	// this forces a newer version of OpenGL to work with Qt3DExtras
 	QSurfaceFormat fmt;
