@@ -95,6 +95,9 @@ AcqPlotManager::AcqPlotManager(scopy::acq::DataStore *store, scopy::acq::Acquisi
 	// No plot is created here, and that is the point: an empty manager is a valid state
 	// and the reader adds the first plot from the rail. A plot created in this
 	// constructor would be the manager deciding what the instrument shows.
+	// The rail group is built now, though: it holds the "Add plot" row, which is the only
+	// way to make the first plot.
+	railGroup();
 
 	m_frameTimer = new QTimer(this);
 	m_frameTimer->setInterval(m_kFrameIntervalMs);
@@ -785,6 +788,21 @@ void AcqPlotManager::onCycleComplete()
 	}
 	// Deliberately no replot here — the frame timer owns repainting.
 	m_dirty = true;
+}
+
+void AcqPlotManager::onTriggerFired(const QMap<QString, scopy::acq::SampleVariant> &snap)
+{
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		ch->pull(plotSizeFor(ch), &snap);
+	}
+	m_dirty = true;
+	// Only while stopped: the trigger's single-shot stops the engine on the fire, so a Single
+	// ends with a read that lands after the stop's final flush and would never be painted.
+	// While running the frame timer owns the repaint, capping it at the frame rate.
+	if(!m_frameTimer->isActive()) {
+		m_dirty = false;
+		replot();
+	}
 }
 
 void AcqPlotManager::onStarted()

@@ -197,7 +197,14 @@ void AcqInstrument::single()
 		return;
 	}
 	m_store->clear();
-	m_engine->single();
+	// Before the start, so a listener arming a one-shot stop is armed before the first
+	// cycle can fire — and so the flag it sets below is read after it is set.
+	Q_EMIT singleRequested();
+	if(m_singleWaitsForStop) {
+		m_engine->run();
+	} else {
+		m_engine->single();
+	}
 }
 
 void AcqInstrument::stop() { m_engine->stop(); }
