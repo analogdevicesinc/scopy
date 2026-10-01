@@ -501,7 +501,8 @@ void DecoderManager::claimWindowDepth(const DecoderInstance &d)
 	// on every push, so a resized acquisition buffer needs nothing from here — no
 	// engine read, and no re-claim on a buffer size change.
 	for(const scopy::acq::DataKey &k : d.orderedRawKeys)
-		m_store->claimSamples(k, d.uid, static_cast<std::size_t>(m_windowSize));
+		m_store->claimDepth(k, d.uid,
+				    scopy::acq::DataStore::Claim::samples(static_cast<std::size_t>(m_windowSize)));
 }
 
 void DecoderManager::setDecoderWindowSize(int n)

@@ -924,8 +924,9 @@ void SimInstrumentController::claimWaterfallDepth()
 	m_store->releaseClaimant(kWaterfallClaimant);
 	if(!m_fftWaterfallKey.key.isEmpty())
 		// Chunks: one retained chunk is one row however wide a chunk is.
-		m_store->claimChunks(m_fftWaterfallKey, kWaterfallClaimant,
-				     static_cast<std::size_t>(std::max(1, m_currentWaterfallRows)));
+		m_store->claimDepth(m_fftWaterfallKey, kWaterfallClaimant,
+				    scopy::acq::DataStore::Claim::chunks(
+					    static_cast<std::size_t>(std::max(1, m_currentWaterfallRows))));
 }
 
 // Every key the plot can read — curve X/Y axes and raw digital tracks — needs
@@ -941,8 +942,9 @@ void SimInstrumentController::claimPlotDepth()
 	// the sample part against the current chunk length on every push, so this needs
 	// no engine read and no re-claim when the buffer is resized.
 	for(const scopy::acq::DataKey &k : m_store->keys())
-		m_store->claimSamples(k, kPlotClaimant, static_cast<std::size_t>(m_plotSize),
-				      /*extraChunks=*/1);
+		m_store->claimDepth(k, kPlotClaimant,
+				    scopy::acq::DataStore::Claim::samples(
+					    static_cast<std::size_t>(m_plotSize), /*extraChunks=*/1));
 }
 
 void SimInstrumentController::setCurveDriven(PlotChannel *ch, bool driven)

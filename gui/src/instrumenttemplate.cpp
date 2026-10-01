@@ -799,24 +799,24 @@ DebugPopup *InstrumentTemplate::debugPopup()
 		// panel sized to a QTabWidget's own hint comes out about two rows tall.
 		m_debugPopup->setMinimumHeight(debugPanelHeight());
 		m_debugPopup->setVisible(false);
-
-		// Docked into ToolTemplate's own column, immediately above the bottom rail:
-		// that lands it in the cell the rail spans, so it is exactly as wide as the
-		// rail with no geometry computed by hand, and it takes height from the layout
-		// instead of covering the plot.
-		//
-		// Stretch 0 against `content`'s MinimumExpanding: the panel settles at the
-		// height it needs and the plot absorbs whatever is left, so resizing the
-		// window grows the plot rather than the debug tabs.
-		QVBoxLayout *col = qobject_cast<QVBoxLayout *>(m_tool->layout());
-		if(col) {
-			int railIdx = col->indexOf(m_tool->bottomContainer());
-			col->insertWidget(railIdx < 0 ? -1 : railIdx, m_debugPopup, 0);
-		}
+		dockAboveBottomRail(m_debugPopup);
 	}
 	return m_debugPopup;
 }
 
 void InstrumentTemplate::addDebugTab(QWidget *w, const QString &title) { debugPopup()->addTab(w, title); }
+
+// Above the bottom rail, so `w` lands in the cell the rail spans and is exactly as wide as
+// it with no geometry computed by hand. Stretch 0 against `content`'s MinimumExpanding, so
+// a window resize grows the plot and not this.
+void InstrumentTemplate::dockAboveBottomRail(QWidget *w)
+{
+	QVBoxLayout *col = qobject_cast<QVBoxLayout *>(m_tool->layout());
+	if(!col) {
+		return;
+	}
+	int railIdx = col->indexOf(m_tool->bottomContainer());
+	col->insertWidget(railIdx < 0 ? -1 : railIdx, w, 0);
+}
 
 #include "moc_instrumenttemplate.cpp"

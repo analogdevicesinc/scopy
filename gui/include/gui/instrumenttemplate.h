@@ -101,6 +101,8 @@ private:
  *   |  of rows)|          |  nothing else) |            |              |  background_primary
  *   |          |            PS_BOTTOM slot              |              |
  *   +----------+----------------------------------------+--------------+
+ *   |          the debug panel, while it is raised                       |
+ *   +----------+----------------------------------------+--------------+
  *   | bottom rail   Debug                                               |  transparent
  *   +--------------------------------------------------------------------+
  *
@@ -275,6 +277,7 @@ private:
 	void setupSlots();
 	void setupTopRail();
 	void setupBottomRail();
+	void dockAboveBottomRail(QWidget *w);
 	// Shared by all three add*Row overloads. `row` is the button that goes in the rail
 	// for a plain row, or the header of the expandable one — everything except which
 	// widget gets inserted into `group` is identical between them.
