@@ -21,12 +21,10 @@ namespace acq {
 // Sources and processors write chunks; the engine and GUI read them. Every
 // method is safe to call from any thread.
 //
-// History depth is not set directly. Consumers register a named claim — in
-// samples (claimSamples) or in chunks (claimChunks), whichever their requirement
-// is actually expressed in — and the effective capacity of a stream is the
-// maximum over its live claims. This keeps independent consumers of the same key
-// — a plot window, a waterfall, a decoder — from overwriting each other's
-// requirements. Reads never mutate capacity.
+// History depth is not set directly. Consumers register a named claim
+// (claimDepth) and capacity is the max over the live claims — named because
+// unrelated consumers legitimately share one key, a digital stream can be plotted
+// *and* decoded, so last-writer-wins would let one silently clip the others.
 //
 // The samples->chunks conversion lives here and nowhere else. It needs the chunk
 // length, and the store is the only place that knows the length chunks *actually*
@@ -109,31 +107,38 @@ public:
 
 	// --- History depth ---------------------------------------------------
 
-	// Register `claimant`'s requirement for `key`; either call replaces that
-	// claimant's previous claim on that key, whichever unit it was in. Effective
-	// capacity is the max over claims.
+	// One consumer's history requirement, in the unit it was expressed in. Kept in
+	// that unit rather than converted at claim time: a sample claim has to be
+	// re-derived whenever the chunk length changes, which is the whole point.
 	//
-	// Pick the one your requirement is naturally in and let the store do the rest:
-	//   claimSamples — "I draw a window this many samples wide". The store keeps
-	//     enough chunks to cover it at the length chunks are currently arriving in,
-	//     and re-derives that on every push, so the claim needs no refreshing when
-	//     the acquisition buffer changes size.
-	//   claimChunks — "I need this many past chunks", where a chunk is the unit
+	//   Claim::samples — "I draw a window this many samples wide", re-derived on
+	//     every push against the length chunks are currently arriving in.
+	//   Claim::chunks — "I need this many past chunks", where a chunk is the unit
 	//     itself: one waterfall row, one averaged FFT frame, one annotation set.
-	//     Independent of the chunk length, so nothing to convert.
+	//     Claiming samples for one of those would make it scale with the chunk
+	//     length, which is exactly what it must not do.
 	//
-	// Claiming samples for a chunk-shaped requirement is the bug this split exists
-	// to prevent: it makes the claim scale with the chunk length, which is exactly
-	// what it should not do.
-	//
-	// `extraChunks` is added on top of the converted count, for a reader whose
-	// requirement genuinely is both: a centred trigger window is read over-long
-	// (plotSize + up to one chunk) and then re-anchored, so it needs the window
-	// *plus* a chunk. Two separate claimants could not express that — capacity is
-	// the max over claims, never a sum.
-	void claimSamples(const DataKey &key, const QString &claimant, std::size_t samples,
-			  std::size_t extraChunks = 0);
-	void claimChunks(const DataKey &key, const QString &claimant, std::size_t chunks);
+	// `extraChunks` is added on top of a converted sample claim, for a reader whose
+	// requirement genuinely is both: a centred trigger window is read over-long and
+	// then re-anchored. Two claimants could not express that — capacity is the max
+	// over claims, never a sum.
+	struct Claim
+	{
+		std::size_t amount{1};
+		bool        inSamples{false};
+		std::size_t extraChunks{0};
+
+		static Claim samples(std::size_t n, std::size_t extraChunks = 0)
+		{
+			return {n, true, extraChunks};
+		}
+		static Claim chunks(std::size_t n) { return {n, false, 0}; }
+	};
+
+	// Register `claimant`'s requirement for `key`, replacing that claimant's
+	// previous claim on that key whichever unit it was in. Effective capacity is
+	// the max over claims.
+	void claimDepth(const DataKey &key, const QString &claimant, Claim claim);
 	void releaseDepth(const DataKey &key, const QString &claimant);
 	// Drop every claim held by `claimant` across all keys.
 	void releaseClaimant(const QString &claimant);
@@ -160,19 +165,6 @@ Q_SIGNALS:
 	void keysChanged(QList<DataKey> keys);
 
 private:
-	// One claimant's requirement, in the unit it was expressed in. Kept in its
-	// original unit rather than converted at claim time: a sample claim has to be
-	// re-derived whenever the chunk length changes, which is the whole point.
-	struct Claim
-	{
-		std::size_t amount{1};
-		bool        inSamples{false};
-		// Added after the conversion, and only meaningful for a sample claim. See
-		// claimSamples.
-		std::size_t extraChunks{0};
-	};
-
-	void claimLocked(const DataKey &key, const QString &claimant, Claim c);
 	// Recomputes and applies capacity for `key`. Caller holds m_mutex.
 	void applyDepthLocked(const DataKey &key);
 

@@ -24,7 +24,9 @@
 
 #include "acqchannel.h"
 
+#include <QPoint>
 #include <QPointer>
+#include <QTimer>
 
 namespace scopy {
 class AnnotationCurve;
@@ -92,6 +94,12 @@ protected:
 	scopy::PlotAxis *ownYAxis(AcqPlot *plot) override;
 
 private:
+	// Hover tooltip over this band, off PlotWidget::mouseMove. AnnotationCurve::hitTest does
+	// the work; same plumbing as DecoderOverlay (src/sim/DecoderOverlay.cpp:147-233).
+	void onCanvasMouseMove(QPoint canvasPos, QPoint globalPos);
+	void showPendingTooltip();
+	void hideTip();
+
 	QPointer<PlotWidget> m_plot;
 
 	// Not a QPointer: AnnotationCurve is a QwtPlotItem, not a QObject.
@@ -99,6 +107,19 @@ private:
 	// Is a QPointer: AxisHandle parents itself to the canvas, so a canvas teardown
 	// takes it with no notice to us.
 	QPointer<PlotAxisHandle> m_handle;
+
+	// Deferred rather than shown straight from the move handler: QToolTip::showText called
+	// from inside one leaks QTipLabels until OOM, because the tooltip window appearing
+	// synthesises Leave/MouseMove on the canvas, which shows another tip.
+	QTimer m_hoverTimer;
+
+	// Where the cursor was when the timer was armed: canvas coords to hit-test with,
+	// screen coords to place the tip at.
+	QPoint m_pendingCanvasPos;
+	QPoint m_pendingGlobalPos;
+
+	QString m_lastTip;
+	QPoint m_lastTipGlobal;
 };
 
 } // namespace adc

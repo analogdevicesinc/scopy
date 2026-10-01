@@ -176,8 +176,7 @@ SCOPY_CORE_EXPORT SampleVariant truncateWindow(const SampleVariant &v, int n);
 SCOPY_CORE_EXPORT SampleVariant shiftAnnotations(const SampleVariant &v, int n, int delta);
 
 // Bounded chunk history for one stream, newest at index 0. Capacity is owned by
-// the DataStore (see DataStore::claimSamples / claimChunks); pushing past it drops
-// the oldest.
+// the DataStore (see DataStore::claimDepth); pushing past it drops the oldest.
 class SCOPY_CORE_EXPORT SampleBuffer
 {
 public:
