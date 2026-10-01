@@ -83,6 +83,7 @@ protected:
 	void onColorChanged(const QColor &c) override;
 	void onNameChanged(const QString &n) override;
 	void onSampleRateChanged(double sr) override;
+	void onPlotAxisChanged(bool horizontal, scopy::PlotAxis *axis) override;
 
 private:
 	QPointer<PlotWidget> m_plot;

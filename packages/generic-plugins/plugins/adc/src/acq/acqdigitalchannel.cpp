@@ -143,12 +143,15 @@ void AcqDigitalChannel::detachFrom()
 DepthNeed AcqDigitalChannel::depthNeeded(int plotSize) const
 {
 	// Same window as a curve: a digital track is one bit per sample over the same
-	// visible span.
-	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)));
+	// visible span — including the one extra chunk a re-anchored trigger window needs.
+	// See AcqCurveChannel::depthNeeded for why that chunk is not slack.
+	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)), /*extraChunks=*/1);
 }
 
 void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 {
+	// The read goes through the base's windowFor(). See AcqCurveChannel::readData.
+	Q_UNUSED(store)
 	if(!m_item || m_plot.isNull()) {
 		return;
 	}
@@ -156,7 +159,7 @@ void AcqDigitalChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// toBits owns its result, so unlike AcqCurveChannel's FloatView there is no
 	// aliasing to manage here — and setSamples copies into the item anyway. The cost
 	// is one allocation per cycle, against a quint8 per sample.
-	const QVector<quint8> bits = scopy::acq::toBits(store->window(key(), plotSize));
+	const QVector<quint8> bits = scopy::acq::toBits(windowFor(key(), plotSize));
 	if(bits.isEmpty()) {
 		return;
 	}

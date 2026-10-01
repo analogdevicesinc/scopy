@@ -122,6 +122,10 @@ void AcqWaterfallChannel::readData(scopy::acq::DataStore *store, int plotSize)
 		return;
 	}
 
+	// The store, not the base's snapshot-aware reads, unlike every other kind: a waterfall is
+	// chunk history — one raster row per chunk — and a trigger fire carries one assembled
+	// window per key, with no per-row history in it to draw.
+	//
 	// The cheapest possible "is there anything new" probe: one chunk, so the store
 	// mutex is held for a single refcount bump rather than a whole-history copy. On a
 	// cycle where this key was not written — common, since the heartbeat is
