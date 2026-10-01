@@ -135,10 +135,21 @@ class DecoderPanel : public QWidget
 {
 	Q_OBJECT
 public:
+	// Who scrolls when the panel outgrows the space it is given.
+	enum Scrolling {
+		// Its own QScrollArea, for a host that does not scroll.
+		OwnScrollArea,
+		// Report the full height and let the host scroll. Required when the host is itself
+		// a scroll area: a QScrollArea's minimumSizeHint does not grow with its content, so
+		// a nested one caps the panel's height and cuts off everything past the viewport.
+		HostScrolls,
+	};
+
 	DecoderPanel(DecoderManager *mgr,
 	             scopy::acq::DataStore *store,
 	             scopy::decoder::IDecoderCatalog *catalog,
-	             QWidget *parent = nullptr);
+	             QWidget *parent = nullptr,
+	             Scrolling scrolling = OwnScrollArea);
 
 	void setLogger(scopy::decoder::DecoderLogger *lg) { m_logger = lg; }
 

@@ -77,6 +77,10 @@ public:
 	// decoder chatter would otherwise drown the acquisition log.
 	scopy::decoder::DecoderLogger *decoderLogger() const { return m_decoderLogger; }
 
+	// The "Pipeline" tab's tree, so an owner that builds a decoder stack can hand it the
+	// manager — blocksChanged only reports a decoder once the engine loop applies it.
+	PipelineInspector *pipeline() const { return m_pipeline; }
+
 	// Adds a tab to the debug popup, next to the four built in here.
 	void addDebugTab(QWidget *w, const QString &title);
 
@@ -88,12 +92,25 @@ public Q_SLOTS:
 	void single();
 	void stop();
 
+	// What Single means. False (the default) is one engine cycle; true is "run until
+	// something stops you", for an owner that armed a one-shot stop.
+	//
+	// One cycle is wrong for a trigger: it may need any number of cycles to see its edge,
+	// and a fire whose window runs past the cycle it was found in is latched and completed
+	// on a later one, so a one-cycle run can report "triggered" and never emit the window.
+	void setSingleWaitsForStop(bool on) { m_singleWaitsForStop = on; }
+	bool singleWaitsForStop() const { return m_singleWaitsForStop; }
+
 Q_SIGNALS:
 	// Mirrors the engine's own signals on the GUI thread, for an owner that
 	// wants to refresh plots without connecting to the worker itself.
 	void started();
 	void stopped();
 	void cycleComplete();
+
+	// Emitted before the engine is touched, so a listener can arm a one-shot stop the run
+	// is guaranteed not to start ahead of. Not emitted if the press is refused.
+	void singleRequested();
 
 	// Deliberately no bufferSizeChanged signal. There used to be one, for consumers
 	// whose depth requirement was ceil(window / bufferSize) and so had to be
@@ -131,6 +148,9 @@ private:
 	// the engine's own fields, and the worker reads them between cycles.
 	MenuCombo        *m_modeCombo{nullptr};
 	gui::MenuSpinbox *m_bufferSpin{nullptr};
+
+	// See setSingleWaitsForStop().
+	bool m_singleWaitsForStop{false};
 
 	// Debug tabs.
 	PipelineInspector *m_pipeline{nullptr};

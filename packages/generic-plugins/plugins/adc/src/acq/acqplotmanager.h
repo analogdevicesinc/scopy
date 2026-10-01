@@ -184,6 +184,22 @@ public:
 	// not matter, to those that already exist.
 	void setFallbackSampleRate(double sr);
 
+	// ---- source pickers -------------------------------------------------------
+
+	// Fills `combo` with the available streams — declared ∪ written, sorted — keeping
+	// the current selection where it still exists. `withSampleIndex` prepends the
+	// sample-index entry, which is what an X picker wants and a Y picker does not.
+	//
+	// Public because the trigger's axis-source combo lives on the controller and reads the
+	// same key set.
+	//
+	// Both forward to scopy::acq::populateKeyCombo / keyFromCombo in core; these stay
+	// only to adapt MenuCombo to the QComboBox the shared version takes. See
+	// core/acq_engine/DataKeyCombo.h for why each step of the rebuild is as it is.
+	void populateKeyCombo(MenuCombo *combo, bool withSampleIndex) const;
+	// The key a source combo currently names, empty when nothing is selected.
+	static scopy::acq::DataKey keyFromCombo(const MenuCombo *combo);
+
 public Q_SLOTS:
 	// The visible width in samples, for every plot and for plots added later. Rescales
 	// each plot's ramp and re-claims every channel, which asks the store to retain
@@ -196,6 +212,11 @@ public Q_SLOTS:
 
 	// One acquisition cycle finished. Reads, marks dirty, does NOT replot.
 	void onCycleComplete();
+
+	// A trigger fired, with the window set it fired on, keyed by DataKey::key. Same
+	// read-then-mark-dirty path as onCycleComplete(), except each channel draws the fire's
+	// window rather than the newest samples in the store — see AcqChannel::pull().
+	void onTriggerFired(const QMap<QString, scopy::acq::SampleVariant> &snap);
 
 	void onStarted();
 	void onStopped();
@@ -259,8 +280,9 @@ private:
 	// Called wherever that max can move: a width change, and a plot appearing or going.
 	void announceMaxWindowSize();
 
-	// The "Plots" group, created on first use so an instrument that adds no plot shows
-	// no empty group. Also builds the "+ Add plot" row the first time.
+	// The "Plots" group, and the "Add plot" row inside it. Built from the constructor, not on
+	// first plot: that row is the only way to create a plot. Idempotent — registerPlotRail()
+	// calls it per plot.
 	MenuSectionCollapseWidget *railGroup();
 
 	// A rail row for the plot plus its menu page (ADD CHANNEL · Delete plot), keyed on
@@ -280,17 +302,6 @@ private:
 	// one path.
 	void registerRail(AcqChannel *ch);
 	void unregisterRail(AcqChannel *ch);
-
-	// Fills `combo` with the available streams — declared ∪ written, sorted — keeping
-	// the current selection where it still exists. `withSampleIndex` prepends the
-	// sample-index entry, which is what an X picker wants and a Y picker does not.
-	//
-	// Both forward to scopy::acq::populateKeyCombo / keyFromCombo in core; these stay
-	// only to adapt MenuCombo to the QComboBox the shared version takes. See
-	// core/acq_engine/DataKeyCombo.h for why each step of the rebuild is as it is.
-	void populateKeyCombo(MenuCombo *combo, bool withSampleIndex) const;
-	// The key a source combo currently names, empty when nothing is selected.
-	static scopy::acq::DataKey keyFromCombo(const MenuCombo *combo);
 
 	// ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
 	// extra cycles into one repaint.
