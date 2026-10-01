@@ -25,6 +25,7 @@ echo "Creating and navigating to the build directory..."
 mkdir -p build && cd build
 
 source /home/docker/scopy/scopy/ci/windows/mingw_toolchain.sh $USE_STAGING
+download_cmake
 
 $CMAKE .. $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe -DENABLE_TESTING=OFF
 $MAKE_BIN $JOBS
