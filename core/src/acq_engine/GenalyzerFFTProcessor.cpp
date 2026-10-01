@@ -177,7 +177,7 @@ void GenalyzerFFTProcessor::reclaimAveragingDepth()
 	// claimant's previous one, so shrinking navg releases the depth too.
 	const std::size_t want = static_cast<std::size_t>(qMax(1, m_navg.load(std::memory_order_relaxed)));
 	for(const DataKey &k : m_watchedKeys)
-		m_avgStore->claimChunks(k, name(), want);
+		m_avgStore->claimDepth(k, name(), DataStore::Claim::chunks(want));
 }
 
 std::optional<StreamInfo> GenalyzerFFTProcessor::streamInfo(const DataKey &key) const
