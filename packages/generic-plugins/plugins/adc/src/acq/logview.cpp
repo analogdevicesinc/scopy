@@ -71,6 +71,10 @@ LogView::LogView(const QString &placeholder, QWidget *parent)
 	m_view->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 	m_view->setLineWrapMode(QTextEdit::NoWrap);
 	m_view->setPlaceholderText(placeholder);
+	// The document trims its own oldest block once full, so an over-capacity append stays one
+	// append instead of a full re-render. format() emits exactly one block per entry, so this
+	// cap and m_capacity evict in step.
+	m_view->document()->setMaximumBlockCount(m_capacity);
 	// Its own fill and border, matching the tree panes in the other debug tabs — the
 	// global QTextEdit rule strips the border and the QWidget rule leaves the background
 	// transparent, so without this the log is an unbounded black area.
@@ -90,6 +94,7 @@ void LogView::setCapacity(int entries)
 	while(m_entries.size() > m_capacity) {
 		m_entries.removeFirst();
 	}
+	m_view->document()->setMaximumBlockCount(m_capacity);
 	rebuild();
 }
 
@@ -124,11 +129,11 @@ void LogView::append(int severity, const QString &id, const QString &message)
 
 	m_entries.append(e);
 	if(m_entries.size() > m_capacity) {
-		// Dropping the oldest changes what a filter widening would show, so the
-		// view has to be rebuilt rather than appended to.
+		// Only the retained data; the view drops its own oldest line through the
+		// document's block cap. Rebuilding here instead re-rendered up to m_capacity HTML
+		// lines on every message past the cap, which froze the app once a chatty decoder
+		// run had filled the log.
 		m_entries.removeFirst();
-		rebuild();
-		return;
 	}
 
 	if(severity < m_minSeverity) {
@@ -147,6 +152,9 @@ void LogView::clear()
 
 void LogView::rebuild()
 {
+	// Also resyncs the view with m_entries: while a filter is narrowed the view holds fewer
+	// blocks than there are entries, so the block cap evicts later than the entry list does
+	// and a line whose entry is already gone can linger.
 	m_view->clear();
 	for(const Entry &e : m_entries) {
 		if(e.severity >= m_minSeverity) {

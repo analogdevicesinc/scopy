@@ -221,7 +221,10 @@ void TriggerProcessor::process(DataStore *store)
 
 	// Window split: `pre` samples of history sit left of the firing sample,
 	// `post` at or after it. Both are 0 when no window is configured.
-	const int pre  = L > 0 ? std::clamp(static_cast<int>(std::lround(frac * L)), 0, L - 1) : 0;
+	//
+	// Scaled by L-1, not L: `pre` is reported as a sample *index*, and TriggerMarker::
+	// xForSample maps one back to a position by dividing by L-1. Using L here drifts.
+	const int pre  = L > 0 ? std::clamp(static_cast<int>(std::lround(frac * (L - 1))), 0, L - 1) : 0;
 	const int post = L - pre;
 
 	// Samples this cycle contributed, taken from the first watched stream that
