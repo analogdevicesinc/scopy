@@ -27,7 +27,10 @@ mkdir -p build && cd build
 source /home/docker/scopy/scopy/ci/windows/mingw_toolchain.sh $USE_STAGING
 download_cmake
 
-$CMAKE .. $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe -DENABLE_TESTING=OFF
+# Build only this package (skip the other in-tree Scopy packages)
+PKG_NAME_UPPER=$(echo $GITHUB_REPOSITORY | tr '[:lower:]' '[:upper:]')
+$CMAKE .. $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe -DENABLE_TESTING=OFF \
+	-DENABLE_TRANSLATION=OFF -DDISABLE_ALL_PACKAGES=ON -DENABLE_PACKAGE_$PKG_NAME_UPPER=ON
 $MAKE_BIN $JOBS
 
 echo "Returning to the package generator directory..."
