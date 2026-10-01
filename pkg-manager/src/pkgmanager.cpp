@@ -46,6 +46,10 @@ PkgManager::PkgManager(QObject *parent)
 	: QObject(parent)
 {
 	packagesPath_ = Preferences::get("packages_path").toString();
+	if(packagesPath_.isEmpty()) {
+		packagesPath_ = scopy::config::pkgFolderPath();
+		qInfo(CAT_PKGMANAGER) << "Packages path not set, using default:" << packagesPath_;
+	}
 	createPkgDirectory();
 }
 
@@ -84,6 +88,8 @@ bool PkgManager::install(const QString &zipPath, bool performRestart)
 bool PkgManager::_install(const QString &zipPath, bool performRestart)
 {
 	if(packagesPath_.isEmpty()) {
+		LoggingUtil::logMessage(CAT_PKGMANAGER, "Could not install the package. The packages location is not set.",
+					LoggingUtil::Warning, true, false, STATUS_BAR_MS);
 		return false;
 	}
 	QJsonObject metadata = PkgUtil::extractJsonMetadata(zipPath);
