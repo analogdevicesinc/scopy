@@ -128,26 +128,14 @@ std::optional<AnnotationStreamInfo> DataStore::annotationInfo(const DataKey &key
 	return *it;
 }
 
-void DataStore::claimLocked(const DataKey &key, const QString &claimant, Claim c)
+void DataStore::claimDepth(const DataKey &key, const QString &claimant, Claim claim)
 {
-	c.amount = std::max<std::size_t>(1, c.amount);
-	// One entry per claimant, so a claim in either unit replaces whatever that
-	// claimant asked for before — including a claim in the other unit.
-	m_claims[key][claimant] = c;
+	QMutexLocker lk(&m_mutex);
+	claim.amount = std::max<std::size_t>(1, claim.amount);
+	// One entry per claimant: a new claim replaces that claimant's previous one,
+	// in either unit.
+	m_claims[key][claimant] = claim;
 	applyDepthLocked(key);
-}
-
-void DataStore::claimSamples(const DataKey &key, const QString &claimant, std::size_t samples,
-			     std::size_t extraChunks)
-{
-	QMutexLocker lk(&m_mutex);
-	claimLocked(key, claimant, Claim{samples, /*inSamples=*/true, extraChunks});
-}
-
-void DataStore::claimChunks(const DataKey &key, const QString &claimant, std::size_t chunks)
-{
-	QMutexLocker lk(&m_mutex);
-	claimLocked(key, claimant, Claim{chunks, /*inSamples=*/false, /*extraChunks=*/0});
 }
 
 void DataStore::releaseDepth(const DataKey &key, const QString &claimant)

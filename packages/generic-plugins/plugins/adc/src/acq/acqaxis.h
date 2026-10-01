@@ -113,6 +113,11 @@ public:
 		bool isTime() const { return mode == Mode::Time; }
 		// Either derived mode: reads the ramp rather than acquired data.
 		bool isIndexBased() const { return mode != Mode::Stream; }
+
+		// What decides whether two channels share a PlotAxis: the key, except that Time
+		// gets the sentinel. Sample index and time are the same ramp stream read two ways,
+		// so keying on the key alone would put seconds and sample counts on one scale.
+		QString id() const;
 	};
 
 	// The combo payload for the "time (s)" entry. Unlike sample index, time genuinely is
@@ -132,7 +137,13 @@ public:
 	~AcqAxis() override;
 
 	PlotAxis *plotAxis() const { return m_axis.data(); }
-	// QwtAxis::XBottom/YLeft/... — the position the pool allocated it at.
+
+	// Move this side onto another PlotAxis, because the source it draws against changed:
+	// writing the new source's unit and range onto the old axis would relabel it for every
+	// other channel still reading the old one. Only the wrapper moves — what draws against
+	// the axis is the channel kind's to move.
+	void setPlotAxis(PlotAxis *axis);
+	// QwtAxis::XBottom/YLeft/...
 	int position() const;
 	bool isHorizontal() const;
 

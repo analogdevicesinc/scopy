@@ -163,6 +163,11 @@ private:
 	void setupAxes();
 	void setupPlotButtonManager();
 	QwtSymbol::Style getCurveStyle(int i);
+
+	// Hide `axis` only if no channel still draws against it: axes can be shared, so a
+	// channel leaving one must not take the scale away from its siblings. Call after the
+	// channel has been removed or moved, so it does not count itself.
+	void hideAxisIfUnused(PlotAxis *axis, bool yAxis);
 };
 
 } // namespace scopy

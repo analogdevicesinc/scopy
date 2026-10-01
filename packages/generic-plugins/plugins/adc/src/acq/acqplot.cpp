@@ -114,60 +114,26 @@ void AcqPlot::removeChannelRef(AcqChannel *ch) { m_channels.removeOne(ch); }
 
 bool AcqPlot::supportsPerChannelAxes() const { return plotKindPoolsAxes(m_kind); }
 
-PlotAxis *AcqPlot::acquireAxis(int position)
+PlotAxis *AcqPlot::axisForSource(int position, const QString &sourceId)
 {
 	if(m_plot.isNull()) {
 		return nullptr;
 	}
 
-	QList<PlotAxis *> &free = m_free[position];
-	if(!free.isEmpty()) {
-		PlotAxis *ax = free.takeLast();
-		// Reset what a previous borrower may have left on it. The unit especially: a
-		// recycled axis still carrying "Hz" would mislabel the next channel's volts.
-		// Visibility stays false — the borrowing AcqChannel/PlotWidget is what shows it.
-		ax->setUnits(QString());
-		ax->setUnitsVisible(false);
-		ax->setVisible(false);
-		return ax;
+	const QPair<int, QString> id(position, sourceId);
+	if(PlotAxis *existing = m_sourceAxes.value(id, nullptr)) {
+		// Nothing is reset: the axis is still in use and its unit and interval describe
+		// the source both channels read.
+		return existing;
 	}
 
-	// The PlotWidget * overload specifically: it self-registers through
-	// addPlotAxis(this) and grows the QwtPlot's axis count for this position, which is
-	// the only supported way to add an axis at all.
-	//
-	// content_subtle, matching the pen PlotWidget::setupAxes() gives its built-in pair:
-	// a pooled axis and a plot's own axis are the same kind of scale to the user, and a
-	// waterfall shows the built-in pair directly, so any other colour reads as two
-	// different label styles between plots in the same instrument.
+	// The PlotWidget * overload specifically: it self-registers through addPlotAxis(this),
+	// which grows the QwtPlot's axis count and hands the axis to the navigator. The pen
+	// matches PlotWidget::setupAxes()'s built-in pair, which a waterfall shows directly.
 	QPen pen(Style::getColor(json::theme::content_subtle));
 	PlotAxis *ax = new PlotAxis(position, m_plot.data(), pen, this);
-	m_all.append(ax);
+	m_sourceAxes.insert(id, ax);
 	return ax;
-}
-
-void AcqPlot::releaseAxis(PlotAxis *ax)
-{
-	if(!ax) {
-		return;
-	}
-	if(!m_all.contains(ax)) {
-		// A foreign axis — the plot's own built-in pair, or another plot's. Letting it
-		// into the free list would hand it out as if this pool owned it.
-		qWarning() << "AcqPlot" << m_uuid << "asked to release an axis it did not create";
-		return;
-	}
-
-	QList<PlotAxis *> &free = m_free[ax->position()];
-	if(free.contains(ax)) {
-		// Two entries for one axis means the next two acquires hand the same axis to two
-		// live channels, which draw over each other on one scale.
-		qWarning() << "AcqPlot" << m_uuid << "double release of axis at position" << ax->position();
-		return;
-	}
-
-	ax->setVisible(false);
-	free.append(ax);
 }
 
 PlotAxis *AcqPlot::digitalAxis()
