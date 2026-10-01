@@ -135,6 +135,12 @@ QWidget *AcqChannel::createKindSettings(QWidget *parent)
 	return nullptr;
 }
 
+void AcqChannel::onPlotAxisChanged(bool horizontal, PlotAxis *axis)
+{
+	Q_UNUSED(horizontal)
+	Q_UNUSED(axis)
+}
+
 void AcqChannel::onEnabledChanged(bool en) { Q_UNUSED(en) }
 void AcqChannel::onColorChanged(const QColor &c) { Q_UNUSED(c) }
 void AcqChannel::onNameChanged(const QString &n) { Q_UNUSED(n) }
@@ -150,7 +156,7 @@ void AcqChannel::acquireAxes()
 
 	PlotAxis *xPlotAxis = nullptr;
 	PlotAxis *yPlotAxis = nullptr;
-	// Two reasons a side can decline the pool: the plot kind owns its axes (a
+	// Two reasons a side can decline a shared source axis: the plot kind owns its axes (a
 	// waterfall), or this kind draws on an axis it names itself (a logic track on the
 	// plot's shared digital axis). Either way the AcqAxis still exists and is
 	// source-fixed, so the section is visible with the constraint stated rather than
@@ -158,19 +164,25 @@ void AcqChannel::acquireAxes()
 	const bool xPooled = pooled && wantsPooledXAxis();
 	const bool yPooled = pooled && wantsPooledYAxis();
 
+	// Before the axes: which axis a side draws against is decided by its source.
+	const AcqAxis::Source xSrc = m_xKey == scopy::acq::AcquisitionEngine::indexRampKey()
+		? AcqAxis::Source::sampleIndex()
+		: AcqAxis::Source::stream(m_xKey, QString());
+	const AcqAxis::Source ySrc = AcqAxis::Source::stream(m_key, m_info.unit);
+
 	if(xPooled) {
-		xPlotAxis = m_owner->acquireAxis(QwtAxis::XBottom);
+		xPlotAxis = m_owner->axisForSource(QwtAxis::XBottom, xSrc.id());
 	} else {
 		xPlotAxis = ownXAxis(m_owner);
 	}
 	if(yPooled) {
-		yPlotAxis = m_owner->acquireAxis(QwtAxis::YLeft);
+		yPlotAxis = m_owner->axisForSource(QwtAxis::YLeft, ySrc.id());
 	} else {
 		yPlotAxis = ownYAxis(m_owner);
 	}
 
-	// The plot widget's built-in pair is the fallback for a side that declined the pool
-	// and named nothing — which is the waterfall case.
+	// The plot widget's built-in pair is the fallback for a side that declined and named
+	// nothing — which is the waterfall case.
 	PlotWidget *w = m_owner->plot();
 	if(!xPlotAxis && w) {
 		xPlotAxis = w->xAxis();
@@ -179,13 +191,8 @@ void AcqChannel::acquireAxes()
 		yPlotAxis = w->yAxis();
 	}
 
-	m_xAxis = new AcqAxis(xPlotAxis,
-			      m_xKey == scopy::acq::AcquisitionEngine::indexRampKey()
-				      ? AcqAxis::Source::sampleIndex()
-				      : AcqAxis::Source::stream(m_xKey, QString()),
-			      m_store.data(), m_engine.data(), this);
-	m_yAxis = new AcqAxis(yPlotAxis, AcqAxis::Source::stream(m_key, m_info.unit), m_store.data(),
-			      m_engine.data(), this);
+	m_xAxis = new AcqAxis(xPlotAxis, xSrc, m_store.data(), m_engine.data(), this);
+	m_yAxis = new AcqAxis(yPlotAxis, ySrc, m_store.data(), m_engine.data(), this);
 
 	if(!xPooled) {
 		m_xAxis->setSourceFixed(true, tr("This plot kind owns its horizontal axis"));
@@ -200,6 +207,7 @@ void AcqChannel::acquireAxes()
 	connect(m_xAxis, &AcqAxis::sourceChanged, this,
 		[this](scopy::acq::DataKey oldKey, scopy::acq::DataKey newKey) {
 			m_xKey = newKey;
+			moveToSourceAxis(m_xAxis, QwtAxis::XBottom, wantsPooledXAxis());
 			Q_EMIT depthNeedsReclaim(oldKey);
 		});
 	// The Y axis's source is a scaling choice, not this channel's key — key() is fixed
@@ -207,35 +215,36 @@ void AcqChannel::acquireAxes()
 	connect(m_yAxis, &AcqAxis::sourceChanged, this,
 		[this](scopy::acq::DataKey oldKey, scopy::acq::DataKey newKey) {
 			Q_UNUSED(newKey)
+			moveToSourceAxis(m_yAxis, QwtAxis::YLeft, wantsPooledYAxis());
 			Q_EMIT depthNeedsReclaim(oldKey);
 		});
 }
 
+void AcqChannel::moveToSourceAxis(AcqAxis *side, int position, bool wantsPooled)
+{
+	// A side that named its own axis stays on it: its source is fixed.
+	if(!side || !m_owner || !wantsPooled || !m_owner->supportsPerChannelAxes()) {
+		return;
+	}
+	PlotAxis *want = m_owner->axisForSource(position, side->source().id());
+	if(!want || want == side->plotAxis()) {
+		return;
+	}
+	// The wrapper first, then the kind's visual — which is the only thing that knows what
+	// it drew.
+	side->setPlotAxis(want);
+	onPlotAxisChanged(position == QwtAxis::XBottom, want);
+}
+
 void AcqChannel::releaseAxes()
 {
-	// Capture the borrowed PlotAxis before destroying the wrapper: the AcqAxis
-	// destructor deregisters its channel from its autoscaler, so it has to run before
-	// the axis goes back in the pool and is handed to somebody else.
-	PlotAxis *xBorrowed = m_xAxis ? m_xAxis->plotAxis() : nullptr;
-	PlotAxis *yBorrowed = m_yAxis ? m_yAxis->plotAxis() : nullptr;
-	const bool xWasPooled = m_owner && m_owner->supportsPerChannelAxes() && wantsPooledXAxis();
-	const bool yWasPooled = m_owner && m_owner->supportsPerChannelAxes() && wantsPooledYAxis();
-
+	// The wrappers only. An axis belongs to a source, not to a channel, so there is nothing
+	// to hand back — PlotWidget::removePlotChannel hides an axis no surviving channel uses,
+	// and that is the whole of the cleanup.
 	delete m_xAxis;
 	m_xAxis = nullptr;
 	delete m_yAxis;
 	m_yAxis = nullptr;
-
-	// Only the pool's own axes go back. releaseAxis() warns about a foreign one, and a
-	// plot widget's built-in pair or a shared digital axis is exactly that.
-	if(m_owner) {
-		if(xWasPooled) {
-			m_owner->releaseAxis(xBorrowed);
-		}
-		if(yWasPooled) {
-			m_owner->releaseAxis(yBorrowed);
-		}
-	}
 }
 
 void AcqChannel::attach(AcqPlot *plot)
@@ -316,12 +325,52 @@ void AcqChannel::onStopped()
 	}
 }
 
-void AcqChannel::pull(int plotSize)
+void AcqChannel::pull(int plotSize, const QMap<QString, scopy::acq::SampleVariant> *snap)
 {
 	if(!m_enabled || m_store.isNull()) {
 		return;
 	}
+	// Set around the call rather than added to readData()'s signature, which would make every
+	// override responsible for honouring it.
+	m_snap = snap;
 	readData(m_store.data(), plotSize);
+	m_snap = nullptr;
+}
+
+scopy::acq::SampleVariant AcqChannel::windowFor(const scopy::acq::DataKey &k, int plotSize) const
+{
+	if(m_snap) {
+		// constFind, not value(): a key the fire does not carry has to fall through to the
+		// store rather than be drawn as empty. The index ramp is the case that matters — it
+		// is published outside a cycle, and a curve with no X draws nothing at all.
+		const auto it = m_snap->constFind(k.key);
+		if(it != m_snap->constEnd()) {
+			return *it;
+		}
+	}
+	if(m_store.isNull()) {
+		return QVector<float>{};
+	}
+	return m_store->window(k, plotSize);
+}
+
+QVector<float> AcqChannel::windowFloatFor(const scopy::acq::DataKey &k, int plotSize) const
+{
+	return scopy::acq::toFloat(windowFor(k, plotSize));
+}
+
+std::optional<scopy::acq::SampleVariant> AcqChannel::latestFor(const scopy::acq::DataKey &k) const
+{
+	if(m_snap) {
+		const auto it = m_snap->constFind(k.key);
+		if(it != m_snap->constEnd()) {
+			return *it;
+		}
+	}
+	if(m_store.isNull()) {
+		return std::nullopt;
+	}
+	return m_store->latest(k);
 }
 
 void AcqChannel::reclaimDepth(int plotSize)

@@ -72,6 +72,8 @@ AcqAxis::Source AcqAxis::Source::time()
 	return Source{scopy::acq::AcquisitionEngine::indexRampKey(), QStringLiteral("s"), Mode::Time};
 }
 
+QString AcqAxis::Source::id() const { return isTime() ? timeComboData() : key.toString(); }
+
 AcqAxis::AcqAxis(PlotAxis *axis, const Source &src, scopy::acq::DataStore *store,
 		 scopy::acq::AcquisitionEngine *engine, QObject *parent)
 	: QObject(parent)
@@ -95,13 +97,53 @@ AcqAxis::AcqAxis(PlotAxis *axis, const Source &src, scopy::acq::DataStore *store
 
 AcqAxis::~AcqAxis()
 {
-	// The PlotAxis is deliberately not touched: it belongs to the AcqPlot's pool and
-	// outlives every channel that borrows it. See the header.
+	// The PlotAxis is deliberately not touched: it belongs to the AcqPlot and outlives every
+	// channel reading its source.
 	if(!m_autoscaler.isNull() && m_autoscaleTarget) {
 		// PlotAutoscaler::autoscale() walks its channel list on a timer, so a channel
 		// left registered past this point is a use-after-free within one timeout.
 		m_autoscaler->removeChannels(m_autoscaleTarget);
 	}
+}
+
+void AcqAxis::setPlotAxis(PlotAxis *axis)
+{
+	if(!axis || axis == m_axis.data()) {
+		return;
+	}
+
+	// The old axis is left alone — other channels still read the source it is scaled for.
+	// Only this object's hold on it is dropped: the forwarding, and the manual spinboxes,
+	// which write a PlotAxis directly and would otherwise keep moving the abandoned one.
+	if(!m_axis.isNull()) {
+		disconnect(m_axis.data(), nullptr, this, nullptr);
+		if(!m_rangeCtrl.isNull()) {
+			m_rangeCtrl->removeAxis(m_axis.data());
+		}
+	}
+
+	m_axis = axis;
+
+	// The new axis may never have been labelled, having been created on this very call.
+	applyUnit();
+
+	// Forget the last request so the next one applies rather than being dropped as a repeat
+	// of one made against the old axis.
+	m_reqMin = qQNaN();
+	m_reqMax = qQNaN();
+
+	connect(m_axis.data(), &PlotAxis::minChanged, this, [this](double) { Q_EMIT intervalChanged(min(), max()); });
+	connect(m_axis.data(), &PlotAxis::maxChanged, this, [this](double) { Q_EMIT intervalChanged(min(), max()); });
+
+	if(!m_rangeCtrl.isNull()) {
+		m_rangeCtrl->addAxis(m_axis.data());
+		QSignalBlocker bMin(m_rangeCtrl->minSpinbox());
+		QSignalBlocker bMax(m_rangeCtrl->maxSpinbox());
+		m_rangeCtrl->minSpinbox()->setValue(m_axis->min());
+		m_rangeCtrl->maxSpinbox()->setValue(m_axis->max());
+	}
+
+	Q_EMIT intervalChanged(min(), max());
 }
 
 int AcqAxis::position() const { return m_axis.isNull() ? QwtAxis::YLeft : m_axis->position(); }

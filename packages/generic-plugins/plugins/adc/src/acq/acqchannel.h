@@ -178,7 +178,12 @@ public:
 	// registered in samples and the DataStore converts — and no index ramp, since the
 	// sample-index X source is a real store stream the engine writes
 	// (AcquisitionEngine::indexRampKey()) and is read like any other X.
-	void pull(int plotSize);
+	//
+	// `snap` is a trigger fire's window set, keyed by DataKey::key: draw *this* window and
+	// not whatever is in the store now. The processor has already re-anchored each window
+	// so the sample that fired sits at the requested split, so re-reading the store would
+	// draw a window the reported fire index does not describe. Borrowed for the call only.
+	void pull(int plotSize, const QMap<QString, scopy::acq::SampleVariant> *snap = nullptr);
 
 	// Drop every cached buffer and blank the visual. Called from onStarted(), after
 	// AcqInstrument::run() has already done store->clear(): the chunks are gone but
@@ -297,20 +302,24 @@ protected:
 	// with no knobs.
 	virtual QWidget *createKindSettings(QWidget *parent);
 
-	// Which pooled axes this kind wants out of AcqPlot's pool. A kind whose Y is the
-	// plot's shared digital axis wants only X; a waterfall, which owns its whole
-	// widget and both its axes, wants neither. A false answer does not remove the
-	// AcqAxis — it wraps an axis the kind names instead, source-fixed, so the reader
-	// still sees the section with the constraint stated rather than the settings
-	// silently disappearing for one kind.
+	// Whether this kind takes the plot's axis for its source on each side. A kind whose Y is
+	// the plot's shared digital axis wants only X; a waterfall, which owns both its axes,
+	// wants neither. A false answer does not remove the AcqAxis — it wraps an axis the kind
+	// names instead, source-fixed, so the settings section stays visible with the
+	// constraint stated.
 	virtual bool wantsPooledXAxis() const { return true; }
 	virtual bool wantsPooledYAxis() const { return true; }
 
-	// The axis a kind that declined the pool wants wrapped instead. Called only when
-	// the corresponding wantsPooled*Axis() is false; null falls back to the plot
-	// widget's own built-in axis for that side.
+	// The axis a kind that declined wants wrapped instead. Called only when the
+	// corresponding wantsPooled*Axis() is false; null falls back to the plot widget's own
+	// built-in axis for that side.
 	virtual scopy::PlotAxis *ownXAxis(AcqPlot *plot);
 	virtual scopy::PlotAxis *ownYAxis(AcqPlot *plot);
+
+	// The reader retargeted this side's source, so the PlotAxis drawn against changed. Move
+	// whatever was built against the old one — a PlotChannel, a handle — onto `axis`. Only
+	// for a side that takes the plot's source axis.
+	virtual void onPlotAxisChanged(bool horizontal, scopy::PlotAxis *axis);
 
 	// Hooks for the three base-owned properties. Called after the member is updated
 	// and before the signal, and only when the value actually changed.
@@ -322,17 +331,50 @@ protected:
 	// Say that depthNeeded() would now answer differently.
 	void requestReclaim() { Q_EMIT depthNeedsReclaim(scopy::acq::DataKey()); }
 
+	// ---- reads, snapshot-aware -----------------------------------------------
+	//
+	// Use these instead of store->window()/latest(): on a trigger fire they return that
+	// fire's window for the key, and otherwise they are exactly the store call they
+	// replace. Reading the store directly still works — it just keeps drawing the live
+	// window on a fire, which is the bug these exist to close.
+	//
+	// The fire's windows are already the requested length, so `plotSize` is only the
+	// fallback path's argument. An empty Float32 vector for an absent key, matching
+	// DataStore::window().
+	scopy::acq::SampleVariant windowFor(const scopy::acq::DataKey &k, int plotSize) const;
+	QVector<float>            windowFloatFor(const scopy::acq::DataKey &k, int plotSize) const;
+
+	// nullopt when neither the fire nor the store has `k`, so a caller can tell absent
+	// from empty.
+	std::optional<scopy::acq::SampleVariant> latestFor(const scopy::acq::DataKey &k) const;
+
+	// latestFor() narrowed to one alternative, DataStore::latestAs<>()'s counterpart:
+	// nullopt on a type mismatch, because the narrowing is also the check that the key is
+	// a stream the caller can draw.
+	template<class T>
+	std::optional<T> latestAsFor(const scopy::acq::DataKey &k) const
+	{
+		std::optional<scopy::acq::SampleVariant> v = latestFor(k);
+		if(!v || !std::holds_alternative<T>(*v)) {
+			return std::nullopt;
+		}
+		return std::get<T>(std::move(*v));
+	}
+
 	// For a subclass that needs the store outside readData(). Null once the store has
 	// been destroyed. Out of line because QPointer::data() instantiates against the
 	// complete type, which this header deliberately does not include.
 	scopy::acq::DataStore *store() const;
 
 private:
-	// Acquire and release this channel's axis pair. Called by attach()/detach() around
-	// the subclass's attachTo()/detachFrom(), so a kind can build its visual against
-	// the axes and still be unhooked before they go back to the pool.
+	// Build and destroy this channel's axis pair. Called by attach()/detach() around the
+	// subclass's attachTo()/detachFrom(), so a kind can build its visual against the axes
+	// and still be unhooked before the wrappers go.
 	void acquireAxes();
 	void releaseAxes();
+
+	// Put `side` on the plot's axis for its current source, moving the kind's visual with it.
+	void moveToSourceAxis(AcqAxis *side, int position, bool wantsPooled);
 
 	QPointer<scopy::acq::DataStore> m_store;
 	// Borrowed, for the axes' source pickers. Never driven from here.
@@ -354,6 +396,9 @@ private:
 	// wraps is the plot's, borrowed and returned; see acqaxis.h.
 	AcqAxis *m_xAxis{nullptr};
 	AcqAxis *m_yAxis{nullptr};
+
+	// The fire window set for the duration of one pull(), or null. Borrowed.
+	const QMap<QString, scopy::acq::SampleVariant> *m_snap{nullptr};
 
 	bool m_enabled{true};
 	bool m_keyPresent{true};
