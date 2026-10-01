@@ -122,6 +122,10 @@ void PipelineInspector::setDecoderManager(DecoderManager *mgr)
 
 	connect(mgr, &DecoderManager::decoderRemoved, this, [this](const QString &) { rebuild(); });
 	connect(mgr, &DecoderManager::decoderAdded, this, [this](const QString &) { rebuild(); });
+	// The tree lists a row per stage, and neither signal above fires for a stack change.
+	connect(mgr, &DecoderManager::stageAdded, this, [this](const QString &, int) { rebuild(); });
+	connect(mgr, &DecoderManager::stagesRemoved, this,
+		[this](const QString &, const QList<scopy::acq::DataKey> &) { rebuild(); });
 }
 
 scopy::acq::Block *PipelineInspector::blockOf(QTreeWidgetItem *item)

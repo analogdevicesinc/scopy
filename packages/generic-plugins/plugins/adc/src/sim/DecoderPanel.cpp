@@ -603,7 +603,8 @@ void DecoderEditor::applyNow()
 DecoderPanel::DecoderPanel(DecoderManager *mgr,
                            scopy::acq::DataStore *store,
                            scopy::decoder::IDecoderCatalog *catalog,
-                           QWidget *parent)
+                           QWidget *parent,
+                           Scrolling scrolling)
 	: QWidget(parent)
 	, m_mgr(mgr)
 	, m_store(store)
@@ -613,12 +614,19 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr,
 	outer->setContentsMargins(0, 0, 0, 0);
 	outer->setSpacing(0);
 
-	auto *scroll = new QScrollArea(this);
-	scroll->setWidgetResizable(true);
-	scroll->setFrameShape(QFrame::NoFrame);
-	outer->addWidget(scroll);
+	QScrollArea *scroll = nullptr;
+	if(scrolling == OwnScrollArea) {
+		scroll = new QScrollArea(this);
+		scroll->setWidgetResizable(true);
+		scroll->setFrameShape(QFrame::NoFrame);
+		outer->addWidget(scroll);
+	} else {
+		// Preferred and not Expanding: settle at the height the content needs rather than
+		// claim the host's slack.
+		setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	}
 
-	auto *content = new QWidget(scroll);
+	auto *content = new QWidget(scroll ? static_cast<QWidget *>(scroll) : this);
 	auto *contentLay = new QVBoxLayout(content);
 	contentLay->setContentsMargins(8, 8, 8, 8);
 	contentLay->setSpacing(8);
@@ -635,9 +643,15 @@ DecoderPanel::DecoderPanel(DecoderManager *mgr,
 	m_editorsLay = new QVBoxLayout();
 	m_editorsLay->setSpacing(8);
 	contentLay->addLayout(m_editorsLay);
-	contentLay->addStretch();
-
-	scroll->setWidget(content);
+	// The stretch holds the content at the top of a viewport taller than it. Without a scroll
+	// area of our own it would instead pad the panel out and push the rest of the host page's
+	// sections off the bottom.
+	if(scroll) {
+		contentLay->addStretch();
+		scroll->setWidget(content);
+	} else {
+		outer->addWidget(content);
+	}
 
 	connect(addBtn, &QPushButton::clicked, this, &DecoderPanel::onAddClicked);
 
