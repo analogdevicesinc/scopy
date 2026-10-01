@@ -13,6 +13,14 @@ jobs:
   build_armhf_package:
     runs-on: ubuntu-22.04
     steps:
+      - name: Runner cleanup
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a --force
+          df -h
+
       - name: Checkout Package Repository (this repo)
         uses: actions/checkout@v6
         with:
