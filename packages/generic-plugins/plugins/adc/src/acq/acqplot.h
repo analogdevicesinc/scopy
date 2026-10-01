@@ -27,6 +27,7 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QPair>
 #include <QPointer>
 #include <QString>
 #include <QVector>
@@ -50,20 +51,9 @@ class AcqChannel;
 // A QObject rather than a QWidget — the PlotWidget goes straight into the dock the
 // manager wraps it in, so a wrapper widget here would add a layout level for nothing.
 //
-// THE AXIS POOL. Every channel here gets its own X and Y axis, which is only safe
-// because axes are recycled rather than destroyed. Qwt gives no removal path:
-// PlotWidget's removePlotAxis is commented out as "not supported by Qwt"
-// (gui/include/gui/plotwidget.h:73), PlotAxis's constructor registers itself into
-// PlotWidget::m_plotAxis and bumps the QwtPlot's axis count while its destructor is
-// empty and unregisters nothing, and PlotNavigator has addAxis but no removeAxis. So
-// acquireAxis() hands out a hidden axis from a free list or grows the pool, and
-// releaseAxis() hides it and puts it back. Nothing is ever deleted, so nobody's stored
-// axisId can dangle; reuse is safe because PlotNavigator::addChannel re-registers an
-// axisId it had dropped.
-//
-// The consequence worth knowing: axisPoolSize() rises to the high-water mark of
-// simultaneous channels and then stops. A pool that keeps growing while channels are
-// added and removed one at a time means a release path was missed.
+// ONE AXIS PER SOURCE, NOT PER CHANNEL. An axis is identified by (QwtAxis position,
+// stream), so every channel reading one stream on one side shares a scale. Axes are
+// created on first use and never destroyed: Qwt has no axis removal path.
 class AcqPlot : public QObject
 {
 	Q_OBJECT
@@ -92,20 +82,14 @@ public:
 	// channel here must not take a pooled pair.
 	bool supportsPerChannelAxes() const;
 
-	// --- the axis pool ---
+	// --- axes by source ---
 
-	// A hidden PlotAxis at `position` (a QwtAxis position), recycled if one is free.
-	// The caller borrows it and must hand it back through releaseAxis; it must never
-	// be deleted. Null if this plot has no widget.
-	scopy::PlotAxis *acquireAxis(int position);
+	// The axis at `position` for `sourceId` (AcqAxis::Source::id()), created hidden on first
+	// ask and returned to every later caller naming the same pair. Borrowed — owned by this
+	// plot, never deleted by the caller. Null if this plot has no widget.
+	scopy::PlotAxis *axisForSource(int position, const QString &sourceId);
 
-	// Hides `ax` and returns it to the free list for its position. Ignores an axis
-	// this pool did not hand out, and a double release — putting one axis in the free
-	// list twice would give two live channels the same axis.
-	void releaseAxis(scopy::PlotAxis *ax);
-
-	// Total axes ever created by the pool. Diagnostics: this must plateau.
-	int axisPoolSize() const { return m_all.size(); }
+	int axisCount() const { return m_sourceAxes.size(); }
 
 	// The one axis hosting fixed-height items (digital tracks, annotation bands) on
 	// this plot. Created on first use, interval [0,1], invisible: items place
@@ -194,10 +178,8 @@ private:
 
 	QList<AcqChannel *> m_channels; // not owned — the manager owns them
 
-	// Free axes by QwtAxis position, and every axis the pool ever made. m_all only
-	// grows; see the class comment for why nothing is deleted.
-	QMap<int, QList<scopy::PlotAxis *>> m_free;
-	QList<scopy::PlotAxis *> m_all;
+	// Only grows; see the class comment for why nothing is deleted.
+	QMap<QPair<int, QString>, scopy::PlotAxis *> m_sourceAxes;
 
 	// Parented to this, so Qt frees the QObject — which is as much as is safe.
 	scopy::PlotAxis *m_digitalAxis{nullptr};

@@ -58,10 +58,9 @@ void AcqCurveChannel::attachTo(AcqPlot *plot)
 	}
 	m_plot = plot->plot();
 
-	// This channel's own axes, out of the plot's pool — acquired by the base before it
-	// called us. Two curves on one plot can therefore be drawn against two different X
-	// sources, which is the whole reason the pool exists; see the axis lifetime note in
-	// acqplot.h for why nothing here may delete one.
+	// The plot's axes for this channel's two sources, resolved by the base before it called
+	// us and shared with every other channel reading the same source on the same side. See
+	// the axis lifetime note in acqplot.h for why nothing here may delete one.
 	PlotAxis *x = xAxis() ? xAxis()->plotAxis() : m_plot->xAxis();
 	PlotAxis *y = yAxis() ? yAxis()->plotAxis() : m_plot->yAxis();
 	m_ch = new PlotChannel(name(), QPen(color()), x, y, nullptr);
@@ -103,18 +102,27 @@ void AcqCurveChannel::detachFrom()
 
 DepthNeed AcqCurveChannel::depthNeeded(int plotSize) const
 {
-	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)));
+	// One chunk past the window, and it is not slack: a trigger fire reads plotSize + extra
+	// samples and keeps the first plotSize of them so the fired sample lands where the fire
+	// says it does (TriggerProcessor::emitFire). Claiming only plotSize makes the store
+	// return fewer samples than asked for, and truncateWindow then hands back a window
+	// shifted left by the shortfall, with the marker on the wrong sample and nothing to say
+	// so. Same claim as SimInstrumentController::claimPlotDepth.
+	return DepthNeed::samples(static_cast<std::size_t>(qMax(1, plotSize)), /*extraChunks=*/1);
 }
 
 void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 {
+	// The reads go through the base's windowFor()/windowFloatFor(), which serve a trigger
+	// fire's own window when there is one and fall back to this store otherwise.
+	Q_UNUSED(store)
 	if(!m_ch || m_plot.isNull()) {
 		return;
 	}
 
 	// Assign the member, then view it. Both m_live and m_scratch outlive the view,
 	// and the view does not outlive this function.
-	m_live = store->window(key(), plotSize);
+	m_live = windowFor(key(), plotSize);
 	const scopy::acq::FloatView y = scopy::acq::toFloatView(m_live, m_scratch);
 	if(y.size <= 0) {
 		return;
@@ -124,7 +132,7 @@ void AcqCurveChannel::readData(scopy::acq::DataStore *store, int plotSize)
 	// read the engine's ramp stream, which is written once per length change and so costs
 	// this path nothing. Owned, not viewed — a second FloatView would share m_scratch
 	// with the Y read above and one would overwrite the other.
-	m_xData = store->windowFloat(xKey(), plotSize);
+	m_xData = windowFloatFor(xKey(), plotSize);
 	if(m_xData.isEmpty()) {
 		return;
 	}
@@ -302,6 +310,20 @@ void AcqCurveChannel::onNameChanged(const QString &n)
 {
 	if(m_ch && !m_plot.isNull()) {
 		m_ch->setName(n);
+	}
+}
+
+void AcqCurveChannel::onPlotAxisChanged(bool horizontal, PlotAxis *axis)
+{
+	if(!m_ch || m_plot.isNull() || !axis) {
+		return;
+	}
+	// Through the plot widget rather than PlotChannel::setXAxis directly: the navigator and
+	// the tracker hold the channel by its axis pair and have to be re-registered.
+	if(horizontal) {
+		m_plot->plotChannelChangeXAxis(m_ch, axis);
+	} else {
+		m_plot->plotChannelChangeYAxis(m_ch, axis);
 	}
 }
 
