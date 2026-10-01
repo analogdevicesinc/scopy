@@ -236,8 +236,11 @@ void PlotNavigator::addNavigators(QwtAxisId axisId)
 	connect(zoomer, &PlotZoomer::reset, this,
 		[=]() { Q_EMIT rectChanged(zoomer->zoomBase(), navigationType::None); });
 
-	if(m_plotWidget) {
-		connect(m_plotWidget->plotAxisFromId(axisId), &PlotAxis::axisScaleUpdated, this, [=]() {
+	// Null for an axis the widget does not track: PlotAxis's QwtPlot* overload does not
+	// register itself.
+	PlotAxis *plotAxis = m_plotWidget ? m_plotWidget->plotAxisFromId(axisId) : nullptr;
+	if(plotAxis) {
+		connect(plotAxis, &PlotAxis::axisScaleUpdated, this, [=]() {
 			if(m_autoBase) {
 				setBaseRect(axisId);
 				if(m_resetOnNewBase)
@@ -376,20 +379,14 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 void PlotNavigator::addAxis(PlotAxis *axis)
 {
 	QwtAxisId axisId = axis->axisId();
+	// Everything inside the guard: PlotWidget::addPlotAxis now calls this for every axis and
+	// a caller may still call it itself, so a repeat has to be a no-op.
 	if(!m_axes->contains(axisId)) {
 		m_axes->insert(axisId);
 		addNavigators(axisId);
 		setBaseRect(axisId);
+		m_visibleZoomer->setEnabled(isZoomerEn());
 	}
-	// Connect axis scale updates for auto-base rect
-	connect(axis, &PlotAxis::axisScaleUpdated, this, [=]() {
-		if(m_autoBase) {
-			setBaseRect(axisId);
-			if(m_resetOnNewBase)
-				Q_EMIT reset();
-		}
-	});
-	m_visibleZoomer->setEnabled(isZoomerEn());
 }
 
 void PlotNavigator::removeChannel(PlotChannel *channel)

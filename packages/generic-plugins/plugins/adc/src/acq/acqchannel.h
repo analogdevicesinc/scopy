@@ -24,15 +24,20 @@
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/DataKey.h>
+// Not forward-declarable: DepthNeed below aliases DataStore::Claim.
+#include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/SampleBuffer.h>
 
 #include <QColor>
+#include <QMap>
 #include <QObject>
 #include <QPointer>
 #include <QString>
 #include <QVector>
 
 #include <cstddef>
+#include <optional>
+#include <variant>
 
 namespace scopy {
 class InstrumentTemplate;
@@ -40,28 +45,14 @@ class PlotAxis;
 class PlotChannel;
 class PlotWidget;
 
-namespace acq {
-class DataStore;
-}
-
 namespace adc {
 
 class AcqAxis;
 class AcqPlot;
 
-// What a channel needs retained, in the unit its requirement is actually expressed
-// in. The two are not interchangeable and the DataStore claim methods they map to
-// are separate for the same reason: a window is a sample count that has to survive
-// a change of chunk length, while a waterfall row or an annotation set *is* a
-// chunk whatever its length.
-struct DepthNeed
-{
-	std::size_t amount{1};
-	bool        inSamples{true};
-
-	static DepthNeed samples(std::size_t n) { return {n, true}; }
-	static DepthNeed chunks(std::size_t n) { return {n, false}; }
-};
+// What a channel needs retained. The store's own claim type — a channel's requirement
+// and a claim are the same thing said twice. See DataStore::Claim for the two units.
+using DepthNeed = scopy::acq::DataStore::Claim;
 
 // A DataKey, drawn.
 //

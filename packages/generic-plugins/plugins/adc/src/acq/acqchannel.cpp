@@ -330,13 +330,7 @@ void AcqChannel::reclaimDepth(int plotSize)
 		return;
 	}
 	const DepthNeed d = depthNeeded(plotSize);
-	const auto claim = [this, d](const scopy::acq::DataKey &k) {
-		if(d.inSamples) {
-			m_store->claimSamples(k, m_claimant, d.amount);
-		} else {
-			m_store->claimChunks(k, m_claimant, d.amount);
-		}
-	};
+	const auto claim = [this, d](const scopy::acq::DataKey &k) { m_store->claimDepth(k, m_claimant, d); };
 
 	claim(m_key);
 
