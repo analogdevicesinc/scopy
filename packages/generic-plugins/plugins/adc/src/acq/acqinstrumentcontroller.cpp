@@ -22,21 +22,44 @@
 #include "acqinstrumentcontroller.h"
 
 #include "acqinstrument.h"
+#include "acqaxis.h"
+#include "acqplot.h"
 #include "acqplotmanager.h"
 #include "filesourceblock.h"
 #include "sourceregistry.h"
+// Under src/sim/ but not sim-specific: the manager's plot and overlay are optional and the
+// panel has no plot dependency at all.
+#include "../sim/DecoderManager.h"
+#include "../sim/DecoderPanel.h"
+#include "../sim/PipelineInspector.h"
 
 #include <core/acq_engine/AcquisitionEngine.h>
 #include <core/acq_engine/Block.h>
 #include <core/acq_engine/DataStore.h>
 #include <core/acq_engine/GenalyzerFFTProcessor.h>
 #include <core/acq_engine/SourceBlock.h>
+#include <core/acq_engine/TriggerBinder.h>
+#include <core/acq_engine/TriggerMarker.h>
+#include <core/acq_engine/TriggerProcessor.h>
+#include <core/acq_engine/TriggerProcessorWidget.h>
+#include <core/decoder/SigrokCliBackendFactory.h>
+#include <core/decoder/SigrokCliCatalog.h>
+#include <gui/axishandle.h>
 #include <gui/instrumenttemplate.h>
+#include <gui/plotaxis.h>
+#include <gui/plotaxishandle.h>
+#include <gui/plotwidget.h>
+#include <gui/style.h>
+#include <gui/style_attributes.h>
 #include <gui/widgets/genalyzerpanel.h>
+
+#include <qwt_axis.h>
+#include <qwt_plot.h>
+
+#include <algorithm>
 
 #include <QMap>
 #include <QPointer>
-#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include <memory>
@@ -47,19 +70,23 @@ using namespace scopy::adc;
 
 namespace {
 
-// Wraps a block's own settings widget in a menu page with an owner pill, which is what
-// every rail row's page is made of.
-QWidget *blockPage(InstrumentTemplate *it, scopy::acq::Block *block, const QString &title)
+// A rail row's right-menu page: any widget inside a section with an owner pill.
+QWidget *widgetPage(InstrumentTemplate *it, QWidget *body, const QString &title)
 {
 	QWidget *page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(page);
 	lay->setContentsMargins(0, 0, 0, 0);
 
 	MenuSectionCollapseWidget *section = it->createMenuSection(title, SO_CH, page);
-	section->add(block->settingsWidget(section));
+	section->add(body);
 	lay->addWidget(section);
 	lay->addStretch();
 	return page;
+}
+
+QWidget *blockPage(InstrumentTemplate *it, scopy::acq::Block *block, const QString &title)
+{
+	return widgetPage(it, block->settingsWidget(), title);
 }
 
 // The engine's registered sources are the only record of what setupBlocks() built, so the
@@ -98,6 +125,9 @@ void AcqInstrumentController::init(iio_context *ctx)
 	setupBlocks(ctx);
 	setupProcessors();
 	setupPlots();
+	// Both after setupPlots(): the fire window and the decode window are the plot window.
+	setupTrigger();
+	setupDecoders();
 	// Last: it sits in a slot around the center widget setupPlots() installs.
 	setupAnalysisPanel();
 
@@ -135,6 +165,10 @@ void AcqInstrumentController::setupProcessors()
 {
 	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
 
+	// Before the early return, so the section lands between Sources and Plots on the rail
+	// even with no Pluto: the trigger and the decoders add their rows to it later.
+	MenuSectionCollapseWidget *procs = m_ui->shell()->addChannelGroup("Processors");
+
 	if(!sourceById(engine, QStringLiteral("pluto"))) {
 		return;
 	}
@@ -152,14 +186,13 @@ void AcqInstrumentController::setupProcessors()
 	m_fftProc->setAveragingStore(m_ui->store());
 	engine->addProcessor(m_fftProc);
 
-	MenuSectionCollapseWidget *procs = m_ui->shell()->addChannelGroup("Processors");
 	addBlockRow(procs, m_fftProc, QStringLiteral("FFT"), QStringLiteral("GENALYZER FFT"),
 		    QStringLiteral("fft"));
 }
 
-CollapsableMenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCollapseWidget *group,
-								   scopy::acq::Block *block, const QString &label,
-								   const QString &pageTitle, const QString &menuId)
+MenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCollapseWidget *group, scopy::acq::Block *block,
+							const QString &label, const QString &pageTitle,
+							const QString &menuId)
 {
 	if(!group || !block) {
 		return nullptr;
@@ -168,79 +201,10 @@ CollapsableMenuControlButton *AcqInstrumentController::addBlockRow(MenuSectionCo
 
 	// No colour: a coloured swatch on the rail means "this is the curve you see in that
 	// colour", and only plot channels have one.
-	CollapsableMenuControlButton *row = it->addExpandableChannelRow(group, label, QColor(), menuId);
+	MenuControlButton *row = it->addChannelRow(group, label, QColor(), menuId);
 	it->addMenuPage(menuId, blockPage(it, block, pageTitle));
 
-	// A source's channels hang under the row as a subtree. A block that declares none — every
-	// processor, and the snapshot source until a slot is captured — gets an empty one.
-	if(auto *src = qobject_cast<scopy::acq::SourceBlock *>(block)) {
-		addSourceChannelRows(row, src);
-	}
-
 	return row;
-}
-
-void AcqInstrumentController::addSourceChannelRows(CollapsableMenuControlButton *parentRow,
-						  scopy::acq::SourceBlock *src)
-{
-	if(!parentRow || !src) {
-		return;
-	}
-	InstrumentTemplate *it = m_ui->shell();
-
-	// id -> its switch, so the source flipping a channel itself can find the row again.
-	// Shared rather than a member: both lambdas below outlive this call.
-	auto switches = std::make_shared<QMap<QString, QPointer<SmallOnOffSwitch>>>();
-
-	auto rebuild = [this, it, parentRow, src, switches]() {
-		const QList<MenuControlButton *> old = parentRow->findChildren<MenuControlButton *>();
-		for(MenuControlButton *row : old) {
-			// The header is a child too, and removing it would take the whole row's
-			// selection and page with it.
-			if(row == parentRow->getControlBtn()) {
-				continue;
-			}
-			it->removeChannelRow(parentRow, row, QString());
-		}
-		switches->clear();
-
-		const QList<QString> ids = src->channelIds();
-		for(const QString &id : ids) {
-			// No page — the source's own settings cover the whole device — and no
-			// colour, because a raw channel is not a curve until someone adds one from
-			// the key picker.
-			MenuControlButton *row = it->addChannelSwitchRow(parentRow, id, QColor(), QString(), 1);
-			SmallOnOffSwitch *sw = InstrumentTemplate::rowSwitch(row);
-			if(!sw) {
-				continue;
-			}
-			QSignalBlocker b(sw);
-			sw->setChecked(src->isChannelEnabled(id));
-			switches->insert(id, sw);
-			connect(sw, &QAbstractButton::toggled, src, [src, id](bool en) { src->enableChannel(id, en); });
-		}
-	};
-
-	rebuild();
-	// Queued, both of them: a source can add channels or flip one from the worker
-	// thread (onStart reading the device, disableAllChannels on a failed start), and
-	// these touch widgets.
-	connect(src, &scopy::acq::SourceBlock::channelsChanged, this, rebuild, Qt::QueuedConnection);
-	// Without this the switch would keep claiming a channel is on after the source
-	// turned it off by itself.
-	connect(
-		src, &scopy::acq::SourceBlock::channelEnabledChanged, this,
-		[switches](const QString &id, bool en) {
-			SmallOnOffSwitch *sw = switches->value(id).data();
-			if(!sw) {
-				return;
-			}
-			// Blocked: this reflects what the source already did, so echoing it
-			// back through enableChannel() would be a round trip for nothing.
-			QSignalBlocker b(sw);
-			sw->setChecked(en);
-		},
-		Qt::QueuedConnection);
 }
 
 void AcqInstrumentController::setupPlots()
@@ -252,7 +216,9 @@ void AcqInstrumentController::setupPlots()
 
 	// Direct, not queued: AcqInstrument already mirrors the engine's worker-thread
 	// signals onto the GUI thread, and these are its GUI-thread re-emissions.
-	connect(m_ui, &AcqInstrument::cycleComplete, m_plots, &AcqPlotManager::onCycleComplete);
+	//
+	// Kept: setupTrigger() swaps this for the trigger's fires.
+	m_cycleConn = connect(m_ui, &AcqInstrument::cycleComplete, m_plots, &AcqPlotManager::onCycleComplete);
 	connect(m_ui, &AcqInstrument::started, m_plots, &AcqPlotManager::onStarted);
 	connect(m_ui, &AcqInstrument::stopped, m_plots, &AcqPlotManager::onStopped);
 
@@ -271,8 +237,17 @@ void AcqInstrumentController::setupPlots()
 							  true, false, false, it);
 	plotSpin->setIncrementMode(gui::MenuSpinbox::IS_POW2);
 	it->addEngineControl(plotSpin);
-	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots,
-		[this](double v) { m_plots->setPlotSize(static_cast<int>(v)); });
+	connect(plotSpin, &gui::MenuSpinbox::valueChanged, m_plots, [this](double v) {
+		const int n = static_cast<int>(v);
+		m_plots->setPlotSize(n);
+		// The marker's axis needs nothing — the curve re-requests its range on the next
+		// read — but its window does: one call carries the new width to the marker, the
+		// processor and the target spinbox, so the three cannot disagree.
+		updateTriggerMarkerWindow();
+		if(m_decoderMgr) {
+			m_decoderMgr->setDecoderWindowSize(n);
+		}
+	});
 
 	// The engine's sample-index ramp has to be at least as long as the widest plot, or a plot
 	// wider than it reads a short X window and draws a truncated curve. The manager states
@@ -290,6 +265,372 @@ void AcqInstrumentController::setupPlots()
 		// own rate ignores this.
 		m_plots->setFallbackSampleRate(m_fftProc->sampleRate());
 	}
+}
+
+void AcqInstrumentController::setupTrigger()
+{
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+	InstrumentTemplate            *it = m_ui->shell();
+
+	m_trigProc = new scopy::acq::TriggerProcessor(QStringLiteral("trigger"), engine);
+	m_trigProc->setEnabled(false);
+	m_trigProc->setWindowSize(m_plots->plotSize());
+	m_trigProc->setTriggerPosition(0.5);
+	engine->addProcessor(m_trigProc);
+	// Its snapshot spans the whole store, so it has to run after this cycle's derived data —
+	// the FFT, the decoder annotations — is written.
+	engine->setRunLast(m_trigProc);
+
+	m_trigMarker = new scopy::acq::TriggerMarker(m_trigProc, this);
+
+	m_trigBinder = new scopy::acq::TriggerBinder(m_trigProc, engine, this);
+	// The fire's own window set is forwarded rather than dropped: re-reading the store here
+	// would draw the newest samples, a different window from the one the fire index names.
+	connect(m_trigBinder, &scopy::acq::TriggerBinder::replotFired, m_plots,
+		[this](quint32, const QMap<QString, scopy::acq::SampleVariant> &snap) {
+			m_plots->onTriggerFired(snap);
+		});
+
+	// Built here and handed to the block, so the Pipeline tab shows this one widget rather
+	// than a second, independent copy of the same condition list.
+	QWidget     *body = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(body);
+	lay->setContentsMargins(0, 0, 0, 0);
+	// The base widget explicitly: TriggerProcessor's own createSettingsWidget() would build
+	// a second TriggerProcessorWidget right above the one added below.
+	lay->addWidget(m_trigProc->ProcessorBlock::createSettingsWidget(body));
+
+	// Which X axis the marker rides.
+	MenuSectionCollapseWidget *axisSection = it->createMenuSection(tr("TRIGGER AXIS"), SO_VIEW, body);
+	m_trigAxisCombo = new MenuCombo(tr("Axis source"), axisSection);
+	// Every key, unfiltered: a picker that hid a key until some channel happened to draw it
+	// would change its own contents behind the reader. A pick that resolves to no axis is
+	// handled instead, by hiding the handle until it does resolve.
+	m_plots->populateKeyCombo(m_trigAxisCombo, /*withSampleIndex=*/true);
+	m_trigAxisKey = AcqPlotManager::keyFromCombo(m_trigAxisCombo.data());
+	connect(m_trigAxisCombo->combo(), &QComboBox::currentIndexChanged, this, [this](int) {
+		m_trigAxisKey = AcqPlotManager::keyFromCombo(m_trigAxisCombo.data());
+		retargetTriggerHandle();
+	});
+	axisSection->add(m_trigAxisCombo);
+	lay->addWidget(axisSection);
+
+	m_trigWidget = new scopy::acq::TriggerProcessorWidget(m_trigProc, body);
+	m_trigWidget->setMaxTargetSample(std::max(0, m_plots->plotSize() - 1));
+	lay->addWidget(m_trigWidget);
+	m_trigProc->setSettingsWidget(body);
+
+	addBlockRow(it->addChannelGroup("Processors"), m_trigProc, tr("Trigger"), QStringLiteral("TRIGGER"),
+		    QStringLiteral("trigger"));
+
+	// All four signals, not just plotAdded: the axis the marker rides is created by a
+	// *channel*, so a plot appearing is neither necessary nor sufficient.
+	if(!m_plots.isNull()) {
+		retargetTriggerHandle();
+		connect(m_plots, &AcqPlotManager::plotAdded, this, [this](quint32) { retargetTriggerHandle(); });
+		// The dying plot is excluded because it is still in m_plots->plots() here, so the
+		// resolve would otherwise find its axis and put the handle straight back onto it.
+		connect(m_plots, &AcqPlotManager::plotRemoved, this, [this](quint32 uuid) {
+			if(m_plots.isNull()) {
+				return;
+			}
+			retargetTriggerHandle(m_plots->plot(uuid));
+		});
+		// No exclusion for channelRemoved: the plot survives and may have another channel
+		// on the same X.
+		connect(m_plots, &AcqPlotManager::channelAdded, this, [this](AcqChannel *) { retargetTriggerHandle(); });
+		connect(m_plots, &AcqPlotManager::channelRemoved, this,
+			[this](AcqChannel *) { retargetTriggerHandle(); });
+	}
+
+	// Follows the block, not a button of our own: the reader flips the trigger from its own
+	// settings widget. The marker's visibility follows the same signal on its own.
+	connect(m_trigProc, &scopy::acq::ProcessorBlock::enabledChanged, this, [this](bool en) {
+		if(!m_trigBinder) {
+			return;
+		}
+		if(en) {
+			disconnect(m_cycleConn);
+			m_cycleConn = {};
+			m_trigBinder->bindReplotOnFire();
+		} else {
+			m_trigBinder->unbindReplotOnFire();
+			if(!m_cycleConn) {
+				m_cycleConn = connect(m_ui, &AcqInstrument::cycleComplete, m_plots,
+						      &AcqPlotManager::onCycleComplete);
+			}
+		}
+		// With a trigger, "one acquisition" is one fire, not one cycle.
+		m_ui->setSingleWaitsForStop(en);
+	});
+
+	// Armed per press, not once: the binder's one-shot disconnects itself on the fire it
+	// stops on.
+	connect(m_ui, &AcqInstrument::singleRequested, this, [this]() {
+		if(m_trigBinder && m_trigProc && m_trigProc->isEnabled()) {
+			m_trigBinder->armSingleShot();
+		}
+	});
+	// On any stop, so an aborted Single does not leave an arm behind to stop the *next* run
+	// on its first fire.
+	connect(m_ui, &AcqInstrument::stopped, this, [this]() {
+		if(m_trigBinder) {
+			m_trigBinder->disarmSingleShot();
+		}
+	});
+
+	// The widget's status label ("idle" / "waiting" / "triggered") and its key combos.
+	connect(m_ui, &AcqInstrument::started, m_trigWidget,
+		[this]() { m_trigWidget->setAcquisitionRunning(true); });
+	connect(m_ui, &AcqInstrument::stopped, m_trigWidget,
+		[this]() { m_trigWidget->setAcquisitionRunning(false); });
+	connect(m_plots, &AcqPlotManager::keysAvailable, m_trigWidget,
+		[this](const QList<scopy::acq::DataKey> &keys) {
+			QStringList names;
+			names.reserve(keys.size());
+			for(const scopy::acq::DataKey &k : keys) {
+				names << k.key;
+			}
+			m_trigWidget->setAvailableKeys(names);
+		});
+	// The axis picker off the same list. No retarget: populateKeyCombo keeps the current
+	// selection, and a new key is not a new axis — channelAdded says one was drawn.
+	connect(m_plots, &AcqPlotManager::keysAvailable, this, [this](const QList<scopy::acq::DataKey> &) {
+		if(!m_trigAxisCombo.isNull() && !m_plots.isNull()) {
+			m_plots->populateKeyCombo(m_trigAxisCombo.data(), /*withSampleIndex=*/true);
+		}
+	});
+}
+
+PlotAxis *AcqInstrumentController::findXAxisFor(AcqPlot *plot, const scopy::acq::DataKey &key) const
+{
+	if(!plot || key.key.isEmpty()) {
+		return nullptr;
+	}
+
+	// The channels, not plot->axisForSource(): that one creates on miss, and only a channel
+	// can say an axis is really being drawn against.
+	PlotAxis *fallback = nullptr;
+	const QList<AcqChannel *> chans = plot->channels();
+	for(AcqChannel *ch : chans) {
+		if(!ch || !ch->xAxis()) {
+			continue;
+		}
+		AcqAxis *ax = ch->xAxis();
+		// isHorizontal() even on the X side: a channel's "X" axis is whichever PlotAxis it
+		// was given, and nothing stops a caller handing it a vertical one.
+		if(ax->source().key != key || !ax->isHorizontal() || !ax->plotAxis()) {
+			continue;
+		}
+		// Sample index and time share the ramp key, so a key match cannot tell them apart.
+		// Prefer the index axis: its interval really is 0..plotSize-1, which makes the
+		// position-to-sample map exact rather than merely monotonic.
+		if(ax->isSampleIndex()) {
+			return ax->plotAxis();
+		}
+		if(!fallback) {
+			fallback = ax->plotAxis();
+		}
+	}
+	return fallback;
+}
+
+void AcqInstrumentController::retargetTriggerHandle(AcqPlot *excluding)
+{
+	if(!m_trigProc || m_plots.isNull()) {
+		return;
+	}
+
+	// First plot that has it: one trigger, and no basis for preferring a later plot.
+	AcqPlot  *target = nullptr;
+	PlotAxis *axis = nullptr;
+	const QList<AcqPlot *> plots = m_plots->plots();
+	for(AcqPlot *p : plots) {
+		if(p == excluding) {
+			continue;
+		}
+		if(PlotAxis *ax = findXAxisFor(p, m_trigAxisKey)) {
+			target = p;
+			axis = ax;
+			break;
+		}
+	}
+
+	if(!axis) {
+		// Detached rather than parked on some other axis. The combo keeps the reader's
+		// pick, so this resolves itself once a channel draws X against that key.
+		const bool had = m_trigMarker && m_trigMarker->isAttached();
+		if(m_trigMarker) {
+			m_trigMarker->detach();
+		}
+		m_trigMarkerPlot = nullptr;
+		m_trigMarkerAxis = nullptr;
+		if(had) {
+			// Only on the transition: this runs on every plot and channel change.
+			qWarning() << "acq: trigger axis" << m_trigAxisKey.toString()
+				   << "is not drawn as an X axis on any plot — marker hidden";
+		}
+		return;
+	}
+
+	PlotWidget *w = target->plot();
+	if(!w) {
+		return;
+	}
+
+	m_trigMarkerPlot = target;
+	m_trigMarkerAxis = axis;
+	// The window before the attach, so the marker's first sync places the bar against the
+	// right one.
+	updateTriggerMarkerWindow();
+	m_trigMarker->attach(w, axis);
+}
+
+void AcqInstrumentController::updateTriggerMarkerWindow()
+{
+	if(m_trigMarker.isNull()) {
+		return;
+	}
+
+	// The *marker plot's* plotSize: plots can be different widths. The manager's default is
+	// only the answer before the first resolve.
+	const int n = m_trigMarkerPlot.isNull() ? (m_plots.isNull() ? 1 : m_plots->plotSize())
+						: m_trigMarkerPlot->plotSize();
+	const int last = std::max(0, n - 1);
+
+	// The axis units that window spans: slot numbers, or slots over the channel's rate for a
+	// time axis. Any other X is left as slot numbers — monotonic, which is all the marker
+	// needs, and the most a proportional map can claim without scanning the stream.
+	double x1 = static_cast<double>(last);
+	if(!m_trigMarkerAxis.isNull() && !m_trigMarkerPlot.isNull()) {
+		const QList<AcqChannel *> chans = m_trigMarkerPlot->channels();
+		for(AcqChannel *ch : chans) {
+			AcqAxis *ax = ch ? ch->xAxis() : nullptr;
+			if(!ax || ax->plotAxis() != m_trigMarkerAxis.data()) {
+				continue;
+			}
+			if(ax->isTime()) {
+				const double rate = ch->sampleRate() > 0.0 ? ch->sampleRate() : 1.0;
+				x1 = static_cast<double>(last) / rate;
+			}
+			break;
+		}
+	}
+
+	m_trigMarker->setWindow(n, 0.0, x1);
+
+	// The processor's fire window from the same `n`: the fire index is in these units and the
+	// marker maps it back through them, so the two must be one number.
+	if(m_trigProc) {
+		m_trigProc->setWindowSize(n);
+	}
+	if(m_trigWidget) {
+		m_trigWidget->setMaxTargetSample(std::max(0, last));
+	}
+}
+
+void AcqInstrumentController::setupDecoders()
+{
+	scopy::acq::AcquisitionEngine *engine = m_ui->engine();
+	InstrumentTemplate            *it = m_ui->shell();
+	scopy::decoder::DecoderLogger *log = m_ui->decoderLogger();
+
+	// Neither is enumerated here: listing decoders runs sigrok-cli as a subprocess, so it
+	// waits until the reader opens a picker.
+	auto catalog = std::make_unique<scopy::decoder::SigrokCliCatalog>();
+	catalog->setLogger(log);
+	auto factory = std::make_unique<scopy::decoder::SigrokCliBackendFactory>(catalog.get());
+	factory->setLogger(log);
+
+	m_decoderMgr = new DecoderManager(engine, m_ui->store(), factory.get(), this);
+	m_decoderMgr->setLogger(log);
+	m_decoderMgr->setDecoderWindowSize(m_plots->plotSize());
+	// No setPlot/setOverlay: annotations are drawn by adding a ReprKind::Annotations channel
+	// on the output key, through the same ADD CHANNEL flow every other stream uses.
+
+	// HostScrolls: the right menu already wraps its stack in a scroll area, and a nested one
+	// would cap the panel's reported height and cut off everything past it.
+	m_decoderPanel = new DecoderPanel(m_decoderMgr, m_ui->store(), catalog.get(), m_ui, DecoderPanel::HostScrolls);
+	m_decoderPanel->setLogger(log);
+
+	// What addBlockRow() does, inlined: the decoders are a stack of blocks the manager adds
+	// on demand, so there is no one Block whose settings widget this is.
+	MenuSectionCollapseWidget *procs = it->addChannelGroup("Processors");
+	it->addChannelRow(procs, tr("Decoders"), QColor(), QStringLiteral("decoders"));
+	it->addMenuPage(QStringLiteral("decoders"), widgetPage(it, m_decoderPanel, tr("DECODERS")));
+
+	// Members last: the panel and the manager borrow both, and the factory borrows the
+	// catalog, so all three must outlive them.
+	m_decoderCatalog = std::move(catalog);
+	m_decoderFactory = std::move(factory);
+
+	// A new editor comes up with empty channel combos unless it is given the key set: the
+	// store may not have changed since the last refresh.
+	connect(m_decoderMgr, &DecoderManager::decoderAdded, m_decoderPanel,
+		[this](const QString &) { m_decoderPanel->refreshKeys(m_ui->store()->keys()); });
+	connect(m_plots, &AcqPlotManager::keysAvailable, m_decoderPanel,
+		[this](const QList<scopy::acq::DataKey> &keys) { m_decoderPanel->refreshKeys(keys); });
+
+	if(PipelineInspector *pipeline = m_ui->pipeline()) {
+		pipeline->setDecoderManager(m_decoderMgr);
+	}
+
+	// A new decoder draws itself on the first plot there is. The plot manager knows nothing
+	// about decoders; this is the whole link between the two.
+	connect(m_decoderMgr, &DecoderManager::decoderAdded, m_plots, [this](const QString &uid) {
+		DecoderInstance *d = m_decoderMgr->find(uid);
+		if(!d || d->outKeys.isEmpty()) {
+			return;
+		}
+		// A fresh decoder is one stage, so one output key: the root's.
+		drawDecoderStage(d->outKeys.first());
+	});
+
+	// A stacked stage is a new output key on a decoder that already exists, so decoderAdded
+	// has already fired and says nothing about it. Without this it publishes undrawn.
+	connect(m_decoderMgr, &DecoderManager::stageAdded, m_plots, [this](const QString &uid, int stageIndex) {
+		DecoderInstance *d = m_decoderMgr->find(uid);
+		if(!d || stageIndex < 0 || stageIndex >= d->outKeys.size()) {
+			return;
+		}
+		drawDecoderStage(d->outKeys.at(stageIndex));
+	});
+
+	// The mirror: a dropped key stops being written, so the channel drawing it would sit
+	// there greyed out forever.
+	connect(m_decoderMgr, &DecoderManager::stagesRemoved, m_plots,
+		[this](const QString &, const QList<scopy::acq::DataKey> &keys) {
+			// Over a copy of the channel list: removeChannel mutates it.
+			const QList<AcqChannel *> chans = m_plots->channels();
+			for(AcqChannel *ch : chans) {
+				if(ch && keys.contains(ch->key())) {
+					m_plots->removeChannel(ch);
+				}
+			}
+		});
+}
+
+void AcqInstrumentController::drawDecoderStage(const scopy::acq::DataKey &outKey)
+{
+	if(!m_plots) {
+		return;
+	}
+	// No plot yet: nothing to draw on, and not an error — a decoder can exist before any
+	// plot does, and the reader can still add the channel from ADD CHANNEL.
+	const QList<AcqPlot *> plots = m_plots->plots();
+	if(plots.isEmpty()) {
+		return;
+	}
+	// Two channels may share a Y key by design, so the manager will not refuse a duplicate.
+	// Reachable: a popped stage can be re-pushed, which reuses the key.
+	for(AcqChannel *ch : m_plots->channels()) {
+		if(ch && ch->key() == outKey) {
+			return;
+		}
+	}
+	// X left empty: annotation offsets are relative to the window the decode ran on, so they
+	// index the plot's own sample ramp.
+	m_plots->addChannel(plots.first(), scopy::acq::ReprKind::Annotations, outKey);
 }
 
 void AcqInstrumentController::setupAnalysisPanel()

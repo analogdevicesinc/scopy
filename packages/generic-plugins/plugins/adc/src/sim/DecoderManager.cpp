@@ -49,19 +49,22 @@ DecoderManager::DecoderManager(scopy::acq::AcquisitionEngine *engine,
 
 DecoderManager::~DecoderManager()
 {
-	// Detach processors before destruction to avoid dangling calls.
+	// Every pointer here is normally already null at this point — see m_engine in the header.
+	// This loop is the orderly path, removeDecoder() while the instrument is alive; a shutdown
+	// walks it finding nothing to do. It must not assume otherwise: a raw d.proc->deleteLater()
+	// segfaulted on every close.
 	for(const DecoderInstance &d : m_decoders) {
-		if(m_engine && d.proc) m_engine->removeProcessor(d.proc);
+		if(!m_engine.isNull() && !d.proc.isNull()) m_engine->removeProcessor(d.proc);
 		for(const QPointer<scopy::PlotAxisHandle> &h : d.handles) {
 			if(h.isNull()) continue;
 			if(!m_digitalMgr.isNull()) {
 				m_digitalMgr->unregisterAnnotationBand(h);
 			} else {
-				if(m_plot) m_plot->removePlotAxisHandle(h);
+				if(!m_plot.isNull()) m_plot->removePlotAxisHandle(h);
 				h->deleteLater();
 			}
 		}
-		if(d.proc) d.proc->deleteLater();
+		if(!d.proc.isNull()) d.proc->deleteLater();
 	}
 	m_decoders.clear();
 }
@@ -135,12 +138,6 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 		if(m_logger) m_logger->critical(kMgrId, QStringLiteral("addDecoder: no engine"));
 		return {};
 	}
-	if(!m_overlay || !m_plot) {
-		if(m_logger)
-			m_logger->warning(kMgrId,
-				QStringLiteral("addDecoder: overlay/plot not set (call setPlot/setOverlay first)"));
-		return {};
-	}
 	if(!m_backendFactory) {
 		if(m_logger)
 			m_logger->critical(kMgrId, QStringLiteral("addDecoder: no backend factory injected"));
@@ -175,14 +172,18 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 
 	m_engine->addProcessor(proc);
 
+	// Skipped without an overlay: a band is presentation, and the processor already writes
+	// outKey, which is all a store-backed view needs.
 	scopy::PlotAxisHandle *handle = nullptr;
 	if(!m_digitalMgr.isNull()) {
 		handle = m_digitalMgr->registerAnnotationBand(uid);
-	} else {
+	} else if(m_plot) {
 		handle = attachHandle(nextBandPos());
 	}
-	m_overlay->registerDecoder(proc, outKey, handle,
-	                           stageTitle(uid, decoderId, 0));
+	if(m_overlay) {
+		m_overlay->registerDecoder(proc, outKey, handle,
+		                           stageTitle(uid, decoderId, 0));
+	}
 
 	DecoderInstance d;
 	d.uid       = uid;
@@ -204,11 +205,6 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId,
 	if(!m_engine) {
 		if(m_logger) m_logger->critical(kMgrId,
 			QStringLiteral("addDecoderFromAnnotations: no engine"));
-		return {};
-	}
-	if(!m_overlay || !m_plot) {
-		if(m_logger) m_logger->warning(kMgrId,
-			QStringLiteral("addDecoderFromAnnotations: overlay/plot not set"));
 		return {};
 	}
 	if(!m_backendFactory) {
@@ -284,14 +280,18 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId,
 
 	m_engine->addProcessor(proc);
 
+	// Skipped without an overlay: a band is presentation, and the processor already writes
+	// outKey, which is all a store-backed view needs.
 	scopy::PlotAxisHandle *handle = nullptr;
 	if(!m_digitalMgr.isNull()) {
 		handle = m_digitalMgr->registerAnnotationBand(uid);
-	} else {
+	} else if(m_plot) {
 		handle = attachHandle(nextBandPos());
 	}
-	m_overlay->registerDecoder(proc, outKey, handle,
-	                           stageTitle(uid, decoderId, 0));
+	if(m_overlay) {
+		m_overlay->registerDecoder(proc, outKey, handle,
+		                           stageTitle(uid, decoderId, 0));
+	}
 
 	DecoderInstance d;
 	d.uid       = uid;
@@ -331,6 +331,7 @@ void DecoderManager::removeDecoder(const QString &uid)
 			}
 		}
 		if(d.proc) d.proc->deleteLater();
+		if(!d.outKeys.isEmpty()) Q_EMIT stagesRemoved(uid, d.outKeys);
 		Q_EMIT decoderRemoved(uid);
 		if(m_logger) m_logger->info(kMgrId, QStringLiteral("removed decoder ") + uid);
 		return;
@@ -351,8 +352,7 @@ int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
 				QStringLiteral("pushStage: refusing mid-run mutation for ") + uid);
 		return -1;
 	}
-	if(!m_overlay || !m_plot) return -1;
-	if(decoderId.isEmpty())   return -1;
+	if(decoderId.isEmpty()) return -1;
 
 	const int stageIndex = d->stageIds.size();
 
@@ -367,24 +367,30 @@ int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
 			"annotations");
 	d->outKeys.append(outKey);
 
-	// popStagesFrom() truncates d->handles; always allocate fresh here.
+	// popStagesFrom() truncates d->handles; always allocate fresh here. Stays a null
+	// entry with no overlay, so the index still lines up with outKeys.
 	scopy::PlotAxisHandle *handle = nullptr;
 	if(!m_digitalMgr.isNull()) {
 		handle = m_digitalMgr->registerAnnotationBand(
 			QStringLiteral("%1/%2").arg(uid).arg(stageIndex));
-	} else {
+	} else if(m_plot) {
 		handle = attachHandle(nextBandPos());
 	}
 	d->handles.append(QPointer<scopy::PlotAxisHandle>(handle));
 
 	d->proc->setConfig(d->cfg);
 	d->proc->setOutputKeys(d->outKeys);
-	m_overlay->registerDecoder(d->proc, outKey, handle,
-	                           stageTitle(uid, decoderId, stageIndex));
+	if(m_overlay) {
+		m_overlay->registerDecoder(d->proc, outKey, handle,
+		                           stageTitle(uid, decoderId, stageIndex));
+	}
 
 	if(m_logger)
 		m_logger->info(kMgrId, QStringLiteral("pushStage: %1 += %2 (index %3)")
 			.arg(uid, decoderId).arg(stageIndex));
+
+	// Last, so a handler that reads find(uid) sees the finished stage.
+	Q_EMIT stageAdded(uid, stageIndex);
 	return stageIndex;
 }
 
@@ -402,9 +408,11 @@ void DecoderManager::popStagesFrom(const QString &uid, int fromIndex)
 	if(fromIndex >= d->stageIds.size()) return;
 
 	// Tear down popped stages: overlay curve, store key, cfg entry, handle.
+	QList<scopy::acq::DataKey> dropped;
 	while(d->stageIds.size() > fromIndex) {
 		const int idx = d->stageIds.size() - 1;
 		const scopy::acq::DataKey k = d->outKeys[idx];
+		dropped.append(k);
 		if(m_overlay) m_overlay->unregisterDecoder(k);
 		if(m_store)   m_store->remove(k);
 		if(idx < d->handles.size()) {
@@ -426,6 +434,8 @@ void DecoderManager::popStagesFrom(const QString &uid, int fromIndex)
 
 	d->proc->setConfig(d->cfg);
 	d->proc->setOutputKeys(d->outKeys);
+
+	if(!dropped.isEmpty()) Q_EMIT stagesRemoved(uid, dropped);
 }
 
 void DecoderManager::applyConfig(const QString &uid,
