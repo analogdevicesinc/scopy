@@ -40,8 +40,6 @@ class GenalyzerPanel;
 class MenuCombo;
 class MenuControlButton;
 class MenuSectionCollapseWidget;
-class PlotAxis;
-class PlotAxisHandle;
 
 namespace acq {
 class Block;
@@ -58,7 +56,6 @@ class IDecoderCatalog;
 namespace adc {
 
 class AcqInstrument;
-class AcqPlot;
 class AcqPlotManager;
 class DecoderManager;
 class DecoderPanel;
@@ -90,10 +87,16 @@ private:
 	// watches keys no single source owns. After setupBlocks().
 	void setupProcessors();
 
-	// The one rail entry every block gets, source or processor: a plain row opening the
-	// block's settings page. Plain and not expandable — a block nests nothing, and an
-	// expandable row would draw its collapse arrow with nothing behind it. Only a plot's
-	// row nests, because only a plot has children.
+	// The one rail entry a Sources/Processors row gets: a plain row opening `body` as its
+	// right-menu page. Plain and not expandable — nothing nests under it, and an expandable
+	// row would draw its collapse arrow with nothing behind it. Only a plot's row nests,
+	// because only a plot has children.
+	//
+	// The widget overload is for a page that is not one block's settings widget: the decoder
+	// stack's panel, which stands for blocks the manager creates on demand.
+	MenuControlButton *addBlockRow(MenuSectionCollapseWidget *group, QWidget *body, const QString &label,
+				       const QString &pageTitle, const QString &menuId);
+	// The same row plus the checkbox↔enable wiring, which needs a block to toggle.
 	MenuControlButton *addBlockRow(MenuSectionCollapseWidget *group, scopy::acq::Block *block, const QString &label,
 				       const QString &pageTitle, const QString &menuId);
 
@@ -109,34 +112,10 @@ private:
 	// reader enables it. After setupPlots(): the fire window is the plot window.
 	void setupTrigger();
 
-	// The X PlotAxis a channel on `plot` draws against for `key`, or null when no channel
-	// there reads X from it. Walks plot->channels() rather than calling
-	// AcqPlot::axisForSource, which would create one on miss — an axis nobody draws on does
-	// not zoom with the plot, which is the bug this path exists to avoid.
-	scopy::PlotAxis *findXAxisFor(AcqPlot *plot, const scopy::acq::DataKey &key) const;
-
-	// Put the marker on whatever m_trigAxisKey resolves to now: the first plot with an X
-	// axis for that key, or detached when no plot has one. Idempotent and the single entry
-	// point — the combo, plotAdded/plotRemoved and channelAdded/channelRemoved all change
-	// the same answer.
-	//
-	// `excluding` is skipped. For plotRemoved, which fires while the dying plot is still in
-	// the manager's list — which is what makes the handle removable from it at all, and also
-	// what would otherwise put the marker straight back onto it.
-	void retargetTriggerHandle(AcqPlot *excluding = nullptr);
-
-	// Tell the marker which window its sample↔axis map spans: the marker plot's plotSize in
-	// the axis's units. On a retarget and on a plot-width change.
-	void updateTriggerMarkerWindow();
-
 	// The decoder stack: catalog, backend factory, manager and panel. No plot and no overlay
 	// — a decoder's annotations are drawn as ordinary ReprKind::Annotations channels on
 	// whichever plot the reader picks. After setupPlots(), which supplies the decode window.
 	void setupDecoders();
-
-	// Draw one decoder output key as an Annotations channel on the first plot there is.
-	// Shared by decoderAdded and stageAdded, which differ only in which key they name.
-	void drawDecoderStage(const scopy::acq::DataKey &outKey);
 
 	// Pluto's RX default. The source doesn't read the rate back, so the FFT has to be told.
 	const double m_kPlutoSampleRate;
@@ -160,7 +139,8 @@ private:
 	// triggered run draws the cycle that fired, not every cycle the worker completes.
 	QMetaObject::Connection m_cycleConn;
 
-	// The draggable bar on the plot. Parented here; owns its own PlotAxisHandle.
+	// The draggable bar on the plot. Parented here, because it is built from the processor;
+	// handed to the plot manager, which resolves and owns the question of which axis it rides.
 	//
 	// It rides an axis a channel actually draws against, borrowed and never owned. A private
 	// hidden axis pinned to [0, plotSize-1] would make the bar's position *be* the sample
@@ -168,16 +148,10 @@ private:
 	// and the curve's axis to two different scale ranges and the bar would drift off the
 	// feature it was aimed at. The sample index is recovered arithmetically instead.
 	QPointer<scopy::acq::TriggerMarker> m_trigMarker;
-	// Only so the marker's window can be measured in the right plot's plotSize and the right
-	// axis's units; the attach decision is the marker's own.
-	QPointer<AcqPlot>	 m_trigMarkerPlot;
-	QPointer<scopy::PlotAxis> m_trigMarkerAxis;
 
-	// Which X source the handle rides, as the reader picked it. Kept rather than resolved
-	// once: every key is offered, including ones no channel plots on X yet, so a pick can
-	// name an axis that does not exist and start working the moment a channel does.
-	scopy::acq::DataKey  m_trigAxisKey;
-	QPointer<MenuCombo>  m_trigAxisCombo;
+	// The reader's X-source pick. Every key is offered, including ones no channel plots on X
+	// yet: a pick that resolves to no axis hides the bar until one does.
+	QPointer<MenuCombo> m_trigAxisCombo;
 
 	// Decoders. Catalog and factory are owned here and must outlive the manager — the
 	// factory holds the catalog and the manager holds the factory, both non-owning.

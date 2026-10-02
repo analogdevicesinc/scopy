@@ -47,10 +47,12 @@ class QTimer;
 namespace scopy {
 class CursorSettings;
 class MenuCombo;
+class PlotAxis;
 class PlotWidget;
 
 namespace acq {
 class DataStore;
+class TriggerMarker;
 } // namespace acq
 
 namespace adc {
@@ -200,6 +202,37 @@ public:
 	// The key a source combo currently names, empty when nothing is selected.
 	static scopy::acq::DataKey keyFromCombo(const MenuCombo *combo);
 
+	// ---- trigger marker -------------------------------------------------------
+
+	// The trigger's draggable bar, borrowed — the controller owns it, because it is built
+	// from the TriggerProcessor this class knows nothing about.
+	//
+	// Which axis the bar rides is answered here because every input to that question belongs
+	// to this class: the plots, their channels, the per-source axes and each plot's own
+	// width. The marker is re-resolved on its own whenever a plot or channel comes or goes.
+	void setTriggerMarker(scopy::acq::TriggerMarker *marker);
+
+	// Which X source the bar rides, as the reader picked it. May name a key no channel draws
+	// yet: the marker stays detached until one does, and starts working the moment it
+	// happens.
+	void setTriggerAxisKey(const scopy::acq::DataKey &key);
+
+	// ---- generic draw helpers -------------------------------------------------
+
+	// Draw `yKey` as `kind` on the first plot there is, skipping it when some channel already
+	// draws that key. No plot is not an error and not a warning: a stream can exist before
+	// any plot does, and the reader can still add it from ADD CHANNEL.
+	//
+	// The duplicate check is here and not in addChannel(), which accepts duplicates by design
+	// — two channels may share a Y key against different X sources. This is the "draw it once
+	// if it is not already drawn" caller, which is a different request.
+	AcqChannel *drawOnFirstPlot(scopy::acq::ReprKind kind, const scopy::acq::DataKey &yKey,
+				    const scopy::acq::DataKey &xKey = scopy::acq::DataKey());
+
+	// Remove every channel drawing any of `keys` — for a stream that stopped being written,
+	// whose channel would otherwise sit there greyed out forever.
+	void removeChannelsFor(const QList<scopy::acq::DataKey> &keys);
+
 public Q_SLOTS:
 	// The visible width in samples, for every plot and for plots added later. Rescales
 	// each plot's ramp and re-claims every channel, which asks the store to retain
@@ -242,6 +275,17 @@ Q_SIGNALS:
 	// pointer (see the constructor): it states its requirement and the controller, which
 	// is the thing that knows the pipeline, applies it.
 	void maxWindowSizeChanged(int n);
+
+	// The default plot width changed, in samples. Same reason as maxWindowSizeChanged: this
+	// class states what changed and the controller, which knows the pipeline, applies it —
+	// here to the decode window.
+	void plotSizeChanged(int n);
+
+	// The window the trigger marker's sample↔axis map now spans, in samples: the marker
+	// plot's own width. The processor's fire window and the target spinbox's maximum are the
+	// same number, so they follow this rather than each deriving it. Emitted on a retarget
+	// and on a width change.
+	void triggerWindowChanged(int samples);
 
 	void plotAdded(quint32 uuid);
 	// Before anything belonging to the plot is torn down, while it is still readable.
@@ -303,6 +347,25 @@ private:
 	void registerRail(AcqChannel *ch);
 	void unregisterRail(AcqChannel *ch);
 
+	// The X PlotAxis a channel on `plot` draws against for `key`, or null when no channel
+	// there reads X from it. Walks plot->channels() rather than calling
+	// AcqPlot::axisForSource, which would create one on miss — an axis nobody draws on does
+	// not zoom with the plot, which is the bug this path exists to avoid.
+	scopy::PlotAxis *findXAxisFor(AcqPlot *plot, const scopy::acq::DataKey &key) const;
+
+	// Put the marker on whatever m_trigAxisKey resolves to now: the first plot with an X axis
+	// for that key, or detached when no plot has one. Idempotent and the single entry point —
+	// the reader's pick, and a plot or channel coming or going, all change the same answer.
+	//
+	// Called at the *end* of addPlot/removePlot/addChannel/removeChannel, which is what makes
+	// it safe: by then the dying plot or channel is already off the lists, so there is nothing
+	// to exclude.
+	void retargetTriggerHandle();
+
+	// Tell the marker which window its sample↔axis map spans: the marker plot's plotSize in
+	// the axis's units, and triggerWindowChanged for whoever owns the processor.
+	void updateTriggerMarkerWindow();
+
 	// ~60 Hz. A cycle can complete far faster than this; the dirty flag collapses the
 	// extra cycles into one repaint.
 	const int m_kFrameIntervalMs;
@@ -347,6 +410,15 @@ private:
 
 	// Applied to channels whose producer declared no rate.
 	double m_fallbackSampleRate{1.0};
+
+	// The trigger's bar and what it currently rides. All borrowed: the marker belongs to the
+	// controller, and the axis is shared with every channel drawing against that source and
+	// outlives it. The plot and axis are kept only so the window can be measured in the right
+	// plot's width and the right axis's units — the attach decision is the marker's own.
+	QPointer<scopy::acq::TriggerMarker> m_trigMarker;
+	QPointer<AcqPlot> m_trigMarkerPlot;
+	QPointer<scopy::PlotAxis> m_trigMarkerAxis;
+	scopy::acq::DataKey m_trigAxisKey;
 };
 
 } // namespace adc
