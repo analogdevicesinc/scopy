@@ -62,6 +62,9 @@
    * - general_mcp_server_enabled
      - Enable the MCP server
      - When enabled, Scopy exposes a local MCP control socket for AI agents.
+   * - dc_cmd_execution_parallel
+     - Enable parallel command execution
+     - When enabled, Scopy's plugins execute backend commands in parallel using an      optimal number of threads. Otherwise, a single thread is used.     If the device has already been added to the Device Browser, changing this      preference will have no      effect. The preference is applied when a new device is added.
    * - autoconnect_previous
      - Auto-connect to previous session
      - Automatically use the saved URI to connect to previous devices,       if available, when the application starts. This speeds up the       connection process and reduces the number of necessary steps.
