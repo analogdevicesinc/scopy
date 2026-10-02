@@ -46,9 +46,9 @@ class PlotAxisHandle;
 struct SCOPY_GUI_EXPORT AnnotationSpan
 {
 	quint64 startSample = 0;
-	quint64 endSample   = 0;   // == startSample → instant marker
-	QString klass;             // row / class name (used for coloring & row bucket)
-	QString text;              // label drawn inside the block if it fits
+	quint64 endSample = 0; // == startSample → instant marker
+	QString klass;	       // row / class name (used for coloring & row bucket)
+	QString text;	       // label drawn inside the block if it fits
 };
 
 // Draws a set of decoder annotations on a QwtPlot as colored rounded-rect
@@ -61,8 +61,7 @@ struct SCOPY_GUI_EXPORT AnnotationSpan
 class SCOPY_GUI_EXPORT AnnotationCurve : public QwtPlotItem
 {
 public:
-	AnnotationCurve(const QString &title, PlotAxis *xAxis, PlotAxis *yAxis,
-			PlotAxisHandle *handle = nullptr);
+	AnnotationCurve(const QString &title, PlotAxis *xAxis, PlotAxis *yAxis, PlotAxisHandle *handle = nullptr);
 	~AnnotationCurve() override;
 
 	// Full-replace update. Rows are derived from AnnotationSpan::klass;
@@ -88,9 +87,9 @@ public:
 	void setBandHeightPx(double heightPx);
 
 	// QwtPlotItem
-	int  rtti() const override { return QwtPlotItem::Rtti_PlotUserItem + 42; }
-	void draw(QPainter *painter, const QwtScaleMap &xMap,
-		  const QwtScaleMap &yMap, const QRectF &canvasRect) const override;
+	int rtti() const override { return QwtPlotItem::Rtti_PlotUserItem + 42; }
+	void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+		  const QRectF &canvasRect) const override;
 
 	// Hit-test a canvas-pixel point against the currently laid out
 	// annotations. Uses the exact same row geometry as draw(). Returns
@@ -98,37 +97,30 @@ public:
 	// any visible annotation. Returns by value so the caller owns the
 	// result and is unaffected by subsequent setAnnotations()/clear()
 	// calls on this curve.
-	std::optional<AnnotationSpan> hitTest(const QPointF &canvasPos,
-					      const QwtScaleMap &xMap,
-					      const QwtScaleMap &yMap,
-					      const QRectF &canvasRect) const;
+	std::optional<AnnotationSpan> hitTest(const QPointF &canvasPos, const QwtScaleMap &xMap,
+					      const QwtScaleMap &yMap, const QRectF &canvasRect) const;
 
 private:
 	struct Row
 	{
-		QString      klass;
-		QColor       color;
+		QString klass;
+		QColor color;
 		QVector<int> indices; // into m_anns, sorted by startSample
 	};
 
 	QColor colorFor(const QString &klass) const;
-	void   rebuildRows();
+	void rebuildRows();
 
-	void drawRow(QPainter *painter, const QwtScaleMap &xMap,
-		     const QwtScaleMap &yMap, const QRectF &canvasRect,
-		     const Row &row, double topPx, double bottomPx,
-		     double annotLeft) const;
+	void drawRow(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect,
+		     const Row &row, double topPx, double bottomPx, double annotLeft) const;
 
-	void drawRowLabel(QPainter *painter, double leftPx,
-			  double topPx, double bottomPx,
-			  double labelBoxW, const QString &text) const;
+	void drawRowLabel(QPainter *painter, double leftPx, double topPx, double bottomPx, double labelBoxW,
+			  const QString &text) const;
 
-	void drawAnnotation(QPainter *painter, const AnnotationSpan &ann,
-			    const QColor &color, const QwtScaleMap &xMap,
+	void drawAnnotation(QPainter *painter, const AnnotationSpan &ann, const QColor &color, const QwtScaleMap &xMap,
 			    double topPx, double bottomPx) const;
 
-	static QString elideText(const QString &text, double maxWidth,
-				 const QFontMetrics &fm);
+	static QString elideText(const QString &text, double maxWidth, const QFontMetrics &fm);
 
 	PlotAxis *m_xAxis;
 	PlotAxis *m_yAxis;
@@ -136,14 +128,14 @@ private:
 
 	double sampleToX(quint64 sample, const QwtScaleMap &xMap) const;
 
-	QString                 m_title;
+	QString m_title;
 	QVector<AnnotationSpan> m_anns;
-	QList<Row>              m_rows;
-	QHash<QString, int>     m_rowByClass;
-	QHash<QString, QColor>  m_classColor;
-	quint64                 m_sampleCount = 0;
+	QList<Row> m_rows;
+	QHash<QString, int> m_rowByClass;
+	QHash<QString, QColor> m_classColor;
+	quint64 m_sampleCount = 0;
 
-	// Band geometry supplied by the caller (typically DecoderOverlay).
+	// Band geometry supplied by the caller.
 	// Default: place at y-scale 0 with a modest height so the item is
 	// non-empty even if the caller forgets to configure it.
 	double m_bandTopScale = 0.0;
