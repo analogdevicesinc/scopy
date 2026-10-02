@@ -29,9 +29,6 @@
 
 #include <iio.h>
 
-// TEMPORARY: forward declarations for M2kLogicSource wiring
-namespace libm2k { namespace context { class M2k; } }
-
 #include <QLabel>
 #include <QLineEdit>
 #include <QObject>
@@ -53,13 +50,8 @@ using namespace grutil;
 typedef enum
 {
 	TIME,
-	FREQUENCY,
-	SIM,
-	ACQ
+	FREQUENCY
 } ADCInstrumentType;
-
-class SimInstrumentController;
-class AcqInstrumentController;
 
 class SCOPY_ADC_EXPORT ADCPlugin : public QObject, public PluginBase
 {
@@ -95,9 +87,6 @@ private:
 	iio_context *m_ctx;
 	QLineEdit *edit;
 	QList<ADCInstrumentController *> m_ctrls;
-	QList<SimInstrumentController *> m_simCtrls;
-	QList<AcqInstrumentController *> m_acqCtrls;
-	libm2k::context::M2k *m_m2k{nullptr}; // TEMPORARY: for M2kLogicSource
 
 	void createGRIIOTreeNode(GRTopBlockNode *node, iio_context *ctx);
 };

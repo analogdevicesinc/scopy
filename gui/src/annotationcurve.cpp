@@ -43,24 +43,23 @@ namespace scopy {
 namespace {
 
 // Padding inside a rectangular annotation block before text (px).
-constexpr double kTextPadding    = 6.0;
+constexpr double kTextPadding = 6.0;
 // Minimum ratio of block width the label + "..." needs, else no text drawn.
-constexpr double kMinLabelRatio  = 0.35;
+constexpr double kMinLabelRatio = 0.35;
 // Row spacing (vertical px between rows within the band). Tight packing.
-constexpr double kRowSpacingPx   = 0.0;
+constexpr double kRowSpacingPx = 0.0;
 // Max annotation-block pixel height regardless of band size.
 constexpr double kMaxRowHeightPx = 24.0;
 // Corner radius factor (r = height / kCornerRadiusDiv).
 constexpr double kCornerRadiusDiv = 4.0;
 // Chevron label geometry (per row).
-constexpr double kLabelHPadPx    = 6.0;  // horizontal text padding inside label
-constexpr double kLabelChevronPx = 6.0;  // width of the right-side ">" tip
-constexpr double kLabelGapPx     = 2.0;  // gap after chevron before annotations
+constexpr double kLabelHPadPx = 6.0;	// horizontal text padding inside label
+constexpr double kLabelChevronPx = 6.0; // width of the right-side ">" tip
+constexpr double kLabelGapPx = 2.0;	// gap after chevron before annotations
 
 } // namespace
 
-AnnotationCurve::AnnotationCurve(const QString &title, PlotAxis *xAxis, PlotAxis *yAxis,
-				 PlotAxisHandle *handle)
+AnnotationCurve::AnnotationCurve(const QString &title, PlotAxis *xAxis, PlotAxis *yAxis, PlotAxisHandle *handle)
 	: QwtPlotItem(QwtText(title))
 	, m_xAxis(xAxis)
 	, m_yAxis(yAxis)
@@ -83,9 +82,7 @@ void AnnotationCurve::setAnnotations(const QVector<AnnotationSpan> &anns)
 {
 	m_anns = anns;
 	std::sort(m_anns.begin(), m_anns.end(),
-		  [](const AnnotationSpan &a, const AnnotationSpan &b) {
-			  return a.startSample < b.startSample;
-		  });
+		  [](const AnnotationSpan &a, const AnnotationSpan &b) { return a.startSample < b.startSample; });
 	rebuildRows();
 	itemChanged();
 }
@@ -160,7 +157,7 @@ void AnnotationCurve::rebuildRows()
 {
 	// Preserve existing row order; only append newly-seen classes.
 	QHash<QString, int> newRowByClass = m_rowByClass;
-	QList<Row>          newRows       = m_rows;
+	QList<Row> newRows = m_rows;
 	for(Row &r : newRows)
 		r.indices.clear();
 
@@ -178,15 +175,15 @@ void AnnotationCurve::rebuildRows()
 	}
 
 	m_rowByClass = std::move(newRowByClass);
-	m_rows       = std::move(newRows);
+	m_rows = std::move(newRows);
 }
 
-void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
-			   const QwtScaleMap &yMap, const QRectF &canvasRect) const
+void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+			   const QRectF &canvasRect) const
 {
 	const int nRows = std::max(1, (int)m_rows.size());
 	const double bandTopScale = m_handle ? m_handle->getPosition() : yMap.s2();
-	const double bandTopPx    = yMap.transform(bandTopScale);
+	const double bandTopPx = yMap.transform(bandTopScale);
 	const double bandHeightPx = nRows * kMaxRowHeightPx;
 	const double bandBottomPx = bandTopPx + bandHeightPx;
 
@@ -201,10 +198,8 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 		painter->setFont(titleFont);
 		const QFontMetrics tfm = painter->fontMetrics();
 		const double titleH = tfm.height() + 4.0;
-		const QRectF titleRect(canvasRect.left() + kLabelHPadPx,
-				       bandTopPx - titleH,
-				       canvasRect.width() - kLabelHPadPx * 2,
-				       titleH);
+		const QRectF titleRect(canvasRect.left() + kLabelHPadPx, bandTopPx - titleH,
+				       canvasRect.width() - kLabelHPadPx * 2, titleH);
 		painter->setPen(Style::getColor(json::theme::content_default));
 		painter->drawText(titleRect, Qt::AlignLeft | Qt::AlignVCenter, m_title);
 		painter->restore();
@@ -216,7 +211,7 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 	}
 
 	const double rowStrideHeightPx = bandHeightPx / nRows;
-	const double rowHeightPx       = kMaxRowHeightPx;
+	const double rowHeightPx = kMaxRowHeightPx;
 
 	const QFontMetrics fm = painter->fontMetrics();
 	int maxTextW = 0;
@@ -227,10 +222,9 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 
 	for(int r = 0; r < nRows; ++r) {
 		const double rowCenterPx = bandTopPx + rowHeightPx * (r + 0.5);
-		const double topPx       = rowCenterPx - rowHeightPx / 2.0;
-		const double bottomPx    = rowCenterPx + rowHeightPx / 2.0;
-		drawRow(painter, xMap, yMap, canvasRect, m_rows[r],
-			topPx, bottomPx, annotLeft);
+		const double topPx = rowCenterPx - rowHeightPx / 2.0;
+		const double bottomPx = rowCenterPx + rowHeightPx / 2.0;
+		drawRow(painter, xMap, yMap, canvasRect, m_rows[r], topPx, bottomPx, annotLeft);
 	}
 
 	// Row labels: sharp-edged box with a chevron ">" right edge.
@@ -239,19 +233,16 @@ void AnnotationCurve::draw(QPainter *painter, const QwtScaleMap &xMap,
 		if(klass.isEmpty())
 			continue;
 		const double rowCenterPx = bandTopPx + rowHeightPx * (r + 0.5);
-		const double topPx       = rowCenterPx - rowHeightPx / 2.0;
-		const double bottomPx    = rowCenterPx + rowHeightPx / 2.0;
-		drawRowLabel(painter, canvasRect.right() - labelBoxW, topPx, bottomPx,
-			     labelBoxW, klass);
+		const double topPx = rowCenterPx - rowHeightPx / 2.0;
+		const double bottomPx = rowCenterPx + rowHeightPx / 2.0;
+		drawRowLabel(painter, canvasRect.right() - labelBoxW, topPx, bottomPx, labelBoxW, klass);
 	}
 
 	painter->restore();
 }
 
-std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos,
-						       const QwtScaleMap &xMap,
-						       const QwtScaleMap &yMap,
-						       const QRectF &canvasRect) const
+std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos, const QwtScaleMap &xMap,
+						       const QwtScaleMap &yMap, const QRectF &canvasRect) const
 {
 	if(m_rows.isEmpty() || m_anns.isEmpty())
 		return std::nullopt;
@@ -260,15 +251,14 @@ std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos,
 
 	const int nRows = m_rows.size();
 	const double bandTopScale = m_handle ? m_handle->getPosition() : yMap.s2();
-	const double bandTopPx    = yMap.transform(bandTopScale);
+	const double bandTopPx = yMap.transform(bandTopScale);
 	const double bandHeightPx = nRows * kMaxRowHeightPx;
 	const double bandBottomPx = bandTopPx + bandHeightPx;
 	if(bandHeightPx <= 0)
 		return std::nullopt;
 
 	const double rowStrideHeightPx = bandHeightPx / nRows;
-	const double rowHeightPx       = std::min(
-		std::max(rowStrideHeightPx - kRowSpacingPx, 4.0), kMaxRowHeightPx);
+	const double rowHeightPx = std::min(std::max(rowStrideHeightPx - kRowSpacingPx, 4.0), kMaxRowHeightPx);
 
 	// Find which row (if any) the y-coord falls into.
 	const double y = canvasPos.y();
@@ -278,7 +268,7 @@ std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos,
 	int rowIndex = -1;
 	for(int r = 0; r < nRows; ++r) {
 		const double rowCenterPx = bandTopPx + rowHeightPx * (r + 0.5);
-		const double topPx    = rowCenterPx - rowHeightPx / 2.0;
+		const double topPx = rowCenterPx - rowHeightPx / 2.0;
 		const double bottomPx = rowCenterPx + rowHeightPx / 2.0;
 		if(y >= topPx && y <= bottomPx) {
 			rowIndex = r;
@@ -299,7 +289,7 @@ std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos,
 	for(int idx : row.indices) {
 		const AnnotationSpan &a = m_anns[idx];
 		const double aStartPx = xMap.transform(sampleToX(a.startSample, xMap));
-		const double aEndPx   = xMap.transform(sampleToX(a.endSample,   xMap));
+		const double aEndPx = xMap.transform(sampleToX(a.endSample, xMap));
 		if(a.startSample == a.endSample) {
 			if(std::abs(x - aStartPx) <= kInstantRadiusPx)
 				return a;
@@ -311,10 +301,8 @@ std::optional<AnnotationSpan> AnnotationCurve::hitTest(const QPointF &canvasPos,
 	return std::nullopt;
 }
 
-void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap,
-			      const QwtScaleMap & /*yMap*/,
-			      const QRectF &canvasRect, const Row &row,
-			      double topPx, double bottomPx,
+void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap & /*yMap*/,
+			      const QRectF &canvasRect, const Row &row, double topPx, double bottomPx,
 			      double /*annotLeft*/) const
 {
 	if(row.indices.isEmpty())
@@ -327,7 +315,7 @@ void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap,
 		const AnnotationSpan &a = m_anns[idx];
 
 		const double aStartPx = xMap.transform(sampleToX(a.startSample, xMap));
-		const double aEndPx   = xMap.transform(sampleToX(a.endSample, xMap));
+		const double aEndPx = xMap.transform(sampleToX(a.endSample, xMap));
 
 		// Off-screen quick reject.
 		if(aEndPx < canvasRect.left() - 4.0 || aStartPx > canvasRect.right() + 4.0)
@@ -339,25 +327,21 @@ void AnnotationCurve::drawRow(QPainter *painter, const QwtScaleMap &xMap,
 	painter->restore();
 }
 
-void AnnotationCurve::drawRowLabel(QPainter *painter, double leftPx,
-				   double topPx, double bottomPx,
-				   double labelBoxW, const QString &text) const
+void AnnotationCurve::drawRowLabel(QPainter *painter, double leftPx, double topPx, double bottomPx, double labelBoxW,
+				   const QString &text) const
 {
 	// Sharp-edged box with a chevron "<" left edge (tip on the left).
 	// Positioned on the right of the canvas by the caller. Uses default
 	// application palette colors so the label is theme-agnostic.
 	const double heightPx = bottomPx - topPx;
-	const double tipX     = leftPx;
-	const double bodyL    = leftPx + kLabelChevronPx;
-	const double rightPx  = leftPx + labelBoxW;
-	const double midY     = (topPx + bottomPx) / 2.0;
+	const double tipX = leftPx;
+	const double bodyL = leftPx + kLabelChevronPx;
+	const double rightPx = leftPx + labelBoxW;
+	const double midY = (topPx + bottomPx) / 2.0;
 
 	QPolygonF poly;
-	poly << QPointF(tipX,    midY)
-	     << QPointF(bodyL,   topPx)
-	     << QPointF(rightPx, topPx)
-	     << QPointF(rightPx, bottomPx)
-	     << QPointF(bodyL,   bottomPx);
+	poly << QPointF(tipX, midY) << QPointF(bodyL, topPx) << QPointF(rightPx, topPx) << QPointF(rightPx, bottomPx)
+	     << QPointF(bodyL, bottomPx);
 
 	painter->save();
 	painter->setPen(QPen(Style::getColor(json::theme::content_silent), 1.0));
@@ -367,22 +351,18 @@ void AnnotationCurve::drawRowLabel(QPainter *painter, double leftPx,
 	painter->drawPolygon(poly);
 
 	painter->setPen(Style::getColor(json::theme::content_default));
-	const QRectF textRect(bodyL + kLabelHPadPx,
-			      topPx,
-			      labelBoxW - kLabelHPadPx * 2 - kLabelChevronPx,
-			      heightPx);
+	const QRectF textRect(bodyL + kLabelHPadPx, topPx, labelBoxW - kLabelHPadPx * 2 - kLabelChevronPx, heightPx);
 	painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
 	painter->restore();
 }
 
-void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &ann,
-				     const QColor &color, const QwtScaleMap &xMap,
-				     double topPx, double bottomPx) const
+void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &ann, const QColor &color,
+				     const QwtScaleMap &xMap, double topPx, double bottomPx) const
 {
 	const double startPx = xMap.transform(sampleToX(ann.startSample, xMap));
-	const double endPx   = xMap.transform(sampleToX(ann.endSample, xMap));
+	const double endPx = xMap.transform(sampleToX(ann.endSample, xMap));
 	const double heightPx = bottomPx - topPx;
-	const double centerY  = (topPx + bottomPx) / 2.0;
+	const double centerY = (topPx + bottomPx) / 2.0;
 
 	painter->save();
 	painter->setPen(QPen(color.darker(150), 1.0));
@@ -396,10 +376,7 @@ void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &an
 		// Optional label to the right if it fits.
 		if(!ann.text.isEmpty()) {
 			const QFontMetrics fm = painter->fontMetrics();
-			const QRectF textRect(startPx + r + 2.0,
-					      topPx,
-					      fm.horizontalAdvance(ann.text) + 4.0,
-					      heightPx);
+			const QRectF textRect(startPx + r + 2.0, topPx, fm.horizontalAdvance(ann.text) + 4.0, heightPx);
 			painter->setPen(Style::getColor(json::theme::content_inverse));
 			painter->drawText(textRect, Qt::AlignCenter, ann.text);
 		}
@@ -414,8 +391,8 @@ void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &an
 	painter->drawRoundedRect(rect, radius, radius);
 
 	if(!ann.text.isEmpty()) {
-		const QFontMetrics fm  = painter->fontMetrics();
-		const double innerW    = widthPx - kTextPadding * 2;
+		const QFontMetrics fm = painter->fontMetrics();
+		const double innerW = widthPx - kTextPadding * 2;
 		if(innerW >= fm.horizontalAdvance(QStringLiteral("X"))) {
 			const QString shown = elideText(ann.text, innerW, fm);
 			if(!shown.isEmpty()) {
@@ -428,8 +405,7 @@ void AnnotationCurve::drawAnnotation(QPainter *painter, const AnnotationSpan &an
 	painter->restore();
 }
 
-QString AnnotationCurve::elideText(const QString &text, double maxWidth,
-				   const QFontMetrics &fm)
+QString AnnotationCurve::elideText(const QString &text, double maxWidth, const QFontMetrics &fm)
 {
 	if(text.isEmpty())
 		return QString();
