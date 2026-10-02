@@ -41,14 +41,7 @@
 
 #include "adctimeinstrumentcontroller.h"
 #include "adcfftinstrumentcontroller.h"
-#include "sim/siminstrumentcontroller.h"
-#include "acq/acqinstrument.h"
-#include "acq/acqinstrumentcontroller.h"
 #include "scopy-adc_config.h"
-
-// TEMPORARY: for M2kLogicSource wiring
-#include <libm2k/contextbuilder.hpp>
-#include <libm2k/digital/m2kdigital.hpp>
 
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN, "ADCPlugin");
 using namespace scopy;
@@ -248,9 +241,6 @@ void ADCPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("freq", "ADC - Frequency",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_spectrum_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("sim", "ADC - Simulated",
-						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
-							  "/icons/tool_oscilloscope.svg"));
 }
 
 bool iio_is_buffer_capable(struct iio_device *dev)
@@ -331,8 +321,6 @@ bool ADCPlugin::onConnect()
 
 	newInstrument(TIME, root, top);
 	newInstrument(FREQUENCY, root, top);
-	newInstrument(SIM, nullptr, nullptr);
-	newInstrument(ACQ, nullptr, nullptr);
 	QMetaObject::invokeMethod(top, &GRTopBlock::unsuspendBuild, Qt::QueuedConnection);
 	return true;
 }
@@ -423,48 +411,6 @@ void ADCPlugin::newInstrument(ADCInstrumentType t, AcqTreeNode *root, GRTopBlock
 		connect(adc, &ADCInstrumentController::connectionLost, this, &ADCPlugin::connectionLost,
 			Qt::QueuedConnection);
 		m_ctrls.append(adc);
-	} else if(t == SIM) {
-		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("sim", "ADC - Simulated",
-							  ":/gui/icons/" +
-								  Style::getAttribute(json::theme::icon_theme_folder) +
-								  "/icons/tool_oscilloscope.svg"));
-		auto tme = m_toolList.last();
-		tme->setEnabled(true);
-		tme->setRunBtnVisible(false);
-
-		// TEMPORARY: try to get M2kDigital for M2kLogicSource
-		libm2k::digital::M2kDigital *digital = nullptr;
-		try {
-			m_m2k = libm2k::context::m2kOpen(m_ctx, m_param.toStdString().c_str());
-			if(m_m2k)
-				digital = m_m2k->getDigital();
-		} catch(...) {
-			qWarning(CAT_ADCPLUGIN) << "m2kOpen failed — M2kLogicSource will not be available";
-		}
-
-		auto *ctrl = new SimInstrumentController(tme, this);
-		ctrl->init(m_ctx, digital);
-		m_simCtrls.append(ctrl);
-
-		Q_EMIT toolListChanged();
-		tme->setTool(ctrl->ui());
-		return;
-	} else if(t == ACQ) {
-		m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("acq", "ADC - Acquisition",
-							  ":/gui/icons/" +
-								  Style::getAttribute(json::theme::icon_theme_folder) +
-								  "/icons/tool_oscilloscope.svg"));
-		auto tme = m_toolList.last();
-		tme->setEnabled(true);
-		tme->setRunBtnVisible(true);
-
-		auto *ctrl = new AcqInstrumentController(tme, this);
-		ctrl->init(m_ctx);
-		m_acqCtrls.append(ctrl);
-
-		Q_EMIT toolListChanged();
-		tme->setTool(ctrl->ui());
-		return;
 	} else {
 		return;
 	}
@@ -502,34 +448,8 @@ void ADCPlugin::deleteInstrument(ToolMenuEntry *tool)
 				break;
 			}
 		}
-		if(found) {
-			found->stop();
-			m_ctrls.removeAll(found);
-		} else {
-			SimInstrumentController *simFound = nullptr;
-			for(SimInstrumentController *ctrl : qAsConst(m_simCtrls)) {
-				if(ctrl->ui() == tool->tool()) {
-					simFound = ctrl;
-					break;
-				}
-			}
-			if(simFound) {
-				simFound->stop();
-				m_simCtrls.removeAll(simFound);
-			} else {
-				AcqInstrumentController *acqFound = nullptr;
-				for(AcqInstrumentController *ctrl : std::as_const(m_acqCtrls)) {
-					if(ctrl->ui() == tool->tool()) {
-						acqFound = ctrl;
-						break;
-					}
-				}
-				if(acqFound) {
-					acqFound->stop();
-					m_acqCtrls.removeAll(acqFound);
-				}
-			}
-		}
+		found->stop();
+		m_ctrls.removeAll(found);
 		tool->setTool(nullptr);
 		delete(w);
 	}
@@ -579,12 +499,6 @@ bool ADCPlugin::onDisconnect()
 	Preferences *p = Preferences::GetInstance();
 	disconnect(p, &Preferences::preferenceChanged, this, &ADCPlugin::preferenceChanged);
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
-	// TEMPORARY: close the libm2k wrapper (deinit=false so the iio_context is not destroyed)
-	if(m_m2k) {
-		libm2k::context::contextClose(m_m2k, false);
-		m_m2k = nullptr;
-	}
-
 	if(m_ctx)
 		ConnectionProvider::GetInstance()->close(m_param);
 

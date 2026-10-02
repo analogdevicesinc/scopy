@@ -49,16 +49,10 @@ static int menuWidth()
 }
 // The debug panel is docked, so this is plot height it takes away permanently while open.
 // ~256px: enough for a tab bar plus about eight tree rows.
-static int debugPanelHeight()
-{
-	return Style::getDimension(json::global::unit_6) * 2;
-}
+static int debugPanelHeight() { return Style::getDimension(json::global::unit_6) * 2; }
 // Both fps fields, so the readout and the field under it line up. ~80px: wide enough
 // for the "target FPS" placeholder, which is the longer of the two strings.
-static int fpsFieldWidth()
-{
-	return Style::getDimension(json::global::unit_5);
-}
+static int fpsFieldWidth() { return Style::getDimension(json::global::unit_5); }
 
 // A rail's content in a vertical-only scroll area, so a menu taller than the panel stays
 // reachable. Same recipe VerticalChannelManager uses for its rows.
@@ -250,9 +244,9 @@ void InstrumentTemplate::setupTopRail()
 	// same way PrintBtn does and give it the existing save glyph.
 	m_exportBtn = new QPushButton(this);
 	m_exportBtn->setCheckable(false);
-	m_exportBtn->setIcon(
-		Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) + "/icons/save.svg",
-				 Style::getColor(json::theme::content_default)));
+	m_exportBtn->setIcon(Style::getPixmap(":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+						      "/icons/save.svg",
+					      Style::getColor(json::theme::content_default)));
 	m_exportBtn->setToolTip("Export");
 	Style::setStyle(m_exportBtn, style::properties::button::squareIconButton);
 
@@ -464,8 +458,8 @@ MenuSectionCollapseWidget *InstrumentTemplate::addChannelGroup(const QString &ti
 		return m_groups.value(title);
 	}
 
-	MenuSectionCollapseWidget *group = new MenuSectionCollapseWidget(
-		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, m_vcm);
+	MenuSectionCollapseWidget *group = new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_ARROW,
+									 MenuCollapseSection::MHW_BASEWIDGET, m_vcm);
 
 	// Each group keeps MenuSectionWidget's own fill and border rather than being flattened
 	// to transparent: the rail panel *is* transparent now, so the gap the
@@ -532,9 +526,8 @@ void InstrumentTemplate::configureChannelRow(MenuControlButton *row, QWidget *in
 	}
 }
 
-MenuControlButton *InstrumentTemplate::makeChannelRow(CompositeWidget *group, const QString &name,
-						     const QColor &color, const QString &menuId, int indent,
-						     bool asSwitch)
+MenuControlButton *InstrumentTemplate::makeChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
+						      const QString &menuId, int indent, bool asSwitch)
 {
 	MenuControlButton *btn = new MenuControlButton();
 
@@ -551,20 +544,20 @@ MenuControlButton *InstrumentTemplate::makeChannelRow(CompositeWidget *group, co
 	return btn;
 }
 
-MenuControlButton *InstrumentTemplate::addChannelRow(CompositeWidget *group, const QString &name,
-						    const QColor &color, const QString &menuId, int indent)
+MenuControlButton *InstrumentTemplate::addChannelRow(CompositeWidget *group, const QString &name, const QColor &color,
+						     const QString &menuId, int indent)
 {
 	return makeChannelRow(group, name, color, menuId, indent, false);
 }
 
 MenuControlButton *InstrumentTemplate::addChannelSwitchRow(CompositeWidget *group, const QString &name,
-							  const QColor &color, const QString &menuId, int indent)
+							   const QColor &color, const QString &menuId, int indent)
 {
 	return makeChannelRow(group, name, color, menuId, indent, true);
 }
 
 CollapsableMenuControlButton *InstrumentTemplate::addExpandableChannelRow(CompositeWidget *group, const QString &name,
-									 const QColor &color, const QString &menuId)
+									  const QColor &color, const QString &menuId)
 {
 	CollapsableMenuControlButton *row = new CollapsableMenuControlButton();
 	MenuControlButton *hdr = row->getControlBtn();
@@ -591,8 +584,7 @@ CollapsableMenuControlButton *InstrumentTemplate::addExpandableChannelRow(Compos
 	return row;
 }
 
-QPushButton *InstrumentTemplate::addRailActionButton(CompositeWidget *group, const QString &text,
-						     const QString &menuId)
+QPushButton *InstrumentTemplate::addRailActionButton(CompositeWidget *group, const QString &text, const QString &menuId)
 {
 	QPushButton *btn = new QPushButton(text);
 	// Checkable so the exclusive group can hold it, which is what makes it fall back out
@@ -748,8 +740,8 @@ QLabel *InstrumentTemplate::createOwnerPill(SettingOwner owner, QWidget *parent)
 MenuSectionCollapseWidget *InstrumentTemplate::createMenuSection(const QString &title, SettingOwner owner,
 								 QWidget *parent)
 {
-	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(
-		title, MenuCollapseSection::MHCW_ARROW, MenuCollapseSection::MHW_BASEWIDGET, parent);
+	MenuSectionCollapseWidget *section = new MenuSectionCollapseWidget(title, MenuCollapseSection::MHCW_ARROW,
+									   MenuCollapseSection::MHW_BASEWIDGET, parent);
 
 	QLabel *pill = createOwnerPill(owner, section);
 
