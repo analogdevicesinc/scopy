@@ -27,6 +27,7 @@
 
 #include <core/acq_engine/DataKeyCombo.h>
 #include <core/acq_engine/DataStore.h>
+#include <core/acq_engine/TriggerMarker.h>
 
 // The factories, needed here and not in the header: they are static free functions, so
 // the translation unit that calls one must include it (see the ODR note in
@@ -177,6 +178,9 @@ AcqPlot *AcqPlotManager::addPlot(const QString &name, AcqPlotKind kind)
 
 	announceMaxWindowSize();
 	Q_EMIT plotAdded(uuid);
+	// After the emit: a handler may add channels to the new plot, and the resolve should see
+	// them. Idempotent, so the channels' own retargets costing a second pass is harmless.
+	retargetTriggerHandle();
 	return p;
 }
 
@@ -229,6 +233,9 @@ void AcqPlotManager::removePlot(quint32 uuid)
 	delete p;
 
 	announceMaxWindowSize();
+	// Last, with the plot already off m_plots: the resolve cannot find its axis and put the
+	// marker straight back onto the plot that just went.
+	retargetTriggerHandle();
 	m_dirty = true;
 }
 
@@ -321,6 +328,9 @@ AcqChannel *AcqPlotManager::addChannel(AcqPlot *p, scopy::acq::ReprKind kind, co
 	ch->setKeyPresent(m_store->contains(yKey));
 
 	Q_EMIT channelAdded(ch);
+	// After attach(), which is what created the channel's axis pair — the axis the marker
+	// rides is made by a channel, so this and not plotAdded is the event that matters.
+	retargetTriggerHandle();
 	m_dirty = true;
 	return ch;
 }
@@ -351,7 +361,164 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 	// and releases the depth claim.
 	ch->deleteLater();
 
+	// After detach(), which returned its axes to the plot's pool: resolving any earlier would
+	// walk a list that still holds this channel and could park the marker on its axis.
+	retargetTriggerHandle();
 	m_dirty = true;
+}
+
+AcqChannel *AcqPlotManager::drawOnFirstPlot(scopy::acq::ReprKind kind, const scopy::acq::DataKey &yKey,
+					    const scopy::acq::DataKey &xKey)
+{
+	if(m_plots.isEmpty()) {
+		return nullptr;
+	}
+	for(AcqChannel *ch : std::as_const(m_channels)) {
+		if(ch && ch->key() == yKey) {
+			return nullptr;
+		}
+	}
+	return addChannel(m_plots.first(), kind, yKey, xKey);
+}
+
+void AcqPlotManager::removeChannelsFor(const QList<scopy::acq::DataKey> &keys)
+{
+	// Over a copy: removeChannel mutates m_channels.
+	const QList<AcqChannel *> chans = m_channels;
+	for(AcqChannel *ch : chans) {
+		if(ch && keys.contains(ch->key())) {
+			removeChannel(ch);
+		}
+	}
+}
+
+// --- trigger marker ---------------------------------------------------------
+
+void AcqPlotManager::setTriggerMarker(scopy::acq::TriggerMarker *marker)
+{
+	m_trigMarker = marker;
+	retargetTriggerHandle();
+}
+
+void AcqPlotManager::setTriggerAxisKey(const scopy::acq::DataKey &key)
+{
+	m_trigAxisKey = key;
+	retargetTriggerHandle();
+}
+
+PlotAxis *AcqPlotManager::findXAxisFor(AcqPlot *plot, const scopy::acq::DataKey &key) const
+{
+	if(!plot || key.key.isEmpty()) {
+		return nullptr;
+	}
+
+	// The channels, not plot->axisForSource(): that one creates on miss, and only a channel
+	// can say an axis is really being drawn against.
+	PlotAxis *fallback = nullptr;
+	const QList<AcqChannel *> chans = plot->channels();
+	for(AcqChannel *ch : chans) {
+		if(!ch || !ch->xAxis()) {
+			continue;
+		}
+		AcqAxis *ax = ch->xAxis();
+		// isHorizontal() even on the X side: a channel's "X" axis is whichever PlotAxis it
+		// was given, and nothing stops a caller handing it a vertical one.
+		if(ax->source().key != key || !ax->isHorizontal() || !ax->plotAxis()) {
+			continue;
+		}
+		// Sample index and time share the ramp key, so a key match cannot tell them apart.
+		// Prefer the index axis: its interval really is 0..plotSize-1, which makes the
+		// position-to-sample map exact rather than merely monotonic.
+		if(ax->isSampleIndex()) {
+			return ax->plotAxis();
+		}
+		if(!fallback) {
+			fallback = ax->plotAxis();
+		}
+	}
+	return fallback;
+}
+
+void AcqPlotManager::retargetTriggerHandle()
+{
+	if(m_trigMarker.isNull()) {
+		return;
+	}
+
+	// First plot that has it: one trigger, and no basis for preferring a later plot.
+	AcqPlot *target = nullptr;
+	PlotAxis *axis = nullptr;
+	for(AcqPlot *p : std::as_const(m_plots)) {
+		if(PlotAxis *ax = findXAxisFor(p, m_trigAxisKey)) {
+			target = p;
+			axis = ax;
+			break;
+		}
+	}
+
+	if(!axis) {
+		// Detached rather than parked on some other axis. The reader's pick is kept, so this
+		// resolves itself once a channel draws X against that key.
+		const bool had = m_trigMarker->isAttached();
+		m_trigMarker->detach();
+		m_trigMarkerPlot = nullptr;
+		m_trigMarkerAxis = nullptr;
+		if(had) {
+			// Only on the transition: this runs on every plot and channel change.
+			qWarning(CAT_ACQ_PLOTMANAGER) << "trigger axis" << m_trigAxisKey.toString()
+						      << "is not drawn as an X axis on any plot — marker hidden";
+		}
+		return;
+	}
+
+	PlotWidget *w = target->plot();
+	if(!w) {
+		return;
+	}
+
+	m_trigMarkerPlot = target;
+	m_trigMarkerAxis = axis;
+	// The window before the attach, so the marker's first sync places the bar against the
+	// right one.
+	updateTriggerMarkerWindow();
+	m_trigMarker->attach(w, axis);
+}
+
+void AcqPlotManager::updateTriggerMarkerWindow()
+{
+	if(m_trigMarker.isNull()) {
+		return;
+	}
+
+	// The *marker plot's* plotSize: plots can be different widths. The default is only the
+	// answer before the first resolve.
+	const int n = m_trigMarkerPlot.isNull() ? m_plotSize : m_trigMarkerPlot->plotSize();
+	const int last = std::max(0, n - 1);
+
+	// The axis units that window spans: slot numbers, or slots over the channel's rate for a
+	// time axis. Any other X is left as slot numbers — monotonic, which is all the marker
+	// needs, and the most a proportional map can claim without scanning the stream.
+	double x1 = static_cast<double>(last);
+	if(!m_trigMarkerAxis.isNull() && !m_trigMarkerPlot.isNull()) {
+		const QList<AcqChannel *> chans = m_trigMarkerPlot->channels();
+		for(AcqChannel *ch : chans) {
+			AcqAxis *ax = ch ? ch->xAxis() : nullptr;
+			if(!ax || ax->plotAxis() != m_trigMarkerAxis.data()) {
+				continue;
+			}
+			if(ax->isTime()) {
+				const double rate = ch->sampleRate() > 0.0 ? ch->sampleRate() : 1.0;
+				x1 = static_cast<double>(last) / rate;
+			}
+			break;
+		}
+	}
+
+	m_trigMarker->setWindow(n, 0.0, x1);
+	// The same `n` for the processor's fire window and the target spinbox's maximum: the fire
+	// index is in these units and the marker maps it back through them, so the three must be
+	// one number. Stated rather than applied — this class holds no processor.
+	Q_EMIT triggerWindowChanged(n);
 }
 
 // --- rail: the "Plots" group ------------------------------------------------
@@ -721,6 +888,11 @@ void AcqPlotManager::setPlotSize(int n)
 	// Nothing to set on the sample-index axes here either — see addChannel().
 	reclaimAll();
 	announceMaxWindowSize();
+	// The marker's axis needs nothing — the curve re-requests its range on the next read —
+	// but its window does, and one call carries the new width to the marker and to whoever
+	// owns the processor, so the two cannot disagree.
+	updateTriggerMarkerWindow();
+	Q_EMIT plotSizeChanged(n);
 	m_dirty = true;
 }
 

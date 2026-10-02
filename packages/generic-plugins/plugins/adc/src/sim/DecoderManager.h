@@ -120,6 +120,12 @@ Q_SIGNALS:
 	// holds, so blocksChanged never fires.
 	void stageAdded(const QString &uid, int stageIndex);
 
+	// A new output key, whether it came with a new decoder or with a stage pushed onto one
+	// that already exists. decoderAdded and stageAdded name a uid and an index that a handler
+	// then has to resolve back to this; emitting the key is that resolution done once, here,
+	// where it is already in hand. Fires alongside them, never instead of them.
+	void outKeyAdded(const scopy::acq::DataKey &key);
+
 	// Output keys that no longer exist — popped stages, or every stage of a removed decoder.
 	// The keys travel in the signal because by the time it fires they are already off the
 	// instance, which for removeDecoder is gone.

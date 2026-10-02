@@ -195,6 +195,7 @@ QString DecoderManager::addDecoder(const QString &decoderId)
 	m_decoders.append(d);
 
 	Q_EMIT decoderAdded(uid);
+	Q_EMIT outKeyAdded(outKey);
 	if(m_logger) m_logger->info(kMgrId, QStringLiteral("added decoder ") + uid);
 	return uid;
 }
@@ -303,6 +304,7 @@ QString DecoderManager::addDecoderFromAnnotations(const QString &decoderId,
 	m_decoders.append(d);
 
 	Q_EMIT decoderAdded(uid);
+	Q_EMIT outKeyAdded(outKey);
 	if(m_logger)
 		m_logger->info(kMgrId,
 			QStringLiteral("added annotation-chained decoder %1 (source=%2 stage=%3 upstream=%4)")
@@ -391,6 +393,7 @@ int DecoderManager::pushStage(const QString &uid, const QString &decoderId)
 
 	// Last, so a handler that reads find(uid) sees the finished stage.
 	Q_EMIT stageAdded(uid, stageIndex);
+	Q_EMIT outKeyAdded(outKey);
 	return stageIndex;
 }
 
