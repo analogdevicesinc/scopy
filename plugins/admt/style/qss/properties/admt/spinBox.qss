@@ -1,0 +1,8 @@
+QSpinBox[&&property&&=true]{
+    height: &unit_2&;
+    border: &border_width& solid &interactive_subtle_idle&;
+    border-bottom: &border_width_interactive& solid &interactive_subtle_idle&;
+    border-radius: &radius_interactive&;
+    padding: 0 &padding_interactive& 0 &padding_interactive&;
+    selection-background-color: &interactive_subtle_pressed&;
+}

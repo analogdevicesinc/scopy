@@ -32,6 +32,11 @@
 	"uri": "ip:127.0.0.1"
     },
     {
+        "device": "admt4000",
+	"xml_path": "admt4000.xml",
+        "uri": "ip:127.0.0.1"
+    },
+    {
         "device": "generic",
         "uri": "ip:127.0.0.1"
     }
