@@ -109,9 +109,9 @@ void IIOComponentBuilder::buildOneDevice(IIOContext *iioCtx, scopy::iio::DeviceH
 	dev->setLabel(devOps->label(dh));
 	dev->setIsHwmon(devOps->isHwmon(dh));
 
-	buildDeviceAttributes(dev, executor);
+	const AttrMap devAttrs = buildDeviceAttributes(dev, executor);
 	buildDebugAttributes(dev, executor);
-	buildChannels(dev, executor);
+	buildChannels(dev, devAttrs, executor);
 	buildStreams(dev, executor);
 	buildTrigger(dev, executor);
 }
@@ -135,15 +135,18 @@ void IIOComponentBuilder::buildTrigger(IIODevice *dev, ICmdExecutor *executor)
 	}
 }
 
-void IIOComponentBuilder::buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor)
+IIOComponentBuilder::AttrMap IIOComponentBuilder::buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor)
 {
 	auto *devOps = m_backend->deviceOps();
 	const auto dh = dev->handle();
+	AttrMap attrs;
 	const unsigned int count = devOps->attrsCount(dh);
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = devOps->attrName(dh, i);
-		makeAttribute(dev, name, m_attrOps->deviceAttr(dh, name), executor);
+		attrs.insert(name, makeAttribute(dev, name, m_attrOps->deviceAttr(dh, name), executor));
 	}
+	applyAvailable(attrs);
+	return attrs;
 }
 
 void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *executor)
@@ -152,13 +155,15 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 	const auto dh = dev->handle();
 	const unsigned int count = devOps->debugAttrsCount(dh);
 	bool hasRegAccess = false;
+	AttrMap attrs;
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = devOps->debugAttrName(dh, i);
-		makeAttribute(dev, name, m_attrOps->debugAttr(dh, name), executor);
+		attrs.insert(name, makeAttribute(dev, name, m_attrOps->debugAttr(dh, name), executor));
 		if(name.contains("direct_reg_access")) {
 			hasRegAccess = true;
 		}
 	}
+	applyAvailable(attrs);
 
 	// Register access — only where the device exposes a debug/register plane.
 	if(hasRegAccess) {
@@ -167,7 +172,7 @@ void IIOComponentBuilder::buildDebugAttributes(IIODevice *dev, ICmdExecutor *exe
 	}
 }
 
-void IIOComponentBuilder::buildChannels(IIODevice *dev, ICmdExecutor *executor)
+void IIOComponentBuilder::buildChannels(IIODevice *dev, const AttrMap &devAttrs, ICmdExecutor *executor)
 {
 	auto *devOps = m_backend->deviceOps();
 	auto *chOps = m_backend->channelOps();
@@ -188,11 +193,14 @@ void IIOComponentBuilder::buildChannels(IIODevice *dev, ICmdExecutor *executor)
 		chan->setIsOutput(chOps->isOutput(ch));
 		chan->setChanType(chOps->channelType(ch));
 
-		const unsigned int attrs = chOps->attrsCount(ch);
-		for(unsigned int i = 0; i < attrs; ++i) {
+		AttrMap attrs;
+		const unsigned int attrCount = chOps->attrsCount(ch);
+		for(unsigned int i = 0; i < attrCount; ++i) {
 			const QString name = chOps->attrName(ch, i);
-			makeAttribute(chan, name, m_attrOps->channelAttr(ch, name), executor);
+			attrs.insert(name, makeAttribute(chan, name, m_attrOps->channelAttr(ch, name), executor));
 		}
+		// Some drivers expose a channel attr's "_available" at device level.
+		applyAvailable(attrs, &devAttrs);
 
 		if(chOps->isScanElement(ch)) {
 			new IIOSampleCodec(chOps, ch, chan);
@@ -251,35 +259,56 @@ void IIOComponentBuilder::buildBufferAttributes(QObject *stream, scopy::iio::Dev
 						ICmdExecutor *executor)
 {
 	auto *devOps = m_backend->deviceOps();
-	const unsigned int attrs = devOps->bufferAttrsCount(dh, bufferIndex);
-	for(unsigned int i = 0; i < attrs; ++i) {
+	AttrMap attrs;
+	const unsigned int count = devOps->bufferAttrsCount(dh, bufferIndex);
+	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = devOps->bufferAttrName(dh, bufferIndex, i);
-		makeAttribute(stream, name, m_attrOps->bufferAttr(dh, bufferIndex, name), executor);
+		attrs.insert(name, makeAttribute(stream, name, m_attrOps->bufferAttr(dh, bufferIndex, name), executor));
 	}
+	applyAvailable(attrs);
 }
 
-scopy::component::Attribute *IIOComponentBuilder::makeAttribute(QObject *parent, const QString &attrName,
-								scopy::iio::AttrHandle handle, ICmdExecutor *executor,
-								bool forceReadOnly)
+IIOAttribute *IIOComponentBuilder::makeAttribute(QObject *parent, const QString &attrName,
+						 scopy::iio::AttrHandle handle, ICmdExecutor *executor,
+						 bool forceReadOnly)
 {
 	auto *attr = new IIOAttribute(parent);
 	attr->setHandle(handle);
 	attr->setName(attrName);
-
-	double min = 0, step = 0, max = 0;
-	if(m_attrOps->getRange(handle, min, step, max)) {
-		attr->setRange({min, step, max});
-	}
-	QStringList values;
-	if(m_attrOps->getAvailable(handle, values) && !values.isEmpty()) {
-		attr->setOptions(values);
-	}
 
 	attr->addReadCapability(new IIOAttributeReader(m_attrOps, handle, executor));
 	if(!(forceReadOnly || isReadOnlyAttr(attrName))) {
 		attr->addWriteCapability(new IIOAttributeWriter(m_attrOps, handle, executor));
 	}
 	return attr;
+}
+
+void IIOComponentBuilder::applyAvailable(const AttrMap &scope, const AttrMap *fallback)
+{
+	static const QString kSuffix = QStringLiteral("_available");
+	for(auto it = scope.cbegin(); it != scope.cend(); ++it) {
+		if(it.key().endsWith(kSuffix)) {
+			continue;
+		}
+		const QString availName = it.key() + kSuffix;
+		IIOAttribute *avail = scope.value(availName);
+		if(!avail && fallback) {
+			avail = fallback->value(availName);
+		}
+		if(!avail) {
+			continue;
+		}
+
+		double min = 0, step = 0, max = 0;
+		if(m_attrOps->getRange(avail->handle(), min, step, max)) {
+			it.value()->setRange({min, step, max});
+			continue; // range and list are mutually exclusive
+		}
+		QStringList values;
+		if(m_attrOps->getAvailable(avail->handle(), values) && !values.isEmpty()) {
+			it.value()->setOptions(values);
+		}
+	}
 }
 
 bool IIOComponentBuilder::isReadOnlyAttr(const QString &attrName)

@@ -26,6 +26,18 @@
 
 namespace scopy::iio {
 
+// Returns true for the "[min step max]" form; `tokens` holds the whitespace-split payload.
+static bool splitAvailable(const QByteArray &raw, QStringList &tokens)
+{
+	QString str = QString::fromUtf8(raw).trimmed();
+	const bool isRange = str.startsWith('[') && str.endsWith(']');
+	if(isRange) {
+		str = str.mid(1, str.length() - 2);
+	}
+	tokens = str.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+	return isRange;
+}
+
 static V0AttrInfo *info(AttrHandle h) { return static_cast<V0AttrInfo *>(h.ptr); }
 
 AttrHandle V0AttrOps::makeHandle(V0AttrInfo::Scope scope, void *parent, const QString &name)
@@ -151,7 +163,8 @@ Result<QByteArray> V0AttrOps::readAvailableAttr(const V0AttrInfo *ai) const
 		return Unexpected{Error{-ENOSYS, QStringLiteral("no _available for context attrs")}};
 	}
 
-	QByteArray availName = ai->name + "_available";
+	// The handle is the "X_available" attr itself (see IAttrOps contract).
+	const QByteArray &availName = ai->name;
 	QByteArray buf;
 	ssize_t ret = 0;
 
@@ -198,44 +211,38 @@ Result<QByteArray> V0AttrOps::readAvailableAttr(const V0AttrInfo *ai) const
 
 Result<void> V0AttrOps::getRange(AttrHandle attr, double &min, double &step, double &max) const
 {
-	auto *ai = info(attr);
-	Result<QByteArray> r = readAvailableAttr(ai);
+	Result<QByteArray> r = readAvailableAttr(info(attr));
 	if(!r) {
 		return Unexpected{r.error()};
 	}
 
-	// Parse "[min step max]" format
-	QString str = QString::fromUtf8(r.value()).trimmed();
-	if(str.startsWith('[') && str.endsWith(']')) {
-		str = str.mid(1, str.length() - 2).trimmed();
-	}
-
-	QStringList parts = str.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-	if(parts.size() != 3) {
-		return Unexpected{
-			Error{-EINVAL, QStringLiteral("range: expected \"[min step max]\", got \"%1\"").arg(str)}};
+	QStringList parts;
+	if(!splitAvailable(r.value(), parts) || parts.size() != 3) {
+		return Unexpected{Error{-EOPNOTSUPP, QStringLiteral("not a [min step max] range")}};
 	}
 
 	bool okMin, okStep, okMax;
 	min = parts[0].toDouble(&okMin);
 	step = parts[1].toDouble(&okStep);
 	max = parts[2].toDouble(&okMax);
-
 	if(!okMin || !okStep || !okMax) {
-		return Unexpected{Error{-EINVAL, QStringLiteral("range: non-numeric field in \"%1\"").arg(str)}};
+		return Unexpected{Error{-EOPNOTSUPP, QStringLiteral("range: non-numeric field")}};
 	}
 	return {};
 }
 
 Result<void> V0AttrOps::getAvailable(AttrHandle attr, QStringList &values) const
 {
-	auto *ai = info(attr);
-	Result<QByteArray> r = readAvailableAttr(ai);
+	Result<QByteArray> r = readAvailableAttr(info(attr));
 	if(!r) {
 		return Unexpected{r.error()};
 	}
 
-	values = QString::fromUtf8(r.value()).trimmed().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+	QStringList tokens;
+	if(splitAvailable(r.value(), tokens)) {
+		return Unexpected{Error{-EOPNOTSUPP, QStringLiteral("_available is a range, not a list")}};
+	}
+	values = tokens;
 	return {};
 }
 
