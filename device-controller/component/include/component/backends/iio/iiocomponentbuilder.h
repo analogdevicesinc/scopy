@@ -25,6 +25,7 @@
 #include "iioutil/handles.h"
 #include "component/component_export.h"
 
+#include <QHash>
 #include <QString>
 
 namespace scopy::iio {
@@ -38,6 +39,7 @@ class Attribute;
 
 namespace scopy::component::iio {
 
+class IIOAttribute;
 class IIOContext;
 class IIODevice;
 
@@ -53,21 +55,25 @@ public:
 	bool build(Context *ctx, ICmdExecutor *executor) override;
 
 private:
+	using AttrMap = QHash<QString, IIOAttribute *>;
+
 	void setContextIdentity(IIOContext *iioCtx);
 	void buildContextAttributes(IIOContext *iioCtx, ICmdExecutor *executor);
 	void buildDevices(IIOContext *iioCtx, ICmdExecutor *executor);
 	void buildOneDevice(IIOContext *iioCtx, scopy::iio::DeviceHandle dh, ICmdExecutor *executor);
-	void buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor);
+
+	AttrMap buildDeviceAttributes(IIODevice *dev, ICmdExecutor *executor);
 	void buildDebugAttributes(IIODevice *dev, ICmdExecutor *executor);
-	void buildChannels(IIODevice *dev, ICmdExecutor *executor);
+	void buildChannels(IIODevice *dev, const AttrMap &devAttrs, ICmdExecutor *executor);
 	void buildStreams(IIODevice *dev, ICmdExecutor *executor);
 	void buildBufferAttributes(QObject *stream, scopy::iio::DeviceHandle dh, unsigned int bufferIndex,
 				   ICmdExecutor *executor);
 	void buildTrigger(IIODevice *dev, ICmdExecutor *executor);
 
-	scopy::component::Attribute *makeAttribute(QObject *parent, const QString &attrName,
-						   scopy::iio::AttrHandle handle, ICmdExecutor *executor,
-						   bool forceReadOnly = false);
+	IIOAttribute *makeAttribute(QObject *parent, const QString &attrName, scopy::iio::AttrHandle handle,
+				    ICmdExecutor *executor, bool forceReadOnly = false);
+
+	void applyAvailable(const AttrMap &scope, const AttrMap *fallback = nullptr);
 
 	static bool isReadOnlyAttr(const QString &attrName);
 

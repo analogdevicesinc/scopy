@@ -45,9 +45,11 @@ public:
 	virtual Result<QByteArray> read(AttrHandle attr, size_t bytes = 4096) = 0;
 	virtual Result<void> write(AttrHandle attr, const QString &value) = 0;
 
-	// Range / available — convenience parsers for _available attributes.
-	// v1: thin wrappers around iio_attr_get_range / iio_attr_get_available.
-	// v0: backend reads the attr string and parses it manually.
+	// Range / available — parse the value of an "X_available" attribute.
+	// `attr` MUST be the handle of the "X_available" attribute itself (libiio v1 semantics).
+	//  - "[min step max]" -> getRange succeeds; getAvailable fails with -EOPNOTSUPP.
+	//  - list "a b c"     -> getAvailable succeeds; getRange fails with -EOPNOTSUPP.
+	// v1: native iio_attr_get_range / iio_attr_get_available. v0: reads the attr and parses it.
 	virtual Result<void> getRange(AttrHandle attr, double &min, double &step, double &max) const = 0;
 	virtual Result<void> getAvailable(AttrHandle attr, QStringList &values) const = 0;
 };

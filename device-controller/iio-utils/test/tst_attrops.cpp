@@ -129,9 +129,8 @@ void TestAttrOps::rangeAndAvailableParse()
 
 	// getRange/getAvailable are the top v0/v1 divergence risk: v1 wraps the native
 	// iio_attr_get_range/available, v0 parses the "*_available" attr string by hand.
-	// For any channel attr whose name ends in "_available", both parsers must either
-	// succeed with a coherent result or fail with a typed Error — never crash, and
-	// never return success with an empty/degenerate payload.
+	// Both take the "*_available" handle itself (IAttrOps contract) and must agree on
+	// which form (range or list) the payload has.
 	bool exercised = false;
 	const unsigned int devCount = ctxOps->devicesCount(ctx);
 	for(unsigned int i = 0; i < devCount; ++i) {
@@ -148,22 +147,19 @@ void TestAttrOps::rangeAndAvailableParse()
 				AttrHandle h = attrOps->channelAttr(ch, aname);
 				QVERIFY(h.ptr != nullptr);
 
+				// Contract: exactly one of range/list parses; the other reports -EOPNOTSUPP.
 				QStringList values;
 				Result<void> ra = attrOps->getAvailable(h, values);
-				if(ra) {
-					// A parsed "available" list must not be empty on success.
-					QVERIFY(!values.isEmpty());
-				} else {
-					QVERIFY(ra.error().code != 0 || !ra.error().message.isEmpty());
-				}
-
 				double mn = 0, st = 0, mx = 0;
 				Result<void> rr = attrOps->getRange(h, mn, st, mx);
+				QVERIFY2(rr || ra, qPrintable(aname + ": neither range nor list parsed"));
+				QVERIFY2(!(rr && ra), qPrintable(aname + ": both range and list parsed"));
 				if(rr) {
-					// A range only makes sense when max >= min.
 					QVERIFY(mx >= mn);
+					QCOMPARE(ra.error().code, -EOPNOTSUPP);
 				} else {
-					QVERIFY(rr.error().code != 0 || !rr.error().message.isEmpty());
+					QVERIFY(!values.isEmpty());
+					QCOMPARE(rr.error().code, -EOPNOTSUPP);
 				}
 
 				attrOps->releaseAttr(h);
