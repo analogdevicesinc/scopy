@@ -20,17 +20,23 @@
 
 #pragma once
 
-#include "component/componentbuilder.h"
+#include <gui/rangepresetscaler.h>
 
-namespace scopy::adalm2000 {
+#include <QVector>
 
-class M2kComponentBuilder : public component::ComponentBuilder
+namespace scopy::adalm2000::vm {
+
+inline constexpr int SETTLE_INTERVAL_MS = 3000;
+
+// The M2K analog-in ranges, ascending: RangePresetScaler scans for the first fit.
+inline QVector<ScalePreset> presets()
 {
-public:
-	bool build(component::Context *ctx, scopy::ICmdExecutor *executor) override;
-};
+	return {
+		{-0.1, 0.1, 5, 5},
+		{-1.0, 1.0, 5, 5},
+		{-5.0, 5.0, 10, 2},
+		{-25.0, 25.0, 10, 5},
+	};
+}
 
-inline constexpr auto PLUS_25V = "+/-25V";
-inline constexpr auto PLUS_2_5V = "+/-2.5V";
-
-} // namespace scopy::adalm2000
+} // namespace scopy::adalm2000::vm
