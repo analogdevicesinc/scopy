@@ -409,8 +409,9 @@ double MenuSpinbox::clamp(double val, double min, double max)
 	val = std::max(val, min);
 	val = std::min(val, max);
 
-	// disable decrement button if min is reached
-	if((val == m_min) && (m_scaleCb->currentIndex() == 0)) {
+	// disable decrement button if min is reached and no prefix is left to roll down to
+	double rolled = 0.0;
+	if((val == m_min) && !prefixRollDown(&rolled)) {
 		m_minus->setEnabled(false);
 	} else {
 		m_minus->setEnabled(true);
@@ -437,36 +438,43 @@ void MenuSpinbox::incrementValue()
 	}
 }
 
+bool MenuSpinbox::prefixRollDown(double *rolled) const
+{
+	const int idx = m_scaleCb->currentIndex();
+	if(idx <= 0) {
+		return false;
+	}
+	const double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
+	const double currentScale = m_scaleCb->itemData(idx).toDouble();
+	if(lowerScale <= 0 || currentScale <= 0) {
+		return false;
+	}
+
+	const double candidate = ((currentScale / lowerScale) - 1) * lowerScale;
+	if(m_rangeLimits && (candidate < m_min || candidate > m_max)) {
+		return false;
+	}
+
+	*rolled = candidate;
+	return true;
+}
+
 void MenuSpinbox::decrementValue()
 {
+	double rolled = 0.0;
+
 	if(qFuzzyCompare(m_value, 0.0)) {
-		int idx = m_scaleCb->currentIndex();
-		if(idx > 0) {
-			// Go to max of lower scale - 1
-			double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
-			double currentScale = m_scaleCb->itemData(idx).toDouble();
-			double maxLower = (currentScale / lowerScale) - 1;
-			setValue(maxLower * lowerScale);
-		} else {
-			// Already at lowest scale, go to -1 * current scale
-			double scale = m_scaleCb->itemData(idx).toDouble();
-			setValue(-1 * scale);
-		}
-	} else {
-		double newValue = m_incrementStrategy->decrement(m_value);
-		// If decrement would result in 0 and there is a lower scale, scale down instead
-		if(qFuzzyCompare(newValue, 0.0)) {
-			int idx = m_scaleCb->currentIndex();
-			if(idx > 0) {
-				double lowerScale = m_scaleCb->itemData(idx - 1).toDouble();
-				double currentScale = m_scaleCb->itemData(idx).toDouble();
-				double maxLower = (currentScale / lowerScale) - 1;
-				setValue(maxLower * lowerScale);
-				return;
-			}
-		}
-		setValue(newValue);
+		setValue(prefixRollDown(&rolled) ? rolled : m_incrementStrategy->decrement(m_value));
+		return;
 	}
+
+	// If decrement would result in 0 and there is a lower scale, scale down instead
+	const double newValue = m_incrementStrategy->decrement(m_value);
+	if(qFuzzyCompare(newValue, 0.0) && prefixRollDown(&rolled)) {
+		setValue(rolled);
+		return;
+	}
+	setValue(newValue);
 }
 
 QString MenuSpinbox::name() const { return m_name; }
