@@ -203,15 +203,22 @@ private:
 	QPushButton *m_minus;
 	MouseWheelWidgetGuard *m_mouseWheelGuard;
 
+	// The top of the next prefix down, e.g. 1 V -> 999 mV. False when there is no
+	// lower prefix or the result leaves the range, which is the case for a bipolar
+	// range: the roll moves the value upward, so it cannot serve as a decrement.
+	bool prefixRollDown(double *rolled) const;
+
 	IncrementStrategy *m_incrementStrategy;
-	IncrementMode m_im;
+	// Must match the strategy the constructor installs, or setIncrementMode() takes
+	// its early-out and silently keeps the wrong one.
+	IncrementMode m_im = IS_POW2;
 
 	Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 	Q_PROPERTY(double value READ value WRITE setValue NOTIFY valueChanged)
 	Q_PROPERTY(QString unit READ unit WRITE setUnit NOTIFY unitChanged)
 
 	QString m_name;
-	double m_value, m_min, m_max;
+	double m_value = 0.0, m_min = 0.0, m_max = 0.0;
 	double m_scaleMin, m_scaleMax;
 	QString m_unit;
 	bool m_large_widget;
@@ -219,8 +226,8 @@ private:
 	QList<UnitPrefix> m_scales;
 	// QMap<QString, double> m_scaleMap;
 	double getScaleForPrefix(QString prefix, Qt::CaseSensitivity s = Qt::CaseSensitive);
-	bool m_scalingEnabled;
-	bool m_rangeLimits;
+	bool m_scalingEnabled = false;
+	bool m_rangeLimits = false;
 };
 } // namespace gui
 } // namespace scopy

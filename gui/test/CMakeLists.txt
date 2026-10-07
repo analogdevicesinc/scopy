@@ -22,4 +22,4 @@ cmake_minimum_required(VERSION 3.16)
 
 include(ScopyTest)
 
-setup_scopy_tests(rangepresetscaler)
+setup_scopy_tests(rangepresetscaler menuspinbox)
