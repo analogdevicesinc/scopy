@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 3.16)
 
 include(ScopyTest)
 
-setup_scopy_tests(pluginmanager pluginrepository)
+setup_scopy_tests(pluginmanager pluginrepository m2kdeviceimpl)
 
 # test_translationsrepository
 if(ENABLE_TRANSLATION)
