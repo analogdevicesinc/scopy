@@ -35,6 +35,7 @@ macro(add_adalm2000_unit_test name)
 		${_t}
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include ${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/m2kBackend
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/voltmeter
 	)
 	target_link_libraries(
 		${_t}
@@ -56,5 +57,7 @@ add_adalm2000_unit_test(
 )
 
 add_adalm2000_unit_test(m2kping ../include/adalm2000/m2kBackend/m2kping.h)
+
+add_adalm2000_unit_test(voltmeterdsp)
 
 setup_scopy_tests(pluginloader)

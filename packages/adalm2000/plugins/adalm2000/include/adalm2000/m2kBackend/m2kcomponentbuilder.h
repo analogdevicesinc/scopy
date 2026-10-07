@@ -30,4 +30,7 @@ public:
 	bool build(component::Context *ctx, scopy::ICmdExecutor *executor) override;
 };
 
+inline constexpr auto PLUS_25V = "+/-25V";
+inline constexpr auto PLUS_2_5V = "+/-2.5V";
+
 } // namespace scopy::adalm2000

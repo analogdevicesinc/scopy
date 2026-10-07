@@ -50,6 +50,8 @@ file(
 	src/*.cc
 	src/m2kBackend/*.cpp
 	src/m2kBackend/*.cc
+	src/voltmeter/*.cpp
+	src/voltmeter/*.cc
 )
 file(
 	GLOB
@@ -58,6 +60,8 @@ file(
 	include/${SCOPY_MODULE}/*.hpp
 	include/${SCOPY_MODULE}/m2kBackend/*.h
 	include/${SCOPY_MODULE}/m2kBackend/*.hpp
+	include/${SCOPY_MODULE}/voltmeter/*.h
+	include/${SCOPY_MODULE}/voltmeter/*.hpp
 )
 
 set(ENABLE_TESTING ON)
@@ -82,8 +86,9 @@ configure_file(
 
 # src/ and include/ are parallel trees, so a .cpp never reaches its own header relatively -- every include resolves
 # through here.
-set(INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
-			${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/m2kBackend
+set(INCLUDE_DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/m2kBackend
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/voltmeter
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
