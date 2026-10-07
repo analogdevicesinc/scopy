@@ -48,6 +48,20 @@ public:
 
 	bool isValid() final;
 
+	/**
+	 * @overload GuiStrategyInterface::setCustomTitle()
+	 * @brief No-op. The switch's own two state labels act as the caption, so there is
+	 * no title label to set.
+	 * */
+	void setCustomTitle(QString title) override;
+
+	/**
+	 * @overload GuiStrategyInterface::setInfoMessage()
+	 * @brief Applied as the switch's tooltip. There is no InfoIconWidget here, unlike
+	 * CheckBoxAttrUi and ComboAttrUi.
+	 * */
+	void setInfoMessage(QString infoMessage) override;
+
 public Q_SLOTS:
 	void receiveData(QString currentData, QString optionalData) override;
 

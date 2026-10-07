@@ -556,6 +556,8 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 
 		break;
 	case UIS::SwitchUi:
+		ui = new SwitchAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
+		break;
 	case UIS::ComboUi:
 		ui = new ComboAttrUi(m_generatedRecipe, m_isCompact, m_widgetParent);
 		break;
