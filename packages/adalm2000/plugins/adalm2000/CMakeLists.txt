@@ -1,0 +1,105 @@
+#
+# Copyright (c) 2026 Analog Devices Inc.
+#
+# This file is part of Scopy
+# (see https://www.github.com/analogdevicesinc/scopy).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+#
+cmake_minimum_required(VERSION 3.16)
+
+set(SCOPY_MODULE adalm2000)
+
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+
+set(PLUGIN_DISPLAY_NAME "ADALM2000")
+set(PLUGIN_DESCRIPTION "ADALM2000 libm2k backend and tools")
+
+include(GenerateExportHeader)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
+
+find_package(libm2k REQUIRED)
+qcoro_enable_coroutines()
+
+file(
+	GLOB
+	SRC_LIST
+	src/*.cpp
+	src/*.cc
+	src/m2kBackend/*.cpp
+	src/m2kBackend/*.cc
+)
+file(
+	GLOB
+	HEADER_LIST
+	include/${SCOPY_MODULE}/*.h
+	include/${SCOPY_MODULE}/*.hpp
+	include/${SCOPY_MODULE}/m2kBackend/*.h
+	include/${SCOPY_MODULE}/m2kBackend/*.hpp
+)
+
+set(ENABLE_TESTING ON)
+if(ENABLE_TESTING)
+	add_subdirectory(test)
+endif()
+
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST})
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
+
+qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
+
+generate_export_header(
+	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
+)
+
+configure_file(
+	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
+)
+
+# src/ and include/ are parallel trees, so a .cpp never reaches its own header relatively -- every include resolves
+# through here.
+set(INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+			${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/m2kBackend
+)
+
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRECTORIES})
+
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC Qt::Widgets
+	       Qt::Core
+	       QCoro6::Core
+	       QCoro6::Coro
+	       scopy-pluginbase
+	       scopy-gui
+	       scopy-iioutil
+	       scopy-iio-widgets
+	       libm2k::libm2k
+)
+
+set(ADALM2000_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
