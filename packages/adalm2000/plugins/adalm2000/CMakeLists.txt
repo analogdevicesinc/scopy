@@ -54,6 +54,8 @@ file(
 	src/voltmeter/*.cc
 	src/powersupply/*.cpp
 	src/powersupply/*.cc
+	src/digitalio/*.cpp
+	src/digitalio/*.cc
 )
 file(
 	GLOB
@@ -66,6 +68,8 @@ file(
 	include/${SCOPY_MODULE}/voltmeter/*.hpp
 	include/${SCOPY_MODULE}/powersupply/*.h
 	include/${SCOPY_MODULE}/powersupply/*.hpp
+	include/${SCOPY_MODULE}/digitalio/*.h
+	include/${SCOPY_MODULE}/digitalio/*.hpp
 )
 
 set(ENABLE_TESTING ON)
@@ -91,9 +95,11 @@ configure_file(
 # src/ and include/ are parallel trees, so a .cpp never reaches its own header relatively -- every include resolves
 # through here.
 set(INCLUDE_DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/m2kBackend
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/m2kBackend
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/voltmeter
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/powersupply
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/digitalio
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
