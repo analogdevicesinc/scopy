@@ -38,6 +38,7 @@ macro(add_adalm2000_unit_test name)
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/m2kBackend
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/voltmeter
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/powersupply
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/digitalio
 	)
 	target_link_libraries(
 		${_t}
@@ -63,5 +64,7 @@ add_adalm2000_unit_test(m2kping ../include/adalm2000/m2kBackend/m2kping.h)
 add_adalm2000_unit_test(voltmeterdsp)
 
 add_adalm2000_unit_test(powersupplymath)
+
+add_adalm2000_unit_test(digitaliomath)
 
 setup_scopy_tests(pluginloader)
