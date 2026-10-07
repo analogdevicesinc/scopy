@@ -40,7 +40,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-find_package(libm2k REQUIRED)
+find_package(libm2k QUIET)
+if(NOT libm2k_FOUND)
+	# Fall back to a pre-built libm2k placed in the package's dependencies/ folder. include() runs in the current
+	# scope so the IMPORTED target is immediately visible.
+	include("${CMAKE_CURRENT_SOURCE_DIR}/../../dependencies/cmake/libm2k/libm2kConfig.cmake" OPTIONAL)
+endif()
+if(NOT libm2k_FOUND)
+	message(FATAL_ERROR "libm2k not found.\n" "Either install it system-wide, or place libm2k.so and headers in:\n"
+			    "  packages/adalm2000/dependencies/lib/\n" "  packages/adalm2000/dependencies/include/"
+	)
+endif()
 qcoro_enable_coroutines()
 
 file(
