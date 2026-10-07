@@ -1,0 +1,12 @@
+{
+    "id": "adalm2000",
+    "title": "ADALM2000",
+    "version": "@PROJECT_VERSION@",
+    "description": "ADALM2000 plugin built on libm2k and the device controller",
+    "license": "LGPL",
+    "author": "Analog Devices Inc.",
+    "download_link": "",
+    "zip_checksum": "",
+    "scopy_compatibility": ["@CMAKE_PROJECT_VERSION@"],
+    "category": ["iio", "plugin", "base-pkg"]
+  }
