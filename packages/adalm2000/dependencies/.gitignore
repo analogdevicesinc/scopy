@@ -1,0 +1,4 @@
+# Binary dependencies — place pre-built libm2k here; not tracked in git.
+# See cmake/libm2k/libm2kConfig.cmake for the expected directory layout.
+lib/
+include/
