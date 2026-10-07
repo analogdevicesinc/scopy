@@ -29,11 +29,16 @@
 #include "component/channel.h"
 #include "component/device.h"
 
+#include "powersupplymath.h"
+
 #include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/analog/m2kpowersupply.hpp>
 #include <libm2k/m2k.hpp>
 
 #include <QLoggingCategory>
 #include <QString>
+
+#include <memory>
 
 Q_LOGGING_CATEGORY(CAT_M2K_BUILDER, "M2kComponentBuilder")
 
@@ -114,6 +119,73 @@ bool buildAnalogIn(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecu
 	return true;
 }
 
+void addRail(component::Device *dev, libm2k::analog::M2kPowerSupply *supply, void *resource, int index, double minV,
+	     double maxV, ICmdExecutor *exec)
+{
+	auto *chn = new component::Channel(dev);
+	chn->setId(QStringLiteral("voltage%1").arg(index));
+	chn->setName(index == 0 ? QStringLiteral("Positive output") : QStringLiteral("Negative output"));
+	chn->setLabel(chn->name());
+	chn->setIsOutput(true);
+
+	const unsigned int idx = static_cast<unsigned int>(index);
+
+	auto setpoint = std::make_shared<double>(0.0);
+	auto *voltage = new component::Attribute(chn);
+	voltage->setName(QStringLiteral("voltage"));
+	voltage->setUnit(QStringLiteral("V"));
+	voltage->setRange({minV, ps::VOLTAGE_STEP, maxV});
+	voltage->addReadCapability(new M2kAttributeReader(
+		resource, [setpoint]() { return QByteArray::number(*setpoint, 'f', 7); }, exec));
+	voltage->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[supply, idx, setpoint](const QString &v) {
+			const double volts = v.toDouble();
+			supply->pushChannel(idx, volts);
+			*setpoint = volts;
+		},
+		exec));
+
+	auto enabled = std::make_shared<bool>(false);
+	auto *enable = new component::Attribute(chn);
+	enable->setName(QStringLiteral("enabled"));
+	enable->setOptions({QStringLiteral("0"), QStringLiteral("1")});
+	enable->addReadCapability(new M2kAttributeReader(
+		resource, [enabled]() { return QByteArray::number(*enabled ? 1 : 0); }, exec));
+	enable->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[supply, idx, enabled](const QString &v) {
+			const bool on = (v.toInt() != 0);
+			supply->enableChannel(idx, on);
+			*enabled = on;
+		},
+		exec));
+
+	auto *measured = new component::Attribute(chn);
+	measured->setName(QStringLiteral("measured"));
+	measured->setUnit(QStringLiteral("V"));
+	measured->addReadCapability(new M2kAttributeReader(
+		resource, [supply, idx]() { return QByteArray::number(supply->readChannel(idx), 'f', 7); }, exec));
+}
+
+void buildPowerSupply(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
+{
+	component::Device *powerSupply = addDevice(ctx, QStringLiteral("power-supply"));
+
+	libm2k::analog::M2kPowerSupply *supply = nullptr;
+	try {
+		supply = m2k->getPowerSupply();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "getPowerSupply failed:" << e.what();
+	}
+	if(!supply) {
+		qWarning(CAT_M2K_BUILDER) << "power-supply device left empty; the Power Supply tool will be idle";
+		return;
+	}
+	addRail(powerSupply, supply, m2k, 0, ps::POSITIVE_MIN, ps::POSITIVE_MAX, executor);
+	addRail(powerSupply, supply, m2k, 1, ps::NEGATIVE_MIN, ps::NEGATIVE_MAX, executor);
+}
+
 } // namespace
 
 bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
@@ -142,6 +214,7 @@ bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
 		return false;
 	}
 	addDevice(m2kCtx, QStringLiteral("analog-out"));
+	buildPowerSupply(m2kCtx, m2k, executor);
 
 	return true;
 }
