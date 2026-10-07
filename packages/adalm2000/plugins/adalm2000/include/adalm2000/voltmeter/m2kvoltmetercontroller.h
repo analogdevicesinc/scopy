@@ -18,53 +18,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ADALM2000PLUGIN_H
-#define ADALM2000PLUGIN_H
-
-#define SCOPY_PLUGIN_NAME Adalm2000Plugin
-
-#include "scopy-adalm2000_export.h"
+#pragma once
 
 #include <QObject>
+#include <QString>
 
 #include <qcoro/qcorotask.h>
 
-#include <component/controller.h>
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
-
-namespace scopy {
-class IIOWidgetGroup;
-}
+#include <pluginbase/resourcemanager.h>
 
 namespace scopy::adalm2000 {
+class M2kContext;
 
-class SCOPY_ADALM2000_EXPORT Adalm2000Plugin : public QObject, public PluginBase
+// Owns ADC arbitration and the Voltmeter's fixed start-up configuration.
+class M2kVoltmeterController : public QObject, public scopy::ResourceUser
 {
 	Q_OBJECT
-	SCOPY_PLUGIN;
-
 public:
-	void init() override;
-	bool compatible(QString param, QString category) override;
-	bool loadPage() override;
-	bool loadIcon() override;
-	void loadToolList() override;
-	void unload() override;
-	void initMetadata() override;
-	QString description() override;
+	M2kVoltmeterController(M2kContext *ctx, const QString &uri, QObject *parent = nullptr);
+	~M2kVoltmeterController() override;
 
-public Q_SLOTS:
-	bool onConnect() override;
-	bool onDisconnect() override;
+	QCoro::Task<bool> claimAndConfigure();
+	void release();
+
+	void stop() override;
+
+	QString resourceKey() const { return m_key; }
+
+Q_SIGNALS:
+	void resourceLost();
 
 private:
-	QCoro::Task<void> calibrateAsync();
-
-	IIOWidgetGroup *m_widgetGroup = nullptr;
-	component::ContextHandle m_context;
-	bool m_calibrated = false;
+	M2kContext *m_ctx;
+	QString m_key;
+	bool m_claimed = false;
 };
 
 } // namespace scopy::adalm2000
-#endif // ADALM2000PLUGIN_H
