@@ -52,6 +52,8 @@ file(
 	src/m2kBackend/*.cc
 	src/voltmeter/*.cpp
 	src/voltmeter/*.cc
+	src/powersupply/*.cpp
+	src/powersupply/*.cc
 )
 file(
 	GLOB
@@ -62,6 +64,8 @@ file(
 	include/${SCOPY_MODULE}/m2kBackend/*.hpp
 	include/${SCOPY_MODULE}/voltmeter/*.h
 	include/${SCOPY_MODULE}/voltmeter/*.hpp
+	include/${SCOPY_MODULE}/powersupply/*.h
+	include/${SCOPY_MODULE}/powersupply/*.hpp
 )
 
 set(ENABLE_TESTING ON)
@@ -89,6 +93,7 @@ configure_file(
 set(INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/m2kBackend
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/voltmeter
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/powersupply
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

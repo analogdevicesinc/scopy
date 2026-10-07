@@ -33,9 +33,11 @@ macro(add_adalm2000_unit_test name)
 	add_executable(${_t} tst_${name}.cpp ${ARGN})
 	target_include_directories(
 		${_t}
-		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include ${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}
+		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/m2kBackend
 			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/voltmeter
+			${CMAKE_CURRENT_SOURCE_DIR}/../include/${SCOPY_MODULE}/powersupply
 	)
 	target_link_libraries(
 		${_t}
@@ -59,5 +61,7 @@ add_adalm2000_unit_test(
 add_adalm2000_unit_test(m2kping ../include/adalm2000/m2kBackend/m2kping.h)
 
 add_adalm2000_unit_test(voltmeterdsp)
+
+add_adalm2000_unit_test(powersupplymath)
 
 setup_scopy_tests(pluginloader)
