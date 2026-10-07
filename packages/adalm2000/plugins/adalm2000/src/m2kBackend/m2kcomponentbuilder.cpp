@@ -29,10 +29,12 @@
 #include "component/channel.h"
 #include "component/device.h"
 
+#include "digitaliomath.h"
 #include "powersupplymath.h"
 
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/analog/m2kpowersupply.hpp>
+#include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/m2k.hpp>
 
 #include <QLoggingCategory>
@@ -186,6 +188,169 @@ void buildPowerSupply(component::Context *ctx, libm2k::context::M2k *m2k, ICmdEx
 	addRail(powerSupply, supply, m2k, 1, ps::NEGATIVE_MIN, ps::NEGATIVE_MAX, executor);
 }
 
+using libm2k::digital::DIO_CHANNEL;
+using libm2k::digital::DIO_DIRECTION;
+using libm2k::digital::DIO_LEVEL;
+using libm2k::digital::M2kDigital;
+
+using DioStatePtr = std::shared_ptr<dio::PinState>;
+
+void writePinDirection(M2kDigital *dig, const dio::PinState &state, int pin)
+{
+	const bool output = state.outputEnabled && dio::bit(state.direction, pin);
+	dig->setDirection(static_cast<DIO_CHANNEL>(pin), output ? DIO_DIRECTION::DIO_OUTPUT : DIO_DIRECTION::DIO_INPUT);
+}
+
+void writePinValue(M2kDigital *dig, const dio::PinState &state, int pin)
+{
+	if(!state.outputEnabled) {
+		return;
+	}
+	dig->setValueRaw(static_cast<DIO_CHANNEL>(pin), dio::bit(state.gpo, pin) ? DIO_LEVEL::HIGH : DIO_LEVEL::LOW);
+}
+
+void addPin(component::Device *dev, M2kDigital *dig, void *resource, int pin, DioStatePtr state, ICmdExecutor *exec)
+{
+	auto *chn = new component::Channel(dev);
+	chn->setId(QStringLiteral("voltage%1").arg(pin));
+	chn->setName(QStringLiteral("DIO %1").arg(pin));
+	chn->setLabel(chn->name());
+	chn->setIsOutput(false);
+
+	auto *direction = new component::Attribute(chn);
+	direction->setName(QStringLiteral("direction"));
+	direction->setOptions({QLatin1String(dio::DIRECTION_OPTIONS[0]), QLatin1String(dio::DIRECTION_OPTIONS[1])});
+	direction->addReadCapability(new M2kAttributeReader(
+		resource, [state, pin]() { return QByteArray(dio::bit(state->direction, pin) ? "out" : "in"); }, exec));
+	direction->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[dig, state, pin](const QString &v) {
+			state->direction = dio::withBit(state->direction, pin, v == QLatin1String("out"));
+			writePinDirection(dig, *state, pin);
+		},
+		exec));
+
+	auto *raw = new component::Attribute(chn);
+	raw->setName(QStringLiteral("raw"));
+	raw->setOptions({QLatin1String(dio::VALUE_OPTIONS[0]), QLatin1String(dio::VALUE_OPTIONS[1])});
+	raw->addReadCapability(new M2kAttributeReader(
+		resource, [state, pin]() { return QByteArray::number(dio::bit(state->gpo, pin) ? 1 : 0); }, exec));
+	raw->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[dig, state, pin](const QString &v) {
+			state->gpo = dio::withBit(state->gpo, pin, v.toInt() != 0);
+			writePinValue(dig, *state, pin);
+		},
+		exec));
+}
+
+void addGroup(component::Device *dev, M2kDigital *dig, void *resource, int group, DioStatePtr state, ICmdExecutor *exec)
+{
+	const int base = dio::groupBase(group);
+
+	auto *chn = new component::Channel(dev);
+	chn->setId(QStringLiteral("group%1").arg(group));
+	chn->setName(QStringLiteral("DIO %1 - %2").arg(base).arg(base + dio::PINS_PER_GROUP - 1));
+	chn->setLabel(chn->name());
+	chn->setIsOutput(false);
+
+	auto *value = new component::Attribute(chn);
+	value->setName(QStringLiteral("value"));
+	value->setRange({0.0, 1.0, static_cast<double>(dio::GROUP_VALUE_MAX)});
+	value->addReadCapability(new M2kAttributeReader(
+		resource, [state, group]() { return QByteArray::number(dio::groupValue(state->gpo, group)); }, exec));
+	value->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[dig, state, group, base](const QString &v) {
+			state->gpo = dio::withGroupValue(state->gpo, group, static_cast<uint8_t>(v.toInt()));
+			for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+				writePinValue(dig, *state, base + i);
+			}
+		},
+		exec));
+
+	auto *direction = new component::Attribute(chn);
+	direction->setName(QStringLiteral("direction"));
+	direction->setOptions({QLatin1String(dio::DIRECTION_OPTIONS[0]), QLatin1String(dio::DIRECTION_OPTIONS[1])});
+	direction->addReadCapability(new M2kAttributeReader(
+		resource,
+		[state, group]() { return QByteArray(dio::groupIsOutput(state->direction, group) ? "out" : "in"); },
+		exec));
+	direction->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[dig, state, base](const QString &v) {
+			const bool output = (v == QLatin1String("out"));
+			for(int i = 0; i < dio::PINS_PER_GROUP; ++i) {
+				state->direction = dio::withBit(state->direction, base + i, output);
+				writePinDirection(dig, *state, base + i);
+			}
+		},
+		exec));
+}
+
+void addDigitalDeviceAttrs(component::Device *dev, M2kDigital *dig, void *resource, DioStatePtr state,
+			   ICmdExecutor *exec)
+{
+	auto *gpi = new component::Attribute(dev);
+	gpi->setName(QStringLiteral("gpi"));
+	gpi->addReadCapability(new M2kAttributeReader(
+		resource,
+		[dig]() {
+			uint16_t word = 0;
+			for(int i = 0; i < dio::PIN_COUNT; ++i) {
+				const bool high = dig->getValueRaw(static_cast<DIO_CHANNEL>(i)) != DIO_LEVEL::LOW;
+				word = dio::withBit(word, i, high);
+			}
+			return QByteArray::number(word);
+		},
+		exec));
+
+	auto *outputEnabled = new component::Attribute(dev);
+	outputEnabled->setName(QStringLiteral("output_enabled"));
+	outputEnabled->setOptions({QStringLiteral("0"), QStringLiteral("1")});
+	outputEnabled->addReadCapability(new M2kAttributeReader(
+		resource, [state]() { return QByteArray::number(state->outputEnabled ? 1 : 0); }, exec));
+	outputEnabled->addWriteCapability(new M2kAttributeWriter(
+		resource,
+		[dig, state](const QString &v) {
+			const bool on = (v.toInt() != 0);
+			if(state->outputEnabled == on) {
+				return;
+			}
+			state->outputEnabled = on;
+			for(int i = 0; i < dio::PIN_COUNT; ++i) {
+				writePinDirection(dig, *state, i);
+				writePinValue(dig, *state, i);
+			}
+		},
+		exec));
+}
+
+void buildDigital(component::Context *ctx, libm2k::context::M2k *m2k, ICmdExecutor *executor)
+{
+	component::Device *digitalDev = addDevice(ctx, QStringLiteral("digital"));
+
+	M2kDigital *digital = nullptr;
+	try {
+		digital = m2k->getDigital();
+	} catch(const std::exception &e) {
+		qWarning(CAT_M2K_BUILDER) << "getDigital failed:" << e.what();
+	}
+	if(!digital) {
+		qWarning(CAT_M2K_BUILDER) << "digital device left empty; the Digital I/O tool will be idle";
+		return;
+	}
+
+	auto state = std::make_shared<dio::PinState>();
+	for(int pin = 0; pin < dio::PIN_COUNT; ++pin) {
+		addPin(digitalDev, digital, m2k, pin, state, executor);
+	}
+	for(int group = 0; group < dio::GROUP_COUNT; ++group) {
+		addGroup(digitalDev, digital, m2k, group, state, executor);
+	}
+	addDigitalDeviceAttrs(digitalDev, digital, m2k, state, executor);
+}
+
 } // namespace
 
 bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
@@ -215,6 +380,7 @@ bool M2kComponentBuilder::build(component::Context *ctx, ICmdExecutor *executor)
 	}
 	addDevice(m2kCtx, QStringLiteral("analog-out"));
 	buildPowerSupply(m2kCtx, m2k, executor);
+	buildDigital(m2kCtx, m2k, executor);
 
 	return true;
 }

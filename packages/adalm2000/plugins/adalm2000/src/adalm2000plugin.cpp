@@ -20,6 +20,7 @@
 
 #include "adalm2000plugin.h"
 
+#include "digitalio/adalm2000digitaliotool.h"
 #include "powersupply/adalm2000powersupplytool.h"
 #include "voltmeter/adalm2000voltmetertool.h"
 #include "m2kcalibration.h"
@@ -72,6 +73,9 @@ void Adalm2000Plugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_power", "Power Supply",
 						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
 							  "/icons/tool_power_supply.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_dio", "Digital I/O",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_io.svg"));
 }
 
 void Adalm2000Plugin::unload() {}
@@ -101,6 +105,9 @@ bool Adalm2000Plugin::onConnect()
 	auto *powerTool = new Adalm2000PowerSupplyTool(m_context.get(), m_widgetGroup);
 	m_toolList[1]->setTool(powerTool);
 
+	auto *dioTool = new Adalm2000DigitalIoTool(m_toolList[2], m_context.get(), m_widgetGroup);
+	m_toolList[2]->setTool(dioTool);
+
 	for(auto &entry : m_toolList) {
 		entry->setEnabled(false);
 	}
@@ -121,9 +128,10 @@ QCoro::Task<void> Adalm2000Plugin::calibrateAsync()
 	for(auto &entry : m_toolList) {
 		entry->setEnabled(true);
 	}
-	// Only the Voltmeter has a run button; the Power Supply's rails are enabled
-	// individually from its settings menu.
+	// The Power Supply has no run button: its rails are enabled individually from
+	// its settings menu, so there is no single state for one to mirror.
 	m_toolList[0]->setRunBtnVisible(true);
+	m_toolList[2]->setRunBtnVisible(true);
 
 	if(!m_calibrated) {
 		qWarning(CAT_ADALM2000PLUGIN) << "proceeding with uncalibrated readings";
