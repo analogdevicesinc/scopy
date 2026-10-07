@@ -20,11 +20,14 @@
 
 #include "adalm2000plugin.h"
 
+#include "voltmeter/adalm2000voltmetertool.h"
 #include "m2kcalibration.h"
 #include "m2kcontext.h"
 #include "m2kcontextfactory.h"
 
 #include <component/device.h>
+#include <iio-widgets/iiowidgetgroup.h>
+#include <style.h>
 
 #include <QLabel>
 #include <QLoggingCategory>
@@ -60,7 +63,12 @@ bool Adalm2000Plugin::loadIcon()
 	return true;
 }
 
-void Adalm2000Plugin::loadToolList() {}
+void Adalm2000Plugin::loadToolList()
+{
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("adalm2000_dmm", "Voltmeter",
+						  ":/gui/icons/" + Style::getAttribute(json::theme::icon_theme_folder) +
+							  "/icons/tool_voltmeter.svg"));
+}
 
 void Adalm2000Plugin::unload() {}
 
@@ -81,6 +89,14 @@ bool Adalm2000Plugin::onConnect()
 		return false;
 	}
 
+	m_widgetGroup = new IIOWidgetGroup(this);
+
+	auto *tool = new Adalm2000VoltmeterTool(m_toolList[0], m_context.get(), m_widgetGroup, m_param);
+	m_toolList[0]->setTool(tool);
+
+	for(auto &entry : m_toolList) {
+		entry->setEnabled(false);
+	}
 	calibrateAsync();
 	return true;
 }
@@ -94,6 +110,11 @@ QCoro::Task<void> Adalm2000Plugin::calibrateAsync()
 
 	M2kCalibration calibration(m2kCtx, this);
 	m_calibrated = co_await calibration.run();
+
+	for(auto &entry : m_toolList) {
+		entry->setEnabled(true);
+		entry->setRunBtnVisible(true);
+	}
 	if(!m_calibrated) {
 		qWarning(CAT_ADALM2000PLUGIN) << "proceeding with uncalibrated readings";
 	}
@@ -101,6 +122,22 @@ QCoro::Task<void> Adalm2000Plugin::calibrateAsync()
 
 bool Adalm2000Plugin::onDisconnect()
 {
+	for(auto &tool : m_toolList) {
+		tool->setEnabled(false);
+		tool->setRunning(false);
+		tool->setRunBtnVisible(false);
+		QWidget *w = tool->tool();
+		if(w) {
+			tool->setTool(nullptr);
+			delete w;
+		}
+	}
+
+	if(m_widgetGroup) {
+		delete m_widgetGroup;
+		m_widgetGroup = nullptr;
+	}
+
 	m_context = {};
 	return true;
 }

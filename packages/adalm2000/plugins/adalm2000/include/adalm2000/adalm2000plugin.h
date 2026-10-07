@@ -33,6 +33,10 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 
+namespace scopy {
+class IIOWidgetGroup;
+}
+
 namespace scopy::adalm2000 {
 
 class SCOPY_ADALM2000_EXPORT Adalm2000Plugin : public QObject, public PluginBase
@@ -57,6 +61,7 @@ public Q_SLOTS:
 private:
 	QCoro::Task<void> calibrateAsync();
 
+	IIOWidgetGroup *m_widgetGroup = nullptr;
 	component::ContextHandle m_context;
 	bool m_calibrated = false;
 };
