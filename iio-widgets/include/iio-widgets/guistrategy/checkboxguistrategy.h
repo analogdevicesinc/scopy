@@ -22,7 +22,6 @@
 #define SCOPY_CHECKBOXGUISTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 #include <gui/widgets/menuonoffswitch.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
