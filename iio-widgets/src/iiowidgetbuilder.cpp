@@ -27,15 +27,12 @@
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
-#include "datastrategy/cmdqchannelattrdatastrategy.h"
-#include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include "datastrategy/componentattrdatastrategy.h"
 #include <component/attribute.h>
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
 #include "guistrategy/temperatureguistrategy.h"
 #include <pluginbase/preferences.h>
-#include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
 
 #define ATTR_BUFFER_SIZE 16384
@@ -68,7 +65,6 @@ QString formatComponentOptions(scopy::component::Attribute *attr)
 
 IIOWidgetBuilder::IIOWidgetBuilder(QWidget *parent)
 	: QObject(parent)
-	, m_connection(nullptr)
 	, m_isCompact(false)
 	, m_includeDebugAttrs(Preferences::get("debugger_v2_include_debugfs").toBool())
 	, m_includeAvailableAttrs(false)
@@ -152,7 +148,6 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 	}
 
 	m_generatedRecipe = {
-		.connection = m_connection,
 		.context = m_context,
 		.device = m_device,
 		.channel = m_channel,
@@ -306,7 +301,6 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 
 void IIOWidgetBuilder::clear()
 {
-	m_connection = nullptr;
 	m_isCompact = false;
 	m_context = nullptr;
 	m_device = nullptr;
@@ -322,12 +316,6 @@ void IIOWidgetBuilder::clear()
 	m_title = "";
 	m_infoMessage = "";
 	m_group = nullptr;
-}
-
-IIOWidgetBuilder &IIOWidgetBuilder::connection(Connection *connection)
-{
-	m_connection = connection;
-	return *this;
 }
 
 IIOWidgetBuilder &IIOWidgetBuilder::compactMode(bool isCompact)
@@ -458,16 +446,10 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 		qWarning(CAT_ATTRBUILDER) << "Could not determine the Data Strategy";
 		break;
 	case DS::AttrData:
-		if(m_connection)
-			ds = new CmdQChannelAttrDataStrategy(m_generatedRecipe, m_widgetParent);
-		else
-			ds = new ChannelAttrDataStrategy(m_generatedRecipe, m_widgetParent);
+		ds = new ChannelAttrDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
 	case DS::DeviceAttrData:
-		if(m_connection)
-			ds = new CmdQDeviceAttrDataStrategy(m_generatedRecipe, m_widgetParent);
-		else
-			ds = new DeviceAttrDataStrategy(m_generatedRecipe, m_widgetParent);
+		ds = new DeviceAttrDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
 	case DS::ContextAttrData:
 		ds = new ContextAttrDataStrategy(m_generatedRecipe, m_widgetParent);
