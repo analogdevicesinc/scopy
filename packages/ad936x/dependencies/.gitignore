@@ -1,0 +1,6 @@
+# Binary dependencies — place a pre-built libad9361 here; not tracked in git.
+# Expected layout (see cmake/Modules/ScopyPackageDeps.cmake):
+#   lib/libad9361.so        the library, any architecture-matching build
+#   include/ad9361.h        the matching header
+lib/
+include/
