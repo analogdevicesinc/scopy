@@ -18,13 +18,10 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 
-# iio-utils — libiio backend interfaces (I*Ops), opaque handles, concrete commands, the dlopen backend loader, and the
-# scan helper. Depends on core; no direct libiio.
+# iio-utils — libiio backend interfaces (I*Ops), opaque handles, concrete commands and the scan helper. Depends on core;
+# no direct libiio (the backends implement these interfaces; IIOContextFactory instantiates the one linked in).
 file(GLOB IIOUTIL_HEADERS include/iioutil/*.h include/iioutil/commands/*.h)
 file(GLOB IIOUTIL_SOURCES src/*.cpp)
-
-# Test purpose only (it is not cross platform)
-list(REMOVE_ITEM IIOUTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/iiobackendloader.cpp)
 
 add_library(controller-iioutils SHARED ${IIOUTIL_HEADERS} ${IIOUTIL_SOURCES})
 

@@ -29,13 +29,15 @@
 // at a reachable context (or a local iiod / network device) to exercise the live
 // paths; otherwise the context-dependent rows QSKIP.
 
-#include "iioutil/iiobackendloader.h"
 #include "iioutil/ibackend.h"
 #include "iioutil/icontextops.h"
 
 #include <QProcessEnvironment>
 #include <QString>
 #include <QTest>
+
+// The libiio backend linked into this test (iio-backend-v${SCOPY_LIBIIO_VERSION}).
+extern "C" scopy::iio::IBackend *createIIOBackend();
 
 namespace dctest {
 
@@ -45,25 +47,23 @@ inline QString testUri()
 	return env.isEmpty() ? QStringLiteral("ip:192.168.2.1") : env;
 }
 
-// Adds one "version" column row per backend plugin that is loadable right now.
+// The one backend linked into this build, kept resident for the whole test process.
+inline scopy::iio::IBackend *backend()
+{
+	static scopy::iio::IBackend *s_backend = createIIOBackend();
+	return s_backend;
+}
+
+// Adds the "version" column with a single row: the backend linked into this build.
 inline void addBackendRows()
 {
 	QTest::addColumn<int>("version");
-	auto *loader = scopy::iio::IIOBackendLoader::instance();
-	if(loader->backend(scopy::iio::LibiioVersion::V0)) {
-		QTest::newRow("v0") << static_cast<int>(scopy::iio::LibiioVersion::V0);
-	}
-	if(loader->backend(scopy::iio::LibiioVersion::V1)) {
-		QTest::newRow("v1") << static_cast<int>(scopy::iio::LibiioVersion::V1);
-	}
+	const auto v = backend()->version();
+	QTest::newRow(v == scopy::iio::LibiioVersion::V0 ? "v0" : "v1") << static_cast<int>(v);
 }
 
-// Returns the backend for the given version, or nullptr if the plugin is absent.
-// The loader keeps it resident for the whole test process.
-inline scopy::iio::IBackend *loadBackend(scopy::iio::LibiioVersion v)
-{
-	return scopy::iio::IIOBackendLoader::instance()->backend(v);
-}
+// Returns the linked backend (its version() always matches the requested one here).
+inline scopy::iio::IBackend *loadBackend(scopy::iio::LibiioVersion) { return backend(); }
 
 // Opens a live context at the test URI. Returns a null handle if unreachable.
 inline scopy::iio::ContextHandle openContext(scopy::iio::IBackend *b)

@@ -53,10 +53,9 @@ Controller *Controller::GetInstance()
 Controller::Controller(QObject *parent)
 	: QObject(parent)
 {
-	registerFactory(BackendKind::Libiiov0, std::make_shared<iio::IIOContextFactory>(scopy::iio::LibiioVersion::V0));
-	registerFactory(BackendKind::Libiiov1, std::make_shared<iio::IIOContextFactory>(scopy::iio::LibiioVersion::V1));
-	registerFactory(BackendKind::Default,
-			std::make_shared<iio::IIOContextFactory>(scopy::iio::LibiioVersion::Default));
+	auto iioFactory = std::make_shared<iio::IIOContextFactory>();
+	registerFactory(BackendKind::Libiio, iioFactory);
+	registerFactory(BackendKind::Default, iioFactory);
 }
 
 Controller::~Controller() = default;

@@ -27,34 +27,27 @@
 #include "core/pooledcmdexecutor.h"
 #include "iioutil/ibackend.h"
 #include "iioutil/icontextops.h"
-#include "iioutil/iiobackendloader.h"
 
 using namespace scopy;
 using namespace scopy::component;
 using namespace scopy::component::iio;
 
-#ifdef SCOPY_DC_DIRECT_LIBIIO_V0
-// Direct-link path (Scopy integration): the libiio v0 backend is statically linked in,
-// so we call its factory symbol directly and never touch IIOBackendLoader/dlopen. The
-// backend is kept resident for the whole process, matching the loader's old semantics.
+// Implemented by the libiio backend linked into `component` (iio-backend-v0 or iio-backend-v1,
+// selected at build time by SCOPY_LIBIIO_VERSION). Resolved at link time — no dlopen.
 extern "C" scopy::iio::IBackend *createIIOBackend();
+
 namespace {
-scopy::iio::IBackend *directBackend()
+// The backend is stateless and kept resident for the whole process.
+scopy::iio::IBackend *backendInstance()
 {
 	static scopy::iio::IBackend *s_backend = createIIOBackend();
 	return s_backend;
 }
 } // namespace
-#endif
 
 Context *IIOContextFactory::create(const QString &uri, const int maxThreads)
 {
-#ifdef SCOPY_DC_DIRECT_LIBIIO_V0
-	Q_UNUSED(m_version) // version is fixed to v0 at build time in direct-link mode
-	scopy::iio::IBackend *backend = directBackend();
-#else
-	scopy::iio::IBackend *backend = scopy::iio::IIOBackendLoader::instance()->backend(m_version);
-#endif
+	scopy::iio::IBackend *backend = backendInstance();
 	if(!backend) {
 		return nullptr;
 	}
