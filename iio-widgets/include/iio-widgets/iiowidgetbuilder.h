@@ -82,14 +82,6 @@ public:
 	void clear();
 
 	/**
-	 * @brief If the connection is set, all IIOWidgets created will work through
-	 * command queue, except if there is no data strategy that implements that.
-	 * In that case, the non-commandQueue strategy will be selected.
-	 * @param connection
-	 */
-	IIOWidgetBuilder &connection(scopy::Connection *connection);
-
-	/**
 	 * @brief Sets the UI of the widgets to compact mode, this way, the widget
 	 * sizes will be more compact.
 	 * @param isCompact If this is set to true, the widget will be in compact
@@ -218,7 +210,6 @@ private:
 	DataStrategyInterface *createDS();
 	GuiStrategyInterface *createUIS();
 
-	Connection *m_connection;
 	bool m_isCompact;
 	bool m_includeDebugAttrs;
 	bool m_includeAvailableAttrs;

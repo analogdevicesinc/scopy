@@ -24,7 +24,6 @@
 #include <QObject>
 #include <QLoggingCategory>
 #include <QDateTime>
-#include <iio.h>
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
 

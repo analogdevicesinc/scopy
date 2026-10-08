@@ -22,7 +22,6 @@
 #define SCOPY_RANGEGUISTRATEGY_H
 
 #include <QWidget>
-#include <iio.h>
 // #include <gui/widgets/titlespinbox.h>
 #include <gui/widgets/menuspinbox.h>
 #include "guistrategy/guistrategyinterface.h"
