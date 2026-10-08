@@ -53,12 +53,6 @@ file(
 	src/freq/*.c
 	src/freq/*.cpp
 	src/freq/*.h
-	src/sim/*.c
-	src/sim/*.cpp
-	src/sim/*.h
-	src/acq/*.c
-	src/acq/*.cpp
-	src/acq/*.h
 )
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
@@ -69,10 +63,7 @@ if(ENABLE_TESTING)
 endif()
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core Qml)
-
-# TEMPORARY: needed by M2kLogicSource — remove once the source block moves to the m2k package
-find_package(libm2k REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
@@ -87,29 +78,18 @@ configure_file(
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(
-	${PROJECT_NAME}
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
-		src/time
-		src
-		src/sim
-		src/acq
-)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} src/time src)
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
-
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt::Widgets
 	       Qt::Core
-	       Qt::Qml
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
 	       scopy-gr-util
 	       scopy-iio-widgets
-	       scopy-core
-	       libm2k::libm2k # TEMPORARY: for M2kLogicSource
 )
 
 set(ADC_TARGET_NAME ${PROJECT_NAME} PARENT_SCOPE)
