@@ -56,7 +56,7 @@ jobs:
       run: |
         python3 extract_macros.py ../ user_guide/preferences_table.rst
         export ADOC_DOC_VERSION=${{ github.ref_name }}
-        make html SPHINXOPTS='-W --keep-going'
+        make dirhtml SPHINXOPTS='-W --keep-going'
 
     - name: Build Structurizr diagrams
       working-directory: docs/architecture/diagrams
@@ -66,8 +66,8 @@ jobs:
     - name: Store the generated doc
       uses: actions/upload-artifact@v7
       with:
-        name: html
-        path: docs/_build/html
+        name: dirhtml
+        path: docs/_build/dirhtml
 
   deploy-doc:
     runs-on: ubuntu-latest
@@ -110,18 +110,18 @@ jobs:
     # - uses: actions/download-artifact@v8
     #   if: ${{ env.new_tag == '0' }} && ${{ env.test_report_folder == '' }}
     #   with:
-    #     name: html
+    #     name: dirhtml
     #     path: scopy_testing_results/${{ env.test_report_folder }}
 
     - uses: actions/download-artifact@v8
       if: ${{ env.new_tag == '0' }} # && !${{ env.test_report_folder == '' }}
       with:
-        name: html
+        name: dirhtml
 
     - uses: actions/download-artifact@v8
       if: ${{ env.new_tag == '1' }}
       with:
-        name: html
+        name: dirhtml
         path: ${{ github.ref_name }}
 
     - name: Generate aux files
