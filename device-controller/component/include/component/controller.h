@@ -37,8 +37,7 @@ class ContextFactory;
 
 enum class BackendKind
 {
-	Libiiov0,
-	Libiiov1,
+	Libiio, // libiio v0 or v1, fixed at build time (SCOPY_LIBIIO_VERSION)
 	M2k,
 	Audio,
 	Default

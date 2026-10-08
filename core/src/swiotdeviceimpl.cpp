@@ -27,7 +27,7 @@ void SWIOTDeviceImpl::connectDev()
 {
 	if(!m_context) {
 		m_context =
-			component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0, m_swiotMaxThreads);
+			component::Controller::connectCtx(m_param, component::BackendKind::Libiio, m_swiotMaxThreads);
 	}
 	IIODeviceImpl::connectDev();
 }

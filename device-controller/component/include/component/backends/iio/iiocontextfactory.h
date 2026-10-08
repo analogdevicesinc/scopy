@@ -27,20 +27,15 @@
 
 namespace scopy::component::iio {
 
-// Builds a libiio-backed Context: loads the backend plugin for its fixed
-// LibiioVersion, opens the context handle, attaches a serial executor, and
-// runs the IIO component builder. One factory instance per version.
+// Builds a libiio-backed Context: instantiates the libiio backend linked into this
+// build (SCOPY_LIBIIO_VERSION selects v0 or v1 at compile time), opens the context
+// handle, attaches a serial executor, and runs the IIO component builder.
 class COMPONENT_EXPORT IIOContextFactory : public ContextFactory
 {
 public:
-	explicit IIOContextFactory(scopy::iio::LibiioVersion version)
-		: m_version(version)
-	{}
+	IIOContextFactory() = default;
 
 	Context *create(const QString &uri, const int maxThreads) override;
-
-private:
-	scopy::iio::LibiioVersion m_version;
 };
 
 } // namespace scopy::component::iio

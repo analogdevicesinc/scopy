@@ -35,7 +35,7 @@ DeviceImpl *DeviceFactory::build(QString param, QString category, QObject *paren
 	int maxThreads = Preferences::get("dc_cmd_execution_parallel").toBool() ? QThread::idealThreadCount() : 1;
 	if(category.compare("iio", Qt::CaseInsensitive) == 0) {
 		component::ContextHandle ctx =
-			component::Controller::connectCtx(param, component::BackendKind::Libiiov0, maxThreads);
+			component::Controller::connectCtx(param, component::BackendKind::Libiio, maxThreads);
 		if(ctx && ctx->findChild<component::Device *>("swiot", Qt::FindDirectChildrenOnly)) {
 			return new SWIOTDeviceImpl(param, maxThreads, parent);
 		}
