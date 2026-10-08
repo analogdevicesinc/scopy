@@ -63,11 +63,11 @@ struct ChannelsMaskHandle
 	void *ptr = nullptr;
 };
 
+// Which libiio API a backend implements; reported by IBackend::version().
 enum class LibiioVersion
 {
 	V0,
-	V1,
-	Default
+	V1
 };
 
 struct ContextParams

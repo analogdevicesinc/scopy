@@ -51,7 +51,7 @@ void IIODeviceImpl::acquireContext()
 	if(m_context) {
 		return;
 	}
-	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiiov0, m_maxThreads);
+	m_context = component::Controller::connectCtx(m_param, component::BackendKind::Libiio, m_maxThreads);
 	if(!m_context) {
 		qWarning(CAT_IIO_DEVICEIMPL) << "Failed to acquire context for" << m_param;
 	}

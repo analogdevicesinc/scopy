@@ -45,12 +45,8 @@ target_link_libraries(
 	       Qt6::Core
 	       QCoro6::Core
 	       QCoro6::Coro
-	PRIVATE iio-backend-v0
+	PRIVATE iio-backend-v${SCOPY_LIBIIO_VERSION} # provides createIIOBackend(), called by IIOContextFactory
 )
-
-# Direct-link libiio v0: IIOContextFactory instantiates the v0 backend via the statically-linked createIIOBackend()
-# instead of dlopen'ing a plugin through IIOBackendLoader (which stays compiled but dormant). See iiocontextfactory.cpp.
-target_compile_definitions(component PRIVATE SCOPY_DC_DIRECT_LIBIIO_V0)
 
 install(
 	TARGETS
