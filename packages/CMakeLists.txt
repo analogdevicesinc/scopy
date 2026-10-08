@@ -34,6 +34,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include(ScopyWindowsInstaller)
 endif()
 include(PackageUtils)
+include(ScopyPackageDeps)
 
 if(DISABLE_ALL_PACKAGES MATCHES ON)
 	enable_all_packages(${CMAKE_CURRENT_SOURCE_DIR} OFF)
