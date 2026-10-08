@@ -22,9 +22,22 @@
 # extern "C" createIIOBackend() is resolved at link time.
 #
 # libiio v1 is located on its own: the root IIO_LIBRARIES / IIO_INCLUDE_DIRS point at the v0 API (the LIBIIO_COMPAT
-# shim) used by the rest of Scopy. Set IIO_V1_LIBRARY / IIO_V1_INCLUDE_DIR to override.
+# shim) used by the rest of Scopy. Pass -DIIO_V1_INCLUDE_DIR / -DIIO_V1_LIBRARY to override the auto-detection below.
+#
+# The v1 header lives at <prefix>/include/iio/iio.h (unambiguously v1 — v0 has a flat <prefix>/include/iio.h). Find it
+# first, then look for the library NEXT TO it (same prefix) with NO_DEFAULT_PATH, so a v0 libiio.so elsewhere on the
+# system (e.g. /usr/local) can't shadow the real v1. Fall back to a default search only if that misses.
 find_path(IIO_V1_INCLUDE_DIR NAMES iio/iio.h)
-find_library(IIO_V1_LIBRARY NAMES iio1 libiio1 iio libiio)
+if(IIO_V1_INCLUDE_DIR AND NOT IIO_V1_LIBRARY)
+	get_filename_component(_iio_v1_prefix "${IIO_V1_INCLUDE_DIR}" DIRECTORY) # strip trailing /include
+	find_library(
+		IIO_V1_LIBRARY
+		NAMES iio1 libiio1 iio libiio
+		HINTS ${_iio_v1_prefix}/lib ${_iio_v1_prefix}/lib/${CMAKE_LIBRARY_ARCHITECTURE}
+		NO_DEFAULT_PATH
+	)
+endif()
+find_library(IIO_V1_LIBRARY NAMES iio1 libiio1 iio libiio) # fallback (also a no-op if already found)
 if(NOT (IIO_V1_LIBRARY AND IIO_V1_INCLUDE_DIR))
 	message(FATAL_ERROR "SCOPY_LIBIIO_VERSION=1 requires libiio v1 (iio/iio.h + library); "
 			    "set IIO_V1_INCLUDE_DIR / IIO_V1_LIBRARY"
@@ -32,11 +45,16 @@ if(NOT (IIO_V1_LIBRARY AND IIO_V1_INCLUDE_DIR))
 endif()
 
 # `iio` may also name the v0 / compat library; make sure the one found really exports the v1 API. iio_create_context is
-# the v1 entry point (v0 only has iio_create_context_from_uri).
+# the v1 entry point (v0 only has iio_create_context_from_uri). On mismatch, clear the cached path so the next configure
+# re-detects instead of getting stuck on the bad value.
 include(CheckLibraryExists)
 check_library_exists(${IIO_V1_LIBRARY} iio_create_context "" IIO_V1_LIBRARY_IS_V1)
 if(NOT IIO_V1_LIBRARY_IS_V1)
-	message(FATAL_ERROR "${IIO_V1_LIBRARY} is not libiio v1 (no iio_create_context); set IIO_V1_LIBRARY")
+	set(_bad_v1 "${IIO_V1_LIBRARY}")
+	unset(IIO_V1_LIBRARY CACHE)
+	message(FATAL_ERROR "${_bad_v1} is not libiio v1 (no iio_create_context). "
+			    "Pass -DIIO_V1_LIBRARY=/path/to/libiio.so.1 (and -DIIO_V1_INCLUDE_DIR)."
+	)
 endif()
 message(STATUS "device-controller libiio v1: ${IIO_V1_LIBRARY} (include: ${IIO_V1_INCLUDE_DIR})")
 
