@@ -71,6 +71,8 @@ void IIOComponentBuilder::setContextIdentity(IIOContext *iioCtx)
 	const auto handle = iioCtx->handle();
 	iioCtx->setName(ctxOps->name(handle));
 	iioCtx->setDescription(ctxOps->description(handle));
+	const scopy::iio::ContextVersion v = ctxOps->getVersion(handle);
+	iioCtx->setVersion({v.major, v.minor, v.gitTag});
 }
 
 void IIOComponentBuilder::buildContextAttributes(IIOContext *iioCtx, ICmdExecutor *executor)
@@ -80,8 +82,15 @@ void IIOComponentBuilder::buildContextAttributes(IIOContext *iioCtx, ICmdExecuto
 	const unsigned int count = ctxOps->attrsCount(handle);
 	for(unsigned int i = 0; i < count; ++i) {
 		const QString name = ctxOps->attrName(handle, i);
+		const scopy::iio::AttrHandle attr = m_attrOps->contextAttr(handle, name);
 		// Context attributes are always read-only in libiio.
-		makeAttribute(iioCtx, name, m_attrOps->contextAttr(handle, name), executor, /*forceReadOnly=*/true);
+		IIOAttribute *a = makeAttribute(iioCtx, name, attr, executor, /*forceReadOnly=*/true);
+		// Context attrs are static strings; read eagerly and cache so clients (e.g. the device
+		// info page) can read the value off the Attribute child without an async round-trip.
+		scopy::Result<QByteArray> value = m_attrOps->read(attr);
+		if(value && a) {
+			a->setCachedValue(QString::fromUtf8(value.value()));
+		}
 	}
 }
 

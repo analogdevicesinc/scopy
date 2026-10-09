@@ -19,32 +19,22 @@
  *
  */
 
-#ifndef IIOPINGTASK_H
-#define IIOPINGTASK_H
+#ifndef SERIALPORTENUMERATOR_H
+#define SERIALPORTENUMERATOR_H
 
-#include "pingtask.h"
 #include "scopy-iioutil_export.h"
 
-#include <iio.h>
+#include <QMap>
+#include <QString>
 
 namespace scopy {
-/**
- * @brief The IIOPingTask class
- * IIOPingTask verifies IIO connection and emits pingSuccess/connectionLost
- */
-class SCOPY_IIOUTIL_EXPORT IIOPingTask : public PingTask
+// Enumerates host serial ports via libserialport (no libiio). Used by the add-device
+// serial section. Split out of the former IIOScanTask so serial scanning stays available
+// after IIO scanning moved to the device-controller.
+class SCOPY_IIOUTIL_EXPORT SerialPortEnumerator
 {
-	Q_OBJECT
 public:
-	IIOPingTask(iio_context *c, QObject *parent = nullptr);
-	~IIOPingTask();
-
-	void run() override;
-	bool ping() override;
-	static bool pingCtx(iio_context *ctx);
-
-protected:
-	iio_context *m_ctx;
+	static QMap<QString, QString> getSerialPortsName();
 };
 } // namespace scopy
-#endif // IIOPINGTASK_H
+#endif // SERIALPORTENUMERATOR_H

@@ -25,13 +25,16 @@
 #include "menusectionwidget.h"
 #include "qtconcurrentrun.h"
 
-#include <iio.h>
 #include <QLoggingCategory>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <style.h>
 #include <stylehelper.h>
-#include <iioutil/iioscantask.h>
+#include "dcioscantask.h"
+#include <iioutil/serialportenumerator.h>
+#include <component/backends/iio/iiocontextfactory.h>
+#include <iioutil/ibackend.h>
+#include <iioutil/iscanops.h>
 
 Q_LOGGING_CATEGORY(CAT_IIO_ADD_PAGE, "IIOTabWidget")
 
@@ -156,9 +159,12 @@ void IioTabWidget::setupConnections()
 QStringList IioTabWidget::computeBackendsList()
 {
 	QStringList list;
-	int backEndsCount = iio_get_backends_count();
-	for(int i = 0; i < backEndsCount; i++) {
-		QString backEnd(iio_get_backend(i));
+	scopy::iio::IBackend *backend = scopy::component::iio::IIOContextFactory::defaultBackend();
+	if(!backend) {
+		return list;
+	}
+	const QStringList backends = backend->scanOps()->availableBackends();
+	for(const QString &backEnd : backends) {
 		if(backEnd.compare("xml") == 0 || backEnd.compare("serial") == 0) {
 			continue;
 		}
@@ -227,13 +233,13 @@ void IioTabWidget::futureScan()
 {
 	m_scanList.clear();
 	QString scanParams = m_scanParamsList.join("");
-	QFuture<int> f = QtConcurrent::run(std::bind(&IIOScanTask::scan, &m_scanList, scanParams));
+	QFuture<int> f = QtConcurrent::run(std::bind(&DcIioScanTask::scan, &m_scanList, scanParams));
 	m_fwScan->setFuture(f);
 }
 
 void IioTabWidget::futureSerialScan()
 {
-	QFuture<QMap<QString, QString>> f = QtConcurrent::run(std::bind(&IIOScanTask::getSerialPortsName));
+	QFuture<QMap<QString, QString>> f = QtConcurrent::run(std::bind(&SerialPortEnumerator::getSerialPortsName));
 	m_fwSerialScan->setFuture(f);
 }
 
@@ -315,7 +321,8 @@ bool IioTabWidget::isSerialCompatible()
 #ifdef WITH_LIBSERIALPORT
 	hasLibSerialPort = true;
 #endif
-	bool hasSerialBackend = iio_has_backend("serial");
+	scopy::iio::IBackend *backend = scopy::component::iio::IIOContextFactory::defaultBackend();
+	bool hasSerialBackend = backend && backend->scanOps()->hasBackend("serial");
 	return hasLibSerialPort && hasSerialBackend;
 }
 

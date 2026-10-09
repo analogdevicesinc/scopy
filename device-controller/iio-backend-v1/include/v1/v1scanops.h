@@ -29,6 +29,8 @@ class V1ScanOps : public IScanOps
 {
 public:
 	QVector<ScanResult> scan(const QString &backends = QString()) override;
+	QStringList availableBackends() override;
+	bool hasBackend(const QString &backend) override;
 };
 
 } // namespace scopy::iio

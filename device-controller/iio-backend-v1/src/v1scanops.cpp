@@ -21,13 +21,19 @@
 
 #include "v1scanops.h"
 #include <iio/iio.h>
+#include <QRegularExpression>
 
 namespace scopy::iio {
 
 QVector<ScanResult> V1ScanOps::scan(const QString &backends)
 {
 	QVector<ScanResult> results;
-	const char *back = backends.isEmpty() ? nullptr : backends.toUtf8().constData();
+
+	// Normalize the scopy/v0 filter convention ("usb:", "usb:ip:") to what libiio v1's
+	// iio_scan() expects: a comma-separated list of plain backend names ("usb", "usb,ip").
+	const QStringList names = backends.split(QRegularExpression("[:,]"), Qt::SkipEmptyParts);
+	const QByteArray backendsUtf8 = names.join(',').toUtf8();
+	const char *back = backendsUtf8.isEmpty() ? nullptr : backendsUtf8.constData();
 
 	struct iio_scan *scan = iio_scan(nullptr, back);
 	if(iio_err(scan)) {
@@ -50,5 +56,20 @@ QVector<ScanResult> V1ScanOps::scan(const QString &backends)
 
 	return results;
 }
+
+QStringList V1ScanOps::availableBackends()
+{
+	QStringList out;
+	const unsigned int n = iio_get_builtin_backends_count();
+	for(unsigned int i = 0; i < n; ++i) {
+		const char *b = iio_get_builtin_backend(i);
+		if(b) {
+			out << QString::fromUtf8(b);
+		}
+	}
+	return out;
+}
+
+bool V1ScanOps::hasBackend(const QString &backend) { return iio_has_backend(nullptr, backend.toUtf8().constData()); }
 
 } // namespace scopy::iio

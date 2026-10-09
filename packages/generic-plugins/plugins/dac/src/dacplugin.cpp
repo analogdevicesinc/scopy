@@ -39,7 +39,7 @@
 #include <component/attributereader.h>
 #include <component/backends/iio/iiosamplecodec.h>
 
-#include <gui/infopage.h>
+#include <core/deviceinfopage.h>
 #include <pluginbase/preferences.h>
 
 #include <qcoro/qcorotask.h>
@@ -112,23 +112,10 @@ bool DACPlugin::loadPage()
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
 
-	InfoPage *infoPage = new InfoPage(m_page);
-	lay->addWidget(infoPage);
-	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
-
 	component::ContextHandle ctx = component::Controller::context(m_param);
-	if(!ctx) {
-		return false;
-	}
-	const QList<component::Attribute *> attributes =
-		ctx->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
-	for(component::Attribute *attr : attributes) {
-		if(!attr->readCapability()) {
-			continue;
-		}
-		QCoro::waitFor(attr->readCapability()->readAsync());
-		infoPage->update(attr->name(), attr->cachedValue());
-	}
+	auto deviceInfoPage = new DeviceInfoPage(ctx.get());
+	lay->addWidget(deviceInfoPage);
+	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
 	return true;
 }

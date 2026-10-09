@@ -49,7 +49,7 @@
 #include <component/backends/iio/iioregisterwriter.h>
 #include <pluginbase/preferences.h>
 #include <gui/preferenceshelper.h>
-#include <gui/deviceinfopage.h>
+#include <core/deviceinfopage.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
 #include <readwrite/fileregisterreadstrategy.hpp>
@@ -58,7 +58,6 @@
 #include <regmap_api.h>
 #include <deviceiconbuilder.h>
 
-#include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
@@ -77,12 +76,10 @@ bool RegmapPlugin::loadPage()
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
 
-	ConnectionProvider *c = ConnectionProvider::GetInstance();
-	Connection *conn = c->open(m_param);
-	auto deviceInfoPage = new DeviceInfoPage(conn);
+	component::ContextHandle ctx = component::Controller::context(m_param);
+	auto deviceInfoPage = new DeviceInfoPage(ctx.get());
 	lay->addWidget(deviceInfoPage);
 	lay->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
-	c->close(m_param);
 
 	return true;
 }
