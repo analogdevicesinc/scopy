@@ -36,7 +36,6 @@
 #include <tutorialbuilder.h>
 #include <pluginbase/preferences.h>
 #include "datamonitorstylehelper.hpp"
-#include <iioutil/connection.h>
 #include <QComboBox>
 
 using namespace scopy::datamonitor;

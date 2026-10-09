@@ -25,6 +25,10 @@
 #include "iioutil/handles.h"
 #include "component/component_export.h"
 
+namespace scopy::iio {
+class IBackend;
+}
+
 namespace scopy::component::iio {
 
 // Builds a libiio-backed Context: instantiates the libiio backend linked into this
@@ -36,6 +40,11 @@ public:
 	IIOContextFactory() = default;
 
 	Context *create(const QString &uri, const int maxThreads) override;
+
+	// The process-wide libiio backend linked into this build. Lets non-context clients
+	// (e.g. the device scanner via IBackend::scanOps()) reach the backend without opening
+	// a context. Kept resident for the whole process; never null.
+	static scopy::iio::IBackend *defaultBackend();
 };
 
 } // namespace scopy::component::iio

@@ -19,29 +19,30 @@
  *
  */
 
-#ifndef IIOSCANTASK_H
-#define IIOSCANTASK_H
+#ifndef DCIIOSCANTASK_H
+#define DCIIOSCANTASK_H
 
-#include "scopy-iioutil_export.h"
+#include "scopy-core_export.h"
 
 #include <QThread>
 
 namespace scopy {
-/**
- * @brief The IIOScanTask class
- * IIOScanTask - scans for IIO context and emits a scanFinished signal
- */
-class SCOPY_IIOUTIL_EXPORT IIOScanTask : public QThread
+// Scans for IIO contexts through the device-controller backend (libiio v0 or v1,
+// fixed at build time) and emits scanFinished. Drop-in replacement for the former
+// IIOScanTask: same QThread contract, so it plugs into CyclicalTask / ScanButtonController
+// / ScannedIIOContextCollector unchanged. Lives in core (not iioutil) because it uses the
+// component layer, which core links and iioutil must not.
+class SCOPY_CORE_EXPORT DcIioScanTask : public QThread
 {
 	Q_OBJECT
 public:
-	IIOScanTask(QObject *parent);
-	~IIOScanTask();
+	DcIioScanTask(QObject *parent);
+	~DcIioScanTask();
 
-	virtual void run() override;
+	void run() override;
 	void setScanParams(QString s);
+	// Appends {description, uri} for each found context. Returns the number found, or -1 on error.
 	static int scan(QVector<QPair<QString, QString>> *ctxs, QString scanParams);
-	static QMap<QString, QString> getSerialPortsName();
 
 Q_SIGNALS:
 	void scanFinished(QVector<QPair<QString, QString>> ctxs);
@@ -49,7 +50,6 @@ Q_SIGNALS:
 protected:
 	static QString parseDescription(const QString &d);
 	QString scanParams = "";
-	bool enabled;
 };
 } // namespace scopy
-#endif // IIOSCANTASK_H
+#endif // DCIIOSCANTASK_H

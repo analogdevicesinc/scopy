@@ -23,7 +23,6 @@
 
 #include <iio.h>
 #include <QString>
-#include <iioutil/connection.h>
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy::component {
@@ -32,7 +31,6 @@ class Attribute;
 
 struct SCOPY_IIO_WIDGETS_EXPORT IIOWidgetFactoryRecipe
 {
-	scopy::Connection *connection = nullptr;	  // the connection is needed for using an commandq
 	struct iio_context *context = nullptr;		  // the context in which to search for iio structures
 	struct iio_device *device = nullptr;		  // the device in which to search for iio structures
 	struct iio_channel *channel = nullptr;		  // the channel in which to search for iio structures

@@ -25,7 +25,6 @@
 #include "scopy-core_export.h"
 #include "scopymainwindow.h"
 #include "scanbuttoncontroller.h"
-#include "iioutil/connectionprovider.h"
 #include <QFile>
 
 namespace scopy {

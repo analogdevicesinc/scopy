@@ -33,6 +33,7 @@
 #include <QScrollArea>
 #include "toolstack.h"
 #include "whatsnewoverlay.h"
+#include <component/controller.h>
 using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SCOPY_API, "Scopy_API")
@@ -55,17 +56,26 @@ void ScopyMainWindow_API::acceptLicense()
 	}
 }
 
+namespace {
+// Lightweight "can we open this context?" probe through the device-controller, replacing the old
+// ConnectionProvider::open() used purely as a connectivity check. The handle releases immediately.
+bool probeUri(const QString &uri)
+{
+	auto h = scopy::component::Controller::connectCtx(uri, scopy::component::BackendKind::Libiio, 1);
+	return static_cast<bool>(h);
+}
+} // namespace
+
 QString ScopyMainWindow_API::addDevice(QString uri, QString cat, bool async)
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(uri);
+	bool conn = probeUri(uri);
 	QString devID = "";
 	if(conn) {
 		Q_ASSERT(m_w->dm != nullptr);
 		devID = m_w->dm->createDevice(cat, uri, async);
 	} else {
 		uri = "ip:" + uri;
-		conn = cp->open(uri);
+		conn = probeUri(uri);
 		if(conn) {
 			devID = m_w->dm->createDevice(cat, uri, async);
 		} else {
@@ -77,15 +87,14 @@ QString ScopyMainWindow_API::addDevice(QString uri, QString cat, bool async)
 
 QString ScopyMainWindow_API::addDevice(QString uri, QList<QString> plugins, QString cat, bool async)
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(uri);
+	bool conn = probeUri(uri);
 	QString devID = "";
 	if(conn) {
 		Q_ASSERT(m_w->dm != nullptr);
 		devID = m_w->dm->createDevice(cat, uri, async, plugins);
 	} else {
 		uri = "ip:" + uri;
-		conn = cp->open(uri);
+		conn = probeUri(uri);
 		if(conn) {
 			devID = m_w->dm->createDevice(cat, uri, async, plugins);
 		} else {
@@ -109,8 +118,7 @@ Device *ScopyMainWindow_API::getDevice(int idx)
 
 bool ScopyMainWindow_API::removeDevice(QString uri, QString cat)
 {
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(uri);
+	bool conn = probeUri(uri);
 	Q_ASSERT(m_w->dm != nullptr);
 	bool devRemoved = false;
 	if(conn) {
@@ -445,8 +453,7 @@ QStringList ScopyMainWindow_API::getPlugins(int idx)
 QStringList ScopyMainWindow_API::getPlugins(QString uri, QString cat)
 {
 	QStringList pluginList;
-	auto &&cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(uri);
+	bool conn = probeUri(uri);
 	if(conn) {
 		pluginList = availablePlugins(uri, cat, nullptr);
 	} else {

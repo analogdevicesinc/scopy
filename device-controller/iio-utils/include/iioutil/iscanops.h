@@ -23,6 +23,7 @@
 
 #include "iioutil/handles.h"
 #include <QString>
+#include <QStringList>
 #include <QVector>
 
 namespace scopy::iio {
@@ -32,6 +33,11 @@ class IScanOps
 public:
 	virtual ~IScanOps() = default;
 	virtual QVector<ScanResult> scan(const QString &backends = QString()) = 0;
+
+	// Names of the libiio backends compiled into the library (e.g. "usb", "ip", "serial"),
+	// used to build the add-device scan filters without calling libiio from core.
+	virtual QStringList availableBackends() = 0;
+	virtual bool hasBackend(const QString &backend) = 0;
 };
 
 } // namespace scopy::iio

@@ -27,7 +27,8 @@ namespace scopy::iio {
 QVector<ScanResult> V0ScanOps::scan(const QString &backends)
 {
 	QVector<ScanResult> results;
-	const char *back = backends.isEmpty() ? nullptr : backends.toUtf8().constData();
+	const QByteArray backendsUtf8 = backends.toUtf8();
+	const char *back = backends.isEmpty() ? nullptr : backendsUtf8.constData();
 
 	iio_scan_block *blk = iio_create_scan_block(back, 0);
 	if(!blk) {
@@ -53,5 +54,20 @@ QVector<ScanResult> V0ScanOps::scan(const QString &backends)
 	iio_scan_block_destroy(blk);
 	return results;
 }
+
+QStringList V0ScanOps::availableBackends()
+{
+	QStringList out;
+	const unsigned int n = iio_get_backends_count();
+	for(unsigned int i = 0; i < n; ++i) {
+		const char *b = iio_get_backend(i);
+		if(b) {
+			out << QString::fromUtf8(b);
+		}
+	}
+	return out;
+}
+
+bool V0ScanOps::hasBackend(const QString &backend) { return iio_has_backend(backend.toUtf8().constData()); }
 
 } // namespace scopy::iio

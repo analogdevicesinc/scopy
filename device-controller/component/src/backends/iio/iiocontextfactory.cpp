@@ -36,18 +36,16 @@ using namespace scopy::component::iio;
 // selected at build time by SCOPY_LIBIIO_VERSION). Resolved at link time — no dlopen.
 extern "C" scopy::iio::IBackend *createIIOBackend();
 
-namespace {
-// The backend is stateless and kept resident for the whole process.
-scopy::iio::IBackend *backendInstance()
+scopy::iio::IBackend *IIOContextFactory::defaultBackend()
 {
+	// The backend is stateless and kept resident for the whole process.
 	static scopy::iio::IBackend *s_backend = createIIOBackend();
 	return s_backend;
 }
-} // namespace
 
 Context *IIOContextFactory::create(const QString &uri, const int maxThreads)
 {
-	scopy::iio::IBackend *backend = backendInstance();
+	scopy::iio::IBackend *backend = defaultBackend();
 	if(!backend) {
 		return nullptr;
 	}
