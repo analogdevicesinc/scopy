@@ -26,7 +26,9 @@
 #include <iiowidgetutils.h>
 #include <QLoggingCategory>
 
+#if SCOPY_LIBIIO_VERSION == 0
 #include <fmcomms5/fmcomms5calibration.h>
+#endif
 
 #include <component/context.h>
 #include <component/device.h>
@@ -65,6 +67,8 @@ Fmcomms5Tab::Fmcomms5Tab(component::Context *ctx, IIOWidgetGroup *group, QWidget
 	Style::setStyle(title, style::properties::label::menuBig);
 	layout->addWidget(title);
 
+#if SCOPY_LIBIIO_VERSION == 0
+	// Calibration uses the libiio v0 API directly; only available in libiio v0 builds.
 	Fmcomms5Calibration *calibration = new Fmcomms5Calibration(ctx, this);
 
 	QComboBox *calSwitchControl = new QComboBox(widget);
@@ -102,6 +106,7 @@ Fmcomms5Tab::Fmcomms5Tab(component::Context *ctx, IIOWidgetGroup *group, QWidget
 		&QProgressBar::setValue);
 
 	layout->addWidget(m_calibProgressBar);
+#endif
 
 	component::Device *mainDevice = m_ctx->findChild<component::Device *>("ad9361-phy", Qt::FindDirectChildrenOnly);
 
@@ -120,12 +125,14 @@ Fmcomms5Tab::Fmcomms5Tab(component::Context *ctx, IIOWidgetGroup *group, QWidget
 				     .buildSingle();
 	layout->addWidget(txPhase);
 
+#if SCOPY_LIBIIO_VERSION == 0
 	connect(m_calibrateBtn, &QPushButton::clicked, this, [this, calibration, txPhase]() {
 		m_calibrateBtn->setEnabled(false);
 		calibration->calibrate();
 		m_calibrateBtn->setEnabled(true);
 		txPhase->readAsync();
 	});
+#endif
 
 	m_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Preferred, QSizePolicy::Expanding));
 }

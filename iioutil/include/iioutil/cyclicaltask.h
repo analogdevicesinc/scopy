@@ -24,8 +24,6 @@
 
 #include "scopy-iioutil_export.h"
 
-#include <iio.h>
-
 #include <QLoggingCategory>
 #include <QObject>
 #include <QThread>
