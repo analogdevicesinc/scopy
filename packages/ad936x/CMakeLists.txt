@@ -29,6 +29,16 @@ set(PACKAGE_DESCRIPTION "Plugin for AD936X")
 
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+scopy_package_dependency(
+	libad9361
+	TARGET
+	libad9361::libad9361
+	LIB_NAMES
+	ad9361
+	HEADER
+	ad9361.h
+)
+
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
 include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)
 include_resources(${CMAKE_CURRENT_SOURCE_DIR}/resources ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/resources)
