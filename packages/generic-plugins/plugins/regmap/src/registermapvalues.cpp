@@ -23,11 +23,9 @@
 
 #include "readwrite/iregisterreadstrategy.hpp"
 #include "readwrite/iregisterwritestrategy.hpp"
-#include "regreadwrite.hpp"
 
 #include <src/readwrite/fileregisterreadstrategy.hpp>
 #include <src/readwrite/fileregisterwritestrategy.hpp>
-#include <src/readwrite/iioregisterwritestrategy.hpp>
 
 #include <QFile>
 #include <QTextStream>

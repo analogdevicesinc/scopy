@@ -58,12 +58,7 @@ file(
 )
 file(GLOB UI_LIST ui/*.ui)
 
-if(ENABLE_TESTING)
-	add_subdirectory(test)
-endif()
-
 option(WITH_LIBSERIALPORT "Add serial backend support to Scopy - also needs to be enabled in libiio" ON)
-find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
 find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
 if(${WITH_LIBSERIALPORT})
 	find_library(LIBSERIALPORT_LIBRARIES serialport REQUIRED)
@@ -95,7 +90,7 @@ target_include_directories(
 				${LIBSERIALPORT_INCLUDE_DIR}
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets ${IIO_LIBRARIES} ${LIBSERIALPORT_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets ${LIBSERIALPORT_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_INSTALL_PATH} COMPONENT ${SCOPY_PDK}
 	RUNTIME DESTINATION ${SCOPY_DLL_INSTALL_PATH}

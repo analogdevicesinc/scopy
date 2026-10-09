@@ -72,11 +72,20 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
+# FMCOMMS5 calibration and the MCS sync use the libiio v0 API directly (and libad9361, which is built on
+# libiio v0). They are compiled only when Scopy is built against libiio v0 (SCOPY_LIBIIO_VERSION=0); with
+# libiio v1 they are left out, so no libiio v0 code ends up in the process.
+if(SCOPY_LIBIIO_VERSION STREQUAL "0")
+	find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
+	find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
+else()
+	list(REMOVE_ITEM SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/fmcomms5/fmcomms5calibration.cpp)
+	list(REMOVE_ITEM HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/fmcomms5/fmcomms5calibration.h)
+	set(AD9361_LIBRARIES "")
+endif()
+
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
-
-find_library(AD9361_LIBRARIES NAMES ad9361 libad9361 REQUIRED)
-find_path(AD9361_INCLUDE_DIRS ad9361.h REQUIRED)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(AD936X_FILTERS_BUILD_PATH
@@ -105,6 +114,7 @@ configure_file(
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-pkg-manager)
 

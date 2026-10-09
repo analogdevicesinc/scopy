@@ -41,7 +41,6 @@
 #include <waveforminstrument.h>
 
 #include <pluginbase/preferences.h>
-#include <iioutil/connectionprovider.h>
 #include <component/attribute.h>
 #include <component/controller.h>
 

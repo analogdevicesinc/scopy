@@ -26,14 +26,11 @@
 
 #include <QLineEdit>
 #include <QPushButton>
-#include <iio.h>
 #include <qboxlayout.h>
 #include <qcheckbox.h>
 #include <stylehelper.h>
 #include <toolbuttons.h>
 #include <utils.h>
-#include "readwrite/iioregisterreadstrategy.hpp"
-#include "readwrite/iioregisterwritestrategy.hpp"
 #include "register/registerdetailedwidget.hpp"
 #include "register/registermodel.hpp"
 #include "registercontroller.hpp"
@@ -43,7 +40,6 @@
 #include "search.hpp"
 #include "utils.hpp"
 
-#include <iio.h>
 
 #include <QLineEdit>
 #include <QPushButton>

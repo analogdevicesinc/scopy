@@ -42,8 +42,6 @@
 
 #include <readwrite/fileregisterreadstrategy.hpp>
 #include <readwrite/fileregisterwritestrategy.hpp>
-#include <readwrite/iioregisterreadstrategy.hpp>
-#include <readwrite/iioregisterwritestrategy.hpp>
 #include <style_properties.h>
 
 #include <pluginbase/preferences.h>
