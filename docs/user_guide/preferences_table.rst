@@ -35,6 +35,9 @@
    * - show_graticule
      - Show Graticule
      - This setting allows the user to enable or disable the display of the graticule      on all the plots in the application for better signal visualization.
+   * - plot_labels_inside
+     - Draw plot labels inside the canvas
+     - Draw the axis labels inside the plot canvas instead of in a margin beside it, which gives the plot itself the space the labels would otherwise occupy.
    * - iiowidgets_use_lazy_loading
      - Use Lazy Loading
      - Indicates whether lazy loading should be used for IIO widgets.      Enabling this option allows the application to load IIO widgets only      when they are needed, improving startup performance.

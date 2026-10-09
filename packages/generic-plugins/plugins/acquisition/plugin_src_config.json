@@ -1,0 +1,32 @@
+{
+    "baseplugin": false,
+    "plugin_name": "acquisition",
+    "plugin_display_name": "Acquisition",
+    "plugin_description": "Device controller based acquisition plugin",
+    "class_name": "AcquisitionPlugin",
+    "namespace": "scopy::acquisition",
+    "device_category": "iio",
+    "tools": [],
+    "cmakelists": {
+        "cmake_min_required": 3.16,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "style": {
+        "qss": false,
+        "json": false
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.16,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": false,
+    "pdk": {
+        "deps_path": "",
+        "project_path": ""
+    }
+}

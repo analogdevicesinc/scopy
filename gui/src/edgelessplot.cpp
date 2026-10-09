@@ -21,6 +21,8 @@
 
 #include "edgelessplot.h"
 
+#include <QwtPlot>
+
 using namespace scopy;
 
 static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv &from_scaleDiv);
@@ -53,8 +55,30 @@ EdgelessPlotScaleItem::EdgelessPlotScaleItem(QwtScaleDraw::Alignment alignment, 
 
 void EdgelessPlotScaleItem::updateScaleDiv(const QwtScaleDiv &xScaleDiv, const QwtScaleDiv &yScaleDiv)
 {
+	if(!m_edgeless) {
+		QwtPlotScaleItem::updateScaleDiv(xScaleDiv, yScaleDiv);
+		return;
+	}
+
 	QwtPlotScaleItem::updateScaleDiv(getEdgelessScaleDiv(xScaleDiv), getEdgelessScaleDiv(yScaleDiv));
 }
+
+void EdgelessPlotScaleItem::setEdgeless(bool edgeless)
+{
+	if(m_edgeless == edgeless) {
+		return;
+	}
+
+	m_edgeless = edgeless;
+
+	// The trimmed scale div is already cached, so recompute it from the plot's current one
+	// instead of waiting for the next scale change to bring the end ticks back.
+	if(const QwtPlot *plt = plot()) {
+		updateScaleDiv(plt->axisScaleDiv(xAxis()), plt->axisScaleDiv(yAxis()));
+	}
+}
+
+bool EdgelessPlotScaleItem::isEdgeless() const { return m_edgeless; }
 
 /*
  * EdgelessPlotGrid class implementation

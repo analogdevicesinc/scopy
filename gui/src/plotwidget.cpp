@@ -59,6 +59,9 @@ PlotWidget::PlotWidget(QWidget *parent)
 {
 
 	m_selectedChannel = nullptr;
+	// Before setupAxes(), which creates axes that register themselves through
+	// addPlotAxis() — and that hands them to the navigator when there is one.
+	m_navigator = nullptr;
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_plot = new QwtPlot(this);
 	m_plot->canvas()->setContentsMargins(0, 0, 0, 0);
@@ -87,6 +90,14 @@ void PlotWidget::setupNavigator()
 {
 	m_navigator = new PlotNavigator(this);
 	connect(m_navigator, &PlotNavigator::rectChanged, this, &PlotWidget::plotScaleChanged);
+
+	// setupAxes() runs before this, so the built-in X/Y pair missed addPlotAxis()'s
+	// registration. Without this a plot can end up with no zoomable axis at all.
+	for(int position = 0; position < QwtAxis::AxisPositions; position++) {
+		for(PlotAxis *ax : std::as_const(m_plotAxis[position])) {
+			m_navigator->addAxis(ax);
+		}
+	}
 
 	m_tracker = new PlotTracker(this);
 }
@@ -136,8 +147,9 @@ void PlotWidget::plotChannelChangeXAxis(PlotChannel *c, PlotAxis *x)
 {
 	m_navigator->removeChannel(c);
 	m_tracker->removeChannel(c);
-	c->xAxis()->setVisible(false);
+	PlotAxis *old = c->xAxis();
 	c->setXAxis(x);
+	hideAxisIfUnused(old, /*yAxis=*/false);
 	m_navigator->addChannel(c);
 	m_tracker->addChannel(c);
 	showAxisLabels();
@@ -147,13 +159,27 @@ void PlotWidget::plotChannelChangeYAxis(PlotChannel *c, PlotAxis *y)
 {
 	m_navigator->removeChannel(c);
 	m_tracker->removeChannel(c);
-	c->yAxis()->setVisible(false);
+	PlotAxis *old = c->yAxis();
 	c->setYAxis(y);
+	hideAxisIfUnused(old, /*yAxis=*/true);
 	m_navigator->addChannel(c);
 	m_tracker->addChannel(c);
 	showAxisLabels();
 
 	Q_EMIT channelSelected(c);
+}
+
+void PlotWidget::hideAxisIfUnused(PlotAxis *axis, bool yAxis)
+{
+	if(!axis) {
+		return;
+	}
+	for(PlotChannel *other : std::as_const(m_plotChannels)) {
+		if((yAxis ? other->yAxis() : other->xAxis()) == axis) {
+			return;
+		}
+	}
+	axis->setVisible(false);
 }
 
 void PlotWidget::addPlotChannel(PlotChannel *ch)
@@ -178,8 +204,10 @@ void PlotWidget::removePlotChannel(PlotChannel *ch)
 	m_navigator->removeChannel(ch);
 	m_tracker->removeChannel(ch);
 
-	// QwtAxisId cannot be removed from QwtPlot
-	ch->yAxis()->setVisible(false);
+	// After the removal above, so the departing channel does not count itself. Qwt cannot
+	// remove an axis, so hiding it is the whole of the cleanup.
+	hideAxisIfUnused(ch->yAxis(), /*yAxis=*/true);
+	hideAxisIfUnused(ch->xAxis(), /*yAxis=*/false);
 	if(m_selectedChannel == ch) {
 		if(m_plotChannels.size() > 0) {
 			selectChannel(m_plotChannels[0]);
@@ -198,7 +226,16 @@ void PlotWidget::addPlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->a
 
 void PlotWidget::removePlotAxisHandle(PlotAxisHandle *ax) { m_plotAxisHandles[ax->axis()->position()].removeAll(ax); }
 
-void PlotWidget::addPlotAxis(PlotAxis *ax) { m_plotAxis[ax->position()].append(ax); }
+void PlotWidget::addPlotAxis(PlotAxis *ax)
+{
+	m_plotAxis[ax->position()].append(ax);
+	// PlotNavigator only rescales axes it owns, so an axis registered here but not with it
+	// would stay put while the rest of the plot zoomed. Null during setupAxes(), which runs
+	// before setupNavigator(); that one backfills.
+	if(m_navigator) {
+		m_navigator->addAxis(ax);
+	}
+}
 
 bool PlotWidget::eventFilter(QObject *object, QEvent *event)
 {
@@ -348,7 +385,7 @@ void PlotWidget::showAxisLabels()
 		m_selectedChannel->yAxis()->setVisible(m_showYAxisLabels);
 	} else {
 		xAxis()->setVisible(m_showXAxisLabels);
-		yAxis()->setVisible(m_showXAxisLabels);
+		yAxis()->setVisible(m_showYAxisLabels);
 	}
 }
 

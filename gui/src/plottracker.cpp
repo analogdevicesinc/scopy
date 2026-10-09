@@ -63,12 +63,19 @@ void PlotTracker::addChannel(PlotChannel *ch) { m_trackers->insert(createTracker
 
 void PlotTracker::removeChannel(PlotChannel *ch)
 {
-	ChannelTracker *toRemove;
+	// Initialised, and checked before use: an unmatched channel used to leave this
+	// pointer indeterminate and then remove() and delete it. A second
+	// removePlotChannel() for the same channel reaches here with nothing to find,
+	// so that was a wild delete on an ordinary double-remove.
+	ChannelTracker *toRemove = nullptr;
 	for(ChannelTracker *chTracker : std::as_const(*m_trackers)) {
 		if(chTracker->channel == ch) {
 			toRemove = chTracker;
 			break;
 		}
+	}
+	if(!toRemove) {
+		return;
 	}
 	m_trackers->remove(toRemove);
 	delete toRemove;

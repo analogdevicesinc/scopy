@@ -40,6 +40,16 @@ public:
 	PrintBtn(QWidget *parent = nullptr);
 };
 
+// PrintBtn's 145px-wide text form spends rail width on a word the glyph already
+// says. This is the same action as a square icon button, sized like the export
+// button beside it.
+class SCOPY_GUI_EXPORT PrintIconBtn : public QPushButton
+{
+	Q_OBJECT
+public:
+	PrintIconBtn(QWidget *parent = nullptr);
+};
+
 class SCOPY_GUI_EXPORT OpenLastMenuBtn : public QPushButton
 {
 	Q_OBJECT

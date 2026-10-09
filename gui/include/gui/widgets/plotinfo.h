@@ -52,6 +52,8 @@ public:
 
 protected:
 	void initLayouts();
+	void applyMargins();
+	void setMouseTransparent(QWidget *w);
 
 private:
 	QWidget *m_parent;
