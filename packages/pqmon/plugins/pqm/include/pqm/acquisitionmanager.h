@@ -30,7 +30,6 @@
 #include <optional>
 #include <qcoro/qcorotask.h>
 
-#include <iioutil/commandqueue.h>
 #include <iioutil/pingtask.h>
 
 #include <pqmdatalogger.h>

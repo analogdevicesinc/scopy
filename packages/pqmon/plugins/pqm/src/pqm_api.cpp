@@ -28,7 +28,12 @@
 #include <pluginbase/toolmenuentry.h>
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/filebrowserwidget.h>
-#include <iioutil/connectionprovider.h>
+#include <component/controller.h>
+#include <component/device.h>
+#include <component/channel.h>
+#include <component/attribute.h>
+#include <component/attributewriter.h>
+#include <qcorotask.h>
 #include <QLineEdit>
 #include <QLoggingCategory>
 
@@ -400,32 +405,42 @@ void PQM_API::setSettingsAttributeValue(const QString &attrName, const QString &
 
 bool PQM_API::triggerPqEvent(bool enable)
 {
-	auto *cp = ConnectionProvider::GetInstance();
-	Connection *conn = cp->open(m_pqmPlugin->m_param);
-	if(!conn) {
-		qWarning(CAT_PQM_API) << "Failed to open connection for PQ event trigger";
+	component::ContextHandle ctx = component::Controller::context(m_pqmPlugin->m_param);
+	if(!ctx) {
+		qWarning(CAT_PQM_API) << "Failed to acquire context for PQ event trigger";
 		return false;
 	}
 
-	iio_device *pqmDevice = iio_context_find_device(conn->context(), "pqm");
+	component::Device *pqmDevice = ctx->findChild<component::Device *>("pqm");
 	if(!pqmDevice) {
 		qWarning(CAT_PQM_API) << "PQM device not found";
-		cp->close(m_pqmPlugin->m_param);
 		return false;
 	}
 
-	iio_channel *countChannel = iio_device_find_channel(pqmDevice, "count0", true);
+	component::Channel *countChannel = nullptr;
+	const QList<component::Channel *> chnls =
+		pqmDevice->findChildren<component::Channel *>(Qt::FindDirectChildrenOnly);
+	for(component::Channel *ch : chnls) {
+		if(ch->isOutput() && (ch->id() == "count0" || ch->name() == "count0")) {
+			countChannel = ch;
+			break;
+		}
+	}
 	if(!countChannel) {
 		qWarning(CAT_PQM_API) << "dips channel not found";
-		cp->close(m_pqmPlugin->m_param);
 		return false;
 	}
 
-	const char *value = enable ? "1" : "0";
-	int ret = iio_channel_attr_write(countChannel, "countEvent", value);
-	cp->close(m_pqmPlugin->m_param);
-	if(ret < 0) {
-		qWarning(CAT_PQM_API) << "Failed to write countEvent attribute:" << ret;
+	component::Attribute *countEvent =
+		countChannel->findChild<component::Attribute *>("countEvent", Qt::FindDirectChildrenOnly);
+	if(!countEvent || !countEvent->writeCapability()) {
+		qWarning(CAT_PQM_API) << "countEvent attribute not found or not writable";
+		return false;
+	}
+
+	auto ret = QCoro::waitFor(countEvent->writeCapability()->writeAsync(enable ? "1" : "0"));
+	if(!ret) {
+		qWarning(CAT_PQM_API) << "Failed to write countEvent attribute:" << ret.error().errorCode();
 		return false;
 	}
 

@@ -34,7 +34,9 @@
 #include <component/device.h>
 #include <component/backends/iio/iiodevice.h>
 
+#if SCOPY_LIBIIO_VERSION == 0
 #include <ad9361.h>
+#endif
 
 Q_LOGGING_CATEGORY(CAT_FMCOMMS5_ADVANCED, "FMCOMMS5_ADVANCED")
 
@@ -157,6 +159,8 @@ Fmcomms5Advanced::Fmcomms5Advanced(component::Context *ctx, IIOWidgetGroup *grou
 		m_tool->addWidgetToTopContainerHelper(m_bistBtn, TTA_LEFT);
 		m_tool->addWidgetToTopContainerHelper(m_fmcomms5Btn, TTA_LEFT);
 
+#if SCOPY_LIBIIO_VERSION == 0
+		// MCS sync goes through libad9361 (libiio v0); only available in libiio v0 builds.
 		m_syncBtn = new QPushButton("MSC Sync", this);
 		Style::setStyle(m_syncBtn, style::properties::button::basicButton);
 		connect(m_syncBtn, &QPushButton::clicked, this, [this]() {
@@ -179,6 +183,7 @@ Fmcomms5Advanced::Fmcomms5Advanced(component::Context *ctx, IIOWidgetGroup *grou
 		});
 
 		m_tool->addWidgetToBottomContainerHelper(m_syncBtn, TTA_LEFT);
+#endif
 
 		bool useLazyLoading = scopy::Preferences::get("iiowidgets_use_lazy_loading").toBool();
 		if(!useLazyLoading) {
