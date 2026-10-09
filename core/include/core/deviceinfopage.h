@@ -22,24 +22,29 @@
 #ifndef DEVICEINFOPAGE_H
 #define DEVICEINFOPAGE_H
 
-#include "scopy-gui_export.h"
+#include "scopy-core_export.h"
 #include <QWidget>
 #include <QLabel>
-#include <infopage.h>
-#include <iioutil/connection.h>
+#include <gui/infopage.h>
 
 namespace scopy {
-class SCOPY_GUI_EXPORT DeviceInfoPage : public QWidget
+namespace component {
+class Context;
+}
+
+// Shows a device-controller context's identity (backend name/version/description) and its
+// context attributes. Lives in core (not gui) so it can read component::Context directly
+// without coupling gui to the device-controller.
+class SCOPY_CORE_EXPORT DeviceInfoPage : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit DeviceInfoPage(Connection *conn, QWidget *parent = nullptr);
+	explicit DeviceInfoPage(scopy::component::Context *ctx, QWidget *parent = nullptr);
 
 private:
 	void setupUi();
-	void setupInfoPage();
+	void setupInfoPage(scopy::component::Context *ctx);
 
-	Connection *m_conn;
 	InfoPage *m_infoPage;
 	QLabel *m_title;
 	QLabel *m_backendInfo;

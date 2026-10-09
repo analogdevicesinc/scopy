@@ -39,7 +39,7 @@
 #include "pluginbase/preferences.h"
 #include "pluginbase/versionchecker.h"
 #include "iioutil/cyclicaltask.h"
-#include "iioutil/iioscantask.h"
+#include "dcioscantask.h"
 #include <gui/widgets/scopystatusbar.h>
 #include "versioncheckmessage.h"
 
@@ -94,7 +94,7 @@ private:
 	DeviceManager *dm;
 
 	CyclicalTask *scanCycle;
-	IIOScanTask *scanTask;
+	DcIioScanTask *scanTask;
 	ScannedIIOContextCollector *scc;
 	DetachedToolWindowManager *dtm;
 

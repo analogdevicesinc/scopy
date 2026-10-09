@@ -54,7 +54,6 @@
 #include "application_restarter.h"
 #include "pluginbase/preferences.h"
 #include "pluginbase/scopyjs.h"
-#include "iioutil/connectionprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
 #include "pluginbase/statusbarmanager.h"
@@ -110,7 +109,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initStatusBar();
 	setupPreferences();
 
-	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 
 	// get the version document
@@ -140,7 +138,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	Style::setBackgroundColor(ui->centralwidget, json::theme::background_primary);
 
-	scanTask = new IIOScanTask(this);
+	scanTask = new DcIioScanTask(this);
 	scanTask->setScanParams("usb");
 	scanCycle = new CyclicalTask(scanTask, this);
 	scc = new ScannedIIOContextCollector(this);
@@ -173,7 +171,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ts->add("package", pkgWidget);
 	ts->add("scripting", m_scriptingTool);
 
-	connect(scanTask, &IIOScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
+	connect(scanTask, &DcIioScanTask::scanFinished, scc, &ScannedIIOContextCollector::update, Qt::QueuedConnection);
 
 	connect(scc, &ScannedIIOContextCollector::foundDevice, dm,
 		[this](QString cat, QString uri) { dm->createDevice(cat, uri); });

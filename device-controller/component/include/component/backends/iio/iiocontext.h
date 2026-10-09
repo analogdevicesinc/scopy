@@ -46,6 +46,17 @@ public:
 	scopy::iio::ContextHandle handle() const { return m_handle; }
 	void setHandle(scopy::iio::ContextHandle handle) { m_handle = handle; }
 
+	// libiio backend version, filled once by the builder. IIO-specific, so it lives here
+	// rather than on the backend-agnostic Context base.
+	struct Version
+	{
+		unsigned int major = 0;
+		unsigned int minor = 0;
+		QString gitTag;
+	};
+	Version version() const { return m_version; }
+	void setVersion(const Version &v) { m_version = v; }
+
 	// The backend this context was built with. The loader keeps every backend
 	// resident for the whole process, so this is a non-owning pointer.
 	scopy::iio::IBackend *backend() const { return m_backend; }
@@ -54,6 +65,7 @@ public:
 private:
 	scopy::iio::ContextHandle m_handle;
 	scopy::iio::IBackend *m_backend = nullptr;
+	Version m_version;
 };
 
 } // namespace scopy::component::iio

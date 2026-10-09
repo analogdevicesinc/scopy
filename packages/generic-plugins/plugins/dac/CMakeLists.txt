@@ -90,6 +90,7 @@ target_link_libraries(
 	       Qt::Core
 	       scopy-pluginbase
 	       scopy-gui
+	       scopy-core
 	       scopy-iioutil
 	       scopy-iio-widgets
 	       scopy-pkg-manager

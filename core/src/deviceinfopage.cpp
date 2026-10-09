@@ -20,20 +20,23 @@
  */
 
 #include "deviceinfopage.h"
+
+#include <component/context.h>
+#include <component/attribute.h>
+#include <component/backends/iio/iiocontext.h>
+
 #include <QVBoxLayout>
-#include <QDebug>
 
 using namespace scopy;
 
-DeviceInfoPage::DeviceInfoPage(Connection *conn, QWidget *parent)
+DeviceInfoPage::DeviceInfoPage(component::Context *ctx, QWidget *parent)
 	: QWidget(parent)
-	, m_conn(conn)
 	, m_infoPage(new InfoPage(this))
 	, m_title(new QLabel("Device Info", this))
 	, m_backendInfo(new QLabel(this))
 {
 	setupUi();
-	setupInfoPage();
+	setupInfoPage(ctx);
 }
 
 void DeviceInfoPage::setupUi()
@@ -46,44 +49,32 @@ void DeviceInfoPage::setupUi()
 	layout()->addWidget(m_infoPage);
 }
 
-void DeviceInfoPage::setupInfoPage()
+void DeviceInfoPage::setupInfoPage(component::Context *ctx)
 {
-	if(!m_conn) {
-		qWarning() << "Error, invalid connection, cannot create info page.";
+	if(!ctx) {
+		qWarning() << "Error, invalid context, cannot create info page.";
 		return;
 	}
 
-	QString backendName, description;
-	unsigned int major, minor;
-	char git_tag[8] = "0000000";
-	int ret = EXIT_FAILURE;
-	ret = iio_context_get_version(m_conn->context(), &major, &minor, git_tag);
-	if(ret) {
-		qWarning() << "Error, cannot read backend version.";
-		major = 'x';
-		minor = 'x';
+	component::iio::IIOContext::Version v;
+	if(auto *iioCtx = qobject_cast<component::iio::IIOContext *>(ctx)) {
+		v = iioCtx->version();
 	}
-
-	backendName = iio_context_get_name(m_conn->context());
-	description = iio_context_get_description(m_conn->context());
-
 	QString backendText = "IIO context created with %1 backend.\n"
 			      "Backend version: %2.%3 (git tag: %4)\n"
 			      "Backend description string: %5";
-	m_backendInfo->setText(backendText.arg(backendName)
-				       .arg(QString::number(major))
-				       .arg(QString::number(minor))
-				       .arg(git_tag)
-				       .arg(description));
+	m_backendInfo->setText(backendText.arg(ctx->name())
+				       .arg(QString::number(v.major))
+				       .arg(QString::number(v.minor))
+				       .arg(v.gitTag)
+				       .arg(ctx->description()));
 
-	const char *name;
-	const char *value;
-	for(int i = 0; i < iio_context_get_attrs_count(m_conn->context()); ++i) {
-		int ret = iio_context_get_attr(m_conn->context(), i, &name, &value);
-		if(ret != 0)
-			continue;
-
-		m_infoPage->update(name, value);
+	// Context attributes are read-only component::Attribute children, their values cached
+	// eagerly by the builder.
+	const QList<component::Attribute *> attrs =
+		ctx->findChildren<component::Attribute *>(Qt::FindDirectChildrenOnly);
+	for(component::Attribute *a : attrs) {
+		m_infoPage->update(a->name(), a->cachedValue());
 	}
 }
 
