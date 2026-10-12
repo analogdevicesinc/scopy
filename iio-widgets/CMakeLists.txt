@@ -73,7 +73,20 @@ endif()
 
 set(SCOPY_QT_COMPONENTS Core Widgets)
 
-find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
+# Legacy data strategies that talk to libiio v0 directly (iio_context/iio_device/iio_channel recipes:
+# ChannelAttr/DeviceAttr/ContextAttr/Trigger). Built only with SCOPY_LIBIIO_VERSION=0; with libiio v1 only the
+# device-controller strategy (ComponentAttrDataStrategy) is built and iio-widgets does not link libiio.
+set(IIOWIDGETS_IIO_LIBRARIES "")
+if(SCOPY_LIBIIO_VERSION STREQUAL "0")
+	find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
+	set(IIOWIDGETS_IIO_LIBRARIES ${IIO_LIBRARIES})
+else()
+	foreach(_s channelattrdatastrategy deviceattrdatastrategy contextattrdatastrategy triggerdatastrategy)
+		list(REMOVE_ITEM SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/datastrategy/${_s}.cpp)
+		list(REMOVE_ITEM HEADER_LIST ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/datastrategy/${_s}.h)
+	endforeach()
+endif()
+# The public headers still mention iio_* types in the raw recipe fields.
 find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
 
 set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
@@ -81,6 +94,7 @@ set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCOPY_LIBIIO_VERSION=${SCOPY_LIBIIO_VERSION})
 
 generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
@@ -119,7 +133,7 @@ endforeach()
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC ${SCOPY_QT_LIBRARIES}
-	       ${IIO_LIBRARIES}
+	       ${IIOWIDGETS_IIO_LIBRARIES}
 	       scopy-gui
 	       scopy-iioutil
 	       component
