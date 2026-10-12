@@ -94,6 +94,8 @@ QString IIOWidgetGroup::generateKey(const IIOWidgetFactoryRecipe &recipe)
 		return QStringLiteral("context/") + attribute;
 	}
 
+#if SCOPY_LIBIIO_VERSION == 0
+	// Legacy raw-libiio recipe (only in builds with the raw strategies enabled).
 	if(recipe.channel) {
 		const char *name = iio_channel_get_id(recipe.channel);
 		channelId = name ? QString(name) : QString();
@@ -121,6 +123,7 @@ QString IIOWidgetGroup::generateKey(const IIOWidgetFactoryRecipe &recipe)
 	} else if(recipe.context) {
 		return QStringLiteral("context/") + attribute;
 	}
+#endif
 
 	return deviceName + "/" + channelId + "/" + attribute;
 }
