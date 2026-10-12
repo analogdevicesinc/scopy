@@ -28,6 +28,7 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QJsonObject>
+#include <QLibrary>
 #include <common/loggingutil.h>
 #include <common/scopyconfig.h>
 #include <QFileSystemModel>
@@ -73,6 +74,50 @@ void PkgManager::_init(const QSet<QString> &paths)
 		while(it.hasNext()) {
 			QFileInfo file(it.next());
 			loadPkg(file);
+		}
+	}
+}
+
+void PkgManager::preloadDependencies()
+{
+	const QString depsDirName = QStringLiteral("dependencies");
+	for(const QVariantMap &pkg : validPackages_) {
+		QString pkgPath = pkg[PkgManifest::PKG_PATH].toString();
+		QString pkgId = pkg[PkgManifest::PKG_ID].toString();
+		QStringList declared = pkg[PkgManifest::PKG_DEPENDENCIES].toStringList();
+
+		if(declared.isEmpty())
+			continue;
+
+		QDir depsDir(pkgPath + "/" + depsDirName);
+		if(!depsDir.exists()) {
+			qWarning(CAT_PKGMANAGER) << pkgId << ": declared dependencies" << declared << "but"
+						 << depsDir.absolutePath() << "does not exist";
+			continue;
+		}
+
+		QSet<QString> loaded;
+		for(const QFileInfo &fi : depsDir.entryInfoList(QDir::Files)) {
+			if(!QLibrary::isLibrary(fi.fileName()))
+				continue;
+			QLibrary lib(fi.absoluteFilePath());
+			if(lib.load()) {
+				QString base = fi.baseName();
+				loaded.insert(base);
+				if(base.startsWith("lib"))
+					loaded.insert(base.mid(3));
+				qCDebug(CAT_PKGMANAGER) << pkgId << ": loaded dep" << fi.fileName();
+			} else {
+				qWarning(CAT_PKGMANAGER)
+					<< pkgId << ": failed to load" << fi.fileName() << lib.errorString();
+			}
+		}
+
+		for(const QString &dep : declared) {
+			if(!loaded.contains(dep)) {
+				qWarning(CAT_PKGMANAGER) << pkgId << ": declared dependency" << dep
+							 << "was not found in" << depsDir.absolutePath();
+			}
 		}
 	}
 }

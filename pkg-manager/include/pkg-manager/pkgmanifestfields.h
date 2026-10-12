@@ -36,6 +36,7 @@ struct PkgManifest
 	static constexpr auto PKG_BASE = "base-pkg";
 	static constexpr auto PKG_SCOPY_COMPATIBILITY = "scopy_compatibility";
 	static constexpr auto PKG_PATH = "path";
+	static constexpr auto PKG_DEPENDENCIES = "dependencies";
 
 	inline static const std::vector<const char *> requiredFields = {
 		PKG_ID, PKG_VERSION, PKG_LICENSE, PKG_AUTHOR, PKG_SCOPY_COMPATIBILITY, PKG_CATEGORY};

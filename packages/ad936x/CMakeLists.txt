@@ -29,6 +29,7 @@ set(PACKAGE_DESCRIPTION "Plugin for AD936X")
 
 project(scopy-package-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
+set(SCOPY_PKG_LOCAL_DEPS "")
 scopy_package_dependency(
 	libad9361
 	TARGET
@@ -38,6 +39,7 @@ scopy_package_dependency(
 	HEADER
 	ad9361.h
 )
+scopy_deps_to_json(SCOPY_PKG_DEPENDENCIES)
 
 configure_file(manifest.json.cmakein ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/MANIFEST.json @ONLY)
 include_emu_xml(${CMAKE_CURRENT_SOURCE_DIR}/emu-xml ${SCOPY_PACKAGE_BUILD_PATH}/${SCOPY_MODULE}/emu-xml)

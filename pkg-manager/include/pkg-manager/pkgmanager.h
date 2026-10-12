@@ -43,6 +43,7 @@ public:
 	static PkgManager *GetInstance();
 	static void init(QSet<QString> paths = {});
 	void _init(const QSet<QString> &paths);
+	static void preloadDependencies();
 
 	static bool install(const QString &zipPath = "", bool performRestart = true);
 	bool _install(const QString &zipPath = "", bool performRestart = true);

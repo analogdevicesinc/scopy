@@ -94,6 +94,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 #endif
 	PkgManager::GetInstance();
 	PkgManager::init(pkgsPath);
+	PkgManager::preloadDependencies();
 
 	initStyle();
 	ScopySplashscreen::showMessage("Initializing ui");
