@@ -23,10 +23,12 @@
 #include "guistrategy/editableguistrategy.h"
 #include "guistrategy/switchguistrategy.h"
 #include "guistrategy/checkboxguistrategy.h"
+#if SCOPY_LIBIIO_VERSION == 0
 #include "datastrategy/channelattrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
+#endif
 #include "datastrategy/componentattrdatastrategy.h"
 #include <component/attribute.h>
 #include "guistrategy/comboguistrategy.h"
@@ -119,6 +121,8 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 		return widget;
 	}
 
+#if SCOPY_LIBIIO_VERSION == 0
+	// Legacy raw-libiio path (iio_context/iio_device/iio_channel).
 	if(!m_context && !m_device && !m_channel) {
 		qWarning(CAT_ATTRBUILDER) << "No channel/device/context set.";
 		return nullptr;
@@ -165,6 +169,11 @@ IIOWidget *IIOWidgetBuilder::buildSingle()
 		m_group->add(widget);
 	}
 	return widget;
+#else
+	Q_UNUSED(availableAttr)
+	qWarning(CAT_ATTRBUILDER) << "No component attribute set (raw libiio strategies are only built with libiio v0).";
+	return nullptr;
+#endif
 }
 
 QList<IIOWidget *> IIOWidgetBuilder::buildAll()
@@ -192,6 +201,8 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 		return result;
 	}
 
+#if SCOPY_LIBIIO_VERSION == 0
+	// Legacy raw-libiio path.
 	if(m_channel) {
 		attrCount = iio_channel_get_attrs_count(m_channel);
 		for(ssize_t i = 0; i < attrCount; ++i) {
@@ -297,6 +308,13 @@ QList<IIOWidget *> IIOWidgetBuilder::buildAll()
 	m_optionsAttribute.clear();
 
 	return result;
+#else
+	Q_UNUSED(attrCount)
+	Q_UNUSED(attrName)
+	Q_UNUSED(availableAttr)
+	qWarning(CAT_ATTRBUILDER) << "No component container set (raw libiio strategies are only built with libiio v0).";
+	return result;
+#endif
 }
 
 void IIOWidgetBuilder::clear()
@@ -432,19 +450,23 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 	if(strategy == DS::NoDataStrategy) {
 		if(m_componentAttribute) {
 			strategy = DS::ComponentAttrData;
-		} else if(m_channel) {
+		}
+#if SCOPY_LIBIIO_VERSION == 0
+		else if(m_channel) {
 			strategy = DS::AttrData;
 		} else if(m_device) {
 			strategy = DS::DeviceAttrData;
 		} else if(m_context) {
 			strategy = DS::ContextAttrData;
 		}
+#endif
 	}
 
 	switch(strategy) {
 	case DS::NoDataStrategy:
 		qWarning(CAT_ATTRBUILDER) << "Could not determine the Data Strategy";
 		break;
+#if SCOPY_LIBIIO_VERSION == 0
 	case DS::AttrData:
 		ds = new ChannelAttrDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
@@ -454,11 +476,12 @@ DataStrategyInterface *IIOWidgetBuilder::createDS()
 	case DS::ContextAttrData:
 		ds = new ContextAttrDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
-	case DS::ComponentAttrData:
-		ds = new ComponentAttrDataStrategy(m_generatedRecipe, m_widgetParent);
-		break;
 	case DS::TriggerData:
 		ds = new TriggerDataStrategy(m_generatedRecipe, m_widgetParent);
+		break;
+#endif
+	case DS::ComponentAttrData:
+		ds = new ComponentAttrDataStrategy(m_generatedRecipe, m_widgetParent);
 		break;
 	default:
 		qWarning(CAT_ATTRBUILDER) << "No valid Data Strategy was provided.";
@@ -495,7 +518,9 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 			} else {
 				strategy = UIS::EditableUi;
 			}
-		} else if(!m_optionsAttribute.isEmpty()) {
+		}
+#if SCOPY_LIBIIO_VERSION == 0
+		else if(!m_optionsAttribute.isEmpty()) {
 			// read values from iio and interpret them
 			char buffer[ATTR_BUFFER_SIZE] = {0};
 			ssize_t res = -1;
@@ -520,7 +545,9 @@ GuiStrategyInterface *IIOWidgetBuilder::createUIS()
 					strategy = UIS::ComboUi;
 				}
 			}
-		} else if(!m_optionsValues.isEmpty()) {
+		}
+#endif
+		else if(!m_optionsValues.isEmpty()) {
 			// const values
 			if(m_optionsValues.startsWith('[')) {
 				strategy = UIS::RangeUi;
