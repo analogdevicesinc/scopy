@@ -59,9 +59,11 @@ private:
 	void init();
 	void enGenericOptWidget(QString crtOpt);
 	QStringList createArgList();
+	QStringList createIiodEmuArgList();
 	void setStatusMessage(QString msg);
 	QString findEmuPath();
-	QString buildEmuPath(QString dirPath);
+	QString findEmuPath(const QString &emuName);
+	QString buildEmuPath(QString dirPath, QString emuName);
 	void stopEnableBtn(QString btnText);
 	bool startIioEmuProcess(QString processPath, QStringList arg = {});
 	void killEmuProcess();
@@ -72,6 +74,7 @@ private:
 	QComboBox *m_demoOptCb;
 	QLineEdit *m_portEdit;
 	FileBrowserWidget *m_xmlFileBrowser;
+	QLabel *m_rxTxLabel;
 	FileBrowserWidget *m_rxTxFileBrowser;
 	QLineEdit *m_uriEdit;
 	QLabel *m_uriMsgLabel;
@@ -85,6 +88,7 @@ private:
 
 	QString m_jsonConfigVal;
 	QString m_emuType = "generic";
+	bool m_isIiodEmu = false;
 };
 } // namespace scopy
 
