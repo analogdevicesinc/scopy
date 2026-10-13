@@ -43,6 +43,31 @@ TriggerProcessor::TriggerProcessor(const QString &name, QObject *parent)
 	qRegisterMetaType<QMap<QString, scopy::acq::SampleVariant>>("QMap<QString,scopy::acq::SampleVariant>");
 }
 
+void TriggerProcessor::publishFire(quint32 sampleIndex, QMap<QString, SampleVariant> snapshot)
+{
+	{
+		QMutexLocker lk(&m_fireMutex);
+		m_latestFire = {sampleIndex, std::move(snapshot)};
+	}
+	// At most one delivery in flight, carrying the newest fire: a GUI that falls
+	// behind skips fires instead of queueing a full-store snapshot per cycle.
+	if(m_firePending.exchange(true))
+		return;
+	QMetaObject::invokeMethod(
+		this,
+		[this] {
+			Fire f;
+			{
+				QMutexLocker lk(&m_fireMutex);
+				f = std::move(m_latestFire);
+				m_latestFire = {};
+				m_firePending = false;
+			}
+			Q_EMIT fired(f.sampleIndex, std::move(f.snapshot));
+		},
+		Qt::QueuedConnection);
+}
+
 void TriggerProcessor::addCondition(const TriggerCondition &c)
 {
 	{
@@ -71,10 +96,8 @@ void TriggerProcessor::setCondition(int index, const TriggerCondition &c)
 		QMutexLocker lk(&m_mutex);
 		if(index < 0 || index >= m_conditions.size())
 			return;
-		const bool keyChanged = (m_conditions[index].key != c.key);
 		m_conditions[index] = c;
-		if(keyChanged)
-			rebuildWatchedKeysLocked();
+		rebuildWatchedKeysLocked();
 	}
 	Q_EMIT conditionsChanged();
 }
@@ -88,6 +111,7 @@ void TriggerProcessor::setConditionEnabled(int index, bool en)
 		if(m_conditions[index].enabled == en)
 			return;
 		m_conditions[index].enabled = en;
+		rebuildWatchedKeysLocked();
 	}
 	Q_EMIT conditionsChanged();
 }
@@ -141,18 +165,19 @@ void TriggerProcessor::reset() { m_postWanted = -1; }
 
 void TriggerProcessor::rebuildWatchedKeysLocked()
 {
-	// Called under m_mutex. Deduplicate keys of enabled conditions.
+	// Called under m_mutex. Deduplicated keys of the conditions that take part. A
+	// condition with no key yet does not, or it would block the trigger forever.
 	QList<DataKey> keys;
 	QSet<QString> seen;
 	for(const TriggerCondition &c : m_conditions) {
-		if(!c.enabled)
+		if(!c.enabled || c.key.toString().isEmpty())
 			continue;
-		if(seen.contains(c.key.key))
+		if(seen.contains(c.key.toString()))
 			continue;
-		seen.insert(c.key.key);
+		seen.insert(c.key.toString());
 		keys.append(c.key);
 	}
-	m_watchedKeys = keys;
+	storeWatchedKeys(keys);
 }
 
 // --- Evaluation ----------------------------------------------------------
@@ -243,6 +268,10 @@ void TriggerProcessor::process(DataStore *store)
 		L = m_windowSize;
 		frac = m_triggerPosition;
 	}
+	// Same rule as the watched keys: a keyless condition does not take part.
+	for(TriggerCondition &c : conds)
+		if(c.key.toString().isEmpty())
+			c.enabled = false;
 
 	// Window split: `pre` samples of history sit left of the firing sample,
 	// `post` at or after it. Both are 0 when no window is configured.
@@ -274,18 +303,18 @@ void TriggerProcessor::process(DataStore *store)
 		for(const DataKey &k : store->keys()) {
 			if(L <= 0) {
 				if(auto chunk = store->latest(k))
-					snapshot.insert(k.key, std::move(*chunk));
+					snapshot.insert(k.toString(), std::move(*chunk));
 			} else if(store->typeOf(k) == SampleType::Annotation) {
 				// Annotations are produced against their own
 				// right-anchored window of length L, so re-anchoring
 				// shifts their offsets right rather than truncating.
-				snapshot.insert(k.key, shiftAnnotations(store->window(k, L), L, extra));
+				snapshot.insert(k.toString(), shiftAnnotations(store->window(k, L), L, extra));
 			} else {
-				snapshot.insert(k.key, truncateWindow(store->window(k, L + extra), L));
+				snapshot.insert(k.toString(), truncateWindow(store->window(k, L + extra), L));
 			}
 		}
 		m_postWanted = -1;
-		Q_EMIT fired(atSample, std::move(snapshot));
+		publishFire(atSample, std::move(snapshot));
 	};
 
 	// A latched fire is waiting for its post-trigger half. Ignore further edges

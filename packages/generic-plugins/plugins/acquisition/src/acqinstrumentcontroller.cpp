@@ -311,7 +311,7 @@ void AcqInstrumentController::setupTrigger()
 	engine->addProcessor(m_trigProc);
 	// Its snapshot spans the whole store, so it has to run after this cycle's derived data —
 	// the FFT, the decoder annotations — is written.
-	engine->setRunLast(m_trigProc);
+	m_trigProc->setRunsLast(true);
 
 	m_trigMarker = new scopy::acq::TriggerMarker(m_trigProc, this);
 
@@ -410,7 +410,7 @@ void AcqInstrumentController::setupTrigger()
 			QStringList names;
 			names.reserve(keys.size());
 			for(const scopy::acq::DataKey &k : keys) {
-				names << k.key;
+				names << k.toString();
 			}
 			m_trigWidget->setAvailableKeys(names);
 		}

@@ -50,6 +50,18 @@ QWidget *MathSource::createSettingsWidget(QWidget *parent)
 	return withBaseSettings(new MathBlockWidget(&m_evaluator), parent);
 }
 
+void MathSource::onStart()
+{
+	SourceBlock::onStart();
+	m_evaluator.resetEngine();
+}
+
+void MathSource::requestStop()
+{
+	m_evaluator.interrupt();
+	SourceBlock::requestStop();
+}
+
 void MathSource::setFormula(const QString &formula) { m_evaluator.setFormula(formula); }
 
 } // namespace acq

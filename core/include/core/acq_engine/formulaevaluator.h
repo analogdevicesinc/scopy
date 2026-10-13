@@ -52,6 +52,14 @@ public:
 	bool evaluateBatch(int n, const QVector<const QVector<float> *> &inputs, QVector<float> &out,
 			   QString *errorOut = nullptr);
 
+	// Any thread. Aborts a running evaluateBatch() — a formula can loop forever.
+	void interrupt();
+
+	// Worker thread, between runs. Drops the script engine so the next batch builds a
+	// fresh one on the current worker thread (each run gets a new QThread) with the
+	// interrupt flag clear.
+	void resetEngine();
+
 private:
 	static QString wrapFormula(const QString &formula, int inputCount);
 	void rebuildEngine(const QString &formula, int inputCount);
@@ -62,6 +70,8 @@ private:
 	std::atomic<bool> m_syntaxValid{false};
 	int m_lastInputCount{0};
 
+	// Guards the pointer only, so interrupt() can reach the engine from another thread.
+	std::mutex m_engineMutex;
 	std::unique_ptr<QJSEngine> m_workerEngine;
 	QJSValue m_batchFn;
 

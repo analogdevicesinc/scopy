@@ -56,10 +56,10 @@ QString labelFor(const scopy::acq::StreamInfo &info, const scopy::acq::DataKey &
 // the engine's ramp. Never empty — see the member's initialiser for why that matters.
 scopy::acq::DataKey resolveXKey(const AcqChannel::Args &args)
 {
-	if(!args.xKey.key.isEmpty()) {
+	if(!args.xKey.toString().isEmpty()) {
 		return args.xKey;
 	}
-	if(!args.info.xKey.key.isEmpty()) {
+	if(!args.info.xKey.toString().isEmpty()) {
 		return args.info.xKey;
 	}
 	return scopy::acq::AcquisitionEngine::indexRampKey();
@@ -341,7 +341,7 @@ scopy::acq::SampleVariant AcqChannel::windowFor(const scopy::acq::DataKey &k, in
 		// constFind, not value(): a key the fire does not carry has to fall through to the
 		// store rather than be drawn as empty. The index ramp is the case that matters — it
 		// is published outside a cycle, and a curve with no X draws nothing at all.
-		const auto it = m_snap->constFind(k.key);
+		const auto it = m_snap->constFind(k.toString());
 		if(it != m_snap->constEnd()) {
 			return *it;
 		}
@@ -360,7 +360,7 @@ QVector<float> AcqChannel::windowFloatFor(const scopy::acq::DataKey &k, int plot
 std::optional<scopy::acq::SampleVariant> AcqChannel::latestFor(const scopy::acq::DataKey &k) const
 {
 	if(m_snap) {
-		const auto it = m_snap->constFind(k.key);
+		const auto it = m_snap->constFind(k.toString());
 		if(it != m_snap->constEnd()) {
 			return *it;
 		}
@@ -388,7 +388,7 @@ void AcqChannel::reclaimDepth(int plotSize)
 	// A plain "different from Y" test now: m_xKey is never empty, so the ramp gets a
 	// claim like any other X stream. That claim resolves to one chunk, since the ramp
 	// arrives as a single chunk at least plotSize long.
-	if(m_xKey.key != m_key.key) {
+	if(m_xKey.toString() != m_key.toString()) {
 		claim(m_xKey);
 	}
 }
@@ -513,7 +513,7 @@ QWidget *AcqChannel::createSettingsPage(InstrumentTemplate *it, QWidget *parent)
 		facts << QStringLiteral("X: time (s)");
 	} else if(m_xAxis && m_xAxis->isSampleIndex()) {
 		facts << QStringLiteral("X: sample index");
-	} else if(!m_xKey.key.isEmpty()) {
+	} else if(!m_xKey.toString().isEmpty()) {
 		facts << QStringLiteral("X: %1").arg(m_xKey.toString());
 	}
 	if(!facts.isEmpty()) {

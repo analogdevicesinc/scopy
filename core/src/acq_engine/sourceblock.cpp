@@ -37,6 +37,8 @@ void SourceBlock::onStart() { m_stopRequested = false; }
 
 void SourceBlock::onStop() { m_stopRequested = true; }
 
+void SourceBlock::requestStop() { m_stopRequested = true; }
+
 void SourceBlock::setBufferSize(std::size_t size) { m_bufferSize = size; }
 
 std::size_t SourceBlock::bufferSize() const { return m_bufferSize; }

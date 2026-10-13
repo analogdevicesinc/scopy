@@ -208,7 +208,7 @@ void SnapshotSource::capture(int index)
 		       QStringLiteral("snapshot %1: capture ignored, the snapshot has no name").arg(index));
 		return;
 	}
-	if(s.source.key.isEmpty()) {
+	if(s.source.toString().isEmpty()) {
 		report(AcquisitionError::Severity::Warning,
 		       QStringLiteral("%1: capture ignored, no source selected").arg(s.title));
 		return;

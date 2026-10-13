@@ -43,12 +43,8 @@ struct Annotation
 	QString text;
 	int severity{0};
 
-	// Numeric payload, when the producer knows it. `text` is a *display*
-	// string, so recovering a byte from it means guessing the radix the
-	// producer chose to print in — which silently corrupts data when the
-	// guess is wrong. Producers that have the value should set it here;
-	// consumers should prefer it and fall back to parsing `text` only for
-	// producers that cannot (e.g. scraping a child process's stdout).
+	// Numeric payload, when the producer knows it. Prefer it over parsing `text`, which
+	// is a display string in whatever radix the producer chose.
 	std::optional<quint64> value;
 };
 
@@ -68,13 +64,9 @@ SCOPY_CORE_EXPORT const char *textRadixName(TextRadix r);
 // (case-insensitive).
 SCOPY_CORE_EXPORT bool textRadixFromString(const QString &s, TextRadix &out);
 
-// Stream-level description of an annotation stream, held once per DataKey
-// rather than repeated on every Annotation (a stream carries thousands of
-// records per cycle and these fields are constant across them).
-//
-// Producers declare this; consumers read it. That keeps consumers free of
-// any knowledge of *which* decoder produced the stream — a vendor decoder
-// publishes the same fields as the built-in sigrok path.
+// Stream-level description of an annotation stream, held once per key rather than on
+// every Annotation. Lets a consumer interpret the stream without knowing which decoder
+// produced it.
 struct AnnotationStreamInfo
 {
 	// Canonical id of the producing decoder, e.g. "spi". Selects the
@@ -91,20 +83,10 @@ struct AnnotationStreamInfo
 	quint64 bitrate{0};
 };
 
-// How a stream is drawn *if* a view asks for it to be drawn. This is the
-// producer's recommendation, not a request: no view creates a channel off the
-// back of it — that is the instrument's explicit call — so a stream declared
-// Curve is not on any plot until someone says addChannel().
-//
-// Always an explicit choice by whoever declares the stream — there is
-// deliberately no "figure it out from the SampleType" value.
-// Such a value can only ever be a guess (UInt8 is as plausibly an 8-bit ADC as
-// it is a logic line), and a wrong guess draws something misleading rather than
-// failing, which is worse than asking the producer to state what it publishes.
-//
-// `Hidden` is the default because it is the only safe thing to assume about a
-// stream nobody described: that it exists to be read by something other than a
-// plot — an X axis, a processor's input — and is not a trace.
+// How a stream should be drawn if a view draws it — the producer's recommendation; no
+// channel is created from it. Always stated by the producer: there is deliberately no
+// "infer from the SampleType" value (UInt8 is as plausibly an ADC as a logic line).
+// Hidden, the default, means "not a trace" (an X axis, a processor input).
 enum class ReprKind
 {
 	Hidden,
@@ -116,19 +98,9 @@ enum class ReprKind
 
 SCOPY_CORE_EXPORT const char *reprKindName(ReprKind k);
 
-// Stream-level presentation descriptor, held once per DataKey.
-//
-// Same contract as AnnotationStreamInfo above, and the same reason for
-// existing: the producer knows what its stream *means* — that a chunk of
-// floats is a voltage in volts, or an FFT magnitude indexed by a companion
-// frequency stream — and without somewhere to say so, every consumer has to
-// guess it back from the key string and the sample type. Purely descriptive:
-// nothing in the engine reads this, only views.
-//
-// AnnotationStreamInfo stays separate rather than merging into this. It
-// describes *protocol* semantics (radix, bitrate, producing decoder) that a
-// downstream decoder consumes, which is a different concern from how a plot
-// should present the stream.
+// Stream-level presentation descriptor, declared by the producing block and read only by
+// views. Kept apart from AnnotationStreamInfo, which carries protocol semantics a
+// downstream decoder consumes.
 struct StreamInfo
 {
 	// Display name. Empty means the view derives one from the key.
@@ -145,9 +117,7 @@ struct StreamInfo
 	// against FFT magnitudes. Empty means X is the sample index.
 	DataKey xKey;
 
-	// How to draw it, and — since the default is Hidden — also whether to draw
-	// it at all. There is no separate opt-in flag: a stream a producer never
-	// described stays Hidden, and naming any other kind *is* the opt-in.
+	// How to draw it. Hidden (the default) also means "not drawn".
 	ReprKind kind{ReprKind::Hidden};
 
 	// Index into the view's channel palette. -1 = let the view assign.
@@ -196,11 +166,8 @@ SCOPY_CORE_EXPORT QVector<float> toFloat(const SampleVariant &v);
 SCOPY_CORE_EXPORT FloatView toFloatView(const SampleVariant &v, QVector<float> &scratch);
 SCOPY_CORE_EXPORT QVector<quint8> toBits(const SampleVariant &v); // != 0 -> 1
 
-// Drops everything past the first `n` samples. Annotation chunks pass through
-// untouched — use shiftAnnotations() for those.
-//
-// Turns a right-anchored window of length n+extra into one ending `extra` samples
-// earlier, i.e. centred on a sample sitting `extra` positions from its right end.
+// Keeps the first `n` samples. Annotation chunks pass through untouched (see
+// shiftAnnotations()). Turns an over-long right-anchored window into one ending earlier.
 SCOPY_CORE_EXPORT SampleVariant truncateWindow(const SampleVariant &v, int n);
 
 // Offsets every annotation by `delta` and drops those leaving [0, n). Annotations

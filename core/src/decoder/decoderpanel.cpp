@@ -462,7 +462,7 @@ void DecoderEditor::refreshKeys(const QList<scopy::acq::DataKey> &keys)
 		c->clear();
 		c->addItem(CH_UNASSIGNED, QString());
 		for(const auto &k : raw)
-			c->addItem(k.key, k.key);
+			c->addItem(k.toString(), k.toString());
 
 		int idx = 0;
 		if(!prev.isEmpty()) {
@@ -493,7 +493,7 @@ void DecoderEditor::refreshAnnotationSources()
 			const QString upstreamId = (stage < d.stageIds.size()) ? d.stageIds[stage] : QString();
 			const QString label =
 				QStringLiteral("%1 · stage %2 (%3)").arg(d.uid).arg(stage).arg(upstreamId);
-			m_annSourceCombo->addItem(label, k.key);
+			m_annSourceCombo->addItem(label, k.toString());
 		}
 	}
 

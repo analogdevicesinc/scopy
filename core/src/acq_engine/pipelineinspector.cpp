@@ -45,7 +45,7 @@ QString joinKeys(const QList<DataKey> &keys)
 	QStringList parts;
 	parts.reserve(keys.size());
 	for(const DataKey &k : keys)
-		parts << k.key;
+		parts << k.toString();
 	return parts.join(QStringLiteral(", "));
 }
 
@@ -202,8 +202,8 @@ void PipelineInspector::rebuild()
 			stage->setFlags(Qt::ItemIsEnabled);
 			stage->setText(ColBlock, QStringLiteral("stage %1").arg(s));
 			stage->setText(ColStatus, QString());
-			stage->setText(ColIn, outs.at(s - 1).key);
-			stage->setText(ColOut, outs.at(s).key);
+			stage->setText(ColIn, outs.at(s - 1).toString());
+			stage->setText(ColOut, outs.at(s).toString());
 		}
 		item->setExpanded(true);
 	}

@@ -67,15 +67,16 @@ QWidget *labelledRow(const QString &text, QWidget *field, QWidget *parent)
 // fall back to index 0 and silently retarget the slot.
 void selectKey(QComboBox *box, const DataKey &key)
 {
-	if(!box || key.key.isEmpty()) {
+	if(!box || key.toString().isEmpty()) {
 		return;
 	}
 	QSignalBlocker b(box);
-	if(box->findData(key.key) < 0) {
-		box->insertItem(0, QCoreApplication::translate("SnapshotSourceWidget", "%1 (absent)").arg(key.key),
-				key.key);
+	if(box->findData(key.toString()) < 0) {
+		box->insertItem(0,
+				QCoreApplication::translate("SnapshotSourceWidget", "%1 (absent)").arg(key.toString()),
+				key.toString());
 	}
-	box->setCurrentIndex(box->findData(key.key));
+	box->setCurrentIndex(box->findData(key.toString()));
 }
 
 // Frame 1 of N rather than 0: the playhead is an implementation index.

@@ -68,15 +68,16 @@ QWidget *labelledRow(const QString &text, QWidget *field, QWidget *parent, QLabe
 // fall back to index 0 and silently retarget the FFT at a different channel.
 void selectKey(QComboBox *box, const DataKey &key)
 {
-	if(!box || key.key.isEmpty()) {
+	if(!box || key.toString().isEmpty()) {
 		return;
 	}
 	QSignalBlocker b(box);
-	if(box->findData(key.key) < 0) {
-		box->insertItem(0, QCoreApplication::translate("GenalyzerInputSettings", "%1 (absent)").arg(key.key),
-				key.key);
+	if(box->findData(key.toString()) < 0) {
+		box->insertItem(
+			0, QCoreApplication::translate("GenalyzerInputSettings", "%1 (absent)").arg(key.toString()),
+			key.toString());
 	}
-	box->setCurrentIndex(box->findData(key.key));
+	box->setCurrentIndex(box->findData(key.toString()));
 }
 
 } // namespace
@@ -266,7 +267,7 @@ void GenalyzerInputSettings::pushInputs()
 	QList<DataKey> keys;
 	switch(mode) {
 	case FFTMode::Real:
-		if(!first.key.isEmpty()) {
+		if(!first.toString().isEmpty()) {
 			keys << first;
 		}
 		break;
@@ -274,7 +275,7 @@ void GenalyzerInputSettings::pushInputs()
 		// Both halves or neither. A complex pair with one key missing is not a
 		// real transform of the other — it would measure a different thing and
 		// label it the same way, so the block idles until the pair is complete.
-		if(!first.key.isEmpty() && !second.key.isEmpty()) {
+		if(!first.toString().isEmpty() && !second.toString().isEmpty()) {
 			keys << first << second;
 		}
 		break;
@@ -314,8 +315,9 @@ void GenalyzerInputSettings::updateState()
 		return;
 	}
 
-	const bool incomplete = (real && keyFromCombo(m_firstKey).key.isEmpty()) ||
-		(complex && (keyFromCombo(m_firstKey).key.isEmpty() || keyFromCombo(m_secondKey).key.isEmpty()));
+	const bool incomplete = (real && keyFromCombo(m_firstKey).toString().isEmpty()) ||
+		(complex &&
+		 (keyFromCombo(m_firstKey).toString().isEmpty() || keyFromCombo(m_secondKey).toString().isEmpty()));
 
 	if(mode == FFTMode::None) {
 		m_hint->setText(tr("No inputs — pick one stream for a real FFT, or two for a complex I/Q pair."));

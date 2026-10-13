@@ -27,7 +27,9 @@
 #include "datakey.h"
 #include "datastore.h"
 
+#include <atomic>
 #include <QList>
+#include <QMutex>
 #include <QString>
 
 namespace scopy {
@@ -35,29 +37,42 @@ namespace acq {
 
 // Transforms DataStore streams: reads its watchedKeys, writes derived keys.
 //
-// The engine runs process() once per cycle, but only after every watched key has
-// been written that cycle — that ordering constraint is the whole scheduling
-// contract, so a processor chain is expressed purely by which keys each link
-// watches. A processor whose inputs never arrive is skipped for the cycle.
+// The engine runs process() once per cycle, after every watched key has been
+// written that cycle, so a processor chain is expressed purely by which keys each
+// link watches. A processor whose inputs never arrive is skipped for the cycle.
 //
-// process() runs on the worker thread. Configuration set from the GUI must
-// therefore be either atomic or mutex-guarded.
+// process() runs on the worker thread; configuration set from the GUI must be
+// atomic or mutex-guarded. The watched-key list already is: read it through
+// watchedKeys(), which returns a snapshot.
 class SCOPY_CORE_EXPORT ProcessorBlock : public Block
 {
 	Q_OBJECT
 public:
 	explicit ProcessorBlock(const QString &name, QObject *parent = nullptr);
 
-	virtual const QList<DataKey> &watchedKeys() const { return m_watchedKeys; }
-	virtual void setWatchedKeys(const QList<DataKey> &keys) { m_watchedKeys = keys; }
+	// Thread-safe snapshot. Safe to call from any thread while running.
+	QList<DataKey> watchedKeys() const;
+	virtual void setWatchedKeys(const QList<DataKey> &keys) { storeWatchedKeys(keys); }
 
 	virtual void process(DataStore *store) = 0;
 
-	// Called before each run so stateful processors can drop carry-over.
+	// Called on the worker before each run so stateful processors can drop carry-over.
 	virtual void reset() {}
 
+	// Run after every other processor in the cycle, so this one observes everything
+	// they wrote — e.g. a trigger snapshotting the whole store.
+	bool runsLast() const { return m_runsLast.load(std::memory_order_relaxed); }
+	void setRunsLast(bool on) { m_runsLast.store(on, std::memory_order_relaxed); }
+
 protected:
+	// The non-virtual store behind setWatchedKeys(), for subclasses whose override
+	// does more than assign.
+	void storeWatchedKeys(const QList<DataKey> &keys);
+
+private:
+	mutable QMutex m_keysMutex;
 	QList<DataKey> m_watchedKeys;
+	std::atomic<bool> m_runsLast{false};
 };
 
 } // namespace acq

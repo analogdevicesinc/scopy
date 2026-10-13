@@ -27,6 +27,7 @@
 #include "processorblock.h"
 #include "samplebuffer.h"
 
+#include <atomic>
 #include <QList>
 #include <QMap>
 #include <QMutex>
@@ -129,9 +130,9 @@ public:
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 Q_SIGNALS:
-	// Emitted from the engine worker thread; consumers must use QueuedConnection.
-	// snapshot holds one assembled window per DataStore key, captured at emit
-	// time, so the GUI plots exactly the fire's window even if the free-running
+	// Delivered on the processor's own (GUI) thread and coalesced: if fires arrive
+	// faster than the GUI drains them, only the newest is delivered. snapshot holds one assembled window per
+	// DataStore key, captured at emit time, so the GUI plots exactly the fire's window even if the free-running
 	// worker has already advanced past it. sampleIndex indexes into those
 	// windows (or into the newest chunk when windowSize() == 0).
 	void fired(quint32 sampleIndex, QMap<QString, scopy::acq::SampleVariant> snapshot);
@@ -144,6 +145,16 @@ Q_SIGNALS:
 
 private:
 	void rebuildWatchedKeysLocked();
+	void publishFire(quint32 sampleIndex, QMap<QString, SampleVariant> snapshot);
+
+	struct Fire
+	{
+		quint32 sampleIndex{0};
+		QMap<QString, SampleVariant> snapshot;
+	};
+	QMutex m_fireMutex;
+	Fire m_latestFire;
+	std::atomic<bool> m_firePending{false};
 
 	// Assigns under m_mutex, returning true if the value actually changed, so
 	// setters emit only on a real edit.
