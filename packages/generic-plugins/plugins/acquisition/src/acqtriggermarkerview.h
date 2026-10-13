@@ -73,11 +73,11 @@ public:
 	// Call at the *end* of an add or remove, which is what makes it safe: by then the dying
 	// plot or channel is already off the caller's lists, so there is nothing to exclude.
 	//
-	// `defaultWidth` is the window to report before anything resolves.
-	void retarget(const QList<AcqPlot *> &plots, int defaultWidth);
+	// `width` is the plot window, in samples.
+	void retarget(const QList<AcqPlot *> &plots, int width);
 
 	// Re-measure the window without re-resolving the axis, for a width change.
-	void updateWindow(int defaultWidth);
+	void updateWindow(int width);
 
 Q_SIGNALS:
 	// The window the marker's sample↔axis map now spans, in samples: the marker plot's own

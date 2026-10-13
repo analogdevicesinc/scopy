@@ -45,11 +45,6 @@ void AcqChannelRegistry::registerKind(scopy::acq::ReprKind kind, Factory f)
 	m_kinds.insert(static_cast<int>(kind), std::move(f));
 }
 
-bool AcqChannelRegistry::isRegistered(scopy::acq::ReprKind kind) const
-{
-	return m_kinds.contains(static_cast<int>(kind));
-}
-
 AcqChannel *AcqChannelRegistry::create(scopy::acq::ReprKind kind, const AcqChannel::Args &args) const
 {
 	const auto it = m_kinds.constFind(static_cast<int>(kind));

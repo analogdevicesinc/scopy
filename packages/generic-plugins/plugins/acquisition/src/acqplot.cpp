@@ -47,7 +47,6 @@ AcqPlot::AcqPlot(const QString &name, AcqPlotKind kind, quint32 uuid, QWidget *p
 	, m_name(name)
 	, m_kSlotPitchPx(26.0)
 	, m_kTopMargin(0.10)
-	, m_kDefaultPlotSize(1024)
 {
 	// Which widget class a kind means is acqplotkind.cpp's business, not this class's —
 	// which is what keeps every concrete widget type out of AcqPlot and AcqPlotManager.
@@ -76,8 +75,6 @@ AcqPlot::AcqPlot(const QString &name, AcqPlotKind kind, quint32 uuid, QWidget *p
 			}
 		});
 	}
-
-	setPlotSize(m_kDefaultPlotSize);
 }
 
 AcqPlot::~AcqPlot()
@@ -184,16 +181,6 @@ double AcqPlot::nextDigitalSlot()
 	}
 	m_nextSlot = pos - delta;
 	return pos;
-}
-
-void AcqPlot::setPlotSize(int n)
-{
-	n = qMax(1, n);
-	if(n == m_plotSize) {
-		return;
-	}
-	m_plotSize = n;
-	Q_EMIT plotSizeChanged(n);
 }
 
 void AcqPlot::setShowLabels(bool on)

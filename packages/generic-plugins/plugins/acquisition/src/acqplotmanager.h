@@ -158,16 +158,6 @@ public:
 	// only the default, the plot holds its own width and index ramp.
 	int plotSize() const { return m_plotSize; }
 
-	// The visible width a given channel reads under, in samples: its plot's own, since
-	// plots can be different widths. There is nothing else to pass — a depth claim is in
-	// samples and the DataStore converts, so no buffer size, and the sample-index ramp is
-	// a store stream rather than something handed down.
-	int plotSizeFor(AcqChannel *ch) const;
-
-	// The first plot, or null when there is none. For CursorController and anything
-	// else that binds to a PlotWidget.
-	PlotWidget *sharedPlot() const;
-
 	// Cursors are per plot and live on AcqPlot — see AcqPlot::cursors(). There is
 	// deliberately no manager-wide accessor: PlotCursors binds its handles to one canvas
 	// in its constructor and cannot be retargeted, so a single controller could only ever
@@ -258,9 +248,6 @@ public Q_SLOTS:
 	void replot();
 
 Q_SIGNALS:
-	// Payload-free, for panels that only need to know a frame landed. Mirrors
-	// PlotManager::newData() (gui/src/plotmanager.cpp:177).
-	void newData();
 
 	// The store's key set changed, on the GUI thread. Depth claims have already been
 	// re-applied and every source picker refreshed by the time this fires. Nothing is
@@ -268,18 +255,8 @@ Q_SIGNALS:
 	// the pipeline is producing.
 	void keysAvailable(QList<scopy::acq::DataKey> keys);
 
-	// The widest window any plot draws, in samples. The engine's sample-index ramp has to
-	// be at least this long or every plot wider than it reads a short X window and draws
-	// a truncated curve.
-	//
-	// A signal rather than a call, because this class deliberately holds no engine
-	// pointer (see the constructor): it states its requirement and the controller, which
-	// is the thing that knows the pipeline, applies it.
-	void maxWindowSizeChanged(int n);
-
-	// The default plot width changed, in samples. Same reason as maxWindowSizeChanged: this
-	// class states what changed and the controller, which knows the pipeline, applies it —
-	// here to the decode window.
+	// The plot width changed, in samples. A signal rather than a call: this class holds no
+	// engine, so the controller applies it (the index ramp length, the decode window).
 	void plotSizeChanged(int n);
 
 	// The window the trigger marker's sample↔axis map now spans, in samples: the marker
@@ -287,14 +264,6 @@ Q_SIGNALS:
 	// same number, so they follow this rather than each deriving it. Emitted on a retarget
 	// and on a width change.
 	void triggerWindowChanged(int samples);
-
-	void plotAdded(quint32 uuid);
-	// Before anything belonging to the plot is torn down, while it is still readable.
-	void plotRemoved(quint32 uuid);
-
-	void channelAdded(AcqChannel *ch);
-	// Before the channel is destroyed, while it is still safe to read.
-	void channelRemoved(AcqChannel *ch);
 
 private Q_SLOTS:
 	// Re-applies every channel's depth claim (reset()/remove() erase claims), greys the
@@ -310,10 +279,6 @@ private:
 	// the paths that must not wait for a frame that is not coming.
 	void markDirty() { m_dirty = true; }
 	void flushIfDirty();
-
-	// Emits maxWindowSizeChanged with the max over m_plotSize and every plot's own width.
-	// Called wherever that max can move: a width change, and a plot appearing or going.
-	void announceMaxWindowSize();
 
 	// Both forward to m_trigMarkerView, which holds neither the plot list nor the default
 	// width.

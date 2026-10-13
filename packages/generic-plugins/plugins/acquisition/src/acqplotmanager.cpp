@@ -118,8 +118,6 @@ AcqPlot *AcqPlotManager::plot(quint32 uuid) const
 	return nullptr;
 }
 
-PlotWidget *AcqPlotManager::sharedPlot() const { return m_plots.isEmpty() ? nullptr : m_plots.first()->plot(); }
-
 AcqPlot *AcqPlotManager::addPlot(const QString &name, AcqPlotKind kind)
 {
 	const quint32 uuid = m_plotUuidCounter++;
@@ -140,10 +138,6 @@ AcqPlot *AcqPlotManager::addPlot(const QString &name, AcqPlotKind kind)
 	dock->setInnerWidget(p->plot());
 	m_dockArea->addDockWrapper(dock, DockableAreaInterface::Direction_BOTTOM);
 
-	// The instrument's current window width, so a plot added later starts where the
-	// spinbox already says rather than at AcqPlot's own default.
-	p->setPlotSize(m_plotSize);
-
 	m_plots.append(p);
 	m_rail->registerPlot(p);
 	m_docks.insert(p, dock);
@@ -153,19 +147,6 @@ AcqPlot *AcqPlotManager::addPlot(const QString &name, AcqPlotKind kind)
 	// (src/freq/fftplotcomponent.cpp:128-130).
 	connect(p, &AcqPlot::nameChanged, this, [dock](const QString &n) { dock->setTitle(n); });
 
-	// Everything derived from a plot's width, on the plot's own say-so rather than only on
-	// the path that set it.
-	connect(p, &AcqPlot::plotSizeChanged, this, [this]() {
-		announceMaxWindowSize();
-		applyWindowToIndexAxes();
-		updateTriggerMarkerWindow();
-		markDirty();
-	});
-
-	announceMaxWindowSize();
-	Q_EMIT plotAdded(uuid);
-	// After the emit: a handler may add channels to the new plot, and the resolve should see
-	// them. Idempotent, so the channels' own retargets costing a second pass is harmless.
 	retargetTriggerHandle();
 	return p;
 }
@@ -176,9 +157,6 @@ void AcqPlotManager::removePlot(quint32 uuid)
 	if(!p) {
 		return;
 	}
-
-	// First, while everything below it is still readable.
-	Q_EMIT plotRemoved(uuid);
 
 	// Over a copy: removeChannel mutates the plot's list through removeChannelRef.
 	const QList<AcqChannel *> chans = p->channels();
@@ -217,7 +195,6 @@ void AcqPlotManager::removePlot(quint32 uuid)
 	// object, and destroying it ahead of the widget would free axes the widget still lists.
 	p->deleteLater();
 
-	announceMaxWindowSize();
 	// Last, with the plot already off m_plots: the resolve cannot find its axis and put the
 	// marker straight back onto the plot that just went.
 	retargetTriggerHandle();
@@ -287,16 +264,14 @@ AcqChannel *AcqPlotManager::addChannel(AcqPlot *p, scopy::acq::ReprKind kind, co
 	// full-depth instead of a single chunk.
 	reclaim(ch);
 
-	// A retarget leaves a stale claim on the key that dropped out. Releasing the whole
-	// claimant and re-claiming is exactly equivalent to releasing `dropped` alone — a
-	// channel only ever claims its own two keys — and stays correct if a kind ever starts
-	// reading a third.
+	// A retarget leaves a stale claim on the key that dropped out. Claim first, then
+	// release only that key: releasing everything first would drop a key this channel
+	// still reads to a single chunk for as long as it took to re-claim.
 	connect(ch, &AcqChannel::depthNeedsReclaim, this, [this, ch](scopy::acq::DataKey dropped) {
-		Q_UNUSED(dropped)
-		if(!m_store.isNull()) {
-			m_store->releaseClaimant(ch->claimant());
-		}
 		reclaim(ch);
+		if(!m_store.isNull() && dropped != ch->key() && dropped != ch->xKey()) {
+			m_store->releaseDepth(dropped, ch->claimant());
+		}
 		markDirty();
 	});
 
@@ -313,9 +288,7 @@ AcqChannel *AcqPlotManager::addChannel(AcqPlot *p, scopy::acq::ReprKind kind, co
 	// created before the first cycle would look live while reading nothing.
 	ch->setKeyPresent(m_store->contains(yKey));
 
-	Q_EMIT channelAdded(ch);
-	// After attach(), which is what created the channel's axis pair — the axis the marker
-	// rides is made by a channel, so this and not plotAdded is the event that matters.
+	// After attach(), which is what created the channel's axis pair the marker may ride.
 	retargetTriggerHandle();
 	markDirty();
 	return ch;
@@ -326,8 +299,6 @@ void AcqPlotManager::removeChannel(AcqChannel *ch)
 	if(!ch || !m_channels.removeOne(ch)) {
 		return;
 	}
-	Q_EMIT channelRemoved(ch);
-
 	// Before detach(), which nulls the channel's owner: the rail row was nested under the
 	// plot's row, and the rail asks the channel which plot that was.
 	m_rail->unregisterChannel(ch);
@@ -407,26 +378,6 @@ scopy::acq::DataKey AcqPlotManager::keyFromCombo(const MenuCombo *combo) { retur
 
 // --- geometry --------------------------------------------------------------
 
-int AcqPlotManager::plotSizeFor(AcqChannel *ch) const
-{
-	AcqPlot *p = ch ? ch->plotOwner() : nullptr;
-	// The plot's own width: plots can be different widths, so a channel's width is its
-	// plot's. The manager's default covers a channel read while detached, which pull()
-	// should never be doing but must not crash on.
-	return p ? p->plotSize() : m_plotSize;
-}
-
-void AcqPlotManager::announceMaxWindowSize()
-{
-	// Max, not the manager's default: two plots can be different widths, and the one ramp
-	// has to satisfy the widest. A narrower plot reads its tail.
-	int n = m_plotSize;
-	for(AcqPlot *p : std::as_const(m_plots)) {
-		n = qMax(n, p->plotSize());
-	}
-	Q_EMIT maxWindowSizeChanged(n);
-}
-
 void AcqPlotManager::applyWindowToIndexAxes()
 {
 	for(AcqChannel *ch : std::as_const(m_channels)) {
@@ -437,9 +388,8 @@ void AcqPlotManager::applyWindowToIndexAxes()
 			continue;
 		}
 		// Same formula as AcqCurveChannel::readData(): 0..(width-1), scaled by the
-		// rate for Time. The width this channel's own plot was given, which is not
-		// necessarily m_plotSize — plots can be different widths.
-		const int width = qMax(1, plotSizeFor(ch));
+		// rate for Time.
+		const int width = qMax(1, m_plotSize);
 		const double rate = ch->sampleRate() > 0.0 ? ch->sampleRate() : 1.0;
 		const double scale = ax->mode() == AcqAxis::Source::Mode::Time ? 1.0 / rate : 1.0;
 		// requestInterval() drops repeats and is a no-op while autoscale is on, so this
@@ -456,16 +406,12 @@ void AcqPlotManager::setPlotSize(int n)
 	}
 	m_plotSize = n;
 
-	for(AcqPlot *p : std::as_const(m_plots)) {
-		p->setPlotSize(n);
-	}
 	// The index-based axes are the plot window by definition, so the new width *is*
 	// their new range and it is known without reading a sample. Pushed here rather
 	// than left to the next readData(): while stopped there is no next read, so the
 	// axis kept the old width's range until the run was restarted.
 	applyWindowToIndexAxes();
 	reclaimAll();
-	announceMaxWindowSize();
 	// The marker's axis needs nothing — the curve re-requests its range on the next read —
 	// but its window does, and one call carries the new width to the marker and to whoever
 	// owns the processor, so the two cannot disagree.
@@ -491,7 +437,7 @@ void AcqPlotManager::setFallbackSampleRate(double sr)
 void AcqPlotManager::reclaim(AcqChannel *ch)
 {
 	if(ch) {
-		ch->reclaimDepth(plotSizeFor(ch));
+		ch->reclaimDepth(m_plotSize);
 	}
 }
 
@@ -531,7 +477,7 @@ void AcqPlotManager::onKeysChanged(QList<scopy::acq::DataKey> keys)
 void AcqPlotManager::onCycleComplete()
 {
 	for(AcqChannel *ch : std::as_const(m_channels)) {
-		ch->pull(plotSizeFor(ch));
+		ch->pull(m_plotSize);
 	}
 	// Deliberately no replot here — the frame timer owns repainting.
 	markDirty();
@@ -540,7 +486,7 @@ void AcqPlotManager::onCycleComplete()
 void AcqPlotManager::onTriggerFired(const QMap<QString, scopy::acq::SampleVariant> &snap)
 {
 	for(AcqChannel *ch : std::as_const(m_channels)) {
-		ch->pull(plotSizeFor(ch), &snap);
+		ch->pull(m_plotSize, &snap);
 	}
 	markDirty();
 	// Only while stopped: the trigger's single-shot stops the engine on the fire, so a Single
@@ -558,7 +504,6 @@ void AcqPlotManager::onStarted()
 	// cycle landed.
 	for(AcqChannel *ch : std::as_const(m_channels)) {
 		ch->reset();
-		ch->onStarted();
 	}
 	markDirty();
 	m_frameTimer->start();
@@ -590,7 +535,6 @@ void AcqPlotManager::replot()
 	for(AcqPlot *p : std::as_const(m_plots)) {
 		p->replot();
 	}
-	Q_EMIT newData();
 }
 
 #include "moc_acqplotmanager.cpp"

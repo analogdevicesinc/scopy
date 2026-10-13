@@ -220,7 +220,7 @@ void TST_AcqChannelDelete::sampleIndexIsMonotonicAcrossChunks()
 	AcqPlotManager mgr(&store, nullptr, &shell);
 	// The connection AcqInstrumentController makes, so the ramp tracks the width the
 	// plots actually ask for rather than the engine's default.
-	QObject::connect(&mgr, &AcqPlotManager::maxWindowSizeChanged, &engine,
+	QObject::connect(&mgr, &AcqPlotManager::plotSizeChanged, &engine,
 			 [&engine](int n) { engine.setIndexRampLength(static_cast<std::size_t>(n)); });
 	mgr.setPlotSize(kPlotSize);
 
@@ -310,7 +310,7 @@ void TST_AcqChannelDelete::sampleIndexSpansPlotWindowWhileFilling()
 
 	InstrumentTemplate shell;
 	AcqPlotManager mgr(&store, nullptr, &shell);
-	QObject::connect(&mgr, &AcqPlotManager::maxWindowSizeChanged, &engine,
+	QObject::connect(&mgr, &AcqPlotManager::plotSizeChanged, &engine,
 			 [&engine](int n) { engine.setIndexRampLength(static_cast<std::size_t>(n)); });
 	mgr.setPlotSize(kPlotSize);
 
