@@ -62,8 +62,6 @@ public:
 	// Null when the kind was never registered.
 	AcqChannel *create(scopy::acq::ReprKind kind, const AcqChannel::Args &args) const;
 
-	bool isRegistered(scopy::acq::ReprKind kind) const;
-
 private:
 	AcqChannelRegistry() = default;
 
