@@ -65,9 +65,9 @@ public:
 		out.anchors.clear();
 		out.anchors.reserve(sym.size());
 
-		// sigrok's `-I protocoldata:protocol=uart` emits a single wire "rxtx".
+		// sigrok's `-I protocoldata:protocol=uart` emits a single wire "rxtx". Bound to rx
+		// only: binding tx to the same wire makes every stacked decoder see each byte twice.
 		out.rootChannelOverrides["rx"] = "rxtx";
-		out.rootChannelOverrides["tx"] = "rxtx";
 
 		for(const ExtractedSymbol &s : sym) {
 			if(s.tag != SymbolTag::Data)
