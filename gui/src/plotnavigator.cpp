@@ -377,23 +377,26 @@ void PlotNavigator::addChannel(PlotChannel *channel)
 void PlotNavigator::addAxis(PlotAxis *axis)
 {
 	QwtAxisId axisId = axis->axisId();
-	// Everything inside the guard: PlotWidget::addPlotAxis now calls this for every axis and
-	// a caller may still call it itself, so a repeat has to be a no-op.
-	if(!m_axes->contains(axisId)) {
-		m_axes->insert(axisId);
-		addNavigators(axisId);
-		setBaseRect(axisId);
-		m_visibleZoomer->setEnabled(isZoomerEn());
+	// A repeat is a no-op: PlotWidget::addPlotAxis calls this for every axis and a caller
+	// may still call it itself.
+	if(m_axes->contains(axisId)) {
+		return;
 	}
+	m_axes->insert(axisId);
+	addNavigators(axisId);
+	setBaseRect(axisId);
 
-	// Connect axis scale updates for auto-base rect
-	connect(axis, &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
-		if(m_autoBase) {
-			setBaseRect(axisId);
-			if(m_resetOnNewBase)
-				Q_EMIT reset();
-		}
-	});
+	// addNavigators() already follows the axis the plot widget knows by this id. Only an
+	// axis it does not (e.g. one a WaterfallPlotWidget tracks itself) needs its own wire.
+	if(!m_plotWidget || m_plotWidget->plotAxisFromId(axisId) != axis) {
+		connect(axis, &PlotAxis::axisScaleUpdated, this, [this, axisId]() {
+			if(m_autoBase) {
+				setBaseRect(axisId);
+				if(m_resetOnNewBase)
+					Q_EMIT reset();
+			}
+		});
+	}
 	m_visibleZoomer->setEnabled(isZoomerEn());
 }
 
