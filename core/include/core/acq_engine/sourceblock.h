@@ -37,9 +37,11 @@ namespace acq {
 
 // Produces sample chunks into the DataStore, one per enabled channel per cycle.
 //
-// Lifecycle, all on the engine's worker thread: onStart() once, acquire() per
-// cycle, onStop() once. Throwing from any of them aborts the run and surfaces
-// as a Critical report.
+// Lifecycle, all on the engine's worker thread: onStart() before the first
+// acquire(), acquire() per cycle, onStop() once done. A source enabled or added
+// mid-run is started at the next cycle boundary; one disabled or removed is
+// stopped there. Throwing from any of them aborts the run and surfaces as a
+// Critical report.
 //
 // The channel map is shared with the GUI thread, so acquire() must go through
 // enabledChannels() rather than touch it directly; the returned list is a
@@ -63,6 +65,11 @@ public:
 	// Acquire and release device resources. Overrides must call the base.
 	virtual void onStart();
 	virtual void onStop();
+
+	// Sets stopRequested(). Overrides that can cancel a blocking read should do so,
+	// then call the base.
+	void requestStop() override;
+	bool stopRequested() const { return m_stopRequested.load(std::memory_order_relaxed); }
 
 	const QString &id() const { return name(); }
 
@@ -96,7 +103,7 @@ Q_SIGNALS:
 	void channelEnabledChanged(const QString &channelId, bool en);
 
 protected:
-	std::size_t m_bufferSize{1024};
+	std::atomic<std::size_t> m_bufferSize{1024};
 	std::atomic<bool> m_stopRequested{false};
 
 private:

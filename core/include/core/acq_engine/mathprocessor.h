@@ -51,6 +51,8 @@ public:
 	void setWatchedKeys(const QList<DataKey> &keys) override;
 
 	void process(DataStore *store) override;
+	void reset() override { m_evaluator.resetEngine(); }
+	void requestStop() override { m_evaluator.interrupt(); }
 	QWidget *createSettingsWidget(QWidget *parent = nullptr) override;
 
 	void setFormula(const QString &formula);

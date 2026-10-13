@@ -38,9 +38,9 @@ ScaleOffsetProcessor::~ScaleOffsetProcessor() { qDeleteAll(m_channels); }
 ScaleOffsetProcessor::ChannelConfig *ScaleOffsetProcessor::addChannel(const DataKey &inputKey, const DataKey &outputKey,
 								      const QString &label)
 {
-	auto *cfg = new ChannelConfig(inputKey, outputKey, label.isEmpty() ? inputKey.key : label);
+	auto *cfg = new ChannelConfig(inputKey, outputKey, label.isEmpty() ? inputKey.toString() : label);
 	m_channels.append(cfg);
-	m_watchedKeys.append(inputKey);
+	storeWatchedKeys(watchedKeys() << inputKey);
 	return cfg;
 }
 

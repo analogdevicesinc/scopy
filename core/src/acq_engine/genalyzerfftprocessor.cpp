@@ -71,7 +71,7 @@ GenalyzerFFTProcessor::GenalyzerFFTProcessor(const DataKey &outputKey, const Dat
 	, m_sampleRate(sampleRate)
 	, m_window(window)
 {
-	// m_watchedKeys stays empty: no inputs until the reader picks them. Still sized,
+	// The watched keys stay empty: no inputs until the reader picks them. Still sized,
 	// so the buffers are in a defined state if something calls process() first.
 	resizeForNfft(m_nfft, FFTMode::None, 1);
 }
@@ -86,7 +86,7 @@ GenalyzerFFTProcessor::GenalyzerFFTProcessor(const DataKey &iKey, const DataKey 
 	, m_sampleRate(sampleRate)
 	, m_window(window)
 {
-	m_watchedKeys = {iKey, qKey};
+	storeWatchedKeys({iKey, qKey});
 	resizeForNfft(m_nfft, FFTMode::Complex, 1);
 }
 
@@ -99,7 +99,7 @@ GenalyzerFFTProcessor::GenalyzerFFTProcessor(const DataKey &inKey, const DataKey
 	, m_sampleRate(sampleRate)
 	, m_window(window)
 {
-	m_watchedKeys = {inKey};
+	storeWatchedKeys({inKey});
 	resizeForNfft(m_nfft, FFTMode::Real, 1);
 }
 
@@ -117,7 +117,7 @@ GenalyzerFFTProcessor::~GenalyzerFFTProcessor()
 namespace {
 // The one place the key count maps to a transform. process() re-derives it from
 // the count it actually read rather than calling mode(), so that both agree
-// without the cycle path reaching for m_watchedKeys twice.
+// without the cycle path reading the key list twice.
 GenalyzerFFTProcessor::FFTMode modeForKeyCount(int n)
 {
 	switch(n) {
@@ -131,7 +131,7 @@ GenalyzerFFTProcessor::FFTMode modeForKeyCount(int n)
 }
 } // namespace
 
-GenalyzerFFTProcessor::FFTMode GenalyzerFFTProcessor::mode() const { return modeForKeyCount(m_watchedKeys.size()); }
+GenalyzerFFTProcessor::FFTMode GenalyzerFFTProcessor::mode() const { return modeForKeyCount(watchedKeys().size()); }
 
 void GenalyzerFFTProcessor::setInputs(const QList<DataKey> &keys)
 {
@@ -146,12 +146,13 @@ void GenalyzerFFTProcessor::setInputs(const QList<DataKey> &keys)
 	// Empty keys would make the block watch a stream that cannot exist, so it would
 	// never be scheduled and never say why.
 	for(const DataKey &k : keys) {
-		if(k.key.isEmpty()) {
+		if(k.toString().isEmpty()) {
 			report(AcquisitionError::Severity::Warning, QStringLiteral("setInputs: empty key rejected"));
 			return;
 		}
 	}
-	if(keys == m_watchedKeys) {
+	const QList<DataKey> oldKeys = watchedKeys();
+	if(keys == oldKeys) {
 		return;
 	}
 
@@ -159,7 +160,7 @@ void GenalyzerFFTProcessor::setInputs(const QList<DataKey> &keys)
 	// is keyed (key, claimant), so dropping the list first would leave this block's
 	// claim pinning history on a key it no longer reads.
 	if(m_avgStore) {
-		for(const DataKey &k : m_watchedKeys) {
+		for(const DataKey &k : oldKeys) {
 			m_avgStore->releaseDepth(k, name());
 		}
 	}
@@ -167,7 +168,7 @@ void GenalyzerFFTProcessor::setInputs(const QList<DataKey> &keys)
 	const FFTMode newMode = modeForKeyCount(keys.size());
 	{
 		std::lock_guard<std::mutex> lock(s_genalyzerMutex);
-		m_watchedKeys = keys;
+		storeWatchedKeys(keys);
 		// Complex and real stage differently sized buffers and a different axis, so a
 		// mode switch is a resize. process() would catch it on the next cycle anyway;
 		// doing it here is what lets the widget read the new bin count immediately.
@@ -266,7 +267,7 @@ void GenalyzerFFTProcessor::reclaimAveragingDepth()
 	// One claim per watched key under this block's name. A claim replaces that
 	// claimant's previous one, so shrinking navg releases the depth too.
 	const std::size_t want = static_cast<std::size_t>(qMax(1, m_navg.load(std::memory_order_relaxed)));
-	for(const DataKey &k : m_watchedKeys)
+	for(const DataKey &k : watchedKeys())
 		m_avgStore->claimDepth(k, name(), DataStore::Claim::chunks(want));
 }
 
@@ -734,7 +735,7 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 	// two keys at the top and one further down would index past chan[] — a crash
 	// where the contract violation should only cost a bad frame. A QList copy is a
 	// refcount bump.
-	const QList<DataKey> keys = m_watchedKeys;
+	const QList<DataKey> keys = watchedKeys();
 	const int nWatched = keys.size();
 	const FFTMode currentMode = modeForKeyCount(nWatched);
 	if(currentMode == FFTMode::None) {
@@ -747,6 +748,15 @@ void GenalyzerFFTProcessor::process(DataStore *store)
 			   QStringLiteral("no inputs selected; pick 1 (real) or 2 (complex I/Q) streams"));
 		return;
 	}
+	// The input's own timeline when its producer declares one, so the bins land at the
+	// real frequencies; the settings field's value otherwise. Before any lock is taken:
+	// setSampleRate() takes the genalyzer mutex, and streamInfo() calls into other blocks.
+	if(auto *eng = qobject_cast<AcquisitionEngine *>(parent())) {
+		const std::optional<StreamInfo> info = eng->streamInfo(keys[0]);
+		if(info && info->sampleRate > 0.0)
+			setSampleRate(info->sampleRate);
+	}
+
 	const int navgMax = qMax(1, m_navg.load(std::memory_order_relaxed));
 
 	// nfft is the length of one chunk — one acquisition buffer is one FFT frame,

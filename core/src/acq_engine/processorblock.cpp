@@ -21,12 +21,26 @@
 
 #include "processorblock.h"
 
+#include <QMutexLocker>
+
 namespace scopy {
 namespace acq {
 
 ProcessorBlock::ProcessorBlock(const QString &name, QObject *parent)
 	: Block(name, parent)
 {}
+
+QList<DataKey> ProcessorBlock::watchedKeys() const
+{
+	QMutexLocker lk(&m_keysMutex);
+	return m_watchedKeys;
+}
+
+void ProcessorBlock::storeWatchedKeys(const QList<DataKey> &keys)
+{
+	QMutexLocker lk(&m_keysMutex);
+	m_watchedKeys = keys;
+}
 
 } // namespace acq
 } // namespace scopy

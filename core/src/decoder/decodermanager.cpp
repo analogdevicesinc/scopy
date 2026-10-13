@@ -42,15 +42,11 @@ DecoderManager::DecoderManager(scopy::acq::AcquisitionEngine *engine, scopy::acq
 
 DecoderManager::~DecoderManager()
 {
-	// Every pointer here is normally already null at this point — see m_engine in the header.
-	// This loop is the orderly path, removeDecoder() while the instrument is alive; a shutdown
-	// walks it finding nothing to do. It must not assume otherwise: a raw d.proc->deleteLater()
-	// segfaulted on every close.
+	// The engine owns the processors: removeProcessor() disposes of them once the worker
+	// has let go. With the engine already gone they went with it.
 	for(const DecoderInstance &d : m_decoders) {
 		if(!m_engine.isNull() && !d.proc.isNull())
 			m_engine->removeProcessor(d.proc);
-		if(!d.proc.isNull())
-			d.proc->deleteLater();
 	}
 	m_decoders.clear();
 }
@@ -239,8 +235,6 @@ void DecoderManager::removeDecoder(const QString &uid)
 			if(m_store)
 				m_store->remove(k);
 		}
-		if(d.proc)
-			d.proc->deleteLater();
 		if(!d.outKeys.isEmpty())
 			Q_EMIT stagesRemoved(uid, d.outKeys);
 		Q_EMIT decoderRemoved(uid);
