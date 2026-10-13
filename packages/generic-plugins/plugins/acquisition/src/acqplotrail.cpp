@@ -263,7 +263,7 @@ QWidget *AcqPlotRail::createPlotPage(AcqPlot *p, Entry &entry)
 	Style::setStyle(addBtn, style::properties::button::borderButton);
 	connect(addBtn, &QAbstractButton::clicked, this, [this, p, yCombo, xCombo, reprCombo]() {
 		const scopy::acq::DataKey yKey = keyFromCombo(yCombo);
-		if(yKey.key.isEmpty()) {
+		if(yKey.toString().isEmpty()) {
 			// Either nothing is selected or the store has no streams yet. The sample index is
 			// not offered on the Y picker, so an empty key here is always "no source".
 			qWarning(CAT_ACQ_PLOTRAIL) << "no Y source selected";
